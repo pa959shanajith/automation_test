@@ -380,6 +380,22 @@
 }
 /******Custom Bootstrap Dialog CSS******/
 
+/******************Header CSS***************************/
+.userInfo
+{
+	vertical-align: middle;
+	position: relative;
+	top: 3px;
+}
+#displayUsername
+{
+	vertical-align: middle;
+	position: relative;
+	top: 4px;
+}
+
+/******************Header CSS***************************/
+
 /******************Admin CSS***************************/
 nav {
     z-index: 1;

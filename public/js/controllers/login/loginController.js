@@ -3,29 +3,7 @@ mySPA.controller('loginController', function ($scope, $http, $location, LoginSer
     $scope.loginValidation = "";
     window.localStorage['LoginSuccess'] = "False";
     $("#yearlogin").text(new Date().getFullYear());
-    var availablePlugins = [{
-        "id": "123478",
-        "pluginName": "Mindmap"
-      }, {
-        "id": "4846654",
-        "pluginName": "Neuron 2D"
-      }, {
-        "id": "4464166",
-        "pluginName": "Neuron 3D"
-      }, {
-        "id": "5458468",
-        "pluginName": "Oxbow Code Identifier"
-      }, {
-        "id": "56466",
-        "pluginName": "Reports"
-      }, {
-        "id": "8579469",
-        "pluginName": "Dead Code Identifier"
-      }, {
-        "id": "544684",
-        "pluginName": "RAID"
-      }];
-    window.localStorage['availablePlugins'] = angular.toJson(availablePlugins)
+   
     $scope.check_credentials = function (path) {
         cfpLoadingBar.start();
         $scope.loginValidation = "";
@@ -67,6 +45,30 @@ mySPA.controller('loginController', function ($scope, $http, $location, LoginSer
 
                             LoginService.loadUserInfo_Nineteen68(username)
                                 .then(function (data) {
+                                	//To be removed - Has to come from database
+                                	 var availablePlugins = [{
+                                	        "id": "123478",
+                                	        "pluginName": "Mindmap"
+                                	      }, {
+                                	        "id": "4846654",
+                                	        "pluginName": "Neuron 2D"
+                                	      }, {
+                                	        "id": "4464166",
+                                	        "pluginName": "Neuron 3D"
+                                	      }, {
+                                	        "id": "5458468",
+                                	        "pluginName": "Oxbow Code Identifier"
+                                	      }, {
+                                	        "id": "56466",
+                                	        "pluginName": "Reports"
+                                	      }, {
+                                	        "id": "8579469",
+                                	        "pluginName": "Dead Code Identifier"
+                                	      }, {
+                                	        "id": "544684",
+                                	        "pluginName": "RAID"
+                                	      }];
+                                	data.pluginsInfo = availablePlugins;
                                     window.localStorage['LoginSuccess'] = "True";
                                     window.localStorage['_UI'] = JSON.stringify(data);
                                     var role = data.role;
