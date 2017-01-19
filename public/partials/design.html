@@ -10,7 +10,7 @@
 			<div id="left-top-section">
 				<ul>
 					<li><span><a class='scrapeOnTxt' href='#'>Scrape On</a></span></li>
-					<li><a href='#'><span><img src='imgs/ic-ie.png' alt='Internet Explorer' /></span>Internet Explorer</a></li>
+					<li><a href='#' ng-click="initScraping('1'); $event.preventDefault(); $event.stopPropagation();"><span><img src='imgs/ic-ie.png' alt='Internet Explorer' /></span>Internet Explorer</a></li>
 					<li><a href='#'><span><img src='imgs/ic-chrome.png' alt='Google Chrome' /></span>Google Chrome</a></li>
 					<li><a href='#'><span><img src='imgs/ic-mozilla.png' alt='Mozilla Firefox' /></span>Mozilla Firefox</a></li>
 					<li class="last"><span style="margin-bottom:-5px"><input id="enableAppend" type='checkbox' value=""></span><label for="enableAppend">Append</label></li>
@@ -31,7 +31,15 @@
 
 	<!--Middle Panel-->
 	<div id="middle-content-section">
-		adgvgv
+		<!--Task Name-->
+		<div id="design-taskName">
+			<span>AHRI-Identify objects related to login location screen</span>	
+		</div>
+		<!--Task Name-->
+
+		<!--Scrape Tree-->
+		<div id="finalScrap" class="wrap"></div>
+		<!--Scrape Tree-->
 	</div>
 	<!--Middle Panel-->
 

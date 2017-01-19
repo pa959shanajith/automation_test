@@ -12,43 +12,7 @@
 			<!--Left Plugins-->
 			<div class="col-md-7">
 				<h2 class="heading-light">Available Plugins</h2>
-				<div class="col-md-12 plugin-container">
-					<!--Plugin Block-->
-					<div class="col-md-4 plugin-block"><span id='mindmap'>Mindmap</span></div>
-					<!--Plugin Block-->
-					
-					<!--Plugin Block-->
-					<div class="col-md-4 plugin-block"><span id='neuron_2d'>Neuron 2D</span></div>
-					<!--Plugin Block-->
-
-					<!--Plugin Block-->
-					<div class="col-md-4 plugin-block"><span id='neuron_3d'>Neuron 3D</span></div>
-					<!--Plugin Block-->
-
-					<!--Plugin Block-->
-					<div class="col-md-4 plugin-block"><span id='flow_chart_generator'>Flow Chart Generator</span></div>
-					<!--Plugin Block-->
-					
-					<!--Plugin Block-->
-					<div class="col-md-4 plugin-block"><span id='Oxbow_Code_Identifier'>Oxbow Code Identifier</span></div>
-					<!--Plugin Block-->
-
-					<!--Plugin Block-->
-					<div class="col-md-4 plugin-block"><span id='Test_Data_Generator'>Test Data Generator</span></div>
-					<!--Plugin Block-->
-
-					<!--Plugin Block-->
-					<div class="col-md-4 plugin-block"><span id='Dead_Code_Identifier'>Dead Code Identifier</span></div>
-					<!--Plugin Block-->
-					
-					<!--Plugin Block-->
-					<div class="col-md-4 plugin-block"><span id='Reports'>Reports</span></div>
-					<!--Plugin Block-->
-
-					<!--Plugin Block-->
-					<div class="col-md-4 plugin-block"><span id='Raid'>RAID</span></div>
-					<!--Plugin Block-->
-				</div>
+				<div id="plugin-container" class="col-md-12 plugin-container"></div>
 			</div>
 			<!--Left Plugins-->
 
@@ -77,7 +41,7 @@
 							<div class="panel-heading">
 								<h4 class="panel-title">
 									<div class="collapse-head" data-toggle="collapse" data-parent="#accordion" href="#collapse1">
-										Task 1
+										<span class="taskNo">Task 1</span>
 										<!--Addition-->
 										<div class="panel-additional-details">
 											<span class="panel-head-time">10:00 AM</span>
@@ -88,9 +52,10 @@
 								</h4>
 							</div>
 							<div id="collapse1" class="panel-collapse collapse">
-								<div class="panel-body">Lorem ipsum dolor sit amet, consectetur adipisicing elit,
-								sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-								quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</div>
+								<div class="panel-body">
+									<span class="assignedTaskName"></span>
+									<span class="assignedTask"></span>	
+								</div>
 							</div>
 						</div>
 						<!--Panel Block-->
@@ -100,7 +65,7 @@
 							<div class="panel-heading">
 								<h4 class="panel-title">
 									<div class="collapse-head" data-toggle="collapse" data-parent="#accordion" href="#collapse2">
-										Task 2
+										<span class="taskNo">Task 2</span>
 										<!--Addition-->
 										<div class="panel-additional-details">
 											<span class="panel-head-time">10:00 AM</span>
@@ -111,58 +76,15 @@
 								</h4>
 							</div>
 							<div id="collapse2" class="panel-collapse collapse">
-								<div class="panel-body">Lorem ipsum dolor sit amet, consectetur adipisicing elit,
-								sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-								quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</div>
+								<div class="panel-body">
+									<span class="assignedTaskName"></span>
+									<span class="assignedTask"></span>	
+								</div>
 							</div>
 						</div>
 						<!--Panel Block-->
 
-						<!--Panel Block-->
-						<div class="panel panel-default">
-							<div class="panel-heading">
-								<h4 class="panel-title">
-									<div class="collapse-head" data-toggle="collapse" data-parent="#accordion" href="#collapse3">
-										Task 3
-										<!--Addition-->
-										<div class="panel-additional-details">
-											<span class="panel-head-time">10:00 AM</span>
-											<span class="panel-head-details details-weekly">Details <span class="caret caret-absolute"></span></span>
-										</div>
-										<!--Addition-->
-									</div>
-								</h4>
-							</div>
-							<div id="collapse3" class="panel-collapse collapse">
-								<div class="panel-body">Lorem ipsum dolor sit amet, consectetur adipisicing elit,
-								sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-								quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</div>
-							</div>
-						</div>
-						<!--Panel Block-->
-
-						<!--Panel Block-->
-						<div class="panel panel-default">
-							<div class="panel-heading">
-								<h4 class="panel-title">
-									<div class="collapse-head" data-toggle="collapse" data-parent="#accordion" href="#collapse4">
-										Task 4
-										<!--Addition-->
-										<div class="panel-additional-details">
-											<span class="panel-head-time">10:00 AM</span>
-											<span class="panel-head-details details-daily">Details <span class="caret caret-absolute"></span></span>
-										</div>
-										<!--Addition-->
-									</div>
-								</h4>
-							</div>
-							<div id="collapse4" class="panel-collapse collapse">
-								<div class="panel-body">Lorem ipsum dolor sit amet, consectetur adipisicing elit,
-								sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-								quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</div>
-							</div>
-						</div>
-						<!--Panel Block-->
+						
 					</div> 
 				</div>
 				<!--Task Content Part-->

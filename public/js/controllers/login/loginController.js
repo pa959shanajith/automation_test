@@ -3,6 +3,29 @@ mySPA.controller('loginController', function ($scope, $http, $location, LoginSer
     $scope.loginValidation = "";
     window.localStorage['LoginSuccess'] = "False";
     $("#yearlogin").text(new Date().getFullYear());
+    var availablePlugins = [{
+        "id": "123478",
+        "pluginName": "Mindmap"
+      }, {
+        "id": "4846654",
+        "pluginName": "Neuron 2D"
+      }, {
+        "id": "4464166",
+        "pluginName": "Neuron 3D"
+      }, {
+        "id": "5458468",
+        "pluginName": "Oxbow Code Identifier"
+      }, {
+        "id": "56466",
+        "pluginName": "Reports"
+      }, {
+        "id": "8579469",
+        "pluginName": "Dead Code Identifier"
+      }, {
+        "id": "544684",
+        "pluginName": "RAID"
+      }];
+    window.localStorage['availablePlugins'] = angular.toJson(availablePlugins)
     $scope.check_credentials = function (path) {
         cfpLoadingBar.start();
         $scope.loginValidation = "";

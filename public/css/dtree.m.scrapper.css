@@ -1,0 +1,204 @@
+@CHARSET "ISO-8859-1";
+
+.bg {
+	margin-bottom: 1px;	
+	background-color: #d6d6d6;
+	border-radius: 0px;
+}
+
+.bg:HOVER {
+	background: -webkit-linear-gradient(left top, white , #d6d6d6); /* For Safari 5.1 to 6.0 */
+	background: -o-linear-gradient(bottom right, white, #d6d6d6); /* For Opera 11.1 to 12.0 */
+	background: -moz-linear-gradient(bottom right, white, #d6d6d6); /* For Firefox 3.6 to 15 */
+	background: linear-gradient(to bottom right, white , #d6d6d6); /* Standard syntax */ 
+}
+
+li.item a:HOVER, a:FOCUS {	
+	font-weight:bold;
+	font-variant: normal;
+	color: #30a9ff;
+}
+
+li.item a input[type='text']{
+	position:relative;
+	height: 24px;	
+	margin-top: 0px;
+	margin-left: 8px;
+	width: 150px;
+}
+
+.content-hide{
+	display: none !important;
+}
+.autoWidth
+{
+	width: 300px !important;
+    height: 30px !important;
+    position: relative !important;
+    display: inline-block !important;
+}
+img.tag-icon{
+	width: 15px;
+	height: 15px; 
+	margin-left:8px;
+	margin-top: -10px;
+}
+
+span[id^=content], span.content {
+    display: inline-block;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    margin-left: 8px;
+    font-size: small;
+    width: 300px;
+}
+
+#controls, #finalScrap {
+	font-size: small!important;
+}
+
+
+/* overriding custom.css style */
+.ui-widget input {
+  margin: 0px 0 0; 
+}
+
+/********************************O R I G I N A L********************************/
+/*!
+ * scrapTree.css v1.0.0 
+ * mefe.net
+ * 2014-08-21
+ */
+/* body {
+	font-family: "Verdana";
+	font-size: 12px;
+} */
+
+.scrapTree ul, li {	
+	margin: 0px;
+	padding: 0px;
+	list-style-type: none;	
+}
+
+.scrapTree li.item>a {
+	height: 18px;
+	/* display: inline-block; */
+	padding-top: 0px;	
+	text-decoration: none;
+	font-size: small;
+}
+
+.text {
+	height: 18px;
+	display: inline-block;
+	float: left;
+	text-decoration: none;
+}
+
+.scrapTree li {
+	height: 18px;
+	display: block;
+/* 	width: 300px; */
+	line-height: 20px;
+}
+
+.scrapTree li.folder-group {
+	height: auto;
+}
+
+.folder-group ul {
+	display: none;
+}
+
+.folder {
+	background: url('../imgs/misc.png') 0px -39px no-repeat;
+	padding-left: 20px;
+	height: 18px;
+	display: inline-block;
+	float: left;
+	transition: all 0.5s ease-in-out;
+}
+
+.folder-open {
+	background: url('../imgs/misc.png') -21px -39px no-repeat;
+	padding-left: 20px;
+	height: 18px;
+	display: none;
+	float: left;
+	transition: all 0.5s ease-in-out;
+}
+
+.main {	
+	background: url('../imgs/misc.png') 2px 0 no-repeat; 
+	width: 18px;
+	height: 18px;
+	display: inline-block;
+	float: left;
+}
+
+.folder-group {
+ 	/*background: url('../imgs/misc.png') -46px -2px repeat-y;*/
+}
+
+.folder-group.last {
+	background: none;
+}
+
+.last .plus {
+	/* background: url('../imgs/misc.png') 0px -82px no-repeat; */
+	padding-left: 20px;
+	display: inline-block;
+	height: 18px;
+	float: left;
+}
+
+.folder-group.last .minus {
+	/* background: url('../imgs/misc.png') -18px -82px no-repeat; */
+	padding-left: 20px;
+	display: none;
+	height: 18px;
+	float: left;
+}
+
+.plus {
+	/* background: url('../imgs/misc.png') 0px -59px no-repeat; */
+	background: url('../imgs/ic-arrow-right.png') no-repeat;
+	padding-left: 20px;
+	display: inline-block;
+	height: 18px;
+	float: left;
+}
+
+.minus {
+	/* background: url('../imgs/misc.png') -18px -59px no-repeat #fff; */
+	background: url('../imgs/ic-arrow-down.png') no-repeat;
+	padding-left: 20px;
+	display: inline-block;
+	height: 18px;
+	float: left;
+}
+
+/* .page {
+	background: url('../imgs/misc.png') no-repeat;
+	width: 18px;
+	height: 18px;
+	display: inline-block;
+	float: left;
+} */
+
+.join {
+	background: url('../imgs/misc.png') 0 -20px no-repeat;
+	width: 18px;
+	height: 18px;
+	display: inline-block;
+	float: left;
+}
+
+.join-last .join {
+	background: url('../imgs/misc.png') -18px -20px no-repeat;
+	width: 18px;
+	height: 18px;
+	display: inline-block;
+	float: left;
+}
