@@ -3,8 +3,49 @@
  */
 var DOMAINID;
 mySPA.controller('adminController', ['$scope', '$http', 'adminServices', function ($scope, $http, adminServices) {
-
- $scope.create_userCheck = function () {				//Yes-----------------------------------
+	$('.dropdown').on('show.bs.dropdown', function(e){
+	    $(this).find('.dropdown-menu').first().stop(true, true).slideDown(300);
+	});
+	$('.dropdown').on('hide.bs.dropdown', function(e){
+		$(this).find('.dropdown-menu').first().stop(true, true).slideUp(300);
+	});
+    
+    toggleMenu = function() {
+        var elem = document.getElementById("sidebar-wrapper");
+    	left = window.getComputedStyle(elem,null).getPropertyValue("left");
+        // hiding the sidebar
+		if(left == "200px"){
+			document.getElementsByClassName("sidebar-toggle")[0].style.left="-200px";
+            $('#overlay').css('opacity', 0);
+            setTimeout(function() {
+                $('#overlay').remove();
+            }, 300);
+		}
+        // showing the sidebar
+		else if(left == "-200px"){
+			document.getElementsByClassName("sidebar-toggle")[0].style.left="200px";
+            // adding overlay to darken #page-wrapper and dismiss the left drawer...
+            $overlay = $('<div id="overlay" style="position: absolute; height: 100%; width: 100%; top: 0; left: 0; background: rgb(0, 0, 0); opacity: 0; transition: ease-in-out all .3s"></div>');
+            $overlay.click(toggleMenu);            
+            setTimeout(function() {
+                $overlay.css('opacity', .1);
+            }, 200);
+            $('#page-wrapper').prepend($overlay);
+		}
+    }
+	$("#menu-toggle").click(function(e) {
+        e.preventDefault();
+        toggleMenu();        
+	});
+    
+    $("[data-parent]").click(function(e) {
+        console.log('clicked');
+        $parent = $($(this).attr('data-parent'));
+        actives = $parent.find('.in:not(data-target)'.replace('data-target', $(this).attr('data-target')));
+        actives.collapse('hide');
+    });
+	
+	$scope.create_userCheck = function () {				//Yes-----------------------------------
         $scope.userNameRequired = '';
         $scope.passwordRequired = '';
         $scope.firstNameRequired = '';
