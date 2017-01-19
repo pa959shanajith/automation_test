@@ -1,0 +1,56 @@
+<section class="container-fluid login-block-fluid">
+	<!--Background Image-->
+	<img src="imgs/login-bg.png" class="login-bg-img" />
+	<!--Background Image-->
+
+	<!--Content Area-->
+	<div class="row row-vh-middle">
+		<!--Left Captions-->
+		<div class="col-md-6">
+			<div class="jumbotron jumbotron-nobg">
+    			<h1>Hello.</h1>   
+    			<h2>Welcome to Nineteen68!</h2>
+				<h3>Login to Experience Intelligence</h3>
+			</div>	
+		</div>
+		<!--Left Captions-->
+
+		<!--Right Login Block-->
+		<div class="col-md-6">
+			<div class="login-white-block">
+				<!--Logo-->
+				<div class="wrap row-center-logo"><img src="imgs/logo.png" /></div>
+				<!--Logo-->
+
+				<!--Login Form-->
+				<div class="wrap login-wrap">
+					<form>
+						<div class="input-group">
+							<span class="input-group-addon ic-username"><img src="imgs/ic-username.png" /></span>
+							<input ng-model="userName" type="text" class="form-control" name="username" placeholder="Username">
+						</div>
+						<div class="input-group">
+							<span class="input-group-addon ic-password"><img src="imgs/ic-password.png" /></span>
+							<input ng-model="password" type="password" class="form-control" name="password" placeholder="Password">
+						</div>
+						<span ng-show="loginValidation" class="absoluteError errorMessages">{{loginValidation}}</span>
+						<button ng-click="check_credentials('/plugin')" type="submit" class="btn btn-block">Login</button>
+					</form>
+				</div>
+				<!--Login Form-->
+			</div>
+		</div>
+		<!--Right Login Block-->
+	</div>
+	<!--Content Area-->
+</section>
+
+<!--Footer-->
+<footer id="footer" class="login-footer">
+	<p class="text-right">
+		Powered By <img class="f-logo" src="imgs/ftr-slk-logo.png" />
+		<br />
+		<span class="small">© 2016 SLK Software Services Pvt. Ltd. All Rights Reserved. Patent Pending</span>
+	</p>
+</footer>
+<!--Footer-->

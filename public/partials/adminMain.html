@@ -1,0 +1,106 @@
+<header header></header>
+
+<!--------------- Left Nav Bar ------------------------->
+	<div class="container">
+		<div id="sidebar-wrapper" class="sidebar-toggle">
+			<div id="nav-menu">
+                <div class="submenu">
+                    <div class="submenu-heading" data-parent="#nav-menu" data-toggle="collapse" data-target="#submenu1"> <h4 class="submenu-title">Create</h4> </div>
+                    <div class="submenu-body collapse" id="submenu1">
+                        <div class="list-group">
+                            <a href="#" class="list-group-item" ng-click="$event.preventDefault(); tab = 'CreateUserTab'; getUserRoles('create');">User</a>
+                            <a href="#" class="list-group-item">Domain / Projects</a>
+                            <a href="#" class="list-group-item">Release / Cycle</a>
+                        </div>
+                    </div>                    
+                </div>
+                
+                <div class="submenu">
+                    <div class="submenu-heading" data-parent="#nav-menu" data-toggle="collapse" data-target="#submenu2"> <h4 class="submenu-title">Edit</h4> </div>
+                    <div class="submenu-body collapse" id="submenu2">
+                        <div class="list-group">
+                            <a href="#" class="list-group-item">User</a>
+                            <a href="#" class="list-group-item">Domain / Projects</a>
+                            <a href="#" class="list-group-item">Release / Cycle</a>
+                        </div>
+                    </div>                    
+                </div> 
+			</div>
+            
+		</div>
+        
+  	</div>
+<!--------------- Left Nav Bar ------------------------->
+
+<!----------------- Mid Container ------------------------>
+<div class="mid-section">
+	<!-- Create User Tab -->
+		<div ng-show="tab == 'CreateUserTab'">
+			<!--Content Area-->
+			<div class="content-wrap">
+				<!-- Form Starts -->
+				<div class="content-wrap">
+					<!-- Create User Form -->
+					<form method="post">
+						<div class="seprator sepratorStyle2">
+							<label class="labelStyle1">User Name <span class="mandatory">*</span></label>
+							<input type="text" id="userName" name="userName" placeholder="Enter User Name" ng-model="userName" maxlength="50" class="formField forValidation"
+							/>
+							<span class="ldapUserInput"><input class="ldapChkBox" type="checkbox" />Ldap User</span>
+							<span ng-show="userNameRequired" class="error-msg ng-cloak">{{userNameRequired}}</span>
+						</div>
+
+						<div class="seprator sepratorStyle2">
+							<label class="labelStyle1">Password <span class="mandatory">*</span></label>
+							<input type="password" placeholder="Enter Password" id="passwordIcon" name="passWord" ng-model="passWord" maxlength="12"
+								class="formField" autocomplete="off" />
+							<span ng-show="passwordRequired" class="error-msg error-msg-password ng-cloak">{{passwordRequired}}</span>
+						</div>
+
+						<div class="seprator sepratorStyle2">
+							<label class="labelStyle1">First Name <span class="mandatory">*</span></label>
+							<input style="background:none !important; padding-left:12px !important" type="text" placeholder="Enter First Name" name="firstName"
+								id="userNameIcon" ng-model="firstName" maxlength="12" class="formField forValidation_Opt" />
+							<span ng-show="firstNameRequired" class="error-msg ng-cloak">{{firstNameRequired}}</span>
+						</div>
+
+						<div class="seprator sepratorStyle2">
+							<label class="labelStyle1">Last Name <span class="mandatory">*</span></label>
+							<input style="background:none !important; padding-left:12px !important" type="text" placeholder="Enter Last Name" id="userNameIcon"
+								name="lastName" ng-model="lastName" maxlength="12" class="formField forValidation_Opt" />
+							<span ng-show="lastNameRequired" class="error-msg ng-cloak">{{lastNameRequired}}</span>
+						</div>
+
+						<div class="seprator sepratorStyle2">
+							<label class="labelStyle1">Email Id <span class="mandatory">*</span></label>
+							<input type="email" placeholder="Enter Email Address" name="email" id="emailIcon" ng-model="email" maxlength="50" class="formField forValidation_Opt"
+							/>
+							<span ng-show="emailRequired" class="error-msg ng-cloak">{{emailRequired}}</span>
+						</div>
+
+						<div class="seprator sepratorStyle2">
+							<label class="labelStyle1">User Role <span class="mandatory">*</span></label>
+							<select x-ng-model="role" id="userRoles" class="slt-domain slt-domain-custom">
+							<option value="" disabled selected>Select User Role</option>
+						</select>
+
+							<span ng-show="roleRequired" class="error-msg ng-cloak">{{roleRequired}}</span>
+						</div>
+
+						<div class="seprator sepratorStyle2">
+							<button name="adminAction" ng-click="create_userCheck()" class="formbtn">Create User</button>
+						</div>
+					</form>
+					<!-- Create User Form -->
+
+				</div>
+				<!-- Form Ends -->
+			</div>
+			<!--Content Area-->
+		</div>
+</div>
+<!----------------- Mid Container ------------------------>
+
+<!--Footer-->
+<footer footer id="footer" class="footer-global"></footer>
+<!--Footer-->

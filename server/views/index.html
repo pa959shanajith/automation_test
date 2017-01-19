@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<!-- Angular App Initialization -->
+<html lang="en" ng-app="singlePageApp">
+
+<head>
+	<!--<base href="/TestAutoWebSPANode/">-->
+	<title>SLK Nineteen68</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href=""> <!-- Favicon -->
+	<!--Font-->
+	<link rel="stylesheet" type="text/css" href="fonts/latofonts.css" />
+	<link rel="stylesheet" type="text/css" href="css/bootstrap/bootstrap.min.css" />
+
+	<!--Main-->
+	<link rel="stylesheet" type="text/css" href="css/main.css" />
+	<link rel="stylesheet" type="text/css" href="css/scroll.css" />
+
+	<!--Loading Bar-->
+	<link rel="stylesheet" type="text/css" href="css/loading-bar.css" />
+</head>
+
+<body>
+	<!-- Content goes in ng-view -->
+	<div id="viewArea" class="viewAreaStyle">
+		<div ng-view class="ngViewCustom"></div>
+	</div>
+	<!-- Content goes in ng-view -->
+	<!-- Angular JS Scripts-->
+	<script type="text/javascript" src="js/plugins/jquery.min.js"></script>
+	<script type="text/javascript" src="js/plugins/angular/angular.min.js"></script>
+	<script type="text/javascript" src="js/plugins/angular/angular-route.min.js"></script>
+
+	<!-- Angular JS Initialization & Routes-->
+	<script type="text/javascript" src="js/app/initializer/app.js"></script>
+	<script type="text/javascript" src="js/app/navigation/angular-route.js"></script>
+
+	<!-- AngularJS Directives for Transclusion -->
+	<script type="text/javascript" src="js/directives/headerDirective.js"></script>
+	<script type="text/javascript" src="js/directives/footerDirective.js"></script>
+
+	<!--AngularJS Controllers-->
+	<script type="text/javascript" src="js/controllers/admin/adminController.js"></script>
+	<script type="text/javascript" src="js/controllers/admin/adminServices.js"></script>
+	<script type="text/javascript" src="js/controllers/header/headerController.js"></script>
+	<script type="text/javascript" src="js/controllers/header/headerServices.js"></script>
+	<script type="text/javascript" src="js/controllers/login/loginController.js"></script>
+	<script type="text/javascript" src="js/controllers/login/loginService.js"></script>
+	<script type="text/javascript" src="js/controllers/plugin/pluginController.js"></script>
+	<script type="text/javascript" src="js/controllers/plugin/pluginService.js"></script>
+	<script type="text/javascript" src="js/controllers/design/designController.js"></script>
+	<script type="text/javascript" src="js/controllers/design/designService.js"></script>
+
+
+	<!-- ng-grid  -->
+	<script type="text/javascript" src="js/plugins/angular/angular-touch.js"></script>
+	<script type="text/javascript" src="js/plugins/angular/angular-animate.js"></script>
+	<script type="text/javascript" src="js/plugins/angular/ui-grid.js"></script>
+
+	<!--Bootstrap-->
+	<script type="text/javascript" src="js/plugins/bootstrap/bootstrap.min.js"></script>
+	
+	<!-- Custom Scroll -->
+	<script type="text/javascript" src="js/plugins/scroll.js"></script>
+
+	<!--Common-->
+	<script type="text/javascript" src="js/plugins/custom.js"></script>
+
+	<!--Loading Bar on HTTP Request-->
+	<script type="text/javascript" src="js/plugins/loading-bar.js"></script>
+</body>
+
+</html>
