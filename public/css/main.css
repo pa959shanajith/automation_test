@@ -9,7 +9,8 @@ html {
 body {
     font-family: LatoWeb;
     margin: 0;
-    padding: 0
+    padding: 0;
+	opacity:0
 }
 
 .wrap {
@@ -32,6 +33,11 @@ body {
 
 .footer-global {
     padding: 0 30px
+}
+
+.footer-global .small{
+	float: left;
+    line-height: 25px;
 }
 
 .f-logo {
@@ -217,7 +223,7 @@ body {
 .dropdown-userPart {
     float: right;
     width: auto;
-    margin: 8px 0px;
+	margin: 8px -20px 8px 0;
 }
 
 .dropdown-userPart .dropdown-toggle:active:focus {
@@ -458,7 +464,7 @@ body {
     width: 100%;
     float: left;
     position: relative;
-    height: calc(100% - 125px)
+	height: calc(100% - 108px)
 }
 
 #left-nav-section {
@@ -472,7 +478,7 @@ body {
 }
 
 #left-top-section {
-    height: auto;
+	min-height:60%;
     float: left;
     width: 100%;
     border-bottom: 2px solid #461F6E;
@@ -490,7 +496,6 @@ body {
     float: left;
     width: 100%;
     padding: 0;
-    display: table;
     margin: 0;
     text-align: center;
 }
@@ -578,6 +583,11 @@ body {
     -webkit-transition: 0.2s ease-in-out;
 }
 
+#left-top-section ul li label{
+	padding-left:15px;
+	padding-right:15px
+}
+
 #left-top-section ul li label,
 #left-bottom-section ul li a {
     font-weight: normal;
@@ -612,27 +622,26 @@ body {
     top: 0;
 }
 
-#design-taskName {
+#page-taskName {
     float: left;
     width: 100%
 }
 
-#design-taskName span {
+#page-taskName span {
     display: inline-block;
     background: #2f1c49;
     font-size: 18px;
     color: #fff;
     font-family: 'LatoWebLight';
     padding: 2px 14px 1px;
-    border-radius: 20px;
+    border-radius: 5px;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
 }
-
-
 /***Mid Section CSS***/
 
 
 /***Right Section CSS***/
-
 #right-dependencies-section {
     width: 90px;
     height: 100%;
@@ -721,6 +730,9 @@ body {
     opacity: 0;
     cursor: auto;
     background: #321e4f;
+	border-radius: 5px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
 }
 
 .popupWrap-filter {

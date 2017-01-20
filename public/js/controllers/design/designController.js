@@ -1,5 +1,5 @@
 mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout', 'DesignServices', function($scope,$http,$location,$timeout,DesignServices) {
-    $("body").css("background","#eee");
+	$("body").css("background","#eee");
     $timeout(function(){
         $('.scrollbar-inner').scrollbar();
         $('.scrollbar-macosx').scrollbar();

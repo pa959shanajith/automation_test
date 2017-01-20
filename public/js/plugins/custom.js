@@ -47,3 +47,9 @@ $(document).ready(function() {
         $(this).toggleClass("popupContent-filter-active")
     })
 });
+
+function loadBody(){
+	$("body").delay(400).animate({opacity:"1"})
+}
+
+window.onload = loadBody;

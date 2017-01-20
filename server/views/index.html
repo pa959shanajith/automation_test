@@ -25,7 +25,8 @@
 	<link rel="stylesheet" type="text/css" href="css/loading-bar.css" />
 </head>
 
-<body>
+<body onload="loadBody()">
+	<div class="overlayPage"></div>
 	<!-- Content goes in ng-view -->
 	<div id="viewArea" class="viewAreaStyle">
 		<div ng-view class="ngViewCustom"></div>
@@ -55,6 +56,8 @@
 	<script type="text/javascript" src="js/controllers/plugin/pluginService.js"></script>
 	<script type="text/javascript" src="js/controllers/design/designController.js"></script>
 	<script type="text/javascript" src="js/controllers/design/designService.js"></script>
+	<script type="text/javascript" src="js/controllers/execution/executionController.js"></script>
+	<script type="text/javascript" src="js/controllers/execution/executionService.js"></script>
 
 
 	<!-- ng-grid  -->

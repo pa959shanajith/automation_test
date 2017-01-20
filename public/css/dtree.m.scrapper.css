@@ -44,7 +44,7 @@ img.tag-icon{
 	margin-top: -10px;
 }
 
-span[id^=content], span.content {
+/* span[id^=content], span.content {
     display: inline-block;
     text-overflow: ellipsis;
     overflow: hidden;
@@ -52,7 +52,7 @@ span[id^=content], span.content {
     margin-left: 8px;
     font-size: small;
     width: 300px;
-}
+} */
 
 #controls, #finalScrap {
 	font-size: small!important;
