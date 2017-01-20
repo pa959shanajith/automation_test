@@ -359,11 +359,12 @@ body {
     background: 0 0;
     border: none;
     position: relative;
-    padding: 0
+    padding: 0;
+    border-radius: 0;
 }
 
 .task-content .panel-group .panel-default .panel-body {
-    padding: 15px;
+    padding: 0;
     margin-bottom: 5px
 }
 
@@ -377,6 +378,21 @@ body {
 .task-content .panel-group .panel-default>.panel-heading+.panel-collapse>.panel-body {
     border: none;
     background: #eee
+}
+
+.taskNo{
+	font-family: 'LatoWebBold';
+}
+
+.assignedTask{
+	font-size: 18px;
+    padding: 10px 15px;
+    display: inline-block;
+    width: 100%;
+}
+
+.assignedTask:hover{
+	background: rgb(230, 230, 230);	
 }
 
 .panel-head-tasktype {
