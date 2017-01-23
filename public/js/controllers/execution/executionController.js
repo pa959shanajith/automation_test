@@ -2,5 +2,8 @@ mySPA.controller('executionController',['$scope','$http','$location','ExecutionS
 	$("body").css("background","#eee");
 	$('.scrollbar-inner').scrollbar();
     $('.scrollbar-macosx').scrollbar();
+    
+    //Task Listing
+    loadUserTasks()
 }]);
 

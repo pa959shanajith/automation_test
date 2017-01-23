@@ -54,6 +54,7 @@ mySPA.controller('pluginController',['$scope','$window','$http','$location','$ti
     	"Release_Id": "68744446+",
     	"Cycle_Id": "574644446"
     }]
+    window.localStorage['_TJ'] = angular.toJson(tasksJson)
     $(".plugin-taks-listing").empty().hide()
     var counter = 1;
     for(i=0; i<tasksJson.length; i++){

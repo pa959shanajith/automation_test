@@ -4,12 +4,13 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
         $('.scrollbar-inner').scrollbar();
         $('.scrollbar-macosx').scrollbar();
     }, 500)
+    
+    //Task Listing
+    loadUserTasks()
 
-    //Initiating Scraping
-    $scope.initScraping = function(browserType){
-        console.log("Scrapping Started::::::")
-        var viewString = {}
-        viewString.view = [{
+    //Sample Scrape JSON
+    var viewString = {}
+    viewString.view = [{
             "id": "unamebean",
             "text": "",
             "tag": "input",
@@ -45,7 +46,11 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
             "custname": "Cancel_button2",
             "tempId": 3,
             "xpath": "//*[@id=\"Cancel\"];Cancel;/html/body/span/div[2]/form/span[2]/div/div/div[1]/div/div[3]/table[2]/tbody/tr[2]/td[2]/span/table/tbody/tr[5]/td[2]/table/tbody/tr[6]/td[2]/button[2];null;null;null"
-        }]
+    }]
+    
+    //Initiating Scraping
+    $scope.initScraping = function(browserType){
+        console.log("Scrapping Started::::::")
         $("#finalScrap").empty()
         $("#finalScrap").append("<div id='scrapTree' class='scrapTree'><ul><li><input title='Select all' type='checkbox' class='checkStylebox'><a id='aScrapper'>Screen Fields </a><ul id='scraplist' class='scraplistStyle'></ul></li></ul></div>");
         var custname;

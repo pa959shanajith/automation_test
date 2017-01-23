@@ -11,9 +11,9 @@
 				<ul>
 					<li><span><a class='scrapeOnTxt' href='#'>Scrape On</a></span></li>
 					<li><a href='#' ng-click="initScraping('1'); $event.preventDefault(); $event.stopPropagation();"><span><img src='imgs/ic-ie.png' alt='Internet Explorer' /></span>Internet Explorer</a></li>
-					<li><a href='#'><span><img src='imgs/ic-chrome.png' alt='Google Chrome' /></span>Google Chrome</a></li>
-					<li><a href='#'><span><img src='imgs/ic-mozilla.png' alt='Mozilla Firefox' /></span>Mozilla Firefox</a></li>
-					<li class="last"><span style="margin-bottom:-5px"><input id="enableAppend" type='checkbox' value=""></span><label for="enableAppend">Append</label></li>
+					<li><a href='#' ng-click="initScraping('2'); $event.preventDefault(); $event.stopPropagation();"><span><img src='imgs/ic-chrome.png' alt='Google Chrome' /></span>Google Chrome</a></li>
+					<li><a href='#' ng-click="initScraping('3'); $event.preventDefault(); $event.stopPropagation();"><span><img src='imgs/ic-mozilla.png' alt='Mozilla Firefox' /></span>Mozilla Firefox</a></li>
+					<li class="last"><span style="margin-bottom:-5px"><input ng-model="enbledChecked" id="enableAppend" type='checkbox' value=""></span><label for="enableAppend">Append</label></li>
 				</ul>
 			</div>
 
@@ -104,99 +104,7 @@
 				<div class="popupContent popupTasks">
 					<div class="scrollbar-inner scrollbar-innerpages">
 						<!--Tasks-->
-						<div class="panel-group task-content-inner" id="accordion">
-							<!--Panel Block-->
-							<div class="panel panel-default">
-								<div class="panel-heading">
-									<h4 class="panel-title">
-										<div class="collapse-head" data-toggle="collapse" data-parent="#accordion" href="#collapse1">
-											Task 1
-											<!--Addition-->
-											<div class="panel-additional-details">
-												<span class="panel-task-directory">Design</span>
-												<span class="panel-head-details details-weekly">Details <span class="caret caret-absolute"></span></span>
-											</div>
-											<!--Addition-->
-										</div>
-									</h4>
-								</div>
-								<div id="collapse1" class="panel-collapse collapse">
-									<div class="panel-body">Lorem ipsum dolor sit amet, consectetur adipisicing elit,
-									sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-									quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</div>
-								</div>
-							</div>
-							<!--Panel Block-->
-
-							<!--Panel Block-->
-							<div class="panel panel-default">
-								<div class="panel-heading">
-									<h4 class="panel-title">
-										<div class="collapse-head" data-toggle="collapse" data-parent="#accordion" href="#collapse2">
-											Task 2
-											<!--Addition-->
-											<div class="panel-additional-details">
-												<span class="panel-task-directory">Execution</span>
-												<span class="panel-head-details details-daily">Details <span class="caret caret-absolute"></span></span>
-											</div>
-											<!--Addition-->
-										</div>
-									</h4>
-								</div>
-								<div id="collapse2" class="panel-collapse collapse">
-									<div class="panel-body">Lorem ipsum dolor sit amet, consectetur adipisicing elit,
-									sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-									quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</div>
-								</div>
-							</div>
-							<!--Panel Block-->
-
-							<!--Panel Block-->
-							<div class="panel panel-default">
-								<div class="panel-heading">
-									<h4 class="panel-title">
-										<div class="collapse-head" data-toggle="collapse" data-parent="#accordion" href="#collapse3">
-											Task 3
-											<!--Addition-->
-											<div class="panel-additional-details">
-												<span class="panel-task-directory">Design</span>
-												<span class="panel-head-details details-weekly">Details <span class="caret caret-absolute"></span></span>
-											</div>
-											<!--Addition-->
-										</div>
-									</h4>
-								</div>
-								<div id="collapse3" class="panel-collapse collapse">
-									<div class="panel-body">Lorem ipsum dolor sit amet, consectetur adipisicing elit,
-									sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-									quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</div>
-								</div>
-							</div>
-							<!--Panel Block-->
-
-							<!--Panel Block-->
-							<div class="panel panel-default">
-								<div class="panel-heading">
-									<h4 class="panel-title">
-										<div class="collapse-head" data-toggle="collapse" data-parent="#accordion" href="#collapse4">
-											Task 4
-											<!--Addition-->
-											<div class="panel-additional-details">
-												<span class="panel-task-directory">Reports</span>
-												<span class="panel-head-details details-daily">Details <span class="caret caret-absolute"></span></span>
-											</div>
-											<!--Addition-->
-										</div>
-									</h4>
-								</div>
-								<div id="collapse4" class="panel-collapse collapse">
-									<div class="panel-body">Lorem ipsum dolor sit amet, consectetur adipisicing elit,
-									sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-									quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</div>
-								</div>
-							</div>
-							<!--Panel Block-->
-						</div>
+						<div class="panel-group task-content-inner" id="accordion"></div>
 						<!--Tasks-->
 					</div>
 				</div>
@@ -256,7 +164,7 @@
 
 <!--Bootstrap Popup-->
 	<!-- Add Object -->
-	<div id="dialog-addObject" class="modal fade" role="dialog">
+	<div id="dialog-addObject" class="modal fade" role="dialog" data-keyboard="false" data-backdrop="static">
 		<div class="modal-dialog">
 			<!-- Modal content-->
 			<div class="modal-content">
@@ -328,7 +236,7 @@
 	<!-- Add Object -->
 
 	<!-- Map Object -->
-	<div id="dialog-mapObject" class="modal fade" role="dialog">
+	<div id="dialog-mapObject" class="modal fade" role="dialog" data-keyboard="false" data-backdrop="static">
 		<div class="modal-dialog">
 			<!-- Modal content-->
 			<div class="modal-content">

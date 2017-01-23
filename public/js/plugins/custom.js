@@ -1,3 +1,11 @@
+//Window Load Function
+function loadBody(){
+	$("body").delay(400).animate({opacity:"1"})
+}
+window.onload = loadBody;
+//Window Load Function
+
+//Document Ready Function
 $(document).ready(function() {	
     //Task Function - Plugin Page
     $(document).on("click", ".task-content .collapse-head", function(){
@@ -47,9 +55,27 @@ $(document).ready(function() {
         $(this).toggleClass("popupContent-filter-active")
     })
 });
+//Document Ready Function
 
-function loadBody(){
-	$("body").delay(400).animate({opacity:"1"})
+
+//Innerpages Tasks Implementation
+function loadUserTasks(){
+	var tasksJson = JSON.parse(window.localStorage['_TJ'])
+    $(".task-content-inner").empty().hide()
+    var counter = 1;
+    for(i=0; i<tasksJson.length; i++){
+		if(tasksJson[i].Task_Type == "Design"){
+			$(".task-content-inner").append('<div class="panel panel-default"><div class="panel-heading"><h4 class="panel-title"><div class="collapse-head" data-toggle="collapse" data-parent="#accordion" href="#collapse'+i+'"><span class="taskNo">Task '+ counter +'</span><!--Addition--><div class="panel-additional-details"><span class="panel-task-directory">'+tasksJson[i].Task_Type+'</span><span class="panel-head-details details-design-task">Details <span class="caret caret-absolute"></span></span></div><!--Addition--></div></h4></div><div id="collapse'+i+'" class="panel-collapse collapse"><div class="panel-body"><span class="assignedTaskInner" data-name="'+tasksJson[i].Task_Type+'" onclick="taskRedirectionInner(this.dataset.name)">'+tasksJson[i].Task_Name+'</span></div></div></div>').fadeIn()
+		} 
+    	else if(tasksJson[i].Task_Type == "Execution"){
+    		$(".task-content-inner").append('<div class="panel panel-default"><div class="panel-heading"><h4 class="panel-title"><div class="collapse-head" data-toggle="collapse" data-parent="#accordion" href="#collapse'+i+'"><span class="taskNo">Task '+ counter +'</span><!--Addition--><div class="panel-additional-details"><span class="panel-task-directory">'+tasksJson[i].Task_Type+'</span><span class="panel-head-details details-execute-task">Details <span class="caret caret-absolute"></span></span></div><!--Addition--></div></h4></div><div id="collapse'+i+'" class="panel-collapse collapse"><div class="panel-body"><span class="assignedTaskInner" data-name="'+tasksJson[i].Task_Type+'" onclick="taskRedirectionInner(this.dataset.name)">'+tasksJson[i].Task_Name+'</span></div></div></div>').fadeIn()
+    	}
+		counter++
+    }
 }
 
-window.onload = loadBody;
+function taskRedirectionInner(path){
+	if(path == "Design") 			window.location.pathname = '/design'
+	else if(path == "Execution")	window.location.pathname = '/execute'
+}
+//Innerpages Tasks Implementation

@@ -401,6 +401,12 @@ body {
 	background: rgb(230, 230, 230);	
 }
 
+.assignedTaskInner{
+	font-size: 16px;
+    display: inline-block;
+    width: 100%;
+}
+
 .panel-head-tasktype {
     font-family: LatoWeb;
     font-size: 17px;
@@ -424,11 +430,11 @@ body {
 }
 
 .details-execute-task {
-    background: #09d2ef
+    background: #09d2ef !important;
 }
 
 .details-design-task {
-    background: #ffb52a
+    background: #ffb52a !important;
 }
 
 .collapse-head-active {
@@ -485,10 +491,10 @@ body {
 }
 
 #left-bottom-section {
-    height: auto;
+	min-height: 40%;
     float: left;
     width: 100%;
-    padding: 25% 0;
+	position: relative;
 }
 
 #left-top-section ul,
@@ -500,6 +506,15 @@ body {
     text-align: center;
 }
 
+#left-bottom-section ul{
+	position: absolute;
+	top:50%;
+	left:50%;
+	transform: translate(-50%, -50%);
+	-moz-transform: translate(-50%, -50%);
+	-webkit-transform: translate(-50%, -50%)
+}
+
 #left-top-section ul li,
 #left-bottom-section ul li {
     list-style-type: none;
@@ -508,7 +523,7 @@ body {
     color: #fff;
     line-height: inherit;
     text-align: center;
-    margin: 10% 0px;
+    margin: 10% 0px 5%;
 }
 
 #left-top-section li:first-child {
@@ -523,7 +538,7 @@ body {
 
 #left-bottom-section ul li {
     margin-top: 0;
-    margin-bottom: 30%;
+	margin-bottom: 25%;
 }
 
 #left-bottom-section ul li:last-child {
@@ -558,7 +573,7 @@ body {
     word-wrap: break-word;
     font-weight: normal;
     display: block;
-    width: 60%;
+    width: 70%;
     margin: 0 auto;
 }
 
@@ -825,7 +840,7 @@ body {
 
 .popupTasks .panel-group .panel-default .panel-body {
     padding: 0 15px 15px 0;
-    margin-bottom: 5px
+    margin-bottom: 0px
 }
 
 .popupTasks .panel-group .panel-default>.panel-heading .collapse-head {
@@ -859,14 +874,6 @@ body {
     top: 10px
 }
 
-.popupTasks .details-daily {
-    background: #09d2ef
-}
-
-.popupTasks .details-weekly {
-    background: #ffb52a
-}
-
 .collapse-head-active {
     background-color: #404040;
     color: #fff
@@ -883,6 +890,24 @@ body {
 
 
 /******Custom Bootstrap Dialog CSS******/
+.modal {
+  text-align: center;
+  padding: 0!important;
+}
+
+.modal:before {
+  content: '';
+  display: inline-block;
+  height: 100%;
+  vertical-align: middle;
+  margin-right: -4px;
+}
+
+.modal-dialog {
+  display: inline-block;
+  text-align: left;
+  vertical-align: middle;
+}
 
 .modal-content {
     border-radius: 20px;
@@ -931,13 +956,17 @@ body {
 .row-modal {
     margin-left: 0;
     margin-right: 0;
-    margin-bottom: 25px;
+    margin-bottom: 20px;
     position: relative;
+}
+
+.row-modal:last-child{
+	margin-bottom: 0
 }
 
 .row-modal img[title='delete-row'] {
     position: absolute;
-    bottom: 5px;
+    bottom: 15px;
     right: 20px;
     cursor: pointer;
 }
@@ -945,6 +974,7 @@ body {
 .modal-body .row-modal .form-group {
     width: 43%;
     margin-right: 3%;
+    float: left;
 }
 
 .modal-body .row-modal .form-group:last-child {
@@ -957,7 +987,7 @@ body {
 }
 
 .modal-body .row-modal .form-control {
-    border: 1px solid #311d4e;
+    border: 1px solid #311d4e !important;
     width: 100%
 }
 
@@ -1234,32 +1264,7 @@ select:-webkit-autofill:focus {
 /******************Remove Webkit autocolor CSS***************************/
 
 /*****************Custom Media Queries*****************/
-
-@media only screen and (min-width:1280px) and (max-height:960px) {
-    .login-bg-img {
-        width: 48%;
-    }
-    .jumbotron-nobg {
-        margin-top: 18%;
-    }
-    .jumbotron-nobg h2 {
-        font-size: 42px;
-    }
-    .jumbotron-nobg h3 {
-        font-size: 26px;
-    }
-    .bg-img {
-        width: 410px;
-    }
-    .h1-header-margin {
-        margin: 5% 0
-    }
-    .plugin-block {
-        margin-bottom: 6%
-    }
-}
-
-@media only screen and (min-width:1366px) {
+@media only screen and (max-width:1366px) {
     .login-bg-img {
         width: 45%;
     }
@@ -1283,3 +1288,26 @@ select:-webkit-autofill:focus {
     }
 }
 
+@media only screen and (max-width:1280px) and (max-height:960px) {
+    .login-bg-img {
+        width: 48%;
+    }
+    .jumbotron-nobg {
+        margin-top: 18%;
+    }
+    .jumbotron-nobg h2 {
+        font-size: 42px;
+    }
+    .jumbotron-nobg h3 {
+        font-size: 26px;
+    }
+    .bg-img {
+        width: 410px;
+    }
+    .h1-header-margin {
+        margin: 5% 0
+    }
+    .plugin-block {
+        margin-bottom: 6%
+    }
+}
