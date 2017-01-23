@@ -15,7 +15,7 @@ var server = new Hapi.Server();
 //Server Connection
 server.connection({
     host: 'localhost',
-    address: '10.41.31.29',
+    address: '10.41.31.15',
     port: '443',
     tls: {
         key: fs.readFileSync('./server/https/privatekey.pem'),  

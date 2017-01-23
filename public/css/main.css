@@ -392,13 +392,9 @@ body {
 
 .assignedTask{
 	font-size: 18px;
-    padding: 10px 15px;
+    padding: 0px 15px 10px;
     display: inline-block;
     width: 100%;
-}
-
-.assignedTask:hover{
-	background: rgb(230, 230, 230);	
 }
 
 .assignedTaskInner{
@@ -719,7 +715,8 @@ body {
 }
 
 .thumbnail-custom a:focus {
-    outline: 0
+    outline: 0;
+    text-decoration: none;
 }
 
 .thumbnail-custom a:focus .thumb-ic,
@@ -1264,7 +1261,31 @@ select:-webkit-autofill:focus {
 /******************Remove Webkit autocolor CSS***************************/
 
 /*****************Custom Media Queries*****************/
-@media only screen and (max-width:1366px) {
+@media screen and (min-width:1280px) and (max-height:960px) {
+    .login-bg-img {
+        width: 48%;
+    }
+    .jumbotron-nobg {
+        margin-top: 18%;
+    }
+    .jumbotron-nobg h2 {
+        font-size: 42px;
+    }
+    .jumbotron-nobg h3 {
+        font-size: 26px;
+    }
+    .bg-img {
+        width: 410px;
+    }
+    .h1-header-margin {
+        margin: 5% 0
+    }
+    .plugin-block {
+        margin-bottom: 6%
+    }
+}
+
+/* @media only screen and (min-width:1366px) {
     .login-bg-img {
         width: 45%;
     }
@@ -1287,27 +1308,30 @@ select:-webkit-autofill:focus {
         margin-bottom: 3%
     }
 }
-
-@media only screen and (max-width:1280px) and (max-height:960px) {
-    .login-bg-img {
-        width: 48%;
+ */
+@media screen and (max-height: 675px) {
+	.login-bg-img {
+        width: 45%;
     }
     .jumbotron-nobg {
-        margin-top: 18%;
+        margin-top: 11%;
     }
     .jumbotron-nobg h2 {
-        font-size: 42px;
+        font-size: 40px;
     }
     .jumbotron-nobg h3 {
-        font-size: 26px;
+        font-size: 25px;
     }
     .bg-img {
         width: 410px;
     }
     .h1-header-margin {
-        margin: 5% 0
+        margin: 0% 0 3%
     }
     .plugin-block {
-        margin-bottom: 6%
+        margin-bottom: 3%
+    }
+    .lbs-single{
+    	min-height: calc(100% - 67%) !important;
     }
 }
