@@ -1335,3 +1335,8 @@ select:-webkit-autofill:focus {
     	min-height: calc(100% - 67%) !important;
     }
 }
+
+#scrapTree ul:first-child
+{
+	 margin: 2% 1% 0% 1%;
+}

@@ -15,7 +15,7 @@ var server = new Hapi.Server();
 //Server Connection
 server.connection({
     host: 'localhost',
-    address: '10.41.31.15',
+    address: '10.41.31.29',
     port: '443',
     tls: {
         key: fs.readFileSync('./server/https/privatekey.pem'),  
@@ -94,6 +94,7 @@ var base = require('./server/controllers/base');
 var assets = require('./server/controllers/assets');
 var login = require('./server/controllers/login');
 var admin = require('./server/controllers/admin');
+var design = require('./server/controllers/design');
 
 //Hapi Routes
 server.route([
@@ -108,6 +109,7 @@ server.route([
     { method: 'POST', path: '/createUser_Nineteen68', config: admin.createUser_Nineteen68 }, 
     { method: 'POST', path: '/loadUserInfo_Nineteen68', config: login.loadUserInfo_Nineteen68 },  
     { method: 'POST', path: '/getRoleNameByRoleId_Nineteen68', config: login.getRoleNameByRoleId_Nineteen68 },  
+    { method: 'POST', path: '/initScraping_ICE', config: design.initScraping_ICE },  
     { method: '*', path: '/logoutUser', handler: function (request, reply) { reply.view('./server/views/index', '') } }
   ]);
 

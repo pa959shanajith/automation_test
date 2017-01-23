@@ -7,49 +7,14 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
     
     //Task Listing
     loadUserTasks()
-
-    //Sample Scrape JSON
-    var viewString = {}
-    viewString.view = [{
-            "id": "unamebean",
-            "text": "",
-            "tag": "input",
-            "hiddentag": "No",
-            "url": "https://nucleus.slkgroup.com:4450/OA_HTML/RF.jsp?function_id=28716&resp_id=…2G2B1m5nYepZW7sgGQGFA..&params=5j0bzUgs9j2gsy7f2IhOgr-7x5nWRx63YDVSeM1o2-M",
-            "custname": "username_input",
-            "tempId": 0,
-            "xpath": "//*[@id=\"unamebean\"];unamebean;/html/body/span/div[2]/form/span[2]/div/div/div[1]/div/div[3]/table[2]/tbody/tr[2]/td[2]/span/table/tbody/tr[5]/td[2]/table/tbody/tr[2]/td[2]/table/tbody/tr/td[3]/input;null;null;null"
-        }, {
-            "id": "pwdbean",
-            "text": "",
-            "tag": "input",
-            "hiddentag": "No",
-            "url": "https://nucleus.slkgroup.com:4450/OA_HTML/RF.jsp?function_id=28716&resp_id=…2G2B1m5nYepZW7sgGQGFA..&params=5j0bzUgs9j2gsy7f2IhOgr-7x5nWRx63YDVSeM1o2-M",
-            "custname": "password_input",
-            "tempId": 1,
-            "xpath": "//*[@id=\"pwdbean\"];pwdbean;/html/body/span/div[2]/form/span[2]/div/div/div[1]/div/div[3]/table[2]/tbody/tr[2]/td[2]/span/table/tbody/tr[5]/td[2]/table/tbody/tr[4]/td[2]/table/tbody/tr/td[3]/input;null;null;null"
-        }, {
-            "id": "SubmitButton",
-            "text": "Login",
-            "tag": "button",
-            "hiddentag": "No",
-            "custname": "Login",
-            "url": "https://nucleus.slkgroup.com:4450/OA_HTML/RF.jsp?function_id=28716&resp_id=…2G2B1m5nYepZW7sgGQGFA..&params=5j0bzUgs9j2gsy7f2IhOgr-7x5nWRx63YDVSeM1o2-M",
-            "tempId": 2,
-            "xpath": "//*[@id=\"SubmitButton\"];SubmitButton;/html/body/span/div[2]/form/span[2]/div/div/div[1]/div/div[3]/table[2]/tbody/tr[2]/td[2]/span/table/tbody/tr[5]/td[2]/table/tbody/tr[6]/td[2]/button[1];null;null;null"
-        }, {
-            "id": "Cancel",
-            "text": "Cancel",
-            "tag": "button",
-            "hiddentag": "No",
-            "url": "https://nucleus.slkgroup.com:4450/OA_HTML/RF.jsp?function_id=28716&resp_id=…2G2B1m5nYepZW7sgGQGFA..&params=5j0bzUgs9j2gsy7f2IhOgr-7x5nWRx63YDVSeM1o2-M",
-            "custname": "Cancel_button2",
-            "tempId": 3,
-            "xpath": "//*[@id=\"Cancel\"];Cancel;/html/body/span/div[2]/form/span[2]/div/div/div[1]/div/div[3]/table[2]/tbody/tr[2]/td[2]/span/table/tbody/tr[5]/td[2]/table/tbody/tr[6]/td[2]/button[2];null;null;null"
-    }]
     
     //Initiating Scraping
     $scope.initScraping = function(browserType){
+    	 DesignServices.initScraping_ICE()
+ 	    .then(function (data) {
+     	
+        var viewString = {};
+        viewString.view = data;
         console.log("Scrapping Started::::::")
         $("#finalScrap").empty()
         $("#finalScrap").append("<div id='scrapTree' class='scrapTree'><ul><li><input title='Select all' type='checkbox' class='checkStylebox'><a id='aScrapper'>Screen Fields </a><ul id='scraplist' class='scraplistStyle'></ul></li></ul></div>");
@@ -74,5 +39,6 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			},
 			editable: true,
 		});
+ 	   }, function (error) { console.log("Fail to Load design_ICE") });
     }
 }]);
