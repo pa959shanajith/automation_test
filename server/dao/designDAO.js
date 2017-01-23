@@ -17,7 +17,6 @@ initScraping_ICE: function initScraping_ICE(req, cb, data) {
 	 //console.log(socket);
 	fs.readFile('D:/Nineteen68.git/server/config/scrapeData.json','utf8', (err, data) => {
 		  if (err) throw err;
-		  console.log(data);
 		  cb(null, data);
 		});  
 }
