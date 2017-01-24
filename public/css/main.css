@@ -672,6 +672,7 @@ body {
 {
 	 margin: 2% 1% 0% 1%;
 }
+<<<<<<< HEAD
 #scrapTree ul li a
 {
 	 font-family: 'LatoWeb';
@@ -762,6 +763,7 @@ body {
     left: 0%;
     line-height: 20px;
 }
+
 /***Mid Section CSS***/
 
 
@@ -1448,3 +1450,6 @@ select:-webkit-autofill:focus {
     	min-height: calc(100% - 67%) !important;
     }
 }
+
+}
+
