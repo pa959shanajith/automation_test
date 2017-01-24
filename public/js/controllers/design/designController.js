@@ -3,6 +3,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
     $timeout(function(){
         $('.scrollbar-inner').scrollbar();
         $('.scrollbar-macosx').scrollbar();
+        document.getElementById("currentYear").innerHTML = new Date().getFullYear()
     }, 500)
     
     //Task Listing
@@ -12,7 +13,10 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
     $scope.initScraping = function(browserType){
     	 DesignServices.initScraping_ICE()
  	    .then(function (data) {
-     	
+     	if(data.length > 0)
+     	{
+     		
+     	}
         var viewString = {};
         viewString.view = data;
         console.log("Scrapping Started::::::")
