@@ -42,6 +42,7 @@ img.tag-icon{
 	height: 15px; 
 	margin-left:8px;
 	margin-top: -10px;
+	display: none; /* Commented to hide images of object types */
 }
 
 /* span[id^=content], span.content {
@@ -120,14 +121,14 @@ img.tag-icon{
 	transition: all 0.5s ease-in-out;
 }
 
-.folder-open {
+/*.folder-open {
 	background: url('../imgs/misc.png') -21px -39px no-repeat;
 	padding-left: 20px;
 	height: 18px;
 	display: none;
 	float: left;
 	transition: all 0.5s ease-in-out;
-}
+}*/ /*commented as folder open is no longer a functionality*/
 
 .main {	
 	background: url('../imgs/misc.png') 2px 0 no-repeat; 
@@ -187,7 +188,8 @@ img.tag-icon{
 	float: left;
 } */
 
-.join {
+/************ COMMENTED TO REMOVE DOTTED JOINS BETWEEN PARENT AND CHILD NODES***********/
+/*.join {
 	background: url('../imgs/misc.png') 0 -20px no-repeat;
 	width: 18px;
 	height: 18px;
@@ -201,4 +203,4 @@ img.tag-icon{
 	height: 18px;
 	display: inline-block;
 	float: left;
-}
+}*/
