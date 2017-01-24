@@ -3,6 +3,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
     $timeout(function(){
         $('.scrollbar-inner').scrollbar();
         $('.scrollbar-macosx').scrollbar();
+        document.getElementById("currentYear").innerHTML = new Date().getFullYear()
     }, 500)
     
     //Task Listing

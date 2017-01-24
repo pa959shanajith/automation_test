@@ -7,7 +7,7 @@ window.onload = loadBody;
 
 //Document Ready Function
 $(document).ready(function() {	
-    //Task Function - Plugin Page
+	//Task Function - Plugin Page
     $(document).on("click", ".task-content .collapse-head", function(){
         $(".caret-absolute").hide()
         $(".panel-heading").css({'background':''})

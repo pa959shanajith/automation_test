@@ -1,5 +1,6 @@
 mySPA.controller('pluginController',['$scope','$window','$http','$location','$timeout','PluginService', function($scope,$window,$http,$location,$timeout,PluginService) {
 	$('.scrollbar-inner').scrollbar()
+	document.getElementById("currentYear").innerHTML = new Date().getFullYear()
     var userInfo = JSON.parse(window.localStorage['_UI']);
     var availablePlugins = userInfo.pluginsInfo;
     $("#plugin-container").empty().hide()
