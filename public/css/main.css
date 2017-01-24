@@ -766,6 +766,8 @@ body {
     left: 0%;
     line-height: 20px;
     background: none  !important;
+    font-size: 12px;
+    font-family: LatoWebLight;
 }
 .selectAllTxt:hover
 {
