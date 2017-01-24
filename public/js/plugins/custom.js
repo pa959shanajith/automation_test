@@ -51,9 +51,37 @@ $(document).ready(function() {
     })
 
     //Filter Function - Screen Level
-    $(document).on("click", ".popupContent-filter div span", function(){
-        $(this).toggleClass("popupContent-filter-active")
+    $(document).on("click", ".popupContent-default", function(){
+        $(this).removeClass("popupContent-default").addClass("popupContent-filter-active"); 
     })
+    
+    $(document).on("click", ".popupContent-filter-active", function(){
+        $(this).removeClass("popupContent-filter-active").addClass("popupContent-default"); 
+    })
+    
+    //To Select All Element Filters
+	$(document).on('click', ".checkStyleboxFilter", function(){
+		if($(this).is(":checked"))
+			{
+			 $('.popupContent-filter div span:not(.selectAllTxt)').addClass('popupContent-filter-active').removeClass('popupContent-default');
+			}
+		else{
+			 $('.popupContent-filter div span:not(.selectAllTxt)').removeClass('popupContent-filter-active').addClass('popupContent-default');
+		} 
+	})
+	
+	//If all filters get selected then parent select all get selected
+	$(document).on('click', ".popupContent-filter div span", function(){
+		var defaultFilterLen = $('.popupContent-filter div span:not(.selectAllTxt)').length;
+		var activefilterLen =  $('.popupContent-filter-active').length;
+		if(defaultFilterLen == activefilterLen)
+		{
+			$(".checkStyleboxFilter").prop('checked', true);
+		}
+		else{
+			$(".checkStyleboxFilter").prop('checked', false);
+		}
+	})
 });
 //Document Ready Function
 
