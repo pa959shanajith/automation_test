@@ -10,7 +10,7 @@ body {
     font-family: LatoWeb;
     margin: 0;
     padding: 0;
-	opacity:0
+    opacity: 0
 }
 
 .wrap {
@@ -19,8 +19,8 @@ body {
     position: relative
 }
 
-.btn-default{
-	color: #fff;
+.btn-default {
+    color: #fff;
     border: 0;
     border-radius: 20px;
     padding: 5px 20px;
@@ -32,8 +32,8 @@ body {
 .btn-default,
 .btn-default:active:focus,
 .btn-default:focus,
-.btn-default:hover{
-	background: #643693;
+.btn-default:hover {
+    background: #643693;
     color: #fff;
     outline: 0
 }
@@ -54,8 +54,8 @@ body {
     padding: 0 30px
 }
 
-.footer-global .small{
-	float: left;
+.footer-global .small {
+    float: left;
     line-height: 25px;
 }
 
@@ -242,7 +242,7 @@ body {
 .dropdown-userPart {
     float: right;
     width: auto;
-	margin: 8px -20px 8px 0;
+    margin: 8px -20px 8px 0;
 }
 
 .dropdown-userPart .dropdown-toggle:active:focus {
@@ -405,19 +405,19 @@ body {
     background: #eee
 }
 
-.taskNo{
-	font-family: 'LatoWebBold';
+.taskNo {
+    font-family: 'LatoWebBold';
 }
 
-.assignedTask{
-	font-size: 18px;
+.assignedTask {
+    font-size: 18px;
     padding: 0px 15px 10px;
     display: inline-block;
     width: 100%;
 }
 
-.assignedTaskInner{
-	font-size: 16px;
+.assignedTaskInner {
+    font-size: 16px;
     display: inline-block;
     width: 100%;
 }
@@ -485,7 +485,7 @@ body {
     width: 100%;
     float: left;
     position: relative;
-	height: calc(100% - 108px)
+    height: calc(100% - 108px)
 }
 
 #left-nav-section {
@@ -499,17 +499,17 @@ body {
 }
 
 #left-top-section {
-	min-height:60%;
+    min-height: 60%;
     float: left;
     width: 100%;
     border-bottom: 2px solid #461F6E;
 }
 
 #left-bottom-section {
-	min-height: 40%;
+    min-height: 40%;
     float: left;
     width: 100%;
-	position: relative;
+    position: relative;
 }
 
 #left-top-section ul,
@@ -521,13 +521,13 @@ body {
     text-align: center;
 }
 
-#left-bottom-section ul{
-	position: absolute;
-	top:50%;
-	left:50%;
-	transform: translate(-50%, -50%);
-	-moz-transform: translate(-50%, -50%);
-	-webkit-transform: translate(-50%, -50%)
+#left-bottom-section ul {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    -moz-transform: translate(-50%, -50%);
+    -webkit-transform: translate(-50%, -50%)
 }
 
 #left-top-section ul li,
@@ -553,7 +553,7 @@ body {
 
 #left-bottom-section ul li {
     margin-top: 0;
-	margin-bottom: 25%;
+    margin-bottom: 25%;
 }
 
 #left-bottom-section ul li:last-child {
@@ -613,9 +613,9 @@ body {
     -webkit-transition: 0.2s ease-in-out;
 }
 
-#left-top-section ul li label{
-	padding-left:15px;
-	padding-right:15px
+#left-top-section ul li label {
+    padding-left: 15px;
+    padding-right: 15px
 }
 
 #left-top-section ul li label,
@@ -668,44 +668,42 @@ body {
     -moz-border-radius: 5px;
     -webkit-border-radius: 5px;
 }
-#scrapTree ul:first-child
-{
-	 margin: 2% 1% 0% 1%;
+
+#scrapTree ul:first-child {
+    margin: 2% 1% 0% 1%;
 }
 
-#scrapTree ul li a
-{
-	 font-family: 'LatoWeb';
-	 text-decoration :none;
-	 color: #33363B;
-	 font-size: 16px;
-	 line-height: 20px;
-	 
+#scrapTree ul li a {
+    font-family: 'LatoWeb';
+    text-decoration: none;
+    color: #33363B;
+    font-size: 16px;
+    line-height: 20px;
 }
-.dtreeObjects
-{
-	display:inline-block;
-	width: auto;
+
+.dtreeObjects {
+    display: inline-block;
+    width: auto;
 }
-.objectText
-{
-	font-family: 'LatoWeb';
-	font-size: 16px;
-	padding: 0 10px;
-	vertical-align: text-bottom;
-	cursor: pointer;
+
+.objectText {
+    font-family: 'LatoWeb';
+    font-size: 16px;
+    padding: 0 10px;
+    vertical-align: text-bottom;
+    cursor: pointer;
 }
-.parentObjContainer
-{
-	display: inline-block;
+
+.parentObjContainer {
+    display: inline-block;
     position: relative;
     top: -10px;
     border-bottom: 1px solid #707070;
     padding-bottom: 5px;
 }
-.parentObject
-{
-	display: inline-block;
+
+.parentObject {
+    display: inline-block;
     width: auto;
     padding: 0px 10px;
     vertical-align: text-bottom;
@@ -713,71 +711,76 @@ body {
     font-family: LatoWeb;
     position: relative;
     top: 3px;
-}    
-.checkStylebox,.checkall,.checkStyleboxFilter
-{
-	width: 15px;
+}
+
+.checkStylebox,
+.checkall,
+.checkStyleboxFilter {
+    width: 15px;
     height: 15px;
     outline: 0;
     cursor: pointer;
 }
-.objBtn{
+
+.objBtn {
     font-size: 11px;
     margin-left: 10px;
     position: relative;
     top: -2px;
     border-radius: 11px;
 }
-#scraplist
-{
-	 padding: 0% 0% 0% 1%;
+
+#scraplist {
+    padding: 0% 0% 0% 1%;
 }
-#finalScrap
-{
-	padding-top: 1%;
+
+#finalScrap {
+    padding-top: 1%;
 }
-#scraplist li
-{
-	padding: 1% 0 1.5% 0 !important;
+
+#scraplist li {
+    padding: 1% 0 1.5% 0 !important;
 }
-.focus-icon
-{
-	display: inline;
+
+.focus-icon {
+    display: inline;
     width: 20px;
     height: 13px;
     position: relative;
     top: -4px;
     left: -10px;
-    cursor:pointer;
+    cursor: pointer;
 }
-#selectAllFilters
-{
-	float: left;
+
+#selectAllFilters {
+    float: left;
     width: 100%;
     font-size: 12px;
     margin-bottom: -1%;
     margin-left: 0%;
 }
-.selectAllTxt
-{
-	vertical-align: middle;
+
+.selectAllTxt {
+    vertical-align: middle;
     position: relative;
     top: 1px;
     left: 0%;
     line-height: 20px;
-    background: none  !important;
+    background: none !important;
     font-size: 12px;
     font-family: LatoWebLight;
 }
-.selectAllTxt:hover
-{
-	 background: none !important;
+
+.selectAllTxt:hover {
+    background: none !important;
 }
+
 
 /***Mid Section CSS***/
 
 
 /***Right Section CSS***/
+
 #right-dependencies-section {
     width: 90px;
     height: 100%;
@@ -867,9 +870,9 @@ body {
     opacity: 0;
     cursor: auto;
     background: #321e4f;
-	border-radius: 5px;
-	-moz-border-radius: 5px;
-	-webkit-border-radius: 5px;
+    border-radius: 5px;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
 }
 
 .popupWrap-filter {
@@ -877,7 +880,7 @@ body {
 }
 
 .popupContent {
-    padding: 4% 10%;
+    padding: 4% 9%;
     float: left;
     width: 100%;
 }
@@ -893,12 +896,11 @@ body {
     padding: 0px 15px 0 10px;
     cursor: pointer;
     margin-bottom: 10px;
-   
     border-radius: 20px;
 }
-.popupContent-default
-{
-	 background: #46326B;
+
+.popupContent-default {
+    background: #46326B;
 }
 
 .popupContent-filter div span:hover,
@@ -1018,23 +1020,24 @@ body {
 
 
 /******Custom Bootstrap Dialog CSS******/
+
 .modal {
-  text-align: center;
-  padding: 0!important;
+    text-align: center;
+    padding: 0!important;
 }
 
 .modal:before {
-  content: '';
-  display: inline-block;
-  height: 100%;
-  vertical-align: middle;
-  margin-right: -4px;
+    content: '';
+    display: inline-block;
+    height: 100%;
+    vertical-align: middle;
+    margin-right: -4px;
 }
 
 .modal-dialog {
-  display: inline-block;
-  text-align: left;
-  vertical-align: middle;
+    display: inline-block;
+    text-align: left;
+    vertical-align: middle;
 }
 
 .modal-content {
@@ -1088,8 +1091,8 @@ body {
     position: relative;
 }
 
-.row-modal:last-child{
-	margin-bottom: 0
+.row-modal:last-child {
+    margin-bottom: 0
 }
 
 .row-modal img[title='delete-row'] {
@@ -1148,21 +1151,24 @@ body {
 
 /******Custom Bootstrap Dialog CSS******/
 
-/******************Header CSS***************************/
-.userInfo
-{
-	vertical-align: middle;
-	position: relative;
-	top: 3px;
-}
-#displayUsername
-{
-	vertical-align: middle;
-	position: relative;
-	top: 4px;
-}
 
 /******************Header CSS***************************/
+
+.userInfo {
+    vertical-align: middle;
+    position: relative;
+    top: 3px;
+}
+
+#displayUsername {
+    vertical-align: middle;
+    position: relative;
+    top: 4px;
+}
+
+
+/******************Header CSS***************************/
+
 
 /******************Admin CSS***************************/
 
@@ -1373,25 +1379,29 @@ select:hover {
 
 /******************Admin CSS***************************/
 
+
 /******************Remove Webkit autocolor CSS***************************/
+
 input:-webkit-autofill,
-input:-webkit-autofill:hover, 
-input:-webkit-autofill:focus
-input:-webkit-autofill, 
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus input:-webkit-autofill,
 textarea:-webkit-autofill,
-textarea:-webkit-autofill:hover
-textarea:-webkit-autofill:focus,
+textarea:-webkit-autofill:hover textarea:-webkit-autofill:focus,
 select:-webkit-autofill,
 select:-webkit-autofill:hover,
 select:-webkit-autofill:focus {
-  border:none !important;
-  -webkit-text-fill-color: inherit !important;
-  -webkit-box-shadow: 0 0 0px 1000px #FFFFFF inset;
-  transition: background-color 5000s ease-in-out 0s;
+    border: none !important;
+    -webkit-text-fill-color: inherit !important;
+    -webkit-box-shadow: 0 0 0px 1000px #FFFFFF inset;
+    transition: background-color 5000s ease-in-out 0s;
 }
+
+
 /******************Remove Webkit autocolor CSS***************************/
 
+
 /*****************Custom Media Queries*****************/
+
 @media screen and (min-width:1280px) and (max-height:960px) {
     .login-bg-img {
         width: 48%;
@@ -1415,6 +1425,7 @@ select:-webkit-autofill:focus {
         margin-bottom: 6%
     }
 }
+
 
 /* @media only screen and (min-width:1366px) {
     .login-bg-img {
@@ -1440,8 +1451,9 @@ select:-webkit-autofill:focus {
     }
 }
  */
+
 @media screen and (max-height: 675px) {
-	.login-bg-img {
+    .login-bg-img {
         width: 45%;
     }
     .jumbotron-nobg {
@@ -1462,10 +1474,7 @@ select:-webkit-autofill:focus {
     .plugin-block {
         margin-bottom: 3%
     }
-    .lbs-single{
-    	min-height: calc(100% - 67%) !important;
+    .lbs-single {
+        min-height: calc(100% - 67%) !important;
     }
 }
-
-
-
