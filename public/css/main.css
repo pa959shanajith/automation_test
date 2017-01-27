@@ -568,7 +568,7 @@ body {
 
 #left-top-section ul li span,
 #left-bottom-section ul li span {
-    font-size: 18px;
+    /* font-size: 18px; */
     float: left;
     width: 100%;
     text-align: center;
@@ -671,6 +671,7 @@ body {
 
 #scrapTree ul:first-child {
     margin: 2% 1% 0% 1%;
+
 }
 
 #scrapTree ul li a {
@@ -686,9 +687,7 @@ body {
     width: auto;
 }
 
-.objectText {
-    font-family: 'LatoWeb';
-    font-size: 16px;
+.objectNames{
     padding: 0 10px;
     vertical-align: text-bottom;
     cursor: pointer;
@@ -774,7 +773,6 @@ body {
 .selectAllTxt:hover {
     background: none !important;
 }
-
 
 /***Mid Section CSS***/
 

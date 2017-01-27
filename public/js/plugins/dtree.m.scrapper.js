@@ -24,7 +24,7 @@
         console.log("settings: ", settings);
         
         //get the id of the menu div
-        var id = (this).selector;
+        var id = "";
         return this.each(function() {
         	
             var $ul = $(this).find('ul');
@@ -65,8 +65,8 @@
             		var id_content = "content_"+index;
             		var id_editable = "editable_"+index;
             		index++;
-            		var usrRole = JSON.parse(window.localStorage['userInfo'])
-            		var spanHtml = "<span class='customeNewNames' id='"+id_content+"'/>";
+            		//var usrRole = JSON.parse(window.localStorage['userInfo'])
+            		var spanHtml = "<span class='objectNames' id='"+id_content+"'/>";
             		/*$(".customeNewNames").each(function(){
             			$(this).html($(this).html().replace(/ &nbsp;/gi,''));
             			$(this).html($(this).html().trim());
@@ -75,9 +75,9 @@
             	    $(v).contents().eq(1).wrap(function(){
             	    	return spanHtml;
             	    });
-            	    
-            	    $(this).find('span.customeNewNames').on('dblclick',  function () {
-            	    	if(usrRole.role == "Test Engineer" || usrRole.role == "Viewer"){
+            	    var userRole = window.localStorage['_SR'];
+            	    $(this).find('span.objectNames').on('dblclick',  function () {
+            	    	if(userRole == "Test Lead"){
             	    		if(this.parentElement.parentElement.hasAttribute("data-xpath") == true){
             	    			var span = $(this);
                     	        var input = $('<input />', {
@@ -98,14 +98,14 @@
                 	        var input = $('<input />', {
                 	            'type' : 'text',
                 	            'id'   : id_editable,
-                	            'class': 'forValidationScreenObject',
+                	            'class': 'editObjectName',
                 	            'value': span.html().replace('&amp;','&').trim()
                 	        });                	        
     	        	        span.parent().append(input);
     	        	        span.addClass('content-hide');
     	        	        //$(this).remove();
     	        	        input.focus();
-    	        	        input.addClass('autoWidth');            	    		
+    	        	        //input.addClass('autoWidth');            	    		
             	    	}
 	        	        $('#'+id_editable)
 		        	        .on('keypress',  function (e) {
@@ -138,6 +138,13 @@
 		        	        		}
 		        	        	}
 		        	        })
+		        	         .on('keypress',  function (e) { debugger;
+		        	        	 var txtWidth = $(this).attr('size');
+		        	             var cs = $(this).val().length-6;
+		        	             txtWidth = parseInt(txtWidth);
+		        	             if(cs>txtWidth){
+		        	             $(this).attr('size',txtWidth+5);    }
+	        	        })
 		        	       .on('blur',  function (e) {
 		        	    	   //$(this).parent().append($(span).html($(this).val()));
 		        	    	   span.removeClass('content-hide');

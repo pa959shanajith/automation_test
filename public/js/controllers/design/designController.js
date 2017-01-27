@@ -13,15 +13,12 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
     $scope.initScraping = function(browserType){
     	 DesignServices.initScraping_ICE()
  	    .then(function (data) {
-     	if(data.length > 0)
-     	{
-     		
-     	}
+     
         var viewString = {};
         viewString.view = data;
         console.log("Scrapping Started::::::")
         $("#finalScrap").empty()
-        $("#finalScrap").append("<div id='scrapTree' class='scrapTree'><ul><li><span class='parentObjContainer'><input title='Select all' type='checkbox' class='checkStylebox'><span class='parentObject'><a id='aScrapper'>Select all </a><button class='btn btn-default objBtn'>Save</button><button class='btn btn-default objBtn'>Delete</button></span><span></span></span><ul id='scraplist' class='scraplistStyle'></ul></li></ul></div>");
+        $("#finalScrap").append("<div id='scrapTree' class='scrapTree'><ul><li><span class='parentObjContainer'><input title='Select all' type='checkbox' class='checkStylebox'><span class='parentObject'><a id='aScrapper'>Select all </a><button id='saveObjects' class='btn btn-default objBtn hide'>Save</button><button data-toggle='modal' id='deleteObjects' data-target='#deleteObjectsModal' class='btn btn-default objBtn hide'>Delete</button></span><span></span></span><ul id='scraplist' class='scraplistStyle'></ul></li></ul></div>");
         var custname;
 		var imgTag;
 		var scrapTree = $("#finalScrap").children('#scrapTree');
@@ -33,7 +30,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			custname = ob.custname;
 			var tag = ob.tag;
 			//Add This after Anchor Tag in next line <input type='checkbox' name='selectAllListItems' />
-			var li = "<li class='item' val="+ob.tempId+"><span class='dtreeObjects'><img id='focus_"+i+"' class='focus-icon' src='imgs/ic-highlight-element-inactive.png'/><input type='checkbox' class='checkall' name='selectAllListItems' /><a><img class='tag-icon' src='imgs/ic_"+imgTag+"_32x32.png'/><span class='objectText'>"+custname+"</span></a></span></li>";
+			var li = "<li class='item' val="+ob.tempId+"><img id='focus_"+i+"' class='focus-icon' src='imgs/ic-highlight-element-inactive.png'/><input type='checkbox' class='checkall' name='selectAllListItems' /><a><img class='tag-icon' src='imgs/ic_"+imgTag+"_32x32.png'/>"+custname+"</a></li>";
 			angular.element(innerUL).append(li)
 		}
         $(document).find('#scrapTree').scrapTree({
@@ -43,6 +40,13 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			},
 			editable: true,
 		});
+    	if(data.length > 0)
+     	{
+     		$("#saveObjects").removeClass('hide');
+     	}
+     	else{
+     		$("#saveObjects").addClass('hide');
+     	}
         
         //Highlight Focus Icon
         $(document).on('click', '.focus-icon', function(e) {
@@ -57,14 +61,16 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		if($(this).is(":checked")){
 			$("#scraplist li").find('input[name="selectAllListItems"]').prop("checked", true).addClass('checked');
 			$(".optionalActionButtions").children("#deleteFunction").prop("disabled", false).show().css({'cursor':'pointer'});
+			  $("#deleteObjects").removeClass('hide');
 			}
 			else{
 				$("#scraplist li").find('input[name="selectAllListItems"]').prop("checked", false).removeClass('checked');
 				$(".optionalActionButtions").children("#deleteFunction").prop("disabled", true).hide().css({'cursor':'no-drop'});
+				$("#deleteObjects").addClass('hide');
 			}
 		})
 		
-		//Triggered When individual checkbox objects clicked
+		//Triggered When each checkbox objects are clicked
 		$(document).on('click', "input[name='selectAllListItems']", function(){
 			if($(this).is(":checked")){
 				$(this).addClass('checked');
@@ -83,12 +89,35 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				$('.checkStylebox').prop("checked", false);
 			}
 			
+			if(checkedLength > 0 )
+			{
+			   $("#deleteObjects").removeClass('hide');
+			}
+			else{
+			   $("#deleteObjects").addClass('hide');
+			}
 		})
-		
+		//To delete Scrape Objects 
+		 $scope.del_Objects = function() 
+	     {
+        	$(".close:visible").trigger('click');
+        	var checkCond = $("#scraplist li").children("input[type='checkbox']").is(':checked');
+        	if(checkCond = true){
+        		
+        		DesignServices.deleteScrapeObjects_ICE(	$scope.newTestScriptDataLS)
+    			.then(function(data) {
+    				//Service to be integrated as it has dependency of ($scope.newTestScriptDataLS)
+    			}, function(error) {
+
+    			});
+        	}
+        	
+	     }
        
  	   }, function (error) { console.log("Fail to Load design_ICE") });
     	 
 
     	 
     }
+
 }]);

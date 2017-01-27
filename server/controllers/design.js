@@ -19,5 +19,16 @@ module.exports = {
 	      name: 'initScraping_ICE'
     }
   },		
+  deleteScrapeObjects_ICE: {
+	    handler: function (req, reply) {
+	      designDAO.deleteScrapeObjects_ICE(req, function (err, data) {
+	        if (err) { console.log(err); }
+	        return reply(data);
+	      });
+	    },
+	    app: {
+	      name: 'deleteScrapeObjects_ICE'
+  }
+},		
 		
 };

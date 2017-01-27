@@ -8,5 +8,12 @@ mySPA.factory('DesignServices', ['$http','$q', function ($http, $httpProvider, $
 	      .then(function(response)  { return response.data},
 	       function(response)        {return $q.reject(response.data)})
 	    },
+	    deleteScrapeObjects_ICE : function(){
+		      return $http.post('/deleteScrapeObjects_ICE',{
+		    	  	param : 'deleteScrapeObjects_ICE'
+		      })
+		      .then(function(response)  { return response.data},
+		       function(response)        {return $q.reject(response.data)})
+		    },
   }
 }]);

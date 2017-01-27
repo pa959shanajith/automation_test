@@ -110,6 +110,7 @@ server.route([
     { method: 'POST', path: '/loadUserInfo_Nineteen68', config: login.loadUserInfo_Nineteen68 },  
     { method: 'POST', path: '/getRoleNameByRoleId_Nineteen68', config: login.getRoleNameByRoleId_Nineteen68 },  
     { method: 'POST', path: '/initScraping_ICE', config: design.initScraping_ICE },  
+    { method: 'POST', path: '/deleteScrapeObjects_ICE', config: design.deleteScrapeObjects_ICE },  
     { method: '*', path: '/logoutUser', handler: function (request, reply) { reply.view('./server/views/index', '') } }
   ]);
 
