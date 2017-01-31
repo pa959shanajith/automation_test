@@ -14,21 +14,24 @@ var server = new Hapi.Server();
 
 //Server Connection
 server.connection({
-    host: 'localhost',
+   host: '10.41.31.29',
     address: '10.41.31.29',
-    port: '443',
-    tls: {
-        key: fs.readFileSync('./server/https/privatekey.pem'),  
-        cert: fs.readFileSync('./server/https/certificate.pem'),
-        requestCert: false,   // Set to true if require client certificate authentication.
-        ca: [] // Only necessary only if client is using the self-signed certificate.
-    },
-    labels: ['development', 'production'],
-    routes: {
-        security: true // turns on HSTS and other security headers
-    }
+    port: '3000'
+//    port: '443',
+//    tls: {
+//        key: fs.readFileSync('./server/https/privatekey.pem'),  
+//        cert: fs.readFileSync('./server/https/certificate.pem'),
+//        requestCert: false,   // Set to true if require client certificate authentication.
+//        ca: [] // Only necessary only if client is using the self-signed certificate.
+//    },
+//    routes: {
+//        security: true // turns on HSTS and other security headers
+//    }
 }
 );
+
+
+io = require('socket.io')(server.listener);
 
 //Logs 
 const options = {
@@ -116,7 +119,6 @@ server.route([
 
 });
 
-
 // Start Server
 server.register({
     register: require('good'),
@@ -128,5 +130,42 @@ server.register({
     server.start(() => {
         console.info(`Server started at ${ server.info.uri }`);
     });
- 
 });
+
+
+
+var allClients = [];
+var allSockets = [];
+var socketMap = {};
+
+io.on('connection', function (socket) {
+
+var address = socket.request.connection.remoteAddress;
+console.log(address);
+socketMap[address] = socket;
+console.log("socketMap", socketMap);
+socket.send('connected' );
+module.exports.allSocketsMap = socketMap;
+	
+console.log("NO OF CLIENTS CONNECTED:", io.engine.clientsCount);
+socket.on('message', function(data){
+});
+
+allSockets.push(socket);
+
+
+allClients.push(socket.conn.id)
+module.exports.abc = allSockets;
+
+socket.on('disconnect', function() {     
+var i = allSockets.indexOf(socket);
+console.log('Got disconnect!');
+allSockets.splice(i, 1);
+console.log("------------------------SOCKET DISCONNECTED----------------------------------------");
+console.log("SOCKET LENGTH", allSockets.length);
+});
+});
+
+
+
+

@@ -11,11 +11,17 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
     
     //Initiating Scraping
     $scope.initScraping = function(browserType){
-    	 DesignServices.initScraping_ICE()
+    	console.log(io);
+    	
+    	
+    	 DesignServices.initScraping_ICE(browserType)
  	    .then(function (data) {
-     
+        console.log(data);
+        var data = JSON.stringify(data);
+        var scrapeJson = JSON.parse(data);
+        scrapeJson = scrapeJson.view;
         var viewString = {};
-        viewString.view = data;
+        //viewString.view = data;
         console.log("Scrapping Started::::::")
         $("#finalScrap").empty()
         $("#finalScrap").append("<div id='scrapTree' class='scrapTree'><ul><li><span class='parentObjContainer'><input title='Select all' type='checkbox' class='checkStylebox'><span class='parentObject'><a id='aScrapper'>Select all </a><button id='saveObjects' class='btn btn-default objBtn hide'>Save</button><button data-toggle='modal' id='deleteObjects' data-target='#deleteObjectsModal' class='btn btn-default objBtn hide'>Delete</button></span><span></span></span><ul id='scraplist' class='scraplistStyle'></ul></li></ul></div>");
@@ -23,9 +29,9 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		var imgTag;
 		var scrapTree = $("#finalScrap").children('#scrapTree');
 		var innerUL = $("#finalScrap").children('#scrapTree').children('ul').children().children('#scraplist');
-        for (var i = 0; i < viewString.view.length; i++) {
-			var path = viewString.view[i].xpath;
-			var ob = viewString.view[i];
+        for (var i = 0; i < scrapeJson.length; i++) {
+			var path = scrapeJson[i].xpath;
+			var ob = scrapeJson[i];
 			ob.tempId= i; 
 			custname = ob.custname;
 			var tag = ob.tag;
