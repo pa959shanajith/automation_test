@@ -9,10 +9,6 @@ var cb = require('callback');
 var fs = require('fs');
 var myserver = require('../../server.js');
 
-
-//Init Server
-//var server = new Hapi.Server();
-
 var reqScrapJson =  {};
 module.exports = {
 	
