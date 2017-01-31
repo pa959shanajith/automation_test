@@ -143,7 +143,7 @@ io.on('connection', function (socket) {
 var address = socket.request.connection.remoteAddress;
 console.log(address);
 socketMap[address] = socket;
-console.log("socketMap", socketMap);
+//console.log("socketMap", socketMap);
 socket.send('connected' );
 module.exports.allSocketsMap = socketMap;
 	

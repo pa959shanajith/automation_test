@@ -19,7 +19,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
         console.log(data);
         var data = JSON.stringify(data);
         var scrapeJson = JSON.parse(data);
-        scrapeJson = scrapeJson.view;
+        scrapeJson = scrapeJson[0].view;
         var viewString = {};
         //viewString.view = data;
         console.log("Scrapping Started::::::")

@@ -14,14 +14,23 @@ module.exports = {
 	
 initScraping_ICE: function initScraping_ICE(req, cb, data) {
         var browserType = req.payload.browserType;
+        //console.log(browserType);
         reqScrapJson.appType = "Web";
         reqScrapJson.action =  "SCRAPE"
-        var data = "OPEN BROWSER CH";
+        if(browserType == "chrome")
+        {
+           var data = "OPEN BROWSER CH";
+        }
+        else if(browserType == "ie")
+        {
+           var data = "OPEN BROWSER IE";
+        }
+       
         var ip = req.headers['x-forwarded-for'] || req.info.remoteAddress;
         var mySocket =  myserver.allSocketsMap[ip];
         mySocket.send(data);
         mySocket.on('message', function(data){
-   	      cb(null, data);
+   	        cb(null, data);
        });
 },
 
