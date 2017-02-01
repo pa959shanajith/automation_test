@@ -738,17 +738,30 @@ body {
 }
 
 #scraplist li {
-    padding: 1% 0 1.5% 0 !important;
+    padding: 1% 0 3% 0 !important;
 }
 
-.focus-icon {
+/*.focus-icon {
     display: inline;
     width: 20px;
     height: 13px;
     position: relative;
-    top: -4px;
-    left: -10px;
+    top: 3px;
+    left: -8px;
     cursor: pointer;
+    float: left;
+}*/
+
+.ellipsis
+{
+	overflow: hidden;
+    white-space:nowrap !important;
+    text-overflow: ellipsis;
+    width: 85%;
+    display: inline-block;
+    position: relative;
+    left: -5px;
+    top: 4px;
 }
 
 #selectAllFilters {
