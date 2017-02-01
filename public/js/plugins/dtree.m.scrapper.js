@@ -8,7 +8,7 @@
 (function ( $ ) {
 
 	$.fn.scrapTree = function(options) {
-    	console.log("options: "+ (this).selector);
+    	//console.log("options: "+ (this).selector);
         var defaults = {
             closeSameLevel: true,
             useCookie: true,
@@ -21,7 +21,7 @@
             radio: false
         };
         var settings = $.extend( {}, defaults, options );//.css({"color":"red","border":"2px solid red"});
-        console.log("settings: ", settings);
+       // console.log("settings: ", settings);
         
         //get the id of the menu div
         var id = "";
@@ -32,32 +32,40 @@
             var $folder = $li.has("ul");
             
             if (settings.editable){
-            	console.log('preparing editable tree .......');
+            	//console.log('preparing editable tree .......');
             	var sel = id+' li a';
             	var index = 0;
-
-            	var radioStr = '<span><input type="radio"  name="radio"></input></span>';
+            	//var radioStr = '<span><input type="radio"  name="radio"></input></span>';
+            	var radioStr = '<img class="focus-icon" src="imgs/ic-highlight-element-inactive.png"/>';
             	var ri = 0;
                 if (settings.radio){
                        $('li.item').each(function(i, v){
-                    	   if($(this).parent().parent().parent().parent().attr('id') == "scrapTree2"){
-                    		   $(this).append(radioStr);
+                    	   if($(this).parent().parent().parent().parent().attr('id') == "scrapTree"){
+                    		  //$(this).append(radioStr);
+                    		 //  $(this).children("a").append(radioStr);
+                    		 $(this).children("a").children("span.highlight").html(radioStr);
                     	   }
                            var xpath = $(this).data('xpath');
                            //new change to highlight webelement in iframe
                            var url = $(this).data('url')
                            var hiddentag = $(this).data('hiddentag');
-                             $(this).find("input[type='radio']").on('click',function(){     
+                            // $(this).find("input[type='radio']").on('click',function(){    
+                           $(this).find(".focus-icon").on('click',function(){ 
+                        		$('.focus-highlight').removeAttr('src').attr('src','imgs/ic-highlight-element-inactive.png').removeClass('focus-highlight');
+                    		    $(this).addClass('focus-highlight');
+                             	$(this).attr('src','imgs/ic-highlight-element-active.png');
                             	 if(hiddentag == "Yes"){
-                            		 showDialogMesgsBtn("Highlight Error", "Cannot highlight as the element is hidden.", "btnHighlight");
-                            		 /*$("#highlightMsg").dialog({
-             							modal : true,
-             							resizable : false,
-             							draggable : false
-             						});*/
+                            		 $('#hiddenTagBox').modal('show'); 
                             	 }
                             	 else
-                            		 angular.element(document.getElementById("tree")).scope().highlightScrapElement(xpath,url);
+                            		 {
+                            		 	$('.focus-highlight').removeAttr('src').attr('src','imgs/ic-highlight-element-inactive.png').removeClass('focus-highlight');
+                            		    $(this).addClass('focus-highlight');
+	                                 	$(this).attr('src','imgs/ic-highlight-element-active.png');
+                            		    angular.element(document.getElementById("finalScrap")).scope().highlightScrapElement(xpath,url);
+                            		 
+                            		 }
+                            		
                              });
                        });
                 }
@@ -155,7 +163,7 @@
             }            
             //multiple selection
 			if (settings.multipleSelection.checkbox) {
-				console.log("multipleSelection: ", settings.multipleSelection);
+				//console.log("multipleSelection: ", settings.multipleSelection);
 				
 				var chkSelector = '';
 				
@@ -163,11 +171,11 @@
 					chkSelector += (settings.multipleSelection.classes[i] +' ');
 				}
 				
-				console.log ("chkSelector: "+chkSelector);
+				//console.log ("chkSelector: "+chkSelector);
 				
 				$(id+' '+chkSelector+' a').prepend("<span class='input'><input type='checkbox'/></input></span>");
 				//$("<span class='input'><input type='checkbox'/></input></span>").insertBefore($($(id+' '+chkSelector+' img')));
-$("#customInfo").html("<div class='info-msg custom-msg-info'><img src='imgs/info-icon.png'><span>Please provide unique name to object(s)</span></div>")
+				$("#customInfo").html("<div class='info-msg custom-msg-info'><img src='imgs/info-icon.png'><span>Please provide unique name to object(s)</span></div>")
 				
 				//$("#custnameSelection").html("Please provide unique name to object(s)");
 				$("input[type='checkbox']").change(
