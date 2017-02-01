@@ -1,0 +1,208 @@
+<!--Header-->
+<header header></header>
+<!--Header-->
+
+<!--Content Area-->
+<section class="container-fluid container-fluid-inner">
+	<!--Left Panel-->
+	<div id="left-nav-section">
+		<div class="scrollbar-macosx">
+			<div id="left-top-section">
+				<ul>
+					<li><span><a class='scrapeOnTxt' href='#'>Schedule On</a></span></li>
+					<li><a class="selectBrowser"><span><img src='imgs/ic-ie.png' alt='Internet Explorer' /></span>Internet Explorer</a></li>
+					<li><a class="selectBrowser"><span><img src='imgs/ic-chrome.png' alt='Google Chrome' /></span>Google Chrome</a></li>
+					<li style="margin-bottom: 30px"><a class="selectBrowser"><span><img src='imgs/ic-mozilla.png' alt='Mozilla Firefox' /></span>Mozilla Firefox</a></li>
+				</ul>
+			</div>
+
+			<div class='clear-both'></div>
+
+			<div id="left-bottom-section" class="lbs-single">
+				<ul>
+					<li><a href='/scheduling'><span><img src='imgs/ic-scheduling.png' alt='Scheduling' /></span>Schedule</a></li>
+				</ul>
+			</div>
+		</div>
+	</div>
+	<!--Left Panel-->
+
+	<!--Middle Panel-->
+	<div id="middle-content-section">
+		<!-- Wrapper -->
+		<div id="wrapper-sc">
+			<!--Task Name-->
+			<div id="page-taskName">
+				<span>AHRI-Identify objects related to login location screen</span>	
+			</div>
+			<!--Task Name-->
+			
+			<!--Page Contents-->
+			<div id="pageContent">
+				<!-- Top Section -->
+				<div id="scheduleSuitesTopSection">
+					<!-- Table Buttons -->
+					<div id="tableActionButtons">
+						<button class="btn btn-md pull-right btnAddToSchedule" ng-click="initSchedule()">Add</button>
+					</div>
+					<!-- Table Buttons -->
+					
+					<!-- Schedule Data Table -->
+					<div class="scheduleDataTable">
+						<!-- Schedule Table Header -->
+						<div class="scheduleDataHeader">
+							<span style="width: 4%">&nbsp;</span>
+							<span style="width: 23%; text-align:left; border-right: 1px solid #fff;">Scenario Name</span>
+							<span style="width: 17%; border-right: 1px solid #fff;">IP Address</span>
+							<span style="width: 20%; border-right: 1px solid #fff;">Data Parameterization</span>
+							<span style="width: 25%; border-right: 1px solid #fff;">Date & Time</span>
+							<span style="width: 11%">ALM</span>
+						</div>
+						<!-- Schedule Table Header -->
+						
+						<!-- Schedule Table Body -->
+						<div id="scheduleDataBody" class="scrollbar-inner scheduleDataBody"></div>
+						<!-- Schedule Table Body -->
+					</div>
+					<!-- Schedule Data Table -->
+				</div>
+				<!-- Top Section -->
+				
+				<!-- Bottom Section -->
+				<div id="scheduleSuitesBottomSection">
+					<!--Task Name-->
+					<div id="page-taskName">
+						<span>Scheduled</span>	
+						<select id="scheduledSuitesFilterData" class="form-control">
+							<option>Completed</option>
+							<option>In Progress</option>
+							<option>Terminated</option>
+						</select>
+					</div>
+					<!--Task Name-->
+					
+					<!-- Schedule Data Table -->
+					<div class="scheduleDataTable">
+						<!-- Schedule Table Header -->
+						<div class="scheduleDataHeader">
+							<span style="width: 15%; border-right: 1px solid #fff">Date & Time</span>
+							<span style="width: 15%; border-right: 1px solid #fff">IP Address</span>
+							<span style="width: 20%; border-right: 1px solid #fff">Scenario Name</span>
+							<span style="width: 20%; border-right: 1px solid #fff">Test Suite</span>
+							<span style="width: 18%; border-right: 1px solid #fff">Browsers</span>
+							<span style="width: 12%">Status</span>
+						</div>
+						<!-- Schedule Table Header -->
+						
+						<!-- Schedule Table Body -->
+						<div id="scheduledDataBody" class="scrollbar-inner scheduledDataBody">
+							<div class="scheduleDataBodyRow">
+								<div style="width: 15%">Date & Time</div>
+								<div style="width: 15%">IP Address</div>
+								<div style="width: 20%">Scenario Name</div>
+								<div style="width: 20%">Project Name</div>
+								<div style="width: 18%">Browser</div>
+								<div style="width: 12%">Completed</div>
+							</div>
+							<div class="scheduleDataBodyRow">
+								<div style="width: 15%">Date & Time</div>
+								<div style="width: 15%">IP Address</div>
+								<div style="width: 20%">Scenario Name</div>
+								<div style="width: 20%">Project Name</div>
+								<div style="width: 18%">Browser</div>
+								<div style="width: 12%">Completed</div>
+							</div>
+							<div class="scheduleDataBodyRow">
+								<div style="width: 15%">Date & Time</div>
+								<div style="width: 15%">IP Address</div>
+								<div style="width: 20%">Scenario Name</div>
+								<div style="width: 20%">Project Name</div>
+								<div style="width: 18%">Browser</div>
+								<div style="width: 12%">Completed</div>
+							</div>
+						</div>
+						<!-- Schedule Table Body -->
+					</div>
+					<!-- Schedule Data Table -->
+				</div>
+				<!-- Bottom Section -->
+			</div>
+			<!--Page Contents-->
+		</div>
+		<!-- Wrapper -->
+	</div>
+	<!--Middle Panel-->
+
+	<!--Right Panel-->
+	<div id="right-dependencies-section">
+		<!--Images Blocks-->
+		<div class="thumbnail thumbnail-custom">
+        	<a class="slidePopup">
+          		<img class="thumb-ic" src="imgs/ic-task.png" alt="Tasks">
+          		<div class="caption">
+            		<p>Tasks</p>
+          		</div>
+        	</a>
+			<!--Popup-->
+			<div tabindex="0" id="window-task" class="popupWrap">
+				<h4 class="h4-custom closePopup">Tasks <img class="closePopup pull-right" src="imgs/ic-arrow.png" /></h4>
+				<div class="popupContent popupTasks">
+					<div class="scrollbar-inner scrollbar-innerpages">
+						<!--Tasks-->
+						<div class="panel-group task-content-inner" id="accordion"></div>
+						<!--Tasks-->
+					</div>
+				</div>
+			</div>
+			<!--Popup-->
+      	</div>
+		<!--Images Blocks-->
+
+		<!--Images Blocks-->  		
+		<div class="thumbnail thumbnail-custom">
+        	<a class="slidePopup">
+          		<img class="thumb-ic" src="imgs/ic-info.png" alt="Project Info">
+          		<div class="caption">
+            		<p>Info</p>
+          		</div>
+        	</a>
+			<!--Popup-->
+			<div tabindex="0" id="window-pi" class="popupWrap">
+				<h4 class="h4-custom closePopup">Project Information <img class="closePopup pull-right" src="imgs/ic-arrow.png" /></h4>
+				<div class="popupContent">
+					<p class="proj-info-wrap">
+						<span class="content-label">Project :</span>
+						<span class="content">AHRI Implementation</span>
+					</p>
+					<p class="proj-info-wrap">
+						<span class="content-label">Module :</span>
+						<span class="content">AHRI Implementation_Module_1</span>
+					</p>
+					<p class="proj-info-wrap">
+						<span class="content-label">Screen :</span>
+						<span class="content">AHRI Implementation_Screen_1</span>
+					</p>
+				</div>
+			</div>
+			<!--Popup-->
+      	</div>
+		<!--Images Blocks-->
+
+		<!--Images Blocks-->
+		<div class="thumbnail thumbnail-custom thumbnail-custom-wiki">
+        	<a class="slide_popup" href="#">
+          		<img class="thumb-ic" src="imgs/ic-wiki.png" alt="Project Info">
+          		<div class="caption">
+            		<p>Wiki</p>
+          		</div>
+        	</a>
+      	</div>
+		<!--Images Blocks-->
+	</div>
+	<!--Right Panel-->
+</section>	
+<!--Content Area-->
+
+<!--Footer-->
+<footer footer id="footer" class="footer-global"></footer>
+<!--Footer-->

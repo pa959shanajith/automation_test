@@ -35,7 +35,42 @@ body {
 .btn-default:hover {
     background: #643693;
     color: #fff;
-    outline: 0
+    outline: 0;
+}
+
+.btn-xs.focus,
+.btn-xs,
+.btn-xs:active:focus,
+.btn-xs:focus,
+.btn-xs:hover {
+    background: #643693;
+    color: #fff;
+    outline: 0;
+    border-radius: 20px;
+    padding: 0px 12px;
+    font-size: 13px;
+    font-family: "LatoWeb";
+    margin-right: 7px;
+    font-family: 'LatoWebLight';
+}
+
+.btn-xs-custom {
+	margin-top: 7px;
+}
+
+.btn-md.focus,
+.btn-md,
+.btn-md:active:focus,
+.btn-md:focus,
+.btn-md:hover {
+    color: #fff;
+    border: 0;
+    border-radius: 20px;
+    padding: 2px 15px;
+    font-size: 17px;
+    background: #643693;
+	font-family: 'LatoWebLight';
+    outline: 0;
 }
 
 #footer {
@@ -177,12 +212,11 @@ body {
     padding-left: 0
 }
 
-.btn.focus,
 .login-wrap button,
 .login-wrap button:active:focus,
 .login-wrap button:focus,
 .login-wrap button:hover {
-    background: #643693;
+    background: #9f62e1;
     color: #fff;
     outline: 0
 }
@@ -213,7 +247,8 @@ body {
     font-size: 32px;
     float: left;
     margin-top: 35px;
-    padding: 0 12px
+    padding: 0 12px;
+    background: #9f62e1;
 }
 
 .absoluteError {
@@ -221,7 +256,8 @@ body {
     width: 100%;
     text-align: center;
     top: 60%;
-    transform: translateY(-25%)
+    transform: translateY(-25%);
+    left: 0
 }
 
 .errorMessages {
@@ -312,6 +348,12 @@ body {
     cursor: pointer
 }
 
+.pluginTaskBlock{
+	position: absolute;
+	right:0;
+	height: calc(100% - 30px);
+}
+
 .task-bar {
     font-family: LatoWebLight;
     background: #643693;
@@ -363,7 +405,8 @@ body {
 }
 
 .task-content {
-    padding-right: 25px
+    padding-right: 25px;
+	height: calc(100% - 65px);
 }
 
 .task-content .panel-group {
@@ -496,7 +539,11 @@ body {
     font-family: 'LatoWebLight';
     position: absolute;
     left: 0px;
+    overflow: auto;
+	-ms-overflow-style: none;
+	-webkit-overflow-style: none;
 }
+
 
 #left-top-section {
     min-height: 60%;
@@ -506,7 +553,7 @@ body {
 }
 
 #left-bottom-section {
-    min-height: 40%;
+    min-height: 39%;
     float: left;
     width: 100%;
     position: relative;
@@ -588,7 +635,7 @@ body {
     word-wrap: break-word;
     font-weight: normal;
     display: block;
-    width: 70%;
+    width: 75%;
     margin: 0 auto;
 }
 
@@ -639,7 +686,7 @@ body {
 /***Left Section CSS***/
 
 
-/***Mid Section CSS***/
+/***Design Mid Section CSS***/
 
 #middle-content-section {
     width: calc(100% - 270px);
@@ -652,9 +699,17 @@ body {
     top: 0;
 }
 
+#wrapper-sc{
+	float: left;
+    width: 100%;
+    position: relative;
+    height: 100%;
+}
+
 #page-taskName {
     float: left;
-    width: 100%
+    width: 100%;
+	margin-bottom: 10px;
 }
 
 #page-taskName span {
@@ -787,7 +842,7 @@ body {
     background: none !important;
 }
 
-/***Mid Section CSS***/
+/***Design Mid Section CSS***/
 
 
 /***Right Section CSS***/
@@ -880,6 +935,7 @@ body {
     top: 10px;
     opacity: 0;
     cursor: auto;
+    display:none;
     background: #321e4f;
     border-radius: 5px;
     -moz-border-radius: 5px;
@@ -1028,6 +1084,195 @@ body {
 
 
 /*****************Design CSS*****************/
+
+
+/*****************Execution CSS*****************/
+
+/******Exectuion Mid Section******/
+#pageContent{
+	float:left;
+	width:100%;
+	height: 95%;
+}
+
+#scheduleSuitesTopSection{
+	position: relative;
+	height: 65%;
+	float:left;
+	width:100%;
+	padding-bottom: 25px;
+}
+
+#scheduleSuitesBottomSection{
+	float: left;
+    width: calc(100% + 40px);
+    position: relative;
+    border-top: 20px solid #EEEEEE;
+    margin-left: -20px;
+    padding: 20px;
+    height: 38%;
+}
+
+#tableActionButtons{
+	float:left;
+	width:100%;
+	margin-bottom: 15px;
+	opacity:0
+}
+.executionTableDnd, .scheduleDataTable{
+	float:left;
+	width:100%;
+	opacity:0;
+	height: calc(100% - 45px);
+}
+.btnAddToSchedule{
+	padding: 2px 30px !important;
+}
+.d-execute{
+	width:18px;
+	height:16px;
+	float:left;
+}
+.d-schedule{
+	width:18px;
+	height:16px;
+}
+.executionDataTable{
+	float:left;
+	width:100%;
+	position: relative;
+}
+.executionDataTable thead, .scheduleDataHeader {
+    position: fixed;
+    width: calc(100% - 308px);
+    margin: -0.1em;
+    z-index: 1;
+    background: #5e636b;
+    color: #fff;
+    font-size: 17px;
+    font-family: 'LatoWebLight';
+    border-radius: 6px;
+    -moz-border-radius: 6px;
+    -webkit-border-radius: 6px;
+}
+.executionDataTable thead tr{
+	width: 100%;
+	display: block;
+	float: left;
+}
+.executionDataTable tbody tr:nth-child(odd), .scheduleDataBodyRow:nth-child(odd){
+	background:#e8e6ff;	
+}
+.executionDataTable tbody {
+	position: absolute;
+    width: 100%;
+    margin-top: 28px;
+}
+#scheduleDataBody, #scheduledDataBody{
+	float:left;
+	width:100%;
+	margin-top: 28px;
+	overflow: auto;
+	-ms-overflow-style: none;
+	-webkit-overflow-style: none;
+}
+.executionDataTable tbody tr, .scheduleDataBodyRow{
+	width: 100%;
+    display: block;
+    float: left;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+.executionDataTable th, .executionDataTable td, .scheduleDataHeader span, .scheduleDataBodyRow div{
+	font-weight: normal !important;
+	padding: 1px 0px;
+	display: inline-block;
+	text-align: center;
+	float:left;
+}    
+.executionDataTable .form-control, #scheduleDataBody .form-control{
+	display: inline-block;
+	width: 90%;
+	height: 28px;
+	float: none;
+	border: 1px solid #5e636b;
+	padding: 0px 5px;
+}
+.executionDataTable select.form-control{
+	margin-bottom: 0;
+    width: 70%;
+    padding: 0px 10px;
+    appearance: none;
+	border: 1px solid #5e636b !important;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
+.executionDataTable select.form-control::-ms-expand {
+    display: none;
+}
+#scheduledSuitesFilterData{
+	margin-bottom: 0;
+    border: 1px solid #5e636b !important;
+    display: inline-block;
+    float: none;
+    width: 15%;
+    height: 30px;
+    margin-left: 15px;
+}
+.fc-datePicker{
+	width: 100% !important;
+}
+.fc-timePicker{
+	width: 100% !important;
+}
+.datepickerIcon{
+	top: 0px;
+    position: absolute;
+    right: 0;
+    background: #643693;
+    padding: 4px 5px;
+    border-radius: 0px 4px 4px 0px;
+    -moz-border-radius: 0px 4px 4px 0px;
+    -webkit-border-radius: 0px 4px 4px 0px;
+    cursor:pointer;
+}
+.timepickerIcon{
+	top: 0px;
+    position: absolute;
+    right: 0;
+	background: #643693;
+    padding: 5px;
+    border-radius: 0px 4px 2px 0px;
+    -moz-border-radius: 0px 4px 2px 0px;
+    -webkit-border-radius: 0px 4px 2px 0px;
+    cursor:pointer;
+}
+.selectBrowser{
+	cursor: pointer;
+}
+.sb{
+	background: #331d4c;
+	border-radius: 5px;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+}
+.executionDataTable .form-control:focus,
+#scheduleDataBody .form-control:focus,
+#scheduledSuitesFilterData:focus{
+	box-shadow:none;
+}
+.tabeleCellPadding{
+	padding: 5px 0px !important;
+}
+.alertGreen{
+	background: #fff url("../imgs/ic-true.png") 90% center no-repeat !important
+}
+.alertRed{
+	background: #fff url("../imgs/ic-false.png") 90% center no-repeat !important
+}
+/******Exectuion Mid Section******/
+
+/*****************Execution CSS*****************/
 
 
 /******Custom Bootstrap Dialog CSS******/
@@ -1487,5 +1732,8 @@ select:-webkit-autofill:focus {
     }
     .lbs-single {
         min-height: calc(100% - 67%) !important;
+    }
+    .executionTableDnd{
+		height: calc(100% - 60px);
     }
 }

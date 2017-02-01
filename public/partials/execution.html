@@ -20,7 +20,7 @@
 
 			<div id="left-bottom-section" class="lbs-single">
 				<ul>
-					<li><a href='#'><span><img src='imgs/ic-scheduling.png' alt='Scheduling' /></span>Schedule</a></li>
+					<li><a href='/scheduling'><span><img src='imgs/ic-scheduling.png' alt='Scheduling' /></span>Schedule</a></li>
 				</ul>
 			</div>
 		</div>
@@ -34,6 +34,40 @@
 			<span>AHRI-Identify objects related to login location screen</span>	
 		</div>
 		<!--Task Name-->
+		
+		<!--Page Contents-->
+		<div id="pageContent">
+			<!-- Table Buttons -->
+			<div id="tableActionButtons">
+				<button class="btn btn-xs btn-xs-custom">Save</button>
+				<button class="btn btn-xs btn-xs-custom">Configure</button>
+				<button class="btn btn-md pull-right">Execute</button>
+				<button class="btn btn-md pull-right" style="margin-right:10px">Schedule</button>
+			</div>
+			<!-- Table Buttons -->
+			
+			<!-- Table DnD -->
+			<div class="executionTableDnd">
+				<div class="scrollbar-inner exeDataTable">
+					<table id="executionDataTable" class="executionDataTable" cellspacing="0" cellpadding="0">
+						<thead>
+							<tr>
+								<th style="width: 4%" id="contextmenu"></th>
+								<th style="width: 3%; padding: 5px 0px"><i class="fa fa-ban" title="Do Not Execute" aria-hidden="true" style="font-size: 14px;"></i><input class="d-execute" type="checkbox" /></th>
+								<th style="width: 25%; text-align:left; border-right: 1px solid #fff;">Scenario Name</th>
+		  						<th style="width: 22%; border-right: 1px solid #fff">Data Parameterization</th>
+								<th style="width: 15%; border-right: 1px solid #fff">Condition</th>
+								<th style="width: 23%; border-right: 1px solid #fff">Project Name</th>
+								<th style="width: 8%; text-align: center;">ALM</th>
+							</tr>
+						</thead>
+						<tbody></tbody>
+					</table>
+				</div>
+			</div>
+			<!-- Table DnD -->
+		</div>
+		<!--Page Contents-->
 	</div>
 	<!--Middle Panel-->
 

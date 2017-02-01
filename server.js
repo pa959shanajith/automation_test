@@ -14,8 +14,8 @@ var server = new Hapi.Server();
 
 //Server Connection
 server.connection({
-   host: '10.41.31.29',
-    address: '10.41.31.29',
+   host: '10.41.31.15',
+    address: '10.41.31.15',
     port: '3000'
 //    port: '443',
 //    tls: {
