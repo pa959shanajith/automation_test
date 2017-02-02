@@ -2198,7 +2198,7 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 				row.append($('<td style="width:20%;"><input class="getParamPath" type="text" /></td>'));
 				row.append($('<td style="width:15%;padding-left: 23px;" ><select class="conditionCheck"><option value="False" selected>False</option><option value="True">True</option></select> </td>'));
 				row.append($("<td style='width:25%;padding-left: 19px;'>" + rowData[i].projectName+ "</td>"));
-				row.append($("<td style='width:5%'> <i class=\"fa fa-refresh syncIcon icon-linkexe\" id='syncScenario' title='Sync Test Scenario' aria-hidden='true'></i></td>"));
+				row.append($("<td style='width:5%'> <i class=\"fa fa-refresh syncIcon icon-linkexe\" id='syncScenario' title='Sync Test Scenario' aria-hidden='true' style='cursor: pointer;'></i></td>"));
 				row.append($("<td style='width:5%'>  <i class=\"fi-trash delete-row top-space icon-linkexe\" onClick=\"executionRemoverow("+ indexVal + ")\" ></i> </td>"));
 				indexVal++;
 				getCount++;
@@ -2231,7 +2231,7 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 					row.append($('<td style="width:15%"><select class="conditionCheck form-control"><option value="False" selected>False</option><option value="True">True</option></select> </td>'));				
 				}
 				row.append($("<td style='width:23%;' class='tabeleCellPadding'>" + rowData[i].projectName+ "</td>"));
-				row.append($("<td style='width:8%' class='tabeleCellPadding'><img src='../imgs/ic-alm.png' id='syncScenario' title='Sync Test Scenario' /></td>"));
+				row.append($("<td style='width:8%' class='tabeleCellPadding'><img src='../imgs/ic-alm.png' id='syncScenario' title='Sync Test Scenario' style='cursor: pointer;'/></td>"));
 				indexValue++;
 				count++;
 			}
@@ -2242,7 +2242,7 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 			})
 		}
 		
-		$('#executionDataTable').tableDnD	({
+		/*$('#executionDataTable').tableDnD	({
 			onDrop : function(table, row) {
 				var checkArray = [];
 				var rows = table.tBodies[0].rows;
@@ -2271,7 +2271,7 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 				flag = true;
 				executionDrawRow(chkArray);
 			}
-		});
+		});*/
 	}
     
     $(document).on("change", ".conditionCheck", function(){
@@ -2279,6 +2279,29 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
     	else $(this).removeClass("alertRed").addClass("alertGreen")
     })
     
+     $(document).on('click',"#parentExecute", function(){
+    	 if($(this).is(":checked")){
+    	   $(".doNotExecuteScenario").prop("checked", true)
+
+    		
+    	 }
+    	   else{
+    		   $(".doNotExecuteScenario").prop("checked", false)
+    	   }
+     })
+     
+      $(document).on('click',".doNotExecuteScenario", function(){
+  		var checkedLen =  $(".doNotExecuteScenario:checked").length;
+  		var totalLen =  $(".doNotExecuteScenario").length;
+  		if(totalLen == checkedLen){
+  			$("#parentExecute").prop("checked", true)
+  		}
+  		else{
+  			$("#parentExecute").prop("checked", false)
+  		}
+  		  
+      })
+     
     $("#tableActionButtons, .executionTableDnd").delay(500).animate({opacity:"1"}, 500)
     cfpLoadingBar.complete();
 }]);

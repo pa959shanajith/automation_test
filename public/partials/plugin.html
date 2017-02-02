@@ -23,6 +23,10 @@
 			<!--Right Tasks-->
 			<div class="col-md-5 pluginTaskBlock">
 				<!--Task Heading Part-->
+				<div>
+					<input id="uploadTasks" ng-click="getTask()" type="submit" value="Upload Tasks">
+					<input name="Select File" style="z-index:-1; display: none;" type="file" id="fileInputJson" accept=".json">
+				</div>
 				<div class="col-md-12 task-bar">
 					<span class="task-heading">My task(s)</span>
 					<ul class="list-inline list-inline-right">

@@ -11,9 +11,11 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
     
     //Initiating Scraping
     $scope.initScraping = function(browserType){
+    	var blockMsg = 'Scrapping in progress. Please Wait...';
+    	blockUI(blockMsg);
     	DesignServices.initScraping_ICE(browserType)
- 	    .then(function (data) {
-        console.log(data);
+ 	    .then(function (data) { 
+ 	     unblockUI();
         var data = JSON.stringify(data);
         var scrapeJson = JSON.parse(data);
         var viewString = {}
@@ -38,12 +40,10 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			var tag1 = tag.replace(/ /g, "_");
 			var tag2;
 			if(tag == "a" || tag == "input" || tag == "table" || tag == "list" || tag == "select" || tag == "img" || tag == "button" || tag == "radiobutton" || tag == "checkbox" || tag == "tablecell"){
-				var li = "<li data-xpath='"+ob.xpath+"' data-url='"+ob.url+"' data-hiddentag='"+ob.hiddentag+"' class='item select_all "+tag+"x' val="+ob.tempId+"><a><input type='checkbox' class='checkall' name='selectAllListItems' /><span class='highlight'></span ><span  class='ellipsis'>"+custN+"</span></a></li>";
-				$(".ellipsis").attr('title',custN)
+				var li = "<li data-xpath='"+ob.xpath+"' data-url='"+ob.url+"' data-hiddentag='"+ob.hiddentag+"' class='item select_all "+tag+"x' val="+ob.tempId+"><a><input type='checkbox' class='checkall' name='selectAllListItems' /><span class='highlight'></span ><span class='ellipsis'>"+custN+"</span></a></li>";
 			} 
 			else {
-				var li = "<li data-xpath='"+ob.xpath+"' data-url='"+ob.url+"' data-hiddentag='"+ob.hiddentag+"' class='item select_all "+tag+"x' val="+ob.tempId+"><a><input type='checkbox' class='checkall' name='selectAllListItems' /><span class='highlight'></span><span  class='ellipsis'>"+custN+"</span></a></li>";
-				$(".ellipsis").attr('title',custN)
+				var li = "<li data-xpath='"+ob.xpath+"' data-url='"+ob.url+"' data-hiddentag='"+ob.hiddentag+"' class='item select_all "+tag+"x' val="+ob.tempId+"><a><input type='checkbox' class='checkall' name='selectAllListItems' /><span class='highlight'></span><span class='ellipsis'>"+custN+"</span></a></li>";
 			}
 			angular.element(innerUL).append(li);
 		}

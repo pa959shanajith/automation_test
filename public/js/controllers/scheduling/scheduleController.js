@@ -75,7 +75,8 @@ mySPA.controller('scheduleController',['$scope','$http','$timeout','$location','
 	//Datepicker Function
 	$('.fc-datePicker').datepicker({
 		autoclose:"true",
-		format:"dd-mm-yyyy"
+		format:"dd-mm-yyyy",
+		todayHighlight: true
 	})
 	$(document).on('click', ".datepickerIcon", function(){
 		$(this).siblings(".fc-datePicker").focus()

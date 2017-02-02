@@ -14,7 +14,38 @@ mySPA.controller('pluginController',['$scope','$window','$http','$location','$ti
     }
     
   //Task Function
-    var tasksJson = [{
+    $scope.getTask = function(){
+    	$("#fileInputJson").attr("type","file");
+    	$("#fileInputJson").trigger('click');
+    	fileInputJson.addEventListener('change', function(e) {
+				// Put the rest of the demo code here.
+				var file = fileInputJson.files[0];
+				var textType = /json.*/;
+				var reader = new FileReader();
+				reader.onload = function(e) {
+					if((file.name.split('.')[file.name.split('.').length-1]).toLowerCase() == "json"){
+						var tasksJson = JSON.parse(reader.result);
+						window.localStorage['_TJ'] = angular.toJson(tasksJson);
+						$(".plugin-taks-listing").empty().hide()
+						var counter = 1;
+					    for(i=0; i<tasksJson.length; i++){
+					       if(tasksJson[i].Task_Type == "Design"){
+					    	   $(".plugin-taks-listing").append('<div class="panel panel-default"><div class="panel-heading"><h4 class="panel-title"><div class="collapse-head" data-toggle="collapse" data-parent="#accordion" href="#collapse'+i+'"><span class="taskNo">Task '+ counter +'</span><!--Addition--><div class="panel-additional-details"><span class="panel-head-tasktype">'+tasksJson[i].Task_Type+'</span><span class="panel-head-details details-design-task">Details <span class="caret caret-absolute"></span></span></div><!--Addition--></div></h4></div><div id="collapse'+i+'" class="panel-collapse collapse"><div class="panel-body"><span class="assignedTask" data-name="'+tasksJson[i].Sub_Task+'" onclick="taskRedirection(this.dataset.name)">'+tasksJson[i].Task_Name+'</span></div></div></div>').fadeIn()
+					       } 
+					       else if(tasksJson[i].Task_Type == "Execution"){
+					           $(".plugin-taks-listing").append('<div class="panel panel-default"><div class="panel-heading"><h4 class="panel-title"><div class="collapse-head" data-toggle="collapse" data-parent="#accordion" href="#collapse'+i+'"><span class="taskNo">Task '+ counter +'</span><!--Addition--><div class="panel-additional-details"><span class="panel-head-tasktype">'+tasksJson[i].Task_Type+'</span><span class="panel-head-details details-execute-task">Details <span class="caret caret-absolute"></span></span></div><!--Addition--></div></h4></div><div id="collapse'+i+'" class="panel-collapse collapse"><div class="panel-body"><span class="assignedTask" data-name="'+tasksJson[i].Sub_Task+'" onclick="taskRedirection(this.dataset.name)">'+tasksJson[i].Task_Name+'</span></div></div></div>').fadeIn()
+					       }
+					       counter++
+					    }
+					}
+					else{
+						alert("Upload only JSON file");
+					}
+				}
+				reader.readAsText(file);
+		});
+    }
+    /*var tasksJson = [{
     	"Project_Id": "4464668464",
     	"Node_Type": "Web",
     	"Node_Id": "4464668464",
@@ -96,7 +127,7 @@ mySPA.controller('pluginController',['$scope','$window','$http','$location','$ti
     		$(".plugin-taks-listing").append('<div class="panel panel-default"><div class="panel-heading"><h4 class="panel-title"><div class="collapse-head" data-toggle="collapse" data-parent="#accordion" href="#collapse'+i+'"><span class="taskNo">Task '+ counter +'</span><!--Addition--><div class="panel-additional-details"><span class="panel-head-tasktype">'+tasksJson[i].Task_Type+'</span><span class="panel-head-details details-execute-task">Details <span class="caret caret-absolute"></span></span></div><!--Addition--></div></h4></div><div id="collapse'+i+'" class="panel-collapse collapse"><div class="panel-body"><span class="assignedTask" data-name="'+tasksJson[i].Sub_Task+'" onclick="taskRedirection(this.dataset.name)">'+tasksJson[i].Task_Name+'</span></div></div></div>').fadeIn()
     	}
 		counter++
-    }
+    }*/
     
     $scope.taskRedirection = function(path){
     	if(path == "Screen") 			$window.location.assign("/design")
