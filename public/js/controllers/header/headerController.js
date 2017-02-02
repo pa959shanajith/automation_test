@@ -6,7 +6,7 @@ mySPA.controller('headerController', function($scope,$http,$location,headerServi
 	 userDetails = JSON.parse(window.localStorage['_UI']);
 	 userRole = window.localStorage['_SR'];
 	 $("#displayUsername").text(userDetails.firstname + ' ' + userDetails.lastname)
-	 $(".heading-center-light").text('Welcome  '+ userDetails.firstname + ' ' + userDetails.lastname);
+	 $(".heading-center-light").text('Welcome  '+ userDetails.firstname + ' ' + userDetails.lastname +'!');
 	 $(".userRole").text(userRole);
 	 if(userRole == 'Admin')
 	  {

@@ -82,6 +82,7 @@ $(document).ready(function() {
 			$(".checkStyleboxFilter").prop('checked', false);
 		}
 	})
+	
 });
 //Document Ready Function
 
@@ -110,3 +111,15 @@ function taskRedirectionInner(path){
 }
 
 //Innerpages Tasks Implementation
+
+//Function to Block UI & unBlockUI
+function blockUI(content)
+{
+	$("body").append("<div id='overlayContainer'><div class='contentOverlay'>"+content+"</div></div>");
+	$("#overlayContainer").fadeIn( "slow" );
+}
+
+function unblockUI(){
+	$("#overlayContainer").fadeOut().remove()
+}
+//Function to Block UI

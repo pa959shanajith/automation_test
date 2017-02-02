@@ -30,7 +30,10 @@ mySPA.controller('loginController', function ($scope, $http, $location, LoginSer
             LoginService.authenticateUser_Nineteen68(username, password)
                 .then(function (data) {
                     if (data == 'inValidCredential') {
-                        $scope.loginValidation = "The username or password you entered isn't correct. Try entering it again.";
+                    	 $(".ic-username").children().attr("src", "imgs/ic-username-error.png");
+                         $(".ic-password").children().attr("src", "imgs/ic-password-error.png");
+                         $(".ic-password").parent().addClass("input-border-error")
+                        $scope.loginValidation = "The username or password you entered isn't correct. Please try again.";
                         cfpLoadingBar.complete();
                     }
                     else {

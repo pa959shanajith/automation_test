@@ -6,6 +6,36 @@ html {
     height: 100%
 }
 
+#overlayContainer{
+	position: fixed;
+    background-color: rgba(0, 0, 0, 0.85);
+    -moz-background-color: rgba(0, 0, 0, 0.85);
+    -webkit-background-color: rgba(0, 0, 0, 0.85);
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    cursor: wait;
+    z-index: 10;
+}
+
+.contentOverlay{
+	position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translateX(-50%) translateY(-50%);
+    -moz-transform: translateX(-50%) translateY(-50%);
+    -webkit-transform: translateX(-50%) translateY(-50%);
+    background: #fff;
+    padding: 10px 20px;
+    border-radius: 5px;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    cursor: auto;
+    color:#461F6E;
+    font-family: LatoWebBold;
+}
+
 body {
     font-family: LatoWeb;
     margin: 0;
@@ -611,6 +641,7 @@ body {
     font-family: 'LatoWebMedium' !important;
     font-size: 18px !important;
     color: #eee9ff;
+    cursor: default !important;
 }
 
 #left-top-section ul li span,
@@ -725,7 +756,7 @@ body {
 }
 
 #scrapTree ul:first-child {
-    margin: 2% 1% 0% 1%;
+    
 
 }
 
@@ -735,6 +766,18 @@ body {
     color: #33363B;
     font-size: 16px;
     line-height: 20px;
+    position: relative;
+}
+
+.highlight{
+	display: inline-block;
+    margin-left: -30px;
+    margin-right: 10px;
+    cursor: pointer;
+}
+
+.highlight img {
+	vertical-align: top
 }
 
 .dtreeObjects {
@@ -743,8 +786,6 @@ body {
 }
 
 .objectNames{
-    padding: 0 10px;
-    vertical-align: text-bottom;
     cursor: pointer;
 }
 
@@ -759,7 +800,7 @@ body {
 .parentObject {
     display: inline-block;
     width: auto;
-    padding: 0px 10px;
+    padding: 0px 0px 0 10px;
     vertical-align: text-bottom;
     font-size: 16px;
     font-family: LatoWeb;
@@ -777,23 +818,33 @@ body {
 }
 
 .objBtn {
-    font-size: 11px;
-    margin-left: 10px;
     position: relative;
-    top: -2px;
+    top: -3px;
     border-radius: 11px;
+    margin-top: 0;
+}
+
+.scrapTree{
+	float: left;
+    width: 100%;
+    padding-left: 35px;
 }
 
 #scraplist {
-    padding: 0% 0% 0% 1%;
+    padding: 0% 0% 0% 0%;
+    float: left;
+    width: 100%;
 }
 
 #finalScrap {
     padding-top: 1%;
+	padding-right: 27px;
+    overflow: auto;
+    -moz-overflow-style:none
 }
 
 #scraplist li {
-    padding: 1% 0 3% 0 !important;
+    margin-bottom: 10px;
 }
 
 /*.focus-icon {
@@ -815,7 +866,7 @@ body {
     width: 85%;
     display: inline-block;
     position: relative;
-    left: -5px;
+  	left: 9px;
     top: 4px;
 }
 
@@ -942,6 +993,7 @@ body {
     -webkit-border-radius: 5px;
 }
 
+
 .popupWrap-filter {
     width: 300px;
 }
@@ -979,6 +1031,29 @@ body {
     transition: 0.2s ease-in-out;
     -moz-transition: 0.2s ease-in-out;
     -webkit-transition: 0.2s ease-in-out;
+}
+
+#window-scrape-screenshot{
+	width:500px;
+    min-height: auto;
+    max-height: calc(100% - 185px);
+    position: fixed;
+    top: 110px;
+    overflow: auto;
+}
+
+#window-scrape-screenshot .popupContent {
+	padding:1%
+}
+
+#screenShotScrape{
+	float: left;
+    width: 100%;
+    position: relative
+}
+
+#screenShotScrape img {
+    width: 100%;
 }
 
 .proj-info-wrap {
