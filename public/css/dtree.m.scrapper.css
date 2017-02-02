@@ -20,11 +20,13 @@ li.item a:HOVER, a:FOCUS {
 }
 
 li.item a input[type='text']{
-	position:relative;
-	height: 22px;	
-	margin-top: 0px;
-	margin-left: 8px;
-	width: 200px;
+	position: absolute;
+    height: 22px;
+    width: 300px;
+    top: -5px;
+    left: 23px;
+    padding: 2px 7px;
+    height: 27px;
 }
 
 li.item a input[type='text']:focus{
@@ -33,7 +35,8 @@ li.item a input[type='text']:focus{
 }
 
 .content-hide{
-	display: none !important;
+	/* display: none !important; */
+	visibility: hidden;
 }
 .autoWidth
 {
@@ -104,9 +107,9 @@ img.tag-icon{
 
 .scrapTree li {
 	height: 18px;
-	display: block;
-/* 	width: 300px; */
-	line-height: 20px;
+    display: block;
+    float: left;
+    width: 100%;
 }
 
 .scrapTree li.folder-group {

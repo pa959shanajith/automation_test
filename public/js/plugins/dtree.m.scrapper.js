@@ -24,16 +24,17 @@
        // console.log("settings: ", settings);
         
         //get the id of the menu div
-        var id = "";
+        var id = $("#scrapTree");
         return this.each(function() {
         	
             var $ul = $(this).find('ul');
             var $li = $(this).find('li');
-            var $folder = $li.has("ul");
+            //var $folder = $li.has("ul");
             
             if (settings.editable){
             	//console.log('preparing editable tree .......');
-            	var sel = id+' li a';
+            	//var sel = id+' li a';
+            	var sel = $(id).find("#scraplist li a");
             	var index = 0;
             	//var radioStr = '<span><input type="radio"  name="radio"></input></span>';
             	var radioStr = '<img class="focus-icon" src="imgs/ic-highlight-element-inactive.png"/>';
@@ -51,6 +52,7 @@
                            var hiddentag = $(this).data('hiddentag');
                             // $(this).find("input[type='radio']").on('click',function(){    
                            $(this).find(".focus-icon").on('click',function(){ 
+                        	    $(".hightlight").remove();
                         		$('.focus-highlight').removeAttr('src').attr('src','imgs/ic-highlight-element-inactive.png').removeClass('focus-highlight');
                     		    $(this).addClass('focus-highlight');
                              	$(this).attr('src','imgs/ic-highlight-element-active.png');
@@ -84,7 +86,7 @@
             	    	return spanHtml;
             	    });
             	    var userRole = window.localStorage['_SR'];
-            	    $(this).find('span.objectNames').on('dblclick',  function () {
+            	    $(this).find('.ellipsis').on('dblclick',  function () {
             	    	if(userRole == "Test Lead"){
             	    		if(this.parentElement.parentElement.hasAttribute("data-xpath") == true){
             	    			var span = $(this);
@@ -106,7 +108,7 @@
                 	        var input = $('<input />', {
                 	            'type' : 'text',
                 	            'id'   : id_editable,
-                	            'class': 'editObjectName',
+                	            'class': 'editObjectName form-control',
                 	            'value': span.html().replace('&amp;','&').trim()
                 	        });                	        
     	        	        span.parent().append(input);
@@ -186,11 +188,11 @@
 						});
 			}
                       
-            $folder.prepend("<span class=\"plus\"></span><span class=\"folder\"></span>");
-            $li.not($folder).prepend("<span class=\"join\"></span><span class=\"page\"></span>");
-            $ul.parent("li").addClass("folder-group");
+            //$folder.prepend("<span class=\"plus\"></span><span class=\"folder\"></span>");
+            //$li.not($folder).prepend("<span class=\"join\"></span><span class=\"page\"></span>");
+            //$ul.parent("li").addClass("folder-group");
             
-            $ul.children('li:last-child').not($folder).addClass("join-last");
+            //$ul.children('li:last-child').not($folder).addClass("join-last");
 			//$.fn.scrapTree.tree_first_element($li.first());
                         
 		    /**

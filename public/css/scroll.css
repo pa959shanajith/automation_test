@@ -316,12 +316,18 @@
 
 .scroll-wrapper > .fsScroll{
 	min-height:auto;
+	width: 100% !important;
 	height: calc(100% - 45px) !important;
 }
-
 .fsScroll > .scroll-element.scroll-y{
 	top: 75px;
 	height: calc(100% - 110px);
+}
+.fsScroll > .scroll-element.scroll-y .scroll-bar{
+	background: #321e4f
+}
+.fsScroll > .scroll-element .scroll-element_track{
+	background: rgb(211, 211, 211)
 }
 
 
