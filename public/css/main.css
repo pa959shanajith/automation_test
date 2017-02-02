@@ -6,6 +6,36 @@ html {
     height: 100%
 }
 
+#overlayContainer{
+	position: fixed;
+    background-color: rgba(0, 0, 0, 0.85);
+    -moz-background-color: rgba(0, 0, 0, 0.85);
+    -webkit-background-color: rgba(0, 0, 0, 0.85);
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    cursor: wait;
+    z-index: 10;
+}
+
+.contentOverlay{
+	position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translateX(-50%) translateY(-50%);
+    -moz-transform: translateX(-50%) translateY(-50%);
+    -webkit-transform: translateX(-50%) translateY(-50%);
+    background: #fff;
+    padding: 10px 20px;
+    border-radius: 5px;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    cursor: auto;
+    color:#461F6E;
+    font-family: LatoWebBold;
+}
+
 body {
     font-family: LatoWeb;
     margin: 0;
@@ -611,6 +641,7 @@ body {
     font-family: 'LatoWebMedium' !important;
     font-size: 18px !important;
     color: #eee9ff;
+    cursor: default !important;
 }
 
 #left-top-section ul li span,
