@@ -27,11 +27,13 @@ li.item a input[type='text']{
     left: 23px;
     padding: 2px 7px;
     height: 27px;
+    border: 1px solid #5e636b;
 }
 
 li.item a input[type='text']:focus{
 	outline: none;
 	color: #33363B;
+	box-shadow:none;
 }
 
 .content-hide{

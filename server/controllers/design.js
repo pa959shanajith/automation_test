@@ -29,8 +29,19 @@ module.exports = {
 	    app: {
 	      name: 'highlightScrapElement_ICE'
   }
-},		
-  deleteScrapeObjects_ICE: {
+},
+updateScrapeData_ICE:{
+    handler: function(req, reply){
+          designDAO.updateScrapeData_ICE(req, function(err, data){
+                 if(err)       { console.log(err); }
+                 return reply(data);
+          })
+    },
+    app: {
+          name: 'updateScrapeData_ICE'
+    }
+},
+deleteScrapeObjects_ICE: {
 	    handler: function (req, reply) {
 	      designDAO.deleteScrapeObjects_ICE(req, function (err, data) {
 	        if (err) { console.log(err); }
@@ -41,5 +52,16 @@ module.exports = {
 	      name: 'deleteScrapeObjects_ICE'
   }
 },		
+getScrapeDataScreenLevel_ICE : {
+	 handler: function (req, reply) {
+	      designDAO.getScrapeDataScreenLevel_ICE(req, function (err, data) {
+	        if (err) { console.log(err); }
+	        return reply(data);
+	      });
+	    },
+	    app: {
+	      name: 'getScrapeDataScreenLevel_ICE'
+	    }
+}
 		
 };

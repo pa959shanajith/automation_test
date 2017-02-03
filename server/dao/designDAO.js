@@ -55,9 +55,52 @@ highlightScrapElement_ICE: function highlightScrapElement_ICE(req, cb, data) {
 //     });
 	  //callback success on highlight
 },
-
+updateScrapeData_ICE : function updateScrapeData_ICE(req, cb, data){
+    var appType = req.payload.appType;
+    var scrapedJSON = JSON.stringify(req.payload.getScrapeData);
+    var flag = "fail";
+    var userInfo =  req.payload.userInfo;
+    var moduleID, screenID, modifiedBy;
+    moduleID = req.payload.moduleId;
+    screenID = req.payload.screenId;
+    screenName = req.payload.screenName;
+    modifiedBy = userInfo.firstname + " " + userInfo.lastname;
+    var updateScreenData = "update icetestautomation.screens set screendata='"
+          + scrapedJSON + "', modifiedby ='" + modifiedBy + "', modifiedon = '" + new Date().getTime() 
+          + "' where screenid= "+screenID+" and moduleid ="+moduleID+" and screenName ='" + screenName +"';"
+    dbConnICE.execute(updateScreenData, function(err, result){
+          if (err) {
+                 console.log("updateScreenData=============",err);
+      cb(null, flag);
+  }
+          else{
+                 flag = "success";
+                 cb(null, flag);
+          }
+    });
+},
 deleteScrapeObjects_ICE: function deleteScrapeObjects_ICE(req, cb, data) {
 
 },
-
+getScrapeDataScreenLevel_ICE : function getScrapeDataScreenLevel_ICE(req, cb, data) {
+	  var scrapeData = {};
+	  var getScrapeData = "select screendata from screens where screenid ="
+			+ req.payload.screenId + " allow filtering  ";
+	  console.log("query", getScrapeData);
+	  dbConnICE.execute(getScrapeData, function(err, result){
+		  if (err) {
+              console.log("getScrapeDataScreenLevel=============",err);
+          	  cb(null, flag);
+          }
+		  else{
+              // console.log("result",result);
+              for (var i = 0; i < result.rows.length; i++) {
+            	  scrapeData.scrapeObj = result.rows[i].screendata
+            	  cb(null, scrapeData)
+                  //scrapeData.scarpedObj = 
+              }
+       }
+	  });
+	
+},
 };

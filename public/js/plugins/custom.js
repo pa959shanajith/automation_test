@@ -43,7 +43,11 @@ $(document).ready(function() {
         $(".thumb-ic").removeClass("thumb-ic-highlight")
         $(".popupWrap").animate({ opacity: 0, right: "70px" }, 100).css({'z-index':'0','pointer-events':'none'})
         $(this).children(".thumb-ic").addClass("thumb-ic-highlight")
-        $(this).siblings(".popupWrap").animate({ opacity: 1, right: "92px" }, 100).css({'z-index':'12','pointer-events':'all','display':'block'}).focus()
+        if($(this).siblings(".popupWrap").attr("id") == "window-scrape-screenshot"){
+        	$(this).siblings(".popupWrap").animate({ opacity: 1, right: "97px" }, 100).css({'z-index':'12','pointer-events':'all','display':'block'}).focus()
+        } else{
+        	$(this).siblings(".popupWrap").animate({ opacity: 1, right: "92px" }, 100).css({'z-index':'12','pointer-events':'all','display':'block'}).focus()
+        }
     })
     .on("click", ".closePopup", function(){
         $(".popupWrap").animate({ opacity: 0, right: "70px" }, 100).css({'z-index':'0','pointer-events':'none'})

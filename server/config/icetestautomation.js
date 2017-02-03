@@ -1,7 +1,7 @@
 var cassandra = require('cassandra-driver');
 const authProvider = new cassandra.auth.PlainTextAuthProvider('nineteen68', 'TA@SLK2017');
 module.exports = new cassandra.Client({
-    contactPoints: ['127.0.0.1'], 
+    contactPoints: ['10.41.31.5'], 
     keyspace: 'icetestautomation',
     authProvider: authProvider
 });

@@ -33,6 +33,33 @@ mySPA.factory('DesignServices', ['$http','$q', function ($http, $httpProvider, $
 				   return $q.reject(response.data);
 			   });
 		   },
+		   getScrapeDataScreenLevel_ICE: function()	{
+		    	var screenId = JSON.parse(window.localStorage['_T']).screenId;
+		    	return $http.post('/getScrapeDataScreenLevel_ICE',{
+		    	  	param : 'getScrapeDataScreenLevel_ICE',
+		    	  	screenId : screenId
+		    	})
+				.then (function(response){return response.data;	},
+				function(response){	return $q.reject(response.data);});	
+		   },
+		   updateScrapeData_ICE : function(getScrapeData,moduleId,screenId,screenName,userinfo){
+               return $http.post('/updateScrapeData_ICE',{
+                     param : 'updateScrapeData_ICE',
+                     getScrapeData : getScrapeData,
+                     appType       :      "Web",
+                     moduleId : moduleId,
+                     screenId : screenId,
+                     screenName: screenName,
+                     userInfo : userinfo
+               })
+               .then(function(response) { 
+                     return response.data
+               },
+               function(response) {
+                     return $q.reject(response.data)
+               })
+        }
+
 		    
   }
 }]);
