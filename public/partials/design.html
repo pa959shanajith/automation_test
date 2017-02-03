@@ -9,11 +9,11 @@
 		<div class="scrollbar-macosx">
 			<div id="left-top-section">
 				<ul>
-					<li><span><a class='scrapeOnTxt' href='#'>Scrape On</a></span></li>
+					<li><span><a class='scrapeOnTxt'>Scrape On</a></span></li>
 					<li><a href='#' ng-click="initScraping('ie'); $event.preventDefault(); $event.stopPropagation();"><span><img src='imgs/ic-ie.png' alt='Internet Explorer' /></span>Internet Explorer</a></li>
 					<li><a href='#' ng-click="initScraping('chrome'); $event.preventDefault(); $event.stopPropagation();"><span><img src='imgs/ic-chrome.png' alt='Google Chrome' /></span>Google Chrome</a></li>
 					<li><a href='#' ng-click="initScraping('mozilla'); $event.preventDefault(); $event.stopPropagation();"><span><img src='imgs/ic-mozilla.png' alt='Mozilla Firefox' /></span>Mozilla Firefox</a></li>
-					<li class="last"><span style="margin-bottom:-5px"><input ng-model="enbledChecked" id="enableAppend" type='checkbox' value=""></span><label for="enableAppend">Append</label></li>
+					<li class="last"><span style="margin-bottom:-5px"><input ng-model="enbledChecked" id="enableAppend" type='checkbox' value="" disabled></span><label for="enableAppend">Append</label></li>
 				</ul>
 			</div>
 
