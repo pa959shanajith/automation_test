@@ -178,7 +178,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 						obj : $("#scrapTree").find(".focus-highlight").closest("li")
 					}
 				}
-			console.log(data)
+			//console.log(data)
 			//window.localStorage['mobilityiOSRef'] = $("#scrapTree2").find("input[type='radio']:checked").parent().parent().data("reference")
 			//Inspector.prototype.onNodeMouseOver("mouseover", data)
 			var rect, type, ref, name, id, value, label, visible, l10n, source;
@@ -254,7 +254,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
     //Save ScrapeData Objects into Database
 	$(document).on('click', "#saveObjects", function(){
 		var tasks = JSON.parse(window.localStorage['_T']);
-		console.log(screenshotObj);
+		//console.log(screenshotObj);
 		var getScrapeData = angular.toJson(screenshotObj);
         var moduleId = tasks.moduleId;
         var screenId = tasks.screenId;
