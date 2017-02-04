@@ -17,6 +17,7 @@ html {
     left: 0;
     cursor: wait;
     z-index: 20;
+    display: none
 }
 
 .contentOverlay{
@@ -791,8 +792,8 @@ body {
 
 .parentObjContainer {
     display: inline-block;
-    position: relative;
-    top: -10px;
+    position: fixed;
+    top: 125px;
     border-bottom: 1px solid #707070;
     padding-bottom: 5px;
 }
@@ -837,7 +838,7 @@ body {
 }
 
 #finalScrap {
-    padding-top: 1%;
+    padding-top: 0%;
 	padding-right: 27px;
     overflow: auto;
     -moz-overflow-style:none
@@ -1012,9 +1013,9 @@ body {
 
 .popupContent-filter div span {
     display: inline-block;
-    padding: 0px 15px 0 10px;
+    padding: 0px 20px 0 15px;
     cursor: pointer;
-    margin-bottom: 10px;
+    margin-bottom: 15px;
     border-radius: 20px;
 }
 
@@ -1036,14 +1037,23 @@ body {
 #window-scrape-screenshot{
 	width:500px;
     min-height: auto;
-    max-height: calc(100% - 185px);
+    max-height: calc(100% - 212px);
     position: fixed;
-    top: 110px;
+    top: 120px;
     overflow: auto;
 }
 
-#window-scrape-screenshot .popupContent {
+#window-scrape-screenshot .popupContent, #window-scrape-screenshotTs .popupContent{
 	padding:1%
+}
+
+#window-scrape-screenshotTs{
+	width:500px;
+    min-height: auto;
+    max-height: calc(100% - 305px);
+    position: fixed;
+    top: 212px;
+    overflow: auto;
 }
 
 #screenShotScrape{

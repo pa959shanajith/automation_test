@@ -43,7 +43,7 @@ $(document).ready(function() {
         $(".thumb-ic").removeClass("thumb-ic-highlight")
         $(".popupWrap").animate({ opacity: 0, right: "70px" }, 100).css({'z-index':'0','pointer-events':'none'})
         $(this).children(".thumb-ic").addClass("thumb-ic-highlight")
-        if($(this).siblings(".popupWrap").attr("id") == "window-scrape-screenshot"){
+        if($(this).siblings(".popupWrap").attr("id") == "window-scrape-screenshot" || $(this).siblings(".popupWrap").attr("id") == "window-scrape-screenshotTs"){
         	$(this).siblings(".popupWrap").animate({ opacity: 1, right: "97px" }, 100).css({'z-index':'12','pointer-events':'all','display':'block'}).focus()
         } else{
         	$(this).siblings(".popupWrap").animate({ opacity: 1, right: "92px" }, 100).css({'z-index':'12','pointer-events':'all','display':'block'}).focus()
@@ -120,10 +120,10 @@ function taskRedirectionInner(path){
 function blockUI(content)
 {
 	$("body").append("<div id='overlayContainer'><div class='contentOverlay'>"+content+"</div></div>");
-	$("#overlayContainer").fadeIn( "slow" );
+	$("#overlayContainer").fadeIn(300);
 }
 
 function unblockUI(){
-	$("#overlayContainer").fadeOut().remove()
+	$("#overlayContainer").fadeOut(300).remove()
 }
 //Function to Block UI
