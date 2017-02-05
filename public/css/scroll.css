@@ -313,15 +313,17 @@
 	background: rgb(211, 211, 211)
 }
 
-
+.scrollbar-inner.fsScroll {
+    margin-top: 25px;
+}
 .scroll-wrapper > .fsScroll{
 	min-height:auto;
 	width: 100% !important;
-	height: calc(100% - 45px) !important;
+	height: calc(100% - 90px) !important
 }
 .fsScroll > .scroll-element.scroll-y{
-	top: 75px;
-	height: calc(100% - 110px);
+	top: 30px;
+    height: calc(100% - 90px);
 }
 .fsScroll > .scroll-element.scroll-y .scroll-bar{
 	background: #321e4f

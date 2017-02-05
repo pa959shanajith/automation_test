@@ -1,6 +1,5 @@
 var screenshotObj,scrapedGlobJson,enableScreenShotHighlight,mirrorObj;
 mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout', 'DesignServices','cfpLoadingBar', function($scope,$http,$location,$timeout,DesignServices, cfpLoadingBar) {
-	cfpLoadingBar.start()
 	$("body").css("background","#eee");
     $timeout(function(){
         $('.scrollbar-inner').scrollbar();
@@ -10,7 +9,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
     
     //Task Listing
     loadUserTasks()
-    
+    cfpLoadingBar.start()
     $timeout(function(){
 		angular.element(document.getElementById("left-nav-section")).scope().getScrapeData();
 		cfpLoadingBar.complete()
@@ -26,8 +25,8 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			//window.localStorage['projectIdVal'] = projectId;
 			//$scope.newTestScriptDataLS = viewString;
 			//var screenLabel = window.localStorage['projLabelVal'];
-			$("#window-scrape-screenshot .popupContent").empty()
-	        $("#window-scrape-screenshot .popupContent").html('<div id="screenShotScrape"><img id="screenshot" src="data:image/PNG;base64,'+viewString[1].mirror+'" /></div>')
+			$("#window-scrape-screenshot .popupContent, #window-scrape-screenshotTs .popupContent").empty()
+	        $("#window-scrape-screenshot .popupContent, #window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrape"><img id="screenshot" src="data:image/PNG;base64,'+viewString[1].mirror+'" /></div>')
 			angular.element($("#finalScrap")).empty();
 			if (jQuery.isEmptyObject(viewString)){	
 				console.log("Data is Empty")
@@ -36,7 +35,6 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			else{
 				console.log("Data There")
 			}
-			//console.log("divId: "+divId);
 			console.log("response data: ", viewString);
 			$("#finalScrap").append("<div id='scrapTree' class='scrapTree'><ul><li><span class='parentObjContainer'><input title='Select all' type='checkbox' class='checkStylebox'><span class='parentObject'><a id='aScrapper'>Select all </a><button id='saveObjects' class='btn btn-xs btn-xs-custom objBtn' style='margin-left: 10px'>Save</button><button data-toggle='modal' id='deleteObjects' data-target='#deleteObjectsModal' class='btn btn-xs btn-xs-custom objBtn' style='margin-right: 10px' disabled>Delete</button></span><span></span></span><ul id='scraplist' class='scraplistStyle'></ul></li></ul></div>");
 			var custN;
@@ -52,12 +50,11 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				if(tag == "dropdown"){imgTag = "select"}
 				else if(tag == "textbox/textarea"){imgTag = "input"}
 				else imgTag = tag;
-				//var li = "<li class='item' val="+ob.tempId+"><input type='checkbox' class='checkall' name='selectAllListItems' /><a><img class='tag-icon' src='imgs/ic_"+imgTag+"_32x32.png'/>"+custname+"</a></li>";
 				if(tag == "a" || tag == "input" || tag == "table" || tag == "list" || tag == "select" || tag == "img" || tag == "button" || tag == "radiobutton" || tag == "checkbox" || tag == "tablecell"){
-					var li = "<li data-xpath='"+ob.xpath+"' data-left='"+ob.left+"' data-top='"+ob.top+"' data-width='"+ob.width+"' data-height='"+ob.height+"' data-tag='"+tag+"' data-url='"+ob.url+"' data-hiddentag='"+ob.hiddentag+"' class='item select_all "+tag+"x' val="+ob.tempId+"><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' /><span title="+custN+" class='ellipsis'>"+custN+"</span></a></li>";
+					var li = "<li data-xpath='"+ob.xpath+"' data-left='"+ob.left+"' data-top='"+ob.top+"' data-width='"+ob.width+"' data-height='"+ob.height+"' data-tag='"+tag+"' data-url='"+ob.url+"' data-hiddentag='"+ob.hiddentag+"' class='item select_all "+tag+"x' val="+ob.tempId+"><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' /><span title='"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"' class='ellipsis'>"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"</span></a></li>";
 				} 
 				else {
-					var li = "<li data-xpath='"+ob.xpath+"' data-left='"+ob.left+"' data-top='"+ob.top+"' data-width='"+ob.width+"' data-height='"+ob.height+"' data-tag='"+tag+"' data-url='"+ob.url+"' data-hiddentag='"+ob.hiddentag+"' class='item select_all "+tag+"x' val="+ob.tempId+"><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' /><span title="+custN+" class='ellipsis'>"+custN+"</span></a></li>";
+					var li = "<li data-xpath='"+ob.xpath+"' data-left='"+ob.left+"' data-top='"+ob.top+"' data-width='"+ob.width+"' data-height='"+ob.height+"' data-tag='"+tag+"' data-url='"+ob.url+"' data-hiddentag='"+ob.hiddentag+"' class='item select_all "+tag+"x' val="+ob.tempId+"><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' /><span title='"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"' class='ellipsis'>"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"</span></a></li>";
 				}
 				angular.element(innerUL).append(li)
 			}
@@ -82,12 +79,12 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
     	blockUI(blockMsg);
     	DesignServices.initScraping_ICE(browserType)
  	    .then(function (data) { 
- 	     unblockUI();
-        var data = JSON.stringify(data);
+ 	    unblockUI();
+ 	    var data = JSON.stringify(data);
         var scrapeJson = JSON.parse(data);
         screenshotObj = scrapeJson;
-        $("#window-scrape-screenshot .popupContent").empty()
-        $("#window-scrape-screenshot .popupContent").html('<div id="screenShotScrape"><img id="screenshot" src="data:image/PNG;base64,'+screenshotObj[1].mirror+'" /></div>')
+        $("#window-scrape-screenshot .popupContent, #window-scrape-screenshotTs .popupContent").empty()
+        $("#window-scrape-screenshot .popupContent, #window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrape"><img id="screenshot" src="data:image/PNG;base64,'+screenshotObj[1].mirror+'" /></div>')
         var viewString = {}
         viewString = scrapeJson[0];
         //viewString.view = data;
@@ -110,10 +107,10 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			var tag1 = tag.replace(/ /g, "_");
 			var tag2;
 			if(tag == "a" || tag == "input" || tag == "table" || tag == "list" || tag == "select" || tag == "img" || tag == "button" || tag == "radiobutton" || tag == "checkbox" || tag == "tablecell"){
-				var li = "<li data-xpath='"+ob.xpath+"' data-left='"+ob.left+"' data-top='"+ob.top+"' data-width='"+ob.width+"' data-height='"+ob.height+"' data-tag='"+tag+"' data-url='"+ob.url+"' data-hiddentag='"+ob.hiddentag+"' class='item select_all "+tag+"x' val="+ob.tempId+"><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' /><span title="+custN+" class='ellipsis'>"+custN+"</span></a></li>";
+				var li = "<li data-xpath='"+ob.xpath+"' data-left='"+ob.left+"' data-top='"+ob.top+"' data-width='"+ob.width+"' data-height='"+ob.height+"' data-tag='"+tag+"' data-url='"+ob.url+"' data-hiddentag='"+ob.hiddentag+"' class='item select_all "+tag+"x' val="+ob.tempId+"><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' /><span title='"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"' class='ellipsis'>"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"</span></a></li>";
 			} 
 			else {
-				var li = "<li data-xpath='"+ob.xpath+"' data-left='"+ob.left+"' data-top='"+ob.top+"' data-width='"+ob.width+"' data-height='"+ob.height+"' data-tag='"+tag+"' data-url='"+ob.url+"' data-hiddentag='"+ob.hiddentag+"' class='item select_all "+tag+"x' val="+ob.tempId+"><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' /><span title="+custN+" class='ellipsis'>"+custN+"</span></a></li>";
+				var li = "<li data-xpath='"+ob.xpath+"' data-left='"+ob.left+"' data-top='"+ob.top+"' data-width='"+ob.width+"' data-height='"+ob.height+"' data-tag='"+tag+"' data-url='"+ob.url+"' data-hiddentag='"+ob.hiddentag+"' class='item select_all "+tag+"x' val="+ob.tempId+"><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' /><span title='"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"' class='ellipsis'>"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"</span></a></li>";
 			}
 			angular.element(innerUL).append(li);
 		}
@@ -128,7 +125,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			},
 			editable: true,
 			radio: true
-		});
+		});        
         //Build Scrape Tree using dmtree.scrapper.js file
         
     	if(data.length > 0)
@@ -168,7 +165,6 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
     
     //Highlight Element on browser
     $scope.highlightScrapElement = function(xpath,url) {
-    	//if($("#enableScreenShot").prop("checked") == true){
     	if(enableScreenShotHighlight == true){
     		console.log("Init ScreenShot Highlight")
     		var data = {
@@ -179,8 +175,6 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					}
 				}
 			console.log(data)
-			//window.localStorage['mobilityiOSRef'] = $("#scrapTree2").find("input[type='radio']:checked").parent().parent().data("reference")
-			//Inspector.prototype.onNodeMouseOver("mouseover", data)
 			var rect, type, ref, name, id, value, label, visible, l10n, source;
     		rect = {
 					x : data.rslt.obj.data("left"),
@@ -270,7 +264,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
                      angular.element(document.getElementById("left-nav-section")).scope().getScrapeData();
                }
                else{
-            	   enableScreenShotHighlight = false;
+            	     enableScreenShotHighlight = false;
                      $("#globalModal").modal("show");
                      $("#globalModal").find('.modal-title').text("Save Scraped data");
                      $("#globalModal").find('.modal-body p').text("Failed to save");
