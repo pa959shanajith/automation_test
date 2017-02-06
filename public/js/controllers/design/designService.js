@@ -8,18 +8,7 @@ mySPA.factory('DesignServices', ['$http','$q', function ($http, $httpProvider, $
 	      .then(function(response)  { return response.data},
 	       function(response)        {return $q.reject(response.data)})
 	    },
-	    deleteScrapeObjects_ICE : function(){
-		      return $http.post('/deleteScrapeObjects_ICE',{
-		    	  	param : 'deleteScrapeObjects_ICE'
-		      })
-		      .then(function(response)  { return response.data},
-		       function(response)        {return $q.reject(response.data)})
-		    },
-	    highlightScrapElement_ICE: function(xpath,url) {    		
-			   // the $http API is based on the deferred/promise APIs exposed by the $q service
-			   // so it returns a promise for us by default
-
-			   //var appType = window.localStorage['appTypeScreen'];
+	    highlightScrapElement_ICE: function(xpath,url) {
 			   return $http.post('/highlightScrapElement_ICE',
 					   {"action":"highlightScrapElement_ICE","elementXpath":xpath,"elementUrl" : url,"appType":"web"}
 
@@ -42,15 +31,9 @@ mySPA.factory('DesignServices', ['$http','$q', function ($http, $httpProvider, $
 				.then (function(response){return response.data;	},
 				function(response){	return $q.reject(response.data);});	
 		   },
-		   updateScrapeData_ICE : function(getScrapeData,moduleId,screenId,screenName,userinfo){
+		   updateScrapeData_ICE : function(scrapeObject){
                return $http.post('/updateScrapeData_ICE',{
-                     param : 'updateScrapeData_ICE',
-                     getScrapeData : getScrapeData,
-                     appType       :      "Web",
-                     moduleId : moduleId,
-                     screenId : screenId,
-                     screenName: screenName,
-                     userInfo : userinfo
+                     scrapeObject : scrapeObject
                })
                .then(function(response) { 
                      return response.data
@@ -58,8 +41,6 @@ mySPA.factory('DesignServices', ['$http','$q', function ($http, $httpProvider, $
                function(response) {
                      return $q.reject(response.data)
                })
-        }
-
-		    
+        }	    
   }
 }]);
