@@ -692,6 +692,28 @@ body {
     -webkit-transition: 0.2s ease-in-out;
 }
 
+.disableActions{
+	opacity:0.5;
+	transition: opacity .2s;
+	-webkit-transition: opacity .2s;
+	transition-timing-function: ease-out;
+	-webkit-transition-timing-function: ease-out;
+}
+
+#left-top-section ul li a.disableActions:hover, #left-top-section ul li a.disableActions:hover span img{
+	background:none;
+	cursor: no-drop
+}
+
+.enableActions{
+	opacity:1;
+	transition: opacity .2s;
+	-webkit-transition: opacity .2s;
+	transition-timing-function: ease-in;
+	-webkit-transition-timing-function: ease-in;
+}
+
+
 #left-top-section ul li label {
     padding-left: 15px;
     padding-right: 15px
