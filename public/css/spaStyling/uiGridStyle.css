@@ -1,0 +1,141 @@
+/* 
+*	UI  
+*		Grid
+*			  Styling
+*/
+@CHARSET "ISO-8859-1";
+.section {
+  padding: 50px;
+}
+
+.grid {
+  width: 500px;
+  height: 300px;
+}
+.grid {
+	width: 950px;
+	height:  calc(100% - 36%);
+	margin-top: 53px;
+	box-shadow: 2px 2px 2px #e2e2e2;
+    border: 1px solid #e2e2e2;
+}
+.gridReports{
+	height:  calc(100% - 22%);
+}
+.ui-grid-cell{
+	border-color: #E2E2E2 !important;
+	height:35px !important;
+}
+
+.ui-grid-cell .ui-grid-cell-contents{
+	font-size: 15px;
+}
+.ui-grid-cell:nth-child(4) {
+  padding: 0 4px 0 0;
+}
+
+.ui-grid-draggable-row {
+    height: 48px;
+}
+.ui-grid-row-selected{
+	/* outline: 1px solid #b9ffb7; */
+}
+.ui-grid-row-selected .ui-grid-cell{
+	background-color: #b9ffb7 !important;
+	outline: 1px solid #b9ffb7;
+}
+form[name="inputForm"]{
+	margin: 0 0 0rem;
+    float: left;
+    width: 100%;	
+}
+.ui-grid-draggable-row input{
+	height: 25px !important;
+    margin: 5px 6px;
+    width: 98% !important;
+}
+.ui-grid-draggable-row select{
+	height: 25px;
+    width: 97% !important;
+    padding: 0 5px !important;
+    margin: 5px 5px;
+}
+.ui-grid-draggable-row-over {
+  position: relative;
+    color: lightblue;
+}
+
+.ui-grid-draggable-row-over:before {
+    content: " ";
+    display: block;
+    position: absolute;
+    left: 0;
+    width: 100%;
+    border-bottom: 1px dashed green;
+}
+
+.ui-grid-draggable-row-over--above:before {
+    top: 0;
+}
+
+.ui-grid-draggable-row-over--below:before {
+    bottom: 0;
+}
+.ui-grid-header-viewport {
+    overflow: hidden;
+    background-color: #619DEA;
+    color: #fff;
+}
+.headerBackGround{
+	background-color: #4EA32A !important;
+}
+/* .ui-grid-header {
+    border-bottom: 1px solid #d4d4d4;
+    box-sizing: border-box;
+    height: 34px;
+    text-align: center;
+    font-size: 13px;
+} */
+.ui-grid-header-cell-row {
+    display: table-row;
+    position: relative;
+    height: 34px;
+    text-align: center;
+    font-size: 13px;
+}
+.ui-grid-cell-contents {
+    padding: 9px;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    white-space: nowrap;
+    -ms-text-overflow: ellipsis;
+    -o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    height: 100%;
+    font-size: 13px;
+    outline: none;
+}
+.ui-grid-render-container-body .ui-grid-viewport {
+    width: 950px;
+    height: 303px;
+    overflow-x: hidden !important;
+}
+.ui-grid-render-container-body .ui-grid-header-canvas {
+    width: 950px;
+}
+.ui-grid-contents-wrapper {
+    position: relative;
+    height: 100%;
+    width: 100%;
+    font-size: 15px;
+}
+@media only screen and (max-height: 655px) {
+	.gridReports{
+	    height: calc(100% - 29%);
+	}
+	.datagrid-wrap {
+    	height: 220px ! important;
+	}
+}

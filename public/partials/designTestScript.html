@@ -33,9 +33,50 @@
 	<div id="middle-content-section">
 		<!--Task Name-->
 		<div id="page-taskName">
-			<span>AHRI-Identify objects related to login location screen</span>	
+			<span>Design Test case screen</span>	
+
 		</div>
 		<!--Task Name-->
+		
+		<!-- Table Action Buttons -->
+		<div id="tableActionButtons">
+			<img class="btn btn-action" src="imgs\ic-jq-addstep.png" alt="Add Steps" onclick="addTestScriptRow()">
+			<img class="btn btn-action" src="imgs\ic-jq-editstep.png" alt="Edit Steps" onclick="editTestCaseRow()">
+			<img class="btn btn-action" src="imgs\ic-jq-dragstep.png" alt="Drag Steps" onclick="rearrangeTestScriptRow()" disabled>
+			<img class="btn btn-action" src="imgs\ic-jq-copystep.png" alt="Copy Steps" onclick="copyTestStep()" disabled>
+			<img class="btn btn-action" src="imgs\ic-jq-pastestep.png" alt="Paste Steps" onclick="pasteTestStep()" disabled>
+			<img class="btn btn-action" src="imgs\ic-jq-commentstep.png" alt="Comment Steps" onclick="commentStep()" disabled>
+			<button class="btn btn-xs btn-xs-custom btn-xs-action" ng-click="updateTestCase_ICE()">Save</button>
+			<button class="btn btn-xs btn-xs-custom btn-xs-action" onclick="deleteTestScriptRow()">Delete</button>
+		</div>
+		<!-- Table Action Buttons -->
+		
+		<!-- Table DnD -->
+			<!-- <div class="designTableDnd">
+				<div class="scrollbar-inner designDataTable">
+					<table id="designDataTable" class="designDataTable" cellspacing="0" cellpadding="0">
+						<thead>
+							<tr>
+								<th style="width: 4%" id="contextmenu"></th>
+								<th style="width: 3%; padding: 5px 0px"><i class="fa fa-ban" title="Do Not Execute" aria-hidden="true" style="font-size: 14px;"></i><input class="d-execute" type="checkbox" /></th>
+								<th style="width: 25%; text-align:left; border-right: 1px solid #fff;">Object Name</th>
+		  						<th style="width: 22%; border-right: 1px solid #fff">Keyword</th>
+								<th style="width: 15%; border-right: 1px solid #fff">Input</th>
+								<th style="width: 23%; border-right: 1px solid #fff">Output</th>
+								<th style="width: 8%; text-align: center;">Remark</th>
+							</tr>
+						</thead>
+						<tbody></tbody>
+					</table>
+				</div>
+			</div> -->
+			<div class="designTableDnd">
+				<div class="scrollbar-inner designDataTable">
+					<table id="jqGrid" class="designDataTable" cellspacing="0" cellpadding="0">						
+					</table>
+				</div>
+			</div>
+		<!-- Table DnD -->
 	</div>
 	<!--Middle Panel-->
 
@@ -142,6 +183,45 @@
         	</a>
       	</div>
 		<!--Images Blocks-->
+		
+		<!-- Global Modal  -->
+       <div class="modal fade" id="globalModal" role="dialog" data-keyboard="false" data-backdrop="static">
+         <div class="modal-dialog modal-sm">
+           <div class="modal-content">
+             <div class="modal-header">
+               <button type="button" class="close" data-dismiss="modal">&times;</button>
+               <h4 class="modal-title"></h4>
+             </div>
+             <div class="modal-body">
+               <p></p>
+             </div>
+             <div class="modal-footer">
+               <button type="button" class="btn btn-default" data-dismiss="modal">Ok</button>
+             </div>
+           </div>
+         </div>
+       </div>
+       <!-- Global Modal  -->
+       
+        <!-- Global Modal for Yes and No  -->
+		<div class="modal fade" id="globalModalYesNo" role="dialog" data-keyboard="false" data-backdrop="static">
+		  <div class="modal-dialog modal-sm">
+		    <div class="modal-content">
+		      <div class="modal-header">
+		        <button type="button" class="close" data-dismiss="modal">&times;</button>
+		        <h4 class="modal-title"></h4>
+		      </div>
+		      <div class="modal-body">
+		        <p></p>
+		      </div>
+		      <div class="modal-footer">
+		        <button type="button" class="btn btn-default" id="">Yes</button>
+		        <button type="button" class="btn btn-default" data-dismiss="modal" >No</button>
+		      </div>
+		    </div>
+		  </div>
+		</div>
+		<!-- Global Modal for Yes and No  -->
 	</div>
 	<!--Right Panel-->
 </section>	
