@@ -148,8 +148,7 @@ module.exports = {
 			          + scrapedJsonObject + "', modifiedby ='" + modifiedBy + "', modifiedon = '" + new Date().getTime() 
 			          + "' where screenid= "+screenID+" and moduleid ="+moduleID+" and screenname ='" + screenName +"'IF EXISTS;"
 			          
-			     console.log(updateScreenData);
-			    dbConnICE.execute(updateScreenData, function(err, result){
+			     dbConnICE.execute(updateScreenData, function(err, result){
 			          if (err) {
 			                 cb(null, flag);
 			          }
