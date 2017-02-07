@@ -32,17 +32,17 @@ mySPA.factory('DesignServices', ['$http','$q', function ($http, $httpProvider, $
 					function(response){	return $q.reject(response.data);});	
 		},
 
-		   updateScrapeData_ICE : function(scrapeObject){
-               return $http.post('/updateScrapeData_ICE',{
-                     scrapeObject : scrapeObject
-               })
-               .then(function(response) { 
-                     return response.data
-               },
-               function(response) {
-                     return $q.reject(response.data)
-               })
-        },	
+		updateScreen_ICE : function(scrapeObject){
+	               return $http.post('/updateScreen_ICE',{
+	                   scrapeObject : scrapeObject
+	             })
+	             .then(function(response) { 
+	                   return response.data
+	             },
+	             function(response) {
+	                   return $q.reject(response.data)
+	             })
+	      },	
 
 		readTestCase_ICE : function(screenId,testCaseId){
 			return $http.post('/readTestCase_ICE',{

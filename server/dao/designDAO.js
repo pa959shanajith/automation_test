@@ -46,7 +46,7 @@ module.exports = {
 			cb(null, flag);
 		},
 
-		updateScrapeData_ICE : function updateScrapeData_ICE(req, cb, data){
+		updateScreen_ICE : function updateScreen_ICE(req, cb, data){
 			var updateData = req.payload.scrapeObject;
 			var param = updateData.param;
 			if(param == "updateScrapeData_ICE")
@@ -62,14 +62,13 @@ module.exports = {
 			    screenName = updateData.screenName;
 			    modifiedBy = userInfo.username;
 			    scrapedJSON = scrapedJSON.replace(/'+/g,"''")
-			    console.log("screenID", screenID);
-			    console.log("moduleID", moduleID);
+			  
 				
 				var updateScreenData = "update icetestautomation.screens set screendata='"
 			          + scrapedJSON + "', modifiedby ='" + modifiedBy + "', modifiedon = '" + new Date().getTime() 
 			          + "' where screenid= "+screenID+" and moduleid ="+moduleID+" and screenname ='" + screenName +"'IF EXISTS; "
 			          
-			     console.log(updateScreenData);
+			    
 			     dbConnICE.execute(updateScreenData, function(err, result){
 			          if (err) {
 			                 console.log("updateScreenData=============",err);
@@ -81,9 +80,88 @@ module.exports = {
 			          }
 			    });
 			}
-			else if(param == "updateScrapeData_ICE"){
+			else if(param == "deleteScrapeData_ICE"){
 				
+			    var flag = "fail";
+			    var userInfo =  updateData.userinfo;
+			    var moduleID, screenID, modifiedBy;
+			    moduleID = updateData.moduleId;
+			    screenID = updateData.screenId;
+			    screenName = updateData.screenName;
+			    modifiedBy = userInfo.username;
+				var delObjects = updateData.deletedObjectsList;
+				var delCust;
+				var deletedRes = [];
+				var deletedCustName = [];
+				var deletedCustPath = [];
+				var deletedJson = [];
+				var scrapedJsonObject ={};
+			
+			for(var d=0;d<delObjects.length;d++)
+			{
+				delCust = delObjects[d].split("!");
+				deletedRes.push(delCust);
 			}
+			 for(var k= 0;k<deletedRes.length;k++)
+				{
+				        deletedCustName.push(deletedRes[k][0]);
+				        deletedCustPath.push(deletedRes[k][1]);
+				}
+			 //console.log("deletedObjects", delObjects);
+			var allObjects = {};
+			var allObjectsView;
+			//console.log("delObjects", delObjects);
+			
+			var screenQuery = "select screendata from icetestautomation.screens where screenid= " + screenID + ";";
+			dbConnICE.execute(screenQuery, function(err, result){
+				//console.log("Result", result.rows);		
+				
+				 for (var i = 0; i < result.rows.length; i++) {
+					 allObjects = result.rows[i].screendata;
+					
+					 allObjects = JSON.parse(JSON.parse(allObjects));
+					 console.log("length", allObjects.view.length)
+					  for(var j=0; j < allObjects.view.length; j++)
+					   {
+						  allObjectsView = allObjects.view[j];
+						  
+						   custname  = allObjectsView.custname;
+						   xpath = allObjectsView.xpath;
+						   if(in_array(custname, deletedCustName) &&  in_array(xpath, deletedCustPath))
+						   {
+							    	  // flag = true;
+							    	   deletedJson.push(allObjectsView);
+							    	   delete allObjects.view[j];
+						   }
+				       }
+				 }
+				
+				 
+				 allObjects.view =  allObjects.view.filter(function(n){ return n != null }); 
+				 scrapedJsonObject.view =  allObjects.view;
+				 
+				 scrapedJsonObject.mirror =  updateData.view.mirror;
+				 scrapedJsonObject.scrapeType =  updateData.view.scrapeTypeObj;
+				 scrapedJsonObject = JSON.stringify(scrapedJsonObject);
+				 scrapedJsonObject = scrapedJsonObject.replace(/'+/g,"''");
+				 var updateScreenData = "update icetestautomation.screens set screendata='"
+			          + scrapedJsonObject + "', modifiedby ='" + modifiedBy + "', modifiedon = '" + new Date().getTime() 
+			          + "' where screenid= "+screenID+" and moduleid ="+moduleID+" and screenname ='" + screenName +"'IF EXISTS;"
+			          
+			     console.log(updateScreenData);
+			    dbConnICE.execute(updateScreenData, function(err, result){
+			          if (err) {
+			                 cb(null, flag);
+			          }
+			          else{
+			                 flag = "success";
+			                 //console.log(scrapedJsonObject);
+			                 cb(null, flag);
+			          }
+			    });
+				
+			});
+		}
 			
 		},
 
@@ -92,6 +170,8 @@ module.exports = {
 			var getScrapeData = "select screendata from screens where screenid ="
 				+ req.payload.screenId + " allow filtering  ";
 			
+			//console.log("GET", getScrapeData);
+			
 			dbConnICE.execute(getScrapeData, function(err, result){
 				if (err) {
 					console.log("getScrapeDataScreenLevel=============",err);
@@ -99,9 +179,9 @@ module.exports = {
 				}
 				else{
 					for (var i = 0; i < result.rows.length; i++) {
-						scrapeData.scrapeObj = result.rows[i].screendata
-						cb(null, scrapeData) 
+						scrapeData.scrapeObj = result.rows[i].screendata;
 					}
+					cb(null, scrapeData) 
 				}
 			});
 		},

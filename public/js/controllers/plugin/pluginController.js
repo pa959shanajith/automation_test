@@ -31,8 +31,8 @@ mySPA.controller('pluginController',['$scope','$window','$http','$location','$ti
 						var counter = 1;
 					    for(i=0; i<tasksJson.length; i++){
 					       if(tasksJson[i].Task_Type == "Design"){
-					    	   $(".plugin-taks-listing").append('<div class="panel panel-default"><div class="panel-heading"><h4 class="panel-title"><div class="collapse-head" data-toggle="collapse" data-parent="#accordion" href="#collapse'+i+'"><span class="taskNo">Task '+ counter +'</span><!--Addition--><div class="panel-additional-details"><span class="panel-head-tasktype">'+tasksJson[i].Task_Type+'</span><span class="panel-head-details details-design-task">Details <span class="caret caret-absolute"></span></span></div><!--Addition--></div></h4></div><div id="collapse'+i+'" class="panel-collapse collapse"><div class="panel-body"><span class="assignedTask" data-name="'+tasksJson[i].Sub_Task+'" data-moduleid="'+tasksJson[i].ModuleID+'" data-screenid="'+tasksJson[i].screenID+'"  data-screenname="'+tasksJson[i].screenName+'" data-testcaseid="'+tasksJson[i].testCaseId+'" data-testcasename="'+tasksJson[i].testCaseName+'" onclick="taskRedirection(this.dataset.name, this.dataset.moduleid, this.dataset.screenid, this.dataset.screenname, this.dataset.testcaseid, this.dataset.testcasename)">'+tasksJson[i].Task_Name+'</span></div></div></div>').fadeIn()
-					       } 
+						   	   $(".plugin-taks-listing").append('<div class="panel panel-default"><div class="panel-heading"><h4 class="panel-title"><div class="collapse-head" data-toggle="collapse" data-parent="#accordion" href="#collapse'+i+'"><span class="taskNo">Task '+ counter +'</span><!--Addition--><div class="panel-additional-details"><span class="panel-head-tasktype">'+tasksJson[i].Task_Type+'</span><span class="panel-head-details details-design-task">Details <span class="caret caret-absolute"></span></span></div><!--Addition--></div></h4></div><div id="collapse'+i+'" class="panel-collapse collapse"><div class="panel-body"><span class="assignedTask" data-projectname="'+tasksJson[i].Project_Name+'" data-modulename="'+tasksJson[i].Module_Name+'" data-name="'+tasksJson[i].Sub_Task+'" data-moduleid="'+tasksJson[i].ModuleID+'" data-screenid="'+tasksJson[i].screenID+'"  data-screenname="'+tasksJson[i].screenName+'" data-testcaseid="'+tasksJson[i].testCaseId+'" data-testcasename="'+tasksJson[i].testCaseName+'" onclick="taskRedirection(this.dataset.projectname, this.dataset.modulename, this.dataset.name, this.dataset.moduleid, this.dataset.screenid, this.dataset.screenname, this.dataset.testcaseid, this.dataset.testcasename)">'+tasksJson[i].Task_Name+'</span></div></div></div>').fadeIn()
+						   } 
 					       else if(tasksJson[i].Task_Type == "Execution"){
 					           $(".plugin-taks-listing").append('<div class="panel panel-default"><div class="panel-heading"><h4 class="panel-title"><div class="collapse-head" data-toggle="collapse" data-parent="#accordion" href="#collapse'+i+'"><span class="taskNo">Task '+ counter +'</span><!--Addition--><div class="panel-additional-details"><span class="panel-head-tasktype">'+tasksJson[i].Task_Type+'</span><span class="panel-head-details details-execute-task">Details <span class="caret caret-absolute"></span></span></div><!--Addition--></div></h4></div><div id="collapse'+i+'" class="panel-collapse collapse"><div class="panel-body"><span class="assignedTask" data-name="'+tasksJson[i].Sub_Task+'" onclick="taskRedirection(this.dataset.name)">'+tasksJson[i].Task_Name+'</span></div></div></div>').fadeIn()
 					       }
@@ -144,9 +144,11 @@ function p_event(name){
     angular.element(document.getElementsByClassName("plugin-block")).scope().pluginFunction(name)
 }
 
-function taskRedirection(name, moduleId, screenId, screenName, testCaseId, testCaseName){
+function taskRedirection(projectname, modulename, name, moduleId, screenId, screenName, testCaseId, testCaseName){
 	debugger;
 	var taskObj = {};
+	taskObj.projectName = projectname,
+	taskObj.moduleName = modulename,
 	taskObj.moduleId = moduleId;
 	taskObj.screenId = screenId;
 	taskObj.screenName = screenName;

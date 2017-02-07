@@ -33,15 +33,15 @@ module.exports = {
 
 		},
 		
-		updateScrapeData_ICE:{
+		updateScreen_ICE:{
 			handler: function(req, reply){
-				designDAO.updateScrapeData_ICE(req, function(err, data){
+				designDAO.updateScreen_ICE(req, function(err, data){
 					if(err)       { console.log(err); }
 					return reply(data);
 				})
 			},
 			app: {
-				name: 'updateScrapeData_ICE'
+				name: 'updateScreen_ICE'
 			}
 		},
 

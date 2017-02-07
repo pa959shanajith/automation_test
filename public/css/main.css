@@ -818,6 +818,7 @@ body {
     top: 125px;
     border-bottom: 1px solid #707070;
     padding-bottom: 5px;
+    left: 228px
 }
 
 .parentObject {
@@ -904,12 +905,14 @@ body {
 .selectAllTxt {
     vertical-align: middle;
     position: relative;
-    top: 1px;
+    top: 2px;
     left: 0%;
+    padding-left: 10px !important;
     line-height: 20px;
     background: none !important;
     font-size: 12px;
     font-family: LatoWebLight;
+    font-weight: normal;
 }
 
 .selectAllTxt:hover {
@@ -1095,13 +1098,13 @@ body {
 
 .proj-info-wrap .content-label {
     display: inline-block;
-    width: 20%;
+    width: 21%;
     vertical-align: top;
 }
 
 .proj-info-wrap .content {
     display: inline-block;
-    width: 77%;
+    width: 79%;
 }
 
 .closePopup {
