@@ -51,113 +51,37 @@ module.exports = {
 			var param = updateData.param;
 			if(param == "updateScrapeData_ICE")
 			{
+
 				var appType = updateData.appType;
-				var scrapedJSON = JSON.stringify(updateData.getScrapeData);
-				var flag = "fail";
-				var userInfo =  updateData.userinfo;
-				var moduleID, screenID, modifiedBy;
-				moduleID = updateData.moduleId;
-				screenID = updateData.screenId;
-				screenName = updateData.screenName;
-				modifiedBy = userInfo.username;	
-
+			    var scrapedJSON = JSON.stringify(updateData.getScrapeData);
+			    var flag = "fail";
+			    var userInfo =  updateData.userinfo;
+			    var moduleID, screenID, modifiedBy;
+			    moduleID = updateData.moduleId;
+			    screenID = updateData.screenId;
+			    screenName = updateData.screenName;
+			    modifiedBy = userInfo.username;
+			    scrapedJSON = scrapedJSON.replace(/'+/g,"''")
+			    console.log("screenID", screenID);
+			    console.log("moduleID", moduleID);
+				
 				var updateScreenData = "update icetestautomation.screens set screendata='"
-					+ scrapedJSON + "', modifiedby ='" + modifiedBy + "', modifiedon = '" + new Date().getTime() 
-					+ "' where screenid= "+screenID+" and moduleid ="+moduleID+" and screenName ='" + screenName +"';"
-
-					dbConnICE.execute(updateScreenData, function(err, result){
-						if (err) {
-							console.log("updateScreenData=============",err);
-							cb(null, flag);
-						}
-						else{
-							flag = "success";
-							cb(null, flag);
-						}
-					});
+			          + scrapedJSON + "', modifiedby ='" + modifiedBy + "', modifiedon = '" + new Date().getTime() 
+			          + "' where screenid= "+screenID+" and moduleid ="+moduleID+" and screenname ='" + screenName +"';"
+			          
+			  
+			     dbConnICE.execute(updateScreenData, function(err, result){
+			          if (err) {
+			                 console.log("updateScreenData=============",err);
+			      cb(null, flag);
+			          }      
+			          else{
+			                 flag = "success";
+			                 cb(null, flag);
+			          }
+			    });
 			}
-			else if(param == "deleteScrapeData_ICE")
-			{		
-				var flag = "fail";
-				var userInfo =  updateData.userinfo;
-				var moduleID, screenID, modifiedBy;
-				moduleID = updateData.moduleId;
-				screenID = updateData.screenId;
-				screenName = updateData.screenName;
-				modifiedBy = userInfo.username;
-
-				var delObjects = updateData.deletedObjectsList;
-				var delCust;
-				var deletedRes = [];
-				var deletedCustName = [];
-				var deletedCustPath = [];
-				var deletedJson = [];
-				var finalJson = [];
-				var scrapedJsonArray = [];
-				var scrapedJsonObject ={};
-
-				for(var d=0;d<delObjects.length;d++)
-				{
-					delCust = delObjects[d].split("!");
-					deletedRes.push(delCust);
-				}
-				for(var k= 0;k<deletedRes.length;k++)
-				{
-					deletedCustName.push(deletedRes[k][0]);
-					deletedCustPath.push(deletedRes[k][1]);
-				}
-				var allObjects = {};
-				var allObjectsView;
-				//console.log("delObjects", delObjects);
-
-				var screenQuery = "select screendata from icetestautomation.screens where screenid= " + screenID + ";";
-				dbConnICE.execute(screenQuery, function(err, result){
-					console.log("Result", result.rows);
-					//cb(null, result.rows);
-					for (var i = 0; i < result.rows.length; i++) {
-
-					}
-//					for (var i = 0; i < result.rows.length; i++) {
-//					allObjects = result.rows[i].screendata;
-//					allObjects = JSON.parse(JSON.parse(allObjects));
-//					for(var j=0; j < allObjects[0].view.length; j++)
-//					{
-//					allObjectsView = allObjects[0].view[j];
-//					custname  = allObjectsView.custname;
-//					xpath = allObjectsView.xpath;
-//					if( (in_array(custname,deletedCustName)) && (in_array(xpath,deletedCustPath)) )
-//					{
-//					console.log(j);
-//					console.log("____________________________________________________________________TRUE");
-//					flag = true;
-//					deletedJson.push(allObjectsView)
-//					console.log( allObjects[0].view[j]);
-//					delete allObjects[0].view[j];
-//					}
-//					console.log(":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
-//					}
-//					console.log(":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::");
-//					}
-					scrapedJsonArray.push(allObjects[0]);
-					scrapedJsonArray.push(updateData.mirror);
-					scrapedJsonArray.push(updateData.scrapetype);
-					scrapedJsonArray = JSON.stringify(scrapedJsonArray);
-					var updateScreenData = "update icetestautomation.screens set screendata='"
-						+ scrapedJsonArray + "', modifiedby ='" + modifiedBy + "', modifiedon = '" + new Date().getTime() 
-						+ "' where screenid= "+screenID+" and moduleid ="+moduleID+" and screenName ='" + screenName +"';"
-						dbConnICE.execute(updateScreenData, function(err, result){
-							if (err) {
-								console.log("updateScreenData=============",err);
-								cb(null, flag);
-							}
-							else{
-								flag = "success";
-								//cb(null, flag);
-							}
-						});
-					//cb(null, scrapedJsonArray)
-				});
-			}    
+			
 		},
 
 		getScrapeDataScreenLevel_ICE : function getScrapeDataScreenLevel_ICE(req, cb, data) {

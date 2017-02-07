@@ -145,6 +145,7 @@ function p_event(name){
 }
 
 function taskRedirection(name, moduleId, screenId, screenName, testCaseId, testCaseName){
+	debugger;
 	var taskObj = {};
 	taskObj.moduleId = moduleId;
 	taskObj.screenId = screenId;

@@ -180,57 +180,59 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		enableScreenShotHighlight = true;
 		DesignServices.getScrapeDataScreenLevel_ICE() 
 		.then(function(data){
-			if(deleteFlag  == true) console.log("inside delete", data);
-			else{
-				console.log("inside save", data);
-				viewString = JSON.parse(JSON.parse(data.scrapeObj));
-			}
-			$("#window-scrape-screenshot .popupContent, #window-scrape-screenshotTs .popupContent").empty()
-			$("#window-scrape-screenshot .popupContent, #window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrape"><img id="screenshot" src="data:image/PNG;base64,'+viewString.mirror+'" /></div>')
-			$("#finalScrap").empty()
-			if (jQuery.isEmptyObject(viewString)){	
-				console.log("Data is Empty");
-				$(".disableActions").addClass("enableActions").removeClass("disableActions");
-				$("#enableAppend").prop("disabled", true)
-				return;
-			}
-			else{
-				console.log("Data There");
-				$(".enableActions").addClass("disableActions").removeClass("enableActions");
-				$("#enableAppend").prop("disabled", false)
-			}
-			console.log("response data: ", viewString);
-			$("#finalScrap").append("<div id='scrapTree' class='scrapTree'><ul><li><span class='parentObjContainer'><input title='Select all' type='checkbox' class='checkStylebox'><span class='parentObject'><a id='aScrapper'>Select all </a><button id='saveObjects' class='btn btn-xs btn-xs-custom objBtn' style='margin-left: 10px'>Save</button><button data-toggle='modal' id='deleteObjects' data-target='#deleteObjectsModal' class='btn btn-xs btn-xs-custom objBtn' style='margin-right: 0' disabled>Delete</button></span><span></span></span><ul id='scraplist' class='scraplistStyle'></ul></li></ul></div>");
-			var custN;
-			var imgTag;
-			var scrapTree = $("#finalScrap").children('#scrapTree');
-			var innerUL = $("#finalScrap").children('#scrapTree').children('ul').children().children('#scraplist');
-			for (var i = 0; i < viewString.view.length; i++) {        			
-				var path = viewString.view[i].xpath;
-				var ob = viewString.view[i];
-				ob.tempId= i; 
-				custN = ob.custname;
-				var tag = ob.tag;
-				if(tag == "dropdown"){imgTag = "select"}
-				else if(tag == "textbox/textarea"){imgTag = "input"}
-				else imgTag = tag;
-				if(tag == "a" || tag == "input" || tag == "table" || tag == "list" || tag == "select" || tag == "img" || tag == "button" || tag == "radiobutton" || tag == "checkbox" || tag == "tablecell"){
-					var li = "<li data-xpath='"+ob.xpath+"' data-left='"+ob.left+"' data-top='"+ob.top+"' data-width='"+ob.width+"' data-height='"+ob.height+"' data-tag='"+tag+"' data-url='"+ob.url+"' data-hiddentag='"+ob.hiddentag+"' class='item select_all "+tag+"x' val="+ob.tempId+"><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' /><span title='"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"' class='ellipsis'>"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"</span></a></li>";
-				} 
-				else {
-					var li = "<li data-xpath='"+ob.xpath+"' data-left='"+ob.left+"' data-top='"+ob.top+"' data-width='"+ob.width+"' data-height='"+ob.height+"' data-tag='"+tag+"' data-url='"+ob.url+"' data-hiddentag='"+ob.hiddentag+"' class='item select_all "+tag+"x' val="+ob.tempId+"><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' /><span title='"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"' class='ellipsis'>"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"</span></a></li>";
+			if(data.scrapeObj != null){
+				if(deleteFlag  == true) console.log("inside delete", data);
+				else{
+					console.log("inside save", data);
+					viewString = JSON.parse(JSON.parse(data.scrapeObj));
 				}
-				angular.element(innerUL).append(li)
-			}
+				$("#window-scrape-screenshot .popupContent, #window-scrape-screenshotTs .popupContent").empty()
+				$("#window-scrape-screenshot .popupContent, #window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrape"><img id="screenshot" src="data:image/PNG;base64,'+viewString.mirror+'" /></div>')
+				$("#finalScrap").empty()
+				if (jQuery.isEmptyObject(viewString)){	
+					console.log("Data is Empty");
+					$(".disableActions").addClass("enableActions").removeClass("disableActions");
+					$("#enableAppend").prop("disabled", true)
+					return;
+				}
+				else{
+					console.log("Data There");
+					$(".enableActions").addClass("disableActions").removeClass("enableActions");
+					$("#enableAppend").prop("disabled", false)
+				}
+				console.log("response data: ", viewString);
+				$("#finalScrap").append("<div id='scrapTree' class='scrapTree'><ul><li><span class='parentObjContainer'><input title='Select all' type='checkbox' class='checkStylebox'><span class='parentObject'><a id='aScrapper'>Select all </a><button id='saveObjects' class='btn btn-xs btn-xs-custom objBtn' style='margin-left: 10px'>Save</button><button data-toggle='modal' id='deleteObjects' data-target='#deleteObjectsModal' class='btn btn-xs btn-xs-custom objBtn' style='margin-right: 0' disabled>Delete</button></span><span></span></span><ul id='scraplist' class='scraplistStyle'></ul></li></ul></div>");
+				var custN;
+				var imgTag;
+				var scrapTree = $("#finalScrap").children('#scrapTree');
+				var innerUL = $("#finalScrap").children('#scrapTree').children('ul').children().children('#scraplist');
+				for (var i = 0; i < viewString.view.length; i++) {        			
+					var path = viewString.view[i].xpath;
+					var ob = viewString.view[i];
+					ob.tempId= i; 
+					custN = ob.custname;
+					var tag = ob.tag;
+					if(tag == "dropdown"){imgTag = "select"}
+					else if(tag == "textbox/textarea"){imgTag = "input"}
+					else imgTag = tag;
+					if(tag == "a" || tag == "input" || tag == "table" || tag == "list" || tag == "select" || tag == "img" || tag == "button" || tag == "radiobutton" || tag == "checkbox" || tag == "tablecell"){
+						var li = "<li data-xpath='"+ob.xpath+"' data-left='"+ob.left+"' data-top='"+ob.top+"' data-width='"+ob.width+"' data-height='"+ob.height+"' data-tag='"+tag+"' data-url='"+ob.url+"' data-hiddentag='"+ob.hiddentag+"' class='item select_all "+tag+"x' val="+ob.tempId+"><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' /><span title='"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"' class='ellipsis'>"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"</span></a></li>";
+					} 
+					else {
+						var li = "<li data-xpath='"+ob.xpath+"' data-left='"+ob.left+"' data-top='"+ob.top+"' data-width='"+ob.width+"' data-height='"+ob.height+"' data-tag='"+tag+"' data-url='"+ob.url+"' data-hiddentag='"+ob.hiddentag+"' class='item select_all "+tag+"x' val="+ob.tempId+"><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' /><span title='"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"' class='ellipsis'>"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"</span></a></li>";
+					}
+					angular.element(innerUL).append(li)
+				}
 
-			$(document).find('#scrapTree').scrapTree({
-				multipleSelection : {
-					//checkbox : checked,
-					classes : [ '.item' ]
-				},
-				editable: true,
-				radio: true
-			});
+				$(document).find('#scrapTree').scrapTree({
+					multipleSelection : {
+						//checkbox : checked,
+						classes : [ '.item' ]
+					},
+					editable: true,
+					radio: true
+				});
+			}
 		}, 
 		function(error){console.log("error");})
 	}
@@ -316,7 +318,8 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 							angular.element(innerUL).append(li);
 							viewString.view.push(initScraping.view[i])
 						}
-						viewString.mirror = mirrorObj.mirror
+						viewString.mirror = mirrorObj.mirror;
+						viewString.scrapeTypeObj = scrapeTypeObj.scrapetype
 					}
 					//Getting appended scraped object irrespective to the dynamic value
 				}
@@ -338,15 +341,16 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 						var tag1 = tag.replace(/ /g, "_");
 						var tag2;
 						if(tag == "a" || tag == "input" || tag == "table" || tag == "list" || tag == "select" || tag == "img" || tag == "button" || tag == "radiobutton" || tag == "checkbox" || tag == "tablecell"){
-							var li = "<li data-xpath='"+ob.xpath+"' data-left='"+ob.left+"' data-top='"+ob.top+"' data-width='"+ob.width+"' data-height='"+ob.height+"' data-tag='"+tag+"' data-url='"+ob.url+"' data-hiddentag='"+ob.hiddentag+"' class='item select_all "+tag+"x' val="+ob.tempId+"><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' /><span title="+custN+" class='ellipsis'>"+custN+"</span></a></li>";
+							var li = "<li data-xpath='"+ob.xpath+"' data-left='"+ob.left+"' data-top='"+ob.top+"' data-width='"+ob.width+"' data-height='"+ob.height+"' data-tag='"+tag+"' data-url='"+ob.url+"' data-hiddentag='"+ob.hiddentag+"' class='item select_all "+tag+"x' val="+ob.tempId+"><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' /><span title="+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+" class='ellipsis'>"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"</span></a></li>";
 						} 
 						else {
-							var li = "<li data-xpath='"+ob.xpath+"' data-left='"+ob.left+"' data-top='"+ob.top+"' data-width='"+ob.width+"' data-height='"+ob.height+"' data-tag='"+tag+"' data-url='"+ob.url+"' data-hiddentag='"+ob.hiddentag+"' class='item select_all "+tag+"x' val="+ob.tempId+"><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' /><span title="+custN+" class='ellipsis'>"+custN+"</span></a></li>";
+							var li = "<li data-xpath='"+ob.xpath+"' data-left='"+ob.left+"' data-top='"+ob.top+"' data-width='"+ob.width+"' data-height='"+ob.height+"' data-tag='"+tag+"' data-url='"+ob.url+"' data-hiddentag='"+ob.hiddentag+"' class='item select_all "+tag+"x' val="+ob.tempId+"><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' /><span title="+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+" class='ellipsis'>"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"</span></a></li>";
 						}
 
 						angular.element(innerUL).append(li);
 					}
-					initScraping.mirror = mirrorObj.mirror
+					initScraping.mirror = mirrorObj.mirror;
+					initScraping.scrapeTypeObj = scrapeTypeObj.scrapetype
 
 					//Before Saving the Scrape JSON to the Database
 				}
