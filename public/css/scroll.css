@@ -256,30 +256,25 @@
 .pluginTask > .scroll-element.scroll-y .scroll-element_outer{
 	background: rgb(239, 239, 239);
 }
-
-
 .scroll-wrapper.scrollbar-innerpages {
     height: 215px;
 }
-
-
-.scroll-wrapper > .exeDataTable{
+.scroll-wrapper > .exeDataTable, .scroll-wrapper > .designDataTable{
 	min-height: auto;
 	height: 100% !important;
 }
-.exeDataTable > .scroll-element.scroll-y{
+.scroll-wrapper > .designDataTable{max-height: 682px !important;}
+.exeDataTable > .scroll-element.scroll-y, .designDataTable > .scroll-element.scroll-y{
 	top: 28px;
 	height: calc(100% - 28px);	
 	right: 0
 }
-.exeDataTable > .scroll-element.scroll-y .scroll-bar{
+.exeDataTable > .scroll-element.scroll-y .scroll-bar, .designDataTable > .scroll-element.scroll-y .scroll-bar{
 	background: #321e4f
 }
-.exeDataTable > .scroll-element .scroll-element_track{
+.exeDataTable > .scroll-element .scroll-element_track, .designDataTable > .scroll-element .scroll-element_track{
 	background: rgb(211, 211, 211)
 }
-
-
 .scroll-wrapper > .scheduleDataBody{
 	min-height: auto;
 	height: calc(100% - 28px) !important;
@@ -316,11 +311,13 @@
 .scrollbar-inner.fsScroll {
     margin-top: 25px;
 }
+
 .scroll-wrapper > .fsScroll{
 	min-height:auto;
 	width: 100% !important;
 	height: calc(100% - 90px) !important
 }
+
 .fsScroll > .scroll-element.scroll-y{
 	top: 30px;
     height: calc(100% - 90px);

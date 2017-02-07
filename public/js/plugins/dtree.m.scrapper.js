@@ -52,6 +52,7 @@
                            var hiddentag = $(this).data('hiddentag');
                             // $(this).find("input[type='radio']").on('click',function(){    
                            $(this).find(".focus-icon").on('click',function(){ 
+                        		
                         	    $(".hightlight").remove();
                         		$('.focus-highlight').removeAttr('src').attr('src','imgs/ic-highlight-element-inactive.png').removeClass('focus-highlight');
                     		    $(this).addClass('focus-highlight');
@@ -120,6 +121,7 @@
 	        	        $('#'+id_editable)
 		        	        .on('keypress',  function (e) {
 		        	        	if (e.which == 13){
+		        	        		$("#saveObjects").attr('disabled', false);
 		        	        		var regEx = /<|>/g;
 		        	        		/*window.localStorage['checkEditWorking'] = "true";
 		        	        		$(".optionalActionButtions").children("#editFunction").prop("disabled", false).show().css({'cursor':'pointer'});

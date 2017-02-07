@@ -32,9 +32,7 @@
 	<!--Middle Panel-->
 	<div id="middle-content-section">
 		<!--Task Name-->
-		<div id="page-taskName">
-			<span>AHRI-Identify objects related to login location screen</span>	
-		</div>
+		<div id="page-taskName"></div>
 		<!--Task Name-->
 
 		<!--Scrape Tree-->
@@ -77,16 +75,16 @@
 				<h4 class="h4-custom closePopup">Filters <img class="closePopup pull-right" src="imgs/ic-arrow.png" /></h4>
 				<div class="popupContent popupContent-filter">
 				<div id ='selectAllFilters'><label><input title="Select all" type="checkbox" class="checkStyleboxFilter"><span class='selectAllTxt'>Select all</span></label></div>
-					<div><span class='popupContent-default'>Button</span></div>
-					<div><span class='popupContent-default'>Checkbox</span></div>
-					<div><span class='popupContent-default'>Dropdown</span></div>
-					<div><span class='popupContent-default'>Image</span></div>
-					<div><span class='popupContent-default'>Link</span></div>
-					<div><span class='popupContent-default'>Radio Button</span></div>
-					<div><span class='popupContent-default'>Text Box</span></div>
-					<div><span class='popupContent-default'>Element</span></div>
-					<div><span class='popupContent-default'>List</span></div>
-					<div><span class='popupContent-default'>Table</span></div>
+					<div><span class='popupContent-default filterObjects' data-tag="button">Button</span></div>
+					<div><span class='popupContent-default filterObjects' data-tag="checkbox">Checkbox</span></div>
+					<div><span class='popupContent-default filterObjects' data-tag="select">Dropdown</span></div>
+					<div><span class='popupContent-default filterObjects' data-tag="img">Image</span></div>
+					<div><span class='popupContent-default filterObjects' data-tag="a">Link</span></div>
+					<div><span class='popupContent-default filterObjects' data-tag="radiobutton">Radio Button</span></div>
+					<div><span class='popupContent-default filterObjects' data-tag="input">Text Box</span></div>
+					<div><span class='popupContent-default filterObjects' data-tag="Element">Element</span></div>
+					<div><span class='popupContent-default filterObjects' data-tag="list">List</span></div>
+					<div><span class='popupContent-default filterObjects' data-tag="table">Table</span></div>
 				</div>
 			</div>
 			<!--Popup-->
@@ -127,20 +125,7 @@
 			<!--Popup-->
 			<div tabindex="0" id="window-pi" class="popupWrap">
 				<h4 class="h4-custom closePopup">Project Information <img class="closePopup pull-right" src="imgs/ic-arrow.png" /></h4>
-				<div class="popupContent">
-					<p class="proj-info-wrap">
-						<span class="content-label">Project :</span>
-						<span class="content">AHRI Implementation</span>
-					</p>
-					<p class="proj-info-wrap">
-						<span class="content-label">Module :</span>
-						<span class="content">AHRI Implementation_Module_1</span>
-					</p>
-					<p class="proj-info-wrap">
-						<span class="content-label">Screen :</span>
-						<span class="content">AHRI Implementation_Screen_1</span>
-					</p>
-				</div>
+				<div class="popupContent projectInfoWrap"></div>
 			</div>
 			<!--Popup-->
       	</div>
