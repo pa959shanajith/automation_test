@@ -180,6 +180,8 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		enableScreenShotHighlight = true;
 		DesignServices.getScrapeDataScreenLevel_ICE() 
 		.then(function(data){
+			debugger;
+			
 			if(data.scrapeObj != null){
 				if(deleteFlag  == true) console.log("inside delete", data);
 				else{
@@ -202,6 +204,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				}
 				console.log("response data: ", viewString);
 				$("#finalScrap").append("<div id='scrapTree' class='scrapTree'><ul><li><span class='parentObjContainer'><input title='Select all' type='checkbox' class='checkStylebox'><span class='parentObject'><a id='aScrapper'>Select all </a><button id='saveObjects' class='btn btn-xs btn-xs-custom objBtn' style='margin-left: 10px'>Save</button><button data-toggle='modal' id='deleteObjects' data-target='#deleteObjectsModal' class='btn btn-xs btn-xs-custom objBtn' style='margin-right: 0' disabled>Delete</button></span><span></span></span><ul id='scraplist' class='scraplistStyle'></ul></li></ul></div>");
+				$("#saveObjects").attr('disabled', true);
 				var custN;
 				var imgTag;
 				var scrapTree = $("#finalScrap").children('#scrapTree');
@@ -232,6 +235,9 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					editable: true,
 					radio: true
 				});
+			}
+			else{
+				$("#finalScrap").hide()
 			}
 		}, 
 		function(error){console.log("error");})
@@ -476,8 +482,13 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 	$(document).on('click', "#saveObjects", function(){
 		debugger;
 		var tasks = JSON.parse(window.localStorage['_T']);
-		if(eaCheckbox) var getScrapeData = angular.toJson(viewString);
-		else var getScrapeData = angular.toJson(initScraping);
+		if(eaCheckbox) 
+		 {
+			var getScrapeData = angular.toJson(viewString);
+		 }
+		else {
+			var getScrapeData = angular.toJson(initScraping);
+		}
 
 		//var getScrapeData = angular.toJson(screenshotObj);
 		var moduleId = tasks.moduleId;
@@ -502,6 +513,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				$("#globalModal").find('.modal-title').text("Save Scraped data");
 				$("#globalModal").find('.modal-body p').text("Scraped data saved successfully.");
 				angular.element(document.getElementById("left-nav-section")).scope().getScrapeData();
+				$("#saveObjects").attr('disabled', true);
 			}
 			else{
 				enableScreenShotHighlight = false;

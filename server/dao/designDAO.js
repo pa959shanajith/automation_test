@@ -67,9 +67,9 @@ module.exports = {
 				
 				var updateScreenData = "update icetestautomation.screens set screendata='"
 			          + scrapedJSON + "', modifiedby ='" + modifiedBy + "', modifiedon = '" + new Date().getTime() 
-			          + "' where screenid= "+screenID+" and moduleid ="+moduleID+" and screenname ='" + screenName +"';"
+			          + "' where screenid= "+screenID+" and moduleid ="+moduleID+" and screenname ='" + screenName +"'IF EXISTS; "
 			          
-			  
+			     console.log(updateScreenData);
 			     dbConnICE.execute(updateScreenData, function(err, result){
 			          if (err) {
 			                 console.log("updateScreenData=============",err);
@@ -81,6 +81,9 @@ module.exports = {
 			          }
 			    });
 			}
+			else if(param == "updateScrapeData_ICE"){
+				
+			}
 			
 		},
 
@@ -88,7 +91,7 @@ module.exports = {
 			var scrapeData = {};
 			var getScrapeData = "select screendata from screens where screenid ="
 				+ req.payload.screenId + " allow filtering  ";
-			console.log("select", req.payload.screenId);
+			
 			dbConnICE.execute(getScrapeData, function(err, result){
 				if (err) {
 					console.log("getScrapeDataScreenLevel=============",err);
