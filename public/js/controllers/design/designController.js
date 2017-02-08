@@ -1,5 +1,5 @@
 var screenshotObj,scrapedGlobJson,enableScreenShotHighlight,mirrorObj,emptyTestStep,anotherScriptId,getAppTypeForPaste, eaCheckbox, finalViewString, scrapedData, deleteFlag;
-var initScraping = {}; var mirrorObj = {}; var scrapeTypeObj = {}; var viewString = {}; var scrapeObject = {};
+var initScraping = {}; var mirrorObj = {}; var scrapeTypeObj = {}; var newScrapedList; var viewString = {}; var scrapeObject = {};
 var selectRowStepNoFlag = false; var deleteStep = false;
 var getAllAppendedObj; //Getting all appended scraped objects
 var gsElement = []
@@ -173,10 +173,15 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			function(error) {	console.log("Error in designController.js file getTestScriptData method! \r\n "+(error.data));	
 			});
 	};//	getTestScriptData end
-
+	
+	
+	
+	
 	//Populating Saved Scrape Data
 	$scope.getScrapeData = function(){
 		$("#enableAppend").prop("checked", false)
+		window.localStorage['checkEditWorking'] = "false";
+	
 		if($("#finalScrap").find("#scrapTree").length == 0){
 			$(".disableActions").addClass("enableActions").removeClass("disableActions");
 			$("#enableAppend").prop("disabled", true).css('cursor','no-drop')
@@ -188,21 +193,18 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		enableScreenShotHighlight = true;
 		DesignServices.getScrapeDataScreenLevel_ICE() 
 		.then(function(data){
-			if(data.scrapeObj != null){
-				if(deleteFlag  == true){
-					viewString = JSON.parse(data.scrapeObj);
-					deleteFlag = false;
-				}
-				else{
-					viewString = JSON.parse(JSON.parse(data.scrapeObj));
-				}
+			debugger;
+			if(data != null){
+				viewString = data;
+				newScrapedList = viewString
 				$("#window-scrape-screenshot .popupContent, #window-scrape-screenshotTs .popupContent").empty()
 				$("#window-scrape-screenshot .popupContent, #window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrape"><img id="screenshot" src="data:image/PNG;base64,'+viewString.mirror+'" /></div>')
 				$("#finalScrap").empty()
 				if (jQuery.isEmptyObject(viewString)){	
 					console.log("Data is Empty");
 					$(".disableActions").addClass("enableActions").removeClass("disableActions");
-					$("#enableAppend").prop("disabled", true).css('cursor','no-drop')
+					$("#enableAppend").prop("disabled", true).css('cursor','no-drop');
+					$("#screenShotScrape").text("No Screenshot Available")
 					return;
 				}
 				else{
@@ -210,13 +212,14 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					$(".enableActions").addClass("disableActions").removeClass("enableActions");
 					$("#enableAppend").prop("disabled", false).css('cursor','pointer')
 				}
-				console.log("response data: ", viewString);
+				//console.log("response data: ", viewString);
 				$("#finalScrap").append("<div id='scrapTree' class='scrapTree'><ul><li><span class='parentObjContainer'><input title='Select all' type='checkbox' class='checkStylebox'><span class='parentObject'><a id='aScrapper'>Select all </a><button id='saveObjects' class='btn btn-xs btn-xs-custom objBtn' style='margin-left: 10px'>Save</button><button data-toggle='modal' id='deleteObjects' data-target='#deleteObjectsModal' class='btn btn-xs btn-xs-custom objBtn' style='margin-right: 0' disabled>Delete</button></span><span></span></span><ul id='scraplist' class='scraplistStyle'></ul></li></ul></div>");
 				$("#saveObjects").attr('disabled', true);
 				var custN;
 				var imgTag;
 				var scrapTree = $("#finalScrap").children('#scrapTree');
 				var innerUL = $("#finalScrap").children('#scrapTree').children('ul').children().children('#scraplist');
+				debugger;
 				for (var i = 0; i < viewString.view.length; i++) {        			
 					var path = viewString.view[i].xpath;
 					var ob = viewString.view[i];
@@ -246,9 +249,6 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				
 				$(".checkStylebox, .checkall").prop("disabled", false)
 			}
-			else{
-				$("#finalScrap").hide()
-			}
 		}, 
 		function(error){console.log("error");})
 	}
@@ -264,15 +264,17 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			blockUI(blockMsg);
 			DesignServices.initScraping_ICE(browserType)
 			.then(function (data) { 
+				debugger;
 				unblockUI();
-				var data = JSON.stringify(data);
-				var scrapeJson = JSON.parse(data);
-				screenshotObj = scrapeJson;
-				initScraping = scrapeJson[0];
-				mirrorObj = scrapeJson[1];
-				scrapeTypeObj = scrapeJson[2];
+				viewString = data;
+				//var data = JSON.stringify(data);
+				//var scrapeJson = JSON.parse(data);
+				//screenshotObj = scrapeJson;
+				//initScraping = scrapeJson[0];
+				//mirrorObj = scrapeJson[1];
+				//scrapeTypeObj = scrapeJson[2];
 				$("#window-scrape-screenshot .popupContent, #window-scrape-screenshotTs .popupContent").empty()
-				$("#window-scrape-screenshot .popupContent, #window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrape"><img id="screenshot" src="data:image/PNG;base64,'+mirrorObj.mirror+'" /></div>')
+				$("#window-scrape-screenshot .popupContent, #window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrape"><img id="screenshot" src="data:image/PNG;base64,'+viewString.mirror+'" /></div>')
 				
 
 
@@ -284,11 +286,11 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				if(eaCheckbox){
 					//Getting the Existing Scrape Data
 
+					debugger;
+					for (var i = 0; i < newScrapedList.view.length; i++) {        			
 
-					for (var i = 0; i < viewString.view.length; i++) {        			
-
-						var path = viewString.view[i].xpath;
-						var ob = viewString.view[i];
+						var path = newScrapedList.view[i].xpath;
+						var ob = newScrapedList.view[i];
 						ob.tempId= i; 
 						custN = ob.custname;
 						var tag = ob.tag;
@@ -308,12 +310,12 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					generateScrape()
 
 					//Getting appended scraped object irrespective to the dynamic value
-					function generateScrape(){
-						var tempId = viewString.view.length - 1;
-						for (var i = 0; i < initScraping.view.length; i++) { 
+					function generateScrape(){ debugger;
+						var tempId = newScrapedList.view.length - 1;
+						for (var i = 0; i < viewString.view.length; i++) { 
 							tempId++
-							var path = initScraping.view[i].xpath;
-							var ob = initScraping.view[i];
+							var path = viewString.view[i].xpath;
+							var ob = viewString.view[i];
 
 							var custN = ob.custname.replace(/[<>]/g, '').trim();
 							var tag = ob.tag;
@@ -329,11 +331,11 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 							else {
 								var li = "<li data-xpath='"+ob.xpath+"' data-left='"+ob.left+"' data-top='"+ob.top+"' data-width='"+ob.width+"' data-height='"+ob.height+"' data-tag='"+tag+"' data-url='"+ob.url+"' data-hiddentag='"+ob.hiddentag+"' class='item select_all "+tag+"x' val="+tempId+"><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' disabled /><span title='"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"' class='ellipsis'>"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"</span></a></li>";
 							}
-							angular.element(innerUL).append(li);
-							viewString.view.push(initScraping.view[i])
+							angular.element(innerUL).append(li)
+							newScrapedList.view.push(viewString.view[i]);
 						}
-						viewString.mirror = mirrorObj.mirror;
-						viewString.scrapeTypeObj = scrapeTypeObj.scrapetype
+						newScrapedList.mirror = viewString.mirror;
+						newScrapedList.scrapetype = viewString.scrapetype;
 					}
 					//Getting appended scraped object irrespective to the dynamic value
 				}
@@ -342,10 +344,11 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				//If enable append is inactive
 				else{
 					//Before Saving the Scrape JSON to the Database
-					for (var i = 0; i < initScraping.view.length; i++) { 
+					for (var i = 0; i < viewString.view.length; i++) {
+						debugger;
 						var innerUL = $("#finalScrap").children('#scrapTree').children('ul').children().children('#scraplist');
-						var path = initScraping.view[i].xpath;
-						var ob = initScraping.view[i];
+						var path = viewString.view[i].xpath;
+						var ob = viewString.view[i];
 						ob.tempId= i;
 						var custN = ob.custname.replace(/[<>]/g, '').trim();
 						var tag = ob.tag;
@@ -360,11 +363,8 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 						else {
 							var li = "<li data-xpath='"+ob.xpath+"' data-left='"+ob.left+"' data-top='"+ob.top+"' data-width='"+ob.width+"' data-height='"+ob.height+"' data-tag='"+tag+"' data-url='"+ob.url+"' data-hiddentag='"+ob.hiddentag+"' class='item select_all "+tag+"x' val="+ob.tempId+"><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' disabled /><span title="+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+" class='ellipsis'>"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"</span></a></li>";
 						}
-
 						angular.element(innerUL).append(li);
 					}
-					initScraping.mirror = mirrorObj.mirror;
-					initScraping.scrapeTypeObj = scrapeTypeObj.scrapetype
 
 					//Before Saving the Scrape JSON to the Database
 				}
@@ -378,9 +378,10 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 
 					editable: true,
 					radio: true
-				});        
+				});   
+				debugger;
 				//Build Scrape Tree using dmtree.scrapper.js file
-				if(data.length > 0) $("#saveObjects").removeClass('hide');
+				if(viewString.view.length > 0) $("#saveObjects").removeClass('hide');
 				else $("#saveObjects").addClass('hide');
 			}, function (error) { console.log("Fail to Load design_ICE") });
 		}
@@ -408,7 +409,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 	    var screenName = tasks.screenName;
 		scrapeObject = {};
 		scrapeObject.param = 'deleteScrapeData_ICE';
-		scrapeObject.view = viewString
+		scrapeObject.view = JSON.stringify(viewString);
 	   	scrapeObject.moduleId = moduleId;
 	    scrapeObject.screenId = screenId;
 	    scrapeObject.screenName = screenName;
@@ -525,19 +526,16 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 	$(document).on('click', "#saveObjects", function(){
 		debugger;
 		var tasks = JSON.parse(window.localStorage['_T']);
-		if(eaCheckbox) 
-		 {
-			var getScrapeData = angular.toJson(viewString);
-		 }
-		else {
-			var getScrapeData = angular.toJson(initScraping);
-		}
-
+		if(eaCheckbox) var getScrapeData = JSON.stringify(newScrapedList);
+		else var getScrapeData = JSON.stringify(viewString);
+		
 		//var getScrapeData = angular.toJson(screenshotObj);
 		var moduleId = tasks.moduleId;
 		var screenId = tasks.screenId;
 		var screenName = tasks.screenName;
 		var userinfo = JSON.parse(window.localStorage['_UI']);
+		
+		
 		scrapeObject = {};
 		scrapeObject.getScrapeData = getScrapeData;
 		scrapeObject.moduleId = moduleId;
@@ -546,9 +544,46 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		scrapeObject.userinfo = userinfo;
 		scrapeObject.param = "updateScrapeData_ICE";
 		scrapeObject.appType = "Web";
+		
+		
+//		if(window.localStorage['checkEditWorking'] == "true")
+//		{
+//			console.log("inside edit");
+//			var currlistItems = [];
+//        	var modifiedListItems = [];
+//        	var screenId = tasks.screenId;
+//        	var userinfo = JSON.parse(window.localStorage['_UI']);
+//        	var getScrapeData = angular.toJson(viewString);
+//        	getScrapeData = JSON.parse(getScrapeData);
+//        	scrapeObject = {};
+//        	scrapeObject.moduleId = moduleId;
+//    		scrapeObject.screenId = screenId;
+//    		scrapeObject.screenName = screenName;
+//    		scrapeObject.userinfo = userinfo;
+//        	scrapeObject.param = "editScrapeData_ICE";
+//        	scrapeObject.appType = "Web";
+//        	for(i=0; i<getScrapeData.view.length; i++){
+//        		currlistItems.push(getScrapeData.view[i].custname);
+//        	}
+//        	var modList = [];
+//        	//$(".ellipsis").parent().parent().parent().remove();
+//        	$.each($(".ellipsis"), function(){            
+//    			modifiedListItems.push($(this).text());
+//    		});
+//    		for(i=0; i<modifiedListItems.length; i++){
+//    			if(modifiedListItems[i] != "" || modifiedListItems[i] != undefined){
+//    				modList.push(modifiedListItems[i])
+//    			}
+//    		}
+//		}
+	
+
+		
+		
 
 		DesignServices.updateScreen_ICE(scrapeObject)
 		.then(function(data){
+			debugger;
 			if(data == "success"){
 				enableScreenShotHighlight = true;
 				$("#globalModal").modal("show");

@@ -53,7 +53,7 @@ module.exports = {
 			{
 
 				var appType = updateData.appType;
-			    var scrapedJSON = JSON.stringify(updateData.getScrapeData);
+			    var scrapedJSON = updateData.getScrapeData;
 			    var flag = "fail";
 			    var userInfo =  updateData.userinfo;
 			    var moduleID, screenID, modifiedBy;
@@ -62,17 +62,15 @@ module.exports = {
 			    screenName = updateData.screenName;
 			    modifiedBy = userInfo.username;
 			    scrapedJSON = scrapedJSON.replace(/'+/g,"''")
-			  
-				
 				var updateScreenData = "update icetestautomation.screens set screendata='"
 			          + scrapedJSON + "', modifiedby ='" + modifiedBy + "', modifiedon = '" + new Date().getTime() 
 			          + "' where screenid= "+screenID+" and moduleid ="+moduleID+" and screenname ='" + screenName +"'IF EXISTS; "
-			          
+			    console.log(updateScreenData);
 			    
 			     dbConnICE.execute(updateScreenData, function(err, result){
 			          if (err) {
 			                 console.log("updateScreenData=============",err);
-			      cb(null, flag);
+			                 	cb(null, flag);
 			          }      
 			          else{
 			                 flag = "success";
@@ -107,20 +105,16 @@ module.exports = {
 				        deletedCustName.push(deletedRes[k][0]);
 				        deletedCustPath.push(deletedRes[k][1]);
 				}
-			 //console.log("deletedObjects", delObjects);
 			var allObjects = {};
 			var allObjectsView;
-			//console.log("delObjects", delObjects);
 			
 			var screenQuery = "select screendata from icetestautomation.screens where screenid= " + screenID + ";";
-			dbConnICE.execute(screenQuery, function(err, result){
-				//console.log("Result", result.rows);		
+			dbConnICE.execute(screenQuery, function(err, result){	
 				
 				 for (var i = 0; i < result.rows.length; i++) {
 					 allObjects = result.rows[i].screendata;
-					
-					 allObjects = JSON.parse(JSON.parse(allObjects));
-					 console.log("length", allObjects.view.length)
+					 console.log("Result", allObjects);
+					 allObjects = JSON.parse(allObjects);
 					  for(var j=0; j < allObjects.view.length; j++)
 					   {
 						  allObjectsView = allObjects.view[j];
@@ -129,43 +123,36 @@ module.exports = {
 						   xpath = allObjectsView.xpath;
 						   if(in_array(custname, deletedCustName) &&  in_array(xpath, deletedCustPath))
 						   {
-							    	  // flag = true;
+							   //console.log("TRUE________________________________________________________");
 							    	   deletedJson.push(allObjectsView);
 							    	   delete allObjects.view[j];
 						   }
 				       }
 				 }
-				
-				 
-				 allObjects.view =  allObjects.view.filter(function(n){ return n != null }); 
-				 scrapedJsonObject.view =  allObjects.view;
-				 
-				 scrapedJsonObject.mirror =  updateData.view.mirror;
-				 scrapedJsonObject.scrapeType =  updateData.view.scrapeTypeObj;
-				 scrapedJsonObject = JSON.stringify(scrapedJsonObject);
-				 scrapedJsonObject = scrapedJsonObject.replace(/'+/g,"''");
+				 allObjects.view =  allObjects.view.filter(function(n){ return n != null });
+				 allObjects.scrapeType = updateData.view.scrapeTypeObj;
+				 allObjects = JSON.stringify(allObjects);
+				 allObjects = allObjects.replace(/'+/g,"''");
 				 var updateScreenData = "update icetestautomation.screens set screendata='"
-			          + scrapedJsonObject + "', modifiedby ='" + modifiedBy + "', modifiedon = '" + new Date().getTime() 
+			          + allObjects + "', modifiedby ='" + modifiedBy + "', modifiedon = '" + new Date().getTime() 
 			          + "' where screenid= "+screenID+" and moduleid ="+moduleID+" and screenname ='" + screenName +"'IF EXISTS;"
-			          
+			      
 			     dbConnICE.execute(updateScreenData, function(err, result){
 			          if (err) {
 			                 cb(null, flag);
 			          }
 			          else{
 			                 flag = "success";
-			                 //console.log(scrapedJsonObject);
 			                 cb(null, flag);
 			          }
 			    });
 				
 			});
 		}
-			
 		},
 
 		getScrapeDataScreenLevel_ICE : function getScrapeDataScreenLevel_ICE(req, cb, data) {
-			var scrapeData = {};
+			var viewString = {};
 			var getScrapeData = "select screendata from screens where screenid ="
 				+ req.payload.screenId + " allow filtering  ";
 			
@@ -178,9 +165,9 @@ module.exports = {
 				}
 				else{
 					for (var i = 0; i < result.rows.length; i++) {
-						scrapeData.scrapeObj = result.rows[i].screendata;
+						viewString = result.rows[i].screendata;
 					}
-					cb(null, scrapeData) 
+					cb(null, JSON.parse(viewString)) 
 				}
 			});
 		},
