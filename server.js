@@ -166,15 +166,8 @@ socket.on('message', function(data){
 allSockets.push(socket);
 
 
-
-
-
-
 allClients.push(socket.conn.id)
 module.exports.abc = allSockets;
-
-
-
 
 socket.on('disconnect', function() {     
 var i = allSockets.indexOf(socket);
