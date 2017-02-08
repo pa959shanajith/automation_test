@@ -105,6 +105,7 @@
             	    		}
             	    	}
             	    	else{
+            	    		
                 	    	var span = $(this);
                 	        var input = $('<input />', {
                 	            'type' : 'text',
@@ -129,15 +130,19 @@
 		        	        		span.text($(this).val()).removeClass('content-hide');
 		        	        		$(this).remove();*/
 		        	        		if((!regEx.test($(this).val()))){
-		        	        			window.localStorage['checkEditWorking'] = "true";
-			        	        		$(".optionalActionButtions").children("#editFunction").prop("disabled", false).show().css({'cursor':'pointer'});
+		        	        			
+		        	        		
+			        	        		//$(".optionalActionButtions").children("#editFunction").prop("disabled", false).show().css({'cursor':'pointer'});
 			        	        		//$(this).parent().append($(span).html($(this).val()));
 			        	        		if($(this).val().trim() == ""){
 			        	        			showDialogMesgs("Edit Objects", "Object name cannot be empty.");
 			        	        			span.removeClass('content-hide');
 			 		        	    	   	$(this).remove();
 			        	        		}
-			        	        		else span.text($(this).val()).removeClass('content-hide');
+			        	        		else { 
+			        	        			window.localStorage['checkEditWorking'] = "true";
+			        	        			span.text($(this).val()).removeClass('content-hide');
+			        	        		}
 			        	        		$(this).remove();
 		        	        		} else{
 /*		        	        			$("#specialCharacterValidation3").dialog({

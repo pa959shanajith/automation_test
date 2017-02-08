@@ -6,7 +6,7 @@ var dbConn = require('../../server/config/icetestautomation');
 var cassandra = require('cassandra-driver');
 var cb = require('callback');
 var designDAO = require('../dao/designDAO');
-
+var myserver = require('../../server.js');
 module.exports = {
 		initScraping_ICE: {
 			handler: function (req, reply) {
@@ -99,6 +99,49 @@ module.exports = {
 			},
 			app: {
 				name: 'updateTestCase_ICE'
+			}
+		},
+		
+		//Debug Testcase
+		debugTestCase_ICE : {
+			handler: function (req, reply) {
+				// var requestedbrowsertypes=req.payload.browsertypes;
+				var requestfordebug=[]
+				designDAO.debugTestCase_ICE(req,function (err,data) {
+					if(err.length != 0){
+						return reply(err);
+					}else{
+						if(data.length==1){
+							err="yes its DB time out"; 
+							return reply(err);
+						}else{
+							requestfordebug=data;
+							var ip = req.headers['x-forwarded-for'] || req.info.remoteAddress;
+							var mySocket =  myserver.allSocketsMap[ip];
+							var dataarray=[];
+							
+//							dataarray.push(data);
+//							dataarray.push(requestfordebug);
+//							mySocket.send(data,requestfordebug);
+							
+							mySocket.emit('debugTestCase',requestfordebug);
+							mySocket.on('result_debugTestCase', function(requestfordebug){
+								
+								console.log("this is the value:",requestfordebug);
+								return reply("success");
+							});
+//							mySocket.emit('debugTestCase',requestfordebug);
+//							mySocket.on('debugTestCase', function(cb,requestfordebug){
+//								cb(null, data);
+//							});
+//							cb(null, requestfordebug);
+							//return reply("success");
+						}
+					}
+				});
+			},
+			app: {
+				name: 'debugTestCase_ICE'
 			}
 		}
 
