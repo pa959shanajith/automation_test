@@ -119,7 +119,7 @@ function taskRedirectionInner(projectname, modulename, path, moduleId, screenId,
 	taskObj.appType = apptype;
 	window.localStorage['_T'] = JSON.stringify(taskObj)
 	if(path == "Screen") 			window.location.pathname = "/design"
-    else if(path == "TestCase")	window.location.pathname = "/designTestScript"
+    else if(path == "TestCase")	window.location.pathname = "/designTestCase"
     else if(path == "TestSuite")	window.location.pathname = "/execute"
     else if(path == "Scheduling")	window.location.pathname = "/scheduling"
 }

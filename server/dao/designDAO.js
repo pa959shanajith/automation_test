@@ -167,7 +167,15 @@ module.exports = {
 					for (var i = 0; i < result.rows.length; i++) {
 						viewString = result.rows[i].screendata;
 					}
-					cb(null, JSON.parse(viewString)) 
+					if(viewString == null)
+					{
+						console.log("Data Null");
+					}
+					else{
+						viewString = JSON.parse(viewString)
+					}
+					
+					cb(null, viewString) 
 				}
 			});
 		},

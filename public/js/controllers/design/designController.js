@@ -24,7 +24,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 
 	cfpLoadingBar.start()
 	$timeout(function(){
-		if(window.location.href.split("/")[3] == "designTestScript"){
+		if(window.location.href.split("/")[3] == "designTestCase"){
 			angular.element(document.getElementById("tableActionButtons")).scope().readTestCase_ICE();
 		}
 		else if(window.location.href.split("/")[3] == "design"){
@@ -60,11 +60,10 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					custnameArr.length = 0;
 					// counter to append the items @ correct indexes of custnameArr
 					var indexCounter = '';
-					var recievedData = JSON.parse(data2.scrapeObj);
-					window.localStorage['newTestScriptDataList'] = angular.toJson(recievedData[0].view);
-					$scope.newTestScriptDataLS = recievedData[0].view;
+					window.localStorage['newTestScriptDataList'] = data2.view;
+					//$scope.newTestScriptDataLS = recievedData[0].view;
 					$("#window-scrape-screenshotTs .popupContent").empty()
-					$("#window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrapeTS"><img id="screenshotTS" src="data:image/PNG;base64,'+recievedData[0].mirror+'" /></div>')
+					$("#window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrapeTS"><img id="screenshotTS" src="data:image/PNG;base64,'+data2.mirror+'" /></div>')
 					
 					// service call # 3 -objectType service call
 					/*DesignServices.getObjectType()
@@ -100,7 +99,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 						if(data.testcase[0].comments!=null || data.testcase[0].comments!=""){
 							comments=data.testcase[0].comments;
 						}
-						contentTable($scope.newTestScriptDataLS);
+						contentTable(data2.view);
 						/*if(itemLabelName == "Runtime_Settings" || window.localStorage['RunFlag'] == "true" || usrRole.role == "Viewer"){
 							$('.cbox').prop('disabled',true);
 							$('.cbox').addClass('disabled');
@@ -119,7 +118,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					}
 					else{
 						window.localStorage['testScriptTableData'] = angular.toJson(data);
-						var testcase = JSON.parse(JSON.parse(window.localStorage['testScriptTableData']).testcase);
+						var testcase = JSON.parse(data.testcase);
 						var testcaseArray = [];
 						for(var i = 0; i < testcase.length; i++)	{
 							testcaseArray.push(testcase[i]);
@@ -141,7 +140,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 						$("#jqGrid_addNewTestScript").jqGrid('clearGridData');
 						$("#jqGrid").jqGrid('GridUnload');
 						$("#jqGrid").trigger("reloadGrid");
-						contentTable($scope.newTestScriptDataLS);
+						contentTable(data2.view);
 						/*if(itemLabelName == "Runtime_Settings" || window.localStorage['RunFlag'] == "true" || usrRole.role == "Viewer"){
 							$('.cbox').prop('disabled',true);
 							$('.cbox').addClass('disabled');
