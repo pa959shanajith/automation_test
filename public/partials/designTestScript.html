@@ -10,10 +10,10 @@
 			<div id="left-top-section">
 				<ul>
 					<li><span><a class='scrapeOnTxt'>Debug On</a></span></li>
-					<li><a href='#' ng-click="initDebug(); $event.preventDefault(); $event.stopPropagation();"><span><img src='imgs/ic-ie.png' alt='Internet Explorer' /></span>Internet Explorer</a></li>
-					<li><a href='#'><span><img src='imgs/ic-chrome.png' alt='Google Chrome' /></span>Google Chrome</a></li>
-					<li><a href='#'><span><img src='imgs/ic-mozilla.png' alt='Mozilla Firefox' /></span>Mozilla Firefox</a></li>
-					<li class="last"><span style="margin-bottom:-5px"><input id="enableAppend" type='checkbox' value=""></span><label for="enableAppend">Add Dependent Test Cases</label></li>
+					<li><a href='#' ng-click="debugTestCase_ICE('3');" title="Debug on Internet Explorer"><span><img src='imgs/ic-ie.png' alt='Internet Explorer' /></span>Internet Explorer</a></li>
+					<li><a href='#' ng-click="debugTestCase_ICE('1');" title="Debug on Chrome"><span><img src='imgs/ic-chrome.png' alt='Google Chrome' /></span>Google Chrome</a></li>
+					<li><a href='#' ng-click="debugTestCase_ICE('2');" title="Debug on Firefox"><span><img src='imgs/ic-mozilla.png' alt='Mozilla Firefox' /></span>Mozilla Firefox</a></li>
+					<li class="last"><span style="margin-bottom:-5px"><input id="addDependent" type='checkbox' value="" disabled></span><label for="addDependent">Add Dependent Test Cases</label></li>
 				</ul>
 			</div>
 
@@ -40,14 +40,14 @@
 		
 		<!-- Table Action Buttons -->
 		<div id="tableActionButtons">
-			<img class="btn btn-action" src="imgs\ic-jq-addstep.png" alt="Add Steps" onclick="addTestScriptRow()">
-			<img class="btn btn-action" src="imgs\ic-jq-editstep.png" alt="Edit Steps" onclick="editTestCaseRow()">
-			<img class="btn btn-action" src="imgs\ic-jq-dragstep.png" alt="Drag Steps" onclick="rearrangeTestScriptRow()" disabled>
-			<img class="btn btn-action" src="imgs\ic-jq-copystep.png" alt="Copy Steps" onclick="copyTestStep()" disabled>
-			<img class="btn btn-action" src="imgs\ic-jq-pastestep.png" alt="Paste Steps" onclick="pasteTestStep()" disabled>
-			<img class="btn btn-action" src="imgs\ic-jq-commentstep.png" alt="Comment Steps" onclick="commentStep()" disabled>
-			<button class="btn btn-xs btn-xs-custom btn-xs-action" ng-click="updateTestCase_ICE()">Save</button>
-			<button class="btn btn-xs btn-xs-custom btn-xs-action" onclick="deleteTestScriptRow()">Delete</button>
+			<img class="btn btn-action" src="imgs\ic-jq-addstep.png" alt="Add Steps" onclick="addTestScriptRow()" title="Add Test step">
+			<img class="btn btn-action" src="imgs\ic-jq-editstep.png" alt="Edit Steps" onclick="editTestCaseRow()" title="Edit Test step">
+			<img class="btn btn-action" src="imgs\ic-jq-dragstep.png" alt="Drag Steps" onclick="rearrangeTestScriptRow()" title="Drag & Drop Test step">
+			<img class="btn btn-action" src="imgs\ic-jq-copystep.png" alt="Copy Steps" onclick="copyTestStep()" title="Copy Test step">
+			<img class="btn btn-action" src="imgs\ic-jq-pastestep.png" alt="Paste Steps" onclick="pasteTestStep()" title="Paste Test step">
+			<img class="btn btn-action" src="imgs\ic-jq-commentstep.png" alt="Comment Steps" onclick="commentStep(event)" title="Skip Test step">
+			<button class="btn btn-xs btn-xs-custom btn-xs-action" ng-click="updateTestCase_ICE()" title="Save Test step">Save</button>
+			<button class="btn btn-xs btn-xs-custom btn-xs-action" onclick="deleteTestScriptRow()" title="Delete Test step">Delete</button>
 		</div>
 		<!-- Table Action Buttons -->
 		
@@ -113,7 +113,6 @@
 			<div tabindex="0" id="window-scrape-screenshotTs" class="popupWrap">
 				<h4 class="h4-custom closePopup">Screenshot <img class="closePopup pull-right" src="imgs/ic-arrow.png" /></h4>
 				<div class="popupContent">
-					Screenshot Content
 				</div>
 			</div>
 			<!--Popup-->
@@ -222,6 +221,48 @@
 		  </div>
 		</div>
 		<!-- Global Modal for Yes and No  -->
+		
+		<!-- Global Modal for Input field -->
+	<div id="modalDialog-inputField" class="modal fade" role="dialog" data-keyboard="false" data-backdrop="static">
+		<div class="modal-dialog modal-sm">
+			<!-- Modal content-->
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal">&times;</button>
+					<h4 class="modal-title"></h4>
+				</div>
+				<div class="modal-body">
+					<!--Modal Content-->
+					<form class="form-inline">
+						<!--Inputs Seprators-->
+						<div class="row row-modal">
+							<!-- <div class="form-group">
+								<label>Object Type</label>
+								<select class="form-control"><option>Select</option></select>
+							</div> -->						
+							<div class="form-group" style="width: 100% !important;">
+								<label id="labelContent" style="margin-bottom: 0px;"></label>
+								<input type="text" class="form-control" id="getInputData" placeholder="Enter object name">
+							</div>
+							<div>
+								<span id="errorMsgs1" class="errorMsg" style="display: none;"></span>
+								<span id="errorMsgs2" class="errorMsg" style="display: none;"></span>
+								<span id="errorMsgs3" class="errorMsg" style="display: none;"></span>
+							</div>
+						</div>
+						<!--Inputs Seprators-->
+					</form>
+					<!--Modal Content-->
+				</div>
+				<div class="modal-footer">
+					<!-- <button type="button" class="btn btn-default pull-left">Add More</button> -->
+					<button type="button" class="btn btn-default" id="">Submit</button>
+					<!-- <button type="button" class="btn btn-default">Reset</button> -->
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- Global Modal for Input field -->
 	</div>
 	<!--Right Panel-->
 </section>	

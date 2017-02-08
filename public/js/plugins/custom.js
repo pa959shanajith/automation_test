@@ -93,38 +93,36 @@ $(document).ready(function() {
 
 //Innerpages Tasks Implementation
 function loadUserTasks(){
-    var tasksJson = JSON.parse(window.localStorage['_TJ'])
+	var tasksJson = JSON.parse(window.localStorage['_TJ'])
     $(".task-content-inner").empty().hide()
     var counter = 1;
     for(i=0; i<tasksJson.length; i++){
-    	if(tasksJson[i].Task_Type == "Design"){
-    		$(".task-content-inner").append('<div class="panel panel-default"><div class="panel-heading"><h4 class="panel-title"><div class="collapse-head" data-toggle="collapse" data-parent="#accordion" href="#collapse'+i+'"><span class="taskNo">Task '+ counter +'</span><!--Addition--><div class="panel-additional-details"><span class="panel-task-directory">'+tasksJson[i].Task_Type+'</span><span class="panel-head-details details-design-task">Details <span class="caret caret-absolute"></span></span></div><!--Addition--></div></h4></div><div id="collapse'+i+'" class="panel-collapse collapse"><div class="panel-body"><span class="assignedTaskInner" data-apptype="'+tasksJson[i].Node_Type+'" data-projectname="'+tasksJson[i].Project_Name+'" data-modulename="'+tasksJson[i].Module_Name+'" data-name="'+tasksJson[i].Sub_Task+'" data-moduleid="'+tasksJson[i].ModuleID+'" data-screenid="'+tasksJson[i].screenID+'"  data-screenname="'+tasksJson[i].screenName+'" data-testcaseid="'+tasksJson[i].testCaseId+'" data-testcasename="'+tasksJson[i].testCaseName+'" onclick="taskRedirectionInner(this.dataset.projectname, this.dataset.modulename, this.dataset.name, this.dataset.moduleid, this.dataset.screenid, this.dataset.screenname, this.dataset.testcaseid, this.dataset.testcasename, this.dataset.apptype)">'+tasksJson[i].Task_Name+'</span></div></div></div>').fadeIn()
-    	} 
+		if(tasksJson[i].Task_Type == "Design"){
+			$(".task-content-inner").append('<div class="panel panel-default"><div class="panel-heading"><h4 class="panel-title"><div class="collapse-head" data-toggle="collapse" data-parent="#accordion" href="#collapse'+i+'"><span class="taskNo">Task '+ counter +'</span><!--Addition--><div class="panel-additional-details"><span class="panel-task-directory">'+tasksJson[i].Task_Type+'</span><span class="panel-head-details details-design-task">Details <span class="caret caret-absolute"></span></span></div><!--Addition--></div></h4></div><div id="collapse'+i+'" class="panel-collapse collapse"><div class="panel-body"><span class="assignedTaskInner" data-apptype="'+tasksJson[i].Node_Type+'" data-projectname="'+tasksJson[i].Project_Name+'" data-modulename="'+tasksJson[i].Module_Name+'" data-name="'+tasksJson[i].Sub_Task+'" data-moduleid="'+tasksJson[i].ModuleID+'" data-screenid="'+tasksJson[i].screenID+'"  data-screenname="'+tasksJson[i].screenName+'" data-testcaseid="'+tasksJson[i].testCaseId+'" data-testcasename="'+tasksJson[i].testCaseName+'" onclick="taskRedirectionInner(this.dataset.projectname, this.dataset.modulename, this.dataset.name, this.dataset.moduleid, this.dataset.screenid, this.dataset.screenname, this.dataset.testcaseid, this.dataset.testcasename, this.dataset.apptype)">'+tasksJson[i].Task_Name+'</span></div></div></div>').fadeIn()
+		} 
     	else if(tasksJson[i].Task_Type == "Execution"){
     		$(".task-content-inner").append('<div class="panel panel-default"><div class="panel-heading"><h4 class="panel-title"><div class="collapse-head" data-toggle="collapse" data-parent="#accordion" href="#collapse'+i+'"><span class="taskNo">Task '+ counter +'</span><!--Addition--><div class="panel-additional-details"><span class="panel-task-directory">'+tasksJson[i].Task_Type+'</span><span class="panel-head-details details-execute-task">Details <span class="caret caret-absolute"></span></span></div><!--Addition--></div></h4></div><div id="collapse'+i+'" class="panel-collapse collapse"><div class="panel-body"><span class="assignedTaskInner" data-name="'+tasksJson[i].Sub_Task+'" onclick="taskRedirectionInner(this.dataset.name)">'+tasksJson[i].Task_Name+'</span></div></div></div>').fadeIn()
     	}
-    	counter++
+		counter++
     }
 }
 
-
 function taskRedirectionInner(projectname, modulename, path, moduleId, screenId, screenName, testCaseId, testCaseName, apptype){
-    var taskObj = {};
-    taskObj.projectName = projectname,
+	var taskObj = {};
+	taskObj.projectName = projectname,
 	taskObj.moduleName = modulename,
 	taskObj.moduleId = moduleId;
 	taskObj.screenId = screenId;
 	taskObj.screenName = screenName;
 	taskObj.testCaseId = testCaseId;
 	taskObj.testCaseName = testCaseName;
-    taskObj.appType = apptype;
-    window.localStorage['_T'] = JSON.stringify(taskObj)
-    if(path == "Screen")                     window.location.pathname = "/design"
-    else if(path == "TestCase")   			 window.location.pathname = "/designTestScript"
-    else if(path == "TestSuite")  			 window.location.pathname = "/execute"
-    else if(path == "Scheduling") 		     window.location.pathname = "/scheduling"
+	taskObj.appType = apptype;
+	window.localStorage['_T'] = JSON.stringify(taskObj)
+	if(path == "Screen") 			window.location.pathname = "/design"
+    else if(path == "TestCase")	window.location.pathname = "/designTestScript"
+    else if(path == "TestSuite")	window.location.pathname = "/execute"
+    else if(path == "Scheduling")	window.location.pathname = "/scheduling"
 }
-
 
 //Innerpages Tasks Implementation
 

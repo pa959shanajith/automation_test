@@ -1,8 +1,8 @@
-var screenshotObj,scrapedGlobJson,enableScreenShotHighlight,mirrorObj,emptyTestStep,anotherScriptId,getAppTypeForPaste, eaCheckbox, finalViewString, scrapedData, deleteFlag;
+var screenshotObj,scrapedGlobJson,enableScreenShotHighlight,mirrorObj,emptyTestStep,anotherScriptId,getAppTypeForPaste, eaCheckbox, finalViewString, scrapedData, deleteFlag, pasteSelecteStepNo,globalSelectedBrowserType;
 var initScraping = {}; var mirrorObj = {}; var scrapeTypeObj = {}; var newScrapedList; var viewString = {}; var scrapeObject = {};
 var selectRowStepNoFlag = false; var deleteStep = false;
 var getAllAppendedObj; //Getting all appended scraped objects
-var gsElement = []
+var gsElement = []; window.localStorage['selectRowStepNo'] = '';
 mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout', 'DesignServices','cfpLoadingBar', function($scope,$http,$location,$timeout,DesignServices, cfpLoadingBar) {
 	$("body").css("background","#eee");
 	$("#tableActionButtons, .designTableDnd").delay(500).animate({opacity:"1"}, 500)
@@ -45,7 +45,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			// service call # 1 - getTestScriptData service call
 			DesignServices.readTestCase_ICE(screenId, testCaseId)	
 			.then(function(data) {
-				var appType = "Web";
+				var appType = taskInfo.appType;
 				$('#jqGrid').removeClass('visibility-hide').addClass('visibility-show');
 				// removing the down arrow from grid header columns - disabling the grid menu pop-up
 				$('.ui-grid-icon-angle-down').removeClass('ui-grid-icon-angle-down');
@@ -61,8 +61,11 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					// counter to append the items @ correct indexes of custnameArr
 					var indexCounter = '';
 					var recievedData = JSON.parse(data2.scrapeObj);
-					window.localStorage['newTestScriptDataList'] = angular.toJson(recievedData.view);
-					$scope.newTestScriptDataLS = recievedData.view;
+					window.localStorage['newTestScriptDataList'] = angular.toJson(recievedData[0].view);
+					$scope.newTestScriptDataLS = recievedData[0].view;
+					$("#window-scrape-screenshotTs .popupContent").empty()
+					$("#window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrapeTS"><img id="screenshotTS" src="data:image/PNG;base64,'+recievedData[0].mirror+'" /></div>')
+					
 					// service call # 3 -objectType service call
 					/*DesignServices.getObjectType()
 					.then(function(data3)	{
@@ -158,7 +161,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 						if(selectRowStepNoFlag == true){
 							if($("#jqGrid").find("tr[id='"+window.localStorage['selectRowStepNo']+"']").prev('tr[class="ui-widget-content"]').length > 0){
 								//$("#jqGrid").find("tr[id='"+window.localStorage['selectRowStepNo']+"']").trigger('click');
-								$("#jqGrid").find("tr[id='"+window.localStorage['selectRowStepNo']+"']").prev().focus();
+								//$("#jqGrid").find("tr[id='"+window.localStorage['selectRowStepNo']+"']").prev().focus();
 							}else{
 								//$("#jqGrid").find("tr[id='"+window.localStorage['selectRowStepNo']+"']").focus().trigger('click');
 							}					
@@ -173,9 +176,124 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			function(error) {	console.log("Error in designController.js file getTestScriptData method! \r\n "+(error.data));	
 			});
 	};//	getTestScriptData end
+
+	// browser icon clicked
+	$scope.debugTestCase_ICE = function (selectedBrowserType) {
+		var taskInfo = JSON.parse(window.localStorage['_T']);
+		var testcaseID = [];
+		testcaseID.push(taskInfo.testCaseId);
+		var browserType = [];
+		browserType.push(selectedBrowserType)
+		globalSelectedBrowserType = selectedBrowserType;
+		if(jQuery("#addDependent").is(":checked"))	triggerPopUp();
+
+		else	{
+			var blockMsg = 'Debug in Progress. Please Wait...';
+			blockUI(blockMsg);    
+			DesignServices.debugTestCase_ICE(browserType,testcaseID)
+			.then(function(data)	{
+				console.log("debug-----",data);
+				if (data == "unavailableLocalServer")	{
+					unblockUI();
+	                $("#globalModal").find('.modal-title').text("Server not found");
+	                $("#globalModal").find('.modal-body p').text("Local Server is not available. Please run the batch file from the Bundle.").css('color','black');
+					$("#globalModal").modal("show");
+				}
+				else if(data == "success"){
+					unblockUI();
+	                $("#globalModal").find('.modal-title').text("Success");
+	                $("#globalModal").find('.modal-body p').text("Debug completed.").css('color','black');
+					$("#globalModal").modal("show");
+				}
+				else if(data == "fail"){
+					unblockUI();
+	                $("#globalModal").find('.modal-title').text("Fail");
+	                $("#globalModal").find('.modal-body p').text("Failed to debug").css('color','black');
+					$("#globalModal").modal("show");
+				}
+				else if(data == "terminate"){
+					unblockUI();
+	                $("#globalModal").find('.modal-title').text("Terminate");
+	                $("#globalModal").find('.modal-body p').text("Debug Terminated").css('color','black');
+					$("#globalModal").modal("show");
+				}
+				else if(data == "browserUnavailable"){
+					unblockUI();
+	                $("#globalModal").find('.modal-title').text("Error");
+	                $("#globalModal").find('.modal-body p').text("Browser is not available").css('color','black');
+					$("#globalModal").modal("show");
+				}
+			},
+			function(error) {console.log("Error while traversing while executing debugTestcase method!! \r\n "+(error.data));});			
+		}
+	};	// browser invocation ends
 	
-	
-	
+	//Add Dependence
+	/*$scope.multipleDebugOnBrowser1 = function (selectedBrowserType) {
+		selectedBrowserType = window.localStorage['selectedBrowserType'];
+		tsNewId.push(window.localStorage['testScriptIdVal']);
+		window.localStorage['tsNewId'] = '{"'+tsNewId+'"}';
+		if(jQuery("#triggerDialog").is(":checked")){
+			triggerPopUp();
+			window.localStorage['selectedBrowserType'] = selectedBrowserType;
+		}
+		$.blockUI({ message: '<h1><img src="imgs/busy.gif" />Debug in Progress<a id="btnTerminate">Terminate?<img src="imgs/terminate.png"/></a></h1>' }); 
+		DesignServices.multiDebugOnBrowser(selectedBrowserType)
+		.then(function(data) 	{
+			if (data == "unavailableLocalServer"){
+				showDialogMesgs("Server not found", "Local Server is not available. Please run the batch file from the Bundle.");
+				$.unblockUI();
+			} 
+			else if(data.indexOf("<!") == 0  ){
+				location.href = 'login_post.html';
+			}
+			else{
+				$('#divTestScript').dialog("close");
+				var executionId =  data;
+				(function poll() {
+					setTimeout(function(){
+						DesignServices.pollExecutionStatus(executionId)
+						.then(function(data) 	{
+							$("#debugSuccessDialog").hide();
+							$("#executionFailDialog").hide();
+							$("#terminateDialog").hide();
+							$("#browserUnavailableDialog").hide();
+							$("#serverNotFoundDialog").hide();
+							console.log("data is here:::"+data);			       			
+							if (data == "complete"){
+								$.unblockUI();
+								showDialogMesgsBtn("Success", "Debug completed.", "btnDebugOk");
+							}
+							else  if (data == "fail"){
+								$.unblockUI();
+								showDialogMesgs("Fail", "<img src='imgs/Warning.png' style='width: 24px; height: 24px;'>Something has gone wrong. Please contact the support team!");
+							}
+							else if (data == "terminate"){
+								$.unblockUI();
+								showDialogMesgsBtn("Debug Terminated", "<img src='imgs/Warning.png' style='width: 24px; height: 24px;'>Debug terminated successfully.", "btnTerminateOk");
+							}
+							else if (data == "browserUnavailable"){
+								$.unblockUI();
+								showDialogMesgs("Error", "<img src='imgs/Warning.png' style='width: 24px; height: 24px;'>Browser is not available");
+							}
+							else if (data == "unavailableLocalServer"){
+								$.unblockUI();
+								showDialogMesgs("Server not found", "Local Server is not available. Please run the batch file from the Bundle.");
+							}
+							else if (data == "progress"){
+								{
+									poll();
+								}
+							}
+						})
+					}, 5000);})();
+			}
+			tsNewId = [];
+			window.localStorage['tsNewId'].clear();
+		},
+		function(error){
+		});
+	};*/
 	
 	//Populating Saved Scrape Data
 	$scope.getScrapeData = function(){
@@ -193,7 +311,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		enableScreenShotHighlight = true;
 		DesignServices.getScrapeDataScreenLevel_ICE() 
 		.then(function(data){
-			debugger;
+			
 			if(data != null){
 				viewString = data;
 				newScrapedList = viewString
@@ -219,7 +337,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				var imgTag;
 				var scrapTree = $("#finalScrap").children('#scrapTree');
 				var innerUL = $("#finalScrap").children('#scrapTree').children('ul').children().children('#scraplist');
-				debugger;
+				
 				for (var i = 0; i < viewString.view.length; i++) {        			
 					var path = viewString.view[i].xpath;
 					var ob = viewString.view[i];
@@ -264,7 +382,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			blockUI(blockMsg);
 			DesignServices.initScraping_ICE(browserType)
 			.then(function (data) { 
-				debugger;
+				
 				unblockUI();
 				viewString = data;
 				//var data = JSON.stringify(data);
@@ -286,7 +404,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				if(eaCheckbox){
 					//Getting the Existing Scrape Data
 
-					debugger;
+					
 					for (var i = 0; i < newScrapedList.view.length; i++) {        			
 
 						var path = newScrapedList.view[i].xpath;
@@ -310,7 +428,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					generateScrape()
 
 					//Getting appended scraped object irrespective to the dynamic value
-					function generateScrape(){ debugger;
+					function generateScrape(){ 
 						var tempId = newScrapedList.view.length - 1;
 						for (var i = 0; i < viewString.view.length; i++) { 
 							tempId++
@@ -345,7 +463,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				else{
 					//Before Saving the Scrape JSON to the Database
 					for (var i = 0; i < viewString.view.length; i++) {
-						debugger;
+						
 						var innerUL = $("#finalScrap").children('#scrapTree').children('ul').children().children('#scraplist');
 						var path = viewString.view[i].xpath;
 						var ob = viewString.view[i];
@@ -379,7 +497,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					editable: true,
 					radio: true
 				});   
-				debugger;
+				
 				//Build Scrape Tree using dmtree.scrapper.js file
 				if(viewString.view.length > 0) $("#saveObjects").removeClass('hide');
 				else $("#saveObjects").addClass('hide');
@@ -524,7 +642,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 
 	//Save ScrapeData Objects into Database
 	$(document).on('click', "#saveObjects", function(){
-		debugger;
+		
 		var tasks = JSON.parse(window.localStorage['_T']);
 		if(eaCheckbox) var getScrapeData = JSON.stringify(newScrapedList);
 		else var getScrapeData = JSON.stringify(viewString);
@@ -583,7 +701,6 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 
 		DesignServices.updateScreen_ICE(scrapeObject)
 		.then(function(data){
-			debugger;
 			if(data == "success"){
 				enableScreenShotHighlight = true;
 				$("#globalModal").modal("show");
@@ -895,7 +1012,7 @@ function contentTable(newTestScriptDataLS) {
 		           scrollrows : true,
 		           loadComplete: function() {
 		        	   $("#cb_jqGrid").on('click', function() {
-		        		   var cboxParent =  $(this).is(":checked");
+		        		   /*var cboxParent =  $(this).is(":checked");
 		        		   var editableLen = $(".editable").length;
 		        		   if (cboxParent == true && editableLen == 0){
 		        			   $(".commentIcon,.unCommentIcon,.deleteIcon").show();
@@ -903,11 +1020,17 @@ function contentTable(newTestScriptDataLS) {
 		        		   else{
 		        			   $(".commentIcon,.unCommentIcon,.deleteIcon").hide();
 		        		   }
-		        		   window.localStorage['selectRowStepNo']='';
+		        		   window.localStorage['selectRowStepNo']='';*/
 		        	   });		        	   
 		        	   $("#jqGrid tr").children("td[aria-describedby='jqGrid_outputVal']").each(function(){
 		        		   if($(this).text().trim() == "##" || $(this).is(":contains(';##')")){
-		        			   $(this).parent().css("background","#D5E7FF").focus();
+		        			   if($(this).parent('tr:nth-child(odd)').length > 0){
+		        				   $(this).parent().css("background","linear-gradient(90deg, red 0.7%, #e8e6ff 0)").focus();
+		        			   }
+		        			   else{
+			        			   $(this).parent().css("background","linear-gradient(90deg, red 0.7%, white 0)").focus();		        				   
+		        			   }
+		        			   $(this).css('color','red');
 		        		   }
 		        	   });
 		        	   hideOtherFuncOnEdit();
@@ -945,7 +1068,6 @@ function contentTable(newTestScriptDataLS) {
 		addParams: {
 			keys: true,
 			position:"last"
-
 		}
 	});
 
@@ -984,12 +1106,12 @@ function contentTable(newTestScriptDataLS) {
 				$("#cb_jqGrid").prop('checked',false);
 			}
 
-			if (cboxCheckedLen != 0 && editableLen == 0 ){
+			/*if (cboxCheckedLen != 0 && editableLen == 0 ){
 				$(".commentIcon,.unCommentIcon,.deleteIcon").show();	
 			}
 			else{
 				$(".commentIcon,.unCommentIcon,.deleteIcon").hide();
-			}
+			}*/
 		});
 
 		$(".cbox:not(#cb_jqGrid)").each(function() {
@@ -1086,7 +1208,8 @@ function contentTable(newTestScriptDataLS) {
 	function setKeyword(e,selectedText,$grid,selectedKeyword){
 		var keywordArrayList1 = window.localStorage['keywordListData'];
 		var keywordArrayList = JSON.parse(keywordArrayList1);
-		var appTypeLocal = "Web";//window.localStorage['appTypeScreen'];
+		var taskInfo = JSON.parse(window.localStorage['_T']);
+		var appTypeLocal = taskInfo.appType;//window.localStorage['appTypeScreen'];
 		if(selectedText == ""){selectedText = "@Generic"}
 		if(selectedText == "@Generic" || selectedText == undefined) 
 		{
@@ -1736,7 +1859,8 @@ function contentTable(newTestScriptDataLS) {
 	function setKeyword1(e,selectedText,$grid,selectedKeyword){
 		var keywordArrayList1 = window.localStorage['keywordListData'];
 		var keywordArrayList = JSON.parse(keywordArrayList1);
-		var appTypeLocal = "Web";//window.localStorage['appTypeScreen'];
+		var taskInfo = JSON.parse(window.localStorage['_T']);
+		var appTypeLocal = taskInfo.appType;//window.localStorage['appTypeScreen'];
 		if(selectedText == "getBody"){
 			$(e.target).parent().next().html("<textarea class='editable' rows='1' style='width: 98%;resize:none;min-height:25px;'></textarea>");
 		}
@@ -1834,22 +1958,29 @@ function contentTable(newTestScriptDataLS) {
 
 //Delete Testscripts
 function deleteTestScriptRow(e){
-	var selectedRowIds = $("#jqGrid").jqGrid('getGridParam','selarrrow').map(Number);
-	var gridArrayData = $("#jqGrid").jqGrid('getRowData');
-	console.log("array data test ***** "+JSON.stringify(gridArrayData));
-	for(var i=0;i<selectedRowIds.length;i++){
-		$("#jqGrid").delRowData(selectedRowIds[i]);
+	if($(document).find("#cb_jqGrid:checked").length > 0 || $("#jqGrid").find(".cbox:checked").length > 0 ){
+		var selectedRowIds = $("#jqGrid").jqGrid('getGridParam','selarrrow').map(Number);
+		var gridArrayData = $("#jqGrid").jqGrid('getRowData');
+		console.log("array data test ***** "+JSON.stringify(gridArrayData));
+		for(var i=0;i<selectedRowIds.length;i++){
+			$("#jqGrid").delRowData(selectedRowIds[i]);
+		}
+		var gridData = $("#jqGrid").jqGrid('getRowData');
+		for(var i=0; i<gridData.length;i++){
+			//new to parse str to int (step No)
+			gridData[i].stepNo = i+1;
+		}
+		$("#jqGrid").jqGrid('clearGridData');
+		$("#jqGrid").jqGrid('setGridParam',{data: gridData});
+		$("#jqGrid").trigger("reloadGrid");
+		deleteStep = true;
+		angular.element(document.getElementById("tableActionButtons")).scope().updateTestCase_ICE();		
 	}
-	var gridData = $("#jqGrid").jqGrid('getRowData');
-	for(var i=0; i<gridData.length;i++){
-		//new to parse str to int (step No)
-		gridData[i].stepNo = i+1;
+	else{
+		$("#globalModal").find('.modal-title').text("Delete Test step");
+		$("#globalModal").find('.modal-body p').text("Select steps to delete").css("color","#000");
+		$("#globalModal").modal("show");
 	}
-	$("#jqGrid").jqGrid('clearGridData');
-	$("#jqGrid").jqGrid('setGridParam',{data: gridData});
-	$("#jqGrid").trigger("reloadGrid");
-	deleteStep = true;
-	angular.element(document.getElementById("tableActionButtons")).scope().updateTestCase_ICE();
 }
 
 function addTestScriptRow(){
@@ -1993,6 +2124,7 @@ function editTestCaseRow(){
 //Copy-Paste TestStep Functionality
 function copyTestStep(){
 	emptyTestStep = "false";
+	var taskInfo = JSON.parse(window.localStorage['_T']);
 	if(!$(document).find(".cbox:checked").parent().parent("tr").hasClass("ui-state-highlight")) return false
 	else{
 		getSelectedRowData = [];
@@ -2016,7 +2148,7 @@ function copyTestStep(){
 					"inputVal"		: $(this).children("td:nth-child(7)").text(),
 					"outputVal"		: $(this).children("td:nth-child(8)").text().trim(),
 					"stepNo"		: parseInt($(this).children("td:nth-child(1)").text()),
-					//"remarksIcon"		: $(this).children("td:nth-child(9)").text(),
+					"remarksIcon"		: $(this).children("td:nth-child(9)").text(),
 					"remarks"		: $(this).children("td:nth-child(10)").text(),
 					"url"			: $(this).children("td:nth-child(11)").text().trim(),
 					"appType"		: $(this).children("td:nth-child(12)").text()					
@@ -2038,7 +2170,7 @@ function copyTestStep(){
 		$("#jqGrid").resetSelection();
 		$("#jqGrid").find(">tbody").sortable("enable");
 		anotherScriptId = JSON.parse(window.localStorage['_T']).testCaseId;//window.localStorage['testScriptIdVal'];
-		getAppTypeForPaste = "Web";//window.localStorage['appTypeScreen']
+		getAppTypeForPaste = taskInfo.appType;//window.localStorage['appTypeScreen']
 	}
 }
 //Need to work
@@ -2058,9 +2190,19 @@ function pasteTestStep(){
 		if (emptyTestStep == "true" || getRowJsonCopy == undefined) return false
 		else if($("#jqGrid").jqGrid('getRowData').length == 1 && $("#jqGrid").jqGrid('getRowData')[0].custname == "") showDialogMesgsYesNo("Paste Test Step", "Copied step(s) might contain object reference which will not be supported for other screen. Do you still want to continue ?", "btnPasteTestStepYes", "btnPasteTestStepNo")
 		else{
-			createDialogsCopyPaste("Paste Test Step", "Paste after step no:<br/><span style='font-size:11px;'>For multiple paste, provide step numbers separated by semicolon Eg: 5;10;20</span>", "*Textbox cannot be empty", "*Textbox cannot contain characters other than numbers seperated by single semi colon", "*Please enter a valid step no", "btnPasteTestStep");
-			$("#btnPasteTestStep").text("Paste")
-			$("#textBoxID").css({'margin-bottom':'0'})
+			$("#modalDialog-inputField").find('.modal-title').text("Paste Test Step");
+			$("#modalDialog-inputField").find('#labelContent').text("Paste after step no:").css('color','black');
+			$("</br><span style='font-size:11px; color: #000;'>For multiple paste. Eg: 5;10;20</span>").insertAfter('#labelContent');
+			$("#modalDialog-inputField").find('.modal-footer button').attr("id","btnPasteTestStep");
+			$("#modalDialog-inputField").find('#getInputData').attr("placeholder","Enter a value");
+			$("#modalDialog-inputField").find('#getInputData').addClass("copyPasteValidation");
+			$("#modalDialog-inputField").find('#errorMsgs1').text("*Textbox cannot be empty");
+			$("#modalDialog-inputField").find('#errorMsgs2').text("*Textbox cannot contain characters other than numbers seperated by single semi colon");
+			$("#modalDialog-inputField").find('#errorMsgs3').text("*Please enter a valid step no");
+			$("#modalDialog-inputField").modal("show");
+			//createDialogsCopyPaste("Paste Test Step", "Paste after step no:<br/><span style='font-size:11px;'>For multiple paste, provide step numbers separated by semicolon Eg: 5;10;20</span>", "*Textbox cannot be empty", "*Textbox cannot contain characters other than numbers seperated by single semi colon", "*Please enter a valid step no", "btnPasteTestStep");
+			/*$("#btnPasteTestStep").text("Paste")
+			$("#textBoxID").css({'margin-bottom':'0'})*/
 		}
 	}
 }
@@ -2071,9 +2213,16 @@ $(document).on("click", "#btnPasteTestStepYes", function(){
 		pasteInGrid()
 	}
 	else{
-		createDialogsCopyPaste("Paste Test Step", "Paste after step no:<br/><span style='font-size:11px;'>For multiple paste, provide step numbers separated by semicolon Eg: 5;10;20</span>", "*Textbox cannot be empty", "*Textbox cannot contain characters other than numbers seperated by single semi colon", "*Please enter a valid step no", "btnPasteTestStep");
+		$("#modalDialog-inputField").find('.modal-title').text("Paste Test Step");
+		$("#modalDialog-inputField").find('#labelContent').text("Paste after step no:").css('color','black');
+		$("</br><span style='font-size:11px; color: #000;'>For multiple paste. Eg: 5;10;20</span>").insertAfter('#labelContent');
+		$("#modalDialog-inputField").find('.modal-footer button').attr("id","btnPasteTestStep");
+		$("#modalDialog-inputField").find('#getInputData').attr("placeholder","Enter a value");
+		$("#modalDialog-inputField").find('#getInputData').addClass("copyPasteValidation");
+		$("#modalDialog-inputField").modal("show");
+		/*createDialogsCopyPaste("Paste Test Step", "Paste after step no:<br/><span style='font-size:11px;'>For multiple paste, provide step numbers separated by semicolon Eg: 5;10;20</span>", "*Textbox cannot be empty", "*Textbox cannot contain characters other than numbers seperated by single semi colon", "*Please enter a valid step no", "btnPasteTestStep");
 		$("#btnPasteTestStep").text("Paste")
-		$("#textBoxID").css({'margin-bottom':'0'})
+		$("#textBoxID").css({'margin-bottom':'0'})*/
 	}
 })
 
@@ -2082,10 +2231,10 @@ $(document).on("click","#btnPasteTestStep", function(){
 	var selectedStepNo = [];
 	var proceed = true;
 	$("#errorMsgs1, #errorMsgs2, #errorMsgs3").hide();
-	if(!$("#textBoxID").val()) $("#errorMsgs1").show();
+	if(!$("#getInputData").val()) $("#errorMsgs1").show();
 	else{
-		$(document).find(".dialogContent").append('<img src="imgs/loader1.gif" class="domainLoader" style="bottom: 20px; left: 20px;" />')
-		chkNo = $("#textBoxID").val().split(";");
+		//$(document).find(".dialogContent").append('<img src="imgs/loader1.gif" class="domainLoader" style="bottom: 20px; left: 20px;" />')
+		chkNo = $("#getInputData").val().split(";");
 
 		if(chkNo.length > 1){
 			selectedStepNo.push(parseInt(chkNo[0]));
@@ -2111,10 +2260,24 @@ $(document).on("click","#btnPasteTestStep", function(){
 				pasteSelecteStepNo = selectedStepNo[i];
 				pasteInGrid();
 			}
-			$('.domainLoader').remove();
-			$("#dialogOverlay, #dialogContainer").remove();
+			/*$('.domainLoader').remove();
+			$("#dialogOverlay, #dialogContainer").remove();*/
+			$("#modalDialog-inputField").find(".close").trigger("click");
 		}
 	}	
+})
+
+$(document).on('keypress', '.copyPasteValidation', function(e){
+	if((e.charCode >= 48 && e.charCode <= 57) || e.charCode == 59) return true;
+	else return false;
+}).blur(function(){
+	var reg = /^[0-9;]+$/;
+	if(reg.test($(this).val())){
+		return true;
+	}else{
+		$(this).val('');
+		return false;
+	}
 })
 
 function pasteInGrid(){
@@ -2185,6 +2348,96 @@ function pasteInGrid(){
 
 }
 //Copy-Paste TestStep Functionality
+
+//Commenting TestScript Row
+function commentStep(){
+	var getOutputVal = $(document).find(".ui-state-highlight").children("td[aria-describedby='jqGrid_outputVal']").text();
+	if(!getOutputVal.match("##") && !getOutputVal.match(";##")){
+		var myData = $("#jqGrid").jqGrid('getGridParam','data')
+		var selectedRowIds = $("#jqGrid").jqGrid('getGridParam','selarrrow').map(Number);
+		selectedRowIds = selectedRowIds.sort();
+		$(document).find(".ui-state-highlight").children("td[aria-describedby='jqGrid_outputVal']").each(function() { 
+			var outputValLen = $(this).text().trim().length;
+			var outputHashMatch = $(this).text().match("##");
+			if(outputValLen == 0){
+				for(i=0; i<myData.length; i++){
+					if($.inArray(myData[i].stepNo, (selectedRowIds)) != -1 && (myData[i].outputVal == "")) {
+						myData[i].outputVal = "##";
+						$("#jqGrid").trigger("reloadGrid");
+					}
+					else if($.inArray(myData[i].stepNo, (selectedRowIds.map(String))) != -1 && (myData[i].outputVal == "")) {
+						myData[i].outputVal = "##";
+						$("#jqGrid").trigger("reloadGrid");
+					}
+				}
+			}
+			else if(outputValLen != 0 &&  outputHashMatch == null)
+			{
+				for(i=0; i<myData.length; i++){
+					if(($.inArray(myData[i].stepNo, (selectedRowIds) ) != -1 && myData[i].outputVal != "")) {
+						if(myData[i].outputVal.match(";##") == null && myData[i].outputVal != "##")
+						{
+							myData[i].outputVal = myData[i].outputVal.concat(";##");
+							$("#jqGrid").trigger("reloadGrid");
+						}								
+					}
+					else if(($.inArray(myData[i].stepNo, (selectedRowIds.map(String)) ) != -1 && myData[i].outputVal != "")) {
+						if(myData[i].outputVal.match(";##") == null && myData[i].outputVal != "##"){
+							myData[i].outputVal = myData[i].outputVal.concat(";##");
+							$("#jqGrid").trigger("reloadGrid");
+						}
+					}
+				}
+			}
+		});
+	}
+	else{
+		var myData = $("#jqGrid").jqGrid('getGridParam','data')
+		var selectedRowIds = $("#jqGrid").jqGrid('getGridParam','selarrrow').map(Number);
+		selectedRowIds = selectedRowIds.sort();
+		$(document).find(".ui-state-highlight").children("td[aria-describedby='jqGrid_outputVal']").each(function() {
+			var outputValLen = $(this).text().trim().length;
+			var outputHashMatch = $(this).text().match("##");
+			if(outputValLen != 0 &&  outputHashMatch != null)
+			{
+				for(i=0; i<myData.length; i++){
+					if(($.inArray(myData[i].stepNo, (selectedRowIds) ) != -1 && myData[i].outputVal != "")) {
+						if(myData[i].outputVal.match("##") == '##' && myData[i].outputVal.length > 2)
+						{
+							var lastThree = myData[i].outputVal.substr(myData[i].outputVal.length - 3);
+							if (lastThree == ";##")
+							{
+								myData[i].outputVal = 	myData[i].outputVal.replace(lastThree,"");
+								$("#jqGrid").trigger("reloadGrid");
+							}
+						}
+						else if(myData[i].outputVal.match("##") == '##' && myData[i].outputVal.length == 2){
+							var lastTwo = myData[i].outputVal.substr(myData[i].outputVal.length - 2);
+							myData[i].outputVal = 	myData[i].outputVal.replace(lastTwo,"");
+							$("#jqGrid").trigger("reloadGrid");
+						}						
+					}
+					else if(($.inArray(myData[i].stepNo, (selectedRowIds.map(String)) ) != -1 && myData[i].outputVal != "")) {
+						if(myData[i].outputVal.match("##") == '##' && myData[i].outputVal.length > 2)
+						{
+							var lastThree = myData[i].outputVal.substr(myData[i].outputVal.length - 3);
+							if (lastThree == ";##")
+							{
+								myData[i].outputVal = 	myData[i].outputVal.replace(lastThree,"");
+								$("#jqGrid").trigger("reloadGrid");
+							}
+						}
+						else if(myData[i].outputVal.match("##") == '##' && myData[i].outputVal.length == 2){
+							var lastTwo = myData[i].outputVal.substr(myData[i].outputVal.length - 2);
+							myData[i].outputVal = 	myData[i].outputVal.replace(lastTwo,"");
+							$("#jqGrid").trigger("reloadGrid");
+						}
+					}
+				}
+			}
+		});
+	}
+}
 
 function getTags(data) {
 	var obnames = [];

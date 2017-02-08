@@ -87,5 +87,18 @@ mySPA.factory('DesignServices', ['$http','$q', function ($http, $httpProvider, $
 				return $q.reject(response.data)
 			})
 		},
+		//Debug Testcases
+		debugTestCase_ICE : function(browserType,testcaseID){
+			return $http.post('/debugTestCase_ICE',{
+				param : 'debugTestCase_ICE',
+				browsertypes: browserType,
+				testcaseids: testcaseID
+			})
+			.then(function(response)  { 
+				return response.data
+			},function(response){
+				return $q.reject(response.data)
+			})
+		}
 	}
 }]);

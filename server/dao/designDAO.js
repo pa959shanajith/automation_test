@@ -270,11 +270,11 @@ module.exports = {
 						 * Query 2 updating the testcasedata based on
 						 * based on requested screenid,testcaseid and testcasesteps
 						 */
-						var updateTestCaseData="update testcases set modifiedby='"+userinfo.username+
+						var updateTestCaseData="UPDATE testcases SET modifiedby='"+userinfo.username+
 						"', modifiedbyrole='"+userinfo.role+"', modifiedon="+new Date().getTime()+
 						", skucodetestcase='"+requestedskucodetestcase+
 						"', testcasesteps='"+requestedtestcasesteps+"', versionnumber="+requestedversionnumber+
-						" where screenid="+requestedscreenid+" and testcaseid="+requestedtestcaseid+" and testcasename='"+requestedtestcasename+"';"; 
+						" where screenid="+requestedscreenid+" and testcaseid="+requestedtestcaseid+" and testcasename='"+requestedtestcasename+"' IF EXISTS;"; 
 						console.log(updateTestCaseData);
 						dbConnICE.execute(updateTestCaseData, function (err, result) {
 							if (err) {
@@ -293,5 +293,47 @@ module.exports = {
 			 * Query 2 updating the testcasesteps
 			 * based on requested screenid,testcasename,testcaseid and testcasesteps
 			 */
+		},
+		
+		/**
+	     * debugTestCase_ICE for debuging of testcases
+	     * @author vishvas.a
+	     */
+		debugTestCase_ICE: function debugTestCase_ICE(req,cb,data) {
+			/*
+			 * request variables
+			 */
+			var requestedbrowsertypes=req.payload.browsertypes;
+			var requestedtestcaseids=req.payload.testcaseids;
+			/**
+			 * output data 
+			 */
+			var responsedata=[];
+			var responseobject={
+					template:"",
+					testcasename:"",
+					testcase:[]    
+			};
+			var browsertypeobject={browsertype:requestedbrowsertypes};
+			var flag = "";
+			for(var indexes=0;indexes<requestedtestcaseids.length;indexes++){
+				var getProjectTestcasedata="select testcasename,testcasesteps from testcases where testcaseid="+requestedtestcaseids[indexes];
+				dbConnICE.execute(getProjectTestcasedata, function (errgetTestcasedata, testcasedataresult) {
+					if (errgetTestcasedata) {
+						flag = "Error in getProjectTestcasedata : Fail";
+						cb(null, flag);
+					}else{
+						for(var ids=0;ids<testcasedataresult.rows.length;ids++){
+							responseobject.testcase=testcasedataresult.rows[ids].testcasesteps;
+							responseobject.template="";
+							responseobject.testcasename=testcasedataresult.rows[ids].testcasename;
+							responsedata.push(responseobject);
+						}
+					}
+				});
+			}
+			responsedata.push(browsertypeobject);
+			var maxtimeout=requestedtestcaseids.length * 1000;
+			setTimeout(cb,maxtimeout,flag,responsedata);
 		}
 };

@@ -14,8 +14,8 @@ var server = new Hapi.Server();
 
 //Server Connection
 server.connection({
-   //host: '10.41.31.29',
-    //address: '10.41.31.29',
+   /*host: '10.41.31.5',
+    address: '10.41.31.5',*/
     port: '3000'
 //    port: '443',
 //    tls: {
@@ -111,12 +111,20 @@ server.route([
     { method: 'POST', path: '/getUserRoles_Nineteen68', config: admin.getUserRoles_Nineteen68 }, 
     { method: 'POST', path: '/createUser_Nineteen68', config: admin.createUser_Nineteen68 }, 
     { method: 'POST', path: '/loadUserInfo_Nineteen68', config: login.loadUserInfo_Nineteen68 },  
-    { method: 'POST', path: '/getRoleNameByRoleId_Nineteen68', config: login.getRoleNameByRoleId_Nineteen68 },  
-    { method: 'POST', path: '/initScraping_ICE', config: design.initScraping_ICE },  
-    { method: 'POST', path: '/highlightScrapElement_ICE', config: design.highlightScrapElement_ICE },  
+    { method: 'POST', path: '/getRoleNameByRoleId_Nineteen68', config: login.getRoleNameByRoleId_Nineteen68 },    
+    
+    //Design Testcase
+	{ method: 'POST', path: '/readTestCase_ICE', config: design.readTestCase_ICE },
+	{ method: 'POST', path: '/updateTestCase_ICE', config: design.updateTestCase_ICE },
+	{ method: 'POST', path: '/debugTestCase_ICE', config: design.debugTestCase_ICE},
+	
+	//Design Screens
+	{ method: 'POST', path: '/initScraping_ICE', config: design.initScraping_ICE },  
+    { method: 'POST', path: '/highlightScrapElement_ICE', config: design.highlightScrapElement_ICE },
     { method: 'POST', path: '/updateScreen_ICE', config: design.updateScreen_ICE },
     { method: 'POST', path: '/deleteScrapeObjects_ICE', config: design.deleteScrapeObjects_ICE },  
     { method: 'POST', path: '/getScrapeDataScreenLevel_ICE', config: design.getScrapeDataScreenLevel_ICE },  
+
     { method: '*', path: '/logoutUser', handler: function (request, reply) { reply.view('./server/views/index', '') } }
   ]);
 
@@ -158,8 +166,15 @@ socket.on('message', function(data){
 allSockets.push(socket);
 
 
+
+
+
+
 allClients.push(socket.conn.id)
 module.exports.abc = allSockets;
+
+
+
 
 socket.on('disconnect', function() {     
 var i = allSockets.indexOf(socket);
