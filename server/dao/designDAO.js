@@ -203,7 +203,8 @@ module.exports = {
 			//Query 1 fetching the testcasesteps from the test cases based on requested screenid,testcasename,testcaseid
 			var  getTestCases="select testcasesteps,testcasename from testcases where screenid= "+requestedscreenid+
 //			" and testcasename='"+requestedtestscasename+"' " +
-			"and testcaseid="+requestedtestscaseid;
+			" and testcaseid="+requestedtestscaseid;
+			
 			//var  getTestCases="select testcasesteps,testcasename from testCases where screenid= d61c95d4-c23b-4899-94a4-0b87c28c7a9c and testcasename='Dev_Testing1' and testcaseid= 634068fc-b459-4a7e-b4cb-2e25c0af2f2c";
 			dbConnICE.execute(getTestCases, function (err, result) {
 				if (err) {
@@ -214,7 +215,10 @@ module.exports = {
 						testcasesteps=result.rows[i].testcasesteps;
 						testcasename=result.rows[i].testcasename;
 					}
-					if (testcasesteps.length > 0 && testcasename==""){
+					if ((testcasesteps == "" || testcasesteps == null) && testcasename != ""){
+						responsedata={ template : "", testcase:"[]", testcasename:testcasename}
+						cb(null, responsedata);
+					}else if ((testcasesteps == "" || testcasesteps == null) && testcasename == ""){
 						responsedata={ template : "", testcase:"[]", testcasename:""}
 						cb(null, responsedata);
 					}else{

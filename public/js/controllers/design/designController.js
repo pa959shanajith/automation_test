@@ -1,5 +1,5 @@
 var screenshotObj,scrapedGlobJson,enableScreenShotHighlight,mirrorObj,emptyTestStep,anotherScriptId,getAppTypeForPaste, eaCheckbox, finalViewString, scrapedData, deleteFlag, pasteSelecteStepNo,globalSelectedBrowserType;
-var initScraping = {}; var mirrorObj = {}; var scrapeTypeObj = {}; var newScrapedList; var viewString = {}; var scrapeObject = {};
+var initScraping = {}; var mirrorObj = {}; var scrapeTypeObj = {}; var newScrapedList; var viewString = {}; var scrapeObject = {}; var readTestCaseData;
 var selectRowStepNoFlag = false; var deleteStep = false;
 var getAllAppendedObj; //Getting all appended scraped objects
 var gsElement = []; window.localStorage['selectRowStepNo'] = '';
@@ -17,7 +17,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 	
 	//Loading Project Info
 	var getProjInfo = JSON.parse(window.localStorage['_T'])
-	$("#page-taskName").empty().append('<span>'+getProjInfo.screenName+'</span>')
+	$("#page-taskName").empty().append('<span>'+JSON.parse(window.localStorage['_T']).taskName+'</span>')
 	$(".projectInfoWrap").empty()
 	$(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">Project :</span><span class="content">'+getProjInfo.projectName+'</span></p><p class="proj-info-wrap"><span class="content-label">Module :</span><span class="content">'+getProjInfo.moduleName+'</span></p><p class="proj-info-wrap"><span class="content-label">Screen :</span><span class="content">'+getProjInfo.screenName+'</span></p>')
 	//Loading Project Info
@@ -45,6 +45,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			// service call # 1 - getTestScriptData service call
 			DesignServices.readTestCase_ICE(screenId, testCaseId)	
 			.then(function(data) {
+				console.log(data);
 				var appType = taskInfo.appType;
 				$('#jqGrid').removeClass('visibility-hide').addClass('visibility-show');
 				// removing the down arrow from grid header columns - disabling the grid menu pop-up
@@ -60,7 +61,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					custnameArr.length = 0;
 					// counter to append the items @ correct indexes of custnameArr
 					var indexCounter = '';
-					window.localStorage['newTestScriptDataList'] = data2.view;
+					//window.localStorage['newTestScriptDataList'] = data2.view;
 					//$scope.newTestScriptDataLS = recievedData[0].view;
 					$("#window-scrape-screenshotTs .popupContent").empty()
 					$("#window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrapeTS"><img id="screenshotTS" src="data:image/PNG;base64,'+data2.mirror+'" /></div>')
@@ -80,7 +81,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					// 'readTestScript' service response null or empty or blank (If service#1 response is null then)
 					var emptyStr = "{}";
 					var len = data.testcase.length;
-					if (data == "" || data == null || data == emptyStr || data == "[]" || data.testcase.toString() == "" || len == 1)	{
+					if (data == "" || data == null || data == emptyStr || data == "[]" || data.testcase.toString() == "" || data.testcase == "[]"|| len == 1)	{
 						var appTypeLocal1 = "Generic";
 						var datalist = [{  
 							"stepNo":"1",
@@ -93,12 +94,9 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 							"_id_":"",
 							"appType":appTypeLocal1
 						}];
-						window.localStorage['testScriptTableData'] = angular.toJson(datalist);
+						readTestCaseData = JSON.stringify(datalist);
 						$("#jqGrid").jqGrid('GridUnload');
 						$("#jqGrid").trigger("reloadGrid");
-						if(data.testcase[0].comments!=null || data.testcase[0].comments!=""){
-							comments=data.testcase[0].comments;
-						}
 						contentTable(data2.view);
 						/*if(itemLabelName == "Runtime_Settings" || window.localStorage['RunFlag'] == "true" || usrRole.role == "Viewer"){
 							$('.cbox').prop('disabled',true);
@@ -117,26 +115,12 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 						return;
 					}
 					else{
-						window.localStorage['testScriptTableData'] = angular.toJson(data);
 						var testcase = JSON.parse(data.testcase);
 						var testcaseArray = [];
 						for(var i = 0; i < testcase.length; i++)	{
-							testcaseArray.push(testcase[i]);
-							/*if(testcase[i].hasOwnProperty('comments')){
-							if($('#commentField').val() == testcase[i].comments){
-
-							}
-							else if(testcase[i].comments == "" || testcase[i].comments == " " || testcase[i].comments == null){
-								$('#commentField').val('');
-							}
-							else{
-								$('#commentField').val(testcase[i].comments);							
-							}
-						}else{
-							testcaseArray.push(testcase[i]);
-						}*/						
+							testcaseArray.push(testcase[i]);						
 						}				
-						window.localStorage['testScriptTableData'] = JSON.stringify(testcaseArray)
+						readTestCaseData = JSON.stringify(testcaseArray)
 						$("#jqGrid_addNewTestScript").jqGrid('clearGridData');
 						$("#jqGrid").jqGrid('GridUnload');
 						$("#jqGrid").trigger("reloadGrid");
@@ -157,15 +141,15 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 						$('.cbox').prop('disabled',false);
 						//$('.cbox').addClass('disabled');
 						$('.cbox').parent().removeClass('disable_a_href');
-						if(selectRowStepNoFlag == true){
+						/*if(selectRowStepNoFlag == true){
 							if($("#jqGrid").find("tr[id='"+window.localStorage['selectRowStepNo']+"']").prev('tr[class="ui-widget-content"]').length > 0){
-								//$("#jqGrid").find("tr[id='"+window.localStorage['selectRowStepNo']+"']").trigger('click');
-								//$("#jqGrid").find("tr[id='"+window.localStorage['selectRowStepNo']+"']").prev().focus();
+								$("#jqGrid").find("tr[id='"+window.localStorage['selectRowStepNo']+"']").trigger('click');
+								$("#jqGrid").find("tr[id='"+window.localStorage['selectRowStepNo']+"']").prev().focus();
 							}else{
-								//$("#jqGrid").find("tr[id='"+window.localStorage['selectRowStepNo']+"']").focus().trigger('click');
+								$("#jqGrid").find("tr[id='"+window.localStorage['selectRowStepNo']+"']").focus().trigger('click');
 							}					
 							selectRowStepNoFlag = false;
-						}
+						}*/
 						return;
 					}
 				},
@@ -294,6 +278,225 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		});
 	};*/
 	
+	//Import Test case
+	/*$scope.importTestCase=function(){
+		var counter1 = 0;
+		var userInfo = JSON.parse(window.localStorage['_UI']);
+		var taskInfo = JSON.parse(window.localStorage['_T']);
+		var screenId = taskInfo.screenId;
+		var testCaseId = taskInfo.testCaseId;
+		var testCaseName = taskInfo.testCaseName;
+		var appType = taskInfo.appType;
+		var flag = false;
+		var defaultTestScript='[{"stepNo":"1","custname":"","objectName":"","keywordVal":"","inputVal":"","outputVal":"","url":"","_id_":"","appType":"Generic"}]';
+		if(readTestCaseData == defaultTestScript){
+			$("#importfileJson").attr("type","file");
+			$("#importfileJson").trigger("click");
+			importfileJson.addEventListener('change', function(e) {
+				if(counter1 == 0){
+					// Put the rest of the demo code here.
+					var file = importfileJson.files[0];
+					var textType = /json.*;
+					var reader = new FileReader();
+					reader.onload = function(e) {
+						if((file.name.split('.')[file.name.split('.').length-1]).toLowerCase() == "json"){
+							var resultString = reader.result;
+							for(i = 0; i < resultString.length; i++){
+								if(resultString[i].appType == appType || resultString[i].appType.toLowerCase() == "generic"){
+									flag = true;
+								}else flag = false;
+							}
+							if (flag == false){
+								$("#globalModal").find('.modal-title').text("App Type Error");
+				                $("#globalModal").find('.modal-body p').text("Project application type and Imported JSON application type doesn't match, please check!!").css('color','black');
+								$("#globalModal").modal("show");
+							}
+							else{
+								DesignServices.updateTestCase_ICE(screenId,testCaseId,testCaseName,resultString,userInfo)
+								.then(function(data) {
+									if (data == "Success") {
+						                $("#globalModal").find('.modal-title').text("Import Of JSON file");
+						                $("#globalModal").find('.modal-body p').text("TestCase Json imported successfully.").css('color','black');
+										$("#globalModal").modal("show");
+										showDialogMesgsBtn("Import Of JSON file", "TestScript Json imported successfully. Click on testscripts to reload", "btnImportTestScriptOk");
+										$.unblockUI();
+									} else {
+										$("#globalModal").find('.modal-title').text("Fail");
+						                $("#globalModal").find('.modal-body p').text("Please Check the file format you have uploaded!").css('color','black');
+										$("#globalModal").modal("show");
+										showDialogMesgs("Fail", "<img src='imgs/Warning.png' style='width: 24px; height: 24px;'><br/>Please Check the file format you have uploaded!");
+										$.unblockUI();
+									}
+								}, function(error) {
+								});
+							}
+						}
+						else{
+							$("#globalModal").find('.modal-title').text("Fail");
+			                $("#globalModal").find('.modal-body p').text("Please Check the file format you have uploaded!").css('color','black');
+							$("#globalModal").modal("show");
+						}
+					}
+					reader.readAsText(file);
+					counter1 = 1;
+				}
+			});	
+		} else{
+			$("#fileInputJson").removeAttr("type","file");
+			$("#fileInputJson").attr("type","text");
+			$("#globalModalYesNo").find('.modal-title').text("Table Consists of Data");
+			$("#globalModalYesNo").find('.modal-body p').text("Import will erase your old data. Do you want to continue??").css('color','black');
+			$("#globalModalYesNo").find('.modal-footer button:nth-child(1)').attr("id","btnImportEmptyErrorYes")
+			$("#globalModalYesNo").modal("show");
+			//showDialogMesgsYesNo("Table Consists of Data", "Import will erase your old data. Do you want to continue??", "btnImportEmptyErrorYes", "btnImportEmptyErrorNo")
+		}
+	}*/
+	
+	
+	/*$(document).on('click', '#btnImportEmptyErrorYes', function(){
+		var counter2 = 0;
+		var userInfo = JSON.parse(window.localStorage['_UI']);
+		var taskInfo = JSON.parse(window.localStorage['_T']);
+		var screenId = taskInfo.screenId;
+		var testCaseId = taskInfo.testCaseId;
+		var testCaseName = taskInfo.testCaseName;
+		var appType = taskInfo.appType;
+		var flag = false;
+		$("#importOverWriteJson").trigger("click");
+		importOverWriteJson.addEventListener('change', function(e) {
+			if(counter2 == 0){
+				// Put the rest of the demo code here.
+				var file = overWriteJson.files[0];
+				var textType = /json.*;
+				var reader = new FileReader();
+				reader.onload = function(e) {
+					if((file.name.split('.')[file.name.split('.').length-1]).toLowerCase() == "json"){
+						var resultString = reader.result;
+						for(i = 0; i < resultString.length; i++){
+							if(resultString[i].appType == appType || resultString[i].appType.toLowerCase() == "generic"){
+								flag = true;
+							}else flag = false;
+						}
+						if (flag == false){
+							$("#globalModal").find('.modal-title').text("App Type Error");
+			                $("#globalModal").find('.modal-body p').text("Project application type and Imported JSON application type doesn't match, please check!!").css('color','black');
+							$("#globalModal").modal("show");
+						}
+						else{
+							DesignServices.updateTestCase_ICE(screenId,testCaseId,testCaseName,resultString,userInfo)
+							.then(function(data) {
+								if (data == "Success") {
+					                $("#globalModal").find('.modal-title').text("Import Of JSON file");
+					                $("#globalModal").find('.modal-body p').text("TestCase Json imported successfully.").css('color','black');
+									$("#globalModal").modal("show");
+									showDialogMesgsBtn("Import Of JSON file", "TestScript Json imported successfully. Click on testscripts to reload", "btnImportTestScriptOk");
+									$.unblockUI();
+								} else {
+									$("#globalModal").find('.modal-title').text("Fail");
+					                $("#globalModal").find('.modal-body p').text("Please Check the file format you have uploaded!").css('color','black');
+									$("#globalModal").modal("show");
+									showDialogMesgs("Fail", "<img src='imgs/Warning.png' style='width: 24px; height: 24px;'><br/>Please Check the file format you have uploaded!");
+									$.unblockUI();
+								}
+							}, function(error) {
+							});
+						}
+					}
+					else{
+						$("#globalModal").find('.modal-title').text("Fail");
+		                $("#globalModal").find('.modal-body p').text("Please Check the file format you have uploaded!").css('color','black');
+						$("#globalModal").modal("show");
+					}
+				}
+				reader.readAsText(file);
+				counter2 = 1;
+				$("#importOverWriteJson").val('');
+			}
+		});
+	})*/
+	//Import Test case
+	
+	//Export Test case
+	//Export TestScript
+	/*$scope.export_testscript=function() {
+		var taskInfo = JSON.parse(window.localStorage['_T']);
+		var testCaseId = taskInfo.testCaseId;
+		DesignServices.exportTestScript(value).then(function(response,filename) {	
+			if (typeof response === 'object') {
+				var temp=JSON.parse(response.jsonData);
+				var responseData = JSON.stringify(temp, undefined, 2);
+			}
+			if (!filename) {
+				filename =response.jsonFilename;
+			}
+			var objAgent = $window.navigator.userAgent;
+			var objbrowserName = navigator.appName;
+			var objfullVersion = ''+parseFloat(navigator.appVersion);
+			var objBrMajorVersion = parseInt(navigator.appVersion,10);
+			var objOffsetName,objOffsetVersion,ix;
+			// In Chrome 
+			if ((objOffsetVersion=objAgent.indexOf("Chrome"))!=-1) { 
+				objbrowserName = "Chrome";
+				objfullVersion = objAgent.substring(objOffsetVersion+7);
+			}
+			// In Microsoft internet explorer
+			else if ((objOffsetVersion=objAgent.indexOf("MSIE"))!=-1) { 
+				objbrowserName = "Microsoft Internet Explorer"; 
+				objfullVersion = objAgent.substring(objOffsetVersion+5);
+			}
+			// In Firefox 
+			else if ((objOffsetVersion=objAgent.indexOf("Firefox"))!=-1) { 
+				objbrowserName = "Firefox";
+
+			} 
+			// In Safari 
+			else if ((objOffsetVersion=objAgent.indexOf("Safari"))!=-1) { 
+				objbrowserName = "Safari"; 
+				objfullVersion = objAgent.substring(objOffsetVersion+7); 
+				if ((objOffsetVersion=objAgent.indexOf("Version"))!=-1)
+					objfullVersion = objAgent.substring(objOffsetVersion+8);
+			}
+			// For other browser "name/version" is at the end of userAgent 
+			else if ( (objOffsetName=objAgent.lastIndexOf(' ')+1) < (objOffsetVersion=objAgent.lastIndexOf('/')) ) {
+				objbrowserName = objAgent.substring(objOffsetName,objOffsetVersion); 
+				objfullVersion = objAgent.substring(objOffsetVersion+1); 
+				if (objbrowserName.toLowerCase()==objbrowserName.toUpperCase()) { 
+					objbrowserName = navigator.appName; 
+				} 
+			} 
+			// trimming the fullVersion string at semicolon/space if present 
+			if ((ix=objfullVersion.indexOf(";"))!=-1) objfullVersion=objfullVersion.substring(0,ix);
+			if ((ix=objfullVersion.indexOf(" "))!=-1) objfullVersion=objfullVersion.substring(0,ix); 
+			objBrMajorVersion = parseInt(''+objfullVersion,10);
+			if (isNaN(objBrMajorVersion)) { 
+				objfullVersion = ''+parseFloat(navigator.appVersion); 
+				objBrMajorVersion = parseInt(navigator.appVersion,10); 
+			}	
+			if(objBrMajorVersion== "9"){
+				if(objbrowserName == "Microsoft Internet Explorer"){
+					window.navigator.msSaveOrOpenBlob(new Blob([responseData], {type:"text/json;charset=utf-8"}), filename);
+				}
+			}else{	
+				var blob = new Blob([responseData], {type: 'text/json'}),
+				e = document.createEvent('MouseEvents'),
+				a = document.createElement('a');
+				a.download = filename;
+				if(objbrowserName == "Microsoft Internet Explorer" || objbrowserName == "Netscape"){
+					window.navigator.msSaveOrOpenBlob(new Blob([responseData], {type:"text/json;charset=utf-8"}), filename);
+				}else{
+					a.href = window.URL.createObjectURL(blob);
+					a.dataset.downloadurl = ['text/json', a.download, a.href].join(':');
+					e.initMouseEvent('click', true, true, window,
+							0, 0, 0, 0, 0, false, false, false, false, 0, null);
+					a.dispatchEvent(e);
+				}
+			}
+		},
+		function(error) {
+		});
+	}*/
+	//Export Test Case
+	
 	//Populating Saved Scrape Data
 	$scope.getScrapeData = function(){
 		$("#enableAppend").prop("checked", false)
@@ -380,8 +583,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			var blockMsg = 'Scrapping in progress. Please Wait...';
 			blockUI(blockMsg);
 			DesignServices.initScraping_ICE(browserType)
-			.then(function (data) { 
-				
+			.then(function (data) { 				
 				unblockUI();
 				viewString = data;
 				//var data = JSON.stringify(data);
@@ -392,20 +594,14 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				//scrapeTypeObj = scrapeJson[2];
 				$("#window-scrape-screenshot .popupContent, #window-scrape-screenshotTs .popupContent").empty()
 				$("#window-scrape-screenshot .popupContent, #window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrape"><img id="screenshot" src="data:image/PNG;base64,'+viewString.mirror+'" /></div>')
-				
-
-
 				$("#finalScrap").empty()
 				$("#finalScrap").append("<div id='scrapTree' class='scrapTree'><ul><li><span class='parentObjContainer'><input title='Select all' type='checkbox' class='checkStylebox' disabled /><span class='parentObject'><a id='aScrapper'>Select all </a><button id='saveObjects' class='btn btn-xs btn-xs-custom objBtn' style='margin-left: 10px'>Save</button><button data-toggle='modal' id='deleteObjects' data-target='#deleteObjectsModal' class='btn btn-xs btn-xs-custom objBtn' style='margin-right: 0' disabled>Delete</button></span><span></span></span><ul id='scraplist' class='scraplistStyle'></ul></li></ul></div>");
 				var innerUL = $("#finalScrap").children('#scrapTree').children('ul').children().children('#scraplist');
 
 				//If enable append is active
 				if(eaCheckbox){
-					//Getting the Existing Scrape Data
-
-					
-					for (var i = 0; i < newScrapedList.view.length; i++) {        			
-
+					//Getting the Existing Scrape Data					
+					for (var i = 0; i < newScrapedList.view.length; i++) {
 						var path = newScrapedList.view[i].xpath;
 						var ob = newScrapedList.view[i];
 						ob.tempId= i; 
@@ -492,7 +688,6 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 						//checkbox : checked,
 						classes : [ '.item' ]
 					},
-
 					editable: true,
 					radio: true
 				});   
@@ -619,19 +814,15 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				if (translationFound) {
 					color = "blue";
 				} else {
-
 					color = "yellow";
 				}
-
 				d.css("background-color", color);
-
 			} else {
 				$(".hightlight").remove();
 			}
 		}	
 		else{
 			DesignServices.highlightScrapElement_ICE(xpath,url)
-
 			.then(function(data) {
 				if(data == "fail"){
 					alert("fail");
@@ -653,8 +844,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		var moduleId = tasks.moduleId;
 		var screenId = tasks.screenId;
 		var screenName = tasks.screenName;
-		var userinfo = JSON.parse(window.localStorage['_UI']);
-		
+		var userinfo = JSON.parse(window.localStorage['_UI']);		
 		
 		scrapeObject = {};
 		scrapeObject.getScrapeData = getScrapeData;
@@ -663,9 +853,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		scrapeObject.screenName = screenName;
 		scrapeObject.userinfo = userinfo;
 		scrapeObject.param = "updateScrapeData_ICE";
-		scrapeObject.appType = "Web";
-		
-		
+		scrapeObject.appType = "Web";		
 //		if(window.localStorage['checkEditWorking'] == "true")
 //		{
 //			console.log("inside edit");
@@ -696,11 +884,6 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 //    			}
 //    		}
 //		}
-	
-
-		
-		
-
 		DesignServices.updateScreen_ICE(scrapeObject)
 		.then(function(data){
 			if(data == "success"){
@@ -851,7 +1034,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 							}
 							else{
 								$("#globalModal").find('.modal-title').text("Delete Testcase step");
-								$("#globalModal").find('.modal-body p').text("Successfully delete the steps").css('color','black');
+								$("#globalModal").find('.modal-body p').text("Successfully deleted the steps").css('color','black');
 								$("#globalModal").modal("show");
 								deleteStep = false;
 							}
@@ -941,7 +1124,7 @@ function contentTable(newTestScriptDataLS) {
 	//get keyword list
 	var keywordArrayList = window.localStorage['keywordListData'];
 	keywordArrayList = JSON.parse(keywordArrayList);
-	testContent = JSON.parse(window.localStorage['testScriptTableData']);
+	testContent = JSON.parse(readTestCaseData);
 	var emptyStr = "{}";
 	var obj = testContent;
 	var scrappedData = "";
@@ -1027,10 +1210,10 @@ function contentTable(newTestScriptDataLS) {
 		        	   $("#jqGrid tr").children("td[aria-describedby='jqGrid_outputVal']").each(function(){
 		        		   if($(this).text().trim() == "##" || $(this).is(":contains(';##')")){
 		        			   if($(this).parent('tr:nth-child(odd)').length > 0){
-		        				   $(this).parent().css("background","linear-gradient(90deg, red 0.7%, #e8e6ff 0)").focus();
+		        				   $(this).parent().css("background","linear-gradient(90deg, red 0.6%, #e8e6ff 0)").focus();
 		        			   }
 		        			   else{
-			        			   $(this).parent().css("background","linear-gradient(90deg, red 0.7%, white 0)").focus();		        				   
+			        			   $(this).parent().css("background","linear-gradient(90deg, red 0.6%, white 0)").focus();		        				   
 		        			   }
 		        			   $(this).css('color','red');
 		        		   }
@@ -1107,13 +1290,6 @@ function contentTable(newTestScriptDataLS) {
 			else{
 				$("#cb_jqGrid").prop('checked',false);
 			}
-
-			/*if (cboxCheckedLen != 0 && editableLen == 0 ){
-				$(".commentIcon,.unCommentIcon,.deleteIcon").show();	
-			}
-			else{
-				$(".commentIcon,.unCommentIcon,.deleteIcon").hide();
-			}*/
 		});
 
 		$(".cbox:not(#cb_jqGrid)").each(function() {
