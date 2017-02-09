@@ -597,6 +597,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				var d = $("<div></div>", {
 					"class": "hightlight"
 				});
+				var getTopValue;
 
 				var screen_width = document.getElementById('screenshot').height;
 				var real_width = document.getElementById('screenshot').naturalHeight;
@@ -610,8 +611,10 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				d.css('position', 'absolute');
 				d.css('background-color', 'yellow');
 				d.css('z-index', '3');
-				d.css('opacity', '0.5');
-				d.css('opacity', '0.5');
+				d.css('opacity', '0.7');
+				getTopValue = Math.round(rect.y) * scale_highlight + 'px'
+				$(".scroll-wrapper > .scrollbar-screenshot").animate({ scrollTop: parseInt(getTopValue) },500);
+				//$('.scroll-wrapper > .scrollbar-screenshot').scrollTo(d.offset().top);
 				var color;
 				if (translationFound) {
 					color = "blue";

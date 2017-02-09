@@ -243,6 +243,25 @@
 .scrollbar-innerpages > .scroll-element.scroll-draggable .scroll-bar { background-color: #ffffff; opacity: 1; }
 .scrollbar-innerpages > .scroll-element .scroll-element_track  {background: #46326b;}
 
+
+.scroll-wrapper > .scrollbar-screenshot{
+	padding: 0px;
+	height: auto !important;
+	min-height: auto !important;
+	max-height: 650px !important;
+}
+.scroll-wrapper.scrollbar-screenshot {
+   /*  height: calc(100% - 350px); */
+    margin-bottom: 1%;
+}
+.scrollbar-screenshot > .scroll-element.scroll-y .scroll-bar{
+	background: #321e4f
+}
+.scrollbar-screenshot > .scroll-element .scroll-element_track{
+	background: rgb(211, 211, 211)
+}
+
+
 .scroll-wrapper.pluginTask {
 	height: calc(100% - 65px);
 }
@@ -333,6 +352,12 @@
 
 /**********Custom Media Queries**********/
 @media screen and (max-height:675px){
+	.scroll-wrapper > .scrollbar-screenshot{
+		padding: 0px;
+		height: auto !important;
+		min-height: auto !important;
+		max-height: 400px !important
+	}
 	.scroll-wrapper > .scrollbar-macosx{
 		width:-moz-fit-content !important
 	}
