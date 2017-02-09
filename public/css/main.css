@@ -1065,11 +1065,12 @@ body {
     max-height: calc(100% - 212px);
     position: fixed;
     top: 120px;
-    overflow: auto;
+    /* overflow: auto; */
 }
 
 #window-scrape-screenshot .popupContent, #window-scrape-screenshotTs .popupContent{
-	padding:1%
+	padding:1%;
+	padding-bottom: 0;
 }
 
 #window-scrape-screenshotTs{
