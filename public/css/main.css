@@ -1397,6 +1397,7 @@ body {
 .btn-action{padding: 6px 16px;}
 .btn-xs-action:nth-child(odd){margin-left: 60px; margin-top: 0px;}
 .btn-xs-action{margin-top: 0px;}
+.btn-action:active{box-shadow: none !important;}
 .designDataTable tbody tr td:nth-child(1), .designDataTable thead tr th:nth-child(1){width: 4% !important;}
 .designDataTable tbody tr td:nth-child(2), .designDataTable thead tr th:nth-child(2){width: 3% !important;}
 .designDataTable tbody tr td:nth-child(3),.designDataTable tbody tr td:nth-child(4), .designDataTable thead tr th:nth-child(3), .designDataTable thead tr th:nth-child(4){width: 0;}
@@ -1410,6 +1411,8 @@ body {
 .designDataTable tbody tr td:nth-child(6),.designDataTable tbody tr td:nth-child(7),.designDataTable tbody tr td:nth-child(8){padding-left: 10px; padding-right: 10px; word-break: break-all;}
 .designDataTable thead tr th:nth-child(2){padding-left: 3px;}
 .loading, .jqgfirstrow, #alertmod_jqGrid{display: none !important;}
+.errorMsg{color: #cc3300; font-size: 11px;}
+.ui-widget-content:focus{outline: none; background-color: #e3caff !important;}
 /*****************Design CSS*****************/
 
 /******Custom Bootstrap Dialog CSS******/
