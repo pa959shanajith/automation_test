@@ -31,8 +31,9 @@ module.exports = {
 				}
 			var ip = req.headers['x-forwarded-for'] || req.info.remoteAddress;
 			var mySocket =  myserver.allSocketsMap[ip];
+			mySocket._events.scrape = [];
 			mySocket.send(data);
-			mySocket.on('message', function(data){
+			mySocket.on('scrape', function(data){
 				cb(null, data);
 			});
 		},

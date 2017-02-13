@@ -10,7 +10,7 @@ mySPA.controller('pluginController',['$scope','$window','$http','$location','$ti
 
     //Plugin click event 
     $scope.pluginFunction = function(name){
-        alert(name)
+    	$window.location.assign(name)
     }
     
   //Task Function
@@ -48,7 +48,7 @@ mySPA.controller('pluginController',['$scope','$window','$http','$location','$ti
     
     $scope.taskRedirection = function(path){
     	if(path == "Screen") 			$window.location.assign("/design")
-    	else if(path == "TestCase")	$window.location.assign("/designTestCase")
+    	else if(path == "TestCase")		$window.location.assign("/designTestCase")
     	else if(path == "TestSuite")	$window.location.assign("/execute")
     	else if(path == "Scheduling")	$window.location.assign("/scheduling")
     }
@@ -60,7 +60,7 @@ function p_event(name){
     angular.element(document.getElementsByClassName("plugin-block")).scope().pluginFunction(name)
 }
 
-function taskRedirection(projectname, modulename, name, moduleId, screenId, screenName, testCaseId, testCaseName, apptype, taskname){
+function taskRedirection(projectname, modulename, name, moduleId, screenId, screenName, testCaseId, testCaseName, apptype, taskname, cycleId, testSuiteId, testSuiteName){
 	var taskObj = {};
 	taskObj.projectName = projectname,
 	taskObj.moduleName = modulename,
@@ -71,6 +71,9 @@ function taskRedirection(projectname, modulename, name, moduleId, screenId, scre
 	taskObj.testCaseName = testCaseName;
 	taskObj.appType = apptype;
 	taskObj.taskName = taskname;
+	taskObj.cycleId = cycleId;
+	taskObj.testSuiteId = testSuiteId;
+	taskObj.testSuiteName = testSuiteName
 	window.localStorage['_T'] = JSON.stringify(taskObj)
 	angular.element(document.getElementsByClassName("assignedTask")).scope().taskRedirection(name, moduleId, screenId, screenName)
 }

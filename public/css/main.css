@@ -1079,7 +1079,7 @@ body {
     max-height: calc(100% - 305px);
     position: fixed;
     top: 212px;
-    overflow: auto;
+    /* overflow: auto; */
 }
 
 #screenShotScrape{
@@ -1088,7 +1088,7 @@ body {
     position: relative
 }
 
-#screenShotScrape img {
+#screenShotScrape img, #screenShotScrapeTS img {
     width: 100%;
 }
 
@@ -1295,6 +1295,7 @@ body {
     padding-top: 5px;
     padding-bottom: 5px;
 }
+.designDataTable tbody tr, .ui-widget-content{cursor: pointer;}
 .executionDataTable th, .executionDataTable td, .scheduleDataHeader span, .scheduleDataBodyRow div, .designDataTable th, .designDataTable td{
 	font-weight: normal !important;
 	padding: 1px 0px;
@@ -1395,21 +1396,23 @@ body {
     padding: 0px 10px;
 	border: 1px solid #5e636b !important;
 }
+.designTableDnd .scroll-wrapper .scroll-content, .ui-jqgrid-view, .scroll-content, #gbox_jqGrid, .ui-jqgrid-bdiv, #jqGrid{width: 100% !important;}
 .btn-action{padding: 6px 16px;}
 .btn-xs-action:nth-child(odd){margin-left: 60px; margin-top: 0px;}
 .btn-xs-action{margin-top: 0px;}
 .btn-action:active{box-shadow: none !important;}
-.designDataTable tbody tr td:nth-child(1), .designDataTable thead tr th:nth-child(1){width: 4% !important;}
-.designDataTable tbody tr td:nth-child(2), .designDataTable thead tr th:nth-child(2){width: 3% !important;}
+.designDataTable thead tr th:nth-child(1), .designDataTable tbody tr td:nth-child(1){width: 5% !important;}
+.designDataTable thead tr th:nth-child(2), .designDataTable tbody tr td:nth-child(2){width: 3% !important;}
 .designDataTable tbody tr td:nth-child(3),.designDataTable tbody tr td:nth-child(4), .designDataTable thead tr th:nth-child(3), .designDataTable thead tr th:nth-child(4){width: 0;}
-.designDataTable thead tr th:nth-child(5){width: 20% !important; text-align: left;} .designDataTable tbody tr td:nth-child(5){width: 19% !important; text-align: left;}
-.designDataTable thead tr th:nth-child(6){width: 21% !important;}.designDataTable tbody tr td:nth-child(6){width: 20.5% !important}
-.designDataTable thead tr th:nth-child(7){width: 21% !important;}.designDataTable tbody tr td:nth-child(7){width: 20.5% !important}
-.designDataTable thead tr th:nth-child(8){width: 21% !important;}.designDataTable tbody tr td:nth-child(8){width: 20.2% !important}
-.designDataTable tbody tr td:nth-child(9), .designDataTable thead tr th:nth-child(9){width: 10% !important;}
+.designDataTable thead tr th:nth-child(5), .designDataTable tbody tr td:nth-child(5){width: 22% !important; text-align: left;}
+.designDataTable thead tr th:nth-child(6), .designDataTable tbody tr td:nth-child(6){width: 20% !important;}
+.designDataTable thead tr th:nth-child(7), .designDataTable tbody tr td:nth-child(7){width: 20% !important;}
+.designDataTable thead tr th:nth-child(8), .designDataTable tbody tr td:nth-child(8){width: 20% !important;}
+.designDataTable thead tr th:nth-child(9), .designDataTable tbody tr td:nth-child(9){width: 10% !important;}
 .designDataTable thead tr th:nth-child(5), .designDataTable thead tr th:nth-child(6), .designDataTable thead tr th:nth-child(7), .designDataTable thead tr th:nth-child(8){border-right: 1px solid #fff;}
 .designDataTable tbody tr td:nth-child(1),.designDataTable tbody tr td:nth-child(2),.designDataTable tbody tr td:nth-child(5),.designDataTable tbody tr td:nth-child(6),.designDataTable tbody tr td:nth-child(7),.designDataTable tbody tr td:nth-child(8){text-align: left;}
 .designDataTable tbody tr td:nth-child(6),.designDataTable tbody tr td:nth-child(7),.designDataTable tbody tr td:nth-child(8){padding-left: 10px; padding-right: 10px; word-break: break-all;}
+.designDataTable tbody tr td:nth-child(5){padding-right: 10px; word-break: break-all;}
 .designDataTable thead tr th:nth-child(2){padding-left: 3px;}
 .loading, .jqgfirstrow, #alertmod_jqGrid{display: none !important;}
 .errorMsg{color: #cc3300; font-size: 11px;}
@@ -1773,6 +1776,161 @@ select:hover {
     position: relative;
 }
 
+/******************Reports CSS***************************/
+.upper-section-testsuites{
+	position: relative;
+    width: 100%;
+    height: 128px;
+    background-color: #e0e0e0;
+    float: left;
+    padding-top: 30px;
+    padding-left: 20px;
+    padding-right: 20px;
+    overflow: hidden;
+}
+.suiteContainer{
+	width: 16%;
+	margin-bottom: 30px;
+	display: inline-block;
+	text-align: center;
+	
+}
+.suiteIconContainer{
+	background-color: #5d5cde;
+	display: inline-block;
+	border-radius: 7px;
+    -moz-border-radius: 7px;
+    -webkit-border-radius: 7px;
+    padding: 7px;
+}
+.suitedropdownicon{
+	position: absolute;
+	left: 49%;
+	bottom: 0;
+	transform: translateX(-50%);
+    -moz-transform: translateX(-50%);
+    -webkit-transform: translateX(-50%);
+}
+.iconSpace{
+	background: #fff;
+    width: 70px;
+    display: inline-block;
+    height: 10px;
+    vertical-align: bottom;
+    cursor: pointer;
+}
+.addscrolltotestsuite{overflow-y: scroll;}
+.middle-section-testsuites, .bottom-section-testsuites{
+	position: relative;
+    width: 100%;
+    height: 310px;
+    float: left;
+    margin-top: 9px;
+    border-radius: 6px;
+}
+.left-section-testsuites{
+	position: relative;
+    width: 58%;
+    height: 310px;
+    float: left;
+    border: 1px solid #edefec;
+    border-radius: 6px;
+    margin-right: 12px;
+}
+.suitestartend, .scenarioReports{
+	width: 100%;
+}
+.suitestartend thead, .scenarioReports thead{
+	background: #5e636b;
+    color: #fff;
+    font-size: 17px;
+    font-family: 'LatoWebLight';
+    border-radius: 6px;
+    -moz-border-radius: 6px;
+    -webkit-border-radius: 6px;
+    position: fixed;
+    width: 562px;
+}
+.scenarioReports thead{
+	width: 970px !important;
+}
+.suitestartend thead tr, .scenarioReports thead tr{
+    float: left;
+    width: 100%;	
+}
+.suitestartend th, .scenarioReports th{
+	font-weight: normal !important;
+	padding: 1px 0px;
+	display: inline-block;
+	text-align: center;
+	float:left;
+}
+.suitestartend tbody, .scenarioReports tbody{
+	position: absolute;
+    width: 562px;
+    margin-top: 28px;
+}
+.scenarioReports tbody{width: 970px !important}
+.scenarioReports{width: 100% !important}
+.suitestartend tbody tr, .scenarioReports tbody tr{
+	width: 100%;
+    display: block;
+    float: left;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+.suitestartend tbody tr td, .scenarioReports tbody tr td{
+    font-weight: normal !important;
+    padding: 1px 0px;
+    display: inline-block;
+    text-align: center;
+    float: left;
+}
+.suitestartend tbody tr td:nth-child(1){width: 5%;}
+.suitestartend tbody tr td:nth-child(2){width: 45%; padding-left: 45px; text-align: left;}
+.suitestartend tbody tr td:nth-child(3){width: 50%; padding-left: 78px; text-align: left;}
+.scenarioReports tbody tr:nth-child(odd){
+	background:#e8e6ff;	
+}
+.scenarioReports tbody tr:nth-child(even) {
+    background: #fff;
+}
+.scenarioReports tbody tr td:nth-child(1){width: 30%;}
+.scenarioReports tbody tr td:nth-child(2){width: 20%;}
+.scenarioReports tbody tr td:nth-child(3){width: 20%;}
+.scenarioReports tbody tr td:nth-child(4){width: 15%;}
+.scenarioReports tbody tr td:nth-child(5){width: 15%;}
+.right-section-charts{
+	position: relative;
+    width: 40.7%;
+    height: 310px;
+    float: left;
+    border: 1px solid #edefec;
+    border-radius: 6px;
+}
+.progress-bar-norun{background-color: #939598 !important;}
+.reportStatus{margin-top: 90px;}
+.reportStatusBlk {
+    float: left;
+    width: 100%;
+}
+.progresslabel{width: 25%; padding-left: 14px;}
+.progresslabel, .progresspercentage{display: inline-block;}
+.progresslabel, .customprogress{float: left;}
+.customprogress{
+	width: 65% !important;
+    height: 12px;
+    border-radius: 8px;
+    margin-top: 3px;
+}
+.progresspercentage{width: 10%; text-align: center;}
+
+.bottom-section-testsuites{
+	width: 970px !important;
+	height: 290px !important;
+    padding-bottom: 3px;
+    border: 1px solid #edefec;
+}
 
 /******************Admin CSS***************************/
 
