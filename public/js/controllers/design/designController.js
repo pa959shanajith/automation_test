@@ -1,6 +1,6 @@
 var screenshotObj,scrapedGlobJson,enableScreenShotHighlight,mirrorObj,emptyTestStep,anotherScriptId,getAppTypeForPaste, eaCheckbox, finalViewString, scrapedData, deleteFlag, pasteSelecteStepNo,globalSelectedBrowserType;
-var initScraping = {}; var mirrorObj = {}; var scrapeTypeObj = {}; var newScrapedList; var viewString = {}; var scrapeObject = {}; var readTestCaseData;
-var selectRowStepNoFlag = false; var deleteStep = false;
+var initScraping = {}; var mirrorObj = {}; var scrapeTypeObj = {}; var newScrapedList; var viewString = {}; var scrapeObject = {}; var readTestCaseData; var getRowJsonCopy = [];
+var selectRowStepNoFlag = false; //var deleteStep = false;
 var getAllAppendedObj; //Getting all appended scraped objects
 var gsElement = []; window.localStorage['selectRowStepNo'] = '';
 mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout', 'DesignServices','cfpLoadingBar', function($scope,$http,$location,$timeout,DesignServices, cfpLoadingBar) {
@@ -17,7 +17,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 	
 	//Loading Project Info
 	var getProjInfo = JSON.parse(window.localStorage['_T'])
-	$("#page-taskName").empty().append('<span>'+JSON.parse(window.localStorage['_T']).taskName+'</span>')
+	$("#page-taskName").empty().append('<span>'+getProjInfo.taskName+'</span>')
 	$(".projectInfoWrap").empty()
 	$(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">Project :</span><span class="content">'+getProjInfo.projectName+'</span></p><p class="proj-info-wrap"><span class="content-label">Module :</span><span class="content">'+getProjInfo.moduleName+'</span></p><p class="proj-info-wrap"><span class="content-label">Screen :</span><span class="content">'+getProjInfo.screenName+'</span></p>')
 	//Loading Project Info
@@ -64,7 +64,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					//window.localStorage['newTestScriptDataList'] = data2.view;
 					//$scope.newTestScriptDataLS = recievedData[0].view;
 					$("#window-scrape-screenshotTs .popupContent").empty()
-					$("#window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrapeTS"><img id="screenshotTS" src="data:image/PNG;base64,'+data2.mirror+'" /></div>')
+					$("#window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrapeTS"><img id="screenshotTS" src="data:image/PNG;base64,'+data2[0].mirror+'" /></div>')
 					
 					// service call # 3 -objectType service call
 					/*DesignServices.getObjectType()
@@ -290,12 +290,21 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		var flag = false;
 		var defaultTestScript='[{"stepNo":"1","custname":"","objectName":"","keywordVal":"","inputVal":"","outputVal":"","url":"","_id_":"","appType":"Generic"}]';
 		if(readTestCaseData == defaultTestScript){
-			$("#importfileJson").attr("type","file");
-			$("#importfileJson").trigger("click");
-			importfileJson.addEventListener('change', function(e) {
+			$("#fileInputJson").attr("type","file");
+			$("#fileInputJson").trigger("click");
+			var input = document.getElementById("fileInputJson");
+			input.click()
+//			input.onclick = function () {
+//			    alert("Opening")
+//			};
+
+			input.onchange = function () {
+			    alert(this.value);
+			};
+			input.addEventListener('change', function(e) {
 				if(counter1 == 0){
 					// Put the rest of the demo code here.
-					var file = importfileJson.files[0];
+					var file = input.files[0];
 					var textType = /json.*;
 					var reader = new FileReader();
 					reader.onload = function(e) {
@@ -340,10 +349,10 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					reader.readAsText(file);
 					counter1 = 1;
 				}
-			});	
+			});
 		} else{
 			$("#fileInputJson").removeAttr("type","file");
-			$("#fileInputJson").attr("type","text");
+			$("#fileInputJson").attr("type","text");			
 			$("#globalModalYesNo").find('.modal-title').text("Table Consists of Data");
 			$("#globalModalYesNo").find('.modal-body p').text("Import will erase your old data. Do you want to continue??").css('color','black');
 			$("#globalModalYesNo").find('.modal-footer button:nth-child(1)').attr("id","btnImportEmptyErrorYes")
@@ -351,7 +360,6 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			//showDialogMesgsYesNo("Table Consists of Data", "Import will erase your old data. Do you want to continue??", "btnImportEmptyErrorYes", "btnImportEmptyErrorNo")
 		}
 	}*/
-	
 	
 	/*$(document).on('click', '#btnImportEmptyErrorYes', function(){
 		var counter2 = 0;
@@ -963,23 +971,19 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			var testCaseId = taskInfo.testCaseId;
 			var testCaseName = taskInfo.testCaseName;
 			if((screenId != undefined) && (screenId != "undefined") && (testCaseId != undefined) && (testCaseId != "undefined")){
-				$("#jqGrid tr").children("td[aria-describedby='jqGrid_outputVal']").each(function(){
-					if($(this).text().trim() == "##" || $(this).is(":contains(';##')")){
-						$(this).parent().css("background","#D5E7FF").focus();
-					}
-				})
 				//#D5E7FF  DBF5DF
 				var serviceCallFlag = false;
-				var mydata = $("#jqGrid").jqGrid('getGridParam','data');		 
+				var mydata = $("#jqGrid").jqGrid('getGridParam','data');
 				for(var i=0; i<mydata.length;i++){
 					//new to parse str to int (step No)
 					if(mydata[i].url == undefined){mydata[i].url="";}
 					mydata[i].stepNo = i+1;
+					mydata[i].remarks = $("#jqGrid tbody tr td:nth-child(10)")[i+1].textContent
 					//check - keyword column should be mandatorily populated by User
 					if(mydata[i].custname == undefined || mydata[i].custname == ""){
 						var stepNoPos = parseInt(mydata[i].stepNo);
 						$("#globalModal").find('.modal-title').text("Save Testcase");
-						$("#globalModal").find('.modal-body p').text("Please select Object Name at Step No. ",stepNoPos).css('color','black');
+						$("#globalModal").find('.modal-body p').text("Please select Object Name at Step No. "+stepNoPos);
 						$("#globalModal").modal("show");
 						serviceCallFlag  = true;
 						break;
@@ -988,9 +992,8 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 						mydata[i].custname = mydata[i].custname.trim();
 						if(mydata[i].keywordVal == undefined || mydata[i].keywordVal == ""){
 							var stepNoPos = parseInt(mydata[i].stepNo);
-							window.localStorage['stepNoPos'] = stepNoPos;
 							$("#globalModal").find('.modal-title').text("Save Testcase");
-							$("#globalModal").find('.modal-body p').text("Please select Object Name at Step No. ",stepNoPos).css('color','black');
+							$("#globalModal").find('.modal-body p').text("Please select keyword at Step No. "+stepNoPos);
 							$("#globalModal").modal("show");
 							serviceCallFlag  = true;
 							break;
@@ -1026,18 +1029,19 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			        			$("#tabs,#tabo2,#tabo1").tabs();
 		        			}*/
 							angular.element(document.getElementById("tableActionButtons")).scope().readTestCase_ICE();
-							if(deleteStep == false){
+							$("#globalModal").find('.modal-title').text("Save Testcase");
+							$("#globalModal").find('.modal-body p').text("Testcase saved successfully").css('color','black');
+							$("#globalModal").modal("show");
+							/*if(deleteStep == false){
 								selectRowStepNoFlag = true;
-								$("#globalModal").find('.modal-title').text("Save Testcase");
-								$("#globalModal").find('.modal-body p').text("Testcase saved successfully").css('color','black');
-								$("#globalModal").modal("show");
+								
 							}
 							else{
 								$("#globalModal").find('.modal-title').text("Delete Testcase step");
 								$("#globalModal").find('.modal-body p').text("Successfully deleted the steps").css('color','black');
 								$("#globalModal").modal("show");
 								deleteStep = false;
-							}
+							}*/
 						}
 						else{
 							$("#globalModal").find('.modal-title').text("Save Testcase");
@@ -1144,9 +1148,9 @@ function contentTable(newTestScriptDataLS) {
 		page:1,
 		scroll:1,
 		colModel: [
-		           { label: 'Step No', 	name: 'stepNo', key:true, width: 50,  editable: false, sortable:false, resizable:false,  key:true, hidden: true},
-		           { name: 'objectName', width: 0, editable: false, sortable:false, resizable:false, hidden: true},
-		           { label: 'Object Name', name: 'custname', width: 250, editable: true,  resizable:false, sortable:false, 
+		           { label: 'Step No', 	name: 'stepNo', key:true, editable: false, sortable:false, resizable:false,  key:true, hidden: true},
+		           { name: 'objectName', editable: false, sortable:false, resizable:false, hidden: true},
+		           { label: 'Object Name', name: 'custname', editable: true,  resizable:false, sortable:false, 
 		        	   edittype:'select', 
 		        	   editoptions : {
 		        		   value : getTags(scrappedData),
@@ -1156,7 +1160,7 @@ function contentTable(newTestScriptDataLS) {
 		        		   }]
 		        	   }
 		           },
-		           { label: 'Keyword', 	name: 'keywordVal',	width: 250, editable: true, resizable:false, sortable:false ,
+		           { label: 'Keyword', 	name: 'keywordVal', editable: true, resizable:false, sortable:false ,
 		        	   edittype:'select',
 		        	   editoptions :{
 		        		   value : getKeywordList(keywordArrayList),
@@ -1166,12 +1170,12 @@ function contentTable(newTestScriptDataLS) {
 		        		   }]
 		        	   }
 		           },
-		           { label: 'Input', name: 'inputVal', width: 200, editable: true,  resizable:false, sortable:false },
-		           { label: 'Output', name: 'outputVal', width: 150, editable: true,  resizable:false, sortable:false },
-		           { label: 'Remark', name: 'remarksIcon', width: 70, editable: false,  resizable:false, sortable:false},
-		           { label: 'Remark', name: 'remarks', width: 70, editable: false,  resizable:false, sortable:false, hidden: true},
-		           { label: 'URL', 	name: 'url', width: 0, editable: false, resizable:false, hidden:true },
-		           { label: 'appType', name: 'appType', width: 0, editable: false, resizable:false, hidden:true }
+		           { label: 'Input', name: 'inputVal', editable: true,  resizable:false, sortable:false },
+		           { label: 'Output', name: 'outputVal', editable: true,  resizable:false, sortable:false },
+		           { label: 'Remarks', name:'remarksStatus', editable: false,  resizable:false, sortable:false},
+		           { label: 'Remarks', name: 'remarks', editable: false,  resizable:false, sortable:false, hidden:true},
+		           { label: 'URL', 	name: 'url', editable: false, resizable:false, hidden:true },
+		           { label: 'appType', name: 'appType', editable: false, resizable:false, hidden:true }
 		           ],
 		           loadonce: false,
 		           viewrecords: false,
@@ -1196,7 +1200,15 @@ function contentTable(newTestScriptDataLS) {
 		           autoencode: true,
 		           scrollrows : true,
 		           loadComplete: function() {
-		        	   $("#cb_jqGrid").on('click', function() {
+		        	   $("#jqGrid tr").each(function(){
+		        		   if($(this).find("td:nth-child(10)").text().trim().length <= 0){
+		        			   $(this).find("td:nth-child(9)").append('<img src="imgs/ic-remarks-inactive.png" class="remarksIcon"/>');
+		        		   }
+		        		   else{
+		        			   $(this).find("td:nth-child(9)").append('<img src="imgs/ic-remarks-active.png" class="remarksIcon"/>');
+		        		   }
+		        	   })
+		        	   //$("#cb_jqGrid").on('click', function() {
 		        		   /*var cboxParent =  $(this).is(":checked");
 		        		   var editableLen = $(".editable").length;
 		        		   if (cboxParent == true && editableLen == 0){
@@ -1206,7 +1218,7 @@ function contentTable(newTestScriptDataLS) {
 		        			   $(".commentIcon,.unCommentIcon,.deleteIcon").hide();
 		        		   }
 		        		   window.localStorage['selectRowStepNo']='';*/
-		        	   });		        	   
+		        	   //});		        	   
 		        	   $("#jqGrid tr").children("td[aria-describedby='jqGrid_outputVal']").each(function(){
 		        		   if($(this).text().trim() == "##" || $(this).is(":contains(';##')")){
 		        			   if($(this).parent('tr:nth-child(odd)').length > 0){
@@ -1266,8 +1278,27 @@ function contentTable(newTestScriptDataLS) {
 	$("#jqGrid").jqGrid("setColProp", "outputVal", {editable: false});
 	$("#jqGrid").jqGrid("setColProp", "url", {editable: false});
 	$("#jqGrid").jqGrid("setColProp", "appType", {editable: false});
-	$("#jqGrid").resetSelection();	
+	$("#jqGrid").resetSelection();
+	
+	$(document).on('click', '.remarksIcon', function(){
+		$(this).parent('td').next('td[aria-describedby="jqGrid_remarks"]').addClass('selectedRemarkCell');
+		$("#modalDialogRemarks").find('.modal-title').text("Remarks");
+		$("#modalDialogRemarks").find('#labelContent').text("Add Remarks");
+		$("#getremarksData").val('');
+		$("#modalDialogRemarks").find('.modal-footer button').attr("id","btnaddRemarks");
+		$("#modalDialogRemarks").modal("show");
+	})
 
+	$(document).on('click', '#btnaddRemarks', function(){
+		var getremarks = $("#getremarksData").val();
+		if(getremarks.length > 0){
+			$("#jqGrid tbody tr td.selectedRemarkCell").text(getremarks);
+			$("#jqGrid tbody tr td.selectedRemarkCell").attr('title',getremarks);
+			$("#jqGrid tbody tr td.selectedRemarkCell").removeClass('selectedRemarkCell');
+			$(this).parent(".modal-footer").parent(".modal-content").find(".close").trigger('click');
+		}
+	})
+	
 	function hideOtherFuncOnEdit()
 	{
 		$("#jqGrid").each(function() {
@@ -2137,22 +2168,11 @@ function contentTable(newTestScriptDataLS) {
 //Delete Testscripts
 function deleteTestScriptRow(e){
 	if($(document).find("#cb_jqGrid:checked").length > 0 || $("#jqGrid").find(".cbox:checked").length > 0 ){
-		var selectedRowIds = $("#jqGrid").jqGrid('getGridParam','selarrrow').map(Number);
-		var gridArrayData = $("#jqGrid").jqGrid('getRowData');
-		console.log("array data test ***** "+JSON.stringify(gridArrayData));
-		for(var i=0;i<selectedRowIds.length;i++){
-			$("#jqGrid").delRowData(selectedRowIds[i]);
-		}
-		var gridData = $("#jqGrid").jqGrid('getRowData');
-		for(var i=0; i<gridData.length;i++){
-			//new to parse str to int (step No)
-			gridData[i].stepNo = i+1;
-		}
-		$("#jqGrid").jqGrid('clearGridData');
-		$("#jqGrid").jqGrid('setGridParam',{data: gridData});
-		$("#jqGrid").trigger("reloadGrid");
-		deleteStep = true;
-		angular.element(document.getElementById("tableActionButtons")).scope().updateTestCase_ICE();		
+		$("#globalModalYesNo").find('.modal-title').text("Delete Test Step");
+		$("#globalModalYesNo").find('.modal-body p').text("Are you sure, you want to delete?").css('color','black');
+		$("#globalModalYesNo").find('.modal-footer button:nth-child(1)').attr("id","btnDeleteStepYes")
+		$("#globalModalYesNo").modal("show");		
+		/*angular.element(document.getElementById("tableActionButtons")).scope().updateTestCase_ICE();*/		
 	}
 	else{
 		$("#globalModal").find('.modal-title').text("Delete Test step");
@@ -2160,6 +2180,25 @@ function deleteTestScriptRow(e){
 		$("#globalModal").modal("show");
 	}
 }
+
+$(document).on('click','#btnDeleteStepYes', function(){
+	var selectedRowIds = $("#jqGrid").jqGrid('getGridParam','selarrrow').map(Number);
+	var gridArrayData = $("#jqGrid").jqGrid('getRowData');
+	console.log("array data test ***** "+JSON.stringify(gridArrayData));
+	for(var i=0;i<selectedRowIds.length;i++){
+		$("#jqGrid").delRowData(selectedRowIds[i]);
+	}
+	var gridData = $("#jqGrid").jqGrid('getRowData');
+	for(var i=0; i<gridData.length;i++){
+		//new to parse str to int (step No)
+		gridData[i].stepNo = i+1;
+	}
+	$("#jqGrid").jqGrid('clearGridData');
+	$("#jqGrid").jqGrid('setGridParam',{data: gridData});
+	$("#jqGrid").trigger("reloadGrid");
+	$('.modal-header:visible').find('.close').trigger('click')
+	//deleteStep = true;
+})
 
 function addTestScriptRow(){
 	var flagClass;
@@ -2170,7 +2209,7 @@ function addTestScriptRow(){
 	}
 	else flagClass = "false";
 	var selectedStepNo = window.localStorage['selectedRowStepNo']
-	$("#jqGrid").trigger("reloadGrid");
+	//$("#jqGrid").trigger("reloadGrid");
 	appTypeLocal = "Web";//window.localStorage['appTypeScreen'];
 	var emptyRowData = {
 			"objectName": "",
@@ -2181,7 +2220,14 @@ function addTestScriptRow(){
 			"stepNo": "",
 			"url": "",
 			"appType": "Generic"
-	};             
+	};
+	
+	$("#jqGrid tr").each(function(){
+		if($(this).find("td:nth-child(9)").find(".remarksIcon").length > 0){
+			$(this).find("td:nth-child(9)").find(".remarksIcon").remove();
+		}
+	})
+	   
 	var gridArrayData = $("#jqGrid").jqGrid('getRowData');
 	var arrayLength = gridArrayData.length;
 	if(arrayLength <= 0){
@@ -2303,7 +2349,11 @@ function editTestCaseRow(){
 function copyTestStep(){
 	emptyTestStep = "false";
 	var taskInfo = JSON.parse(window.localStorage['_T']);
-	if(!$(document).find(".cbox:checked").parent().parent("tr").hasClass("ui-state-highlight")) return false
+	if(!$(document).find(".cbox:checked").parent().parent("tr").hasClass("ui-state-highlight")){
+		$("#globalModal").find('.modal-title').text("Copy Testcase step");
+		$("#globalModal").find('.modal-body p').text("Select step to copy").css('color','black');
+		$("#globalModal").modal("show");
+	}
 	else{
 		getSelectedRowData = [];
 		getRowJsonCopy = [];
@@ -2353,36 +2403,43 @@ function copyTestStep(){
 }
 //Need to work
 function pasteTestStep(){
-	if(anotherScriptId != JSON.parse(window.localStorage['_T']).testCaseId){
-		if (emptyTestStep == "true" || getRowJsonCopy == undefined) return false
-		else if(getAppTypeForPaste != "Web") return false
-		else{
-			$("#globalModalYesNo").find('.modal-title').text("Paste Test Step");
-			$("#globalModalYesNo").find('.modal-body p').text("Copied step(s) might contain object reference which will not be supported for other screen. Do you still want to continue ?").css('color','black');
-			$("#globalModalYesNo").find('.modal-footer button:nth-child(1)').attr("id","btnPasteTestStepYes")
-			$("#globalModalYesNo").modal("show");
-			//showDialogMesgsYesNo("Paste Test Step", "Copied step(s) might contain object reference which will not be supported for other screen. Do you still want to continue ?", "btnPasteTestStepYes", "btnPasteTestStepNo")
-		}
-	} 
-	else{
-		if (emptyTestStep == "true" || getRowJsonCopy == undefined) return false
-		else if($("#jqGrid").jqGrid('getRowData').length == 1 && $("#jqGrid").jqGrid('getRowData')[0].custname == "") showDialogMesgsYesNo("Paste Test Step", "Copied step(s) might contain object reference which will not be supported for other screen. Do you still want to continue ?", "btnPasteTestStepYes", "btnPasteTestStepNo")
-		else{
-			$("#modalDialog-inputField").find('.modal-title').text("Paste Test Step");
-			$("#modalDialog-inputField").find('#labelContent').text("Paste after step no:").css('color','black');
-			$("</br><span style='font-size:11px; color: #000;'>For multiple paste. Eg: 5;10;20</span>").insertAfter('#labelContent');
-			$("#modalDialog-inputField").find('.modal-footer button').attr("id","btnPasteTestStep");
-			$("#modalDialog-inputField").find('#getInputData').attr("placeholder","Enter a value");
-			$("#modalDialog-inputField").find('#getInputData').addClass("copyPasteValidation");
-			$("#modalDialog-inputField").find('#errorMsgs1').text("*Textbox cannot be empty");
-			$("#modalDialog-inputField").find('#errorMsgs2').text("*Textbox cannot contain characters other than numbers seperated by single semi colon");
-			$("#modalDialog-inputField").find('#errorMsgs3').text("*Please enter a valid step no");
-			$("#modalDialog-inputField").modal("show");
-			//createDialogsCopyPaste("Paste Test Step", "Paste after step no:<br/><span style='font-size:11px;'>For multiple paste, provide step numbers separated by semicolon Eg: 5;10;20</span>", "*Textbox cannot be empty", "*Textbox cannot contain characters other than numbers seperated by single semi colon", "*Please enter a valid step no", "btnPasteTestStep");
-			/*$("#btnPasteTestStep").text("Paste")
-			$("#textBoxID").css({'margin-bottom':'0'})*/
-		}
+	if(getRowJsonCopy == [] || getRowJsonCopy == undefined || getRowJsonCopy.length <= 0){
+		$("#globalModal").find('.modal-title').text("Paste Testcase step");
+		$("#globalModal").find('.modal-body p').text("Copy steps to paste").css('color','black');
+		$("#globalModal").modal("show");
 	}
+	else{
+		if(anotherScriptId != JSON.parse(window.localStorage['_T']).testCaseId){
+			if (emptyTestStep == "true" || getRowJsonCopy == undefined) return false
+			else if(getAppTypeForPaste != "Web") return false
+			else{
+				$("#globalModalYesNo").find('.modal-title').text("Paste Test Step");
+				$("#globalModalYesNo").find('.modal-body p').text("Copied step(s) might contain object reference which will not be supported for other screen. Do you still want to continue ?").css('color','black');
+				$("#globalModalYesNo").find('.modal-footer button:nth-child(1)').attr("id","btnPasteTestStepYes")
+				$("#globalModalYesNo").modal("show");
+				//showDialogMesgsYesNo("Paste Test Step", "Copied step(s) might contain object reference which will not be supported for other screen. Do you still want to continue ?", "btnPasteTestStepYes", "btnPasteTestStepNo")
+			}
+		} 
+		else{
+			if (emptyTestStep == "true" || getRowJsonCopy == undefined) return false
+			else if($("#jqGrid").jqGrid('getRowData').length == 1 && $("#jqGrid").jqGrid('getRowData')[0].custname == "") showDialogMesgsYesNo("Paste Test Step", "Copied step(s) might contain object reference which will not be supported for other screen. Do you still want to continue ?", "btnPasteTestStepYes", "btnPasteTestStepNo")
+			else{
+				$("#modalDialog-inputField").find('.modal-title').text("Paste Test Step");
+				$("#modalDialog-inputField").find('#labelContent').text("Paste after step no:").css('color','black');
+				$("</br><span style='font-size:11px; color: #000;'>For multiple paste. Eg: 5;10;20</span>").insertAfter('#labelContent');
+				$("#modalDialog-inputField").find('.modal-footer button').attr("id","btnPasteTestStep");
+				$("#modalDialog-inputField").find('#getInputData').attr("placeholder","Enter a value");
+				$("#modalDialog-inputField").find('#getInputData').addClass("copyPasteValidation");
+				$("#modalDialog-inputField").find('#errorMsgs1').text("*Textbox cannot be empty");
+				$("#modalDialog-inputField").find('#errorMsgs2').text("*Textbox cannot contain characters other than numbers seperated by single semi colon");
+				$("#modalDialog-inputField").find('#errorMsgs3').text("*Please enter a valid step no");
+				$("#modalDialog-inputField").modal("show");
+				//createDialogsCopyPaste("Paste Test Step", "Paste after step no:<br/><span style='font-size:11px;'>For multiple paste, provide step numbers separated by semicolon Eg: 5;10;20</span>", "*Textbox cannot be empty", "*Textbox cannot contain characters other than numbers seperated by single semi colon", "*Please enter a valid step no", "btnPasteTestStep");
+				/*$("#btnPasteTestStep").text("Paste")
+				$("#textBoxID").css({'margin-bottom':'0'})*/
+			}
+		}
+	}	
 }
 
 $(document).on("click", "#btnPasteTestStepYes", function(){
@@ -2529,91 +2586,98 @@ function pasteInGrid(){
 
 //Commenting TestScript Row
 function commentStep(){
-	var getOutputVal = $(document).find(".ui-state-highlight").children("td[aria-describedby='jqGrid_outputVal']").text();
-	if(!getOutputVal.match("##") && !getOutputVal.match(";##")){
-		var myData = $("#jqGrid").jqGrid('getGridParam','data')
-		var selectedRowIds = $("#jqGrid").jqGrid('getGridParam','selarrrow').map(Number);
-		selectedRowIds = selectedRowIds.sort();
-		$(document).find(".ui-state-highlight").children("td[aria-describedby='jqGrid_outputVal']").each(function() { 
-			var outputValLen = $(this).text().trim().length;
-			var outputHashMatch = $(this).text().match("##");
-			if(outputValLen == 0){
-				for(i=0; i<myData.length; i++){
-					if($.inArray(myData[i].stepNo, (selectedRowIds)) != -1 && (myData[i].outputVal == "")) {
-						myData[i].outputVal = "##";
-						$("#jqGrid").trigger("reloadGrid");
-					}
-					else if($.inArray(myData[i].stepNo, (selectedRowIds.map(String))) != -1 && (myData[i].outputVal == "")) {
-						myData[i].outputVal = "##";
-						$("#jqGrid").trigger("reloadGrid");
-					}
-				}
-			}
-			else if(outputValLen != 0 &&  outputHashMatch == null)
-			{
-				for(i=0; i<myData.length; i++){
-					if(($.inArray(myData[i].stepNo, (selectedRowIds) ) != -1 && myData[i].outputVal != "")) {
-						if(myData[i].outputVal.match(";##") == null && myData[i].outputVal != "##")
-						{
-							myData[i].outputVal = myData[i].outputVal.concat(";##");
+	if($(document).find(".ui-state-highlight").length > 0){
+		var getOutputVal = $(document).find(".ui-state-highlight").children("td[aria-describedby='jqGrid_outputVal']").text();
+		if(!getOutputVal.match("##") && !getOutputVal.match(";##")){
+			var myData = $("#jqGrid").jqGrid('getGridParam','data')
+			var selectedRowIds = $("#jqGrid").jqGrid('getGridParam','selarrrow').map(Number);
+			selectedRowIds = selectedRowIds.sort();
+			$(document).find(".ui-state-highlight").children("td[aria-describedby='jqGrid_outputVal']").each(function() { 
+				var outputValLen = $(this).text().trim().length;
+				var outputHashMatch = $(this).text().match("##");
+				if(outputValLen == 0){
+					for(i=0; i<myData.length; i++){
+						if($.inArray(myData[i].stepNo, (selectedRowIds)) != -1 && (myData[i].outputVal == "")) {
+							myData[i].outputVal = "##";
 							$("#jqGrid").trigger("reloadGrid");
-						}								
-					}
-					else if(($.inArray(myData[i].stepNo, (selectedRowIds.map(String)) ) != -1 && myData[i].outputVal != "")) {
-						if(myData[i].outputVal.match(";##") == null && myData[i].outputVal != "##"){
-							myData[i].outputVal = myData[i].outputVal.concat(";##");
+						}
+						else if($.inArray(myData[i].stepNo, (selectedRowIds.map(String))) != -1 && (myData[i].outputVal == "")) {
+							myData[i].outputVal = "##";
 							$("#jqGrid").trigger("reloadGrid");
 						}
 					}
 				}
-			}
-		});
+				else if(outputValLen != 0 &&  outputHashMatch == null)
+				{
+					for(i=0; i<myData.length; i++){
+						if(($.inArray(myData[i].stepNo, (selectedRowIds) ) != -1 && myData[i].outputVal != "")) {
+							if(myData[i].outputVal.match(";##") == null && myData[i].outputVal != "##")
+							{
+								myData[i].outputVal = myData[i].outputVal.concat(";##");
+								$("#jqGrid").trigger("reloadGrid");
+							}								
+						}
+						else if(($.inArray(myData[i].stepNo, (selectedRowIds.map(String)) ) != -1 && myData[i].outputVal != "")) {
+							if(myData[i].outputVal.match(";##") == null && myData[i].outputVal != "##"){
+								myData[i].outputVal = myData[i].outputVal.concat(";##");
+								$("#jqGrid").trigger("reloadGrid");
+							}
+						}
+					}
+				}
+			});
+		}
+		else{
+			var myData = $("#jqGrid").jqGrid('getGridParam','data')
+			var selectedRowIds = $("#jqGrid").jqGrid('getGridParam','selarrrow').map(Number);
+			selectedRowIds = selectedRowIds.sort();
+			$(document).find(".ui-state-highlight").children("td[aria-describedby='jqGrid_outputVal']").each(function() {
+				var outputValLen = $(this).text().trim().length;
+				var outputHashMatch = $(this).text().match("##");
+				if(outputValLen != 0 &&  outputHashMatch != null)
+				{
+					for(i=0; i<myData.length; i++){
+						if(($.inArray(myData[i].stepNo, (selectedRowIds) ) != -1 && myData[i].outputVal != "")) {
+							if(myData[i].outputVal.match("##") == '##' && myData[i].outputVal.length > 2)
+							{
+								var lastThree = myData[i].outputVal.substr(myData[i].outputVal.length - 3);
+								if (lastThree == ";##")
+								{
+									myData[i].outputVal = 	myData[i].outputVal.replace(lastThree,"");
+									$("#jqGrid").trigger("reloadGrid");
+								}
+							}
+							else if(myData[i].outputVal.match("##") == '##' && myData[i].outputVal.length == 2){
+								var lastTwo = myData[i].outputVal.substr(myData[i].outputVal.length - 2);
+								myData[i].outputVal = 	myData[i].outputVal.replace(lastTwo,"");
+								$("#jqGrid").trigger("reloadGrid");
+							}						
+						}
+						else if(($.inArray(myData[i].stepNo, (selectedRowIds.map(String)) ) != -1 && myData[i].outputVal != "")) {
+							if(myData[i].outputVal.match("##") == '##' && myData[i].outputVal.length > 2)
+							{
+								var lastThree = myData[i].outputVal.substr(myData[i].outputVal.length - 3);
+								if (lastThree == ";##")
+								{
+									myData[i].outputVal = 	myData[i].outputVal.replace(lastThree,"");
+									$("#jqGrid").trigger("reloadGrid");
+								}
+							}
+							else if(myData[i].outputVal.match("##") == '##' && myData[i].outputVal.length == 2){
+								var lastTwo = myData[i].outputVal.substr(myData[i].outputVal.length - 2);
+								myData[i].outputVal = 	myData[i].outputVal.replace(lastTwo,"");
+								$("#jqGrid").trigger("reloadGrid");
+							}
+						}
+					}
+				}
+			});
+		}
 	}
 	else{
-		var myData = $("#jqGrid").jqGrid('getGridParam','data')
-		var selectedRowIds = $("#jqGrid").jqGrid('getGridParam','selarrrow').map(Number);
-		selectedRowIds = selectedRowIds.sort();
-		$(document).find(".ui-state-highlight").children("td[aria-describedby='jqGrid_outputVal']").each(function() {
-			var outputValLen = $(this).text().trim().length;
-			var outputHashMatch = $(this).text().match("##");
-			if(outputValLen != 0 &&  outputHashMatch != null)
-			{
-				for(i=0; i<myData.length; i++){
-					if(($.inArray(myData[i].stepNo, (selectedRowIds) ) != -1 && myData[i].outputVal != "")) {
-						if(myData[i].outputVal.match("##") == '##' && myData[i].outputVal.length > 2)
-						{
-							var lastThree = myData[i].outputVal.substr(myData[i].outputVal.length - 3);
-							if (lastThree == ";##")
-							{
-								myData[i].outputVal = 	myData[i].outputVal.replace(lastThree,"");
-								$("#jqGrid").trigger("reloadGrid");
-							}
-						}
-						else if(myData[i].outputVal.match("##") == '##' && myData[i].outputVal.length == 2){
-							var lastTwo = myData[i].outputVal.substr(myData[i].outputVal.length - 2);
-							myData[i].outputVal = 	myData[i].outputVal.replace(lastTwo,"");
-							$("#jqGrid").trigger("reloadGrid");
-						}						
-					}
-					else if(($.inArray(myData[i].stepNo, (selectedRowIds.map(String)) ) != -1 && myData[i].outputVal != "")) {
-						if(myData[i].outputVal.match("##") == '##' && myData[i].outputVal.length > 2)
-						{
-							var lastThree = myData[i].outputVal.substr(myData[i].outputVal.length - 3);
-							if (lastThree == ";##")
-							{
-								myData[i].outputVal = 	myData[i].outputVal.replace(lastThree,"");
-								$("#jqGrid").trigger("reloadGrid");
-							}
-						}
-						else if(myData[i].outputVal.match("##") == '##' && myData[i].outputVal.length == 2){
-							var lastTwo = myData[i].outputVal.substr(myData[i].outputVal.length - 2);
-							myData[i].outputVal = 	myData[i].outputVal.replace(lastTwo,"");
-							$("#jqGrid").trigger("reloadGrid");
-						}
-					}
-				}
-			}
-		});
+		$("#globalModal").find('.modal-title').text("Skip Testcase step");
+		$("#globalModal").find('.modal-body p').text("Please select step to skip").css('color','black');
+		$("#globalModal").modal("show");
 	}
 }
 

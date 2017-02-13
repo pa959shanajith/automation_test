@@ -262,6 +262,25 @@
 }
 
 
+.scroll-wrapper > .scrollbar-screenshotTs{
+       padding: 0px;
+       height: auto !important;
+       min-height: auto !important;
+       max-height: 650px !important;
+}
+.scroll-wrapper.scrollbar-screenshotTs {
+   /*  height: calc(100% - 350px); */
+    margin-bottom: 1%;
+}
+.scrollbar-screenshotTs > .scroll-element.scroll-y .scroll-bar{
+       background: #321e4f
+}
+.scrollbar-screenshotTs > .scroll-element .scroll-element_track{
+       background: rgb(211, 211, 211)
+}
+
+
+
 .scroll-wrapper.pluginTask {
 	height: calc(100% - 65px);
 }
@@ -349,6 +368,23 @@
 }
 
 
+.scroll-wrapper > .scrollbar-inner-report{
+	padding: 0px;
+	height: auto !important;
+	min-height: auto !important;
+	max-height: 100% !important;
+}
+.scroll-wrapper.scrollbar-inner-report {
+	min-height:128px !important;
+    max-height:400px !important;
+    margin-bottom: 1%;
+}
+.scrollbar-inner-report > .scroll-element.scroll-y .scroll-bar{
+	background: #321e4f
+}
+.scrollbar-inner-report > .scroll-element .scroll-element_track{
+	background: rgb(211, 211, 211)
+}
 
 /**********Custom Media Queries**********/
 @media screen and (max-height:675px){
