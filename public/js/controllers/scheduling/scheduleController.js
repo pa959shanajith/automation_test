@@ -10,6 +10,13 @@ mySPA.controller('scheduleController',['$scope','$http','$timeout','$location','
     //Task Listing
     loadUserTasks()
     
+    //Loading Project Info
+	var getProjInfo = JSON.parse(window.localStorage['_T'])
+	$("#page-taskName").empty().append('<span>'+JSON.parse(window.localStorage['_T']).taskName+'</span>')
+	$(".projectInfoWrap").empty()
+	$(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">Project :</span><span class="content">'+getProjInfo.projectName+'</span></p><p class="proj-info-wrap"><span class="content-label">Module :</span><span class="content">'+getProjInfo.moduleName+'</span></p><p class="proj-info-wrap"><span class="content-label">Screen :</span><span class="content">'+getProjInfo.screenName+'</span></p>')
+	//Loading Project Info
+    
     
     //Sample JSON to load Test Suite Data
     var testSuiteData = [{

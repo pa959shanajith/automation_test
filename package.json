@@ -9,6 +9,7 @@
   "author": "",
   "license": "",
   "dependencies": {
+    "async": "^2.1.4",
     "callback": "0.0.1",
     "cassandra-driver": "^3.1.6",
     "good": "^7.1.0",

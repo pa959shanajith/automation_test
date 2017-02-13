@@ -101,13 +101,13 @@ function loadUserTasks(){
 			$(".task-content-inner").append('<div class="panel panel-default"><div class="panel-heading"><h4 class="panel-title"><div class="collapse-head" data-toggle="collapse" data-parent="#accordion" href="#collapse'+i+'"><span class="taskNo">Task '+ counter +'</span><!--Addition--><div class="panel-additional-details"><span class="panel-task-directory">'+tasksJson[i].Task_Type+'</span><span class="panel-head-details details-design-task">Details <span class="caret caret-absolute"></span></span></div><!--Addition--></div></h4></div><div id="collapse'+i+'" class="panel-collapse collapse"><div class="panel-body"><span class="assignedTaskInner" data-apptype="'+tasksJson[i].Node_Type+'" data-projectname="'+tasksJson[i].Project_Name+'" data-modulename="'+tasksJson[i].Module_Name+'" data-name="'+tasksJson[i].Sub_Task+'" data-moduleid="'+tasksJson[i].ModuleID+'" data-screenid="'+tasksJson[i].screenID+'"  data-screenname="'+tasksJson[i].screenName+'" data-testcaseid="'+tasksJson[i].testCaseId+'" data-testcasename="'+tasksJson[i].testCaseName+'" data-taskname="'+tasksJson[i].Task_Name+'" onclick="taskRedirectionInner(this.dataset.projectname, this.dataset.modulename, this.dataset.name, this.dataset.moduleid, this.dataset.screenid, this.dataset.screenname, this.dataset.testcaseid, this.dataset.testcasename, this.dataset.apptype, this.dataset.taskname)">'+tasksJson[i].Task_Name+'</span></div></div></div>').fadeIn()
 		} 
     	else if(tasksJson[i].Task_Type == "Execution"){
-    		$(".task-content-inner").append('<div class="panel panel-default"><div class="panel-heading"><h4 class="panel-title"><div class="collapse-head" data-toggle="collapse" data-parent="#accordion" href="#collapse'+i+'"><span class="taskNo">Task '+ counter +'</span><!--Addition--><div class="panel-additional-details"><span class="panel-task-directory">'+tasksJson[i].Task_Type+'</span><span class="panel-head-details details-execute-task">Details <span class="caret caret-absolute"></span></span></div><!--Addition--></div></h4></div><div id="collapse'+i+'" class="panel-collapse collapse"><div class="panel-body"><span class="assignedTaskInner" data-name="'+tasksJson[i].Sub_Task+'" onclick="taskRedirectionInner(this.dataset.name)">'+tasksJson[i].Task_Name+'</span></div></div></div>').fadeIn()
+    		$(".task-content-inner").append('<div class="panel panel-default"><div class="panel-heading"><h4 class="panel-title"><div class="collapse-head" data-toggle="collapse" data-parent="#accordion" href="#collapse'+i+'"><span class="taskNo">Task '+ counter +'</span><!--Addition--><div class="panel-additional-details"><span class="panel-task-directory">'+tasksJson[i].Task_Type+'</span><span class="panel-head-details details-execute-task">Details <span class="caret caret-absolute"></span></span></div><!--Addition--></div></h4></div><div id="collapse'+i+'" class="panel-collapse collapse"><div class="panel-body"><span class="assignedTaskInner" data-apptype="'+tasksJson[i].Node_Type+'" data-projectname="'+tasksJson[i].Project_Name+'" data-modulename="'+tasksJson[i].Module_Name+'" data-name="'+tasksJson[i].Sub_Task+'" data-moduleid="'+tasksJson[i].ModuleID+'" data-screenid="'+tasksJson[i].screenID+'"  data-screenname="'+tasksJson[i].screenName+'" data-testcaseid="'+tasksJson[i].testCaseId+'" data-testcasename="'+tasksJson[i].testCaseName+'" data-taskname="'+tasksJson[i].Task_Name+'" data-cycleid="'+tasksJson[i].CycleId+'" data-testsuiteid="'+tasksJson[i].TestSuiteId+'" data-testsuitename="'+tasksJson[i].TestSuiteName+'" onclick="taskRedirectionInner(this.dataset.projectname, this.dataset.modulename, this.dataset.name, this.dataset.moduleid, this.dataset.screenid, this.dataset.screenname, this.dataset.testcaseid, this.dataset.testcasename, this.dataset.apptype, this.dataset.taskname, this.dataset.cycleid, this.dataset.testsuiteid, this.dataset.testsuitename)">'+tasksJson[i].Task_Name+'</span></div></div></div>').fadeIn()
     	}
 		counter++
     }
 }
 
-function taskRedirectionInner(projectname, modulename, path, moduleId, screenId, screenName, testCaseId, testCaseName, apptype, taskname){
+function taskRedirectionInner(projectname, modulename, path, moduleId, screenId, screenName, testCaseId, testCaseName, apptype, taskname, cycleId, testSuiteId, testSuiteName){
 	var taskObj = {};
 	taskObj.projectName = projectname,
 	taskObj.moduleName = modulename,
@@ -118,6 +118,9 @@ function taskRedirectionInner(projectname, modulename, path, moduleId, screenId,
 	taskObj.testCaseName = testCaseName;
 	taskObj.appType = apptype;
 	taskObj.taskName = taskname;
+	taskObj.cycleId = cycleId;
+	taskObj.testSuiteId = testSuiteId;
+	taskObj.testSuiteName = testSuiteName
 	window.localStorage['_T'] = JSON.stringify(taskObj)
 	if(path == "Screen") 			window.location.pathname = "/design"
     else if(path == "TestCase")	window.location.pathname = "/designTestCase"
