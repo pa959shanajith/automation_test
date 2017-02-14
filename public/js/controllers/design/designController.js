@@ -64,7 +64,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					//window.localStorage['newTestScriptDataList'] = data2.view;
 					//$scope.newTestScriptDataLS = recievedData[0].view;
 					$("#window-scrape-screenshotTs .popupContent").empty()
-					$("#window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrapeTS"><img id="screenshotTS" src="data:image/PNG;base64,'+data2[0].mirror+'" /></div>')
+					$("#window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrapeTS"><img id="screenshotTS" src="data:image/PNG;base64,'+data2.mirror+'" /></div>')
 					
 					// service call # 3 -objectType service call
 					/*DesignServices.getObjectType()
