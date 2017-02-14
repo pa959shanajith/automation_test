@@ -76,6 +76,7 @@ module.exports = {
 				
 				var json1 = JSON.parse(json);
 				var executionId = uuid();
+				var starttime = new Date().getTime();
 				async.forEachSeries(json1,function(itr,callback3){
 					scenarioIdList.push(itr.scenarioids);
 					dataparamlist.push(itr.dataParam);
@@ -107,13 +108,14 @@ module.exports = {
 //					console.log(JSON.stringfy(testsuitedetails));
 					var ip = req.headers['x-forwarded-for'] || req.info.remoteAddress;
 					var mySocket =  myserver.allSocketsMap[ip];
-
+					//mySocket._events.result_executeTestSuite = [];               						
+					//mySocket.send(data);
 					mySocket.emit('executeTestSuite',testsuitedetails);
 					mySocket.on('result_executeTestSuite', function(resultData){
 
 						console.log(resultData);
-						//if(resultData !="success"){
-							var scenarioid =resultData.scenarioId;
+						if(resultData !="success" && resultData != "terminate"){
+						var scenarioid =resultData.scenarioId;
 						var executionid = resultData.executionId;
 						var reportdata = resultData.reportData; 
 						var req_report = resultData.reportdata;
@@ -123,13 +125,18 @@ module.exports = {
 
 						var insertReport = "INSERT INTO reports (reportid,executionid,testsuiteid,testscenarioid,browser,modifiedon,status,report) VALUES (" + uuid() + "," + executionid + "," + testsuiteid + ","
                			 + scenarioid + ",'" + req_browser + "'," + new Date().getTime() + ",'" + resultData.reportData.overallstatus[0].overallstatus + "','" + JSON.stringify(reportdata)  +"')";
-						var dbquery =		dbConnICE.execute(insertReport, function (err, result) {if (err) {flag ="fail"; callback3(null, flag);}else {flag = "success";callback3(null, flag);}});
+						var dbquery =	dbConnICE.execute(insertReport, function (err, result) {if (err) {flag ="fail";}else {flag = "success";}});
 
+						var insertIntoExecution = "INSERT INTO execution (testsuiteid,executionid,starttime,endtime) VALUES ("
+						+testsuiteid+","+executionid+","+starttime+","+new Date().getTime()+");"
+						var dbqueryexecution =	dbConnICE.execute(insertIntoExecution, function (err, resultexecution) {if (err) {flag ="fail";}else {flag = "success";}});
 						console.log("this is the value:",resultData);
-						return reply("success");
-						//}
+
+						}
+						if(resultData =="success" || resultData == "terminate")
+						return reply(resultData);
 						
-					});
+					} );
 
 				});
 			}
