@@ -160,11 +160,17 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 			ExecutionService.ExecuteTestSuite_ICE(selectedRowData, browserTypeExe, testSuiteId)
 			.then(function(data){
 				unblockUI()
-				$('.executeBtn').prop("disabled", false);
+				$('#executionCompleted').modal('show');
+				$(".selectBrowser").find("img").removeClass("sb");
+				browserTypeExe = [];
 				angular.element(document.getElementById("left-nav-section")).scope().readTestSuite_ICE()
 			},
 			function(error){ 
 				unblockUI()
+				$('#executionFailed').modal('show');
+				$(".selectBrowser").find("img").removeClass("sb");
+				browserTypeExe = [];
+				angular.element(document.getElementById("left-nav-section")).scope().readTestSuite_ICE()
 				console.log("Failed to Execute")
 			})
 		}
