@@ -124,7 +124,6 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 		ExecutionService.updateTestSuite_ICE(cycleId, testSuiteId, testSuiteName, testScenarioIds, executeStatus, conditionCheck, getParamPaths, userinfo)
 		.then(function(data) {
 			if(data != "fail"){
-				$(".executeBtn").prop("disabled", false)
 				$("#saveSuitesModal").modal("show")
 				angular.element(document.getElementById("left-nav-section")).scope().readTestSuite_ICE();
 			}
@@ -161,6 +160,8 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 			ExecutionService.ExecuteTestSuite_ICE(selectedRowData, browserTypeExe, testSuiteId)
 			.then(function(data){
 				unblockUI()
+				$('.executeBtn').prop("disabled", false);
+				angular.element(document.getElementById("left-nav-section")).scope().readTestSuite_ICE()
 			},
 			function(error){ 
 				unblockUI()

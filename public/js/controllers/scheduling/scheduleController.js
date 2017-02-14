@@ -95,7 +95,7 @@ mySPA.controller('scheduleController',['$scope','$http','$timeout','$location','
 	
 	
 	//Select Browser Function
-	$(document).on("click", ".selectBrowser", function(){
+	$(document).on("click", ".selectBrowserSc", function(){
 		$(this).find("img").toggleClass("sb")
 	})
 	//Select Browser Function

@@ -1360,7 +1360,7 @@ body {
     -webkit-border-radius: 0px 4px 2px 0px;
     cursor:pointer;
 }
-.selectBrowser{
+.selectBrowser, .selectBrowserSc{
 	cursor: pointer;
 }
 .sb{
