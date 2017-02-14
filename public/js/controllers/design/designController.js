@@ -279,7 +279,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 	};*/
 	
 	//Import Test case
-	/*$scope.importTestCase=function(){
+	$scope.importTestCase=function(){
 		var counter1 = 0;
 		var userInfo = JSON.parse(window.localStorage['_UI']);
 		var taskInfo = JSON.parse(window.localStorage['_T']);
@@ -290,28 +290,19 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		var flag = false;
 		var defaultTestScript='[{"stepNo":"1","custname":"","objectName":"","keywordVal":"","inputVal":"","outputVal":"","url":"","_id_":"","appType":"Generic"}]';
 		if(readTestCaseData == defaultTestScript){
-			$("#fileInputJson").attr("type","file");
-			$("#fileInputJson").trigger("click");
-			var input = document.getElementById("fileInputJson");
-			input.click()
-//			input.onclick = function () {
-//			    alert("Opening")
-//			};
-
-			input.onchange = function () {
-			    alert(this.value);
-			};
-			input.addEventListener('change', function(e) {
+			$("#importTestCaseFile").attr("type","file");
+			$("#importTestCaseFile").trigger("click");
+			importTestCaseFile.addEventListener('change', function(e) {
 				if(counter1 == 0){
 					// Put the rest of the demo code here.
-					var file = input.files[0];
-					var textType = /json.*;
+					var file = importTestCaseFile.files[0];
+					var textType = /json.*/;
 					var reader = new FileReader();
 					reader.onload = function(e) {
 						if((file.name.split('.')[file.name.split('.').length-1]).toLowerCase() == "json"){
-							var resultString = reader.result;
+							var resultString = JSON.parse(reader.result);
 							for(i = 0; i < resultString.length; i++){
-								if(resultString[i].appType == appType || resultString[i].appType.toLowerCase() == "generic"){
+								if(resultString[i].appType == appType || resultString[i].hasOwnProperty("comments") || resultString[i].appType.toLowerCase() == "generic"){
 									flag = true;
 								}else flag = false;
 							}
@@ -324,17 +315,14 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 								DesignServices.updateTestCase_ICE(screenId,testCaseId,testCaseName,resultString,userInfo)
 								.then(function(data) {
 									if (data == "Success") {
+										angular.element(document.getElementById("tableActionButtons")).scope().readTestCase_ICE();
 						                $("#globalModal").find('.modal-title').text("Import Of JSON file");
 						                $("#globalModal").find('.modal-body p').text("TestCase Json imported successfully.").css('color','black');
 										$("#globalModal").modal("show");
-										showDialogMesgsBtn("Import Of JSON file", "TestScript Json imported successfully. Click on testscripts to reload", "btnImportTestScriptOk");
-										$.unblockUI();
 									} else {
 										$("#globalModal").find('.modal-title').text("Fail");
 						                $("#globalModal").find('.modal-body p').text("Please Check the file format you have uploaded!").css('color','black');
 										$("#globalModal").modal("show");
-										showDialogMesgs("Fail", "<img src='imgs/Warning.png' style='width: 24px; height: 24px;'><br/>Please Check the file format you have uploaded!");
-										$.unblockUI();
 									}
 								}, function(error) {
 								});
@@ -357,71 +345,102 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			$("#globalModalYesNo").find('.modal-body p').text("Import will erase your old data. Do you want to continue??").css('color','black');
 			$("#globalModalYesNo").find('.modal-footer button:nth-child(1)').attr("id","btnImportEmptyErrorYes")
 			$("#globalModalYesNo").modal("show");
-			//showDialogMesgsYesNo("Table Consists of Data", "Import will erase your old data. Do you want to continue??", "btnImportEmptyErrorYes", "btnImportEmptyErrorNo")
 		}
-	}*/
+	}
 	
-	/*$(document).on('click', '#btnImportEmptyErrorYes', function(){
+	$(document).on('click', '#btnImportEmptyErrorYes', function(){
+		$("#globalModalYesNo").modal("hide");
 		var counter2 = 0;
+		$("#overWriteJson").trigger("click");
+		overWriteJson.addEventListener('change', function(e) {
+			if(counter2 == 0){
+				// Put the rest of the demo code here.
+				var file = overWriteJson.files[0];
+				var textType = /json.*/;
+				var reader = new FileReader();
+				reader.onload = function(e) {
+					if((file.name.split('.')[file.name.split('.').length-1]).toLowerCase() == "json"){
+						var resultString = JSON.parse(reader.result);
+						DesignServices.updateTestCase_ICE(screenId,testCaseId,testCaseName,resultString,userInfo)
+						.then(function(data) {
+									if (data == "success") {
+										angular.element(document.getElementById("tableActionButtons")).scope().readTestCase_ICE();
+						                $("#globalModal").find('.modal-title').text("Import Of JSON file");
+						                $("#globalModal").find('.modal-body p').text("TestCase Json imported successfully.").css('color','black');
+										$("#globalModal").modal("show");
+									} else {
+										$("#globalModal").find('.modal-title').text("Fail");
+						                $("#globalModal").find('.modal-body p').text("Please Check the file format you have uploaded!").css('color','black');
+										$("#globalModal").modal("show");
+									} /*else if (data == "appTypeError"){
+										showDialogMesgsBtn("App Type Error", "Project application type and Imported JSON application type doesn't match, please check!!", "btnAppTypeErrorOk");
+										$.unblockUI();
+									}	*/											
+								}, function(error) {
+						});
+					}
+					else{
+						$("#globalModal").find('.modal-title').text("Fail");
+		                $("#globalModal").find('.modal-body p').text("Please Check the file format you have uploaded!").css('color','black');
+						$("#globalModal").modal("show");
+					}					
+				}
+				reader.readAsText(file);
+				counter2 = 1;
+				$("#overWriteJson").val('');
+			}
+		});
+	})
+	
+	$("#overWriteJson").on("click", function(){
+		angular.element(document.getElementById("left-bottom-section")).scope().importTestCase1();
+	})
+	//Import Testcase1
+	$scope.importTestCase1=function(){
+		var counter = 0;
 		var userInfo = JSON.parse(window.localStorage['_UI']);
 		var taskInfo = JSON.parse(window.localStorage['_T']);
 		var screenId = taskInfo.screenId;
 		var testCaseId = taskInfo.testCaseId;
 		var testCaseName = taskInfo.testCaseName;
 		var appType = taskInfo.appType;
-		var flag = false;
-		$("#importOverWriteJson").trigger("click");
-		importOverWriteJson.addEventListener('change', function(e) {
-			if(counter2 == 0){
+		overWriteJson.addEventListener('change', function(e) {
+			if(counter == 0){
 				// Put the rest of the demo code here.
 				var file = overWriteJson.files[0];
-				var textType = /json.*;
+				var textType = /json.*/;
 				var reader = new FileReader();
-				reader.onload = function(e) {
-					if((file.name.split('.')[file.name.split('.').length-1]).toLowerCase() == "json"){
-						var resultString = reader.result;
-						for(i = 0; i < resultString.length; i++){
-							if(resultString[i].appType == appType || resultString[i].appType.toLowerCase() == "generic"){
-								flag = true;
-							}else flag = false;
-						}
-						if (flag == false){
-							$("#globalModal").find('.modal-title').text("App Type Error");
-			                $("#globalModal").find('.modal-body p').text("Project application type and Imported JSON application type doesn't match, please check!!").css('color','black');
-							$("#globalModal").modal("show");
-						}
-						else{
-							DesignServices.updateTestCase_ICE(screenId,testCaseId,testCaseName,resultString,userInfo)
-							.then(function(data) {
-								if (data == "Success") {
-					                $("#globalModal").find('.modal-title').text("Import Of JSON file");
-					                $("#globalModal").find('.modal-body p').text("TestCase Json imported successfully.").css('color','black');
-									$("#globalModal").modal("show");
-									showDialogMesgsBtn("Import Of JSON file", "TestScript Json imported successfully. Click on testscripts to reload", "btnImportTestScriptOk");
-									$.unblockUI();
-								} else {
-									$("#globalModal").find('.modal-title').text("Fail");
-					                $("#globalModal").find('.modal-body p').text("Please Check the file format you have uploaded!").css('color','black');
-									$("#globalModal").modal("show");
-									showDialogMesgs("Fail", "<img src='imgs/Warning.png' style='width: 24px; height: 24px;'><br/>Please Check the file format you have uploaded!");
-									$.unblockUI();
-								}
-							}, function(error) {
-							});
-						}
-					}
-					else{
-						$("#globalModal").find('.modal-title').text("Fail");
-		                $("#globalModal").find('.modal-body p').text("Please Check the file format you have uploaded!").css('color','black');
-						$("#globalModal").modal("show");
-					}
+				if((file.name.split('.')[file.name.split('.').length-1]).toLowerCase() == "json"){
+					reader.onload = function(e) {
+						var resultString = JSON.parse(reader.result);
+						DesignServices.updateTestCase_ICE(screenId,testCaseId,testCaseName,resultString,userInfo)
+						.then(function(data) {
+							if (data == "Success") {
+								angular.element(document.getElementById("tableActionButtons")).scope().readTestCase_ICE();
+								$("#globalModal").find('.modal-title').text("Import Of JSON file");
+				                $("#globalModal").find('.modal-body p').text("TestCase Json imported successfully.").css('color','black');
+								$("#globalModal").modal("show");
+							} else {
+								$("#globalModal").find('.modal-title').text("Fail");
+				                $("#globalModal").find('.modal-body p').text("Please Check the file format you have uploaded!").css('color','black');
+								$("#globalModal").modal("show");
+							} /*else if (data == "appTypeError"){
+								showDialogMesgsBtn("App Type Error", "Project application type and Imported JSON application type doesn't match, please check!!", "btnAppTypeErrorOk");
+								$.unblockUI();
+							}*/												
+						}, function(error) {});					
+					}	
+					reader.readAsText(file);
 				}
-				reader.readAsText(file);
-				counter2 = 1;
-				$("#importOverWriteJson").val('');
-			}
+				else{
+					$("#globalModal").find('.modal-title').text("Fail");
+	                $("#globalModal").find('.modal-body p').text("Please Check the file format you have uploaded!").css('color','black');
+					$("#globalModal").modal("show");
+				}
+				counter = 1;
+			}				
 		});
-	})*/
+	}
 	//Import Test case
 	
 	//Export Test case
@@ -1170,8 +1189,8 @@ function contentTable(newTestScriptDataLS) {
 		        		   }]
 		        	   }
 		           },
-		           { label: 'Input', name: 'inputVal', editable: true,  resizable:false, sortable:false },
-		           { label: 'Output', name: 'outputVal', editable: true,  resizable:false, sortable:false },
+		           { label: 'Input', name: 'inputVal', classes:'singleInvitedComma', editable: true,  resizable:false, sortable:false },
+		           { label: 'Output', name: 'outputVal', classes:'singleInvitedComma', editable: true,  resizable:false, sortable:false },
 		           { label: 'Remarks', name:'remarksStatus', editable: false,  resizable:false, sortable:false},
 		           { label: 'Remarks', name: 'remarks', editable: false,  resizable:false, sortable:false, hidden:true},
 		           { label: 'URL', 	name: 'url', editable: false, resizable:false, hidden:true },
@@ -1200,11 +1219,14 @@ function contentTable(newTestScriptDataLS) {
 		           autoencode: true,
 		           scrollrows : true,
 		           loadComplete: function() {
+		        	   $("#jqGrid tr[id^='jqg']").remove();
 		        	   $("#jqGrid tr").each(function(){
 		        		   if($(this).find("td:nth-child(10)").text().trim().length <= 0){
+		        			   $(this).find("td:nth-child(9)").text('');
 		        			   $(this).find("td:nth-child(9)").append('<img src="imgs/ic-remarks-inactive.png" class="remarksIcon"/>');
 		        		   }
 		        		   else{
+		        			   $(this).find("td:nth-child(9)").text('');
 		        			   $(this).find("td:nth-child(9)").append('<img src="imgs/ic-remarks-active.png" class="remarksIcon"/>');
 		        		   }
 		        	   })
