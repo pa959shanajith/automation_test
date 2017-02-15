@@ -295,7 +295,7 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 		//					console.log(JSON.stringfy(testsuitedetails));
 		var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 		var mySocket = myserver.allSocketsMap[ip];
-
+		mySocket._events.result_executeTestSuite = [];
 		mySocket.emit('executeTestSuite', testsuitedetails);
 		mySocket.on('result_executeTestSuite', function (resultData) {
 

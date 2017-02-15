@@ -376,7 +376,8 @@ exports.debugTestCase_ICE = function (req, res) {
 				responsedata.push(browsertypeobject);
 				var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 				var mySocket = myserver.allSocketsMap[ip];
-				mySocket.send(responsedata);
+				mySocket._events.result_debugTestCase = [];
+				mySocket.emit('debugTestCase',responsedata);
 				mySocket.on('result_debugTestCase', function (responsedata) {
 					res.send("success");
 				});
