@@ -5,6 +5,11 @@
  * 2014-09-03
  * 
  */
+var editedList = {};
+var modifiedCustNames =[];
+var xpathListofCustNames = [];
+var oldCustName = [];
+
 (function ( $ ) {
 
 	$.fn.scrapTree = function(options) {
@@ -142,6 +147,13 @@
 			        	        		else { 
 			        	        			window.localStorage['checkEditWorking'] = "true";
 			        	        			span.text($(this).val()).removeClass('content-hide');
+											oldCustName.push($(this)[0].defaultValue);
+			        	        		    modifiedCustNames.push($(this)[0].value);
+			        	        		    xpathListofCustNames.push($(this).parent().parent().attr("data-xpath"));
+			        	        		    editedList.modifiedCustNames = modifiedCustNames;
+			        	        		    editedList.xpathListofCustNames = xpathListofCustNames;
+											editedList.oldCustName = oldCustName;
+			        	        		    window.localStorage['_modified'] = JSON.stringify(editedList);
 			        	        		}
 			        	        		$(this).remove();
 		        	        		} else{

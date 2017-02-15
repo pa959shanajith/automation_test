@@ -141,3 +141,16 @@ function unblockUI(){
 	$("#overlayContainer").fadeOut(300).remove()
 }
 //Function to Block UI
+
+$(document).on('keypress', '.singleInvitedComma', function(e){
+	if(e.charCode == 39) return false;
+	else return true;
+}).blur(function(){
+	var reg = /^[']+$/;
+	if(!reg.test($(this).val())){
+		return false;
+	}else{
+		$(this).val('');
+		return true;
+	}
+})

@@ -41,9 +41,10 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		var taskInfo = JSON.parse(window.localStorage['_T']);
 		var screenId = taskInfo.screenId;
 		var testCaseId = taskInfo.testCaseId;
+		var testCaseName = taskInfo.testCaseName;
 		enabledEdit = "false"
 			// service call # 1 - getTestScriptData service call
-			DesignServices.readTestCase_ICE(screenId, testCaseId)	
+			DesignServices.readTestCase_ICE(screenId, testCaseId, testCaseName)	
 			.then(function(data) {
 				console.log(data);
 				var appType = taskInfo.appType;
@@ -726,20 +727,26 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		}
 	}
 
-	//To delete Scrape Objects 
+//To delete Scrape Objects 
 	$scope.del_Objects = function() 
 	{
 		$("#deleteObjectsModal").modal("hide")
 		var userinfo = JSON.parse(window.localStorage['_UI']);
 		var tasks = JSON.parse(window.localStorage['_T']);
+		var delList = {};
 		var deletedCustNames = [];
+		var deletedCustPath = [];
+
 		var checkCondLen = $("#scraplist li").children('a').find('input[type=checkbox].checkall:checked').length;
 		if(checkCondLen > 0)
 		{		
    		 $('input[type=checkbox].checkall:checked').each(function() {
    			 
-   			deletedCustNames.push($(this).parent().next('span.ellipsis').text()+"!"+ $(this).parent().parent().parent("li").attr('data-xpath'));
+   			deletedCustNames.push($(this).parent().next('span.ellipsis').text());
+   			deletedCustPath.push($(this).parent().parent().parent("li").attr('data-xpath'));
    		});	
+   		delList.deletedCustName = deletedCustNames;
+   		delList.deletedXpath = deletedCustPath;
    		 //console.log(deletedCustNames);
 		}
 		//console.log("Delete", viewString);
@@ -748,11 +755,11 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 	    var screenName = tasks.screenName;
 		scrapeObject = {};
 		scrapeObject.param = 'deleteScrapeData_ICE';
-		scrapeObject.view = JSON.stringify(viewString);
+		scrapeObject.getScrapeData = viewString;
 	   	scrapeObject.moduleId = moduleId;
 	    scrapeObject.screenId = screenId;
 	    scrapeObject.screenName = screenName;
-		scrapeObject.deletedObjectsList = deletedCustNames;
+		scrapeObject.deletedList = delList;
 		scrapeObject.userinfo = userinfo;
 		DesignServices.updateScreen_ICE(scrapeObject)
 		.then(function(data) {
@@ -775,7 +782,6 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 
 		});
 	}
-
 	//Highlight Element on browser
 	$scope.highlightScrapElement = function(xpath,url) {
 		if(enableScreenShotHighlight == true){
@@ -860,19 +866,17 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 	};
 	//Highlight Element on browser
 
-	//Save ScrapeData Objects into Database
+	//Save Scrape Objects
 	$(document).on('click', "#saveObjects", function(){
 		
 		var tasks = JSON.parse(window.localStorage['_T']);
 		if(eaCheckbox) var getScrapeData = JSON.stringify(newScrapedList);
 		else var getScrapeData = JSON.stringify(viewString);
-		
-		//var getScrapeData = angular.toJson(screenshotObj);
+
 		var moduleId = tasks.moduleId;
 		var screenId = tasks.screenId;
 		var screenName = tasks.screenName;
-		var userinfo = JSON.parse(window.localStorage['_UI']);		
-		
+		var userinfo = JSON.parse(window.localStorage['_UI']);
 		scrapeObject = {};
 		scrapeObject.getScrapeData = getScrapeData;
 		scrapeObject.moduleId = moduleId;
@@ -880,41 +884,47 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		scrapeObject.screenName = screenName;
 		scrapeObject.userinfo = userinfo;
 		scrapeObject.param = "updateScrapeData_ICE";
-		scrapeObject.appType = "Web";		
-//		if(window.localStorage['checkEditWorking'] == "true")
-//		{
-//			console.log("inside edit");
-//			var currlistItems = [];
-//        	var modifiedListItems = [];
-//        	var screenId = tasks.screenId;
-//        	var userinfo = JSON.parse(window.localStorage['_UI']);
-//        	var getScrapeData = angular.toJson(viewString);
-//        	getScrapeData = JSON.parse(getScrapeData);
-//        	scrapeObject = {};
-//        	scrapeObject.moduleId = moduleId;
-//    		scrapeObject.screenId = screenId;
-//    		scrapeObject.screenName = screenName;
-//    		scrapeObject.userinfo = userinfo;
-//        	scrapeObject.param = "editScrapeData_ICE";
-//        	scrapeObject.appType = "Web";
-//        	for(i=0; i<getScrapeData.view.length; i++){
-//        		currlistItems.push(getScrapeData.view[i].custname);
-//        	}
-//        	var modList = [];
-//        	//$(".ellipsis").parent().parent().parent().remove();
-//        	$.each($(".ellipsis"), function(){            
-//    			modifiedListItems.push($(this).text());
-//    		});
-//    		for(i=0; i<modifiedListItems.length; i++){
-//    			if(modifiedListItems[i] != "" || modifiedListItems[i] != undefined){
-//    				modList.push(modifiedListItems[i])
-//    			}
-//    		}
-//		}
+		scrapeObject.appType = "Web";
+		
+		if(window.localStorage['checkEditWorking'] == "true")
+		{
+			console.log("inside edit");
+			var modifiedCust = JSON.parse(window.localStorage['_modified']);
+			var currlistItems = [];
+        	var modifiedListItems = [];
+        	var modList = [];
+        	var screenId = tasks.screenId;
+        	var userinfo = JSON.parse(window.localStorage['_UI']);
+        	getScrapeData = JSON.parse(getScrapeData);
+        	scrapeObject.moduleId = moduleId;
+    		scrapeObject.screenId = screenId;
+    		scrapeObject.screenName = screenName;
+    		scrapeObject.userinfo = userinfo;
+        	scrapeObject.param = "editScrapeData_ICE";
+        	scrapeObject.appType = "Web";
+        	for(i=0; i<getScrapeData.view.length; i++){
+        		currlistItems.push(getScrapeData.view[i].custname);
+        	}
+        	$(".ellipsis").children().parent().parent().parent().remove();
+        	$.each($(".ellipsis"), function(){            
+    			modifiedListItems.push($(this).text());
+    		});
+    		for(i=0; i<modifiedListItems.length; i++){
+    			if(modifiedListItems[i] != "" || modifiedListItems[i] != undefined){
+    				modList.push(modifiedListItems[i])
+    			}
+    		}
+    		scrapeObject.getScrapeData = getScrapeData; 
+    		scrapeObject.editedList = modifiedCust; 
+		}
+		
+		//Update Service to Save Scrape Objects
 		DesignServices.updateScreen_ICE(scrapeObject)
 		.then(function(data){
 			if(data == "success"){
+				window.localStorage['_modified'] = "";
 				enableScreenShotHighlight = true;
+				localStorage.removeItem("_modified");
 				$("#globalModal").modal("show");
 				$("#globalModal").find('.modal-title').text("Save Scraped data");
 				$("#globalModal").find('.modal-body p').text("Scraped data saved successfully.");
@@ -931,7 +941,6 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		}, function(error){})
 
 	})
-	//Save ScrapeData Objects into Database
 
 	//To Select and unSelect all objects 
 	$(document).on("click", ".checkStylebox", function(){
@@ -1167,7 +1176,7 @@ function contentTable(newTestScriptDataLS) {
 		page:1,
 		scroll:1,
 		colModel: [
-		           { label: 'Step No', 	name: 'stepNo', key:true, editable: false, sortable:false, resizable:false,  key:true, hidden: true},
+		           { label: 'Step No', 	name: 'stepNo', key:true, editable: false, sortable:false, resizable:false, hidden: true},
 		           { name: 'objectName', editable: false, sortable:false, resizable:false, hidden: true},
 		           { label: 'Object Name', name: 'custname', editable: true,  resizable:false, sortable:false, 
 		        	   edittype:'select', 
@@ -1323,6 +1332,7 @@ function contentTable(newTestScriptDataLS) {
 	
 	function hideOtherFuncOnEdit()
 	{
+	
 		$("#jqGrid").each(function() {
 			var cboxCheckedLen = $(".cbox:not(#cb_jqGrid):checked").length;
 			var cboxLen = $(".cbox:not(#cb_jqGrid)").length;
@@ -1387,7 +1397,7 @@ function contentTable(newTestScriptDataLS) {
 	}
 
 	//Enable/disable Functions on start/end of editing
-	$("#jqGrid").bind("jqGridInlineEditRow jqGridInlineAfterSaveRow jqGridInlineAfterRestoreRow", function () {
+	$("#jqGrid").bind("jqGridInlineEditRow jqGridInlineAfterSaveRow jqGridInlineAfterRestoreRow", function (e) {
 		var $self = $(this),
 		savedRows = $self.jqGrid("getGridParam", "savedRow");
 		if (savedRows.length > 0) {
