@@ -160,8 +160,13 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 			blockUI("Execution in progress. Please Wait...")
 			ExecutionService.ExecuteTestSuite_ICE(selectedRowData, browserTypeExe, testSuiteId)
 			.then(function(data){
+				if(data == "Terminate"){
+					$('#executionTerminated').modal('show');
+				}
+				else{
+					$('#executionCompleted').modal('show');
+				}
 				unblockUI()
-				$('#executionCompleted').modal('show');
 				$(".selectBrowser").find("img").removeClass("sb");
 				browserTypeExe = [];
 				angular.element(document.getElementById("left-nav-section")).scope().readTestSuite_ICE()

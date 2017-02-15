@@ -332,7 +332,7 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 		mySocket.emit('executeTestSuite', testsuitedetails);
 		mySocket.on('result_executeTestSuite', function (resultData) {
 
-			if(resultData !="success" && resultData != "terminate"){
+			if(resultData !="success" && resultData != "Terminate"){
 					var scenarioid =resultData.scenarioId;
 					var executionid = resultData.executionId;
 					var reportdata = resultData.reportData; 
@@ -351,7 +351,7 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 					//console.log("this is the value:",resultData);
 
 					}
-					if(resultData =="success" || resultData == "terminate")
+					if(resultData =="success" || resultData == "Terminate")
 					res.send(resultData);
 			
 			//}
