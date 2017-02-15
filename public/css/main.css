@@ -104,6 +104,14 @@ body {
     outline: 0;
 }
 
+.submitTaskBtn.focus,
+.submitTaskBtn,
+.submitTaskBtn:active:focus,
+.submitTaskBtn:focus,
+.submitTaskBtn:hover {
+	background:#ff7300
+}
+
 #footer {
     position: absolute;
     bottom: 0;
@@ -161,6 +169,18 @@ body {
     border-bottom: 2px solid #643693;
     width: 100%;
     font-family: LatoWeb;
+}
+
+.h4-custom-assist{
+	border: 0;
+    text-align: left;
+    cursor: auto;
+    background: #321E4F;
+    border-radius:5px 5px 0px 0px;
+    -moz-border-radius:5px 5px 0px 0px;
+    -webkit-border-radius:5px 5px 0px 0px;
+    -o-border-radius:5px 5px 0px 0px;
+    -ms-border-radius:5px 5px 0px 0px;
 }
 
 
@@ -863,6 +883,7 @@ body {
 #finalScrap {
     padding-top: 0%;
 	padding-right: 27px;
+	margin-top:25px;
     overflow: auto;
     -moz-overflow-style:none
 }
@@ -1110,6 +1131,93 @@ body {
 
 .closePopup {
     cursor: pointer;
+}
+
+.assistWrap{
+	position: fixed;
+    bottom: 46px;
+    display:none;
+    right: 97px;
+    z-index: 11;
+    text-align:left;
+    width: 360px;
+    border-radius:5px;
+    -moz-border-radius:5px;
+    -webkit-border-radius:5px;
+    -o-border-radius:5px;
+    -ms-border-radius:5px;
+}
+
+.assistContent{
+    cursor: auto;
+    display: none;
+    float: left;
+    width: 100%;
+    font-family: 'LatoWeb';
+    background:#fff;
+    padding: 15px 20px;
+    color: #333;
+    border: 1px solid #b7b7b7;
+    border-top: none;
+    border-radius: 0px 0px 5px 5px;
+    -moz-border-radius: 0px 0px 5px 5px;
+    -webkit-border-radius: 0px 0px 5px 5px;
+    -o-border-radius: 0px 0px 5px 5px;
+    -ms-border-radius: 0px 0px 5px 5px;
+}
+
+.assist-left img{
+	vertical-align: middle;
+    margin-right: 8px;
+}
+
+.assist-right{
+	
+}
+.assist-right img{
+	cursor: pointer;
+}
+
+.chatContainer{
+	float: left;
+	width: 100%;
+}
+
+.chatArea{
+	height: 200px;
+    margin-bottom: 25px;
+}
+
+.chatTextArea{
+	resize: none;
+    color: #333;
+    font-family: 'LatoWebMedium';
+    border: 1px solid #797979 !important;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.chatTextArea:focus{
+    outline: 0 !important;
+    -webkit-box-shadow: none !important;
+    -moz-box-shadow: none !important;
+    box-shadow: none !important;
+}
+
+.chatList{
+	margin: 0;
+    padding: 0;
+    float: left;
+    width: 90%;
+    list-style-type: decimal;
+}
+
+.chatList li{
+	margin-bottom: 10px
+}
+
+.animateAssistUp, .animateAssistDown{
+	padding:5px 0px
 }
 
 

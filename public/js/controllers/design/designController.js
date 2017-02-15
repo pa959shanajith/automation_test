@@ -36,6 +36,18 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 	var custnameArr = [];
 	var keywordValArr = [];
 	var proceed = false;
+	
+	//Submit Task Screen
+	$scope.submitTasksScreen = function(){
+		$("#submitTasksScreen").modal("show")
+	} 
+	//Submit Task Screen
+	
+	//Submit Tast Test Case
+	$scope.submitTasksTestCase = function(){
+		$("#submitTasksTestCase").modal("show")
+	} 
+	//Submit task Test Case
 
 	$scope.readTestCase_ICE = function()	{
 		var taskInfo = JSON.parse(window.localStorage['_T']);

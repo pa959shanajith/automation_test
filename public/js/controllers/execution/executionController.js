@@ -178,6 +178,13 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 	//Execute TestSuite Functionality
 	
 	
+	//Submit Task Function
+	$scope.submitTaskExecution = function(){
+		$("#submitTasksExecution").modal("show")
+	}
+	//Submit Task Function
+	
+	
 	//Conditiion Check Function 
 	$(".conditionCheck").each(function(){
 		if($(this).val() == 0) $(this).removeClass("alertGreen").addClass("alertRed");

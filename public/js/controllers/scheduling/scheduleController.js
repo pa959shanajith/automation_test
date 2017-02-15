@@ -100,6 +100,12 @@ mySPA.controller('scheduleController',['$scope','$http','$timeout','$location','
 	})
 	//Select Browser Function
 	
+	//Submit Task Scheduling
+	$scope.submitTaskScheduling = function(){
+		$("#submitTasksdScheduling").modal("show")
+	}
+	//Submit Task Scheduling
+	
 	
 	//Add to list and schedule
 	$scope.initSchedule = function(){

@@ -87,6 +87,25 @@ $(document).ready(function() {
 		}
 	})
 	
+	//Assist functionality
+	$(document).on("click", ".animateAssistUp", function(){
+		$(this).attr("src","imgs/ic-down.png").attr("class","animateAssistDown")
+		$(".assistContent").fadeIn()
+	})
+	
+	$(document).on("click", ".animateAssistDown", function(){
+		$(this).attr("src","imgs/ic-up.png").attr("class","animateAssistUp")
+		$(".assistContent").fadeOut(100)
+	})
+	
+	$(document).on("click", ".animateAssistClose", function(){
+		$(".assistWrap").fadeOut(100)
+	})
+	
+	$(document).on("click", ".slide_assist", function(){
+		$(".assistWrap").fadeIn(100)
+	})
+	
 });
 //Document Ready Function
 
