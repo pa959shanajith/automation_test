@@ -12,55 +12,88 @@ var dbConnICE = require('../../server/config/icetestautomation');
 //ReadTestSuite Functionality
 exports.readTestSuite_ICE = function (req, res) {
 
-	/*
-	 * base output elements
-	 */
-	var outexecutestatus = [];
-	var outcondition = [];
-	var outdataparam = [];
-	var outscenarioids = [];
-	/*
-	 * base request elements
-	 */
-	var requiredtestsuiteid = req.body.testsuiteid;
-	var requiredcycleid = req.body.cycleid;
-	/*var requiredtestsuiteid="13bbacaf-82c7-4c4a-9f91-0933462b10d4";
-	var requiredcycleid="e6e5b473-34cd-4963-9bda-cb78c727e413";*/
-	/*
-	 * complete response data
-	 */
-	var responsedata = {
-		executestatus: [],
-		condition: [],
-		dataparam: [],
-		scenarioids: []
-	};
+var outexecutestatus=[];
+		var outcondition=[];
+		var outdataparam=[];
+		var outscenarioids=[];
+		var outscenarionames = [];
+		/*
+		 * base request elements
+		 */
+		var requiredtestsuiteid=req.body.testsuiteid;
+		var requiredcycleid=req.body.cycleid;
+		/*var requiredtestsuiteid="13bbacaf-82c7-4c4a-9f91-0933462b10d4";
+		var requiredcycleid="e6e5b473-34cd-4963-9bda-cb78c727e413";*/
+		/*
+		 * complete response data
+		 */
+		var responsedata={
+				executestatus: [],
+				condition: [],
+				dataparam:[],
+				scenarioids:[],
+				scenarionames:[]
+		};
 
-	/*
-	 * Query 1 fetching the donotexecute,conditioncheck,getparampaths,testscenarioids
-	 * based on testsuiteid,testsuitename and cycleid
-	 */
+		/*
+		 * Query 1 fetching the donotexecute,conditioncheck,getparampaths,testscenarioids
+		 * based on testsuiteid,testsuitename and cycleid
+		 */
+		async.series(
+			{	
+				testsuitesdata: function(callback){
+									var getTestSuites="select donotexecute,conditioncheck,getparampaths,testscenarioids from testsuites where testsuiteid= "+requiredtestsuiteid+" and cycleid="+requiredcycleid;
+						//var getTestSuites="select donotexecute,condtitioncheck,getparampaths,testscenarioids from testsuites where testsuiteid= 13bbacaf-82c7-4c4a-9f91-0933462b10d4 AND cycleid=e6e5b473-34cd-4963-9bda-cb78c727e413 and testsuitename='Dev Suite 1'"; 
+						dbConnICE.execute(getTestSuites, function (err, result) {
+							if (err) {
+								var flag = "Error in readTestSuite_ICE : Fail";
+								cb(null, flag);
+							}else {
+								//for (var i = 0; i < result.rows.length; i++) {
+									
 
-	var getTestSuites = "select donotexecute,conditioncheck,getparampaths,testscenarioids from testsuites where testsuiteid= " + requiredtestsuiteid + " and cycleid=" + requiredcycleid;
-	//var getTestSuites="select donotexecute,condtitioncheck,getparampaths,testscenarioids from testsuites where testsuiteid= 13bbacaf-82c7-4c4a-9f91-0933462b10d4 AND cycleid=e6e5b473-34cd-4963-9bda-cb78c727e413 and testsuitename='Dev Suite 1'"; 
-	dbConnICE.execute(getTestSuites, function (err, result) {
-		if (err) {
-			var flag = "Error in readTestSuite_ICE : Fail";
-			res.send(flag);
-		} else {
-			for (var i = 0; i < result.rows.length; i++) {
-				outexecutestatus = result.rows[i].donotexecute;
-				outcondition = result.rows[i].conditioncheck;
-				outdataparam = result.rows[i].getparampaths;
-				outscenarioids = result.rows[i].testscenarioids;
-			}
-			responsedata.executestatus = outexecutestatus;
-			responsedata.condition = outcondition;
-			responsedata.dataparam = outdataparam;
-			responsedata.scenarioids = outscenarioids;
-			res.send(responsedata);
-		}
-	});
+					async.forEachSeries(result.rows, function(quest, callback2) {
+						outexecutestatus=quest.donotexecute;
+						outcondition=quest.conditioncheck;
+						outdataparam=quest.getparampaths;
+						outscenarioids=quest.testscenarioids;
+						//var responsedata={template: "",testcase:[],testcasename:""};
+
+						async.forEachSeries(outscenarioids,function(quest1,callback3){
+						var testcasestepsquery = "SELECT testscenarioname FROM testscenarios where testscenarioid="+quest1;
+								dbConnICE.execute(testcasestepsquery, function(err, answers) {
+								if(err){
+									console.log(err);
+								}else{
+									outscenarionames.push(answers.rows[0].testscenarioname);
+								}
+								callback3(); 
+							});
+						}, callback2);
+						},callback);
+						
+						
+								responsedata.executestatus=outexecutestatus;
+								responsedata.condition=outcondition;
+								responsedata.dataparam=outdataparam;
+								responsedata.scenarioids=outscenarioids;
+								responsedata.scenarionames = outscenarionames;
+								//cb(null, responsedata);
+							}
+						});
+				},
+				
+				},
+				function(err,results){
+					//data.setHeader('Content-Type','application/json');
+					if(err){
+						res.send(err);
+					} 
+					else{
+						console.log(responsedata);
+						res.send(JSON.stringify(responsedata));
+					} 
+				})
 };
 //ReadTestSuite Functionality
 
