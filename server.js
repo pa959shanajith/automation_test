@@ -76,7 +76,7 @@ socketMap[address] = socket;
 //console.log("socketMap", socketMap);
 socket.send('connected' );
 module.exports.allSocketsMap = socketMap;
-	
+server.setTimeout();
 console.log("NO OF CLIENTS CONNECTED:", io.engine.clientsCount);
 socket.on('message', function(data){
 	//console.log("SER", data);
