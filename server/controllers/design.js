@@ -61,7 +61,7 @@ exports.getScrapeDataScreenLevel_ICE = function(req, res){
 				+ req.body.screenId + " allow filtering  ";
 	dbConn.execute(getScrapeDataQuery, function(getScrapeDataQueryerr, getScrapeDataQueryresult){
 		if (getScrapeDataQueryerr) {
-			console.log("scrape data error: Fail",getScrapeDataQueryerr);
+			//console.log("scrape data error: Fail",getScrapeDataQueryerr);
 			flag="getScrapeData Fail.";
 			res.send(flag);
 		}else{
@@ -99,6 +99,7 @@ exports.updateScreen_ICE = function(req, res){
 	*/
 	scrapedObjects = JSON.stringify(scrapedObjects);
 	scrapedObjects = scrapedObjects.replace(/'+/g,"''");
+	//console.log(scrapedObjects)
 	var newParse = JSON.parse(scrapedObjects);
 	scrapedObjects=newParse;
 	if(param == "updateScrapeData_ICE"){		
@@ -130,7 +131,7 @@ exports.updateScreen_ICE = function(req, res){
 						for(var scrapedobjectindex=0;scrapedobjectindex<viewString.length;scrapedobjectindex++){
 							if(elementschanged<newCustNamesList.length){
 							if((viewString[scrapedobjectindex].xpath == xpathListofCustName[elementsindex]) 
-								&& (viewString[scrapedobjectindex].custname.replace(/\t\n|\r\n|\r/g, "") == oldCustNamesList[elementsindex])){
+								&& (viewString[scrapedobjectindex].custname == oldCustNamesList[elementsindex])){
 									viewString[scrapedobjectindex].custname=newCustNamesList[elementsindex];
 									//elementschanged increments only when edit has occured
 									elementschanged=elementschanged+1;
@@ -145,6 +146,7 @@ exports.updateScreen_ICE = function(req, res){
 		//the query here will be called only if ALL objects are identified.
 		if(elementschanged <= newCustNamesList.length){
 			scrapedObjects=JSON.stringify(scrapedObjects);
+			scrapedObjects = scrapedObjects.replace(/'+/g,"''");
 			updateScreenQuery = "update icetestautomation.screens set"+
 								" screendata ='"+ scrapedObjects +"',"+
 								" modifiedby ='" + modifiedBy + "',"+
@@ -164,32 +166,50 @@ exports.updateScreen_ICE = function(req, res){
 		* based on the custom names and xpath. 
 		*/
 		var deleteCustNames, deleteXpathNames;
-		var deleteCustNames = updateData.deletedList.deletedCustName;
-		var deleteObjectXpath = updateData.deletedList.deletedXpath;
+		deleteCustNames = updateData.deletedList.deletedCustName;
+		deleteXpathNames = updateData.deletedList.deletedXpath;
 		var elementschanged = 0;
+		var deleteAll=false;
 		var viewString = updateData.getScrapeData.view;
+		var deleteindex=[];
 		async.series([
 			function(callback){
-				for(var elementsindex=0;elementsindex<deleteObjectXpath.length;elementsindex++){
-					for(var scrapedobjectindex=0;scrapedobjectindex<viewString.length;scrapedobjectindex++){
-						if(elementschanged<deleteCustNames.length){
-							//console.log(viewString[scrapedobjectindex].custname);
-							delete viewString[scrapedobjectindex];
-							elementschanged=elementschanged+1;
+				if(viewString.length == deleteXpathNames.length){
+					deleteAll=true;
+					viewString=[];
+				}
+				if(!deleteAll){
+					for(var elementsindex=0;elementsindex<deleteXpathNames.length;elementsindex++){
+						for(var scrapedobjectindex=0;scrapedobjectindex<viewString.length;scrapedobjectindex++){
+							//console.log(scrapedobjectindex,"---",viewString[scrapedobjectindex].custname,"====",deleteCustNames[elementsindex]);
+							if((viewString[scrapedobjectindex].xpath == deleteXpathNames[elementsindex]) 
+									&& (viewString[scrapedobjectindex].custname == deleteCustNames[elementsindex])){
+								if(elementschanged<deleteCustNames.length){
+									//console.log(viewString[scrapedobjectindex].custname);
+									deleteindex.push(scrapedobjectindex);
+									elementschanged=elementschanged+1;
+								}
+							}
 						}
 					}
+					for(var deletingelementindex=0;deletingelementindex<deleteindex.length;deletingelementindex++){
+						delete viewString[deleteindex[deletingelementindex]];
+					}
+					//delete is not recommended as the index stays empty after using delete on array.
+					//hence performing the below action
+					//removing null values from the array JSON
+					viewString =  viewString.filter(function(n){ return n != null });
 				}
-				//delete is not recommended as the index stays empty after using delete on array.
-				//hence performing the below action
-				//removing null values from the array JSON
-				viewString =  viewString.filter(function(n){ return n != null });
+				
+			
 				scrapedObjects.view=viewString;
 				callback(null,scrapedObjects);
 			}
 		]);
 		//this query will be called only if ALL objects are identified.
-		if(elementschanged<=deleteObjectXpath.length){
+		if(elementschanged<=deleteXpathNames.length){
 			scrapedObjects=JSON.stringify(scrapedObjects);
+			scrapedObjects = scrapedObjects.replace(/'+/g,"''");
 			updateScreenQuery = "update icetestautomation.screens set"+
 								" screendata ='"+ scrapedObjects +"',"+
 								" modifiedby ='" + modifiedBy + "',"+
@@ -206,8 +226,10 @@ exports.updateScreen_ICE = function(req, res){
 	//console.log("scraped:",scrapedObjects);
 	//this code will be called only if the statusFlag is empty.
 	if(statusFlag=="" && scrapedObjects != "scrape data error: Fail"){
+		// console.log(updateScreenQuery);
 		dbConn.execute(updateScreenQuery, function(err, result){
 			if (err) {
+				// console.log(err);
 				statusFlag="Error occured in updateScreenData : Fail";
 				res.send(statusFlag);
 			}else{
@@ -220,7 +242,7 @@ exports.updateScreen_ICE = function(req, res){
 };
 
 /**
-* @author sunil.revankar
+* @author vishvas.a
 * @modified author sunil.revankar
 * readTestCase_ICE service is used to fetch the testcase data
 */
@@ -270,7 +292,7 @@ exports.readTestCase_ICE = function (req, res) {
 };
 
 /**
-* @author sunil.revankar
+* @author vishvas.a
 * @modified author sunil.revankar
 * updateTestCase_ICE service is used to save testcase data
 */
@@ -286,7 +308,7 @@ exports.updateTestCase_ICE = function (req, res) {
 	var requestedtestcaseid = req.body.testcaseid;
 	var requestedtestcasename = req.body.testcasename;
 	var requestedtestcasesteps = req.body.testcasesteps;
-	console.log(requestedtestcasesteps);
+	//console.log(requestedtestcasesteps);
 	var userinfo = req.body.userinfo;
 	//these value has to be modified later
 	var requestedskucodetestcase = req.body.skucodetestcase;
@@ -324,7 +346,7 @@ exports.updateTestCase_ICE = function (req, res) {
 					", skucodetestcase='" + requestedskucodetestcase +
 					"', testcasesteps='" + requestedtestcasesteps + "', versionnumber=" + requestedversionnumber +
 					" where screenid=" + requestedscreenid + " and testcaseid=" + requestedtestcaseid + " and testcasename='" + requestedtestcasename + "' IF EXISTS;";
-				console.log(updateTestCaseData);
+				//console.log(updateTestCaseData);
 				dbConn.execute(updateTestCaseData, function (err, result) {
 					if (err) {
 						console.log(err)
@@ -345,7 +367,7 @@ exports.updateTestCase_ICE = function (req, res) {
 };
 
 /**
-* @author sunil.revankar
+* @author vishvas.a
 * @modified author sunil.revankar
 * debugTestCase_ICE service is used to debug the testcase
 */

@@ -553,7 +553,10 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		enableScreenShotHighlight = true;
 		DesignServices.getScrapeDataScreenLevel_ICE() 
 		.then(function(data){
-			
+			if(data.view.length == 0)
+			{
+				$("#finalScrap").hide();
+			}
 			if(data != null){
 				viewString = data;
 				newScrapedList = viewString
@@ -625,6 +628,10 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			DesignServices.initScraping_ICE(browserType)
 			.then(function (data) { 				
 				unblockUI();
+				if(data.view.length > 0)
+				{
+					$("#finalScrap").show();
+				}
 				viewString = data;
 				//var data = JSON.stringify(data);
 				//var scrapeJson = JSON.parse(data);
