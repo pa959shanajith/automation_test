@@ -122,7 +122,8 @@ var oldCustName = [];
     	        	        span.addClass('content-hide');
     	        	        //$(this).remove();
     	        	        input.focus();
-    	        	        //input.addClass('autoWidth');            	    		
+    	        	        //input.addClass('autoWidth');
+    	        	        input.val(input.val().replace(/&amp;/g, '&'))
             	    	}
 	        	        $('#'+id_editable)
 		        	        .on('keypress',  function (e) {
