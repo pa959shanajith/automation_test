@@ -347,7 +347,7 @@
 }
 
 .scrollbar-inner.fsScroll {
-    margin-top: 25px;
+    margin-top: 0px;
 }
 
 .scroll-wrapper > .fsScroll{
@@ -383,6 +383,25 @@
 	background: #321e4f
 }
 .scrollbar-inner-report > .scroll-element .scroll-element_track{
+	background: rgb(211, 211, 211)
+}
+
+
+.scroll-wrapper > .scrollbar-chatArea{
+	padding: 0px;
+	height: auto !important;
+	min-height: auto !important;
+	max-height: 200px !important;
+}
+.scroll-wrapper.scrollbar-chatArea {
+	min-height:128px !important;
+    max-height: 200px !important;
+    margin-bottom: 25px;
+}
+.scrollbar-chatArea > .scroll-element.scroll-y .scroll-bar{
+	background: #321e4f
+}
+.scrollbar-chatArea > .scroll-element .scroll-element_track{
 	background: rgb(211, 211, 211)
 }
 

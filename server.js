@@ -1,172 +1,89 @@
-/**
- * Dependencies.
- */
-var Hapi = require('hapi'),
-https = require('https'),
-hoek = require('hoek'),
-path = require('path'),
-vision = require('vision'),
-inert = require('inert'),
-fs = require('fs');
-
-//Init Server
-var server = new Hapi.Server();
-
-//Server Connection
-server.connection({
-	/*host: '10.41.31.92',
-	address: '10.41.31.92',*/
-	port: '3000'
-//		port: '443',
-//		tls: {
-//		key: fs.readFileSync('./server/https/privatekey.pem'),  
-//		cert: fs.readFileSync('./server/https/certificate.pem'),
-//		requestCert: false,   // Set to true if require client certificate authentication.
-//		ca: [] // Only necessary only if client is using the self-signed certificate.
-//		},
-//		routes: {
-//		security: true // turns on HSTS and other security headers
-//		}
-}
-);
+var express = require('express');
+var app = express();
+var server = require('http').createServer(app); 
+var io = require('socket.io')(server);
+var bodyParser = require('body-parser');
 
 
-io = require('socket.io')(server.listener);
+module.exports = app;
+app.use(bodyParser.json({limit: '5mb'}));
+app.use(bodyParser.urlencoded({limit: '5mb', extended: true}));
 
-//Logs 
-const options = {
-		ops: {
-			interval: 1000
-		},
-		reporters: {
-			myConsoleReporter: [{
-				module: 'good-squeeze',
-				name: 'Squeeze',
-				args: [{ log: '*', response: '*' }]
-			}, {
-				module: 'good-console'
-			}, 'stdout'],
-			myFileReporter: [{
-				module: 'good-squeeze',
-				name: 'Squeeze',
-				args: [{ ops: '*' }]
-			}, {
-				module: 'good-squeeze',
-				name: 'SafeJson'
-			}, {
-				module: 'good-file',
-				args: ['./test/fixtures/nineteen68_log']
-			}],
-			myHTTPReporter: [{
-				module: 'good-squeeze',
-				name: 'Squeeze',
-				args: [{ error: '*' }]
-			}, {
-				module: 'good-http',
-				args: ['http://prod.logs:3000', {
-					wreck: {
-						headers: { 'x-api-key': 12345 }
-					}
-				}]
-			}]
-		}
-}
-
-//Add Plugins
-var plugins = [
-               {
-            	   register: require('vision')   
-               },
-               {
-            	   register: require('inert')    
-               }
-               ];
+//serve all asset files from necessary directories
+app.use("/js", express.static(__dirname + "/public/js"));
+app.use("/imgs", express.static(__dirname + "/public/imgs"));
+app.use("/css", express.static(__dirname + "/public/css"));
+app.use("/fonts", express.static(__dirname + "/public/fonts"));
 
 
-//Register Plugins
-server.register(plugins, (err) => {
-	hoek.assert(!err, err);
-	server.views({
-		engines: {
-			html: require('swig')
-		},
-	});
 
-//	Route Directory
-	var base = require('./server/controllers/base');
-	var assets = require('./server/controllers/assets');
-	var login = require('./server/controllers/login');
-	var admin = require('./server/controllers/admin');
-	var design = require('./server/controllers/design');
-	var suite = require('./server/controllers/suite');
-
-//	Hapi Routes
-	server.route([
-	              { method: 'GET', path: '/imgs/{path*}', config: assets.imgs },                 
-	              { method: 'GET', path: '/css/{path*}', config: assets.css },                   
-	              { method: 'GET', path: '/js/{path*}', config: assets.js },                      
-	              { method: 'GET', path: '/fonts/{path*}', config: assets.fonts },               
-	              { method: 'GET', path: '/partials/{path*}', config: assets.partials },         
-	              { method: '*',   path: '/{path*}', handler: function (request, reply) { reply.view('./server/views/index', '') } },    
-	              { method: 'POST', path: '/authenticateUser_Nineteen68', config: login.authenticateUser_Nineteen68 }, 
-	              { method: 'POST', path: '/getUserRoles_Nineteen68', config: admin.getUserRoles_Nineteen68 }, 
-	              { method: 'POST', path: '/createUser_Nineteen68', config: admin.createUser_Nineteen68 }, 
-	              { method: 'POST', path: '/loadUserInfo_Nineteen68', config: login.loadUserInfo_Nineteen68 },  
-	              { method: 'POST', path: '/getRoleNameByRoleId_Nineteen68', config: login.getRoleNameByRoleId_Nineteen68 },    
-
-	              //Design Testcase
-	              { method: 'POST', path: '/readTestCase_ICE', config: design.readTestCase_ICE },
-	              { method: 'POST', path: '/updateTestCase_ICE', config: design.updateTestCase_ICE },
-	              { method: 'POST', path: '/debugTestCase_ICE', config: design.debugTestCase_ICE},
-
-	              //Design Screens
-	              { method: 'POST', path: '/initScraping_ICE', config: design.initScraping_ICE },  
-	              { method: 'POST', path: '/highlightScrapElement_ICE', config: design.highlightScrapElement_ICE },
-	              { method: 'POST', path: '/updateScreen_ICE', config: design.updateScreen_ICE },
-	              { method: 'POST', path: '/deleteScrapeObjects_ICE', config: design.deleteScrapeObjects_ICE },  
-	              { method: 'POST', path: '/getScrapeDataScreenLevel_ICE', config: design.getScrapeDataScreenLevel_ICE },  
-
-	              //Test Suites
-	              { method: 'POST', path: '/readTestSuite_ICE', config: suite.readTestSuite_ICE }, 
-	              { method: 'POST', path: '/readTestScenarios_ICE', config: suite.readTestScenarios_ICE }, 
-	              { method: 'POST', path: '/updateTestSuite_ICE', config: suite.updateTestSuite_ICE }, 
-	              { method: 'POST', path: '/updateTestScenario_ICE', config: suite.updateTestScenario_ICE }, 
-	              { method: 'POST', path: '/ExecuteTestSuite_ICE', config: suite.ExecuteTestSuite_ICE }, 
-	              
-	              //Default Loading Index
-	              { method: '*', path: '/logoutUser', handler: function (request, reply) { reply.view('./server/views/index', '') } }
-	              ]);
-
+app.get("/", function(req, res) {
+	// console.log("/--------",req);
+	res.sendFile("index.html", { root: __dirname + "/public/" });
+});
+app.get('/partials/:name', function(req, res){
+	// console.log("/partials-----",req);
+	res.sendFile(__dirname + "/public/partials/"+ req.params.name); //To render partials
+});
+app.get('*', function(req, res){
+	// console.log("*--------",req);
+	res.sendFile("index.html", { root: __dirname + "/public/" });
+});
+app.post('/designTestCase', function(req, res){
+	// console.log("*--------",req);
+	res.sendFile("index.html", { root: __dirname + "/public/" });
 });
 
-//Start Server
-server.register({
-	register: require('good'),
-	options,
-}, (err) => {
-	if (err) {
-		return console.error(err);
-	}
-	server.start(() => {
-		console.info(`Server started at ${ server.info.uri }`);
-	});
-});
+//Route Directories
+var login = require('./server/controllers/login');
+var admin = require('./server/controllers/admin');
+var design = require('./server/controllers/design');
+var suite = require('./server/controllers/suite');
+
+//Login Routes
+app.post('/authenticateUser_Nineteen68', login.authenticateUser_Nineteen68);
+app.post('/loadUserInfo_Nineteen68', login.loadUserInfo_Nineteen68);
+app.post('/getRoleNameByRoleId_Nineteen68', login.getRoleNameByRoleId_Nineteen68);
+//Admin Routes
+app.post('/getUserRoles_Nineteen68', admin.getUserRoles_Nineteen68);
+app.post('/createUser_Nineteen68', admin.createUser_Nineteen68);
+//Design Screen Routes
+app.post('/initScraping_ICE', design.initScraping_ICE);
+app.post('/highlightScrapElement_ICE', design.highlightScrapElement_ICE);
+app.post('/getScrapeDataScreenLevel_ICE', design.getScrapeDataScreenLevel_ICE);
+app.post('/updateScreen_ICE', design.updateScreen_ICE);
+//Design TestCase Routes
+app.post('/readTestCase_ICE', design.readTestCase_ICE);
+app.post('/updateTestCase_ICE', design.updateTestCase_ICE);
+app.post('/debugTestCase_ICE', design.debugTestCase_ICE);
+//Execute Screen Routes
+app.post('/readTestSuite_ICE', suite.readTestSuite_ICE);
+app.post('/updateTestSuite_ICE', suite.updateTestSuite_ICE);
+app.post('/updateTestScenario_ICE', suite.updateTestScenario_ICE);
+app.post('/ExecuteTestSuite_ICE', suite.ExecuteTestSuite_ICE);
+//app.post('/readTestScenarios_ICE', suite.readTestScenarios_ICE);
 
 
 
+
+
+//-------------SERVER START------------//
+server.listen(3000);  
+
+//SOCKET CONNECTION USING SOCKET.IO
 var allClients = [];
 var allSockets = [];
 var socketMap = {};
 
 io.on('connection', function (socket) {
-
+//	console.log("Inside connection method");
 	var address = socket.request.connection.remoteAddress;
-	console.log(address);
+//	console.log(address);
 	socketMap[address] = socket;
 //	console.log("socketMap", socketMap);
 	socket.send('connected' );
 	module.exports.allSocketsMap = socketMap;
-
+	server.setTimeout();
 	console.log("NO OF CLIENTS CONNECTED:", io.engine.clientsCount);
 	socket.on('message', function(data){
 		//console.log("SER", data);
@@ -180,13 +97,16 @@ io.on('connection', function (socket) {
 
 	socket.on('disconnect', function() {     
 		var i = allSockets.indexOf(socket);
-		console.log('Got disconnect!');
+		console.log('Socket Connection got disconnected!');
 		allSockets.splice(i, 1);
-		console.log("------------------------SOCKET DISCONNECTED----------------------------------------");
+//		console.log("------------------------SOCKET DISCONNECTED----------------------------------------");
 		console.log("SOCKET LENGTH", allSockets.length);
 	});
+
+//	Socket Connection Failed
+	socket.on('connect_failed', function() {
+		console.log("Sorry, there seems to be an issue with the connection!");
+	});
+
 });
-
-
-
-
+//SOCKET CONNECTION USING SOCKET.IO

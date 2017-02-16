@@ -46,7 +46,8 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 					"condition" : rowData.condition[i],
 					"dataParam" : rowData.dataparam[i],
 					"executeStatus" : rowData.executestatus[i],
-					"scenarioIds" : rowData.scenarioids[i]
+					"scenarioIds" : rowData.scenarioids[i],
+					"scenarionames": rowData.scenarionames[i]
 				})
 			}
 			//Building object for each row after getting the data from server
@@ -62,7 +63,7 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 				else if(getEachScenario[i].executeStatus == 1){
 					row.append($("<td class='tabeleCellPadding exe-ExecuteStatus' style='width:3%; padding-top: 7px !important'><input ng-checked='executeAll' type='checkbox' title='Select to not execute this scenario' class='doNotExecuteScenario d-execute' checked></td>"));
 				}
-				row.append($("<td class='tabeleCellPadding exe-scenarioIds' sId="+getEachScenario[i].scenarioIds+" style='width: 23%; margin-right: 2%; word-break: break-all; text-align:left'>" + getEachScenario[i].scenarioIds+ "</td>"));
+				row.append($("<td class='tabeleCellPadding exe-scenarioIds' sId="+getEachScenario[i].scenarioIds+" style='width: 23%; margin-right: 2%; word-break: break-all; text-align:left'>" + getEachScenario[i].scenarionames+ "</td>"));
 				if(getEachScenario[i].dataParam == undefined){
 					row.append($('<td style="width: 22%" class="tabeleCellPadding exe-dataParam"><input class="getParamPath form-control" type="text" value=""/></td>'));
 				}
@@ -159,8 +160,13 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 			blockUI("Execution in progress. Please Wait...")
 			ExecutionService.ExecuteTestSuite_ICE(selectedRowData, browserTypeExe, testSuiteId)
 			.then(function(data){
+				if(data == "Terminate"){
+					$('#executionTerminated').modal('show');
+				}
+				else{
+					$('#executionCompleted').modal('show');
+				}
 				unblockUI()
-				$('#executionCompleted').modal('show');
 				$(".selectBrowser").find("img").removeClass("sb");
 				browserTypeExe = [];
 				angular.element(document.getElementById("left-nav-section")).scope().readTestSuite_ICE()
@@ -176,6 +182,13 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 		}
 	}
 	//Execute TestSuite Functionality
+	
+	
+	//Submit Task Function
+	$scope.submitTaskExecution = function(){
+		$("#submitTasksExecution").modal("show")
+	}
+	//Submit Task Function
 	
 	
 	//Conditiion Check Function 

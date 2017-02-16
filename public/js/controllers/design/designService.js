@@ -44,11 +44,12 @@ mySPA.factory('DesignServices', ['$http','$q', function ($http, $httpProvider, $
 	             })
 	      },	
 
-		readTestCase_ICE : function(screenId,testCaseId){
+		readTestCase_ICE : function(screenId,testCaseId,testCaseName){
 			return $http.post('/readTestCase_ICE',{
 				param : 'readTestCase_ICE',
 				screenid: screenId,
-				testcaseid: testCaseId
+				testcaseid: testCaseId,
+				testcasename: testCaseName
 			})
 			.then(function(response)  { 
 				return response.data

@@ -5,6 +5,11 @@
  * 2014-09-03
  * 
  */
+var editedList = {};
+var modifiedCustNames =[];
+var xpathListofCustNames = [];
+var oldCustName = [];
+
 (function ( $ ) {
 
 	$.fn.scrapTree = function(options) {
@@ -117,7 +122,8 @@
     	        	        span.addClass('content-hide');
     	        	        //$(this).remove();
     	        	        input.focus();
-    	        	        //input.addClass('autoWidth');            	    		
+    	        	        //input.addClass('autoWidth');
+    	        	        input.val(input.val().replace(/&amp;/g, '&'))
             	    	}
 	        	        $('#'+id_editable)
 		        	        .on('keypress',  function (e) {
@@ -142,6 +148,13 @@
 			        	        		else { 
 			        	        			window.localStorage['checkEditWorking'] = "true";
 			        	        			span.text($(this).val()).removeClass('content-hide');
+											oldCustName.push($(this)[0].defaultValue);
+			        	        		    modifiedCustNames.push($(this)[0].value);
+			        	        		    xpathListofCustNames.push($(this).parent().parent().attr("data-xpath"));
+			        	        		    editedList.modifiedCustNames = modifiedCustNames;
+			        	        		    editedList.xpathListofCustNames = xpathListofCustNames;
+											editedList.oldCustName = oldCustName;
+			        	        		    window.localStorage['_modified'] = JSON.stringify(editedList);
 			        	        		}
 			        	        		$(this).remove();
 		        	        		} else{
