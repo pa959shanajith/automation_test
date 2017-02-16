@@ -325,7 +325,7 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 					var req_report = resultData.reportdata;
 					var req_reportStepsArray = reportdata.rows;
 					var req_overAllStatus = reportdata.overallstatus
-					var req_browser = reportdata.overallstatus.browserType;
+					var req_browser = reportdata.overallstatus[0].browserType;
 
 					var insertReport = "INSERT INTO reports (reportid,executionid,testsuiteid,testscenarioid,browser,modifiedon,status,report) VALUES (" + uuid() + "," + executionid + "," + testsuiteid + ","
 						+ scenarioid + ",'" + req_browser + "'," + new Date().getTime() + ",'" + resultData.reportData.overallstatus[0].overallstatus + "','" + JSON.stringify(reportdata)  +"')";
