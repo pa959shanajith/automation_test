@@ -9,59 +9,56 @@ var uuid = require('uuid-random');
 var dbConnICE = require('../../server/config/icetestautomation');
 
 
-//ReadTestSuite Functionality
+/**
+ * @author vishvas.a	
+ * @modifiedauthor shree.p (fetching the scenario names from the scenarios table)
+ * this reads the scenario information from the testsuites
+ * and testsuites table of the icetestautomation keyspace 
+ */
 exports.readTestSuite_ICE = function (req, res) {
+	//internal variables
+	var outexecutestatus=[];
+	var outcondition=[];
+	var outdataparam=[];
+	var outscenarioids=[];
+	var outscenarionames = [];
+	
+	//base request elements
+	var requiredtestsuiteid=req.body.testsuiteid;
+	var requiredcycleid=req.body.cycleid;
+	/*var requiredtestsuiteid="13bbacaf-82c7-4c4a-9f91-0933462b10d4";
+	var requiredcycleid="e6e5b473-34cd-4963-9bda-cb78c727e413";*/
+	//complete response data
+	var responsedata={
+			executestatus: [],
+			condition: [],
+			dataparam:[],
+			scenarioids:[],
+			scenarionames:[]
+	};
 
-var outexecutestatus=[];
-		var outcondition=[];
-		var outdataparam=[];
-		var outscenarioids=[];
-		var outscenarionames = [];
-		/*
-		 * base request elements
-		 */
-		var requiredtestsuiteid=req.body.testsuiteid;
-		var requiredcycleid=req.body.cycleid;
-		/*var requiredtestsuiteid="13bbacaf-82c7-4c4a-9f91-0933462b10d4";
-		var requiredcycleid="e6e5b473-34cd-4963-9bda-cb78c727e413";*/
-		/*
-		 * complete response data
-		 */
-		var responsedata={
-				executestatus: [],
-				condition: [],
-				dataparam:[],
-				scenarioids:[],
-				scenarionames:[]
-		};
-
-		/*
-		 * Query 1 fetching the donotexecute,conditioncheck,getparampaths,testscenarioids
-		 * based on testsuiteid,testsuitename and cycleid
-		 */
-		async.series(
-			{	
-				testsuitesdata: function(callback){
-									var getTestSuites="select donotexecute,conditioncheck,getparampaths,testscenarioids from testsuites where testsuiteid= "+requiredtestsuiteid+" and cycleid="+requiredcycleid;
-						//var getTestSuites="select donotexecute,condtitioncheck,getparampaths,testscenarioids from testsuites where testsuiteid= 13bbacaf-82c7-4c4a-9f91-0933462b10d4 AND cycleid=e6e5b473-34cd-4963-9bda-cb78c727e413 and testsuitename='Dev Suite 1'"; 
-						dbConnICE.execute(getTestSuites, function (err, result) {
-							if (err) {
-								var flag = "Error in readTestSuite_ICE : Fail";
-								cb(null, flag);
-							}else {
-								//for (var i = 0; i < result.rows.length; i++) {
-									
-
+	/*
+	* Query 1 fetching the donotexecute,conditioncheck,getparampaths,testscenarioids
+	* based on testsuiteid,testsuitename and cycleid
+	*/
+	async.series({		
+		testsuitesdata: function(callback){
+			var getTestSuites="select donotexecute,conditioncheck,getparampaths,testscenarioids from testsuites where testsuiteid= "+requiredtestsuiteid+" and cycleid="+requiredcycleid;
+			//var getTestSuites="select donotexecute,condtitioncheck,getparampaths,testscenarioids from testsuites where testsuiteid= 13bbacaf-82c7-4c4a-9f91-0933462b10d4 AND cycleid=e6e5b473-34cd-4963-9bda-cb78c727e413 and testsuitename='Dev Suite 1'"; 
+			dbConnICE.execute(getTestSuites, function (err, result) {
+				if (err) {
+					var flag = "Error in readTestSuite_ICE : Fail";
+					req.send(flag);
+				}else {
 					async.forEachSeries(result.rows, function(quest, callback2) {
 						outexecutestatus=quest.donotexecute;
 						outcondition=quest.conditioncheck;
 						outdataparam=quest.getparampaths;
 						outscenarioids=quest.testscenarioids;
 						//var responsedata={template: "",testcase:[],testcasename:""};
-
 						async.forEachSeries(outscenarioids,function(quest1,callback3){
-						var testcasestepsquery = "SELECT testscenarioname FROM testscenarios where testscenarioid="+quest1;
-								dbConnICE.execute(testcasestepsquery, function(err, answers) {
+							var testcasestepsquery = "SELECT testscenarioname FROM testscenarios where testscenarioid="+quest1;
+							dbConnICE.execute(testcasestepsquery, function(err, answers) {
 								if(err){
 									console.log(err);
 								}else{
@@ -69,44 +66,41 @@ var outexecutestatus=[];
 								}
 								callback3(); 
 							});
-						}, callback2);
-						},callback);
-						
-						
-								responsedata.executestatus=outexecutestatus;
-								responsedata.condition=outcondition;
-								responsedata.dataparam=outdataparam;
-								responsedata.scenarioids=outscenarioids;
-								responsedata.scenarionames = outscenarionames;
-								//cb(null, responsedata);
-							}
-						});
-				},
-				
-				},
-				function(err,results){
-					//data.setHeader('Content-Type','application/json');
-					if(err){
-						res.send(err);
-					} 
-					else{
-						console.log(responsedata);
-						res.send(JSON.stringify(responsedata));
-					} 
-				})
+					}, callback2);
+				},callback);
+				responsedata.executestatus=outexecutestatus;
+				responsedata.condition=outcondition;
+				responsedata.dataparam=outdataparam;
+				responsedata.scenarioids=outscenarioids;
+				responsedata.scenarionames = outscenarionames;
+				//cb(null, responsedata);
+				}
+			});
+		},
+	},
+	function(err,results){
+	//data.setHeader('Content-Type','application/json');
+	if(err){
+		res.send(err);
+	} 
+	else{
+		console.log(responsedata);
+		res.send(JSON.stringify(responsedata));
+	} 
+	})
 };
 //ReadTestSuite Functionality
 
 
-//UpdateTestSuite Functionality
+/**
+ * @author vishvas.a
+ * this block of code is used for updating the testsuite details 
+ * to the testsuites table of icetestautomation keyspace 
+ */
 exports.updateTestSuite_ICE = function (req, res) {
-	/*
-	 * internal variables
-	 */
+	//internal variables
 	var hasrow = false;
-	/*
-	 * base request elements
-	 */
+	//base request elements
 	var userinfo = req.body.userinfo;
 	var requestedtestscycleid = req.body.testscycleid;
 	var requestedtestsuitename = req.body.requestedtestsuitename;
@@ -124,16 +118,10 @@ exports.updateTestSuite_ICE = function (req, res) {
 	//		" testscenarioids="+requestedtestscenarioids+" versionnumber="+requestedversionnumber;
 	//		var requestedhistory={date:new Date().getTime(), historydetails:requesthistorydetails};
 
-	// var requestedskucodetestcase="";
-	// var requestedtags=[];
-	// var requestedversionnumber=2;
-	// var requestedtestscycleid="e6e5b473-34cd-4963-9bda-cb78c727e413";
-	// var requestedtestsuiteid="13bbacaf-82c7-4c4a-9f91-0933462b10d4";
 	/*
 	 * Query 1 checking whether the requestedtestsuiteid belongs to the same requestedtestscycleid
 	 * based on requested cycleid,suiteid 
 	 */
-	// requestedtestsuiteid="123";
 	var checksuiteexists = "";
 	var deleteTestSuiteData = "";
 	var updateTestSuiteData = "";
@@ -154,7 +142,6 @@ exports.updateTestSuite_ICE = function (req, res) {
 					});
 				}
 				callback1(null, hasrow);
-				//res.send(hasrow);
 			});
 		},
 		function (actualExecutioncallback) {
@@ -168,12 +155,12 @@ exports.updateTestSuite_ICE = function (req, res) {
 						dbConnICE.execute(deleteTestSuiteData, function (err, deleteQueryresults) {
 							if (err) {
 								flag = "failed to execute update query: Fail";
-								//cb(err, flag);
 								res.send(flag);
 							} else {
 								flag = "success";
 							}
 						});
+						//response is sent with the result stating "query1success" on success
 						deletecallback(null, "query1success");
 					},
 					function (value, waterfallquery2callback) {
@@ -189,25 +176,24 @@ exports.updateTestSuite_ICE = function (req, res) {
 							dbConnICE.execute(updateTestSuiteData, function (err, updateQueryresults) {
 								if (err) {
 									flag = "fail";
-									//cb(err, flag);
 									res.send(flag);
 								} else {
 									flag = "success";
 								}
 							});
 						}
+						//response is sent with the result stating "success" on success
 						waterfallquery2callback(null, "success");
 					}
 				],
 					function (err, finalcallback) {
-						//cb(null, "success");
+					//response is sent with the result stating "success" on at the end 
 						res.send("success");
 					});
 			}
 		}
 	]);
 }
-//UpdateTestSuite Functionality
 
 
 //UpdateTestSscnario Functionality
