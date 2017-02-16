@@ -99,7 +99,6 @@ exports.updateScreen_ICE = function(req, res){
 	*/
 	scrapedObjects = JSON.stringify(scrapedObjects);
 	scrapedObjects = scrapedObjects.replace(/'+/g,"''");
-	//console.log(scrapedObjects)
 	var newParse = JSON.parse(scrapedObjects);
 	scrapedObjects=newParse;
 	if(param == "updateScrapeData_ICE"){		
@@ -323,7 +322,7 @@ exports.updateTestCase_ICE = function (req, res) {
 	 * Query 1 checking whether the testcaseid belongs to the same screen
 	 * based on requested screenid,testcasename,testcaseid and testcasesteps
 	 */
-	var checktestcaseexist = "select testcaseid from testCases where screenid=" + requestedscreenid;
+	var checktestcaseexist = "select testcaseid from testcases where screenid=" + requestedscreenid;
 
 	dbConn.execute(checktestcaseexist, function (err, result) {
 		if (err) {

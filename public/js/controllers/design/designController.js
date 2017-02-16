@@ -1,4 +1,4 @@
-var screenshotObj,scrapedGlobJson,enableScreenShotHighlight,mirrorObj,emptyTestStep,anotherScriptId,getAppTypeForPaste, eaCheckbox, finalViewString, scrapedData, deleteFlag, pasteSelecteStepNo,globalSelectedBrowserType;
+var screenshotObj,scrapedGlobJson,enableScreenShotHighlight,mirrorObj,emptyTestStep,anotherScriptId,getAppTypeForPaste, eaCheckbox, finalViewString, scrapedData, deleteFlag, pasteSelecteStepNo,globalSelectedBrowserType,selectedKeywordList;
 var initScraping = {}; var mirrorObj = {}; var scrapeTypeObj = {}; var newScrapedList; var viewString = {}; var scrapeObject = {}; var readTestCaseData; var getRowJsonCopy = [];
 var selectRowStepNoFlag = false; //var deleteStep = false;
 var getAllAppendedObj; //Getting all appended scraped objects
@@ -364,6 +364,12 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 	$(document).on('click', '#btnImportEmptyErrorYes', function(){
 		$("#globalModalYesNo").modal("hide");
 		var counter2 = 0;
+		var userInfo = JSON.parse(window.localStorage['_UI']);
+		var taskInfo = JSON.parse(window.localStorage['_T']);
+		var screenId = taskInfo.screenId;
+		var testCaseId = taskInfo.testCaseId;
+		var testCaseName = taskInfo.testCaseName;
+		var appType = taskInfo.appType;
 		$("#overWriteJson").trigger("click");
 		overWriteJson.addEventListener('change', function(e) {
 			if(counter2 == 0){
@@ -428,7 +434,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 						var resultString = JSON.parse(reader.result);
 						DesignServices.updateTestCase_ICE(screenId,testCaseId,testCaseName,resultString,userInfo)
 						.then(function(data) {
-							if (data == "Success") {
+							if (data == "success") {
 								angular.element(document.getElementById("tableActionButtons")).scope().readTestCase_ICE();
 								$("#globalModal").find('.modal-title').text("Import Of JSON file");
 				                $("#globalModal").find('.modal-body p').text("TestCase Json imported successfully.").css('color','black');
@@ -1023,36 +1029,44 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				var mydata = $("#jqGrid").jqGrid('getGridParam','data');
 				for(var i=0; i<mydata.length;i++){
 					//new to parse str to int (step No)
-					if(mydata[i].url == undefined){mydata[i].url="";}
-					mydata[i].stepNo = i+1;
-					mydata[i].remarks = $("#jqGrid tbody tr td:nth-child(10)")[i+1].textContent
-					//check - keyword column should be mandatorily populated by User
-					if(mydata[i].custname == undefined || mydata[i].custname == ""){
-						var stepNoPos = parseInt(mydata[i].stepNo);
-						$("#globalModal").find('.modal-title').text("Save Testcase");
-						$("#globalModal").find('.modal-body p').text("Please select Object Name at Step No. "+stepNoPos);
-						$("#globalModal").modal("show");
-						serviceCallFlag  = true;
-						break;
+					if(mydata[i].hasOwnProperty("_id_")){
+						if(mydata[i]._id_.startsWith("jqg")){
+							var index = mydata.indexOf(mydata[i]);
+							mydata.splice(index, 1)
+						}
 					}
 					else{
-						mydata[i].custname = mydata[i].custname.trim();
-						if(mydata[i].keywordVal == undefined || mydata[i].keywordVal == ""){
+						if(mydata[i].url == undefined){mydata[i].url="";}
+						mydata[i].stepNo = i+1;
+						//mydata[i].remarks = $("#jqGrid tbody tr td:nth-child(10)")[i+1].textContent
+						//check - keyword column should be mandatorily populated by User
+						if(mydata[i].custname == undefined || mydata[i].custname == ""){
 							var stepNoPos = parseInt(mydata[i].stepNo);
 							$("#globalModal").find('.modal-title').text("Save Testcase");
-							$("#globalModal").find('.modal-body p').text("Please select keyword at Step No. "+stepNoPos);
+							$("#globalModal").find('.modal-body p').text("Please select Object Name at Step No. "+stepNoPos);
 							$("#globalModal").modal("show");
 							serviceCallFlag  = true;
 							break;
 						}
-						else if(mydata[i].keywordVal == 'SwitchToFrame'){
-							if($scope.newTestScriptDataLS != "undefined"){
-								var testScriptTableData = JSON.parse($scope.newTestScriptDataLS);
-								for(j=0;j<testScriptTableData.length;j++){
-									if(testScriptTableData[j].custname != '@Browser' && testScriptTableData[j].custname != '@Oebs' && testScriptTableData[j].custname != '@Window' && testScriptTableData[j].custname != '@Generic' && testScriptTableData[j].custname != '@Custom'){
-										if(testScriptTableData[j].url != ""){
-											mydata[i].url = testScriptTableData[j].url;
-											break;
+						else{
+							mydata[i].custname = mydata[i].custname.trim();
+							if(mydata[i].keywordVal == undefined || mydata[i].keywordVal == ""){
+								var stepNoPos = parseInt(mydata[i].stepNo);
+								$("#globalModal").find('.modal-title').text("Save Testcase");
+								$("#globalModal").find('.modal-body p').text("Please select keyword at Step No. "+stepNoPos);
+								$("#globalModal").modal("show");
+								serviceCallFlag  = true;
+								break;
+							}
+							else if(mydata[i].keywordVal == 'SwitchToFrame'){
+								if($scope.newTestScriptDataLS != "undefined"){
+									var testScriptTableData = JSON.parse($scope.newTestScriptDataLS);
+									for(j=0;j<testScriptTableData.length;j++){
+										if(testScriptTableData[j].custname != '@Browser' && testScriptTableData[j].custname != '@Oebs' && testScriptTableData[j].custname != '@Window' && testScriptTableData[j].custname != '@Generic' && testScriptTableData[j].custname != '@Custom'){
+											if(testScriptTableData[j].url != ""){
+												mydata[i].url = testScriptTableData[j].url;
+												break;
+											}
 										}
 									}
 								}
@@ -1067,7 +1081,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				else{
 					DesignServices.updateTestCase_ICE(screenId,testCaseId,testCaseName,mydata,userInfo)
 					.then(function(data){
-						if(data == "Success"){
+						if(data == "success"){
 							/*if(window.localStorage['UITSCrtd'] == "true") window.localStorage['UITSCrtd'] = "false"
 		        			else{
 		        				$("#tabs,#tabo2,#tabo1").tabs("destroy");

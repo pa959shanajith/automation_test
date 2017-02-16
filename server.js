@@ -9,7 +9,7 @@ module.exports = app;
 app.use(bodyParser.json({limit: '5mb'}));
 app.use(bodyParser.urlencoded({limit: '5mb', extended: true}));
 
-// serve all asset files from necessary directories
+//serve all asset files from necessary directories
 app.use("/js", express.static(__dirname + "/public/js"));
 app.use("/imgs", express.static(__dirname + "/public/imgs"));
 app.use("/css", express.static(__dirname + "/public/css"));
@@ -18,13 +18,20 @@ app.use("/fonts", express.static(__dirname + "/public/fonts"));
 
 
 app.get("/", function(req, res) {
-    res.sendFile("index.html", { root: __dirname + "/public/" });
+	// console.log("/--------",req);
+	res.sendFile("index.html", { root: __dirname + "/public/" });
 });
 app.get('/partials/:name', function(req, res){
-    res.sendFile(__dirname + "/public/partials/"+ req.params.name); //To render partials
+	// console.log("/partials-----",req);
+	res.sendFile(__dirname + "/public/partials/"+ req.params.name); //To render partials
 });
 app.get('*', function(req, res){
-    res.sendFile("index.html", { root: __dirname + "/public/" });
+	// console.log("*--------",req);
+	res.sendFile("index.html", { root: __dirname + "/public/" });
+});
+app.post('/designTestCase', function(req, res){
+	// console.log("*--------",req);
+	res.sendFile("index.html", { root: __dirname + "/public/" });
 });
 
 //Route Directories
@@ -69,37 +76,37 @@ var allSockets = [];
 var socketMap = {};
 
 io.on('connection', function (socket) {
-//console.log("Inside connection method");
-var address = socket.request.connection.remoteAddress;
-//console.log(address);
-socketMap[address] = socket;
-//console.log("socketMap", socketMap);
-socket.send('connected' );
-module.exports.allSocketsMap = socketMap;
-server.setTimeout();
-console.log("NO OF CLIENTS CONNECTED:", io.engine.clientsCount);
-socket.on('message', function(data){
-	//console.log("SER", data);
-});
+//	console.log("Inside connection method");
+	var address = socket.request.connection.remoteAddress;
+//	console.log(address);
+	socketMap[address] = socket;
+//	console.log("socketMap", socketMap);
+	socket.send('connected' );
+	module.exports.allSocketsMap = socketMap;
+	server.setTimeout();
+	console.log("NO OF CLIENTS CONNECTED:", io.engine.clientsCount);
+	socket.on('message', function(data){
+		//console.log("SER", data);
+	});
 
-allSockets.push(socket);
+	allSockets.push(socket);
 
 
-allClients.push(socket.conn.id)
-module.exports.abc = allSockets;
+	allClients.push(socket.conn.id)
+	module.exports.abc = allSockets;
 
-socket.on('disconnect', function() {     
-var i = allSockets.indexOf(socket);
-console.log('Socket Connection got disconnected!');
-allSockets.splice(i, 1);
-//console.log("------------------------SOCKET DISCONNECTED----------------------------------------");
-console.log("SOCKET LENGTH", allSockets.length);
-});
+	socket.on('disconnect', function() {     
+		var i = allSockets.indexOf(socket);
+		console.log('Socket Connection got disconnected!');
+		allSockets.splice(i, 1);
+//		console.log("------------------------SOCKET DISCONNECTED----------------------------------------");
+		console.log("SOCKET LENGTH", allSockets.length);
+	});
 
-//Socket Connection Failed
-socket.on('connect_failed', function() {
-    console.log("Sorry, there seems to be an issue with the connection!");
-});
+//	Socket Connection Failed
+	socket.on('connect_failed', function() {
+		console.log("Sorry, there seems to be an issue with the connection!");
+	});
 
 });
 //SOCKET CONNECTION USING SOCKET.IO
