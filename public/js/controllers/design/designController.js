@@ -3,7 +3,7 @@ var initScraping = {}; var mirrorObj = {}; var scrapeTypeObj = {}; var newScrape
 var selectRowStepNoFlag = false; //var deleteStep = false;
 var getAllAppendedObj; //Getting all appended scraped objects
 var gsElement = []; window.localStorage['selectRowStepNo'] = '';
-mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout', 'DesignServices','cfpLoadingBar', function($scope,$http,$location,$timeout,DesignServices, cfpLoadingBar) {
+mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout', 'DesignServices','cfpLoadingBar','$window', function($scope,$http,$location,$timeout,DesignServices,cfpLoadingBar,$window) {
 	$("body").css("background","#eee");
 	$("#tableActionButtons, .designTableDnd").delay(500).animate({opacity:"1"}, 500)
 	$timeout(function(){
@@ -315,9 +315,13 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 						if((file.name.split('.')[file.name.split('.').length-1]).toLowerCase() == "json"){
 							var resultString = JSON.parse(reader.result);
 							for(i = 0; i < resultString.length; i++){
-								if(resultString[i].appType == appType || resultString[i].hasOwnProperty("comments") || resultString[i].appType.toLowerCase() == "generic"){
+								if(resultString[i].appType == appType || resultString[i].appType.toLowerCase() == "generic"){
 									flag = true;
-								}else flag = false;
+									break;
+								}else{
+									flag = false;
+									break;
+								}
 							}
 							if (flag == false){
 								$("#globalModal").find('.modal-title').text("App Type Error");
@@ -327,7 +331,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 							else{
 								DesignServices.updateTestCase_ICE(screenId,testCaseId,testCaseName,resultString,userInfo)
 								.then(function(data) {
-									if (data == "Success") {
+									if (data == "success") {
 										angular.element(document.getElementById("tableActionButtons")).scope().readTestCase_ICE();
 						                $("#globalModal").find('.modal-title').text("Import Of JSON file");
 						                $("#globalModal").find('.modal-body p').text("TestCase Json imported successfully.").css('color','black');
@@ -349,6 +353,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					}
 					reader.readAsText(file);
 					counter1 = 1;
+					$("#importTestCaseFile").val('');
 				}
 			});
 		} else{
@@ -370,6 +375,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		var testCaseId = taskInfo.testCaseId;
 		var testCaseName = taskInfo.testCaseName;
 		var appType = taskInfo.appType;
+		var flag = false;
 		$("#overWriteJson").trigger("click");
 		overWriteJson.addEventListener('change', function(e) {
 			if(counter2 == 0){
@@ -380,23 +386,39 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				reader.onload = function(e) {
 					if((file.name.split('.')[file.name.split('.').length-1]).toLowerCase() == "json"){
 						var resultString = JSON.parse(reader.result);
-						DesignServices.updateTestCase_ICE(screenId,testCaseId,testCaseName,resultString,userInfo)
-						.then(function(data) {
-									if (data == "success") {
-										angular.element(document.getElementById("tableActionButtons")).scope().readTestCase_ICE();
-						                $("#globalModal").find('.modal-title').text("Import Of JSON file");
-						                $("#globalModal").find('.modal-body p').text("TestCase Json imported successfully.").css('color','black');
-										$("#globalModal").modal("show");
-									} else {
-										$("#globalModal").find('.modal-title').text("Fail");
-						                $("#globalModal").find('.modal-body p').text("Please Check the file format you have uploaded!").css('color','black');
-										$("#globalModal").modal("show");
-									} /*else if (data == "appTypeError"){
-										showDialogMesgsBtn("App Type Error", "Project application type and Imported JSON application type doesn't match, please check!!", "btnAppTypeErrorOk");
-										$.unblockUI();
-									}	*/											
-								}, function(error) {
-						});
+						for(i = 0; i < resultString.length; i++){
+							if(resultString[i].appType == appType || resultString[i].appType.toLowerCase() == "generic"){
+								flag = true;
+								break;
+							}else{
+								flag = false;
+								break;
+							}
+						}
+						if(flag == false){
+							$("#globalModal").find('.modal-title').text("App Type Error");
+			                $("#globalModal").find('.modal-body p').text("Project application type and Imported JSON application type doesn't match, please check!!").css('color','black');
+							$("#globalModal").modal("show");
+						}
+						else{
+							DesignServices.updateTestCase_ICE(screenId,testCaseId,testCaseName,resultString,userInfo)
+							.then(function(data) {
+										if (data == "success") {
+											angular.element(document.getElementById("tableActionButtons")).scope().readTestCase_ICE();
+							                $("#globalModal").find('.modal-title').text("Import Of JSON file");
+							                $("#globalModal").find('.modal-body p').text("TestCase Json imported successfully.").css('color','black');
+											$("#globalModal").modal("show");
+										} else {
+											$("#globalModal").find('.modal-title').text("Fail");
+							                $("#globalModal").find('.modal-body p').text("Please Check the file format you have uploaded!").css('color','black');
+											$("#globalModal").modal("show");
+										} /*else if (data == "appTypeError"){
+											showDialogMesgsBtn("App Type Error", "Project application type and Imported JSON application type doesn't match, please check!!", "btnAppTypeErrorOk");
+											$.unblockUI();
+										}	*/											
+									}, function(error) {
+							});
+						}
 					}
 					else{
 						$("#globalModal").find('.modal-title').text("Fail");
@@ -423,6 +445,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		var testCaseId = taskInfo.testCaseId;
 		var testCaseName = taskInfo.testCaseName;
 		var appType = taskInfo.appType;
+		var flag = false;
 		overWriteJson.addEventListener('change', function(e) {
 			if(counter == 0){
 				// Put the rest of the demo code here.
@@ -432,24 +455,41 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				if((file.name.split('.')[file.name.split('.').length-1]).toLowerCase() == "json"){
 					reader.onload = function(e) {
 						var resultString = JSON.parse(reader.result);
-						DesignServices.updateTestCase_ICE(screenId,testCaseId,testCaseName,resultString,userInfo)
-						.then(function(data) {
-							if (data == "success") {
-								angular.element(document.getElementById("tableActionButtons")).scope().readTestCase_ICE();
-								$("#globalModal").find('.modal-title').text("Import Of JSON file");
-				                $("#globalModal").find('.modal-body p').text("TestCase Json imported successfully.").css('color','black');
-								$("#globalModal").modal("show");
-							} else {
-								$("#globalModal").find('.modal-title').text("Fail");
-				                $("#globalModal").find('.modal-body p').text("Please Check the file format you have uploaded!").css('color','black');
-								$("#globalModal").modal("show");
-							} /*else if (data == "appTypeError"){
-								showDialogMesgsBtn("App Type Error", "Project application type and Imported JSON application type doesn't match, please check!!", "btnAppTypeErrorOk");
-								$.unblockUI();
-							}*/												
-						}, function(error) {});					
+						for(i = 0; i < resultString.length; i++){
+							if(resultString[i].appType == appType || resultString[i].appType.toLowerCase() == "generic"){
+								flag = true;
+								break;
+							}else{
+								flag = false;
+								break;
+							}
+						}
+						if(flag == false){
+							$("#globalModal").find('.modal-title').text("App Type Error");
+			                $("#globalModal").find('.modal-body p').text("Project application type and Imported JSON application type doesn't match, please check!!").css('color','black');
+							$("#globalModal").modal("show");
+						}
+						else{
+							DesignServices.updateTestCase_ICE(screenId,testCaseId,testCaseName,resultString,userInfo)
+							.then(function(data) {
+								if (data == "success") {
+									angular.element(document.getElementById("tableActionButtons")).scope().readTestCase_ICE();
+									$("#globalModal").find('.modal-title').text("Import Of JSON file");
+					                $("#globalModal").find('.modal-body p').text("TestCase Json imported successfully.").css('color','black');
+									$("#globalModal").modal("show");
+								} else {
+									$("#globalModal").find('.modal-title').text("Fail");
+					                $("#globalModal").find('.modal-body p').text("Please Check the file format you have uploaded!").css('color','black');
+									$("#globalModal").modal("show");
+								} /*else if (data == "appTypeError"){
+									showDialogMesgsBtn("App Type Error", "Project application type and Imported JSON application type doesn't match, please check!!", "btnAppTypeErrorOk");
+									$.unblockUI();
+								}*/												
+							}, function(error) {});
+						}						
 					}	
 					reader.readAsText(file);
+					$("#overWriteJson").val('');
 				}
 				else{
 					$("#globalModal").find('.modal-title').text("Fail");
@@ -463,18 +503,19 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 	//Import Test case
 	
 	//Export Test case
-	//Export TestScript
-	/*$scope.export_testscript=function() {
+	$scope.exportTestCase=function() {
 		var taskInfo = JSON.parse(window.localStorage['_T']);
+		var screenId = taskInfo.screenId;
 		var testCaseId = taskInfo.testCaseId;
-		DesignServices.exportTestScript(value).then(function(response,filename) {	
+		var testCaseName = taskInfo.testCaseName;
+		DesignServices.readTestCase_ICE(screenId, testCaseId, testCaseName)
+		.then(function(response) {	
+			var temp, responseData;
 			if (typeof response === 'object') {
-				var temp=JSON.parse(response.jsonData);
-				var responseData = JSON.stringify(temp, undefined, 2);
+				temp=JSON.parse(response.testcase);
+				responseData = JSON.stringify(temp, undefined, 2);
 			}
-			if (!filename) {
-				filename =response.jsonFilename;
-			}
+			filename = testCaseName+".json";
 			var objAgent = $window.navigator.userAgent;
 			var objbrowserName = navigator.appName;
 			var objfullVersion = ''+parseFloat(navigator.appVersion);
@@ -540,7 +581,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		},
 		function(error) {
 		});
-	}*/
+	}
 	//Export Test Case
 	
 	//Populating Saved Scrape Data
@@ -1231,8 +1272,8 @@ function contentTable(newTestScriptDataLS) {
 		        		   }]
 		        	   }
 		           },
-		           { label: 'Input', name: 'inputVal', classes:'singleInvitedComma', editable: true,  resizable:false, sortable:false },
-		           { label: 'Output', name: 'outputVal', classes:'singleInvitedComma', editable: true,  resizable:false, sortable:false },
+		           { label: 'Input', name: 'inputVal', editable: true,  resizable:false, sortable:false },
+		           { label: 'Output', name: 'outputVal', editable: true,  resizable:false, sortable:false },
 		           { label: 'Remarks', name:'remarksStatus', editable: false,  resizable:false, sortable:false},
 		           { label: 'Remarks', name: 'remarks', editable: false,  resizable:false, sortable:false, hidden:true},
 		           { label: 'URL', 	name: 'url', editable: false, resizable:false, hidden:true },
@@ -2490,9 +2531,7 @@ function pasteTestStep(){
 			else if($("#jqGrid").jqGrid('getRowData').length == 1 && $("#jqGrid").jqGrid('getRowData')[0].custname == "") showDialogMesgsYesNo("Paste Test Step", "Copied step(s) might contain object reference which will not be supported for other screen. Do you still want to continue ?", "btnPasteTestStepYes", "btnPasteTestStepNo")
 			else{
 				$("#modalDialog-inputField").find('.modal-title').text("Paste Test Step");
-				$("#modalDialog-inputField").find('#labelContent').html("Paste after step no: </br><span style='font-size:11px; color: #000;'>For multiple paste. Eg: 5;10;20</span>").css('color','black');
-				//$("labelContent").next().html("</br><span style='font-size:11px; color: #000;'>For multiple paste. Eg: 5;10;20</span>");
-				//$("</br><span style='font-size:11px; color: #000;'>For multiple paste. Eg: 5;10;20</span>").insertAfter('#labelContent');
+				$("#modalDialog-inputField").find('#labelContent').html("Paste after step no: </br><span style='font-size:11px; color: #000;'>For multiple paste. Eg: 5;10;20</span>").css('color','black');				
 				$("#modalDialog-inputField").find('.modal-footer button').attr("id","btnPasteTestStep");
 				$("#modalDialog-inputField").find('#getInputData').attr("placeholder","Enter a value");
 				$("#modalDialog-inputField").find('#getInputData').addClass("copyPasteValidation");
@@ -2658,13 +2697,11 @@ function pasteInGrid(){
 function commentStep(){
 	if($(document).find(".ui-state-highlight").length > 0){
 		var getOutputVal = $(document).find(".ui-state-highlight").children("td[aria-describedby='jqGrid_outputVal']").text();
-	
 		if(!getOutputVal.match("##") && !getOutputVal.match(";##")){
 			var myData = $("#jqGrid").jqGrid('getGridParam','data')
 			var selectedRowIds = $("#jqGrid").jqGrid('getGridParam','selarrrow').map(Number);
 			selectedRowIds = selectedRowIds.sort();
 			$(document).find(".ui-state-highlight").children("td[aria-describedby='jqGrid_outputVal']").each(function() {
-				debugger; 
 				var outputValLen = $(this).text().trim().length;
 				var outputHashMatch = $(this).text().match("##");
 				if(outputValLen == 0){

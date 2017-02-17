@@ -405,6 +405,32 @@
 	background: rgb(211, 211, 211)
 }
 
+.scroll-wrapper > .scrollbar-inner-rep{
+	min-height: auto !important;
+	height: 275px !important;
+	padding-top: 30px;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+.scroll-wrapper.scrollbar-inner-rep {
+	display: none;
+    max-height: 305px !important;
+    position: fixed !important;
+    width: calc(100% - 310px);
+    z-index: 50;
+    top: 249px;
+    /* overflow: auto; */
+}
+.scrollbar-inner-rep > .scroll-element.scroll-y{
+	z-index:60;
+}
+.scrollbar-inner-rep > .scroll-element.scroll-y .scroll-bar{
+	background: #321e4f
+}
+.scrollbar-inner-rep > .scroll-element .scroll-element_track{
+	background: rgb(211, 211, 211)
+}
+
 /**********Custom Media Queries**********/
 @media screen and (max-height:675px){
 	.scroll-wrapper > .scrollbar-screenshot{
@@ -415,5 +441,12 @@
 	}
 	.scroll-wrapper > .scrollbar-macosx{
 		width:-moz-fit-content !important
+	}
+
+	.scroll-wrapper.scrollbar-inner-rep{
+		max-height: 184px !important;
+	}
+	.scroll-wrapper > .scrollbar-inner-rep{
+	    height: 155px !important;
 	}
 }

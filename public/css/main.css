@@ -1939,8 +1939,7 @@ select:hover {
     -webkit-transform: translateX(-50%);
 }
 .iconSpace{
-	background: #fff;
-    width: 70px;
+    width: 65px;
     display: inline-block;
     height: 10px;
     vertical-align: bottom;
@@ -1950,7 +1949,8 @@ select:hover {
 .middle-section-testsuites, .bottom-section-testsuites{
 	position: relative;
     width: 100%;
-    height: 300px;
+    /* height: 300px; */
+    height: calc(100% - 480px);
     float: left;
     margin-top: 9px;
     border-radius: 6px;
@@ -2056,7 +2056,7 @@ select:hover {
 .progresspercentage{width: 10%; text-align: center;}
 
 .bottom-section-testsuites{
-	height: 300px !important;
+	/*height: 300px !important;*/
     padding-bottom: 3px;
     border: 1px solid #edefec;
 }
@@ -2079,6 +2079,9 @@ select:-webkit-autofill:focus {
     -webkit-box-shadow: 0 0 0px 1000px #FFFFFF inset;
     transition: background-color 5000s ease-in-out 0s;
 }
+
+
+
 
 
 /******************Remove Webkit autocolor CSS***************************/
@@ -2165,4 +2168,13 @@ select:-webkit-autofill:focus {
 		height: calc(100% - 60px);
     }
 	.designTableDnd{height: calc(100% - 95px);}
+	.middle-section-testsuites, .bottom-section-testsuites{
+		height: 32%;
+	}
+	.reportStatus {
+		margin-top: 20px;
+	}
+	.suitestartend thead{
+		width: calc(100% - 765px);
+	}
 }
