@@ -2490,8 +2490,9 @@ function pasteTestStep(){
 			else if($("#jqGrid").jqGrid('getRowData').length == 1 && $("#jqGrid").jqGrid('getRowData')[0].custname == "") showDialogMesgsYesNo("Paste Test Step", "Copied step(s) might contain object reference which will not be supported for other screen. Do you still want to continue ?", "btnPasteTestStepYes", "btnPasteTestStepNo")
 			else{
 				$("#modalDialog-inputField").find('.modal-title').text("Paste Test Step");
-				$("#modalDialog-inputField").find('#labelContent').text("Paste after step no:").css('color','black');
-				$("</br><span style='font-size:11px; color: #000;'>For multiple paste. Eg: 5;10;20</span>").insertAfter('#labelContent');
+				$("#modalDialog-inputField").find('#labelContent').html("Paste after step no: </br><span style='font-size:11px; color: #000;'>For multiple paste. Eg: 5;10;20</span>").css('color','black');
+				//$("labelContent").next().html("</br><span style='font-size:11px; color: #000;'>For multiple paste. Eg: 5;10;20</span>");
+				//$("</br><span style='font-size:11px; color: #000;'>For multiple paste. Eg: 5;10;20</span>").insertAfter('#labelContent');
 				$("#modalDialog-inputField").find('.modal-footer button').attr("id","btnPasteTestStep");
 				$("#modalDialog-inputField").find('#getInputData').attr("placeholder","Enter a value");
 				$("#modalDialog-inputField").find('#getInputData').addClass("copyPasteValidation");
@@ -2506,6 +2507,10 @@ function pasteTestStep(){
 		}
 	}	
 }
+// TO Clear Input Val on Close of Bootstrap Modal Dialog
+$(document).on('hide.bs.modal','#modalDialog-inputField', function () {
+              $("#getInputData").val('')
+});
 
 $(document).on("click", "#btnPasteTestStepYes", function(){
 	$("#globalModalYesNo").find('.modal-footer button:nth-child(2)').trigger("click");
@@ -2514,8 +2519,8 @@ $(document).on("click", "#btnPasteTestStepYes", function(){
 	}
 	else{
 		$("#modalDialog-inputField").find('.modal-title').text("Paste Test Step");
-		$("#modalDialog-inputField").find('#labelContent').text("Paste after step no:").css('color','black');
-		$("</br><span style='font-size:11px; color: #000;'>For multiple paste. Eg: 5;10;20</span>").insertAfter('#labelContent');
+		$("#modalDialog-inputField").find('#labelContent').text("Paste after step no: </br><span style='font-size:11px; color: #000;'>For multiple paste. Eg: 5;10;20</span>").css('color','black');
+		//$("</br><span style='font-size:11px; color: #000;'>For multiple paste. Eg: 5;10;20</span>").insertAfter('#labelContent');
 		$("#modalDialog-inputField").find('.modal-footer button').attr("id","btnPasteTestStep");
 		$("#modalDialog-inputField").find('#getInputData').attr("placeholder","Enter a value");
 		$("#modalDialog-inputField").find('#getInputData').addClass("copyPasteValidation");
