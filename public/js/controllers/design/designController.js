@@ -2658,11 +2658,13 @@ function pasteInGrid(){
 function commentStep(){
 	if($(document).find(".ui-state-highlight").length > 0){
 		var getOutputVal = $(document).find(".ui-state-highlight").children("td[aria-describedby='jqGrid_outputVal']").text();
+	
 		if(!getOutputVal.match("##") && !getOutputVal.match(";##")){
 			var myData = $("#jqGrid").jqGrid('getGridParam','data')
 			var selectedRowIds = $("#jqGrid").jqGrid('getGridParam','selarrrow').map(Number);
 			selectedRowIds = selectedRowIds.sort();
-			$(document).find(".ui-state-highlight").children("td[aria-describedby='jqGrid_outputVal']").each(function() { 
+			$(document).find(".ui-state-highlight").children("td[aria-describedby='jqGrid_outputVal']").each(function() {
+				debugger; 
 				var outputValLen = $(this).text().trim().length;
 				var outputHashMatch = $(this).text().match("##");
 				if(outputValLen == 0){

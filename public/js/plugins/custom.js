@@ -11,7 +11,7 @@ $(document).ready(function() {
     $(document).on("click", ".task-content .collapse-head", function(){
         $(".caret-absolute").hide()
         $(".panel-heading").css({'background':''})
-        $(this).parents(".panel-heading").css({'background':'#eee'})
+        $(this).parents(".panel-heading").css({'background':'#efefef'})
         if($(this).hasClass("collapsed")) {
             $(".panel-heading").css({'background':''})
             $(this).find(".caret-absolute").fadeOut()
