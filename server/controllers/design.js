@@ -130,7 +130,7 @@ exports.updateScreen_ICE = function(req, res){
 						for(var scrapedobjectindex=0;scrapedobjectindex<viewString.length;scrapedobjectindex++){
 							if(elementschanged<newCustNamesList.length){
 							if((viewString[scrapedobjectindex].xpath == xpathListofCustName[elementsindex]) 
-								&& (viewString[scrapedobjectindex].custname == oldCustNamesList[elementsindex])){
+								&& (viewString[scrapedobjectindex].custname.trim() == oldCustNamesList[elementsindex].trim())){
 									viewString[scrapedobjectindex].custname=newCustNamesList[elementsindex];
 									//elementschanged increments only when edit has occured
 									elementschanged=elementschanged+1;
@@ -182,7 +182,7 @@ exports.updateScreen_ICE = function(req, res){
 						for(var scrapedobjectindex=0;scrapedobjectindex<viewString.length;scrapedobjectindex++){
 							//console.log(scrapedobjectindex,"---",viewString[scrapedobjectindex].custname,"====",deleteCustNames[elementsindex]);
 							if((viewString[scrapedobjectindex].xpath == deleteXpathNames[elementsindex]) 
-									&& (viewString[scrapedobjectindex].custname == deleteCustNames[elementsindex])){
+									&& (viewString[scrapedobjectindex].custname.trim() == deleteCustNames[elementsindex].trim())){
 								if(elementschanged<deleteCustNames.length){
 									//console.log(viewString[scrapedobjectindex].custname);
 									deleteindex.push(scrapedobjectindex);
@@ -232,8 +232,86 @@ exports.updateScreen_ICE = function(req, res){
 				statusFlag="Error occured in updateScreenData : Fail";
 				res.send(statusFlag);
 			}else{
+				if(param != 'updateScrapeData_ICE'){
+					async.waterfall([
+					function(testcasecallback){
+						var testcaseDataQuery="select testcaseid,testcasename,testcasesteps from testcases where screenid="+screenID;
+						var newCustnames,oldCustnames,xpathofCustnames;
+						if(param == 'editScrapeData_ICE'){
+							newCustnames=updateData.editedList.modifiedCustNames;
+							oldCustnames=updateData.editedList.oldCustName;
+							xpathofCustnames=updateData.editedList.xpathListofCustNames;
+						}else{
+							oldCustnames = updateData.deletedList.deletedCustName;
+							xpathofCustnames = updateData.deletedList.deletedXpath;
+						}
+							dbConn.execute(testcaseDataQuery, function(testcaseDataQueryerr, testcaseDataQueryresult){
+								if(testcaseDataQueryerr){
+									statusFlag="Error occured in testcaseDataQuery : Fail";
+									res.send(statusFlag);
+								}else{
+									async.forEachSeries(testcaseDataQueryresult.rows,
+									function(eachTestcase,testcaserendercallback){
+									// for(var eachtestcaseindex=0;eachtestcaseindex<testcaseDataQueryresult.length;eachtestcaseindex++){
+										var updatingTestcaseid=eachTestcase.testcaseid;
+										var updatingtestcasedata=JSON.parse(eachTestcase.testcasesteps);
+										var updatingtestcasename=eachTestcase.testcasename;
+										//replacing/deleting all the custnames based on xpath and old custnames
+										var deletingStepindex=[]; 
+										for(var updatingindex=0;updatingindex<oldCustnames.length;updatingindex++){
+											for(var eachtestcasestepindex=0;eachtestcasestepindex<updatingtestcasedata.length;eachtestcasestepindex++){
+												var testcasestep=updatingtestcasedata[eachtestcasestepindex];
+												var step = eachtestcasestepindex + 1;
+												// console.log(testcasestep);
+												if('custname' in testcasestep && 'objectName' in testcasestep){
+													// console.log((testcasestep.custname == oldCustnames[updatingindex]
+													// && testcasestep.objectName == xpathofCustnames[updatingindex]));
+													if(testcasestep.custname.trim() == oldCustnames[updatingindex].trim()
+													&& testcasestep.objectName == xpathofCustnames[updatingindex]){
+														if(param == 'editScrapeData_ICE'){
+															testcasestep.custname=newCustnames[updatingindex];
+														}else if (param == 'deleteScrapeData_ICE'){
+															testcasestep.stepNo=step;
+															deletingStepindex.push(eachtestcasestepindex);
+														}
+													}
+												}
+											}
+										}
+											// console.log(deletingStepindex,updatingtestcasedata);
+										if(param == 'deleteScrapeData_ICE'){
+											deletingStepindex=deletingStepindex.sort();
+											for(var deletingcaseindex=0;deletingcaseindex<deletingStepindex.length;deletingcaseindex++){
+												delete updatingtestcasedata[deletingStepindex[deletingcaseindex]];
+											}	
+										//removing null values from the array JSON
+										updatingtestcasedata =  updatingtestcasedata.filter(function(n){ return n != null });
+										}
+										updatingtestcasedata=JSON.stringify(updatingtestcasedata);
+										updatingtestcasedata = updatingtestcasedata.replace(/'+/g,"''");
+										var updateTestCaseQuery="update testcases set testcasesteps='"+updatingtestcasedata+"'"+
+											" where screenid="+screenID+
+											" and testcasename = '"+updatingtestcasename+"'"+
+											" and testcaseid="+updatingTestcaseid;
+										dbConn.execute(updateTestCaseQuery, function(updateTestCaseQueryerr, updateTestCaseQueryresult){
+											if(updateTestCaseQueryerr){
+												statusFlag="Error occured in updateTestCaseQuery : Fail";
+												res.send(statusFlag);
+											}else{
+												statusFlag = "success";						
+												res.send(statusFlag);
+											}
+										});
+									});
+								}
+							});
+							testcasecallback();
+						}
+					]);
+				}else{
 				statusFlag = "success";
 				res.send(statusFlag);
+				}
 			}
 		});
 	}
@@ -307,17 +385,19 @@ exports.updateTestCase_ICE = function (req, res) {
 	var requestedtestcaseid = req.body.testcaseid;
 	var requestedtestcasename = req.body.testcasename;
 	var requestedtestcasesteps = req.body.testcasesteps;
-	//console.log(requestedtestcasesteps);
+	var historyRemarks = JSON.parse(req.body.testcasesteps);
+	var updatedTestSteps = JSON.parse(req.body.testcasesteps);
+	historyRemarks = JSON.stringify(historyRemarks);
 	var userinfo = req.body.userinfo;
 	//these value has to be modified later
 	var requestedskucodetestcase = req.body.skucodetestcase;
 	var requestedtags = req.body.tags;
 	var requestedversionnumber = req.body.versionnumber;
-	var requesthistorydetails = "updated testcase action by " + userinfo.username + " having role:" + userinfo.role + "" +
-		" skucodetestcase='" + requestedskucodetestcase + "', tags=" + requestedtags + "," +
-		" testcasesteps=" + requestedtestcasesteps + " versionnumber=" + requestedversionnumber;
-
-	var requestedhistory = { date: new Date().getTime(), historydetails: requesthistorydetails };
+	var requesthistorydetails = "'updated testcase action by " + userinfo.username + " having role:" + userinfo.role + "" +
+		" skucodetestcase=" + requestedskucodetestcase + ", tags=" + requestedtags + "," +
+		" testcasesteps=" + historyRemarks + ", versionnumber=" + requestedversionnumber+" '";
+	var date = new Date().getTime();
+	var requestedhistory =  date + ":" + requesthistorydetails;
 	/*
 	 * Query 1 checking whether the testcaseid belongs to the same screen
 	 * based on requested screenid,testcasename,testcaseid and testcasesteps
@@ -340,15 +420,17 @@ exports.updateTestCase_ICE = function (req, res) {
 				 * Query 2 updating the testcasedata based on
 				 * based on requested screenid,testcaseid and testcasesteps
 				 */
+				updatedTestSteps = JSON.stringify(updatedTestSteps);
 				var updateTestCaseData = "UPDATE testcases SET modifiedby='" + userinfo.username +
-					"', modifiedbyrole='" + userinfo.role + "', modifiedon=" + new Date().getTime() +
-					", skucodetestcase='" + requestedskucodetestcase +
-					"', testcasesteps='" + requestedtestcasesteps + "', versionnumber=" + requestedversionnumber +
+					"', modifiedon=" + new Date().getTime() +
+					",  skucodetestcase='" + requestedskucodetestcase +
+					"', history= history + { "+requestedhistory+" }" +
+					",  testcasesteps='" + updatedTestSteps + "', versionnumber=" + requestedversionnumber +
 					" where screenid=" + requestedscreenid + " and testcaseid=" + requestedtestcaseid + " and testcasename='" + requestedtestcasename + "' IF EXISTS;";
-				//console.log(updateTestCaseData);
-				dbConn.execute(updateTestCaseData, function (err, result) {
+				  //console.log("upQuery", updateTestCaseData);
+				 dbConn.execute(updateTestCaseData, function (err, result) {
 					if (err) {
-						console.log(err)
+//						console.log(err)
 						var flag = "Error in Query 1 updateTestCaseData: Fail";
 						res.send(flag);
 					} else {
