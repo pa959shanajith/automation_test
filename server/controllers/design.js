@@ -307,17 +307,19 @@ exports.updateTestCase_ICE = function (req, res) {
 	var requestedtestcaseid = req.body.testcaseid;
 	var requestedtestcasename = req.body.testcasename;
 	var requestedtestcasesteps = req.body.testcasesteps;
-	//console.log(requestedtestcasesteps);
+	var historyRemarks = JSON.parse(req.body.testcasesteps);
+	var updatedTestSteps = JSON.parse(req.body.testcasesteps);
+	historyRemarks = JSON.stringify(historyRemarks);
 	var userinfo = req.body.userinfo;
 	//these value has to be modified later
 	var requestedskucodetestcase = req.body.skucodetestcase;
 	var requestedtags = req.body.tags;
 	var requestedversionnumber = req.body.versionnumber;
-	var requesthistorydetails = "updated testcase action by " + userinfo.username + " having role:" + userinfo.role + "" +
-		" skucodetestcase='" + requestedskucodetestcase + "', tags=" + requestedtags + "," +
-		" testcasesteps=" + requestedtestcasesteps + " versionnumber=" + requestedversionnumber;
-
-	var requestedhistory = { date: new Date().getTime(), historydetails: requesthistorydetails };
+	var requesthistorydetails = "'updated testcase action by " + userinfo.username + " having role:" + userinfo.role + "" +
+		" skucodetestcase=" + requestedskucodetestcase + ", tags=" + requestedtags + "," +
+		" testcasesteps=" + historyRemarks + ", versionnumber=" + requestedversionnumber+" '";
+	var date = new Date().getTime();
+	var requestedhistory =  date + ":" + requesthistorydetails;
 	/*
 	 * Query 1 checking whether the testcaseid belongs to the same screen
 	 * based on requested screenid,testcasename,testcaseid and testcasesteps
@@ -340,13 +342,15 @@ exports.updateTestCase_ICE = function (req, res) {
 				 * Query 2 updating the testcasedata based on
 				 * based on requested screenid,testcaseid and testcasesteps
 				 */
+				updatedTestSteps = JSON.stringify(updatedTestSteps);
 				var updateTestCaseData = "UPDATE testcases SET modifiedby='" + userinfo.username +
-					"', modifiedbyrole='" + userinfo.role + "', modifiedon=" + new Date().getTime() +
-					", skucodetestcase='" + requestedskucodetestcase +
-					"', testcasesteps='" + requestedtestcasesteps + "', versionnumber=" + requestedversionnumber +
+					"', modifiedon=" + new Date().getTime() +
+					",  skucodetestcase='" + requestedskucodetestcase +
+					"', history= history + { "+requestedhistory+" }" +
+					",  testcasesteps='" + updatedTestSteps + "', versionnumber=" + requestedversionnumber +
 					" where screenid=" + requestedscreenid + " and testcaseid=" + requestedtestcaseid + " and testcasename='" + requestedtestcasename + "' IF EXISTS;";
-				//console.log(updateTestCaseData);
-				dbConn.execute(updateTestCaseData, function (err, result) {
+				  //console.log("upQuery", updateTestCaseData);
+				 dbConn.execute(updateTestCaseData, function (err, result) {
 					if (err) {
 						console.log(err)
 						var flag = "Error in Query 1 updateTestCaseData: Fail";

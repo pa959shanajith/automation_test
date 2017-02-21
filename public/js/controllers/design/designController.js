@@ -314,6 +314,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					reader.onload = function(e) {
 						if((file.name.split('.')[file.name.split('.').length-1]).toLowerCase() == "json"){
 							var resultString = JSON.parse(reader.result);
+							//var resultString = reader.result;
 							for(i = 0; i < resultString.length; i++){
 								if(resultString[i].appType == appType || resultString[i].appType.toLowerCase() == "generic"){
 									flag = true;
@@ -1076,10 +1077,22 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 							mydata.splice(index, 1)
 						}
 					}
-					else{
+			//		else{
 						if(mydata[i].url == undefined){mydata[i].url="";}
 						mydata[i].stepNo = i+1;
-						//mydata[i].remarks = $("#jqGrid tbody tr td:nth-child(10)")[i+1].textContent
+						debugger;
+						//mydata[i].remarks = $("#jqGrid tbody tr td:nth-child(10)")[i+1].textContent;
+						if(mydata[i].remarks != undefined)
+						{
+							if(  mydata[i].remarks != $("#jqGrid tbody tr td:nth-child(10)")[i+1].textContent  && $("#jqGrid tbody tr td:nth-child(10)")[i+1].textContent.trim().length > 0 )	{
+								if( mydata[i].remarks.length > 0 ){
+									mydata[i].remarks = mydata[i].remarks.concat( " ; " + $("#jqGrid tbody tr td:nth-child(10)")[i+1].textContent);
+								}
+							     else{
+									  mydata[i].remarks = $("#jqGrid tbody tr td:nth-child(10)")[i+1].textContent;
+								 }	 
+						     }
+						}
 						//check - keyword column should be mandatorily populated by User
 						if(mydata[i].custname == undefined || mydata[i].custname == ""){
 							var stepNoPos = parseInt(mydata[i].stepNo);
@@ -1113,7 +1126,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 								}
 							}
 						}
-					}
+				//	}
 				}
 				if(serviceCallFlag  == true)
 				{
