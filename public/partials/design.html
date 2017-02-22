@@ -7,7 +7,8 @@
 	<!--Left Panel-->
 	<div id="left-nav-section">
 		<div class="scrollbar-macosx">
-			<div id="left-top-section">
+			<!-- Apptype Web -->
+			<div ng-if="getScreenView == 'Web'" id="left-top-section" class="webScreenView">
 				<ul>
 					<li><span><a class='scrapeOnTxt'>Scrape On</a></span></li>
 					<li><a href='#' ng-class="enbledChecked ? 'enableActions' : 'disableActions'" ng-click="initScraping($event, 'ie'); $event.preventDefault(); $event.stopPropagation();"><span><img src='imgs/ic-ie.png' alt='Internet Explorer' /></span>Internet Explorer</a></li>
@@ -16,12 +17,53 @@
 					<li class="last"><span style="margin-bottom:-5px"><input ng-model="enbledChecked" id="enableAppend" type='checkbox' value=""></span><label for="enableAppend">Append</label></li>
 				</ul>
 			</div>
+			<!-- Apptype Web -->
+			
+			<!-- Apptype Desktop -->
+			<div ng-if="getScreenView == 'Desktop'" id="left-top-section" class="ApptypeScreenView">
+				<ul>
+					<li><span><a class='scrapeOnTxt'>Scrape On</a></span></li>
+					<li><a href='#' ng-class="enbledChecked ? 'enableActions' : 'disableActions'" data-toggle="modal" ng-click="initScrape($event); $event.preventDefault(); $event.stopPropagation();"><span><img src='imgs/ic-desktop.png' alt='Desktop Apps' /></span>Desktop Apps</a></li>
+					<li class="last"><span style="margin-bottom:-5px"><input ng-model="enbledChecked" id="enableAppend" type='checkbox' value=""></span><label for="enableAppend">Append</label></li>
+				</ul>
+			</div>
+			<!-- Apptype Desktop -->
+			
+			<!-- Apptype OEBS -->
+			<div ng-if="getScreenView == 'DesktopJava'" id="left-top-section" class="ApptypeScreenView">
+				<ul>
+					<li><span><a class='scrapeOnTxt'>Scrape On</a></span></li>
+					<li><a href='#' ng-class="enbledChecked ? 'enableActions' : 'disableActions'" data-toggle="modal" ng-click="initScrape($event); $event.preventDefault(); $event.stopPropagation();"><span><img src='imgs/ic-desktop.png' alt='Desktop Apps' /></span>OEBS Apps</a></li>
+					<li class="last"><span style="margin-bottom:-5px"><input ng-model="enbledChecked" id="enableAppend" type='checkbox' value=""></span><label for="enableAppend">Append</label></li>
+				</ul>
+			</div>
+			<!-- Apptype OEBS -->
+			
+			<!-- Apptype Mobilty -->
+			<div ng-if="getScreenView == 'Mobility'" id="left-top-section" class="ApptypeScreenView">
+				<ul>
+					<li><span><a class='scrapeOnTxt'>Scrape On</a></span></li>
+					<li><a href='#' ng-class="enbledChecked ? 'enableActions' : 'disableActions'" data-toggle="modal" ng-click="initScrape($event); $event.preventDefault(); $event.stopPropagation();"><span><img src='imgs/ic-mobility.png' alt='Mobile Apps' /></span>Android Apps</a></li>
+					<li class="last"><span style="margin-bottom:-5px"><input ng-model="enbledChecked" id="enableAppend" type='checkbox' value=""></span><label for="enableAppend">Append</label></li>
+				</ul>
+			</div>
+			<!-- Apptype Mobilty -->
+			
+			<!-- Apptype Webservice -->
+			<div style="border-bottom:0" ng-if="getScreenView == 'Webservice'" id="left-top-section" class="ApptypeScreenView">
+				<ul>
+					<li><span><a class='scrapeOnTxt'>Scrape On</a></span></li>
+					<li><a href='#' ng-class="enbledChecked ? 'enableActions' : 'disableActions'" data-toggle="modal" ng-click="initScrape($event); $event.preventDefault(); $event.stopPropagation();"><span><img src='imgs/ic-webservice.png' alt='Webservices' /></span>Web Services</a></li>
+					<li class="last"><span style="margin-bottom:-5px"><input ng-model="enbledChecked" id="enableAppend" type='checkbox' value=""></span><label for="enableAppend">Append</label></li>
+				</ul>
+			</div>
+			<!-- Apptype Webservice -->
 
 			<div class='clear-both'></div>
 
-			<div id="left-bottom-section">
+			<div ng-class="getScreenView == 'Webservice' ? 'hideContainer' : 'showContainer'" id="left-bottom-section">
 				<ul>
-					<li><a data-toggle="modal" data-target="#dialog-addObject" href='#'><span><img src='imgs/ic-addobject.png' alt='Add Object' /></span>Add Object</a></li>
+					<li><a ng-click="addObj()" href='#'><span><img src='imgs/ic-addobject.png' alt='Add Object' /></span>Add Object</a></li>
 					<li><a data-toggle="modal" data-target="#dialog-mapObject" href='#'><span><img src='imgs/ic-mapobject.png' alt='Map Object' /></span>Map Object</a></li>
 				</ul>
 			</div>
@@ -32,15 +74,75 @@
 	<!--Middle Panel-->
 	<div id="middle-content-section">
 		<!--Task Name-->
-		<div id="page-taskName"></div>
+		<div ng-class="getScreenView == 'Webservice' ? 'hideContainer' : 'showContainer'" id="page-taskName"></div>
 		<!--Task Name-->
 		
+		<!-- Specificly Webservice Screen -->
+		<div ng-class="getScreenView == 'Webservice' ? 'showContainer' : 'hideContainer'" class="WebServcieScreen">
+			<!-- Top -->
+			<div class="wsdlRow wsdlContainer">
+				<div class="wsdlUrlMethod">
+					<label>WSDL</label>
+					<span class="wsdlInputButton">
+						<input type="text" class="form-control wsldInput" />
+						<button class="btn btn-md launchWSDL">Go</button>
+					</span>
+					
+					<span class="wsdlInputButton wsdlSelectButton">
+						<select class="form-control wsldSelect">
+							<option>Method</option>
+						</select>
+					</span>
+				</div>
+				
+				<!-- Submit Task Button-->
+				<button class="btn btn-md pull-right submitTaskBtn submitTaskBtn-abs" ng-click="submitTasksScreen()">Submit</button>
+				<!-- Submit Task Button-->
+			</div>
+			<!-- Top -->
+			
+			<!-- Middle -->
+			<div class="wsdlRow wsdlActions">
+				<div id="wsdlActionsButton">
+					<button ng-click="selectedWsdlTab = 'requestWrap'" class="btn btn-xs btn-xs-custom pull-left">Request</button>
+					<button ng-click="selectedWsdlTab = 'responseWrap'" class="btn btn-xs btn-xs-custom pull-left">Response</button>
+					<button class="btn btn-xs btn-xs-custom pull-left">Save</button>
+					<input type="text" class="endPointURL form-control pull-left" placeholder="End Point URL"/>
+					<select class="form-control wsdlMethods pull-left">
+						<option>HTTP Method</option>
+					</select>
+					<input type="text" class="wsdlOperation form-control pull-left" placeholder="Operation"/>
+					<button style="padding: 2px 25px" class="btn btn-md pull-right">Add</button>
+				</div>
+			</div>
+			<!-- Middle -->
+			
+			<!-- Bottom -->
+			<div class="wsdlRow wsdlRqstRspns">
+				<!-- requestWrap -->
+				<div id="wsdlRequest" class="wsdlRqstRspnsWrap" ng-if="selectedWsdlTab == 'requestWrap'">
+					<textarea id="wsdlRequestHeader" class="wsdlTextAreaHeader" placeholder="Request Header"></textarea>
+					<textarea id="wsdlRequestBody" class="wsdlTextAreaBody" placeholder="Request Body"></textarea>
+				</div>
+				<!-- requestWrap -->
+				
+				<!-- responseWrap -->
+				<div id="wsdlResponse" class="wsdlRqstRspnsWrap" ng-if="selectedWsdlTab == 'responseWrap'">
+					<textarea id="wsdlResponseHeader" class="wsdlTextAreaHeader" placeholder="Response Header"></textarea>
+					<textarea id="wsdlResponseBody" class="wsdlTextAreaBody" placeholder="Response Body"></textarea>
+				</div>
+				<!-- responseWrap -->
+			</div>
+			<!-- Bottom -->
+		</div>
+		<!-- Specificly Webservice Screen -->
+		
 		<!-- Submit Task Button-->
-		<button class="btn btn-md pull-right submitTaskBtn" ng-click="submitTasksScreen()">Submit</button>
+		<button ng-class="getScreenView == 'Webservice' ? 'hideContainer' : 'showContainer'" class="btn btn-md pull-right submitTaskBtn" ng-click="submitTasksScreen()">Submit</button>
 		<!-- Submit Task Button-->
 
 		<!--Scrape Tree-->
-		<div id="finalScrap" class="wrap scrollbar-inner fsScroll"></div>
+		<div ng-class="getScreenView == 'Webservice' ? 'hideContainer' : 'showContainer'" id="finalScrap" class="wrap scrollbar-inner fsScroll"></div>
 		<!--Scrape Tree-->
 	</div>
 	<!--Middle Panel-->
@@ -48,7 +150,7 @@
 	<!--Right Panel-->
 	<div id="right-dependencies-section">
 		<!--Images Blocks-->
-		<div class="thumbnail thumbnail-custom">
+		<div ng-class="getScreenView == 'Webservice' ? 'hideContainer' : 'showContainer'" class="thumbnail thumbnail-custom">
         	<a class="slidePopup">
           		<img class="thumb-ic" src="imgs/ic-screenshot.png" alt="Scrape Screenshot">
           		<div class="caption">
@@ -69,7 +171,7 @@
 		<!--Images Blocks-->
 
 		<!--Images Blocks-->
-		<div class="thumbnail thumbnail-custom">
+		<div ng-class="getScreenView == 'Webservice' ? 'hideContainer' : 'showContainer'" class="thumbnail thumbnail-custom">
         	<a class="slidePopup">
           		<img class="thumb-ic" src="imgs/ic-filter.png" alt="Filter Objects">
           		<div class="caption">
@@ -193,7 +295,7 @@
 <!--Bootstrap Popup-->
 	<!-- Add Object -->
 	<div id="dialog-addObject" class="modal fade" role="dialog" data-keyboard="false" data-backdrop="static">
-		<div class="modal-dialog">
+		<div class="modal-dialog" style="width: 700px">
 			<!-- Modal content-->
 			<div class="modal-content">
 			<div class="modal-header">
@@ -201,62 +303,20 @@
 				<h4 class="modal-title">Add Objects</h4>
 			</div>
 			<div class="modal-body modal-body-add_obj">
+				<!-- Add Button -->
+				<div class="row addObjTopWrap">
+					<span ng-show="errorMessage" class="error-msg-abs ng-cloak">{{errorMessage}}</span>
+					<button ng-click="addMoreObject()" type="button" id="addMoreObjRow" class="btn btn-default btn-no-bg pull-left"><img src="imgs/ic-add.png" /> Add</button>
+				</div>
+				<!-- Add Button -->
+				
 				<!--Modal Content-->
-				<form class="form-inline">
-					<!--Inputs Seprators-->
-					<div class="row row-modal">
-						<div class="form-group">
-							<label>Object Type</label>
-							<select class="form-control"><option>Select</option></select>
-						</div>
-						
-						<div class="form-group">
-							<label>Object Name</label>
-							<input type="text" class="form-control" placeholder="Enter object name">
-						</div>
-
-						<img title="delete-row" src="imgs/ic-delete.png" />
-					</div>
-					<!--Inputs Seprators-->
-
-					<!--Inputs Seprators-->
-					<div class="row row-modal">
-						<div class="form-group">
-							<label>Object Type</label>
-							<select class="form-control"><option>Select</option></select>
-						</div>
-
-						<div class="form-group">
-							<label>Object Name</label>
-							<input type="text" class="form-control" placeholder="Enter object name">
-						</div>
-
-						<img title="delete-row" src="imgs/ic-delete.png" />
-					</div>
-					<!--Inputs Seprators-->
-
-					<!--Inputs Seprators-->
-					<div class="row row-modal">
-						<div class="form-group">
-							<label>Object Type</label>
-							<select class="form-control"><option>Select</option></select>
-						</div>
-						
-						<div class="form-group">
-							<label>Object Name</label>
-							<input type="text" class="form-control" placeholder="Enter object name">
-						</div>
-
-						<img title="delete-row" src="imgs/ic-delete.png" />
-					</div>
-					<!--Inputs Seprators-->
-				</form>
+				<form class="form-inline scrollbar-inner addObjectScroll" id="addObjContainer"></form>
 				<!--Modal Content-->
 			</div>
 			<div class="modal-footer">
-				<button type="button" class="btn btn-default pull-left">Add More</button>
-				<button type="button" class="btn btn-default">Submit</button>
-				<button type="button" class="btn btn-default">Reset</button>
+				<button ng-click="resetTextFields()" type="button" id="resetObjRow" class="btn btn-default">Reset</button>
+				<button ng-click="submitCustomObject()" type="button" id="rubmitObjRow" class="btn btn-default">Submit</button>
 			</div>
 			</div>
 		</div>
@@ -339,22 +399,89 @@
 	<!-- DeleteObjects Modal  -->
 	
 	<!-- Submitting Task -->
-<div class="modal fade" id="submitTasksScreen" role="dialog" data-keyboard="false" data-backdrop="static">
-	<div class="modal-dialog modal-sm">
-		<div class="modal-content">
-			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal">&times;</button>
-				<h4 class="modal-title">Submit Task</h4>
-			</div>
-			<div class="modal-body">
-				<p>Are you sure you want to submit the task ?</p>
-			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-default" data-dismiss="modal">Yes</button>
-				<button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+	<div class="modal fade" id="submitTasksScreen" role="dialog" data-keyboard="false" data-backdrop="static">
+		<div class="modal-dialog modal-sm">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal">&times;</button>
+					<h4 class="modal-title">Submit Task</h4>
+				</div>
+				<div class="modal-body">
+					<p>Are you sure you want to submit the task ?</p>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Yes</button>
+					<button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+				</div>
 			</div>
 		</div>
 	</div>
-</div>
-<!-- Submitting Task -->
+	<!-- Submitting Task -->
+	
+	<!-- Desktop Launch Popup -->
+	<div class="modal fade" id="launchDesktopApps" role="dialog" data-keyboard="false" data-backdrop="static">
+		<div class="modal-dialog modal-md">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal">&times;</button>
+					<h4 class="modal-title">Launch Application</h4>
+				</div>
+				<div class="modal-body">
+					<p><input class='launchPopupInput form-control' type='text' placeholder='Enter exe path name' id='desktopPath'/></p>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default btn-default-modal" ng-click="initScraping($event)">Launch</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- Desktop Launch Popup -->
+	
+	<!-- OEBS Launch Popup -->
+	<div class="modal fade" id="launchOEBSApps" role="dialog" data-keyboard="false" data-backdrop="static">
+		<div class="modal-dialog modal-md">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal">&times;</button>
+					<h4 class="modal-title">Launch Application</h4>
+				</div>
+				<div class="modal-body">
+					<p><input class='launchPopupInput form-control' type='text' placeholder='Enter exe path name' id='OEBSPath'/></p>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default btn-default-modal" ng-click="initScraping($event)">Launch</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- OEBS Launch Popup -->
+	
+	<!-- Mobility Launch Popup -->
+	<div class="modal fade" id="launchMobilityApps" role="dialog" data-keyboard="false" data-backdrop="static">
+		<div class="modal-dialog modal-md">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal">&times;</button>
+					<h4 class="modal-title">Launch Application</h4>
+				</div>
+				<div class="modal-body">
+					<!-- Error Printing Wrapper -->
+					<div class="errorHandling"></div>
+					<!-- Error Printing Wrapper -->
+					
+					<div class="leftAlign">
+						<p><input class='launchPopupInput form-control' type='text' placeholder='Enter APK path name' id='mobilityAPKPath'/></p>
+						<p><input class='launchPopupInput form-control' type='text' placeholder='Enter mobile serial number' id='mobilitySerialPath'/></p>
+					</div>
+					
+					<div class="rightAlign"><span class="androidIcon"></span></div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default btn-default-modal" ng-click="initScraping($event)">Launch</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- Mobility Launch Popup -->
+	
 <!--Bootstrap Popup-->

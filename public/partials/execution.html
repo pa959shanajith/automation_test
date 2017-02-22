@@ -300,3 +300,61 @@
 	</div>
 </div>
 <!-- Submitting Task -->
+
+<!-- Mobility Launch Popup -->
+<div class="modal fade" id="ALMSyncWindow" role="dialog" data-keyboard="false" data-backdrop="static">
+	<div class="modal-dialog modal-md" style="width:700px">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">&times;</button>
+				<h4 class="modal-title">ALM</h4>
+			</div>
+			<div class="modal-body">
+				<div class="popupWrapRow">
+				<!-- Top -->
+				<div class="textFieldsContainer">
+					<p>
+						<input type="text" class="form-control form-control-custom" placeholder="Enter ALM Url" ng-model="almURL" id="almURL" />
+					</p>
+					<p class="halfWrap" style="margin-right: 3%">
+						<input type="text" class="form-control form-control-custom" placeholder="Enter User Name" ng-model="almUserName" id="almUserName" />
+					</p>
+					<p class="halfWrap">
+						<input type="password" class="form-control form-control-custom" placeholder="Enter Password" ng-model="almPassword" id="almPassword" />
+					</p>
+					<p align="right">
+						<span class="error-msg-abs error-msg-abs2" ng-show="errorMessage2">{{errorMessage2}}</span>
+						<button type="button" class="btn btn-default btn-default-modal" ng-click="testConnection()">Connect</button>
+					</p>
+				</div>
+				<!-- Top -->
+				
+				<!-- Bottom -->
+				<div class="textFieldsContainer">
+					<p class="halfWrap" style="margin-right: 3%">
+						<input type="text" class="form-control form-control-custom" placeholder="Enter Domain Name" ng-model="almDomainName" id="almDomainName" />
+					</p>
+					<p class="halfWrap">
+						<input type="password" class="form-control form-control-custom" placeholder="Enter Project Name" ng-model="almProjectName" id="almProjectName" />
+					</p>
+					<p class="halfWrap" style="margin-right: 3%">
+						<input type="text" class="form-control form-control-custom" placeholder="Enter Testset Name" ng-model="almTestSetName" id="almTestSetName" />
+					</p>
+					<p class="halfWrap">
+						<input type="password" class="form-control form-control-custom" placeholder="Enter Testcase Name" ng-model="almTestCaseName" id="almTestCaseName" />
+					</p>
+					<p>
+						<input type="text" class="form-control form-control-custom" placeholder="Enter Folder Name" ng-model="almFolderPath" id="almFolderPath" />
+					</p>
+					<p align="right">
+						<span class="error-msg-abs error-msg-abs2" ng-show="errorMessage3">{{errorMessage3}}</span>
+						<button type="button" class="btn btn-default btn-default-modal" ng-click="saveQcScenarioDetails()">Save</button>
+					</p>
+				</div>
+				<!-- Bottom -->
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- Mobility Launch Popup -->

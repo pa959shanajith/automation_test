@@ -12,7 +12,7 @@ var async = require('async');
  * the service is used to init scraping & fetch scrape objects 
  */
 exports.initScraping_ICE = function (req, res) {
-	var reqScrapJson = {};
+	/*var reqScrapJson = {};
 	var browserType = req.body.browserType;
 	reqScrapJson.appType = "Web";
 	reqScrapJson.action = "SCRAPE"
@@ -31,7 +31,50 @@ exports.initScraping_ICE = function (req, res) {
 	mySocket.send(data);
 	mySocket.on('scrape', function (data) {
 		res.send(data);
-	});
+	});*/
+	var reqScrapJson = {};
+	reqScrapJson.action = "SCRAPE"
+	if(req.body.screenViewObject.appType == "Desktop"){
+		var applicationPath = req.body.screenViewObject.applicationPath;
+		var data = "LAUNCH_DESKTOP";
+		var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+		var mySocket = myserver.allSocketsMap[ip];
+		mySocket._events.scrape = [];               						
+		mySocket.emit("LAUNCH_DESKTOP", applicationPath);
+		mySocket.on('scrape', function (data) {
+			res.send(data);
+		});
+	}
+	else if(req.body.screenViewObject.appType == "DesktopJava"){
+		var applicationPath = req.body.screenViewObject.applicationPath;
+		var data = "LAUNCH OEBS";
+		var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+		var mySocket = myserver.allSocketsMap[ip];
+		mySocket._events.scrape = [];               						
+		mySocket.send(data);
+		mySocket.on('scrape', function (data) {
+			res.send(data);
+		});
+	}
+	else{	
+		var browserType = req.body.screenViewObject.browserType;
+			if (browserType == "chrome") {
+				var data = "OPEN BROWSER CH";
+			}
+			else if (browserType == "ie") {
+				var data = "OPEN BROWSER IE";
+			}
+			else if (browserType == "mozilla") {
+				var data = "OPEN BROWSER FX";
+			}
+		var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+		var mySocket = myserver.allSocketsMap[ip];
+		mySocket._events.scrape = [];               						
+		mySocket.send(data);
+		mySocket.on('scrape', function (data) {
+			res.send(data);
+		});
+	}
 };
 
 /**
@@ -40,12 +83,13 @@ exports.initScraping_ICE = function (req, res) {
  * the service is used to highlight scraped Objects into the browser
  */
  exports.highlightScrapElement_ICE = function(req, res) {
-			var focusParam = req.body.elementXpath+","+req.body.elementUrl;
-			var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-			var mySocket =  myserver.allSocketsMap[ip];
-			mySocket.emit("focus", focusParam);
-			var flag = 'success';
-			res.send(flag);
+	 	var focusParam = req.body.elementXpath+","+req.body.elementUrl;
+		var appType = req.body.appType;
+		var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+		var mySocket =  myserver.allSocketsMap[ip];
+		mySocket.emit("focus", focusParam, appType);
+		var flag = 'success';
+		res.send(flag);
 };
 
 /**

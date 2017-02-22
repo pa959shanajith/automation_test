@@ -36,6 +36,40 @@ mySPA.factory('ExecutionService', ['$http','$q', function ($http, $httpProvider,
 			})
 			.then(function(response)  { return response.data},
 			function(response)        {return $q.reject(response.data)})
-		}
+		},
+		
+		QClogin : function(url, userName, passWord){
+			return $http.post('/QCLOGIN_ICE',{
+				param : 'QCLOGIN_ICE',
+				url : url,
+            	uname : userName,
+            	password : passWord
+			})
+			.then(function(response)  { return response.data},
+			function(response)        {return $q.reject(response.data)})
+		},
+		
+		saveQcScenarioDetails : function(scenarioIdQC,domainName,projectName,testSetName,testCaseName,folderPath){
+			return $http.post('/saveQcScenarioDetails_ICE',{
+				param : 'saveQcScenarioDetails_ICE',
+				testScenarioId : scenarioIdQC,
+            	domainName : domainName,
+            	projectName : projectName,
+            	testset : testSetName,
+            	testcase : testCaseName,
+            	folderpath : folderPath
+			})
+			.then(function(response)  { return response.data},
+			function(response)        {return $q.reject(response.data)})
+		},
+		
+		getQcScenarioDetails: function(scenarioIdQC){
+			return $http.post('/getQcScenarioDetails_ICE',{
+				param : 'getQcScenarioDetails_ICE',
+				testScenarioId : scenarioIdQC
+			})
+			.then(function(response)  { return response.data},
+			function(response)        {return $q.reject(response.data)})
+	    },
 	}
 }]);
