@@ -1,5 +1,5 @@
 var screenshotObj,scrapedGlobJson,enableScreenShotHighlight,mirrorObj,emptyTestStep,anotherScriptId,getAppTypeForPaste, eaCheckbox, finalViewString, scrapedData, deleteFlag, pasteSelecteStepNo,globalSelectedBrowserType,selectedKeywordList;
-var initScraping = {}; var mirrorObj = {}; var scrapeTypeObj = {}; var newScrapedList; var viewString = {}; var scrapeObject = {}; var readTestCaseData; var getRowJsonCopy = [];
+var initScraping = {}; var mirrorObj = {}; var scrapeTypeObj = {}; var newScrapedList; var viewString = {}; var scrapeObject = {}; var screenViewObject = {}; var readTestCaseData; var getRowJsonCopy = [];
 var selectRowStepNoFlag = false; //var deleteStep = false;
 var getAllAppendedObj; //Getting all appended scraped objects
 var gsElement = []; window.localStorage['selectRowStepNo'] = '';
@@ -15,12 +15,26 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 	//Task Listing
 	loadUserTasks()
 	
+	//Default Function to reset all input, select
+	$scope.resetTextFields = function(){
+		$("input").val('');
+		$("select").prop('selectedIndex', 0);
+		$(".addObj-row").find("input").removeClass('inputErrorBorder')
+		$(".addObj-row").find("select").removeClass('selectErrorBorder')
+		$scope.errorMessage = "";
+	}
+	//Default Function to reset all input, select
+	
 	//Loading Project Info
 	var getProjInfo = JSON.parse(window.localStorage['_T'])
 	$("#page-taskName").empty().append('<span>'+getProjInfo.taskName+'</span>')
 	$(".projectInfoWrap").empty()
 	$(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">Project :</span><span class="content">'+getProjInfo.projectName+'</span></p><p class="proj-info-wrap"><span class="content-label">Module :</span><span class="content">'+getProjInfo.moduleName+'</span></p><p class="proj-info-wrap"><span class="content-label">Screen :</span><span class="content">'+getProjInfo.screenName+'</span></p>')
 	//Loading Project Info
+	
+	//Getting Apptype or Screen Type
+	$scope.getScreenView = getProjInfo.appType
+	//Getting Apptype orScreen Type
 
 	cfpLoadingBar.start()
 	$timeout(function(){
@@ -664,16 +678,103 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		function(error){console.log("error");})
 	}
 	//Populating Saved Scrape Data
-
+	
+	
+	//Initialization for apptype(Desktop, Mobility, OEBS) to redirect on initScraping function
+	$scope.initScrape = function(e){
+		if(e.currentTarget.className == "disableActions") return false
+		else{
+			$(document).find("#desktopPath").removeClass("inputErrorBorder")
+			$(document).find("#OEBSPath").removeClass("inputErrorBorder")
+			if(getProjInfo.appType == "Desktop"){
+				$("#launchDesktopApps").modal("show")
+			}
+			else if(getProjInfo.appType == "DesktopJava"){
+				$("#launchOEBSApps").modal("show")
+			}
+			else if(getProjInfo.appType == "Mobility"){
+				$("#launchMobilityApps").modal("show")
+			}
+		}
+	}
+	//Initialization for apptype(Desktop, Mobility, OEBS) to redirect on initScraping function
+	
+	
+	//Mobile Serial Number Keyup Function
+	$("#mobilitySerialPath").on("keyup", function(){
+		if($(this).val() != "") $(".androidIcon").addClass("androidIconActive")
+		else $(".androidIcon").removeClass("androidIconActive")
+	})
+	//Mobile Serial Number Keyup Function
+	
+ 	
 	//Initiating Scraping
 	$scope.initScraping = function(e, browserType){
 		if(e.currentTarget.className == "disableActions") return false
 		else{
 			eaCheckbox = $("#enableAppend").is(":checked")
 			enableScreenShotHighlight = false;
+			screenViewObject = {}
 			var blockMsg = 'Scrapping in progress. Please Wait...';
-			blockUI(blockMsg);
-			DesignServices.initScraping_ICE(browserType)
+			$(document).find("#desktopPath").removeClass("inputErrorBorder")
+			$(document).find("#OEBSPath").removeClass("inputErrorBorder")
+			//For Desktop
+			if(getProjInfo.appType == "Desktop"){
+				if($(document).find("#desktopPath").val() == "") {
+					$(document).find("#desktopPath").addClass("inputErrorBorder")
+					return false
+				}
+				else{
+					$(document).find("#desktopPath").removeClass("inputErrorBorder")
+					screenViewObject.appType = getProjInfo.appType,
+					screenViewObject.applicationPath = $(document).find("#desktopPath").val();
+					$("#launchDesktopApps").modal("hide");
+					blockUI(blockMsg);
+				}
+			}
+			//For Desktop
+			
+			//For Mobility
+			else if(getProjInfo.appType == "Mobility"){
+				if($(document).find("#mobilityAPKPath").val() == ""){
+					return false
+				}
+				else if($(document).find("#mobilitySerialPath").val() == ""){
+					return false
+				}
+				else{
+					screenViewObject.appType = getProjInfo.appType,
+					screenViewObject.apkPath = $(document).find("#mobilityAPKPath").val();
+					screenViewObject.mobileSerial = $(document).find("#mobilitySerialPath").val();
+					$("#launchMobilityApps").modal("hide");
+					blockUI(blockMsg);
+				}
+			}
+			//For Mobility
+			
+			//For OEBS
+			else if(getProjInfo.appType == "DesktopJava"){
+				if($(document).find("#OEBSPath").val() == "") {
+					$(document).find("#OEBSPath").addClass("inputErrorBorder")
+					return false
+				}
+				else{
+					$(document).find("#OEBSPath").removeClass("inputErrorBorder")
+					screenViewObject.appType = getProjInfo.appType,
+					screenViewObject.applicationPath = $(document).find("#OEBSPath").val();
+					$("#launchOEBSApps").modal("hide");
+					blockUI(blockMsg);
+				}
+			}
+			//For OEBS
+			
+			//For Web
+			else{
+				screenViewObject.browserType = browserType
+				blockUI(blockMsg);
+			}
+			//For Web
+			DesignServices.initScraping_ICE(screenViewObject)
 			.then(function (data) { 				
 				unblockUI();
 				if(data.view.length > 0)
@@ -851,6 +952,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 	}
 	//Highlight Element on browser
 	$scope.highlightScrapElement = function(xpath,url) {
+		var appType = $scope.getScreenView;
 		if(enableScreenShotHighlight == true){
 			console.log("Init ScreenShot Highlight")
 			var data = {
@@ -922,7 +1024,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			}
 		}	
 		else{
-			DesignServices.highlightScrapElement_ICE(xpath,url)
+			DesignServices.highlightScrapElement_ICE(xpath,url, appType)
 			.then(function(data) {
 				if(data == "fail"){
 					alert("fail");
@@ -932,6 +1034,117 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		}    
 	};
 	//Highlight Element on browser
+	
+	
+	//Add Object Functionality
+	$scope.addObj = function(){
+		$scope.errorMessage = "";
+		$("#dialog-addObject").modal("show");
+		$("#addObjContainer").empty()
+		if($(".addObj-row").length > 1) $(".addObj-row").remove()
+		$("#addObjContainer").append('<div class="row row-modal addObj-row"><div class="form-group"><input type="text" class="form-control form-control-custom" placeholder="Enter object name"></div><div class="form-group form-group-2"><select class="form-control form-control-custom"><option selected disabled>Select Object</option><option value="button">button</option><option value="checkbox">checkbox</option><option value="select">select</option><option value="img">img</option><option value="a">a</option><option value="radiobutton">radiobutton</option><option value="input">input</option><option value="Element">Element</option><option value="list">list</option><option value="table">table</option></select></div><img class="deleteAddObjRow" src="imgs/ic-delete.png" /></div>')
+	};
+	//Add Object Functionality
+	
+	
+	//Delete Custom Object Row
+	$(document).on("click", ".deleteAddObjRow", function(){
+		$(this).parent(".addObj-row").remove();
+	});
+	
+	//Add More Object Functionality
+	$scope.addMoreObject = function(){
+		$("#addObjContainer").append('<div class="row row-modal addObj-row"><div class="form-group"><input type="text" class="form-control form-control-custom" placeholder="Enter object name"></div><div class="form-group form-group-2"><select class="form-control form-control-custom"><option selected disabled>Select Object</option><option value="button">button</option><option value="checkbox">checkbox</option><option value="select">select</option><option value="img">img</option><option value="a">a</option><option value="radiobutton">radiobutton</option><option value="input">input</option><option value="Element">Element</option><option value="list">list</option><option value="table">table</option></select></div><img class="deleteAddObjRow" src="imgs/ic-delete.png" /></div>')
+	};
+	//Add More Object Functionality
+	
+	//WSDL Functionality
+	$scope.selectedWsdlTab = "requestWrap"
+	//WSDL Functionality
+	
+	
+	//Submit Custom Object Functionality
+	$scope.submitCustomObject = function(){
+		$scope.errorMessage = "";
+		var flag = "false";
+		$(".addObj-row").find("input").removeClass('inputErrorBorder')
+		$(".addObj-row").find("select").removeClass('selectErrorBorder')
+		$.each($(".addObj-row"), function(){
+			if($(this).find("input").val() == ""){
+				$scope.errorMessage = "Please enter object name";
+				$(this).find("input").addClass('inputErrorBorder')
+				flag = "false";
+				return false
+			}
+			else if($(this).find("select option:selected").val() == "Select Object"){
+				$scope.errorMessage = "Please select object type";
+				$(this).find("select").addClass('selectErrorBorder')
+				flag = "false";
+				return false
+			}
+			else{
+				//If no field is empty, proceed to service call
+				flag = "true";
+				$scope.errorMessage = "";
+				$(".addObj-row").find("input").removeClass('inputErrorBorder')
+				$(".addObj-row").find("select").removeClass('selectErrorBorder')
+			}
+		})
+		if(flag == "true"){
+			var customObj = [];
+			
+			//Pushing custom object in array
+			$.each($(".addObj-row"), function(){
+				customObj.push({
+					custname : $(this).find("input").val(),
+					tag : $(this).find("select option:selected").val()
+				})
+			})
+			
+			//Pushing custom object array in viewString.view
+			for(i=0; i<customObj.length; i++){
+				viewString.view.push(customObj[i])
+			}
+			
+			//Reloading List Items
+			$('#scraplist').empty()
+			for(i=0; i<viewString.view.length; i++){
+				var innerUL = $('#scraplist');
+				var path = viewString.view[i].xpath;
+				var ob = viewString.view[i];
+				ob.tempId= i;
+				var custN = ob.custname.replace(/[<>]/g, '').trim();
+				var tag = ob.tag;
+				if(tag == "dropdown"){imgTag = "select"}
+				else if(tag == "textbox/textarea"){imgTag = "input"}
+				else imgTag = tag;
+				var tag1 = tag.replace(/ /g, "_");
+				var tag2;
+				if(tag == "a" || tag == "input" || tag == "table" || tag == "list" || tag == "select" || tag == "img" || tag == "button" || tag == "radiobutton" || tag == "checkbox" || tag == "tablecell"){
+					var li = "<li data-xpath='"+ob.xpath+"' data-left='"+ob.left+"' data-top='"+ob.top+"' data-width='"+ob.width+"' data-height='"+ob.height+"' data-tag='"+tag+"' data-url='"+ob.url+"' data-hiddentag='"+ob.hiddentag+"' class='item select_all "+tag+"x' val="+ob.tempId+"><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' disabled /><span title="+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+" class='ellipsis'>"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"</span></a></li>";
+				} 
+				else {
+					var li = "<li data-xpath='"+ob.xpath+"' data-left='"+ob.left+"' data-top='"+ob.top+"' data-width='"+ob.width+"' data-height='"+ob.height+"' data-tag='"+tag+"' data-url='"+ob.url+"' data-hiddentag='"+ob.hiddentag+"' class='item select_all "+tag+"x' val="+ob.tempId+"><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' disabled /><span title="+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+" class='ellipsis'>"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"</span></a></li>";
+				}
+				angular.element(innerUL).append(li);
+			}
+			
+			$("#dialog-addObject").modal("hide");
+			$("#saveObjects").prop("disabled", false)
+			flag = "false";
+		}
+		
+		//Building Tree
+		$(document).find('#scrapTree').scrapTree({
+			multipleSelection : {
+				//checkbox : checked,
+				classes : [ '.item' ]
+			},
+			editable: true,
+			radio: true
+		});
+	};
+	//Submit Custom Object Functionality
 
 	//Save Scrape Objects
 	$(document).on('click', "#saveObjects", function(){

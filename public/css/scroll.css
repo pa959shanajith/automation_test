@@ -288,11 +288,11 @@
 	min-height: auto;
 	height: 100% !important;
 }
-.pluginTask > .scroll-element.scroll-y{
-	top: 0;
+.pluginTask > .scroll-element.scroll-y .scroll-bar{
+       background: #321e4f
 }
-.pluginTask > .scroll-element.scroll-y .scroll-element_outer{
-	background: rgb(239, 239, 239);
+.pluginTask > .scroll-element .scroll-element_track{
+       background: rgb(211, 211, 211)
 }
 .scroll-wrapper.scrollbar-innerpages {
     height: 215px;
@@ -348,6 +348,7 @@
 
 .scrollbar-inner.fsScroll {
     margin-top: 0px;
+    height: 99%;
 }
 
 .scroll-wrapper > .fsScroll{
@@ -361,7 +362,8 @@
     height: calc(100% - 90px);
 }
 .fsScroll > .scroll-element.scroll-y .scroll-bar{
-	background: #321e4f
+	background: #321e4f;
+	min-height: 20px;
 }
 .fsScroll > .scroll-element .scroll-element_track{
 	background: rgb(211, 211, 211)
@@ -429,6 +431,24 @@
 }
 .scrollbar-inner-rep > .scroll-element .scroll-element_track{
 	background: rgb(211, 211, 211)
+}
+
+
+.scroll-wrapper > .addObjectScroll{
+       padding: 0px;
+       height: auto !important;
+       min-height: auto !important;
+       max-height: 100% !important;
+}
+.scroll-wrapper.addObjectScroll {
+       float: none;
+       height:160px !important
+}
+.addObjectScroll > .scroll-element.scroll-y .scroll-bar{
+       background: #321e4f
+}
+.addObjectScroll > .scroll-element .scroll-element_track{
+       background: rgb(211, 211, 211)
 }
 
 /**********Custom Media Queries**********/

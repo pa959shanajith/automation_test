@@ -3,6 +3,7 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 	var getEachScenario = [] //Contains Each RowData of Scenarios
 	var userinfo = {} //Contains Userinfo
 	var browserTypeExe = []; // Contains selected browser id for execution
+	var scenarioIdQC;
 	$("body").css("background","#eee");
 	$timeout(function(){
 		$('.scrollbar-inner').scrollbar();
@@ -182,6 +183,95 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 		}
 	}
 	//Execute TestSuite Functionality
+	
+	
+	//ALM Functionality
+	$(document).on("click", "#syncScenario", function(){
+		scenarioIdQC = $(this).parent().siblings("td:nth-child(3)").attr("sId")
+		$("#ALMSyncWindow").modal("show");
+		$("#almURL, #almUserName, #almPassword, #almDomainName, #almProjectName, #almTestSetName, #almTestCaseName, #almFolderPath").val('')
+		$("#almFolderPath").val('Root\\')
+		/*ExecutionServices.getQcScenarioDetails(scenarioIdQC)	
+		.then(function(data) {
+			console.log(data)
+		},
+		function(error) {
+			console.log("Error while traversing executionController.js file testConnection method!! \r\n "+(error.data));
+		});*/
+	})
+	
+	$scope.testConnection = function(){
+		$scope.errorMessage2 = "";
+		$("#almURL, #almUserName, #almPassword").removeClass('inputErrorBorder')
+		if(!$scope.almURL) {
+			$scope.errorMessage2 = "Enter ALM Url";
+			$("#almURL").addClass('inputErrorBorder')
+		}
+		else if(!$scope.almUserName){
+			$scope.errorMessage2 = "Enter User Name";
+			$("#almUserName").addClass('inputErrorBorder')
+		}
+		else if(!$scope.almPassword){
+			$scope.errorMessage2 = "Enter Password";
+			$("#almPassword").addClass('inputErrorBorder')
+		}
+		else{
+			$scope.errorMessage2 = "";
+			$("#almURL, #almUserName, #almPassword").removeClass('inputErrorBorder')
+			var alURL = $scope.almURL;
+			var almUserName = $scope.almUserName;
+			var almPassword = $scope.almPassword;
+			/*ExecutionService.QClogin(alURL,almUserName,almPassword)
+			.then(function(data) {
+				console.log(data)
+			},
+			function(error) {
+				console.log("Error while traversing executionController.js file testConnection method!! \r\n "+(error.data));
+			});*/
+		}
+	};
+	
+	$scope.saveQcScenarioDetails = function(){
+		$scope.errorMessage3 = "";
+		$("#almDomainName, #almProjectName, #almTestSetName, #almTestCaseName, #almFolderPath").removeClass('inputErrorBorder')
+		if(!$scope.almDomainName) {
+			$scope.errorMessage3 = "Enter Domain Name";
+			$("#almDomainName").addClass('inputErrorBorder')
+		}
+		else if(!$scope.almProjectName){
+			$scope.errorMessage3 = "Enter Project Name";
+			$("#almProjectName").addClass('inputErrorBorder')
+		}
+		else if(!$scope.almTestSetName){
+			$scope.errorMessage3 = "Enter Testset Name";
+			$("#almTestSetName").addClass('inputErrorBorder')
+		}
+		else if(!$scope.almTestCaseName){
+			$scope.errorMessage3 = "Enter Testcase Name";
+			$("#almTestCaseName").addClass('inputErrorBorder')
+		}
+		else if(!$scope.almFolderPath){
+			$scope.errorMessage3 = "Enter Folder Name";
+			$("#almFolderPath").addClass('inputErrorBorder')
+		}
+		else{
+			$scope.errorMessage3 = "";
+			$("#almDomainName, #almProjectName, #almTestSetName, #almTestCaseName, #almFolderPath").removeClass('inputErrorBorder')
+			var domainName = $scope.almDomainName;
+			var projectName = $scope.almProjectName;
+			var testSetName = $scope.almTestSetName;
+			var testCaseName = $scope.almTestCaseName;
+			var folderPath = $scope.almFolderPath;
+			/*ExecutionServices.saveQcScenarioDetails(scenarioIdQC,domainName,projectName,testSetName,testCaseName,folderPath)	
+			.then(function(data) {
+				console.log(data)
+			},
+			function(error) {
+				console.log("Error while traversing executionController.js file testConnection method!! \r\n "+(error.data));
+			});*/
+		}
+	}
+	//ALM Functionality
 	
 	
 	//Submit Task Function

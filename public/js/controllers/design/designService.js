@@ -1,16 +1,16 @@
 mySPA.factory('DesignServices', ['$http','$q', function ($http, $httpProvider, $q)   {
 	return{
-		initScraping_ICE : function(browserType){
+		initScraping_ICE : function(screenViewObject){
 			return $http.post('/initScraping_ICE',{
 				param : 'initScraping_ICE',
-				browserType: browserType
+				screenViewObject: screenViewObject
 			})
 			.then(function(response)  { return response.data},
 					function(response)        {return $q.reject(response.data)})
 		},
-		highlightScrapElement_ICE: function(xpath,url) {
+		highlightScrapElement_ICE: function(xpath,url,appType) {
 			return $http.post('/highlightScrapElement_ICE',
-					{"action":"highlightScrapElement_ICE","elementXpath":xpath,"elementUrl" : url,"appType":"web"}
+					{"action":"highlightScrapElement_ICE","elementXpath":xpath,"elementUrl" : url,"appType":appType}
 			).then(function(response) {
 				console.log("highlightScrapElement ...", response.data);
 				//promise fulfilled

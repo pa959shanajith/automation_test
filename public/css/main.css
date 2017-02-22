@@ -37,6 +37,38 @@ html {
     font-family: LatoWebBold;
 }
 
+.contentOverlayStyle2{
+	width: 50%;
+    padding: 5px 5px;
+    padding-right: 15px;
+}
+
+.launchPopupInput{
+	width: 94%;
+    border-radius: 0;
+    border-right: 0;
+    border-left: 0;
+    border-top: 0;
+    border-bottom: 1px solid #9e9e9e;
+    box-shadow: none;
+    font-family: 'LatoWeb';
+    margin-right: 16px;
+    font-size: 15px;
+    padding: 0;
+    margin: 0 3%;
+}
+.launchPopupInput:focus{
+	border-color: #9e9e9e;
+	outline: 0 !important;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+}
+
+.launchButton{
+	float: none !important;
+    vertical-align: text-top;
+}
+
 body {
     font-family: LatoWeb;
     margin: 0;
@@ -86,6 +118,26 @@ body {
     font-family: 'LatoWebLight';
 }
 
+.btn-no-bg{
+	background: none !important;
+    color: #333 !important;
+    font-size: 15px !important;
+    font-family: 'LatoWebBold';
+	padding: 0 10px !important;
+}
+
+.btn-no-bg:active:focus,
+.btn-no-bg:focus,
+.btn-no-bg:hover{
+	box-shadow: none;
+}
+
+.btn-no-bg img{
+	margin-right: 5px;
+    vertical-align: middle;
+    display: inline-block;
+}
+
 .btn-xs-custom {
 	margin-top: 7px;
 }
@@ -111,6 +163,12 @@ body {
 .submitTaskBtn:focus,
 .submitTaskBtn:hover {
 	background:#ff7300
+}
+
+.submitTaskBtn-abs{
+	position: absolute;
+    right: 0;
+    top: 9px;
 }
 
 #footer {
@@ -515,6 +573,7 @@ body {
     padding: 0px 15px 10px;
     display: inline-block;
     width: 100%;
+    word-break: break-all;
 }
 
 .assignedTaskInner {
@@ -771,6 +830,135 @@ body {
 
 
 /***Design Mid Section CSS***/
+/*** Web service Screen **/
+.WebServcieScreen{
+	float: left;
+	width:100%;
+	height:100%;
+	position:relative;
+}
+
+.wsdlRow{
+	float:left;
+	width:100%;
+	position: relative;
+}
+
+.wsdlUrlMethod{
+	background: #e6e7e9;
+    float: left;
+    width: 87%;
+    padding: 10px 15px;
+}
+
+.wsdlUrlMethod label{
+	font-family: 'LatoWebLight';
+    font-size: 16px;
+    margin-bottom: 0;
+    vertical-align: sub;
+    color: #643693
+}
+
+.wsldInput, .wsldSelect, .endPointURL, .wsdlMethods, .wsdlOperation{
+	padding: 5px;
+    height: 24px;
+    border: 1px solid #909090 !important;
+    margin-bottom: 0;
+}
+
+.endPointURL {
+    width: 35%;
+    margin-top: 6px;
+    margin-left: 8px;
+}
+
+.wsdlMethods {
+	width: 13%;
+    margin: 0 10px;
+    margin-top: 6px;
+}
+
+.wsdlOperation {
+    width: 13%;
+    margin-top: 6px;
+}
+
+.wsldSelect, .wsdlMethods{
+	padding: 0px;
+	height: 25px;
+}
+
+.wsldInput:focus, .wsldSelect:focus, .wsdlMethods:focus, .endPointURL:focus, .wsdlOperation:focus{
+	outline: 0 !important;
+    -webkit-box-shadow: none !important;
+    -moz-box-shadow: none !important;
+    box-shadow: none !important;
+    border: 1px solid #909090;
+}
+
+.wsdlInputButton{
+	display: inline-block;
+    width: 56%;
+    margin-left: 15px;
+    position: relative;
+    vertical-align: middle;
+}
+
+.wsdlSelectButton{
+	width:28%;
+	margin-left: 35px;
+}
+
+.launchWSDL.focus,
+.launchWSDL,
+.launchWSDL:active:focus,
+.launchWSDL:focus,
+.launchWSDL:hover {
+    position: absolute;
+    top: 0;
+    right: 0;
+    border-radius: 0px 5px 5px 0px;
+    font-size: 14px;
+    padding: 2px 25px;
+}
+
+#wsdlActionsButton{
+	float: left;
+    width: 100%;
+    margin-bottom: 15px;
+    margin-top: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #888;
+}
+
+.wsdlRqstRspns{
+	height: calc(100% - 120px);
+}
+
+.wsdlRqstRspnsWrap{
+	float: left;
+	width:100%;
+	height:100%;
+}
+
+.wsdlTextAreaHeader, .wsdlTextAreaBody{
+	float: left;
+	width:100%;
+	resize:none;
+	padding: 10px;
+	background: #e6e7e9;
+	border: none;
+}
+
+.wsdlTextAreaHeader{
+	height: 38%;
+	margin-bottom: 2%
+}
+
+.wsdlTextAreaBody{
+	height: 59%;
+}
+/*** Web service Screen **/
 
 #middle-content-section {
     width: calc(100% - 270px);
@@ -794,6 +982,10 @@ body {
     float: left;
     width: 100%;
 	margin-bottom: 10px;
+}
+
+.hideContainer{
+	display: none
 }
 
 #page-taskName span {
@@ -1548,6 +1740,52 @@ body {
 
 /******Custom Bootstrap Dialog CSS******/
 
+.addObjTopWrap{
+	margin: 0;
+    float: left;
+    margin-left: -15px;
+    margin-bottom: 30px;
+    width: 100%;
+    position: relative;
+}
+
+.errorHandling{
+	float:left;
+	width:100%;
+	position: relative;
+}
+
+.leftAlign{
+	display: inline-block;
+    width: 450px;
+}
+
+.leftAlign p{
+	margin-bottom: 20px;
+}
+
+.rightAlign{
+    display: inline-block;
+    width: 70px;
+    position: relative;
+    top: 20px;
+    left: 20px;
+}
+
+.androidIcon{
+	width:69px;
+	display: inline-block;
+	height: 81px;
+	background: url("../imgs/ic-andrd-inactive.png") left top no-repeat;
+}
+
+.androidIconActive{
+	 transition: 0.2s ease-in ease-in-out;
+    -moz-transition: 0.2s ease-in-out;
+    -webkit-transition: 0.2s ease-in-out;
+	background: url("../imgs/ic-andrd-active.png") left top no-repeat;
+}
+
 .modal {
     text-align: center;
     padding: 0!important;
@@ -1606,9 +1844,12 @@ body {
 }
 
 .modal-body-add_obj {
-    height: 300px;
-    overflow: auto;
     padding: 15px 30px;
+    padding-right: 10px;
+}
+
+.addObj-row input{
+	font-size:16px;
 }
 
 .row-modal {
@@ -1630,8 +1871,8 @@ body {
 }
 
 .modal-body .row-modal .form-group {
-    width: 43%;
-    margin-right: 3%;
+    width: 52%;
+    margin-right: 6%;
     float: left;
 }
 
@@ -1655,6 +1896,47 @@ body {
     box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075), 0 0 8px rgb(204, 169, 255) !important;
 }
 
+.modal-body .row-modal .form-control-custom, .form-control-custom{
+	border: 1px solid #311d4e !important;
+	border-left:0 !important;
+	border-right:0 !important;
+	border-top:0 !important;
+	border-radius:0;
+	box-shadow: none; 
+	color:#333;
+}
+
+.modal-body .row-modal .form-control-custom:focus, .form-control-custom:focus {
+    box-shadow: none !important;
+}
+
+.modal-body .row-modal .form-group-2{
+	width: 28%;
+}
+
+.modal-body .row-modal .form-group-2 select{
+	margin-bottom:0;
+	background: #311d4e url('../imgs/ic-dropdown.png') 95% 6px no-repeat;
+    color: #fff;
+	border: 1px solid #311d4e !important;
+	appearance: none;
+	-moz-appearance: none;
+	-webkit-appearance: none;
+}
+
+.modal-body .row-modal .form-group-2 select option{
+	background:#fff;
+	color:#333;
+	border:1px solid #311d4e;
+}
+
+.deleteAddObjRow{
+	position: absolute;
+    right: 30px;
+    top: 5px;
+    cursor: pointer;
+}
+
 .modal-footer button {
     background: #643693;
     color: #fff;
@@ -1662,6 +1944,10 @@ body {
     border-radius: 20px;
     padding: 5px 20px;
     font-size: 16px;
+}
+
+.btn-default-modal{
+	padding:5px 30px !important;
 }
 
 .modal-footer button:hover,
@@ -1858,6 +2144,36 @@ nav {
     right: 0;
     bottom: -35px;
     font-weight: 500;
+}
+
+.error-msg-abs{
+    color: #d33c3c;
+    position: absolute;
+	left:50%;
+	top:50%;
+	transform:translate(-50%, -50%);
+	-moz-transform:translate(-50%, -50%);
+	-webkit-transform:translate(-50%, -50%)	
+}
+
+.error-msg-abs2{
+	left: 0%;
+	top:50%;
+	transform:translate(0%, -50%);
+	-moz-transform:translate(0%, -50%);
+	-webkit-transform:translate(0%, -50%)	
+}
+
+.modal-body .row-modal .inputErrorBorder{
+	border-bottom: 2px solid #d33c3c !important;
+}
+
+.modal-body .row-modal select.selectErrorBorder{
+	border: 2px solid #d33c3c !important;
+}
+
+.inputErrorBorder{
+	border-bottom: 2px solid #d33c3c !important;
 }
 
 input[type="checkbox"] {
@@ -2061,6 +2377,30 @@ select:hover {
     border: 1px solid #edefec;
 }
 
+.popupWrapRow{
+	display: block;
+	width:100%;
+}
+
+.textFieldsContainer{
+	display: block;
+	width:100%;
+}
+
+.textFieldsContainer p{
+	margin-bottom: 25px;
+	position: relative;
+}
+
+.textFieldsContainer:first-child{
+	border-bottom: 5px solid #EEEEEE;
+	margin-bottom: 25px;
+}
+
+.halfWrap{
+	width:48%;
+	display: inline-block;
+}
 /******************Admin CSS***************************/
 
 
@@ -2176,5 +2516,14 @@ select:-webkit-autofill:focus {
 	}
 	.suitestartend thead{
 		width: calc(100% - 765px);
+	}
+	.ApptypeScreenView{
+		min-height: 50% !important;
+	}
+	.endPointURL{
+		width: 37%
+	}
+	.wsdlTextAreaBody{
+		height: 56%;
 	}
 }
