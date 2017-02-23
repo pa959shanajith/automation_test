@@ -164,7 +164,11 @@ exports.updateScreen_ICE = function(req, res){
 		*/
 		//this viewString is an array of scraped objects
 		var viewString = updateData.getScrapeData.view;
-		var oldCustNamesList = updateData.editedList.oldCustName;   
+		var oldCustNamesList = updateData.editedList.oldCustName; 
+		for(i=0;i<oldCustNamesList.length;i++)
+		{
+			oldCustNamesList[i] = oldCustNamesList[i].replace(/&amp;/g, '&');
+		} 
 		var newCustNamesList = updateData.editedList.modifiedCustNames;
 		var xpathListofCustName = updateData.editedList.xpathListofCustNames;
 		var elementschanged = 0;
@@ -294,6 +298,9 @@ exports.updateScreen_ICE = function(req, res){
 									statusFlag="Error occured in testcaseDataQuery : Fail";
 									res.send(statusFlag);
 								}else{
+
+									if(testcaseDataQueryresult.rows.length>0){
+
 									async.forEachSeries(testcaseDataQueryresult.rows,
 									function(eachTestcase,testcaserendercallback){
 									// for(var eachtestcaseindex=0;eachtestcaseindex<testcaseDataQueryresult.length;eachtestcaseindex++){
@@ -347,6 +354,11 @@ exports.updateScreen_ICE = function(req, res){
 											}
 										});
 									});
+									}
+									else{
+										statusFlag = "success";
+										res.send(statusFlag);
+									}
 								}
 							});
 							testcasecallback();

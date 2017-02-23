@@ -168,13 +168,13 @@ var oldCustName = [];
 		        	        		}
 		        	        	}
 		        	        })
-		        	         .on('keypress',  function (e) { debugger;
-		        	        	 var txtWidth = $(this).attr('size');
-		        	             var cs = $(this).val().length-6;
-		        	             txtWidth = parseInt(txtWidth);
-		        	             if(cs>txtWidth){
-		        	             $(this).attr('size',txtWidth+5);    }
-	        	        })
+		        	    //      .on('keypress',  function (e) { debugger;
+		        	    //     	 var txtWidth = $(this).attr('size');
+		        	    //          var cs = $(this).val().length-6;
+		        	    //          txtWidth = parseInt(txtWidth);
+		        	    //          if(cs>txtWidth){
+		        	    //          $(this).attr('size',txtWidth+5);    }
+	        	        // })
 		        	       .on('blur',  function (e) {
 		        	    	   //$(this).parent().append($(span).html($(this).val()));
 		        	    	   span.removeClass('content-hide');

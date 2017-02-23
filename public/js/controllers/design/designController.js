@@ -1097,7 +1097,8 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			$.each($(".addObj-row"), function(){
 				customObj.push({
 					custname : $(this).find("input").val(),
-					tag : $(this).find("select option:selected").val()
+					tag : $(this).find("select option:selected").val(),
+					xpath : ''
 				})
 			})
 			
