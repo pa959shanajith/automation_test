@@ -544,3 +544,35 @@ exports.debugTestCase_ICE = function (req, res) {
 		});
 	}
 };
+
+/**
+* getKeywordDetails_ICE for fetching the objects,keywords 
+* based on projecttype sent by front end
+* @author vishvas.a
+*/
+exports.getKeywordDetails_ICE = function getKeywordDetails_ICE(req, res) {
+	// request variables
+	var requestedprojecttypename = req.body.projecttypename;
+	//var requestedprojecttypename = "Web";
+	// Query 1 fetching the objecttype,keywords based on projecttypename
+	var individualsyntax = {};
+
+	var flag = "Error in errProjectBasedKeywords : Fail";
+	var getProjectBasedKeywords = "select objecttype, keywords from keywords where projecttypename in ('"
+			+ requestedprojecttypename + "','Generic') ALLOW FILTERING";
+	dbConn.execute(getProjectBasedKeywords,
+		function(errProjectBasedKeywords,projectBasedKeywordsresult) {
+			if (errProjectBasedKeywords) {
+				flag = "Error in errProjectBasedKeywords : Fail";
+				res.send(flag);
+			} else {
+				for (var objectindex = 0; objectindex < projectBasedKeywordsresult.rows.length; objectindex++) {
+					var objecttype = projectBasedKeywordsresult.rows[objectindex].objecttype;
+					var keywords = projectBasedKeywordsresult.rows[objectindex].keywords;
+					individualsyntax[objecttype] = keywords;
+				}
+			res.send(individualsyntax);
+			}
+		});
+};
+

@@ -64,6 +64,7 @@ app.post('/updateScreen_ICE', design.updateScreen_ICE);
 app.post('/readTestCase_ICE', design.readTestCase_ICE);
 app.post('/updateTestCase_ICE', design.updateTestCase_ICE);
 app.post('/debugTestCase_ICE', design.debugTestCase_ICE);
+app.post('/getKeywordDetails_ICE', design.getKeywordDetails_ICE);
 //Execute Screen Routes
 app.post('/readTestSuite_ICE', suite.readTestSuite_ICE);
 app.post('/updateTestSuite_ICE', suite.updateTestSuite_ICE);
