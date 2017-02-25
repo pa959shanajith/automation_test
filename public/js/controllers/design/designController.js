@@ -3013,7 +3013,7 @@ function commentStep(){
 
 function getTags(data) {
 	var obnames = [];
-	var appTypeLocal = "Web"//window.localStorage['appTypeScreen'];
+	var appTypeLocal = JSON.parse(window.localStorage['_T']).appType;
 		if(appTypeLocal == "Web"){
 			obnames.push("@Generic");
 			obnames.push("@Excel");
