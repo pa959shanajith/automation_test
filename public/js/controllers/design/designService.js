@@ -100,6 +100,19 @@ mySPA.factory('DesignServices', ['$http','$q', function ($http, $httpProvider, $
 			},function(response){
 				return $q.reject(response.data)
 			})
+		},
+		
+		//Testcases Keywords
+		getKeywordDetails_ICE : function(appType){
+			return $http.post('/getKeywordDetails_ICE',{
+				param : 'getKeywordDetails_ICE',
+				projecttypename : appType
+			})
+			.then(function(response)  { 
+				return response.data
+			},function(response){
+				return $q.reject(response.data)
+			})
 		}
 	}
 }]);

@@ -164,7 +164,11 @@ exports.updateScreen_ICE = function(req, res){
 		*/
 		//this viewString is an array of scraped objects
 		var viewString = updateData.getScrapeData.view;
-		var oldCustNamesList = updateData.editedList.oldCustName;   
+		var oldCustNamesList = updateData.editedList.oldCustName; 
+		for(i=0;i<oldCustNamesList.length;i++)
+		{
+			oldCustNamesList[i] = oldCustNamesList[i].replace(/&amp;/g, '&');
+		} 
 		var newCustNamesList = updateData.editedList.modifiedCustNames;
 		var xpathListofCustName = updateData.editedList.xpathListofCustNames;
 		var elementschanged = 0;
@@ -294,6 +298,9 @@ exports.updateScreen_ICE = function(req, res){
 									statusFlag="Error occured in testcaseDataQuery : Fail";
 									res.send(statusFlag);
 								}else{
+
+									if(testcaseDataQueryresult.rows.length>0){
+
 									async.forEachSeries(testcaseDataQueryresult.rows,
 									function(eachTestcase,testcaserendercallback){
 									// for(var eachtestcaseindex=0;eachtestcaseindex<testcaseDataQueryresult.length;eachtestcaseindex++){
@@ -347,6 +354,11 @@ exports.updateScreen_ICE = function(req, res){
 											}
 										});
 									});
+									}
+									else{
+										statusFlag = "success";
+										res.send(statusFlag);
+									}
 								}
 							});
 							testcasecallback();
@@ -532,3 +544,35 @@ exports.debugTestCase_ICE = function (req, res) {
 		});
 	}
 };
+
+/**
+* getKeywordDetails_ICE for fetching the objects,keywords 
+* based on projecttype sent by front end
+* @author vishvas.a
+*/
+exports.getKeywordDetails_ICE = function getKeywordDetails_ICE(req, res) {
+	// request variables
+	var requestedprojecttypename = req.body.projecttypename;
+	//var requestedprojecttypename = "Web";
+	// Query 1 fetching the objecttype,keywords based on projecttypename
+	var individualsyntax = {};
+
+	var flag = "Error in errProjectBasedKeywords : Fail";
+	var getProjectBasedKeywords = "select objecttype, keywords from keywords where projecttypename in ('"
+			+ requestedprojecttypename + "','Generic') ALLOW FILTERING";
+	dbConn.execute(getProjectBasedKeywords,
+		function(errProjectBasedKeywords,projectBasedKeywordsresult) {
+			if (errProjectBasedKeywords) {
+				flag = "Error in errProjectBasedKeywords : Fail";
+				res.send(flag);
+			} else {
+				for (var objectindex = 0; objectindex < projectBasedKeywordsresult.rows.length; objectindex++) {
+					var objecttype = projectBasedKeywordsresult.rows[objectindex].objecttype;
+					var keywords = projectBasedKeywordsresult.rows[objectindex].keywords;
+					individualsyntax[objecttype] = keywords;
+				}
+			res.send(individualsyntax);
+			}
+		});
+};
+

@@ -1,4 +1,4 @@
-var screenshotObj,scrapedGlobJson,enableScreenShotHighlight,mirrorObj,emptyTestStep,anotherScriptId,getAppTypeForPaste, eaCheckbox, finalViewString, scrapedData, deleteFlag, pasteSelecteStepNo,globalSelectedBrowserType,selectedKeywordList;
+var screenshotObj,scrapedGlobJson,enableScreenShotHighlight,mirrorObj,emptyTestStep,anotherScriptId,getAppTypeForPaste, eaCheckbox, finalViewString, scrapedData, deleteFlag, pasteSelecteStepNo,globalSelectedBrowserType,selectedKeywordList,keywordListData;
 var initScraping = {}; var mirrorObj = {}; var scrapeTypeObj = {}; var newScrapedList; var viewString = {}; var scrapeObject = {}; var screenViewObject = {}; var readTestCaseData; var getRowJsonCopy = [];
 var selectRowStepNoFlag = false; //var deleteStep = false;
 var getAllAppendedObj; //Getting all appended scraped objects
@@ -94,91 +94,87 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					$("#window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrapeTS"><img id="screenshotTS" src="data:image/PNG;base64,'+data2.mirror+'" /></div>')
 					
 					// service call # 3 -objectType service call
-					/*DesignServices.getObjectType()
+					DesignServices.getKeywordDetails_ICE(appType)
 					.then(function(data3)	{
 						keywordValArr.length = 0;
-						window.localStorage['keywordListData'] = angular.toJson(data3);
+						keywordListData = angular.toJson(data3);						
+						var emptyStr = "{}";
+						var len = data.testcase.length;
+						if (data == "" || data == null || data == emptyStr || data == "[]" || data.testcase.toString() == "" || data.testcase == "[]"|| len == 1)	{
+							var appTypeLocal1 = "Generic";
+							var datalist = [{  
+								"stepNo":"1",
+								"custname":"",
+								"objectName":"",
+								"keywordVal":"",
+								"inputVal":"",
+								"outputVal":"",
+								"url":"",
+								"_id_":"",
+								"appType":appTypeLocal1
+							}];
+							readTestCaseData = JSON.stringify(datalist);
+							$("#jqGrid").jqGrid('GridUnload');
+							$("#jqGrid").trigger("reloadGrid");
+							contentTable(data2.view);
+							/*if(itemLabelName == "Runtime_Settings" || window.localStorage['RunFlag'] == "true" || usrRole.role == "Viewer"){
+								$('.cbox').prop('disabled',true);
+								$('.cbox').addClass('disabled');
+								$('.cbox').closest('tr').addClass('state-disabled ui-jqgrid-disablePointerEvents');
+								$('.cbox').parent().addClass('disable_a_href');
+								if(usrRole.role == "Viewer"){
+									$('#triggerDialog').prop('disabled',true);
+								}else $('#triggerDialog').prop('disabled',false);
+							}else{
+								$('.cbox').prop('disabled',false);
+								$('.cbox').parent().removeClass('disable_a_href');			
+							}*/
+							$('.cbox').prop('disabled',false);
+							$('.cbox').parent().removeClass('disable_a_href');
+							return;
+						}
+						else{
+							var testcase = JSON.parse(data.testcase);
+							var testcaseArray = [];
+							for(var i = 0; i < testcase.length; i++)	{
+								testcaseArray.push(testcase[i]);						
+							}				
+							readTestCaseData = JSON.stringify(testcaseArray)
+							$("#jqGrid_addNewTestScript").jqGrid('clearGridData');
+							$("#jqGrid").jqGrid('GridUnload');
+							$("#jqGrid").trigger("reloadGrid");
+							contentTable(data2.view);
+							/*if(itemLabelName == "Runtime_Settings" || window.localStorage['RunFlag'] == "true" || usrRole.role == "Viewer"){
+								$('.cbox').prop('disabled',true);
+								$('.cbox').addClass('disabled');
+								$('.cbox').closest('tr').addClass('state-disabled ui-jqgrid-disablePointerEvents');
+								$('.cbox').parent().addClass('disable_a_href');
+								if(usrRole.role == "Viewer"){
+									$('#triggerDialog').prop('disabled',true);
+								}else $('#triggerDialog').prop('disabled',false);
+							}else{
+								$('.cbox').prop('disabled',false);
+								$('.cbox').addClass('disabled');
+								$('.cbox').parent().removeClass('disable_a_href');
+							}*/
+							$('.cbox').prop('disabled',false);
+							//$('.cbox').addClass('disabled');
+							$('.cbox').parent().removeClass('disable_a_href');
+							/*if(selectRowStepNoFlag == true){
+								if($("#jqGrid").find("tr[id='"+window.localStorage['selectRowStepNo']+"']").prev('tr[class="ui-widget-content"]').length > 0){
+									$("#jqGrid").find("tr[id='"+window.localStorage['selectRowStepNo']+"']").trigger('click');
+									$("#jqGrid").find("tr[id='"+window.localStorage['selectRowStepNo']+"']").prev().focus();
+								}else{
+									$("#jqGrid").find("tr[id='"+window.localStorage['selectRowStepNo']+"']").focus().trigger('click');
+								}					
+								selectRowStepNoFlag = false;
+							}*/
+							return;
+						}
 					},
 					function(error) {	console.log("Error in designController.js file getObjectType method! \r\n "+(error.data));
-					});*/ //	getObjectType end
-					var data3 = { 	"a": ["click", "doubleClick", "drag", "drop", "getLinkText", "getToolTipText", "mouseHover", "press", "rightClick", "sendFunctionKeys", "setFocus", "tab", "uploadFile", "verifyDisabled", "verifyDoesNotExists", "verifyEnabled", "verifyExists", "verifyHidden", "verifyLinkText", "verifyToolTipText", "verifyVisible", "waitForElementVisible"], 	"img": ["click", "doubleClick", "drag", "drop", "getToolTipText", "mouseHover", "press", "rightClick", "sendFunctionKeys", "setFocus", "tab", "uploadFile", "verifyDisabled", "verifyDoesNotExists", "verifyEnabled", "verifyExists", "verifyHidden", "verifyToolTipText", "verifyVisible", "verifyWebImages", "waitForElementVisible"], 	"select": ["getCount", "getSelected", "getToolTipText", "getValueByIndex", "mouseHover", "selectValueByIndex", "selectValueByText", "sendFunctionKeys", "setFocus", "tab", "verifyAllValues", "verifyCount", "verifyDisabled", "verifyDoesNotExists", "verifyEnabled", "verifyExists", "verifyHidden", "verifySelectedValue", "verifyToolTipText", "verifyValuesExists", "verifyVisible", "waitForElementVisible"], 	"browserPopUp": ["acceptPopUp", "dismissPopUp", "getPopUpText", "verifyPopUpText"], 	"custom": ["clickElement", "doubleClick", "getElementText", "getStatus", "getText", "getToolTipText", "mouseHover", "rightClick", "selectCheckbox", "selectRadioButton", "selectValueByIndex", "sendFunctionKeys", "sendValue", "setFocus", "setSecureText", "setText", "tab", "unselectCheckbox", "verifyDoesNotExists", "verifyElementText", "verifyExists", "verifyHidden", "verifyToolTipText", "verifyVisible", "waitForElementVisible"], 	"list": ["deselectAll", "getCount", "getMultipleValuesByIndexes", "getSelected", "getToolTipText", "getValueByIndex", "mouseHover", "selectAllValues", "selectMultipleValuesByIndexes", "selectMultipleValuesByText", "selectValueByIndex", "selectValueByText", "sendFunctionKeys", "setFocus", "tab", "verifyAllValues", "verifyCount", "verifyDisabled", "verifyDoesNotExists", "verifyEnabled", "verifyExists", "verifyHidden", "verifySelectedValue", "verifyToolTipText", "verifyValuesExists", "verifyVisible", "waitForElementVisible"], 	"runtimeList": ["stepExecutionWait"], 	"defaultList": ["", "GetBlockValue", "VerifyValues", "captureScreenshot", "changeDateFormat", "clearFileContent", "compareContent", "concatenate", "copyValue", "createDynVariable", "dateAddition", "dateCompare", "dateDifference", "deleteDynVariable", "displayVariableValue", "else", "elseIf", "endFor", "endIf", "endLoop", "evaluate", "executeFile", "exportData", "find", "for", "getBlockCount", "getContent", "getCurrentDate", "getCurrentDateAndTime", "getCurrentTime", "getData", "getIndexCount", "getLineNumber", "getParam", "getStringLength", "getSubString", "getTagValue", "if", "jumpBy", "jumpTo", "left", "mid", "modifyValue", "pause", "replace", "replaceContent", "right", "runQuery", "secureExportData", "secureGetData", "secureRunQuery", "secureVerifyData", "sendFunctionKeys", "split", "startLoop", "stringGeneration", "toLowerCase", "toUpperCase", "trim", "typeCast", "verifyContent", "verifyData", "verifyFileImages", "wait", "writeToFile"], 	"button": ["click", "doubleClick", "drag", "drop", "getToolTipText", "mouseHover", "press", "sendFunctionKeys", "setFocus", "tab", "uploadFile", "verifyButtonName", "verifyDisabled", "verifyDoesNotExists", "verifyEnabled", "verifyExists", "verifyHidden", "verifyToolTipText", "verifyVisible", "waitForElementVisible"], 	"tablecell": ["click", "doubleClick", "mouseHover", "press", "sendFunctionKeys", "setFocus", "tab", "verifyDoesNotExists", "verifyExists", "waitForElementVisible"], 	"excelList": ["clearCell", "clearExcelPath", "deleteRow", "getColumnCount", "getRowCount", "readCell", "setExcelPath", "writeToCell"], 	"input": ["clearText", "click", "drag", "drop", "getText", "getTextboxLength", "getToolTipText", "mouseHover", "press", "rightClick", "sendFunctionKeys", "sendValue", "setFocus", "setSecureText", "setText", "tab", "verifyDisabled", "verifyDoesNotExists", "verifyEnabled", "verifyExists", "verifyHidden", "verifyReadOnly", "verifyText", "verifyTextboxLength", "verifyToolTipText", "verifyVisible", "waitForElementVisible"], 	"radiobutton": ["drag", "drop", "getStatus", "getToolTipText", "mouseHover", "selectRadioButton", "sendFunctionKeys", "setFocus", "tab", "verifyDisabled", "verifyDoesNotExists", "verifyEnabled", "verifyExists", "verifyHidden", "verifyReadOnly", "verifyToolTipText", "verifyVisible", "waitForElementVisible"], 	"browser": ["closeBrowser", "closeSubWindows", "getCurrentURL", "getPageTitle", "maximizeBrowser", "navigateToURL", "navigateWithAuthenticate", "openBrowser", "openNewBrowser", "refresh", "switchToWindow", "verifyCurrentURL", "verifyPageTitle", "verifyTextExists"], 	"checkbox": ["drag", "drop", "getStatus", "getToolTipText", "mouseHover", "selectCheckbox", "sendFunctionKeys", "setFocus", "tab", "unselectCheckbox", "verifyDisabled", "verifyDoesNotExists", "verifyEnabled", "verifyExists", "verifyHidden", "verifyReadOnly", "verifyToolTipText", "verifyVisible", "waitForElementVisible"], 	"syntax": { 		"a": "{\"click\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"doubleClick\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"drag\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"drop\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"getLinkText\":{\"outputVal\":\"{Variable}\",\"inputVal\":[\"N/A\"]}, \"getToolTipText\":{\"outputVal\":\"{Variable}\",\"inputVal\":[\"N/A\"]}, \"mouseHover\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"press\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"rightClick\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"sendFunctionKeys\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"FunctionKey;Number(optional)\"]}, \"setFocus\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"tab\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"uploadFile\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"FilePath;FileName\"]}, \"verifyDisabled\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"verifyDoesNotExists\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"verifyEnabled\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"verifyExists\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"verifyHidden\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"verifyLinkText\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"Input Value\"]}, \"verifyToolTipText\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"Input Value\"]}, \"verifyVisible\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"waitForElementVisible\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}}", 		"img": "{\"click\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"doubleClick\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"drag\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"drop\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"getToolTipText\":{\"outputVal\":\"{Variable}\",\"inputVal\":[\"N/A\"]}, \"mouseHover\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"press\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"rightClick\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"sendFunctionKeys\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"FunctionKey;Number(optional)\"]}, \"setFocus\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"tab\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"uploadFile\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"FilePath;FileName\"]}, \"verifyDisabled\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"verifyDoesNotExists\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"verifyEnabled\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"verifyExists\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"verifyHidden\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"verifyToolTipText\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"Input Value\"]}, \"verifyVisible\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"verifyWebImages\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"Image Path\"]}, \"waitForElementVisible\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}}", 		"select": "{\"getCount\":{\"outputVal\":\"{Variable}\",\"inputVal\":[\"N/A\"]}, \"getSelected\":{\"outputVal\":\"{Variable}\",\"inputVal\":[\"N/A\"]}, \"getToolTipText\":{\"outputVal\":\"{Variable}\",\"inputVal\":[\"N/A\"]}, \"getValueByIndex\":{\"outputVal\":\"{Variable}\",\"inputVal\":[\"Index value\"]}, \"mouseHover\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"selectValueByIndex\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"Index Value\"]}, \"selectValueByText\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"Input Value\"]}, \"sendFunctionKeys\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"FunctionKey;Number(optional)\"]}, \"setFocus\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"tab\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"verifyAllValues\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"val1;val2;val3,...etc\"]}, \"verifyCount\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"Input Value\"]}, \"verifyDisabled\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"verifyDoesNotExists\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"verifyEnabled\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"verifyExists\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"verifyHidden\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"verifySelectedValue\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"Input Value\"]}, \"verifyToolTipText\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"Input Value\"]}, \"verifyValuesExists\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"val1;val2;val3,...etc\"]}, \"verifyVisible\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"waitForElementVisible\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}}", 		"browserPopUp": "{\"acceptPopUp\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"dismissPopUp\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"getPopUpText\":{\"outputVal\":\"{Variable}\",\"inputVal\":[\"N/A\"]}, \"verifyPopUpText\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"Input Value\"]}}", 		"custom": "{\"clickElement\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"ObjectType;VisibleText(optional);Index\"]}, \"doubleClick\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"ObjectType;VisibleText(optional);Index\"]}, \"getElementText\":{\"outputVal\":\"{Variable}\",\"inputVal\":[\"ObjectType;VisibleText(optional);Index\"]}, \"getObjectCount\":{\"outputVal\":\"{Variable}\",\"inputVal\":[\"ObjectType\"]}, \"getStatus\":{\"outputVal\":\"{Variable}\",\"inputVal\":[\"ObjectType;VisibleText(optional);Index\"]}, \"getText\":{\"outputVal\":\"{Variable}\",\"inputVal\":[\"ObjectType;VisibleText(optional);Index\"]}, \"getToolTipText\":{\"outputVal\":\"{Variable}\",\"inputVal\":[\"ObjectType;VisibleText(optional);Index\"]}, \"mouseHover\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"ObjectType;VisibleText(optional);Index\"]}, \"rightClick\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"ObjectType;VisibleText(optional);Index\"]}, \"selectCheckbox\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"ObjectType;VisibleText(optional);Index\"]}, \"selectRadioButton\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"ObjectType;VisibleText(optional);Index\"]}, \"selectValueByIndex\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"ObjectType;VisibleText(optional);Index;selectIndex\"]}, \"sendFunctionKeys\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"ObjectType;VisibleText(Optional);Index;FunctionKey;Number(Optional)\"]}, \"sendValue\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"ObjectType;VisibleText(optional);Index;Value\"]}, \"setFocus\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"ObjectType;VisibleText(optional);Index\"]}, \"setSecureText\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"ObjectType;VisibleText(optional);Index;Encrypted Value\"]}, \"setText\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"ObjectType;VisibleText(optional);Index;Value\"]}, \"tab\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"ObjectType;VisibleText(optional);Index\"]}, \"unselectCheckbox\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"ObjectType;VisibleText(optional);Index\"]}, \"verifyDoesNotExists\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"ObjectType;VisibleText(optional);Index\"]}, \"verifyElementText\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"ObjectType;VisibleText(optional);Index;Value\"]}, \"verifyExists\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"ObjectType;VisibleText(optional);Index\"]}, \"verifyHidden\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"ObjectType;VisibleText(optional);Index\"]}, \"verifyToolTipText\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"ObjectType;VisibleText(optional);Index;Value\"]}, \"verifyVisible\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"ObjectType;VisibleText(optional);Index\"]}, \"waitForElementVisible\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"ObjectType;VisibleText(optional);Index;Time in Seconds\"]}}", 		"list": "{\"deselectAll\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"getCount\":{\"outputVal\":\"{Variable}\",\"inputVal\":[\"N/A\"]}, \"getMultipleValuesByIndexes\":{\"outputVal\":\"{Variable}\",\"inputVal\":[\"Multiple Indexes\"]}, \"getSelected\":{\"outputVal\":\"{Variable}\",\"inputVal\":[\"N/A\"]}, \"getToolTipText\":{\"outputVal\":\"{Variable}\",\"inputVal\":[\"N/A\"]}, \"getValueByIndex\":{\"outputVal\":\"{Variable}\",\"inputVal\":[\"Index value\"]}, \"mouseHover\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"selectAllValues\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"selectMultipleValuesByIndexes\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"Multiple Indexes\"]}, \"selectMultipleValuesByText\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"Multiple Text\"]}, \"selectValueByIndex\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"Index Value\"]}, \"selectValueByText\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"Input Value\"]}, \"sendFunctionKeys\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"FunctionKey;Number(optional)\"]}, \"setFocus\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"tab\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"verifyAllValues\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"val1;val2;val3,...etc\"]}, \"verifyCount\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"Input Value\"]}, \"verifyDisabled\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"verifyDoesNotExists\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"verifyEnabled\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"verifyExists\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"verifyHidden\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"verifySelectedValue\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"val1;val2;val3,...etc\"]}, \"verifyToolTipText\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"Input Value\"]}, \"verifyValuesExists\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"val1;val2;val3,...etc\"]}, \"verifyVisible\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"waitForElementVisible\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}}", 		"runtimeList": "{\"stepExecutionWait\":{\"outputVal\":\"N/A\",\"inputVal\":[\"N/A\"]}}", 		"defaultList": "{\"\":{\"outputVal\":\"\",\"inputVal\":[\"\"]},\"GetBlockValue\":{\"outputVal\":\"{Variable}\",\"inputVal\":[\"XML tagName;No.of blocks to be fetched;BlockName\"]},\"VerifyValues\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"value1;value2\"]},\"captureScreenshot\":{\"outputVal\":\"N/A\",\"inputVal\":[\"(Optional)\"]},\"changeDateFormat\":{\"outputVal\":\"{Variable}\",\"inputVal\":[\"Date;Current Format;Required Format\"]},\"clearFileContent\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"FilePath;FileName;SheetName\"]},\"compareContent\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"FilePath1;SheetName1;FilePath2;SheetName2\"]},\"concatenate\":{\"outputVal\":\"{Variable}\",\"inputVal\":[\"Input Text1;Input Text2\"]},\"copyValue\":{\"outputVal\":\"{Variable}\",\"inputVal\":[\"Target Variable;Source Variable\"]}, \"createDynVariable\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"Variable Name;Value\"]}, \"dateAddition\":{\"outputVal\":\"{Variable}\",\"inputVal\":[\"Date;Number of days;CurrentDate format\"]}, \"dateCompare\":{\"outputVal\":\"{Variable}\",\"inputVal\":[\"DateVariable==Date\"]}, \"dateDifference\":{\"outputVal\":\"{Variable}\",\"inputVal\":[\"Date;No.of days/date;CurrentDate Format\"]}, \"deleteDynVariable\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"variable\"]}, \"displayVariableValue\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"variable\"]}, \"else\":{\"outputVal\":\"N/A\",\"inputVal\":[\"N/A\"]}, \"elseIf\":{\"outputVal\":\"N/A\",\"inputVal\":[\"(Operand1;Operator;Operand2)\"]}, \"endFor\":{\"outputVal\":\"N/A\",\"inputVal\":[\"N/A\"]}, \"endIf\":{\"outputVal\":\"N/A\",\"inputVal\":[\"N/A\"]}, \"endLoop\":{\"outputVal\":\"N/A\",\"inputVal\":[\"N/A\"]}, \"evaluate\":{\"outputVal\":\"{Variable}\",\"inputVal\":[\"operand1 operator operand2\"]}, \"executeFile\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"FilePath\"]}, \"exportData\":{\"outputVal\":\"FilePath\",\"inputVal\":[\"DB IP/instance name;DB port;DB username;DB password;DB name;Query;DB Number\"]}, \"find\":{\"outputVal\":\"{Variable}\",\"inputVal\":[\"actual string;string to find\"]}, \"for\":{\"outputVal\":\"N/A\",\"inputVal\":[\"number\"]}, \"getBlockCount\":{\"outputVal\":\"{Variable}\",\"inputVal\":[\"XML block/XML tags;block name\"]}, \"getContent\":{\"outputVal\":\"{Variable}\",\"inputVal\":[\"FilePath;SheetName/PageNumber\"]}, \"getCurrentDate\":{\"outputVal\":\"{Variable}\",\"inputVal\":[\"Date Format\"]}, \"getCurrentDateAndTime\":{\"outputVal\":\"{Variable}\",\"inputVal\":[\"Date and Time Format\"]}, \"getCurrentTime\":{\"outputVal\":\"{Variable}\",\"inputVal\":[\"Time Format\"]}, \"getData\":{\"outputVal\":\"{Variable}\",\"inputVal\":[\"DB IP/instance name;DB port;DB username;DB password;DB name;Query;DB Number\"]}, \"getIndexCount\":{\"outputVal\":\"{Variable}\",\"inputVal\":[\"variable containing list of value\"]}, \"getLineNumber\":{\"outputVal\":\"{Variable}\",\"inputVal\":[\"Filepath;Content\"]}, \"getParam\":{\"outputVal\":\"N/A\",\"inputVal\":[\"Filepath;sheetname\"]}, \"getStringLength\":{\"outputVal\":\"{Variable}\",\"inputVal\":[\"string\"]}, \"getSubString\":{\"outputVal\":\"{Variable}\",\"inputVal\":[\"String;Index OR Range\"]}, \"getTagValue\":{\"outputVal\":\"{Variable}\",\"inputVal\":[\"XML block/XML tags;Number;BlockName;TagName\"]}, \"if\":{\"outputVal\":\"N/A\",\"inputVal\":[\"(operand1;operator;operand2)\"]}, \"jumpBy\":{\"outputVal\":\"N/A\",\"inputVal\":[\"Count of steps +ve or -ve\"]}, \"jumpTo\":{\"outputVal\":\"N/A\",\"inputVal\":[\"TestScript Name\"]}, \"left\":{\"outputVal\":\"{Variable}\",\"inputVal\":[\"string;number of characters to be fetched from left\"]}, \"mid\":{\"outputVal\":\"{Variable}\",\"inputVal\":[\"string\"]}, \"modifyValue\":{\"outputVal\":\"{Variable}\",\"inputVal\":[\"Existing Value;New Value\"]}, \"pause\":{\"outputVal\":\"N/A\",\"inputVal\":[\"N/A\"]}, \"replace\":{\"outputVal\":\"{Variable}\",\"inputVal\":[\"ActualString;String to be replaced;String to replace\"]}, \"replaceContent\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"FilePath;SheetNumber;content to replace;content\"]}, \"right\":{\"outputVal\":\"{Variable}\",\"inputVal\":[\"string;number of characters to be fetched from right\"]}, \"runQuery\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"DB IP/instance name;DB port;DB username;DB password;DB name;Query;DB Number\"]}, \"secureExportData\":{\"outputVal\":\"FilePath\",\"inputVal\":[\"DB IP/instance name;DB port;DB username;DB encrypted password;DB name;Query;DB Number\"]}, \"secureGetData\":{\"outputVal\":\"{Variable}\",\"inputVal\":[\"DB IP/instance name;DB port;DB username;DB encrypted password;DB name;Query;DB Number\"]}, \"secureRunQuery\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"DB IP/instance name;DB port;DB username;DB encrypted password;DB name;Query;DB Number\"]}, \"secureVerifyData\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"DB IP/instance name;DB port;DB username;DB encrypted password;DB name;Query;DB Number\"]}, \"sendFunctionKeys\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"FunctionKey;Number(optional)\"]}, \"split\":{\"outputVal\":\"{Variable}\",\"inputVal\":[\"String;Split Character\"]}, \"startLoop\":{\"outputVal\":\"N/A\",\"inputVal\":[\"N/A\"]}, \"stringGeneration\":{\"outputVal\":\"{Variable}\",\"inputVal\":[\"Type;Length\"]}, \"toLowerCase\":{\"outputVal\":\"{Variable}\",\"inputVal\":[\"Input String\"]}, \"toUpperCase\":{\"outputVal\":\"{Variable}\",\"inputVal\":[\"Input String\"]}, \"trim\":{\"outputVal\":\"{Variable}\",\"inputVal\":[\"Input String\"]}, \"typeCast\":{\"outputVal\":\"{Variable}\",\"inputVal\":[\"Value;Type to be converted\"]}, \"verifyContent\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"FileName;SheetName;Content to verify\"]}, \"verifyData\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"DB IP/instance name;DB port;DB username;DB password;DB name;Query;DB Number;file path to be verified;Sheet name\"]}, \"verifyFileImages\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"ImagePath1;ImagePath2\"]}, \"wait\":{\"outputVal\":\"N/A\",\"inputVal\":[\"Time in seconds\"]}, \"writeToFile\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"FilePath;SheetName;ContentToBeWritten;Newline\"]} }", 		"button": "{\"click\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"doubleClick\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"drag\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"drop\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"getToolTipText\":{\"outputVal\":\"{Variable}\",\"inputVal\":[\"N/A\"]}, \"mouseHover\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"press\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"sendFunctionKeys\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"FunctionKey;Number(optional)\"]}, \"setFocus\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"tab\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"uploadFile\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"FilePath;FileName\"]}, \"verifyButtonName\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"ButtonName\"]}, \"verifyDisabled\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"verifyDoesNotExists\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"verifyEnabled\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"verifyExists\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"verifyHidden\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"verifyToolTipText\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"Input Value\"]}, \"verifyVisible\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"waitForElementVisible\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}}", 		"tablecell": "{\"click\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"doubleClick\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"mouseHover\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"press\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"sendFunctionKeys\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"FunctionKey;Number(optional)\"]}, \"setFocus\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"tab\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"verifyDoesNotExists\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"verifyExists\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"waitForElementVisible\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}}", 		"excelList": "{\"clearCell\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"Row;Column\"]},\"clearExcelPath\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]},\"deleteRow\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"RowNumber\"]},\"getColumnCount\":{\"outputVal\":\"{Variable}\",\"inputVal\":[\"N/A\"]},\"getRowCount\":{\"outputVal\":\"{Variable}\",\"inputVal\":[\"N/A\"]},\"readCell\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"Row;Column\"]},\"setExcelPath\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"FilePath;SheetName\"]},\"writeToCell\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"Row;Column;Value;Type\"]}}", 		"input": "{\"clearText\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"click\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"drag\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"drop\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"getText\":{\"outputVal\":\"{Variable}\",\"inputVal\":[\"N/A\"]}, \"getTextboxLength\":{\"outputVal\":\"{Variable}\",\"inputVal\":[\"N/A\"]}, \"getToolTipText\":{\"outputVal\":\"{Variable}\",\"inputVal\":[\"N/A\"]}, \"mouseHover\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"press\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"rightClick\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"sendFunctionKeys\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"FunctionKey;Number(optional)\"]}, \"sendValue\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"Input Value\"]}, \"setFocus\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"setSecureText\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"Encrypted Input\"]}, \"setText\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"Input Value\"]}, \"tab\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"verifyDisabled\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"verifyDoesNotExists\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"verifyEnabled\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"verifyExists\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"verifyHidden\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"verifyReadOnly\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"verifyText\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"Input Value\"]}, \"verifyTextboxLength\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"Input Value\"]}, \"verifyToolTipText\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"Input Value\"]}, \"verifyVisible\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"waitForElementVisible\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}}", 		"radiobutton": "{\"drag\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"drop\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"getStatus\":{\"outputVal\":\"{Variable}\",\"inputVal\":[\"N/A\"]}, \"getToolTipText\":{\"outputVal\":\"{Variable}\",\"inputVal\":[\"N/A\"]}, \"mouseHover\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"selectRadioButton\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"sendFunctionKeys\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"FunctionKey;Number(optional)\"]}, \"setFocus\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"tab\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"verifyDisabled\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"verifyDoesNotExists\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"verifyEnabled\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"verifyExists\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"verifyHidden\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"verifyReadOnly\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"verifyToolTipText\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"Input Value\"]}, \"verifyVisible\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"waitForElementVisible\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}}", 		"browser": "{\"closeBrowser\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]},\"closeSubWindows\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]},\"getCurrentURL\":{\"outputVal\":\"{Variable}\",\"inputVal\":[\"N/A\"]},\"getPageTitle\":{\"outputVal\":\"{Variable}\",\"inputVal\":[\"N/A\"]},\"maximizeBrowser\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]},\"navigateToURL\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"URL\"]},\"navigateWithAuthenticate\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"URL;UserName;EncryptedPassword\"]},\"openBrowser\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]},\"openNewBrowser\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]},\"refresh\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]},\"switchToWindow\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"Number\"]},\"verifyCurrentURL\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"Input Value\"]},\"verifyPageTitle\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"Input Value\"]},\"verifyTextExists\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"Input Value\"]}}", 		"checkbox": "{\"drag\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"drop\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"getStatus\":{\"outputVal\":\"{Variable}\",\"inputVal\":[\"N/A\"]}, \"getToolTipText\":{\"outputVal\":\"{Variable}\",\"inputVal\":[\"N/A\"]}, \"mouseHover\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"selectCheckbox\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"sendFunctionKeys\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"FunctionKey;Number(optional)\"]}, \"setFocus\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"tab\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"unselectCheckbox\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"verifyDisabled\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"verifyDoesNotExists\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"verifyEnabled\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"verifyExists\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"verifyHidden\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"verifyReadOnly\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"verifyToolTipText\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"Input Value\"]}, \"verifyVisible\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"waitForElementVisible\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}}", 		"table": "{\"cellClick\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"Row;Column;ObjectType;Index\"]}, \"getCellToolTip\":{\"outputVal\":\"{Variable}\",\"inputVal\":[\"Row;Column\"]}, \"getCellValue\":{\"outputVal\":\"{Variable}\",\"inputVal\":[\"Row;Column\"]}, \"getColNumByText\":{\"outputVal\":\"{Variable}\",\"inputVal\":[\"Input Value\"]}, \"getColumnCount\":{\"outputVal\":\"{Variable}\",\"inputVal\":[\"N/A\"]}, \"getRowCount\":{\"outputVal\":\"{Variable}\",\"inputVal\":[\"N/A\"]}, \"getRowNumByText\":{\"outputVal\":\"{Variable}\",\"inputVal\":[\"Input Value\"]}, \"mouseHover\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"verifyCellValue\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"Row;Column;Input Value\"]}, \"verifyExists\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"verifyTextExists\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"Input Value\"]}}", 		"element": "{\"clickElement\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"doubleClick\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"drag\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"drop\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"getElementText\":{\"outputVal\":\"{Variable}\",\"inputVal\":[\"N/A\"]}, \"getToolTipText\":{\"outputVal\":\"{Variable}\",\"inputVal\":[\"N/A\"]}, \"mouseHover\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"rightClick\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"sendFunctionKeys\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"FunctionKey;Number(optional)\"]}, \"setFocus\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"tab\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"uploadFile\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"FilePath;FileName\"]}, \"verifyDoesNotExists\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"verifyElementText\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"Input Value\"]}, \"verifyExists\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"verifyHidden\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"verifyToolTipText\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"Input Value\"]}, \"verifyVisible\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}, \"waitForElementVisible\":{\"outputVal\":\"(Optional)\",\"inputVal\":[\"N/A\"]}}" 	}, 	"table": ["cellClick", "getCellDetails", "getCellValue", "getColNumByText", "getColumnCount", "getRowCount", "getRowNumByText", "getSelected", "getStatus", "mouseClick", "selectValueByIndex", "selectValueByText", "setFocus", "verifyCellValue", "verifyExists"], 	"element": ["clickElement", "doubleClick", "drag", "drop", "getElementText", "getToolTipText", "mouseHover", "rightClick", "sendFunctionKeys", "setFocus", "tab", "uploadFile", "verifyDoesNotExists", "verifyElementText", "verifyExists", "verifyHidden", "verifyToolTipText", "verifyVisible", "waitForElementVisible"] };
-					keywordValArr.length = 0;
-					window.localStorage['keywordListData'] = angular.toJson(data3);
-
-					// 'readTestScript' service response null or empty or blank (If service#1 response is null then)
-					var emptyStr = "{}";
-					var len = data.testcase.length;
-					if (data == "" || data == null || data == emptyStr || data == "[]" || data.testcase.toString() == "" || data.testcase == "[]"|| len == 1)	{
-						var appTypeLocal1 = "Generic";
-						var datalist = [{  
-							"stepNo":"1",
-							"custname":"",
-							"objectName":"",
-							"keywordVal":"",
-							"inputVal":"",
-							"outputVal":"",
-							"url":"",
-							"_id_":"",
-							"appType":appTypeLocal1
-						}];
-						readTestCaseData = JSON.stringify(datalist);
-						$("#jqGrid").jqGrid('GridUnload');
-						$("#jqGrid").trigger("reloadGrid");
-						contentTable(data2.view);
-						/*if(itemLabelName == "Runtime_Settings" || window.localStorage['RunFlag'] == "true" || usrRole.role == "Viewer"){
-							$('.cbox').prop('disabled',true);
-							$('.cbox').addClass('disabled');
-							$('.cbox').closest('tr').addClass('state-disabled ui-jqgrid-disablePointerEvents');
-							$('.cbox').parent().addClass('disable_a_href');
-							if(usrRole.role == "Viewer"){
-								$('#triggerDialog').prop('disabled',true);
-							}else $('#triggerDialog').prop('disabled',false);
-						}else{
-							$('.cbox').prop('disabled',false);
-							$('.cbox').parent().removeClass('disable_a_href');			
-						}*/
-						$('.cbox').prop('disabled',false);
-						$('.cbox').parent().removeClass('disable_a_href');
-						return;
-					}
-					else{
-						var testcase = JSON.parse(data.testcase);
-						var testcaseArray = [];
-						for(var i = 0; i < testcase.length; i++)	{
-							testcaseArray.push(testcase[i]);						
-						}				
-						readTestCaseData = JSON.stringify(testcaseArray)
-						$("#jqGrid_addNewTestScript").jqGrid('clearGridData');
-						$("#jqGrid").jqGrid('GridUnload');
-						$("#jqGrid").trigger("reloadGrid");
-						contentTable(data2.view);
-						/*if(itemLabelName == "Runtime_Settings" || window.localStorage['RunFlag'] == "true" || usrRole.role == "Viewer"){
-							$('.cbox').prop('disabled',true);
-							$('.cbox').addClass('disabled');
-							$('.cbox').closest('tr').addClass('state-disabled ui-jqgrid-disablePointerEvents');
-							$('.cbox').parent().addClass('disable_a_href');
-							if(usrRole.role == "Viewer"){
-								$('#triggerDialog').prop('disabled',true);
-							}else $('#triggerDialog').prop('disabled',false);
-						}else{
-							$('.cbox').prop('disabled',false);
-							$('.cbox').addClass('disabled');
-							$('.cbox').parent().removeClass('disable_a_href');
-						}*/
-						$('.cbox').prop('disabled',false);
-						//$('.cbox').addClass('disabled');
-						$('.cbox').parent().removeClass('disable_a_href');
-						/*if(selectRowStepNoFlag == true){
-							if($("#jqGrid").find("tr[id='"+window.localStorage['selectRowStepNo']+"']").prev('tr[class="ui-widget-content"]').length > 0){
-								$("#jqGrid").find("tr[id='"+window.localStorage['selectRowStepNo']+"']").trigger('click');
-								$("#jqGrid").find("tr[id='"+window.localStorage['selectRowStepNo']+"']").prev().focus();
-							}else{
-								$("#jqGrid").find("tr[id='"+window.localStorage['selectRowStepNo']+"']").focus().trigger('click');
-							}					
-							selectRowStepNoFlag = false;
-						}*/
-						return;
-					}
+					}); //	getObjectType end
+					
 				},
 				function(error) {	console.log("Error in designController.js file getObjectType method! \r\n "+(error.data));
 				}); //	getScrapeData end
@@ -328,7 +324,6 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					reader.onload = function(e) {
 						if((file.name.split('.')[file.name.split('.').length-1]).toLowerCase() == "json"){
 							var resultString = JSON.parse(reader.result);
-							//var resultString = reader.result;
 							for(i = 0; i < resultString.length; i++){
 								if(resultString[i].appType == appType || resultString[i].appType.toLowerCase() == "generic"){
 									flag = true;
@@ -1097,7 +1092,8 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			$.each($(".addObj-row"), function(){
 				customObj.push({
 					custname : $(this).find("input").val(),
-					tag : $(this).find("select option:selected").val()
+					tag : $(this).find("select option:selected").val(),
+					xpath : ''
 				})
 			})
 			
@@ -1454,7 +1450,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 //Loading table action buttons
 function contentTable(newTestScriptDataLS) {
 	//get keyword list
-	var keywordArrayList = window.localStorage['keywordListData'];
+	var keywordArrayList = keywordListData;
 	keywordArrayList = JSON.parse(keywordArrayList);
 	testContent = JSON.parse(readTestCaseData);
 	var emptyStr = "{}";
@@ -1711,7 +1707,6 @@ function contentTable(newTestScriptDataLS) {
 	function editRow(id,status,e) {
 		if (id && id !== lastSelection) {
 			var grid = $("#jqGrid");
-
 			var selectedText = grid.jqGrid('getRowData',id).custname;
 			var selectedKeyword = grid.jqGrid('getRowData', id).keywordVal;
 			grid.jqGrid('restoreRow',lastSelection);                        
@@ -1726,18 +1721,18 @@ function contentTable(newTestScriptDataLS) {
 			lastSelection = "";
 		}	
 		//get Input and Output Syntax for selected Keyword
-		var keywordArrayList1 = window.localStorage['keywordListData'];
+		var keywordArrayList1 = keywordListData;
 		var keywordArrayList = JSON.parse(keywordArrayList1);
-		$.each(keywordArrayList.syntax, function( index, value ) {
+		$.each(keywordArrayList, function( index, value ) {
 			keywordArrayKey = index;
-			keywordArrayValue =  JSON.parse(value);
+			keywordArrayValue = value; //JSON.parse(value);
 			if(selectedKeywordList == keywordArrayKey)
 			{
 				$.each(keywordArrayValue, function(k, v) {
 					if(selectedKeyword == k)
 					{
-						inputSyntax = v.inputVal;
-						outputSyntax = v.outputVal;
+						inputSyntax = JSON.parse(v).inputVal;
+						outputSyntax = JSON.parse(v).outputVal;
 						grid.find("td[aria-describedby = jqGrid_inputVal]:visible").find('input').attr("placeholder", inputSyntax).attr("title", inputSyntax);
 						grid.find("td[aria-describedby = jqGrid_outputVal]:visible").find('input').attr("placeholder", outputSyntax).attr("title", outputSyntax);
 					}
@@ -1747,7 +1742,7 @@ function contentTable(newTestScriptDataLS) {
 	}
 
 	function setKeyword(e,selectedText,$grid,selectedKeyword){
-		var keywordArrayList1 = window.localStorage['keywordListData'];
+		var keywordArrayList1 = keywordListData;
 		var keywordArrayList = JSON.parse(keywordArrayList1);
 		var taskInfo = JSON.parse(window.localStorage['_T']);
 		var appTypeLocal = taskInfo.appType;//window.localStorage['appTypeScreen'];
@@ -1757,7 +1752,7 @@ function contentTable(newTestScriptDataLS) {
 			objName = " ";
 			url = " ";    
 			if(appTypeLocal == "MobilityiOS"){
-				var sc = keywordArrayList.defaultListMobilityiOS;
+				var sc = Object.keys(keywordArrayList.defaultListMobilityiOS);
 				selectedKeywordList = "defaultListMobilityiOS";
 				var res = '';
 				for(var i = 0; i < sc.length; i++){
@@ -1777,10 +1772,10 @@ function contentTable(newTestScriptDataLS) {
 			}
 			else{
 				if (appTypeLocal == 'Mobility') {
-					var sc = keywordArrayList.defaultListMobility;
+					var sc = Object.keys(keywordArrayList.defaultListMobility);
 					selectedKeywordList = "defaultListMobility";
 				} else {
-					var sc = keywordArrayList.defaultList;
+					var sc = Object.keys(keywordArrayList.defaultList);
 					selectedKeywordList = "defaultList";
 				}
 				var res = '';
@@ -1805,7 +1800,7 @@ function contentTable(newTestScriptDataLS) {
 		{
 			objName = " ";
 			url = " ";
-			var sc = keywordArrayList.browser;
+			var sc = Object.keys(keywordArrayList.browser);
 			selectedKeywordList = "browser";
 			var res = '';
 			for(var i = 0; i < sc.length; i++){
@@ -1826,7 +1821,7 @@ function contentTable(newTestScriptDataLS) {
 		else if(selectedText == "@BrowserPopUp" ){
 			objName = " ";
 			url = " ";
-			var sc = keywordArrayList.browserPopUp;
+			var sc = Object.keys(keywordArrayList.browserPopUp);
 			selectedKeywordList = "browserPopUp";
 			var res = '';
 			for(var i = 0; i < sc.length; i++){
@@ -1855,11 +1850,11 @@ function contentTable(newTestScriptDataLS) {
 			var sc;
 			var res = '';
 			if(appTypeLocal == 'Desktop'){
-				sc = keywordArrayList.customDp;
+				sc = Object.keys(keywordArrayList.customDp);
 				selectedKeywordList = "customDp";
 			}
 			else if(appTypeLocal == 'DesktopJava'){
-				sc = keywordArrayList.customOEBS;
+				sc = Object.keys(keywordArrayList.customOEBS);
 				selectedKeywordList = "customOEBS";
 				var newTSDataLS = angular.element(document.getElementsByClassName('gridview-1')).scope().newTestScriptDataLS;
 				if(newTSDataLS){
@@ -1877,7 +1872,7 @@ function contentTable(newTestScriptDataLS) {
 				}
 			}
 			else {
-				sc = keywordArrayList.custom;
+				sc = Object.keys(keywordArrayList.custom);
 				selectedKeywordList = "custom";
 			}
 			for(var i = 0; i < sc.length; i++){
@@ -1899,7 +1894,7 @@ function contentTable(newTestScriptDataLS) {
 		else if(selectedText == "WebService List" ){
 			objName = " ";
 			url = " ";
-			var sc = keywordArrayList.defaultListWS;
+			var sc = Object.keys(keywordArrayList.defaultListWS);
 			selectedKeywordList = "defaultListWS";
 			var res = '';
 			for(var i = 0; i < sc.length; i++){
@@ -1918,7 +1913,7 @@ function contentTable(newTestScriptDataLS) {
 		else if(selectedText == "Mainframe List" ){
 			objName = " ";
 			url = " ";
-			var sc = keywordArrayList.defaultListMF;
+			var sc = Object.keys(keywordArrayList.defaultListMF);
 			selectedKeywordList = "defaultListMF";
 			var res = '';
 			for(var i = 0; i < sc.length; i++){
@@ -1937,7 +1932,7 @@ function contentTable(newTestScriptDataLS) {
 		else if(selectedText == "@Email" ){
 			objName = " ";
 			url = " ";
-			var sc = keywordArrayList.defaultListDP;
+			var sc = Object.keys(keywordArrayList.defaultListDP);
 			selectedKeywordList = "defaultListDP";
 			var res = '';
 			for(var i = 0; i < sc.length; i++){
@@ -1956,7 +1951,7 @@ function contentTable(newTestScriptDataLS) {
 		else if(selectedText == "@Window" ){
 			objName = " ";
 			url = " ";
-			var sc = keywordArrayList.generic;
+			var sc = Object.keys(keywordArrayList.generic);
 			selectedKeywordList = "generic";
 			var res = '';
 			for(var i = 0; i < sc.length; i++){
@@ -1977,7 +1972,7 @@ function contentTable(newTestScriptDataLS) {
 		else if(selectedText == "@Oebs" ){
 			objName = "";
 			url = "";
-			var sc = keywordArrayList.generic;
+			var sc = Object.keys(keywordArrayList.generic);
 			selectedKeywordList = "generic";
 			var res = '';
 			for(var i = 0; i < sc.length; i++){
@@ -1998,7 +1993,7 @@ function contentTable(newTestScriptDataLS) {
 		else if(selectedText == "@Mobile" ){
 			objName = " ";
 			url = " ";
-			var sc = keywordArrayList.generic;
+			var sc = Object.keys(keywordArrayList.generic);
 			selectedKeywordList = "generic";
 			var res = '';
 			for(var i = 0; i < sc.length; i++){
@@ -2017,7 +2012,7 @@ function contentTable(newTestScriptDataLS) {
 		else if (selectedText == "@Action") {
 			objName = " ";
 			url = " ";
-			var sc = keywordArrayList.action;
+			var sc = Object.keys(keywordArrayList.action);
 			selectedKeywordList = "a";
 			var res = '';
 			for (var i = 0; i < sc.length; i++) {
@@ -2039,7 +2034,7 @@ function contentTable(newTestScriptDataLS) {
 		else if(selectedText == "@MobileiOS" ){
 			objName = " ";
 			url = " ";
-			var sc = keywordArrayList.genericiOS;
+			var sc = Object.keys(keywordArrayList.genericiOS);
 			selectedKeywordList = "genericiOS";
 			var res = '';
 			for(var i = 0; i < sc.length; i++){
@@ -2061,7 +2056,7 @@ function contentTable(newTestScriptDataLS) {
 			objName = " ";
 			url = " ";    		
 			//new
-			var sc = keywordArrayList.excelList;
+			var sc = Object.keys(keywordArrayList.excelList);
 			selectedKeywordList = "excelList";
 			var res = '';
 			for(var i = 0; i < sc.length; i++){
@@ -2093,7 +2088,7 @@ function contentTable(newTestScriptDataLS) {
 					//changes from wasim
 					if(obType!='a' && obType!='select' && obType!='radiobutton' && obType!='checkbox' && obType!='input' && obType!='list' 
 						&& obType!='tablecell' && obType!='table' && obType!='img' && obType!='button' && appTypeLocal == 'Web' ){						
-						var sc = keywordArrayList.element;
+						var sc = Object.keys(keywordArrayList.element);
 						selectedKeywordList = "element";
 						var res = '';
 						for(var i = 0; i < sc.length; i++){
@@ -2113,7 +2108,7 @@ function contentTable(newTestScriptDataLS) {
 						break;
 					}	
 					else if(obType =='elementWS'){
-						var sc = keywordArrayList.elementWS;
+						var sc = Object.keys(keywordArrayList.elementWS);
 						selectedKeywordList = "elementWS";
 						var res = '';
 						for(var i = 0; i < sc.length; i++){
@@ -2137,23 +2132,23 @@ function contentTable(newTestScriptDataLS) {
 						var res = '';
 						var sc;
 						var listType = ob.canselectmultiple;
-						if(obType =='push_button')	{sc = keywordArrayList.button;selectedKeywordList = "button";}		
-						else if(obType =='text' || obType == 'edit'){	sc = keywordArrayList.text;selectedKeywordList = "text";}
-						else if(obType =='combo_box'){	sc = keywordArrayList.select;selectedKeywordList = "select";}
-						else if(obType =='list_item')	{sc = keywordArrayList.list;selectedKeywordList = "list";}
+						if(obType =='push_button')	{sc = Object.keys(keywordArrayList.button);selectedKeywordList = "button";}		
+						else if(obType =='text' || obType == 'edit'){	sc = Object.keys(keywordArrayList.text);selectedKeywordList = "text";}
+						else if(obType =='combo_box'){	sc = Object.keys(keywordArrayList.select);selectedKeywordList = "select";}
+						else if(obType =='list_item')	{sc = Object.keys(keywordArrayList.list);selectedKeywordList = "list";}
 						else if (obType == 'list_item' || obType == 'list') {
 							if (listType == 'true') {
-								sc = keywordArrayList.list;
+								sc = Object.keys(keywordArrayList.list);
 								selectedKeywordList = "list";
 							} else {
-								sc = keywordArrayList.select;
+								sc = Object.keys(keywordArrayList.select);
 								selectedKeywordList = "select";
 							}
 						}
-						else if(obType =='check_box'){	sc = keywordArrayList.checkbox;selectedKeywordList = "checkbox";}
-						else if(obType == 'radio_button')	{sc = keywordArrayList.radiobutton;selectedKeywordList = "radiobutton";}
-						else if(obType =='hyperlink' || obType =='lbl'){	sc = keywordArrayList.link;selectedKeywordList = "link";}
-						else	{sc = keywordArrayList.element;selectedKeywordList = "element";}
+						else if(obType =='check_box'){	sc = Object.keys(keywordArrayList.checkbox);selectedKeywordList = "checkbox";}
+						else if(obType == 'radio_button')	{sc = Object.keys(keywordArrayList.radiobutton);selectedKeywordList = "radiobutton";}
+						else if(obType =='hyperlink' || obType =='lbl'){	sc = Object.keys(keywordArrayList.link);selectedKeywordList = "link";}
+						else	{sc = Object.keys(keywordArrayList.element);selectedKeywordList = "element";}
 						for(var i = 0; i < sc.length; i++){
 							if(selectedKeyword == sc[i]){
 								res += '<option role="option" value="' + sc[i]+'" selected>' + sc[i] + '</option>';
@@ -2173,7 +2168,7 @@ function contentTable(newTestScriptDataLS) {
 					else if(appTypeLocal == 'Desktop' &&(!(obType =='push_button' ||obType =='text' ||obType =='combo_box' || obType =='list_item'|| obType =='hyperlink' || obType =='lbl'
 						||obType =='list' || obType == 'edit' || obType == null || obType == 'Static' || obType == 'check_box'|| obType == 'radio_button'))){
 						var res = '';
-						var sc = keywordArrayList.element;
+						var sc = Object.keys(keywordArrayList.element);
 						selectedKeywordList = "element";
 						for(var i = 0; i < sc.length; i++){
 							if(selectedKeyword == sc[i]){
@@ -2197,33 +2192,33 @@ function contentTable(newTestScriptDataLS) {
 						var res = '';
 						var sc;
 						if (obType.includes("RadioButton"))
-						{sc = keywordArrayList.radiobutton;
+						{sc = Object.keys(keywordArrayList.radiobutton);
 						selectedKeywordList = "radiobutton";}
 						else if (obType.includes("EditText"))
-						{sc = keywordArrayList.input;
+						{sc = Object.keys(keywordArrayList.input);
 						selectedKeywordList = "input";}
 						else if (obType.includes("Switch"))
-						{sc = keywordArrayList.togglebutton;
+						{sc = Object.keys(keywordArrayList.togglebutton);
 						selectedKeywordList = "togglebutton";}
 						else if (obType.includes("ImageButton")
 								|| obType.includes("Button"))
-						{sc = keywordArrayList.button; selectedKeywordList = "button";}
+						{sc = Object.keys(keywordArrayList.button); selectedKeywordList = "button";}
 						else if (obType.includes("Spinner"))
-						{sc = keywordArrayList.spinners;selectedKeywordList = "spinners";}
+						{sc = Object.keys(keywordArrayList.spinners);selectedKeywordList = "spinners";}
 						else if (obType.includes("CheckBox"))
-						{sc = keywordArrayList.checkbox;selectedKeywordList = "checkbox";}
+						{sc = Object.keys(keywordArrayList.checkbox);selectedKeywordList = "checkbox";}
 						else if (obType.includes("TimePicker"))
-						{sc = keywordArrayList.time;selectedKeywordList = "time";}
+						{sc = Object.keys(keywordArrayList.time);selectedKeywordList = "time";}
 						else if (obType.includes("DatePicker"))
-						{sc = keywordArrayList.date;selectedKeywordList = "date";}
+						{sc = Object.keys(keywordArrayList.date);selectedKeywordList = "date";}
 						else if (obType.includes("NumberPicker"))
-						{sc = keywordArrayList.numberpicker;selectedKeywordList = "numberpicker";}
+						{sc = Object.keys(keywordArrayList.numberpicker);selectedKeywordList = "numberpicker";}
 						else if (obType.includes("RangeSeekBar"))
-						{sc = keywordArrayList.rangeseekbar;selectedKeywordList = "rangeseekbar";}
+						{sc = Object.keys(keywordArrayList.rangeseekbar);selectedKeywordList = "rangeseekbar";}
 						else if (obType.includes("SeekBar"))
-						{sc = keywordArrayList.seekbar;selectedKeywordList = "seekbar";}
+						{sc = Object.keys(keywordArrayList.seekbar);selectedKeywordList = "seekbar";}
 						else if (obType.includes("ListView"))
-						{sc = keywordArrayList.listview;selectedKeywordList = "listview";}	
+						{sc = Object.keys(keywordArrayList.listview);selectedKeywordList = "listview";}	
 						for (var i = 0; i < sc.length; i++) {
 							if (selectedKeyword == sc[i]) {
 								res += '<option role="option" value="' + sc[i]
@@ -2243,7 +2238,7 @@ function contentTable(newTestScriptDataLS) {
 					} else if (appTypeLocal == 'Mobility' && (!(obType.includes("RadioButton") || obType.includes("ImageButton") || obType.includes("Button") || obType.includes("EditText") 
 							|| obType.includes("Switch")  || obType.includes("CheckBox") || obType.includes("Spinner") || obType.includes("TimePicker") || obType.includes("DatePicker") || obType.includes("NumberPicker") || obType.includes("RangeSeekBar") || obType.includes("SeekBar") || obType.includes("ListView")))) {
 						var res = '';
-						var sc = keywordArrayList.element;
+						var sc = Object.keys(keywordArrayList.element);
 						selectedKeywordList = "element";
 						for (var i = 0; i < sc.length; i++) {
 							if (selectedKeyword == sc[i]) {
@@ -2265,13 +2260,13 @@ function contentTable(newTestScriptDataLS) {
 					else if(appTypeLocal == 'MobilityiOS' && (( obType == 'UIATableView' || obType == 'UIASecureTextField' || obType == 'UIATextField' || obType=='UIASwitch' || obType=='UIAButton'  || obType == 'UIASearchBar' || obType == 'UIASlider' || obType =='UIAPickerWheel'))){
 						var res = '';
 						var sc;
-						if(obType == 'UIASecureTextField' || obType == 'UIATextField' || obType == 'UIASearchBar'){ sc = keywordArrayList.text;selectedKeywordList = "text";}
-						else if(obType =='UIASwitch'){ sc = keywordArrayList.Switch;selectedKeywordList = "Switch";}
-						else if(obType =='UIAButton') {sc= keywordArrayList.button;selectedKeywordList = "button";}
-						else if(obType == 'UIASlider') {sc = keywordArrayList.slider;selectedKeywordList = "slider";}
-						else if(obType =='UIAPickerWheel'){ sc = keywordArrayList.picker;selectedKeywordList = "picker";}
-						else if(obType =='UIATableView') {sc = keywordArrayList.table;selectedKeywordList = "table";}
-						else	{sc = keywordArrayList.generic;selectedKeywordList = "generic";}
+						if(obType == 'UIASecureTextField' || obType == 'UIATextField' || obType == 'UIASearchBar'){ sc = Object.keys(keywordArrayList.text);selectedKeywordList = "text";}
+						else if(obType =='UIASwitch'){ sc = Object.keys(keywordArrayList.Switch);selectedKeywordList = "Switch";}
+						else if(obType =='UIAButton') {sc= Object.keys(keywordArrayList.button);selectedKeywordList = "button";}
+						else if(obType == 'UIASlider') {sc = Object.keys(keywordArrayList.slider);selectedKeywordList = "slider";}
+						else if(obType =='UIAPickerWheel'){ sc = Object.keys(keywordArrayList.picker);selectedKeywordList = "picker";}
+						else if(obType =='UIATableView') {sc = Object.keys(keywordArrayList.table);selectedKeywordList = "table";}
+						else	{sc = Object.keys(keywordArrayList.generic);selectedKeywordList = "generic";}
 						for(var i = 0; i < sc.length; i++){
 							if(selectedKeyword == sc[i]){
 								res += '<option role="option" value="' + sc[i]+'" selected>' + sc[i] + '</option>';
@@ -2290,7 +2285,7 @@ function contentTable(newTestScriptDataLS) {
 					}
 					else if(appTypeLocal == 'MobilityiOS' && (!(obType == 'UIATableView' || obType == 'UIASecureTextField' || obType == 'UIATextField' || obType=='UIASwitch' || obType=='UIAButton'  || obType == 'UIASearchBar' || obType == 'UIASlider' || obType =='UIAPickerWheel'))){
 						var res = '';
-						var sc = keywordArrayList.element;
+						var sc = Object.keys(keywordArrayList.element);
 						selectedKeywordList = "element";
 						for(var i = 0; i < sc.length; i++){
 							if(selectedKeyword == sc[i]){
@@ -2312,47 +2307,47 @@ function contentTable(newTestScriptDataLS) {
 						||obType =='list' || obType == 'edit' || obType == 'Edit Box' || obType == null || obType == 'Static' || obType == 'check box'|| obType == 'radio button' || obType == 'panel' || obType != undefined || obType == 'table')){
 						var sc;
 						if(obType =='push button' || obType =='toggle button'){
-							sc = keywordArrayList.button;		
+							sc = Object.keys(keywordArrayList.button);		
 							selectedKeywordList = "button";
 						}
 						else if(obType == 'edit'|| obType == 'Edit Box' || obType =='text'){
-							sc = keywordArrayList.text;
+							sc = Object.keys(keywordArrayList.text);
 							selectedKeywordList = "text";
 						}
 						else if(obType =='combo box'){
-							sc = keywordArrayList.select;
+							sc = Object.keys(keywordArrayList.select);
 							selectedKeywordList = "select";
 						}
 						else if(obType =='list item' || obType =='list' ){
-							sc = keywordArrayList.list;
+							sc = Object.keys(keywordArrayList.list);
 							selectedKeywordList = "list";
 						}
 						else if(obType =='hyperlink' || obType =='Static' || obType == 'text'){
-							sc = keywordArrayList.link;
+							sc = Object.keys(keywordArrayList.link);
 							selectedKeywordList = "link";
 						}
 						else if(obType =='check box'){
-							sc = keywordArrayList.checkbox;
+							sc = Object.keys(keywordArrayList.checkbox);
 							selectedKeywordList = "checkbox";
 						}
 						else if(obType =='radio button'){
-							sc = keywordArrayList.radiobutton;
+							sc = Object.keys(keywordArrayList.radiobutton);
 							selectedKeywordList = "radiobutton";
 						}
 						else if(obType == 'table'){
-							sc = keywordArrayList.table;
+							sc = Object.keys(keywordArrayList.table);
 							selectedKeywordList = "table";
 						}
 						else if(obType == 'scroll bar'){
-							sc = keywordArrayList.scrollbar;
+							sc = Object.keys(keywordArrayList.scrollbar);
 							selectedKeywordList = "scrollbar";
 						}
 						else if(obType == 'internal frame'){
-							sc = keywordArrayList.internalframe;
+							sc = Object.keys(keywordArrayList.internalframe);
 							selectedKeywordList = "internalframe";
 						}
 						else{
-							sc = keywordArrayList.element;
+							sc = Object.keys(keywordArrayList.element);
 							selectedKeywordList = "element";
 						}
 						var res = '';
@@ -2373,7 +2368,7 @@ function contentTable(newTestScriptDataLS) {
 						break;
 					}
 					else {
-						var sc = keywordArrayList[obType];
+						var sc = Object.keys(keywordArrayList[obType]);
 						selectedKeywordList = obType;
 						var res = '';
 						for(var i = 0; i < sc.length; i++){
@@ -2398,7 +2393,7 @@ function contentTable(newTestScriptDataLS) {
 	}
 
 	function setKeyword1(e,selectedText,$grid,selectedKeyword){
-		var keywordArrayList1 = window.localStorage['keywordListData'];
+		var keywordArrayList1 = keywordListData;
 		var keywordArrayList = JSON.parse(keywordArrayList1);
 		var taskInfo = JSON.parse(window.localStorage['_T']);
 		var appTypeLocal = taskInfo.appType;//window.localStorage['appTypeScreen'];
@@ -2424,7 +2419,7 @@ function contentTable(newTestScriptDataLS) {
 
 	//function editCell(rowid, iCol, cellcontent, e){
 	function editkeyWord(e){
-		var keywordArrayList = window.localStorage['keywordListData'];
+		var keywordArrayList = keywordListData;
 		keywordArrayList = jQuery.parseJSON(keywordArrayList);
 		var selName = 'keywordVal';
 		var $grid = $('#jqGrid');
@@ -2438,16 +2433,16 @@ function contentTable(newTestScriptDataLS) {
 		$(selId).parent().next().find('input').val('');
 		$(selId).parent().next().next().find('input').val('');
 		//get Input and Output Syntax for selected Keyword
-		$.each(keywordArrayList.syntax, function( index, value ) {
+		$.each(keywordArrayList, function( index, value ) {
 			keywordArrayKey = index;
-			keywordArrayValue =  JSON.parse(value);
+			keywordArrayValue =  value;//JSON.parse(value);
 			if(selectedKeywordList == keywordArrayKey)
 			{
 				$.each(keywordArrayValue, function(k, v) {
 					if(selectedText == k)
 					{
-						inputSyntax = v.inputVal;
-						outputSyntax = v.outputVal;
+						inputSyntax = JSON.parse(v).inputVal;
+						outputSyntax = JSON.parse(v).outputVal;
 						$grid.find("td[aria-describedby = jqGrid_inputVal]:visible").find('input').attr("placeholder", inputSyntax).attr("title", inputSyntax);
 						$grid.find("td[aria-describedby = jqGrid_outputVal]:visible").find('input').attr("placeholder", outputSyntax).attr("title", outputSyntax);
 					}
@@ -2458,7 +2453,7 @@ function contentTable(newTestScriptDataLS) {
 
 	//function editCell(rowid, iCol, cellcontent, e){
 	function editCell(e){
-		var keywordArrayList = window.localStorage['keywordListData'];
+		var keywordArrayList = keywordListData;
 		keywordArrayList = jQuery.parseJSON(keywordArrayList);
 		var selName = 'custname';
 		var $grid = $('#jqGrid');
@@ -2476,16 +2471,16 @@ function contentTable(newTestScriptDataLS) {
 			$grid.jqGrid('setCell', currRowId, 'url', url); 
 		}
 		//get Input and Output Syntax for selected Keyword
-		$.each(keywordArrayList.syntax, function( index, value ) {
+		$.each(keywordArrayList, function( index, value ) {
 			keywordArrayKey = index;
-			keywordArrayValue =  JSON.parse(value);
+			keywordArrayValue =  value;//JSON.parse(value);
 			if(selectedKeywordList == keywordArrayKey)
 			{
 				$.each(keywordArrayValue, function(k, v) {
 					if(selectedKey == k)
 					{
-						inputSyntax = v.inputVal;
-						outputSyntax = v.outputVal;
+						inputSyntax = JSON.parse(v).inputVal;
+						outputSyntax = JSON.parse(v).outputVal;
 						$grid.find("td[aria-describedby = jqGrid_inputVal]:visible").find('input').attr("placeholder", inputSyntax).attr("title", inputSyntax);
 						$grid.find("td[aria-describedby = jqGrid_outputVal]:visible").find('input').attr("placeholder", outputSyntax).attr("title", outputSyntax);
 					}
@@ -3065,7 +3060,7 @@ function getTags(data) {
 }
 
 function getKeywordList(data) {
-	var arr = data.defaultList;
+	var arr = Object.keys(data.defaultList);
 	var keywordList = [];
 	for (var i=0; i<arr.length; i++){
 		keywordList.push(arr[i]);

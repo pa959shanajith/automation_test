@@ -3,11 +3,19 @@ var app = express();
 var server = require('http').createServer(app); 
 var io = require('socket.io')(server);
 var bodyParser = require('body-parser');
+var morgan = require('morgan');
 
 
 module.exports = app;
 app.use(bodyParser.json({limit: '5mb'}));
 app.use(bodyParser.urlencoded({limit: '5mb', extended: true}));
+app.use(morgan('combined'))
+
+//write stream for logs
+//var accessLogStream = fs.createWriteStream(__dirname + '/access.log', {flags: 'a'})
+
+//setup the logger
+//app.use(morgan('combined', {stream: accessLogStream}))
 
 //serve all asset files from necessary directories
 app.use("/js", express.static(__dirname + "/public/js"));
@@ -56,6 +64,7 @@ app.post('/updateScreen_ICE', design.updateScreen_ICE);
 app.post('/readTestCase_ICE', design.readTestCase_ICE);
 app.post('/updateTestCase_ICE', design.updateTestCase_ICE);
 app.post('/debugTestCase_ICE', design.debugTestCase_ICE);
+app.post('/getKeywordDetails_ICE', design.getKeywordDetails_ICE);
 //Execute Screen Routes
 app.post('/readTestSuite_ICE', suite.readTestSuite_ICE);
 app.post('/updateTestSuite_ICE', suite.updateTestSuite_ICE);
