@@ -2537,7 +2537,7 @@ function addTestScriptRow(){
 	else flagClass = "false";
 	var selectedStepNo = window.localStorage['selectedRowStepNo']
 	//$("#jqGrid").trigger("reloadGrid");
-	appTypeLocal = "Web";//window.localStorage['appTypeScreen'];
+	appTypeLocal = JSON.parse(window.localStorage['_T']).appType;
 	var emptyRowData = {
 			"objectName": "",
 			"custname": "",
@@ -2738,7 +2738,7 @@ function pasteTestStep(){
 	else{
 		if(anotherScriptId != JSON.parse(window.localStorage['_T']).testCaseId){
 			if (emptyTestStep == "true" || getRowJsonCopy == undefined) return false
-			else if(getAppTypeForPaste != "Web") return false
+			else if(getAppTypeForPaste != JSON.parse(window.localStorage['_T']).appType) return false
 			else{
 				$("#globalModalYesNo").find('.modal-title').text("Paste Test Step");
 				$("#globalModalYesNo").find('.modal-body p').text("Copied step(s) might contain object reference which will not be supported for other screen. Do you still want to continue ?").css('color','black');
