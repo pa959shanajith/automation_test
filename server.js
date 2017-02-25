@@ -47,6 +47,8 @@ var login = require('./server/controllers/login');
 var admin = require('./server/controllers/admin');
 var design = require('./server/controllers/design');
 var suite = require('./server/controllers/suite');
+var report = require('./server/controllers/report');
+
 
 //Login Routes
 app.post('/authenticateUser_Nineteen68', login.authenticateUser_Nineteen68);
@@ -71,6 +73,10 @@ app.post('/updateTestSuite_ICE', suite.updateTestSuite_ICE);
 app.post('/updateTestScenario_ICE', suite.updateTestScenario_ICE);
 app.post('/ExecuteTestSuite_ICE', suite.ExecuteTestSuite_ICE);
 //app.post('/readTestScenarios_ICE', suite.readTestScenarios_ICE);
+//Report Screen Routes
+app.post('/getAllSuites_ICE', report.getAllSuites_ICE);
+app.post('/getSuiteDetailsInExecution_ICE', report.getSuiteDetailsInExecution_ICE);
+app.post('/reportStatusScenarios_ICE', report.reportStatusScenarios_ICE);
 
 
 

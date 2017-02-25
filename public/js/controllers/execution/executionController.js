@@ -1,9 +1,11 @@
+var appType;
 mySPA.controller('executionController',['$scope','$http','$timeout','$location','ExecutionService','cfpLoadingBar', function ($scope, $http, $timeout, $location, ExecutionService, cfpLoadingBar) {
 	cfpLoadingBar.start();
 	var getEachScenario = [] //Contains Each RowData of Scenarios
 	var userinfo = {} //Contains Userinfo
 	var browserTypeExe = []; // Contains selected browser id for execution
 	var scenarioIdQC;
+	
 	$("body").css("background","#eee");
 	$timeout(function(){
 		$('.scrollbar-inner').scrollbar();
@@ -11,20 +13,20 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 		document.getElementById("currentYear").innerHTML = new Date().getFullYear()
 	}, 500)
 
-	//Task Listing
-	loadUserTasks()
+			//Task Listing
+			loadUserTasks()
+			var getTaskName = JSON.parse(window.localStorage['_CT']).taskName;
+			appType = JSON.parse(window.localStorage['_CT']).appType;
+			$("#page-taskName").empty().append('<span class="taskname">'+getTaskName+'</span>');
+			$(".projectInfoWrap").empty()
 
-	//Loading Project Info
-	var getProjInfo = JSON.parse(window.localStorage['_T'])
-	$("#page-taskName").empty().append('<span>'+JSON.parse(window.localStorage['_T']).taskName+'</span>')
-	$(".projectInfoWrap").empty()
-	$(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">Project :</span><span class="content">'+getProjInfo.projectName+'</span></p><p class="proj-info-wrap"><span class="content-label">Module :</span><span class="content">'+getProjInfo.moduleName+'</span></p><p class="proj-info-wrap"><span class="content-label">Screen :</span><span class="content">'+getProjInfo.screenName+'</span></p>')
+	// $(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">Project :</span><span class="content">'+getProjInfo.projectName+'</span></p><p class="proj-info-wrap"><span class="content-label">Module :</span><span class="content">'+getProjInfo.moduleName+'</span></p><p class="proj-info-wrap"><span class="content-label">Screen :</span><span class="content">'+getProjInfo.screenName+'</span></p>')
 	//Loading Project Info
 	
 	//Global Information
-	var cycleId = getProjInfo.cycleId;
-	var testSuiteId = getProjInfo.testSuiteId;
-	var testSuiteName = getProjInfo.testSuiteName;
+	var cycleId = JSON.parse(window.localStorage['_CT']).cycleId;
+	var testSuiteId = JSON.parse(window.localStorage['_CT']).testSuiteId;
+	var testSuiteName = JSON.parse(window.localStorage['_CT']).testSuiteName;
 	//Global Information
 	
 	//Onload ServiceCall

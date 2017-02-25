@@ -781,7 +781,7 @@ body {
     -webkit-transition: 0.2s ease-in-out;
 }
 
-.disableActions{
+.disableActions, .disableActionsWS{
 	opacity:0.5;
 	transition: opacity .2s;
 	-webkit-transition: opacity .2s;
@@ -794,7 +794,7 @@ body {
 	cursor: no-drop
 }
 
-.enableActions{
+.enableActions, .enableActionsWS{
 	opacity:1;
 	transition: opacity .2s;
 	-webkit-transition: opacity .2s;
@@ -2525,6 +2525,8 @@ select:-webkit-autofill:focus {
 .reportsDetail{line-height: 2; text-align: center; height:425px; overflow: auto;}
 .rDstepDes{text-align: left;}
 /*****************Specific Reports CSS*****************/
+
+
 
 /******************Remove Webkit autocolor CSS***************************/
 
