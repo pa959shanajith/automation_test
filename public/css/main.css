@@ -1141,7 +1141,9 @@ body {
 .selectAllTxt:hover {
     background: none !important;
 }
-
+.editable{
+	font-size: 12px !important
+}
 /***Design Mid Section CSS***/
 
 
@@ -2236,7 +2238,14 @@ select:hover {
 	margin-bottom: 30px;
 	display: inline-block;
 	text-align: center;
-	
+	cursor: pointer;
+}
+.repsuitename{
+	text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap !important;
+    width: 85%;
+    display: inline-block;
 }
 .suiteIconContainer{
 	background-color: #5d5cde;
@@ -2311,6 +2320,7 @@ select:hover {
 .suitestartend tbody, .scenarioReports tbody{
 	position: absolute;
     margin-top: 23px;
+    width: 100%;
 }
 .scenarioReports tbody{width: 100%;}
 .scenarioReports{width: 100% !important}
@@ -2329,15 +2339,15 @@ select:hover {
     float: left;
 }
 .suitestartend tbody tr td:nth-child(1){width: 5%;}
-.suitestartend tbody tr td:nth-child(2){width: 45%; padding-left: 45px; text-align: left;}
-.suitestartend tbody tr td:nth-child(3){width: 50%; padding-left: 78px; text-align: left;}
+.suitestartend tbody tr td:nth-child(2){width: 45%; text-align: center;}
+.suitestartend tbody tr td:nth-child(3){width: 50%; text-align: center;}
 .scenarioReports tbody tr:nth-child(odd){
 	background:#e8e6ff;	
 }
 .scenarioReports tbody tr:nth-child(even) {
     background: #fff;
 }
-.scenarioReports tbody tr td:nth-child(1){width: 30%;}
+.scenarioReports tbody tr td:nth-child(1){width: 30%; word-wrap: break-word; padding-left: 10px; padding-right: 10px;}
 .scenarioReports tbody tr td:nth-child(2){width: 20%;}
 .scenarioReports tbody tr td:nth-child(3){width: 20%;}
 .scenarioReports tbody tr td:nth-child(4){width: 15%;}
@@ -2360,7 +2370,7 @@ select:hover {
 .progresslabel, .progresspercentage{display: inline-block;}
 .progresslabel, .customprogress{float: left;}
 .customprogress{
-	width: 65% !important;
+	width: 62% !important;
     height: 12px;
     border-radius: 8px;
     margin-top: 3px;
@@ -2369,18 +2379,22 @@ select:hover {
 .customprogress .progress-bar{
 	border-radius: 20px;	
 }
-.progresspercentage{width: 10%; text-align: center;}
+.progresspercentage{width: 13%; text-align: center;}
 
 .bottom-section-testsuites{
 	/*height: 300px !important;*/
     padding-bottom: 3px;
     border: 1px solid #edefec;
 }
-
+.scenariostatusreport{cursor: pointer;}
 .popupWrapRow{
 	display: block;
 	width:100%;
 }
+.progress-bar-success{background: linear-gradient(to right, #39b54a, #009444) !important;}
+.progress-bar-danger{background: linear-gradient(to right, #d41e2d, #b31f2d) !important;}
+.progress-bar-warning{background: linear-gradient(to right, #f7b91e, #faa536) !important;}
+.progress-bar-norun{background: linear-gradient(to right, #939598, #58595b) !important;}
 
 .textFieldsContainer{
 	display: block;
@@ -2421,8 +2435,96 @@ select:-webkit-autofill:focus {
 }
 
 
-
-
+/*****************Specific Reports CSS*****************/
+.mainContainer{
+	border: 1px solid #B5AAAA;
+    margin: 4px;
+    float: left;
+    padding: 14px;
+    width: calc(100% - 8px);
+    height: calc(100% - 10px);
+    background-color: #fff;
+ }
+.hearderCon{
+	position: relative;
+	width: 100%;
+	float: left;
+	border: 1px solid #cfcfcf;
+	background: linear-gradient(to bottom, #FFFFFF 0%, #E6E6E6 100%);
+	height: 50px;
+	margin-bottom: 10px;
+}
+.headerRepDetails{ width: 50%; padding: 0;}
+.headerRepDetails label{ text-align: right; width: 29%; font-size: 13px;}
+.headerRepDetails span{
+	width: 64%;
+	padding-bottom: 5px;
+	font-weight: bold;
+	font-size: 13px;
+}
+.h2Header{
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+} 
+.leftSummary label{
+	text-align: right;
+    float: left;
+    width: 29%;
+    padding-right: 5px;
+    padding-bottom: 5px;
+    font-size: 13px;
+}
+.leftSummary span{
+	float: left;
+    width: 64%;
+    padding-bottom: 5px;
+    font-weight: bold;
+    font-size: 13px;
+}
+.summaryCon{
+	position: relative;
+	float: left;
+	width: 100%;
+	border: 1px solid #cfcfcf;
+	background: linear-gradient(to bottom, #FFFFFF 0%, #E6E6E6 100%);
+	height: 30px;
+}
+.summaryCon span{position: absolute; top: 5px; left: 40px;}
+.midContainer{
+	border-collapse: collapse;
+    border: 1px solid #cfcfcf;
+    width: 100%;
+    font: 14px cabin_Regular;
+    float: left;
+    margin: 1% 0;
+}
+.midContainer td{padding-top: 5px; border: 1px solid #cfcfcf;}
+.midContainer td label{
+	text-align: right;
+    float: left;
+    width: 29%;
+    padding-right: 5px;
+    padding-bottom: 5px;
+    font-size: 13px;
+}
+.reportsDetails{
+	border: 1px solid #cfcfcf;
+	background: linear-gradient(to bottom, #FFFFFF 0%, #E6E6E6 100%);
+	height: 50px;
+}
+.reportsDetails th:nth-child(1), .rDid{width: 5%;}
+.reportsDetails th:nth-child(2), .rDstep{width: 10%;}
+.reportsDetails th:nth-child(3), .rDstepDes{width: 50%;}
+.reportsDetails th:nth-child(4), .rDstatus{width: 10%;}
+.reportsDetails th:nth-child(5), .rDellaps{width: 12%;}
+.reportsDetails th:nth-child(6), .rDcomments{width: 13%;}
+.maintabCont{float: left; width: 100%; border: 1px solid #dcdcdc;}
+.tabCont{display: table-cell; border-bottom: 1px solid #ececec;}
+.reportsDetail{line-height: 2; text-align: center; height:425px; overflow: auto;}
+.rDstepDes{text-align: left;}
+/*****************Specific Reports CSS*****************/
 
 /******************Remove Webkit autocolor CSS***************************/
 
