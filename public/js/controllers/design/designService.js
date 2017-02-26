@@ -22,10 +22,12 @@ mySPA.factory('DesignServices', ['$http','$q', function ($http, $httpProvider, $
 		},
 
 		getScrapeDataScreenLevel_ICE: function()	{
-			var screenId = JSON.parse(window.localStorage['_T']).screenId;
+			var screenId = JSON.parse(window.localStorage['_CT']).screenId;
+			var projectId = JSON.parse(window.localStorage['_CT']).projectId;
 			return $http.post('/getScrapeDataScreenLevel_ICE',{
 				param : 'getScrapeDataScreenLevel_ICE',
-				screenId : screenId
+				screenId : screenId,
+				projectId : projectId
 			})
 
 			.then (function(response){return response.data;	},
@@ -102,7 +104,17 @@ mySPA.factory('DesignServices', ['$http','$q', function ($http, $httpProvider, $
 			})
 		},
 		
-		//Testcases Keywords
+		initScrapeWS_ICE : function(initWSJson){
+			return $http.post('/debugTestCase_ICE',{
+				param : 'debugTestCaseWS_ICE',
+				testCaseWS: initWSJson
+			})
+			.then(function(response)  { 
+				return response.data
+			},function(response){
+				return $q.reject(response.data)
+			})
+		},
 		getKeywordDetails_ICE : function(appType){
 			return $http.post('/getKeywordDetails_ICE',{
 				param : 'getKeywordDetails_ICE',

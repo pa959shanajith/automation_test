@@ -53,8 +53,8 @@
 			<div style="border-bottom:0" ng-if="getScreenView == 'Webservice'" id="left-top-section" class="ApptypeScreenView">
 				<ul>
 					<li><span><a class='scrapeOnTxt'>Scrape On</a></span></li>
-					<li><a href='#' ng-class="enbledChecked ? 'enableActions' : 'disableActions'" data-toggle="modal" ng-click="initScrape($event); $event.preventDefault(); $event.stopPropagation();"><span><img src='imgs/ic-webservice.png' alt='Webservices' /></span>Web Services</a></li>
-					<li class="last"><span style="margin-bottom:-5px"><input ng-model="enbledChecked" id="enableAppend" type='checkbox' value=""></span><label for="enableAppend">Append</label></li>
+					<li><a href='#' ng-class="enbledWS ? 'enableActionsWS' : 'disableActionsWS'" data-toggle="modal" ng-click="initScrapeWS($event); $event.preventDefault(); $event.stopPropagation();"><span><img src='imgs/ic-webservice.png' alt='Webservices' /></span>Web Services</a></li>
+					<li class="last"><span style="margin-bottom:-5px"><input ng-model="enbledWS" id="enbledWS" type='checkbox' value=""></span><label for="enbledWS">Append</label></li>
 				</ul>
 			</div>
 			<!-- Apptype Webservice -->
@@ -106,12 +106,17 @@
 				<div id="wsdlActionsButton">
 					<button ng-click="selectedWsdlTab = 'requestWrap'" class="btn btn-xs btn-xs-custom pull-left">Request</button>
 					<button ng-click="selectedWsdlTab = 'responseWrap'" class="btn btn-xs btn-xs-custom pull-left">Response</button>
-					<button class="btn btn-xs btn-xs-custom pull-left">Save</button>
-					<input type="text" class="endPointURL form-control pull-left" placeholder="End Point URL"/>
-					<select class="form-control wsdlMethods pull-left">
-						<option>HTTP Method</option>
+					<button ng-click="saveWS()" class="btn btn-xs btn-xs-custom pull-left saveWS">Save</button>
+					<input ng-model="endPointURL" type="text" class="endPointURL form-control pull-left" placeholder="End Point URL"/>
+					<select ng-model="wsdlMethods" class="form-control wsdlMethods pull-left">
+						<option value="HTTP Method">HTTP Method</option>
+						<option value="GET">GET</option>
+						<option value="POST">POST</option>
+						<option value="HEAD">HEAD</option>
+						<option value="PUT">PUT</option>
+						<option value="DELETE">DELETE</option>
 					</select>
-					<input type="text" class="wsdlOperation form-control pull-left" placeholder="Operation"/>
+					<input ng-model="wsdlOperation" type="text" class="wsdlOperation form-control pull-left" placeholder="Operation"/>
 					<button style="padding: 2px 25px" class="btn btn-md pull-right">Add</button>
 				</div>
 			</div>
@@ -483,5 +488,43 @@
 		</div>
 	</div>
 	<!-- Mobility Launch Popup -->
+	
+	<!-- Save WebService Template Success  -->
+	<div class="modal fade" id="WSSaveSuccess" role="dialog" data-keyboard="false" data-backdrop="static">
+	  <div class="modal-dialog modal-sm">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal">&times;</button>
+	        <h4 class="modal-title">Save WebService Template</h4>
+	      </div>
+	      <div class="modal-body">
+	        <p>WebService Template saved successfully.</p>
+	      </div>
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-default" data-dismiss="modal">Ok</button>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+	<!-- Save WebService Template Success  -->
+	
+	<!-- Save WebService Template Fail  -->
+	<div class="modal fade" id="WSSaveFail" role="dialog" data-keyboard="false" data-backdrop="static">
+	  <div class="modal-dialog modal-sm">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal">&times;</button>
+	        <h4 class="modal-title">Save WebService Template</h4>
+	      </div>
+	      <div class="modal-body">
+	        <p>Failed to save WebService Template.</p>
+	      </div>
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-default" data-dismiss="modal">Ok</button>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+	<!-- Save WebService Template Fail  -->
 	
 <!--Bootstrap Popup-->

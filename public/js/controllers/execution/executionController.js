@@ -1,9 +1,11 @@
+var appType;var releaseName;var cycleName;var testSuiteName;
 mySPA.controller('executionController',['$scope','$http','$timeout','$location','ExecutionService','cfpLoadingBar', function ($scope, $http, $timeout, $location, ExecutionService, cfpLoadingBar) {
 	cfpLoadingBar.start();
 	var getEachScenario = [] //Contains Each RowData of Scenarios
 	var userinfo = {} //Contains Userinfo
 	var browserTypeExe = []; // Contains selected browser id for execution
 	var scenarioIdQC;
+	
 	$("body").css("background","#eee");
 	$timeout(function(){
 		$('.scrollbar-inner').scrollbar();
@@ -11,20 +13,27 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 		document.getElementById("currentYear").innerHTML = new Date().getFullYear()
 	}, 500)
 
-	//Task Listing
-	loadUserTasks()
+			//Task Listing
+			loadUserTasks()
+			var getTaskName = JSON.parse(window.localStorage['_CT']).taskName;
+			appType = JSON.parse(window.localStorage['_CT']).appType;
 
-	//Loading Project Info
-	var getProjInfo = JSON.parse(window.localStorage['_T'])
-	$("#page-taskName").empty().append('<span>'+JSON.parse(window.localStorage['_T']).taskName+'</span>')
-	$(".projectInfoWrap").empty()
-	$(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">Project :</span><span class="content">'+getProjInfo.projectName+'</span></p><p class="proj-info-wrap"><span class="content-label">Module :</span><span class="content">'+getProjInfo.moduleName+'</span></p><p class="proj-info-wrap"><span class="content-label">Screen :</span><span class="content">'+getProjInfo.screenName+'</span></p>')
-	//Loading Project Info
+			$("#page-taskName").empty().append('<span class="taskname">'+getTaskName+'</span>');
+			$(".projectInfoWrap").empty()
+
+			releaseName = JSON.parse(window.localStorage['_CT']).releaseName;
+			cycleName = JSON.parse(window.localStorage['_CT']).cycleName;
+			testSuiteName = JSON.parse(window.localStorage['_CT']).testSuiteName;
+
+	$timeout(function(){
+		projectDetails = angular.element(document.getElementById("left-nav-section")).scope().projectDetails;
+		$(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">Project :</span><span class="content">'+projectDetails.projectname+'</span></p><p class="proj-info-wrap"><span class="content-label">Cycle :</span><span class="content">'+releaseName+'</span></p><p class="proj-info-wrap"><span class="content-label">Cycle :</span><span class="content">'+cycleName+'</span></p><p class="proj-info-wrap"><span class="content-label">TestSuite :</span><span class="content">'+testSuiteName+'</span></p>')
+	}, 3000)
 	
 	//Global Information
-	var cycleId = getProjInfo.cycleId;
-	var testSuiteId = getProjInfo.testSuiteId;
-	var testSuiteName = getProjInfo.testSuiteName;
+	var cycleId = JSON.parse(window.localStorage['_CT']).cycleId;
+	var testSuiteId = JSON.parse(window.localStorage['_CT']).testSuiteId;
+	
 	//Global Information
 	
 	//Onload ServiceCall

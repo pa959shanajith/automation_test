@@ -3,6 +3,8 @@ var initScraping = {}; var mirrorObj = {}; var scrapeTypeObj = {}; var newScrape
 var selectRowStepNoFlag = false; //var deleteStep = false;
 var getAllAppendedObj; //Getting all appended scraped objects
 var gsElement = []; window.localStorage['selectRowStepNo'] = '';
+var getWSTemplateData = {} //Contains Webservice saved data
+var appType;var projectId;var projectDetails;var screenName;var testCaseName;var subTaskType;var subTask;
 mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout', 'DesignServices','cfpLoadingBar','$window', function($scope,$http,$location,$timeout,DesignServices,cfpLoadingBar,$window) {
 	$("body").css("background","#eee");
 	$("#tableActionButtons, .designTableDnd").delay(500).animate({opacity:"1"}, 500)
@@ -25,15 +27,21 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 	}
 	//Default Function to reset all input, select
 	
-	//Loading Project Info
-	var getProjInfo = JSON.parse(window.localStorage['_T'])
-	$("#page-taskName").empty().append('<span>'+getProjInfo.taskName+'</span>')
-	$(".projectInfoWrap").empty()
-	$(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">Project :</span><span class="content">'+getProjInfo.projectName+'</span></p><p class="proj-info-wrap"><span class="content-label">Module :</span><span class="content">'+getProjInfo.moduleName+'</span></p><p class="proj-info-wrap"><span class="content-label">Screen :</span><span class="content">'+getProjInfo.screenName+'</span></p>')
+	
+	
+		var getTaskName = JSON.parse(window.localStorage['_CT']).taskName;
+		    appType = JSON.parse(window.localStorage['_CT']).appType;
+		   screenName =  JSON.parse(window.localStorage['_CT']).screenName;
+		   testCaseName = JSON.parse(window.localStorage['_CT']).testCaseName;
+		 subTaskType = JSON.parse(window.localStorage['_CT']).subTaskType;
+		 subTask = JSON.parse(window.localStorage['_CT']).subtask;
+		$("#page-taskName").empty().append('<span class="taskname">'+getTaskName+'</span>');
+		$(".projectInfoWrap").empty()
 	//Loading Project Info
 	
 	//Getting Apptype or Screen Type
-	$scope.getScreenView = getProjInfo.appType
+	//console.log(appType);
+	$scope.getScreenView = appType
 	//Getting Apptype orScreen Type
 
 	cfpLoadingBar.start()
@@ -41,11 +49,36 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		if(window.location.href.split("/")[3] == "designTestCase"){
 			angular.element(document.getElementById("tableActionButtons")).scope().readTestCase_ICE();
 		}
-		else if(window.location.href.split("/")[3] == "design"){
+		else if(window.location.href.split("/")[3] == "design" && $scope.getScreenView != "Webservice"){
 			angular.element(document.getElementById("left-nav-section")).scope().getScrapeData();			
+		}
+		if($scope.getScreenView == "Webservice"){
+			angular.element(document.getElementById("left-nav-section")).scope().getWSData();
 		}
 		cfpLoadingBar.complete()
 	}, 1500)
+
+
+	$timeout(function(){
+		projectDetails = angular.element(document.getElementById("left-nav-section")).scope().projectDetails;
+		var getTaskName = JSON.parse(window.localStorage['_CT']).taskName;
+		    appType = JSON.parse(window.localStorage['_CT']).appType;
+		   screenName =  JSON.parse(window.localStorage['_CT']).screenName;
+		   testCaseName = JSON.parse(window.localStorage['_CT']).testCaseName;
+		 subTaskType = JSON.parse(window.localStorage['_CT']).subTaskType;
+		 subTask = JSON.parse(window.localStorage['_CT']).subtask;
+		 console.log("subTaskType", subTaskType);
+		 console.log(subTask);
+		if(subTaskType == "Scrape" || subTask == "Scrape")
+		{
+				$(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">Project :</span><span class="content">'+projectDetails.projectname+'</span></p><p class="proj-info-wrap"><span class="content-label">Screen :</span><span class="content">'+screenName+'</span></p>')
+		}
+		else{
+	$(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">Project: </span><span class="content">'+projectDetails.projectname+'</span></p><p class="proj-info-wrap"><span class="content-label">Screen: </span><span class="content">'+screenName+'</span></p><p class="proj-info-wrap"><span style="width: 23%;" class="content-label">TestCase: </span><span style="width: 77%;" class="content">'+testCaseName+'</span></p>')
+		}
+	
+	}, 3000)
+	
 
 	var custnameArr = [];
 	var keywordValArr = [];
@@ -64,10 +97,12 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 	//Submit task Test Case
 
 	$scope.readTestCase_ICE = function()	{
-		var taskInfo = JSON.parse(window.localStorage['_T']);
+	
+		var taskInfo = JSON.parse(window.localStorage['_CT']);
 		var screenId = taskInfo.screenId;
 		var testCaseId = taskInfo.testCaseId;
 		var testCaseName = taskInfo.testCaseName;
+		appType = taskInfo.appType;
 		enabledEdit = "false"
 			// service call # 1 - getTestScriptData service call
 			DesignServices.readTestCase_ICE(screenId, testCaseId, testCaseName)	
@@ -181,11 +216,12 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			},
 			function(error) {	console.log("Error in designController.js file getTestScriptData method! \r\n "+(error.data));	
 			});
+	
 	};//	getTestScriptData end
 
 	// browser icon clicked
 	$scope.debugTestCase_ICE = function (selectedBrowserType) {
-		var taskInfo = JSON.parse(window.localStorage['_T']);
+		var taskInfo = JSON.parse(window.localStorage['_CT']);
 		var testcaseID = [];
 		testcaseID.push(taskInfo.testCaseId);
 		var browserType = [];
@@ -305,7 +341,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 	$scope.importTestCase=function(){
 		var counter1 = 0;
 		var userInfo = JSON.parse(window.localStorage['_UI']);
-		var taskInfo = JSON.parse(window.localStorage['_T']);
+		var taskInfo = JSON.parse(window.localStorage['_CT']);
 		var screenId = taskInfo.screenId;
 		var testCaseId = taskInfo.testCaseId;
 		var testCaseName = taskInfo.testCaseName;
@@ -324,6 +360,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					reader.onload = function(e) {
 						if((file.name.split('.')[file.name.split('.').length-1]).toLowerCase() == "json"){
 							var resultString = JSON.parse(reader.result);
+							//var resultString = reader.result;
 							for(i = 0; i < resultString.length; i++){
 								if(resultString[i].appType == appType || resultString[i].appType.toLowerCase() == "generic"){
 									flag = true;
@@ -380,7 +417,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		$("#globalModalYesNo").modal("hide");
 		var counter2 = 0;
 		var userInfo = JSON.parse(window.localStorage['_UI']);
-		var taskInfo = JSON.parse(window.localStorage['_T']);
+		var taskInfo = JSON.parse(window.localStorage['_CT']);
 		var screenId = taskInfo.screenId;
 		var testCaseId = taskInfo.testCaseId;
 		var testCaseName = taskInfo.testCaseName;
@@ -450,7 +487,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 	$scope.importTestCase1=function(){
 		var counter = 0;
 		var userInfo = JSON.parse(window.localStorage['_UI']);
-		var taskInfo = JSON.parse(window.localStorage['_T']);
+		var taskInfo = JSON.parse(window.localStorage['_CT']);
 		var screenId = taskInfo.screenId;
 		var testCaseId = taskInfo.testCaseId;
 		var testCaseName = taskInfo.testCaseName;
@@ -514,7 +551,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 	
 	//Export Test case
 	$scope.exportTestCase=function() {
-		var taskInfo = JSON.parse(window.localStorage['_T']);
+		var taskInfo = JSON.parse(window.localStorage['_CT']);
 		var screenId = taskInfo.screenId;
 		var testCaseId = taskInfo.testCaseId;
 		var testCaseName = taskInfo.testCaseName;
@@ -610,11 +647,8 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		enableScreenShotHighlight = true;
 		DesignServices.getScrapeDataScreenLevel_ICE() 
 		.then(function(data){
-			if(data.view.length == 0)
-			{
-				$("#finalScrap").hide();
-			}
-			if(data != null){
+		
+			if(data != null && data != "getScrapeData Fail."){
 				viewString = data;
 				newScrapedList = viewString
 				$("#window-scrape-screenshot .popupContent, #window-scrape-screenshotTs .popupContent").empty()
@@ -681,18 +715,169 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		else{
 			$(document).find("#desktopPath").removeClass("inputErrorBorder")
 			$(document).find("#OEBSPath").removeClass("inputErrorBorder")
-			if(getProjInfo.appType == "Desktop"){
+			if($scope.getScreenView == "Desktop"){
 				$("#launchDesktopApps").modal("show")
+				$(document).find("#desktopPath").val('')
+				$(document).find("#desktopPath").removeClass("inputErrorBorder");
 			}
-			else if(getProjInfo.appType == "DesktopJava"){
-				$("#launchOEBSApps").modal("show")
+			else if($scope.getScreenView == "DesktopJava"){
+				$("#launchOEBSApps").modal("show");
+				$(document).find("#OEBSPath").val('');
+				$(document).find("#OEBSPath").removeClass("inputErrorBorder");
 			}
-			else if(getProjInfo.appType == "Mobility"){
+			else if($scope.getScreenView == "Mobility"){
 				$("#launchMobilityApps").modal("show")
+				$(document).find("#mobilityAPKPath, #mobilitySerialPath").val('')
+				$(document).find("#mobilityAPKPath, #mobilitySerialPath").removeClass("inputErrorBorder");
+				$(".androidIcon").removeClass("androidIconActive")
 			}
 		}
 	}
 	//Initialization for apptype(Desktop, Mobility, OEBS) to redirect on initScraping function
+	
+	
+	//Get Webservice Data
+	$scope.getWSData = function(){
+		if($("#wsdlRequestHeader, #wsdlRequestBody").val().length > 0){
+			$(".saveWS").prop("disabled", true);
+			$("#enbledWS").prop("disabled", false)
+			$(".enableActionsWS").addClass("disableActionsWS").removeClass("enableActionsWS")
+		}
+		else{
+			$(".saveWS").prop("disabled", false);
+			$("#enbledWS").prop("disabled", true)
+			$(".disableActionsWS").addClass("enableActionsWS").removeClass("disableActionsWS")
+		}
+	}
+	//Get Webservice Data
+	
+	
+	//Save Webservice Data
+	$scope.saveWS = function(){
+		var tasks = JSON.parse(window.localStorage['_CT']);
+		var endPointURL = $scope.endPointURL;
+		var wsdlMethods = $scope.wsdlMethods;
+		var wsdlOperation = $scope.wsdlOperation;
+		var wsdlRequestHeader = $("#wsdlRequestHeader").val().replace(/[\n\r]/g,'##').replace(/"/g, '\"');
+		var wsdlRequestBody = $("#wsdlRequestBody").val().replace(/[\n\r]/g,'').replace(/\s\s+/g, ' ').replace(/"/g, '\"');
+		var getWSData = {
+			"body": [wsdlRequestBody],
+			"operation": [wsdlOperation],
+			"responseHeader": [""],
+			"responseBody": [""],
+			"method": [wsdlMethods],
+			"endPointURL": [endPointURL],
+			"header": [wsdlRequestHeader]
+		};
+		getWSTemplateData = JSON.stringify(getWSData)
+		var projectId = tasks.projectId;
+		var screenId = tasks.screenId;
+		var screenName = tasks.screenName;
+		var userinfo = JSON.parse(window.localStorage['_UI']);
+		scrapeObject = {};
+		scrapeObject.param = 'debugTestCaseWS_ICE';
+		scrapeObject.getScrapeData = getWSTemplateData;
+		scrapeObject.projectId = projectId;
+		scrapeObject.screenId = screenId;
+		scrapeObject.screenName = screenName;
+		scrapeObject.userinfo = userinfo;
+		/*DesignServices.updateScreen_ICE(scrapeObject)
+		.then(function(data){
+			if(data == "success"){
+				$("#WSSaveSuccess").modal("show")
+			}
+			else{
+				$("#WSSaveFail").modal("show")
+			}
+		}, function(error){ console.log("Error") })*/
+	}
+	//Save Webservice Data
+	
+	
+	//Init Webservice
+	$scope.initScrapeWS = function(e){
+		var initWSJson = {}
+		var testCaseWS = []
+		var appType = $scope.getScreenView;
+		var endPointURL = $scope.endPointURL;
+		var wsdlMethods = $scope.wsdlMethods;
+		var wsdlOperation = $scope.wsdlOperation;
+		var wsdlRequestHeader = $("#wsdlRequestHeader").val().replace(/[\n\r]/g,'##').replace(/"/g, '\"');
+		var wsdlRequestBody = $("#wsdlRequestBody").val().replace(/[\n\r]/g,'').replace(/\s\s+/g, ' ').replace(/"/g, '\"');
+		if(e.currentTarget.className == "disableActionsWS") return false
+		else{
+			testCaseWS.push({
+				"stepNo": 1,
+				"appType": appType,
+				"objectName": "",
+				"inputVal": [endPointURL],
+				"keywordVal": "setEndPointURL",
+				"outputVal": "",
+				"url": "",
+				"custname": "",
+				"remarks":[""]
+			}, {
+				"stepNo": 2,
+				"appType": appType,
+				"objectName": "",
+				"inputVal": [wsdlMethods],
+				"keywordVal": "setMethods",
+				"outputVal": "",
+				"url": "",
+				"custname": "",
+				"remarks":[""]
+			}, {
+				"stepNo": 3,
+				"appType": appType,
+				"objectName": "",
+				"inputVal": [wsdlOperation],
+				"keywordVal": "setOperations",
+				"outputVal": "",
+				"url": "",
+				"custname": "",
+				"remarks":[""]
+			}, {
+				"stepNo": 4,
+				"appType": appType,
+				"objectName": "",
+				"inputVal": [wsdlRequestHeader],
+				"keywordVal": "setHeader",
+				"outputVal": "",
+				"url": "",
+				"custname": "",
+				"remarks":[""]
+			}, {
+				"stepNo": 5,
+				"appType": appType,
+				"objectName": "",
+				"inputVal": [wsdlRequestBody],
+				"keywordVal": "setWholeBody",
+				"outputVal": "",
+				"url": "",
+				"custname": "",
+				"remarks":[""]
+			}, {
+				"stepNo": 6,
+				"appType": appType,
+				"objectName": "",
+				"inputVal": [""],
+				"keywordVal": "executeRequest",
+				"outputVal": "",
+				"url": "",
+				"custname": "",
+				"remarks":[""]
+			});
+			initWSJson.testcasename = "",
+			initWSJson.testcase = testCaseWS
+			DesignServices.initScrapeWS_ICE(initWSJson)
+			.then(function (data) {
+				console.log(data)
+			}, function (error) { 
+				console.log("Error") 
+			});
+		}
+	};
+	//Init Webservice
 	
 	
 	//Mobile Serial Number Keyup Function
@@ -711,17 +896,18 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			enableScreenShotHighlight = false;
 			screenViewObject = {}
 			var blockMsg = 'Scrapping in progress. Please Wait...';
-			$(document).find("#desktopPath").removeClass("inputErrorBorder")
-			$(document).find("#OEBSPath").removeClass("inputErrorBorder")
+			$(document).find("#desktopPath").removeClass("inputErrorBorder");
+			$(document).find("#OEBSPath").removeClass("inputErrorBorder");
+			$(document).find("#mobilityAPKPath, #mobilitySerialPath").removeClass("inputErrorBorder");
 			//For Desktop
-			if(getProjInfo.appType == "Desktop"){
+			if($scope.getScreenView == "Desktop"){
 				if($(document).find("#desktopPath").val() == "") {
 					$(document).find("#desktopPath").addClass("inputErrorBorder")
 					return false
 				}
 				else{
 					$(document).find("#desktopPath").removeClass("inputErrorBorder")
-					screenViewObject.appType = getProjInfo.appType,
+					screenViewObject.appType = $scope.getScreenView,
 					screenViewObject.applicationPath = $(document).find("#desktopPath").val();
 					$("#launchDesktopApps").modal("hide");
 					blockUI(blockMsg);
@@ -730,15 +916,18 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			//For Desktop
 			
 			//For Mobility
-			else if(getProjInfo.appType == "Mobility"){
+			else if($scope.getScreenView == "Mobility"){
 				if($(document).find("#mobilityAPKPath").val() == ""){
+					$(document).find("#mobilityAPKPath").addClass("inputErrorBorder")
 					return false
 				}
 				else if($(document).find("#mobilitySerialPath").val() == ""){
+					$(document).find("#mobilitySerialPath").addClass("inputErrorBorder")
 					return false
 				}
 				else{
-					screenViewObject.appType = getProjInfo.appType,
+					$(document).find("#mobilityAPKPath, #mobilitySerialPath").removeClass("inputErrorBorder")
+					screenViewObject.appType = $scope.getScreenView,
 					screenViewObject.apkPath = $(document).find("#mobilityAPKPath").val();
 					screenViewObject.mobileSerial = $(document).find("#mobilitySerialPath").val();
 					$("#launchMobilityApps").modal("hide");
@@ -748,14 +937,14 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			//For Mobility
 			
 			//For OEBS
-			else if(getProjInfo.appType == "DesktopJava"){
+			else if($scope.getScreenView == "DesktopJava"){
 				if($(document).find("#OEBSPath").val() == "") {
 					$(document).find("#OEBSPath").addClass("inputErrorBorder")
 					return false
 				}
 				else{
 					$(document).find("#OEBSPath").removeClass("inputErrorBorder")
-					screenViewObject.appType = getProjInfo.appType,
+					screenViewObject.appType = $scope.getScreenView,
 					screenViewObject.applicationPath = $(document).find("#OEBSPath").val();
 					$("#launchOEBSApps").modal("hide");
 					blockUI(blockMsg);
@@ -895,7 +1084,8 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 	{
 		$("#deleteObjectsModal").modal("hide")
 		var userinfo = JSON.parse(window.localStorage['_UI']);
-		var tasks = JSON.parse(window.localStorage['_T']);
+		//var tasks = JSON.parse(window.localStorage['_TJ']);
+		var tasks = JSON.parse(window.localStorage['_CT']);
 		var delList = {};
 		var deletedCustNames = [];
 		var deletedCustPath = [];
@@ -913,13 +1103,13 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
    		 //console.log(deletedCustNames);
 		}
 		//console.log("Delete", viewString);
-	    var moduleId = tasks.moduleId;
 	    var screenId = tasks.screenId;
 	    var screenName = tasks.screenName;
+		var projectId = tasks.projectId;
 		scrapeObject = {};
 		scrapeObject.param = 'deleteScrapeData_ICE';
 		scrapeObject.getScrapeData = viewString;
-	   	scrapeObject.moduleId = moduleId;
+	    scrapeObject.projectId = projectId;
 	    scrapeObject.screenId = screenId;
 	    scrapeObject.screenName = screenName;
 		scrapeObject.deletedList = delList;
@@ -1142,25 +1332,28 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 	};
 	//Submit Custom Object Functionality
 
+	
 	//Save Scrape Objects
 	$(document).on('click', "#saveObjects", function(){
 		
-		var tasks = JSON.parse(window.localStorage['_T']);
+		//var tasks = JSON.parse(window.localStorage['_TJ']);
+		var tasks = JSON.parse(window.localStorage['_CT'])
 		if(eaCheckbox) var getScrapeData = JSON.stringify(newScrapedList);
 		else var getScrapeData = JSON.stringify(viewString);
 
-		var moduleId = tasks.moduleId;
+		
 		var screenId = tasks.screenId;
 		var screenName = tasks.screenName;
+		var projectId = tasks.projectId;
 		var userinfo = JSON.parse(window.localStorage['_UI']);
 		scrapeObject = {};
 		scrapeObject.getScrapeData = getScrapeData;
-		scrapeObject.moduleId = moduleId;
+		scrapeObject.projectId = projectId;
 		scrapeObject.screenId = screenId;
 		scrapeObject.screenName = screenName;
 		scrapeObject.userinfo = userinfo;
 		scrapeObject.param = "updateScrapeData_ICE";
-		scrapeObject.appType = "Web";
+		scrapeObject.appType = tasks.appType;
 		
 		if(window.localStorage['checkEditWorking'] == "true")
 		{
@@ -1172,12 +1365,12 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
         	var screenId = tasks.screenId;
         	var userinfo = JSON.parse(window.localStorage['_UI']);
         	getScrapeData = JSON.parse(getScrapeData);
-        	scrapeObject.moduleId = moduleId;
+        	scrapeObject.projectId = projectId;
     		scrapeObject.screenId = screenId;
     		scrapeObject.screenName = screenName;
     		scrapeObject.userinfo = userinfo;
         	scrapeObject.param = "editScrapeData_ICE";
-        	scrapeObject.appType = "Web";
+        	scrapeObject.appType = tasks.appType;
         	for(i=0; i<getScrapeData.view.length; i++){
         		currlistItems.push(getScrapeData.view[i].custname);
         	}
@@ -1263,7 +1456,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 	//save button clicked - save the testcase steps
 	$scope.updateTestCase_ICE = function()	{
 		var userInfo = JSON.parse(window.localStorage['_UI']);
-		var taskInfo = JSON.parse(window.localStorage['_T']);
+		var taskInfo = JSON.parse(window.localStorage['_CT']);
 		if(userInfo.role == "Viewer") return false;
 		else{
 			var screenId = taskInfo.screenId;
@@ -1707,6 +1900,7 @@ function contentTable(newTestScriptDataLS) {
 	function editRow(id,status,e) {
 		if (id && id !== lastSelection) {
 			var grid = $("#jqGrid");
+
 			var selectedText = grid.jqGrid('getRowData',id).custname;
 			var selectedKeyword = grid.jqGrid('getRowData', id).keywordVal;
 			grid.jqGrid('restoreRow',lastSelection);                        
@@ -1725,7 +1919,7 @@ function contentTable(newTestScriptDataLS) {
 		var keywordArrayList = JSON.parse(keywordArrayList1);
 		$.each(keywordArrayList, function( index, value ) {
 			keywordArrayKey = index;
-			keywordArrayValue = value; //JSON.parse(value);
+			keywordArrayValue =  value;//JSON.parse(value);
 			if(selectedKeywordList == keywordArrayKey)
 			{
 				$.each(keywordArrayValue, function(k, v) {
@@ -1744,7 +1938,7 @@ function contentTable(newTestScriptDataLS) {
 	function setKeyword(e,selectedText,$grid,selectedKeyword){
 		var keywordArrayList1 = keywordListData;
 		var keywordArrayList = JSON.parse(keywordArrayList1);
-		var taskInfo = JSON.parse(window.localStorage['_T']);
+		var taskInfo = JSON.parse(window.localStorage['_CT']);
 		var appTypeLocal = taskInfo.appType;//window.localStorage['appTypeScreen'];
 		if(selectedText == ""){selectedText = "@Generic"}
 		if(selectedText == "@Generic" || selectedText == undefined) 
@@ -2395,7 +2589,7 @@ function contentTable(newTestScriptDataLS) {
 	function setKeyword1(e,selectedText,$grid,selectedKeyword){
 		var keywordArrayList1 = keywordListData;
 		var keywordArrayList = JSON.parse(keywordArrayList1);
-		var taskInfo = JSON.parse(window.localStorage['_T']);
+		var taskInfo = JSON.parse(window.localStorage['_CT']);
 		var appTypeLocal = taskInfo.appType;//window.localStorage['appTypeScreen'];
 		if(selectedText == "getBody"){
 			$(e.target).parent().next().html("<textarea class='editable' rows='1' style='width: 98%;resize:none;min-height:25px;'></textarea>");
@@ -2537,7 +2731,7 @@ function addTestScriptRow(){
 	else flagClass = "false";
 	var selectedStepNo = window.localStorage['selectedRowStepNo']
 	//$("#jqGrid").trigger("reloadGrid");
-	appTypeLocal = "Web";//window.localStorage['appTypeScreen'];
+	appTypeLocal = JSON.parse(window.localStorage['_CT']).appType;;
 	var emptyRowData = {
 			"objectName": "",
 			"custname": "",
@@ -2675,7 +2869,7 @@ function editTestCaseRow(){
 //Copy-Paste TestStep Functionality
 function copyTestStep(){
 	emptyTestStep = "false";
-	var taskInfo = JSON.parse(window.localStorage['_T']);
+	var taskInfo = JSON.parse(window.localStorage['_CT']);
 	if(!$(document).find(".cbox:checked").parent().parent("tr").hasClass("ui-state-highlight")){
 		$("#globalModal").find('.modal-title').text("Copy Testcase step");
 		$("#globalModal").find('.modal-body p').text("Select step to copy").css('color','black');
@@ -2724,7 +2918,7 @@ function copyTestStep(){
 		$("#jqGrid").jqGrid("setColProp", "remarksIcon", {editable: false});
 		$("#jqGrid").resetSelection();
 		$("#jqGrid").find(">tbody").sortable("enable");
-		anotherScriptId = JSON.parse(window.localStorage['_T']).testCaseId;//window.localStorage['testScriptIdVal'];
+		anotherScriptId = JSON.parse(window.localStorage['_CT']).testCaseId;//window.localStorage['testScriptIdVal'];
 		getAppTypeForPaste = taskInfo.appType;//window.localStorage['appTypeScreen']
 	}
 }
@@ -2736,7 +2930,7 @@ function pasteTestStep(){
 		$("#globalModal").modal("show");
 	}
 	else{
-		if(anotherScriptId != JSON.parse(window.localStorage['_T']).testCaseId){
+		if(anotherScriptId != JSON.parse(window.localStorage['_CT']).testCaseId){
 			if (emptyTestStep == "true" || getRowJsonCopy == undefined) return false
 			else if(getAppTypeForPaste != "Web") return false
 			else{
@@ -3013,7 +3207,7 @@ function commentStep(){
 
 function getTags(data) {
 	var obnames = [];
-	var appTypeLocal = "Web"//window.localStorage['appTypeScreen'];
+	var appTypeLocal = JSON.parse(window.localStorage['_CT']).appType;
 		if(appTypeLocal == "Web"){
 			obnames.push("@Generic");
 			obnames.push("@Excel");

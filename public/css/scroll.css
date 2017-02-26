@@ -264,7 +264,7 @@
 
 .scroll-wrapper > .scrollbar-screenshotTs{
        padding: 0px;
-       height: auto !important;
+       /* height: auto !important; */
        min-height: auto !important;
        max-height: 650px !important;
 }
@@ -301,7 +301,7 @@
 	min-height: auto;
 	height: 100% !important;
 }
-.scroll-wrapper > .designDataTable{max-height: 682px !important;}
+.scroll-wrapper > .designDataTable{max-height: 690px !important;}
 .exeDataTable > .scroll-element.scroll-y, .designDataTable > .scroll-element.scroll-y{
 	top: 28px;
 	height: calc(100% - 28px);	
@@ -419,7 +419,7 @@
     max-height: 305px !important;
     position: fixed !important;
     width: calc(100% - 310px);
-    z-index: 50;
+    z-index: 55;
     top: 249px;
     /* overflow: auto; */
 }
@@ -451,6 +451,53 @@
        background: rgb(211, 211, 211)
 }
 
+/* Testsuite scenarios mid section  */
+.scroll-wrapper > .scrollbar-inner-scenariostatus{
+	width: 100% !important;
+    float: left;
+    height: 100% !important;
+}
+.scroll-wrapper.scrollbar-inner-scenariostatus {    
+    position: absolute !important;
+    top: 22px;
+    height: calc(100% - 22px);
+    width: 100%;
+    z-index: 50;
+    /* overflow: auto; */
+}
+.scrollbar-inner-scenariostatus > .scroll-element.scroll-y{
+	z-index:60;
+}
+.scrollbar-inner-scenariostatus > .scroll-element.scroll-y .scroll-bar{
+	background: #321e4f
+}
+.scrollbar-inner-scenariostatus > .scroll-element .scroll-element_track{
+	background: rgb(211, 211, 211)
+}
+
+/* Testsuite scenarios bottom section  */
+.scroll-wrapper > .scrollbar-inner-scenarioreports{
+	width: 100% !important;
+    float: left;
+    height: 100% !important;
+}
+.scroll-wrapper.scrollbar-inner-scenarioreports {    
+    position: absolute !important;
+    top: 22px;
+    height: calc(100% - 22px);
+    width: 100%;
+    z-index: 50;
+    /* overflow: auto; */
+}
+.scrollbar-inner-scenarioreports > .scroll-element.scroll-y{
+	z-index:60;
+}
+.scrollbar-inner-scenarioreports > .scroll-element.scroll-y .scroll-bar{
+	background: #321e4f
+}
+.scrollbar-inner-scenarioreports > .scroll-element .scroll-element_track{
+	background: rgb(211, 211, 211)
+}
 /**********Custom Media Queries**********/
 @media screen and (max-height:675px){
 	.scroll-wrapper > .scrollbar-screenshot{
