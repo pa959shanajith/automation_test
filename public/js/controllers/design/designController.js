@@ -67,8 +67,6 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		   testCaseName = JSON.parse(window.localStorage['_CT']).testCaseName;
 		 subTaskType = JSON.parse(window.localStorage['_CT']).subTaskType;
 		 subTask = JSON.parse(window.localStorage['_CT']).subtask;
-		 console.log("subTaskType", subTaskType);
-		 console.log(subTask);
 		if(subTaskType == "Scrape" || subTask == "Scrape")
 		{
 				$(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">Project :</span><span class="content">'+projectDetails.projectname+'</span></p><p class="proj-info-wrap"><span class="content-label">Screen :</span><span class="content">'+screenName+'</span></p>')

@@ -9,7 +9,7 @@ var morgan = require('morgan');
 module.exports = app;
 app.use(bodyParser.json({limit: '5mb'}));
 app.use(bodyParser.urlencoded({limit: '5mb', extended: true}));
-app.use(morgan('combined'))
+// app.use(morgan('combined'))
 
 //write stream for logs
 //var accessLogStream = fs.createWriteStream(__dirname + '/access.log', {flags: 'a'})
@@ -48,6 +48,7 @@ var admin = require('./server/controllers/admin');
 var design = require('./server/controllers/design');
 var suite = require('./server/controllers/suite');
 var report = require('./server/controllers/report');
+var header = require('./server/controllers/header');
 
 
 //Login Routes
@@ -77,6 +78,10 @@ app.post('/ExecuteTestSuite_ICE', suite.ExecuteTestSuite_ICE);
 app.post('/getAllSuites_ICE', report.getAllSuites_ICE);
 app.post('/getSuiteDetailsInExecution_ICE', report.getSuiteDetailsInExecution_ICE);
 app.post('/reportStatusScenarios_ICE', report.reportStatusScenarios_ICE);
+
+//Generic Routes
+app.post('/getProjectDetails_ICE', header.getProjectDetails_ICE);
+
 
 
 

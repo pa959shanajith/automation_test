@@ -181,7 +181,7 @@ exports.updateScreen_ICE = function(req, res){
 	//var requestedtags = req.body.tags;
 	var requestedtags = "tags";
 	// var requestedversionnumber = req.body.versionnumber;
-	var requestedversionnumber = 2;
+	var requestedversionnumber = 1;
 	var requestscreenhistorydetails = "'updated screens action by " + userInfo.username + " having role:" + userInfo.role + "" +
 					" skucodetestcase=" + requestedskucodeScreens + ", tags=" + requestedtags + ", versionnumber=" + requestedversionnumber+
 					" with the service action="+param+" '";
@@ -404,6 +404,9 @@ exports.updateScreen_ICE = function(req, res){
 												" and screenname ='" + screenName +
 												"' and versionnumber = "+requestedversionnumber+
 												" IF EXISTS; "
+
+							//console.log(updateScreenQuery);
+
 							finalFunction(scrapedObjects);	
 						}else{
 							statusFlag="All objects are not edited.";
@@ -454,6 +457,7 @@ exports.updateScreen_ICE = function(req, res){
 												var updatingtestcasename=eachTestcase.testcasename;
 												//replacing/deleting all the custnames based on xpath and old custnames
 												var deletingStepindex=[]; 
+												//console.log(updatingtestcasedata);
 												if(updatingtestcasedata.length>0){
 													for(var updatingindex=0;updatingindex<oldCustnames.length;updatingindex++){
 														for(var eachtestcasestepindex=0;eachtestcasestepindex<updatingtestcasedata.length;eachtestcasestepindex++){
@@ -622,7 +626,7 @@ exports.readTestCase_ICE = function (req, res) {
 	var requestedtestscasename=req.body.testcasename;
 	var requestedtestscaseid = req.body.testcaseid;
 	// var requestedversionnumber = req.body.versionnumber;
-	 var requestedversionnumber = 2;
+	 var requestedversionnumber = 1;
 	//complete response data
 	var responsedata = {
 		template: "",
@@ -685,7 +689,7 @@ exports.updateTestCase_ICE = function (req, res) {
 	var requestedskucodetestcase = req.body.skucodetestcase;
 	var requestedtags = req.body.tags;
 	// var requestedversionnumber = req.body.versionnumber;
-	var requestedversionnumber = 2;
+	var requestedversionnumber = 1;
 	requestedtestcasesteps = requestedtestcasesteps.replace(/'+/g,"''");
 	var requesthistorydetails = "'updated testcase action by " + userinfo.username + " having role:" + userinfo.role + "" +
 		" skucodetestcase=" + requestedskucodetestcase + ", tags=" + requestedtags + "," +

@@ -28,10 +28,10 @@ mySPA.controller('headerController', function($scope,$http,$location,headerServi
 	     window.localStorage.clear();
 	     window.location.href = '/';
 	     //Logout User Service to be called
-	      headerServices.logoutUser 
-	      .then(function(data){
+	    //   headerServices.logoutUser 
+	    //   .then(function(data){
 	          
-	      }, function(error) {	console.log("Failed to Logout")});
+	    //   }, function(error) {	console.log("Failed to Logout")});
 	 }
 });
 
