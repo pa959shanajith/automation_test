@@ -82,7 +82,7 @@ mySPA.factory('DesignServices', ['$http','$q', function ($http, $httpProvider, $
 				userinfo: userInfo,
 				skucodetestcase : "skucodetestcase",
 				tags: "tags",
-				versionnumber: "2"
+				versionnumber: "1"
 			})
 			.then(function(response)  { 
 				return response.data
