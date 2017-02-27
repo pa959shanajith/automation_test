@@ -111,6 +111,8 @@ exports.updateTestSuite_ICE = function (req, res) {
 	var requestedcondtioncheck = req.body.condtioncheck;
 	var requesteddonotexecute = req.body.donotexecute;
 	var requestedgetparampaths = req.body.getparampaths;
+	// var requestedversionnumber=req.body.versionnumber;
+	var requestedversionnumber = 1;
 	//		var requestedexecutionids = req.payload.executionids;
 	//		var requestedversionnumber = req.payload.versionnumber;
 	//		var requesthistorydetails="update testcase action by "+userinfo.username+" having role:"+userinfo.role+""+
@@ -171,8 +173,10 @@ exports.updateTestSuite_ICE = function (req, res) {
 								"getparampaths=getparampaths+[" + requestedgetparampaths[scenarioidindex] + "], " +
 								"testscenarioids=testscenarioids+[" + requestedtestscenarioids[scenarioidindex] + "], " +
 								"modifiedby='" + userinfo.username + "', modifiedbyrole='" + userinfo.role + "' " +
-								"where cycleid=" + requestedtestscycleid + " and testsuiteid=" + requestedtestsuiteid +
-								" and testsuitename='" + requestedtestsuitename + "';";
+								"where cycleid=" + requestedtestscycleid + 
+								" and testsuiteid=" + requestedtestsuiteid +
+								" and testsuitename='" + requestedtestsuitename +
+								"' and versionnumber = "+requestedversionnumber+" ;";
 							dbConnICE.execute(updateTestSuiteData, function (err, updateQueryresults) {
 								if (err) {
 									flag = "fail";
