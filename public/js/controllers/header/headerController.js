@@ -17,6 +17,12 @@ mySPA.controller('headerController', function($scope,$http,$location,headerServi
 	 {
 	    window.location.href = '/plugin';
 	 }
+	 var projectId =  JSON.parse(window.localStorage['_CT']).projectId;
+	  headerServices.getProjectDetails_ICE(projectId) 
+	      .then(function(data){
+			 $scope.projectDetails = data;
+	      }, function(error) {	console.log("Failed to fetch projectInfo")});
+		  
 	 $scope.logout = function() 
 	 {
 	     window.localStorage.clear();

@@ -1,3 +1,4 @@
+var releaseName;var cycleName;var testSuiteName;
 mySPA.controller('scheduleController',['$scope','$http','$timeout','$location','ScheduleService','cfpLoadingBar', function ($scope, $http, $timeout, $location, ScheduleService, cfpLoadingBar) {
 	cfpLoadingBar.start();
 	$("body").css("background","#eee");
@@ -14,10 +15,14 @@ mySPA.controller('scheduleController',['$scope','$http','$timeout','$location','
 	var	appType = JSON.parse(window.localStorage['_CT']).appType;
 			$("#page-taskName").empty().append('<span class="taskname">'+getTaskName+'</span>');
 			$(".projectInfoWrap").empty()
-
-	// $(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">Project :</span><span class="content">'+getProjInfo.projectName+'</span></p><p class="proj-info-wrap"><span class="content-label">Module :</span><span class="content">'+getProjInfo.moduleName+'</span></p><p class="proj-info-wrap"><span class="content-label">Screen :</span><span class="content">'+getProjInfo.screenName+'</span></p>')
-	//Loading Project Info
-    
+			releaseName = JSON.parse(window.localStorage['_CT']).releaseName;
+			cycleName = JSON.parse(window.localStorage['_CT']).cycleName;
+			testSuiteName = JSON.parse(window.localStorage['_CT']).testSuiteName;
+	
+	$timeout(function(){
+		projectDetails = angular.element(document.getElementById("left-nav-section")).scope().projectDetails;
+		$(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">Project :</span><span class="content">'+projectDetails.projectname+'</span></p><p class="proj-info-wrap"><span class="content-label">Cycle :</span><span class="content">'+releaseName+'</span></p><p class="proj-info-wrap"><span class="content-label">Cycle :</span><span class="content">'+cycleName+'</span></p><p class="proj-info-wrap"><span class="content-label">TestSuite :</span><span class="content">'+testSuiteName+'</span></p>')
+	}, 3000)
     
     //Sample JSON to load Test Suite Data
     var testSuiteData = [{

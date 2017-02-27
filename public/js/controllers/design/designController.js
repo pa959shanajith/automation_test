@@ -4,7 +4,7 @@ var selectRowStepNoFlag = false; //var deleteStep = false;
 var getAllAppendedObj; //Getting all appended scraped objects
 var gsElement = []; window.localStorage['selectRowStepNo'] = '';
 var getWSTemplateData = {} //Contains Webservice saved data
-var appType;var projectId;
+var appType;var projectId;var projectDetails;var screenName;var testCaseName;var subTaskType;var subTask;
 mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout', 'DesignServices','cfpLoadingBar','$window', function($scope,$http,$location,$timeout,DesignServices,cfpLoadingBar,$window) {
 	$("body").css("background","#eee");
 	$("#tableActionButtons, .designTableDnd").delay(500).animate({opacity:"1"}, 500)
@@ -31,9 +31,12 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 	
 		var getTaskName = JSON.parse(window.localStorage['_CT']).taskName;
 		    appType = JSON.parse(window.localStorage['_CT']).appType;
+		   screenName =  JSON.parse(window.localStorage['_CT']).screenName;
+		   testCaseName = JSON.parse(window.localStorage['_CT']).testCaseName;
+		 subTaskType = JSON.parse(window.localStorage['_CT']).subTaskType;
+		 subTask = JSON.parse(window.localStorage['_CT']).subtask;
 		$("#page-taskName").empty().append('<span class="taskname">'+getTaskName+'</span>');
 		$(".projectInfoWrap").empty()
-	// $(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">Project :</span><span class="content">'+getProjInfo.projectName+'</span></p><p class="proj-info-wrap"><span class="content-label">Module :</span><span class="content">'+getProjInfo.moduleName+'</span></p><p class="proj-info-wrap"><span class="content-label">Screen :</span><span class="content">'+getProjInfo.screenName+'</span></p>')
 	//Loading Project Info
 	
 	//Getting Apptype or Screen Type
@@ -54,6 +57,28 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		}
 		cfpLoadingBar.complete()
 	}, 1500)
+
+
+	$timeout(function(){
+		projectDetails = angular.element(document.getElementById("left-nav-section")).scope().projectDetails;
+		var getTaskName = JSON.parse(window.localStorage['_CT']).taskName;
+		    appType = JSON.parse(window.localStorage['_CT']).appType;
+		   screenName =  JSON.parse(window.localStorage['_CT']).screenName;
+		   testCaseName = JSON.parse(window.localStorage['_CT']).testCaseName;
+		 subTaskType = JSON.parse(window.localStorage['_CT']).subTaskType;
+		 subTask = JSON.parse(window.localStorage['_CT']).subtask;
+		 console.log("subTaskType", subTaskType);
+		 console.log(subTask);
+		if(subTaskType == "Scrape" || subTask == "Scrape")
+		{
+				$(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">Project :</span><span class="content">'+projectDetails.projectname+'</span></p><p class="proj-info-wrap"><span class="content-label">Screen :</span><span class="content">'+screenName+'</span></p>')
+		}
+		else{
+	$(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">Project: </span><span class="content">'+projectDetails.projectname+'</span></p><p class="proj-info-wrap"><span class="content-label">Screen: </span><span class="content">'+screenName+'</span></p><p class="proj-info-wrap"><span style="width: 23%;" class="content-label">TestCase: </span><span style="width: 77%;" class="content">'+testCaseName+'</span></p>')
+		}
+	
+	}, 3000)
+	
 
 	var custnameArr = [];
 	var keywordValArr = [];

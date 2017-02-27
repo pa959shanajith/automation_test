@@ -62,6 +62,7 @@ mySPA.controller('pluginController',['$scope','$window','$http','$location','$ti
 		taskObj.cycleId = cycleid;
 		taskObj.testSuiteId = testsuiteid;
 		taskObj.testSuiteName = testsuitename;
+		taskObj.subTask = subtask; 
 		window.localStorage['_CT'] = JSON.stringify(taskObj);
     	if(subtask == "Scrape") 			$window.location.assign("/design")
     	else if(subtask == "TestCase")		$window.location.assign("/designTestCase")

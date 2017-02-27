@@ -67,6 +67,18 @@ exports.initScraping_ICE = function (req, res) {
 			res.send(data);
 		});
 	}
+	else if(req.body.screenViewObject.appType == "Mobility"){
+        var apkPath = req.body.screenViewObject.apkPath;
+        var serial = req.body.screenViewObject.mobileSerial;
+		var data = "LAUNCH_MOBILE";
+		var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+		var mySocket = myserver.allSocketsMap[ip];
+		mySocket._events.scrape = [];                                                                                                  
+		mySocket.emit("LAUNCH_MOBILE", apkPath,serial);
+		mySocket.on('scrape', function (data) {
+						res.send(data);
+		});
+	}
 	else{	
 		var browserType = req.body.screenViewObject.browserType;
 			if (browserType == "chrome") {

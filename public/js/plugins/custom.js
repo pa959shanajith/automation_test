@@ -143,6 +143,7 @@ function taskRedirectionInner(subtasktype,screenid,screenname,projectid,taskname
 		taskObj.testSuiteId = testsuiteid;
 		taskObj.testSuiteName = testsuitename;
 		taskObj.appType = apptype;
+		taskObj.subTaskType = subtasktype; 
 		window.localStorage['_CT'] = JSON.stringify(taskObj);
 	if(subtasktype == "Scrape")                       window.location.pathname = "/design"
 		else if(subtasktype == "TestCase")      	  window.location.pathname = "/designTestCase"
