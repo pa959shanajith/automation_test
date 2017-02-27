@@ -2585,7 +2585,7 @@ select:-webkit-autofill:focus {
 
 @media screen and (max-height: 675px) {
     .login-bg-img {
-        width: 45%;
+        width: 42%;
     }
     .jumbotron-nobg {
         margin-top: 11%;

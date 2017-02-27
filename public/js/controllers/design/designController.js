@@ -692,12 +692,19 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			$(document).find("#OEBSPath").removeClass("inputErrorBorder")
 			if($scope.getScreenView == "Desktop"){
 				$("#launchDesktopApps").modal("show")
+				$(document).find("#desktopPath").val('')
+				$(document).find("#desktopPath").removeClass("inputErrorBorder");
 			}
 			else if($scope.getScreenView == "DesktopJava"){
-				$("#launchOEBSApps").modal("show")
+				$("#launchOEBSApps").modal("show");
+				$(document).find("#OEBSPath").val('');
+				$(document).find("#OEBSPath").removeClass("inputErrorBorder");
 			}
 			else if($scope.getScreenView == "Mobility"){
 				$("#launchMobilityApps").modal("show")
+				$(document).find("#mobilityAPKPath, #mobilitySerialPath").val('')
+				$(document).find("#mobilityAPKPath, #mobilitySerialPath").removeClass("inputErrorBorder");
+				$(".androidIcon").removeClass("androidIconActive")
 			}
 		}
 	}
@@ -864,8 +871,9 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			enableScreenShotHighlight = false;
 			screenViewObject = {}
 			var blockMsg = 'Scrapping in progress. Please Wait...';
-			$(document).find("#desktopPath").removeClass("inputErrorBorder")
-			$(document).find("#OEBSPath").removeClass("inputErrorBorder")
+			$(document).find("#desktopPath").removeClass("inputErrorBorder");
+			$(document).find("#OEBSPath").removeClass("inputErrorBorder");
+			$(document).find("#mobilityAPKPath, #mobilitySerialPath").removeClass("inputErrorBorder");
 			//For Desktop
 			if($scope.getScreenView == "Desktop"){
 				if($(document).find("#desktopPath").val() == "") {
@@ -874,7 +882,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				}
 				else{
 					$(document).find("#desktopPath").removeClass("inputErrorBorder")
-					screenViewObject.appType = $scope.getScreenView;
+					screenViewObject.appType = $scope.getScreenView,
 					screenViewObject.applicationPath = $(document).find("#desktopPath").val();
 					$("#launchDesktopApps").modal("hide");
 					blockUI(blockMsg);
@@ -885,12 +893,15 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			//For Mobility
 			else if($scope.getScreenView == "Mobility"){
 				if($(document).find("#mobilityAPKPath").val() == ""){
+					$(document).find("#mobilityAPKPath").addClass("inputErrorBorder")
 					return false
 				}
 				else if($(document).find("#mobilitySerialPath").val() == ""){
+					$(document).find("#mobilitySerialPath").addClass("inputErrorBorder")
 					return false
 				}
 				else{
+					$(document).find("#mobilityAPKPath, #mobilitySerialPath").removeClass("inputErrorBorder")
 					screenViewObject.appType = $scope.getScreenView,
 					screenViewObject.apkPath = $(document).find("#mobilityAPKPath").val();
 					screenViewObject.mobileSerial = $(document).find("#mobilitySerialPath").val();
