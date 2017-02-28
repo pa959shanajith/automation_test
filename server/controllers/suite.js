@@ -26,6 +26,7 @@ exports.readTestSuite_ICE = function (req, res) {
 	//base request elements
 	var requiredtestsuiteid=req.body.testsuiteid;
 	var requiredcycleid=req.body.cycleid;
+	var requiredtestsuitename = req.body.testsuitename;
 	/*var requiredtestsuiteid="13bbacaf-82c7-4c4a-9f91-0933462b10d4";
 	var requiredcycleid="e6e5b473-34cd-4963-9bda-cb78c727e413";*/
 	//complete response data
@@ -43,12 +44,12 @@ exports.readTestSuite_ICE = function (req, res) {
 	*/
 	async.series({		
 		testsuitesdata: function(callback){
-			var getTestSuites="select donotexecute,conditioncheck,getparampaths,testscenarioids from testsuites where testsuiteid= "+requiredtestsuiteid+" and cycleid="+requiredcycleid;
+			var getTestSuites="select donotexecute,conditioncheck,getparampaths,testscenarioids from testsuites where testsuiteid= "+requiredtestsuiteid+" and cycleid="+requiredcycleid+" and testsuitename='"+requiredtestsuitename+"'";
 			//var getTestSuites="select donotexecute,condtitioncheck,getparampaths,testscenarioids from testsuites where testsuiteid= 13bbacaf-82c7-4c4a-9f91-0933462b10d4 AND cycleid=e6e5b473-34cd-4963-9bda-cb78c727e413 and testsuitename='Dev Suite 1'"; 
 			dbConnICE.execute(getTestSuites, function (err, result) {
 				if (err) {
 					var flag = "Error in readTestSuite_ICE : Fail";
-					req.send(flag);
+					res.send("");
 				}else {
 					async.forEachSeries(result.rows, function(quest, callback2) {
 						outexecutestatus=quest.donotexecute;

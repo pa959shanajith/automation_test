@@ -33,6 +33,7 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 	//Global Information
 	var cycleId = JSON.parse(window.localStorage['_CT']).cycleId;
 	var testSuiteId = JSON.parse(window.localStorage['_CT']).testSuiteId;
+	var testSuiteName = JSON.parse(window.localStorage['_CT']).testSuiteName;
 	
 	//Global Information
 	
@@ -43,7 +44,7 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 	
 	$scope.readTestSuite_ICE = function(){
 		getEachScenario = []
-		ExecutionService.readTestSuite_ICE(cycleId, testSuiteId)
+		ExecutionService.readTestSuite_ICE(cycleId, testSuiteId,testSuiteName)
 		.then(function(data) {
 			cfpLoadingBar.complete();
 			rowData = data;
