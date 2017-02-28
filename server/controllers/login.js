@@ -5,7 +5,7 @@ var Joi = require('joi');
 var client_cas = require('../../server/config/cassandra');
 var dbConn = require('../../server/config/cassandra');
 var cassandra = require('cassandra-driver');
-var passwordHash = require('password-hash');
+var bcrypt = require('bcrypt');
 
 //Global Variables
 var roles = [];
@@ -30,7 +30,7 @@ exports.authenticateUser_Nineteen68 = function(req, res){
             for (var i = 0; i < result.rows.length; i++) {
                   dbHashedPassword = result.rows[i].password;
             }
-            var validUser = passwordHash.verify(password,dbHashedPassword)
+            var validUser = bcrypt.compareSync(password, dbHashedPassword);         // true
             if(validUser == true)
             {
                flag = 'validCredential';

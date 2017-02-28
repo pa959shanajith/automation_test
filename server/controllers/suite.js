@@ -101,6 +101,7 @@ exports.readTestSuite_ICE = function (req, res) {
 exports.updateTestSuite_ICE = function (req, res) {
 	//internal variables
 	var hasrow = false;
+	var flag = "fail";
 	//base request elements
 	var userinfo = req.body.userinfo;
 	var requestedtestscycleid = req.body.testscycleid;
@@ -112,8 +113,8 @@ exports.updateTestSuite_ICE = function (req, res) {
 	var requestedcondtioncheck = req.body.condtioncheck;
 	var requesteddonotexecute = req.body.donotexecute;
 	var requestedgetparampaths = req.body.getparampaths;
-	// var requestedversionnumber=req.body.versionnumber;
-	var requestedversionnumber = 1;
+	var requestedversionnumber=req.body.versionnumber;
+	requestedversionnumber = 1;
 	//		var requestedexecutionids = req.payload.executionids;
 	//		var requestedversionnumber = req.payload.versionnumber;
 	//		var requesthistorydetails="update testcase action by "+userinfo.username+" having role:"+userinfo.role+""+
@@ -135,7 +136,7 @@ exports.updateTestSuite_ICE = function (req, res) {
 			dbConnICE.execute(checksuiteexists, function (err, checksuiteexistsresult) {
 				if (err) {
 					var flag = "Error in Query 1 checksuiteexists: Fail";
-					res.send(flag);
+					//res.send(flag);
 				} else {
 					async.forEachSeries(checksuiteexistsresult.rows, function (row, forEachSeriescallback) {
 						if (row.testsuiteid == requestedtestsuiteid) {
@@ -154,11 +155,11 @@ exports.updateTestSuite_ICE = function (req, res) {
 						deleteTestSuiteData = "DELETE conditioncheck,donotexecute,getparampaths,testscenarioids FROM testsuites " +
 							"where cycleid=" + requestedtestscycleid +
 							" and testsuitename='" + requestedtestsuitename + "'" +
-							" and testsuiteid=" + requestedtestsuiteid;
+							" and testsuiteid=" + requestedtestsuiteid +" and versionnumber = "+requestedversionnumber;
 						dbConnICE.execute(deleteTestSuiteData, function (err, deleteQueryresults) {
 							if (err) {
-								flag = "failed to execute update query: Fail";
-								res.send(flag);
+								// flag = "failed to execute update query: Fail";
+								// res.send("fail");
 							} else {
 								flag = "success";
 							}
@@ -180,8 +181,9 @@ exports.updateTestSuite_ICE = function (req, res) {
 								"' and versionnumber = "+requestedversionnumber+" ;";
 							dbConnICE.execute(updateTestSuiteData, function (err, updateQueryresults) {
 								if (err) {
-									flag = "fail";
-									res.send(flag);
+									//Commenting sending response 
+									// flag = "fail";
+									// res.send(flag);
 								} else {
 									flag = "success";
 								}
@@ -193,7 +195,7 @@ exports.updateTestSuite_ICE = function (req, res) {
 				],
 					function (err, finalcallback) {
 					//response is sent with the result stating "success" on at the end 
-						res.send("success");
+						res.send(flag);
 					});
 			}
 		}

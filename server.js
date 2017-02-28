@@ -9,7 +9,7 @@ var morgan = require('morgan');
 module.exports = app;
 app.use(bodyParser.json({limit: '5mb'}));
 app.use(bodyParser.urlencoded({limit: '5mb', extended: true}));
-// app.use(morgan('combined'))
+app.use(morgan('combined'))
 
 //write stream for logs
 //var accessLogStream = fs.createWriteStream(__dirname + '/access.log', {flags: 'a'})
