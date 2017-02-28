@@ -29,14 +29,14 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 	
 	
 	
-		var getTaskName = JSON.parse(window.localStorage['_CT']).taskName;
-		    appType = JSON.parse(window.localStorage['_CT']).appType;
-		   screenName =  JSON.parse(window.localStorage['_CT']).screenName;
-		   testCaseName = JSON.parse(window.localStorage['_CT']).testCaseName;
-		 subTaskType = JSON.parse(window.localStorage['_CT']).subTaskType;
-		 subTask = JSON.parse(window.localStorage['_CT']).subtask;
-		$("#page-taskName").empty().append('<span class="taskname">'+getTaskName+'</span>');
-		$(".projectInfoWrap").empty()
+	var getTaskName = JSON.parse(window.localStorage['_CT']).taskName;
+	appType = JSON.parse(window.localStorage['_CT']).appType;
+	screenName =  JSON.parse(window.localStorage['_CT']).screenName;
+	testCaseName = JSON.parse(window.localStorage['_CT']).testCaseName;
+	subTaskType = JSON.parse(window.localStorage['_CT']).subTaskType;
+	subTask = JSON.parse(window.localStorage['_CT']).subtask;
+	$("#page-taskName").empty().append('<span class="taskname">'+getTaskName+'</span>');
+	$(".projectInfoWrap").empty()
 	//Loading Project Info
 	
 	//Getting Apptype or Screen Type
@@ -1225,7 +1225,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		$("#dialog-addObject").modal("show");
 		$("#addObjContainer").empty()
 		if($(".addObj-row").length > 1) $(".addObj-row").remove()
-		$("#addObjContainer").append('<div class="row row-modal addObj-row"><div class="form-group"><input type="text" class="form-control form-control-custom" placeholder="Enter object name"></div><div class="form-group form-group-2"><select class="form-control form-control-custom"><option selected disabled>Select Object</option><option value="button">button</option><option value="checkbox">checkbox</option><option value="select">select</option><option value="img">img</option><option value="a">a</option><option value="radiobutton">radiobutton</option><option value="input">input</option><option value="Element">Element</option><option value="list">list</option><option value="table">table</option></select></div><img class="deleteAddObjRow" src="imgs/ic-delete.png" /></div>')
+		$("#addObjContainer").append('<div class="row row-modal addObj-row"><div class="form-group"><input type="text" class="form-control form-control-custom" placeholder="Enter object name"></div><div class="form-group form-group-2"><select class="form-control form-control-custom"><option selected disabled>Select Object Type</option><option value="a">Link</option><option value="input">Textbox/Textarea</option><option value="table">Table</option><option value="list">List</option><option value="select">Dropdown</option><option value="img">Image</option><option value="button">Button</option><option value="radiobutton">Radiobutton</option><option value="checkbox">Checkbox</option><option value="Element">Element</option></select></div><img class="deleteAddObjRow" src="imgs/ic-delete.png" /></div>')
 	};
 	//Add Object Functionality
 	
@@ -1237,7 +1237,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 	
 	//Add More Object Functionality
 	$scope.addMoreObject = function(){
-		$("#addObjContainer").append('<div class="row row-modal addObj-row"><div class="form-group"><input type="text" class="form-control form-control-custom" placeholder="Enter object name"></div><div class="form-group form-group-2"><select class="form-control form-control-custom"><option selected disabled>Select Object</option><option value="button">button</option><option value="checkbox">checkbox</option><option value="select">select</option><option value="img">img</option><option value="a">a</option><option value="radiobutton">radiobutton</option><option value="input">input</option><option value="Element">Element</option><option value="list">list</option><option value="table">table</option></select></div><img class="deleteAddObjRow" src="imgs/ic-delete.png" /></div>')
+		$("#addObjContainer").append('<div class="row row-modal addObj-row"><div class="form-group"><input type="text" class="form-control form-control-custom" placeholder="Enter object name"></div><div class="form-group form-group-2"><select class="form-control form-control-custom"><option selected disabled>Select Object Type</option><option value="a">Link</option><option value="input">Textbox/Textarea</option><option value="table">Table</option><option value="list">List</option><option value="select">Dropdown</option><option value="img">Image</option><option value="button">Button</option><option value="radiobutton">Radiobutton</option><option value="checkbox">Checkbox</option><option value="Element">Element</option></select></div><img class="deleteAddObjRow" src="imgs/ic-delete.png" /></div>')
 	};
 	//Add More Object Functionality
 	
@@ -1259,7 +1259,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				flag = "false";
 				return false
 			}
-			else if($(this).find("select option:selected").val() == "Select Object"){
+			else if($(this).find("select option:selected").val() == "Select Object Type"){
 				$scope.errorMessage = "Please select object type";
 				$(this).find("select").addClass('selectErrorBorder')
 				flag = "false";
@@ -1314,6 +1314,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			}
 			
 			$("#dialog-addObject").modal("hide");
+			$("#addObjectSuccess").modal("show")
 			$("#saveObjects").prop("disabled", false)
 			flag = "false";
 		}

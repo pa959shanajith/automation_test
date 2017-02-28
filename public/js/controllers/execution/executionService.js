@@ -1,10 +1,11 @@
 mySPA.factory('ExecutionService', ['$http','$q', function ($http, $httpProvider, $q)   {
 	return{
-		readTestSuite_ICE : function(cycleId, testSuiteId){
+		readTestSuite_ICE : function(cycleId, testSuiteId,testSuiteName){
 			return $http.post('/readTestSuite_ICE',{
 				param : 'readTestSuite_ICE',
 				cycleid : cycleId,
-				testsuiteid : testSuiteId
+				testsuiteid : testSuiteId,
+				testsuitename : testSuiteName
 			})
 			.then(function(response)  { return response.data},
 			function(response)        {return $q.reject(response.data)})
