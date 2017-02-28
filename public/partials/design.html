@@ -305,7 +305,7 @@
 			<div class="modal-content">
 			<div class="modal-header">
 				<button type="button" class="close" data-dismiss="modal">&times;</button>
-				<h4 class="modal-title">Add Objects</h4>
+				<h4 class="modal-title">Add Object</h4>
 			</div>
 			<div class="modal-body modal-body-add_obj">
 				<!-- Add Button -->
@@ -327,6 +327,25 @@
 		</div>
 	</div>
 	<!-- Add Object -->
+	
+	<!-- Add Object Successfull -->
+	<div class="modal fade" id="addObjectSuccess" role="dialog" data-keyboard="false" data-backdrop="static">
+	  <div class="modal-dialog modal-sm">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal">&times;</button>
+	        <h4 class="modal-title">Add Object</h4>
+	      </div>
+	      <div class="modal-body">
+	        <p>Objects has been added successfully.</p>
+	      </div>
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-default" data-dismiss="modal">Ok</button>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+	<!-- Add Object Successfull -->
 
 	<!-- Map Object -->
 	<div id="dialog-mapObject" class="modal fade" role="dialog" data-keyboard="false" data-backdrop="static">
@@ -432,7 +451,7 @@
 					<h4 class="modal-title">Launch Application</h4>
 				</div>
 				<div class="modal-body">
-					<p><input class='launchPopupInput form-control' type='text' placeholder='Enter exe path name' id='desktopPath'/></p>
+					<p><input class='launchPopupInput form-control' type='text' placeholder='Enter the .exe path;App Name' id='desktopPath'/></p>
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-default btn-default-modal" ng-click="initScraping($event)">Launch</button>
