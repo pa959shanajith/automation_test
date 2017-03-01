@@ -62,9 +62,10 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 				})
 			}
 			//Building object for each row after getting the data from server
-			
+			var projectName=['Project Name'];
 			//Creating Table Rows for each of the Scenarios
 			for (var i = 0; i < getEachScenario.length; i++) {
+				
 				row = $("<tr id=\"" + count + "\"/>");
 				$("#executionDataTable").append(row);
 				row.append($("<td class='tabeleCellPadding' style='width:3.9%;' id=\"" + count + "\">"+ count + "</td>"));
@@ -87,7 +88,7 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 				else{
 					row.append($('<td style="width:15%" class="tabeleCellPadding exe-conditionCheck"><select class="conditionCheck form-control alertGreen"><option value="'+getEachScenario[i].condition+'" selected>True</option><option value="0">False</option></select> </td>'));
 				}
-				row.append($("<td style='width:23%; word-break: break-all; padding-left: 1% !important; padding-right: 1% !important' class='tabeleCellPadding'>" + getProjInfo.projectName+ "</td>"));
+				row.append($("<td style='width:23%; word-break: break-all; padding-left: 1% !important; padding-right: 1% !important' class='tabeleCellPadding'>" + projectName[0] + "</td>"));
 				row.append($("<td style='width:8%' class='tabeleCellPadding'><img src='../imgs/ic-alm.png' id='syncScenario' title='Sync Test Scenario' style='cursor: pointer;'/></td>"));
 				count++;
 			}
