@@ -794,6 +794,15 @@ body {
 	cursor: no-drop
 }
 
+#left-top-section ul li a.disableActionsWS:hover, #left-top-section ul li a.disableActionsWS:hover span img{
+	background:none;
+	cursor: no-drop
+}
+
+.disableActionsWS{
+	cursor: no-drop
+}
+
 .enableActions, .enableActionsWS{
 	opacity:1;
 	transition: opacity .2s;
@@ -822,7 +831,10 @@ body {
     width: 18px;
     height: 18px;
     outline: 0;
-    cursor: pointer;
+}
+
+input[disabled]{
+	cursor: no-drop
 }
 
 
@@ -2176,6 +2188,10 @@ nav {
 
 .inputErrorBorder{
 	border-bottom: 2px solid #d33c3c !important;
+}
+
+.selectErrorBorder{
+	border: 2px solid #d33c3c !important;
 }
 
 input[type="checkbox"] {
