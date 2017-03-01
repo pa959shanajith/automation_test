@@ -121,13 +121,12 @@ exports.initScraping_ICE = function (req, res) {
  * the service is used to fetch the  screen data based on the screenid and *projectid
  */
 exports.getScrapeDataScreenLevel_ICE = function(req, res){
-	var appType=req.body.appType;
 	var flag = "";
 	var getScrapeDataQuery = "select screenid,screenname,screendata from screens where "+
 			" screenid ="+ req.body.screenId + 
 			" and projectid="+req.body.projectId+
 			" allow filtering ;";
-		fetchScrapedData(appType,getScrapeDataQuery,function(getScrapeDataQueryerror,getScrapeDataQueryresponse){
+		fetchScrapedData(getScrapeDataQuery,function(getScrapeDataQueryerror,getScrapeDataQueryresponse){
 				res.send(getScrapeDataQueryresponse);
 		});
 };
@@ -136,7 +135,7 @@ exports.getScrapeDataScreenLevel_ICE = function(req, res){
  * generic function for DB call to fetch the screendata
  * @author vishvas.a
  */
-function fetchScrapedData(appType,scrapeQuery,fetchScrapedDatacallback){
+function fetchScrapedData(scrapeQuery,fetchScrapedDatacallback){
 	var responsedata;
 	var flag;
 	dbConn.execute(scrapeQuery, function(getScrapeDataQueryerr, getScrapeDataQueryresult){
@@ -147,16 +146,8 @@ function fetchScrapedData(appType,scrapeQuery,fetchScrapedDatacallback){
 		}else{
 			for (var i = 0; i < getScrapeDataQueryresult.rows.length; i++) {
 				responsedata = getScrapeDataQueryresult.rows[i].screendata;
-				if(responsedata != ''){
-					if(appType.toUpperCase() == 'WEBSERVICE'){
-						fetchScrapedDatacallback(null,responsedata);
-					}else{
-						fetchScrapedDatacallback(null,responsedata);
-					}
-				}else{
-					fetchScrapedDatacallback(null,responsedata);
-				}
 			}
+			fetchScrapedDatacallback(null,responsedata);
 		}
 	});
 };
@@ -201,7 +192,7 @@ exports.updateScreen_ICE = function(req, res){
 	if(param == "updateScrapeData_ICE"){	
 		scrapedObjects = updateData.getScrapeData;
 		// single quote is replaced with double single quote for scraped data
-		// scrapedObjects = JSON.stringify(scrapedObjects);
+		scrapedObjects = JSON.stringify(scrapedObjects);
 		scrapedObjects = scrapedObjects.replace(/'+/g,"''");
 		var newParse = JSON.parse(scrapedObjects);
 		scrapedObjects=newParse;
@@ -211,20 +202,20 @@ exports.updateScreen_ICE = function(req, res){
 			if('method' in scrapedObjects &&
 				'header' in scrapedObjects && 
 				'body' in scrapedObjects){
-				if(scrapedObjects.method[0] == 'POST'){
+				if(scrapedObjects.method == 'POST'){
 					var requestedBody=scrapedObjects.body[0];
-					var requestedHeader=scrapedObjects.header[0];
 					if(requestedBody != null &&
 					   requestedBody != '' &&
 					   requestedHeader.indexOf('json') === -1){
 						   if(requestedBody.indexOf('Envelope') !== -1){
 							var obj = parse(requestedBody);
 							if ('root' in obj){
-								baseRequestBody={};
-								allXpaths={};
-								xpath="";
 								baseRequestBody=obj.root;
 								parseRequest(baseRequestBody);
+								console.log(objectLevel);
+								console.log(allCustnames);
+								console.log("\n");
+								console.log(allXpaths);
 								for(var populationindex=0;populationindex<allXpaths.length;populationindex++){
 									scrapedObjectsWS.xpath=allXpaths[populationindex];
 									scrapedObjectsWS.custname=allCustnames[populationindex];
@@ -235,53 +226,30 @@ exports.updateScreen_ICE = function(req, res){
 									scrapedObjectsWS.id="";
 									viewArray.push(scrapedObjectsWS);
 								}
-								var baseData={};
 								baseData.endPointURL=scrapedObjects.endPointURL;
 								baseData.method=scrapedObjects.method;
-								baseData.operations=scrapedObjects.operations;
 								baseData.header=scrapedObjects.header;
 								baseData.body=scrapedObjects.body;
 								baseData.responseHeader=scrapedObjects.responseHeader;
 								baseData.responseBody=scrapedObjects.responseBody;
 								baseData.view=viewArray;
 								scrapedObjects=baseData;
-								scrapedObjects=JSON.stringify(scrapedObjects);
-								scrapedObjects = scrapedObjects.replace(/'+/g,"''");
-								updateScreenQuery = "update icetestautomation.screens set"+
-									" screendata ='"+ scrapedObjects +"',"+
-									" modifiedby ='" + modifiedBy + "',"+
-									" modifiedon = '" + new Date().getTime()+
-									"', skucodescreen ='" + requestedskucodeScreens +
-									"' , history= history + { "+requestedScreenhistory+" }" +
-									" where screenid = "+screenID+
-									" and projectid ="+projectID+
-									" and screenname ='" + screenName +
-									"' and versionnumber = "+requestedversionnumber+
-									" IF EXISTS; ";	
-								finalFunction(scrapedObjects);
+								finalFunction(scrapedObjects);	
 							}else{
 								//JSON with view string empty
-								updateScreenQuery=buildObject(scrapedObjects,modifiedBy,requestedskucodeScreens,requestedScreenhistory,screenID,projectID,screenName,requestedversionnumber);
-								finalFunction(scrapedObjects);
+								scrapedObjects=buildObject(scrapedObjects);
 							}
 						}else{
-							//JSON with view string empty
-							updateScreenQuery=buildObject(scrapedObjects,modifiedBy,requestedskucodeScreens,requestedScreenhistory,screenID,projectID,screenName,requestedversionnumber);
-							finalFunction(scrapedObjects);
+							scrapedObjects=buildObject(scrapedObjects);
 						}
 					}else{
-						//JSON with view string empty
-						updateScreenQuery=buildObject(scrapedObjects,modifiedBy,requestedskucodeScreens,requestedScreenhistory,screenID,projectID,screenName,requestedversionnumber);
-						finalFunction(scrapedObjects);
+						scrapedObjects=buildObject(scrapedObjects);
 					}
 				}else{
-					//JSON with view string empty
-					updateScreenQuery=buildObject(scrapedObjects,modifiedBy,requestedskucodeScreens,requestedScreenhistory,screenID,projectID,screenName,requestedversionnumber);
-					finalFunction(scrapedObjects);
+					scrapedObjects=buildObject(scrapedObjects);
 				}
-			}else{//JSON with view string empty
-				updateScreenQuery=buildObject(scrapedObjects,modifiedBy,requestedskucodeScreens,requestedScreenhistory,screenID,projectID,screenName,requestedversionnumber);
-				finalFunction(scrapedObjects);
+			}else{
+				scrapedObjects=buildObject(scrapedObjects);
 			}
 		}else{
 			updateScreenQuery = "update icetestautomation.screens set"+
@@ -436,6 +404,9 @@ exports.updateScreen_ICE = function(req, res){
 												" and screenname ='" + screenName +
 												"' and versionnumber = "+requestedversionnumber+
 												" IF EXISTS; "
+
+							//console.log(updateScreenQuery);
+
 							finalFunction(scrapedObjects);	
 						}else{
 							statusFlag="All objects are not edited.";
@@ -452,7 +423,7 @@ exports.updateScreen_ICE = function(req, res){
 	function finalFunction(scrapedObjects,finalcallback){
 
 		if(statusFlag=="" && scrapedObjects != "scrape data error: Fail"){
-			// console.log(updateScreenQuery);
+			//console.log(updateScreenQuery);
 			dbConn.execute(updateScreenQuery, function(err, result){
 				if (err) {
 					// console.log(err);
@@ -486,6 +457,7 @@ exports.updateScreen_ICE = function(req, res){
 												var updatingtestcasename=eachTestcase.testcasename;
 												//replacing/deleting all the custnames based on xpath and old custnames
 												var deletingStepindex=[]; 
+												//console.log(updatingtestcasedata);
 												if(updatingtestcasedata.length>0){
 													for(var updatingindex=0;updatingindex<oldCustnames.length;updatingindex++){
 														for(var eachtestcasestepindex=0;eachtestcasestepindex<updatingtestcasedata.length;eachtestcasestepindex++){
@@ -558,33 +530,18 @@ exports.updateScreen_ICE = function(req, res){
 };
 
 
-function buildObject(scrapedObjects,modifiedBy,requestedskucodeScreens,
-requestedScreenhistory,screenID,projectID,screenName,requestedversionnumber){
+function buildObject(scrapedObjects){
 	var baseData={};
 	var viewArray=[];
-	var updateScreenQuery="";
+	//JSON with view string empty
 	baseData.endPointURL=scrapedObjects.endPointURL;
 	baseData.method=scrapedObjects.method;
-	baseData.operations=scrapedObjects.operations;
 	baseData.header=scrapedObjects.header;
 	baseData.body=scrapedObjects.body;
 	baseData.responseHeader=scrapedObjects.responseHeader;
 	baseData.responseBody=scrapedObjects.responseBody;
 	baseData.view=viewArray;
-	scrapedObjects=JSON.stringify(scrapedObjects);
-	scrapedObjects = scrapedObjects.replace(/'+/g,"''");
-	updateScreenQuery = "update icetestautomation.screens set"+
-		" screendata ='"+ scrapedObjects +"',"+
-		" modifiedby ='" + modifiedBy + "',"+
-		" modifiedon = '" + new Date().getTime()+
-		"', skucodescreen ='" + requestedskucodeScreens +
-		"' , history= history + { "+requestedScreenhistory+" }" +
-		" where screenid = "+screenID+
-		" and projectid ="+projectID+
-		" and screenname ='" + screenName +
-		"' and versionnumber = "+requestedversionnumber+
-	" IF EXISTS; ";	
-	return updateScreenQuery;
+	return baseData;
 }
 
 function parseRequest(readChild){
@@ -786,52 +743,39 @@ exports.updateTestCase_ICE = function (req, res) {
 * debugTestCase_ICE service is used to debug the testcase
 */
 exports.debugTestCase_ICE = function (req, res) {
-	var action=req.body.param;
-	if(action == 'debugTestCase_ICE'){
-		var requestedbrowsertypes = req.body.browsertypes;
-		var requestedtestcaseids = req.body.testcaseids;
-		var responsedata = [];
-		var responseobject = {
-			template: "",
-			testcasename: "",
-			testcase: []
-		};
-		var browsertypeobject = { browsertype: requestedbrowsertypes };
-		var flag = "";
-		for (var indexes = 0; indexes < requestedtestcaseids.length; indexes++) {
-			var getProjectTestcasedata = "select testcasename,testcasesteps from testcases where testcaseid=" + requestedtestcaseids[indexes];
-			dbConn.execute(getProjectTestcasedata, function (errgetTestcasedata, testcasedataresult) {
-				if (errgetTestcasedata) {
-					flag = "Error in getProjectTestcasedata : Fail";
-					res.send(flag);
-				} else {
-					for (var ids = 0; ids < testcasedataresult.rows.length; ids++) {
-						responseobject.testcase = testcasedataresult.rows[ids].testcasesteps;
-						responseobject.template = "";
-						responseobject.testcasename = testcasedataresult.rows[ids].testcasename;
-						responsedata.push(responseobject);
-					}
-					responsedata.push(browsertypeobject);
-					var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-					var mySocket = myserver.allSocketsMap[ip];
-					mySocket._events.result_debugTestCase = [];
-					mySocket.emit('debugTestCase',responsedata);
-					mySocket.on('result_debugTestCase', function (responsedata) {
-						res.send("success");
-					});
+	var requestedbrowsertypes = req.body.browsertypes;
+	var requestedtestcaseids = req.body.testcaseids;
+	var responsedata = [];
+	var responseobject = {
+		template: "",
+		testcasename: "",
+		testcase: []
+	};
+	var browsertypeobject = { browsertype: requestedbrowsertypes };
+	var flag = "";
+	for (var indexes = 0; indexes < requestedtestcaseids.length; indexes++) {
+		var getProjectTestcasedata = "select testcasename,testcasesteps from testcases where testcaseid=" + requestedtestcaseids[indexes];
+		dbConn.execute(getProjectTestcasedata, function (errgetTestcasedata, testcasedataresult) {
+			if (errgetTestcasedata) {
+				flag = "Error in getProjectTestcasedata : Fail";
+				res.send(flag);
+			} else {
+				for (var ids = 0; ids < testcasedataresult.rows.length; ids++) {
+					responseobject.testcase = testcasedataresult.rows[ids].testcasesteps;
+					responseobject.template = "";
+					responseobject.testcasename = testcasedataresult.rows[ids].testcasename;
+					responsedata.push(responseobject);
 				}
-			});
-		}
-	}else if(action == 'debugTestCaseWS_ICE'){
-		/*var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-		var mySocket = myserver.allSocketsMap[ip];
-		mySocket._events.result_debugTestCase = [];
-		mySocket.emit('debugTestCaseWS',JSON.stringify(req.body.testCaseWS));
-		mySocket.on('result_debugTestCaseWS', function (JSON.stringify(req.body.testCaseWS)) {
-			res.send("success");
-		});*/
-		console.log("initWSJson::::::::::", JSON.stringify(req.body.testCaseWS));
-		res.send(req.body.testCaseWS);
+				responsedata.push(browsertypeobject);
+				var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+				var mySocket = myserver.allSocketsMap[ip];
+				mySocket._events.result_debugTestCase = [];
+				mySocket.emit('debugTestCase',responsedata);
+				mySocket.on('result_debugTestCase', function (responsedata) {
+					res.send("success");
+				});
+			}
+		});
 	}
 };
 

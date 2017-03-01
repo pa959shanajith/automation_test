@@ -46,7 +46,11 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 		getEachScenario = []
 		ExecutionService.readTestSuite_ICE(cycleId, testSuiteId,testSuiteName)
 		.then(function(data) {
-			cfpLoadingBar.complete();
+			if(data == "")
+			{
+			}
+			else{
+					cfpLoadingBar.complete();
 			rowData = data;
 			var row = $("<tbody />");
 			$("#executionDataTable tbody tr").remove();
@@ -93,6 +97,7 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 				count++;
 			}
 			//Creating Table Rows for each of the Scenarios
+			}
 		}, 
 		function(error) {
 			console.log("Error")

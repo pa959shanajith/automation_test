@@ -736,65 +736,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 	
 	//Get Webservice Data
 	$scope.getWSData = function(){
-		/*if($("#wsdlRequestHeader, #wsdlRequestBody").val().length > 0){
-			$(".saveWS").prop("disabled", true);
-			$("#enbledWS").prop("disabled", false);
-			$(".enableActionsWS").addClass("disableActionsWS").removeClass("enableActionsWS");
-			$("#endPointURL, #wsdlMethods, #wsdlOperation, #wsdlRequestHeader, #wsdlRequestBody").prop("disabled", true)
-		}
-		else{
-			$(".saveWS").prop("disabled", false);
-			$("#enbledWS").prop("disabled", true)
-			$(".disableActionsWS").addClass("enableActionsWS").removeClass("disableActionsWS")
-			$("#endPointURL, #wsdlMethods, #wsdlOperation, #wsdlRequestHeader, #wsdlRequestBody").prop("disabled", false)
-		}*/
-		DesignServices.getScrapeDataScreenLevel_ICE() 
-		.then(function(data){
-			if(typeof data === "object"){
-				//Printing the Save data in UI
-				$("#endPointURL").val(data.endPointURL);
-				$("#wsdlMethods option").each(function(){
-					if($(this).val() == data.method){
-						$(this).prop("selected", true)
-					}
-				})
-				$("#wsdlOperation").val(data.operations)
-				$("#wsdlRequestHeader").val(data.header[0].split("##").join("\n"));
-				if(data.body[0].indexOf("{") == 0 || data.body[0].indexOf("[") == 0){
-					var jsonStr = data.body;
-					var jsonObj = JSON.parse(jsonStr);
-					var jsonPretty = JSON.stringify(jsonObj, null, '\t');
-					xml_neat2 = jsonPretty;
-					$("#wsdlRequestBody").val(jsonPretty)
-				}
-				else{
-					var getXML = formatXml(data.body[0].replace(/>\s+</g,'><'));
-					$("#wsdlRequestBody").val(getXML)
-				}
-				//Printing the Save data in UI
-				if($("#wsdlRequestHeader, #wsdlRequestBody").val().length > 0){
-					$(".saveWS").prop("disabled", true);
-					$("#enbledWS").prop("disabled", false)
-					$(".enableActionsWS").addClass("disableActionsWS").removeClass("enableActionsWS")
-					$("#endPointURL, #wsdlMethods, #wsdlOperation, #wsdlRequestHeader, #wsdlRequestBody").prop("disabled", true)
-				}
-				else{
-					$(".saveWS").prop("disabled", false);
-					$("#enbledWS").prop("disabled", true)
-					$(".disableActionsWS").addClass("enableActionsWS").removeClass("disableActionsWS")
-				}
-			}
-			else{
-				$("#wsdlMethods").prop("selectedIndex", 1)
-				$(".saveWS").prop("disabled", false);
-				$("#enbledWS").prop("disabled", true)
-				$(".disableActionsWS").addClass("enableActionsWS").removeClass("disableActionsWS")
-			}
-		}, 
-		function(error){ 
-			console.log(error) 
-		})
-		/*if($("#wsdlRequestHeader, #wsdlRequestBody").val().length > 0){
+		if($("#wsdlRequestHeader, #wsdlRequestBody").val().length > 0){
 			$(".saveWS").prop("disabled", true);
 			$("#enbledWS").prop("disabled", false)
 			$(".enableActionsWS").addClass("disableActionsWS").removeClass("enableActionsWS")
@@ -803,130 +745,64 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			$(".saveWS").prop("disabled", false);
 			$("#enbledWS").prop("disabled", true)
 			$(".disableActionsWS").addClass("enableActionsWS").removeClass("disableActionsWS")
-		}*/
-		
-		//XML Beatuifier
-		function formatXml(xml) {
-		    var formatted = '';
-		    var reg = /(>)(<)(\/*)/g;
-		    xml = xml.replace(reg, '$1\r\n$2$3');
-		    var pad = 0;
-		    jQuery.each(xml.split('\r\n'), function(index, node){
-		        var indent = 0;
-		        if (node.match( /.+<\/\w[^>]*>$/ ))
-		        {
-		            indent = 0;
-		        }
-		        else if (node.match( /^<\/\w/ ))
-		        {
-		            if (pad != 0)
-		            {
-		                pad -= 1;
-		            }
-		        }
-		        else if (node.match( /^<\w[^>]*[^\/]>.*$/ ))
-		        {
-		            indent = 1;
-		        }
-		        else
-		        {
-		            indent = 0;
-		        }
-		        var padding = '';
-		        for (var i = 0; i < pad; i++)
-		        {
-		            padding += '  ';
-		        }
-		        formatted += padding + node + '\r\n';
-		        pad += indent;
-		    });
-		    return formatted;
 		}
-		//XML Beatuifier
 	}
 	//Get Webservice Data
 	
 	
 	//Save Webservice Data
 	$scope.saveWS = function(){
-		$("#endPointURL, #wsdlMethods, #wsdlRequestHeader").removeClass("inputErrorBorder").removeClass("selectErrorBorder")
 		var tasks = JSON.parse(window.localStorage['_CT']);
-		var endPointURL = $("#endPointURL").val();
-		var wsdlMethods = $("#wsdlMethods option:selected").val();
-		var wsdlOperation = $("#wsdlOperation").val();
+		var endPointURL = $scope.endPointURL;
+		var wsdlMethods = $scope.wsdlMethods;
+		var wsdlOperation = $scope.wsdlOperation;
 		var wsdlRequestHeader = $("#wsdlRequestHeader").val().replace(/[\n\r]/g,'##').replace(/"/g, '\"');
 		var wsdlRequestBody = $("#wsdlRequestBody").val().replace(/[\n\r]/g,'').replace(/\s\s+/g, ' ').replace(/"/g, '\"');
-		if(!endPointURL) $("#endPointURL").addClass("inputErrorBorder")
-		else if(!$scope.wsdlMethods && !wsdlMethods) $("#wsdlMethods").addClass("selectErrorBorder")
-		else if(!wsdlRequestHeader) $("#wsdlRequestHeader").addClass("inputErrorBorder")
-		else{
-			var getWSData = {
-				"body": [wsdlRequestBody],
-				"operations": [wsdlOperation],
-				"responseHeader": [""],
-				"responseBody": [""],
-				"method": [wsdlMethods],
-				"endPointURL": [endPointURL],
-				"header": [wsdlRequestHeader]
-			};
-			var appType = $scope.getScreenView;
-			getWSTemplateData = JSON.stringify(getWSData)
-			var projectId = tasks.projectId;
-			var screenId = tasks.screenId;
-			var screenName = tasks.screenName;
-			var userinfo = JSON.parse(window.localStorage['_UI']);
-			scrapeObject = {};
-			scrapeObject.param = 'updateScrapeData_ICE';
-			scrapeObject.getScrapeData = getWSTemplateData;
-			scrapeObject.projectId = projectId;
-			scrapeObject.appType = appType;
-			scrapeObject.screenId = screenId;
-			scrapeObject.screenName = screenName;
-			scrapeObject.userinfo = userinfo;
-			DesignServices.updateScreen_ICE(scrapeObject)
-			.then(function(data){
-				if(data == "success"){
-					$("#WSSaveSuccess").modal("show");
-					$("#enbledWS").prop("checked", false)
-					angular.element(document.getElementById("left-nav-section")).scope().getWSData();
-				}
-				else{
-					$("#WSSaveFail").modal("show")
-				}
-			}, function(error){ console.log("Error") })
-		}
+		var getWSData = {
+			"body": [wsdlRequestBody],
+			"operation": [wsdlOperation],
+			"responseHeader": [""],
+			"responseBody": [""],
+			"method": [wsdlMethods],
+			"endPointURL": [endPointURL],
+			"header": [wsdlRequestHeader]
+		};
+		getWSTemplateData = JSON.stringify(getWSData)
+		var projectId = tasks.projectId;
+		var screenId = tasks.screenId;
+		var screenName = tasks.screenName;
+		var userinfo = JSON.parse(window.localStorage['_UI']);
+		scrapeObject = {};
+		scrapeObject.param = 'debugTestCaseWS_ICE';
+		scrapeObject.getScrapeData = getWSTemplateData;
+		scrapeObject.projectId = projectId;
+		scrapeObject.screenId = screenId;
+		scrapeObject.screenName = screenName;
+		scrapeObject.userinfo = userinfo;
+		/*DesignServices.updateScreen_ICE(scrapeObject)
+		.then(function(data){
+			if(data == "success"){
+				$("#WSSaveSuccess").modal("show")
+			}
+			else{
+				$("#WSSaveFail").modal("show")
+			}
+		}, function(error){ console.log("Error") })*/
 	}
 	//Save Webservice Data
 	
 	
-	//Enable Save WS Button
-	$(document).on("click", "#enbledWS", function(){
-		if($(this).is(":checked") == true){
-			$(".saveWS").prop("disabled", false)
-			$("#endPointURL, #wsdlMethods, #wsdlOperation, #wsdlRequestHeader, #wsdlRequestBody").prop("disabled", false)
-		}
-		else {
-			$(".saveWS").prop("disabled", true)
-			$("#endPointURL, #wsdlMethods, #wsdlOperation, #wsdlRequestHeader, #wsdlRequestBody").prop("disabled", true)
-		}
-	})
-	
 	//Init Webservice
 	$scope.initScrapeWS = function(e){
-		$("#endPointURL, #wsdlMethods, #wsdlRequestHeader").removeClass("inputErrorBorder").removeClass("selectErrorBorder")
 		var initWSJson = {}
 		var testCaseWS = []
 		var appType = $scope.getScreenView;
 		var endPointURL = $scope.endPointURL;
 		var wsdlMethods = $scope.wsdlMethods;
 		var wsdlOperation = $scope.wsdlOperation;
-		var param = 'debugTestCaseWS_ICE';
 		var wsdlRequestHeader = $("#wsdlRequestHeader").val().replace(/[\n\r]/g,'##').replace(/"/g, '\"');
 		var wsdlRequestBody = $("#wsdlRequestBody").val().replace(/[\n\r]/g,'').replace(/\s\s+/g, ' ').replace(/"/g, '\"');
 		if(e.currentTarget.className == "disableActionsWS") return false
-		else if(!endPointURL) $("#endPointURL").addClass("inputErrorBorder")
-		else if(!$scope.wsdlMethods && !wsdlMethods) $("#wsdlMethods").addClass("selectErrorBorder")
-		else if(!wsdlRequestHeader) $("#wsdlRequestHeader").addClass("inputErrorBorder")
 		else{
 			testCaseWS.push({
 				"stepNo": 1,

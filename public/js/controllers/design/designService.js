@@ -22,13 +22,11 @@ mySPA.factory('DesignServices', ['$http','$q', function ($http, $httpProvider, $
 		},
 
 		getScrapeDataScreenLevel_ICE: function()	{
-			var appType =  JSON.parse(window.localStorage['_CT']).appType;
 			var screenId = JSON.parse(window.localStorage['_CT']).screenId;
 			var projectId = JSON.parse(window.localStorage['_CT']).projectId;
 			return $http.post('/getScrapeDataScreenLevel_ICE',{
 				param : 'getScrapeDataScreenLevel_ICE',
 				screenId : screenId,
-				appType : appType,
 				projectId : projectId
 			})
 
