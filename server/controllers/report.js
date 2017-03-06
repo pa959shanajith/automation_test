@@ -10,7 +10,7 @@ var dbConnICE = require('../../server/config/icetestautomation');
 var async = require('async');
 
 exports.getMainReport_ICE = function(req, res){
-	var client = require("jsreport-client")("http://10.41.31.5:3001/");
+	var client = require("jsreport-client")("http://localhost:3001/");
 	client.render({
 	    template: { 
 	    	shortid: "HJP1pqMcg", 
@@ -31,7 +31,7 @@ exports.getMainReport_ICE = function(req, res){
 exports.renderReport_ICE = function(req, res){
 	var finalReports = req.body.finalreports;
 	var reportType = req.body.reporttype;
-	var client = require("jsreport-client")("http://10.41.31.5:3001/");
+	var client = require("jsreport-client")("http://localhost:3001/");
 	client.render({
 	    template: { 
 	    	shortid: "rkE973-5l", 
