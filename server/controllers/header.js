@@ -36,5 +36,11 @@ exports.getProjectDetails_ICE = function (req, res) {
                     res.send(responsedata);
                 }
             });
-            
         }
+exports.logoutUser_Nineteen68 = function (req, res) {
+    req.session.destroy();
+        if(req.session == undefined)
+        {
+            res.send('Session Expired');
+        }
+};
