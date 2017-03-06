@@ -1,16 +1,16 @@
 
-mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout', 'reportService','cfpLoadingBar', function($scope,$http,$location,$timeout,reportService, cfpLoadingBar) {
+mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout','$window', 'reportService','cfpLoadingBar', function($scope,$http,$location,$timeout,$window,reportService, cfpLoadingBar) {
 	$("body").css("background","#eee");
 	var getUserInfo = JSON.parse(window.localStorage['_UI']);
 	var userID = getUserInfo.user_id;
 	var open = 0;	var openWindow = 0;
-	var executionId;
+	var executionId, testsuiteId;
 	$("#page-taskName").empty().append('<span>Reports</span>')
 	$timeout(function(){
 		$('.scrollbar-inner').scrollbar();
 		$('.scrollbar-macosx').scrollbar();
-		document.getElementById("currentYear").innerHTML = new Date().getFullYear()
-		angular.element(document.getElementById("left-nav-section")).scope().getAllSuites_ICE();
+		/*document.getElementById("currentYear").innerHTML = new Date().getFullYear()*/
+		angular.element(document.getElementById("reportSection")).scope().getReports_ICE();
 	}, 100)
 	//Loading Project Info
 	//var getProjInfo = JSON.parse(window.localStorage['_T'])
@@ -20,40 +20,64 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 	//$(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">Project :</span><span class="content">'+getProjInfo.projectName+'</span></p><p class="proj-info-wrap"><span class="content-label">Module :</span><span class="content">'+getProjInfo.moduleName+'</span></p><p class="proj-info-wrap"><span class="content-label">Screen :</span><span class="content">'+getProjInfo.screenName+'</span></p>')
 	//Loading Project Info
 	
-	//Onload ServiceCall to display testsuites
-	$scope.getAllSuites_ICE = function(){
-		reportService.getAllSuites_ICE(userID)
-		.then(function(data) {
-			var container = $('.staticTestsuiteContainer');
-			if(Object.prototype.toString.call( data ) === '[object Array]'){
-				for(i=0; i<data.length; i++){
-					if(container.find('.suiteContainer').length >= 6){
-						$('.dynamicTestsuiteContainer').append("<span class='suiteContainer' data-suiteId='"+data[i].testsuiteid+"' title='"+data[i].testsuitename+"'><img alt='Test suite icon' src='imgs/ic-testsuite-reportbox.png'><br/><span class='repsuitename'>"+data[i].testsuitename+"</span></span>");
+	$scope.getReports_ICE = function(){
+		reportService.getMainReport_ICE()
+		.then(function(data1) {
+			if(data1){
+				$("#reportSection").append(data1)
+				reportService.getAllSuites_ICE(userID)
+				.then(function(data) {
+					$('.scrollbar-inner').scrollbar();
+					$('.scrollbar-macosx').scrollbar();
+					var container = $('.staticTestsuiteContainer');
+					if(Object.prototype.toString.call( data ) === '[object Array]'){
+						if(data.length > 0){
+							for(i=0; i<data.length; i++){
+								if(container.find('.suiteContainer').length >= 6){
+									$('.dynamicTestsuiteContainer').append("<span class='suiteContainer' data-suiteId='"+data[i].testsuiteid+"'><img alt='Test suite icon' class='reportbox' src='imgs/ic-reportbox.png' title='"+data[i].testsuitename+"'><br/><span class='repsuitename' title='"+data[i].testsuitename+"'>"+data[i].testsuitename+"</span></span>");
+								}
+								else
+									container.append("<span class='suiteContainer' data-suiteId='"+data[i].testsuiteid+"'><img alt='Test suite icon' class='reportbox' src='imgs/ic-reportbox.png' title='"+data[i].testsuitename+"'><br/><span class='repsuitename' title='"+data[i].testsuitename+"'>"+data[i].testsuitename+"</span></span>");
+							}					
+						}
 					}
-					else
-						container.append("<span class='suiteContainer' data-suiteId='"+data[i].testsuiteid+"' title='"+data[i].testsuitename+"'><img alt='Test suite icon' src='imgs/ic-testsuite-reportbox.png'><br/><span class='repsuitename'>"+data[i].testsuitename+"</span></span>");
-				}				
-			}
-			else{
-				
-			}
-		}, 
-		function(error) {
-			console.log("Error-------"+error);
-		})
+					else{
+						
+					}
+					if($('.dynamicTestsuiteContainer').find('.suiteContainer').length <= 0){
+						$('.suitedropdownicon').hide();
+					}
+				}, 
+				function(error) {
+					console.log("Error-------"+error);
+				})
+			}					
+		}, function(error) {
+		});
 	}
-	
+		
 	//Service call to get start and end details of suites
 	$(document).on('click', '.suiteContainer', function(){
-		var testsuiteId = $(this).attr('data-suiteId');
+		$(this).find('.reportbox').addClass('reportboxselected');
+		if($(this).parent().hasClass('staticTestsuiteContainer')){
+			$(this).siblings().find('.reportbox').removeClass('reportboxselected');
+			$('.dynamicTestsuiteContainer').find('.reportbox').removeClass('reportboxselected');
+		}
+		else if($(this).parent().hasClass('dynamicTestsuiteContainer')){
+			$(this).siblings().find('.reportbox').removeClass('reportboxselected');
+			$('.staticTestsuiteContainer').find('.reportbox').removeClass('reportboxselected');
+		}		
+		testsuiteId = $(this).attr('data-suiteId');
 		$('#scenarioReportsTable').find('tbody').empty();
 		reportService.getSuiteDetailsInExecution_ICE(testsuiteId)
 		.then(function(data) {
 			var tableContainer = $('#testSuitesTimeTable');
 			if(Object.prototype.toString.call(data) === '[object Array]'){
-				tableContainer.find('tbody').empty();
-				for(i=0; i<data.length; i++){
-					tableContainer.find('tbody').append("<tr class='scenariostatusreport' data-executionid='"+data[i].execution_id+"'><td>"+(i+1)+"</td><td>"+data[i].start_time+"</td><td>"+data[i].end_time+"</td></tr>");
+				if(data.length > 0){
+					tableContainer.find('tbody').empty();
+					for(i=0; i<data.length; i++){
+						tableContainer.find('tbody').append("<tr class='scenariostatusreport' data-executionid='"+data[i].execution_id+"'><td>"+(i+1)+"</td><td>"+data[i].start_time.split(' ')[0]+"<span style='margin-left: 30px;'>"+data[i].start_time.split(' ')[1]+"</span></td><td>"+data[i].end_time.split(' ')[0]+"<span style='margin-left: 30px;'>"+data[i].end_time.split(' ')[1]+"</span></td></tr>");
+					}					
 				}
 			}
 			$('.progress-bar-success, .progress-bar-danger, .progress-bar-warning, .progress-bar-norun').css('width','0%');
@@ -69,6 +93,8 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 	
 	//Service call to get scenario status
 	$(document).on('click', '.scenariostatusreport', function(){
+		$(this).addClass('scenariostatusreportselect');
+		$(this).siblings().removeClass('scenariostatusreportselect');
 		executionId = $(this).attr('data-executionid');
 		reportService.reportStatusScenarios_ICE(executionId)
 		.then(function(data) {
@@ -78,21 +104,22 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 				var total = data.length;
 				scenarioContainer.find('tbody').empty();
 				var browserIcon;
+				var styleColor;
 				for(i=0; i<data.length; i++){
 					if(data[i].browser == "chrome")	browserIcon = "ic-reports-chrome.png";
 					else if(data[i].browser == "firefox")	browserIcon = "ic-reports-firefox.png";
-					else if(data[i].browser == "ie")	browserIcon = "ic-reports-ie.png";
-					scenarioContainer.find('tbody').append("<tr><td>"+data[i].testscenarioname+"</td><td>"+data[i].executedtime+"</td><td><img alt='Test suite icon' src='imgs/"+browserIcon+"'></td><td class='openReports' data-reportid='"+data[i].reportid+"'>"+data[i].status+"</td><td><img alt='Export JSON' src='imgs/ic-export-json.png'></td></tr>");
-					if(data[i].status == "Pass")	pass++;
-					else if(data[i].status == "Fail")	fail++;
-					else if(data[i].status == "Terminate")	terminated++;
-					else if(data[i].status == "Incomplete")	incomplete++;
+					else if(data[i].browser == "internet explorer")	browserIcon = "ic-reports-ie.png";					
+					if(data[i].status == "Pass"){	pass++;	styleColor="style='color: #009444 !important;'";}
+					else if(data[i].status == "Fail"){	fail++;	styleColor="style='color: #b31f2d !important;'";}
+					else if(data[i].status == "Terminate"){	terminated++;	styleColor="style='color: #faa536 !important;'";}
+					else if(data[i].status == "Incomplete"){	incomplete++;	styleColor="style='color: #58595b !important;'";}
+					scenarioContainer.find('tbody').append("<tr><td>"+data[i].testscenarioname+"</td><td>"+data[i].executedtime+"</td><td><img alt='Browser icon' src='imgs/"+browserIcon+"'></td><td class='openReports' data-reportid='"+data[i].reportid+"'><a class='openreportstatuss' "+styleColor+">"+data[i].status+"</a></td><td data-reportid='"+data[i].reportid+"'><img alt='Export JSON' src='imgs/ic-export-json.png' style='margin-right: 10px; cursor: pointer;'><img alt='Pdf Icon' class='getSpecificReportBrowser openreportstatus' data-getrep='phantom-pdf' style='cursor: pointer; margin-right: 10px;' src='imgs/ic-pdf.png'><img alt='Browser Icon' class='getSpecificReportBrowser openreportstatus' data-getrep='html' style='cursor: pointer;' src='imgs/ic-reports-chrome.png'></td></tr>");
 				}
 				if(data.length > 0){
-					P=(pass/total)*100;
-					F=(fail/total)*100;
-					T=(terminated/total)*100;
-					I=(incomplete/total)*100;
+					P = parseFloat((pass/total)*100).toFixed();
+					F = parseFloat((fail/total)*100).toFixed();
+					T = parseFloat((terminated/total)*100).toFixed();
+					I = parseFloat((incomplete/total)*100).toFixed();
 					$('.progress-bar-success').css('width',P+"%");	$('.passPercent').text(P+" %");
 					$('.progress-bar-danger').css('width',F+"%");	$('.failPercent').text(F+" %");
 					$('.progress-bar-warning').css('width',T+"%");	$('.terminatePercent').text(T+" %");
@@ -141,18 +168,91 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 		}
 	    
 	})
-	
-	$(document).on("click",".openReports", function(e){ 
-		openWindow = 0;
-		var reportId = $(this).attr('data-reportid');
-		var path = "/specificreports";
-		//$location.path(path);
-		if(openWindow == 0)
-		{
-			window.open(path,'_blank');
-			
-		}
-		openWindow++;
-		e.stopImmediatePropagation();
+		
+	$(document).on('click', '.openreportstatus', function(e){
+		var reportID = $(this).parent().attr('data-reportid');
+		var reportType = $(this).attr('data-getrep');
+		var d = new Date();
+		var hours = d.getHours();
+	    var hours = (hours+24-2)%24; 
+	    var mid='AM';
+	    if(hours>12){	mid='PM';}
+	    var DATE = d.getDate()+"-"+(d.getMonth()+1)+"-"+d.getFullYear();
+	    var TIME = d.getHours()+":"+d.getMinutes()+" "+mid;
+	    var pass = fail = terminated = total = 0;
+		var finalReports = {
+				overallstatus : [{
+					"domainName": "",
+					"projectName": "",
+					"releaseName": "",
+					"cycleName": "",
+					"scenarioName": "",
+					"browserVersion": "",
+					"browserType": "",
+					"StartTime": "",
+					"EndTime": "",
+					"overAllStatus": "",
+					"EllapsedTime": "",
+					"date": DATE,
+					"time": TIME,
+					"pass": "",
+					"fail": "",
+					"terminate": ""
+				}],
+				rows : []
+		}		
+		reportService.getReport_Nineteen68(reportID, testsuiteId)
+		.then(function(data) {
+			if(data.length > 0){
+				finalReports.overallstatus[0].domainName = data[0].domainname
+				finalReports.overallstatus[0].projectName = data[0].projectname
+				finalReports.overallstatus[0].releaseName =	data[0].releasename
+				finalReports.overallstatus[0].cycleName = data[0].cyclename
+				finalReports.overallstatus[0].scenarioName = data[0].testscenarioname
+				
+				var obj2 = JSON.parse(data[1].reportdata);
+				for(j=0; j<obj2.overallstatus.length; j++){
+					finalReports.overallstatus[0].browserVersion = obj2.overallstatus[j].browserVersion
+					finalReports.overallstatus[0].browserType = obj2.overallstatus[j].browserType
+					finalReports.overallstatus[0].StartTime = obj2.overallstatus[j].StartTime
+					finalReports.overallstatus[0].EndTime = obj2.overallstatus[j].EndTime
+					finalReports.overallstatus[0].overAllStatus = obj2.overallstatus[j].overallstatus
+					finalReports.overallstatus[0].EllapsedTime = obj2.overallstatus[j].EllapsedTime
+				}
+				for(k=0; k<obj2.rows.length; k++){
+					finalReports.rows.push(obj2.rows[k]);
+					if(finalReports.rows[k].hasOwnProperty("status")){
+						total++;
+					}
+				}
+				for(l=0; l<finalReports.rows.length; l++){
+					finalReports.rows[l].Step = finalReports.rows[l]["Step "];
+					if(finalReports.rows[l].status == "Pass"){	pass++;}
+					else if(finalReports.rows[l].status == "Fail"){	fail++;}
+					else if(finalReports.rows[l].status == "Terminate"){	terminated++;}
+				}
+				finalReports.overallstatus[0].pass = parseFloat((pass/total)*100).toFixed(2);
+				finalReports.overallstatus[0].fail = parseFloat((fail/total)*100).toFixed(2);
+				finalReports.overallstatus[0].terminate = parseFloat((terminated/total)*100).toFixed(2);
+			}
+			reportService.renderReport_ICE(finalReports, reportType)
+			.then(function(data1) {
+				var path = "/specificreports";
+				openWindow = 0;
+				if(openWindow == 0)
+				{
+					var myWindow = window.open(path);
+					myWindow.document.write(data1);
+				}
+				openWindow++;
+				e.stopImmediatePropagation();
+			},
+			function(error) {
+				console.log("Error-------"+error);
+			})
+		},
+		function(error) {
+			console.log("Error-------"+error);
+		})
 	})
 }]);

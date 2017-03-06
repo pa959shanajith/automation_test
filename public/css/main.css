@@ -627,10 +627,9 @@ body {
     display: none
 }
 
-.panel-body {
+.panel-body{
     cursor: pointer
 }
-
 
 /*****************Plugin CSS*****************/
 
@@ -1731,8 +1730,9 @@ body {
 .designDataTable thead tr th:nth-child(9), .designDataTable tbody tr td:nth-child(9){width: 10% !important;}
 .designDataTable thead tr th:nth-child(5), .designDataTable thead tr th:nth-child(6), .designDataTable thead tr th:nth-child(7), .designDataTable thead tr th:nth-child(8){border-right: 1px solid #fff;}
 .designDataTable tbody tr td:nth-child(1),.designDataTable tbody tr td:nth-child(2),.designDataTable tbody tr td:nth-child(5),.designDataTable tbody tr td:nth-child(6),.designDataTable tbody tr td:nth-child(7),.designDataTable tbody tr td:nth-child(8){text-align: left;}
-.designDataTable tbody tr td:nth-child(6),.designDataTable tbody tr td:nth-child(7),.designDataTable tbody tr td:nth-child(8){padding-left: 10px; padding-right: 10px; word-break: break-all;}
-.designDataTable tbody tr td:nth-child(5){padding-right: 10px; word-break: break-all;}
+.designDataTable tbody tr td:nth-child(6),.designDataTable tbody tr td:nth-child(7),.designDataTable tbody tr td:nth-child(8){padding-left: 3px; padding-right: 5px; word-break: break-all;}
+.designDataTable tbody tr td:nth-child(5){padding-right: 5px; word-break: break-all;}
+.designDataTable tbody tr td:nth-child(7),.designDataTable tbody tr td:nth-child(8){padding-right: 0px;}
 .designDataTable thead tr th:nth-child(2){padding-left: 3px;}
 .loading, .jqgfirstrow, #alertmod_jqGrid{display: none !important;}
 .errorMsg{color: #cc3300; font-size: 11px;}
@@ -2222,6 +2222,17 @@ select:hover {
 }
 
 /******************Reports CSS***************************/
+.reportbox{
+	padding: 10px;
+    background-color: #5c5ce4;
+    border-radius: 8px;
+}
+.reportbox:hover{
+	background-color: #ff7300;
+}
+.reportboxselected{
+	background-color: #ff7300 !important;
+}
 .upper-section-testsuites{
 	position: relative;
     width: 100%;
@@ -2339,15 +2350,26 @@ select:hover {
     float: left;
 }
 .suitestartend tbody tr td:nth-child(1){width: 5%;}
-.suitestartend tbody tr td:nth-child(2){width: 45%; text-align: center;}
-.suitestartend tbody tr td:nth-child(3){width: 50%; text-align: center;}
+.suitestartend tbody tr td:nth-child(2){width: 45%; text-align: left; padding-left: 51px;}
+.suitestartend tbody tr td:nth-child(3){width: 50%; text-align: left; padding-left: 83px;}
 .scenarioReports tbody tr:nth-child(odd){
 	background:#e8e6ff;	
 }
 .scenarioReports tbody tr:nth-child(even) {
     background: #fff;
 }
-.scenarioReports tbody tr td:nth-child(1){width: 30%; word-wrap: break-word; padding-left: 10px; padding-right: 10px;}
+.scenarioReports tbody tr td:nth-child(1){
+	width: 30%;
+    padding-left: 70px;
+    padding-right: 10px;
+    text-align: left;
+    overflow: hidden;
+    white-space: nowrap !important;
+    text-overflow: ellipsis;
+    display: inline-block;
+    position: relative;
+    top: 4px;
+}
 .scenarioReports tbody tr td:nth-child(2){width: 20%;}
 .scenarioReports tbody tr td:nth-child(3){width: 20%;}
 .scenarioReports tbody tr td:nth-child(4){width: 15%;}
@@ -2387,6 +2409,9 @@ select:hover {
     border: 1px solid #edefec;
 }
 .scenariostatusreport{cursor: pointer;}
+.scenariostatusreportselect{
+	background-color: #e3caff
+}
 .popupWrapRow{
 	display: block;
 	width:100%;
@@ -2395,7 +2420,6 @@ select:hover {
 .progress-bar-danger{background: linear-gradient(to right, #d41e2d, #b31f2d) !important;}
 .progress-bar-warning{background: linear-gradient(to right, #f7b91e, #faa536) !important;}
 .progress-bar-norun{background: linear-gradient(to right, #939598, #58595b) !important;}
-
 .textFieldsContainer{
 	display: block;
 	width:100%;
@@ -2524,9 +2548,9 @@ select:-webkit-autofill:focus {
 .tabCont{display: table-cell; border-bottom: 1px solid #ececec;}
 .reportsDetail{line-height: 2; text-align: center; height:425px; overflow: auto;}
 .rDstepDes{text-align: left;}
+.openreportstatuss{text-decoration: none; cursor: text;}
+.openreportstatuss:hover{text-decoration: none; cursor: text;}
 /*****************Specific Reports CSS*****************/
-
-
 
 /******************Remove Webkit autocolor CSS***************************/
 
