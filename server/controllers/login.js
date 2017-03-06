@@ -5,8 +5,7 @@ var Joi = require('joi');
 var client_cas = require('../../server/config/cassandra');
 var dbConn = require('../../server/config/cassandra');
 var cassandra = require('cassandra-driver');
-var passwordHash = require('password-hash');
-//var bcrypt = require('bcrypt');
+var bcrypt = require('bcrypt');
 
 //Global Variables
 var roles = [];
@@ -18,7 +17,12 @@ exports.authenticateUser_Nineteen68 = function(req, res){
      console.log("Inside Authenticate User");
      username = req.body.username;
      password = req.body.password;
-     var authUser = "select password from users where username = '"+username+"' allow filtering";
+     var session = req.session;
+     var sessId = req.session.id;
+     req.session.username = username;
+     req.session.uniqueId = sessId;
+     var authUser = "select password from users where username = '"+ req.session.username+"' allow filtering";
+     //console.log(req);
      dbConn.execute(authUser, function (err, result) {
       if(err) console.log(err);
       if (result.rows.length == 0)
@@ -31,8 +35,7 @@ exports.authenticateUser_Nineteen68 = function(req, res){
             for (var i = 0; i < result.rows.length; i++) {
                   dbHashedPassword = result.rows[i].password;
             }
-              var validUser = passwordHash.verify(password,dbHashedPassword);
-            //var validUser = bcrypt.compareSync(password, dbHashedPassword);         // true
+            var validUser = bcrypt.compareSync(password, dbHashedPassword);         // true
             if(validUser == true)
             {
                flag = 'validCredential';

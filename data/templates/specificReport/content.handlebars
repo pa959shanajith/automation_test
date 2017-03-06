@@ -1,0 +1,217 @@
+<html>
+    <head>
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <title>SLK Nineteen68</title>
+        <script type="text/javascript" src="{#asset jquery.min.js @encoding=link}"></script>
+        <style>
+            .mainContainer{ border: 1px solid #B5AAAA; margin: 4px; float: left; padding: 14px; width: 97%; height: 95%;}
+            .hearderCon{position: relative; width: 100%; float: left; border: 1px solid #cfcfcf; background: linear-gradient(to bottom, #FFFFFF 0%, #E6E6E6 100%); height: 50px; margin-bottom: 10px;border-radius: 5px; font-size: 16px;}
+            .headerRepDetails{ width: 50%; padding: 3px 40px;}
+            .headerRepDetails label{ text-align: right; width: 29%; font-size: 13px;}
+            .headerRepDetails span{ width: 64%; padding-bottom: 5px; font-weight: bold; font-size: 13px;}
+            .h2Header{ position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);}
+            .leftSummary{width: 50%; float: left; padding: 25px 0;}
+            .leftSummary label{
+                text-align: right;
+                float: left;
+                width: 29%;
+                padding-right: 5px;
+                padding-bottom: 5px;
+                font-size: 13px;
+            }
+            .leftSummary span{
+                float: left;
+                width: 64%;
+                padding-bottom: 5px;
+                font-weight: bold;
+                font-size: 13px;
+            }
+            .summaryCon{position: relative; float: left; width: 100%; border: 1px solid #cfcfcf; background: linear-gradient(to bottom, #FFFFFF 0%, #E6E6E6 100%); height: 30px;}
+            .summaryCon span{position: absolute; top: 5px; left: 40px;}
+            .midContainer{
+                border-collapse: collapse;
+                border: 1px solid #cfcfcf;
+                width: 100%;
+                font: 14px cabin_Regular;
+                float: left;
+                margin: 1% 0;
+            }
+            .midContainer td{padding-top: 5px; border: 1px solid #cfcfcf;}
+            .midContainer td label{
+                text-align: right;
+                float: left;
+                width: 29%;
+                padding-right: 5px;
+                padding-bottom: 5px;
+                font-size: 13px;
+            }
+            .reportsDetails{border: 1px solid #cfcfcf; background: linear-gradient(to bottom, #FFFFFF 0%, #E6E6E6 100%); height: 50px;}
+            .reportsDetails th:nth-child(1), .rDid{width: 5%;}
+            .reportsDetails th:nth-child(2), .rDstep{width: 10%;}
+            .reportsDetails th:nth-child(3), .rDstepDes{width: 50%;}
+            .reportsDetails th:nth-child(4), .rDstatus{width: 10%;}
+            .reportsDetails th:nth-child(5), .rDellaps{width: 12%;}
+            .reportsDetails th:nth-child(6), .rDcomments{width: 13%;}
+            .maintabCont{float: left; width: 100%; border: 1px solid #dcdcdc;}
+            .tabCont{display: table-cell; border-bottom: 1px solid #ececec;}
+            .reportsDetail{line-height: 2; text-align: center; height:425px; overflow: auto;}
+            .rDstepDes{text-align: left; word-break: break-word;}
+            .progress {
+                margin-bottom: 20px;
+                overflow: hidden;
+                box-shadow: inset 0 1px 2px rgba(0,0,0,.1);
+            }
+            .progress-bar {
+                float: left;
+                height: 100%;
+                font-size: 12px;
+                line-height: 20px;
+                color: #fff;
+                text-align: center;
+                box-shadow: inset 0 -1px 0 rgba(0,0,0,.15);
+                transition: width .6s ease;
+            }
+            .reportStatusBlk {
+                float: left;
+                width: 100%;
+            }
+            .progresslabel {
+                float: left;
+                display: inline-block;
+                width: 20%;
+                padding-left: 14px;
+            }
+            .customprogress{
+                float: left;
+                width: 45% !important;
+                height: 12px;
+                border-radius: 8px;
+                margin-top: 3px;
+                background-color: #e0e0e0;
+            }
+            .customprogress .progress-bar {
+                border-radius: 20px;
+            }
+            .progress-bar-success {
+                background: linear-gradient(to right, #39b54a, #009444) !important;
+            }
+            .progress-bar-danger {
+                background: linear-gradient(to right, #d41e2d, #b31f2d) !important;
+            }
+            .progresspercentage{margin-left: 20px;}
+            .rightSummaryFunc{
+                    width: 50%;
+                    float: left;
+                    margin-top: 80px;
+                    font-size: 14px;
+            }
+            .progress-bar-warning {
+                background: linear-gradient(to right, #f7b91e, #faa536) !important;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="mainContainer">
+            {{#each overallstatus}}
+            <div class="hearderCon" >
+                <div class="headerRepDetails">
+                    <label>Generated Report Date:</label><span>{{date}}</span>
+                </div>
+                <div class="headerRepDetails">
+                    <label>Generated Report Time:</label><span>{{time}}</span>
+                </div>
+                <div class="h2Header">
+                    <h2>SLK Nineteen68 Execution Reports</h2>
+                </div>
+            </div>
+            <div class="summaryCon">
+                <span>Result Summary</span>
+            </div>
+            <div style="width: 100%;">
+                <div class="leftSummary">
+                    <label>Senario:</label><span>{{scenarioName}}</span>
+                    <label>Project:</label><span>{{projectName}}</span>
+                    <label>Cycle:</label><span>{{cycleName}}</span>
+                    <label>Domain:</label><span>{{domainName}}</span>
+                    <label>Release:</label><span>{{releaseName}}</span>
+                    <label>Browser Type:</label><span>{{browserType}}</span>
+                    <label>Browser Version:</label><span>{{browserVersion}}</span>
+                </div>
+                <div id="rightSummaryFunc" class="rightSummaryFunc">
+                    <div class="reportStatus">				
+            			<div class="reportStatusBlk">
+            				<span class="progresslabel">Pass</span>
+            				<div class="progress customprogress">
+            					<span class="progress-bar progress-bar-success" style="width: {{pass}}%" role="progressbar"></span>
+            				</div>
+            				<span class="progresspercentage">{{pass}}%</span>
+            			</div>
+            			<div class="reportStatusBlk">
+            				<span class="progresslabel">Fail</span>
+            				<div class="progress customprogress">
+            					<span class="progress-bar progress-bar-danger" style="width: {{fail}}%" role="progressbar"></span>
+            				</div>
+            				<span class="progresspercentage">{{fail}}%</span>
+            			</div>	
+            			<div class="reportStatusBlk">
+            				<span class="progresslabel">Terminated</span>
+            				<div class="progress customprogress">
+            					<span class="progress-bar progress-bar-warning" style="width: {{terminate}}%" role="progressbar"></span>
+            			    </div>
+            			    <span class="progresspercentage">{{terminate}}%</span>
+            			</div>
+            		</div>
+                </div>
+            </div>
+            <div style="margin-top: 280px;">
+                <table cellpadding="3" cellspacing="0" class="midContainer" id="staustable">
+                    <tbody>
+                        <tr>
+                            <td>
+                                <label>Start Date and Time :</label><span id="startTime">{{StartTime}}</span>
+                            </td>
+                            <td rowspan="3">
+                                <label>Status :</label><span id="overAllStat"><span style="color:Green;"></span>{{overAllStatus}}</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label>End Date and Time :</label><span id="endTime">{{EndTime}}</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <label>Elapsed Time:</label><span id="elapsedTime">{{EllapsedTime}}</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            {{/each}}
+            <div class="maintabCont">
+                <table style="width: 100%;">
+                    <thead class="reportsDetails">
+                        <th>Sl No.</th>
+                        <th>Test Step No.</th>
+                        <th>Test Step Description</th>
+                        <th>Status</th>
+                        <th>Elapsed Time</th>
+                        <th>Comments</th>
+                    </thead>
+                </table>
+                <div class="reportsDetail">
+                    {{#each rows}}
+                    <div style="width: 100%; display: table;">
+                        <div class="rDid tabCont">{{id}}</div>
+                        <div class="rDstep tabCont">{{Step}}</div>
+                        <div class="rDstepDes tabCont" style="padding-left: 10px;">{{StepDescription}}</div>
+                        <div class="rDstatus tabCont" style="padding-left: 10px;">{{status}}</div>
+                        <div class="rDellaps tabCont" style="padding-left: 21px;">{{EllapsedTime}}</div>
+                        <div class="rDcomments tabCont" style="padding-left: 10px;">{{Comments}}</div>
+                    </div>
+                    {{/each}}
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

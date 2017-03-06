@@ -4,13 +4,22 @@ var server = require('http').createServer(app);
 var io = require('socket.io')(server);
 var bodyParser = require('body-parser');
 var morgan = require('morgan');
-
-
+var sessions = require('express-session')
+var cookieParser = require('cookie-parser');
+var errorhandler = require('errorhandler');
+var cmd = require('node-cmd');
 module.exports = app;
 app.use(bodyParser.json({limit: '5mb'}));
 app.use(bodyParser.urlencoded({limit: '5mb', extended: true}));
 app.use(morgan('combined'))
-
+app.use(cookieParser());
+app.use(sessions({
+	secret: '$^%EDE%^tfd65e7ufyCYDR^%IU',
+	resave: false,
+	rolling: true,
+	saveUninitialized: false,
+	cookie: { maxAge: (30*60*1000) }
+}));
 //write stream for logs
 //var accessLogStream = fs.createWriteStream(__dirname + '/access.log', {flags: 'a'})
 
@@ -34,13 +43,28 @@ app.get('/partials/:name', function(req, res){
 	res.sendFile(__dirname + "/public/partials/"+ req.params.name); //To render partials
 });
 app.get('*', function(req, res){
-	// console.log("*--------",req);
-	res.sendFile("index.html", { root: __dirname + "/public/" });
+	if(req.cookies['connect.sid'] && req.cookies['connect.sid'] != undefined)
+	{
+		res.sendFile("index.html", { root: __dirname + "/public/" });
+	}
+	else{
+		req.session.destroy(); //Clear Session
+		res.status(200).send('<br><br>Your session has been expired. Please <a href="/">Login</a> Again');
+	}
 });
 app.post('/designTestCase', function(req, res){
 	// console.log("*--------",req);
 	res.sendFile("index.html", { root: __dirname + "/public/" });
 });
+cmd.get('node index.js',
+		function(data, err, stderr){
+		    if (!err) {
+		       console.log('the node-cmd:',data)
+		    } else {
+		       console.log('error', err)
+		    }
+		}
+);
 
 //Route Directories
 var login = require('./server/controllers/login');
@@ -78,16 +102,15 @@ app.post('/ExecuteTestSuite_ICE', suite.ExecuteTestSuite_ICE);
 app.post('/getAllSuites_ICE', report.getAllSuites_ICE);
 app.post('/getSuiteDetailsInExecution_ICE', report.getSuiteDetailsInExecution_ICE);
 app.post('/reportStatusScenarios_ICE', report.reportStatusScenarios_ICE);
-
+app.post('/renderReport_ICE', report.renderReport_ICE);
+app.post('/getMainReport_ICE', report.getMainReport_ICE);
+app.post('/getReport_Nineteen68', report.getReport_Nineteen68);
 //Generic Routes
 app.post('/getProjectDetails_ICE', header.getProjectDetails_ICE);
-
-
-
-
-
-
+//Logout Routes
+app.post('/logoutUser_Nineteen68',header.logoutUser_Nineteen68);
 //-------------SERVER START------------//
+
 server.listen(3000);  
 
 //SOCKET CONNECTION USING SOCKET.IO
@@ -110,8 +133,6 @@ io.on('connection', function (socket) {
 	});
 
 	allSockets.push(socket);
-
-
 	allClients.push(socket.conn.id)
 	module.exports.abc = allSockets;
 
@@ -130,3 +151,6 @@ io.on('connection', function (socket) {
 
 });
 //SOCKET CONNECTION USING SOCKET.IO
+
+//Error Handler
+app.use(errorhandler)

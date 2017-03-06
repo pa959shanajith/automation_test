@@ -9,26 +9,54 @@ var uuid = require('uuid-random');
 var dbConnICE = require('../../server/config/icetestautomation');
 var async = require('async');
 
-// exports.renderReport_ICE = function(req, res){
-// 	//var templateName = req.body.templateName;
-// 	myserver.jsreport.render({
-// 		template: {
-// 			name: myserver.fs.readFileSync('./public/partials/Reports.html').toString(),
-// 			recipe: 'html',
-// 			engine: 'none'
-// 		}
-// 	}).then(function(o) {
-// 		o.result.pipe(res)
-// 	}).catch(function(e) {
-// 		console.error(e)
-// 	})
-// }
+exports.getMainReport_ICE = function(req, res){
+	var client = require("jsreport-client")("http://localhost:3001/");
+	client.render({
+	    template: { 
+	    	shortid: "HJP1pqMcg", 
+	    	recipe: "html",
+	        engine: "none" 
+	    }
+	}, function(err, response) {
+		if (err) {
+			console.log('error when trying to render report:', err);
+		}
+		else{
+			response.pipe(res);
+			//res.end()
+		}
+	});
+}
+
+exports.renderReport_ICE = function(req, res){
+	var finalReports = req.body.finalreports;
+	var reportType = req.body.reporttype;
+	var client = require("jsreport-client")("http://localhost:3001/");
+	client.render({
+	    template: { 
+	    	shortid: "rkE973-5l", 
+	    	recipe: reportType,
+	        engine: "handlebars" },
+	    data: {
+	    	"overallstatus": finalReports.overallstatus,
+	    	"rows": finalReports.rows
+	    }
+	}, function(err, response) {
+		if (err) {
+			console.log('error when trying to render report:', err);
+		}
+		else{
+			response.pipe(res);
+			//res.end()
+		}
+	});
+}
 
 exports.getAllSuites_ICE = function (req, res) {
 	console.log("coming into getAllSuites_ICE service")
 	var req_userId=req.body.userId;
 	//req_userId = 'a144b468-e84f-4e7c-9a8a-0a658330212e';
-	var getDomain="SELECT domainid FROM permissions WHERE userid="+req_userId+";";
+	var getDomain="SELECT domainid FROM icepermissions WHERE userid="+req_userId+";";
 	var testSuiteDetails=[];
 	async.series(
 			{	domainAssignedWithUserID: function(callback){
@@ -106,7 +134,7 @@ exports.getAllSuites_ICE = function (req, res) {
 
 exports.getSuiteDetailsInExecution_ICE = function (req, res) {
 	var req_testsuiteId=req.body.testsuiteid;
-	//var executionDetailsArray=[];
+	var startTime, endTime, starttime, endtime;
 	var executionDetailsJSON=[];
 	var getExecutionDetails="SELECT executionid,starttime,endtime FROM execution WHERE testsuiteid="
 		+ req_testsuiteId ;
@@ -116,10 +144,14 @@ exports.getSuiteDetailsInExecution_ICE = function (req, res) {
 			console.log(err);
 		}else{
 			for (var i = 0; i < executionData.rows.length; i++) {
+				startTime = executionData.rows[i].starttime;
+				endTime = executionData.rows[i].endtime;
+				starttime = startTime.getDate()+"-"+(startTime.getMonth()+1)+"-"+startTime.getFullYear()+" "+startTime.getHours()+":"+startTime.getMinutes();
+				endtime =  endTime.getDate()+"-"+(endTime.getMonth()+1)+"-"+endTime.getFullYear()+" "+endTime.getHours()+":"+endTime.getMinutes();
 				executionDetailsJSON.push({
-					execution_id :  executionData.rows[i].executionid ,
-					start_time: executionData.rows[i].starttime,
-					end_time: executionData.rows[i].endtime
+					execution_id :  executionData.rows[i].executionid,
+					start_time: starttime,
+					end_time: endtime
 				});
 				//executionDetailsArray.push(executionDetailsJSON);
 			}
@@ -144,6 +176,9 @@ exports.reportStatusScenarios_ICE = function (req, res) {
 				}else {
 					async.forEachSeries(result.rows, function(iterator, callback2) {
 						var executedtimeTemp = iterator.executedtime;
+						if(executedtimeTemp != null){
+							executedtimeTemp = executedtimeTemp.getDate()+"-"+(executedtimeTemp.getMonth()+1)+"-"+executedtimeTemp.getFullYear()+" "+executedtimeTemp.getHours()+":"+executedtimeTemp.getMinutes();
+						}						
 						var browserTemp = iterator.browser;
 						var statusTemp = iterator.status;
 						var reportidTemp = iterator.reportid;
@@ -215,7 +250,162 @@ exports.getReport = function (req, res) {
 	})
 }
 
+exports.getReport_Nineteen68 = function(req, res) {
+	var reportId = req.body.reportId;
+	var testsuiteId = req.body.testsuiteId;
+	var reportInfoObj = {};
+	var reportjson = {};
+	async.series({
+		projectsUnderDomain: function(callback) {
+			var getReportQuery = "select report,executedtime,testscenarioid from reports where reportid=" +
+			reportId + " ALLOW FILTERING";
+			dbConnICE.execute(getReportQuery, function(err, reportResult) {
+				if (err) {
+					console.log(err);
+				} else {
+					var reportres = reportResult.rows.length;          
+					async.forEachSeries(reportResult.rows, function(iterator, callback1) {
+						var reportdata = iterator.report;
+						var executedtime = iterator.executedtime;
+						var testscenarioid = iterator.testscenarioid;
+						reportjson.reportdata = reportdata;
+						reportInfoObj.reportId = reportId;
+						reportInfoObj.executedtime = executedtime;
+						reportInfoObj.testscenarioid = testscenarioid;
+						var getReportQuery2 = "select testscenarioname,projectid from testscenarios where testscenarioid=" + testscenarioid + " ALLOW FILTERING";
+						dbConnICE.execute(getReportQuery2, function(err, scenarioResult) {
+							if (err) {
+								console.log(err);
+							} else {
+								async.forEachSeries(scenarioResult.rows, function(sceiditr, callback2) {
 
+									var testscenarioname = sceiditr.testscenarioname;
+									var projectid = sceiditr.projectid;
+									reportInfoObj.testscenarioname = testscenarioname;
+									reportInfoObj.projectid = projectid;
+									var getReportQuery3 = "select testscenarioids,cycleid from testsuites ";
+									dbConnICE.execute(getReportQuery3, function(err, suiteResult) {
+										if (err) {
+											console.log(err);
+										} else {
+											// var   testscenarioids=[];
+											async.forEachSeries(suiteResult.rows, function(suiteiditr, callback3) {
+												// count=0;
+												console.log('suiteResult.rows', suiteResult.rows.length);
+												testscenarioids12 = suiteiditr.testscenarioids;
+												if (testscenarioids12 != null) {
+													for (var i = 0; i < testscenarioids12.length; i++) {
+														if (testscenarioids12[i].toString() == testscenarioid.toString()) {
+															cycleid = suiteiditr.cycleid;
+															reportInfoObj.cycleid = cycleid;
+															break;
+														}
+													}
+												}
+												//   callback3();
+												var cycledetails = "select cyclename,releaseid from cycles";
+												dbConnICE.execute(cycledetails, function(err, cycleResult) {
+													if (err) {
+														console.log(err);
+													} else {
+														async.forEachSeries(cycleResult.rows, function(cycleiditr, callback4) {
+															var cyclename = cycleiditr.cyclename;
+															var releaseid = cycleiditr.releaseid;
+															reportInfoObj.cyclename = cyclename;
+															reportInfoObj.releaseid = releaseid;
+															console.log('final reportInfoObj', reportInfoObj);
+															// callback4();
+															var releasedetails = "select releasename,projectid from releases where releaseid=" + releaseid + " ALLOW FILTERING";
+															dbConnICE.execute(releasedetails, function(err, releaseResult) {
+																if (err) {
+																	console.log(err);
+																} else {
+																	async.forEachSeries(releaseResult.rows, function(reliditr, callback5) {
+																		var releasename = reliditr.releasename;
+																		var projectid = reliditr.projectid;
+																		reportInfoObj.releasename = releasename;
+																		reportInfoObj.projectid = projectid;
+																		console.log('final reportInfoObj in release deatails', reportInfoObj);
+
+																		var projectdeatils = "select projectname,domainid from projects where projectid=" + projectid + " ALLOW FILTERING";
+																		dbConnICE.execute(projectdeatils, function(err, projectResult) {
+																			if (err) {
+																				console.log(err);
+																			} else {
+																				async.forEachSeries(projectResult.rows, function(proiditr, callback6) {
+
+																					var projectname = proiditr.projectname;
+																					var domainid = proiditr.domainid;
+																					reportInfoObj.projectname = projectname;
+																					reportInfoObj.domainid = domainid;
+																					console.log('final reportInfoObj in project deatails', reportInfoObj);
+
+																					var domaindetails = "select domainname from domains where domainid=" + domainid + " ALLOW FILTERING";
+																					dbConnICE.execute(domaindetails, function(err, domainResult) {
+																						if (err) {
+																							console.log(err);
+																						} else {
+																							async.forEachSeries(domainResult.rows, function(domainiditr, callback7) {
+																								var domainname = domainiditr.domainname;
+																								reportInfoObj.domainname = domainname;
+																								console.log('final reportInfoObj in domain deatails', reportInfoObj);
+																								callback7();
+																							}, callback6);
+																						}
+
+
+																					});
+																				}, callback5);
+																			}
+																		});
+																	}, callback4);
+
+																}
+
+															});
+
+														}, callback3);
+													}
+
+
+												});
+											}, callback2);
+
+										}
+									});
+
+
+								}, callback1);
+
+							}
+
+						});
+					}, callback);
+				}
+
+			});
+
+			//adding false check paran
+			// }
+
+		}
+
+	},
+	function(err, results) {
+		// data.setHeader('Content-Type','application/json');
+		if (err) {
+			console.log(err);
+			cb(err);
+		} else {
+			console.log('in last function');
+			var finalReport = [];
+			finalReport.push(reportInfoObj);
+			finalReport.push(reportjson)
+			res.send(finalReport);
+		}
+	}
+	);
+};
 
 // serviceController.createStructure= {
 // 		handler: function(req, reply) {

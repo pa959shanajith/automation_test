@@ -8,8 +8,8 @@ var Joi = require('joi');
 var dbConn = require('../../server/config/cassandra');
 var cassandra = require('cassandra-driver');
 var uuid = require('uuid-random');
-var passwordHash = require('password-hash');
-//var bcrypt = require('bcrypt');
+//var passwordHash = require('password-hash');
+var bcrypt = require('bcrypt');
 
 var roles = [];
 var r_ids = [];
@@ -20,7 +20,7 @@ exports.getUserRoles_Nineteen68 = function(req, res){
    var getUserRoles = "select roleid, rolename from roles";
         dbConn.execute(getUserRoles, function (err, result) {
             if (err) {
-                cb(null, err);
+                 res.send(err);
             }
             else {
                 for (var i = 0; i < result.rows.length; i++) {
@@ -45,9 +45,8 @@ exports.createUser_Nineteen68 = function(req, res){
         var req_ldapuser = req.body.ldapUser;
         var req_defaultRole = req.body.role;
         var req_email_id = req.body.email;
-        //var salt = bcrypt.genSaltSync(10);
-        var validUser = passwordHash.verify(password,dbHashedPassword)
-        //var req_hashedPassword = bcrypt.hashSync(req_password, salt);
+        var salt = bcrypt.genSaltSync(10);
+        var req_hashedPassword = bcrypt.hashSync(req_password, salt);
         
         var getUsername = "SELECT username FROM users";
         dbConn.execute(getUsername, function (err, userNameresult) {

@@ -52,10 +52,13 @@ mySPA.config(function($routeProvider, $locationProvider,$provide) {
 			 	templateUrl: 'partials/Reports.html',
 			 	controller: 'reportsController'
 			})
-			/*.when('/specificreports',{
-				templateUrl:	'partials/specificreports.html',
+			.when('/Reports', 
+			{
+			 	controller: 'reportsController'
+			})
+			.when('/specificreports',{
 				controller:		'reportsController'
-			})*/
+			})
 			.otherwise({redirectTo: '/'});
 	
 	//$locationProvider.html5Mode(true);      //to remove angular hash(#) in the url

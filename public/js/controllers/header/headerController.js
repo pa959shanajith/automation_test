@@ -25,16 +25,17 @@ mySPA.controller('headerController', function($scope,$http,$location,headerServi
 				$scope.projectDetails = data;
 			}, function(error) {	console.log("Failed to fetch projectInfo")});
 	 }
-		  
 	 $scope.logout = function() 
 	 {
-	     window.localStorage.clear();
-	     window.location.href = '/';
 	     //Logout User Service to be called
-	    //   headerServices.logoutUser 
-	    //   .then(function(data){
-	          
-	    //   }, function(error) {	console.log("Failed to Logout")});
+	      headerServices.logoutUser_Nineteen68() 
+	      .then(function(data){
+			  if(data == "Session Expired")
+			  {
+				    window.localStorage.clear();
+			         window.location.href = '/';
+			  }
+	      }, function(error) {	console.log("Failed to Logout")});
 	 }
 });
 
