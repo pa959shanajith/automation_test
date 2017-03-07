@@ -224,6 +224,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		testcaseID.push(taskInfo.testCaseId);
 		var browserType = [];
 		browserType.push(selectedBrowserType)
+		if(appType == "mobileweb") browserType = [];
 		globalSelectedBrowserType = selectedBrowserType;
 		if(jQuery("#addDependent").is(":checked"))	triggerPopUp();
 
@@ -729,6 +730,12 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				$(document).find("#mobilityAPKPath, #mobilitySerialPath").removeClass("inputErrorBorder");
 				$(".androidIcon").removeClass("androidIconActive")
 			}
+			else if($scope.getScreenView == "mobileweb"){
+				$("#launchMobilityWeb").modal("show")
+				$(document).find("#mobilityWebSerialNo, #mobilityAndroidVersion").val('')
+				$(document).find("#mobilityWebSerialNo, #mobilityAndroidVersion").removeClass("inputErrorBorder");
+				$(".androidIcon").removeClass("androidIconActive")
+			}
 		}
 	}
 	//Initialization for apptype(Desktop, Mobility, OEBS) to redirect on initScraping function
@@ -879,7 +886,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 	
 	
 	//Mobile Serial Number Keyup Function
-	$("#mobilitySerialPath").on("keyup", function(){
+	$("#mobilitySerialPath, #mobilityWebSerialNo").on("keyup", function(){
 		if($(this).val() != "") $(".androidIcon").addClass("androidIconActive")
 		else $(".androidIcon").removeClass("androidIconActive")
 	})
@@ -897,6 +904,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			$(document).find("#desktopPath").removeClass("inputErrorBorder");
 			$(document).find("#OEBSPath").removeClass("inputErrorBorder");
 			$(document).find("#mobilityAPKPath, #mobilitySerialPath").removeClass("inputErrorBorder");
+			$(document).find("#mobilityWebSerialNo, #mobilityAndroidVersion").removeClass("inputErrorBorder");
 			//For Desktop
 			if($scope.getScreenView == "Desktop"){
 				if($(document).find("#desktopPath").val() == "") {
@@ -933,6 +941,27 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				}
 			}
 			//For Mobility
+			
+			//For Mobility Web
+			else if($scope.getScreenView == "mobileweb"){
+				if($(document).find("#mobilityWebSerialNo").val() == ""){
+					$(document).find("#mobilityWebSerialNo").addClass("inputErrorBorder")
+					return false
+				}
+				else if($(document).find("#mobilityAndroidVersion").val() == ""){
+					$(document).find("#mobilityAndroidVersion").addClass("inputErrorBorder")
+					return false
+				}
+				else{
+					$(document).find("#mobilityWebSerialNo, #mobilityAndroidVersion").removeClass("inputErrorBorder")
+					screenViewObject.appType = $scope.getScreenView,
+					screenViewObject.mobileSerial = $(document).find("#mobilityWebSerialNo").val();
+					screenViewObject.androidVersion = $(document).find("#mobilityAndroidVersion").val();
+					$("#launchMobilityWeb").modal("hide");
+					blockUI(blockMsg);
+				}
+			}
+			//For Mobility Web
 			
 			//For OEBS
 			else if($scope.getScreenView == "DesktopJava"){
@@ -3241,6 +3270,11 @@ function getTags(data) {
 			obnames.push("@Generic");
 			obnames.push("@Mobile");
 			obnames.push("@Action");
+		}
+		else if(appTypeLocal == "mobileweb")	{
+			obnames.push("@Generic");
+			obnames.push("@Browser");
+			//obnames.push("@Custom");
 		}
 		else if(appTypeLocal == "MobilityiOS")	{
 			obnames.push("@Generic");

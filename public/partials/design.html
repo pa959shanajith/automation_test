@@ -49,6 +49,16 @@
 			</div>
 			<!-- Apptype Mobilty -->
 			
+			<!-- Apptype Mobilty -->
+			<div ng-if="getScreenView == 'mobileweb'" id="left-top-section" class="ApptypeScreenView">
+				<ul>
+					<li><span><a class='scrapeOnTxt'>Scrape On</a></span></li>
+					<li><a href='#' ng-class="enbledChecked ? 'enableActions' : 'disableActions'" data-toggle="modal" ng-click="initScrape($event); $event.preventDefault(); $event.stopPropagation();"><span><img src='imgs/ic-mobility.png' alt='Mobile Web' /></span>Android Web</a></li>
+					<li class="last"><span style="margin-bottom:-5px"><input ng-model="enbledChecked" id="enableAppend" type='checkbox' value=""></span><label for="enableAppend">Append</label></li>
+				</ul>
+			</div>
+			<!-- Apptype Mobilty -->
+			
 			<!-- Apptype Webservice -->
 			<div style="border-bottom:0" ng-if="getScreenView == 'Webservice'" id="left-top-section" class="ApptypeScreenView">
 				<ul>
@@ -506,7 +516,31 @@
 			</div>
 		</div>
 	</div>
-	<!-- Mobility Launch Popup -->
+	<!-- Mobility App Launch Popup -->
+	
+	<!-- Mobility Web Launch Popup -->
+	<div class="modal fade" id="launchMobilityWeb" role="dialog" data-keyboard="false" data-backdrop="static">
+		<div class="modal-dialog modal-md">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal">&times;</button>
+					<h4 class="modal-title">Launch Application</h4>
+				</div>
+				<div class="modal-body">
+					<div class="leftAlign">
+						<p><input class='launchPopupInput form-control' type='text' placeholder='Enter mobile serial number' id='mobilityWebSerialNo'/></p>
+						<p><input class='launchPopupInput form-control' type='text' placeholder='Enter Android Version' id='mobilityAndroidVersion'/></p>
+					</div>
+					
+					<div class="rightAlign"><span class="androidIcon"></span></div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default btn-default-modal" ng-click="initScraping($event)">Launch</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- Mobility Web Launch Popup -->
 	
 	<!-- Save WebService Template Success  -->
 	<div class="modal fade" id="WSSaveSuccess" role="dialog" data-keyboard="false" data-backdrop="static">
