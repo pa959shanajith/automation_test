@@ -37,6 +37,11 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 	
 	//Global Information
 	
+	//Getting Apptype or Screen Type
+	//console.log(appType);
+	$scope.getScreenView = appType
+	//Getting Apptype orScreen Type
+	
 	//Onload ServiceCall
 	$timeout(function(){
 		angular.element(document.getElementById("left-nav-section")).scope().readTestSuite_ICE();

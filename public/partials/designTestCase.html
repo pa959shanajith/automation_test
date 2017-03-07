@@ -7,7 +7,7 @@
 	<!--Left Panel-->
 	<div id="left-nav-section">
 		<div class="scrollbar-macosx">
-			<div id="left-top-section">
+			<div id="left-top-section" ng-if="getScreenView == 'Web' || getScreenView == 'Desktop' || getScreenView == 'Mobility' || getScreenView == 'Webservice'">
 				<ul>
 					<li><span><a class='scrapeOnTxt'>Debug On</a></span></li>
 					<li><a href='#' ng-click="debugTestCase_ICE('3');" title="Debug on Internet Explorer"><span><img src='imgs/ic-ie.png' alt='Internet Explorer' /></span>Internet Explorer</a></li>
@@ -16,9 +16,17 @@
 					<li class="last"><span style="margin-bottom:-5px"><input id="addDependent" type='checkbox' value="" disabled></span><label for="addDependent">Add Dependent Test Cases</label></li>
 				</ul>
 			</div>
-
+			
+			<div id="left-top-section" ng-if="getScreenView == 'mobileweb'" class="ApptypeScreenView">
+				<ul>
+					<li><span><a class='scrapeOnTxt'>Debug On</a></span></li>
+					<li><a href='#' ng-click="debugTestCase_ICE();" title="Debug on Chrome"><span><img src='imgs/ic-chrome.png' alt='Google Chrome' /></span>Google Chrome</a></li>
+					<li class="last"><span style="margin-bottom:-5px"><input id="addDependent" type='checkbox' value="" disabled></span><label for="addDependent">Add Dependent Test Cases</label></li>
+				</ul>
+			</div>
+			
 			<div class='clear-both'></div>
-
+			
 			<div id="left-bottom-section">
 				<ul>
 					<li><a href='#' ng-click="importTestCase()"><span><img src='imgs/ic-import-script.png' alt='Import TestScript' /></span>Import Test Case</a><input style="visibility: hidden;" type="file" id="importTestCaseFile" accept=".json"></li>

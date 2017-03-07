@@ -79,6 +79,19 @@ exports.initScraping_ICE = function (req, res) {
 						res.send(data);
 		});
 	}
+	else if(req.body.screenViewObject.appType == "mobileweb"){
+		console.log(req.body.screenViewObject)
+		var mobileSerial = req.body.screenViewObject.mobileSerial;
+        var androidVersion = req.body.screenViewObject.androidVersion;
+        var data = "LAUNCH_MOBILE_WEB";
+		var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+		var mySocket = myserver.allSocketsMap[ip];
+		mySocket._events.scrape = [];                                                                                                  
+		mySocket.emit("LAUNCH_MOBILE_WEB", mobileSerial, androidVersion);
+		mySocket.on('scrape', function (data) {
+						res.send(data);
+		});
+	}
 	else{	
 		var browserType = req.body.screenViewObject.browserType;
 			if (browserType == "chrome") {

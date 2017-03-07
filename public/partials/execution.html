@@ -7,12 +7,19 @@
 	<!--Left Panel-->
 	<div id="left-nav-section">
 		<div class="scrollbar-macosx">
-			<div id="left-top-section">
+			<div id="left-top-section" ng-if="getScreenView == 'Web' || getScreenView == 'Desktop' || getScreenView == 'Mobility' || getScreenView == 'Webservice'">
 				<ul>
 					<li><span><a class='scrapeOnTxt'>Execute On</a></span></li>
 					<li><a class="selectBrowser" data-name="3"><span><img src='imgs/ic-ie.png' alt='Internet Explorer' /></span>Internet Explorer</a></li>
 					<li><a class="selectBrowser" data-name="1"><span><img src='imgs/ic-chrome.png' alt='Google Chrome' /></span>Google Chrome</a></li>
 					<li style="margin-bottom: 30px"><a class="selectBrowser" data-name="2"><span><img src='imgs/ic-mozilla.png' alt='Mozilla Firefox' /></span>Mozilla Firefox</a></li>
+				</ul>
+			</div>
+			
+			<div id="left-top-section" ng-if="getScreenView == 'mobileweb'" class="ApptypeScreenView">
+				<ul>
+					<li><span><a class='scrapeOnTxt'>Execute On</a></span></li>
+					<li><a class="selectBrowser" data-name=""><span><img src='imgs/ic-chrome.png' alt='Google Chrome' /></span>Google Chrome</a></li>
 				</ul>
 			</div>
 
