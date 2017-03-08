@@ -114,19 +114,19 @@
 			<!-- Middle -->
 			<div class="wsdlRow wsdlActions">
 				<div id="wsdlActionsButton">
-					<button ng-click="selectedWsdlTab = 'requestWrap'" class="btn btn-xs btn-xs-custom pull-left">Request</button>
-					<button ng-click="selectedWsdlTab = 'responseWrap'" class="btn btn-xs btn-xs-custom pull-left">Response</button>
+					<button ng-click="showWsdlRequest()" class="btn btn-xs btn-xs-custom pull-left">Request</button>
+					<button ng-click="showWsdlResponse()" class="btn btn-xs btn-xs-custom pull-left">Response</button>
 					<button ng-click="saveWS()" class="btn btn-xs btn-xs-custom pull-left saveWS">Save</button>
-					<input ng-model="endPointURL" type="text" class="endPointURL form-control pull-left" placeholder="End Point URL"/>
-					<select ng-model="wsdlMethods" class="form-control wsdlMethods pull-left">
-						<option value="HTTP Method">HTTP Method</option>
+					<input ng-model="endPointURL" id="endPointURL" type="text" class="endPointURL form-control pull-left" placeholder="End Point URL"/>
+					<select ng-model="wsdlMethods" id="wsdlMethods" class="form-control wsdlMethods pull-left">
+						<option value="HTTP Method" selected>HTTP Method</option>
 						<option value="GET">GET</option>
 						<option value="POST">POST</option>
 						<option value="HEAD">HEAD</option>
 						<option value="PUT">PUT</option>
 						<option value="DELETE">DELETE</option>
 					</select>
-					<input ng-model="wsdlOperation" type="text" class="wsdlOperation form-control pull-left" placeholder="Operation"/>
+					<input id="wsdlOperation" ng-model="wsdlOperation" type="text" class="wsdlOperation form-control pull-left" placeholder="Operation"/>
 					<button style="padding: 2px 25px" class="btn btn-md pull-right">Add</button>
 				</div>
 			</div>
@@ -135,14 +135,14 @@
 			<!-- Bottom -->
 			<div class="wsdlRow wsdlRqstRspns">
 				<!-- requestWrap -->
-				<div id="wsdlRequest" class="wsdlRqstRspnsWrap" ng-if="selectedWsdlTab == 'requestWrap'">
+				<div id="wsdlRequest" class="wsdlRqstRspnsWrap wsdlRqstWrap">
 					<textarea id="wsdlRequestHeader" class="wsdlTextAreaHeader" placeholder="Request Header"></textarea>
 					<textarea id="wsdlRequestBody" class="wsdlTextAreaBody" placeholder="Request Body"></textarea>
 				</div>
 				<!-- requestWrap -->
 				
 				<!-- responseWrap -->
-				<div id="wsdlResponse" class="wsdlRqstRspnsWrap" ng-if="selectedWsdlTab == 'responseWrap'">
+				<div id="wsdlResponse" class="wsdlRqstRspnsWrap wsdlRspnsWrap">
 					<textarea id="wsdlResponseHeader" class="wsdlTextAreaHeader" placeholder="Response Header"></textarea>
 					<textarea id="wsdlResponseBody" class="wsdlTextAreaBody" placeholder="Response Body"></textarea>
 				</div>
