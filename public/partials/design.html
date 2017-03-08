@@ -74,7 +74,7 @@
 			<div ng-class="getScreenView == 'Webservice' ? 'hideContainer' : 'showContainer'" id="left-bottom-section">
 				<ul>
 					<li><a ng-click="addObj()" href='#'><span><img src='imgs/ic-addobject.png' alt='Add Object' /></span>Add Object</a></li>
-					<li><a data-toggle="modal" data-target="#dialog-mapObject" href='#'><span><img src='imgs/ic-mapobject.png' alt='Map Object' /></span>Map Object</a></li>
+					<li><a ng-click="generateMapObj()" href='#'><span><img src='imgs/ic-mapobject.png' alt='Map Object' /></span>Map Object</a></li>
 				</ul>
 			</div>
 		</div>
@@ -114,19 +114,19 @@
 			<!-- Middle -->
 			<div class="wsdlRow wsdlActions">
 				<div id="wsdlActionsButton">
-					<button ng-click="selectedWsdlTab = 'requestWrap'" class="btn btn-xs btn-xs-custom pull-left">Request</button>
-					<button ng-click="selectedWsdlTab = 'responseWrap'" class="btn btn-xs btn-xs-custom pull-left">Response</button>
+					<button ng-click="showWsdlRequest()" class="btn btn-xs btn-xs-custom pull-left">Request</button>
+					<button ng-click="showWsdlResponse()" class="btn btn-xs btn-xs-custom pull-left">Response</button>
 					<button ng-click="saveWS()" class="btn btn-xs btn-xs-custom pull-left saveWS">Save</button>
-					<input ng-model="endPointURL" type="text" class="endPointURL form-control pull-left" placeholder="End Point URL"/>
-					<select ng-model="wsdlMethods" class="form-control wsdlMethods pull-left">
-						<option value="HTTP Method">HTTP Method</option>
+					<input ng-model="endPointURL" id="endPointURL" type="text" class="endPointURL form-control pull-left" placeholder="End Point URL"/>
+					<select ng-model="wsdlMethods" id="wsdlMethods" class="form-control wsdlMethods pull-left">
+						<option value="HTTP Method" selected>HTTP Method</option>
 						<option value="GET">GET</option>
 						<option value="POST">POST</option>
 						<option value="HEAD">HEAD</option>
 						<option value="PUT">PUT</option>
 						<option value="DELETE">DELETE</option>
 					</select>
-					<input ng-model="wsdlOperation" type="text" class="wsdlOperation form-control pull-left" placeholder="Operation"/>
+					<input id="wsdlOperation" ng-model="wsdlOperation" type="text" class="wsdlOperation form-control pull-left" placeholder="Operation"/>
 					<button style="padding: 2px 25px" class="btn btn-md pull-right">Add</button>
 				</div>
 			</div>
@@ -135,14 +135,14 @@
 			<!-- Bottom -->
 			<div class="wsdlRow wsdlRqstRspns">
 				<!-- requestWrap -->
-				<div id="wsdlRequest" class="wsdlRqstRspnsWrap" ng-if="selectedWsdlTab == 'requestWrap'">
+				<div id="wsdlRequest" class="wsdlRqstRspnsWrap wsdlRqstWrap">
 					<textarea id="wsdlRequestHeader" class="wsdlTextAreaHeader" placeholder="Request Header"></textarea>
 					<textarea id="wsdlRequestBody" class="wsdlTextAreaBody" placeholder="Request Body"></textarea>
 				</div>
 				<!-- requestWrap -->
 				
 				<!-- responseWrap -->
-				<div id="wsdlResponse" class="wsdlRqstRspnsWrap" ng-if="selectedWsdlTab == 'responseWrap'">
+				<div id="wsdlResponse" class="wsdlRqstRspnsWrap wsdlRspnsWrap">
 					<textarea id="wsdlResponseHeader" class="wsdlTextAreaHeader" placeholder="Response Header"></textarea>
 					<textarea id="wsdlResponseBody" class="wsdlTextAreaBody" placeholder="Response Body"></textarea>
 				</div>
@@ -358,24 +358,104 @@
 	<!-- Add Object Successfull -->
 
 	<!-- Map Object -->
-	<div id="dialog-mapObject" class="modal fade" role="dialog" data-keyboard="false" data-backdrop="static">
-		<div class="modal-dialog">
+	<div id="dialog-mapObject" class="modal fade mapObjectModal" role="dialog" data-keyboard="false" data-backdrop="static">
+		<div class="modal-dialog" style="width: 700px">
 			<!-- Modal content-->
 			<div class="modal-content">
-			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal">&times;</button>
-				<h4 class="modal-title">Map Objects</h4>
-			</div>
-			<div class="modal-body">
-				<p>Some text in the modal.</p>
-			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-			</div>
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal">&times;</button>
+					<h4 class="modal-title">Map Object</h4>
+				</div>
+				<div class="modal-body">
+					<p class="labelAsHeading">Please select the objects to drag and drop</p>
+					
+					<!-- Left Scraped Object -->
+					<div id="leftScrapedObjects" class="mapObjContainer" style="width: 45%; margin-left: 30px; margin-right: 15%;">
+						<p class="labelAsHeading">Scraped Objects</p>
+						<!-- Data Appends Here -->
+						<ul id="scrapedObjforMap" class="scrollbar-inner ObjforMapScroll"></ul>
+						<!-- Data Appends Here -->
+					</div>
+					<!-- Left Scraped Object -->
+					
+					<!-- Right Custom Object -->
+					<div id="rightCustomObjects" class="mapObjContainer" style="width:30%">
+						<p class="labelAsHeading">Custom Objects</p>
+						<!-- Data Appends Here -->
+						<div id="customObjforMap"></div>
+						<!-- Data Appends Here -->
+					</div>
+					<!-- Right Custom Object -->
+				</div>
+				<div class="modal-footer">
+					<span class="error-msg-abs error-msg-abs3 ng-cloak submitObjectWarning">Please select atleast one object to Map</span>
+					<span class="error-msg-abs error-msg-abs3 ng-cloak noObjectToMap">Please add custom object to Map</span>
+					<span class="error-msg-abs error-msg-abs3 ng-cloak objectExistMap">Object already merged</span>
+					<button type="button" disabled class="btn btn-default unlinkButton" ng-click="unlinkMapObj()">Un-link</button>
+					<button type="button" class="btn btn-default" ng-click="submitMapObject()">Submit</button>
+				</div>
 			</div>
 		</div>
 	</div>
 	<!-- Map Object -->
+	
+	<!-- Map Object Successfull  -->
+	<div class="modal fade" id="mapObjSuccess" role="dialog" data-keyboard="false" data-backdrop="static">
+	  <div class="modal-dialog modal-sm">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal">&times;</button>
+	        <h4 class="modal-title">Map Object</h4>
+	      </div>
+	      <div class="modal-body">
+	        <p>Objects has been mapped successfully.</p>
+	      </div>
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-default" data-dismiss="modal">Ok</button>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+	<!-- Map Object Successfull  -->
+	
+	<!-- Map Object Tag MisMatch  -->
+	<div class="modal fade" id="mapObjTagMissMatch" role="dialog" data-keyboard="false" data-backdrop="static">
+	  <div class="modal-dialog modal-sm">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal">&times;</button>
+	        <h4 class="modal-title">Map Object</h4>
+	      </div>
+	      <div class="modal-body">
+	        <p>Failed to map objects.</p>
+	      </div>
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-default" data-dismiss="modal">Ok</button>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+	<!-- Map Object Tag MisMatch  -->
+	
+	<!-- Map Object Same Objects  -->
+	<div class="modal fade" id="mapObjSameObject" role="dialog" data-keyboard="false" data-backdrop="static">
+	  <div class="modal-dialog modal-sm">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal">&times;</button>
+	        <h4 class="modal-title">Map Object</h4>
+	      </div>
+	      <div class="modal-body">
+	        <p>Failed to map objects.</p>
+	      </div>
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-default" data-dismiss="modal">Ok</button>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+	<!-- Map Object Same Objects  -->
+	
     <!-- HiddenTagModal  -->
 	<div class="modal fade" id="hiddenTagBox" role="dialog" data-keyboard="false" data-backdrop="static">
 	  <div class="modal-dialog modal-sm">
@@ -394,6 +474,7 @@
 	  </div>
 	</div>
 	<!-- HiddenTagModal Modal  -->
+	
 	<!-- Global Modal  -->
        <div class="modal fade" id="globalModal" role="dialog" data-keyboard="false" data-backdrop="static">
          <div class="modal-dialog modal-sm">
@@ -412,6 +493,7 @@
          </div>
        </div>
        <!-- Global Modal  -->
+       
 	 <!-- DeleteObjects Modal  -->
 	<div class="modal fade" id="deleteObjectsModal" role="dialog" data-keyboard="false" data-backdrop="static">
 	  <div class="modal-dialog modal-sm">
@@ -490,7 +572,7 @@
 	</div>
 	<!-- OEBS Launch Popup -->
 	
-	<!-- Mobility Launch Popup -->
+	<!-- Mobility App Launch Popup -->
 	<div class="modal fade" id="launchMobilityApps" role="dialog" data-keyboard="false" data-backdrop="static">
 		<div class="modal-dialog modal-md">
 			<div class="modal-content">
@@ -499,10 +581,6 @@
 					<h4 class="modal-title">Launch Application</h4>
 				</div>
 				<div class="modal-body">
-					<!-- Error Printing Wrapper -->
-					<div class="errorHandling"></div>
-					<!-- Error Printing Wrapper -->
-					
 					<div class="leftAlign">
 						<p><input class='launchPopupInput form-control' type='text' placeholder='Enter APK path name' id='mobilityAPKPath'/></p>
 						<p><input class='launchPopupInput form-control' type='text' placeholder='Enter mobile serial number' id='mobilitySerialPath'/></p>

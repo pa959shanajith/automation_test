@@ -8,6 +8,7 @@ mySPA.factory('DesignServices', ['$http','$q', function ($http, $httpProvider, $
 			.then(function(response)  { return response.data},
 					function(response)        {return $q.reject(response.data)})
 		},
+
 		highlightScrapElement_ICE: function(xpath,url,appType) {
 			return $http.post('/highlightScrapElement_ICE',
 					{"action":"highlightScrapElement_ICE","elementXpath":xpath,"elementUrl" : url,"appType":appType}
@@ -35,16 +36,28 @@ mySPA.factory('DesignServices', ['$http','$q', function ($http, $httpProvider, $
 		},
 
 		updateScreen_ICE : function(scrapeObject){
-	               return $http.post('/updateScreen_ICE',{
-	                   scrapeObject : scrapeObject
-	             })
-	             .then(function(response) { 
-	                   return response.data
-	             },
-	             function(response) {
-	                   return $q.reject(response.data)
-	             })
-	      },	
+			return $http.post('/updateScreen_ICE',{
+				scrapeObject : scrapeObject
+			})
+			.then(function(response) { 
+				return response.data
+			},
+			function(response) {
+				return $q.reject(response.data)
+			})
+		},
+		
+		mapScrapeData_ICE : function(updateData){
+			return $http.post('/updateScreen_ICE',{
+				scrapeObject : scrapeObject
+			})
+			.then(function(response) { 
+				return response.data
+			},
+			function(response) {
+				return $q.reject(response.data)
+			})
+		},
 
 		readTestCase_ICE : function(screenId,testCaseId,testCaseName){
 			return $http.post('/readTestCase_ICE',{
@@ -59,6 +72,7 @@ mySPA.factory('DesignServices', ['$http','$q', function ($http, $httpProvider, $
 				return $q.reject(response.data)
 			})
 		},
+
 		updateTestCase_ICE : function(screenId,testCaseId,testCaseName,mydata,userInfo){
 			var modifiedData = JSON.parse(JSON.stringify(mydata));
 			for(i=0;i<modifiedData.length;i++){
@@ -90,6 +104,7 @@ mySPA.factory('DesignServices', ['$http','$q', function ($http, $httpProvider, $
 				return $q.reject(response.data)
 			})
 		},
+
 		//Debug Testcases
 		debugTestCase_ICE : function(browserType,testcaseID){
 			return $http.post('/debugTestCase_ICE',{
@@ -103,7 +118,7 @@ mySPA.factory('DesignServices', ['$http','$q', function ($http, $httpProvider, $
 				return $q.reject(response.data)
 			})
 		},
-		
+
 		initScrapeWS_ICE : function(initWSJson){
 			return $http.post('/debugTestCase_ICE',{
 				param : 'debugTestCaseWS_ICE',
@@ -115,6 +130,7 @@ mySPA.factory('DesignServices', ['$http','$q', function ($http, $httpProvider, $
 				return $q.reject(response.data)
 			})
 		},
+
 		getKeywordDetails_ICE : function(appType){
 			return $http.post('/getKeywordDetails_ICE',{
 				param : 'getKeywordDetails_ICE',

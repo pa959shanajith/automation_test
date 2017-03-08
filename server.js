@@ -97,6 +97,10 @@ app.post('/readTestSuite_ICE', suite.readTestSuite_ICE);
 app.post('/updateTestSuite_ICE', suite.updateTestSuite_ICE);
 app.post('/updateTestScenario_ICE', suite.updateTestScenario_ICE);
 app.post('/ExecuteTestSuite_ICE', suite.ExecuteTestSuite_ICE);
+app.post('/getReleaseNameByReleaseId_ICE', suite.getReleaseNameByReleaseId_ICE);
+app.post('/getCycleNameByCycleId', suite.getCycleNameByCycleId);
+app.post('/getTestcaseDetailsForScenario_ICE', suite.getTestcaseDetailsForScenario_ICE);
+
 //app.post('/readTestScenarios_ICE', suite.readTestScenarios_ICE);
 //Report Screen Routes
 app.post('/getAllSuites_ICE', report.getAllSuites_ICE);

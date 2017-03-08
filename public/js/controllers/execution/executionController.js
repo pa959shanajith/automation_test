@@ -13,21 +13,33 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 		document.getElementById("currentYear").innerHTML = new Date().getFullYear()
 	}, 500)
 
-			//Task Listing
-			loadUserTasks()
-			var getTaskName = JSON.parse(window.localStorage['_CT']).taskName;
-			appType = JSON.parse(window.localStorage['_CT']).appType;
+	//Task Listing
+	loadUserTasks()
+	var getTaskName = JSON.parse(window.localStorage['_CT']).taskName;
+	appType = JSON.parse(window.localStorage['_CT']).appType;
 
-			$("#page-taskName").empty().append('<span class="taskname">'+getTaskName+'</span>');
-			$(".projectInfoWrap").empty()
-
-			releaseName = JSON.parse(window.localStorage['_CT']).releaseName;
-			cycleName = JSON.parse(window.localStorage['_CT']).cycleName;
-			testSuiteName = JSON.parse(window.localStorage['_CT']).testSuiteName;
+	$("#page-taskName").empty().append('<span class="taskname">'+getTaskName+'</span>');
+	$(".projectInfoWrap").empty()
+	testSuiteName = JSON.parse(window.localStorage['_CT']).testSuiteName;
 
 	$timeout(function(){
+  		var releaseId = JSON.parse(window.localStorage['_CT']).releaseId;
+		var cycleId = JSON.parse(window.localStorage['_CT']).cycleId;
+		var projectId = JSON.parse(window.localStorage['_CT']).projectId;
 		projectDetails = angular.element(document.getElementById("left-nav-section")).scope().projectDetails;
-		$(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">Project :</span><span class="content">'+projectDetails.projectname+'</span></p><p class="proj-info-wrap"><span class="content-label">Cycle :</span><span class="content">'+releaseName+'</span></p><p class="proj-info-wrap"><span class="content-label">Cycle :</span><span class="content">'+cycleName+'</span></p><p class="proj-info-wrap"><span class="content-label">TestSuite :</span><span class="content">'+testSuiteName+'</span></p>')
+		ExecutionService.getReleaseNameByReleaseId_ICE(releaseId, projectId) 
+		  .then(function(data){
+			  releaseName = data;
+		  }, function(error) {	console.log("Failed to get release name")});
+		  
+		ExecutionService.getCycleNameByCycleId(cycleId, releaseId)
+		.then(function(data) {
+			cycleName = data;
+			$(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">Project :</span><span class="content">'+projectDetails.projectname+'</span></p><p class="proj-info-wrap"><span class="content-label">Release :</span><span class="content">'+releaseName+'</span></p><p class="proj-info-wrap"><span class="content-label">Cycle :</span><span class="content">'+cycleName+'</span></p><p class="proj-info-wrap"><span class="content-label">TestSuite :</span><span class="content">'+testSuiteName+'</span></p>')
+		}, 
+		function(error) {console.log("Error") })
+	
+	
 	}, 3000)
 	
 	//Global Information
@@ -84,7 +96,7 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 				else if(getEachScenario[i].executeStatus == 1){
 					row.append($("<td class='tabeleCellPadding exe-ExecuteStatus' style='width:3%; padding-top: 7px !important'><input ng-checked='executeAll' type='checkbox' title='Select to not execute this scenario' class='doNotExecuteScenario d-execute' checked></td>"));
 				}
-				row.append($("<td class='tabeleCellPadding exe-scenarioIds' sId="+getEachScenario[i].scenarioIds+" style='width: 23%; margin-right: 2%; word-break: break-all; text-align:left'>" + getEachScenario[i].scenarionames+ "</td>"));
+				row.append($("<td class='tabeleCellPadding exe-scenarioIds' onclick='loadLocationDetails(this.innerHTML, this.getAttribute(\"sId\"))' sId="+getEachScenario[i].scenarioIds+" style='width: 23%; margin-right: 2%; cursor:pointer; word-break: break-all; text-align:left'>" + getEachScenario[i].scenarionames+ "</td>"));
 				if(getEachScenario[i].dataParam == undefined){
 					row.append($('<td style="width: 22%" class="tabeleCellPadding exe-dataParam"><input class="getParamPath form-control" type="text" value=""/></td>'));
 				}
@@ -107,7 +119,23 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 		function(error) {
 			console.log("Error")
 		})
+	};
+	
+	//Load Location Details of Scenario
+	$scope.loadLocationDetails = function(scenarioName, scenarioId) {
+		$(".scenarioDetailsContent").empty()
+		ExecutionService.loadLocationDetails(scenarioName, scenarioId)
+		.then(function(data) {
+			$("#modalScenarioDetails").modal("show");
+			for(i=0; i<data.projectnames.length && data.testcasenames.length && data.screennames.length; i++){
+				$(".scenarioDetailsContent").append('<div class="sDInnerContentsWrap"><div class="sDInnerContents">'+data.testcasenames[i]+'</div><div class="sDInnerContents">'+data.screennames[i]+'</div><div class="sDInnerContents">'+data.projectnames[i]+'</div></div>')
+			}
+		}, 
+		function(error){
+			console.log(error)
+		})
 	}
+	//Load Location Details of Scenario
 	
 	
 	//Save TestSuite Functionality
@@ -360,3 +388,7 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 
 	$("#tableActionButtons, .executionTableDnd").delay(500).animate({opacity:"1"}, 500)
 }]);
+
+function loadLocationDetails(scenarioName, scenarioId){
+	angular.element(document.getElementById("left-nav-section")).scope().loadLocationDetails(scenarioName, scenarioId);
+}
