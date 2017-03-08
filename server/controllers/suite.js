@@ -408,6 +408,24 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 
 		);
 	}
-
+exports.getCycleNameByCycleId = function (req, res) {
+	var getCycleName = "select cyclename from cycles where releaseid = "+req.body.releaseId+" and cycleid = "+req.body.cycleId+"";
+		dbConnICE.execute(getCycleName, function(err, result) {
+							if(err){ console.log(err);
+							}
+							else{
+								if(result.rows.length > 0)
+								{
+										for (var i = 0; i < result.rows.length; i++) {
+										    cycleName = result.rows[i].cyclename;
+								          }	
+								}
+								else{
+									cycleName = "";
+								}
+									res.send(cycleName);
+							}
+		});
+}
 
 //ExecuteTestSuite Functionality

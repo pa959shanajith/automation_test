@@ -21,13 +21,22 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 			$("#page-taskName").empty().append('<span class="taskname">'+getTaskName+'</span>');
 			$(".projectInfoWrap").empty()
 
-			releaseName = JSON.parse(window.localStorage['_CT']).releaseName;
-			cycleName = JSON.parse(window.localStorage['_CT']).cycleName;
+		
 			testSuiteName = JSON.parse(window.localStorage['_CT']).testSuiteName;
 
 	$timeout(function(){
-		projectDetails = angular.element(document.getElementById("left-nav-section")).scope().projectDetails;
-		$(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">Project :</span><span class="content">'+projectDetails.projectname+'</span></p><p class="proj-info-wrap"><span class="content-label">Cycle :</span><span class="content">'+releaseName+'</span></p><p class="proj-info-wrap"><span class="content-label">Cycle :</span><span class="content">'+cycleName+'</span></p><p class="proj-info-wrap"><span class="content-label">TestSuite :</span><span class="content">'+testSuiteName+'</span></p>')
+  		var releaseId = JSON.parse(window.localStorage['_CT']).releaseId;
+		var cycleId = JSON.parse(window.localStorage['_CT']).cycleId;
+		var projectId = JSON.parse(window.localStorage['_CT']).projectId;
+		ExecutionService.getCycleNameByCycleId(cycleId, releaseId)
+		.then(function(data) {
+			cycleName = data;
+				projectDetails = angular.element(document.getElementById("left-nav-section")).scope().projectDetails;
+		$(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">Project :</span><span class="content">'+projectDetails.projectname+'</span></p><p class="proj-info-wrap"><span class="content-label">Release :</span><span class="content">'+releaseName+'</span></p><p class="proj-info-wrap"><span class="content-label">Cycle :</span><span class="content">'+cycleName+'</span></p><p class="proj-info-wrap"><span class="content-label">TestSuite :</span><span class="content">'+testSuiteName+'</span></p>')
+		}, 
+		function(error) {console.log("Error") })
+	
+	
 	}, 3000)
 	
 	//Global Information

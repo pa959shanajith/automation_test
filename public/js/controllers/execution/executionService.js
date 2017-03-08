@@ -72,5 +72,14 @@ mySPA.factory('ExecutionService', ['$http','$q', function ($http, $httpProvider,
 			.then(function(response)  { return response.data},
 			function(response)        {return $q.reject(response.data)})
 	    },
+	   getCycleNameByCycleId: function(cycleId, releaseId){
+			return $http.post('/getCycleNameByCycleId',{
+				param : 'getCycleNameByCycleId',
+				cycleId : cycleId,
+				releaseId : releaseId
+			})
+			.then(function(response)  { return response.data},
+			function(response)        {return $q.reject(response.data)})
+	    },
 	}
 }]);
