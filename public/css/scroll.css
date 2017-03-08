@@ -451,6 +451,44 @@
        background: rgb(211, 211, 211)
 }
 
+
+.scroll-wrapper > .ObjforMapScroll{
+       padding: 0px;
+       height: auto !important;
+       min-height: auto !important;
+       max-height: 100% !important;
+}
+.scroll-wrapper.ObjforMapScroll {
+       float: none;
+       height:350px !important
+}
+.ObjforMapScroll > .scroll-element.scroll-y .scroll-bar{
+       background: #321e4f;
+       min-height: 20px;
+}
+.ObjforMapScroll > .scroll-element .scroll-element_track{
+       background: rgb(211, 211, 211)
+}
+
+
+.scroll-wrapper > .scenarioDetailsContent{
+       padding: 0px;
+       height: auto !important;
+}
+.scroll-wrapper.scenarioDetailsContent {
+       float: none;
+       max-height:350px !important
+}
+.scenarioDetailsContent > .scroll-element.scroll-y .scroll-bar{
+       background: #321e4f;
+       min-height: 20px;
+}
+.scenarioDetailsContent > .scroll-element .scroll-element_track{
+       background: rgb(211, 211, 211)
+}
+
+
+
 /* Testsuite scenarios mid section  */
 .scroll-wrapper > .scrollbar-inner-scenariostatus{
 	width: 100% !important;

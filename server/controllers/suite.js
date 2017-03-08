@@ -95,6 +95,7 @@ exports.readTestSuite_ICE = function (req, res) {
 
 /**
  * @author vishvas.a
+ * @author vishvas.a modified on 08/03/2017
  * this block of code is used for updating the testsuite details 
  * to the testsuites table of icetestautomation keyspace 
  */
@@ -102,6 +103,7 @@ exports.updateTestSuite_ICE = function (req, res) {
 	//internal variables
 	var hasrow = false;
 	var flag = "fail";
+	var index=0;
 	//base request elements
 	var userinfo = req.body.userinfo;
 	var requestedtestscycleid = req.body.testscycleid;
@@ -127,79 +129,72 @@ exports.updateTestSuite_ICE = function (req, res) {
 	 * based on requested cycleid,suiteid 
 	 */
 	var checksuiteexists = "";
-	var deleteTestSuiteData = "";
+	var deleteTestSuiteQuery = "";
 	var updateTestSuiteData = "";
-	async.waterfall([
-		function (callback1) {
-			//check exists
 			checksuiteexists = "select testsuiteid from testsuites where cycleid=" + requestedtestscycleid;
 			dbConnICE.execute(checksuiteexists, function (err, checksuiteexistsresult) {
 				if (err) {
 					var flag = "Error in Query 1 checksuiteexists: Fail";
 					//res.send(flag);
 				} else {
-					async.forEachSeries(checksuiteexistsresult.rows, function (row, forEachSeriescallback) {
-						if (row.testsuiteid == requestedtestsuiteid) {
-							hasrow = true;
-						}
-						forEachSeriescallback(null, hasrow);
-					});
-				}
-				callback1(null, hasrow);
-			});
-		},
-		function (actualExecutioncallback) {
-			if (hasrow) {
-				async.waterfall([
-					function (deletecallback) {
-						deleteTestSuiteData = "DELETE conditioncheck,donotexecute,getparampaths,testscenarioids FROM testsuites " +
-							"where cycleid=" + requestedtestscycleid +
-							" and testsuitename='" + requestedtestsuitename + "'" +
-							" and testsuiteid=" + requestedtestsuiteid +" and versionnumber = "+requestedversionnumber;
-						dbConnICE.execute(deleteTestSuiteData, function (err, deleteQueryresults) {
-							if (err) {
-								// flag = "failed to execute update query: Fail";
-								// res.send("fail");
-							} else {
-								flag = "success";
+					if (checksuiteexistsresult.rows[0].testsuiteid == requestedtestsuiteid) {
+						deleteTestSuiteQuery = "DELETE conditioncheck,donotexecute,getparampaths,testscenarioids FROM testsuites " +
+						"where cycleid=" + requestedtestscycleid +
+						" and testsuitename='" + requestedtestsuitename + "'" +
+						" and testsuiteid=" + requestedtestsuiteid +" and versionnumber = "+requestedversionnumber;
+						deleteSuite(deleteTestSuiteQuery,function(err,response){
+							if(response == "success"){
+								saveSuite(function(err,response){
+									if(err){
+										flag = "fail";
+										index=index+1;
+										if(index == requestedtestscenarioids.length){res.send(flag);}
+									}else{
+										flag = "success";
+										index=index+1;
+										if(index == requestedtestscenarioids.length){res.send(flag);}										
+									}
+								});
 							}
 						});
-						//response is sent with the result stating "query1success" on success
-						deletecallback(null, "query1success");
-					},
-					function (value, waterfallquery2callback) {
-						for (var scenarioidindex = 0; scenarioidindex < requestedtestscenarioids.length; scenarioidindex++) {
-							updateTestSuiteData = "update testsuites set" +
-								" conditioncheck=conditioncheck+[" + requestedcondtioncheck[scenarioidindex] + "], " +
-								"donotexecute=donotexecute+[" + requesteddonotexecute[scenarioidindex] + "], " +
-								"getparampaths=getparampaths+[" + requestedgetparampaths[scenarioidindex] + "], " +
-								"testscenarioids=testscenarioids+[" + requestedtestscenarioids[scenarioidindex] + "], " +
-								"modifiedby='" + userinfo.username + "', modifiedbyrole='" + userinfo.role + "' " +
-								"where cycleid=" + requestedtestscycleid + 
-								" and testsuiteid=" + requestedtestsuiteid +
-								" and testsuitename='" + requestedtestsuitename +
-								"' and versionnumber = "+requestedversionnumber+" ;";
-							dbConnICE.execute(updateTestSuiteData, function (err, updateQueryresults) {
-								if (err) {
-									//Commenting sending response 
-									// flag = "fail";
-									// res.send(flag);
-								} else {
-									flag = "success";
-								}
-							});
-						}
-						//response is sent with the result stating "success" on success
-						waterfallquery2callback(null, "success");
 					}
-				],
-					function (err, finalcallback) {
-					//response is sent with the result stating "success" on at the end 
-						res.send(flag);
-					});
+				}
+			});
+
+	function deleteSuite(deleteTestSuiteQuery,deleteSuitecallback){
+		dbConnICE.execute(deleteTestSuiteQuery, function (err, deleteQueryresults) {
+			if (err) {
+					flag = "failed to execute update query: Fail";
+					res.send("fail");
+			} else {
+					flag = "success";
+					deleteSuitecallback(null,flag);
 			}
+		});
+	}
+	function saveSuite(saveSuite){
+		for (var scenarioidindex = 0; scenarioidindex < requestedtestscenarioids.length; scenarioidindex++) {
+			updateTestSuiteData = "update testsuites set" +
+				" conditioncheck=conditioncheck+[" + requestedcondtioncheck[scenarioidindex] + "], " +
+				"donotexecute=donotexecute+[" + requesteddonotexecute[scenarioidindex] + "], " +
+				"getparampaths=getparampaths+[" + requestedgetparampaths[scenarioidindex] + "], " +
+				"testscenarioids=testscenarioids+[" + requestedtestscenarioids[scenarioidindex] + "], " +
+				"modifiedby='" + userinfo.username + "', modifiedbyrole='" + userinfo.role + "' " +
+				"where cycleid=" + requestedtestscycleid + 
+				" and testsuiteid=" + requestedtestsuiteid +
+				" and testsuitename='" + requestedtestsuitename +
+				"' and versionnumber = "+requestedversionnumber+" ;";
+			dbConnICE.execute(updateTestSuiteData, function (err, updateQueryresults) {
+				if (err) {
+					flag="fail";
+					saveSuite(flag,null);
+				} else {
+					flag = "success";
+					saveSuite(null,flag);
+				}
+			});
 		}
-	]);
+	}
 }
 
 
@@ -427,5 +422,140 @@ exports.getCycleNameByCycleId = function (req, res) {
 							}
 		});
 }
+	//getReleaseName Functionality
+	exports.getReleaseNameByReleaseId_ICE = function (req, res) {
+		var releaseId = req.body.releaseId;
+		var projectId = req.body.projectId;
+		var getReleaseName = "select releasename from icetestautomation.releases where releaseid = "+releaseId+" and projectid = "+projectId+"";
+		console.log("sd", getReleaseName)
+		dbConnICE.execute(getReleaseName, function(err, result) {
+			//console.log("Result", result);
+			if(result.rows.length > 0)
+								{
+			  for (var i = 0; i < result.rows.length; i++) {
+                  releaseName = result.rows[i].releasename;
+                
+              }
+								}
+								else{
+									releaseName = "";
+								}
+								  res.send(releaseName);
+		});
+	  }
 
 //ExecuteTestSuite Functionality
+
+
+	/**
+	 * Service to fetch all the testcase,screen and project names for provided scenarioid
+	 * @author Shreeram
+	 */
+	exports.getTestcaseDetailsForScenario_ICE = function (req, res) {
+
+		var requiredtestscenarioid = req.body.testScenarioId;
+		//var requiredtestscenarioname = req.testScenarioName;
+
+		testcasedetails_testscenarios(requiredtestscenarioid,function(err,data){
+			if(err){
+				res.send("fail");
+			}else{
+				console.log(data);
+				res.send(JSON.stringify(data));
+			}
+		})
+
+
+
+	}
+
+	//Function to fetch all the testcase,screen and project names for provided scenarioid
+	function testcasedetails_testscenarios(req,cb,data){
+		var testcasedetails = {testcasename:"",screenname:"",projectname:""};
+		var testcaseids = [];
+		var screenidlist = [];
+		var testcasenamelist = [];
+		var screennamelist=[];
+		var projectidlist = [];
+		var projectnamelist = [];
+		async.series({
+			testscenariotable:function(callback){
+				var testscenarioquery = "SELECT testcaseids FROM testscenarios where testscenarioid="+req;
+				dbConnICE.execute(testscenarioquery,function(err,testscenarioresult){
+					if(err){
+						console.log(err);
+					}else{
+						testcaseids = testscenarioresult.rows[0].testcaseids;
+					}                                              
+					callback(err,testcaseids);                                                              
+				});
+			},
+			testcasetable:function(callback){
+				var testcasename = '';
+				async.forEachSeries(testcaseids,function(itr,callback2){
+					var testcasequery = "SELECT testcasename,screenid FROM testcases WHERE testcaseid="+itr;
+					dbConnICE.execute(testcasequery,function(err,testcaseresult){
+						if(err){
+							console.log(err);
+						}else{
+							testcasenamelist.push(testcaseresult.rows[0].testcasename);
+							screenidlist.push(testcaseresult.rows[0].screenid);
+
+						}
+						callback2();
+					});
+
+				},callback);
+			},
+			screentable:function(callback){
+				async.forEachSeries(screenidlist,function(screenitr,callback3){
+					var screenquery = "SELECT screenname,projectid FROM screens where screenid="+screenitr;
+					dbConnICE.execute(screenquery,function(err,screenresult){
+						if(err){
+							console.log(err);
+						}else{
+							screennamelist.push(screenresult.rows[0].screenname);
+							projectidlist.push(screenresult.rows[0].projectid);
+
+						}
+						callback3();         
+					});
+
+
+				},callback);
+
+			},
+			projecttable:function(callback){
+				async.forEachSeries(projectidlist,function(projectitr,callback4){
+					var projectquery = "SELECT projectname FROM projects where projectid="+projectitr;
+					dbConnICE.execute(projectquery,function(err,projectresult){
+						if(err){
+							console.log(err);
+						}else{
+							projectnamelist.push(projectresult.rows[0].projectname);
+
+							//projectidlist.push(screenresult.rows[0].projectid);
+						}
+						callback4();
+
+					});
+				},callback)
+				//callback(projectidlist);
+
+			}
+		},function(err,data){
+			if(err){
+				console.log(err);
+				cb(err,"fail");
+			}else{
+				var resultdata = {testcasenames:[],testcaseids:[],screennames:[],screenids:[],projectnames:[],projectids:[]};
+				resultdata.testcasenames = testcasenamelist;
+				resultdata.testcaseids = testcaseids;
+				resultdata.screennames = screennamelist;
+				resultdata.screenids = screenidlist
+				resultdata.projectnames = projectnamelist;
+				resultdata.projectids = projectidlist;
+				cb(err,resultdata);
+			}
+		});
+	}

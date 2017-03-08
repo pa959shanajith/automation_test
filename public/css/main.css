@@ -165,6 +165,13 @@ body {
 	background:#ff7300
 }
 
+
+.btn-default[disabled]:hover{
+	color: #fff;
+    background: #643693;
+}
+
+
 .submitTaskBtn-abs{
 	position: absolute;
     right: 0;
@@ -1344,13 +1351,13 @@ input[disabled]{
 
 .proj-info-wrap .content-label {
     display: inline-block;
-    width: 21%;
+    width: 28%;
     vertical-align: top;
 }
 
 .proj-info-wrap .content {
     display: inline-block;
-    width: 79%;
+    width: 70%;
 }
 
 .closePopup {
@@ -1640,7 +1647,7 @@ input[disabled]{
 .executionDataTable .form-control, #scheduleDataBody .form-control, .designDataTable .form-control{
 	display: inline-block;
 	width: 90%;
-	height: 28px;
+	height: 25px;
 	float: none;
 	border: 1px solid #5e636b;
 	padding: 0px 5px;
@@ -1719,6 +1726,60 @@ input[disabled]{
 	background: #fff url("../imgs/ic-false.png") 90% center no-repeat !important
 }
 /******Exectuion Mid Section******/
+
+
+/******Scenario Details Modal******/
+.modalScenarioDetails{
+	width:650px;
+}
+
+.modalScenarioDetails .modal-content,
+.modalScenarioDetails .modal-header,
+.modalScenarioDetails .modal-body,
+.modalScenarioDetails .modal-footer{
+	float:left;
+	width: 100%;
+}
+
+.modalScenarioDetails .modal-body{
+	padding-top:0px
+}
+
+.scenarioDetails{
+	float:left;
+	width:100%;
+	font-size: 15px
+}
+
+.scenarioDetailsHeading{
+	background: #311d4e;
+    padding: 5px 10px;
+    color: #fff;
+    font-family: 'LatoWebMedium';
+    border-radius: 5px;
+    margin-bottom: 8px;
+}
+
+.sDInnerContentsWrap{
+	float:left;
+	width:100%;
+	padding: 5px 10px;
+}
+
+.sDInnerContentsWrap:nth-child(odd){
+	background: #e8e6fe;
+}    
+
+.sDInnerContents{
+	float: left;
+    width: 33%;
+    text-align: center;
+    word-break: break-all;
+    word-wrap: break-word;
+    padding: 0px 10px;
+}
+/******Scenario Details Modal******/
+
 
 /*****************Execution CSS*****************/
 
@@ -1983,6 +2044,139 @@ input[disabled]{
 /******Custom Bootstrap Dialog CSS******/
 
 
+/******Map Object CSS******/
+.labelAsHeading{
+	color: #311d4e;
+    font-family: 'LatoWebBold';
+    font-size: 15px;
+    margin-bottom: 25px;
+}
+
+.mapObjContainer .labelAsHeading{
+	margin-bottom: 10px;
+}
+
+.mapObjectModal .modal-content{
+	float: left;
+    width: 100%;
+}
+
+.mapObjectModal .modal-content .modal-body{
+	padding: 25px 40px;
+	float: left;
+    width: 100%;
+}
+
+.mapObjectModal .modal-content .modal-footer{
+	float: left;
+    width: 100%;
+}
+
+.mapObjContainer{
+	float:left;
+}
+
+#scrapedObjforMap, #customObjforMap{
+	float:left;
+	width: 100% !important;
+}
+
+#scrapedObjforMap li span{
+	font-size: 15px;
+	top:2px;	
+}
+
+.accd-Obj, .accd-Obj-head, .accd-Obj-body{
+	float:left;
+	width:100%
+}
+
+.accd-Obj-head{
+	cursor: pointer;
+    background: #311d4e;
+    margin-bottom:5px;
+    padding: 2px 10px;
+    border-radius: 5px;
+    color: #fff;
+    position: relative;
+}
+
+.accd-Obj-body{
+	display: none;
+	margin: 10px 0px 15px;
+}
+
+.accd-Obj-body li{
+	border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-bottom: 8px;
+    position: relative;
+    height: 28px;
+}
+
+.accd-Obj-body li:last-child{
+	margin-bottom: 0
+}
+
+.showPreviousVal{
+	display: none;
+    width: 25px;
+    height: 100%;
+    position: absolute;
+    right: 0;
+    z-index: 1;
+    cursor: pointer;
+    background: #fff;
+    border-radius: 0 5px 5px 0;
+}
+
+.showPreviousVal::before{
+	content: "";
+    width: 10px;
+    height: 10px;
+    margin-left: -10px;
+    margin-top: 8px;
+    display: inline-block;
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+    border-right: 5px solid #fff;
+}
+
+.showactiveArrow{
+	position: absolute;
+	display:none;
+	top:100%;
+	left:50%;
+	border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 5px solid #311d4e;
+	transform:translate(-50%, 0%);
+	-moz-transform:translate(-50%, 0%);
+	-webkit-transform:translate(-50%, 0%);
+	-ms-transform:translate(-50%, 0%);
+}
+
+.valueMerged{
+	background:#e0e0e0;;
+	cursor: pointer;
+}
+
+.valueMergedSelected{
+	border: 1px solid rgba(49, 29, 78, 0.76) !important;
+    box-shadow: 1px 1px 1px rgba(115, 115, 115, 0.73);
+    -moz-box-shadow: 1px 1px 1px rgba(115, 115, 115, 0.73);
+    -webkit-box-shadow: 1px 1px 1px rgb(115, 115, 115);
+    -ms-box-shadow: 1px 1px 1px rgba(115, 115, 115, 0.73);
+}
+
+.toMergeObj{}
+
+.fromMergeObj{
+	cursor: pointer !important;
+}
+/******Map Object CSS******/
+
+
 /******************Header CSS***************************/
 
 .userInfo {
@@ -2172,6 +2366,10 @@ nav {
 	transform:translate(-50%, -50%);
 	-moz-transform:translate(-50%, -50%);
 	-webkit-transform:translate(-50%, -50%)	
+}
+
+.error-msg-abs3{
+	top:94%;
 }
 
 .error-msg-abs2{

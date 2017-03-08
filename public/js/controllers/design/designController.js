@@ -4,7 +4,7 @@ var selectRowStepNoFlag = false; //var deleteStep = false;
 var getAllAppendedObj; //Getting all appended scraped objects
 var gsElement = []; window.localStorage['selectRowStepNo'] = '';
 var getWSTemplateData = {} //Contains Webservice saved data
-var appType;var projectId;var projectDetails;var screenName;var testCaseName;var subTaskType;var subTask;
+var appType;var projectId;var projectDetails;var screenName;var testCaseName;var subTaskType;var subTask; var draggedEle; var getDraggedEle; 
 mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout', 'DesignServices','cfpLoadingBar','$window', function($scope,$http,$location,$timeout,DesignServices,cfpLoadingBar,$window) {
 	$("body").css("background","#eee");
 	$("#tableActionButtons, .designTableDnd").delay(500).animate({opacity:"1"}, 500)
@@ -62,19 +62,19 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 	$timeout(function(){
 		projectDetails = angular.element(document.getElementById("left-nav-section")).scope().projectDetails;
 		var getTaskName = JSON.parse(window.localStorage['_CT']).taskName;
-		    appType = JSON.parse(window.localStorage['_CT']).appType;
-		   screenName =  JSON.parse(window.localStorage['_CT']).screenName;
-		   testCaseName = JSON.parse(window.localStorage['_CT']).testCaseName;
-		 subTaskType = JSON.parse(window.localStorage['_CT']).subTaskType;
-		 subTask = JSON.parse(window.localStorage['_CT']).subtask;
+		appType = JSON.parse(window.localStorage['_CT']).appType;
+		screenName =  JSON.parse(window.localStorage['_CT']).screenName;
+		testCaseName = JSON.parse(window.localStorage['_CT']).testCaseName;
+		subTaskType = JSON.parse(window.localStorage['_CT']).subTaskType;
+		subTask = JSON.parse(window.localStorage['_CT']).subtask;
 		if(subTaskType == "Scrape" || subTask == "Scrape")
 		{
-				$(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">Project :</span><span class="content">'+projectDetails.projectname+'</span></p><p class="proj-info-wrap"><span class="content-label">Screen :</span><span class="content">'+screenName+'</span></p>')
+			$(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">Project :</span><span class="content">'+projectDetails.projectname+'</span></p><p class="proj-info-wrap"><span class="content-label">Screen :</span><span class="content">'+screenName+'</span></p>')
 		}
 		else{
-	$(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">Project: </span><span class="content">'+projectDetails.projectname+'</span></p><p class="proj-info-wrap"><span class="content-label">Screen: </span><span class="content">'+screenName+'</span></p><p class="proj-info-wrap"><span style="width: 23%;" class="content-label">TestCase: </span><span style="width: 77%;" class="content">'+testCaseName+'</span></p>')
+			$(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">Project: </span><span class="content">'+projectDetails.projectname+'</span></p><p class="proj-info-wrap"><span class="content-label">Screen: </span><span class="content">'+screenName+'</span></p><p class="proj-info-wrap"><span class="content-label">TestCase: </span><span class="content">'+testCaseName+'</span></p>')
 		}
-	
+
 	}, 3000)
 	
 
@@ -1498,6 +1498,187 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		});
 	};
 	//Submit Custom Object Functionality
+	
+	
+	//Map Object Drag and Drop Functionality
+	$scope.generateMapObj = function(){
+		$(".submitObjectWarning, .objectExistMap, .noObjectToMap").hide();
+		$("#dialog-mapObject").modal("show");
+		$('#scrapedObjforMap, #customObjforMap').empty();
+		for(i=0; i<viewString.view.length; i++){
+			var path = viewString.view[i].xpath;
+			var ob = viewString.view[i];
+			ob.tempId= i;
+			var custN = ob.custname.replace(/[<>]/g, '').trim();
+			var tag = ob.tag;
+			if(tag == "dropdown"){imgTag = "select"}
+			else if(tag == "textbox/textarea"){imgTag = "input"}
+			else imgTag = tag;
+			var tag1 = tag.replace(/ /g, "_");
+			var tag2;
+			if(path != ""){
+				var innerUL = $('#scrapedObjforMap');
+				var li = "<li data-xpath='"+ob.xpath+"' data-left='"+ob.left+"' data-top='"+ob.top+"' data-width='"+ob.width+"' data-height='"+ob.height+"' data-tag='"+tag+"' data-url='"+ob.url+"' data-hiddentag='"+ob.hiddentag+"' class='item select_all "+tag+"x' val="+ob.tempId+" draggable='true' ondragstart='drag(event)'><input type='checkbox' class='checkall' name='selectAllListItems' disabled /><span title="+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+" data-xpath='"+ob.xpath+"' class='ellipsis'>"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"</span></li>";
+				angular.element(innerUL).append(li);
+			}
+			else {
+				var li = "<li data-xpath='"+ob.xpath+"' data-tag='"+tag+"' class='item select_all "+tag+"x' dropzone='move s:text/plain' ondrop='drop(event)' ondragover='allowDrop(event)'><span title="+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+" data-xpath='"+ob.xpath+"' class='ellipsis'>"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"</span></li>";
+				$('#customObjforMap').append('<div class="accd-Obj"><div class="accd-Obj-head">'+tag+'</div><div class="accd-Obj-body">'+li+'</div></div>')
+				
+				/****Filtering same object type in one container****/
+				$(".accd-Obj .accd-Obj-head").each(function(){
+					if($(this).text() == $(li).data("tag") && $(this).siblings().text() != $(li).children("span").text()){
+						$(this).parent().children(".accd-Obj-body").append(li);
+					}
+				})
+				/****Filtering same object type in one container****/
+			}
+		}
+		
+		/****Removing same objects type for custom objects****/
+		var seen = {};
+		$('.accd-Obj .accd-Obj-head').each(function() {
+		    var txt = $(this).text();
+		    if (seen[txt]) $(this).remove();
+		    else seen[txt] = true;
+		});
+		/****Removing same objects type for custom objects****/
+		
+		$(".accd-Obj-head").append('<span class="showactiveArrow"></span>');
+		$(".accd-Obj-body li").append('<span class="showPreviousVal" title="Show Previous Text"></span>');
+	}
+	
+	/****Custom object Accoridan****/
+	$(document).on("click", ".accd-Obj-head", function(){
+		$(this).siblings(".accd-Obj-body").slideToggle("fast", function(){
+			$(this).siblings(".accd-Obj-head").find(".showactiveArrow").fadeIn("fast");
+			if($(this).parent().siblings().children(".accd-Obj-body").is(":visible") == true){
+				$(this).parent().siblings().children(".accd-Obj-body").slideUp("fast");
+				$(this).parent().siblings().children(".accd-Obj-head").find(".showactiveArrow").fadeOut("fast");
+			}
+			else if($(this).is(":visible") == false){
+				$(this).siblings(".accd-Obj-head").find(".showactiveArrow").fadeOut("fast");
+			}
+			return false
+		});
+	})
+	/****Custom object Accoridan****/
+	
+	
+	/***Un-link Functonality***/
+	$(document).on("click", ".valueMerged", function(){
+		$(this).toggleClass("valueMergedSelected")
+		
+		//Enable-Disable Unlink button based on the valueMergedSelected Class
+		if($(".valueMergedSelected").length > 0) $(".unlinkButton").prop("disabled", false)
+		else $(".unlinkButton").prop("disabled", true)
+	});
+	
+	$scope.unlinkMapObj = function(){
+		$(".submitObjectWarning, .objectExistMap").hide();
+		var mergedObj = $(".valueMergedSelected");
+		var sXpath;
+		$.each(mergedObj, function(){
+			sXpath = $(this).children(".fromMergeObj").data("xpath")
+			$(this).children(".showPreviousVal").hide();
+			$(this).children(".fromMergeObj").remove();
+			$(this).children(".toMergeObj").show().removeClass("toMergeObj")
+			$(this).removeClass("valueMerged valueMergedSelected");
+			
+			/***Reseting Selected Dragged Object for Left Scrapped Tree***/
+			$.each($("#scrapedObjforMap li"), function(){
+				if($(this).data("xpath") == sXpath){
+					$(this).attr("draggable", true)
+					$(this).children(".ellipsis").css({'background':'', 'cursor':'auto'})
+				}
+			})
+			/***Reseting Selected Dragged Object for Left Scrapped Tree***/
+		});
+		$(".unlinkButton").prop("disabled", true)
+	}
+	/***Un-link Functonality***/
+	
+	
+	/****Show prev value functionality for map object****/
+	$(document).on("click", function(e){
+		if(e.target.className == "showPreviousVal"){
+			$(e.target).siblings(".fromMergeObj").hide();
+			$(e.target).siblings(".toMergeObj").show();
+		}
+		else {
+			$(".showPreviousVal").siblings(".fromMergeObj").show();
+			$(".showPreviousVal").siblings(".toMergeObj").hide();
+		}
+	})
+	/****Show prev value functionality for map object****/
+	
+	
+	/****Submit Map Object Functionality****/
+	$scope.submitMapObject = function(){
+		$(".submitObjectWarning, .objectExistMap, .noObjectToMap").hide()
+		if($("#customObjforMap").text() == ""){
+			$(".noObjectToMap").show()
+			return false
+		}
+		else{
+			if($(".valueMerged").length == 0){
+				$(".submitObjectWarning").show()
+				return false
+			}
+			else{
+				var tasks = JSON.parse(window.localStorage['_CT'])
+				var screenId = tasks.screenId;
+				var screenName = tasks.screenName;
+				var projectId = tasks.projectId;
+				var userinfo = JSON.parse(window.localStorage['_UI']);
+				scrapeObject = {};
+				scrapeObject.projectId = projectId;
+				scrapeObject.screenId = screenId;
+				scrapeObject.screenName = screenName;
+				scrapeObject.userinfo = userinfo;
+				scrapeObject.param = "mapScrapeData_ICE";
+				scrapeObject.appType = tasks.appType;
+				scrapeObject.editedListmodifiedCustNames = [];
+				scrapeObject.editedListoldCustName = [];
+				scrapeObject.editedListoldXpath = [];
+				scrapeObject.editedListmodifiedXpaths = [];
+				
+				//Filtering the Object which has been mapped
+				var valueToMap = $(".valueMerged")
+				$.each(valueToMap, function(){
+					scrapeObject.editedListmodifiedCustNames.push($(this).children(".fromMergeObj").text());
+					scrapeObject.editedListoldCustName.push($(this).children(".toMergeObj").text());
+					scrapeObject.editedListoldXpath.push($(this).children(".toMergeObj").data("xpath"));
+					scrapeObject.editedListmodifiedXpaths.push($(this).children(".fromMergeObj").data("xpath"));
+					
+					/***Resetting Values to Default***/
+					$(this).children(".showPreviousVal").hide();
+					$(this).children(".fromMergeObj").remove();
+					$(this).children(".toMergeObj").show().removeClass("toMergeObj")
+					$(this).removeClass("valueMerged valueMergedSelected")
+					/***Resetting Values to Default***/
+				})
+				//Filtering the Object which has been mapped
+				
+				/*DesignServices.mapScrapeData_ICE(scrapeObject)
+				.then(function(data){
+					$("#dialog-mapObject").modal("hide");
+					if(data == "Success") 				$("#mapObjSuccess").modal("show");
+					else if(data == "TagMissMatch") 	$("#mapObjTagMissMatch").modal("show");
+					else if(typeof data == "object") 	$("mapObjSameObject").modal("show");
+					angular.element(document.getElementById("left-nav-section")).scope().getScrapeData();
+				}, 
+				function(error){
+					console.log("Error::::", error)
+				})*/
+				
+				$("#scrapedObjforMap li").attr("draggable", true);
+				$("#scrapedObjforMap li").children(".ellipsis").css({'background':'', 'cursor':'auto'});
+			}
+		}
+	}
+	/****Submit Map Object Functionality****/
+	//Map Object Drag and Drop Functionality
 
 	
 	//Save Scrape Objects
@@ -3433,3 +3614,42 @@ function getKeywordList(data) {
 	}
 	return keywordList;
 }
+//Map Object Drag nad Drop Functionality
+function allowDrop(ev) {
+	ev.preventDefault();
+}
+
+function drag(ev) {
+    ev.dataTransfer.setData("text/plain", ev.target.innerHTML);
+    draggedEle = ev.currentTarget;
+}
+
+function drop(ev) {
+	//Enable-Disable dragged element based on drop event
+	draggedEle.setAttribute("draggable", false)
+	draggedEle.childNodes[1].style.background = "#e0e0e0";
+	draggedEle.childNodes[1].style.cursor = "no-drop"
+	//Enable-Disable dragged element based on drop event
+	
+	$(".submitObjectWarning").hide()
+	
+	if($(ev.target).parent().children(".ellipsis").hasClass("fromMergeObj") == true){
+		draggedEle.setAttribute("draggable", true)
+		draggedEle.childNodes[1].style.background = "";
+		draggedEle.childNodes[1].style.cursor = "pointer";
+		$(".objectExistMap").show();
+		return false
+	}
+	else{
+		$(".objectExistMap").hide()
+		getDraggedEle = ev.dataTransfer.getData("text/plain").trim()
+		getDraggedEle = $(getDraggedEle)[1];
+		$(getDraggedEle).addClass("fromMergeObj");
+		$(ev.target).parent("li").addClass("valueMerged");
+		$(ev.target).parent("li").find(".ellipsis").hide().addClass("toMergeObj");
+		$(ev.target).parent("li").find(".showPreviousVal").show()
+		$(ev.target).parent("li").append(getDraggedEle);
+	}
+	ev.preventDefault();
+}
+//Map Object Drag nad Drop Functionality
