@@ -67,10 +67,11 @@ mySPA.factory('reportService', ['$http','$q', function ($http, $httpProvider, $q
 		},
 		
 		//Get Final Reports
-		getReport_Nineteen68 : function(reportID, testsuiteId){
+		getReport_Nineteen68 : function(reportID, testsuiteId, testsuitename){
 			return $http.post('/getReport_Nineteen68',{
 				param : 'getReport_Nineteen68',
 				reportId : reportID,
+				testsuitename:testsuitename,
 				testsuiteId : testsuiteId
 			})
 			.then(function(response)  {
