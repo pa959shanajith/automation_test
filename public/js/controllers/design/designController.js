@@ -1,6 +1,7 @@
 var screenshotObj,scrapedGlobJson,enableScreenShotHighlight,mirrorObj,emptyTestStep,anotherScriptId,getAppTypeForPaste, eaCheckbox, finalViewString, scrapedData, deleteFlag, pasteSelecteStepNo,globalSelectedBrowserType,selectedKeywordList,keywordListData;
 var initScraping = {}; var mirrorObj = {}; var scrapeTypeObj = {}; var newScrapedList; var viewString = {}; var scrapeObject = {}; var screenViewObject = {}; var readTestCaseData; var getRowJsonCopy = [];
 var selectRowStepNoFlag = false; //var deleteStep = false;
+var dataFormat12;
 var getAllAppendedObj; //Getting all appended scraped objects
 var gsElement = []; window.localStorage['selectRowStepNo'] = '';
 var getWSTemplateData = {} //Contains Webservice saved data
@@ -118,6 +119,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				// service call # 2 - objectType service call
 				DesignServices.getScrapeDataScreenLevel_ICE(screenId)
 				.then(function(data2)	{
+					if(appType == "Webservice") dataFormat12 = data2.header[0].split("##").join("\n");
 					custnameArr.length = 0;
 					// counter to append the items @ correct indexes of custnameArr
 					var indexCounter = '';
@@ -702,6 +704,12 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				});
 				
 				$(".checkStylebox, .checkall").prop("disabled", false)
+				
+				if(viewString.view.length == 0){
+					$(".disableActions").addClass("enableActions").removeClass("disableActions");
+					$("#enableAppend").prop("disabled", true).css('cursor','no-drop');
+					$(document).find(".checkStylebox").prop("disabled", true)
+				}
 			}
 		}, 
 		function(error){console.log("error");})

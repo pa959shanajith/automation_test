@@ -99,14 +99,15 @@ var oldCustName = [];
                     	        var input = $('<input />', {
                     	            'type' : 'text',
                     	            'id'   : id_editable,
-                    	            'class': 'forValidationScreenObject',
+                    	            'class': 'editObjectName form-control',
                     	            'value': span.html().replace('&amp;','&').trim()
                     	        });                    	        
-        	        	        span.parent().append(input);
+                    	        span.parent().append(input);
         	        	        span.addClass('content-hide');
         	        	        //$(this).remove();
         	        	        input.focus();
-        	        	        input.addClass('autoWidth');
+        	        	        //input.addClass('autoWidth');
+        	        	        input.val(input.val().replace(/&amp;/g, '&'))
             	    		}
             	    	}
             	    	else{
