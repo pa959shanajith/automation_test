@@ -420,8 +420,16 @@ exports.updateScreen_ICE = function(req, res){
 						scrapedobjects='{}';
 					}
 					if(scrapedobjects.length>0){
+						var viewString;
 						scrapedobjects=JSON.parse(scrapedobjects);
-						var viewString = scrapedobjects.view;
+						if('view' in scrapedobjects){
+							viewString = scrapedobjects.view;
+						}else{
+							viewString=[];
+							scrapedobjects.mirror='';
+							scrapedobjects.scrapedin='';
+							scrapedobjects.scrapetype='';
+						}
 						if(viewString.length == deleteXpathNames.length){
 							deleteAll=true;
 							viewString=[];
