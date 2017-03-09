@@ -231,6 +231,8 @@ exports.updateScreen_ICE = function(req, res){
 							var obj = parse(requestedBody);
 							if ('root' in obj){
 								baseRequestBody=obj.root;
+								allXpaths=[];
+								allCustnames=[];
 								parseRequest(baseRequestBody);
 								for(var populationindex=0;populationindex<allXpaths.length;populationindex++){
 									
@@ -418,8 +420,16 @@ exports.updateScreen_ICE = function(req, res){
 						scrapedobjects='{}';
 					}
 					if(scrapedobjects.length>0){
+						var viewString;
 						scrapedobjects=JSON.parse(scrapedobjects);
-						var viewString = scrapedobjects.view;
+						if('view' in scrapedobjects){
+							viewString = scrapedobjects.view;
+						}else{
+							viewString=[];
+							scrapedobjects.mirror='';
+							scrapedobjects.scrapedin='';
+							scrapedobjects.scrapetype='';
+						}
 						if(viewString.length == deleteXpathNames.length){
 							deleteAll=true;
 							viewString=[];

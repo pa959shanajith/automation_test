@@ -178,6 +178,10 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 				$("#saveSuitesModal").modal("show")
 				angular.element(document.getElementById("left-nav-section")).scope().readTestSuite_ICE();
 			}
+			else{
+				$("#saveSuitesModalFail").show();
+				angular.element(document.getElementById("left-nav-section")).scope().readTestSuite_ICE();
+			}
 		}, 
 		function(error){})
 	}
@@ -212,6 +216,9 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 			.then(function(data){
 				if(data == "Terminate"){
 					$('#executionTerminated').modal('show');
+				}
+				else if(data == "unavailableLocalServer"){
+					$('#executionserverunavailable').modal('show');
 				}
 				else{
 					$('#executionCompleted').modal('show');

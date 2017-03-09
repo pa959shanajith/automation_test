@@ -172,6 +172,7 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 	$(document).on('click', '.openreportstatus', function(e){
 		var reportID = $(this).parent().attr('data-reportid');
 		var reportType = $(this).attr('data-getrep');
+		var testsuitename = $(".reportboxselected").siblings(".repsuitename").text();
 		var d = new Date();
 		var hours = d.getHours();
 	    var hours = (hours+24-2)%24; 
@@ -201,7 +202,7 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 				}],
 				rows : []
 		}		
-		reportService.getReport_Nineteen68(reportID, testsuiteId)
+		reportService.getReport_Nineteen68(reportID, testsuiteId,testsuitename)
 		.then(function(data) {
 			if(data.length > 0){
 				finalReports.overallstatus[0].domainName = data[0].domainname

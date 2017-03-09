@@ -315,35 +315,43 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 		testsuitedetails.executionId = executionId;
 		//					console.log(JSON.stringfy(testsuitedetails));
 		var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-		var mySocket = myserver.allSocketsMap[ip];
-		mySocket._events.result_executeTestSuite = [];
-		mySocket.emit('executeTestSuite', testsuitedetails);
-		mySocket.on('result_executeTestSuite', function (resultData) {
+		if('allSocketsMap' in myserver && ip in myserver.allSocketsMap){
+			var mySocket = myserver.allSocketsMap[ip];
+			mySocket._events.result_executeTestSuite = [];
+			mySocket.emit('executeTestSuite', testsuitedetails);
+			mySocket.on('result_executeTestSuite', function (resultData) {
 
-			if(resultData !="success" && resultData != "Terminate"){
-					var scenarioid =resultData.scenarioId;
-					var executionid = resultData.executionId;
-					var reportdata = resultData.reportData; 
-					var req_report = resultData.reportdata;
-					var req_reportStepsArray = reportdata.rows;
-					var req_overAllStatus = reportdata.overallstatus
-					var req_browser = reportdata.overallstatus[0].browserType;
+				if(resultData !="success" && resultData != "Terminate"){
+						var scenarioid =resultData.scenarioId;
+						var executionid = resultData.executionId;
+						var reportdata = resultData.reportData; 
+						var req_report = resultData.reportdata;
+						var req_reportStepsArray = reportdata.rows;
+						var req_overAllStatus = reportdata.overallstatus
+						var req_browser = reportdata.overallstatus[0].browserType;
+						reportdata = JSON.stringify(reportdata).replace(/'/g,"''");
+						reportdata = JSON.parse(reportdata);
 
-					var insertReport = "INSERT INTO reports (reportid,executionid,testsuiteid,testscenarioid,browser,modifiedon,status,report) VALUES (" + uuid() + "," + executionid + "," + testsuiteid + ","
-						+ scenarioid + ",'" + req_browser + "'," + new Date().getTime() + ",'" + resultData.reportData.overallstatus[0].overallstatus + "','" + JSON.stringify(reportdata)  +"')";
-					var dbquery =	dbConnICE.execute(insertReport, function (err, result) {if (err) {flag ="fail";}else {flag = "success";}});
+						var insertReport = "INSERT INTO reports (reportid,executionid,testsuiteid,testscenarioid,browser,modifiedon,status,report) VALUES (" + uuid() + "," + executionid + "," + testsuiteid + ","
+							+ scenarioid + ",'" + req_browser + "'," + new Date().getTime() + ",'" + resultData.reportData.overallstatus[0].overallstatus + "','" + JSON.stringify(reportdata)  +"')";
+						var dbquery =	dbConnICE.execute(insertReport, function (err, result) {if (err) {flag ="fail";}else {flag = "success";}});
 
-					var insertIntoExecution = "INSERT INTO execution (testsuiteid,executionid,starttime,endtime) VALUES ("
-					+testsuiteid+","+executionid+","+starttime+","+new Date().getTime()+");"
-					var dbqueryexecution =	dbConnICE.execute(insertIntoExecution, function (err, resultexecution) {if (err) {flag ="fail";}else {flag = "success";}});
-					//console.log("this is the value:",resultData);
+						var insertIntoExecution = "INSERT INTO execution (testsuiteid,executionid,starttime,endtime) VALUES ("
+						+testsuiteid+","+executionid+","+starttime+","+new Date().getTime()+");"
+						var dbqueryexecution =	dbConnICE.execute(insertIntoExecution, function (err, resultexecution) {if (err) {flag ="fail";}else {flag = "success";}});
+						//console.log("this is the value:",resultData);
 
-					}
-					if(resultData =="success" || resultData == "Terminate")
-					res.send(resultData);
+						}
+						if(resultData =="success" || resultData == "Terminate")
+						res.send(resultData);
 			
 			//}
-		});
+			});
+		}else{
+			console.log("Socket not Available");
+			res.send("unavailableLocalServer");
+		}
+		
 	});
 }
 
