@@ -213,6 +213,9 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 				if(data == "Terminate"){
 					$('#executionTerminated').modal('show');
 				}
+				else if(data == "unavailableLocalServer"){
+					$('#executionserverunavailable').modal('show');
+				}
 				else{
 					$('#executionCompleted').modal('show');
 				}
