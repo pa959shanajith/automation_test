@@ -231,6 +231,8 @@ exports.updateScreen_ICE = function(req, res){
 							var obj = parse(requestedBody);
 							if ('root' in obj){
 								baseRequestBody=obj.root;
+								allXpaths=[];
+								allCustnames=[];
 								parseRequest(baseRequestBody);
 								for(var populationindex=0;populationindex<allXpaths.length;populationindex++){
 									
