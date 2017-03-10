@@ -75,6 +75,11 @@ mySPA.controller('pluginController',['$scope','$window','$http','$location','$ti
 //Plugin click event - Creating Scope to define the function and returning back to controller
 function p_event(name){
     angular.element(document.getElementsByClassName("plugin-block")).scope().pluginFunction(name)
+	if(name == "p_Mindmap")
+	{
+		debugger;
+		window.location.href = '/home';
+	}
 }
 
 function taskRedirection(subtask,screenid,screenname,projectname,taskname,testcaseid,testcasename,apptype,releaseid,cycleid,testsuiteid,testsuitename){
