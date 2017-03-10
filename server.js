@@ -29,6 +29,7 @@ app.use(sessions({
 //serve all asset files from necessary directories
 app.use("/js", express.static(__dirname + "/public/js"));
 app.use("/imgs", express.static(__dirname + "/public/imgs"));
+app.use("/images_mindmap", express.static(__dirname + "/public/images_mindmap"));
 app.use("/css", express.static(__dirname + "/public/css"));
 app.use("/fonts", express.static(__dirname + "/public/fonts"));
 
@@ -56,6 +57,20 @@ app.post('/designTestCase', function(req, res){
 	// console.log("*--------",req);
 	res.sendFile("index.html", { root: __dirname + "/public/" });
 });
+
+// Mindmap Routes
+var api = require('./routes_mindmap/api.js');
+var home = require('./routes_mindmap/home.js');
+var index = require('./routes_mindmap/index.js');
+var templates = require('./routes_mindmap/tmTemplates.js');
+
+app.use('/home', home);
+app.use('/templates', templates);
+app.get('/import', api.importToNeo);
+app.get('/logout', api.logout);
+app.post('/casQuerya', api.casScriptA);
+app.post('/neoQuerya', api.neoScriptA);
+
 cmd.get('node index.js',
 		function(data, err, stderr){
 		    if (!err) {

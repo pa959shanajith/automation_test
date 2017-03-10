@@ -1,0 +1,1 @@
+{"cassandra":{"host":"127.0.0.1","port":9042,"keyspace":"testautomation"},"neo4j":{"host":"localhost","port":7474,"username":"neo4j","password":"local7474"}}

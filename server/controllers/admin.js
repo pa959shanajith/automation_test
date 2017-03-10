@@ -10,6 +10,7 @@ var cassandra = require('cassandra-driver');
 var uuid = require('uuid-random');
 //var passwordHash = require('password-hash');
 var bcrypt = require('bcrypt');
+var async = require('async');
 
 var roles = [];
 var r_ids = [];
@@ -33,6 +34,32 @@ exports.getUserRoles_Nineteen68 = function(req, res){
             }
         });
 };
+
+//GetUsers
+exports.getUsers_Nineteen68 = function(req, res){
+    var roles = [];
+    var r_ids = [];
+    var userRoles = {userRoles:[],r_ids:[]};
+   var getUserRoles = "select userid, username from nineteen68.users ";
+        dbConn.execute(getUserRoles, function (err, result) {
+            if (err) {
+                res(null, err);
+            }
+            else {
+                async.forEachSeries(result.rows,function(iterator,callback1){
+                    roles.push(iterator.username);
+                    r_ids.push(iterator.userid);
+                    callback1();
+                });
+                userRoles.userRoles = roles;
+                userRoles.r_ids = r_ids;
+                //console.log(userRoles);
+               res(null,userRoles);
+            }
+        });
+};
+
+
 
 //CreateUser   
 exports.createUser_Nineteen68 = function(req, res){
