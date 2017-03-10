@@ -2128,6 +2128,36 @@ function contentTable(newTestScriptDataLS) {
 			//tsrows_reorder();
 		}
 	});
+	
+	$(document).on('click', "[name='inputVal'],[name='custname'],[name='keywordVal'],[name='outputVal']", function() {
+		if($("[name='inputVal']").parent().siblings("[aria-describedby='jqGrid_keywordVal']").children().val() == "getBody" 
+			|| $("[name='inputVal']").parent().siblings("[aria-describedby='jqGrid_keywordVal']").children().val() == "setHeader"
+				|| $("[name='inputVal']").parent().siblings("[aria-describedby='jqGrid_keywordVal']").children().val() == "setWholeBody"
+					|| $("[name='inputVal']").parent().siblings("[aria-describedby='jqGrid_keywordVal']").children().val() == "setHeaderTemplate"	){    	
+			var getValueInput =$("[name='inputVal']").parent().attr('title');
+			if(getValueInput == undefined){
+				$("[name='inputVal']").parent().html("<textarea rows='1' style='resize:none;width:98%;min-height:25px;' class='form-control'></textarea>")
+			}
+			else{
+				$("[name='inputVal']").parent().html("<textarea rows='1' style='resize:none;width:98%;min-height:25px;' class='form-control'>"+getValueInput+"</textarea>")
+			}
+		}
+	});
+	$(document).on('focus', "[name='inputVal'],[name='custname'],[name='keywordVal'],[name='outputVal']", function(e) {
+		if($("[name='inputVal']").parent().siblings("[aria-describedby='jqGrid_keywordVal']").children().val() == "getBody"
+			|| $("[name='inputVal']").parent().siblings("[aria-describedby='jqGrid_keywordVal']").children().val() == "setHeader"
+				|| $("[name='inputVal']").parent().siblings("[aria-describedby='jqGrid_keywordVal']").children().val() == "setWholeBody"
+					|| $("[name='inputVal']").parent().siblings("[aria-describedby='jqGrid_keywordVal']").children().val() == "setHeaderTemplate"){
+			var getValueInput =$("[name='inputVal']").parent().attr('title');
+			if(getValueInput == undefined){
+				$("[name='inputVal']").parent().html("<textarea rows='1' style='resize:none;width:98%;min-height:25px;' class='form-control'></textarea>")
+			}
+			else{
+				$("[name='inputVal']").parent().html("<textarea rows='1' style='resize:none;width:98%;min-height:25px;' class='form-control'>"+getValueInput+"</textarea>")
+			}
+		}
+		e.preventDefault();
+	});
 
 	$("#jqGrid_rn").css("width","54px");
 	$('#jqGrid').navGrid("#jqGridPager", {edit: false, add: false, del: false, refresh: false, view: false, search:false, position:"left", cloneToTop: true });
@@ -2948,19 +2978,19 @@ function contentTable(newTestScriptDataLS) {
 		var taskInfo = JSON.parse(window.localStorage['_CT']);
 		var appTypeLocal = taskInfo.appType;//window.localStorage['appTypeScreen'];
 		if(selectedText == "getBody"){
-			$(e.target).parent().next().html("<textarea class='editable' rows='1' style='width: 98%;resize:none;min-height:25px;'></textarea>");
+			$(e.target).parent().next().html("<textarea class='editable form-control' rows='1' style='width: 98%;resize:none;min-height:25px;'></textarea>");
 		}
 		else if (selectedText == "setHeader"){
-			$(e.target).parent().next().html("<textarea class='editable' rows='1' style='width: 98%;resize:none;min-height:25px;'></textarea>");
+			$(e.target).parent().next().html("<textarea class='editable form-control' rows='1' style='width: 98%;resize:none;min-height:25px;'></textarea>");
 		}
 		else if (selectedText == "setWholeBody"){
-			$(e.target).parent().next().html("<textarea class='editable' rows='1' style='width: 98%;resize:none;min-height:25px;'></textarea>");
+			$(e.target).parent().next().html("<textarea class='editable form-control' rows='1' style='width: 98%;resize:none;min-height:25px;'></textarea>");
 		}
 		else if(selectedText == "setHeaderTemplate"){
 			var header;
 			if(dataFormat12.length == 1) header = dataFormat12.val();
 			else if(dataFormat12.length > 1) header = dataFormat12.replace(/##/g, '\n');
-			$(e.target).parent().next().html("<textarea class='editable' rows='1' style='width: 98%;resize:none;min-height:25px;'>"+header+"</textarea>");
+			$(e.target).parent().next().html("<textarea class='editable form-control' rows='1' style='width: 98%;resize:none;min-height:25px;'>"+header+"</textarea>");
 		}
 		else{
 			$(e.target).parent().next().html("<input type='text' class='editable form-control' style='width: 100%;'/>");
