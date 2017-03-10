@@ -30,6 +30,7 @@ function loadMindmapData(){
 		if(err) console.log(result);
 		else{
 			var nodeBox=d3.select('.ct-nodeBox');
+			$(nodeBox[0]).empty();
 			allMMaps=JSON.parse(result);
 			allMMaps.forEach(function(e,i){
 				var t=e.name.replace(/_/g,' ');
