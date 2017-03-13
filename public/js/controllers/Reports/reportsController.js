@@ -4,6 +4,7 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 	var getUserInfo = JSON.parse(window.localStorage['_UI']);
 	var userID = getUserInfo.user_id;
 	var open = 0;	var openWindow = 0;
+	var counter = 0;
 	var executionId, testsuiteId;
 	$("#page-taskName").empty().append('<span>Reports</span>')
 	$timeout(function(){
@@ -76,7 +77,7 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 				if(data.length > 0){
 					tableContainer.find('tbody').empty();
 					for(i=0; i<data.length; i++){
-						tableContainer.find('tbody').append("<tr class='scenariostatusreport' data-executionid='"+data[i].execution_id+"'><td>"+(i+1)+"</td><td>"+data[i].start_time.split(' ')[0]+"<span style='margin-left: 30px;'>"+data[i].start_time.split(' ')[1]+"</span></td><td>"+data[i].end_time.split(' ')[0]+"<span style='margin-left: 30px;'>"+data[i].end_time.split(' ')[1]+"</span></td></tr>");
+						tableContainer.find('tbody').append("<tr class='scenariostatusreport' data-executionid='"+data[i].execution_id+"'><td>"+(i+1)+"</td><td>"+data[i].start_time.split(' ')[0]+"</td><td>"+data[i].start_time.split(' ')[1]+"</td><td>"+data[i].end_time.split(' ')[0]+"</td><td>"+data[i].end_time.split(' ')[1]+"</td></tr>");
 					}					
 				}
 			}
@@ -113,7 +114,7 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 					else if(data[i].status == "Fail"){	fail++;	styleColor="style='color: #b31f2d !important;'";}
 					else if(data[i].status == "Terminate"){	terminated++;	styleColor="style='color: #faa536 !important;'";}
 					else if(data[i].status == "Incomplete"){	incomplete++;	styleColor="style='color: #58595b !important;'";}
-					scenarioContainer.find('tbody').append("<tr><td>"+data[i].testscenarioname+"</td><td>"+data[i].executedtime+"</td><td><img alt='Browser icon' src='imgs/"+browserIcon+"'></td><td class='openReports' data-reportid='"+data[i].reportid+"'><a class='openreportstatuss' "+styleColor+">"+data[i].status+"</a></td><td data-reportid='"+data[i].reportid+"'><img alt='Export JSON' src='imgs/ic-export-json.png' style='margin-right: 10px; cursor: pointer;'><img alt='Pdf Icon' class='getSpecificReportBrowser openreportstatus' data-getrep='phantom-pdf' style='cursor: pointer; margin-right: 10px;' src='imgs/ic-pdf.png'><img alt='Browser Icon' class='getSpecificReportBrowser openreportstatus' data-getrep='html' style='cursor: pointer;' src='imgs/ic-reports-chrome.png'></td></tr>");
+					scenarioContainer.find('tbody').append("<tr><td>"+data[i].testscenarioname+"</td><td>"+data[i].executedtime+"</td><td><img alt='Browser icon' src='imgs/"+browserIcon+"'></td><td class='openReports' data-reportid='"+data[i].reportid+"'><a class='openreportstatuss' "+styleColor+">"+data[i].status+"</a></td><td data-reportid='"+data[i].reportid+"'><img alt='Export JSON' class='exportToJSON' src='imgs/ic-export-json.png' style='margin-right: 10px; cursor: pointer;' title='Export to Json'><img alt='Pdf Icon' class='getSpecificReportBrowser openreportstatus' data-getrep='phantom-pdf' style='cursor: pointer; margin-right: 10px;' src='imgs/ic-pdf.png' title='PDF Report'><img alt='Browser Icon' class='getSpecificReportBrowser openreportstatus' data-getrep='html' style='cursor: pointer;' src='imgs/ic-reports-chrome.png' title='Browser Report'></td></tr>");
 				}
 				if(data.length > 0){
 					P = parseFloat((pass/total)*100).toFixed();
@@ -255,5 +256,90 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 		function(error) {
 			console.log("Error-------"+error);
 		})
+	})
+	
+	
+	//Export To JSON
+	$(document).on('click', '.exportToJSON', function(e){
+		var repId = $(this).parent().attr('data-reportid');		
+		reportService.exportToJson_ICE(repId)
+		.then(function(response) {
+			if (typeof response === 'object') {
+				var temp = JSON.parse(response.reportdata);
+				var responseData = JSON.stringify(temp, undefined, 2);
+			}
+			filename = response.scenarioname +".json";
+			var objAgent = $window.navigator.userAgent;
+			var objbrowserName = navigator.appName;
+			var objfullVersion = ''+parseFloat(navigator.appVersion);
+			var objBrMajorVersion = parseInt(navigator.appVersion,10);
+			var objOffsetName,objOffsetVersion,ix;
+			// In Chrome 
+			if ((objOffsetVersion=objAgent.indexOf("Chrome"))!=-1) { 
+				objbrowserName = "Chrome";
+				objfullVersion = objAgent.substring(objOffsetVersion+7);
+			} 
+			// In Microsoft internet explorer
+			else if ((objOffsetVersion=objAgent.indexOf("MSIE"))!=-1) { 
+				objbrowserName = "Microsoft Internet Explorer"; 
+				objfullVersion = objAgent.substring(objOffsetVersion+5);
+			} 
+			// In Firefox 
+			else if ((objOffsetVersion=objAgent.indexOf("Firefox"))!=-1) { 
+				objbrowserName = "Firefox";
+			} 
+			// In Safari 
+			else if ((objOffsetVersion=objAgent.indexOf("Safari"))!=-1) { 
+				objbrowserName = "Safari"; 
+				objfullVersion = objAgent.substring(objOffsetVersion+7); 
+				if ((objOffsetVersion=objAgent.indexOf("Version"))!=-1)
+					objfullVersion = objAgent.substring(objOffsetVersion+8);
+			}
+			// For other browser "name/version" is at the end of userAgent 
+			else if ( (objOffsetName=objAgent.lastIndexOf(' ')+1) < (objOffsetVersion=objAgent.lastIndexOf('/')) ) {
+				objbrowserName = objAgent.substring(objOffsetName,objOffsetVersion); 
+				objfullVersion = objAgent.substring(objOffsetVersion+1); 
+				if (objbrowserName.toLowerCase()==objbrowserName.toUpperCase()) { 
+					objbrowserName = navigator.appName; 
+				} 
+			} 
+			// trimming the fullVersion string at semicolon/space if present 
+			if ((ix=objfullVersion.indexOf(";"))!=-1) objfullVersion=objfullVersion.substring(0,ix);
+			if ((ix=objfullVersion.indexOf(" "))!=-1) objfullVersion=objfullVersion.substring(0,ix); 
+			objBrMajorVersion = parseInt(''+objfullVersion,10);
+			if (isNaN(objBrMajorVersion)) { 
+				objfullVersion = ''+parseFloat(navigator.appVersion); 
+				objBrMajorVersion = parseInt(navigator.appVersion,10); 
+			}
+			if(objBrMajorVersion== "9"){
+				if(objbrowserName == "Microsoft Internet Explorer"){
+					window.navigator.msSaveOrOpenBlob(new Blob([responseData], {type:"text/json;charset=utf-8"}), filename);
+				}
+			}else{
+				var blob = new Blob([responseData], {type: 'text/json'}),
+				e = document.createEvent('MouseEvents'),
+				a = document.createElement('a');
+				a.download = filename;
+				if(objbrowserName == "Microsoft Internet Explorer" || objbrowserName == "Netscape"){
+					window.navigator.msSaveOrOpenBlob(new Blob([responseData], {type:"text/json;charset=utf-8"}), filename);
+					//saveAs(blob, filename);
+				}else{
+					a.href = window.URL.createObjectURL(blob);
+					a.dataset.downloadurl = ['text/json', a.download, a.href].join(':');
+					e.initMouseEvent('click', true, true, window,
+							0, 0, 0, 0, 0, false, false, false, false, 0, null);
+					if(counter == 0)
+					{
+						a.dispatchEvent(e);
+					}
+					counter++;
+				}
+				
+			}
+          
+		},
+		function(error) {
+			//alert("Error while fetching reports! \r\n "+(error.data));
+		});
 	})
 }]);

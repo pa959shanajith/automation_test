@@ -2568,8 +2568,10 @@ select:hover {
     float: left;
 }
 .suitestartend tbody tr td:nth-child(1){width: 5%;}
-.suitestartend tbody tr td:nth-child(2){width: 45%; text-align: left; padding-left: 51px;}
-.suitestartend tbody tr td:nth-child(3){width: 50%; text-align: left; padding-left: 83px;}
+.suitestartend tbody tr td:nth-child(2){width: 25%; text-align: left; padding-left: 51px;}
+.suitestartend tbody tr td:nth-child(3){width: 20%; text-align: left; padding-left: 15px;}
+.suitestartend tbody tr td:nth-child(4){width: 30%; text-align: left; padding-left: 83px;}
+.suitestartend tbody tr td:nth-child(5){width: 20%; text-align: left; padding-left: 15px;}
 .scenarioReports tbody tr:nth-child(odd){
 	background:#e8e6ff;	
 }

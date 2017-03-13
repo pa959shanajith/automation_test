@@ -10,7 +10,8 @@ var dbConnICE = require('../../server/config/icetestautomation');
 var async = require('async');
 
 exports.getMainReport_ICE = function(req, res){
-	var client = require("jsreport-client")("http://localhost:3001/");
+	var IP = req.ip.split(":")[req.ip.split(":").length-1];
+	var client = require("jsreport-client")("http://"+IP+":3001/");
 	client.render({
 	    template: { 
 	    	shortid: "HJP1pqMcg", 
@@ -31,12 +32,14 @@ exports.getMainReport_ICE = function(req, res){
 exports.renderReport_ICE = function(req, res){
 	var finalReports = req.body.finalreports;
 	var reportType = req.body.reporttype;
-	var client = require("jsreport-client")("http://localhost:3001/");
+	var IP = req.ip.split(":")[req.ip.split(":").length-1];
+	var client = require("jsreport-client")("http://"+IP+":3001/");
 	client.render({
 	    template: { 
 	    	shortid: "rkE973-5l", 
 	    	recipe: reportType,
-	        engine: "handlebars" },
+	        engine: "handlebars" 
+	    },
 	    data: {
 	    	"overallstatus": finalReports.overallstatus,
 	    	"rows": finalReports.rows
@@ -412,6 +415,75 @@ exports.getReport_Nineteen68 = function(req, res) {
     );
 };
 
+
+exports.exportToJson_ICE = function(req, res) {
+	var reportId = req.body.reportId;
+	var reportInfoObj = {};
+	async.series({
+		projectsUnderDomain: function(callback) {
+			var getReportQuery = "select report from reports where reportid =" +reportId + " ALLOW FILTERING ";
+			dbConnICE.execute(getReportQuery, function(err, reportResult) {
+				if (err) {
+					console.log(err);
+				} else {
+					var reportres = reportResult.rows.length;
+					console.log('report result length', reportres);
+
+					async.forEachSeries(reportResult.rows, function(iterator, callback1) {
+						var reportdata = iterator.report;
+						reportInfoObj.reportdata = reportdata;
+						var testScenarioQuery = "select testscenarioid from reports where reportid ="+ reportId + " ALLOW FILTERING ";
+						dbConnICE.execute(testScenarioQuery, function(err, scenarioResult) {
+							if (err) {
+								console.log(err);
+							} else {
+								var reportres = scenarioResult.rows.length;
+								async.forEachSeries(scenarioResult.rows, function(sceiditr, callback2) {
+									var scenarioid=sceiditr.testscenarioid;
+									console.log('scenarioid',scenarioid);
+									var testScenarionameQuery = "select testscenarioname from testscenarios where testscenarioid ="
+									+ scenarioid + " ALLOW FILTERING ";
+									dbConnICE.execute(testScenarionameQuery, function(err, scenarionameResult) {
+										if (err) {
+											console.log(err);
+										} 
+										else {
+											var scenameres = scenarionameResult.rows.length;
+											async.forEachSeries(scenarionameResult.rows, function(scenameitr, callback3) {
+												var scenarioname=scenameitr.testscenarioname;
+												console.log(scenarioname,'scenarioname')
+												reportInfoObj.scenarioname = scenarioname;
+												console.log('reportInfoObj',reportInfoObj)
+
+												callback3();                       
+											},callback2);
+										}
+
+									});
+
+								},callback1);
+							}
+						});
+
+					}, callback);
+				}
+			});
+		}
+	},
+	function(err, results) {
+		// data.setHeader('Content-Type','application/json');
+		if (err) {
+			console.log(err);
+			cb(err);
+		} else {
+			console.log('in last function');
+			// console.log('here in last function   ',JSON.stringify(testSuiteDetails));
+			// cb(null,JSON.stringify(RequestedJSON));
+			res.send(reportInfoObj);
+		}
+	}
+	);
+};
 // serviceController.createStructure= {
 // 		handler: function(req, reply) {
 // 			var RequestedJSON={ "projectId": "42c3238d-7c0f-48dc-a6e1-fd5deeab845f","releaseId":"05329457-f02f-4d41-8ffc-9e04d2d380e3","cycleId": "69906803-f30d-485a-9bd1-0719c3e70ff4","appType": "Web","testsuiteDetails": [{"testsuiteName": "AHRI_RFRN_Manage_Disciplinary_Mode_Penalty","testscenarioDetails": [{"testscenarioName": "RFRN_OEM_Prerequisites","screenDetails": [{"screenName": "AHRI_Login","testcaseDetails": [{"testcaseName": "AHRI_USHP_AT"}]}, {"screenName": "Common_Excel_Data","testcaseDetails": [{"testcaseName": "AHRI_USAC_PBM"}]}]}, {"testscenarioName": "RFRN_Manage_Disciplinary_Mode_Penalty","screenDetails": [{"screenName": "Common_Manage_Program","testcaseDetails": [{"testcaseName": "USAC_Systems"}, {"testcaseName": "USAC_PBM_Single_Entry"}]}, {"screenName": "AHRI_QuickSearch","testcaseDetails": [{"testcaseName": "USAC_QuickSearch"}, {"testcaseName": "USHP_QuickSearch"}]}]}]}]};
