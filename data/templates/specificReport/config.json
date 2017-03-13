@@ -3,12 +3,21 @@
     "recipe": "phantom-pdf",
     "engine": "handlebars",
     "modificationDate": {
-        "$$date": 1488804269382
+        "$$date": 1489394150299
     },
     "_id": "2ikqtxTiQgHPFRZd",
     "phantom": {
         "fitToPage": true,
         "customPhantomJS": true,
         "blockJavaScript": true
+    },
+    "data": null,
+    "resources": {
+        "items": [
+            {
+                "shortid": "SJoj7aQol",
+                "entitySet": "data"
+            }
+        ]
     }
 }

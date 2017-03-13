@@ -172,8 +172,14 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 							var testcase = JSON.parse(data.testcase);
 							var testcaseArray = [];
 							for(var i = 0; i < testcase.length; i++)	{
+								if(appType == "Webservice"){
+									if(testcase[i].keywordVal == "setHeader" || testcase[i].keywordVal == "setHeaderTemplate"){
+										testcase[i].inputVal[0] = testcase[i].inputVal[0].split("##").join("\n")
+									}
+								}
 								testcaseArray.push(testcase[i]);						
 							}
+							console.log("readTestCase:::", testcaseArray)
 											
 							readTestCaseData = JSON.stringify(testcaseArray)
 							$("#jqGrid_addNewTestScript").jqGrid('clearGridData');
@@ -1838,7 +1844,6 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			//		else{
 						if(mydata[i].url == undefined){mydata[i].url="";}
 						mydata[i].stepNo = i+1;
-						debugger;
 						//mydata[i].remarks = $("#jqGrid tbody tr td:nth-child(10)")[i+1].textContent;
 						if(mydata[i].remarks != undefined)
 						{
@@ -1883,6 +1888,10 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 									}
 								}
 							}
+							else if(mydata[i].keywordVal == "setHeader" || mydata[i].keywordVal == "setHeaderTemplate"){
+								mydata[i].inputVal[0] = mydata[i].inputVal[0].replace(/[\n\r]/g,'##');
+							}
+							console.log("updateTestCase:::", mydata)
 						}
 				//	}
 				}
@@ -2139,7 +2148,7 @@ function contentTable(newTestScriptDataLS) {
 				$("[name='inputVal']").parent().html("<textarea rows='1' style='resize:none;width:98%;min-height:25px;' class='form-control'></textarea>")
 			}
 			else{
-				$("[name='inputVal']").parent().html("<textarea rows='1' style='resize:none;width:98%;min-height:25px;' class='form-control'>"+getValueInput+"</textarea>")
+				$("[name='inputVal']").parent().html("<textarea rows='1' style='resize:none;width:98%;min-height:25px;' class='form-control'>"+getValueInput.split('##').join('\n')+"</textarea>")
 			}
 		}
 	});
@@ -2153,7 +2162,7 @@ function contentTable(newTestScriptDataLS) {
 				$("[name='inputVal']").parent().html("<textarea rows='1' style='resize:none;width:98%;min-height:25px;' class='form-control'></textarea>")
 			}
 			else{
-				$("[name='inputVal']").parent().html("<textarea rows='1' style='resize:none;width:98%;min-height:25px;' class='form-control'>"+getValueInput+"</textarea>")
+				$("[name='inputVal']").parent().html("<textarea rows='1' style='resize:none;width:98%;min-height:25px;' class='form-control'>"+getValueInput.split('##').join('\n')+"</textarea>")
 			}
 		}
 		e.preventDefault();
@@ -3074,17 +3083,22 @@ function contentTable(newTestScriptDataLS) {
 
 //Delete Testscripts
 function deleteTestScriptRow(e){
-	if($(document).find("#cb_jqGrid:checked").length > 0 || $("#jqGrid").find(".cbox:checked").length > 0 ){
-		$("#globalModalYesNo").find('.modal-title').text("Delete Test Step");
-		$("#globalModalYesNo").find('.modal-body p').text("Are you sure, you want to delete?").css('color','black');
-		$("#globalModalYesNo").find('.modal-footer button:nth-child(1)').attr("id","btnDeleteStepYes")
-		$("#globalModalYesNo").modal("show");		
-		/*angular.element(document.getElementById("tableActionButtons")).scope().updateTestCase_ICE();*/		
+	if($('.ui-state-highlight').find('td:nth-child(2)').find('input').is(":checked") && $('.ui-state-highlight').find('td:nth-child(7)').find('input').length > 0){
+		
 	}
 	else{
-		$("#globalModal").find('.modal-title').text("Delete Test step");
-		$("#globalModal").find('.modal-body p').text("Select steps to delete").css("color","#000");
-		$("#globalModal").modal("show");
+		if($(document).find("#cb_jqGrid:checked").length > 0 || $("#jqGrid").find(".cbox:checked").length > 0 ){
+			$("#globalModalYesNo").find('.modal-title').text("Delete Test Step");
+			$("#globalModalYesNo").find('.modal-body p').text("Are you sure, you want to delete?").css('color','black');
+			$("#globalModalYesNo").find('.modal-footer button:nth-child(1)').attr("id","btnDeleteStepYes")
+			$("#globalModalYesNo").modal("show");
+			/*angular.element(document.getElementById("tableActionButtons")).scope().updateTestCase_ICE();*/		
+		}
+		else{
+			$("#globalModal").find('.modal-title').text("Delete Test step");
+			$("#globalModal").find('.modal-body p').text("Select steps to delete").css("color","#000");
+			$("#globalModal").modal("show");
+		}
 	}
 }
 
@@ -3108,73 +3122,78 @@ $(document).on('click','#btnDeleteStepYes', function(){
 })
 
 function addTestScriptRow(){
-	var flagClass;
-	if($("#jqGrid tr").hasClass("ui-state-highlight") == true) {
-		flagClass = "true";
-		window.localStorage['selectedRowStepNo'] = $("#jqGrid tr.ui-state-highlight td:nth-child(1)").text();
-		if($("#jqGrid tr.ui-state-highlight").length > 1) flagClass = "false";
+	if($('.ui-state-highlight').find('td:nth-child(2)').find('input').is(":checked") && $('.ui-state-highlight').find('td:nth-child(7)').find('input').length > 0){
+		
 	}
-	else flagClass = "false";
-	var selectedStepNo = window.localStorage['selectedRowStepNo']
-	//$("#jqGrid").trigger("reloadGrid");
-	appTypeLocal = JSON.parse(window.localStorage['_CT']).appType;;
-	var emptyRowData = {
-			"objectName": "",
-			"custname": "",
-			"keywordVal": "",
-			"inputVal": [""],
-			"outputVal": "",
-			"stepNo": "",
-			"url": "",
-			"appType": "Generic"
-	};
-	
-	$("#jqGrid tr").each(function(){
-		if($(this).find("td:nth-child(9)").find(".remarksIcon").length > 0){
-			$(this).find("td:nth-child(9)").find(".remarksIcon").remove();
+	else{
+		var flagClass;
+		if($("#jqGrid tr").hasClass("ui-state-highlight") == true) {
+			flagClass = "true";
+			window.localStorage['selectedRowStepNo'] = $("#jqGrid tr.ui-state-highlight td:nth-child(1)").text();
+			if($("#jqGrid tr.ui-state-highlight").length > 1) flagClass = "false";
 		}
-	})
-	   
-	var gridArrayData = $("#jqGrid").jqGrid('getRowData');
-	var arrayLength = gridArrayData.length;
-	if(arrayLength <= 0){
-		gridArrayData.splice(arrayLength,0,emptyRowData);
-		gridArrayData[0].stepNo = parseInt("1");
-		window.localStorage['emptyTable'] = true;
-	}else{
-		window.localStorage['emptyTable'] = false;
-		if(flagClass == "true"){
-			gridArrayData.splice(parseInt(selectedStepNo),0,emptyRowData);
-			if(gridArrayData[parseInt(selectedStepNo)+1] == undefined){
-				gridArrayData[arrayLength].stepNo = parseInt(gridArrayData[arrayLength-1].stepNo)+1;
-			}
-			else{
-				gridArrayData[parseInt(selectedStepNo)].stepNo = parseInt(gridArrayData[parseInt(selectedStepNo)+1].stepNo)
-				//i=gridArrayData[parseInt(selectedStepNo)].stepNo
-				for(i=0; i < gridArrayData.length; i++){
-					gridArrayData[i].stepNo = i+1;
-				}
-			}
-		} 
-		else{
-			gridArrayData.splice(arrayLength,0,emptyRowData);
-			gridArrayData[arrayLength].stepNo = parseInt(gridArrayData[arrayLength-1].stepNo)+1;
-		}
-	}
-	$("#jqGrid").jqGrid('clearGridData');
-	$("#jqGrid").jqGrid('setGridParam',{data: gridArrayData});
-	$("#jqGrid").trigger("reloadGrid");
-
-	$("#jqGrid tr:last").focus();
-	if(flagClass == "true"){
+		else flagClass = "false";
+		var selectedStepNo = window.localStorage['selectedRowStepNo']
+		//$("#jqGrid").trigger("reloadGrid");
+		appTypeLocal = JSON.parse(window.localStorage['_CT']).appType;
+		var emptyRowData = {
+				"objectName": "",
+				"custname": "",
+				"keywordVal": "",
+				"inputVal": [""],
+				"outputVal": "",
+				"stepNo": "",
+				"url": "",
+				"appType": "Generic"
+		};
+		
 		$("#jqGrid tr").each(function(){
-			if($(this).children("td:nth-child(1)").text() == window.localStorage['selectedRowStepNo']){
-				$(this).siblings().removeClass("ui-state-highlight")
-				$(this).next().addClass("ui-state-highlight").focus();
+			if($(this).find("td:nth-child(9)").find(".remarksIcon").length > 0){
+				$(this).find("td:nth-child(9)").find(".remarksIcon").remove();
 			}
 		})
-		flagClass == "false"
-	}
+		   
+		var gridArrayData = $("#jqGrid").jqGrid('getRowData');
+		var arrayLength = gridArrayData.length;
+		if(arrayLength <= 0){
+			gridArrayData.splice(arrayLength,0,emptyRowData);
+			gridArrayData[0].stepNo = parseInt("1");
+			window.localStorage['emptyTable'] = true;
+		}else{
+			window.localStorage['emptyTable'] = false;
+			if(flagClass == "true"){
+				gridArrayData.splice(parseInt(selectedStepNo),0,emptyRowData);
+				if(gridArrayData[parseInt(selectedStepNo)+1] == undefined){
+					gridArrayData[arrayLength].stepNo = parseInt(gridArrayData[arrayLength-1].stepNo)+1;
+				}
+				else{
+					gridArrayData[parseInt(selectedStepNo)].stepNo = parseInt(gridArrayData[parseInt(selectedStepNo)+1].stepNo)
+					//i=gridArrayData[parseInt(selectedStepNo)].stepNo
+					for(i=0; i < gridArrayData.length; i++){
+						gridArrayData[i].stepNo = i+1;
+					}
+				}
+			} 
+			else{
+				gridArrayData.splice(arrayLength,0,emptyRowData);
+				gridArrayData[arrayLength].stepNo = parseInt(gridArrayData[arrayLength-1].stepNo)+1;
+			}
+		}
+		$("#jqGrid").jqGrid('clearGridData');
+		$("#jqGrid").jqGrid('setGridParam',{data: gridArrayData});
+		$("#jqGrid").trigger("reloadGrid");
+
+		$("#jqGrid tr:last").focus();
+		if(flagClass == "true"){
+			$("#jqGrid tr").each(function(){
+				if($(this).children("td:nth-child(1)").text() == window.localStorage['selectedRowStepNo']){
+					$(this).siblings().removeClass("ui-state-highlight")
+					$(this).next().addClass("ui-state-highlight").focus();
+				}
+			})
+			flagClass == "false"
+		}
+	}	
 }
 
 function rearrangeTestScriptRow(){
@@ -3349,7 +3368,7 @@ function pasteTestStep(){
 }
 // TO Clear Input Val on Close of Bootstrap Modal Dialog
 $(document).on('hide.bs.modal','#modalDialog-inputField', function () {
-              $("#getInputData").val('')
+	$("#getInputData").val('')
 });
 
 $(document).on("click", "#btnPasteTestStepYes", function(){
@@ -3632,7 +3651,7 @@ function getTags(data) {
 		else if(appTypeLocal == "mobileweb")	{
 			obnames.push("@Generic");
 			obnames.push("@Browser");
-			//obnames.push("@Custom");
+			obnames.push("@BrowserPopUp");
 		}
 		else if(appTypeLocal == "MobilityiOS")	{
 			obnames.push("@Generic");

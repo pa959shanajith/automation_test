@@ -80,6 +80,20 @@ mySPA.factory('reportService', ['$http','$q', function ($http, $httpProvider, $q
 			function(response){
 				return $q.reject(response.data)
 			})
+		},
+		
+		//Export To JSON Reports
+		exportToJson_ICE : function(repId){
+			return $http.post('/exportToJson_ICE',{
+				param : 'exportToJson_ICE',
+				reportId : repId
+			})
+			.then(function(response)  {
+				return response.data
+			},
+			function(response){
+				return $q.reject(response.data)
+			})
 		}
 	}
 }]);
