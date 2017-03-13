@@ -22,6 +22,7 @@ exports.readTestSuite_ICE = function (req, res) {
 	var outdataparam=[];
 	var outscenarioids=[];
 	var outscenarionames = [];
+	var outprojectnames = [];
 	
 	//base request elements
 	var requiredtestsuiteid=req.body.testsuiteid;
@@ -35,15 +36,21 @@ exports.readTestSuite_ICE = function (req, res) {
 			condition: [],
 			dataparam:[],
 			scenarioids:[],
-			scenarionames:[]
+			scenarionames:[],
+			projectnames:[]
 	};
 
 	/*
 	* Query 1 fetching the donotexecute,conditioncheck,getparampaths,testscenarioids
 	* based on testsuiteid,testsuitename and cycleid
 	*/
-	async.series({		
-		testsuitesdata: function(callback){
+	TestSuiteDetails_Module_ICE(req.body,function(err,data){
+		if(err){
+			console.log(err);
+		}else{
+			console.log(data);
+			async.series({		
+			testsuitesdata: function(callback){
 			var getTestSuites="select donotexecute,conditioncheck,getparampaths,testscenarioids from testsuites where testsuiteid= "+requiredtestsuiteid+" and cycleid="+requiredcycleid+" and testsuitename='"+requiredtestsuitename+"'";
 			//var getTestSuites="select donotexecute,condtitioncheck,getparampaths,testscenarioids from testsuites where testsuiteid= 13bbacaf-82c7-4c4a-9f91-0933462b10d4 AND cycleid=e6e5b473-34cd-4963-9bda-cb78c727e413 and testsuitename='Dev Suite 1'"; 
 			dbConnICE.execute(getTestSuites, function (err, result) {
@@ -52,17 +59,49 @@ exports.readTestSuite_ICE = function (req, res) {
 					res.send("");
 				}else {
 					async.forEachSeries(result.rows, function(quest, callback2) {
-						outexecutestatus=quest.donotexecute;
-						outcondition=quest.conditioncheck;
-						outdataparam=quest.getparampaths;
+						
 						outscenarioids=quest.testscenarioids;
-						//var responsedata={template: "",testcase:[],testcasename:""};
+
+						if(quest.donotexecute == null){
+							var arrTemp = [];
+							for(var i=0;i<outscenarioids.length;i++){
+								arrTemp.push(1);
+							}
+							outexecutestatus = arrTemp;
+						}else{
+						outexecutestatus=quest.donotexecute;
+						}
+
+						if(quest.conditioncheck == null){
+							var arrTemp = [];
+							for(var i=0;i<outscenarioids.length;i++){
+								arrTemp.push(0);
+							}
+							outcondition = arrTemp;
+						}else{
+						outcondition=quest.conditioncheck;
+						}
+
+						if(quest.getparampaths == null){
+							var arrTemp = [];
+							for(var i=0;i<outscenarioids.length;i++){
+								arrTemp.push('');
+							}
+							outdataparam = arrTemp;
+						}else{
+						outdataparam=quest.getparampaths;
+						}
+						
+						
+						//var responsedata={template: "",testcase:[],testcas	ename:""};
 						async.forEachSeries(outscenarioids,function(quest1,callback3){
-							var testcasestepsquery = "SELECT testscenarioname FROM testscenarios where testscenarioid="+quest1;
+							var testcasestepsquery = "SELECT testscenarioname,projectid FROM testscenarios where testscenarioid="+quest1;
 							dbConnICE.execute(testcasestepsquery, function(err, answers) {
 								if(err){
 									console.log(err);
 								}else{
+									// var projectnamequery = "SELECT projectname FROM projects where projectid = "+answers.rows[0].projectid+" ALLOW FILTERING;";
+									// var runquery = dbConnICE.execute(projectnamequery, function(err, projectnameresult) {if(err){ }else{outprojectnames.push(projectnameresult.rows[0].projectname)}});
 									outscenarionames.push(answers.rows[0].testscenarioname);
 								}
 								callback3(); 
@@ -74,6 +113,7 @@ exports.readTestSuite_ICE = function (req, res) {
 				responsedata.dataparam=outdataparam;
 				responsedata.scenarioids=outscenarioids;
 				responsedata.scenarionames = outscenarionames;
+				//responsedata.projectnames = outprojectnames;
 				//cb(null, responsedata);
 				}
 			});
@@ -89,6 +129,8 @@ exports.readTestSuite_ICE = function (req, res) {
 		res.send(JSON.stringify(responsedata));
 	} 
 	})
+		}
+	});
 };
 //ReadTestSuite Functionality
 
@@ -567,3 +609,83 @@ exports.getCycleNameByCycleId = function (req, res) {
 			}
 		});
 	}
+
+	function TestSuiteDetails_Module_ICE(req,cb,data){
+//	var requestedtestscenarioid = req;
+	var requiredcycleid = req.cycleid;
+	var requiredtestsuiteid = req.testsuiteid;
+	var requiredtestsuitename = req.testsuitename;
+	//var testscenarioslist = "select testcaseids from testscenarios where testscenarioid="+requestedtestscenarioid+";";
+	
+	
+	
+	var resultstring = [];
+	var data = [];
+	var resultdata ='';
+	var flag = false;
+	var listoftestcasedata = [];
+	async.series(
+			{
+			testsuitecheck : function(callback){
+				var getTestSuites="select donotexecute,conditioncheck,getparampaths,testscenarioids from testsuites where testsuiteid= "+requiredtestsuiteid+" and cycleid="+requiredcycleid+" and testsuitename='"+requiredtestsuitename+"'";
+				dbConnICE.execute(getTestSuites,function(err,result){
+					if(err){
+						console.log(err);
+					}else{
+						if(result.rows.length!=0){
+							flag = true;
+						}
+						callback();
+					}
+				});
+			},
+			selectmodule: function(callback){
+				var moduledetails = "SELECT * FROM modules where moduleid="+requiredtestsuiteid+" and modulename='"+requiredtestsuitename+"' ALLOW FILTERING";
+				dbConnICE.execute(moduledetails,function(err,result){
+					if(err){
+						console.log(err);
+					}else{
+						if(result.rows.length!=0){
+							data = JSON.parse(JSON.stringify(result.rows[0]));
+							resultdata = data;
+						}
+						
+						console.log(data);
+						callback(err,resultdata);
+					}
+				});
+			},
+			testcasesteps : function(callback){
+				var testscenarioids = resultdata.testscenarioids;
+				//async.forEachSeries(resultdata, function(quest, callback2) {
+					var responsedata={template: "",testcase:[],testcasename:""};
+					var testsuiteexe = "INSERT INTO testsuites (cycleid,testsuitename,testsuiteid,versionnumber,condtitioncheck,createdby,createdon,createdthrough,deleted,donotexecute,getparampaths,history,modifiedby,modifiedon,skucodetestsuite,tags,testscenarioids) VALUES (" + requiredcycleid + ",'" + requiredtestsuitename + "'," + requiredtestsuiteid + ",1,[],'Kavyashree'," + new Date().getTime().toString() + ",null,null,[],[],null,null," + new Date().getTime().toString() + ",null,null,["+testscenarioids+"])";
+					//var testcasestepsquery = "select testcasesteps,testcasename from testcases where testcaseid = "+quest;
+					if(!flag){
+						dbConnICE.execute(testsuiteexe, function(err, answers) {
+						if(err){
+							console.log(err);
+						}else{
+							
+						}
+						
+						});
+					}
+					callback(); 
+					
+				//}, callback);
+
+			}
+			},
+			function(err,results){
+				//data.setHeader('Content-Type','application/json');
+				if(err){
+					cb(err);
+				} 
+				else{
+					cb(null,flag);
+				} 
+			}
+
+	);
+}
