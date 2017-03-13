@@ -172,8 +172,14 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 							var testcase = JSON.parse(data.testcase);
 							var testcaseArray = [];
 							for(var i = 0; i < testcase.length; i++)	{
+								if(appType == "Webservice"){
+									if(testcase[i].keywordVal == "setHeader" || testcase[i].keywordVal == "setHeaderTemplate"){
+										testcase[i].inputVal[0] = testcase[i].inputVal[0].split("##").join("\n")
+									}
+								}
 								testcaseArray.push(testcase[i]);						
 							}
+							console.log("readTestCase:::", testcaseArray)
 											
 							readTestCaseData = JSON.stringify(testcaseArray)
 							$("#jqGrid_addNewTestScript").jqGrid('clearGridData');
@@ -1838,7 +1844,6 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			//		else{
 						if(mydata[i].url == undefined){mydata[i].url="";}
 						mydata[i].stepNo = i+1;
-						debugger;
 						//mydata[i].remarks = $("#jqGrid tbody tr td:nth-child(10)")[i+1].textContent;
 						if(mydata[i].remarks != undefined)
 						{
@@ -1883,6 +1888,10 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 									}
 								}
 							}
+							else if(mydata[i].keywordVal == "setHeader" || mydata[i].keywordVal == "setHeaderTemplate"){
+								mydata[i].inputVal[0] = mydata[i].inputVal[0].replace(/[\n\r]/g,'##');
+							}
+							console.log("updateTestCase:::", mydata)
 						}
 				//	}
 				}
@@ -2139,7 +2148,7 @@ function contentTable(newTestScriptDataLS) {
 				$("[name='inputVal']").parent().html("<textarea rows='1' style='resize:none;width:98%;min-height:25px;' class='form-control'></textarea>")
 			}
 			else{
-				$("[name='inputVal']").parent().html("<textarea rows='1' style='resize:none;width:98%;min-height:25px;' class='form-control'>"+getValueInput+"</textarea>")
+				$("[name='inputVal']").parent().html("<textarea rows='1' style='resize:none;width:98%;min-height:25px;' class='form-control'>"+getValueInput.split('##').join('\n')+"</textarea>")
 			}
 		}
 	});
@@ -2153,7 +2162,7 @@ function contentTable(newTestScriptDataLS) {
 				$("[name='inputVal']").parent().html("<textarea rows='1' style='resize:none;width:98%;min-height:25px;' class='form-control'></textarea>")
 			}
 			else{
-				$("[name='inputVal']").parent().html("<textarea rows='1' style='resize:none;width:98%;min-height:25px;' class='form-control'>"+getValueInput+"</textarea>")
+				$("[name='inputVal']").parent().html("<textarea rows='1' style='resize:none;width:98%;min-height:25px;' class='form-control'>"+getValueInput.split('##').join('\n')+"</textarea>")
 			}
 		}
 		e.preventDefault();
