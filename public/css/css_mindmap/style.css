@@ -187,9 +187,9 @@ p,a,img,text,span,.noselect{-webkit-touch-callout:none;-webkit-user-select:none;
 #ct-collapse{
     right: 0
 }
-.rsSlide{
+/* .rsSlide{
     display: none;
-}
+} */
 #ct-expand-right{
     z-index: 10000;
     right: 84px;
