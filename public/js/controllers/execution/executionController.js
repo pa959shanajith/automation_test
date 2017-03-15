@@ -63,57 +63,56 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 		getEachScenario = []
 		ExecutionService.readTestSuite_ICE(cycleId, testSuiteId,testSuiteName)
 		.then(function(data) {
-			if(data == "")
-			{
-			}
+			if(data == ""){}
 			else{
-					cfpLoadingBar.complete();
-			rowData = data;
-			var row = $("<tbody />");
-			$("#executionDataTable tbody tr").remove();
-			var count = 1
-			//Building object for each row after getting the data from server
-			for(i=0; i<rowData.condition.length && rowData.dataparam.length && rowData.executestatus && rowData.scenarioids.length; i++){
-				getEachScenario.push({
-					"condition" : rowData.condition[i],
-					"dataParam" : rowData.dataparam[i],
-					"executeStatus" : rowData.executestatus[i],
-					"scenarioIds" : rowData.scenarioids[i],
-					"scenarionames": rowData.scenarionames[i]
-				})
-			}
-			//Building object for each row after getting the data from server
-			var projectName=['Project Name'];
-			//Creating Table Rows for each of the Scenarios
-			for (var i = 0; i < getEachScenario.length; i++) {
-				
-				row = $("<tr id=\"" + count + "\"/>");
-				$("#executionDataTable").append(row);
-				row.append($("<td class='tabeleCellPadding' style='width:3.9%;' id=\"" + count + "\">"+ count + "</td>"));
-				if(getEachScenario[i].executeStatus == undefined || getEachScenario[i].executeStatus == 0){
-					row.append($("<td class='tabeleCellPadding exe-ExecuteStatus' style='width: 3%; padding-top: 7px !important'><input ng-checked='executeAll' type='checkbox' title='Select to not execute this scenario' class='doNotExecuteScenario d-execute'></td>"));
+				cfpLoadingBar.complete();
+				rowData = data;
+				var row = $("<tbody />");
+				$("#executionDataTable tbody tr").remove();
+				var count = 1
+				//Building object for each row after getting the data from server
+				for(i=0; i<rowData.condition.length && rowData.dataparam.length && rowData.executestatus && rowData.scenarioids.length && rowData.projectnames.length; i++){
+					getEachScenario.push({
+						"condition" : rowData.condition[i],
+						"dataParam" : rowData.dataparam[i],
+						"executeStatus" : rowData.executestatus[i],
+						"scenarioIds" : rowData.scenarioids[i],
+						"scenarionames": rowData.scenarionames[i],
+						"projectnames" : rowData.projectnames[i]
+					})
 				}
-				else if(getEachScenario[i].executeStatus == 1){
-					row.append($("<td class='tabeleCellPadding exe-ExecuteStatus' style='width:3%; padding-top: 7px !important'><input ng-checked='executeAll' type='checkbox' title='Select to not execute this scenario' class='doNotExecuteScenario d-execute' checked></td>"));
+				//Building object for each row after getting the data from server
+				var projectName=['Project Name'];
+				//Creating Table Rows for each of the Scenarios
+				for (var i = 0; i < getEachScenario.length; i++) {
+
+					row = $("<tr id=\"" + count + "\"/>");
+					$("#executionDataTable").append(row);
+					row.append($("<td class='tabeleCellPadding' style='width:3.9%;' id=\"" + count + "\">"+ count + "</td>"));
+					if(getEachScenario[i].executeStatus == undefined || getEachScenario[i].executeStatus == 0){
+						row.append($("<td class='tabeleCellPadding exe-ExecuteStatus' style='width: 3%; padding-top: 7px !important'><input ng-checked='executeAll' type='checkbox' title='Select to not execute this scenario' class='doNotExecuteScenario d-execute'></td>"));
+					}
+					else if(getEachScenario[i].executeStatus == 1){
+						row.append($("<td class='tabeleCellPadding exe-ExecuteStatus' style='width:3%; padding-top: 7px !important'><input ng-checked='executeAll' type='checkbox' title='Select to not execute this scenario' class='doNotExecuteScenario d-execute' checked></td>"));
+					}
+					row.append($("<td class='tabeleCellPadding exe-scenarioIds' onclick='loadLocationDetails(this.innerHTML, this.getAttribute(\"sId\"))' sId="+getEachScenario[i].scenarioIds+" style='width: 23%; margin-right: 2%; cursor:pointer; word-break: break-all; text-align:left'>" + getEachScenario[i].scenarionames+ "</td>"));
+					if(getEachScenario[i].dataParam == undefined){
+						row.append($('<td style="width: 22%" class="tabeleCellPadding exe-dataParam"><input class="getParamPath form-control" type="text" value=""/></td>'));
+					}
+					else {
+						row.append($('<td style="width: 22%" class="tabeleCellPadding exe-dataParam"><input class="getParamPath form-control" type="text" value="'+ getEachScenario[i].dataParam +'"/></td>'));
+					}
+					if(getEachScenario[i].condition == 0){
+						row.append($('<td style="width:15%" class="tabeleCellPadding exe-conditionCheck"><select class="conditionCheck form-control alertRed"><option value="1">True</option><option value="'+getEachScenario[i].condition+'" selected>False</option></select> </td>'));
+					}
+					else{
+						row.append($('<td style="width:15%" class="tabeleCellPadding exe-conditionCheck"><select class="conditionCheck form-control alertGreen"><option value="'+getEachScenario[i].condition+'" selected>True</option><option value="0">False</option></select> </td>'));
+					}
+					row.append($("<td style='width:23%; word-break: break-all; padding-left: 1% !important; padding-right: 1% !important' class='tabeleCellPadding'>" + getEachScenario[i].projectnames + "</td>"));
+					row.append($("<td style='width:8%' class='tabeleCellPadding'><img src='../imgs/ic-alm.png' id='syncScenario' title='Sync Test Scenario' style='cursor: pointer;'/></td>"));
+					count++;
 				}
-				row.append($("<td class='tabeleCellPadding exe-scenarioIds' onclick='loadLocationDetails(this.innerHTML, this.getAttribute(\"sId\"))' sId="+getEachScenario[i].scenarioIds+" style='width: 23%; margin-right: 2%; cursor:pointer; word-break: break-all; text-align:left'>" + getEachScenario[i].scenarionames+ "</td>"));
-				if(getEachScenario[i].dataParam == undefined){
-					row.append($('<td style="width: 22%" class="tabeleCellPadding exe-dataParam"><input class="getParamPath form-control" type="text" value=""/></td>'));
-				}
-				else {
-					row.append($('<td style="width: 22%" class="tabeleCellPadding exe-dataParam"><input class="getParamPath form-control" type="text" value="'+ getEachScenario[i].dataParam +'"/></td>'));
-				}
-				if(getEachScenario[i].condition == 0){
-					row.append($('<td style="width:15%" class="tabeleCellPadding exe-conditionCheck"><select class="conditionCheck form-control alertRed"><option value="1">True</option><option value="'+getEachScenario[i].condition+'" selected>False</option></select> </td>'));
-				}
-				else{
-					row.append($('<td style="width:15%" class="tabeleCellPadding exe-conditionCheck"><select class="conditionCheck form-control alertGreen"><option value="'+getEachScenario[i].condition+'" selected>True</option><option value="0">False</option></select> </td>'));
-				}
-				row.append($("<td style='width:23%; word-break: break-all; padding-left: 1% !important; padding-right: 1% !important' class='tabeleCellPadding'>" + projectName[0] + "</td>"));
-				row.append($("<td style='width:8%' class='tabeleCellPadding'><img src='../imgs/ic-alm.png' id='syncScenario' title='Sync Test Scenario' style='cursor: pointer;'/></td>"));
-				count++;
-			}
-			//Creating Table Rows for each of the Scenarios
+				//Creating Table Rows for each of the Scenarios
 			}
 		}, 
 		function(error) {

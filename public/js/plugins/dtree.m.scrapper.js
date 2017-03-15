@@ -92,95 +92,99 @@ var oldCustName = [];
             	    	return spanHtml;
             	    });
             	    var userRole = window.localStorage['_SR'];
+            	    var debs = window.localStorage['disableEditing']
             	    $(this).find('.ellipsis').on('dblclick',  function () {
-            	    	if(userRole == "Test Lead"){
-            	    		if(this.parentElement.parentElement.hasAttribute("data-xpath") == true){
-            	    			var span = $(this);
+            	    	if(debs == "true") return false
+            	    	else{
+            	    		if(userRole == "Test Lead"){
+                	    		if(this.parentElement.parentElement.hasAttribute("data-xpath") == true){
+                	    			var span = $(this);
+                        	        var input = $('<input />', {
+                        	            'type' : 'text',
+                        	            'id'   : id_editable,
+                        	            'class': 'editObjectName form-control',
+                        	            'value': span.html().replace('&amp;','&').trim()
+                        	        });                    	        
+                        	        span.parent().append(input);
+            	        	        span.addClass('content-hide');
+            	        	        //$(this).remove();
+            	        	        input.focus();
+            	        	        //input.addClass('autoWidth');
+            	        	        input.val(input.val().replace(/&amp;/g, '&'))
+                	    		}
+                	    	}
+                	    	else{
+                	    		
+                    	    	var span = $(this);
                     	        var input = $('<input />', {
                     	            'type' : 'text',
                     	            'id'   : id_editable,
                     	            'class': 'editObjectName form-control',
                     	            'value': span.html().replace('&amp;','&').trim()
-                    	        });                    	        
-                    	        span.parent().append(input);
+                    	        });                	        
+        	        	        span.parent().append(input);
         	        	        span.addClass('content-hide');
         	        	        //$(this).remove();
         	        	        input.focus();
         	        	        //input.addClass('autoWidth');
         	        	        input.val(input.val().replace(/&amp;/g, '&'))
-            	    		}
+                	    	}
+    	        	        $('#'+id_editable)
+    		        	        .on('keypress',  function (e) {
+    		        	        	if (e.which == 13){
+    		        	        		$("#saveObjects").attr('disabled', false);
+    		        	        		var regEx = /<|>/g;
+    		        	        		/*window.localStorage['checkEditWorking'] = "true";
+    		        	        		$(".optionalActionButtions").children("#editFunction").prop("disabled", false).show().css({'cursor':'pointer'});
+    		        	        		//$(this).parent().append($(span).html($(this).val()));
+    		        	        		span.text($(this).val()).removeClass('content-hide');
+    		        	        		$(this).remove();*/
+    		        	        		if((!regEx.test($(this).val()))){
+    		        	        			
+    		        	        		
+    			        	        		//$(".optionalActionButtions").children("#editFunction").prop("disabled", false).show().css({'cursor':'pointer'});
+    			        	        		//$(this).parent().append($(span).html($(this).val()));
+    			        	        		if($(this).val().trim() == ""){
+    			        	        			showDialogMesgs("Edit Objects", "Object name cannot be empty.");
+    			        	        			span.removeClass('content-hide');
+    			 		        	    	   	$(this).remove();
+    			        	        		}
+    			        	        		else { 
+    			        	        			window.localStorage['checkEditWorking'] = "true";
+    			        	        			span.text($(this).val()).removeClass('content-hide');
+    											oldCustName.push($(this)[0].defaultValue);
+    			        	        		    modifiedCustNames.push($(this)[0].value);
+    			        	        		    xpathListofCustNames.push($(this).parent().parent().attr("data-xpath"));
+    			        	        		    editedList.modifiedCustNames = modifiedCustNames;
+    			        	        		    editedList.xpathListofCustNames = xpathListofCustNames;
+    											editedList.oldCustName = oldCustName;
+    			        	        		    window.localStorage['_modified'] = JSON.stringify(editedList);
+    			        	        		}
+    			        	        		$(this).remove();
+    		        	        		} else{
+    /*		        	        			$("#specialCharacterValidation3").dialog({
+    			      			                  modal: true,
+    			      			                  resizable: false,
+    			      			                  draggable: false
+    			      						});*/
+    		        	        			showDialogMesgsBtn("Incorrect Inputs","Cannot contain special characters other than ._- and space","btnSCV3");
+    			        	        		return false;
+    		        	        		}
+    		        	        	}
+    		        	        })
+    		        	    //      .on('keypress',  function (e) { debugger;
+    		        	    //     	 var txtWidth = $(this).attr('size');
+    		        	    //          var cs = $(this).val().length-6;
+    		        	    //          txtWidth = parseInt(txtWidth);
+    		        	    //          if(cs>txtWidth){
+    		        	    //          $(this).attr('size',txtWidth+5);    }
+    	        	        // })
+    		        	       .on('blur',  function (e) {
+    		        	    	   //$(this).parent().append($(span).html($(this).val()));
+    		        	    	   span.removeClass('content-hide');
+    		        	    	   $(this).remove();
+    	        	        });
             	    	}
-            	    	else{
-            	    		
-                	    	var span = $(this);
-                	        var input = $('<input />', {
-                	            'type' : 'text',
-                	            'id'   : id_editable,
-                	            'class': 'editObjectName form-control',
-                	            'value': span.html().replace('&amp;','&').trim()
-                	        });                	        
-    	        	        span.parent().append(input);
-    	        	        span.addClass('content-hide');
-    	        	        //$(this).remove();
-    	        	        input.focus();
-    	        	        //input.addClass('autoWidth');
-    	        	        input.val(input.val().replace(/&amp;/g, '&'))
-            	    	}
-	        	        $('#'+id_editable)
-		        	        .on('keypress',  function (e) {
-		        	        	if (e.which == 13){
-		        	        		$("#saveObjects").attr('disabled', false);
-		        	        		var regEx = /<|>/g;
-		        	        		/*window.localStorage['checkEditWorking'] = "true";
-		        	        		$(".optionalActionButtions").children("#editFunction").prop("disabled", false).show().css({'cursor':'pointer'});
-		        	        		//$(this).parent().append($(span).html($(this).val()));
-		        	        		span.text($(this).val()).removeClass('content-hide');
-		        	        		$(this).remove();*/
-		        	        		if((!regEx.test($(this).val()))){
-		        	        			
-		        	        		
-			        	        		//$(".optionalActionButtions").children("#editFunction").prop("disabled", false).show().css({'cursor':'pointer'});
-			        	        		//$(this).parent().append($(span).html($(this).val()));
-			        	        		if($(this).val().trim() == ""){
-			        	        			showDialogMesgs("Edit Objects", "Object name cannot be empty.");
-			        	        			span.removeClass('content-hide');
-			 		        	    	   	$(this).remove();
-			        	        		}
-			        	        		else { 
-			        	        			window.localStorage['checkEditWorking'] = "true";
-			        	        			span.text($(this).val()).removeClass('content-hide');
-											oldCustName.push($(this)[0].defaultValue);
-			        	        		    modifiedCustNames.push($(this)[0].value);
-			        	        		    xpathListofCustNames.push($(this).parent().parent().attr("data-xpath"));
-			        	        		    editedList.modifiedCustNames = modifiedCustNames;
-			        	        		    editedList.xpathListofCustNames = xpathListofCustNames;
-											editedList.oldCustName = oldCustName;
-			        	        		    window.localStorage['_modified'] = JSON.stringify(editedList);
-			        	        		}
-			        	        		$(this).remove();
-		        	        		} else{
-/*		        	        			$("#specialCharacterValidation3").dialog({
-			      			                  modal: true,
-			      			                  resizable: false,
-			      			                  draggable: false
-			      						});*/
-		        	        			showDialogMesgsBtn("Incorrect Inputs","Cannot contain special characters other than ._- and space","btnSCV3");
-			        	        		return false;
-		        	        		}
-		        	        	}
-		        	        })
-		        	    //      .on('keypress',  function (e) { debugger;
-		        	    //     	 var txtWidth = $(this).attr('size');
-		        	    //          var cs = $(this).val().length-6;
-		        	    //          txtWidth = parseInt(txtWidth);
-		        	    //          if(cs>txtWidth){
-		        	    //          $(this).attr('size',txtWidth+5);    }
-	        	        // })
-		        	       .on('blur',  function (e) {
-		        	    	   //$(this).parent().append($(span).html($(this).val()));
-		        	    	   span.removeClass('content-hide');
-		        	    	   $(this).remove();
-	        	        });
             	    });
             	});
             }            
