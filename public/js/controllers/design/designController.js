@@ -1146,7 +1146,6 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				if(data.view.length > 0)
 				{
 					$("#finalScrap").show();
-					return false
 				}
 				viewString = data;
 				//var data = JSON.stringify(data);
