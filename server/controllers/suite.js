@@ -95,16 +95,30 @@ exports.readTestSuite_ICE = function (req, res) {
 						
 						//var responsedata={template: "",testcase:[],testcas	ename:""};
 						async.forEachSeries(outscenarioids,function(quest1,callback3){
-							var testcasestepsquery = "SELECT testscenarioname,projectid FROM testscenarios where testscenarioid="+quest1;
-							dbConnICE.execute(testcasestepsquery, function(err, answers) {
+							// var testcasestepsquery = "SELECT testscenarioname,projectid FROM testscenarios where testscenarioid="+quest1;
+							// dbConnICE.execute(testcasestepsquery, function(err, answers) {
+							// 	if(err){
+							// 		console.log(err);
+							// 	}else{
+							// 		// var projectnamequery = "SELECT projectname FROM projects where projectid = "+answers.rows[0].projectid+" ALLOW FILTERING;";
+							// 		// var runquery = dbConnICE.execute(projectnamequery, function(err, projectnameresult) {if(err){ }else{outprojectnames.push(projectnameresult.rows[0].projectname)}});
+							// 		outscenarionames.push(answers.rows[0].testscenarioname);
+							// 	}
+							// 	callback3(); 
+							// });
+							/**
+							 *  Projectnametestcasename_ICE is a function to fetch testscenario name and project name
+							 * 	modified shreeram p on 15th mar 2017
+							 * */
+							Projectnametestcasename_ICE(quest1,function(err,data){
 								if(err){
 									console.log(err);
 								}else{
-									// var projectnamequery = "SELECT projectname FROM projects where projectid = "+answers.rows[0].projectid+" ALLOW FILTERING;";
-									// var runquery = dbConnICE.execute(projectnamequery, function(err, projectnameresult) {if(err){ }else{outprojectnames.push(projectnameresult.rows[0].projectname)}});
-									outscenarionames.push(answers.rows[0].testscenarioname);
+									outscenarionames.push(data.testcasename);
+									outprojectnames.push(data.projectname);
+									
 								}
-								callback3(); 
+								callback3();
 							});
 					}, callback2);
 				},callback);
@@ -113,7 +127,7 @@ exports.readTestSuite_ICE = function (req, res) {
 				responsedata.dataparam=outdataparam;
 				responsedata.scenarioids=outscenarioids;
 				responsedata.scenarionames = outscenarionames;
-				//responsedata.projectnames = outprojectnames;
+				responsedata.projectnames = outprojectnames;
 				//cb(null, responsedata);
 				}
 			});
@@ -132,8 +146,45 @@ exports.readTestSuite_ICE = function (req, res) {
 		}
 	});
 };
-//ReadTestSuite Functionality
 
+/**
+ * Projectnametestcasename_ICE function is to fetch projectname and testscenario
+ * created by shreeram p on 15th mar 2017
+ *  */ 
+function Projectnametestcasename_ICE(req,cb,data){
+	var projectid = '';
+	var testcaseNproject = {testcasename:"",projectname:""};
+	async.series({
+		testcasename : function(callback_name){
+			var testcasestepsquery = "SELECT testscenarioname,projectid FROM testscenarios where testscenarioid="+req;
+			dbConnICE.execute(testcasestepsquery, function(err, answers) {
+				if(err){
+					console.log(err);
+				}else{
+					projectid = answers.rows[0].projectid;
+					testcaseNproject.testcasename = answers.rows[0].testscenarioname;
+					callback_name(null,projectid); 
+				}
+				
+			});
+		},
+		projectname : function(callback_name){
+			var projectnamequery = "SELECT projectname FROM projects where projectid = "+projectid+" ALLOW FILTERING;";
+			dbConnICE.execute(projectnamequery, function(err, projectnameresult) {
+				if(err){ 
+
+				}else{
+					testcaseNproject.projectname = projectnameresult.rows[0].projectname;
+					callback_name(err,testcaseNproject)
+				}
+			});
+		}
+
+	},function(err,data){
+		cb(null,testcaseNproject);
+	})
+	
+}
 
 /**
  * @author vishvas.a
