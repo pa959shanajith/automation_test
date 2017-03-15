@@ -4,6 +4,7 @@
         <title>SLK Nineteen68</title>
         <script type="text/javascript" src="{#asset jquery.min.js @encoding=link}"></script>
         <style>
+            body{font-family: Open_Sans, sans-serif;}
             .mainContainer{ border: 1px solid #B5AAAA; margin: 4px; float: left; padding: 14px; width: 97%; height: 95%;}
             .hearderCon{position: relative; width: 100%; float: left; border: 1px solid #cfcfcf; background: linear-gradient(to bottom, #FFFFFF 0%, #E6E6E6 100%); height: 50px; margin-bottom: 10px;border-radius: 5px; font-size: 16px;}
             .headerRepDetails{ width: 50%; padding: 3px 40px;}
@@ -54,7 +55,7 @@
             .reportsDetails th:nth-child(6), .rDcomments{width: 13%;}
             .maintabCont{float: left; width: 100%; border: 1px solid #dcdcdc;}
             .tabCont{display: table-cell; border-bottom: 1px solid #ececec;}
-            .reportsDetail{line-height: 2; text-align: center; height:425px; overflow: auto;}
+            .reportsDetail{line-height: 2; text-align: center; height:425px; overflow: auto;font-size: 14px;}
             .rDstepDes{text-align: left; word-break: break-word;}
             .progress {
                 margin-bottom: 20px;
@@ -121,7 +122,7 @@
                     <label>Generated Report Time:</label><span>{{time}}</span>
                 </div>
                 <div class="h2Header">
-                    <h2>SLK Nineteen68 Execution Reports</h2>
+                    <h3>SLK Nineteen68 Execution Reports</h3>
                 </div>
             </div>
             <div class="summaryCon">
@@ -137,7 +138,7 @@
                     <label>Browser Type:</label><span>{{browserType}}</span>
                     <label>Browser Version:</label><span>{{browserVersion}}</span>
                 </div>
-                <div id="rightSummaryFunc" class="rightSummaryFunc">
+                <!-- <div id="rightSummaryFunc" class="rightSummaryFunc">
                     <div class="reportStatus">				
             			<div class="reportStatusBlk">
             				<span class="progresslabel">Pass</span>
@@ -161,7 +162,7 @@
             			    <span class="progresspercentage">{{terminate}}%</span>
             			</div>
             		</div>
-                </div>
+                </div> -->
             </div>
             <div style="margin-top: 280px;">
                 <table cellpadding="3" cellspacing="0" class="midContainer" id="staustable">
@@ -206,7 +207,7 @@
                         <div class="rDstep tabCont">{{Step}}</div>
                         <div class="rDstepDes tabCont" style="padding-left: 10px;">{{StepDescription}}</div>
                         <div class="rDstatus tabCont" style="padding-left: 10px;">{{status}}</div>
-                        <div class="rDellaps tabCont" style="padding-left: 21px;">{{EllapsedTime}}</div>
+                        <div class="rDellaps tabCont">{{EllapsedTime}}</div>
                         <div class="rDcomments tabCont" style="padding-left: 10px;">{{Comments}}</div>
                     </div>
                     {{/each}}

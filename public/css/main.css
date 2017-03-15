@@ -2445,11 +2445,14 @@ select:hover {
     background-color: #5c5ce4;
     border-radius: 8px;
 }
-.reportbox:hover{
+/* .reportbox:hover{
 	background-color: #ff7300;
-}
+} */
 .reportboxselected{
-	background-color: #ff7300 !important;
+    background-color: #eee;
+	border-radius: 5px;
+	-moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
 }
 .upper-section-testsuites{
 	position: relative;
@@ -2457,7 +2460,7 @@ select:hover {
     height: 128px;
     background-color: #e0e0e0;
     float: left;
-    padding-top: 30px;
+    padding-top: 20px;
     padding-left: 20px;
     padding-right: 20px;
     overflow: hidden;
@@ -2468,6 +2471,8 @@ select:hover {
 	display: inline-block;
 	text-align: center;
 	cursor: pointer;
+	padding-top: 10px;
+	margin-right: 6px;
 }
 .repsuitename{
 	text-overflow: ellipsis;
@@ -2593,7 +2598,7 @@ select:hover {
 .scenarioReports tbody tr td:nth-child(2){width: 20%;}
 .scenarioReports tbody tr td:nth-child(3){width: 20%;}
 .scenarioReports tbody tr td:nth-child(4){width: 15%;}
-.scenarioReports tbody tr td:nth-child(5){width: 15%;}
+.scenarioReports tbody tr td:nth-child(5){width: 15%; position: relative;}
 .right-section-charts{
 	position: relative;
     width: 41.7%;
@@ -2658,6 +2663,17 @@ select:hover {
 .halfWrap{
 	width:48%;
 	display: inline-block;
+}
+.formatpdfbrwsrexport{
+	position: absolute;
+    background: #fff;
+    width: 100px;
+    height: 30px;
+    padding: 4px;
+    border-radius: 4px;
+    z-index: 10;
+    left: 20px;
+    top: -3px;
 }
 /******************Admin CSS***************************/
 

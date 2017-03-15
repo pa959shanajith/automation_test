@@ -10,7 +10,7 @@ var dbConnICE = require('../../server/config/icetestautomation');
 var async = require('async');
 
 exports.getMainReport_ICE = function(req, res){
-	var IP = req.ip.split(":")[req.ip.split(":").length-1];
+	var IP = req.connection.localAddress.split(":")[req.connection.localAddress.split(":").length-1];
 	var client = require("jsreport-client")("http://"+IP+":3001/");
 	client.render({
 	    template: { 
@@ -32,7 +32,7 @@ exports.getMainReport_ICE = function(req, res){
 exports.renderReport_ICE = function(req, res){
 	var finalReports = req.body.finalreports;
 	var reportType = req.body.reporttype;
-	var IP = req.ip.split(":")[req.ip.split(":").length-1];
+	var IP = req.connection.localAddress.split(":")[req.connection.localAddress.split(":").length-1];
 	var client = require("jsreport-client")("http://"+IP+":3001/");
 	client.render({
 	    template: { 
