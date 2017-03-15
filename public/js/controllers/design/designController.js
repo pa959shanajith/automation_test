@@ -6,6 +6,7 @@ var getAllAppendedObj; //Getting all appended scraped objects
 var gsElement = []; window.localStorage['selectRowStepNo'] = '';
 var getWSTemplateData = {} //Contains Webservice saved data
 var appType;var projectId;var projectDetails;var screenName;var testCaseName;var subTaskType;var subTask; var draggedEle; var getDraggedEle; 
+window.localStorage['disableEditing'] = "false";
 mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout', 'DesignServices','cfpLoadingBar','$window', function($scope,$http,$location,$timeout,DesignServices,cfpLoadingBar,$window) {
 	$("body").css("background","#eee");
 	$("#tableActionButtons, .designTableDnd").delay(500).animate({opacity:"1"}, 500)
@@ -1135,11 +1136,17 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			}
 			//For Web
 			DesignServices.initScraping_ICE(screenViewObject)
-			.then(function (data) { 				
+			.then(function (data) {
+				window.localStorage['disableEditing'] = "true";
 				unblockUI();
+				if(data == "Fail"){
+					$("#scrapeFailModal").modal("show");
+					return false
+				}
 				if(data.view.length > 0)
 				{
 					$("#finalScrap").show();
+					return false
 				}
 				viewString = data;
 				//var data = JSON.stringify(data);
@@ -1693,7 +1700,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 	
 	//Save Scrape Objects
 	$(document).on('click', "#saveObjects", function(){
-		
+		window.localStorage['disableEditing'] = "false";
 		//var tasks = JSON.parse(window.localStorage['_TJ']);
 		var tasks = JSON.parse(window.localStorage['_CT'])
 		if(eaCheckbox) var getScrapeData = JSON.stringify(newScrapedList);

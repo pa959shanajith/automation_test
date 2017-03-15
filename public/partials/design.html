@@ -64,7 +64,7 @@
 				<ul>
 					<li><span><a class='scrapeOnTxt'>Scrape On</a></span></li>
 					<li><a href='#' ng-class="enbledWS ? 'enableActionsWS' : 'disableActionsWS'" data-toggle="modal" ng-click="initScrapeWS($event); $event.preventDefault(); $event.stopPropagation();"><span><img src='imgs/ic-webservice.png' alt='Webservices' /></span>Web Services</a></li>
-					<li class="last"><span style="margin-bottom:-5px"><input ng-model="enbledWS" id="enbledWS" type='checkbox' value=""></span><label for="enbledWS">Append</label></li>
+					<li class="last"><span style="margin-bottom:-5px"><input ng-model="enbledWS" id="enbledWS" type='checkbox' value=""></span><label for="enbledWS">Edit</label></li>
 				</ul>
 			</div>
 			<!-- Apptype Webservice -->
@@ -308,6 +308,25 @@
 <!--Footer-->
 
 <!--Bootstrap Popup-->
+	<!-- Scrape Fail -->
+	<div class="modal fade" id="scrapeFailModal" role="dialog" data-keyboard="false" data-backdrop="static">
+	  <div class="modal-dialog modal-sm">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal">&times;</button>
+	        <h4 class="modal-title">Scrape</h4>
+	      </div>
+	      <div class="modal-body">
+	        <p>Failed to scrape.</p>
+	      </div>
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-default" data-dismiss="modal">Ok</button>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+	<!-- Scrape Fail -->
+	
 	<!-- Add Object -->
 	<div id="dialog-addObject" class="modal fade" role="dialog" data-keyboard="false" data-backdrop="static">
 		<div class="modal-dialog" style="width: 700px">
