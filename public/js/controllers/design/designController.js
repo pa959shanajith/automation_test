@@ -792,6 +792,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					}
 				})
 				$("#wsdlOperation").val(data.operations)
+				//Printing Request Data
 				$("#wsdlRequestHeader").val(data.header[0].split("##").join("\n"));
 				if(data.body[0].indexOf("{") == 0 || data.body[0].indexOf("[") == 0){
 					var jsonStr = data.body;
@@ -804,12 +805,27 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					var getXML = formatXml(data.body[0].replace(/>\s+</g,'><'));
 					$("#wsdlRequestBody").val(getXML)
 				}
+
+				//Printing Response Data
+				$("#wsdlResponseHeader").val(data.responseHeader[0].split("##").join("\n"));
+				if(data.responseBody[0].indexOf("{") == 0 || data.responseBody[0].indexOf("[") == 0){
+					var jsonStr = data.responseBody;
+					var jsonObj = JSON.parse(jsonStr);
+					var jsonPretty = JSON.stringify(jsonObj, null, '\t');
+					xml_neat2 = jsonPretty;
+					$("#wsdlResponseBody").val(jsonPretty)
+				}
+				else{
+					var getXML = formatXml(data.responseBody[0].replace(/>\s+</g,'><'));
+					$("#wsdlResponseBody").val(getXML)
+				}
+
 				//Printing the Save data in UI
 				if($("#wsdlRequestHeader, #wsdlRequestBody").val().length > 0){
 					$(".saveWS").prop("disabled", true);
 					$("#enbledWS").prop("disabled", false)
 					$(".enableActionsWS").addClass("disableActionsWS").removeClass("enableActionsWS")
-					$("#endPointURL, #wsdlMethods, #wsdlOperation, #wsdlRequestHeader, #wsdlRequestBody").prop("disabled", true)
+					$("#endPointURL, #wsdlMethods, #wsdlOperation, #wsdlRequestHeader, #wsdlRequestBody, #wsdlResponseHeader, #wsdlResponseBody").prop("disabled", true)
 				}
 				else{
 					$(".saveWS").prop("disabled", false);
@@ -837,45 +853,6 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			$("#enbledWS").prop("disabled", true)
 			$(".disableActionsWS").addClass("enableActionsWS").removeClass("disableActionsWS")
 		}*/
-		
-		//XML Beatuifier
-		function formatXml(xml) {
-		    var formatted = '';
-		    var reg = /(>)(<)(\/*)/g;
-		    xml = xml.replace(reg, '$1\r\n$2$3');
-		    var pad = 0;
-		    jQuery.each(xml.split('\r\n'), function(index, node){
-		        var indent = 0;
-		        if (node.match( /.+<\/\w[^>]*>$/ ))
-		        {
-		            indent = 0;
-		        }
-		        else if (node.match( /^<\/\w/ ))
-		        {
-		            if (pad != 0)
-		            {
-		                pad -= 1;
-		            }
-		        }
-		        else if (node.match( /^<\w[^>]*[^\/]>.*$/ ))
-		        {
-		            indent = 1;
-		        }
-		        else
-		        {
-		            indent = 0;
-		        }
-		        var padding = '';
-		        for (var i = 0; i < pad; i++)
-		        {
-		            padding += '  ';
-		        }
-		        formatted += padding + node + '\r\n';
-		        pad += indent;
-		    });
-		    return formatted;
-		}
-		//XML Beatuifier
 	}
 	//Get Webservice Data
 	
@@ -889,6 +866,8 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		var wsdlOperation = $("#wsdlOperation").val();
 		var wsdlRequestHeader = $("#wsdlRequestHeader").val().replace(/[\n\r]/g,'##').replace(/"/g, '\"');
 		var wsdlRequestBody = $("#wsdlRequestBody").val().replace(/[\n\r]/g,'').replace(/\s\s+/g, ' ').replace(/"/g, '\"');
+		var wsdlResponseHeader = $("#wsdlResponseHeader").val().replace(/[\n\r]/g,'##').replace(/"/g, '\"');
+		var wsdlResponseBody = $("#wsdlResponseBody").val().replace(/[\n\r]/g,'').replace(/\s\s+/g, ' ').replace(/"/g, '\"');
 		if(!endPointURL) $("#endPointURL").addClass("inputErrorBorder")
 		else if(!$scope.wsdlMethods && !wsdlMethods) $("#wsdlMethods").addClass("selectErrorBorder")
 		else if(!wsdlRequestHeader) $("#wsdlRequestHeader").addClass("inputErrorBorder")
@@ -896,8 +875,8 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			var getWSData = {
 				"body": [wsdlRequestBody],
 				"operations": [wsdlOperation],
-				"responseHeader": [""],
-				"responseBody": [""],
+				"responseHeader": [wsdlResponseHeader],
+				"responseBody": [wsdlResponseBody],
 				"method": [wsdlMethods],
 				"endPointURL": [endPointURL],
 				"header": [wsdlRequestHeader]
@@ -1029,7 +1008,24 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			DesignServices.initScrapeWS_ICE(initWSJson)
 			.then(function (data) {
 				unblockUI();
-				console.log(data)
+				if(typeof data == "object"){
+					$("#webserviceDeubgSuccess").modal("show")
+					$("#wsdlResponseHeader").val(data.responseHeader[0].split("##").join("\n"));
+					if(data.responseBody[0].indexOf("{") == 0 || data.responseBody[0].indexOf("[") == 0){
+						var jsonStr = data.responseBody;
+						var jsonObj = JSON.parse(jsonStr);
+						var jsonPretty = JSON.stringify(jsonObj, null, '\t');
+						xml_neat2 = jsonPretty;
+						$("#wsdlResponseBody").val(jsonPretty)
+					}
+					else{
+						var getXML = formatXml(data.responseBody[0].replace(/>\s+</g,'><'));
+						$("#wsdlResponseBody").val(getXML)
+					}
+				}
+				else{
+					$("#webserviceDeubgFail").modal("show")
+				}
 			}, function (error) { 
 				console.log("Error") 
 			});
@@ -3710,3 +3706,42 @@ function drop(ev) {
 	ev.preventDefault();
 }
 //Map Object Drag nad Drop Functionality
+
+//XML Beatuifier
+function formatXml(xml) {
+	var formatted = '';
+	var reg = /(>)(<)(\/*)/g;
+	xml = xml.replace(reg, '$1\r\n$2$3');
+	var pad = 0;
+	jQuery.each(xml.split('\r\n'), function(index, node){
+		var indent = 0;
+		if (node.match( /.+<\/\w[^>]*>$/ ))
+		{
+			indent = 0;
+		}
+		else if (node.match( /^<\/\w/ ))
+		{
+			if (pad != 0)
+			{
+				pad -= 1;
+			}
+		}
+		else if (node.match( /^<\w[^>]*[^\/]>.*$/ ))
+		{
+			indent = 1;
+		}
+		else
+		{
+			indent = 0;
+		}
+		var padding = '';
+		for (var i = 0; i < pad; i++)
+		{
+			padding += '  ';
+		}
+		formatted += padding + node + '\r\n';
+		pad += indent;
+	});
+	return formatted;
+}
+//XML Beatuifier

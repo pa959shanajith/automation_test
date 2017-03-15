@@ -842,11 +842,6 @@ exports.updateTestCase_ICE = function (req, res) {
 * @modified author sunil.revankar
 * debugTestCase_ICE service is used to debug the testcase
 */
-/**
-* @author vishvas.a
-* @modified author sunil.revankar
-* debugTestCase_ICE service is used to debug the testcase
-*/
 exports.debugTestCase_ICE = function (req, res) {
 	var action=req.body.param;
 	if(action == 'debugTestCase_ICE'){
@@ -887,7 +882,6 @@ exports.debugTestCase_ICE = function (req, res) {
 						res.send("fail");
 					}
 				}
-
 			});
 		}
 	}else if(action == 'debugTestCaseWS_ICE'){
@@ -895,14 +889,37 @@ exports.debugTestCase_ICE = function (req, res) {
 		if('allSocketsMap' in myserver && ip in myserver.allSocketsMap){
 			// res.send("success");
 			var mySocket = myserver.allSocketsMap[ip];
-			mySocket._events.result_debugTestCase = [];
-			var testcaseWS=JSON.stringify(req.body.testCaseWS)
-			mySocket.emit('debugTestCaseWS',testcaseWS);
-			mySocket.on('result_debugTestCaseWS', function (testcaseWS) {
-				res.send("success");
+			mySocket._events.result_debugTestCaseWS = [];
+			var testcaseWS=[];
+			testcaseWS.push(req.body.testCaseWS);
+			mySocket.emit('debugTestCase',testcaseWS);
+			mySocket.on('result_debugTestCaseWS', function (value) {
+				var responseData={
+						responseHeader:[],
+						responseBody:[]
+					};
+				if(value != "fail" && value != undefined && value != ""){
+					var response=value.split('rEsPONseBOdY:');
+					
+					if(response.length == 2){
+						responseData.responseHeader.push(response[0]);
+						responseData.responseBody.push(response[1]);
+						res.send(responseData);
+					}else if (response.length == 1){
+						responseData.responseHeader.push(response[0]);
+						responseData.responseBody.push("");
+						res.send(responseData);
+					}else{
+						responseData.responseHeader.push("");
+						responseData.responseBody.push("");
+						res.send(responseData);
+					}
+				}else{
+					responseData.responseHeader.push("Response Header - Fail");
+					responseData.responseBody.push("Response Body - Fail");
+					res.send(responseData);
+				}
 			});
-			console.log("initWSJson::::::::::", JSON.stringify(req.body.testCaseWS));
-			res.send(req.body.testCaseWS);
 		}else{
 			console.log("Socket not Available");
 			res.send("fail");

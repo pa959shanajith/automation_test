@@ -59,14 +59,15 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 		
 	//Service call to get start and end details of suites
 	$(document).on('click', '.suiteContainer', function(){
-		$(this).find('.reportbox').addClass('reportboxselected');
+		$('.formatpdfbrwsrexport').remove();
+		$(this).find('.reportbox').parent().addClass('reportboxselected');
 		if($(this).parent().hasClass('staticTestsuiteContainer')){
-			$(this).siblings().find('.reportbox').removeClass('reportboxselected');
-			$('.dynamicTestsuiteContainer').find('.reportbox').removeClass('reportboxselected');
+			$(this).siblings().find('.reportbox').parent().removeClass('reportboxselected');
+			$('.dynamicTestsuiteContainer').find('.reportbox').parent().removeClass('reportboxselected');
 		}
 		else if($(this).parent().hasClass('dynamicTestsuiteContainer')){
-			$(this).siblings().find('.reportbox').removeClass('reportboxselected');
-			$('.staticTestsuiteContainer').find('.reportbox').removeClass('reportboxselected');
+			$(this).siblings().find('.reportbox').parent().removeClass('reportboxselected');
+			$('.staticTestsuiteContainer').find('.reportbox').parent().removeClass('reportboxselected');
 		}		
 		testsuiteId = $(this).attr('data-suiteId');
 		$('#scenarioReportsTable').find('tbody').empty();
@@ -97,6 +98,7 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 		$(this).addClass('scenariostatusreportselect');
 		$(this).siblings().removeClass('scenariostatusreportselect');
 		executionId = $(this).attr('data-executionid');
+		$('.formatpdfbrwsrexport').remove();
 		reportService.reportStatusScenarios_ICE(executionId)
 		.then(function(data) {
 			var scenarioContainer = $('#scenarioReportsTable');
@@ -114,7 +116,7 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 					else if(data[i].status == "Fail"){	fail++;	styleColor="style='color: #b31f2d !important;'";}
 					else if(data[i].status == "Terminate"){	terminated++;	styleColor="style='color: #faa536 !important;'";}
 					else if(data[i].status == "Incomplete"){	incomplete++;	styleColor="style='color: #58595b !important;'";}
-					scenarioContainer.find('tbody').append("<tr><td>"+data[i].testscenarioname+"</td><td>"+data[i].executedtime+"</td><td><img alt='Browser icon' src='imgs/"+browserIcon+"'></td><td class='openReports' data-reportid='"+data[i].reportid+"'><a class='openreportstatuss' "+styleColor+">"+data[i].status+"</a></td><td data-reportid='"+data[i].reportid+"'><img alt='Export JSON' class='exportToJSON' src='imgs/ic-export-json.png' style='margin-right: 10px; cursor: pointer;' title='Export to Json'><img alt='Pdf Icon' class='getSpecificReportBrowser openreportstatus' data-getrep='phantom-pdf' style='cursor: pointer; margin-right: 10px;' src='imgs/ic-pdf.png' title='PDF Report'><img alt='Browser Icon' class='getSpecificReportBrowser openreportstatus' data-getrep='html' style='cursor: pointer;' src='imgs/ic-reports-chrome.png' title='Browser Report'></td></tr>");
+					scenarioContainer.find('tbody').append("<tr><td>"+data[i].testscenarioname+"</td><td>"+data[i].executedtime+"</td><td><img alt='Browser icon' src='imgs/"+browserIcon+"'></td><td class='openReports' data-reportid='"+data[i].reportid+"'><a class='openreportstatuss' "+styleColor+">"+data[i].status+"</a></td><td data-reportid='"+data[i].reportid+"'><img alt='Select format' class='selectFormat' src='imgs/ic-export-json.png' style='cursor: pointer;' title='Select format'></td></tr>");
 				}
 				if(data.length > 0){
 					P = parseFloat((pass/total)*100).toFixed();
@@ -135,6 +137,17 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 		function(error) {
 			console.log("Error-------"+error);
 		})
+	})
+	
+	$(document).on('click', '.selectFormat', function(){
+		$('.formatpdfbrwsrexport').remove();
+		var repID = $(this).parent().attr("data-reportid");
+		$(this).parent().append("<span class='formatpdfbrwsrexport'><img alt='Pdf Icon' class='getSpecificReportBrowser openreportstatus' data-getrep='phantom-pdf' data-reportid='"+repID+"' style='cursor: pointer; margin-right: 10px;' src='imgs/ic-pdf.png' title='PDF Report'><img alt='Browser Icon' class='getSpecificReportBrowser openreportstatus' data-getrep='html' data-reportid='"+repID+"' style='cursor: pointer; margin-right: 10px;' src='imgs/ic-reports-chrome.png' title='Browser Report'><img alt='Export JSON' class='exportToJSON' data-reportid='"+repID+"' style='cursor: pointer;' src='imgs/ic-export-to-json.png' title='Export to Json'></span>")
+		$('.formatpdfbrwsrexport').focus();
+	})
+	
+	$('span.formatpdfbrwsrexport').focusout(function(){
+		$('.formatpdfbrwsrexport').remove();
 	})
 	
 	$(document).on('click','.iconSpace', function(){	
@@ -171,17 +184,17 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 	})
 		
 	$(document).on('click', '.openreportstatus', function(e){
-		var reportID = $(this).parent().attr('data-reportid');
+		var reportID = $(this).attr('data-reportid');
 		var reportType = $(this).attr('data-getrep');
-		var testsuitename = $(".reportboxselected").siblings(".repsuitename").text();
+		var testsuitename = $(".reportboxselected").text();
 		var d = new Date();
 		var hours = d.getHours();
 	    var hours = (hours+24-2)%24; 
 	    var mid='AM';
 	    if(hours>12){	mid='PM';}
-	    var DATE = d.getDate()+"-"+(d.getMonth()+1)+"-"+d.getFullYear();
-	    var TIME = d.getHours()+":"+d.getMinutes()+" "+mid;
-	    var pass = fail = terminated = total = 0;
+	    var DATE = ("0" + (d.getMonth()+1)).slice(-2) + "/" + ("0" + d.getDate()).slice(-2) + "/" + d.getFullYear();
+	    var TIME = ("0" + d.getHours()).slice(-2) +":"+ ("0" + d.getMinutes()).slice(-2)+" "+mid;
+	    //var pass = fail = terminated = total = 0;
 		var finalReports = {
 				overallstatus : [{
 					"domainName": "",
@@ -197,9 +210,9 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 					"EllapsedTime": "",
 					"date": DATE,
 					"time": TIME,
-					"pass": "",
+					/*"pass": "",
 					"fail": "",
-					"terminate": ""
+					"terminate": ""*/
 				}],
 				rows : []
 		}		
@@ -216,26 +229,38 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 				for(j=0; j<obj2.overallstatus.length; j++){
 					finalReports.overallstatus[0].browserVersion = obj2.overallstatus[j].browserVersion
 					finalReports.overallstatus[0].browserType = obj2.overallstatus[j].browserType
-					finalReports.overallstatus[0].StartTime = obj2.overallstatus[j].StartTime
-					finalReports.overallstatus[0].EndTime = obj2.overallstatus[j].EndTime
+					finalReports.overallstatus[0].StartTime = obj2.overallstatus[j].StartTime.split(".")[0]
+					finalReports.overallstatus[0].EndTime = obj2.overallstatus[j].EndTime.split(".")[0]
 					finalReports.overallstatus[0].overAllStatus = obj2.overallstatus[j].overallstatus
-					finalReports.overallstatus[0].EllapsedTime = obj2.overallstatus[j].EllapsedTime
+					finalReports.overallstatus[0].EllapsedTime = "~" + obj2.overallstatus[j].EllapsedTime.split(".")[0]
 				}
 				for(k=0; k<obj2.rows.length; k++){
 					finalReports.rows.push(obj2.rows[k]);
-					if(finalReports.rows[k].hasOwnProperty("status")){
-						total++;
+					finalReports.rows[k].Step = finalReports.rows[k]["Step "];
+					if(finalReports.rows[k].hasOwnProperty("EllapsedTime") && finalReports.rows[k].EllapsedTime.trim() != ""){
+						if(finalReports.rows[k].EllapsedTime.split(".")[1] == undefined || finalReports.rows[k].EllapsedTime.split(".")[1] == ""){
+							finalReports.rows[k].EllapsedTime = finalReports.rows[k].EllapsedTime.split(".")[0];
+						}
+						else{
+							finalReports.rows[k].EllapsedTime = finalReports.rows[k].EllapsedTime.split(".")[0]+":"+finalReports.rows[k].EllapsedTime.split(".")[1].slice(0, 3);							
+						}
 					}
+					/*if(finalReports.rows[k].hasOwnProperty("status")){
+						total++;
+					}*/
 				}
-				for(l=0; l<finalReports.rows.length; l++){
+				/*for(l=0; l<finalReports.rows.length; l++){
 					finalReports.rows[l].Step = finalReports.rows[l]["Step "];
+					if(finalReports.rows[l].hasOwnProperty("EllapsedTime") && finalReports.rows[l].EllapsedTime.trim() != ""){
+						finalReports.rows[l].EllapsedTime = finalReports.rows[l].EllapsedTime.split(".")[0]+":"+finalReports.rows[l].EllapsedTime.split(".")[1].slice(0, 3);
+					}
 					if(finalReports.rows[l].status == "Pass"){	pass++;}
 					else if(finalReports.rows[l].status == "Fail"){	fail++;}
 					else if(finalReports.rows[l].status == "Terminate"){	terminated++;}
 				}
 				finalReports.overallstatus[0].pass = parseFloat((pass/total)*100).toFixed(2);
 				finalReports.overallstatus[0].fail = parseFloat((fail/total)*100).toFixed(2);
-				finalReports.overallstatus[0].terminate = parseFloat((terminated/total)*100).toFixed(2);
+				finalReports.overallstatus[0].terminate = parseFloat((terminated/total)*100).toFixed(2);*/
 			}
 			reportService.renderReport_ICE(finalReports, reportType)
 			.then(function(data1) {
@@ -248,6 +273,7 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 				}
 				openWindow++;
 				e.stopImmediatePropagation();
+				$('.formatpdfbrwsrexport').remove();
 			},
 			function(error) {
 				console.log("Error-------"+error);
@@ -261,7 +287,7 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 	
 	//Export To JSON
 	$(document).on('click', '.exportToJSON', function(e){
-		var repId = $(this).parent().attr('data-reportid');		
+		var repId = $(this).attr('data-reportid');		
 		reportService.exportToJson_ICE(repId)
 		.then(function(response) {
 			if (typeof response === 'object') {
@@ -341,5 +367,6 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 		function(error) {
 			//alert("Error while fetching reports! \r\n "+(error.data));
 		});
+		$('.formatpdfbrwsrexport').remove();
 	})
 }]);
