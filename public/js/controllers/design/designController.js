@@ -262,7 +262,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 	                $("#globalModal").find('.modal-body p').text("Failed to debug").css('color','black');
 					$("#globalModal").modal("show");
 				}
-				else if(data == "terminate"){
+				else if(data == "Terminate"){
 					unblockUI();
 	                $("#globalModal").find('.modal-title').text("Terminate");
 	                $("#globalModal").find('.modal-body p').text("Debug Terminated").css('color','black');
@@ -640,6 +640,19 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 	}
 	//Export Test Case
 	
+	//Enable Append Checkbox (if after checking the, browser doesn't enables)
+	$(document).on("click", "#enableAppend", function(){
+		if($(this).is(":checked") == true){
+			$.each($(this).parents("ul").children("li"),function(){
+				if($(this).find("a").hasClass("disableActions") == true){
+					$(this).find("a").addClass("enableActions").removeClass("disableActions")
+				}
+			})
+		}
+	})
+	//Enable Append Checkbox (if after checking the, browser doesn't enables)
+	
+	
 	//Populating Saved Scrape Data
 	$scope.getScrapeData = function(){
 		$("#enableAppend").prop("checked", false)
@@ -917,6 +930,13 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		if($(this).is(":checked") == true){
 			$(".saveWS").prop("disabled", false)
 			$("#endPointURL, #wsdlMethods, #wsdlOperation, #wsdlRequestHeader, #wsdlRequestBody").prop("disabled", false)
+			//Additional to enable the web service icon
+			$.each($(this).parents("ul").children("li"),function(){
+				if($(this).find("a").hasClass("disableActions") == true){
+					$(this).find("a").addClass("enableActions").removeClass("disableActions")
+				}
+			})
+			//Additional to enable the web service icon
 		}
 		else {
 			$(".saveWS").prop("disabled", true)

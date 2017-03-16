@@ -875,7 +875,7 @@ exports.debugTestCase_ICE = function (req, res) {
 						mySocket._events.result_debugTestCase = [];
 						mySocket.emit('debugTestCase',responsedata);
 						mySocket.on('result_debugTestCase', function (responsedata) {
-							res.send("success");
+							res.send(responsedata);
 						});
 					}else{
 						console.log("Socket not Available");

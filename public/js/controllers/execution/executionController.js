@@ -90,7 +90,7 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 					$("#executionDataTable").append(row);
 					row.append($("<td class='tabeleCellPadding' style='width:3.9%;' id=\"" + count + "\">"+ count + "</td>"));
 					if(getEachScenario[i].executeStatus == undefined || getEachScenario[i].executeStatus == 0){
-						row.append($("<td class='tabeleCellPadding exe-ExecuteStatus' style='width: 3%; padding-top: 7px !important'><input ng-checked='executeAll' type='checkbox' title='Select to not execute this scenario' class='doNotExecuteScenario d-execute'></td>"));
+						row.append($("<td class='tabeleCellPadding exe-ExecuteStatus noExe' style='width: 3%; padding-top: 7px !important'><input ng-checked='executeAll' type='checkbox' title='Select to not execute this scenario' class='doNotExecuteScenario d-execute'></td>"));
 					}
 					else if(getEachScenario[i].executeStatus == 1){
 						row.append($("<td class='tabeleCellPadding exe-ExecuteStatus' style='width:3%; padding-top: 7px !important'><input ng-checked='executeAll' type='checkbox' title='Select to not execute this scenario' class='doNotExecuteScenario d-execute' checked></td>"));
@@ -113,6 +113,10 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 					count++;
 				}
 				//Creating Table Rows for each of the Scenarios
+				
+				//No Execution Status Marking Red
+				$(".noExe").parent("tr").css({'border-left':'4px solid red'});
+				$(".noExe").prev().css({'width':'3.5%'})
 			}
 		}, 
 		function(error) {
@@ -122,12 +126,12 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 	
 	//Load Location Details of Scenario
 	$scope.loadLocationDetails = function(scenarioName, scenarioId) {
-		$(".scenarioDetailsContent").empty()
+		document.getElementById("scenarioDetailsContent").innerHTML = "";
 		ExecutionService.loadLocationDetails(scenarioName, scenarioId)
 		.then(function(data) {
 			$("#modalScenarioDetails").modal("show");
 			for(i=0; i<data.projectnames.length && data.testcasenames.length && data.screennames.length; i++){
-				$(".scenarioDetailsContent").append('<div class="sDInnerContentsWrap"><div class="sDInnerContents">'+data.testcasenames[i]+'</div><div class="sDInnerContents">'+data.screennames[i]+'</div><div class="sDInnerContents">'+data.projectnames[i]+'</div></div>')
+				document.getElementById("scenarioDetailsContent").innerHTML += '<div class="sDInnerContentsWrap"><div class="sDInnerContents">'+data.testcasenames[i]+'</div><div class="sDInnerContents">'+data.screennames[i]+'</div><div class="sDInnerContents">'+data.projectnames[i]+'</div></div>'
 			}
 		}, 
 		function(error){
