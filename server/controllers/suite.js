@@ -417,8 +417,8 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 						reportdata = JSON.stringify(reportdata).replace(/'/g,"''");
 						reportdata = JSON.parse(reportdata);
 
-						var insertReport = "INSERT INTO reports (reportid,executionid,testsuiteid,testscenarioid,browser,modifiedon,status,report) VALUES (" + uuid() + "," + executionid + "," + testsuiteid + ","
-							+ scenarioid + ",'" + req_browser + "'," + new Date().getTime() + ",'" + resultData.reportData.overallstatus[0].overallstatus + "','" + JSON.stringify(reportdata)  +"')";
+						var insertReport = "INSERT INTO reports (reportid,executionid,testsuiteid,testscenarioid,executedtime,browser,modifiedon,status,report) VALUES (" + uuid() + "," + executionid + "," + testsuiteid + ","
+							+ scenarioid + ","+new Date().getTime()+",'" + req_browser + "'," + new Date().getTime() + ",'" + resultData.reportData.overallstatus[0].overallstatus + "','" + JSON.stringify(reportdata)  +"')";
 						var dbquery =	dbConnICE.execute(insertReport, function (err, result) {if (err) {flag ="fail";}else {flag = "success";}});
 
 						var insertIntoExecution = "INSERT INTO execution (testsuiteid,executionid,starttime,endtime) VALUES ("
