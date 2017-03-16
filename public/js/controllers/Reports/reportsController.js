@@ -187,14 +187,10 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 		var reportID = $(this).attr('data-reportid');
 		var reportType = $(this).attr('data-getrep');
 		var testsuitename = $(".reportboxselected").text();
-		var d = new Date();
-		var hours = d.getHours();
-	    var hours = (hours+24-2)%24; 
-	    var mid='AM';
-	    if(hours>12){	mid='PM';}
-	    var DATE = ("0" + (d.getMonth()+1)).slice(-2) + "/" + ("0" + d.getDate()).slice(-2) + "/" + d.getFullYear();
-	    var TIME = ("0" + d.getHours()).slice(-2) +":"+ ("0" + d.getMinutes()).slice(-2)+" "+mid;
-	    //var pass = fail = terminated = total = 0;
+		var d = new Date();		
+	    //var DATE = ("0" + (d.getMonth()+1)).slice(-2) + "/" + ("0" + d.getDate()).slice(-2) + "/" + d.getFullYear();
+	    //var TIME = ("0" + d.getHours()).slice(-2) +":"+ ("0" + d.getMinutes()).slice(-2) +":"+ ("0" + d.getSeconds()).slice(-2);
+	    var pass = fail = terminated = total = 0;
 		var finalReports = {
 				overallstatus : [{
 					"domainName": "",
@@ -208,11 +204,11 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 					"EndTime": "",
 					"overAllStatus": "",
 					"EllapsedTime": "",
-					"date": DATE,
-					"time": TIME,
-					/*"pass": "",
+					"date": "",
+					"time": "",
+					"pass": "",
 					"fail": "",
-					"terminate": ""*/
+					"terminate": ""
 				}],
 				rows : []
 		}		
@@ -226,41 +222,45 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 				finalReports.overallstatus[0].scenarioName = data[0].testscenarioname
 				
 				var obj2 = JSON.parse(data[1].reportdata);
+				var elapTym;
 				for(j=0; j<obj2.overallstatus.length; j++){
-					finalReports.overallstatus[0].browserVersion = obj2.overallstatus[j].browserVersion
-					finalReports.overallstatus[0].browserType = obj2.overallstatus[j].browserType
-					finalReports.overallstatus[0].StartTime = obj2.overallstatus[j].StartTime.split(".")[0]
-					finalReports.overallstatus[0].EndTime = obj2.overallstatus[j].EndTime.split(".")[0]
-					finalReports.overallstatus[0].overAllStatus = obj2.overallstatus[j].overallstatus
-					finalReports.overallstatus[0].EllapsedTime = "~" + obj2.overallstatus[j].EllapsedTime.split(".")[0]
+					finalReports.overallstatus[0].browserVersion = obj2.overallstatus[j].browserVersion;
+					finalReports.overallstatus[0].browserType = obj2.overallstatus[j].browserType;
+					finalReports.overallstatus[0].StartTime = obj2.overallstatus[j].StartTime.split(".")[0];
+					finalReports.overallstatus[0].EndTime = obj2.overallstatus[j].EndTime.split(".")[0];
+					var getTym = obj2.overallstatus[j].EndTime.split(".")[0];
+					var getDat = getTym.split(" ")[0].split("-");
+					finalReports.overallstatus[0].date = getDat[1] +"/"+ getDat[2] +"/"+ getDat[0];
+					finalReports.overallstatus[0].time = getTym.split(" ")[1];
+					finalReports.overallstatus[0].overAllStatus = obj2.overallstatus[j].overallstatus;
+					elapTym = (obj2.overallstatus[j].EllapsedTime.split(".")[0]).split(":");
+					finalReports.overallstatus[0].EllapsedTime = "~" + ("0" + elapTym[0]).slice(-2) +":"+ ("0" + elapTym[1]).slice(-2) +":"+ ("0" + elapTym[2]).slice(-2)
 				}
 				for(k=0; k<obj2.rows.length; k++){
 					finalReports.rows.push(obj2.rows[k]);
-					finalReports.rows[k].Step = finalReports.rows[k]["Step "];
+					finalReports.rows[k].slno = k+1;
+					if(finalReports.rows[k]["Step "] != undefined && finalReports.rows[k]["Step "].startsWith("S")){
+						finalReports.rows[k].Step = finalReports.rows[k]["Step "];						
+					}
 					if(finalReports.rows[k].hasOwnProperty("EllapsedTime") && finalReports.rows[k].EllapsedTime.trim() != ""){
+						elapTym = (finalReports.rows[k].EllapsedTime.split(".")[0]).split(":")
 						if(finalReports.rows[k].EllapsedTime.split(".")[1] == undefined || finalReports.rows[k].EllapsedTime.split(".")[1] == ""){
-							finalReports.rows[k].EllapsedTime = finalReports.rows[k].EllapsedTime.split(".")[0];
+							finalReports.rows[k].EllapsedTime = ("0" + elapTym[0]).slice(-2) +":"+ ("0" + elapTym[1]).slice(-2) +":"+ ("0" + elapTym[2]).slice(-2);
 						}
 						else{
-							finalReports.rows[k].EllapsedTime = finalReports.rows[k].EllapsedTime.split(".")[0]+":"+finalReports.rows[k].EllapsedTime.split(".")[1].slice(0, 3);							
+							finalReports.rows[k].EllapsedTime = ("0" + elapTym[0]).slice(-2) +":"+ ("0" + elapTym[1]).slice(-2) +":"+ ("0" + elapTym[2]).slice(-2) +":"+ finalReports.rows[k].EllapsedTime.split(".")[1].slice(0, 3);							
 						}
 					}
-					/*if(finalReports.rows[k].hasOwnProperty("status")){
+					if(finalReports.rows[k].hasOwnProperty("status")){
 						total++;
-					}*/
-				}
-				/*for(l=0; l<finalReports.rows.length; l++){
-					finalReports.rows[l].Step = finalReports.rows[l]["Step "];
-					if(finalReports.rows[l].hasOwnProperty("EllapsedTime") && finalReports.rows[l].EllapsedTime.trim() != ""){
-						finalReports.rows[l].EllapsedTime = finalReports.rows[l].EllapsedTime.split(".")[0]+":"+finalReports.rows[l].EllapsedTime.split(".")[1].slice(0, 3);
 					}
-					if(finalReports.rows[l].status == "Pass"){	pass++;}
-					else if(finalReports.rows[l].status == "Fail"){	fail++;}
-					else if(finalReports.rows[l].status == "Terminate"){	terminated++;}
+					if(finalReports.rows[k].status == "Pass"){	pass++;}
+					else if(finalReports.rows[k].status == "Fail"){	fail++;}
+					else if(finalReports.rows[k].status == "Terminate"){	terminated++;}
 				}
 				finalReports.overallstatus[0].pass = parseFloat((pass/total)*100).toFixed(2);
 				finalReports.overallstatus[0].fail = parseFloat((fail/total)*100).toFixed(2);
-				finalReports.overallstatus[0].terminate = parseFloat((terminated/total)*100).toFixed(2);*/
+				finalReports.overallstatus[0].terminate = parseFloat((terminated/total)*100).toFixed(2);
 			}
 			reportService.renderReport_ICE(finalReports, reportType)
 			.then(function(data1) {
@@ -268,8 +268,9 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 				openWindow = 0;
 				if(openWindow == 0)
 				{
-					var myWindow = window.open(path);
+					var myWindow = window.open();
 					myWindow.document.write(data1);
+					//myWindow.location.hash = path;
 				}
 				openWindow++;
 				e.stopImmediatePropagation();

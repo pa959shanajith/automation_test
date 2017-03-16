@@ -147,7 +147,9 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 								"outputVal":"",
 								"url":"",
 								"_id_":"",
-								"appType":appTypeLocal1
+								"appType":appTypeLocal1,
+								"remarksStatus": "",
+							    "remarks": ""
 							}];
 							readTestCaseData = JSON.stringify(datalist);
 							$("#jqGrid").jqGrid('GridUnload');
@@ -262,7 +264,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 	                $("#globalModal").find('.modal-body p').text("Failed to debug").css('color','black');
 					$("#globalModal").modal("show");
 				}
-				else if(data == "terminate"){
+				else if(data == "Terminate"){
 					unblockUI();
 	                $("#globalModal").find('.modal-title').text("Terminate");
 	                $("#globalModal").find('.modal-body p').text("Debug Terminated").css('color','black');
@@ -640,6 +642,19 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 	}
 	//Export Test Case
 	
+	//Enable Append Checkbox (if after checking the, browser doesn't enables)
+	$(document).on("click", "#enableAppend", function(){
+		if($(this).is(":checked") == true){
+			$.each($(this).parents("ul").children("li"),function(){
+				if($(this).find("a").hasClass("disableActions") == true){
+					$(this).find("a").addClass("enableActions").removeClass("disableActions")
+				}
+			})
+		}
+	})
+	//Enable Append Checkbox (if after checking the, browser doesn't enables)
+	
+	
 	//Populating Saved Scrape Data
 	$scope.getScrapeData = function(){
 		$("#enableAppend").prop("checked", false)
@@ -917,6 +932,13 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		if($(this).is(":checked") == true){
 			$(".saveWS").prop("disabled", false)
 			$("#endPointURL, #wsdlMethods, #wsdlOperation, #wsdlRequestHeader, #wsdlRequestBody").prop("disabled", false)
+			//Additional to enable the web service icon
+			$.each($(this).parents("ul").children("li"),function(){
+				if($(this).find("a").hasClass("disableActions") == true){
+					$(this).find("a").addClass("enableActions").removeClass("disableActions")
+				}
+			})
+			//Additional to enable the web service icon
 		}
 		else {
 			$(".saveWS").prop("disabled", true)
@@ -3146,7 +3168,9 @@ function addTestScriptRow(){
 				"outputVal": "",
 				"stepNo": "",
 				"url": "",
-				"appType": "Generic"
+				"appType": "Generic",
+				"remarksStatus": "",
+			    "remarks": ""
 		};
 		
 		$("#jqGrid tr").each(function(){
@@ -3688,10 +3712,8 @@ function drop(ev) {
 	draggedEle.setAttribute("draggable", false)
 	draggedEle.childNodes[1].style.background = "#e0e0e0";
 	draggedEle.childNodes[1].style.cursor = "no-drop"
-	//Enable-Disable dragged element based on drop event
-	
-	$(".submitObjectWarning").hide()
-	
+	//Enable-Disable dragged element based on drop event	
+	$(".submitObjectWarning").hide();	
 	if($(ev.target).parent().children(".ellipsis").hasClass("fromMergeObj") == true){
 		draggedEle.setAttribute("draggable", true)
 		draggedEle.childNodes[1].style.background = "";
