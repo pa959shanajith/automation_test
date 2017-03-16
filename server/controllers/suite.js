@@ -708,12 +708,22 @@ exports.getCycleNameByCycleId = function (req, res) {
 			},
 			testcasesteps : function(callback){
 				var testscenarioids = resultdata.testscenarioids;
-				//async.forEachSeries(resultdata, function(quest, callback2) {
-					var responsedata={template: "",testcase:[],testcasename:""};
+				//async.forEachSeries(resultdata, function(quest, callback2) {					var responsedata={template: "",testcase:[],testcasename:""};
+				var requiredversionnumber = 1;
 					var testsuiteexe = "INSERT INTO testsuites (cycleid,testsuitename,testsuiteid,versionnumber,condtitioncheck,createdby,createdon,createdthrough,deleted,donotexecute,getparampaths,history,modifiedby,modifiedon,skucodetestsuite,tags,testscenarioids) VALUES (" + requiredcycleid + ",'" + requiredtestsuitename + "'," + requiredtestsuiteid + ",1,[],'Kavyashree'," + new Date().getTime().toString() + ",null,null,[],[],null,null," + new Date().getTime().toString() + ",null,null,["+testscenarioids+"])";
 					//var testcasestepsquery = "select testcasesteps,testcasename from testcases where testcaseid = "+quest;
 					if(!flag){
 						dbConnICE.execute(testsuiteexe, function(err, answers) {
+						if(err){
+							console.log(err);
+						}else{
+							
+						}
+						
+						});
+					}else{
+						var updatetestsuitefrommodule = "UPDATE testsuites SET testscenarioids = ["+testscenarioids+"] WHERE testsuiteid="+requiredtestsuiteid+" and cycleid="+requiredcycleid+" and testsuitename='"+requiredtestsuitename+"' and versionnumber="+requiredversionnumber;
+						dbConnICE.execute(updatetestsuitefrommodule, function(err, answers) {
 						if(err){
 							console.log(err);
 						}else{
