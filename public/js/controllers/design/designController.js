@@ -147,7 +147,9 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 								"outputVal":"",
 								"url":"",
 								"_id_":"",
-								"appType":appTypeLocal1
+								"appType":appTypeLocal1,
+								"remarksStatus": "",
+							    "remarks": ""
 							}];
 							readTestCaseData = JSON.stringify(datalist);
 							$("#jqGrid").jqGrid('GridUnload');
@@ -3166,7 +3168,9 @@ function addTestScriptRow(){
 				"outputVal": "",
 				"stepNo": "",
 				"url": "",
-				"appType": "Generic"
+				"appType": "Generic",
+				"remarksStatus": "",
+			    "remarks": ""
 		};
 		
 		$("#jqGrid tr").each(function(){
@@ -3708,10 +3712,8 @@ function drop(ev) {
 	draggedEle.setAttribute("draggable", false)
 	draggedEle.childNodes[1].style.background = "#e0e0e0";
 	draggedEle.childNodes[1].style.cursor = "no-drop"
-	//Enable-Disable dragged element based on drop event
-	
-	$(".submitObjectWarning").hide()
-	
+	//Enable-Disable dragged element based on drop event	
+	$(".submitObjectWarning").hide();	
 	if($(ev.target).parent().children(".ellipsis").hasClass("fromMergeObj") == true){
 		draggedEle.setAttribute("draggable", true)
 		draggedEle.childNodes[1].style.background = "";
