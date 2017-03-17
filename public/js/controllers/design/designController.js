@@ -1971,27 +1971,39 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 	
 	//Filter Scrape Objects
 	$(document).on("click", ".checkStyleboxFilter", function(){
+		cfpLoadingBar.start();
+		$("html").css({'cursor':'wait'});
 		gsElement = []
 		$(".popupContent-filter-active").each(function(){
 			gsElement.push($(this).data("tag"))
 		})
-		filter()
+		$timeout(function(){
+			filter()
+		}, 500);
 	})
 	$(document).on("click", ".selectAllTxt", function(){
+		cfpLoadingBar.start();
+		$("html").css({'cursor':'wait'});
 		gsElement = []
 		$(".popupContent-filter-active").each(function(){
 			gsElement.push($(this).data("tag"))
 		})
-		filter()
+		$timeout(function(){
+			filter()
+		}, 500);
 	})
 	$(document).on("click", ".filterObjects", function(){
+		cfpLoadingBar.start();
+		$("html").css({'cursor':'wait'});
 		$("#scraplist li").hide()
 		if($(this).hasClass("popupContent-filter-active") == false) {
 			var getSpliceIndex = gsElement.indexOf($(this).data("tag"))
 			gsElement.splice(getSpliceIndex, 1)
 		}
 		else gsElement.push($(this).data("tag"))	
-		filter()
+		$timeout(function(){
+			filter()
+		}, 500);
 	})
 	
 	function filter(){
@@ -2025,6 +2037,8 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		else{
 			$("#scraplist li").show()
 		}
+		$("html").css({'cursor':'auto'});
+		cfpLoadingBar.complete()
 	}
 	//Filter Scrape Objects
 }]);

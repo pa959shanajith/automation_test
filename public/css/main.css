@@ -991,6 +991,7 @@ input[disabled]{
     position: absolute;
     left: 173px;
     top: 0;
+    visibility: hidden;
 }
 
 #wrapper-sc{
