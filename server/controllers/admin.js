@@ -65,13 +65,13 @@ exports.getUsers_Nineteen68 = function(req, res){
 exports.createUser_Nineteen68 = function(req, res){
         var flag = "fail";
         var status = false;
-        var req_username = req.body.username;
-        var req_password = req.body.password;
-        var req_firstname = req.body.firstName;
-        var req_lastname =  req.body.lastName;
-        var req_ldapuser = req.body.ldapUser;
-        var req_defaultRole = req.body.role;
-        var req_email_id = req.body.email;
+        var req_username = req.body.createUser.username;
+        var req_password = req.body.createUser.password;
+        var req_firstname = req.body.createUser.firstName;
+        var req_lastname =  req.body.createUser.lastName;
+        var req_ldapuser = req.body.createUser.ldapUser;
+        var req_defaultRole = req.body.createUser.role;
+        var req_email_id = req.body.createUser.email;
         var salt = bcrypt.genSaltSync(10);
         var req_hashedPassword = bcrypt.hashSync(req_password, salt);
         
@@ -88,14 +88,13 @@ exports.createUser_Nineteen68 = function(req, res){
             if(status === false){
              var createUser = "INSERT INTO users (userid,deactivated,additionalroles,createdby,createdon,defaultrole,emailid,firstname,history,lastname,ldapuser,modifiedby,modifiedon,password,username) VALUES ("+uuid()+",null,null,'"+req_username+"',"+ new Date().getTime()+","+req_defaultRole+",'"+req_email_id+"','"+req_firstname+"',null,'"+req_lastname+"',null,'"+req_username+"',"+new Date().getTime()+",'"+req_hashedPassword+"','"+req_username+"')";
                 dbConn.execute(createUser, function (err, userResult) {
-                flag = "success";
+                flag = "Success";
                 res.send(flag);
                 })
             }
             else
             {
                flag = "User Exists";
-               console.log(flag);
                res.send(flag);
             }
         })        
