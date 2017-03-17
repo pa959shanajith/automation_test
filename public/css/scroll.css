@@ -474,6 +474,7 @@
 .scroll-wrapper > .scenarioDetailsContent{
        padding: 0px;
        height: auto !important;
+       width: 100% !important;
 }
 .scroll-wrapper.scenarioDetailsContent {
        float: none;

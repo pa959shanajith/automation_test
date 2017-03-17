@@ -321,7 +321,7 @@ exports.getReport_Nineteen68 = function(req, res) {
                                                                 var releaseid = cycleiditr.releaseid;
                                                                 reportInfoObj.cyclename = cyclename;
                                                                 reportInfoObj.releaseid = releaseid;
-                                                                console.log('final reportInfoObj', reportInfoObj);
+                                                                //console.log('final reportInfoObj', reportInfoObj);
                                                                 // callback4();
                                                                 var releasedetails = "select releasename,projectid from releases where releaseid=" + releaseid + " ALLOW FILTERING";
                                                                 dbConnICE.execute(releasedetails, function(err, releaseResult) {
@@ -333,7 +333,7 @@ exports.getReport_Nineteen68 = function(req, res) {
                                                                             var projectid = reliditr.projectid;
                                                                             reportInfoObj.releasename = releasename;
                                                                             reportInfoObj.projectid = projectid;
-                                                                            console.log('final reportInfoObj in release deatails', reportInfoObj);
+                                                                            //console.log('final reportInfoObj in release deatails', reportInfoObj);
 
                                                                             var projectdeatils = "select projectname,domainid from projects where projectid=" + projectid + " ALLOW FILTERING";
                                                                             dbConnICE.execute(projectdeatils, function(err, projectResult) {
@@ -346,7 +346,7 @@ exports.getReport_Nineteen68 = function(req, res) {
                                                                                         var domainid = proiditr.domainid;
                                                                                         reportInfoObj.projectname = projectname;
                                                                                         reportInfoObj.domainid = domainid;
-                                                                                        console.log('final reportInfoObj in project deatails', reportInfoObj);
+                                                                                        //console.log('final reportInfoObj in project deatails', reportInfoObj);
 
                                                                                         var domaindetails = "select domainname from domains where domainid=" + domainid + " ALLOW FILTERING";
                                                                                         dbConnICE.execute(domaindetails, function(err, domainResult) {
@@ -356,7 +356,7 @@ exports.getReport_Nineteen68 = function(req, res) {
                                                                                                 async.forEachSeries(domainResult.rows, function(domainiditr, callback7) {
                                                                                                     var domainname = domainiditr.domainname;
                                                                                                     reportInfoObj.domainname = domainname;
-                                                                                                    console.log('final reportInfoObj in domain deatails', reportInfoObj);
+                                                                                                    //console.log('final reportInfoObj in domain deatails', reportInfoObj);
                                                                                                     callback7();
                                                                                                 }, callback6);
                                                                                             }
@@ -427,8 +427,6 @@ exports.exportToJson_ICE = function(req, res) {
 					console.log(err);
 				} else {
 					var reportres = reportResult.rows.length;
-					console.log('report result length', reportres);
-
 					async.forEachSeries(reportResult.rows, function(iterator, callback1) {
 						var reportdata = iterator.report;
 						reportInfoObj.reportdata = reportdata;
@@ -440,7 +438,6 @@ exports.exportToJson_ICE = function(req, res) {
 								var reportres = scenarioResult.rows.length;
 								async.forEachSeries(scenarioResult.rows, function(sceiditr, callback2) {
 									var scenarioid=sceiditr.testscenarioid;
-									console.log('scenarioid',scenarioid);
 									var testScenarionameQuery = "select testscenarioname from testscenarios where testscenarioid ="
 									+ scenarioid + " ALLOW FILTERING ";
 									dbConnICE.execute(testScenarionameQuery, function(err, scenarionameResult) {
@@ -451,10 +448,7 @@ exports.exportToJson_ICE = function(req, res) {
 											var scenameres = scenarionameResult.rows.length;
 											async.forEachSeries(scenarionameResult.rows, function(scenameitr, callback3) {
 												var scenarioname=scenameitr.testscenarioname;
-												console.log(scenarioname,'scenarioname')
 												reportInfoObj.scenarioname = scenarioname;
-												console.log('reportInfoObj',reportInfoObj)
-
 												callback3();                       
 											},callback2);
 										}

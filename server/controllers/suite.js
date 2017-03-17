@@ -224,35 +224,27 @@ exports.updateTestSuite_ICE = function (req, res) {
 	var checksuiteexists = "";
 	var deleteTestSuiteQuery = "";
 	var updateTestSuiteData = "";
-			checksuiteexists = "select testsuiteid from testsuites where cycleid=" + requestedtestscycleid;
-			dbConnICE.execute(checksuiteexists, function (err, checksuiteexistsresult) {
-				if (err) {
-					var flag = "Error in Query 1 checksuiteexists: Fail";
-					//res.send(flag);
-				} else {
-					if (checksuiteexistsresult.rows[0].testsuiteid == requestedtestsuiteid) {
-						deleteTestSuiteQuery = "DELETE conditioncheck,donotexecute,getparampaths,testscenarioids FROM testsuites " +
-						"where cycleid=" + requestedtestscycleid +
-						" and testsuitename='" + requestedtestsuitename + "'" +
-						" and testsuiteid=" + requestedtestsuiteid +" and versionnumber = "+requestedversionnumber;
-						deleteSuite(deleteTestSuiteQuery,function(err,response){
-							if(response == "success"){
-								saveSuite(function(err,response){
-									if(err){
-										flag = "fail";
-										index=index+1;
-										if(index == requestedtestscenarioids.length){res.send(flag);}
-									}else{
-										flag = "success";
-										index=index+1;
-										if(index == requestedtestscenarioids.length){res.send(flag);}										
-									}
-								});
-							}
-						});
+		//Removed the unwanted check for testsuite id based on cycleid in testsuite table 
+		deleteTestSuiteQuery = "DELETE conditioncheck,donotexecute,getparampaths,testscenarioids FROM testsuites " +
+		"where cycleid=" + requestedtestscycleid +
+		" and testsuitename='" + requestedtestsuitename + "'" +
+		" and testsuiteid=" + requestedtestsuiteid +" and versionnumber = "+requestedversionnumber;
+		deleteSuite(deleteTestSuiteQuery,function(err,response){
+			if(response == "success"){
+				saveSuite(function(err,response){
+					if(err){
+						flag = "fail";
+						index=index+1;
+						if(index == requestedtestscenarioids.length){res.send(flag);}
+					}else{
+						flag = "success";
+						index=index+1;
+						if(index == requestedtestscenarioids.length){res.send(flag);}										
 					}
-				}
-			});
+				});
+			}
+		});
+
 
 	function deleteSuite(deleteTestSuiteQuery,deleteSuitecallback){
 		dbConnICE.execute(deleteTestSuiteQuery, function (err, deleteQueryresults) {
@@ -425,8 +417,8 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 						reportdata = JSON.stringify(reportdata).replace(/'/g,"''");
 						reportdata = JSON.parse(reportdata);
 
-						var insertReport = "INSERT INTO reports (reportid,executionid,testsuiteid,testscenarioid,browser,modifiedon,status,report) VALUES (" + uuid() + "," + executionid + "," + testsuiteid + ","
-							+ scenarioid + ",'" + req_browser + "'," + new Date().getTime() + ",'" + resultData.reportData.overallstatus[0].overallstatus + "','" + JSON.stringify(reportdata)  +"')";
+						var insertReport = "INSERT INTO reports (reportid,executionid,testsuiteid,testscenarioid,executedtime,browser,modifiedon,status,report) VALUES (" + uuid() + "," + executionid + "," + testsuiteid + ","
+							+ scenarioid + ","+new Date().getTime()+",'" + req_browser + "'," + new Date().getTime() + ",'" + resultData.reportData.overallstatus[0].overallstatus + "','" + JSON.stringify(reportdata)  +"')";
 						var dbquery =	dbConnICE.execute(insertReport, function (err, result) {if (err) {flag ="fail";}else {flag = "success";}});
 
 						var insertIntoExecution = "INSERT INTO execution (testsuiteid,executionid,starttime,endtime) VALUES ("

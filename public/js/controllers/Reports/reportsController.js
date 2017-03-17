@@ -1,12 +1,14 @@
 
 mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout','$window', 'reportService','cfpLoadingBar', function($scope,$http,$location,$timeout,$window,reportService, cfpLoadingBar) {
 	$("body").css("background","#eee");
+	$("head").append('<link id="mindmapCSS2" rel="stylesheet" type="text/css" href="fonts/font-awesome_mindmap/css/font-awesome.min.css" />')
 	var getUserInfo = JSON.parse(window.localStorage['_UI']);
 	var userID = getUserInfo.user_id;
 	var open = 0;	var openWindow = 0;
 	var counter = 0;
 	var executionId, testsuiteId;
 	$("#page-taskName").empty().append('<span>Reports</span>')
+	cfpLoadingBar.start()
 	$timeout(function(){
 		$('.scrollbar-inner').scrollbar();
 		$('.scrollbar-macosx').scrollbar();
@@ -48,6 +50,8 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 					if($('.dynamicTestsuiteContainer').find('.suiteContainer').length <= 0){
 						$('.suitedropdownicon').hide();
 					}
+					cfpLoadingBar.complete();
+					$("#middle-content-section").css('visibility','visible');
 				}, 
 				function(error) {
 					console.log("Error-------"+error);
@@ -56,7 +60,7 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 		}, function(error) {
 		});
 	}
-		
+
 	//Service call to get start and end details of suites
 	$(document).on('click', '.suiteContainer', function(){
 		$('.formatpdfbrwsrexport').remove();
@@ -77,9 +81,21 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 			if(Object.prototype.toString.call(data) === '[object Array]'){
 				if(data.length > 0){
 					tableContainer.find('tbody').empty();
+					var startDat, startTym, endDat, endTym, sD,sT,eD,eT;
 					for(i=0; i<data.length; i++){
-						tableContainer.find('tbody').append("<tr class='scenariostatusreport' data-executionid='"+data[i].execution_id+"'><td>"+(i+1)+"</td><td>"+data[i].start_time.split(' ')[0]+"</td><td>"+data[i].start_time.split(' ')[1]+"</td><td>"+data[i].end_time.split(' ')[0]+"</td><td>"+data[i].end_time.split(' ')[1]+"</td></tr>");
+						startDat = (data[i].start_time.split(' ')[0]).split("-")
+						startTym = (data[i].start_time.split(' ')[1]).split(":")
+						endDat = (data[i].end_time.split(' ')[0]).split("-")
+						endTym = (data[i].end_time.split(' ')[1]).split(":")
+						sD = ("0" + startDat[0]).slice(-2) +"-"+ ("0" + startDat[1]).slice(-2) +"-"+ startDat[2];
+						sT = ("0" + startTym[0]).slice(-2) +":"+ ("0" + startTym[1]).slice(-2);
+						eD = ("0" + endDat[0]).slice(-2) +"-"+ ("0" + endDat[1]).slice(-2) +"-"+ endDat[2];
+						eT = ("0" + endTym[0]).slice(-2) +":"+ ("0" + endTym[1]).slice(-2);
+						tableContainer.find('tbody').append("<tr class='scenariostatusreport' data-executionid='"+data[i].execution_id+"'><td>"+(i+1)+"</td><td>"+sD+"</td><td>"+sT+"</td><td>"+eD+"</td><td>"+eT+"</td></tr>");
 					}					
+				}
+				if(data.length > 2){
+					$("#dateDESC").show();
 				}
 			}
 			$('.progress-bar-success, .progress-bar-danger, .progress-bar-warning, .progress-bar-norun').css('width','0%');
@@ -93,6 +109,56 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 		}
 	})
 	
+	//Date sorting
+    $(document).on('click', '#dateDESC', function(){
+    	$(this).hide();
+    	$('#dateASC').show();
+    	var dateArray = $('.scrollbar-inner-scenariostatus').children('.scenariostatusreport');
+    	dateDESC(dateArray);
+    	$(".scrollbar-inner-scenariostatus").empty();
+    	for(i=0; i<dateArray.length; i++){
+			$(".scrollbar-inner-scenariostatus").append(dateArray[i]);
+		}
+    })
+    $(document).on('click', '#dateASC', function(){
+    	$(this).hide();
+    	$('#dateDESC').show();
+    	var dateArray = $('.scrollbar-inner-scenariostatus').children('.scenariostatusreport');
+    	dateASC(dateArray);
+    	$(".scrollbar-inner-scenariostatus").empty();
+    	for(i=0; i<dateArray.length; i++){
+			$(".scrollbar-inner-scenariostatus").append(dateArray[i]);
+		}
+    })
+    
+    function dateDESC(dateArray){
+    	dateArray.sort(function(a,b){
+    		var aA = a.children.item(1).innerHTML;
+    		var bB = b.children.item(1).innerHTML;
+    		var fDate = aA.split("-"); var lDate = bB.split("-");
+    		//var fFDate = fDate[0].split("/"); var lLDate = lDate[0].split("/");
+    		var gDate = fDate[0]+"-"+fDate[1]+"-"+fDate[2]//+" "+a.children.item(2).innerHTML;
+    		var mDate = lDate[0]+"-"+lDate[1]+"-"+lDate[2]//+" "+b.children.item(2).innerHTML;
+    		if ( new Date(gDate) < new Date(mDate) )  return -1;
+    	    if ( new Date(gDate) > new Date(mDate) )  return 1;
+    	    return dateArray;
+    	})
+	}
+    
+    function dateASC(dateArray){
+    	dateArray.sort(function(a,b){
+    		var aA = a.children.item(1).innerHTML//.replace("&nbsp;&nbsp;&nbsp;&nbsp;"," ");
+    		var bB = b.children.item(1).innerHTML//.replace("&nbsp;&nbsp;&nbsp;&nbsp;"," ");
+    		var fDate = aA.split("-"); var lDate = bB.split("-");
+    		//var fFDate = fDate[0].split("/"); var lLDate = lDate[0].split("/");
+    		var gDate = fDate[0]+"-"+fDate[1]+"-"+fDate[2]//+" "+a.children.item(2).innerHTML;
+    		var mDate = lDate[0]+"-"+lDate[1]+"-"+lDate[2]//+" "+b.children.item(2).innerHTML;
+    		if ( new Date(gDate) > new Date(mDate) )  return -1;
+    	    if ( new Date(gDate) < new Date(mDate) )  return 1;
+    	    return dateArray;
+    	})
+	}
+    //Date sorting
 	//Service call to get scenario status
 	$(document).on('click', '.scenariostatusreport', function(){
 		$(this).addClass('scenariostatusreportselect');
@@ -187,14 +253,10 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 		var reportID = $(this).attr('data-reportid');
 		var reportType = $(this).attr('data-getrep');
 		var testsuitename = $(".reportboxselected").text();
-		var d = new Date();
-		var hours = d.getHours();
-	    var hours = (hours+24-2)%24; 
-	    var mid='AM';
-	    if(hours>12){	mid='PM';}
-	    var DATE = ("0" + (d.getMonth()+1)).slice(-2) + "/" + ("0" + d.getDate()).slice(-2) + "/" + d.getFullYear();
-	    var TIME = ("0" + d.getHours()).slice(-2) +":"+ ("0" + d.getMinutes()).slice(-2)+" "+mid;
-	    //var pass = fail = terminated = total = 0;
+		var d = new Date();		
+	    //var DATE = ("0" + (d.getMonth()+1)).slice(-2) + "/" + ("0" + d.getDate()).slice(-2) + "/" + d.getFullYear();
+	    //var TIME = ("0" + d.getHours()).slice(-2) +":"+ ("0" + d.getMinutes()).slice(-2) +":"+ ("0" + d.getSeconds()).slice(-2);
+	    var pass = fail = terminated = total = 0;
 		var finalReports = {
 				overallstatus : [{
 					"domainName": "",
@@ -208,11 +270,11 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 					"EndTime": "",
 					"overAllStatus": "",
 					"EllapsedTime": "",
-					"date": DATE,
-					"time": TIME,
-					/*"pass": "",
+					"date": "",
+					"time": "",
+					"pass": "",
 					"fail": "",
-					"terminate": ""*/
+					"terminate": ""
 				}],
 				rows : []
 		}		
@@ -226,41 +288,45 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 				finalReports.overallstatus[0].scenarioName = data[0].testscenarioname
 				
 				var obj2 = JSON.parse(data[1].reportdata);
+				var elapTym;
 				for(j=0; j<obj2.overallstatus.length; j++){
-					finalReports.overallstatus[0].browserVersion = obj2.overallstatus[j].browserVersion
-					finalReports.overallstatus[0].browserType = obj2.overallstatus[j].browserType
-					finalReports.overallstatus[0].StartTime = obj2.overallstatus[j].StartTime.split(".")[0]
-					finalReports.overallstatus[0].EndTime = obj2.overallstatus[j].EndTime.split(".")[0]
-					finalReports.overallstatus[0].overAllStatus = obj2.overallstatus[j].overallstatus
-					finalReports.overallstatus[0].EllapsedTime = "~" + obj2.overallstatus[j].EllapsedTime.split(".")[0]
+					finalReports.overallstatus[0].browserVersion = obj2.overallstatus[j].browserVersion;
+					finalReports.overallstatus[0].browserType = obj2.overallstatus[j].browserType;
+					finalReports.overallstatus[0].StartTime = obj2.overallstatus[j].StartTime.split(".")[0];
+					finalReports.overallstatus[0].EndTime = obj2.overallstatus[j].EndTime.split(".")[0];
+					var getTym = obj2.overallstatus[j].EndTime.split(".")[0];
+					var getDat = getTym.split(" ")[0].split("-");
+					finalReports.overallstatus[0].date = getDat[1] +"/"+ getDat[2] +"/"+ getDat[0];
+					finalReports.overallstatus[0].time = getTym.split(" ")[1];
+					finalReports.overallstatus[0].overAllStatus = obj2.overallstatus[j].overallstatus;
+					elapTym = (obj2.overallstatus[j].EllapsedTime.split(".")[0]).split(":");
+					finalReports.overallstatus[0].EllapsedTime = "~" + ("0" + elapTym[0]).slice(-2) +":"+ ("0" + elapTym[1]).slice(-2) +":"+ ("0" + elapTym[2]).slice(-2)
 				}
 				for(k=0; k<obj2.rows.length; k++){
 					finalReports.rows.push(obj2.rows[k]);
-					finalReports.rows[k].Step = finalReports.rows[k]["Step "];
+					finalReports.rows[k].slno = k+1;
+					if(finalReports.rows[k]["Step "] != undefined && finalReports.rows[k]["Step "].startsWith("S")){
+						finalReports.rows[k].Step = finalReports.rows[k]["Step "];						
+					}
 					if(finalReports.rows[k].hasOwnProperty("EllapsedTime") && finalReports.rows[k].EllapsedTime.trim() != ""){
+						elapTym = (finalReports.rows[k].EllapsedTime.split(".")[0]).split(":")
 						if(finalReports.rows[k].EllapsedTime.split(".")[1] == undefined || finalReports.rows[k].EllapsedTime.split(".")[1] == ""){
-							finalReports.rows[k].EllapsedTime = finalReports.rows[k].EllapsedTime.split(".")[0];
+							finalReports.rows[k].EllapsedTime = ("0" + elapTym[0]).slice(-2) +":"+ ("0" + elapTym[1]).slice(-2) +":"+ ("0" + elapTym[2]).slice(-2);
 						}
 						else{
-							finalReports.rows[k].EllapsedTime = finalReports.rows[k].EllapsedTime.split(".")[0]+":"+finalReports.rows[k].EllapsedTime.split(".")[1].slice(0, 3);							
+							finalReports.rows[k].EllapsedTime = ("0" + elapTym[0]).slice(-2) +":"+ ("0" + elapTym[1]).slice(-2) +":"+ ("0" + elapTym[2]).slice(-2) +":"+ finalReports.rows[k].EllapsedTime.split(".")[1].slice(0, 3);							
 						}
 					}
-					/*if(finalReports.rows[k].hasOwnProperty("status")){
+					if(finalReports.rows[k].hasOwnProperty("status") && finalReports.rows[k].status != ""){
 						total++;
-					}*/
-				}
-				/*for(l=0; l<finalReports.rows.length; l++){
-					finalReports.rows[l].Step = finalReports.rows[l]["Step "];
-					if(finalReports.rows[l].hasOwnProperty("EllapsedTime") && finalReports.rows[l].EllapsedTime.trim() != ""){
-						finalReports.rows[l].EllapsedTime = finalReports.rows[l].EllapsedTime.split(".")[0]+":"+finalReports.rows[l].EllapsedTime.split(".")[1].slice(0, 3);
 					}
-					if(finalReports.rows[l].status == "Pass"){	pass++;}
-					else if(finalReports.rows[l].status == "Fail"){	fail++;}
-					else if(finalReports.rows[l].status == "Terminate"){	terminated++;}
+					if(finalReports.rows[k].status == "Pass"){	pass++;}
+					else if(finalReports.rows[k].status == "Fail"){	fail++;}
+					else if(finalReports.rows[k].status == "Terminate"){terminated++;}
 				}
 				finalReports.overallstatus[0].pass = parseFloat((pass/total)*100).toFixed(2);
 				finalReports.overallstatus[0].fail = parseFloat((fail/total)*100).toFixed(2);
-				finalReports.overallstatus[0].terminate = parseFloat((terminated/total)*100).toFixed(2);*/
+				finalReports.overallstatus[0].terminate = parseFloat((terminated/total)*100).toFixed(2);
 			}
 			reportService.renderReport_ICE(finalReports, reportType)
 			.then(function(data1) {
@@ -268,8 +334,9 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 				openWindow = 0;
 				if(openWindow == 0)
 				{
-					var myWindow = window.open(path);
+					var myWindow = window.open();
 					myWindow.document.write(data1);
+					//myWindow.location.hash = path;
 				}
 				openWindow++;
 				e.stopImmediatePropagation();

@@ -991,6 +991,7 @@ input[disabled]{
     position: absolute;
     left: 173px;
     top: 0;
+    visibility: hidden;
 }
 
 #wrapper-sc{
@@ -2704,7 +2705,7 @@ select:hover {
     text-overflow: ellipsis;
     display: inline-block;
     position: relative;
-    top: 4px;
+    top: 0px;
 }
 .scenarioReports tbody tr td:nth-child(2){width: 20%;}
 .scenarioReports tbody tr td:nth-child(3){width: 20%;}

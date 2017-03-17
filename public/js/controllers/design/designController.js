@@ -147,7 +147,9 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 								"outputVal":"",
 								"url":"",
 								"_id_":"",
-								"appType":appTypeLocal1
+								"appType":appTypeLocal1,
+								"remarksStatus": "",
+							    "remarks": ""
 							}];
 							readTestCaseData = JSON.stringify(datalist);
 							$("#jqGrid").jqGrid('GridUnload');
@@ -1969,27 +1971,39 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 	
 	//Filter Scrape Objects
 	$(document).on("click", ".checkStyleboxFilter", function(){
+		cfpLoadingBar.start();
+		$("html").css({'cursor':'wait'});
 		gsElement = []
 		$(".popupContent-filter-active").each(function(){
 			gsElement.push($(this).data("tag"))
 		})
-		filter()
+		$timeout(function(){
+			filter()
+		}, 500);
 	})
 	$(document).on("click", ".selectAllTxt", function(){
+		cfpLoadingBar.start();
+		$("html").css({'cursor':'wait'});
 		gsElement = []
 		$(".popupContent-filter-active").each(function(){
 			gsElement.push($(this).data("tag"))
 		})
-		filter()
+		$timeout(function(){
+			filter()
+		}, 500);
 	})
 	$(document).on("click", ".filterObjects", function(){
+		cfpLoadingBar.start();
+		$("html").css({'cursor':'wait'});
 		$("#scraplist li").hide()
 		if($(this).hasClass("popupContent-filter-active") == false) {
 			var getSpliceIndex = gsElement.indexOf($(this).data("tag"))
 			gsElement.splice(getSpliceIndex, 1)
 		}
 		else gsElement.push($(this).data("tag"))	
-		filter()
+		$timeout(function(){
+			filter()
+		}, 500);
 	})
 	
 	function filter(){
@@ -2023,6 +2037,8 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		else{
 			$("#scraplist li").show()
 		}
+		$("html").css({'cursor':'auto'});
+		cfpLoadingBar.complete()
 	}
 	//Filter Scrape Objects
 }]);
@@ -3166,7 +3182,9 @@ function addTestScriptRow(){
 				"outputVal": "",
 				"stepNo": "",
 				"url": "",
-				"appType": "Generic"
+				"appType": "Generic",
+				"remarksStatus": "",
+			    "remarks": ""
 		};
 		
 		$("#jqGrid tr").each(function(){
@@ -3708,10 +3726,8 @@ function drop(ev) {
 	draggedEle.setAttribute("draggable", false)
 	draggedEle.childNodes[1].style.background = "#e0e0e0";
 	draggedEle.childNodes[1].style.cursor = "no-drop"
-	//Enable-Disable dragged element based on drop event
-	
-	$(".submitObjectWarning").hide()
-	
+	//Enable-Disable dragged element based on drop event	
+	$(".submitObjectWarning").hide();	
 	if($(ev.target).parent().children(".ellipsis").hasClass("fromMergeObj") == true){
 		draggedEle.setAttribute("draggable", true)
 		draggedEle.childNodes[1].style.background = "";

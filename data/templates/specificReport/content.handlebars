@@ -2,33 +2,53 @@
     <head>
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <title>SLK Nineteen68</title>
-        <script type="text/javascript" src="{#asset jquery.min.js @encoding=link}"></script>
+        <link rel="stylesheet" type="text/css" href="{#asset latofonts.css @encoding=link}"/>
+        <script type="text/javascript" src="{#asset jquery.min.js @encoding=link}"></script> 
+        <script>
+			setTimeout(function(){
+				if($("#overAllStat").text() == "Pass"){$("#overAllStat").css('color','green')}
+				else if($("#overAllStat").text() == "Fail"){$("#overAllStat").css('color','red')}
+				else if($("#overAllStat").text() == "Terminate"){$("#overAllStat").css('color','#faa536')}
+				var getStatus = $('.reportdetailsrow');
+				for(i=0; i<getStatus.length; i++){
+					if(getStatus[i].getElementsByClassName("rDstatus")[0].innerHTML == "Pass"){getStatus[i].getElementsByClassName("rDstatus")[0].style.color = "green"}
+					else if(getStatus[i].getElementsByClassName("rDstatus")[0].innerHTML == "Fail"){getStatus[i].getElementsByClassName("rDstatus")[0].style.color = "red"}
+					else if(getStatus[i].getElementsByClassName("rDstatus")[0].innerHTML == "Terminate"){getStatus[i].getElementsByClassName("rDstatus")[0].style.color = "#faa536"}
+					if(getStatus[i].getElementsByClassName("rDstepDes")[0].innerHTML.startsWith("Testscriptname") || getStatus[i].getElementsByClassName("rDstepDes")[0].innerHTML.startsWith("TestCase Name")){
+						getStatus[i].getElementsByClassName("rDstepDes")[0].style.fontWeight = "bold";
+					}
+				}
+				if($('.reportsDetail .reportdetailsrow').length < 12){
+					$('.rDstep').css('width','10.1%');
+					$('.rDstepDes').css('width','49.6%');
+					$('.rDstatus').css('width','10%');
+				}
+			}, 300);
+		</script>      
         <style>
-            body{font-family: Open_Sans, sans-serif;}
+            body{font-family: LatoWeb;}
             .mainContainer{ border: 1px solid #B5AAAA; margin: 4px; float: left; padding: 14px; width: 97%; height: 95%;}
-            .hearderCon{position: relative; width: 100%; float: left; border: 1px solid #cfcfcf; background: linear-gradient(to bottom, #FFFFFF 0%, #E6E6E6 100%); height: 50px; margin-bottom: 10px;border-radius: 5px; font-size: 16px;}
+            .hearderCon{position: relative; width: 100%; float: left; border: 1px solid #cfcfcf; background: linear-gradient(to bottom, #FFFFFF 0%, #E6E6E6 100%); height: 50px; margin-bottom: 10px;border-radius: 5px; font-size: 16px; padding-top: 7px;}
             .headerRepDetails{ width: 50%; padding: 3px 40px;}
             .headerRepDetails label{ text-align: right; width: 29%; font-size: 13px;}
             .headerRepDetails span{ width: 64%; padding-bottom: 5px; font-weight: bold; font-size: 13px;}
             .h2Header{ position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);}
-            .leftSummary{width: 50%; float: left; padding: 25px 0;}
+            .leftSummary{width: 50%; float: left; padding: 25px 0; font-size: 14px;}
             .leftSummary label{
                 text-align: right;
                 float: left;
                 width: 29%;
                 padding-right: 5px;
                 padding-bottom: 5px;
-                font-size: 13px;
             }
             .leftSummary span{
                 float: left;
                 width: 64%;
                 padding-bottom: 5px;
                 font-weight: bold;
-                font-size: 13px;
             }
-            .summaryCon{position: relative; float: left; width: 100%; border: 1px solid #cfcfcf; background: linear-gradient(to bottom, #FFFFFF 0%, #E6E6E6 100%); height: 30px;}
-            .summaryCon span{position: absolute; top: 5px; left: 40px;}
+            .summaryCon{position: relative; float: left; width: 100%; border: 1px solid #cfcfcf; background: linear-gradient(to bottom, #FFFFFF 0%, #E6E6E6 100%); height: 38px; border-radius: 5px;}
+            .summaryCon span{position: absolute; top: 10px; left: 40px;}
             .midContainer{
                 border-collapse: collapse;
                 border: 1px solid #cfcfcf;
@@ -36,6 +56,8 @@
                 font: 14px cabin_Regular;
                 float: left;
                 margin: 1% 0;
+                font-family: LatoWeb;
+    			font-size: 14px;
             }
             .midContainer td{padding-top: 5px; border: 1px solid #cfcfcf;}
             .midContainer td label{
@@ -44,18 +66,17 @@
                 width: 29%;
                 padding-right: 5px;
                 padding-bottom: 5px;
-                font-size: 13px;
             }
-            .reportsDetails{border: 1px solid #cfcfcf; background: linear-gradient(to bottom, #FFFFFF 0%, #E6E6E6 100%); height: 50px;}
-            .reportsDetails th:nth-child(1), .rDid{width: 5%;}
-            .reportsDetails th:nth-child(2), .rDstep{width: 10%;}
-            .reportsDetails th:nth-child(3), .rDstepDes{width: 50%;}
-            .reportsDetails th:nth-child(4), .rDstatus{width: 10%;}
-            .reportsDetails th:nth-child(5), .rDellaps{width: 12%;}
-            .reportsDetails th:nth-child(6), .rDcomments{width: 13%;}
+            .reportsDetails{border: 1px solid #cfcfcf; background: linear-gradient(to bottom, #FFFFFF 0%, #E6E6E6 100%); height: 50px; font-size: 15px;}
+            .reportsDetails th:nth-child(1){width: 5%;} .rDid{width: 5.25%;}
+            .reportsDetails th:nth-child(2){width: 10%;} .rDstep{width: 10.25%;}
+            .reportsDetails th:nth-child(3){width: 50%;} .rDstepDes{width: 49.8%;}
+            .reportsDetails th:nth-child(4){width: 10%;} .rDstatus{width: 10.1%;}
+            .reportsDetails th:nth-child(5){width: 12%;} .rDellaps{width: 12.1%;}
+            .reportsDetails th:nth-child(6), .rDcomments{width: 13%; word-break: break-word;}
             .maintabCont{float: left; width: 100%; border: 1px solid #dcdcdc;}
-            .tabCont{display: table-cell; border-bottom: 1px solid #ececec;}
-            .reportsDetail{line-height: 2; text-align: center; height:425px; overflow: auto;font-size: 14px;}
+            .tabCont{display: table-cell; border-bottom: 1px solid #ececec; border-right: 1px solid #ececec;}
+            .reportsDetail{line-height: 2; text-align: center; height:402px; overflow: auto;font-size: 14px;}
             .rDstepDes{text-align: left; word-break: break-word;}
             .progress {
                 margin-bottom: 20px;
@@ -109,6 +130,18 @@
             .progress-bar-warning {
                 background: linear-gradient(to right, #f7b91e, #faa536) !important;
             }
+            .reportsDetail div.reportdetailsrow:nth-child(even){background: #f9f9f9;}
+			::-webkit-scrollbar {
+			    width: 8px;
+			}			 
+			::-webkit-scrollbar-track {
+			    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3); 
+			    border-radius: 4px;
+			}			 
+			::-webkit-scrollbar-thumb {
+			    border-radius: 10px;
+			    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5); 
+			}
         </style>
     </head>
     <body>
@@ -116,13 +149,13 @@
             {{#each overallstatus}}
             <div class="hearderCon" >
                 <div class="headerRepDetails">
-                    <label>Generated Report Date:</label><span>{{date}}</span>
+                    <label>Report Generated Date : </label><span>{{date}}</span>
                 </div>
                 <div class="headerRepDetails">
-                    <label>Generated Report Time:</label><span>{{time}}</span>
+                    <label>Report Generated Time : </label><span>{{time}}</span>
                 </div>
                 <div class="h2Header">
-                    <h3>SLK Nineteen68 Execution Reports</h3>
+                    <h4>SLK Nineteen68 Execution Reports</h4>
                 </div>
             </div>
             <div class="summaryCon">
@@ -130,59 +163,59 @@
             </div>
             <div style="width: 100%;">
                 <div class="leftSummary">
-                    <label>Senario:</label><span>{{scenarioName}}</span>
-                    <label>Project:</label><span>{{projectName}}</span>
-                    <label>Cycle:</label><span>{{cycleName}}</span>
-                    <label>Domain:</label><span>{{domainName}}</span>
-                    <label>Release:</label><span>{{releaseName}}</span>
-                    <label>Browser Type:</label><span>{{browserType}}</span>
-                    <label>Browser Version:</label><span>{{browserVersion}}</span>
+                    <label>Senario :</label><span>{{scenarioName}}</span>
+                    <label>Project :</label><span>{{projectName}}</span>
+                    <label>Cycle :</label><span>{{cycleName}}</span>
+                    <label>Domain :</label><span>{{domainName}}</span>
+                    <label>Release :</label><span>{{releaseName}}</span>
+                    <label>Browser Type :</label><span>{{browserType}}</span>
+                    <label>Browser Version :</label><span>{{browserVersion}}</span>
                 </div>
-                <!-- <div id="rightSummaryFunc" class="rightSummaryFunc">
+                <div id="rightSummaryFunc" class="rightSummaryFunc">
                     <div class="reportStatus">				
             			<div class="reportStatusBlk">
             				<span class="progresslabel">Pass</span>
             				<div class="progress customprogress">
             					<span class="progress-bar progress-bar-success" style="width: {{pass}}%" role="progressbar"></span>
             				</div>
-            				<span class="progresspercentage">{{pass}}%</span>
+            				<span class="progresspercentage">{{pass}} %</span>
             			</div>
             			<div class="reportStatusBlk">
             				<span class="progresslabel">Fail</span>
             				<div class="progress customprogress">
             					<span class="progress-bar progress-bar-danger" style="width: {{fail}}%" role="progressbar"></span>
             				</div>
-            				<span class="progresspercentage">{{fail}}%</span>
+            				<span class="progresspercentage">{{fail}} %</span>
             			</div>	
             			<div class="reportStatusBlk">
             				<span class="progresslabel">Terminated</span>
             				<div class="progress customprogress">
             					<span class="progress-bar progress-bar-warning" style="width: {{terminate}}%" role="progressbar"></span>
             			    </div>
-            			    <span class="progresspercentage">{{terminate}}%</span>
+            			    <span class="progresspercentage">{{terminate}} %</span>
             			</div>
             		</div>
-                </div> -->
+                </div>
             </div>
             <div style="margin-top: 280px;">
                 <table cellpadding="3" cellspacing="0" class="midContainer" id="staustable">
                     <tbody>
                         <tr>
                             <td>
-                                <label>Start Date and Time :</label><span id="startTime">{{StartTime}}</span>
+                                <label>Start Date and Time :</label><span id="startTime"><b>{{StartTime}}</b></span>
                             </td>
                             <td rowspan="3">
-                                <label>Status :</label><span id="overAllStat"><span style="color:Green;"></span>{{overAllStatus}}</span>
+                                <label>Status :</label><span id="overAllStat"><span style="color:Green;"></span><b>{{overAllStatus}}</b></span>
                             </td>
                         </tr>
                         <tr>
                             <td>
-                                <label>End Date and Time :</label><span id="endTime">{{EndTime}}</span>
+                                <label>End Date and Time :</label><span id="endTime"><b>{{EndTime}}</b></span>
                             </td>
                         </tr>
                         <tr>
                             <td>
-                                <label>Elapsed Time:</label><span id="elapsedTime">{{EllapsedTime}}</span>
+                                <label>Elapsed Time :</label><span id="elapsedTime"><b>{{EllapsedTime}}</b></span>
                             </td>
                         </tr>
                     </tbody>
@@ -202,8 +235,8 @@
                 </table>
                 <div class="reportsDetail">
                     {{#each rows}}
-                    <div style="width: 100%; display: table;">
-                        <div class="rDid tabCont">{{@index}}</div>
+                    <div style="width: 100%; display: table;" class="reportdetailsrow">
+                        <div class="rDid tabCont">{{slno}}</div>
                         <div class="rDstep tabCont">{{Step}}</div>
                         <div class="rDstepDes tabCont" style="padding-left: 10px;">{{StepDescription}}</div>
                         <div class="rDstatus tabCont" style="padding-left: 10px;">{{status}}</div>
@@ -213,6 +246,6 @@
                     {{/each}}
                 </div>
             </div>
-        </div>
+        </div>      
     </body>
 </html>
