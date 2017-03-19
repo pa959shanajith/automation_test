@@ -11,17 +11,11 @@ mySPA.factory('adminServices', ['$http', '$q', function ($http, $q) {
                 .then(function (response) { return response.data; },
                 function (response) { return $q.reject(response.data); });
         },
-         createUser_Nineteen68: function (userName, passWord, firstName, lastName, email, role ,ldapUser) {
+         createUser_Nineteen68: function (createUser) {
             var param = "createUser_Nineteen68";
             return $http.post('/createUser_Nineteen68', {
                 action: param,
-                    username: userName,
-                    password: passWord,
-                    firstName: firstName,
-                    lastName: lastName,
-                    email: email,
-                    role: role,
-                    ldapUser: ldapUser
+                createUser:createUser
             })
                 .then(function (response) { return response.data; },
                 function (response) { return $q.reject(response.data); });

@@ -2439,6 +2439,117 @@ select:hover {
     position: relative;
 }
 
+/*****************ADMIN CSS NEW ************************/
+.adminActionBtn
+{
+    float: right;
+    width: auto;
+}
+.adminBtn 
+{
+   padding: 2px 25px !important;
+}
+.adminForm
+{
+    padding-top: 5%;
+    padding-left: 3%;
+}
+.adminSmBox
+{
+    padding-top: 5%;
+    padding-left: 0px;
+}
+.adminControl
+{
+    margin-bottom: 3%;
+    padding: 0px 6px;
+}
+.leftControl
+{
+    float: left;
+    width: 47%;
+}
+.rightControl
+{
+    float: right;
+    width: 50%;
+}
+.primaryRole
+{
+    width: auto;
+    vertical-align: middle;
+    font-weight: normal;
+    line-height: 2;
+}
+.selectControl
+{
+    position: relative;
+    left: -90px;
+}
+.errorlbl
+{
+    margin: -2.5em 0 2em;
+    line-height: 17px;
+    position: relative;
+    left: 12px;
+}
+.userForm
+{
+    float: left;
+    width: 100%;
+}
+.adminSelect
+{
+    padding: 0px;
+    height: 25px;
+    margin-bottom: 0;
+    width: 60%;
+    margin-left: 4%;
+    margin-top: 0%;
+    line-height: 2;
+}
+.selectRole
+{
+    margin-top: 2%;
+    float: left;
+}
+.selectedIcon
+{
+    background: #331d4c;
+    border-radius: 5px;
+}
+.domainTxt
+{
+    float: left;
+}
+.projectForm:first-child
+{
+      margin-top: 5%;
+}
+
+.projectForm
+{
+    margin-bottom: 3%;
+    padding: 0 6px;
+}
+.appTypeTxt
+{
+    position: relative;
+    top: 5px;
+}
+.projectTypes
+{
+    margin: 0% 0 0 3%;
+    float: left;
+    width: auto;
+}
+#selDomain
+{
+    margin-left: 2%;
+}
+/*****************ADMIN CSS NEW ************************/
+
+
 /******************Reports CSS***************************/
 .reportbox{
 	padding: 10px;
@@ -2593,7 +2704,7 @@ select:hover {
     text-overflow: ellipsis;
     display: inline-block;
     position: relative;
-    top: 0px;
+    top: 4px;
 }
 .scenarioReports tbody tr td:nth-child(2){width: 20%;}
 .scenarioReports tbody tr td:nth-child(3){width: 20%;}

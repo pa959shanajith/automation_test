@@ -2,13 +2,38 @@
  * 
  */
 var DOMAINID;
-mySPA.controller('adminController', ['$scope', '$http', 'adminServices', function ($scope, $http, adminServices) {
+mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeout','cfpLoadingBar', function ($scope, $http, adminServices, $timeout, cfpLoadingBar) {
+    $("body").css("background","#eee");
 	$('.dropdown').on('show.bs.dropdown', function(e){
 	    $(this).find('.dropdown-menu').first().stop(true, true).slideDown(300);
 	});
 	$('.dropdown').on('hide.bs.dropdown', function(e){
 		$(this).find('.dropdown-menu').first().stop(true, true).slideUp(300);
 	});
+
+$timeout(function(){
+		angular.element(document.getElementById("left-nav-section")).scope().getUserRoles();
+        angular.element('#userTab').triggerHandler('click');
+		cfpLoadingBar.complete()
+	}, 500)
+
+         $("#userTab").on('click',function() {
+            debugger;
+            $("img.selectedIcon").removeClass("selectedIcon");
+            $(this).children().find('img').addClass('selectedIcon');
+        });
+
+        $("#projectTab").on('click',function() {
+            debugger;
+            $("img.selectedIcon").removeClass("selectedIcon");
+            $(this).children().find('img').addClass('selectedIcon');
+        });
+
+         $("#preferencesTab").on('click',function() {
+            debugger;
+            $("img.selectedIcon").removeClass("selectedIcon");
+            $(this).children().find('img').addClass('selectedIcon');
+        });
     
     toggleMenu = function() {
         var elem = document.getElementById("sidebar-wrapper");
@@ -48,70 +73,108 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices', functio
 	$scope.create_userCheck = function () {				//Yes-----------------------------------
         $scope.userNameRequired = '';
         $scope.passwordRequired = '';
+        $scope.confirmPasswordRequired = '';
         $scope.firstNameRequired = '';
         $scope.lastNameRequired = '';
         $scope.emailRequired = '';
         $scope.roleRequired = '';
         $scope.loadIcon = '';
+        $("#userName,#firstName,#lastName,#password,#confirmPassword,#email").removeClass("inputErrorBorder");
+        $("#userRoles").removeClass("selectErrorBorder").css('border','1px solid #909090 !important');
         var reg = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
         //var regexPassword = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[^\w\s]).{8,16}$/;
         var regexPassword = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~]).{8,16}$/;
-        if (!$scope.userName) {
-            $scope.userNameRequired = 'Enter User Name';
-        } else if (!$scope.passWord && !$('.ldapChkBox').is(':checked')) {
-            $scope.passwordRequired = 'Enter Password';
-        } else if (regexPassword.test($scope.passWord) == false && !$('.ldapChkBox').is(':checked')) {
-            $scope.passwordRequired = 'Password must contain atleast 1 special character, 1 numeric, 1 uppercase, length should be minimum 8 character and maximum 12 character';
-        } else if (!$scope.firstName) {
-            $scope.firstNameRequired = 'Enter First Name';
-        } else if (!$scope.lastName) {
-            $scope.lastNameRequired = 'Enter Last Name';
-        } else if (!$scope.email) {
-            $scope.emailRequired = 'Enter Email Address';
-        } else if (reg.test($scope.email) == false) {
-            $scope.emailRequired = 'Email address is not valid';
+        if ($("#userName").val() == "") {
+            $("#userName").addClass("inputErrorBorder");
+        }
+        else if ($("#firstName").val() == "") {
+            $("#firstName").addClass("inputErrorBorder");
+        } else if ($("#lastName").val() == "") {
+            $("#lastName").addClass("inputErrorBorder");
+        }
+         else if ($("#password").val() == "") {
+            $("#password").addClass("inputErrorBorder");
         } 
-         else if (!$scope.role) {
-             $scope.roleRequired = 'Select a Role';
+        else if (regexPassword.test($("#password").val()) == false) {
+                    $("#adminModal").find('.modal-title').text("Error");
+	                $("#adminModal").find('.modal-body p').text("Password must contain atleast 1 special character, 1 numeric, 1 uppercase, length should be minimum 8 character and maximum 12 character.");
+					$("#adminModal").modal("show");
+                    $("#password").addClass("inputErrorBorder");
+        }
+        else if ($("#confirmPassword").val() == "") {
+           $("#confirmPassword").addClass("inputErrorBorder");
+        }
+        else if (regexPassword.test($("#confirmPassword").val()) == false ) {
+                    $("#adminModal").find('.modal-title').text("Error");
+	                $("#adminModal").find('.modal-body p').text("Password must contain atleast 1 special character, 1 numeric, 1 uppercase, length should be minimum 8 character and maximum 12 character.");
+					$("#adminModal").modal("show");
+                    $("#confirmPassword").addClass("inputErrorBorder");
+        }
+        else if($("#password").val() != $("#confirmPassword").val()){
+              $("#adminModal").find('.modal-title').text("Error");
+	          $("#adminModal").find('.modal-body p').text("Password and Confirm Password did not match");
+			  $("#adminModal").modal("show");
+              $("#confirmPassword").addClass("inputErrorBorder");
+        }
+         else if ($("#email").val() == "") {
+          $("#email").addClass("inputErrorBorder");
+        } 
+        else if (reg.test($("#email").val()) == false) {
+              $("#adminModal").find('.modal-title').text("Error");
+	          $("#adminModal").find('.modal-body p').text("Email address is not valid");
+			  $("#adminModal").modal("show");
+              $("#email").addClass("inputErrorBorder");
+           // $scope.emailRequired = 'Email address is not valid';
+        } 
+         else if($('#userRoles option:selected').val() == "") {
+            $("#userRoles").css('border','').addClass("selectErrorBorder");
          } 
         else {
             //role = $('#userRoles option:selected').text();
-            role = $('#userRoles option:selected').val();
-            userName = $scope.userName;
-            passWord = $scope.passWord;
-            firstName = $scope.firstName;
-            lastName = $scope.lastName;
-            email = $scope.email;
-            role = role;
-            ldapUser = $('.ldapChkBox').is(':checked')
+            var createUser = {};
+            createUser.role = $('#userRoles option:selected').val();
+            createUser.username = $("#userName").val();
+            createUser.password = $("#password").val();
+            createUser.confirmPassword = $("#confirmPassword").val();
+            createUser.firstName = $("#firstName").val();
+            createUser.lastName =  $("#lastName").val();
+            createUser.email =  $("#email").val();
+            createUser.ldapUser = $('.ldapChkBox').is(':checked')
 
-            adminServices.createUser_Nineteen68(userName, passWord, firstName, lastName, email, role, ldapUser)
+            adminServices.createUser_Nineteen68(createUser)
                 .then(function (data) { 
-                    if (data == "success") {
-                        alert('success');
-                       // showDialogMesgsBtn("Create User", "New User has been created successfully", "btnCreate");
-                    } else {
-                        console.log(data);
-                        alert('fail');
-                       // showDialogMesgsBtn("User Creation Failed", "User Already Exists", "btnCreateFail");
+                    if (data == "Success") {
+                        $("#adminModal").find('.modal-title').text("Admin");
+                        $("#adminModal").find('.modal-body p').text("User created successfully");
+                        $("#adminModal").modal("show");
+                    }
+                    else if (data == "User Exists") {
+                        $("#adminModal").find('.modal-title').text("Admin");
+                        $("#adminModal").find('.modal-body p').text("User already Exists");
+                        $("#adminModal").modal("show");
+                    }
+                   else {
+                        $("#adminModal").find('.modal-title').text("Admin");
+                        $("#adminModal").find('.modal-body p').text("Failed to create user");
+                        $("#adminModal").modal("show");
                     }
                 }, function (error) { console.log("Error:::::::::::::", error) })
         }
     };
 
     //Get User Roles in the select container
-    $scope.getUserRoles = function (getTab) {	//Yes---------------------------------
+    $scope.getUserRoles = function () {	//Yes---------------------------------
         $("#passwordIcon").parent().show()
         adminServices.getUserRoles_Nineteen68()
             .then(function (response) {
                  userRoleArrayList = response.userRoles;
                  var getDropDown;
-                 if (getTab == "create") {
+                // if (getTab == "create") {
                      getDropDown = $('#userRoles');
-                 }
-                 else if (getTab == "edit") {
-                     getDropDown = $('#userRolesED');
-                 }
+                //  }
+                //  else if (getTab == "edit") {
+                //      getDropDown = $('#userRolesED');
+                //  }
                  getDropDown.empty();
                  getDropDown.append('<option value=""selected>Select User Role</option>');
                  for (var i = 0; i < userRoleArrayList.length; i++) {
