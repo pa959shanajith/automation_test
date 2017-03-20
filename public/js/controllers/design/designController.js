@@ -875,7 +875,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 	
 	//Save Webservice Data
 	$scope.saveWS = function(){
-		$("#endPointURL, #wsdlMethods, #wsdlRequestHeader").removeClass("inputErrorBorderFull").removeClass("selectErrorBorder")
+		$("#endPointURL, #wsdlMethods, #wsdlRequestHeader").removeClass("inputErrorBorder").removeClass("selectErrorBorder")
 		var tasks = JSON.parse(window.localStorage['_CT']);
 		var endPointURL = $("#endPointURL").val();
 		var wsdlMethods = $("#wsdlMethods option:selected").val();
@@ -884,9 +884,9 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		var wsdlRequestBody = $("#wsdlRequestBody").val().replace(/[\n\r]/g,'').replace(/\s\s+/g, ' ').replace(/"/g, '\"');
 		var wsdlResponseHeader = $("#wsdlResponseHeader").val().replace(/[\n\r]/g,'##').replace(/"/g, '\"');
 		var wsdlResponseBody = $("#wsdlResponseBody").val().replace(/[\n\r]/g,'').replace(/\s\s+/g, ' ').replace(/"/g, '\"');
-		if(!endPointURL) $("#endPointURL").addClass("inputErrorBorderFull")
+		if(!endPointURL) $("#endPointURL").addClass("inputErrorBorder")
 		else if(!$scope.wsdlMethods && !wsdlMethods) $("#wsdlMethods").addClass("selectErrorBorder")
-		else if(!wsdlRequestHeader) $("#wsdlRequestHeader").addClass("inputErrorBorderFull")
+		else if(!wsdlRequestHeader) $("#wsdlRequestHeader").addClass("inputErrorBorder")
 		else{
 			var getWSData = {
 				"body": [wsdlRequestBody],
@@ -1056,14 +1056,13 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 	};
 	//Init Webservice
 	
-	
 	//Launch WSDL Functionality
 	$scope.launchWSDLGo = function(){
 		$("#wsldInput").removeClass("inputErrorBorderFull")
 		var wsdlUrl = $("#wsldInput").val()
 		if(!wsdlUrl) $("#wsldInput").addClass("inputErrorBorderFull")
 		else {
-			/*DesignServices.launchWSDLGo(wsdlUrl)
+			DesignServices.launchWSDLGo(wsdlUrl)
 			.then(function(data) {
 				console.log(data)
 				$("#wsldSelect").empty().append('<option value selected disabled>Select Operations</option>')
@@ -1073,13 +1072,15 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			}, 
 			function (error) { 
 				console.log("Error") 
-			});*/
+			});
 		}
 	}
 	//Launch WSDL Functionality
 	
 	//WSDL Add Functionality
 	$scope.wsdlAdd = function(){
+		$("#endPointURL, #wsdlOperation, #wsdlRequestHeader, #wsdlRequestBody, #wsdlResponseHeader, #wsdlResponseBody").val("");
+		$("#wsdlMethods").prop('selectedIndex', 0);
 		$("#wsldInput").removeClass("inputErrorBorderFull");
 		$("#wsldSelect").removeClass("selectErrorBorder");
 		var wsdlUrl = $("#wsldInput").val();
@@ -1087,7 +1088,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		if(!wsdlUrl) $("#wsldInput").addClass("inputErrorBorderFull");
 		else if(!wsdlSelectedMethod) $("#wsldSelect").addClass("selectErrorBorder");
 		else{
-			/*DesignServices.wsdlAdd(wsdlUrl, wsdlSelectedMethod)
+			DesignServices.wsdlAdd(wsdlUrl, wsdlSelectedMethod)
 			.then(function(data) {
 				if(typeof data === "object"){
 					//Printing the Save data in UI
@@ -1116,7 +1117,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			}, 
 			function (error) { 
 				console.log("Error") 
-			});*/
+			});
 		}
 	}
 	//WSDL Add Functionality

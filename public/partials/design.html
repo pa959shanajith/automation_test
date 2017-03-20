@@ -94,13 +94,13 @@
 				<div class="wsdlUrlMethod">
 					<label>WSDL</label>
 					<span class="wsdlInputButton">
-						<input type="text" class="form-control wsldInput" />
-						<button class="btn btn-md launchWSDL">Go</button>
+						<input type="text" class="form-control wsldInput" placeholder="Enter WSDL Url" ng-model="wsldInput" id="wsldInput" />
+						<button ng-click="launchWSDLGo()" class="btn btn-md launchWSDL">Go</button>
 					</span>
 					
 					<span class="wsdlInputButton wsdlSelectButton">
-						<select class="form-control wsldSelect">
-							<option>Method</option>
+						<select class="form-control wsldSelect" id="wsldSelect">
+							<option value>Select Method</option>
 						</select>
 					</span>
 				</div>
@@ -127,7 +127,7 @@
 						<option value="DELETE">DELETE</option>
 					</select>
 					<input id="wsdlOperation" ng-model="wsdlOperation" type="text" class="wsdlOperation form-control pull-left" placeholder="Operation"/>
-					<button style="padding: 2px 25px" class="btn btn-md pull-right">Add</button>
+					<button style="padding: 2px 25px" class="btn btn-md pull-right" ng-click="wsdlAdd()">Add</button>
 				</div>
 			</div>
 			<!-- Middle -->
