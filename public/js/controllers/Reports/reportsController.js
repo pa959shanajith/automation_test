@@ -113,21 +113,23 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
     $(document).on('click', '#dateDESC', function(){
     	$(this).hide();
     	$('#dateASC').show();
-    	var dateArray = $('.scrollbar-inner-scenariostatus').children('.scenariostatusreport');
+    	var dateArray = $('tbody.scrollbar-inner-scenariostatus').children('.scenariostatusreport');
     	dateDESC(dateArray);
-    	$(".scrollbar-inner-scenariostatus").empty();
+    	$("tbody.scrollbar-inner-scenariostatus").empty();
     	for(i=0; i<dateArray.length; i++){
-			$(".scrollbar-inner-scenariostatus").append(dateArray[i]);
+    		dateArray[i].firstChild.innerHTML = i+1;
+			$("tbody.scrollbar-inner-scenariostatus").append(dateArray[i]);
 		}
     })
     $(document).on('click', '#dateASC', function(){
     	$(this).hide();
     	$('#dateDESC').show();
-    	var dateArray = $('.scrollbar-inner-scenariostatus').children('.scenariostatusreport');
+    	var dateArray = $('tbody.scrollbar-inner-scenariostatus').children('.scenariostatusreport');
     	dateASC(dateArray);
-    	$(".scrollbar-inner-scenariostatus").empty();
+    	$("tbody.scrollbar-inner-scenariostatus").empty();
     	for(i=0; i<dateArray.length; i++){
-			$(".scrollbar-inner-scenariostatus").append(dateArray[i]);
+    		dateArray[i].firstChild.innerHTML = i+1;
+			$("tbody.scrollbar-inner-scenariostatus").append(dateArray[i]);
 		}
     })
     
@@ -137,8 +139,8 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
     		var bB = b.children.item(1).innerHTML;
     		var fDate = aA.split("-"); var lDate = bB.split("-");
     		//var fFDate = fDate[0].split("/"); var lLDate = lDate[0].split("/");
-    		var gDate = fDate[0]+"-"+fDate[1]+"-"+fDate[2]//+" "+a.children.item(2).innerHTML;
-    		var mDate = lDate[0]+"-"+lDate[1]+"-"+lDate[2]//+" "+b.children.item(2).innerHTML;
+    		var gDate = fDate[1]+"-"+fDate[0]+"-"+fDate[2]//+" "+a.children.item(2).innerHTML;
+    		var mDate = lDate[1]+"-"+lDate[0]+"-"+lDate[2]//+" "+b.children.item(2).innerHTML;
     		if ( new Date(gDate) < new Date(mDate) )  return -1;
     	    if ( new Date(gDate) > new Date(mDate) )  return 1;
     	    return dateArray;
@@ -151,8 +153,8 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
     		var bB = b.children.item(1).innerHTML//.replace("&nbsp;&nbsp;&nbsp;&nbsp;"," ");
     		var fDate = aA.split("-"); var lDate = bB.split("-");
     		//var fFDate = fDate[0].split("/"); var lLDate = lDate[0].split("/");
-    		var gDate = fDate[0]+"-"+fDate[1]+"-"+fDate[2]//+" "+a.children.item(2).innerHTML;
-    		var mDate = lDate[0]+"-"+lDate[1]+"-"+lDate[2]//+" "+b.children.item(2).innerHTML;
+    		var gDate = fDate[1]+"-"+fDate[0]+"-"+fDate[2]//+" "+a.children.item(2).innerHTML;
+    		var mDate = lDate[1]+"-"+lDate[0]+"-"+lDate[2]//+" "+b.children.item(2).innerHTML;
     		if ( new Date(gDate) > new Date(mDate) )  return -1;
     	    if ( new Date(gDate) < new Date(mDate) )  return 1;
     	    return dateArray;
@@ -305,7 +307,7 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 				for(k=0; k<obj2.rows.length; k++){
 					finalReports.rows.push(obj2.rows[k]);
 					finalReports.rows[k].slno = k+1;
-					if(finalReports.rows[k]["Step "] != undefined && finalReports.rows[k]["Step "].startsWith("S")){
+					if(finalReports.rows[k]["Step "] != undefined && finalReports.rows[k]["Step "].indexOf("Step") !== -1){
 						finalReports.rows[k].Step = finalReports.rows[k]["Step "];						
 					}
 					if(finalReports.rows[k].hasOwnProperty("EllapsedTime") && finalReports.rows[k].EllapsedTime.trim() != ""){

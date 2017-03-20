@@ -992,6 +992,9 @@ input[disabled]{
     left: 173px;
     top: 0;
 }
+.middle-content-section-reports{
+    visibility: hidden;	
+}
 
 #wrapper-sc{
 	float: left;
@@ -2844,12 +2847,17 @@ select:hover {
     text-overflow: ellipsis;
     display: inline-block;
     position: relative;
-    top: 4px;
+    top: 0px;
 }
 .scenarioReports tbody tr td:nth-child(2){width: 20%;}
 .scenarioReports tbody tr td:nth-child(3){width: 20%;}
 .scenarioReports tbody tr td:nth-child(4){width: 15%;}
 .scenarioReports tbody tr td:nth-child(5){width: 15%; position: relative;}
+.suitestartendtbody, .scenarioReportstbody{
+	overflow: auto;
+	-ms-overflow-style: none;
+	-webkit-overflow-style: none;
+}
 .right-section-charts{
 	position: relative;
     width: 41.7%;
