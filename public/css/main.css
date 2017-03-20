@@ -992,6 +992,9 @@ input[disabled]{
     left: 173px;
     top: 0;
 }
+.middle-content-section-reports{
+    visibility: hidden;	
+}
 
 #wrapper-sc{
 	float: left;
@@ -1976,7 +1979,7 @@ input[disabled]{
 }
 
 .modal-body .row-modal .form-control-custom, .form-control-custom{
-	border: 1px solid #311d4e !important;
+	border: 1px solid #656565 !important;
 	border-left:0 !important;
 	border-right:0 !important;
 	border-top:0 !important;
@@ -2392,6 +2395,10 @@ nav {
 	border-bottom: 2px solid #d33c3c !important;
 }
 
+.inputErrorBorderFull{
+	border: 2px solid #d33c3c !important;
+}
+
 .selectErrorBorder{
 	border: 2px solid #d33c3c !important;
 }
@@ -2440,115 +2447,251 @@ select:hover {
 }
 
 /*****************ADMIN CSS NEW ************************/
-.adminActionBtn
-{
-    float: right;
-    width: auto;
-}
-.adminBtn 
-{
-   padding: 2px 25px !important;
-}
-.adminForm
-{
-    padding-top: 5%;
-    padding-left: 3%;
-}
-.adminSmBox
-{
-    padding-top: 5%;
-    padding-left: 0px;
-}
-.adminControl
-{
-    margin-bottom: 3%;
-    padding: 0px 6px;
-}
-.leftControl
-{
-    float: left;
-    width: 47%;
-}
-.rightControl
-{
-    float: right;
-    width: 50%;
-}
-.primaryRole
-{
-    width: auto;
-    vertical-align: middle;
-    font-weight: normal;
-    line-height: 2;
-}
-.selectControl
-{
-    position: relative;
-    left: -90px;
-}
-.errorlbl
-{
-    margin: -2.5em 0 2em;
-    line-height: 17px;
-    position: relative;
-    left: 12px;
-}
-.userForm
-{
-    float: left;
-    width: 100%;
-}
-.adminSelect
-{
-    padding: 0px;
-    height: 25px;
-    margin-bottom: 0;
-    width: 60%;
-    margin-left: 4%;
-    margin-top: 0%;
-    line-height: 2;
-}
-.selectRole
-{
-    margin-top: 2%;
-    float: left;
-}
-.selectedIcon
-{
-    background: #331d4c;
-    border-radius: 5px;
-}
-.domainTxt
-{
-    float: left;
-}
-.projectForm:first-child
-{
-      margin-top: 5%;
+.containerWrap {
+	float: left;
+	width: 100%;
+	height: 100%
 }
 
-.projectForm
-{
-    margin-bottom: 3%;
-    padding: 0 6px;
+.adminActionBtn {
+	float: right;
+	width: auto;
 }
-.appTypeTxt
-{
+
+.adminBtn {
+	padding: 2px 25px !important;
+}
+
+.adminForm {
+	padding-top: 5%;
+}
+
+.adminSmBox {
+	padding-top: 5%;
+	padding-left: 0px;
+}
+
+.adminControl {
+	margin-bottom: 3%;
+	padding: 0px 0px;
+}
+
+.adminSelect:focus {
+	box-shadow: none !important;
+}
+
+.leftControl {
+	float: left;
+	width: 47%;
+}
+
+.rightControl {
+	float: right;
+	width: 50%;
+}
+
+.primaryRole {
+	width: auto;
+	vertical-align: middle;
+	font-weight: normal;
+	line-height: 2;
+}
+
+.selectControl {
+	position: relative;
+	left: -90px;
+}
+
+.errorlbl {
+	margin: -2.5em 0 2em;
+	line-height: 17px;
+	position: relative;
+	left: 12px;
+}
+
+.userForm {
+	float: left;
+	width: 100%;
+}
+
+.adminSelect {
+	padding: 0px;
+	height: 25px;
+	margin-bottom: 0;
+	width: 60%;
+	margin-left: 4%;
+	margin-top: 0%;
+	line-height: 2;
+	border: 1px solid #656565 !important;
+}
+
+.selectRole {
+	margin-top: 2%;
+	float: left;
+}
+
+.selectedIcon {
+	background: #331d4c;
+	border-radius: 5px;
+}
+
+.domainTxt {
+	float: left;
+}
+
+.projectForm:first-child {
+	margin-top: 5%;
+}
+
+.projectForm {
+	margin-bottom: 3%;
+	padding: 0 0px;
+}
+
+.appTypeTxt {
+	position: relative;
+	top: 20px;
+}
+
+.projectTypes {
+	float: left;
+	width: 12.5%;
+	padding: 7px;
+	text-align: center;
+	cursor: pointer
+}
+
+.projectTypes label {
+	float: left;
+	width: 100%;
+	font-size: 11px;
+	font-weight: 500;
+	margin-top: 8px;
+	color: #311d4e;
+	margin-bottom: 0;
+	cursor: pointer
+}
+
+.projectTypes:nth-child(3) label,
+.projectTypes:nth-child(4) label,
+.projectTypes:nth-child(6) label,
+.projectTypes:nth-child(7) label{
+	margin-top: 9px;
+}
+
+.projectTypes:nth-child(5) label{
+	margin-top: 14px;
+}
+
+.projectTypes:nth-child(8) label{
+	margin-top: 19px;
+}
+
+.projectTypes:hover{
+	background: #e4e4e4;
+    border-radius: 6px;
+    transition: 0.3s ease-in-out;
+    -moz-transition: 0.3s ease-in-out;
+    -webkit-transition: 0.3s ease-in-out;
+}
+
+.projectTypeSelected{
+	background: #e4e4e4;
+    border-radius: 6px;
+    -moz-border-radius: 6px;
+    -webkit-border-radius: 6px;
+    -o-border-radius: 6px;
+    -ms-border-radius: 6px;
+}
+
+#selDomain {
+	margin-left: 2%;
+}
+
+.appTypesContainer {
+	float: right;
+    width: 86%;
+    margin-left: 5px;
+}
+
+.relCycContainer{
+	background: #e6e7e9;
+    border-radius: 5px;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -o-border-radius: 5px;
+    -ms-border-radius: 5px;
+    height: calc(100% - 270px);
+    padding: 8px;
+    clear: both;
     position: relative;
     top: 5px;
 }
-.projectTypes
-{
-    margin: 0% 0 0 3%;
-    float: left;
-    width: auto;
+
+.releaseContainer, .cycleContainer{
+	width:50%;
 }
-#selDomain
-{
-    margin-left: 2%;
+
+.addContainer{
+	float: left;
+    width: 100%;
+    padding: 10px 25px;
+    font-size: 15px;
+    margin-bottom: 10px
+}
+
+.addContainer span{
+	cursor: pointer;
+	display: inline-block;
+}
+
+.addContainer img{
+	margin-right: 10px;
+    vertical-align: bottom;
+}
+
+#releaseList, #cycleList{
+	padding: 0;
+    float: left;
+    width: 100%;
+}
+
+#releaseList li img,
+#cycleList li img{
+	vertical-align: bottom;
+    margin-right: 15px;
+}
+
+#releaseList li,
+#cycleList li{
+	float: left;
+    width: 100%;
+    padding: 8px 25px 8px 30px;
+    font-size: 15px;
+    position: relative;
+    cursor: pointer;
+}
+
+#releaseList li:hover,
+#cycleList li:hover{
+	background: #f1f1f1;
+}
+
+.actionOnHover{
+	display: inline-block;
+    position: absolute;
+    right: 45px;
+    top: 5px;
+}
+
+.actionOnHover img{
+	margin: 0 !important;
+}
+
+.actionOnHover img:first-child{
+	margin-right: 10px !important;
 }
 /*****************ADMIN CSS NEW ************************/
-
 
 /******************Reports CSS***************************/
 .reportbox{
@@ -2704,12 +2847,17 @@ select:hover {
     text-overflow: ellipsis;
     display: inline-block;
     position: relative;
-    top: 4px;
+    top: 0px;
 }
 .scenarioReports tbody tr td:nth-child(2){width: 20%;}
 .scenarioReports tbody tr td:nth-child(3){width: 20%;}
 .scenarioReports tbody tr td:nth-child(4){width: 15%;}
 .scenarioReports tbody tr td:nth-child(5){width: 15%; position: relative;}
+.suitestartendtbody, .scenarioReportstbody{
+	overflow: auto;
+	-ms-overflow-style: none;
+	-webkit-overflow-style: none;
+}
 .right-section-charts{
 	position: relative;
     width: 41.7%;
@@ -3000,5 +3148,8 @@ select:-webkit-autofill:focus {
 	}
 	.wsdlTextAreaBody{
 		height: 56%;
+	}
+	.relCycContainer{
+		height: calc(100% - 280px);
 	}
 }

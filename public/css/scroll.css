@@ -489,6 +489,25 @@
 }
 
 
+.scroll-wrapper > .relCycScroll{
+       padding: 0px;
+       height: auto !important;
+       width: 100% !important;
+}
+.scroll-wrapper.relCycScroll {
+       float: none;
+       margin-left: -6px;
+       max-height:calc(100% - 55px) !important
+}
+.relCycScroll > .scroll-element.scroll-y .scroll-bar{
+       background: #321e4f;
+       min-height: 20px;
+}
+.relCycScroll > .scroll-element .scroll-element_track{
+       background: rgb(211, 211, 211)
+}
+
+
 
 /* Testsuite scenarios mid section  */
 .scroll-wrapper > .scrollbar-inner-scenariostatus{

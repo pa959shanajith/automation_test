@@ -7,142 +7,480 @@
 	<!--Left Panel-->
 	<div id="left-nav-section">
 		<div class="scrollbar-macosx">
-			<div id="left-top-section" style='border-bottom:0px !important'>
+			<div id="left-top-section" style='border-bottom: 0px !important'>
 				<ul>
 					<li><span><a class='scrapeOnTxt'>Create</a></span></li>
-					<li><a id='userTab' ng-click="tab = 'tabUser'" class="selectBrowser" data-name="3"><span><img class='selectedIcon' src='imgs/user.png' alt='User' /></span>User</a></li>
-					<li><a id='projectTab' ng-click="tab = 'tabProject'" class="selectBrowser" data-name="1"><span><img src='imgs/project.png' alt='Project' /></span>Project</a></li>
-					<li style="margin-bottom: 30px"><a id='preferencesTab' ng-click="tab = 'tabPreferences'" class="selectBrowser" data-name="2"><span><img src='imgs/preferences.png' alt='Preferences' /></span>Preferences</a></li>
+					<li><a id='userTab' ng-click="tab = 'tabUser'"
+						class="selectBrowser" data-name="3"><span><img
+								class='selectedIcon' src='imgs/user.png' alt='User' /></span>User</a></li>
+					<li><a id='projectTab' ng-click="tab = 'tabProject'"
+						class="selectBrowser" data-name="1"><span><img
+								src='imgs/project.png' alt='Project' /></span>Project</a></li>
+					<li style="margin-bottom: 30px"><a id='preferencesTab'
+						ng-click="tab = 'tabPreferences'" class="selectBrowser"
+						data-name="2"><span><img src='imgs/preferences.png'
+								alt='Preferences' /></span>Preferences</a></li>
 				</ul>
 			</div>
 			<div class='clear-both'></div>
 		</div>
 	</div>
 	<!--Left Panel-->
+	
 	<!--Middle Panel-->
 	<div id="middle-content-section">
-       <div ng-if="tab == 'tabUser'">
-		<!--Task Name-->
-		<div id="page-taskName">
-			<span>Create User</span>	
-		</div>
-		<!--Task Name-->
-        <!-- Button -->
-        <div class="adminActionBtn">
-            <button class="btn btn-md pull-right adminBtn" ng-click="create_userCheck()">Create</button>
-		</div>
-        <!-- Button -->
-        <!-- Action area -->
-        <div class="col-xs-10 form-group adminForm">
-            <div class='userForm adminControl'><input type="text" id="userName" name="userName" ng-model="userName" maxlength="50" class="form-control form-control-custom" placeholder="User Name"><span ng-show="userNameRequired" class="error-msg ng-cloak errorlbl">{{userNameRequired}}</span></div>
-                 <div class='leftControl adminControl'><input type="text" name="firstName" id="firstName" ng-model="firstName" maxlength="12"  class="form-control form-control-custom" placeholder="First Name"><span ng-show="firstNameRequired" class="error-msg ng-cloak errorlbl">{{firstNameRequired}}</span></div>
-                 <div class='rightControl adminControl'><input type="text" name="lastName" id="lastName" ng-model="lastName" maxlength="12" class="form-control form-control-custom" placeholder="Last Name"><span ng-show="lastNameRequired" class="error-msg ng-cloak errorlbl">{{lastNameRequired}}</span></div>
-                 <div class='leftControl adminControl'><input type="password" name="passWord" id="password" ng-model="passWord" maxlength="12" class="form-control form-control-custom" placeholder="Password" autocomplete="off"><span ng-show="passwordRequired" class="error-msg error-msg-password ng-cloak errorlbl">{{passwordRequired}}</span></div>
-                 <div class='rightControl adminControl'><input type="password" name='confirmPassword' id='confirmPassword' ng-model="confirmPassword" class="form-control form-control-custom" placeholder="Confirm Password" autocomplete="off"><span ng-show="confirmPasswordRequired" class="error-msg error-msg-password ng-cloak errorlbl">{{confirmPasswordRequired}}</span></div>
-                 <div class='adminControl'><input type="email" name="email" id="email" ng-model="email" maxlength="50" class="form-control form-control-custom" placeholder="Email Id"><span ng-show="emailRequired" class="error-msg ng-cloak errorlbl">{{emailRequired}}</span></div>
-                 <div><div class="col-xs-6 selectRole">
-                        <label class="leftControl primaryRole">Primary Role</label>
-                            <select style="border:1px solid #909090 !important" class='adminSelect' x-ng-model="role" id="userRoles" class="form-control rightControl selectControl">
-                                    <option value="" disabled selected>Select User Role</option>
-                            </select>
-                        <span ng-show="roleRequired" class="error-msg ng-cloak errorlbl">{{roleRequired}}</span>
+		<div ng-if="tab == 'tabUser'">
+			<!--Task Name-->
+			<div id="page-taskName">
+				<span>Create User</span>
 			</div>
-            </div>
-        </div>
-         <!-- Action area -->
-	</div>
+			<!--Task Name-->
+			<!-- Button -->
+			<div class="adminActionBtn">
+				<button class="btn btn-md pull-right adminBtn"
+					ng-click="create_userCheck()">Create</button>
+			</div>
+			<!-- Button -->
+			<!-- Action area -->
+			<div class="col-xs-9 form-group adminForm">
+				<div class='userForm adminControl'>
+					<input type="text" id="userName" name="userName"
+						ng-model="userName" maxlength="50"
+						class="form-control form-control-custom" placeholder="User Name"><span
+						ng-show="userNameRequired" class="error-msg ng-cloak errorlbl">{{userNameRequired}}</span>
+				</div>
+				<div class='leftControl adminControl'>
+					<input type="text" name="firstName" id="firstName"
+						ng-model="firstName" maxlength="12"
+						class="form-control form-control-custom" placeholder="First Name"><span
+						ng-show="firstNameRequired" class="error-msg ng-cloak errorlbl">{{firstNameRequired}}</span>
+				</div>
+				<div class='rightControl adminControl'>
+					<input type="text" name="lastName" id="lastName"
+						ng-model="lastName" maxlength="12"
+						class="form-control form-control-custom" placeholder="Last Name"><span
+						ng-show="lastNameRequired" class="error-msg ng-cloak errorlbl">{{lastNameRequired}}</span>
+				</div>
+				<div class='leftControl adminControl'>
+					<input type="password" name="passWord" id="password"
+						ng-model="passWord" maxlength="12"
+						class="form-control form-control-custom" placeholder="Password"
+						autocomplete="off"><span ng-show="passwordRequired"
+						class="error-msg error-msg-password ng-cloak errorlbl">{{passwordRequired}}</span>
+				</div>
+				<div class='rightControl adminControl'>
+					<input type="password" name='confirmPassword' id='confirmPassword'
+						ng-model="confirmPassword"
+						class="form-control form-control-custom"
+						placeholder="Confirm Password" autocomplete="off"><span
+						ng-show="confirmPasswordRequired"
+						class="error-msg error-msg-password ng-cloak errorlbl">{{confirmPasswordRequired}}</span>
+				</div>
+				<div class='adminControl'>
+					<input type="email" name="email" id="email" ng-model="email"
+						maxlength="50" class="form-control form-control-custom"
+						placeholder="Email Id"><span ng-show="emailRequired"
+						class="error-msg ng-cloak errorlbl">{{emailRequired}}</span>
+				</div>
+				<div>
+					<div class="col-xs-6 selectRole">
+						<label class="leftControl primaryRole">Primary Role</label> 
+						<select class='adminSelect form-control'
+							x-ng-model="role" id="userRoles"
+							class="form-control rightControl selectControl">
+							<option value="" disabled selected>Select User Role</option>
+						</select> <span ng-show="roleRequired" class="error-msg ng-cloak errorlbl">{{roleRequired}}</span>
+					</div>
+				</div>
+			</div>
+			<!-- Action area -->
+		</div>
 
-      <div ng-if="tab == 'tabProject'">
-        <!--Task Name-->
-		<div id="page-taskName">
-			<span>Create Project</span>	
+		<!-- Create Project -->
+		<div class="containerWrap" ng-if="tab == 'tabProject'">
+			<!--Task Name-->
+			<div id="page-taskName">
+				<span>Create Project</span>
+			</div>
+			<!--Task Name-->
+			<!-- Button -->
+			<div class="adminActionBtn">
+				<button class="btn btn-md pull-right adminBtn" ng-click="">Create</button>
+			</div>
+			<!-- Button -->
+			<div class="col-xs-9 form-group" style="width: 83%">
+				<div class='userForm projectForm'>
+					<div class='domainTxt'>Domain</div>
+					<select class="adminSelect form-control" style="width: 91%" id="selDomain">
+						<option value="" disabled selected>Please Select Your Domain</option>
+					</select> 
+					<span ng-show="domainNameRequired" class="error-msg ng-cloak errorlbl">{{domainNameRequired}}</span>
+				</div>
+				<div class='userForm adminControl'>
+					<input type="text" id="projectName" name="projectName"
+						ng-model="projectName" maxlength="50"
+						class="form-control form-control-custom"
+						placeholder="Project Name"><span
+						ng-show="projectNameRequired" class="error-msg ng-cloak errorlbl">{{projectNameRequired}}</span>
+				</div>
+				
+				<div class='domainTxt appTypeTxt'>Application Type</div>
+				
+				<div class="appTypesContainer">
+					<div class='projectTypes' data-app="web">
+						<img src='imgs/web.png' alt='Web' />
+						<label>Web</label>
+					</div>
+					<div class='projectTypes' data-app="webService">
+						<img src='imgs/webservice.png' alt='WebService' />
+						<label>Web Services</label>
+					</div>
+					<div class='projectTypes' data-app="mainframe">
+						<img src='imgs/mainframe.png' alt='Mainframe' />
+						<label>Mainframe</label>
+					</div>
+					<div class='projectTypes' data-app="desktopApps">
+						<img src='imgs/desktop.png' alt='Desktop' />
+						<label>Desktop Apps</label>
+					</div>
+					<div class='projectTypes' data-app="oracleWeb">
+						<img src='imgs/oracleApps.png' alt='Oracle Apps' />
+						<label>Oracle Apps</label>
+					</div>
+					<div class='projectTypes' data-app="mobileApps">
+						<img src='imgs/mobileApps.png' alt='Mobile Apps' />
+						<label>Mobile Apps</label>
+					</div>
+					<div class='projectTypes' data-app="mobileWeb">
+						<img src='imgs/mobileWeb.png' alt='Mobile Web' />
+						<label>Mobile Web</label>
+					</div>
+					<div class='projectTypes' data-app="sapApps">
+						<img src='imgs/sapApps.png' alt='SAP Apps' />
+						<label>Sap Apps</label>
+					</div>
+				</div>
+			</div>
+			
+			<!-- Relase Cycle -->
+			<div class="containerWrap relCycContainer">
+				 <!-- Release Container -->
+				 <div class="containerWrap releaseContainer rcContainer">
+				 	<!-- Add Release -->
+				 	<div class="addContainer"><span id="addRelease"><img src="imgs/ic-add-sm.png" />Add Release</span></div>
+				 	<!-- Add Release -->
+				 	
+				 	<!-- Releases List -->
+				 	<ul id="releaseList" class="containerWrap scrollbar-inner relCycScroll">
+				 		<li>
+				 			<img src="imgs/ic-release.png" />
+				 			<span class="releaseName">Release Name 1</span>
+				 			<span class="actionOnHover">
+				 				<img title="Edit Release Name" src="imgs/ic-edit-sm.png" class="editReleaseName">
+				 				<img title="Delete Release" src="imgs/ic-delete-sm.png" class="deleteRelease">
+				 			</span>
+				 		</li>
+				 		<li>
+				 			<img src="imgs/ic-release.png" />
+				 			<span class="releaseName">Release Name 2</span>
+				 			<span class="actionOnHover">
+				 				<img title="Edit Release Name" src="imgs/ic-edit-sm.png" class="editReleaseName">
+				 				<img title="Delete Release" src="imgs/ic-delete-sm.png" class="deleteRelease">
+				 			</span>
+				 		</li>
+				 		<li>
+				 			<img src="imgs/ic-release.png" />
+				 			<span class="releaseName">Release Name 3</span>
+				 			<span class="actionOnHover">
+				 				<img title="Edit Release Name" src="imgs/ic-edit-sm.png" class="editReleaseName">
+				 				<img title="Delete Release" src="imgs/ic-delete-sm.png" class="deleteRelease">
+				 			</span>
+				 		</li>
+				 		<li>
+				 			<img src="imgs/ic-release.png" />
+				 			<span class="releaseName">Release Name 4</span>
+				 			<span class="actionOnHover">
+				 				<img title="Edit Release Name" src="imgs/ic-edit-sm.png" class="editReleaseName">
+				 				<img title="Delete Release" src="imgs/ic-delete-sm.png" class="deleteRelease">
+				 			</span>
+				 		</li>
+				 		<li>
+				 			<img src="imgs/ic-release.png" />
+				 			<span class="releaseName">Release Name 5</span>
+				 			<span class="actionOnHover">
+				 				<img title="Edit Release Name" src="imgs/ic-edit-sm.png" class="editReleaseName">
+				 				<img title="Delete Release" src="imgs/ic-delete-sm.png" class="deleteRelease">
+				 			</span>
+				 		</li>
+				 		<li>
+				 			<img src="imgs/ic-release.png" />
+				 			<span class="releaseName">Release Name 6</span>
+				 			<span class="actionOnHover">
+				 				<img title="Edit Release Name" src="imgs/ic-edit-sm.png" class="editReleaseName">
+				 				<img title="Delete Release" src="imgs/ic-delete-sm.png" class="deleteRelease">
+				 			</span>
+				 		</li>
+				 		<li>
+				 			<img src="imgs/ic-release.png" />
+				 			<span class="releaseName">Release Name 7</span>
+				 			<span class="actionOnHover">
+				 				<img title="Edit Release Name" src="imgs/ic-edit-sm.png" class="editReleaseName">
+				 				<img title="Delete Release" src="imgs/ic-delete-sm.png" class="deleteRelease">
+				 			</span>
+				 		</li>
+				 		<li>
+				 			<img src="imgs/ic-release.png" />
+				 			<span class="releaseName">Release Name 8</span>
+				 			<span class="actionOnHover">
+				 				<img title="Edit Release Name" src="imgs/ic-edit-sm.png" class="editReleaseName">
+				 				<img title="Delete Release" src="imgs/ic-delete-sm.png" class="deleteRelease">
+				 			</span>
+				 		</li>
+				 		<li>
+				 			<img src="imgs/ic-release.png" />
+				 			<span class="releaseName">Release Name 9</span>
+				 			<span class="actionOnHover">
+				 				<img title="Edit Release Name" src="imgs/ic-edit-sm.png" class="editReleaseName">
+				 				<img title="Delete Release" src="imgs/ic-delete-sm.png" class="deleteRelease">
+				 			</span>
+				 		</li>
+				 		<li>
+				 			<img src="imgs/ic-release.png" />
+				 			<span class="releaseName">Release Name 10</span>
+				 			<span class="actionOnHover">
+				 				<img title="Edit Release Name" src="imgs/ic-edit-sm.png" class="editReleaseName">
+				 				<img title="Delete Release" src="imgs/ic-delete-sm.png" class="deleteRelease">
+				 			</span>
+				 		</li>
+				 		<li>
+				 			<img src="imgs/ic-release.png" />
+				 			<span class="releaseName">Release Name 11</span>
+				 			<span class="actionOnHover">
+				 				<img title="Edit Release Name" src="imgs/ic-edit-sm.png" class="editReleaseName">
+				 				<img title="Delete Release" src="imgs/ic-delete-sm.png" class="deleteRelease">
+				 			</span>
+				 		</li>
+				 		<li>
+				 			<img src="imgs/ic-release.png" />
+				 			<span class="releaseName">Release Name 12</span>
+				 			<span class="actionOnHover">
+				 				<img title="Edit Release Name" src="imgs/ic-edit-sm.png" class="editReleaseName">
+				 				<img title="Delete Release" src="imgs/ic-delete-sm.png" class="deleteRelease">
+				 			</span>
+				 		</li>
+				 		<li>
+				 			<img src="imgs/ic-release.png" />
+				 			<span class="releaseName">Release Name 13</span>
+				 			<span class="actionOnHover">
+				 				<img title="Edit Release Name" src="imgs/ic-edit-sm.png" class="editReleaseName">
+				 				<img title="Delete Release" src="imgs/ic-delete-sm.png" class="deleteRelease">
+				 			</span>
+				 		</li>
+				 		<li>
+				 			<img src="imgs/ic-release.png" />
+				 			<span class="releaseName">Release Name 14</span>
+				 			<span class="actionOnHover">
+				 				<img title="Edit Release Name" src="imgs/ic-edit-sm.png" class="editReleaseName">
+				 				<img title="Delete Release" src="imgs/ic-delete-sm.png" class="deleteRelease">
+				 			</span>
+				 		</li>
+				 		<li>
+				 			<img src="imgs/ic-release.png" />
+				 			<span class="releaseName">Release Name 15</span>
+				 			<span class="actionOnHover">
+				 				<img title="Edit Release Name" src="imgs/ic-edit-sm.png" class="editReleaseName">
+				 				<img title="Delete Release" src="imgs/ic-delete-sm.png" class="deleteRelease">
+				 			</span>
+				 		</li>
+				 	</ul>
+				 	<!-- Releases List -->
+				 </div>
+				 <!-- Release Container -->
+				 
+				  <!-- Cycle Container -->
+				 <div class="containerWrap cycleContainer rcContainer">
+				 	<!-- Add Release -->
+				 	<div class="addContainer"><span id="addCycle"><img src="imgs/ic-add-sm.png" />Add Cycle</span></div>
+				 	<!-- Add Release -->
+				 	
+				 	<!-- Cycle List -->
+				 	<ul id="cycleList" class="containerWrap scrollbar-inner relCycScroll">
+				 		<li>
+				 			<img src="imgs/ic-cycle.png" />
+				 			<span class="cycleName">Cycle Name 1</span>
+				 			<span class="actionOnHover">
+				 				<img title="Edit Cycle Name" src="imgs/ic-edit-sm.png" class="editCycleName">
+				 				<img title="Delete Cycle" src="imgs/ic-delete-sm.png" class="deleteCycle">
+				 			</span>
+				 		</li>
+				 		<li>
+				 			<img src="imgs/ic-cycle.png" />
+				 			<span class="cycleName">Cycle Name 2</span>
+				 			<span class="actionOnHover">
+				 				<img title="Edit Cycle Name" src="imgs/ic-edit-sm.png" class="editCycleName">
+				 				<img title="Delete Cycle" src="imgs/ic-delete-sm.png" class="deleteCycle">
+				 			</span>
+				 		</li>
+				 		<li>
+				 			<img src="imgs/ic-cycle.png" />
+				 			<span class="cycleName">Cycle Name 3</span>
+				 			<span class="actionOnHover">
+				 				<img title="Edit Cycle Name" src="imgs/ic-edit-sm.png" class="editCycleName">
+				 				<img title="Delete Cycle" src="imgs/ic-delete-sm.png" class="deleteCycle">
+				 			</span>
+				 		</li>
+				 		<li>
+				 			<img src="imgs/ic-cycle.png" />
+				 			<span class="cycleName">Cycle Name 4</span>
+				 			<span class="actionOnHover">
+				 				<img title="Edit Cycle Name" src="imgs/ic-edit-sm.png" class="editCycleName">
+				 				<img title="Delete Cycle" src="imgs/ic-delete-sm.png" class="deleteCycle">
+				 			</span>
+				 		</li>
+				 		<li>
+				 			<img src="imgs/ic-cycle.png" />
+				 			<span class="cycleName">Cycle Name 5</span>
+				 			<span class="actionOnHover">
+				 				<img title="Edit Cycle Name" src="imgs/ic-edit-sm.png" class="editCycleName">
+				 				<img title="Delete Cycle" src="imgs/ic-delete-sm.png" class="deleteCycle">
+				 			</span>
+				 		</li>
+				 		<li>
+				 			<img src="imgs/ic-cycle.png" />
+				 			<span class="cycleName">Cycle Name 6</span>
+				 			<span class="actionOnHover">
+				 				<img title="Edit Cycle Name" src="imgs/ic-edit-sm.png" class="editCycleName">
+				 				<img title="Delete Cycle" src="imgs/ic-delete-sm.png" class="deleteCycle">
+				 			</span>
+				 		</li>
+				 		<li>
+				 			<img src="imgs/ic-cycle.png" />
+				 			<span class="cycleName">Cycle Name 7</span>
+				 			<span class="actionOnHover">
+				 				<img title="Edit Cycle Name" src="imgs/ic-edit-sm.png" class="editCycleName">
+				 				<img title="Delete Cycle" src="imgs/ic-delete-sm.png" class="deleteCycle">
+				 			</span>
+				 		</li>
+				 		<li>
+				 			<img src="imgs/ic-cycle.png" />
+				 			<span class="cycleName">Cycle Name 8</span>
+				 			<span class="actionOnHover">
+				 				<img title="Edit Cycle Name" src="imgs/ic-edit-sm.png" class="editCycleName">
+				 				<img title="Delete Cycle" src="imgs/ic-delete-sm.png" class="deleteCycle">
+				 			</span>
+				 		</li>
+				 		<li>
+				 			<img src="imgs/ic-cycle.png" />
+				 			<span class="cycleName">Cycle Name 9</span>
+				 			<span class="actionOnHover">
+				 				<img title="Edit Cycle Name" src="imgs/ic-edit-sm.png" class="editCycleName">
+				 				<img title="Delete Cycle" src="imgs/ic-delete-sm.png" class="deleteCycle">
+				 			</span>
+				 		</li>
+				 		<li>
+				 			<img src="imgs/ic-cycle.png" />
+				 			<span class="cycleName">Cycle Name 10</span>
+				 			<span class="actionOnHover">
+				 				<img title="Edit Cycle Name" src="imgs/ic-edit-sm.png" class="editCycleName">
+				 				<img title="Delete Cycle" src="imgs/ic-delete-sm.png" class="deleteCycle">
+				 			</span>
+				 		</li>
+				 		<li>
+				 			<img src="imgs/ic-cycle.png" />
+				 			<span class="cycleName">Cycle Name 11</span>
+				 			<span class="actionOnHover">
+				 				<img title="Edit Cycle Name" src="imgs/ic-edit-sm.png" class="editCycleName">
+				 				<img title="Delete Cycle" src="imgs/ic-delete-sm.png" class="deleteCycle">
+				 			</span>
+				 		</li>
+				 		<li>
+				 			<img src="imgs/ic-cycle.png" />
+				 			<span class="cycleName">Cycle Name 12</span>
+				 			<span class="actionOnHover">
+				 				<img title="Edit Cycle Name" src="imgs/ic-edit-sm.png" class="editCycleName">
+				 				<img title="Delete Cycle" src="imgs/ic-delete-sm.png" class="deleteCycle">
+				 			</span>
+				 		</li>
+				 		<li>
+				 			<img src="imgs/ic-cycle.png" />
+				 			<span class="cycleName">Cycle Name 13</span>
+				 			<span class="actionOnHover">
+				 				<img title="Edit Cycle Name" src="imgs/ic-edit-sm.png" class="editCycleName">
+				 				<img title="Delete Cycle" src="imgs/ic-delete-sm.png" class="deleteCycle">
+				 			</span>
+				 		</li>
+				 	</ul>
+				 	<!-- Cycle List -->
+				 </div>
+				 <!-- Cycle Container -->
+			</div>
+			<!-- Relase Cycle -->
 		</div>
-		<!--Task Name-->
-        <!-- Button -->
-        <div class="adminActionBtn">
-            <button class="btn btn-md pull-right adminBtn" ng-click="">Create</button>
-		</div>
-        <!-- Button -->
-         <div class="col-xs-10 form-group">
-            <div class='userForm projectForm'>
-                <div class='domainTxt'>Domain</div>
-                    <select class="adminSelect" id="selDomain">
-                            <option value="" disabled="" selected="">Please Select Your Domain</option>
-                    </select>
-                    <span ng-show="domainNameRequired" class="error-msg ng-cloak errorlbl">{{domainNameRequired}}</span>
-             </div>
-             <div class='userForm adminControl'><input type="text" id="projectName" name="projectName" ng-model="projectName" maxlength="50" class="form-control form-control-custom" placeholder="Project Name"><span ng-show="projectNameRequired" class="error-msg ng-cloak errorlbl">{{projectNameRequired}}</span></div>    
-              <div class='domainTxt appTypeTxt'>Application Type</div>
-              <div>
-                  <div class='projectTypes'><img src='imgs/web.png' alt='Web' /></div>
-                  <!--<span><img src='imgs/webservice.png' alt='WebService' /></span>
-                  <span><img src='imgs/mainframe.png' alt='Mainframe' /></span>
-                  <span><img src='imgs/desktop.png' alt='Desktop' /></span>
-                  <span><img src='imgs/oracleApps.png' alt='Oracle Apps' /></span>
-                  <span><img src='imgs/mobileApps.png' alt='Mobile Apps' /></span>
-                  <span><img src='imgs/mobileWeb.png' alt='Mobile Web' /></span>
-                  <span><img src='imgs/sapApps.png' alt='SAP Apps' /></span>-->
-                </div>
-         </div>
-          </div>
-       <div ng-if="tab == 'tabPreferences'">
-        Preferences
-          </div>
-    </div>
+		<!-- Create Project -->
+		
+		
+		<div ng-if="tab == 'tabPreferences'">Preferences</div>
+	</div>
 	<!--Middle Panel-->
 
 	<!--Right Panel-->
 	<div id="right-dependencies-section">
-		<!--Images Blocks-->  		
+		<!--Images Blocks-->
 		<div class="thumbnail thumbnail-custom">
-        	<a class="slidePopup">
-          		<img class="thumb-ic" src="imgs/ic-info.png" alt="Project Info">
-          		<div class="caption">
-            		<p>Info</p>
-          		</div>
-        	</a>
+			<a class="slidePopup"> <img class="thumb-ic"
+				src="imgs/ic-info.png" alt="Project Info">
+				<div class="caption">
+					<p>Info</p>
+				</div>
+			</a>
 			<!--Popup-->
 			<div tabindex="0" id="window-pi" class="popupWrap">
-				<h4 class="h4-custom closePopup">Information <img class="closePopup pull-right" src="imgs/ic-arrow.png" /></h4>
+				<h4 class="h4-custom closePopup">
+					Information <img class="closePopup pull-right"
+						src="imgs/ic-arrow.png" />
+				</h4>
 				<div class="popupContent projectInfoWrap"></div>
 			</div>
 			<!--Popup-->
-      	</div>
+		</div>
 		<!--Images Blocks-->
 
 		<!--Images Blocks-->
 		<div class="thumbnail thumbnail-custom thumbnail-custom-wiki">
-        	<a class="slide_popup slide_assist" href="#">
-          		<img class="thumb-ic" src="imgs/ic-assist.png" alt="Assist">
-          		<div class="caption">
-            		<p>Assist</p>
-          		</div>
-        	</a>
-        	<!--Popup-->
+			<a class="slide_popup slide_assist" href="#"> <img
+				class="thumb-ic" src="imgs/ic-assist.png" alt="Assist">
+				<div class="caption">
+					<p>Assist</p>
+				</div>
+			</a>
+			<!--Popup-->
 			<div id="assistWindow" class="assistWrap">
 				<h4 class="h4-custom h4-custom-assist">
 					<span class="assist-left pull-left"> <img
 						src="imgs/ic-message.png" />Assist
 					</span> <span class="assist-right pull-right"> <img
-						src="imgs/ic-up.png" class="animateAssistUp" style="margin-right: 10px" /> <img
-						src="imgs/ic-close.png" class="animateAssistClose" />
+						src="imgs/ic-up.png" class="animateAssistUp"
+						style="margin-right: 10px" /> <img src="imgs/ic-close.png"
+						class="animateAssistClose" />
 					</span>
 				</h4>
 				<div class="assistContent">
 					<!-- Chat Container -->
-					<div class="chatContainer scrollbar-inner scrollbar-chatArea chatArea">
+					<div
+						class="chatContainer scrollbar-inner scrollbar-chatArea chatArea">
 						<ul class="chatList">
-							<li>Choose from the available browser icons from the action bar</li>
+							<li>Choose from the available browser icons from the action
+								bar</li>
 							<li>Enter the URL of the AUT (Application under test)</li>
-							<li>Click on one of the options available in the Scrape Options
-								window</li>
+							<li>Click on one of the options available in the Scrape
+								Options window</li>
 							<li>Identify the required objects</li>
 							<li>Rename the objects as per the naming convention</li>
 							<li>Click on the save button in the work area</li>
 							<li>Click on submit to complete task.</li>
 						</ul>
 					</div>
-			
+
 					<div class="chatContainer">
 						<textarea rows="3" cols="" class="chatTextArea form-control"
 							placeholder="Ask Prof.J"></textarea>
@@ -152,32 +490,94 @@
 				</div>
 			</div>
 			<!--Popup-->
-      	</div>
+		</div>
 		<!--Images Blocks-->
 	</div>
 	<!--Right Panel-->
-</section>	
+</section>
 <!--Content Area-->
 
 <!--Footer-->
 <footer footer id="footer" class="footer-global"></footer>
 <!--Footer-->
 
-	<!-- Admin Modal Box  -->
-	<div class="modal fade" id="adminModal" role="dialog" data-keyboard="false" data-backdrop="static">
-	  <div class="modal-dialog modal-sm">
-	    <div class="modal-content">
-	      <div class="modal-header">
-	        <button type="button" class="close" data-dismiss="modal">&times;</button>
-	        <h4 class="modal-title"></h4>
-	      </div>
-	      <div class="modal-body">
-	        <p></p>
-	      </div>
-	      <div class="modal-footer">
-	        <button type="button" class="btn btn-default" data-dismiss="modal">Ok</button>
-	      </div>
-	    </div>
-	  </div>
+<!-- Edit Release Name  -->
+<div class="modal fade" id="editReleaseNameModal" role="dialog" data-keyboard="false" data-backdrop="static">
+	<div class="modal-dialog modal-sm">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">&times;</button>
+				<h4 class="modal-title">Edit Release Name</h4>
+			</div>
+			<div class="modal-body">
+				<p><input type="text" class="form-control form-control-custom" placeholder="Enter New Release Name" id="releaseName" /></p>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Save</button>
+			</div>
+		</div>
 	</div>
-	<!-- Admin Modal Box  -->
+</div>
+<!-- Edit Release Name  -->
+
+
+<!-- Delete Release -->
+<div class="modal fade" id="deleteReleaseModal" role="dialog" data-keyboard="false" data-backdrop="static">
+	<div class="modal-dialog modal-sm">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">&times;</button>
+				<h4 class="modal-title">Delete Release</h4>
+			</div>
+			<div class="modal-body">
+				<p>Are you sure you want to delete ?</p>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Yes</button>
+				<button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- Delete Release -->
+
+
+<!-- Edit Release Name  -->
+<div class="modal fade" id="editCycleNameModal" role="dialog" data-keyboard="false" data-backdrop="static">
+	<div class="modal-dialog modal-sm">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">&times;</button>
+				<h4 class="modal-title">Edit Cycle Name</h4>
+			</div>
+			<div class="modal-body">
+				<p><input type="text" class="form-control form-control-custom" placeholder="Enter New Release Name" id="cycleName" /></p>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Save</button>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- Edit Release Name  -->
+
+
+<!-- Delete Release -->
+<div class="modal fade" id="deleteCycleModal" role="dialog" data-keyboard="false" data-backdrop="static">
+	<div class="modal-dialog modal-sm">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">&times;</button>
+				<h4 class="modal-title">Delete Cycle</h4>
+			</div>
+			<div class="modal-body">
+				<p>Are you sure you want to delete ?</p>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Yes</button>
+				<button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- Delete Release -->

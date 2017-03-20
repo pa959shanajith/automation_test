@@ -1,4 +1,4 @@
-<html>
+<html style="height: 100%;">
     <head>
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <title>SLK Nineteen68</title>
@@ -14,7 +14,7 @@
 					if(getStatus[i].getElementsByClassName("rDstatus")[0].innerHTML == "Pass"){getStatus[i].getElementsByClassName("rDstatus")[0].style.color = "green"}
 					else if(getStatus[i].getElementsByClassName("rDstatus")[0].innerHTML == "Fail"){getStatus[i].getElementsByClassName("rDstatus")[0].style.color = "red"}
 					else if(getStatus[i].getElementsByClassName("rDstatus")[0].innerHTML == "Terminate"){getStatus[i].getElementsByClassName("rDstatus")[0].style.color = "#faa536"}
-					if(getStatus[i].getElementsByClassName("rDstepDes")[0].innerHTML.startsWith("Testscriptname") || getStatus[i].getElementsByClassName("rDstepDes")[0].innerHTML.startsWith("TestCase Name")){
+					if(getStatus[i].getElementsByClassName("rDstepDes")[0].innerHTML.indexOf("Testscriptname") !== -1 || getStatus[i].getElementsByClassName("rDstepDes")[0].innerHTML.indexOf("TestCase Name") !== -1){
 						getStatus[i].getElementsByClassName("rDstepDes")[0].style.fontWeight = "bold";
 					}
 				}
@@ -26,8 +26,8 @@
 			}, 300);
 		</script>      
         <style>
-            body{font-family: LatoWeb;}
-            .mainContainer{ border: 1px solid #B5AAAA; margin: 4px; float: left; padding: 14px; width: 97%; height: 95%;}
+            body{font-family: LatoWeb; height: 98%;}
+            .mainContainer{ border: 1px solid #B5AAAA; margin: 4px; float: left; padding: 14px; width: 97%; height: calc(100% - 50px);}
             .hearderCon{position: relative; width: 100%; float: left; border: 1px solid #cfcfcf; background: linear-gradient(to bottom, #FFFFFF 0%, #E6E6E6 100%); height: 50px; margin-bottom: 10px;border-radius: 5px; font-size: 16px; padding-top: 7px;}
             .headerRepDetails{ width: 50%; padding: 3px 40px;}
             .headerRepDetails label{ text-align: right; width: 29%; font-size: 13px;}
@@ -67,16 +67,17 @@
                 padding-right: 5px;
                 padding-bottom: 5px;
             }
-            .reportsDetails{border: 1px solid #cfcfcf; background: linear-gradient(to bottom, #FFFFFF 0%, #E6E6E6 100%); height: 50px; font-size: 15px;}
+            .reportsDetails{border: 1px solid #cfcfcf; background: linear-gradient(to bottom, #FFFFFF 0%, #E6E6E6 100%); font-size: 15px;}
+            .reportsDetails tr{height: 32px;}
             .reportsDetails th:nth-child(1){width: 5%;} .rDid{width: 5.25%;}
             .reportsDetails th:nth-child(2){width: 10%;} .rDstep{width: 10.25%;}
             .reportsDetails th:nth-child(3){width: 50%;} .rDstepDes{width: 49.8%;}
             .reportsDetails th:nth-child(4){width: 10%;} .rDstatus{width: 10.1%;}
             .reportsDetails th:nth-child(5){width: 12%;} .rDellaps{width: 12.1%;}
-            .reportsDetails th:nth-child(6), .rDcomments{width: 13%; word-break: break-word;}
-            .maintabCont{float: left; width: 100%; border: 1px solid #dcdcdc;}
+            .reportsDetails th:nth-child(6), .rDcomments{width: 13%; word-break: break-word; word-break: break-all;}
+            .maintabCont{float: left; width: 100%; border: 1px solid #dcdcdc; height: 49%;}
             .tabCont{display: table-cell; border-bottom: 1px solid #ececec; border-right: 1px solid #ececec;}
-            .reportsDetail{line-height: 2; text-align: center; height:402px; overflow: auto;font-size: 14px;}
+            .reportsDetail{line-height: 2; text-align: center; height: calc(100% - 35px); overflow: auto;font-size: 14px;}
             .rDstepDes{text-align: left; word-break: break-word;}
             .progress {
                 margin-bottom: 20px;
@@ -100,7 +101,7 @@
             .progresslabel {
                 float: left;
                 display: inline-block;
-                width: 20%;
+                width: 15%;
                 padding-left: 14px;
             }
             .customprogress{
@@ -131,16 +132,21 @@
                 background: linear-gradient(to right, #f7b91e, #faa536) !important;
             }
             .reportsDetail div.reportdetailsrow:nth-child(even){background: #f9f9f9;}
-			::-webkit-scrollbar {
+			::-webkit-scrollbar{
 			    width: 8px;
 			}			 
-			::-webkit-scrollbar-track {
+			::-webkit-scrollbar-track{
 			    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3); 
 			    border-radius: 4px;
 			}			 
-			::-webkit-scrollbar-thumb {
+			::-webkit-scrollbar-thumb{
 			    border-radius: 10px;
 			    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5); 
+			}
+			@media screen and (max-height: 675px) {
+				.reportsDetail{
+					height: 174px;
+				}
 			}
         </style>
     </head>

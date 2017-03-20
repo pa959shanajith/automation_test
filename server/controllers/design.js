@@ -204,19 +204,26 @@ exports.updateScreen_ICE = function(req, res){
 	var statusFlag = "";
 	if(param == "updateScrapeData_ICE"){	
 		scrapedObjects = updateData.getScrapeData;
-		// single quote is replaced with double single quote for scraped data
+		// single quote is replaced with double single quote for scraped data.
+		var parsedScrapedObj=JSON.parse(scrapedObjects);
+		if(appType.toUpperCase() === 'WEBSERVICE'){
+			if('body' in parsedScrapedObj){
+				parsedScrapedObj.body[0]=parsedScrapedObj.body[0].replace(/'+/g,"\"");
+				scrapedObjects=parsedScrapedObj;
+			}
+		}
 		scrapedObjects = JSON.stringify(scrapedObjects);
 		scrapedObjects = scrapedObjects.replace(/'+/g,"''");
 		var newParse;
 		if(scrapedObjects !=null && scrapedObjects !='' && scrapedObjects != undefined){
 			newParse = JSON.parse(scrapedObjects);
 		}else{
-			newParse=JSON.parse("{}");;
+			newParse=JSON.parse("{}");
 		}
 			
 		scrapedObjects=newParse;
 		if(appType.toUpperCase() === 'WEBSERVICE'){
-			scrapedObjects=JSON.parse(newParse);
+			//scrapedObjects=JSON.parse(newParse);
 			var viewArray=[];
 			if('method' in scrapedObjects &&
 				'header' in scrapedObjects && 
@@ -747,21 +754,36 @@ exports.readTestCase_ICE = function (req, res) {
 				testcasesteps = result.rows[i].testcasesteps;
 				testcasename = result.rows[i].testcasename;
 			}
-			if ((testcasesteps == "" || testcasesteps == null) && testcasename != "") {
-				responsedata = { template: "", testcase: "[]", testcasename: testcasename }
-				res.send(responsedata);
-			} else if ((testcasesteps == "" || testcasesteps == null) && testcasename == "") {
-				responsedata = { template: "", testcase: "[]", testcasename: "" }
-				res.send(responsedata);
-			} else {
-				//only web related logic is handledWeb Service related logic is pending
-				responsedata.template = template;
-				responsedata.testcase = testcasesteps;
-				responsedata.testcasename = testcasename;
-				res.send(responsedata);
-			}
+			var scrapedDataQuery="select screendata from screens where screenid="+requestedscreenid+
+				" allow filtering ;";
+			fetchScrapedData(scrapedDataQuery,function(err,scrapedobjects,querycallback){
+				if(scrapedobjects != null && scrapedobjects != '' && scrapedobjects != undefined){
+					var newParse = JSON.parse(scrapedobjects);
+					if('body' in newParse){
+						//this is checked
+						template = newParse.body;
+						responsedata.template = template;
+						responsedata.testcase = testcasesteps;
+						responsedata.testcasename = testcasename;
+						res.send(responsedata);
+					}else{
+						//this is checked
+						responsedata = { template: "", testcase: testcasesteps, testcasename: testcasename }
+						res.send(responsedata);
+					}
+				}else if((scrapedobjects == null || scrapedobjects == '' || scrapedobjects == undefined ) 
+						 && (testcasesteps != null && testcasesteps != '' || testcasesteps != undefined)){
+					//this is checked
+					responsedata = { template: "", testcase: testcasesteps, testcasename: testcasename }
+					res.send(responsedata);
+				} else {
+					//this case is merely impossible in V2.0 as creation happens in MindMaps
+					responsedata = { template: "", testcase: "[]", testcasename: "" }
+					res.send(responsedata);
+				}
+			});
 		}
-	})
+	});
 };
 
 /**
@@ -856,7 +878,7 @@ exports.debugTestCase_ICE = function (req, res) {
 		var browsertypeobject = { browsertype: requestedbrowsertypes };
 		var flag = "";
 		for (var indexes = 0; indexes < requestedtestcaseids.length; indexes++) {
-			var getProjectTestcasedata = "select testcasename,testcasesteps from testcases where testcaseid=" + requestedtestcaseids[indexes];
+			var getProjectTestcasedata = "select screenid,testcasename,testcasesteps from testcases where testcaseid=" + requestedtestcaseids[indexes];
 			dbConn.execute(getProjectTestcasedata, function (errgetTestcasedata, testcasedataresult) {
 				if (errgetTestcasedata) {
 					flag = "Error in getProjectTestcasedata : Fail";
@@ -864,22 +886,31 @@ exports.debugTestCase_ICE = function (req, res) {
 				} else {
 					for (var ids = 0; ids < testcasedataresult.rows.length; ids++) {
 						responseobject.testcase = testcasedataresult.rows[ids].testcasesteps;
-						responseobject.template = "";
 						responseobject.testcasename = testcasedataresult.rows[ids].testcasename;
-						responsedata.push(responseobject);
-					}
-					responsedata.push(browsertypeobject);
-					var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-					if('allSocketsMap' in myserver && ip in myserver.allSocketsMap){
-						var mySocket = myserver.allSocketsMap[ip];
-						mySocket._events.result_debugTestCase = [];
-						mySocket.emit('debugTestCase',responsedata);
-						mySocket.on('result_debugTestCase', function (responsedata) {
-							res.send(responsedata);
+						var scrapedDataQuery="select screendata from screens where screenid="+
+								testcasedataresult.rows[0].screenid+" allow filtering ;";
+						fetchScrapedData(scrapedDataQuery,function(err,scrapedobjects,querycallback){
+							if(scrapedobjects != null && scrapedobjects != '' && scrapedobjects != undefined){
+								var newParse = JSON.parse(scrapedobjects);
+								if('body' in newParse){
+									responseobject.template = newParse.body[0];
+								}
+							}
+							responsedata.push(responseobject);
+							responsedata.push(browsertypeobject);
+							var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+							if('allSocketsMap' in myserver && ip in myserver.allSocketsMap){
+								var mySocket = myserver.allSocketsMap[ip];
+								mySocket._events.result_debugTestCase = [];
+								mySocket.emit('debugTestCase',responsedata);
+								mySocket.on('result_debugTestCase', function (responsedata) {
+									res.send(responsedata);
+								});
+							}else{
+								console.log("Socket not Available");
+								res.send("fail");
+							}
 						});
-					}else{
-						console.log("Socket not Available");
-						res.send("fail");
 					}
 				}
 			});
@@ -919,6 +950,84 @@ exports.debugTestCase_ICE = function (req, res) {
 					responseData.responseBody.push("Response Body - Fail");
 					res.send(responseData);
 				}
+			});
+		}else{
+			console.log("Socket not Available");
+			res.send("fail");
+		}
+	}else if(action == 'wsdlListGenerator_ICE'){
+		var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+		if('allSocketsMap' in myserver && ip in myserver.allSocketsMap){
+			var mySocket = myserver.allSocketsMap[ip];
+			var wsdlurl=req.body.wsdlurl;
+			console.log("wsdlurl::",wsdlurl);
+			mySocket._events.result_wsdl_listOfOperation = []
+			mySocket.emit('wsdl_listOfOperation',wsdlurl);
+			mySocket.on('result_wsdl_listOfOperation', function (listGenResponse) {
+				var responsedata={listofoperations:[]};
+				if(listGenResponse != "fail" && listGenResponse != undefined && listGenResponse != ""){
+					console.log(listGenResponse);
+					listGenResponse=listGenResponse.replace(/'+/g,"\"");
+					var listGenResponse=JSON.parse(listGenResponse);
+					responsedata.listofoperations=listGenResponse;
+					res.send(responsedata);
+				}else{
+					res.send(responsedata);
+				}
+			});
+		}else{
+			console.log("Socket not Available");
+			res.send("fail");
+		}
+	}else if(action == 'wsdlServiceGenerator_ICE'){
+		var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+		if('allSocketsMap' in myserver && ip in myserver.allSocketsMap){
+			var wsdlurl=req.body.wsdlurl;
+			var operations=req.body.method;
+			var soapVersion='0';
+			if(operations.indexOf('SOAP1.1') === -1){
+				soapVersion='1';
+			}
+			operations=operations.split('-')[1]
+			var serviceGenRequest={
+				wsdlurl:wsdlurl,
+				operations:operations,
+				soapVersion:soapVersion
+			}
+			var mySocket = myserver.allSocketsMap[ip];
+			mySocket._events.result_wsdl_ServiceGenerator = [];
+			mySocket.emit('wsdl_ServiceGenerator',serviceGenRequest);
+			mySocket.on('result_wsdl_ServiceGenerator', function (serviceGenResponse) {
+				console.log(wsdlurl.split('?')[0]);
+				console.log(operations);
+				var responsedata={
+					endPointURL:[],
+					method:["POST"],
+					header:[],
+					body:[],
+					operations:[],
+					responseHeader:[""],
+					responseBody:[""]
+				};
+				responsedata.endPointURL.push(wsdlurl.split('?')[0]);
+				responsedata.operations.push(operations);
+				if(serviceGenResponse != "fail" && serviceGenResponse != undefined && serviceGenResponse != ""){
+					response=serviceGenResponse.split('rEsPONseBOdY:');
+					if(response.length == 2){
+						responsedata.header.push(response[0]);
+						responsedata.body.push(response[1]);
+					}else if(response.length == 1){
+						responsedata.header.push(response[0]);
+						responsedata.body.push("");
+					}else{
+						responsedata.header.push("");
+						responsedata.body.push("");
+					}
+				}else{
+					responsedata.header.push("");
+					responsedata.body.push("");
+				}
+				res.send(responsedata);
 			});
 		}else{
 			console.log("Socket not Available");

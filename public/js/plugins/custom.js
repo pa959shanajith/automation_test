@@ -167,6 +167,10 @@ function unblockUI(){
 }
 //Function to Block UI
 
+function p_redirect(name){
+	window.location.assign(name);
+}
+
 $(document).on('keypress', '.singleInvitedComma', function(e){
 	if(e.charCode == 39) return false;
 	else return true;
