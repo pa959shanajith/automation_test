@@ -52,6 +52,7 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 					}
 					cfpLoadingBar.complete();
 					$("#middle-content-section").css('visibility','visible');
+					$('[data-toggle="tooltip"]').tooltip();
 				}, 
 				function(error) {
 					console.log("Error-------"+error);
