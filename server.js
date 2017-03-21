@@ -97,6 +97,9 @@ app.post('/getRoleNameByRoleId_Nineteen68', login.getRoleNameByRoleId_Nineteen68
 //Admin Routes
 app.post('/getUserRoles_Nineteen68', admin.getUserRoles_Nineteen68);
 app.post('/createUser_Nineteen68', admin.createUser_Nineteen68);
+app.post('/updateUser_nineteen68', admin.updateUser_nineteen68);
+app.post('/getAllUsers_Nineteen68', admin.getAllUsers_Nineteen68);
+app.post('/getEditUsersInfo_Nineteen68', admin.getEditUsersInfo_Nineteen68);
 //Design Screen Routes
 app.post('/initScraping_ICE', design.initScraping_ICE);
 app.post('/highlightScrapElement_ICE', design.highlightScrapElement_ICE);

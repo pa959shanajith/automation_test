@@ -5,7 +5,7 @@ body,
 html {
     height: 100%
 }
-
+input[type="checkbox"]{cursor: default !important;}
 #overlayContainer{
 	position: fixed;
     background-color: rgba(0, 0, 0, 0.85);
@@ -2473,7 +2473,10 @@ select:hover {
 
 .adminControl {
 	margin-bottom: 3%;
-	padding: 0px 0px;
+    padding: 0px 0px;
+    position: relative;
+    float: left;
+    width: 100%;
 }
 
 .adminSelect:focus {
@@ -2690,6 +2693,33 @@ select:hover {
 
 .actionOnHover img:first-child{
 	margin-right: 10px !important;
+}
+
+.ldapBtn {
+	position: absolute;
+    z-index: 1;
+    right: 0;
+    margin: 0;
+    padding: 0px 20px;
+    background: #5e636b;
+}
+
+.ldapBtnActive{
+	background: #643693
+}
+
+.ldapBtn.focus,
+.ldapBtn,
+.ldapBtn:active:focus,
+.ldapBtn:focus,
+.ldapBtn:hover{
+	padding: 0px 20px !important;
+	margin-right: 0;
+}
+
+.selectlg{
+	margin-left: 0;
+    width: 100%;
 }
 /*****************ADMIN CSS NEW ************************/
 

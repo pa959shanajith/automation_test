@@ -10,18 +10,18 @@
 			<div id="left-top-section" ng-if="getScreenView == 'Web' || getScreenView == 'Desktop' || getScreenView == 'Mobility' || getScreenView == 'Webservice'">
 				<ul>
 					<li><span><a class='scrapeOnTxt'>Debug On</a></span></li>
-					<li><a href='#' ng-click="debugTestCase_ICE('3');" title="Debug on Internet Explorer"><span><img src='imgs/ic-ie.png' alt='Internet Explorer' /></span>Internet Explorer</a></li>
-					<li><a href='#' ng-click="debugTestCase_ICE('1');" title="Debug on Chrome"><span><img src='imgs/ic-chrome.png' alt='Google Chrome' /></span>Google Chrome</a></li>
-					<li><a href='#' ng-click="debugTestCase_ICE('2');" title="Debug on Firefox"><span><img src='imgs/ic-mozilla.png' alt='Mozilla Firefox' /></span>Mozilla Firefox</a></li>
-					<li class="last"><span style="margin-bottom:-5px"><input id="addDependent" type='checkbox' value="" disabled></span><label for="addDependent">Add Dependent Test Cases</label></li>
+					<li><a href='#' data-toggle="tooltip" ng-click="debugTestCase_ICE('3');" title="Debug on Internet Explorer"><span><img src='imgs/ic-ie.png' alt='Internet Explorer' /></span>Internet Explorer</a></li>
+					<li><a href='#' data-toggle="tooltip" ng-click="debugTestCase_ICE('1');" title="Debug on Chrome"><span><img src='imgs/ic-chrome.png' alt='Google Chrome' /></span>Google Chrome</a></li>
+					<li><a href='#' data-toggle="tooltip" ng-click="debugTestCase_ICE('2');" title="Debug on Firefox"><span><img src='imgs/ic-mozilla.png' alt='Mozilla Firefox' /></span>Mozilla Firefox</a></li>
+					<li class="last" data-toggle="tooltip" title="Add Dependent Test Cases"><span style="margin-bottom:-5px"><input id="addDependent" type='checkbox' value="" disabled></span><label for="addDependent">Add Dependent Test Cases</label></li>
 				</ul>
 			</div>
 			
 			<div id="left-top-section" ng-if="getScreenView == 'mobileweb'" class="ApptypeScreenView">
 				<ul>
 					<li><span><a class='scrapeOnTxt'>Debug On</a></span></li>
-					<li><a href='#' ng-click="debugTestCase_ICE();" title="Debug on Chrome"><span><img src='imgs/ic-chrome.png' alt='Google Chrome' /></span>Google Chrome</a></li>
-					<li class="last"><span style="margin-bottom:-5px"><input id="addDependent" type='checkbox' value="" disabled></span><label for="addDependent">Add Dependent Test Cases</label></li>
+					<li><a href='#' data-toggle="tooltip" ng-click="debugTestCase_ICE();" title="Debug on Chrome"><span><img src='imgs/ic-chrome.png' alt='Google Chrome' /></span>Google Chrome</a></li>
+					<li class="last" data-toggle="tooltip" title="Add Dependent Test Cases"><span style="margin-bottom:-5px"><input id="addDependent" type='checkbox' value="" disabled></span><label for="addDependent">Add Dependent Test Cases</label></li>
 				</ul>
 			</div>
 			
@@ -29,9 +29,9 @@
 			
 			<div id="left-bottom-section">
 				<ul>
-					<li><a href='#' ng-click="importTestCase()"><span><img src='imgs/ic-import-script.png' alt='Import TestScript' /></span>Import Test Case</a><input style="visibility: hidden;" type="file" id="importTestCaseFile" accept=".json"></li>
+					<li><a href='#' ng-click="importTestCase()" data-toggle="tooltip" title="Import TestCase"><span><img src='imgs/ic-import-script.png' alt='Import TestCase' /></span>Import Test Case</a><input style="visibility: hidden;" type="file" id="importTestCaseFile" accept=".json"></li>
 					<li style="visibility: hidden; display: none;"><a href='#' ng-click="importTestCase1()"></a><input style="visibility: hidden;" type="file" id="overWriteJson" accept=".json"></li>
-					<li><a href='#' ng-click="exportTestCase()"><span><img src='imgs/ic-export-script.png' alt='Export TestScript' /></span>Export Test Case</a></li>
+					<li><a href='#' ng-click="exportTestCase()" data-toggle="tooltip" title="Export TestCase"><span><img src='imgs/ic-export-script.png' alt='Export TestScript' /></span>Export Test Case</a></li>
 				</ul>
 			</div>
 		</div>
@@ -48,15 +48,21 @@
 		
 		<!-- Table Action Buttons -->
 		<div id="tableActionButtons">
-			<img class="btn btn-action" src="imgs\ic-jq-addstep.png" alt="Add Steps" onclick="addTestScriptRow()" title="Add Test step">
-			<img class="btn btn-action" src="imgs\ic-jq-editstep.png" alt="Edit Steps" onclick="editTestCaseRow()" title="Edit Test step">
-			<img class="btn btn-action" src="imgs\ic-jq-dragstep.png" alt="Drag Steps" onclick="rearrangeTestScriptRow()" title="Drag & Drop Test step">
-			<img class="btn btn-action" src="imgs\ic-jq-copystep.png" alt="Copy Steps" onclick="copyTestStep()" title="Copy Test step">
-			<img class="btn btn-action" src="imgs\ic-jq-pastestep.png" alt="Paste Steps" onclick="pasteTestStep()" title="Paste Test step">
-			<img class="btn btn-action" src="imgs\ic-jq-commentstep.png" alt="Comment Steps" onclick="commentStep(event)" title="Skip Test step">
-			<button class="btn btn-xs btn-xs-custom btn-xs-action" ng-click="updateTestCase_ICE()" title="Save Test Case">Save</button>
-			<button class="btn btn-xs btn-xs-custom btn-xs-action" onclick="deleteTestScriptRow()" title="Delete Test step">Delete</button>
-			<button class="btn btn-md pull-right submitTaskBtn" style="margin-top: 2px" ng-click="submitTasksTestCase()">Submit</button>
+		<span>
+			<img class="btn btn-action" src="imgs/ic-jq-addstep.png" alt="Add Steps" onclick="addTestScriptRow()" data-toggle="tooltip" title="Add Test step">
+			<img class="btn btn-action" src="imgs/ic-jq-editstep.png" alt="Edit Steps" onclick="editTestCaseRow()" data-toggle="tooltip" title="Edit Test step">
+			<img class="btn btn-action" src="imgs/ic-jq-dragstep.png" alt="Drag Steps" onclick="rearrangeTestScriptRow()" data-toggle="tooltip" title="Drag & Drop Test step">
+			<img class="btn btn-action" src="imgs/ic-jq-copystep.png" alt="Copy Steps" onclick="copyTestStep()" data-toggle="tooltip" title="Copy Test step">
+			<img class="btn btn-action" src="imgs/ic-jq-pastestep.png" alt="Paste Steps" onclick="pasteTestStep()" data-toggle="tooltip" title="Paste Test step">
+			<img class="btn btn-action" src="imgs/ic-jq-commentstep.png" alt="Comment Steps" onclick="commentStep(event)" data-toggle="tooltip" title="Skip Test step">
+		</span>
+		<span>
+			<button class="btn btn-xs btn-xs-custom btn-xs-action" ng-click="updateTestCase_ICE()" data-toggle="tooltip" title="Save Test Case">Save</button>
+		</span>
+		<span>
+			<button class="btn btn-xs btn-xs-custom btn-xs-action" onclick="deleteTestScriptRow()" data-toggle="tooltip" title="Delete Test step" style="margin-left: 0;">Delete</button>
+			<button class="btn btn-md pull-right submitTaskBtn" style="margin-top: 2px" ng-click="submitTasksTestCase()" data-toggle="tooltip" title="Submit Task">Submit</button>
+		</span>
 		</div>
 		<!-- Table Action Buttons -->
 		<div class="designTableDnd">
@@ -72,7 +78,7 @@
 	<div id="right-dependencies-section">
 		<!--Images Blocks-->
 		<div class="thumbnail thumbnail-custom">
-        	<a class="slidePopup">
+        	<a class="slidePopup" data-toggle="tooltip" title="Encryption">
           		<img class="thumb-ic" src="imgs/ic-encryption.png" alt="Encryption">
           		<div class="caption">
             		<p>Encryption</p>
@@ -91,7 +97,7 @@
 		
 		<!--Images Blocks-->
 		<div class="thumbnail thumbnail-custom">
-        	<a class="slidePopup">
+        	<a class="slidePopup" data-toggle="tooltip" title="Screenshot">
           		<img class="thumb-ic" src="imgs/ic-screenshot.png" alt="Scrape Screenshot">
           		<div class="caption">
             		<p>Screenshot</p>
@@ -113,7 +119,7 @@
 
 		<!--Images Blocks-->
 		<div class="thumbnail thumbnail-custom">
-        	<a class="slidePopup">
+        	<a class="slidePopup" data-toggle="tooltip" title="Tasks">
           		<img class="thumb-ic" src="imgs/ic-task.png" alt="Tasks">
           		<div class="caption">
             		<p>Tasks</p>
@@ -136,7 +142,7 @@
 
 		<!--Images Blocks-->  		
 		<div class="thumbnail thumbnail-custom">
-        	<a class="slidePopup">
+        	<a class="slidePopup" data-toggle="tooltip" title="Info">
           		<img class="thumb-ic" src="imgs/ic-info.png" alt="Project Info">
           		<div class="caption">
             		<p>Info</p>
@@ -153,7 +159,7 @@
 
 		<!--Images Blocks-->
 		<div class="thumbnail thumbnail-custom thumbnail-custom-wiki">
-        	<a class="slide_popup slide_assist" href="#">
+        	<a class="slide_popup slide_assist" href="#" data-toggle="tooltip" title="Assist">
           		<img class="thumb-ic" src="imgs/ic-assist.png" alt="Assist">
           		<div class="caption">
             		<p>Assist</p>

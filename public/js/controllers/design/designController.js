@@ -691,7 +691,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					$("#enableAppend").prop("disabled", false).css('cursor','pointer')
 				}
 				//console.log("response data: ", viewString);
-				$("#finalScrap").append("<div id='scrapTree' class='scrapTree'><ul><li><span class='parentObjContainer'><input title='Select all' type='checkbox' class='checkStylebox'><span class='parentObject'><a id='aScrapper'>Select all </a><button id='saveObjects' class='btn btn-xs btn-xs-custom objBtn' style='margin-left: 10px'>Save</button><button data-toggle='modal' id='deleteObjects' data-target='#deleteObjectsModal' class='btn btn-xs btn-xs-custom objBtn' style='margin-right: 0' disabled>Delete</button></span><span></span></span><ul id='scraplist' class='scraplistStyle'></ul></li></ul></div>");
+				$("#finalScrap").append("<div id='scrapTree' class='scrapTree'><ul><li><span class='parentObjContainer'><input title='Select all' type='checkbox' class='checkStylebox'><span class='parentObject'><a id='aScrapper'>Select all </a><button id='saveObjects' class='btn btn-xs btn-xs-custom objBtn' style='margin-left: 10px' data-toggle='tooltip' title='Save Objects'>Save</button><button data-toggle='modal' id='deleteObjects' data-target='#deleteObjectsModal' class='btn btn-xs btn-xs-custom objBtn' style='margin-right: 0' data-toggle='tooltip' title='Delete Objects' disabled>Delete</button></span><span></span></span><ul id='scraplist' class='scraplistStyle'></ul></li></ul></div>");
 				$("#saveObjects").attr('disabled', true);
 				var custN;
 				var imgTag;
@@ -2238,6 +2238,7 @@ function contentTable(newTestScriptDataLS) {
 			$("#jqGrid").jqGrid('clearGridData');
 			$("#jqGrid").jqGrid('setGridParam',{data: gridArrayData});
 			$("#jqGrid").trigger("reloadGrid");
+			$("#jqGrid").parent('div').css('height','auto');
 			//tsrows_reorder();
 		}
 	});

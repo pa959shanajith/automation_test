@@ -5,8 +5,13 @@ function loadBody(){
 window.onload = loadBody;
 //Window Load Function
 
+setTimeout(function(){
+	//For bootstrap tool tip
+	$('[data-toggle="tooltip"]').tooltip();
+}, 500)
+
 //Document Ready Function
-$(document).ready(function() {	
+$(document).ready(function() {
     //Task Function - Plugin Page
     $(document).on("click", ".task-content .collapse-head", function(){
         $(".caret-absolute").hide()
@@ -40,14 +45,19 @@ $(document).ready(function() {
 
     //Popup Function - Screen Level (Screenshot, Filter, Tasks, Project Info)
     $(document).on("click", ".slidePopup", function(e){
-        $(".thumb-ic").removeClass("thumb-ic-highlight")
-        $(".popupWrap").animate({ opacity: 0, right: "70px" }, 100).css({'z-index':'0','pointer-events':'none'})
-        $(this).children(".thumb-ic").addClass("thumb-ic-highlight")
-        if($(this).siblings(".popupWrap").attr("id") == "window-scrape-screenshot" || $(this).siblings(".popupWrap").attr("id") == "window-scrape-screenshotTs"){
-        	$(this).siblings(".popupWrap").animate({ opacity: 1, right: "97px" }, 100).css({'z-index':'12','pointer-events':'all','display':'block'}).focus()
-        } else{
-        	$(this).siblings(".popupWrap").animate({ opacity: 1, right: "92px" }, 100).css({'z-index':'12','pointer-events':'all','display':'block'}).focus()
-        }
+    	if($(this).attr('data-original-title') == "Filter" && $('#scraplist li').length <= 0){
+               		
+    	}
+    	else{
+    		$(".thumb-ic").removeClass("thumb-ic-highlight")
+            $(".popupWrap").animate({ opacity: 0, right: "70px" }, 100).css({'z-index':'0','pointer-events':'none'})
+            $(this).children(".thumb-ic").addClass("thumb-ic-highlight")
+            if($(this).siblings(".popupWrap").attr("id") == "window-scrape-screenshot" || $(this).siblings(".popupWrap").attr("id") == "window-scrape-screenshotTs"){
+            	$(this).siblings(".popupWrap").animate({ opacity: 1, right: "97px" }, 100).css({'z-index':'12','pointer-events':'all','display':'block'}).focus()
+            } else{
+            	$(this).siblings(".popupWrap").animate({ opacity: 1, right: "92px" }, 100).css({'z-index':'12','pointer-events':'all','display':'block'}).focus()
+            } 
+    	}
     })
     .on("click", ".closePopup", function(){
         $(".popupWrap").animate({ opacity: 0, right: "70px" }, 100).css({'z-index':'0','pointer-events':'none'})

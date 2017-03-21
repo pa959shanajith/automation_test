@@ -37,13 +37,14 @@
 			<!--Task Name-->
 			<!-- Button -->
 			<div class="adminActionBtn">
-				<button class="btn btn-md pull-right adminBtn"
-					ng-click="create_userCheck()">Create</button>
+				<button class="btn btn-md pull-right adminBtn" ng-click="editUserTab()" style="background: #5e636b">Edit</button>
+				<button class="btn btn-md pull-right adminBtn" ng-click="create_userCheck()" style="margin-right:10px">Create</button>
 			</div>
 			<!-- Button -->
 			<!-- Action area -->
 			<div class="col-xs-9 form-group adminForm">
 				<div class='userForm adminControl'>
+					<button class="btn btn-xs ldapBtn" ng-click="ldapFn()">LDAP</button>
 					<input type="text" id="userName" name="userName"
 						ng-model="userName" maxlength="50"
 						class="form-control form-control-custom" placeholder="User Name"><span
@@ -95,6 +96,78 @@
 			</div>
 			<!-- Action area -->
 		</div>
+		
+		<!-- Edit User -->
+		<div class="containerWrap" ng-if="tab == 'editUser'">
+			<!--Task Name-->
+			<div id="page-taskName">
+				<span>Edit User</span>
+			</div>
+			<!--Task Name-->
+			
+			<!-- Button -->
+			<div class="adminActionBtn">
+				<button class="btn btn-md pull-right adminBtn" ng-click="updateUser()">Update</button>
+			</div>
+			<!-- Button -->
+			
+			<!-- Edit User Form -->
+			<div class="col-xs-9 form-group adminForm">
+				<div class='userForm adminControl'>
+					<button class="btn btn-xs ldapBtn" style="top:2px" ng-click="ldapFn()">LDAP</button>
+					<select ng-change="getUserData()" style="width: 87%" class='adminSelect selectlg form-control'
+							x-ng-model="users" id="userSelect"
+							class="form-control rightControl selectControl">
+							<option value="" disabled selected>Select User</option>
+					</select>
+				</div>
+				<div class='leftControl adminControl'>
+					<input type="text" name="firstName" id="firstName"
+						ng-model="firstName" maxlength="12"
+						class="form-control form-control-custom" placeholder="First Name"><span
+						ng-show="firstNameRequired" class="error-msg ng-cloak errorlbl">{{firstNameRequired}}</span>
+				</div>
+				<div class='rightControl adminControl'>
+					<input type="text" name="lastName" id="lastName"
+						ng-model="lastName" maxlength="12"
+						class="form-control form-control-custom" placeholder="Last Name"><span
+						ng-show="lastNameRequired" class="error-msg ng-cloak errorlbl">{{lastNameRequired}}</span>
+				</div>
+				<div class='leftControl adminControl'>
+					<input type="password" name="passWord" id="password"
+						ng-model="passWord" maxlength="12"
+						class="form-control form-control-custom" placeholder="Password"
+						autocomplete="off"><span ng-show="passwordRequired"
+						class="error-msg error-msg-password ng-cloak errorlbl">{{passwordRequired}}</span>
+				</div>
+				<div class='rightControl adminControl'>
+					<input type="password" name='confirmPassword' id='confirmPassword'
+						ng-model="confirmPassword"
+						class="form-control form-control-custom"
+						placeholder="Confirm Password" autocomplete="off"><span
+						ng-show="confirmPasswordRequired"
+						class="error-msg error-msg-password ng-cloak errorlbl">{{confirmPasswordRequired}}</span>
+				</div>
+				<div class='adminControl'>
+					<input type="email" name="email" id="email" ng-model="email"
+						maxlength="50" class="form-control form-control-custom"
+						placeholder="Email Id"><span ng-show="emailRequired"
+						class="error-msg ng-cloak errorlbl">{{emailRequired}}</span>
+				</div>
+				<div>
+					<div class="col-xs-6 selectRole">
+						<label class="leftControl primaryRole">Primary Role</label> 
+						<select class='adminSelect form-control'
+							x-ng-model="role" id="userRoles"
+							class="form-control rightControl selectControl">
+							<option value="" disabled selected>Select User Role</option>
+						</select> <span ng-show="roleRequired" class="error-msg ng-cloak errorlbl">{{roleRequired}}</span>
+					</div>
+				</div>
+			</div>
+			<!-- Edit User Form -->
+		</div>
+		<!-- Edit User -->
 
 		<!-- Create Project -->
 		<div class="containerWrap" ng-if="tab == 'tabProject'">
@@ -581,3 +654,43 @@
 	</div>
 </div>
 <!-- Delete Release -->
+
+
+<!-- Edit User Success -->
+<div class="modal fade" id="editUserSuccessModal" role="dialog" data-keyboard="false" data-backdrop="static">
+	<div class="modal-dialog modal-sm">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">&times;</button>
+				<h4 class="modal-title">Edit User</h4>
+			</div>
+			<div class="modal-body">
+				<p>User has been edited successfully.</p>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Ok</button>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- Edit User Success -->
+
+
+<!-- Edit User Fail -->
+<div class="modal fade" id="editUserFailModal" role="dialog" data-keyboard="false" data-backdrop="static">
+	<div class="modal-dialog modal-sm">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">&times;</button>
+				<h4 class="modal-title">Edit User</h4>
+			</div>
+			<div class="modal-body">
+				<p>Failed to edit user.</p>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Ok</button>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- Edit User Fail -->
