@@ -162,6 +162,11 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 			}, function (error) { console.log("Error:::::::::::::", error) })
 		}
 	};
+	
+	//LDAP Functionality for Create User
+	$(document).on("click", ".ldapBtn", function(){
+		$(this).toggleClass("ldapBtnActive")
+	})
 
 	//Get User Roles in the select container
 	$scope.getUserRoles = function () {	//Yes---------------------------------
@@ -185,6 +190,70 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 		}, function (error) { console.log("Error:::::::::::::", error) })
 	};
 	
+	
+	//Load Users for Edit
+	$scope.editUserTab = function(){
+		$scope.tab = "editUser";
+		adminServices.getAllUsers_Nineteen68()
+		.then(function (response) {
+			$("#userSelect").empty()
+			$("#userSelect").append('<option data-id="" value disabled selected>Select User</option>')
+			for(i=0; i<response.userIds.length && response.user_names.length; i++){
+				$("#userSelect").append('<option data-id="'+response.userIds[i]+'" value="'+response.user_names[i]+'">'+response.user_names[i]+'</option>')
+			}
+		}, 
+		function (error) { console.log("Error:::::::::::::", error) })
+	};
+	
+	//Get Selected User Data
+	$scope.getUserData = function(){
+		var userId = $("#userSelect option:selected").data("id");
+		var userName = $("#userSelect option:selected").val();
+		adminServices.getUsersInfo(userId, userName)
+		.then(function (response) {
+			$("#firstName").val(response.firstName);
+			$("#lastName").val(response.lastName);
+			$("#email").val(response.emailId);
+			var roleId = response.roleId;
+				adminServices.getUserRoles_Nineteen68()
+				.then(function (response) {
+					$("#userRoles").empty().append('<option value disabled>Select User Role</option>')
+					for(i=0; i<response.r_ids.length && response.userRoles.length; i++){
+						if(roleId == response.r_ids[i]){
+							$("#userRoles").append('<option selected value="'+response.r_ids[i]+'">'+response.userRoles[i]+'</option>')
+						}
+						else{
+							$("#userRoles").append('<option value="'+response.r_ids[i]+'">'+response.userRoles[i]+'</option>')
+						}
+					}
+				}, 
+				function (error) { console.log("Error:::::::::::::", error) })
+		}, 
+		function (error) { console.log("Error:::::::::::::", error) })
+	};
+	
+	//Update Edit User
+	$scope.updateUser = function(){
+		var updateUserObj = {};
+		updateUserObj.userName = $("#userSelect option:selected").text();
+		updateUserObj.passWord = $("#password").val();
+		updateUserObj.firstName = $("#firstName").val();
+		updateUserObj.lastName = $("#lastName").val();
+		updateUserObj.role = $("#userRoles option:selected").val();
+		updateUserObj.email = $("#email").val();
+		updateUserObj.userId = $("#userSelect option:selected").data("id");
+		adminServices.updateUser_nineteen68(updateUserObj)
+		.then(function (response) {
+			if(response == "success"){
+				$("#editUserSuccessModal").modal("show");
+			}
+			else{
+				$("#editUserFailModal").modal("show");
+			}
+		}, 
+		function (error) { console.log("Error:::::::::::::", error) })
+	};
+	
 	//AppTypeSelect Functionality
 	$(document).on("click", ".projectTypes", function(){
 		$(this).toggleClass("projectTypeSelected");
@@ -196,23 +265,23 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 		$("#editReleaseNameModal").modal("show");
 		var existingReleaseName = $(this).parents("li").children(".releaseName").text()
 		$("#releaseName").val(existingReleaseName)
-	})
+	});
 	
 	//Delete Release Functionality
 	$(document).on("click", ".deleteRelease", function(){
 		$("#deleteReleaseModal").modal("show")
-	})
+	});
 	
 	//Edit Cycle Name Functionality
 	$(document).on("click", ".editCycleName", function(){
 		$("#editCycleNameModal").modal("show");
 		var existingCycleName = $(this).parents("li").children(".cycleName").text()
 		$("#cycleName").val(existingCycleName)
-	})
+	});
 	
 	//Delete Release Functionality
 	$(document).on("click", ".deleteCycle", function(){
 		$("#deleteCycleModal").modal("show")
-	})
+	});
 }]);
 
