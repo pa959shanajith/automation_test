@@ -118,6 +118,22 @@ body {
     font-family: 'LatoWebLight';
 }
 
+.wsButtonActive{
+	background: #311d4e !important;
+	position: relative
+}
+
+.wsButtonActive::after{
+	content: "";
+    position: absolute;
+    left: 50%;
+    bottom: -8px;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 5px solid #311d4e;
+    transform: translate(-50%, -50%);
+}
+
 .btn-no-bg{
 	background: none !important;
     color: #333 !important;

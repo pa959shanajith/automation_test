@@ -114,8 +114,8 @@
 			<!-- Middle -->
 			<div class="wsdlRow wsdlActions">
 				<div id="wsdlActionsButton">
-					<button ng-click="showWsdlRequest()" class="btn btn-xs btn-xs-custom pull-left" data-toggle="tooltip" title="Request">Request</button>
-					<button ng-click="showWsdlResponse()" class="btn btn-xs btn-xs-custom pull-left" data-toggle="tooltip" title="Response">Response</button>
+					<button ng-click="showWsdlRequest()" id="showWsdlRequest" class="btn btn-xs btn-xs-custom pull-left" data-toggle="tooltip" title="Request">Request</button>
+					<button ng-click="showWsdlResponse()" id="showWsdlResponse" class="btn btn-xs btn-xs-custom pull-left" data-toggle="tooltip" title="Response">Response</button>
 					<button ng-click="saveWS()" class="btn btn-xs btn-xs-custom pull-left saveWS" data-toggle="tooltip" title="Save">Save</button>
 					<input ng-model="endPointURL" id="endPointURL" type="text" class="endPointURL form-control pull-left" placeholder="End Point URL"/>
 					<select ng-model="wsdlMethods" id="wsdlMethods" class="form-control wsdlMethods pull-left">
@@ -683,10 +683,10 @@
 	    <div class="modal-content">
 	      <div class="modal-header">
 	        <button type="button" class="close" data-dismiss="modal">&times;</button>
-	        <h4 class="modal-title">Debug Web Service</h4>
+	        <h4 class="modal-title">Data Retrieve</h4>
 	      </div>
 	      <div class="modal-body">
-	        <p>Web Service debug completed.</p>
+	        <p>Web Service response received successfully</p>
 	      </div>
 	      <div class="modal-footer">
 	        <button type="button" class="btn btn-default" data-dismiss="modal">Ok</button>

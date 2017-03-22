@@ -775,18 +775,24 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 	
 	
 	//Get Webservice Data
+	$(".wsdlRqstWrap").show();
+	$("#showWsdlRequest").addClass("wsButtonActive")
+	
 	$scope.showWsdlRequest = function(){
 		$(".wsdlRqstWrap").show();
 		$(".wsdlRspnsWrap").hide();
+		$("#showWsdlRequest").addClass("wsButtonActive")
+		$("#showWsdlResponse").removeClass("wsButtonActive")
 	}
 
 	$scope.showWsdlResponse = function(){
 		$(".wsdlRspnsWrap").show();
 		$(".wsdlRqstWrap").hide();
+		$("#showWsdlResponse").addClass("wsButtonActive")
+		$("#showWsdlRequest").removeClass("wsButtonActive")
 	}
 
 	$scope.getWSData = function(){
-		$(".wsdlRqstWrap").show();
 		/*if($("#wsdlRequestHeader, #wsdlRequestBody").val().length > 0){
 			$(".saveWS").prop("disabled", true);
 			$("#enbledWS").prop("disabled", false);
@@ -965,7 +971,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		else if(!$scope.wsdlMethods && !wsdlMethods) $("#wsdlMethods").addClass("selectErrorBorder")
 		else if(!wsdlRequestHeader) $("#wsdlRequestHeader").addClass("inputErrorBorderFull")
 		else{
-			var blockMsg = "Web Service debug in progress..."
+			var blockMsg = "Fetching Response Header & Body..."
 			blockUI(blockMsg);
 			testCaseWS.push({
 				"stepNo": 1,
