@@ -1,7 +1,7 @@
-var activeNode,uNix,uLix,node,link,dNodes,dLinks,allMMaps,temp,rootIndex,faRef,nCount,scrList,tcList,mapSaved,zoom,cSpan,cScale,taskAssign;
+var activeNode,uNix,uLix,node,link,dNodes,dLinks,allMMaps,temp,rootIndex,faRef,nCount,scrList,tcList,mapSaved,zoom,cSpan,cScale,taskAssign,releaseResult;
 function loadMindmapData(){
 	uNix=0;uLix=0;dNodes=[];dLinks=[];nCount=[0,0,0,0];scrList=[];tcList=[];cSpan=[0,0];cScale=1;mapSaved=!1;
-	taskAssign={"modules":{"task":["Execute"],"attributes":["at","sd","ed","re","cy"]},"scenarios":null,"screens":{"task":["Scrape","Append","Compare","Add","Map"],"attributes":["at","rw","sd","ed"]},"testcases":{"task":["Update","Design","Debug"],"attributes":["at","rw","sd","ed"]}};
+	taskAssign={"modules":{"task":["Execute"],"attributes":["at","sd","ed","re","cy"]},"scenarios":null,"screens":{"task":["Scrape","Append","Compare","Add","Map"],"attributes":["at","rw","sd","ed"]},"testcases":{"task":["Update","Design"],"attributes":["at","rw","sd","ed"]}};
 	zoom=d3.behavior.zoom().scaleExtent([0.1,3]).on("zoom", zoomed);
 	faRef={"plus":"fa-plus","edit":"fa-pencil-square-o","delete":"fa-trash-o"};
 	//d3.selectAll('.ct-tile').on('click',createNewMap);
@@ -142,7 +142,7 @@ var addTask = function(e){
 	var a,b,p=d3.select(activeNode);
 	var pi=parseInt(p.attr('id').split('-')[2]);
 	var nType=p.attr('data-nodetype');
-	var tObj={t:d3.select('#ct-assignTask').html(),at:$('#ct-assignedTo').val(),rw:(d3.select('#ct-assignRevw')[0][0])?$('#ct-assignRevw').val():null,sd:d3.select('#ct-assignStart').html(),ed:d3.select('#ct-assignEnd').html(),re:(d3.select('#ct-assignRel')[0][0])?$('#ct-assignRel').val():null,cy:(d3.select('#ct-assignCyc')[0][0])?$('#ct-assignCyc').val():null,det:d3.select('#ct-assignDetails').property('value')};
+	var tObj={t:d3.select('#ct-assignTask').html(),at:$('#ct-assignedTo').val(),rw:(d3.select('#ct-assignRevw')[0][0])?$('#ct-assignRevw').val():null,sd:$('#startDate').val(),ed:$('#endDate').val(),re:(d3.select('#ct-assignRel')[0][0])?$('#ct-assignRel').val():null,cy:(d3.select('#ct-assignCyc')[0][0])?$('#ct-assignCyc').val():null,det:d3.select('#ct-assignDetails').property('value')};
 	if(dNodes[pi].task){
 		tObj.id=dNodes[pi].task.id;
 		tObj.oid=dNodes[pi].task.oid;
@@ -156,16 +156,16 @@ var addTask = function(e){
 	Object.keys(tObj).forEach(function(k){if(tObj[k]==''||tObj[k]===undefined) tObj[k]=null;});
 	if(p.select('.ct-nodeTask')[0][0]==null) p.append('image').attr('class','ct-nodeTask').attr('xlink:href','images_mindmap/node-task-assigned.png').attr('x',29).attr('y',-10);
 	if(nType=="modules"){
-		dNodes[pi].task={id:tObj.id,oid:tObj.oid,task:tObj.t,assignedTo:tObj.at,startDate:tObj.sd,endDate:tObj.ed,release:tObj.re,cycle:tObj.cy,details:tObj.det,parent:(tObj.parent!=null)?tObj.parent:null};
+		dNodes[pi].task={id:tObj.id,oid:tObj.oid,task:tObj.t,assignedTo:tObj.at,startDate:tObj.sd,endDate:tObj.ed,release:tObj.re,cycle:tObj.cy,details:tObj.det,parent:(tObj.parent!=null)?tObj.parent:[dNodes[pi].id_c]};
 		if(dNodes[pi].children) dNodes[pi].children.forEach(function(tSc){
 			tSc.children.forEach(function(scr){
 				if(scr.task===undefined||scr.task==null){
-					scr.task={id:null,oid:null,task:"Scrape",assignedTo:tObj.at,reviewer:null,startDate:tObj.sd,endDate:tObj.ed,details:tObj.det,parent:[pi,tSc.id]};
+					scr.task={id:null,oid:null,task:"Scrape",assignedTo:tObj.at,reviewer:null,startDate:tObj.sd,endDate:tObj.ed,details:tObj.det,parent:[dNodes[pi].id_c,tSc.id_c,scr.id_c]};
 					d3.select('#ct-node-'+scr.id).append('image').attr('class','ct-nodeTask').attr('xlink:href','images_mindmap/node-task-assigned.png').attr('x',29).attr('y',-10);
 				}
 				scr.children.forEach(function(tCa){
 					if(tCa.task===undefined||tCa.task==null){
-						tCa.task={id:null,oid:null,task:"Design",assignedTo:tObj.at,reviewer:null,startDate:tObj.sd,endDate:tObj.ed,details:tObj.det,parent:[pi,tSc.id,scr.id]};
+						tCa.task={id:null,oid:null,task:"Design",assignedTo:tObj.at,reviewer:null,startDate:tObj.sd,endDate:tObj.ed,details:tObj.det,parent:[dNodes[pi].id_c,tSc.id_c,scr.id_c,tCa.id_c]};
 						d3.select('#ct-node-'+tCa.id).append('image').attr('class','ct-nodeTask').attr('xlink:href','images_mindmap/node-task-assigned.png').attr('x',29).attr('y',-10);
 					}
 				});
@@ -173,8 +173,8 @@ var addTask = function(e){
 		});
 	}
 	else if(nType=="screens"){
-		var modid=dNodes[pi].parent.parent.id,tscid=dNodes[pi].parent.id;
-		dNodes[pi].task={id:tObj.id,oid:tObj.oid,task:tObj.t,assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,details:tObj.det,parent:(tObj.parent!=null)?tObj.parent:[modid,tscid]};
+		var modid=dNodes[pi].parent.parent.id_c,tscid=dNodes[pi].parent.id_c,scrid=dNodes[pi].id_c;
+		dNodes[pi].task={id:tObj.id,oid:tObj.oid,task:tObj.t,assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,details:tObj.det,parent:(tObj.parent!=null)?tObj.parent:[modid,tscid,scrid]};
 		if(dNodes[pi].children) dNodes[pi].children.forEach(function(tCa){
 			var cTask=(tObj.t=="Scrape"||tObj.t=="Append"||tObj.t=="Compare")? "Design":"Debug";
 			if(tCa.task===undefined||tCa.task==null){
@@ -184,62 +184,12 @@ var addTask = function(e){
 		});
 	}
 	else if(nType=="testcases"){
-		var modid=dNodes[pi].parent.parent.parent.id,tscid=dNodes[pi].parent.parent.id,scrid=dNodes[pi].parent.id;
-		dNodes[pi].task={id:tObj.id,oid:tObj.oid,task:tObj.t,assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,details:tObj.det,parent:(tObj.parent!=null)?tObj.parent:[modid,tscid,scrid]};
+		var modid=dNodes[pi].parent.parent.parent.id_c,tscid=dNodes[pi].parent.parent.id_c,scrid=dNodes[pi].parent.id_c;var tcid=dNodes[pi].id_c;
+		dNodes[pi].task={id:tObj.id,oid:tObj.oid,task:tObj.t,assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,details:tObj.det,parent:(tObj.parent!=null)?tObj.parent:[modid,tscid,scrid,tcid]};
 	}
 };
 
-var addTask_old = function(e){
-	d3.select('#ct-assignBox').classed('no-disp',!0);
-	var a,b,p=d3.select(activeNode);
-	var pi=parseInt(p.attr('id').split('-')[2]);
-	var nType=p.attr('data-nodetype');
-	var tObj={t:d3.select('#ct-assignTask').html(),at:d3.select('#ct-assignTo').html(),rw:(d3.select('#ct-assignRevw')[0][0])?d3.select('#ct-assignRevw').html():null,sd:d3.select('#ct-assignStart').html(),ed:d3.select('#ct-assignEnd').html(),re:(d3.select('#ct-assignRel')[0][0])?d3.select('#ct-assignRel').html():null,cy:(d3.select('#ct-assignCyc')[0][0])?d3.select('#ct-assignCyc').html():null,det:d3.select('#ct-assignDetails').property('value')};
-	if(dNodes[pi].task){
-		tObj.id=dNodes[pi].task.id;
-		tObj.oid=dNodes[pi].task.oid;
-		tObj.parent=dNodes[pi].task.parent;
-	}
-	else {
-		tObj.id=null;
-		tObj.oid=null;
-		tObj.parent=null;
-	}
-	Object.keys(tObj).forEach(function(k){if(tObj[k]==''||tObj[k]===undefined) tObj[k]=null;});
-	if(p.select('.ct-nodeTask')[0][0]==null) p.append('image').attr('class','ct-nodeTask').attr('xlink:href','images_mindmap/node-task-assigned.png').attr('x',29).attr('y',-10);
-	if(nType=="modules"){
-		dNodes[pi].task={id:tObj.id,oid:tObj.oid,task:tObj.t,assignedTo:tObj.at,startDate:tObj.sd,endDate:tObj.ed,release:tObj.re,cycle:tObj.cy,details:tObj.det,parent:(tObj.parent!=null)?tObj.parent:null};
-		if(dNodes[pi].children) dNodes[pi].children.forEach(function(tSc){
-			tSc.children.forEach(function(scr){
-				if(scr.task===undefined||scr.task==null){
-					scr.task={id:null,oid:null,task:"Scrape",assignedTo:tObj.at,reviewer:null,startDate:tObj.sd,endDate:tObj.ed,details:tObj.det,parent:[pi,tSc.id]};
-					d3.select('#ct-node-'+scr.id).append('image').attr('class','ct-nodeTask').attr('xlink:href','images_mindmap/node-task-assigned.png').attr('x',29).attr('y',-10);
-				}
-				scr.children.forEach(function(tCa){
-					if(tCa.task===undefined||tCa.task==null){
-						tCa.task={id:null,oid:null,task:"Design",assignedTo:tObj.at,reviewer:null,startDate:tObj.sd,endDate:tObj.ed,details:tObj.det,parent:[pi,tSc.id,scr.id]};
-						d3.select('#ct-node-'+tCa.id).append('image').attr('class','ct-nodeTask').attr('xlink:href','images_mindmap/node-task-assigned.png').attr('x',29).attr('y',-10);
-					}
-				});
-			});
-		});
-	}
-	else if(nType=="screens"){
-		var modid=dNodes[pi].parent.parent.id,tscid=dNodes[pi].parent.id;
-		dNodes[pi].task={id:tObj.id,oid:tObj.oid,task:tObj.t,assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,details:tObj.det,parent:(tObj.parent!=null)?tObj.parent:[modid,tscid]};
-		if(dNodes[pi].children) dNodes[pi].children.forEach(function(tCa){
-			var cTask=(tObj.t=="Scrape"||tObj.t=="Append"||tObj.t=="Compare")? "Design":"Debug";
-			if(tCa.task===undefined||tCa.task==null){
-				tCa.task={id:null,oid:null,task:cTask,assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,details:tObj.det,parent:[modid,tscid,pi]};
-				d3.select('#ct-node-'+tCa.id).append('image').attr('class','ct-nodeTask').attr('xlink:href','images_mindmap/node-task-assigned.png').attr('x',29).attr('y',-10);
-			}
-		});
-	}
-	else if(nType=="testcases"){
-		var modid=dNodes[pi].parent.parent.parent.id,tscid=dNodes[pi].parent.parent.id,scrid=dNodes[pi].parent.id;
-		dNodes[pi].task={id:tObj.id,oid:tObj.oid,task:tObj.t,assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,details:tObj.det,parent:(tObj.parent!=null)?tObj.parent:[modid,tscid,scrid]};
-	}
-};
+
 
 var nodeClick = function(e){
 	e=e||window.event;
@@ -263,8 +213,10 @@ var nodeClick = function(e){
 	w.append('button').attr('class','ct-asValBoxIcon btn dropdown-toggle').attr('data-toggle','dropdown').append('span').attr('class','caret');
 	f=w.append('ul').attr('class','ct-asValOptBox dropdown-menu');
 	taskAssign[t].task.forEach(function(tsk){f.append('li').html(tsk).on('click',function(e){d3.select(this.parentElement.parentElement).select('.ct-asValBox').select('a').html(this.innerHTML);});});
+	var default_releaseid='';
 	taskAssign[t].attributes.forEach(function(tk){
 		v=u.append('li');
+		
 		if(tk=='at'){
 			
 			var result1 = {};
@@ -321,19 +273,36 @@ var nodeClick = function(e){
 		// 	w.append('button').attr('class','ct-asValBoxIcon btn dropdown-toggle').attr('data-toggle','dropdown').append('span').attr('class','caret');
 		// 	f=w.append('ul').attr('class','ct-asValOptBox dropdown-menu');
 		 }
-		else if(tk=='sd'){
+				else if(tk=='sd'){
 			v.append('span').attr('class','ct-assignItem fl-left').html('Start Date');
-			w=v.append('div').attr('class','ct-assignItem btn-group dropdown fl-right');
-			w.append('button').attr('class','ct-asValBox btn dropdown-toggle').attr('data-toggle','dropdown').append('a').attr('id','ct-assignStart').html(tObj.sd);
-			w.append('button').attr('class','ct-asValBoxIcon ct-asItemCal btn dropdown-toggle').attr('data-toggle','dropdown').append('img').attr('src','images_mindmap/ic-datepicker.png').attr('alt','calIcon');
-			f=w.append('ul').attr('class','ct-asValCalBox dropdown-menu');
+			w=v.append('div').attr('class','ct-assignItem btn-group dropdown fl-right dateBoxSd');
+			// w.append('input').attr('class','ct-asValBox btn dropdown-toggle').attr('data-toggle','dropdown').append('a').attr('id','ct-assignStart').html(tObj.sd);
+			// w.append('button').attr('class','ct-asValBoxIcon ct-asItemCal btn dropdown-toggle').attr('data-toggle','dropdown').append('img').attr('src','images_mindmap/ic-datepicker.png').attr('alt','calIcon');
+			w.append('input').attr('class', 'datepicker').attr('id','startDate');
+		    //$("img[src='images_mindmap/ic-datepicker.png']:not(.dateIcon)").remove();
+			$(".dateBoxSd").append("<img class='dateIcon' src='images_mindmap/ic-datepicker.png' />").attr('alt','calIcon');
+			$('#startDate').datepicker({
+						 format: "dd/mm/yyyy",
+                         autoclose: true
+					});
+			f=w.append('ul').attr('class','ct-asValCalBox dropdown-menu');//.on('click',$('.ct-asValBoxIcon.ct-asItemCal.btn.dropdown-toggle').datepicker());
+			$("#startDate").val(tObj.sd);
+							
 		}
 		else if(tk=='ed'){
 			v.append('span').attr('class','ct-assignItem fl-left').html('End Date');
-			w=v.append('div').attr('class','ct-assignItem btn-group dropdown fl-right');
-			w.append('button').attr('class','ct-asValBox btn dropdown-toggle').attr('data-toggle','dropdown').append('a').attr('id','ct-assignEnd').html(tObj.ed);
-			w.append('button').attr('class','ct-asValBoxIcon ct-asItemCal btn dropdown-toggle').attr('data-toggle','dropdown').append('img').attr('src','images_mindmap/ic-datepicker.png').attr('alt','calIcon');
-			f=w.append('ul').attr('class','ct-asValCalBox dropdown-menu');
+			$(".fl-right").append("<img src='images_mindmap/ic-datepicker.png' />").attr('alt','calIcon');
+			w=v.append('div').attr('class','ct-assignItem btn-group dropdown fl-right dateBoxEd');
+			//w.append('button').attr('class','ct-asValBox btn dropdown-toggle').attr('data-toggle','dropdown').append('a').attr('id','ct-assignEnd').html(tObj.ed);
+			//w.append('button').attr('class','ct-asValBoxIcon ct-asItemCal btn dropdown-toggle').attr('data-toggle','dropdown').append('img').attr('src','images_mindmap/ic-datepicker.png').attr('alt','calIcon');
+			w.append('input').attr('class', 'datepicker').attr('id','endDate');
+			$(".dateBoxEd").append("<img class='dateIcon' src='images_mindmap/ic-datepicker.png' />").attr('alt','calIcon');
+			    $('#endDate').datepicker({
+						 format: "dd/mm/yyyy",
+                         autoclose: true
+					});
+			f=w.append('ul').attr('class','ct-asValCalBox dropdown-menu');//.on('click',$('.ct-asValBoxIcon.ct-asItemCal.btn.dropdown-toggle').datepicker());
+			$("#endDate").val(tObj.ed);
 		}
 		else if(tk=='re'){
 			var result1 = {};
@@ -341,44 +310,75 @@ var nodeClick = function(e){
 					var d = v.append('select').attr('id','ct-assignRel');
 					$('#ct-assignRel').append("<option value='select release' select=selected>"+"Select release"+"</option>");
 					dataSender({task:'populateReleases',projectId:'d4965851-a7f1-4499-87a3-ce53e8bf8e66'},function(err,result){
-						if(err){ console.log(result);callback(null,err);}
+						if(err){ releaseResult=err;console.log(result);callback(null,err);}
+						
 						else{
+							
 							result1=JSON.parse(result);
+							releaseResult = result1;
+							default_releaseid=result1.r_ids[0];
+							console.log('In rel ',default_releaseid);
 							for(i=0; i<result1.r_ids.length && result1.rel.length; i++){
 								$('#ct-assignRel').append("<option data-id='"+result1.rel[i]+"' value='"+result1.r_ids[i]+"'>"+result1.rel[i]+"</option>");
 							}
 							$("#ct-assignRel option[value='" + tObj.re + "']").attr('selected', 'selected'); 
+								var result2 = {};
+							v.append('span').attr('class','ct-assignItem fl-left').html('Cycle');
+							var d = v.append('select').attr('id','ct-assignCyc');
+							$('#ct-assignCyc').append("<option value='select cycle' select=selected>"+"Select cycle"+"</option>");
+							//'46974ffa-d02a-49d8-978d-7da3b2304255'
+							dataSender({task:'populateCycles',relId:default_releaseid},function(err,result){
+								console.log('In CYC ',default_releaseid);
+								if(err){ 
+									console.log('In CYC2222 ',default_releaseid);
+									console.log(result);
+									callback(null,err);
+								}
+								else{
+									result2=JSON.parse(result);
+									for(i=0; i<result2.c_ids.length && result2.cyc.length; i++){
+										$('#ct-assignCyc').append("<option data-id='"+result2.cyc[i]+"' value='"+result2.c_ids[i]+"'>"+result2.cyc[i]+"</option>");
+									}
+									$("#ct-assignCyc option[value='" + tObj.cy + "']").attr('selected', 'selected'); 
+								}
+								
+							});
+							
 						}
+
+
 						
 					});
+					
+					
 
-			// v.append('span').attr('class','ct-assignItem fl-left').html('Release');
-			// w=v.append('div').attr('class','ct-assignItem btn-group dropdown fl-right');
-			// w.append('button').attr('class','ct-asValBox btn dropdown-toggle').attr('data-toggle','dropdown').append('a').attr('id','ct-assignRel').html(tObj.re);
-			// w.append('button').attr('class','ct-asValBoxIcon btn dropdown-toggle').attr('data-toggle','dropdown').append('span').attr('class','caret');
-			// f=w.append('ul').attr('class','ct-asValOptBox dropdown-menu');
 		}
 		else if(tk=='cy'){
-			var result1 = {};
-			v.append('span').attr('class','ct-assignItem fl-left').html('Cycle');
-					var d = v.append('select').attr('id','ct-assignCyc');
-					$('#ct-assignCyc').append("<option value='select cycle' select=selected>"+"Select cycle"+"</option>");
-					dataSender({task:'populateCycles',relId:'46974ffa-d02a-49d8-978d-7da3b2304255'},function(err,result){
-						if(err){ console.log(result);callback(null,err);}
-						else{
-							result1=JSON.parse(result);
-							for(i=0; i<result1.c_ids.length && result1.cyc.length; i++){
-								$('#ct-assignCyc').append("<option data-id='"+result1.c_ids[i]+"' value='"+result1.cyc[i]+"'>"+result1.cyc[i]+"</option>");
-							}
-							$("#ct-assignCyc option[value='" + tObj.cy + "']").attr('selected', 'selected'); 
-						}
-						
-					});
+			// var result2 = {};
 			// v.append('span').attr('class','ct-assignItem fl-left').html('Cycle');
-			// w=v.append('div').attr('class','ct-assignItem btn-group dropdown fl-right');
-			// w.append('button').attr('class','ct-asValBox btn dropdown-toggle').attr('data-toggle','dropdown').append('a').attr('id','ct-assignCyc').html(tObj.cy);
-			// w.append('button').attr('class','ct-asValBoxIcon btn dropdown-toggle').attr('data-toggle','dropdown').append('span').attr('class','caret');
-			// f=w.append('ul').attr('class','ct-asValOptBox dropdown-menu');
+			// 		var d = v.append('select').attr('id','ct-assignCyc');
+			// 		$('#ct-assignCyc').append("<option value='select cycle' select=selected>"+"Select cycle"+"</option>");
+			// 		//'46974ffa-d02a-49d8-978d-7da3b2304255'
+			// 		alert('hjiiii',releaseResult);
+			// 		dataSender({task:'populateCycles',relId:default_releaseid},function(err,result){
+			// 			console.log('In CYC ',default_releaseid);
+			// 			if(err){ 
+			// 				console.log('In CYC2222 ',default_releaseid);
+			// 				console.log(result);
+			// 				callback(null,err);
+			// 			}
+			// 			else{
+			// 				result2=JSON.parse(result);
+			// 				for(i=0; i<result2.c_ids.length && result2.cyc.length; i++){
+			// 					$('#ct-assignCyc').append("<option data-id='"+result2.cyc[i]+"' value='"+result2.c_ids[i]+"'>"+result2.cyc[i]+"</option>");
+			// 				}
+			// 				$("#ct-assignCyc option[value='" + tObj.cy + "']").attr('selected', 'selected'); 
+			// 			}
+						
+			// 		});
+
+
+			
 		}
 	});
 	//var cSize=getElementDimm(c);
