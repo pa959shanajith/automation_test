@@ -11,10 +11,10 @@
 			<div ng-if="getScreenView == 'Web'" id="left-top-section" class="webScreenView">
 				<ul>
 					<li><span><a class='scrapeOnTxt'>Scrape On</a></span></li>
-					<li><a href='#' data-toggle="tooltip" title="Launch Internet Explorer" ng-class="enbledChecked ? 'enableActions' : 'disableActions'" ng-click="initScraping($event, 'ie'); $event.preventDefault(); $event.stopPropagation();"><span><img src='imgs/ic-ie.png' alt='Internet Explorer' /></span>Internet Explorer</a></li>
-					<li><a href='#' data-toggle="tooltip" title="Launch Google Chrome" ng-class="enbledChecked ? 'enableActions' : 'disableActions'" ng-click="initScraping($event, 'chrome'); $event.preventDefault(); $event.stopPropagation();"><span><img src='imgs/ic-chrome.png' alt='Google Chrome' /></span>Google Chrome</a></li>
-					<li><a href='#' data-toggle="tooltip" title="Launch Mozilla Firefox" ng-class="enbledChecked ? 'enableActions' : 'disableActions'" ng-click="initScraping($event, 'mozilla'); $event.preventDefault(); $event.stopPropagation();"><span><img src='imgs/ic-mozilla.png' alt='Mozilla Firefox' /></span>Mozilla Firefox</a></li>
-					<li class="last" data-toggle="tooltip" title="Enable Append"><span style="margin-bottom:-5px"><input ng-model="enbledChecked" id="enableAppend" type='checkbox' value=""></span><label for="enableAppend">Append</label></li>
+					<li><a href='#'  title="Launch Internet Explorer" ng-class="enbledChecked ? 'enableActions' : 'disableActions'" ng-click="initScraping($event, 'ie'); $event.preventDefault(); $event.stopPropagation();"><span><img src='imgs/ic-ie.png' alt='Internet Explorer' /></span>Internet Explorer</a></li>
+					<li><a href='#'  title="Launch Google Chrome" ng-class="enbledChecked ? 'enableActions' : 'disableActions'" ng-click="initScraping($event, 'chrome'); $event.preventDefault(); $event.stopPropagation();"><span><img src='imgs/ic-chrome.png' alt='Google Chrome' /></span>Google Chrome</a></li>
+					<li><a href='#'  title="Launch Mozilla Firefox" ng-class="enbledChecked ? 'enableActions' : 'disableActions'" ng-click="initScraping($event, 'mozilla'); $event.preventDefault(); $event.stopPropagation();"><span><img src='imgs/ic-mozilla.png' alt='Mozilla Firefox' /></span>Mozilla Firefox</a></li>
+					<li class="last"  title="Enable Append"><span style="margin-bottom:-5px"><input ng-model="enbledChecked" id="enableAppend" type='checkbox' value=""></span><label for="enableAppend">Append</label></li>
 				</ul>
 			</div>
 			<!-- Apptype Web -->
@@ -23,8 +23,8 @@
 			<div ng-if="getScreenView == 'Desktop'" id="left-top-section" class="ApptypeScreenView">
 				<ul>
 					<li><span><a class='scrapeOnTxt'>Scrape On</a></span></li>
-					<li><a href='#' data-toggle="tooltip" title="Desktop Apps" ng-class="enbledChecked ? 'enableActions' : 'disableActions'" data-toggle="modal" ng-click="initScrape($event); $event.preventDefault(); $event.stopPropagation();"><span><img src='imgs/ic-desktop.png' alt='Desktop Apps' /></span>Desktop Apps</a></li>
-					<li class="last" data-toggle="tooltip" title="Append Objects"><span style="margin-bottom:-5px"><input ng-model="enbledChecked" id="enableAppend" type='checkbox' value=""></span><label for="enableAppend">Append</label></li>
+					<li><a href='#'  title="Desktop Apps" ng-class="enbledChecked ? 'enableActions' : 'disableActions'" data-toggle="modal" ng-click="initScrape($event); $event.preventDefault(); $event.stopPropagation();"><span><img src='imgs/ic-desktop.png' alt='Desktop Apps' /></span>Desktop Apps</a></li>
+					<li class="last"  title="Append Objects"><span style="margin-bottom:-5px"><input ng-model="enbledChecked" id="enableAppend" type='checkbox' value=""></span><label for="enableAppend">Append</label></li>
 				</ul>
 			</div>
 			<!-- Apptype Desktop -->
@@ -33,8 +33,8 @@
 			<div ng-if="getScreenView == 'DesktopJava'" id="left-top-section" class="ApptypeScreenView">
 				<ul>
 					<li><span><a class='scrapeOnTxt'>Scrape On</a></span></li>
-					<li><a href='#' data-toggle="tooltip" title="OEBS Apps" ng-class="enbledChecked ? 'enableActions' : 'disableActions'" data-toggle="modal" ng-click="initScrape($event); $event.preventDefault(); $event.stopPropagation();"><span><img src='imgs/ic-desktop.png' alt='OEBS Apps' /></span>OEBS Apps</a></li>
-					<li class="last" data-toggle="tooltip" title="Append Objects"><span style="margin-bottom:-5px"><input ng-model="enbledChecked" id="enableAppend" type='checkbox' value=""></span><label for="enableAppend">Append</label></li>
+					<li><a href='#'  title="OEBS Apps" ng-class="enbledChecked ? 'enableActions' : 'disableActions'" data-toggle="modal" ng-click="initScrape($event); $event.preventDefault(); $event.stopPropagation();"><span><img src='imgs/ic-desktop.png' alt='OEBS Apps' /></span>OEBS Apps</a></li>
+					<li class="last"  title="Append Objects"><span style="margin-bottom:-5px"><input ng-model="enbledChecked" id="enableAppend" type='checkbox' value=""></span><label for="enableAppend">Append</label></li>
 				</ul>
 			</div>
 			<!-- Apptype OEBS -->
@@ -43,8 +43,8 @@
 			<div ng-if="getScreenView == 'Mobility'" id="left-top-section" class="ApptypeScreenView">
 				<ul>
 					<li><span><a class='scrapeOnTxt'>Scrape On</a></span></li>
-					<li><a href='#' data-toggle="tooltip" title="Android Apps" ng-class="enbledChecked ? 'enableActions' : 'disableActions'" data-toggle="modal" ng-click="initScrape($event); $event.preventDefault(); $event.stopPropagation();"><span><img src='imgs/ic-mobility.png' alt='Mobile Apps' /></span>Android Apps</a></li>
-					<li class="last" data-toggle="tooltip" title="Append Objects"><span style="margin-bottom:-5px"><input ng-model="enbledChecked" id="enableAppend" type='checkbox' value=""></span><label for="enableAppend">Append</label></li>
+					<li><a href='#'  title="Android Apps" ng-class="enbledChecked ? 'enableActions' : 'disableActions'" data-toggle="modal" ng-click="initScrape($event); $event.preventDefault(); $event.stopPropagation();"><span><img src='imgs/ic-mobility.png' alt='Mobile Apps' /></span>Android Apps</a></li>
+					<li class="last"  title="Append Objects"><span style="margin-bottom:-5px"><input ng-model="enbledChecked" id="enableAppend" type='checkbox' value=""></span><label for="enableAppend">Append</label></li>
 				</ul>
 			</div>
 			<!-- Apptype Mobilty -->
@@ -53,8 +53,8 @@
 			<div ng-if="getScreenView == 'mobileweb'" id="left-top-section" class="ApptypeScreenView">
 				<ul>
 					<li><span><a class='scrapeOnTxt'>Scrape On</a></span></li>
-					<li><a href='#' data-toggle="tooltip" title="Android Web" ng-class="enbledChecked ? 'enableActions' : 'disableActions'" data-toggle="modal" ng-click="initScrape($event); $event.preventDefault(); $event.stopPropagation();"><span><img src='imgs/ic-mobility.png' alt='Mobile Web' /></span>Android Web</a></li>
-					<li class="last" data-toggle="tooltip" title="Append Objects"><span style="margin-bottom:-5px"><input ng-model="enbledChecked" id="enableAppend" type='checkbox' value=""></span><label for="enableAppend">Append</label></li>
+					<li><a href='#'  title="Android Web" ng-class="enbledChecked ? 'enableActions' : 'disableActions'" data-toggle="modal" ng-click="initScrape($event); $event.preventDefault(); $event.stopPropagation();"><span><img src='imgs/ic-mobility.png' alt='Mobile Web' /></span>Android Web</a></li>
+					<li class="last"  title="Append Objects"><span style="margin-bottom:-5px"><input ng-model="enbledChecked" id="enableAppend" type='checkbox' value=""></span><label for="enableAppend">Append</label></li>
 				</ul>
 			</div>
 			<!-- Apptype Mobilty -->
@@ -63,8 +63,8 @@
 			<div style="border-bottom:0" ng-if="getScreenView == 'Webservice'" id="left-top-section" class="ApptypeScreenView">
 				<ul>
 					<li><span><a class='scrapeOnTxt'>Scrape On</a></span></li>
-					<li><a href='#' data-toggle="tooltip" title="Web Services" ng-class="enbledWS ? 'enableActionsWS' : 'disableActionsWS'" data-toggle="modal" ng-click="initScrapeWS($event); $event.preventDefault(); $event.stopPropagation();"><span><img src='imgs/ic-webservice.png' alt='Webservices' /></span>Web Services</a></li>
-					<li class="last" data-toggle="tooltip" title="Append Objects"><span style="margin-bottom:-5px"><input ng-model="enbledWS" id="enbledWS" type='checkbox' value=""></span><label for="enbledWS">Edit</label></li>
+					<li><a href='#'  title="Web Services" ng-class="enbledWS ? 'enableActionsWS' : 'disableActionsWS'" data-toggle="modal" ng-click="initScrapeWS($event); $event.preventDefault(); $event.stopPropagation();"><span><img src='imgs/ic-webservice.png' alt='Webservices' /></span>Web Services</a></li>
+					<li class="last"  title="Append Objects"><span style="margin-bottom:-5px"><input ng-model="enbledWS" id="enbledWS" type='checkbox' value=""></span><label for="enbledWS">Edit</label></li>
 				</ul>
 			</div>
 			<!-- Apptype Webservice -->
@@ -73,8 +73,8 @@
 
 			<div ng-class="getScreenView == 'Webservice' ? 'hideContainer' : 'showContainer'" id="left-bottom-section">
 				<ul>
-					<li><a ng-click="addObj()" href='#' data-toggle="tooltip" title="Add Objects"><span><img src='imgs/ic-addobject.png' alt='Add Object' /></span>Add Object</a></li>
-					<li><a ng-click="generateMapObj()" href='#' data-toggle="tooltip" title="Map Objects"><span><img src='imgs/ic-mapobject.png' alt='Map Object' /></span>Map Object</a></li>
+					<li><a ng-click="addObj()" href='#'  title="Add Objects"><span><img src='imgs/ic-addobject.png' alt='Add Object' /></span>Add Object</a></li>
+					<li><a ng-click="generateMapObj()" href='#'  title="Map Objects"><span><img src='imgs/ic-mapobject.png' alt='Map Object' /></span>Map Object</a></li>
 				</ul>
 			</div>
 		</div>
@@ -100,13 +100,13 @@
 					
 					<span class="wsdlInputButton wsdlSelectButton">
 						<select class="form-control wsldSelect" id="wsldSelect">
-							<option value>Select Method</option>
+							<option value disabled selected>Select Operation</option>
 						</select>
 					</span>
 				</div>
 				
 				<!-- Submit Task Button-->
-				<button class="btn btn-md pull-right submitTaskBtn submitTaskBtn-abs" ng-click="submitTasksScreen()" data-toggle="tooltip" title="Submit">Submit</button>
+				<button class="btn btn-md pull-right submitTaskBtn submitTaskBtn-abs" ng-click="submitTasksScreen()"  title="Submit">Submit</button>
 				<!-- Submit Task Button-->
 			</div>
 			<!-- Top -->
@@ -114,9 +114,9 @@
 			<!-- Middle -->
 			<div class="wsdlRow wsdlActions">
 				<div id="wsdlActionsButton">
-					<button ng-click="showWsdlRequest()" class="btn btn-xs btn-xs-custom pull-left" data-toggle="tooltip" title="Request">Request</button>
-					<button ng-click="showWsdlResponse()" class="btn btn-xs btn-xs-custom pull-left" data-toggle="tooltip" title="Response">Response</button>
-					<button ng-click="saveWS()" class="btn btn-xs btn-xs-custom pull-left saveWS" data-toggle="tooltip" title="Save">Save</button>
+					<button ng-click="showWsdlRequest()" id="showWsdlRequest" class="btn btn-xs btn-xs-custom pull-left"  title="Request">Request</button>
+					<button ng-click="showWsdlResponse()" id="showWsdlResponse" class="btn btn-xs btn-xs-custom pull-left"  title="Response">Response</button>
+					<button ng-click="saveWS()" class="btn btn-xs btn-xs-custom pull-left saveWS"  title="Save">Save</button>
 					<input ng-model="endPointURL" id="endPointURL" type="text" class="endPointURL form-control pull-left" placeholder="End Point URL"/>
 					<select ng-model="wsdlMethods" id="wsdlMethods" class="form-control wsdlMethods pull-left">
 						<option value="HTTP Method" selected>HTTP Method</option>
@@ -127,7 +127,7 @@
 						<option value="DELETE">DELETE</option>
 					</select>
 					<input id="wsdlOperation" ng-model="wsdlOperation" type="text" class="wsdlOperation form-control pull-left" placeholder="Operation"/>
-					<button style="padding: 2px 25px" class="btn btn-md pull-right" ng-click="wsdlAdd()" data-toggle="tooltip" title="Add">Add</button>
+					<button style="padding: 2px 25px" class="btn btn-md pull-right" ng-click="wsdlAdd()"  title="Add">Add</button>
 				</div>
 			</div>
 			<!-- Middle -->
@@ -153,7 +153,7 @@
 		<!-- Specificly Webservice Screen -->
 		
 		<!-- Submit Task Button-->
-		<button ng-class="getScreenView == 'Webservice' ? 'hideContainer' : 'showContainer'" class="btn btn-md pull-right submitTaskBtn" ng-click="submitTasksScreen()" data-toggle="tooltip" title="Submit Task">Submit</button>
+		<button ng-class="getScreenView == 'Webservice' ? 'hideContainer' : 'showContainer'" class="btn btn-md pull-right submitTaskBtn" ng-click="submitTasksScreen()"  title="Submit Task">Submit</button>
 		<!-- Submit Task Button-->
 
 		<!--Scrape Tree-->
@@ -166,7 +166,7 @@
 	<div id="right-dependencies-section">
 		<!--Images Blocks-->
 		<div ng-class="getScreenView == 'Webservice' ? 'hideContainer' : 'showContainer'" class="thumbnail thumbnail-custom">
-        	<a class="slidePopup" data-toggle="tooltip" title="Screenshot">
+        	<a class="slidePopup"  title="Screenshot">
           		<img class="thumb-ic" src="imgs/ic-screenshot.png" alt="Scrape Screenshot">
           		<div class="caption">
             		<p>Screenshot</p>
@@ -187,7 +187,7 @@
 
 		<!--Images Blocks-->
 		<div ng-class="getScreenView == 'Webservice' ? 'hideContainer' : 'showContainer'" class="thumbnail thumbnail-custom">
-        	<a class="slidePopup" data-toggle="tooltip" title="Filter">
+        	<a class="slidePopup"  title="Filter">
           		<img class="thumb-ic" src="imgs/ic-filter.png" alt="Filter Objects">
           		<div class="caption">
             		<p>Filter</p>
@@ -216,7 +216,7 @@
 
 		<!--Images Blocks-->
 		<div class="thumbnail thumbnail-custom">
-        	<a class="slidePopup" data-toggle="tooltip" title="Tasks">
+        	<a class="slidePopup"  title="Tasks">
           		<img class="thumb-ic" src="imgs/ic-task.png" alt="Tasks">
           		<div class="caption">
             		<p>Tasks</p>
@@ -239,7 +239,7 @@
 
 		<!--Images Blocks-->  		
 		<div class="thumbnail thumbnail-custom">
-        	<a class="slidePopup" data-toggle="tooltip" title="Info">
+        	<a class="slidePopup"  title="Info">
           		<img class="thumb-ic" src="imgs/ic-info.png" alt="Project Info">
           		<div class="caption">
             		<p>Info</p>
@@ -256,7 +256,7 @@
 
 		<!--Images Blocks-->
 		<div class="thumbnail thumbnail-custom thumbnail-custom-wiki">
-        	<a class="slide_popup slide_assist" href="#" data-toggle="tooltip" title="Assist">
+        	<a class="slide_popup slide_assist" href="#"  title="Assist">
           		<img class="thumb-ic" src="imgs/ic-assist.png" alt="Assist">
           		<div class="caption">
             		<p>Assist</p>
@@ -683,10 +683,10 @@
 	    <div class="modal-content">
 	      <div class="modal-header">
 	        <button type="button" class="close" data-dismiss="modal">&times;</button>
-	        <h4 class="modal-title">Debug Web Service</h4>
+	        <h4 class="modal-title">Data Retrieve</h4>
 	      </div>
 	      <div class="modal-body">
-	        <p>Web Service debug completed.</p>
+	        <p>Web Service response received successfully</p>
 	      </div>
 	      <div class="modal-footer">
 	        <button type="button" class="btn btn-default" data-dismiss="modal">Ok</button>
