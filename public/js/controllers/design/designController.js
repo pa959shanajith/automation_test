@@ -68,7 +68,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		screenName =  JSON.parse(window.localStorage['_CT']).screenName;
 		testCaseName = JSON.parse(window.localStorage['_CT']).testCaseName;
 		subTaskType = JSON.parse(window.localStorage['_CT']).subTaskType;
-		subTask = JSON.parse(window.localStorage['_CT']).subtask;
+		subTask = JSON.parse(window.localStorage['_CT']).subTask;
 		if(subTaskType == "Scrape" || subTask == "Scrape")
 		{
 			$(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">Project :</span><span class="content">'+projectDetails.projectname+'</span></p><p class="proj-info-wrap"><span class="content-label">Screen :</span><span class="content">'+screenName+'</span></p>')
@@ -1871,6 +1871,18 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			}
 
 		}, function(error){})
+		
+		if($("#window-filter").is(":visible")){
+			var filters = $(".popupContent-filter .filterObjects");
+			$.each(filters, function(){
+				if($(this).hasClass('popupContent-filter-active')){
+					$(this).removeClass('popupContent-filter-active').addClass("popupContent-default");
+				}
+			})
+			if($('.checkStyleboxFilter').is(':checked')){
+				$('.checkStyleboxFilter').prop('checked',false);
+			}
+		}
 
 	})
 
@@ -1956,6 +1968,9 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 									  mydata[i].remarks = $("#jqGrid tbody tr td:nth-child(10)")[i+1].textContent;
 								 }	 
 						     }
+						}
+						else{
+							mydata[i].remarks = $("#jqGrid tbody tr td:nth-child(10)")[i+1].textContent;
 						}
 						//check - keyword column should be mandatorily populated by User
 						if(mydata[i].custname == undefined || mydata[i].custname == ""){

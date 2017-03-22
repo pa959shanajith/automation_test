@@ -2749,7 +2749,7 @@ select:hover {
 	background-color: #ff7300;
 } */
 .reportboxselected{
-    background-color: #eee;
+    background-color: #f4f4f4;
 	border-radius: 5px;
 	-moz-border-radius: 5px;
     -webkit-border-radius: 5px;

@@ -30,16 +30,13 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 		ExecutionService.getReleaseNameByReleaseId_ICE(releaseId, projectId) 
 		  .then(function(data){
 			  releaseName = data;
+			  ExecutionService.getCycleNameByCycleId(cycleId, releaseId)
+				.then(function(data) {
+					cycleName = data;
+					$(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">Project :</span><span class="content">'+projectDetails.projectname+'</span></p><p class="proj-info-wrap"><span class="content-label">Release :</span><span class="content">'+releaseName+'</span></p><p class="proj-info-wrap"><span class="content-label">Cycle :</span><span class="content">'+cycleName+'</span></p><p class="proj-info-wrap"><span class="content-label">TestSuite :</span><span class="content">'+testSuiteName+'</span></p>')
+				}, 
+				function(error) {console.log("Error") })
 		  }, function(error) {	console.log("Failed to get release name")});
-		  
-		ExecutionService.getCycleNameByCycleId(cycleId, releaseId)
-		.then(function(data) {
-			cycleName = data;
-			$(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">Project :</span><span class="content">'+projectDetails.projectname+'</span></p><p class="proj-info-wrap"><span class="content-label">Release :</span><span class="content">'+releaseName+'</span></p><p class="proj-info-wrap"><span class="content-label">Cycle :</span><span class="content">'+cycleName+'</span></p><p class="proj-info-wrap"><span class="content-label">TestSuite :</span><span class="content">'+testSuiteName+'</span></p>')
-		}, 
-		function(error) {console.log("Error") })
-	
-	
 	}, 3000)
 	
 	//Global Information
