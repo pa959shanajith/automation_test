@@ -10,16 +10,16 @@
 			<div id="left-top-section" ng-if="getScreenView == 'Web' || getScreenView == 'Desktop' || getScreenView == 'Mobility' || getScreenView == 'Webservice'">
 				<ul>
 					<li><span><a class='scrapeOnTxt'>Execute On</a></span></li>
-					<li><a class="selectBrowser" data-name="3"><span><img src='imgs/ic-ie.png' alt='Internet Explorer' /></span>Internet Explorer</a></li>
-					<li><a class="selectBrowser" data-name="1"><span><img src='imgs/ic-chrome.png' alt='Google Chrome' /></span>Google Chrome</a></li>
-					<li style="margin-bottom: 30px"><a class="selectBrowser" data-name="2"><span><img src='imgs/ic-mozilla.png' alt='Mozilla Firefox' /></span>Mozilla Firefox</a></li>
+					<li><a class="selectBrowser" data-name="3"  title="Execute on IE"><span><img src='imgs/ic-ie.png' alt='Internet Explorer' /></span>Internet Explorer</a></li>
+					<li><a class="selectBrowser" data-name="1"  title="Execute on Chrome"><span><img src='imgs/ic-chrome.png' alt='Google Chrome' /></span>Google Chrome</a></li>
+					<li style="margin-bottom: 30px"><a class="selectBrowser" data-name="2"  title="Execute on Mozilla Firefox"><span><img src='imgs/ic-mozilla.png' alt='Mozilla Firefox' /></span>Mozilla Firefox</a></li>
 				</ul>
 			</div>
 			
 			<div id="left-top-section" ng-if="getScreenView == 'mobileweb'" class="ApptypeScreenView">
 				<ul>
 					<li><span><a class='scrapeOnTxt'>Execute On</a></span></li>
-					<li><a class="selectBrowser" data-name=""><span><img src='imgs/ic-chrome.png' alt='Google Chrome' /></span>Google Chrome</a></li>
+					<li><a class="selectBrowser" data-name=""  title="Execute on Chrome"><span><img src='imgs/ic-chrome.png' alt='Google Chrome' /></span>Google Chrome</a></li>
 				</ul>
 			</div>
 
@@ -27,7 +27,7 @@
 
 			<div id="left-bottom-section" class="lbs-single">
 				<ul>
-					<li><a href='/scheduling'><span><img src='imgs/ic-scheduling.png' alt='Scheduling' /></span>Schedule</a></li>
+					<li><a href='/scheduling'  title="Scheduling"><span><img src='imgs/ic-scheduling.png' alt='Scheduling' /></span>Schedule</a></li>
 				</ul>
 			</div>
 		</div>
@@ -46,11 +46,11 @@
 		<div id="pageContent">
 			<!-- Table Buttons -->
 			<div id="tableActionButtons">
-				<button class="btn btn-xs btn-xs-custom" ng-click="updateTestSuite()">Save</button>
-				<button disabled class="btn btn-xs btn-xs-custom">Configure</button>
-				<button class="btn btn-md pull-right submitTaskBtn" ng-click="submitTaskExecution()">Submit</button>
-				<button class="btn btn-md pull-right executeBtn" style="margin-right:10px" ng-click="ExecuteTestSuite()">Execute</button>
-				<button disabled class="btn btn-md pull-right scheduleBtn" style="margin-right:10px">Schedule</button>
+				<button class="btn btn-xs btn-xs-custom" ng-click="updateTestSuite()"  title="Save">Save</button>
+				<button disabled class="btn btn-xs btn-xs-custom"  title="Configure">Configure</button>
+				<button class="btn btn-md pull-right submitTaskBtn" ng-click="submitTaskExecution()"  title="Submit Task">Submit</button>
+				<button class="btn btn-md pull-right executeBtn" style="margin-right:10px" ng-click="ExecuteTestSuite()"  title="Execute">Execute</button>
+				<button disabled class="btn btn-md pull-right scheduleBtn" style="margin-right:10px"  title="Schedule">Schedule</button>
 			</div>
 			<!-- Table Buttons -->
 			
@@ -83,7 +83,7 @@
 	<div id="right-dependencies-section">
 		<!--Images Blocks-->
 		<div class="thumbnail thumbnail-custom">
-        	<a class="slidePopup">
+        	<a class="slidePopup"  title="Tasks">
           		<img class="thumb-ic" src="imgs/ic-task.png" alt="Tasks">
           		<div class="caption">
             		<p>Tasks</p>
@@ -106,7 +106,7 @@
 
 		<!--Images Blocks-->  		
 		<div class="thumbnail thumbnail-custom">
-        	<a class="slidePopup">
+        	<a class="slidePopup"  title="Info">
           		<img class="thumb-ic" src="imgs/ic-info.png" alt="Project Info">
           		<div class="caption">
             		<p>Info</p>
@@ -123,7 +123,7 @@
 
 		<!--Images Blocks-->
 		<div class="thumbnail thumbnail-custom thumbnail-custom-wiki">
-        	<a class="slide_popup slide_assist" href="#">
+        	<a class="slide_popup slide_assist" href="#"  title="Assist">
           		<img class="thumb-ic" src="imgs/ic-assist.png" alt="Assist">
           		<div class="caption">
             		<p>Assist</p>
@@ -259,7 +259,7 @@
 				<h4 class="modal-title">Execute Test Suite</h4>
 			</div>
 			<div class="modal-body">
-				<p>Execution completed successfully. <br /> Go to <a href="#">Reports</a></p>
+				<p>Execution completed successfully. <br /> Go to <a href="#" onclick="p_redirect('/p_Reports')">Reports</a></p>
 			</div>
 			<div class="modal-footer">
 				<button type="button" class="btn btn-default" data-dismiss="modal">Ok</button>

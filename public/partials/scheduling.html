@@ -10,9 +10,9 @@
 			<div id="left-top-section">
 				<ul>
 					<li><span><a class='scrapeOnTxt'>Schedule On</a></span></li>
-					<li><a class="selectBrowserSc"><span><img src='imgs/ic-ie.png' alt='Internet Explorer' /></span>Internet Explorer</a></li>
-					<li><a class="selectBrowserSc"><span><img src='imgs/ic-chrome.png' alt='Google Chrome' /></span>Google Chrome</a></li>
-					<li style="margin-bottom: 30px"><a class="selectBrowserSc"><span><img src='imgs/ic-mozilla.png' alt='Mozilla Firefox' /></span>Mozilla Firefox</a></li>
+					<li><a class="selectBrowserSc"  title="Schedule On IE"><span><img src='imgs/ic-ie.png' alt='Internet Explorer' /></span>Internet Explorer</a></li>
+					<li><a class="selectBrowserSc"  title="Schedule On Chrome"><span><img src='imgs/ic-chrome.png' alt='Google Chrome' /></span>Google Chrome</a></li>
+					<li style="margin-bottom: 30px"><a class="selectBrowserSc"  title="Schedule On Firefox"><span><img src='imgs/ic-mozilla.png' alt='Mozilla Firefox' /></span>Mozilla Firefox</a></li>
 				</ul>
 			</div>
 
@@ -20,7 +20,7 @@
 
 			<div id="left-bottom-section" class="lbs-single">
 				<ul>
-					<li><a href='/scheduling'><span><img src='imgs/ic-scheduling.png' alt='Scheduling' /></span>Schedule</a></li>
+					<li><a href='/scheduling'  title="Scheduling"><span><img src='imgs/ic-scheduling.png' alt='Scheduling' /></span>Schedule</a></li>
 				</ul>
 			</div>
 		</div>
@@ -43,8 +43,8 @@
 				<div id="scheduleSuitesTopSection">
 					<!-- Table Buttons -->
 					<div id="tableActionButtons">
-						<button class="btn btn-md pull-right submitTaskBtn" ng-click="submitTaskScheduling()">Submit</button>
-						<button class="btn btn-md pull-right btnAddToSchedule" style="margin-right:10px" ng-click="initSchedule()">Add</button>
+						<button class="btn btn-md pull-right submitTaskBtn" ng-click="submitTaskScheduling()"  title="Submit Task">Submit</button>
+						<button class="btn btn-md pull-right btnAddToSchedule" style="margin-right:10px" ng-click="initSchedule()"  title="Add">Add</button>
 					</div>
 					<!-- Table Buttons -->
 					
@@ -193,7 +193,7 @@
 	<div id="right-dependencies-section">
 		<!--Images Blocks-->
 		<div class="thumbnail thumbnail-custom">
-        	<a class="slidePopup">
+        	<a class="slidePopup"  title="Tasks">
           		<img class="thumb-ic" src="imgs/ic-task.png" alt="Tasks">
           		<div class="caption">
             		<p>Tasks</p>
@@ -216,7 +216,7 @@
 
 		<!--Images Blocks-->  		
 		<div class="thumbnail thumbnail-custom">
-        	<a class="slidePopup">
+        	<a class="slidePopup"  title="Info">
           		<img class="thumb-ic" src="imgs/ic-info.png" alt="Project Info">
           		<div class="caption">
             		<p>Info</p>
@@ -233,7 +233,7 @@
 
 		<!--Images Blocks-->
 		<div class="thumbnail thumbnail-custom thumbnail-custom-wiki">
-        	<a class="slide_popup slide_assist" href="#">
+        	<a class="slide_popup slide_assist" href="#"  title="Assist">
           		<img class="thumb-ic" src="imgs/ic-assist.png" alt="Assist">
           		<div class="caption">
             		<p>Assist</p>

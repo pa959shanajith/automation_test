@@ -68,7 +68,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		screenName =  JSON.parse(window.localStorage['_CT']).screenName;
 		testCaseName = JSON.parse(window.localStorage['_CT']).testCaseName;
 		subTaskType = JSON.parse(window.localStorage['_CT']).subTaskType;
-		subTask = JSON.parse(window.localStorage['_CT']).subtask;
+		subTask = JSON.parse(window.localStorage['_CT']).subTask;
 		if(subTaskType == "Scrape" || subTask == "Scrape")
 		{
 			$(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">Project :</span><span class="content">'+projectDetails.projectname+'</span></p><p class="proj-info-wrap"><span class="content-label">Screen :</span><span class="content">'+screenName+'</span></p>')
@@ -120,7 +120,9 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				// service call # 2 - objectType service call
 				DesignServices.getScrapeDataScreenLevel_ICE(screenId)
 				.then(function(data2)	{
-					if(appType == "Webservice") dataFormat12 = data2.header[0].split("##").join("\n");
+					if(appType == "Webservice") {
+						if(data2 != "") dataFormat12 = data2.header[0].split("##").join("\n");
+					}
 					custnameArr.length = 0;
 					// counter to append the items @ correct indexes of custnameArr
 					var indexCounter = '';
@@ -691,7 +693,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					$("#enableAppend").prop("disabled", false).css('cursor','pointer')
 				}
 				//console.log("response data: ", viewString);
-				$("#finalScrap").append("<div id='scrapTree' class='scrapTree'><ul><li><span class='parentObjContainer'><input title='Select all' type='checkbox' class='checkStylebox'><span class='parentObject'><a id='aScrapper'>Select all </a><button id='saveObjects' class='btn btn-xs btn-xs-custom objBtn' style='margin-left: 10px'>Save</button><button data-toggle='modal' id='deleteObjects' data-target='#deleteObjectsModal' class='btn btn-xs btn-xs-custom objBtn' style='margin-right: 0' disabled>Delete</button></span><span></span></span><ul id='scraplist' class='scraplistStyle'></ul></li></ul></div>");
+				$("#finalScrap").append("<div id='scrapTree' class='scrapTree'><ul><li><span class='parentObjContainer'><input title='Select all' type='checkbox' class='checkStylebox'><span class='parentObject'><a id='aScrapper'>Select all </a><button id='saveObjects' class='btn btn-xs btn-xs-custom objBtn' style='margin-left: 10px' data-toggle='tooltip' title='Save Objects'>Save</button><button data-toggle='modal' id='deleteObjects' data-target='#deleteObjectsModal' class='btn btn-xs btn-xs-custom objBtn' style='margin-right: 0' data-toggle='tooltip' title='Delete Objects' disabled>Delete</button></span><span></span></span><ul id='scraplist' class='scraplistStyle'></ul></li></ul></div>");
 				$("#saveObjects").attr('disabled', true);
 				var custN;
 				var imgTag;
@@ -773,18 +775,24 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 	
 	
 	//Get Webservice Data
+	$(".wsdlRqstWrap").show();
+	$("#showWsdlRequest").addClass("wsButtonActive")
+	
 	$scope.showWsdlRequest = function(){
 		$(".wsdlRqstWrap").show();
 		$(".wsdlRspnsWrap").hide();
+		$("#showWsdlRequest").addClass("wsButtonActive")
+		$("#showWsdlResponse").removeClass("wsButtonActive")
 	}
 
 	$scope.showWsdlResponse = function(){
 		$(".wsdlRspnsWrap").show();
 		$(".wsdlRqstWrap").hide();
+		$("#showWsdlResponse").addClass("wsButtonActive")
+		$("#showWsdlRequest").removeClass("wsButtonActive")
 	}
 
 	$scope.getWSData = function(){
-		$(".wsdlRqstWrap").show();
 		/*if($("#wsdlRequestHeader, #wsdlRequestBody").val().length > 0){
 			$(".saveWS").prop("disabled", true);
 			$("#enbledWS").prop("disabled", false);
@@ -875,7 +883,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 	
 	//Save Webservice Data
 	$scope.saveWS = function(){
-		$("#endPointURL, #wsdlMethods, #wsdlRequestHeader").removeClass("inputErrorBorder").removeClass("selectErrorBorder")
+		$("#endPointURL, #wsdlMethods, #wsdlRequestHeader").removeClass("inputErrorBorderFull").removeClass("selectErrorBorder")
 		var tasks = JSON.parse(window.localStorage['_CT']);
 		var endPointURL = $("#endPointURL").val();
 		var wsdlMethods = $("#wsdlMethods option:selected").val();
@@ -884,9 +892,9 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		var wsdlRequestBody = $("#wsdlRequestBody").val().replace(/[\n\r]/g,'').replace(/\s\s+/g, ' ').replace(/"/g, '\"');
 		var wsdlResponseHeader = $("#wsdlResponseHeader").val().replace(/[\n\r]/g,'##').replace(/"/g, '\"');
 		var wsdlResponseBody = $("#wsdlResponseBody").val().replace(/[\n\r]/g,'').replace(/\s\s+/g, ' ').replace(/"/g, '\"');
-		if(!endPointURL) $("#endPointURL").addClass("inputErrorBorder")
+		if(!endPointURL) $("#endPointURL").addClass("inputErrorBorderFull")
 		else if(!$scope.wsdlMethods && !wsdlMethods) $("#wsdlMethods").addClass("selectErrorBorder")
-		else if(!wsdlRequestHeader) $("#wsdlRequestHeader").addClass("inputErrorBorder")
+		else if(!wsdlRequestHeader) $("#wsdlRequestHeader").addClass("inputErrorBorderFull")
 		else{
 			var getWSData = {
 				"body": [wsdlRequestBody],
@@ -948,7 +956,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 	
 	//Init Webservice
 	$scope.initScrapeWS = function(e){
-		$("#endPointURL, #wsdlMethods, #wsdlRequestHeader").removeClass("inputErrorBorder").removeClass("selectErrorBorder")
+		$("#endPointURL, #wsdlMethods, #wsdlRequestHeader").removeClass("inputErrorBorderFull").removeClass("selectErrorBorder")
 		var initWSJson = {}
 		var testCaseWS = []
 		var appType = $scope.getScreenView;
@@ -959,11 +967,11 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		var wsdlRequestHeader = $("#wsdlRequestHeader").val().replace(/[\n\r]/g,'##').replace(/"/g, '\"');
 		var wsdlRequestBody = $("#wsdlRequestBody").val().replace(/[\n\r]/g,'').replace(/\s\s+/g, ' ').replace(/"/g, '\"');
 		if(e.currentTarget.className == "disableActionsWS") return false
-		else if(!endPointURL) $("#endPointURL").addClass("inputErrorBorder")
+		else if(!endPointURL) $("#endPointURL").addClass("inputErrorBorderFull")
 		else if(!$scope.wsdlMethods && !wsdlMethods) $("#wsdlMethods").addClass("selectErrorBorder")
-		else if(!wsdlRequestHeader) $("#wsdlRequestHeader").addClass("inputErrorBorder")
+		else if(!wsdlRequestHeader) $("#wsdlRequestHeader").addClass("inputErrorBorderFull")
 		else{
-			var blockMsg = "Web Service debug in progress..."
+			var blockMsg = "Fetching Response Header & Body..."
 			blockUI(blockMsg);
 			testCaseWS.push({
 				"stepNo": 1,
@@ -1039,11 +1047,11 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 						var jsonObj = JSON.parse(jsonStr);
 						var jsonPretty = JSON.stringify(jsonObj, null, '\t');
 						xml_neat2 = jsonPretty;
-						$("#wsdlResponseBody").val(jsonPretty)
+						$("#wsdlResponseBody").val(jsonPretty.replace(/\&gt;/g, '>').replace(/\&lt;/g, '<'))
 					}
 					else{
 						var getXML = formatXml(data.responseBody[0].replace(/>\s+</g,'><'));
-						$("#wsdlResponseBody").val(getXML)
+						$("#wsdlResponseBody").val(getXML.replace(/\&gt;/g, '>').replace(/\&lt;/g, '<'))
 					}
 				}
 				else{
@@ -1055,6 +1063,75 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		}
 	};
 	//Init Webservice
+	
+	//Launch WSDL Functionality
+	$scope.launchWSDLGo = function(){
+		var blockMsg = 'Please Wait...';
+		$("#wsldInput").removeClass("inputErrorBorderFull")
+		var wsdlUrl = $("#wsldInput").val()
+		if(!wsdlUrl) $("#wsldInput").addClass("inputErrorBorderFull")
+		else {
+			blockUI(blockMsg);
+			DesignServices.launchWSDLGo(wsdlUrl)
+			.then(function(data) {
+				console.log(data)
+				$("#wsldSelect").empty().append('<option value selected disabled>Select Operation</option>')
+				for(i=0; i<data.listofoperations.length; i++){
+					$("#wsldSelect").append('<option value="'+data.listofoperations[i]+'">'+data.listofoperations[i]+'</option>')
+				}
+				unblockUI()
+			}, 
+			function (error) { 
+				console.log("Error") 
+			});
+		}
+	}
+	//Launch WSDL Functionality
+	
+	//WSDL Add Functionality
+	$scope.wsdlAdd = function(){
+		$("#endPointURL, #wsdlOperation, #wsdlRequestHeader, #wsdlRequestBody, #wsdlResponseHeader, #wsdlResponseBody").val("");
+		$("#wsdlMethods").prop('selectedIndex', 0);
+		$("#wsldInput").removeClass("inputErrorBorderFull");
+		$("#wsldSelect").removeClass("selectErrorBorder");
+		var wsdlUrl = $("#wsldInput").val();
+		var wsdlSelectedMethod = $("#wsldSelect option:selected").val();
+		if(!wsdlUrl) $("#wsldInput").addClass("inputErrorBorderFull");
+		else if(!wsdlSelectedMethod) $("#wsldSelect").addClass("selectErrorBorder");
+		else{
+			DesignServices.wsdlAdd(wsdlUrl, wsdlSelectedMethod)
+			.then(function(data) {
+				if(typeof data === "object"){
+					//Printing the Save data in UI
+					$("#endPointURL").val(data.endPointURL);
+					$("#wsdlMethods option").each(function(){
+						if($(this).val() == data.method){
+							$(this).prop("selected", true)
+						}
+					})
+					$("#wsdlOperation").val(data.operations)
+					//Printing Request Data
+					$("#wsdlRequestHeader").val(data.header[0].split("##").join("\n"));
+					if(data.body[0].indexOf("{") == 0 || data.body[0].indexOf("[") == 0){
+						var jsonStr = data.body;
+						var jsonObj = JSON.parse(jsonStr);
+						var jsonPretty = JSON.stringify(jsonObj, null, '\t');
+						xml_neat2 = jsonPretty;
+						$("#wsdlRequestBody").val(jsonPretty)
+					}
+					else{
+						var getXML = formatXml(data.body[0].replace(/>\s+</g,'><'));
+						$("#wsdlRequestBody").val(getXML)
+					}
+					$(".saveWS").prop("disabled", false)
+				}
+			}, 
+			function (error) { 
+				console.log("Error") 
+			});
+		}
+	}
+	//WSDL Add Functionality
 	
 	
 	//Mobile Serial Number Keyup Function
@@ -1794,6 +1871,18 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			}
 
 		}, function(error){})
+		
+		if($("#window-filter").is(":visible")){
+			var filters = $(".popupContent-filter .filterObjects");
+			$.each(filters, function(){
+				if($(this).hasClass('popupContent-filter-active')){
+					$(this).removeClass('popupContent-filter-active').addClass("popupContent-default");
+				}
+			})
+			if($('.checkStyleboxFilter').is(':checked')){
+				$('.checkStyleboxFilter').prop('checked',false);
+			}
+		}
 
 	})
 
@@ -1879,6 +1968,9 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 									  mydata[i].remarks = $("#jqGrid tbody tr td:nth-child(10)")[i+1].textContent;
 								 }	 
 						     }
+						}
+						else{
+							mydata[i].remarks = $("#jqGrid tbody tr td:nth-child(10)")[i+1].textContent;
 						}
 						//check - keyword column should be mandatorily populated by User
 						if(mydata[i].custname == undefined || mydata[i].custname == ""){
@@ -1971,27 +2063,39 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 	
 	//Filter Scrape Objects
 	$(document).on("click", ".checkStyleboxFilter", function(){
+		cfpLoadingBar.start();
+		$("html").css({'cursor':'wait'});
 		gsElement = []
 		$(".popupContent-filter-active").each(function(){
 			gsElement.push($(this).data("tag"))
 		})
-		filter()
+		$timeout(function(){
+			filter()
+		}, 500);
 	})
 	$(document).on("click", ".selectAllTxt", function(){
+		cfpLoadingBar.start();
+		$("html").css({'cursor':'wait'});
 		gsElement = []
 		$(".popupContent-filter-active").each(function(){
 			gsElement.push($(this).data("tag"))
 		})
-		filter()
+		$timeout(function(){
+			filter()
+		}, 500);
 	})
 	$(document).on("click", ".filterObjects", function(){
+		cfpLoadingBar.start();
+		$("html").css({'cursor':'wait'});
 		$("#scraplist li").hide()
 		if($(this).hasClass("popupContent-filter-active") == false) {
 			var getSpliceIndex = gsElement.indexOf($(this).data("tag"))
 			gsElement.splice(getSpliceIndex, 1)
 		}
 		else gsElement.push($(this).data("tag"))	
-		filter()
+		$timeout(function(){
+			filter()
+		}, 500);
 	})
 	
 	function filter(){
@@ -2025,6 +2129,8 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		else{
 			$("#scraplist li").show()
 		}
+		$("html").css({'cursor':'auto'});
+		cfpLoadingBar.complete()
 	}
 	//Filter Scrape Objects
 }]);
@@ -2158,6 +2264,7 @@ function contentTable(newTestScriptDataLS) {
 			$("#jqGrid").jqGrid('clearGridData');
 			$("#jqGrid").jqGrid('setGridParam',{data: gridArrayData});
 			$("#jqGrid").trigger("reloadGrid");
+			$("#jqGrid").parent('div').css('height','auto');
 			//tsrows_reorder();
 		}
 	});

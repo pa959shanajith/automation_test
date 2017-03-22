@@ -141,6 +141,31 @@ mySPA.factory('DesignServices', ['$http','$q', function ($http, $httpProvider, $
 			},function(response){
 				return $q.reject(response.data)
 			})
+		},
+		
+		launchWSDLGo: function(wsdlUrl){
+			return $http.post('/debugTestCase_ICE',{
+				param : 'wsdlListGenerator_ICE',
+				wsdlurl: wsdlUrl
+			})
+			.then(function(response)  { 
+				return response.data
+			},function(response){
+				return $q.reject(response.data)
+			})
+		},
+		
+		wsdlAdd : function(wsdlUrl, wsdlSelectedMethod){
+			return $http.post('/debugTestCase_ICE',{
+				param : 'wsdlServiceGenerator_ICE',
+				wsdlurl: wsdlUrl,
+                method : wsdlSelectedMethod
+			})
+			.then(function(response)  { 
+				return response.data
+			},function(response){
+				return $q.reject(response.data)
+			})
 		}
 	}
 }]);
