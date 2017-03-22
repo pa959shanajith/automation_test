@@ -120,7 +120,9 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				// service call # 2 - objectType service call
 				DesignServices.getScrapeDataScreenLevel_ICE(screenId)
 				.then(function(data2)	{
-					if(appType == "Webservice") dataFormat12 = data2.header[0].split("##").join("\n");
+					if(appType == "Webservice") {
+						if(data2 != "") dataFormat12 = data2.header[0].split("##").join("\n");
+					}
 					custnameArr.length = 0;
 					// counter to append the items @ correct indexes of custnameArr
 					var indexCounter = '';
@@ -875,7 +877,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 	
 	//Save Webservice Data
 	$scope.saveWS = function(){
-		$("#endPointURL, #wsdlMethods, #wsdlRequestHeader").removeClass("inputErrorBorder").removeClass("selectErrorBorder")
+		$("#endPointURL, #wsdlMethods, #wsdlRequestHeader").removeClass("inputErrorBorderFull").removeClass("selectErrorBorder")
 		var tasks = JSON.parse(window.localStorage['_CT']);
 		var endPointURL = $("#endPointURL").val();
 		var wsdlMethods = $("#wsdlMethods option:selected").val();
@@ -884,9 +886,9 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		var wsdlRequestBody = $("#wsdlRequestBody").val().replace(/[\n\r]/g,'').replace(/\s\s+/g, ' ').replace(/"/g, '\"');
 		var wsdlResponseHeader = $("#wsdlResponseHeader").val().replace(/[\n\r]/g,'##').replace(/"/g, '\"');
 		var wsdlResponseBody = $("#wsdlResponseBody").val().replace(/[\n\r]/g,'').replace(/\s\s+/g, ' ').replace(/"/g, '\"');
-		if(!endPointURL) $("#endPointURL").addClass("inputErrorBorder")
+		if(!endPointURL) $("#endPointURL").addClass("inputErrorBorderFull")
 		else if(!$scope.wsdlMethods && !wsdlMethods) $("#wsdlMethods").addClass("selectErrorBorder")
-		else if(!wsdlRequestHeader) $("#wsdlRequestHeader").addClass("inputErrorBorder")
+		else if(!wsdlRequestHeader) $("#wsdlRequestHeader").addClass("inputErrorBorderFull")
 		else{
 			var getWSData = {
 				"body": [wsdlRequestBody],
@@ -1039,11 +1041,11 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 						var jsonObj = JSON.parse(jsonStr);
 						var jsonPretty = JSON.stringify(jsonObj, null, '\t');
 						xml_neat2 = jsonPretty;
-						$("#wsdlResponseBody").val(jsonPretty)
+						$("#wsdlResponseBody").val(jsonPretty.replace(/\&gt;/g, '>').replace(/\&lt;/g, '<'))
 					}
 					else{
 						var getXML = formatXml(data.responseBody[0].replace(/>\s+</g,'><'));
-						$("#wsdlResponseBody").val(getXML)
+						$("#wsdlResponseBody").val(getXML.replace(/\&gt;/g, '>').replace(/\&lt;/g, '<'))
 					}
 				}
 				else{
@@ -1058,17 +1060,20 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 	
 	//Launch WSDL Functionality
 	$scope.launchWSDLGo = function(){
+		var blockMsg = 'Please Wait...';
 		$("#wsldInput").removeClass("inputErrorBorderFull")
 		var wsdlUrl = $("#wsldInput").val()
 		if(!wsdlUrl) $("#wsldInput").addClass("inputErrorBorderFull")
 		else {
+			blockUI(blockMsg);
 			DesignServices.launchWSDLGo(wsdlUrl)
 			.then(function(data) {
 				console.log(data)
-				$("#wsldSelect").empty().append('<option value selected disabled>Select Operations</option>')
+				$("#wsldSelect").empty().append('<option value selected disabled>Select Operation</option>')
 				for(i=0; i<data.listofoperations.length; i++){
 					$("#wsldSelect").append('<option value="'+data.listofoperations[i]+'">'+data.listofoperations[i]+'</option>')
 				}
+				unblockUI()
 			}, 
 			function (error) { 
 				console.log("Error") 
