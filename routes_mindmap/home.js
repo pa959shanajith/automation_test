@@ -420,14 +420,14 @@ var parsing = function(d,urlData) {
 					//var modulename_json=sc.testsuiteName;
 					var testcaseDetails_json=scr.testcaseDetails;
 					//console.log(screenId_json,screenId_c_json);
-					qList_new.push({"statement":"MATCH (a:SCREENS) WHERE a.testScenarioID='"+testscenarioId_json+"' SET a.testScenarioID_c='"+testscenarioId_c_json+"'"});
+					qList_new.push({"statement":"MATCH (a:SCREENS) WHERE a.screenID='"+screenId_json+"' SET a.screenID_c='"+screenId_c_json+"'"});
 
 						testcaseDetails_json.forEach(function(tc,i){
 						var testcaseId_json=tc.testcaseId;
 						var testcaseId_c_json=tc.testcaseId_c;
 						var testcaseName_json=tc.testcaseName;
 						console.log(testcaseId_json,testcaseId_c_json);
-						qList_new.push({"statement":"MATCH (a:TESTCASES) WHERE a.testCaseID='"+testcaseId_json+"' SET a.testcaseId_c='"+testcaseId_c_json+"'"});
+						qList_new.push({"statement":"MATCH (a:TESTCASES) WHERE a.testCaseID='"+testcaseId_json+"' SET a.testCaseID_c='"+testcaseId_c_json+"'"});
 
 					});
 					
