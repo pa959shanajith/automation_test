@@ -140,7 +140,11 @@ exports.getScrapeDataScreenLevel_ICE = function(req, res){
 			" and projectid="+req.body.projectId+
 			" allow filtering ;";
 		fetchScrapedData(getScrapeDataQuery,function(getScrapeDataQueryerror,getScrapeDataQueryresponse){
-				res.send(getScrapeDataQueryresponse);
+				try{
+					res.send(getScrapeDataQueryresponse);
+				}catch(execption){
+					console.log(exception);
+				}
 		});
 };
 
@@ -392,11 +396,19 @@ exports.updateScreen_ICE = function(req, res){
 							finalFunction(scrapedObjects);
 						}else{
 							statusFlag="All objects are not edited.";
-							res.send(statusFlag);
+							try{
+								res.send(statusFlag);
+							}catch(execption){
+								console.log(exception);
+							}
 						}
 					}else{
 						statusFlag="Error occured in updateScreenData : Fail";
-						res.send(statusFlag);
+						try{
+							res.send(statusFlag);
+						}catch(execption){
+							console.log(exception);
+						}
 					}
 				});
 				editcallback;
@@ -489,11 +501,19 @@ exports.updateScreen_ICE = function(req, res){
 							finalFunction(scrapedObjects);	
 						}else{
 							statusFlag="All objects are not edited.";
-							res.send(statusFlag);
+							try{
+								res.send(statusFlag);
+							}catch(execption){
+								console.log(exception);
+							}
 						}
 					}else{
 						statusFlag="Error occured in updateScreenData : Fail";
-						res.send(statusFlag);
+						try{
+							res.send(statusFlag);
+						}catch(execption){
+							console.log(exception);
+						}
 					}
 				});
 				deletecallback;
@@ -511,7 +531,11 @@ exports.updateScreen_ICE = function(req, res){
 					// console.log(err);
 					statusFlag="Error occured in updateScreenData : Fail";
 					// console.log(err);
-					res.send(statusFlag);
+					try{
+						res.send(statusFlag);
+					}catch(execption){
+						console.log(exception);
+					}
 				}else{
 					if(param != 'updateScrapeData_ICE'){
 						async.waterfall([
@@ -529,7 +553,11 @@ exports.updateScreen_ICE = function(req, res){
 								dbConn.execute(testcaseDataQuery, function(testcaseDataQueryerr, testcaseDataQueryresult){
 									if(testcaseDataQueryerr){
 										statusFlag="Error occured in testcaseDataQuery : Fail";
-										res.send(statusFlag);
+										try{
+											res.send(statusFlag);
+										}catch(execption){
+											console.log(exception);
+										}
 									}else{
 										if(testcaseDataQueryresult.rows.length>0){
 											async.forEachSeries(testcaseDataQueryresult.rows,
@@ -598,12 +626,20 @@ exports.updateScreen_ICE = function(req, res){
 													" and testcasename='" + updatingtestcasename + 
 													"' and versionnumber = "+requestedversionnumber+" IF EXISTS;";
 												uploadTestCaseData(updateTestCaseQuery,function(error,response){
+													try{
 														res.send(response);
+													}catch(execption){
+														console.log(exception);
+													}
 												});
 											});
 										}else{
 											statusFlag = "success";
-											res.send(statusFlag);
+											try{
+												res.send(statusFlag);
+											}catch(execption){
+												console.log(exception);
+											}
 										}
 									}
 								});
@@ -612,7 +648,11 @@ exports.updateScreen_ICE = function(req, res){
 						]);
 					}else{
 					statusFlag = "success";
-					res.send(statusFlag);
+						try{
+							res.send(statusFlag);
+						}catch(execption){
+							console.log(exception);
+						}
 					}
 				}
 			});
@@ -748,7 +788,11 @@ exports.readTestCase_ICE = function (req, res) {
 	dbConn.execute(getTestCases, function (err, result) {
 		if (err) {
 			var flag = "Error in readTestCase_ICE : Fail";
-			res.send(flag);
+			try{
+				res.send(flag);
+			}catch(exception){
+				console.log(exception);
+			}
 		} else {
 			for (var i = 0; i < result.rows.length; i++) {
 				testcasesteps = result.rows[i].testcasesteps;
@@ -765,21 +809,37 @@ exports.readTestCase_ICE = function (req, res) {
 						responsedata.template = template;
 						responsedata.testcase = testcasesteps;
 						responsedata.testcasename = testcasename;
-						res.send(responsedata);
+						try{
+							res.send(responsedata);
+						}catch(exception){
+							console.log(exception);
+						}
 					}else{
 						//this is checked
 						responsedata = { template: "", testcase: testcasesteps, testcasename: testcasename }
-						res.send(responsedata);
+						try{
+							res.send(responsedata);
+						}catch(exception){
+							console.log(exception);
+						}
 					}
 				}else if((scrapedobjects == null || scrapedobjects == '' || scrapedobjects == undefined ) 
 						 && (testcasesteps != null && testcasesteps != '' || testcasesteps != undefined)){
 					//this is checked
 					responsedata = { template: "", testcase: testcasesteps, testcasename: testcasename }
-					res.send(responsedata);
+					try{
+						res.send(responsedata);
+					}catch(exception){
+						console.log(exception);
+					}
 				} else {
 					//this case is merely impossible in V2.0 as creation happens in MindMaps
 					responsedata = { template: "", testcase: "[]", testcasename: "" }
-					res.send(responsedata);
+					try{
+						res.send(responsedata);
+					}catch(exception){
+						console.log(exception);
+					}
 				}
 			});
 		}
@@ -826,7 +886,11 @@ exports.updateTestCase_ICE = function (req, res) {
 	dbConn.execute(checktestcaseexist, function (err, result) {
 		if (err) {
 			var flag = "Error in Query 1 testcaseexist: Fail";
-			res.send(flag);
+			try{
+				res.send(flag);
+			}catch(exception){
+				console.log(exception);
+			}
 		} else {
 			for (var i = 0; i < result.rows.length; i++) {
 				if (result.rows[i].testcaseid == requestedtestcaseid) {
@@ -885,7 +949,11 @@ exports.debugTestCase_ICE = function (req, res) {
 				dbConn.execute(getProjectTestcasedata, function (errgetTestcasedata, testcasedataresult) {
 					if (errgetTestcasedata) {
 						flag = "Error in getProjectTestcasedata : Fail";
-						res.send(flag);
+						try{
+							res.send(flag);
+						}catch(exception){
+							console.log(exception);
+						}
 					} else {
 						for (var ids = 0; ids < testcasedataresult.rows.length; ids++) {
 							responseobject.testcase = testcasedataresult.rows[ids].testcasesteps;
@@ -904,7 +972,11 @@ exports.debugTestCase_ICE = function (req, res) {
 								mySocket._events.result_debugTestCase = [];
 								mySocket.emit('debugTestCase',responsedata);
 								mySocket.on('result_debugTestCase', function (responsedata) {
-									res.send(responsedata);
+									try{
+										res.send(responsedata);
+									}catch(exception){
+										console.log(exception);
+									}
 								});
 							});
 						}
@@ -918,7 +990,11 @@ exports.debugTestCase_ICE = function (req, res) {
 			mySocket.emit('debugTestCase',testcaseWS);
 			mySocket.on('result_debugTestCaseWS', function (value) {
 				if(value.toUpperCase() === 'TERMINATE'){
-					res.send(value);
+					try{
+						res.send(value);
+					}catch(exception){
+						console.log(exception);
+					}
 				}else{
 					var responseData={
 							responseHeader:[],
@@ -930,20 +1006,36 @@ exports.debugTestCase_ICE = function (req, res) {
 						if(response.length == 2){
 							responseData.responseHeader.push(response[0]);
 							responseData.responseBody.push(response[1]);
-							res.send(responseData);
+							try{
+								res.send(responsedata);
+							}catch(exception){
+								console.log(exception);
+							}
 						}else if (response.length == 1){
 							responseData.responseHeader.push(response[0]);
 							responseData.responseBody.push("");
-							res.send(responseData);
+							try{
+								res.send(responsedata);
+							}catch(exception){
+								console.log(exception);
+							}
 						}else{
 							responseData.responseHeader.push("");
 							responseData.responseBody.push("");
-							res.send(responseData);
+							try{
+								res.send(responsedata);
+							}catch(exception){
+								console.log(exception);
+							}
 						}
 					}else{
 						responseData.responseHeader.push("Response Header - Fail");
 						responseData.responseBody.push("Response Body - Fail");
-						res.send(responseData);
+						try{
+							res.send(responsedata);
+						}catch(exception){
+							console.log(exception);
+						}
 					}
 				}
 			});
@@ -953,7 +1045,11 @@ exports.debugTestCase_ICE = function (req, res) {
 			mySocket.emit('wsdl_listOfOperation',wsdlurl);
 			mySocket.on('result_wsdl_listOfOperation', function (listGenResponse) {
 				if(listGenResponse.toUpperCase() === 'TERMINATE'){
-					res.send(listGenResponse);
+					try{
+						res.send(listGenResponse);
+					}catch(exception){
+						console.log(exception);
+					}
 				}else{
 					var responsedata={listofoperations:[]};
 					if(listGenResponse != "fail" && listGenResponse != undefined && listGenResponse != ""){
@@ -961,9 +1057,17 @@ exports.debugTestCase_ICE = function (req, res) {
 						listGenResponse=listGenResponse.replace(/'+/g,"\"");
 						var listGenResponse=JSON.parse(listGenResponse);
 						responsedata.listofoperations=listGenResponse;
-						res.send(responsedata);
+						try{
+							res.send(responsedata);
+						}catch(exception){
+							console.log(exception);
+						}
 					}else{
-						res.send(responsedata);
+						try{
+							res.send(responsedata);
+						}catch(exception){
+							console.log(exception);
+						}
 					}
 				}
 			});
@@ -986,7 +1090,15 @@ exports.debugTestCase_ICE = function (req, res) {
 			mySocket.emit('wsdl_ServiceGenerator',serviceGenRequest);
 			mySocket.on('result_wsdl_ServiceGenerator', function (serviceGenResponse) {
 				if(serviceGenResponse.toUpperCase() === 'TERMINATE'){
-					res.send(serviceGenResponse);
+					try{
+						try{
+							res.send(serviceGenResponse);
+						}catch(execption){
+							console.log(exception);
+						}
+					}catch(exception){
+						console.log(exception);
+					}
 				}else{
 					console.log(wsdlurl.split('?')[0]);
 					console.log(operations);
@@ -1017,13 +1129,21 @@ exports.debugTestCase_ICE = function (req, res) {
 						responsedata.header.push("");
 						responsedata.body.push("");
 					}
-					res.send(responsedata);
+					try{
+						res.send(responsedata);
+					}catch(exception){
+						console.log(exception);
+					}
 				}
 			});
 		}
 	}else{
 		console.log("Socket not Available");
-		res.send("fail");
+		try{
+			res.send("fail");
+		}catch(execption){
+			console.log(exception);
+		}
 	}
 };
 
