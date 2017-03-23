@@ -126,7 +126,8 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 		document.getElementById("scenarioDetailsContent").innerHTML = "";
 		ExecutionService.loadLocationDetails(scenarioName, scenarioId)
 		.then(function(data) {
-			$("#modalScenarioDetails").modal("show");
+			$("#modalScenarioDetails").find(".modal-title").text(scenarioName)
+			$("#modalScenarioDetails").modal("show");	
 			for(i=0; i<data.projectnames.length && data.testcasenames.length && data.screennames.length; i++){
 				document.getElementById("scenarioDetailsContent").innerHTML += '<div class="sDInnerContentsWrap"><div class="sDInnerContents">'+data.testcasenames[i]+'</div><div class="sDInnerContents">'+data.screennames[i]+'</div><div class="sDInnerContents">'+data.projectnames[i]+'</div></div>'
 			}
