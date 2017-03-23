@@ -23,15 +23,19 @@ exports.getProjectIDs_Nineteen68 = function(req, res){
                var getProjIds = "select projectids FROM icetestautomation.icepermissions where userid"+'='+ user_id;
         dbConnICE.execute(getProjIds, function (err, result) {
             if (err) {
-               res.send("fail");
+               res.send("projectsNotAssigned");
             }
             else {
-                async.forEachSeries(result.rows[0].projectids,function(iterator,callback1){
+                if (result.rows[0]==undefined){
+                    res.send("projectsNotAssigned");
+                }else{
+                      async.forEachSeries(result.rows[0].projectids,function(iterator,callback1){
                     var projectdetails = {projectId:'',projectName:''};
                     var getProjectName = "select projectName FROM icetestautomation.projects where projectID"+'='+iterator;
                     dbConnICE.execute(getProjectName,function(err,projectnamedata){
                         if(err){
-
+                            console.log(err);
+                            project_ids='projectsNotAssigned';
                         }else{
                             projectdetails.projectId = iterator;
                             projectdetails.projectName = projectnamedata.rows[0].projectname; 
@@ -44,6 +48,10 @@ exports.getProjectIDs_Nineteen68 = function(req, res){
                     })
 
                 },callback);
+                }
+
+
+              
                 //project_ids.out_project_id = out_project_id;
                // callback();
            }
