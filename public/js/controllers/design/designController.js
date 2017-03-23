@@ -250,33 +250,23 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				console.log("debug-----",data);
 				if (data == "unavailableLocalServer")	{
 					unblockUI();
-	                $("#globalModal").find('.modal-title').text("Server not found");
-	                $("#globalModal").find('.modal-body p').text("Local Server is not available. Please run the batch file from the Bundle.").css('color','black');
-					$("#globalModal").modal("show");
+					openDialog("Debug Testcase", "Local Server is not available. Please run the batch file from the Bundle.")
 				}
 				else if(data == "success"){
 					unblockUI();
-	                $("#globalModal").find('.modal-title').text("Success");
-	                $("#globalModal").find('.modal-body p').text("Debug completed.").css('color','black');
-					$("#globalModal").modal("show");
+					openDialog("Debug Testcase", "Debug completed successfully.")
 				}
 				else if(data == "fail"){
 					unblockUI();
-	                $("#globalModal").find('.modal-title').text("Fail");
-	                $("#globalModal").find('.modal-body p').text("Failed to debug").css('color','black');
-					$("#globalModal").modal("show");
+					openDialog("Debug Testcase", "Failed to debug.")
 				}
 				else if(data == "Terminate"){
 					unblockUI();
-	                $("#globalModal").find('.modal-title').text("Terminate");
-	                $("#globalModal").find('.modal-body p').text("Debug Terminated").css('color','black');
-					$("#globalModal").modal("show");
+					openDialog("Debug Testcase", "Debug Terminated")
 				}
 				else if(data == "browserUnavailable"){
 					unblockUI();
-	                $("#globalModal").find('.modal-title').text("Error");
-	                $("#globalModal").find('.modal-body p').text("Browser is not available").css('color','black');
-					$("#globalModal").modal("show");
+					openDialog("Debug Testcase", "Browser is not available")
 				}
 			},
 			function(error) {console.log("Error while traversing while executing debugTestcase method!! \r\n "+(error.data));});			
@@ -384,31 +374,23 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 								}
 							}
 							if (flag == false){
-								$("#globalModal").find('.modal-title').text("App Type Error");
-				                $("#globalModal").find('.modal-body p').text("Project application type and Imported JSON application type doesn't match, please check!!").css('color','black');
-								$("#globalModal").modal("show");
+								openDialog("App Type Error", "Project application type and Imported JSON application type doesn't match, please check!!")
 							}
 							else{
 								DesignServices.updateTestCase_ICE(screenId,testCaseId,testCaseName,resultString,userInfo)
 								.then(function(data) {
 									if (data == "success") {
 										angular.element(document.getElementById("tableActionButtons")).scope().readTestCase_ICE();
-						                $("#globalModal").find('.modal-title').text("Import Of JSON file");
-						                $("#globalModal").find('.modal-body p').text("TestCase Json imported successfully.").css('color','black');
-										$("#globalModal").modal("show");
+										openDialog("Import Testcase", "TestCase Json imported successfully.")
 									} else {
-										$("#globalModal").find('.modal-title').text("Fail");
-						                $("#globalModal").find('.modal-body p').text("Please Check the file format you have uploaded!").css('color','black');
-										$("#globalModal").modal("show");
+										openDialog("Import Testcase", "Please Check the file format you have uploaded!")
 									}
 								}, function(error) {
 								});
 							}
 						}
 						else{
-							$("#globalModal").find('.modal-title').text("Fail");
-			                $("#globalModal").find('.modal-body p').text("Please Check the file format you have uploaded!").css('color','black');
-							$("#globalModal").modal("show");
+							openDialog("Import Testcase", "Please Check the file format you have uploaded!")
 						}
 					}
 					reader.readAsText(file);
@@ -456,22 +438,16 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 							}
 						}
 						if(flag == false){
-							$("#globalModal").find('.modal-title').text("App Type Error");
-			                $("#globalModal").find('.modal-body p').text("Project application type and Imported JSON application type doesn't match, please check!!").css('color','black');
-							$("#globalModal").modal("show");
+							openDialog("App Type Error", "Project application type and Imported JSON application type doesn't match, please check!!")
 						}
 						else{
 							DesignServices.updateTestCase_ICE(screenId,testCaseId,testCaseName,resultString,userInfo)
 							.then(function(data) {
 										if (data == "success") {
 											angular.element(document.getElementById("tableActionButtons")).scope().readTestCase_ICE();
-							                $("#globalModal").find('.modal-title').text("Import Of JSON file");
-							                $("#globalModal").find('.modal-body p').text("TestCase Json imported successfully.").css('color','black');
-											$("#globalModal").modal("show");
+											openDialog("Import Testcase", "TestCase Json imported successfully.")
 										} else {
-											$("#globalModal").find('.modal-title').text("Fail");
-							                $("#globalModal").find('.modal-body p').text("Please Check the file format you have uploaded!").css('color','black');
-											$("#globalModal").modal("show");
+											openDialog("Import Testcase", "Please Check the file format you have uploaded!")
 										} /*else if (data == "appTypeError"){
 											showDialogMesgsBtn("App Type Error", "Project application type and Imported JSON application type doesn't match, please check!!", "btnAppTypeErrorOk");
 											$.unblockUI();
@@ -481,9 +457,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 						}
 					}
 					else{
-						$("#globalModal").find('.modal-title').text("Fail");
-		                $("#globalModal").find('.modal-body p').text("Please Check the file format you have uploaded!").css('color','black');
-						$("#globalModal").modal("show");
+						openDialog("Import Testcase", "Please Check the file format you have uploaded!")
 					}					
 				}
 				reader.readAsText(file);
@@ -525,22 +499,16 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 							}
 						}
 						if(flag == false){
-							$("#globalModal").find('.modal-title').text("App Type Error");
-			                $("#globalModal").find('.modal-body p').text("Project application type and Imported JSON application type doesn't match, please check!!").css('color','black');
-							$("#globalModal").modal("show");
+							openDialog("App Type Error", "Project application type and Imported JSON application type doesn't match, please check!!")
 						}
 						else{
 							DesignServices.updateTestCase_ICE(screenId,testCaseId,testCaseName,resultString,userInfo)
 							.then(function(data) {
 								if (data == "success") {
 									angular.element(document.getElementById("tableActionButtons")).scope().readTestCase_ICE();
-									$("#globalModal").find('.modal-title').text("Import Of JSON file");
-					                $("#globalModal").find('.modal-body p').text("TestCase Json imported successfully.").css('color','black');
-									$("#globalModal").modal("show");
+									openDialog("Import Testcase", "TestCase Json imported successfully.")
 								} else {
-									$("#globalModal").find('.modal-title').text("Fail");
-					                $("#globalModal").find('.modal-body p').text("Please Check the file format you have uploaded!").css('color','black');
-									$("#globalModal").modal("show");
+									openDialog("Import Testcase", "Please Check the file format you have uploaded!")
 								} /*else if (data == "appTypeError"){
 									showDialogMesgsBtn("App Type Error", "Project application type and Imported JSON application type doesn't match, please check!!", "btnAppTypeErrorOk");
 									$.unblockUI();
@@ -552,9 +520,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					$("#overWriteJson").val('');
 				}
 				else{
-					$("#globalModal").find('.modal-title').text("Fail");
-	                $("#globalModal").find('.modal-body p').text("Please Check the file format you have uploaded!").css('color','black');
-					$("#globalModal").modal("show");
+					openDialog("Import Testcase", "Please Check the file format you have uploaded!")
 				}
 				counter = 1;
 			}				
@@ -1399,16 +1365,12 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		.then(function(data) {
 			if(data == "success")
 			{
-				$("#globalModal").modal("show");
-                $("#globalModal").find('.modal-title').text("Delete Scrape Objects");
-                $("#globalModal").find('.modal-body p').text("Scraped Objects deleted successfully.");
+				openDialog("Delete Scrape Objects", "Scraped Objects deleted successfully.")
                 deleteFlag = true;
                 angular.element(document.getElementById("left-nav-section")).scope().getScrapeData();	
 			}
 			else{
-				$("#globalModal").modal("show");
-                $("#globalModal").find('.modal-title').text("Delete Scrape Objects");
-                $("#globalModal").find('.modal-body p').text("Scraped Objects fail to delete.");
+				openDialog("Delete Scrape Objects", "Scraped Objects fail to delete.")
                 deleteFlag = false;
 			}
 			//Service to be integrated as it has dependency of ($scope.newTestScriptDataLS)
@@ -1857,17 +1819,13 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				window.localStorage['_modified'] = "";
 				enableScreenShotHighlight = true;
 				localStorage.removeItem("_modified");
-				$("#globalModal").modal("show");
-				$("#globalModal").find('.modal-title').text("Save Scraped data");
-				$("#globalModal").find('.modal-body p').text("Scraped data saved successfully.");
+				openDialog("Save Scraped data", "Scraped data saved successfully.")
 				angular.element(document.getElementById("left-nav-section")).scope().getScrapeData();
 				$("#saveObjects").attr('disabled', true);
 			}
 			else{
 				enableScreenShotHighlight = false;
-				$("#globalModal").modal("show");
-				$("#globalModal").find('.modal-title').text("Save Scraped data");
-				$("#globalModal").find('.modal-body p').text("Failed to save");
+				openDialog("Save Scraped data", "Failed to save")
 			}
 
 		}, function(error){})
@@ -1975,9 +1933,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 						//check - keyword column should be mandatorily populated by User
 						if(mydata[i].custname == undefined || mydata[i].custname == ""){
 							var stepNoPos = parseInt(mydata[i].stepNo);
-							$("#globalModal").find('.modal-title').text("Save Testcase");
-							$("#globalModal").find('.modal-body p').text("Please select Object Name at Step No. "+stepNoPos);
-							$("#globalModal").modal("show");
+							openDialog("Save Testcase", "Please select Object Name at Step No. "+stepNoPos)
 							serviceCallFlag  = true;
 							break;
 						}
@@ -1985,9 +1941,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 							mydata[i].custname = mydata[i].custname.trim();
 							if(mydata[i].keywordVal == undefined || mydata[i].keywordVal == ""){
 								var stepNoPos = parseInt(mydata[i].stepNo);
-								$("#globalModal").find('.modal-title').text("Save Testcase");
-								$("#globalModal").find('.modal-body p').text("Please select keyword at Step No. "+stepNoPos);
-								$("#globalModal").modal("show");
+								openDialog("Save Testcase", "Please select keyword at Step No. "+stepNoPos)
 								serviceCallFlag  = true;
 								break;
 							}
@@ -2027,9 +1981,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			        			$("#tabs,#tabo2,#tabo1").tabs();
 		        			}*/
 							angular.element(document.getElementById("tableActionButtons")).scope().readTestCase_ICE();
-							$("#globalModal").find('.modal-title').text("Save Testcase");
-							$("#globalModal").find('.modal-body p').text("Testcase saved successfully").css('color','black');
-							$("#globalModal").modal("show");
+							openDialog("Save Testcase", "Testcase saved successfully")
 							/*if(deleteStep == false){
 								selectRowStepNoFlag = true;
 								
@@ -2042,9 +1994,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 							}*/
 						}
 						else{
-							$("#globalModal").find('.modal-title').text("Save Testcase");
-							$("#globalModal").find('.modal-body p').text("Failed to save Testcase").css('color','black');
-							$("#globalModal").modal("show");
+							openDialog("Save Testcase", "Failed to save Testcase")
 						}
 					},
 					function(error) {
@@ -2053,9 +2003,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				}
 			}
 			else{
-				$("#globalModal").find('.modal-title').text("Save Testcase");
-				$("#globalModal").find('.modal-body p').text("ScreenID or TestscriptID is undefined").css('color','black');
-				$("#globalModal").modal("show");
+				openDialog("Save Testcase", "ScreenID or TestscriptID is undefined")
 				return false;
 			}
 		}
@@ -2246,6 +2194,7 @@ function contentTable(newTestScriptDataLS) {
 		        		   }
 		        	   });
 		        	   hideOtherFuncOnEdit();
+		        	   $("#jqGrid").parent('div').css('height','auto');
 		           },
 	})
 
@@ -2793,13 +2742,13 @@ function contentTable(newTestScriptDataLS) {
 			$grid.jqGrid('setCell', rowId, 'appType', 'Generic');
 		}
 		else{
+			selectedText = replaceHtmlEntites(selectedText.trim());
 			for (var i=0; i<scrappedData.length; i++){
 				var ob = scrappedData[i];
 				var custname1;
-				var custval=ob.custname;
-				selectedText = selectedText.trim();		
+				var custval=ob.custname;	
 				custname1 = $('<input>').html(custval).text().trim();
-				if (custname1 == selectedText){
+				if (custname1.replace(/\s/g, ' ') == selectedText.replace('/\s/g', ' ')){
 					objName = ob.xpath;
 					url = ob.url;					
 					var obType = ob.tag;
@@ -3226,9 +3175,7 @@ function deleteTestScriptRow(e){
 			/*angular.element(document.getElementById("tableActionButtons")).scope().updateTestCase_ICE();*/		
 		}
 		else{
-			$("#globalModal").find('.modal-title').text("Delete Test step");
-			$("#globalModal").find('.modal-body p').text("Select steps to delete").css("color","#000");
-			$("#globalModal").modal("show");
+			openDialog("Delete Test step", "Select steps to delete")
 		}
 	}
 }
@@ -3355,9 +3302,7 @@ var lastSelectedRowId
 function editTestCaseRow(){
 	var rowSelect = $(document).find(".ui-state-highlight").children("td:nth-child(1)").text();
 	if(rowSelect == "" || rowSelect == " "){
-		$("#globalModal").find('.modal-title').text("Edit Testcase step");
-		$("#globalModal").find('.modal-body p').text("Select step to edit.").css('color','black');
-		$("#globalModal").modal("show");		
+		openDialog("Edit Testcase step", "Select step to edit.")
 	}
 	else{
 		var editSelRow = parseInt(rowSelect) + parseInt(1);
@@ -3409,9 +3354,7 @@ function copyTestStep(){
 	emptyTestStep = "false";
 	var taskInfo = JSON.parse(window.localStorage['_CT']);
 	if(!$(document).find(".cbox:checked").parent().parent("tr").hasClass("ui-state-highlight")){
-		$("#globalModal").find('.modal-title').text("Copy Testcase step");
-		$("#globalModal").find('.modal-body p').text("Select step to copy").css('color','black');
-		$("#globalModal").modal("show");
+		openDialog("Copy Testcase step", "Select step to copy")
 	}
 	else{
 		getSelectedRowData = [];
@@ -3420,9 +3363,7 @@ function copyTestStep(){
 		$.each(getSelectedRowData, function(){
 			if($(this).children(":nth-child(5)").html() == "&nbsp;"){
 				emptyTestStep = "true";
-				$("#globalModal").find('.modal-title').text("Copy Test Step");
-				$("#globalModal").find('.modal-body p').text("The operation cannot be performed as the steps contains invalid/blank object references").css('color','black');
-				$("#globalModal").modal("show");
+				openDialog("Copy Test Step", "The operation cannot be performed as the steps contains invalid/blank object references")
 				getSelectedRowData = [];
 				getRowJsonCopy = [];
 				return false
@@ -3463,9 +3404,7 @@ function copyTestStep(){
 //Need to work
 function pasteTestStep(){
 	if(getRowJsonCopy == [] || getRowJsonCopy == undefined || getRowJsonCopy.length <= 0){
-		$("#globalModal").find('.modal-title').text("Paste Testcase step");
-		$("#globalModal").find('.modal-body p').text("Copy steps to paste").css('color','black');
-		$("#globalModal").modal("show");
+		openDialog("Paste Testcase step", "Copy steps to paste")
 	}
 	else{
 		if(anotherScriptId != JSON.parse(window.localStorage['_CT']).testCaseId){
@@ -3737,9 +3676,7 @@ function commentStep(){
 		}
 	}
 	else{
-		$("#globalModal").find('.modal-title').text("Skip Testcase step");
-		$("#globalModal").find('.modal-body p').text("Please select step to skip").css('color','black');
-		$("#globalModal").modal("show");
+		openDialog("Skip Testcase step", "Please select step to skip")
 	}
 }
 
@@ -3878,5 +3815,14 @@ function formatXml(xml) {
 		pad += indent;
 	});
 	return formatted;
+}
+
+function openDialog(title, body){
+	$("#globalModal").find('.modal-title').text(title);
+    $("#globalModal").find('.modal-body p').text(body).css('color','black');
+	$("#globalModal").modal("show");
+	setTimeout(function(){
+		$("#globalModal").find('.btn-default').focus();					
+	}, 300);
 }
 //XML Beatuifier

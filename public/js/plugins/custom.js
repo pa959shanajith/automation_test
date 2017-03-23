@@ -181,6 +181,14 @@ function p_redirect(name){
 	window.location.assign(name);
 }
 
+function replaceHtmlEntites(selectedText) {
+	var translate_re = /&(nbsp|amp|quot|lt|gt);/g;
+	var translate = {"nbsp": " ","amp" : "&","quot": "\"","lt"  : "<","gt"  : ">"};
+	return ( selectedText.replace(translate_re, function(match, entity) {
+	  return translate[entity];
+	}) );
+};
+
 $(document).on('keypress', '.singleInvitedComma', function(e){
 	if(e.charCode == 39) return false;
 	else return true;
