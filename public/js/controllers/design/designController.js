@@ -2143,7 +2143,7 @@ function contentTable(newTestScriptDataLS) {
 		           autowidth: true,
 		           shrinkToFit: true,
 		           multiselect: true, //Appends Checkbox for multiRowSelection
-		           multiboxonly: true, //Selects single row
+		          //multiboxonly: true, //Selects single row
 		           beforeSelectRow: function (rowid, e) {
 		        	   if ($(e.target).closest("tr.jqgrow").hasClass("state-disabled")) {
 		        		   return false;   // doesnot allow to select the row
