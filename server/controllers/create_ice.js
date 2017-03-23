@@ -51,39 +51,129 @@ function testsuiteid_exists(testsuiteName,cb,data){
 
 };
 
-
-function testsuiteid_exists(testsuiteName,cb,data){
+function get_moduleName(moduleId,cb,data){
         var flag = false;
-        var obj = {flag:false,suiteid:''};
-        var suiteCheck = "SELECT moduleid FROM modules where modulename='"+testsuiteName+"' ALLOW FILTERING";
-        dbConnICE.execute(suiteCheck,function(err,suiteid){
+        var obj = {flag:false,modulename:''};
+        var moduleCheck = "SELECT modulename FROM modules where moduleid="+moduleId;
+        dbConnICE.execute(moduleCheck,function(err,modulename){
             if(err){
                 console.log(err);
                 cb(null,err);
             }else{
-                if(suiteid.rows.length!=0){obj.flag = true; obj.suiteid = suiteid.rows[0].moduleid}
+                if(modulename.rows.length!=0){
+                    obj.flag = true; 
+                    obj.modulename = modulename.rows[0].modulename
+                }
                 cb(null,obj) 
+            }
+            
+        });
+
+};
+function get_screenName(screenId,cb,data){
+         var screenCheck = "SELECT screenname FROM screens where screenid="+screenId;
+         var obj2 = {flag:false,screenname:''};
+         dbConnICE.execute(screenCheck,function(err,screenname){
+             if(err){
+                        console.log(err);
+                        cb(null,err);
+                    }else{
+                        if(screenname.rows.length!=0){
+                            obj2.flag = true; 
+                            obj2.screenname = screenname.rows[0].screenname;
+                        }
+                        cb(null,obj2) 
+                    }
+                    
+            })
+
+};
+
+exports.getAllNames = function(parent,cb,data){
+
+            var parent_length=parent.length;
+			//task_json.testSuiteId=parent[1];
+            var allNames = {"testsuitename":"","screenname":"","testcasename":""};
+			async.series({
+			modulename:function(callback){
+				get_moduleName(parent[1],function(err,data){
+					if(err)
+					console.log(err);
+					else{
+						allNames.modulename=data.modulename;
+					    callback();
+					}
+				});
+			},
+            // modulename:function(callback){
+			// 	get_moduleName(parent[1],function(err,data){
+			// 		if(err)
+			// 		console.log(err);
+			// 		else{
+			// 			allNames.modulename=data.modulename;
+			// 		    callback();
+			// 		}
+			// 	});
+			// },
+			screenname:function(callback){
+				if (parent_length>=4){
+					//task_json.screenId=parent[3];
+					get_screenName(parent[3],function(err,data2){
+						if(err)
+						console.log(err);
+						else{
+							allNames.screenname=data2.screenname;
+							callback();
+						}
+					});
+				}else{
+                    callback();
+                }
+			},
+			testcasename:function(callback){
+				if (parent_length==5){
+					//task_json.testCaseId=parent[4];
+					get_testcaseName(parent[4],function(err,data3){
+						if(err)
+						console.log(err);
+						else{
+							allNames.testcasename=data3.testcasename;
+							callback();
+						}
+					});
+				}else{
+                    callback();
+                }
+			}
+		},function(err,data){
+			cb(null,allNames);
+		});	
+			
+		
+
+};
+
+function get_testcaseName(testcaseId,cb,data){
+         var testcaseCheck = "SELECT testcasename FROM testcases where testcaseid="+testcaseId;
+         var obj3 = {flag:false,testcasename:''};
+        dbConnICE.execute(testcaseCheck,function(err,testcasename){
+            if(err){
+                console.log(err);
+                cb(null,err);
+            }else{
+                if(testcasename.rows.length!=0){
+                    obj3.flag = true; 
+                    obj3.testcasename = testcasename.rows[0].testcasename
+                }
+                cb(null,obj3) 
             }
             
         })
 
 };
 
-function testscenariosid_exists(testscenarioname,cb,data){
-    var flag = false;
-    var obj = {flag:false,scenarioid:''};
-        var scenarioCheck = "select testscenarioid from testscenarios where testscenarioname='"+testscenarioname+"' ALLOW FILTERING";
-        dbConnICE.execute(scenarioCheck,function(err,scenarioid){
-            if(err){
-                console.log(err);
-                cb(null,err);
-            }else{
-                if(scenarioid.rows.length!=0){ obj.flag = true; obj.scenarioid = scenarioid.rows[0].testscenarioid}
-                cb(null,obj) 
-            }
-            
-        })
-}
+
+
 
 function testscreen_exists(testscreenname,cb,data){
     var flag = false;
@@ -125,6 +215,7 @@ exports.getProjectIDs_Nineteen68 = function(req, res){
     var out_project_id = [];
     
     var project_ids = [];
+    //var user_id = req.userid;
     var user_id = req.userid;
     //var user_id='e348b7e0-aad7-47d5-ae43-23ec64e83747';
     async.series({
@@ -537,7 +628,7 @@ exports.getReleaseIDs_Ninteen68 = function(req,res){
     var r_ids = [];
     var rel = {rel:[],r_ids:[]};
     //var project_id = req.projectid;
-   var project_id = '5122b95c-84ad-40fd-9f10-e29988323fb5'
+   var project_id = 'd4965851-a7f1-4499-87a3-ce53e8bf8e66'
    var getReleaseDetails = "select releasename,releaseid from icetestautomation.releases where projectid"+'='+ project_id;
         dbConnICE.execute(getReleaseDetails, function (err, result) {
             if (err) {

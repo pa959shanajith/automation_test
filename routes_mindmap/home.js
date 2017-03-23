@@ -5,6 +5,7 @@ var express = require('express');
 var router = express.Router();
 var admin = require('../server/controllers/admin');
 var create_ice=require('../server/controllers/create_ice');
+var async = require('async');
 
 /* Send queries to Neo4J/ICE API. */
 var reqToAPI = function(d,u,p,callback) {
@@ -156,16 +157,17 @@ router.post('/', function(req, res, next) {
 					if(e.type=='modules'){
 						if(e.oid!=null){
 							qList.push({"statement":"MATCH (n)-[r:FMTTS{id:'"+e.id+"'}]->(o:TESTSCENARIOS)-[s]->(p:SCREENS)-[t]->(q:TESTCASES) DETACH DELETE r,s,t,o,p,q"});
-							if(e.renamed) qList.push({"statement":"MATCH(n:MODULES{moduleID:'"+e.id+"'}) SET n.moduleName='"+e.name+"'"});
+							if(e.renamed) qList.push({"statement":"MATCH(n:MODULES{moduleID:'"+e.id+"'}) SET n.moduleName='"+e.name+"'"+",n.unique_property='["+e.name+','+prjId+"]'"});
 						}
-						else qList.push({"statement":"MERGE(n:MODULES{projectID:'"+prjId+"',moduleName:'"+e.name+"',moduleID:'"+e.id+"',createdBy:'null',createdOn:'null',moduleID_c:'"+e.id_c+"'})"});
+						else qList.push({"statement":"MERGE(n:MODULES{projectID:'"+prjId+"',moduleName:'"+e.name+"',moduleID:'"+e.id+"',createdBy:'null',createdOn:'null',moduleID_c:'"+e.id_c+"',unique_property:'["+e.name+','+prjId+"]'})"});
 						if(t!=null){
+							t.parent=[prjId].concat(e.id_c);
 							t.id=(t.id!=null)?t.id:uuidV4();
-							if(t.oid!=null) qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',nodeID:'"+e.id+"',parent:'["+prjId+"]'}) SET n.task='"+t.task+"',n.assignedTo='"+t.assignedTo+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.release='"+t.release+"',n.cycle='"+t.cycle+"',n.details='"+t.details+"'"});
-							else qList.push({"statement":"MERGE(n:TASKS{taskID:'"+t.id+"',task:'"+t.task+"',assignedTo:'"+t.assignedTo+"',startDate:'"+t.startDate+"',endDate:'"+t.endDate+"',release:'"+t.release+"',cycle:'"+t.cycle+"',details:'"+t.details+"',nodeID:'"+e.id+"',parent:'["+prjId+"]'})"});
+							if(t.oid!=null) qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',nodeID:'"+e.id+"',parent:'["+t.parent+"]'}) SET n.task='"+t.task+"',n.assignedTo='"+t.assignedTo+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.release='"+t.release+"',n.cycle='"+t.cycle+"',n.details='"+t.details+"'"});
+							else qList.push({"statement":"MERGE(n:TASKS{taskID:'"+t.id+"',task:'"+t.task+"',assignedTo:'"+t.assignedTo+"',startDate:'"+t.startDate+"',endDate:'"+t.endDate+"',release:'"+t.release+"',cycle:'"+t.cycle+"',details:'"+t.details+"',nodeID:'"+e.id+"',parent:'["+t.parent+"]'})"});
 						}
 					}
-					else if(e.type=='scenarios'){
+ 					else if(e.type=='scenarios'){
 						if(e.renamed && e.id_n) rnmList.push({"statement":"MATCH(n:TESTSCENARIOS{testScenarioID:'"+e.id+"'}) SET n.testScenarioName='"+e.name+"'"});
 						qList.push({"statement":"MERGE(n:TESTSCENARIOS{moduleID:'"+idDict[e.pid]+"',testScenarioName:'"+e.name+"',testScenarioID:'"+e.id+"',createdBy:'null',createdOn:'null',testScenarioID_c:'"+e.id_c+"'})"});
 					}
@@ -177,7 +179,9 @@ router.post('/', function(req, res, next) {
 							t.id=(t.id!=null)?t.id:uuidV4();
 							if(t.oid!=null) qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',nodeID:'"+e.id+"',parent:'["+t.parent+"]'}) SET n.task='"+t.task+"',n.assignedTo='"+t.assignedTo+"',n.reviewer='"+t.reviewer+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.details='"+t.details+"',n.uid='"+uidx+"'"});
 							else{
-								if(t.parent) t.parent.forEach(function(tPrt,tIdx){t.parent[tIdx]=idDict[tPrt];});
+								if(t.parent) t.parent.forEach(function(tPrt,tIdx){
+									//t.parent[tIdx]=idDict[tPrt];
+								});
 								t.parent=[prjId].concat(t.parent);
 								qList.push({"statement":"MERGE(n:TASKS{taskID:'"+t.id+"',task:'"+t.task+"',assignedTo:'"+t.assignedTo+"',reviewer:'"+t.reviewer+"',startDate:'"+t.startDate+"',endDate:'"+t.endDate+"',details:'"+t.details+"',nodeID:'"+e.id+"',parent:'["+t.parent+"]',uid:'"+uidx+"'})"});
 							}
@@ -190,7 +194,10 @@ router.post('/', function(req, res, next) {
 							t.id=(t.id!=null)?t.id:uuidV4();
 							if(t.oid!=null) qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',nodeID:'"+e.id+"',parent:'["+t.parent+"]'}) SET n.task='"+t.task+"',n.assignedTo='"+t.assignedTo+"',n.reviewer='"+t.reviewer+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.details='"+t.details+"',n.uid='"+uidx+"'"});
 							else{
-								if(t.parent) t.parent.forEach(function(tPrt,tIdx){t.parent[tIdx]=idDict[tPrt];});
+								if(t.parent){ t.parent.forEach(function(tPrt,tIdx){
+									//t.parent[tIdx]=idDict[tPrt];
+								});
+								}
 								t.parent=[prjId].concat(t.parent);
 								qList.push({"statement":"MERGE(n:TASKS{taskID:'"+t.id+"',task:'"+t.task+"',assignedTo:'"+t.assignedTo+"',reviewer:'"+t.reviewer+"',startDate:'"+t.startDate+"',endDate:'"+t.endDate+"',details:'"+t.details+"',nodeID:'"+e.id+"',parent:'["+t.parent+"]',uid:'"+uidx+"'})"});
 							}
@@ -244,6 +251,16 @@ router.post('/', function(req, res, next) {
 								else e.pid_n=null;
 							}
 						});
+						var userid='';
+						var obj={'userid':userid,'urlData':urlData,'prjId':prjId};
+						// getTaskJson(obj,function(err,data){
+						// 	if (err){
+						// 		console.log(err);
+						// 	}else{
+
+						// 		res.status(status).send(nData[rIndex]);
+						// 	}
+						// });
 						res.status(status).send(nData[rIndex]);
 					}
 				});
@@ -375,96 +392,5 @@ router.post('/', function(req, res, next) {
 		}
 	}
 });
-
-var tasktypes={'Create':['TestCase','Design'],
-' Update':['TestCase','Design'],
-'UpdateSuite' :['Execution']
-
-}
-
-var getTaskJson=function(userid){
-	
-	var taskDetails={'taskName':'',
-	'taskDescription':'',
-	'taskType':'',//module nd scenario - Execute screen & TC- Design
-	'subTaskType':'',
-	'subTaskId':'',
-	'assignedTo':'',
-	'reviewer':'',
-	'startDate':'',
-	'expectedEndDate':'',
-	'status':''
-	};
-
-// Screens : Scrape, Append, Compare, Add, Map
-// Design : Create, Update  : TestCase
-// Scenarios : 
-// Suite : Update, Execute : Execution
-	var task_json={'appType':'',
-			'projectId':'',
-			'releaseId':'',
-			'cycleId':'',
-			'screenId':'',
-			'screenName':'',
-			'testCaseId':'',
-			'testCaseName':'',
-			'assignedTestScenarioIds':'',
-			'testSuiteId':'',
-			'testSuiteName':'',
-			'taskDetails':taskDetails
-
-}
-};
-
-
-var parsing = function(d,urlData) {
-	var data = d;
-	var qList_new=[];
-	var result="";
-	var testsuiteDetails=d.testsuiteDetails;
-	var moduleDict={};
-	testsuiteDetails.forEach(function(e,i){
-		var moduleID_json=e.testsuiteId;
-		var moduleID_c_json=e.testsuiteId_c;
-		//var modulename_json=e.testsuiteName;
-		var testscenarioDetails_json=e.testscenarioDetails;
-		qList_new.push({"statement":"MATCH (a:MODULES) WHERE a.moduleID='"+moduleID_json+"' SET a.moduleID_c='"+moduleID_c_json+"'"});		
-
-			testscenarioDetails_json.forEach(function(sc,i){
-				var testscenarioId_json=sc.testscenarioId;
-				var testscenarioId_c_json=sc.testscenarioId_c;
-				//var modulename_json=sc.testsuiteName;
-				var screenDetails_json=sc.screenDetails;
-				//console.log(testscenarioId_json,testscenarioId_c_json);
-				qList_new.push({"statement":"MATCH (a:TESTSCENARIOS) WHERE a.testScenarioID='"+testscenarioId_json+"' SET a.testScenarioID_c='"+testscenarioId_c_json+"'"});
-
-				screenDetails_json.forEach(function(scr,i){
-					var screenId_json=scr.screenId;
-					var screenId_c_json=scr.screenId_c;
-					//var modulename_json=sc.testsuiteName;
-					var testcaseDetails_json=scr.testcaseDetails;
-					//console.log(screenId_json,screenId_c_json);
-					qList_new.push({"statement":"MATCH (a:SCREENS) WHERE a.testScenarioID='"+testscenarioId_json+"' SET a.testScenarioID_c='"+testscenarioId_c_json+"'"});
-
-						testcaseDetails_json.forEach(function(tc,i){
-						var testcaseId_json=tc.testcaseId;
-						var testcaseId_c_json=tc.testcaseId_c;
-						var testcaseName_json=tc.testcaseName;
-						console.log(testcaseId_json,testcaseId_c_json);
-						qList_new.push({"statement":"MATCH (a:TESTCASES) WHERE a.testCaseID='"+testcaseId_json+"' SET a.testcaseId_c='"+testcaseId_c_json+"'"});
-
-					});
-					
-		});
-
-
-	});
-		
-
-
-	});
-
-return qList_new;
-};
 
 module.exports = router;

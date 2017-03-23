@@ -213,3 +213,28 @@ select
 {
    padding: 2px !important;
 }
+#startDate,#endDate
+{
+    padding: 2px;
+    width: 90%;
+    position: relative;
+    height: 24px;
+    border-radius: 5px;
+}
+.dateIcon
+{
+    background: #643693;
+    position: absolute;
+    padding: 3px;
+    right: 0;
+    height: 23px;
+    border-radius: 0 5px 5px 0;
+}
+.dateBoxSd,.dateBoxEd
+{
+    width: 65%;
+}
+.dateBoxEd{
+    position: relative;
+    top: -10px;
+}

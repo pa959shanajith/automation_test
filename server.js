@@ -88,6 +88,7 @@ var design = require('./server/controllers/design');
 var suite = require('./server/controllers/suite');
 var report = require('./server/controllers/report');
 var header = require('./server/controllers/header');
+var plugin = require('./server/controllers/plugin');
 
 
 //Login Routes
@@ -132,6 +133,10 @@ app.post('/exportToJson_ICE', report.exportToJson_ICE);
 app.post('/getProjectDetails_ICE', header.getProjectDetails_ICE);
 //Logout Routes
 app.post('/logoutUser_Nineteen68',header.logoutUser_Nineteen68);
+//Plugin Routes
+app.post('/getProjectIDs_Nineteen68',plugin.getProjectIDs_Nineteen68);
+app.post('/getTaskJson_Nineteen68',plugin.getTaskJson_Nineteen68);
+
 //-------------SERVER START------------//
 
 server.listen(3000);  
