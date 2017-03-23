@@ -393,4 +393,56 @@ router.post('/', function(req, res, next) {
 	}
 });
 
+var parsing = function(d,urlData) {
+	var data = d;
+	var qList_new=[];
+	var result="";
+	var testsuiteDetails=d.testsuiteDetails;
+	var moduleDict={};
+	testsuiteDetails.forEach(function(e,i){
+		var moduleID_json=e.testsuiteId;
+		var moduleID_c_json=e.testsuiteId_c;
+		//var modulename_json=e.testsuiteName;
+		var testscenarioDetails_json=e.testscenarioDetails;
+		qList_new.push({"statement":"MATCH (a:MODULES) WHERE a.moduleID='"+moduleID_json+"' SET a.moduleID_c='"+moduleID_c_json+"'"});		
+
+			testscenarioDetails_json.forEach(function(sc,i){
+				var testscenarioId_json=sc.testscenarioId;
+				var testscenarioId_c_json=sc.testscenarioId_c;
+				//var modulename_json=sc.testsuiteName;
+				var screenDetails_json=sc.screenDetails;
+				//console.log(testscenarioId_json,testscenarioId_c_json);
+				qList_new.push({"statement":"MATCH (a:TESTSCENARIOS) WHERE a.testScenarioID='"+testscenarioId_json+"' SET a.testScenarioID_c='"+testscenarioId_c_json+"'"});
+
+				screenDetails_json.forEach(function(scr,i){
+					var screenId_json=scr.screenId;
+					var screenId_c_json=scr.screenId_c;
+					//var modulename_json=sc.testsuiteName;
+					var testcaseDetails_json=scr.testcaseDetails;
+					//console.log(screenId_json,screenId_c_json);
+					qList_new.push({"statement":"MATCH (a:SCREENS) WHERE a.testScenarioID='"+testscenarioId_json+"' SET a.testScenarioID_c='"+testscenarioId_c_json+"'"});
+
+						testcaseDetails_json.forEach(function(tc,i){
+						var testcaseId_json=tc.testcaseId;
+						var testcaseId_c_json=tc.testcaseId_c;
+						var testcaseName_json=tc.testcaseName;
+						console.log(testcaseId_json,testcaseId_c_json);
+						qList_new.push({"statement":"MATCH (a:TESTCASES) WHERE a.testCaseID='"+testcaseId_json+"' SET a.testcaseId_c='"+testcaseId_c_json+"'"});
+
+					});
+					
+		});
+
+
+	});
+		
+
+
+	});
+
+return qList_new;
+};
+
+
+
 module.exports = router;
