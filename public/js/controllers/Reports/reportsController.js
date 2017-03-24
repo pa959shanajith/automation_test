@@ -93,11 +93,12 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 						eD = ("0" + endDat[0]).slice(-2) +"-"+ ("0" + endDat[1]).slice(-2) +"-"+ endDat[2];
 						eT = ("0" + endTym[0]).slice(-2) +":"+ ("0" + endTym[1]).slice(-2);
 						tableContainer.find('tbody').append("<tr class='scenariostatusreport' data-executionid='"+data[i].execution_id+"'><td>"+(i+1)+"</td><td>"+sD+"</td><td>"+sT+"</td><td>"+eD+"</td><td>"+eT+"</td></tr>");
-					}					
+					}
+					if(data.length > 2){
+						$("#dateDESC").show();
+					}				
 				}
-				if(data.length > 2){
-					$("#dateDESC").show();
-				}
+				else tableContainer.find('tbody').empty();
 			}
 			$('.progress-bar-success, .progress-bar-danger, .progress-bar-warning, .progress-bar-norun').css('width','0%');
 			$('.passPercent, .failPercent, .terminatePercent, .incompletePercent').text('');

@@ -433,7 +433,7 @@ exports.createStructure_Nineteen68 = function(req, res) {
                                             }
                                             var insertInScreen = '';
                                             if(!screenflag){
-                                                insertInScreen = "INSERT INTO screens (projectid,screenname,screenid,versionnumber,createdby,createdon,createdthrough,deleted,history,modifiedby,modifiedon,screendata,skucodescreen,tags) VALUES (" + projectid + ",'" + screenName + "'," + screenId + ",1,'Kavyashree'," + new Date().getTime() + ",null,null,null,null," + new Date().getTime() + ",null,null,null)";
+                                                insertInScreen = "INSERT INTO screens (projectid,screenname,screenid,versionnumber,createdby,createdon,createdthrough,deleted,history,modifiedby,modifiedon,screendata,skucodescreen,tags) VALUES (" + projectid + ",'" + screenName + "'," + screenId + ",1,'Kavyashree'," + new Date().getTime() + ",null,null,null,null," + new Date().getTime() + ",'',null,null)";
 
                                             }else{
                                                 insertInScreen = "select screenid from screens where screenname='"+screenName+"' ALLOW FILTERING";
@@ -468,7 +468,7 @@ exports.createStructure_Nineteen68 = function(req, res) {
 
                                                                 var insertInTescase = '';
                                                                 if(!testcaseflag){
-                                                                    insertInTescase = "INSERT INTO testcases (screenid,testcasename,testcaseid,versionnumber,createdby,createdon,createdthrough,deleted,history,modifiedby,modifiedon,skucodetestcase,tags,testcasesteps)VALUES (" + screenId + ",'" + testcaseName + "'," + testcaseID + ",1,'Kavyashree'," + new Date().getTime() + ",null,null,null,null," + new Date().getTime() + ",null,null,null)";
+                                                                    insertInTescase = "INSERT INTO testcases (screenid,testcasename,testcaseid,versionnumber,createdby,createdon,createdthrough,deleted,history,modifiedby,modifiedon,skucodetestcase,tags,testcasesteps)VALUES (" + screenId + ",'" + testcaseName + "'," + testcaseID + ",1,'Kavyashree'," + new Date().getTime() + ",null,null,null,null," + new Date().getTime() + ",null,null,'')";
 
                                                                 }else{
                                                                     insertInTescase = "select testcaseid from testcases where testcasename='"+testcaseName+"' ALLOW FILTERING";

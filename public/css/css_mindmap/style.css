@@ -163,6 +163,7 @@ p,a,img,text,span,.noselect{-webkit-touch-callout:none;-webkit-user-select:none;
 .ghostCircle.show{display:block}
 .ghostCircle,.activeDrag .ghostCircle{display:none}
 /*.assignedTo{ position: relative; left: 10px; width: 64%;}*/
+#ct-assignTask{ position: relative; left: 54px; width: 64%;}
 #ct-assignedTo{ position: relative; left: 10px; width: 64%;}
 #ct-assignRevw{ position: relative; left: 24px; width: 64%;}
 #ct-assignRel{ position: relative; left: 24px; width: 64%;}

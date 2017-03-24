@@ -15,9 +15,11 @@ app.use(morgan('combined'))
 app.use(cookieParser());
 app.use(sessions({
 	secret: '$^%EDE%^tfd65e7ufyCYDR^%IU',
-	resave: false,
+	path: '/',
+    httpOnly: true,
+    secure: false,
 	rolling: true,
-	saveUninitialized: false,
+	//saveUninitialized: false,
 	cookie: { maxAge: (30*60*1000) }
 }));
 //write stream for logs

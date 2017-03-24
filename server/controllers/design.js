@@ -140,7 +140,11 @@ exports.getScrapeDataScreenLevel_ICE = function(req, res){
 			" and projectid="+req.body.projectId+
 			" allow filtering ;";
 		fetchScrapedData(getScrapeDataQuery,function(getScrapeDataQueryerror,getScrapeDataQueryresponse){
-				res.send(getScrapeDataQueryresponse);
+				try{
+					res.send(getScrapeDataQueryresponse);
+				}catch(execption){
+					console.log(exception);
+				}
 		});
 };
 
@@ -392,11 +396,19 @@ exports.updateScreen_ICE = function(req, res){
 							finalFunction(scrapedObjects);
 						}else{
 							statusFlag="All objects are not edited.";
-							res.send(statusFlag);
+							try{
+								res.send(statusFlag);
+							}catch(execption){
+								console.log(exception);
+							}
 						}
 					}else{
 						statusFlag="Error occured in updateScreenData : Fail";
-						res.send(statusFlag);
+						try{
+							res.send(statusFlag);
+						}catch(execption){
+							console.log(exception);
+						}
 					}
 				});
 				editcallback;
@@ -489,11 +501,19 @@ exports.updateScreen_ICE = function(req, res){
 							finalFunction(scrapedObjects);	
 						}else{
 							statusFlag="All objects are not edited.";
-							res.send(statusFlag);
+							try{
+								res.send(statusFlag);
+							}catch(execption){
+								console.log(exception);
+							}
 						}
 					}else{
 						statusFlag="Error occured in updateScreenData : Fail";
-						res.send(statusFlag);
+						try{
+							res.send(statusFlag);
+						}catch(execption){
+							console.log(exception);
+						}
 					}
 				});
 				deletecallback;
@@ -511,7 +531,11 @@ exports.updateScreen_ICE = function(req, res){
 					// console.log(err);
 					statusFlag="Error occured in updateScreenData : Fail";
 					// console.log(err);
-					res.send(statusFlag);
+					try{
+						res.send(statusFlag);
+					}catch(execption){
+						console.log(exception);
+					}
 				}else{
 					if(param != 'updateScrapeData_ICE'){
 						async.waterfall([
@@ -529,7 +553,11 @@ exports.updateScreen_ICE = function(req, res){
 								dbConn.execute(testcaseDataQuery, function(testcaseDataQueryerr, testcaseDataQueryresult){
 									if(testcaseDataQueryerr){
 										statusFlag="Error occured in testcaseDataQuery : Fail";
-										res.send(statusFlag);
+										try{
+											res.send(statusFlag);
+										}catch(execption){
+											console.log(exception);
+										}
 									}else{
 										if(testcaseDataQueryresult.rows.length>0){
 											async.forEachSeries(testcaseDataQueryresult.rows,
@@ -598,12 +626,20 @@ exports.updateScreen_ICE = function(req, res){
 													" and testcasename='" + updatingtestcasename + 
 													"' and versionnumber = "+requestedversionnumber+" IF EXISTS;";
 												uploadTestCaseData(updateTestCaseQuery,function(error,response){
+													try{
 														res.send(response);
+													}catch(execption){
+														console.log(exception);
+													}
 												});
 											});
 										}else{
 											statusFlag = "success";
-											res.send(statusFlag);
+											try{
+												res.send(statusFlag);
+											}catch(execption){
+												console.log(exception);
+											}
 										}
 									}
 								});
@@ -612,7 +648,11 @@ exports.updateScreen_ICE = function(req, res){
 						]);
 					}else{
 					statusFlag = "success";
-					res.send(statusFlag);
+						try{
+							res.send(statusFlag);
+						}catch(execption){
+							console.log(exception);
+						}
 					}
 				}
 			});
@@ -748,7 +788,11 @@ exports.readTestCase_ICE = function (req, res) {
 	dbConn.execute(getTestCases, function (err, result) {
 		if (err) {
 			var flag = "Error in readTestCase_ICE : Fail";
-			res.send(flag);
+			try{
+				res.send(flag);
+			}catch(exception){
+				console.log(exception);
+			}
 		} else {
 			for (var i = 0; i < result.rows.length; i++) {
 				testcasesteps = result.rows[i].testcasesteps;
@@ -765,21 +809,37 @@ exports.readTestCase_ICE = function (req, res) {
 						responsedata.template = template;
 						responsedata.testcase = testcasesteps;
 						responsedata.testcasename = testcasename;
-						res.send(responsedata);
+						try{
+							res.send(responsedata);
+						}catch(exception){
+							console.log(exception);
+						}
 					}else{
 						//this is checked
 						responsedata = { template: "", testcase: testcasesteps, testcasename: testcasename }
-						res.send(responsedata);
+						try{
+							res.send(responsedata);
+						}catch(exception){
+							console.log(exception);
+						}
 					}
 				}else if((scrapedobjects == null || scrapedobjects == '' || scrapedobjects == undefined ) 
 						 && (testcasesteps != null && testcasesteps != '' || testcasesteps != undefined)){
 					//this is checked
 					responsedata = { template: "", testcase: testcasesteps, testcasename: testcasename }
-					res.send(responsedata);
+					try{
+						res.send(responsedata);
+					}catch(exception){
+						console.log(exception);
+					}
 				} else {
 					//this case is merely impossible in V2.0 as creation happens in MindMaps
 					responsedata = { template: "", testcase: "[]", testcasename: "" }
-					res.send(responsedata);
+					try{
+						res.send(responsedata);
+					}catch(exception){
+						console.log(exception);
+					}
 				}
 			});
 		}
@@ -826,7 +886,11 @@ exports.updateTestCase_ICE = function (req, res) {
 	dbConn.execute(checktestcaseexist, function (err, result) {
 		if (err) {
 			var flag = "Error in Query 1 testcaseexist: Fail";
-			res.send(flag);
+			try{
+				res.send(flag);
+			}catch(exception){
+				console.log(exception);
+			}
 		} else {
 			for (var i = 0; i < result.rows.length; i++) {
 				if (result.rows[i].testcaseid == requestedtestcaseid) {
@@ -865,173 +929,220 @@ exports.updateTestCase_ICE = function (req, res) {
 * debugTestCase_ICE service is used to debug the testcase
 */
 exports.debugTestCase_ICE = function (req, res) {
-	var action=req.body.param;
-	if(action == 'debugTestCase_ICE'){
-		var requestedbrowsertypes = req.body.browsertypes;
-		var requestedtestcaseids = req.body.testcaseids;
-		var responsedata = [];
-		var responseobject = {
-			template: "",
-			testcasename: "",
-			testcase: []
-		};
-		var browsertypeobject = { browsertype: requestedbrowsertypes };
-		var flag = "";
-		for (var indexes = 0; indexes < requestedtestcaseids.length; indexes++) {
-			var getProjectTestcasedata = "select screenid,testcasename,testcasesteps from testcases where testcaseid=" + requestedtestcaseids[indexes];
-			dbConn.execute(getProjectTestcasedata, function (errgetTestcasedata, testcasedataresult) {
-				if (errgetTestcasedata) {
-					flag = "Error in getProjectTestcasedata : Fail";
-					res.send(flag);
-				} else {
-					for (var ids = 0; ids < testcasedataresult.rows.length; ids++) {
-						responseobject.testcase = testcasedataresult.rows[ids].testcasesteps;
-						responseobject.testcasename = testcasedataresult.rows[ids].testcasename;
-						var scrapedDataQuery="select screendata from screens where screenid="+
-								testcasedataresult.rows[0].screenid+" allow filtering ;";
-						fetchScrapedData(scrapedDataQuery,function(err,scrapedobjects,querycallback){
-							if(scrapedobjects != null && scrapedobjects != '' && scrapedobjects != undefined){
-								var newParse = JSON.parse(scrapedobjects);
-								if('body' in newParse){
-									responseobject.template = newParse.body[0];
+	var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+	var mySocket = myserver.allSocketsMap[ip];
+	if('allSocketsMap' in myserver && ip in myserver.allSocketsMap){
+		var action=req.body.param;
+		if(action == 'debugTestCase_ICE'){
+			var requestedbrowsertypes = req.body.browsertypes;
+			var requestedtestcaseids = req.body.testcaseids;
+			var responsedata = [];
+			var responseobject = {
+				template: "",
+				testcasename: "",
+				testcase: []
+			};
+			var browsertypeobject = { browsertype: requestedbrowsertypes };
+			var flag = "";
+			for (var indexes = 0; indexes < requestedtestcaseids.length; indexes++) {
+				var getProjectTestcasedata = "select screenid,testcasename,testcasesteps from testcases where testcaseid=" + requestedtestcaseids[indexes];
+				dbConn.execute(getProjectTestcasedata, function (errgetTestcasedata, testcasedataresult) {
+					if (errgetTestcasedata) {
+						flag = "Error in getProjectTestcasedata : Fail";
+						try{
+							res.send(flag);
+						}catch(exception){
+							console.log(exception);
+						}
+					} else {
+						for (var ids = 0; ids < testcasedataresult.rows.length; ids++) {
+							responseobject.testcase = testcasedataresult.rows[ids].testcasesteps;
+							responseobject.testcasename = testcasedataresult.rows[ids].testcasename;
+							var scrapedDataQuery="select screendata from screens where screenid="+
+									testcasedataresult.rows[0].screenid+" allow filtering ;";
+							fetchScrapedData(scrapedDataQuery,function(err,scrapedobjects,querycallback){
+								if(scrapedobjects != null && scrapedobjects != '' && scrapedobjects != undefined){
+									var newParse = JSON.parse(scrapedobjects);
+									if('body' in newParse){
+										responseobject.template = newParse.body[0];
+									}
 								}
-							}
-							responsedata.push(responseobject);
-							responsedata.push(browsertypeobject);
-							var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-							if('allSocketsMap' in myserver && ip in myserver.allSocketsMap){
-								var mySocket = myserver.allSocketsMap[ip];
+								responsedata.push(responseobject);
+								responsedata.push(browsertypeobject);
 								mySocket._events.result_debugTestCase = [];
 								mySocket.emit('debugTestCase',responsedata);
 								mySocket.on('result_debugTestCase', function (responsedata) {
-									res.send(responsedata);
+									try{
+										res.send(responsedata);
+									}catch(exception){
+										console.log(exception);
+									}
 								});
-							}else{
-								console.log("Socket not Available");
-								res.send("fail");
-							}
-						});
+							});
+						}
 					}
-				}
-			});
-		}
-	}else if(action == 'debugTestCaseWS_ICE'){
-		var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-		if('allSocketsMap' in myserver && ip in myserver.allSocketsMap){
-			// res.send("success");
-			var mySocket = myserver.allSocketsMap[ip];
+				});
+			}
+		}else if(action == 'debugTestCaseWS_ICE'){
 			mySocket._events.result_debugTestCaseWS = [];
 			var testcaseWS=[];
 			testcaseWS.push(req.body.testCaseWS);
 			mySocket.emit('debugTestCase',testcaseWS);
 			mySocket.on('result_debugTestCaseWS', function (value) {
-				var responseData={
-						responseHeader:[],
-						responseBody:[]
-					};
-				if(value != "fail" && value != undefined && value != ""){
-					var response=value.split('rEsPONseBOdY:');
-					
-					if(response.length == 2){
-						responseData.responseHeader.push(response[0]);
-						responseData.responseBody.push(response[1]);
-						res.send(responseData);
-					}else if (response.length == 1){
-						responseData.responseHeader.push(response[0]);
-						responseData.responseBody.push("");
-						res.send(responseData);
-					}else{
-						responseData.responseHeader.push("");
-						responseData.responseBody.push("");
-						res.send(responseData);
+				if(value.toUpperCase() === 'TERMINATE'){
+					try{
+						res.send(value);
+					}catch(exception){
+						console.log(exception);
 					}
 				}else{
-					responseData.responseHeader.push("Response Header - Fail");
-					responseData.responseBody.push("Response Body - Fail");
-					res.send(responseData);
+					var responseData={
+							responseHeader:[],
+							responseBody:[]
+						};
+					if(value != "fail" && value != undefined && value != ""){
+						var response=value.split('rEsPONseBOdY:');
+						
+						if(response.length == 2){
+							responseData.responseHeader.push(response[0]);
+							responseData.responseBody.push(response[1]);
+							try{
+								res.send(responsedata);
+							}catch(exception){
+								console.log(exception);
+							}
+						}else if (response.length == 1){
+							responseData.responseHeader.push(response[0]);
+							responseData.responseBody.push("");
+							try{
+								res.send(responsedata);
+							}catch(exception){
+								console.log(exception);
+							}
+						}else{
+							responseData.responseHeader.push("");
+							responseData.responseBody.push("");
+							try{
+								res.send(responsedata);
+							}catch(exception){
+								console.log(exception);
+							}
+						}
+					}else{
+						responseData.responseHeader.push("Response Header - Fail");
+						responseData.responseBody.push("Response Body - Fail");
+						try{
+							res.send(responsedata);
+						}catch(exception){
+							console.log(exception);
+						}
+					}
 				}
 			});
-		}else{
-			console.log("Socket not Available");
-			res.send("fail");
-		}
-	}else if(action == 'wsdlListGenerator_ICE'){
-		var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-		if('allSocketsMap' in myserver && ip in myserver.allSocketsMap){
-			var mySocket = myserver.allSocketsMap[ip];
+		}else if(action == 'wsdlListGenerator_ICE'){
 			var wsdlurl=req.body.wsdlurl;
-			console.log("wsdlurl::",wsdlurl);
 			mySocket._events.result_wsdl_listOfOperation = []
 			mySocket.emit('wsdl_listOfOperation',wsdlurl);
 			mySocket.on('result_wsdl_listOfOperation', function (listGenResponse) {
-				var responsedata={listofoperations:[]};
-				if(listGenResponse != "fail" && listGenResponse != undefined && listGenResponse != ""){
-					console.log(listGenResponse);
-					listGenResponse=listGenResponse.replace(/'+/g,"\"");
-					var listGenResponse=JSON.parse(listGenResponse);
-					responsedata.listofoperations=listGenResponse;
-					res.send(responsedata);
+				if(listGenResponse.toUpperCase() === 'TERMINATE'){
+					try{
+						res.send(listGenResponse);
+					}catch(exception){
+						console.log(exception);
+					}
 				}else{
-					res.send(responsedata);
+					var responsedata={listofoperations:[]};
+					if(listGenResponse != "fail" && listGenResponse != undefined && listGenResponse != ""){
+						console.log(listGenResponse);
+						listGenResponse=listGenResponse.replace(/'+/g,"\"");
+						var listGenResponse=JSON.parse(listGenResponse);
+						responsedata.listofoperations=listGenResponse;
+						try{
+							res.send(responsedata);
+						}catch(exception){
+							console.log(exception);
+						}
+					}else{
+						try{
+							res.send(responsedata);
+						}catch(exception){
+							console.log(exception);
+						}
+					}
 				}
 			});
-		}else{
-			console.log("Socket not Available");
-			res.send("fail");
-		}
-	}else if(action == 'wsdlServiceGenerator_ICE'){
-		var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-		if('allSocketsMap' in myserver && ip in myserver.allSocketsMap){
+		}else if(action == 'wsdlServiceGenerator_ICE'){
 			var wsdlurl=req.body.wsdlurl;
 			var operations=req.body.method;
 			var soapVersion='0';
-			if(operations.indexOf('SOAP1.1') === -1){
+			if(operations.indexOf('SOAP1.2') !== -1){
 				soapVersion='1';
 			}
-			operations=operations.split('-')[1]
+			if(operations.indexOf('SOAP') !== -1){
+				operations=operations.split('-')[1];
+			}
 			var serviceGenRequest={
 				wsdlurl:wsdlurl,
 				operations:operations,
 				soapVersion:soapVersion
 			}
-			var mySocket = myserver.allSocketsMap[ip];
 			mySocket._events.result_wsdl_ServiceGenerator = [];
 			mySocket.emit('wsdl_ServiceGenerator',serviceGenRequest);
 			mySocket.on('result_wsdl_ServiceGenerator', function (serviceGenResponse) {
-				console.log(wsdlurl.split('?')[0]);
-				console.log(operations);
-				var responsedata={
-					endPointURL:[],
-					method:["POST"],
-					header:[],
-					body:[],
-					operations:[],
-					responseHeader:[""],
-					responseBody:[""]
-				};
-				responsedata.endPointURL.push(wsdlurl.split('?')[0]);
-				responsedata.operations.push(operations);
-				if(serviceGenResponse != "fail" && serviceGenResponse != undefined && serviceGenResponse != ""){
-					response=serviceGenResponse.split('rEsPONseBOdY:');
-					if(response.length == 2){
-						responsedata.header.push(response[0]);
-						responsedata.body.push(response[1]);
-					}else if(response.length == 1){
-						responsedata.header.push(response[0]);
-						responsedata.body.push("");
+				if(serviceGenResponse.toUpperCase() === 'TERMINATE'){
+					try{
+						try{
+							res.send(serviceGenResponse);
+						}catch(execption){
+							console.log(exception);
+						}
+					}catch(exception){
+						console.log(exception);
+					}
+				}else{
+					console.log(wsdlurl.split('?')[0]);
+					console.log(operations);
+					var responsedata={
+						endPointURL:[],
+						method:["POST"],
+						header:[],
+						body:[],
+						operations:[],
+						responseHeader:[""],
+						responseBody:[""]
+					};
+					responsedata.endPointURL.push(wsdlurl.split('?')[0]);
+					responsedata.operations.push(operations);
+					if(serviceGenResponse != "fail" && serviceGenResponse != undefined && serviceGenResponse != ""){
+						response=serviceGenResponse.split('rEsPONseBOdY:');
+						if(response.length == 2){
+							responsedata.header.push(response[0]);
+							responsedata.body.push(response[1]);
+						}else if(response.length == 1){
+							responsedata.header.push(response[0]);
+							responsedata.body.push("");
+						}else{
+							responsedata.header.push("");
+							responsedata.body.push("");
+						}
 					}else{
 						responsedata.header.push("");
 						responsedata.body.push("");
 					}
-				}else{
-					responsedata.header.push("");
-					responsedata.body.push("");
+					try{
+						res.send(responsedata);
+					}catch(exception){
+						console.log(exception);
+					}
 				}
-				res.send(responsedata);
 			});
-		}else{
-			console.log("Socket not Available");
+		}
+	}else{
+		console.log("Socket not Available");
+		try{
 			res.send("fail");
+		}catch(execption){
+			console.log(exception);
 		}
 	}
 };

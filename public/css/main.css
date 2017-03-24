@@ -1918,8 +1918,9 @@ input[disabled]{
     background: #311d4e;
     color: #fff;
     border-radius: 6px;
-    padding: 5px 8px;
+    padding: 5px 40px;
     text-align: center;
+    word-break: break-all;
 }
 
 .modal-header .close {
