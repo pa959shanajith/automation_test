@@ -136,11 +136,21 @@ exports.readTestSuite_ICE = function (req, res) {
 	function(err,results){
 	//data.setHeader('Content-Type','application/json');
 	if(err){
-		res.send(err);
+		
+		try{
+			res.send(err);
+		}catch(ex){
+			console.log("Exception occured in read test suite : ",ex);
+		}
+		
 	} 
 	else{
 		console.log(responsedata);
-		res.send(JSON.stringify(responsedata));
+		try{
+			res.send(JSON.stringify(responsedata));
+		}catch(ex){
+			console.log("Exception occured in read test suite : ",ex);
+		}
 	} 
 	})
 		}
@@ -407,6 +417,7 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 			mySocket.on('result_executeTestSuite', function (resultData) {
 
 				if(resultData !="success" && resultData != "Terminate"){
+						try{
 						var scenarioid =resultData.scenarioId;
 						var executionid = resultData.executionId;
 						var reportdata = resultData.reportData; 
@@ -425,10 +436,18 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 						+testsuiteid+","+executionid+","+starttime+","+new Date().getTime()+");"
 						var dbqueryexecution =	dbConnICE.execute(insertIntoExecution, function (err, resultexecution) {if (err) {flag ="fail";}else {flag = "success";}});
 						//console.log("this is the value:",resultData);
-
+						}catch(ex){
+							console.log(ex);
+							
 						}
-						if(resultData =="success" || resultData == "Terminate")
-						res.send(resultData);
+						}
+						console.log("Response data in execution : ",resultData);
+						try{
+							if(resultData =="success" || resultData == "Terminate")
+							res.send(resultData);
+						}catch(ex){
+							console.log("Exception occured is : ",ex)
+						}
 			
 			//}
 			});
@@ -511,7 +530,11 @@ exports.getCycleNameByCycleId = function (req, res) {
 								else{
 									cycleName = "";
 								}
-									res.send(cycleName);
+									try{
+										res.send(cycleName);
+									}catch(ex){
+										console.log("Exception occured in getCycleNameByCycleId : ",ex)
+									}
 							}
 		});
 }
@@ -523,17 +546,24 @@ exports.getCycleNameByCycleId = function (req, res) {
 		console.log("sd", getReleaseName)
 		dbConnICE.execute(getReleaseName, function(err, result) {
 			//console.log("Result", result);
-			if(result.rows.length > 0)
-								{
-			  for (var i = 0; i < result.rows.length; i++) {
-                  releaseName = result.rows[i].releasename;
-                
-              }
-								}
-								else{
-									releaseName = "";
-								}
-								  res.send(releaseName);
+			var	releaseName = '';
+			if(err){
+				console.log(err);
+			}else{
+				if(result.rows.length > 0){
+					for (var i = 0; i < result.rows.length; i++) {
+					releaseName = result.rows[i].releasename;
+					}
+				}
+				else{
+					releaseName = "";
+				}
+			}
+				try{
+					res.send(releaseName);
+				}catch(ex){
+					console.log("Exception occured in getReleaseNameByReleaseId_ICE : ",ex)
+				}
 		});
 	  }
 
@@ -553,8 +583,13 @@ exports.getCycleNameByCycleId = function (req, res) {
 			if(err){
 				res.send("fail");
 			}else{
-				console.log(data);
-				res.send(JSON.stringify(data));
+				
+				try{
+					console.log(data);
+					res.send(JSON.stringify(data));
+				}catch(ex){
+					console.log("Exception occured in getTestcaseDetailsForScenario_ICE : ",ex)
+				}
 			}
 		})
 
@@ -715,6 +750,7 @@ exports.getCycleNameByCycleId = function (req, res) {
 						});
 					}else{
 						var updatetestsuitefrommodule = "UPDATE testsuites SET testscenarioids = ["+testscenarioids+"] WHERE testsuiteid="+requiredtestsuiteid+" and cycleid="+requiredcycleid+" and testsuitename='"+requiredtestsuitename+"' and versionnumber="+requiredversionnumber;
+						try{
 						dbConnICE.execute(updatetestsuitefrommodule, function(err, answers) {
 						if(err){
 							console.log(err);
@@ -722,7 +758,11 @@ exports.getCycleNameByCycleId = function (req, res) {
 							
 						}
 						
-						});
+						});						
+
+						}catch(ex){
+							console.log("Exception occured in the udating scenarios",ex);
+						}
 					}
 					callback(); 
 					
