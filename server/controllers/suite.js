@@ -737,7 +737,7 @@ exports.getCycleNameByCycleId = function (req, res) {
 				var testscenarioids = resultdata.testscenarioids;
 				//async.forEachSeries(resultdata, function(quest, callback2) {					var responsedata={template: "",testcase:[],testcasename:""};
 				var requiredversionnumber = 1;
-					var testsuiteexe = "INSERT INTO testsuites (cycleid,testsuitename,testsuiteid,versionnumber,condtitioncheck,createdby,createdon,createdthrough,deleted,donotexecute,getparampaths,history,modifiedby,modifiedon,skucodetestsuite,tags,testscenarioids) VALUES (" + requiredcycleid + ",'" + requiredtestsuitename + "'," + requiredtestsuiteid + ",1,[],'Kavyashree'," + new Date().getTime().toString() + ",null,null,[],[],null,null," + new Date().getTime().toString() + ",null,null,["+testscenarioids+"])";
+					var testsuiteexe = "INSERT INTO testsuites (cycleid,testsuitename,testsuiteid,versionnumber,conditioncheck,createdby,createdon,createdthrough,deleted,donotexecute,getparampaths,history,modifiedby,modifiedon,skucodetestsuite,tags,testscenarioids) VALUES (" + requiredcycleid + ",'" + requiredtestsuitename + "'," + requiredtestsuiteid + ",1,[],'Kavyashree'," + new Date().getTime().toString() + ",null,null,[],[],null,null," + new Date().getTime().toString() + ",null,null,["+testscenarioids+"])";
 					//var testcasestepsquery = "select testcasesteps,testcasename from testcases where testcaseid = "+quest;
 					if(!flag){
 						dbConnICE.execute(testsuiteexe, function(err, answers) {
