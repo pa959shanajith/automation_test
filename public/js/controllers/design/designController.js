@@ -381,7 +381,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 								.then(function(data) {
 									if (data == "success") {
 										angular.element(document.getElementById("tableActionButtons")).scope().readTestCase_ICE();
-										openDialog("Import Testcase", "TestCase Json imported successfully.")
+										openDialog("Import Testcase", "TestCase Json imported successfully.");
 									} else {
 										openDialog("Import Testcase", "Please Check the file format you have uploaded!")
 									}
@@ -445,7 +445,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 							.then(function(data) {
 										if (data == "success") {
 											angular.element(document.getElementById("tableActionButtons")).scope().readTestCase_ICE();
-											openDialog("Import Testcase", "TestCase Json imported successfully.")
+											openDialog("Import Testcase", "TestCase Json imported successfully.");
 										} else {
 											openDialog("Import Testcase", "Please Check the file format you have uploaded!")
 										} /*else if (data == "appTypeError"){
@@ -506,7 +506,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 							.then(function(data) {
 								if (data == "success") {
 									angular.element(document.getElementById("tableActionButtons")).scope().readTestCase_ICE();
-									openDialog("Import Testcase", "TestCase Json imported successfully.")
+									openDialog("Import Testcase", "TestCase Json imported successfully.");
 								} else {
 									openDialog("Import Testcase", "Please Check the file format you have uploaded!")
 								} /*else if (data == "appTypeError"){
@@ -824,7 +824,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				}
 			}
 			else{
-				$("#wsdlMethods").prop("selectedIndex", 1)
+				$("#wsdlMethods").prop("selectedIndex", 0)
 				$(".saveWS").prop("disabled", false);
 				$("#enbledWS").prop("disabled", true)
 				$(".disableActionsWS").addClass("enableActionsWS").removeClass("disableActionsWS")
@@ -922,24 +922,71 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 	
 	//Init Webservice
 	$scope.initScrapeWS = function(e){
-		$("#endPointURL, #wsdlMethods, #wsdlRequestHeader").removeClass("inputErrorBorderFull").removeClass("selectErrorBorder")
+		$("#endPointURL, #wsdlMethods, #wsdlRequestHeader, #wsdlOperation, #wsdlRequestBody").removeClass("inputErrorBorderFull").removeClass("selectErrorBorder")
 		var initWSJson = {}
 		var testCaseWS = []
+		var proceed = false;
 		var appType = $scope.getScreenView;
-		var endPointURL = $("#endPointURL").val();
-		var wsdlMethods = $("#wsdlMethods").val();
-		var wsdlOperation = $("#wsdlOperation").val();
+		var wsdlInputs = []
+		wsdlInputs.push($("#endPointURL").val());
+		wsdlInputs.push($("#wsdlMethods").val());
+		wsdlInputs.push($("#wsdlOperation").val());
+		wsdlInputs.push($("#wsdlRequestHeader").val().replace(/[\n\r]/g,'##').replace(/"/g, '\"'));
+		wsdlInputs.push($("#wsdlRequestBody").val().replace(/[\n\r]/g,'').replace(/\s\s+/g, ' ').replace(/"/g, '\"'));
+		//var endPointURL = $("#endPointURL").val();
+		//var wsdlMethods = $("#wsdlMethods").val();
+		//var wsdlOperation = $("#wsdlOperation").val();
 		var param = 'debugTestCaseWS_ICE';
-		var wsdlRequestHeader = $("#wsdlRequestHeader").val().replace(/[\n\r]/g,'##').replace(/"/g, '\"');
-		var wsdlRequestBody = $("#wsdlRequestBody").val().replace(/[\n\r]/g,'').replace(/\s\s+/g, ' ').replace(/"/g, '\"');
+		//var wsdlRequestHeader = $("#wsdlRequestHeader").val().replace(/[\n\r]/g,'##').replace(/"/g, '\"');
+		//var wsdlRequestBody = $("#wsdlRequestBody").val().replace(/[\n\r]/g,'').replace(/\s\s+/g, ' ').replace(/"/g, '\"');
 		if(e.currentTarget.className == "disableActionsWS") return false
-		else if(!endPointURL) $("#endPointURL").addClass("inputErrorBorderFull")
-		else if(!$scope.wsdlMethods && !wsdlMethods) $("#wsdlMethods").addClass("selectErrorBorder")
-		else if(!wsdlRequestHeader) $("#wsdlRequestHeader").addClass("inputErrorBorderFull")
+		else if(!wsdlInputs[0]) $("#endPointURL").addClass("inputErrorBorderFull")
+		else if(!$scope.wsdlMethods && !wsdlInputs[1]) $("#wsdlMethods").addClass("selectErrorBorder")
 		else{
+			if(wsdlInputs[1] == "GET" || wsdlInputs[1] == "HEAD" || wsdlInputs[1] == "PUT" || wsdlInputs[1] == "DELETE"){
+				if(wsdlInputs[3]){
+					if(!wsdlInputs[2]) $("#wsdlOperation").addClass("inputErrorBorderFull")
+					else proceed = true;
+				}
+				else proceed = true;
+			}
+			else if(wsdlInputs[1] == "POST"){
+				if(!wsdlInputs[3]) $("#wsdlRequestHeader").addClass("inputErrorBorderFull")
+				else if(!wsdlInputs[4]) $("#wsdlRequestBody").addClass("inputErrorBorderFull")
+				else proceed = true;
+			}
+		}
+		if(proceed){
+			var keywordVal = ["setEndPointURL","setMethods","setOperations","setHeader","setWholeBody"]
 			var blockMsg = "Fetching Response Header & Body..."
 			blockUI(blockMsg);
+			for(i = 0; i < wsdlInputs.length; i++){
+				if(wsdlInputs[i] != ""){
+					testCaseWS.push({
+						"stepNo": i+1,
+						"appType": appType,
+						"objectName": "",
+						"inputVal": [wsdlInputs[i]],
+						"keywordVal": keywordVal[i],
+						"outputVal": "",
+						"url": "",
+						"custname": "",
+						"remarks":[""]
+					})
+				}
+			}
 			testCaseWS.push({
+				"stepNo": testCaseWS.length + 1,
+				"appType": appType,
+				"objectName": "",
+				"inputVal": [""],
+				"keywordVal": "executeRequest",
+				"outputVal": "",
+				"url": "",
+				"custname": "",
+				"remarks":[""]
+			})
+			/*testCaseWS.push({
 				"stepNo": 1,
 				"appType": appType,
 				"objectName": "",
@@ -999,7 +1046,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				"url": "",
 				"custname": "",
 				"remarks":[""]
-			});
+			});*/
 			initWSJson.testcasename = "",
 			initWSJson.testcase = testCaseWS
 			DesignServices.initScrapeWS_ICE(initWSJson)
@@ -2145,7 +2192,7 @@ function contentTable(newTestScriptDataLS) {
 		           autowidth: true,
 		           shrinkToFit: true,
 		           multiselect: true, //Appends Checkbox for multiRowSelection
-		          //multiboxonly: true, //Selects single row
+		           multiboxonly: true, //Selects single row
 		           beforeSelectRow: function (rowid, e) {
 		        	   if ($(e.target).closest("tr.jqgrow").hasClass("state-disabled")) {
 		        		   return false;   // doesnot allow to select the row
