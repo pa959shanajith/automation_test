@@ -364,8 +364,8 @@ exports.updateScreen_ICE = function(req, res){
 							for(var elementsindex=0;elementsindex<xpathListofCustName.length;elementsindex++){
 									for(var scrapedobjectindex=0;scrapedobjectindex<viewString.length;scrapedobjectindex++){
 										if(elementschanged<newCustNamesList.length){
-										if((viewString[scrapedobjectindex].xpath == xpathListofCustName[elementsindex]) 
-											&& (viewString[scrapedobjectindex].custname.trim() == oldCustNamesList[elementsindex].trim())){
+										if((viewString[scrapedobjectindex].xpath.replace(/\s/g,' ').replace('&nbsp;',' ') == xpathListofCustName[elementsindex].replace(/\s/g,' ').replace('&nbsp;',' ')) 
+											&& (viewString[scrapedobjectindex].custname.replace(/\s/g,' ').replace('&nbsp;',' ').trim() == oldCustNamesList[elementsindex].replace(/\s/g,' ').replace('&nbsp;',' ').trim())){
 												viewString[scrapedobjectindex].custname=newCustNamesList[elementsindex];
 												//elementschanged increments only when edit has occured
 												elementschanged=elementschanged+1;
@@ -458,8 +458,8 @@ exports.updateScreen_ICE = function(req, res){
 							for(var elementsindex=0;elementsindex<deleteXpathNames.length;elementsindex++){
 								for(var scrapedobjectindex=0;scrapedobjectindex<viewString.length;scrapedobjectindex++){
 									//console.log(scrapedobjectindex,"---",viewString[scrapedobjectindex].custname,"====",deleteCustNames[elementsindex]);
-									if((viewString[scrapedobjectindex].xpath == deleteXpathNames[elementsindex]) 
-											&& (viewString[scrapedobjectindex].custname.trim() == deleteCustNames[elementsindex].trim())){
+									if((viewString[scrapedobjectindex].xpath.replace(/\s/g,' ').replace('&nbsp;',' ') == deleteXpathNames[elementsindex].replace(/\s/g,' ').replace('&nbsp;',' ')) 
+											&& (viewString[scrapedobjectindex].custname.replace(/\s/g,' ').replace('&nbsp;',' ').trim() == deleteCustNames[elementsindex].replace(/\s/g,' ').replace('&nbsp;',' ').trim())){
 										if(elementschanged<deleteCustNames.length){
 											//console.log(viewString[scrapedobjectindex].custname);
 											deleteindex.push(scrapedobjectindex);
