@@ -152,9 +152,11 @@ var oldCustName = [];
     			        	        		else { 
     			        	        			window.localStorage['checkEditWorking'] = "true";
     			        	        			span.text($(this).val()).removeClass('content-hide');
-    											oldCustName.push($(this)[0].defaultValue);
     			        	        		    modifiedCustNames.push($(this)[0].value);
-    			        	        		    xpathListofCustNames.push($(this).parent().parent().attr("data-xpath"));
+												var id = e.target.id.split("_");
+												id = id[1];
+    			        	        		    xpathListofCustNames.push(viewString.view[id].xpath);
+												oldCustName.push(viewString.view[id].custname);
     			        	        		    editedList.modifiedCustNames = modifiedCustNames;
     			        	        		    editedList.xpathListofCustNames = xpathListofCustNames;
     											editedList.oldCustName = oldCustName;
