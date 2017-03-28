@@ -239,3 +239,12 @@ select
     position: relative;
     top: -10px;
 }
+.selectedIcon {
+	background: #331d4c;
+	border-radius: 5px;
+    padding: 6px;
+}
+.errorClass { 
+    border:  1px 
+    solid red; 
+}
