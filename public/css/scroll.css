@@ -301,7 +301,13 @@
 	min-height: auto;
 	height: 100% !important;
 }
-.scroll-wrapper > .designDataTable{max-height: 690px !important;}
+.scroll-wrapper > .designDataTable{
+    min-height: auto;
+	width: 100% !important;
+	padding-right: 16px;
+	max-height: 100% !important;
+}
+
 .exeDataTable > .scroll-element.scroll-y, .designDataTable > .scroll-element.scroll-y{
 	top: 28px;
 	height: calc(100% - 28px);	
@@ -413,13 +419,14 @@
 	padding-top: 30px;
     padding-left: 20px;
     padding-right: 20px;
+    width: 97% !important;
 }
 .scroll-wrapper.scrollbar-inner-rep {
 	display: none;
     max-height: 305px !important;
     position: fixed !important;
     width: calc(100% - 310px);
-    z-index: 55;
+    z-index: 1001;
     top: 249px;
     /* overflow: auto; */
 }
@@ -470,15 +477,16 @@
        background: rgb(211, 211, 211)
 }
 
-
 .scroll-wrapper > .scenarioDetailsContent{
        padding: 0px;
-       height: auto !important;
+       min-height: auto !important;
        width: 100% !important;
+       height: auto !important;
+       max-height:350px !important;
 }
 .scroll-wrapper.scenarioDetailsContent {
        float: none;
-       max-height:350px !important
+       /* max-height:350px !important */
 }
 .scenarioDetailsContent > .scroll-element.scroll-y .scroll-bar{
        background: #321e4f;
@@ -573,5 +581,59 @@
 	}
 	.scroll-wrapper > .scrollbar-inner-rep{
 	    height: 155px !important;
+	}
+}
+
+/**********Specifically for Firefox**********/
+@-moz-document url-prefix() {
+	.scroll-wrapper > .scenarioDetailsContent{
+	 	padding: 0px;
+		min-height: auto !important;
+		width: calc(100% - -17px) !important;
+		max-height: 350px !important;
+		margin-bottom: 0 !important;
+	}
+	
+	#scheduleDataBody, #scheduledDataBody {
+		width: calc(100% - -9px) !important;
+		padding-right: 8px;
+		margin-bottom: 0 !important;
+	}
+	
+	.scroll-wrapper > .scrollbar-inner-scenariostatus{
+		width: 102% !important;
+		padding-right: 6px;
+	}
+}
+
+/**********Specifically for Internet Explorer**********/
+@media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
+	#left-bottom-section{
+		min-height: 36%;
+	}
+	
+	#left-bottom-section ul li {
+	    margin-top: 0;
+	    margin-bottom: 20%;
+	}
+	
+	.scroll-wrapper > .scenarioDetailsContent{
+	 	padding: 0px;
+		min-height: auto !important;
+		width: calc(100% - -17px) !important;
+		max-height: 350px !important;
+		margin-bottom: 0 !important;
+	}
+	
+	#scheduleDataBody, #scheduledDataBody {
+		width: 100% !important;
+		padding-right: 8px;
+		margin-bottom: 0 !important;
+	}
+	
+	.scroll-wrapper > .scrollbar-inner-scenariostatus{
+		width: 100% !important;
+		padding-right:8px;
+		margin-bottom: 0px !important
 	}
 }

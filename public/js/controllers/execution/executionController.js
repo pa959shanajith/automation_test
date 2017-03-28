@@ -123,13 +123,15 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 	
 	//Load Location Details of Scenario
 	$scope.loadLocationDetails = function(scenarioName, scenarioId) {
-		document.getElementById("scenarioDetailsContent").innerHTML = "";
+		//document.getElementById("scenarioDetailsContent").innerHTML = "";
+		$("#scenarioDetailsContent").empty();
+		$("#modalScenarioDetails").find(".modal-title").text(scenarioName);
+		$("#modalScenarioDetails").modal("show");
 		ExecutionService.loadLocationDetails(scenarioName, scenarioId)
 		.then(function(data) {
-			$("#modalScenarioDetails").find(".modal-title").text(scenarioName)
-			$("#modalScenarioDetails").modal("show");	
 			for(i=0; i<data.projectnames.length && data.testcasenames.length && data.screennames.length; i++){
-				document.getElementById("scenarioDetailsContent").innerHTML += '<div class="sDInnerContentsWrap"><div class="sDInnerContents">'+data.testcasenames[i]+'</div><div class="sDInnerContents">'+data.screennames[i]+'</div><div class="sDInnerContents">'+data.projectnames[i]+'</div></div>'
+				//document.getElementById("scenarioDetailsContent").innerHTML += '<div class="sDInnerContentsWrap"><div class="sDInnerContents">'+data.testcasenames[i]+'</div><div class="sDInnerContents">'+data.screennames[i]+'</div><div class="sDInnerContents">'+data.projectnames[i]+'</div></div>'
+				$("#scenarioDetailsContent").append('<div class="sDInnerContentsWrap"><div class="sDInnerContents">'+data.testcasenames[i]+'</div><div class="sDInnerContents">'+data.screennames[i]+'</div><div class="sDInnerContents">'+data.projectnames[i]+'</div></div>')
 			}
 		}, 
 		function(error){
