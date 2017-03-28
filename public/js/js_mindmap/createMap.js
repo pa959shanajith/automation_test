@@ -1,4 +1,5 @@
 var activeNode,uNix,uLix,node,link,dNodes,dLinks,allMMaps,temp,rootIndex,faRef,nCount,scrList,tcList,mapSaved,zoom,cSpan,cScale,taskAssign,releaseResult;
+var deletednode=[];
 function loadMindmapData(){
 	uNix=0;uLix=0;dNodes=[];dLinks=[];nCount=[0,0,0,0];scrList=[];tcList=[];cSpan=[0,0];cScale=1;mapSaved=!1;
 	taskAssign={"modules":{"task":["Execute"],"attributes":["at","sd","ed","re","cy"]},"scenarios":null,"screens":{"task":["Scrape","Append","Compare","Add","Map"],"attributes":["at","rw","sd","ed"]},"testcases":{"task":["Update","Design"],"attributes":["at","rw","sd","ed"]}};
@@ -21,6 +22,7 @@ function loadMindmapData(){
 	var svgTileLen = $(".ct-svgTile").length;
 	if(svgTileLen == 0)
 	{
+			//$('#ct-mapSvg').empty();
 			svgTileG.append('circle').attr('cx',75).attr('cy',75).attr('r',30);
 			svgTileG.append('path').attr('d','M75,55L75,95');
 			svgTileG.append('path').attr('d','M55,75L95,75');
@@ -78,9 +80,13 @@ var initiate = function(){
 	t=u.append('g').attr('id','ct-saveAction').attr('class','ct-actionButton').on('click',actionEvent);
 	t.append('rect').attr('x',0).attr('y',0).attr('rx',12).attr('ry',12);
 	t.append('text').attr('x',23).attr('y',18).html('Save');
-	t=u.append('g').attr('id','ct-createAction').attr('class','ct-actionButton').on('click',actionEvent);
-	t.append('rect').attr('x',100).attr('y',0).attr('rx',12).attr('ry',12);
-	t.append('text').attr('x',114).attr('y',18).html('Create');
+	if(selectedTab == "tabCreate"){
+		t=u.append('g').attr('id','ct-createAction').attr('class','ct-actionButton').on('click',actionEvent);
+		t.append('rect').attr('x',100).attr('y',0).attr('rx',12).attr('ry',12);
+		t.append('text').attr('x',114).attr('y',18).html('Create');
+	}
+	
+	
 };
 var zoomed = function(){
 	cSpan=d3.event.translate;
@@ -153,20 +159,30 @@ var addTask = function(e){
 		tObj.oid=null;
 		tObj.parent=null;
 	}
+	var taskflag=false;
 	Object.keys(tObj).forEach(function(k){if(tObj[k]==''||tObj[k]===undefined) tObj[k]=null;});
-	if(p.select('.ct-nodeTask')[0][0]==null) p.append('image').attr('class','ct-nodeTask').attr('xlink:href','images_mindmap/node-task-assigned.png').attr('x',29).attr('y',-10);
+	//if(p.select('.ct-nodeTask')[0][0]==null) p.append('image').attr('class','ct-nodeTask').attr('xlink:href','images_mindmap/node-task-assigned.png').attr('x',29).attr('y',-10);
 	if(nType=="modules"){
 		dNodes[pi].task={id:tObj.id,oid:tObj.oid,task:tObj.t,assignedTo:tObj.at,startDate:tObj.sd,endDate:tObj.ed,release:tObj.re,cycle:tObj.cy,details:tObj.det,parent:(tObj.parent!=null)?tObj.parent:[dNodes[pi].id_c]};
 		if(dNodes[pi].children) dNodes[pi].children.forEach(function(tSc){
 			tSc.children.forEach(function(scr){
 				if(scr.task===undefined||scr.task==null){
-					scr.task={id:null,oid:null,task:"Scrape",assignedTo:tObj.at,reviewer:null,startDate:tObj.sd,endDate:tObj.ed,details:tObj.det,parent:[dNodes[pi].id_c,tSc.id_c,scr.id_c]};
-					d3.select('#ct-node-'+scr.id).append('image').attr('class','ct-nodeTask').attr('xlink:href','images_mindmap/node-task-assigned.png').attr('x',29).attr('y',-10);
+					if(dNodes[pi].id_c!='null' && tSc.id_c!='null' && scr.id_c!='null'){
+						taskflag=true;
+						scr.task={id:null,oid:null,task:"Scrape",assignedTo:tObj.at,reviewer:null,startDate:tObj.sd,endDate:tObj.ed,details:tObj.det,parent:[dNodes[pi].id_c,tSc.id_c,scr.id_c]};
+						d3.select('#ct-node-'+scr.id).append('image').attr('class','ct-nodeTask').attr('xlink:href','images_mindmap/node-task-assigned.png').attr('x',29).attr('y',-10);
+					}
+					
 				}
 				scr.children.forEach(function(tCa){
 					if(tCa.task===undefined||tCa.task==null){
-						tCa.task={id:null,oid:null,task:"Design",assignedTo:tObj.at,reviewer:null,startDate:tObj.sd,endDate:tObj.ed,details:tObj.det,parent:[dNodes[pi].id_c,tSc.id_c,scr.id_c,tCa.id_c]};
-						d3.select('#ct-node-'+tCa.id).append('image').attr('class','ct-nodeTask').attr('xlink:href','images_mindmap/node-task-assigned.png').attr('x',29).attr('y',-10);
+						if(dNodes[pi].id_c!='null' && tSc.id_c!='null' && scr.id_c!='null' && tCa.id_c != 'null' ){
+							taskflag=true;
+							tCa.task={id:null,oid:null,task:"Design",assignedTo:tObj.at,reviewer:null,startDate:tObj.sd,endDate:tObj.ed,details:tObj.det,parent:[dNodes[pi].id_c,tSc.id_c,scr.id_c,tCa.id_c]};
+							d3.select('#ct-node-'+tCa.id).append('image').attr('class','ct-nodeTask').attr('xlink:href','images_mindmap/node-task-assigned.png').attr('x',29).attr('y',-10);
+						}
+					}else{
+						taskflag=true;
 					}
 				});
 			});
@@ -178,14 +194,30 @@ var addTask = function(e){
 		if(dNodes[pi].children) dNodes[pi].children.forEach(function(tCa){
 			var cTask=(tObj.t=="Scrape"||tObj.t=="Append"||tObj.t=="Compare")? "Design":"Debug";
 			if(tCa.task===undefined||tCa.task==null){
-				tCa.task={id:null,oid:null,task:cTask,assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,details:tObj.det,parent:[modid,tscid,pi]};
-				d3.select('#ct-node-'+tCa.id).append('image').attr('class','ct-nodeTask').attr('xlink:href','images_mindmap/node-task-assigned.png').attr('x',29).attr('y',-10);
+				var tcid=dNodes[pi].children[0].id_c;
+				if (modid !='null' && tscid !='null' && scrid!='null' && tcid!='null'){
+					taskflag=true;
+					tCa.task={id:null,oid:null,task:cTask,assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,details:tObj.det,parent:[modid,tscid,scrid,tcid]};
+					d3.select('#ct-node-'+tCa.id).append('image').attr('class','ct-nodeTask').attr('xlink:href','images_mindmap/node-task-assigned.png').attr('x',29).attr('y',-10);
+				}
+			}else{
+				taskflag=true;
 			}
 		});
 	}
 	else if(nType=="testcases"){
 		var modid=dNodes[pi].parent.parent.parent.id_c,tscid=dNodes[pi].parent.parent.id_c,scrid=dNodes[pi].parent.id_c;var tcid=dNodes[pi].id_c;
-		dNodes[pi].task={id:tObj.id,oid:tObj.oid,task:tObj.t,assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,details:tObj.det,parent:(tObj.parent!=null)?tObj.parent:[modid,tscid,scrid,tcid]};
+		if (modid !='null' && tscid !='null' && scrid!='null' && tcid!='null'){
+			taskflag=true;
+			dNodes[pi].task={id:tObj.id,oid:tObj.oid,task:tObj.t,assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,details:tObj.det,parent:(tObj.parent!=null)?tObj.parent:[modid,tscid,scrid,tcid]};
+		}
+		
+	}
+	if (taskflag){
+		if(p.select('.ct-nodeTask')[0][0]==null) p.append('image').attr('class','ct-nodeTask').attr('xlink:href','images_mindmap/node-task-assigned.png').attr('x',29).attr('y',-10);
+	}else{
+		$('#Mindmap_assign_error').modal('show');
+		//alert('Error ! Please create the structure before Task Assignement');
 	}
 };
 
@@ -532,6 +564,7 @@ var createNode = function(e){
 	uNix++;uLix++;
 };
 var editNode = function(e){
+	$('#ct-inpAct').removeClass('errorClass');
 	e=e||window.event;
 	e.cancelbubble=!0;
 	if(e.stopPropagation) e.stopPropagation();
@@ -543,7 +576,7 @@ var editNode = function(e){
 	l=[(parseFloat(l[0])-20)*cScale+cSpan[0],(parseFloat(l[1])+42)*cScale+cSpan[1]];
 	d3.select('#ct-inpBox').style('top',l[1]+'px').style('left',l[0]+'px').classed('no-disp',!1);
 	d3.select('#ct-inpPredict').property('value','');
-	d3.select('#ct-inpAct').attr('data-nodeid',null).property('value','').node().focus();
+	d3.select('#ct-inpAct').attr('data-nodeid',null).property('value',p.text()).node().focus();
 	d3.select('#ct-inpSugg').classed('no-disp',!0);
 };
 var deleteNode = function(e){
@@ -574,6 +607,7 @@ var recurseDelChild = function(d){
 	d.children=null;
 	d.task=null;
 	d3.select('#ct-node-'+d.id).remove();
+	deletednode.push(d.oid)
 	for(j=dLinks.length-1;j>=0;j--){
 		if(dLinks[j].source.id==d.id){
 			d3.select('#ct-link-'+dLinks[j].id).remove();
@@ -656,7 +690,17 @@ var recurseTogChild = function(d,v){
 		}
 	});
 };
-var validNodeDetails = function(p){
+var validNodeDetails = function(value,p){
+	var nName,flag=!0;
+	nName=value;
+	if (!(nName.length>0 && (/^[a-zA-Z0-9_]/.test(nName))) ){
+		$('#ct-inpAct').addClass('errorClass');
+		flag=!1;
+	}
+	return flag;
+};
+
+var validNodeDetails1 = function(p){
 	var nName,flag=!0;
 	nName=d3.select(p).property('value');
 	if(!(/^[a-zA-Z0-9_]+$/.test(nName))){
@@ -673,6 +717,7 @@ var validNodeDetails = function(p){
 var inpChange = function(e){
 	var inp=d3.select('#ct-inpAct');
 	var val=inp.property('value');
+	if(!validNodeDetails(val,this)) return;
 	//if(!validNodeDetails(this)) return;
 	var p=d3.select(activeNode);
 	var pi=p.attr('id').split('-')[2];
@@ -706,7 +751,7 @@ var inpKeyUp = function(e){
 	var val=d3.select(this).property('value');
 	var iul=d3.select('#ct-inpSugg');
 	if(e.keyCode==13) {
-		inpChange();
+		inpChange();			
 		return;
 	}
 	if(val.indexOf('_')==-1) {
@@ -766,26 +811,31 @@ var actionEvent = function(e){
 	var error=!1,mapData=[],flag=0,alertMsg;
 	error=treeIterator(mapData,dNodes[0],error);
 	if(error){
-		alert('Mindmap flow must be complete!\nModules>Scenarios>Screens>Testcases');
+		//alert('Mindmap flow must be complete!\nModules>Scenarios>Screens>Testcases');
+		$('#Mindmap_error').modal('show');
 		return;
 	}
 	if(s.attr('id')=='ct-saveAction'){
 		flag=10;
-		alertMsg="Data written successfully!";
+		//alertMsg="Data written successfully!";
+		$('#Mindmap_save').modal('show');
 	}
 	else if(s.attr('id')=='ct-createAction'){
 		flag=20;
-		alertMsg="Data sent successfully!";
-		alert("Caution! Save data before submitting\nIgnore if already saved.");
+		//alertMsg="Data sent successfully!";
+		$('#Mindmap_save').modal('show');
+		//alert("Caution! Save data before submitting\nIgnore if already saved.");
 	}
 	if(flag==0) return;
 	if(s.classed('no-access')) return;
 	s.classed('no-access',!0);
-	dataSender({task:'writeMap',data:{write:flag,map:mapData}},function(err,result){
+	var userInfo =  JSON.parse(window.localStorage['_UI']);
+	var username = userInfo.username;
+	dataSender({task:'writeMap',data:{write:flag,map:mapData,user_name:username,abc:deletednode}},function(err,result){
 		s.classed('no-access',!1);
 		if(err) console.log(result);
 		else{
-			alert(alertMsg);
+			//alert(alertMsg);
 			var res=JSON.parse(result);
 			if(flag==10) mapSaved=!0;
 			var mid,sts=allMMaps.some(function(m,i){
@@ -863,6 +913,8 @@ var populateDynamicInputList = function(){
 };
 var clearSvg = function(){
 	d3.select('#ct-mindMap').remove();
+	d3.select('#ct-ctrlBox').classed('no-disp',!0);
+	d3.select('#ct-assignBox').classed('no-disp',!0);
 	d3.select('#ct-mapSvg').append('g').attr('id','ct-mindMap');
 	uNix=0;uLix=0;dNodes=[];dLinks=[];nCount=[0,0,0,0];cSpan=[0,0];cScale=1;mapSaved=!1;
 	zoom.scale(cScale).translate(cSpan);
