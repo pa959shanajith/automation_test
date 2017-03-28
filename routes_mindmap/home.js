@@ -148,8 +148,13 @@ router.post('/', function(req, res, next) {
 		}
 		else if(d.task=='writeMap'){
 			data=d.data.map;
+			var deletednodes=d.data.abc;
 			if(d.data.write==10){
 				var uidx=0,t,lts,rnmList=[];
+				deletednodes.forEach(function(t,i){
+					qList.push({"statement":"MATCH (N) WHERE ID(N)="+t+" MATCH (N)-[r:FNTT]-(b) DETACH DELETE b"});
+				});
+				
 				data.forEach(function(e,i){
 					idDict[e.id]=(e.id_n)?e.id_n:uuidV4();
 					e.id=idDict[e.id];
@@ -160,7 +165,7 @@ router.post('/', function(req, res, next) {
 							if(e.renamed) qList.push({"statement":"MATCH(n:MODULES{moduleID:'"+e.id+"'}) SET n.moduleName='"+e.name+"'"+",n.unique_property='["+e.name+','+prjId+"]'"});
 						}
 						else qList.push({"statement":"MERGE(n:MODULES{projectID:'"+prjId+"',moduleName:'"+e.name+"',moduleID:'"+e.id+"',createdBy:'null',createdOn:'null',moduleID_c:'"+e.id_c+"',unique_property:'["+e.name+','+prjId+"]'})"});
-						if(t!=null){
+						if(t!=null && e.id_c !=null){
 							t.parent=[prjId].concat(e.id_c);
 							t.id=(t.id!=null)?t.id:uuidV4();
 							if(t.oid!=null) qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',nodeID:'"+e.id+"',parent:'["+t.parent+"]'}) SET n.task='"+t.task+"',n.assignedTo='"+t.assignedTo+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.release='"+t.release+"',n.cycle='"+t.cycle+"',n.details='"+t.details+"'"});
@@ -175,7 +180,7 @@ router.post('/', function(req, res, next) {
 						uidx++;lts=idDict[e.pid];
 						if(e.renamed && e.id_n) rnmList.push({"statement":"MATCH(n:SCREENS{screenID:'"+e.id+"'}) SET n.screenName='"+e.name+"'"});
 						qList.push({"statement":"MERGE(n:SCREENS{testScenarioID:'"+idDict[e.pid]+"',screenName:'"+e.name+"',screenID:'"+e.id+"',createdBy:'null',createdOn:'null',uid:'"+uidx+"',screenID_c:'"+e.id_c+"'})"});
-						if(t!=null){
+						if(t!=null && e.id_c!=null){
 							t.id=(t.id!=null)?t.id:uuidV4();
 							if(t.oid!=null) qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',nodeID:'"+e.id+"',parent:'["+t.parent+"]'}) SET n.task='"+t.task+"',n.assignedTo='"+t.assignedTo+"',n.reviewer='"+t.reviewer+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.details='"+t.details+"',n.uid='"+uidx+"'"});
 							else{
@@ -190,7 +195,7 @@ router.post('/', function(req, res, next) {
 					else if(e.type=='testcases'){
 						if(e.renamed && e.id_n) rnmList.push({"statement":"MATCH(n:TESTCASES{testCaseID:'"+e.id+"'}) SET n.testCaseName='"+e.name+"'"});
 						qList.push({"statement":"MERGE(n:TESTCASES{screenID:'"+idDict[e.pid]+"',testScenarioID:'"+lts+"',testCaseName:'"+e.name+"',testCaseID:'"+e.id+"',createdBy:'null',createdOn:'null',uid:'"+uidx+"',testCaseID_c:'"+e.id_c+"'})"});
-						if(t!=null){
+						if(t!=null  && e.id_c!=null){
 							t.id=(t.id!=null)?t.id:uuidV4();
 							if(t.oid!=null) qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',nodeID:'"+e.id+"',parent:'["+t.parent+"]'}) SET n.task='"+t.task+"',n.assignedTo='"+t.assignedTo+"',n.reviewer='"+t.reviewer+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.details='"+t.details+"',n.uid='"+uidx+"'"});
 							else{
@@ -294,6 +299,7 @@ router.post('/', function(req, res, next) {
 					tsList.push({"testscenarioId":ts.id,"testscenarioId_c":ts.id_c,"testscenarioName":ts.name,"tasks":ts.task,"screenDetails":sList});
 				});
 				qObj.testsuiteDetails=[{"testsuiteId":nObj[rIndex].id,"testsuiteId_c":nObj[rIndex].id_c,"testsuiteName":nObj[rIndex].name,"task":nObj[rIndex].task,"testscenarioDetails":tsList}];
+				qObj.userName=d.data.username;
 				fs.writeFileSync('assets_mindmap/req_json.txt',JSON.stringify(qObj),'utf8');
 				create_ice.createStructure_Nineteen68(qObj,function(err,data){
 				//res.setHeader('Content-Type', 'application/json');
@@ -323,7 +329,7 @@ router.post('/', function(req, res, next) {
 
 				
 				
-				res.status(200).send("success");
+				//res.status(200).send("success");
 			}
 		}
 		else if(d.task=='populateUsers'){
