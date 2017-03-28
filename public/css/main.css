@@ -1704,7 +1704,7 @@ input[disabled]{
     position: absolute;
     right: 0;
     background: #643693;
-    padding: 4px 5px;
+    padding: 3px 4px;
     border-radius: 0px 4px 4px 0px;
     -moz-border-radius: 0px 4px 4px 0px;
     -webkit-border-radius: 0px 4px 4px 0px;
@@ -1715,7 +1715,7 @@ input[disabled]{
     position: absolute;
     right: 0;
 	background: #643693;
-    padding: 5px;
+    padding: 4px;
     border-radius: 0px 4px 2px 0px;
     -moz-border-radius: 0px 4px 2px 0px;
     -webkit-border-radius: 0px 4px 2px 0px;
@@ -1761,7 +1761,18 @@ input[disabled]{
 }
 
 .modalScenarioDetails .modal-body{
-	padding-top:0px
+	padding-top:0px;
+	position: relative;
+}
+
+.gifloader{
+	position: absolute;
+	left:50%;
+	top:50%;
+	transform:translate(-50%, -50%);
+	-moz-transform:translate(-50%, -50%);
+	-webkit-transform:translate(-50%, -50%);
+	-ms-transform:translate(-50%, -50%);
 }
 
 .scenarioDetails{
@@ -1811,7 +1822,7 @@ input[disabled]{
     padding: 0px 10px;
 	border: 1px solid #5e636b !important;
 }
-.designTableDnd .scroll-wrapper .scroll-content, .ui-jqgrid-view, .scroll-content, #gbox_jqGrid, .ui-jqgrid-bdiv, #jqGrid{width: 100% !important;}
+/* .designTableDnd .scroll-wrapper .scroll-content, .ui-jqgrid-view, .scroll-content, #gbox_jqGrid, .ui-jqgrid-bdiv, #jqGrid{width: 100% !important;} */
 .btn-action{padding: 6px 16px;}
 .btn-xs-action:nth-child(odd){margin-left: 60px; margin-top: 0px;}
 .btn-xs-action{margin-top: 0px;}
@@ -3198,5 +3209,23 @@ select:-webkit-autofill:focus {
 	}
 	.relCycContainer{
 		height: calc(100% - 280px);
+	}
+}
+
+
+/**********Specifically for Firefox**********/
+@-moz-document url-prefix() {
+
+}
+
+/**********Specifically for Internet Explorer**********/
+@media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
+	#left-bottom-section{
+		min-height: 36%;
+	}
+	
+	#left-bottom-section ul li {
+	    margin-top: 0;
+	    margin-bottom: 20%;
 	}
 }
