@@ -173,6 +173,11 @@ var addTask = function(e){
 						d3.select('#ct-node-'+scr.id).append('image').attr('class','ct-nodeTask').attr('xlink:href','images_mindmap/node-task-assigned.png').attr('x',29).attr('y',-10);
 					}
 					
+				}else{
+						if (scr.task.assignedTo!=tObj.at){
+							scr.task.assignedTo=tObj.at;
+						}
+						//taskflag=true;
 				}
 				scr.children.forEach(function(tCa){
 					if(tCa.task===undefined||tCa.task==null){
@@ -182,6 +187,10 @@ var addTask = function(e){
 							d3.select('#ct-node-'+tCa.id).append('image').attr('class','ct-nodeTask').attr('xlink:href','images_mindmap/node-task-assigned.png').attr('x',29).attr('y',-10);
 						}
 					}else{
+						if (tCa.task.assignedTo!=tObj.at){
+							tCa.task.assignedTo=tObj.at;
+
+						}
 						taskflag=true;
 					}
 				});
@@ -201,6 +210,10 @@ var addTask = function(e){
 					d3.select('#ct-node-'+tCa.id).append('image').attr('class','ct-nodeTask').attr('xlink:href','images_mindmap/node-task-assigned.png').attr('x',29).attr('y',-10);
 				}
 			}else{
+				if (tCa.task.assignedTo!=tObj.at || tCa.task.reviewer!=tObj.rw ){
+					tCa.task.assignedTo=tObj.at;
+					tCa.task.reviewer!=tObj.rw
+				}
 				taskflag=true;
 			}
 		});
@@ -693,7 +706,8 @@ var recurseTogChild = function(d,v){
 var validNodeDetails = function(value,p){
 	var nName,flag=!0;
 	nName=value;
-	if (!(nName.length>0 && (/^[a-zA-Z0-9_]/.test(nName))) ){
+	var specials=/[*|\":<>[\]{}`\\()';@&$]/;
+	if (!(nName.length>0 || (specials.test(nName))) ){
 		$('#ct-inpAct').addClass('errorClass');
 		flag=!1;
 	}
