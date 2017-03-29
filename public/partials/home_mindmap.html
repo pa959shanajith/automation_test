@@ -8,13 +8,13 @@
                <div class="clear-both"></div>
                <div id="left-bottom-section" style="top: 150px !important;">
                   <ul>
-                     <li><a ng-click="tab = 'tabRequirement'" href="#"><span><img src="images_mindmap/requirement.png" alt="Requirement"></span>Requirement</a></li>
+                     <li><a id='reqImg1' ng-click="tab = 'tabRequirement'" href="#"><span><img id='reqImg' class='highlightImg selectedIcon' src="images_mindmap/requirement.png" alt="Requirement"></span>Requirement</a></li>
                      <li>
-                        <a ng-click="tab = 'tabCreate'; createMapsCall()" href="#"><span><img src="images_mindmap/create.png" alt="Create"></span>Create</a>
+                        <a id='createImg1' class='highlightImg' ng-click="tab = 'tabCreate'; createMapsCall()" href="#"><span ><img id='createImg' class='highlightImg1' src="images_mindmap/create.png" alt="Create"></span>Create</a>
                         <!--<span  class="ct-expand ct-show-left">
                         </span>-->
                      </li>
-                     <li><a ng-click="tab = 'tabAssign'; createMapsCall()" href="#"><span><img src="images_mindmap/assign.png" alt="Assign"></span>Assign</a></li>
+                     <li><a id='assignImg1' class='highlightImg' ng-click="tab = 'tabAssign'; createMapsCall()" href="#"><span><img id='assignImg' class='highlightImg1' src="images_mindmap/assign.png" alt="Assign"></span>Assign</a></li>
                   </ul>
                </div>
             </div>
@@ -192,6 +192,78 @@
    </div>
    <!-- Right Section -->  
 </div>
+
+<!-- MIndmaps -->
+<div class="modal fade" id="Mindmap_save" role="dialog" data-keyboard="false" data-backdrop="static">
+	<div class="modal-dialog modal-sm">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">&times;</button>
+				<h4 class="modal-title">Mindmaps Success</h4>
+			</div>
+			<div class="modal-body">
+				<p>Data sent successfully</p>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Ok</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<div class="modal fade" id="Mindmap_error" role="dialog" data-keyboard="false" data-backdrop="static">
+	<div class="modal-dialog modal-sm">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">&times;</button>
+				<h4 class="modal-title">Mindmaps Error</h4>
+			</div>
+			<div class="modal-body">
+				<p>Mindmap flow must be complete!<br />Modules>Scenarios>Screens>Testcases</p>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Ok</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="Mindmap_assign_error" role="dialog" data-keyboard="false" data-backdrop="static">
+	<div class="modal-dialog modal-sm">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">&times;</button>
+				<h4 class="modal-title">Task assignment Error</h4>
+			</div>
+			<div class="modal-body">
+				<p>Error ! Please create the structure before Task Assignement</p>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Ok</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="SaveStructure" role="dialog" data-keyboard="false" data-backdrop="static">
+	<div class="modal-dialog modal-sm">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">&times;</button>
+				<h4 class="modal-title">Save Structure</h4>
+			</div>
+			<div class="modal-body">
+				<p>'Unsaved work will be lost if you continue.<br/>Continue?'</p>
+			</div>
+			<div class="modal-footer">
+				<button id='yes' type="button" class="btn btn-default" data-dismiss="modal">Yes</button>
+				<button id='no' type="button" class="btn btn-default" data-dismiss="modal">No</button>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- MIndmaps -->
 
 <!--Footer-->
 <footer footer id="footer" class="footer-global"></footer>

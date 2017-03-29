@@ -1956,7 +1956,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				for(var i=0; i<mydata.length;i++){
 					//new to parse str to int (step No)
 					if(mydata[i].hasOwnProperty("_id_")){
-						if(mydata[i]._id_.startsWith("jqg")){
+						if(mydata[i]._id_.indexOf('jpg') !== -1){
 							var index = mydata.indexOf(mydata[i]);
 							mydata.splice(index, 1)
 						}
@@ -2131,6 +2131,10 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 	}
 	//Filter Scrape Objects
 }]);
+
+function updateTestCase_ICE(){
+	angular.element(document.getElementById("tableActionButtons")).scope().updateTestCase_ICE()
+}
 
 //Loading table action buttons
 function contentTable(newTestScriptDataLS) {

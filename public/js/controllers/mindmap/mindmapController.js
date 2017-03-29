@@ -31,9 +31,27 @@ mySPA.controller('mindmapController', ['$scope', '$http', '$location', '$timeout
          });
     });
 
-    $scope.createMapsCall = function(){
+    $scope.createMapsCall = function(e){
+            if ($scope.tab=='tabCreate'){
+                 $("a.selectedIcon").removeClass("selectedIcon");
+		         $('#createImg1').addClass('selectedIcon');
+            }else if($scope.tab=='tabAssign'){
+                $("a.selectedIcon").removeClass("selectedIcon");
+		         $('#assignImg1').addClass('selectedIcon');
+
+            }
         window.localStorage['tabMindMap'] = $scope.tab;
         loadMindmapData()
     }
+
+    // $(".highlightImg").on('click',function(e) {
+    //     if(e.target.id == "reqImg" || e.target.id == "createImg" ||  e.target.id == "assignImg" || 
+    //     e.target.id == "reqImg1" || e.target.id == "createImg1" ||  e.target.id == "assignImg1")
+    //     {
+    //         $("a.selectedIcon").removeClass("selectedIcon");
+	// 	    $(this).addClass('selectedIcon');
+    //     }
+		
+	// });
 
 }]);

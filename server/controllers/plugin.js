@@ -35,7 +35,7 @@ exports.getProjectIDs_Nineteen68 = function(req, res){
                     dbConnICE.execute(getProjectName,function(err,projectnamedata){
                         if(err){
                             console.log(err);
-                            project_ids='projectsNotAssigned';
+                            project_ids.push('projectsNotAssigned');
                         }else{
                             projectdetails.projectId = iterator;
                             projectdetails.projectName = projectnamedata.rows[0].projectname; 
