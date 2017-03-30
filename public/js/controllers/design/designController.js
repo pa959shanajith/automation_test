@@ -639,7 +639,9 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		enableScreenShotHighlight = true;
 		DesignServices.getScrapeDataScreenLevel_ICE() 
 		.then(function(data){
-		
+			gsElement = [];
+			$(".popupWrap").animate({ opacity: 0, right: "70px" }, 100).css({'z-index':'0','pointer-events':'none'});
+			$(".thumb-ic").removeClass("thumb-ic-highlight");
 			if(data != null && data != "getScrapeData Fail."){
 				viewString = data;
 				newScrapedList = viewString

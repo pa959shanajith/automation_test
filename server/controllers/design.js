@@ -1137,7 +1137,7 @@ exports.debugTestCase_ICE = function (req, res) {
 										console.log(exception);
 									}
 								}else{
-									var responseData={
+									var responsedata={
 											responseHeader:[],
 											responseBody:[]
 										};
@@ -1145,24 +1145,24 @@ exports.debugTestCase_ICE = function (req, res) {
 										var response=value.split('rEsPONseBOdY:');
 										
 										if(response.length == 2){
-											responseData.responseHeader.push(response[0]);
-											responseData.responseBody.push(response[1]);
+											responsedata.responseHeader.push(response[0]);
+											responsedata.responseBody.push(response[1]);
 											try{
 												res.send(responsedata);
 											}catch(exception){
 												console.log(exception);
 											}
 										}else if (response.length == 1){
-											responseData.responseHeader.push(response[0]);
-											responseData.responseBody.push("");
+											responsedata.responseHeader.push(response[0]);
+											responsedata.responseBody.push("");
 											try{
 												res.send(responsedata);
 											}catch(exception){
 												console.log(exception);
 											}
 										}else{
-											responseData.responseHeader.push("");
-											responseData.responseBody.push("");
+											responsedata.responseHeader.push("");
+											responsedata.responseBody.push("");
 											try{
 												res.send(responsedata);
 											}catch(exception){
@@ -1170,8 +1170,8 @@ exports.debugTestCase_ICE = function (req, res) {
 											}
 										}
 									}else{
-										responseData.responseHeader.push("Response Header - Fail");
-										responseData.responseBody.push("Response Body - Fail");
+										responsedata.responseHeader.push("Response Header - Fail");
+										responsedata.responseBody.push("Response Body - Fail");
 										try{
 											res.send(responsedata);
 										}catch(exception){

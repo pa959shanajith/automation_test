@@ -299,7 +299,7 @@ router.post('/', function(req, res, next) {
 					tsList.push({"testscenarioId":ts.id,"testscenarioId_c":ts.id_c,"testscenarioName":ts.name,"tasks":ts.task,"screenDetails":sList});
 				});
 				qObj.testsuiteDetails=[{"testsuiteId":nObj[rIndex].id,"testsuiteId_c":nObj[rIndex].id_c,"testsuiteName":nObj[rIndex].name,"task":nObj[rIndex].task,"testscenarioDetails":tsList}];
-				qObj.userName=d.data.username;
+				qObj.userName=d.data.user_name;
 				fs.writeFileSync('assets_mindmap/req_json.txt',JSON.stringify(qObj),'utf8');
 				create_ice.createStructure_Nineteen68(qObj,function(err,data){
 				//res.setHeader('Content-Type', 'application/json');
@@ -311,25 +311,27 @@ router.post('/', function(req, res, next) {
 				}
 				fs.writeFileSync('assets_mindmap/req_json_cassandra.txt',JSON.stringify(data),'utf8');
 				//var data = JSON.stringify(data);
-				var qList_new=parsing(data,urlData);
-
-				reqToAPI({"data":{"statements":qList_new}},urlData,'/neoQuerya',function(err,status,result){
+				var parsing_result=parsing(data,urlData);
+				//var qList_new=parsing(data,urlData);
+				 
+				reqToAPI({"data":{"statements":parsing_result[0]}},urlData,'/neoQuerya',function(err,status,result){
 					//res.setHeader('Content-Type','application/json');
 					if(err) res.status(status).send(err);
-
+					res.status(200).send(parsing_result[1]);
 					//else if(status!=200) res.status(status).send(result);
 					// else{
 						
 					// 	//res.status(status).send('success');
 					// }
 				});
+				
 
 
 				});
 
 				
 				
-				//res.status(200).send("success");
+				//res.status(200).send(updateJson);
 			}
 		}
 		else if(d.task=='populateUsers'){
@@ -402,16 +404,19 @@ router.post('/', function(req, res, next) {
 var parsing = function(d,urlData) {
 	var data = d;
 	var qList_new=[];
+
 	var result="";
 	var testsuiteDetails=d.testsuiteDetails;
-	var moduleDict={};
+	var updateJson=[];
+	var cassandraId_dict={};
 	testsuiteDetails.forEach(function(e,i){
 		var moduleID_json=e.testsuiteId;
 		var moduleID_c_json=e.testsuiteId_c;
 		//var modulename_json=e.testsuiteName;
 		var testscenarioDetails_json=e.testscenarioDetails;
-		qList_new.push({"statement":"MATCH (a:MODULES) WHERE a.moduleID='"+moduleID_json+"' SET a.moduleID_c='"+moduleID_c_json+"'"});		
-
+		qList_new.push({"statement":"MATCH (a:MODULES) WHERE a.moduleID='"+moduleID_json+"' SET a.moduleID_c='"+moduleID_c_json+"'"});
+		cassandraId_dict[moduleID_json]=moduleID_c_json;
+		//updateJson.push(cassandraId_dict);
 			testscenarioDetails_json.forEach(function(sc,i){
 				var testscenarioId_json=sc.testscenarioId;
 				var testscenarioId_c_json=sc.testscenarioId_c;
@@ -419,6 +424,9 @@ var parsing = function(d,urlData) {
 				var screenDetails_json=sc.screenDetails;
 				//console.log(testscenarioId_json,testscenarioId_c_json);
 				qList_new.push({"statement":"MATCH (a:TESTSCENARIOS) WHERE a.testScenarioID='"+testscenarioId_json+"' SET a.testScenarioID_c='"+testscenarioId_c_json+"'"});
+				//updateJson.push({testscenarioId_json:testscenarioId_c_json});
+				cassandraId_dict[testscenarioId_json]=testscenarioId_c_json;
+				//updateJson.push(cassandraId_dict);
 
 				screenDetails_json.forEach(function(scr,i){
 					var screenId_json=scr.screenId;
@@ -427,6 +435,9 @@ var parsing = function(d,urlData) {
 					var testcaseDetails_json=scr.testcaseDetails;
 					//console.log(screenId_json,screenId_c_json);
 					qList_new.push({"statement":"MATCH (a:SCREENS) WHERE a.screenID='"+screenId_json+"' SET a.screenID_c='"+screenId_c_json+"'"});
+					//updateJson.push({screenId_json:screenId_c_json});
+					cassandraId_dict[screenId_json]=screenId_c_json;
+				//updateJson.push(cassandraId_dict);
 
 						testcaseDetails_json.forEach(function(tc,i){
 						var testcaseId_json=tc.testcaseId;
@@ -434,6 +445,9 @@ var parsing = function(d,urlData) {
 						var testcaseName_json=tc.testcaseName;
 						console.log(testcaseId_json,testcaseId_c_json);
 						qList_new.push({"statement":"MATCH (a:TESTCASES) WHERE a.testCaseID='"+testcaseId_json+"' SET a.testCaseID_c='"+testcaseId_c_json+"'"});
+						//updateJson.push({testcaseId_json:testcaseId_c_json});
+						cassandraId_dict[testcaseId_json]=testcaseId_c_json;
+				//updateJson.push(cassandraId_dict);
 
 					});
 					
@@ -445,8 +459,11 @@ var parsing = function(d,urlData) {
 
 
 	});
-
-return qList_new;
+updateJson.push(cassandraId_dict);
+console.log('cassandraId_dict',cassandraId_dict);
+console.log('updateJson',updateJson);
+//return qList_new;
+return [ qList_new,updateJson];
 };
 
 

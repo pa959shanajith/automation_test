@@ -34,22 +34,22 @@ var dbConnICE = require('../../server/config/icetestautomation');
 //         });
 // };
 
-function testsuiteid_exists(testsuiteName,cb,data){
-        var flag = false;
-        var obj = {flag:false,suiteid:''};
-        var suiteCheck = "SELECT moduleid FROM modules where modulename='"+testsuiteName+"' ALLOW FILTERING";
-        dbConnICE.execute(suiteCheck,function(err,suiteid){
-            if(err){
-                console.log(err);
-                cb(null,err);
-            }else{
-                if(suiteid.rows.length!=0){obj.flag = true; obj.suiteid = suiteid.rows[0].moduleid}
-                cb(null,obj) 
-            }
+// function testsuiteid_exists(testsuiteName,cb,data){
+//         var flag = false;
+//         var obj = {flag:false,suiteid:''};
+//         var suiteCheck = "SELECT moduleid FROM modules where modulename='"+testsuiteName+"' ALLOW FILTERING";
+//         dbConnICE.execute(suiteCheck,function(err,suiteid){
+//             if(err){
+//                 console.log(err);
+//                 cb(null,err);
+//             }else{
+//                 if(suiteid.rows.length!=0){obj.flag = true; obj.suiteid = suiteid.rows[0].moduleid}
+//                 cb(null,obj) 
+//             }
             
-        })
+//         });
 
-};
+// };
 
 function get_moduleName(moduleId,cb,data){
         var flag = false;
@@ -67,7 +67,7 @@ function get_moduleName(moduleId,cb,data){
                 cb(null,obj) 
             }
             
-        });
+        })
 
 };
 function get_screenName(screenId,cb,data){
@@ -308,11 +308,12 @@ exports.createStructure_Nineteen68 = function(req, res) {
     console.log('projectid', projectid);
     console.log('cycleId', cycleId);
 
-
+    var username=RequestedJSON.userName;
     var suite = RequestedJSON.testsuiteDetails.length;
     var suiteID = uuid();
     var suitedetails = RequestedJSON.testsuiteDetails[0];
     var testsuiteName = suitedetails.testsuiteName;
+    var moduleid_c = suitedetails.testsuiteId_c;
     var scenarioidlist = [];
     var scenario =[];
     
@@ -347,7 +348,7 @@ exports.createStructure_Nineteen68 = function(req, res) {
                // }
 
 
-               testsuiteid_exists(testsuiteName,function(err,data){
+               testsuiteid_exists({"modulename":testsuiteName,"moduleid":moduleid_c,'modifiedby':username},function(err,data){
 						
 						if(err){
 							console.log(err);
@@ -358,7 +359,7 @@ exports.createStructure_Nineteen68 = function(req, res) {
 
                             var insertInSuite ='';
                 if(!suiteflag){
-                insertInSuite = "INSERT INTO modules (projectid,modulename,moduleid,versionnumber,createdby,createdon,createdthrough,deleted,history,modifiedby,modifiedbyrole,modifiedon,skucodemodule,tags,testscenarioids) VALUES (" + projectid + ",'" + testsuiteName + "'," + suiteID + ",1,'Kavyashree'," + new Date().getTime() + ",null,null,null,null,null," + new Date().getTime() + ",null,null,null);";
+                insertInSuite = "INSERT INTO modules (projectid,modulename,moduleid,versionnumber,createdby,createdon,createdthrough,deleted,history,modifiedby,modifiedbyrole,modifiedon,skucodemodule,tags,testscenarioids) VALUES (" + projectid + ",'" + testsuiteName + "'," + suiteID + ",1,'"+username+"'," + new Date().getTime() + ",null,null,null,null,null," + new Date().getTime() + ",null,null,null);";
                 }else{
                 insertInSuite = "SELECT moduleid FROM modules where modulename='"+testsuiteName+"' ALLOW FILTERING";
                 suiteID = suiteidTemp; 
@@ -381,6 +382,7 @@ exports.createStructure_Nineteen68 = function(req, res) {
                             var modifiedon = new Date().getTime();
                             //var scenariodetails = iterator.testscenarioDetails[scenario];
                             var scenarioName = iterator.testscenarioName;
+                            var scenarioid_c = iterator.testscenarioId_c;
                             var scenarioflag = false;
                             var scenarioidTemp = '';
                             var screendetailslist = [];
@@ -388,7 +390,7 @@ exports.createStructure_Nineteen68 = function(req, res) {
                             var scenarioidneo = iterator.testscenarioId;
                             
                             
-                            testscenariosid_exists(scenarioName,function(err,scenariodata){
+                            testscenariosid_exists({"testscenarioname":scenarioName,"testscenarioid":scenarioid_c},function(err,scenariodata){
                                 if(err){
                                     console.log(err);
                                     cb(null,err);
@@ -398,7 +400,7 @@ exports.createStructure_Nineteen68 = function(req, res) {
                                 }
                                 var insertInScenario='';
                                 if(!scenarioflag){
-                                    insertInScenario   = "insert into testscenarios(projectid,testscenarioname,testscenarioid,createdby,createdon,history,modifiedby,modifiedbyrole,modifiedon,skucodetestscenario,tags,testcaseids) VALUES (" + projectid + ",'" + scenarioName + "'," + scenarioId + ",'Kavyashree'," + new Date().getTime() + ",null,null,null," + new Date().getTime() + ",null,null,null)";
+                                    insertInScenario   = "insert into testscenarios(projectid,testscenarioname,testscenarioid,createdby,createdon,history,modifiedby,modifiedbyrole,modifiedon,skucodetestscenario,tags,testcaseids) VALUES (" + projectid + ",'" + scenarioName + "'," + scenarioId + ",'"+username+"'," + new Date().getTime() + ",null,null,null," + new Date().getTime() + ",null,null,null)";
                                 }else{
                                     insertInScenario = "DELETE testcaseids FROM testscenarios WHERE testscenarioid="+scenarioidTemp+" and testscenarioname='"+scenarioName +"' and projectid = "+projectid;
                                     scenarioId =  scenarioidTemp;
@@ -417,6 +419,7 @@ exports.createStructure_Nineteen68 = function(req, res) {
                                         var screenId = uuid();
                                         var screenDetails = screenitr;
                                         var screenName = screenitr.screenName;
+                                        var screenid_c = screenitr.screenId_c;
                                         var screenflag = false;
                                         var screenidTemp = '';
                                         var testcasedetailslist = [];
@@ -424,7 +427,7 @@ exports.createStructure_Nineteen68 = function(req, res) {
                                         var taskscreen = screenitr.task;
 
                                         //console.log('screenName details',screenName);
-                                        testscreen_exists(screenName,function(err,screendata){
+                                        testscreen_exists({"testscreenname":screenName,"testscreenid":screenid_c},function(err,screendata){
                                             if(err){
                                                 console.log(err);
                                             }else{
@@ -433,7 +436,7 @@ exports.createStructure_Nineteen68 = function(req, res) {
                                             }
                                             var insertInScreen = '';
                                             if(!screenflag){
-                                                insertInScreen = "INSERT INTO screens (projectid,screenname,screenid,versionnumber,createdby,createdon,createdthrough,deleted,history,modifiedby,modifiedon,screendata,skucodescreen,tags) VALUES (" + projectid + ",'" + screenName + "'," + screenId + ",1,'Kavyashree'," + new Date().getTime() + ",null,null,null,null," + new Date().getTime() + ",'',null,null)";
+                                                insertInScreen = "INSERT INTO screens (projectid,screenname,screenid,versionnumber,createdby,createdon,createdthrough,deleted,history,modifiedby,modifiedon,screendata,skucodescreen,tags) VALUES (" + projectid + ",'" + screenName + "'," + screenId + ",1,'"+username+"'," + new Date().getTime() + ",null,null,null,null," + new Date().getTime() + ",'',null,null)";
 
                                             }else{
                                                 insertInScreen = "select screenid from screens where screenname='"+screenName+"' ALLOW FILTERING";
@@ -454,11 +457,12 @@ exports.createStructure_Nineteen68 = function(req, res) {
 
                                                             var testcaseDetails = testcaseitr;
                                                             var testcaseName = testcaseitr.testcaseName;
+                                                            var testcaseid_c = testcaseitr.testcaseId_c;
                                                             var testcaseflag = false;
                                                             var testcaseidTemp = '';
                                                             var testcaseidneo = testcaseitr.testcaseId;
                                                             var tasktestcase = testcaseitr.task;
-                                                            testcase_exists(testcaseName,function(err,testcasedata){
+                                                            testcase_exists({"testcasename":testcaseName,"testcaseid":testcaseid_c},function(err,testcasedata){
                                                                 if(err){
                                                                     console.log(err)
                                                                 }else{
@@ -468,7 +472,7 @@ exports.createStructure_Nineteen68 = function(req, res) {
 
                                                                 var insertInTescase = '';
                                                                 if(!testcaseflag){
-                                                                    insertInTescase = "INSERT INTO testcases (screenid,testcasename,testcaseid,versionnumber,createdby,createdon,createdthrough,deleted,history,modifiedby,modifiedon,skucodetestcase,tags,testcasesteps)VALUES (" + screenId + ",'" + testcaseName + "'," + testcaseID + ",1,'Kavyashree'," + new Date().getTime() + ",null,null,null,null," + new Date().getTime() + ",null,null,'')";
+                                                                    insertInTescase = "INSERT INTO testcases (screenid,testcasename,testcaseid,versionnumber,createdby,createdon,createdthrough,deleted,history,modifiedby,modifiedon,skucodetestcase,tags,testcasesteps)VALUES (" + screenId + ",'" + testcaseName + "'," + testcaseID + ",1,'"+username+"'," + new Date().getTime() + ",null,null,null,null," + new Date().getTime() + ",null,null,'')";
 
                                                                 }else{
                                                                     insertInTescase = "select testcaseid from testcases where testcasename='"+testcaseName+"' ALLOW FILTERING";
@@ -483,7 +487,7 @@ exports.createStructure_Nineteen68 = function(req, res) {
                                                                     console.log(err);
                                                                 } else {
                                                                     testcaseidlist.push(testcaseID);
-                                                                	var updateTestscenario="update testscenarios set testcaseids=testcaseids+["+testcaseID+"],modifiedby='KAVYASREE',modifiedon="+modifiedon+"   where projectid ="+projectid+"and testscenarioid ="+scenarioId+" and testscenarioname = '"+scenarioName+"' ";
+                                                                	var updateTestscenario="update testscenarios set testcaseids=testcaseids+["+testcaseID+"],modifiedby="+username+",modifiedon="+modifiedon+"   where projectid ="+projectid+"and testscenarioid ="+scenarioId+" and testscenarioname = '"+scenarioName+"' ";
                                                                     var update =dbConnICE.execute(updateTestscenario,function(err,result){});
                                                                 }
                                                                 
@@ -558,71 +562,526 @@ exports.createStructure_Nineteen68 = function(req, res) {
 }
 
 
-function testsuiteid_exists(testsuiteName,cb,data){
+function testsuiteid_exists(moduledetails,cb,data){
         var flag = false;
         var obj = {flag:false,suiteid:''};
-        var suiteCheck = "SELECT moduleid FROM modules where modulename='"+testsuiteName+"' ALLOW FILTERING";
-        dbConnICE.execute(suiteCheck,function(err,suiteid){
-            if(err){
-                console.log(err);
-                cb(null,err);
-            }else{
-                if(suiteid.rows.length!=0){obj.flag = true; obj.suiteid = suiteid.rows[0].moduleid}
-                cb(null,obj) 
+        var statusflag = false;
+        async.series({
+
+            moduledetails:function(modulecallback){
+                var suiteCheck = "SELECT moduleid FROM modules where modulename='"+moduledetails.modulename+"' and moduleid="+moduledetails.moduleid+" ALLOW FILTERING";
+                dbConnICE.execute(suiteCheck,function(err,suiteid){
+                    if(err){
+                        console.log(err);
+                        cb(null,obj);
+                    }else{
+                        if(suiteid.rows.length!=0){obj.flag = true; obj.suiteid = suiteid.rows[0].moduleid
+                            statusflag = true;
+                            //cb(null,obj);
+                        }
+                        modulecallback();
+                        
+                    }
+                    
+                });
+            },
+            moduleupdate:function(modulecallback){
+               if(!statusflag){
+                    updatetestsuitename(moduledetails,function(err,data){
+                        if(err){
+                            console.log(err);
+                        }else{
+                            console.log(data);
+                            if(data=="success"){
+                                obj.flag = true;
+                                obj.suiteid = moduledetails.moduleid;
+                            }
+                            modulecallback(null,data);
+                        }
+                        //cb(null,obj);
+                    });
+                }else{
+                   modulecallback(null,obj);
+                }
+                
             }
-            
-        })
+
+        },function(err,data){
+            if(err){
+
+            }else{
+                cb(null,obj);
+            }
+        });
+        
 
 };
+function updatetestsuitename(moduledetails,cb,data){
+    var suitedatatoupdate = [];
+    var flagtocheckifexists = false;
+    async.series({
+        select:function(callback){
+            var completesuite = "select * from modules where moduleid="+moduledetails.moduleid;
+            dbConnICE.execute(completesuite,function(err,suitedata){
+                if(err){
+                    console.log(err);
+                }else{
+                    if(suitedata.rows.length!=0){
+                        flagtocheckifexists = true;
+                        suitedatatoupdate = suitedata.rows[0];
+                    }
+                    
+                }
+                callback(null,suitedatatoupdate);
+            });
+        },
+        delete:function(callback){
+            if(flagtocheckifexists){
+                var deletequery = "DELETE FROM modules WHERE moduleid="+moduledetails.moduleid+" and modulename='"+suitedatatoupdate.modulename+"' and projectid="+suitedatatoupdate.projectid;
+                dbConnICE.execute(deletequery,function(err,deleted){
+                    if(err)  console.log(err);
+                    // {
+                    
+                    // }else{
+                        
+                    // }
+                    callback();
+                });
+            }else{
+                callback();
+            }
+            
+        },
+        update:function(callback){
+            if(flagtocheckifexists){
+                var insertquery = "";
+                try{
+                    insertquery = "INSERT INTO modules (projectid,modulename,moduleid,versionnumber,createdby,createdon,createdthrough,deleted,history,modifiedby,modifiedbyrole,modifiedon,skucodemodule,tags,testscenarioids) VALUES ("+suitedatatoupdate.projectid+",'"+moduledetails.modulename+"',"+
+                    suitedatatoupdate.moduleid+","+suitedatatoupdate.versionnumber+",'"+suitedatatoupdate.createdby+"',"+suitedatatoupdate.createdon.valueOf()+","+suitedatatoupdate.createdthrough
+                    +","+suitedatatoupdate.deleted+","+suitedatatoupdate.history+",'"+moduledetails.modifiedby+"',"+suitedatatoupdate.modifiedbyrole+","+new Date().getTime()+","+suitedatatoupdate.skucodemodule
+                    +","+suitedatatoupdate.tags+",["+suitedatatoupdate.testscenarioids+"]);"; 
+                }catch(ex){
+                    console.log(ex);
+                    console.log(insertquery);
+                }
+                
+                dbConnICE.execute(insertquery,function(err,deleted){
+                    // if(err){
+                    //     console.log(err);
+                    // }else{
+                    // }
+                    callback(null,"success");
+                });
+            }else{
+                callback(null,"fail");
+            }    
+            
 
-function testscenariosid_exists(testscenarioname,cb,data){
+        }
+    },function(err,data){
+        cb(null,"success");
+    });
+
+}
+function testscenariosid_exists(testscenariodetails,cb,data){
     var flag = false;
     var obj = {flag:false,scenarioid:''};
-        var scenarioCheck = "select testscenarioid from testscenarios where testscenarioname='"+testscenarioname+"' ALLOW FILTERING";
-        dbConnICE.execute(scenarioCheck,function(err,scenarioid){
+    var statusflag = false;
+        
+        // dbConnICE.execute(scenarioCheck,function(err,scenarioid){
+        //     if(err){
+        //         console.log(err);
+        //         cb(null,obj);
+        //     }else{
+        //         if(scenarioid.rows.length!=0){ obj.flag = true; obj.scenarioid = scenarioid.rows[0].testscenarioid}
+        //         else{
+                    
+        //         }
+        //         cb(null,obj) 
+        //     }
+            
+        // })
+        async.series({
+
+            scenariodetails:function(scenariocallback){
+                var scenarioCheck = "select testscenarioid from testscenarios where testscenarioname='"+testscenariodetails.testscenarioname+"' and testscenarioid = "+testscenariodetails.testscenarioid+" ALLOW FILTERING";
+                dbConnICE.execute(scenarioCheck,function(err,scenarioid){
+                    if(err){
+                        console.log(err);
+                        cb(null,obj);
+                    }else{
+                        if(scenarioid.rows.length!=0){ 
+                            obj.flag = true; 
+                            obj.scenarioid = scenarioid.rows[0].testscenarioid;
+                            statusflag = true;
+                        }
+                        scenariocallback();
+                        
+                    }
+                    
+                });
+            },
+            scenarioupdate:function(scenariocallback){
+               if(!statusflag){
+                    updatetestscenarioname(testscenariodetails,function(err,data){
+                        if(err){
+                            console.log(err);
+                        }else{
+                            console.log(data);
+                            if(data=="success"){
+                                obj.flag = true;
+                                obj.scenarioid = testscenariodetails.testscenarioid;
+                            }
+                            scenariocallback(null,data);
+                        }
+                        //cb(null,obj);
+                    });
+                }else{
+                   scenariocallback(null,obj);
+                }
+                
+            }
+
+        },function(err,data){
             if(err){
-                console.log(err);
-                cb(null,err);
+
             }else{
-                if(scenarioid.rows.length!=0){ obj.flag = true; obj.scenarioid = scenarioid.rows[0].testscenarioid}
-                cb(null,obj) 
+                cb(null,obj);
+            }
+        });
+
+}
+function updatetestscenarioname(testscenariodetails,cb,data){
+    var scenariodatatoupdate = [];
+    var flagtocheckifexists = false;
+    async.series({
+        select:function(callback){
+            var completesuite = "select * from testscenarios where testscenarioid="+testscenariodetails.testscenarioid;
+            dbConnICE.execute(completesuite,function(err,scenariodata){
+                if(err){
+                    console.log(err);
+                }else{
+                    if(scenariodata.rows.length!=0){
+                        flagtocheckifexists = true;
+                        scenariodatatoupdate = scenariodata.rows[0];
+                    }
+                    
+                }
+                callback(null,scenariodatatoupdate);
+            });
+        },
+        delete:function(callback){
+            if(flagtocheckifexists){
+                var deletequery = "DELETE FROM testscenarios WHERE testscenarioid="+testscenariodetails.testscenarioid+" and testscenarioname='"+scenariodatatoupdate.testscenarioname+"' and projectid="+scenariodatatoupdate.projectid;
+                dbConnICE.execute(deletequery,function(err,deleted){
+                    if(err)  console.log(err);
+                    // {
+                    
+                    // }else{
+                        
+                    // }
+                    callback();
+                });
+            }else{
+                callback();
             }
             
-        })
-}
+        },
+        update:function(callback){
+            // var insertquery = "INSERT INTO modules (projectid,modulename,moduleid,versionnumber,createdby,createdon,createdthrough,deleted,history,modifiedby,modifiedbyrole,modifiedon,skucodemodule,tags,testscenarioids) VALUES ("+suitedatatoupdate.projectid+",'"+moduledetails.modulename+"',"+
+            // suitedatatoupdate.moduleid+","+suitedatatoupdate.versionnumber+",'"+suitedatatoupdate.createdby+"',"+suitedatatoupdate.createdon.valueOf()+","+suitedatatoupdate.createdthrough
+            // +","+suitedatatoupdate.deleted+","+suitedatatoupdate.history+","+suitedatatoupdate.modifiedby+","+suitedatatoupdate.modifiedbyrole+","+new Date().getTime()+","+suitedatatoupdate.skucodemodule
+            // +","+suitedatatoupdate.tags+",["+suitedatatoupdate.testscenarioids+"]);";
+            if(flagtocheckifexists){
+                var insertquery = "";
+                try{
+                    if (scenariodatatoupdate.testcaseids==null){
+                        scenariodatatoupdate.testcaseids='';
+                    }
+                    insertquery = "INSERT INTO testscenarios (projectid,testscenarioname,testscenarioid,createdby,createdon,deleted,history,modifiedby,modifiedbyrole,modifiedon,skucodetestscenario,tags,testcaseids) VALUES ("+
+                scenariodatatoupdate.projectid+",'"+testscenariodetails.testscenarioname+"',"+testscenariodetails.testscenarioid+",'"+scenariodatatoupdate.createdby+"',"+scenariodatatoupdate.createdon.valueOf()
+                +","+scenariodatatoupdate.deleted+","+scenariodatatoupdate.history+",'"+scenariodatatoupdate.modifiedby+"',"+scenariodatatoupdate.modifiedbyrole+","+new Date().getTime()+","+scenariodatatoupdate.skucodetestscenario
+                +","+scenariodatatoupdate.tags+",["+scenariodatatoupdate.testcaseids+"]);";
+                }catch(ex){
+                    console.log(ex);
+                }
 
-function testscreen_exists(testscreenname,cb,data){
+                dbConnICE.execute(insertquery,function(err,deleted){
+                    // if(err){
+                    //     console.log(err);
+                    // }else{
+                    // }
+                    callback(null,"success");
+                });
+            }else{
+                callback(null,"fail");
+            }
+
+        }
+    },function(err,data){
+        cb(null,"success");
+    });   
+}
+function testscreen_exists(testscreendetails,cb,data){
     var flag = false;
     var obj = {flag:false,screenid:''};
-        var screenCheck = "select screenid from screens where screenname='"+testscreenname+"' ALLOW FILTERING";
-        dbConnICE.execute(screenCheck,function(err,screenid){
-            if(err){
-                console.log(err);
-                cb(null,err);
-            }else{
-                if(screenid.rows.length!=0){ obj.flag = true; obj.screenid = screenid.rows[0].screenid}
-                cb(null,obj) 
+    var statusflag = false;
+
+        async.series({
+
+            screendetails:function(screencallback){
+                var screenCheck =  "select screenid from screens where screenname='"+testscreendetails.testscreenname+"' and screenid="+testscreendetails.testscreenid+" ALLOW FILTERING";
+                dbConnICE.execute(screenCheck,function(err,screenid){
+                    if(err){
+                        console.log(err);
+                        cb(null,obj);
+                    }else{
+                        if(screenid.rows.length!=0){ 
+                            obj.flag = true; 
+                            obj.screenid = screenid.rows[0].screenid;
+                            statusflag = true;
+                        }
+                        screencallback();
+                        
+                    }
+                    
+                });
+            },
+            screenupdate:function(screencallback){
+               if(!statusflag){
+                    updatetestscreenname(testscreendetails,function(err,data){
+                        if(err){
+                            console.log(err);
+                        }else{
+                            console.log(data);
+                            if(data=="success"){
+                                obj.flag = true;
+                                obj.screenid = testscreendetails.testscreenid;
+                            }
+                            screencallback(null,data);
+                        }
+                        //cb(null,obj);
+                    });
+                }else{
+                   screencallback(null,obj);
+                }
+                
             }
-            
-        })
+
+        },function(err,data){
+            if(err){
+
+            }else{
+                cb(null,obj);
+            }
+        });
+
 }
 
-function testcase_exists(testcasename,cb,data){
+function updatetestscreenname(testscreendetails,cb,data){
+var screendatatoupdate = [];
+    var flagtocheckifexists = false;
+    async.series({
+        select:function(callback){
+            var completescreen = "select * from screens where screenid="+testscreendetails.testscreenid;
+            dbConnICE.execute(completescreen,function(err,screendata){
+                if(err){
+                    console.log(err);
+                }else{
+                    if(screendata.rows.length!=0){
+                        flagtocheckifexists = true;
+                        screendatatoupdate = screendata.rows[0];
+                    }
+                    
+                }
+                callback(null,screendatatoupdate);
+            });
+        },
+        delete:function(callback){
+            if(flagtocheckifexists){
+                
+                var deletequery = "DELETE FROM screens WHERE screenid="+testscreendetails.testscreenid+" and screenname='"+screendatatoupdate.screenname+"' and projectid="+screendatatoupdate.projectid;
+                dbConnICE.execute(deletequery,function(err,deleted){
+                    if(err)  console.log(err);
+                    // {
+                    
+                    // }else{
+                        
+                    // }
+                    callback();
+                });
+                
+            }else{
+                callback();
+            }
+        },
+        update:function(callback){
+            if(flagtocheckifexists){
+                var insertquery = "";
+                try{
+                     insertquery = "INSERT INTO screens (projectid,screenname,screenid,versionnumber,createdby,createdon,createdthrough,deleted,history,modifiedby,modifiedbyrole,modifiedon,screendata,skucodescreen,tags) VALUES ("+screendatatoupdate.projectid
+                +",'"+testscreendetails.testscreenname+"',"+screendatatoupdate.screenid+","+screendatatoupdate.versionnumber+",'"+screendatatoupdate.createdby+"',"+screendatatoupdate.createdon.valueOf()
+                +","+screendatatoupdate.createdthrough+","+screendatatoupdate.deleted+","+screendatatoupdate.history+","+screendatatoupdate.modifiedby+","+screendatatoupdate.modifiedbyrole
+                +","+new Date().getTime()+",'"+screendatatoupdate.screendata+"',"+screendatatoupdate.skucodescreen+","+screendatatoupdate.tags+");"
+                }catch(ex){
+                    console.log(ex);
+                }
+                
+
+                dbConnICE.execute(insertquery,function(err,deleted){
+                    // if(err){
+                    //     console.log(err);
+                    // }else{
+                    // }
+                    callback(null,"success");
+                });
+            }else{
+                callback(null,"fail");
+            }
+
+        }
+    },function(err,data){
+        cb(null,"success");
+    });
+}
+
+function testcase_exists(testcasedetails,cb,data){
     var flag = false;
-    var obj = {flag:false,testcaseid:''}; 
-        var screenCheck = "select testcaseid from testcases where testcasename='"+testcasename+"' ALLOW FILTERING";
-        dbConnICE.execute(screenCheck,function(err,testcaseid){
-            if(err){
-                console.log(err);
-                cb(null,err);
-            }else{
-                if(testcaseid.rows.length!=0){ obj.flag = true; obj.testcaseid = testcaseid.rows[0].testcaseid; }
-                cb(null,obj) 
-            }
+    var obj = {flag:false,testcaseid:''};
+    var statusflag = false; 
+        // var screenCheck = "select testcaseid from testcases where testcasename='"+testcasedetails.testcasename+"' and testcaseid="+testcasedetails.testcaseid+" ALLOW FILTERING";
+        // dbConnICE.execute(screenCheck,function(err,testcaseid){
+        //     if(err){
+        //         console.log(err);
+        //         cb(null,err);
+        //     }else{
+        //         if(testcaseid.rows.length!=0){ obj.flag = true; obj.testcaseid = testcaseid.rows[0].testcaseid; }
+        //         else{
+                    
+        //         }
+        //         cb(null,obj) 
+        //     }
             
-        })
-}
+        // })
+        async.series({
 
+            testcasedetails:function(testcasecallback){
+                var testcaseCheck =  "select testcaseid from testcases where testcasename='"+testcasedetails.testcasename+"' and testcaseid="+testcasedetails.testcaseid+" ALLOW FILTERING";
+                dbConnICE.execute(testcaseCheck,function(err,testcaseid){
+                    if(err){
+                        console.log(err);
+                        cb(null,obj);
+                    }else{
+                        if(testcaseid.rows.length!=0){ 
+                            obj.flag = true; 
+                            obj.testcaseid = testcaseid.rows[0].testcaseid;
+                            statusflag = true;
+                        }
+                        testcasecallback();
+                        
+                    }
+                    
+                });
+            },
+            testcaseupdate:function(testcasecallback){
+               if(!statusflag){
+                    updatetestcasename(testcasedetails,function(err,data){
+                        if(err){
+                            console.log(err);
+                        }else{
+                            console.log(data);
+                            if(data=="success"){
+                                obj.flag = true;
+                                obj.screenid = testcasedetails.testcaseid;
+                            }
+                            testcasecallback(null,data);
+                        }
+                        //cb(null,obj);
+                    });
+                }else{
+                   testcasecallback(null,obj);
+                }
+                
+            }
+
+        },function(err,data){
+            if(err){
+
+            }else{
+                cb(null,obj);
+            }
+        });
+}
+function updatetestcasename(testcasedetails,cb,data){
+var testcasedatatoupdate = [];
+    var flagtocheckifexists = false;
+    async.series({
+        select:function(callback){
+            var completetestcase = "select * from testcases where testcaseid="+testcasedetails.testcaseid;
+            dbConnICE.execute(completetestcase,function(err,testcasedata){
+                if(err){
+                    console.log(err);
+                }else{
+                    if(testcasedata.rows.length!=0){
+                        flagtocheckifexists = true;
+                        testcasedatatoupdate = testcasedata.rows[0];
+                    }
+                    
+                }
+                callback(null,testcasedatatoupdate);
+            });
+        },
+        delete:function(callback){
+            if(flagtocheckifexists){
+                
+                var deletequery = "DELETE FROM testcases WHERE testcaseid="+testcasedetails.testcaseid+" and testcasename='"+testcasedatatoupdate.testcasename+"' and screenid="+testcasedatatoupdate.screenid;
+                dbConnICE.execute(deletequery,function(err,deleted){
+                    if(err)  console.log(err);
+                    // {
+                    
+                    // }else{
+                        
+                    // }
+                    callback();
+                });
+            }else{
+                callback();
+            }
+        },
+        update:function(callback){
+
+            // var insertquery = "INSERT INTO screens (projectid,screenname,screenid,versionnumber,createdby,createdon,createdthrough,deleted,history,modifiedby,modifiedbyrole,modifiedon,screendata,skucodescreen,tags) VALUES ("+screendatatoupdate.projectid
+            // +",'"+testscreendetails.testscreenname+"',"+screendatatoupdate.screenid+","+screendatatoupdate.versionnumber+",'"+screendatatoupdate.createdby+"',"+screendatatoupdate.createdon.valueOf()
+            // +","+screendatatoupdate.createdthrough+","+screendatatoupdate.deleted+","+screendatatoupdate.history+","+screendatatoupdate.modifiedby+","+screendatatoupdate.modifiedbyrole
+            // +","+new Date().getTime()+",'"+screendatatoupdate.screendata+"',"+screendatatoupdate.skucodescreen+","+screendatatoupdate.tags+");"
+            if(flagtocheckifexists){
+                var insertquery = "";
+                try{
+                     insertquery = "INSERT INTO testcases (screenid,testcasename,testcaseid,versionnumber,createdby,createdon,createdthrough,deleted,history,modifiedby,modifiedbyrole,modifiedon,skucodetestcase,tags,testcasesteps) VALUES ("+
+                testcasedatatoupdate.screenid+",'"+testcasedetails.testcasename+"',"+testcasedetails.testcaseid+","+testcasedatatoupdate.versionnumber+",'"+testcasedatatoupdate.createdby
+                +"',"+testcasedatatoupdate.createdon.valueOf()+","+testcasedatatoupdate.createdthrough+","+testcasedatatoupdate.deleted+","+testcasedatatoupdate.history+","+testcasedatatoupdate.modifiedby+","+testcasedatatoupdate.modifiedbyrole+","+new Date().getTime()
+                +","+testcasedatatoupdate.skucodetestcase+","+testcasedatatoupdate.tags+",'"+testcasedatatoupdate.testcasesteps+"');";
+                }catch(ex){
+                    console.log(ex);
+                }
+                
+
+                dbConnICE.execute(insertquery,function(err,deleted){
+                    // if(err){
+                    //     console.log(err);
+                    // }else{
+                    // }
+                    callback(null,"success");
+                });
+            }else{
+                callback(null,"fail");
+            }
+
+        }
+    },function(err,data){
+        cb(null,"success");
+    });
+}
 exports.getReleaseIDs_Ninteen68 = function(req,res){
     var rname = [];
     var r_ids = [];
