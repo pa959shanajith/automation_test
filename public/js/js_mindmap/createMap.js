@@ -706,8 +706,8 @@ var recurseTogChild = function(d,v){
 var validNodeDetails = function(value,p){
 	var nName,flag=!0;
 	nName=value;
-	var specials=/[*|\":<>[\]{}`\\()';@&$]/;
-	if (!(nName.length>0 || (specials.test(nName))) ){
+	var specials=/[*|\":<>[\]{}`\\()'!;@&$]/;
+	if (nName.length==0 || nName.length>40|| (specials.test(nName))){
 		$('#ct-inpAct').addClass('errorClass');
 		flag=!1;
 	}
@@ -832,12 +832,12 @@ var actionEvent = function(e){
 	if(s.attr('id')=='ct-saveAction'){
 		flag=10;
 		//alertMsg="Data written successfully!";
-		$('#Mindmap_save').modal('show');
+		//$('#Mindmap_save').modal('show');
 	}
 	else if(s.attr('id')=='ct-createAction'){
 		flag=20;
 		//alertMsg="Data sent successfully!";
-		$('#Mindmap_save').modal('show');
+		//$('#Mindmap_save').modal('show');
 		//alert("Caution! Save data before submitting\nIgnore if already saved.");
 	}
 	if(flag==0) return;
@@ -851,7 +851,9 @@ var actionEvent = function(e){
 		else{
 			//alert(alertMsg);
 			var res=JSON.parse(result);
-			if(flag==10) mapSaved=!0;
+			if(flag==10){
+
+			 mapSaved=!0;
 			var mid,sts=allMMaps.some(function(m,i){
 				if(m.id_n==res.id_n) {
 					mid=i;
@@ -871,6 +873,34 @@ var actionEvent = function(e){
 			populateDynamicInputList();
 			clearSvg();
 			treeBuilder(allMMaps[mid]);
+			$('#Mindmap_save').modal('show');
+		}
+if(flag==20){
+	var res=JSON.parse(result);
+	res=res[0];
+	var mid,resMap=Object.keys(res);
+	allMMaps.some(function(m,i){
+		if(m.id_n==resMap[0]) {
+			mid=i;
+			return !0;
+		}
+			return !1;
+	});
+		allMMaps[mid].id_c=res[resMap[0]];
+	    allMMaps[mid].children.forEach(function(tsc){
+			tsc.id_c=res[tsc.id_n];
+			tsc.children.forEach(function(scr){
+				scr.id_c=res[scr.id_n];
+				scr.children.forEach(function(tc){
+					if (res[tc.id_n]!='null'){
+						tc.id_c=res[tc.id_n];
+					}
+				});
+		});
+	});
+	$('#Mindmap_create').modal('show');
+  }
+
 		}
 	});
 };
