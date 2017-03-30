@@ -51,5 +51,61 @@ mySPA.factory('adminServices', ['$http', '$q', function ($http, $q) {
     		.then(function (response) { return response.data; },
     				function (response) { return $q.reject(response.data); });
     	},
+		  getDomains_ICE: function () {
+            var param = "getDomains_ICE";
+            return $http.post('/getDomains_ICE', {
+                action: param
+            })
+                .then(function (response) { return response.data; },
+                function (response) { return $q.reject(response.data); });
+        },
+		 checkReleaseNameExists_ICE: function (releaseName) {
+            var param = "checkReleaseNameExists_ICE";
+            return $http.post('/checkReleaseNameExists_ICE', {
+                action: param,
+                releaseName : releaseName
+            })
+            .then(function (response) { return response.data; },
+            function (response) { return $q.reject(response.data); });
+        },
+         checkCycleNameExists_ICE: function (cycleName) {
+            var param = "checkCycleNameExists_ICE";
+            return $http.post('/checkCycleNameExists_ICE', {
+                action: param,
+                cycleName : cycleName
+            })
+            .then(function (response) { return response.data; },
+            function (response) { return $q.reject(response.data); });
+        },
+		 createProject_ICE: function (createprojectObj,userDetails) {
+            var param = "createProject_ICE";
+            return $http.post('/createProject_ICE', {
+                action: param,
+				userDetails:userDetails,
+				createProjectObj: createprojectObj
+            })
+            .then(function (response) { return response.data; },
+            function (response) { return $q.reject(response.data); });
+        },
+		updateProject_ICE: function (updateProjectObj,userDetails) {
+            var param = "updateProject_ICE";
+            return $http.post('/updateProject_ICE', {
+                action: param,
+				userDetails:userDetails,
+				updateProjectObj: updateProjectObj
+            })
+            .then(function (response) { return response.data; },
+            function (response) { return $q.reject(response.data); });
+        },
+		getNames_ICE: function (requestedids,idtype) {
+            var param = "getNames_ICE";
+            return $http.post('/getNames_ICE', {
+                action: param,
+				requestedids:requestedids,
+				idtype: idtype
+            })
+            .then(function (response) { return response.data; },
+            function (response) { return $q.reject(response.data); });
+        },
     };
 }]);

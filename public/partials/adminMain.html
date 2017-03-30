@@ -178,7 +178,8 @@
 			<!--Task Name-->
 			<!-- Button -->
 			<div class="adminActionBtn">
-				<button class="btn btn-md pull-right adminBtn" ng-click="">Create</button>
+				<button class="btn btn-md pull-right adminBtn" ng-click="editProjectTab()" style="background: #5e636b">Edit</button>
+				<button class="btn btn-md pull-right adminBtn createProjectBtn" ng-click="create_project()">Create</button>
 			</div>
 			<!-- Button -->
 			<div class="col-xs-9 form-group" style="width: 83%">
@@ -200,19 +201,19 @@
 				<div class='domainTxt appTypeTxt'>Application Type</div>
 				
 				<div class="appTypesContainer">
-					<div class='projectTypes' data-app="web">
+					<div class='projectTypes' data-app="Web">
 						<img src='imgs/web.png' alt='Web' />
 						<label>Web</label>
 					</div>
-					<div class='projectTypes' data-app="webService">
+					<div class='projectTypes' data-app="WebService">
 						<img src='imgs/webservice.png' alt='WebService' />
 						<label>Web Services</label>
 					</div>
-					<div class='projectTypes' data-app="mainframe">
+					<div class='projectTypes' data-app="Mainframe">
 						<img src='imgs/mainframe.png' alt='Mainframe' />
 						<label>Mainframe</label>
 					</div>
-					<div class='projectTypes' data-app="desktopApps">
+					<div class='projectTypes' data-app="Desktop">
 						<img src='imgs/desktop.png' alt='Desktop' />
 						<label>Desktop Apps</label>
 					</div>
@@ -245,126 +246,6 @@
 				 	
 				 	<!-- Releases List -->
 				 	<ul id="releaseList" class="containerWrap scrollbar-inner relCycScroll">
-				 		<li>
-				 			<img src="imgs/ic-release.png" />
-				 			<span class="releaseName">Release Name 1</span>
-				 			<span class="actionOnHover">
-				 				<img title="Edit Release Name" src="imgs/ic-edit-sm.png" class="editReleaseName">
-				 				<img title="Delete Release" src="imgs/ic-delete-sm.png" class="deleteRelease">
-				 			</span>
-				 		</li>
-				 		<li>
-				 			<img src="imgs/ic-release.png" />
-				 			<span class="releaseName">Release Name 2</span>
-				 			<span class="actionOnHover">
-				 				<img title="Edit Release Name" src="imgs/ic-edit-sm.png" class="editReleaseName">
-				 				<img title="Delete Release" src="imgs/ic-delete-sm.png" class="deleteRelease">
-				 			</span>
-				 		</li>
-				 		<li>
-				 			<img src="imgs/ic-release.png" />
-				 			<span class="releaseName">Release Name 3</span>
-				 			<span class="actionOnHover">
-				 				<img title="Edit Release Name" src="imgs/ic-edit-sm.png" class="editReleaseName">
-				 				<img title="Delete Release" src="imgs/ic-delete-sm.png" class="deleteRelease">
-				 			</span>
-				 		</li>
-				 		<li>
-				 			<img src="imgs/ic-release.png" />
-				 			<span class="releaseName">Release Name 4</span>
-				 			<span class="actionOnHover">
-				 				<img title="Edit Release Name" src="imgs/ic-edit-sm.png" class="editReleaseName">
-				 				<img title="Delete Release" src="imgs/ic-delete-sm.png" class="deleteRelease">
-				 			</span>
-				 		</li>
-				 		<li>
-				 			<img src="imgs/ic-release.png" />
-				 			<span class="releaseName">Release Name 5</span>
-				 			<span class="actionOnHover">
-				 				<img title="Edit Release Name" src="imgs/ic-edit-sm.png" class="editReleaseName">
-				 				<img title="Delete Release" src="imgs/ic-delete-sm.png" class="deleteRelease">
-				 			</span>
-				 		</li>
-				 		<li>
-				 			<img src="imgs/ic-release.png" />
-				 			<span class="releaseName">Release Name 6</span>
-				 			<span class="actionOnHover">
-				 				<img title="Edit Release Name" src="imgs/ic-edit-sm.png" class="editReleaseName">
-				 				<img title="Delete Release" src="imgs/ic-delete-sm.png" class="deleteRelease">
-				 			</span>
-				 		</li>
-				 		<li>
-				 			<img src="imgs/ic-release.png" />
-				 			<span class="releaseName">Release Name 7</span>
-				 			<span class="actionOnHover">
-				 				<img title="Edit Release Name" src="imgs/ic-edit-sm.png" class="editReleaseName">
-				 				<img title="Delete Release" src="imgs/ic-delete-sm.png" class="deleteRelease">
-				 			</span>
-				 		</li>
-				 		<li>
-				 			<img src="imgs/ic-release.png" />
-				 			<span class="releaseName">Release Name 8</span>
-				 			<span class="actionOnHover">
-				 				<img title="Edit Release Name" src="imgs/ic-edit-sm.png" class="editReleaseName">
-				 				<img title="Delete Release" src="imgs/ic-delete-sm.png" class="deleteRelease">
-				 			</span>
-				 		</li>
-				 		<li>
-				 			<img src="imgs/ic-release.png" />
-				 			<span class="releaseName">Release Name 9</span>
-				 			<span class="actionOnHover">
-				 				<img title="Edit Release Name" src="imgs/ic-edit-sm.png" class="editReleaseName">
-				 				<img title="Delete Release" src="imgs/ic-delete-sm.png" class="deleteRelease">
-				 			</span>
-				 		</li>
-				 		<li>
-				 			<img src="imgs/ic-release.png" />
-				 			<span class="releaseName">Release Name 10</span>
-				 			<span class="actionOnHover">
-				 				<img title="Edit Release Name" src="imgs/ic-edit-sm.png" class="editReleaseName">
-				 				<img title="Delete Release" src="imgs/ic-delete-sm.png" class="deleteRelease">
-				 			</span>
-				 		</li>
-				 		<li>
-				 			<img src="imgs/ic-release.png" />
-				 			<span class="releaseName">Release Name 11</span>
-				 			<span class="actionOnHover">
-				 				<img title="Edit Release Name" src="imgs/ic-edit-sm.png" class="editReleaseName">
-				 				<img title="Delete Release" src="imgs/ic-delete-sm.png" class="deleteRelease">
-				 			</span>
-				 		</li>
-				 		<li>
-				 			<img src="imgs/ic-release.png" />
-				 			<span class="releaseName">Release Name 12</span>
-				 			<span class="actionOnHover">
-				 				<img title="Edit Release Name" src="imgs/ic-edit-sm.png" class="editReleaseName">
-				 				<img title="Delete Release" src="imgs/ic-delete-sm.png" class="deleteRelease">
-				 			</span>
-				 		</li>
-				 		<li>
-				 			<img src="imgs/ic-release.png" />
-				 			<span class="releaseName">Release Name 13</span>
-				 			<span class="actionOnHover">
-				 				<img title="Edit Release Name" src="imgs/ic-edit-sm.png" class="editReleaseName">
-				 				<img title="Delete Release" src="imgs/ic-delete-sm.png" class="deleteRelease">
-				 			</span>
-				 		</li>
-				 		<li>
-				 			<img src="imgs/ic-release.png" />
-				 			<span class="releaseName">Release Name 14</span>
-				 			<span class="actionOnHover">
-				 				<img title="Edit Release Name" src="imgs/ic-edit-sm.png" class="editReleaseName">
-				 				<img title="Delete Release" src="imgs/ic-delete-sm.png" class="deleteRelease">
-				 			</span>
-				 		</li>
-				 		<li>
-				 			<img src="imgs/ic-release.png" />
-				 			<span class="releaseName">Release Name 15</span>
-				 			<span class="actionOnHover">
-				 				<img title="Edit Release Name" src="imgs/ic-edit-sm.png" class="editReleaseName">
-				 				<img title="Delete Release" src="imgs/ic-delete-sm.png" class="deleteRelease">
-				 			</span>
-				 		</li>
 				 	</ul>
 				 	<!-- Releases List -->
 				 </div>
@@ -378,110 +259,6 @@
 				 	
 				 	<!-- Cycle List -->
 				 	<ul id="cycleList" class="containerWrap scrollbar-inner relCycScroll">
-				 		<li>
-				 			<img src="imgs/ic-cycle.png" />
-				 			<span class="cycleName">Cycle Name 1</span>
-				 			<span class="actionOnHover">
-				 				<img title="Edit Cycle Name" src="imgs/ic-edit-sm.png" class="editCycleName">
-				 				<img title="Delete Cycle" src="imgs/ic-delete-sm.png" class="deleteCycle">
-				 			</span>
-				 		</li>
-				 		<li>
-				 			<img src="imgs/ic-cycle.png" />
-				 			<span class="cycleName">Cycle Name 2</span>
-				 			<span class="actionOnHover">
-				 				<img title="Edit Cycle Name" src="imgs/ic-edit-sm.png" class="editCycleName">
-				 				<img title="Delete Cycle" src="imgs/ic-delete-sm.png" class="deleteCycle">
-				 			</span>
-				 		</li>
-				 		<li>
-				 			<img src="imgs/ic-cycle.png" />
-				 			<span class="cycleName">Cycle Name 3</span>
-				 			<span class="actionOnHover">
-				 				<img title="Edit Cycle Name" src="imgs/ic-edit-sm.png" class="editCycleName">
-				 				<img title="Delete Cycle" src="imgs/ic-delete-sm.png" class="deleteCycle">
-				 			</span>
-				 		</li>
-				 		<li>
-				 			<img src="imgs/ic-cycle.png" />
-				 			<span class="cycleName">Cycle Name 4</span>
-				 			<span class="actionOnHover">
-				 				<img title="Edit Cycle Name" src="imgs/ic-edit-sm.png" class="editCycleName">
-				 				<img title="Delete Cycle" src="imgs/ic-delete-sm.png" class="deleteCycle">
-				 			</span>
-				 		</li>
-				 		<li>
-				 			<img src="imgs/ic-cycle.png" />
-				 			<span class="cycleName">Cycle Name 5</span>
-				 			<span class="actionOnHover">
-				 				<img title="Edit Cycle Name" src="imgs/ic-edit-sm.png" class="editCycleName">
-				 				<img title="Delete Cycle" src="imgs/ic-delete-sm.png" class="deleteCycle">
-				 			</span>
-				 		</li>
-				 		<li>
-				 			<img src="imgs/ic-cycle.png" />
-				 			<span class="cycleName">Cycle Name 6</span>
-				 			<span class="actionOnHover">
-				 				<img title="Edit Cycle Name" src="imgs/ic-edit-sm.png" class="editCycleName">
-				 				<img title="Delete Cycle" src="imgs/ic-delete-sm.png" class="deleteCycle">
-				 			</span>
-				 		</li>
-				 		<li>
-				 			<img src="imgs/ic-cycle.png" />
-				 			<span class="cycleName">Cycle Name 7</span>
-				 			<span class="actionOnHover">
-				 				<img title="Edit Cycle Name" src="imgs/ic-edit-sm.png" class="editCycleName">
-				 				<img title="Delete Cycle" src="imgs/ic-delete-sm.png" class="deleteCycle">
-				 			</span>
-				 		</li>
-				 		<li>
-				 			<img src="imgs/ic-cycle.png" />
-				 			<span class="cycleName">Cycle Name 8</span>
-				 			<span class="actionOnHover">
-				 				<img title="Edit Cycle Name" src="imgs/ic-edit-sm.png" class="editCycleName">
-				 				<img title="Delete Cycle" src="imgs/ic-delete-sm.png" class="deleteCycle">
-				 			</span>
-				 		</li>
-				 		<li>
-				 			<img src="imgs/ic-cycle.png" />
-				 			<span class="cycleName">Cycle Name 9</span>
-				 			<span class="actionOnHover">
-				 				<img title="Edit Cycle Name" src="imgs/ic-edit-sm.png" class="editCycleName">
-				 				<img title="Delete Cycle" src="imgs/ic-delete-sm.png" class="deleteCycle">
-				 			</span>
-				 		</li>
-				 		<li>
-				 			<img src="imgs/ic-cycle.png" />
-				 			<span class="cycleName">Cycle Name 10</span>
-				 			<span class="actionOnHover">
-				 				<img title="Edit Cycle Name" src="imgs/ic-edit-sm.png" class="editCycleName">
-				 				<img title="Delete Cycle" src="imgs/ic-delete-sm.png" class="deleteCycle">
-				 			</span>
-				 		</li>
-				 		<li>
-				 			<img src="imgs/ic-cycle.png" />
-				 			<span class="cycleName">Cycle Name 11</span>
-				 			<span class="actionOnHover">
-				 				<img title="Edit Cycle Name" src="imgs/ic-edit-sm.png" class="editCycleName">
-				 				<img title="Delete Cycle" src="imgs/ic-delete-sm.png" class="deleteCycle">
-				 			</span>
-				 		</li>
-				 		<li>
-				 			<img src="imgs/ic-cycle.png" />
-				 			<span class="cycleName">Cycle Name 12</span>
-				 			<span class="actionOnHover">
-				 				<img title="Edit Cycle Name" src="imgs/ic-edit-sm.png" class="editCycleName">
-				 				<img title="Delete Cycle" src="imgs/ic-delete-sm.png" class="deleteCycle">
-				 			</span>
-				 		</li>
-				 		<li>
-				 			<img src="imgs/ic-cycle.png" />
-				 			<span class="cycleName">Cycle Name 13</span>
-				 			<span class="actionOnHover">
-				 				<img title="Edit Cycle Name" src="imgs/ic-edit-sm.png" class="editCycleName">
-				 				<img title="Delete Cycle" src="imgs/ic-delete-sm.png" class="deleteCycle">
-				 			</span>
-				 		</li>
 				 	</ul>
 				 	<!-- Cycle List -->
 				 </div>
@@ -490,9 +267,110 @@
 			<!-- Relase Cycle -->
 		</div>
 		<!-- Create Project -->
-		
-		
-		<div ng-if="tab == 'tabPreferences'">Preferences</div>
+
+		<!-- Update Project -->
+		<div class="containerWrap" ng-if="tab == 'editProject'">
+			<!--Task Name-->
+			<div id="page-taskName">
+				<span>Update Project</span>
+			</div>
+			<!--Task Name-->
+			<!-- Button -->
+			<div class="adminActionBtn">
+				<button class="btn btn-md pull-right adminBtn createProjectBtn" ng-click="update_project()">Update</button>
+			</div>
+			<!-- Button -->
+			<div class="col-xs-9 form-group" style="width: 83%">
+				<div class='userForm projectForm'>
+					<div class='domainTxt'>Domain</div>
+					<select class="adminSelect form-control" style="width: 91%" id="selDomainEdit">
+						<option value="" disabled selected>Please Select Your Domain</option>
+					</select> 
+					<span ng-show="domainNameRequired" class="error-msg ng-cloak errorlbl">{{domainNameRequired}}</span>
+				</div>
+				<div class='userForm adminControl'>
+					<div class='domainTxt'>Project</div>
+					<select class="adminSelect form-control" style="width: 91%" id="selProject">
+						<option value="" disabled selected>Please Select Your Project</option>
+					</select> 
+					<span ng-show="projectNameRequired" class="error-msg ng-cloak errorlbl">{{projectNameRequired}}</span>
+				</div>
+				
+				<div class='domainTxt appTypeTxt'>Application Type</div>
+				
+				<div class="appTypesContainer">
+					<div class='projectTypes' data-app="Web">
+						<img src='imgs/web.png' alt='Web' />
+						<label>Web</label>
+					</div>
+					<div class='projectTypes' data-app="WebService">
+						<img src='imgs/webservice.png' alt='WebService' />
+						<label>Web Services</label>
+					</div>
+					<div class='projectTypes' data-app="Mainframe">
+						<img src='imgs/mainframe.png' alt='Mainframe' />
+						<label>Mainframe</label>
+					</div>
+					<div class='projectTypes' data-app="Desktop">
+						<img src='imgs/desktop.png' alt='Desktop' />
+						<label>Desktop Apps</label>
+					</div>
+					<div class='projectTypes' data-app="oracleWeb">
+						<img src='imgs/oracleApps.png' alt='Oracle Apps' />
+						<label>Oracle Apps</label>
+					</div>
+					<div class='projectTypes' data-app="mobileApps">
+						<img src='imgs/mobileApps.png' alt='Mobile Apps' />
+						<label>Mobile Apps</label>
+					</div>
+					<div class='projectTypes' data-app="mobileWeb">
+						<img src='imgs/mobileWeb.png' alt='Mobile Web' />
+						<label>Mobile Web</label>
+					</div>
+					<div class='projectTypes' data-app="sapApps">
+						<img src='imgs/sapApps.png' alt='SAP Apps' />
+						<label>Sap Apps</label>
+					</div>
+				</div>
+			</div>
+			
+			<!-- Relase Cycle -->
+			<div class="containerWrap relCycContainer">
+				 <!-- Release Container -->
+				 <div class="containerWrap releaseContainer rcContainer">
+				 	<!-- Add Release -->
+				 	<div class="addContainer"><span id="addRelease"><img src="imgs/ic-add-sm.png" />Add Release</span></div>
+				 	<!-- Add Release -->
+				 	
+				 	<!-- Releases List -->
+				 	<ul id="releaseList" class="containerWrap scrollbar-inner relCycScroll">
+				 	</ul>
+				 	<!-- Releases List -->
+				 </div>
+				 <!-- Release Container -->
+				 
+				  <!-- Cycle Container -->
+				 <div class="containerWrap cycleContainer rcContainer">
+				 	<!-- Add Release -->
+				 	<div class="addContainer"><span id="addCycle"><img src="imgs/ic-add-sm.png" />Add Cycle</span></div>
+				 	<!-- Add Release -->
+				 	
+				 	<!-- Cycle List -->
+				 	<ul id="cycleList" class="containerWrap scrollbar-inner relCycScroll">
+				 	</ul>
+				 	<!-- Cycle List -->
+				 </div>
+				 <!-- Cycle Container -->
+			</div>
+			<!-- Relase Cycle -->
+		</div>
+		<!-- Update Project -->
+
+		<div ng-if="tab == 'tabPreferences'">
+			<div id="page-taskName">
+				<span>Preferences</span>
+			</div>
+		</div>
 	</div>
 	<!--Middle Panel-->
 
@@ -586,7 +464,7 @@
 				<p><input type="text" class="form-control form-control-custom" placeholder="Enter New Release Name" id="releaseName" /></p>
 			</div>
 			<div class="modal-footer">
-				<button type="button" class="btn btn-default" data-dismiss="modal">Save</button>
+				<button id='updateReleaseName' type="button" class="btn btn-default" data-dismiss="modal">Save</button>
 			</div>
 		</div>
 	</div>
@@ -606,7 +484,7 @@
 				<p>Are you sure you want to delete ?</p>
 			</div>
 			<div class="modal-footer">
-				<button type="button" class="btn btn-default" data-dismiss="modal">Yes</button>
+				<button id='deleteReleaseYes' type="button" class="btn btn-default" data-dismiss="modal">Yes</button>
 				<button type="button" class="btn btn-default" data-dismiss="modal">No</button>
 			</div>
 		</div>
@@ -627,7 +505,7 @@
 				<p><input type="text" class="form-control form-control-custom" placeholder="Enter New Release Name" id="cycleName" /></p>
 			</div>
 			<div class="modal-footer">
-				<button type="button" class="btn btn-default" data-dismiss="modal">Save</button>
+				<button id='updateCycleName' type="button" class="btn btn-default" data-dismiss="modal">Save</button>
 			</div>
 		</div>
 	</div>
@@ -647,7 +525,7 @@
 				<p>Are you sure you want to delete ?</p>
 			</div>
 			<div class="modal-footer">
-				<button type="button" class="btn btn-default" data-dismiss="modal">Yes</button>
+				<button id='deleteCycleYes'  type="button" class="btn btn-default" data-dismiss="modal">Yes</button>
 				<button type="button" class="btn btn-default" data-dismiss="modal">No</button>
 			</div>
 		</div>
@@ -694,3 +572,60 @@
 	</div>
 </div>
 <!-- Edit User Fail -->
+
+<!-- Admin Modal Box  -->
+	<div class="modal fade" id="adminModal" role="dialog" data-keyboard="false" data-backdrop="static">
+	  <div class="modal-dialog modal-sm">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal">&times;</button>
+	        <h4 class="modal-title"></h4>
+	      </div>
+	      <div class="modal-body">
+	        <p></p>
+	      </div>
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-default" data-dismiss="modal">Ok</button>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+	<!-- Admin Modal Box  -->
+
+	<!-- Add Release Modal Box  -->
+	<div class="modal fade" id="addReleaseNameModal" role="dialog" data-keyboard="false" data-backdrop="static">
+	  <div class="modal-dialog modal-sm">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal">&times;</button>
+	        <h4 class="modal-title">Add Release</h4>
+	      </div>
+	      <div class="modal-body">
+	        <div class="form-group"><input id='releaseTxt' type="text" class="form-control form-control-custom" placeholder="Add Release Name"></div>
+	      </div>
+	      <div class="modal-footer">
+	        <button id='addReleaseName' type="button" class="btn btn-default" data-dismiss="modal">Ok</button>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+	<!-- Add Release Modal Box   -->
+
+		<!-- Add Cycle Modal Box  -->
+	<div class="modal fade" id="addCycleNameModal" role="dialog" data-keyboard="false" data-backdrop="static">
+	  <div class="modal-dialog modal-sm">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal">&times;</button>
+	        <h4 class="modal-title">Add Cycle</h4>
+	      </div>
+	      <div class="modal-body">
+	        <div class="form-group"><input id='cycleTxt' type="text" class="form-control form-control-custom" placeholder="Add Cycle Name"></div>
+	      </div>
+	      <div class="modal-footer">
+	        <button id='addCycleName' type="button" class="btn btn-default" data-dismiss="modal">Ok</button>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+	<!-- Add Cycle Modal Box   -->
