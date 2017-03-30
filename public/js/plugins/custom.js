@@ -45,7 +45,7 @@ $(document).ready(function() {
 
     //Popup Function - Screen Level (Screenshot, Filter, Tasks, Project Info)
     $(document).on("click", ".slidePopup", function(e){
-    	if($(this).attr('data-original-title') == "Filter" && $('#scraplist li').length <= 0){
+    	if($(this).attr('title') == "Filter" && $('#scraplist li').length <= 0){
                		
     	}
     	else{
