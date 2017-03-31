@@ -268,29 +268,7 @@ function toggleCycleClick()
 			projectExists = false;
 			var requestedids = [];
 			var idtype = [];
-			if($('#selDomain option:selected').val() != "")
-			{
-					requestedids.push($('#selDomain option:selected').val());
-					idtype.push('domainsall');
-					adminServices.getNames_ICE(requestedids,idtype)
-						.then(function (response) {
-						console.log(response);
-						for(var i=0;i<response.projectNames.length;i++)
-						{
-							if($("#projectName").val() == response.projectNames[i])
-							{
-								console.log($("#projectName").val());
-								console.log(response.projectNames[i]);
-								$("#adminModal").find('.modal-title').text("Admin");
-								$("#adminModal").find('.modal-body p').text("Project Name already Exists");
-								$("#adminModal").modal("show");
-								 projectExists = true;
-							}
-						}
-						
-					}, function (error) { console.log("Error:::::::::::::", error) })
-			}
-				$("#releaseList li").each(function() {
+			$("#releaseList li").each(function() {
 					for(var i=0;i<projectDetails.length;i++)
 					{
 						if($(this).children('span.releaseName').text() == projectDetails[i].releaseName)
@@ -301,37 +279,69 @@ function toggleCycleClick()
 								$("#adminModal").find('.modal-body p').text("Please add atleast one cycle for a release");
 								$("#adminModal").modal("show");
 								flag = true;
+								if(flag == true)
+								{
+									return false;
+								}
 							}
 						}
 					}
 				});
-				if(projectExists == true || flag == true)
-					{
-						return false;
-					}
-				else{
-						var userDetails = JSON.parse(window.localStorage['_UI']);
-						createprojectObj.domainId =  $('#selDomain option:selected').val();
-						createprojectObj.projectName = $.trim($("#projectName").val());
-						createprojectObj.appType = $(".projectTypeSelected").attr('data-app');
-						createprojectObj.projectDetails = projectDetails;
-						adminServices.createProject_ICE(createprojectObj,userDetails)
-							.then(function (response) {
-							if(response == 'success')
-							{
-								$("#adminModal").find('.modal-title').text("Admin");
-								$("#adminModal").find('.modal-body p').text("Project created successfully");
-								$("#adminModal").modal("show");
-								resetForm();
-							}
-							else{
-								$("#adminModal").find('.modal-title').text("Admin");
-								$("#adminModal").find('.modal-body p').text("Failed to create project");
-								$("#adminModal").modal("show");
-								resetForm();
-							}
-							}, function (error) { console.log("Error:::::::::::::", error) })
+			
+			if($('#selDomain option:selected').val() != "")
+			{
+					requestedids.push($('#selDomain option:selected').val());
+					idtype.push('domainsall');
+					adminServices.getNames_ICE(requestedids,idtype)
+						.then(function (response) {
+						if(response.projectNames.length > 0)
+						{
+								for(var i=0;i<response.projectNames.length;i++)
+									{
+										if($("#projectName").val() == response.projectNames[i])
+										{
+											console.log($("#projectName").val());
+											console.log(response.projectNames[i]);
+											$("#adminModal").find('.modal-title').text("Admin");
+											$("#adminModal").find('.modal-body p').text("Project Name already Exists");
+											$("#adminModal").modal("show");
+											projectExists = true;
+											return false;
+										}
+										
+									}
 						}
+						else{
+										$("#adminModal").find('.modal-title').text("Admin");
+										$("#adminModal").find('.modal-body p').text("Failed to create project");
+										$("#adminModal").modal("show");
+										return false;
+						     }
+				
+										var userDetails = JSON.parse(window.localStorage['_UI']);
+										createprojectObj.domainId =  $('#selDomain option:selected').val();
+										createprojectObj.projectName = $.trim($("#projectName").val());
+										createprojectObj.appType = $(".projectTypeSelected").attr('data-app');
+										createprojectObj.projectDetails = projectDetails;
+										adminServices.createProject_ICE(createprojectObj,userDetails)
+											.then(function (response) {
+											if(response == 'success')
+											{
+												$("#adminModal").find('.modal-title').text("Admin");
+												$("#adminModal").find('.modal-body p').text("Project created successfully");
+												$("#adminModal").modal("show");
+												resetForm();
+											}
+											else{
+												$("#adminModal").find('.modal-title').text("Admin");
+												$("#adminModal").find('.modal-body p').text("Failed to create project");
+												$("#adminModal").modal("show");
+												resetForm();
+											}
+											}, function (error) { console.log("Error:::::::::::::", error) })
+					
+					}, function (error) { console.log("Error:::::::::::::", error) })
+			      }
 				}
 				
 	};
