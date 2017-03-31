@@ -501,6 +501,11 @@ function toggleCycleClick()
 	        $(this).addClass("active");
 		});
 
+	$(document).on('click',"#cycleList li",function() {
+		$("li.cycleList").removeClass("cycleList");
+		$(this).addClass("cycleList");
+	});
+
 	//Add Cycle Name Functionality
 	$(document).on("click","#addCycle", function(e){
 		e.preventDefault();
@@ -556,7 +561,9 @@ function toggleCycleClick()
 				   else{
 					   	
 					  	$(".close:visible").trigger('click');
-					    $("#cycleList").append("<li><img src='imgs/ic-cycle.png' /><span class='cycleName'>"+cycleName+"</span><span class='actionOnHover'><img id=editCycleName_"+delCount+" title='Edit Cycle Name' src='imgs/ic-edit-sm.png' class='editCycleName'><img id=deleteCycleName_"+delCount+" title='Delete Cycle' src='imgs/ic-delete-sm.png' class='deleteCycle'></span></li>");
+						$("#cycleList li.cycleList").removeClass("cycleList");
+					    $("#cycleList").append("<li class='cycleList'><img src='imgs/ic-cycle.png' /><span class='cycleName'>"+cycleName+"</span><span class='actionOnHover'><img id=editCycleName_"+delCount+" title='Edit Cycle Name' src='imgs/ic-edit-sm.png' class='editCycleName'><img id=deleteCycleName_"+delCount+" title='Delete Cycle' src='imgs/ic-delete-sm.png' class='deleteCycle'></span></li>");
+						 
 						    for(i=0;i<releaseNamesArr.length;i++)
 							{
 								console.log("selRelease", releaseNamesArr[i]);
@@ -655,7 +662,17 @@ function toggleCycleClick()
 						}
 						else{
 							$(".close:visible").trigger('click');
+							var index = '';
+							    index = $('li.active').index();
 							$("#"+editReleaseId).parent().prev('span').text($("#releaseName").val());
+							console.log("projectDetails", projectDetails);
+							for(var i=0;i<projectDetails.length;i++)
+							{
+								if(i == index)
+								{
+									projectDetails[i].releaseName = $("#releaseName").val();
+								}
+							}
 						}
 						}, function (error) { console.log("Error:::::::::::::", error) })
 						e.stopImmediatePropagation();
@@ -727,6 +744,21 @@ function toggleCycleClick()
 				   else{
 					  	$(".close:visible").trigger('click');
 					    $("#"+editCycleId).parent().prev('span').text($("#cycleName").val());
+							var cycleIndex = '';
+							    cycleIndex = $('li.cycleList').index();
+						for(var i=0;i<projectDetails.length;i++)
+						{
+							if(projectDetails[i].releaseName == $("li.active").children('span.releaseName').text())
+							{
+								for(var j=0;j<projectDetails[i].cycleNames.length;j++)
+								{
+									if(j == cycleIndex)
+									{
+										projectDetails[i].cycleNames[j] = $("#cycleName").val();
+									}
+								}
+							}
+						}
 				   }
 				}, function (error) { console.log("Error:::::::::::::", error) })
 				e.stopImmediatePropagation();
