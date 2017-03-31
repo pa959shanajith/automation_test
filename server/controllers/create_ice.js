@@ -487,7 +487,7 @@ exports.createStructure_Nineteen68 = function(req, res) {
                                                                     console.log(err);
                                                                 } else {
                                                                     testcaseidlist.push(testcaseID);
-                                                                	var updateTestscenario="update testscenarios set testcaseids=testcaseids+["+testcaseID+"],modifiedby="+username+",modifiedon="+modifiedon+"   where projectid ="+projectid+"and testscenarioid ="+scenarioId+" and testscenarioname = '"+scenarioName+"' ";
+                                                                	var updateTestscenario="update testscenarios set testcaseids=testcaseids+["+testcaseID+"],modifiedby='"+username+"',modifiedon="+modifiedon+"   where projectid ="+projectid+"and testscenarioid ="+scenarioId+" and testscenarioname = '"+scenarioName+"' ";
                                                                     var update =dbConnICE.execute(updateTestscenario,function(err,result){});
                                                                 }
                                                                 

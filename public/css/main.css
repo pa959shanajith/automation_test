@@ -2226,254 +2226,313 @@ input[disabled]{
 /******************Header CSS***************************/
 
 
-/******************Admin CSS***************************/
-
-nav {
-    z-index: 1;
+/*****************ADMIN CSS NEW ************************/
+.containerWrap {
+	float: left;
+	width: 100%;
+	height: 100%
 }
 
-#sidebar-wrapper {
-    top: 63px;
-    left: -200px;
-    width: 15%;
-    background-color: #643693;
-    color: #eee9ff;
-    position: fixed;
-    height: 87%;
-    z-index: 1;
-    float: left;
-    padding: 30px 0px;
-    font-family: 'Roboto', sans-serif;
+.adminActionBtn {
+	float: right;
+	width: auto;
 }
 
-.sidebar-nav {
-    position: absolute;
-    top: 0;
-    margin: 0;
-    padding: 0;
-    width: 250px;
-    list-style: none;
+.adminBtn {
+	padding: 2px 25px !important;
 }
 
-#sidebar-wrapper.sidebar-toggle {
-    transition: all 0.3s ease-out;
-    margin-left: -200px;
+.adminForm {
+	padding-top: 5%;
 }
 
-@media (min-width: 768px) {
-    #sidebar-wrapper.sidebar-toggle {
-        transition: 0s;
-        left: 200px;
-    }
-    #page-wrapper {
-        margin-left: 200px;
-    }
+.adminSmBox {
+	padding-top: 5%;
+	padding-left: 0px;
 }
 
-.submenu-heading {
-    padding: 15px;
-    cursor: pointer;
-}
-
-.submenu-heading h4 {
-    margin: 0;
-}
-
-.submenu-heading:hover {
-    background: rgba(255, 255, 255, .5);
-    color: rgba(0, 0, 0, .6);
-}
-
-.submenu .list-group {
-    margin: 0;
-}
-
-.submenu .list-group-item {
-    border-radius: 0;
-    background: rgba(0, 0, 0, .07);
-    border: 0;
-    color: white;
-    padding: .75em 1.7em;
-}
-
-.submenu .list-group-item:hover {
-    background: rgba(255, 255, 255, .5);
-}
-
-.mid-section {
-    width: 85%;
-    float: right;
-    padding: 30px 30px;
-    height: 87%;
-    box-sizing: border-box;
-    box-shadow: 0px -4px 20px #ccc;
-    -moz-box-shadow: 0px -4px 20px #ccc;
-    -webkit-box-shadow: 0px -4px 20px #ccc;
-    background: #fff;
-}
-
-.content-wrap {
-    float: left;
-    width: 100%;
-    position: relative;
-}
-
-.content-wrap form {
-    margin: 0 0 1rem;
-}
-
-.sepratorStyle2 {
-    width: 50%;
-    margin-bottom: 30px;
-    clear: both;
-}
-
-.seprator {
+.adminControl {
+	margin-bottom: 3%;
+    padding: 0px 0px;
     position: relative;
     float: left;
-}
-
-.labelStyle1 {
-    float: left;
-    line-height: 1;
-    margin-bottom: 12px;
-    font-weight: 300;
-    cursor: default;
-}
-
-.formField {
-    font-size: 13px !important;
-    font-family: Open_Sans, sans-serif !important;
-    margin-bottom: 0px;
     width: 100%;
-    height: 3.5rem !important;
-    box-sizing: border-box;
-    padding: 12px !important;
-    float: left;
-    border: 1px solid #ddd !important;
-    border-radius: 3px;
-    -moz-border-radius: 3px;
-    -webkit-border-radius: 3px;
-    -o-border-radius: 3px;
-    -ms-border-radius: 3px;
-    box-shadow: inset 0px 1px 6px #ddd !important;
-    -moz-box-shadow: inset 0px 1px 6px #ddd !important;
-    -webkit-box-shadow: inset 0px 1px 6px #ddd !important;
-    -o-box-shadow: inset 0px 1px 6px #ddd !important;
-    -ms-box-shadow: inset 0px 1px 6px #ddd !important;
 }
 
-.ldapUserInput {
-    position: absolute;
-    bottom: 17%;
-    right: -110px;
+.adminSelect:focus {
+	box-shadow: none !important;
 }
 
-.ldapChkBox,
-.ldapEditChkBox {
-    vertical-align: sub;
-    margin-right: 6px !important;
-    width: 15px;
-    height: 15px;
-    cursor: pointer;
+.leftControl {
+	float: left;
+	width: 47%;
 }
 
-.error-msg {
-    margin: -0.8em 0 0.8em;
-    color: #ff3300;
-    font-size: .85em;
-    float: left;
-    position: absolute;
-    right: 0;
-    bottom: -35px;
-    font-weight: 500;
+.rightControl {
+	float: right;
+	width: 50%;
 }
 
-.error-msg-abs{
-    color: #d33c3c;
-    position: absolute;
-	left:50%;
-	top:50%;
-	transform:translate(-50%, -50%);
-	-moz-transform:translate(-50%, -50%);
-	-webkit-transform:translate(-50%, -50%)	
+.primaryRole {
+	width: auto;
+	vertical-align: middle;
+	font-weight: normal;
+	line-height: 2;
 }
 
-.error-msg-abs3{
-	top:94%;
+.selectControl {
+	position: relative;
+	left: -90px;
 }
 
-.error-msg-abs2{
-	left: 0%;
-	top:50%;
-	transform:translate(0%, -50%);
-	-moz-transform:translate(0%, -50%);
-	-webkit-transform:translate(0%, -50%)	
+.errorlbl {
+	margin: -2.5em 0 2em;
+	line-height: 17px;
+	position: relative;
+	left: 12px;
 }
 
-.modal-body .row-modal .inputErrorBorder{
-	border-bottom: 2px solid #d33c3c !important;
+.userForm {
+	float: left;
+	width: 100%;
 }
 
-.modal-body .row-modal select.selectErrorBorder{
-	border: 2px solid #d33c3c !important;
+.adminSelect {
+	padding: 0px;
+	height: 25px;
+	margin-bottom: 0;
+	width: 60%;
+	margin-left: 4%;
+	margin-top: 0%;
+	line-height: 2;
+	border: 1px solid #656565 !important;
 }
 
-.inputErrorBorder{
-	border-bottom: 2px solid #d33c3c !important;
+.selectRole {
+	margin-top: 2%;
+	float: left;
 }
 
-.inputErrorBorderFull{
-	border: 2px solid #d33c3c !important;
+.selectedIcon {
+	background: #331d4c;
+	border-radius: 5px;
 }
 
-.selectErrorBorder{
-	border: 2px solid #d33c3c !important;
+.domainTxt {
+	float: left;
 }
 
-input[type="checkbox"] {
-    margin: 0;
-    padding: 0;
-    box-shadow: none !important;
+.projectForm:first-child {
+	margin-top: 5%;
 }
 
-select {
-    width: 100%;
-    overflow: hidden;
-    white-space: pre;
-    text-overflow: ellipsis;
-    height: 2.1rem;
-    border: 1px solid #ccc !important;
-    border-radius: 5px !important;
-    margin-bottom: 0;
-    font-size: 13px;
+.projectForm {
+	margin-bottom: 3%;
+	padding: 0 0px;
+}
+
+.appTypeTxt {
+	position: relative;
+	top: 20px;
+}
+
+.projectTypes {
+	float: left;
+	width: 12.5%;
+	padding: 7px;
+	text-align: center;
+	cursor: pointer
+}
+
+.projectTypes label {
+	float: left;
+	width: 100%;
+	font-size: 11px;
+	font-weight: 500;
+	margin-top: 8px;
+	color: #311d4e;
+	margin-bottom: 0;
+	cursor: pointer
+}
+
+.projectTypes:nth-child(3) label,
+.projectTypes:nth-child(4) label,
+.projectTypes:nth-child(6) label,
+.projectTypes:nth-child(7) label{
+	margin-top: 9px;
+}
+
+.projectTypes:nth-child(5) label{
+	margin-top: 14px;
+}
+
+.projectTypes:nth-child(8) label{
+	margin-top: 19px;
+}
+
+.projectTypes:hover{
+	background: #e4e4e4;
+    border-radius: 6px;
+    transition: 0.3s ease-in-out;
+    -moz-transition: 0.3s ease-in-out;
+    -webkit-transition: 0.3s ease-in-out;
+}
+
+.projectTypeSelected{
+	background: #e4e4e4;
+    border-radius: 6px;
+    -moz-border-radius: 6px;
+    -webkit-border-radius: 6px;
+    -o-border-radius: 6px;
+    -ms-border-radius: 6px;
+}
+
+#selDomain, #selDomainEdit {
+	    position: relative;
+        left: 10px
+}
+
+.appTypesContainer {
+	float: right;
+    width: 86%;
+    margin-left: 5px;
+}
+
+.relCycContainer{
+	background: #e6e7e9;
+    border-radius: 5px;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -o-border-radius: 5px;
+    -ms-border-radius: 5px;
+    height: calc(100% - 285px);
     padding: 8px;
-    float: left;
-    -webkit-box-shadow: inset 0px 1px 6px #ddd;
-    margin: 0 0 1rem 0;
-}
-
-select.slt-domain-custom {
-    min-height: 40px;
-}
-
-#passwordIcon,
-#emailIcon {
-    padding-left: 12px !important;
-    background: none !important;
-}
-
-.wrap select,
-select:hover {
-    background-color: #fff;
-}
-
-.error-msg-password {
-    margin: -2.5em 0 2em;
-    line-height: 17px;
+    clear: both;
     position: relative;
+    top: 5px;
 }
 
+#updateReleaseCycle
+{
+  height: calc(100% - 255px);
+}
+
+.releaseContainer, .cycleContainer{
+	width:50%;
+}
+
+.addContainer{
+	float: left;
+    width: 100%;
+    padding: 10px 25px;
+    font-size: 15px;
+    margin-bottom: 10px
+}
+
+.addContainer span{
+	cursor: pointer;
+	display: inline-block;
+}
+
+.addContainer img{
+	margin-right: 10px;
+    vertical-align: bottom;
+}
+
+#releaseList, #cycleList{
+	padding: 0;
+    float: left;
+    width: 100%;
+}
+
+#releaseList li img,
+#cycleList li img{
+	vertical-align: bottom;
+    margin-right: 15px;
+}
+
+#releaseList li,
+#cycleList li{
+	float: left;
+    width: 100%;
+    padding: 8px 25px 8px 30px;
+    font-size: 15px;
+    position: relative;
+    cursor: pointer;
+}
+
+#releaseList li:hover,
+#cycleList li:hover{
+	background: #f1f1f1;
+}
+
+.actionOnHover{
+	display: inline-block;
+    position: absolute;
+    right: 45px;
+    top: 5px;
+}
+
+.actionOnHover img{
+	margin: 0 !important;
+}
+
+.actionOnHover img:first-child{
+	margin-right: 10px !important;
+}
+
+.ldapBtn {
+	position: absolute;
+    z-index: 1;
+    right: 0;
+    margin: 0;
+    padding: 0px 20px;
+    background: #5e636b;
+}
+
+.ldapBtnActive{
+	background: #643693
+}
+
+.ldapBtn.focus,
+.ldapBtn,
+.ldapBtn:active:focus,
+.ldapBtn:focus,
+.ldapBtn:hover{
+	padding: 0px 20px !important;
+	margin-right: 0;
+}
+
+.selectlg{
+	margin-left: 0;
+    width: 100%;
+}
+
+#releaseList li.active, #cycleList li.active {		
+    background: #f1f1f1;		
+}
+
+.disableAddCycle		
+{		
+    cursor: not-allowed !important;	
+    pointer-events: none;	
+}
+.createProjectBtn
+{
+    margin-right: 10px;
+}
+#selProject
+{
+    margin-left: 21px;
+    position: relative;
+    left: 15px;
+}
+#userRoles
+{
+    position: relative;
+    left: 10px;
+    top: 2px;
+}
 /*****************ADMIN CSS NEW ************************/
 .containerWrap {
 	float: left;
@@ -2652,7 +2711,7 @@ select:hover {
     -webkit-border-radius: 5px;
     -o-border-radius: 5px;
     -ms-border-radius: 5px;
-    height: calc(100% - 270px);
+    height: calc(100% - 290px);
     padding: 8px;
     clear: both;
     position: relative;
@@ -3107,6 +3166,17 @@ select:-webkit-autofill:focus {
 
 /******************Remove Webkit autocolor CSS***************************/
 
+.inputErrorBorder{
+	border-bottom: 2px solid #d33c3c !important;
+}
+
+.inputErrorBorderFull{
+	border: 2px solid #d33c3c !important;
+}
+
+.selectErrorBorder{
+	border: 2px solid #d33c3c !important;
+}
 
 /*****************Custom Media Queries*****************/
 
@@ -3208,7 +3278,7 @@ select:-webkit-autofill:focus {
 		height: 56%;
 	}
 	.relCycContainer{
-		height: calc(100% - 280px);
+		height: calc(100% - 285px);
 	}
 }
 

@@ -103,6 +103,12 @@ app.post('/createUser_Nineteen68', admin.createUser_Nineteen68);
 app.post('/updateUser_nineteen68', admin.updateUser_nineteen68);
 app.post('/getAllUsers_Nineteen68', admin.getAllUsers_Nineteen68);
 app.post('/getEditUsersInfo_Nineteen68', admin.getEditUsersInfo_Nineteen68);
+app.post('/getDomains_ICE', admin.getDomains_ICE);
+app.post('/checkReleaseNameExists_ICE', admin.checkReleaseNameExists_ICE);
+app.post('/checkCycleNameExists_ICE', admin.checkCycleNameExists_ICE);
+app.post('/createProject_ICE', admin.createProject_ICE);
+app.post('/updateProject_ICE', admin.updateProject_ICE);
+app.post('/getNames_ICE', admin.getNames_ICE);
 //Design Screen Routes
 app.post('/initScraping_ICE', design.initScraping_ICE);
 app.post('/highlightScrapElement_ICE', design.highlightScrapElement_ICE);
