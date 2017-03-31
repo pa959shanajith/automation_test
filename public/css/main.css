@@ -2412,6 +2412,11 @@ input[disabled]{
     top: 5px;
 }
 
+#updateReleaseCycle
+{
+  height: calc(100% - 255px);
+}
+
 .releaseContainer, .cycleContainer{
 	width:50%;
 }
