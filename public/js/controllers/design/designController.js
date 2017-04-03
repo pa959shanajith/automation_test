@@ -107,6 +107,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			// service call # 1 - getTestScriptData service call
 			DesignServices.readTestCase_ICE(screenId, testCaseId, testCaseName)	
 			.then(function(data) {
+				debugger;
 				console.log(data);
 				var appType = taskInfo.appType;
 				$('#jqGrid').removeClass('visibility-hide').addClass('visibility-show');
@@ -2272,6 +2273,8 @@ function contentTable(newTestScriptDataLS) {
 			//tsrows_reorder();
 		}
 	});
+
+	$("#jqGrid").focus().css("outline","none");
 	
 	$(document).on('click', "[name='inputVal'],[name='custname'],[name='keywordVal'],[name='outputVal']", function() {
 		if($("[name='inputVal']").parent().siblings("[aria-describedby='jqGrid_keywordVal']").children().val() == "getBody" 
@@ -3497,6 +3500,7 @@ function pasteTestStep(){
 $(document).on('hide.bs.modal','#modalDialog-inputField', function () {
 	$("#getInputData").val('')
 });
+
 
 $(document).on("click", "#btnPasteTestStepYes", function(){
 	$("#globalModalYesNo").find('.modal-footer button:nth-child(2)').trigger("click");
