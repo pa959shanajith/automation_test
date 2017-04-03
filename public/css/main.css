@@ -628,7 +628,7 @@ body {
 }
 
 .details-execute-task {
-    background: #09d2ef !important;
+    background: #0CD5E9 !important;
 }
 
 .details-design-task {
@@ -2032,6 +2032,11 @@ input[disabled]{
 	appearance: none;
 	-moz-appearance: none;
 	-webkit-appearance: none;
+	border-radius: 5px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	-o-border-radius: 5px;
+	-ms-border-radius: 5px;
 }
 
 .modal-body .row-modal .form-group-2 select option{
