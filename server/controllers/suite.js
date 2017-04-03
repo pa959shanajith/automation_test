@@ -515,58 +515,6 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 
 		);
 	}
-exports.getCycleNameByCycleId = function (req, res) {
-	var getCycleName = "select cyclename from cycles where releaseid = "+req.body.releaseId+" and cycleid = "+req.body.cycleId+"";
-		dbConnICE.execute(getCycleName, function(err, result) {
-							if(err){ console.log(err);
-							}
-							else{
-								if(result.rows.length > 0)
-								{
-										for (var i = 0; i < result.rows.length; i++) {
-										    cycleName = result.rows[i].cyclename;
-								          }	
-								}
-								else{
-									cycleName = "";
-								}
-									try{
-										res.send(cycleName);
-									}catch(ex){
-										console.log("Exception occured in getCycleNameByCycleId : ",ex)
-									}
-							}
-		});
-}
-	//getReleaseName Functionality
-	exports.getReleaseNameByReleaseId_ICE = function (req, res) {
-		var releaseId = req.body.releaseId;
-		var projectId = req.body.projectId;
-		var getReleaseName = "select releasename from icetestautomation.releases where releaseid = "+releaseId+" and projectid = "+projectId+"";
-		console.log("sd", getReleaseName)
-		dbConnICE.execute(getReleaseName, function(err, result) {
-			//console.log("Result", result);
-			var	releaseName = '';
-			if(err){
-				console.log(err);
-			}else{
-				if(result.rows.length > 0){
-					for (var i = 0; i < result.rows.length; i++) {
-					releaseName = result.rows[i].releasename;
-					}
-				}
-				else{
-					releaseName = "";
-				}
-			}
-				try{
-					res.send(releaseName);
-				}catch(ex){
-					console.log("Exception occured in getReleaseNameByReleaseId_ICE : ",ex)
-				}
-		});
-	  }
-
 //ExecuteTestSuite Functionality
 
 

@@ -1,7 +1,7 @@
 /**
  * 
  */
-var userDetails,userRole;
+var userDetails,userRole,projectId,releaseId,cycleId,task;
 mySPA.controller('headerController', function($scope,$http,$location,headerServices,cfpLoadingBar) {
 	if(window.localStorage['_UI'])
 	{
@@ -21,11 +21,24 @@ mySPA.controller('headerController', function($scope,$http,$location,headerServi
 	 }
 	  if(window.localStorage['_CT'])
 	 {
-		var projectId =  JSON.parse(window.localStorage['_CT']).projectId;
-		headerServices.getProjectDetails_ICE(projectId) 
-			.then(function(data){
-				$scope.projectDetails = data;
-			}, function(error) {	console.log("Failed to fetch projectInfo")});
+			   projectId =  JSON.parse(window.localStorage['_CT']).projectId;
+				headerServices.getProjectDetails_ICE(projectId) 
+					.then(function(data){
+						$scope.projectDetails = data;
+						task = JSON.parse(window.localStorage['_CT']);
+							releaseId = task.releaseId;
+							headerServices.getReleaseNameByReleaseId_ICE(releaseId, projectId) 
+							.then(function(data){
+								$scope.releaseDetails = data;
+									cycleId = task.cycleId;
+										headerServices.getCycleNameByCycleId_ICE(cycleId, releaseId) 
+										.then(function(data){
+											console.log("cycleDetails", data);
+											$scope.cycleDetails = data;
+										}, function(error) {	console.log("Failed to get cycle name")});
+							}, function(error) {	console.log("Failed to get release name")});
+
+					}, function(error) {	console.log("Failed to fetch projectInfo")});
 	 }
 	 $scope.logout = function() 
 	 {

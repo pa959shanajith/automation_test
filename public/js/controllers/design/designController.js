@@ -2273,7 +2273,7 @@ function contentTable(newTestScriptDataLS) {
 			//tsrows_reorder();
 		}
 	});
-
+	//Focus JqGrid onLoad 
 	$("#jqGrid").focus().css("outline","none");
 	
 	$(document).on('click', "[name='inputVal'],[name='custname'],[name='keywordVal'],[name='outputVal']", function() {

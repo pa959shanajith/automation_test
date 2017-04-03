@@ -1,4 +1,4 @@
-var releaseName;var cycleName;var testSuiteName;
+var releaseName,cycleName,testSuiteName;
 mySPA.controller('scheduleController',['$scope','$http','$timeout','$location','ScheduleService','cfpLoadingBar', function ($scope, $http, $timeout, $location, ScheduleService, cfpLoadingBar) {
 	cfpLoadingBar.start();
 	$("body").css("background","#eee");
@@ -15,14 +15,20 @@ mySPA.controller('scheduleController',['$scope','$http','$timeout','$location','
 	var	appType = JSON.parse(window.localStorage['_CT']).appType;
 			$("#page-taskName").empty().append('<span class="taskname">'+getTaskName+'</span>');
 			$(".projectInfoWrap").empty()
-			releaseName = JSON.parse(window.localStorage['_CT']).releaseName;
-			cycleName = JSON.parse(window.localStorage['_CT']).cycleName;
-			testSuiteName = JSON.parse(window.localStorage['_CT']).testSuiteName;
+			 testSuiteName = JSON.parse(window.localStorage['_CT']).testSuiteName;
 	
 	$timeout(function(){
-		projectDetails = angular.element(document.getElementById("left-nav-section")).scope().projectDetails;
-		$(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">Project :</span><span class="content">'+projectDetails.projectname+'</span></p><p class="proj-info-wrap"><span class="content-label">Cycle :</span><span class="content">'+releaseName+'</span></p><p class="proj-info-wrap"><span class="content-label">Cycle :</span><span class="content">'+cycleName+'</span></p><p class="proj-info-wrap"><span class="content-label">TestSuite :</span><span class="content">'+testSuiteName+'</span></p>')
-	}, 3000)
+		var releaseId = JSON.parse(window.localStorage['_CT']).releaseId;
+		var cycleId = JSON.parse(window.localStorage['_CT']).cycleId;
+		var projectId = JSON.parse(window.localStorage['_CT']).projectId;
+		var	projectDetails = angular.element(document.getElementById("left-nav-section")).scope().projectDetails;
+		 	releaseName = angular.element(document.getElementById("left-nav-section")).scope().releaseDetails;
+			cycleName = angular.element(document.getElementById("left-nav-section")).scope().cycleDetails;
+			if(projectDetails.projectName !="" &&  releaseName!="" && cycleName !="")
+			{
+				$(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">Project :</span><span class="content">'+projectDetails.projectname+'</span></p><p class="proj-info-wrap"><span class="content-label">Release :</span><span class="content">'+releaseName+'</span></p><p class="proj-info-wrap"><span class="content-label">Cycle :</span><span class="content">'+cycleName+'</span></p>')
+			}
+	}, 2000)
     
     //Sample JSON to load Test Suite Data
     var testSuiteData = [{
