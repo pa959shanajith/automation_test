@@ -26,6 +26,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 	});
 
 	$("#projectTab").on('click',function() {
+		projectDetails = [];
 		$("img.selectedIcon").removeClass("selectedIcon");
 		$(this).children().find('img').addClass('selectedIcon');
 		$timeout(function(){
@@ -605,21 +606,27 @@ function toggleCycleClick()
 		$(document).on('click',"[id^=releaseList]",function(e) {
 			toggleCycleClick();
 				var id = e.target.id;
-				var releaseName = $("#"+id).children('span.releaseName').text();
-				$("#cycleList li").remove();
-				if(projectDetails.length > 0)
+				if(id.indexOf("edit") != 0)
 				{
-					for(var i=0;i<projectDetails.length;i++)
+					if(id.indexOf("delete") != 0)
+					{
+						var releaseName = $("#"+id).children('span.releaseName').text();
+						$("#cycleList li").remove();
+						if(projectDetails.length > 0)
 						{
-							
-							if(projectDetails[i].releaseName == releaseName && 'cycleNames' in projectDetails[i])
-							{
-								for(var j=0;j<projectDetails[i].cycleNames.length;j++)
+							for(var i=0;i<projectDetails.length;i++)
 								{
-									$("#cycleList").append("<li><img src='imgs/ic-cycle.png' /><span class='cycleName'>"+projectDetails[i].cycleNames[j]+"</span><span class='actionOnHover'><img id=editCycleName_"+j+" title='Edit Cycle Name' src='imgs/ic-edit-sm.png' class='editCycleName'><img id=deleteCycleName_"+j+" title='Delete Cycle' src='imgs/ic-delete-sm.png' class='deleteCycle'></span></li>");
+									
+									if(projectDetails[i].releaseName == releaseName && 'cycleNames' in projectDetails[i])
+									{
+										for(var j=0;j<projectDetails[i].cycleNames.length;j++)
+										{
+											$("#cycleList").append("<li><img src='imgs/ic-cycle.png' /><span class='cycleName'>"+projectDetails[i].cycleNames[j]+"</span><span class='actionOnHover'><img id=editCycleName_"+j+" title='Edit Cycle Name' src='imgs/ic-edit-sm.png' class='editCycleName'><img id=deleteCycleName_"+j+" title='Delete Cycle' src='imgs/ic-delete-sm.png' class='deleteCycle'></span></li>");
+										}
+									}
 								}
-							}
 						}
+					}
 				}
 		});
 	
@@ -686,11 +693,25 @@ function toggleCycleClick()
 	$(document).on("click","[id^=deleteReleaseName_]", function(e){
 		$("#deleteReleaseModal").modal("show");
 		deleteReleaseId = e.target.id;
+		
 		$("#deleteReleaseYes").on('click',function() {
 			for(var i=0;i<projectDetails.length;i++)
 			{
 					if(projectDetails[i].releaseName == $("#"+deleteReleaseId).parent().prev('span.releaseName').text())
 					{
+						if('cycleNames' in projectDetails[i])
+						{
+							for (var j=0;j<projectDetails[i].cycleNames.length;j++)
+								{
+									$("#cycleList li").each(function() {
+										if(projectDetails[i].cycleNames[j] == $(this).children("span.cycleName").text())
+										{
+												$(this).remove();
+										}
+									})
+									
+								}
+						}
 						    delete projectDetails[i];
 							projectDetails = projectDetails.filter(function(n){ return n != undefined });
 					}
@@ -812,6 +833,7 @@ function toggleCycleClick()
 
 	//Load Projects for Edit
 	$scope.editProjectTab = function(){
+		projectDetails = [];
 		$scope.tab = "editProject";
 		adminServices.getDomains_ICE()
 			.then(function (data) {

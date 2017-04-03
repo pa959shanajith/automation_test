@@ -2808,6 +2808,10 @@ input[disabled]{
 	margin-left: 0;
     width: 100%;
 }
+.pointerEventsDisabled
+{
+    pointer-events: none;
+}
 /*****************ADMIN CSS NEW ************************/
 
 /******************Reports CSS***************************/
