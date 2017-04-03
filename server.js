@@ -109,6 +109,8 @@ app.post('/checkCycleNameExists_ICE', admin.checkCycleNameExists_ICE);
 app.post('/createProject_ICE', admin.createProject_ICE);
 app.post('/updateProject_ICE', admin.updateProject_ICE);
 app.post('/getNames_ICE', admin.getNames_ICE);
+app.post('/getDetails_ICE', admin.getDetails_ICE);
+
 //Design Screen Routes
 app.post('/initScraping_ICE', design.initScraping_ICE);
 app.post('/highlightScrapElement_ICE', design.highlightScrapElement_ICE);

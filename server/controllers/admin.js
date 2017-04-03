@@ -489,7 +489,7 @@ exports.updateProject_ICE = function updateProject_ICE(req, res){
 /**
  * vishvas.a   
  * service renders the names of all projects in domain/projects
- * cycles/
+ * cycles
  * date 24/03/2017
  */
 exports.getNames_ICE = function(req, res){
@@ -584,5 +584,218 @@ exports.getNames_ICE = function(req, res){
 				    	
 		}
 	});
+    }
+};
+
+
+/**
+ * vishvas.a   
+ * service renders all the details of the child type
+ * if domainid is provided all projects in domain is returned
+ * if projectid is provided all release and cycle details is returned
+ * date 03/04/2017
+ */
+exports.getDetails_ICE = function(req, res) {
+    try {
+        var requestedidslist = req.body.requestedids;
+        var idtypes = req.body.idtype;
+        var responsedata = {
+            appType: "",
+            projectName: "",
+            projectId: "",
+            projectDetails: []
+        }
+        var requestedid;
+        var eachProjectDetail = {};
+        var index = 0;
+        if (requestedidslist.length == idtypes.length) {
+            try {
+                var queryString = "";
+                for (var eachid = 0; eachid < requestedidslist.length; eachid++) {
+                    requestedid = requestedidslist[eachid];
+                    //here the data gets sent at once
+                    if (idtypes[eachid] == 'domaindetails') {
+                        try {
+                            var responsedatadomains = {
+                                projectIds: [],
+                                projectNames: []
+                            }
+                            queryString = "select projectid,projectname from projects where domainid=" + requestedid;
+                            queryExecutor(queryString, function(error, response) {
+                                if (error) {
+                                    try {
+                                        res.send("Error in getDetails_ICE_domaindetails : Fail");
+                                    } catch (exception) {
+                                        console.log(exception);
+                                    }
+                                } else {
+                                	try{
+	                                    for (var i = 0; i < response.length; i++) {
+	                                        responsedatadomains.projectIds.push(response[i].projectid);
+	                                        responsedatadomains.projectNames.push(response[i].projectname);
+	                                        if (i == response.length - 1) {
+	                                            try {
+	                                                res.send(responsedatadomains);
+	                                            } catch (exception) {
+	                                                console.log(exception);
+	                                            }
+	                                        }
+	                                    }
+                                    } catch (exception) {
+                                        console.log(exception);
+                                    }
+                                }
+                            });
+                        } catch (exception) {
+                            console.log(exception);
+                        }
+                    } else if (idtypes[eachid] == 'projectsdetails') {
+                        try {
+                            var queryForProjectTypeId = "select projecttypeid,projectname from projects where projectid=" + requestedid;
+                            queryExecutor(queryForProjectTypeId, function(queryForProjectTypeIderror, queryForProjectTypeIdresponse) {
+                                if (queryForProjectTypeIderror) {
+                                    try {
+                                        res.send(queryForProjectTypeIderror);
+                                    } catch (exception) {
+                                        console.log(exception);
+                                    }
+                                } else {
+                                    try {
+                                        for (var i = 0; i < queryForProjectTypeIdresponse.length; i++) {
+                                            responsedata.projectName = queryForProjectTypeIdresponse[i].projectname;
+                                            responsedata.projectId = queryForProjectTypeIdresponse[i].projecttypeid;
+                                            var queryForProjectType = "select projecttypename from projecttype where projecttypeid=" + queryForProjectTypeIdresponse[i].projecttypeid;
+                                            queryExecutor(queryForProjectType, function(queryForProjectTypeerror, queryForProjectTyperesponse) {
+                                                if (queryForProjectTypeerror) {
+                                                    try {
+                                                        res.send(queryForProjectTypeerror);
+                                                    } catch (exception) {
+                                                        console.log(exception);
+                                                    }
+                                                } else {
+                                                    try {
+                                                        for (var indexofName = 0; indexofName < queryForProjectTyperesponse.length; indexofName++) {
+                                                            responsedata.appType = queryForProjectTyperesponse[indexofName].projecttypename;
+                                                            var queryGetReleases = "select releaseid,releasename from releases where projectid=" + requestedid;
+                                                            queryExecutor(queryGetReleases, function(queryGetReleaseserror, queryGetReleasesresponse) {
+                                                                if (queryGetReleaseserror) {
+                                                                    try {
+                                                                        res.send(queryGetReleasesQueryerror);
+                                                                    } catch (exception) {
+                                                                        console.log(exception);
+                                                                    }
+                                                                } else {
+                                                                    var releaseindex = 0;
+                                                                    async.forEachSeries(queryGetReleasesresponse,
+                                                                        function(eachRelease, releasecallback) {
+                                                                            try {
+                                                                                eachProjectDetail = {};
+                                                                                var queryGetCycles = "select cycleid,cyclename from cycles where releaseid=" + eachRelease.releaseid;
+                                                                                queryExecutor(queryGetCycles, function(queryGetCycleserror, queryGetCyclesresponse) {
+                                                                                    try {
+                                                                                        if (queryGetCycleserror) {
+                                                                                            try {
+                                                                                                res.send(queryGetCycleserror);
+                                                                                            } catch (exception) {
+                                                                                                console.log(exception);
+                                                                                            }
+                                                                                        } else {
+                                                                                            try {
+                                                                                                releaseindex = releaseindex + 1;
+                                                                                                var cycleindex = 0;
+                                                                                                var cycleDetails = [];
+                                                                                                async.forEachSeries(queryGetCyclesresponse,
+                                                                                                    function(eachCycle, cyclecallback) {
+                                                                                                        try {
+                                                                                                            var eachCycleObject = {};
+                                                                                                            responsedata.projectDetails.releaseid = eachRelease.releaseid;
+                                                                                                            responsedata.projectDetails.releaseid = eachRelease.releaseid;
+                                                                                                            eachCycleObject.cycleName = eachCycle.cyclename;
+                                                                                                            eachCycleObject.cycleId = eachCycle.cycleid;
+                                                                                                            cycleindex = cycleindex + 1;
+                                                                                                            cycleDetails.push(eachCycleObject);
+                                                                                                            cyclecallback();
+                                                                                                        } catch (exception) {
+                                                                                                            console.log(exception);
+                                                                                                        }
+                                                                                                    });
+                                                                                                eachProjectDetail.releaseName = eachRelease.releasename;
+                                                                                                eachProjectDetail.releaseId = eachRelease.releaseid;
+                                                                                                eachProjectDetail.cycleDetails = cycleDetails;
+                                                                                                if (releaseindex == queryGetReleasesresponse.length && queryGetCyclesresponse.length == cycleindex) {
+                                                                                                    finalDataReturn();
+                                                                                                }
+                                                                                            } catch (exception) {
+                                                                                                console.log(exception);
+                                                                                            }
+                                                                                        }
+                                                                                        releasecallback();
+                                                                                    } catch (exception) {
+                                                                                        console.log(exception);
+                                                                                    }
+                                                                                });
+                                                                                responsedata.projectDetails.push(eachProjectDetail);
+                                                                            } catch (exception) {
+                                                                                console.log(exception);
+                                                                            }
+                                                                        });
+                                                                }
+                                                            });
+                                                        }
+                                                    } catch (exception) {
+                                                        console.log(exception);
+                                                    }
+                                                }
+                                            });
+                                        }
+                                    } catch (exception) {
+                                        console.log(exception);
+                                    }
+                                }
+                            });
+                        } catch (exception) {
+                            console.log(exception);
+                        }
+                    } else {
+                    	try {
+            				res.send("fail");
+            			} catch (exception) {
+            				console.log(exception);
+            			}
+                    }
+                }
+            } catch (exception) {
+                console.log(exception);
+            }
+        } else {
+			try {
+				res.send("fail");
+			} catch (exception) {
+				console.log(exception);
+			}
+        }
+        function queryExecutor(queryString, queryExecutorcallback) {
+            console.log(queryString);
+            dbConnICE.execute(queryString,
+                function(queryStringerr, queryStringresult) {
+                    if (queryStringerr) {
+                        statusFlag = "Error occured in queryExecutor : Fail";
+                        queryExecutorcallback(statusFlag, null);
+                    } else {
+                        index = index + 1;
+                        queryExecutorcallback(null, queryStringresult.rows);
+                    }
+                });
+        }
+        function finalDataReturn() {
+            console.log(JSON.stringify(responsedata));
+			try {
+				res.send(responsedata);
+			} catch (exception) {
+				console.log(exception);
+			}
+        }
+    } catch (exception) {
+        console.log(exception);
     }
 };
