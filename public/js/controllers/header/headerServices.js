@@ -15,6 +15,24 @@ mySPA.factory('headerServices', ['$http','$q', function ($http, $httpProvider, $
 			.then(function(response)  { return response.data},
 					function(response)        {return $q.reject(response.data)})
 		},
+		getReleaseNameByReleaseId_ICE: function(releaseId,projectId){
+			return $http.post('/getReleaseNameByReleaseId_ICE',{
+				param : 'getReleaseNameByReleaseId_ICE',
+				releaseId : releaseId,
+				projectId : projectId
+			})
+			.then(function(response)  { return response.data},
+			function(response)        {return $q.reject(response.data)})
+	    },
+		getCycleNameByCycleId_ICE: function(cycleId, releaseId){
+			return $http.post('/getCycleNameByCycleId_ICE',{
+				param : 'getCycleNameByCycleId_ICE',
+				cycleId : cycleId,
+				releaseId : releaseId
+			})
+			.then(function(response)  { return response.data},
+			function(response)        {return $q.reject(response.data)})
+	    },
     }
 }]);
 

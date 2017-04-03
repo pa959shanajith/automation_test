@@ -103,6 +103,8 @@ var createNewMap = function(e){
 	addNode(dNodes[uNix-1],!1,null);
 };
 var loadMap = function(e){
+	$("div.nodeBoxSelected").removeClass("nodeBoxSelected");
+	$(this).addClass("nodeBoxSelected");
 	initiate();
 	if(!d3.select('#ct-mindMap')[0][0] || confirm('Unsaved work will be lost if you continue.\nContinue?')){
 		clearSvg();

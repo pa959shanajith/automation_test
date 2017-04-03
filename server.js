@@ -109,6 +109,8 @@ app.post('/checkCycleNameExists_ICE', admin.checkCycleNameExists_ICE);
 app.post('/createProject_ICE', admin.createProject_ICE);
 app.post('/updateProject_ICE', admin.updateProject_ICE);
 app.post('/getNames_ICE', admin.getNames_ICE);
+app.post('/getDetails_ICE', admin.getDetails_ICE);
+
 //Design Screen Routes
 app.post('/initScraping_ICE', design.initScraping_ICE);
 app.post('/highlightScrapElement_ICE', design.highlightScrapElement_ICE);
@@ -124,8 +126,6 @@ app.post('/readTestSuite_ICE', suite.readTestSuite_ICE);
 app.post('/updateTestSuite_ICE', suite.updateTestSuite_ICE);
 app.post('/updateTestScenario_ICE', suite.updateTestScenario_ICE);
 app.post('/ExecuteTestSuite_ICE', suite.ExecuteTestSuite_ICE);
-app.post('/getReleaseNameByReleaseId_ICE', suite.getReleaseNameByReleaseId_ICE);
-app.post('/getCycleNameByCycleId', suite.getCycleNameByCycleId);
 app.post('/getTestcaseDetailsForScenario_ICE', suite.getTestcaseDetailsForScenario_ICE);
 
 //app.post('/readTestScenarios_ICE', suite.readTestScenarios_ICE);
@@ -139,6 +139,8 @@ app.post('/getReport_Nineteen68', report.getReport_Nineteen68);
 app.post('/exportToJson_ICE', report.exportToJson_ICE);
 //Generic Routes
 app.post('/getProjectDetails_ICE', header.getProjectDetails_ICE);
+app.post('/getReleaseNameByReleaseId_ICE', header.getReleaseNameByReleaseId_ICE);
+app.post('/getCycleNameByCycleId_ICE', header.getCycleNameByCycleId_ICE);
 //Logout Routes
 app.post('/logoutUser_Nineteen68',header.logoutUser_Nineteen68);
 //Plugin Routes

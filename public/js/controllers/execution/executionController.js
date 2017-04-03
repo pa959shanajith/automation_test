@@ -27,17 +27,13 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 		var cycleId = JSON.parse(window.localStorage['_CT']).cycleId;
 		var projectId = JSON.parse(window.localStorage['_CT']).projectId;
 		projectDetails = angular.element(document.getElementById("left-nav-section")).scope().projectDetails;
-		ExecutionService.getReleaseNameByReleaseId_ICE(releaseId, projectId) 
-		  .then(function(data){
-			  releaseName = data;
-			  ExecutionService.getCycleNameByCycleId(cycleId, releaseId)
-				.then(function(data) {
-					cycleName = data;
-					$(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">Project :</span><span class="content">'+projectDetails.projectname+'</span></p><p class="proj-info-wrap"><span class="content-label">Release :</span><span class="content">'+releaseName+'</span></p><p class="proj-info-wrap"><span class="content-label">Cycle :</span><span class="content">'+cycleName+'</span></p><p class="proj-info-wrap"><span class="content-label">TestSuite :</span><span class="content">'+testSuiteName+'</span></p>')
-				}, 
-				function(error) {console.log("Error") })
-		  }, function(error) {	console.log("Failed to get release name")});
-	}, 3000)
+		releaseName = angular.element(document.getElementById("left-nav-section")).scope().releaseDetails;
+		cycleName = angular.element(document.getElementById("left-nav-section")).scope().cycleDetails;
+		if(projectDetails.projectName !="" &&  releaseName!="" && cycleName !="" && testSuiteName != "")
+		{
+			$(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">Project :</span><span class="content">'+projectDetails.projectname+'</span></p><p class="proj-info-wrap"><span class="content-label">Release :</span><span class="content">'+releaseName+'</span></p><p class="proj-info-wrap"><span class="content-label">Cycle :</span><span class="content">'+cycleName+'</span></p><p class="proj-info-wrap"><span class="content-label">TestSuite :</span><span class="content">'+testSuiteName+'</span></p>')
+		}
+	}, 2000)
 	
 	//Global Information
 	var cycleId = JSON.parse(window.localStorage['_CT']).cycleId;
@@ -365,6 +361,15 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 		}
 	})
 	//Default checked all the checkboxes
+
+	//check parent checkbox by default if all child checkboxes are checked
+	if($("input[type='checkbox']:not(#parentExecute):checked").length == $("input[type='checkbox']:not(#parentExecute)").length)
+	{
+		$("#parentExecute").prop("checked", true);
+	}
+	else{
+		$("#parentExecute").prop("checked", false);
+	}
 
 	
 	//Do Not Execute Checkboxes
