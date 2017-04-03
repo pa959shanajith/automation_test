@@ -472,7 +472,7 @@ exports.createStructure_Nineteen68 = function(req, res) {
 
                                                                 var insertInTescase = '';
                                                                 if(!testcaseflag){
-                                                                    insertInTescase = "INSERT INTO testcases (screenid,testcasename,testcaseid,versionnumber,createdby,createdon,createdthrough,deleted,history,modifiedby,modifiedon,skucodetestcase,tags,testcasesteps)VALUES (" + screenId + ",'" + testcaseName + "'," + testcaseID + ",1,'"+username+"'," + new Date().getTime() + ",null,null,null,null," + new Date().getTime() + ",null,null,'')";
+                                                                    insertInTescase = "INSERT INTO testcases (screenid,testcasename,testcaseid,versionnumber,createdby,createdon,createdthrough,deleted,history,modifiedby,modifiedon,skucodetestcase,tags,testcasesteps)VALUES (" + screenId + ",'" + testcaseName + "'," + testcaseID + ",1,'"+username+"'," + new Date().getTime() + ",null,null,null,null," + new Date().getTime() + ",'skucodetestcase',null,'')";
 
                                                                 }else{
                                                                     insertInTescase = "select testcaseid from testcases where testcasename='"+testcaseName+"' ALLOW FILTERING";
@@ -658,7 +658,7 @@ function updatetestsuitename(moduledetails,cb,data){
                 try{
                     insertquery = "INSERT INTO modules (projectid,modulename,moduleid,versionnumber,createdby,createdon,createdthrough,deleted,history,modifiedby,modifiedbyrole,modifiedon,skucodemodule,tags,testscenarioids) VALUES ("+suitedatatoupdate.projectid+",'"+moduledetails.modulename+"',"+
                     suitedatatoupdate.moduleid+","+suitedatatoupdate.versionnumber+",'"+suitedatatoupdate.createdby+"',"+suitedatatoupdate.createdon.valueOf()+","+suitedatatoupdate.createdthrough
-                    +","+suitedatatoupdate.deleted+","+suitedatatoupdate.history+",'"+moduledetails.modifiedby+"',"+suitedatatoupdate.modifiedbyrole+","+new Date().getTime()+","+suitedatatoupdate.skucodemodule
+                    +","+suitedatatoupdate.deleted+",null,'"+moduledetails.modifiedby+"',"+suitedatatoupdate.modifiedbyrole+","+new Date().getTime()+","+suitedatatoupdate.skucodemodule
                     +","+suitedatatoupdate.tags+",["+suitedatatoupdate.testscenarioids+"]);"; 
                 }catch(ex){
                     console.log(ex);
@@ -800,8 +800,8 @@ function updatetestscenarioname(testscenariodetails,cb,data){
                     }
                     insertquery = "INSERT INTO testscenarios (projectid,testscenarioname,testscenarioid,createdby,createdon,deleted,history,modifiedby,modifiedbyrole,modifiedon,skucodetestscenario,tags,testcaseids) VALUES ("+
                 scenariodatatoupdate.projectid+",'"+testscenariodetails.testscenarioname+"',"+testscenariodetails.testscenarioid+",'"+scenariodatatoupdate.createdby+"',"+scenariodatatoupdate.createdon.valueOf()
-                +","+scenariodatatoupdate.deleted+","+scenariodatatoupdate.history+",'"+scenariodatatoupdate.modifiedby+"',"+scenariodatatoupdate.modifiedbyrole+","+new Date().getTime()+","+scenariodatatoupdate.skucodetestscenario
-                +","+scenariodatatoupdate.tags+",["+scenariodatatoupdate.testcaseids+"]);";
+                +","+scenariodatatoupdate.deleted+",null,'"+scenariodatatoupdate.modifiedby+"',"+scenariodatatoupdate.modifiedbyrole+","+new Date().getTime()+",'"+scenariodatatoupdate.skucodetestscenario
+                +"',"+scenariodatatoupdate.tags+",["+scenariodatatoupdate.testcaseids+"]);";
                 }catch(ex){
                     console.log(ex);
                 }
@@ -921,8 +921,8 @@ var screendatatoupdate = [];
                 try{
                      insertquery = "INSERT INTO screens (projectid,screenname,screenid,versionnumber,createdby,createdon,createdthrough,deleted,history,modifiedby,modifiedbyrole,modifiedon,screendata,skucodescreen,tags) VALUES ("+screendatatoupdate.projectid
                 +",'"+testscreendetails.testscreenname+"',"+screendatatoupdate.screenid+","+screendatatoupdate.versionnumber+",'"+screendatatoupdate.createdby+"',"+screendatatoupdate.createdon.valueOf()
-                +","+screendatatoupdate.createdthrough+","+screendatatoupdate.deleted+","+screendatatoupdate.history+","+screendatatoupdate.modifiedby+","+screendatatoupdate.modifiedbyrole
-                +","+new Date().getTime()+",'"+screendatatoupdate.screendata+"',"+screendatatoupdate.skucodescreen+","+screendatatoupdate.tags+");"
+                +","+screendatatoupdate.createdthrough+","+screendatatoupdate.deleted+",null,'"+screendatatoupdate.modifiedby+"',"+screendatatoupdate.modifiedbyrole
+                +","+new Date().getTime()+",'"+screendatatoupdate.screendata+"','"+screendatatoupdate.skucodescreen+"',"+screendatatoupdate.tags+");"
                 }catch(ex){
                     console.log(ex);
                 }
@@ -992,7 +992,7 @@ function testcase_exists(testcasedetails,cb,data){
                             console.log(data);
                             if(data=="success"){
                                 obj.flag = true;
-                                obj.screenid = testcasedetails.testcaseid;
+                                obj.testcaseid = testcasedetails.testcaseid;
                             }
                             testcasecallback(null,data);
                         }
@@ -1052,15 +1052,15 @@ var testcasedatatoupdate = [];
 
             // var insertquery = "INSERT INTO screens (projectid,screenname,screenid,versionnumber,createdby,createdon,createdthrough,deleted,history,modifiedby,modifiedbyrole,modifiedon,screendata,skucodescreen,tags) VALUES ("+screendatatoupdate.projectid
             // +",'"+testscreendetails.testscreenname+"',"+screendatatoupdate.screenid+","+screendatatoupdate.versionnumber+",'"+screendatatoupdate.createdby+"',"+screendatatoupdate.createdon.valueOf()
-            // +","+screendatatoupdate.createdthrough+","+screendatatoupdate.deleted+","+screendatatoupdate.history+","+screendatatoupdate.modifiedby+","+screendatatoupdate.modifiedbyrole
+            // +","+screendatatoupdate.createdthrough+","+screendatatoupdate.deleted+","+screendatatoupdate.history+",'"+screendatatoupdate.modifiedby+"',"+screendatatoupdate.modifiedbyrole
             // +","+new Date().getTime()+",'"+screendatatoupdate.screendata+"',"+screendatatoupdate.skucodescreen+","+screendatatoupdate.tags+");"
             if(flagtocheckifexists){
                 var insertquery = "";
                 try{
                      insertquery = "INSERT INTO testcases (screenid,testcasename,testcaseid,versionnumber,createdby,createdon,createdthrough,deleted,history,modifiedby,modifiedbyrole,modifiedon,skucodetestcase,tags,testcasesteps) VALUES ("+
                 testcasedatatoupdate.screenid+",'"+testcasedetails.testcasename+"',"+testcasedetails.testcaseid+","+testcasedatatoupdate.versionnumber+",'"+testcasedatatoupdate.createdby
-                +"',"+testcasedatatoupdate.createdon.valueOf()+","+testcasedatatoupdate.createdthrough+","+testcasedatatoupdate.deleted+","+testcasedatatoupdate.history+","+testcasedatatoupdate.modifiedby+","+testcasedatatoupdate.modifiedbyrole+","+new Date().getTime()
-                +","+testcasedatatoupdate.skucodetestcase+","+testcasedatatoupdate.tags+",'"+testcasedatatoupdate.testcasesteps+"');";
+                +"',"+testcasedatatoupdate.createdon.valueOf()+","+testcasedatatoupdate.createdthrough+","+testcasedatatoupdate.deleted+",null,'"+testcasedatatoupdate.modifiedby+"',"+testcasedatatoupdate.modifiedbyrole+","+new Date().getTime()
+                +",'"+testcasedatatoupdate.skucodetestcase+"',"+testcasedatatoupdate.tags+",'"+testcasedatatoupdate.testcasesteps+"');";
                 }catch(ex){
                     console.log(ex);
                 }
