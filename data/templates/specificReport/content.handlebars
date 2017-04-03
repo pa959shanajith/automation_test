@@ -3,6 +3,7 @@
         <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
         <title>SLK Nineteen68</title>
         <link rel="stylesheet" type="text/css" href="{#asset latofonts.css @encoding=link}"/>
+        <link rel="stylesheet" type="text/css" href="{#asset font-awesome.min.css @encoding=link}"/>
         <script type="text/javascript" src="{#asset jquery.min.js @encoding=link}"></script> 
         <script>
 			setTimeout(function(){
@@ -23,6 +24,70 @@
 					$('.rDstepDes').css('width','49.6%');
 					$('.rDstatus').css('width','10%');
 				}
+				
+				var getRows = $('.reportdetailsrow');
+				// for(i=0; i<getRows.length; i++){
+				// 	var parentid;
+                //     if(getRows[i].getAttribute('data-parentid').length > 1){
+                //        parentid = parseInt(getRows[i].getAttribute('data-parentid').split(",")[1]);
+                //     }
+                //     else parentid = parseInt(getRows[i].getAttribute('data-parentid'));
+                //     var flag = true;
+                //     if(parentid == 1){
+                //         getRows[i].children[1].innerHTML += '<i class="fa fa-caret-down unexpand" aria-hidden="true" style="position: relative; left: -63px;"></i>';
+                //     }
+				// 	else if(parentid > 1){
+				// 		for(j=i; j>=0 ;j--){
+				// 			if(parentid == getRows[j-1].getAttribute('data-id')){
+                //                 flag = false;
+                //                 break;
+                //             }
+                //             else if(parentid != getRows[j-1].getAttribute('data-id')){
+				// 				flag = true;
+				// 			}
+				// 		}
+                //         if(flag == true){
+                //             getRows[i].children[1].innerHTML += '<i class="fa fa-caret-down unexpand" aria-hidden="true" style="position: relative; left: -63px;"></i>';
+                //         }
+				// 	}
+				// }
+                for(i=0; i<getRows.length; i++){
+                    var getRowId = parseInt(getRows[i].getAttribute('data-id'));
+                    var name = getRows[i].children[2].innerHTML;
+                    var rowCount = 0;
+                    var getParentId;
+                    for(j=i; j<getRows.length; j++){
+                        if(parseInt(getRows[j].getAttribute('data-parentid')).length == NaN)    getParentId = parseInt(getRows[j].getAttribute('data-parentid').split(",")[1]);
+                        else    getParentId = parseInt(getRows[j].getAttribute('data-parentid'));
+                        if(getParentId == getRowId && name.indexOf('TestCase Name') === -1) rowCount++;
+                    }
+                    if(rowCount > 0){
+                        getRows[i].children[1].innerHTML += '<i class="fa fa-caret-down unexpand" aria-hidden="true" style="position: relative; left: -58px;"></i>';
+                        rowCount = 0;
+                    }
+                }
+
+                $(document).on('click', '.unexpand', function(){
+                    var getID = $(this).parents('.reportdetailsrow').attr('data-id');
+                    $(this).removeClass('unexpand').addClass('expand');
+                    $(this).removeClass('fa-caret-down').addClass('fa-caret-right');
+                    $.each(getRows, function(){
+                        if($(this).attr('data-parentid') == getID){
+                            $(this).hide();
+                        }
+                    })
+                })
+
+                $(document).on('click', '.expand', function(){
+                    var getID = $(this).parents('.reportdetailsrow').attr('data-id');
+                    $(this).removeClass('expand').addClass('unexpand');
+                    $(this).removeClass('fa-caret-right').addClass('fa-caret-down');
+                    $.each(getRows, function(){
+                        if($(this).attr('data-parentid') == getID){
+                            $(this).show();
+                        }
+                    })
+                })
 			}, 300);
 		</script>      
         <style>
@@ -241,7 +306,7 @@
                 </table>
                 <div class="reportsDetail">
                     {{#each rows}}
-                    <div style="width: 100%; display: table;" class="reportdetailsrow">
+                    <div style="width: 100%; display: table;" class="reportdetailsrow" data-id={{id}} data-parentid={{parentId}}>
                         <div class="rDid tabCont">{{slno}}</div>
                         <div class="rDstep tabCont">{{Step}}</div>
                         <div class="rDstepDes tabCont" style="padding-left: 10px;">{{StepDescription}}</div>

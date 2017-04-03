@@ -4,10 +4,8 @@
 var Joi = require('joi');
 var cassandra = require('cassandra-driver');
 var async = require('async');
-var myserver = require('../../server.js');
 var uuid = require('uuid-random');
 var dbConnICE = require('../../server/config/icetestautomation');
-var async = require('async');
 
 exports.getMainReport_ICE = function(req, res){
 	var IP = req.connection.localAddress.split(":")[req.connection.localAddress.split(":").length-1];
@@ -32,11 +30,14 @@ exports.getMainReport_ICE = function(req, res){
 exports.renderReport_ICE = function(req, res){
 	var finalReports = req.body.finalreports;
 	var reportType = req.body.reporttype;
+	var shortId;
 	var IP = req.connection.localAddress.split(":")[req.connection.localAddress.split(":").length-1];
+	if(reportType == "html") shortId = "rkE973-5l";
+	else shortId = "H1Orcdvhg";
 	var client = require("jsreport-client")("http://"+IP+":3001/");
 	client.render({
 	    template: { 
-	    	shortid: "rkE973-5l", 
+	    	shortid: shortId, 
 	    	recipe: reportType,
 	        engine: "handlebars" 
 	    },
@@ -49,8 +50,13 @@ exports.renderReport_ICE = function(req, res){
 			console.log('error when trying to render report:', err);
 		}
 		else{
-			response.pipe(res);
-			//res.end()
+			/*if(reportType != "phantom-pdf"){
+				response.pipe(res);
+			}
+			else{
+				res.header("Content-Type", "application/pdf")*/
+				response.pipe(res)
+			//}
 		}
 	});
 }
@@ -175,7 +181,7 @@ exports.reportStatusScenarios_ICE = function (req, res) {
 			dbConnICE.execute(reportFetchQuery, function (err, result) {
 				if (err) {
 					var flag = "Error in reportStatusScenarios : Fail";
-					req.send(flag);
+					res.send(flag);
 				}else {
 					async.forEachSeries(result.rows, function(iterator, callback2) {
 						var executedtimeTemp = iterator.executedtime;

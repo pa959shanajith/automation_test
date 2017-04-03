@@ -1,5 +1,5 @@
 
-mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout','$window', 'reportService','cfpLoadingBar', function($scope,$http,$location,$timeout,$window,reportService, cfpLoadingBar) {
+mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout','$window', 'reportService','cfpLoadingBar','$sce', function($scope,$http,$location,$timeout,$window,reportService, cfpLoadingBar, $sce) {
 	$("body").css("background","#eee");
 	$("head").append('<link id="mindmapCSS2" rel="stylesheet" type="text/css" href="fonts/font-awesome_mindmap/css/font-awesome.min.css" />')
 	var getUserInfo = JSON.parse(window.localStorage['_UI']);
@@ -176,17 +176,18 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 				var pass = fail = terminated = incomplete = P = F = T = I = 0;
 				var total = data.length;
 				scenarioContainer.find('tbody').empty();
-				var browserIcon;
+				var browserIcon, brow="";
 				var styleColor;
 				for(i=0; i<data.length; i++){
 					if(data[i].browser == "chrome")	browserIcon = "ic-reports-chrome.png";
 					else if(data[i].browser == "firefox")	browserIcon = "ic-reports-firefox.png";
-					else if(data[i].browser == "internet explorer")	browserIcon = "ic-reports-ie.png";					
+					else if(data[i].browser == "internet explorer")	browserIcon = "ic-reports-ie.png";
+					if(browserIcon)	brow = "imgs/"+browserIcon;
 					if(data[i].status == "Pass"){	pass++;	styleColor="style='color: #009444 !important;'";}
 					else if(data[i].status == "Fail"){	fail++;	styleColor="style='color: #b31f2d !important;'";}
 					else if(data[i].status == "Terminate"){	terminated++;	styleColor="style='color: #faa536 !important;'";}
 					else if(data[i].status == "Incomplete"){	incomplete++;	styleColor="style='color: #58595b !important;'";}
-					scenarioContainer.find('tbody').append("<tr><td>"+data[i].testscenarioname+"</td><td>"+data[i].executedtime+"</td><td><img alt='Browser icon' src='imgs/"+browserIcon+"'></td><td class='openReports' data-reportid='"+data[i].reportid+"'><a class='openreportstatuss' "+styleColor+">"+data[i].status+"</a></td><td data-reportid='"+data[i].reportid+"'><img alt='Select format' class='selectFormat' src='imgs/ic-export-json.png' style='cursor: pointer;' title='Select format'></td></tr>");
+					scenarioContainer.find('tbody').append("<tr><td>"+data[i].testscenarioname+"</td><td>"+data[i].executedtime+"</td><td><img alt='-' src='"+brow+"'></td><td class='openReports' data-reportid='"+data[i].reportid+"'><a class='openreportstatuss' "+styleColor+">"+data[i].status+"</a></td><td data-reportid='"+data[i].reportid+"'><img alt='Select format' class='selectFormat' src='imgs/ic-export-json.png' style='cursor: pointer;' title='Select format'></td></tr>");
 				}
 				if(data.length > 0){
 					P = parseFloat((pass/total)*100).toFixed();
@@ -212,7 +213,7 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 	$(document).on('click', '.selectFormat', function(){
 		$('.formatpdfbrwsrexport').remove();
 		var repID = $(this).parent().attr("data-reportid");
-		$(this).parent().append("<span class='formatpdfbrwsrexport'><img alt='Pdf Icon' class='getSpecificReportBrowser openreportstatus' data-getrep='phantom-pdf' data-reportid='"+repID+"' style='cursor: pointer; margin-right: 10px;' src='imgs/ic-pdf.png' title='PDF Report'><img alt='Browser Icon' class='getSpecificReportBrowser openreportstatus' data-getrep='html' data-reportid='"+repID+"' style='cursor: pointer; margin-right: 10px;' src='imgs/ic-reports-chrome.png' title='Browser Report'><img alt='Export JSON' class='exportToJSON' data-reportid='"+repID+"' style='cursor: pointer;' src='imgs/ic-export-to-json.png' title='Export to Json'></span>")
+		$(this).parent().append("<span class='formatpdfbrwsrexport'><img alt='Pdf Icon' class='getSpecificReportBrowser openreportstatus' data-getrep='phantom-pdf' data-reportid='"+repID+"' style='cursor: pointer; margin-right: 10px;' src='imgs/ic-pdf.png' title='PDF Report'><img alt='-' class='getSpecificReportBrowser openreportstatus' data-getrep='html' data-reportid='"+repID+"' style='cursor: pointer; margin-right: 10px;' src='imgs/ic-reports-chrome.png' title='Browser Report'><img alt='Export JSON' class='exportToJSON' data-reportid='"+repID+"' style='cursor: pointer;' src='imgs/ic-export-to-json.png' title='Export to Json'></span>")
 		$('.formatpdfbrwsrexport').focus();
 	})
 	
@@ -257,7 +258,8 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 		var reportID = $(this).attr('data-reportid');
 		var reportType = $(this).attr('data-getrep');
 		var testsuitename = $(".reportboxselected").text();
-		var d = new Date();		
+		var scenarioName = $('.openreportstatus').parents('tr').find('td:first-child').text();
+		//var d = new Date();		
 	    //var DATE = ("0" + (d.getMonth()+1)).slice(-2) + "/" + ("0" + d.getDate()).slice(-2) + "/" + d.getFullYear();
 	    //var TIME = ("0" + d.getHours()).slice(-2) +":"+ ("0" + d.getMinutes()).slice(-2) +":"+ ("0" + d.getSeconds()).slice(-2);
 	    var pass = fail = terminated = total = 0;
@@ -317,6 +319,9 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 						if(finalReports.rows[k].EllapsedTime.split(".")[1] == undefined || finalReports.rows[k].EllapsedTime.split(".")[1] == ""){
 							finalReports.rows[k].EllapsedTime = ("0" + elapTym[0]).slice(-2) +":"+ ("0" + elapTym[1]).slice(-2) +":"+ ("0" + elapTym[2]).slice(-2);
 						}
+						else if(finalReports.rows[k].EllapsedTime.split(".").length < 3){
+							finalReports.rows[k].EllapsedTime = ("0" + 0).slice(-2) +":"+ ("0" + 0).slice(-2) +":"+ ("0" + elapTym[0]).slice(-2) +":"+ ("0" + 0).slice(-2);
+						}
 						else{
 							finalReports.rows[k].EllapsedTime = ("0" + elapTym[0]).slice(-2) +":"+ ("0" + elapTym[1]).slice(-2) +":"+ ("0" + elapTym[2]).slice(-2) +":"+ finalReports.rows[k].EllapsedTime.split(".")[1].slice(0, 3);							
 						}
@@ -334,17 +339,53 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 			}
 			reportService.renderReport_ICE(finalReports, reportType)
 			.then(function(data1) {
-				var path = "/specificreports";
-				openWindow = 0;
-				if(openWindow == 0)
-				{
-					var myWindow = window.open();
-					myWindow.document.write(data1);
-					//myWindow.location.hash = path;
-				}
-				openWindow++;
-				e.stopImmediatePropagation();
-				$('.formatpdfbrwsrexport').remove();
+				//if(reportType == "phantom-pdf"){
+					//var file = new Blob([data1], {type: 'application/pdf'});
+					//var fileURL = URL.createObjectURL(file);
+					//window.localStorage['pdfData'] = fileURL;
+					//p_redirect('/pdfReport')
+					//$scope.content = $sce.trustAsResourceUrl(fileURL);
+					//console.log($scope.content);
+				//}
+				//else{
+					var path = "/specificreports";
+					openWindow = 0;
+					if(openWindow == 0)
+					{
+						var myWindow;
+						if(reportType == "phantom-pdf"){
+							//var file = new Blob([data1], {type: 'application/pdf'});
+						    //var fileURL = URL.createObjectURL(file);
+							/*var pdfText=$.base64.decode($.trim(data1));
+							var winlogicalname = "detailPDF";
+							var winparams = 'dependent=yes,locationbar=no,scrollbars=yes,menubar=yes,'+
+							            'resizable,screenX=50,screenY=50,width=850,height=1050';
+							var htmlText = '<embed width=100% height=100%'
+			                     + ' type="application/pdf"'
+			                     + ' src="data:application/pdf,'
+			                     + escape(pdfText)
+			                     + '"></embed>'; 
+
+							myWindow = window.open ("", winlogicalname, winparams)
+							myWindow.document.write(htmlText);*/
+							window.open($sce.trustAsResourceUrl(data1))
+							/*myWindow = window.open()
+							var myWindowbody = myWindow.document.getElementsByTagName('body')
+							myWindowbody[0].setAttribute("style","margin: 0")
+							myWindowbody[0].innerHTML += '<embed src="'+$sce.trustAsUrl(data1)+'" style="width:100%; height:100%;"></embed>'*/
+							//var myWindowbody = myWindow.document.getElementsByTagName('body')
+							//myWindowbody[0].innerHTML += "<object data='"+$sce.trustAsUrl(data1)+"' type='application/pdf' style='width:100%; height:100%;'></object>"
+						}
+						else{
+							myWindow = window.open();
+							myWindow.document.write(data1);
+						}
+						//myWindow.location.hash = path;
+					}
+					openWindow++;
+					e.stopImmediatePropagation();
+					$('.formatpdfbrwsrexport').remove();					
+				//}
 			},
 			function(error) {
 				console.log("Error-------"+error);
