@@ -366,6 +366,15 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 	})
 	//Default checked all the checkboxes
 
+	//check parent checkbox by default if all child checkboxes are checked
+	if($("input[type='checkbox']:not(#parentExecute):checked").length == $("input[type='checkbox']:not(#parentExecute)").length)
+	{
+		$("#parentExecute").prop("checked", true);
+	}
+	else{
+		$("#parentExecute").prop("checked", false);
+	}
+
 	
 	//Do Not Execute Checkboxes
 	$(document).on('click',".doNotExecuteScenario", function(){
