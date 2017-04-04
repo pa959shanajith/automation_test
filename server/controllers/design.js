@@ -169,7 +169,7 @@ function fetchScrapedData(scrapeQuery,fetchScrapedDatacallback){
 				if (getScrapeDataQueryerr) {
 					//console.log("scrape data error: Fail",getScrapeDataQueryerr);
 					flag="getScrapeData Fail.";
-					fetchScrapedDatacallback(null,flag);
+					fetchScrapedDatacallback(flag,null);
 				}else{
 					for (var i = 0; i < getScrapeDataQueryresult.rows.length; i++) {
 						responsedata = getScrapeDataQueryresult.rows[i].screendata;
@@ -614,6 +614,7 @@ exports.updateScreen_ICE = function(req, res){
 													}else{
 														try{
 															if(testcaseDataQueryresult.rows.length>0){
+																var testcasessize=0;
 																async.forEachSeries(testcaseDataQueryresult.rows,
 																function(eachTestcase,testcaserendercallback){
 																	try{
@@ -689,7 +690,10 @@ exports.updateScreen_ICE = function(req, res){
 																				}
 																			}else{
 																				try{
-																					res.send(response);
+																					testcasessize=testcasessize + 1;
+																					if(testcasessize==testcaseDataQueryresult.rows.length){
+																						res.send(response);
+																					}
 																				}catch(exception){
 																					console.log(exception);
 																				}
@@ -698,6 +702,7 @@ exports.updateScreen_ICE = function(req, res){
 																	}catch(exception){
 																		console.log(exception);
 																	}
+																	testcaserendercallback();
 																});
 															}else{
 																statusFlag = "success";
