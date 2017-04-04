@@ -59,13 +59,13 @@ p,a,img,text,span,.noselect{-webkit-touch-callout:none;-webkit-user-select:none;
 #ct-rSide .ct-expand::after{left:-4px;border-right-color:#333}
 #ct-rSide .ct-expand.ct-rev::after{left:1px;border-left-color:#333;border-right-color:transparent}
 #ct-main{position:relative;margin:2px;padding:5px;height:calc(100% - 4px);width:calc(100% - 16px)}
-#ct-moduleBox{position:absolute;padding:0 10px;top:-2px;z-index:100;height:92px;width:100%;background-color:#e6e7e9;border:1px solid#e6e7e9}
-#ct-moduleBox .ct-expand{height:8px;width:60px;left:calc(50% - 30px);bottom:0;background-color:#fff}
+#ct-moduleBox{position:absolute;padding:0 10px;top:30px;z-index:100;height:92px;width:83%;background-color:#e6e7e9;border:1px solid#e6e7e9}
+#ct-moduleBox .ct-expand{height:8px;width:60px;left:calc(50% - 40px);bottom:0;background-color:#fff}
 #ct-moduleBox .ct-expand::after{left:25px;top:1px;border-top-color:#333}
 #ct-moduleBox .ct-expand.ct-rev::after{left:25px;top:-4px;border-top-color:transparent;border-bottom-color:#333}
 #ct-moduleBox.ct-open{height:auto;max-height:300px;overflow:auto}
 /**Optional for id ct-moduleBox CSS**/
-.ct-moduleBoxOptional{position:absolute;padding:0 10px;top:-2px;z-index:100;height:92px;width:100%;background-color:#e6e7e9;border:1px solid#e6e7e9}
+.ct-moduleBoxOptional{position:absolute;padding:0 10px;top:30px;z-index:100;height:92px;width:83%;background-color:#e6e7e9;border:1px solid#e6e7e9; left: 147px;}
 .ct-moduleBoxOptional .ct-expand{height:8px;width:60px;left:calc(50% - 30px);bottom:0;background-color:#fff}
 .ct-moduleBoxOptional .ct-expand::after{left:25px;top:1px;border-top-color:#333}
 .ct-moduleBoxOptional .ct-expand.ct-rev::after{left:25px;top:-4px;border-top-color:transparent;border-bottom-color:#333}
@@ -78,7 +78,7 @@ p,a,img,text,span,.noselect{-webkit-touch-callout:none;-webkit-user-select:none;
 .ct-svgTile>g>path{stroke:#333;stroke-width:1px}
 .ct-tileBox .ct-text{display:block;font-size:16px;white-space:nowrap}
 .ct-nodeBox{position:relative;margin:0 20px;height:100%;overflow:hidden}
-.ct-nodeBox .ct-node{position:relative;display:inline-block;height:75px;width:140px;padding:5px;margin:5px 15px 10px;text-align:center;line-height:1;-webkit-border-radius:10px;-moz-border-radius:10px;border-radius:10px;cursor:pointer}
+.ct-nodeBox .ct-node{position:relative;display:inline-block;height:75px;width:140px;padding:5px;margin:5px 11px 10px;text-align:center;line-height:2;-webkit-border-radius:10px;-moz-border-radius:10px;border-radius:10px;cursor:pointer}
 .ct-nodeBox .ct-node:hover{background-color:#f4f4f4}
 .ct-node .ct-nodeIcon{display:inline-block;height:40px;width:40px;cursor:pointer}
 .ct-node .ct-nodeLabel{display:block;font-size:10px;cursor:default}
@@ -168,7 +168,8 @@ p,a,img,text,span,.noselect{-webkit-touch-callout:none;-webkit-user-select:none;
 #ct-assignRevw{ position: relative; left: 24px; width: 64%;}
 #ct-assignRel{ position: relative; left: 24px; width: 64%;}
 #ct-assignCyc{ position: relative; left: 24px; width: 64%;}
-.selectProject{ position: relative; left: 10px; width: 25%;}
+.selectProject{width: 100%; height: 24px;}
+.project-list{width: 200px; float: right; margin-right: 100px;}
 /*FOR MINDMAP ENDS HERE*/
 .ct-show-left{
     width: 10px !important;
