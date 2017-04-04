@@ -63,6 +63,17 @@ var tasktypes={'Design':['TestCase','Design','Create Testcase'],
 'Add':['Scrape','Design','Create Screen'],
 'Map':['Scrape','Design','Create Screen']}
 
+var projectTypes={'41e1c61b-fb17-4eda-a3a7-e1d7578ea166':'Desktop',
+'3e7d1a83-3add-4ed1-86f4-9ca80fea5758':'Webservice',
+'396d8a74-aeb3-41a7-a943-4bfe8b915c6f':'Mobility',
+'f7d09f53-4c11-4e14-a37c-5001d8b4042d':'DesktopJava',
+'e9ed5428-64e4-45e0-b4f1-77e1803ab4fe':'Web',
+'b2a208a5-8c9d-4a7f-b522-0df14993dbd2':'mobilityweb',
+'ef145edd-5b2a-4452-bfab-0c85dee926ba':'MobilityiOS',
+'07181740-f420-4ea1-bf2b-5219d6535fb5':'Generic',
+'258afbfd-088c-445f-b270-5014e61ba4e2':'Mainframe'
+}
+
 function next_function(resultobj,cb,data){
 
 
@@ -77,7 +88,7 @@ function next_function(resultobj,cb,data){
 	
 	
 	async.forEachSeries(alltasks,function(a,maincallback){
-		var task_json={'appType':'Web',
+		var task_json={'appType':'',
 			'projectId':'',
 			'releaseId':'',
 			'cycleId':'',
@@ -118,50 +129,58 @@ function next_function(resultobj,cb,data){
 		var parent=t.parent.substring(1, t.parent.length-1).split(",");
 		var parent_length=parent.length;
         task_json.projectId=parent[0];
-		
-		if (parent_length>=2){
-			task_json.testSuiteId=parent[1];
-			if(parent_length>=4){
-				task_json.screenId=parent[3];
-
-			}if(parent_length==5){
-				task_json.testCaseId=parent[4];
-
-			}	
-				create_ice.getAllNames(parent,function(err,data){
+		create_ice.getProjectType_Nineteen68(parent[0],function(err,data){
 					if(err){
-
+						console.log(err);
 					}else{
-						task_json.testSuiteName=data.modulename;
-						task_json.screenName=data.screenname;
-						task_json.testCaseName=data.testcasename;
-                        //task_json.assignedTestScenarioIds=data.assignedTestScenarioIds;
-						task_json.taskDetails.push(taskDetails);
-						user_task_json.push(task_json);
-						console.log(user_task_json);
-						fs.writeFileSync('assets_mindmap/task_json.json',JSON.stringify(user_task_json),'utf8');
-						maincallback();
+						task_json.appType=projectTypes[data.projectType];
+						if (parent_length>=2){
+							task_json.testSuiteId=parent[1];
+							if(parent_length>=4){
+								task_json.screenId=parent[3];
 
+							}if(parent_length==5){
+								task_json.testCaseId=parent[4];
+
+							}	
+								create_ice.getAllNames(parent,function(err,data){
+									if(err){
+
+									}else{
+										task_json.testSuiteName=data.modulename;
+										task_json.screenName=data.screenname;
+										task_json.testCaseName=data.testcasename;
+										//task_json.assignedTestScenarioIds=data.assignedTestScenarioIds;
+										task_json.taskDetails.push(taskDetails);
+										user_task_json.push(task_json);
+										console.log(user_task_json);
+										fs.writeFileSync('assets_mindmap/task_json.json',JSON.stringify(user_task_json),'utf8');
+										maincallback();
+
+									}
+
+									
+
+								});
+
+			
 					}
+
+				}
 
 					
 
 				});
-
-			
-		}
-		// task_json.taskDetails=taskDetails;
 		
-		// user_task_json.push(task_json);
+		
+
 	
 		
 	},function(maincallback){
-        // if(err){
-        //     return "fail";
-        // }else{
+
             cb(null,user_task_json);      
-        // }
+      
     });
-    //return user_task_json;
+
 	
 }
