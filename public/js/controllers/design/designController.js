@@ -1,5 +1,5 @@
-var screenshotObj,scrapedGlobJson,enableScreenShotHighlight,mirrorObj,emptyTestStep,anotherScriptId,getAppTypeForPaste, eaCheckbox, finalViewString, scrapedData, deleteFlag, pasteSelecteStepNo,globalSelectedBrowserType,selectedKeywordList,keywordListData;
-var initScraping = {}; var mirrorObj = {}; var scrapeTypeObj = {}; var newScrapedList; var viewString = {}; var scrapeObject = {}; var screenViewObject = {}; var readTestCaseData; var getRowJsonCopy = [];
+var screenshotObj,scrapedGlobJson,enableScreenShotHighlight,mirrorObj, eaCheckbox, finalViewString, scrapedData, deleteFlag, pasteSelecteStepNo,globalSelectedBrowserType,selectedKeywordList,keywordListData;
+var initScraping = {}; var mirrorObj = {}; var scrapeTypeObj = {}; var newScrapedList; var viewString = {}; var scrapeObject = {}; var screenViewObject = {}; var readTestCaseData; var getRowJsonCopy;
 var selectRowStepNoFlag = false; //var deleteStep = false;
 var dataFormat12;
 var getAllAppendedObj; //Getting all appended scraped objects
@@ -911,8 +911,8 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			$("#endPointURL, #wsdlMethods, #wsdlOperation, #wsdlRequestHeader, #wsdlRequestBody").prop("disabled", false)
 			//Additional to enable the web service icon
 			$.each($(this).parents("ul").children("li"),function(){
-				if($(this).find("a").hasClass("disableActions") == true){
-					$(this).find("a").addClass("enableActions").removeClass("disableActions")
+				if($(this).find("a").hasClass("disableActionsWS") == true){
+					$(this).find("a").addClass("enableActionsWS").removeClass("disableActionsWS")
 				}
 			})
 			//Additional to enable the web service icon
@@ -3224,6 +3224,9 @@ function deleteTestScriptRow(e){
 	if($('.ui-state-highlight').find('td:nth-child(2)').find('input').is(":checked") && $('.ui-state-highlight').find('td:nth-child(7)').find('input').length > 0){
 		
 	}
+	else if($('#jqGrid tbody tr.ui-widget-content').length <= 0){
+		openDialog("Delete Testcase step", "No steps to Delete")
+	}
 	else{
 		if($(document).find("#cb_jqGrid:checked").length > 0 || $("#jqGrid").find(".cbox:checked").length > 0 ){
 			$("#globalModalYesNo").find('.modal-title').text("Delete Test Step");
@@ -3359,8 +3362,11 @@ var lastSelectedRowId
 //Edit Testscript Row
 function editTestCaseRow(){
 	var rowSelect = $(document).find(".ui-state-highlight").children("td:nth-child(1)").text();
-	if(rowSelect == "" || rowSelect == " "){
-		openDialog("Edit Testcase step", "Select step to edit.")
+	if($('#jqGrid tbody tr.ui-widget-content').length <= 0){
+		openDialog("Edit Testcase step", "No steps to edit")
+	}
+	else if(rowSelect == "" || rowSelect == " "){
+		openDialog("Edit Testcase step", "Select step to edit")
 	}
 	else{
 		var editSelRow = parseInt(rowSelect) + parseInt(1);
@@ -3409,7 +3415,7 @@ function editTestCaseRow(){
 
 //Copy-Paste TestStep Functionality
 function copyTestStep(){
-	emptyTestStep = "false";
+	window.localStorage['emptyTestStep'] = "false";
 	var taskInfo = JSON.parse(window.localStorage['_CT']);
 	if(!$(document).find(".cbox:checked").parent().parent("tr").hasClass("ui-state-highlight")){
 		openDialog("Copy Testcase step", "Select step to copy")
@@ -3420,7 +3426,7 @@ function copyTestStep(){
 		getSelectedRowData = $(document).find(".cbox:checked").parent().parent("tr.ui-state-highlight")
 		$.each(getSelectedRowData, function(){
 			if($(this).children(":nth-child(5)").html() == "&nbsp;"){
-				emptyTestStep = "true";
+				window.localStorage['emptyTestStep'] = "true";
 				openDialog("Copy Test Step", "The operation cannot be performed as the steps contains invalid/blank object references")
 				getSelectedRowData = [];
 				getRowJsonCopy = [];
@@ -3439,6 +3445,7 @@ function copyTestStep(){
 					"url"			: $(this).children("td:nth-child(11)").text().trim(),
 					"appType"		: $(this).children("td:nth-child(12)").text()					
 				});
+				window.localStorage['getRowJsonCopy'] = angular.toJson(getRowJsonCopy);
 			}
 		});
 		//Reloading Row
@@ -3455,19 +3462,23 @@ function copyTestStep(){
 		$("#jqGrid").jqGrid("setColProp", "remarksIcon", {editable: false});
 		$("#jqGrid").resetSelection();
 		$("#jqGrid").find(">tbody").sortable("enable");
-		anotherScriptId = JSON.parse(window.localStorage['_CT']).testCaseId;//window.localStorage['testScriptIdVal'];
-		getAppTypeForPaste = taskInfo.appType;//window.localStorage['appTypeScreen']
+		window.localStorage['anotherScriptId'] = JSON.parse(window.localStorage['_CT']).testCaseId;//window.localStorage['testScriptIdVal'];
+		window.localStorage['getAppTypeForPaste'] = taskInfo.appType;//window.localStorage['appTypeScreen']
 	}
 }
 //Need to work
 function pasteTestStep(){
-	if(getRowJsonCopy == [] || getRowJsonCopy == undefined || getRowJsonCopy.length <= 0){
+	var getRowJsonToPaste = JSON.parse(window.localStorage['getRowJsonCopy']);
+	if(getRowJsonToPaste == [] || getRowJsonToPaste == undefined || getRowJsonToPaste.length <= 0){
 		openDialog("Paste Testcase step", "Copy steps to paste")
 	}
 	else{
-		if(anotherScriptId != JSON.parse(window.localStorage['_CT']).testCaseId){
-			if (emptyTestStep == "true" || getRowJsonCopy == undefined) return false
-			else if(getAppTypeForPaste != "Web") return false
+		if(window.localStorage['anotherScriptId'] != JSON.parse(window.localStorage['_CT']).testCaseId){
+			if (window.localStorage['emptyTestStep'] == "true" || getRowJsonToPaste == undefined) return false
+			else if(window.localStorage['getAppTypeForPaste'] != JSON.parse(window.localStorage['_CT']).appType){
+				openDialog("Paste Test Step", "Project type is not same");
+				return false
+			}
 			else{
 				$("#globalModalYesNo").find('.modal-title').text("Paste Test Step");
 				$("#globalModalYesNo").find('.modal-body p').text("Copied step(s) might contain object reference which will not be supported for other screen. Do you still want to continue ?").css('color','black');
@@ -3477,7 +3488,7 @@ function pasteTestStep(){
 			}
 		} 
 		else{
-			if (emptyTestStep == "true" || getRowJsonCopy == undefined) return false
+			if (window.localStorage['emptyTestStep'] == "true" || getRowJsonToPaste == undefined) return false
 			else if($("#jqGrid").jqGrid('getRowData').length == 1 && $("#jqGrid").jqGrid('getRowData')[0].custname == "") showDialogMesgsYesNo("Paste Test Step", "Copied step(s) might contain object reference which will not be supported for other screen. Do you still want to continue ?", "btnPasteTestStepYes", "btnPasteTestStepNo")
 			else{
 				$("#modalDialog-inputField").find('.modal-title').text("Paste Test Step");
@@ -3528,13 +3539,14 @@ $(document).on("click","#btnPasteTestStep", function(){
 	$("#errorMsgs1, #errorMsgs2, #errorMsgs3").hide();
 	if(!$("#getInputData").val()) $("#errorMsgs1").show();
 	else{
+		var getRowJsonToPaste = JSON.parse(window.localStorage['getRowJsonCopy']);
 		//$(document).find(".dialogContent").append('<img src="imgs/loader1.gif" class="domainLoader" style="bottom: 20px; left: 20px;" />')
 		chkNo = $("#getInputData").val().split(";");
 
 		if(chkNo.length > 1){
 			selectedStepNo.push(parseInt(chkNo[0]));
 			for(j=1; j<chkNo.length; j++){
-				selectedStepNo.push(parseInt(chkNo[j])+(getRowJsonCopy.length * selectedStepNo.length));
+				selectedStepNo.push(parseInt(chkNo[j])+(getRowJsonToPaste.length * selectedStepNo.length));
 			}
 		}
 		else selectedStepNo.push(chkNo[0]);
@@ -3579,20 +3591,21 @@ function pasteInGrid(){
 	var gridData = $("#jqGrid").jqGrid('getRowData');
 	var increaseSplice; var getRowJsonCopyTemp = [];
 	var newVal = parseInt(pasteSelecteStepNo);
+	var getRowJsonToPaste = JSON.parse(window.localStorage['getRowJsonCopy']);
 	if(gridData.length == 1 && gridData[0].custname == ""){
 		gridData.splice(gridData[0],1)
-		for(k=0; k<getRowJsonCopy.length; k++){
-			gridData.push(getRowJsonCopy[k])
+		for(k=0; k<getRowJsonToPaste.length; k++){
+			gridData.push(getRowJsonToPaste[k])
 		}
 	}
 	else{
 		if(pasteSelecteStepNo > 0){
 			for(i=0; i<gridData.length; i++){
 				if(gridData[i].stepNo == pasteSelecteStepNo){
-					for(j=0; j<getRowJsonCopy.length; j++){
-						getRowJsonCopy[j].stepNo = parseInt(gridData[i].stepNo) + 1
-						if(increaseSplice == "true") gridData.splice(newVal,0,getRowJsonCopy[j]);
-						else gridData.splice(pasteSelecteStepNo,0,getRowJsonCopy[j]);
+					for(j=0; j<getRowJsonToPaste.length; j++){
+						getRowJsonToPaste[j].stepNo = parseInt(gridData[i].stepNo) + 1
+						if(increaseSplice == "true") gridData.splice(newVal,0,getRowJsonToPaste[j]);
+						else gridData.splice(pasteSelecteStepNo,0,getRowJsonToPaste[j]);
 						//ReArranging Step No
 						for(var l=0; l<gridData.length;l++) gridData[l].stepNo = l+1;
 						//ReArranging Step No
@@ -3603,8 +3616,8 @@ function pasteInGrid(){
 			}
 		}
 		else{
-			for(i=0; i<getRowJsonCopy.length; i++){
-				getRowJsonCopyTemp.push(getRowJsonCopy[i]);
+			for(i=0; i<getRowJsonToPaste.length; i++){
+				getRowJsonCopyTemp.push(getRowJsonToPaste[i]);
 			}
 			for(j=0; j<gridData.length;j++){
 				getRowJsonCopyTemp.push(gridData[j]);
@@ -3621,7 +3634,7 @@ function pasteInGrid(){
 	$("#jqGrid").jqGrid('setGridParam',{data: gridData});
 	$("#jqGrid").trigger("reloadGrid");
 	if(pasteSelecteStepNo > 0){
-		for(var i=parseInt(pasteSelecteStepNo)+1; i<=parseInt(pasteSelecteStepNo)+getRowJsonCopy.length; i++){
+		for(var i=parseInt(pasteSelecteStepNo)+1; i<=parseInt(pasteSelecteStepNo)+getRowJsonToPaste.length; i++){
 			$.each($("#jqGrid tr"), function(){
 				if(parseInt($(this).children("td:nth-child(1)").text()) == i){				
 					$(this).find("input.cbox").trigger("click")
@@ -3631,7 +3644,7 @@ function pasteInGrid(){
 		}
 	}
 	else{
-		for(var i=parseInt(pasteSelecteStepNo)+1; i<=getRowJsonCopy.length; i++){
+		for(var i=parseInt(pasteSelecteStepNo)+1; i<=getRowJsonToPaste.length; i++){
 			$.each($("#jqGrid tr"), function(){
 				if(parseInt($(this).children("td:nth-child(1)").text()) == i){				
 					$(this).find("input.cbox").trigger("click")
