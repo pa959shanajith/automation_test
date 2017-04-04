@@ -52,7 +52,10 @@
       <div ng-if="tab == 'tabRequirement'" class="content-div"></div>
       <div ng-if="tab == 'tabRequirement'" class="content-div"></div>
       <div ng-if="tab == 'tabRequirement'" class="content-div"></div>
-      <div ng-if="tab == 'tabCreate'" id="ct-moduleBox" class="ct-moduleBoxOptional tabCreate">
+      <div class="selectProject">
+             <select class="project-list"></select>
+         </div>
+      <div ng-if="tab == 'tabCreate'" id="ct-moduleBox" class="ct-moduleBoxOptional tabCreate">         
          <div class="ct-nodeBox"></div>
          <div id="ctExpandCreate" class="ct-expand"></div>
       </div>
@@ -75,7 +78,7 @@
             </div>-->
       </div>
       <div ng-if="tab == 'tabCreate'" id="ct-canvas" class="tabCreate">
-         <div class="ct-tileBox">
+         <!--<div class="ct-tileBox">
             <div class="ct-tile">
                <svg class="ct-svgTile" height="150px" width="150px">
                   <g>
@@ -86,7 +89,7 @@
                </svg>
             </div>
             <span class="ct-text">Create Mindmap</span>
-         </div>
+         </div>-->
       </div>
    </div>
    <!-- Mid Section -->  
@@ -261,7 +264,22 @@
 		</div>
 	</div>
 </div>
-
+<div class="modal fade" id="Mindmap_rel_cycle_error" role="dialog" data-keyboard="false" data-backdrop="static">
+	<div class="modal-dialog modal-sm">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">&times;</button>
+				<h4 class="modal-title">Task assignment Error</h4>
+			</div>
+			<div class="modal-body">
+				<p>Error ! Please select Release/Cycle</p>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Ok</button>
+			</div>
+		</div>
+	</div>
+</div>
 <div class="modal fade" id="SaveStructure" role="dialog" data-keyboard="false" data-backdrop="static">
 	<div class="modal-dialog modal-sm">
 		<div class="modal-content">
