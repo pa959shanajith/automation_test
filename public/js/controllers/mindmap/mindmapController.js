@@ -11,6 +11,7 @@ mySPA.controller('mindmapController', ['$scope', '$http', '$location', '$timeout
 		/*Sidebar-toggle*/
     $scope.tab = "tabRequirement";
     $(".left-sec-mindmap,.rsSlide").show();
+    $('.selectProject').hide();
     // $("#ct-moduleBox").hide();
     //$("#ct-moduleBox,.ct-tilebox").hide();
     $(".ct-show-left").click(function(e) {
@@ -20,18 +21,38 @@ mySPA.controller('mindmapController', ['$scope', '$http', '$location', '$timeout
     });
     $("#ct-expand").click(function(e) {
            $(".left-sec-mindmap").show();
+           if($('#right-dependencies-section').is(':visible')){
+                $("#ct-moduleBox").css({'left':'147px','width':'83%'})
+           }
+           else{
+               $("#ct-moduleBox").css({'left':'147px','width':'100%'})
+           }
+           
     });
     $("#ct-collapse").click(function(e) {
            $(".left-sec-mindmap").hide();
+           if($('#right-dependencies-section').is(':visible')){
+               $("#ct-moduleBox").css({'left':'0','width':'94%'})
+           }
+           else{
+               $("#ct-moduleBox").css({'left':'0','width':'100%'})
+           }
     });
     $("#ct-expand-right").click(function(e) {
          e.preventDefault()
          $(".rsSlide").toggle(5, function(){
-             $(this).siblings("#ct-expand-right").toggleClass("ct-collapse-right")
+             $(this).siblings("#ct-expand-right").toggleClass("ct-collapse-right");
+             if($(".left-sec-mindmap").is(':visible')){
+                 $("#ct-moduleBox").css({'z-index':'0','width':'89%'})
+             }
+             else{
+                 $("#ct-moduleBox").css({'width':'100%'})
+             }
          });
     });
 
     $scope.createMapsCall = function(e){
+         $('.selectProject').show();
             if ($scope.tab=='tabCreate'){
                  $("a.selectedIcon").removeClass("selectedIcon");
 		         $('#createImg1').addClass('selectedIcon');
@@ -40,6 +61,7 @@ mySPA.controller('mindmapController', ['$scope', '$http', '$location', '$timeout
 		         $('#assignImg1').addClass('selectedIcon');
 
             }
+                
         window.localStorage['tabMindMap'] = $scope.tab;
         loadMindmapData()
     }
