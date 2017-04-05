@@ -151,6 +151,18 @@ app.post('/getTaskJson_Nineteen68',plugin.getTaskJson_Nineteen68);
 
 server.listen(3000);  
 
+//To be removed when try catch is implemented across the application
+app.use(function(req,res,next){
+  var _send = res.send;
+  var sent = false;
+  res.send = function(data){
+    if(sent) return;
+    _send.bind(res)(data);
+    sent = true;
+};
+  next();
+});
+
 //SOCKET CONNECTION USING SOCKET.IO
 var allClients = [];
 var allSockets = [];
