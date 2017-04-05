@@ -140,11 +140,11 @@
 /* update scrollbar offset if both scrolls are visible */
 
 .scrollbar-inner > .scroll-element.scroll-x.scroll-scrolly_visible .scroll-element_track { left: -12px; }
-.scrollbar-inner > .scroll-element.scroll-y.scroll-scrollx_visible .scroll-element_track { top: -12px; }
+.scrollbar-inner > .scroll-element.scroll-y.scroll-scrollx_visible .scroll-element_track { top: 0px; }
 
  
 .scrollbar-inner > .scroll-element.scroll-x.scroll-scrolly_visible .scroll-element_size { left: -12px; }
-.scrollbar-inner > .scroll-element.scroll-y.scroll-scrollx_visible .scroll-element_size { top: -12px; }
+.scrollbar-inner > .scroll-element.scroll-y.scroll-scrollx_visible .scroll-element_size { top: 0px; }
 
 
 
@@ -604,6 +604,11 @@
 		width: 102% !important;
 		padding-right: 6px;
 	}
+	
+	.scroll-wrapper > .scrollbar-screenshot{
+		max-height: 650px !important;
+		margin-bottom: 0 !important;
+	}
 }
 
 /**********Specifically for Internet Explorer**********/
@@ -635,5 +640,10 @@
 		width: 100% !important;
 		padding-right:8px;
 		margin-bottom: 0px !important
+	}
+	
+	.scroll-wrapper > .scrollbar-screenshot{
+		max-height: 650px !important;
+		margin-bottom: 0 !important;
 	}
 }
