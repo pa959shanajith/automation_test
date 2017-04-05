@@ -52,18 +52,22 @@ mySPA.controller('mindmapController', ['$scope', '$http', '$location', '$timeout
     });
 
     $scope.createMapsCall = function(e){
-         $('.selectProject').show();
+    	$('.selectProject').show();
+        if($scope.tab=='tabRequirement'){
+            $("img.selectedIcon").removeClass("selectedIcon");
+            $('#reqImg').addClass('selectedIcon');
+        }
+        else{
             if ($scope.tab=='tabCreate'){
-                 $("a.selectedIcon").removeClass("selectedIcon");
-		         $('#createImg1').addClass('selectedIcon');
+                 $("img.selectedIcon").removeClass("selectedIcon");
+		         $('#createImg').addClass('selectedIcon');
             }else if($scope.tab=='tabAssign'){
-                $("a.selectedIcon").removeClass("selectedIcon");
-		         $('#assignImg1').addClass('selectedIcon');
-
+                $("img.selectedIcon").removeClass("selectedIcon");
+		        $('#assignImg').addClass('selectedIcon');
             }
-                
+            loadMindmapData()
+        }
         window.localStorage['tabMindMap'] = $scope.tab;
-        loadMindmapData()
     }
 
     // $(".highlightImg").on('click',function(e) {

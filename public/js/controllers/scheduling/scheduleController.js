@@ -2,6 +2,7 @@ var releaseName,cycleName,testSuiteName;
 mySPA.controller('scheduleController',['$scope','$http','$timeout','$location','ScheduleService','cfpLoadingBar', function ($scope, $http, $timeout, $location, ScheduleService, cfpLoadingBar) {
 	cfpLoadingBar.start();
 	$("body").css("background","#eee");
+	
 	$timeout(function(){
 		$('.scrollbar-inner').scrollbar();
 	    $('.scrollbar-macosx').scrollbar();
@@ -84,7 +85,7 @@ mySPA.controller('scheduleController',['$scope','$http','$timeout','$location','
 	//Populating Data in Scheduling Table
 	$("#scheduleDataBody").empty()
 	for(i=0; i<testSuiteData.length; i++){
-		$("#scheduleDataBody").append('<div class="scheduleDataBodyRow"><div style="width: 4%" class="tabeleCellPadding"><input type="checkbox" class="d-schedule"></div><div style="width: 23%; text-align:left" class="tabeleCellPadding" data-SuiteId="'+testSuiteData[i].test_suite_id+'">'+testSuiteData[i].test_suite_name+'</div><div style="width: 17%"><input class="form-control" type="text" value=""/></div><div style="width: 20%"><input class="form-control" type="text" value=""/></div><div style="width: 25%"><span style="position: relative; display: inline-block; width:50%; margin-right:5%"><input class="form-control fc-datePicker" type="text" value=""/><img class="datepickerIcon" src="../imgs/ic-datepicker.png" /></span><span style="position: relative; display: inline-block; width:40%"><input class="form-control fc-timePicker" type="text" value=""/><img class="timepickerIcon" src="../imgs/ic-timepicker.png" /></span></div><div style="width: 11%" class="tabeleCellPadding"><img src="../imgs/ic-alm.png" style="cursor:pointer" /></div></div>')
+		$("#scheduleDataBody").append('<div class="scheduleDataBodyRow"><div style="width: 4%" class="tabeleCellPadding"><input type="checkbox" class="d-schedule"></div><div style="width: 23%; text-align:left" class="tabeleCellPadding" data-SuiteId="'+testSuiteData[i].test_suite_id+'">'+testSuiteData[i].test_suite_name+'</div><div style="width: 17%"><input class="form-control ipformating" type="text" value=""/></div><div style="width: 20%"><input class="form-control" type="text" value=""/></div><div style="width: 25%"><span style="position: relative; display: inline-block; width:50%; margin-right:5%" title="Select Date"><input class="form-control fc-datePicker" type="text" value="" readonly/><img class="datepickerIcon" src="../imgs/ic-datepicker.png" /></span><span style="position: relative; display: inline-block; width:40%" title="Select Time"><input class="form-control fc-timePicker" type="text" value="" readonly disabled/><img class="timepickerIcon" src="../imgs/ic-timepicker.png" /></span></div><div style="width: 11%" class="tabeleCellPadding"><img src="../imgs/ic-alm.png" style="cursor:pointer" /></div></div>')
 	}
 	
 	cfpLoadingBar.complete();
@@ -95,8 +96,32 @@ mySPA.controller('scheduleController',['$scope','$http','$timeout','$location','
 	$('.fc-datePicker').datepicker({
 		autoclose:"true",
 		format:"dd-mm-yyyy",
-		todayHighlight: true
+		todayHighlight: true,
+		startDate: new Date()
 	})
+	$('.fc-datePicker').datepicker().on('hide.datepicker', function(e){
+		if($(this).val().length > 0){
+			$(this).parent().siblings('span').find('.fc-timePicker').prop('disabled',false);
+		}
+	})
+	
+	$(".fc-timePicker").timepicker({
+		minuteStep: 1
+	})
+	$('.fc-timePicker').timepicker().on('changeTime.timepicker', function(e) {
+	    console.log('The time is ' + e.time.value);
+	    console.log('The hour is ' + e.time.hours);
+	    console.log('The minute is ' + e.time.minutes);
+	    console.log('The meridian is ' + e.time.meridian);
+	});
+	$('.fc-timePicker').timepicker().on('hide.timepicker', function(e) {
+		var date = new Date();
+	    console.log('The time is ' + e.time.value);
+	    console.log('The hour is ' + e.time.hour);
+	    console.log('The minute is ' + e.time.minute);
+	    console.log('The meridian is ' + e.time.meridian);
+	});
+	
 	$(document).on('click', ".datepickerIcon", function(){
 		$(this).siblings(".fc-datePicker").focus()
 	})
@@ -105,6 +130,15 @@ mySPA.controller('scheduleController',['$scope','$http','$timeout','$location','
 	})
 	//Datepicker Function
 	
+	//IP Address masking
+	$('.ipformating').mask('0ZZ.0ZZ.0ZZ.0ZZ', {
+		translation: {
+	        'Z': {
+	          pattern: /[0-9]/, optional: true
+	         }
+	    }
+	});
+    $('.ipformating').mask('099.099.099.099');
 	
 	//Select Browser Function
 	$(document).on("click", ".selectBrowserSc", function(){

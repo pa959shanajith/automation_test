@@ -64,7 +64,7 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 				$("#executionDataTable tbody tr").remove();
 				var count = 1
 				//Building object for each row after getting the data from server
-				for(i=0; i<rowData.condition.length && rowData.dataparam.length && rowData.executestatus && rowData.scenarioids.length && rowData.projectnames.length; i++){
+				for(i=0; i<rowData.scenarioids.length; i++){
 					getEachScenario.push({
 						"condition" : rowData.condition[i],
 						"dataParam" : rowData.dataparam[i],
