@@ -1695,6 +1695,7 @@ input[disabled]{
 }
 .fc-datePicker{
 	width: 100% !important;
+	background-color: #fff !important;
 }
 .fc-timePicker{
 	width: 100% !important;
@@ -1704,7 +1705,7 @@ input[disabled]{
     position: absolute;
     right: 0;
     background: #643693;
-    padding: 3px 4px;
+    padding: 3px 5px;
     border-radius: 0px 4px 4px 0px;
     -moz-border-radius: 0px 4px 4px 0px;
     -webkit-border-radius: 0px 4px 4px 0px;
@@ -1932,6 +1933,7 @@ input[disabled]{
     padding: 5px 40px;
     text-align: center;
     word-break: break-all;
+    font-size: 17px;
 }
 
 .modal-header .close {
@@ -2317,12 +2319,19 @@ input[disabled]{
 	margin-top: 2%;
 	float: left;
 }
-
+.mindmap-left-section{
+    min-height: auto !important;
+    margin-top: 150px;
+    border-bottom: 0 !important;
+}
+.mindmap-left-section ul li{
+    margin-bottom: 40px !important;
+}
 .selectedIcon {
 	background: #331d4c;
-	border-radius: 5px;
+	border-radius: 6px;
+    padding: 10px;
 }
-
 .domainTxt {
 	float: left;
 }
@@ -2624,12 +2633,6 @@ input[disabled]{
 	margin-top: 2%;
 	float: left;
 }
-
-.selectedIcon {
-	background: #331d4c;
-	border-radius: 5px;
-}
-
 .domainTxt {
 	float: left;
 }
@@ -2931,6 +2934,7 @@ input[disabled]{
 	text-align: center;
 	float:left;
 }
+.suitestartend th{text-align: left; padding-left: 74px;}
 .suitestartend tbody, .scenarioReports tbody{
 	position: absolute;
     margin-top: 23px;
@@ -2953,9 +2957,9 @@ input[disabled]{
     float: left;
 }
 .suitestartend tbody tr td:nth-child(1){width: 5%;}
-.suitestartend tbody tr td:nth-child(2){width: 25%; text-align: left; padding-left: 51px;}
+.suitestartend tbody tr td:nth-child(2){width: 25%; text-align: left; padding-left: 36px;}
 .suitestartend tbody tr td:nth-child(3){width: 20%; text-align: left; padding-left: 15px;}
-.suitestartend tbody tr td:nth-child(4){width: 30%; text-align: left; padding-left: 83px;}
+.suitestartend tbody tr td:nth-child(4){width: 30%; text-align: left; padding-left: 74px;}
 .suitestartend tbody tr td:nth-child(5){width: 20%; text-align: left; padding-left: 15px;}
 .scenarioReports tbody tr:nth-child(odd){
 	background:#e8e6ff;	
@@ -2965,9 +2969,9 @@ input[disabled]{
 }
 .scenarioReports tbody tr td:nth-child(1){
 	width: 30%;
-    padding-left: 70px;
-    padding-right: 10px;
-    text-align: left;
+    padding-left: 25px;
+    padding-right: 25px;
+    text-align: center;
     overflow: hidden;
     white-space: nowrap !important;
     text-overflow: ellipsis;

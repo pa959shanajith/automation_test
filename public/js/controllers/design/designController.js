@@ -863,7 +863,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		var wsdlResponseBody = $("#wsdlResponseBody").val().replace(/[\n\r]/g,'').replace(/\s\s+/g, ' ').replace(/"/g, '\"');
 		if(!endPointURL) $("#endPointURL").addClass("inputErrorBorderFull")
 		else if(!$scope.wsdlMethods && !wsdlMethods) $("#wsdlMethods").addClass("selectErrorBorder")
-		else if(!wsdlRequestHeader) $("#wsdlRequestHeader").addClass("inputErrorBorderFull")
+		//else if(!wsdlRequestHeader) $("#wsdlRequestHeader").addClass("inputErrorBorderFull")
 		else{
 			var getWSData = {
 				"body": [wsdlRequestBody],

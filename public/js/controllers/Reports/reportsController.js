@@ -137,14 +137,16 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
     
     function dateDESC(dateArray){
     	dateArray.sort(function(a,b){
-    		var aA = a.children.item(1).innerHTML;
-    		var bB = b.children.item(1).innerHTML;
-    		var fDate = aA.split("-"); var lDate = bB.split("-");
+    		var dateA = a.children.item(1).innerHTML;
+			var timeA = a.children.item(2).innerHTML;
+    		var dateB = b.children.item(1).innerHTML;
+			var timeB = b.children.item(2).innerHTML;
+    		var fDate = dateA.split("-"); var lDate = dateB.split("-");
     		//var fFDate = fDate[0].split("/"); var lLDate = lDate[0].split("/");
     		var gDate = fDate[1]+"-"+fDate[0]+"-"+fDate[2]//+" "+a.children.item(2).innerHTML;
     		var mDate = lDate[1]+"-"+lDate[0]+"-"+lDate[2]//+" "+b.children.item(2).innerHTML;
-    		if ( new Date(gDate) < new Date(mDate) )  return -1;
-    	    if ( new Date(gDate) > new Date(mDate) )  return 1;
+    		if ( new Date(gDate+" "+timeA) < new Date(mDate+" "+timeB) )  return -1;
+    	    if ( new Date(gDate+" "+timeA) > new Date(mDate+" "+timeB) )  return 1;
     	    return dateArray;
     	})
 	}
@@ -152,13 +154,15 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
     function dateASC(dateArray){
     	dateArray.sort(function(a,b){
     		var aA = a.children.item(1).innerHTML//.replace("&nbsp;&nbsp;&nbsp;&nbsp;"," ");
+			var timeA = a.children.item(2).innerHTML;
     		var bB = b.children.item(1).innerHTML//.replace("&nbsp;&nbsp;&nbsp;&nbsp;"," ");
+			var timeB = b.children.item(2).innerHTML;
     		var fDate = aA.split("-"); var lDate = bB.split("-");
     		//var fFDate = fDate[0].split("/"); var lLDate = lDate[0].split("/");
     		var gDate = fDate[1]+"-"+fDate[0]+"-"+fDate[2]//+" "+a.children.item(2).innerHTML;
     		var mDate = lDate[1]+"-"+lDate[0]+"-"+lDate[2]//+" "+b.children.item(2).innerHTML;
-    		if ( new Date(gDate) > new Date(mDate) )  return -1;
-    	    if ( new Date(gDate) < new Date(mDate) )  return 1;
+    		if ( new Date(gDate+" "+timeA) > new Date(mDate+" "+timeB) )  return -1;
+    	    if ( new Date(gDate+" "+timeA) < new Date(mDate+" "+timeB) )  return 1;
     	    return dateArray;
     	})
 	}
@@ -177,7 +181,7 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 				var total = data.length;
 				scenarioContainer.find('tbody').empty();
 				var browserIcon, brow="";
-				var styleColor;
+				var styleColor, exeTym, exeTime;
 				for(i=0; i<data.length; i++){
 					if(data[i].browser == "chrome")	browserIcon = "ic-reports-chrome.png";
 					else if(data[i].browser == "firefox")	browserIcon = "ic-reports-firefox.png";
@@ -187,7 +191,9 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 					else if(data[i].status == "Fail"){	fail++;	styleColor="style='color: #b31f2d !important;'";}
 					else if(data[i].status == "Terminate"){	terminated++;	styleColor="style='color: #faa536 !important;'";}
 					else if(data[i].status == "Incomplete"){	incomplete++;	styleColor="style='color: #58595b !important;'";}
-					scenarioContainer.find('tbody').append("<tr><td>"+data[i].testscenarioname+"</td><td>"+data[i].executedtime+"</td><td><img alt='-' src='"+brow+"'></td><td class='openReports' data-reportid='"+data[i].reportid+"'><a class='openreportstatuss' "+styleColor+">"+data[i].status+"</a></td><td data-reportid='"+data[i].reportid+"'><img alt='Select format' class='selectFormat' src='imgs/ic-export-json.png' style='cursor: pointer;' title='Select format'></td></tr>");
+					exeTym = data[i].executedtime.split(" ")[0].split("-");
+					exeTime = ("0" + exeTym[0]).slice(-2) +"-"+ ("0" + exeTym[1]).slice(-2) +"-"+ exeTym[2];
+					scenarioContainer.find('tbody').append("<tr><td title='"+data[i].testscenarioname+"'>"+data[i].testscenarioname+"</td><td><span style='margin-right: 28px;'>"+exeTime+"</span><span>"+data[i].executedtime.split(" ")[1]+"</span></td><td><img alt='-' src='"+brow+"'></td><td class='openReports' data-reportid='"+data[i].reportid+"'><a class='openreportstatuss' "+styleColor+">"+data[i].status+"</a></td><td data-reportid='"+data[i].reportid+"'><img alt='Select format' class='selectFormat' src='imgs/ic-export-json.png' style='cursor: pointer;' title='Select format'></td></tr>");
 				}
 				if(data.length > 0){
 					P = parseFloat((pass/total)*100).toFixed();
@@ -319,7 +325,7 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 						if(finalReports.rows[k].EllapsedTime.split(".")[1] == undefined || finalReports.rows[k].EllapsedTime.split(".")[1] == ""){
 							finalReports.rows[k].EllapsedTime = ("0" + elapTym[0]).slice(-2) +":"+ ("0" + elapTym[1]).slice(-2) +":"+ ("0" + elapTym[2]).slice(-2);
 						}
-						else if(finalReports.rows[k].EllapsedTime.split(".").length < 3){
+						else if(finalReports.rows[k].EllapsedTime.split(".").length < 3 && finalReports.rows[k].EllapsedTime.split(".")[0].indexOf(":") === -1){
 							finalReports.rows[k].EllapsedTime = ("0" + 0).slice(-2) +":"+ ("0" + 0).slice(-2) +":"+ ("0" + elapTym[0]).slice(-2) +":"+ ("0" + 0).slice(-2);
 						}
 						else{
