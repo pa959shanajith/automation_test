@@ -721,7 +721,6 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		}
 	})
 	
-	
 	//Initialization for apptype(Desktop, Mobility, OEBS) to redirect on initScraping function
 	$scope.initScrape = function(e){
 		if(e.currentTarget.className == "disableActions") return false
@@ -1968,7 +1967,6 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				//#D5E7FF  DBF5DF
 				var serviceCallFlag = false;
 				var mydata = $("#jqGrid").jqGrid('getGridParam','data');
-				
 				for(var i=0; i<mydata.length;i++){
 					//new to parse str to int (step No)
 					if(mydata[i].hasOwnProperty("_id_")){
@@ -2456,14 +2454,16 @@ function contentTable(newTestScriptDataLS) {
 	function editRow(id,status,e) {
 		if (id && id !== lastSelection) {
 			var grid = $("#jqGrid");
-
-			var selectedText = grid.jqGrid('getRowData',id).custname;
-			var selectedKeyword = grid.jqGrid('getRowData', id).keywordVal;
-			grid.jqGrid('restoreRow',lastSelection);                        
-			grid.jqGrid('editRow',id, {keys: true} );
-			setKeyword(e,selectedText,grid,selectedKeyword);
-			lastSelection = id;
-			window.localStorage['selectRowStepNo'] = id;
+			if(grid[0].children[0].children[id].children[1].children[0].checked){
+				var selectedText = grid.jqGrid('getRowData',id).custname;
+				var selectedKeyword = grid.jqGrid('getRowData', id).keywordVal;
+				grid.jqGrid('restoreRow',lastSelection);                        
+				grid.jqGrid('editRow',id, {keys: true} );
+				setKeyword(e,selectedText,grid,selectedKeyword);
+				lastSelection = id;
+				window.localStorage['selectRowStepNo'] = id;
+			}
+			//else return false;
 		}
 		else{
 			var grid = $("#jqGrid");
@@ -3440,8 +3440,11 @@ function editTestCaseRow(){
 function copyTestStep(){
 	window.localStorage['emptyTestStep'] = "false";
 	var taskInfo = JSON.parse(window.localStorage['_CT']);
-	if(!$(document).find(".cbox:checked").parent().parent("tr").hasClass("ui-state-highlight")){
-		openDialog("Copy Testcase step", "Select step to copy")
+	if(($(document).find(".ui-state-highlight").length <= 0 && $('#jqGrid tbody tr.ui-widget-content').children('td:nth-child(4)').text().trim() == "") || ($(document).find(".ui-state-highlight").length == 1 && $(document).find(".ui-state-highlight").children('td:nth-child(4)').text().trim() == "")){
+		openDialog("Copy step", "Empty step can not be copied.")
+	}
+	else if(!$(document).find(".cbox:checked").parent().parent("tr").hasClass("ui-state-highlight")){
+		openDialog("Copy step", "Select step to copy")
 	}
 	else{
 		getSelectedRowData = [];
@@ -3682,7 +3685,13 @@ function pasteInGrid(){
 
 //Commenting TestScript Row
 function commentStep(){
-	if($(document).find(".ui-state-highlight").length > 0){
+	if($('#jqGrid tbody tr.ui-widget-content').length <= 0){
+		openDialog("Comment step", "No steps to comment")
+	}
+	else if(($(document).find(".ui-state-highlight").length <= 0 && $('#jqGrid tbody tr.ui-widget-content').children('td:nth-child(4)').text().trim() == "") || ($(document).find(".ui-state-highlight").length == 1 && $(document).find(".ui-state-highlight").children('td:nth-child(4)').text().trim() == "")){
+		openDialog("Comment step", "Empty step can not be commented.")
+	}
+	else if($(document).find(".ui-state-highlight").length > 0 && $(document).find(".ui-state-highlight").children('td:nth-child(4)').text().trim() != ""){
 		var getOutputVal = $(document).find(".ui-state-highlight").children("td[aria-describedby='jqGrid_outputVal']").text();
 		if(!getOutputVal.match("##") && !getOutputVal.match(";##")){
 			var myData = $("#jqGrid").jqGrid('getGridParam','data')

@@ -123,6 +123,7 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 		$("#scenarioDetailsContent").empty();
 		$("#modalScenarioDetails").find(".modal-title").text(scenarioName);
 		$("#modalScenarioDetails").modal("show");
+		$('#modalScenarioDetails').find('.btn-default').focus();
 		ExecutionService.loadLocationDetails(scenarioName, scenarioId)
 		.then(function(data) {
 			for(i=0; i<data.projectnames.length && data.testcasenames.length && data.screennames.length; i++){
@@ -174,11 +175,13 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 		ExecutionService.updateTestSuite_ICE(cycleId, testSuiteId, testSuiteName, testScenarioIds, executeStatus, conditionCheck, getParamPaths, userinfo)
 		.then(function(data) {
 			if(data != "fail"){
-				$("#saveSuitesModal").modal("show")
+				openDialogExe("Save Test Suite", "Test suite saved successfully.")
+				//$("#saveSuitesModal").modal("show")
 				angular.element(document.getElementById("left-nav-section")).scope().readTestSuite_ICE();
 			}
 			else{
-				$("#saveSuitesModalFail").show();
+				openDialogExe("Save Test Suite", "Failed to save test suite.")
+				//$("#saveSuitesModalFail").show();
 				angular.element(document.getElementById("left-nav-section")).scope().readTestSuite_ICE();
 			}
 		}, 
@@ -207,20 +210,23 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 		
 		console.log("selectedRowData:::" + selectedRowData)
 		
-		if(browserTypeExe.length == 0) $("#selectBrowserAlert").modal("show");
-		else if($(".exe-ExecuteStatus input:checked").length == 0) $("#selectScenarioAlert").modal("show");
+		if(browserTypeExe.length == 0)	openDialogExe("Execute Test Suite", "Please select a browser")//$("#selectBrowserAlert").modal("show");
+		else if($(".exe-ExecuteStatus input:checked").length == 0) openDialogExe("Execute Test Suite", "Please select atleast one scenario(s) to execute")//$("#selectScenarioAlert").modal("show");
 		else{
 			blockUI("Execution in progress. Please Wait...")
 			ExecutionService.ExecuteTestSuite_ICE(selectedRowData, browserTypeExe, testSuiteId)
 			.then(function(data){
 				if(data == "Terminate"){
 					$('#executionTerminated').modal('show');
+					$('#executionTerminated').find('.btn-default').focus();
 				}
 				else if(data == "unavailableLocalServer"){
-					$('#executionserverunavailable').modal('show');
+					openDialogExe("Execute Test Suite", "ICE Engine is not available")
+					//$('#executionserverunavailable').modal('show');
 				}
 				else{
 					$('#executionCompleted').modal('show');
+					$('#executionCompleted').find('.btn-default').focus();
 				}
 				unblockUI()
 				$(".selectBrowser").find("img").removeClass("sb");
@@ -229,11 +235,11 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 			},
 			function(error){ 
 				unblockUI()
-				$('#executionFailed').modal('show');
+				openDialogExe("Execute Failed", "Failed to execute.")
+				//$('#executionFailed').modal('show');
 				$(".selectBrowser").find("img").removeClass("sb");
 				browserTypeExe = [];
 				angular.element(document.getElementById("left-nav-section")).scope().readTestSuite_ICE()
-				console.log("Failed to Execute")
 			})
 		}
 	}
@@ -332,6 +338,7 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 	//Submit Task Function
 	$scope.submitTaskExecution = function(){
 		$("#submitTasksExecution").modal("show")
+		$('#submitTasksExecution').find('.btn-default-yes').focus();
 	}
 	//Submit Task Function
 	
@@ -406,4 +413,13 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 
 function loadLocationDetails(scenarioName, scenarioId){
 	angular.element(document.getElementById("left-nav-section")).scope().loadLocationDetails(scenarioName, scenarioId);
+}
+
+function openDialogExe(title, body){
+	$("#executeGlobalModal").find('.modal-title').text(title);
+    $("#executeGlobalModal").find('.modal-body p').text(body).css('color','black');
+	$("#executeGlobalModal").modal("show");
+	setTimeout(function(){
+		$("#executeGlobalModal").find('.btn-accept').focus();					
+	}, 300);
 }
