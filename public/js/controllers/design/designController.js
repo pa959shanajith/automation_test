@@ -701,13 +701,25 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				if(viewString.view.length == 0){
 					$(".disableActions").addClass("enableActions").removeClass("disableActions");
 					$("#enableAppend").prop("disabled", true).css('cursor','no-drop');
-					$(document).find(".checkStylebox").prop("disabled", true)
+					$(document).find(".checkStylebox").prop("disabled", true);
 				}
 			}
 		}, 
 		function(error){console.log("error");})
 	}
 	//Populating Saved Scrape Data
+	
+	//Disabling Filter
+	$("a[title='Filter']").mouseover(function(){
+		if(viewString.view.length == 0){
+			$(this).children("img").addClass("thumb-ic-disabled").removeClass("thumb-ic");
+			$(this).parent().css("cursor", "no-drop");
+		}
+		else{
+			$(this).children("img").addClass("thumb-ic").removeClass("thumb-ic-disabled");
+			$(this).parent().css("cursor", "pointer");
+		}
+	})
 	
 	
 	//Initialization for apptype(Desktop, Mobility, OEBS) to redirect on initScraping function
@@ -1572,7 +1584,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		})
 		if(flag == "true"){
 			var customObj = [];
-			
+			window.localStorage['disableEditing'] = "true";
 			//Pushing custom object in array
 			$.each($(".addObj-row"), function(){
 				customObj.push({
@@ -1956,14 +1968,25 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				//#D5E7FF  DBF5DF
 				var serviceCallFlag = false;
 				var mydata = $("#jqGrid").jqGrid('getGridParam','data');
+				
 				for(var i=0; i<mydata.length;i++){
 					//new to parse str to int (step No)
 					if(mydata[i].hasOwnProperty("_id_")){
-						if(mydata[i]._id_.indexOf('jpg') !== -1){
+						if(mydata[i]._id_.indexOf('jpg') !== -1 || mydata[i]._id_.indexOf('jqg') !== -1){
 							var index = mydata.indexOf(mydata[i]);
 							mydata.splice(index, 1)
 						}
 					}
+				}
+				
+				for(var i=0; i<mydata.length;i++){
+					//new to parse str to int (step No)
+					/*if(mydata[i].hasOwnProperty("_id_")){
+						if(mydata[i]._id_.indexOf('jpg') !== -1 || mydata[i]._id_.indexOf('jqg') !== -1){
+							var index = mydata.indexOf(mydata[i]);
+							mydata.splice(index, 1)
+						}
+					}*/
 			//		else{
 						if(mydata[i].url == undefined){mydata[i].url="";}
 						mydata[i].stepNo = i+1;
