@@ -701,7 +701,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				if(viewString.view.length == 0){
 					$(".disableActions").addClass("enableActions").removeClass("disableActions");
 					$("#enableAppend").prop("disabled", true).css('cursor','no-drop');
-					$(document).find(".checkStylebox").prop("disabled", true)
+					$(document).find(".checkStylebox").prop("disabled", true);
 				}
 			}
 		}, 
@@ -709,6 +709,17 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 	}
 	//Populating Saved Scrape Data
 	
+	//Disabling Filter
+	$("a[title='Filter']").mouseover(function(){
+		if(viewString.view.length == 0){
+			$(this).children("img").addClass("thumb-ic-disabled").removeClass("thumb-ic");
+			$(this).parent().css("cursor", "no-drop");
+		}
+		else{
+			$(this).children("img").addClass("thumb-ic").removeClass("thumb-ic-disabled");
+			$(this).parent().css("cursor", "pointer");
+		}
+	})
 	
 	//Initialization for apptype(Desktop, Mobility, OEBS) to redirect on initScraping function
 	$scope.initScrape = function(e){
@@ -1572,7 +1583,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		})
 		if(flag == "true"){
 			var customObj = [];
-			
+			window.localStorage['disableEditing'] = "true";
 			//Pushing custom object in array
 			$.each($(".addObj-row"), function(){
 				customObj.push({
@@ -1959,11 +1970,21 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				for(var i=0; i<mydata.length;i++){
 					//new to parse str to int (step No)
 					if(mydata[i].hasOwnProperty("_id_")){
-						if(mydata[i]._id_.indexOf('jpg') !== -1){
+						if(mydata[i]._id_.indexOf('jpg') !== -1 || mydata[i]._id_.indexOf('jqg') !== -1){
 							var index = mydata.indexOf(mydata[i]);
 							mydata.splice(index, 1)
 						}
 					}
+				}
+				
+				for(var i=0; i<mydata.length;i++){
+					//new to parse str to int (step No)
+					/*if(mydata[i].hasOwnProperty("_id_")){
+						if(mydata[i]._id_.indexOf('jpg') !== -1 || mydata[i]._id_.indexOf('jqg') !== -1){
+							var index = mydata.indexOf(mydata[i]);
+							mydata.splice(index, 1)
+						}
+					}*/
 			//		else{
 						if(mydata[i].url == undefined){mydata[i].url="";}
 						mydata[i].stepNo = i+1;
@@ -2433,14 +2454,16 @@ function contentTable(newTestScriptDataLS) {
 	function editRow(id,status,e) {
 		if (id && id !== lastSelection) {
 			var grid = $("#jqGrid");
-
-			var selectedText = grid.jqGrid('getRowData',id).custname;
-			var selectedKeyword = grid.jqGrid('getRowData', id).keywordVal;
-			grid.jqGrid('restoreRow',lastSelection);                        
-			grid.jqGrid('editRow',id, {keys: true} );
-			setKeyword(e,selectedText,grid,selectedKeyword);
-			lastSelection = id;
-			window.localStorage['selectRowStepNo'] = id;
+			if(grid[0].children[0].children[id].children[1].children[0].checked){
+				var selectedText = grid.jqGrid('getRowData',id).custname;
+				var selectedKeyword = grid.jqGrid('getRowData', id).keywordVal;
+				grid.jqGrid('restoreRow',lastSelection);                        
+				grid.jqGrid('editRow',id, {keys: true} );
+				setKeyword(e,selectedText,grid,selectedKeyword);
+				lastSelection = id;
+				window.localStorage['selectRowStepNo'] = id;
+			}
+			//else return false;
 		}
 		else{
 			var grid = $("#jqGrid");
@@ -3417,8 +3440,11 @@ function editTestCaseRow(){
 function copyTestStep(){
 	window.localStorage['emptyTestStep'] = "false";
 	var taskInfo = JSON.parse(window.localStorage['_CT']);
-	if(!$(document).find(".cbox:checked").parent().parent("tr").hasClass("ui-state-highlight")){
-		openDialog("Copy Testcase step", "Select step to copy")
+	if(($(document).find(".ui-state-highlight").length <= 0 && $('#jqGrid tbody tr.ui-widget-content').children('td:nth-child(4)').text().trim() == "") || ($(document).find(".ui-state-highlight").length == 1 && $(document).find(".ui-state-highlight").children('td:nth-child(4)').text().trim() == "")){
+		openDialog("Copy step", "Empty step can not be copied.")
+	}
+	else if(!$(document).find(".cbox:checked").parent().parent("tr").hasClass("ui-state-highlight")){
+		openDialog("Copy step", "Select step to copy")
 	}
 	else{
 		getSelectedRowData = [];
@@ -3659,7 +3685,13 @@ function pasteInGrid(){
 
 //Commenting TestScript Row
 function commentStep(){
-	if($(document).find(".ui-state-highlight").length > 0){
+	if($('#jqGrid tbody tr.ui-widget-content').length <= 0){
+		openDialog("Comment step", "No steps to comment")
+	}
+	else if(($(document).find(".ui-state-highlight").length <= 0 && $('#jqGrid tbody tr.ui-widget-content').children('td:nth-child(4)').text().trim() == "") || ($(document).find(".ui-state-highlight").length == 1 && $(document).find(".ui-state-highlight").children('td:nth-child(4)').text().trim() == "")){
+		openDialog("Comment step", "Empty step can not be commented.")
+	}
+	else if($(document).find(".ui-state-highlight").length > 0 && $(document).find(".ui-state-highlight").children('td:nth-child(4)').text().trim() != ""){
 		var getOutputVal = $(document).find(".ui-state-highlight").children("td[aria-describedby='jqGrid_outputVal']").text();
 		if(!getOutputVal.match("##") && !getOutputVal.match(";##")){
 			var myData = $("#jqGrid").jqGrid('getGridParam','data')

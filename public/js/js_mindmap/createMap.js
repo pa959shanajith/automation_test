@@ -7,9 +7,6 @@ function loadMindmapData(){
 	dataSender({task:'populateProjects',user_id:userid},function(err,result){
 		if(err) console.log(result);
 		else{
-			
-			
-	
 			result1=JSON.parse(result);
 			$(".project-list").empty();
 			for(i=0; i<result1.projectId.length && result1.projectName.length; i++){
@@ -22,8 +19,6 @@ function loadMindmapData(){
             //alert($(".project-list").val());
 			loadMindmapData1();
 			});
-			
-       
 		}
 	});
 }
@@ -51,8 +46,7 @@ function loadMindmapData1(){
 	if(svgTileLen == 0)
 	{
 		$('#ct-mapSvg, #ct-canvas').empty();
-		$('#ct-canvas').append('<div class="ct-tileBox">             <div class="ct-tile">                <svg class="ct-svgTile" height="150px" width="150px">                   <g>                      <circle cx="75" cy="75" r="30"></circle>                      <path d="M75,55L75,95"></path>                      <path d="M55,75L95,75"></path>                   </g>                </svg>             </div>             <span class="ct-text">Create Mindmap</span>          </div>');
-			 
+		$('#ct-canvas').append('<div class="ct-tileBox"><div class="ct-tile"><svg class="ct-svgTile" height="150px" width="150px"><g><circle cx="75" cy="75" r="30"></circle><path d="M75,55L75,95"></path><path d="M55,75L95,75"></path></g></svg></div><span class="ct-text">Create Mindmap</span></div>');
 			// svgTileG.append('circle').attr('cx',75).attr('cy',75).attr('r',30);
 			// svgTileG.append('path').attr('d','M75,55L75,95');
 			// svgTileG.append('path').attr('d','M55,75L95,75');
@@ -250,20 +244,18 @@ var addTask = function(e){
 			taskflag=true;
 			dNodes[pi].task={id:tObj.id,oid:tObj.oid,task:tObj.t,assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,details:tObj.det,parent:(tObj.parent!=null)?tObj.parent:[modid,tscid,scrid,tcid]};
 		}
-		
 	}
 	if (taskflag){
 		if(p.select('.ct-nodeTask')[0][0]==null) p.append('image').attr('class','ct-nodeTask').attr('xlink:href','images_mindmap/node-task-assigned.png').attr('x',29).attr('y',-10);
 	}else if(taskflag==false){
-		$('#Mindmap_assign_error').modal('show');
-		//alert('Error ! Please create the structure before Task Assignement');
+		openDialogMindmap("Task Assignment Error", "Please create the structure before assigning task")
+		//$('#Mindmap_assign_error').modal('show');
 	}
 	if (errorRelCyc){
-		$('#Mindmap_rel_cycle_error').modal('show');
+		openDialogMindmap("Task Assignment Error", "Please select Release/Cycle")
+		//$('#Mindmap_rel_cycle_error').modal('show');
 	}
 };
-
-
 
 var nodeClick = function(e){
 	e=e||window.event;
@@ -290,9 +282,6 @@ var nodeClick = function(e){
 		tObj.t=taskAssign[t].task[0];
 	}
 	$("#ct-assignTask option[value='" + tObj.t + "']").attr('selected', 'selected'); 
-								
-						
-							
 
 	// w=v.append('div').attr('class','ct-assignItem btn-group dropdown fl-right');
 	// w.append('button').attr('class','ct-asValBox btn dropdown-toggle').attr('data-toggle','dropdown').append('a').attr('id','ct-assignTask').html(tObj.t);
@@ -303,8 +292,7 @@ var nodeClick = function(e){
 	taskAssign[t].attributes.forEach(function(tk){
 		v=u.append('li');
 		
-		if(tk=='at'){
-			
+		if(tk=='at'){			
 			var result1 = {};
 			v.append('span').attr('class','ct-assignItem fl-left').html('Assigned to');
 			var d = v.append('select').attr('id','ct-assignedTo');//.attr('class','assignedTo')
@@ -319,9 +307,7 @@ var nodeClick = function(e){
 						for(i=0; i<result1.userRoles.length && result1.r_ids.length; i++){
 							$('#ct-assignedTo').append("<option data-id='"+result1.userRoles[i]+"' value='"+result1.r_ids[i]+"'>"+result1.userRoles[i]+"</option>");	
 						}
-							$("#ct-assignedTo option[value='" + tObj.at + "']").attr('selected', 'selected'); 
-					
-					
+							$("#ct-assignedTo option[value='" + tObj.at + "']").attr('selected', 'selected');					
 				}
 				
 			});
@@ -767,8 +753,8 @@ var actionEvent = function(e){
 	var error=!1,mapData=[],flag=0,alertMsg;
 	error=treeIterator(mapData,dNodes[0],error);
 	if(error){
-		//alert('Mindmap flow must be complete!\nModules>Scenarios>Screens>Testcases');
-		$('#Mindmap_error').modal('show');
+		openDialogMindmap("Error", "Mindmap flow must be complete!<br />Modules -> Scenarios -> Screens -> Testcases")
+		//$('#Mindmap_error').modal('show');
 		return;
 	}
 	if(s.attr('id')=='ct-saveAction'){
@@ -815,7 +801,8 @@ var actionEvent = function(e){
 			populateDynamicInputList();
 			clearSvg();
 			treeBuilder(allMMaps[mid]);
-			$('#Mindmap_save').modal('show');
+			openDialogMindmap("Success", "Data saved successfully");
+			//$('#Mindmap_save').modal('show');
 		}
 if(flag==20){
 	var res=JSON.parse(result);
@@ -840,7 +827,8 @@ if(flag==20){
 				});
 		});
 	});
-	$('#Mindmap_create').modal('show');
+	    openDialogMindmap("Success", "Structure created successfully");
+	//$('#Mindmap_create').modal('show');
   }
 
 		}
@@ -946,3 +934,13 @@ var dataSender = function(data,callback){
 	xhttp.setRequestHeader("Content-Type", "application/json");
 	xhttp.send(JSON.stringify(data));
 };
+
+//Dialog used through out mindmap
+function openDialogMindmap(title, body){
+	$("#mindmapGlobalDialog").find('.modal-title').text(title);
+    $("#mindmapGlobalDialog").find('.modal-body p').text(body).css('color','black');
+	$("#mindmapGlobalDialog").modal("show");
+	setTimeout(function(){
+		$("#mindmapGlobalDialog").find('.btn-default').focus();					
+	}, 300);
+}

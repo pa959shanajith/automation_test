@@ -23,9 +23,11 @@ mySPA.controller('mindmapController', ['$scope', '$http', '$location', '$timeout
            $(".left-sec-mindmap").show();
            if($('#right-dependencies-section').is(':visible')){
                 $("#ct-moduleBox").css({'left':'147px','width':'83%'})
+                $(".ct-tileBox").css({'left':'50%'})
            }
            else{
                $("#ct-moduleBox").css({'left':'147px','width':'100%'})
+               $(".ct-tileBox").css({'left':'52% !important'})
            }
            
     });
@@ -33,34 +35,42 @@ mySPA.controller('mindmapController', ['$scope', '$http', '$location', '$timeout
            $(".left-sec-mindmap").hide();
            if($('#right-dependencies-section').is(':visible')){
                $("#ct-moduleBox").css({'left':'0','width':'94%'})
+               $(".ct-tileBox").css({'left':'50%'})
            }
            else{
                $("#ct-moduleBox").css({'left':'0','width':'100%'})
+               $(".ct-tileBox").css({'left':'52% !important'})
            }
     });
     $("#ct-expand-right").click(function(e) {
+    	var flg = false;
          e.preventDefault()
          $(".rsSlide").toggle(5, function(){
              $(this).siblings("#ct-expand-right").toggleClass("ct-collapse-right");
-             if($(".left-sec-mindmap").is(':visible')){
-                 $("#ct-moduleBox").css({'z-index':'0','width':'89%'})
+             if($(".left-sec-mindmap").is(':visible') && $('#right-dependencies-section').is(':visible')){
+            	 $("#ct-moduleBox").css({'width':''})
+            	 flg = true;
+                 $(".ct-tileBox").css({'left':'50%'})
              }
              else{
-                 $("#ct-moduleBox").css({'width':'100%'})
+                 $("#ct-moduleBox").css({'z-index':'0','width':'100%'})
+                 $(".ct-tileBox").css({'left':'52% !important'})
              }
+             if(flg)	$("#ct-moduleBox").css({'z-index':'0','width':'82% !important'})
          });
     });
 
     $scope.createMapsCall = function(e){
-    	$('.selectProject').show();
         if($scope.tab=='tabRequirement'){
+        	$('.selectProject').hide();
             $("img.selectedIcon").removeClass("selectedIcon");
             $('#reqImg').addClass('selectedIcon');
         }
         else{
             if ($scope.tab=='tabCreate'){
-                 $("img.selectedIcon").removeClass("selectedIcon");
-		         $('#createImg').addClass('selectedIcon');
+            	$('.selectProject').show();
+                $("img.selectedIcon").removeClass("selectedIcon");
+		        $('#createImg').addClass('selectedIcon');
             }else if($scope.tab=='tabAssign'){
                 $("img.selectedIcon").removeClass("selectedIcon");
 		        $('#assignImg').addClass('selectedIcon');

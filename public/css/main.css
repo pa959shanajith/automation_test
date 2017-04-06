@@ -1249,7 +1249,7 @@ input[disabled]{
     -webkit-transition: 0.2s ease-in-out;
 }
 
-.thumb-ic {
+.thumb-ic, .thumb-ic-disabled {
     padding: 10px;
 }
 

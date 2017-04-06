@@ -149,6 +149,7 @@ mySPA.controller('scheduleController',['$scope','$http','$timeout','$location','
 	//Submit Task Scheduling
 	$scope.submitTaskScheduling = function(){
 		$("#submitTasksdScheduling").modal("show")
+		$('#submitTasksdScheduling').find('.btn-default-yes').focus();
 	}
 	//Submit Task Scheduling
 	
