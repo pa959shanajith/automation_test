@@ -1214,6 +1214,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					$("#launchSAPApps").modal("hide");
 					blockUI(blockMsg);
 				}
+			}
 			
 			//For Mobility
 			else if($scope.getScreenView == "Mobility"){
@@ -3751,10 +3752,10 @@ function commentStep(){
 	if($('#jqGrid tbody tr.ui-widget-content').length <= 0){
 		openDialog("Comment step", "No steps to comment")
 	}
-	else if(($(document).find(".ui-state-highlight").length <= 0 && $('#jqGrid tbody tr.ui-widget-content').children('td:nth-child(4)').text().trim() == "") || ($(document).find(".ui-state-highlight").length == 1 && $(document).find(".ui-state-highlight").children('td:nth-child(4)').text().trim() == "")){
+	else if(($(document).find(".ui-state-highlight").length <= 0 && $('#jqGrid tbody tr.ui-widget-content').children('td:nth-child(5)').text().trim() == "") || ($(document).find(".ui-state-highlight").length == 1 && $(document).find(".ui-state-highlight").children('td:nth-child(5)').text().trim() == "")){
 		openDialog("Comment step", "Empty step can not be commented.")
 	}
-	else if($(document).find(".ui-state-highlight").length > 0 && $(document).find(".ui-state-highlight").children('td:nth-child(4)').text().trim() != ""){
+	/*else if($(document).find(".ui-state-highlight").length > 0 && $(document).find(".ui-state-highlight").children('td:nth-child(5)').text().trim() != ""){
 		var getOutputVal = $(document).find(".ui-state-highlight").children("td[aria-describedby='jqGrid_outputVal']").text();
 		if(!getOutputVal.match("##") && !getOutputVal.match(";##")){
 			var myData = $("#jqGrid").jqGrid('getGridParam','data')
@@ -3841,6 +3842,41 @@ function commentStep(){
 				}
 			});
 		}
+	}*/
+	else if($(document).find(".ui-state-highlight").length > 0){
+		var myData = $("#jqGrid").jqGrid('getGridParam','data')
+		$(document).find(".ui-state-highlight").each(function(){
+			for(i=0; i<myData.length; i++){
+				if(myData[i].stepNo == parseInt($(this).children('td:nth-child(1)').text().trim())){
+					//Check whether output coloumn is empty
+					if($(this).children('td:nth-child(8)').text().trim() == ""){
+						myData[i].outputVal = "##";
+						$("#jqGrid").trigger("reloadGrid");
+					}
+					else{
+						//Check whether output coloumn has some value
+						if($(this).children('td:nth-child(8)').text().trim() != "") {
+							//If already commented but no additional value
+							if($(this).children('td:nth-child(8)').text().trim() == "##"){
+								myData[i].outputVal = "";
+								$("#jqGrid").trigger("reloadGrid");
+							}
+							//If already commented and contains additional value
+							else if($(this).children('td:nth-child(8)').text().trim().indexOf(";##") !== -1){
+								var lastTwo = myData[i].outputVal.substr(myData[i].outputVal.length - 3);
+								myData[i].outputVal = myData[i].outputVal.replace(lastTwo,"");
+								$("#jqGrid").trigger("reloadGrid");
+							}
+							//If contains value but not commented
+							else{
+								myData[i].outputVal = myData[i].outputVal.concat(";##");
+								$("#jqGrid").trigger("reloadGrid");
+							}
+						}
+					}
+				}
+			}
+		});
 	}
 	else{
 		openDialog("Skip Testcase step", "Please select step to skip")
