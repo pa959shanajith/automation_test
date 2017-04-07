@@ -581,6 +581,25 @@
 		</div>
 	</div>
 	<!-- Desktop Launch Popup -->
+		
+	<!-- SAP Launch Popup -->
+	<div class="modal fade" id="launchSAPApps" role="dialog" data-keyboard="false" data-backdrop="static">
+		<div class="modal-dialog modal-md">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal">&times;</button>
+					<h4 class="modal-title">Launch Application</h4>
+				</div>
+				<div class="modal-body">
+					<p><input class='launchPopupInput form-control' type='text' placeholder='Enter the .exe path;App Name' id='SAPPath'/></p>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default btn-default-modal" ng-click="initScraping($event)">Launch</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- SAP Launch Popup -->
 	
 	<!-- OEBS Launch Popup -->
 	<div class="modal fade" id="launchOEBSApps" role="dialog" data-keyboard="false" data-backdrop="static">
