@@ -481,9 +481,9 @@ function createCycle(createCycleQuery,createCycleCallback){
 	});
 };
 
-//update project
+//Update Project
 exports.updateProject_ICE = function updateProject_ICE(req, res){
-		//updateProject
+	console.log(req.body);
 };
 
 /**

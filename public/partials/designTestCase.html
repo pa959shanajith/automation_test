@@ -7,23 +7,77 @@
 	<!--Left Panel-->
 	<div id="left-nav-section">
 		<div class="scrollbar-macosx">
-			<div id="left-top-section" ng-if="getScreenView == 'Web' || getScreenView == 'Desktop' || getScreenView == 'Mobility' || getScreenView == 'Webservice'">
+			<!-- Web -->
+			<div id="left-top-section" ng-if="getScreenView == 'Web'">
 				<ul>
 					<li><span><a class='scrapeOnTxt'>Debug On</a></span></li>
-					<li><a href='#'  ng-click="debugTestCase_ICE('3');" title="Debug on Internet Explorer"><span><img src='imgs/ic-ie.png' alt='Internet Explorer' /></span>Internet Explorer</a></li>
-					<li><a href='#'  ng-click="debugTestCase_ICE('1');" title="Debug on Chrome"><span><img src='imgs/ic-chrome.png' alt='Google Chrome' /></span>Google Chrome</a></li>
-					<li><a href='#'  ng-click="debugTestCase_ICE('2');" title="Debug on Firefox"><span><img src='imgs/ic-mozilla.png' alt='Mozilla Firefox' /></span>Mozilla Firefox</a></li>
-					<li class="last"  title="Add Dependent Test Cases"><span style="margin-bottom:-5px"><input id="addDependent" type='checkbox' value="" disabled></span><label for="addDependent">Add Dependent Test Cases</label></li>
+					<li><a href='#' ng-click="debugTestCase_ICE('3');" title="Debug on Internet Explorer"><span><img src='imgs/ic-ie.png' alt='Internet Explorer' /></span>Internet Explorer</a></li>
+					<li><a href='#' ng-click="debugTestCase_ICE('1');" title="Debug on Chrome"><span><img src='imgs/ic-chrome.png' alt='Google Chrome' /></span>Google Chrome</a></li>
+					<li><a href='#' ng-click="debugTestCase_ICE('2');" title="Debug on Firefox"><span><img src='imgs/ic-mozilla.png' alt='Mozilla Firefox' /></span>Mozilla Firefox</a></li>
+					<li class="last" title="Add Dependent Test Cases"><span style="margin-bottom:-5px"><input id="addDependent" type='checkbox' value="" disabled></span><label for="addDependent">Add Dependent Test Cases</label></li>
 				</ul>
 			</div>
+			<!-- Web -->
 			
+			<!-- DesktopJava -->
+			<div id="left-top-section" ng-if="getScreenView == 'DesktopJava'" class="ApptypeScreenView">
+				<ul>
+					<li><span><a class='scrapeOnTxt'>Debug On</a></span></li>
+					<li><a href='#' ng-click="debugTestCase_ICE('1');" title="OEBS Apps"><span><img src='imgs/ic-desktop.png' alt='OEBS Apps' /></span>OEBS Apps</a></li>
+					<li class="last" title="Add Dependent Test Cases"><span style="margin-bottom:-5px"><input id="addDependent" type='checkbox' value="" disabled></span><label for="addDependent">Add Dependent Test Cases</label></li>
+				</ul>
+			</div>
+			<!-- DesktopJava -->
+			
+			<!-- Desktop -->
+			<div id="left-top-section" ng-if="getScreenView == 'Desktop'" class="ApptypeScreenView">
+				<ul>
+					<li><span><a class='scrapeOnTxt'>Debug On</a></span></li>
+					<li><a href='#' ng-click="debugTestCase_ICE('1');" title="Desktop Apps"><span><img src='imgs/ic-desktop.png' alt='Desktop Apps' /></span>Desktop Apps</a></li>
+					<li class="last" title="Add Dependent Test Cases"><span style="margin-bottom:-5px"><input id="addDependent" type='checkbox' value="" disabled></span><label for="addDependent">Add Dependent Test Cases</label></li>
+				</ul>
+			</div>
+			<!-- Desktop -->
+			
+			<!-- SAP -->
+			<div id="left-top-section" ng-if="getScreenView == 'SAP'" class="ApptypeScreenView">
+				<ul>
+					<li><span><a class='scrapeOnTxt'>Debug On</a></span></li>
+					<li><a href='#' ng-click="debugTestCase_ICE('1');" title="SAP Apps"><span><img src='imgs/ic-desktop.png' alt='SAP Apps' /></span>SAP Apps</a></li>
+					<li class="last" title="Add Dependent Test Cases"><span style="margin-bottom:-5px"><input id="addDependent" type='checkbox' value="" disabled></span><label for="addDependent">Add Dependent Test Cases</label></li>
+				</ul>
+			</div>
+			<!-- SAP -->
+			
+			<!-- Webservice -->
+			<div id="left-top-section" ng-if="getScreenView == 'Webservice'" class="ApptypeScreenView">
+				<ul>
+					<li><span><a class='scrapeOnTxt'>Debug On</a></span></li>
+					<li><a href='#' ng-click="debugTestCase_ICE('1');" title="Web Services"><span><img src='imgs/ic-webservice.png' alt='Webservices' /></span>Web Services</a></li>
+					<li class="last" title="Add Dependent Test Cases"><span style="margin-bottom:-5px"><input id="addDependent" type='checkbox' value="" disabled></span><label for="addDependent">Add Dependent Test Cases</label></li>
+				</ul>
+			</div>
+			<!-- Webservice -->
+			
+			<!-- Mobility -->
+			<div id="left-top-section" ng-if="getScreenView == 'Mobility'" class="ApptypeScreenView">
+				<ul>
+					<li><span><a class='scrapeOnTxt'>Debug On</a></span></li>
+					<li><a href='#' ng-click="debugTestCase_ICE('1');" title="Android Apps"><span><img src='imgs/ic-mobility.png' alt='Android Apps' /></span>Android Apps</a></li>
+					<li class="last" title="Add Dependent Test Cases"><span style="margin-bottom:-5px"><input id="addDependent" type='checkbox' value="" disabled></span><label for="addDependent">Add Dependent Test Cases</label></li>
+				</ul>
+			</div>
+			<!-- Mobility -->
+			
+			<!-- Mobile Web -->
 			<div id="left-top-section" ng-if="getScreenView == 'mobileweb'" class="ApptypeScreenView">
 				<ul>
 					<li><span><a class='scrapeOnTxt'>Debug On</a></span></li>
-					<li><a href='#'  ng-click="debugTestCase_ICE();" title="Debug on Chrome"><span><img src='imgs/ic-chrome.png' alt='Google Chrome' /></span>Google Chrome</a></li>
+					<li><a href='#'  ng-click="debugTestCase_ICE();" title="Android Web"><span><img src='imgs/ic-mobility.png' alt='Android Web' /></span>Android Web</a></li>
 					<li class="last"  title="Add Dependent Test Cases"><span style="margin-bottom:-5px"><input id="addDependent" type='checkbox' value="" disabled></span><label for="addDependent">Add Dependent Test Cases</label></li>
 				</ul>
 			</div>
+			<!-- Mobile Web -->
 			
 			<div class='clear-both'></div>
 			
