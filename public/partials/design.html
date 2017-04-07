@@ -29,6 +29,16 @@
 			</div>
 			<!-- Apptype Desktop -->
 			
+			<!-- Apptype SAP -->
+			<div ng-if="getScreenView == 'SAP'" id="left-top-section" class="ApptypeScreenView">
+				<ul>
+					<li><span><a class='scrapeOnTxt'>Scrape On</a></span></li>
+					<li><a href='#'  title="SAP Apps" ng-class="enbledChecked ? 'enableActions' : 'disableActions'" data-toggle="modal" ng-click="initScrape($event); $event.preventDefault(); $event.stopPropagation();"><span><img src='imgs/ic-desktop.png' alt='SAP Apps' /></span>SAP Apps</a></li>
+					<li class="last"  title="Append Objects"><span style="margin-bottom:-5px"><input ng-model="enbledChecked" id="enableAppend" type='checkbox' value=""></span><label for="enableAppend">Append</label></li>
+				</ul>
+			</div>
+			<!-- Apptype SAP -->
+			
 			<!-- Apptype OEBS -->
 			<div ng-if="getScreenView == 'DesktopJava'" id="left-top-section" class="ApptypeScreenView">
 				<ul>
