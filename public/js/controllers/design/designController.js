@@ -737,6 +737,11 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				$(document).find("#OEBSPath").val('');
 				$(document).find("#OEBSPath").removeClass("inputErrorBorder");
 			}
+			else if($scope.getScreenView == "SAP"){
+				$("#launchSAPApps").modal("show")
+				$(document).find("#SAPPath").val('')
+				$(document).find("#SAPPath").removeClass("inputErrorBorder");
+			}
 			else if($scope.getScreenView == "Mobility"){
 				$("#launchMobilityApps").modal("show")
 				$(document).find("#mobilityAPKPath, #mobilitySerialPath").val('')
@@ -1196,6 +1201,19 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				}
 			}
 			//For Desktop
+			//For SAP
+			else if($scope.getScreenView == "SAP"){
+				if($(document).find("#SAPPath").val() == "") {
+					$(document).find("#SAPPath").addClass("inputErrorBorder")
+					return false
+				}
+				else{
+					$(document).find("#SAPPath").removeClass("inputErrorBorder")
+					screenViewObject.appType = $scope.getScreenView,
+					screenViewObject.applicationPath = $(document).find("#SAPPath").val();
+					$("#launchSAPApps").modal("hide");
+					blockUI(blockMsg);
+				}
 			
 			//For Mobility
 			else if($scope.getScreenView == "Mobility"){
@@ -2936,6 +2954,51 @@ function contentTable(newTestScriptDataLS) {
 						$grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
 						break;
 					}
+					//adding for SAP
+					else if(appTypeLocal == 'SAP' &&(obType =='GuiTextField' ||obType =='GuiTitlebar' ||obType =='GuiButton' ||obType =='GuiUserArea'||obType =='GuiRadioButton' 
+					    ||obType =='GuiLabel' ||obType =='GuiBox' ||obType =='GuiSimpleContainer' ||obType =='GuiPasswordField'||obType=='GuiComboBox'||obType=='GuiCheckBox'
+						||obType =='GuiStatusbar' ||obType =='GuiStatusPane' ||obType =='text' ||obType =='combo_box' || obType =='list_item' 
+						|| obType =='hyperlink' || obType =='lbl'||obType =='list' || obType == 'edit' || obType == null || obType == 'check_box' 
+						|| obType == 'radio_button' ||obType != undefined)){
+						var res = '';
+						var sc;
+						var listType = '';
+						if(obType =='push_button' ||obType =='GuiButton' )	{sc = Object.keys(keywordArrayList.button);selectedKeywordList = "button";}		
+						else if(obType =='GuiTextField'){	sc = Object.keys(keywordArrayList.input);selectedKeywordList = "input";}
+						else if(obType =='GuiLabel'){	sc = Object.keys(keywordArrayList.input);selectedKeywordList = "element";}
+						else if(obType =='GuiPasswordField'){	sc = Object.keys(keywordArrayList.input);selectedKeywordList = "input";}
+						else if(obType =='GuiPasswordField'){	sc = Object.keys(keywordArrayList.input);selectedKeywordList = "input";}
+						else if(obType =='combo_box'||obType =='GuiBox'|| obType=='GuiComboBox'){	sc = Object.keys(keywordArrayList.select);selectedKeywordList = "select";}
+						else if(obType =='list_item')	{sc = Object.keys(keywordArrayList.list);selectedKeywordList = "list";}
+						else if (obType == 'list_item' || obType == 'list') {
+							if (listType == 'true') {
+								sc = Object.keys(keywordArrayList.list);
+								selectedKeywordList = "list";
+							} else {
+								sc = Object.keys(keywordArrayList.select);
+								selectedKeywordList = "select";
+							}
+						}
+						else if(obType =='check_box'||obType=='GuiCheckBox'){	sc = Object.keys(keywordArrayList.checkbox);selectedKeywordList = "checkbox";}
+						else if(obType == 'radio_button '||obType =='GuiRadioButton')	{sc = Object.keys(keywordArrayList.radiobutton);selectedKeywordList = "radiobutton";}
+						else if(obType =='hyperlink' || obType =='lbl'){	sc = Object.keys(keywordArrayList.link);selectedKeywordList = "link";}
+						else	{sc = Object.keys(keywordArrayList.element);selectedKeywordList = "element";}
+						for(var i = 0; i < sc.length; i++){
+							if(selectedKeyword == sc[i]){
+								res += '<option role="option" value="' + sc[i]+'" selected>' + sc[i] + '</option>';
+							}
+							else
+								res += '<option role="option" value="' + sc[i]+'">' + sc[i] + '</option>';
+						}
+						var row = $(e.target).closest('tr.jqgrow');
+						var rowId = row.attr('id');
+						$("select#" + rowId + "_keywordVal", row[0]).html(res);
+						selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
+						$grid.jqGrid('setCell', rowId, 'url', url);
+						$grid.jqGrid('setCell', rowId, 'objectName', objName); 
+						$grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
+						break;
+					}
 					else if (appTypeLocal == 'Mobility'
 						&& (obType.includes("RadioButton") || obType.includes("ImageButton") || obType.includes("Button") || obType.includes("EditText") 
 								|| obType.includes("Switch") || obType.includes("CheckBox") || obType.includes("Spinner") || obType.includes("TimePicker") || obType.includes("DatePicker") || obType.includes("NumberPicker") || obType.includes("RangeSeekBar") || obType.includes("SeekBar") || obType.includes("ListView"))) {
@@ -3831,6 +3894,11 @@ function getTags(data) {
 			obnames.push("@Generic");
 			obnames.push("@MobileiOS");
 		}
+		else if(appTypeLocal == "SAP")	{
+			obnames.push("@Generic");
+			obnames.push("@Sap");
+			
+					}
 	for (var i=0; i<data.length; i++){
 		obnames.push(data[i].custname);
 	}
