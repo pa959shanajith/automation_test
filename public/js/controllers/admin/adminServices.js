@@ -107,5 +107,15 @@ mySPA.factory('adminServices', ['$http', '$q', function ($http, $q) {
             .then(function (response) { return response.data; },
             function (response) { return $q.reject(response.data); });
         },
+		getDetails_ICE: function (idtype,requestedids) {
+            var param = "getDetails_ICE";
+            return $http.post('/getDetails_ICE', {
+				param:param,
+				idtype:idtype,
+				requestedids:requestedids
+            })
+            .then(function (response) { return response.data; },
+            function (response) { return $q.reject(response.data); });
+        }
     };
 }]);

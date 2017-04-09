@@ -98,7 +98,11 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 						$("#dateDESC").show();
 					}				
 				}
-				else tableContainer.find('tbody').empty();
+				else {
+					tableContainer.find('tbody').empty();
+					$("#dateDESC").hide();
+					$("#dateASC").hide();
+				}
 			}
 			$('.progress-bar-success, .progress-bar-danger, .progress-bar-warning, .progress-bar-norun').css('width','0%');
 			$('.passPercent, .failPercent, .terminatePercent, .incompletePercent').text('');
