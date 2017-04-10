@@ -69,11 +69,12 @@ exports.initScraping_ICE = function (req, res) {
 	}
 	else if(req.body.screenViewObject.appType == "DesktopJava"){
 		var applicationPath = req.body.screenViewObject.applicationPath;
-		var data = "LAUNCH OEBS";
+		var data = "LAUNCH_OEBS";
 		var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 		var mySocket = myserver.allSocketsMap[ip];
 		mySocket._events.scrape = [];               						
-		mySocket.send(data);
+		// mySocket.send(data);
+		mySocket.emit("LAUNCH_OEBS", applicationPath);
 		mySocket.on('scrape', function (data) {
 			res.send(data);
 		});
