@@ -71,7 +71,8 @@ var projectTypes={'41e1c61b-fb17-4eda-a3a7-e1d7578ea166':'Desktop',
 'b2a208a5-8c9d-4a7f-b522-0df14993dbd2':'mobilityweb',
 'ef145edd-5b2a-4452-bfab-0c85dee926ba':'MobilityiOS',
 '07181740-f420-4ea1-bf2b-5219d6535fb5':'Generic',
-'258afbfd-088c-445f-b270-5014e61ba4e2':'Mainframe'
+'258afbfd-088c-445f-b270-5014e61ba4e2':'Mainframe',
+'58acfa14-7936-4bf0-be11-47b0f1578b89':'SAP'
 }
 
 function next_function(resultobj,cb,data){
