@@ -486,11 +486,11 @@ exports.updateProject_ICE = function updateProject_ICE(req, res){
 	console.log(req.body);
 };
 
-/**
+/***
  * vishvas.a   
  * service renders the names of all projects in domain/projects
  * cycles
- * date 24/03/2017
+ * date 24.03.2017
  */
 exports.getNames_ICE = function(req, res){
     var requestedidslist=req.body.requestedids;
