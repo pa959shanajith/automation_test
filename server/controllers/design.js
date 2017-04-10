@@ -79,7 +79,7 @@ exports.initScraping_ICE = function (req, res) {
 			res.send(data);
 		});
 	}
-	else if(req.body.screenViewObject.appType == "Mobility"){
+	else if(req.body.screenViewObject.appType == "MobileApp"){
         var apkPath = req.body.screenViewObject.apkPath;
         var serial = req.body.screenViewObject.mobileSerial;
 		var data = "LAUNCH_MOBILE";
@@ -91,7 +91,7 @@ exports.initScraping_ICE = function (req, res) {
 						res.send(data);
 		});
 	}
-	else if(req.body.screenViewObject.appType == "mobileweb"){
+	else if(req.body.screenViewObject.appType == "MobileWeb"){
 		console.log(req.body.screenViewObject)
 		var mobileSerial = req.body.screenViewObject.mobileSerial;
         var androidVersion = req.body.screenViewObject.androidVersion;
