@@ -56,6 +56,17 @@ exports.initScraping_ICE = function (req, res) {
 			res.send(data);
 		});
 	}
+	else if(req.body.screenViewObject.appType == "SAP"){
+		var applicationPath = req.body.screenViewObject.applicationPath;
+		var data = "LAUNCH_SAP";
+		var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+		var mySocket = myserver.allSocketsMap[ip];
+		mySocket._events.scrape = [];               						
+		mySocket.emit("LAUNCH_SAP", applicationPath);
+		mySocket.on('scrape', function (data) {
+			res.send(data);
+		});
+	}
 	else if(req.body.screenViewObject.appType == "DesktopJava"){
 		var applicationPath = req.body.screenViewObject.applicationPath;
 		var data = "LAUNCH OEBS";
