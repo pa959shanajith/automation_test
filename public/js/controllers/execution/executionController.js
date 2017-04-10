@@ -81,7 +81,7 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 
 					row = $("<tr id=\"" + count + "\"/>");
 					$("#executionDataTable").append(row);
-					row.append($("<td class='tabeleCellPadding' style='width:3.9%;' id=\"" + count + "\">"+ count + "</td>"));
+					row.append($("<td class='tabeleCellPadding' style='width:3.7%;' id=\"" + count + "\">"+ count + "</td>"));
 					if(getEachScenario[i].executeStatus == undefined || getEachScenario[i].executeStatus == 0){
 						row.append($("<td class='tabeleCellPadding exe-ExecuteStatus noExe' style='width: 3%; padding-top: 7px !important'><input ng-checked='executeAll' type='checkbox' title='Select to not execute this scenario' class='doNotExecuteScenario d-execute'></td>"));
 					}
@@ -109,7 +109,7 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 				
 				//No Execution Status Marking Red
 				$(".noExe").parent("tr").css({'border-left':'4px solid red'});
-				$(".noExe").prev().css({'width':'3.5%'})
+				$(".noExe").prev().css({'width':'calc(3.9% - 4px)'})
 			}
 			
 			//check parent checkbox by default if all child checkboxes are checked

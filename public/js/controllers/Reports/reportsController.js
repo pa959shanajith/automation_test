@@ -5,7 +5,6 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 	var getUserInfo = JSON.parse(window.localStorage['_UI']);
 	var userID = getUserInfo.user_id;
 	var open = 0;	var openWindow = 0;
-	var counter = 0;
 	var executionId, testsuiteId;
 	$("#page-taskName").empty().append('<span>Reports</span>')
 	cfpLoadingBar.start()
@@ -476,11 +475,12 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 					a.dataset.downloadurl = ['text/json', a.download, a.href].join(':');
 					e.initMouseEvent('click', true, true, window,
 							0, 0, 0, 0, 0, false, false, false, false, 0, null);
-					if(counter == 0)
+					/*if(counter == 0)
 					{
 						a.dispatchEvent(e);
 					}
-					counter++;
+					counter++;*/
+					a.dispatchEvent(e);
 				}
 				
 			}

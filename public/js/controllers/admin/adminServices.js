@@ -1,4 +1,4 @@
-/**
+/***
  * Admin Services 
  */
 mySPA.factory('adminServices', ['$http', '$q', function ($http, $q) {
@@ -115,7 +115,7 @@ mySPA.factory('adminServices', ['$http', '$q', function ($http, $q) {
 				requestedids:requestedids
             })
             .then(function (response) { return response.data; },
-            function (response) { return $q.reject(response.data); });
+           			 function (response) { return $q.reject(response.data); });
         }
     };
 }]);

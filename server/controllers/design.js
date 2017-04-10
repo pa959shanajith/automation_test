@@ -56,18 +56,30 @@ exports.initScraping_ICE = function (req, res) {
 			res.send(data);
 		});
 	}
-	else if(req.body.screenViewObject.appType == "DesktopJava"){
+	else if(req.body.screenViewObject.appType == "SAP"){
 		var applicationPath = req.body.screenViewObject.applicationPath;
-		var data = "LAUNCH OEBS";
+		var data = "LAUNCH_SAP";
 		var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 		var mySocket = myserver.allSocketsMap[ip];
 		mySocket._events.scrape = [];               						
-		mySocket.send(data);
+		mySocket.emit("LAUNCH_SAP", applicationPath);
 		mySocket.on('scrape', function (data) {
 			res.send(data);
 		});
 	}
-	else if(req.body.screenViewObject.appType == "Mobility"){
+	else if(req.body.screenViewObject.appType == "DesktopJava"){
+		var applicationPath = req.body.screenViewObject.applicationPath;
+		var data = "LAUNCH_OEBS";
+		var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+		var mySocket = myserver.allSocketsMap[ip];
+		mySocket._events.scrape = [];               						
+		// mySocket.send(data);
+		mySocket.emit("LAUNCH_OEBS", applicationPath);
+		mySocket.on('scrape', function (data) {
+			res.send(data);
+		});
+	}
+	else if(req.body.screenViewObject.appType == "MobileApp"){
         var apkPath = req.body.screenViewObject.apkPath;
         var serial = req.body.screenViewObject.mobileSerial;
 		var data = "LAUNCH_MOBILE";
@@ -79,7 +91,7 @@ exports.initScraping_ICE = function (req, res) {
 						res.send(data);
 		});
 	}
-	else if(req.body.screenViewObject.appType == "mobileweb"){
+	else if(req.body.screenViewObject.appType == "MobileWeb"){
 		console.log(req.body.screenViewObject)
 		var mobileSerial = req.body.screenViewObject.mobileSerial;
         var androidVersion = req.body.screenViewObject.androidVersion;

@@ -239,7 +239,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		testcaseID.push(taskInfo.testCaseId);
 		var browserType = [];
 		browserType.push(selectedBrowserType)
-		if(appType == "mobileweb") browserType = [];
+		if(appType == "MobileWeb") browserType = [];
 		globalSelectedBrowserType = selectedBrowserType;
 		if(jQuery("#addDependent").is(":checked"))	triggerPopUp();
 
@@ -642,6 +642,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		.then(function(data){
 			gsElement = [];
 			$(".popupWrap").animate({ opacity: 0, right: "70px" }, 100).css({'z-index':'0','pointer-events':'none'});
+			$(".filterObjects").removeClass("popupContent-filter-active").addClass("popupContent-default");
 			$(".thumb-ic").removeClass("thumb-ic-highlight");
 			if(data != null && data != "getScrapeData Fail."){
 				viewString = data;
@@ -742,13 +743,13 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				$(document).find("#SAPPath").val('')
 				$(document).find("#SAPPath").removeClass("inputErrorBorder");
 			}
-			else if($scope.getScreenView == "Mobility"){
+			else if($scope.getScreenView == "MobileApp"){
 				$("#launchMobilityApps").modal("show")
 				$(document).find("#mobilityAPKPath, #mobilitySerialPath").val('')
 				$(document).find("#mobilityAPKPath, #mobilitySerialPath").removeClass("inputErrorBorder");
 				$(".androidIcon").removeClass("androidIconActive")
 			}
-			else if($scope.getScreenView == "mobileweb"){
+			else if($scope.getScreenView == "MobileWeb"){
 				$("#launchMobilityWeb").modal("show")
 				$(document).find("#mobilityWebSerialNo, #mobilityAndroidVersion").val('')
 				$(document).find("#mobilityWebSerialNo, #mobilityAndroidVersion").removeClass("inputErrorBorder");
@@ -1102,6 +1103,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		$("#wsldInput").removeClass("inputErrorBorderFull")
 		var wsdlUrl = $("#wsldInput").val()
 		if(!wsdlUrl) $("#wsldInput").addClass("inputErrorBorderFull")
+		else if(wsdlUrl.indexOf(".svc?wsdl") <= 0 || wsdlUrl.indexOf(".asmx?wsdl") <= 0)	$("#wsldInput").addClass("inputErrorBorderFull")
 		else {
 			blockUI(blockMsg);
 			DesignServices.launchWSDLGo(wsdlUrl)
@@ -1217,7 +1219,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			}
 			
 			//For Mobility
-			else if($scope.getScreenView == "Mobility"){
+			else if($scope.getScreenView == "MobileApp"){
 				if($(document).find("#mobilityAPKPath").val() == ""){
 					$(document).find("#mobilityAPKPath").addClass("inputErrorBorder")
 					return false
@@ -1238,7 +1240,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			//For Mobility
 			
 			//For Mobility Web
-			else if($scope.getScreenView == "mobileweb"){
+			else if($scope.getScreenView == "MobileWeb"){
 				if($(document).find("#mobilityWebSerialNo").val() == ""){
 					$(document).find("#mobilityWebSerialNo").addClass("inputErrorBorder")
 					return false
@@ -1537,7 +1539,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			DesignServices.highlightScrapElement_ICE(xpath,url, appType)
 			.then(function(data) {
 				if(data == "fail"){
-					alert("fail");
+					openDialog("Fail", "Failed to highlight")
 				}
 				console.log("success!::::"+data);
 			}, function(error) { });
@@ -1997,17 +1999,8 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				}
 				
 				for(var i=0; i<mydata.length;i++){
-					//new to parse str to int (step No)
-					/*if(mydata[i].hasOwnProperty("_id_")){
-						if(mydata[i]._id_.indexOf('jpg') !== -1 || mydata[i]._id_.indexOf('jqg') !== -1){
-							var index = mydata.indexOf(mydata[i]);
-							mydata.splice(index, 1)
-						}
-					}*/
-			//		else{
 						if(mydata[i].url == undefined){mydata[i].url="";}
 						mydata[i].stepNo = i+1;
-						//mydata[i].remarks = $("#jqGrid tbody tr td:nth-child(10)")[i+1].textContent;
 						if(mydata[i].remarks != undefined)
 						{
 							if(  mydata[i].remarks != $("#jqGrid tbody tr td:nth-child(10)")[i+1].textContent  && $("#jqGrid tbody tr td:nth-child(10)")[i+1].textContent.trim().length > 0 )	{
@@ -2050,12 +2043,11 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 									}
 								}
 							}
-							else if(mydata[i].keywordVal == "setHeader" || mydata[i].keywordVal == "setHeaderTemplate"){
+							else if(mydata[i].keywordVal == "setHeader" || mydata[i].keywordVal == "setHeaderTemplate" ||  mydata[i].keywordVal == "setWholeBody"){
 								mydata[i].inputVal[0] = mydata[i].inputVal[0].replace(/[\n\r]/g,'##');
 							}
 							console.log("updateTestCase:::", mydata)
 						}
-				//	}
 				}
 				if(serviceCallFlag  == true)
 				{
@@ -2520,8 +2512,8 @@ function contentTable(newTestScriptDataLS) {
 		{
 			objName = " ";
 			url = " ";    
-			if(appTypeLocal == "MobilityiOS"){
-				var sc = Object.keys(keywordArrayList.defaultListMobilityiOS);
+			if(appTypeLocal == "MobileApp"){
+				var sc = Object.keys(keywordArrayList.defaultListMobility);
 				selectedKeywordList = "defaultListMobilityiOS";
 				var res = '';
 				for(var i = 0; i < sc.length; i++){
@@ -2540,7 +2532,7 @@ function contentTable(newTestScriptDataLS) {
 				$grid.jqGrid('setCell', rowId, 'objectName', objName);
 			}
 			else{
-				if (appTypeLocal == 'Mobility') {
+				if (appTypeLocal == 'MobileApp') {
 					var sc = Object.keys(keywordArrayList.defaultListMobility);
 					selectedKeywordList = "defaultListMobility";
 				} else {
@@ -2819,8 +2811,27 @@ function contentTable(newTestScriptDataLS) {
 			selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
 			$grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
 		}
+		else if(selectedText == "@Sap" ){
+			objName = " ";
+			url = " ";
+			var sc = Object.keys(keywordArrayList.generic);
+			selectedKeywordList = "generic";
+			var res = '';
+			for(var i = 0; i < sc.length; i++){
+				if(selectedKeyword == sc[i]){
+					res += '<option role="option" value="' + sc[i]+'" selected>' + sc[i] + '</option>';
+				}
+				else
+					res += '<option role="option" value="' + sc[i]+'">' + sc[i] + '</option>';
+			}
+			var row = $(e.target).closest('tr.jqgrow');
+			var rowId = row.attr('id');
+			$("select#" + rowId + "_keywordVal", row[0]).html(res);
+			selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
+			$grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
+		}
 		//Adding @Excel to the objectName dropdown
-		if(selectedText == "@Excel") 
+		else if(selectedText == "@Excel") 
 		{
 			objName = " ";
 			url = " ";    		
@@ -2965,10 +2976,9 @@ function contentTable(newTestScriptDataLS) {
 						var sc;
 						var listType = '';
 						if(obType =='push_button' ||obType =='GuiButton' )	{sc = Object.keys(keywordArrayList.button);selectedKeywordList = "button";}		
-						else if(obType =='GuiTextField'){	sc = Object.keys(keywordArrayList.input);selectedKeywordList = "input";}
-						else if(obType =='GuiLabel'){	sc = Object.keys(keywordArrayList.input);selectedKeywordList = "element";}
-						else if(obType =='GuiPasswordField'){	sc = Object.keys(keywordArrayList.input);selectedKeywordList = "input";}
-						else if(obType =='GuiPasswordField'){	sc = Object.keys(keywordArrayList.input);selectedKeywordList = "input";}
+						else if(obType =='GuiTextField'){	sc = Object.keys(keywordArrayList.text);selectedKeywordList = "text";}
+						else if(obType =='GuiLabel'){	sc = Object.keys(keywordArrayList.element);selectedKeywordList = "element";}
+						else if(obType =='GuiPasswordField'){	sc = Object.keys(keywordArrayList.text);selectedKeywordList = "text";}
 						else if(obType =='combo_box'||obType =='GuiBox'|| obType=='GuiComboBox'){	sc = Object.keys(keywordArrayList.select);selectedKeywordList = "select";}
 						else if(obType =='list_item')	{sc = Object.keys(keywordArrayList.list);selectedKeywordList = "list";}
 						else if (obType == 'list_item' || obType == 'list') {
@@ -3000,7 +3010,7 @@ function contentTable(newTestScriptDataLS) {
 						$grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
 						break;
 					}
-					else if (appTypeLocal == 'Mobility'
+					else if (appTypeLocal == 'MobileApp'
 						&& (obType.includes("RadioButton") || obType.includes("ImageButton") || obType.includes("Button") || obType.includes("EditText") 
 								|| obType.includes("Switch") || obType.includes("CheckBox") || obType.includes("Spinner") || obType.includes("TimePicker") || obType.includes("DatePicker") || obType.includes("NumberPicker") || obType.includes("RangeSeekBar") || obType.includes("SeekBar") || obType.includes("ListView"))) {
 						var res = '';
@@ -3049,7 +3059,7 @@ function contentTable(newTestScriptDataLS) {
 						$grid.jqGrid('setCell', rowId, 'objectName', objName);
 						$grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
 						break;
-					} else if (appTypeLocal == 'Mobility' && (!(obType.includes("RadioButton") || obType.includes("ImageButton") || obType.includes("Button") || obType.includes("EditText") 
+					} else if (appTypeLocal == 'MobileApp' && (!(obType.includes("RadioButton") || obType.includes("ImageButton") || obType.includes("Button") || obType.includes("EditText") 
 							|| obType.includes("Switch")  || obType.includes("CheckBox") || obType.includes("Spinner") || obType.includes("TimePicker") || obType.includes("DatePicker") || obType.includes("NumberPicker") || obType.includes("RangeSeekBar") || obType.includes("SeekBar") || obType.includes("ListView")))) {
 						var res = '';
 						var sc = Object.keys(keywordArrayList.element);
@@ -3071,7 +3081,7 @@ function contentTable(newTestScriptDataLS) {
 						$grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
 						break;
 					}
-					else if(appTypeLocal == 'MobilityiOS' && (( obType == 'UIATableView' || obType == 'UIASecureTextField' || obType == 'UIATextField' || obType=='UIASwitch' || obType=='UIAButton'  || obType == 'UIASearchBar' || obType == 'UIASlider' || obType =='UIAPickerWheel'))){
+					else if(appTypeLocal == 'MobileApp' && (( obType == 'UIATableView' || obType == 'UIASecureTextField' || obType == 'UIATextField' || obType=='UIASwitch' || obType=='UIAButton'  || obType == 'UIASearchBar' || obType == 'UIASlider' || obType =='UIAPickerWheel'))){
 						var res = '';
 						var sc;
 						if(obType == 'UIASecureTextField' || obType == 'UIATextField' || obType == 'UIASearchBar'){ sc = Object.keys(keywordArrayList.text);selectedKeywordList = "text";}
@@ -3097,7 +3107,7 @@ function contentTable(newTestScriptDataLS) {
 						$grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
 						break;						
 					}
-					else if(appTypeLocal == 'MobilityiOS' && (!(obType == 'UIATableView' || obType == 'UIASecureTextField' || obType == 'UIATextField' || obType=='UIASwitch' || obType=='UIAButton'  || obType == 'UIASearchBar' || obType == 'UIASlider' || obType =='UIAPickerWheel'))){
+					else if(appTypeLocal == 'MobileApp' && (!(obType == 'UIATableView' || obType == 'UIASecureTextField' || obType == 'UIATextField' || obType=='UIASwitch' || obType=='UIAButton'  || obType == 'UIASearchBar' || obType == 'UIASlider' || obType =='UIAPickerWheel'))){
 						var res = '';
 						var sc = Object.keys(keywordArrayList.element);
 						selectedKeywordList = "element";
@@ -3676,7 +3686,7 @@ $(document).on('focusout', '.copyPasteValidation', function(){
 	if(reg.test($(this).val())){
 		return true;
 	}else{
-		$(this).val('');
+		//$(this).val('');
 		//$('#errorMsgs2').show();
 		return false;
 	}
@@ -3924,17 +3934,17 @@ function getTags(data) {
 			obnames.push("@Oebs");
 			obnames.push("@Custom");
 		}
-		else if(appTypeLocal == "Mobility")	{
+		else if(appTypeLocal == "MobileApp")	{
 			obnames.push("@Generic");
 			obnames.push("@Mobile");
 			obnames.push("@Action");
 		}
-		else if(appTypeLocal == "mobileweb")	{
+		else if(appTypeLocal == "MobileWeb")	{
 			obnames.push("@Generic");
 			obnames.push("@Browser");
 			obnames.push("@BrowserPopUp");
 		}
-		else if(appTypeLocal == "MobilityiOS")	{
+		else if(appTypeLocal == "MobileApp")	{
 			obnames.push("@Generic");
 			obnames.push("@MobileiOS");
 		}

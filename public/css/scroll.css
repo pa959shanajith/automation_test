@@ -609,6 +609,18 @@
 		max-height: 650px !important;
 		margin-bottom: 0 !important;
 	}
+	
+	.scroll-wrapper.exeDataTable{
+		width: 100% !important;
+	}
+	
+	.scroll-wrapper > .exeDataTable{
+		width: 100% !important;
+	}
+	
+	.scroll-wrapper > .exeDataTable.scroll-scrolly_visible{
+		width: 102% !important;
+	}
 }
 
 /**********Specifically for Internet Explorer**********/
@@ -645,5 +657,17 @@
 	.scroll-wrapper > .scrollbar-screenshot{
 		max-height: 650px !important;
 		margin-bottom: 0 !important;
+	}
+	
+	.scroll-wrapper.exeDataTable{
+		width: 100% !important;
+	}
+	
+	.scroll-wrapper > .exeDataTable{
+		width: 100% !important;
+	}
+	
+	.scroll-wrapper > .exeDataTable.scroll-scrolly_visible{
+		width: 102% !important;
 	}
 }
