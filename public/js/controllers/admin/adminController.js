@@ -108,7 +108,7 @@ function toggleCycleClick()
 	});
 
 	$("[data-parent]").click(function(e) {
-		console.log('clicked');
+		//console.log('clicked');
 		$parent = $($(this).attr('data-parent'));
 		actives = $parent.find('.in:not(data-target)'.replace('data-target', $(this).attr('data-target')));
 		actives.collapse('hide');
@@ -302,8 +302,8 @@ function toggleCycleClick()
 									{
 										if($("#projectName").val() == response.projectNames[i])
 										{
-											console.log($("#projectName").val());
-											console.log(response.projectNames[i]);
+											//console.log($("#projectName").val());
+											//console.log(response.projectNames[i]);
 											$("#adminModal").find('.modal-title').text("Admin");
 											$("#adminModal").find('.modal-body p').text("Project Name already Exists");
 											$("#adminModal").modal("show");
@@ -393,7 +393,7 @@ function toggleCycleClick()
 					return false;
 				}
 				else{
-					  console.log("updateProjectDetaills", updateProjectDetails);
+					 // console.log("updateProjectDetaills", updateProjectDetails);
 					  var releaseCycleDetails = [];
 
 					 releaseCycleDetails = updateProjectDetails.slice();
@@ -606,8 +606,8 @@ function toggleCycleClick()
 						    $("#cycleList").append("<li class='cycleList createCycle'><img src='imgs/ic-cycle.png' /><span class='cycleName'>"+cycleName+"</span><span class='actionOnHover'><img id=editCycleName_"+delCount+" title='Edit Cycle Name' src='imgs/ic-edit-sm.png' class='editCycleName'><img id=deleteCycleName_"+delCount+" title='Delete Cycle' src='imgs/ic-delete-sm.png' class='deleteCycle'></span></li>");
 							for(i=0;i<releaseNamesArr.length;i++)
 							{
-								console.log("selRelease", releaseNamesArr[i]);
-								console.log("activeRel", $("li.active").children('span.releaseName').text());
+								//console.log("selRelease", releaseNamesArr[i]);
+								//console.log("activeRel", $("li.active").children('span.releaseName').text());
 								if(releaseNamesArr[i] == $("li.active").children('span.releaseName').text())
 								{
 									for(var j=0;j<projectDetails.length;j++)
@@ -793,7 +793,7 @@ function toggleCycleClick()
 								var index = '';
 							    index = $('li.active').index();
 								$("#"+editReleaseId).parent().prev('span').text($("#releaseName").val());
-								console.log("projectDetails", projectDetails);
+								//console.log("projectDetails", projectDetails);
 								for(var i=0;i<projectDetails.length;i++)
 								{
 									if(i == index)
@@ -957,12 +957,12 @@ function toggleCycleClick()
 												var objectType = typeof(updateProjectDetails[i].cycleDetails[j]);
 													if(objectType == "object" && j == cycleIndex && (updateProjectDetails[i].releaseName == $("li.active").children('span.releaseName').text()))
 													{
-															console.log("objectType", typeof(updateProjectDetails[i].cycleDetails[j]))
+															//console.log("objectType", typeof(updateProjectDetails[i].cycleDetails[j]))
 															updateProjectDetails[i].cycleDetails[j].cycleName = $("#cycleName").val();
 													}
 												    if(objectType == "string" && j == cycleIndex){
-																console.log("objectString");
-																console.log("objectType", typeof(updateProjectDetails[i].cycleDetails[j]))
+																//console.log("objectString");
+																//console.log("objectType", typeof(updateProjectDetails[i].cycleDetails[j]))
 																updateProjectDetails[i].cycleDetails[j] =  $("#cycleName").val();
 													}
 											}
@@ -1087,7 +1087,7 @@ function toggleCycleClick()
 					var requestedids = ["e1cb0da2-44b8-4f8a-9ba8-8a290174881f"];
 					var domains = [];
 					domains.push(domainId);
-					console.log("Domain", domains);
+					//console.log("Domain", domains);
 					//var requestedids = domains.push(domainId);
     				var idtype=["domaindetails"];
 					adminServices.getDetails_ICE(idtype,requestedids)
@@ -1118,10 +1118,10 @@ function toggleCycleClick()
 					var requestedids=["f9409e26-cb50-489b-9527-623ce9f23672"];
     				var idtype=["projectsdetails"];
 					projects.push(domaiprojectId);
-					console.log("projects", projects);
+					//console.log("projects", projects);
 					adminServices.getDetails_ICE(idtype,requestedids)
 						.then(function (response) {
-							console.log("resposne", response);
+							//console.log("resposne", response);
 							$("div.projectTypes").addClass("disableProjectType");
 								switch (response.appType)
 								{
