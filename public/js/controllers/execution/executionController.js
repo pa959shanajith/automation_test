@@ -111,6 +111,15 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 				$(".noExe").parent("tr").css({'border-left':'4px solid red'});
 				$(".noExe").prev().css({'width':'3.5%'})
 			}
+			
+			//check parent checkbox by default if all child checkboxes are checked
+			if($("#executionDataTable tbody tr").length == $("#executionDataTable tbody tr td.exe-ExecuteStatus input:checked").length)
+			{
+				$("#parentExecute").prop("checked", true);
+			}
+			else{
+				$("#parentExecute").prop("checked", false);
+			}
 		}, 
 		function(error) {
 			console.log("Error")
@@ -368,16 +377,6 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 		}
 	})
 	//Default checked all the checkboxes
-
-	//check parent checkbox by default if all child checkboxes are checked
-	if($("input[type='checkbox']:not(#parentExecute):checked").length == $("input[type='checkbox']:not(#parentExecute)").length)
-	{
-		$("#parentExecute").prop("checked", true);
-	}
-	else{
-		$("#parentExecute").prop("checked", false);
-	}
-
 	
 	//Do Not Execute Checkboxes
 	$(document).on('click',".doNotExecuteScenario", function(){
@@ -397,7 +396,7 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 	$(document).on("click", ".selectBrowser", function(){
 		$(this).find("img").toggleClass("sb")
 		if($(this).find("img").hasClass("sb") == false) {
-			var getSpliceIndex = browserTypeExe.indexOf($(this).data("name"))
+			var getSpliceIndex = browserTypeExe.indexOf(''+$(this).data("name")+'')
 			browserTypeExe.splice(getSpliceIndex, 1)
 		}
 		else {

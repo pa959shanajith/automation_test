@@ -1214,6 +1214,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					$("#launchSAPApps").modal("hide");
 					blockUI(blockMsg);
 				}
+			}
 			
 			//For Mobility
 			else if($scope.getScreenView == "Mobility"){
@@ -3449,10 +3450,10 @@ var lastSelectedRowId
 function editTestCaseRow(){
 	var rowSelect = $(document).find(".ui-state-highlight").children("td:nth-child(1)").text();
 	if($('#jqGrid tbody tr.ui-widget-content').length <= 0){
-		openDialog("Edit Testcase step", "No steps to edit")
+		openDialog("Edit step", "No steps to edit")
 	}
 	else if(rowSelect == "" || rowSelect == " "){
-		openDialog("Edit Testcase step", "Select step to edit")
+		openDialog("Edit step", "Select step to edit")
 	}
 	else{
 		var editSelRow = parseInt(rowSelect) + parseInt(1);
@@ -3503,7 +3504,7 @@ function editTestCaseRow(){
 function copyTestStep(){
 	window.localStorage['emptyTestStep'] = "false";
 	var taskInfo = JSON.parse(window.localStorage['_CT']);
-	if(($(document).find(".ui-state-highlight").length <= 0 && $('#jqGrid tbody tr.ui-widget-content').children('td:nth-child(4)').text().trim() == "") || ($(document).find(".ui-state-highlight").length == 1 && $(document).find(".ui-state-highlight").children('td:nth-child(4)').text().trim() == "")){
+	if(($(document).find(".ui-state-highlight").length <= 0 && $('#jqGrid tbody tr.ui-widget-content').children('td:nth-child(5)').text().trim() == "") || ($(document).find(".ui-state-highlight").length == 1 && $(document).find(".ui-state-highlight").children('td:nth-child(5)').text().trim() == "")){
 		openDialog("Copy step", "Empty step can not be copied.")
 	}
 	else if(!$(document).find(".cbox:checked").parent().parent("tr").hasClass("ui-state-highlight")){
@@ -3581,7 +3582,7 @@ function pasteTestStep(){
 			else if($("#jqGrid").jqGrid('getRowData').length == 1 && $("#jqGrid").jqGrid('getRowData')[0].custname == "") showDialogMesgsYesNo("Paste Test Step", "Copied step(s) might contain object reference which will not be supported for other screen. Do you still want to continue ?", "btnPasteTestStepYes", "btnPasteTestStepNo")
 			else{
 				$("#modalDialog-inputField").find('.modal-title').text("Paste Test Step");
-				$("#modalDialog-inputField").find('#labelContent').html("Paste after step no: </br><span style='font-size:11px; color: #000;'>For multiple paste. Eg: 5;10;20</span>").css('color','black');				
+				$("#modalDialog-inputField").find('#labelContent').html("Paste after step no:").css('color','black').append("<br/><span style='font-size:11px; color: #000;'>For multiple paste. Eg: 5;10;20</span>");				
 				$("#modalDialog-inputField").find('.modal-footer button').attr("id","btnPasteTestStep");
 				$("#modalDialog-inputField").find('#getInputData').attr("placeholder","Enter a value");
 				$("#modalDialog-inputField").find('#getInputData').addClass("copyPasteValidation");
@@ -3609,11 +3610,14 @@ $(document).on("click", "#btnPasteTestStepYes", function(){
 	}
 	else{
 		$("#modalDialog-inputField").find('.modal-title').text("Paste Test Step");
-		$("#modalDialog-inputField").find('#labelContent').text("Paste after step no: </br><span style='font-size:11px; color: #000;'>For multiple paste. Eg: 5;10;20</span>").css('color','black');
+		$("#modalDialog-inputField").find('#labelContent').text("Paste after step no:").css('color','black').append("</br><span style='font-size:11px; color: #000;'>For multiple paste. Eg: 5;10;20</span>");
 		//$("</br><span style='font-size:11px; color: #000;'>For multiple paste. Eg: 5;10;20</span>").insertAfter('#labelContent');
 		$("#modalDialog-inputField").find('.modal-footer button').attr("id","btnPasteTestStep");
 		$("#modalDialog-inputField").find('#getInputData').attr("placeholder","Enter a value");
 		$("#modalDialog-inputField").find('#getInputData').addClass("copyPasteValidation");
+		$("#modalDialog-inputField").find('#errorMsgs1').text("*Textbox cannot be empty")
+		$("#modalDialog-inputField").find('#errorMsgs2').text("*Textbox cannot contain characters other than numbers seperated by single semi colon")
+		$("#modalDialog-inputField").find('#errorMsgs3').text("*Please enter a valid step no")
 		$("#modalDialog-inputField").modal("show");
 		/*createDialogsCopyPaste("Paste Test Step", "Paste after step no:<br/><span style='font-size:11px;'>For multiple paste, provide step numbers separated by semicolon Eg: 5;10;20</span>", "*Textbox cannot be empty", "*Textbox cannot contain characters other than numbers seperated by single semi colon", "*Please enter a valid step no", "btnPasteTestStep");
 		$("#btnPasteTestStep").text("Paste")
@@ -3666,14 +3670,19 @@ $(document).on("click","#btnPasteTestStep", function(){
 $(document).on('keypress', '.copyPasteValidation', function(e){
 	if((e.charCode >= 48 && e.charCode <= 57) || e.charCode == 59) return true;
 	else return false;
-}).blur(function(){
+})
+$(document).on('focusout', '.copyPasteValidation', function(){
 	var reg = /^[0-9;]+$/;
 	if(reg.test($(this).val())){
 		return true;
 	}else{
 		$(this).val('');
+		//$('#errorMsgs2').show();
 		return false;
 	}
+})
+$(document).on('focus', '.copyPasteValidation', function(){
+	$('#errorMsgs1, #errorMsgs2, #errorMsgs3').hide();	
 })
 
 function pasteInGrid(){
@@ -3751,10 +3760,10 @@ function commentStep(){
 	if($('#jqGrid tbody tr.ui-widget-content').length <= 0){
 		openDialog("Comment step", "No steps to comment")
 	}
-	else if(($(document).find(".ui-state-highlight").length <= 0 && $('#jqGrid tbody tr.ui-widget-content').children('td:nth-child(4)').text().trim() == "") || ($(document).find(".ui-state-highlight").length == 1 && $(document).find(".ui-state-highlight").children('td:nth-child(4)').text().trim() == "")){
+	else if(($(document).find(".ui-state-highlight").length <= 0 && $('#jqGrid tbody tr.ui-widget-content').children('td:nth-child(5)').text().trim() == "") || ($(document).find(".ui-state-highlight").length == 1 && $(document).find(".ui-state-highlight").children('td:nth-child(5)').text().trim() == "")){
 		openDialog("Comment step", "Empty step can not be commented.")
 	}
-	else if($(document).find(".ui-state-highlight").length > 0 && $(document).find(".ui-state-highlight").children('td:nth-child(4)').text().trim() != ""){
+	/*else if($(document).find(".ui-state-highlight").length > 0 && $(document).find(".ui-state-highlight").children('td:nth-child(5)').text().trim() != ""){
 		var getOutputVal = $(document).find(".ui-state-highlight").children("td[aria-describedby='jqGrid_outputVal']").text();
 		if(!getOutputVal.match("##") && !getOutputVal.match(";##")){
 			var myData = $("#jqGrid").jqGrid('getGridParam','data')
@@ -3841,6 +3850,41 @@ function commentStep(){
 				}
 			});
 		}
+	}*/
+	else if($(document).find(".ui-state-highlight").length > 0){
+		var myData = $("#jqGrid").jqGrid('getGridParam','data')
+		$(document).find(".ui-state-highlight").each(function(){
+			for(i=0; i<myData.length; i++){
+				if(myData[i].stepNo == parseInt($(this).children('td:nth-child(1)').text().trim())){
+					//Check whether output coloumn is empty
+					if($(this).children('td:nth-child(8)').text().trim() == ""){
+						myData[i].outputVal = "##";
+						$("#jqGrid").trigger("reloadGrid");
+					}
+					else{
+						//Check whether output coloumn has some value
+						if($(this).children('td:nth-child(8)').text().trim() != "") {
+							//If already commented but no additional value
+							if($(this).children('td:nth-child(8)').text().trim() == "##"){
+								myData[i].outputVal = "";
+								$("#jqGrid").trigger("reloadGrid");
+							}
+							//If already commented and contains additional value
+							else if($(this).children('td:nth-child(8)').text().trim().indexOf(";##") !== -1){
+								var lastTwo = myData[i].outputVal.substr(myData[i].outputVal.length - 3);
+								myData[i].outputVal = myData[i].outputVal.replace(lastTwo,"");
+								$("#jqGrid").trigger("reloadGrid");
+							}
+							//If contains value but not commented
+							else{
+								myData[i].outputVal = myData[i].outputVal.concat(";##");
+								$("#jqGrid").trigger("reloadGrid");
+							}
+						}
+					}
+				}
+			}
+		});
 	}
 	else{
 		openDialog("Skip Testcase step", "Please select step to skip")
@@ -3897,8 +3941,7 @@ function getTags(data) {
 		else if(appTypeLocal == "SAP")	{
 			obnames.push("@Generic");
 			obnames.push("@Sap");
-			
-					}
+		}
 	for (var i=0; i<data.length; i++){
 		obnames.push(data[i].custname);
 	}

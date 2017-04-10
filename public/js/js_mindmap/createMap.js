@@ -46,7 +46,7 @@ function loadMindmapData1(){
 	if(svgTileLen == 0)
 	{
 		$('#ct-mapSvg, #ct-canvas').empty();
-		$('#ct-canvas').append('<div class="ct-tileBox"><div class="ct-tile"><svg class="ct-svgTile" height="150px" width="150px"><g><circle cx="75" cy="75" r="30"></circle><path d="M75,55L75,95"></path><path d="M55,75L95,75"></path></g></svg></div><span class="ct-text">Create Mindmap</span></div>');
+		$('#ct-canvas').append('<div class="ct-tileBox"><div class="ct-tile" title="Create Mindmap"><svg class="ct-svgTile" height="150px" width="150px"><g><circle cx="75" cy="75" r="30"></circle><path d="M75,55L75,95"></path><path d="M55,75L95,75"></path></g></svg></div><span class="ct-text">Create Mindmap</span></div>');
 			// svgTileG.append('circle').attr('cx',75).attr('cy',75).attr('r',30);
 			// svgTileG.append('path').attr('d','M75,55L75,95');
 			// svgTileG.append('path').attr('d','M55,75L95,75');
