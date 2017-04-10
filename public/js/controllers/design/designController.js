@@ -2513,7 +2513,7 @@ function contentTable(newTestScriptDataLS) {
 			objName = " ";
 			url = " ";    
 			if(appTypeLocal == "MobileApp"){
-				var sc = Object.keys(keywordArrayList.defaultListMobilityiOS);
+				var sc = Object.keys(keywordArrayList.defaultListMobility);
 				selectedKeywordList = "defaultListMobilityiOS";
 				var res = '';
 				for(var i = 0; i < sc.length; i++){
