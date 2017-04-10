@@ -1,4 +1,4 @@
-/**
+/***
  * 
  */
 var DOMAINID, releaseName, cycleName, count=0,delCount=0,editReleaseId='',editCycleId='',deleteReleaseId='',deleteCycleId='',taskName;releaseNamesArr =[];
@@ -411,7 +411,7 @@ function toggleCycleClick()
 					 updateProjectObj.projectId = $('#selProject option:selected').val();
 					 updateProjectObj.appType = $(".projectTypeSelected").attr('data-app');
 					 updateProjectObj.updateProjectDetails = updateProjectDetails;
-					 updateProjectObj.editProjectDetails = editProjectDetails;
+					 updateProjectObj.editProjectDetails = editProjectDetails; 
 					 adminServices.updateProject_ICE(updateProjectObj, userDetails)
 						.then(function (response) {
 						 if(response == 'success')
