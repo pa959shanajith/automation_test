@@ -219,9 +219,10 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 		
 		console.log("selectedRowData:::" + selectedRowData)
 		
-		if(browserTypeExe.length == 0)	openDialogExe("Execute Test Suite", "Please select a browser")//$("#selectBrowserAlert").modal("show");
+		if(appType != "SAP" && browserTypeExe.length == 0)	openDialogExe("Execute Test Suite", "Please select a browser")//$("#selectBrowserAlert").modal("show");
 		else if($(".exe-ExecuteStatus input:checked").length == 0) openDialogExe("Execute Test Suite", "Please select atleast one scenario(s) to execute")//$("#selectScenarioAlert").modal("show");
 		else{
+			if(appType == "SAP") browserTypeExe = ["1"];
 			blockUI("Execution in progress. Please Wait...")
 			ExecutionService.ExecuteTestSuite_ICE(selectedRowData, browserTypeExe, testSuiteId)
 			.then(function(data){
