@@ -202,11 +202,32 @@ p,a,img,text,span,.noselect{-webkit-touch-callout:none;-webkit-user-select:none;
 }
 .content-div
 {
-    width: 100%;
+    width: 93%;
     height: 20%;
     background: #eee;
     margin-bottom: 1%;
+    border-radius: 10px;
+    float: left;
 }  
+.content-div-req
+{
+    width: 80% !important;
+    margin-left: 163px;
+    border-radius: 10px;
+    float: left;
+}
+.content-div-right-expand
+{
+    width: 87% !important;
+    margin-left: 163px;
+    float: left;
+}
+.content-div-both-collapse
+{
+    width: 100% !important;
+    float: left;
+    margin-left: 0px;
+}
 .clear-both
 {
     clear:both;
@@ -252,4 +273,9 @@ select
 .nodeBoxSelected
 {
     background-color: #f4f4f4;
+}
+.taskTitle
+{
+    position: relative;
+    left: 160px;
 }

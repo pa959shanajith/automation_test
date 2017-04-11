@@ -7,6 +7,16 @@ mySPA.controller('mindmapController', ['$scope', '$http', '$location', '$timeout
 		$('.scrollbar-inner').scrollbar();
 		$('.scrollbar-macosx').scrollbar();
 		document.getElementById("currentYear").innerHTML = new Date().getFullYear()
+        if($("#left-nav-section").is(":visible") == true)
+            {
+               $("span.taskname").addClass('taskTitle');
+            }
+        else{
+             $("span.taskname").removeClass('taskTitle');
+             $("div.content-div").removeClass("content-div-req");
+        }
+       
+
 	}, 500)
 		/*Sidebar-toggle*/
     $scope.tab = "tabRequirement";
@@ -19,6 +29,7 @@ mySPA.controller('mindmapController', ['$scope', '$http', '$location', '$timeout
         $(".left-sec-mindmap").hide();
         //$("#wrapper").toggleClass("active");
     });
+   
     $("#ct-expand").click(function(e) {
            $(".left-sec-mindmap").show();
            if($('#right-dependencies-section').is(':visible')){
@@ -28,8 +39,11 @@ mySPA.controller('mindmapController', ['$scope', '$http', '$location', '$timeout
            else{
                $("#ct-moduleBox").css({'left':'147px','width':'100%'})
                $(".ct-tileBox").css({'left':'52% !important'})
-           }
-           
+           }  
+            $("span.taskname").addClass('taskTitle');
+            $("div.content-div").removeClass("content-div-both-collapse");
+            $("div.content-div").addClass("content-div-req");
+
     });
     $("#ct-collapse").click(function(e) {
            $(".left-sec-mindmap").hide();
@@ -41,6 +55,15 @@ mySPA.controller('mindmapController', ['$scope', '$http', '$location', '$timeout
                $("#ct-moduleBox").css({'left':'0','width':'100%'})
                $(".ct-tileBox").css({'left':'52% !important'})
            }
+              $("span.taskname").removeClass('taskTitle');
+              $("div.content-div").removeClass("content-div-req ");
+            if(($("#left-nav-section").is(":visible") == false &&  $("#right-dependencies-section").is(":visible") == false))
+                {
+                   $("div.content-div").addClass("content-div-both-collapse");
+                }
+                else{
+                      $("div.content-div").removeClass("content-div-both-collapse");
+                }
     });
     $("#ct-expand-right").click(function(e) {
     	var flg = false;
@@ -51,13 +74,30 @@ mySPA.controller('mindmapController', ['$scope', '$http', '$location', '$timeout
             	 $("#ct-moduleBox").css({'width':''})
             	 flg = true;
                  $(".ct-tileBox").css({'left':'50%'})
+                 $("div.content-div").addClass("content-div-req");
+                $("div.content-div").removeClass("content-div-right-expand");
+                
              }
              else{
                  $("#ct-moduleBox").css({'z-index':'0','width':'100%'})
                  $(".ct-tileBox").css({'left':'52% !important'})
+                 $("div.content-div").removeClass("content-div-req");
+                 $("div.content-div").addClass("content-div-right-expand");
+                if(($("#left-nav-section").is(":visible") == false &&  $("#right-dependencies-section").is(":visible") == true))
+                {
+                   $("div.content-div").removeClass("content-div-right-expand");
+                }
              }
-             if(flg)	$("#ct-moduleBox").css({'z-index':'0','width':'82% !important'})
+             if(flg) $("#ct-moduleBox").css({'z-index':'0','width':'82% !important'})
+               if(($("#left-nav-section").is(":visible") == false &&  $("#right-dependencies-section").is(":visible") == false))
+                {
+                   $("div.content-div").addClass("content-div-both-collapse");
+                }
+                else{
+                      $("div.content-div").removeClass("content-div-both-collapse");
+                }
          });
+     
     });
 
     $scope.createMapsCall = function(e){
