@@ -504,7 +504,7 @@ function toggleCycleClick()
 					    $(".close:visible").trigger('click');
 					   if(taskName == "Create Project")
 					   {
-							$("#releaseList").append("<li id='releaseList_"+count+"'><img src='imgs/ic-release.png' /><span class='releaseName'>"+releaseName+"</span><span class='actionOnHover'><img id=editReleaseName_"+count+" title='Edit Release Name' src='imgs/ic-edit-sm.png' class='editReleaseName'><img id=deleteReleaseName_"+count+" title='Delete Release' src='imgs/ic-delete-sm.png' class='deleteRelease'></span></li>");
+							$("#releaseList").append("<li id='releaseList_"+count+"'><img src='imgs/ic-release.png' /><span title="+releaseName+" class='releaseName'>"+releaseName+"</span><span class='actionOnHover'><img id=editReleaseName_"+count+" title='Edit Release Name' src='imgs/ic-edit-sm.png' class='editReleaseName'><img id=deleteReleaseName_"+count+" title='Delete Release' src='imgs/ic-delete-sm.png' class='deleteRelease'></span></li>");
 							$("#releaseList li:last").trigger('click');
 							releaseNamesArr.push(releaseName);
 							releCycObj = {};
@@ -516,7 +516,7 @@ function toggleCycleClick()
 					   if(taskName == "Update Project")
 					   {
 						   count = updateProjectDetails.length * 2;
-						   $("#releaseList").append("<li class='createRelease' id='releaseList_"+count+"'><img src='imgs/ic-release.png' /><span class='releaseName'>"+releaseName+"</span><span class='actionOnHover'><img id=editReleaseName_"+count+" title='Edit Release Name' src='imgs/ic-edit-sm.png' class='editReleaseName'><img id=deleteReleaseName_"+count+" title='Delete Release' src='imgs/ic-delete-sm.png' class='deleteRelease'></span></li>");
+						   $("#releaseList").append("<li class='createRelease' id='releaseList_"+count+"'><img src='imgs/ic-release.png' /><span title="+releaseName+" class='releaseName'>"+releaseName+"</span><span class='actionOnHover'><img id=editReleaseName_"+count+" title='Edit Release Name' src='imgs/ic-edit-sm.png' class='editReleaseName'><img id=deleteReleaseName_"+count+" title='Delete Release' src='imgs/ic-delete-sm.png' class='deleteRelease'></span></li>");
 						   releCycObj = {};
 						   releCycObj.releaseName = releaseName;
 						   releCycObj.releaseId = "";
@@ -603,7 +603,7 @@ function toggleCycleClick()
 						 taskName = $("#page-taskName").children("span").text();
 						 if(taskName == "Create Project")
 						 {
-						    $("#cycleList").append("<li class='cycleList createCycle'><img src='imgs/ic-cycle.png' /><span class='cycleName'>"+cycleName+"</span><span class='actionOnHover'><img id=editCycleName_"+delCount+" title='Edit Cycle Name' src='imgs/ic-edit-sm.png' class='editCycleName'><img id=deleteCycleName_"+delCount+" title='Delete Cycle' src='imgs/ic-delete-sm.png' class='deleteCycle'></span></li>");
+						    $("#cycleList").append("<li class='cycleList createCycle'><img src='imgs/ic-cycle.png' /><span title="+cycleName+" class='cycleName'>"+cycleName+"</span><span class='actionOnHover'><img id=editCycleName_"+delCount+" title='Edit Cycle Name' src='imgs/ic-edit-sm.png' class='editCycleName'><img id=deleteCycleName_"+delCount+" title='Delete Cycle' src='imgs/ic-delete-sm.png' class='deleteCycle'></span></li>");
 							for(i=0;i<releaseNamesArr.length;i++)
 							{
 								//console.log("selRelease", releaseNamesArr[i]);
@@ -636,7 +636,7 @@ function toggleCycleClick()
 						if(taskName == "Update Project")
 						{  
 							delCount = (delCount +1) * 3;
-							$("#cycleList").append("<li class='cycleList createCycle'><img src='imgs/ic-cycle.png' /><span class='cycleName'>"+cycleName+"</span><span class='actionOnHover'><img id=editCycleName_"+delCount+" title='Edit Cycle Name' src='imgs/ic-edit-sm.png' class='editCycleName'><img id=deleteCycleName_"+delCount+" title='Delete Cycle' src='imgs/ic-delete-sm.png' class='deleteCycle'></span></li>");
+							$("#cycleList").append("<li class='cycleList createCycle'><img src='imgs/ic-cycle.png' /><span title="+cycleName+" class='cycleName'>"+cycleName+"</span><span class='actionOnHover'><img id=editCycleName_"+delCount+" title='Edit Cycle Name' src='imgs/ic-edit-sm.png' class='editCycleName'><img id=deleteCycleName_"+delCount+" title='Delete Cycle' src='imgs/ic-delete-sm.png' class='deleteCycle'></span></li>");
 							for(var i=0;i<updateProjectDetails.length;i++)
 							{
 								if(updateProjectDetails[i].releaseName == $("li.active").children('span.releaseName').text())
@@ -696,7 +696,7 @@ function toggleCycleClick()
 											{
 												for(var j=0;j<projectDetails[i].cycleNames.length;j++)
 												{
-													$("#cycleList").append("<li><img src='imgs/ic-cycle.png' /><span class='cycleName'>"+projectDetails[i].cycleNames[j]+"</span><span class='actionOnHover'><img id=editCycleName_"+j+" title='Edit Cycle Name' src='imgs/ic-edit-sm.png' class='editCycleName'><img id=deleteCycleName_"+j+" title='Delete Cycle' src='imgs/ic-delete-sm.png' class='deleteCycle'></span></li>");
+													$("#cycleList").append("<li><img src='imgs/ic-cycle.png' /><span title="+projectDetails[i].cycleNames[j]+" class='cycleName'>"+projectDetails[i].cycleNames[j]+"</span><span class='actionOnHover'><img id=editCycleName_"+j+" title='Edit Cycle Name' src='imgs/ic-edit-sm.png' class='editCycleName'><img id=deleteCycleName_"+j+" title='Delete Cycle' src='imgs/ic-delete-sm.png' class='deleteCycle'></span></li>");
 												}
 											}
 										}
@@ -724,11 +724,11 @@ function toggleCycleClick()
 													var objectType = typeof(updateProjectDetails[i].cycleDetails[j]);
 													if(objectType == "object")
 													{
-															$("#cycleList").append("<li class='updateCycle'><img src='imgs/ic-cycle.png' /><span class='cycleName'>"+updateProjectDetails[i].cycleDetails[j].cycleName+"</span><span class='actionOnHover'><img id=editCycleName_"+j+" title='Edit Cycle Name' src='imgs/ic-edit-sm.png' class='editCycleName'><img id=deleteCycleName_"+j+" title='Delete Cycle' src='imgs/ic-delete-sm.png' class='deleteCycle'></span></li>");
+															$("#cycleList").append("<li class='updateCycle'><img src='imgs/ic-cycle.png' /><span title="+updateProjectDetails[i].cycleDetails[j].cycleName+"  class='cycleName'>"+updateProjectDetails[i].cycleDetails[j].cycleName+"</span><span class='actionOnHover'><img id=editCycleName_"+j+" title='Edit Cycle Name' src='imgs/ic-edit-sm.png' class='editCycleName'><img id=deleteCycleName_"+j+" title='Delete Cycle' src='imgs/ic-delete-sm.png' class='deleteCycle'></span></li>");
 													}
 													if(objectType == "string")
 													{
-															$("#cycleList").append("<li class='updateCycle'><img src='imgs/ic-cycle.png' /><span class='cycleName'>"+updateProjectDetails[i].cycleDetails[j]+"</span><span class='actionOnHover'><img id=editCycleName_"+j+" title='Edit Cycle Name' src='imgs/ic-edit-sm.png' class='editCycleName'><img id=deleteCycleName_"+j+" title='Delete Cycle' src='imgs/ic-delete-sm.png' class='deleteCycle'></span></li>");
+															$("#cycleList").append("<li class='updateCycle'><img src='imgs/ic-cycle.png' /><span title="+updateProjectDetails[i].cycleDetails[j]+"  class='cycleName'>"+updateProjectDetails[i].cycleDetails[j]+"</span><span class='actionOnHover'><img id=editCycleName_"+j+" title='Edit Cycle Name' src='imgs/ic-edit-sm.png' class='editCycleName'><img id=deleteCycleName_"+j+" title='Delete Cycle' src='imgs/ic-delete-sm.png' class='deleteCycle'></span></li>");
 													}
 													// if($("li.active").hasClass("updateRelease"))
 													// {
@@ -1164,7 +1164,7 @@ function toggleCycleClick()
 						  $("#releaseList li,#cycleList li").remove()
 						  for(var i=0;i<updateProjectDetails.length;i++)
 						  {
-							 $("#releaseList").append("<li class='updateRelease' id='releaseList_"+i+"'><img src='imgs/ic-release.png' /><span class='releaseName'>"+updateProjectDetails[i].releaseName+"</span><span class='actionOnHover'><img id=editReleaseName_"+i+" title='Edit Release Name' src='imgs/ic-edit-sm.png' class='editReleaseName'><img id=deleteReleaseName_"+i+" title='Delete Release' src='imgs/ic-delete-sm.png' class='deleteRelease'></span></li>");
+							 $("#releaseList").append("<li class='updateRelease' id='releaseList_"+i+"'><img src='imgs/ic-release.png' /><span title="+updateProjectDetails[i].releaseName+" class='releaseName'>"+updateProjectDetails[i].releaseName+"</span><span class='actionOnHover'><img id=editReleaseName_"+i+" title='Edit Release Name' src='imgs/ic-edit-sm.png' class='editReleaseName'><img id=deleteReleaseName_"+i+" title='Delete Release' src='imgs/ic-delete-sm.png' class='deleteRelease'></span></li>");
 							 $("#releaseList li:first").trigger('click');
 						  }
 						 showHideEditDeleteIcons();

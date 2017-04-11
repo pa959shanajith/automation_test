@@ -2820,6 +2820,21 @@ input[disabled]{
 {
     pointer-events: none;
 }
+/* Ellipsis for Release and Cycle Name */
+.releaseName,.cycleName
+{
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    width: 75%;
+    vertical-align: middle;
+    display: inline-block;
+}
+.cycleName
+{
+    margin-top:-10px !important;
+}
+
 /*****************ADMIN CSS NEW ************************/
 
 /******************Reports CSS***************************/
