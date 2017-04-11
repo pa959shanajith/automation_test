@@ -1105,9 +1105,9 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 	$scope.launchWSDLGo = function(){
 		var blockMsg = 'Please Wait...';
 		$("#wsldInput").removeClass("inputErrorBorderFull")
-		var wsdlUrl = $("#wsldInput").val()
+		var wsdlUrl = $("#wsldInput").val();
 		if(!wsdlUrl) $("#wsldInput").addClass("inputErrorBorderFull")
-		else if(wsdlUrl.indexOf(".svc?wsdl") <= 0 || wsdlUrl.indexOf(".asmx?wsdl") <= 0)	$("#wsldInput").addClass("inputErrorBorderFull")
+		else if(wsdlUrl.indexOf(".svc?wsdl") === -1 && wsdlUrl.indexOf(".asmx?wsdl") === -1)	$("#wsldInput").addClass("inputErrorBorderFull")
 		else {
 			blockUI(blockMsg);
 			DesignServices.launchWSDLGo(wsdlUrl)
@@ -2047,7 +2047,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 									}
 								}
 							}
-							else if(mydata[i].keywordVal == "setHeader" || mydata[i].keywordVal == "setHeaderTemplate" ||  mydata[i].keywordVal == "setWholeBody"){
+							else if(mydata[i].keywordVal == "setHeader" || mydata[i].keywordVal == "setHeaderTemplate"){
 								mydata[i].inputVal[0] = mydata[i].inputVal[0].replace(/[\n\r]/g,'##');
 							}
 							console.log("updateTestCase:::", mydata)
