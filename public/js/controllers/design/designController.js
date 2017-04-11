@@ -712,7 +712,11 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 	
 	//Disabling Filter
 	$("a[title='Filter']").mouseover(function(){
-		if(viewString.view.length == 0){
+		if(viewString == ""){
+			$(this).children("img").addClass("thumb-ic-disabled").removeClass("thumb-ic");
+			$(this).parent().css("cursor", "no-drop");
+		}
+		else if(viewString.view.length == 0){
 			$(this).children("img").addClass("thumb-ic-disabled").removeClass("thumb-ic");
 			$(this).parent().css("cursor", "no-drop");
 		}
