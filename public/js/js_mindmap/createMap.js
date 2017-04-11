@@ -338,11 +338,14 @@ var nodeClick = function(e){
 			// w.append('button').attr('class','ct-asValBoxIcon ct-asItemCal btn dropdown-toggle').attr('data-toggle','dropdown').append('img').attr('src','images_mindmap/ic-datepicker.png').attr('alt','calIcon');
 			w.append('input').attr('class', 'datepicker').attr('id','startDate');
 		    //$("img[src='images_mindmap/ic-datepicker.png']:not(.dateIcon)").remove();
-			$(".dateBoxSd").append("<img class='dateIcon' src='images_mindmap/ic-datepicker.png' />").attr('alt','calIcon');
+			$(".dateBoxSd").append("<img id='dateIconStartDate' class='dateIcon' src='images_mindmap/ic-datepicker.png' />").attr('alt','calIcon');
 			$('#startDate').datepicker({
 						 format: "dd/mm/yyyy",
                          autoclose: true
 					});
+			$(document).on('click','#dateIconStartDate', function() {
+					$("#startDate").datepicker("show");
+			});
 			f=w.append('ul').attr('class','ct-asValCalBox dropdown-menu');//.on('click',$('.ct-asValBoxIcon.ct-asItemCal.btn.dropdown-toggle').datepicker());
 			$("#startDate").val(tObj.sd);
 							
@@ -354,11 +357,14 @@ var nodeClick = function(e){
 			//w.append('button').attr('class','ct-asValBox btn dropdown-toggle').attr('data-toggle','dropdown').append('a').attr('id','ct-assignEnd').html(tObj.ed);
 			//w.append('button').attr('class','ct-asValBoxIcon ct-asItemCal btn dropdown-toggle').attr('data-toggle','dropdown').append('img').attr('src','images_mindmap/ic-datepicker.png').attr('alt','calIcon');
 			w.append('input').attr('class', 'datepicker').attr('id','endDate');
-			$(".dateBoxEd").append("<img class='dateIcon' src='images_mindmap/ic-datepicker.png' />").attr('alt','calIcon');
+			$(".dateBoxEd").append("<img id='dateIconEndDate' class='dateIcon' src='images_mindmap/ic-datepicker.png' />").attr('alt','calIcon');
 			    $('#endDate').datepicker({
 						 format: "dd/mm/yyyy",
                          autoclose: true
 					});
+			$(document).on('click','#dateIconEndDate', function() {
+					$("#endDate").datepicker("show");
+			});
 			f=w.append('ul').attr('class','ct-asValCalBox dropdown-menu');//.on('click',$('.ct-asValBoxIcon.ct-asItemCal.btn.dropdown-toggle').datepicker());
 			$("#endDate").val(tObj.ed);
 		}
