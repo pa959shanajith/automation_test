@@ -131,6 +131,7 @@ var loadMap = function(e){
 	$(this).addClass("nodeBoxSelected");
 	initiate();
 	if(!d3.select('#ct-mindMap')[0][0] || confirm('Unsaved work will be lost if you continue.\nContinue?')){
+		d3.select('#ct-inpBox').classed('no-disp',!0);
 		clearSvg();
 		var reqMap=d3.select(this).attr('data-mapid');
 		treeBuilder(allMMaps[reqMap]);
@@ -175,6 +176,7 @@ var addTask = function(e){
 	var pi=parseInt(p.attr('id').split('-')[2]);
 	var nType=p.attr('data-nodetype');
 	var tObj={t:/*d3.select('#ct-assignTask').html()*/$('#ct-assignTask').val(),at:$('#ct-assignedTo').val(),rw:(d3.select('#ct-assignRevw')[0][0])?$('#ct-assignRevw').val():null,sd:$('#startDate').val(),ed:$('#endDate').val(),re:(d3.select('#ct-assignRel')[0][0])?$('#ct-assignRel').val():null,cy:(d3.select('#ct-assignCyc')[0][0])?$('#ct-assignCyc').val():null,det:d3.select('#ct-assignDetails').property('value'),app:$('option:selected', '.project-list').attr('app-type')};
+	//console.log(tObj);
 	if(dNodes[pi].task){
 		tObj.id=dNodes[pi].task.id;
 		tObj.oid=dNodes[pi].task.oid;
@@ -339,10 +341,15 @@ var nodeClick = function(e){
 			w.append('input').attr('class', 'datepicker').attr('id','startDate');
 		    //$("img[src='images_mindmap/ic-datepicker.png']:not(.dateIcon)").remove();
 			$(".dateBoxSd").append("<img id='dateIconStartDate' class='dateIcon' src='images_mindmap/ic-datepicker.png' />").attr('alt','calIcon');
-			$('#startDate').datepicker({
+					$('#startDate').datepicker({
 						 format: "dd/mm/yyyy",
-                         autoclose: true
+						 todayHighlight: true,
+                         autoclose: true,
+						 startDate: new Date()
 					});
+			$(document).on('blur', '#startDate',function() {
+				$('#startDate').val($(this).val());
+			});
 			$(document).on('click','#dateIconStartDate', function() {
 					$("#startDate").datepicker("show");
 			});
@@ -359,8 +366,10 @@ var nodeClick = function(e){
 			w.append('input').attr('class', 'datepicker').attr('id','endDate');
 			$(".dateBoxEd").append("<img id='dateIconEndDate' class='dateIcon' src='images_mindmap/ic-datepicker.png' />").attr('alt','calIcon');
 			    $('#endDate').datepicker({
-						 format: "dd/mm/yyyy",
-                         autoclose: true
+						  format: "dd/mm/yyyy",
+						  todayHighlight: true,
+                          autoclose: true,
+						  startDate: new Date()
 					});
 			$(document).on('click','#dateIconEndDate', function() {
 					$("#endDate").datepicker("show");
@@ -492,6 +501,7 @@ var nodeCtrlClick = function(e){
 	}
 };
 var createNode = function(e){
+	d3.select('#ct-inpBox').classed('no-disp',!0);
 	d3.select('#ct-ctrlBox').classed('no-disp',!0);
 	var p=d3.select(activeNode);
 	var pt=p.attr('data-nodetype');
