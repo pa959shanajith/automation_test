@@ -131,6 +131,7 @@ var loadMap = function(e){
 	$(this).addClass("nodeBoxSelected");
 	initiate();
 	if(!d3.select('#ct-mindMap')[0][0] || confirm('Unsaved work will be lost if you continue.\nContinue?')){
+		d3.select('#ct-inpBox').classed('no-disp',!0);
 		clearSvg();
 		var reqMap=d3.select(this).attr('data-mapid');
 		treeBuilder(allMMaps[reqMap]);
@@ -492,6 +493,7 @@ var nodeCtrlClick = function(e){
 	}
 };
 var createNode = function(e){
+	d3.select('#ct-inpBox').classed('no-disp',!0);
 	d3.select('#ct-ctrlBox').classed('no-disp',!0);
 	var p=d3.select(activeNode);
 	var pt=p.attr('data-nodetype');
