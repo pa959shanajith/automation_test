@@ -1517,10 +1517,18 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				scale_highlight = 1 / (real_width / screen_width)
 				d.appendTo("#screenShotScrape");
 				d.css('border', "1px solid red");
-				d.css('left', Math.round(rect.x)  * scale_highlight + 'px');
-				d.css('top', Math.round(rect.y) * scale_highlight + 'px');
-				d.css('height', Math.round(rect.h) * scale_highlight + 'px');
-				d.css('width', Math.round(rect.w) * scale_highlight + 'px');
+				if(appType == "MobileWeb"){
+					d.css('left', Math.round(rect.x) * 1.5 * scale_highlight + 'px');
+					d.css('top', Math.round(rect.y) * 1.5 * scale_highlight + 'px');
+					d.css('height', Math.round(rect.h) * 1.5 * scale_highlight + 'px');
+					d.css('width', Math.round(rect.w) * 1.5 * scale_highlight + 'px');
+				}
+				else{
+					d.css('left', Math.round(rect.x)  * scale_highlight + 'px');
+					d.css('top', Math.round(rect.y) * scale_highlight + 'px');
+					d.css('height', Math.round(rect.h) * scale_highlight + 'px');
+					d.css('width', Math.round(rect.w) * scale_highlight + 'px');
+				}
 				d.css('position', 'absolute');
 				d.css('background-color', 'yellow');
 				d.css('z-index', '3');
