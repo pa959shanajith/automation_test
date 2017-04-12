@@ -249,6 +249,7 @@
 	height: auto !important;
 	min-height: auto !important;
 	max-height: 650px !important;
+	width:100% !important;
 }
 .scroll-wrapper.scrollbar-screenshot {
    /*  height: calc(100% - 350px); */
@@ -564,25 +565,6 @@
 .scrollbar-inner-scenarioreports > .scroll-element .scroll-element_track{
 	background: rgb(211, 211, 211)
 }
-/**********Custom Media Queries**********/
-@media screen and (max-height:675px){
-	.scroll-wrapper > .scrollbar-screenshot{
-		padding: 0px;
-		height: auto !important;
-		min-height: auto !important;
-		max-height: 400px !important
-	}
-	.scroll-wrapper > .scrollbar-macosx{
-		width:-moz-fit-content !important
-	}
-
-	.scroll-wrapper.scrollbar-inner-rep{
-		max-height: 184px !important;
-	}
-	.scroll-wrapper > .scrollbar-inner-rep{
-	    height: 155px !important;
-	}
-}
 
 /**********Specifically for Firefox**********/
 @-moz-document url-prefix() {
@@ -608,6 +590,10 @@
 	.scroll-wrapper > .scrollbar-screenshot{
 		max-height: 650px !important;
 		margin-bottom: 0 !important;
+	}
+	
+	.scroll-wrapper > .scrollbar-screenshot.scroll-scrolly_visible{
+		width:auto !important;
 	}
 	
 	.scroll-wrapper.exeDataTable{
@@ -659,6 +645,10 @@
 		margin-bottom: 0 !important;
 	}
 	
+	.scroll-wrapper > .scrollbar-screenshot.scroll-scrolly_visible{
+		width:auto !important;
+	}
+	
 	.scroll-wrapper.exeDataTable{
 		width: 100% !important;
 	}
@@ -669,5 +659,24 @@
 	
 	.scroll-wrapper > .exeDataTable.scroll-scrolly_visible{
 		width: 102% !important;
+	}
+}
+/**********Custom Media Queries**********/
+@media screen and (max-height:675px){
+	.scroll-wrapper > .scrollbar-screenshot{
+		padding: 0px;
+		height: auto !important;
+		min-height: auto !important;
+		max-height: 400px !important
+	}
+	.scroll-wrapper > .scrollbar-macosx{
+		width:-moz-fit-content !important
+	}
+
+	.scroll-wrapper.scrollbar-inner-rep{
+		max-height: 184px !important;
+	}
+	.scroll-wrapper > .scrollbar-inner-rep{
+	    height: 155px !important;
 	}
 }
