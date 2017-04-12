@@ -82,7 +82,8 @@ function next_function(resultobj,cb,data){
     var prjId = resultobj.prjId[0].projectId;
     //var prjName = resultobj.prjId[0].projectName;
 	console.log(resultobj);
-	var jsonData=JSON.parse(result);
+	try{
+			var jsonData=JSON.parse(result);
 	var alltasks=jsonData[0].data;
 	var user_task_json=[];
 	var taskDetails={};
@@ -182,6 +183,11 @@ function next_function(resultobj,cb,data){
             cb(null,user_task_json);      
       
     });
+
+	}catch (ex){
+		console.log(ex);
+	}
+
 
 	
 }
