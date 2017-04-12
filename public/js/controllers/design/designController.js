@@ -1106,8 +1106,8 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		var blockMsg = 'Please Wait...';
 		$("#wsldInput").removeClass("inputErrorBorderFull")
 		var wsdlUrl = $("#wsldInput").val();
-		if(!wsdlUrl) $("#wsldInput").addClass("inputErrorBorderFull")
-		else if(wsdlUrl.indexOf(".svc?wsdl") === -1 && wsdlUrl.indexOf(".asmx?wsdl") === -1)	$("#wsldInput").addClass("inputErrorBorderFull")
+		if(!wsdlUrl) openDialog("Launch WSDL", "Invalid WSDL url.");//$("#wsldInput").addClass("inputErrorBorderFull")
+		else if(wsdlUrl.toLowerCase().indexOf(".svc?wsdl") === -1 && wsdlUrl.toLowerCase().indexOf(".asmx?wsdl") === -1)	openDialog("Launch WSDL", "Invalid WSDL url.");//$("#wsldInput").addClass("inputErrorBorderFull")
 		else {
 			blockUI(blockMsg);
 			DesignServices.launchWSDLGo(wsdlUrl)
@@ -2011,55 +2011,55 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				}
 				
 				for(var i=0; i<mydata.length;i++){
-						if(mydata[i].url == undefined){mydata[i].url="";}
-						mydata[i].stepNo = i+1;
-						if(mydata[i].remarks != undefined)
-						{
-							if(  mydata[i].remarks != $("#jqGrid tbody tr td:nth-child(10)")[i+1].textContent  && $("#jqGrid tbody tr td:nth-child(10)")[i+1].textContent.trim().length > 0 )	{
-								if( mydata[i].remarks.length > 0 ){
-									mydata[i].remarks = mydata[i].remarks.concat( " ; " + $("#jqGrid tbody tr td:nth-child(10)")[i+1].textContent);
-								}
-							     else{
-									  mydata[i].remarks = $("#jqGrid tbody tr td:nth-child(10)")[i+1].textContent;
-								 }	 
-						     }
-						}
-						else{
-							mydata[i].remarks = $("#jqGrid tbody tr td:nth-child(10)")[i+1].textContent;
-						}
+					mydata[i].stepNo = i+1;
+					if(mydata[i].custname == undefined || mydata[i].custname == ""){
+						var stepNoPos = parseInt(mydata[i].stepNo);
+						openDialog("Save Testcase", "Please select Object Name at Step No. "+stepNoPos)
+						serviceCallFlag  = true;
+						break;
+					}
+					else{
 						//check - keyword column should be mandatorily populated by User
-						if(mydata[i].custname == undefined || mydata[i].custname == ""){
+						mydata[i].custname = mydata[i].custname.trim();
+						if(mydata[i].keywordVal == undefined || mydata[i].keywordVal == ""){
 							var stepNoPos = parseInt(mydata[i].stepNo);
-							openDialog("Save Testcase", "Please select Object Name at Step No. "+stepNoPos)
+							openDialog("Save Testcase", "Please select keyword at Step No. "+stepNoPos)
 							serviceCallFlag  = true;
 							break;
 						}
-						else{
-							mydata[i].custname = mydata[i].custname.trim();
-							if(mydata[i].keywordVal == undefined || mydata[i].keywordVal == ""){
-								var stepNoPos = parseInt(mydata[i].stepNo);
-								openDialog("Save Testcase", "Please select keyword at Step No. "+stepNoPos)
-								serviceCallFlag  = true;
-								break;
-							}
-							else if(mydata[i].keywordVal == 'SwitchToFrame'){
-								if($scope.newTestScriptDataLS != "undefined"){
-									var testScriptTableData = JSON.parse($scope.newTestScriptDataLS);
-									for(j=0;j<testScriptTableData.length;j++){
-										if(testScriptTableData[j].custname != '@Browser' && testScriptTableData[j].custname != '@Oebs' && testScriptTableData[j].custname != '@Window' && testScriptTableData[j].custname != '@Generic' && testScriptTableData[j].custname != '@Custom'){
-											if(testScriptTableData[j].url != ""){
-												mydata[i].url = testScriptTableData[j].url;
-												break;
-											}
+						else if(mydata[i].keywordVal == 'SwitchToFrame'){
+							if($scope.newTestScriptDataLS != "undefined"){
+								var testScriptTableData = JSON.parse($scope.newTestScriptDataLS);
+								for(j=0;j<testScriptTableData.length;j++){
+									if(testScriptTableData[j].custname != '@Browser' && testScriptTableData[j].custname != '@Oebs' && testScriptTableData[j].custname != '@Window' && testScriptTableData[j].custname != '@Generic' && testScriptTableData[j].custname != '@Custom'){
+										if(testScriptTableData[j].url != ""){
+											mydata[i].url = testScriptTableData[j].url;
+											break;
 										}
 									}
 								}
 							}
-							else if(mydata[i].keywordVal == "setHeader" || mydata[i].keywordVal == "setHeaderTemplate"){
-								mydata[i].inputVal[0] = mydata[i].inputVal[0].replace(/[\n\r]/g,'##');
-							}
-							console.log("updateTestCase:::", mydata)
 						}
+						if(mydata[i].keywordVal == "setHeader" || mydata[i].keywordVal == "setHeaderTemplate"){
+							mydata[i].inputVal[0] = mydata[i].inputVal[0].replace(/[\n\r]/g,'##');
+						}
+						console.log("updateTestCase:::", mydata)
+					}
+					if(mydata[i].url == undefined){mydata[i].url="";}
+					if(mydata[i].remarks != undefined)
+					{
+						if(  mydata[i].remarks != $("#jqGrid tbody tr td:nth-child(10)")[i+1].textContent  && $("#jqGrid tbody tr td:nth-child(10)")[i+1].textContent.trim().length > 0 )	{
+							if( mydata[i].remarks.length > 0 ){
+								mydata[i].remarks = mydata[i].remarks.concat( " ; " + $("#jqGrid tbody tr td:nth-child(10)")[i+1].textContent);
+							}
+						     else{
+								  mydata[i].remarks = $("#jqGrid tbody tr td:nth-child(10)")[i+1].textContent;
+							 }	 
+					     }
+					}
+					else{
+						mydata[i].remarks = $("#jqGrid tbody tr td:nth-child(10)")[i+1].textContent;
+					}						
 				}
 				if(serviceCallFlag  == true)
 				{
