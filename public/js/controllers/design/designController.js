@@ -1833,7 +1833,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				})
 				//Filtering the Object which has been mapped
 				
-				/*DesignServices.mapScrapeData_ICE(scrapeObject)
+				DesignServices.mapScrapeData_ICE(scrapeObject)
 				.then(function(data){
 					$("#dialog-mapObject").modal("hide");
 					if(data == "Success") 				$("#mapObjSuccess").modal("show");
@@ -1843,7 +1843,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				}, 
 				function(error){
 					console.log("Error::::", error)
-				})*/
+				})
 				
 				$("#scrapedObjforMap li").attr("draggable", true);
 				$("#scrapedObjforMap li").children(".ellipsis").css({'background':'', 'cursor':'auto'});

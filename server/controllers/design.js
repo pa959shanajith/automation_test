@@ -218,18 +218,21 @@ exports.updateScreen_ICE = function(req, res){
 		modifiedBy = userInfo.username;
 		param      = updateData.param;
 		appType    = updateData.appType;
-		
+		//xpaths required to be mapped(used only when param is mapScrapeData_ICE)
+		var requiredXpathList=[];	
+		//urls required to be mapped(used only when param is mapScrapeData_ICE)
+		var requiredURLList=[];
 		scrapedObjects={};
 		// scrapedObjects = updateData.getScrapeData;
 		//these value has to be modified later
 		// var requestedskucodeScreens = req.body.skucodetestcase;
-		var requestedskucodeScreens = "skucodetestcase";
+		var requestedskucodeScreens = "skucode";
 		//var requestedtags = req.body.tags;
 		var requestedtags = "tags";
 		// var requestedversionnumber = req.body.versionnumber;
 		var requestedversionnumber = 1;
 		var requestscreenhistorydetails = "'updated screens action by " + userInfo.username + " having role:" + userInfo.role + "" +
-						" skucodetestcase=" + requestedskucodeScreens + ", tags=" + requestedtags + ", versionnumber=" + requestedversionnumber+
+						" skucode=" + requestedskucodeScreens + ", tags=" + requestedtags + ", versionnumber=" + requestedversionnumber+
 						" with the service action="+param+" '";
 		var dateScreen = new Date().getTime();
 		var requestedScreenhistory =  dateScreen + ":" + requestscreenhistorydetails;
@@ -582,6 +585,261 @@ exports.updateScreen_ICE = function(req, res){
 			}catch(exception){
 				console.log(exception);
 			}
+		}else if(param == "mapScrapeData_ICE"){
+			/*
+			* @author vishvas.a
+			* mapping of scraped/new objects
+			* based on the scraped data from AUT
+			* data used : new Custom names,old custom names,old xpaths,new Xpaths(newly mapped elements)
+			*/
+			var tagMatch = "";
+			//list of custom names of objects scraped and asked to map
+			var uiElementsCustnameList=[];
+			//tag names of objects scraped(available in DB) 
+			var dbElementsTagList=[];
+			//mapped custom names(has no xpath)
+			var uiUserProvidedNamesList=[];
+			//index of objects added
+			var addedObjectIndexes=[];
+			//list of base elements supported in Ninteen68(ICE)
+			var baseElementsList=["a","radiobutton","checkbox","input","list","select","table","button","img"];
+			//location of each element to be deleted from scraped list
+			var addedObjectIndexes = [];
+			async.series({
+				function(mappingCallback){
+					try{
+						var scrapedDataQuery="select screendata from screens where screenid="+screenID+
+									" and projectid="+projectID+
+									" and screenname = '"+screenName+
+									"' and versionnumber = "+requestedversionnumber+
+									" allow filtering ;";
+						fetchScrapedData(scrapedDataQuery,function(err,scrapedobjects,querycallback){
+							try{
+								if(scrapedobjects == null && scrapedobjects == '' && scrapedobjects == undefined){
+									scrapedobjects=JSON.parse("{}");
+								}
+								var viewString;
+								if(scrapedobjects.length>0){
+									scrapedobjects=JSON.parse(scrapedobjects);
+									if('view' in scrapedobjects){
+										viewString = scrapedobjects.view;
+										if(viewString.length > 0){
+											uiUserProvidedNamesList=updateData.editedListoldCustName;
+											uiElementsCustnameList=updateData.editedListmodifiedCustNames;
+											//fetching tag names 
+											console.log("Cust Names with no Xpath :",uiUserProvidedNamesList);
+											console.log("Scraped Cust Names:",uiElementsCustnameList);
+											async.forEachSeries(uiUserProvidedNamesList,function(addedObjectCustName,addedObjectCustNameCallback){
+													async.forEachSeries(viewString,function(eachScrapedObject,scrapedObjectCallback){
+													try{
+														if('custname' in eachScrapedObject){
+															var elementCustnameDB=eachScrapedObject.custname;
+															if(elementCustnameDB.replace(/\s/g,' ').replace('&nbsp;',' ').trim() == addedObjectCustName.replace(/\s/g,' ').replace('&nbsp;',' ').trim()){
+																if('tag' in eachScrapedObject){
+																	dbElementsTagList.push(eachScrapedObject.tag);
+																}
+															}
+														}
+														scrapedObjectCallback();
+													}catch(exception){
+														console.log(exception);
+													}		
+												},addedObjectCustNameCallback);
+											});
+											/*
+											* fetching the appropriate xpath of the actual elements.
+											* to change the custom name
+											*/
+											console.log("dbElementsTagList:::",dbElementsTagList.join());
+											var indexOfUiElement=-1;			
+											async.forEachSeries(uiElementsCustnameList,function(userCustName,userCustNameCallback){
+												indexOfUiElement=indexOfUiElement+1;
+												async.forEachSeries(viewString,function(eachScrapedObject,scrapedObjectCallback){
+													try{
+														if('custname' in eachScrapedObject){
+															var elementCustnameDB=eachScrapedObject.custname;
+															if(elementCustnameDB.replace(/\s/g,' ').replace('&nbsp;',' ').trim() == userCustName.replace(/\s/g,' ').replace('&nbsp;',' ').trim()){
+																if('tag' in eachScrapedObject){
+																	var dbTagName=eachScrapedObject.tag;
+																	/*
+																	* checks the tag name, if matches take the xpath
+																	* if does not match then checks if the dbElementsTagList
+																	* at the index is 'element'. if 'element' then without any 
+																	* check, match the object.  
+																	*/
+																	if(dbTagName.toLowerCase() == dbElementsTagList[indexOfUiElement]){
+																		if('xpath' in eachScrapedObject){
+																			requiredXpathList.push(eachScrapedObject.xpath.replace(/\s/g,' ').replace('&nbsp;',' ').trim());
+																		}
+																	}else if(dbElementsTagList[indexOfUiElement].toLowerCase() == 'element'
+																	&& baseElementsList.indexOf(dbTagName.toLowerCase()) === -1){
+																		if('xpath' in eachScrapedObject){
+																			requiredXpathList.push(eachScrapedObject.xpath.replace(/\s/g,' ').replace('&nbsp;',' ').trim());
+																		}
+																	}
+																	if('url' in eachScrapedObject){
+																			requiredURLList.push(eachScrapedObject.url.replace(/\s/g,' ').replace('&nbsp;',' ').trim())
+																	}
+																}
+															}
+														}
+														scrapedObjectCallback();
+													}catch(exception){
+														console.log(exception);
+													}	
+												},userCustNameCallback);
+											});
+											console.log("requiredXpathList:::",requiredXpathList.join());
+											console.log("requiredURLList:::",requiredURLList.join());
+											/*
+											* the method call below checks if 
+											* multiple elements with same xpath are found for mapped elements.
+											* if found true mapping of objects is stopped 
+											* and user is alerted with an appropriate error message.
+											*/
+											var multipleObjectsCustnameSet=[];
+											async.forEachSeries(requiredXpathList,function(eachXpath,requiredXpathListCallback){
+												try{
+													var custname=repeatedXpath(viewString,eachXpath);
+													if(custname != ""){
+														//maintaining the uniqueness of the multipleObjectsCustnameSet
+														if(multipleObjectsCustnameSet.indexOf(custname) === -1){
+															multipleObjectsCustnameSet.push(custname.replace(/\s/g,' ').replace('&nbsp;',' ').trim());
+														}
+														tagMatch="sAmEoBjEcTrEpeAtEd";
+													}
+													requiredXpathListCallback();
+												}catch(exception){
+													console.log(exception);
+												}	
+											});
+											console.log("multipleObjectsCustnameSet:::",multipleObjectsCustnameSet.join());
+											if(tagMatch != "sAmEoBjEcTrEpeAtEd"){
+												/*
+												*if the size of xpath list is same as user provided custom names list
+												* replacing the custom names of actual elements with xpath with 
+												* the user provided custom names   
+												*/
+												if(requiredXpathList.length == uiUserProvidedNamesList.length){
+													var xpathindex=-1;
+													async.forEachSeries(requiredXpathList,function(eachXpath,requiredXpathListCallback){
+														try{
+															xpathindex=xpathindex+1;
+															var objectindex=-1;
+															async.forEachSeries(viewString,function(eachScrapedObject,scrapedObjectCallback){
+																try{
+																	objectindex=objectindex+1;
+																	if('xpath' in eachScrapedObject){
+																		var scrapedXpath=eachScrapedObject.xpath.replace(/\s/g,' ').replace('&nbsp;',' ').trim();
+																		if(eachXpath.replace(/\s/g,' ').replace('&nbsp;',' ').trim() == scrapedXpath.replace(/\s/g,' ').replace('&nbsp;',' ').trim()){
+																			eachScrapedObject.custname=uiUserProvidedNamesList[xpathindex];
+																			addedObjectIndexes.push(objectindex);
+																		}
+																	}
+																	scrapedObjectCallback();
+																}catch(exception){
+																console.log(exception);
+															}	
+															},requiredXpathListCallback);
+														}catch(exception){
+															console.log(exception);
+														}
+													});
+												}else{
+													tagMatch="TagMissMatch";
+													console.log("Response sent to the front end:",tagMatch);
+													res.send(tagMatch);
+												}
+												console.log("addedObjectIndexes:::",addedObjectIndexes.join());
+												/*
+												* if the tagMatch status is empty, ie., if its not TagMissMatch
+												* then remove the dummy objects
+												*/
+												if(tagMatch == ""){
+													var dummyObjectsToDelete=[];
+													async.forEachSeries(uiUserProvidedNamesList,function(addedObjectCustName,addedObjectCustNameCallback){
+														var objectindexes=-1;
+														async.forEachSeries(viewString,function(eachScrapedObject,scrapedObjectCallback){
+															try{
+																objectindexes=objectindexes+1;
+																if(addedObjectIndexes.indexOf(objectindexes) === -1){
+																	if((!('xpath' in eachScrapedObject) ||(eachScrapedObject.xpath.trim() == "")) &&
+																	('custname' in eachScrapedObject && 
+																	uiUserProvidedNamesList.indexOf(eachScrapedObject.custname) !== -1
+																	)){
+																		if(dummyObjectsToDelete.indexOf(objectindexes) === -1){
+																			dummyObjectsToDelete.push(objectindexes);
+																		}
+																	}
+																}
+															}catch(exception){
+																console.log(exception);
+															}	
+															scrapedObjectCallback();	
+														},addedObjectCustNameCallback);
+													});
+													dummyObjectsToDelete=dummyObjectsToDelete.sort();
+													console.log("dummyObjectsToDelete:::",dummyObjectsToDelete.join());
+													for(var deleteelementindex=0;deleteelementindex<dummyObjectsToDelete.length;deleteelementindex++){
+														delete viewString[dummyObjectsToDelete[deleteelementindex]];
+													}
+													//delete is not recommended as the index stays empty after using delete on array.
+													//hence performing the below action
+													//removing null values from the array JSON
+													viewString =  viewString.filter(function(n){ return n != null });
+
+													scrapedObjects.view=viewString;
+													scrapedObjects.mirror=scrapedobjects.mirror;
+													scrapedObjects.scrapedin=scrapedobjects.scrapedin;
+													scrapedObjects.scrapetype=scrapedobjects.scrapetype;
+													scrapedObjects=JSON.stringify(scrapedObjects);
+													scrapedObjects = scrapedObjects.replace(/'+/g,"''");
+													updateScreenQuery = "update icetestautomation.screens set"+
+																" screendata ='"+ scrapedObjects +"',"+
+																" modifiedby ='" + modifiedBy + "',"+
+																" modifiedon = '" + new Date().getTime()+ "'"+
+																" , skucodescreen ='" + requestedskucodeScreens +
+																"' , history= history + { "+requestedScreenhistory+" }" +
+																" where screenid = "+screenID+
+																" and projectid ="+projectID+
+																" and screenname ='" + screenName +
+																"' and versionnumber = "+requestedversionnumber+
+																" IF EXISTS; "
+													//console.log(updateScreenQuery);
+													finalFunction(scrapedObjects);	
+												}
+													
+											}else{
+												console.log("These are the repeated objects:",multipleObjectsCustnameSet);
+												tagMatch=tagMatch+"maPinGScraPedDaTa"+multipleObjectsCustnameSet.join();
+												res.send(tagMatch);
+											}
+										}
+									}else{
+										statusFlag="Error occured in mapScreenData : Fail";
+										try{
+											res.send(statusFlag);
+										}catch(exception){
+											console.log(exception);
+										}	
+									}
+								}else{
+									statusFlag="Error occured in updateScreenData : Fail";
+									try{
+										res.send(statusFlag);
+									}catch(exception){
+										console.log(exception);
+									}
+								}
+							}catch(exception){
+						 		console.log(exception);
+							}
+						});
+					}catch(exception){
+						 console.log(exception);
+					}
+				}
+			});
 		}
 		//console.log("scraped:",scrapedObjects);
 		//this code will be called only if the statusFlag is empty.
@@ -611,6 +869,7 @@ exports.updateScreen_ICE = function(req, res){
 												newCustnames=updateData.editedList.modifiedCustNames;
 												oldCustnames=updateData.editedList.oldCustName;
 												xpathofCustnames=updateData.editedList.xpathListofCustNames;
+											}else if(param == 'mapScrapeData_ICE'){
 											}else{
 												oldCustnames = updateData.deletedList.deletedCustName;
 												xpathofCustnames = updateData.deletedList.deletedXpath;
@@ -640,42 +899,80 @@ exports.updateScreen_ICE = function(req, res){
 																				updatingtestcasedata=JSON.parse("[]");
 																			}
 																			var updatingtestcasename=eachTestcase.testcasename;
-																			//replacing/deleting all the custnames based on xpath and old custnames
-																			var deletingStepindex=[]; 
-																			//console.log(updatingtestcasedata);
-																			if(updatingtestcasedata.length>0){
-																				for(var updatingindex=0;updatingindex<oldCustnames.length;updatingindex++){
-																					for(var eachtestcasestepindex=0;eachtestcasestepindex<updatingtestcasedata.length;eachtestcasestepindex++){
-																						var testcasestep=updatingtestcasedata[eachtestcasestepindex];
-																						var step = eachtestcasestepindex + 1;
-																						// console.log(testcasestep);
-																						if('custname' in testcasestep && 'objectName' in testcasestep){
-																							// console.log((testcasestep.custname == oldCustnames[updatingindex]
-																							// && testcasestep.objectName == xpathofCustnames[updatingindex]));
-																							if(testcasestep.custname.trim() == oldCustnames[updatingindex].trim()
-																							&& testcasestep.objectName.trim() == xpathofCustnames[updatingindex].trim()){
-																								if(param == 'editScrapeData_ICE'){
-																									testcasestep.custname=newCustnames[updatingindex];
-																								}else if (param == 'deleteScrapeData_ICE'){
-																									testcasestep.stepNo=step;
-																									deletingStepindex.push(eachtestcasestepindex);
+																			if(!(param == 'mapScrapeData_ICE')){
+																				//replacing/deleting all the custnames based on xpath and old custnames
+																				var deletingStepindex=[]; 
+																				//console.log(updatingtestcasedata);
+																				if(updatingtestcasedata.length>0){
+																					for(var updatingindex=0;updatingindex<oldCustnames.length;updatingindex++){
+																						for(var eachtestcasestepindex=0;eachtestcasestepindex<updatingtestcasedata.length;eachtestcasestepindex++){
+																							var testcasestep=updatingtestcasedata[eachtestcasestepindex];
+																							var step = eachtestcasestepindex + 1;
+																							// console.log(testcasestep);
+																							if('custname' in testcasestep && 'objectName' in testcasestep){
+																								// console.log((testcasestep.custname == oldCustnames[updatingindex]
+																								// && testcasestep.objectName == xpathofCustnames[updatingindex]));
+																								if(testcasestep.custname.trim() == oldCustnames[updatingindex].trim()
+																								&& testcasestep.objectName.trim() == xpathofCustnames[updatingindex].trim()){
+																									if(param == 'editScrapeData_ICE'){
+																										testcasestep.custname=newCustnames[updatingindex];
+																									}else if (param == 'deleteScrapeData_ICE'){
+																										testcasestep.stepNo=step;
+																										deletingStepindex.push(eachtestcasestepindex);
+																									}
 																								}
 																							}
 																						}
 																					}
 																				}
+																				// console.log(deletingStepindex,updatingtestcasedata);
+																				if(param == 'deleteScrapeData_ICE'){
+																					deletingStepindex=deletingStepindex.sort();
+																					for(var deletingcaseindex=0;deletingcaseindex<deletingStepindex.length;deletingcaseindex++){
+																						delete updatingtestcasedata[deletingStepindex[deletingcaseindex]];
+																					}	
+																				//removing null values from the array JSON
+																				updatingtestcasedata =  updatingtestcasedata.filter(function(n){ return n != null });
+																				}
+																				updatingtestcasedata=JSON.stringify(updatingtestcasedata);
+																				updatingtestcasedata = updatingtestcasedata.replace(/'+/g,"''");
+																			}else{
+																				try{
+																					var uiUserProvidedNamesList=updateData.editedListoldCustName;
+																					var uiElementsCustnameList=updateData.editedListmodifiedCustNames;
+																					if(updatingtestcasedata.length>0){
+																						var uiCustNameIndex=-1;
+																						async.forEachSeries(uiElementsCustnameList,function(userCustName,userCustNameCallback){
+																							uiCustNameIndex=uiCustNameIndex+1;
+																							async.forEachSeries(updatingtestcasedata,function(eachTestCaseStep,eachTestCaseStepCallback){
+																								// console.log("before eachTestCaseStep:",eachTestCaseStep);
+																								if('custname' in eachTestCaseStep){
+																									if(eachTestCaseStep.custname.replace(/\s/g,' ').replace('&nbsp;',' ').trim() == userCustName.replace(/\s/g,' ').replace('&nbsp;',' ').trim()){
+																										console.log("Removing Custom Object Value:",eachTestCaseStep.custname.replace(/\s/g,' ').replace('&nbsp;',' ').trim());
+																										eachTestCaseStep.custname=uiUserProvidedNamesList[uiCustNameIndex];
+																										console.log("Replaced Custom Object Value:",userCustName.replace(/\s/g,' ').replace('&nbsp;',' ').trim());
+																									}
+																								}
+																								if('custname' in eachTestCaseStep){
+																									if(eachTestCaseStep.custname.replace(/\s/g,' ').replace('&nbsp;',' ').trim() == uiUserProvidedNamesList[uiCustNameIndex].replace(/\s/g,' ').replace('&nbsp;',' ').trim()){
+																										if(('objectName' in eachTestCaseStep && eachTestCaseStep.objectName.trim() == "")
+																											|| !('objectName' in eachTestCaseStep)){
+																												eachTestCaseStep.objectName=requiredXpathList[uiCustNameIndex];
+																												eachTestCaseStep.url=requiredURLList[uiCustNameIndex];
+																										}
+																									}
+																								}
+																								// console.log("after eachTestCaseStep:",eachTestCaseStep);
+																								eachTestCaseStepCallback();
+																							},userCustNameCallback);
+																						});
+																					}
+																					updatingtestcasedata = JSON.stringify(updatingtestcasedata);
+																					updatingtestcasedata = updatingtestcasedata.replace(/'+/g,"''");
+																				}catch(exception){
+																					console.log(exception);
+																				}
 																			}
-																			// console.log(deletingStepindex,updatingtestcasedata);
-																		if(param == 'deleteScrapeData_ICE'){
-																			deletingStepindex=deletingStepindex.sort();
-																			for(var deletingcaseindex=0;deletingcaseindex<deletingStepindex.length;deletingcaseindex++){
-																				delete updatingtestcasedata[deletingStepindex[deletingcaseindex]];
-																			}	
-																		//removing null values from the array JSON
-																		updatingtestcasedata =  updatingtestcasedata.filter(function(n){ return n != null });
-																		}
-																		updatingtestcasedata=JSON.stringify(updatingtestcasedata);
-																		updatingtestcasedata = updatingtestcasedata.replace(/'+/g,"''");
 																		var requesthistorydetails = "'updated testcase action by " + userInfo.username + " having role:" + userInfo.role + "" +
 																			" skucodetestcase=" + requestedskucodeScreens + ", tags=" + requestedtags + "," +
 																			" testcasesteps=" + updatingtestcasedata + ", versionnumber=" + requestedversionnumber+
@@ -759,7 +1056,36 @@ exports.updateScreen_ICE = function(req, res){
 	}
 };
 
-
+function repeatedXpath(viewString, xpath) {
+    var xpathIndex = 0;
+    var result = "";
+    try {
+        for(eachObjectindex=0;eachObjectindex<viewString.length;eachObjectindex++){
+            try {
+				var eachScrapedObject=viewString[eachObjectindex];
+                if ('custname' in eachScrapedObject) {
+                    if ('xpath' in eachScrapedObject) {
+                        var scrapedxpath = eachScrapedObject.xpath;
+                        var scrapedCustName = eachScrapedObject.custname;
+                        if (scrapedxpath == xpath) {
+                            xpathIndex = xpathIndex + 1;
+                        }
+                        if (xpathIndex > 1) {
+                            console.log("scrapedCustName:::", scrapedCustName);
+                            result = scrapedCustName;
+                            break;
+                        }
+                    }
+                }
+            } catch (exception) {
+                console.log(exception);
+            }
+        }
+        return result;
+    } catch (exception) {
+        console.log(exception);
+    }
+}
 function buildObject(scrapedObjects,modifiedBy,requestedskucodeScreens,
 	requestedScreenhistory,screenID,projectID,screenName,requestedversionnumber){
 	try{
