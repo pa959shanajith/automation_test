@@ -2041,7 +2041,10 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 							}
 						}
 						if(mydata[i].keywordVal == "setHeader" || mydata[i].keywordVal == "setHeaderTemplate"){
-							mydata[i].inputVal[0] = mydata[i].inputVal[0].replace(/[\n\r]/g,'##');
+							if(typeof(mydata[i].inputVal) === "string"){
+								mydata[i].inputVal = mydata[i].inputVal.replace(/[\n\r]/g,'##');
+							}
+							else mydata[i].inputVal[0] = mydata[i].inputVal[0].replace(/[\n\r]/g,'##');
 						}
 						console.log("updateTestCase:::", mydata)
 					}
