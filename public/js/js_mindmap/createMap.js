@@ -62,7 +62,8 @@ function loadMindmapData1(){
 			$(nodeBox[0]).empty();
 			allMMaps=JSON.parse(result);
 			allMMaps.forEach(function(e,i){
-				var t=e.name.replace(/_/g,' ');
+				//var t=e.name.replace(/_/g,' ');
+				var t = $.trim(e.name);
 				var node=nodeBox.append('div').attr('class','ct-node fl-left').attr('data-mapid',i).on('click',loadMap);
 				node.append('img').attr('class','ct-nodeIcon').attr('src','images_mindmap/node-modules-no.png').attr('alt','Module').attr('aria-hidden',true);
 				node.append('span').attr('class','ct-nodeLabel').html(t);
@@ -821,6 +822,24 @@ var actionEvent = function(e){
 			clearSvg();
 			treeBuilder(allMMaps[mid]);
 			openDialogMindmap("Success", "Data saved successfully");
+			 dataSender({task:'getModules',prjId:$(".project-list").val()},function(err,result){
+				 	if(err) console.log(result);
+				 	else{
+						 console.log(result);
+						var nodeBox=d3.select('.ct-nodeBox');
+						$(nodeBox[0]).empty();
+						allMMaps=JSON.parse(result);
+						allMMaps.forEach(function(e,i){
+							//var t=e.name.replace(/_/g,' ');
+							var t = $.trim(e.name);
+							var node=nodeBox.append('div').attr('class','ct-node fl-left').attr('data-mapid',i).on('click',loadMap);
+							node.append('img').attr('class','ct-nodeIcon').attr('src','images_mindmap/node-modules-no.png').attr('alt','Module').attr('aria-hidden',true);
+							node.append('span').attr('class','ct-nodeLabel').html(t);
+						});
+						populateDynamicInputList();
+						setModuleBoxHeight();
+				 	}
+				});
 			//$('#Mindmap_save').modal('show');
 		}
 if(flag==20){
