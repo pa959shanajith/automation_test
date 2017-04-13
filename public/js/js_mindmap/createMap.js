@@ -6,6 +6,10 @@ function loadMindmapData(){
 	dataSender({task:'populateProjects',user_id:userid},function(err,result){
 		if(err) console.log(result);
 		else{
+			 if($("#left-nav-section").is(":visible") == true && $("#right-dependencies-section").is(":visible") == false)
+                {
+                   $("#ct-moduleBox,.tabAssign").addClass("ct-expand-module");
+                }
 			result1=JSON.parse(result);
 			var selectedProject=$(".project-list").val();
 			$(".project-list").empty();

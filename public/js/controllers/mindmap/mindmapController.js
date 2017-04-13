@@ -10,13 +10,13 @@ mySPA.controller('mindmapController', ['$scope', '$http', '$location', '$timeout
         if($("#left-nav-section").is(":visible") == true)
             {
                $("span.taskname").addClass('taskTitle');
+              
             }
         else{
              $("span.taskname").removeClass('taskTitle');
              $("div.content-div").removeClass("content-div-req");
         }
-       
-
+        
 	}, 500)
 		/*Sidebar-toggle*/
     $scope.tab = "tabRequirement";
@@ -31,28 +31,30 @@ mySPA.controller('mindmapController', ['$scope', '$http', '$location', '$timeout
     });
    
     $("#ct-expand").click(function(e) {
+         $("#ct-moduleBox,.tabAssign").removeClass("ct-expand-module");
            $(".left-sec-mindmap").show();
            if($('#right-dependencies-section').is(':visible')){
-                $("#ct-moduleBox").css({'left':'147px','width':'83%'})
+                $("#ct-moduleBox,.tabAssign").css({'left':'147px','width':'83%'})
                 $(".ct-tileBox").css({'left':'50%'})
            }
            else{
-               $("#ct-moduleBox").css({'left':'147px','width':'100%'})
+               $("#ct-moduleBox,.tabAssign").css({'left':'147px','width':'100%'})
                $(".ct-tileBox").css({'left':'52% !important'})
            }  
             $("span.taskname").addClass('taskTitle');
             $("div.content-div").removeClass("content-div-both-collapse");
             $("div.content-div").addClass("content-div-req");
-
+            
     });
     $("#ct-collapse").click(function(e) {
+         $("#ct-moduleBox,.tabAssign").removeClass("ct-expand-module");
            $(".left-sec-mindmap").hide();
            if($('#right-dependencies-section').is(':visible')){
-               $("#ct-moduleBox").css({'left':'0','width':'94%'})
+               $("#ct-moduleBox,.tabAssign").css({'left':'0','width':'94%'})
                $(".ct-tileBox").css({'left':'50%'})
            }
            else{
-               $("#ct-moduleBox").css({'left':'0','width':'100%'})
+               $("#ct-moduleBox,.tabAssign").css({'left':'0','width':'100%'})
                $(".ct-tileBox").css({'left':'52% !important'})
            }
               $("span.taskname").removeClass('taskTitle');
@@ -66,29 +68,32 @@ mySPA.controller('mindmapController', ['$scope', '$http', '$location', '$timeout
                 }
     });
     $("#ct-expand-right").click(function(e) {
+         $("#ct-moduleBox,.tabAssign").removeClass("ct-expand-module");
     	var flg = false;
          e.preventDefault()
          $(".rsSlide").toggle(5, function(){
              $(this).siblings("#ct-expand-right").toggleClass("ct-collapse-right");
              if($(".left-sec-mindmap").is(':visible') && $('#right-dependencies-section').is(':visible')){
-            	 $("#ct-moduleBox").css({'width':''})
+            	 $("#ct-moduleBox,.tabAssign").css({'width':''})
             	 flg = true;
                  $(".ct-tileBox").css({'left':'50%'})
                  $("div.content-div").addClass("content-div-req");
-                $("div.content-div").removeClass("content-div-right-expand");
-                
+                 $("div.content-div").removeClass("content-div-right-expand");
+                 $(".project-list").removeClass("selectProject");
              }
              else{
-                 $("#ct-moduleBox").css({'z-index':'0','width':'100%'})
+                 $("#ct-moduleBox,.tabAssign").css({'z-index':'0','width':'100%'})
                  $(".ct-tileBox").css({'left':'52% !important'})
                  $("div.content-div").removeClass("content-div-req");
                  $("div.content-div").addClass("content-div-right-expand");
+                $(".project-list").addClass("selectProject");
                 if(($("#left-nav-section").is(":visible") == false &&  $("#right-dependencies-section").is(":visible") == true))
                 {
                    $("div.content-div").removeClass("content-div-right-expand");
+                   $(".project-list").removeClass("selectProject");
                 }
              }
-             if(flg) $("#ct-moduleBox").css({'z-index':'0','width':'82% !important'})
+             if(flg) $("#ct-moduleBox,.tabAssign").css({'z-index':'0','width':'82% !important'})
                if(($("#left-nav-section").is(":visible") == false &&  $("#right-dependencies-section").is(":visible") == false))
                 {
                    $("div.content-div").addClass("content-div-both-collapse");
@@ -111,10 +116,18 @@ mySPA.controller('mindmapController', ['$scope', '$http', '$location', '$timeout
             	$('.selectProject').show();
                 $("img.selectedIcon").removeClass("selectedIcon");
 		        $('#createImg').addClass('selectedIcon');
+                if($("#left-nav-section").is(":visible") == true && $("#right-dependencies-section").is(":visible") == false)
+                {
+                   $("#ct-moduleBox,.tabAssign").addClass("ct-expand-module");
+                }
             }else if($scope.tab=='tabAssign'){
                 $('.selectProject').show();
                 $("img.selectedIcon").removeClass("selectedIcon");
 		        $('#assignImg').addClass('selectedIcon');
+                 if($("#left-nav-section").is(":visible") == true && $("#right-dependencies-section").is(":visible") == false)
+                {
+                    $("#ct-moduleBox,.tabAssign").addClass("ct-expand-module");
+                }
             }
             loadMindmapData()
         }

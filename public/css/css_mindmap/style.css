@@ -279,3 +279,11 @@ select
     position: relative;
     left: 160px;
 }
+.selectProject
+{
+    margin-right: 0px !important;
+}
+.ct-expand-module
+{
+    width: 88.5% !important;
+}
