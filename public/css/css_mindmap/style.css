@@ -78,10 +78,10 @@ p,a,img,text,span,.noselect{-webkit-touch-callout:none;-webkit-user-select:none;
 .ct-svgTile>g>path{stroke:#333;stroke-width:1px}
 .ct-tileBox .ct-text{display:block;font-size:16px;white-space:nowrap}
 .ct-nodeBox{position:relative;margin:0 20px;height:100%;overflow:hidden}
-.ct-nodeBox .ct-node{position:relative;display:inline-block;height:75px;width:140px;padding:5px;margin:5px 11px 10px;text-align:center;line-height:2;-webkit-border-radius:10px;-moz-border-radius:10px;border-radius:10px;cursor:pointer}
+.ct-nodeBox .ct-node{position:relative;display:inline-block;height:75px;width:140px;padding:5px;margin:5px 11px 10px;text-align:center;-webkit-border-radius:10px;-moz-border-radius:10px;border-radius:10px;cursor:pointer}
 .ct-nodeBox .ct-node:hover{background-color:#f4f4f4}
 .ct-node .ct-nodeIcon{display:inline-block;height:40px;width:40px;cursor:pointer}
-.ct-node .ct-nodeLabel{display:block;font-size:10px;cursor:default}
+.ct-node .ct-nodeLabel{display:block;font-size:10px;cursor:default;word-wrap: break-word;padding-top: 2px;}
 .ct-node .ct-nodeCtrl{fill:#fff}
 .ct-node .ct-nodeBubble{stroke-width:1px;fill:#fff}
 .ct-nodeLabel{font-size:12px}
@@ -278,4 +278,12 @@ select
 {
     position: relative;
     left: 160px;
+}
+.selectProject
+{
+    margin-right: 0px !important;
+}
+.ct-expand-module
+{
+    width: 88.5% !important;
 }
