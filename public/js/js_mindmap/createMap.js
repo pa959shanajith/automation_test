@@ -1,19 +1,22 @@
 var activeNode,uNix,uLix,node,link,dNodes,dLinks,allMMaps,temp,rootIndex,faRef,nCount,scrList,tcList,mapSaved,zoom,cSpan,cScale,taskAssign,releaseResult;
 var deletednode=[];
 function loadMindmapData(){
-	$(".project-list")
 	var userInfo =  JSON.parse(window.localStorage['_UI']);
 	var userid = userInfo.user_id;
 	dataSender({task:'populateProjects',user_id:userid},function(err,result){
 		if(err) console.log(result);
 		else{
 			result1=JSON.parse(result);
+			var selectedProject=$(".project-list").val();
 			$(".project-list").empty();
 			for(i=0; i<result1.projectId.length && result1.projectName.length; i++){
 				$('.project-list').append("<option app-type='"+result1.appType[i]+"' data-id='"+result1.projectName[i]+"' value='"+result1.projectId[i]+"'>"+result1.projectName[i]+"</option>");	
 			}
-			
-			$(".project-list option[value='" + result1.projectName[0] + "']").attr('selected', 'selected');
+
+			if (selectedProject == null){
+				selectedProject=result1.projectName[0];
+			}
+			$(".project-list option[value='" + selectedProject + "']").attr('selected', 'selected');
 			loadMindmapData1(); 
 			$(".project-list").change(function () {
             //alert($(".project-list").val());
@@ -229,7 +232,7 @@ var addTask = function(e){
 		if(dNodes[pi].children) dNodes[pi].children.forEach(function(tCa){
 			var cTask=(tObj.t=="Scrape"||tObj.t=="Append"||tObj.t=="Compare")? "Design":"Debug";
 			if(tCa.task===undefined||tCa.task==null){
-				var tcid=dNodes[pi].children[0].id_c;
+				var tcid=tCa.id_c;
 				if (modid !='null' && tscid !='null' && scrid!='null' && tcid!='null'){
 					taskflag=true;
 					tCa.task={id:null,oid:null,task:cTask,assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,details:tObj.det,parent:[modid,tscid,scrid,tcid]};
