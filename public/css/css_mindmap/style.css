@@ -75,7 +75,7 @@ p,a,img,text,span,.noselect{-webkit-touch-callout:none;-webkit-user-select:none;
 .ct-moduleBoxOptional .ct-expand.ct-rev::after{left:25px;top:-4px;border-top-color:transparent;border-bottom-color:#333}
 .ct-moduleBoxOptional.ct-open{height:auto;max-height:300px;overflow:auto}
 /**Optional for id ct-moduleBox CSS**/
-#ct-canvas, #ct-canvasforAssign{position:relative;height:100%;overflow:hidden;border:1px solid transparent}
+#ct-canvas, #ct-canvasforAssign{position:relative;height:100%;overflow:hidden;border:1px solid transparent; z-index: -99 !important;}
 .ct-tileBox{position: relative; display: block; top: 50%; left: 52%; transform: translateX(-50%) translateY(-50%); width: 150px;}
 .ct-tile{position:relative;display:block;height:150px;width:100%;cursor:pointer;background-color:#e6e7e9;-webkit-border-radius:20px;-moz-border-radius:20px;border-radius:20px}
 .ct-svgTile>g>circle{fill:none;stroke:#333;stroke-width:1px}
