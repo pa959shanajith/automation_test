@@ -498,7 +498,8 @@ var parsing = function(d,urlData) {
 						var testcaseId_c_json=tc.testcaseId_c;
 						var testcaseName_json=tc.testcaseName;
 						console.log(testcaseId_json,testcaseId_c_json);
-						qList_new.push({"statement":"MATCH (a:TESTCASES) WHERE a.testCaseName='"+testcaseName_json+"' and a.screenID_c='"+screenId_c_json+"' SET a.testCaseID_c='"+testcaseId_c_json+"'"});
+						qList_new.push({"statement":"MATCH (a:TESTCASES) WHERE a.testCaseName='"+testcaseName_json+"' and a.screenID='"+screenId_json+"' SET a.testCaseID_c='"+testcaseId_c_json+"'"});
+						
 						//updateJson.push({testcaseId_json:testcaseId_c_json});
 						cassandraId_dict[testcaseId_json]=testcaseId_c_json;
 				//updateJson.push(cassandraId_dict);
