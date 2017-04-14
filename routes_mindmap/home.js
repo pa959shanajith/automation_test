@@ -414,7 +414,7 @@ router.post('/', function(req, res, next) {
 					}else{
 						res_data=JSON.parse(result);
 						if(res_data[0].data.length!= 0){
-							if(res_data[0].data[0].row[0] != null){
+							if(res_data[0].data[0].row[0] != null && res_data[0].data[0].row[0] != 'select reviewer'){
 								query={'statement':"MATCH (n:TASKS) WHERE n.taskID='"+taskID+"' and n.assignedTo='"+d.userId+"' set n.task_owner=n.assignedTo,n.assignedTo=n.reviewer,n.status='review' RETURN n"};
 								var qlist_query=[query];
 								reqToAPI({"data":{"statements":qlist_query}},urlData,'/neoQuerya',function(err,status,result){
@@ -429,21 +429,10 @@ router.post('/', function(req, res, next) {
 						}else{
 							res.status(200).send('Tasksubmitted');
 						}
-						// if(res_data[0].data.length!= 0 && res_data[0].data[0].row[0] != 'null'){
-						// 	query={'statement':"MATCH (n:TASKS) WHERE n.taskID='"+taskID+"' and n.assignedTo='"+d.userId+"' set n.task_owner=n.assignedTo,n.assignedTo=n.reviewer,n.status='review' RETURN n"};
-						// 	var qlist_query=[query];
-						// 	reqToAPI({"data":{"statements":qlist_query}},urlData,'/neoQuerya',function(err,status,result){
-						// 			//res.setHeader('Content-Type','application/json');
-						// 			if(err) res.status(status).send(err);
-						// 			res.status(200).send('success');
-							
-						// 	});
-						// }else{
-						// 	res.status(200).send('fail');
-						// }
+						
 					}
 					
-					//res.status(200).send('success');
+					
 					
 				});
 			
