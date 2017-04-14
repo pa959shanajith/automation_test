@@ -2984,14 +2984,14 @@ function contentTable(newTestScriptDataLS) {
 					//adding for SAP
 					else if(appTypeLocal == 'SAP' &&(obType =='GuiTextField' ||obType =='GuiTitlebar' ||obType =='GuiButton' ||obType =='GuiUserArea'||obType =='GuiRadioButton' 
 					    ||obType =='GuiLabel' ||obType =='GuiBox' ||obType =='GuiSimpleContainer' ||obType =='GuiPasswordField'||obType=='GuiComboBox'||obType=='GuiCheckBox'
-						||obType =='GuiStatusbar' ||obType =='GuiStatusPane' ||obType =='text' ||obType =='combo_box' || obType =='list_item' 
+						||obType =='GuiStatusbar' ||obType =='GuiStatusPane' ||obType =='text' ||obType =='combo_box' || obType =='list_item' || obType =='GuiCTextField'
 						|| obType =='hyperlink' || obType =='lbl'||obType =='list' || obType == 'edit' || obType == null || obType == 'check_box' 
 						|| obType == 'radio_button' ||obType != undefined)){
 						var res = '';
 						var sc;
 						var listType = '';
 						if(obType =='push_button' ||obType =='GuiButton' )	{sc = Object.keys(keywordArrayList.button);selectedKeywordList = "button";}		
-						else if(obType =='GuiTextField'){	sc = Object.keys(keywordArrayList.text);selectedKeywordList = "text";}
+						else if(obType =='GuiTextField' || obType =='GuiCTextField'){	sc = Object.keys(keywordArrayList.text);selectedKeywordList = "text";}
 						else if(obType =='GuiLabel'){	sc = Object.keys(keywordArrayList.element);selectedKeywordList = "element";}
 						else if(obType =='GuiPasswordField'){	sc = Object.keys(keywordArrayList.text);selectedKeywordList = "text";}
 						else if(obType =='combo_box'||obType =='GuiBox'|| obType=='GuiComboBox'){	sc = Object.keys(keywordArrayList.select);selectedKeywordList = "select";}
