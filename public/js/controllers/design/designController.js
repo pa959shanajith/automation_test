@@ -3882,34 +3882,35 @@ function commentStep(){
 			for(i=0; i<myData.length; i++){
 				if(myData[i].stepNo == parseInt($(this).children('td:nth-child(1)').text().trim())){
 					//Check whether output coloumn is empty
-					if($(this).children('td:nth-child(8)').text().trim() == ""){
+					if(myData[i].outputVal == ""){
 						myData[i].outputVal = "##";
-						$("#jqGrid").trigger("reloadGrid");
+						//$("#jqGrid").trigger("reloadGrid");
 					}
 					else{
 						//Check whether output coloumn has some value
-						if($(this).children('td:nth-child(8)').text().trim() != "") {
+						if(myData[i].outputVal != "") {
 							//If already commented but no additional value
-							if($(this).children('td:nth-child(8)').text().trim() == "##"){
+							if(myData[i].outputVal == "##"){
 								myData[i].outputVal = "";
-								$("#jqGrid").trigger("reloadGrid");
+								//$("#jqGrid").trigger("reloadGrid");
 							}
 							//If already commented and contains additional value
-							else if($(this).children('td:nth-child(8)').text().trim().indexOf(";##") !== -1){
+							else if(myData[i].outputVal.indexOf(";##") !== -1){
 								var lastTwo = myData[i].outputVal.substr(myData[i].outputVal.length - 3);
 								myData[i].outputVal = myData[i].outputVal.replace(lastTwo,"");
-								$("#jqGrid").trigger("reloadGrid");
+								//$("#jqGrid").trigger("reloadGrid");
 							}
 							//If contains value but not commented
 							else{
 								myData[i].outputVal = myData[i].outputVal.concat(";##");
-								$("#jqGrid").trigger("reloadGrid");
+								//$("#jqGrid").trigger("reloadGrid");
 							}
 						}
 					}
 				}
 			}
 		});
+		$("#jqGrid").trigger("reloadGrid");
 	}
 	else{
 		openDialog("Skip Testcase step", "Please select step to skip")
