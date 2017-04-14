@@ -4,6 +4,9 @@ var http = require('http');
 var async=require('async');
 
 
+
+
+
 exports.getTaskJson_mindmaps = function(obj,cb,data){
 	try {
 	//var userid="482fa3f8-7db6-4512-a35f-adef7f07a6c2";
@@ -79,7 +82,7 @@ function next_function(resultobj,cb,data){
 
 
     var result=resultobj.result;
-    var prjId = resultobj.prjId[0].projectId;
+    var prjId = resultobj.prjId.projectId;
     //var prjName = resultobj.prjId[0].projectName;
 	console.log(resultobj);
 	try{
@@ -128,6 +131,9 @@ function next_function(resultobj,cb,data){
 		taskDetails.reviewer=t.reviewer;
 		taskDetails.subTaskId=t.taskID;
 		taskDetails.taskDescription=t.details;
+		if (t.status != undefined){
+			taskDetails.status=t.status;
+		}
 		var parent=t.parent.substring(1, t.parent.length-1).split(",");
 		var parent_length=parent.length;
         task_json.projectId=parent[0];
@@ -155,7 +161,7 @@ function next_function(resultobj,cb,data){
 										//task_json.assignedTestScenarioIds=data.assignedTestScenarioIds;
 										task_json.taskDetails.push(taskDetails);
 										user_task_json.push(task_json);
-										console.log(user_task_json);
+										//console.log(user_task_json);
 										fs.writeFileSync('assets_mindmap/task_json.json',JSON.stringify(user_task_json),'utf8');
 										maincallback();
 
