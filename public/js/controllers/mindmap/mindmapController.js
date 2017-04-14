@@ -49,11 +49,13 @@ mySPA.controller('mindmapController', ['$scope', '$http', '$location', '$timeout
     $("#ct-collapse").click(function(e) {
          $("#ct-moduleBox,.tabAssign").removeClass("ct-expand-module");
            $(".left-sec-mindmap").hide();
+            $("#ct-expand").addClass('collapsed');
            if($('#right-dependencies-section').is(':visible')){
                $("#ct-moduleBox,.tabAssign").css({'left':'0','width':'94%'})
                $(".ct-tileBox").css({'left':'50%'})
            }
            else{
+               $("#ct-expand").removeClass('collapsed');
                $("#ct-moduleBox,.tabAssign").css({'left':'0','width':'100%'})
                $(".ct-tileBox").css({'left':'52% !important'})
            }
@@ -73,6 +75,7 @@ mySPA.controller('mindmapController', ['$scope', '$http', '$location', '$timeout
          e.preventDefault()
          $(".rsSlide").toggle(5, function(){
              $(this).siblings("#ct-expand-right").toggleClass("ct-collapse-right");
+             $("#ct-expand-right").removeClass('expand');
              if($(".left-sec-mindmap").is(':visible') && $('#right-dependencies-section').is(':visible')){
             	 $("#ct-moduleBox,.tabAssign").css({'width':''})
             	 flg = true;
@@ -82,6 +85,7 @@ mySPA.controller('mindmapController', ['$scope', '$http', '$location', '$timeout
                  $(".project-list").removeClass("selectProject");
              }
              else{
+                 $("#ct-expand-right").addClass('expand');
                  $("#ct-moduleBox,.tabAssign").css({'z-index':'0','width':'100%'})
                  $(".ct-tileBox").css({'left':'52% !important'})
                  $("div.content-div").removeClass("content-div-req");

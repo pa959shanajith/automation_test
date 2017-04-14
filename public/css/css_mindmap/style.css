@@ -53,12 +53,16 @@ p,a,img,text,span,.noselect{-webkit-touch-callout:none;-webkit-user-select:none;
 .ct-expand{position:absolute;cursor:pointer;overflow:hidden;background-color:rgba(255,255,255,.7)}
 .ct-expand::after{position:absolute;content:'';top:7.5px;border:5px solid transparent}
 #ct-lSide{left:0}
-#ct-lSide .ct-expand::after{left:1px;border-left-color:#333}
+/*#ct-lSide .ct-expand::after{left:1px;border-left-color:#333}*/
+#ct-lSide .ct-expand::after{ left: -4px; border-right-color: #333;}
+.ct-expand.collapsed:after {left: 1px !important; border-left-color:#333 !important;} /*toggle Arrow Icons for left section*/
+.ct-expand.expand:after {left: -4px !important; border-right-color:#333 !important;} /*toggle Arrow Icons for right section*/
 #ct-lSide .ct-expand.ct-rev::after{left:-4px;border-right-color:#333;border-left-color:transparent}
 #ct-rSide{right:0; position: relative;}
-#ct-rSide .ct-expand::after{left:-4px;border-right-color:#333}
+/*#ct-rSide .ct-expand::after{left:-4px;border-right-color:#333}*/
+#ct-rSide .ct-expand::after{left: 1px;border-left-color:#333}
 #ct-rSide .ct-expand.ct-rev::after{left:1px;border-left-color:#333;border-right-color:transparent}
-#ct-main{position:relative;margin:2px;padding:5px;height:calc(100% - 4px);width:calc(100% - 16px)}
+#ct-main{position:relative;margin:2px;padding:5px;height:calc(100% - 4px);width:calc(100% - 16px);z-index: -1 !important;}
 #ct-moduleBox{position:absolute;padding:0 10px;top:30px;z-index:100;height:92px;width:83%;background-color:#e6e7e9;border:1px solid#e6e7e9}
 #ct-moduleBox .ct-expand{height:8px;width:60px;left:calc(50% - 40px);bottom:0;background-color:#fff}
 #ct-moduleBox .ct-expand::after{left:25px;top:1px;border-top-color:#333}
@@ -71,7 +75,7 @@ p,a,img,text,span,.noselect{-webkit-touch-callout:none;-webkit-user-select:none;
 .ct-moduleBoxOptional .ct-expand.ct-rev::after{left:25px;top:-4px;border-top-color:transparent;border-bottom-color:#333}
 .ct-moduleBoxOptional.ct-open{height:auto;max-height:300px;overflow:auto}
 /**Optional for id ct-moduleBox CSS**/
-#ct-canvas, #ct-canvasforAssign{position:relative;height:100%;overflow:hidden;border:1px solid transparent}
+#ct-canvas, #ct-canvasforAssign{position:relative;height:100%;overflow:hidden;border:1px solid transparent; z-index: -99 !important;}
 .ct-tileBox{position: relative; display: block; top: 50%; left: 52%; transform: translateX(-50%) translateY(-50%); width: 150px;}
 .ct-tile{position:relative;display:block;height:150px;width:100%;cursor:pointer;background-color:#e6e7e9;-webkit-border-radius:20px;-moz-border-radius:20px;border-radius:20px}
 .ct-svgTile>g>circle{fill:none;stroke:#333;stroke-width:1px}

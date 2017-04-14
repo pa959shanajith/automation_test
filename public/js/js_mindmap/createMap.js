@@ -1,8 +1,9 @@
 var activeNode,uNix,uLix,node,link,dNodes,dLinks,allMMaps,temp,rootIndex,faRef,nCount,scrList,tcList,mapSaved,zoom,cSpan,cScale,taskAssign,releaseResult;
 var deletednode=[];
+var userInfo =  JSON.parse(window.localStorage['_UI']);
+var userid = userInfo.user_id;
 function loadMindmapData(){
-	var userInfo =  JSON.parse(window.localStorage['_UI']);
-	var userid = userInfo.user_id;
+	
 	dataSender({task:'populateProjects',user_id:userid},function(err,result){
 		if(err) console.log(result);
 		else{
@@ -690,7 +691,10 @@ var inpChange = function(e){
 	var pt=p.select('.ct-nodeLabel');
 	var t=p.attr('data-nodetype');
 	if(!d3.select('#ct-inpSugg').classed('no-disp') && temp && temp.length>0) return;
-	if(dNodes[pi].id_n) dNodes[pi].rnm=!0;
+	if(dNodes[pi].id_n){
+		dNodes[pi].original_name=p.text();
+		dNodes[pi].rnm=!0;
+	} 
 	if(t=='screens' && scrList[inp.attr('data-nodeid')]!==undefined){
 		dNodes[pi].id_n=scrList[inp.attr('data-nodeid')].id_n;
 		dNodes[pi].name=scrList[inp.attr('data-nodeid')].name;
@@ -766,12 +770,32 @@ var inpKeyUp = function(e){
 	}
 };
 var treeIterator = function(c,d,e){
-	c.push({id:d.id,id_c:(d.id_c)?d.id_c:null,id_n:(d.id_n)?d.id_n:null,oid:(d.oid)?d.oid:null,name:d.name,type:d.type,pid:(d.parent)?d.parent.id:null,task:(d.task)?d.task:null,renamed:(d.rnm)?d.rnm:!1});
+	c.push({id:d.id,id_c:(d.id_c)?d.id_c:null,id_n:(d.id_n)?d.id_n:null,oid:(d.oid)?d.oid:null,name:d.name,type:d.type,pid:(d.parent)?d.parent.id:null,task:(d.task)?d.task:null,renamed:(d.rnm)?d.rnm:!1,orig_name:(d.original_name)?d.original_name:null});
 	if(d.children&&d.children.length>0) d.children.forEach(function(t){e=treeIterator(c,t,e);});
 	else if(d._children&&d._children.length>0) d._children.forEach(function(t){e=treeIterator(c,t,e);});
 	else if(d.type!='testcases') return !0;
 	return e;
 };
+
+var submit_task=function(e){
+	var taskinfo=JSON.parse(window.localStorage['_CT']);
+	var taskid=taskinfo.subTaskId;
+	//alert(taskinfo.subTaskId);
+	dataSender({task:'reviewTask',prjId:$(".project-list").val(),taskId:taskid,userId:userid},function(err,result){
+		if(err) console.log(result);
+		else{
+			console.log(result);
+			if (result=='fail'){
+				openDialogMindmap("Task Submission Error", "Reviewer is not assigned !")
+			}else if(result=='Tasksubmitted'){
+				openDialogMindmap("Task Submission Error", "Task Already Submitted!")
+			}else{
+				openDialogMindmap("Task Submission Success", "Task Submitted scucessfully!")
+			}
+		}
+	});
+}
+
 var actionEvent = function(e){
 	var s=d3.select(this);
 	var error=!1,mapData=[],flag=0,alertMsg;
@@ -829,7 +853,7 @@ var actionEvent = function(e){
 			 dataSender({task:'getModules',prjId:$(".project-list").val()},function(err,result){
 				 	if(err) console.log(result);
 				 	else{
-						 console.log(result);
+						// console.log(result);
 						var nodeBox=d3.select('.ct-nodeBox');
 						$(nodeBox[0]).empty();
 						allMMaps=JSON.parse(result);
@@ -972,17 +996,38 @@ var dataSender = function(data,callback){
 	var xhttp;
 	try{xhttp=new XMLHttpRequest();}catch(e){try{xhttp=new ActiveXObject("Msxml2.XMLHTTP");}catch(e){try{xhttp=new ActiveXObject("Microsoft.XMLHTTP");}catch(e){alert("Your Browser is outdated!\nPlease Update!");return false;}}}
 	xhttp.onreadystatechange = function(){4==this.readyState&&(200==this.status?callback(!1,this.responseText):(400==this.status||401==this.status||402==this.status||403==this.status||404==this.status)&&callback(!0,this.responseText));};
-	xhttp.open("POST",window.location.pathname,!0);
+	//xhttp.open("POST",window.location.pathname,!0);
+	xhttp.open("POST",'/home',!0);
 	xhttp.setRequestHeader("Content-Type", "application/json");
 	xhttp.send(JSON.stringify(data));
 };
 
 //Dialog used through out mindmap
 function openDialogMindmap(title, body){
-	$("#mindmapGlobalDialog").find('.modal-title').text(title);
-    $("#mindmapGlobalDialog").find('.modal-body p').text(body).css('color','black');
-	$("#mindmapGlobalDialog").modal("show");
-	setTimeout(function(){
-		$("#mindmapGlobalDialog").find('.btn-default').focus();					
-	}, 300);
+	if (window.location.pathname == '/home'){
+		$("#mindmapGlobalDialog").find('.modal-title').text(title);
+		$("#mindmapGlobalDialog").find('.modal-body p').text(body).css('color','black');
+		$("#mindmapGlobalDialog").modal("show");
+		setTimeout(function(){
+			$("#mindmapGlobalDialog").find('.btn-default').focus();					
+		}, 300);
+	}else if(window.location.pathname == '/designTestCase' || window.location.pathname == '/design'){
+		$("#globalModal").find('.modal-title').text(title);
+		$("#globalModal").find('.modal-body p').text(body).css('color','black');
+		$("#globalModal").modal("show");
+		setTimeout(function(){
+			$("#globalModal").find('.btn-default').focus();					
+		}, 300);
+	}
+	else if(window.location.pathname == '/execute'){
+		$("#executeGlobalModal").find('.modal-title').text(title);
+		$("#executeGlobalModal").find('.modal-body p').text(body).css('color','black');
+		$("#executeGlobalModal").modal("show");
+		setTimeout(function(){
+			$("#executeGlobalModal").find('.btn-accept').focus();					
+		}, 300);
+	}
+	
+
+	
 }
