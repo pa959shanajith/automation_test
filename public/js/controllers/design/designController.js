@@ -2495,7 +2495,8 @@ function contentTable(newTestScriptDataLS) {
 			var grid = $("#jqGrid");
 			grid.jqGrid('restoreRow',lastSelection);
 			lastSelection = "";
-		}	
+		}
+		shortString(); //Call to wrap the select option text in JqGrid
 		//get Input and Output Syntax for selected Keyword
 		var keywordArrayList1 = keywordListData;
 		var keywordArrayList = JSON.parse(keywordArrayList1);
@@ -3265,7 +3266,7 @@ function contentTable(newTestScriptDataLS) {
 		//get current selected row
 		var currRowId = $grid.jqGrid('getGridParam','selrow');
 		var selId = '#' + currRowId + '_'+selName;
-		var selectedText = $(selId+' option:selected').text();
+		var selectedText = $(selId+' option:selected').val();
 		var url = " " ;
 		var objName = " ";
 		setKeyword1(e,selectedText,$grid,"empty");
@@ -3299,7 +3300,7 @@ function contentTable(newTestScriptDataLS) {
 		//get current selected row
 		var currRowId = $grid.jqGrid('getGridParam','selrow'); 
 		var selId = '#' + currRowId + '_'+selName;             	
-		var selectedText = $(selId+' option:selected').text();
+		var selectedText = $(selId+' option:selected').val();
 		var url = " " ;
 		var objName = " ";
 		setKeyword(e,selectedText,$grid,"empty");
@@ -3914,6 +3915,27 @@ function commentStep(){
 	}
 	else{
 		openDialog("Skip Testcase step", "Please select step to skip")
+	}
+}
+
+function shortString() {
+	var shorts = document.querySelectorAll('.ellipsisText');
+	if (shorts) {
+		Array.prototype.forEach.call(shorts, function(ele) {
+			var str = ele.innerText,
+			indt = '...';
+
+			if (ele.hasAttribute('data-limit')) {
+				if (str.length > ele.dataset.limit) {
+					var result = `${str.substring(0, ele.dataset.limit - indt.length).trim()}${indt}`;
+					ele.innerText = result;
+					str = null;
+					result = null;
+				}
+			} else {
+				throw Error('Cannot find attribute \'data-limit\'');
+			}
+		});
 	}
 }
 
