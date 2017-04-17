@@ -79,15 +79,20 @@ mySPA.controller('mindmapController', ['$scope', '$http', '$location', '$timeout
              if($(".left-sec-mindmap").is(':visible') && $('#right-dependencies-section').is(':visible')){
             	 $("#ct-moduleBox,.tabAssign").css({'width':''})
             	 flg = true;
-                 $(".ct-tileBox").css({'left':'50%'})
+                // $(".ct-tileBox").css({'left':'50%'})
                  $("div.content-div").addClass("content-div-req");
                  $("div.content-div").removeClass("content-div-right-expand");
                  $(".project-list").removeClass("selectProject");
+                 if($("#ctExpandCreate").hasClass("ctExpandCreateFixed"))
+                 {
+                      $("#ctExpandCreate").removeClass("ctExpandCreateFixedClosed").addClass("ctExpandCreateFixed");
+                 }
              }
              else{
+                 
                  $("#ct-expand-right").addClass('expand');
                  $("#ct-moduleBox,.tabAssign").css({'z-index':'0','width':'100%'})
-                 $(".ct-tileBox").css({'left':'52% !important'})
+               //  $(".ct-tileBox").css({'left':'52% !important'})
                  $("div.content-div").removeClass("content-div-req");
                  $("div.content-div").addClass("content-div-right-expand");
                 $(".project-list").addClass("selectProject");
@@ -105,6 +110,11 @@ mySPA.controller('mindmapController', ['$scope', '$http', '$location', '$timeout
                 else{
                       $("div.content-div").removeClass("content-div-both-collapse");
                 }
+            if($("#ctExpandCreate").hasClass("ctExpandCreateFixed"))
+            {
+                 $("#ctExpandCreate").removeClass("ctExpandCreateFixed").addClass("ctExpandCreateFixedCLosed");
+            }
+                  $("#ctExpandCreate").css("bottom","553px !important");
          });
      
     });
