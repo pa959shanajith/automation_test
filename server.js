@@ -19,7 +19,8 @@ app.use(sessions({
     httpOnly: true,
     secure: false,
 	rolling: true,
-	//saveUninitialized: false,
+	saveUninitialized: false,
+	resave: false,
 	cookie: { maxAge: (30*60*1000) }
 }));
 //write stream for logs
