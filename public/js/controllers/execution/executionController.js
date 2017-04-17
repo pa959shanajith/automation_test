@@ -231,7 +231,7 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 					$('#executionTerminated').find('.btn-default').focus();
 				}
 				else if(data == "unavailableLocalServer"){
-					openDialogExe("Execute Test Suite", "ICE Engine is not available")
+					openDialogExe("Execute Test Suite", "ICE Engine is not available. Please run the batch file and connect to the Server.")
 					//$('#executionserverunavailable').modal('show');
 				}
 				else{

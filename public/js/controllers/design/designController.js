@@ -251,7 +251,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				console.log("debug-----",data);
 				if (data == "unavailableLocalServer")	{
 					unblockUI();
-					openDialog("Debug Testcase", "Local Server is not available. Please run the batch file from the Bundle.")
+					openDialog("Debug Testcase", "ICE Engine is not available. Please run the batch file and connect to the Server.")
 				}
 				else if(data == "success"){
 					unblockUI();
@@ -1290,6 +1290,11 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			.then(function (data) {
 				window.localStorage['disableEditing'] = "true";
 				unblockUI();
+				if (data == "unavailableLocalServer")	{
+					unblockUI();
+					openDialog("Scrape Screen", "ICE Engine is not available. Please run the batch file and connect to the Server.");
+					return false
+				}
 				if(data == "Fail"){
 					$("#scrapeFailModal").modal("show");
 					return false
@@ -2495,8 +2500,7 @@ function contentTable(newTestScriptDataLS) {
 			var grid = $("#jqGrid");
 			grid.jqGrid('restoreRow',lastSelection);
 			lastSelection = "";
-		}
-		shortString(); //Call to wrap the select option text in JqGrid
+		}	
 		//get Input and Output Syntax for selected Keyword
 		var keywordArrayList1 = keywordListData;
 		var keywordArrayList = JSON.parse(keywordArrayList1);
@@ -2985,14 +2989,14 @@ function contentTable(newTestScriptDataLS) {
 					//adding for SAP
 					else if(appTypeLocal == 'SAP' &&(obType =='GuiTextField' ||obType =='GuiTitlebar' ||obType =='GuiButton' ||obType =='GuiUserArea'||obType =='GuiRadioButton' 
 					    ||obType =='GuiLabel' ||obType =='GuiBox' ||obType =='GuiSimpleContainer' ||obType =='GuiPasswordField'||obType=='GuiComboBox'||obType=='GuiCheckBox'
-						||obType =='GuiStatusbar' ||obType =='GuiStatusPane' ||obType =='text' ||obType =='combo_box' || obType =='list_item' || obType =='GuiCTextField'
+						||obType =='GuiStatusbar' ||obType =='GuiStatusPane' ||obType =='text' ||obType =='combo_box' || obType =='list_item' 
 						|| obType =='hyperlink' || obType =='lbl'||obType =='list' || obType == 'edit' || obType == null || obType == 'check_box' 
 						|| obType == 'radio_button' ||obType != undefined)){
 						var res = '';
 						var sc;
 						var listType = '';
 						if(obType =='push_button' ||obType =='GuiButton' )	{sc = Object.keys(keywordArrayList.button);selectedKeywordList = "button";}		
-						else if(obType =='GuiTextField' || obType =='GuiCTextField'){	sc = Object.keys(keywordArrayList.text);selectedKeywordList = "text";}
+						else if(obType =='GuiTextField'){	sc = Object.keys(keywordArrayList.text);selectedKeywordList = "text";}
 						else if(obType =='GuiLabel'){	sc = Object.keys(keywordArrayList.element);selectedKeywordList = "element";}
 						else if(obType =='GuiPasswordField'){	sc = Object.keys(keywordArrayList.text);selectedKeywordList = "text";}
 						else if(obType =='combo_box'||obType =='GuiBox'|| obType=='GuiComboBox'){	sc = Object.keys(keywordArrayList.select);selectedKeywordList = "select";}
@@ -3266,7 +3270,7 @@ function contentTable(newTestScriptDataLS) {
 		//get current selected row
 		var currRowId = $grid.jqGrid('getGridParam','selrow');
 		var selId = '#' + currRowId + '_'+selName;
-		var selectedText = $(selId+' option:selected').val();
+		var selectedText = $(selId+' option:selected').text();
 		var url = " " ;
 		var objName = " ";
 		setKeyword1(e,selectedText,$grid,"empty");
@@ -3300,7 +3304,7 @@ function contentTable(newTestScriptDataLS) {
 		//get current selected row
 		var currRowId = $grid.jqGrid('getGridParam','selrow'); 
 		var selId = '#' + currRowId + '_'+selName;             	
-		var selectedText = $(selId+' option:selected').val();
+		var selectedText = $(selId+' option:selected').text();
 		var url = " " ;
 		var objName = " ";
 		setKeyword(e,selectedText,$grid,"empty");
@@ -3883,59 +3887,37 @@ function commentStep(){
 			for(i=0; i<myData.length; i++){
 				if(myData[i].stepNo == parseInt($(this).children('td:nth-child(1)').text().trim())){
 					//Check whether output coloumn is empty
-					if(myData[i].outputVal == ""){
+					if($(this).children('td:nth-child(8)').text().trim() == ""){
 						myData[i].outputVal = "##";
-						//$("#jqGrid").trigger("reloadGrid");
+						$("#jqGrid").trigger("reloadGrid");
 					}
 					else{
 						//Check whether output coloumn has some value
-						if(myData[i].outputVal != "") {
+						if($(this).children('td:nth-child(8)').text().trim() != "") {
 							//If already commented but no additional value
-							if(myData[i].outputVal == "##"){
+							if($(this).children('td:nth-child(8)').text().trim() == "##"){
 								myData[i].outputVal = "";
-								//$("#jqGrid").trigger("reloadGrid");
+								$("#jqGrid").trigger("reloadGrid");
 							}
 							//If already commented and contains additional value
-							else if(myData[i].outputVal.indexOf(";##") !== -1){
+							else if($(this).children('td:nth-child(8)').text().trim().indexOf(";##") !== -1){
 								var lastTwo = myData[i].outputVal.substr(myData[i].outputVal.length - 3);
 								myData[i].outputVal = myData[i].outputVal.replace(lastTwo,"");
-								//$("#jqGrid").trigger("reloadGrid");
+								$("#jqGrid").trigger("reloadGrid");
 							}
 							//If contains value but not commented
 							else{
 								myData[i].outputVal = myData[i].outputVal.concat(";##");
-								//$("#jqGrid").trigger("reloadGrid");
+								$("#jqGrid").trigger("reloadGrid");
 							}
 						}
 					}
 				}
 			}
 		});
-		$("#jqGrid").trigger("reloadGrid");
 	}
 	else{
 		openDialog("Skip Testcase step", "Please select step to skip")
-	}
-}
-
-function shortString() {
-	var shorts = document.querySelectorAll('.ellipsisText');
-	if (shorts) {
-		Array.prototype.forEach.call(shorts, function(ele) {
-			var str = ele.innerText,
-			indt = '...';
-
-			if (ele.hasAttribute('data-limit')) {
-				if (str.length > ele.dataset.limit) {
-					var result = `${str.substring(0, ele.dataset.limit - indt.length).trim()}${indt}`;
-					ele.innerText = result;
-					str = null;
-					result = null;
-				}
-			} else {
-				throw Error('Cannot find attribute \'data-limit\'');
-			}
-		});
 	}
 }
 
