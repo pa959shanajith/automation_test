@@ -903,7 +903,7 @@ if(flag==20){
 var toggleExpand = function(e){
 	var s=d3.select($("#"+e.target.id));
 	var p=d3.select($("#"+e.target.id).parent());
-	$("#"+e.target.id).toggleClass('ct-rev');
+	$("#"+e.target.id).toggleClass('ct-rev ctExpandCreateFixed');
 	$("#"+e.target.id).parent().toggleClass('ct-open');
 	e.stopImmediatePropagation();
 };

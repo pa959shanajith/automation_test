@@ -291,3 +291,9 @@ select
 {
     width: 88.5% !important;
 }
+.ctExpandCreateFixed
+{
+    position: fixed !important;
+    bottom: 525px !important;
+    margin-bottom: 0px !important;
+}
