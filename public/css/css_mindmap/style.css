@@ -76,7 +76,16 @@ p,a,img,text,span,.noselect{-webkit-touch-callout:none;-webkit-user-select:none;
 .ct-moduleBoxOptional.ct-open{height:auto;max-height:300px;overflow:auto}
 /**Optional for id ct-moduleBox CSS**/
 #ct-canvas, #ct-canvasforAssign{position:relative;height:100%;overflow:hidden;border:1px solid transparent; z-index: -99 !important;}
-.ct-tileBox{position: relative; display: block; top: 50%; left: 52%; transform: translateX(-50%) translateY(-50%); width: 150px;}
+/*.ct-tileBox{position: relative; display: block; top: 53%; left: 65%; transform: translateX(-50%) translateY(-50%); width: 150px;}*/
+.ct-tileBox
+{
+    position: relative;
+    display: block;
+    top: 53%;
+    left: 65%;
+    transform: translateX(-50%) translateY(-50%);
+    width: 150px;
+}
 .ct-tile{position:relative;display:block;height:150px;width:100%;cursor:pointer;background-color:#e6e7e9;-webkit-border-radius:20px;-moz-border-radius:20px;border-radius:20px}
 .ct-svgTile>g>circle{fill:none;stroke:#333;stroke-width:1px}
 .ct-svgTile>g>path{stroke:#333;stroke-width:1px}
@@ -172,7 +181,7 @@ p,a,img,text,span,.noselect{-webkit-touch-callout:none;-webkit-user-select:none;
 #ct-assignRevw{ position: relative; left: 24px; width: 64%;}
 #ct-assignRel{ position: relative; left: 24px; width: 64%;}
 #ct-assignCyc{ position: relative; left: 24px; width: 64%;}
-.selectProject{width: 100%; height: 24px;}
+/*.selectProject{height: 24px;width: 100%;}*/
 .project-list{width: 200px; float: right; margin-right: 100px;}
 /*FOR MINDMAP ENDS HERE*/
 .ct-show-left{
@@ -290,4 +299,16 @@ select
 .ct-expand-module
 {
     width: 88.5% !important;
+}
+.ctExpandCreateFixed
+{
+    position: fixed !important;
+    bottom: 525px !important;
+    margin-bottom: 0px !important;
+}
+.ctExpandCreateFixedClosed
+{
+    position: fixed !important;
+    bottom: 553px !important;
+    margin-bottom: 0px !important;
 }

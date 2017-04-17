@@ -172,33 +172,54 @@ io.on('connection', function (socket) {
 //	console.log("Inside connection method");
 	var address = socket.request.connection.remoteAddress;
 //	console.log(address);
-	socketMap[address] = socket;
+	if(!(address in socketMap)){
+		socketMap[address] = socket;
+	}
 //	console.log("socketMap", socketMap);
 	socket.send('connected' );
 	module.exports.allSocketsMap = socketMap;
 	server.setTimeout();
-	console.log("NO OF CLIENTS CONNECTED:", io.engine.clientsCount);
+	
 	socket.on('message', function(data){
 		//console.log("SER", data);
 	});
-
-	allSockets.push(socket);
-	allClients.push(socket.conn.id)
+	var socketFlag=false;
+	if(allSockets.length > 0){
+		for(var socketIndexes=0;socketIndexes<allSockets.length;socketIndexes++){
+			if(allSockets[socketIndexes].handshake.address.indexOf(socket.handshake.address) != -1){
+				socketFlag=true;
+			}
+		}
+	}else{
+		allSockets.push(socket);
+		allClients.push(socket.conn.id);
+		socketFlag=true;
+	}
+	if(socketFlag == false){
+		allSockets.push(socket);
+		allClients.push(socket.conn.id)
+	}
 	module.exports.abc = allSockets;
 
 	socket.on('disconnect', function() {     
 		var i = allSockets.indexOf(socket);
-		console.log('Socket Connection got disconnected!');
-		allSockets.splice(i, 1);
-//		console.log("------------------------SOCKET DISCONNECTED----------------------------------------");
-		console.log("SOCKET LENGTH", allSockets.length);
+		if(i > -1){
+			console.log('Socket Connection got disconnected for :',allSockets[i].handshake.address);
+			delete socketMap[allSockets[i].handshake.address];
+			allClients.splice(i,1);
+			allSockets.splice(i, 1);
+			
+			module.exports.allSocketsMap = socketMap;
+	//		console.log("------------------------SOCKET DISCONNECTED----------------------------------------");
+			console.log("NO OF CLIENTS CONNECTED:", allSockets.length);
+		}
 	});
 
 //	Socket Connection Failed
 	socket.on('connect_failed', function() {
 		console.log("Sorry, there seems to be an issue with the connection!");
 	});
-
+	console.log("NO OF CLIENTS CONNECTED:", allSockets.length);
 });
 //SOCKET CONNECTION USING SOCKET.IO
 

@@ -23,105 +23,104 @@ var objectLevel=1;
 var xpath="";
 
 exports.initScraping_ICE = function (req, res) {
-	/*var reqScrapJson = {};
-	var browserType = req.body.browserType;
-	reqScrapJson.appType = "Web";
-	reqScrapJson.action = "SCRAPE"
-				if (browserType == "chrome") {
-		var data = "OPEN BROWSER CH";
-				}
-				else if (browserType == "ie") {
-		var data = "OPEN BROWSER IE";
-				}
-				else if (browserType == "mozilla") {
-		var data = "OPEN BROWSER FX";
-				}
 	var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 	var mySocket = myserver.allSocketsMap[ip];
-	mySocket._events.scrape = [];               						
-	mySocket.send(data);
-	mySocket.on('scrape', function (data) {
-		res.send(data);
-	});*/
-	var reqScrapJson = {};
-	reqScrapJson.action = "SCRAPE"
-	if(req.body.screenViewObject.appType == "Desktop"){
-		var applicationPath = req.body.screenViewObject.applicationPath;
-		var data = "LAUNCH_DESKTOP";
-		var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-		var mySocket = myserver.allSocketsMap[ip];
-		mySocket._events.scrape = [];               						
-		mySocket.emit("LAUNCH_DESKTOP", applicationPath);
-		mySocket.on('scrape', function (data) {
-			res.send(data);
-		});
-	}
-	else if(req.body.screenViewObject.appType == "SAP"){
-		var applicationPath = req.body.screenViewObject.applicationPath;
-		var data = "LAUNCH_SAP";
-		var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-		var mySocket = myserver.allSocketsMap[ip];
-		mySocket._events.scrape = [];               						
-		mySocket.emit("LAUNCH_SAP", applicationPath);
-		mySocket.on('scrape', function (data) {
-			res.send(data);
-		});
-	}
-	else if(req.body.screenViewObject.appType == "DesktopJava"){
-		var applicationPath = req.body.screenViewObject.applicationPath;
-		var data = "LAUNCH_OEBS";
-		var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-		var mySocket = myserver.allSocketsMap[ip];
-		mySocket._events.scrape = [];               						
-		// mySocket.send(data);
-		mySocket.emit("LAUNCH_OEBS", applicationPath);
-		mySocket.on('scrape', function (data) {
-			res.send(data);
-		});
-	}
-	else if(req.body.screenViewObject.appType == "MobileApp"){
-        var apkPath = req.body.screenViewObject.apkPath;
-        var serial = req.body.screenViewObject.mobileSerial;
-		var data = "LAUNCH_MOBILE";
-		var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-		var mySocket = myserver.allSocketsMap[ip];
-		mySocket._events.scrape = [];                                                                                                  
-		mySocket.emit("LAUNCH_MOBILE", apkPath,serial);
-		mySocket.on('scrape', function (data) {
-						res.send(data);
-		});
-	}
-	else if(req.body.screenViewObject.appType == "MobileWeb"){
-		console.log(req.body.screenViewObject)
-		var mobileSerial = req.body.screenViewObject.mobileSerial;
-        var androidVersion = req.body.screenViewObject.androidVersion;
-        var data = "LAUNCH_MOBILE_WEB";
-		var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-		var mySocket = myserver.allSocketsMap[ip];
-		mySocket._events.scrape = [];                                                                                                  
-		mySocket.emit("LAUNCH_MOBILE_WEB", mobileSerial, androidVersion);
-		mySocket.on('scrape', function (data) {
-						res.send(data);
-		});
-	}
-	else{	
-		var browserType = req.body.screenViewObject.browserType;
-			if (browserType == "chrome") {
-				var data = "OPEN BROWSER CH";
-			}
-			else if (browserType == "ie") {
-				var data = "OPEN BROWSER IE";
-			}
-			else if (browserType == "mozilla") {
-				var data = "OPEN BROWSER FX";
-			}
+	if('allSocketsMap' in myserver && ip in myserver.allSocketsMap){
+		/*var reqScrapJson = {};
+		var browserType = req.body.browserType;
+		reqScrapJson.appType = "Web";
+		reqScrapJson.action = "SCRAPE"
+					if (browserType == "chrome") {
+			var data = "OPEN BROWSER CH";
+					}
+					else if (browserType == "ie") {
+			var data = "OPEN BROWSER IE";
+					}
+					else if (browserType == "mozilla") {
+			var data = "OPEN BROWSER FX";
+					}
 		var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 		var mySocket = myserver.allSocketsMap[ip];
 		mySocket._events.scrape = [];               						
 		mySocket.send(data);
 		mySocket.on('scrape', function (data) {
 			res.send(data);
-		});
+		});*/
+		var reqScrapJson = {};
+		reqScrapJson.action = "SCRAPE"
+		if(req.body.screenViewObject.appType == "Desktop"){
+			var applicationPath = req.body.screenViewObject.applicationPath;
+			var data = "LAUNCH_DESKTOP";
+			mySocket._events.scrape = [];               						
+			mySocket.emit("LAUNCH_DESKTOP", applicationPath);
+			mySocket.on('scrape', function (data) {
+				res.send(data);
+			});
+		}
+		else if(req.body.screenViewObject.appType == "SAP"){
+			var applicationPath = req.body.screenViewObject.applicationPath;
+			var data = "LAUNCH_SAP";
+			mySocket._events.scrape = [];               						
+			mySocket.emit("LAUNCH_SAP", applicationPath);
+			mySocket.on('scrape', function (data) {
+				res.send(data);
+			});
+		}
+		else if(req.body.screenViewObject.appType == "DesktopJava"){
+			var applicationPath = req.body.screenViewObject.applicationPath;
+			var data = "LAUNCH_OEBS";
+			mySocket._events.scrape = [];               						
+			// mySocket.send(data);
+			mySocket.emit("LAUNCH_OEBS", applicationPath);
+			mySocket.on('scrape', function (data) {
+				res.send(data);
+			});
+		}
+		else if(req.body.screenViewObject.appType == "MobileApp"){
+			var apkPath = req.body.screenViewObject.apkPath;
+			var serial = req.body.screenViewObject.mobileSerial;
+			var data = "LAUNCH_MOBILE";
+			mySocket._events.scrape = [];                                                                                                  
+			mySocket.emit("LAUNCH_MOBILE", apkPath,serial);
+			mySocket.on('scrape', function (data) {
+							res.send(data);
+			});
+		}
+		else if(req.body.screenViewObject.appType == "MobileWeb"){
+			console.log(req.body.screenViewObject)
+			var mobileSerial = req.body.screenViewObject.mobileSerial;
+			var androidVersion = req.body.screenViewObject.androidVersion;
+			var data = "LAUNCH_MOBILE_WEB";
+			mySocket._events.scrape = [];                                                                                                  
+			mySocket.emit("LAUNCH_MOBILE_WEB", mobileSerial, androidVersion);
+			mySocket.on('scrape', function (data) {
+							res.send(data);
+			});
+		}
+		else{	
+			var browserType = req.body.screenViewObject.browserType;
+				if (browserType == "chrome") {
+					var data = "OPEN BROWSER CH";
+				}
+				else if (browserType == "ie") {
+					var data = "OPEN BROWSER IE";
+				}
+				else if (browserType == "mozilla") {
+					var data = "OPEN BROWSER FX";
+				}
+			mySocket._events.scrape = [];               						
+			mySocket.send(data);
+			mySocket.on('scrape', function (data) {
+				res.send(data);
+			});
+		}
+	}else{
+		console.log("Socket not Available");
+		try{
+			res.send("unavailableLocalServer");
+		}catch(exception){
+			console.log(exception);
+		}
 	}
 };
 
@@ -1645,7 +1644,7 @@ exports.debugTestCase_ICE = function (req, res) {
 		}else{
 			console.log("Socket not Available");
 			try{
-				res.send("fail");
+				res.send("unavailableLocalServer");
 			}catch(exception){
 				console.log(exception);
 			}

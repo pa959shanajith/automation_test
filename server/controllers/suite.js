@@ -685,9 +685,18 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 				var testscenarioids = resultdata.testscenarioids;
 				//async.forEachSeries(resultdata, function(quest, callback2) {					var responsedata={template: "",testcase:[],testcasename:""};
 				var requiredversionnumber = 1;
-					var testsuiteexe = "INSERT INTO testsuites (cycleid,testsuitename,testsuiteid,versionnumber,conditioncheck,createdby,createdon,createdthrough,deleted,donotexecute,getparampaths,history,modifiedby,modifiedon,skucodetestsuite,tags,testscenarioids) VALUES (" + requiredcycleid + ",'" + requiredtestsuitename + "'," + requiredtestsuiteid + ",1,[],'Kavyashree'," + new Date().getTime().toString() + ",null,null,[],[],null,null," + new Date().getTime().toString() + ",null,null,["+testscenarioids+"])";
+				
 					//var testcasestepsquery = "select testcasesteps,testcasename from testcases where testcaseid = "+quest;
 					if(!flag){
+						var conditioncheckvalues = [];
+						var donotexecutevalues = [];
+						var getparampathvalues = [];
+						for(var i =0;i<testscenarioids.length;i++){
+							conditioncheckvalues.push('0');
+							donotexecutevalues.push('1');
+							getparampathvalues.push('\' \'');
+						}
+						var testsuiteexe = "INSERT INTO testsuites (cycleid,testsuitename,testsuiteid,versionnumber,conditioncheck,createdby,createdon,createdthrough,deleted,donotexecute,getparampaths,history,modifiedby,modifiedon,skucodetestsuite,tags,testscenarioids) VALUES (" + requiredcycleid + ",'" + requiredtestsuitename + "'," + requiredtestsuiteid + ",1,["+conditioncheckvalues+"],'Kavyashree'," + new Date().getTime().toString() + ",null,null,["+donotexecutevalues+"],["+getparampathvalues+"],null,null," + new Date().getTime().toString() + ",null,null,["+testscenarioids+"])";
 						dbConnICE.execute(testsuiteexe, function(err, answers) {
 						if(err){
 							console.log(err);
@@ -697,17 +706,17 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 						
 						});
 					}else{
-						var updatetestsuitefrommodule = "UPDATE testsuites SET testscenarioids = ["+testscenarioids+"] WHERE testsuiteid="+requiredtestsuiteid+" and cycleid="+requiredcycleid+" and testsuitename='"+requiredtestsuitename+"' and versionnumber="+requiredversionnumber;
+						//var updatetestsuitefrommodule = "UPDATE testsuites SET testscenarioids = ["+testscenarioids+"] WHERE testsuiteid="+requiredtestsuiteid+" and cycleid="+requiredcycleid+" and testsuitename='"+requiredtestsuitename+"' and versionnumber="+requiredversionnumber;
+						var jsondata = {"testsuiteid":requiredtestsuiteid,"testscenarioid":testscenarioids,"cycleid":requiredcycleid,"testsuitename":requiredtestsuitename,"versionnumber":requiredversionnumber,"testscenarioids":testscenarioids}
 						try{
-						dbConnICE.execute(updatetestsuitefrommodule, function(err, answers) {
-						if(err){
-							console.log(err);
-						}else{
-							
-						}
-						
-						});						
+					
+							updatescenariodetailsinsuite(jsondata,function(err,data){
+								if(err){
+									cb(null,flag);
+								}else{
 
+								}
+							});
 						}catch(ex){
 							console.log("Exception occured in the udating scenarios",ex);
 						}
@@ -721,7 +730,7 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 			function(err,results){
 				//data.setHeader('Content-Type','application/json');
 				if(err){
-					cb(err);
+					cb(null,flag);
 				} 
 				else{
 					cb(null,flag);
@@ -729,4 +738,82 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 			}
 
 	);
+}
+
+function updatescenariodetailsinsuite(req,cb,data){
+	var suiterowdetails = {};
+	var getparampath1 = [];
+	var conditioncheck1 = [];
+	var donotexecute1 = [];
+	async.series({
+		fetchdata:function(simplecallback){
+			var selectsuierows = "SELECT * FROM testsuites where testsuiteid = "+req.testsuiteid+" and testsuitename='"+req.testsuitename+"' ALLOW FILTERING;";
+			dbConnICE.execute(selectsuierows, function(err, answers) {
+				if(err){
+					console.log(err);
+				}else{
+					suiterowdetails = answers.rows[0]
+				}
+				simplecallback();
+				});
+		},
+		validatedata: function(simplecallback){
+			var scenarioidstocheck = suiterowdetails.testscenarioids;
+			var verifyscenarioid = req.testscenarioids;
+			var getparampath = suiterowdetails.getparampaths;
+			var conditioncheck = suiterowdetails.conditioncheck;
+			var donotexecute = suiterowdetails.donotexecute;
+			
+
+
+			for(var i=0;i<verifyscenarioid.length;i++){
+				var temp = verifyscenarioid[i];
+				var index = scenarioidstocheck.toString().indexOf(temp);
+				if(index != null && index != undefined && index!=-1){
+					if(getparampath!=null){
+						if(getparampath[index] == '' || getparampath[index] == ' '){
+							getparampath1.push('\' \'');
+						}else{
+							getparampath1.push(getparampath[index]);
+						}
+						
+					}
+					if(conditioncheck!=null){
+						conditioncheck1.push(conditioncheck[index]);
+					}
+					if(donotexecute!=null){
+						donotexecute1.push(donotexecute[index]);
+					}
+				}else{
+					getparampath1.push('\' \'');
+					conditioncheck1.push('0');
+					donotexecute1.push('1');
+				}
+			}
+			simplecallback();
+
+		},
+		updatescenarioinnsuite:function(simplecallback){
+			var updatetestsuitefrommodule = "UPDATE testsuites SET testscenarioids = ["+req.testscenarioid+"], conditioncheck=["+conditioncheck1+"] ,getparampaths=["+getparampath1+"], donotexecute=["+donotexecute1+"] WHERE testsuiteid="+req.testsuiteid+" and cycleid="+req.cycleid+" and testsuitename='"+req.testsuitename+"' and versionnumber="+req.versionnumber;
+				dbConnICE.execute(updatetestsuitefrommodule, function(err, answers) {
+					if(err){
+						cb(null,err);
+					}else{
+						
+					}
+					simplecallback(null,answers);
+				});						
+
+		}
+
+	},function(err,data){
+		if(err){
+			console.log(err);
+			cb(null,err);
+		}else{
+			cb(null,data);
+		}
+	})
+
+
 }
