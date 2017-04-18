@@ -2991,7 +2991,7 @@ function contentTable(newTestScriptDataLS) {
 					else if(appTypeLocal == 'SAP' &&(obType =='GuiTextField' ||obType =='GuiTitlebar' ||obType =='GuiButton' ||obType =='GuiUserArea'||obType =='GuiRadioButton' 
 					    ||obType =='GuiLabel' ||obType =='GuiBox' ||obType =='GuiSimpleContainer' ||obType =='GuiPasswordField'||obType=='GuiComboBox'||obType=='GuiCheckBox'
 						||obType =='GuiStatusbar' ||obType =='GuiStatusPane' ||obType =='text' ||obType =='combo_box' || obType =='list_item' || obType =='GuiCTextField'
-						|| obType =='hyperlink' || obType =='lbl'||obType =='list' || obType == 'edit' || obType == null || obType == 'check_box' 
+						|| obType =='hyperlink' || obType =='lbl'||obType =='list' || obType == 'edit' || obType == null || obType == 'check_box'|| obType== 'GuiTableControl' 
 						|| obType == 'radio_button' ||obType != undefined)){
 						var res = '';
 						var sc;
@@ -3002,6 +3002,7 @@ function contentTable(newTestScriptDataLS) {
 						else if(obType =='GuiPasswordField'){	sc = Object.keys(keywordArrayList.text);selectedKeywordList = "text";}
 						else if(obType =='combo_box'||obType =='GuiBox'|| obType=='GuiComboBox'){	sc = Object.keys(keywordArrayList.select);selectedKeywordList = "select";}
 						else if(obType =='list_item')	{sc = Object.keys(keywordArrayList.list);selectedKeywordList = "list";}
+						else if(obType =='GuiTableControl')	{sc = Object.keys(keywordArrayList.list);selectedKeywordList = "table";}
 						else if (obType == 'list_item' || obType == 'list') {
 							if (listType == 'true') {
 								sc = Object.keys(keywordArrayList.list);
