@@ -1839,7 +1839,7 @@ input[disabled]{
 .designDataTable thead tr th:nth-child(5), .designDataTable thead tr th:nth-child(6), .designDataTable thead tr th:nth-child(7), .designDataTable thead tr th:nth-child(8){border-right: 1px solid #fff;}
 .designDataTable tbody tr td:nth-child(1),.designDataTable tbody tr td:nth-child(2),.designDataTable tbody tr td:nth-child(5),.designDataTable tbody tr td:nth-child(6),.designDataTable tbody tr td:nth-child(7),.designDataTable tbody tr td:nth-child(8){text-align: left;}
 .designDataTable tbody tr td:nth-child(6),.designDataTable tbody tr td:nth-child(7),.designDataTable tbody tr td:nth-child(8){padding-left: 3px; padding-right: 5px; word-break: break-all;}
-.designDataTable tbody tr td:nth-child(5){padding-right: 5px; word-break: break-word;}
+.designDataTable tbody tr td:nth-child(5){padding-right: 5px; word-wrap: break-word; word-break: break-all;}
 .designDataTable tbody tr td:nth-child(7),.designDataTable tbody tr td:nth-child(8){padding-right: 0px;}
 .designDataTable thead tr th:nth-child(2){padding-left: 3px;}
 .loading, .jqgfirstrow, #alertmod_jqGrid{display: none !important;}
@@ -1910,9 +1910,18 @@ input[disabled]{
 }
 
 .modal-dialog {
-    display: inline-block;
+    /* display: inline-block;
     text-align: left;
-    vertical-align: middle;
+    vertical-align: middle; */  
+    text-align: left;
+    position:absolute;      
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) !important;
+    -moz-transform: translate(-50%, -50%) !important;
+    -webkit-transform: translate(-50%, -50%) !important;
+    -o-transform: translate(-50%, -50%) !important;
+    -ms-transform: translate(-50%, -50%) !important;
 }
 
 .modal-content {
@@ -2117,6 +2126,7 @@ input[disabled]{
 #scrapedObjforMap, #customObjforMap{
 	float:left;
 	width: 100% !important;
+	padding-right:20px;
 }
 
 #scrapedObjforMap li span{
