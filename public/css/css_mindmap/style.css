@@ -75,14 +75,14 @@ p,a,img,text,span,.noselect{-webkit-touch-callout:none;-webkit-user-select:none;
 .ct-moduleBoxOptional .ct-expand.ct-rev::after{left:25px;top:-4px;border-top-color:transparent;border-bottom-color:#333}
 .ct-moduleBoxOptional.ct-open{height:auto;max-height:300px;overflow:auto}
 /**Optional for id ct-moduleBox CSS**/
-#ct-canvas, #ct-canvasforAssign{position:relative;height:100%;overflow:hidden;border:1px solid transparent; z-index: -99 !important;}
+#ct-canvas, #ct-canvasforAssign{position:absolute;height:100%;overflow:hidden;border:1px solid transparent; z-index: -99 !important; width: inherit;}
 /*.ct-tileBox{position: relative; display: block; top: 53%; left: 65%; transform: translateX(-50%) translateY(-50%); width: 150px;}*/
 .ct-tileBox
 {
-    position: relative;
+    position: absolute;
     display: block;
     top: 53%;
-    left: 65%;
+    left: 50%;
     transform: translateX(-50%) translateY(-50%);
     width: 150px;
 }
@@ -182,7 +182,12 @@ p,a,img,text,span,.noselect{-webkit-touch-callout:none;-webkit-user-select:none;
 #ct-assignRel{ position: relative; left: 24px; width: 64%;}
 #ct-assignCyc{ position: relative; left: 24px; width: 64%;}
 /*.selectProject{height: 24px;width: 100%;}*/
-.project-list{width: 200px; float: right; margin-right: 100px;}
+.selectProject{
+    float: right;
+    position: relative;
+    left: 0px !important;
+}
+.project-list{width: 200px;left: -90px;position: relative;}
 /*FOR MINDMAP ENDS HERE*/
 .ct-show-left{
     width: 10px !important;

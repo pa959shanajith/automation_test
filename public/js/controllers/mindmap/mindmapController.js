@@ -79,7 +79,6 @@ mySPA.controller('mindmapController', ['$scope', '$http', '$location', '$timeout
              if($(".left-sec-mindmap").is(':visible') && $('#right-dependencies-section').is(':visible')){
             	 $("#ct-moduleBox,.tabAssign").css({'width':''})
             	 flg = true;
-                // $(".ct-tileBox").css({'left':'50%'})
                  $("div.content-div").addClass("content-div-req");
                  $("div.content-div").removeClass("content-div-right-expand");
                  $(".project-list").removeClass("selectProject");
