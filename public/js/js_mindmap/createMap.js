@@ -25,6 +25,10 @@ function loadMindmapData(){
 			loadMindmapData1(); 
 			$(".project-list").change(function () {
             //alert($(".project-list").val());
+			if($("img.iconSpaceArrow").hasClass("iconSpaceArrowTop"))
+			{
+				$("img.iconSpaceArrow").removeClass("iconSpaceArrowTop");
+			}
 			loadMindmapData1();
 			});
 		}
@@ -36,17 +40,21 @@ function loadMindmapData1(){
 	zoom=d3.behavior.zoom().scaleExtent([0.1,3]).on("zoom", zoomed);
 	faRef={"plus":"fa-plus","edit":"fa-pencil-square-o","delete":"fa-trash-o"};
 	
-	
 		$(document).on('click',".ct-tile", function() {
 			createNewMap();
 			});
-
 //	d3.selectAll('#ctExpandCreate').on('click',toggleExpand);
 				 $(document).on('click',"#ctExpandCreate", function(e) {
-					toggleExpand(e);
+					if($(".ct-node:visible").length > 6)
+					{
+						toggleExpand(e);
+					}
 				 	});
 				$(document).on('click',"#ctExpandAssign", function(e) {
-					toggleExpandAssign(e);
+					if($(".ct-node:visible").length > 6)
+					{
+						toggleExpandAssign(e);
+					}
 				 	});
 	d3.select('#ct-main').on('contextmenu',function(e){d3.event.preventDefault();});
 	var svgTileG=d3.select('.ct-tile').append('svg').attr('class','ct-svgTile').attr('height','150px').attr('width','150px').append('g');
@@ -901,17 +909,23 @@ if(flag==20){
 	});
 };
 var toggleExpand = function(e){
-	var s=d3.select($("#"+e.target.id));
-	var p=d3.select($("#"+e.target.id).parent());
-	$("#"+e.target.id).toggleClass('ct-rev');
-	$("#"+e.target.id).parent().toggleClass('ct-open');
+	var s=d3.select($(e.target).parent());
+	var p=d3.select($(e.target).parent().parent());
+    $(e.target).parent().toggleClass('ct-rev');
+	$(e.target).parent().parent().toggleClass('ct-open');
+	$(e.target).toggleClass("iconSpaceArrowTop");
 	e.stopImmediatePropagation();
 };
 var toggleExpandAssign = function(e){
-	var s=d3.select($("#"+e.target.id));
-	var p=d3.select($("#"+e.target.id).parent());
-	$("#"+e.target.id).toggleClass('ct-rev');
-	$("#"+e.target.id).parent().toggleClass('ct-open');
+	// var s=d3.select($("#"+e.target.id));
+	// var p=d3.select($("#"+e.target.id).parent());
+	// $("#"+e.target.id).toggleClass('ct-rev');
+	// $("#"+e.target.id).parent().toggleClass('ct-open');
+	var s=d3.select($(e.target).parent());
+	var p=d3.select($(e.target).parent().parent());
+    $(e.target).parent().toggleClass('ct-rev');
+	$(e.target).parent().parent().toggleClass('ct-open');
+	$(e.target).toggleClass("iconSpaceArrowTop");
 	e.stopImmediatePropagation();
 };
 var clickHideElements = function(e){
