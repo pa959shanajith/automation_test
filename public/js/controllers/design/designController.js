@@ -1075,6 +1075,11 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			initWSJson.testcase = testCaseWS
 			DesignServices.initScrapeWS_ICE(initWSJson)
 			.then(function (data) {
+				if (data == "unavailableLocalServer")	{
+					unblockUI();
+					openDialog("Web Service Screen", "ICE Engine is not available. Please run the batch file and connect to the Server.");
+					return false
+				}
 				unblockUI();
 				if(typeof data == "object"){
 					$("#webserviceDeubgSuccess").modal("show")
