@@ -1379,6 +1379,9 @@ exports.updateTestCase_ICE = function (req, res) {
 									}
 								}
 							});
+					}else{
+						console.log("Fail to save testcase");
+						res.send("fail");
 					}
 				}
 			}catch(exception){

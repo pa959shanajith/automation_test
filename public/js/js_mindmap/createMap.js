@@ -25,6 +25,11 @@ function loadMindmapData(){
 			loadMindmapData1(); 
 			$(".project-list").change(function () {
             //alert($(".project-list").val());
+			if($("img.iconSpaceArrow").hasClass("iconSpaceArrowTop"))
+			{
+				$("img.iconSpaceArrow").removeClass("iconSpaceArrowTop");
+			}
+			$(".ct-nodeBox").css({"overflow":"hidden"})
 			loadMindmapData1();
 			});
 		}
@@ -36,17 +41,21 @@ function loadMindmapData1(){
 	zoom=d3.behavior.zoom().scaleExtent([0.1,3]).on("zoom", zoomed);
 	faRef={"plus":"fa-plus","edit":"fa-pencil-square-o","delete":"fa-trash-o"};
 	
-	
 		$(document).on('click',".ct-tile", function() {
 			createNewMap();
 			});
-
 //	d3.selectAll('#ctExpandCreate').on('click',toggleExpand);
 				 $(document).on('click',"#ctExpandCreate", function(e) {
-					toggleExpand(e);
+					if($(".ct-node:visible").length > 6)
+					{
+						toggleExpand(e);
+					}
 				 	});
 				$(document).on('click',"#ctExpandAssign", function(e) {
-					toggleExpandAssign(e);
+					if($(".ct-node:visible").length > 6)
+					{
+						toggleExpandAssign(e);
+					}
 				 	});
 	d3.select('#ct-main').on('contextmenu',function(e){d3.event.preventDefault();});
 	var svgTileG=d3.select('.ct-tile').append('svg').attr('class','ct-svgTile').attr('height','150px').attr('width','150px').append('g');
@@ -901,18 +910,58 @@ if(flag==20){
 	});
 };
 var toggleExpand = function(e){
-	var s=d3.select($("#"+e.target.id));
-	var p=d3.select($("#"+e.target.id).parent());
-	$("#"+e.target.id).toggleClass('ct-rev ctExpandCreateFixed');
-	$("#"+e.target.id).parent().toggleClass('ct-open');
+	var s=d3.select($(e.target).parent());
+	var p=d3.select($(e.target).parent().parent());
+    $(e.target).parent().toggleClass('ct-rev');
+	$(e.target).parent().parent().toggleClass('ct-open');
+	$(e.target).toggleClass("iconSpaceArrowTop");
 	e.stopImmediatePropagation();
+	if($("#ct-moduleBox").hasClass("ct-open") == true){
+		$("#ct-canvas").css("top","5px");
+		if($("#left-nav-section").is(":visible") == true && $("#right-dependencies-section").is(":visible") == true)
+		{
+			$("#ct-AssignBox").css({"position":"relative","top":"25px"});
+		}
+		$(".ct-nodeBox .ct-node").css("width","139px");
+		$(".ct-nodeBox").css({"overflow":"auto", "width":"99%"})
+		$(".iconSpaceArrow").attr("src","imgs/ic-collapseup.png");
+	}
+	else{
+		$(".iconSpaceArrow").attr("src","imgs/ic-collapse.png");
+		$("#ct-moduleBox").css({"position":"","top":""});
+		$("#ct-canvas").css("top","");
+		$(".ct-nodeBox .ct-node").css("width","");
+		$(".ct-nodeBox").css({"overflow":"hidden", "width":""})
+	}
 };
 var toggleExpandAssign = function(e){
-	var s=d3.select($("#"+e.target.id));
-	var p=d3.select($("#"+e.target.id).parent());
-	$("#"+e.target.id).toggleClass('ct-rev ctExpandCreateFixed');
-	$("#"+e.target.id).parent().toggleClass('ct-open');
+	// var s=d3.select($("#"+e.target.id));
+	// var p=d3.select($("#"+e.target.id).parent());
+	// $("#"+e.target.id).toggleClass('ct-rev');
+	// $("#"+e.target.id).parent().toggleClass('ct-open');
+	var s=d3.select($(e.target).parent());
+	var p=d3.select($(e.target).parent().parent());
+    $(e.target).parent().toggleClass('ct-rev');
+	$(e.target).parent().parent().toggleClass('ct-open');
+	$(e.target).toggleClass("iconSpaceArrowTop");
 	e.stopImmediatePropagation();
+	if($("#ct-AssignBox").hasClass("ct-open") == true){
+		$("#ct-canvas").css("top","5px");
+		if($("#left-nav-section").is(":visible") == true && $("#right-dependencies-section").is(":visible") == true)
+		{
+			$("#ct-AssignBox").css({"position":"relative","top":"25px"});
+		}
+		$(".ct-nodeBox .ct-node").css("width","139px");
+		$(".ct-nodeBox").css({"overflow":"auto", "width":"98%"})
+		$(".iconSpaceArrow").attr("src","imgs/ic-collapseup.png");
+	}
+	else{
+		$(".iconSpaceArrow").attr("src","imgs/ic-collapse.png");
+		$("#ct-AssignBox").css({"position":"","top":""});
+		$("#ct-canvas").css("top","");
+		$(".ct-nodeBox .ct-node").css("width","");
+		$(".ct-nodeBox").css({"overflow":"", "width":""})
+	}
 };
 var clickHideElements = function(e){
 	d3.select('#ct-inpBox').classed('no-disp',!0);

@@ -128,7 +128,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					// counter to append the items @ correct indexes of custnameArr
 					var indexCounter = '';
 					//window.localStorage['newTestScriptDataList'] = data2.view;
-					//$scope.newTestScriptDataLS = recievedData[0].view;
+					$scope.newTestScriptDataLS = data2.view;
 					$("#window-scrape-screenshotTs .popupContent").empty()
 					$("#window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrapeTS"><img id="screenshotTS" src="data:image/PNG;base64,'+data2.mirror+'" /></div>')
 					
@@ -1075,6 +1075,11 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			initWSJson.testcase = testCaseWS
 			DesignServices.initScrapeWS_ICE(initWSJson)
 			.then(function (data) {
+				if (data == "unavailableLocalServer")	{
+					unblockUI();
+					openDialog("Web Service Screen", "ICE Engine is not available. Please run the batch file and connect to the Server.");
+					return false
+				}
 				unblockUI();
 				if(typeof data == "object"){
 					$("#webserviceDeubgSuccess").modal("show")
@@ -1631,12 +1636,17 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				})
 			})
 			
+			if(viewString == "" || viewString.view == undefined){
+				viewString = {view: []}
+			}
 			//Pushing custom object array in viewString.view
 			for(i=0; i<customObj.length; i++){
 				viewString.view.push(customObj[i])
 			}
 			
 			//Reloading List Items
+			$("#finalScrap").empty()
+			$("#finalScrap").append("<div id='scrapTree' class='scrapTree'><ul><li><span class='parentObjContainer'><input title='Select all' type='checkbox' class='checkStylebox' disabled /><span class='parentObject'><a id='aScrapper'>Select all </a><button id='saveObjects' class='btn btn-xs btn-xs-custom objBtn' style='margin-left: 10px'>Save</button><button data-toggle='modal' id='deleteObjects' data-target='#deleteObjectsModal' class='btn btn-xs btn-xs-custom objBtn' style='margin-right: 0' disabled>Delete</button></span><span></span></span><ul id='scraplist' class='scraplistStyle'></ul></li></ul></div>");
 			$('#scraplist').empty()
 			for(i=0; i<viewString.view.length; i++){
 				var innerUL = $('#scraplist');
@@ -2033,7 +2043,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 							break;
 						}
 						else if(mydata[i].keywordVal == 'SwitchToFrame'){
-							if($scope.newTestScriptDataLS != "undefined"){
+							if($scope.newTestScriptDataLS != "undefined" || $scope.newTestScriptDataLS != undefined){
 								var testScriptTableData = JSON.parse($scope.newTestScriptDataLS);
 								for(j=0;j<testScriptTableData.length;j++){
 									if(testScriptTableData[j].custname != '@Browser' && testScriptTableData[j].custname != '@Oebs' && testScriptTableData[j].custname != '@Window' && testScriptTableData[j].custname != '@Generic' && testScriptTableData[j].custname != '@Custom'){
@@ -2500,7 +2510,8 @@ function contentTable(newTestScriptDataLS) {
 			var grid = $("#jqGrid");
 			grid.jqGrid('restoreRow',lastSelection);
 			lastSelection = "";
-		}	
+		}
+		shortString(); //Call to wrap the select option text in JqGrid
 		//get Input and Output Syntax for selected Keyword
 		var keywordArrayList1 = keywordListData;
 		var keywordArrayList = JSON.parse(keywordArrayList1);
@@ -2989,18 +3000,19 @@ function contentTable(newTestScriptDataLS) {
 					//adding for SAP
 					else if(appTypeLocal == 'SAP' &&(obType =='GuiTextField' ||obType =='GuiTitlebar' ||obType =='GuiButton' ||obType =='GuiUserArea'||obType =='GuiRadioButton' 
 					    ||obType =='GuiLabel' ||obType =='GuiBox' ||obType =='GuiSimpleContainer' ||obType =='GuiPasswordField'||obType=='GuiComboBox'||obType=='GuiCheckBox'
-						||obType =='GuiStatusbar' ||obType =='GuiStatusPane' ||obType =='text' ||obType =='combo_box' || obType =='list_item' 
-						|| obType =='hyperlink' || obType =='lbl'||obType =='list' || obType == 'edit' || obType == null || obType == 'check_box' 
+						||obType =='GuiStatusbar' ||obType =='GuiStatusPane' ||obType =='text' ||obType =='combo_box' || obType =='list_item' || obType =='GuiCTextField'
+						|| obType =='hyperlink' || obType =='lbl'||obType =='list' || obType == 'edit' || obType == null || obType == 'check_box'|| obType== 'GuiTableControl' 
 						|| obType == 'radio_button' ||obType != undefined)){
 						var res = '';
 						var sc;
 						var listType = '';
 						if(obType =='push_button' ||obType =='GuiButton' )	{sc = Object.keys(keywordArrayList.button);selectedKeywordList = "button";}		
-						else if(obType =='GuiTextField'){	sc = Object.keys(keywordArrayList.text);selectedKeywordList = "text";}
+						else if(obType =='GuiTextField' || obType =='GuiCTextField'){	sc = Object.keys(keywordArrayList.text);selectedKeywordList = "text";}
 						else if(obType =='GuiLabel'){	sc = Object.keys(keywordArrayList.element);selectedKeywordList = "element";}
 						else if(obType =='GuiPasswordField'){	sc = Object.keys(keywordArrayList.text);selectedKeywordList = "text";}
 						else if(obType =='combo_box'||obType =='GuiBox'|| obType=='GuiComboBox'){	sc = Object.keys(keywordArrayList.select);selectedKeywordList = "select";}
 						else if(obType =='list_item')	{sc = Object.keys(keywordArrayList.list);selectedKeywordList = "list";}
+						else if(obType =='GuiTableControl')	{sc = Object.keys(keywordArrayList.list);selectedKeywordList = "table";}
 						else if (obType == 'list_item' || obType == 'list') {
 							if (listType == 'true') {
 								sc = Object.keys(keywordArrayList.list);
@@ -3270,7 +3282,7 @@ function contentTable(newTestScriptDataLS) {
 		//get current selected row
 		var currRowId = $grid.jqGrid('getGridParam','selrow');
 		var selId = '#' + currRowId + '_'+selName;
-		var selectedText = $(selId+' option:selected').text();
+		var selectedText = $(selId+' option:selected').val();
 		var url = " " ;
 		var objName = " ";
 		setKeyword1(e,selectedText,$grid,"empty");
@@ -3304,7 +3316,7 @@ function contentTable(newTestScriptDataLS) {
 		//get current selected row
 		var currRowId = $grid.jqGrid('getGridParam','selrow'); 
 		var selId = '#' + currRowId + '_'+selName;             	
-		var selectedText = $(selId+' option:selected').text();
+		var selectedText = $(selId+' option:selected').val();
 		var url = " " ;
 		var objName = " ";
 		setKeyword(e,selectedText,$grid,"empty");
@@ -3887,37 +3899,59 @@ function commentStep(){
 			for(i=0; i<myData.length; i++){
 				if(myData[i].stepNo == parseInt($(this).children('td:nth-child(1)').text().trim())){
 					//Check whether output coloumn is empty
-					if($(this).children('td:nth-child(8)').text().trim() == ""){
+					if(myData[i].outputVal == ""){
 						myData[i].outputVal = "##";
-						$("#jqGrid").trigger("reloadGrid");
+						//$("#jqGrid").trigger("reloadGrid");
 					}
 					else{
 						//Check whether output coloumn has some value
-						if($(this).children('td:nth-child(8)').text().trim() != "") {
+						if(myData[i].outputVal != "") {
 							//If already commented but no additional value
-							if($(this).children('td:nth-child(8)').text().trim() == "##"){
+							if(myData[i].outputVal == "##"){
 								myData[i].outputVal = "";
-								$("#jqGrid").trigger("reloadGrid");
+								//$("#jqGrid").trigger("reloadGrid");
 							}
 							//If already commented and contains additional value
-							else if($(this).children('td:nth-child(8)').text().trim().indexOf(";##") !== -1){
+							else if(myData[i].outputVal.indexOf(";##") !== -1){
 								var lastTwo = myData[i].outputVal.substr(myData[i].outputVal.length - 3);
 								myData[i].outputVal = myData[i].outputVal.replace(lastTwo,"");
-								$("#jqGrid").trigger("reloadGrid");
+								//$("#jqGrid").trigger("reloadGrid");
 							}
 							//If contains value but not commented
 							else{
 								myData[i].outputVal = myData[i].outputVal.concat(";##");
-								$("#jqGrid").trigger("reloadGrid");
+								//$("#jqGrid").trigger("reloadGrid");
 							}
 						}
 					}
 				}
 			}
 		});
+		$("#jqGrid").trigger("reloadGrid");
 	}
 	else{
 		openDialog("Skip Testcase step", "Please select step to skip")
+	}
+}
+
+function shortString() {
+	var shorts = document.querySelectorAll('.ellipsisText');
+	if (shorts) {
+		Array.prototype.forEach.call(shorts, function(ele) {
+			var str = ele.innerText,
+			indt = '...';
+
+			if (ele.hasAttribute('data-limit')) {
+				if (str.length > ele.dataset.limit) {
+					var result = `${str.substring(0, ele.dataset.limit - indt.length).trim()}${indt}`;
+					ele.innerText = result;
+					str = null;
+					result = null;
+				}
+			} else {
+				throw Error('Cannot find attribute \'data-limit\'');
+			}
+		});
 	}
 }
 

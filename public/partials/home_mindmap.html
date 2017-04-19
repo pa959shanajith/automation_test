@@ -55,14 +55,15 @@
        <div class="selectProject">
              <select class="project-list"></select>
          </div>
-     
       <div ng-if="tab == 'tabCreate'" id="ct-moduleBox" class="ct-moduleBoxOptional tabCreate">         
          <div class="ct-nodeBox"></div>
-         <div id="ctExpandCreate" class="ct-expand"></div>
+         <span id='ctExpandCreate' class=''><img alt="Collapse Icon" class="iconSpaceArrow" src="imgs/ic-collapse.png"></span>
+         <!--<div id="ctExpandCreate" class="ct-expand"></div>-->
       </div>
-      <div ng-if="tab == 'tabAssign'" class="ct-moduleBoxOptional tabAssign">
+      <div ng-if="tab == 'tabAssign'" id="ct-AssignBox" class="ct-moduleBoxOptional tabAssign">
          <div class="ct-nodeBox"></div>
-         <div id="ctExpandAssign" class="ct-expand"></div>
+        <span id='ctExpandAssign' class=''><img alt="Collapse Icon" class="iconSpaceArrow" src="imgs/ic-collapse.png"></span>
+         <!--<div id="ctExpandAssign" class="ct-expand"></div>-->
       </div>
       <div ng-if="tab == 'tabAssign'" id="ct-canvasforAssign" class="tabAssign">
             <!--<div class="ct-tileBox">
