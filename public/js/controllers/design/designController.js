@@ -128,7 +128,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					// counter to append the items @ correct indexes of custnameArr
 					var indexCounter = '';
 					//window.localStorage['newTestScriptDataList'] = data2.view;
-					//$scope.newTestScriptDataLS = recievedData[0].view;
+					$scope.newTestScriptDataLS = data2.view;
 					$("#window-scrape-screenshotTs .popupContent").empty()
 					$("#window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrapeTS"><img id="screenshotTS" src="data:image/PNG;base64,'+data2.mirror+'" /></div>')
 					
@@ -1636,12 +1636,17 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				})
 			})
 			
+			if(viewString == "" || viewString.view == undefined){
+				viewString = {view: []}
+			}
 			//Pushing custom object array in viewString.view
 			for(i=0; i<customObj.length; i++){
 				viewString.view.push(customObj[i])
 			}
 			
 			//Reloading List Items
+			$("#finalScrap").empty()
+			$("#finalScrap").append("<div id='scrapTree' class='scrapTree'><ul><li><span class='parentObjContainer'><input title='Select all' type='checkbox' class='checkStylebox' disabled /><span class='parentObject'><a id='aScrapper'>Select all </a><button id='saveObjects' class='btn btn-xs btn-xs-custom objBtn' style='margin-left: 10px'>Save</button><button data-toggle='modal' id='deleteObjects' data-target='#deleteObjectsModal' class='btn btn-xs btn-xs-custom objBtn' style='margin-right: 0' disabled>Delete</button></span><span></span></span><ul id='scraplist' class='scraplistStyle'></ul></li></ul></div>");
 			$('#scraplist').empty()
 			for(i=0; i<viewString.view.length; i++){
 				var innerUL = $('#scraplist');
@@ -2038,7 +2043,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 							break;
 						}
 						else if(mydata[i].keywordVal == 'SwitchToFrame'){
-							if($scope.newTestScriptDataLS != "undefined"){
+							if($scope.newTestScriptDataLS != "undefined" || $scope.newTestScriptDataLS != undefined){
 								var testScriptTableData = JSON.parse($scope.newTestScriptDataLS);
 								for(j=0;j<testScriptTableData.length;j++){
 									if(testScriptTableData[j].custname != '@Browser' && testScriptTableData[j].custname != '@Oebs' && testScriptTableData[j].custname != '@Window' && testScriptTableData[j].custname != '@Generic' && testScriptTableData[j].custname != '@Custom'){
