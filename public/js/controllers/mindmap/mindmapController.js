@@ -10,7 +10,6 @@ mySPA.controller('mindmapController', ['$scope', '$http', '$location', '$timeout
         if($("#left-nav-section").is(":visible") == true)
             {
                $("span.taskname").addClass('taskTitle');
-              
             }
         else{
              $("span.taskname").removeClass('taskTitle');
@@ -38,7 +37,6 @@ mySPA.controller('mindmapController', ['$scope', '$http', '$location', '$timeout
                  $("#ct-moduleBox,.tabAssign").removeClass("leftBarClose rightBarClose rightBarOpen bar-collapse leftOpenRightClose rightOpenLeftClose bar-expand").addClass("leftBarOpen");
            }
            else{
-                alert(2);
                  $("#ct-moduleBox,.tabAssign").removeClass("leftBarClose leftBarOpen bar-collaspe rightBarClose rightBarOpen rightOpenLeftClose bar-expand").addClass("leftOpenRightClose");
               // $("#ct-moduleBox,.tabAssign").css({'left':'147px !important','width':'100%'})
                $(".ct-tileBox").css({'left':'52% !important'})
