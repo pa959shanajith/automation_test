@@ -29,6 +29,7 @@ function loadMindmapData(){
 			{
 				$("img.iconSpaceArrow").removeClass("iconSpaceArrowTop");
 			}
+			$(".ct-nodeBox").css({"overflow":"hidden"})
 			loadMindmapData1();
 			});
 		}
@@ -930,7 +931,7 @@ var toggleExpand = function(e){
 		$("#ct-moduleBox").css({"position":"","top":""});
 		$("#ct-canvas").css("top","");
 		$(".ct-nodeBox .ct-node").css("width","");
-		$(".ct-nodeBox").css({"overflow":"", "width":""})
+		$(".ct-nodeBox").css({"overflow":"hidden", "width":""})
 	}
 };
 var toggleExpandAssign = function(e){
