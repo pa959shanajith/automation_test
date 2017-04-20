@@ -2441,10 +2441,6 @@ input[disabled]{
   height: calc(100% - 255px);
 }
 
-.releaseContainer, .cycleContainer{
-	width:50%;
-}
-
 .addContainer{
 	float: left;
     width: 100%;
@@ -2468,7 +2464,7 @@ input[disabled]{
     float: left;
     width: 100%;
 }
-
+#cycleList li{ padding-bottom: 4px !important;}
 #releaseList li img,
 #cycleList li img{
 	vertical-align: bottom;
@@ -2739,7 +2735,8 @@ input[disabled]{
 .releaseContainer, .cycleContainer{
 	width:50%;
 }
-
+.releaseContainer{padding-right: 3px;}
+.cycleContainer{padding-left: 3px;}
 .addContainer{
 	float: left;
     width: 100%;
@@ -2774,7 +2771,7 @@ input[disabled]{
 #cycleList li{
 	float: left;
     width: 100%;
-    padding: 8px 25px 8px 30px;
+    padding: 8px 25px 8px 24px;
     font-size: 15px;
     position: relative;
     cursor: pointer;

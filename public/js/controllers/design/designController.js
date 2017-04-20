@@ -2044,7 +2044,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 						}
 						else if(mydata[i].keywordVal == 'SwitchToFrame'){
 							if($scope.newTestScriptDataLS != "undefined" || $scope.newTestScriptDataLS != undefined){
-								var testScriptTableData = JSON.parse($scope.newTestScriptDataLS);
+								var testScriptTableData = $scope.newTestScriptDataLS;
 								for(j=0;j<testScriptTableData.length;j++){
 									if(testScriptTableData[j].custname != '@Browser' && testScriptTableData[j].custname != '@Oebs' && testScriptTableData[j].custname != '@Window' && testScriptTableData[j].custname != '@Generic' && testScriptTableData[j].custname != '@Custom'){
 										if(testScriptTableData[j].url != ""){
@@ -2648,14 +2648,14 @@ function contentTable(newTestScriptDataLS) {
 			else if(appTypeLocal == 'DesktopJava'){
 				sc = Object.keys(keywordArrayList.customOEBS);
 				selectedKeywordList = "customOEBS";
-				var newTSDataLS = angular.element(document.getElementsByClassName('gridview-1')).scope().newTestScriptDataLS;
+				var newTSDataLS = angular.element(document.getElementById('jqGrid')).scope().newTestScriptDataLS;
 				if(newTSDataLS){
 					if(newTSDataLS != "undefined"){
-						var testScriptTableData = JSON.parse(newTSDataLS);
-						for(j=0;j<testScriptTableData.length;j++){
-							if(testScriptTableData[j].custname != '@Browser' && testScriptTableData[j].custname != '@Oebs' && testScriptTableData[j].custname != '@Window' && testScriptTableData[j].custname != '@Generic' && testScriptTableData[j].custname != '@Custom'){
-								if(testScriptTableData[j].url != ""){
-									url = testScriptTableData[j].url;
+						//var testScriptTableData = JSON.parse(newTSDataLS);
+						for(j=0;j<newTSDataLS.length;j++){
+							if(newTSDataLS[j].custname != '@Browser' && newTSDataLS[j].custname != '@Oebs' && newTSDataLS[j].custname != '@Window' && newTSDataLS[j].custname != '@Generic' && newTSDataLS[j].custname != '@Custom'){
+								if(newTSDataLS[j].url != ""){
+									url = newTSDataLS[j].url;
 									break;
 								}
 							}
@@ -3897,7 +3897,7 @@ function commentStep(){
 		var myData = $("#jqGrid").jqGrid('getGridParam','data')
 		$(document).find(".ui-state-highlight").each(function(){
 			for(i=0; i<myData.length; i++){
-				if(myData[i].stepNo == parseInt($(this).children('td:nth-child(1)').text().trim())){
+				if(myData[i].stepNo == parseInt($(this).attr("id").trim())){
 					//Check whether output coloumn is empty
 					if(myData[i].outputVal == ""){
 						myData[i].outputVal = "##";
@@ -3943,7 +3943,8 @@ function shortString() {
 
 			if (ele.hasAttribute('data-limit')) {
 				if (str.length > ele.dataset.limit) {
-					var result = `${str.substring(0, ele.dataset.limit - indt.length).trim()}${indt}`;
+					//var result = `${str.substring(0, ele.dataset.limit - indt.length).trim()}${indt}`;
+					var result = str.substring(0, ele.dataset.limit - indt.length).trim().concat(indt);
 					ele.innerText = result;
 					str = null;
 					result = null;
