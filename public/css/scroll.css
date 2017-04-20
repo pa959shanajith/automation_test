@@ -505,7 +505,7 @@
 }
 .scroll-wrapper.relCycScroll {
        float: none;
-       margin-left: -6px;
+       margin-left: 0;
        max-height:calc(100% - 55px) !important
 }
 .relCycScroll > .scroll-element.scroll-y .scroll-bar{

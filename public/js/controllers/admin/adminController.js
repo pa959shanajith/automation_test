@@ -482,6 +482,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 				{
 					var createNewRelCyc = {
 						"releaseName": "",
+						"newStatus" : true,
 						"cycleDetails": []
 					}
 					count = updateProjectDetails.length * 2;
@@ -549,7 +550,6 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 				$("#cycleTxt").removeClass('inputErrorBorder');
 				cycleName = $("#cycleTxt").val();
 
-
 				$(".close:visible").trigger('click');
 				$("#cycleList li.cycleList").removeClass("cycleList");
 				taskName = $("#page-taskName").children("span").text();
@@ -572,10 +572,10 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 										//this line is for releases which already have at least 1 cycle
 										if('cycleNames' in projectDetails[j])
 										{
-											cycleArr=projectDetails[j].cycleNames;
+											cycleArr = projectDetails[j].cycleNames;
 										}
 										cycleArr.push(cycleName);
-										projectDetails[j].cycleNames=cycleArr;
+										projectDetails[j].cycleNames = cycleArr;
 									}
 								}
 							}	
@@ -589,10 +589,13 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 				{
 					var createNewRelCyc = {
 						"releaseName": "",
+						"releaseId" : "",
+						"newStatus" : false,
 						"cycleDetails": []
 					}
 					var createCyc = {
-						"cycleName": ""
+						"cycleName": "",
+						"newStatus": true
 					}
 					delCount = (delCount +1) * 3;
 					$("#cycleList").append("<li class='cycleList createCycle'><img src='imgs/ic-cycle.png' /><span title="+cycleName+" class='cycleName'>"+cycleName+"</span><span class='actionOnHover'><img id=editCycleName_"+delCount+" title='Edit Cycle Name' src='imgs/ic-edit-sm.png' class='editCycleName'><img id=deleteCycleName_"+delCount+" title='Delete Cycle' src='imgs/ic-delete-sm.png' class='deleteCycle'></span></li>");
@@ -613,9 +616,11 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 							}
 						}
 					}
+					var RelID = $("li.active").children('span.releaseName').data("releaseid");
 					//For update project json
 					if(newProjectDetails.length <= 0){
 						createNewRelCyc.releaseName = relName;
+						createNewRelCyc.releaseId = RelID;
 						createCyc.cycleName = cycleName;
 						createNewRelCyc.cycleDetails.push(createCyc)
 						newProjectDetails.push(createNewRelCyc);
@@ -623,7 +628,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 					else{
 						var chk = true;
 						for(j=0; j<newProjectDetails.length; j++){
-							if(newProjectDetails[j].releaseName == relName){
+							if(newProjectDetails[j].releaseName == relName && newProjectDetails[j].releaseId == RelID){
 								createCyc.cycleName = cycleName;
 								newProjectDetails[j].cycleDetails.push(createCyc);
 								chk = false;
@@ -632,6 +637,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 						}
 						if(chk == true){
 							createNewRelCyc.releaseName = relName;
+							createNewRelCyc.releaseId = RelID;
 							createCyc.cycleName = cycleName;
 							createNewRelCyc.cycleDetails.push(createCyc)
 							newProjectDetails.push(createNewRelCyc);
@@ -729,344 +735,327 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 	var editRelid;
 	//Edit Release Name Functionality
 	$(document).on("click", "[id^=editReleaseName_]", function(e){
-		editReleaseId = e.target.id;
-		editRelid = e.target.parentElement.previousSibling.dataset.releaseid;
-		if(e.target.id != "releaseName")
-		{
+		/*if($(this).hasClass("editedRelease")){
+			openModelPopup("Edit Release Name", "Release Name already edited");
+		}
+		else{*/
 			$("#editReleaseNameModal").modal("show");
-			$("#releaseName").removeClass("inputErrorBorder");
-			$('#editReleaseNameModal').on('shown.bs.modal', function () {
-				$('#releaseName').focus();
-			});
 			var existingReleaseName = $(this).parents("li").children(".releaseName").text()
-			releaseName = $("#releaseName").val(existingReleaseName);
-			$("#updateReleaseName").on('click', function(event) {
-				if($("#releaseName").val() == "")
-				{
-					$("#releaseName").addClass('inputErrorBorder');
-					return false;
-				}
-				else{
-					for(i=0; i<updateProjectDetails.length; i++){
-						if($("#releaseName").val().trim() == updateProjectDetails[i].releaseName){
-							$(".close:visible").trigger('click');
-							openModelPopup("Add Release", "Release Name already exists");
-							return false;
-						}
-					}
-					$("#releaseName").removeClass('inputErrorBorder');
-					releaseName = $("#releaseName").val();
-					taskName = $("#page-taskName").children("span").text();
-					if(taskName == "Create Project")
+			$("#releaseName").val(existingReleaseName);
+			editReleaseId = e.target.id;
+			editRelid = e.target.parentElement.previousSibling.dataset.releaseid;
+			if(e.target.id != "releaseName")
+			{
+				$("#editReleaseNameModal").modal("show");
+				$("#releaseName").removeClass("inputErrorBorder");
+				$('#editReleaseNameModal').on('shown.bs.modal', function () {
+					$('#releaseName').focus();
+				});
+				var existingReleaseName = $(this).parents("li").children(".releaseName").text()
+				releaseName = $("#releaseName").val(existingReleaseName);
+				//Save edited release name
+				$("#updateReleaseName").on('click', function(event) {
+					if($("#releaseName").val() == "")
 					{
-						$(".close:visible").trigger('click');
-						var index = '';
-						index = $('li.active').index();
-						$("#"+editReleaseId).parent().prev('span').text($("#releaseName").val());
-						//console.log("projectDetails", projectDetails);
-						for(var i=0;i<projectDetails.length;i++)
-						{
-							if(i == index)
-							{
-								projectDetails[i].releaseName = $("#releaseName").val();
+						$("#releaseName").addClass('inputErrorBorder');
+						return false;
+					}
+					else{
+						for(i=0; i<updateProjectDetails.length; i++){
+							if($("#releaseName").val().trim() == updateProjectDetails[i].releaseName){
+								$(".close:visible").trigger('click');
+								openModelPopup("Edit Release Name", "Release Name already exists");
+								return false;
 							}
 						}
-					}
-					else if(taskName == "Update Project")
-					{
-						var editRelCyc = {
-							"releaseId": "",
-							"releaseName": "",
-							"oldreleaseName" :"",
-							"cycleDetails": [],
-							"editStatus": false
-						}
-						$(".close:visible").trigger('click');
-						var index = '';
-						index = $('li.active').index();
-						var oldRelText = $("#"+editReleaseId).parent().prev('span').text();
-						$("#"+editReleaseId).parent().prev('span').text($("#releaseName").val());
-						var newReleaseTxt = $("li.active").children("span.releaseName").text();
-						for(var i=0;i<updateProjectDetails.length;i++)
+						$("#releaseName").removeClass('inputErrorBorder');
+						releaseName = $("#releaseName").val();
+						taskName = $("#page-taskName").children("span").text();
+						if(taskName == "Create Project")
 						{
-							if(i == index)
+							$(".close:visible").trigger('click');
+							var index = '';
+							index = $('li.active').index();
+							$("#"+editReleaseId).parent().prev('span').text($("#releaseName").val());
+							//console.log("projectDetails", projectDetails);
+							for(var i=0;i<projectDetails.length;i++)
 							{
-								updateProjectDetails[i].releaseName = $("#releaseName").val();
-								//For update project json
-								if(editedProjectDetails.length <= 0){
-									editRelCyc.releaseId = editRelid;//updateProjectDetails[i].releaseId;
-									editRelCyc.releaseName = $("#releaseName").val();//updateProjectDetails[i].releaseName;
-									editRelCyc.oldreleaseName = oldRelText;
-									editRelCyc.editStatus = true;
-									editedProjectDetails.push(editRelCyc)
+								if(i == index)
+								{
+									projectDetails[i].releaseName = $("#releaseName").val();
 								}
-								else{
-									var chkPresent = true;
-									for(m=0; m<editedProjectDetails.length; m++){
-										if(editedProjectDetails[m].releaseId == editRelid/*updateProjectDetails[i].releaseId*/){
-											editedProjectDetails[m].releaseId = editRelid;//updateProjectDetails[i].releaseId;
-											editedProjectDetails[m].releaseName = $("#releaseName").val();//updateProjectDetails[i].releaseName;
-											editedProjectDetails[m].oldreleaseName = oldRelText;
-											editedProjectDetails[m].editStatus = true;
-											chkPresent = false;
-											break;
-										}
+							}
+						}
+						else if(taskName == "Update Project")
+						{
+							$(".close:visible").trigger('click');
+							var index = '';
+							index = $('li.active').index();
+							var oldRelText = $("#"+editReleaseId).parent().prev('span').text();
+							$("#"+editReleaseId).parent().prev('span').text($("#releaseName").val());
+							var newReleaseTxt = $("li.active").children("span.releaseName").text();
+							for(var i=0;i<updateProjectDetails.length;i++)
+							{
+								if(i == index)
+								{
+									var editRelCyc = {
+										"releaseId": "",
+										"releaseName": "",
+										"oldreleaseName" :"",
+										"cycleDetails": [],
+										"editStatus": false
 									}
-									if(chkPresent == true){
+									updateProjectDetails[i].releaseName = $("#releaseName").val();
+									//For update project json
+									if(editedProjectDetails.length <= 0){
 										editRelCyc.releaseId = editRelid;//updateProjectDetails[i].releaseId;
 										editRelCyc.releaseName = $("#releaseName").val();//updateProjectDetails[i].releaseName;
 										editRelCyc.oldreleaseName = oldRelText;
 										editRelCyc.editStatus = true;
 										editedProjectDetails.push(editRelCyc)
 									}
+									else{
+										var chkPresent = true;
+										for(m=0; m<editedProjectDetails.length; m++){
+											if(editedProjectDetails[m].releaseId == editRelid/*updateProjectDetails[i].releaseId*/){
+												editedProjectDetails[m].releaseName = $("#releaseName").val();//updateProjectDetails[i].releaseName;
+												editedProjectDetails[m].oldreleaseName = oldRelText;
+												editedProjectDetails[m].editStatus = true;
+												chkPresent = false;
+												break;
+											}
+										}
+										if(chkPresent == true){
+											editRelCyc.releaseId = editRelid;//updateProjectDetails[i].releaseId;
+											editRelCyc.releaseName = $("#releaseName").val();//updateProjectDetails[i].releaseName;
+											editRelCyc.oldreleaseName = oldRelText;
+											editRelCyc.editStatus = true;
+											editedProjectDetails.push(editRelCyc)
+										}
+									}
+									//For update project json
 								}
-								//For update project json
 							}
 						}
+						//$("#"+editReleaseId).addClass("editedRelease");
+						//$("#"+editReleaseId).siblings(".deleteRelease").addClass("editedRelease");
+						event.stopImmediatePropagation();
 					}
-					event.stopImmediatePropagation();
-				}
-			})
-		}
-
+				})
+				e.stopImmediatePropagation();
+			}
+		//}
 	});
 
 	var deleteRelid;
 	//Delete Release Functionality
 	$(document).on("click","[id^=deleteReleaseName_]", function(e){
-		$("#deleteReleaseModal").modal("show");
-		deleteReleaseId = e.target.id;
-		deleteRelid = e.target.parentElement.previousSibling.dataset.releaseid;
-		//deleteRelname = e.target.parentElement.previousSibling.innerHTML;
-		$("#deleteReleaseYes").on('click',function(event) {
-			$("#deleteReleaseModal").modal("hide");
-			taskName = $("#page-taskName").children("span").text();
-			var goahead = false;
-			if(taskName == "Create Project")
-			{
-				if($("#cycleList").find(".updateCycle").length > 0){
-					openModelPopup("Delete Release", "Release contains cycles. Cannot delete");
-				}
-				else{
-					for(var i=0;i<projectDetails.length;i++)
-					{
-						if(projectDetails[i].releaseName == $("#"+deleteReleaseId).parent().prev('span.releaseName').text())
-						{
-							if('cycleNames' in projectDetails[i])
-							{
-								for (var j=0;j<projectDetails[i].cycleNames.length;j++)
-								{
-									$("#cycleList li").each(function() {
-
-										if(projectDetails[i].cycleNames[j] == $(this).children("span.cycleName").text())
-										{
-											$(this).remove();
-										}
-									})
-
-								}
-							}
-							delete projectDetails[i];
-							projectDetails = projectDetails.filter(function(n){ return n != undefined });
-						}
-					}					
-				}
-			}
-			else if(taskName == "Update Project")
-			{
-				if($("#cycleList").find(".updateCycle").length > 0){
-					openModelPopup("Delete Release", "Release contains cycles. Cannot delete");
-				}
-				else{
-					var deleteRelCyc = {
-						"releaseName": "",
-						"releaseId": "",
-						"cycleDetails": [],
-						"deleteStatus": false
+		/*if($(this).hasClass("editedRelease")){
+			openModelPopup("Delete Release", "Release is edited. Cannot delete");
+		}
+		else{*/
+			$("#deleteReleaseModal").modal("show");
+			deleteReleaseId = e.target.id;
+			deleteRelid = e.target.parentElement.previousSibling.dataset.releaseid;
+			//deleteRelname = e.target.parentElement.previousSibling.innerHTML;
+			$("#deleteReleaseYes").on('click',function(event) {
+				$("#deleteReleaseModal").modal("hide");
+				taskName = $("#page-taskName").children("span").text();
+				var goahead = false;
+				if(taskName == "Create Project")
+				{
+					if($("#cycleList").find(".updateCycle").length > 0){
+						openModelPopup("Delete Release", "Release contains cycles. Cannot delete");
 					}
-					for(var i=0;i<updateProjectDetails.length;i++)
-					{
-						if(updateProjectDetails[i].releaseName == $("#"+deleteReleaseId).parent().prev('span.releaseName').text())
+					else{
+						for(var i=0;i<projectDetails.length;i++)
 						{
-							//For update project json
-							if(deletedProjectDetails.length <= 0){
-								deleteRelCyc.releaseName = $("#"+deleteReleaseId).parent().prev('span.releaseName').text();//updateProjectDetails[i].releaseName;
-								deleteRelCyc.releaseId = deleteRelid;//updateProjectDetails[i].releaseId
-								deleteRelCyc.deleteStatus = true;
-								deletedProjectDetails.push(deleteRelCyc);
-							}
-							else{
-								var chkRelease = true;
-								for(j=0; j<deletedProjectDetails.length; j++){
-									if(deletedProjectDetails[j].releaseId == deleteRelid/*updateProjectDetails[i].releaseId*/){
-										deletedProjectDetails[j].releaseName = $("#"+deleteReleaseId).parent().prev('span.releaseName').text();//updateProjectDetails[i].releaseName;
-										deletedProjectDetails[j].deleteStatus = true;
-										chkRelease = false;
-										break;
+							if(projectDetails[i].releaseName == $("#"+deleteReleaseId).parent().prev('span.releaseName').text())
+							{
+								if('cycleNames' in projectDetails[i])
+								{
+									for (var j=0;j<projectDetails[i].cycleNames.length;j++)
+									{
+										$("#cycleList li").each(function() {
+
+											if(projectDetails[i].cycleNames[j] == $(this).children("span.cycleName").text())
+											{
+												$(this).remove();
+											}
+										})
+
 									}
 								}
-								if(chkRelease == true){
+								delete projectDetails[i];
+								projectDetails = projectDetails.filter(function(n){ return n != undefined });
+							}
+						}					
+					}
+				}
+				else if(taskName == "Update Project")
+				{
+					if($("#cycleList").find(".updateCycle").length > 0){
+						openModelPopup("Delete Release", "Release contains cycles. Cannot delete");
+					}
+					else{
+						for(var i=0;i<updateProjectDetails.length;i++)
+						{
+							if(updateProjectDetails[i].releaseName == $("#"+deleteReleaseId).parent().prev('span.releaseName').text())
+							{
+								var deleteRelCyc = {
+									"releaseName": "",
+									"releaseId": "",
+									"cycleDetails": [],
+									"deleteStatus": false
+								}
+								//For update project json
+								if(deletedProjectDetails.length <= 0){
 									deleteRelCyc.releaseName = $("#"+deleteReleaseId).parent().prev('span.releaseName').text();//updateProjectDetails[i].releaseName;
 									deleteRelCyc.releaseId = deleteRelid;//updateProjectDetails[i].releaseId
 									deleteRelCyc.deleteStatus = true;
 									deletedProjectDetails.push(deleteRelCyc);
 								}
+								else{
+									var chkRelease = true;
+									for(j=0; j<deletedProjectDetails.length; j++){
+										if(deletedProjectDetails[j].releaseId == deleteRelid/*updateProjectDetails[i].releaseId*/){
+											deletedProjectDetails[j].releaseName = $("#"+deleteReleaseId).parent().prev('span.releaseName').text();//updateProjectDetails[i].releaseName;
+											deletedProjectDetails[j].deleteStatus = true;
+											chkRelease = false;
+											break;
+										}
+									}
+									if(chkRelease == true){
+										deleteRelCyc.releaseName = $("#"+deleteReleaseId).parent().prev('span.releaseName').text();//updateProjectDetails[i].releaseName;
+										deleteRelCyc.releaseId = deleteRelid;//updateProjectDetails[i].releaseId
+										deleteRelCyc.deleteStatus = true;
+										deletedProjectDetails.push(deleteRelCyc);
+									}
+								}
+								//For update project json
+								
+								delete updateProjectDetails[i];
+								$("#cycleList li").remove();
+								updateProjectDetails = updateProjectDetails.filter(function(n){ return n != undefined });
 							}
-							//For update project json
-							
-							delete updateProjectDetails[i];
-							$("#cycleList li").remove();
-							updateProjectDetails = updateProjectDetails.filter(function(n){ return n != undefined });
 						}
+						goahead = true;
 					}
-					goahead = true;
 				}
-			}
-			if(goahead){
-				$("#"+deleteReleaseId).parent().parent("li").remove();
-				$("#releaseList li:last").trigger('click');
-				openModelPopup("Delete Release", "Release deleted successfully");
-				toggleCycleClick();				
-			}
-			event.stopImmediatePropagation();
-		});
+				if(goahead){
+					$("#"+deleteReleaseId).parent().parent("li").remove();
+					$("#releaseList li:last").trigger('click');
+					openModelPopup("Delete Release", "Release deleted successfully");
+					toggleCycleClick();				
+				}
+				event.stopImmediatePropagation();
+			});
+		//}
 	})
 
 	var editCycId;
 	//Edit Cycle Name Functionality
 	$(document).on("click", "[id^=editCycleName_]", function(e){
-		editCycleId = e.target.id;
-		editCycId = e.target.parentElement.previousSibling.dataset.cycleid;
-		if(e.target.id != "cycleName")
-		{
+		/*if($(this).hasClass("editedCycle") == true){
+			openModelPopup("Edit Cycle Name", "Cycle Name already edited");
+		}
+		else{*/
 			$("#editCycleNameModal").modal("show");
-			$("#cycleName").removeClass("inputErrorBorder");
-			$('#editCycleNameModal').on('shown.bs.modal', function () {
-				$('#cycleName').focus();
-			});
 			var existingCycleName = $(this).parents("li").children(".cycleName").text()
-			cycleName = $("#cycleName").val(existingCycleName);
-			
-			//Edit cycle name save button
-			$("#updateCycleName").on('click', function(event) {
-				if($("#cycleName").val() == "")
-				{
-					$("#cycleName").addClass('inputErrorBorder');
-					return false;
-				}
-				else{
-					var relID = $("li.active").children('span.releaseName').data("releaseid");
-					for(i=0; i<updateProjectDetails.length; i++){
-						if(relID == updateProjectDetails[i].releaseId){
-							for(j=0; j<updateProjectDetails[i].cycleDetails.length; j++){
-								if($("#cycleName").val().trim() == updateProjectDetails[i].cycleDetails[j].cycleName){
-									$(".close:visible").trigger('click');
-									openModelPopup("Add Cycle", "Cycle Name already exists");
-									return false;
-								}
-							}
-							break;
-						}
-					}
-					$("#cycleName").removeClass('inputErrorBorder');
-					cycleName = $("#cycleName").val();
-
-					$(".close:visible").trigger('click');
-					taskName = $("#page-taskName").children("span").text();
-					if(taskName == "Create Project")
+			$("#cycleName").val(existingCycleName)
+			editCycleId = e.target.id;
+			editCycId = e.target.parentElement.previousSibling.dataset.cycleid;
+			if(e.target.id != "cycleName")
+			{
+				$("#editCycleNameModal").modal("show");
+				$("#cycleName").removeClass("inputErrorBorder");
+				/*$('#editCycleNameModal').on('shown.bs.modal', function () {
+					$('#cycleName').focus();
+				});*/
+				var existingCycleName = $(this).parents("li").children(".cycleName").text()
+				cycleName = $("#cycleName").val(existingCycleName);
+				$('#cycleName').focus();
+				//Edit cycle name save button
+				$("#updateCycleName").on('click', function(event) {
+					if($("#cycleName").val() == "")
 					{
-						$("#"+editCycleId).parent().prev('span').text($("#cycleName").val());
-						var cycleIndex = '';
-						cycleIndex = $('li.cycleList').index();
-						for(var i=0;i<projectDetails.length;i++)
+						$("#cycleName").addClass('inputErrorBorder');
+						return false;
+					}
+					else{
+						var relID = $("li.active").children('span.releaseName').data("releaseid");
+						for(i=0; i<updateProjectDetails.length; i++){
+							if(relID == updateProjectDetails[i].releaseId){
+								for(j=0; j<updateProjectDetails[i].cycleDetails.length; j++){
+									if($("#cycleName").val().trim() == updateProjectDetails[i].cycleDetails[j].cycleName){
+										$(".close:visible").trigger('click');
+										openModelPopup("Edit Cycle Name", "Cycle Name already exists");
+										return false;
+									}
+								}
+								break;
+							}
+						}
+						$("#cycleName").removeClass('inputErrorBorder');
+						cycleName = $("#cycleName").val();
+
+						$(".close:visible").trigger('click');
+						taskName = $("#page-taskName").children("span").text();
+						if(taskName == "Create Project")
 						{
-							if(projectDetails[i].releaseName == $("li.active").children('span.releaseName').text())
+							$("#"+editCycleId).parent().prev('span').text($("#cycleName").val());
+							var cycleIndex = '';
+							cycleIndex = $('li.cycleList').index();
+							for(var i=0;i<projectDetails.length;i++)
 							{
-								for(var j=0;j<projectDetails[i].cycleNames.length;j++)
+								if(projectDetails[i].releaseName == $("li.active").children('span.releaseName').text())
 								{
-									if(j == cycleIndex)
+									for(var j=0;j<projectDetails[i].cycleNames.length;j++)
 									{
-										projectDetails[i].cycleNames[j] = $("#cycleName").val();
+										if(j == cycleIndex)
+										{
+											projectDetails[i].cycleNames[j] = $("#cycleName").val();
+										}
 									}
 								}
 							}
 						}
-					}
-					else if(taskName == "Update Project")
-					{
-						var editRelCyc = {
-							"releaseId": "",
-						    "releaseName": "",
-						    "oldreleaseName" :"",
-						    "cycleDetails": [],
-						    "editStatus": false
-						}
-						var editCycle = {
-						    "oldCycleName": "",
-						    "cycleName": "",
-						    "cycleId": "",
-						    "editStatus":  false
-						}
-						var oldCycText = $("#"+editCycleId).parent().prev('span').text();
-						$("#"+editCycleId).parent().prev('span').text($("#cycleName").val());
-						var cycleIndex = '';
-						cycleIndex = $('li.cycleList').index();
-						for(var i=0;i<updateProjectDetails.length;i++)
+						else if(taskName == "Update Project")
 						{
-							if(updateProjectDetails[i].releaseName == $("li.active").children('span.releaseName').text())
+							var oldCycText = $("#"+editCycleId).parent().prev('span').text();
+							$("#"+editCycleId).parent().prev('span').text($("#cycleName").val());
+							var cycleIndex = '';
+							cycleIndex = $('li.cycleList').index();
+							for(var i=0;i<updateProjectDetails.length;i++)
 							{
-								for(var j=0;j<updateProjectDetails[i].cycleDetails.length;j++)
+								if(updateProjectDetails[i].releaseName == $("li.active").children('span.releaseName').text())
 								{
-									var objectType = typeof(updateProjectDetails[i].cycleDetails[j]);
-									if(objectType == "object" && j == cycleIndex && (updateProjectDetails[i].releaseName == $("li.active").children('span.releaseName').text()) && (updateProjectDetails[i].cycleDetails[j].cycleId == editCycId))
+									for(var j=0;j<updateProjectDetails[i].cycleDetails.length;j++)
 									{
-										//console.log("objectType", typeof(updateProjectDetails[i].cycleDetails[j]))
-										updateProjectDetails[i].cycleDetails[j].cycleName = $("#cycleName").val();
-										
-										//For update project json
-										if(editedProjectDetails.length <= 0){
-											//building release details
-											editRelCyc.releaseId = relID;//updateProjectDetails[i].releaseId;
-											editRelCyc.releaseName = $("li.active").children('span.releaseName').text();//updateProjectDetails[i].releaseName;												
-											//building cycle details with release
-											editCycle.oldCycleName = oldCycText;
-											editCycle.cycleName = $("#cycleName").val();//updateProjectDetails[i].cycleDetails[j].cycleName;
-											editCycle.cycleId = editCycId;//updateProjectDetails[i].cycleDetails[j].cycleId;
-											editCycle.editStatus = true;
-											editRelCyc.cycleDetails.push(editCycle)
-											//pushing all data to an array
-											editedProjectDetails.push(editRelCyc)
-										}
-										else {
-											var chkRelPresent = true;
-											for(m=0; m<editedProjectDetails.length; m++){
-												if(editedProjectDetails[m].releaseId == relID/*updateProjectDetails[i].releaseId*/){
-													var chkcycinrel = true;
-													for(n=0; n<editedProjectDetails[m].cycleDetails.length; n++){
-														if(editedProjectDetails[m].cycleDetails[n].cycleId == editCycId/*updateProjectDetails[i].cycleDetails[j].cycleId*/){
-															editedProjectDetails[m].cycleDetails[n].cycleName = $("#cycleName").val();//updateProjectDetails[i].cycleDetails[j].cycleName;
-															editedProjectDetails[m].cycleDetails[n].oldCycleName = oldCycText;
-															editedProjectDetails[m].cycleDetails[n].editStatus = true;
-															chkcycinrel = false;
-															break;
-														}
-													}
-													if(chkcycinrel == true){
-														//building cycle details with release
-														editCycle.oldCycleName = oldCycText;
-														editCycle.cycleName = $("#cycleName").val();//updateProjectDetails[i].cycleDetails[j].cycleName;
-														editCycle.cycleId = editCycId;//updateProjectDetails[i].cycleDetails[j].cycleId;
-														editCycle.editStatus = true;
-														editedProjectDetails[m].cycleDetails.push(editCycle);
-														chkRelPresent = false;
-														break;															
-													}
-												}
+										var objectType = typeof(updateProjectDetails[i].cycleDetails[j]);
+										if(objectType == "object" && j == cycleIndex && (updateProjectDetails[i].releaseName == $("li.active").children('span.releaseName').text()) && (updateProjectDetails[i].cycleDetails[j].cycleId == editCycId))
+										{
+											var editRelCyc = {
+												"releaseId": "",
+											    "releaseName": "",
+											    "oldreleaseName" :"",
+											    "cycleDetails": [],
+											    "editStatus": false
 											}
-											if(chkRelPresent == true){
+											var editCycle = {
+											    "oldCycleName": "",
+											    "cycleName": "",
+											    "cycleId": "",
+											    "editStatus":  false
+											}
+											//console.log("objectType", typeof(updateProjectDetails[i].cycleDetails[j]))
+											updateProjectDetails[i].cycleDetails[j].cycleName = $("#cycleName").val();
+											
+											//For update project json
+											if(editedProjectDetails.length <= 0){
 												//building release details
 												editRelCyc.releaseId = relID;//updateProjectDetails[i].releaseId;
-												editRelCyc.releaseName = $("li.active").children('span.releaseName').text();//updateProjectDetails[i].releaseName;
+												editRelCyc.releaseName = $("li.active").children('span.releaseName').text();//updateProjectDetails[i].releaseName;												
 												//building cycle details with release
 												editCycle.oldCycleName = oldCycText;
 												editCycle.cycleName = $("#cycleName").val();//updateProjectDetails[i].cycleDetails[j].cycleName;
@@ -1076,123 +1065,133 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 												//pushing all data to an array
 												editedProjectDetails.push(editRelCyc)
 											}
+											else {
+												var chkRelPresent = true;
+												for(m=0; m<editedProjectDetails.length; m++){
+													if(editedProjectDetails[m].releaseId == relID/*updateProjectDetails[i].releaseId*/){
+														var chkcycinrel = true;
+														for(n=0; n<editedProjectDetails[m].cycleDetails.length; n++){
+															if(editedProjectDetails[m].cycleDetails[n].cycleId == editCycId/*updateProjectDetails[i].cycleDetails[j].cycleId*/){
+																editedProjectDetails[m].cycleDetails[n].cycleName = $("#cycleName").val();//updateProjectDetails[i].cycleDetails[j].cycleName;
+																editedProjectDetails[m].cycleDetails[n].oldCycleName = oldCycText;
+																editedProjectDetails[m].cycleDetails[n].editStatus = true;
+																chkcycinrel = false;
+																break;
+															}
+														}
+														if(chkcycinrel == true){
+															//building cycle details with release
+															editCycle.oldCycleName = oldCycText;
+															editCycle.cycleName = $("#cycleName").val();//updateProjectDetails[i].cycleDetails[j].cycleName;
+															editCycle.cycleId = editCycId;//updateProjectDetails[i].cycleDetails[j].cycleId;
+															editCycle.editStatus = true;
+															editedProjectDetails[m].cycleDetails.push(editCycle);
+															break;															
+														}
+														chkRelPresent = false;
+													}
+												}
+												if(chkRelPresent == true){
+													//building release details
+													editRelCyc.releaseId = relID;//updateProjectDetails[i].releaseId;
+													editRelCyc.releaseName = $("li.active").children('span.releaseName').text();//updateProjectDetails[i].releaseName;
+													//building cycle details with release
+													editCycle.oldCycleName = oldCycText;
+													editCycle.cycleName = $("#cycleName").val();//updateProjectDetails[i].cycleDetails[j].cycleName;
+													editCycle.cycleId = editCycId;//updateProjectDetails[i].cycleDetails[j].cycleId;
+													editCycle.editStatus = true;
+													editRelCyc.cycleDetails.push(editCycle)
+													//pushing all data to an array
+													editedProjectDetails.push(editRelCyc)
+												}
+											}
+											break;
 										}
-										break;
+										//For update project json									
+										if(objectType == "string" && j == cycleIndex){
+											updateProjectDetails[i].cycleDetails[j] =  $("#cycleName").val();
+										}											
 									}
-									//For update project json									
-									if(objectType == "string" && j == cycleIndex){
-										updateProjectDetails[i].cycleDetails[j] =  $("#cycleName").val();
-									}											
 								}
 							}
 						}
+						//$("#"+editCycleId).addClass("editedCycle");
+						//$("#"+editCycleId).siblings(".deleteCycle").addClass("editedCycle");
+						event.stopImmediatePropagation();
+						$("#"+event.target.id).unbind('click');
 					}
-					event.stopImmediatePropagation();
-					$("#"+event.target.id).unbind('click');
-				}
-			});
-
-		}
-	})
+				});
+			}
+		//}
+	});
 
 	var cycId;
 	//Delete Cycle Functionality
 	$(document).on("click", "[id^=deleteCycleName_]", function(e){
-		$("#deleteCycleModal").modal("show");
-		deleteCycleId = e.target.id;
-		var cycName = $(this).parent().siblings(".cycleName").text();
-		cycId = $(this).parent().siblings(".cycleName").attr("data-cycleid");
-		$("#deleteCycleYes").on('click',function(event) {
-			var CycleID = [];
-			CycleID.push(cycId);
-			$("#deleteCycleModal").modal("hide");
-			//console.log(projectDetails);
-			taskName = $("#page-taskName").children("span").text();
-			var goahead = false;
-			if(taskName == "Create Project")
-			{
-				for(var i=0;i<projectDetails.length;i++)
+		/*if($(this).hasClass("editedCycle")){
+			openModelPopup("Delete Cycle", "Cycle is edited. Cannot delete");
+		}
+		else{*/
+			$("#deleteCycleModal").modal("show");
+			deleteCycleId = e.target.id;
+			var cycName = $(this).parent().siblings(".cycleName").text();
+			cycId = $(this).parent().siblings(".cycleName").attr("data-cycleid");
+			$("#deleteCycleYes").on('click',function(event) {
+				var CycleID = [];
+				CycleID.push(cycId);
+				$("#deleteCycleModal").modal("hide");
+				//console.log(projectDetails);
+				taskName = $("#page-taskName").children("span").text();
+				var goahead = false;
+				if(taskName == "Create Project")
 				{
-					for(var j=0;j<projectDetails[i].cycleNames.length;j++)
+					for(var i=0;i<projectDetails.length;i++)
 					{
-						if(projectDetails[i].cycleNames[j] == $("#"+deleteCycleId).parent().prev('span.cycleName').text())
+						for(var j=0;j<projectDetails[i].cycleNames.length;j++)
 						{
-							delete projectDetails[i].cycleNames[j];
-							projectDetails[i].cycleNames =  projectDetails[i].cycleNames.filter(function(n){ return n != null });
-							goahead = true;
+							if(projectDetails[i].cycleNames[j] == $("#"+deleteCycleId).parent().prev('span.cycleName').text())
+							{
+								delete projectDetails[i].cycleNames[j];
+								projectDetails[i].cycleNames =  projectDetails[i].cycleNames.filter(function(n){ return n != null });
+								goahead = true;
+							}
 						}
 					}
 				}
-			}
-			else if(taskName == "Update Project")
-			{
-				var idtype=["cycledetails"];
-				adminServices.getDetails_ICE(idtype,CycleID)
-				.then(function (response) {
-					if(response.testsuiteIds.length > 0){
-						goahead = false;
-						openModelPopup("Delete Cycle", "Cycle contains Test suites. Cannot delete");
-					}
-					else{
-						var deleteRelCyc = {
-							"releaseName": "",
-							"releaseId": "",
-							"cycleDetails": [],
-							"deleteStatus": false
+				else if(taskName == "Update Project")
+				{
+					var idtype=["cycledetails"];
+					adminServices.getDetails_ICE(idtype,CycleID)
+					.then(function (response) {
+						if(response.testsuiteIds.length > 0){
+							goahead = false;
+							openModelPopup("Delete Cycle", "Cycle contains Test suites. Cannot delete");
 						}
-						var deleteCycle = {
-							"cycleName": "",
-							"cycleId": "",
-							"deleteStatus": false
-						}
-						for(var i=0;i<updateProjectDetails.length;i++)
-						{
-							if(updateProjectDetails[i].releaseName == $("li.active").children("span.releaseName").text())
+						else{
+							for(var i=0;i<updateProjectDetails.length;i++)
 							{
-								for(var j=0;j<updateProjectDetails[i].cycleDetails.length;j++)
+								if(updateProjectDetails[i].releaseName == $("li.active").children("span.releaseName").text())
 								{
-									var objectType = typeof(updateProjectDetails[i].cycleDetails[j]);
-									if( objectType == 'object')
+									for(var j=0;j<updateProjectDetails[i].cycleDetails.length;j++)
 									{
-										if(updateProjectDetails[i].cycleDetails[j].cycleName == $("#"+deleteCycleId).parent().prev('span.cycleName').text())
+										var objectType = typeof(updateProjectDetails[i].cycleDetails[j]);
+										if( objectType == 'object')
 										{
-											//For update project json
-											if(deletedProjectDetails.length <= 0){
-												//adding release object
-												deleteRelCyc.releaseName = $("li.active").children("span.releaseName").text();//updateProjectDetails[i].releaseName;
-												deleteRelCyc.releaseId = $("li.active").children("span.releaseName").data("releaseid");//updateProjectDetails[i].releaseId;
-												deleteRelCyc.deleteStatus = false;
-												//adding cycle object within release
-												deleteCycle.cycleName = $("#"+deleteCycleId).parent().prev('span.cycleName').text();//updateProjectDetails[i].cycleDetails[j].cycleName;
-												deleteCycle.cycleId = cycId;//updateProjectDetails[i].cycleDetails[j].cycleId;
-												deleteCycle.deleteStatus = true;
-												deleteRelCyc.cycleDetails.push(deleteCycle);
-												//pushing all to object
-												deletedProjectDetails.push(deleteRelCyc);
-											}
-											else{
-												var chk = true;
-												for(k=0; k<deletedProjectDetails.length; k++){
-													if(deletedProjectDetails[k].releaseId == $("li.active").children("span.releaseName").data("releaseid")/*updateProjectDetails[i].releaseId*/){
-														var chkCycInRel = true;
-														for(l=0; l<deletedProjectDetails[k].cycleDetails.length; l++){
-															if(deletedProjectDetails[k].cycleDetails[l].cycleId == cycId/*updateProjectDetails[i].cycleDetails[j].cycleId*/){
-																deletedProjectDetails[k].cycleDetails[l].cycleName = $("#"+deleteCycleId).parent().prev('span.cycleName').text();//updateProjectDetails[i].cycleDetails[j].cycleName;
-																deletedProjectDetails[k].cycleDetails[l].deleteStatus = true;
-																chkCycInRel = false;
-																break;
-															}
-														}
-														if(chkCycInRel == true){
-															deleteCycle.cycleName = $("#"+deleteCycleId).parent().prev('span.cycleName').text();//updateProjectDetails[i].cycleDetails[j].cycleName;
-															deleteCycle.cycleId = cycId;//updateProjectDetails[i].cycleDetails[j].cycleId;
-															deleteCycle.deleteStatus = true;
-															deletedProjectDetails[k].cycleDetails.push(deleteCycle)															
-														}
-														chk = false;
-													}
+											if(updateProjectDetails[i].cycleDetails[j].cycleName == $("#"+deleteCycleId).parent().prev('span.cycleName').text())
+											{
+												var deleteRelCyc = {
+													"releaseName": "",
+													"releaseId": "",
+													"cycleDetails": [],
+													"deleteStatus": false
 												}
-												if(chk == true){
+												var deleteCycle = {
+													"cycleName": "",
+													"cycleId": "",
+													"deleteStatus": false
+												}
+												//For update project json
+												if(deletedProjectDetails.length <= 0){
 													//adding release object
 													deleteRelCyc.releaseName = $("li.active").children("span.releaseName").text();//updateProjectDetails[i].releaseName;
 													deleteRelCyc.releaseId = $("li.active").children("span.releaseName").data("releaseid");//updateProjectDetails[i].releaseId;
@@ -1205,35 +1204,70 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 													//pushing all to object
 													deletedProjectDetails.push(deleteRelCyc);
 												}
+												else{
+													var chk = true;
+													for(k=0; k<deletedProjectDetails.length; k++){
+														if(deletedProjectDetails[k].releaseId == $("li.active").children("span.releaseName").data("releaseid")/*updateProjectDetails[i].releaseId*/){
+															var chkCycInRel = true;
+															for(l=0; l<deletedProjectDetails[k].cycleDetails.length; l++){
+																if(deletedProjectDetails[k].cycleDetails[l].cycleId == cycId/*updateProjectDetails[i].cycleDetails[j].cycleId*/){
+																	deletedProjectDetails[k].cycleDetails[l].cycleName = $("#"+deleteCycleId).parent().prev('span.cycleName').text();//updateProjectDetails[i].cycleDetails[j].cycleName;
+																	deletedProjectDetails[k].cycleDetails[l].deleteStatus = true;
+																	chkCycInRel = false;
+																	break;
+																}
+															}
+															if(chkCycInRel == true){
+																deleteCycle.cycleName = $("#"+deleteCycleId).parent().prev('span.cycleName').text();//updateProjectDetails[i].cycleDetails[j].cycleName;
+																deleteCycle.cycleId = cycId;//updateProjectDetails[i].cycleDetails[j].cycleId;
+																deleteCycle.deleteStatus = true;
+																deletedProjectDetails[k].cycleDetails.push(deleteCycle)															
+															}
+															chk = false;
+														}
+													}
+													if(chk == true){
+														//adding release object
+														deleteRelCyc.releaseName = $("li.active").children("span.releaseName").text();//updateProjectDetails[i].releaseName;
+														deleteRelCyc.releaseId = $("li.active").children("span.releaseName").data("releaseid");//updateProjectDetails[i].releaseId;
+														deleteRelCyc.deleteStatus = false;
+														//adding cycle object within release
+														deleteCycle.cycleName = $("#"+deleteCycleId).parent().prev('span.cycleName').text();//updateProjectDetails[i].cycleDetails[j].cycleName;
+														deleteCycle.cycleId = cycId;//updateProjectDetails[i].cycleDetails[j].cycleId;
+														deleteCycle.deleteStatus = true;
+														deleteRelCyc.cycleDetails.push(deleteCycle);
+														//pushing all to object
+														deletedProjectDetails.push(deleteRelCyc);
+													}
+												}
+												//For update project json											
+												delete updateProjectDetails[i].cycleDetails[j];
+												updateProjectDetails[i].cycleDetails =  updateProjectDetails[i].cycleDetails.filter(function(n){ return n != null });
 											}
-											//For update project json											
-											delete updateProjectDetails[i].cycleDetails[j];
-											updateProjectDetails[i].cycleDetails =  updateProjectDetails[i].cycleDetails.filter(function(n){ return n != null });
 										}
-									}
-									else if(objectType == 'string')
-									{
-										if(updateProjectDetails[i].cycleDetails[j] == $("#"+deleteCycleId).parent().prev('span.cycleName').text())
+										else if(objectType == 'string')
 										{
-											delete updateProjectDetails[i].cycleDetails[j];
-											updateProjectDetails[i].cycleDetails =  updateProjectDetails[i].cycleDetails.filter(function(n){ return n != null });
+											if(updateProjectDetails[i].cycleDetails[j] == $("#"+deleteCycleId).parent().prev('span.cycleName').text())
+											{
+												delete updateProjectDetails[i].cycleDetails[j];
+												updateProjectDetails[i].cycleDetails =  updateProjectDetails[i].cycleDetails.filter(function(n){ return n != null });
+											}
 										}
 									}
 								}
 							}
+							goahead = true;
 						}
-						goahead = true;
-					}
-					if(goahead == true){
-						$("#"+deleteCycleId).parent().parent("li").remove();
-						openModelPopup("Delete Cycle", "Cycle deleted successfully");
-						toggleCycleClick();				
-					}
-				})
-				event.stopImmediatePropagation();
-			}
-		})
-
+						if(goahead == true){
+							$("#"+deleteCycleId).parent().parent("li").remove();
+							openModelPopup("Delete Cycle", "Cycle deleted successfully");
+							toggleCycleClick();				
+						}
+					})
+					event.stopImmediatePropagation();
+				}
+			})
+		//}
 	})
 
 
@@ -1434,33 +1468,37 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 
 	//AppTypeSelect Functionality
 	$(document).on("click", ".projectTypes", function(){
-		$(this).toggleClass("projectTypeSelected");
-		$(this).siblings().removeClass("projectTypeSelected")
+		var taskName = $("#page-taskName").children("span").text();
+		if(taskName == "Create Project"){
+			$(this).toggleClass("projectTypeSelected");
+			$(this).siblings().removeClass("projectTypeSelected")			
+		}
+		else return false;
 	});
 
 	//Edit Release Name Functionality
-	$(document).on("click", ".editReleaseName", function(){
+	/*$(document).on("click", ".editReleaseName", function(){
 		$("#editReleaseNameModal").modal("show");
 		var existingReleaseName = $(this).parents("li").children(".releaseName").text()
 		$("#releaseName").val(existingReleaseName)
-	});
+	});*/
 
 	//Delete Release Functionality
-	$(document).on("click", ".deleteRelease", function(){
+	/*$(document).on("click", ".deleteRelease", function(){
 		$("#deleteReleaseModal").modal("show")
-	});
+	});*/
 
 	//Edit Cycle Name Functionality
-	$(document).on("click", ".editCycleName", function(){
+	/*$(document).on("click", ".editCycleName", function(){
 		$("#editCycleNameModal").modal("show");
 		var existingCycleName = $(this).parents("li").children(".cycleName").text()
 		$("#cycleName").val(existingCycleName)
-	});
+	});*/
 
 	//Delete Release Functionality
-	$(document).on("click", ".deleteCycle", function(){
+	/*$(document).on("click", ".deleteCycle", function(){
 		$("#deleteCycleModal").modal("show")
-	});
+	});*/
 	
 	//Global moded popup
 	function openModelPopup(title, body){
