@@ -3897,7 +3897,7 @@ function commentStep(){
 		var myData = $("#jqGrid").jqGrid('getGridParam','data')
 		$(document).find(".ui-state-highlight").each(function(){
 			for(i=0; i<myData.length; i++){
-				if(myData[i].stepNo == parseInt($(this).children('td:nth-child(1)').text().trim())){
+				if(myData[i].stepNo == parseInt($(this).attr("id").trim())){
 					//Check whether output coloumn is empty
 					if(myData[i].outputVal == ""){
 						myData[i].outputVal = "##";
@@ -3943,7 +3943,8 @@ function shortString() {
 
 			if (ele.hasAttribute('data-limit')) {
 				if (str.length > ele.dataset.limit) {
-					var result = `${str.substring(0, ele.dataset.limit - indt.length).trim()}${indt}`;
+					//var result = `${str.substring(0, ele.dataset.limit - indt.length).trim()}${indt}`;
+					var result = str.substring(0, ele.dataset.limit - indt.length).trim().concat(indt);
 					ele.innerText = result;
 					str = null;
 					result = null;
