@@ -37,6 +37,7 @@ router.post('/', function(req, res, next) {
 	if(1>2) res.status(401).send('Session Timed Out! Login Again');
 	else {
 		var d=req.body;
+		console.log(d.task);
 		//var sessObj=req.session.uniqueID;
 		//var prjId=sessObj.project.id;
 		//var prjId='d4965851-a7f1-4499-87a3-ce53e8bf8e66';
@@ -199,6 +200,7 @@ router.post('/', function(req, res, next) {
 						qList.push({"statement":"MERGE(n:SCREENS{projectID:'"+prjId+"',testScenarioID:'"+idDict[e.pid]+"',screenName:'"+e.name+"',screenID:'"+e.id+"',createdBy:'null',createdOn:'null',uid:'"+uidx+"',screenID_c:'"+e.id_c+"'})"});
 						if(t!=null && e.id_c!=null){
 							t.id=(t.id!=null)?t.id:uuidV4();
+							//var parent=[prjId].concat(t.parent);
 							if(t.oid!=null) qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',nodeID:'"+e.id+"',parent:'["+t.parent+"]'}) SET n.task='"+t.task+"',n.assignedTo='"+t.assignedTo+"',n.reviewer='"+t.reviewer+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.details='"+t.details+"',n.uid='"+uidx+"'"});
 							else{
 								if(t.parent) t.parent.forEach(function(tPrt,tIdx){
@@ -210,16 +212,27 @@ router.post('/', function(req, res, next) {
 						}
 					}
 					else if(e.type=='testcases'){
-						if(e.renamed && e.id_n && e.orig_name) rnmList.push({"statement":"MATCH(n:TESTCASES{testCaseName:'"+e.orig_name+"',testScenarioID:'"+lts+"'}) SET n.testCaseName='"+e.name+"'"});
-						qList.push({"statement":"MERGE(n:TESTCASES{screenID:'"+idDict[e.pid]+"',testScenarioID:'"+lts+"',testCaseName:'"+e.name+"',testCaseID:'"+e.id+"',createdBy:'null',createdOn:'null',uid:'"+uidx+"',testCaseID_c:'"+e.id_c+"'})"});
+						var screen_data='';
+						var screenid_c='null';
+						if(e.renamed && e.id_n && e.orig_name){
+							rnmList.push({"statement":"MATCH(n:TESTCASES{testCaseName:'"+e.orig_name+"',testScenarioID:'"+lts+"',screenID_c:'"+e.pid_c+"'}) SET n.testCaseName='"+e.name+"'"});
+						}
+						
+						if(e.pid_c!='null' && e.pid_c!=undefined){
+							qList.push({"statement":"MERGE(n:TESTCASES{screenID:'"+idDict[e.pid]+"',testScenarioID:'"+lts+"',testCaseName:'"+e.name+"',testCaseID:'"+e.id+"',createdBy:'null',createdOn:'null',uid:'"+uidx+"',testCaseID_c:'"+e.id_c+"'}) SET n.screenID_c='"+e.pid_c+"'"});
+						}else{
+							qList.push({"statement":"MERGE(n:TESTCASES{screenID:'"+idDict[e.pid]+"',testScenarioID:'"+lts+"',testCaseName:'"+e.name+"',testCaseID:'"+e.id+"',createdBy:'null',createdOn:'null',uid:'"+uidx+"',testCaseID_c:'"+e.id_c+"'})"});
+						}
+						
 						
 						if(t!=null  && e.id_c!=null){
 							t.id=(t.id!=null)?t.id:uuidV4();
+							//var parent=[prjId].concat(t.parent);
 							if(t.oid!=null) qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',nodeID:'"+e.id+"',parent:'["+t.parent+"]'}) SET n.task='"+t.task+"',n.assignedTo='"+t.assignedTo+"',n.reviewer='"+t.reviewer+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.details='"+t.details+"',n.uid='"+uidx+"'"});
 							else{
 								if(t.parent){ t.parent.forEach(function(tPrt,tIdx){
 									//t.parent[tIdx]=idDict[tPrt];
-								});
+									});
 								}
 								t.parent=[prjId].concat(t.parent);
 								qList.push({"statement":"MERGE(n:TASKS{taskID:'"+t.id+"',task:'"+t.task+"',assignedTo:'"+t.assignedTo+"',reviewer:'"+t.reviewer+"',startDate:'"+t.startDate+"',endDate:'"+t.endDate+"',details:'"+t.details+"',nodeID:'"+e.id+"',parent:'["+t.parent+"]',uid:'"+uidx+"'})"});
@@ -296,6 +309,7 @@ router.post('/', function(req, res, next) {
 					if(e.type=="modules") rIndex=uidx;
 					if(e.task!=null) delete e.task.oid;
 					nObj.push({id:e.id_n,id_c:e.id_c,name:e.name,task:e.task,children:[]});
+					if(e.type=="testcases") nObj[nObj.length-1]['pid_c']=e.pid_c;
 					if(idDict[e.pid]!==undefined) nObj[idDict[e.pid]].children.push(nObj[uidx]);
 					idDict[e.id]=uidx++;
 				});
@@ -304,7 +318,7 @@ router.post('/', function(req, res, next) {
 					ts.children.forEach(function(s,i){
 						var tcList=[];
 						s.children.forEach(function(tc,i){
-							tcList.push({"testcaseId":tc.id,"testcaseId_c":tc.id_c,"testcaseName":tc.name,"task":tc.task});
+							tcList.push({"screenID_c":tc.pid_c,"testcaseId":tc.id,"testcaseId_c":tc.id_c,"testcaseName":tc.name,"task":tc.task});
 						});
 						sList.push({"screenId":s.id,"screenId_c":s.id_c,"screenName":s.name,"task":s.task,"testcaseDetails":tcList});
 					});
@@ -441,6 +455,9 @@ router.post('/', function(req, res, next) {
 	}
 });
 
+
+
+
 var parsing = function(d,urlData) {
 	var data = d;
 	var qList_new=[];
@@ -486,8 +503,15 @@ var parsing = function(d,urlData) {
 						var testcaseId_json=tc.testcaseId;
 						var testcaseId_c_json=tc.testcaseId_c;
 						var testcaseName_json=tc.testcaseName;
-						console.log(testcaseId_json,testcaseId_c_json);
-						qList_new.push({"statement":"MATCH (a:TESTCASES) WHERE a.testCaseName='"+testcaseName_json+"' and a.screenID='"+screenId_json+"' SET a.testCaseID_c='"+testcaseId_c_json+"'"});
+						var screenId_C_neo=tc.screenID_c;
+						//console.log('testcaseId_json',testcaseId_c_json);
+						if(screenId_C_neo == 'null' || screenId_C_neo == undefined){
+							qList_new.push({"statement":"MATCH (a:TESTCASES) WHERE a.testCaseName='"+testcaseName_json+"' and a.screenID='"+screenId_json+"' SET a.screenID_c='"+screenId_c_json+"'"});
+							qList_new.push({"statement":"MATCH (a:TESTCASES) WHERE a.testCaseName='"+testcaseName_json+"' and a.screenId_c='"+screenId_c_json+"' SET a.testCaseID_c='"+testcaseId_c_json+"'"});
+						}else{
+							qList_new.push({"statement":"MATCH (a:TESTCASES) WHERE a.testCaseName='"+testcaseName_json+"' and a.screenID_c='"+screenId_c_json+"' SET a.testCaseID_c='"+testcaseId_c_json+"'"});
+						}
+						
 						
 						//updateJson.push({testcaseId_json:testcaseId_c_json});
 						cassandraId_dict[testcaseId_json]=testcaseId_c_json;

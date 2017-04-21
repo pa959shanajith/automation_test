@@ -1705,3 +1705,78 @@ exports.getKeywordDetails_ICE = function getKeywordDetails_ICE(req, res) {
 		console.log(exception);
 	}
 };
+
+//getDependentTestCases by ScenarioId
+exports.getTestcasesByScenarioId_ICE = function getTestcasesByScenarioId_ICE(req, res) {
+	try{
+		var testcasesArr = [];
+		var testScenarioId = req.body.testScenarioId;
+		var getTestcaseIds = "select testcaseids from testscenarios where testscenarioid = "+testScenarioId+" ALLOW FILTERING";
+		//console.log(getTestcaseIds);
+		dbConn.execute(getTestcaseIds,
+			function(errGetTestCaseIds,testcasesResult) {
+				try{
+					if (errGetTestCaseIds) {
+						flag = "Error in fetching testcaseIds : Fail";
+						try{
+							res.send(flag);
+						}catch(exception){
+							console.log(exception);
+						}
+					} else {
+						//console.log("testcaseIds", testcasesResult.rows[0].testcaseids);
+						var testcaseIds = testcasesResult.rows[0].testcaseids
+						
+						async.forEachSeries(testcaseIds,function(eachtestcaseid,fetchtestcaseNameCallback){
+							
+							var testcasesObj={};
+							try{
+							var getTestCaseDetails = "select testcasename from testcases where testcaseid = "+eachtestcaseid+" ALLOW FILTERING";
+							dbConn.execute(getTestCaseDetails,
+			                      function(errGetTestCaseDetails,testcaseNamesResult) {
+									try{
+											if(errGetTestCaseDetails)
+											{
+												flag = "Error in fetching testcaseNames : Fail";
+												try{
+														res.send(flag);
+													}catch(exception){
+														console.log(exception);
+													}
+											}
+											else{
+												//console.log("testcaseNames", testcaseNamesResult);
+												var testcaseNames = testcaseNamesResult.rows[0];
+												testcasesObj.testcaseId = eachtestcaseid;
+												testcasesObj.testcaseName = testcaseNames.testcasename;
+												testcasesArr.push(testcasesObj);
+												//console.log("testcasesArr", testcasesArr);
+												fetchtestcaseNameCallback();
+											}
+									   }
+									catch(exception){
+								console.log(exception);
+							}
+							});
+							}catch(exception){
+								console.log(exception);
+							}	
+						},finalfunction);
+					}
+				}catch(exception){
+					console.log(exception);
+				}
+
+				function finalfunction(){
+					try{	
+						res.send(testcasesArr);
+						}catch(exception){
+							console.log(exception);
+						}
+				}
+			});
+	}
+	catch(exception){
+		console.log(exception);
+	}
+};

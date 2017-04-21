@@ -2044,7 +2044,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 						}
 						else if(mydata[i].keywordVal == 'SwitchToFrame'){
 							if($scope.newTestScriptDataLS != "undefined" || $scope.newTestScriptDataLS != undefined){
-								var testScriptTableData = $scope.newTestScriptDataLS;
+								var testScriptTableData = JSON.parse($scope.newTestScriptDataLS);
 								for(j=0;j<testScriptTableData.length;j++){
 									if(testScriptTableData[j].custname != '@Browser' && testScriptTableData[j].custname != '@Oebs' && testScriptTableData[j].custname != '@Window' && testScriptTableData[j].custname != '@Generic' && testScriptTableData[j].custname != '@Custom'){
 										if(testScriptTableData[j].url != ""){
@@ -2194,6 +2194,37 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		$("html").css({'cursor':'auto'});
 		cfpLoadingBar.complete()
 	}
+
+	//Click on add dependent testcase
+	$(document).on("click",".addDependentTestCase",function() {
+		$("input[type=checkbox]:checked").prop("checked",false);
+		$("span.errTestCase").addClass("hide");
+		$("#dialog-addDependentTestCase").modal("show")
+		//subTask = JSON.parse(window.localStorage['_CT']).subtask;
+		//var testScenarioId = "e191bb4a-2c4f-4909-acef-32bc60e527bc";
+		var testScenarioId = JSON.parse(window.localStorage['_CT']).scenarioId;
+		DesignServices.getTestcasesByScenarioId_ICE(testScenarioId)
+							.then(function(data) {
+						$("#dependentTestCasesContent").empty();
+						for(var i=0;i<data.length;i++)
+						{
+							$("#dependentTestCasesContent").append("<span class='testcaseListItem'><input data-attr = "+data[i].testcaseId+" class='checkTestCase' type='checkbox' id='dependentTestCase_"+i+"' /><label title="+data[i].testcaseName+" class='dependentTestcases' for='dependentTestCase_"+i+"'>"+data[i].testcaseName+"</label></span>");
+						}
+			$(document).on('click','#debugOn',function() {
+				var checkedLength = $(".checkTestCase:checked").length;
+				if(checkedLength == 0)
+				{
+						$("span.errTestCase").removeClass("hide");
+						return false;
+				}
+				else{
+					$("span.errTestCase").addClass("hide");
+
+				}
+			});
+		}, function(error) {
+	   });
+	});
 	//Filter Scrape Objects
 }]);
 

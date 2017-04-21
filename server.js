@@ -19,7 +19,8 @@ app.use(sessions({
     httpOnly: true,
     secure: false,
 	rolling: true,
-	//saveUninitialized: false,
+	saveUninitialized: false,
+	resave: false,
 	cookie: { maxAge: (30*60*1000) }
 }));
 //write stream for logs
@@ -119,6 +120,7 @@ app.post('/readTestCase_ICE', design.readTestCase_ICE);
 app.post('/updateTestCase_ICE', design.updateTestCase_ICE);
 app.post('/debugTestCase_ICE', design.debugTestCase_ICE);
 app.post('/getKeywordDetails_ICE', design.getKeywordDetails_ICE);
+app.post('/getTestcasesByScenarioId_ICE', design.getTestcasesByScenarioId_ICE);
 //Execute Screen Routes
 app.post('/readTestSuite_ICE', suite.readTestSuite_ICE);
 app.post('/updateTestSuite_ICE', suite.updateTestSuite_ICE);

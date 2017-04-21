@@ -858,8 +858,51 @@ body {
 input[disabled]{
 	cursor: no-drop
 }
-
-
+#dependentTestCasesContent
+{
+    padding-left: 0;
+}
+.addDependentTestCase
+{
+    cursor: pointer;
+}
+.modal-dependentTC
+{
+    padding: 10px 10px 10px 25px !important;
+}
+.checkTestCase
+{
+    width: 18px;
+    height: 16px;
+    float: left;
+}
+.testcaseListItem
+{
+    display: inline-block;
+    margin-bottom: 1%;
+    width: 170px;
+    margin-right: 2%;
+}
+.dependentTestcases
+{
+    margin-left: 10px;
+    vertical-align: middle;
+    color: #333 !important;
+    font-size: 15px !important;
+    font-family: 'LatoWebLight';
+    margin-top: -3px;
+    text-overflow: ellipsis;
+    white-space: normal;
+    overflow: hidden;
+    width: 135px;
+}
+.errTestCase
+{
+    color: #d33c3c;
+    font-family: LatoWebMedium;
+    position: relative;
+    top: -9px;
+}
 /***Left Section CSS***/
 
 
@@ -2112,6 +2155,11 @@ input[disabled]{
 	padding: 25px 40px;
 	float: left;
     width: 100%;
+}
+
+.positioningModal{
+    float: left;
+    width:100%
 }
 
 .mapObjectModal .modal-content .modal-footer{
