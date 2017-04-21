@@ -662,6 +662,14 @@
 	}
 }
 /**********Custom Media Queries**********/
+@media screen and (max-height:900px){
+	.scroll-wrapper > .scrollbar-screenshot{
+		padding: 0px;
+		height: auto !important;
+		min-height: auto !important;
+		max-height: 500px !important
+	}
+}
 @media screen and (max-height:675px){
 	.scroll-wrapper > .scrollbar-screenshot{
 		padding: 0px;
