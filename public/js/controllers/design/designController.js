@@ -1327,7 +1327,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					openDialog("Scrape Screen", "ICE Engine is not available. Please run the batch file and connect to the Server.");
 					return false
 				}
-				if(data == "Fail"){
+				if(data == "FAIL"){
 					$("#scrapeFailModal").modal("show");
 					return false
 				}
@@ -1463,16 +1463,16 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		var checkCondLen = $("#scraplist li").children('a').find('input[type=checkbox].checkall:checked').length;
 		if(checkCondLen > 0)
 		{		
-   		 $('input[type=checkbox].checkall:checked').each(function() {
-   		  var id = $(this).parent().attr('id').split("_");
-			  id = id[1];
-   			deletedCustNames.push(viewString.view[id].custname);
-   			deletedCustPath.push(viewString.view[id].xpath);
-			   // console.log(viewString.view[id])
-   		});	
-   		delList.deletedCustName = deletedCustNames;
-   		delList.deletedXpath = deletedCustPath;
-   		 //console.log(deletedCustNames);
+			$('input[type=checkbox].checkall:checked').each(function() {
+				var id = $(this).parent().attr('id').split("_");
+				id = id[1];
+				deletedCustNames.push(viewString.view[id].custname);
+				deletedCustPath.push(viewString.view[id].xpath);
+				// console.log(viewString.view[id])
+			});	
+			delList.deletedCustName = deletedCustNames;
+			delList.deletedXpath = deletedCustPath;
+			//console.log(deletedCustNames);
 		}
 		//console.log("Delete", viewString);
 	    var screenId = tasks.screenId;
@@ -1492,6 +1492,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			{
 				openDialog("Delete Scrape Objects", "Scraped Objects deleted successfully.")
                 deleteFlag = true;
+				$(".checkStylebox").prop("checked", false);
                 angular.element(document.getElementById("left-nav-section")).scope().getScrapeData();	
 			}
 			else{
@@ -1985,13 +1986,11 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 	//To Select and unSelect all objects 
 	$(document).on("click", ".checkStylebox", function(){
 		if($(this).is(":checked")){
-			$("#scraplist li").find('input[name="selectAllListItems"]').prop("checked", true).addClass('checked');
-
+			$("#scraplist li").find('input[name="selectAllListItems"]:visible').prop("checked", true).addClass('checked');
 			$("#deleteObjects").prop("disabled", false)
 		}
 		else{
-			$("#scraplist li").find('input[name="selectAllListItems"]').prop("checked", false).removeClass('checked');
-
+			$("#scraplist li").find('input[name="selectAllListItems"]:visible').prop("checked", false).removeClass('checked');
 			$("#deleteObjects").prop("disabled", true)
 		}
 	})
@@ -2071,7 +2070,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 						}
 						else if(mydata[i].keywordVal == 'SwitchToFrame'){
 							if($scope.newTestScriptDataLS != "undefined" || $scope.newTestScriptDataLS != undefined){
-								var testScriptTableData = JSON.parse($scope.newTestScriptDataLS);
+								var testScriptTableData = $scope.newTestScriptDataLS;
 								for(j=0;j<testScriptTableData.length;j++){
 									if(testScriptTableData[j].custname != '@Browser' && testScriptTableData[j].custname != '@Oebs' && testScriptTableData[j].custname != '@Window' && testScriptTableData[j].custname != '@Generic' && testScriptTableData[j].custname != '@Custom'){
 										if(testScriptTableData[j].url != ""){
@@ -2184,6 +2183,10 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		else gsElement.push($(this).data("tag"))	
 		$timeout(function(){
 			filter()
+			if(($("#scraplist li").find('input[name="selectAllListItems"]:checked').length == $("#scraplist li").find('input[name="selectAllListItems"]:visible').length) && $("#scraplist li").find('input[name="selectAllListItems"]:visible').length != 0){
+				$(".checkStylebox").prop("checked",true);
+			}
+			else $(".checkStylebox").prop("checked",false);
 		}, 500);
 	})
 	
