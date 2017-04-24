@@ -221,8 +221,8 @@ var addTask = function(e){
 						}
 						
 					}else{
-						if(scr.id_c!=scr.task.parent[2]){
-							scr.task.parent[2]=scr.id_c;
+						if(scr.task.parent!=[dNodes[pi].id_c,tSc.id_c,scr.id_c]){
+							scr.task['updatedParent']=[dNodes[pi].id_c,tSc.id_c,scr.id_c];
 						}
 
 					}
@@ -235,8 +235,8 @@ var addTask = function(e){
 								d3.select('#ct-node-'+tCa.id).append('image').attr('class','ct-nodeTask').attr('xlink:href','images_mindmap/node-task-assigned.png').attr('x',29).attr('y',-10);
 							}
 						}else{
-							if(tCa.id_c!=tCa.task.parent[3]){
-								tCa.task.parent[3]=tCa.id_c;
+							if(tCa.task.parent!=[dNodes[pi].id_c,tSc.id_c,scr.id_c,tCa.id_c]){
+								tCa.task['updatedParent']=[dNodes[pi].id_c,tSc.id_c,scr.id_c,tCa.id_c];
 							}
 							taskflag=true;
 						}
@@ -250,7 +250,10 @@ var addTask = function(e){
 	}
 	else if(nType=="screens"){
 		var modid=dNodes[pi].parent.parent.id_c,tscid=dNodes[pi].parent.id_c,scrid=dNodes[pi].id_c;
-		dNodes[pi].task={id:tObj.id,oid:tObj.oid,task:tObj.t,assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,details:tObj.det,parent:/*(tObj.parent!=null)?tObj.parent:*/[modid,tscid,scrid]};
+		dNodes[pi].task={id:tObj.id,oid:tObj.oid,task:tObj.t,assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,details:tObj.det,parent:(tObj.parent!=null)?tObj.parent:[modid,tscid,scrid]};
+		if(tObj.parent!=[modid,tscid,scrid]){
+			dNodes[pi].task['updatedParent']=[modid,tscid,scrid];
+		}
 		if(dNodes[pi].children) dNodes[pi].children.forEach(function(tCa){
 			var cTask=(tObj.t=="Scrape"||tObj.t=="Append"||tObj.t=="Compare")? "Design":"Debug";
 			if(tCa.task===undefined||tCa.task==null){
@@ -261,6 +264,9 @@ var addTask = function(e){
 					d3.select('#ct-node-'+tCa.id).append('image').attr('class','ct-nodeTask').attr('xlink:href','images_mindmap/node-task-assigned.png').attr('x',29).attr('y',-10);
 				}
 			}else{
+				if(tCa.task.parent!=[modid,tscid,scrid,tcid]){
+					tCa.task['updatedParent']=[modid,tscid,scrid,tcid];
+				}
 				taskflag=true;
 			}
 		});
@@ -269,18 +275,19 @@ var addTask = function(e){
 		var modid=dNodes[pi].parent.parent.parent.id_c,tscid=dNodes[pi].parent.parent.id_c,scrid=dNodes[pi].parent.id_c;var tcid=dNodes[pi].id_c;
 		if (modid !='null' && tscid !='null' && scrid!='null' && tcid!='null'){
 			taskflag=true;
-			dNodes[pi].task={id:tObj.id,oid:tObj.oid,task:tObj.t,assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,details:tObj.det,parent:/*(tObj.parent!=null)?tObj.parent:*/[modid,tscid,scrid,tcid]};
+			dNodes[pi].task={id:tObj.id,oid:tObj.oid,task:tObj.t,assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,details:tObj.det,parent:(tObj.parent!=null)?tObj.parent:[modid,tscid,scrid,tcid]};
+			if(tObj.parent!=[modid,tscid,scrid,tcid]){
+				dNodes[pi].task['updatedParent']=[modid,tscid,scrid,tcid];
+			}
 		}
 	}
 	if (taskflag){
 		if(p.select('.ct-nodeTask')[0][0]==null) p.append('image').attr('class','ct-nodeTask').attr('xlink:href','images_mindmap/node-task-assigned.png').attr('x',29).attr('y',-10);
 	}else if(taskflag==false){
 		openDialogMindmap("Task Assignment Error", "Please create the structure before assigning task")
-		//$('#Mindmap_assign_error').modal('show');
 	}
 	if (errorRelCyc){
 		openDialogMindmap("Task Assignment Error", "Please select Release/Cycle")
-		//$('#Mindmap_rel_cycle_error').modal('show');
 	}
 };
 
