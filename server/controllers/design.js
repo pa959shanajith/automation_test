@@ -160,7 +160,6 @@ function fetchScrapedData(scrapeQuery,fetchScrapedDatacallback){
 	try{
 		var responsedata;
 		var flag;
-		var index=null;
 		dbConn.execute(scrapeQuery, function(getScrapeDataQueryerr, getScrapeDataQueryresult){
 			try{
 				if (getScrapeDataQueryerr) {
