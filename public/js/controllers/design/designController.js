@@ -2395,7 +2395,7 @@ function contentTable(newTestScriptDataLS) {
 		        		   }
 		        		   window.localStorage['selectRowStepNo']='';*/
 		        	   //});		        	   
-		        	   $("#jqGrid tr").children("td[aria-describedby='jqGrid_outputVal']").each(function(){
+		        	   /*$("#jqGrid tr").children("td[aria-describedby='jqGrid_outputVal']").each(function(){
 		        		   if($(this).text().trim() == "##" || $(this).is(":contains(';##')")){
 		        			   if($(this).parent('tr:nth-child(odd)').length > 0){
 		        				   $(this).parent().css("background","linear-gradient(90deg, red 0.6%, #e8e6ff 0)").focus();
@@ -2405,7 +2405,20 @@ function contentTable(newTestScriptDataLS) {
 		        			   }
 		        			   $(this).css('color','red');
 		        		   }
-		        	   });
+		        	   });*/
+		        	   var gridArrayData = $("#jqGrid").jqGrid('getRowData');
+		        	   for(i=0; i<gridArrayData.length; i++){
+		        		   if(gridArrayData[i].outputVal.indexOf('##') !== -1  || gridArrayData[i].outputVal.indexOf(';##') !== -1){
+		        			   $(this).find('tr.jqgrow')[i].style.borderLeft = "5px solid red";
+		        			   $(this).find('tr.jqgrow')[i].childNodes[0].style.marginLeft = "-4px"
+		        			   $(this).find('tr.jqgrow')[i].childNodes[7].style.color = "red";
+		        		   }
+		        		   else{
+		        			   $(this).find('tr.jqgrow')[i].style.borderLeft = "5px solid transparent";
+		        			   $(this).find('tr.jqgrow')[i].childNodes[0].style.marginLeft = "-4px"
+		        			   $(this).find('tr.jqgrow')[i].childNodes[7].style.color = "";
+		        		   }
+		        	   }
 		        	   hideOtherFuncOnEdit();
 		        	   $("#jqGrid").parent('div').css('height','auto');
 		           },
