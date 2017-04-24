@@ -2230,6 +2230,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			if(isDependentTestCaseChecked == false)
 			{
 				$(".addDependentTestCase").css("pointer-events","none");
+				dependentTestCaseFlag = false;
 			}
 			else{
 				$(".addDependentTestCase").css("pointer-events","visible");
@@ -2242,6 +2243,14 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		$("span.errTestCase").addClass("hide");
 		$(document).on('shown.bs.modal','#dialog-addDependentTestCase', function () {
 			$("input[type=checkbox].checkTestCase").prop("checked",true);
+				var currentTestCase = JSON.parse(window.localStorage['_CT']).testCaseName;
+				$("span.testcaseListItem").each(function() {
+							if(currentTestCase == $(this).children("label").text())
+							{
+											$(this).nextAll('.testcaseListItem').children('input.checkTestCase').attr("disabled",true);
+											$(".checkTestCase[disabled=disabled]").prop('checked',false);
+							}
+				});
 		});
 		$("#dialog-addDependentTestCase").modal("show");
 
@@ -2256,6 +2265,8 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 						{
 							$("#dependentTestCasesContent").append("<span class='testcaseListItem'><input data-attr = "+data[i].testcaseId+" class='checkTestCase' type='checkbox' id='dependentTestCase_"+i+"' /><label title="+data[i].testcaseName+" class='dependentTestcases' for='dependentTestCase_"+i+"'>"+data[i].testcaseName+"</label></span><br />");
 						}
+
+
 			$(document).on('click','#debugOn',function() {
 				var checkedLength = $(".checkTestCase:checked").length;
 				checkedTestcases = [];
