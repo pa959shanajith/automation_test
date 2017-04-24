@@ -2260,7 +2260,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		DesignServices.getTestcasesByScenarioId_ICE(testScenarioId)
 							.then(function(data) {
 						$("#dependentTestCasesContent").empty();
-						data = data.sort();
+						//data = data.sort();
 						for(var i=0;i<data.length;i++)
 						{
 							$("#dependentTestCasesContent").append("<span class='testcaseListItem'><input data-attr = "+data[i].testcaseId+" class='checkTestCase' type='checkbox' id='dependentTestCase_"+i+"' /><label title="+data[i].testcaseName+" class='dependentTestcases' for='dependentTestCase_"+i+"'>"+data[i].testcaseName+"</label></span><br />");
