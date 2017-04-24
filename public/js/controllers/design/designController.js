@@ -2195,20 +2195,40 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		cfpLoadingBar.complete()
 	}
 
+	//var isDependentTestCaseChecked = $("#addDependent").is(":checked");
+		$(".addDependentTestCase").css("pointer-events","none");
+	//alert(isDependentTestCaseChecked);
+	$(document).on('click','#addDependent', function() {
+			var isDependentTestCaseChecked = $("#addDependent").is(":checked");
+			if(isDependentTestCaseChecked == false)
+			{
+				$(".addDependentTestCase").css("pointer-events","none");
+			}
+			else{
+				$(".addDependentTestCase").css("pointer-events","visible");
+			}
+	});
+		
 	//Click on add dependent testcase
 	$(document).on("click",".addDependentTestCase",function() {
 		$("input[type=checkbox]:checked").prop("checked",false);
 		$("span.errTestCase").addClass("hide");
-		$("#dialog-addDependentTestCase").modal("show")
+		$(document).on('shown.bs.modal','#dialog-addDependentTestCase', function () {
+			$("input[type=checkbox].checkTestCase").prop("checked",true);
+		});
+		var checkedTestcases = [];
+		$("#dialog-addDependentTestCase").modal("show");
+
 		//subTask = JSON.parse(window.localStorage['_CT']).subtask;
 		//var testScenarioId = "e191bb4a-2c4f-4909-acef-32bc60e527bc";
 		var testScenarioId = JSON.parse(window.localStorage['_CT']).scenarioId;
 		DesignServices.getTestcasesByScenarioId_ICE(testScenarioId)
 							.then(function(data) {
 						$("#dependentTestCasesContent").empty();
+						data = data.sort();
 						for(var i=0;i<data.length;i++)
 						{
-							$("#dependentTestCasesContent").append("<span class='testcaseListItem'><input data-attr = "+data[i].testcaseId+" class='checkTestCase' type='checkbox' id='dependentTestCase_"+i+"' /><label title="+data[i].testcaseName+" class='dependentTestcases' for='dependentTestCase_"+i+"'>"+data[i].testcaseName+"</label></span>");
+							$("#dependentTestCasesContent").append("<span class='testcaseListItem'><input data-attr = "+data[i].testcaseId+" class='checkTestCase' type='checkbox' id='dependentTestCase_"+i+"' /><label title="+data[i].testcaseName+" class='dependentTestcases' for='dependentTestCase_"+i+"'>"+data[i].testcaseName+"</label></span><br />");
 						}
 			$(document).on('click','#debugOn',function() {
 				var checkedLength = $(".checkTestCase:checked").length;
@@ -2219,7 +2239,24 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				}
 				else{
 					$("span.errTestCase").addClass("hide");
-
+					$("input[type=checkbox].checkTestCase:checked").each(function() {
+						checkedTestcases.push($(this).attr("data-attr"));
+					});
+					if(checkedTestcases.length > 0)
+					{
+							
+							$("button.close").trigger('click');
+							$("#globalModal").find('.modal-title').text("Dependent Test Cases");
+							$("#globalModal").find('.modal-body p').html("Dependent Test Cases saved successfully");
+							$("#globalModal").modal("show");
+					}
+					else{
+						    $("button.close").trigger('click');
+							$("#globalModal").find('.modal-title').text("Dependent Test Cases");
+							$("#globalModal").find('.modal-body p').html("Failed to save dependent testcases");
+							$("#globalModal").modal("show");
+							return false;
+					}
 				}
 			});
 		}, function(error) {

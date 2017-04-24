@@ -544,7 +544,7 @@
 
 
 .scroll-wrapper > .dependentTC{
-	width: 100% !important;
+	/*width: 100% !important;*/
     float: left;
     height: 100% !important;
 }

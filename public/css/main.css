@@ -865,6 +865,7 @@ input[disabled]{
 .addDependentTestCase
 {
     cursor: pointer;
+    pointer-events: none;
 }
 .modal-dependentTC
 {
@@ -880,8 +881,8 @@ input[disabled]{
 {
     display: inline-block;
     margin-bottom: 1%;
-    width: 170px;
-    margin-right: 2%;
+    /*width: 170px;
+    margin-right: 2%;*/
 }
 .dependentTestcases
 {
@@ -891,10 +892,10 @@ input[disabled]{
     font-size: 15px !important;
     font-family: 'LatoWebLight';
     margin-top: -3px;
-    text-overflow: ellipsis;
+    /*text-overflow: ellipsis;
     white-space: normal;
     overflow: hidden;
-    width: 135px;
+    width: 135px;*/
 }
 .errTestCase
 {
