@@ -8,49 +8,6 @@ var async=require('async');
 var dbConnICE = require('../../server/config/icetestautomation');
 
 
-
-
-// //GetUserRoles
-// exports.getUserRoles_Nineteen68 = function(req, res){
-//     var roles = [];
-//     var r_ids = [];
-//     var userRoles = {userRoles:[],r_ids:[]};
-//    var getUserRoles = "select userid, username from nineteen68.users ";
-//         dbConn.execute(getUserRoles, function (err, result) {
-//             if (err) {
-//                 res(null, err);
-//             }
-//             else {
-//                 async.forEachSeries(result.rows,function(iterator,callback1){
-//                     roles.push(iterator.username);
-//                     r_ids.push(iterator.userid);
-//                     callback1();
-//                 });
-//                 userRoles.userRoles = roles;
-//                 userRoles.r_ids = r_ids;
-//                 //console.log(userRoles);
-//                res(null,userRoles);
-//             }
-//         });
-// };
-
-// function testsuiteid_exists(testsuiteName,cb,data){
-//         var flag = false;
-//         var obj = {flag:false,suiteid:''};
-//         var suiteCheck = "SELECT moduleid FROM modules where modulename='"+testsuiteName+"' ALLOW FILTERING";
-//         dbConnICE.execute(suiteCheck,function(err,suiteid){
-//             if(err){
-//                 console.log(err);
-//                 cb(null,err);
-//             }else{
-//                 if(suiteid.rows.length!=0){obj.flag = true; obj.suiteid = suiteid.rows[0].moduleid}
-//                 cb(null,obj) 
-//             }
-            
-//         });
-
-// };
-
 function get_moduleName(moduleId,cb,data){
         var flag = false;
         var obj = {flag:false,modulename:'',testscenarioids:[]};
