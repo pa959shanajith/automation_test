@@ -549,7 +549,7 @@
     height: 100% !important;
 }
 .scroll-wrapper.dependentTC {    
-    min-height: 200px;
+    min-height: 100px;
     max-height: 300px;
 }
 .dependentTC > .scroll-element.scroll-y{

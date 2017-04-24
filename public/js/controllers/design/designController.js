@@ -2258,6 +2258,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 						}
 			$(document).on('click','#debugOn',function() {
 				var checkedLength = $(".checkTestCase:checked").length;
+				checkedTestcases = [];
 				if(checkedLength == 0)
 				{
 						$("span.errTestCase").removeClass("hide");
@@ -2271,18 +2272,17 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					if(checkedTestcases.length > 0)
 					{
 							
-							$("button.close").trigger('click');
+							$("button.close:visible").trigger('click');
 							$("#globalModal").find('.modal-title').text("Dependent Test Cases");
 							$("#globalModal").find('.modal-body p').html("Dependent Test Cases saved successfully");
 							$("#globalModal").modal("show");
 							dependentTestCaseFlag = true;
 					}
 					else{
-						    $("button.close").trigger('click');
+						    $("button.close:visible").trigger('click');
 							$("#globalModal").find('.modal-title').text("Dependent Test Cases");
 							$("#globalModal").find('.modal-body p').html("Failed to save dependent testcases");
 							$("#globalModal").modal("show");
-							return false;
 					}
 				}
 			});

@@ -19,9 +19,9 @@ app.use(sessions({
     httpOnly: true,
     secure: false,
 	rolling: true,
-	saveUninitialized: false,
-	resave: false,
-	cookie: { maxAge: (30*60*1000) }
+ 	resave:false,
+    saveUninitialized: true,
+	cookie: { maxAge:(30*60*1000) }
 }));
 //write stream for logs
 //var accessLogStream = fs.createWriteStream(__dirname + '/access.log', {flags: 'a'})
