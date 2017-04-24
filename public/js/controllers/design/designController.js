@@ -1,4 +1,4 @@
-var screenshotObj,scrapedGlobJson,enableScreenShotHighlight,mirrorObj, eaCheckbox, finalViewString, scrapedData, deleteFlag, pasteSelecteStepNo,globalSelectedBrowserType,selectedKeywordList,keywordListData;
+var screenshotObj,scrapedGlobJson,enableScreenShotHighlight,mirrorObj, eaCheckbox, finalViewString, scrapedData, deleteFlag, pasteSelecteStepNo,globalSelectedBrowserType,selectedKeywordList,keywordListData,dependentTestCaseFlag = false;checkedTestcases = [];
 var initScraping = {}; var mirrorObj = {}; var scrapeTypeObj = {}; var newScrapedList; var viewString = {}; var scrapeObject = {}; var screenViewObject = {}; var readTestCaseData; var getRowJsonCopy;
 var selectRowStepNoFlag = false; //var deleteStep = false;
 var dataFormat12;
@@ -241,9 +241,36 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		browserType.push(selectedBrowserType)
 		if(appType == "MobileWeb") browserType = [];
 		globalSelectedBrowserType = selectedBrowserType;
-		if(jQuery("#addDependent").is(":checked"))	triggerPopUp();
-
-		else	{
+		//if(jQuery("#addDependent").is(":checked"))	triggerPopUp();
+		if(dependentTestCaseFlag == true)
+		{
+			DesignServices.debugTestCase_ICE(browserType,checkedTestcases)
+			.then(function(data)	{
+				console.log("debug-----",data);
+				if (data == "unavailableLocalServer")	{
+					unblockUI();
+					openDialog("Debug Testcase", "ICE Engine is not available. Please run the batch file and connect to the Server.")
+				}
+				else if(data == "success"){
+					unblockUI();
+					openDialog("Debug Testcase", "Debug completed successfully.")
+				}
+				else if(data == "fail"){
+					unblockUI();
+					openDialog("Debug Testcase", "Failed to debug.")
+				}
+				else if(data == "Terminate"){
+					unblockUI();
+					openDialog("Debug Testcase", "Debug Terminated")
+				}
+				else if(data == "browserUnavailable"){
+					unblockUI();
+					openDialog("Debug Testcase", "Browser is not available")
+				}
+			},
+			function(error) {console.log("Error while traversing while executing debugTestcase method!! \r\n "+(error.data));});		
+		}
+		else {
 			var blockMsg = 'Debug in Progress. Please Wait...';
 			blockUI(blockMsg);    
 			DesignServices.debugTestCase_ICE(browserType,testcaseID)
@@ -2216,7 +2243,6 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		$(document).on('shown.bs.modal','#dialog-addDependentTestCase', function () {
 			$("input[type=checkbox].checkTestCase").prop("checked",true);
 		});
-		var checkedTestcases = [];
 		$("#dialog-addDependentTestCase").modal("show");
 
 		//subTask = JSON.parse(window.localStorage['_CT']).subtask;
@@ -2249,6 +2275,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 							$("#globalModal").find('.modal-title').text("Dependent Test Cases");
 							$("#globalModal").find('.modal-body p').html("Dependent Test Cases saved successfully");
 							$("#globalModal").modal("show");
+							dependentTestCaseFlag = true;
 					}
 					else{
 						    $("button.close").trigger('click');
