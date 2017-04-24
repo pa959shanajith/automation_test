@@ -166,6 +166,17 @@ mySPA.factory('DesignServices', ['$http','$q', function ($http, $httpProvider, $
 			},function(response){
 				return $q.reject(response.data)
 			})
-		}
+		},
+		getTestcasesByScenarioId_ICE : function(testScenarioId){
+				return $http.post('/getTestcasesByScenarioId_ICE',{
+				param : 'getTestcasesByScenarioId_ICE',
+				testScenarioId : testScenarioId
+			})
+			.then(function(response)  { 
+				return response.data
+			},function(response){
+				return $q.reject(response.data)
+			})
+	 }
 	}
 }]);

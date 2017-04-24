@@ -14,7 +14,7 @@
 					<li><a href='#' ng-click="debugTestCase_ICE('3');" title="Debug on Internet Explorer"><span><img src='imgs/ic-ie.png' alt='Internet Explorer' /></span>Internet Explorer</a></li>
 					<li><a href='#' ng-click="debugTestCase_ICE('1');" title="Debug on Chrome"><span><img src='imgs/ic-chrome.png' alt='Google Chrome' /></span>Google Chrome</a></li>
 					<li><a href='#' ng-click="debugTestCase_ICE('2');" title="Debug on Firefox"><span><img src='imgs/ic-mozilla.png' alt='Mozilla Firefox' /></span>Mozilla Firefox</a></li>
-					<li class="last" title="Add Dependent Test Cases"><span style="margin-bottom:-5px"><input id="addDependent" type='checkbox' value="" disabled></span><label for="addDependent">Add Dependent Test Cases</label></li>
+					<li class="last" title="Add Dependent Test Cases"><span style="margin-bottom:-5px"><input id="addDependent" type='checkbox' value=""></span><label class='addDependentTestCase' for="addDependent">Add Dependent Test Cases</label></li>
 				</ul>
 			</div>
 			<!-- Web -->
@@ -24,7 +24,7 @@
 				<ul>
 					<li><span><a class='scrapeOnTxt'>Debug On</a></span></li>
 					<li><a href='#' ng-click="debugTestCase_ICE('1');" title="OEBS Apps"><span><img src='imgs/ic-desktop.png' alt='OEBS Apps' /></span>OEBS Apps</a></li>
-					<li class="last" title="Add Dependent Test Cases"><span style="margin-bottom:-5px"><input id="addDependent" type='checkbox' value="" disabled></span><label for="addDependent">Add Dependent Test Cases</label></li>
+					<li class="last" title="Add Dependent Test Cases"><span style="margin-bottom:-5px"><input id="addDependent" type='checkbox' value=""></span><label class='addDependentTestCase' for="addDependent">Add Dependent Test Cases</label></li>
 				</ul>
 			</div>
 			<!-- DesktopJava -->
@@ -34,7 +34,7 @@
 				<ul>
 					<li><span><a class='scrapeOnTxt'>Debug On</a></span></li>
 					<li><a href='#' ng-click="debugTestCase_ICE('1');" title="Desktop Apps"><span><img src='imgs/ic-desktop.png' alt='Desktop Apps' /></span>Desktop Apps</a></li>
-					<li class="last" title="Add Dependent Test Cases"><span style="margin-bottom:-5px"><input id="addDependent" type='checkbox' value="" disabled></span><label for="addDependent">Add Dependent Test Cases</label></li>
+					<li class="last" title="Add Dependent Test Cases"><span style="margin-bottom:-5px"><input id="addDependent" type='checkbox' value=""></span><label class='addDependentTestCase' for="addDependent">Add Dependent Test Cases</label></li>
 				</ul>
 			</div>
 			<!-- Desktop -->
@@ -44,7 +44,7 @@
 				<ul>
 					<li><span><a class='scrapeOnTxt'>Debug On</a></span></li>
 					<li><a href='#' ng-click="debugTestCase_ICE('1');" title="SAP Apps"><span><img src='imgs/ic-desktop.png' alt='SAP Apps' /></span>SAP Apps</a></li>
-					<li class="last" title="Add Dependent Test Cases"><span style="margin-bottom:-5px"><input id="addDependent" type='checkbox' value="" disabled></span><label for="addDependent">Add Dependent Test Cases</label></li>
+					<li class="last" title="Add Dependent Test Cases"><span style="margin-bottom:-5px"><input id="addDependent" type='checkbox' value=""></span><label class='addDependentTestCase' for="addDependent">Add Dependent Test Cases</label></li>
 				</ul>
 			</div>
 			<!-- SAP -->
@@ -54,7 +54,7 @@
 				<ul>
 					<li><span><a class='scrapeOnTxt'>Debug On</a></span></li>
 					<li><a href='#' ng-click="debugTestCase_ICE('1');" title="Web Services"><span><img src='imgs/ic-webservice.png' alt='Webservices' /></span>Web Services</a></li>
-					<li class="last" title="Add Dependent Test Cases"><span style="margin-bottom:-5px"><input id="addDependent" type='checkbox' value="" disabled></span><label for="addDependent">Add Dependent Test Cases</label></li>
+					<li class="last" title="Add Dependent Test Cases"><span style="margin-bottom:-5px"><input id="addDependent" type='checkbox' value=""></span><label class='addDependentTestCase' for="addDependent">Add Dependent Test Cases</label></li>
 				</ul>
 			</div>
 			<!-- Webservice -->
@@ -64,7 +64,7 @@
 				<ul>
 					<li><span><a class='scrapeOnTxt'>Debug On</a></span></li>
 					<li><a href='#' ng-click="debugTestCase_ICE('1');" title="Android Apps"><span><img src='imgs/ic-mobility.png' alt='Android Apps' /></span>Android Apps</a></li>
-					<li class="last" title="Add Dependent Test Cases"><span style="margin-bottom:-5px"><input id="addDependent" type='checkbox' value="" disabled></span><label for="addDependent">Add Dependent Test Cases</label></li>
+					<li class="last" title="Add Dependent Test Cases"><span style="margin-bottom:-5px"><input id="addDependent" type='checkbox' value=""></span><label class='addDependentTestCase' for="addDependent">Add Dependent Test Cases</label></li>
 				</ul>
 			</div>
 			<!-- Mobility -->
@@ -74,7 +74,7 @@
 				<ul>
 					<li><span><a class='scrapeOnTxt'>Debug On</a></span></li>
 					<li><a href='#'  ng-click="debugTestCase_ICE();" title="Android Web"><span><img src='imgs/ic-mobility.png' alt='Android Web' /></span>Android Web</a></li>
-					<li class="last"  title="Add Dependent Test Cases"><span style="margin-bottom:-5px"><input id="addDependent" type='checkbox' value="" disabled></span><label for="addDependent">Add Dependent Test Cases</label></li>
+					<li class="last"  title="Add Dependent Test Cases"><span style="margin-bottom:-5px"><input id="addDependent" type='checkbox' value=""></span><label class='addDependentTestCase' for="addDependent">Add Dependent Test Cases</label></li>
 				</ul>
 			</div>
 			<!-- Mobile Web -->
@@ -395,3 +395,26 @@
 	</div>
 </div>
 <!-- Submitting Task -->
+
+	<!-- Add Dependent Test Cases -->
+	<div id="dialog-addDependentTestCase" class="modal fade" role="dialog" data-keyboard="false" data-backdrop="static">
+		<div class="modal-dialog" class=''style="width: 500px">
+			<!-- Modal content-->
+			<div class="modal-content positioningModal">
+			<div class="modal-header positioningModal">
+				<button type="button" class="close" data-dismiss="modal">&times;</button>
+				<h4 class="modal-title">Select Dependent Test Cases</h4>
+			</div>
+			<div class="modal-body modal-dependentTC positioningModal">
+				<span class='errTestCase hide'>Please Select Dependent Test Case</span>
+				<!-- Bind Test Cases -->
+					<div id="dependentTestCasesContent" class="scrollbar-inner dependentTC"></div>
+				<!-- Bind Test Cases -->
+			</div>
+			<div class="modal-footer positioningModal">
+				<button ng-click="" type="button" id="debugOn" class="btn btn-default">Save Dependent Test Cases</button>
+			</div>
+			</div>
+		</div>
+	</div>
+	<!-- Add Dependent Test Cases -->

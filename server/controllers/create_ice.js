@@ -8,53 +8,10 @@ var async=require('async');
 var dbConnICE = require('../../server/config/icetestautomation');
 
 
-
-
-// //GetUserRoles
-// exports.getUserRoles_Nineteen68 = function(req, res){
-//     var roles = [];
-//     var r_ids = [];
-//     var userRoles = {userRoles:[],r_ids:[]};
-//    var getUserRoles = "select userid, username from nineteen68.users ";
-//         dbConn.execute(getUserRoles, function (err, result) {
-//             if (err) {
-//                 res(null, err);
-//             }
-//             else {
-//                 async.forEachSeries(result.rows,function(iterator,callback1){
-//                     roles.push(iterator.username);
-//                     r_ids.push(iterator.userid);
-//                     callback1();
-//                 });
-//                 userRoles.userRoles = roles;
-//                 userRoles.r_ids = r_ids;
-//                 //console.log(userRoles);
-//                res(null,userRoles);
-//             }
-//         });
-// };
-
-// function testsuiteid_exists(testsuiteName,cb,data){
-//         var flag = false;
-//         var obj = {flag:false,suiteid:''};
-//         var suiteCheck = "SELECT moduleid FROM modules where modulename='"+testsuiteName+"' ALLOW FILTERING";
-//         dbConnICE.execute(suiteCheck,function(err,suiteid){
-//             if(err){
-//                 console.log(err);
-//                 cb(null,err);
-//             }else{
-//                 if(suiteid.rows.length!=0){obj.flag = true; obj.suiteid = suiteid.rows[0].moduleid}
-//                 cb(null,obj) 
-//             }
-            
-//         });
-
-// };
-
 function get_moduleName(moduleId,cb,data){
         var flag = false;
-        var obj = {flag:false,modulename:''};
-        var moduleCheck = "SELECT modulename FROM modules where moduleid="+moduleId;
+        var obj = {flag:false,modulename:'',testscenarioids:[]};
+        var moduleCheck = "SELECT modulename,testscenarioids FROM modules where moduleid="+moduleId;
         dbConnICE.execute(moduleCheck,function(err,modulename){
             if(err){
                 console.log(err);
@@ -63,6 +20,7 @@ function get_moduleName(moduleId,cb,data){
                 if(modulename.rows.length!=0){
                     obj.flag = true; 
                     obj.modulename = modulename.rows[0].modulename
+                    obj.testscenarioids=modulename.rows[0].testscenarioids
                 }
                 cb(null,obj) 
             }
@@ -89,11 +47,30 @@ function get_screenName(screenId,cb,data){
 
 };
 
+function get_scenarioName(testscenarioId,cb,data){
+         var testscenarioCheck = "SELECT testscenarioname FROM testscenarios where testscenarioid="+testscenarioId;
+         var obj2 = {flag:false,testscenarioname:''};
+        dbConnICE.execute(testscenarioCheck,function(err,testscenarioname){
+                if(err){
+                        console.log(err);
+                        cb(null,err);
+                    }else{
+                        if(testscenarioname.rows.length!=0){
+                            obj2.flag = true; 
+                            obj2.testscenarioname = testscenarioname.rows[0].testscenarioname;
+                        }
+                        cb(null,obj2) 
+                    }
+                    
+            })
+
+};
+
 exports.getAllNames = function(parent,cb,data){
 
             var parent_length=parent.length;
 			//task_json.testSuiteId=parent[1];
-            var allNames = {"testsuitename":"","screenname":"","testcasename":""};
+            var allNames = {"testsuitename":"","screenname":"","testcasename":"","scenarioname":"","testscenarioIds":[]};
 			async.series({
 			modulename:function(callback){
 				get_moduleName(parent[1],function(err,data){
@@ -101,20 +78,27 @@ exports.getAllNames = function(parent,cb,data){
 					console.log(err);
 					else{
 						allNames.modulename=data.modulename;
+                        allNames.testscenarioIds.push(data.testscenarioids);
 					    callback();
 					}
 				});
 			},
-            // modulename:function(callback){
-			// 	get_moduleName(parent[1],function(err,data){
-			// 		if(err)
-			// 		console.log(err);
-			// 		else{
-			// 			allNames.modulename=data.modulename;
-			// 		    callback();
-			// 		}
-			// 	});
-			// },
+           
+            scenarioname:function(callback){
+				if (parent_length==5){
+					
+					get_scenarioName(parent[2],function(err,data2){
+						if(err)
+						console.log(err);
+						else{
+                            allNames.scenarioname=data2.testscenarioname;
+							callback();
+						}
+					});
+				}else{
+                    callback();
+                }
+			},
 			screenname:function(callback){
 				if (parent_length>=4){
 					//task_json.screenId=parent[3];
@@ -357,6 +341,7 @@ exports.createStructure_Nineteen68 = function(req, res) {
                                                             var testcaseidTemp = '';
                                                             var testcaseidneo = testcaseitr.testcaseId;
                                                             var tasktestcase = testcaseitr.task;
+                                                            var screenID_c_neo=testcaseitr.screenID_c;
                                                             testcase_exists({"testcasename":testcaseName,"testcaseid":testcaseid_c,"pid":projectid},function(err,testcasedata){
                                                                 if(err){
                                                                     console.log(err)
@@ -374,7 +359,7 @@ exports.createStructure_Nineteen68 = function(req, res) {
                                                                     testcaseID = testcaseidTemp;
 
                                                                 } 
-                                                                 var testcasedetailsobj = {"testcaseId":testcaseidneo,"testcaseId_c":testcaseID,"testcaseName":testcaseName,"task":tasktestcase};
+                                                                 var testcasedetailsobj = {"screenID_c":screenID_c_neo,"testcaseId":testcaseidneo,"testcaseId_c":testcaseID,"testcaseName":testcaseName,"task":tasktestcase};
                                                                 testcasedetailslist.push(testcasedetailsobj);                                                           
                                                             //   var testsuiteids = "SELECT testsuiteid,testsuitename FROM testsuites WHERE cycleid="+cycleiditr.cycleid;
                                                             dbConnICE.execute(insertInTescase, function(err, testsuiteidsdata) {
@@ -455,89 +440,6 @@ exports.createStructure_Nineteen68 = function(req, res) {
         }
     );
 }
-
-// function testsuiteid_exists(moduledetails,cb,data){
-//         var flagId = false;
-//         var obj = {flag:false,suiteid:''};
-        
-//         var statusflag = false;
-//         async.series({
-
-//             modulename:function(modulecallback){
-//                 var suiteCheck = "SELECT moduleid FROM modules where modulename='"+moduledetails.modulename+"' ALLOW FILTERING";
-//                 dbConnICE.execute(suiteCheck,function(err,suiteid){
-//                     if(err){
-//                         console.log(err);
-//                         cb(null,obj);
-//                     }else{
-//                         if(suiteid.rows.length!=0){
-//                             obj.flag = true; 
-//                             flagId=true;
-//                             obj.suiteid = suiteid.rows[0].moduleid
-//                             statusflag = true;
-//                             //cb(null,obj);
-//                         }
-//                         modulecallback();
-                        
-//                     }
-                    
-//                 });
-//             },
-//             moduleId:function(modulecallback){
-//                 if(!flagId){
-//                       var suiteCheck = "SELECT moduleid FROM modules where modulename='"+moduledetails.modulename+"' and moduleid="+moduledetails.moduleid+" ALLOW FILTERING";
-//                         dbConnICE.execute(suiteCheck,function(err,suiteid){
-//                             if(err){
-//                                 console.log(err);
-//                                 cb(null,obj);
-//                             }else{
-//                                 if(suiteid.rows.length!=0){
-//                                     obj.flag = true; 
-//                                     obj.suiteid = suiteid.rows[0].moduleid
-//                                     statusflag = true;
-//                                     //cb(null,obj);
-//                                 }
-//                                 modulecallback();
-                                
-//                             }
-                            
-//                         });
-//                 }else{
-//                     cb(null,obj);
-//                 }
-              
-//             },
-//             moduleupdate:function(modulecallback){
-//                if(!statusflag){
-//                     updatetestsuitename(moduledetails,function(err,data){
-//                         if(err){
-//                             console.log(err);
-//                         }else{
-//                             console.log(data);
-//                             if(data=="success"){
-//                                 obj.flag = true;
-//                                 obj.suiteid = moduledetails.moduleid;
-//                             }
-//                             modulecallback(null,data);
-//                         }
-//                         //cb(null,obj);
-//                     });
-//                 }else{
-//                    modulecallback(null,obj);
-//                 }
-                
-//             }
-
-//         },function(err,data){
-//             if(err){
-
-//             }else{
-//                 cb(null,obj);
-//             }
-//         });
-        
-
-// };
 
 
 
@@ -627,6 +529,7 @@ function testsuiteid_exists(moduledetails,cb,data){
 function updatetestsuitename(moduledetails,cb,data){
     var suitedatatoupdate = [];
     var flagtocheckifexists = false;
+    var flagtocheckifdeleted = false;
     async.series({
         select:function(callback){
             var completesuite = "select * from modules where moduleid="+moduledetails.moduleid;
@@ -647,12 +550,16 @@ function updatetestsuitename(moduledetails,cb,data){
             if(flagtocheckifexists){
                 var deletequery = "DELETE FROM modules WHERE moduleid="+moduledetails.moduleid+" and modulename='"+suitedatatoupdate.modulename+"' and projectid="+suitedatatoupdate.projectid;
                 dbConnICE.execute(deletequery,function(err,deleted){
-                    if(err)  console.log(err);
-                    // {
-                    
-                    // }else{
+                    if(err) 
+                     {
+                     console.log(err);
+                     }else{
+                        // if(deleted.rows != undefined && deleted.rows.length!=0){
+                             flagtocheckifdeleted=true;
+                        // }
+                          
                         
-                    // }
+                     }
                     callback();
                 });
             }else{
@@ -661,7 +568,7 @@ function updatetestsuitename(moduledetails,cb,data){
             
         },
         update:function(callback){
-            if(flagtocheckifexists){
+            if(flagtocheckifexists && flagtocheckifdeleted){
                 var insertquery = "";
                 try{
                     insertquery = "INSERT INTO modules (projectid,modulename,moduleid,versionnumber,createdby,createdon,createdthrough,deleted,history,modifiedby,modifiedbyrole,modifiedon,skucodemodule,tags,testscenarioids) VALUES ("+suitedatatoupdate.projectid+",'"+moduledetails.modulename+"',"+
@@ -772,6 +679,7 @@ function testscenariosid_exists(testscenariodetails,cb,data){
 function updatetestscenarioname(testscenariodetails,cb,data){
     var scenariodatatoupdate = [];
     var flagtocheckifexists = false;
+    var flagtocheckifdeleted = false;
     async.series({
         select:function(callback){
             var completesuite = "select * from testscenarios where testscenarioid="+testscenariodetails.testscenarioid;
@@ -792,12 +700,15 @@ function updatetestscenarioname(testscenariodetails,cb,data){
             if(flagtocheckifexists){
                 var deletequery = "DELETE FROM testscenarios WHERE testscenarioid="+testscenariodetails.testscenarioid+" and testscenarioname='"+scenariodatatoupdate.testscenarioname+"' and projectid="+scenariodatatoupdate.projectid;
                 dbConnICE.execute(deletequery,function(err,deleted){
-                    if(err)  console.log(err);
-                    // {
-                    
-                    // }else{
+                    if(err) 
+                    {
+                     console.log(err);
+                    }else{
+                       // if(deleted.rows != undefined && deleted.rows.length!=0){
+                            flagtocheckifdeleted=true;
+                      //  }
                         
-                    // }
+                    }
                     callback();
                 });
             }else{
@@ -810,7 +721,7 @@ function updatetestscenarioname(testscenariodetails,cb,data){
             // suitedatatoupdate.moduleid+","+suitedatatoupdate.versionnumber+",'"+suitedatatoupdate.createdby+"',"+suitedatatoupdate.createdon.valueOf()+","+suitedatatoupdate.createdthrough
             // +","+suitedatatoupdate.deleted+","+suitedatatoupdate.history+","+suitedatatoupdate.modifiedby+","+suitedatatoupdate.modifiedbyrole+","+new Date().getTime()+","+suitedatatoupdate.skucodemodule
             // +","+suitedatatoupdate.tags+",["+suitedatatoupdate.testscenarioids+"]);";
-            if(flagtocheckifexists){
+            if(flagtocheckifexists && flagtocheckifdeleted){
                 var insertquery = "";
                 try{
                     if (scenariodatatoupdate.testcaseids==null){
@@ -923,6 +834,7 @@ function testscreen_exists(testscreendetails,cb,data){
 function updatetestscreenname(testscreendetails,cb,data){
 var screendatatoupdate = [];
     var flagtocheckifexists = false;
+    var flagtocheckifdeleted=false;
     async.series({
         select:function(callback){
             var completescreen = "select * from screens where screenid="+testscreendetails.testscreenid;
@@ -944,12 +856,14 @@ var screendatatoupdate = [];
                 
                 var deletequery = "DELETE FROM screens WHERE screenid="+testscreendetails.testscreenid+" and screenname='"+screendatatoupdate.screenname+"' and projectid="+screendatatoupdate.projectid;
                 dbConnICE.execute(deletequery,function(err,deleted){
-                    if(err)  console.log(err);
-                    // {
-                    
-                    // }else{
-                        
-                    // }
+                    if(err)  
+                    {
+                        console.log(err);
+                    }else{
+                       // if(deleted.rows != undefined && deleted.rows.length!=0){
+                            flagtocheckifdeleted=true;
+                       // }
+                    }
                     callback();
                 });
                 
@@ -1072,6 +986,7 @@ function updatetestcasename(testcasedetails,cb,data){
 var testcasedatatoupdate = [];
     var flagtocheckifexists = false;
     var flagtocheckifnameexists = false;
+    var flagtocheckifdeleted=false;
     async.series({
         select:function(callback){
             var completetestcase = "select * from testcases where testcaseid="+testcasedetails.testcaseid;
@@ -1090,7 +1005,6 @@ var testcasedatatoupdate = [];
         },
        
         delete:function(callback){
-            var flagtocheckifdeleted = false;
             if(flagtocheckifexists){
                 
                 var deletequery = "DELETE FROM testcases WHERE testcaseid="+testcasedetails.testcaseid+" and testcasename='"+testcasedatatoupdate.testcasename+"' and screenid="+testcasedatatoupdate.screenid;
@@ -1099,10 +1013,10 @@ var testcasedatatoupdate = [];
                      {
                          console.log(err);
                      }else{
-                         if(deleted.rows != undefined && deleted.rows.length!=0){
+                        // if(deleted.rows != undefined && deleted.rows.length!=0){
                         flagtocheckifdeleted = true;
-                        //testcasedatatoupdate = testcasedata.rows[0];
-                    }
+                        
+                   // }
                         
                     }
                     callback();
@@ -1117,7 +1031,7 @@ var testcasedatatoupdate = [];
             // +",'"+testscreendetails.testscreenname+"',"+screendatatoupdate.screenid+","+screendatatoupdate.versionnumber+",'"+screendatatoupdate.createdby+"',"+screendatatoupdate.createdon.valueOf()
             // +","+screendatatoupdate.createdthrough+","+screendatatoupdate.deleted+","+screendatatoupdate.history+",'"+screendatatoupdate.modifiedby+"',"+screendatatoupdate.modifiedbyrole
             // +","+new Date().getTime()+",'"+screendatatoupdate.screendata+"',"+screendatatoupdate.skucodescreen+","+screendatatoupdate.tags+");"
-            if(flagtocheckifexists){
+            if(flagtocheckifexists && flagtocheckifdeleted){
                 var insertquery = "";
                 try{
                    if( testcasedatatoupdate.testcasesteps == null){

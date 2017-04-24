@@ -1,4 +1,4 @@
-var screenshotObj,scrapedGlobJson,enableScreenShotHighlight,mirrorObj, eaCheckbox, finalViewString, scrapedData, deleteFlag, pasteSelecteStepNo,globalSelectedBrowserType,selectedKeywordList,keywordListData;
+var screenshotObj,scrapedGlobJson,enableScreenShotHighlight,mirrorObj, eaCheckbox, finalViewString, scrapedData, deleteFlag, pasteSelecteStepNo,globalSelectedBrowserType,selectedKeywordList,keywordListData,dependentTestCaseFlag = false;checkedTestcases = [];
 var initScraping = {}; var mirrorObj = {}; var scrapeTypeObj = {}; var newScrapedList; var viewString = {}; var scrapeObject = {}; var screenViewObject = {}; var readTestCaseData; var getRowJsonCopy;
 var selectRowStepNoFlag = false; //var deleteStep = false;
 var dataFormat12;
@@ -241,9 +241,36 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		browserType.push(selectedBrowserType)
 		if(appType == "MobileWeb") browserType = [];
 		globalSelectedBrowserType = selectedBrowserType;
-		if(jQuery("#addDependent").is(":checked"))	triggerPopUp();
-
-		else	{
+		//if(jQuery("#addDependent").is(":checked"))	triggerPopUp();
+		if(dependentTestCaseFlag == true)
+		{
+			DesignServices.debugTestCase_ICE(browserType,checkedTestcases)
+			.then(function(data)	{
+				console.log("debug-----",data);
+				if (data == "unavailableLocalServer")	{
+					unblockUI();
+					openDialog("Debug Testcase", "ICE Engine is not available. Please run the batch file and connect to the Server.")
+				}
+				else if(data == "success"){
+					unblockUI();
+					openDialog("Debug Testcase", "Debug completed successfully.")
+				}
+				else if(data == "fail"){
+					unblockUI();
+					openDialog("Debug Testcase", "Failed to debug.")
+				}
+				else if(data == "Terminate"){
+					unblockUI();
+					openDialog("Debug Testcase", "Debug Terminated")
+				}
+				else if(data == "browserUnavailable"){
+					unblockUI();
+					openDialog("Debug Testcase", "Browser is not available")
+				}
+			},
+			function(error) {console.log("Error while traversing while executing debugTestcase method!! \r\n "+(error.data));});		
+		}
+		else {
 			var blockMsg = 'Debug in Progress. Please Wait...';
 			blockUI(blockMsg);    
 			DesignServices.debugTestCase_ICE(browserType,testcaseID)
@@ -1300,7 +1327,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					openDialog("Scrape Screen", "ICE Engine is not available. Please run the batch file and connect to the Server.");
 					return false
 				}
-				if(data == "Fail"){
+				if(data == "FAIL"){
 					$("#scrapeFailModal").modal("show");
 					return false
 				}
@@ -1436,16 +1463,16 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		var checkCondLen = $("#scraplist li").children('a').find('input[type=checkbox].checkall:checked').length;
 		if(checkCondLen > 0)
 		{		
-   		 $('input[type=checkbox].checkall:checked').each(function() {
-   		  var id = $(this).parent().attr('id').split("_");
-			  id = id[1];
-   			deletedCustNames.push(viewString.view[id].custname);
-   			deletedCustPath.push(viewString.view[id].xpath);
-			   // console.log(viewString.view[id])
-   		});	
-   		delList.deletedCustName = deletedCustNames;
-   		delList.deletedXpath = deletedCustPath;
-   		 //console.log(deletedCustNames);
+			$('input[type=checkbox].checkall:checked').each(function() {
+				var id = $(this).parent().attr('id').split("_");
+				id = id[1];
+				deletedCustNames.push(viewString.view[id].custname);
+				deletedCustPath.push(viewString.view[id].xpath);
+				// console.log(viewString.view[id])
+			});	
+			delList.deletedCustName = deletedCustNames;
+			delList.deletedXpath = deletedCustPath;
+			//console.log(deletedCustNames);
 		}
 		//console.log("Delete", viewString);
 	    var screenId = tasks.screenId;
@@ -1465,6 +1492,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			{
 				openDialog("Delete Scrape Objects", "Scraped Objects deleted successfully.")
                 deleteFlag = true;
+				$(".checkStylebox").prop("checked", false);
                 angular.element(document.getElementById("left-nav-section")).scope().getScrapeData();	
 			}
 			else{
@@ -1958,13 +1986,11 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 	//To Select and unSelect all objects 
 	$(document).on("click", ".checkStylebox", function(){
 		if($(this).is(":checked")){
-			$("#scraplist li").find('input[name="selectAllListItems"]').prop("checked", true).addClass('checked');
-
+			$("#scraplist li").find('input[name="selectAllListItems"]:visible').prop("checked", true).addClass('checked');
 			$("#deleteObjects").prop("disabled", false)
 		}
 		else{
-			$("#scraplist li").find('input[name="selectAllListItems"]').prop("checked", false).removeClass('checked');
-
+			$("#scraplist li").find('input[name="selectAllListItems"]:visible').prop("checked", false).removeClass('checked');
 			$("#deleteObjects").prop("disabled", true)
 		}
 	})
@@ -2157,6 +2183,10 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		else gsElement.push($(this).data("tag"))	
 		$timeout(function(){
 			filter()
+			if(($("#scraplist li").find('input[name="selectAllListItems"]:checked').length == $("#scraplist li").find('input[name="selectAllListItems"]:visible').length) && $("#scraplist li").find('input[name="selectAllListItems"]:visible').length != 0){
+				$(".checkStylebox").prop("checked",true);
+			}
+			else $(".checkStylebox").prop("checked",false);
 		}, 500);
 	})
 	
@@ -2194,6 +2224,85 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		$("html").css({'cursor':'auto'});
 		cfpLoadingBar.complete()
 	}
+
+	//var isDependentTestCaseChecked = $("#addDependent").is(":checked");
+		$(".addDependentTestCase").css("pointer-events","none");
+	//alert(isDependentTestCaseChecked);
+	$(document).on('click','#addDependent', function() {
+			var isDependentTestCaseChecked = $("#addDependent").is(":checked");
+			if(isDependentTestCaseChecked == false)
+			{
+				$(".addDependentTestCase").css("pointer-events","none");
+				dependentTestCaseFlag = false;
+			}
+			else{
+				$(".addDependentTestCase").css("pointer-events","visible");
+			}
+	});
+		
+	//Click on add dependent testcase
+	$(document).on("click",".addDependentTestCase",function() {
+		$("input[type=checkbox]:checked").prop("checked",false);
+		$("span.errTestCase").addClass("hide");
+		$(document).on('shown.bs.modal','#dialog-addDependentTestCase', function () {
+			$("input[type=checkbox].checkTestCase").prop("checked",true);
+				var currentTestCase = JSON.parse(window.localStorage['_CT']).testCaseName;
+				$("span.testcaseListItem").each(function() {
+							if(currentTestCase == $(this).children("label").text())
+							{
+											$(this).nextAll('.testcaseListItem').children('input.checkTestCase').attr("disabled",true);
+											$(".checkTestCase[disabled=disabled]").prop('checked',false);
+							}
+				});
+		});
+		$("#dialog-addDependentTestCase").modal("show");
+
+		//subTask = JSON.parse(window.localStorage['_CT']).subtask;
+		//var testScenarioId = "e191bb4a-2c4f-4909-acef-32bc60e527bc";
+		var testScenarioId = JSON.parse(window.localStorage['_CT']).scenarioId;
+		DesignServices.getTestcasesByScenarioId_ICE(testScenarioId)
+							.then(function(data) {
+						$("#dependentTestCasesContent").empty();
+						//data = data.sort();
+						for(var i=0;i<data.length;i++)
+						{
+							$("#dependentTestCasesContent").append("<span class='testcaseListItem'><input data-attr = "+data[i].testcaseId+" class='checkTestCase' type='checkbox' id='dependentTestCase_"+i+"' /><label title="+data[i].testcaseName+" class='dependentTestcases' for='dependentTestCase_"+i+"'>"+data[i].testcaseName+"</label></span><br />");
+						}
+
+
+			$(document).on('click','#debugOn',function() {
+				var checkedLength = $(".checkTestCase:checked").length;
+				checkedTestcases = [];
+				if(checkedLength == 0)
+				{
+						$("span.errTestCase").removeClass("hide");
+						return false;
+				}
+				else{
+					$("span.errTestCase").addClass("hide");
+					$("input[type=checkbox].checkTestCase:checked").each(function() {
+						checkedTestcases.push($(this).attr("data-attr"));
+					});
+					if(checkedTestcases.length > 0)
+					{
+							
+							$("button.close:visible").trigger('click');
+							$("#globalModal").find('.modal-title').text("Dependent Test Cases");
+							$("#globalModal").find('.modal-body p').html("Dependent Test Cases saved successfully");
+							$("#globalModal").modal("show");
+							dependentTestCaseFlag = true;
+					}
+					else{
+						    $("button.close:visible").trigger('click');
+							$("#globalModal").find('.modal-title').text("Dependent Test Cases");
+							$("#globalModal").find('.modal-body p').html("Failed to save dependent testcases");
+							$("#globalModal").modal("show");
+					}
+				}
+			});
+		}, function(error) {
+	   });
+	});
 	//Filter Scrape Objects
 }]);
 
@@ -2300,7 +2409,7 @@ function contentTable(newTestScriptDataLS) {
 		        		   }
 		        		   window.localStorage['selectRowStepNo']='';*/
 		        	   //});		        	   
-		        	   $("#jqGrid tr").children("td[aria-describedby='jqGrid_outputVal']").each(function(){
+		        	   /*$("#jqGrid tr").children("td[aria-describedby='jqGrid_outputVal']").each(function(){
 		        		   if($(this).text().trim() == "##" || $(this).is(":contains(';##')")){
 		        			   if($(this).parent('tr:nth-child(odd)').length > 0){
 		        				   $(this).parent().css("background","linear-gradient(90deg, red 0.6%, #e8e6ff 0)").focus();
@@ -2310,7 +2419,20 @@ function contentTable(newTestScriptDataLS) {
 		        			   }
 		        			   $(this).css('color','red');
 		        		   }
-		        	   });
+		        	   });*/
+		        	   var gridArrayData = $("#jqGrid").jqGrid('getRowData');
+		        	   for(i=0; i<gridArrayData.length; i++){
+		        		   if(gridArrayData[i].outputVal.indexOf('##') !== -1  || gridArrayData[i].outputVal.indexOf(';##') !== -1){
+		        			   $(this).find('tr.jqgrow')[i].style.borderLeft = "5px solid red";
+		        			   $(this).find('tr.jqgrow')[i].childNodes[0].style.marginLeft = "-4px"
+		        			   $(this).find('tr.jqgrow')[i].childNodes[7].style.color = "red";
+		        		   }
+		        		   else{
+		        			   $(this).find('tr.jqgrow')[i].style.borderLeft = "5px solid transparent";
+		        			   $(this).find('tr.jqgrow')[i].childNodes[0].style.marginLeft = "-4px"
+		        			   $(this).find('tr.jqgrow')[i].childNodes[7].style.color = "";
+		        		   }
+		        	   }
 		        	   hideOtherFuncOnEdit();
 		        	   $("#jqGrid").parent('div').css('height','auto');
 		           },

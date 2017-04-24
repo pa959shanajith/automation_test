@@ -101,6 +101,8 @@ function next_function(resultobj,cb,data){
 			'screenName':'',
 			'testCaseId':'',
 			'testCaseName':'',
+			'scenarioId':'',
+			'scenarioName':'',
 			'assignedTestScenarioIds':'',
 			'testSuiteId':'',
 			'testSuiteName':'',
@@ -149,6 +151,7 @@ function next_function(resultobj,cb,data){
 
 							}if(parent_length==5){
 								task_json.testCaseId=parent[4];
+								task_json.scenarioId=parent[2];
 
 							}	
 								create_ice.getAllNames(parent,function(err,data){
@@ -156,8 +159,18 @@ function next_function(resultobj,cb,data){
 
 									}else{
 										task_json.testSuiteName=data.modulename;
+										task_json.assignedTestScenarioIds=data.testscenarioIds;
 										task_json.screenName=data.screenname;
+										task_json.scenarioName=data.scenarioname;
 										task_json.testCaseName=data.testcasename;
+										if(t.task=='Design' || t.task=='Update' ){
+											taskDetails.taskName=t.task+' '+data.testcasename;
+										}else if(t.task=='Execute'){
+											taskDetails.taskName=t.task+' '+data.modulename;
+										}else{
+											taskDetails.taskName=t.task+' '+data.screenname;
+										}
+									
 										//task_json.assignedTestScenarioIds=data.assignedTestScenarioIds;
 										task_json.taskDetails.push(taskDetails);
 										user_task_json.push(task_json);

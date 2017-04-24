@@ -19,8 +19,9 @@ app.use(sessions({
     httpOnly: true,
     secure: false,
 	rolling: true,
-	//saveUninitialized: false,
-	cookie: { maxAge: (30*60*1000) }
+ 	resave:false,
+    saveUninitialized: true,
+	cookie: { maxAge:(30*60*1000) }
 }));
 //write stream for logs
 //var accessLogStream = fs.createWriteStream(__dirname + '/access.log', {flags: 'a'})
@@ -104,8 +105,6 @@ app.post('/updateUser_nineteen68', admin.updateUser_nineteen68);
 app.post('/getAllUsers_Nineteen68', admin.getAllUsers_Nineteen68);
 app.post('/getEditUsersInfo_Nineteen68', admin.getEditUsersInfo_Nineteen68);
 app.post('/getDomains_ICE', admin.getDomains_ICE);
-app.post('/checkReleaseNameExists_ICE', admin.checkReleaseNameExists_ICE);
-app.post('/checkCycleNameExists_ICE', admin.checkCycleNameExists_ICE);
 app.post('/createProject_ICE', admin.createProject_ICE);
 app.post('/updateProject_ICE', admin.updateProject_ICE);
 app.post('/getNames_ICE', admin.getNames_ICE);
@@ -121,6 +120,7 @@ app.post('/readTestCase_ICE', design.readTestCase_ICE);
 app.post('/updateTestCase_ICE', design.updateTestCase_ICE);
 app.post('/debugTestCase_ICE', design.debugTestCase_ICE);
 app.post('/getKeywordDetails_ICE', design.getKeywordDetails_ICE);
+app.post('/getTestcasesByScenarioId_ICE', design.getTestcasesByScenarioId_ICE);
 //Execute Screen Routes
 app.post('/readTestSuite_ICE', suite.readTestSuite_ICE);
 app.post('/updateTestSuite_ICE', suite.updateTestSuite_ICE);

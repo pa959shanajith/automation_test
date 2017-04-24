@@ -23,104 +23,89 @@ var objectLevel=1;
 var xpath="";
 
 exports.initScraping_ICE = function (req, res) {
-	var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-	var mySocket = myserver.allSocketsMap[ip];
-	if('allSocketsMap' in myserver && ip in myserver.allSocketsMap){
-		/*var reqScrapJson = {};
-		var browserType = req.body.browserType;
-		reqScrapJson.appType = "Web";
-		reqScrapJson.action = "SCRAPE"
-					if (browserType == "chrome") {
-			var data = "OPEN BROWSER CH";
-					}
-					else if (browserType == "ie") {
-			var data = "OPEN BROWSER IE";
-					}
-					else if (browserType == "mozilla") {
-			var data = "OPEN BROWSER FX";
-					}
+	try{
 		var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 		var mySocket = myserver.allSocketsMap[ip];
-		mySocket._events.scrape = [];               						
-		mySocket.send(data);
-		mySocket.on('scrape', function (data) {
-			res.send(data);
-		});*/
-		var reqScrapJson = {};
-		reqScrapJson.action = "SCRAPE"
-		if(req.body.screenViewObject.appType == "Desktop"){
-			var applicationPath = req.body.screenViewObject.applicationPath;
-			var data = "LAUNCH_DESKTOP";
-			mySocket._events.scrape = [];               						
-			mySocket.emit("LAUNCH_DESKTOP", applicationPath);
-			mySocket.on('scrape', function (data) {
-				res.send(data);
-			});
+		if('allSocketsMap' in myserver && ip in myserver.allSocketsMap){
+			var reqScrapJson = {};
+			reqScrapJson.action = "SCRAPE"
+			if(req.body.screenViewObject.appType == "Desktop"){
+				var applicationPath = req.body.screenViewObject.applicationPath;
+				var data = "LAUNCH_DESKTOP";
+				mySocket._events.scrape = [];               						
+				mySocket.emit("LAUNCH_DESKTOP", applicationPath);
+				mySocket.on('scrape', function (data) {
+					res.send(data);
+				});
+			}
+			else if(req.body.screenViewObject.appType == "SAP"){
+				var applicationPath = req.body.screenViewObject.applicationPath;
+				var data = "LAUNCH_SAP";
+				mySocket._events.scrape = [];               						
+				mySocket.emit("LAUNCH_SAP", applicationPath);
+				mySocket.on('scrape', function (data) {
+					res.send(data);
+				});
+			}
+			else if(req.body.screenViewObject.appType == "DesktopJava"){
+				var applicationPath = req.body.screenViewObject.applicationPath;
+				var data = "LAUNCH_OEBS";
+				mySocket._events.scrape = [];               						
+				// mySocket.send(data);
+				mySocket.emit("LAUNCH_OEBS", applicationPath);
+				mySocket.on('scrape', function (data) {
+					res.send(data);
+				});
+			}
+			else if(req.body.screenViewObject.appType == "MobileApp"){
+				var apkPath = req.body.screenViewObject.apkPath;
+				var serial = req.body.screenViewObject.mobileSerial;
+				var data = "LAUNCH_MOBILE";
+				mySocket._events.scrape = [];                                                                                                  
+				mySocket.emit("LAUNCH_MOBILE", apkPath,serial);
+				mySocket.on('scrape', function (data) {
+								res.send(data);
+				});
+			}
+			else if(req.body.screenViewObject.appType == "MobileWeb"){
+				console.log(req.body.screenViewObject)
+				var mobileSerial = req.body.screenViewObject.mobileSerial;
+				var androidVersion = req.body.screenViewObject.androidVersion;
+				var data = "LAUNCH_MOBILE_WEB";
+				mySocket._events.scrape = [];                                                                                                  
+				mySocket.emit("LAUNCH_MOBILE_WEB", mobileSerial, androidVersion);
+				mySocket.on('scrape', function (data) {
+								res.send(data);
+				});
+			}
+			else{	
+				var browserType = req.body.screenViewObject.browserType;
+					if (browserType == "chrome") {
+						var data = "OPEN BROWSER CH";
+					}
+					else if (browserType == "ie") {
+						var data = "OPEN BROWSER IE";
+					}
+					else if (browserType == "mozilla") {
+						var data = "OPEN BROWSER FX";
+					}
+				mySocket._events.scrape = [];               						
+				mySocket.send(data);
+				mySocket.on('scrape', function (data) {
+					res.send(data);
+				});
+			}
+		}else{
+			console.log("Socket not Available");
+			try{
+				res.send("unavailableLocalServer");
+			}catch(exception){
+				console.log(exception);
+			}
 		}
-		else if(req.body.screenViewObject.appType == "SAP"){
-			var applicationPath = req.body.screenViewObject.applicationPath;
-			var data = "LAUNCH_SAP";
-			mySocket._events.scrape = [];               						
-			mySocket.emit("LAUNCH_SAP", applicationPath);
-			mySocket.on('scrape', function (data) {
-				res.send(data);
-			});
-		}
-		else if(req.body.screenViewObject.appType == "DesktopJava"){
-			var applicationPath = req.body.screenViewObject.applicationPath;
-			var data = "LAUNCH_OEBS";
-			mySocket._events.scrape = [];               						
-			// mySocket.send(data);
-			mySocket.emit("LAUNCH_OEBS", applicationPath);
-			mySocket.on('scrape', function (data) {
-				res.send(data);
-			});
-		}
-		else if(req.body.screenViewObject.appType == "MobileApp"){
-			var apkPath = req.body.screenViewObject.apkPath;
-			var serial = req.body.screenViewObject.mobileSerial;
-			var data = "LAUNCH_MOBILE";
-			mySocket._events.scrape = [];                                                                                                  
-			mySocket.emit("LAUNCH_MOBILE", apkPath,serial);
-			mySocket.on('scrape', function (data) {
-							res.send(data);
-			});
-		}
-		else if(req.body.screenViewObject.appType == "MobileWeb"){
-			console.log(req.body.screenViewObject)
-			var mobileSerial = req.body.screenViewObject.mobileSerial;
-			var androidVersion = req.body.screenViewObject.androidVersion;
-			var data = "LAUNCH_MOBILE_WEB";
-			mySocket._events.scrape = [];                                                                                                  
-			mySocket.emit("LAUNCH_MOBILE_WEB", mobileSerial, androidVersion);
-			mySocket.on('scrape', function (data) {
-							res.send(data);
-			});
-		}
-		else{	
-			var browserType = req.body.screenViewObject.browserType;
-				if (browserType == "chrome") {
-					var data = "OPEN BROWSER CH";
-				}
-				else if (browserType == "ie") {
-					var data = "OPEN BROWSER IE";
-				}
-				else if (browserType == "mozilla") {
-					var data = "OPEN BROWSER FX";
-				}
-			mySocket._events.scrape = [];               						
-			mySocket.send(data);
-			mySocket.on('scrape', function (data) {
-				res.send(data);
-			});
-		}
-	}else{
-		console.log("Socket not Available");
-		try{
-			res.send("unavailableLocalServer");
-		}catch(exception){
-			console.log(exception);
-		}
+	}catch(exception){
+		console.log(exception);
+		res.send("unavailableLocalServer");
 	}
 };
 
@@ -1410,15 +1395,17 @@ exports.debugTestCase_ICE = function (req, res) {
 						var requestedbrowsertypes = req.body.browsertypes;
 						var requestedtestcaseids = req.body.testcaseids;
 						var responsedata = [];
-						var responseobject = {
-							template: "",
-							testcasename: "",
-							testcase: []
-						};
+						var counter=-1;
+						// var responseobject = {
+						// 	template: "",
+						// 	testcasename: "",
+						// 	testcase: []
+						// };
 						var browsertypeobject = { browsertype: requestedbrowsertypes };
 						var flag = "";
-						for (var indexes = 0; indexes < requestedtestcaseids.length; indexes++) {
-							var getProjectTestcasedata = "select screenid,testcasename,testcasesteps from testcases where testcaseid=" + requestedtestcaseids[indexes];
+						//for (var indexes = 0; indexes < requestedtestcaseids.length; indexes++) {
+							requestedtestcaseids.forEach(function(testcase,i){
+							var getProjectTestcasedata = "select screenid,testcasename,testcasesteps from testcases where testcaseid=" + testcase;
 							dbConn.execute(getProjectTestcasedata, function (errgetTestcasedata, testcasedataresult) {
 								try{
 									if (errgetTestcasedata) {
@@ -1429,44 +1416,127 @@ exports.debugTestCase_ICE = function (req, res) {
 											console.log(exception);
 										}
 									} else {
-										for (var ids = 0; ids < testcasedataresult.rows.length; ids++) {
-											responseobject.testcase = testcasedataresult.rows[ids].testcasesteps;
-											responseobject.testcasename = testcasedataresult.rows[ids].testcasename;
+										//for (var ids = 0; ids < testcasedataresult.rows.length; ids++) {
+											testcasedataresult.rows.forEach(function(ids,j){
+												var responseobject = {
+													template: "",
+													testcasename: "",
+													testcase: []
+												};
+											responseobject.testcase = ids.testcasesteps;
+											responseobject.testcasename = ids.testcasename;
+											responsedata.push(responseobject);
+											responsedata.push(browsertypeobject);
 											var scrapedDataQuery="select screendata from screens where screenid="+
 													testcasedataresult.rows[0].screenid+" allow filtering ;";
 											fetchScrapedData(scrapedDataQuery,function(err,scrapedobjects,querycallback){
+												counter++;
 												try{
 													if(scrapedobjects != null && scrapedobjects != '' && scrapedobjects != undefined){
 														var newParse = JSON.parse(scrapedobjects);
 														if('body' in newParse){
-															responseobject.template = newParse.body[0];
+															var screen_obj=responsedata[counter];
+															screen_obj.template = newParse.body[0];
+
 														}
 													}
-													responsedata.push(responseobject);
-													responsedata.push(browsertypeobject);
-													mySocket._events.result_debugTestCase = [];
-													mySocket.emit('debugTestCase',responsedata);
-													mySocket.on('result_debugTestCase', function (responsedata) {
-														try{
-															res.send(responsedata);
-														}catch(exception){
-															console.log(exception);
-														}
-													});
+													// responsedata.push(responseobject);
+													// responsedata.push(browsertypeobject);
+													if(counter==requestedtestcaseids.length-1){
+														mySocket._events.result_debugTestCase = [];
+														mySocket.emit('debugTestCase',responsedata);
+														mySocket.on('result_debugTestCase', function (responsedata) {
+															try{
+																res.send(responsedata);
+															}catch(exception){
+																console.log(exception);
+															}
+														})
+													}
+														
+													
+													
 												}catch(exception){
 													console.log(exception);
 												}
 											});
-										}
+										//}
+										});
 									}
 								}catch(exception){
 									console.log(exception);
 								}
 							});
-						}
+						//}
+							});
+						
 					}catch(exception){
 						console.log(exception);
 					}
+					// try{
+					// 	var requestedbrowsertypes = req.body.browsertypes;
+					// 	var requestedtestcaseids = req.body.testcaseids;
+					// 	var responsedata = [];
+					// 	var responseobject = {
+					// 		template: "",
+					// 		testcasename: "",
+					// 		testcase: []
+					// 	};
+					// 	var browsertypeobject = { browsertype: requestedbrowsertypes };
+					// 	var flag = "";
+					// 	for (var indexes = 0; indexes < requestedtestcaseids.length; indexes++) {
+					// 		var getProjectTestcasedata = "select screenid,testcasename,testcasesteps from testcases where testcaseid=" + requestedtestcaseids[indexes];
+					// 		dbConn.execute(getProjectTestcasedata, function (errgetTestcasedata, testcasedataresult) {
+					// 			try{
+					// 				if (errgetTestcasedata) {
+					// 					flag = "Error in getProjectTestcasedata : Fail";
+					// 					try{
+					// 						res.send(flag);
+					// 					}catch(exception){
+					// 						console.log(exception);
+					// 					}
+					// 				} else {
+					// 					for (var ids = 0; ids < testcasedataresult.rows.length; ids++) {
+					// 						responseobject.testcase = testcasedataresult.rows[ids].testcasesteps;
+					// 						responseobject.testcasename = testcasedataresult.rows[ids].testcasename;
+					// 						var scrapedDataQuery="select screendata from screens where screenid="+
+					// 								testcasedataresult.rows[0].screenid+" allow filtering ;";
+					// 						fetchScrapedData(scrapedDataQuery,function(err,scrapedobjects,querycallback){
+					// 							try{
+					// 								if(scrapedobjects != null && scrapedobjects != '' && scrapedobjects != undefined){
+					// 									var newParse = JSON.parse(scrapedobjects);
+					// 									if('body' in newParse){
+					// 										responseobject.template = newParse.body[0];
+					// 									}
+					// 								}
+					// 								responsedata.push(responseobject);
+					// 								responsedata.push(browsertypeobject);
+					// 									mySocket._events.result_debugTestCase = [];
+					// 									mySocket.emit('debugTestCase',responsedata);
+					// 									mySocket.on('result_debugTestCase', function (responsedata) {
+					// 										try{
+					// 											res.send(responsedata);
+					// 										}catch(exception){
+					// 											console.log(exception);
+					// 										}
+					// 									})
+													
+													
+					// 							}catch(exception){
+					// 								console.log(exception);
+					// 							}
+					// 						});
+					// 					}
+					// 				}
+					// 			}catch(exception){
+					// 				console.log(exception);
+					// 			}
+					// 		});
+					// 	}
+						
+					// }catch(exception){
+					// 	console.log(exception);
+					// }
 				}else if(action == 'debugTestCaseWS_ICE'){
 					try{
 						mySocket._events.result_debugTestCaseWS = [];
@@ -1702,6 +1772,81 @@ exports.getKeywordDetails_ICE = function getKeywordDetails_ICE(req, res) {
 				}
 			});
 	}catch(exception){
+		console.log(exception);
+	}
+};
+
+//getDependentTestCases by ScenarioId
+exports.getTestcasesByScenarioId_ICE = function getTestcasesByScenarioId_ICE(req, res) {
+	try{
+		var testcasesArr = [];
+		var testScenarioId = req.body.testScenarioId;
+		var getTestcaseIds = "select testcaseids from testscenarios where testscenarioid = "+testScenarioId+" ALLOW FILTERING";
+		//console.log(getTestcaseIds);
+		dbConn.execute(getTestcaseIds,
+			function(errGetTestCaseIds,testcasesResult) {
+				try{
+					if (errGetTestCaseIds) {
+						flag = "Error in fetching testcaseIds : Fail";
+						try{
+							res.send(flag);
+						}catch(exception){
+							console.log(exception);
+						}
+					} else {
+						//console.log("testcaseIds", testcasesResult.rows[0].testcaseids);
+						var testcaseIds = testcasesResult.rows[0].testcaseids
+						
+						async.forEachSeries(testcaseIds,function(eachtestcaseid,fetchtestcaseNameCallback){
+							
+							var testcasesObj={};
+							try{
+							var getTestCaseDetails = "select testcasename from testcases where testcaseid = "+eachtestcaseid+" ALLOW FILTERING";
+							dbConn.execute(getTestCaseDetails,
+			                      function(errGetTestCaseDetails,testcaseNamesResult) {
+									try{
+											if(errGetTestCaseDetails)
+											{
+												flag = "Error in fetching testcaseNames : Fail";
+												try{
+														res.send(flag);
+													}catch(exception){
+														console.log(exception);
+													}
+											}
+											else{
+												//console.log("testcaseNames", testcaseNamesResult);
+												var testcaseNames = testcaseNamesResult.rows[0];
+												testcasesObj.testcaseId = eachtestcaseid;
+												testcasesObj.testcaseName = testcaseNames.testcasename;
+												testcasesArr.push(testcasesObj);
+												//console.log("testcasesArr", testcasesArr);
+												fetchtestcaseNameCallback();
+											}
+									   }
+									catch(exception){
+								console.log(exception);
+							}
+							});
+							}catch(exception){
+								console.log(exception);
+							}	
+						},finalfunction);
+					}
+				}catch(exception){
+					console.log(exception);
+				}
+
+				function finalfunction(){
+					try{	
+						res.send(testcasesArr);
+						}catch(exception){
+							console.log(exception);
+						}
+				}
+			});
+	}
+	catch(exception){
 		console.log(exception);
 	}
 };

@@ -29,7 +29,6 @@ function loadMindmapData(){
 			{
 				$("img.iconSpaceArrow").removeClass("iconSpaceArrowTop");
 			}
-			$(".ct-nodeBox").css({"overflow":"hidden"})
 			loadMindmapData1();
 			});
 		}
@@ -221,6 +220,11 @@ var addTask = function(e){
 							d3.select('#ct-node-'+scr.id).append('image').attr('class','ct-nodeTask').attr('xlink:href','images_mindmap/node-task-assigned.png').attr('x',29).attr('y',-10);
 						}
 						
+					}else{
+						if(scr.task.parent!=[dNodes[pi].id_c,tSc.id_c,scr.id_c]){
+							scr.task['updatedParent']=[dNodes[pi].id_c,tSc.id_c,scr.id_c];
+						}
+
 					}
 					
 					scr.children.forEach(function(tCa){
@@ -231,6 +235,9 @@ var addTask = function(e){
 								d3.select('#ct-node-'+tCa.id).append('image').attr('class','ct-nodeTask').attr('xlink:href','images_mindmap/node-task-assigned.png').attr('x',29).attr('y',-10);
 							}
 						}else{
+							if(tCa.task.parent!=[dNodes[pi].id_c,tSc.id_c,scr.id_c,tCa.id_c]){
+								tCa.task['updatedParent']=[dNodes[pi].id_c,tSc.id_c,scr.id_c,tCa.id_c];
+							}
 							taskflag=true;
 						}
 					});
@@ -244,6 +251,9 @@ var addTask = function(e){
 	else if(nType=="screens"){
 		var modid=dNodes[pi].parent.parent.id_c,tscid=dNodes[pi].parent.id_c,scrid=dNodes[pi].id_c;
 		dNodes[pi].task={id:tObj.id,oid:tObj.oid,task:tObj.t,assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,details:tObj.det,parent:(tObj.parent!=null)?tObj.parent:[modid,tscid,scrid]};
+		if(tObj.parent!=[modid,tscid,scrid]){
+			dNodes[pi].task['updatedParent']=[modid,tscid,scrid];
+		}
 		if(dNodes[pi].children) dNodes[pi].children.forEach(function(tCa){
 			var cTask=(tObj.t=="Scrape"||tObj.t=="Append"||tObj.t=="Compare")? "Design":"Debug";
 			if(tCa.task===undefined||tCa.task==null){
@@ -254,6 +264,9 @@ var addTask = function(e){
 					d3.select('#ct-node-'+tCa.id).append('image').attr('class','ct-nodeTask').attr('xlink:href','images_mindmap/node-task-assigned.png').attr('x',29).attr('y',-10);
 				}
 			}else{
+				if(tCa.task.parent!=[modid,tscid,scrid,tcid]){
+					tCa.task['updatedParent']=[modid,tscid,scrid,tcid];
+				}
 				taskflag=true;
 			}
 		});
@@ -263,17 +276,18 @@ var addTask = function(e){
 		if (modid !='null' && tscid !='null' && scrid!='null' && tcid!='null'){
 			taskflag=true;
 			dNodes[pi].task={id:tObj.id,oid:tObj.oid,task:tObj.t,assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,details:tObj.det,parent:(tObj.parent!=null)?tObj.parent:[modid,tscid,scrid,tcid]};
+			if(tObj.parent!=[modid,tscid,scrid,tcid]){
+				dNodes[pi].task['updatedParent']=[modid,tscid,scrid,tcid];
+			}
 		}
 	}
 	if (taskflag){
 		if(p.select('.ct-nodeTask')[0][0]==null) p.append('image').attr('class','ct-nodeTask').attr('xlink:href','images_mindmap/node-task-assigned.png').attr('x',29).attr('y',-10);
 	}else if(taskflag==false){
 		openDialogMindmap("Task Assignment Error", "Please create the structure before assigning task")
-		//$('#Mindmap_assign_error').modal('show');
 	}
 	if (errorRelCyc){
 		openDialogMindmap("Task Assignment Error", "Please select Release/Cycle")
-		//$('#Mindmap_rel_cycle_error').modal('show');
 	}
 };
 
@@ -779,7 +793,7 @@ var inpKeyUp = function(e){
 	}
 };
 var treeIterator = function(c,d,e){
-	c.push({id:d.id,id_c:(d.id_c)?d.id_c:null,id_n:(d.id_n)?d.id_n:null,oid:(d.oid)?d.oid:null,name:d.name,type:d.type,pid:(d.parent)?d.parent.id:null,task:(d.task)?d.task:null,renamed:(d.rnm)?d.rnm:!1,orig_name:(d.original_name)?d.original_name:null});
+	c.push({id:d.id,id_c:(d.id_c)?d.id_c:null,id_n:(d.id_n)?d.id_n:null,oid:(d.oid)?d.oid:null,name:d.name,type:d.type,pid:(d.parent)?d.parent.id:null,pid_c:(d.parent)?d.parent.id_c:null,task:(d.task)?d.task:null,renamed:(d.rnm)?d.rnm:!1,orig_name:(d.original_name)?d.original_name:null});
 	if(d.children&&d.children.length>0) d.children.forEach(function(t){e=treeIterator(c,t,e);});
 	else if(d._children&&d._children.length>0) d._children.forEach(function(t){e=treeIterator(c,t,e);});
 	else if(d.type!='testcases') return !0;
@@ -916,23 +930,6 @@ var toggleExpand = function(e){
 	$(e.target).parent().parent().toggleClass('ct-open');
 	$(e.target).toggleClass("iconSpaceArrowTop");
 	e.stopImmediatePropagation();
-	if($("#ct-moduleBox").hasClass("ct-open") == true){
-		$("#ct-canvas").css("top","5px");
-		if($("#left-nav-section").is(":visible") == true && $("#right-dependencies-section").is(":visible") == true)
-		{
-			$("#ct-AssignBox").css({"position":"relative","top":"25px"});
-		}
-		$(".ct-nodeBox .ct-node").css("width","139px");
-		$(".ct-nodeBox").css({"overflow":"auto", "width":"99%"})
-		$(".iconSpaceArrow").attr("src","imgs/ic-collapseup.png");
-	}
-	else{
-		$(".iconSpaceArrow").attr("src","imgs/ic-collapse.png");
-		$("#ct-moduleBox").css({"position":"","top":""});
-		$("#ct-canvas").css("top","");
-		$(".ct-nodeBox .ct-node").css("width","");
-		$(".ct-nodeBox").css({"overflow":"hidden", "width":""})
-	}
 };
 var toggleExpandAssign = function(e){
 	// var s=d3.select($("#"+e.target.id));
@@ -945,23 +942,6 @@ var toggleExpandAssign = function(e){
 	$(e.target).parent().parent().toggleClass('ct-open');
 	$(e.target).toggleClass("iconSpaceArrowTop");
 	e.stopImmediatePropagation();
-	if($("#ct-AssignBox").hasClass("ct-open") == true){
-		$("#ct-canvas").css("top","5px");
-		if($("#left-nav-section").is(":visible") == true && $("#right-dependencies-section").is(":visible") == true)
-		{
-			$("#ct-AssignBox").css({"position":"relative","top":"25px"});
-		}
-		$(".ct-nodeBox .ct-node").css("width","139px");
-		$(".ct-nodeBox").css({"overflow":"auto", "width":"98%"})
-		$(".iconSpaceArrow").attr("src","imgs/ic-collapseup.png");
-	}
-	else{
-		$(".iconSpaceArrow").attr("src","imgs/ic-collapse.png");
-		$("#ct-AssignBox").css({"position":"","top":""});
-		$("#ct-canvas").css("top","");
-		$(".ct-nodeBox .ct-node").css("width","");
-		$(".ct-nodeBox").css({"overflow":"", "width":""})
-	}
 };
 var clickHideElements = function(e){
 	d3.select('#ct-inpBox').classed('no-disp',!0);
@@ -982,17 +962,17 @@ var populateDynamicInputList = function(){
 	allMMaps.forEach(function(m){
 		m.children.forEach(function(ts){
 			if(scenarioDict[ts.id_n]===undefined){
-					scenarioList.push({id:ts.id,name:ts.name,id_n:ts.id_n});
+					scenarioList.push({id:ts.id,name:ts.name,id_n:ts.id_n,id_c:ts.id_c});
 					scenarioDict[ts.id_n]=!0;
 			}
 			ts.children.forEach(function(s){
 				if(scrDict[s.id_n]===undefined){
-					scrList.push({id:s.id,name:s.name,id_n:s.id_n});
+					scrList.push({id:s.id,name:s.name,id_n:s.id_n,id_c:s.id_c});
 					scrDict[s.id_n]=!0;
 				}
 				s.children.forEach(function(tc){
 					if(tcDict[tc.id_n]===undefined){
-						tcList.push({id:tc.id,name:tc.name,id_n:tc.id_n});
+						tcList.push({id:tc.id,name:tc.name,id_n:tc.id_n,id_c:tc.id_c});
 						tcDict[tc.id_n]=!0;
 					}
 				});

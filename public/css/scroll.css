@@ -542,6 +542,26 @@
 	background: rgb(211, 211, 211)
 }
 
+
+.scroll-wrapper > .dependentTC{
+	/*width: 100% !important;*/
+    float: left;
+    height: 100% !important;
+}
+.scroll-wrapper.dependentTC {    
+    min-height: 100px;
+    max-height: 300px;
+}
+.dependentTC > .scroll-element.scroll-y{
+	z-index:60;
+}
+.dependentTC > .scroll-element.scroll-y .scroll-bar{
+	background: #321e4f
+}
+.dependentTC > .scroll-element .scroll-element_track{
+	background: rgb(211, 211, 211)
+}
+
 /* Testsuite scenarios bottom section  */
 .scroll-wrapper > .scrollbar-inner-scenarioreports{
 	width: 100% !important;
@@ -662,6 +682,14 @@
 	}
 }
 /**********Custom Media Queries**********/
+@media screen and (max-height:900px){
+	.scroll-wrapper > .scrollbar-screenshot{
+		padding: 0px;
+		height: auto !important;
+		min-height: auto !important;
+		max-height: 500px !important
+	}
+}
 @media screen and (max-height:675px){
 	.scroll-wrapper > .scrollbar-screenshot{
 		padding: 0px;
