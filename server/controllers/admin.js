@@ -836,17 +836,21 @@ exports.getDetails_ICE = function(req, res) {
                                     }
                                 } else {
                                 	try{
-	                                    for (var i = 0; i < response.length; i++) {
-	                                        responsedatadomains.projectIds.push(response[i].projectid);
-	                                        responsedatadomains.projectNames.push(response[i].projectname);
-	                                        if (i == response.length - 1) {
-	                                            try {
-	                                                res.send(responsedatadomains);
-	                                            } catch (exception) {
-	                                                console.log(exception);
-	                                            }
-	                                        }
-	                                    }
+                                        if(response.length == 0){
+                                            res.send(responsedatadomains);
+                                        }else{
+                                            for (var i = 0; i < response.length; i++) {
+                                                responsedatadomains.projectIds.push(response[i].projectid);
+                                                responsedatadomains.projectNames.push(response[i].projectname);
+                                                if (i == response.length - 1) {
+                                                    try {
+                                                        res.send(responsedatadomains);
+                                                    } catch (exception) {
+                                                        console.log(exception);
+                                                    }
+                                                }
+                                            }
+                                        }
                                     } catch (exception) {
                                         console.log(exception);
                                     }

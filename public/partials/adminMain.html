@@ -16,6 +16,9 @@
 					<li><a id='projectTab' ng-click="tab = 'tabProject'"
 						class="selectBrowser" data-name="1"><span><img
 								src='imgs/project.png' alt='Project' /></span>Project</a></li>
+					<li><a id='assignProjectTab' ng-click="tab = 'tabAssignProject'"
+					class="selectBrowser" data-name="1"><span><img
+							src='imgs/project.png' alt='Project' /></span>Assign Projects</a></li>
 					<li style="margin-bottom: 30px"><a id='preferencesTab'
 						ng-click="tab = 'tabPreferences'" class="selectBrowser"
 						data-name="2"><span><img src='imgs/preferences.png'
@@ -267,6 +270,86 @@
 			<!-- Relase Cycle -->
 		</div>
 		<!-- Create Project -->
+
+		<!-- Assign Projects -->
+		<div class="containerWrap" ng-if="tab == 'tabAssignProject'">
+			<!--Task Name-->
+			<div id="page-taskName">
+				<span>Assign Projects</span>
+			</div>
+			<!--Task Name-->
+			<div class="adminActionBtn">
+				<button class="btn btn-md pull-right adminBtn" ng-click="assignProjects()" style="margin-right:10px">Assign Projects</button>
+			</div>
+			<div class="col-xs-9 form-group" style="width: 83%">
+				<div class='userForm projectForm'>
+					<div class='domainTxt'>User</div>
+					<select class="adminSelect form-control selectDomain" style="width: 91%" id="selAssignUser">
+						<option value="" disabled selected>Please Select User</option>
+					</select> 
+					<span ng-show="userNameRequired" class="error-msg ng-cloak errorlbl">{{userNameRequired}}</span>
+				</div>
+				<div class='userForm projectForm'>
+					<div class='domainTxt'>Domain</div>
+					<select class="adminSelect form-control selectDomain" style="width: 91%" id="selAssignProject">
+						<option value="" disabled selected>Please Select Your Domain</option>
+					</select> 
+					<span ng-show="domainNameRequired" class="error-msg ng-cloak errorlbl">{{domainNameRequired}}</span>
+				</div>
+			</div>
+			<!-- Assign Div -->
+			<div class="col-xs-9 form-group" style="width: 100%">
+			<div class="project-left2">				
+					<!--Left Select Box-->
+					<div class="wrap left-select scrollbar-inner">
+						<!--Labels-->
+						<label class="labelStyle1">All Projects</label>
+						<!--Labels-->
+						 
+						<div class="seprator" style="margin-bottom:0px;">
+							<!-- <select multiple id="allProjectEU" ng-model="allProjectNameEU" size="13" ng-options="p as p.ProjectName for p in projBox1 track by p.ProjectId"></select> -->
+							<select multiple="" id="allProjectAP" ng-model="allProjectNameAP" size="" ng-options="p as p.ProjectName for p in projBox1 track by p.ProjectId" class="ng-pristine ng-untouched ng-valid"></select>
+							<span ng-show="projectNameRequired" class="error-msg ng-binding ng-hide"></span>
+						</div>
+					</div>
+					<!--Left Select Box-->
+					
+					<!--Center Input-->
+					<div class="wrap wrap-editpro center-button">
+						<button id="rightall" type="button" ng-click="rightall('#allProjectAP', '#assignedProjectAP')" class=""> &gt;&gt; </button>				
+						<button type="button" id="rightgo" ng-click="rightgo('#allProjectAP', '#assignedProjectAP')"> &gt; </button>			
+						<button type="button" id="leftgo" ng-click="leftgo('#assignedProjectAP','#allProjectAP')"> &lt; </button>			
+						<button id="leftall" type="button" ng-click="leftall('#assignedProjectAP','#allProjectAP')"> &lt;&lt; </button>
+					
+						<!-- <input  id="moverightall" ng-click="moveAll(userBox1,userBox2)"  type="button" value=">>"/><br /> 
+						<input id="moveright" type="button" value=">" ng-click="moveItem(userName[0], userBox1,userBox2)" /><br />
+						<input id="move left" type="button" value="<" ng-click="moveItem(SelectedUsers[0], userBox2,userBox1)" /><br />
+					    <input id="moveleftall" type="button" value="<<" ng-click="moveAll(userBox2,userBox1)" /> -->
+					</div>
+					<!--Center Input-->
+					
+					<!--Right Select Box-->
+					<div class="wrap right-select">
+						<!--Labels-->
+						<label class="labelStyle1">Assign Projects</label>
+						<!--Labels-->
+						
+						<!--Print Selected Domain-->
+						<!--<div class="sltd-domain-print">Please Assign Projects</strong></div>-->
+						<!--Print Selected Domain-->
+						
+						<div class="seprator" style="margin-bottom:0px;">
+							<!-- <select size="13" multiple ng-model="assignedProjectNameEU" id="assignedProject" ng-options="p as p.ProjectName for p in projBox2 track by p.ProjectId"></select> -->
+							<select size="" multiple="" ng-model="assignedProjectNameAP" id="assignedProjectAP" ng-options="p as p.ProjectName for p in projBox2 track by p.ProjectId" class="ng-pristine ng-untouched ng-valid"></select>
+							<span ng-show="selectProjects" class="error-msg ng-binding ng-hide"></span>
+						</div>
+					</div>
+					<!--Right Select Box-->
+				</div>
+				<!-- Assign Div -->
+		</div>
+	</div>
+		<!-- Assign Projects -->
 
 		<!-- Update Project -->
 		<div class="containerWrap" ng-if="tab == 'editProject'">
