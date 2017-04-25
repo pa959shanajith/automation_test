@@ -682,8 +682,9 @@ var recurseTogChild = function(d,v){
 var validNodeDetails = function(value,p){
 	var nName,flag=!0;
 	nName=value;
-	var specials=/[*|\":<>[\]{}`\\()'!;@&$]/;
-	if (nName.length==0 || nName.length>40|| (specials.test(nName))){
+	//var specials=/[*|\":<>[\]{}`\\()'!;@&$~#%^-]/;
+	var regex = /^[a-zA-Z0-9_]*$/;;
+	if (nName.length==0 || nName.length>40|| !(regex.test(nName))){
 		$('#ct-inpAct').addClass('errorClass');
 		flag=!1;
 	}
@@ -830,14 +831,13 @@ var actionEvent = function(e){
 	}
 	if(s.attr('id')=='ct-saveAction'){
 		flag=10;
-		//alertMsg="Data written successfully!";
-		//$('#Mindmap_save').modal('show');
+		d3.select('#ct-inpBox').classed('no-disp',!0);
+		
 	}
 	else if(s.attr('id')=='ct-createAction'){
 		flag=20;
-		//alertMsg="Data sent successfully!";
-		//$('#Mindmap_save').modal('show');
-		//alert("Caution! Save data before submitting\nIgnore if already saved.");
+		d3.select('#ct-inpBox').classed('no-disp',!0);
+		
 	}
 	if(flag==0) return;
 	if(s.classed('no-access')) return;
