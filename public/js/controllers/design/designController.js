@@ -2250,6 +2250,8 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				$("span.testcaseListItem").each(function() {
 							if(currentTestCase == $(this).children("label").text())
 							{
+											$(this).children('input.checkTestCase').attr("disabled",true)
+											//$(".checkTestCase[disabled=disabled]").prop('checked',false);
 											$(this).nextAll('.testcaseListItem').children('input.checkTestCase').attr("disabled",true);
 											$(".checkTestCase[disabled=disabled]").prop('checked',false);
 							}
@@ -2285,7 +2287,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					});
 					if(checkedTestcases.length > 0)
 					{
-							
+							checkedTestcases.push(JSON.parse(window.localStorage['_CT']).testCaseId);
 							$("button.close:visible").trigger('click');
 							$("#globalModal").find('.modal-title').text("Dependent Test Cases");
 							$("#globalModal").find('.modal-body p').html("Dependent Test Cases saved successfully");

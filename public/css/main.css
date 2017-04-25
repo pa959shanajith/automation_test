@@ -2460,9 +2460,19 @@ input[disabled]{
     -ms-border-radius: 6px;
 }
 
-#selDomain, #selDomainEdit {
+#selDomain, #selDomainEdit, #selAssignDomain, #selAssignUser {
 	    position: relative;
         left: 10px
+}
+
+#selAssignUser
+{
+    margin-left: 6.5%;
+}
+
+#selAssignProject
+{
+    margin-left: 8%;
 }
 
 .appTypesContainer {
@@ -2601,6 +2611,100 @@ input[disabled]{
     position: relative;
     left: 10px;
     top: 2px;
+}
+/*** ADMIN ASSIGNTAB USER CSS **/
+.project-left2 {
+    float: left;
+    background: #fff;
+    width: 100%;
+    border-radius: 3px;
+    padding: 25px 47px 0 0px;
+    position: relative;
+}
+.left-select
+{
+    float: left;
+    width: 40%;
+}
+.labelStyle1 {
+    float: left;
+    line-height: 1;
+    margin-bottom: 12px;
+    font-weight: 300;
+    cursor: default;
+}
+.seprator {
+    position: relative;
+    margin-bottom: 0px;
+    float: left;
+    width: 100%;
+}
+.adminFontStyling .wrap select, select:hover {
+    background-color: #fff;
+}
+.adminFontStyling .wrap select, select {
+    width: 100%;
+    background-image: none;
+    -webkit-appearance: select;
+    overflow-y: scroll;
+    margin-bottom: 0;
+    font-size: 13px;
+    height: 30%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    -o-border-radius: 3px;
+    -ms-border-radius: 3px;
+    box-shadow: inset 0px 1px 6px #ddd;
+    -moz-box-shadow: inset 0px 1px 6px #ddd;
+    -webkit-box-shadow: inset 0px 1px 6px #ddd;
+    -o-box-shadow: inset 0px 1px 6px #ddd;
+    -ms-box-shadow: inset 0px 1px 6px #ddd;
+}
+
+.wrap-editpro {
+    float: left;
+    top: 60%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-50%);
+    position: absolute;
+    width: 10%;
+}
+.center-button button {
+font-size: 11px;
+cursor: pointer;
+font-weight: 600;
+width: 35px;
+outline: none;
+margin-bottom: 15px;
+padding: 6px 12px;
+background: #643693;
+border: none;
+color: #fff;
+border-radius: 3px;
+-moz-border-radius: 3px;
+-webkit-border-radius: 3px;
+-o-border-radius: 3px;
+-ms-border-radius: 3px;
+margin-top: 1%;
+margin-left: 12%;
+clear: both;
+float: left;
+}
+
+
+.right-select {
+    float: right;
+    width: 40%;
+}
+#allProjectAP option,#assignedProjectAP option
+{
+    padding: 10px;
+}
+select[multiple], select[size] {
+    min-height: 400px;
 }
 /*****************ADMIN CSS NEW ************************/
 .containerWrap {
@@ -2757,7 +2861,7 @@ input[disabled]{
     -ms-border-radius: 6px;
 }
 
-#selDomain {
+#selDomain,.selectDomain {
 	margin-left: 2%;
 }
 

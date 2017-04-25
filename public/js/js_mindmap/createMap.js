@@ -206,82 +206,100 @@ var addTask = function(e){
 	}
 	var taskflag=false;
 	var errorRelCyc=false;
-	Object.keys(tObj).forEach(function(k){if(tObj[k]==''||tObj[k]===undefined) tObj[k]=null;});
-	//if(p.select('.ct-nodeTask')[0][0]==null) p.append('image').attr('class','ct-nodeTask').attr('xlink:href','images_mindmap/node-task-assigned.png').attr('x',29).attr('y',-10);
-	if(nType=="modules"){
-		if(tObj.cy != 'select cycle' && tObj.re != 'select release'){
-			dNodes[pi].task={id:tObj.id,oid:tObj.oid,task:tObj.t,assignedTo:tObj.at,startDate:tObj.sd,endDate:tObj.ed,release:tObj.re,cycle:tObj.cy,details:tObj.det,parent:(tObj.parent!=null)?tObj.parent:[dNodes[pi].id_c]};
-			if(dNodes[pi].children) dNodes[pi].children.forEach(function(tSc){
-				tSc.children.forEach(function(scr){
-					if(scr.task===undefined||scr.task==null){
-						if(dNodes[pi].id_c!='null' && tSc.id_c!='null' && scr.id_c!='null'){
-							taskflag=true;
-							scr.task={id:null,oid:null,task:"Scrape",assignedTo:tObj.at,reviewer:null,startDate:tObj.sd,endDate:tObj.ed,details:tObj.det,parent:[dNodes[pi].id_c,tSc.id_c,scr.id_c]};
-							d3.select('#ct-node-'+scr.id).append('image').attr('class','ct-nodeTask').attr('xlink:href','images_mindmap/node-task-assigned.png').attr('x',29).attr('y',-10);
+	var dateFlag=true;
+	var reviewerFlag=true;
+	if($('#startDate').val() == null || $('#endDate').val() == null || $('#startDate').val() == '' || $('#startDate').val() ==''){
+		dateFlag=false;
+	}
+	if(tObj.rw=='select reviewer'){
+		reviewerFlag=false;
+	}
+	if(dateFlag && reviewerFlag){
+		Object.keys(tObj).forEach(function(k){if(tObj[k]==''||tObj[k]===undefined) tObj[k]=null;});
+		//if(p.select('.ct-nodeTask')[0][0]==null) p.append('image').attr('class','ct-nodeTask').attr('xlink:href','images_mindmap/node-task-assigned.png').attr('x',29).attr('y',-10);
+		if(nType=="modules"){
+			if(tObj.cy != 'select cycle' && tObj.re != 'select release'){
+				dNodes[pi].task={id:tObj.id,oid:tObj.oid,task:tObj.t,assignedTo:tObj.at,startDate:tObj.sd,endDate:tObj.ed,release:tObj.re,cycle:tObj.cy,details:tObj.det,parent:(tObj.parent!=null)?tObj.parent:[dNodes[pi].id_c]};
+				if(dNodes[pi].children) dNodes[pi].children.forEach(function(tSc){
+					tSc.children.forEach(function(scr){
+						if(scr.task===undefined||scr.task==null){
+							if(dNodes[pi].id_c!='null' && tSc.id_c!='null' && scr.id_c!='null'){
+								taskflag=true;
+								scr.task={id:null,oid:null,task:"Scrape",assignedTo:tObj.at,reviewer:null,startDate:tObj.sd,endDate:tObj.ed,details:tObj.det,parent:[dNodes[pi].id_c,tSc.id_c,scr.id_c]};
+								d3.select('#ct-node-'+scr.id).append('image').attr('class','ct-nodeTask').attr('xlink:href','images_mindmap/node-task-assigned.png').attr('x',29).attr('y',-10);
+							}
+							
+						}else{
+							if(scr.task.parent!=[dNodes[pi].id_c,tSc.id_c,scr.id_c]){
+								scr.task['updatedParent']=[dNodes[pi].id_c,tSc.id_c,scr.id_c];
+							}
+
 						}
 						
-					}else{
-						if(scr.task.parent!=[dNodes[pi].id_c,tSc.id_c,scr.id_c]){
-							scr.task['updatedParent']=[dNodes[pi].id_c,tSc.id_c,scr.id_c];
-						}
-
-					}
-					
-					scr.children.forEach(function(tCa){
-						if(tCa.task===undefined||tCa.task==null){
-							if(dNodes[pi].id_c!='null' && tSc.id_c!='null' && scr.id_c!='null' && tCa.id_c != 'null' ){
+						scr.children.forEach(function(tCa){
+							if(tCa.task===undefined||tCa.task==null){
+								if(dNodes[pi].id_c!='null' && tSc.id_c!='null' && scr.id_c!='null' && tCa.id_c != 'null' ){
+									taskflag=true;
+									tCa.task={id:null,oid:null,task:"Design",assignedTo:tObj.at,reviewer:null,startDate:tObj.sd,endDate:tObj.ed,details:tObj.det,parent:[dNodes[pi].id_c,tSc.id_c,scr.id_c,tCa.id_c]};
+									d3.select('#ct-node-'+tCa.id).append('image').attr('class','ct-nodeTask').attr('xlink:href','images_mindmap/node-task-assigned.png').attr('x',29).attr('y',-10);
+								}
+							}else{
+								if(tCa.task.parent!=[dNodes[pi].id_c,tSc.id_c,scr.id_c,tCa.id_c]){
+									tCa.task['updatedParent']=[dNodes[pi].id_c,tSc.id_c,scr.id_c,tCa.id_c];
+								}
 								taskflag=true;
-								tCa.task={id:null,oid:null,task:"Design",assignedTo:tObj.at,reviewer:null,startDate:tObj.sd,endDate:tObj.ed,details:tObj.det,parent:[dNodes[pi].id_c,tSc.id_c,scr.id_c,tCa.id_c]};
-								d3.select('#ct-node-'+tCa.id).append('image').attr('class','ct-nodeTask').attr('xlink:href','images_mindmap/node-task-assigned.png').attr('x',29).attr('y',-10);
 							}
-						}else{
-							if(tCa.task.parent!=[dNodes[pi].id_c,tSc.id_c,scr.id_c,tCa.id_c]){
-								tCa.task['updatedParent']=[dNodes[pi].id_c,tSc.id_c,scr.id_c,tCa.id_c];
-							}
-							taskflag=true;
-						}
+						});
 					});
 				});
-			});
-		}else{
-			taskflag='';
-			errorRelCyc=true;
-		}
-	}
-	else if(nType=="screens"){
-		var modid=dNodes[pi].parent.parent.id_c,tscid=dNodes[pi].parent.id_c,scrid=dNodes[pi].id_c;
-		dNodes[pi].task={id:tObj.id,oid:tObj.oid,task:tObj.t,assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,details:tObj.det,parent:(tObj.parent!=null)?tObj.parent:[modid,tscid,scrid]};
-		if(tObj.parent!=[modid,tscid,scrid]){
-			dNodes[pi].task['updatedParent']=[modid,tscid,scrid];
-		}
-		if(dNodes[pi].children) dNodes[pi].children.forEach(function(tCa){
-			var cTask=(tObj.t=="Scrape"||tObj.t=="Append"||tObj.t=="Compare")? "Design":"Debug";
-			if(tCa.task===undefined||tCa.task==null){
-				var tcid=tCa.id_c;
-				if (modid !='null' && tscid !='null' && scrid!='null' && tcid!='null'){
-					taskflag=true;
-					tCa.task={id:null,oid:null,task:cTask,assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,details:tObj.det,parent:[modid,tscid,scrid,tcid]};
-					d3.select('#ct-node-'+tCa.id).append('image').attr('class','ct-nodeTask').attr('xlink:href','images_mindmap/node-task-assigned.png').attr('x',29).attr('y',-10);
-				}
 			}else{
-				if(tCa.task.parent!=[modid,tscid,scrid,tcid]){
-					tCa.task['updatedParent']=[modid,tscid,scrid,tcid];
-				}
-				taskflag=true;
-			}
-		});
-	}
-	else if(nType=="testcases"){
-		var modid=dNodes[pi].parent.parent.parent.id_c,tscid=dNodes[pi].parent.parent.id_c,scrid=dNodes[pi].parent.id_c;var tcid=dNodes[pi].id_c;
-		if (modid !='null' && tscid !='null' && scrid!='null' && tcid!='null'){
-			taskflag=true;
-			dNodes[pi].task={id:tObj.id,oid:tObj.oid,task:tObj.t,assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,details:tObj.det,parent:(tObj.parent!=null)?tObj.parent:[modid,tscid,scrid,tcid]};
-			if(tObj.parent!=[modid,tscid,scrid,tcid]){
-				dNodes[pi].task['updatedParent']=[modid,tscid,scrid,tcid];
+				taskflag='';
+				errorRelCyc=true;
 			}
 		}
-	}
-	if (taskflag){
+		else if(nType=="screens"){
+			var modid=dNodes[pi].parent.parent.id_c,tscid=dNodes[pi].parent.id_c,scrid=dNodes[pi].id_c;
+			dNodes[pi].task={id:tObj.id,oid:tObj.oid,task:tObj.t,assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,details:tObj.det,parent:(tObj.parent!=null)?tObj.parent:[modid,tscid,scrid]};
+			if(tObj.parent!=[modid,tscid,scrid]){
+				dNodes[pi].task['updatedParent']=[modid,tscid,scrid];
+			}
+			if(dNodes[pi].children) dNodes[pi].children.forEach(function(tCa){
+				var cTask=(tObj.t=="Scrape"||tObj.t=="Append"||tObj.t=="Compare")? "Design":"Debug";
+				if(tCa.task===undefined||tCa.task==null){
+					var tcid=tCa.id_c;
+					if (modid !='null' && tscid !='null' && scrid!='null' && tcid!='null'){
+						taskflag=true;
+						tCa.task={id:null,oid:null,task:cTask,assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,details:tObj.det,parent:[modid,tscid,scrid,tcid]};
+						d3.select('#ct-node-'+tCa.id).append('image').attr('class','ct-nodeTask').attr('xlink:href','images_mindmap/node-task-assigned.png').attr('x',29).attr('y',-10);
+					}
+				}else{
+					if(tCa.task.parent!=[modid,tscid,scrid,tcid]){
+						tCa.task['updatedParent']=[modid,tscid,scrid,tcid];
+					}
+					taskflag=true;
+				}
+			});
+		}
+		else if(nType=="testcases"){
+			var modid=dNodes[pi].parent.parent.parent.id_c,tscid=dNodes[pi].parent.parent.id_c,scrid=dNodes[pi].parent.id_c;var tcid=dNodes[pi].id_c;
+			if (modid !='null' && tscid !='null' && scrid!='null' && tcid!='null'){
+				taskflag=true;
+				dNodes[pi].task={id:tObj.id,oid:tObj.oid,task:tObj.t,assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,details:tObj.det,parent:(tObj.parent!=null)?tObj.parent:[modid,tscid,scrid,tcid]};
+				if(tObj.parent!=[modid,tscid,scrid,tcid]){
+					dNodes[pi].task['updatedParent']=[modid,tscid,scrid,tcid];
+				}
+			}
+		}
+  }
+  if(!(dateFlag || reviewerFlag)){
+	  openDialogMindmap("Date Error", "Please select Reviewer and Date ")
+  }
+  else if(dateFlag==false){
+	  openDialogMindmap("Date Error", "Please select Date")
+  }else if(reviewerFlag==false){
+	openDialogMindmap("Task Assignment Error", "Please select Reviewer")
+  }
+	else if (taskflag){
 		if(p.select('.ct-nodeTask')[0][0]==null) p.append('image').attr('class','ct-nodeTask').attr('xlink:href','images_mindmap/node-task-assigned.png').attr('x',29).attr('y',-10);
 	}else if(taskflag==false){
 		openDialogMindmap("Task Assignment Error", "Please create the structure before assigning task")
@@ -365,7 +383,7 @@ var nodeClick = function(e){
 				
 			});
 		 }
-				else if(tk=='sd'){
+		else if(tk=='sd'){
 			v.append('span').attr('class','ct-assignItem fl-left').html('Start Date');
 			w=v.append('div').attr('class','ct-assignItem btn-group dropdown fl-right dateBoxSd');
 			// w.append('input').attr('class','ct-asValBox btn dropdown-toggle').attr('data-toggle','dropdown').append('a').attr('id','ct-assignStart').html(tObj.sd);
@@ -682,8 +700,9 @@ var recurseTogChild = function(d,v){
 var validNodeDetails = function(value,p){
 	var nName,flag=!0;
 	nName=value;
-	var specials=/[*|\":<>[\]{}`\\()'!;@&$]/;
-	if (nName.length==0 || nName.length>40|| (specials.test(nName))){
+	//var specials=/[*|\":<>[\]{}`\\()'!;@&$~#%^-]/;
+	var regex = /^[a-zA-Z0-9_]*$/;;
+	if (nName.length==0 || nName.length>40|| !(regex.test(nName))){
 		$('#ct-inpAct').addClass('errorClass');
 		flag=!1;
 	}
@@ -830,14 +849,13 @@ var actionEvent = function(e){
 	}
 	if(s.attr('id')=='ct-saveAction'){
 		flag=10;
-		//alertMsg="Data written successfully!";
-		//$('#Mindmap_save').modal('show');
+		d3.select('#ct-inpBox').classed('no-disp',!0);
+		
 	}
 	else if(s.attr('id')=='ct-createAction'){
 		flag=20;
-		//alertMsg="Data sent successfully!";
-		//$('#Mindmap_save').modal('show');
-		//alert("Caution! Save data before submitting\nIgnore if already saved.");
+		d3.select('#ct-inpBox').classed('no-disp',!0);
+		
 	}
 	if(flag==0) return;
 	if(s.classed('no-access')) return;
@@ -846,7 +864,10 @@ var actionEvent = function(e){
 	var username = userInfo.username;
 	dataSender({task:'writeMap',data:{write:flag,map:mapData,user_name:username,abc:deletednode,prjId:$('.project-list').val(),relId:$('#ct-assignRel').val(),cycId:$('#ct-assignCyc').val()}},function(err,result){
 		s.classed('no-access',!1);
-		if(err) console.log(result);
+		if(err){
+			openDialogMindmap('Save error','Module names cannot be duplicate');
+			console.log(result);
+		} 
 		else{
 			//alert(alertMsg);
 			var res=JSON.parse(result);

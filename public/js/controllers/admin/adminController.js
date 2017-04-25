@@ -6,6 +6,7 @@ var createprojectObj = {}; var projectDetails = [];var releCycObj;var flag;var p
 var editedProjectDetails = [];
 var deletedProjectDetails = [];
 var newProjectDetails = [];
+var unAssignedProjects = []; var assignedProjects = [];
 mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeout','cfpLoadingBar', function ($scope, $http, adminServices, $timeout, cfpLoadingBar) {
 	$("body").css("background","#eee");
 	$('.dropdown').on('show.bs.dropdown', function(e){
@@ -27,6 +28,114 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 		$(this).children().find('img').addClass('selectedIcon');
 		angular.element(document.getElementById("left-nav-section")).scope().getUserRoles();
 	});
+
+//Assign Projects Tab Click
+	$("#assignProjectTab").on('click',function() {
+		$("img.selectedIcon").removeClass("selectedIcon");
+		$(this).children().find('img').addClass('selectedIcon');
+
+		adminServices.getAllUsers_Nineteen68()
+		.then(function (response) {
+			$("#selAssignUser").empty()
+			$("#selAssignUser").append('<option data-id="" value disabled selected>Select User</option>')
+			for(i=0; i<response.userIds.length && response.user_names.length; i++){
+				$("#selAssignUser").append('<option data-id="'+response.userIds[i]+'" value="'+response.user_names[i]+'">'+response.user_names[i]+'</option>')
+			}
+		}, 
+		function (error) { console.log("Error:::::::::::::", error) })
+
+	$(document).on('change','#selAssignUser', function() {
+		adminServices.getDomains_ICE()
+		.then(function (data) {
+			if (data == "No Records Found") {
+				var domainList = data;
+				$('#selAssignProject').empty();
+				$('#selAssignProject').append($("<option value=''  disabled selected>Please Select Your Domain</option>"));
+				for (var i = 0; i < domainList.length; i++) {
+					$('#selAssignProject').append($("<option value=" + domainList[i].domainId + "></option>").text(domainList[i].domainName));
+				}
+			} else {
+				var domainList = data;
+				$('#selAssignProject').empty();
+				$('#selAssignProject').append($("<option value='' disabled selected>Please Select Your Domain</option>"));
+				for (var i = 0; i < domainList.length; i++) {
+					$('#selAssignProject').append($("<option value=" + domainList[i].domainId + "></option>").text(domainList[i].domainName));
+				}
+			}
+		}, function (error) { console.log("Error:::::::::::::", error) })
+	});
+
+	$(document).on('change','#selAssignProject', function() {
+
+			var domainId = $("#selAssignProject option:selected").val();
+			var requestedids = [domainId];
+			var domains = [];
+			domains.push(domainId);
+			//console.log("Domain", domains);
+			//var requestedids = domains.push(domainId);
+			var idtype=["domaindetails"];
+			adminServices.getDetails_ICE(idtype,requestedids)
+			.then(function (response) {
+			  $('#allProjectAP,#assignedProjectAP').empty();
+			  	if(response.projectIds.length > 0)
+				  {
+						for(var i=0;i<response.projectIds.length;i++)
+						{
+							$('#allProjectAP').append($("<option value=" +response.projectIds[i]+ "></option>").text(response.projectNames[i]));
+						}
+				  }
+				else{
+					 $('#allProjectAP,#assignedProjectAP').empty();
+				}
+
+			 
+			}, function (error) { console.log("Error:::::::::::::", error) })
+	});
+});
+
+//Assign Projects Button Click
+$scope.assignProjects = function() {
+$("#selAssignUser,#selAssignProject").removeClass("selectErrorBorder").css('border','1px solid #909090 !important');
+if($('#selAssignUser option:selected').val() == "") {
+			$("#selAssignUser").css('border','').addClass("selectErrorBorder");
+			return false;
+		}
+else if($('#selAssignProject option:selected').val() == "") {
+	$("#selAssignProject").css('border','').addClass("selectErrorBorder");
+	return false;
+}
+
+$("#allProjectAP option").each(function() {
+	var unassignedProj = {};
+	debugger;
+	unassignedProj.projectId = $(this).val();
+	unassignedProj.projectName = $(this).text();
+	unAssignedProjects.push(unassignedProj);
+});
+
+
+$("#assignedProjectAP option").each(function() {
+	var assignedProj = {};
+	debugger;
+	assignedProj.projectId = $(this).val();
+	assignedProj.projectName = $(this).text();
+	assignedProjects.push(assignedProj);
+});
+var domainId = $('#selAssignProject option:selected').val();
+var userDetails = JSON.parse(window.localStorage['_UI']);
+
+
+var assignProjectsObj = {};
+assignProjectsObj.domainId = domainId;
+assignProjectsObj.userInfo = userDetails;
+assignProjectsObj.unAssignedProjects = unAssignedProjects;
+assignProjectsObj.assignedProjects = assignedProjects;
+
+console.log(assignProjectsObj);
+
+
+};
+
 
 	$("#projectTab").on('click',function() {
 		projectDetails = [];
@@ -1514,5 +1623,31 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 		deletedProjectDetails = [];
 		editedProjectDetails = [];		
 	}
+		//Special character validation 
+	function moveItems(origin, dest) {
+		$(origin).find(':selected').appendTo(dest);
+	}
+
+	function moveAllItems(origin, dest) {
+		$(origin).children().appendTo(dest);
+	}
+    
+    $scope.leftgo = function (to,from) {
+        moveItems(to,from);
+    }
+     
+    $scope.rightgo = function (from,to) {
+        moveItems(from,to);
+    }
+    
+    $scope.leftall = function (to,from) {
+        moveAllItems(to,from);
+    }
+     
+    $scope.rightall = function (from,to) {
+        moveAllItems(from,to);
+    }
 }]);
 
+
+    
