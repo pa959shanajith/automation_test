@@ -163,7 +163,14 @@ function next_function(resultobj,cb,data){
 										task_json.screenName=data.screenname;
 										task_json.scenarioName=data.scenarioname;
 										task_json.testCaseName=data.testcasename;
-										taskDetails.taskName=t.task+' '+data.testcasename;
+										if(t.task=='Design' || t.task=='Update' ){
+											taskDetails.taskName=t.task+' '+data.testcasename;
+										}else if(t.task=='Execute'){
+											taskDetails.taskName=t.task+' '+data.modulename;
+										}else{
+											taskDetails.taskName=t.task+' '+data.screenname;
+										}
+									
 										//task_json.assignedTestScenarioIds=data.assignedTestScenarioIds;
 										task_json.taskDetails.push(taskDetails);
 										user_task_json.push(task_json);
