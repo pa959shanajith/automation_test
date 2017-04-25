@@ -843,7 +843,7 @@ var actionEvent = function(e){
 	var error=!1,mapData=[],flag=0,alertMsg;
 	error=treeIterator(mapData,dNodes[0],error);
 	if(error){
-		openDialogMindmap("Error", "Mindmap flow must be complete!<br />Modules -> Scenarios -> Screens -> Testcases")
+		openDialogMindmap("Error", "Mindmap flow must be complete! Modules -> Scenarios -> Screens -> Testcases")
 		//$('#Mindmap_error').modal('show');
 		return;
 	}
