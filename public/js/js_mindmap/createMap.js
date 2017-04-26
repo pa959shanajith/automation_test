@@ -934,6 +934,8 @@ if(flag==20){
 					if (res[tc.id_n]!='null'){
 						tc.id_c=res[tc.id_n];
 					}
+				console.log(allMMaps);
+				console.log(dNodes);
 				});
 		});
 	});
