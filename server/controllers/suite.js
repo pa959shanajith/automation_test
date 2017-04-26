@@ -709,19 +709,20 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 						//var updatetestsuitefrommodule = "UPDATE testsuites SET testscenarioids = ["+testscenarioids+"] WHERE testsuiteid="+requiredtestsuiteid+" and cycleid="+requiredcycleid+" and testsuitename='"+requiredtestsuitename+"' and versionnumber="+requiredversionnumber;
 						var jsondata = {"testsuiteid":requiredtestsuiteid,"testscenarioid":testscenarioids,"cycleid":requiredcycleid,"testsuitename":requiredtestsuitename,"versionnumber":requiredversionnumber,"testscenarioids":testscenarioids}
 						try{
-					
+							
 							updatescenariodetailsinsuite(jsondata,function(err,data){
 								if(err){
 									cb(null,flag);
+									
 								}else{
-
+									callback(); 
 								}
 							});
 						}catch(ex){
 							console.log("Exception occured in the udating scenarios",ex);
 						}
 					}
-					callback(); 
+					//callback(); 
 					
 				//}, callback);
 
@@ -759,7 +760,7 @@ function updatescenariodetailsinsuite(req,cb,data){
 		},
 		validatedata: function(simplecallback){
 			var scenarioidstocheck = suiterowdetails.testscenarioids;
-			var verifyscenarioid = req.testscenarioids;
+			var verifyscenarioid = req.testscenarioid;
 			var getparampath = suiterowdetails.getparampaths;
 			var conditioncheck = suiterowdetails.conditioncheck;
 			var donotexecute = suiterowdetails.donotexecute;
@@ -794,13 +795,15 @@ function updatescenariodetailsinsuite(req,cb,data){
 
 		},
 		updatescenarioinnsuite:function(simplecallback){
-			var updatetestsuitefrommodule = "UPDATE testsuites SET testscenarioids = ["+req.testscenarioid+"], conditioncheck=["+conditioncheck1+"] ,getparampaths=["+getparampath1+"], donotexecute=["+donotexecute1+"] WHERE testsuiteid="+req.testsuiteid+" and cycleid="+req.cycleid+" and testsuitename='"+req.testsuitename+"' and versionnumber="+req.versionnumber;
+			
+			var updatetestsuitefrommodule = "UPDATE testsuites SET testscenarioids = ["+req.testscenarioids+"], conditioncheck=["+conditioncheck1+"] ,getparampaths=["+getparampath1+"], donotexecute=["+donotexecute1+"] WHERE testsuiteid="+req.testsuiteid+" and cycleid="+req.cycleid+" and testsuitename='"+req.testsuitename+"' and versionnumber="+req.versionnumber;
 				dbConnICE.execute(updatetestsuitefrommodule, function(err, answers) {
 					if(err){
 						cb(null,err);
 					}else{
 						
 					}
+					//data=answers;
 					simplecallback(null,answers);
 				});						
 
@@ -811,7 +814,7 @@ function updatescenariodetailsinsuite(req,cb,data){
 			console.log(err);
 			cb(null,err);
 		}else{
-			cb(null,data);
+			cb(null,'Successsssssss');
 		}
 	})
 
