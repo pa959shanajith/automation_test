@@ -311,8 +311,7 @@ router.post('/', function(req, res, next) {
 								else e.pid_n=null;
 							}
 						});
-						var userid='';
-						var obj={'userid':userid,'urlData':urlData,'prjId':prjId};
+						
 					
 						res.status(status).send(nData[rIndex]);
 					}
@@ -530,7 +529,7 @@ var parsing = function(d,urlData) {
 						//console.log('testcaseId_json',testcaseId_c_json);
 						if(screenId_C_neo == 'null' || screenId_C_neo == undefined){
 							qList_new.push({"statement":"MATCH (a:TESTCASES) WHERE a.testCaseName='"+testcaseName_json+"' and a.screenID='"+screenId_json+"' SET a.screenID_c='"+screenId_c_json+"'"});
-							qList_new.push({"statement":"MATCH (a:TESTCASES) WHERE a.testCaseName='"+testcaseName_json+"' and a.screenId_c='"+screenId_c_json+"' SET a.testCaseID_c='"+testcaseId_c_json+"'"});
+							qList_new.push({"statement":"MATCH (a:TESTCASES) WHERE a.testCaseName='"+testcaseName_json+"' and a.screenID_c='"+screenId_c_json+"' SET a.testCaseID_c='"+testcaseId_c_json+"'"});
 						}else{
 							qList_new.push({"statement":"MATCH (a:TESTCASES) WHERE a.testCaseName='"+testcaseName_json+"' and a.screenID_c='"+screenId_c_json+"' SET a.testCaseID_c='"+testcaseId_c_json+"'"});
 						}
