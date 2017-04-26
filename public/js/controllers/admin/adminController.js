@@ -335,7 +335,6 @@ console.log(assignProjectsObj);
 	$scope.create_project = function () {
 		$("#selDomain").removeClass("selectErrorBorder");
 		$("#projectName").removeClass("inputErrorBorder");
-
 		if($('#selDomain option:selected').val() == "")
 		{
 			$("#selDomain").addClass("selectErrorBorder");
@@ -424,7 +423,6 @@ console.log(assignProjectsObj);
 				}, function (error) { console.log("Error:::::::::::::", error) })
 			}
 		}
-
 	};
 
 	//Update Project Action
@@ -611,7 +609,6 @@ console.log(assignProjectsObj);
 				e.stopImmediatePropagation();
 			}
 		})
-
 	});
 
 	$(document).on('click',"#releaseList li",function() {
@@ -785,7 +782,6 @@ console.log(assignProjectsObj);
 					{
 						for(var i=0;i<projectDetails.length;i++)
 						{
-
 							if(projectDetails[i].releaseName == releaseName && 'cycleNames' in projectDetails[i])
 							{
 								for(var j=0;j<projectDetails[i].cycleNames.length;j++)
@@ -973,7 +969,7 @@ console.log(assignProjectsObj);
 				var goahead = false;
 				if(taskName == "Create Project")
 				{
-					if($("#cycleList").find(".updateCycle").length > 0){
+					if($("#cycleList").length > 0){
 						openModelPopup("Delete Release", "Release contains cycles. Cannot delete");
 					}
 					else{
@@ -986,13 +982,11 @@ console.log(assignProjectsObj);
 									for (var j=0;j<projectDetails[i].cycleNames.length;j++)
 									{
 										$("#cycleList li").each(function() {
-
 											if(projectDetails[i].cycleNames[j] == $(this).children("span.cycleName").text())
 											{
 												$(this).remove();
 											}
 										})
-
 									}
 								}
 								delete projectDetails[i];
@@ -1065,106 +1059,141 @@ console.log(assignProjectsObj);
 	var editCycId;
 	//Edit Cycle Name Functionality
 	$(document).on("click", "[id^=editCycleName_]", function(e){
-		/*if($(this).hasClass("editedCycle") == true){
-			openModelPopup("Edit Cycle Name", "Cycle Name already edited");
-		}
-		else{*/
+		$("#editCycleNameModal").modal("show");
+		var existingCycleName = $(this).parents("li").children(".cycleName").text()
+		$("#cycleName").val(existingCycleName)
+		editCycleId = e.target.id;
+		editCycId = e.target.parentElement.previousSibling.dataset.cycleid;
+		if(e.target.id != "cycleName")
+		{
 			$("#editCycleNameModal").modal("show");
-			var existingCycleName = $(this).parents("li").children(".cycleName").text()
-			$("#cycleName").val(existingCycleName)
-			editCycleId = e.target.id;
-			editCycId = e.target.parentElement.previousSibling.dataset.cycleid;
-			if(e.target.id != "cycleName")
-			{
-				$("#editCycleNameModal").modal("show");
-				$("#cycleName").removeClass("inputErrorBorder");
-				/*$('#editCycleNameModal').on('shown.bs.modal', function () {
+			$("#cycleName").removeClass("inputErrorBorder");
+			/*$('#editCycleNameModal').on('shown.bs.modal', function () {
 					$('#cycleName').focus();
 				});*/
-				var existingCycleName = $(this).parents("li").children(".cycleName").text()
-				cycleName = $("#cycleName").val(existingCycleName);
-				$('#cycleName').focus();
-				//Edit cycle name save button
-				$("#updateCycleName").on('click', function(event) {
-					if($("#cycleName").val() == "")
-					{
-						$("#cycleName").addClass('inputErrorBorder');
-						return false;
+			var existingCycleName = $(this).parents("li").children(".cycleName").text()
+			cycleName = $("#cycleName").val(existingCycleName);
+			$('#cycleName').focus();
+			//Edit cycle name save button
+			$("#updateCycleName").on('click', function(event) {
+				if($("#cycleName").val() == "")
+				{
+					$("#cycleName").addClass('inputErrorBorder');
+					return false;
+				}
+				else{
+					var relID = $("li.active").children('span.releaseName').data("releaseid");
+					for(i=0; i<updateProjectDetails.length; i++){
+						if(relID == updateProjectDetails[i].releaseId){
+							for(j=0; j<updateProjectDetails[i].cycleDetails.length; j++){
+								if($("#cycleName").val().trim() == updateProjectDetails[i].cycleDetails[j].cycleName){
+									$(".close:visible").trigger('click');
+									openModelPopup("Edit Cycle Name", "Cycle Name already exists");
+									return false;
+								}
+							}
+							break;
+						}
 					}
-					else{
-						var relID = $("li.active").children('span.releaseName').data("releaseid");
-						for(i=0; i<updateProjectDetails.length; i++){
-							if(relID == updateProjectDetails[i].releaseId){
-								for(j=0; j<updateProjectDetails[i].cycleDetails.length; j++){
-									if($("#cycleName").val().trim() == updateProjectDetails[i].cycleDetails[j].cycleName){
-										$(".close:visible").trigger('click');
-										openModelPopup("Edit Cycle Name", "Cycle Name already exists");
-										return false;
-									}
-								}
-								break;
-							}
-						}
-						$("#cycleName").removeClass('inputErrorBorder');
-						cycleName = $("#cycleName").val();
+					$("#cycleName").removeClass('inputErrorBorder');
+					cycleName = $("#cycleName").val();
 
-						$(".close:visible").trigger('click');
-						taskName = $("#page-taskName").children("span").text();
-						if(taskName == "Create Project")
+					$(".close:visible").trigger('click');
+					taskName = $("#page-taskName").children("span").text();
+					if(taskName == "Create Project")
+					{
+						$("#"+editCycleId).parent().prev('span').text($("#cycleName").val());
+						var cycleIndex = '';
+						cycleIndex = $('li.cycleList').index();
+						for(var i=0;i<projectDetails.length;i++)
 						{
-							$("#"+editCycleId).parent().prev('span').text($("#cycleName").val());
-							var cycleIndex = '';
-							cycleIndex = $('li.cycleList').index();
-							for(var i=0;i<projectDetails.length;i++)
+							if(projectDetails[i].releaseName == $("li.active").children('span.releaseName').text())
 							{
-								if(projectDetails[i].releaseName == $("li.active").children('span.releaseName').text())
+								for(var j=0;j<projectDetails[i].cycleNames.length;j++)
 								{
-									for(var j=0;j<projectDetails[i].cycleNames.length;j++)
+									if(j == cycleIndex)
 									{
-										if(j == cycleIndex)
-										{
-											projectDetails[i].cycleNames[j] = $("#cycleName").val();
-										}
+										projectDetails[i].cycleNames[j] = $("#cycleName").val();
 									}
 								}
 							}
 						}
-						else if(taskName == "Update Project")
+					}
+					else if(taskName == "Update Project")
+					{
+						var oldCycText = $("#"+editCycleId).parent().prev('span').text();
+						$("#"+editCycleId).parent().prev('span').text($("#cycleName").val());
+						var cycleIndex = '';
+						cycleIndex = $('li.cycleList').index();
+						for(var i=0;i<updateProjectDetails.length;i++)
 						{
-							var oldCycText = $("#"+editCycleId).parent().prev('span').text();
-							$("#"+editCycleId).parent().prev('span').text($("#cycleName").val());
-							var cycleIndex = '';
-							cycleIndex = $('li.cycleList').index();
-							for(var i=0;i<updateProjectDetails.length;i++)
+							if(updateProjectDetails[i].releaseName == $("li.active").children('span.releaseName').text())
 							{
-								if(updateProjectDetails[i].releaseName == $("li.active").children('span.releaseName').text())
+								for(var j=0;j<updateProjectDetails[i].cycleDetails.length;j++)
 								{
-									for(var j=0;j<updateProjectDetails[i].cycleDetails.length;j++)
+									var objectType = typeof(updateProjectDetails[i].cycleDetails[j]);
+									if(objectType == "object" && j == cycleIndex && (updateProjectDetails[i].releaseName == $("li.active").children('span.releaseName').text()) && (updateProjectDetails[i].cycleDetails[j].cycleId == editCycId))
 									{
-										var objectType = typeof(updateProjectDetails[i].cycleDetails[j]);
-										if(objectType == "object" && j == cycleIndex && (updateProjectDetails[i].releaseName == $("li.active").children('span.releaseName').text()) && (updateProjectDetails[i].cycleDetails[j].cycleId == editCycId))
-										{
-											var editRelCyc = {
+										var editRelCyc = {
 												"releaseId": "",
-											    "releaseName": "",
-											    "oldreleaseName" :"",
-											    "cycleDetails": [],
-											    "editStatus": false
+												"releaseName": "",
+												"oldreleaseName" :"",
+												"cycleDetails": [],
+												"editStatus": false
+										}
+										var editCycle = {
+												"oldCycleName": "",
+												"cycleName": "",
+												"cycleId": "",
+												"editStatus":  false
+										}
+										//console.log("objectType", typeof(updateProjectDetails[i].cycleDetails[j]))
+										updateProjectDetails[i].cycleDetails[j].cycleName = $("#cycleName").val();
+
+										//For update project json
+										if(editedProjectDetails.length <= 0){
+											//building release details
+											editRelCyc.releaseId = relID;//updateProjectDetails[i].releaseId;
+											editRelCyc.releaseName = $("li.active").children('span.releaseName').text();//updateProjectDetails[i].releaseName;												
+											//building cycle details with release
+											editCycle.oldCycleName = oldCycText;
+											editCycle.cycleName = $("#cycleName").val();//updateProjectDetails[i].cycleDetails[j].cycleName;
+											editCycle.cycleId = editCycId;//updateProjectDetails[i].cycleDetails[j].cycleId;
+											editCycle.editStatus = true;
+											editRelCyc.cycleDetails.push(editCycle)
+											//pushing all data to an array
+											editedProjectDetails.push(editRelCyc)
+										}
+										else {
+											var chkRelPresent = true;
+											for(m=0; m<editedProjectDetails.length; m++){
+												if(editedProjectDetails[m].releaseId == relID/*updateProjectDetails[i].releaseId*/){
+													var chkcycinrel = true;
+													for(n=0; n<editedProjectDetails[m].cycleDetails.length; n++){
+														if(editedProjectDetails[m].cycleDetails[n].cycleId == editCycId/*updateProjectDetails[i].cycleDetails[j].cycleId*/){
+															editedProjectDetails[m].cycleDetails[n].cycleName = $("#cycleName").val();//updateProjectDetails[i].cycleDetails[j].cycleName;
+															editedProjectDetails[m].cycleDetails[n].oldCycleName = oldCycText;
+															editedProjectDetails[m].cycleDetails[n].editStatus = true;
+															chkcycinrel = false;
+															break;
+														}
+													}
+													if(chkcycinrel == true){
+														//building cycle details with release
+														editCycle.oldCycleName = oldCycText;
+														editCycle.cycleName = $("#cycleName").val();//updateProjectDetails[i].cycleDetails[j].cycleName;
+														editCycle.cycleId = editCycId;//updateProjectDetails[i].cycleDetails[j].cycleId;
+														editCycle.editStatus = true;
+														editedProjectDetails[m].cycleDetails.push(editCycle);
+														break;															
+													}
+													chkRelPresent = false;
+												}
 											}
-											var editCycle = {
-											    "oldCycleName": "",
-											    "cycleName": "",
-											    "cycleId": "",
-											    "editStatus":  false
-											}
-											//console.log("objectType", typeof(updateProjectDetails[i].cycleDetails[j]))
-											updateProjectDetails[i].cycleDetails[j].cycleName = $("#cycleName").val();
-											
-											//For update project json
-											if(editedProjectDetails.length <= 0){
+											if(chkRelPresent == true){
 												//building release details
 												editRelCyc.releaseId = relID;//updateProjectDetails[i].releaseId;
-												editRelCyc.releaseName = $("li.active").children('span.releaseName').text();//updateProjectDetails[i].releaseName;												
+												editRelCyc.releaseName = $("li.active").children('span.releaseName').text();//updateProjectDetails[i].releaseName;
 												//building cycle details with release
 												editCycle.oldCycleName = oldCycText;
 												editCycle.cycleName = $("#cycleName").val();//updateProjectDetails[i].cycleDetails[j].cycleName;
@@ -1174,133 +1203,124 @@ console.log(assignProjectsObj);
 												//pushing all data to an array
 												editedProjectDetails.push(editRelCyc)
 											}
-											else {
-												var chkRelPresent = true;
-												for(m=0; m<editedProjectDetails.length; m++){
-													if(editedProjectDetails[m].releaseId == relID/*updateProjectDetails[i].releaseId*/){
-														var chkcycinrel = true;
-														for(n=0; n<editedProjectDetails[m].cycleDetails.length; n++){
-															if(editedProjectDetails[m].cycleDetails[n].cycleId == editCycId/*updateProjectDetails[i].cycleDetails[j].cycleId*/){
-																editedProjectDetails[m].cycleDetails[n].cycleName = $("#cycleName").val();//updateProjectDetails[i].cycleDetails[j].cycleName;
-																editedProjectDetails[m].cycleDetails[n].oldCycleName = oldCycText;
-																editedProjectDetails[m].cycleDetails[n].editStatus = true;
-																chkcycinrel = false;
-																break;
-															}
-														}
-														if(chkcycinrel == true){
-															//building cycle details with release
-															editCycle.oldCycleName = oldCycText;
-															editCycle.cycleName = $("#cycleName").val();//updateProjectDetails[i].cycleDetails[j].cycleName;
-															editCycle.cycleId = editCycId;//updateProjectDetails[i].cycleDetails[j].cycleId;
-															editCycle.editStatus = true;
-															editedProjectDetails[m].cycleDetails.push(editCycle);
-															break;															
-														}
-														chkRelPresent = false;
-													}
-												}
-												if(chkRelPresent == true){
-													//building release details
-													editRelCyc.releaseId = relID;//updateProjectDetails[i].releaseId;
-													editRelCyc.releaseName = $("li.active").children('span.releaseName').text();//updateProjectDetails[i].releaseName;
-													//building cycle details with release
-													editCycle.oldCycleName = oldCycText;
-													editCycle.cycleName = $("#cycleName").val();//updateProjectDetails[i].cycleDetails[j].cycleName;
-													editCycle.cycleId = editCycId;//updateProjectDetails[i].cycleDetails[j].cycleId;
-													editCycle.editStatus = true;
-													editRelCyc.cycleDetails.push(editCycle)
-													//pushing all data to an array
-													editedProjectDetails.push(editRelCyc)
-												}
-											}
-											break;
 										}
-										//For update project json									
-										if(objectType == "string" && j == cycleIndex){
-											updateProjectDetails[i].cycleDetails[j] =  $("#cycleName").val();
-										}											
+										break;
 									}
+									//For update project json									
+									if(objectType == "string" && j == cycleIndex){
+										updateProjectDetails[i].cycleDetails[j] =  $("#cycleName").val();
+									}											
 								}
 							}
 						}
-						//$("#"+editCycleId).addClass("editedCycle");
-						//$("#"+editCycleId).siblings(".deleteCycle").addClass("editedCycle");
-						event.stopImmediatePropagation();
-						$("#"+event.target.id).unbind('click');
 					}
-				});
-			}
-		//}
+					//$("#"+editCycleId).addClass("editedCycle");
+					//$("#"+editCycleId).siblings(".deleteCycle").addClass("editedCycle");
+					event.stopImmediatePropagation();
+					$("#"+event.target.id).unbind('click');
+				}
+			});
+		}
 	});
 
 	var cycId;
 	//Delete Cycle Functionality
 	$(document).on("click", "[id^=deleteCycleName_]", function(e){
-		/*if($(this).hasClass("editedCycle")){
-			openModelPopup("Delete Cycle", "Cycle is edited. Cannot delete");
-		}
-		else{*/
-			$("#deleteCycleModal").modal("show");
-			deleteCycleId = e.target.id;
-			var cycName = $(this).parent().siblings(".cycleName").text();
-			cycId = $(this).parent().siblings(".cycleName").attr("data-cycleid");
-			$("#deleteCycleYes").on('click',function(event) {
-				var CycleID = [];
-				CycleID.push(cycId);
-				$("#deleteCycleModal").modal("hide");
-				//console.log(projectDetails);
-				taskName = $("#page-taskName").children("span").text();
-				var goahead = false;
-				if(taskName == "Create Project")
+		$("#deleteCycleModal").modal("show");
+		deleteCycleId = e.target.id;
+		var cycName = $(this).parent().siblings(".cycleName").text();
+		cycId = $(this).parent().siblings(".cycleName").attr("data-cycleid");
+		$("#deleteCycleYes").on('click',function(event) {
+			var CycleID = [];
+			CycleID.push(cycId);
+			$("#deleteCycleModal").modal("hide");
+			//console.log(projectDetails);
+			taskName = $("#page-taskName").children("span").text();
+			var goahead = false;
+			if(taskName == "Create Project")
+			{
+				for(var i=0;i<projectDetails.length;i++)
 				{
-					for(var i=0;i<projectDetails.length;i++)
+					for(var j=0;j<projectDetails[i].cycleNames.length;j++)
 					{
-						for(var j=0;j<projectDetails[i].cycleNames.length;j++)
+						if(projectDetails[i].cycleNames[j] == $("#"+deleteCycleId).parent().prev('span.cycleName').text())
 						{
-							if(projectDetails[i].cycleNames[j] == $("#"+deleteCycleId).parent().prev('span.cycleName').text())
-							{
-								delete projectDetails[i].cycleNames[j];
-								projectDetails[i].cycleNames =  projectDetails[i].cycleNames.filter(function(n){ return n != null });
-								goahead = true;
-							}
+							delete projectDetails[i].cycleNames[j];
+							projectDetails[i].cycleNames =  projectDetails[i].cycleNames.filter(function(n){ return n != null });
+							goahead = true;
 						}
 					}
 				}
-				else if(taskName == "Update Project")
-				{
-					var idtype=["cycledetails"];
-					adminServices.getDetails_ICE(idtype,CycleID)
-					.then(function (response) {
-						if(response.testsuiteIds.length > 0){
-							goahead = false;
-							openModelPopup("Delete Cycle", "Cycle contains Test suites. Cannot delete");
-						}
-						else{
-							for(var i=0;i<updateProjectDetails.length;i++)
+			}
+			else if(taskName == "Update Project")
+			{
+				var idtype=["cycledetails"];
+				adminServices.getDetails_ICE(idtype,CycleID)
+				.then(function (response) {
+					if(response.testsuiteIds.length > 0){
+						goahead = false;
+						openModelPopup("Delete Cycle", "Cycle contains Test suites. Cannot delete");
+					}
+					else{
+						for(var i=0;i<updateProjectDetails.length;i++)
+						{
+							if(updateProjectDetails[i].releaseName == $("li.active").children("span.releaseName").text())
 							{
-								if(updateProjectDetails[i].releaseName == $("li.active").children("span.releaseName").text())
+								for(var j=0;j<updateProjectDetails[i].cycleDetails.length;j++)
 								{
-									for(var j=0;j<updateProjectDetails[i].cycleDetails.length;j++)
+									var objectType = typeof(updateProjectDetails[i].cycleDetails[j]);
+									if( objectType == 'object')
 									{
-										var objectType = typeof(updateProjectDetails[i].cycleDetails[j]);
-										if( objectType == 'object')
+										if(updateProjectDetails[i].cycleDetails[j].cycleName == $("#"+deleteCycleId).parent().prev('span.cycleName').text())
 										{
-											if(updateProjectDetails[i].cycleDetails[j].cycleName == $("#"+deleteCycleId).parent().prev('span.cycleName').text())
-											{
-												var deleteRelCyc = {
+											var deleteRelCyc = {
 													"releaseName": "",
 													"releaseId": "",
 													"cycleDetails": [],
 													"deleteStatus": false
-												}
-												var deleteCycle = {
+											}
+											var deleteCycle = {
 													"cycleName": "",
 													"cycleId": "",
 													"deleteStatus": false
+											}
+											//For update project json
+											if(deletedProjectDetails.length <= 0){
+												//adding release object
+												deleteRelCyc.releaseName = $("li.active").children("span.releaseName").text();//updateProjectDetails[i].releaseName;
+												deleteRelCyc.releaseId = $("li.active").children("span.releaseName").data("releaseid");//updateProjectDetails[i].releaseId;
+												deleteRelCyc.deleteStatus = false;
+												//adding cycle object within release
+												deleteCycle.cycleName = $("#"+deleteCycleId).parent().prev('span.cycleName').text();//updateProjectDetails[i].cycleDetails[j].cycleName;
+												deleteCycle.cycleId = cycId;//updateProjectDetails[i].cycleDetails[j].cycleId;
+												deleteCycle.deleteStatus = true;
+												deleteRelCyc.cycleDetails.push(deleteCycle);
+												//pushing all to object
+												deletedProjectDetails.push(deleteRelCyc);
+											}
+											else{
+												var chk = true;
+												for(k=0; k<deletedProjectDetails.length; k++){
+													if(deletedProjectDetails[k].releaseId == $("li.active").children("span.releaseName").data("releaseid")/*updateProjectDetails[i].releaseId*/){
+														var chkCycInRel = true;
+														for(l=0; l<deletedProjectDetails[k].cycleDetails.length; l++){
+															if(deletedProjectDetails[k].cycleDetails[l].cycleId == cycId/*updateProjectDetails[i].cycleDetails[j].cycleId*/){
+																deletedProjectDetails[k].cycleDetails[l].cycleName = $("#"+deleteCycleId).parent().prev('span.cycleName').text();//updateProjectDetails[i].cycleDetails[j].cycleName;
+																deletedProjectDetails[k].cycleDetails[l].deleteStatus = true;
+																chkCycInRel = false;
+																break;
+															}
+														}
+														if(chkCycInRel == true){
+															deleteCycle.cycleName = $("#"+deleteCycleId).parent().prev('span.cycleName').text();//updateProjectDetails[i].cycleDetails[j].cycleName;
+															deleteCycle.cycleId = cycId;//updateProjectDetails[i].cycleDetails[j].cycleId;
+															deleteCycle.deleteStatus = true;
+															deletedProjectDetails[k].cycleDetails.push(deleteCycle)															
+														}
+														chk = false;
+													}
 												}
-												//For update project json
-												if(deletedProjectDetails.length <= 0){
+												if(chk == true){
 													//adding release object
 													deleteRelCyc.releaseName = $("li.active").children("span.releaseName").text();//updateProjectDetails[i].releaseName;
 													deleteRelCyc.releaseId = $("li.active").children("span.releaseName").data("releaseid");//updateProjectDetails[i].releaseId;
@@ -1313,70 +1333,34 @@ console.log(assignProjectsObj);
 													//pushing all to object
 													deletedProjectDetails.push(deleteRelCyc);
 												}
-												else{
-													var chk = true;
-													for(k=0; k<deletedProjectDetails.length; k++){
-														if(deletedProjectDetails[k].releaseId == $("li.active").children("span.releaseName").data("releaseid")/*updateProjectDetails[i].releaseId*/){
-															var chkCycInRel = true;
-															for(l=0; l<deletedProjectDetails[k].cycleDetails.length; l++){
-																if(deletedProjectDetails[k].cycleDetails[l].cycleId == cycId/*updateProjectDetails[i].cycleDetails[j].cycleId*/){
-																	deletedProjectDetails[k].cycleDetails[l].cycleName = $("#"+deleteCycleId).parent().prev('span.cycleName').text();//updateProjectDetails[i].cycleDetails[j].cycleName;
-																	deletedProjectDetails[k].cycleDetails[l].deleteStatus = true;
-																	chkCycInRel = false;
-																	break;
-																}
-															}
-															if(chkCycInRel == true){
-																deleteCycle.cycleName = $("#"+deleteCycleId).parent().prev('span.cycleName').text();//updateProjectDetails[i].cycleDetails[j].cycleName;
-																deleteCycle.cycleId = cycId;//updateProjectDetails[i].cycleDetails[j].cycleId;
-																deleteCycle.deleteStatus = true;
-																deletedProjectDetails[k].cycleDetails.push(deleteCycle)															
-															}
-															chk = false;
-														}
-													}
-													if(chk == true){
-														//adding release object
-														deleteRelCyc.releaseName = $("li.active").children("span.releaseName").text();//updateProjectDetails[i].releaseName;
-														deleteRelCyc.releaseId = $("li.active").children("span.releaseName").data("releaseid");//updateProjectDetails[i].releaseId;
-														deleteRelCyc.deleteStatus = false;
-														//adding cycle object within release
-														deleteCycle.cycleName = $("#"+deleteCycleId).parent().prev('span.cycleName').text();//updateProjectDetails[i].cycleDetails[j].cycleName;
-														deleteCycle.cycleId = cycId;//updateProjectDetails[i].cycleDetails[j].cycleId;
-														deleteCycle.deleteStatus = true;
-														deleteRelCyc.cycleDetails.push(deleteCycle);
-														//pushing all to object
-														deletedProjectDetails.push(deleteRelCyc);
-													}
-												}
-												//For update project json											
-												delete updateProjectDetails[i].cycleDetails[j];
-												updateProjectDetails[i].cycleDetails =  updateProjectDetails[i].cycleDetails.filter(function(n){ return n != null });
 											}
+											//For update project json											
+											delete updateProjectDetails[i].cycleDetails[j];
+											updateProjectDetails[i].cycleDetails =  updateProjectDetails[i].cycleDetails.filter(function(n){ return n != null });
 										}
-										else if(objectType == 'string')
+									}
+									else if(objectType == 'string')
+									{
+										if(updateProjectDetails[i].cycleDetails[j] == $("#"+deleteCycleId).parent().prev('span.cycleName').text())
 										{
-											if(updateProjectDetails[i].cycleDetails[j] == $("#"+deleteCycleId).parent().prev('span.cycleName').text())
-											{
-												delete updateProjectDetails[i].cycleDetails[j];
-												updateProjectDetails[i].cycleDetails =  updateProjectDetails[i].cycleDetails.filter(function(n){ return n != null });
-											}
+											delete updateProjectDetails[i].cycleDetails[j];
+											updateProjectDetails[i].cycleDetails =  updateProjectDetails[i].cycleDetails.filter(function(n){ return n != null });
 										}
 									}
 								}
 							}
-							goahead = true;
 						}
-						if(goahead == true){
-							$("#"+deleteCycleId).parent().parent("li").remove();
-							openModelPopup("Delete Cycle", "Cycle deleted successfully");
-							toggleCycleClick();				
-						}
-					})
-					event.stopImmediatePropagation();
-				}
-			})
-		//}
+						goahead = true;
+					}
+				})
+				event.stopImmediatePropagation();
+			}
+			if(goahead == true){
+				$("#"+deleteCycleId).parent().parent("li").remove();
+				openModelPopup("Delete Cycle", "Cycle deleted successfully");
+				toggleCycleClick();				
+			}
+		})
 	})
 
 
@@ -1649,5 +1633,3 @@ console.log(assignProjectsObj);
     }
 }]);
 
-
-    
