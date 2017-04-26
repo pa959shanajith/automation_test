@@ -95,7 +95,14 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 					}
 					if(data.length > 2){
 						$("#dateDESC").show();
-					}				
+					}
+					var dateArray = $('tbody.scrollbar-inner-scenariostatus').children('.scenariostatusreport');
+					dateASC(dateArray);
+			    	$("tbody.scrollbar-inner-scenariostatus").empty();
+			    	for(i=0; i<dateArray.length; i++){
+			    		dateArray[i].firstChild.innerHTML = i+1;
+						$("tbody.scrollbar-inner-scenariostatus").append(dateArray[i]);
+					}
 				}
 				else {
 					tableContainer.find('tbody').empty();
@@ -116,38 +123,70 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 	
 	//Date sorting
     $(document).on('click', '#dateDESC', function(){
-    	$(this).hide();
-    	$('#dateASC').show();
-    	var dateArray = $('tbody.scrollbar-inner-scenariostatus').children('.scenariostatusreport');
-    	dateDESC(dateArray);
-    	$("tbody.scrollbar-inner-scenariostatus").empty();
-    	for(i=0; i<dateArray.length; i++){
-    		dateArray[i].firstChild.innerHTML = i+1;
-			$("tbody.scrollbar-inner-scenariostatus").append(dateArray[i]);
-		}
+    	$(this).hide();    	
+    	var dateArray;
+    	if($(this).parents('table').attr("id") == "testSuitesTimeTable"){
+    		$('#dateASC').show();
+        	dateArray = $('tbody.scrollbar-inner-scenariostatus').children('.scenariostatusreport');
+        	dateDESC(dateArray);
+        	$("tbody.scrollbar-inner-scenariostatus").empty();
+        	for(i=0; i<dateArray.length; i++){
+        		dateArray[i].firstChild.innerHTML = i+1;
+    			$("tbody.scrollbar-inner-scenariostatus").append(dateArray[i]);
+    		}
+    	}
+    	else if($(this).parents('table').attr("id") == "scenarioReportsTable"){
+    		$("#scenarioReportsTable #dateASC").show();
+    		dateArray = $('tbody.scrollbar-inner-scenarioreports').children('tr');
+        	dateDESC(dateArray);
+        	$("tbody.scrollbar-inner-scenarioreports").empty();
+        	for(i=0; i<dateArray.length; i++){
+    			$("tbody.scrollbar-inner-scenarioreports").append(dateArray[i]);
+    		}
+    	}
     })
     $(document).on('click', '#dateASC', function(){
     	$(this).hide();
-    	$('#dateDESC').show();
-    	var dateArray = $('tbody.scrollbar-inner-scenariostatus').children('.scenariostatusreport');
-    	dateASC(dateArray);
-    	$("tbody.scrollbar-inner-scenariostatus").empty();
-    	for(i=0; i<dateArray.length; i++){
-    		dateArray[i].firstChild.innerHTML = i+1;
-			$("tbody.scrollbar-inner-scenariostatus").append(dateArray[i]);
-		}
+    	if($(this).parents('table').attr("id") == "testSuitesTimeTable"){
+        	$('#dateDESC').show();
+        	var dateArray = $('tbody.scrollbar-inner-scenariostatus').children('.scenariostatusreport');
+        	dateASC(dateArray);
+        	$("tbody.scrollbar-inner-scenariostatus").empty();
+        	for(i=0; i<dateArray.length; i++){
+        		dateArray[i].firstChild.innerHTML = i+1;
+    			$("tbody.scrollbar-inner-scenariostatus").append(dateArray[i]);
+    		}    		
+    	}
+    	else if($(this).parents('table').attr("id") == "scenarioReportsTable"){
+    		$("#scenarioReportsTable #dateDESC").show();
+    		var dateArray = $('tbody.scrollbar-inner-scenarioreports').children('tr');
+        	dateASC(dateArray);
+        	$("tbody.scrollbar-inner-scenarioreports").empty();
+        	for(i=0; i<dateArray.length; i++){
+    			$("tbody.scrollbar-inner-scenarioreports").append(dateArray[i]);
+    		}
+    	}
     })
     
     function dateDESC(dateArray){
     	dateArray.sort(function(a,b){
-    		var dateA = a.children.item(1).innerHTML;
-			var timeA = a.children.item(2).innerHTML;
-    		var dateB = b.children.item(1).innerHTML;
-			var timeB = b.children.item(2).innerHTML;
+    		var dateA, timeA, dateB, timeB;
+    		if(a.children.item(1).innerHTML.indexOf("span") === -1){
+    			dateA = a.children.item(1).innerHTML;
+    			timeA = a.children.item(2).innerHTML;
+    			dateB = b.children.item(1).innerHTML;
+    			timeB = b.children.item(2).innerHTML;
+    		}
+    		else{
+    			dateA = a.children.item(1).children.item(0).innerHTML;
+    			timeA = a.children.item(1).children.item(1).innerHTML;
+    			dateB = b.children.item(1).children.item(0).innerHTML;
+    			timeB = b.children.item(1).children.item(1).innerHTML;
+    		}
     		var fDate = dateA.split("-"); var lDate = dateB.split("-");
     		//var fFDate = fDate[0].split("/"); var lLDate = lDate[0].split("/");
-    		var gDate = fDate[1]+"-"+fDate[0]+"-"+fDate[2]//+" "+a.children.item(2).innerHTML;
-    		var mDate = lDate[1]+"-"+lDate[0]+"-"+lDate[2]//+" "+b.children.item(2).innerHTML;
+    		var gDate = fDate[1]+"-"+fDate[0]+"-"+fDate[2];
+    		var mDate = lDate[1]+"-"+lDate[0]+"-"+lDate[2];
     		if ( new Date(gDate+" "+timeA) < new Date(mDate+" "+timeB) )  return -1;
     	    if ( new Date(gDate+" "+timeA) > new Date(mDate+" "+timeB) )  return 1;
     	    return dateArray;
@@ -156,14 +195,23 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
     
     function dateASC(dateArray){
     	dateArray.sort(function(a,b){
-    		var aA = a.children.item(1).innerHTML//.replace("&nbsp;&nbsp;&nbsp;&nbsp;"," ");
-			var timeA = a.children.item(2).innerHTML;
-    		var bB = b.children.item(1).innerHTML//.replace("&nbsp;&nbsp;&nbsp;&nbsp;"," ");
-			var timeB = b.children.item(2).innerHTML;
+    		var aA, timeA, bB, timeB;
+    		if(a.children.item(1).innerHTML.indexOf("span") === -1){
+        		aA = a.children.item(1).innerHTML;
+    			timeA = a.children.item(2).innerHTML;
+        		bB = b.children.item(1).innerHTML;
+    			timeB = b.children.item(2).innerHTML;    			
+    		}
+    		else{
+    			aA = a.children.item(1).children.item(0).innerHTML;
+    			timeA = a.children.item(1).children.item(1).innerHTML;
+        		bB = b.children.item(1).children.item(0).innerHTML;
+    			timeB = b.children.item(1).children.item(1).innerHTML;
+    		}
     		var fDate = aA.split("-"); var lDate = bB.split("-");
     		//var fFDate = fDate[0].split("/"); var lLDate = lDate[0].split("/");
-    		var gDate = fDate[1]+"-"+fDate[0]+"-"+fDate[2]//+" "+a.children.item(2).innerHTML;
-    		var mDate = lDate[1]+"-"+lDate[0]+"-"+lDate[2]//+" "+b.children.item(2).innerHTML;
+    		var gDate = fDate[1]+"-"+fDate[0]+"-"+fDate[2];
+    		var mDate = lDate[1]+"-"+lDate[0]+"-"+lDate[2];
     		if ( new Date(gDate+" "+timeA) > new Date(mDate+" "+timeB) )  return -1;
     	    if ( new Date(gDate+" "+timeA) < new Date(mDate+" "+timeB) )  return 1;
     	    return dateArray;
@@ -184,7 +232,7 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 				var total = data.length;
 				scenarioContainer.find('tbody').empty();
 				var browserIcon, brow="";
-				var styleColor, exeTym, exeTime;
+				var styleColor, exeDate, exeDat, exeTime;
 				for(i=0; i<data.length; i++){
 					if(data[i].browser == "chrome")	browserIcon = "ic-reports-chrome.png";
 					else if(data[i].browser == "firefox")	browserIcon = "ic-reports-firefox.png";
@@ -194,9 +242,21 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 					else if(data[i].status == "Fail"){	fail++;	styleColor="style='color: #b31f2d !important;'";}
 					else if(data[i].status == "Terminate"){	terminated++;	styleColor="style='color: #faa536 !important;'";}
 					else if(data[i].status == "Incomplete"){	incomplete++;	styleColor="style='color: #58595b !important;'";}
-					exeTym = data[i].executedtime.split(" ")[0].split("-");
-					exeTime = ("0" + exeTym[0]).slice(-2) +"-"+ ("0" + exeTym[1]).slice(-2) +"-"+ exeTym[2];
-					scenarioContainer.find('tbody').append("<tr><td title='"+data[i].testscenarioname+"'>"+data[i].testscenarioname+"</td><td><span style='margin-right: 28px;'>"+exeTime+"</span><span>"+data[i].executedtime.split(" ")[1]+"</span></td><td><img alt='-' src='"+brow+"'></td><td class='openReports' data-reportid='"+data[i].reportid+"'><a class='openreportstatuss' "+styleColor+">"+data[i].status+"</a></td><td data-reportid='"+data[i].reportid+"'><img alt='Select format' class='selectFormat' src='imgs/ic-export-json.png' style='cursor: pointer;' title='Select format'></td></tr>");
+					exeDate = data[i].executedtime.split(" ")[0].split("-");
+					exeDat = ("0" + exeDate[0]).slice(-2) +"-"+ ("0" + exeDate[1]).slice(-2) +"-"+ exeDate[2];
+					var fst = data[i].executedtime.split(" ")[1].split(":");
+					exeTime = ("0" + fst[0]).slice(-2) +":"+ ("0" + fst[1]).slice(-2);
+					scenarioContainer.find('tbody').append("<tr><td title='"+data[i].testscenarioname+"'>"+data[i].testscenarioname+"</td><td><span style='margin-right: 28px;'>"+exeDat+"</span><span>"+exeTime+"</span></td><td><img alt='-' src='"+brow+"'></td><td class='openReports' data-reportid='"+data[i].reportid+"'><a class='openreportstatuss' "+styleColor+">"+data[i].status+"</a></td><td data-reportid='"+data[i].reportid+"'><img alt='Select format' class='selectFormat' src='imgs/ic-export-json.png' style='cursor: pointer;' title='Select format'></td></tr>");
+				}
+				if(data.length > 2){
+					$("#scenarioReportsTable #dateDESC").show();
+				}
+				var dateArray = $('tbody.scrollbar-inner-scenarioreports').children('tr');
+				dateASC(dateArray);
+		    	$("tbody.scrollbar-inner-scenarioreports").empty();
+		    	for(i=0; i<dateArray.length; i++){
+		    		//dateArray[i].firstChild.innerHTML = i+1;
+					$("tbody.scrollbar-inner-scenarioreports").append(dateArray[i]);
 				}
 				if(data.length > 0){
 					P = parseFloat((pass/total)*100).toFixed();
