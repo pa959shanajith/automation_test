@@ -1098,23 +1098,9 @@ function openDialogMindmap(title, body){
 		setTimeout(function(){
 			$("#mindmapGlobalDialog").find('.btn-default').focus();					
 		}, 300);
-	}else if(window.location.pathname == '/designTestCase' || window.location.pathname == '/design'){
-		$("#globalModal").find('.modal-title').text(title);
-		$("#globalModal").find('.modal-body p').text(body).css('color','black');
-		$("#globalModal").modal("show");
-		setTimeout(function(){
-			$("#globalModal").find('.btn-default').focus();					
-		}, 300);
-	}
-	else if(window.location.pathname == '/execute'){
-		$("#executeGlobalModal").find('.modal-title').text(title);
-		$("#executeGlobalModal").find('.modal-body p').text(body).css('color','black');
-		$("#executeGlobalModal").modal("show");
-		setTimeout(function(){
-			$("#executeGlobalModal").find('.btn-accept').focus();					
-		}, 300);
+	}else if(window.location.pathname == '/designTestCase' || window.location.pathname == '/design' ||window.location.pathname == '/execute'){
+		$("#globalTaskSubmit").modal("show");
 	}
 	
-
 	
 }
