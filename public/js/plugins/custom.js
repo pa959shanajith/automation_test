@@ -115,6 +115,10 @@ $(document).ready(function() {
 	$(document).on("click", ".slide_assist", function(){
 		$(".assistWrap").fadeIn(100)
 	})
+
+	$(document).on("click", ".globalSubmit", function(){
+		window.location.href = "/plugin";
+	});
 	
 });
 //Document Ready Function

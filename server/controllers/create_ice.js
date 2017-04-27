@@ -342,7 +342,7 @@ exports.createStructure_Nineteen68 = function(req, res) {
                                                             var testcaseidneo = testcaseitr.testcaseId;
                                                             var tasktestcase = testcaseitr.task;
                                                             var screenID_c_neo=testcaseitr.screenID_c;
-                                                            testcase_exists({"testcasename":testcaseName,"testcaseid":testcaseid_c,"pid":projectid},function(err,testcasedata){
+                                                            testcase_exists({"screenId":screenId,"testcasename":testcaseName,"testcaseid":testcaseid_c,"pid":projectid},function(err,testcasedata){
                                                                 if(err){
                                                                     console.log(err)
                                                                 }else{
@@ -548,7 +548,7 @@ function updatetestsuitename(moduledetails,cb,data){
         },
         delete:function(callback){
             if(flagtocheckifexists){
-                var deletequery = "DELETE FROM modules WHERE moduleid="+moduledetails.moduleid+" and modulename='"+suitedatatoupdate.modulename+"' and projectid="+suitedatatoupdate.projectid;
+                var deletequery = "DELETE FROM modules WHERE moduleid="+moduledetails.moduleid+" and modulename='"+suitedatatoupdate.modulename+"' and versionnumber="+suitedatatoupdate.versionnumber+" and projectid="+suitedatatoupdate.projectid;
                 dbConnICE.execute(deletequery,function(err,deleted){
                     if(err) 
                      {
@@ -854,7 +854,7 @@ var screendatatoupdate = [];
         delete:function(callback){
             if(flagtocheckifexists){
                 
-                var deletequery = "DELETE FROM screens WHERE screenid="+testscreendetails.testscreenid+" and screenname='"+screendatatoupdate.screenname+"' and projectid="+screendatatoupdate.projectid;
+                var deletequery = "DELETE FROM screens WHERE screenid="+testscreendetails.testscreenid+" and screenname='"+screendatatoupdate.screenname+"' and versionnumber="+screendatatoupdate.versionnumber+" and projectid="+screendatatoupdate.projectid;
                 dbConnICE.execute(deletequery,function(err,deleted){
                     if(err)  
                     {
@@ -911,7 +911,7 @@ function testcase_exists(testcasedetails,cb,data){
         
         async.series({
             testcasename:function(testcasecallback){
-                var testcaseCheck =  "select testcaseid from testcases where testcasename='"+testcasedetails.testcasename+"' ALLOW FILTERING";
+                var testcaseCheck =  "select testcaseid from testcases where screenid="+testcasedetails.screenId+" and testcasename='"+testcasedetails.testcasename+"' ALLOW FILTERING";
                 dbConnICE.execute(testcaseCheck,function(err,testcaseid){
                     if(err){
                         console.log(err);
@@ -932,7 +932,7 @@ function testcase_exists(testcasedetails,cb,data){
 
             testcasedetails:function(testcasecallback){
                 if(!flagId){
-                    var testcaseCheck =  "select testcaseid from testcases where testcasename='"+testcasedetails.testcasename+"' and testcaseid="+testcasedetails.testcaseid+" ALLOW FILTERING";
+                    var testcaseCheck =  "select testcaseid from testcases where screenid="+testcasedetails.screenId+" and testcasename='"+testcasedetails.testcasename+"' and testcaseid="+testcasedetails.testcaseid+" ALLOW FILTERING";
                     dbConnICE.execute(testcaseCheck,function(err,testcaseid){
                         if(err){
                             console.log(err);
@@ -1007,7 +1007,7 @@ var testcasedatatoupdate = [];
         delete:function(callback){
             if(flagtocheckifexists){
                 
-                var deletequery = "DELETE FROM testcases WHERE testcaseid="+testcasedetails.testcaseid+" and testcasename='"+testcasedatatoupdate.testcasename+"' and screenid="+testcasedatatoupdate.screenid;
+                var deletequery = "DELETE FROM testcases WHERE testcaseid="+testcasedetails.testcaseid+" and testcasename='"+testcasedatatoupdate.testcasename+"' and versionnumber="+testcasedatatoupdate.versionnumber+" and screenid="+testcasedatatoupdate.screenid;
                 dbConnICE.execute(deletequery,function(err,deleted){
                     if(err)  
                      {

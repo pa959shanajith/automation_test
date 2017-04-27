@@ -1144,6 +1144,16 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			blockUI(blockMsg);
 			DesignServices.launchWSDLGo(wsdlUrl)
 			.then(function(data) {
+				if (data == "fail")	{
+					unblockUI();
+					openDialog("WSDL-Scrape Screen", "Invalid WSDL url.");
+					return false
+				}
+				if (data == "unavailableLocalServer")	{
+					unblockUI();
+					openDialog("WSDL-Scrape Screen", "ICE Engine is not available. Please run the batch file and connect to the Server.");
+					return false
+				}
 				console.log(data)
 				$("#wsldSelect").empty().append('<option value selected disabled>Select Operation</option>')
 				for(i=0; i<data.listofoperations.length; i++){
@@ -1171,6 +1181,11 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		else{
 			DesignServices.wsdlAdd(wsdlUrl, wsdlSelectedMethod)
 			.then(function(data) {
+				if (data == "unavailableLocalServer")	{
+					unblockUI();
+					openDialog("WSDL Add-Scrape Screen", "ICE Engine is not available. Please run the batch file and connect to the Server.");
+					return false
+				}
 				if(typeof data === "object"){
 					//Printing the Save data in UI
 					$("#endPointURL").val(data.endPointURL);

@@ -1561,7 +1561,7 @@ exports.debugTestCase_ICE = function (req, res) {
 										
 										if(response.length == 2){
 											responsedata.responseHeader.push(response[0]);
-											responsedata.responseBody.push(response[1]);
+											responsedata.responseBody.push(response[1].replace("&gt;",">").replace("&lt;","<"));
 											try{
 												res.send(responsedata);
 											}catch(exception){
@@ -1616,7 +1616,7 @@ exports.debugTestCase_ICE = function (req, res) {
 									}
 								}else{
 									var responsedata={listofoperations:[]};
-									if(listGenResponse != "fail" && listGenResponse != undefined && listGenResponse != ""){
+									if(listGenResponse != "None" && listGenResponse != "fail" && listGenResponse != undefined && listGenResponse != ""){
 										console.log(listGenResponse);
 										listGenResponse=listGenResponse.replace(/'+/g,"\"");
 										var listGenResponse=JSON.parse(listGenResponse);
@@ -1628,7 +1628,7 @@ exports.debugTestCase_ICE = function (req, res) {
 //										}
 									}else{
 										try{
-											res.send(responsedata);
+											res.send("fail");
 										}catch(exception){
 											console.log(exception);
 										}
@@ -1723,6 +1723,7 @@ exports.debugTestCase_ICE = function (req, res) {
 			}
 		}
 	}catch(exception){
+		res.send("unavailableLocalServer");
 		console.log(exception);
 	}
 };

@@ -48,7 +48,7 @@ exports.readTestSuite_ICE = function (req, res) {
 		if(err){
 			console.log(err);
 		}else{
-			console.log(data);
+			
 			async.series({		
 			testsuitesdata: function(callback){
 			var getTestSuites="select donotexecute,conditioncheck,getparampaths,testscenarioids from testsuites where testsuiteid= "+requiredtestsuiteid+" and cycleid="+requiredcycleid+" and testsuitename='"+requiredtestsuitename+"'";
@@ -636,7 +636,7 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 		});
 	}
 
-	function TestSuiteDetails_Module_ICE(req,cb,data){
+	function TestSuiteDetails_Module_ICE(req,cb1,data){
 //	var requestedtestscenarioid = req;
 	var requiredcycleid = req.cycleid;
 	var requiredtestsuiteid = req.testsuiteid;
@@ -700,28 +700,36 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 						dbConnICE.execute(testsuiteexe, function(err, answers) {
 						if(err){
 							console.log(err);
+							cb1(null,flag);
 						}else{
-							
+							//cb1(null,flag);
+							callback(null,flag);
 						}
+						
 						
 						});
 					}else{
 						//var updatetestsuitefrommodule = "UPDATE testsuites SET testscenarioids = ["+testscenarioids+"] WHERE testsuiteid="+requiredtestsuiteid+" and cycleid="+requiredcycleid+" and testsuitename='"+requiredtestsuitename+"' and versionnumber="+requiredversionnumber;
 						var jsondata = {"testsuiteid":requiredtestsuiteid,"testscenarioid":testscenarioids,"cycleid":requiredcycleid,"testsuitename":requiredtestsuitename,"versionnumber":requiredversionnumber,"testscenarioids":testscenarioids}
 						try{
-					
+							
 							updatescenariodetailsinsuite(jsondata,function(err,data){
 								if(err){
-									cb(null,flag);
+									console.log(err);
+									cb1(null,flag);
+									
 								}else{
-
+									
+									callback(null,flag);
+									//cb1(null,flag);
 								}
+								
 							});
 						}catch(ex){
 							console.log("Exception occured in the udating scenarios",ex);
 						}
 					}
-					callback(); 
+					//callback(); 
 					
 				//}, callback);
 
@@ -730,10 +738,10 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 			function(err,results){
 				//data.setHeader('Content-Type','application/json');
 				if(err){
-					cb(null,flag);
+					cb1(null,flag);
 				} 
 				else{
-					cb(null,flag);
+					cb1(null,flag);
 				} 
 			}
 
@@ -759,7 +767,7 @@ function updatescenariodetailsinsuite(req,cb,data){
 		},
 		validatedata: function(simplecallback){
 			var scenarioidstocheck = suiterowdetails.testscenarioids;
-			var verifyscenarioid = req.testscenarioids;
+			var verifyscenarioid = req.testscenarioid;
 			var getparampath = suiterowdetails.getparampaths;
 			var conditioncheck = suiterowdetails.conditioncheck;
 			var donotexecute = suiterowdetails.donotexecute;
@@ -768,7 +776,8 @@ function updatescenariodetailsinsuite(req,cb,data){
 
 			for(var i=0;i<verifyscenarioid.length;i++){
 				var temp = verifyscenarioid[i];
-				var index = scenarioidstocheck.toString().indexOf(temp);
+				//var index = scenarioidstocheck.toString().indexOf(temp);
+				var index = JSON.parse(JSON.stringify(scenarioidstocheck)).indexOf(temp);
 				if(index != null && index != undefined && index!=-1){
 					if(getparampath!=null){
 						if(getparampath[index] == '' || getparampath[index] == ' '){
@@ -794,13 +803,15 @@ function updatescenariodetailsinsuite(req,cb,data){
 
 		},
 		updatescenarioinnsuite:function(simplecallback){
-			var updatetestsuitefrommodule = "UPDATE testsuites SET testscenarioids = ["+req.testscenarioid+"], conditioncheck=["+conditioncheck1+"] ,getparampaths=["+getparampath1+"], donotexecute=["+donotexecute1+"] WHERE testsuiteid="+req.testsuiteid+" and cycleid="+req.cycleid+" and testsuitename='"+req.testsuitename+"' and versionnumber="+req.versionnumber;
+			
+			var updatetestsuitefrommodule = "UPDATE testsuites SET testscenarioids = ["+req.testscenarioids+"], conditioncheck=["+conditioncheck1+"] ,getparampaths=["+getparampath1+"], donotexecute=["+donotexecute1+"] WHERE testsuiteid="+req.testsuiteid+" and cycleid="+req.cycleid+" and testsuitename='"+req.testsuitename+"' and versionnumber="+req.versionnumber;
 				dbConnICE.execute(updatetestsuitefrommodule, function(err, answers) {
 					if(err){
 						cb(null,err);
 					}else{
 						
 					}
+					//data=answers;
 					simplecallback(null,answers);
 				});						
 
@@ -811,7 +822,7 @@ function updatescenariodetailsinsuite(req,cb,data){
 			console.log(err);
 			cb(null,err);
 		}else{
-			cb(null,data);
+			cb(null,'Successsssssss');
 		}
 	})
 
