@@ -48,7 +48,7 @@ exports.readTestSuite_ICE = function (req, res) {
 		if(err){
 			console.log(err);
 		}else{
-			console.log(data);
+			
 			async.series({		
 			testsuitesdata: function(callback){
 			var getTestSuites="select donotexecute,conditioncheck,getparampaths,testscenarioids from testsuites where testsuiteid= "+requiredtestsuiteid+" and cycleid="+requiredcycleid+" and testsuitename='"+requiredtestsuitename+"'";
@@ -636,7 +636,7 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 		});
 	}
 
-	function TestSuiteDetails_Module_ICE(req,cb,data){
+	function TestSuiteDetails_Module_ICE(req,cb1,data){
 //	var requestedtestscenarioid = req;
 	var requiredcycleid = req.cycleid;
 	var requiredtestsuiteid = req.testsuiteid;
@@ -700,10 +700,12 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 						dbConnICE.execute(testsuiteexe, function(err, answers) {
 						if(err){
 							console.log(err);
+							cb1(null,flag);
 						}else{
-							
+							//cb1(null,flag);
+							callback(null,flag);
 						}
-						cb(null,flag);
+						
 						
 						});
 					}else{
@@ -714,15 +716,13 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 							updatescenariodetailsinsuite(jsondata,function(err,data){
 								if(err){
 									console.log(err);
-									cb(null,flag);
+									cb1(null,flag);
 									
 								}else{
-									//cb(null,flag);
+									
+									callback(null,flag);
+									//cb1(null,flag);
 								}
-								cb(null,flag);
-									
-									
-																
 								
 							});
 						}catch(ex){
@@ -738,10 +738,10 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 			function(err,results){
 				//data.setHeader('Content-Type','application/json');
 				if(err){
-					cb(null,flag);
+					cb1(null,flag);
 				} 
 				else{
-					cb(null,flag);
+					cb1(null,flag);
 				} 
 			}
 
@@ -776,7 +776,8 @@ function updatescenariodetailsinsuite(req,cb,data){
 
 			for(var i=0;i<verifyscenarioid.length;i++){
 				var temp = verifyscenarioid[i];
-				var index = scenarioidstocheck.toString().indexOf(temp);
+				//var index = scenarioidstocheck.toString().indexOf(temp);
+				var index = JSON.parse(JSON.stringify(scenarioidstocheck)).indexOf(temp);
 				if(index != null && index != undefined && index!=-1){
 					if(getparampath!=null){
 						if(getparampath[index] == '' || getparampath[index] == ' '){
