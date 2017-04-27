@@ -160,7 +160,7 @@ var genPathData = function(s,t){
 	return ('M'+s[0]+','+s[1]+'C'+(s[0]+t[0])/2+','+s[1]+' '+(s[0]+t[0])/2+','+t[1]+' '+t[0]+','+t[1]);
 };
 var addNode = function(n,m,pi){
-	debugger;
+	
 	var v=d3.select('#ct-mindMap').append('g').attr('id','ct-node-'+n.id).attr('class','ct-node').attr('data-nodetype',n.type).attr('transform',"translate("+(n.x).toString()+","+(n.y).toString()+")");
 	if($("#ct-canvas").attr('class')=='tabCreate ng-scope'){
 		v.append('image').attr('class','ct-nodeIcon').attr('xlink:href','images_mindmap/node-'+n.type+'.png').on('click',nodeCtrlClick);
@@ -954,10 +954,10 @@ var toggleExpand = function(e){
 	e.stopImmediatePropagation();
 		if($("#ct-moduleBox").hasClass("ct-open") == true){
  	$("#ct-canvas").css("top","5px");
-	// if($("#left-nav-section").is(":visible") == true && $("#right-dependencies-section").is(":visible") == true)
-	// 	{
-	// 	$("#ct-AssignBox").css({"position":"relative","top":"25px"});
-	// 	}
+	if($("#left-nav-section").is(":visible") == true && $("#right-dependencies-section").is(":visible") == true)
+		{
+		$("#ct-AssignBox").css({"position":"relative","top":"25px"});
+		}
 		$(".ct-nodeBox .ct-node").css("width","139px");
 		$(".ct-nodeBox").css({"overflow":"auto", "width":"99%"})
 		$(".iconSpaceArrow").attr("src","imgs/ic-collapseup.png");
@@ -983,10 +983,10 @@ var toggleExpandAssign = function(e){
 	e.stopImmediatePropagation();
 	if($("#ct-AssignBox").hasClass("ct-open") == true){		
 		$("#ct-canvas").css("top","5px");
-	// 	if($("#left-nav-section").is(":visible") == true && $("#right-dependencies-section").is(":visible") == true)
-	// {
-	// 		//$("#ct-AssignBox").css({"position":"relative","top":"25px"});
-	// }
+		if($("#left-nav-section").is(":visible") == true && $("#right-dependencies-section").is(":visible") == true)
+	{
+			$("#ct-AssignBox").css({"position":"relative","top":"25px"});
+	}
 		$(".ct-nodeBox .ct-node").css("width","139px");
 	$(".ct-nodeBox").css({"overflow":"auto", "width":"98%"})
 		$(".iconSpaceArrow").attr("src","imgs/ic-collapseup.png");
@@ -1058,12 +1058,10 @@ var treeBuilder = function(tree){
 	childCounter(1,tree);
 	var newHeight = d3.max(levelCount)*90;
 	var d3Tree=d3.layout.tree().size([newHeight,cSize[0]]);
-	// if(tree.oid===undefined) d3Tree.sort(function(a,b){return a.id-b.id;});
-	// else d3Tree.sort(function(a,b){return a.oid-b.oid;});
+	if(tree.oid===undefined) d3Tree.sort(function(a,b){return a.id-b.id;});
+	else d3Tree.sort(function(a,b){return a.oid-b.oid;});
 	dNodes=d3Tree.nodes(tree);
 	dLinks=d3Tree.links(dNodes);
-	//console.log(dLinks);
-	console.log("beforeForeach", dNodes);
 	dNodes.forEach(function(d){
 		d.y=d.x;
 		d.x=cSize[0]*0.2*(0.9+typeNum[d.type]);
@@ -1072,7 +1070,6 @@ var treeBuilder = function(tree){
 		addNode(d,!0,d.parent);
 		if(d.task!=null) d3.select('#ct-node-'+d.id).append('image').attr('class','ct-nodeTask').attr('xlink:href','images_mindmap/node-task-assigned.png').attr('x',29).attr('y',-10);
 	});
-	console.log("afterForeach", dNodes);
 	dLinks.forEach(function(d){
 		d.id=uLix++;
 		addLink(d.id,d.source,d.target);
@@ -1099,23 +1096,9 @@ function openDialogMindmap(title, body){
 		setTimeout(function(){
 			$("#mindmapGlobalDialog").find('.btn-default').focus();					
 		}, 300);
-	}else if(window.location.pathname == '/designTestCase' || window.location.pathname == '/design'){
-		$("#globalModal").find('.modal-title').text(title);
-		$("#globalModal").find('.modal-body p').text(body).css('color','black');
-		$("#globalModal").modal("show");
-		setTimeout(function(){
-			$("#globalModal").find('.btn-default').focus();					
-		}, 300);
-	}
-	else if(window.location.pathname == '/execute'){
-		$("#executeGlobalModal").find('.modal-title').text(title);
-		$("#executeGlobalModal").find('.modal-body p').text(body).css('color','black');
-		$("#executeGlobalModal").modal("show");
-		setTimeout(function(){
-			$("#executeGlobalModal").find('.btn-accept').focus();					
-		}, 300);
+	}else if(window.location.pathname == '/designTestCase' || window.location.pathname == '/design' ||window.location.pathname == '/execute'){
+		$("#globalTaskSubmit").modal("show");
 	}
 	
-
 	
 }
