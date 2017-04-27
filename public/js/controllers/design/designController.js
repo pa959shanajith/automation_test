@@ -3151,7 +3151,7 @@ function contentTable(newTestScriptDataLS) {
 						else if(obType =='GuiPasswordField'){	sc = Object.keys(keywordArrayList.text);selectedKeywordList = "text";}
 						else if(obType =='combo_box'||obType =='GuiBox'|| obType=='GuiComboBox'){	sc = Object.keys(keywordArrayList.select);selectedKeywordList = "select";}
 						else if(obType =='list_item')	{sc = Object.keys(keywordArrayList.list);selectedKeywordList = "list";}
-						else if(obType =='GuiTableControl')	{sc = Object.keys(keywordArrayList.list);selectedKeywordList = "table";}
+						else if(obType =='GuiTableControl')	{sc = Object.keys(keywordArrayList.table);selectedKeywordList = "table";}
 						else if (obType == 'list_item' || obType == 'list') {
 							if (listType == 'true') {
 								sc = Object.keys(keywordArrayList.list);
@@ -3830,7 +3830,7 @@ $(document).on("click","#btnPasteTestStep", function(){
 				proceed = false;
 				break;
 			}
-			else if(parseInt(chkNo[i]) > $("#jqGrid tr").length || parseInt(chkNo[i]) < 0){
+			else if(parseInt(chkNo[i]) >= $("#jqGrid tr").length || parseInt(chkNo[i]) < 0){
 				$("#errorMsgs3").show();
 				proceed = false;
 				break;
