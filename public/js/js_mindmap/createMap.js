@@ -954,10 +954,10 @@ var toggleExpand = function(e){
 	e.stopImmediatePropagation();
 		if($("#ct-moduleBox").hasClass("ct-open") == true){
  	$("#ct-canvas").css("top","5px");
-	if($("#left-nav-section").is(":visible") == true && $("#right-dependencies-section").is(":visible") == true)
-		{
-		$("#ct-AssignBox").css({"position":"relative","top":"25px"});
-		}
+	// if($("#left-nav-section").is(":visible") == true && $("#right-dependencies-section").is(":visible") == true)
+	// 	{
+	// 	$("#ct-AssignBox").css({"position":"relative","top":"25px"});
+	// 	}
 		$(".ct-nodeBox .ct-node").css("width","139px");
 		$(".ct-nodeBox").css({"overflow":"auto", "width":"99%"})
 		$(".iconSpaceArrow").attr("src","imgs/ic-collapseup.png");
@@ -983,10 +983,10 @@ var toggleExpandAssign = function(e){
 	e.stopImmediatePropagation();
 	if($("#ct-AssignBox").hasClass("ct-open") == true){		
 		$("#ct-canvas").css("top","5px");
-		if($("#left-nav-section").is(":visible") == true && $("#right-dependencies-section").is(":visible") == true)
-	{
-			$("#ct-AssignBox").css({"position":"relative","top":"25px"});
-	}
+	// 	if($("#left-nav-section").is(":visible") == true && $("#right-dependencies-section").is(":visible") == true)
+	// {
+	// 		//$("#ct-AssignBox").css({"position":"relative","top":"25px"});
+	// }
 		$(".ct-nodeBox .ct-node").css("width","139px");
 	$(".ct-nodeBox").css({"overflow":"auto", "width":"98%"})
 		$(".iconSpaceArrow").attr("src","imgs/ic-collapseup.png");

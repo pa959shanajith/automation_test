@@ -348,7 +348,7 @@ router.post('/', function(req, res, next) {
 				});
 				qObj.testsuiteDetails=[{"testsuiteId":nObj[rIndex].id,"testsuiteId_c":nObj[rIndex].id_c,"testsuiteName":nObj[rIndex].name,"task":nObj[rIndex].task,"testscenarioDetails":tsList}];
 				qObj.userName=d.data.user_name;
-				fs.writeFileSync('assets_mindmap/req_json.json',JSON.stringify(qObj),'utf8');
+				//fs.writeFileSync('assets_mindmap/req_json.json',JSON.stringify(qObj),'utf8');
 				create_ice.createStructure_Nineteen68(qObj,function(err,data){
 				//res.setHeader('Content-Type', 'application/json');
 				if(err)
@@ -357,7 +357,7 @@ router.post('/', function(req, res, next) {
 					datatosend=data;
 					
 				}
-				fs.writeFileSync('assets_mindmap/req_json_cassandra.txt',JSON.stringify(data),'utf8');
+				//fs.writeFileSync('assets_mindmap/req_json_cassandra.txt',JSON.stringify(data),'utf8');
 				//var data = JSON.stringify(data);
 				var parsing_result=parsing(data,urlData);
 				//var qList_new=parsing(data,urlData);

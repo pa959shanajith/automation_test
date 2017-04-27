@@ -86,7 +86,7 @@ function next_function(resultobj,cb,data){
     //var prjName = resultobj.prjId[0].projectName;
 	console.log(resultobj);
 	try{
-			var jsonData=JSON.parse(result);
+	var jsonData=JSON.parse(result);
 	var alltasks=jsonData[0].data;
 	var user_task_json=[];
 	var taskDetails={};
@@ -175,7 +175,7 @@ function next_function(resultobj,cb,data){
 										task_json.taskDetails.push(taskDetails);
 										user_task_json.push(task_json);
 										//console.log(user_task_json);
-										fs.writeFileSync('assets_mindmap/task_json.json',JSON.stringify(user_task_json),'utf8');
+										//fs.writeFileSync('assets_mindmap/task_json.json',JSON.stringify(user_task_json),'utf8');
 										maincallback();
 
 									}
