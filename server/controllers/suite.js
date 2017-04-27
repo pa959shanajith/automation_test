@@ -703,6 +703,7 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 						}else{
 							
 						}
+						cb(null,flag);
 						
 						});
 					}else{
@@ -712,11 +713,17 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 							
 							updatescenariodetailsinsuite(jsondata,function(err,data){
 								if(err){
+									console.log(err);
 									cb(null,flag);
 									
 								}else{
-									callback(); 
+									//cb(null,flag);
 								}
+								cb(null,flag);
+									
+									
+																
+								
 							});
 						}catch(ex){
 							console.log("Exception occured in the udating scenarios",ex);
