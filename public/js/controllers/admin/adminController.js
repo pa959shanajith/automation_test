@@ -96,7 +96,6 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 					{
 						$('#assignedProjectAP').append($("<option value=" +data[i].projectId+ "></option>").text(data[i].projectName));
 					}
-					console.log("1-AssignedProjects",projectData);
 					for(var j=0;j<projectData.length;j++)
 					{
 						assignedProjectsArr.push(projectData[j].projectId);
@@ -105,8 +104,6 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 
 					adminServices.getDetails_ICE(idtype,requestedids)
 						.then(function (response) {
-						console.log("2-AllResponse",assignedProjects);
-
 							$('#allProjectAP').empty();
 								if(response.projectIds.length > 0)
 								{
@@ -131,12 +128,8 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 											}
 											return false;
 										}	
-										//console.log("unassignedProjectIds", unassignedProjectIds);
-										//console.log("unassignedProjectIds", unassignedProjectNames);
 										unAssignedProjects.projectIds =  unassignedProjectIds;
 										unAssignedProjects.projectNames =  unassignedProjectNames;
-										console.log("3-UnAssignedProjects",unAssignedProjects);
-
 										for(var m=0;m<unAssignedProjects.projectIds.length;m++)
 										{
 											$('#allProjectAP').append($("<option value=" +unAssignedProjects.projectIds[m]+ "></option>").text(unAssignedProjects.projectNames[m]));
@@ -147,7 +140,6 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 					else{
 							adminServices.getDetails_ICE(idtype,requestedids)
 								.then(function (res) {
-									console.log("4-UnAssignedProjects",res);
 									if(res.projectIds.length > 0)
 									{
 										$("#assignedProjectAP,#allProjectAP").empty();
