@@ -160,9 +160,10 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 					}
 			}, function (error) { console.log("Error:::::::::::::", error) })
 	});
+	
 });
 
-//Assign Projects Button Click
+//	Assign Projects Button Click
 $scope.assignProjects = function() {
 	unAssignedProjects =[];
 	assignedProjects = [];
@@ -171,10 +172,10 @@ if($('#selAssignUser option:selected').val() == "") {
 			$("#selAssignUser").css('border','').addClass("selectErrorBorder");
 			return false;
 		}
-		else if($('#selAssignProject option:selected').val() == "") {
-			$("#selAssignProject").css('border','').addClass("selectErrorBorder");
-			return false;
-		}
+else if($('#selAssignProject option:selected').val() == "") {
+	$("#selAssignProject").css('border','').addClass("selectErrorBorder");
+	return false;
+}
 
 $("#allProjectAP option").each(function() {
 	var unassignedProj = {};
@@ -183,20 +184,6 @@ $("#allProjectAP option").each(function() {
 	unAssignedProjects.push(unassignedProj);
 });
 
-		$("#assignedProjectAP option").each(function() {
-			var assignedProj = {};
-			debugger;
-			assignedProj.projectId = $(this).val();
-			assignedProj.projectName = $(this).text();
-			assignedProjects.push(assignedProj);
-		});
-		var domainId = $('#selAssignProject option:selected').val();
-		var userDetails = JSON.parse(window.localStorage['_UI']);
-		var assignProjectsObj = {};
-		assignProjectsObj.domainId = domainId;
-		assignProjectsObj.userInfo = userDetails;
-		assignProjectsObj.unAssignedProjects = unAssignedProjects;
-		assignProjectsObj.assignedProjects = assignedProjects;
 
 $("#assignedProjectAP option").each(function() {
 	var assignedProj = {};
@@ -232,6 +219,9 @@ console.log(assignProjectsObj);
 			}
 
 	}, function (error) { console.log("Error:::::::::::::", error) })
+};
+
+
 	$("#projectTab").on('click',function() {
 		projectDetails = [];
 		updateProjectDetails = [];
@@ -613,7 +603,6 @@ console.log(assignProjectsObj);
 		$("div.projectTypeSelected").removeClass("projectTypeSelected");
 		$("#releaseList li, #cycleList li").remove();
 	}
-
 	function resetAssignProjectForm()
 	{
 		$("#selAssignUser, #selAssignProject").prop('selectedIndex', 0);
