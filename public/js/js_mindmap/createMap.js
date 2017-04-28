@@ -866,8 +866,14 @@ var actionEvent = function(e){
 	dataSender({task:'writeMap',data:{write:flag,map:mapData,user_name:username,abc:deletednode,prjId:$('.project-list').val(),relId:$('#ct-assignRel').val(),cycId:$('#ct-assignCyc').val()}},function(err,result){
 		s.classed('no-access',!1);
 		if(err){
-			openDialogMindmap('Save error','Module names cannot be duplicate');
 			console.log(result);
+			if(result.indexOf('Schema.ConstraintValidationFailed')>-1){
+				openDialogMindmap('Save error','Module names cannot be duplicate');
+			}
+			else{
+				openDialogMindmap('Save error','Failed to save data');
+			}
+			
 		} 
 		else{
 			//alert(alertMsg);
