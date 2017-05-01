@@ -1039,3 +1039,72 @@ exports.getDetails_ICE = function(req, res) {
         console.log(exception);
     }
 };
+
+//Save Assigned Projects
+exports.assignProjects_ICE = function(req, res){
+var assignProjectsDetails = req.body.assignProjectsObj;
+var projectDetails = assignProjectsDetails.assignedProjects;
+var projectIds = [];
+for(var i=0;i<projectDetails.length;i++)
+{
+    projectIds.push(projectDetails[i].projectId);
+}
+var assignProjectsToUsers = "INSERT INTO icepermissions (userid,domainid,createdby,createdon,history,modifiedby,modifiedbyrole,modifiedon,projectids) VALUES ("+assignProjectsDetails.userId+","+assignProjectsDetails.domainId+",'"+assignProjectsDetails.userInfo.username+"','" + new Date().getTime() + "',null,'"+assignProjectsDetails.userInfo.username+"','"+assignProjectsDetails.userInfo.role+"','" + new Date().getTime() + "',["+projectIds+"]);"
+dbConnICE.execute(assignProjectsToUsers, function (err, result) {
+		if (err) {
+		     try {
+                    res.send("Error occured in getassignProjects_ICE: Fail");
+                 } catch (exception) {
+                    console.log(exception);
+                    res.send("fail");
+                  }
+		}
+		else {
+              try {
+			        res.send('success');
+                  } catch (exception) {
+                    console.log(exception);
+                  }
+		}
+	});
+};
+
+//get Assigned Projects
+exports.getAssignedProjects_ICE = function(req, res){
+var requestDetails = req.body.getAssignProj;
+var assignedProjectIds =[];
+var assignedProjObj = [];
+var getAssignedProjects = "Select projectids from icepermissions where userid = "+requestDetails.userId+" and domainid = "+requestDetails.domainId+"";
+console.log(getAssignedProjects);
+dbConnICE.execute(getAssignedProjects, function (err, result) {
+		if (err) {
+		    res.send(null, err);
+		}
+		else {
+            for(var i=0;i<result.rows.length;i++)
+            {
+               assignedProjectIds = result.rows[i].projectids;
+            }
+             async.forEachSeries(assignedProjectIds,function(iterator,assignProjectCallback){
+                var getProjectNames = "Select projectname from projects where projectid = "+iterator+"";
+                dbConnICE.execute(getProjectNames, function (err, result) {
+                    	if (err) {
+                                res.send(null, err);
+                            }
+                     else{
+                        console.log(result);
+                        var assignedProjects = {};
+                        assignedProjects.projectId = iterator;
+                        assignedProjects.projectName = result.rows[0].projectname;
+                        assignedProjObj.push(assignedProjects);
+                        assignProjectCallback();
+                     }
+                });
+			},finalfunction);
+            
+		}
+        function finalfunction(){
+            res.send(assignedProjObj);
+        }
+	});
+};

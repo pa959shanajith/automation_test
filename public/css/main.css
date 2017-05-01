@@ -2945,6 +2945,7 @@ input[disabled]{
     overflow-y: scroll;
     margin-bottom: 0;
     font-size: 13px;
+    font-family: LatoWebMedium;
     height: 30%;
     padding: 8px;
     border: 1px solid #ddd;
@@ -2999,6 +3000,14 @@ float: left;
 }
 #allProjectAP,#assignedProjectAP, #allProjectAP[size],#assignedProjectAP[size] {
     min-height: 400px;
+    outline: none;
+}
+select[multiple]:focus option:checked {
+  background: #633691 linear-gradient(0deg, #633691 0%, #633691 100%);
+}
+select[multiple]:-internal-list-box option:checked 
+{
+background: none;
 }
 
 /*****************ADMIN CSS NEW ************************/

@@ -116,6 +116,22 @@ mySPA.factory('adminServices', ['$http', '$q', function ($http, $q) {
             })
             .then(function (response) { return response.data; },
            			 function (response) { return $q.reject(response.data); });
+        },
+		assignProjects_ICE: function (assignProjectsObj) {
+            var param = "assignProjects_ICE";
+            return $http.post('/assignProjects_ICE', {
+				assignProjectsObj : assignProjectsObj
+            })
+            .then(function (response) { return response.data; },
+           			 function (response) { return $q.reject(response.data); });
+        },
+		getAssignedProjects_ICE: function (getAssignProj) {
+            var param = "getAssignedProjects_ICE";
+            return $http.post('/getAssignedProjects_ICE', {
+				getAssignProj : getAssignProj
+            })
+            .then(function (response) { return response.data; },
+           			 function (response) { return $q.reject(response.data); });
         }
     };
 }]);

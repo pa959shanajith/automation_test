@@ -6,7 +6,7 @@ var createprojectObj = {}; var projectDetails = [];var flag;var projectExists;va
 var editedProjectDetails = [];
 var deletedProjectDetails = [];
 var newProjectDetails = [];
-var unAssignedProjects = []; var assignedProjects = [];
+var unAssignedProjects = []; var assignedProjects = [];var projectData =[];
 mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeout','cfpLoadingBar', function ($scope, $http, adminServices, $timeout, cfpLoadingBar) {
 	$("body").css("background","#eee");
 	$('.dropdown').on('show.bs.dropdown', function(e){
@@ -45,6 +45,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 		function (error) { console.log("Error:::::::::::::", error) })
 
 	$(document).on('change','#selAssignUser', function() {
+		$('#allProjectAP, #assignedProjectAP').empty();
 		adminServices.getDomains_ICE()
 		.then(function (data) {
 			if (data == "No Records Found") {
@@ -66,7 +67,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 	});
 
 	$(document).on('change','#selAssignProject', function() {
-
+			$('#allProjectAP, #assignedProjectAP').empty();
 			var domainId = $("#selAssignProject option:selected").val();
 			var requestedids = [domainId];
 			var domains = [];
@@ -74,62 +75,143 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 			//console.log("Domain", domains);
 			//var requestedids = domains.push(domainId);
 			var idtype=["domaindetails"];
-			adminServices.getDetails_ICE(idtype,requestedids)
-			.then(function (response) {
-			  $('#allProjectAP,#assignedProjectAP').empty();
-			  	if(response.projectIds.length > 0)
-				  {
-						for(var i=0;i<response.projectIds.length;i++)
-						{
-							$('#allProjectAP').append($("<option value=" +response.projectIds[i]+ "></option>").text(response.projectNames[i]));
-						}
-				  }
-				else{
-					 $('#allProjectAP,#assignedProjectAP').empty();
-				}
+			var userId = $("#selAssignUser option:selected").attr("data-id");
 
-			 
+			var getAssignProj = {};
+			getAssignProj.domainId = domainId;
+			getAssignProj.userId = userId;
+			var assignedProjectsArr = [];
+			var assignedProjectNames = [];
+			var unassignedProjectIds = [];
+			var unassignedProjectNames = [];
+			var unAssignedProjects = {};
+			adminServices.getAssignedProjects_ICE(getAssignProj)
+			.then(function (data) {
+				$('#assignedProjectAP').empty();
+				projectData = [];
+				projectData = data;
+				if(data.length > 0)
+				{
+					for(var i=0;i<data.length;i++)
+					{
+						$('#assignedProjectAP').append($("<option value=" +data[i].projectId+ "></option>").text(data[i].projectName));
+					}
+					for(var j=0;j<projectData.length;j++)
+					{
+						assignedProjectsArr.push(projectData[j].projectId);
+						assignedProjectNames.push(projectData[j].projectName)
+					}
+
+					adminServices.getDetails_ICE(idtype,requestedids)
+						.then(function (response) {
+							$('#allProjectAP').empty();
+								if(response.projectIds.length > 0)
+								{
+									for(var k=0;k<response.projectIds.length;k++){
+											if(!eleContainsInArray(assignedProjectsArr,response.projectIds[k])){
+												unassignedProjectIds.push(response.projectIds[k]);
+											}
+										}
+
+									for(var l=0;l<response.projectNames.length;l++){
+											if(!eleContainsInArray(assignedProjectNames,response.projectNames[l])){
+												unassignedProjectNames.push(response.projectNames[l]);
+											}
+										}
+
+										function eleContainsInArray(arr,element){
+											if(arr != null && arr.length >0){
+												for(var s=0;s<arr.length;s++){
+													if(arr[s] == element)
+														return true;
+												}
+											}
+											return false;
+										}	
+										unAssignedProjects.projectIds =  unassignedProjectIds;
+										unAssignedProjects.projectNames =  unassignedProjectNames;
+										for(var m=0;m<unAssignedProjects.projectIds.length;m++)
+										{
+											$('#allProjectAP').append($("<option value=" +unAssignedProjects.projectIds[m]+ "></option>").text(unAssignedProjects.projectNames[m]));
+										}
+								}
+							}, function (error) { console.log("Error:::::::::::::", error) })
+				} 
+					else{
+							adminServices.getDetails_ICE(idtype,requestedids)
+								.then(function (res) {
+									if(res.projectIds.length > 0)
+									{
+										$("#assignedProjectAP,#allProjectAP").empty();
+											for(var n=0;n<res.projectIds.length;n++)
+												{
+													$('#allProjectAP').append($("<option value=" +res.projectIds[n]+ "></option>").text(res.projectNames[n]));
+												}
+									}
+									}, function (error) { console.log("Error:::::::::::::", error) })
+					}
 			}, function (error) { console.log("Error:::::::::::::", error) })
 	});
+	
 });
 
 //	Assign Projects Button Click
-	$scope.assignProjects = function() {
-		$("#selAssignUser,#selAssignProject").removeClass("selectErrorBorder").css('border','1px solid #909090 !important');
-		if($('#selAssignUser option:selected').val() == "") {
+$scope.assignProjects = function() {
+	unAssignedProjects =[];
+	assignedProjects = [];
+$("#selAssignUser,#selAssignProject").removeClass("selectErrorBorder").css('border','1px solid #909090 !important');
+if($('#selAssignUser option:selected').val() == "") {
 			$("#selAssignUser").css('border','').addClass("selectErrorBorder");
 			return false;
 		}
-		else if($('#selAssignProject option:selected').val() == "") {
-			$("#selAssignProject").css('border','').addClass("selectErrorBorder");
-			return false;
-		}
+else if($('#selAssignProject option:selected').val() == "") {
+	$("#selAssignProject").css('border','').addClass("selectErrorBorder");
+	return false;
+}
 
-		$("#allProjectAP option").each(function() {
-			var unassignedProj = {};
-			debugger;
-			unassignedProj.projectId = $(this).val();
-			unassignedProj.projectName = $(this).text();
-			unAssignedProjects.push(unassignedProj);
-		});
+$("#allProjectAP option").each(function() {
+	var unassignedProj = {};
+	unassignedProj.projectId = $(this).val();
+	unassignedProj.projectName = $(this).text();
+	unAssignedProjects.push(unassignedProj);
+});
 
-		$("#assignedProjectAP option").each(function() {
-			var assignedProj = {};
-			debugger;
-			assignedProj.projectId = $(this).val();
-			assignedProj.projectName = $(this).text();
-			assignedProjects.push(assignedProj);
-		});
-		var domainId = $('#selAssignProject option:selected').val();
-		var userDetails = JSON.parse(window.localStorage['_UI']);
-		var assignProjectsObj = {};
-		assignProjectsObj.domainId = domainId;
-		assignProjectsObj.userInfo = userDetails;
-		assignProjectsObj.unAssignedProjects = unAssignedProjects;
-		assignProjectsObj.assignedProjects = assignedProjects;
 
-		console.log(assignProjectsObj);
-	};
+$("#assignedProjectAP option").each(function() {
+	var assignedProj = {};
+	assignedProj.projectId = $(this).val();
+	assignedProj.projectName = $(this).text();
+	assignedProjects.push(assignedProj);
+});
+var domainId = $('#selAssignProject option:selected').val();
+var userDetails = JSON.parse(window.localStorage['_UI']);
+var userId = $("#selAssignUser option:selected").attr("data-id");
+
+var assignProjectsObj = {};
+assignProjectsObj.domainId = domainId;
+assignProjectsObj.userInfo = userDetails;
+assignProjectsObj.userId = userId;
+//assignProjectsObj.unAssignedProjects = unAssignedProjects;
+assignProjectsObj.assignedProjects = assignedProjects;
+
+console.log(assignProjectsObj);
+	adminServices.assignProjects_ICE(assignProjectsObj)
+		.then(function (data) {
+			if(data == 'success')
+			{
+				$("#adminModal").find('.modal-title').text("Assign Projects");
+				$("#adminModal").find('.modal-body p').text("Projects assigned to user successfully");
+				$("#adminModal").modal("show");
+				resetAssignProjectForm();
+			}
+			else{
+				$("#adminModal").find('.modal-title').text("Assign Projects");
+				$("#adminModal").find('.modal-body p').text("Failed to assign projects to user");
+				$("#adminModal").modal("show");
+			}
+
+	}, function (error) { console.log("Error:::::::::::::", error) })
+};
 
 
 	$("#projectTab").on('click',function() {
@@ -512,6 +594,11 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 		$("#projectName").val("");
 		$("div.projectTypeSelected").removeClass("projectTypeSelected");
 		$("#releaseList li, #cycleList li").remove();
+	}
+	function resetAssignProjectForm()
+	{
+		$("#selAssignUser, #selAssignProject").prop('selectedIndex', 0);
+		$("#allProjectAP,#assignedProjectAP").empty();
 	}
 
 	//Add Release Name Functionality

@@ -109,6 +109,8 @@ app.post('/createProject_ICE', admin.createProject_ICE);
 app.post('/updateProject_ICE', admin.updateProject_ICE);
 app.post('/getNames_ICE', admin.getNames_ICE);
 app.post('/getDetails_ICE', admin.getDetails_ICE);
+app.post('/assignProjects_ICE', admin.assignProjects_ICE);
+app.post('/getAssignedProjects_ICE', admin.getAssignedProjects_ICE);
 
 //Design Screen Routes
 app.post('/initScraping_ICE', design.initScraping_ICE);
