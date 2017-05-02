@@ -236,7 +236,9 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 				}
 				else{
 					$('#executionCompleted').modal('show');
-					$('#executionCompleted').find('.btn-default').focus();
+					setTimeout(function(){
+						$("#executionCompleted").find('.btn-default').focus();					
+					}, 300);
 				}
 				unblockUI()
 				$(".selectBrowser").find("img").removeClass("sb");

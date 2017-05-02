@@ -77,7 +77,7 @@ function loadMindmapData1(){
 			allMMaps.forEach(function(e,i){
 				//var t=e.name.replace(/_/g,' ');
 				var t = $.trim(e.name);
-				var node=nodeBox.append('div').attr('class','ct-node fl-left').attr('data-mapid',i).on('click',loadMap);
+				var node=nodeBox.append('div').attr('class','ct-node fl-left').attr('data-mapid',i).attr('title',t).on('click',loadMap);
 				node.append('img').attr('class','ct-nodeIcon').attr('src','images_mindmap/node-modules-no.png').attr('alt','Module').attr('aria-hidden',true);
 				node.append('span').attr('class','ct-nodeLabel').html(t);
 			});
@@ -892,7 +892,7 @@ var actionEvent = function(e){
 			if(!sts){
 				mid=allMMaps.length;
 				allMMaps.push(res);
-				var node=d3.select('.ct-nodeBox').append('div').attr('class','ct-node fl-left').attr('data-mapid',mid).on('click',loadMap);
+				var node=d3.select('.ct-nodeBox').append('div').attr('class','ct-node fl-left').attr('data-mapid',mid).attr('title',res.name).on('click',loadMap);
 				node.append('img').attr('class','ct-nodeIcon').attr('src','images_mindmap/node-modules-no.png').attr('alt','Module').attr('aria-hidden',true);
 				node.append('span').attr('class','ct-nodeLabel').html(res.name.replace(/_/g,' '));
 			}
@@ -911,7 +911,7 @@ var actionEvent = function(e){
 						allMMaps.forEach(function(e,i){
 							//var t=e.name.replace(/_/g,' ');
 							var t = $.trim(e.name);
-							var node=nodeBox.append('div').attr('class','ct-node fl-left').attr('data-mapid',i).on('click',loadMap);
+							var node=nodeBox.append('div').attr('class','ct-node fl-left').attr('data-mapid',i).attr('title',t).on('click',loadMap);
 							node.append('img').attr('class','ct-nodeIcon').attr('src','images_mindmap/node-modules-no.png').attr('alt','Module').attr('aria-hidden',true);
 							node.append('span').attr('class','ct-nodeLabel').html(t);
 						});
