@@ -208,7 +208,7 @@ var addTask = function(e){
 	var errorRelCyc=false;
 	var dateFlag=true;
 	var reviewerFlag=true;
-	if($('#startDate').val() == null || $('#endDate').val() == null || $('#startDate').val() == '' || $('#startDate').val() ==''){
+	if($('#startDate').val() == null || $('#endDate').val() == null || $('#startDate').val() == '' || $('#endDate').val() ==''){
 		dateFlag=false;
 	}
 	if(tObj.rw=='select reviewer' || tObj.at=='select user'){
