@@ -1576,6 +1576,13 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					d.css('height', Math.round(rect.h) * 1.5 * scale_highlight + 'px');
 					d.css('width', Math.round(rect.w) * 1.5 * scale_highlight + 'px');
 				}
+				else if(appType == "SAP"){
+					d.css('left', (Math.round(rect.x) * scale_highlight) + 3 + 'px');
+					d.css('top', (Math.round(rect.y) * scale_highlight) + 2 + 'px');
+					d.css('height', Math.round(rect.h) * scale_highlight + 'px');
+					d.css('width', Math.round(rect.w) * scale_highlight + 'px');
+				}
+
 				else{
 					d.css('left', Math.round(rect.x)  * scale_highlight + 'px');
 					d.css('top', Math.round(rect.y) * scale_highlight + 'px');
