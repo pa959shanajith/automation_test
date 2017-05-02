@@ -58,6 +58,14 @@ $(document).ready(function() {
             	$(this).siblings(".popupWrap").animate({ opacity: 1, right: "92px" }, 100).css({'z-index':'12','pointer-events':'all','display':'block'}).focus()
             } 
     	}
+		var subTaskID = JSON.parse(window.localStorage['_CT']).subTaskId;
+    	var selectedTask = $("#window-task").find("#accordion").find(".assignedTaskInner");
+    	$.each(selectedTask, function(){
+    		if($(this)[0].dataset.subtaskid == subTaskID){
+    			$(this).parents(".panel-collapse").parent().addClass("disableActions");
+    			$(this)[0].setAttribute("onclick","")
+    		}
+    	})
     })
     .on("click", ".closePopup", function(){
         $(".popupWrap").animate({ opacity: 0, right: "70px" }, 100).css({'z-index':'0','pointer-events':'none'})
