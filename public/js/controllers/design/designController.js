@@ -3148,17 +3148,17 @@ function contentTable(newTestScriptDataLS) {
 					    ||obType =='GuiLabel' ||obType =='GuiBox' ||obType =='GuiSimpleContainer' ||obType =='GuiPasswordField'||obType=='GuiComboBox'||obType=='GuiCheckBox'
 						||obType =='GuiStatusbar' ||obType =='GuiStatusPane' ||obType =='text' ||obType =='combo_box' || obType =='list_item' || obType =='GuiCTextField'
 						|| obType =='hyperlink' || obType =='lbl'||obType =='list' || obType == 'edit' || obType == null || obType == 'check_box'|| obType== 'GuiTableControl' 
-						|| obType == 'radio_button' ||obType != undefined)){
+						|| obType == 'radio_button' || obType=='button' || obType=='checkbox' || obType=='radiobutton' || obType=='table' || obType=='a' || obType=='input' ||obType != undefined)){
 						var res = '';
 						var sc;
 						var listType = '';
-						if(obType =='push_button' ||obType =='GuiButton' )	{sc = Object.keys(keywordArrayList.button);selectedKeywordList = "button";}		
-						else if(obType =='GuiTextField' || obType =='GuiCTextField'){	sc = Object.keys(keywordArrayList.text);selectedKeywordList = "text";}
+						if(obType =='push_button' || obType =='GuiButton' || obType =='button' )	{sc = Object.keys(keywordArrayList.button);selectedKeywordList = "button";}		
+						else if(obType =='GuiTextField' || obType =='GuiCTextField' || obType =='text' || obType=='input'){	sc = Object.keys(keywordArrayList.text);selectedKeywordList = "text";}
 						else if(obType =='GuiLabel'){	sc = Object.keys(keywordArrayList.element);selectedKeywordList = "element";}
 						else if(obType =='GuiPasswordField'){	sc = Object.keys(keywordArrayList.text);selectedKeywordList = "text";}
-						else if(obType =='combo_box'||obType =='GuiBox'|| obType=='GuiComboBox'){	sc = Object.keys(keywordArrayList.select);selectedKeywordList = "select";}
+						else if(obType =='combo_box'||obType =='GuiBox'|| obType=='GuiComboBox' || obType=='select'){	sc = Object.keys(keywordArrayList.select);selectedKeywordList = "select";}
 						else if(obType =='list_item')	{sc = Object.keys(keywordArrayList.list);selectedKeywordList = "list";}
-						else if(obType =='GuiTableControl')	{sc = Object.keys(keywordArrayList.table);selectedKeywordList = "table";}
+						else if(obType =='GuiTableControl' || obType=='table')	{sc = Object.keys(keywordArrayList.table);selectedKeywordList = "table";}
 						else if (obType == 'list_item' || obType == 'list') {
 							if (listType == 'true') {
 								sc = Object.keys(keywordArrayList.list);
@@ -3168,9 +3168,9 @@ function contentTable(newTestScriptDataLS) {
 								selectedKeywordList = "select";
 							}
 						}
-						else if(obType =='check_box'||obType=='GuiCheckBox'){	sc = Object.keys(keywordArrayList.checkbox);selectedKeywordList = "checkbox";}
-						else if(obType == 'radio_button '||obType =='GuiRadioButton')	{sc = Object.keys(keywordArrayList.radiobutton);selectedKeywordList = "radiobutton";}
-						else if(obType =='hyperlink' || obType =='lbl'){	sc = Object.keys(keywordArrayList.link);selectedKeywordList = "link";}
+						else if(obType =='check_box'||obType=='GuiCheckBox' || obType=='checkbox'){	sc = Object.keys(keywordArrayList.checkbox);selectedKeywordList = "checkbox";}
+						else if(obType == 'radio_button '||obType =='GuiRadioButton' || obType=='radiobutton')	{sc = Object.keys(keywordArrayList.radiobutton);selectedKeywordList = "radiobutton";}
+						else if(obType =='hyperlink' || obType =='lbl' || obType=='a'){	sc = Object.keys(keywordArrayList.link);selectedKeywordList = "link";}
 						else	{sc = Object.keys(keywordArrayList.element);selectedKeywordList = "element";}
 						for(var i = 0; i < sc.length; i++){
 							if(selectedKeyword == sc[i]){
