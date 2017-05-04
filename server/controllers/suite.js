@@ -493,56 +493,76 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
                             if (err) {
                                 console.log(err);
                             } else {
+								try{
                                 if (screenidresponse != "") {
                                     var getscreendataquery = "select screendata from screens where screenid=" + screenidresponse.rows[0].screenid;
 									dbConnICE.execute(getscreendataquery, function(err, screendataresponse) {
                                         if (err) {
                                             console.log(err);
                                         } else {
-                                            screendataresponse = JSON.parse(screendataresponse.rows[0].screendata);
-                                            if (screendataresponse != null && screendataresponse != "") {
-                                                if ('body' in screendataresponse) {
-                                                    var wsscreentemplate = screendataresponse.body[0];
-                                                    var testcasestepsquery = "select testcasesteps,testcasename from testcases where testcaseid = " + quest;
-                                                    dbConnICE.execute(testcasestepsquery, function(err, answers) {
-                                                        if (err) {
-                                                            console.log(err);
-                                                        } else {
-                                                            responsedata.template = wsscreentemplate;
-                                                            responsedata.testcasename = answers.rows[0].testcasename;
-                                                            responsedata.testcase = answers.rows[0].testcasesteps;
-                                                            listoftestcasedata.push(responsedata);
-                                                        }
-                                                        callback2();
-                                                    });
-                                                } else {
-                                                    var testcasestepsquery = "select testcasesteps,testcasename from testcases where testcaseid = " + quest;
-                                                    dbConnICE.execute(testcasestepsquery, function(err, answers) {
-                                                        if (err) {
-                                                            console.log(err);
-                                                        } else {
-                                                            responsedata.template = "";
-                                                            responsedata.testcasename = answers.rows[0].testcasename;
-                                                            responsedata.testcase = answers.rows[0].testcasesteps;
-                                                            listoftestcasedata.push(responsedata);
-                                                        }
-                                                        callback2();
-                                                    });
-                                                }
-                                            } else {
-                                                var testcasestepsquery = "select testcasesteps,testcasename from testcases where testcaseid = " + quest;
-                                                dbConnICE.execute(testcasestepsquery, function(err, answers) {
-                                                    if (err) {
-                                                        console.log(err);
-                                                    } else {
-                                                        responsedata.template = "";
-                                                        responsedata.testcasename = answers.rows[0].testcasename;
-                                                        responsedata.testcase = answers.rows[0].testcasesteps;
-                                                        listoftestcasedata.push(responsedata);
-                                                    }
-                                                    callback2();
-                                                });
-                                            }
+											try{
+												try{
+													screendataresponse = JSON.parse(screendataresponse.rows[0].screendata);
+												}catch(exception){
+													screendataresponse=JSON.parse("{}");;
+												}
+												if (screendataresponse != null && screendataresponse != "") {
+													if ('body' in screendataresponse) {
+														var wsscreentemplate = screendataresponse.body[0];
+														var testcasestepsquery = "select testcasesteps,testcasename from testcases where testcaseid = " + quest;
+														dbConnICE.execute(testcasestepsquery, function(err, answers) {
+															if (err) {
+																console.log(err);
+															} else {
+																responsedata.template = wsscreentemplate;
+																responsedata.testcasename = answers.rows[0].testcasename;
+																responsedata.testcase = answers.rows[0].testcasesteps;
+																listoftestcasedata.push(responsedata);
+															}
+															callback2();
+														});
+													} else {
+														var testcasestepsquery = "select testcasesteps,testcasename from testcases where testcaseid = " + quest;
+														dbConnICE.execute(testcasestepsquery, function(err, answers) {
+															if (err) {
+																console.log(err);
+															} else {
+																responsedata.template = "";
+																responsedata.testcasename = answers.rows[0].testcasename;
+																responsedata.testcase = answers.rows[0].testcasesteps;
+																listoftestcasedata.push(responsedata);
+															}
+															callback2();
+														});
+													}
+												} else {
+													var testcasestepsquery = "select testcasesteps,testcasename from testcases where testcaseid = " + quest;
+													dbConnICE.execute(testcasestepsquery, function(err, answers) {
+														if (err) {
+															console.log(err);
+														} else {
+															responsedata.template = "";
+															responsedata.testcasename = answers.rows[0].testcasename;
+															responsedata.testcase = answers.rows[0].testcasesteps;
+															listoftestcasedata.push(responsedata);
+														}
+														callback2();
+													});
+												}
+										}catch(exception){
+											var testcasestepsquery = "select testcasesteps,testcasename from testcases where testcaseid = " + quest;
+											dbConnICE.execute(testcasestepsquery, function(err, answers) {
+												if (err) {
+													console.log(err);
+												} else {
+													responsedata.template = "";
+													responsedata.testcasename = answers.rows[0].testcasename;
+													responsedata.testcase = answers.rows[0].testcasesteps;
+													listoftestcasedata.push(responsedata);
+												}
+												callback2();
+											});
+										}
                                         }
                                     });
                                 } else {
@@ -559,6 +579,20 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
                                         callback2();
                                     });
                                 }
+							}catch(exception){
+								var testcasestepsquery = "select testcasesteps,testcasename from testcases where testcaseid = " + quest;
+                                    dbConnICE.execute(testcasestepsquery, function(err, answers) {
+                                        if (err) {
+                                            console.log(err);
+                                        } else {
+                                            responsedata.template = "";
+                                            responsedata.testcasename = answers.rows[0].testcasename;
+                                            responsedata.testcase = answers.rows[0].testcasesteps;
+                                            listoftestcasedata.push(responsedata);
+                                        }
+                                        callback2();
+                                    });
+							}
                             }
                         });
                     }, callback);
