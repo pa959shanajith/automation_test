@@ -461,60 +461,153 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 
 
 	function TestCaseDetails_Suite_ICE(req,cb,data){
-		var requestedtestscenarioid = req;
-		var testscenarioslist = "select testcaseids from testscenarios where testscenarioid="+requestedtestscenarioid+";";
-		var resultstring = [];
-		var data = [];
-		var resultdata ='';
+        var requestedtestscenarioid = req;
+        var testscenarioslist = "select testcaseids from testscenarios where testscenarioid=" + requestedtestscenarioid + ";";
+        var resultstring = [];
+        var data = [];
+        var resultdata = '';
 
-		var listoftestcasedata = [];
-		async.series(
-				{	testcaseid: function(callback){
-					dbConnICE.execute(testscenarioslist,function(err,result){
-						if(err){
-							console.log(err);
-						}else{
-							data = JSON.parse(JSON.stringify(result.rows[0].testcaseids));
-							resultdata = data;
-							console.log(data);
-							callback(err,resultdata);
-						}
-					});
-				},
-				testcasesteps : function(callback){
-
-					async.forEachSeries(resultdata, function(quest, callback2) {
-						var responsedata={template: "",testcase:[],testcasename:""};
-
-						var testcasestepsquery = "select testcasesteps,testcasename from testcases where testcaseid = "+quest;
-						dbConnICE.execute(testcasestepsquery, function(err, answers) {
-							if(err){
-								console.log(err);
-							}else{
-								responsedata.template = "";
-								responsedata.testcasename = answers.rows[0].testcasename;
-								responsedata.testcase = answers.rows[0].testcasesteps;
-
-								listoftestcasedata.push(responsedata);
+        var listoftestcasedata = [];
+        async.series({
+                testcaseid: function(callback) {
+                    dbConnICE.execute(testscenarioslist, function(err, result) {
+                        if (err) {
+                            console.log(err);
+                        } else {
+                            data = JSON.parse(JSON.stringify(result.rows[0].testcaseids));
+                            resultdata = data;
+                            console.log(data);
+                            callback(err, resultdata);
+                        }
+                    });
+                },
+                testcasesteps: function(callback) {
+                    async.forEachSeries(resultdata, function(quest, callback2) {
+                        var responsedata = {
+                            template: "",
+                            testcase: [],
+                            testcasename: ""
+                        };
+                        var getscreenidquery = "select screenid from testcases where testcaseid=" + quest;
+                        dbConnICE.execute(getscreenidquery, function(err, screenidresponse) {
+                            if (err) {
+                                console.log(err);
+                            } else {
+								try{
+                                if (screenidresponse != "") {
+                                    var getscreendataquery = "select screendata from screens where screenid=" + screenidresponse.rows[0].screenid;
+									dbConnICE.execute(getscreendataquery, function(err, screendataresponse) {
+                                        if (err) {
+                                            console.log(err);
+                                        } else {
+											try{
+												try{
+													screendataresponse = JSON.parse(screendataresponse.rows[0].screendata);
+												}catch(exception){
+													screendataresponse=JSON.parse("{}");;
+												}
+												if (screendataresponse != null && screendataresponse != "") {
+													if ('body' in screendataresponse) {
+														var wsscreentemplate = screendataresponse.body[0];
+														var testcasestepsquery = "select testcasesteps,testcasename from testcases where testcaseid = " + quest;
+														dbConnICE.execute(testcasestepsquery, function(err, answers) {
+															if (err) {
+																console.log(err);
+															} else {
+																responsedata.template = wsscreentemplate;
+																responsedata.testcasename = answers.rows[0].testcasename;
+																responsedata.testcase = answers.rows[0].testcasesteps;
+																listoftestcasedata.push(responsedata);
+															}
+															callback2();
+														});
+													} else {
+														var testcasestepsquery = "select testcasesteps,testcasename from testcases where testcaseid = " + quest;
+														dbConnICE.execute(testcasestepsquery, function(err, answers) {
+															if (err) {
+																console.log(err);
+															} else {
+																responsedata.template = "";
+																responsedata.testcasename = answers.rows[0].testcasename;
+																responsedata.testcase = answers.rows[0].testcasesteps;
+																listoftestcasedata.push(responsedata);
+															}
+															callback2();
+														});
+													}
+												} else {
+													var testcasestepsquery = "select testcasesteps,testcasename from testcases where testcaseid = " + quest;
+													dbConnICE.execute(testcasestepsquery, function(err, answers) {
+														if (err) {
+															console.log(err);
+														} else {
+															responsedata.template = "";
+															responsedata.testcasename = answers.rows[0].testcasename;
+															responsedata.testcase = answers.rows[0].testcasesteps;
+															listoftestcasedata.push(responsedata);
+														}
+														callback2();
+													});
+												}
+										}catch(exception){
+											var testcasestepsquery = "select testcasesteps,testcasename from testcases where testcaseid = " + quest;
+											dbConnICE.execute(testcasestepsquery, function(err, answers) {
+												if (err) {
+													console.log(err);
+												} else {
+													responsedata.template = "";
+													responsedata.testcasename = answers.rows[0].testcasename;
+													responsedata.testcase = answers.rows[0].testcasesteps;
+													listoftestcasedata.push(responsedata);
+												}
+												callback2();
+											});
+										}
+                                        }
+                                    });
+                                } else {
+                                    var testcasestepsquery = "select testcasesteps,testcasename from testcases where testcaseid = " + quest;
+                                    dbConnICE.execute(testcasestepsquery, function(err, answers) {
+                                        if (err) {
+                                            console.log(err);
+                                        } else {
+                                            responsedata.template = "";
+                                            responsedata.testcasename = answers.rows[0].testcasename;
+                                            responsedata.testcase = answers.rows[0].testcasesteps;
+                                            listoftestcasedata.push(responsedata);
+                                        }
+                                        callback2();
+                                    });
+                                }
+							}catch(exception){
+								var testcasestepsquery = "select testcasesteps,testcasename from testcases where testcaseid = " + quest;
+                                    dbConnICE.execute(testcasestepsquery, function(err, answers) {
+                                        if (err) {
+                                            console.log(err);
+                                        } else {
+                                            responsedata.template = "";
+                                            responsedata.testcasename = answers.rows[0].testcasename;
+                                            responsedata.testcase = answers.rows[0].testcasesteps;
+                                            listoftestcasedata.push(responsedata);
+                                        }
+                                        callback2();
+                                    });
 							}
-							callback2(); 
-						});
-					}, callback);
-
-				}
-				},
-				function(err,results){
-					//data.setHeader('Content-Type','application/json');
-					if(err){
-						cb(err);
-					} 
-					else{
-						cb(null,JSON.stringify(listoftestcasedata));
-					} 
-				}
-
-		);
-	}
+                            }
+                        });
+                    }, callback);
+                }
+            },
+            function(err, results) {
+                //data.setHeader('Content-Type','application/json');
+                if (err) {
+                    cb(err);
+                } else {
+                    cb(null, JSON.stringify(listoftestcasedata));
+                }
+            }
+        );
+    }
 //ExecuteTestSuite Functionality
 
 
