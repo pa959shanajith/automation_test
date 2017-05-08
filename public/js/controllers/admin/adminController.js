@@ -370,12 +370,15 @@ console.log(assignProjectsObj);
 			.then(function (data) { 
 				if (data == "Success") {
 					openModelPopup("Create User", "User created successfully");
+					resetCreateUser();
 				}
 				else if (data == "User Exists") {
 					openModelPopup("Create User", "User already Exists");
+					resetCreateUser();
 				}
 				else {
 					openModelPopup("Create User", "Failed to create user");
+					resetCreateUser();
 				}
 			}, function (error) { console.log("Error:::::::::::::", error) })
 		}
@@ -584,6 +587,18 @@ console.log(assignProjectsObj);
 
 		}
 	};
+
+	function resetCreateUser()
+	{
+		$("#userName,#firstName,#lastName,#password,#confirmPassword,#email").val("");
+		$("#userRoles").prop('selectedIndex', 0);
+	}
+
+	function resetUpdateUser()
+	{
+		$("#userSelect,#userRoles").prop('selectedIndex', 0);
+		$("#firstName,#lastName,#password,#confirmPassword,#email").val("");
+	}
 
 	function resetForm()
 	{
@@ -1577,6 +1592,7 @@ console.log(assignProjectsObj);
 		});
 
 		$(document).on('change','#selProject', function() {
+			updateProjectDetails = [];
 			var domaiprojectId = $("#selProject option:selected").val();
 			var projects = [];
 			var requestedids=[domaiprojectId];
@@ -1693,9 +1709,11 @@ console.log(assignProjectsObj);
 		.then(function (response) {
 			if(response == "success"){
 				$("#editUserSuccessModal").modal("show");
+				resetUpdateUser();
 			}
 			else{
 				$("#editUserFailModal").modal("show");
+				resetUpdateUser();
 			}
 		}, 
 		function (error) { console.log("Error:::::::::::::", error) })
