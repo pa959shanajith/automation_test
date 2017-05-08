@@ -21,7 +21,7 @@ exports.authenticateUser_Nineteen68 = function(req, res){
      var sessId = req.session.id;
      req.session.username = username;
      req.session.uniqueId = sessId;
-     var authUser = "select password from users where username = '"+ req.session.username+"' allow filtering";
+     var authUser = "select password from users where username = '"+ req.session.username+"' allow filtering;"
      //console.log(req);
      dbConn.execute(authUser, function (err, result) {
       if(err) console.log(err);

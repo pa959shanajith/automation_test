@@ -164,6 +164,7 @@ exports.updateUser_nineteen68 = function updateUser_nineteen68(req, res) {
 	var local_role = userObj.role;
 	var local_email_id = userObj.email;
 	var local_user_Id = userObj.userId;
+    var db_password='';
 
 	if(local_password != "")
 	{
@@ -184,7 +185,7 @@ exports.updateUser_nineteen68 = function updateUser_nineteen68(req, res) {
 				local_username = service.username;
 			}
 			if(local_password.trim().length == 0) {
-				local_password = service.password;
+				db_password = service.password;
 			}
 			else{
 				var salt = bcrypt.genSaltSync(10);
@@ -200,10 +201,16 @@ exports.updateUser_nineteen68 = function updateUser_nineteen68(req, res) {
 				local_role = service.role;
 			}
 			if(local_email_id == undefined || local_email_id == 'undefined' || local_email_id == ''){
-				local_email_id = service.email_id;
+				local_email_id = service.emailid;
 			}
-
-			var updateUser = "UPDATE users set username='"+local_username+"', password='"+local_password+"', firstname='"+local_firstname+"', lastname='"+local_lastname+"', modifiedby='"+local_username+"', modifiedon="+new Date().getTime()+", defaultrole="+local_role+", emailid='"+local_email_id+"' where userid="+local_user_Id;
+            if(db_password != "" && db_password != undefined)
+            {
+                var updateUser = "UPDATE users set username='"+local_username+"', password='"+db_password+"', firstname='"+local_firstname+"', lastname='"+local_lastname+"', modifiedby='"+local_username+"', modifiedon="+new Date().getTime()+", defaultrole="+local_role+", emailid='"+local_email_id+"' where userid="+local_user_Id;
+            }
+            else{
+                var updateUser = "UPDATE users set username='"+local_username+"', password='"+req_hashedPassword+"', firstname='"+local_firstname+"', lastname='"+local_lastname+"', modifiedby='"+local_username+"', modifiedon="+new Date().getTime()+", defaultrole="+local_role+", emailid='"+local_email_id+"' where userid="+local_user_Id;
+            }
+			
 			// console.log(updateUser);
 			dbConn.execute(updateUser, function (err, result) {
 				if (typeof result === 'undefined') {

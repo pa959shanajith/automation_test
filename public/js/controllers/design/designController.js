@@ -29,8 +29,6 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 	}
 	//Default Function to reset all input, select
 	
-	
-	
 	var getTaskName = JSON.parse(window.localStorage['_CT']).taskName;
 	appType = JSON.parse(window.localStorage['_CT']).appType;
 	screenName =  JSON.parse(window.localStorage['_CT']).screenName;
@@ -3154,7 +3152,7 @@ function contentTable(newTestScriptDataLS) {
 						var listType = '';
 						if(obType =='push_button' || obType =='GuiButton' || obType =='button' )	{sc = Object.keys(keywordArrayList.button);selectedKeywordList = "button";}		
 						else if(obType =='GuiTextField' || obType =='GuiCTextField' || obType =='text' || obType=='input'){	sc = Object.keys(keywordArrayList.text);selectedKeywordList = "text";}
-						else if(obType =='GuiLabel'){	sc = Object.keys(keywordArrayList.element);selectedKeywordList = "element";}
+						else if(obType =='GuiLabel' || obType =='lbl'){	sc = Object.keys(keywordArrayList.element);selectedKeywordList = "element";}
 						else if(obType =='GuiPasswordField'){	sc = Object.keys(keywordArrayList.text);selectedKeywordList = "text";}
 						else if(obType =='combo_box'||obType =='GuiBox'|| obType=='GuiComboBox' || obType=='select'){	sc = Object.keys(keywordArrayList.select);selectedKeywordList = "select";}
 						else if(obType =='list_item')	{sc = Object.keys(keywordArrayList.list);selectedKeywordList = "list";}
@@ -3170,7 +3168,7 @@ function contentTable(newTestScriptDataLS) {
 						}
 						else if(obType =='check_box'||obType=='GuiCheckBox' || obType=='checkbox'){	sc = Object.keys(keywordArrayList.checkbox);selectedKeywordList = "checkbox";}
 						else if(obType == 'radio_button '||obType =='GuiRadioButton' || obType=='radiobutton')	{sc = Object.keys(keywordArrayList.radiobutton);selectedKeywordList = "radiobutton";}
-						else if(obType =='hyperlink' || obType =='lbl' || obType=='a'){	sc = Object.keys(keywordArrayList.link);selectedKeywordList = "link";}
+						else if(obType =='hyperlink' || obType=='a'){	sc = Object.keys(keywordArrayList.link);selectedKeywordList = "link";}
 						else	{sc = Object.keys(keywordArrayList.element);selectedKeywordList = "element";}
 						for(var i = 0; i < sc.length; i++){
 							if(selectedKeyword == sc[i]){

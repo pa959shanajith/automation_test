@@ -246,7 +246,7 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 					exeDat = ("0" + exeDate[0]).slice(-2) +"-"+ ("0" + exeDate[1]).slice(-2) +"-"+ exeDate[2];
 					var fst = data[i].executedtime.split(" ")[1].split(":");
 					exeTime = ("0" + fst[0]).slice(-2) +":"+ ("0" + fst[1]).slice(-2);
-					scenarioContainer.find('tbody').append("<tr><td title='"+data[i].testscenarioname+"'>"+data[i].testscenarioname+"</td><td><span style='margin-right: 28px;'>"+exeDat+"</span><span>"+exeTime+"</span></td><td><img alt='-' src='"+brow+"'></td><td class='openReports' data-reportid='"+data[i].reportid+"'><a class='openreportstatuss' "+styleColor+">"+data[i].status+"</a></td><td data-reportid='"+data[i].reportid+"'><img alt='Select format' class='selectFormat' src='imgs/ic-export-json.png' style='cursor: pointer;' title='Select format'></td></tr>");
+					scenarioContainer.find('tbody').append("<tr><td title='"+data[i].testscenarioname+"'>"+data[i].testscenarioname+"</td><td><span style='margin-right: 28px;'>"+exeDat+"</span><span>"+exeTime+"</span></td><td><img class='sap' alt='-' src='"+brow+"'></td><td class='openReports' data-reportid='"+data[i].reportid+"'><a class='openreportstatus' "+styleColor+">"+data[i].status+"</a></td><td data-reportid='"+data[i].reportid+"'><img alt='Select format' class='selectFormat' src='imgs/ic-export-json.png' style='cursor: pointer;' title='Select format'></td></tr>");
 				}
 				if(data.length > 2){
 					$("#scenarioReportsTable #dateDESC").show();

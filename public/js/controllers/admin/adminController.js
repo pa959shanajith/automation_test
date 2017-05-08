@@ -6,7 +6,7 @@ var createprojectObj = {}; var projectDetails = [];var flag;var projectExists;va
 var editedProjectDetails = [];
 var deletedProjectDetails = [];
 var newProjectDetails = [];
-var unAssignedProjects = []; var assignedProjects = [];var projectData =[];
+var unAssignedProjects = []; var assignedProjects = [];var projectData =[];var valid = "";
 mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeout','cfpLoadingBar', function ($scope, $http, adminServices, $timeout, cfpLoadingBar) {
 	$("body").css("background","#eee");
 	$('.dropdown').on('show.bs.dropdown', function(e){
@@ -370,12 +370,15 @@ console.log(assignProjectsObj);
 			.then(function (data) { 
 				if (data == "Success") {
 					openModelPopup("Create User", "User created successfully");
+					resetCreateUser();
 				}
 				else if (data == "User Exists") {
 					openModelPopup("Create User", "User already Exists");
+					resetCreateUser();
 				}
 				else {
 					openModelPopup("Create User", "Failed to create user");
+					resetCreateUser();
 				}
 			}, function (error) { console.log("Error:::::::::::::", error) })
 		}
@@ -433,10 +436,68 @@ console.log(assignProjectsObj);
 			openModelPopup("Create Project", "Please add atleast one cycle for a release");
 		}
 		else{
-			flag = false;
 			projectExists = false;
 			var requestedids = [];
 			var idtype = [];
+			checkCycle(flag);
+			if(valid == "false")
+			{
+				return false;
+			}
+			else{
+				
+				if($('#selDomain option:selected').val() != "")
+				{
+					requestedids.push($('#selDomain option:selected').val());
+					idtype.push('domainsall');
+					adminServices.getNames_ICE(requestedids,idtype)
+					.then(function (response) {
+						if(response.projectNames.length > 0)
+						{
+							for(var i=0;i<response.projectNames.length;i++)
+							{
+								if($("#projectName").val() == response.projectNames[i])
+								{
+									openModelPopup("Create Project", "Project Name already Exists");
+									projectExists = true;
+									return false;
+								}
+
+							}
+						}
+						else{
+							openModelPopup("Create Project", "Failed to create project");
+							return false;
+						}
+
+						var userDetails = JSON.parse(window.localStorage['_UI']);
+						createprojectObj.domainId =  $('#selDomain option:selected').val();
+						createprojectObj.projectName = $.trim($("#projectName").val());
+						createprojectObj.appType = $(".projectTypeSelected").attr('data-app');
+						createprojectObj.projectDetails = projectDetails;
+						adminServices.createProject_ICE(createprojectObj,userDetails)
+						.then(function (response) {
+							if(response == 'success')
+							{
+								openModelPopup("Create Project", "Project created successfully");
+								resetForm();
+							}
+							else{
+								openModelPopup("Create Project", "Failed to create project");
+								resetForm();
+							}
+						}, function (error) { console.log("Error:::::::::::::", error) })
+
+					}, function (error) { console.log("Error:::::::::::::", error) })
+				}
+			}
+
+			
+		}
+	};
+
+	function checkCycle(flag)
+	{
 			$("#releaseList li").each(function() {
 				for(var i=0;i<projectDetails.length;i++)
 				{
@@ -445,62 +506,14 @@ console.log(assignProjectsObj);
 						if(projectDetails[i].cycleNames.length == 0)
 						{
 							openModelPopup("Create Project", "Please add atleast one cycle for a release");
-							flag = true;
-							if(flag == true)
-							{
-								return false;
-							}
+							
+							valid = "false";
+							return flag;
 						}
 					}
 				}
 			});
-
-			if($('#selDomain option:selected').val() != "")
-			{
-				requestedids.push($('#selDomain option:selected').val());
-				idtype.push('domainsall');
-				adminServices.getNames_ICE(requestedids,idtype)
-				.then(function (response) {
-					if(response.projectNames.length > 0)
-					{
-						for(var i=0;i<response.projectNames.length;i++)
-						{
-							if($("#projectName").val() == response.projectNames[i])
-							{
-								openModelPopup("Create Project", "Project Name already Exists");
-								projectExists = true;
-								return false;
-							}
-
-						}
-					}
-					else{
-						openModelPopup("Create Project", "Failed to create project");
-						return false;
-					}
-
-					var userDetails = JSON.parse(window.localStorage['_UI']);
-					createprojectObj.domainId =  $('#selDomain option:selected').val();
-					createprojectObj.projectName = $.trim($("#projectName").val());
-					createprojectObj.appType = $(".projectTypeSelected").attr('data-app');
-					createprojectObj.projectDetails = projectDetails;
-					adminServices.createProject_ICE(createprojectObj,userDetails)
-					.then(function (response) {
-						if(response == 'success')
-						{
-							openModelPopup("Create Project", "Project created successfully");
-							resetForm();
-						}
-						else{
-							openModelPopup("Create Project", "Failed to create project");
-							resetForm();
-						}
-					}, function (error) { console.log("Error:::::::::::::", error) })
-
-				}, function (error) { console.log("Error:::::::::::::", error) })
-			}
-		}
-	};
+	}
 
 	//Update Project Action
 	$scope.update_project = function () {		
@@ -523,20 +536,7 @@ console.log(assignProjectsObj);
 		}
 		else{
 			flag = false;
-			$("#releaseList li").each(function() {
-				for(var i=0;i<updateProjectDetails.length;i++)
-				{
-					if($(this).children('span.releaseName').text() == updateProjectDetails[i].releaseName)
-					{
-						if(updateProjectDetails[i].cycleDetails.length == 0)
-						{
-							openModelPopup("Update Project", "Please add atleast one cycle for a release");
-							flag = true;
-							break;
-						}
-					}
-				}
-			});
+		
 			if(flag == true)
 			{
 				return false;
@@ -588,18 +588,92 @@ console.log(assignProjectsObj);
 		}
 	};
 
+	function resetCreateUser()
+	{
+		$("#userName,#firstName,#lastName,#password,#confirmPassword,#email").val("");
+		$("#userRoles").prop('selectedIndex', 0);
+	}
+
+	function resetUpdateUser()
+	{
+		$("#userSelect,#userRoles").prop('selectedIndex', 0);
+		$("#firstName,#lastName,#password,#confirmPassword,#email").val("");
+	}
+
 	function resetForm()
 	{
 		$("#selDomain").prop('selectedIndex', 0);
 		$("#projectName").val("");
 		$("div.projectTypeSelected").removeClass("projectTypeSelected");
 		$("#releaseList li, #cycleList li").remove();
+		toggleCycleClick();
 	}
 	function resetAssignProjectForm()
 	{
 		$("#selAssignUser, #selAssignProject").prop('selectedIndex', 0);
 		$("#allProjectAP,#assignedProjectAP").empty();
 	}
+
+	//Prevent Special Character except ._- for releasename on keydown
+	$(document).on("keydown", "#releaseTxt", function(e){
+		if(e.shiftKey && e.keyCode == 190 || (e.shiftKey && (e.keyCode > 46 && e.keyCode < 58)) || e.keyCode == 17)
+			{
+				return false;
+			}
+			if(e.shiftKey && e.keyCode == 189 || e.keyCode == 189 || e.keyCode == 190 || e.keyCode > 64 && e.keyCode < 91 || e.keyCode == 8 || e.keyCode == 46 || e.keyCode > 46 && e.keyCode < 58 || e.keyCode == 32)
+			{
+				return true;
+			}
+			else{
+				return false;
+			}
+	});
+
+	//Prevent Special Character except ._- for releasename on keydown
+	$(document).on("keydown", "#releaseName", function(e){
+		if(e.shiftKey && e.keyCode == 190 || (e.shiftKey && (e.keyCode > 46 && e.keyCode < 58)) || e.keyCode == 17)
+			{
+				return false;
+			}
+			if(e.shiftKey && e.keyCode == 189 || e.keyCode == 189 || e.keyCode == 190 || e.keyCode > 64 && e.keyCode < 91 || e.keyCode == 8 || e.keyCode == 46 || e.keyCode > 46 && e.keyCode < 58 || e.keyCode == 32)
+			{
+				return true;
+			}
+			else{
+				return false;
+			}
+	});
+
+	//Prevent Special Character except ._- for cycleName on keydown
+	$(document).on("keydown", "#cycleTxt", function(e){
+		if(e.shiftKey && e.keyCode == 190 || (e.shiftKey && (e.keyCode > 46 && e.keyCode < 58)) || e.keyCode == 17)
+			{
+				return false;
+			}
+			if(e.shiftKey && e.keyCode == 189 || e.keyCode == 189 || e.keyCode == 190 || e.keyCode > 64 && e.keyCode < 91 || e.keyCode == 8 || e.keyCode == 46 || e.keyCode > 46 && e.keyCode < 58 || e.keyCode == 32)
+			{
+				return true;
+			}
+			else{
+				return false;
+			}
+	});
+
+	//Prevent Special Character except ._- for cycleName on keydown
+	$(document).on("keydown", "#cycleName", function(e){
+		if(e.shiftKey && e.keyCode == 190 || (e.shiftKey && (e.keyCode > 46 && e.keyCode < 58)) || e.keyCode == 17)
+			{
+				return false;
+			}
+			if(e.shiftKey && e.keyCode == 189 || e.keyCode == 189 || e.keyCode == 190 || e.keyCode > 64 && e.keyCode < 91 || e.keyCode == 8 || e.keyCode == 46 || e.keyCode > 46 && e.keyCode < 58 || e.keyCode == 32)
+			{
+				return true;
+			}
+			else{
+				return false;
+			}
+	});
+
 
 	//Add Release Name Functionality
 	$(document).on("click", "#addRelease", function(){
@@ -611,12 +685,19 @@ console.log(assignProjectsObj);
 			$('#releaseTxt').focus();
 		});
 		$("#releaseTxt").val('');
+			var reg = /^[a-zA-Z0-9\s\.\-\_]+$/
 		$("#addReleaseName").on('click',function(e) {
 			e.preventDefault();
 			if($("#releaseTxt").val() == "")
 			{
 				$("#releaseTxt").addClass('inputErrorBorder');
 				return false;
+			}
+			else if(!reg.test($("#releaseTxt").val()))
+			{
+					$("#releaseTxt").addClass('inputErrorBorder');
+					$("#releaseTxt").val('');
+					return false;
 			}
 			else{
 				$("#releaseTxt").removeClass('inputErrorBorder');
@@ -697,6 +778,7 @@ console.log(assignProjectsObj);
 		});
 		$("#cycleTxt").val('');
 		$("#addCycleName").on('click',function(e) {
+			var reg = /^[a-zA-Z0-9\s\.\-\_]+$/
 			var relName = $("#releaseList li.active .releaseName").text();
 			e.preventDefault();
 			$("#cycleTxt").removeClass("inputErrorBorder");
@@ -704,6 +786,12 @@ console.log(assignProjectsObj);
 			{
 				$("#cycleTxt").addClass('inputErrorBorder');
 				return false;
+			}
+			else if(!reg.test($("#cycleTxt").val()))
+			{
+					$("#cycleTxt").addClass('inputErrorBorder');
+					$("#cycleTxt").val('');
+					return false;
 			}
 			else{
 				$("#cycleList li:visible").each(function() {
@@ -927,10 +1015,17 @@ console.log(assignProjectsObj);
 			releaseName = $("#releaseName").val(existingReleaseName);
 			//Save edited release name
 			$("#updateReleaseName").on('click', function(event) {
+				var reg = /^[a-zA-Z0-9\s\.\-\_]+$/
 				if($("#releaseName").val() == "")
 				{
 					$("#releaseName").addClass('inputErrorBorder');
 					return false;
+				}
+				else if(!reg.test($("#releaseName").val()))
+				{
+						$("#releaseName").addClass('inputErrorBorder');
+						$("#releaseName").val('');
+						return false;
 				}
 				else{
 					$("#releaseName").removeClass('inputErrorBorder');
@@ -1129,10 +1224,17 @@ console.log(assignProjectsObj);
 			$('#cycleName').focus();
 			//Edit cycle name save button
 			$("#updateCycleName").on('click', function(event) {
+				var reg = /^[a-zA-Z0-9\s\.\-\_]+$/
 				if($("#cycleName").val() == "")
 				{
 					$("#cycleName").addClass('inputErrorBorder');
 					return false;
+				}
+					else if(!reg.test($("#cycleName").val()))
+				{
+						$("#cycleName").addClass('inputErrorBorder');
+						$("#cycleName").val('');
+						return false;
 				}
 				else{
 					var relID = $("li.active").children('span.releaseName').data("releaseid");
@@ -1490,6 +1592,7 @@ console.log(assignProjectsObj);
 		});
 
 		$(document).on('change','#selProject', function() {
+			updateProjectDetails = [];
 			var domaiprojectId = $("#selProject option:selected").val();
 			var projects = [];
 			var requestedids=[domaiprojectId];
@@ -1606,9 +1709,11 @@ console.log(assignProjectsObj);
 		.then(function (response) {
 			if(response == "success"){
 				$("#editUserSuccessModal").modal("show");
+				resetUpdateUser();
 			}
 			else{
 				$("#editUserFailModal").modal("show");
+				resetUpdateUser();
 			}
 		}, 
 		function (error) { console.log("Error:::::::::::::", error) })
@@ -1623,6 +1728,88 @@ console.log(assignProjectsObj);
 		}
 		else return false;
 	});
+$(document).on("keypress","#email", function(key) {
+  		if(key.charCode >= 189 || key.charCode == 64 || key.charCode == 46) return true;
+      	else if((key.charCode < 95 || key.charCode > 122) && (key.charCode < 48 || key.charCode > 57) && (key.charCode < 65 || key.charCode > 90) && (key.charCode != 45) || key.charCode == 96 || key.charCode == 32) return false;
+});
+$(document).on("blur","#email", function(){
+		  var reg = /^[a-zA-Z0-9\.\@\-\_]+$/
+			  if(reg.test($(this).val()) && !(/^[\s]+$/).test($(this).val())){
+				  return true;
+			  }
+			  else if($(this).val() == ''){
+			  }
+			  else{
+				$("#adminModal").find('.modal-title').text("Incorrect Inputs");
+				$("#adminModal").find('.modal-body p').text("Cannot contain special characters other than ._-");
+				$("#adminModal").modal("show");
+				$(this).val('');
+				return false;
+			  }
+  });
+//Prevents special characters for userName except underscore,hyphen and dot on keydown
+$(document).on("keydown","#userName", function(e) {
+	if(e.shiftKey && e.keyCode == 190 || (e.shiftKey && (e.keyCode > 46 && e.keyCode < 58)) || e.keyCode == 17)
+		{
+			return false;
+		}
+		if(e.shiftKey && e.keyCode == 189 || e.keyCode == 189 || e.keyCode == 190 || e.keyCode > 64 && e.keyCode < 91 || e.keyCode == 8 || e.keyCode == 46 || e.keyCode > 46 && e.keyCode < 58 || e.keyCode == 32)
+		{
+			return true;
+		}
+		else{
+			return false;
+		}
+});
+
+//Prevents special characters for userName except underscore,hyphen and dot on blur/paste 
+$(document).on("blur","#userName", function(e) {
+    var id = e.target.id;
+	var val = $(this).val();
+	preventSpecialCharOnBlur(id,val);
+});
+
+
+//Prevents special characters for projectName except underscore,hyphen and dot on keydown
+$(document).on("keydown","#projectName", function(e) {
+	if(e.shiftKey && e.keyCode == 190 || (e.shiftKey && (e.keyCode > 46 && e.keyCode < 58)) || e.keyCode == 17)
+		{
+			return false;
+		}
+		if(e.shiftKey && e.keyCode == 189 || e.keyCode == 189 || e.keyCode == 190 || e.keyCode > 64 && e.keyCode < 91 || e.keyCode == 8 || e.keyCode == 46 || e.keyCode > 46 && e.keyCode < 58 || e.keyCode == 32)
+		{
+			return true;
+		}
+		else{
+			return false;
+		}
+});
+//Prevents special characters for projectName except underscore,hyphen and dot on blur/paste 
+$(document).on("blur","#projectName", function(e) {
+	var id = e.target.id;
+	var val = $(this).val();
+	preventSpecialCharOnBlur(id,val);
+});
+
+
+function preventSpecialCharOnBlur(id, val)
+{
+	var reg = /^[a-zA-Z0-9\s\.\-\_]+$/
+			  if(reg.test(val)){
+				  return true;
+			  }
+			 else if(val == ''){
+			  }
+			  else{
+				$("#adminModal").find('.modal-title').text("Incorrect Inputs");
+				$("#adminModal").find('.modal-body p').text("Cannot contain special characters other than ._-");
+				$("#adminModal").modal("show");
+				$("#"+id).val('');
+				return false;
+			  }
+}
+
+
 
 	//Edit Release Name Functionality
 	/*$(document).on("click", ".editReleaseName", function(){
