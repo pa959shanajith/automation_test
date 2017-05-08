@@ -201,7 +201,7 @@ exports.updateUser_nineteen68 = function updateUser_nineteen68(req, res) {
 				local_role = service.role;
 			}
 			if(local_email_id == undefined || local_email_id == 'undefined' || local_email_id == ''){
-				local_email_id = service.email_id;
+				local_email_id = service.emailid;
 			}
             if(db_password != "" && db_password != undefined)
             {
