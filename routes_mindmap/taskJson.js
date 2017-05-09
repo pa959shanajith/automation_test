@@ -157,6 +157,10 @@ function next_function(resultobj,cb,data){
 								task_json.scenarioId=parent[2];
 
 							}	
+							//Checking if the user is assigned to that project before showing the task to the user
+							if(prjId.length>0 && prjId.indexOf(parent[0]) > -1 ){
+
+							
 								create_ice.getAllNames(parent,function(err,data){
 									if(err){
 
@@ -186,6 +190,7 @@ function next_function(resultobj,cb,data){
 									
 
 								});
+							}
 
 			
 					}

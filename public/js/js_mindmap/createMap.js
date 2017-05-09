@@ -1063,10 +1063,10 @@ var populateDynamicInputList = function(){
 	var scrDict={},tcDict={},scenarioDict={};
 	allMMaps.forEach(function(m){
 		m.children.forEach(function(ts){
-			if(scenarioDict[ts.id_n]===undefined){
-					scenarioList.push({id:ts.id,name:ts.name,id_n:ts.id_n,id_c:ts.id_c});
-					scenarioDict[ts.id_n]=!0;
-			}
+			// if(scenarioDict[ts.id_n]===undefined){
+			// 		scenarioList.push({id:ts.id,name:ts.name,id_n:ts.id_n,id_c:ts.id_c});
+			// 		scenarioDict[ts.id_n]=!0;
+			// }
 			ts.children.forEach(function(s){
 				if(scrDict[s.id_n]===undefined){
 					scrList.push({id:s.id,name:s.name,id_n:s.id_n,id_c:s.id_c});
