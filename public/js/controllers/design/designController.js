@@ -1,4 +1,4 @@
-var screenshotObj,scrapedGlobJson,enableScreenShotHighlight,mirrorObj, eaCheckbox, finalViewString, scrapedData, deleteFlag, pasteSelecteStepNo,globalSelectedBrowserType,selectedKeywordList,keywordListData,dependentTestCaseFlag = false;checkedTestcases = [];
+var screenshotObj,scrapedGlobJson,enableScreenShotHighlight,mirrorObj, eaCheckbox, finalViewString, scrapedData, deleteFlag, globalSelectedBrowserType,selectedKeywordList,keywordListData,dependentTestCaseFlag = false;checkedTestcases = []; pasteSelecteStepNo = [];
 var initScraping = {}; var mirrorObj = {}; var scrapeTypeObj = {}; var newScrapedList; var viewString = {}; var scrapeObject = {}; var screenViewObject = {}; var readTestCaseData; var getRowJsonCopy;
 var selectRowStepNoFlag = false; //var deleteStep = false;
 var dataFormat12;
@@ -105,7 +105,6 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			// service call # 1 - getTestScriptData service call
 			DesignServices.readTestCase_ICE(screenId, testCaseId, testCaseName)	
 			.then(function(data) {
-				debugger;
 				console.log(data);
 				var appType = taskInfo.appType;
 				$('#jqGrid').removeClass('visibility-hide').addClass('visibility-show');
@@ -3843,9 +3842,9 @@ $(document).on("click","#btnPasteTestStep", function(){
 		}
 		if(proceed == true){
 			for(i=0; i<selectedStepNo.length; i++){
-				pasteSelecteStepNo = selectedStepNo[i];
-				pasteInGrid();
+				pasteSelecteStepNo[i] = selectedStepNo[i];
 			}
+			pasteInGrid();
 			/*$('.domainLoader').remove();
 			$("#dialogOverlay, #dialogContainer").remove();*/
 			$("#modalDialog-inputField").find(".close").trigger("click");
@@ -3874,68 +3873,81 @@ $(document).on('focus', '.copyPasteValidation', function(){
 function pasteInGrid(){
 	var gridData = $("#jqGrid").jqGrid('getRowData');
 	var increaseSplice; var getRowJsonCopyTemp = [];
-	var newVal = parseInt(pasteSelecteStepNo);
+	var newVal;
 	var getRowJsonToPaste = JSON.parse(window.localStorage['getRowJsonCopy']);
-	if(gridData.length == 1 && gridData[0].custname == ""){
-		gridData.splice(gridData[0],1)
-		for(k=0; k<getRowJsonToPaste.length; k++){
-			gridData.push(getRowJsonToPaste[k])
-		}
-	}
-	else{
-		if(pasteSelecteStepNo > 0){
-			for(i=0; i<gridData.length; i++){
-				if(gridData[i].stepNo == pasteSelecteStepNo){
-					for(j=0; j<getRowJsonToPaste.length; j++){
-						getRowJsonToPaste[j].stepNo = parseInt(gridData[i].stepNo) + 1
-						if(increaseSplice == "true") gridData.splice(newVal,0,getRowJsonToPaste[j]);
-						else gridData.splice(pasteSelecteStepNo,0,getRowJsonToPaste[j]);
-						//ReArranging Step No
-						for(var l=0; l<gridData.length;l++) gridData[l].stepNo = l+1;
-						//ReArranging Step No
-						increaseSplice = "true";
-						newVal++
-					}
-				}
+	var highlightPasted = [];
+	for(a=0; a<pasteSelecteStepNo.length; a++){
+		newVal = parseInt(pasteSelecteStepNo[a]);
+		if(gridData.length == 1 && gridData[0].custname == ""){
+			gridData.splice(gridData[0],1)
+			for(k=0; k<getRowJsonToPaste.length; k++){
+				gridData.push(getRowJsonToPaste[k])
 			}
 		}
 		else{
-			for(i=0; i<getRowJsonToPaste.length; i++){
-				getRowJsonCopyTemp.push(getRowJsonToPaste[i]);
+			if(pasteSelecteStepNo[a] > 0){
+				for(i=0; i<gridData.length; i++){
+					if(gridData[i].stepNo == pasteSelecteStepNo[a]){
+						for(j=0; j<getRowJsonToPaste.length; j++){
+							getRowJsonToPaste[j].stepNo = parseInt(gridData[i].stepNo) + 1
+							if(increaseSplice == "true") gridData.splice(newVal,0,getRowJsonToPaste[j]);
+							else gridData.splice(pasteSelecteStepNo[a],0,getRowJsonToPaste[j]);
+							//ReArranging Step No
+							for(var l=0; l<gridData.length;l++) gridData[l].stepNo = l+1;
+							//ReArranging Step No
+							increaseSplice = "true";
+							newVal++
+						}
+					}
+				}
 			}
-			for(j=0; j<gridData.length;j++){
-				getRowJsonCopyTemp.push(gridData[j]);
-				for(var l=0; l<getRowJsonCopyTemp.length;l++) getRowJsonCopyTemp[l].stepNo = l+1;
+			else{
+				for(i=0; i<getRowJsonToPaste.length; i++){
+					getRowJsonCopyTemp.push(getRowJsonToPaste[i]);
+				}
+				for(j=0; j<gridData.length;j++){
+					getRowJsonCopyTemp.push(gridData[j]);
+					for(var l=0; l<getRowJsonCopyTemp.length;l++) getRowJsonCopyTemp[l].stepNo = l+1;
+				}
+				gridData = [];
+				for(k=0; k<getRowJsonCopyTemp.length; k++){
+					gridData.push(getRowJsonCopyTemp[k]);
+				}
 			}
-			gridData = [];
-			for(k=0; k<getRowJsonCopyTemp.length; k++){
-				gridData.push(getRowJsonCopyTemp[k]);
-			}
-		}
 
-	}
-	$("#jqGrid").jqGrid('clearGridData');
-	$("#jqGrid").jqGrid('setGridParam',{data: gridData});
-	$("#jqGrid").trigger("reloadGrid");
-	if(pasteSelecteStepNo > 0){
-		for(var i=parseInt(pasteSelecteStepNo)+1; i<=parseInt(pasteSelecteStepNo)+getRowJsonToPaste.length; i++){
-			$.each($("#jqGrid tr"), function(){
-				if(parseInt($(this).children("td:nth-child(1)").text()) == i){				
-					$(this).find("input.cbox").trigger("click")
-					return false;
-				}
-			})
 		}
-	}
-	else{
-		for(var i=parseInt(pasteSelecteStepNo)+1; i<=getRowJsonToPaste.length; i++){
-			$.each($("#jqGrid tr"), function(){
-				if(parseInt($(this).children("td:nth-child(1)").text()) == i){				
-					$(this).find("input.cbox").trigger("click")
-					return false;
-				}
-			})
+		$("#jqGrid").jqGrid('clearGridData');
+		$("#jqGrid").jqGrid('setGridParam',{data: gridData});
+		$("#jqGrid").trigger("reloadGrid");
+		if(pasteSelecteStepNo[a] > 0){
+			for(var i=parseInt(pasteSelecteStepNo[a])+1; i<=parseInt(pasteSelecteStepNo[a])+getRowJsonToPaste.length; i++){
+				highlightPasted.push(i);
+				/*$.each($("#jqGrid tr"), function(){
+					if(parseInt($(this).children("td:nth-child(1)").text()) == i){				
+						$(this).find("input.cbox").trigger("click")
+						return false;
+					}
+				})*/
+			}
 		}
+		else{
+			for(var i=parseInt(pasteSelecteStepNo[a])+1; i<=getRowJsonToPaste.length; i++){
+				highlightPasted.push(i);
+				/*$.each($("#jqGrid tr"), function(){
+					if(parseInt($(this).children("td:nth-child(1)").text()) == i){				
+						$(this).find("input.cbox").trigger("click")
+						return false;
+					}
+				})*/
+			}
+		}
+		$.each($("#jqGrid tr"), function(){
+			for(j=0;j<highlightPasted.length;j++){
+				if(parseInt($(this).children("td:nth-child(1)").text()) == highlightPasted[j]){				
+					$(this).find("input.cbox").prop("checked",true)
+				}
+			}
+		})
 	}
 
 }
@@ -4142,6 +4154,7 @@ function getTags(data) {
 			obnames.push("@Generic");
 			obnames.push("@Browser");
 			obnames.push("@BrowserPopUp");
+			obnames.push("@Action");
 		}
 		else if(appTypeLocal == "MobileApp")	{
 			obnames.push("@Generic");

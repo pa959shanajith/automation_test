@@ -139,7 +139,7 @@ var createNewMap = function(e){
 	initiate();
 	clearSvg();
 	var s=getElementDimm(d3.select("#ct-mapSvg"));
-	node={id:uNix,name:'Module_0',type:'modules',x:s[0]*0.2,y:s[1]*0.4,children:[],parent:null};
+	node={id:uNix,childIndex:0,name:'Module_0',type:'modules',x:s[0]*0.2,y:s[1]*0.4,children:[],parent:null};
 	dNodes.push(node);nCount[0]++;uNix++;
 	addNode(dNodes[uNix-1],!1,null);
 };
@@ -562,9 +562,10 @@ var createNode = function(e){
 	var mapSvg=d3.select('#ct-mapSvg');
 	var w=parseFloat(mapSvg.style('width'));
 	var h=parseFloat(mapSvg.style('height'));
-	node={id:uNix,name:nNext[pt][0]+'_'+nCount[nNext[pt][1]],type:(nNext[pt][0]).toLowerCase()+'s',x:w*(0.15*(1.34+nNext[pt][1])+Math.random()*0.1),y:90+70*Math.floor(Math.random()*(Math.floor((h-150)/70))),children:[],parent:dNodes[pi]};
+	node={id:uNix,childIndex:'',path:'',name:nNext[pt][0]+'_'+nCount[nNext[pt][1]],type:(nNext[pt][0]).toLowerCase()+'s',x:w*(0.15*(1.34+nNext[pt][1])+Math.random()*0.1),y:90+70*Math.floor(Math.random()*(Math.floor((h-150)/70))),children:[],parent:dNodes[pi]};
 	dNodes.push(node);nCount[nNext[pt][1]]++;
 	dNodes[pi].children.push(dNodes[uNix]);
+	dNodes[uNix].childIndex=dNodes[pi].children.length
 	addNode(dNodes[uNix],!0,dNodes[pi]);
 	link={id:uLix,source:dNodes[pi],target:dNodes[uNix]};
 	dLinks.push(link);
@@ -652,6 +653,42 @@ var moveNodeEnd = function(e){
 	var p=d3.select(this.parentElement);
 	var pi=p.attr('id').split('-')[2];
 	var l=p.attr('transform').slice(10,-1).split(',');
+	//Logic to implement rearranging of nodes
+	var curNode=dNodes[pi];
+	var changeOrderUp = function(curNode,ci,p){
+		var counter=-1;
+		var flag=false;
+		dNodes[pi].parent.children.forEach(function(a,i){
+			if(ci<=(i+1)){
+				return false;
+			}
+			if(l[1]<a.y){
+				if(counter==-1) counter=(i+1);
+				a.childIndex++;
+				curNode.childIndex=counter;
+			}
+		});
+	};
+	var changeOrderDown = function(curNode,ci,p){
+		var counter=0;
+		var flag=false;
+		dNodes[pi].parent.children.forEach(function(a,ci){
+			if(l[1]>a.y){
+				counter=(ci+1);
+				a.childIndex--;
+				curNode.childIndex=counter;
+			}
+		});
+	};
+	var currentChildIndex=curNode.childIndex;
+	var totalChildren=curNode.parent.children;
+	if(l[1]<curNode.y){
+		//alert('moved up');
+		changeOrderUp(curNode,currentChildIndex,totalChildren);
+	}else{
+		//alert('moved down');
+		changeOrderDown(curNode,currentChildIndex,totalChildren);
+	}
 	dNodes[pi].x=parseFloat(l[0]);
 	dNodes[pi].y=parseFloat(l[1]);
 	addLink(temp.t,dLinks[temp.t].source,dLinks[temp.t].target);
@@ -813,7 +850,7 @@ var inpKeyUp = function(e){
 	}
 };
 var treeIterator = function(c,d,e){
-	c.push({id:d.id,id_c:(d.id_c)?d.id_c:null,id_n:(d.id_n)?d.id_n:null,oid:(d.oid)?d.oid:null,name:d.name,type:d.type,pid:(d.parent)?d.parent.id:null,pid_c:(d.parent)?d.parent.id_c:null,task:(d.task)?d.task:null,renamed:(d.rnm)?d.rnm:!1,orig_name:(d.original_name)?d.original_name:null});
+	c.push({id:d.id,childIndex:d.childIndex,id_c:(d.id_c)?d.id_c:null,id_n:(d.id_n)?d.id_n:null,oid:(d.oid)?d.oid:null,name:d.name,type:d.type,pid:(d.parent)?d.parent.id:null,pid_c:(d.parent)?d.parent.id_c:null,task:(d.task)?d.task:null,renamed:(d.rnm)?d.rnm:!1,orig_name:(d.original_name)?d.original_name:null});
 	if(d.children&&d.children.length>0) d.children.forEach(function(t){e=treeIterator(c,t,e);});
 	else if(d._children&&d._children.length>0) d._children.forEach(function(t){e=treeIterator(c,t,e);});
 	else if(d.type!='testcases') return !0;
@@ -1064,8 +1101,10 @@ var treeBuilder = function(tree){
 	childCounter(1,tree);
 	var newHeight = d3.max(levelCount)*90;
 	var d3Tree=d3.layout.tree().size([newHeight,cSize[0]]);
-	if(tree.oid===undefined) d3Tree.sort(function(a,b){return a.id-b.id;});
-	else d3Tree.sort(function(a,b){return a.oid-b.oid;});
+	// if(tree.oid===undefined) d3Tree.sort(function(a,b){return a.childIndex-b.childIndex;});
+	// else d3Tree.sort(function(a,b){return a.childIndex-b.childIndex;});
+	if(tree.childIndex===undefined) d3Tree.sort(function(a,b){return a.childIndex-b.childIndex;});
+	else d3Tree.sort(function(a,b){return a.childIndex-b.childIndex;});
 	dNodes=d3Tree.nodes(tree);
 	dLinks=d3Tree.links(dNodes);
 	dNodes.forEach(function(d){
