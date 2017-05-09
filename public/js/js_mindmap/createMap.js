@@ -265,8 +265,8 @@ var addTask = function(e){
 			}
 			if(dNodes[pi].children) dNodes[pi].children.forEach(function(tCa){
 				var cTask=(tObj.t=="Scrape"||tObj.t=="Append"||tObj.t=="Compare")? "Design":"Debug";
+				var tcid=tCa.id_c;
 				if(tCa.task===undefined||tCa.task==null){
-					var tcid=tCa.id_c;
 					if (modid !='null' && tscid !='null' && scrid!='null' && tcid!='null'){
 						taskflag=true;
 						tCa.task={id:null,oid:null,task:cTask,assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,details:tObj.det,parent:[modid,tscid,scrid,tcid]};
