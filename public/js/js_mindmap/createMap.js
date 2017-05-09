@@ -265,8 +265,8 @@ var addTask = function(e){
 			}
 			if(dNodes[pi].children) dNodes[pi].children.forEach(function(tCa){
 				var cTask=(tObj.t=="Scrape"||tObj.t=="Append"||tObj.t=="Compare")? "Design":"Debug";
+				var tcid=tCa.id_c;
 				if(tCa.task===undefined||tCa.task==null){
-					var tcid=tCa.id_c;
 					if (modid !='null' && tscid !='null' && scrid!='null' && tcid!='null'){
 						taskflag=true;
 						tCa.task={id:null,oid:null,task:cTask,assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,details:tObj.det,parent:[modid,tscid,scrid,tcid]};
@@ -603,6 +603,7 @@ var deleteNode = function(e){
 	}
 	p.children.some(function(d,i){
 		if(d.id==sid){
+			//var nodeDel=dNodes.pop(sid);
 			p.children.splice(i,1);
 			return !0;
 		}
@@ -616,7 +617,9 @@ var recurseDelChild = function(d){
 	d.children=null;
 	d.task=null;
 	d3.select('#ct-node-'+d.id).remove();
-	deletednode.push(d.oid)
+	if(d.oid != undefined){
+		deletednode.push(d.oid)
+	}
 	for(j=dLinks.length-1;j>=0;j--){
 		if(dLinks[j].source.id==d.id){
 			d3.select('#ct-link-'+dLinks[j].id).remove();
@@ -1060,10 +1063,10 @@ var populateDynamicInputList = function(){
 	var scrDict={},tcDict={},scenarioDict={};
 	allMMaps.forEach(function(m){
 		m.children.forEach(function(ts){
-			if(scenarioDict[ts.id_n]===undefined){
-					scenarioList.push({id:ts.id,name:ts.name,id_n:ts.id_n,id_c:ts.id_c});
-					scenarioDict[ts.id_n]=!0;
-			}
+			// if(scenarioDict[ts.id_n]===undefined){
+			// 		scenarioList.push({id:ts.id,name:ts.name,id_n:ts.id_n,id_c:ts.id_c});
+			// 		scenarioDict[ts.id_n]=!0;
+			// }
 			ts.children.forEach(function(s){
 				if(scrDict[s.id_n]===undefined){
 					scrList.push({id:s.id,name:s.name,id_n:s.id_n,id_c:s.id_c});

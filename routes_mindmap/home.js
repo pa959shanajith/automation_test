@@ -283,10 +283,10 @@ router.post('/', function(req, res, next) {
 				qList.push({"statement":"MATCH (a:SCREENS),(b:TASKS) WHERE a.screenID=b.nodeID and a.uid=b.uid MERGE (a)-[r:FNTT {id:b.nodeID}]-(b)"});
 				qList.push({"statement":"MATCH (a:TESTCASES),(b:TASKS) WHERE a.testCaseID=b.nodeID and a.uid=b.uid MERGE (a)-[r:FNTT {id:b.nodeID}]-(b)"});
 				qList.push({"statement":"MATCH (a) remove a.uid"});
-				//qList=qList.concat(rnmList);
-				qList.push({"statement":"MATCH path=(n:MODULES{moduleID:'"+data[0].id+"'})-[r*1..]->(t) RETURN path","resultDataContents":["graph"]});
 				qList=qList.concat(rnmList);
-				var index=(qList.length-rnmList.length)-1;
+				qList.push({"statement":"MATCH path=(n:MODULES{moduleID:'"+data[0].id+"'})-[r*1..]->(t) RETURN path","resultDataContents":["graph"]});
+				//qList=qList.concat(rnmList);
+				//var index=(qList.length-rnmList.length)-1;
 				
 				reqToAPI({"data":{"statements":qList}},urlData,'/neoQuerya',function(err,status,result){
 					res.setHeader('Content-Type','application/json');
@@ -297,7 +297,7 @@ router.post('/', function(req, res, next) {
 						idDict={};
 						var attrDict={"modules":{"childIndex":"childIndex","projectID":"pid_n","moduleName":"name","moduleID":"id_n","moduleID_c":"id_c"},"scenarios":{"childIndex":"childIndex","moduleID":"pid_n","testScenarioName":"name","testScenarioID":"id_n","testScenarioID_c":"id_c"},"screens":{"childIndex":"childIndex","testScenarioID":"pid_n","screenName":"name","screenID":"id_n","screenID_c":"id_c"},"testcases":{"childIndex":"childIndex","screenID":"pid_n","testCaseName":"name","testCaseID":"id_n","testCaseID_c":"id_c"},"tasks":{"taskID":"id_n","task":"t","assignedTo":"at","reviewer":"rw","startDate":"sd","endDate":"ed","release":"re","cycle":"cy","details":"det","nodeID":"pid","parent":"anc"}};
 						var jsonData=JSON.parse(result);
-						jsonData[index].data.forEach(function(row){
+						jsonData[jsonData.length-1].data.forEach(function(row){
 							row.graph.nodes.forEach(function(n){
 								if (idDict[n.id] === undefined) {
 									lbl=n.labels[0].toLowerCase();
