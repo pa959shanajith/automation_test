@@ -603,6 +603,7 @@ var deleteNode = function(e){
 	}
 	p.children.some(function(d,i){
 		if(d.id==sid){
+			//var nodeDel=dNodes.pop(sid);
 			p.children.splice(i,1);
 			return !0;
 		}
@@ -616,7 +617,9 @@ var recurseDelChild = function(d){
 	d.children=null;
 	d.task=null;
 	d3.select('#ct-node-'+d.id).remove();
-	deletednode.push(d.oid)
+	if(d.oid != undefined){
+		deletednode.push(d.oid)
+	}
 	for(j=dLinks.length-1;j>=0;j--){
 		if(dLinks[j].source.id==d.id){
 			d3.select('#ct-link-'+dLinks[j].id).remove();
