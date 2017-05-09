@@ -8,6 +8,20 @@ var sessions = require('express-session')
 var cookieParser = require('cookie-parser');
 var errorhandler = require('errorhandler');
 var cmd = require('node-cmd');
+var helmet = require('helmet');
+var fs = require('fs');
+
+var privateKey  = fs.readFileSync('server/https/key.pem','utf-8');
+var certificate = fs.readFileSync('server/https/server.crt','utf-8');
+var credentials = {key: privateKey, cert: certificate};
+
+console.log("Privatekey", privateKey);
+console.log("Certificate",certificate);
+
+
+var httpsServer = require('https').createServer(credentials,app);
+
+
 module.exports = app;
 app.use(bodyParser.json({limit: '5mb'}));
 app.use(bodyParser.urlencoded({limit: '5mb', extended: true}));
@@ -23,6 +37,8 @@ app.use(sessions({
     saveUninitialized: true,
 	cookie: { maxAge:(30*60*1000) }
 }));
+app.use(helmet());          
+
 //write stream for logs
 //var accessLogStream = fs.createWriteStream(__dirname + '/access.log', {flags: 'a'})
 
@@ -151,7 +167,8 @@ app.post('/getTaskJson_Nineteen68',plugin.getTaskJson_Nineteen68);
 
 //-------------SERVER START------------//
 
-server.listen(3000);  
+server.listen(3000);      //Http Server
+httpsServer.listen(8000); //Https Server
 
 //To be removed when try catch is implemented across the application
 app.use(function(req,res,next){
