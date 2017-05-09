@@ -100,7 +100,7 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 					dateASC(dateArray);
 			    	$("tbody.scrollbar-inner-scenariostatus").empty();
 			    	for(i=0; i<dateArray.length; i++){
-			    		dateArray[i].firstChild.innerHTML = i+1;
+			    		dateArray[i].firstChild.innerText = i+1;
 						$("tbody.scrollbar-inner-scenariostatus").append(dateArray[i]);
 					}
 				}
@@ -131,7 +131,7 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
         	dateDESC(dateArray);
         	$("tbody.scrollbar-inner-scenariostatus").empty();
         	for(i=0; i<dateArray.length; i++){
-        		dateArray[i].firstChild.innerHTML = i+1;
+        		dateArray[i].firstChild.innerText = i+1;
     			$("tbody.scrollbar-inner-scenariostatus").append(dateArray[i]);
     		}
     	}
@@ -153,7 +153,7 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
         	dateASC(dateArray);
         	$("tbody.scrollbar-inner-scenariostatus").empty();
         	for(i=0; i<dateArray.length; i++){
-        		dateArray[i].firstChild.innerHTML = i+1;
+        		dateArray[i].firstChild.innerText = i+1;
     			$("tbody.scrollbar-inner-scenariostatus").append(dateArray[i]);
     		}    		
     	}
@@ -171,22 +171,22 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
     function dateDESC(dateArray){
     	dateArray.sort(function(a,b){
     		var dateA, timeA, dateB, timeB;
-    		if(a.children.item(1).innerHTML.indexOf("span") === -1){
-    			dateA = a.children.item(1).innerHTML;
-    			timeA = a.children.item(2).innerHTML;
-    			dateB = b.children.item(1).innerHTML;
-    			timeB = b.children.item(2).innerHTML;
+    		if(a.children.item(1).innerText.indexOf("span") === -1){
+    			dateA = a.children.item(1).innerText;
+    			timeA = a.children.item(2).innerText;
+    			dateB = b.children.item(1).innerText;
+    			timeB = b.children.item(2).innerText;
     		}
     		else{
-    			dateA = a.children.item(1).children.item(0).innerHTML;
-    			timeA = a.children.item(1).children.item(1).innerHTML;
-    			dateB = b.children.item(1).children.item(0).innerHTML;
-    			timeB = b.children.item(1).children.item(1).innerHTML;
+    			dateA = a.children.item(1).children.item(0).innerText;
+    			timeA = a.children.item(1).children.item(1).innerText;
+    			dateB = b.children.item(1).children.item(0).innerText;
+    			timeB = b.children.item(1).children.item(1).innerText;
     		}
     		var fDate = dateA.split("-"); var lDate = dateB.split("-");
     		//var fFDate = fDate[0].split("/"); var lLDate = lDate[0].split("/");
-    		var gDate = fDate[1]+"-"+fDate[0]+"-"+fDate[2];
-    		var mDate = lDate[1]+"-"+lDate[0]+"-"+lDate[2];
+    		var gDate = fDate[2]+"-"+fDate[1]+"-"+fDate[0];
+    		var mDate = lDate[2]+"-"+lDate[1]+"-"+lDate[0];
     		if ( new Date(gDate+" "+timeA) < new Date(mDate+" "+timeB) )  return -1;
     	    if ( new Date(gDate+" "+timeA) > new Date(mDate+" "+timeB) )  return 1;
     	    return dateArray;
@@ -196,22 +196,22 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
     function dateASC(dateArray){
     	dateArray.sort(function(a,b){
     		var aA, timeA, bB, timeB;
-    		if(a.children.item(1).innerHTML.indexOf("span") === -1){
-        		aA = a.children.item(1).innerHTML;
-    			timeA = a.children.item(2).innerHTML;
-        		bB = b.children.item(1).innerHTML;
-    			timeB = b.children.item(2).innerHTML;    			
+    		if(a.children.item(1).innerText.indexOf("span") === -1){
+        		aA = a.children.item(1).innerText;
+    			timeA = a.children.item(2).innerText;
+        		bB = b.children.item(1).innerText;
+    			timeB = b.children.item(2).innerText;    			
     		}
     		else{
-    			aA = a.children.item(1).children.item(0).innerHTML;
-    			timeA = a.children.item(1).children.item(1).innerHTML;
-        		bB = b.children.item(1).children.item(0).innerHTML;
-    			timeB = b.children.item(1).children.item(1).innerHTML;
+    			aA = a.children.item(1).children.item(0).innerText;
+    			timeA = a.children.item(1).children.item(1).innerText;
+        		bB = b.children.item(1).children.item(0).innerText;
+    			timeB = b.children.item(1).children.item(1).innerText;
     		}
     		var fDate = aA.split("-"); var lDate = bB.split("-");
     		//var fFDate = fDate[0].split("/"); var lLDate = lDate[0].split("/");
-    		var gDate = fDate[1]+"-"+fDate[0]+"-"+fDate[2];
-    		var mDate = lDate[1]+"-"+lDate[0]+"-"+lDate[2];
+    		var gDate = fDate[2]+"-"+fDate[1]+"-"+fDate[0];
+    		var mDate = lDate[2]+"-"+lDate[1]+"-"+lDate[0];
     		if ( new Date(gDate+" "+timeA) > new Date(mDate+" "+timeB) )  return -1;
     	    if ( new Date(gDate+" "+timeA) < new Date(mDate+" "+timeB) )  return 1;
     	    return dateArray;
@@ -255,7 +255,7 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 				dateASC(dateArray);
 		    	$("tbody.scrollbar-inner-scenarioreports").empty();
 		    	for(i=0; i<dateArray.length; i++){
-		    		//dateArray[i].firstChild.innerHTML = i+1;
+		    		//dateArray[i].firstChild.innerText = i+1;
 					$("tbody.scrollbar-inner-scenarioreports").append(dateArray[i]);
 				}
 				if(data.length > 0){
