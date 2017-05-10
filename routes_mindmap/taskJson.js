@@ -2,8 +2,8 @@ var create_ice=require('../server/controllers/create_ice');
 var fs = require('fs');
 var http = require('http');
 var async=require('async');
-
-
+var https = require('https');
+var certificate = fs.readFileSync('server/https/server.crt','utf-8');
 
 
 
@@ -45,8 +45,10 @@ var reqToAPI = function(d,u,p,callback) {
 	var data = JSON.stringify(d);
 	var result="";
     u=u.split(':');
-	var postOptions = {host: u[0], port: u[1], path: p, method: 'POST',	headers: {'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(data)}};
-	var postRequest = http.request(postOptions,function(resp){
+	var postOptions = {host: u[0], port: u[1], path: p, method: 'POST',ca:certificate,checkServerIdentity: function (host, cert) {
+    return undefined; },headers: {'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(data)}};
+  	postOptions.agent= new https.Agent(postOptions);
+	var postRequest = https.request(postOptions,function(resp){
 		resp.setEncoding('utf-8');
 		resp.on('data', function(chunk) {result+=chunk;});
 		resp.on('end', function(chunk) {callback(null,resp.statusCode,result);});
