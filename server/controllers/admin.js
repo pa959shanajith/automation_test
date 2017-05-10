@@ -734,14 +734,20 @@ exports.getNames_ICE = function(req, res){
                 }
                 queryString="select projectid,projectname from projects where domainid="+requestedidslist[eachid];
                 namesfetcher(queryString,function(error,response){
-                    for(var i=0;i<response.length;i++){
-                        responsedata.projectIds.push(response[i].projectid);
-                        responsedata.projectNames.push(response[i].projectname);
-                        if(i==response.length-1){
-                            console.log(responsedata);
-                            res.send(responsedata);
+                    if(response.length<=0){
+                        res.send("No Projects");
+                    }
+                    else{
+                        for(var i=0;i<response.length;i++){
+                            responsedata.projectIds.push(response[i].projectid);
+                            responsedata.projectNames.push(response[i].projectname);
+                            if(i==response.length-1){
+                                console.log(responsedata);
+                                res.send(responsedata);
+                            }
                         }
                     }
+                    
                 });
             }else if(idtypes[eachid] == 'projects'){
                 //in this block project name and project id of the respective id is sent
