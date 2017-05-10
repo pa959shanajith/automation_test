@@ -813,8 +813,8 @@ var inpKeyUp = function(e){
 		return;
 	}
 	t=p.attr('data-nodetype');
-	if(t == 'scenarios') list = scenarioList;
-	else if(t=='screens') list=scrList;
+	//if(t == 'scenarios') list = scenarioList;
+	if(t=='screens') list=scrList;
 	else if(t=='testcases') list=tcList;
 	else return;
 	iul.selectAll('li').remove();
