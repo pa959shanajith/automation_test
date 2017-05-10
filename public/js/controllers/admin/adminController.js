@@ -458,9 +458,13 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 					{
 						requestedids.push($('#selDomain option:selected').val());
 						idtype.push('domainsall');
+						var proceeed = false;
 						adminServices.getNames_ICE(requestedids,idtype)
 						.then(function (response) {
-							if(response.projectNames.length > 0)
+							if(response == "No Projects"){
+								proceeed = true;
+							}							
+							else if(response.projectNames.length > 0)
 							{
 								for(var i=0;i<response.projectNames.length;i++)
 								{
@@ -470,6 +474,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 										projectExists = true;
 										return false;
 									}
+									else proceeed = true;
 
 								}
 							}
@@ -477,25 +482,25 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 								openModelPopup("Create Project", "Failed to create project");
 								return false;
 							}
-
-							var userDetails = JSON.parse(window.localStorage['_UI']);
-							createprojectObj.domainId =  $('#selDomain option:selected').val();
-							createprojectObj.projectName = $.trim($("#projectName").val());
-							createprojectObj.appType = $(".projectTypeSelected").attr('data-app');
-							createprojectObj.projectDetails = projectDetails;
-							adminServices.createProject_ICE(createprojectObj,userDetails)
-							.then(function (response) {
-								if(response == 'success')
-								{
-									openModelPopup("Create Project", "Project created successfully");
-									resetForm();
-								}
-								else{
-									openModelPopup("Create Project", "Failed to create project");
-									resetForm();
-								}
-							}, function (error) { console.log("Error:::::::::::::", error) })
-
+							if(proceeed == true){
+								var userDetails = JSON.parse(window.localStorage['_UI']);
+								createprojectObj.domainId =  $('#selDomain option:selected').val();
+								createprojectObj.projectName = $.trim($("#projectName").val());
+								createprojectObj.appType = $(".projectTypeSelected").attr('data-app');
+								createprojectObj.projectDetails = projectDetails;
+								adminServices.createProject_ICE(createprojectObj,userDetails)
+								.then(function (response) {
+									if(response == 'success')
+									{
+										openModelPopup("Create Project", "Project created successfully");
+										resetForm();
+									}
+									else{
+										openModelPopup("Create Project", "Failed to create project");
+										resetForm();
+									}
+								}, function (error) { console.log("Error:::::::::::::", error) })
+							}
 						}, function (error) { console.log("Error:::::::::::::", error) })
 					}
 				}
