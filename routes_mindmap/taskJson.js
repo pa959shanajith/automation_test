@@ -192,6 +192,8 @@ function next_function(resultobj,cb,data){
 									
 
 								});
+							}else{
+								maincallback();
 							}
 
 			
