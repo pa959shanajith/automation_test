@@ -10,14 +10,11 @@ var errorhandler = require('errorhandler');
 var cmd = require('node-cmd');
 var helmet = require('helmet');
 var fs = require('fs');
+//var csrf = require('csurf');
 
 var privateKey  = fs.readFileSync('server/https/key.pem','utf-8');
 var certificate = fs.readFileSync('server/https/server.crt','utf-8');
 var credentials = {key: privateKey, cert: certificate};
-
-console.log("Privatekey", privateKey);
-console.log("Certificate",certificate);
-
 
 var httpsServer = require('https').createServer(credentials,app);
 
@@ -37,7 +34,8 @@ app.use(sessions({
     saveUninitialized: true,
 	cookie: { maxAge:(30*60*1000) }
 }));
-app.use(helmet());          
+app.use(helmet());
+//app.use(csrf());          
 
 //write stream for logs
 //var accessLogStream = fs.createWriteStream(__dirname + '/access.log', {flags: 'a'})
@@ -167,8 +165,8 @@ app.post('/getTaskJson_Nineteen68',plugin.getTaskJson_Nineteen68);
 
 //-------------SERVER START------------//
 
-server.listen(3000);      //Http Server
-httpsServer.listen(8000); //Https Server
+server.listen(3000);  
+httpsServer.listen(8443);
 
 //To be removed when try catch is implemented across the application
 app.use(function(req,res,next){
