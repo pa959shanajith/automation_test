@@ -746,7 +746,7 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 	async.series(
 			{
 			testsuitecheck : function(callback){
-				var getTestSuites="select donotexecute,conditioncheck,getparampaths,testscenarioids from testsuites where testsuiteid= "+requiredtestsuiteid+" and cycleid="+requiredcycleid+" and testsuitename='"+requiredtestsuitename+"'";
+				var getTestSuites="select donotexecute,conditioncheck,getparampaths,testscenarioids from testsuites where testsuiteid= "+requiredtestsuiteid+" and cycleid="+requiredcycleid;
 				dbConnICE.execute(getTestSuites,function(err,result){
 					if(err){
 						console.log(err);
@@ -848,7 +848,7 @@ function updatescenariodetailsinsuite(req,cb,data){
 	var donotexecute1 = [];
 	async.series({
 		fetchdata:function(simplecallback){
-			var selectsuierows = "SELECT * FROM testsuites where testsuiteid = "+req.testsuiteid+" and testsuitename='"+req.testsuitename+"' ALLOW FILTERING;";
+			var selectsuierows = "SELECT * FROM testsuites where testsuiteid = "+req.testsuiteid+" and cycleid="+req.cycleid+" ALLOW FILTERING;";
 			dbConnICE.execute(selectsuierows, function(err, answers) {
 				if(err){
 					console.log(err);
@@ -895,9 +895,24 @@ function updatescenariodetailsinsuite(req,cb,data){
 			simplecallback();
 
 		},
+		delete:function(simplecallback){
+            // if(flagtocheckifexists){
+                var deletequery = "DELETE FROM testsuites WHERE testsuiteid="+req.testsuiteid+" and cycleid="+req.cycleid+" and testsuitename='"+suiterowdetails.testsuitename+"'";
+                dbConnICE.execute(deletequery,function(err,deleted){
+                    if(err) 
+                     {
+                     console.log(err);
+                     }else{
+                     }
+                    simplecallback();
+                });
+
+            
+        },
 		updatescenarioinnsuite:function(simplecallback){
+			var updatetestsuitefrommodule = "INSERT INTO testsuites (cycleid,testsuitename,testsuiteid,versionnumber,conditioncheck,createdby,createdon,createdthrough,deleted,donotexecute,getparampaths,history,modifiedby,modifiedon,skucodetestsuite,tags,testscenarioids) VALUES (" + req.cycleid + ",'" + req.testsuitename + "'," + req.testsuiteid + ","+suiterowdetails.versionnumber+",["+conditioncheck1+"],'"+suiterowdetails.createdby+"'," + suiterowdetails.createdon.valueOf()+ ",null,null,["+donotexecute1+"],["+getparampath1+"],null,'"+suiterowdetails.modifiedby+"'," + new Date().getTime().toString() + ",null,null,["+req.testscenarioids+"])";
 			
-			var updatetestsuitefrommodule = "UPDATE testsuites SET testscenarioids = ["+req.testscenarioids+"], conditioncheck=["+conditioncheck1+"] ,getparampaths=["+getparampath1+"], donotexecute=["+donotexecute1+"] WHERE testsuiteid="+req.testsuiteid+" and cycleid="+req.cycleid+" and testsuitename='"+req.testsuitename+"' and versionnumber="+req.versionnumber;
+			//var updatetestsuitefrommodule = "UPDATE testsuites SET testscenarioids = ["+req.testscenarioids+"], conditioncheck=["+conditioncheck1+"] ,getparampaths=["+getparampath1+"], donotexecute=["+donotexecute1+"] WHERE testsuiteid="+req.testsuiteid+" and cycleid="+req.cycleid+" and testsuitename='"+req.testsuitename+"' and versionnumber="+req.versionnumber;
 				dbConnICE.execute(updatetestsuitefrommodule, function(err, answers) {
 					if(err){
 						cb(null,err);
