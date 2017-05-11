@@ -188,6 +188,38 @@ var addLink = function(r,p,c){
 
 
 var addTask = function(e){
+	
+	$("ct-assignTask,#ct-assignedTo,#ct-assignRevw,#ct-assignRel,#ct-assignCyc").removeClass("selectErrorBorder");
+	$("#startDate,#endDate").removeClass("inputErrorBorder");
+	if($("ct-assignTask option:selected").val() == "select user") {
+			$("#ct-assignedTo").css('border','').addClass("datePickBorder");
+			return false;
+		}
+	else if($("#ct-assignedTo option:selected").val() == "select user") {
+		$("#ct-assignedTo").css('border','').addClass("datePickBorder");
+		return false;
+	}
+	else if($("#ct-assignRevw option:selected").val() == "select reviewer") {
+		$("#ct-assignRevw").css('border','').addClass("datePickBorder");
+		return false;
+	}
+	else if($("#ct-assignRel option:selected").val() == "select release") {
+		$("#ct-assignRel").css('border','').addClass("datePickBorder");
+		return false;
+	}
+	else if($("#ct-assignCyc option:selected").val() == "select cycle") {
+		$("#ct-assignCyc").css('border','').addClass("datePickBorder");
+		return false;
+	}
+	else if($("#startDate").val() == "") {
+		$("#startDate").css('border','').addClass("datePickBorder");
+		return false;
+	}
+	else if($("#endDate").val() == "") {
+		$("#endDate").css('border','').addClass("datePickBorder");
+		return false;
+	}
+		
 	d3.select('#ct-assignBox').classed('no-disp',!0);
 	var a,b,p=d3.select(activeNode);
 	var pi=parseInt(p.attr('id').split('-')[2]);
@@ -1136,7 +1168,7 @@ var dataSender = function(data,callback){
 };
 
 //Dialog used through out mindmap
-function openDialogMindmap(title, body){
+/*function openDialogMindmap(title, body){
 	if (window.location.pathname == '/home'){
 		$("#mindmapGlobalDialog").find('.modal-title').text(title);
 		$("#mindmapGlobalDialog").find('.modal-body p').text(body).css('color','black');
@@ -1149,4 +1181,4 @@ function openDialogMindmap(title, body){
 	}
 	
 	
-}
+}*/

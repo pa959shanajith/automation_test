@@ -9,7 +9,14 @@ html {
   	-ms-user-select: text !important;
   	-o-user-select: text !important;
   	user-select: text !important;
+  	scroll-snap-type: proximity;
+    scroll-snap-destination: 0 0;
 }
+
+#snaptarget {
+        scroll-snap-coordinate: 0 -8px;
+    }
+
 input[type="checkbox"]{cursor: default !important; margin-top: 0;}
 #overlayContainer{
 	position: fixed;
@@ -3267,7 +3274,7 @@ textarea:-webkit-autofill:hover textarea:-webkit-autofill:focus,
 select:-webkit-autofill,
 select:-webkit-autofill:hover,
 select:-webkit-autofill:focus {
-    border: none !important;
+    /* border: none !important; */
     -webkit-text-fill-color: inherit !important;
     -webkit-box-shadow: 0 0 0px 1000px #FFFFFF inset;
     transition: background-color 5000s ease-in-out 0s;
@@ -3379,6 +3386,16 @@ select:-webkit-autofill:focus {
 
 .selectErrorBorder{
 	border: 2px solid #d33c3c !important;
+}
+
+.datePickBorder{
+	border: 2px solid #d33c3c !important;
+}
+
+/**************** SAP reports Icon CSS ***************************/
+.sap[src='imgs/desktop.png']
+{
+	height: 18px;
 }
 
 /*****************Custom Media Queries*****************/
