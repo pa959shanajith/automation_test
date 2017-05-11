@@ -458,7 +458,8 @@ body {
 
 .dropdown-userinfo .header-ic,
 .dropdown-userrole .header-ic {
-    width: 30px
+    height: 23px;
+    width: 22px;
 }
 
 .ic-caret {
