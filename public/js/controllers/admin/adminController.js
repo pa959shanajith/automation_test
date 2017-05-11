@@ -199,15 +199,11 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 		.then(function (data) {
 			if(data == 'success')
 			{
-				$("#adminModal").find('.modal-title').text("Assign Projects");
-				$("#adminModal").find('.modal-body p').text("Projects assigned to user successfully");
-				$("#adminModal").modal("show");
+				openModelPopup("Assign Projects", "Projects assigned to user successfully");
 				resetAssignProjectForm();
 			}
 			else{
-				$("#adminModal").find('.modal-title').text("Assign Projects");
-				$("#adminModal").find('.modal-body p').text("Failed to assign projects to user");
-				$("#adminModal").modal("show");
+				openModelPopup("Assign Projects", "Failed to assign projects to user");
 			}
 
 		}, function (error) { console.log("Error:::::::::::::", error) })
@@ -458,9 +454,13 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 					{
 						requestedids.push($('#selDomain option:selected').val());
 						idtype.push('domainsall');
+						var proceeed = false;
 						adminServices.getNames_ICE(requestedids,idtype)
 						.then(function (response) {
-							if(response.projectNames.length > 0)
+							if(response == "No Projects"){
+								proceeed = true;
+							}							
+							else if(response.projectNames.length > 0)
 							{
 								for(var i=0;i<response.projectNames.length;i++)
 								{
@@ -470,6 +470,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 										projectExists = true;
 										return false;
 									}
+									else proceeed = true;
 
 								}
 							}
@@ -477,25 +478,25 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 								openModelPopup("Create Project", "Failed to create project");
 								return false;
 							}
-
-							var userDetails = JSON.parse(window.localStorage['_UI']);
-							createprojectObj.domainId =  $('#selDomain option:selected').val();
-							createprojectObj.projectName = $.trim($("#projectName").val());
-							createprojectObj.appType = $(".projectTypeSelected").attr('data-app');
-							createprojectObj.projectDetails = projectDetails;
-							adminServices.createProject_ICE(createprojectObj,userDetails)
-							.then(function (response) {
-								if(response == 'success')
-								{
-									openModelPopup("Create Project", "Project created successfully");
-									resetForm();
-								}
-								else{
-									openModelPopup("Create Project", "Failed to create project");
-									resetForm();
-								}
-							}, function (error) { console.log("Error:::::::::::::", error) })
-
+							if(proceeed == true){
+								var userDetails = JSON.parse(window.localStorage['_UI']);
+								createprojectObj.domainId =  $('#selDomain option:selected').val();
+								createprojectObj.projectName = $.trim($("#projectName").val());
+								createprojectObj.appType = $(".projectTypeSelected").attr('data-app');
+								createprojectObj.projectDetails = projectDetails;
+								adminServices.createProject_ICE(createprojectObj,userDetails)
+								.then(function (response) {
+									if(response == 'success')
+									{
+										openModelPopup("Create Project", "Project created successfully");
+										resetForm();
+									}
+									else{
+										openModelPopup("Create Project", "Failed to create project");
+										resetForm();
+									}
+								}, function (error) { console.log("Error:::::::::::::", error) })
+							}
 						}, function (error) { console.log("Error:::::::::::::", error) })
 					}
 				}
@@ -551,7 +552,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 			{
 				return false;
 			}
-			else{				
+			else{
 				//Update project details json with editedProjectDetails, deletedProjectDetails, newProjectDetails
 				updateProjectObj = {};
 				var userDetails = JSON.parse(window.localStorage['_UI']);
@@ -624,79 +625,19 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 		$("#allProjectAP,#assignedProjectAP").empty();
 	}
 
-	//Prevent Special Character except ._- for releasename on keydown
-	$(document).on("keydown", "#releaseTxt", function(e){
-		if(e.shiftKey && e.keyCode == 190 || (e.shiftKey && (e.keyCode > 46 && e.keyCode < 58)) || e.keyCode == 17)
-		{
-			return false;
-		}
-		if(e.shiftKey && e.keyCode == 189 || e.keyCode == 189 || e.keyCode == 190 || e.keyCode > 64 && e.keyCode < 91 || e.keyCode == 8 || e.keyCode == 46 || e.keyCode > 46 && e.keyCode < 58 || e.keyCode == 32)
-		{
-			return true;
-		}
-		else{
-			return false;
-		}
-	});
-
-	//Prevent Special Character except ._- for releasename on keydown
-	$(document).on("keydown", "#releaseName", function(e){
-		if(e.shiftKey && e.keyCode == 190 || (e.shiftKey && (e.keyCode > 46 && e.keyCode < 58)) || e.keyCode == 17)
-		{
-			return false;
-		}
-		if(e.shiftKey && e.keyCode == 189 || e.keyCode == 189 || e.keyCode == 190 || e.keyCode > 64 && e.keyCode < 91 || e.keyCode == 8 || e.keyCode == 46 || e.keyCode > 46 && e.keyCode < 58 || e.keyCode == 32)
-		{
-			return true;
-		}
-		else{
-			return false;
-		}
-	});
-
-	//Prevent Special Character except ._- for cycleName on keydown
-	$(document).on("keydown", "#cycleTxt", function(e){
-		if(e.shiftKey && e.keyCode == 190 || (e.shiftKey && (e.keyCode > 46 && e.keyCode < 58)) || e.keyCode == 17)
-		{
-			return false;
-		}
-		if(e.shiftKey && e.keyCode == 189 || e.keyCode == 189 || e.keyCode == 190 || e.keyCode > 64 && e.keyCode < 91 || e.keyCode == 8 || e.keyCode == 46 || e.keyCode > 46 && e.keyCode < 58 || e.keyCode == 32)
-		{
-			return true;
-		}
-		else{
-			return false;
-		}
-	});
-
-	//Prevent Special Character except ._- for cycleName on keydown
-	$(document).on("keydown", "#cycleName", function(e){
-		if(e.shiftKey && e.keyCode == 190 || (e.shiftKey && (e.keyCode > 46 && e.keyCode < 58)) || e.keyCode == 17)
-		{
-			return false;
-		}
-		if(e.shiftKey && e.keyCode == 189 || e.keyCode == 189 || e.keyCode == 190 || e.keyCode > 64 && e.keyCode < 91 || e.keyCode == 8 || e.keyCode == 46 || e.keyCode > 46 && e.keyCode < 58 || e.keyCode == 32)
-		{
-			return true;
-		}
-		else{
-			return false;
-		}
-	});
-
-
 	//Add Release Name Functionality
 	$(document).on("click", "#addRelease", function(){
 		flag = false;
-		$("#addReleaseNameModal").modal("show");
+		//$("#addReleaseNameModal").modal("show");
+		openEditGlobalModel("Add Release","releaseTxt","Add Release Name","addReleaseName")
 		$("#releaseTxt").removeClass("inputErrorBorder");
 		//$("#releaseTxt").focus();
-		$('#addReleaseNameModal').on('shown.bs.modal', function () {
+		/*$('#addReleaseNameModal').on('shown.bs.modal', function () {
 			$('#releaseTxt').focus();
-		});
+		});*/
 		$("#releaseTxt").val('');
 		var reg = /^[a-zA-Z0-9\s\.\-\_]+$/
-			$("#addReleaseName").on('click',function(e) {
+			$(document).on('click', "#addReleaseName", function(e) {
 				e.preventDefault();
 				if($("#releaseTxt").val() == "")
 				{
@@ -750,11 +691,11 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 						}
 						count = $("#releaseList li").length;
 						$("#releaseList").append("<li class='createRelease' id='releaseList_"+count+"'><img src='imgs/ic-release.png' /><span title="+releaseName+" class='releaseName'>"+releaseName+"</span><span class='actionOnHover'><img id=editReleaseName_"+count+" title='Edit Release Name' src='imgs/ic-edit-sm.png' class='editReleaseName'><img id=deleteReleaseName_"+count+" title='Delete Release' src='imgs/ic-delete-sm.png' class='deleteRelease'></span></li>");
-						releCycObj = {};
+						/*releCycObj = {};
 						releCycObj.releaseName = releaseName;
 						releCycObj.releaseId = "";
 						releCycObj.cycleDetails = [];
-						updateProjectDetails.push(releCycObj);
+						updateProjectDetails.push(releCycObj);*/
 						//for update project json
 						createNewRelCyc.releaseName = releaseName;
 						newProjectDetails.push(createNewRelCyc);					
@@ -781,15 +722,16 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 	$(document).on("click","#addCycle", function(e){
 		e.preventDefault();
 		flag = false;
-		$("#addCycleNameModal").modal("show");
+		//$("#addCycleNameModal").modal("show");
+		openEditGlobalModel("Add Cycle","cycleTxt","Add Cycle Name","addCycleName")
 		$("#cycleTxt").removeClass('inputErrorBorder');
-		$('#addCycleNameModal').on('shown.bs.modal', function () {
+		/*$('#addCycleNameModal').on('shown.bs.modal', function () {
 			$('#cycleTxt').focus();
-		});
+		});*/
 		$("#cycleTxt").val('');
-		$("#addCycleName").on('click',function(e) {
+		$(document).on('click', "#addCycleName", function(e) {
 			var reg = /^[a-zA-Z0-9\s\.\-\_]+$/
-				var relName = $("#releaseList li.active .releaseName").text();
+			var relName = $("#releaseList li.active .releaseName").text();
 			e.preventDefault();
 			$("#cycleTxt").removeClass("inputErrorBorder");
 			if($("#cycleTxt").val() == "")
@@ -875,7 +817,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 					}
 					delCount = (delCount +1) * 3;
 					$("#cycleList").append("<li class='cycleList createCycle'><img src='imgs/ic-cycle.png' /><span title="+cycleName+" class='cycleName'>"+cycleName+"</span><span class='actionOnHover'><img id=editCycleName_"+delCount+" title='Edit Cycle Name' src='imgs/ic-edit-sm.png' class='editCycleName'><img id=deleteCycleName_"+delCount+" title='Delete Cycle' src='imgs/ic-delete-sm.png' class='deleteCycle'></span></li>");
-					for(var i=0;i<updateProjectDetails.length;i++)
+					/*for(var i=0;i<updateProjectDetails.length;i++)
 					{
 						if(updateProjectDetails[i].releaseName == $("li.active").children('span.releaseName').text())
 						{
@@ -891,7 +833,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 								updateProjectDetails[i].cycleDetails = cycleArr;
 							}
 						}
-					}
+					}*/
 					var RelID = $("li.active").children('span.releaseName').data("releaseid");
 					//For update project json
 					if(newProjectDetails.length <= 0){
@@ -972,6 +914,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 				{
 					var releaseName = $("li.active").children('span.releaseName').text();
 					$("#cycleList li").remove();
+					//Check Release details if already exist
 					if(updateProjectDetails.length > 0)
 					{
 						for(var i=0;i<updateProjectDetails.length;i++)
@@ -1000,6 +943,29 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 							}
 						}
 					}
+					
+					//Check Release details if newly added
+					if(newProjectDetails.length > 0)
+					{
+						for(var i=0;i<newProjectDetails.length;i++)
+						{
+							if(newProjectDetails[i].releaseName == releaseName && 'cycleDetails' in newProjectDetails[i])
+							{
+								for(var j=0;j<newProjectDetails[i].cycleDetails.length;j++)
+								{
+									var objectType = typeof(newProjectDetails[i].cycleDetails[j]);
+									if(objectType == "object")
+									{
+										$("#cycleList").append("<li class='updateCycle'><img src='imgs/ic-cycle.png' /><span title="+newProjectDetails[i].cycleDetails[j].cycleName+" data-cycleid="+newProjectDetails[i].cycleDetails[j].cycleId+" class='cycleName'>"+newProjectDetails[i].cycleDetails[j].cycleName+"</span><span class='actionOnHover'><img id=editCycleName_"+j+" title='Edit Cycle Name' src='imgs/ic-edit-sm.png' class='editCycleName'><img id=deleteCycleName_"+j+" title='Delete Cycle' src='imgs/ic-delete-sm.png' class='deleteCycle'></span></li>");
+									}
+									if(objectType == "string")
+									{
+										$("#cycleList").append("<li class='updateCycle'><img src='imgs/ic-cycle.png' /><span title="+newProjectDetails[i].cycleDetails[j]+"  class='cycleName'>"+newProjectDetails[i].cycleDetails[j]+"</span><span class='actionOnHover'><img id=editCycleName_"+j+" title='Edit Cycle Name' src='imgs/ic-edit-sm.png' class='editCycleName'><img id=deleteCycleName_"+j+" title='Delete Cycle' src='imgs/ic-delete-sm.png' class='deleteCycle'></span></li>");
+									}
+								}
+							}
+						}
+					}
 				}
 			}
 		}
@@ -1009,14 +975,14 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 	var editRelid;
 	//Edit Release Name Functionality
 	$(document).on("click", "[id^=editReleaseName_]", function(e){
-		$("#editReleaseNameModal").modal("show");
+		//$("#editReleaseNameModal").modal("show");
+		openEditGlobalModel("Edit Release Name","releaseName","Enter New Release Name","updateReleaseName")
 		var existingReleaseName = $(this).parents("li").children(".releaseName").text()
 		$("#releaseName").val(existingReleaseName);
 		editReleaseId = e.target.id;
 		editRelid = e.target.parentElement.previousSibling.dataset.releaseid;
 		if(e.target.id != "releaseName")
 		{
-			$("#editReleaseNameModal").modal("show");
 			$("#releaseName").removeClass("inputErrorBorder");
 			$('#editReleaseNameModal').on('shown.bs.modal', function () {
 				$('#releaseName').focus();
@@ -1024,7 +990,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 			var existingReleaseName = $(this).parents("li").children(".releaseName").text()
 			releaseName = $("#releaseName").val(existingReleaseName);
 			//Save edited release name
-			$("#updateReleaseName").on('click', function(event) {
+			$(document).on('click', '#updateReleaseName', function(event) {
 				var reg = /^[a-zA-Z0-9\s\.\-\_]+$/
 					if($("#releaseName").val() == "")
 					{
@@ -1217,14 +1183,14 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 	var editCycId;
 	//Edit Cycle Name Functionality
 	$(document).on("click", "[id^=editCycleName_]", function(e){
-		$("#editCycleNameModal").modal("show");
+		//$("#editCycleNameModal").modal("show");
+		openEditGlobalModel("Edit Cycle Name","cycleName","Enter New Cycle Name","updateCycleName")
 		var existingCycleName = $(this).parents("li").children(".cycleName").text()
 		$("#cycleName").val(existingCycleName)
 		editCycleId = e.target.id;
 		editCycId = e.target.parentElement.previousSibling.dataset.cycleid;
 		if(e.target.id != "cycleName")
 		{
-			$("#editCycleNameModal").modal("show");
 			$("#cycleName").removeClass("inputErrorBorder");
 			/*$('#editCycleNameModal').on('shown.bs.modal', function () {
 					$('#cycleName').focus();
@@ -1233,7 +1199,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 			cycleName = $("#cycleName").val(existingCycleName);
 			$('#cycleName').focus();
 			//Edit cycle name save button
-			$("#updateCycleName").on('click', function(event) {
+			$(document).on('click', '#updateCycleName', function(event) {
 				var reg = /^[a-zA-Z0-9\s\.\-\_]+$/
 					if($("#cycleName").val() == "")
 					{
@@ -1689,7 +1655,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 		.then(function (response) {
 			$("#firstName").val(response.firstName);
 			$("#lastName").val(response.lastName);
-			$("#email").val(response.emailId);
+			$("#email").val(response.emailId != undefined? response.emailId : "");
 			var roleId = response.roleId;
 			adminServices.getUserRoles_Nineteen68()
 			.then(function (response) {
@@ -1710,26 +1676,69 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 
 	//Update Edit User
 	$scope.updateUser = function(){
-		var updateUserObj = {};
-		updateUserObj.userName = $("#userSelect option:selected").text();
-		updateUserObj.passWord = $("#password").val();
-		updateUserObj.firstName = $("#firstName").val();
-		updateUserObj.lastName = $("#lastName").val();
-		updateUserObj.role = $("#userRoles option:selected").val();
-		updateUserObj.email = $("#email").val();
-		updateUserObj.userId = $("#userSelect option:selected").data("id");
-		adminServices.updateUser_nineteen68(updateUserObj)
-		.then(function (response) {
-			if(response == "success"){
-				$("#editUserSuccessModal").modal("show");
-				resetUpdateUser();
-			}
-			else{
-				$("#editUserFailModal").modal("show");
-				resetUpdateUser();
-			}
-		}, 
-		function (error) { console.log("Error:::::::::::::", error) })
+		$("#userSelect, #userRoles").removeClass("selectErrorBorder");
+		$("#firstName, #lastName, #password, #confirmPassword, #email").removeClass("inputErrorBorder");
+		var reg = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+		var regexPassword = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~]).{8,16}$/;
+		if($("#userSelect option:selected").val() == "") {
+			$("#userSelect").css('border','').addClass("selectErrorBorder");
+		}
+		else if ($("#firstName").val() == "") {
+			$("#firstName").addClass("inputErrorBorder");
+		}
+		else if ($("#lastName").val() == "") {
+			$("#lastName").addClass("inputErrorBorder");
+		}
+		else if ($("#password").val() == "") {
+			$("#password").addClass("inputErrorBorder");
+		} 
+		else if (regexPassword.test($("#password").val()) == false) {
+			openModelPopup("Error", "Password must contain atleast 1 special character, 1 numeric, 1 uppercase, length should be minimum 8 character and maximum 12 character.");
+			$("#password").addClass("inputErrorBorder");
+		}
+		else if ($("#confirmPassword").val() == "") {
+			$("#confirmPassword").addClass("inputErrorBorder");
+		}
+		else if (regexPassword.test($("#confirmPassword").val()) == false ) {
+			openModelPopup("Error","Password must contain atleast 1 special character, 1 numeric, 1 uppercase, length should be minimum 8 character and maximum 12 character.");
+			$("#confirmPassword").addClass("inputErrorBorder");
+		}
+		else if($("#password").val() != $("#confirmPassword").val()){
+			openModelPopup("Error", "Password and Confirm Password did not match");
+			$("#confirmPassword").addClass("inputErrorBorder");
+		}
+		else if ($("#email").val() == "") {
+			$("#email").addClass("inputErrorBorder");
+		} 
+		else if (reg.test($("#email").val()) == false) {
+			openModelPopup("Error", "Email address is not valid");
+			$("#email").addClass("inputErrorBorder");
+		} 
+		else if($("#userRoles option:selected").val() == "") {
+			$("#userRoles").css('border','').addClass("selectErrorBorder");
+		}
+		else{
+			var updateUserObj = {};
+			updateUserObj.userName = $("#userSelect option:selected").text();
+			updateUserObj.passWord = $("#password").val();
+			updateUserObj.firstName = $("#firstName").val();
+			updateUserObj.lastName = $("#lastName").val();
+			updateUserObj.role = $("#userRoles option:selected").val();
+			updateUserObj.email = $("#email").val();
+			updateUserObj.userId = $("#userSelect option:selected").data("id");
+			adminServices.updateUser_nineteen68(updateUserObj)
+			.then(function (response) {
+				if(response == "success"){
+					openModelPopup("Edit User", "User has been edited successfully.");
+					resetUpdateUser();
+				}
+				else{
+					openModelPopup("Edit User", "Failed to edit user.");
+					resetUpdateUser();
+				}
+			}, 
+			function (error) { console.log("Error:::::::::::::", error) })
+		}
 	};
 
 	//AppTypeSelect Functionality
@@ -1753,20 +1762,20 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 			else if($(this).val() == ''){
 			}
 			else{
-				$("#adminModal").find('.modal-title').text("Incorrect Inputs");
-				$("#adminModal").find('.modal-body p').text("Cannot contain special characters other than ._-");
-				$("#adminModal").modal("show");
+				openModelPopup("Incorrect Inputs", "Cannot contain special characters other than ._-");
 				$(this).val('');
 				return false;
 			}
 	});
-//	Prevents special characters for userName except underscore,hyphen and dot on keydown
-	$(document).on("keydown","#userName", function(e) {
-		if(e.shiftKey && e.keyCode == 190 || (e.shiftKey && (e.keyCode > 46 && e.keyCode < 58)) || e.keyCode == 17)
+
+
+//	Prevents special characters on keydown
+	$(document).on("keydown", ".validationKeydown", function(e) {
+		if(e.shiftKey && e.keyCode == 190 || (e.shiftKey && (e.keyCode > 46 && e.keyCode < 58)) || e.keyCode == 17 || e.keyCode == 190)
 		{
 			return false;
 		}
-		if(e.shiftKey && e.keyCode == 189 || e.keyCode == 189 || e.keyCode == 190 || e.keyCode > 64 && e.keyCode < 91 || e.keyCode == 8 || e.keyCode == 46 || e.keyCode > 46 && e.keyCode < 58 || e.keyCode == 32)
+		if(e.shiftKey && e.keyCode == 189 || e.keyCode > 64 && e.keyCode < 91 || e.keyCode == 8 || e.keyCode == 46 || e.keyCode > 46 && e.keyCode < 58 || e.keyCode == 32 || e.shiftKey && e.keyCode == 16)
 		{
 			return true;
 		}
@@ -1774,31 +1783,8 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 			return false;
 		}
 	});
-
-//	Prevents special characters for userName except underscore,hyphen and dot on blur/paste 
-	$(document).on("blur","#userName", function(e) {
-		var id = e.target.id;
-		var val = $(this).val();
-		preventSpecialCharOnBlur(id,val);
-	});
-
-
-//	Prevents special characters for projectName except underscore,hyphen and dot on keydown
-	$(document).on("keydown","#projectName", function(e) {
-		if(e.shiftKey && e.keyCode == 190 || (e.shiftKey && (e.keyCode > 46 && e.keyCode < 58)) || e.keyCode == 17)
-		{
-			return false;
-		}
-		if(e.shiftKey && e.keyCode == 189 || e.keyCode == 189 || e.keyCode == 190 || e.keyCode > 64 && e.keyCode < 91 || e.keyCode == 8 || e.keyCode == 46 || e.keyCode > 46 && e.keyCode < 58 || e.keyCode == 32)
-		{
-			return true;
-		}
-		else{
-			return false;
-		}
-	});
-//	Prevents special characters for projectName except underscore,hyphen and dot on blur/paste 
-	$(document).on("blur","#projectName", function(e) {
+//	Prevents special characters on blur/paste 
+	$(document).on("blur", ".validationBlur", function(e) {
 		var id = e.target.id;
 		var val = $(this).val();
 		preventSpecialCharOnBlur(id,val);
@@ -1807,19 +1793,17 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 
 	function preventSpecialCharOnBlur(id, val)
 	{
-		var reg = /^[a-zA-Z0-9\s\.\-\_]+$/
-			if(reg.test(val)){
-				return true;
-			}
-			else if(val == ''){
-			}
-			else{
-				$("#adminModal").find('.modal-title').text("Incorrect Inputs");
-				$("#adminModal").find('.modal-body p').text("Cannot contain special characters other than ._-");
-				$("#adminModal").modal("show");
-				$("#"+id).val('');
-				return false;
-			}
+		var reg = /^[a-zA-Z0-9\_]+$/
+		if(reg.test(val)){
+			return true;
+		}
+		else if(val == ''){
+		}
+		else{
+			openModelPopup("Incorrect Inputs", "Cannot contain special characters other than _");
+			$("#"+id).val('');
+			return false;
+		}
 	}
 
 
@@ -1857,6 +1841,18 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 			$("#adminModal").find('.btn-default').focus();					
 		}, 300);
 	}
+	
+	//Global edit model popup
+	function openEditGlobalModel(title,inputID,placeholder,buttonID){
+		$("#editGlobalModal").find('.modal-title').text(title);
+	    $("#editGlobalModal").find('input').prop("id",inputID).prop("placeholder",placeholder);
+	    $("#editGlobalModal").find('button.btnGlobalSave').prop("id",buttonID);
+		$("#editGlobalModal").modal("show");
+		setTimeout(function(){
+			$("#editGlobalModal").find('input').focus();					
+		}, 300);
+	}
+	
 	function clearUpdateProjectObjects(){
 		newProjectDetails = [];
 		deletedProjectDetails = [];

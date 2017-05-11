@@ -3081,43 +3081,43 @@ function contentTable(newTestScriptDataLS) {
 						$grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
 						break;
 					}
-					else if(appTypeLocal == 'Desktop' &&(obType =='push_button' ||obType =='text' ||obType =='combo_box' || obType =='list_item'|| obType =='hyperlink' || obType =='lbl'
-						||obType =='list' || obType == 'edit' || obType == null || obType == 'check_box' || obType == 'radio_button' || obType != undefined)){
-						var res = '';
-						var sc;
-						var listType = ob.canselectmultiple;
-						if(obType =='push_button')	{sc = Object.keys(keywordArrayList.button);selectedKeywordList = "button";}		
-						else if(obType =='text' || obType == 'edit'){	sc = Object.keys(keywordArrayList.text);selectedKeywordList = "text";}
-						else if(obType =='combo_box'){	sc = Object.keys(keywordArrayList.select);selectedKeywordList = "select";}
-						else if(obType =='list_item')	{sc = Object.keys(keywordArrayList.list);selectedKeywordList = "list";}
-						else if (obType == 'list_item' || obType == 'list') {
-							if (listType == 'true') {
-								sc = Object.keys(keywordArrayList.list);
-								selectedKeywordList = "list";
-							} else {
-								sc = Object.keys(keywordArrayList.select);
-								selectedKeywordList = "select";
-							}
-						}
-						else if(obType =='check_box'){	sc = Object.keys(keywordArrayList.checkbox);selectedKeywordList = "checkbox";}
-						else if(obType == 'radio_button')	{sc = Object.keys(keywordArrayList.radiobutton);selectedKeywordList = "radiobutton";}
-						else if(obType =='hyperlink' || obType =='lbl'){	sc = Object.keys(keywordArrayList.link);selectedKeywordList = "link";}
-						else	{sc = Object.keys(keywordArrayList.element);selectedKeywordList = "element";}
-						for(var i = 0; i < sc.length; i++){
-							if(selectedKeyword == sc[i]){
-								res += '<option role="option" value="' + sc[i]+'" selected>' + sc[i] + '</option>';
-							}
-							else
-								res += '<option role="option" value="' + sc[i]+'">' + sc[i] + '</option>';
-						}
-						var row = $(e.target).closest('tr.jqgrow');
-						var rowId = row.attr('id');
-						$("select#" + rowId + "_keywordVal", row[0]).html(res);
-						selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
-						$grid.jqGrid('setCell', rowId, 'url', url);
-						$grid.jqGrid('setCell', rowId, 'objectName', objName); 
-						$grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
-						break;
+					else if(appTypeLocal == 'Desktop' &&(obType =='button' ||obType =='input' ||obType =='select' || obType =='list_item'|| obType =='hyperlink' || obType =='lbl'
+                        ||obType =='list' || obType == 'edit' || obType == null || obType == 'checkbox' || obType == 'radiobutton' || obType != undefined)){
+                        var res = '';
+                        var sc;
+                        var listType = ob.canselectmultiple;
+                        if(obType =='button')      {sc = Object.keys(keywordArrayList.button);selectedKeywordList = "button";}             
+                        else if(obType =='input' || obType == 'edit'){  sc = Object.keys(keywordArrayList.text);selectedKeywordList = "text";}
+                        else if(obType =='select'){ sc = Object.keys(keywordArrayList.select);selectedKeywordList = "select";}
+                        else if(obType =='list_item')     {sc = Object.keys(keywordArrayList.list);selectedKeywordList = "list";}
+                        else if (obType == 'list_item' || obType == 'list') {
+                               if (listType == 'true') {
+                                      sc = Object.keys(keywordArrayList.list);
+                                      selectedKeywordList = "list";
+                               } else {
+                                      sc = Object.keys(keywordArrayList.select);
+                                      selectedKeywordList = "select";
+                               }
+                        }
+                        else if(obType =='checkbox'){     sc = Object.keys(keywordArrayList.checkbox);selectedKeywordList = "checkbox";}
+                        else if(obType == 'radiobutton')  {sc = Object.keys(keywordArrayList.radiobutton);selectedKeywordList = "radiobutton";}
+                        else if(obType =='hyperlink' || obType =='lbl'){       sc = Object.keys(keywordArrayList.link);selectedKeywordList = "link";}
+                        else   {sc = Object.keys(keywordArrayList.element);selectedKeywordList = "element";}
+                        for(var i = 0; i < sc.length; i++){
+                               if(selectedKeyword == sc[i]){
+                                      res += '<option role="option" value="' + sc[i]+'" selected>' + sc[i] + '</option>';
+                               }
+                               else
+                                      res += '<option role="option" value="' + sc[i]+'">' + sc[i] + '</option>';
+                        }
+                        var row = $(e.target).closest('tr.jqgrow');
+                        var rowId = row.attr('id');
+                        $("select#" + rowId + "_keywordVal", row[0]).html(res);
+                        selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
+                        $grid.jqGrid('setCell', rowId, 'url', url);
+                        $grid.jqGrid('setCell', rowId, 'objectName', objName); 
+                        $grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
+                        break;
 					}
 					else if(appTypeLocal == 'Desktop' &&(!(obType =='push_button' ||obType =='text' ||obType =='combo_box' || obType =='list_item'|| obType =='hyperlink' || obType =='lbl'
 						||obType =='list' || obType == 'edit' || obType == null || obType == 'Static' || obType == 'check_box'|| obType == 'radio_button'))){

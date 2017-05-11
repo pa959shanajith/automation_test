@@ -488,7 +488,10 @@ function createCycle(createCycleQuery,createCycleCallback){
 	});
 };
 
-//Update Project
+/**
+ * this service is used to create/update/delete projects/releases/cycles 
+ * from a particular domain
+ */
 exports.updateProject_ICE = function updateProject_ICE(req, res){
 	
 	var updateProjectDetails=req.body.updateProjectObj;
@@ -505,195 +508,332 @@ exports.updateProject_ICE = function updateProject_ICE(req, res){
         newProjectDetails : function(newProjectDetailsCallback){
             var projectDetails=updateProjectDetails.newProjectDetails;
             async.forEachSeries(projectDetails, function(eachprojectDetail, eachprojectDetailcallback) {
-                var releaseDetails = eachprojectDetail;
-                var releaseName = releaseDetails.releaseName;
-                var cycleDetails = releaseDetails.cycleDetails;
-                var requestReleasehistorydetails = "'inserted release action on Update project service by " + userinfo.username + " having role:" + userinfo.role + "" +
-                    " skucoderelease=" + requestedskucode + ", tags=" + requestedtags + ", with the release Name " + releaseName + " '";
-                var newReleaseID = uuid();
-				//console.log("insideRelease", newProjectID);
-                var createReleaseQuery = "INSERT INTO releases (projectid,releasename,releaseid,createdby,createdon,deleted,history,skucoderelease,tags) values(" +
-                    requestedprojectid + ",'" + releaseName + "'," + newReleaseID + ",'" + userinfo.username + "','" +
-                    new Date().getTime() + "'," + false + ",{" + date + ":" + requestReleasehistorydetails + "},'" +
-                    requestedskucode + "',['" + requestedtags + "']);"
-                dbConnICE.execute(createReleaseQuery, function(err, data) {
-                    if (err) {
-                        console.log(err);
-                    } else {
-                        async.forEachSeries(cycleDetails, function(eachCycleDetail, cycleNamescallback) {
-                            var eachCycleName = eachCycleDetail.cycleName;
-                            var requestCyclehistorydetails = "'inserted cycle action by " + userinfo.username + " having role:" + userinfo.role + "" +
-                                " skucodecycle=" + requestedskucode + ", tags=" + requestedtags + ",with the cycle Name " + eachCycleName + " '";
-                            var newCycleID = uuid();
-                            var getCycleQuery = "INSERT INTO cycles (releaseid,cyclename,cycleid,createdby,createdon,deleted,history,skucodecycle,tags) VALUES (" + 
-                                newReleaseID + ",'" + eachCycleName + "'," + newCycleID + ",'" + userinfo.username + "','" +
-                                new Date().getTime() + "'," + false + ",{" + date + ":" + requestCyclehistorydetails + "},'" +
-                                requestedskucode + "',['" + requestedtags + "']);"
-                            createCycle(getCycleQuery, function(error, response) {
-                                if (error) {
-                                    res.send(error);
-                                } else {
-                                    cycleNamescallback();
-                                }
-                            });
-                            
-                        },eachprojectDetailcallback);
-                    }
-                });
-            },newProjectDetailsCallback);
-        },
-        deletedProjectDetails: function(deletedProjectDetailsCallback){
-            var projectDetails=updateProjectDetails.deletedProjectDetails;
-            async.forEachSeries(projectDetails, function(eachprojectDetail, eachprojectDetailcallback) {
-                var deleteStatus=eachprojectDetail.deleteStatus;
-                if(deleteStatus){
-                    var deleteReleaseQuery="delete from releases where releasename='"+eachprojectDetail.releaseName+
-                    "' and projectid="+requestedprojectid+" and releaseid="+eachprojectDetail.releaseId;
-                    // console.log(deleteReleaseQuery);
-                    dbConnICE.execute(deleteReleaseQuery, function(deleteReleaseQueryerror, deleteReleaseQueryresponse) {
-                        if(deleteReleaseQueryerror){
-                            flag="Error in deleteRelease-updateProject_ICE : Fail";
-                            res.send(flag);
-                        }else{
-                            var cyclesOfRelease=eachprojectDetail.cycleDetails;
-                            async.forEachSeries(cyclesOfRelease, function(eachCycleDetail, eachCycleCallback) {
-                                var deleteCyclesQuery="delete from cycles where cyclename='"+eachCycleDetail.cycleName+
-                                "' and releaseid="+eachprojectDetail.releaseId+" and cycleid="+eachCycleDetail.cycleId;
-                                dbConnICE.execute(deleteCyclesQuery, function(deleteCyclesQueryerror, deleteCyclesQueryresponse) {
-                                    if(deleteCyclesQueryerror){
-                                        flag="Error in deleteCycles(true)-updateProject_ICE : Fail";
-                                        res.send(flag);
-                                    }else{
-                                        eachCycleCallback();
-                                    }
-                                });
-                            },eachprojectDetailcallback);
-                        }
-                    });
-                }else if(!deleteStatus){
-                    var cycleDetails=eachprojectDetail.cycleDetails;
-                    async.forEachSeries(cycleDetails, function(eachCycleDetail, eachCycleCallback) {
-                        var deleteStatusCycles=eachCycleDetail.deleteStatus;
-                        if(deleteStatusCycles){
-                            var cyclesOfRelease=eachCycleDetail.cycleDetails;
-                            var deleteCyclesQuery="delete from cycles where cyclename='"+eachCycleDetail.cycleName+
-                                "' and releaseid="+eachprojectDetail.releaseId+" and cycleid="+eachCycleDetail.cycleId;
-                            dbConnICE.execute(deleteCyclesQuery, function(deleteCyclesQueryerror, deleteCyclesQueryresponse) {
-                                if(deleteCyclesQueryerror){
-                                    flag="Error in deleteCycles(false)-updateProject_ICE : Fail";
-                                    res.send(flag);
-                                }else{
-                                    eachCycleCallback();
-                                }
-                            });
-                        }
-                    },eachprojectDetailcallback);
-                }
-            },deletedProjectDetailsCallback);
-        },
-        editedProjectDetails : function(editedProjectDetailsCallback){
-            var projectDetails=updateProjectDetails.editedProjectDetails;
-            async.forEachSeries(projectDetails, function(eachprojectDetail, eachprojectDetailcallback) {
-                var editedStatus=eachprojectDetail.editStatus;
-                if(editedStatus){
-                    var newReleaseName=eachprojectDetail.releaseName;
-                    var releaseId=eachprojectDetail.releaseId;
-                    var deleteReleaseQuery="delete from releases where releasename='"+eachprojectDetail.oldreleaseName+
-                    "' and projectid="+requestedprojectid+" and releaseid="+releaseId;
-                    // console.log(deleteReleaseQuery);
-                    dbConnICE.execute(deleteReleaseQuery, function(deleteReleaseQueryerror, deleteReleaseQueryresponse) {
-                        if(deleteReleaseQueryerror){
-                            flag="Error in delete-Release(true)-updateProject_ICE : Fail";
-                            res.send(flag);
-                        }else{
+                try{
+                    var releaseCreateStatus=eachprojectDetail.newStatus;
+                        if(releaseCreateStatus){
+                          try{  
+                            var releaseDetails = eachprojectDetail;
+                            var releaseName = releaseDetails.releaseName;
+                            var cycleDetails = releaseDetails.cycleDetails;
                             var requestReleasehistorydetails = "'inserted release action on Update project service by " + userinfo.username + " having role:" + userinfo.role + "" +
-                            " skucoderelease=" + requestedskucode + ", tags=" + requestedtags + ", with the release Name " + newReleaseName + " '";
+                                " skucoderelease=" + requestedskucode + ", tags=" + requestedtags + ", with the release Name " + releaseName + " '";
+                            var newReleaseID = uuid();
+                            //console.log("insideRelease", newProjectID);
                             var createReleaseQuery = "INSERT INTO releases (projectid,releasename,releaseid,createdby,createdon,deleted,history,skucoderelease,tags) values(" +
-                                requestedprojectid + ",'" + newReleaseName + "'," + releaseId + ",'" + userinfo.username + "','" +
+                                requestedprojectid + ",'" + releaseName + "'," + newReleaseID + ",'" + userinfo.username + "','" +
                                 new Date().getTime() + "'," + false + ",{" + date + ":" + requestReleasehistorydetails + "},'" +
                                 requestedskucode + "',['" + requestedtags + "']);"
-                            dbConnICE.execute(createReleaseQuery, function(error, response) {
-                                if(error){
-                                    flag="Error in update-Release(true)-updateProject_ICE : Fail";
-                                    res.send(flag);
-                                }else{
-                                    var cycleDetails=eachprojectDetail.cycleDetails;
-                                    var newCycleName="";
-                                    var cycleId="";
-                                    async.forEachSeries(cycleDetails, function(eachCycleDetail, eachCycleCallback) {
-                                        var editedStatusCycles=eachCycleDetail.editStatus;
-                                        if(editedStatusCycles){
-                                            newCycleName=eachCycleDetail.cycleName;
-                                            cycleId=eachCycleDetail.cycleId;
-                                            var deleteCyclesQuery="delete from cycles where cyclename='"+eachCycleDetail.oldCycleName+
-                                                "' and releaseid="+releaseId+" and cycleid="+cycleId;
-                                            dbConnICE.execute(deleteCyclesQuery, function(deleteCyclesQueryerror, deleteCyclesQueryresponse) {
-                                                if(deleteCyclesQueryerror){
-                                                    flag="Error in delete-Cycle(true)-updateProject_ICE : Fail";
-                                                    res.send(flag);
-                                                }else{
+                            dbConnICE.execute(createReleaseQuery, function(err, data) {
+                                try{    
+                                    if (err) {
+                                        console.log(err);
+                                    } else {
+                                        async.forEachSeries(cycleDetails, function(eachCycleDetail, cycleNamescallback) {
+                                           try{     
+                                                var eachCycleName = eachCycleDetail.cycleName;
                                                 var requestCyclehistorydetails = "'inserted cycle action by " + userinfo.username + " having role:" + userinfo.role + "" +
-                                                    " skucodecyle=" + requestedskucode + ", tags=" + requestedtags + ",with the cycle Name " + newCycleName + " '";
-                                                    var getCycleQuery = "INSERT INTO cycles (releaseid,cyclename,cycleid,createdby,createdon,deleted,history,skucodecycle,tags) VALUES (" + 
-                                                        releaseId + ",'" + newCycleName + "'," + cycleId + ",'" + userinfo.username + "','" +
+                                                    " skucodecycle=" + requestedskucode + ", tags=" + requestedtags + ",with the cycle Name " + eachCycleName + " '";
+                                                var newCycleID = uuid();
+                                                var getCycleQuery = "INSERT INTO cycles (releaseid,cyclename,cycleid,createdby,createdon,deleted,history,skucodecycle,tags) VALUES (" + 
+                                                    newReleaseID + ",'" + eachCycleName + "'," + newCycleID + ",'" + userinfo.username + "','" +
                                                     new Date().getTime() + "'," + false + ",{" + date + ":" + requestCyclehistorydetails + "},'" +
                                                     requestedskucode + "',['" + requestedtags + "']);"
-                                                    createCycle(getCycleQuery, function(error, response) {
-                                                        if (error) {
-                                                            res.send(error);
-                                                        } else {
-                                                            eachCycleCallback();
+                                                createCycle(getCycleQuery, function(error, response) {
+                                                    if (error) {
+                                                        res.send(error);
+                                                    } else {
+                                                        try{
+                                                            cycleNamescallback();
+                                                        }catch(exception){
+                                                            console.log(exception);
                                                         }
-                                                 }); 
-                                                }
-                                            });
-                                        }else{
-                                            eachCycleCallback();
-                                        }
-                                    },eachprojectDetailcallback);
+                                                    }
+                                                });
+                                            }catch(exception){
+                                                console.log(exception);
+                                            }
+                                        },eachprojectDetailcallback);
+                                    }
+                                }catch(exception){
+                                    console.log(exception);
                                 }
                             });
+                        }catch(exception){
+                            console.log(exception);
                         }
-                    });
-                }else{
-                    var newReleaseName=eachprojectDetail.releaseName;
-                    var releaseId=eachprojectDetail.releaseId;
-                    var cycleDetails=eachprojectDetail.cycleDetails;
-                    var newCycleName="";
-                    var cycleId="";
-                    async.forEachSeries(cycleDetails, function(eachCycleDetail, eachCycleCallback) {
-                        var editedStatusCycles=eachCycleDetail.editStatus;
-                        if(editedStatusCycles){
-                            newCycleName=eachCycleDetail.cycleName;
-                            cycleId=eachCycleDetail.cycleId;
-                            var deleteCyclesQuery="delete from cycles where cyclename='"+eachCycleDetail.oldCycleName+
-                                "' and releaseid="+releaseId+" and cycleid="+cycleId;
-                            dbConnICE.execute(deleteCyclesQuery, function(deleteCyclesQueryerror, deleteCyclesQueryresponse) {
-                                if(deleteCyclesQueryerror){
-                                    flag="Error in delete-Cycle(true)-updateProject_ICE : Fail";
-                                    res.send(flag);
-                                }else{
-                                var requestCyclehistorydetails = "'inserted cycle action by " + userinfo.username + " having role:" + userinfo.role + "" +
-                                    " skucodecyle=" + requestedskucode + ", tags=" + requestedtags + ",with the cycle Name " + newCycleName + " '";
+                    }else{
+                        try{ 
+                            //this piece of code runs when only cycles needs to be created 
+                            //in a specified release 
+                            var releaseDetails = eachprojectDetail;
+                            var releaseId = releaseDetails.releaseId;
+                            var cycleDetails = releaseDetails.cycleDetails;
+                            async.forEachSeries(cycleDetails, function(eachCycleDetail, cycleNamescallback) {
+                                try{
+                                    var eachCycleName = eachCycleDetail.cycleName;
+                                    var requestCyclehistorydetails = "'inserted cycle action by " + userinfo.username + " having role:" + userinfo.role + "" +
+                                        " skucodecycle=" + requestedskucode + ", tags=" + requestedtags + ",with the cycle Name " + eachCycleName + " '";
+                                    var newCycleID = uuid();
                                     var getCycleQuery = "INSERT INTO cycles (releaseid,cyclename,cycleid,createdby,createdon,deleted,history,skucodecycle,tags) VALUES (" + 
-                                        releaseId + ",'" + newCycleName + "'," + cycleId + ",'" + userinfo.username + "','" +
-                                    new Date().getTime() + "'," + false + ",{" + date + ":" + requestCyclehistorydetails + "},'" +
-                                    requestedskucode + "',['" + requestedtags + "']);"
+                                        releaseId + ",'" + eachCycleName + "'," + newCycleID + ",'" + userinfo.username + "','" +
+                                        new Date().getTime() + "'," + false + ",{" + date + ":" + requestCyclehistorydetails + "},'" +
+                                        requestedskucode + "',['" + requestedtags + "']);"
                                     createCycle(getCycleQuery, function(error, response) {
                                         if (error) {
                                             res.send(error);
                                         } else {
-                                            eachCycleCallback();
+                                            try{
+                                                cycleNamescallback();
+                                            }catch(exception){
+                                                console.log(exception);
+                                            }
                                         }
-                                }); 
+                                    });
+                                 }catch(exception){
+                                    console.log(exception);
+                                }   
+                            },eachprojectDetailcallback);
+                        }catch(exception){
+                            console.log(exception);
+                        }
+                    }
+                }catch(exception){
+                    console.log(exception)
+                }
+            },newProjectDetailsCallback);
+        },
+        deletedProjectDetails: function(deletedProjectDetailsCallback){
+            try{
+                var projectDetails=updateProjectDetails.deletedProjectDetails;
+                    async.forEachSeries(projectDetails, function(eachprojectDetail, eachprojectDetailcallback) {
+                     try{   
+                        var deleteStatus=eachprojectDetail.deleteStatus;
+                        if(deleteStatus){
+                            var deleteReleaseQuery="delete from releases where releasename='"+eachprojectDetail.releaseName+
+                            "' and projectid="+requestedprojectid+" and releaseid="+eachprojectDetail.releaseId;
+                            // console.log(deleteReleaseQuery);
+                            dbConnICE.execute(deleteReleaseQuery, function(deleteReleaseQueryerror, deleteReleaseQueryresponse) {
+                                try{
+                                    if(deleteReleaseQueryerror){
+                                        flag="Error in deleteRelease-updateProject_ICE : Fail";
+                                        res.send(flag);
+                                    }else{
+                                        var cyclesOfRelease=eachprojectDetail.cycleDetails;
+                                        async.forEachSeries(cyclesOfRelease, function(eachCycleDetail, eachCycleCallback) {
+                                            try{
+                                                var deleteCyclesQuery="delete from cycles where cyclename='"+eachCycleDetail.cycleName+
+                                                "' and releaseid="+eachprojectDetail.releaseId+" and cycleid="+eachCycleDetail.cycleId;
+                                                dbConnICE.execute(deleteCyclesQuery, function(deleteCyclesQueryerror, deleteCyclesQueryresponse) {
+                                                    if(deleteCyclesQueryerror){
+                                                        flag="Error in deleteCycles(true)-updateProject_ICE : Fail";
+                                                        res.send(flag);
+                                                    }else{
+                                                        eachCycleCallback();
+                                                    }
+                                                });
+                                            }catch(exception){
+                                                console.log(exception);
+                                            }
+                                        },eachprojectDetailcallback);
+                                    }
+                                }catch(exception){
+                                    console.log(exception);
                                 }
                             });
-                        }else{
-                            eachCycleCallback();
+                        }else if(!deleteStatus){
+                            try{
+                                var cycleDetails=eachprojectDetail.cycleDetails;
+                                async.forEachSeries(cycleDetails, function(eachCycleDetail, eachCycleCallback) {
+                                   try{
+                                        var deleteStatusCycles=eachCycleDetail.deleteStatus;
+                                        if(deleteStatusCycles){
+                                            try{
+                                                var cyclesOfRelease=eachCycleDetail.cycleDetails;
+                                                var deleteCyclesQuery="delete from cycles where cyclename='"+eachCycleDetail.cycleName+
+                                                    "' and releaseid="+eachprojectDetail.releaseId+" and cycleid="+eachCycleDetail.cycleId;
+                                                dbConnICE.execute(deleteCyclesQuery, function(deleteCyclesQueryerror, deleteCyclesQueryresponse) {
+                                                    if(deleteCyclesQueryerror){
+                                                        flag="Error in deleteCycles(false)-updateProject_ICE : Fail";
+                                                        res.send(flag);
+                                                    }else{
+                                                        eachCycleCallback();
+                                                    }
+                                                });
+                                            }catch(exception){
+                                                console.log(exception);
+                                            }
+                                        }
+                                    }catch(exception){
+                                        console.log(exception);
+                                    }
+                                },eachprojectDetailcallback);
+                            }catch(exception){
+                                console.log(exception);
+                            }
                         }
-                    },eachprojectDetailcallback);
-                }
-            },editedProjectDetailsCallback);
+                    }catch(exception){
+                        console.log(exception);
+                    }
+                },deletedProjectDetailsCallback);
+            }catch(exception){
+                console.log(exception);
+            }
+        },
+        editedProjectDetails : function(editedProjectDetailsCallback){
+            try{
+                var projectDetails=updateProjectDetails.editedProjectDetails;
+                async.forEachSeries(projectDetails, function(eachprojectDetail, eachprojectDetailcallback) {
+                    try{   
+                        var editedStatus=eachprojectDetail.editStatus;
+                        if(editedStatus){
+                            try{
+                                var newReleaseName=eachprojectDetail.releaseName;
+                                var releaseId=eachprojectDetail.releaseId;
+                                var deleteReleaseQuery="delete from releases where releasename='"+eachprojectDetail.oldreleaseName+
+                                "' and projectid="+requestedprojectid+" and releaseid="+releaseId;
+                                // console.log(deleteReleaseQuery);
+                                dbConnICE.execute(deleteReleaseQuery, function(deleteReleaseQueryerror, deleteReleaseQueryresponse) {
+                                    try{
+                                        if(deleteReleaseQueryerror){
+                                            flag="Error in delete-Release(true)-updateProject_ICE : Fail";
+                                            res.send(flag);
+                                        }else{
+                                            try{
+                                                var requestReleasehistorydetails = "'inserted release action on Update project service by " + userinfo.username + " having role:" + userinfo.role + "" +
+                                                " skucoderelease=" + requestedskucode + ", tags=" + requestedtags + ", with the release Name " + newReleaseName + " '";
+                                                var createReleaseQuery = "INSERT INTO releases (projectid,releasename,releaseid,createdby,createdon,deleted,history,skucoderelease,tags) values(" +
+                                                    requestedprojectid + ",'" + newReleaseName + "'," + releaseId + ",'" + userinfo.username + "','" +
+                                                    new Date().getTime() + "'," + false + ",{" + date + ":" + requestReleasehistorydetails + "},'" +
+                                                    requestedskucode + "',['" + requestedtags + "']);"
+                                                dbConnICE.execute(createReleaseQuery, function(error, response) {
+                                                    if(error){
+                                                        flag="Error in update-Release(true)-updateProject_ICE : Fail";
+                                                        res.send(flag);
+                                                    }else{
+                                                        try{
+                                                            var cycleDetails=eachprojectDetail.cycleDetails;
+                                                            var newCycleName="";
+                                                            var cycleId="";
+                                                            async.forEachSeries(cycleDetails, function(eachCycleDetail, eachCycleCallback) {
+                                                               try{
+                                                                   var editedStatusCycles=eachCycleDetail.editStatus;
+                                                                    if(editedStatusCycles){
+                                                                        try{
+                                                                            newCycleName=eachCycleDetail.cycleName;
+                                                                            cycleId=eachCycleDetail.cycleId;
+                                                                            var deleteCyclesQuery="delete from cycles where cyclename='"+eachCycleDetail.oldCycleName+
+                                                                                "' and releaseid="+releaseId+" and cycleid="+cycleId;
+                                                                            dbConnICE.execute(deleteCyclesQuery, function(deleteCyclesQueryerror, deleteCyclesQueryresponse) {
+                                                                                if(deleteCyclesQueryerror){
+                                                                                    flag="Error in delete-Cycle(true)-updateProject_ICE : Fail";
+                                                                                    res.send(flag);
+                                                                                }else{
+                                                                                    try{
+                                                                                        var requestCyclehistorydetails = "'inserted cycle action by " + userinfo.username + " having role:" + userinfo.role + "" +
+                                                                                            " skucodecycle=" + requestedskucode + ", tags=" + requestedtags + ",with the cycle Name " + newCycleName + " '";
+                                                                                            var getCycleQuery = "INSERT INTO cycles (releaseid,cyclename,cycleid,createdby,createdon,deleted,history,skucodecycle,tags) VALUES (" + 
+                                                                                                releaseId + ",'" + newCycleName + "'," + cycleId + ",'" + userinfo.username + "','" +
+                                                                                            new Date().getTime() + "'," + false + ",{" + date + ":" + requestCyclehistorydetails + "},'" +
+                                                                                            requestedskucode + "',['" + requestedtags + "']);"
+                                                                                            createCycle(getCycleQuery, function(error, response) {
+                                                                                                if (error) {
+                                                                                                    res.send(error);
+                                                                                                } else {
+                                                                                                    eachCycleCallback();
+                                                                                                }
+                                                                                            }); 
+                                                                                    }catch(exception){
+                                                                                        console.log(exception);
+                                                                                    }
+                                                                                }
+                                                                            });
+                                                                        }catch(exception){
+                                                                            console.log(exception);
+                                                                        }
+                                                                    }else{
+                                                                        eachCycleCallback();
+                                                                    }
+                                                                }catch(exception){
+                                                                    console.log(exception);
+                                                                }
+                                                            },eachprojectDetailcallback);
+                                                        }catch(exception){
+                                                            console.log(exception);
+                                                        }
+                                                    }
+                                                });
+                                            }catch(exception){
+                                                console.log(exception);
+                                            }
+                                        }
+                                    }catch(exception){
+                                        console.log(exception);
+                                    }
+                                });
+                            }catch(exception){
+                                console.log(exception);
+                            }
+                        }else{
+                             try{   
+                                var newReleaseName=eachprojectDetail.releaseName;
+                                var releaseId=eachprojectDetail.releaseId;
+                                var cycleDetails=eachprojectDetail.cycleDetails;
+                                var newCycleName="";
+                                var cycleId="";
+                                async.forEachSeries(cycleDetails, function(eachCycleDetail, eachCycleCallback) {
+                                    try{
+                                        var editedStatusCycles=eachCycleDetail.editStatus;
+                                        if(editedStatusCycles){
+                                             try{   
+                                                newCycleName=eachCycleDetail.cycleName;
+                                                cycleId=eachCycleDetail.cycleId;
+                                                var deleteCyclesQuery="delete from cycles where cyclename='"+eachCycleDetail.oldCycleName+
+                                                    "' and releaseid="+releaseId+" and cycleid="+cycleId;
+                                                dbConnICE.execute(deleteCyclesQuery, function(deleteCyclesQueryerror, deleteCyclesQueryresponse) {
+                                                    if(deleteCyclesQueryerror){
+                                                        flag="Error in delete-Cycle(true)-updateProject_ICE : Fail";
+                                                        res.send(flag);
+                                                    }else{
+                                                        try{
+                                                            var requestCyclehistorydetails = "'inserted cycle action by " + userinfo.username + " having role:" + userinfo.role + "" +
+                                                                " skucodecycle=" + requestedskucode + ", tags=" + requestedtags + ",with the cycle Name " + newCycleName + " '";
+                                                                var getCycleQuery = "INSERT INTO cycles (releaseid,cyclename,cycleid,createdby,createdon,deleted,history,skucodecycle,tags) VALUES (" + 
+                                                                    releaseId + ",'" + newCycleName + "'," + cycleId + ",'" + userinfo.username + "','" +
+                                                                new Date().getTime() + "'," + false + ",{" + date + ":" + requestCyclehistorydetails + "},'" +
+                                                                requestedskucode + "',['" + requestedtags + "']);"
+                                                                createCycle(getCycleQuery, function(error, response) {
+                                                                    if (error) {
+                                                                        res.send(error);
+                                                                    } else {
+                                                                        eachCycleCallback();
+                                                                    }
+                                                            }); 
+                                                        }catch(exception){
+                                                            console.log(exception);
+                                                        }
+                                                    }
+                                                });
+                                            }catch(exception){
+                                                console.log(exception);
+                                            }
+                                        }else{
+                                            eachCycleCallback();
+                                        }
+                                    }catch(exception){
+                                        console.log(exception);
+                                    }
+                                },eachprojectDetailcallback);
+                            }catch(exception){
+                                console.log(exception);
+                            }
+                        }
+                    }catch(exception){
+                        console.log(exception);
+                    }
+                },editedProjectDetailsCallback);
+            }catch(exception){
+                console.log(exception);
+            }
         }
     }, function(error, response) {
         if (error) {
@@ -705,6 +845,7 @@ exports.updateProject_ICE = function updateProject_ICE(req, res){
         }
     });
 };
+
 
 /***
  * vishvas.a   
@@ -734,12 +875,17 @@ exports.getNames_ICE = function(req, res){
                 }
                 queryString="select projectid,projectname from projects where domainid="+requestedidslist[eachid];
                 namesfetcher(queryString,function(error,response){
-                    for(var i=0;i<response.length;i++){
-                        responsedata.projectIds.push(response[i].projectid);
-                        responsedata.projectNames.push(response[i].projectname);
-                        if(i==response.length-1){
-                            console.log(responsedata);
-                            res.send(responsedata);
+                    if(response.length<=0){
+                        res.send("No Projects");
+                    }
+                    else{
+                        for(var i=0;i<response.length;i++){
+                            responsedata.projectIds.push(response[i].projectid);
+                            responsedata.projectNames.push(response[i].projectname);
+                            if(i==response.length-1){
+                                console.log(responsedata);
+                                res.send(responsedata);
+                            }
                         }
                     }
                 });

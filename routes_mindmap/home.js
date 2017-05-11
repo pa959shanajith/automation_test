@@ -1,18 +1,22 @@
 var fs = require('fs');
 var http = require('http');
+var https = require('https');
 var uuidV4 = require('uuid/v4');
 var express = require('express');
 var router = express.Router();
 var admin = require('../server/controllers/admin');
 var create_ice=require('../server/controllers/create_ice');
 var async = require('async');
+var certificate = fs.readFileSync('server/https/server.crt','utf-8');
 
 /* Send queries to Neo4J/ICE API. */
 var reqToAPI = function(d,u,p,callback) {
 	var data = JSON.stringify(d);
 	var result="";
-	var postOptions = {host: u[0], port: u[1], path: p, method: 'POST',	headers: {'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(data)}};
-	var postRequest = http.request(postOptions,function(resp){
+	var postOptions = {host: u[0], port: u[1], path: p, method: 'POST',ca:certificate,checkServerIdentity: function (host, cert) {
+    return undefined; },headers: {'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(data)}};
+  	postOptions.agent= new https.Agent(postOptions);
+	var postRequest = https.request(postOptions,function(resp){
 		resp.setEncoding('utf-8');
 		resp.on('data', function(chunk) {result+=chunk;});
 		resp.on('end', function(chunk) {callback(null,resp.statusCode,result);});
