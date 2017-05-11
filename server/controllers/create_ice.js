@@ -1138,12 +1138,13 @@ exports.getProjectIDs_Nineteen68 = function(req, res){
                         if(err){
                             res(null,err);
                         }else{
-                            project_names.push(projectnamedata.rows[0].projectname);
-                            app_types.push(projectnamedata.rows[0].projecttypeid);
-                            project_ids.push(iterator);
-                            // projectdetails.projectId = iterator;
-                            // projectdetails.projectName = projectnamedata.rows[0].projectname; 
-                            // console.log(projectnamedata.rows[0].projectname);
+                            if (projectnamedata.rows[0] != undefined ){
+                                project_names.push(projectnamedata.rows[0].projectname);
+                                app_types.push(projectnamedata.rows[0].projecttypeid);
+                                project_ids.push(iterator);
+                            }else{
+                                console.log('projectnamedata is Undefined');
+                            }
                         }
                         projectdetails.projectId=project_ids;
                         projectdetails.projectName=project_names;
