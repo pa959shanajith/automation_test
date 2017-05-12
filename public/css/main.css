@@ -2284,6 +2284,13 @@ input[disabled]{
 .fromMergeObj{
 	cursor: pointer !important;
 }
+.addObjeError{
+	float: right;
+    position: relative;
+    top: 5px;
+    right: 300px;
+    color: red;
+}
 /******Map Object CSS******/
 
 
@@ -3425,6 +3432,9 @@ select:-webkit-autofill:focus {
     }
 }
 
+@media only screen and (height:1024px){
+	.suitestartend thead, .scenarioReports thead{position: relative;}
+}
 
 /* @media only screen and (min-width:1366px) {
     .login-bg-img {
