@@ -176,37 +176,45 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 			unAssignedProjects.push(unassignedProj);
 		});
 
-
+	
 		$("#assignedProjectAP option").each(function() {
 			var assignedProj = {};
 			assignedProj.projectId = $(this).val();
 			assignedProj.projectName = $(this).text();
 			assignedProjects.push(assignedProj);
 		});
-		var domainId = $('#selAssignProject option:selected').val();
-		var userDetails = JSON.parse(window.localStorage['_UI']);
-		var userId = $("#selAssignUser option:selected").attr("data-id");
+		if (assignedProjects.length != 0){
+			var domainId = $('#selAssignProject option:selected').val();
+			var userDetails = JSON.parse(window.localStorage['_UI']);
+			var userId = $("#selAssignUser option:selected").attr("data-id");
 
-		var assignProjectsObj = {};
-		assignProjectsObj.domainId = domainId;
-		assignProjectsObj.userInfo = userDetails;
-		assignProjectsObj.userId = userId;
-//		assignProjectsObj.unAssignedProjects = unAssignedProjects;
-		assignProjectsObj.assignedProjects = assignedProjects;
+			var assignProjectsObj = {};
+			assignProjectsObj.domainId = domainId;
+			assignProjectsObj.userInfo = userDetails;
+			assignProjectsObj.userId = userId;
+//			assignProjectsObj.unAssignedProjects = unAssignedProjects;
+			assignProjectsObj.assignedProjects = assignedProjects;
 
-		console.log(assignProjectsObj);
-		adminServices.assignProjects_ICE(assignProjectsObj)
-		.then(function (data) {
-			if(data == 'success')
-			{
-				openModelPopup("Assign Projects", "Projects assigned to user successfully");
-				resetAssignProjectForm();
-			}
-			else{
-				openModelPopup("Assign Projects", "Failed to assign projects to user");
-			}
+			console.log(assignProjectsObj);
+			adminServices.assignProjects_ICE(assignProjectsObj)
+			.then(function (data) {
+				if(data == 'success')
+				{
+					openModelPopup("Assign Projects", "Projects assigned to user successfully");
+					resetAssignProjectForm();
+				}
+				else{
+					openModelPopup("Assign Projects", "Failed to assign projects to user");
+				}
 
-		}, function (error) { console.log("Error:::::::::::::", error) })
+			}, function (error) { console.log("Error:::::::::::::", error) })
+
+		}
+		else {
+			openModelPopup("Assign Projects", "Please add project/s");
+
+		}
+
 	};
 
 
@@ -582,6 +590,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 					if(response == 'success')
 					{
 						//Clearing old data from updateProject object
+						
 						openModelPopup("Update Project", "Project updated successfully");
 						$timeout(function(){
 							$("#projectTab").trigger("click");
@@ -589,6 +598,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 						},200);
 						resetForm();
 					}
+				
 					else{
 						openModelPopup("Update Project", "Failed to update project");
 						resetForm();
