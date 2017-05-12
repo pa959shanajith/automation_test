@@ -494,7 +494,7 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
                                 console.log(err);
                             } else {
 								try{
-                                if (screenidresponse != "") {
+                                if (screenidresponse.rows.length != 0) {
                                     var getscreendataquery = "select screendata from screens where screenid=" + screenidresponse.rows[0].screenid;
 									dbConnICE.execute(getscreendataquery, function(err, screendataresponse) {
                                         if (err) {
@@ -580,18 +580,19 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
                                     });
                                 }
 							}catch(exception){
-								var testcasestepsquery = "select testcasesteps,testcasename from testcases where testcaseid = " + quest;
-                                    dbConnICE.execute(testcasestepsquery, function(err, answers) {
-                                        if (err) {
-                                            console.log(err);
-                                        } else {
-                                            responsedata.template = "";
-                                            responsedata.testcasename = answers.rows[0].testcasename;
-                                            responsedata.testcase = answers.rows[0].testcasesteps;
-                                            listoftestcasedata.push(responsedata);
-                                        }
-                                        callback2();
-                                    });
+								console.log("Exception occured in TestCaseDetails_Suite_ICE : ",exception);
+								// var testcasestepsquery = "select testcasesteps,testcasename from testcases where testcaseid = " + quest;
+                                //     dbConnICE.execute(testcasestepsquery, function(err, answers) {
+                                //         if (err) {
+                                //             console.log(err);
+                                //         } else {
+                                //             responsedata.template = "";
+                                //             responsedata.testcasename = answers.rows[0].testcasename;
+                                //             responsedata.testcase = answers.rows[0].testcasesteps;
+                                //             listoftestcasedata.push(responsedata);
+                                //         }
+                                //         callback2();
+                                //     });
 							}
                             }
                         });
@@ -667,8 +668,10 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 						if(err){
 							console.log(err);
 						}else{
-							testcasenamelist.push(testcaseresult.rows[0].testcasename);
-							screenidlist.push(testcaseresult.rows[0].screenid);
+							if(testcaseresult.rows.length !=0){
+								testcasenamelist.push(testcaseresult.rows[0].testcasename);
+								screenidlist.push(testcaseresult.rows[0].screenid);
+							}
 
 						}
 						callback2();
@@ -683,9 +686,10 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 						if(err){
 							console.log(err);
 						}else{
-							screennamelist.push(screenresult.rows[0].screenname);
-							projectidlist.push(screenresult.rows[0].projectid);
-
+							if(screenresult.rows.length !=0){
+								screennamelist.push(screenresult.rows[0].screenname);
+								projectidlist.push(screenresult.rows[0].projectid);
+							}	
 						}
 						callback3();         
 					});
@@ -701,6 +705,7 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 						if(err){
 							console.log(err);
 						}else{
+							if(projectresult.rows.length !=0)
 							projectnamelist.push(projectresult.rows[0].projectname);
 
 							//projectidlist.push(screenresult.rows[0].projectid);

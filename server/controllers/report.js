@@ -74,10 +74,15 @@ exports.getAllSuites_ICE = function (req, res) {
 					if(err){
 						console.log(err);
 					}else{
+						try{
+
 						var domainid = JSON.parse(JSON.stringify(result.rows[0].domainid));
 						resultdata = domainid;
 						console.log(resultdata);
-						callback(err,resultdata);
+						callback(err,resultdata);					
+						}catch(ex){
+							console.log("Exception occured in fetching domain_id getAllSuites_ICE : ",ex)
+						}
 					}
 				});
 			},
