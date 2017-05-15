@@ -15,7 +15,7 @@
     },
     "connectionString": { "name": "fs" },
     "httpPort": 3001,
-    "httpsPort": null,
+    "httpsPort": 8001,
     "blobStorage": "fileSystem",
     "phantom": {
         "strategy": "dedicated-process",

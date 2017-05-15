@@ -9,7 +9,7 @@ var dbConnICE = require('../../server/config/icetestautomation');
 
 exports.getMainReport_ICE = function(req, res){
 	var IP = req.connection.localAddress.split(":")[req.connection.localAddress.split(":").length-1];
-	var client = require("jsreport-client")("http://"+IP+":3001/");
+	var client = require("jsreport-client")("https://"+IP+":8001/");
 	client.render({
 	    template: { 
 	    	shortid: "HJP1pqMcg", 
@@ -34,7 +34,7 @@ exports.renderReport_ICE = function(req, res){
 	var IP = req.connection.localAddress.split(":")[req.connection.localAddress.split(":").length-1];
 	if(reportType == "html") shortId = "rkE973-5l";
 	else shortId = "H1Orcdvhg";
-	var client = require("jsreport-client")("http://"+IP+":3001/");
+	var client = require("jsreport-client")("https://"+IP+":8001/");
 	client.render({
 	    template: { 
 	    	shortid: shortId, 
@@ -74,10 +74,15 @@ exports.getAllSuites_ICE = function (req, res) {
 					if(err){
 						console.log(err);
 					}else{
+						try{
+
 						var domainid = JSON.parse(JSON.stringify(result.rows[0].domainid));
 						resultdata = domainid;
 						console.log(resultdata);
-						callback(err,resultdata);
+						callback(err,resultdata);					
+						}catch(ex){
+							console.log("Exception occured in fetching domain_id getAllSuites_ICE : ",ex)
+						}
 					}
 				});
 			},

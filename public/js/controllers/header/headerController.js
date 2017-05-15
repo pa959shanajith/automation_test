@@ -15,6 +15,18 @@ mySPA.controller('headerController', function($scope,$http,$location,headerServi
 	  {
 		  $("#sRole").hide();
 	  }
+	 
+
+	  $(document).on("click", "#naviPg", function(e){
+		  if(userRole == 'Admin')
+		  {
+			  //window.location.href = '/admin';
+		  }
+		  else{
+			  window.location.href = '/plugin';
+		  }
+		  
+	  });
 	 $scope.switchRole_Yes = function () 
 	 {
 	    window.location.href = '/plugin';

@@ -2284,6 +2284,13 @@ input[disabled]{
 .fromMergeObj{
 	cursor: pointer !important;
 }
+.addObjeError{
+	float: right;
+    position: relative;
+    top: 5px;
+    right: 300px;
+    color: red;
+}
 /******Map Object CSS******/
 
 
@@ -3375,6 +3382,36 @@ select:-webkit-autofill:focus {
 .openreportstatuss:hover{text-decoration: none; cursor: text;}
 /*****************Specific Reports CSS*****************/
 
+/******************* Preferences Tab CSS****************/
+/*.customtblWidth
+{
+    width: 83% !important;
+}*/
+.preferencesTbl
+{
+    width: 100%;
+    float: left;
+    margin-top: 2%;
+}
+.preferencesTbl th,.preferencesTbl td
+{
+    text-align: center;
+}
+.preferencesTbl th
+{
+    font-family: latowebbold;
+    font-size: 16px;
+}
+
+.preferencesTbl td
+{
+    font-family: latoweb;
+    font-size: 12px;
+}
+
+/******************* Preferences Tab CSS****************/
+
+
 /******************Remove Webkit autocolor CSS***************************/
 
 .inputErrorBorder{
@@ -3425,6 +3462,9 @@ select:-webkit-autofill:focus {
     }
 }
 
+@media only screen and (height:1024px){
+	.suitestartend thead, .scenarioReports thead{position: relative;}
+}
 
 /* @media only screen and (min-width:1366px) {
     .login-bg-img {

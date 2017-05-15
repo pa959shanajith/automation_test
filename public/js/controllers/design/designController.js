@@ -239,8 +239,10 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		if(appType == "MobileWeb") browserType = [];
 		globalSelectedBrowserType = selectedBrowserType;
 		//if(jQuery("#addDependent").is(":checked"))	triggerPopUp();
+		var blockMsg = 'Debug in Progress. Please Wait...';		
 		if(dependentTestCaseFlag == true)
 		{
+			blockUI(blockMsg); 
 			DesignServices.debugTestCase_ICE(browserType,checkedTestcases)
 			.then(function(data)	{
 				console.log("debug-----",data);
@@ -268,7 +270,6 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			function(error) {console.log("Error while traversing while executing debugTestcase method!! \r\n "+(error.data));});		
 		}
 		else {
-			var blockMsg = 'Debug in Progress. Please Wait...';
 			blockUI(blockMsg);    
 			DesignServices.debugTestCase_ICE(browserType,testcaseID)
 			.then(function(data)	{
@@ -1647,19 +1648,23 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 	//Submit Custom Object Functionality
 	$scope.submitCustomObject = function(){
 		$scope.errorMessage = "";
+		$(".addObjTopWrap").find(".error-msg-abs").text("");
+		$(".addObj-row").find("input").removeAttr("style");
 		var flag = "false";
 		$(".addObj-row").find("input").removeClass('inputErrorBorder')
 		$(".addObj-row").find("select").removeClass('selectErrorBorder')
 		$.each($(".addObj-row"), function(){
 			if($(this).find("input").val() == ""){
 				$scope.errorMessage = "Please enter object name";
-				$(this).find("input").addClass('inputErrorBorder')
+				$(".addObjTopWrap").find(".error-msg-abs").text("Please enter object name");
+				$(this).find("input").attr("style","border-bottom: 2px solid #d33c3c !important;").focus();//.addClass('inputErrorBorder')
 				flag = "false";
 				return false
 			}
 			else if($(this).find("select option:selected").val() == "Select Object Type"){
 				$scope.errorMessage = "Please select object type";
-				$(this).find("select").addClass('selectErrorBorder')
+				$(".addObjTopWrap").find(".error-msg-abs").text("Please select object type");
+				$(this).find("select").attr("style","border-bottom: 2px solid #d33c3c !important;").focus();//.addClass('selectErrorBorder')
 				flag = "false";
 				return false
 			}
@@ -3041,7 +3046,7 @@ function contentTable(newTestScriptDataLS) {
 
 					//changes from wasim
 					if(obType!='a' && obType!='select' && obType!='radiobutton' && obType!='checkbox' && obType!='input' && obType!='list' 
-						&& obType!='tablecell' && obType!='table' && obType!='img' && obType!='button' && appTypeLocal == 'Web' ){						
+						&& obType!='tablecell' && obType!='table' && obType!='img' && obType!='button' && (appTypeLocal == 'Web' || appTypeLocal == 'MobileWeb')){						
 						var sc = Object.keys(keywordArrayList.element);
 						selectedKeywordList = "element";
 						var res = '';

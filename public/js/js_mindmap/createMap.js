@@ -1168,7 +1168,7 @@ var dataSender = function(data,callback){
 };
 
 //Dialog used through out mindmap
-/*function openDialogMindmap(title, body){
+function openDialogMindmap(title, body){
 	if (window.location.pathname == '/home'){
 		$("#mindmapGlobalDialog").find('.modal-title').text(title);
 		$("#mindmapGlobalDialog").find('.modal-body p').text(body).css('color','black');
@@ -1181,4 +1181,4 @@ var dataSender = function(data,callback){
 	}
 	
 	
-}*/
+}
