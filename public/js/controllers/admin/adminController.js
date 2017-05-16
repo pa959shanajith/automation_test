@@ -270,7 +270,14 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 	$("#preferencesTab").on('click',function() {
 		$("img.selectedIcon").removeClass("selectedIcon");
 		$(this).children().find('img').addClass('selectedIcon');
+			setTimeout(function() {
+				$("#preferencesTable").find("input[type=checkbox]").each(function() {
+					$(this).attr("disabled","disabled");
+				});
+			}, 50);
+			
 	});
+	
 
 	toggleMenu = function() {
 		var elem = document.getElementById("sidebar-wrapper");
