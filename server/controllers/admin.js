@@ -66,8 +66,9 @@ exports.getUsers_Nineteen68 = function(req, res){
 exports.getAllUsers_Nineteen68 = function(req, res){
 	var user_names = [];
 	var userIds = [];
-	var userDetails = {user_names:[], userIds : []};
-	var getUserRoles = "select userid, username from nineteen68.users ";
+	var d_role = [];
+	var userDetails = {user_names:[], userIds : [], d_roles:[]};
+	var getUserRoles = "select userid, username, defaultrole from nineteen68.users ";
 	dbConn.execute(getUserRoles, function (err, result) {
 		if (err) {
 			res(null, err);
@@ -76,10 +77,12 @@ exports.getAllUsers_Nineteen68 = function(req, res){
 			async.forEachSeries(result.rows,function(iterator,callback1){
 				user_names.push(iterator.username);
 				userIds.push(iterator.userid);
+				d_role.push(iterator.defaultrole);
 				callback1();
 			});
 			userDetails.userIds = userIds;
 			userDetails.user_names = user_names;
+			userDetails.d_roles = d_role;
 			//console.log(userDetails);
 			res.send(userDetails);
 		}
