@@ -13,7 +13,8 @@ mySPA.controller('headerController', function($scope,$http,$location,headerServi
 	 $(".userRole").text(userRole);
 	 if(userRole == 'Admin')
 	  {
-		  $("#sRole").hide();
+		  $("#sRole").hide(); //naviPg
+		  $("#naviPg").css("cursor", "default");
 	  }
 	 
 

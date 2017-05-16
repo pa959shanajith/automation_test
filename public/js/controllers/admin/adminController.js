@@ -39,7 +39,9 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 			$("#selAssignUser").empty()
 			$("#selAssignUser").append('<option data-id="" value disabled selected>Select User</option>')
 			for(i=0; i<response.userIds.length && response.user_names.length; i++){
-				$("#selAssignUser").append('<option data-id="'+response.userIds[i]+'" value="'+response.user_names[i]+'">'+response.user_names[i]+'</option>')
+				if(response.d_roles[i] != "b5e9cb4a-5299-4806-b7d7-544c30593a6e"){
+					$("#selAssignUser").append('<option data-id="'+response.userIds[i]+'" value="'+response.user_names[i]+'">'+response.user_names[i]+'</option>')	
+				}
 			}
 		}, 
 		function (error) { console.log("Error:::::::::::::", error) })
