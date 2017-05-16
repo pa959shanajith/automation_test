@@ -3,7 +3,7 @@ var fs = require('fs');
 var http = require('http');
 var async=require('async');
 var https = require('https');
-var certificate = fs.readFileSync('server/https/server.crt','utf-8');
+var certificate = fs.readFileSync('server/https/cert.pem','utf-8');
 
 
 

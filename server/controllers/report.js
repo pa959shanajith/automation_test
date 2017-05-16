@@ -9,7 +9,7 @@ var dbConnICE = require('../../server/config/icetestautomation');
 
 exports.getMainReport_ICE = function(req, res){
 	var IP = req.connection.localAddress.split(":")[req.connection.localAddress.split(":").length-1];
-	var client = require("jsreport-client")("http://"+IP+":3001/");
+	var client = require("jsreport-client")("https://"+IP+":8001/");
 	client.render({
 	    template: { 
 	    	shortid: "HJP1pqMcg", 
@@ -34,7 +34,7 @@ exports.renderReport_ICE = function(req, res){
 	var IP = req.connection.localAddress.split(":")[req.connection.localAddress.split(":").length-1];
 	if(reportType == "html") shortId = "rkE973-5l";
 	else shortId = "H1Orcdvhg";
-	var client = require("jsreport-client")("http://"+IP+":3001/");
+	var client = require("jsreport-client")("https://"+IP+":8001/");
 	client.render({
 	    template: { 
 	    	shortid: shortId, 
