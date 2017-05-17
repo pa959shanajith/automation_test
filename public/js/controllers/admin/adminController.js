@@ -1794,12 +1794,9 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 		{
 			return false;
 		}
-		if(e.shiftKey && e.keyCode == 189 || e.keyCode > 64 && e.keyCode < 91 || e.keyCode == 8 || e.keyCode == 46 || e.keyCode > 46 && e.keyCode < 58 || e.keyCode == 32 || e.shiftKey && e.keyCode == 16)
+		else if(e.shiftKey && e.keyCode == 189 || e.keyCode > 64 && e.keyCode < 91 || e.keyCode == 8 || e.keyCode == 46 || e.keyCode > 46 && e.keyCode < 58 || e.keyCode == 32 || e.shiftKey && e.keyCode == 16)
 		{
 			return true;
-		}
-		else{
-			return false;
 		}
 	});
 //	Prevents special characters on blur/paste 
