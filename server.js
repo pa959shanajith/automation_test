@@ -13,8 +13,8 @@ var helmet = require('helmet');
 var fs = require('fs');
 
 //HTTPS Configuration
-var privateKey  = fs.readFileSync('server/https/key.pem','utf-8');
-var certificate = fs.readFileSync('server/https/cert.pem','utf-8');
+var privateKey  = fs.readFileSync('server/https/server.key','utf-8');
+var certificate = fs.readFileSync('server/https/server.crt','utf-8');
 var credentials = {key: privateKey, cert: certificate};
 var httpsServer = require('https').createServer(credentials,app);
 var io = require('socket.io')(httpsServer);

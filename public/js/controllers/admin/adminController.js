@@ -342,14 +342,14 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 			$("#password").addClass("inputErrorBorder");
 		} 
 		else if (regexPassword.test($("#password").val()) == false) {
-			openModelPopup("Error", "Password must contain atleast 1 special character, 1 numeric, 1 uppercase, length should be minimum 8 character and maximum 12 character.");
+			openModelPopup("Error", "Password must contain atleast 1 special character, 1 numeric, 1 uppercase and should be 8 characters length.");
 			$("#password").addClass("inputErrorBorder");
 		}
 		else if ($("#confirmPassword").val() == "") {
 			$("#confirmPassword").addClass("inputErrorBorder");
 		}
 		else if (regexPassword.test($("#confirmPassword").val()) == false ) {
-			openModelPopup("Error","Password must contain atleast 1 special character, 1 numeric, 1 uppercase, length should be minimum 8 character and maximum 12 character.");
+			openModelPopup("Error","Password must contain atleast 1 special character, 1 numeric, 1 uppercase and should be 8 characters length.");
 			$("#confirmPassword").addClass("inputErrorBorder");
 		}
 		else if($("#password").val() != $("#confirmPassword").val()){
