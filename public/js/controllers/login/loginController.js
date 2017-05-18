@@ -49,28 +49,17 @@ mySPA.controller('loginController', function ($scope, $http, $location, LoginSer
                             LoginService.loadUserInfo_Nineteen68(username)
                                 .then(function (data) {
                                 	//To be removed - Has to come from database
-                                	 var availablePlugins = [{
-                                	        "id": "123478",
-                                	        "pluginName": "Mindmap"
-                                	      }, {
-                                	        "id": "4846654",
-                                	        "pluginName": "Neuron 2D"
-                                	      }, {
-                                	        "id": "4464166",
-                                	        "pluginName": "Neuron 3D"
-                                	      }, {
-                                	        "id": "5458468",
-                                	        "pluginName": "Oxbow Code Identifier"
-                                	      }, {
-                                	        "id": "56466",
-                                	        "pluginName": "Reports"
-                                	      }, {
-                                	        "id": "8579469",
-                                	        "pluginName": "Dead Code Identifier"
-                                	      }, {
-                                	        "id": "544684",
-                                	        "pluginName": "RAID"
-                                	      }];
+                                	var availablePlugins = [];
+                                	var key = ["Dashboard", "Dead Code Identifier", "ICE", "Mindmap", "Neuron 2D", "Neuron 3D", "Oxbow Code Identifier", "Reports"];
+                                	var keyValues;
+                                	for(i=0; i<Object.keys(data.plugindetails[0]).length; i++){
+                                		//key = Object.keys(data.plugindetails[0])[i];
+                                		keyValues = Object.values(data.plugindetails[0])[i]
+                                		availablePlugins.push({
+                                			"pluginName" : key[i],
+                                			"pluginValue" : keyValues
+                                		})
+                                	}
                                 	data.pluginsInfo = availablePlugins;
                                     window.localStorage['LoginSuccess'] = "True";
                                     window.localStorage['_UI'] = JSON.stringify(data);
