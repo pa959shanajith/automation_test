@@ -251,7 +251,10 @@ var addTask = function(e){
 		//if(p.select('.ct-nodeTask')[0][0]==null) p.append('image').attr('class','ct-nodeTask').attr('xlink:href','images_mindmap/node-task-assigned.png').attr('x',29).attr('y',-10);
 		if(nType=="modules"){
 			if(tObj.cy != 'select cycle' && tObj.re != 'select release'){
-				dNodes[pi].task={id:tObj.id,oid:tObj.oid,task:tObj.t,assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,release:tObj.re,cycle:tObj.cy,details:tObj.det,parent:(tObj.parent!=null)?tObj.parent:[dNodes[pi].id_c]};
+				if(dNodes[pi].id_c != "null"){
+					dNodes[pi].task={id:tObj.id,oid:tObj.oid,task:tObj.t,assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,release:tObj.re,cycle:tObj.cy,details:tObj.det,parent:(tObj.parent!=null)?tObj.parent:[dNodes[pi].id_c]};
+				}
+				
 				if(dNodes[pi].children) dNodes[pi].children.forEach(function(tSc){
 					tSc.children.forEach(function(scr){
 						if(scr.task===undefined||scr.task==null){
@@ -291,7 +294,10 @@ var addTask = function(e){
 		}
 		else if(nType=="screens"){
 			var modid=dNodes[pi].parent.parent.id_c,tscid=dNodes[pi].parent.id_c,scrid=dNodes[pi].id_c;
-			dNodes[pi].task={id:tObj.id,oid:tObj.oid,task:tObj.t,assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,details:tObj.det,parent:(tObj.parent!=null)?tObj.parent:[modid,tscid,scrid]};
+			if(dNodes[pi].id_c != "null"){
+				dNodes[pi].task={id:tObj.id,oid:tObj.oid,task:tObj.t,assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,details:tObj.det,parent:(tObj.parent!=null)?tObj.parent:[modid,tscid,scrid]};
+			}
+			
 			if(tObj.parent!=[modid,tscid,scrid]){
 				dNodes[pi].task['updatedParent']=[modid,tscid,scrid];
 			}

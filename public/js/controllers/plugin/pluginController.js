@@ -5,7 +5,9 @@ mySPA.controller('pluginController',['$scope','$window','$http','$location','$ti
     var availablePlugins = userInfo.pluginsInfo;
     $("#plugin-container").empty().hide()
     for(i=0; i<availablePlugins.length; i++){
-        $("#plugin-container").append('<div class="col-md-4 plugin-block"><span onclick="p_event(this.dataset.name)" data-name="p_'+availablePlugins[i].pluginName.replace(/\s/g,'')+'" id="'+availablePlugins[i].id+'" title="'+availablePlugins[i].pluginName+'">'+availablePlugins[i].pluginName+'</span></div>').fadeIn()
+    	if(availablePlugins[i].pluginValue != false){
+    		$("#plugin-container").append('<div class="col-md-4 plugin-block"><span onclick="p_event(this.dataset.name)" data-name="p_'+availablePlugins[i].pluginName.replace(/\s/g,'')+'" id="'+availablePlugins[i].pluginName+'" title="'+availablePlugins[i].pluginName+'">'+availablePlugins[i].pluginName+'</span></div>').fadeIn()
+    	}        
     }
     //Integration with Mindmaps
 	$(".plugin-block span").each(function() {
