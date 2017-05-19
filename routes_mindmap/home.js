@@ -7,7 +7,7 @@ var router = express.Router();
 var admin = require('../server/controllers/admin');
 var create_ice=require('../server/controllers/create_ice');
 var async = require('async');
-var certificate = fs.readFileSync('server/https/cert.pem','utf-8');
+var certificate = fs.readFileSync('server/https/server.crt','utf-8');
 
 /* Send queries to Neo4J/ICE API. */
 var reqToAPI = function(d,u,p,callback) {
