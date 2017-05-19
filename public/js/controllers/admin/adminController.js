@@ -342,14 +342,14 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 			$("#password").addClass("inputErrorBorder");
 		} 
 		else if (regexPassword.test($("#password").val()) == false) {
-			openModelPopup("Error", "Password must contain atleast 1 special character, 1 numeric, 1 uppercase and should be 8 characters length.");
+			openModelPopup("Error", "Password must contain atleast 1 special character, 1 numeric, 1 uppercase, length should be minimum 8 character and maximum 12 character.");
 			$("#password").addClass("inputErrorBorder");
 		}
 		else if ($("#confirmPassword").val() == "") {
 			$("#confirmPassword").addClass("inputErrorBorder");
 		}
 		else if (regexPassword.test($("#confirmPassword").val()) == false ) {
-			openModelPopup("Error","Password must contain atleast 1 special character, 1 numeric, 1 uppercase and should be 8 characters length.");
+			openModelPopup("Error","Password must contain atleast 1 special character, 1 numeric, 1 uppercase, length should be minimum 8 character and maximum 12 character.");
 			$("#confirmPassword").addClass("inputErrorBorder");
 		}
 		else if($("#password").val() != $("#confirmPassword").val()){
@@ -1750,10 +1750,29 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 				if(response == "success"){
 					openModelPopup("Edit User", "User has been edited successfully.");
 					resetUpdateUser();
+					
+					$timeout(function(){
+						
+						$("#userTab").trigger("click");
+						$timeout(function(){
+							$(".adminActionBtn").children("button:first-child").trigger("click");
+							
+						}, 50)
+					}, 50)
 				}
 				else{
 					openModelPopup("Edit User", "Failed to edit user.");
 					resetUpdateUser();
+					
+					$timeout(function(){
+						
+						$("#userTab").trigger("click");
+						$timeout(function(){
+							$(".adminActionBtn").children("button:first-child").trigger("click");
+							
+						}, 50)
+
+					}, 50)
 				}
 			}, 
 			function (error) { console.log("Error:::::::::::::", error) })

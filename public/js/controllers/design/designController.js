@@ -3150,7 +3150,7 @@ function contentTable(newTestScriptDataLS) {
 					    ||obType =='GuiLabel' ||obType =='GuiBox' ||obType =='GuiSimpleContainer' ||obType =='GuiPasswordField'||obType=='GuiComboBox'||obType=='GuiCheckBox'
 						||obType =='GuiStatusbar' ||obType =='GuiStatusPane' ||obType =='text' ||obType =='combo_box' || obType =='list_item' || obType =='GuiCTextField'
 						|| obType =='hyperlink' || obType =='lbl'||obType =='list' || obType == 'edit' || obType == null || obType == 'check_box'|| obType== 'GuiTableControl' 
-						|| obType == 'radio_button' || obType=='button' || obType=='checkbox' || obType=='radiobutton' || obType=='table' || obType=='a' || obType=='input' ||obType != undefined)){
+						|| obType == 'radio_button' || obType=='button' || obType=='checkbox' || obType=='radiobutton' || obType=='table' || obType=='a' || obType=='input' || obType == 'GuiScrollContainer' || obType == 'GuiTab' || obType == 'scroll' ||obType != undefined)){
 						var res = '';
 						var sc;
 						var listType = '';
@@ -3158,6 +3158,7 @@ function contentTable(newTestScriptDataLS) {
 						else if(obType =='GuiTextField' || obType =='GuiCTextField' || obType =='text' || obType=='input'){	sc = Object.keys(keywordArrayList.text);selectedKeywordList = "text";}
 						else if(obType =='GuiLabel' || obType =='lbl'){	sc = Object.keys(keywordArrayList.element);selectedKeywordList = "element";}
 						else if(obType =='GuiPasswordField'){	sc = Object.keys(keywordArrayList.text);selectedKeywordList = "text";}
+						else if(obType =='GuiScrollContainer' || obType == 'GuiTab'){	sc = Object.keys(keywordArrayList.scroll);selectedKeywordList = "scroll";}
 						else if(obType =='combo_box'||obType =='GuiBox'|| obType=='GuiComboBox' || obType=='select'){	sc = Object.keys(keywordArrayList.select);selectedKeywordList = "select";}
 						else if(obType =='list_item')	{sc = Object.keys(keywordArrayList.list);selectedKeywordList = "list";}
 						else if(obType =='GuiTableControl' || obType=='table')	{sc = Object.keys(keywordArrayList.table);selectedKeywordList = "table";}
