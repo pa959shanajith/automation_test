@@ -107,7 +107,7 @@ exports.loadUserInfo_Nineteen68 = function(req, res){
 	          //Service call to get the plugins accessible for the user
 	            userPlugins: function(callback){
 	            	try{
-	            		var getUserPlugins = "select dashboard,deadcode,ice,mindmap,neuron2d,neuron3d,oxbowcode,reports from userpermissions WHERE roleid = "+jsonService.role+" allow filtering";
+	            		var getUserPlugins = "select dashboard,deadcode,mindmap,neuron2d,neuron3d,oxbowcode,reports from userpermissions WHERE roleid = "+jsonService.role+" allow filtering";
 	                	dbConn.execute(getUserPlugins, function(err, pluginResult){
 	                		if(err){
 	                			var flag = "Error occured in loadUserInfo_Nineteen68 : Fail";

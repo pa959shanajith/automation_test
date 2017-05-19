@@ -420,10 +420,11 @@ body {
 /*****************Plugin CSS*****************/
 
 .container-plugins {
-    width: 1110px
+    width: 1110px;
+    height: 100%;
 }
-
-.dropdown-userPart {
+.container-plugins .col-md-12:nth-child(2){height: calc(100% - 256px);} 
+.dropdown-userPart{
     float: right;
     width: auto;
     margin: 8px -20px 8px 0;
@@ -544,7 +545,7 @@ body {
 .border-seprator {
     position: absolute;
     width: 1px;
-    height: calc(100% - 47px);
+    height: calc(100% - 42px);
     background: #000000;
     top: 22px;
     left: 55%;
@@ -667,6 +668,9 @@ body {
     cursor: pointer
 }
 
+.pluginSection{
+	height: calc(100% - 124px);
+}
 /*****************Plugin CSS*****************/
 
 
