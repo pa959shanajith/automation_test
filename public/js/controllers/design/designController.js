@@ -3158,7 +3158,8 @@ function contentTable(newTestScriptDataLS) {
 						else if(obType =='GuiTextField' || obType =='GuiCTextField' || obType =='text' || obType=='input'){	sc = Object.keys(keywordArrayList.text);selectedKeywordList = "text";}
 						else if(obType =='GuiLabel' || obType =='lbl'){	sc = Object.keys(keywordArrayList.element);selectedKeywordList = "element";}
 						else if(obType =='GuiPasswordField'){	sc = Object.keys(keywordArrayList.text);selectedKeywordList = "text";}
-						else if(obType =='GuiScrollContainer' || obType == 'GuiTab'){	sc = Object.keys(keywordArrayList.scroll);selectedKeywordList = "scroll";}
+						else if(obType =='GuiTab'){	sc = Object.keys(keywordArrayList.tabs);selectedKeywordList = "tabs";}
+						else if(obType =='GuiScrollContainer'){	sc = Object.keys(keywordArrayList.scroll);selectedKeywordList = "scroll";}
 						else if(obType =='combo_box'||obType =='GuiBox'|| obType=='GuiComboBox' || obType=='select'){	sc = Object.keys(keywordArrayList.select);selectedKeywordList = "select";}
 						else if(obType =='list_item')	{sc = Object.keys(keywordArrayList.list);selectedKeywordList = "list";}
 						else if(obType =='GuiTableControl' || obType=='table')	{sc = Object.keys(keywordArrayList.table);selectedKeywordList = "table";}

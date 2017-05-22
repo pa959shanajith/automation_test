@@ -149,17 +149,29 @@ var oldCustName = [];
     			        	        			span.removeClass('content-hide');
     			 		        	    	   	$(this).remove();
     			        	        		}
-    			        	        		else { 
+    			        	        		else {
+    			        	        			var flagEdit = true;
     			        	        			window.localStorage['checkEditWorking'] = "true";
-    			        	        			span.text($(this).val()).removeClass('content-hide');
-    			        	        		    modifiedCustNames.push($(this)[0].value);
 												var id = e.target.id.split("_");
 												id = id[1];
-    			        	        		    xpathListofCustNames.push(viewString.view[id].xpath);
-												oldCustName.push(viewString.view[id].custname);
-    			        	        		    editedList.modifiedCustNames = modifiedCustNames;
-    			        	        		    editedList.xpathListofCustNames = xpathListofCustNames;
-    											editedList.oldCustName = oldCustName;
+    			        	        			if(editedList.modifiedCustNames != undefined){
+    			        	        				for(i=0;i<editedList.modifiedCustNames.length;i++){
+    			        	        					if(editedList.modifiedCustNames[i] == span.text() && editedList.xpathListofCustNames[i] == viewString.view[id].xpath && editedList.oldCustName[i] == viewString.view[id].custname) {
+    			        	        						editedList.modifiedCustNames[i] = $(this).val();
+    			        	        						flagEdit = false;
+    			        	        						break;
+    			        	        					}
+    			        	        				}
+    			        	        			}
+    			        	        			if(flagEdit == true){
+        			        	        		    modifiedCustNames.push($(this)[0].value);
+        			        	        		    xpathListofCustNames.push(viewString.view[id].xpath);
+    												oldCustName.push(viewString.view[id].custname);
+        			        	        		    editedList.modifiedCustNames = modifiedCustNames;
+        			        	        		    editedList.xpathListofCustNames = xpathListofCustNames;
+        											editedList.oldCustName = oldCustName;   			        	        				
+    			        	        			}
+    			        	        			span.text($(this).val()).removeClass('content-hide');
     			        	        		    window.localStorage['_modified'] = JSON.stringify(editedList);
     			        	        		}
     			        	        		$(this).remove();
