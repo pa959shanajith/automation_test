@@ -114,8 +114,10 @@ exports.readTestSuite_ICE = function (req, res) {
 								if(err){
 									console.log(err);
 								}else{
-									outscenarionames.push(data.testcasename);
-									outprojectnames.push(data.projectname);
+									if(data != null || data != undefined){
+										outscenarionames.push(data.testcasename);
+										outprojectnames.push(data.projectname);
+									}
 									
 								}
 								callback3();
@@ -171,8 +173,10 @@ function Projectnametestcasename_ICE(req,cb,data){
 				if(err){
 					console.log(err);
 				}else{
-					projectid = answers.rows[0].projectid;
-					testcaseNproject.testcasename = answers.rows[0].testscenarioname;
+					if(answers.rows.length !=0){
+						projectid = answers.rows[0].projectid;
+						testcaseNproject.testcasename = answers.rows[0].testscenarioname;
+					}
 					callback_name(null,projectid); 
 				}
 				
@@ -184,8 +188,9 @@ function Projectnametestcasename_ICE(req,cb,data){
 				if(err){ 
 
 				}else{
+					if(projectnameresult.rows.length != 0)
 					testcaseNproject.projectname = projectnameresult.rows[0].projectname;
-					callback_name(err,testcaseNproject)
+					callback_name(err,testcaseNproject);
 				}
 			});
 		}
@@ -390,8 +395,11 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 						if(err){
 							console.log(err);
 						}else{
-							scenariotestcaseobj[scenarioIdinfor] = data;
-							listofscenarioandtestcases.push(scenariotestcaseobj);
+							if(data != null || data !=undefined){
+								scenariotestcaseobj[scenarioIdinfor] = data;
+								listofscenarioandtestcases.push(scenariotestcaseobj);
+							}
+							
 							
 						}
 						callback3(); 
@@ -474,6 +482,7 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
                         if (err) {
                             console.log(err);
                         } else {
+							if(result.rows.length != 0)
                             data = JSON.parse(JSON.stringify(result.rows[0].testcaseids));
                             resultdata = data;
                             console.log(data);
@@ -515,8 +524,10 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 																console.log(err);
 															} else {
 																responsedata.template = wsscreentemplate;
-																responsedata.testcasename = answers.rows[0].testcasename;
-																responsedata.testcase = answers.rows[0].testcasesteps;
+																if(answers.rows.length != 0){
+																	responsedata.testcasename = answers.rows[0].testcasename;
+																	responsedata.testcase = answers.rows[0].testcasesteps;
+																}
 																listoftestcasedata.push(responsedata);
 															}
 															callback2();
@@ -528,8 +539,11 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 																console.log(err);
 															} else {
 																responsedata.template = "";
-																responsedata.testcasename = answers.rows[0].testcasename;
-																responsedata.testcase = answers.rows[0].testcasesteps;
+																if(answers.rows.length != 0){
+																	responsedata.testcasename = answers.rows[0].testcasename;
+																	responsedata.testcase = answers.rows[0].testcasesteps;
+																}
+																
 																listoftestcasedata.push(responsedata);
 															}
 															callback2();
@@ -542,8 +556,10 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 															console.log(err);
 														} else {
 															responsedata.template = "";
-															responsedata.testcasename = answers.rows[0].testcasename;
-															responsedata.testcase = answers.rows[0].testcasesteps;
+															if(answers.rows.length != 0){
+																responsedata.testcasename = answers.rows[0].testcasename;
+																responsedata.testcase = answers.rows[0].testcasesteps;
+															}
 															listoftestcasedata.push(responsedata);
 														}
 														callback2();
@@ -556,8 +572,10 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 													console.log(err);
 												} else {
 													responsedata.template = "";
-													responsedata.testcasename = answers.rows[0].testcasename;
-													responsedata.testcase = answers.rows[0].testcasesteps;
+													if(answers.rows.length != 0){
+														responsedata.testcasename = answers.rows[0].testcasename;
+														responsedata.testcase = answers.rows[0].testcasesteps;
+													}
 													listoftestcasedata.push(responsedata);
 												}
 												callback2();
@@ -572,8 +590,10 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
                                             console.log(err);
                                         } else {
                                             responsedata.template = "";
-                                            responsedata.testcasename = answers.rows[0].testcasename;
-                                            responsedata.testcase = answers.rows[0].testcasesteps;
+											if(answers.rows.length != 0){
+												responsedata.testcasename = answers.rows[0].testcasename;
+												responsedata.testcase = answers.rows[0].testcasesteps;
+											}
                                             listoftestcasedata.push(responsedata);
                                         }
                                         callback2();
@@ -655,6 +675,7 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 					if(err){
 						console.log(err);
 					}else{
+						if(testscenarioresult.rows.length !=0)
 						testcaseids = testscenarioresult.rows[0].testcaseids;
 					}                                              
 					callback(err,testcaseids);                                                              
@@ -858,6 +879,7 @@ function updatescenariodetailsinsuite(req,cb,data){
 				if(err){
 					console.log(err);
 				}else{
+					if(answers.rows.length != 0)
 					suiterowdetails = answers.rows[0]
 				}
 				simplecallback();
