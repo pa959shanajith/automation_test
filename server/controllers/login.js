@@ -116,8 +116,20 @@ exports.loadUserInfo_Nineteen68 = function(req, res){
 	                		else{
 	                			try{
 		                			if(pluginResult.rows.length > 0){
-		                				userpermissiondetails.push(pluginResult.rows[0]);
-		                				jsonService.plugindetails = userpermissiondetails
+								    var objKeys = Object.keys(pluginResult.rows[0]);
+								    var pluginsArr = [];
+								    var count = 0;
+								    for(var k in pluginResult.rows[0]){
+								    	if(count < pluginResult.columns.length){
+								    		pluginsArr.push({
+								    			"keyName" : k,
+								    			"keyValue" : (pluginResult.rows[0])[k]
+								    		})
+								    		count++;
+								    	}
+								    }
+		                			//userpermissiondetails.push(pluginResult.rows[0]);
+		                			jsonService.plugindetails = pluginsArr
 		                			}
 		                			else{
 		                				var flag = "No Records Found";

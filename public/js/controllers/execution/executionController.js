@@ -27,11 +27,11 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 		var cycleId = JSON.parse(window.localStorage['_CT']).cycleId;
 		var projectId = JSON.parse(window.localStorage['_CT']).projectId;
 		projectDetails = angular.element(document.getElementById("left-nav-section")).scope().projectDetails;
-		releaseName = angular.element(document.getElementById("left-nav-section")).scope().releaseDetails;
-		cycleName = angular.element(document.getElementById("left-nav-section")).scope().cycleDetails;
-		if(projectDetails.projectName !="" &&  releaseName!="" && cycleName !="" && testSuiteName != "")
+		releaseName = angular.element(document.getElementById("left-nav-section")).scope().releaseDetails.respnames[0];
+		cycleName = angular.element(document.getElementById("left-nav-section")).scope().cycleDetails.respnames[0];
+		if(projectDetails.respnames[0] !="" &&  releaseName!="" && cycleName !="" && testSuiteName != "")
 		{
-			$(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">Project :</span><span class="content">'+projectDetails.projectname+'</span></p><p class="proj-info-wrap"><span class="content-label">Release :</span><span class="content">'+releaseName+'</span></p><p class="proj-info-wrap"><span class="content-label">Cycle :</span><span class="content">'+cycleName+'</span></p><p class="proj-info-wrap"><span class="content-label">TestSuite :</span><span class="content">'+testSuiteName+'</span></p>')
+			$(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">Project :</span><span class="content">'+projectDetails.respnames[0]+'</span></p><p class="proj-info-wrap"><span class="content-label">Release :</span><span class="content">'+releaseName+'</span></p><p class="proj-info-wrap"><span class="content-label">Cycle :</span><span class="content">'+cycleName+'</span></p><p class="proj-info-wrap"><span class="content-label">TestSuite :</span><span class="content">'+testSuiteName+'</span></p>')
 		}
 	}, 2000)
 	

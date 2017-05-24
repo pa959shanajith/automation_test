@@ -51,13 +51,10 @@ mySPA.controller('loginController', function ($scope, $http, $location, LoginSer
                                 	//To be removed - Has to come from database
                                 	var availablePlugins = [];
                                 	var key = ["Dashboard", "Dead Code Identifier", "Mindmap", "Neuron 2D", "Neuron 3D", "Oxbow Code Identifier", "Reports"];
-                                	var keyValues;
-                                	for(i=0; i<Object.keys(data.plugindetails[0]).length; i++){
-                                		//key = Object.keys(data.plugindetails[0])[i];
-                                		keyValues = Object.values(data.plugindetails[0])[i]
+                                	for(i=0; i<data.plugindetails.length; i++){
                                 		availablePlugins.push({
                                 			"pluginName" : key[i],
-                                			"pluginValue" : keyValues
+                                			"pluginValue" : data.plugindetails[i].keyValue
                                 		})
                                 	}
                                 	data.pluginsInfo = availablePlugins;
