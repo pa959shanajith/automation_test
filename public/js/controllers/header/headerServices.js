@@ -15,7 +15,16 @@ mySPA.factory('headerServices', ['$http','$q', function ($http, $httpProvider, $
 			.then(function(response)  { return response.data},
 					function(response)        {return $q.reject(response.data)})
 		},
-		getReleaseNameByReleaseId_ICE: function(releaseId,projectId){
+		getNames_ICE: function(requestedIds,idType){
+			return $http.post('/getNames_ICE',{
+				param : 'getNames_ICE',
+				requestedids : requestedIds,
+				idtype : idType
+			})
+			.then(function(response)  { return response.data},
+			function(response)        {return $q.reject(response.data)})
+	    },
+		/*getReleaseNameByReleaseId_ICE: function(releaseId,projectId){
 			return $http.post('/getReleaseNameByReleaseId_ICE',{
 				param : 'getReleaseNameByReleaseId_ICE',
 				releaseId : releaseId,
@@ -32,7 +41,7 @@ mySPA.factory('headerServices', ['$http','$q', function ($http, $httpProvider, $
 			})
 			.then(function(response)  { return response.data},
 			function(response)        {return $q.reject(response.data)})
-	    },
+	    },*/
     }
 }]);
 

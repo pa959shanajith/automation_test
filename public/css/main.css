@@ -608,6 +608,14 @@ body {
     top: 5px;
 }
 
+.taskNo-Inner-Pgs{
+	font-family: 'LatoWebBold';
+    position: absolute;
+    top: 5px;
+    color: white;
+    font-size: 15px;
+}
+
 .assignedTask {
 	cursor: pointer;
     font-size: 17px;
@@ -625,6 +633,18 @@ body {
     width: 100%;
 }
 
+.assignedTask-Inner-Pgs{
+	color: white;
+	cursor: pointer;
+    font-size: 15px;
+    padding: 0px 15px 10px;
+    display: inline-block;
+    width: 60%;
+    word-break: break-all;
+    word-wrap: break-word;
+    margin-left: 13px;
+}
+
 .panel-head-tasktype {
 	outline: none;
 	border: none;
@@ -636,6 +656,22 @@ body {
     height: 25px;
     width: 75px;
     background: #efefef;
+    margin-left: 13px;
+}
+
+.panel-head-tasktype-Inner-Pgs{
+	outline: none;
+	border: none;
+	cursor: default;
+    display: inline-block;
+    font-family: LatoWeb;
+    font-size: 14px;
+    border-radius: 20px;
+    height: 25px;
+    width: 75px;
+    background: #a08ab7;
+    color: white;
+    font-weight: lighter;
     margin-left: 13px;
 }
 

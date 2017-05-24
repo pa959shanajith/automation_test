@@ -1,6 +1,6 @@
 /**
-* Dependencies.
-*/
+ * Dependencies.
+ */
 var Joi = require('joi');
 var client_cas = require('../../server/config/cassandra');
 var cassandra = require('cassandra-driver');
@@ -20,27 +20,27 @@ var userRoles = {};
 
 //GetUserRoles
 exports.getUserRoles_Nineteen68 = function(req, res){
-    try{
-        var getUserRoles = "select roleid, rolename from roles";
-        dbConn.execute(getUserRoles, function (err, result) {
-            if (err) {
-                res.send("Error occured in getUserRoles_Nineteen68 : Fail");
-            }
-            else {
-                try{
-                    for (var i = 0; i < result.rows.length; i++) {
-                        roles[i] = result.rows[i].rolename;
-                        r_ids[i] = result.rows[i].roleid;
-                    }
-                    userRoles.userRoles = roles;
-                    userRoles.r_ids = r_ids;
-                    res.send(userRoles);
-                }catch(exception){console.log(exception);}
-            }
-        });
-    }catch(exception){
-        console.log(exception);
-    }
+	try{
+		var getUserRoles = "select roleid, rolename from roles";
+		dbConn.execute(getUserRoles, function (err, result) {
+			if (err) {
+				res.send("Error occured in getUserRoles_Nineteen68 : Fail");
+			}
+			else {
+				try{
+					for (var i = 0; i < result.rows.length; i++) {
+						roles[i] = result.rows[i].rolename;
+						r_ids[i] = result.rows[i].roleid;
+					}
+					userRoles.userRoles = roles;
+					userRoles.r_ids = r_ids;
+					res.send(userRoles);
+				}catch(exception){console.log(exception);}
+			}
+		});
+	}catch(exception){
+		console.log(exception);
+	}
 };
 
 
@@ -76,8 +76,8 @@ exports.getUsers_Nineteen68 = function(req, res){
 		});		
 	}
 	catch(exception){
-        console.log(exception);
-    }
+		console.log(exception);
+	}
 };
 
 //Get All Users
@@ -212,16 +212,16 @@ exports.updateUser_nineteen68 = function updateUser_nineteen68(req, res) {
 		var local_role = userObj.role;
 		var local_email_id = userObj.email;
 		var local_user_Id = userObj.userId;
-	    var db_password='';
+		var db_password='';
 
 		if(local_password != "")
 		{
 			var salt = bcrypt.genSaltSync(10);
-		    var req_hashedPassword = bcrypt.hashSync(local_password, salt);
+			var req_hashedPassword = bcrypt.hashSync(local_password, salt);
 		}
-		
+
 		var getUserDetails = "select username,password,firstname,lastname,defaultrole,emailid from users where userid="+local_user_Id;
-		
+
 		dbConn.execute(getUserDetails, function (err, result) {
 			try{
 				if (typeof result === 'undefined') {
@@ -238,7 +238,7 @@ exports.updateUser_nineteen68 = function updateUser_nineteen68(req, res) {
 					}
 					else{
 						var salt = bcrypt.genSaltSync(10);
-			            var req_hashedPassword = bcrypt.hashSync(local_password, salt);
+						var req_hashedPassword = bcrypt.hashSync(local_password, salt);
 					}
 					if(local_firstname == undefined || local_firstname == 'undefined' || local_firstname == ''){
 						local_firstname = service.firstname;
@@ -252,14 +252,14 @@ exports.updateUser_nineteen68 = function updateUser_nineteen68(req, res) {
 					if(local_email_id == undefined || local_email_id == 'undefined' || local_email_id == ''){
 						local_email_id = service.emailid;
 					}
-		            if(db_password != "" && db_password != undefined)
-		            {
-		                var updateUser = "UPDATE users set username='"+local_username+"', password='"+db_password+"', firstname='"+local_firstname+"', lastname='"+local_lastname+"', modifiedby='"+local_username+"', modifiedon="+new Date().getTime()+", defaultrole="+local_role+", emailid='"+local_email_id+"' where userid="+local_user_Id;
-		            }
-		            else{
-		                var updateUser = "UPDATE users set username='"+local_username+"', password='"+req_hashedPassword+"', firstname='"+local_firstname+"', lastname='"+local_lastname+"', modifiedby='"+local_username+"', modifiedon="+new Date().getTime()+", defaultrole="+local_role+", emailid='"+local_email_id+"' where userid="+local_user_Id;
-		            }
-					
+					if(db_password != "" && db_password != undefined)
+					{
+						var updateUser = "UPDATE users set username='"+local_username+"', password='"+db_password+"', firstname='"+local_firstname+"', lastname='"+local_lastname+"', modifiedby='"+local_username+"', modifiedon="+new Date().getTime()+", defaultrole="+local_role+", emailid='"+local_email_id+"' where userid="+local_user_Id;
+					}
+					else{
+						var updateUser = "UPDATE users set username='"+local_username+"', password='"+req_hashedPassword+"', firstname='"+local_firstname+"', lastname='"+local_lastname+"', modifiedby='"+local_username+"', modifiedon="+new Date().getTime()+", defaultrole="+local_role+", emailid='"+local_email_id+"' where userid="+local_user_Id;
+					}
+
 					dbConn.execute(updateUser, function (err, result) {
 						try{
 							if (typeof result === 'undefined') {
@@ -283,40 +283,40 @@ exports.updateUser_nineteen68 = function updateUser_nineteen68(req, res) {
 
 //Get Domains
 exports.getDomains_ICE = function getDomains_ICE(req, res) {
-    try {
-        var responsedata = [];
-        var domainsQuery = "select domainid,domainname from domains";
-        dbConnICE.execute(domainsQuery, function(error, response) {
-        	try{
-        		if (error) {
-                    res.send("fail");
-                } 
-        		else {
-                    async.forEachSeries(response.rows, function(eachdomain, domainscallback) {
-                    	try {
-                            var reponseobj = {
-                                domainId: "",
-                                domainName: ""
-                            }
-                            reponseobj.domainId=eachdomain.domainid;
-                            reponseobj.domainName=eachdomain.domainname;
-                            responsedata.push(reponseobj);
-                            domainscallback();
-                        } catch (exception) {
-                            console.log(exception);
-                        }
-                    },finalresult);
-                }
-        	}
-        	catch(exception){console.log(exception);}
-        });
-       function finalresult(){
-    	   res.send(responsedata);
-       }
-    } catch (exception) {
-        console.log(exception);
-        res.send("fail");
-    }
+	try {
+		var responsedata = [];
+		var domainsQuery = "select domainid,domainname from domains";
+		dbConnICE.execute(domainsQuery, function(error, response) {
+			try{
+				if (error) {
+					res.send("fail");
+				} 
+				else {
+					async.forEachSeries(response.rows, function(eachdomain, domainscallback) {
+						try {
+							var reponseobj = {
+									domainId: "",
+									domainName: ""
+							}
+							reponseobj.domainId=eachdomain.domainid;
+							reponseobj.domainName=eachdomain.domainname;
+							responsedata.push(reponseobj);
+							domainscallback();
+						} catch (exception) {
+							console.log(exception);
+						}
+					},finalresult);
+				}
+			}
+			catch(exception){console.log(exception);}
+		});
+		function finalresult(){
+			res.send(responsedata);
+		}
+	} catch (exception) {
+		console.log(exception);
+		res.send("fail");
+	}
 };
 
 //CheckReleaseNameExists
@@ -399,120 +399,120 @@ exports.checkCycleNameExists_ICE =  function checkCycleNameExists_ICE(req, res) 
 exports.createProject_ICE = function createProject_ICE(req, res) {
 	try{
 		var createProjectObj = req.body.createProjectObj;
-	    var userinfo = req.body.userDetails;
-	    var dateScreen = new Date().getTime();
-	    var requestedskucode = "skucodetestcase";
-	    var requestedtags = "tags";
-	    var requestedversionnumber = 1;
-	    var projectTypeId = "";
+		var userinfo = req.body.userDetails;
+		var dateScreen = new Date().getTime();
+		var requestedskucode = "skucodetestcase";
+		var requestedtags = "tags";
+		var requestedversionnumber = 1;
+		var projectTypeId = "";
 		var newProjectID = "";
 
-	    async.series({
-	        projecttype: function(callback) {
-	        	try{
-		            var queryGetProjectTypeId = "SELECT projecttypeid from projecttype where projecttypename = '" + createProjectObj.appType + "' ALLOW FILTERING";
-		            dbConnICE.execute(queryGetProjectTypeId, function(err, projectTypeData) {
-		            	try{
-			                if (err) {
+		async.series({
+			projecttype: function(callback) {
+				try{
+					var queryGetProjectTypeId = "SELECT projecttypeid from projecttype where projecttypename = '" + createProjectObj.appType + "' ALLOW FILTERING";
+					dbConnICE.execute(queryGetProjectTypeId, function(err, projectTypeData) {
+						try{
+							if (err) {
 
-			                } else {
-			                    projectTypeId = projectTypeData.rows[0].projecttypeid;
-			                }
-			                callback();		            		
-		            	}
-		            	catch(exception){console.log(exception);}
-		            });	        		
-	        	}
-	        	catch(exception){console.log(exception);}
-	        },
-	        createproject: function(callback) {
-	        	try{
-	        		var requestprojecthistorydetails = "'inserted project action by " + userinfo.username + " having role:" + userinfo.role + "" +
-	        		" skucodetestcase=" + requestedskucode + ", tags=" + requestedtags + ", versionnumber=" + requestedversionnumber +
-	        		" with the project Name " + createProjectObj.projectName + " '";
-	        		newProjectID = uuid();
-	        		//console.log("insideProject", newProjectID);
-	        		var createProjectQuery = "INSERT INTO projects (domainid,projectname,projectid,createdby,createdon,deleted,history,projecttypeid,skucodeproject,tags) values(" +
-	        		createProjectObj.domainId + ",'" + createProjectObj.projectName + "'," + newProjectID + ",'" + userinfo.username +
-	        		"','" + new Date().getTime() + "'," + false + ",{" + dateScreen + ":" + requestprojecthistorydetails + "}," +
-	        		projectTypeId + ",'" + requestedskucode + "',['" + requestedtags + "']);"
-	        		// console.log(createProjectQuery);
-	        		dbConnICE.execute(createProjectQuery, function(err, insertProjectData) {
-	        			if (err) {
-	        				console.log(err);
-	        			} else {
+							} else {
+								projectTypeId = projectTypeData.rows[0].projecttypeid;
+							}
+							callback();		            		
+						}
+						catch(exception){console.log(exception);}
+					});	        		
+				}
+				catch(exception){console.log(exception);}
+			},
+			createproject: function(callback) {
+				try{
+					var requestprojecthistorydetails = "'inserted project action by " + userinfo.username + " having role:" + userinfo.role + "" +
+					" skucodetestcase=" + requestedskucode + ", tags=" + requestedtags + ", versionnumber=" + requestedversionnumber +
+					" with the project Name " + createProjectObj.projectName + " '";
+					newProjectID = uuid();
+					//console.log("insideProject", newProjectID);
+					var createProjectQuery = "INSERT INTO projects (domainid,projectname,projectid,createdby,createdon,deleted,history,projecttypeid,skucodeproject,tags) values(" +
+					createProjectObj.domainId + ",'" + createProjectObj.projectName + "'," + newProjectID + ",'" + userinfo.username +
+					"','" + new Date().getTime() + "'," + false + ",{" + dateScreen + ":" + requestprojecthistorydetails + "}," +
+					projectTypeId + ",'" + requestedskucode + "',['" + requestedtags + "']);"
+					// console.log(createProjectQuery);
+					dbConnICE.execute(createProjectQuery, function(err, insertProjectData) {
+						if (err) {
+							console.log(err);
+						} else {
 
-	        			}
-	        			callback();
-	        		});
-	        	}
-	        	catch(exception){console.log(exception);}
-	        },
-	        createreleases: function(callback) {
-	        	try{
-	        		var numberOfReleases = createProjectObj.projectDetails;
-		            // console.log(numberOfReleases);
-		            var releasesLength = numberOfReleases.length;
-		            async.forEachSeries(numberOfReleases, function(eachrelease, numberOfReleasescallback) {
-		            	try{
-		            		var releaseDetails = eachrelease;
-			                var releaseName = releaseDetails.releaseName;
-			                var cycleNames = releaseDetails.cycleNames;
-			                var cyclesLength = cycleNames.length;
-			                var cycleindex = 0;
-			                // cyclesLength=cycleNames.length;
-			                var requestReleasehistorydetails = "'inserted release action by " + userinfo.username + " having role:" + userinfo.role + "" +
-			                    " skucodetestcase=" + requestedskucode + ", tags=" + requestedtags + ", with the release Name " + releaseName + " '";
-			                var newReleaseID = uuid();
+						}
+						callback();
+					});
+				}
+				catch(exception){console.log(exception);}
+			},
+			createreleases: function(callback) {
+				try{
+					var numberOfReleases = createProjectObj.projectDetails;
+					// console.log(numberOfReleases);
+					var releasesLength = numberOfReleases.length;
+					async.forEachSeries(numberOfReleases, function(eachrelease, numberOfReleasescallback) {
+						try{
+							var releaseDetails = eachrelease;
+							var releaseName = releaseDetails.releaseName;
+							var cycleNames = releaseDetails.cycleNames;
+							var cyclesLength = cycleNames.length;
+							var cycleindex = 0;
+							// cyclesLength=cycleNames.length;
+							var requestReleasehistorydetails = "'inserted release action by " + userinfo.username + " having role:" + userinfo.role + "" +
+							" skucodetestcase=" + requestedskucode + ", tags=" + requestedtags + ", with the release Name " + releaseName + " '";
+							var newReleaseID = uuid();
 							//console.log("insideRelease", newProjectID);
-			                var createReleaseQuery = "INSERT INTO releases (projectid,releasename,releaseid,createdby,createdon,deleted,history,skucoderelease,tags) values(" +
-			                    newProjectID + ",'" + releaseName + "'," + newReleaseID + ",'" + userinfo.username + "','" +
-			                    new Date().getTime() + "'," + false + ",{" + dateScreen + ":" + requestReleasehistorydetails + "},'" +
-			                    requestedskucode + "',['" + requestedtags + "']);"
+							var createReleaseQuery = "INSERT INTO releases (projectid,releasename,releaseid,createdby,createdon,deleted,history,skucoderelease,tags) values(" +
+							newProjectID + ",'" + releaseName + "'," + newReleaseID + ",'" + userinfo.username + "','" +
+							new Date().getTime() + "'," + false + ",{" + dateScreen + ":" + requestReleasehistorydetails + "},'" +
+							requestedskucode + "',['" + requestedtags + "']);"
 
-			                dbConnICE.execute(createReleaseQuery, function(err, data) {
-			                    if (err) {
-			                        console.log(err);
-			                    } else {
-			                        async.forEachSeries(cycleNames, function(cycleName, cycleNamescallback) {
-			                        	try{
-			                        		var eachCycleName = cycleName;
-				                            var requestCyclehistorydetails = "'inserted cycle action by " + userinfo.username + " having role:" + userinfo.role + "" +
-				                                " skucodetestcase=" + requestedskucode + ", tags=" + requestedtags + ",with the cycle Name " + eachCycleName + " '";
-				                            var newCycleID = uuid();
-				                            var getCycleQuery = "INSERT INTO cycles (releaseid,cyclename,cycleid,createdby,createdon,deleted,history,skucodecycle,tags) VALUES (" + newReleaseID + ",'" + eachCycleName + "'," + newCycleID + ",'" + userinfo.username + "','" +
-				                                new Date().getTime() + "'," + false + ",{" + dateScreen + ":" + requestCyclehistorydetails + "},'" +
-				                                requestedskucode + "',['" + requestedtags + "']);"
-				                            createCycle(getCycleQuery, function(error, response) {
-				                            	try{
-					                                if (error) {
-					                                    res.send(error);
-					                                } else {
-					                                    cycleNamescallback();
-					                                }				                            		
-				                            	}
-				                            	catch(exception){console.log(exception);}
-				                            });
-			                        	}
-			                        	catch(exception){console.log(exception);}
-			                        }, numberOfReleasescallback);
-			                    }
-			                });
-		            	}
-		            	catch(exception){console.log(exception);}
-		            }, callback(null, ""));
+							dbConnICE.execute(createReleaseQuery, function(err, data) {
+								if (err) {
+									console.log(err);
+								} else {
+									async.forEachSeries(cycleNames, function(cycleName, cycleNamescallback) {
+										try{
+											var eachCycleName = cycleName;
+											var requestCyclehistorydetails = "'inserted cycle action by " + userinfo.username + " having role:" + userinfo.role + "" +
+											" skucodetestcase=" + requestedskucode + ", tags=" + requestedtags + ",with the cycle Name " + eachCycleName + " '";
+											var newCycleID = uuid();
+											var getCycleQuery = "INSERT INTO cycles (releaseid,cyclename,cycleid,createdby,createdon,deleted,history,skucodecycle,tags) VALUES (" + newReleaseID + ",'" + eachCycleName + "'," + newCycleID + ",'" + userinfo.username + "','" +
+											new Date().getTime() + "'," + false + ",{" + dateScreen + ":" + requestCyclehistorydetails + "},'" +
+											requestedskucode + "',['" + requestedtags + "']);"
+											createCycle(getCycleQuery, function(error, response) {
+												try{
+													if (error) {
+														res.send(error);
+													} else {
+														cycleNamescallback();
+													}				                            		
+												}
+												catch(exception){console.log(exception);}
+											});
+										}
+										catch(exception){console.log(exception);}
+									}, numberOfReleasescallback);
+								}
+							});
+						}
+						catch(exception){console.log(exception);}
+					}, callback(null, ""));
 					res.send('success');
-	        	}
-	        	catch(exception){console.log(exception);}
-	        }
-		
-	    }, function(err, data) {
-	        if (err) {
-	            console.log(err);
-	        } else {
-	            console.log(data);
-	        }
-	    })
+				}
+				catch(exception){console.log(exception);}
+			}
+
+		}, function(err, data) {
+			if (err) {
+				console.log(err);
+			} else {
+				console.log(data);
+			}
+		})
 	}
 	catch(exception){console.log(exception);}
 };
@@ -525,12 +525,12 @@ function getProjectType(getProjectTypeQuery,getProjectTypeCallback){
 	var statusFlag="";
 	dbConnICE.execute(getProjectTypeQuery,function(getProjectTypeQueryError, getProjectTypeQueryRes){
 		try{
-	        if(getProjectTypeQueryError){
-	            statusFlag="Error occured in getProjectType of createProject_ICE: Fail";
-	            getProjectTypeCallback(statusFlag,null);
-	        }else{	
-	            var projectTypeId = getProjectTypeQueryRes.rows[0].projecttypeid;				
-	            getProjectTypeCallback(null,projectTypeId);
+			if(getProjectTypeQueryError){
+				statusFlag="Error occured in getProjectType of createProject_ICE: Fail";
+				getProjectTypeCallback(statusFlag,null);
+			}else{	
+				var projectTypeId = getProjectTypeQueryRes.rows[0].projecttypeid;				
+				getProjectTypeCallback(null,projectTypeId);
 			}			
 		}
 		catch(exception){console.log(exception);}
@@ -956,122 +956,122 @@ exports.updateProject_ICE = function updateProject_ICE(req, res){
  */
 exports.getNames_ICE = function(req, res){
 	try{
-	    var requestedidslist=req.body.requestedids;
-	    var idtypes=req.body.idtype;
-	    var index=0;
-	    var responsedata={
-	        requestedids:[],
-	        respnames:[],
-	        idtypes:[]
-	    }
-	    if(requestedidslist.length == idtypes.length){
-	        var queryString="";
-	        for(var eachid=0; eachid<requestedidslist.length; eachid++){
-	            //in this block all projects under the domain is the response.
-	            if(idtypes[eachid] == 'domainsall'){
-	                var responsedata={
-	                    projectIds:[],
-	                    projectNames:[]
-	                }
-	                queryString="select projectid,projectname from projects where domainid="+requestedidslist[eachid];
-	                namesfetcher(queryString,function(error,response){
-	                	try{
-		                    if(response.length<=0){
-		                        res.send("No Projects");
-		                    }
-		                    else{
-		                        for(var i=0;i<response.length;i++){
-		                            responsedata.projectIds.push(response[i].projectid);
-		                            responsedata.projectNames.push(response[i].projectname);
-		                            if(i==response.length-1){
-		                                console.log(responsedata);
-		                                res.send(responsedata);
-		                            }
-		                        }
-		                    }	                		
-	                	}
-	                	catch(exception){
+		var requestedidslist=req.body.requestedids;
+		var idtypes=req.body.idtype;
+		var index=0;
+		var responsedata={
+				requestedids:[],
+				respnames:[],
+				idtypes:[]
+		}
+		if(requestedidslist.length == idtypes.length){
+			var queryString="";
+			for(var eachid=0; eachid<requestedidslist.length; eachid++){
+				//in this block all projects under the domain is the response.
+				if(idtypes[eachid] == 'domainsall'){
+					var responsedata={
+							projectIds:[],
+							projectNames:[]
+					}
+					queryString="select projectid,projectname from projects where domainid="+requestedidslist[eachid];
+					namesfetcher(queryString,function(error,response){
+						try{
+							if(response.length<=0){
+								res.send("No Projects");
+							}
+							else{
+								for(var i=0;i<response.length;i++){
+									responsedata.projectIds.push(response[i].projectid);
+									responsedata.projectNames.push(response[i].projectname);
+									if(i==response.length-1){
+										console.log(responsedata);
+										res.send(responsedata);
+									}
+								}
+							}	                		
+						}
+						catch(exception){
 							console.log(exception);
 						}
-	                });
-	            }else if(idtypes[eachid] == 'projects'){
-	                //in this block project name and project id of the respective id is sent
-	                queryString="select projectid,projectname from projects where projectid="+requestedidslist[eachid];
-	                namesfetcher(queryString,function(error,response){
-	                	try{
-		                    responsedata.idtypes.push('projects');
-		                    responsedata.requestedids.push(response[0].projectid);
-		                    responsedata.respnames.push(response[0].projectname);
-		                if(index == requestedidslist.length){
-		                            res.send(responsedata);
-		                            // console.log(responsedata);
-		                        }	                		
-	                	}
-	                	catch(exception){
+					});
+				}else if(idtypes[eachid] == 'projects'){
+					//in this block project name and project id of the respective id is sent
+					queryString="select projectid,projectname from projects where projectid="+requestedidslist[eachid];
+					namesfetcher(queryString,function(error,response){
+						try{
+							responsedata.idtypes.push('projects');
+							responsedata.requestedids.push(response[0].projectid);
+							responsedata.respnames.push(response[0].projectname);
+							if(index == requestedidslist.length){
+								res.send(responsedata);
+								// console.log(responsedata);
+							}	                		
+						}
+						catch(exception){
 							console.log(exception);
 						}
-	                });
-	            }else if(idtypes[eachid] == 'releases'){
-	                //in this block release name and release id of the respective id is sent
-	                queryString="select releaseid,releasename from releases where releaseid="+requestedidslist[eachid];
-	                namesfetcher(queryString,function(error,response){
-	                	try{
-		                    responsedata.idtypes.push('releases');
-		                    responsedata.requestedids.push(response[0].releaseid);
-		                    responsedata.respnames.push(response[0].releasename);
-		                    
-		                if(index == requestedidslist.length){
-		                            // res.send(responsedata);
-		                            console.log(responsedata);
-		                        }	                		
-	                	}
-	                	catch(exception){
-							console.log(exception);
-						}
-	                });
-	            }else if(idtypes[eachid] == 'cycles'){
-	                //in this block cycle name and cycle id of the respective id is sent
-	                queryString="select cycleid,cyclename from cycles where cycleid="+requestedidslist[eachid];
-	                namesfetcher(queryString,function(error,response){
-	                	try{
-		                    responsedata.idtypes.push('cycles');
-		                    responsedata.requestedids.push(response[0].cycleid);
-		                    responsedata.respnames.push(response[0].cyclename);
-		                    
-		                if(index == requestedidslist.length){
-		                            // res.send(responsedata);
-		                            console.log(responsedata);
-		                        }	                		
-	                	}
-	                	catch(exception){
-							console.log(exception);
-						}
-	                });
-	            }else{
-	                res.send("fail");
-	                break;
-	            }
-	        }
-	    }else{
-	        res.send("fail");
-	    }
+					});
+				}else if(idtypes[eachid] == 'releases'){
+					//in this block release name and release id of the respective id is sent
+					queryString="select releaseid,releasename from releases where releaseid="+requestedidslist[eachid];
+					namesfetcher(queryString,function(error,response){
+						try{
+							responsedata.idtypes.push('releases');
+							responsedata.requestedids.push(response[0].releaseid);
+							responsedata.respnames.push(response[0].releasename);
 
-	    function namesfetcher(queryString,namesfetchercallback){
-	        dbConnICE.execute(queryString, function(queryStringerr, queryStringresult){
-	        	try{
+							if(index == requestedidslist.length){
+								res.send(responsedata);
+								console.log(responsedata);
+							}	                		
+						}
+						catch(exception){
+							console.log(exception);
+						}
+					});
+				}else if(idtypes[eachid] == 'cycles'){
+					//in this block cycle name and cycle id of the respective id is sent
+					queryString="select cycleid,cyclename from cycles where cycleid="+requestedidslist[eachid];
+					namesfetcher(queryString,function(error,response){
+						try{
+							responsedata.idtypes.push('cycles');
+							responsedata.requestedids.push(response[0].cycleid);
+							responsedata.respnames.push(response[0].cyclename);
+
+							if(index == requestedidslist.length){
+								res.send(responsedata);
+								console.log(responsedata);
+							}	                		
+						}
+						catch(exception){
+							console.log(exception);
+						}
+					});
+				}else{
+					res.send("fail");
+					break;
+				}
+			}
+		}else{
+			res.send("fail");
+		}
+
+		function namesfetcher(queryString,namesfetchercallback){
+			dbConnICE.execute(queryString, function(queryStringerr, queryStringresult){
+				try{
 					if(queryStringerr){
 						statusFlag="Error occured in namesfetcher : Fail";
 						namesfetchercallback(statusFlag,null);
 					}else{
-		                index=index+1;
-		                namesfetchercallback(null,queryStringresult.rows);
+						index=index+1;
+						namesfetchercallback(null,queryStringresult.rows);
 					}	        		
-	        	}
-	        	catch(exception){
+				}
+				catch(exception){
 					console.log(exception);
 				}
-	        });
-	    }		
+			});
+		}		
 	}
 	catch(exception){
 		console.log(exception);
