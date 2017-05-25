@@ -69,10 +69,10 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		subTask = JSON.parse(window.localStorage['_CT']).subTask;
 		if(subTaskType == "Scrape" || subTask == "Scrape")
 		{
-			$(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">Project :</span><span class="content">'+projectDetails.projectname+'</span></p><p class="proj-info-wrap"><span class="content-label">Screen :</span><span class="content">'+screenName+'</span></p>')
+			$(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">Project :</span><span class="content">'+projectDetails.respnames[0]+'</span></p><p class="proj-info-wrap"><span class="content-label">Screen :</span><span class="content">'+screenName+'</span></p>')
 		}
 		else{
-			$(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">Project: </span><span class="content">'+projectDetails.projectname+'</span></p><p class="proj-info-wrap"><span class="content-label">Screen: </span><span class="content">'+screenName+'</span></p><p class="proj-info-wrap"><span class="content-label">TestCase: </span><span class="content">'+testCaseName+'</span></p>')
+			$(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">Project: </span><span class="content">'+projectDetails.respnames[0]+'</span></p><p class="proj-info-wrap"><span class="content-label">Screen: </span><span class="content">'+screenName+'</span></p><p class="proj-info-wrap"><span class="content-label">TestCase: </span><span class="content">'+testCaseName+'</span></p>')
 		}
 
 	}, 3000)
@@ -2250,7 +2250,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 	}
 
 	//var isDependentTestCaseChecked = $("#addDependent").is(":checked");
-		$(".addDependentTestCase").css("pointer-events","none");
+	$(".addDependentTestCase").css("pointer-events","none");
 	//alert(isDependentTestCaseChecked);
 	$(document).on('click','#addDependent', function() {
 			var isDependentTestCaseChecked = $("#addDependent").is(":checked");
@@ -2271,14 +2271,13 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		$(document).on('shown.bs.modal','#dialog-addDependentTestCase', function () {
 			$("input[type=checkbox].checkTestCase").prop("checked",true);
 				var currentTestCase = JSON.parse(window.localStorage['_CT']).testCaseName;
-				$("span.testcaseListItem").each(function() {
-							if(currentTestCase == $(this).children("label").text())
-							{
-											$(this).children('input.checkTestCase').attr("disabled",true)
-											//$(".checkTestCase[disabled=disabled]").prop('checked',false);
-											$(this).nextAll('.testcaseListItem').children('input.checkTestCase').attr("disabled",true);
-											$(".checkTestCase[disabled=disabled]").prop('checked',false);
-							}
+				$("span.testcaseListItem").each(function(){
+					if(currentTestCase == $(this).children("label").text()){
+						$(this).children('input.checkTestCase').attr("disabled",true)
+						//$(".checkTestCase[disabled=disabled]").prop('checked',false);
+						$(this).nextAll('.testcaseListItem').children('input.checkTestCase').attr("disabled",true);
+						$(".checkTestCase[disabled=disabled]").prop('checked',false);
+					}
 				});
 		});
 		$("#dialog-addDependentTestCase").modal("show");
@@ -3727,9 +3726,9 @@ function copyTestStep(){
 					"url"			: $(this).children("td:nth-child(11)").text().trim(),
 					"appType"		: $(this).children("td:nth-child(12)").text()					
 				});
-				window.localStorage['getRowJsonCopy'] = angular.toJson(getRowJsonCopy);
 			}
 		});
+		window.localStorage['getRowJsonCopy'] = angular.toJson(getRowJsonCopy);
 		//Reloading Row
 		$("#jqGrid").trigger("reloadGrid");	
 		$("#jqGrid").jqGrid("setColProp", "stepNo", {editable: false});

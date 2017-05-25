@@ -503,12 +503,16 @@ exports.updateScreen_ICE = function(req, res){
 															&& (viewString[scrapedobjectindex].custname.replace(/\s/g,' ').replace('&nbsp;',' ').trim() == deleteCustNames[elementsindex].replace(/\s/g,' ').replace('&nbsp;',' ').trim())){
 														if(elementschanged<deleteCustNames.length){
 															//console.log(viewString[scrapedobjectindex].custname);
-															deleteindex.push(scrapedobjectindex);
-															elementschanged=elementschanged+1;
+															if(deleteindex.indexOf(scrapedobjectindex) === -1){
+																deleteindex.push(scrapedobjectindex);
+																elementschanged=elementschanged+1;
+															}
 														}
 													}
 												}
 											}
+											deleteindex=deleteindex.sort(sortNumber);
+											console.log("dummyObjectsToDelete:::",deleteindex.join());
 											for(var deletingelementindex=0;deletingelementindex<deleteindex.length;deletingelementindex++){
 												delete viewString[deleteindex[deletingelementindex]];
 											}
@@ -762,7 +766,7 @@ exports.updateScreen_ICE = function(req, res){
 															scrapedObjectCallback();	
 														},addedObjectCustNameCallback);
 													});
-													dummyObjectsToDelete=dummyObjectsToDelete.sort();
+													dummyObjectsToDelete=dummyObjectsToDelete.sort(sortNumber);
 													console.log("dummyObjectsToDelete:::",dummyObjectsToDelete.join());
 													for(var deleteelementindex=0;deleteelementindex<dummyObjectsToDelete.length;deleteelementindex++){
 														delete viewString[dummyObjectsToDelete[deleteelementindex]];
@@ -824,6 +828,10 @@ exports.updateScreen_ICE = function(req, res){
 					}
 				}
 			});
+		}
+
+		function sortNumber(a,b) {
+			return a - b;
 		}
 		//console.log("scraped:",scrapedObjects);
 		//this code will be called only if the statusFlag is empty.
@@ -902,7 +910,9 @@ exports.updateScreen_ICE = function(req, res){
 																										testcasestep.custname=newCustnames[updatingindex];
 																									}else if (param == 'deleteScrapeData_ICE'){
 																										testcasestep.stepNo=step;
-																										deletingStepindex.push(eachtestcasestepindex);
+																										if(deletingStepindex.indexOf(eachtestcasestepindex) === -1){
+																											deletingStepindex.push(eachtestcasestepindex);
+																										}
 																									}
 																								}
 																							}
@@ -911,7 +921,7 @@ exports.updateScreen_ICE = function(req, res){
 																				}
 																				// console.log(deletingStepindex,updatingtestcasedata);
 																				if(param == 'deleteScrapeData_ICE'){
-																					deletingStepindex=deletingStepindex.sort();
+																					deletingStepindex=deletingStepindex.sort(sortNumber);
 																					for(var deletingcaseindex=0;deletingcaseindex<deletingStepindex.length;deletingcaseindex++){
 																						delete updatingtestcasedata[deletingStepindex[deletingcaseindex]];
 																					}	
