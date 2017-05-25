@@ -3950,7 +3950,9 @@ function pasteInGrid(){
 		$.each($("#jqGrid tr"), function(){
 			for(j=0;j<highlightPasted.length;j++){
 				if(parseInt($(this).children("td:nth-child(1)").text()) == highlightPasted[j]){				
-					$(this).find("input.cbox").prop("checked",true)
+					$(this).find("input.cbox").prop("checked",true);
+					$(this).addClass("ui-state-highlight");
+					$(this).siblings().removeClass("ui-state-highlight");
 				}
 			}
 		})

@@ -139,6 +139,36 @@ $(document).ready(function() {
 		window.location.href = "/plugin";
 	});
 	
+  //Special character validation
+    /*$(document).on('keypress','.forValidation', function(e){	
+    	var targetName = e.target.parentElement.firstChild.textContent.trim();
+    	var targetClass = e.target.className.split(" ")[0];
+    	var className = e.target.className;
+    	if (className == "datagrid-editable-input"){
+    		if(e.charCode == 32){
+    			return true;
+    	    }
+    	}
+    	if((targetName == "TestScript Name:" || targetName == "Screen Name:" || targetName == "Scenario Name:" || targetName == "Test Suite Name:") || e.target.parentElement.firstElementChild.textContent.trim() == "UI Test Script name:" || (targetClass == "dynamicInputBoxStyle" || "dynamicInputBoxStyleTS" || "dynamicInputBoxStyleScenario" || "dynamicInputBoxStyleSuite")){
+    		if(e.charCode >= 189 || e.charCode == 46) return true;
+    	    else if((e.charCode < 95 || e.charCode > 122) && (e.charCode < 48 || e.charCode > 57) && (e.charCode < 65 || e.charCode > 90) && (e.charCode != 45) || e.charCode == 96 || e.charCode == 32) return false;
+    	}else{
+    		if(e.charCode >= 189 || e.charCode == 32 || e.charCode == 46) return true;
+    	    else if((e.charCode < 95 || e.charCode > 122) && (e.charCode < 48 || e.charCode > 57) && (e.charCode < 65 || e.charCode > 90) && (e.charCode != 45) || e.charCode == 96) return false;		
+    	}
+    }).blur(function(){
+    	var reg = /^[a-zA-Z0-9\s\.\-\_]+$/
+    		  if(reg.test($(this).val())){
+    			  return true;
+    		  }
+    		  else if($(this).val() == ''){
+    		  }
+    		  else{
+    			  //showDialogMesgsBtn("Incorrect Inputs","Cannot contain special characters other than ._- and space","btnSCV3");
+    			  $(this).val('');
+    			  return false;
+    		  }
+      });*/
 });
 //Document Ready Function
 
@@ -152,10 +182,10 @@ function loadUserTasks(){
 	for(i=0; i<tasksJson.length; i++){
 		for(j=0;j<tasksJson[i].taskDetails.length;j++){
 			if(tasksJson[i].taskDetails[j].taskType == "Design"){
-				$(".task-content-inner").append('<div class="panel panel-default"><div class="panel-heading"><div style="margin-top: 9px;min-height: 40px;margin-top: 15px;" href="#collapse'+counter+'"><h4 class="taskNo-Inner-Pgs" style="margin-top: -1px;">'+ counter +'</h4><span class="assignedTask-Inner-Pgs assignedTaskInner" data-apptype="'+tasksJson[i].appType+'" data-projectname="'+tasksJson[i].projectId+'" data-releaseid="'+tasksJson[i].releaseId+'" data-cycleid="'+tasksJson[i].cycleId+'" data-screenid="'+tasksJson[i].screenId+'"  data-screenname="'+tasksJson[i].screenName+'" data-testcaseid="'+tasksJson[i].testCaseId+'" data-testcasename="'+tasksJson[i].testCaseName+'" data-testsuiteid="'+tasksJson[i].testSuiteId+'" data-scenarioid="'+tasksJson[i].scenarioId+'" data-testsuitename="'+tasksJson[i].testSuiteName+'" data-taskname="'+tasksJson[i].taskDetails[j].taskName+'" data-taskdes="'+tasksJson[i].taskDetails[j].taskDescription+'" data-tasktype="'+tasksJson[i].taskDetails[j].taskType+'" data-subtasktype="'+tasksJson[i].taskDetails[j].subTaskType+'" data-subtaskid="'+tasksJson[i].taskDetails[j].subTaskId+'" data-assignedto="'+tasksJson[i].taskDetails[j].assignedTo+'" data-startdate="'+tasksJson[i].taskDetails[j].startDate+'" data-exenddate="'+tasksJson[i].taskDetails[j].expectedEndDate+'" data-status="'+tasksJson[i].taskDetails[j].status+'" onclick="taskRedirectionInner(this.dataset.subtasktype,this.dataset.screenid,this.dataset.screenname,this.dataset.projectid,this.dataset.taskname,this.dataset.testcaseid,this.dataset.testcasename,this.dataset.apptype,this.dataset.releaseid,this.dataset.cycleid,this.dataset.testsuiteid,this.dataset.scenarioid,this.dataset.testsuitename,this.dataset.subtaskid)">'+tasksJson[i].taskDetails[j].taskName+'</span><!--Addition--><div class="panel-additional-details"><img style="height: 20px;opacity: 0.7;" src="imgs/ic-taskType-yellow-plus.png"/><button class="panel-head-tasktype-Inner-Pgs">'+tasksJson[i].taskDetails[j].taskType+'</button></div><!--Addition--></div></div></div>').fadeIn()
+				$(".task-content-inner").append('<div class="panel panel-default"><div class="panel-heading"><div style="margin-top: 9px;min-height: 40px;margin-top: 15px;" href="#collapse'+counter+'"><h4 class="taskNo-Inner-Pgs" style="margin-top: -1px;">'+ counter +'</h4><span class="assignedTask-Inner-Pgs assignedTaskInner" data-assignedtestscenarioids="'+tasksJson[i].assignedTestScenarioIds+'" data-apptype="'+tasksJson[i].appType+'" data-projectid="'+tasksJson[i].projectId+'" data-releaseid="'+tasksJson[i].releaseId+'" data-cycleid="'+tasksJson[i].cycleId+'" data-screenid="'+tasksJson[i].screenId+'"  data-screenname="'+tasksJson[i].screenName+'" data-testcaseid="'+tasksJson[i].testCaseId+'" data-testcasename="'+tasksJson[i].testCaseName+'" data-testsuiteid="'+tasksJson[i].testSuiteId+'" data-scenarioid="'+tasksJson[i].scenarioId+'" data-testsuitename="'+tasksJson[i].testSuiteName+'" data-taskname="'+tasksJson[i].taskDetails[j].taskName+'" data-taskdes="'+tasksJson[i].taskDetails[j].taskDescription+'" data-tasktype="'+tasksJson[i].taskDetails[j].taskType+'" data-subtasktype="'+tasksJson[i].taskDetails[j].subTaskType+'" data-subtaskid="'+tasksJson[i].taskDetails[j].subTaskId+'" data-assignedto="'+tasksJson[i].taskDetails[j].assignedTo+'" data-startdate="'+tasksJson[i].taskDetails[j].startDate+'" data-exenddate="'+tasksJson[i].taskDetails[j].expectedEndDate+'" data-status="'+tasksJson[i].taskDetails[j].status+'" onclick="taskRedirectionInner(this.dataset.assignedtestscenarioids,this.dataset.subtasktype,this.dataset.screenid,this.dataset.screenname,this.dataset.projectid,this.dataset.taskname,this.dataset.testcaseid,this.dataset.testcasename,this.dataset.apptype,this.dataset.releaseid,this.dataset.cycleid,this.dataset.testsuiteid,this.dataset.scenarioid,this.dataset.testsuitename,this.dataset.subtaskid)">'+tasksJson[i].taskDetails[j].taskName+'</span><!--Addition--><div class="panel-additional-details"><img style="height: 20px;opacity: 0.7;" src="imgs/ic-taskType-yellow-plus.png"/><button class="panel-head-tasktype-Inner-Pgs">'+tasksJson[i].taskDetails[j].taskType+'</button></div><!--Addition--></div></div></div>').fadeIn()
 			}
 			else if(tasksJson[i].taskDetails[j].taskType == "Execution"){
-				$(".task-content-inner").append('<div class="panel panel-default"><div class="panel-heading"><div style="margin-top: 9px;min-height: 40px;margin-top: 15px;" href="#collapse'+counter+'"><h4 class="taskNo-Inner-Pgs" style="margin-top: -1px;">'+ counter +'</h4><span class="assignedTask-Inner-Pgs assignedTaskInner" data-apptype="'+tasksJson[i].appType+'" data-projectname="'+tasksJson[i].projectId+'" data-releaseid="'+tasksJson[i].releaseId+'" data-cycleid="'+tasksJson[i].cycleId+'" data-screenid="'+tasksJson[i].screenId+'"  data-screenname="'+tasksJson[i].screenName+'" data-testcaseid="'+tasksJson[i].testCaseId+'" data-testcasename="'+tasksJson[i].testCaseName+'" data-testsuiteid="'+tasksJson[i].testSuiteId+'" data-scenarioid="'+tasksJson[i].scenarioId+'" data-testsuitename="'+tasksJson[i].testSuiteName+'" data-taskname="'+tasksJson[i].taskDetails[j].taskName+'" data-taskdes="'+tasksJson[i].taskDetails[j].taskDescription+'" data-tasktype="'+tasksJson[i].taskDetails[j].taskType+'" data-subtasktype="'+tasksJson[i].taskDetails[j].subTaskType+'" data-subtaskid="'+tasksJson[i].taskDetails[j].subTaskId+'" data-assignedto="'+tasksJson[i].taskDetails[j].assignedTo+'" data-startdate="'+tasksJson[i].taskDetails[j].startDate+'" data-exenddate="'+tasksJson[i].taskDetails[j].expectedEndDate+'" data-status="'+tasksJson[i].taskDetails[j].status+'" onclick="taskRedirectionInner(this.dataset.subtasktype,this.dataset.screenid,this.dataset.screenname,this.dataset.projectid,this.dataset.taskname,this.dataset.testcaseid,this.dataset.testcasename,this.dataset.apptype,this.dataset.releaseid,this.dataset.cycleid,this.dataset.testsuiteid,this.dataset.scenarioid,this.dataset.testsuitename,this.dataset.subtaskid)">'+tasksJson[i].taskDetails[j].taskName+'</span><!--Addition--><div class="panel-additional-details"><img style="height: 20px;opacity: 0.7;" src="imgs/ic-taskType-blue-plus.png"/><button class="panel-head-tasktype-Inner-Pgs">'+tasksJson[i].taskDetails[j].taskType+'</button></div><!--Addition--></div></div></div>').fadeIn()
+				$(".task-content-inner").append('<div class="panel panel-default"><div class="panel-heading"><div style="margin-top: 9px;min-height: 40px;margin-top: 15px;" href="#collapse'+counter+'"><h4 class="taskNo-Inner-Pgs" style="margin-top: -1px;">'+ counter +'</h4><span class="assignedTask-Inner-Pgs assignedTaskInner" data-assignedtestscenarioids="'+tasksJson[i].assignedTestScenarioIds+'" data-apptype="'+tasksJson[i].appType+'" data-projectid="'+tasksJson[i].projectId+'" data-releaseid="'+tasksJson[i].releaseId+'" data-cycleid="'+tasksJson[i].cycleId+'" data-screenid="'+tasksJson[i].screenId+'"  data-screenname="'+tasksJson[i].screenName+'" data-testcaseid="'+tasksJson[i].testCaseId+'" data-testcasename="'+tasksJson[i].testCaseName+'" data-testsuiteid="'+tasksJson[i].testSuiteId+'" data-scenarioid="'+tasksJson[i].scenarioId+'" data-testsuitename="'+tasksJson[i].testSuiteName+'" data-taskname="'+tasksJson[i].taskDetails[j].taskName+'" data-taskdes="'+tasksJson[i].taskDetails[j].taskDescription+'" data-tasktype="'+tasksJson[i].taskDetails[j].taskType+'" data-subtasktype="'+tasksJson[i].taskDetails[j].subTaskType+'" data-subtaskid="'+tasksJson[i].taskDetails[j].subTaskId+'" data-assignedto="'+tasksJson[i].taskDetails[j].assignedTo+'" data-startdate="'+tasksJson[i].taskDetails[j].startDate+'" data-exenddate="'+tasksJson[i].taskDetails[j].expectedEndDate+'" data-status="'+tasksJson[i].taskDetails[j].status+'" onclick="taskRedirectionInner(this.dataset.assignedtestscenarioids,this.dataset.subtasktype,this.dataset.screenid,this.dataset.screenname,this.dataset.projectid,this.dataset.taskname,this.dataset.testcaseid,this.dataset.testcasename,this.dataset.apptype,this.dataset.releaseid,this.dataset.cycleid,this.dataset.testsuiteid,this.dataset.scenarioid,this.dataset.testsuitename,this.dataset.subtaskid)">'+tasksJson[i].taskDetails[j].taskName+'</span><!--Addition--><div class="panel-additional-details"><img style="height: 20px;opacity: 0.7;" src="imgs/ic-taskType-blue-plus.png"/><button class="panel-head-tasktype-Inner-Pgs">'+tasksJson[i].taskDetails[j].taskType+'</button></div><!--Addition--></div></div></div>').fadeIn()
 			}
 			counter++
 		}
@@ -163,8 +193,7 @@ function loadUserTasks(){
 }
 
 
-function taskRedirectionInner(subtasktype,screenid,screenname,projectid,taskname,testcaseid,testcasename,apptype,releaseid,cycleid,testsuiteid,scenarioid,testsuitename,subtaskid){
-	debugger;
+function taskRedirectionInner(assignedtestscenarioids,subtasktype,screenid,screenname,projectid,taskname,testcaseid,testcasename,apptype,releaseid,cycleid,testsuiteid,scenarioid,testsuitename,subtaskid){
 	var taskObj = {};
 		taskObj.screenId = screenid;
 		taskObj.screenName = screenname;
@@ -178,9 +207,9 @@ function taskRedirectionInner(subtasktype,screenid,screenname,projectid,taskname
 		taskObj.scenarioId = scenarioid;
 		taskObj.testSuiteName = testsuitename;
 		taskObj.appType = apptype;
-		taskObj.subTaskType = subtasktype; 
+		taskObj.subTaskType = subtasktype;
 		taskObj.subTaskId=subtaskid;
-
+		taskObj.assignedTestScenarioIds = assignedtestscenarioids;
 		window.localStorage['_CT'] = JSON.stringify(taskObj);
 	if(subtasktype == "Scrape")                       window.location.pathname = "/design"
 		else if(subtasktype == "TestCase")      	  window.location.pathname = "/designTestCase"

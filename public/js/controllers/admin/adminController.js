@@ -316,7 +316,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 		actives.collapse('hide');
 	});
 
-	$scope.create_userCheck = function () {				//Yes-----------------------------------
+	$scope.create_userCheck = function () {
 		$scope.userNameRequired = '';
 		$scope.passwordRequired = '';
 		$scope.confirmPasswordRequired = '';
@@ -338,21 +338,21 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 		} else if ($("#lastName").val() == "") {
 			$("#lastName").addClass("inputErrorBorder");
 		}
-		else if ($("#password").val() == "") {
+		else if ($("#password").val() == "" && $("#password").is(":visible")) {
 			$("#password").addClass("inputErrorBorder");
 		} 
-		else if (regexPassword.test($("#password").val()) == false) {
+		else if (regexPassword.test($("#password").val()) == false && $("#password").is(":visible")) {
 			openModelPopup("Error", "Password must contain atleast 1 special character, 1 numeric, 1 uppercase, length should be minimum 8 character and maximum 12 character.");
 			$("#password").addClass("inputErrorBorder");
 		}
-		else if ($("#confirmPassword").val() == "") {
+		else if ($("#confirmPassword").val() == "" && $("#confirmPassword").is(":visible")) {
 			$("#confirmPassword").addClass("inputErrorBorder");
 		}
-		else if (regexPassword.test($("#confirmPassword").val()) == false ) {
+		else if (regexPassword.test($("#confirmPassword").val()) == false && $("#confirmPassword").is(":visible")) {
 			openModelPopup("Error","Password must contain atleast 1 special character, 1 numeric, 1 uppercase, length should be minimum 8 character and maximum 12 character.");
 			$("#confirmPassword").addClass("inputErrorBorder");
 		}
-		else if($("#password").val() != $("#confirmPassword").val()){
+		else if($("#password").val() != $("#confirmPassword").val() && $("#password").is(":visible") && $("#confirmPassword").is(":visible")){
 			openModelPopup("Error", "Password and Confirm Password did not match");
 			$("#confirmPassword").addClass("inputErrorBorder");
 		}
@@ -377,7 +377,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 			createUser.firstName = $("#firstName").val();
 			createUser.lastName =  $("#lastName").val();
 			createUser.email =  $("#email").val();
-			createUser.ldapUser = $('.ldapChkBox').is(':checked')
+			createUser.ldapUser = $(".ldapBtn").hasClass("ldapBtnActive")? true : false;
 
 			adminServices.createUser_Nineteen68(createUser)
 			.then(function (data) { 
@@ -399,7 +399,14 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 
 	//LDAP Functionality for Create User
 	$(document).on("click", ".ldapBtn", function(){
-		$(this).toggleClass("ldapBtnActive")
+		$(this).toggleClass("ldapBtnActive");
+		if($(this).hasClass("ldapBtnActive")){
+			$("#password").parent().hide();
+			$("#confirmPassword").parent().hide();
+		}else{
+			$("#password").parent().show();
+			$("#confirmPassword").parent().show();
+		}
 	})
 
 	//Get User Roles in the select container
@@ -1675,6 +1682,13 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 			$("#firstName").val(response.firstName);
 			$("#lastName").val(response.lastName);
 			$("#email").val(response.emailId != undefined? response.emailId : "");
+			if(response.ldapuser == true){
+				$("#userSelect").siblings(".ldapBtn").addClass("ldapBtnActive");
+				$("#password, #confirmPassword").parent().hide();
+			}else{
+				$("#userSelect").siblings(".ldapBtn").removeClass("ldapBtnActive");
+				$("#password, #confirmPassword").parent().show();
+			}
 			var roleId = response.roleId;
 			adminServices.getUserRoles_Nineteen68()
 			.then(function (response) {
@@ -1708,21 +1722,21 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 		else if ($("#lastName").val() == "") {
 			$("#lastName").addClass("inputErrorBorder");
 		}
-		else if ($("#password").val() == "") {
+		/*else if ($("#password").val() == "") {
 			$("#password").addClass("inputErrorBorder");
-		} 
-		else if (regexPassword.test($("#password").val()) == false) {
+		}*/ 
+		else if ($("#password").val().length > 0 && regexPassword.test($("#password").val()) == false) {
 			openModelPopup("Error", "Password must contain atleast 1 special character, 1 numeric, 1 uppercase, length should be minimum 8 character and maximum 12 character.");
 			$("#password").addClass("inputErrorBorder");
 		}
-		else if ($("#confirmPassword").val() == "") {
+		/*else if ($("#confirmPassword").val() == "") {
 			$("#confirmPassword").addClass("inputErrorBorder");
-		}
-		else if (regexPassword.test($("#confirmPassword").val()) == false ) {
+		}*/
+		else if ($("#confirmPassword").val().length > 0 && regexPassword.test($("#confirmPassword").val()) == false ) {
 			openModelPopup("Error","Password must contain atleast 1 special character, 1 numeric, 1 uppercase, length should be minimum 8 character and maximum 12 character.");
 			$("#confirmPassword").addClass("inputErrorBorder");
 		}
-		else if($("#password").val() != $("#confirmPassword").val()){
+		else if($("#password").val() != $("#confirmPassword").val() && ($("#password").val().length > 0 && $("#confirmPassword").val().length > 0)){
 			openModelPopup("Error", "Password and Confirm Password did not match");
 			$("#confirmPassword").addClass("inputErrorBorder");
 		}

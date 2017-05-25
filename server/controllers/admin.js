@@ -44,7 +44,6 @@ exports.getUserRoles_Nineteen68 = function(req, res){
 };
 
 
-
 //GetUsers
 exports.getUsers_Nineteen68 = function(req, res){
 	try{
@@ -123,7 +122,7 @@ exports.getEditUsersInfo_Nineteen68 = function(req, res){
 		var reuestedUserName = req.body.userName;
 		var reuestedUserId = req.body.userId;
 		var userDetails = {};
-		var getUserRoles = "select username,defaultrole,emailid,firstname,lastname from users where userid="+reuestedUserId+"";
+		var getUserRoles = "select username,defaultrole,emailid,firstname,lastname,ldapuser from users where userid="+reuestedUserId+"";
 		dbConn.execute(getUserRoles, function (err, result) {
 			try{
 				if (err) {
@@ -136,7 +135,8 @@ exports.getEditUsersInfo_Nineteen68 = function(req, res){
 							userDetails.roleId = iterator.defaultrole,
 							userDetails.emailId = iterator.emailid,
 							userDetails.firstName = iterator.firstname,
-							userDetails.lastName = iterator.lastname							
+							userDetails.lastName = iterator.lastname,
+							userDetails.ldapuser = iterator.ldapuser
 						}
 						catch(exception){console.log(exception);}
 					});
