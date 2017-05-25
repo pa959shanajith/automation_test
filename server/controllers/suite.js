@@ -418,6 +418,7 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 		testsuitedetails.executionId = executionId;
 		//					console.log(JSON.stringfy(testsuitedetails));
 		var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+		console.log(Object.keys(myserver.allSocketsMap),"<<all people, asking person:",ip);
 		if('allSocketsMap' in myserver && ip in myserver.allSocketsMap){
 			var mySocket = myserver.allSocketsMap[ip];
 			mySocket._events.result_executeTestSuite = [];
