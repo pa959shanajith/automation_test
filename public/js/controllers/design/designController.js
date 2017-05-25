@@ -4170,6 +4170,7 @@ function getTags(data) {
 		else if(appTypeLocal == "SAP")	{
 			obnames.push("@Generic");
 			obnames.push("@Sap");
+			obnames.push("@Custom");
 		}
 	for (var i=0; i<data.length; i++){
 		obnames.push(data[i].custname);
