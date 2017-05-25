@@ -25,6 +25,7 @@ var xpath="";
 exports.initScraping_ICE = function (req, res) {
 	try{
 		var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+		console.log(Object.keys(myserver.allSocketsMap),"<<all people, asking person:",ip);
 		var mySocket = myserver.allSocketsMap[ip];
 		if('allSocketsMap' in myserver && ip in myserver.allSocketsMap){
 			var reqScrapJson = {};
@@ -119,6 +120,7 @@ exports.initScraping_ICE = function (req, res) {
 	 	var focusParam = req.body.elementXpath+","+req.body.elementUrl;
 		var appType = req.body.appType;
 		var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+		console.log(Object.keys(myserver.allSocketsMap),"<<all people, asking person:",ip);
 		var mySocket =  myserver.allSocketsMap[ip];
 		mySocket.emit("focus", focusParam, appType);
 		var flag = 'success';
@@ -1396,6 +1398,7 @@ exports.updateTestCase_ICE = function (req, res) {
 exports.debugTestCase_ICE = function (req, res) {
 	try{
 		var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+		console.log(Object.keys(myserver.allSocketsMap),"<<all people, asking person:",ip);
 		var mySocket = myserver.allSocketsMap[ip];
 		if('allSocketsMap' in myserver && ip in myserver.allSocketsMap){
 			try{

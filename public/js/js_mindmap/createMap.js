@@ -1,7 +1,10 @@
-var activeNode,uNix,uLix,node,link,dNodes,dLinks,allMMaps,temp,rootIndex,faRef,nCount,scrList,tcList,mapSaved,zoom,cSpan,cScale,taskAssign,releaseResult;
-var deletednode=[];
+var activeNode,childNode,uNix,uLix,node,link,dNodes,dLinks,allMMaps,temp,rootIndex,faRef,nCount,scrList,tcList,mapSaved,zoom,cSpan,cScale,taskAssign,releaseResult;
+//unassignTask is an array to store whose task to be deleted
+var deletednode=[],unassignTask=[];
 var userInfo =  JSON.parse(window.localStorage['_UI']);
 var userid = userInfo.user_id;
+// node_names_tc keep track of testcase names to decide reusability of testcases
+var node_names_tc=[];
 function loadMindmapData(){
 	
 	dataSender({task:'populateProjects',user_id:userid},function(err,result){
@@ -31,19 +34,22 @@ function loadMindmapData(){
 				}
 				loadMindmapData1();
 			});
+			//Calling the function to restrict the user to give default node names
+			$("#ct-canvas").click(callme);
 		}
 	});
 }
 function loadMindmapData1(){
 	uNix=0;uLix=0;dNodes=[];dLinks=[];nCount=[0,0,0,0];scrList=[];tcList=[];cSpan=[0,0];cScale=1;mapSaved=!1;
-	taskAssign={"modules":{"task":["Execute"],"attributes":["at","rw","sd","ed","re","cy"]},"scenarios":null,"screens":{"task":["Scrape","Append","Compare","Add","Map"],"attributes":["at","rw","sd","ed"]},"testcases":{"task":["Update","Design"],"attributes":["at","rw","sd","ed"]}};
+	//Adding task to scenario
+	taskAssign={"modules":{"task":["Execute"],"attributes":["at","rw","sd","ed","re","cy"]},"scenarios":{"task":["Execute Scenario"],"attributes":["at","rw","sd","ed"]},"screens":{"task":["Scrape","Append","Compare","Add","Map"],"attributes":["at","rw","sd","ed"]},"testcases":{"task":["Update","Design"],"attributes":["at","rw","sd","ed"]}};
 	zoom=d3.behavior.zoom().scaleExtent([0.1,3]).on("zoom", zoomed);
 	faRef={"plus":"fa-plus","edit":"fa-pencil-square-o","delete":"fa-trash-o"};
 	
 		$(document).on('click',".ct-tile", function() {
 			createNewMap();
 			});
-//	d3.selectAll('#ctExpandCreate').on('click',toggleExpand);
+
 				 $(document).on('click',"#ctExpandCreate", function(e) {
 					if($(".ct-node:visible").length > 6)
 					{
@@ -108,6 +114,7 @@ var initiate = function(){
 	u=canvas.append('div').attr('id','ct-assignBox').classed('no-disp',!0);
 	u.append('div').attr('id','ct-assignTable');
 	u.append('div').attr('class','ct-assignDetailsBox').append('textarea').attr('id','ct-assignDetails').attr('placeholder','Enter Details');
+	u.append('div').attr('id','ct-unassignButton').append('a').html('Unassign').on('click',removeTask);
 	u.append('div').attr('id','ct-assignButton').append('a').html('OK').on('click',addTask);
 	var mapSvg=canvas.append('svg').attr('id','ct-mapSvg').call(zoom).on('click.hideElements',clickHideElements);
 	var dataAdder=[{c:'#5c5ce5',t:'Modules'},{c:'#4299e2',t:'Scenarios'},{c:'#19baae',t:'Screens'},{c:'#efa022',t:'Test Cases'}];
@@ -130,16 +137,21 @@ var initiate = function(){
 	
 };
 var zoomed = function(){
+	
 	cSpan=d3.event.translate;
 	cScale=d3.event.scale;
+	
+	//Logic to change the layout
 	d3.select("#ct-mindMap").attr("transform","translate("+d3.event.translate+")scale("+d3.event.scale +")");
+	
 };
 var getElementDimm = function(s){return [parseFloat(s.style("width")),parseFloat(s.style("height"))];};
 var createNewMap = function(e){ 
 	initiate();
 	clearSvg();
 	var s=getElementDimm(d3.select("#ct-mapSvg"));
-	node={id:uNix,childIndex:0,name:'Module_0',type:'modules',x:s[0]*0.2,y:s[1]*0.4,children:[],parent:null};
+	//X and y changed to implement layout change
+	node={id:uNix,childIndex:0,name:'Module_0',type:'modules',y:s[0]*0.2,x:s[1]*0.4,children:[],parent:null};
 	dNodes.push(node);nCount[0]++;uNix++;
 	addNode(dNodes[uNix-1],!1,null);
 };
@@ -157,9 +169,14 @@ var loadMap = function(e){
 var genPathData = function(s,t){
 	/*if(s[1]<t[1]) return ('M'+s[0]+','+s[1]+' H'+(((s[0]+t[0])/2)-10)+' Q'+((s[0]+t[0])/2)+','+s[1]+' '+((s[0]+t[0])/2)+','+(s[1]+10)+'  V'+(t[1]-10)+' Q'+((s[0]+t[0])/2)+','+t[1]+' '+(((s[0]+t[0])/2)+10)+','+t[1]+' H'+t[0]);
 	else return ('M'+s[0]+','+s[1]+' H'+(((s[0]+t[0])/2)-10)+' Q'+((s[0]+t[0])/2)+','+s[1]+' '+((s[0]+t[0])/2)+','+(s[1]-10)+'  V'+(t[1]+10)+' Q'+((s[0]+t[0])/2)+','+t[1]+' '+(((s[0]+t[0])/2)+10)+','+t[1]+' H'+t[0]);*/
+	
 	return ('M'+s[0]+','+s[1]+'C'+(s[0]+t[0])/2+','+s[1]+' '+(s[0]+t[0])/2+','+t[1]+' '+t[0]+','+t[1]);
 };
 var addNode = function(n,m,pi){
+	
+	if(n.type=='testcases'){
+		node_names_tc.push(n.name);
+	}
 	
 	var v=d3.select('#ct-mindMap').append('g').attr('id','ct-node-'+n.id).attr('class','ct-node').attr('data-nodetype',n.type).attr('transform',"translate("+(n.x).toString()+","+(n.y).toString()+")");
 	if($("#ct-canvas").attr('class')=='tabCreate ng-scope'){
@@ -171,24 +188,49 @@ var addNode = function(n,m,pi){
 	//v.append('image').attr('class','ct-nodeIcon').attr('xlink:href','images_mindmap/node-'+n.type+'.png').on('click',nodeCtrlClick);
 	
 	v.append('text').attr('class','ct-nodeLabel').html(n.name).attr('text-anchor','middle').attr('x',20).attr('y',50);
-
+	//Condition to add the properties of reuse to the node (Currently only for testcases)
+	if(node_names_tc.length>0 && node_names_tc.indexOf(n.name)>-1){
+		if(node_names_tc.indexOf(n.name)==node_names_tc.lastIndexOf(n.name)){
+			n.reuse='reuse';
+		}else{
+			n.reuse='parent';
+		}
+		
+		//if(v.select('.ct-nodeReuse')[0][0]==null) 
+		//v.append('image').attr('class','ct-nodeReuse').attr('xlink:href','images_mindmap/NEAREST.png').attr('x',10).attr('y',10);
+	}
+	
+	
 	
 	if(m&&pi){
 		var p=d3.select('#ct-node-'+pi.id);
-		if(!p.select('circle.ct-cRight')[0][0]) p.append('circle').attr('class','ct-'+pi.type+' ct-cRight ct-nodeBubble').attr('cx',43).attr('cy',20).attr('r',4).on('click',toggleNode);
+		if(!p.select('circle.ct-cRight')[0][0]) p.append('circle').attr('class','ct-'+pi.type+' ct-cRight ct-nodeBubble').attr('cx',20).attr('cy',55).attr('r',4).on('click',toggleNode);
+		//Logic to change the layout
+		v.append('circle').attr('class','ct-'+n.type+' ct-cLeft ct-nodeBubble').attr('cx',20).attr('cy',-3).attr('r',4);//.on('mousedown',moveNodeBegin).on('mouseup',moveNodeEnd);
 		v.append('circle').attr('class','ct-'+n.type+' ct-cLeft ct-nodeBubble').attr('cx',-3).attr('cy',20).attr('r',4).on('mousedown',moveNodeBegin).on('mouseup',moveNodeEnd);
 	}
+	return v;
 };
 var addLink = function(r,p,c){
-	var s=[p.x+43,p.y+20];
-	var t=[c.x-3,c.y+20];
+	var s=[p.x+20,p.y+55];
+	var t=[c.x+20,c.y-3];
 	var d=genPathData(s,t);
 	var l=d3.select('#ct-mindMap').insert('path','g').attr('id','ct-link-'+r).attr('class','ct-link').attr('d',d);
 };
-
-
-var addTask = function(e){
+//To Unassign the task of a particular node
+var removeTask= function(e){
 	
+	var p=d3.select(activeNode);
+	p.select('.ct-nodeTask').classed('no-disp',!0);
+	var pi=parseInt(p.attr('id').split('-')[2]);
+	var nType=p.attr('data-nodetype');
+	if(dNodes[pi].oid !=undefined && dNodes[pi].task !=null){
+		unassignTask.push(dNodes[pi].oid)
+	}
+	d3.select('#ct-assignBox').classed('no-disp',!0);
+}
+var addTask = function(e){
+		
 	$("ct-assignTask,#ct-assignedTo,#ct-assignRevw,#ct-assignRel,#ct-assignCyc").removeClass("selectErrorBorder");
 	$("#startDate,#endDate").removeClass("inputErrorBorder");
 	if($("ct-assignTask option:selected").val() == "select user") {
@@ -219,10 +261,10 @@ var addTask = function(e){
 		$("#endDate").css('border','').addClass("datePickBorder");
 		return false;
 	}
-		
 	d3.select('#ct-assignBox').classed('no-disp',!0);
 	var a,b,p=d3.select(activeNode);
 	var pi=parseInt(p.attr('id').split('-')[2]);
+	
 	var nType=p.attr('data-nodetype');
 	var tObj={t:/*d3.select('#ct-assignTask').html()*/$('#ct-assignTask').val(),at:$('#ct-assignedTo').val(),rw:/*(d3.select('#ct-assignRevw')[0][0])?*/$('#ct-assignRevw').val()/*:null*/,sd:$('#startDate').val(),ed:$('#endDate').val(),re:(d3.select('#ct-assignRel')[0][0])?$('#ct-assignRel').val():null,cy:(d3.select('#ct-assignCyc')[0][0])?$('#ct-assignCyc').val():null,det:d3.select('#ct-assignDetails').property('value'),app:$('option:selected', '.project-list').attr('app-type')};
 	//console.log(tObj);
@@ -251,11 +293,25 @@ var addTask = function(e){
 		//if(p.select('.ct-nodeTask')[0][0]==null) p.append('image').attr('class','ct-nodeTask').attr('xlink:href','images_mindmap/node-task-assigned.png').attr('x',29).attr('y',-10);
 		if(nType=="modules"){
 			if(tObj.cy != 'select cycle' && tObj.re != 'select release'){
-				if(dNodes[pi].id_c != "null"){
+				if(dNodes[pi].id_c!="null"){
 					dNodes[pi].task={id:tObj.id,oid:tObj.oid,task:tObj.t,assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,release:tObj.re,cycle:tObj.cy,details:tObj.det,parent:(tObj.parent!=null)?tObj.parent:[dNodes[pi].id_c]};
 				}
-				
+				//Logic to add tasks for the scenario
 				if(dNodes[pi].children) dNodes[pi].children.forEach(function(tSc){
+					if(tSc.task===undefined||tSc.task==null){
+							if(dNodes[pi].id_c!='null' && tSc.id_c!='null'){
+								taskflag=true;
+								tSc.task={id:tObj.id,oid:tObj.oid,task:"Execute Scenario",assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,release:tObj.re,cycle:tObj.cy,details:tObj.det,parent:(tObj.parent!=null)?tObj.parent:[dNodes[pi].id_c,tSc.id_c]};
+								d3.select('#ct-node-'+tSc.id).append('image').attr('class','ct-nodeTask').attr('xlink:href','images_mindmap/node-task-assigned.png').attr('x',29).attr('y',-10);
+							}
+							
+					}else{
+							//If any of the cassandra id in parent list of the task is null then update it
+							if(tSc.task.parent.indexOf(null)==-1 && tSc.task.parent!=[dNodes[pi].id_c,tSc.id_c]){
+								tSc.task['updatedParent']=[dNodes[pi].id_c,tSc.id_c];
+							}
+
+					}
 					tSc.children.forEach(function(scr){
 						if(scr.task===undefined||scr.task==null){
 							if(dNodes[pi].id_c!='null' && tSc.id_c!='null' && scr.id_c!='null'){
@@ -265,7 +321,7 @@ var addTask = function(e){
 							}
 							
 						}else{
-							if(scr.task.parent!=[dNodes[pi].id_c,tSc.id_c,scr.id_c]){
+							if(scr.task.parent.indexOf(null)==-1 && scr.task.parent!=[dNodes[pi].id_c,tSc.id_c,scr.id_c]){
 								scr.task['updatedParent']=[dNodes[pi].id_c,tSc.id_c,scr.id_c];
 							}
 
@@ -292,9 +348,59 @@ var addTask = function(e){
 				errorRelCyc=true;
 			}
 		}
+		//Logic to add tasks for the scenario
+		else if(nType=="scenarios"){
+			var modid=dNodes[pi].parent.id_c,tscid=dNodes[pi].id_c;
+
+				if(dNodes[pi].parent.task != null){
+					var parentTask=dNodes[pi].parent.task ;
+					
+				
+				if(tscid!='null'){
+					dNodes[pi].task={id:tObj.id,oid:tObj.oid,task:tObj.t,assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,release:parentTask.release,cycle:parentTask.cycle,details:tObj.det,parent:(tObj.parent!=null)?tObj.parent:[modid,dNodes[pi].id_c]};
+				}
+
+				
+				if(dNodes[pi].children) dNodes[pi].children.forEach(function(scr){
+					//tSc.children.forEach(function(scr){
+						if(scr.task===undefined||scr.task==null){
+							if(modid!='null' && tscid!='null' && scr.id_c!='null'){
+								taskflag=true;
+								scr.task={id:null,oid:null,task:"Scrape",assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,details:tObj.det,parent:[modid,tscid,scr.id_c]};
+								d3.select('#ct-node-'+scr.id).append('image').attr('class','ct-nodeTask').attr('xlink:href','images_mindmap/node-task-assigned.png').attr('x',29).attr('y',-10);
+							}
+							
+						}else{
+							if(scr.task.parent!=[modid,tscid,scr.id_c]){
+								scr.task['updatedParent']=[modid,tscid,scr.id_c];
+							}
+
+						}
+						
+						scr.children.forEach(function(tCa){
+							if(tCa.task===undefined||tCa.task==null){
+								if(modid!='null' && tscid!='null' && scr.id_c!='null' && tCa.id_c != 'null' ){
+									taskflag=true;
+									tCa.task={id:null,oid:null,task:"Design",assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,details:tObj.det,parent:[modid,tscid,scr.id_c,tCa.id_c]};
+									d3.select('#ct-node-'+tCa.id).append('image').attr('class','ct-nodeTask').attr('xlink:href','images_mindmap/node-task-assigned.png').attr('x',29).attr('y',-10);
+								}
+							}else{
+								if(tCa.task.parent!=[modid,tscid,scr.id_c,tCa.id_c]){
+									tCa.task['updatedParent']=[modid,tscid,scr.id_c,tCa.id_c];
+								}
+								taskflag=true;
+							}
+						});
+					//});
+				});
+			}else{
+				openDialogMindmap("Error",'Assign task to the module')
+				return;
+			}
+		}
 		else if(nType=="screens"){
 			var modid=dNodes[pi].parent.parent.id_c,tscid=dNodes[pi].parent.id_c,scrid=dNodes[pi].id_c;
-			if(dNodes[pi].id_c != "null"){
+			if(dNodes[pi].id_c!='null'){
 				dNodes[pi].task={id:tObj.id,oid:tObj.oid,task:tObj.t,assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,details:tObj.det,parent:(tObj.parent!=null)?tObj.parent:[modid,tscid,scrid]};
 			}
 			
@@ -356,7 +462,16 @@ var nodeClick = function(e){
 	var p=d3.select(activeNode);
 	var pi=parseInt(p.attr('id').split('-')[2]);
 	var t=p.attr('data-nodetype');
-	if(t=='scenarios') return;
+	if(dNodes[pi].children == undefined || dNodes[pi].children == null){
+		openDialogMindmap('Error','Expand the module');
+		return;
+	}
+	if(dNodes[pi].task==null){!0
+		p.select('#ct-unassignButton').classed('ct-ctrl-inactive',!0);
+	}else{
+		p.select('#ct-unassignButton').classed('ct-ctrl-inactive',!1);
+	}
+	//if(t=='scenarios') return;
 	var nt=(dNodes[pi].task!==undefined||dNodes[pi].task!=null)?dNodes[pi].task:!1;
 	var tObj={t:(nt)?nt.task:'',at:(nt)?nt.assignedTo:'',rw:(nt&&nt.reviewer!=null)?nt.reviewer:'',sd:(nt)?nt.startDate:'',ed:(nt)?nt.endDate:'',re:(nt&&nt.release!=null)?nt.release:'',cy:(nt&&nt.cycle!=null)?nt.cycle:'',det:(nt)?nt.details:''};
 	d3.select('#ct-assignDetails').property('value',tObj.det);
@@ -388,7 +503,8 @@ var nodeClick = function(e){
 			var d = v.append('select').attr('id','ct-assignedTo');//.attr('class','assignedTo')
 			
 			$('#ct-assignedTo').append("<option value='select user' >Select User</option>");
-			dataSender({task:'populateUsers'},function(err,result){
+			//PAssing selected projectid to the service
+			dataSender({task:'populateUsers',projectId:$(".project-list").val()},function(err,result){
 				if(err){ console.log(result);callback(null,err);}
 				else{
 					result1=JSON.parse(result);
@@ -408,7 +524,7 @@ var nodeClick = function(e){
 			v.append('span').attr('class','ct-assignItem fl-left').html('Reviewer');
 			var d = v.append('select').attr('id','ct-assignRevw');//.attr('class','reviwedBy');
 			$('#ct-assignRevw').append("<option value='select reviewer' select=selected>"+"Select Reviewer"+"</option>");
-			dataSender({task:'populateUsers'},function(err,result){
+			dataSender({task:'populateUsers',projectId:$(".project-list").val()},function(err,result){
 				if(err){ console.log(result);callback(null,err);}
 				else{
 					result1=JSON.parse(result);
@@ -590,43 +706,83 @@ var nodeCtrlClick = function(e){
 	}
 };
 var createNode = function(e){
+	//If module is in edit mode, then return do not add any node
+	if(d3.select('#ct-inpBox').attr('class')=="") return;
 	d3.select('#ct-inpBox').classed('no-disp',!0);
 	d3.select('#ct-ctrlBox').classed('no-disp',!0);
 	var p=d3.select(activeNode);
 	var pt=p.attr('data-nodetype');
 	if(pt=='testcases') return;
 	var pi = p.attr('id').split('-')[2];
-	var nNext={'modules':['Scenario',1],'scenarios':['Screen',2],'screens':['Testcase',3]};
-	var mapSvg=d3.select('#ct-mapSvg');
-	var w=parseFloat(mapSvg.style('width'));
-	var h=parseFloat(mapSvg.style('height'));
-	node={id:uNix,childIndex:'',path:'',name:nNext[pt][0]+'_'+nCount[nNext[pt][1]],type:(nNext[pt][0]).toLowerCase()+'s',x:w*(0.15*(1.34+nNext[pt][1])+Math.random()*0.1),y:90+70*Math.floor(Math.random()*(Math.floor((h-150)/70))),children:[],parent:dNodes[pi]};
-	dNodes.push(node);nCount[nNext[pt][1]]++;
-	dNodes[pi].children.push(dNodes[uNix]);
-	dNodes[uNix].childIndex=dNodes[pi].children.length
-	addNode(dNodes[uNix],!0,dNodes[pi]);
-	link={id:uLix,source:dNodes[pi],target:dNodes[uNix]};
-	dLinks.push(link);
-	addLink(uLix,dNodes[pi],dNodes[uNix]);
-	uNix++;uLix++;
+	
+	if(dNodes[pi].children != undefined || dNodes[pi].children != null){
+		var nNext={'modules':['Scenario',1],'scenarios':['Screen',2],'screens':['Testcase',3]};
+		var mapSvg=d3.select('#ct-mapSvg');
+		var w=parseFloat(mapSvg.style('width'));
+		var h=parseFloat(mapSvg.style('height'));
+		//name:nNext[pt][0]+'_'+nCount[nNext[pt][1]]
+		node={id:uNix,childIndex:'',path:'',name:nNext[pt][0]+'_'+nCount[nNext[pt][1]],type:(nNext[pt][0]).toLowerCase()+'s',y:h*(0.15*(1.34+nNext[pt][1])+Math.random()*0.1),x:90+30*Math.floor(Math.random()*(Math.floor((w-150)/80))),children:[],parent:dNodes[pi]};
+		dNodes.push(node);nCount[nNext[pt][1]]++;
+		dNodes[pi].children.push(dNodes[uNix]);
+		dNodes[uNix].childIndex=dNodes[pi].children.length
+		var currentNode=addNode(dNodes[uNix],!0,dNodes[pi]);
+		if(currentNode != null){
+			childNode=currentNode
+			console.log(currentNode);
+			link={id:uLix,source:dNodes[pi],target:dNodes[uNix]};
+			dLinks.push(link);
+			addLink(uLix,dNodes[pi],dNodes[uNix]);
+			uNix++;uLix++;
+			
+			//By default when a node is created it's name should be in ediatable mode
+			editNode(e,currentNode);
+		}
+		
+	}else{
+		openDialogMindmap('Error','Expand the module');
+	}
+	
 };
-var editNode = function(e){
+var editNode = function(e,node){
+	
 	$('#ct-inpAct').removeClass('errorClass');
 	e=e||window.event;
 	e.cancelbubble=!0;
 	if(e.stopPropagation) e.stopPropagation();
-	d3.select('#ct-ctrlBox').classed('no-disp',!0);
-	var p=d3.select(activeNode);
+	//logic to create the node in editable mode
+	if(node==0){
+		childNode=null;
+		var p=d3.select(activeNode);
+	}else var p=childNode;
 	var pi = p.attr('id').split('-')[2];
 	var t=p.attr('data-nodetype');
 	var l=p.attr('transform').slice(10,-1).split(',');
+	d3.select('#ct-ctrlBox').classed('no-disp',!0);
+	if(p.select('.ct-nodeTask')[0][0] != null){
+		var msg='Unassign the task to rename';
+		if(t=='screens'){
+			msg='Unassign the task to rename. And unassign the corresponding testcases tasks';
+		}
+		openDialogMindmap('Rename Error',msg);
+		return;
+	}
+
+	d3.select('#ct-ctrlBox').classed('no-disp',!0);
+	var name='';
+	//By default when a node is created it's name should be in ediatable mode
+	
+	
+	name=p.text();
 	l=[(parseFloat(l[0])-20)*cScale+cSpan[0],(parseFloat(l[1])+42)*cScale+cSpan[1]];
 	d3.select('#ct-inpBox').style('top',l[1]+'px').style('left',l[0]+'px').classed('no-disp',!1);
 	d3.select('#ct-inpPredict').property('value','');
-	d3.select('#ct-inpAct').attr('data-nodeid',null).property('value',p.text()).node().focus();
+	d3.select('#ct-inpAct').attr('data-nodeid',null).property('value',name).node().focus();
 	d3.select('#ct-inpSugg').classed('no-disp',!0);
+	
 };
 var deleteNode = function(e){
+	//If module is in edit mode, then return do not add any node
+	if(d3.select('#ct-inpBox').attr('class')=="") return;
 	d3.select('#ct-ctrlBox').classed('no-disp',!0);
 	var s=d3.select(activeNode);
 	var sid = s.attr('id').split('-')[2];
@@ -667,6 +823,7 @@ var recurseDelChild = function(d){
 };
 var moveNode = function(e){
 	e=e||window.event;
+	// console.log("translate("+parseFloat((e.pageX-14-cSpan[0])/cScale+2)+","+parseFloat((e.pageY-70-cSpan[1])/cScale-20)+")");
 	d3.select('.ct-movable').attr('transform', "translate("+parseFloat((e.pageX-14-cSpan[0])/cScale+2)+","+parseFloat((e.pageY-70-cSpan[1])/cScale-20)+")");
 };
 var moveNodeBegin = function(e){
@@ -696,25 +853,26 @@ var moveNodeEnd = function(e){
 	var l=p.attr('transform').slice(10,-1).split(',');
 	//Logic to implement rearranging of nodes
 	var curNode=dNodes[pi];
-	var changeOrderUp = function(curNode,ci,p){
+	//logic change dto the change in layout
+	var changeOrderRight = function(curNode,ci,p){
 		var counter=-1;
 		var flag=false;
 		dNodes[pi].parent.children.forEach(function(a,i){
 			if(ci<=(i+1)){
 				return false;
 			}
-			if(l[1]<a.y){
+			if(l[0]<a.x){
 				if(counter==-1) counter=(i+1);
 				a.childIndex++;
 				curNode.childIndex=counter;
 			}
 		});
 	};
-	var changeOrderDown = function(curNode,ci,p){
+	var changeOrderLeft = function(curNode,ci,p){
 		var counter=0;
 		var flag=false;
 		dNodes[pi].parent.children.forEach(function(a,ci){
-			if(l[1]>a.y){
+			if(l[0]>a.x){
 				counter=(ci+1);
 				a.childIndex--;
 				curNode.childIndex=counter;
@@ -723,12 +881,12 @@ var moveNodeEnd = function(e){
 	};
 	var currentChildIndex=curNode.childIndex;
 	var totalChildren=curNode.parent.children;
-	if(l[1]<curNode.y){
+	if(l[0]<curNode.x){
 		//alert('moved up');
-		changeOrderUp(curNode,currentChildIndex,totalChildren);
+		changeOrderRight(curNode,currentChildIndex,totalChildren);
 	}else{
 		//alert('moved down');
-		changeOrderDown(curNode,currentChildIndex,totalChildren);
+		changeOrderLeft(curNode,currentChildIndex,totalChildren);
 	}
 	dNodes[pi].x=parseFloat(l[0]);
 	dNodes[pi].y=parseFloat(l[1]);
@@ -805,12 +963,20 @@ var validNodeDetails1 = function(p){
 var inpChange = function(e){
 	var inp=d3.select('#ct-inpAct');
 	var val=inp.property('value');
+	if(val=='Screen_0' || val=='Scenario_0' || val=='Testcase_0' ){
+		$('#ct-inpAct').addClass('errorClass');
+		return;
+	} 
 	if(!validNodeDetails(val,this)) return;
 	//if(!validNodeDetails(this)) return;
-	var p=d3.select(activeNode);
+	if(childNode!=null){
+		var p=childNode;
+	 }else{
+		var p=d3.select(activeNode);
+	}
 	var pi=p.attr('id').split('-')[2];
-	var pt=p.select('.ct-nodeLabel');
-	var t=p.attr('data-nodetype');
+		var pt=p.select('.ct-nodeLabel');
+		var t=p.attr('data-nodetype');
 	if(!d3.select('#ct-inpSugg').classed('no-disp') && temp && temp.length>0) return;
 	if(dNodes[pi].id_n){
 		dNodes[pi].original_name=p.text();
@@ -941,7 +1107,7 @@ var actionEvent = function(e){
 	s.classed('no-access',!0);
 	var userInfo =  JSON.parse(window.localStorage['_UI']);
 	var username = userInfo.username;
-	dataSender({task:'writeMap',data:{write:flag,map:mapData,user_name:username,abc:deletednode,prjId:$('.project-list').val(),relId:$('#ct-assignRel').val(),cycId:$('#ct-assignCyc').val()}},function(err,result){
+	dataSender({task:'writeMap',data:{write:flag,map:mapData,user_name:username,abc:deletednode,xyz:unassignTask,prjId:$('.project-list').val(),relId:$('#ct-assignRel').val(),cycId:$('#ct-assignCyc').val()}},function(err,result){
 		s.classed('no-access',!1);
 		if(err){
 			console.log(result);
@@ -1129,7 +1295,18 @@ var clearSvg = function(){
 	zoom.scale(cScale).translate(cSpan);
 	zoom.event(d3.select('#ct-mapSvg'));
 };
+
+//FUnction is tagge dto every click on 'cnavas' element to validate the names of nodes when created
+var callme=function(){
+	var selectedTab = window.localStorage['tabMindMap']
+	console.log($('#ct-inpBox').attr('class'));
+	if(childNode != null && childNode.name=='Screen_0'){
+		d3.select('#ct-inpBox').classed('no-disp',!1);
+	}
+	
+}
 var treeBuilder = function(tree){
+	node_names_tc=[];
 	var pidx=0,levelCount=[1],cSize=getElementDimm(d3.select("#ct-mapSvg"));
 	var typeNum={'modules':0,'scenarios':1,'screens':2,'testcases':3};
 	var childCounter = function(l,s){
@@ -1147,20 +1324,26 @@ var treeBuilder = function(tree){
 	if(tree.childIndex===undefined) d3Tree.sort(function(a,b){return a.childIndex-b.childIndex;});
 	else d3Tree.sort(function(a,b){return a.childIndex-b.childIndex;});
 	dNodes=d3Tree.nodes(tree);
-	dLinks=d3Tree.links(dNodes);
+	//dLinks=d3Tree.links(dNodes);
 	dNodes.forEach(function(d){
-		d.y=d.x;
-		d.x=cSize[0]*0.2*(0.9+typeNum[d.type]);
+		//d.y=d.x;
+		//Logic to change the layout and to reduce the length of the links
+		d.y=cSize[0]*0.1*(0.9+typeNum[d.type]);
+
+
+
 		if(d.oid===undefined)d.oid=d.id;
 		d.id=uNix++;
 		addNode(d,!0,d.parent);
 		if(d.task!=null) d3.select('#ct-node-'+d.id).append('image').attr('class','ct-nodeTask').attr('xlink:href','images_mindmap/node-task-assigned.png').attr('x',29).attr('y',-10);
 	});
+	dLinks=d3Tree.links(dNodes);
 	dLinks.forEach(function(d){
 		d.id=uLix++;
 		addLink(d.id,d.source,d.target);
 	});
-	zoom.translate([0,(cSize[1]/2)-dNodes[0].y]);
+	//zoom.translate([0,(cSize[1]/2)-dNodes[0].y]);
+	zoom.translate([(cSize[0]/2)-dNodes[0].x,(cSize[1]/5)-dNodes[0].y]);
 	zoom.event(d3.select('#ct-mapSvg'));
 };
 var dataSender = function(data,callback){

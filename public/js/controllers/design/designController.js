@@ -3309,13 +3309,13 @@ function contentTable(newTestScriptDataLS) {
 						break;
 					}
 					else if(appTypeLocal == 'DesktopJava' && (obType =='push button' ||obType =='text' ||obType =='combo box' || obType =='list item'|| obType =='hyperlink' || obType =='label' || obType =='scroll bar' || obType =='toggle button' || obType =='menu' 
-						||obType =='list' || obType == 'edit' || obType == 'Edit Box' || obType == null || obType == 'Static' || obType == 'check box'|| obType == 'radio button' || obType == 'panel' || obType != undefined || obType == 'table')){
+						||obType =='list' || obType == 'edit' || obType == 'Edit Box' || obType == null || obType == 'Static' || obType == 'check box'|| obType == 'radio button' || obType == 'panel' || obType != undefined || obType == 'table') || obType == 'password text'){
 						var sc;
 						if(obType =='push button' || obType =='toggle button'){
 							sc = Object.keys(keywordArrayList.button);		
 							selectedKeywordList = "button";
 						}
-						else if(obType == 'edit'|| obType == 'Edit Box' || obType =='text'){
+						else if(obType == 'edit'|| obType == 'Edit Box' || obType =='text'|| obType =='password text'){
 							sc = Object.keys(keywordArrayList.text);
 							selectedKeywordList = "text";
 						}
@@ -3950,7 +3950,9 @@ function pasteInGrid(){
 		$.each($("#jqGrid tr"), function(){
 			for(j=0;j<highlightPasted.length;j++){
 				if(parseInt($(this).children("td:nth-child(1)").text()) == highlightPasted[j]){				
-					$(this).find("input.cbox").prop("checked",true)
+					$(this).find("input.cbox").prop("checked",true);
+					$(this).addClass("ui-state-highlight");
+					$(this).siblings().removeClass("ui-state-highlight");
 				}
 			}
 		})
@@ -4169,6 +4171,7 @@ function getTags(data) {
 		else if(appTypeLocal == "SAP")	{
 			obnames.push("@Generic");
 			obnames.push("@Sap");
+			obnames.push("@Custom");
 		}
 	for (var i=0; i<data.length; i++){
 		obnames.push(data[i].custname);

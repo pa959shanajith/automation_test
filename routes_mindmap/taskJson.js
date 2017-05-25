@@ -62,6 +62,7 @@ var tasktypes={'Design':['TestCase','Design','Create Testcase'],
 'Update':['TestCase','Design','Update Testcase'],
 'UpdateSuite' :['TestSuite','Execution','Execute'],
 'Execute' :['TestSuite','Execution','Execute'],
+'Execute Scenario':['TestSuite','Execution','Execute'],
 'Scrape':['Scrape','Design','Create Screen'],
 'Append':['Scrape','Design','Create Screen'],
 'Compare':['Scrape','Design','Create Screen'],
@@ -127,7 +128,8 @@ function next_function(resultobj,cb,data){
 	};
 	var t=a.row[0];
 		var abc=tasktypes[t.task];
-        if (t.task=='Execute'){
+		//To support the task assignmnet in scenario
+        if (t.task=='Execute' || t.task=='Execute Scenario'){
             task_json.releaseId=t.release;
             task_json.cycleId=t.cycle;
         }
@@ -151,12 +153,16 @@ function next_function(resultobj,cb,data){
 						task_json.appType=projectTypes[data.projectType];
 						if (parent_length>=2){
 							task_json.testSuiteId=parent[1];
+							if(parent_length>=3){
+								task_json.scenarioId=parent[2];
+							}
 							if(parent_length>=4){
 								task_json.screenId=parent[3];
+								
 
 							}if(parent_length==5){
 								task_json.testCaseId=parent[4];
-								task_json.scenarioId=parent[2];
+								//task_json.scenarioId=parent[2];
 
 							}	
 							//Checking if the user is assigned to that project before showing the task to the user
@@ -168,7 +174,7 @@ function next_function(resultobj,cb,data){
 
 									}else{
 										task_json.testSuiteName=data.modulename;
-										task_json.assignedTestScenarioIds=data.testscenarioIds;
+										task_json.assignedTestScenarioIds=data.testscenarioIds[0];
 										task_json.screenName=data.screenname;
 										task_json.scenarioName=data.scenarioname;
 										task_json.testCaseName=data.testcasename;
@@ -176,7 +182,12 @@ function next_function(resultobj,cb,data){
 											taskDetails.taskName=t.task+' '+data.testcasename;
 										}else if(t.task=='Execute'){
 											taskDetails.taskName=t.task+' '+data.modulename;
-										}else{
+										}
+										else if(t.task=='Execute Scenario'){
+											taskDetails.taskName=t.task+' '+data.scenarioname;
+											task_json.assignedTestScenarioIds=[task_json.scenarioId];
+										}
+										else{
 											taskDetails.taskName=t.task+' '+data.screenname;
 										}
 									

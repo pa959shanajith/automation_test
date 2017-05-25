@@ -39,6 +39,7 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 	var cycleId = JSON.parse(window.localStorage['_CT']).cycleId;
 	var testSuiteId = JSON.parse(window.localStorage['_CT']).testSuiteId;
 	var testSuiteName = JSON.parse(window.localStorage['_CT']).testSuiteName;
+	var assignedTestScenarioId = JSON.parse(window.localStorage['_CT']).assignedTestScenarioIds;
 	
 	//Global Information
 	
@@ -65,14 +66,16 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 				var count = 1
 				//Building object for each row after getting the data from server
 				for(i=0; i<rowData.scenarioids.length; i++){
-					getEachScenario.push({
-						"condition" : rowData.condition[i],
-						"dataParam" : rowData.dataparam[i],
-						"executeStatus" : rowData.executestatus[i],
-						"scenarioIds" : rowData.scenarioids[i],
-						"scenarionames": rowData.scenarionames[i],
-						"projectnames" : rowData.projectnames[i]
-					})
+					if(rowData.scenarioids[i] == assignedTestScenarioId){
+						getEachScenario.push({
+							"condition" : rowData.condition[i],
+							"dataParam" : rowData.dataparam[i],
+							"executeStatus" : rowData.executestatus[i],
+							"scenarioIds" : rowData.scenarioids[i],
+							"scenarionames": rowData.scenarionames[i],
+							"projectnames" : rowData.projectnames[i]
+						})
+					}
 				}
 				//Building object for each row after getting the data from server
 				var projectName=['Project Name'];
