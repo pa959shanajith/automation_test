@@ -3309,13 +3309,13 @@ function contentTable(newTestScriptDataLS) {
 						break;
 					}
 					else if(appTypeLocal == 'DesktopJava' && (obType =='push button' ||obType =='text' ||obType =='combo box' || obType =='list item'|| obType =='hyperlink' || obType =='label' || obType =='scroll bar' || obType =='toggle button' || obType =='menu' 
-						||obType =='list' || obType == 'edit' || obType == 'Edit Box' || obType == null || obType == 'Static' || obType == 'check box'|| obType == 'radio button' || obType == 'panel' || obType != undefined || obType == 'table')){
+						||obType =='list' || obType == 'edit' || obType == 'Edit Box' || obType == null || obType == 'Static' || obType == 'check box'|| obType == 'radio button' || obType == 'panel' || obType != undefined || obType == 'table') || obType == 'password text'){
 						var sc;
 						if(obType =='push button' || obType =='toggle button'){
 							sc = Object.keys(keywordArrayList.button);		
 							selectedKeywordList = "button";
 						}
-						else if(obType == 'edit'|| obType == 'Edit Box' || obType =='text'){
+						else if(obType == 'edit'|| obType == 'Edit Box' || obType =='text'|| obType =='password text'){
 							sc = Object.keys(keywordArrayList.text);
 							selectedKeywordList = "text";
 						}
