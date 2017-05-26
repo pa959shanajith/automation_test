@@ -114,8 +114,8 @@ var initiate = function(){
 	u=canvas.append('div').attr('id','ct-assignBox').classed('no-disp',!0);
 	u.append('div').attr('id','ct-assignTable');
 	u.append('div').attr('class','ct-assignDetailsBox').append('textarea').attr('id','ct-assignDetails').attr('placeholder','Enter Details');
-	u.append('div').attr('id','ct-unassignButton').append('a').html('Unassign').on('click',removeTask);
 	u.append('div').attr('id','ct-assignButton').append('a').html('OK').on('click',addTask);
+	u.append('div').attr('id','ct-unassignButton').append('a').html('Unassign').on('click',removeTask);
 	var mapSvg=canvas.append('svg').attr('id','ct-mapSvg').call(zoom).on('click.hideElements',clickHideElements);
 	var dataAdder=[{c:'#5c5ce5',t:'Modules'},{c:'#4299e2',t:'Scenarios'},{c:'#19baae',t:'Screens'},{c:'#efa022',t:'Test Cases'}];
 	u=canvas.append('svg').attr('id','ct-legendBox').append('g').attr('transform','translate(10,10)');
@@ -462,11 +462,11 @@ var nodeClick = function(e){
 	var p=d3.select(activeNode);
 	var pi=parseInt(p.attr('id').split('-')[2]);
 	var t=p.attr('data-nodetype');
-	if(dNodes[pi].children == undefined || dNodes[pi].children == null){
+	if(t!='testcases' && (dNodes[pi].children == undefined || dNodes[pi].children == null)){
 		openDialogMindmap('Error','Expand the module');
 		return;
 	}
-	if(dNodes[pi].task==null){!0
+	if(dNodes[pi].task==null){
 		p.select('#ct-unassignButton').classed('ct-ctrl-inactive',!0);
 	}else{
 		p.select('#ct-unassignButton').classed('ct-ctrl-inactive',!1);
