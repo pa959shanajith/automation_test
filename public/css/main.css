@@ -1439,7 +1439,7 @@ input[disabled]{
 
 .popupContent-filter div span {
     display: inline-block;
-    padding: 0px 20px 0 15px;
+    padding: 0px 20px 0 12px;
     cursor: pointer;
     margin-bottom: 15px;
     border-radius: 20px;
