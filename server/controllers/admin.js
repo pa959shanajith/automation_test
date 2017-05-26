@@ -43,9 +43,74 @@ exports.getUserRoles_Nineteen68 = function(req, res){
 	}
 };
 
+//GetUsers service has been changed to populate the users who has access to the project
+exports.getUsers_Nineteen68 = function(req, res){
+	var roles = [];
+	var r_ids = [];
+    var prjId=req.prjId;
+	var userRoles = {userRoles:[],r_ids:[]};
+	var getUserId = "select userid,projectids from icepermissions;"
+    var i=0,j=0;
+	dbConnICE.execute(getUserId, function (err, result) {
+		if (err) {
+			res(null, err);
+		}
+		else {
+
+
+			async.forEachSeries(result.rows,function(iterator,callback1){
+                j++;
+                if (iterator.projectids != null && iterator.projectids.length>0 && JSON.parse(JSON.stringify(iterator.projectids)).indexOf(prjId)>-1){
+                    roles.push(iterator.userid);
+                }
+                if(j<result.rows.length){
+                    callback1();
+                }else{
+                    getNames();
+                }
+				
+			});
+            
+            function getNames(){
+				var userid=[];
+                async.forEachSeries(roles,function(iterator,callback2){
+					i++;
+					
+					var getUserName = "select username,defaultrole from users where userid="+iterator;
+					dbConn.execute(getUserName, function (err, result2) {
+						if (err) {
+							res(null, err);
+						}
+						else {
+							
+							if(result2.rows.length>0 && result2.rows[0] != undefined && (result2.rows[0].defaultrole!='160d3943-e6d9-4630-a824-cabf54f225d2' || result2.rows[0].defaultrole!='b5e9cb4a-5299-4806-b7d7-544c30593a6e')){
+								r_ids.push(result2.rows[0].username);
+								userid.push(iterator);
+							}
+							
+							if(i<roles.length){
+								callback2();
+							}else{
+								userRoles.userRoles =r_ids ;
+								userRoles.r_ids = userid;
+								//console.log('----------------------------'+userid);
+								//console.log('----------------------------'+r_ids);
+								res(null,userRoles);
+							}
+							
+							
+						}
+					});
+				});
+            }
+            
+
+		}
+	});
+};
 
 //GetUsers
-exports.getUsers_Nineteen68 = function(req, res){
+exports.getUsersOld_Nineteen68 = function(req, res){
 	try{
 		var roles = [];
 		var r_ids = [];
