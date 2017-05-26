@@ -213,13 +213,13 @@ router.post('/', function(req, res, next) {
 							
 							if(t.oid!=null){
 								if (t.updatedParent != undefined){
-									qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',nodeID:'"+e.id+"',parent:'["+t.parent+"]'}) SET n.task='"+t.task+"',n.assignedTo='"+t.assignedTo+"',n.reviewer='"+t.reviewer+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.release='"+t.release+"',n.cycle='"+t.cycle+"',n.details='"+t.details+"n.status='"+taskstatus+"',n.parent='["+[prjId].concat(t.updatedParent)+"]'"});
+									qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',nodeID:'"+e.id+"',parent:'["+t.parent+"]'}) SET n.task='"+t.task+"',n.assignedTo='"+t.assignedTo+"',n.reviewer='"+t.reviewer+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.release='"+t.release+"',n.cycle='"+t.cycle+"',n.details='"+t.details+",n.status='"+taskstatus+"',n.parent='["+[prjId].concat(t.updatedParent)+"]'"});
 								}else{
 									qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',nodeID:'"+e.id+"',parent:'["+t.parent+"]'}) SET n.task='"+t.task+"',n.status='"+taskstatus+"',n.assignedTo='"+t.assignedTo+"',n.reviewer='"+t.reviewer+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.release='"+t.release+"',n.cycle='"+t.cycle+"',n.details='"+t.details+"'"});
 								}
 								
 							} 
-							else qList.push({"statement":"MERGE(n:TASKS{taskID:'"+t.id+"',task:'"+t.task+"',assignedTo:'"+t.assignedTo+"'status:'"+taskstatus+"',reviewer:'"+t.reviewer+"',startDate:'"+t.startDate+"',endDate:'"+t.endDate+"',release:'"+t.release+"',cycle:'"+t.cycle+"',details:'"+t.details+"',nodeID:'"+e.id+"',parent:'["+t.parent+"]'})"});
+							else qList.push({"statement":"MERGE(n:TASKS{taskID:'"+t.id+"',task:'"+t.task+"',assignedTo:'"+t.assignedTo+"',status:'"+taskstatus+"',reviewer:'"+t.reviewer+"',startDate:'"+t.startDate+"',endDate:'"+t.endDate+"',release:'"+t.release+"',cycle:'"+t.cycle+"',details:'"+t.details+"',nodeID:'"+e.id+"',parent:'["+t.parent+"]'})"});
 						}
 					}
  					else if(e.type=='scenarios'){
@@ -232,9 +232,9 @@ router.post('/', function(req, res, next) {
 		
 							if(t.oid!=null){
 								if (t.updatedParent != undefined){
-									qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',nodeID:'"+e.id+"',parent:'["+t.parent+"]'}) SET n.task='"+t.task+"',n.task='"+taskstatus+"',n.assignedTo='"+t.assignedTo+"',n.reviewer='"+t.reviewer+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.release='"+t.release+"',n.cycle='"+t.cycle+"',n.details='"+t.details+"',n.parent='["+[prjId].concat(t.updatedParent)+"]'"});
+									qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',nodeID:'"+e.id+"',parent:'["+t.parent+"]'}) SET n.task='"+t.task+"',n.status='"+taskstatus+"',n.assignedTo='"+t.assignedTo+"',n.reviewer='"+t.reviewer+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.release='"+t.release+"',n.cycle='"+t.cycle+"',n.details='"+t.details+"',n.parent='["+[prjId].concat(t.updatedParent)+"]'"});
 								}else{
-									qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',nodeID:'"+e.id+"',parent:'["+t.parent+"]'}) SET n.task='"+t.task+"',n.task='"+taskstatus+"',n.assignedTo='"+t.assignedTo+"',n.reviewer='"+t.reviewer+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.release='"+t.release+"',n.cycle='"+t.cycle+"',n.details='"+t.details+"'"});
+									qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',nodeID:'"+e.id+"',parent:'["+t.parent+"]'}) SET n.task='"+t.task+"',n.status='"+taskstatus+"',n.assignedTo='"+t.assignedTo+"',n.reviewer='"+t.reviewer+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.release='"+t.release+"',n.cycle='"+t.cycle+"',n.details='"+t.details+"'"});
 								}
 								
 							} 
