@@ -184,6 +184,7 @@ function next_function(resultobj,cb,data){
 											taskDetails.taskName=t.task+' '+data.modulename;
 										}
 										else if(t.task=='Execute Scenario'){
+											taskDetails['scenario']='True';
 											taskDetails.taskName=t.task+' '+data.scenarioname;
 											task_json.assignedTestScenarioIds=[task_json.scenarioId];
 										}

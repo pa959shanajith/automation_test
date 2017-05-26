@@ -3308,34 +3308,34 @@ function contentTable(newTestScriptDataLS) {
 						$grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
 						break;
 					}
-					else if(appTypeLocal == 'DesktopJava' && (obType =='push button' ||obType =='text' ||obType =='combo box' || obType =='list item'|| obType =='hyperlink' || obType =='label' || obType =='scroll bar' || obType =='toggle button' || obType =='menu' 
-						||obType =='list' || obType == 'edit' || obType == 'Edit Box' || obType == null || obType == 'Static' || obType == 'check box'|| obType == 'radio button' || obType == 'panel' || obType != undefined || obType == 'table') || obType == 'password text'){
+					else if(appTypeLocal == 'DesktopJava' && (obType =='button' ||obType =='input' ||obType =='select' || obType =='list'|| obType =='a' || obType =='label' || obType =='scrollbar' || obType =='menu' 
+						|| obType == null || obType == 'checkbox'|| obType == 'radiobutton' || obType != undefined || obType == 'table' || obType == 'internalframe') ){
 						var sc;
-						if(obType =='push button' || obType =='toggle button'){
+						if(obType =='button' || obType =='button'){
 							sc = Object.keys(keywordArrayList.button);		
 							selectedKeywordList = "button";
 						}
-						else if(obType == 'edit'|| obType == 'Edit Box' || obType =='text'|| obType =='password text'){
+						else if(obType == 'input'){
 							sc = Object.keys(keywordArrayList.text);
 							selectedKeywordList = "text";
 						}
-						else if(obType =='combo box'){
+						else if(obType =='select'){
 							sc = Object.keys(keywordArrayList.select);
 							selectedKeywordList = "select";
 						}
-						else if(obType =='list item' || obType =='list' ){
+						else if(obType =='list' ){
 							sc = Object.keys(keywordArrayList.list);
 							selectedKeywordList = "list";
 						}
-						else if(obType =='hyperlink' || obType =='Static' || obType == 'text'){
+						else if(obType =='a'){
 							sc = Object.keys(keywordArrayList.link);
 							selectedKeywordList = "link";
 						}
-						else if(obType =='check box'){
+						else if(obType =='checkbox'){
 							sc = Object.keys(keywordArrayList.checkbox);
 							selectedKeywordList = "checkbox";
 						}
-						else if(obType =='radio button'){
+						else if(obType =='radiobutton'){
 							sc = Object.keys(keywordArrayList.radiobutton);
 							selectedKeywordList = "radiobutton";
 						}
@@ -3343,11 +3343,11 @@ function contentTable(newTestScriptDataLS) {
 							sc = Object.keys(keywordArrayList.table);
 							selectedKeywordList = "table";
 						}
-						else if(obType == 'scroll bar'){
+						else if(obType == 'scrollbar'){
 							sc = Object.keys(keywordArrayList.scrollbar);
 							selectedKeywordList = "scrollbar";
 						}
-						else if(obType == 'internal frame'){
+						else if(obType == 'internalframe'){
 							sc = Object.keys(keywordArrayList.internalframe);
 							selectedKeywordList = "internalframe";
 						}

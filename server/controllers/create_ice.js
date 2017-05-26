@@ -85,7 +85,7 @@ exports.getAllNames = function(parent,cb,data){
 			},
            
             scenarioname:function(callback){
-				if (parent_length==5){
+				if (parent_length==5 || parent_length==3){
 					
 					get_scenarioName(parent[2],function(err,data2){
 						if(err)
