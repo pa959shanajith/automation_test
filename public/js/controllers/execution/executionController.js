@@ -66,7 +66,19 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 				var count = 1
 				//Building object for each row after getting the data from server
 				for(i=0; i<rowData.scenarioids.length; i++){
-					if(rowData.scenarioids[i] == assignedTestScenarioId){
+					if(JSON.parse(window.localStorage['_CT']).scenarioFlag == 'True'){
+						if(rowData.scenarioids[i] == assignedTestScenarioId){
+							getEachScenario.push({
+								"condition" : rowData.condition[i],
+								"dataParam" : rowData.dataparam[i],
+								"executeStatus" : rowData.executestatus[i],
+								"scenarioIds" : rowData.scenarioids[i],
+								"scenarionames": rowData.scenarionames[i],
+								"projectnames" : rowData.projectnames[i]
+							})							
+						}
+					}
+					else{
 						getEachScenario.push({
 							"condition" : rowData.condition[i],
 							"dataParam" : rowData.dataparam[i],
@@ -211,7 +223,7 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 			if($(this).find("input").is(":checked")){
 				selectedRowData.push({
 					condition : parseInt($(this).siblings(".exe-conditionCheck").find("select option:selected").val()),
-					dataparam : $(this).siblings(".exe-dataParam").find("input").val(),
+					dataparam : [$(this).siblings(".exe-dataParam").find("input").val()],
 					executestatus : 1,
 					scenarioids : $(this).siblings(".exe-scenarioIds").attr("sId"),
 					scenarionames : $(this).siblings(".exe-scenarioIds").text(),
