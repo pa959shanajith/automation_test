@@ -83,7 +83,7 @@ exports.getUsers_Nineteen68 = function(req, res){
 						}
 						else {
 							
-							if(result2.rows.length>0 && result2.rows[0] != undefined && (result2.rows[0].defaultrole!='160d3943-e6d9-4630-a824-cabf54f225d2' || result2.rows[0].defaultrole!='b5e9cb4a-5299-4806-b7d7-544c30593a6e')){
+							if(result2.rows.length>0 && result2.rows[0] != undefined && (result2.rows[0].defaultrole!='160d3943-e6d9-4630-a824-cabf54f225d2' && result2.rows[0].defaultrole!='b5e9cb4a-5299-4806-b7d7-544c30593a6e')){
 								r_ids.push(result2.rows[0].username);
 								userid.push(iterator);
 							}
