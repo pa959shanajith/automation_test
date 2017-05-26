@@ -114,8 +114,8 @@ var initiate = function(){
 	u=canvas.append('div').attr('id','ct-assignBox').classed('no-disp',!0);
 	u.append('div').attr('id','ct-assignTable');
 	u.append('div').attr('class','ct-assignDetailsBox').append('textarea').attr('id','ct-assignDetails').attr('placeholder','Enter Details');
-	u.append('div').attr('id','ct-assignButton').append('a').html('OK').on('click',addTask);
 	u.append('div').attr('id','ct-unassignButton').append('a').html('Unassign').on('click',removeTask);
+	u.append('div').attr('id','ct-assignButton').append('a').html('OK').on('click',addTask);
 	var mapSvg=canvas.append('svg').attr('id','ct-mapSvg').call(zoom).on('click.hideElements',clickHideElements);
 	var dataAdder=[{c:'#5c5ce5',t:'Modules'},{c:'#4299e2',t:'Scenarios'},{c:'#19baae',t:'Screens'},{c:'#efa022',t:'Test Cases'}];
 	u=canvas.append('svg').attr('id','ct-legendBox').append('g').attr('transform','translate(10,10)');
@@ -264,6 +264,7 @@ var addTask = function(e){
 	d3.select('#ct-assignBox').classed('no-disp',!0);
 	var a,b,p=d3.select(activeNode);
 	var pi=parseInt(p.attr('id').split('-')[2]);
+	
 	var nType=p.attr('data-nodetype');
 	var tObj={t:/*d3.select('#ct-assignTask').html()*/$('#ct-assignTask').val(),at:$('#ct-assignedTo').val(),rw:/*(d3.select('#ct-assignRevw')[0][0])?*/$('#ct-assignRevw').val()/*:null*/,sd:$('#startDate').val(),ed:$('#endDate').val(),re:(d3.select('#ct-assignRel')[0][0])?$('#ct-assignRel').val():null,cy:(d3.select('#ct-assignCyc')[0][0])?$('#ct-assignCyc').val():null,det:d3.select('#ct-assignDetails').property('value'),app:$('option:selected', '.project-list').attr('app-type')};
 	//console.log(tObj);
@@ -461,6 +462,10 @@ var nodeClick = function(e){
 	var p=d3.select(activeNode);
 	var pi=parseInt(p.attr('id').split('-')[2]);
 	var t=p.attr('data-nodetype');
+	if(dNodes[pi].children == undefined || dNodes[pi].children == null){
+		openDialogMindmap('Error','Expand the module');
+		return;
+	}
 	if(dNodes[pi].task==null){!0
 		p.select('#ct-unassignButton').classed('ct-ctrl-inactive',!0);
 	}else{
@@ -710,7 +715,7 @@ var createNode = function(e){
 	if(pt=='testcases') return;
 	var pi = p.attr('id').split('-')[2];
 	
-	if(dNodes[pi].children != undefined){
+	if(dNodes[pi].children != undefined || dNodes[pi].children != null){
 		var nNext={'modules':['Scenario',1],'scenarios':['Screen',2],'screens':['Testcase',3]};
 		var mapSvg=d3.select('#ct-mapSvg');
 		var w=parseFloat(mapSvg.style('width'));
