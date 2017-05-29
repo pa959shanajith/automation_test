@@ -619,12 +619,12 @@ body {
 .assignedTask {
 	cursor: pointer;
     font-size: 17px;
-    padding: 0px 15px 10px;
+    padding: 0px 1px 10px;
     display: inline-block;
-    width: 70%;
+    width: 60%;
     word-break: break-all;
     word-wrap: break-word;
-    margin-left: 13px;
+    margin-left: 26px;
 }
 
 .assignedTaskInner {
@@ -1121,12 +1121,12 @@ input[disabled]{
 }
 
 .wsdlTextAreaHeader{
-	height: 38%;
+	height: 35%;
 	margin-bottom: 2%
 }
 
 .wsdlTextAreaBody{
-	height: 59%;
+	height: 54%;
 }
 /*** Web service Screen **/
 
@@ -3488,9 +3488,7 @@ select:-webkit-autofill:focus {
 	border: 2px solid #d33c3c !important;
 }
 
-.datePickBorder{
-	border: 2px solid #d33c3c !important;
-}
+
 
 /**************** SAP reports Icon CSS ***************************/
 .sap[src='imgs/desktop.png']

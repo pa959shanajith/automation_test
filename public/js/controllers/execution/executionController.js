@@ -223,7 +223,7 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 			if($(this).find("input").is(":checked")){
 				selectedRowData.push({
 					condition : parseInt($(this).siblings(".exe-conditionCheck").find("select option:selected").val()),
-					dataparam : [$(this).siblings(".exe-dataParam").find("input").val()],
+					dataparam : [$(this).siblings(".exe-dataParam").find("input").val().trim()],
 					executestatus : 1,
 					scenarioids : $(this).siblings(".exe-scenarioIds").attr("sId"),
 					scenarionames : $(this).siblings(".exe-scenarioIds").text(),

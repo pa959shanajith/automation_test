@@ -387,7 +387,7 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 				var starttime = new Date().getTime();
 		async.forEachSeries(json1, function (itr, callback3) {
 					scenarioIdList.push(itr.scenarioids);
-					dataparamlist.push(itr.dataParam);
+					dataparamlist.push(itr.dataparam[0]);
 					conditionchecklist.push(itr.condition);
 					scenarioIdinfor = itr.scenarioids;
 					TestCaseDetails_Suite_ICE(scenarioIdinfor,function(err,data){
@@ -758,6 +758,7 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 
 	function TestSuiteDetails_Module_ICE(req,cb1,data){
 //	var requestedtestscenarioid = req;
+
 	var requiredcycleid = req.cycleid;
 	var requiredtestsuiteid = req.testsuiteid;
 	var requiredtestsuitename = req.testsuitename;
@@ -831,7 +832,7 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 					}else{
 						//var updatetestsuitefrommodule = "UPDATE testsuites SET testscenarioids = ["+testscenarioids+"] WHERE testsuiteid="+requiredtestsuiteid+" and cycleid="+requiredcycleid+" and testsuitename='"+requiredtestsuitename+"' and versionnumber="+requiredversionnumber;
 						var jsondata = {"testsuiteid":requiredtestsuiteid,"testscenarioid":testscenarioids,"cycleid":requiredcycleid,"testsuitename":requiredtestsuitename,"versionnumber":requiredversionnumber,"testscenarioids":testscenarioids}
-						try{
+						// try{
 							
 							updatescenariodetailsinsuite(jsondata,function(err,data){
 								if(err){
@@ -839,15 +840,15 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 									cb1(null,flag);
 									
 								}else{
+										callback(null,flag);
 									
-									callback(null,flag);
 									//cb1(null,flag);
 								}
 								
 							});
-						}catch(ex){
-							console.log("Exception occured in the udating scenarios",ex);
-						}
+						// }catch(ex){
+						// 	console.log("Exception occured in the updating scenarios",ex);
+						// }
 					}
 					//callback(); 
 					
@@ -904,7 +905,7 @@ function updatescenariodetailsinsuite(req,cb,data){
 						if(getparampath[index] == '' || getparampath[index] == ' '){
 							getparampath1.push('\' \'');
 						}else{
-							getparampath1.push(getparampath[index]);
+							getparampath1.push("\'"+getparampath[index]+"\'");
 						}
 						
 					}
@@ -958,7 +959,12 @@ function updatescenariodetailsinsuite(req,cb,data){
 			console.log(err);
 			cb(null,err);
 		}else{
-			cb(null,'Successsssssss');
+			try{				
+				cb(null,'Successsssssss');
+			}
+			catch(ex){
+				console.log("Exception occured in the updating scenarios",ex);
+			}
 		}
 	})
 

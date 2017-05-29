@@ -137,13 +137,11 @@ var initiate = function(){
 	
 };
 var zoomed = function(){
-	
 	cSpan=d3.event.translate;
 	cScale=d3.event.scale;
 	
 	//Logic to change the layout
 	d3.select("#ct-mindMap").attr("transform","translate("+d3.event.translate+")scale("+d3.event.scale +")");
-	
 };
 var getElementDimm = function(s){return [parseFloat(s.style("width")),parseFloat(s.style("height"))];};
 var createNewMap = function(e){ 
@@ -169,7 +167,6 @@ var loadMap = function(e){
 var genPathData = function(s,t){
 	/*if(s[1]<t[1]) return ('M'+s[0]+','+s[1]+' H'+(((s[0]+t[0])/2)-10)+' Q'+((s[0]+t[0])/2)+','+s[1]+' '+((s[0]+t[0])/2)+','+(s[1]+10)+'  V'+(t[1]-10)+' Q'+((s[0]+t[0])/2)+','+t[1]+' '+(((s[0]+t[0])/2)+10)+','+t[1]+' H'+t[0]);
 	else return ('M'+s[0]+','+s[1]+' H'+(((s[0]+t[0])/2)-10)+' Q'+((s[0]+t[0])/2)+','+s[1]+' '+((s[0]+t[0])/2)+','+(s[1]-10)+'  V'+(t[1]+10)+' Q'+((s[0]+t[0])/2)+','+t[1]+' '+(((s[0]+t[0])/2)+10)+','+t[1]+' H'+t[0]);*/
-	
 	return ('M'+s[0]+','+s[1]+'C'+(s[0]+t[0])/2+','+s[1]+' '+(s[0]+t[0])/2+','+t[1]+' '+t[0]+','+t[1]);
 };
 var addNode = function(n,m,pi){
@@ -230,41 +227,43 @@ var removeTask= function(e){
 	d3.select('#ct-assignBox').classed('no-disp',!0);
 }
 var addTask = function(e){
-		
+	
 	$("ct-assignTask,#ct-assignedTo,#ct-assignRevw,#ct-assignRel,#ct-assignCyc").removeClass("selectErrorBorder");
 	$("#startDate,#endDate").removeClass("inputErrorBorder");
 	if($("ct-assignTask option:selected").val() == "select user") {
-			$("#ct-assignedTo").css('border','').addClass("datePickBorder");
+			$("#ct-assignedTo").css('border','').addClass("inputErrorBorderFull");
 			return false;
 		}
 	else if($("#ct-assignedTo option:selected").val() == "select user") {
-		$("#ct-assignedTo").css('border','').addClass("datePickBorder");
+		$("#ct-assignedTo").css('border','').addClass("inputErrorBorderFull");
 		return false;
 	}
 	else if($("#ct-assignRevw option:selected").val() == "select reviewer") {
-		$("#ct-assignRevw").css('border','').addClass("datePickBorder");
+		$("#ct-assignRevw").css('border','').addClass("inputErrorBorderFull");
 		return false;
 	}
-	else if($("#ct-assignRel option:selected").val() == "select release") {
-		$("#ct-assignRel").css('border','').addClass("datePickBorder");
-		return false;
-	}
-	else if($("#ct-assignCyc option:selected").val() == "select cycle") {
-		$("#ct-assignCyc").css('border','').addClass("datePickBorder");
-		return false;
-	}
+	
 	else if($("#startDate").val() == "") {
-		$("#startDate").css('border','').addClass("datePickBorder");
+		$("#startDate").css('border','').addClass("inputErrorBorderFull");
 		return false;
 	}
 	else if($("#endDate").val() == "") {
-		$("#endDate").css('border','').addClass("datePickBorder");
+		$("#endDate").css('border','').addClass("inputErrorBorderFull");
 		return false;
 	}
+	
+	else if($("#ct-assignRel option:selected").val() == "select release") {
+		$("#ct-assignRel").css('border','').addClass("inputErrorBorderFull");
+		return false;
+	}
+	else if($("#ct-assignCyc option:selected").val() == "select cycle") {
+		$("#ct-assignCyc").css('border','').addClass("inputErrorBorderFull");
+		return false;
+	}
+	
 	d3.select('#ct-assignBox').classed('no-disp',!0);
 	var a,b,p=d3.select(activeNode);
 	var pi=parseInt(p.attr('id').split('-')[2]);
-	
 	var nType=p.attr('data-nodetype');
 	var tObj={t:/*d3.select('#ct-assignTask').html()*/$('#ct-assignTask').val(),at:$('#ct-assignedTo').val(),rw:/*(d3.select('#ct-assignRevw')[0][0])?*/$('#ct-assignRevw').val()/*:null*/,sd:$('#startDate').val(),ed:$('#endDate').val(),re:(d3.select('#ct-assignRel')[0][0])?$('#ct-assignRel').val():null,cy:(d3.select('#ct-assignCyc')[0][0])?$('#ct-assignCyc').val():null,det:d3.select('#ct-assignDetails').property('value'),app:$('option:selected', '.project-list').attr('app-type')};
 	//console.log(tObj);
@@ -651,6 +650,16 @@ var nodeClick = function(e){
 	if(canvSize[0]-l[0]<cSize[0]) l[0]=l[0]-cSize[0]-60*cScale;
 	if(canvSize[1]-l[1]<cSize[1]) l[1]=canvSize[1]-cSize[1]-10*cScale;
 	c.style('top',l[1]+'px').style('left',l[0]+'px').classed('no-disp',!1);
+	
+	//condition to disable unassign task button
+	setTimeout(function(){
+		if($("#ct-assignedTo option:selected").text().toLowerCase() == "select user"  && $("#ct-assignRevw option:selected").text().toLowerCase() == "select reviewer" && $("#ct-assignRel option:selected").text().toLowerCase() == "select release" && $("#startDate").val() == "" && $("#endDate").val() == "") {
+		  $('#ct-unassignButton a').addClass("disableButton");
+		}
+		else	$('#ct-unassignButton a').removeClass("disableButton");
+	},30)
+	
+	
 };
 
 function loadCycles(){
@@ -778,7 +787,6 @@ var editNode = function(e,node){
 	d3.select('#ct-inpPredict').property('value','');
 	d3.select('#ct-inpAct').attr('data-nodeid',null).property('value',name).node().focus();
 	d3.select('#ct-inpSugg').classed('no-disp',!0);
-	
 };
 var deleteNode = function(e){
 	//If module is in edit mode, then return do not add any node
