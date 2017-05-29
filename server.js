@@ -53,7 +53,7 @@ if (cluster.isMaster) {
         secure: false,
         rolling: true,
         resave: false,
-        saveUninitialized: true,
+        saveUninitialized: false,  //Should always be false for cookie to clear 
         cookie: {
             maxAge: (30 * 60 * 1000)
         }
@@ -71,6 +71,8 @@ if (cluster.isMaster) {
     app.use("/fonts", express.static(__dirname + "/public/fonts"));
     app.get("/", function(req, res) {
         // console.log("/--------",req);
+       console.log("sesId", req.session.id);
+        res.clearCookie('connect.sid');
         res.sendFile("index.html", {
             root: __dirname + "/public/"
         });

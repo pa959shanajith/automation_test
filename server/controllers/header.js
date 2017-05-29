@@ -38,7 +38,8 @@ exports.getProjectDetails_ICE = function (req, res) {
             });
         }
 exports.logoutUser_Nineteen68 = function (req, res) {
-    req.session.destroy();
+       req.cookies['connect.sid'] = '';
+		req.session.destroy();
         if(req.session == undefined)
         {
             res.send('Session Expired');
