@@ -149,6 +149,7 @@ p,a,img,text,span,.noselect{-webkit-touch-callout:none;-webkit-user-select:none;
 .ct-screens{background-color:#19baae;fill:#19baae;stroke:#19baae;stroke-width:0}
 .ct-testcases{background-color:#efa022;fill:#efa022;stroke:#efa022;stroke-width:0}
 .modal-backdrop.in{background-color:transparent}
+.disableButton{cursor: default; opacity: 0.6;}
 /*FOR HOME ENDS HERE*/
 
 /*FOR TEMPLATE DESIGN STARTS HERE*/

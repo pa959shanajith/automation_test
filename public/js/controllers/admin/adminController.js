@@ -514,6 +514,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 									{
 										openModelPopup("Create Project", "Project created successfully");
 										resetForm();
+										projectDetails = [];
 									}
 									else{
 										openModelPopup("Create Project", "Failed to create project");
@@ -595,6 +596,19 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 					updateProjectObj.deletedProjectDetails = deletedProjectDetails;
 				else	updateProjectObj.deletedProjectDetails.push(deletedProjectDetails);
 
+				var proceedFlag = false;
+				if(newProjectDetails.length > 0){
+					for(i=0;i<newProjectDetails.length;i++){
+						if(newProjectDetails[i].cycleDetails.length > 0){
+							proceedFlag = true;
+						}
+						else{
+							openModelPopup("Update Project", "Failed. "+newProjectDetails[i].releaseName+ "does not contain cycle");
+							return false;
+						}
+					}
+				}
+				if(proceedFlag==true){
 				if(updateProjectObj.newProjectDetails.length <= 0)
 					updateProjectObj.newProjectDetails = newProjectDetails;
 				else	updateProjectObj.newProjectDetails.push(newProjectDetails);
@@ -620,6 +634,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 						resetForm();
 					}
 				}, function (error) { console.log("Error:::::::::::::", error) })
+				}
 			}
 
 		}

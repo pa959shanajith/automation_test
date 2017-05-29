@@ -231,33 +231,36 @@ var addTask = function(e){
 	$("ct-assignTask,#ct-assignedTo,#ct-assignRevw,#ct-assignRel,#ct-assignCyc").removeClass("selectErrorBorder");
 	$("#startDate,#endDate").removeClass("inputErrorBorder");
 	if($("ct-assignTask option:selected").val() == "select user") {
-			$("#ct-assignedTo").css('border','').addClass("datePickBorder");
+			$("#ct-assignedTo").css('border','').addClass("inputErrorBorderFull");
 			return false;
 		}
 	else if($("#ct-assignedTo option:selected").val() == "select user") {
-		$("#ct-assignedTo").css('border','').addClass("datePickBorder");
+		$("#ct-assignedTo").css('border','').addClass("inputErrorBorderFull");
 		return false;
 	}
 	else if($("#ct-assignRevw option:selected").val() == "select reviewer") {
-		$("#ct-assignRevw").css('border','').addClass("datePickBorder");
+		$("#ct-assignRevw").css('border','').addClass("inputErrorBorderFull");
 		return false;
 	}
-	else if($("#ct-assignRel option:selected").val() == "select release") {
-		$("#ct-assignRel").css('border','').addClass("datePickBorder");
-		return false;
-	}
-	else if($("#ct-assignCyc option:selected").val() == "select cycle") {
-		$("#ct-assignCyc").css('border','').addClass("datePickBorder");
-		return false;
-	}
+	
 	else if($("#startDate").val() == "") {
-		$("#startDate").css('border','').addClass("datePickBorder");
+		$("#startDate").css('border','').addClass("inputErrorBorderFull");
 		return false;
 	}
 	else if($("#endDate").val() == "") {
-		$("#endDate").css('border','').addClass("datePickBorder");
+		$("#endDate").css('border','').addClass("inputErrorBorderFull");
 		return false;
 	}
+	
+	else if($("#ct-assignRel option:selected").val() == "select release") {
+		$("#ct-assignRel").css('border','').addClass("inputErrorBorderFull");
+		return false;
+	}
+	else if($("#ct-assignCyc option:selected").val() == "select cycle") {
+		$("#ct-assignCyc").css('border','').addClass("inputErrorBorderFull");
+		return false;
+	}
+	
 	d3.select('#ct-assignBox').classed('no-disp',!0);
 	var a,b,p=d3.select(activeNode);
 	var pi=parseInt(p.attr('id').split('-')[2]);
@@ -649,12 +652,12 @@ var nodeClick = function(e){
 	c.style('top',l[1]+'px').style('left',l[0]+'px').classed('no-disp',!1);
 	
 	//condition to disable unassign task button
-	/*if(($("ct-assignTask option:selected").val() == "select user") && ($("#ct-assignRevw option:selected").val() == "select reviewer") && ($("#ct-assignRel option:selected").val() == "select release")
-			&& ($("#ct-assignCyc option:selected").val() == "select cycle") && ($("#startDate").val() == "") && ($("#endDate").val() == "")) {
-		
-	  $("unassignButton").prop('disabled', true);
-	
-	}*/
+	setTimeout(function(){
+		if($("#ct-assignedTo option:selected").text().toLowerCase() == "select user"  && $("#ct-assignRevw option:selected").text().toLowerCase() == "select reviewer" && $("#ct-assignRel option:selected").text().toLowerCase() == "select release" && $("#startDate").val() == "" && $("#endDate").val() == "") {
+		  $('#ct-unassignButton a').addClass("disableButton");
+		}
+		else	$('#ct-unassignButton a').removeClass("disableButton");
+	},30)
 	
 	
 };
