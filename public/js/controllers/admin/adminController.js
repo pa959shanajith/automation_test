@@ -43,8 +43,22 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 					$("#selAssignUser").append('<option data-id="'+response.userIds[i]+'" value="'+response.user_names[i]+'">'+response.user_names[i]+'</option>')	
 				}
 			}
-		}, 
-		function (error) { console.log("Error:::::::::::::", error) })
+			
+			//sorting the dropdown values in alphabetical order 
+			var selectOptions = $("#selAssignUser option:not(:first)");
+			selectOptions.sort(function(a,b) {
+				if (a.text > b.text) return 1;
+			    else if (a.text < b.text) return -1;
+			    else return 0;
+			})
+			$("#selAssignUser").empty()
+			$("#selAssignUser").append('<option data-id="" value disabled selected>Select User</option>');
+			for(i=0; i<selectOptions.length;i++){
+				$("#selAssignUser").append(selectOptions[i])				
+			}
+			$("#selAssignUser").prop('selectedIndex', 0);
+		}, 		
+		function (error) { console.log("Error:::::::::::::", error) })		
 
 		$(document).on('change','#selAssignUser', function() {
 			$('#allProjectAP, #assignedProjectAP').empty();
@@ -508,6 +522,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 								createprojectObj.projectName = $.trim($("#projectName").val());
 								createprojectObj.appType = $(".projectTypeSelected").attr('data-app');
 								createprojectObj.projectDetails = projectDetails;
+								console.log("Controller: " + createprojectObj);
 								adminServices.createProject_ICE(createprojectObj,userDetails)
 								.then(function (response) {
 									if(response == 'success')
@@ -613,7 +628,8 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 					updateProjectObj.newProjectDetails = newProjectDetails;
 				else	updateProjectObj.newProjectDetails.push(newProjectDetails);
 				//updateProjectObj.updateProjectDetails = releaseCycleDetails;
-
+				
+				
 				adminServices.updateProject_ICE(updateProjectObj, userDetails)
 				.then(function (response) {
 					clearUpdateProjectObjects();
@@ -1552,6 +1568,21 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 			for(i=0; i<response.userIds.length && response.user_names.length; i++){
 				$("#userSelect").append('<option data-id="'+response.userIds[i]+'" value="'+response.user_names[i]+'">'+response.user_names[i]+'</option>')
 			}
+			
+			//sorting the dropdown values in alphabetical order 
+			var selectOptions = $("#userSelect option:not(:first)");
+			selectOptions.sort(function(a,b) {
+				if (a.text > b.text) return 1;
+			    else if (a.text < b.text) return -1;
+			    else return 0;
+			})
+			$("#userSelect").empty()
+			$("#userSelect").append('<option data-id="" value disabled selected>Select User</option>');
+			for(i=0; i<selectOptions.length;i++){
+				$("#userSelect").append(selectOptions[i])				
+			}
+			$("#userSelect").prop('selectedIndex', 0);
+			
 		}, 
 		function (error) { console.log("Error:::::::::::::", error) })
 	};
@@ -1610,7 +1641,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 			}, function (error) { console.log("Error:::::::::::::", error) })
 			clearUpdateProjectObjects();
 		});
-
+		
 		$(document).on('change','#selProject', function() {
 			updateProjectDetails = [];
 			var domaiprojectId = $("#selProject option:selected").val();
@@ -1659,6 +1690,13 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 					break;
 				default: 
 				}
+				$(".projectTypes").each(function(){
+					if(!$(this).hasClass("projectTypeSelected")){
+						$(this).addClass("projectTypesremovefunc");
+						$(this).find("label").css("cursor","default");
+					}
+				})
+				
 				updateProjectDetails = [];
 				updateProjectDetails =  response.projectDetails;
 				$("#releaseList li,#cycleList li").remove()
@@ -1670,8 +1708,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 				showHideEditDeleteIcons();
 			}, function (error) { console.log("Error:::::::::::::", error) })
 			clearUpdateProjectObjects();
-		});
-
+		});		
 	};
 	//Toggle Release Edit Delete Icons 
 	function showHideEditDeleteIcons()

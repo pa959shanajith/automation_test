@@ -2854,6 +2854,10 @@ input[disabled]{
     -moz-transition: 0.3s ease-in-out;
     -webkit-transition: 0.3s ease-in-out;
 }
+.projectTypesremovefunc:hover{
+	background:none !important;
+	cursor:default !important;
+}
 
 .projectTypeSelected{
 	background: #e4e4e4;
