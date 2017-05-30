@@ -1200,19 +1200,25 @@ if(flag==20){
 		}
 			return !1;
 	});
+	//263-'Mindmap- Module: Currently allowing to create 2 modules with same name- Error msg is given on click of Create button
+	if(allMMaps[mid] != undefined){
 		allMMaps[mid].id_c=res[resMap[0]];
-	    allMMaps[mid].children.forEach(function(tsc){
-			tsc.id_c=res[tsc.id_n];
-			tsc.children.forEach(function(scr){
-				scr.id_c=res[scr.id_n];
-				scr.children.forEach(function(tc){
-					if (res[tc.id_n]!='null'){
-						tc.id_c=res[tc.id_n];
-					}
-				});
+		allMMaps[mid].children.forEach(function(tsc){
+				tsc.id_c=res[tsc.id_n];
+				tsc.children.forEach(function(scr){
+					scr.id_c=res[scr.id_n];
+					scr.children.forEach(function(tc){
+						if (res[tc.id_n]!='null'){
+							tc.id_c=res[tc.id_n];
+						}
+					});
+			});
 		});
-	});
-	    openDialogMindmap("Success", "Structure created successfully");
+		openDialogMindmap("Success", "Structure created successfully");
+	}else{
+		openDialogMindmap("Success", "Fialed to create structure");
+	}
+	
 	//$('#Mindmap_create').modal('show');
   }
 
@@ -1324,7 +1330,7 @@ var clearSvg = function(){
 var callme=function(){
 	var selectedTab = window.localStorage['tabMindMap']
 	console.log($('#ct-inpBox').attr('class'));
-	if(childNode != null && childNode.name=='Screen_0'){
+	if(childNode != null && (childNode.text()=='Module_0' || childNode.text()=='Screen_0' || childNode.text()=='Scenario_0' || childNode.text()=='Testcase_0')){
 		d3.select('#ct-inpBox').classed('no-disp',!1);
 	}
 	
