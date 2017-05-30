@@ -108,7 +108,7 @@ if (cluster.isMaster) {
     app.get('/logout', api.logout);
     app.post('/casQuerya', api.casScriptA);
     app.post('/neoQuerya', api.neoScriptA);
-    cmd.get('node index.js',
+    /*cmd.get('node index.js',
     		function(data, err, stderr){
     			if (!err) {
     			console.log('the node-cmd:',data)
@@ -117,7 +117,41 @@ if (cluster.isMaster) {
 				console.log('********************************* Port for jsreport is in use... *********************************');
     			}
     		}
-    );
+    );*/
+    //Starting jsreport server
+    cmd.get('netstat -ano | find "LISTENING" | find "8001"', function(data, err, stderr){
+    	if(!err){
+        	console.log('killing JS report server and restarting');
+    		console.log('===== Process ID of jsreport =====\\n',data);
+    		var thisResult = data.split("\r\n")[0].split(" ")[data.split("\r\n")[0].split(" ").length-1];
+    		var cmdtoexe = "Taskkill /PID "+thisResult+" /F";
+    		cmd.get(cmdtoexe, function(data, err, stderr){
+    			if(!err){
+    				console.log('===== Killed jsreport server =====\\n',data);
+    				cmd.get('node index.js', function(data, err, stderr){
+    					if (!err) {
+    						console.log('the node-cmd:',data)
+    					} else {
+    						console.log('error', err)
+    					}
+    				});
+    			}
+    			else{
+    				console.log('error::::::::', err);
+    			}
+    		})
+    	}
+    	else{    		
+    		cmd.get('node index.js', function(data, err, stderr){
+    			if (!err) {
+    				console.log('the node-cmd:',data)
+    			} else {
+    				console.log('error', err)
+    			}
+    		});
+    		console.log('JS report server started normally');
+    	}
+    });
     //Route Directories
     var login = require('./server/controllers/login');
     var admin = require('./server/controllers/admin');
