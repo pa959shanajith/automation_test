@@ -151,7 +151,10 @@ var createNewMap = function(e){
 	//X and y changed to implement layout change
 	node={id:uNix,childIndex:0,name:'Module_0',type:'modules',y:s[0]*0.2,x:s[1]*0.4,children:[],parent:null};
 	dNodes.push(node);nCount[0]++;uNix++;
-	addNode(dNodes[uNix-1],!1,null);
+	//To fix issue 710-Create a module and see that module name does not display in edit mode
+	v=addNode(dNodes[uNix-1],!1,null);
+	childNode=v;
+	editNode(e);
 };
 var loadMap = function(e){
 	$("div.nodeBoxSelected").removeClass("nodeBoxSelected");
@@ -300,7 +303,8 @@ var addTask = function(e){
 					if(tSc.task===undefined||tSc.task==null){
 							if(dNodes[pi].id_c!='null' && tSc.id_c!='null'){
 								taskflag=true;
-								tSc.task={id:tObj.id,oid:tObj.oid,task:"Execute Scenario",assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,release:tObj.re,cycle:tObj.cy,details:tObj.det,parent:(tObj.parent!=null)?tObj.parent:[dNodes[pi].id_c,tSc.id_c]};
+								//Issue- 711 Assign directly to the module and see that scenario gets assign but on click of "Save" scenario gets unassign.
+								tSc.task={id:null,oid:null,task:"Execute Scenario",assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,release:tObj.re,cycle:tObj.cy,details:tObj.det,parent:(tObj.parent!=null)?tObj.parent:[dNodes[pi].id_c,tSc.id_c]};
 								d3.select('#ct-node-'+tSc.id).append('image').attr('class','ct-nodeTask').attr('xlink:href','images_mindmap/node-task-assigned.png').attr('x',29).attr('y',-10);
 							}
 							
@@ -462,14 +466,11 @@ var nodeClick = function(e){
 	var pi=parseInt(p.attr('id').split('-')[2]);
 	var t=p.attr('data-nodetype');
 	if(t!='testcases' && (dNodes[pi].children == undefined || dNodes[pi].children == null)){
-		openDialogMindmap('Error','Expand the module');
+		//380-Mindmap-Unable to create node when parent node is collapsed .- Error msg changed to Expand the node
+		openDialogMindmap('Error','Expand the node');
 		return;
 	}
-	if(dNodes[pi].task==null){
-		p.select('#ct-unassignButton').classed('ct-ctrl-inactive',!0);
-	}else{
-		p.select('#ct-unassignButton').classed('ct-ctrl-inactive',!1);
-	}
+	
 	//if(t=='scenarios') return;
 	var nt=(dNodes[pi].task!==undefined||dNodes[pi].task!=null)?dNodes[pi].task:!1;
 	var tObj={t:(nt)?nt.task:'',at:(nt)?nt.assignedTo:'',rw:(nt&&nt.reviewer!=null)?nt.reviewer:'',sd:(nt)?nt.startDate:'',ed:(nt)?nt.endDate:'',re:(nt&&nt.release!=null)?nt.release:'',cy:(nt&&nt.cycle!=null)?nt.cycle:'',det:(nt)?nt.details:''};
@@ -604,6 +605,8 @@ var nodeClick = function(e){
 							var selectedRel='select release';
 							if(tObj.re!=""){
 								selectedRel=tObj.re;
+								//672 Mindmap - Cycle selected under execution task is getting reset to default value after save
+								default_releaseid=tObj.re;
 							}
 							$("#ct-assignRel option[value='" + selectedRel + "']").attr('selected', 'selected'); 
 							var result2 = {};
@@ -693,10 +696,13 @@ var nodeCtrlClick = function(e){
 	l=[(parseFloat(l[0])+40)*cScale+cSpan[0],(parseFloat(l[1])+40)*cScale+cSpan[1]];
 	var c=d3.select('#ct-ctrlBox').style('top',l[1]+'px').style('left',l[0]+'px').classed('no-disp',!1);
 	c.select('p.'+faRef.plus).classed('ct-ctrl-inactive',!1);
+	c.select('p.'+faRef.delete).classed('ct-ctrl-inactive',!1);
 	if(t=='modules'){
 		c.select('p.'+faRef.plus+' .ct-tooltiptext').html('Create Scenarios');
 		c.select('p.'+faRef.edit+' .ct-tooltiptext').html('Edit Module');
-		c.select('p.'+faRef.delete+' .ct-tooltiptext').html('Delete Module');
+		//513-'Mindmap: When we delete an existing Module and create another module in the same work space  then a new Module instance is being appended .
+		c.select('p.'+faRef.delete).classed('ct-ctrl-inactive',!0);
+		//c.select('p.'+faRef.delete+' .ct-tooltiptext').html('Delete Module');
 	}
 	else if(t=='scenarios'){
 		c.select('p.'+faRef.plus+' .ct-tooltiptext').html('Create Screens');
@@ -793,6 +799,9 @@ var deleteNode = function(e){
 	if(d3.select('#ct-inpBox').attr('class')=="") return;
 	d3.select('#ct-ctrlBox').classed('no-disp',!0);
 	var s=d3.select(activeNode);
+	//513-'Mindmap: When we delete an existing Module and create another module in the same work space  then a new Module instance is being appended .
+	var t=s.attr('data-nodetype');
+	if(t=='modules') return;
 	var sid = s.attr('id').split('-')[2];
 	var p=dNodes[sid].parent;
 	recurseDelChild(dNodes[sid]);
@@ -1012,7 +1021,13 @@ var inpKeyUp = function(e){
 	e=e||window.event;
 	temp=[];
 	var t,list;
-	var p=d3.select(activeNode);
+	//To fix issue with suggestions
+	if(childNode!=null){
+		var p=childNode;
+	 }else{
+		var p=d3.select(activeNode);
+	}
+	//var p=d3.select(activeNode);
 	var val=d3.select(this).property('value');
 	var iul=d3.select('#ct-inpSugg');
 	if(e.keyCode==13) {
@@ -1152,6 +1167,7 @@ var actionEvent = function(e){
 			populateDynamicInputList();
 			clearSvg();
 			treeBuilder(allMMaps[mid]);
+			unassignTask=[];
 			openDialogMindmap("Success", "Data saved successfully");
 			 dataSender({task:'getModules',prjId:$(".project-list").val()},function(err,result){
 				 	if(err) console.log(result);
