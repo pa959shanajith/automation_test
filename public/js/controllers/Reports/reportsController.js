@@ -171,7 +171,7 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
     function dateDESC(dateArray){
     	dateArray.sort(function(a,b){
     		var dateA, timeA, dateB, timeB;
-    		if(a.children.item(1).innerText.indexOf("span") === -1){
+    		if(a.children.item(1).children.length == 0){
     			dateA = a.children.item(1).innerText;
     			timeA = a.children.item(2).innerText;
     			dateB = b.children.item(1).innerText;
@@ -196,7 +196,7 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
     function dateASC(dateArray){
     	dateArray.sort(function(a,b){
     		var aA, timeA, bB, timeB;
-    		if(a.children.item(1).innerText.indexOf("span") === -1){
+    		if(a.children.item(1).children.length == 0){
         		aA = a.children.item(1).innerText;
     			timeA = a.children.item(2).innerText;
         		bB = b.children.item(1).innerText;
@@ -251,6 +251,7 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 				if(data.length > 2){
 					$("#scenarioReportsTable #dateDESC").show();
 				}
+				$("#scenarioReportsTable").find("#dateASC").hide();
 				var dateArray = $('tbody.scrollbar-inner-scenarioreports').children('tr');
 				dateASC(dateArray);
 		    	$("tbody.scrollbar-inner-scenarioreports").empty();
@@ -408,53 +409,23 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 			}
 			reportService.renderReport_ICE(finalReports, reportType)
 			.then(function(data1) {
-				//if(reportType == "phantom-pdf"){
-					//var file = new Blob([data1], {type: 'application/pdf'});
-					//var fileURL = URL.createObjectURL(file);
-					//window.localStorage['pdfData'] = fileURL;
-					//p_redirect('/pdfReport')
-					//$scope.content = $sce.trustAsResourceUrl(fileURL);
-					//console.log($scope.content);
-				//}
-				//else{
 					var path = "/specificreports";
 					openWindow = 0;
 					if(openWindow == 0)
 					{
 						var myWindow;
 						if(reportType == "phantom-pdf"){
-							//var file = new Blob([data1], {type: 'application/pdf'});
-						    //var fileURL = URL.createObjectURL(file);
-							/*var pdfText=$.base64.decode($.trim(data1));
-							var winlogicalname = "detailPDF";
-							var winparams = 'dependent=yes,locationbar=no,scrollbars=yes,menubar=yes,'+
-							            'resizable,screenX=50,screenY=50,width=850,height=1050';
-							var htmlText = '<embed width=100% height=100%'
-			                     + ' type="application/pdf"'
-			                     + ' src="data:application/pdf,'
-			                     + escape(pdfText)
-			                     + '"></embed>'; 
-
-							myWindow = window.open ("", winlogicalname, winparams)
-							myWindow.document.write(htmlText);*/
-							window.open($sce.trustAsResourceUrl(data1))
-							/*myWindow = window.open()
-							var myWindowbody = myWindow.document.getElementsByTagName('body')
-							myWindowbody[0].setAttribute("style","margin: 0")
-							myWindowbody[0].innerHTML += '<embed src="'+$sce.trustAsUrl(data1)+'" style="width:100%; height:100%;"></embed>'*/
-							//var myWindowbody = myWindow.document.getElementsByTagName('body')
-							//myWindowbody[0].innerHTML += "<object data='"+$sce.trustAsUrl(data1)+"' type='application/pdf' style='width:100%; height:100%;'></object>"
+							myWindow = window.open();
+							myWindow.document.write(data1);
 						}
 						else{
 							myWindow = window.open();
 							myWindow.document.write(data1);
 						}
-						//myWindow.location.hash = path;
 					}
 					openWindow++;
 					e.stopImmediatePropagation();
-					$('.formatpdfbrwsrexport').remove();					
-				//}
+					$('.formatpdfbrwsrexport').remove();
 			},
 			function(error) {
 				console.log("Error-------"+error);
