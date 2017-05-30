@@ -10,9 +10,14 @@ setTimeout(function(){
 	$('[data-toggle="tooltip"]').tooltip();
 }, 500)
 
+//To prevent Back Button in browser
+history.pushState(null, null, document.URL);
+window.addEventListener('popstate', function () {
+    history.pushState(null, null, document.URL);
+});
+
 //Document Ready Function
 $(document).ready(function() {
-
 	//prevent special characters(such as <,>,',"",-) for all the Inputs except for password field, testcase grid inputs and edit on scrapedobjects.
 	$(document).on("keydown","input:not([type=password]):not(.editObjectName):not(.editable)", function(e) {
 			if(e.shiftKey && e.keyCode == 189)
@@ -24,9 +29,6 @@ $(document).ready(function() {
 					return false;
 				}
 	 });
-
-	
-			
     //Task Function - Plugin Page
     $(document).on("click", ".task-content .collapse-head", function(){
         $(".caret-absolute").hide()
