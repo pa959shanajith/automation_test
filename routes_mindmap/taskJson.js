@@ -42,20 +42,25 @@ exports.getTaskJson_mindmaps = function(obj,cb,data){
 };
 
 var reqToAPI = function(d,u,p,callback) {
-	var data = JSON.stringify(d);
-	var result="";
-    u=u.split(':');
-	var postOptions = {host: u[0], port: u[1], path: p, method: 'POST',ca:certificate,checkServerIdentity: function (host, cert) {
-    return undefined; },headers: {'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(data)}};
-  	postOptions.agent= new https.Agent(postOptions);
-	var postRequest = https.request(postOptions,function(resp){
-		resp.setEncoding('utf-8');
-		resp.on('data', function(chunk) {result+=chunk;});
-		resp.on('end', function(chunk) {callback(null,resp.statusCode,result);});
-	});
-	postRequest.on('error',function(e){callback(e.message,400,null);});
-	postRequest.write(data);
-	postRequest.end();
+	try{
+		var data = JSON.stringify(d);
+		var result="";
+		u=u.split(':');
+		var postOptions = {host: u[0], port: u[1], path: p, method: 'POST',ca:certificate,checkServerIdentity: function (host, cert) {
+		return undefined; },headers: {'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(data)}};
+		postOptions.agent= new https.Agent(postOptions);
+		var postRequest = https.request(postOptions,function(resp){
+			resp.setEncoding('utf-8');
+			resp.on('data', function(chunk) {result+=chunk;});
+			resp.on('end', function(chunk) {callback(null,resp.statusCode,result);});
+		});
+		postRequest.on('error',function(e){callback(e.message,400,null);});
+		postRequest.write(data);
+		postRequest.end();
+	}catch(ex){
+		console.log(ex);
+	}
+	
 };
 
 var tasktypes={'Design':['TestCase','Design','Create Testcase'],
@@ -171,9 +176,10 @@ function next_function(resultobj,cb,data){
 							
 								create_ice.getAllNames(parent,function(err,data){
 									if(err){
-
+										console.log(err);
 									}else{
-										task_json.testSuiteName=data.modulename;
+										try{
+											task_json.testSuiteName=data.modulename;
 										task_json.assignedTestScenarioIds=data.testscenarioIds[0];
 										task_json.screenName=data.screenname;
 										task_json.scenarioName=data.scenarioname;
@@ -198,6 +204,10 @@ function next_function(resultobj,cb,data){
 										//console.log(user_task_json);
 										//fs.writeFileSync('assets_mindmap/task_json.json',JSON.stringify(user_task_json),'utf8');
 										maincallback();
+										}catch(Ex){
+											console.log(ex);
+										}
+										
 
 									}
 
