@@ -1070,20 +1070,25 @@ exports.getReleaseIDs_Ninteen68 = function(req,res){
    //var project_id = 'd4965851-a7f1-4499-87a3-ce53e8bf8e66'
    var getReleaseDetails = "select releasename,releaseid from icetestautomation.releases where projectid"+'='+ project_id;
         dbConnICE.execute(getReleaseDetails, function (err, result) {
-            if (err) {
-                res(null, err);
+            try{
+                if (err) {
+                    res(null, err);
+                }
+                else {
+                    async.forEachSeries(result.rows,function(iterator,callback1){
+                        rname.push(iterator.releasename);
+                        r_ids.push(iterator.releaseid);
+                        callback1();
+                    });
+                    rel.rel = rname;
+                    rel.r_ids = r_ids;
+                    //console.log(rel);
+                res(null,rel);
+                }
+            }catch(ex){
+                console.log(ex);
             }
-            else {
-                async.forEachSeries(result.rows,function(iterator,callback1){
-                    rname.push(iterator.releasename);
-                    r_ids.push(iterator.releaseid);
-                    callback1();
-                });
-                rel.rel = rname;
-                rel.r_ids = r_ids;
-                console.log(rel);
-               res(null,rel);
-            }
+            
         });
 }
 
@@ -1095,6 +1100,7 @@ exports.getCycleIDs_Ninteen68 = function(req,res){
     //var release_id = '7f71b58f-ad8c-46ac-80f5-5c4145585c08'
     var getCycleDetails = "select cyclename,cycleid from icetestautomation.cycles where releaseid"+'='+ release_id;
     dbConnICE.execute(getCycleDetails, function (err, result) {
+        try{
             if (err) {
                 res(null, err);
             }
@@ -1109,6 +1115,10 @@ exports.getCycleIDs_Ninteen68 = function(req,res){
                 console.log(cyc);
                res(null,cyc);
             }
+        }catch(ex){
+            console.log(ex);
+        }
+            
         });
 }
 
@@ -1135,35 +1145,42 @@ exports.getProjectIDs_Nineteen68 = function(req, res){
                     
                     var getProjectName = "select projectName,projecttypeid FROM icetestautomation.projects where projectID"+'='+iterator;
                     dbConnICE.execute(getProjectName,function(err,projectnamedata){
-                        if(err){
+                        try{
+                            if(err){
                             res(null,err);
-                        }else{
-                            if (projectnamedata.rows[0] != undefined ){
-                                project_names.push(projectnamedata.rows[0].projectname);
-                                app_types.push(projectnamedata.rows[0].projecttypeid);
-                                project_ids.push(iterator);
                             }else{
-                                console.log('projectnamedata is Undefined');
+                                if (projectnamedata.rows[0] != undefined ){
+                                    project_names.push(projectnamedata.rows[0].projectname);
+                                    app_types.push(projectnamedata.rows[0].projecttypeid);
+                                    project_ids.push(iterator);
+                                }else{
+                                    console.log('projectnamedata is Undefined');
+                                }
                             }
+                            projectdetails.projectId=project_ids;
+                            projectdetails.projectName=project_names;
+                            projectdetails.appType=app_types;
+                            
+                            callback1();
+                        }catch(ex){
+                            console.log(ex);
                         }
-                        projectdetails.projectId=project_ids;
-                        projectdetails.projectName=project_names;
-                        projectdetails.appType=app_types;
-
-                       // console.log(project_ids);
                         
-                        callback1();
                     })
 
                 },callback);
-                //project_ids.out_project_id = out_project_id;
-               // callback();
+                
            }
         });
         }
     },function(err,results){
         console.log(projectdetails);
-        res(null,projectdetails);
+        try{
+            res(null,projectdetails);
+        }catch(ex){
+            console.log(ex);
+        }
+        
     })
 };
 
@@ -1172,17 +1189,22 @@ exports.getProjectType_Nineteen68 = function(req, res){
 	var projectDetails = {projectType:'',project_id:''};
 	var getProjectType = "select projecttypeid FROM icetestautomation.projects where projectID"+'='+req;
 	dbConnICE.execute(getProjectType, function (err, result) {
-		if (err) {
-			res(null, err);
-		}
-		else {
+        try{
+            if (err) {
+			    res(null, err);
+		    }
+		    else {
 			
 			 if(result.rows.length!=0){
                     projectDetails.projectType = result.rows[0].projecttypeid;
                     projectDetails.project_id = req;
-            }
-			res(null,projectDetails);
-		}
+                }   
+			    res(null,projectDetails);
+		    }
+        }catch(ex){
+            console.log(ex);
+        }
+		
 	});
 };
 

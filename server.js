@@ -120,36 +120,35 @@ if (cluster.isMaster) {
     );*/
     //Starting jsreport server
     cmd.get('netstat -ano | find "LISTENING" | find "8001"', function(data, err, stderr){
-    	if(!err){
-        	console.log('killing JS report server and restarting');
-    		console.log('===== Process ID of jsreport =====\\n',data);
+    	if(data){
+        	//console.log('killing JS report server and restarting');
+    		//console.log('===== Process ID of jsreport =====',data);
     		var thisResult = data.split("\r\n")[0].split(" ")[data.split("\r\n")[0].split(" ").length-1];
     		var cmdtoexe = "Taskkill /PID "+thisResult+" /F";
     		cmd.get(cmdtoexe, function(data, err, stderr){
-    			if(!err){
-    				console.log('===== Killed jsreport server =====\\n',data);
+    			if(data){
+    				console.log('===== Killed jsreport server =====',data);
     				cmd.get('node index.js', function(data, err, stderr){
     					if (!err) {
     						console.log('the node-cmd:',data)
     					} else {
-    						console.log('error', err)
+    						console.log("Cannot start Jsreport server")
     					}
     				});
     			}
     			else{
-    				console.log('error::::::::', err);
+    				console.log("Cannot kill jsreport report");
     			}
     		})
     	}
-    	else{    		
+    	else{
     		cmd.get('node index.js', function(data, err, stderr){
     			if (!err) {
-    				console.log('the node-cmd:',data)
+    	    		console.log('JS report server started normally');
     			} else {
-    				console.log('error', err)
+    				console.log("Cannot start Jsreport server")
     			}
     		});
-    		console.log('JS report server started normally');
     	}
     });
     //Route Directories

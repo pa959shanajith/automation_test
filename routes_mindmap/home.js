@@ -11,19 +11,24 @@ var certificate = fs.readFileSync('server/https/server.crt','utf-8');
 
 /* Send queries to Neo4J/ICE API. */
 var reqToAPI = function(d,u,p,callback) {
-	var data = JSON.stringify(d);
-	var result="";
-	var postOptions = {host: u[0], port: u[1], path: p, method: 'POST',ca:certificate,checkServerIdentity: function (host, cert) {
-    return undefined; },headers: {'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(data)}};
-  	postOptions.agent= new https.Agent(postOptions);
-	var postRequest = https.request(postOptions,function(resp){
-		resp.setEncoding('utf-8');
-		resp.on('data', function(chunk) {result+=chunk;});
-		resp.on('end', function(chunk) {callback(null,resp.statusCode,result);});
-	});
-	postRequest.on('error',function(e){callback(e.message,400,null);});
-	postRequest.write(data);
-	postRequest.end();
+	try{
+		var data = JSON.stringify(d);
+		var result="";
+		var postOptions = {host: u[0], port: u[1], path: p, method: 'POST',ca:certificate,checkServerIdentity: function (host, cert) {
+		return undefined; },headers: {'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(data)}};
+		postOptions.agent= new https.Agent(postOptions);
+		var postRequest = https.request(postOptions,function(resp){
+			resp.setEncoding('utf-8');
+			resp.on('data', function(chunk) {result+=chunk;});
+			resp.on('end', function(chunk) {callback(null,resp.statusCode,result);});
+		});
+		postRequest.on('error',function(e){callback(e.message,400,null);});
+		postRequest.write(data);
+		postRequest.end();
+	}catch(ex){
+		console.log(ex);
+	}
+	
 };
 
 /* GET Home page. */
@@ -495,32 +500,31 @@ router.post('/', function(req, res, next) {
 					if(err) {
 						res.status(status).send(err);
 					}else{
-						res_data=JSON.parse(result);
-						if(res_data[0].data.length!= 0){
-							if(res_data[0].data[0].row[0] != null && res_data[0].data[0].row[0] != 'select reviewer'){
-								query={'statement':"MATCH (n:TASKS) WHERE n.taskID='"+taskID+"' and n.assignedTo='"+d.userId+"' set n.task_owner=n.assignedTo,n.assignedTo=n.reviewer,n.status='review' RETURN n"};
-								var qlist_query=[query];
-								reqToAPI({"data":{"statements":qlist_query}},urlData,'/neoQuerya',function(err,status,result){
-										//res.setHeader('Content-Type','application/json');
-										if(err) res.status(status).send(err);
-										res.status(200).send('success');
-								
-								});
+						try{
+							res_data=JSON.parse(result);
+							if(res_data[0].data.length!= 0){
+								if(res_data[0].data[0].row[0] != null && res_data[0].data[0].row[0] != 'select reviewer'){
+									query={'statement':"MATCH (n:TASKS) WHERE n.taskID='"+taskID+"' and n.assignedTo='"+d.userId+"' set n.task_owner=n.assignedTo,n.assignedTo=n.reviewer,n.status='review' RETURN n"};
+									var qlist_query=[query];
+									reqToAPI({"data":{"statements":qlist_query}},urlData,'/neoQuerya',function(err,status,result){
+											//res.setHeader('Content-Type','application/json');
+											if(err) res.status(status).send(err);
+											res.status(200).send('success');
+									
+									});
+								}else{
+									res.status(200).send('fail');
+								}
 							}else{
-								res.status(200).send('fail');
+								res.status(200).send('Tasksubmitted');
 							}
-						}else{
-							res.status(200).send('Tasksubmitted');
+						}catch(ex){
+							console.log(ex);
+							res.status(200).send('fail');
 						}
-						
 					}
-					
-					
-					
 				});
-			
 		}
-
 	}
 });
 
@@ -535,7 +539,8 @@ var parsing = function(d,urlData) {
 	var testsuiteDetails=d.testsuiteDetails;
 	var updateJson=[];
 	var cassandraId_dict={};
-	testsuiteDetails.forEach(function(e,i){
+	try{
+		testsuiteDetails.forEach(function(e,i){
 		var moduleID_json=e.testsuiteId;
 		var modulename_json=e.testsuiteName;
 		var moduleID_c_json=e.testsuiteId_c;
@@ -588,14 +593,18 @@ var parsing = function(d,urlData) {
 
 					});
 					
-		});
+				});
 
 
-	});
+			});
 		
 
 
-	});
+		});
+	}catch(ex){
+		console.log(ex);
+	}
+	
 updateJson.push(cassandraId_dict);
 //console.log('cassandraId_dict',cassandraId_dict);
 //console.log('updateJson',updateJson);
