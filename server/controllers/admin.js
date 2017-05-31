@@ -105,10 +105,7 @@ exports.getUsers_Nineteen68 = function(req, res){
 							}catch(ex){
 								console.log(ex);
 							}
-							
-							
-							
-							
+								
 						}
 					});
 				});
@@ -1042,89 +1039,93 @@ exports.getNames_ICE = function(req, res){
 		if(requestedidslist.length == idtypes.length){
 			var queryString="";
 			for(var eachid=0; eachid<requestedidslist.length; eachid++){
-				//in this block all projects under the domain is the response.
-				if(idtypes[eachid] == 'domainsall'){
-					var responsedata={
-							projectIds:[],
-							projectNames:[]
-					}
-					queryString="select projectid,projectname from projects where domainid="+requestedidslist[eachid];
-					namesfetcher(queryString,function(error,response){
-						try{
-							if(response.length<=0){
-								res.send("No Projects");
-							}
-							else{
-								for(var i=0;i<response.length;i++){
-									responsedata.projectIds.push(response[i].projectid);
-									responsedata.projectNames.push(response[i].projectname);
-									if(i==response.length-1){
-										console.log(responsedata);
-										res.send(responsedata);
-									}
+				if(requestedidslist[eachid] != null && requestedidslist[eachid] != undefined && requestedidslist[eachid].trim() != ''){
+					//in this block all projects under the domain is the response.
+					if(idtypes[eachid] == 'domainsall'){
+						var responsedata={
+								projectIds:[],
+								projectNames:[]
+						}
+						queryString="select projectid,projectname from projects where domainid="+requestedidslist[eachid];
+						namesfetcher(queryString,function(error,response){
+							try{
+								if(response.length<=0){
+									res.send("No Projects");
 								}
-							}	                		
-						}
-						catch(exception){
-							console.log(exception);
-						}
-					});
-				}else if(idtypes[eachid] == 'projects'){
-					//in this block project name and project id of the respective id is sent
-					queryString="select projectid,projectname from projects where projectid="+requestedidslist[eachid];
-					namesfetcher(queryString,function(error,response){
-						try{
-							responsedata.idtypes.push('projects');
-							responsedata.requestedids.push(response[0].projectid);
-							responsedata.respnames.push(response[0].projectname);
-							if(index == requestedidslist.length){
-								res.send(responsedata);
-								// console.log(responsedata);
-							}	                		
-						}
-						catch(exception){
-							console.log(exception);
-						}
-					});
-				}else if(idtypes[eachid] == 'releases'){
-					//in this block release name and release id of the respective id is sent
-					queryString="select releaseid,releasename from releases where releaseid="+requestedidslist[eachid];
-					namesfetcher(queryString,function(error,response){
-						try{
-							responsedata.idtypes.push('releases');
-							responsedata.requestedids.push(response[0].releaseid);
-							responsedata.respnames.push(response[0].releasename);
-
-							if(index == requestedidslist.length){
-								res.send(responsedata);
-								console.log(responsedata);
-							}	                		
-						}
-						catch(exception){
-							console.log(exception);
-						}
-					});
-				}else if(idtypes[eachid] == 'cycles'){
-					//in this block cycle name and cycle id of the respective id is sent
-					queryString="select cycleid,cyclename from cycles where cycleid="+requestedidslist[eachid];
-					namesfetcher(queryString,function(error,response){
-						try{
-							responsedata.idtypes.push('cycles');
-							responsedata.requestedids.push(response[0].cycleid);
-							responsedata.respnames.push(response[0].cyclename);
-
-							if(index == requestedidslist.length){
-								res.send(responsedata);
-								console.log(responsedata);
-							}	                		
-						}
-						catch(exception){
-							console.log(exception);
-						}
-					});
+								else{
+									for(var i=0;i<response.length;i++){
+										responsedata.projectIds.push(response[i].projectid);
+										responsedata.projectNames.push(response[i].projectname);
+										if(i==response.length-1){
+											console.log(responsedata);
+											res.send(responsedata);
+										}
+									}
+								}	                		
+							}
+							catch(exception){
+								console.log(exception);
+							}
+						});
+					}else if(idtypes[eachid] == 'projects'){
+						//in this block project name and project id of the respective id is sent
+						queryString="select projectid,projectname from projects where projectid="+requestedidslist[eachid];
+						namesfetcher(queryString,function(error,response){
+							try{
+								responsedata.idtypes.push('projects');
+								responsedata.requestedids.push(response[0].projectid);
+								responsedata.respnames.push(response[0].projectname);
+								if(index == requestedidslist.length){
+									res.send(responsedata);
+									// console.log(responsedata);
+								}	                		
+							}
+							catch(exception){
+								console.log(exception);
+							}
+						});
+					}else if(idtypes[eachid] == 'releases'){
+						//in this block release name and release id of the respective id is sent
+						queryString="select releaseid,releasename from releases where releaseid="+requestedidslist[eachid];
+						namesfetcher(queryString,function(error,response){
+							try{
+								responsedata.idtypes.push('releases');
+								responsedata.requestedids.push(response[0].releaseid);
+								responsedata.respnames.push(response[0].releasename);
+	
+								if(index == requestedidslist.length){
+									res.send(responsedata);
+									console.log(responsedata);
+								}	                		
+							}
+							catch(exception){
+								console.log(exception);
+							}
+						});
+					}else if(idtypes[eachid] == 'cycles'){
+						//in this block cycle name and cycle id of the respective id is sent
+						queryString="select cycleid,cyclename from cycles where cycleid="+requestedidslist[eachid];
+						namesfetcher(queryString,function(error,response){
+							try{
+								responsedata.idtypes.push('cycles');
+								responsedata.requestedids.push(response[0].cycleid);
+								responsedata.respnames.push(response[0].cyclename);
+	
+								if(index == requestedidslist.length){
+									res.send(responsedata);
+									console.log(responsedata);
+								}	                		
+							}
+							catch(exception){
+								console.log(exception);
+							}
+						});
+					}else{
+						res.send("fail");
+						break;
+					}
 				}else{
-					res.send("fail");
-					break;
+					console.log("Invalid Input")
 				}
 			}
 		}else{
