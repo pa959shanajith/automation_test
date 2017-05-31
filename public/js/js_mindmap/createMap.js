@@ -656,7 +656,7 @@ var nodeClick = function(e){
 	
 	//condition to disable unassign task button
 	setTimeout(function(){
-		if($("#ct-assignedTo option:selected").text().toLowerCase() == "select user"  && $("#ct-assignRevw option:selected").text().toLowerCase() == "select reviewer" && $("#ct-assignRel option:selected").text().toLowerCase() == "select release" && $("#startDate").val() == "" && $("#endDate").val() == "") {
+		if($("#ct-assignedTo option:selected").text().toLowerCase() == "select user"  && $("#ct-assignRevw option:selected").text().toLowerCase() == "select reviewer" && $("#startDate").val() == "" && $("#endDate").val() == "") {
 		  $('#ct-unassignButton a').addClass("disableButton");
 		}
 		else	$('#ct-unassignButton a').removeClass("disableButton");
