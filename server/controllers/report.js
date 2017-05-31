@@ -5,12 +5,17 @@ var Joi = require('joi');
 var cassandra = require('cassandra-driver');
 var async = require('async');
 var uuid = require('uuid-random');
-var dbConnICE = require('../../server/config/icetestautomation');
+var dbConnICE = require('../../server/config/icetestautomation')
+, Phantom = require('phantom')
+, tmpdir = require('os').tmpdir()
+, fs = require('fs');
 
 exports.getMainReport_ICE = function(req, res){
 	try{
-		var IP = req.connection.servername;//localAddress.split(":")[req.connection.localAddress.split(":").length-1];
+		var IP = req.headers.host.split(":")[0];//req.connection.servername;//localAddress.split(":")[req.connection.localAddress.split(":").length-1];
+		console.log("Jsreport server IP:::::",IP);
 		var client = require("jsreport-client")("https://"+IP+":8001/");
+		console.log("Jsreport server ::::::",client)
 		client.render({
 			template: { 
 				shortid: "HJP1pqMcg", 
@@ -19,7 +24,8 @@ exports.getMainReport_ICE = function(req, res){
 			}
 		}, function(err, response) {
 			if (err) {
-				console.log('error when trying to render report:', err);
+				console.log('Error when trying to render report:', err);
+				res.send("fail");
 			}
 			else{
 				try{
@@ -27,12 +33,14 @@ exports.getMainReport_ICE = function(req, res){
 				}
 				catch(exception){
 					console.log(exception);
+					res.send("fail");
 				}
 			}
 		});
 	}
 	catch(exception){
 		console.log(exception);
+		res.send("fail");
 	}
 }
 
@@ -41,10 +49,12 @@ exports.renderReport_ICE = function(req, res){
 		var finalReports = req.body.finalreports;
 		var reportType = req.body.reporttype;
 		var shortId;
-		var IP = req.connection.servername;//localAddress.split(":")[req.connection.localAddress.split(":").length-1];
+		var IP = req.headers.host.split(":")[0];//req.connection.servername;//localAddress.split(":")[req.connection.localAddress.split(":").length-1];
+		console.log("Jsreport server IP:::::",IP);
 		if(reportType == "html") shortId = "rkE973-5l";
 		else shortId = "H1Orcdvhg";
 		var client = require("jsreport-client")("https://"+IP+":8001/");
+		console.log("Jsreport server ::::::",client)
 		client.render({
 			template: { 
 				shortid: shortId, 
@@ -57,25 +67,47 @@ exports.renderReport_ICE = function(req, res){
 			}
 		}, function(err, response) {
 			if (err) {
-				console.log('error when trying to render report:', err);
+				console.log('Error when trying to render report:', err);
+				res.send("fail");
 			}
 			else{
 				try{
-					if(reportType != "phantom-pdf"){
-						response.pipe(res);
+					if(reportType == "html"){
+						response.pipe(res)						
 					}
 					else{
-						response.pipe(res)
+						var filename = shortId;
+						var file = tmpdir + filename;
+						res.header('Content-disposition', 'inline; filename=' + filename);
+						res.header('Content-type', 'application/pdf');
+						Phantom.create(function(phantom) {
+						    phantom.createPage(function(page) {
+						      // Render PDF and send to browser
+						      function dispatchPDF() {
+						        page.render(file, function() {
+						          fs.createReadStream(file).pipe(res);
+						          phantom.exit();
+						        });
+						      };
+
+						      page.set('content', response);
+						      page.set('paperSize', '5in');
+						      page.set('onLoadFinished', dispatchPDF);
+						   });
+						});
+						//response.pipe(res)
 					}
 				}
 				catch(exception){
 					console.log(exception);
+					res.send("fail");
 				}
 			}
 		});		
 	}
 	catch(exception){
 		console.log(exception);
+		res.send("fail")
 	}
 }
 
@@ -86,22 +118,23 @@ exports.getAllSuites_ICE = function (req, res) {
 	var getDomain="SELECT domainid FROM icepermissions WHERE userid="+req_userId+";";
 	var testSuiteDetails=[];
 	var flag="";
-	async.series(
-			{	domainAssignedWithUserID: function(callback){
+	async.series({
+			domainAssignedWithUserID: function(callback){
 				dbConnICE.execute(getDomain,function(err,result){
 					console.log("Exe getAllSuites_ICE service")
 					if(err){
-						flag="Error occured in getAllSuites_ICE : Fail"
+						flag="fail";
 						res.send(flag);
 						console.log(err);
 					}else{
 						try{
 							var domainid = JSON.parse(JSON.stringify(result.rows[0].domainid));
 							resultdata = domainid;
-							console.log(resultdata);
+							//console.log(resultdata);
 							callback(err,resultdata);					
 						}catch(ex){
-							console.log("Exception occured in fetching domain_id getAllSuites_ICE : ",ex)
+							console.log("Exception occured in fetching domain_id getAllSuites_ICE : ",ex);
+							res.send("fail");
 						}
 					}
 				});
@@ -110,17 +143,16 @@ exports.getAllSuites_ICE = function (req, res) {
 				var getProjectIDs="SELECT projectid FROM projects WHERE domainid="+resultdata+";";
 				dbConnICE.execute(getProjectIDs,function(err,result){
 					if(err){
-						flag="Error occured in getAllSuites_ICE : Fail"
-							res.send(flag);
-						console.log(flag);
+						flag="fail";
+						console.log("Error occured in getAllSuites_ICE : Fail");
+						res.send(flag);
 					}else{
 						async.forEachSeries(result.rows, function(iterator, callback2) {
 							try{
 								var releaseids = "SELECT releaseid FROM releases WHERE projectid="+iterator.projectid;
 								dbConnICE.execute(releaseids,function(err,releaseidsdata){
-
 									if(err){
-										console.log(err);  
+										console.log(err);
 									}else{
 										async.forEachSeries(releaseidsdata.rows,function(releaseiditr,callback3){
 											try{
@@ -146,6 +178,7 @@ exports.getAllSuites_ICE = function (req, res) {
 																			}
 																			catch(exception){
 																				console.log(exception);
+																				res.send("fail");
 																			}
 																		},callback4);
 																	}
@@ -153,6 +186,7 @@ exports.getAllSuites_ICE = function (req, res) {
 															}
 															catch(exception){
 																console.log(exception);
+																res.send("fail");
 															}
 														},callback3);
 													}
@@ -160,6 +194,7 @@ exports.getAllSuites_ICE = function (req, res) {
 											}
 											catch(exception){
 												console.log(exception);
+												res.send("fail");
 											}
 										},callback2);
 									}
@@ -167,18 +202,19 @@ exports.getAllSuites_ICE = function (req, res) {
 							}
 							catch(exception){
 								console.log(exception);
+								res.send("fail");
 							}
 						}, callback);
 					}
 				});
 
 			}
-
 			},
 			function(err,results){
 				//data.setHeader('Content-Type','application/json');
 				if(err){
-					res.send(err);
+					console.log("Error::::::",err)
+					res.send("fail");
 				} 
 				else{
 					//console.log(JSON.stringify(testSuiteDetails));
@@ -200,6 +236,7 @@ exports.getSuiteDetailsInExecution_ICE = function (req, res) {
 			try{
 				if(err){
 					console.log(err);
+					res.send("fail");
 				}else{
 					for (var i = 0; i < executionData.rows.length; i++) {
 						startTime = executionData.rows[i].starttime;
@@ -219,84 +256,92 @@ exports.getSuiteDetailsInExecution_ICE = function (req, res) {
 			}
 			catch(exception){
 				console.log(exception);
+				res.send("fail");
 			}
 		});
 	}
 	catch(exception){
 		console.log(exception);
+		res.send("fail");
 	}
 }
 
 
 exports.reportStatusScenarios_ICE = function (req, res) {
-	var req_executionId=req.body.executionId;
-	var reportList=[];
-	var report=[];
-	async.series({
-		executiondetails:function(callback){
-			var reportFetchQuery = "SELECT * FROM reports where executionid="+req_executionId+" ALLOW FILTERING";
-			dbConnICE.execute(reportFetchQuery, function (err, result) {
-				if (err) {
-					var flag = "Error in reportStatusScenarios : Fail";
-					res.send(flag);
-					console.log(err);  
-				}else {
-					async.forEachSeries(result.rows, function(iterator, callback2) {
-						try{
-							var executedtimeTemp = iterator.executedtime;
-							if(executedtimeTemp != null){
-								executedtimeTemp = executedtimeTemp.getDate()+"-"+(executedtimeTemp.getMonth()+1)+"-"+executedtimeTemp.getFullYear()+" "+executedtimeTemp.getHours()+":"+executedtimeTemp.getMinutes();
-							}						
-							var browserTemp = iterator.browser;
-							var statusTemp = iterator.status;
-							var reportidTemp = iterator.reportid;
-							var testscenarioidTemp = iterator.testscenarioid;
-							var scenarioName = "SELECT testscenarioname FROM testscenarios where testscenarioid="+iterator.testscenarioid+" ALLOW FILTERING";
-							dbConnICE.execute(scenarioName,function(err,scenarioNameDetails){
-								if(err){
-									var flag = "Error in reportStatusScenarios : Fail";
-									res.send(flag);
-									console.log(err);  
-								}else{
-									async.forEachSeries(scenarioNameDetails.rows,function(testScenarioNameitr,callback3){
-										try{
-											report.push({
-												executedtime :  executedtimeTemp ,
-												browser: browserTemp,
-												status: statusTemp,
-												reportid :  reportidTemp ,
-												testscenarioid: testscenarioidTemp,
-												testscenarioname :  testScenarioNameitr.testscenarioname
-											})
-											callback3();
-										}
-										catch(exception){
-											console.log(exception);
-										}
-									},callback2);
-								}
-							});
-							//reportList.push(report);
-						}
-						catch(exception){
-							console.log(exception);
-						}
-
-					},callback);  
-				}
-			});
-		}
-	},
-	function(err,results){
-		//data.setHeader('Content-Type','application/json');
-		if(err){
-			res.send(err);
-		} 
-		else{
-			console.log('result is :',JSON.stringify(report));
-			res.send(JSON.stringify(report));
-		} 
-	})
+	try{
+		var req_executionId = req.body.executionId;
+		var reportList=[];
+		var report=[];
+		async.series({
+			executiondetails:function(callback){
+				var reportFetchQuery = "SELECT * FROM reports where executionid="+req_executionId+" ALLOW FILTERING";
+				dbConnICE.execute(reportFetchQuery, function (err, result) {
+					if (err) {
+						var flag = "fail";
+						console.log(err);
+						res.send(flag);
+					}else {
+						async.forEachSeries(result.rows, function(iterator, callback2) {
+							try{
+								var executedtimeTemp = iterator.executedtime;
+								if(executedtimeTemp != null){
+									executedtimeTemp = executedtimeTemp.getDate()+"-"+(executedtimeTemp.getMonth()+1)+"-"+executedtimeTemp.getFullYear()+" "+executedtimeTemp.getHours()+":"+executedtimeTemp.getMinutes();
+								}						
+								var browserTemp = iterator.browser;
+								var statusTemp = iterator.status;
+								var reportidTemp = iterator.reportid;
+								var testscenarioidTemp = iterator.testscenarioid;
+								var scenarioName = "SELECT testscenarioname FROM testscenarios where testscenarioid="+iterator.testscenarioid+" ALLOW FILTERING";
+								dbConnICE.execute(scenarioName,function(err,scenarioNameDetails){
+									if(err){
+										var flag = "fail";
+										console.log(err);
+										res.send(flag);  
+									}else{
+										async.forEachSeries(scenarioNameDetails.rows,function(testScenarioNameitr,callback3){
+											try{
+												report.push({
+													executedtime :  executedtimeTemp ,
+													browser: browserTemp,
+													status: statusTemp,
+													reportid :  reportidTemp ,
+													testscenarioid: testscenarioidTemp,
+													testscenarioname :  testScenarioNameitr.testscenarioname
+												})
+												callback3();
+											}
+											catch(exception){
+												console.log(exception);
+												res.send("fail");
+											}
+										},callback2);
+									}
+								});
+								//reportList.push(report);
+							}
+							catch(exception){
+								console.log(exception);
+								res.send("fail");
+							}
+						},callback);  
+					}
+				});
+			}
+		},
+		function(err,results){
+			if(err){
+				console.log('Error:--',err);
+				res.send("fail");
+			} 
+			else{
+				res.send(JSON.stringify(report));
+			} 
+		})		
+	}
+	catch(exception){
+		console.log(exception);
+		res.send("fail");
+	}
 }
 
 
@@ -331,270 +376,278 @@ exports.getReport = function (req, res) {
 }
 
 exports.getReport_Nineteen68 = function(req, res) {
-	var reportId = req.body.reportId;
-	var testsuiteId = req.body.testsuiteId;
-	var testsuitename = req.body.testsuitename;
-	var reportInfoObj = {};
-	var reportjson = {};
-	var flag="";
-	async.series({
-		projectsUnderDomain: function(callback) {
-			var getReportQuery = "select report,executedtime,testscenarioid from reports where reportid=" +
-			reportId + " ALLOW FILTERING";
-			dbConnICE.execute(getReportQuery, function(err, reportResult) {
-				if (err) {
-					flag="Error in getReport_Nineteen68 : Fail";
-					res.send(flag);
-					console.log(err);
-				} else {
-					var reportres = reportResult.rows.length;
-					async.forEachSeries(reportResult.rows, function(iterator, callback1) {
-						try{
-							var reportdata = iterator.report;
-							var executedtime = iterator.executedtime;
-							var testscenarioid = iterator.testscenarioid;
-							reportjson.reportdata = reportdata;
-							reportInfoObj.reportId = reportId;
-							reportInfoObj.executedtime = executedtime;
-							reportInfoObj.testscenarioid = testscenarioid;
-							var getReportQuery2 = "select testscenarioname,projectid from testscenarios where testscenarioid=" + testscenarioid + " ALLOW FILTERING";
-							dbConnICE.execute(getReportQuery2, function(err, scenarioResult) {
-								if (err) {
-									flag="Error in getReport_Nineteen68 : Fail";
-									res.send(flag);
-									console.log(err);
-								} else {
-									async.forEachSeries(scenarioResult.rows, function(sceiditr, callback2) {
-										try{
-											var testscenarioname = sceiditr.testscenarioname;
-											var projectid = sceiditr.projectid;
-											reportInfoObj.testscenarioname = testscenarioname;
-											reportInfoObj.projectid = projectid;
-											//	var getReportQuery3 = "select testscenarioids,cycleid from testsuites ";
-											var getReportQuery3 = "select cycleid from testsuites where testsuiteid=" + testsuiteId + " and testsuitename = '" + testsuitename + "' ALLOW FILTERING";
-											dbConnICE.execute(getReportQuery3, function(err, suiteResult) {
-												if (err) {
-													flag="Error in getReport_Nineteen68 : Fail";
-													res.send(flag);
-													console.log(err);
-												} else {
-													// var   testscenarioids=[];
-													async.forEachSeries(suiteResult.rows, function(suiteiditr, callback3) {
-														try{
-															var cycleid = suiteiditr.cycleid;
-															reportInfoObj.cycleid = cycleid;
-															// count=0;
-															/*	console.log('suiteResult.rows', suiteResult.rows.length);
-                                                    	testscenarioids12 = suiteiditr.testscenarioids;
-                                                    	if (testscenarioids12 != null) {
-                                                    		for (var i = 0; i < testscenarioids12.length; i++) {
-                                                    			if (testscenarioids12[i].toString() == testscenarioid.toString()) {
-                                                    				cycleid = suiteiditr.cycleid;
-                                                    				reportInfoObj.cycleid = cycleid;
-                                                    				break;
-                                                    			}
-                                                    		}
-                                                    	}*/
-															//   callback3();
-															//	var cycledetails = "select cyclename,releaseid from cycles";
-															var cycledetails = "select cyclename,releaseid from cycles where cycleid=" + cycleid + "ALLOW FILTERING";
-															dbConnICE.execute(cycledetails, function(err, cycleResult) {
-																if (err) {
-																	console.log(err);
-																} else {
-																	async.forEachSeries(cycleResult.rows, function(cycleiditr, callback4) {
-																		try{
-																			var cyclename = cycleiditr.cyclename;
-																			var releaseid = cycleiditr.releaseid;
-																			reportInfoObj.cyclename = cyclename;
-																			reportInfoObj.releaseid = releaseid;
-																			//console.log('final reportInfoObj', reportInfoObj);
-																			// callback4();
-																			var releasedetails = "select releasename,projectid from releases where releaseid=" + releaseid + " ALLOW FILTERING";
-																			dbConnICE.execute(releasedetails, function(err, releaseResult) {
-																				if (err) {
-																					console.log(err);
-																				} else {
-																					async.forEachSeries(releaseResult.rows, function(reliditr, callback5) {
-																						try{
-																							var releasename = reliditr.releasename;
-																							var projectid = reliditr.projectid;
-																							reportInfoObj.releasename = releasename;
-																							reportInfoObj.projectid = projectid;
-																							//console.log('final reportInfoObj in release deatails', reportInfoObj);
-
-																							var projectdeatils = "select projectname,domainid from projects where projectid=" + projectid + " ALLOW FILTERING";
-																							dbConnICE.execute(projectdeatils, function(err, projectResult) {
-																								if (err) {
-																									console.log(err);
-																								} else {
-																									async.forEachSeries(projectResult.rows, function(proiditr, callback6) {
-																										try{
-
-																											var projectname = proiditr.projectname;
-																											var domainid = proiditr.domainid;
-																											reportInfoObj.projectname = projectname;
-																											reportInfoObj.domainid = domainid;
-																											//console.log('final reportInfoObj in project deatails', reportInfoObj);
-
-																											var domaindetails = "select domainname from domains where domainid=" + domainid + " ALLOW FILTERING";
-																											dbConnICE.execute(domaindetails, function(err, domainResult) {
-																												if (err) {
-																													console.log(err);
-																												} else {
-																													async.forEachSeries(domainResult.rows, function(domainiditr, callback7) {
-																														try{
-																															var domainname = domainiditr.domainname;
-																															reportInfoObj.domainname = domainname;
-																															//console.log('final reportInfoObj in domain deatails', reportInfoObj);
-																															callback7();
-																														}catch(exception){
-																															console.log(exception);
-																														}
-																													}, callback6);
-																												}
-																											});
-																										}catch(exception){
-																											console.log(exception);
-																										}
-																									}, callback5);
-																								}
-																							});
-																						}catch(exception){
-																							console.log(exception);
-																						}
-																					}, callback4);
-																				}
-																			});
-																		}catch(exception){
-																			console.log(exception);
-																		}
-																	}, callback3);
-																}
-															});
-														}catch(exception){
-															console.log(exception);
-														} 
-													}, callback2);
-												}
-											});
-										}catch(exception){
-											console.log(exception);
-										} 
-									}, callback1);
-								}
-							});
-						}catch(exception){
-							console.log(exception);
-						} 
-					}, callback);
-				}
-			});
-			//adding false check paran
-			// }
-		}
-	},
-	function(err, results) {
-		// data.setHeader('Content-Type','application/json');
-		if (err) {
-			console.log(err);
-			cb(err);
-		} else {
-			console.log('in last function');
-			var finalReport = [];
-			finalReport.push(reportInfoObj);
-			finalReport.push(reportjson)
-			res.send(finalReport);
-		}
-	}
-	);
-};
-
-
-exports.exportToJson_ICE = function(req, res) {
-	var reportId = req.body.reportId;
-	var reportInfoObj = {};
-	async.series({
-		projectsUnderDomain: function(callback) {
-			var getReportQuery = "select report from reports where reportid =" +reportId + " ALLOW FILTERING ";
-			dbConnICE.execute(getReportQuery, function(err, reportResult) {
-				if (err) {
-					console.log(err);
-				} 
-				else {
-					try{
+	try{
+		var reportId = req.body.reportId;
+		var testsuiteId = req.body.testsuiteId;
+		var testsuitename = req.body.testsuitename;
+		var reportInfoObj = {};
+		var reportjson = {};
+		var flag="";
+		async.series({
+			projectsUnderDomain: function(callback) {
+				var getReportQuery = "select report,executedtime,testscenarioid from reports where reportid=" +
+				reportId + " ALLOW FILTERING";
+				dbConnICE.execute(getReportQuery, function(err, reportResult) {
+					if (err) {
+						flag="fail";
+						console.log("Failed to get report, executed time and scenarioIds from reports");
+						res.send(flag);
+					} else {
 						var reportres = reportResult.rows.length;
 						async.forEachSeries(reportResult.rows, function(iterator, callback1) {
 							try{
 								var reportdata = iterator.report;
-								reportInfoObj.reportdata = reportdata;
-								var testScenarioQuery = "select testscenarioid from reports where reportid ="+ reportId + " ALLOW FILTERING ";
-								dbConnICE.execute(testScenarioQuery, function(err, scenarioResult) {
+								var executedtime = iterator.executedtime;
+								var testscenarioid = iterator.testscenarioid;
+								reportjson.reportdata = reportdata;
+								reportInfoObj.reportId = reportId;
+								reportInfoObj.executedtime = executedtime;
+								reportInfoObj.testscenarioid = testscenarioid;
+								var getReportQuery2 = "select testscenarioname,projectid from testscenarios where testscenarioid=" + testscenarioid + " ALLOW FILTERING";
+								dbConnICE.execute(getReportQuery2, function(err, scenarioResult) {
 									if (err) {
-										console.log(err);
+										console.log("Failed to get scenario name and projectId from scenarios.");
 									} else {
-										var reportres = scenarioResult.rows.length;
 										async.forEachSeries(scenarioResult.rows, function(sceiditr, callback2) {
 											try{
-												var scenarioid=sceiditr.testscenarioid;
-												var testScenarionameQuery = "select testscenarioname from testscenarios where testscenarioid ="
-													+ scenarioid + " ALLOW FILTERING ";
-												dbConnICE.execute(testScenarionameQuery, function(err, scenarionameResult) {
+												var testscenarioname = sceiditr.testscenarioname;
+												var projectid = sceiditr.projectid;
+												reportInfoObj.testscenarioname = testscenarioname;
+												reportInfoObj.projectid = projectid;
+												//	var getReportQuery3 = "select testscenarioids,cycleid from testsuites ";
+												var getReportQuery3 = "select cycleid from testsuites where testsuiteid=" + testsuiteId + " and testsuitename = '" + testsuitename + "' ALLOW FILTERING";
+												dbConnICE.execute(getReportQuery3, function(err, suiteResult) {
 													if (err) {
-														console.log(err);
-													} 
-													else {
-														var scenameres = scenarionameResult.rows.length;
-														async.forEachSeries(scenarionameResult.rows, function(scenameitr, callback3) {
+														console.log("Failed to get cycle Ids from test suites.");
+													} else {
+														// var   testscenarioids=[];
+														async.forEachSeries(suiteResult.rows, function(suiteiditr, callback3) {
 															try{
-																var scenarioname=scenameitr.testscenarioname;
-																reportInfoObj.scenarioname = scenarioname;
-																callback3(); 
-															}
-															catch(exception){
+																var cycleid = suiteiditr.cycleid;
+																reportInfoObj.cycleid = cycleid;
+																// count=0;
+																/*	console.log('suiteResult.rows', suiteResult.rows.length);
+	                                                    	testscenarioids12 = suiteiditr.testscenarioids;
+	                                                    	if (testscenarioids12 != null) {
+	                                                    		for (var i = 0; i < testscenarioids12.length; i++) {
+	                                                    			if (testscenarioids12[i].toString() == testscenarioid.toString()) {
+	                                                    				cycleid = suiteiditr.cycleid;
+	                                                    				reportInfoObj.cycleid = cycleid;
+	                                                    				break;
+	                                                    			}
+	                                                    		}
+	                                                    	}*/
+																//   callback3();
+																//	var cycledetails = "select cyclename,releaseid from cycles";
+																var cycledetails = "select cyclename,releaseid from cycles where cycleid=" + cycleid + "ALLOW FILTERING";
+																dbConnICE.execute(cycledetails, function(err, cycleResult) {
+																	if (err) {
+																		console.log("Failed to get cycle name and releaseId from cycles.");
+																	} else {
+																		async.forEachSeries(cycleResult.rows, function(cycleiditr, callback4) {
+																			try{
+																				var cyclename = cycleiditr.cyclename;
+																				var releaseid = cycleiditr.releaseid;
+																				reportInfoObj.cyclename = cyclename;
+																				reportInfoObj.releaseid = releaseid;
+																				// callback4();
+																				var releasedetails = "select releasename,projectid from releases where releaseid=" + releaseid + " ALLOW FILTERING";
+																				dbConnICE.execute(releasedetails, function(err, releaseResult) {
+																					if (err) {
+																						console.log("Failed to get release name and projectsId from releases.");
+																					} else {
+																						async.forEachSeries(releaseResult.rows, function(reliditr, callback5) {
+																							try{
+																								var releasename = reliditr.releasename;
+																								var projectid = reliditr.projectid;
+																								reportInfoObj.releasename = releasename;
+																								reportInfoObj.projectid = projectid;
+																								//console.log('final reportInfoObj in release deatails', reportInfoObj);
+																								var projectdeatils = "select projectname,domainid from projects where projectid=" + projectid + " ALLOW FILTERING";
+																								dbConnICE.execute(projectdeatils, function(err, projectResult) {
+																									if (err) {
+																										console.log("Failed to get project name and domainId from projects.");
+																									} else {
+																										async.forEachSeries(projectResult.rows, function(proiditr, callback6) {
+																											try{
+																												var projectname = proiditr.projectname;
+																												var domainid = proiditr.domainid;
+																												reportInfoObj.projectname = projectname;
+																												reportInfoObj.domainid = domainid;
+
+																												var domaindetails = "select domainname from domains where domainid=" + domainid + " ALLOW FILTERING";
+																												dbConnICE.execute(domaindetails, function(err, domainResult) {
+																													if (err) {
+																														console.log("Failed to get domain name from domains.");
+																													} else {
+																														async.forEachSeries(domainResult.rows, function(domainiditr, callback7) {
+																															try{
+																																var domainname = domainiditr.domainname;
+																																reportInfoObj.domainname = domainname;
+																																//console.log('final reportInfoObj in domain deatails', reportInfoObj);
+																																callback7();
+																															}catch(exception){
+																																console.log(exception);
+																																res.send("fail");
+																															}
+																														}, callback6);
+																													}
+																												});
+																											}catch(exception){
+																												console.log(exception);
+																												res.send("fail");
+																											}
+																										}, callback5);
+																									}
+																								});
+																							}catch(exception){
+																								console.log(exception);
+																								res.send("fail");
+																							}
+																						}, callback4);
+																					}
+																				});
+																			}catch(exception){
+																				console.log(exception);
+																				res.send("fail");
+																			}
+																		}, callback3);
+																	}
+																});
+															}catch(exception){
 																console.log(exception);
-															}                    
-														},callback2);
+																res.send("fail");
+															} 
+														}, callback2);
 													}
 												});
-											}
-											catch(exception){
+											}catch(exception){
 												console.log(exception);
-											}
-										},callback1);
+												res.send("fail");
+											} 
+										}, callback1);
 									}
 								});
-							}
-							catch(exception){
+							}catch(exception){
 								console.log(exception);
-							}
+								res.send("fail");
+							} 
 						}, callback);
 					}
-					catch(exception){
-						console.log(exception);
-					}
-				}
-			});
-		}
-	},
-	function(err, results) {
-		// data.setHeader('Content-Type','application/json');
-		if (err) {
-			console.log(err);
-			cb(err);
-		} else {
-			console.log('in last function');
-			// console.log('here in last function   ',JSON.stringify(testSuiteDetails));
-			// cb(null,JSON.stringify(RequestedJSON));
-			try{
-				res.send(reportInfoObj);				
+				});
+				//adding false check paran
+				// }
 			}
-			catch(exception){
-				console.log(exception);
+		},
+		function(err, results) {
+			// data.setHeader('Content-Type','application/json');
+			if (err) {
+				console.log(err);
+				cb(err);
+				res.send("fail");
+			} else {
+				console.log('in last function');
+				var finalReport = [];
+				finalReport.push(reportInfoObj);
+				finalReport.push(reportjson)
+				res.send(finalReport);
 			}
-		}
+		});		
 	}
-	);
+	catch(exception){
+		console.log(exception);
+		res.send("fail");
+	}
+};
+
+
+exports.exportToJson_ICE = function(req, res) {
+	try{
+		var reportId = req.body.reportId;
+		var reportInfoObj = {};
+		async.series({
+			projectsUnderDomain: function(callback) {
+				var getReportQuery = "select report from reports where reportid =" +reportId + " ALLOW FILTERING ";
+				dbConnICE.execute(getReportQuery, function(err, reportResult) {
+					if (err) {
+						console.log("Failed to get reports.");
+						res.send("fail");
+					} 
+					else {
+						try{
+							var reportres = reportResult.rows.length;
+							async.forEachSeries(reportResult.rows, function(iterator, callback1) {
+								try{
+									var reportdata = iterator.report;
+									reportInfoObj.reportdata = reportdata;
+									var testScenarioQuery = "select testscenarioid from reports where reportid ="+ reportId + " ALLOW FILTERING ";
+									dbConnICE.execute(testScenarioQuery, function(err, scenarioResult) {
+										if (err) {
+											console.log("Failed to get scenario Id from reports.");
+										} else {
+											var reportres = scenarioResult.rows.length;
+											async.forEachSeries(scenarioResult.rows, function(sceiditr, callback2) {
+												try{
+													var scenarioid=sceiditr.testscenarioid;
+													var testScenarionameQuery = "select testscenarioname from testscenarios where testscenarioid ="
+														+ scenarioid + " ALLOW FILTERING ";
+													dbConnICE.execute(testScenarionameQuery, function(err, scenarionameResult) {
+														if (err) {
+															console.log("Failed to get testscenarioname from testscenarios.");
+														} 
+														else {
+															var scenameres = scenarionameResult.rows.length;
+															async.forEachSeries(scenarionameResult.rows, function(scenameitr, callback3) {
+																try{
+																	var scenarioname=scenameitr.testscenarioname;
+																	reportInfoObj.scenarioname = scenarioname;
+																	callback3(); 
+																}
+																catch(exception){
+																	console.log(exception);
+																	res.send("fail");
+																}                    
+															},callback2);
+														}
+													});
+												}
+												catch(exception){
+													console.log(exception);
+													res.send("fail");
+												}
+											},callback1);
+										}
+									});
+								}
+								catch(exception){
+									console.log(exception);
+									res.send("fail");
+								}
+							}, callback);
+						}
+						catch(exception){
+							console.log(exception);
+							res.send("fail");
+						}
+					}
+				});
+			}
+		},
+		function(err, results) {
+			if (err) {
+				console.log(err);
+				cb(err);
+				res.send("fail");
+			} else {
+				console.log('in last function');
+				res.send(reportInfoObj);
+			}
+		});		
+	}
+	catch(exception){
+		console.log(exception);
+		res.send("fail");
+	}
 };
 //serviceController.createStructure= {
 //handler: function(req, reply) {

@@ -36,27 +36,29 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 
 		adminServices.getAllUsers_Nineteen68()
 		.then(function (response) {
-			$("#selAssignUser").empty()
-			$("#selAssignUser").append('<option data-id="" value disabled selected>Select User</option>')
-			for(i=0; i<response.userIds.length && response.user_names.length; i++){
-				if(response.d_roles[i] != "b5e9cb4a-5299-4806-b7d7-544c30593a6e"){
-					$("#selAssignUser").append('<option data-id="'+response.userIds[i]+'" value="'+response.user_names[i]+'">'+response.user_names[i]+'</option>')	
+			if(response != "fail"){
+				$("#selAssignUser").empty()
+				$("#selAssignUser").append('<option data-id="" value disabled selected>Select User</option>')
+				for(i=0; i<response.userIds.length && response.user_names.length; i++){
+					if(response.d_roles[i] != "b5e9cb4a-5299-4806-b7d7-544c30593a6e"){
+						$("#selAssignUser").append('<option data-id="'+response.userIds[i]+'" value="'+response.user_names[i]+'">'+response.user_names[i]+'</option>')	
+					}
+				}			
+				//sorting the dropdown values in alphabetical order 
+				var selectOptions = $("#selAssignUser option:not(:first)");
+				selectOptions.sort(function(a,b) {
+					if (a.text > b.text) return 1;
+				    else if (a.text < b.text) return -1;
+				    else return 0;
+				})
+				$("#selAssignUser").empty()
+				$("#selAssignUser").append('<option data-id="" value disabled selected>Select User</option>');
+				for(i=0; i<selectOptions.length;i++){
+					$("#selAssignUser").append(selectOptions[i])				
 				}
+				$("#selAssignUser").prop('selectedIndex', 0);				
 			}
-			
-			//sorting the dropdown values in alphabetical order 
-			var selectOptions = $("#selAssignUser option:not(:first)");
-			selectOptions.sort(function(a,b) {
-				if (a.text > b.text) return 1;
-			    else if (a.text < b.text) return -1;
-			    else return 0;
-			})
-			$("#selAssignUser").empty()
-			$("#selAssignUser").append('<option data-id="" value disabled selected>Select User</option>');
-			for(i=0; i<selectOptions.length;i++){
-				$("#selAssignUser").append(selectOptions[i])				
-			}
-			$("#selAssignUser").prop('selectedIndex', 0);
+			else console.log("Unable to load users.")
 		}, 		
 		function (error) { console.log("Error:::::::::::::", error) })		
 
@@ -103,69 +105,72 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 			var unAssignedProjects = {};
 			adminServices.getAssignedProjects_ICE(getAssignProj)
 			.then(function (data) {
-				$('#assignedProjectAP').empty();
-				projectData = [];
-				projectData = data;
-				if(data.length > 0)
-				{
-					for(var i=0;i<data.length;i++)
+				if(data != "fail"){
+					$('#assignedProjectAP').empty();
+					projectData = [];
+					projectData = data;
+					if(data.length > 0 && typeof(data) === "object")
 					{
-						$('#assignedProjectAP').append($("<option value=" +data[i].projectId+ "></option>").text(data[i].projectName));
-					}
-					for(var j=0;j<projectData.length;j++)
-					{
-						assignedProjectsArr.push(projectData[j].projectId);
-						assignedProjectNames.push(projectData[j].projectName)
-					}
-
-					adminServices.getDetails_ICE(idtype,requestedids)
-					.then(function (response) {
-						$('#allProjectAP').empty();
-						if(response.projectIds.length > 0)
+						for(var i=0;i<data.length;i++)
 						{
-							for(var k=0;k<response.projectIds.length;k++){
-								if(!eleContainsInArray(assignedProjectsArr,response.projectIds[k])){
-									unassignedProjectIds.push(response.projectIds[k]);
-								}
-							}
+							$('#assignedProjectAP').append($("<option value=" +data[i].projectId+ "></option>").text(data[i].projectName));
+						}
+						for(var j=0;j<projectData.length;j++)
+						{
+							assignedProjectsArr.push(projectData[j].projectId);
+							assignedProjectNames.push(projectData[j].projectName)
+						}
 
-							for(var l=0;l<response.projectNames.length;l++){
-								if(!eleContainsInArray(assignedProjectNames,response.projectNames[l])){
-									unassignedProjectNames.push(response.projectNames[l]);
-								}
-							}
-
-							function eleContainsInArray(arr,element){
-								if(arr != null && arr.length >0){
-									for(var s=0;s<arr.length;s++){
-										if(arr[s] == element)
-											return true;
+						adminServices.getDetails_ICE(idtype,requestedids)
+						.then(function (response) {
+							$('#allProjectAP').empty();
+							if(response.projectIds.length > 0)
+							{
+								for(var k=0;k<response.projectIds.length;k++){
+									if(!eleContainsInArray(assignedProjectsArr,response.projectIds[k])){
+										unassignedProjectIds.push(response.projectIds[k]);
 									}
 								}
-								return false;
-							}	
-							unAssignedProjects.projectIds =  unassignedProjectIds;
-							unAssignedProjects.projectNames =  unassignedProjectNames;
-							for(var m=0;m<unAssignedProjects.projectIds.length;m++)
-							{
-								$('#allProjectAP').append($("<option value=" +unAssignedProjects.projectIds[m]+ "></option>").text(unAssignedProjects.projectNames[m]));
+
+								for(var l=0;l<response.projectNames.length;l++){
+									if(!eleContainsInArray(assignedProjectNames,response.projectNames[l])){
+										unassignedProjectNames.push(response.projectNames[l]);
+									}
+								}
+
+								function eleContainsInArray(arr,element){
+									if(arr != null && arr.length >0){
+										for(var s=0;s<arr.length;s++){
+											if(arr[s] == element)
+												return true;
+										}
+									}
+									return false;
+								}	
+								unAssignedProjects.projectIds =  unassignedProjectIds;
+								unAssignedProjects.projectNames =  unassignedProjectNames;
+								for(var m=0;m<unAssignedProjects.projectIds.length;m++)
+								{
+									$('#allProjectAP').append($("<option value=" +unAssignedProjects.projectIds[m]+ "></option>").text(unAssignedProjects.projectNames[m]));
+								}
 							}
-						}
-					}, function (error) { console.log("Error:::::::::::::", error) })
-				} 
-				else{
-					adminServices.getDetails_ICE(idtype,requestedids)
-					.then(function (res) {
-						if(res.projectIds.length > 0)
-						{
-							$("#assignedProjectAP,#allProjectAP").empty();
-							for(var n=0;n<res.projectIds.length;n++)
+						}, function (error) { console.log("Error:::::::::::::", error) })
+					} 
+					else{
+						adminServices.getDetails_ICE(idtype,requestedids)
+						.then(function (res) {
+							if(res.projectIds.length > 0)
 							{
-								$('#allProjectAP').append($("<option value=" +res.projectIds[n]+ "></option>").text(res.projectNames[n]));
+								$("#assignedProjectAP,#allProjectAP").empty();
+								for(var n=0;n<res.projectIds.length;n++)
+								{
+									$('#allProjectAP').append($("<option value=" +res.projectIds[n]+ "></option>").text(res.projectNames[n]));
+								}
 							}
-						}
-					}, function (error) { console.log("Error:::::::::::::", error) })
+						}, function (error) { console.log("Error:::::::::::::", error) })
+					}
 				}
+				else	console.log("Failed to load projects.");
 			}, function (error) { console.log("Error:::::::::::::", error) })
 		});
 
@@ -191,7 +196,6 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 			unassignedProj.projectName = $(this).text();
 			unAssignedProjects.push(unassignedProj);
 		});
-
 	
 		$("#assignedProjectAP option").each(function() {
 			var assignedProj = {};
@@ -210,27 +214,21 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 			assignProjectsObj.userId = userId;
 //			assignProjectsObj.unAssignedProjects = unAssignedProjects;
 			assignProjectsObj.assignedProjects = assignedProjects;
-
 			console.log(assignProjectsObj);
 			adminServices.assignProjects_ICE(assignProjectsObj)
 			.then(function (data) {
-				if(data == 'success')
-				{
+				if(data == 'success'){
 					openModelPopup("Assign Projects", "Projects assigned to user successfully");
 					resetAssignProjectForm();
 				}
 				else{
 					openModelPopup("Assign Projects", "Failed to assign projects to user");
 				}
-
-			}, function (error) { console.log("Error:::::::::::::", error) })
-
-		}
+			}, function (error) { console.log("Error:::::::::::::", error) }
+			)}
 		else {
 			openModelPopup("Assign Projects", "Please add project/s");
-
 		}
-
 	};
 
 
@@ -428,20 +426,23 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 		$("#passwordIcon").parent().show()
 		adminServices.getUserRoles_Nineteen68()
 		.then(function (response) {
-			userRoleArrayList = response.userRoles;
-			var getDropDown;
-			// if (getTab == "create") {
-			getDropDown = $('#userRoles');
-			//  }
-			//  else if (getTab == "edit") {
-			//      getDropDown = $('#userRolesED');
-			//  }
-			getDropDown.empty();
-			getDropDown.append('<option value=""selected>Select User Role</option>');
-			for (var i = 0; i < userRoleArrayList.length; i++) {
-				getDropDown.append($("<option value=" + response.r_ids[i] + "></option>").text(userRoleArrayList[i]));
+			if(response != "fail"){
+				userRoleArrayList = response.userRoles;
+				var getDropDown;
+				// if (getTab == "create") {
+				getDropDown = $('#userRoles');
+				//  }
+				//  else if (getTab == "edit") {
+				//      getDropDown = $('#userRolesED');
+				//  }
+				getDropDown.empty();
+				getDropDown.append('<option value=""selected>Select User Role</option>');
+				for (var i = 0; i < userRoleArrayList.length; i++) {
+					getDropDown.append($("<option value=" + response.r_ids[i] + "></option>").text(userRoleArrayList[i]));
+				}
+				window.localStorage['_R'] = response.r_ids;				
 			}
-			window.localStorage['_R'] = response.r_ids;
+			else console.log("Failed to get user roles.");
 		}, function (error) { console.log("Error:::::::::::::", error) })
 	};
 
@@ -665,7 +666,13 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 	function resetUpdateUser()
 	{
 		$("#userSelect,#userRoles").prop('selectedIndex', 0);
-		$("#firstName,#lastName,#password,#confirmPassword,#email").val("");
+		$("#firstName,#lastName,#password,#confirmPassword,#email").val("");		
+		$timeout(function(){						
+			$("#userTab").trigger("click");
+			$timeout(function(){
+				$(".adminActionBtn").children("button:first-child").trigger("click");							
+			}, 50)
+		}, 50)
 	}
 
 	function resetForm()
@@ -679,7 +686,8 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 	function resetAssignProjectForm()
 	{
 		$("#selAssignUser, #selAssignProject").prop('selectedIndex', 0);
-		$("#allProjectAP,#assignedProjectAP").empty();
+		$("#allProjectAP,#assignedProjectAP, #selAssignProject").empty();
+		$('#selAssignProject').append($("<option value=''  disabled selected>Please Select Your Domain</option>"));
 	}
 
 	//Add Release Name Functionality
@@ -1563,26 +1571,28 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 		$scope.tab = "editUser";
 		adminServices.getAllUsers_Nineteen68()
 		.then(function (response) {
-			$("#userSelect").empty()
-			$("#userSelect").append('<option data-id="" value disabled selected>Select User</option>')
-			for(i=0; i<response.userIds.length && response.user_names.length; i++){
-				$("#userSelect").append('<option data-id="'+response.userIds[i]+'" value="'+response.user_names[i]+'">'+response.user_names[i]+'</option>')
+			if(response != "fail"){
+				$("#userSelect").empty()
+				$("#userSelect").append('<option data-id="" value disabled selected>Select User</option>')
+				for(i=0; i<response.userIds.length && response.user_names.length; i++){
+					$("#userSelect").append('<option data-id="'+response.userIds[i]+'" value="'+response.user_names[i]+'">'+response.user_names[i]+'</option>')
+				}
+				
+				//sorting the dropdown values in alphabetical order 
+				var selectOptions = $("#userSelect option:not(:first)");
+				selectOptions.sort(function(a,b) {
+					if (a.text > b.text) return 1;
+				    else if (a.text < b.text) return -1;
+				    else return 0;
+				})
+				$("#userSelect").empty()
+				$("#userSelect").append('<option data-id="" value disabled selected>Select User</option>');
+				for(i=0; i<selectOptions.length;i++){
+					$("#userSelect").append(selectOptions[i])				
+				}
+				$("#userSelect").prop('selectedIndex', 0);				
 			}
-			
-			//sorting the dropdown values in alphabetical order 
-			var selectOptions = $("#userSelect option:not(:first)");
-			selectOptions.sort(function(a,b) {
-				if (a.text > b.text) return 1;
-			    else if (a.text < b.text) return -1;
-			    else return 0;
-			})
-			$("#userSelect").empty()
-			$("#userSelect").append('<option data-id="" value disabled selected>Select User</option>');
-			for(i=0; i<selectOptions.length;i++){
-				$("#userSelect").append(selectOptions[i])				
-			}
-			$("#userSelect").prop('selectedIndex', 0);
-			
+			else console.log("Unable to load users.")
 		}, 
 		function (error) { console.log("Error:::::::::::::", error) })
 	};
@@ -1744,15 +1754,18 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 			var roleId = response.roleId;
 			adminServices.getUserRoles_Nineteen68()
 			.then(function (response) {
-				$("#userRoles").empty().append('<option value disabled>Select User Role</option>')
-				for(i=0; i<response.r_ids.length && response.userRoles.length; i++){
-					if(roleId == response.r_ids[i]){
-						$("#userRoles").append('<option selected value="'+response.r_ids[i]+'">'+response.userRoles[i]+'</option>')
-					}
-					else{
-						$("#userRoles").append('<option value="'+response.r_ids[i]+'">'+response.userRoles[i]+'</option>')
-					}
+				if(response != "fail"){
+					$("#userRoles").empty().append('<option value disabled>Select User Role</option>')
+					for(i=0; i<response.r_ids.length && response.userRoles.length; i++){
+						if(roleId == response.r_ids[i]){
+							$("#userRoles").append('<option selected value="'+response.r_ids[i]+'">'+response.userRoles[i]+'</option>')
+						}
+						else{
+							$("#userRoles").append('<option value="'+response.r_ids[i]+'">'+response.userRoles[i]+'</option>')
+						}
+					}					
 				}
+				else console.log("Failed to get user roles.");
 			}, 
 			function (error) { console.log("Error:::::::::::::", error) })
 		}, 
@@ -1815,30 +1828,23 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 			.then(function (response) {
 				if(response == "success"){
 					openModelPopup("Edit User", "User has been edited successfully.");
-					resetUpdateUser();
-					
-					$timeout(function(){
-						
+					resetUpdateUser();					
+					/*$timeout(function(){						
 						$("#userTab").trigger("click");
 						$timeout(function(){
-							$(".adminActionBtn").children("button:first-child").trigger("click");
-							
+							$(".adminActionBtn").children("button:first-child").trigger("click");							
 						}, 50)
-					}, 50)
+					}, 50)*/
 				}
 				else{
 					openModelPopup("Edit User", "Failed to edit user.");
-					resetUpdateUser();
-					
-					$timeout(function(){
-						
+					resetUpdateUser();					
+					/*$timeout(function(){						
 						$("#userTab").trigger("click");
 						$timeout(function(){
-							$(".adminActionBtn").children("button:first-child").trigger("click");
-							
+							$(".adminActionBtn").children("button:first-child").trigger("click");							
 						}, 50)
-
-					}, 50)
+					}, 50)*/
 				}
 			}, 
 			function (error) { console.log("Error:::::::::::::", error) })

@@ -27,8 +27,8 @@ exports.authenticateUser_Nineteen68 = function(req, res){
             //console.log(req);
             dbConn.execute(authUser, function (err, result) {
                   if(err) {
-                        flag="Error occured in authenticateUser_Nineteen68 : Fail";
-                        res.send(flag);
+                        console.log("Error occured in authenticateUser_Nineteen68 : Fail");
+                        res.send("fail");
                   }else{
                         try{
                               if (result.rows.length == 0){
@@ -47,13 +47,13 @@ exports.authenticateUser_Nineteen68 = function(req, res){
                               }
                         }catch(exception){
                               console.log(exception);
-                              res.send(flag);
+                              res.send("fail");
                         }
                   }
             });
       }catch(exception){
             console.log(exception);
-            res.send(flag);
+            res.send("fail");
       }
 };
 
@@ -68,13 +68,12 @@ exports.loadUserInfo_Nineteen68 = function(req, res){
 	            	try{
 	            		var getUserInfo = "select userid, emailid, firstname, lastname, defaultrole, additionalroles, username from users where username = '"+userName+"' allow filtering";
 	                    dbConn.execute(getUserInfo, function (err, userResult) {
-	                		if (err)
-	                		{
-	                			var flag = "Error occured in loadUserInfo_Nineteen68 : Fail"
-	                				res.send(flag);
+	                		if (err){
+	                			var flag = "fail";
+	                			console.log("Failed to get user details from users.");
+	                			res.send(flag);
 	                		}
-	                		else
-	                		{
+	                		else{
 	                			try{
 	                				if (userResult.rows.length > 0)
 		                			{
@@ -90,18 +89,21 @@ exports.loadUserInfo_Nineteen68 = function(req, res){
 		        						jsonService.username = service.username;
 		                			}
 		                			else{
-		                				var flag = "No Records Found";
-		                					res.send(flag);
+		                				console.log("No records found.");
+		                				res.send("fail");
 		                			}
 	                			}
-	                			catch(exception){console.log(exception);}
+	                			catch(exception){
+	                				console.log(exception);
+	                				res.send("fail");
+	                			}
 	                		}
-
 	                    	callback();
 	                	})
 	            	}
 	            	catch(exception){
 	            		console.log(exception);
+	            		res.send("fail");
 	            	}
 	            },
 	          //Service call to get the plugins accessible for the user
@@ -110,8 +112,8 @@ exports.loadUserInfo_Nineteen68 = function(req, res){
 	            		var getUserPlugins = "select dashboard,deadcode,mindmap,neuron2d,neuron3d,oxbowcode,reports from userpermissions WHERE roleid = "+jsonService.role+" allow filtering";
 	                	dbConn.execute(getUserPlugins, function(err, pluginResult){
 	                		if(err){
-	                			var flag = "Error occured in loadUserInfo_Nineteen68 : Fail";
-	                				res.send(flag);
+	                			console.log("Error occured in loadUserInfo_Nineteen68 : Fail");
+	                			res.send("fail");
 	                		}
 	                		else{
 	                			try{
@@ -132,30 +134,34 @@ exports.loadUserInfo_Nineteen68 = function(req, res){
 		                			jsonService.plugindetails = pluginsArr
 		                			}
 		                			else{
-		                				var flag = "No Records Found";
-		                				res.send(flag);
+		                				console.log("No Records Found");
+		                				res.send("fail");
 		                			}
 	                			}
-	                			catch(exception){console.log(exception);}
+	                			catch(exception){
+	                				console.log(exception);
+	                				res.send("fail");
+	                			}
 	                		}
 	                    	callback();
 	                	})
 	            	}
-	            	catch(exception){console.log(exception);}
+	            	catch(exception){
+	            		console.log(exception);
+	            		res.send("fail");
+	            	}
 	            }
 	      },function(err,data){
 	    	  if(err){
-	    		  
+	    		  res.send("fail");
 	    	  }else{
-	    		  try{
-	  	    		res.send(jsonService); 	    			  
-	    		  }
-	    		  catch(exception){console.log(exception);}
+	    		  res.send(jsonService);
 	    	  }
 	      })
 	}
 	catch(exception){
         console.log(exception);
+        res.send("fail");
 	}
 };
 
@@ -167,13 +173,13 @@ exports.getRoleNameByRoleId_Nineteen68 = function(req, res){
            var getRoleInfo = "select rolename from roles where roleid = "+roleId+" allow filtering";
            dbConn.execute(getRoleInfo, function (err, rolesResult) {
                  if(err){
-                       flag="Error occured in getRoleNameByRoleId_Nineteen68 : Fail";
-                       res.send(flag);
+                       console.log("Error occured in getRoleNameByRoleId_Nineteen68 : Fail");
+                       res.send("fail");
                  }else{
                        try{
                              if (rolesResult.rows.length == 0){
-                                   flag = "No Records Found"
-                                   res.send(flag);
+                            	 console.log("No Records Found");
+                                  res.send("fail");
                              }else{
                                    try{
                                          var role="";
@@ -183,14 +189,17 @@ exports.getRoleNameByRoleId_Nineteen68 = function(req, res){
                                          res.send(role);
                                    }catch(exception){
                                          console.log(exception);
+                                         res.send("fail");
                                    }
                              }
                        }catch(exception){
                              console.log(exception);
+                             res.send("fail");
                        }
                  }
            });
      }catch(exception){
            console.log(exception);
+           res.send("fail");
      }
 };

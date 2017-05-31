@@ -3605,6 +3605,9 @@ select:-webkit-autofill:focus {
 	.relCycContainer{
 		height: calc(100% - 285px);
 	}
+	.container-plugins .col-md-12:nth-child(2) {
+    	height: calc(100% - 125px);
+	}
 }
 
 

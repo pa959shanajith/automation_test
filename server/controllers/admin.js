@@ -24,7 +24,7 @@ exports.getUserRoles_Nineteen68 = function(req, res){
 		var getUserRoles = "select roleid, rolename from roles";
 		dbConn.execute(getUserRoles, function (err, result) {
 			if (err) {
-				res.send("Error occured in getUserRoles_Nineteen68 : Fail");
+				res.send("fail");
 			}
 			else {
 				try{
@@ -35,11 +35,15 @@ exports.getUserRoles_Nineteen68 = function(req, res){
 					userRoles.userRoles = roles;
 					userRoles.r_ids = r_ids;
 					res.send(userRoles);
-				}catch(exception){console.log(exception);}
+				}catch(exception){
+					console.log(exception);
+					res.send("fail");
+				}
 			}
 		});
 	}catch(exception){
 		console.log(exception);
+		res.send("fail");
 	}
 };
 
@@ -158,11 +162,12 @@ exports.getAllUsers_Nineteen68 = function(req, res){
 		var userIds = [];
 		var d_role = [];
 		var userDetails = {user_names:[], userIds : [], d_roles:[]};
-		var getUserRoles = "select userid, username, defaultrole from nineteen68.users ";
-		dbConn.execute(getUserRoles, function (err, result) {
+		var getUsers = "select userid, username, defaultrole from nineteen68.users ";
+		dbConn.execute(getUsers, function (err, result) {
 			try{
 				if (err) {
-					res(null, err);
+					console.log("Error::::::",err);
+					res.send("fail");
 				}
 				else {
 					async.forEachSeries(result.rows,function(iterator,callback1){
@@ -172,7 +177,10 @@ exports.getAllUsers_Nineteen68 = function(req, res){
 							d_role.push(iterator.defaultrole);
 							callback1();							
 						}
-						catch(exception){console.log(exception);}
+						catch(exception){
+							console.log(exception);
+							res.send("fail");
+						}
 					});
 					userDetails.userIds = userIds;
 					userDetails.user_names = user_names;
@@ -181,10 +189,16 @@ exports.getAllUsers_Nineteen68 = function(req, res){
 					res.send(userDetails);
 				}
 			}
-			catch(exception){console.log(exception);}
+			catch(exception){
+				console.log(exception);
+				res.send("fail");
+			}
 		});
 	}
-	catch(exception){console.log(exception);}
+	catch(exception){
+		console.log(exception);
+		res.send("fail");
+	}
 };
 
 
@@ -254,9 +268,12 @@ exports.createUser_Nineteen68 = function(req, res){
 					dbConn.execute(createUser, function (err, userResult) {
 						try{
 							flag = "Success";
-							res.send(flag);	
+							res.send(flag);
 						}
-						catch(exception){console.log(exception);}
+						catch(exception){
+							console.log(exception);
+							res.send(flag);
+						}
 					})
 				}
 				else{
@@ -264,10 +281,16 @@ exports.createUser_Nineteen68 = function(req, res){
 					res.send(flag);
 				}				
 			}
-			catch(exception){console.log(exception);}
+			catch(exception){
+				console.log(exception);
+				res.send(flag);
+			}
 		})
 	}
-	catch(exception){console.log(exception);}
+	catch(exception){
+		console.log(exception);
+		res.send("fail");
+	}
 };
 
 
@@ -291,14 +314,12 @@ exports.updateUser_nineteen68 = function updateUser_nineteen68(req, res) {
 			var salt = bcrypt.genSaltSync(10);
 			var req_hashedPassword = bcrypt.hashSync(local_password, salt);
 		}
-
 		var getUserDetails = "select username,password,firstname,lastname,defaultrole,emailid from users where userid="+local_user_Id;
-
 		dbConn.execute(getUserDetails, function (err, result) {
 			try{
 				if (typeof result === 'undefined') {
 					var flag = "fail";
-					res.send(flag); 
+					res.send(flag);
 				}
 				else {
 					service = result.rows[0];
@@ -340,17 +361,26 @@ exports.updateUser_nineteen68 = function updateUser_nineteen68(req, res) {
 							}
 							else {
 								flag = "success";
-								res.send(flag); 
+								res.send(flag);
 							}
 						}
-						catch(exception){console.log(exception);}
+						catch(exception){
+							console.log(exception);
+							res.send(flag);
+						}
 					});
 				}
 			}
-			catch(exception){console.log(exception);}
+			catch(exception){
+				console.log(exception);
+				res.send(flag);
+			}
 		});		
 	}
-	catch(exception){console.log(exception);}
+	catch(exception){
+		console.log(exception);
+		res.send("fail");
+	}
 };
 
 //Get Domains
@@ -1420,24 +1450,16 @@ exports.assignProjects_ICE = function(req, res){
 		var assignProjectsToUsers = "INSERT INTO icepermissions (userid,domainid,createdby,createdon,history,modifiedby,modifiedbyrole,modifiedon,projectids) VALUES ("+assignProjectsDetails.userId+","+assignProjectsDetails.domainId+",'"+assignProjectsDetails.userInfo.username+"','" + new Date().getTime() + "',null,'"+assignProjectsDetails.userInfo.username+"','"+assignProjectsDetails.userInfo.role+"','" + new Date().getTime() + "',["+projectIds+"]);"
 		dbConnICE.execute(assignProjectsToUsers, function (err, result) {
 			if (err) {
-				try {
-					res.send("Error occured in getassignProjects_ICE: Fail");
-				} catch (exception) {
-					console.log(exception);
-					res.send("fail");
-				}
+				res.send("fail");
 			}
 			else {
-				try {
-					res.send('success');
-				} catch (exception) {
-					console.log(exception);
-				}
+				res.send('success');
 			}
 		});		
 	}
 	catch (exception) {
 		console.log(exception);
+		res.send("fail");
 	}
 };
 
@@ -1452,7 +1474,8 @@ exports.getAssignedProjects_ICE = function(req, res){
 		dbConnICE.execute(getAssignedProjects, function (err, result) {
 			try{
 				if (err) {
-					res.send(null, err);
+					console.log("Error::::",err);
+					res.send("fail");
 				}
 				else {
 					for(var i=0;i<result.rows.length;i++)
@@ -1465,24 +1488,29 @@ exports.getAssignedProjects_ICE = function(req, res){
 							dbConnICE.execute(getProjectNames, function (err, result) {
 								try{
 									if (err) {
-										res.send(null, err);
+										console.log("Error::::",err);
+										res.send("fail");
 									}
 									else{
 										console.log(result);
-										var assignedProjects = {};
-										assignedProjects.projectId = iterator;
-										assignedProjects.projectName = result.rows[0].projectname;
-										assignedProjObj.push(assignedProjects);
+										if(result.rows.length > 0){
+											var assignedProjects = {};
+											assignedProjects.projectId = iterator;
+											assignedProjects.projectName = result.rows[0].projectname;
+											assignedProjObj.push(assignedProjects);
+										}
 										assignProjectCallback();
 									}									
 								}
 								catch (exception) {
 									console.log(exception);
+									res.send("fail");
 								}
 							});							
 						}
 						catch (exception) {
 							console.log(exception);
+							res.send("fail");
 						}
 					},finalfunction);
 
@@ -1493,10 +1521,12 @@ exports.getAssignedProjects_ICE = function(req, res){
 			}
 			catch (exception) {
 				console.log(exception);
+				res.send("fail");
 			}
 		});
 	}
 	catch (exception) {
 		console.log(exception);
+		res.send("fail");
 	}
 };
