@@ -619,12 +619,12 @@ body {
 .assignedTask {
 	cursor: pointer;
     font-size: 17px;
-    padding: 0px 1px 10px;
+    padding: 0px 0px 10px;
     display: inline-block;
-    width: 60%;
+    width: 57%;
     word-break: break-all;
     word-wrap: break-word;
-    margin-left: 26px;
+    margin-left: 40px;
 }
 
 .assignedTaskInner {
@@ -3604,6 +3604,9 @@ select:-webkit-autofill:focus {
 	}
 	.relCycContainer{
 		height: calc(100% - 285px);
+	}
+	.container-plugins .col-md-12:nth-child(2) {
+    	height: calc(100% - 125px);
 	}
 }
 

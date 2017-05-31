@@ -656,7 +656,7 @@ var nodeClick = function(e){
 	
 	//condition to disable unassign task button
 	setTimeout(function(){
-		if($("#ct-assignedTo option:selected").text().toLowerCase() == "select user"  && $("#ct-assignRevw option:selected").text().toLowerCase() == "select reviewer" && $("#ct-assignRel option:selected").text().toLowerCase() == "select release" && $("#startDate").val() == "" && $("#endDate").val() == "") {
+		if($("#ct-assignedTo option:selected").text().toLowerCase() == "select user"  && $("#ct-assignRevw option:selected").text().toLowerCase() == "select reviewer" && $("#startDate").val() == "" && $("#endDate").val() == "") {
 		  $('#ct-unassignButton a').addClass("disableButton");
 		}
 		else	$('#ct-unassignButton a').removeClass("disableButton");
@@ -1168,7 +1168,13 @@ var actionEvent = function(e){
 			clearSvg();
 			treeBuilder(allMMaps[mid]);
 			unassignTask=[];
-			openDialogMindmap("Success", "Data saved successfully");
+			var selectedTab = window.localStorage['tabMindMap']
+			if(selectedTab=='tabCreate'){
+				openDialogMindmap("Success", "Data saved successfully");
+			}else{
+				openDialogMindmap("Success", "Tasks saved successfully");
+			}
+			
 			 dataSender({task:'getModules',prjId:$(".project-list").val()},function(err,result){
 				 	if(err) console.log(result);
 				 	else{
@@ -1326,10 +1332,8 @@ var clearSvg = function(){
 	zoom.event(d3.select('#ct-mapSvg'));
 };
 
-//FUnction is tagge dto every click on 'cnavas' element to validate the names of nodes when created
+//FUnction is tagged to every click on 'cnavas' element to validate the names of nodes when created
 var callme=function(){
-	var selectedTab = window.localStorage['tabMindMap']
-	console.log($('#ct-inpBox').attr('class'));
 	if(childNode != null && (childNode.text()=='Module_0' || childNode.text()=='Screen_0' || childNode.text()=='Scenario_0' || childNode.text()=='Testcase_0')){
 		d3.select('#ct-inpBox').classed('no-disp',!1);
 	}

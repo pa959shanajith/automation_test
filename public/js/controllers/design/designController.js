@@ -1340,7 +1340,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					openDialog("Scrape Screen", "ICE Engine is not available. Please run the batch file and connect to the Server.");
 					return false
 				}
-				if(data == "FAIL"){
+				if(data == "fail"){
 					$("#scrapeFailModal").modal("show");
 					return false
 				}
@@ -2218,8 +2218,8 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		if(gsElement.length > 0){
 			for(i=0; i<gsElement.length; i++){
 				$.each($("#scraplist li"), function(){
-					if(gsElement[i] == $(this).data("tag")){
-						$(this).show()
+					if(gsElement[i] == $(this).data("tag") || $(this).data("tag").toLowerCase().indexOf(gsElement[i].toLowerCase()) >= 0 || (gsElement[i] == "input" && $(this).data("tag").indexOf("EditText") >= 0)){
+						$(this).show();
 					}
 				})
 				$.each($("#scraplist li"), function(){
@@ -2235,7 +2235,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 								$(this).data("tag") != "list" &&
 								$(this).data("tag") != "table")
 							{
-									$(this).show()
+									$(this).show();
 							}
 						})
 					}
