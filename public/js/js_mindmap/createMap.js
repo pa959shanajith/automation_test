@@ -5,6 +5,7 @@ var userInfo =  JSON.parse(window.localStorage['_UI']);
 var userid = userInfo.user_id;
 // node_names_tc keep track of testcase names to decide reusability of testcases
 var node_names_tc=[];
+var isIE = /*@cc_on!@*/false || !!document.documentMode;
 function loadMindmapData(){
 	
 	dataSender({task:'populateProjects',user_id:userid},function(err,result){
@@ -122,7 +123,7 @@ var initiate = function(){
 	dataAdder.forEach(function(e,i) {
 		t=u.append('g');
 		t.append('circle').attr('class','ct-'+(e.t.toLowerCase().replace(/ /g,''))).attr('cx',i*90).attr('cy',0).attr('r',10);
-		t.append('text').attr('class','ct-nodeLabel').attr('x',i*90+15).attr('y',3).html(e.t);
+		t.append('text').attr('class','ct-nodeLabel').attr('x',i*90+15).attr('y',3).text(e.t);
 	});
 	u=canvas.append('svg').attr('id','ct-actionBox').append('g');
 	t=u.append('g').attr('id','ct-saveAction').attr('class','ct-actionButton').on('click',actionEvent);
@@ -179,15 +180,16 @@ var addNode = function(n,m,pi){
 	}
 	
 	var v=d3.select('#ct-mindMap').append('g').attr('id','ct-node-'+n.id).attr('class','ct-node').attr('data-nodetype',n.type).attr('transform',"translate("+(n.x).toString()+","+(n.y).toString()+")");
+	// To fix rendering issue in FF issue #415
 	if($("#ct-canvas").attr('class')=='tabCreate ng-scope'){
-		v.append('image').attr('class','ct-nodeIcon').attr('xlink:href','images_mindmap/node-'+n.type+'.png').on('click',nodeCtrlClick);
+		v.append('image').attr('height','40px').attr('width','40px').attr('class','ct-nodeIcon').attr('xlink:href','images_mindmap/node-'+n.type+'.png').on('click',nodeCtrlClick);
 	}else{
-		v.append('image').attr('class','ct-nodeIcon').attr('xlink:href','images_mindmap/node-'+n.type+'.png').on('click',nodeClick);
+		v.append('image').attr('height','40px').attr('width','40px').attr('class','ct-nodeIcon').attr('xlink:href','images_mindmap/node-'+n.type+'.png').on('click',nodeClick);
 	}
 	//v.append('path').attr('class','ct-nodeCtrl').attr('d','M37,37L29,37L37,29Z').on('click',nodeCtrlClick);
 	//v.append('image').attr('class','ct-nodeIcon').attr('xlink:href','images_mindmap/node-'+n.type+'.png').on('click',nodeCtrlClick);
 	
-	v.append('text').attr('class','ct-nodeLabel').html(n.name).attr('text-anchor','middle').attr('x',20).attr('y',50);
+	v.append('text').attr('class','ct-nodeLabel').text(n.name).attr('text-anchor','middle').attr('width','5px').attr('word-wrap','break-word').attr('x',20).attr('y',50);
 	//Condition to add the properties of reuse to the node (Currently only for testcases)
 	if(node_names_tc.length>0 && node_names_tc.indexOf(n.name)>-1){
 		if(node_names_tc.indexOf(n.name)==node_names_tc.lastIndexOf(n.name)){
@@ -460,7 +462,8 @@ var nodeClick = function(e){
 	e=e||window.event;
 	e.cancelbubble=!0;
 	if(e.stopPropagation) e.stopPropagation();
-	activeNode=this.parentElement;
+	if(isIE) activeNode=this.parentNode;
+	else activeNode=this.parentElement;
 	var u,v,w,f,c=d3.select('#ct-assignBox');
 	var p=d3.select(activeNode);
 	var pi=parseInt(p.attr('id').split('-')[2]);
@@ -488,11 +491,7 @@ var nodeClick = function(e){
 	}
 	$("#ct-assignTask option[value='" + tObj.t + "']").attr('selected', 'selected'); 
 
-	// w=v.append('div').attr('class','ct-assignItem btn-group dropdown fl-right');
-	// w.append('button').attr('class','ct-asValBox btn dropdown-toggle').attr('data-toggle','dropdown').append('a').attr('id','ct-assignTask').html(tObj.t);
-	// w.append('button').attr('class','ct-asValBoxIcon btn dropdown-toggle').attr('data-toggle','dropdown').append('span').attr('class','caret');
-	// f=w.append('ul').attr('class','ct-asValOptBox dropdown-menu');
-	//taskAssign[t].task.forEach(function(tsk){f.append('li').html(tsk).on('click',function(e){d3.select(this.parentElement.parentElement).select('.ct-asValBox').select('a').html(this.innerHTML);});});
+	
 	var default_releaseid='';
 	taskAssign[t].attributes.forEach(function(tk){
 		v=u.append('li');
@@ -648,7 +647,9 @@ var nodeClick = function(e){
 	//var cSize=getElementDimm(c);
 	var cSize=[270,386];
 	var canvSize=getElementDimm(d3.select("#ct-mapSvg"));
-	var l=p.attr('transform').slice(10,-1).split(',');
+	var split_char=',';
+	if(isIE) split_char=' ';
+	var l=p.attr('transform').slice(10,-1).split(split_char);
 	l=[(parseFloat(l[0])+50)*cScale+cSpan[0],(parseFloat(l[1])-20)*cScale+cSpan[1]];
 	if(canvSize[0]-l[0]<cSize[0]) l[0]=l[0]-cSize[0]-60*cScale;
 	if(canvSize[1]-l[1]<cSize[1]) l[1]=canvSize[1]-cSize[1]-10*cScale;
@@ -689,10 +690,13 @@ var nodeCtrlClick = function(e){
 	e=e||window.event;
 	e.cancelbubble=!0;
 	if(e.stopPropagation) e.stopPropagation();
-	activeNode=this.parentElement;
+	if(isIE) activeNode=this.parentNode;
+	else activeNode=this.parentElement;
 	var p=d3.select(activeNode);
 	var t=p.attr('data-nodetype');
-	var l=p.attr('transform').slice(10,-1).split(',');
+	var split_char=',';
+	if(isIE) split_char=' ';
+	var l=p.attr('transform').slice(10,-1).split(split_char);
 	l=[(parseFloat(l[0])+40)*cScale+cSpan[0],(parseFloat(l[1])+40)*cScale+cSpan[1]];
 	var c=d3.select('#ct-ctrlBox').style('top',l[1]+'px').style('left',l[0]+'px').classed('no-disp',!1);
 	c.select('p.'+faRef.plus).classed('ct-ctrl-inactive',!1);
@@ -754,7 +758,7 @@ var createNode = function(e){
 		}
 		
 	}else{
-		openDialogMindmap('Error','Expand the module');
+		openDialogMindmap('Error','Expand the node');
 	}
 	
 };
@@ -771,7 +775,9 @@ var editNode = function(e,node){
 	}else var p=childNode;
 	var pi = p.attr('id').split('-')[2];
 	var t=p.attr('data-nodetype');
-	var l=p.attr('transform').slice(10,-1).split(',');
+	var split_char=',';
+	if(isIE) split_char=' ';
+	var l=p.attr('transform').slice(10,-1).split(split_char);
 	d3.select('#ct-ctrlBox').classed('no-disp',!0);
 	if(p.select('.ct-nodeTask')[0][0] != null){
 		var msg='Unassign the task to rename';
@@ -847,7 +853,12 @@ var moveNodeBegin = function(e){
 	e=e||window.event;
 	e.cancelbubble=!0;
 	if(e.stopPropagation) e.stopPropagation();
+	//To check whether browser Is IE or not issue #415
+	var isIE = /*@cc_on!@*/false || !!document.documentMode;
 	var p=d3.select(this.parentElement);
+	if (isIE) { 
+		var p=d3.select(this.parentNode);
+	}
 	var pi=p.attr('id').split('-')[2];
 	temp={s:[],t:""};
 	dLinks.forEach(function(d,i){
@@ -865,9 +876,16 @@ var moveNodeBegin = function(e){
 };
 var moveNodeEnd = function(e){
 	d3.select('#ct-mapSvg').on('mousemove.nodemove',null);
+	var isIE = /*@cc_on!@*/false || !!document.documentMode;
 	var p=d3.select(this.parentElement);
+	var split_char=',';
+	if (isIE) { 
+		var p=d3.select(this.parentNode);
+		split_char=' ';
+	}
+	
 	var pi=p.attr('id').split('-')[2];
-	var l=p.attr('transform').slice(10,-1).split(',');
+	var l=p.attr('transform').slice(10,-1).split(split_char);
 	//Logic to implement rearranging of nodes
 	var curNode=dNodes[pi];
 	//logic change dto the change in layout
@@ -916,7 +934,11 @@ var moveNodeEnd = function(e){
 	p.classed('ct-movable',!1);
 };
 var toggleNode = function(e){
+	var isIE = /*@cc_on!@*/false || !!document.documentMode;
 	var p=d3.select(this.parentElement);
+	if (isIE) { 
+		var p=d3.select(this.parentNode);
+	}
 	var pi = p.attr('id').split('-')[2];
 	if(dNodes[pi].children){
 		p.select('.ct-cRight').classed('ct-nodeBubble',!1);
@@ -1002,18 +1024,18 @@ var inpChange = function(e){
 	if(t=='screens' && scrList[inp.attr('data-nodeid')]!==undefined){
 		dNodes[pi].id_n=scrList[inp.attr('data-nodeid')].id_n;
 		dNodes[pi].name=scrList[inp.attr('data-nodeid')].name;
-		pt.html(dNodes[pi].name);
+		pt.text(dNodes[pi].name);
 		d3.select('#ct-inpBox').classed('no-disp',!0);
 	}
 	else if(t=='testcases' && tcList[inp.attr('data-nodeid')]!==undefined){
 		dNodes[pi].id_n=tcList[inp.attr('data-nodeid')].id_n;
 		dNodes[pi].name=tcList[inp.attr('data-nodeid')].name;
-		pt.html(dNodes[pi].name);
+		pt.text(dNodes[pi].name);
 		d3.select('#ct-inpBox').classed('no-disp',!0);
 	}
 	else{
 		dNodes[pi].name=val;
-		pt.html(dNodes[pi].name);
+		pt.text(dNodes[pi].name);
 		d3.select('#ct-inpBox').classed('no-disp',!0);
 	}
 };
@@ -1036,7 +1058,11 @@ var inpKeyUp = function(e){
 	}
 	if(val.indexOf('_')==-1) {
 		iul.classed('no-disp',!0);
-		d3.select(this.parentElement).select('#ct-inpPredict').property('value','');
+		var isIE = /*@cc_on!@*/false || !!document.documentMode;
+		if (isIE) { 
+			d3.select(this.parentNode).select('#ct-inpPredict').property('value','');
+		}else d3.select(this.parentElement).select('#ct-inpPredict').property('value','');
+		
 		return;
 	}
 	t=p.attr('data-nodetype');
@@ -1070,13 +1096,15 @@ var inpKeyUp = function(e){
 			iul.select('li.divider').remove();
 			iul.classed('no-disp',!1);
 			d3.select(this).attr('data-nodeid',null);
-			d3.select(this.parentElement).select('#ct-inpPredict').property('value',list[temp[0]].name);
+			if(isIE) d3.select(this.parentNode).select('#ct-inpPredict').property('value',list[temp[0]].name);
+			else d3.select(this.parentElement).select('#ct-inpPredict').property('value',list[temp[0]].name);
 		}
 	}
 	else{
 		iul.classed('no-disp',!0);
 		d3.select(this).attr('data-nodeid',null);
-		d3.select(this.parentElement).select('#ct-inpPredict').property('value','');
+		if(isIE) d3.select(this.parentNode).select('#ct-inpPredict').property('value','');
+		else d3.select(this.parentElement).select('#ct-inpPredict').property('value','');
 	}
 };
 var treeIterator = function(c,d,e){
