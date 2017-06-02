@@ -1250,7 +1250,7 @@ if(flag==20){
 		});
 		openDialogMindmap("Success", "Structure created successfully");
 	}else{
-		openDialogMindmap("Success", "Fialed to create structure");
+		openDialogMindmap("Success", "Failed to create structure");
 	}
 	
 	//$('#Mindmap_create').modal('show');
