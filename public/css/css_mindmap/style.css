@@ -47,7 +47,7 @@ p,a,img,text,span,.noselect{-webkit-touch-callout:none;-webkit-user-select:none;
 /*FOR FOOTER ENDS HERE*/
 
 /*FOR HOME STARTS HERE*/
-#ct-page{position:fixed;height:calc(100% - 107px);width:100%;background-color:#fff;text-align:center;margin:0;padding:0}
+#ct-page{z-index:1;position:fixed;height:calc(100% - 107px);width:100%;background-color:#fff;text-align:center;margin:0;padding:0}
 .ct-side{height:100%;width:6px;color:#fff;background-color:#633690}
 .ct-side .ct-expand{top:50%;width:6px;height:25px}
 .ct-expand{position:absolute;cursor:pointer;overflow:hidden;background-color:rgba(255,255,255,.7)}
