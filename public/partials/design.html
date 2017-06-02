@@ -320,25 +320,6 @@
 <!--Footer-->
 
 <!--Bootstrap Popup-->
-	<!-- Scrape Fail -->
-	<div class="modal fade" id="scrapeFailModal" role="dialog" data-keyboard="false" data-backdrop="static">
-	  <div class="modal-dialog modal-sm">
-	    <div class="modal-content">
-	      <div class="modal-header">
-	        <button type="button" class="close" data-dismiss="modal">&times;</button>
-	        <h4 class="modal-title">Scrape</h4>
-	      </div>
-	      <div class="modal-body">
-	        <p>Failed to scrape.</p>
-	      </div>
-	      <div class="modal-footer">
-	        <button type="button" class="btn btn-default" data-dismiss="modal">Ok</button>
-	      </div>
-	    </div>
-	  </div>
-	</div>
-	<!-- Scrape Fail -->
-	
 	<!-- Add Object -->
 	<div id="dialog-addObject" class="modal fade" role="dialog" data-keyboard="false" data-backdrop="static">
 		<div class="modal-dialog" style="width: 700px">
@@ -368,25 +349,6 @@
 		</div>
 	</div>
 	<!-- Add Object -->
-	
-	<!-- Add Object Successfull -->
-	<div class="modal fade" id="addObjectSuccess" role="dialog" data-keyboard="false" data-backdrop="static">
-	  <div class="modal-dialog modal-sm">
-	    <div class="modal-content">
-	      <div class="modal-header">
-	        <button type="button" class="close" data-dismiss="modal">&times;</button>
-	        <h4 class="modal-title">Add Object</h4>
-	      </div>
-	      <div class="modal-body">
-	        <p>Objects has been added successfully.</p>
-	      </div>
-	      <div class="modal-footer">
-	        <button type="button" class="btn btn-default" data-dismiss="modal">Ok</button>
-	      </div>
-	    </div>
-	  </div>
-	</div>
-	<!-- Add Object Successfull -->
 
 	<!-- Map Object -->
 	<div id="dialog-mapObject" class="modal fade mapObjectModal" role="dialog" data-keyboard="false" data-backdrop="static">
@@ -429,82 +391,6 @@
 		</div>
 	</div>
 	<!-- Map Object -->
-	
-	<!-- Map Object Successfull  -->
-	<div class="modal fade" id="mapObjSuccess" role="dialog" data-keyboard="false" data-backdrop="static">
-	  <div class="modal-dialog modal-sm">
-	    <div class="modal-content">
-	      <div class="modal-header">
-	        <button type="button" class="close" data-dismiss="modal">&times;</button>
-	        <h4 class="modal-title">Map Object</h4>
-	      </div>
-	      <div class="modal-body">
-	        <p>Objects has been mapped successfully.</p>
-	      </div>
-	      <div class="modal-footer">
-	        <button type="button" class="btn btn-default" data-dismiss="modal">Ok</button>
-	      </div>
-	    </div>
-	  </div>
-	</div>
-	<!-- Map Object Successfull  -->
-	
-	<!-- Map Object Tag MisMatch  -->
-	<div class="modal fade" id="mapObjTagMissMatch" role="dialog" data-keyboard="false" data-backdrop="static">
-	  <div class="modal-dialog modal-sm">
-	    <div class="modal-content">
-	      <div class="modal-header">
-	        <button type="button" class="close" data-dismiss="modal">&times;</button>
-	        <h4 class="modal-title">Map Object</h4>
-	      </div>
-	      <div class="modal-body">
-	        <p>Failed to map objects.</p>
-	      </div>
-	      <div class="modal-footer">
-	        <button type="button" class="btn btn-default" data-dismiss="modal">Ok</button>
-	      </div>
-	    </div>
-	  </div>
-	</div>
-	<!-- Map Object Tag MisMatch  -->
-	
-	<!-- Map Object Same Objects  -->
-	<div class="modal fade" id="mapObjSameObject" role="dialog" data-keyboard="false" data-backdrop="static">
-	  <div class="modal-dialog modal-sm">
-	    <div class="modal-content">
-	      <div class="modal-header">
-	        <button type="button" class="close" data-dismiss="modal">&times;</button>
-	        <h4 class="modal-title">Map Object</h4>
-	      </div>
-	      <div class="modal-body">
-	        <p>Failed to map objects.</p>
-	      </div>
-	      <div class="modal-footer">
-	        <button type="button" class="btn btn-default" data-dismiss="modal">Ok</button>
-	      </div>
-	    </div>
-	  </div>
-	</div>
-	<!-- Map Object Same Objects  -->
-	
-    <!-- HiddenTagModal  -->
-	<div class="modal fade" id="hiddenTagBox" role="dialog" data-keyboard="false" data-backdrop="static">
-	  <div class="modal-dialog modal-sm">
-	    <div class="modal-content">
-	      <div class="modal-header">
-	        <button type="button" class="close" data-dismiss="modal">&times;</button>
-	        <h4 class="modal-title">Highlight Error</h4>
-	      </div>
-	      <div class="modal-body">
-	        <p>Cannot highlight as the element is hidden.</p>
-	      </div>
-	      <div class="modal-footer">
-	        <button type="button" class="btn btn-default" data-dismiss="modal">Ok</button>
-	      </div>
-	    </div>
-	  </div>
-	</div>
-	<!-- HiddenTagModal Modal  -->
 	
 	<!-- Global Modal  -->
        <div class="modal fade" id="globalModal" role="dialog" data-keyboard="false" data-backdrop="static">
@@ -574,7 +460,7 @@
 					<h4 class="modal-title">Launch Application</h4>
 				</div>
 				<div class="modal-body">
-					<p><input class='launchPopupInput form-control' type='text' placeholder='Enter the .exe path;App Name' id='desktopPath'/></p>
+					<p><input class='launchPopupInput form-control' type='text' placeholder='Enter window name' id='desktopPath'/></p>
 				</div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-default btn-default-modal" ng-click="initScraping($event)">Launch</button>
@@ -668,101 +554,5 @@
 			</div>
 		</div>
 	</div>
-	<!-- Mobility Web Launch Popup -->
-	
-	<!-- Save WebService Template Success  -->
-	<div class="modal fade" id="WSSaveSuccess" role="dialog" data-keyboard="false" data-backdrop="static">
-	  <div class="modal-dialog modal-sm">
-	    <div class="modal-content">
-	      <div class="modal-header">
-	        <button type="button" class="close" data-dismiss="modal">&times;</button>
-	        <h4 class="modal-title">Save WebService Template</h4>
-	      </div>
-	      <div class="modal-body">
-	        <p>WebService Template saved successfully.</p>
-	      </div>
-	      <div class="modal-footer">
-	        <button type="button" class="btn btn-default" data-dismiss="modal">Ok</button>
-	      </div>
-	    </div>
-	  </div>
-	</div>
-	<!-- Save WebService Template Success  -->
-	
-	<!-- Save WebService Template Fail  -->
-	<div class="modal fade" id="WSSaveFail" role="dialog" data-keyboard="false" data-backdrop="static">
-	  <div class="modal-dialog modal-sm">
-	    <div class="modal-content">
-	      <div class="modal-header">
-	        <button type="button" class="close" data-dismiss="modal">&times;</button>
-	        <h4 class="modal-title">Save WebService Template</h4>
-	      </div>
-	      <div class="modal-body">
-	        <p>Failed to save WebService Template.</p>
-	      </div>
-	      <div class="modal-footer">
-	        <button type="button" class="btn btn-default" data-dismiss="modal">Ok</button>
-	      </div>
-	    </div>
-	  </div>
-	</div>
-	<!-- Save WebService Template Fail  -->
-
-	<!-- Save WebService Debug Completed  -->
-	<div class="modal fade" id="webserviceDeubgSuccess" role="dialog" data-keyboard="false" data-backdrop="static">
-	  <div class="modal-dialog modal-sm">
-	    <div class="modal-content">
-	      <div class="modal-header">
-	        <button type="button" class="close" data-dismiss="modal">&times;</button>
-	        <h4 class="modal-title">Data Retrieve</h4>
-	      </div>
-	      <div class="modal-body">
-	        <p>Web Service response received successfully</p>
-	      </div>
-	      <div class="modal-footer">
-	        <button type="button" class="btn btn-default" data-dismiss="modal">Ok</button>
-	      </div>
-	    </div>
-	  </div>
-	</div>
-	<!-- Save WebService Debug Completed  -->
-
-	<!-- Save WebService Debug Fail  -->
-	<div class="modal fade" id="webserviceDeubgFail" role="dialog" data-keyboard="false" data-backdrop="static">
-	  <div class="modal-dialog modal-sm">
-	    <div class="modal-content">
-	      <div class="modal-header">
-	        <button type="button" class="close" data-dismiss="modal">&times;</button>
-	        <h4 class="modal-title">Debug Web Service</h4>
-	      </div>
-	      <div class="modal-body">
-	        <p>Failed to debug Web Service.</p>
-	      </div>
-	      <div class="modal-footer">
-	        <button type="button" class="btn btn-default" data-dismiss="modal">Ok</button>
-	      </div>
-	    </div>
-	  </div>
-	</div>
-	<!-- Save WebService Debug Fail  -->
-
-	<!-- Submitting Task Success -->
-<div class="modal fade" id="globalTaskSubmit" role="dialog" data-keyboard="false" data-backdrop="static">
-	<div class="modal-dialog modal-sm">
-		<div class="modal-content">
-			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal">&times;</button>
-				<h4 class="modal-title">Submit Task</h4>
-			</div>
-			<div class="modal-body">
-				<p>Task Submited Successfully</p>
-			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-default globalSubmit" data-dismiss="modal">Ok</button>
-			</div>
-		</div>
-	</div>
-</div>
-<!-- Submitting Task Success -->
-	
+	<!-- Mobility Web Launch Popup -->	
 <!--Bootstrap Popup-->

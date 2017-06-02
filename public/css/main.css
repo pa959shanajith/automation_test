@@ -2218,8 +2218,20 @@ input[disabled]{
     -moz-transition: 0.3s ease-in-out;
     -webkit-transition: 0.3s ease-in-out;
 }
-
-
+.historyContents{
+	width: 100%;
+    max-height: 110px;
+    border: 1px solid #ccc;
+    padding: 3px;
+    float: left;
+}
+.historyContents span{
+	color: black;
+    font-size: 12px;
+    float: left;
+    display: list-item;
+    margin-left: 16px;
+}
 /******Custom Bootstrap Dialog CSS******/
 
 

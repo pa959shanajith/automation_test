@@ -180,6 +180,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 										testcase[i].inputVal[0] = testcase[i].inputVal[0].split("##").join("\n")
 									}
 								}
+								testcase[i].stepNo = (i + 1).toString();
 								testcaseArray.push(testcase[i]);						
 							}
 							console.log("readTestCase:::", testcaseArray)
@@ -937,12 +938,14 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			DesignServices.updateScreen_ICE(scrapeObject)
 			.then(function(data){
 				if(data == "success"){
-					$("#WSSaveSuccess").modal("show");
+					openDialog("Save WebService Template", "WebService Template saved successfully.");
+					//$("#WSSaveSuccess").modal("show");
 					$("#enbledWS").prop("checked", false)
 					angular.element(document.getElementById("left-nav-section")).scope().getWSData();
 				}
 				else{
-					$("#WSSaveFail").modal("show")
+					openDialog("Save WebService Template", "Failed to save WebService Template.");
+					//$("#WSSaveFail").modal("show")
 				}
 			}, function(error){ console.log("Error") })
 		}
@@ -1035,67 +1038,6 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				"custname": "",
 				"remarks":[""]
 			})
-			/*testCaseWS.push({
-				"stepNo": 1,
-				"appType": appType,
-				"objectName": "",
-				"inputVal": [endPointURL],
-				"keywordVal": "setEndPointURL",
-				"outputVal": "",
-				"url": "",
-				"custname": "",
-				"remarks":[""]
-			}, {
-				"stepNo": 2,
-				"appType": appType,
-				"objectName": "",
-				"inputVal": [wsdlMethods],
-				"keywordVal": "setMethods",
-				"outputVal": "",
-				"url": "",
-				"custname": "",
-				"remarks":[""]
-			}, {
-				"stepNo": 3,
-				"appType": appType,
-				"objectName": "",
-				"inputVal": [wsdlOperation],
-				"keywordVal": "setOperations",
-				"outputVal": "",
-				"url": "",
-				"custname": "",
-				"remarks":[""]
-			}, {
-				"stepNo": 4,
-				"appType": appType,
-				"objectName": "",
-				"inputVal": [wsdlRequestHeader],
-				"keywordVal": "setHeader",
-				"outputVal": "",
-				"url": "",
-				"custname": "",
-				"remarks":[""]
-			}, {
-				"stepNo": 5,
-				"appType": appType,
-				"objectName": "",
-				"inputVal": [wsdlRequestBody],
-				"keywordVal": "setWholeBody",
-				"outputVal": "",
-				"url": "",
-				"custname": "",
-				"remarks":[""]
-			}, {
-				"stepNo": 6,
-				"appType": appType,
-				"objectName": "",
-				"inputVal": [""],
-				"keywordVal": "executeRequest",
-				"outputVal": "",
-				"url": "",
-				"custname": "",
-				"remarks":[""]
-			});*/
 			initWSJson.testcasename = "",
 			initWSJson.testcase = testCaseWS
 			DesignServices.initScrapeWS_ICE(initWSJson)
@@ -1107,7 +1049,8 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				}
 				unblockUI();
 				if(typeof data == "object"){
-					$("#webserviceDeubgSuccess").modal("show")
+					openDialog("Data Retrieve", "Web Service response received successfully");
+					//$("#webserviceDeubgSuccess").modal("show")
 					$("#wsdlResponseHeader").val(data.responseHeader[0].split("##").join("\n"));
 					if(data.responseBody[0].indexOf("{") == 0 || data.responseBody[0].indexOf("[") == 0){
 						var jsonStr = data.responseBody;
@@ -1122,7 +1065,8 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					}
 				}
 				else{
-					$("#webserviceDeubgFail").modal("show")
+					openDialog("Debug Web Service", "Debug Terminated.");
+					//$("#webserviceDeubgFail").modal("show")
 				}
 			}, function (error) { 
 				console.log("Error") 
@@ -1341,7 +1285,8 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					return false
 				}
 				if(data == "fail"){
-					$("#scrapeFailModal").modal("show");
+					openDialog("Scrape", "Failed to scrape.")
+					//$("#scrapeFailModal").modal("show");
 					return false
 				}
 				if(data.view.length > 0)
@@ -1722,7 +1667,8 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			}
 			
 			$("#dialog-addObject").modal("hide");
-			$("#addObjectSuccess").modal("show")
+			openDialog("Add Object", "Objects has been added successfully.")
+			//$("#addObjectSuccess").modal("show")
 			$("#saveObjects").prop("disabled", false)
 			flag = "false";
 		}
@@ -1903,9 +1849,9 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				DesignServices.mapScrapeData_ICE(scrapeObject)
 				.then(function(data){
 					$("#dialog-mapObject").modal("hide");
-					if(data == "Success") 				$("#mapObjSuccess").modal("show");
-					else if(data == "TagMissMatch") 	$("#mapObjTagMissMatch").modal("show");
-					else if(typeof data == "object") 	$("mapObjSameObject").modal("show");
+					if(data == "Success") 				openDialog("Map Object", "Objects has been mapped successfully.");//$("#mapObjSuccess").modal("show");
+					else if(data == "TagMissMatch") 	openDialog("Map Object", "Failed to map objects.");//$("#mapObjTagMissMatch").modal("show");
+					else if(typeof data == "object") 	openDialog("Map Object", "Failed to map objects.");//$("mapObjSameObject").modal("show");
 					angular.element(document.getElementById("left-nav-section")).scope().getScrapeData();
 				}, 
 				function(error){
@@ -3862,6 +3808,7 @@ $(document).on("click","#btnPasteTestStep", function(){
 	var proceed = true;
 	$("#errorMsgs1, #errorMsgs2, #errorMsgs3").hide();
 	if(!$("#getInputData").val()) $("#errorMsgs1").show();
+	else if(!/^[0-9.,]+$/.test($("#getInputData").val())) $("#errorMsgs2").show();
 	else{
 		var getRowJsonToPaste = JSON.parse(window.localStorage['getRowJsonCopy']);
 		//$(document).find(".dialogContent").append('<img src="imgs/loader1.gif" class="domainLoader" style="bottom: 20px; left: 20px;" />')
