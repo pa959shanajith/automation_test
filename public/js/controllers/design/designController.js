@@ -2218,7 +2218,15 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		if(gsElement.length > 0){
 			for(i=0; i<gsElement.length; i++){
 				$.each($("#scraplist li"), function(){
-					if(gsElement[i] == $(this).data("tag") || $(this).data("tag").toLowerCase().indexOf(gsElement[i].toLowerCase()) >= 0 || (gsElement[i] == "input" && $(this).data("tag").indexOf("EditText") >= 0)){
+					if(gsElement[i] == $(this).data("tag") || ($(this).data("tag").toLowerCase().indexOf(gsElement[i].toLowerCase()) >= 0 && gsElement[i] != "a")
+							|| (gsElement[i] == "input" && ($(this).data("tag").indexOf("edit") >= 0 || $(this).data("tag").indexOf("Edit Box") >= 0 || $(this).data("tag").indexOf("text") >= 0 || $(this).data("tag").indexOf("EditText") >= 0))
+							|| (gsElement[i] == "select" && $(this).data("tag").indexOf("combo box") >= 0)
+							|| (gsElement[i] == "a" && $(this).data("tag").indexOf("hyperlink") >= 0 || $(this).data("tag").indexOf("Static") >= 0)
+							|| (gsElement[i] == "checkbox" && $(this).data("tag").indexOf("check box") >= 0)
+							|| (gsElement[i] == "radiobutton" && $(this).data("tag").indexOf("radio button") >= 0)
+							|| (gsElement[i] == "scrollbar" && $(this).data("tag").indexOf("scroll bar") >= 0)
+							|| (gsElement[i] == "internalframe" && $(this).data("tag").indexOf("internal frame") >= 0)
+					){
 						$(this).show();
 					}
 				})
@@ -2233,6 +2241,9 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 								$(this).data("tag") != "radiobutton" &&
 								$(this).data("tag") != "input" &&
 								$(this).data("tag") != "list" &&
+								$(this).data("tag") != "link" &&
+								$(this).data("tag") != "scrollbar" &&
+								$(this).data("tag") != "internalframe" &&
 								$(this).data("tag") != "table")
 							{
 									$(this).show();
@@ -2544,20 +2555,49 @@ function contentTable(newTestScriptDataLS) {
 	
 	$(document).on('click', '.remarksIcon', function(){
 		$(this).parent('td').next('td[aria-describedby="jqGrid_remarks"]').addClass('selectedRemarkCell');
-		$("#modalDialogRemarks").find('.modal-title').text("Remarks");
-		$("#modalDialogRemarks").find('#labelContent').text("Add Remarks");
+		var historyDetails = $(this).parent('td').next('td[aria-describedby="jqGrid_remarks"]').text().trim();
+		var historyArray = [];
 		$("#getremarksData").val('');
-		$("#modalDialogRemarks").find('.modal-footer button').attr("id","btnaddRemarks");
+		$("#modalDialogRemarks").modal("show");
+		if(historyDetails.indexOf(";") >= 0)
+			historyArray = historyDetails.split(";");
+		else{
+			if(historyDetails)	historyArray.push(historyDetails);
+		}
+		
+		if(historyArray.length > 0){
+			$(".historyContents").empty();
+			for(i=0; i<historyArray.length; i++){
+				if(historyArray[i] != "" && historyArray[i] != " "){
+					$(".historyContents").append("<span class=''>"+historyArray[i]+"</span>");					
+				}		
+			}			
+		}
+		else $(".historyDetailsContainer").hide();
+		//$("#modalDialogRemarks").find('.modal-title').text("Remarks");
+		//$("#modalDialogRemarks").find('#labelContent').text("Add Remarks");
+		$("#getremarksData").val('');
+		//$("#modalDialogRemarks").find('.modal-footer button').attr("id","btnaddRemarks");
 		$("#modalDialogRemarks").modal("show");
 	})
 
 	$(document).on('click', '#btnaddRemarks', function(){
-		var getremarks = $("#getremarksData").val();
-		if(getremarks.length > 0){
-			$("#jqGrid tbody tr td.selectedRemarkCell").text(getremarks);
-			$("#jqGrid tbody tr td.selectedRemarkCell").attr('title',getremarks);
-			$("#jqGrid tbody tr td.selectedRemarkCell").removeClass('selectedRemarkCell');
-			$(this).parent(".modal-footer").parent(".modal-content").find(".close").trigger('click');
+		//var oldRemarks = $("#jqGrid tbody tr td.selectedRemarkCell").text().trim();
+		if(!$("#getremarksData").val().trim()){
+			$("#getremarksData").addClass("inputErrorBorderFull");
+		}
+		else{
+			var userinfo = JSON.parse(window.localStorage['_UI']);
+			var d = new Date();
+			var DATE = d.getDate() + "/" + (d.getMonth()+1) + "/" + d.getFullYear();
+			var TIME = d.getHours() +":"+ d.getMinutes() +":"+ d.getSeconds();
+			var getremarks = $("#getremarksData").val().trim() + " (From: "+userinfo.firstname+" "+userinfo.lastname+" On: "+ DATE + " " + TIME +")";
+			if(getremarks.length > 0){
+				$("#jqGrid tbody tr td.selectedRemarkCell").text(getremarks);
+				$("#jqGrid tbody tr td.selectedRemarkCell").attr('title',getremarks);
+				$("#jqGrid tbody tr td.selectedRemarkCell").removeClass('selectedRemarkCell');
+				$(this).parent(".modal-footer").parent(".modal-content").find(".close").trigger('click');
+			}			
 		}
 	})
 	
@@ -3308,34 +3348,34 @@ function contentTable(newTestScriptDataLS) {
 						$grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
 						break;
 					}
-					else if(appTypeLocal == 'DesktopJava' && (obType =='button' ||obType =='input' ||obType =='select' || obType =='list'|| obType =='a' || obType =='label' || obType =='scrollbar' || obType =='menu' 
-						|| obType == null || obType == 'checkbox'|| obType == 'radiobutton' || obType != undefined || obType == 'table' || obType == 'internalframe') ){
+					else if(appTypeLocal == 'DesktopJava' && (obType =='push button' ||obType =='text' ||obType =='combo box' || obType =='list item'|| obType =='hyperlink' || obType =='label' || obType =='scroll bar' || obType =='toggle button' || obType =='menu' 
+						||obType =='list' || obType == 'edit' || obType == 'Edit Box' || obType == null || obType == 'Static' || obType == 'check box'|| obType == 'radio button' || obType == 'panel' || obType != undefined || obType == 'table')){
 						var sc;
-						if(obType =='button' || obType =='button'){
+						if(obType =='push button' || obType =='toggle button'){
 							sc = Object.keys(keywordArrayList.button);		
 							selectedKeywordList = "button";
 						}
-						else if(obType == 'input'){
+						else if(obType == 'edit'|| obType == 'Edit Box' || obType =='text'){
 							sc = Object.keys(keywordArrayList.text);
 							selectedKeywordList = "text";
 						}
-						else if(obType =='select'){
+						else if(obType =='combo box'){
 							sc = Object.keys(keywordArrayList.select);
 							selectedKeywordList = "select";
 						}
-						else if(obType =='list' ){
+						else if(obType =='list item' || obType =='list' ){
 							sc = Object.keys(keywordArrayList.list);
 							selectedKeywordList = "list";
 						}
-						else if(obType =='a'){
+						else if(obType =='hyperlink' || obType =='Static'){
 							sc = Object.keys(keywordArrayList.link);
 							selectedKeywordList = "link";
 						}
-						else if(obType =='checkbox'){
+						else if(obType =='check box'){
 							sc = Object.keys(keywordArrayList.checkbox);
 							selectedKeywordList = "checkbox";
 						}
-						else if(obType =='radiobutton'){
+						else if(obType =='radio button'){
 							sc = Object.keys(keywordArrayList.radiobutton);
 							selectedKeywordList = "radiobutton";
 						}
@@ -3343,11 +3383,11 @@ function contentTable(newTestScriptDataLS) {
 							sc = Object.keys(keywordArrayList.table);
 							selectedKeywordList = "table";
 						}
-						else if(obType == 'scrollbar'){
+						else if(obType == 'scroll bar'){
 							sc = Object.keys(keywordArrayList.scrollbar);
 							selectedKeywordList = "scrollbar";
 						}
-						else if(obType == 'internalframe'){
+						else if(obType == 'internal frame'){
 							sc = Object.keys(keywordArrayList.internalframe);
 							selectedKeywordList = "internalframe";
 						}

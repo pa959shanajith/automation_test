@@ -5,10 +5,7 @@ var Joi = require('joi');
 var cassandra = require('cassandra-driver');
 var async = require('async');
 var uuid = require('uuid-random');
-var dbConnICE = require('../../server/config/icetestautomation')
-, Phantom = require('phantom')
-, tmpdir = require('os').tmpdir()
-, fs = require('fs');
+var dbConnICE = require('../../server/config/icetestautomation');
 
 exports.getMainReport_ICE = function(req, res){
 	try{
@@ -76,7 +73,7 @@ exports.renderReport_ICE = function(req, res){
 						response.pipe(res)						
 					}
 					else{
-						var filename = shortId;
+						/*var filename = shortId;
 						var file = tmpdir + filename;
 						res.header('Content-disposition', 'inline; filename=' + filename);
 						res.header('Content-type', 'application/pdf');
@@ -94,8 +91,8 @@ exports.renderReport_ICE = function(req, res){
 						      page.set('paperSize', '5in');
 						      page.set('onLoadFinished', dispatchPDF);
 						   });
-						});
-						//response.pipe(res)
+						});*/
+						response.pipe(res)
 					}
 				}
 				catch(exception){
