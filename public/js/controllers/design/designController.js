@@ -18,7 +18,15 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 
 	//Task Listing
 	loadUserTasks()
-	
+	if(window.localStorage['_CT'] == "")
+	{
+		var taskAuth = false;
+	}
+
+	if(window.localStorage['_CT'] == "" && taskAuth == false)
+	{
+		window.location.href = "/";
+	}
 	//Default Function to reset all input, select
 	$scope.resetTextFields = function(){
 		$("input").val('');

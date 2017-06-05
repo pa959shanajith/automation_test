@@ -1,6 +1,7 @@
 mySPA.controller('loginController', function ($scope, $http, $location, LoginService, cfpLoadingBar) {
 	$(".ic-username, .ic-password").parent().removeClass("input-border-error")
 	$scope.loginValidation = "";
+	window.localStorage.clear();
 	window.localStorage['LoginSuccess'] = "False";
 	document.getElementById("currentYear").innerHTML = new Date().getFullYear()
 

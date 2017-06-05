@@ -14,6 +14,14 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 		/*document.getElementById("currentYear").innerHTML = new Date().getFullYear()*/
 		angular.element(document.getElementById("reportSection")).scope().getReports_ICE();
 	}, 100)
+	if(window.localStorage["_VP"] == "false")
+	{
+		var taskAuth = false;
+	}
+	if(window.localStorage["_VP"] == "false" && taskAuth == false)
+	{
+		window.location.href = "/";
+	}
 	//Loading Project Info
 	//var getProjInfo = JSON.parse(window.localStorage['_T'])
 	//$(".upper-section-testsuites").append('<span class="suitedropdownicon"><span class="iconSpace">Down</span></span>');
