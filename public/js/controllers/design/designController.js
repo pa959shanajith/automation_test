@@ -2613,7 +2613,8 @@ function contentTable(newTestScriptDataLS) {
 				if(historyArray[i] != "" && historyArray[i] != " "){
 					$(".historyContents").append("<span class=''>"+historyArray[i]+"</span>");					
 				}		
-			}			
+			}
+			$(".historyDetailsContainer").show();
 		}
 		else $(".historyDetailsContainer").hide();
 		//$("#modalDialogRemarks").find('.modal-title').text("Remarks");

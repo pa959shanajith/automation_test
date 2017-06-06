@@ -2222,8 +2222,9 @@ input[disabled]{
 	width: 100%;
     max-height: 110px;
     border: 1px solid #ccc;
-    padding: 3px;
+    padding: 3px !important;
     float: left;
+    overflow: auto;
 }
 .historyContents span{
 	color: black;
@@ -2231,6 +2232,12 @@ input[disabled]{
     float: left;
     display: list-item;
     margin-left: 16px;
+}
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-thumb {
+    border-radius: 10px;background-color:#311d4e;border:1px solid transparent;border-left-color:#e6e7e9;border-right-color:#e6e7e9;-webkit-border-radius:10px;-moz-border-radius:10px;
 }
 /******Custom Bootstrap Dialog CSS******/
 
@@ -3540,6 +3547,17 @@ select:-webkit-autofill:focus {
 
 @media only screen and (height:1024px){
 	.suitestartend thead, .scenarioReports thead{position: relative;}
+}
+
+@media only screen and (height:1080px){
+	.designDataTable{width: 1617px;}
+	.container-plugins{width: 1510px;}
+	.plugin-block span{
+		-webkit-transform: translateX(-103%) translateY(-50%);
+	}
+	.tabeleCellPadding{width: 4%;}
+	.suitestartend thead{width: calc(100% - 1004px);}
+	.formatpdfbrwsrexport{left: 75px;}
 }
 
 /* @media only screen and (min-width:1366px) {
