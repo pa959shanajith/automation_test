@@ -1673,7 +1673,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				}
 				angular.element(innerUL).append(li);
 			}
-			
+			$("#saveObjects").trigger("click");
 			$("#dialog-addObject").modal("hide");
 			openDialog("Add Object", "Objects has been added successfully.")
 			//$("#addObjectSuccess").modal("show")
@@ -1881,9 +1881,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		//var tasks = JSON.parse(window.localStorage['_TJ']);
 		var tasks = JSON.parse(window.localStorage['_CT'])
 		if(eaCheckbox) var getScrapeData = JSON.stringify(newScrapedList);
-		else var getScrapeData = JSON.stringify(viewString);
-
-		
+		else var getScrapeData = JSON.stringify(viewString);		
 		var screenId = tasks.screenId;
 		var screenName = tasks.screenName;
 		var projectId = tasks.projectId;
@@ -2003,6 +2001,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 
 	//save button clicked - save the testcase steps
 	$scope.updateTestCase_ICE = function()	{
+		cfpLoadingBar.start();
 		var userInfo = JSON.parse(window.localStorage['_UI']);
 		var taskInfo = JSON.parse(window.localStorage['_CT']);
 		if(userInfo.role == "Viewer") return false;
@@ -2125,6 +2124,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				return false;
 			}
 		}
+		cfpLoadingBar.complete();
 	}
 	
 	//Filter Scrape Objects
@@ -2251,13 +2251,13 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		//var testScenarioId = "e191bb4a-2c4f-4909-acef-32bc60e527bc";
 		var testScenarioId = JSON.parse(window.localStorage['_CT']).scenarioId;
 		DesignServices.getTestcasesByScenarioId_ICE(testScenarioId)
-							.then(function(data) {
-						$("#dependentTestCasesContent").empty();
-						//data = data.sort();
-						for(var i=0;i<data.length;i++)
-						{
-							$("#dependentTestCasesContent").append("<span class='testcaseListItem'><input data-attr = "+data[i].testcaseId+" class='checkTestCase' type='checkbox' id='dependentTestCase_"+i+"' /><label title="+data[i].testcaseName+" class='dependentTestcases' for='dependentTestCase_"+i+"'>"+data[i].testcaseName+"</label></span><br />");
-						}
+		.then(function(data) {
+			$("#dependentTestCasesContent").empty();
+			//data = data.sort();
+			for(var i=0;i<data.length;i++)
+			{
+				$("#dependentTestCasesContent").append("<span class='testcaseListItem'><input data-attr = "+data[i].testcaseId+" class='checkTestCase' type='checkbox' id='dependentTestCase_"+i+"' /><label title="+data[i].testcaseName+" class='dependentTestcases' for='dependentTestCase_"+i+"'>"+data[i].testcaseName+"</label></span><br />");
+			}
 
 
 			$(document).on('click','#debugOn',function() {
@@ -2265,8 +2265,8 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				checkedTestcases = [];
 				if(checkedLength == 0)
 				{
-						$("span.errTestCase").removeClass("hide");
-						return false;
+					$("span.errTestCase").removeClass("hide");
+					return false;
 				}
 				else{
 					$("span.errTestCase").addClass("hide");
@@ -2275,18 +2275,18 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					});
 					if(checkedTestcases.length > 0)
 					{
-							checkedTestcases.push(JSON.parse(window.localStorage['_CT']).testCaseId);
-							$("button.close:visible").trigger('click');
-							$("#globalModal").find('.modal-title').text("Dependent Test Cases");
-							$("#globalModal").find('.modal-body p').html("Dependent Test Cases saved successfully");
-							$("#globalModal").modal("show");
-							dependentTestCaseFlag = true;
+						checkedTestcases.push(JSON.parse(window.localStorage['_CT']).testCaseId);
+						$("button.close:visible").trigger('click');
+						$("#globalModal").find('.modal-title').text("Dependent Test Cases");
+						$("#globalModal").find('.modal-body p').html("Dependent Test Cases saved successfully");
+						$("#globalModal").modal("show");
+						dependentTestCaseFlag = true;
 					}
 					else{
-						    $("button.close:visible").trigger('click');
-							$("#globalModal").find('.modal-title').text("Dependent Test Cases");
-							$("#globalModal").find('.modal-body p').html("Failed to save dependent testcases");
-							$("#globalModal").modal("show");
+						$("button.close:visible").trigger('click');
+						$("#globalModal").find('.modal-title').text("Dependent Test Cases");
+						$("#globalModal").find('.modal-body p').html("Failed to save dependent testcases");
+						$("#globalModal").modal("show");
 					}
 				}
 			});
@@ -2511,8 +2511,8 @@ function contentTable(newTestScriptDataLS) {
 		$(this).parent('td').next('td[aria-describedby="jqGrid_remarks"]').addClass('selectedRemarkCell');
 		var historyDetails = $(this).parent('td').next('td[aria-describedby="jqGrid_remarks"]').text().trim();
 		var historyArray = [];
-		$("#getremarksData").val('');
-		$("#modalDialogRemarks").modal("show");
+		/*$("#getremarksData").val('');
+		$("#modalDialogRemarks").modal("show");*/
 		if(historyDetails.indexOf(";") >= 0)
 			historyArray = historyDetails.split(";");
 		else{
@@ -2557,7 +2557,6 @@ function contentTable(newTestScriptDataLS) {
 	
 	function hideOtherFuncOnEdit()
 	{
-	
 		$("#jqGrid").each(function() {
 			var cboxCheckedLen = $(".cbox:not(#cb_jqGrid):checked").length;
 			var cboxLen = $(".cbox:not(#cb_jqGrid)").length;
@@ -3303,13 +3302,13 @@ function contentTable(newTestScriptDataLS) {
 						break;
 					}
 					else if(appTypeLocal == 'DesktopJava' && (obType =='push button' ||obType =='text' ||obType =='combo box' || obType =='list item'|| obType =='hyperlink' || obType =='label' || obType =='scroll bar' || obType =='toggle button' || obType =='menu' 
-						||obType =='list' || obType == 'edit' || obType == 'Edit Box' || obType == null || obType == 'Static' || obType == 'check box'|| obType == 'radio button' || obType == 'panel' || obType != undefined || obType == 'table')){
+						||obType =='list' || obType == 'edit' || obType == 'Edit Box' || obType == null || obType == 'Static' || obType == 'check box'|| obType == 'radio button' || obType == 'panel' || obType != undefined || obType == 'table') || obType == 'password text'){
 						var sc;
 						if(obType =='push button' || obType =='toggle button'){
 							sc = Object.keys(keywordArrayList.button);		
 							selectedKeywordList = "button";
 						}
-						else if(obType == 'edit'|| obType == 'Edit Box' || obType =='text'){
+						else if(obType == 'edit'|| obType == 'Edit Box' || obType =='text' || obType =='password text'){
 							sc = Object.keys(keywordArrayList.text);
 							selectedKeywordList = "text";
 						}
@@ -3654,6 +3653,11 @@ function editTestCaseRow(){
 		$("#jqGrid").jqGrid("setColProp", "appType", {editable: true});
 		$("#jqGrid").resetSelection();
 		$("#jqGrid").trigger("reloadGrid");
+		$("#jqGrid tr").each(function(){
+			$(this).attr("id",$(this).index());
+			$(this).children("td[aria-describedby='jqGrid_stepNo']").attr("title",$(this).index()).text($(this).index());
+			$(this).children("td[aria-describedby='jqGrid_cb']").children("input").attr("id","jqg_jqGrid_"+$(this).index()).attr("name","jqg_jqGrid_"+$(this).index());
+		})
 		$("#jqGrid").find(">tbody").sortable("disable");
 		$(this).focus();
 		$("#jqGrid tr").each(function(){
@@ -3816,7 +3820,7 @@ $(document).on("click","#btnPasteTestStep", function(){
 	var proceed = true;
 	$("#errorMsgs1, #errorMsgs2, #errorMsgs3").hide();
 	if(!$("#getInputData").val()) $("#errorMsgs1").show();
-	else if(!/^[0-9.,]+$/.test($("#getInputData").val())) $("#errorMsgs2").show();
+	else if(!/^[0-9;]+$/.test($("#getInputData").val())) $("#errorMsgs2").show();
 	else{
 		var getRowJsonToPaste = JSON.parse(window.localStorage['getRowJsonCopy']);
 		//$(document).find(".dialogContent").append('<img src="imgs/loader1.gif" class="domainLoader" style="bottom: 20px; left: 20px;" />')
@@ -3950,6 +3954,9 @@ function pasteInGrid(){
 					$(this).siblings().removeClass("ui-state-highlight");
 				}
 			}
+			$(this).attr("id",$(this).index());
+			$(this).children("td[aria-describedby='jqGrid_stepNo']").attr("title",$(this).index()).text($(this).index());
+			$(this).children("td[aria-describedby='jqGrid_cb']").children("input").attr("id","jqg_jqGrid_"+$(this).index()).attr("name","jqg_jqGrid_"+$(this).index());
 		})
 	}
 
