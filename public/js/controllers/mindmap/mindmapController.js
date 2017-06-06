@@ -86,6 +86,9 @@ mySPA.controller('mindmapController', ['$scope', '$http', '$location', '$timeout
                  $("div.content-div").addClass("content-div-req");
                  $("div.content-div").removeClass("content-div-right-expand");
                  $(".project-list").removeClass("selectProject");
+                $timeout(function(){
+                    $("select.selectProject").removeClass("selectProjectPri");
+                },300)
              }
              else{
                  
@@ -99,6 +102,9 @@ mySPA.controller('mindmapController', ['$scope', '$http', '$location', '$timeout
                    $("div.content-div").removeClass("content-div-right-expand");
                    $(".project-list").removeClass("selectProject");
                 }
+                $timeout(function(){
+                    $("select.selectProject").addClass("selectProjectPri");
+                },300)
              }
              if(flg) $("#ct-moduleBox,.tabAssign").removeClass("leftBarOpen leftBarClose rightBarClose rightBarOpen bar-collaspe leftOpenRightClose rightOpenLeftClose").addClass("bar-expand");
                if(($("#left-nav-section").is(":visible") == false &&  $("#right-dependencies-section").is(":visible") == false))

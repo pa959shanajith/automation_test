@@ -190,6 +190,9 @@ p,a,img,text,span,.noselect{-webkit-touch-callout:none;-webkit-user-select:none;
     position: relative;
     left: -90px !important;
 }
+.selectProjectPri{    
+    left: 0px !important;
+}
 .selectProjectLabel{
     float: left;
     margin: 2px 8px 0 0;
