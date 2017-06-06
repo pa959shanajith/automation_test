@@ -17,6 +17,14 @@ var dbConnICE = require('../../server/config/icetestautomation');
  */
 exports.readTestSuite_ICE = function (req, res) {
 	//internal variables
+	if(req.cookies['connect.sid'] != undefined)
+		{
+			var sessionCookie = req.cookies['connect.sid'].split(".");
+			var sessionToken = sessionCookie[0].split(":");
+			sessionToken = sessionToken[1];
+		}
+			if(sessionToken != undefined && req.session.id == sessionToken)
+		{
 	var outexecutestatus=[];
 	var outcondition=[];
 	var outdataparam=[];
@@ -157,6 +165,11 @@ exports.readTestSuite_ICE = function (req, res) {
 	})
 		}
 	});
+		}
+		else{
+		res.send("Invalid Session");
+	}
+
 };
 
 /**
@@ -208,6 +221,15 @@ function Projectnametestcasename_ICE(req,cb,data){
  * to the testsuites table of icetestautomation keyspace 
  */
 exports.updateTestSuite_ICE = function (req, res) {
+	if(req.cookies['connect.sid'] != undefined)
+		{
+			var sessionCookie = req.cookies['connect.sid'].split(".");
+			var sessionToken = sessionCookie[0].split(":");
+			sessionToken = sessionToken[1];
+		}
+			if(sessionToken != undefined && req.session.id == sessionToken)
+		{
+
 	//internal variables
 	var hasrow = false;
 	var flag = "fail";
@@ -295,6 +317,10 @@ exports.updateTestSuite_ICE = function (req, res) {
 			});
 		}
 	}
+		}
+		else{
+		res.send("Invalid Session");
+	}	
 }
 
 
@@ -310,6 +336,14 @@ exports.updateTestScenario_ICE = function (req, res) {
 	 */
 
 	// var userinfo = req.payload.userinfo;
+	if(req.cookies['connect.sid'] != undefined)
+		{
+			var sessionCookie = req.cookies['connect.sid'].split(".");
+			var sessionToken = sessionCookie[0].split(":");
+			sessionToken = sessionToken[1];
+		}
+			if(sessionToken != undefined && req.session.id == sessionToken)
+		{
 	var requestedtestscycleId = req.body.cycleId;
 	var requestedtestscenarioid = req.body.testscenarioid;
 	var requestedtestscenarioname = req.body.testscenarioname;
@@ -360,12 +394,24 @@ exports.updateTestScenario_ICE = function (req, res) {
 			}
 		});
 	}
+		}
+		else{
+		res.send("Invalid Session");
+	}
 }
 //UpdateTestSscnario Functionality
 
 
 //ExecuteTestSuite Functionality
 exports.ExecuteTestSuite_ICE = function (req, res) {
+	if(req.cookies['connect.sid'] != undefined)
+		{
+			var sessionCookie = req.cookies['connect.sid'].split(".");
+			var sessionToken = sessionCookie[0].split(":");
+			sessionToken = sessionToken[1];
+		}
+			if(sessionToken != undefined && req.session.id == sessionToken)
+		{
 	var scenarioIdList = [];
 				var scenarioIdList = [];
 				var dataparamlist = [];
@@ -466,6 +512,10 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 		}
 		
 	});
+		}
+	else{
+		res.send("Invalid Session");
+	}	
 }
 
 
@@ -638,7 +688,14 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 	 * @author Shreeram
 	 */
 	exports.getTestcaseDetailsForScenario_ICE = function (req, res) {
-
+		if(req.cookies['connect.sid'] != undefined)
+		{
+			var sessionCookie = req.cookies['connect.sid'].split(".");
+			var sessionToken = sessionCookie[0].split(":");
+			sessionToken = sessionToken[1];
+		}
+			if(sessionToken != undefined && req.session.id == sessionToken)
+		{
 		var requiredtestscenarioid = req.body.testScenarioId;
 		//var requiredtestscenarioname = req.testScenarioName;
 
@@ -655,9 +712,10 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 				}
 			}
 		})
-
-
-
+	}
+	else{
+		res.send("Invalid Session");
+	}
 	}
 
 	//Function to fetch all the testcase,screen and project names for provided scenarioid

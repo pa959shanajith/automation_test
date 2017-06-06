@@ -24,6 +24,14 @@ var xpath="";
 
 exports.initScraping_ICE = function (req, res) {
 	try{
+		  if(req.cookies['connect.sid'] != undefined)
+		{
+			var sessionCookie = req.cookies['connect.sid'].split(".");
+			var sessionToken = sessionCookie[0].split(":");
+			sessionToken = sessionToken[1];
+		}
+			if(sessionToken != undefined && req.session.id == sessionToken)
+		{
 		var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 		console.log(Object.keys(myserver.allSocketsMap),"<<all people, asking person:",ip);
 		var mySocket = myserver.allSocketsMap[ip];
@@ -104,7 +112,11 @@ exports.initScraping_ICE = function (req, res) {
 				console.log(exception);
 			}
 		}
-	}catch(exception){
+	}
+	else{
+		res.send("Invalid Session");
+	}
+}catch(exception){
 		console.log(exception);
 		res.send("unavailableLocalServer");
 	}
@@ -117,6 +129,14 @@ exports.initScraping_ICE = function (req, res) {
  */
  exports.highlightScrapElement_ICE = function(req, res) {
 	try{
+		  if(req.cookies['connect.sid'] != undefined)
+		{
+			var sessionCookie = req.cookies['connect.sid'].split(".");
+			var sessionToken = sessionCookie[0].split(":");
+			sessionToken = sessionToken[1];
+		}
+			if(sessionToken != undefined && req.session.id == sessionToken)
+		{
 	 	var focusParam = req.body.elementXpath+","+req.body.elementUrl;
 		var appType = req.body.appType;
 		var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
@@ -125,7 +145,11 @@ exports.initScraping_ICE = function (req, res) {
 		mySocket.emit("focus", focusParam, appType);
 		var flag = 'success';
 		res.send(flag);
-	}catch(exception){
+	}
+	else{
+		res.send("Invalid Session");
+	}
+}catch(exception){
 		console.log(exception);
 	}
 };
@@ -137,6 +161,14 @@ exports.initScraping_ICE = function (req, res) {
  */
 exports.getScrapeDataScreenLevel_ICE = function(req, res){
 	try{
+		 if(req.cookies['connect.sid'] != undefined)
+		{
+			var sessionCookie = req.cookies['connect.sid'].split(".");
+			var sessionToken = sessionCookie[0].split(":");
+			sessionToken = sessionToken[1];
+		}
+			if(sessionToken != undefined && req.session.id == sessionToken)
+		{
 		var flag = "";
 		var getScrapeDataQuery = "select screenid,screenname,screendata from screens where "+
 				" screenid ="+ req.body.screenId + 
@@ -149,7 +181,12 @@ exports.getScrapeDataScreenLevel_ICE = function(req, res){
 						console.log(exception);
 					}
 			});
-	}catch(exception){
+	}
+		else{
+			res.send("Invalid Session");
+		}
+	}
+	catch(exception){
 		console.log(exception);
 	}
 };
@@ -195,6 +232,14 @@ exports.updateScreen_ICE = function(req, res){
 		/*
 		 * internal variables 
 		 */
+		if(req.cookies['connect.sid'] != undefined)
+		{
+			var sessionCookie = req.cookies['connect.sid'].split(".");
+			var sessionToken = sessionCookie[0].split(":");
+			sessionToken = sessionToken[1];
+		}
+			if(sessionToken != undefined && req.session.id == sessionToken)
+		{
 		var projectID, screenID, screenName,getScrapeData,scrapedObjects, modifiedBy, userInfo,appType, requestedversionnumber ,param;
 		var updateData = req.body.scrapeObject; 
 		projectID   = updateData.projectId;
@@ -1047,7 +1092,13 @@ exports.updateScreen_ICE = function(req, res){
 				console.log(exception);
 			}
 		}
-	}catch(exception){
+	}
+	else{
+		res.send("Invalid Session");
+	}
+
+	}
+	catch(exception){
 		console.log(exception);
 	}
 };
@@ -1197,6 +1248,14 @@ function uploadTestCaseData(updateTestCasesQuery,uploadTestCaseDatacallback){
 */
 exports.readTestCase_ICE = function (req, res) {
 	try{
+		if(req.cookies['connect.sid'] != undefined)
+		{
+			var sessionCookie = req.cookies['connect.sid'].split(".");
+			var sessionToken = sessionCookie[0].split(":");
+			sessionToken = sessionToken[1];
+		}
+			if(sessionToken != undefined && req.session.id == sessionToken)
+		{
 		//base output elements
 		var testcasesteps = "";
 		var testcasename = "";
@@ -1289,7 +1348,12 @@ exports.readTestCase_ICE = function (req, res) {
 				console.log(exception);
 			}
 		});
-	}catch(exception){
+	}
+	else{
+		res.send("Invalid Session");
+	}
+}
+catch(exception){
 		console.log(exception);
 	}
 };
@@ -1301,6 +1365,14 @@ exports.readTestCase_ICE = function (req, res) {
 */
 exports.updateTestCase_ICE = function (req, res) {
 	try{
+		if(req.cookies['connect.sid'] != undefined)
+		{
+			var sessionCookie = req.cookies['connect.sid'].split(".");
+			var sessionToken = sessionCookie[0].split(":");
+			sessionToken = sessionToken[1];
+		}
+			if(sessionToken != undefined && req.session.id == sessionToken)
+		{
 		/*
 		 *internal variables 
 		 */
@@ -1385,6 +1457,10 @@ exports.updateTestCase_ICE = function (req, res) {
 				console.log(exception);
 			}
 		});
+	}
+	else{
+		res.send("Invalid Session");
+	}
 	}catch(exception){
 		console.log(exception);
 	}
@@ -1397,6 +1473,14 @@ exports.updateTestCase_ICE = function (req, res) {
 */
 exports.debugTestCase_ICE = function (req, res) {
 	try{
+		if(req.cookies['connect.sid'] != undefined)
+		{
+			var sessionCookie = req.cookies['connect.sid'].split(".");
+			var sessionToken = sessionCookie[0].split(":");
+			sessionToken = sessionToken[1];
+		}
+			if(sessionToken != undefined && req.session.id == sessionToken)
+		{
 		var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 		console.log(Object.keys(myserver.allSocketsMap),"<<all people, asking person:",ip);
 		var mySocket = myserver.allSocketsMap[ip];
@@ -1735,7 +1819,11 @@ exports.debugTestCase_ICE = function (req, res) {
 				console.log(exception);
 			}
 		}
-	}catch(exception){
+	}
+	else{
+		res.send("Invalid Session");
+	}
+}catch(exception){
 		res.send("unavailableLocalServer");
 		console.log(exception);
 	}
@@ -1750,6 +1838,14 @@ exports.debugTestCase_ICE = function (req, res) {
 */
 exports.getKeywordDetails_ICE = function getKeywordDetails_ICE(req, res) {
 	try{
+		if(req.cookies['connect.sid'] != undefined)
+		{
+			var sessionCookie = req.cookies['connect.sid'].split(".");
+			var sessionToken = sessionCookie[0].split(":");
+			sessionToken = sessionToken[1];
+		}
+			if(sessionToken != undefined && req.session.id == sessionToken)
+		{
 		// request variables
 		var requestedprojecttypename = req.body.projecttypename;
 		//var requestedprojecttypename = "Web";
@@ -1785,7 +1881,11 @@ exports.getKeywordDetails_ICE = function getKeywordDetails_ICE(req, res) {
 					console.log(exception);
 				}
 			});
-	}catch(exception){
+	}
+	else{
+		res.send("Invalid Session");
+	}
+}catch(exception){
 		console.log(exception);
 	}
 };
@@ -1793,6 +1893,14 @@ exports.getKeywordDetails_ICE = function getKeywordDetails_ICE(req, res) {
 //getDependentTestCases by ScenarioId
 exports.getTestcasesByScenarioId_ICE = function getTestcasesByScenarioId_ICE(req, res) {
 	try{
+		if(req.cookies['connect.sid'] != undefined)
+		{
+			var sessionCookie = req.cookies['connect.sid'].split(".");
+			var sessionToken = sessionCookie[0].split(":");
+			sessionToken = sessionToken[1];
+		}
+			if(sessionToken != undefined && req.session.id == sessionToken)
+		{
 		var testcasesArr = [];
 		var testScenarioId = req.body.testScenarioId;
 		var getTestcaseIds = "select testcaseids from testscenarios where testscenarioid = "+testScenarioId+" ALLOW FILTERING";
@@ -1859,6 +1967,10 @@ exports.getTestcasesByScenarioId_ICE = function getTestcasesByScenarioId_ICE(req
 						}
 				}
 			});
+	}
+	else{
+		res.send("Invalid Session");
+	}
 	}
 	catch(exception){
 		console.log(exception);

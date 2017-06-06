@@ -7,6 +7,14 @@ var cassandra = require('cassandra-driver');
 
 
 exports.getProjectDetails_ICE = function (req, res) {
+	if(req.cookies['connect.sid'] != undefined)
+		{
+			var sessionCookie = req.cookies['connect.sid'].split(".");
+			var sessionToken = sessionCookie[0].split(":");
+			sessionToken = sessionToken[1];
+		}
+			if(sessionToken != undefined && req.session.id == sessionToken)
+		{
             //base request elements
             var requestedprojectid = req.body.projectId;
             //response data
@@ -36,6 +44,10 @@ exports.getProjectDetails_ICE = function (req, res) {
                     res.send(responsedata);
                 }
             });
+		}
+				else{
+				res.send("Invalid Session");
+			}
         }
 exports.logoutUser_Nineteen68 = function (req, res) {
        req.cookies['connect.sid'] = '';
@@ -48,6 +60,14 @@ exports.logoutUser_Nineteen68 = function (req, res) {
 
 //getReleaseName Functionality
 	exports.getReleaseNameByReleaseId_ICE = function (req, res) {
+		if(req.cookies['connect.sid'] != undefined)
+		{
+			var sessionCookie = req.cookies['connect.sid'].split(".");
+			var sessionToken = sessionCookie[0].split(":");
+			sessionToken = sessionToken[1];
+		}
+			if(sessionToken != undefined && req.session.id == sessionToken)
+		{
 		var releaseId = req.body.releaseId;
 		var projectId = req.body.projectId;
 		if(projectId === 'undefined' || projectId === null|| projectId === ''|| releaseId ==='undefined' || releaseId === null || releaseId === ''){
@@ -77,10 +97,22 @@ exports.logoutUser_Nineteen68 = function (req, res) {
 					}
 			});
 		}
+		}
+		else{
+		res.send("Invalid Session");
+	}
 	  }
 
 //get cycleName
 exports.getCycleNameByCycleId_ICE = function (req, res) {
+	if(req.cookies['connect.sid'] != undefined)
+		{
+			var sessionCookie = req.cookies['connect.sid'].split(".");
+			var sessionToken = sessionCookie[0].split(":");
+			sessionToken = sessionToken[1];
+		}
+			if(sessionToken != undefined && req.session.id == sessionToken)
+		{
 	if(req.body.cycleId === 'undefined' || req.body.cycleId === null|| req.body.cycleId === ''|| req.body.releaseId ==='undefined' || req.body.releaseId === null || req.body.releaseId === '')
 	{
 		console.log('Invalid data received in getCycleNameByCycleId_ICE');
@@ -106,5 +138,9 @@ exports.getCycleNameByCycleId_ICE = function (req, res) {
 									}
 							}
 		});
+	}
+		}
+		else{
+		res.send("Invalid Session");
 	}
 }

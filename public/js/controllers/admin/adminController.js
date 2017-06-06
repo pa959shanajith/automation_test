@@ -36,6 +36,9 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 
 		adminServices.getAllUsers_Nineteen68()
 		.then(function (response) {
+			if(response == "Invalid Session"){
+				window.location.href = "/";
+				}
 			$("#selAssignUser").empty()
 			$("#selAssignUser").append('<option data-id="" value disabled selected>Select User</option>')
 			for(i=0; i<response.userIds.length && response.user_names.length; i++){
@@ -64,6 +67,9 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 			$('#allProjectAP, #assignedProjectAP').empty();
 			adminServices.getDomains_ICE()
 			.then(function (data) {
+				if(data == "Invalid Session"){
+				window.location.href = "/";
+				}
 				if (data == "No Records Found") {
 					var domainList = data;
 					$('#selAssignProject').empty();
@@ -118,6 +124,9 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 			var unAssignedProjects = {};
 			adminServices.getAssignedProjects_ICE(getAssignProj)
 			.then(function (data) {
+				if(data == "Invalid Session"){
+				window.location.href = "/";
+				}
 				$('#assignedProjectAP').empty();
 				projectData = [];
 				projectData = data;
@@ -135,6 +144,9 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 
 					adminServices.getDetails_ICE(idtype,requestedids)
 					.then(function (response) {
+						if(response == "Invalid Session"){
+				window.location.href = "/";
+				}
 						$('#allProjectAP').empty();
 						if(response.projectIds.length > 0)
 						{
@@ -171,6 +183,9 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 				else{
 					adminServices.getDetails_ICE(idtype,requestedids)
 					.then(function (res) {
+						if(res == "Invalid Session"){
+							window.location.href = "/";
+							}
 						if(res.projectIds.length > 0)
 						{
 							$("#assignedProjectAP,#allProjectAP").empty();
@@ -229,6 +244,9 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 			console.log(assignProjectsObj);
 			adminServices.assignProjects_ICE(assignProjectsObj)
 			.then(function (data) {
+					if(data == "Invalid Session"){
+							window.location.href = "/";
+							}
 				if(data == 'success')
 				{
 					openModelPopup("Assign Projects", "Projects assigned to user successfully");
@@ -261,6 +279,9 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 		}, 10)
 		adminServices.getDomains_ICE()
 		.then(function (data) {
+			if(data == "Invalid Session"){
+							window.location.href = "/";
+							}
 			if (data == "No Records Found") {
 				var domainList = data;
 				$('#selDomain').empty();
@@ -425,6 +446,9 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 
 			adminServices.createUser_Nineteen68(createUser)
 			.then(function (data) { 
+				if(data == "Invalid Session"){
+							window.location.href = "/";
+							}
 				if (data == "Success") {
 					openModelPopup("Create User", "User created successfully");
 					resetCreateUser();
@@ -458,6 +482,9 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 		$("#passwordIcon").parent().show()
 		adminServices.getUserRoles_Nineteen68()
 		.then(function (response) {
+			if(response == "Invalid Session"){
+							window.location.href = "/";
+							}
 			userRoleArrayList = response.userRoles;
 			var getDropDown;
 			// if (getTab == "create") {
@@ -530,6 +557,9 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 						var proceeed = false;
 						adminServices.getNames_ICE(requestedids,idtype)
 						.then(function (response) {
+						if(response == "Invalid Session"){
+							  window.location.href = "/";
+							}
 							if(response == "No Projects"){
 								proceeed = true;
 							}							
@@ -560,6 +590,9 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 								console.log("Controller: " + createprojectObj);
 								adminServices.createProject_ICE(createprojectObj,userDetails)
 								.then(function (response) {
+									if(response == "Invalid Session"){
+							  window.location.href = "/";
+							}
 									if(response == 'success')
 									{
 										openModelPopup("Create Project", "Project created successfully");
@@ -672,6 +705,9 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 
 					adminServices.updateProject_ICE(updateProjectObj, userDetails)
 					.then(function (response) {
+						if(response == "Invalid Session"){
+							  window.location.href = "/";
+							}
 						clearUpdateProjectObjects();
 						if(response == 'success')
 						{
@@ -1493,6 +1529,9 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 				var idtype=["cycledetails"];
 				adminServices.getDetails_ICE(idtype,CycleID)
 				.then(function (response) {
+					if(response == "Invalid Session"){
+							  window.location.href = "/";
+							}
 					if((response.testsuiteIds == undefined && cycId == undefined) || response.testsuiteIds.length <= 0){
 						for(var i=0;i<updateProjectDetails.length;i++)
 						{
@@ -1604,6 +1643,9 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 		$scope.tab = "editUser";
 		adminServices.getAllUsers_Nineteen68()
 		.then(function (response) {
+			if(response == "Invalid Session"){
+							  window.location.href = "/";
+							}
 			$("#userSelect").empty()
 			$("#userSelect").append('<option data-id="" value disabled selected>Select User</option>')
 			for(i=0; i<response.userIds.length && response.user_names.length; i++){
@@ -1635,6 +1677,9 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 		$scope.tab = "editProject";
 		adminServices.getDomains_ICE()
 		.then(function (data) {
+			if(data == "Invalid Session"){
+							  window.location.href = "/";
+							}
 			if (data == "No Records Found") {
 				var domainList = data;
 				$('#selDomainEdit').empty();
@@ -1678,6 +1723,9 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 			var idtype=["domaindetails"];
 			adminServices.getDetails_ICE(idtype,requestedids)
 			.then(function (response) {
+				if(response == "Invalid Session"){
+							  window.location.href = "/";
+							}
 				if(response.projectNames.length > 0)
 				{
 					$('#selProject').empty();
@@ -1723,6 +1771,9 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 			//console.log("projects", projects);
 			adminServices.getDetails_ICE(idtype,requestedids)
 			.then(function (response) {
+				if(response == "Invalid Session"){
+							  window.location.href = "/";
+							}
 				//console.log("resposne", response);
 				$("div.projectTypes").addClass("disableProjectType");
 				switch (response.appType)
@@ -1802,6 +1853,9 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 		var userName = $("#userSelect option:selected").val();
 		adminServices.getUsersInfo(userId, userName)
 		.then(function (response) {
+			if(response == "Invalid Session"){
+							  window.location.href = "/";
+							}
 			$("#firstName").val(response.firstName);
 			$("#lastName").val(response.lastName);
 			$("#email").val(response.emailId != undefined? response.emailId : "");
@@ -1815,6 +1869,9 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 			var roleId = response.roleId;
 			adminServices.getUserRoles_Nineteen68()
 			.then(function (response) {
+				if(response == "Invalid Session"){
+							  window.location.href = "/";
+							}
 				$("#userRoles").empty().append('<option value disabled>Select User Role</option>')
 				for(i=0; i<response.r_ids.length && response.userRoles.length; i++){
 					if(roleId == response.r_ids[i]){
@@ -1884,6 +1941,9 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 			updateUserObj.userId = $("#userSelect option:selected").data("id");
 			adminServices.updateUser_nineteen68(updateUserObj)
 			.then(function (response) {
+				if(response == "Invalid Session"){
+							  window.location.href = "/";
+							}
 				if(response == "success"){
 					openModelPopup("Edit User", "User has been edited successfully.");
 					resetUpdateUser();

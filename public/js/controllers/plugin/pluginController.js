@@ -29,11 +29,16 @@ mySPA.controller('pluginController',['$scope','$window','$http','$location','$ti
 		var userid = userInfo.user_id;
 			PluginService.getProjectIDs_Nineteen68(userid)
 			.then(function (data) { 
-			 if(data != "Fail")
+			 if(data != "Fail" && data != "Invalid Session")
 			 {
 				 var obj={'userid':userid,'prjId':data};
 				 PluginService.getTaskJson_Nineteen68(obj)
 				 .then(function (data) { 
+					 if(data == "Invalid Session")
+					 {
+						 window.location.href = "/";
+					 }
+					 else{
 					 //console.log(data);
 					 var tasksJson = data;
 					 window.localStorage['_TJ'] = angular.toJson(tasksJson);
@@ -52,8 +57,12 @@ mySPA.controller('pluginController',['$scope','$window','$http','$location','$ti
 							 counter++
 						 }
 					 }
+					}
 				 }, function (error) { console.log("Error:::::::::::::", error) })
 			 }	
+			 else{
+				 window.location.href = "/";
+			 }
 			}, function (error) { console.log("Error:::::::::::::", error) })
 	}
 	
