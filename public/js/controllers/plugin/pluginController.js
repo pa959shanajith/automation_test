@@ -16,9 +16,16 @@ mySPA.controller('pluginController',['$scope','$window','$http','$location','$ti
 			$(this).parent().hide();
 		}
 	});
+	window.localStorage["_VP"] = false;
+	window.localStorage["_VM"] = false;
 	if(window.localStorage['_UI'])
 	{
 		var userInfo =  JSON.parse(window.localStorage['_UI']);
+		var userRole = window.localStorage['_SR'];
+		if(userRole == "Test Manager")
+		{
+			//$(".task-content").hide();
+		}
 		var userid = userInfo.user_id;
 			PluginService.getProjectIDs_Nineteen68(userid)
 			.then(function (data) { 
@@ -97,6 +104,7 @@ mySPA.controller('pluginController',['$scope','$window','$http','$location','$ti
 	
     //Plugin click event 
     $scope.pluginFunction = function(name){
+		window.localStorage["_VP"] = true;
     	$window.location.assign(name)
     }
     window.localStorage['_TJ'] = "";
@@ -168,7 +176,7 @@ function p_event(name){
     angular.element(document.getElementsByClassName("plugin-block")).scope().pluginFunction(name)
 	if(name == "p_Mindmap")
 	{
-		debugger;
+		window.localStorage["_VM"] = true;
 		window.location.href = '/home';
 	}
 }

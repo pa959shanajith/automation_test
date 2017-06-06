@@ -1474,7 +1474,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 				{
 					for(var j=0;j<projectDetails[i].cycleNames.length;j++)
 					{
-						if(projectDetails[i].cycleNames[j] == $("#"+deleteCycleId).parent().prev('span.cycleName').text())
+						if((projectDetails[i].cycleNames[j] == $("#"+deleteCycleId).parent().prev('span.cycleName').text()) && (projectDetails[i].releaseName == $("li.active").children('span.releaseName').text()))
 						{
 							delete projectDetails[i].cycleNames[j];
 							projectDetails[i].cycleNames =  projectDetails[i].cycleNames.filter(function(n){ return n != null });

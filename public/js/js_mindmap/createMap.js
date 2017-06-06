@@ -128,11 +128,11 @@ var initiate = function(){
 	u=canvas.append('svg').attr('id','ct-actionBox').append('g');
 	t=u.append('g').attr('id','ct-saveAction').attr('class','ct-actionButton').on('click',actionEvent);
 	t.append('rect').attr('x',0).attr('y',0).attr('rx',12).attr('ry',12);
-	t.append('text').attr('x',23).attr('y',18).html('Save');
+	t.append('text').attr('x',23).attr('y',18).text('Save');
 	if(selectedTab == "tabCreate"){
 		t=u.append('g').attr('id','ct-createAction').attr('class','ct-actionButton').on('click',actionEvent);
 		t.append('rect').attr('x',100).attr('y',0).attr('rx',12).attr('ry',12);
-		t.append('text').attr('x',114).attr('y',18).html('Create');
+		t.append('text').attr('x',114).attr('y',18).text('Create');
 	}
 	
 	
@@ -557,6 +557,9 @@ var nodeClick = function(e){
 					$("#startDate").datepicker("show");
 			});
 			f=w.append('ul').attr('class','ct-asValCalBox dropdown-menu');//.on('click',$('.ct-asValBoxIcon.ct-asItemCal.btn.dropdown-toggle').datepicker());
+			if(tObj.sd != ''){
+				$("#startDate").attr('disabled','disabled');
+			}
 			$("#startDate").val(tObj.sd);
 							
 		}
@@ -1158,6 +1161,10 @@ var actionEvent = function(e){
 	s.classed('no-access',!0);
 	var userInfo =  JSON.parse(window.localStorage['_UI']);
 	var username = userInfo.username;
+	if($('.project-list').val()==null){
+		openDialogMindmap('Error','No projects is assigned to User');
+		return !1;
+	}
 	dataSender({task:'writeMap',data:{write:flag,map:mapData,user_name:username,abc:deletednode,xyz:unassignTask,prjId:$('.project-list').val(),relId:$('#ct-assignRel').val(),cycId:$('#ct-assignCyc').val()}},function(err,result){
 		s.classed('no-access',!1);
 		if(err){

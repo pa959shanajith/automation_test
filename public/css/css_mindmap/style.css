@@ -188,9 +188,18 @@ p,a,img,text,span,.noselect{-webkit-touch-callout:none;-webkit-user-select:none;
 .selectProject{
     float: right;
     position: relative;
+    left: -90px !important;
+}
+.selectProjectPri{    
     left: 0px !important;
 }
-.project-list{width: 200px;left: -90px;position: relative;}
+.selectProjectLabel{
+    float: left;
+    margin: 2px 8px 0 0;
+    font-size: 14px;
+    font-family: LatoWeb;
+}
+.project-list{width: 200px;position: relative;}
 /*FOR MINDMAP ENDS HERE*/
 .ct-show-left{
     width: 10px !important;
