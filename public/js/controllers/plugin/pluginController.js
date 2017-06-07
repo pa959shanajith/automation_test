@@ -24,7 +24,7 @@ mySPA.controller('pluginController',['$scope','$window','$http','$location','$ti
 		var userRole = window.localStorage['_SR'];
 		if(userRole == "Test Manager")
 		{
-			//$(".task-content").hide();
+			$(".task-content").hide();
 		}
 		var userid = userInfo.user_id;
 			PluginService.getProjectIDs_Nineteen68(userid)
