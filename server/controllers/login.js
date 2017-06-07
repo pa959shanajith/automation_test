@@ -69,7 +69,8 @@ exports.loadUserInfo_Nineteen68 = function(req, res){
 		}
 		if(sessionToken != undefined && req.session.id == sessionToken)
 		{
-					userName = req.body.username;
+		
+		userName = req.body.username;
 		jsonService = {};
 		userpermissiondetails = [];
 	      async.series({
@@ -96,6 +97,8 @@ exports.loadUserInfo_Nineteen68 = function(req, res){
 		        						jsonService.lastname = service.lastname;
 		        						jsonService.role = service.defaultrole;
 		        						jsonService.username = service.username;
+									req.session.defaultRoleId = jsonService.role;
+									
 		                			}
 		                			else{
 		                				console.log("No records found.");
@@ -115,6 +118,37 @@ exports.loadUserInfo_Nineteen68 = function(req, res){
 	            		res.send("fail");
 	            	}
 	            },
+			 loggedinRole: function(callback){
+				 var getRoleInfo = "select rolename from roles where roleid = "+req.session.defaultRoleId +" allow filtering";
+					dbConn.execute(getRoleInfo, function (err, rolesResult) {
+						if(err){
+							console.log("Error occured in getRoleNameByRoleId_Nineteen68 : Fail");
+							res.send("fail");
+						}else{
+							try{
+								if (rolesResult.rows.length == 0){
+									console.log("No Records Found");
+									res.send("fail");
+								}else{
+									try{
+										var role="";
+										for (var i = 0; i < rolesResult.rows.length; i++) {
+											role = rolesResult.rows[i].rolename;
+										}
+										req.session.defaultRole = role;
+									}catch(exception){
+										console.log(exception);
+										res.send("fail");
+									}
+								}
+							callback();
+							}catch(exception){
+								console.log(exception);
+								res.send("fail");
+							}
+						}
+					});
+			 },
 	          //Service call to get the plugins accessible for the user
 	            userPlugins: function(callback){
 	            	try{
