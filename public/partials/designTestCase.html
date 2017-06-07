@@ -339,20 +339,24 @@
 	
 	<!-- Remarks Modal popup -->
 	<div id="modalDialogRemarks" class="modal fade" role="dialog" data-keyboard="false" data-backdrop="static">
-		<div class="modal-dialog modal-sm">
+		<div class="modal-dialog modal-sm" style="width: 390px;">
 			<!-- Modal content-->
 			<div class="modal-content">
 				<div class="modal-header">
 					<button type="button" class="close" data-dismiss="modal">&times;</button>
-					<h4 class="modal-title"></h4>
+					<h4 class="modal-title">Remarks</h4>
 				</div>
 				<div class="modal-body">
 					<!--Modal Content-->
 					<form class="form-inline">
 						<!--Inputs Seprators-->
-						<div class="row row-modal">					
+						<div class="row row-modal">
+							<div class="form-group historyDetailsContainer" style="width: 100% !important; margin: 0 0 12px 0;">
+								<label id="labelContentHistory" style="margin-bottom: 0px; color: black;">History</label>
+								<div id="historyContent" class="historyContents"></div>								
+							</div>
 							<div class="form-group" style="width: 100% !important;">
-								<label id="labelContent" style="margin-bottom: 0px; color: black;"></label>
+								<label id="labelContent" style="margin-bottom: 0px; color: black;">Add Remarks</label>
 								<textarea class="form-control" id="getremarksData"></textarea>
 							</div>
 						</div>
@@ -361,7 +365,7 @@
 					<!--Modal Content-->
 				</div>
 				<div class="modal-footer">
-					<button type="button" class="btn btn-default" id="">Submit</button>
+					<button type="button" class="btn btn-default" id="btnaddRemarks">Submit</button>
 				</div>
 			</div>
 		</div>

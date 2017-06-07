@@ -265,7 +265,10 @@ var addTask = function(e){
 		$("#ct-assignCyc").css('border','').addClass("inputErrorBorderFull");
 		return false;
 	}
-	
+	if(new Date($("#endDate").val())<=(new Date($("#startDate").val()))){
+		$("#endDate").css('border','').addClass("inputErrorBorderFull");
+		return false;
+	}
 	d3.select('#ct-assignBox').classed('no-disp',!0);
 	var a,b,p=d3.select(activeNode);
 	var pi=parseInt(p.attr('id').split('-')[2]);
@@ -293,7 +296,7 @@ var addTask = function(e){
 		reviewerFlag=false;
 	}
 	if(dateFlag && reviewerFlag){
-		Object.keys(tObj).forEach(function(k){if(tObj[k]==''||tObj[k]===undefined) tObj[k]=null;});
+		Object.keys(tObj).forEach(function(k){if(tObj[k]===undefined) tObj[k]=null;});
 		//if(p.select('.ct-nodeTask')[0][0]==null) p.append('image').attr('class','ct-nodeTask').attr('xlink:href','images_mindmap/node-task-assigned.png').attr('x',29).attr('y',-10);
 		if(nType=="modules"){
 			if(tObj.cy != 'select cycle' && tObj.re != 'select release'){

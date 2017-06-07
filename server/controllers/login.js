@@ -15,6 +15,7 @@ var userRoles = {};
 //Authenticate User - Nineteen68
 exports.authenticateUser_Nineteen68 = function(req, res){
       try{
+		
             console.log("Inside Authenticate User");
             var username = req.body.username;
             var password = req.body.password;
@@ -60,7 +61,15 @@ exports.authenticateUser_Nineteen68 = function(req, res){
 //Load User Information - Nineteen68
 exports.loadUserInfo_Nineteen68 = function(req, res){
 	try{
-		userName = req.body.username;
+		if(req.cookies['connect.sid'] != undefined)
+		{
+			var sessionCookie = req.cookies['connect.sid'].split(".");
+			var sessionToken = sessionCookie[0].split(":");
+			sessionToken = sessionToken[1];
+		}
+		if(sessionToken != undefined && req.session.id == sessionToken)
+		{
+					userName = req.body.username;
 		jsonService = {};
 		userpermissiondetails = [];
 	      async.series({
@@ -158,6 +167,10 @@ exports.loadUserInfo_Nineteen68 = function(req, res){
 	    		  res.send(jsonService);
 	    	  }
 	      })
+		}
+		else{
+			res.send("Invalid Session");
+		}
 	}
 	catch(exception){
         console.log(exception);
@@ -168,6 +181,14 @@ exports.loadUserInfo_Nineteen68 = function(req, res){
 //Get UserRoles By RoleId - Nineteen68
 exports.getRoleNameByRoleId_Nineteen68 = function(req, res){
       try{
+		if(req.cookies['connect.sid'] != undefined)
+		{
+			var sessionCookie = req.cookies['connect.sid'].split(".");
+			var sessionToken = sessionCookie[0].split(":");
+			sessionToken = sessionToken[1];
+		}
+			if(sessionToken != undefined && req.session.id == sessionToken)
+		{
            var roleId= req.body.role;
            var flag="";
            var getRoleInfo = "select rolename from roles where roleid = "+roleId+" allow filtering";
@@ -198,7 +219,12 @@ exports.getRoleNameByRoleId_Nineteen68 = function(req, res){
                        }
                  }
            });
-     }catch(exception){
+     }
+     else{
+	     res.send("Invalid Session");
+     }
+}
+catch(exception){
            console.log(exception);
            res.send("fail");
      }

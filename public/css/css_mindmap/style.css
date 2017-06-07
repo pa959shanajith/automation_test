@@ -399,3 +399,9 @@ select
 {
     overflow: visible !important;
 }*/
+
+/*****************Media query**********************/
+@media only screen and (height:1080px){
+	.content-div-req{width: 86.8% !important;}
+	#ct-moduleBox, .ct-moduleBoxOptional{width: 89%;}
+}

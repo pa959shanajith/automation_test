@@ -61,15 +61,24 @@ mySPA.controller('headerController', function($scope,$http,$location,headerServi
 		projectId.push(JSON.parse(window.localStorage['_CT']).projectId);
 		headerServices.getNames_ICE(projectId,['projects']) 
 		.then(function(data){
+			if(data == "Invalid Session"){
+				  window.location.href = "/";
+				}
 			$scope.projectDetails = data;
 			task = JSON.parse(window.localStorage['_CT']);
 			releaseId.push(task.releaseId);
 			headerServices.getNames_ICE(releaseId, ['releases']) 
 			.then(function(data){
+					if(data == "Invalid Session"){
+				  window.location.href = "/";
+				}
 				$scope.releaseDetails = data;
 				cycleId.push(task.cycleId);
 				headerServices.getNames_ICE(cycleId, ['cycles'])
 				.then(function(data){
+						if(data == "Invalid Session"){
+				  window.location.href = "/";
+				}
 					console.log("cycleDetails", data);
 					$scope.cycleDetails = data;
 				}, function(error) {	console.log("Failed to get cycle name")});

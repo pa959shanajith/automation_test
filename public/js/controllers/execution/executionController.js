@@ -57,6 +57,9 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 		getEachScenario = []
 		ExecutionService.readTestSuite_ICE(cycleId, testSuiteId,testSuiteName)
 		.then(function(data) {
+			if(data == "Invalid Session"){
+					window.location.href = "/";
+			 }
 			if(data == ""){}
 			else{
 				cfpLoadingBar.complete();
@@ -150,6 +153,9 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 		$('#modalScenarioDetails').find('.btn-default').focus();
 		ExecutionService.loadLocationDetails(scenarioName, scenarioId)
 		.then(function(data) {
+			if(data == "Invalid Session"){
+					window.location.href = "/";
+			 }
 			for(i=0; i<data.projectnames.length && data.testcasenames.length && data.screennames.length; i++){
 				//document.getElementById("scenarioDetailsContent").innerHTML += '<div class="sDInnerContentsWrap"><div class="sDInnerContents">'+data.testcasenames[i]+'</div><div class="sDInnerContents">'+data.screennames[i]+'</div><div class="sDInnerContents">'+data.projectnames[i]+'</div></div>'
 				$("#scenarioDetailsContent").append('<div class="sDInnerContentsWrap"><div class="sDInnerContents">'+data.testcasenames[i]+'</div><div class="sDInnerContents">'+data.screennames[i]+'</div><div class="sDInnerContents">'+data.projectnames[i]+'</div></div>')
@@ -198,6 +204,9 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 		//Getting ConditionChecks
 		ExecutionService.updateTestSuite_ICE(cycleId, testSuiteId, testSuiteName, testScenarioIds, executeStatus, conditionCheck, getParamPaths, userinfo)
 		.then(function(data) {
+			if(data == "Invalid Session"){
+					window.location.href = "/";
+			 }
 			if(data != "fail"){
 				openDialogExe("Save Test Suite", "Test suite saved successfully.")
 				//$("#saveSuitesModal").modal("show")
@@ -241,6 +250,9 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 			blockUI("Execution in progress. Please Wait...")
 			ExecutionService.ExecuteTestSuite_ICE(selectedRowData, browserTypeExe, testSuiteId)
 			.then(function(data){
+				if(data == "Invalid Session"){
+					window.location.href = "/";
+			 }
 				if(data == "Terminate"){
 					$('#executionTerminated').modal('show');
 					$('#executionTerminated').find('.btn-default').focus();

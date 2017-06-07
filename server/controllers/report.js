@@ -9,6 +9,14 @@ var dbConnICE = require('../../server/config/icetestautomation');
 
 exports.getMainReport_ICE = function(req, res){
 	try{
+		if(req.cookies['connect.sid'] != undefined)
+		{
+			var sessionCookie = req.cookies['connect.sid'].split(".");
+			var sessionToken = sessionCookie[0].split(":");
+			sessionToken = sessionToken[1];
+		}
+			if(sessionToken != undefined && req.session.id == sessionToken)
+		{
 		var IP = req.headers.host.split(":")[0];//req.connection.servername;//localAddress.split(":")[req.connection.localAddress.split(":").length-1];
 		console.log("Jsreport server IP:::::",IP);
 		var client = require("jsreport-client")("https://"+IP+":8001/");
@@ -35,6 +43,11 @@ exports.getMainReport_ICE = function(req, res){
 			}
 		});
 	}
+	else{
+		res.send("Invalid Session");
+	}
+}
+
 	catch(exception){
 		console.log(exception);
 		res.send("fail");
@@ -43,6 +56,15 @@ exports.getMainReport_ICE = function(req, res){
 
 exports.renderReport_ICE = function(req, res){
 	try{
+		if(req.cookies['connect.sid'] != undefined)
+		{
+			var sessionCookie = req.cookies['connect.sid'].split(".");
+			var sessionToken = sessionCookie[0].split(":");
+			sessionToken = sessionToken[1];
+		}
+			if(sessionToken != undefined && req.session.id == sessionToken)
+		{
+
 		var finalReports = req.body.finalreports;
 		var reportType = req.body.reporttype;
 		var shortId;
@@ -102,6 +124,10 @@ exports.renderReport_ICE = function(req, res){
 			}
 		});		
 	}
+	else{
+		res.send("Invalid Session");
+	}
+}
 	catch(exception){
 		console.log(exception);
 		res.send("fail")
@@ -109,6 +135,14 @@ exports.renderReport_ICE = function(req, res){
 }
 
 exports.getAllSuites_ICE = function (req, res) {
+	if(req.cookies['connect.sid'] != undefined)
+		{
+			var sessionCookie = req.cookies['connect.sid'].split(".");
+			var sessionToken = sessionCookie[0].split(":");
+			sessionToken = sessionToken[1];
+		}
+			if(sessionToken != undefined && req.session.id == sessionToken)
+		{
 	console.log("coming into getAllSuites_ICE service")
 	var req_userId=req.body.userId;
 	//req_userId = 'a144b468-e84f-4e7c-9a8a-0a658330212e';
@@ -218,11 +252,24 @@ exports.getAllSuites_ICE = function (req, res) {
 					res.send(JSON.stringify(testSuiteDetails));
 				} 
 			})
+		}
+	else{
+		res.send("Invalid Session");
+	}	
 }
 
 
 exports.getSuiteDetailsInExecution_ICE = function (req, res) {
 	try{
+		if(req.cookies['connect.sid'] != undefined)
+		{
+			var sessionCookie = req.cookies['connect.sid'].split(".");
+			var sessionToken = sessionCookie[0].split(":");
+			sessionToken = sessionToken[1];
+		}
+			if(sessionToken != undefined && req.session.id == sessionToken)
+		{
+
 		var req_testsuiteId=req.body.testsuiteid;
 		var startTime, endTime, starttime, endtime;
 		var executionDetailsJSON=[];
@@ -257,6 +304,10 @@ exports.getSuiteDetailsInExecution_ICE = function (req, res) {
 			}
 		});
 	}
+	else{
+		res.send("Invalid Session");
+	}
+	}
 	catch(exception){
 		console.log(exception);
 		res.send("fail");
@@ -266,6 +317,14 @@ exports.getSuiteDetailsInExecution_ICE = function (req, res) {
 
 exports.reportStatusScenarios_ICE = function (req, res) {
 	try{
+		f(req.cookies['connect.sid'] != undefined)
+		{
+			var sessionCookie = req.cookies['connect.sid'].split(".");
+			var sessionToken = sessionCookie[0].split(":");
+			sessionToken = sessionToken[1];
+		}
+			if(sessionToken != undefined && req.session.id == sessionToken)
+		{
 		var req_executionId = req.body.executionId;
 		var reportList=[];
 		var report=[];
@@ -335,6 +394,10 @@ exports.reportStatusScenarios_ICE = function (req, res) {
 			} 
 		})		
 	}
+		else{
+		res.send("Invalid Session");
+	}
+}
 	catch(exception){
 		console.log(exception);
 		res.send("fail");
@@ -343,6 +406,14 @@ exports.reportStatusScenarios_ICE = function (req, res) {
 
 
 exports.getReport = function (req, res) {
+	if(req.cookies['connect.sid'] != undefined)
+		{
+			var sessionCookie = req.cookies['connect.sid'].split(".");
+			var sessionToken = sessionCookie[0].split(":");
+			sessionToken = sessionToken[1];
+		}
+			if(sessionToken != undefined && req.session.id == sessionToken)
+		{
 	var reportDetails=[];
 	async.series({	
 		reportdetails:function(callback){
@@ -370,10 +441,23 @@ exports.getReport = function (req, res) {
 			});
 		}
 	})
+		}
+	else{
+		res.send("Invalid Session");
+	}
 }
 
 exports.getReport_Nineteen68 = function(req, res) {
 	try{
+		
+if(req.cookies['connect.sid'] != undefined)
+		{
+			var sessionCookie = req.cookies['connect.sid'].split(".");
+			var sessionToken = sessionCookie[0].split(":");
+			sessionToken = sessionToken[1];
+		}
+			if(sessionToken != undefined && req.session.id == sessionToken)
+		{
 		var reportId = req.body.reportId;
 		var testsuiteId = req.body.testsuiteId;
 		var testsuitename = req.body.testsuitename;
@@ -551,6 +635,10 @@ exports.getReport_Nineteen68 = function(req, res) {
 			}
 		});		
 	}
+	else{
+		res.send("Invalid Session");
+	}
+}
 	catch(exception){
 		console.log(exception);
 		res.send("fail");
@@ -560,6 +648,15 @@ exports.getReport_Nineteen68 = function(req, res) {
 
 exports.exportToJson_ICE = function(req, res) {
 	try{
+		if(req.cookies['connect.sid'] != undefined)
+		{
+			var sessionCookie = req.cookies['connect.sid'].split(".");
+			var sessionToken = sessionCookie[0].split(":");
+			sessionToken = sessionToken[1];
+		}
+			if(sessionToken != undefined && req.session.id == sessionToken)
+		{
+
 		var reportId = req.body.reportId;
 		var reportInfoObj = {};
 		async.series({
@@ -641,6 +738,10 @@ exports.exportToJson_ICE = function(req, res) {
 			}
 		});		
 	}
+	else{
+		res.send("Invalid Session");
+	}
+}
 	catch(exception){
 		console.log(exception);
 		res.send("fail");

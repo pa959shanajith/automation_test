@@ -113,6 +113,10 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			// service call # 1 - getTestScriptData service call
 			DesignServices.readTestCase_ICE(screenId, testCaseId, testCaseName)	
 			.then(function(data) {
+				if(data == "Invalid Session")
+				{
+					window.location.href = "/";
+				}
 				console.log(data);
 				var appType = taskInfo.appType;
 				$('#jqGrid').removeClass('visibility-hide').addClass('visibility-show');
@@ -126,6 +130,10 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				// service call # 2 - objectType service call
 				DesignServices.getScrapeDataScreenLevel_ICE(screenId)
 				.then(function(data2)	{
+						if(data2 == "Invalid Session")
+						{
+							window.location.href = "/";
+						}
 					if(appType == "Webservice") {
 						if(data2 != "") dataFormat12 = data2.header[0].split("##").join("\n");
 					}
@@ -140,6 +148,10 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					// service call # 3 -objectType service call
 					DesignServices.getKeywordDetails_ICE(appType)
 					.then(function(data3)	{
+							if(data3 == "Invalid Session")
+						{
+							window.location.href = "/";
+						}
 						keywordValArr.length = 0;
 						keywordListData = angular.toJson(data3);						
 						var emptyStr = "{}";
@@ -254,6 +266,10 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			blockUI(blockMsg); 
 			DesignServices.debugTestCase_ICE(browserType,checkedTestcases)
 			.then(function(data)	{
+				if(data == "Invalid Session")
+				{
+					window.location.href = "/";
+				}
 				console.log("debug-----",data);
 				if (data == "unavailableLocalServer")	{
 					unblockUI();
@@ -282,6 +298,10 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			blockUI(blockMsg);    
 			DesignServices.debugTestCase_ICE(browserType,testcaseID)
 			.then(function(data)	{
+					if(data == "Invalid Session")
+				{
+					window.location.href = "/";
+				}
 				console.log("debug-----",data);
 				if (data == "unavailableLocalServer")	{
 					unblockUI();
@@ -414,6 +434,10 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 							else{
 								DesignServices.updateTestCase_ICE(screenId,testCaseId,testCaseName,resultString,userInfo)
 								.then(function(data) {
+										if(data == "Invalid Session")
+										{
+											window.location.href = "/";
+										}
 									if (data == "success") {
 										angular.element(document.getElementById("tableActionButtons")).scope().readTestCase_ICE();
 										openDialog("Import Testcase", "TestCase Json imported successfully.");
@@ -478,6 +502,10 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 						else{
 							DesignServices.updateTestCase_ICE(screenId,testCaseId,testCaseName,resultString,userInfo)
 							.then(function(data) {
+											if(data == "Invalid Session")
+										{
+											window.location.href = "/";
+										}
 										if (data == "success") {
 											angular.element(document.getElementById("tableActionButtons")).scope().readTestCase_ICE();
 											openDialog("Import Testcase", "TestCase Json imported successfully.");
@@ -539,6 +567,10 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 						else{
 							DesignServices.updateTestCase_ICE(screenId,testCaseId,testCaseName,resultString,userInfo)
 							.then(function(data) {
+								if(data == "Invalid Session")
+										{
+											window.location.href = "/";
+										}
 								if (data == "success") {
 									angular.element(document.getElementById("tableActionButtons")).scope().readTestCase_ICE();
 									openDialog("Import Testcase", "TestCase Json imported successfully.");
@@ -571,6 +603,10 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		var testCaseName = taskInfo.testCaseName;
 		DesignServices.readTestCase_ICE(screenId, testCaseId, testCaseName)
 		.then(function(response) {	
+			if(response == "Invalid Session")
+				{
+					window.location.href = "/";
+				}
 			var temp, responseData;
 			if (typeof response === 'object') {
 				temp=JSON.parse(response.testcase);
@@ -674,6 +710,10 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		enableScreenShotHighlight = true;
 		DesignServices.getScrapeDataScreenLevel_ICE() 
 		.then(function(data){
+			if(data == "Invalid Session")
+			{
+				window.location.href = "/";
+			}
 			gsElement = [];
 			$(".popupWrap").animate({ opacity: 0, right: "70px" }, 100).css({'z-index':'0','pointer-events':'none'});
 			$(".filterObjects").removeClass("popupContent-filter-active").addClass("popupContent-default");
@@ -831,6 +871,10 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		}*/
 		DesignServices.getScrapeDataScreenLevel_ICE() 
 		.then(function(data){
+				if(data == "Invalid Session")
+			{
+				window.location.href = "/";
+			}
 			if(typeof data === "object"){
 				//Printing the Save data in UI
 				$("#endPointURL").val(data.endPointURL);
@@ -945,6 +989,10 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			scrapeObject.userinfo = userinfo;
 			DesignServices.updateScreen_ICE(scrapeObject)
 			.then(function(data){
+					if(data == "Invalid Session")
+			{
+				window.location.href = "/";
+			}
 				if(data == "success"){
 					openDialog("Save WebService Template", "WebService Template saved successfully.");
 					//$("#WSSaveSuccess").modal("show");
@@ -1050,6 +1098,10 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			initWSJson.testcase = testCaseWS
 			DesignServices.initScrapeWS_ICE(initWSJson)
 			.then(function (data) {
+					if(data == "Invalid Session")
+			{
+				window.location.href = "/";
+			}
 				if (data == "unavailableLocalServer")	{
 					unblockUI();
 					openDialog("Web Service Screen", "ICE Engine is not available. Please run the batch file and connect to the Server.");
@@ -1094,6 +1146,10 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			blockUI(blockMsg);
 			DesignServices.launchWSDLGo(wsdlUrl)
 			.then(function(data) {
+					if(data == "Invalid Session")
+			{
+				window.location.href = "/";
+			}
 				if (data == "fail")	{
 					unblockUI();
 					openDialog("WSDL-Scrape Screen", "Invalid WSDL url.");
@@ -1131,6 +1187,10 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		else{
 			DesignServices.wsdlAdd(wsdlUrl, wsdlSelectedMethod)
 			.then(function(data) {
+					if(data == "Invalid Session")
+			{
+				window.location.href = "/";
+			}
 				if (data == "unavailableLocalServer")	{
 					unblockUI();
 					openDialog("WSDL Add-Scrape Screen", "ICE Engine is not available. Please run the batch file and connect to the Server.");
@@ -1285,6 +1345,10 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			//For Web
 			DesignServices.initScraping_ICE(screenViewObject)
 			.then(function (data) {
+					if(data == "Invalid Session")
+			{
+				window.location.href = "/";
+			}
 				window.localStorage['disableEditing'] = "true";
 				unblockUI();
 				if (data == "unavailableLocalServer")	{
@@ -1454,6 +1518,10 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		scrapeObject.userinfo = userinfo;
 		DesignServices.updateScreen_ICE(scrapeObject)
 		.then(function(data) {
+				if(data == "Invalid Session")
+			{
+				window.location.href = "/";
+			}
 			if(data == "success")
 			{
 				openDialog("Delete Scrape Objects", "Scraped Objects deleted successfully.")
@@ -1561,6 +1629,10 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		else{
 			DesignServices.highlightScrapElement_ICE(xpath,url, appType)
 			.then(function(data) {
+					if(data == "Invalid Session")
+			{
+				window.location.href = "/";
+			}
 				if(data == "fail"){
 					openDialog("Fail", "Failed to highlight")
 				}
@@ -1856,6 +1928,10 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				
 				DesignServices.mapScrapeData_ICE(scrapeObject)
 				.then(function(data){
+						if(data == "Invalid Session")
+			{
+				window.location.href = "/";
+			}
 					$("#dialog-mapObject").modal("hide");
 					if(data == "Success") 				openDialog("Map Object", "Objects has been mapped successfully.");//$("#mapObjSuccess").modal("show");
 					else if(data == "TagMissMatch") 	openDialog("Map Object", "Failed to map objects.");//$("#mapObjTagMissMatch").modal("show");
@@ -1930,6 +2006,10 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		//Update Service to Save Scrape Objects
 		DesignServices.updateScreen_ICE(scrapeObject)
 		.then(function(data){
+				if(data == "Invalid Session")
+			{
+				window.location.href = "/";
+			}
 			if(data == "success"){
 				window.localStorage['_modified'] = "";
 				enableScreenShotHighlight = true;
@@ -2089,6 +2169,10 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				else{
 					DesignServices.updateTestCase_ICE(screenId,testCaseId,testCaseName,mydata,userInfo)
 					.then(function(data){
+							if(data == "Invalid Session")
+							{
+								window.location.href = "/";
+							}
 						if(data == "success"){
 							/*if(window.localStorage['UITSCrtd'] == "true") window.localStorage['UITSCrtd'] = "false"
 		        			else{
@@ -2252,6 +2336,10 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		var testScenarioId = JSON.parse(window.localStorage['_CT']).scenarioId;
 		DesignServices.getTestcasesByScenarioId_ICE(testScenarioId)
 		.then(function(data) {
+				if(data == "Invalid Session")
+			{
+				window.location.href = "/";
+			}
 			$("#dependentTestCasesContent").empty();
 			//data = data.sort();
 			for(var i=0;i<data.length;i++)
@@ -2525,7 +2613,8 @@ function contentTable(newTestScriptDataLS) {
 				if(historyArray[i] != "" && historyArray[i] != " "){
 					$(".historyContents").append("<span class=''>"+historyArray[i]+"</span>");					
 				}		
-			}			
+			}
+			$(".historyDetailsContainer").show();
 		}
 		else $(".historyDetailsContainer").hide();
 		//$("#modalDialogRemarks").find('.modal-title').text("Remarks");

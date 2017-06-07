@@ -11,7 +11,7 @@ var uuid = require('uuid-random');
 //var passwordHash = require('password-hash');
 var bcrypt = require('bcrypt');
 var async = require('async');
-var set = require('set');
+//var set = require('set');
 var dbConnICE = require('../../server/config/icetestautomation');
 
 var roles = [];
@@ -21,6 +21,14 @@ var userRoles = {};
 //GetUserRoles
 exports.getUserRoles_Nineteen68 = function(req, res){
 	try{
+		if(req.cookies['connect.sid'] != undefined)
+		{
+			var sessionCookie = req.cookies['connect.sid'].split(".");
+			var sessionToken = sessionCookie[0].split(":");
+			sessionToken = sessionToken[1];
+		}
+			if(sessionToken != undefined && req.session.id == sessionToken)
+		{
 		var getUserRoles = "select roleid, rolename from roles";
 		dbConn.execute(getUserRoles, function (err, result) {
 			if (err) {
@@ -41,6 +49,10 @@ exports.getUserRoles_Nineteen68 = function(req, res){
 				}
 			}
 		});
+	}
+	else{
+		res.send("Invalid Session");
+	}
 	}catch(exception){
 		console.log(exception);
 		res.send("fail");
@@ -49,6 +61,14 @@ exports.getUserRoles_Nineteen68 = function(req, res){
 
 //GetUsers service has been changed to populate the users who has access to the project
 exports.getUsers_Nineteen68 = function(req, res){
+	if(req.cookies['connect.sid'] != undefined)
+		{
+			var sessionCookie = req.cookies['connect.sid'].split(".");
+			var sessionToken = sessionCookie[0].split(":");
+			sessionToken = sessionToken[1];
+		}
+			if(sessionToken != undefined && req.session.id == sessionToken)
+		{
 	var roles = [];
 	var r_ids = [];
     var prjId=req.prjId;
@@ -118,11 +138,20 @@ exports.getUsers_Nineteen68 = function(req, res){
 
 		}
 	});
+  }
 };
 
 //GetUsers
 exports.getUsersOld_Nineteen68 = function(req, res){
 	try{
+		if(req.cookies['connect.sid'] != undefined)
+		{
+			var sessionCookie = req.cookies['connect.sid'].split(".");
+			var sessionToken = sessionCookie[0].split(":");
+			sessionToken = sessionToken[1];
+		}
+			if(sessionToken != undefined && req.session.id == sessionToken)
+		{
 		var roles = [];
 		var r_ids = [];
 		var userRoles = {userRoles:[],r_ids:[]};
@@ -150,6 +179,10 @@ exports.getUsersOld_Nineteen68 = function(req, res){
 			}
 		});		
 	}
+	else{
+		res.send("Invalid Session");
+	}
+	}
 	catch(exception){
 		console.log(exception);
 	}
@@ -158,6 +191,15 @@ exports.getUsersOld_Nineteen68 = function(req, res){
 //Get All Users
 exports.getAllUsers_Nineteen68 = function(req, res){
 	try{
+		if(req.cookies['connect.sid'] != undefined)
+		{
+			var sessionCookie = req.cookies['connect.sid'].split(".");
+			var sessionToken = sessionCookie[0].split(":");
+			sessionToken = sessionToken[1];
+		}
+			if(sessionToken != undefined && req.session.id == sessionToken)
+		{
+
 		var user_names = [];
 		var userIds = [];
 		var d_role = [];
@@ -195,6 +237,10 @@ exports.getAllUsers_Nineteen68 = function(req, res){
 			}
 		});
 	}
+	else{
+		res.send("Invalid Session");
+	}
+	}
 	catch(exception){
 		console.log(exception);
 		res.send("fail");
@@ -205,6 +251,14 @@ exports.getAllUsers_Nineteen68 = function(req, res){
 //Get Users for Edit
 exports.getEditUsersInfo_Nineteen68 = function(req, res){
 	try{
+		if(req.cookies['connect.sid'] != undefined)
+		{
+			var sessionCookie = req.cookies['connect.sid'].split(".");
+			var sessionToken = sessionCookie[0].split(":");
+			sessionToken = sessionToken[1];
+		}
+			if(sessionToken != undefined && req.session.id == sessionToken)
+		{
 		var reuestedUserName = req.body.userName;
 		var reuestedUserId = req.body.userId;
 		var userDetails = {};
@@ -233,6 +287,10 @@ exports.getEditUsersInfo_Nineteen68 = function(req, res){
 			catch(exception){console.log(exception);}
 		});		
 	}
+		else{
+		res.send("Invalid Session");
+	   }
+	}
 	catch(exception){console.log(exception);}
 };
 
@@ -240,6 +298,15 @@ exports.getEditUsersInfo_Nineteen68 = function(req, res){
 //CreateUser   
 exports.createUser_Nineteen68 = function(req, res){
 	try{
+		if(req.cookies['connect.sid'] != undefined)
+		{
+			var sessionCookie = req.cookies['connect.sid'].split(".");
+			var sessionToken = sessionCookie[0].split(":");
+			sessionToken = sessionToken[1];
+		}
+			if(sessionToken != undefined && req.session.id == sessionToken)
+		{
+
 		var flag = "fail";
 		var status = false;
 		var req_username = req.body.createUser.username;
@@ -287,6 +354,10 @@ exports.createUser_Nineteen68 = function(req, res){
 			}
 		})
 	}
+	else{
+		res.send("Invalid Session");
+	}
+	}
 	catch(exception){
 		console.log(exception);
 		res.send("fail");
@@ -297,6 +368,14 @@ exports.createUser_Nineteen68 = function(req, res){
 //Edit User
 exports.updateUser_nineteen68 = function updateUser_nineteen68(req, res) {
 	try{
+		if(req.cookies['connect.sid'] != undefined)
+		{
+			var sessionCookie = req.cookies['connect.sid'].split(".");
+			var sessionToken = sessionCookie[0].split(":");
+			sessionToken = sessionToken[1];
+		}
+			if(sessionToken != undefined && req.session.id == sessionToken)
+		{
 		var flag = "fail";
 		var status = false;
 		var userObj = req.body.updateUserObj;
@@ -377,6 +456,10 @@ exports.updateUser_nineteen68 = function updateUser_nineteen68(req, res) {
 			}
 		});		
 	}
+	else{
+		res.send("Invalid Session");
+	}
+	}
 	catch(exception){
 		console.log(exception);
 		res.send("fail");
@@ -386,6 +469,14 @@ exports.updateUser_nineteen68 = function updateUser_nineteen68(req, res) {
 //Get Domains
 exports.getDomains_ICE = function getDomains_ICE(req, res) {
 	try {
+		if(req.cookies['connect.sid'] != undefined)
+		{
+			var sessionCookie = req.cookies['connect.sid'].split(".");
+			var sessionToken = sessionCookie[0].split(":");
+			sessionToken = sessionToken[1];
+		}
+			if(sessionToken != undefined && req.session.id == sessionToken)
+		{
 		var responsedata = [];
 		var domainsQuery = "select domainid,domainname from domains";
 		dbConnICE.execute(domainsQuery, function(error, response) {
@@ -415,7 +506,11 @@ exports.getDomains_ICE = function getDomains_ICE(req, res) {
 		function finalresult(){
 			res.send(responsedata);
 		}
-	} catch (exception) {
+	}
+	else{
+		res.send("Invalid Session");
+	} 
+	}catch (exception) {
 		console.log(exception);
 		res.send("fail");
 	}
@@ -424,6 +519,14 @@ exports.getDomains_ICE = function getDomains_ICE(req, res) {
 //CheckReleaseNameExists
 exports.checkReleaseNameExists_ICE =  function checkReleaseNameExists_ICE(req, res) {
 	try{
+		if(req.cookies['connect.sid'] != undefined)
+		{
+			var sessionCookie = req.cookies['connect.sid'].split(".");
+			var sessionToken = sessionCookie[0].split(":");
+			sessionToken = sessionToken[1];
+		}
+			if(sessionToken != undefined && req.session.id == sessionToken)
+		{
 		var releaseName = req.body.releaseName;
 		var flag = "fail";
 		var status = false;
@@ -456,12 +559,24 @@ exports.checkReleaseNameExists_ICE =  function checkReleaseNameExists_ICE(req, r
 			});
 		}
 	}
+	else{
+		res.send("Invalid Session");
+	}
+	}
 	catch(exception){console.log(exception);}
 };
 
 //CheckCycleNameExists
 exports.checkCycleNameExists_ICE =  function checkCycleNameExists_ICE(req, res) {
 	try{
+		if(req.cookies['connect.sid'] != undefined)
+		{
+			var sessionCookie = req.cookies['connect.sid'].split(".");
+			var sessionToken = sessionCookie[0].split(":");
+			sessionToken = sessionToken[1];
+		}
+			if(sessionToken != undefined && req.session.id == sessionToken)
+		{
 		var cycleName = req.body.cycleName;
 		var flag = "fail";
 		var status = false;
@@ -495,11 +610,23 @@ exports.checkCycleNameExists_ICE =  function checkCycleNameExists_ICE(req, res) 
 			});
 		}
 	}
+	else{
+		res.send("Invalid Session");
+	}
+	}
 	catch(exception){console.log(exception);}
 };
 
 exports.createProject_ICE = function createProject_ICE(req, res) {
 	try{
+		if(req.cookies['connect.sid'] != undefined)
+		{
+			var sessionCookie = req.cookies['connect.sid'].split(".");
+			var sessionToken = sessionCookie[0].split(":");
+			sessionToken = sessionToken[1];
+		}
+			if(sessionToken != undefined && req.session.id == sessionToken)
+		{
 		var createProjectObj = req.body.createProjectObj;
 		var userinfo = req.body.userDetails;
 		var dateScreen = new Date().getTime();
@@ -616,6 +743,10 @@ exports.createProject_ICE = function createProject_ICE(req, res) {
 			}
 		})
 	}
+	else{
+		res.send("Invalid Session");
+	}
+	}
 	catch(exception){console.log(exception);}
 };
 
@@ -693,6 +824,14 @@ function createCycle(createCycleQuery,createCycleCallback){
  */
 exports.updateProject_ICE = function updateProject_ICE(req, res){
 	try{
+		if(req.cookies['connect.sid'] != undefined)
+		{
+			var sessionCookie = req.cookies['connect.sid'].split(".");
+			var sessionToken = sessionCookie[0].split(":");
+			sessionToken = sessionToken[1];
+		}
+			if(sessionToken != undefined && req.session.id == sessionToken)
+		{
 		var updateProjectDetails=req.body.updateProjectObj;
 		// var updateProjectDetails={projectId:"f9409e26-cb50-489b-9527-623ce9f23672"};
 		console.log(JSON.stringify(req.body.updateProjectObj));
@@ -1044,6 +1183,10 @@ exports.updateProject_ICE = function updateProject_ICE(req, res){
 			}
 		});		
 	}
+	else{
+		res.send("Invalid Session");
+	}
+	}
 	catch(exception){
 		console.log(exception);
 	}
@@ -1058,6 +1201,14 @@ exports.updateProject_ICE = function updateProject_ICE(req, res){
  */
 exports.getNames_ICE = function(req, res){
 	try{
+		if(req.cookies['connect.sid'] != undefined)
+		{
+			var sessionCookie = req.cookies['connect.sid'].split(".");
+			var sessionToken = sessionCookie[0].split(":");
+			sessionToken = sessionToken[1];
+		}
+			if(sessionToken != undefined && req.session.id == sessionToken)
+		{
 		var requestedidslist=req.body.requestedids;
 		var idtypes=req.body.idtype;
 		var index=0;
@@ -1179,6 +1330,10 @@ exports.getNames_ICE = function(req, res){
 			});
 		}		
 	}
+	else{
+		res.send("Invalid Session");
+	}
+	}
 	catch(exception){
 		console.log(exception);
 	}
@@ -1194,6 +1349,14 @@ exports.getNames_ICE = function(req, res){
  */
 exports.getDetails_ICE = function(req, res) {
 	try {
+		if(req.cookies['connect.sid'] != undefined)
+		{
+			var sessionCookie = req.cookies['connect.sid'].split(".");
+			var sessionToken = sessionCookie[0].split(":");
+			sessionToken = sessionToken[1];
+		}
+			if(sessionToken != undefined && req.session.id == sessionToken)
+		{
 		var requestedidslist = req.body.requestedids;
 		var idtypes = req.body.idtype;
 		var responsedata = {};
@@ -1432,7 +1595,13 @@ exports.getDetails_ICE = function(req, res) {
 				console.log(exception);
 			}
 		}
-	} catch (exception) {
+	}
+	else{
+		res.send("Invalid Session");
+	}
+}
+ 
+	catch (exception) {
 		console.log(exception);
 	}
 };
@@ -1440,6 +1609,14 @@ exports.getDetails_ICE = function(req, res) {
 //Save Assigned Projects
 exports.assignProjects_ICE = function(req, res){
 	try{
+		if(req.cookies['connect.sid'] != undefined)
+		{
+			var sessionCookie = req.cookies['connect.sid'].split(".");
+			var sessionToken = sessionCookie[0].split(":");
+			sessionToken = sessionToken[1];
+		}
+			if(sessionToken != undefined && req.session.id == sessionToken)
+		{
 		var assignProjectsDetails = req.body.assignProjectsObj;
 		var projectDetails = assignProjectsDetails.assignedProjects;
 		var projectIds = [];
@@ -1457,6 +1634,10 @@ exports.assignProjects_ICE = function(req, res){
 			}
 		});		
 	}
+	else{
+		res.send("Invalid Session");
+	}
+	}
 	catch (exception) {
 		console.log(exception);
 		res.send("fail");
@@ -1466,6 +1647,15 @@ exports.assignProjects_ICE = function(req, res){
 //get Assigned Projects
 exports.getAssignedProjects_ICE = function(req, res){
 	try{
+		
+if(req.cookies['connect.sid'] != undefined)
+		{
+			var sessionCookie = req.cookies['connect.sid'].split(".");
+			var sessionToken = sessionCookie[0].split(":");
+			sessionToken = sessionToken[1];
+		}
+			if(sessionToken != undefined && req.session.id == sessionToken)
+		{
 		var requestDetails = req.body.getAssignProj;
 		var assignedProjectIds =[];
 		var assignedProjObj = [];
@@ -1524,7 +1714,10 @@ exports.getAssignedProjects_ICE = function(req, res){
 				res.send("fail");
 			}
 		});
+	}else{
+		res.send("Invalid Session");
 	}
+}
 	catch (exception) {
 		console.log(exception);
 		res.send("fail");

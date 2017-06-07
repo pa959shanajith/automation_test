@@ -33,10 +33,16 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 	$scope.getReports_ICE = function(){
 		reportService.getMainReport_ICE()
 		.then(function(data1) {
+			if(data1 == "Invalid Session"){
+window.location.href = "/";
+}
 			if(data1 != "fail"){
 				$("#reportSection").append(data1)
 				reportService.getAllSuites_ICE(userID)
 				.then(function(data) {
+					if(data == "Invalid Session"){
+window.location.href = "/";
+}
 					if(data != "fail"){
 						$('.scrollbar-inner').scrollbar();
 						$('.scrollbar-macosx').scrollbar();
@@ -87,6 +93,9 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 		$('#scenarioReportsTable').find('tbody').empty();
 		reportService.getSuiteDetailsInExecution_ICE(testsuiteId)
 		.then(function(data) {
+			if(data == "Invalid Session"){
+window.location.href = "/";
+}
 			if(data != "fail"){
 				var tableContainer = $('#testSuitesTimeTable');
 				if(Object.prototype.toString.call(data) === '[object Array]'){
@@ -239,6 +248,9 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 		$('.formatpdfbrwsrexport').remove();
 		reportService.reportStatusScenarios_ICE(executionId)
 		.then(function(data) {
+			if(data == "Invalid Session"){
+window.location.href = "/";
+}
 			if(data != "fail"){
 				var scenarioContainer = $('#scenarioReportsTable');
 				if(Object.prototype.toString.call(data) === '[object Array]'){
@@ -372,6 +384,9 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 		}		
 		reportService.getReport_Nineteen68(reportID, testsuiteId,testsuitename)
 		.then(function(data) {
+			if(data == "Invalid Session"){
+window.location.href = "/";
+}
 			if(data != "fail"){
 				if(data.length > 0){
 					finalReports.overallstatus[0].domainName = data[0].domainname
@@ -426,6 +441,9 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 				}
 				reportService.renderReport_ICE(finalReports, reportType)
 				.then(function(data1) {
+					if(data1 == "Invalid Session"){
+window.location.href = "/";
+}
 					if(data1 != "fail"){
 						var path = "/specificreports";
 						openWindow = 0;
@@ -464,6 +482,9 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 		var repId = $(this).attr('data-reportid');		
 		reportService.exportToJson_ICE(repId)
 		.then(function(response) {
+			if(response == "Invalid Session"){
+window.location.href = "/";
+}
 			if(response != "fail"){
 				if (typeof response === 'object') {
 					var temp = JSON.parse(response.reportdata);

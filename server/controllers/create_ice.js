@@ -67,7 +67,7 @@ function get_scenarioName(testscenarioId,cb,data){
 };
 
 exports.getAllNames = function(parent,cb,data){
-
+        
             var parent_length=parent.length;
 			//task_json.testSuiteId=parent[1];
             var allNames = {"testsuitename":"","screenname":"","testcasename":"","scenarioname":"","testscenarioIds":[]};
@@ -133,7 +133,6 @@ exports.getAllNames = function(parent,cb,data){
 			cb(null,allNames);
 		});	
 			
-		
 
 };
 
@@ -198,6 +197,14 @@ function testcase_exists(testcasename,cb,data){
 
 //CreateStrcutre 
 exports.createStructure_Nineteen68 = function(req, res) {
+    if(req.cookies['connect.sid'] != undefined)
+		{
+			var sessionCookie = req.cookies['connect.sid'].split(".");
+			var sessionToken = sessionCookie[0].split(":");
+			sessionToken = sessionToken[1];
+		}
+			if(sessionToken != undefined && req.session.id == sessionToken)
+		{
     var RequestedJSON =req;
     var projectid = RequestedJSON.projectId;
     var cycleId = RequestedJSON.cycleId;
@@ -439,6 +446,10 @@ exports.createStructure_Nineteen68 = function(req, res) {
             }
         }
     );
+        }
+        else{
+		res.send("Invalid Session");
+	}
 }
 
 
@@ -1063,6 +1074,14 @@ var testcasedatatoupdate = [];
     });
 }
 exports.getReleaseIDs_Ninteen68 = function(req,res){
+    if(req.cookies['connect.sid'] != undefined)
+		{
+			var sessionCookie = req.cookies['connect.sid'].split(".");
+			var sessionToken = sessionCookie[0].split(":");
+			sessionToken = sessionToken[1];
+		}
+			if(sessionToken != undefined && req.session.id == sessionToken)
+		{
     var rname = [];
     var r_ids = [];
     var rel = {rel:[],r_ids:[]};
@@ -1090,9 +1109,21 @@ exports.getReleaseIDs_Ninteen68 = function(req,res){
             }
             
         });
+    }
+    else{
+		res.send("Invalid Session");
+	}
 }
 
 exports.getCycleIDs_Ninteen68 = function(req,res){
+    if(req.cookies['connect.sid'] != undefined)
+		{
+			var sessionCookie = req.cookies['connect.sid'].split(".");
+			var sessionToken = sessionCookie[0].split(":");
+			sessionToken = sessionToken[1];
+		}
+			if(sessionToken != undefined && req.session.id == sessionToken)
+		{
     var cname = [];
     var c_ids = [];
     var cyc = {cyc:[],c_ids:[]};
@@ -1119,10 +1150,15 @@ exports.getCycleIDs_Ninteen68 = function(req,res){
             console.log(ex);
         }
             
-        });
+    });
+        }
+     else{
+		res.send("Invalid Session");
+	}   
 }
 
 exports.getProjectIDs_Nineteen68 = function(req, res){
+
     var project_names = [];   
     var project_ids = [];
     var app_types=[];
@@ -1186,6 +1222,7 @@ exports.getProjectIDs_Nineteen68 = function(req, res){
 
 
 exports.getProjectType_Nineteen68 = function(req, res){
+
 	var projectDetails = {projectType:'',project_id:''};
 	var getProjectType = "select projecttypeid FROM icetestautomation.projects where projectID"+'='+req;
 	dbConnICE.execute(getProjectType, function (err, result) {
