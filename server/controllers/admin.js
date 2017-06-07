@@ -61,14 +61,7 @@ exports.getUserRoles_Nineteen68 = function(req, res){
 
 //GetUsers service has been changed to populate the users who has access to the project
 exports.getUsers_Nineteen68 = function(req, res){
-	if(req.cookies['connect.sid'] != undefined)
-		{
-			var sessionCookie = req.cookies['connect.sid'].split(".");
-			var sessionToken = sessionCookie[0].split(":");
-			sessionToken = sessionToken[1];
-		}
-			if(sessionToken != undefined && req.session.id == sessionToken)
-		{
+
 	var roles = [];
 	var r_ids = [];
     var prjId=req.prjId;
@@ -138,20 +131,11 @@ exports.getUsers_Nineteen68 = function(req, res){
 
 		}
 	});
-  }
 };
 
 //GetUsers
 exports.getUsersOld_Nineteen68 = function(req, res){
 	try{
-		if(req.cookies['connect.sid'] != undefined)
-		{
-			var sessionCookie = req.cookies['connect.sid'].split(".");
-			var sessionToken = sessionCookie[0].split(":");
-			sessionToken = sessionToken[1];
-		}
-			if(sessionToken != undefined && req.session.id == sessionToken)
-		{
 		var roles = [];
 		var r_ids = [];
 		var userRoles = {userRoles:[],r_ids:[]};
@@ -178,10 +162,6 @@ exports.getUsersOld_Nineteen68 = function(req, res){
 				catch(exception){console.log(exception);}
 			}
 		});		
-	}
-	else{
-		res.send("Invalid Session");
-	}
 	}
 	catch(exception){
 		console.log(exception);
