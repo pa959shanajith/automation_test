@@ -317,7 +317,7 @@ exports.getSuiteDetailsInExecution_ICE = function (req, res) {
 
 exports.reportStatusScenarios_ICE = function (req, res) {
 	try{
-		f(req.cookies['connect.sid'] != undefined)
+		if(req.cookies['connect.sid'] != undefined)
 		{
 			var sessionCookie = req.cookies['connect.sid'].split(".");
 			var sessionToken = sessionCookie[0].split(":");
