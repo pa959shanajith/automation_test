@@ -20,15 +20,19 @@ window.addEventListener('popstate', function () {
 $(document).ready(function() {
 	//prevent special characters(such as <,>,',"",-) for all the Inputs except for password field, testcase grid inputs and edit on scrapedobjects.
 	$(document).on("keydown","input:not([type=password]):not(.editObjectName):not(.editable)", function(e) {
-			if(e.shiftKey && e.keyCode == 189)
-				{
-					return true;
-				}
-				if(e.keyCode == 222 || e.shiftKey && e.keyCode == 222 || e.shiftKey && e.keyCode == 188 || e.shiftKey && e.keyCode == 190 || e.keyCode == 189)
-				{
-					return false;
-				}
-	 });
+		if(e.shiftKey && e.keyCode == 189)
+		{
+			return true;
+		}
+		else if($(this).attr("id") == "mobilitySerialPath" && e.keyCode == 189)
+		{
+			return true;
+		}
+		else if(e.keyCode == 222 || e.shiftKey && e.keyCode == 222 || e.shiftKey && e.keyCode == 188 || e.shiftKey && e.keyCode == 190 || e.keyCode == 189)
+		{
+			return false;
+		}
+	});
     //Task Function - Plugin Page
     $(document).on("click", ".task-content .collapse-head", function(){
         $(".caret-absolute").hide()

@@ -1680,16 +1680,16 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		$(".addObj-row").find("select").removeClass('selectErrorBorder')
 		$.each($(".addObj-row"), function(){
 			if($(this).find("input").val() == ""){
-				$scope.errorMessage = "Please enter object name";
-				$(".addObjTopWrap").find(".error-msg-abs").text("Please enter object name");
+				//$scope.errorMessage = "Please enter object name";
+				//$(".addObjTopWrap").find(".error-msg-abs").text("Please enter object name");
 				$(this).find("input").attr("style","border-bottom: 2px solid #d33c3c !important;").focus();//.addClass('inputErrorBorder')
 				flag = "false";
 				return false
 			}
 			else if($(this).find("select option:selected").val() == "Select Object Type"){
-				$scope.errorMessage = "Please select object type";
-				$(".addObjTopWrap").find(".error-msg-abs").text("Please select object type");
-				$(this).find("select").attr("style","border-bottom: 2px solid #d33c3c !important;").focus();//.addClass('selectErrorBorder')
+				//$scope.errorMessage = "Please select object type";
+				//$(".addObjTopWrap").find(".error-msg-abs").text("Please select object type");
+				$(this).find("select").attr("style","border-bottom: 4px solid #d33c3c !important;").focus();//.addClass('selectErrorBorder')
 				flag = "false";
 				return false
 			}
@@ -2282,7 +2282,8 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 								$(this).data("tag") != "link" &&
 								$(this).data("tag") != "scrollbar" &&
 								$(this).data("tag") != "internalframe" &&
-								$(this).data("tag") != "table")
+								$(this).data("tag") != "table" &&
+								$(this).data("tag") != "tab")
 							{
 									$(this).show();
 							}
@@ -3168,7 +3169,7 @@ function contentTable(newTestScriptDataLS) {
 						break;
 					}
 					else if(appTypeLocal == 'Desktop' &&(obType =='button' ||obType =='input' ||obType =='select' || obType =='list_item'|| obType =='hyperlink' || obType =='lbl'
-                        ||obType =='list' || obType == 'edit' || obType == null || obType == 'checkbox' || obType == 'radiobutton' || obType != undefined)){
+                        ||obType =='list' || obType == 'edit' || obType == null || obType == 'checkbox' || obType == 'radiobutton' || obType == 'tab' || obType != undefined)){
                         var res = '';
                         var sc;
                         var listType = ob.canselectmultiple;
@@ -3176,6 +3177,7 @@ function contentTable(newTestScriptDataLS) {
                         else if(obType =='input' || obType == 'edit'){  sc = Object.keys(keywordArrayList.text);selectedKeywordList = "text";}
                         else if(obType =='select'){ sc = Object.keys(keywordArrayList.select);selectedKeywordList = "select";}
                         else if(obType =='list_item')     {sc = Object.keys(keywordArrayList.list);selectedKeywordList = "list";}
+                        else if(obType =='tab')     {sc = Object.keys(keywordArrayList.tab);selectedKeywordList = "tab";}
                         else if (obType == 'list_item' || obType == 'list') {
                                if (listType == 'true') {
                                       sc = Object.keys(keywordArrayList.list);
@@ -3206,7 +3208,7 @@ function contentTable(newTestScriptDataLS) {
                         break;
 					}
 					else if(appTypeLocal == 'Desktop' &&(!(obType =='push_button' ||obType =='text' ||obType =='combo_box' || obType =='list_item'|| obType =='hyperlink' || obType =='lbl'
-						||obType =='list' || obType == 'edit' || obType == null || obType == 'Static' || obType == 'check_box'|| obType == 'radio_button'))){
+						||obType =='list' || obType == 'edit' || obType == null || obType == 'Static' || obType == 'check_box'|| obType == 'radio_button' || obType =='tab'))){
 						var res = '';
 						var sc = Object.keys(keywordArrayList.element);
 						selectedKeywordList = "element";
@@ -3970,6 +3972,9 @@ function pasteInGrid(){
 	var newVal;
 	var getRowJsonToPaste = JSON.parse(window.localStorage['getRowJsonCopy']);
 	var highlightPasted = [];
+	if(pasteSelecteStepNo.length <= 0){
+		pasteSelecteStepNo.push(0);
+	}
 	for(a=0; a<pasteSelecteStepNo.length; a++){
 		newVal = parseInt(pasteSelecteStepNo[a]);
 		if(gridData.length == 1 && gridData[0].custname == ""){

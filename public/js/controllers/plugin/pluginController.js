@@ -77,6 +77,7 @@ mySPA.controller('pluginController',['$scope','$window','$http','$location','$ti
         		$(this).parent().find("input").show();
         		$(this).css("border-radius","0px 7px 7px 0px")
          		isOpen = true;
+        		$(".searchInput").focus();
         	}
 
         	else
