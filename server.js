@@ -411,17 +411,17 @@ if (cluster.isMaster) {
                 delete socketMap[allSockets[i].handshake.address];
                 allClients.splice(i, 1);
                 allSockets.splice(i, 1);
-                console.log("socketMap:", socketMap);
+                // console.log("socketMap:", socketMap);
                 module.exports.allSocketsMap = socketMap;
                 //		console.log("------------------------SOCKET DISCONNECTED----------------------------------------");
-                console.log("NO. OF CLIENTS CONNECTED:", allSockets.length);
+                console.log("NO. OF CLIENTS CONNECTED:", allSockets.length,'\nIP\'s connected :',Object.keys(socketMap).join());
             }
         });
         //	Socket Connection Failed
         socket.on('connect_failed', function() {
             console.log("Sorry, there seems to be an issue with the connection!");
         });
-        console.log("NO. OF CLIENTS CONNECTED:", allSockets.length);
+        console.log("NO. OF CLIENTS CONNECTED:", allSockets.length,'\nIP\'s connected :',Object.keys(socketMap).join());
         // console.log("module.exports.allSocketsMap:", module.exports.allSocketsMap);
         // console.log("allSockets:::",socketMap)
     });
