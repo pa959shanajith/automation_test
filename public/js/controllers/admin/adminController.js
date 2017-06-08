@@ -765,6 +765,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 		//$("#addReleaseNameModal").modal("show");
 		openEditGlobalModel("Add Release","releaseTxt","Add Release Name","addReleaseName")
 		$("#releaseTxt").removeClass("inputErrorBorder");
+		$("#releaseTxt").addClass("validationKeydown");
 		//$("#releaseTxt").focus();
 		/*$('#addReleaseNameModal').on('shown.bs.modal', function () {
 			$('#releaseTxt').focus();
@@ -859,6 +860,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 		//$("#addCycleNameModal").modal("show");
 		openEditGlobalModel("Add Cycle","cycleTxt","Add Cycle Name","addCycleName")
 		$("#cycleTxt").removeClass('inputErrorBorder');
+		$("#cycleTxt").addClass("validationKeydown");
 		/*$('#addCycleNameModal').on('shown.bs.modal', function () {
 			$('#cycleTxt').focus();
 		});*/
@@ -1110,7 +1112,8 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 	//Edit Release Name Functionality
 	$(document).on("click", "[id^=editReleaseName_]", function(e){
 		//$("#editReleaseNameModal").modal("show");
-		openEditGlobalModel("Edit Release Name","releaseName","Enter New Release Name","updateReleaseName")
+		openEditGlobalModel("Edit Release Name","releaseName","Enter New Release Name","updateReleaseName");
+		$("#releaseName").addClass("validationKeydown");
 		var existingReleaseName = $(this).parents("li").children(".releaseName").text()
 		$("#releaseName").val(existingReleaseName);
 		editReleaseId = e.target.id;
@@ -1319,6 +1322,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 	$(document).on("click", "[id^=editCycleName_]", function(e){
 		//$("#editCycleNameModal").modal("show");
 		openEditGlobalModel("Edit Cycle Name","cycleName","Enter New Cycle Name","updateCycleName")
+		$("#cycleName").addClass("validationKeydown");
 		var existingCycleName = $(this).parents("li").children(".cycleName").text()
 		$("#cycleName").val(existingCycleName)
 		editCycleId = e.target.id;
@@ -1798,17 +1802,17 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 					$("div.projectTypeSelected").removeClass("projectTypeSelected");
 					$(".projectTypes[data-app='DesktopJava']").addClass("projectTypeSelected");
 					break;
-				case "Mobility": 
+				case "MobileApp": 
 					$("div.projectTypeSelected").removeClass("projectTypeSelected");
-					$(".projectTypes[data-app='Mobility']").addClass("projectTypeSelected");
+					$(".projectTypes[data-app='MobileApp']").addClass("projectTypeSelected");
 					break;
-				case "mobilityweb": 
+				case "MobileWeb": 
 					$("div.projectTypeSelected").removeClass("projectTypeSelected");
-					$(".projectTypes[data-app='mobilityweb']").addClass("projectTypeSelected");
+					$(".projectTypes[data-app='MobileWeb']").addClass("projectTypeSelected");
 					break;
-				case "Sap": 
+				case "SAP": 
 					$("div.projectTypeSelected").removeClass("projectTypeSelected");
-					$(".projectTypes[data-app='Sap']").addClass("projectTypeSelected");
+					$(".projectTypes[data-app='SAP']").addClass("projectTypeSelected");
 					break;
 				default: 
 				}
@@ -2006,7 +2010,10 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 
 //	Prevents special characters on keydown
 	$(document).on("keydown", ".validationKeydown", function(e) {
-		if(e.shiftKey && e.keyCode == 190 || (e.shiftKey && (e.keyCode > 46 && e.keyCode < 58)) || e.keyCode == 17 || e.keyCode == 190 || e.keyCode == 219 || e.keyCode == 221 || e.keyCode == 186 || e.keyCode == 189 || e.keyCode == 220 || e.keyCode == 188 || e.keyCode == 191 || e.keyCode == 187 || e.keyCode == 110 || e.keyCode == 107 || e.keyCode == 111 || e.keyCode == 106 || e.keyCode == 109 || (e.keyCode >= 96 && e.keyCode <= 105) || (e.keyCode >= 48 && e.keyCode <= 57))
+		if(($(this).attr("id") == "projectName" || $(this).attr("id") == "releaseTxt" || $(this).attr("id") == "cycleTxt" || $(this).attr("id") == "releaseName" || $(this).attr("id") == "cycleName") && (e.shiftKey && e.keyCode == 189 || e.keyCode == 189)){
+			return true;
+		}
+		else if(e.shiftKey && e.keyCode == 190 || (e.shiftKey && (e.keyCode > 46 && e.keyCode < 58)) || e.keyCode == 17 || e.keyCode == 190 || e.keyCode == 219 || e.keyCode == 221 || e.keyCode == 186 || e.keyCode == 189 || e.keyCode == 220 || e.keyCode == 188 || e.keyCode == 191 || e.keyCode == 187 || e.keyCode == 110 || e.keyCode == 107 || e.keyCode == 111 || e.keyCode == 106 || e.keyCode == 109 || (e.keyCode >= 96 && e.keyCode <= 105) || (e.keyCode >= 48 && e.keyCode <= 57))
 		{
 			return false;
 		}
