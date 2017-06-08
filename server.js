@@ -40,10 +40,10 @@ if (cluster.isMaster) {
     module.exports = app;
     module.exports.allSocketsMap = {}
     app.use(bodyParser.json({
-        limit: '5mb'
+        limit: '10mb'
     }));
     app.use(bodyParser.urlencoded({
-        limit: '5mb',
+        limit: '10mb',
         extended: true
     }));
     app.use(morgan('combined'))
