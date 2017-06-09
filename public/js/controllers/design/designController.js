@@ -1368,6 +1368,9 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					//$("#scrapeFailModal").modal("show");
 					return false
 				}
+				if(data == "wrongWindowName"){
+					openDialog("Scrape", "Wrong window name.")
+				} 
 				if(data.view.length > 0)
 				{
 					$("#finalScrap").show();
