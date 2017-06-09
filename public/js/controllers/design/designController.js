@@ -1351,6 +1351,12 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			}
 				window.localStorage['disableEditing'] = "true";
 				unblockUI();
+				if(data == "Response Body exceeds max. Limit.")
+				{
+					unblockUI();
+					openDialog("Scrape Screen", "Scraped data exceeds max. Limit.");
+					return false
+				}
 				if (data == "unavailableLocalServer")	{
 					unblockUI();
 					openDialog("Scrape Screen", "ICE Engine is not available. Please run the batch file and connect to the Server.");
