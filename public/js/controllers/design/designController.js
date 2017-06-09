@@ -102,14 +102,14 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 	} 
 	//Submit task Test Case
 
-	$scope.readTestCase_ICE = function()	{
-	
+	$scope.readTestCase_ICE = function()	{	
 		var taskInfo = JSON.parse(window.localStorage['_CT']);
 		var screenId = taskInfo.screenId;
 		var testCaseId = taskInfo.testCaseId;
 		var testCaseName = taskInfo.testCaseName;
 		appType = taskInfo.appType;
-		enabledEdit = "false"
+		enabledEdit = "false";
+		blockUI("Loading...");
 			// service call # 1 - getTestScriptData service call
 			DesignServices.readTestCase_ICE(screenId, testCaseId, testCaseName)	
 			.then(function(data) {
@@ -240,7 +240,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					},
 					function(error) {	console.log("Error in designController.js file getObjectType method! \r\n "+(error.data));
 					}); //	getObjectType end
-					
+					unblockUI();
 				},
 				function(error) {	console.log("Error in designController.js file getObjectType method! \r\n "+(error.data));
 				}); //	getScrapeData end
@@ -696,9 +696,9 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 	
 	//Populating Saved Scrape Data
 	$scope.getScrapeData = function(){
+		blockUI("Loading...");
 		$("#enableAppend").prop("checked", false)
-		window.localStorage['checkEditWorking'] = "false";
-	
+		window.localStorage['checkEditWorking'] = "false";	
 		if($("#finalScrap").find("#scrapTree").length == 0){
 			$(".disableActions").addClass("enableActions").removeClass("disableActions");
 			$("#enableAppend").prop("disabled", true).css('cursor','no-drop')
@@ -779,6 +779,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					$(document).find(".checkStylebox").prop("disabled", true);
 				}
 			}
+			unblockUI();
 		}, 
 		function(error){console.log("error");})
 	}
@@ -3282,37 +3283,36 @@ function contentTable(newTestScriptDataLS) {
 						break;
 					}
 					else if (appTypeLocal == 'MobileApp'
-						&& (obType.includes("RadioButton") || obType.includes("ImageButton") || obType.includes("Button") || obType.includes("EditText") 
-								|| obType.includes("Switch") || obType.includes("CheckBox") || obType.includes("Spinner") || obType.includes("TimePicker") || obType.includes("DatePicker") || obType.includes("NumberPicker") || obType.includes("RangeSeekBar") || obType.includes("SeekBar") || obType.includes("ListView"))) {
+						&& (obType.indexOf("RadioButton") >= 0 || obType.indexOf("ImageButton") >= 0 || obType.indexOf("Button") >= 0|| obType.indexOf("EditText") >= 0 
+								|| obType.indexOf("Switch") >= 0 || obType.indexOf("CheckBox") >= 0 || obType.indexOf("Spinner") >= 0 || obType.indexOf("TimePicker") >= 0 || obType.indexOf("DatePicker") >= 0 || obType.indexOf("NumberPicker") >= 0 || obType.indexOf("RangeSeekBar") >= 0 || obType.indexOf("SeekBar") >= 0 || obType.indexOf("ListView") >= 0)) {
 						var res = '';
 						var sc;
-						if (obType.includes("RadioButton"))
+						if (obType.indexOf("RadioButton") >= 0)
 						{sc = Object.keys(keywordArrayList.radiobutton);
 						selectedKeywordList = "radiobutton";}
-						else if (obType.includes("EditText"))
+						else if (obType.indexOf("EditText") >= 0)
 						{sc = Object.keys(keywordArrayList.input);
 						selectedKeywordList = "input";}
-						else if (obType.includes("Switch"))
+						else if (obType.indexOf("Switch") >= 0)
 						{sc = Object.keys(keywordArrayList.togglebutton);
 						selectedKeywordList = "togglebutton";}
-						else if (obType.includes("ImageButton")
-								|| obType.includes("Button"))
+						else if (obType.indexOf("ImageButton") >= 0 || obType.indexOf("Button") >= 0)
 						{sc = Object.keys(keywordArrayList.button); selectedKeywordList = "button";}
-						else if (obType.includes("Spinner"))
+						else if (obType.indexOf("Spinner") >= 0)
 						{sc = Object.keys(keywordArrayList.spinners);selectedKeywordList = "spinners";}
-						else if (obType.includes("CheckBox"))
+						else if (obType.indexOf("CheckBox") >= 0)
 						{sc = Object.keys(keywordArrayList.checkbox);selectedKeywordList = "checkbox";}
-						else if (obType.includes("TimePicker"))
+						else if (obType.indexOf("TimePicker") >= 0)
 						{sc = Object.keys(keywordArrayList.time);selectedKeywordList = "time";}
-						else if (obType.includes("DatePicker"))
+						else if (obType.indexOf("DatePicker") >= 0)
 						{sc = Object.keys(keywordArrayList.date);selectedKeywordList = "date";}
-						else if (obType.includes("NumberPicker"))
+						else if (obType.indexOf("NumberPicker") >= 0)
 						{sc = Object.keys(keywordArrayList.numberpicker);selectedKeywordList = "numberpicker";}
-						else if (obType.includes("RangeSeekBar"))
+						else if (obType.indexOf("RangeSeekBar") >= 0)
 						{sc = Object.keys(keywordArrayList.rangeseekbar);selectedKeywordList = "rangeseekbar";}
-						else if (obType.includes("SeekBar"))
+						else if (obType.indexOf("SeekBar") >= 0)
 						{sc = Object.keys(keywordArrayList.seekbar);selectedKeywordList = "seekbar";}
-						else if (obType.includes("ListView"))
+						else if (obType.indexOf("ListView") >= 0)
 						{sc = Object.keys(keywordArrayList.listview);selectedKeywordList = "listview";}	
 						for (var i = 0; i < sc.length; i++) {
 							if (selectedKeyword == sc[i]) {
@@ -3330,8 +3330,8 @@ function contentTable(newTestScriptDataLS) {
 						$grid.jqGrid('setCell', rowId, 'objectName', objName);
 						$grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
 						break;
-					} else if (appTypeLocal == 'MobileApp' && (!(obType.includes("RadioButton") || obType.includes("ImageButton") || obType.includes("Button") || obType.includes("EditText") 
-							|| obType.includes("Switch")  || obType.includes("CheckBox") || obType.includes("Spinner") || obType.includes("TimePicker") || obType.includes("DatePicker") || obType.includes("NumberPicker") || obType.includes("RangeSeekBar") || obType.includes("SeekBar") || obType.includes("ListView")))) {
+					} else if (appTypeLocal == 'MobileApp' && (!(obType.indexOf("RadioButton") >= 0 || obType.indexOf("ImageButton") >= 0 || obType.indexOf("Button") >= 0 || obType.indexOf("EditText") >= 0 
+							|| obType.indexOf("Switch") >= 0  || obType.indexOf("CheckBox") >= 0 || obType.indexOf("Spinner") >= 0 || obType.indexOf("TimePicker") >= 0 || obType.indexOf("DatePicker") >= 0 || obType.indexOf("NumberPicker") >= 0 || obType.indexOf("RangeSeekBar") >= 0 || obType.indexOf("SeekBar") >= 0 || obType.indexOf("ListView") >= 0))) {
 						var res = '';
 						var sc = Object.keys(keywordArrayList.element);
 						selectedKeywordList = "element";
