@@ -186,13 +186,12 @@ var addNode = function(n,m,pi){
 	}else{
 		v.append('image').attr('height','40px').attr('width','40px').attr('class','ct-nodeIcon').attr('xlink:href','images_mindmap/node-'+n.type+'.png').on('click',nodeClick);
 	}
-	//v.append('path').attr('class','ct-nodeCtrl').attr('d','M37,37L29,37L37,29Z').on('click',nodeCtrlClick);
-	//v.append('image').attr('class','ct-nodeIcon').attr('xlink:href','images_mindmap/node-'+n.type+'.png').on('click',nodeCtrlClick);
+	
 	n.display_name=n.name;
-	if(n.name.length>20 && n.type!='modules'){
-		n.display_name=n.display_name.slice(0,15)+'...';
-	}
-	v.append('text').attr('class','ct-nodeLabel').text(n.display_name).attr('text-anchor','middle').attr('x',20).attr('title',n.name).attr('y',50);
+	// if(n.name.length>20 && n.type!='modules'){
+	// 	n.display_name=n.display_name.slice(0,15)+'...';
+	// }
+	v.append('text').attr('class','ct-nodeLabel').text(n.name).attr('text-anchor','middle').attr('x',20).attr('title',n.name).attr('y',50);
 	//Condition to add the properties of reuse to the node (Currently only for testcases)
 	if(node_names_tc.length>0 && node_names_tc.indexOf(n.name)>-1){
 		if(node_names_tc.indexOf(n.name)==node_names_tc.lastIndexOf(n.name)){
@@ -802,8 +801,8 @@ var editNode = function(e,node){
 	var name='';
 	//By default when a node is created it's name should be in ediatable mode
 	
-	name=dNodes[pi].name;
-	//name=p.text();
+	//name=dNodes[pi].name;
+	name=p.text();
 	l=[(parseFloat(l[0])-20)*cScale+cSpan[0],(parseFloat(l[1])+42)*cScale+cSpan[1]];
 	d3.select('#ct-inpBox').style('top',l[1]+'px').style('left',l[0]+'px').classed('no-disp',!1);
 	d3.select('#ct-inpPredict').property('value','');
