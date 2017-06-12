@@ -85,7 +85,8 @@ body {
     font-family: LatoWeb;
     margin: 0;
     padding: 0;
-    opacity: 0
+    opacity: 0;
+    overflow: hidden;
 }
 
 .wrap {
