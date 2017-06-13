@@ -728,7 +728,8 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					console.log("Data is Empty");
 					$(".disableActions").addClass("enableActions").removeClass("disableActions");
 					$("#enableAppend").prop("disabled", true).css('cursor','no-drop');
-					$("#screenShotScrape").text("No Screenshot Available")
+					$("#screenShotScrape").text("No Screenshot Available");
+					unblockUI();
 					return;
 				}
 				else{
