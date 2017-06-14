@@ -5,6 +5,7 @@ var userInfo =  JSON.parse(window.localStorage['_UI']);
 var userid = userInfo.user_id;
 // node_names_tc keep track of testcase names to decide reusability of testcases
 var node_names_tc=[];
+var saveFlag=false;
 var isIE = /*@cc_on!@*/false || !!document.documentMode;
 function loadMindmapData(){
 	
@@ -117,6 +118,8 @@ var initiate = function(){
 	u.append('div').attr('class','ct-assignDetailsBox').append('textarea').attr('id','ct-assignDetails').attr('placeholder','Enter Details');
 	u.append('div').attr('id','ct-assignButton').append('a').html('OK').on('click',addTask);
 	u.append('div').attr('id','ct-unassignButton').append('a').html('Unassign').on('click',removeTask);
+	// var mapSvgDiv = canvas.append('div').attr("class","ct-mapSvgContainer");
+	// var mapSvg=mapSvgDiv.append('svg').attr('id','ct-mapSvg').call(zoom).on('click.hideElements',clickHideElements);
 	var mapSvg=canvas.append('svg').attr('id','ct-mapSvg').call(zoom).on('click.hideElements',clickHideElements);
 	var dataAdder=[{c:'#5c5ce5',t:'Modules'},{c:'#4299e2',t:'Scenarios'},{c:'#19baae',t:'Screens'},{c:'#efa022',t:'Test Cases'}];
 	u=canvas.append('svg').attr('id','ct-legendBox').append('g').attr('transform','translate(10,10)');
@@ -130,7 +133,7 @@ var initiate = function(){
 	t.append('rect').attr('x',0).attr('y',0).attr('rx',12).attr('ry',12);
 	t.append('text').attr('x',23).attr('y',18).text('Save');
 	if(selectedTab == "tabCreate"){
-		t=u.append('g').attr('id','ct-createAction').attr('class','ct-actionButton').on('click',actionEvent);
+		t=u.append('g').attr('id','ct-createAction').attr('class','ct-actionButton disableButton').on('click',actionEvent);
 		t.append('rect').attr('x',100).attr('y',0).attr('rx',12).attr('ry',12);
 		t.append('text').attr('x',114).attr('y',18).text('Create');
 	}
@@ -158,6 +161,8 @@ var createNewMap = function(e){
 	editNode(e);
 };
 var loadMap = function(e){
+	saveFlag=false;
+	$('#ct-createAction').addClass('disableButton');
 	$("div.nodeBoxSelected").removeClass("nodeBoxSelected");
 	$(this).addClass("nodeBoxSelected");
 	initiate();
@@ -188,10 +193,11 @@ var addNode = function(n,m,pi){
 	}
 	
 	n.display_name=n.name;
-	// if(n.name.length>20 && n.type!='modules'){
-	// 	n.display_name=n.display_name.slice(0,15)+'...';
-	// }
-	v.append('text').attr('class','ct-nodeLabel').text(n.name).attr('text-anchor','middle').attr('x',20).attr('title',n.name).attr('y',50);
+	if(n.name.length>15 && n.type!='modules'){
+		n.display_name=n.display_name.slice(0,15)+'...';
+	}
+	v.append('text').attr('class','ct-nodeLabel').text(n.display_name).attr('text-anchor','middle').attr('x',20).attr('title',n.name).attr('y',50);
+	v.append('title').text(n.name);
 	//Condition to add the properties of reuse to the node (Currently only for testcases)
 	if(node_names_tc.length>0 && node_names_tc.indexOf(n.name)>-1){
 		if(node_names_tc.indexOf(n.name)==node_names_tc.lastIndexOf(n.name)){
@@ -756,7 +762,7 @@ var createNode = function(e){
 		var currentNode=addNode(dNodes[uNix],!0,dNodes[pi]);
 		if(currentNode != null){
 			childNode=currentNode
-			console.log(currentNode);
+			//console.log(currentNode);
 			link={id:uLix,source:dNodes[pi],target:dNodes[uNix]};
 			dLinks.push(link);
 			addLink(uLix,dNodes[pi],dNodes[uNix]);
@@ -801,8 +807,8 @@ var editNode = function(e,node){
 	var name='';
 	//By default when a node is created it's name should be in ediatable mode
 	
-	//name=dNodes[pi].name;
-	name=p.text();
+	name=dNodes[pi].name;
+	//name=p.text();
 	l=[(parseFloat(l[0])-20)*cScale+cSpan[0],(parseFloat(l[1])+42)*cScale+cSpan[1]];
 	d3.select('#ct-inpBox').style('top',l[1]+'px').style('left',l[0]+'px').classed('no-disp',!1);
 	d3.select('#ct-inpPredict').property('value','');
@@ -1155,6 +1161,8 @@ var actionEvent = function(e){
 	if(s.attr('id')=='ct-saveAction'){
 		flag=10;
 		d3.select('#ct-inpBox').classed('no-disp',!0);
+		saveFlag=true;
+		$('#ct-createAction').removeClass('disableButton');
 		
 	}
 	else if(s.attr('id')=='ct-createAction'){
@@ -1237,6 +1245,7 @@ var actionEvent = function(e){
 			//$('#Mindmap_save').modal('show');
 		}
 if(flag==20){
+	if(!saveFlag) return;
 	var res=JSON.parse(result);
 	res=res[0];
 	var mid,resMap=Object.keys(res);
@@ -1261,10 +1270,15 @@ if(flag==20){
 					});
 			});
 		});
+		
 		openDialogMindmap("Success", "Structure created successfully");
+		saveFlag=false;
+		$('#ct-createAction').addClass('disableButton');
 	}else{
+		saveFlag=false;
 		openDialogMindmap("Success", "Failed to create structure");
 	}
+	
 	
 	//$('#Mindmap_create').modal('show');
   }
