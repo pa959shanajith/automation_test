@@ -25,24 +25,24 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 	//Loading Project Info
 	//var getProjInfo = JSON.parse(window.localStorage['_T'])
 	//$(".upper-section-testsuites").append('<span class="suitedropdownicon"><span class="iconSpace">Down</span></span>');
-	
+
 	//$(".projectInfoWrap").empty()
 	//$(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">Project :</span><span class="content">'+getProjInfo.projectName+'</span></p><p class="proj-info-wrap"><span class="content-label">Module :</span><span class="content">'+getProjInfo.moduleName+'</span></p><p class="proj-info-wrap"><span class="content-label">Screen :</span><span class="content">'+getProjInfo.screenName+'</span></p>')
 	//Loading Project Info
-	
+
 	$scope.getReports_ICE = function(){
 		reportService.getMainReport_ICE()
 		.then(function(data1) {
 			if(data1 == "Invalid Session"){
-window.location.href = "/";
-}
+				window.location.href = "/";
+			}
 			if(data1 != "fail"){
 				$("#reportSection").append(data1)
 				reportService.getAllSuites_ICE(userID)
 				.then(function(data) {
 					if(data == "Invalid Session"){
-window.location.href = "/";
-}
+						window.location.href = "/";
+					}
 					if(data != "fail"){
 						$('.scrollbar-inner').scrollbar();
 						$('.scrollbar-macosx').scrollbar();
@@ -94,8 +94,8 @@ window.location.href = "/";
 		reportService.getSuiteDetailsInExecution_ICE(testsuiteId)
 		.then(function(data) {
 			if(data == "Invalid Session"){
-window.location.href = "/";
-}
+				window.location.href = "/";
+			}
 			if(data != "fail"){
 				var tableContainer = $('#testSuitesTimeTable');
 				if(Object.prototype.toString.call(data) === '[object Array]'){
@@ -118,9 +118,9 @@ window.location.href = "/";
 						}
 						var dateArray = $('tbody.scrollbar-inner-scenariostatus').children('.scenariostatusreport');
 						dateASC(dateArray);
-				    	$("tbody.scrollbar-inner-scenariostatus").empty();
-				    	for(i=0; i<dateArray.length; i++){
-				    		dateArray[i].firstChild.innerText = i+1;
+						$("tbody.scrollbar-inner-scenariostatus").empty();
+						for(i=0; i<dateArray.length; i++){
+							dateArray[i].firstChild.innerText = i+1;
 							$("tbody.scrollbar-inner-scenariostatus").append(dateArray[i]);
 						}
 					}
@@ -142,104 +142,104 @@ window.location.href = "/";
 			$('.iconSpace').trigger('click');
 		}
 	})
-	
+
 	//Date sorting
-    $(document).on('click', '#dateDESC', function(){
-    	$(this).hide();    	
-    	var dateArray;
-    	if($(this).parents('table').attr("id") == "testSuitesTimeTable"){
-    		$('#dateASC').show();
-        	dateArray = $('tbody.scrollbar-inner-scenariostatus').children('.scenariostatusreport');
-        	dateDESC(dateArray);
-        	$("tbody.scrollbar-inner-scenariostatus").empty();
-        	for(i=0; i<dateArray.length; i++){
-        		dateArray[i].firstChild.innerText = i+1;
-    			$("tbody.scrollbar-inner-scenariostatus").append(dateArray[i]);
-    		}
-    	}
-    	else if($(this).parents('table').attr("id") == "scenarioReportsTable"){
-    		$("#scenarioReportsTable #dateASC").show();
-    		dateArray = $('tbody.scrollbar-inner-scenarioreports').children('tr');
-        	dateDESC(dateArray);
-        	$("tbody.scrollbar-inner-scenarioreports").empty();
-        	for(i=0; i<dateArray.length; i++){
-    			$("tbody.scrollbar-inner-scenarioreports").append(dateArray[i]);
-    		}
-    	}
-    })
-    $(document).on('click', '#dateASC', function(){
-    	$(this).hide();
-    	if($(this).parents('table').attr("id") == "testSuitesTimeTable"){
-        	$('#dateDESC').show();
-        	var dateArray = $('tbody.scrollbar-inner-scenariostatus').children('.scenariostatusreport');
-        	dateASC(dateArray);
-        	$("tbody.scrollbar-inner-scenariostatus").empty();
-        	for(i=0; i<dateArray.length; i++){
-        		dateArray[i].firstChild.innerText = i+1;
-    			$("tbody.scrollbar-inner-scenariostatus").append(dateArray[i]);
-    		}    		
-    	}
-    	else if($(this).parents('table').attr("id") == "scenarioReportsTable"){
-    		$("#scenarioReportsTable #dateDESC").show();
-    		var dateArray = $('tbody.scrollbar-inner-scenarioreports').children('tr');
-        	dateASC(dateArray);
-        	$("tbody.scrollbar-inner-scenarioreports").empty();
-        	for(i=0; i<dateArray.length; i++){
-    			$("tbody.scrollbar-inner-scenarioreports").append(dateArray[i]);
-    		}
-    	}
-    })
-    
-    function dateDESC(dateArray){
-    	dateArray.sort(function(a,b){
-    		var dateA, timeA, dateB, timeB;
-    		if(a.children.item(1).children.length == 0){
-    			dateA = a.children.item(1).innerText;
-    			timeA = a.children.item(2).innerText;
-    			dateB = b.children.item(1).innerText;
-    			timeB = b.children.item(2).innerText;
-    		}
-    		else{
-    			dateA = a.children.item(1).children.item(0).innerText;
-    			timeA = a.children.item(1).children.item(1).innerText;
-    			dateB = b.children.item(1).children.item(0).innerText;
-    			timeB = b.children.item(1).children.item(1).innerText;
-    		}
-    		var fDate = dateA.split("-"); var lDate = dateB.split("-");
-    		//var fFDate = fDate[0].split("/"); var lLDate = lDate[0].split("/");
-    		var gDate = fDate[2]+"-"+fDate[1]+"-"+fDate[0];
-    		var mDate = lDate[2]+"-"+lDate[1]+"-"+lDate[0];
-    		if ( new Date(gDate+" "+timeA) < new Date(mDate+" "+timeB) )  return -1;
-    	    if ( new Date(gDate+" "+timeA) > new Date(mDate+" "+timeB) )  return 1;
-    	    return dateArray;
-    	})
+	$(document).on('click', '#dateDESC', function(){
+		$(this).hide();    	
+		var dateArray;
+		if($(this).parents('table').attr("id") == "testSuitesTimeTable"){
+			$('#dateASC').show();
+			dateArray = $('tbody.scrollbar-inner-scenariostatus').children('.scenariostatusreport');
+			dateDESC(dateArray);
+			$("tbody.scrollbar-inner-scenariostatus").empty();
+			for(i=0; i<dateArray.length; i++){
+				dateArray[i].firstChild.innerText = i+1;
+				$("tbody.scrollbar-inner-scenariostatus").append(dateArray[i]);
+			}
+		}
+		else if($(this).parents('table').attr("id") == "scenarioReportsTable"){
+			$("#scenarioReportsTable #dateASC").show();
+			dateArray = $('tbody.scrollbar-inner-scenarioreports').children('tr');
+			dateDESC(dateArray);
+			$("tbody.scrollbar-inner-scenarioreports").empty();
+			for(i=0; i<dateArray.length; i++){
+				$("tbody.scrollbar-inner-scenarioreports").append(dateArray[i]);
+			}
+		}
+	})
+	$(document).on('click', '#dateASC', function(){
+		$(this).hide();
+		if($(this).parents('table').attr("id") == "testSuitesTimeTable"){
+			$('#dateDESC').show();
+			var dateArray = $('tbody.scrollbar-inner-scenariostatus').children('.scenariostatusreport');
+			dateASC(dateArray);
+			$("tbody.scrollbar-inner-scenariostatus").empty();
+			for(i=0; i<dateArray.length; i++){
+				dateArray[i].firstChild.innerText = i+1;
+				$("tbody.scrollbar-inner-scenariostatus").append(dateArray[i]);
+			}    		
+		}
+		else if($(this).parents('table').attr("id") == "scenarioReportsTable"){
+			$("#scenarioReportsTable #dateDESC").show();
+			var dateArray = $('tbody.scrollbar-inner-scenarioreports').children('tr');
+			dateASC(dateArray);
+			$("tbody.scrollbar-inner-scenarioreports").empty();
+			for(i=0; i<dateArray.length; i++){
+				$("tbody.scrollbar-inner-scenarioreports").append(dateArray[i]);
+			}
+		}
+	})
+
+	function dateDESC(dateArray){
+		dateArray.sort(function(a,b){
+			var dateA, timeA, dateB, timeB;
+			if(a.children.item(1).children.length == 0){
+				dateA = a.children.item(1).innerText;
+				timeA = a.children.item(2).innerText;
+				dateB = b.children.item(1).innerText;
+				timeB = b.children.item(2).innerText;
+			}
+			else{
+				dateA = a.children.item(1).children.item(0).innerText;
+				timeA = a.children.item(1).children.item(1).innerText;
+				dateB = b.children.item(1).children.item(0).innerText;
+				timeB = b.children.item(1).children.item(1).innerText;
+			}
+			var fDate = dateA.split("-"); var lDate = dateB.split("-");
+			//var fFDate = fDate[0].split("/"); var lLDate = lDate[0].split("/");
+			var gDate = fDate[2]+"-"+fDate[1]+"-"+fDate[0];
+			var mDate = lDate[2]+"-"+lDate[1]+"-"+lDate[0];
+			if ( new Date(gDate+" "+timeA) < new Date(mDate+" "+timeB) )  return -1;
+			if ( new Date(gDate+" "+timeA) > new Date(mDate+" "+timeB) )  return 1;
+			return dateArray;
+		})
 	}
-    
-    function dateASC(dateArray){
-    	dateArray.sort(function(a,b){
-    		var aA, timeA, bB, timeB;
-    		if(a.children.item(1).children.length == 0){
-        		aA = a.children.item(1).innerText;
-    			timeA = a.children.item(2).innerText;
-        		bB = b.children.item(1).innerText;
-    			timeB = b.children.item(2).innerText;    			
-    		}
-    		else{
-    			aA = a.children.item(1).children.item(0).innerText;
-    			timeA = a.children.item(1).children.item(1).innerText;
-        		bB = b.children.item(1).children.item(0).innerText;
-    			timeB = b.children.item(1).children.item(1).innerText;
-    		}
-    		var fDate = aA.split("-"); var lDate = bB.split("-");
-    		//var fFDate = fDate[0].split("/"); var lLDate = lDate[0].split("/");
-    		var gDate = fDate[2]+"-"+fDate[1]+"-"+fDate[0];
-    		var mDate = lDate[2]+"-"+lDate[1]+"-"+lDate[0];
-    		if ( new Date(gDate+" "+timeA) > new Date(mDate+" "+timeB) )  return -1;
-    	    if ( new Date(gDate+" "+timeA) < new Date(mDate+" "+timeB) )  return 1;
-    	    return dateArray;
-    	})
+
+	function dateASC(dateArray){
+		dateArray.sort(function(a,b){
+			var aA, timeA, bB, timeB;
+			if(a.children.item(1).children.length == 0){
+				aA = a.children.item(1).innerText;
+				timeA = a.children.item(2).innerText;
+				bB = b.children.item(1).innerText;
+				timeB = b.children.item(2).innerText;    			
+			}
+			else{
+				aA = a.children.item(1).children.item(0).innerText;
+				timeA = a.children.item(1).children.item(1).innerText;
+				bB = b.children.item(1).children.item(0).innerText;
+				timeB = b.children.item(1).children.item(1).innerText;
+			}
+			var fDate = aA.split("-"); var lDate = bB.split("-");
+			//var fFDate = fDate[0].split("/"); var lLDate = lDate[0].split("/");
+			var gDate = fDate[2]+"-"+fDate[1]+"-"+fDate[0];
+			var mDate = lDate[2]+"-"+lDate[1]+"-"+lDate[0];
+			if ( new Date(gDate+" "+timeA) > new Date(mDate+" "+timeB) )  return -1;
+			if ( new Date(gDate+" "+timeA) < new Date(mDate+" "+timeB) )  return 1;
+			return dateArray;
+		})
 	}
-    //Date sorting
+	//Date sorting
 	//Service call to get scenario status
 	$(document).on('click', '.scenariostatusreport', function(){
 		$(this).addClass('scenariostatusreportselect');
@@ -249,8 +249,8 @@ window.location.href = "/";
 		reportService.reportStatusScenarios_ICE(executionId)
 		.then(function(data) {
 			if(data == "Invalid Session"){
-window.location.href = "/";
-}
+				window.location.href = "/";
+			}
 			if(data != "fail"){
 				var scenarioContainer = $('#scenarioReportsTable');
 				if(Object.prototype.toString.call(data) === '[object Array]'){
@@ -264,10 +264,10 @@ window.location.href = "/";
 						else if(data[i].browser == "firefox")	browserIcon = "ic-reports-firefox.png";
 						else if(data[i].browser == "internet explorer")	browserIcon = "ic-reports-ie.png";
 						if(browserIcon)	brow = "imgs/"+browserIcon;
-						if(data[i].status == "Pass"){	pass++;	styleColor="style='color: #009444 !important;'";}
-						else if(data[i].status == "Fail"){	fail++;	styleColor="style='color: #b31f2d !important;'";}
-						else if(data[i].status == "Terminate"){	terminated++;	styleColor="style='color: #faa536 !important;'";}
-						else if(data[i].status == "Incomplete"){	incomplete++;	styleColor="style='color: #58595b !important;'";}
+						if(data[i].status == "Pass"){	pass++;	styleColor="style='color: #009444 !important; text-decoration-line: none;'";}
+						else if(data[i].status == "Fail"){	fail++;	styleColor="style='color: #b31f2d !important; text-decoration-line: none;'";}
+						else if(data[i].status == "Terminate"){	terminated++;	styleColor="style='color: #faa536 !important; text-decoration-line: none;'";}
+						else if(data[i].status == "Incomplete"){	incomplete++;	styleColor="style='color: #58595b !important; text-decoration-line: none;'";}
 						exeDate = data[i].executedtime.split(" ")[0].split("-");
 						exeDat = ("0" + exeDate[0]).slice(-2) +"-"+ ("0" + exeDate[1]).slice(-2) +"-"+ exeDate[2];
 						var fst = data[i].executedtime.split(" ")[1].split(":");
@@ -280,9 +280,9 @@ window.location.href = "/";
 					$("#scenarioReportsTable").find("#dateASC").hide();
 					var dateArray = $('tbody.scrollbar-inner-scenarioreports').children('tr');
 					dateASC(dateArray);
-			    	$("tbody.scrollbar-inner-scenarioreports").empty();
-			    	for(i=0; i<dateArray.length; i++){
-			    		//dateArray[i].firstChild.innerText = i+1;
+					$("tbody.scrollbar-inner-scenarioreports").empty();
+					for(i=0; i<dateArray.length; i++){
+						//dateArray[i].firstChild.innerText = i+1;
 						$("tbody.scrollbar-inner-scenarioreports").append(dateArray[i]);
 					}
 					if(data.length > 0){
@@ -307,60 +307,60 @@ window.location.href = "/";
 			console.log("Error-------"+error);
 		})
 	})
-	
+
 	$(document).on('click', '.selectFormat', function(){
 		$('.formatpdfbrwsrexport').remove();
 		var repID = $(this).parent().attr("data-reportid");
 		$(this).parent().append("<span class='formatpdfbrwsrexport'><img alt='Pdf Icon' class='getSpecificReportBrowser openreportstatus' data-getrep='phantom-pdf' data-reportid='"+repID+"' style='cursor: pointer; margin-right: 10px;' src='imgs/ic-pdf.png' title='PDF Report'><img alt='-' class='getSpecificReportBrowser openreportstatus' data-getrep='html' data-reportid='"+repID+"' style='cursor: pointer; margin-right: 10px;' src='imgs/ic-reports-chrome.png' title='Browser Report'><img alt='Export JSON' class='exportToJSON' data-reportid='"+repID+"' style='cursor: pointer;' src='imgs/ic-export-to-json.png' title='Export to Json'></span>")
 		$('.formatpdfbrwsrexport').focus();
 	})
-	
+
 	$('span.formatpdfbrwsrexport').focusout(function(){
 		$('.formatpdfbrwsrexport').remove();
 	})
-	
+
 	$(document).on('click','.iconSpace', function(){	
 		$elem = $(this);
 		if(open == 0){
 			//getting the next element
-		    $content = $elem.parent().parent().next();
-		    //open up the content needed - toggle the slide- if visible, slide up, if not slidedown.
-		    if($(".scroll-content").parent(".upper-collapsible-section").find(".suitedropdownicon").length > 0){
-	    		$(".scroll-content").parent(".upper-collapsible-section").find(".suitedropdownicon").remove();
-	    	}
-	    	$(".scroll-content").parent(".upper-collapsible-section").append($elem.parent());
-	    	$(".suitedropdownicon").children(".iconSpace").attr("src","imgs/ic-collapseup.png")
-		    $content.slideDown(200, function () {
-		        //execute this after slideToggle is done
-		        //change text of header based on visibility of content div		    	
-		    });
-		    open = 1;
+			$content = $elem.parent().parent().next();
+			//open up the content needed - toggle the slide- if visible, slide up, if not slidedown.
+			if($(".scroll-content").parent(".upper-collapsible-section").find(".suitedropdownicon").length > 0){
+				$(".scroll-content").parent(".upper-collapsible-section").find(".suitedropdownicon").remove();
+			}
+			$(".scroll-content").parent(".upper-collapsible-section").append($elem.parent());
+			$(".suitedropdownicon").children(".iconSpace").attr("src","imgs/ic-collapseup.png")
+			$content.slideDown(200, function () {
+				//execute this after slideToggle is done
+				//change text of header based on visibility of content div		    	
+			});
+			open = 1;
 		}
 		else {
 			$content = $elem.parent().parent();
 			$content.slideUp(200, function () {
-		        //execute this after slideToggle is done
-		        //change text of header based on visibility of content div
+				//execute this after slideToggle is done
+				//change text of header based on visibility of content div
 				if($(".scroll-content").parent(".upper-collapsible-section").find($elem.parent()).length > 0){
-		    		$(".scroll-content").parent(".upper-collapsible-section").find($elem.parent()).remove();
-		    	}
-		    	$(".upper-section-testsuites").append($elem.parent());
-		    	$(".suitedropdownicon").children(".iconSpace").attr("src","imgs/ic-collapse.png")
-		    });
-		    open = 0;
+					$(".scroll-content").parent(".upper-collapsible-section").find($elem.parent()).remove();
+				}
+				$(".upper-section-testsuites").append($elem.parent());
+				$(".suitedropdownicon").children(".iconSpace").attr("src","imgs/ic-collapse.png")
+			});
+			open = 0;
 		}
-	    
+
 	})
-		
+
 	$(document).on('click', '.openreportstatus', function(e){
 		var reportID = $(this).attr('data-reportid');
 		var reportType = $(this).attr('data-getrep');
 		var testsuitename = $(".reportboxselected").text();
 		var scenarioName = $('.openreportstatus').parents('tr').find('td:first-child').text();
 		//var d = new Date();		
-	    //var DATE = ("0" + (d.getMonth()+1)).slice(-2) + "/" + ("0" + d.getDate()).slice(-2) + "/" + d.getFullYear();
-	    //var TIME = ("0" + d.getHours()).slice(-2) +":"+ ("0" + d.getMinutes()).slice(-2) +":"+ ("0" + d.getSeconds()).slice(-2);
-	    var pass = fail = terminated = total = 0;
+		//var DATE = ("0" + (d.getMonth()+1)).slice(-2) + "/" + ("0" + d.getDate()).slice(-2) + "/" + d.getFullYear();
+		//var TIME = ("0" + d.getHours()).slice(-2) +":"+ ("0" + d.getMinutes()).slice(-2) +":"+ ("0" + d.getSeconds()).slice(-2);
+		var pass = fail = terminated = total = 0;
 		var finalReports = {
 				overallstatus : [{
 					"domainName": "",
@@ -385,8 +385,8 @@ window.location.href = "/";
 		reportService.getReport_Nineteen68(reportID, testsuiteId,testsuitename)
 		.then(function(data) {
 			if(data == "Invalid Session"){
-window.location.href = "/";
-}
+				window.location.href = "/";
+			}
 			if(data != "fail"){
 				if(data.length > 0){
 					finalReports.overallstatus[0].domainName = data[0].domainname
@@ -394,7 +394,7 @@ window.location.href = "/";
 					finalReports.overallstatus[0].releaseName =	data[0].releasename
 					finalReports.overallstatus[0].cycleName = data[0].cyclename
 					finalReports.overallstatus[0].scenarioName = data[0].testscenarioname
-					
+
 					var obj2 = JSON.parse(data[1].reportdata);
 					var elapTym;
 					for(j=0; j<obj2.overallstatus.length; j++){
@@ -439,35 +439,57 @@ window.location.href = "/";
 					finalReports.overallstatus[0].fail = parseFloat((fail/total)*100).toFixed(2);
 					finalReports.overallstatus[0].terminate = parseFloat((terminated/total)*100).toFixed(2);
 				}
-				reportService.renderReport_ICE(finalReports, reportType)
-				.then(function(data1) {
-					if(data1 == "Invalid Session"){
-window.location.href = "/";
-}
-					if(data1 != "fail"){
-						var path = "/specificreports";
-						openWindow = 0;
-						if(openWindow == 0)
-						{
-							var myWindow;
-							if(reportType == "phantom-pdf"){
-								myWindow = window.open();
-								myWindow.document.write(data1);
-							}
-							else{
-								myWindow = window.open();
-								myWindow.document.write(data1);
+				if(reportType == "phantom-pdf"){
+					var getCurrentUrl = window.location.href.split(":")
+					var reportUrl = "https:"+getCurrentUrl[1]+":8001/api/report";
+					var parameter = {
+							"template": {shortid: 'H1Orcdvhg', recipe: reportType},
+							"data": {
+								"overallstatus": finalReports.overallstatus,
+								"rows": finalReports.rows
 							}
 						}
-						openWindow++;
-						e.stopImmediatePropagation();
-						$('.formatpdfbrwsrexport').remove();						
-					}
-					else console.log("Failed to render reports.");
-				},
-				function(error) {
-					console.log("Error-------"+error);
-				})				
+					$http.defaults.headers.post["Content-Type"] = "application/json; charset=utf-8";
+					$http.post(reportUrl,parameter, {responseType: 'arraybuffer' })
+						.success(function (result) {
+								console.log(result);
+								var file = new Blob([result], {type: 'application/pdf'});
+								/*var link=document.createElement('a');
+					            link.href=window.URL.createObjectURL(file);
+					            link.download = scenarioName+".pdf";
+					            link.click();*/
+								var fileURL = URL.createObjectURL(file);//.split(":");
+								//var finalURL = fileURL[0]+":"+fileURL[1]+":"+window.location.href.split(":")[1]+":"+fileURL[3]
+								$window.open(fileURL, '_blank');
+						}).error(function(data, status) {
+								console.error('Repos error', status, data);
+						});
+				}
+				else{
+					reportService.renderReport_ICE(finalReports, reportType)
+					.then(function(data1) {
+						if(data1 == "Invalid Session"){
+							window.location.href = "/";
+						}
+						if(data1 != "fail"){
+							var path = "/specificreports";
+							openWindow = 0;
+							if(openWindow == 0)
+							{
+								var myWindow;
+								myWindow = window.open();
+								myWindow.document.write(data1);
+							}
+							openWindow++;
+							e.stopImmediatePropagation();
+							$('.formatpdfbrwsrexport').remove();						
+						}
+						else console.log("Failed to render reports.");
+					},
+					function(error) {
+						console.log("Error-------"+error);
+					})
+				}				
 			}
 			else console.log("Failed to get reports details");
 		},
@@ -475,16 +497,16 @@ window.location.href = "/";
 			console.log("Error-------"+error);
 		})
 	})
-	
-	
+
+
 	//Export To JSON
 	$(document).on('click', '.exportToJSON', function(e){
 		var repId = $(this).attr('data-reportid');		
 		reportService.exportToJson_ICE(repId)
 		.then(function(response) {
 			if(response == "Invalid Session"){
-window.location.href = "/";
-}
+				window.location.href = "/";
+			}
 			if(response != "fail"){
 				if (typeof response === 'object') {
 					var temp = JSON.parse(response.reportdata);
