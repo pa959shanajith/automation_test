@@ -161,12 +161,13 @@ var createNewMap = function(e){
 	editNode(e);
 };
 var loadMap = function(e){
-	saveFlag=false;
-	$('#ct-createAction').addClass('disableButton');
-	$("div.nodeBoxSelected").removeClass("nodeBoxSelected");
-	$(this).addClass("nodeBoxSelected");
-	initiate();
+	
 	if(!d3.select('#ct-mindMap')[0][0] || confirm('Unsaved work will be lost if you continue.\nContinue?')){
+		saveFlag=false;
+		$('#ct-createAction').addClass('disableButton');
+		$("div.nodeBoxSelected").removeClass("nodeBoxSelected");
+		$(this).addClass("nodeBoxSelected");
+		initiate();
 		d3.select('#ct-inpBox').classed('no-disp',!0);
 		clearSvg();
 		var reqMap=d3.select(this).attr('data-mapid');
@@ -193,8 +194,10 @@ var addNode = function(n,m,pi){
 	}
 	
 	n.display_name=n.name;
+	var ch=15;
 	if(n.name.length>15 && n.type!='modules'){
-		n.display_name=n.display_name.slice(0,15)+'...';
+		if(n.type=='testcases') ch=9;
+		n.display_name=n.display_name.slice(0,ch)+'...';
 	}
 	v.append('text').attr('class','ct-nodeLabel').text(n.display_name).attr('text-anchor','middle').attr('x',20).attr('title',n.name).attr('y',50);
 	v.append('title').text(n.name);
