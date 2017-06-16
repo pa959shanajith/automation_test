@@ -74,7 +74,7 @@ exports.logoutUser_Nineteen68 = function (req, res) {
 			console.log('Invalid data received in getReleaseNameByReleaseId_ICE');
 		}else{
 			var getReleaseName = "select releasename from icetestautomation.releases where releaseid = "+releaseId+" and projectid = "+projectId+"";
-			console.log("sd", getReleaseName)
+			//console.log("sd", getReleaseName)
 			dbConn.execute(getReleaseName, function(err, result) {
 				//console.log("Result", result);
 				var	releaseName = '';

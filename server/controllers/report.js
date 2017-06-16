@@ -22,9 +22,9 @@ exports.getMainReport_ICE = function(req, res){
 		if(sessionToken != undefined && req.session.id == sessionToken)
 		{
 			var IP = req.headers.host.split(":")[0];//req.connection.servername;//localAddress.split(":")[req.connection.localAddress.split(":").length-1];
-			console.log("Jsreport server IP:::::",IP);
+			//console.log("Jsreport server IP:::::",IP);
 			var client = require("jsreport-client")("https://"+IP+":8001/");
-			console.log("Jsreport server ::::::",client)
+			//console.log("Jsreport server ::::::",client)
 			client.render({
 				template: { 
 					shortid: "HJP1pqMcg", 
@@ -72,9 +72,9 @@ exports.renderReport_ICE = function(req, res){
 			var reportType = req.body.reporttype;
 			var shortId = "rkE973-5l";
 			var IP = req.headers.host.split(":")[0];//req.connection.servername;//localAddress.split(":")[req.connection.localAddress.split(":").length-1];
-			console.log("Jsreport server IP:::::",IP);
+			//console.log("Jsreport server IP:::::",IP);
 			var client = require("jsreport-client")("https://"+IP+":8001/");
-			console.log("Jsreport server ::::::",client)
+			//console.log("Jsreport server ::::::",client)
 			/*if(reportType != "html"){
 				var options = {
 						host: IP,

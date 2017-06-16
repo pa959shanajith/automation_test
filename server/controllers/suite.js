@@ -155,7 +155,7 @@ exports.readTestSuite_ICE = function (req, res) {
 		
 	} 
 	else{
-		console.log(responsedata);
+		//console.log(responsedata);
 		try{
 			res.send(JSON.stringify(responsedata));
 		}catch(ex){
@@ -360,7 +360,7 @@ exports.updateTestScenario_ICE = function (req, res) {
 	requestedtestscenarioname = "Dev Scenario1";
 	requestedmodifiedon = new Date().getTime();
 	requestedmodifiedby = "Shreeram";
-	console.log(requestedetestcaseids)
+	//console.log(requestedetestcaseids)
 	var delettestcaseids = "delete testcaseids from  testscenarios where projectid=" + requestedprojectid + " and testscenarioid=" + requestedtestscenarioid + " and testscenarioname ='" + requestedtestscenarioname + "';";
 	dbConnICE.execute(delettestcaseids, function (err, result) {
 		if (err) {
@@ -496,7 +496,7 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 							
 						}
 						}
-						console.log("Response data in execution : ",resultData);
+						//console.log("Response data in execution : ",resultData);
 						try{
 							if(resultData =="success" || resultData == "Terminate")
 							res.send(resultData);
@@ -536,7 +536,7 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 							if(result.rows.length != 0)
                             data = JSON.parse(JSON.stringify(result.rows[0].testcaseids));
                             resultdata = data;
-                            console.log(data);
+                            //console.log(data);
                             callback(err, resultdata);
                         }
                     });
@@ -705,7 +705,7 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 			}else{
 				
 				try{
-					console.log(data);
+					//console.log(data);
 					res.send(JSON.stringify(data));
 				}catch(ex){
 					console.log("Exception occured in getTestcaseDetailsForScenario_ICE : ",ex)
@@ -855,7 +855,7 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 							resultdata = data;
 						}
 						
-						console.log(data);
+						//console.log(data);
 						callback(err,resultdata);
 					}
 				});
