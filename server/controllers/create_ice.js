@@ -203,8 +203,8 @@ exports.createStructure_Nineteen68 = function(req, res) {
     var cycleId = RequestedJSON.cycleId;
     var releaseId = RequestedJSON.releaseId;
     var appType = RequestedJSON.appType;
-    console.log('projectid', projectid);
-    console.log('cycleId', cycleId);
+    /*console.log('projectid', projectid);
+    console.log('cycleId', cycleId);*/
 
     var username=RequestedJSON.userName;
     var suite = RequestedJSON.testsuiteDetails.length;
@@ -245,7 +245,7 @@ exports.createStructure_Nineteen68 = function(req, res) {
                }
                var testsuiteobj = {"testsuiteId":testsuiteidneo,"testsuiteId_c":suiteID,"testsuiteName":testsuiteName,"task":tasksuite,"testscenarioDetails":scenariodetailslist};
                suitedetailslist.push(testsuiteobj);
-               console.log(insertInSuite);
+               //console.log(insertInSuite);
                 dbConnICE.execute(insertInSuite, function(err, testsuiteresult) {
                     if (err) {
                         console.log(err);
@@ -429,7 +429,7 @@ exports.createStructure_Nineteen68 = function(req, res) {
                 res(null,err);
             } else {
                 var returnJsonmindmap = {"projectId":projectid,"cycleId":cycleId,"releaseId":releaseId,"appType":appType,"testsuiteDetails":suitedetailslist}
-                console.log('in last function',returnJsonmindmap);
+                //console.log('in last function',returnJsonmindmap);
                 // console.log('here in last function   ',JSON.stringify(testSuiteDetails));
                 // cb(null,JSON.stringify(RequestedJSON));
                 res(null,returnJsonmindmap);
@@ -501,7 +501,7 @@ function testsuiteid_exists(moduledetails,cb,data){
                         if(err){
                             console.log(err);
                         }else{
-                            console.log(data);
+                            //console.log(data);
                             if(data=="success"){
                                 obj.flag = true;
                                 obj.suiteid = moduledetails.moduleid;
@@ -652,7 +652,7 @@ function testscenariosid_exists(testscenariodetails,cb,data){
                         if(err){
                             console.log(err);
                         }else{
-                            console.log(data);
+                            //console.log(data);
                             if(data=="success"){
                                 obj.flag = true;
                                 obj.scenarioid = testscenariodetails.testscenarioid;
@@ -806,7 +806,7 @@ function testscreen_exists(testscreendetails,cb,data){
                         if(err){
                             console.log(err);
                         }else{
-                            console.log(data);
+                            //console.log(data);
                             if(data=="success"){
                                 obj.flag = true;
                                 obj.screenid = testscreendetails.testscreenid;
@@ -959,7 +959,7 @@ function testcase_exists(testcasedetails,cb,data){
                         if(err){
                             console.log(err);
                         }else{
-                            console.log(data);
+                            //console.log(data);
                             if(data=="success"){
                                 obj.flag = true;
                                 obj.testcaseid = testcasedetails.testcaseid;
@@ -1112,7 +1112,7 @@ exports.getCycleIDs_Ninteen68 = function(req,res){
                 });
                 cyc.cyc = cname;
                 cyc.c_ids = c_ids;
-                console.log(cyc);
+                //console.log(cyc);
                res(null,cyc);
             }
         }catch(ex){
@@ -1175,7 +1175,7 @@ exports.getProjectIDs_Nineteen68 = function(req, res){
         });
         }
     },function(err,results){
-        console.log(projectdetails);
+        //console.log(projectdetails);
         try{
             res(null,projectdetails);
         }catch(ex){

@@ -1612,7 +1612,12 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					d.css('height', Math.round(rect.h) * scale_highlight + 'px');
 					d.css('width', Math.round(rect.w) * scale_highlight + 'px');
 				}
-
+				else if(appType == "MobileApp"){
+					d.css('left', Math.round(rect.x) * 1.8 * scale_highlight + 'px');
+					d.css('top', Math.round(rect.y) * 2 * scale_highlight + 'px');
+					d.css('height', Math.round(rect.h) * 1.7 * scale_highlight + 'px');
+					d.css('width', Math.round(rect.w) * 2.1 * scale_highlight + 'px');
+				}
 				else{
 					d.css('left', Math.round(rect.x)  * scale_highlight + 'px');
 					d.css('top', Math.round(rect.y) * scale_highlight + 'px');
@@ -3180,7 +3185,7 @@ function contentTable(newTestScriptDataLS) {
 						break;
 					}
 					else if(appTypeLocal == 'Desktop' &&(obType =='button' ||obType =='input' ||obType =='select' || obType =='list_item'|| obType =='hyperlink' || obType =='lbl'
-                        ||obType =='list' || obType == 'edit' || obType == null || obType == 'checkbox' || obType == 'radiobutton' || obType == 'tab' || obType != undefined)){
+                        ||obType =='list' || obType == 'edit' || obType == null || obType == 'checkbox' || obType == 'radiobutton' || obType == 'tab' || obType =='datepicker' || obType != undefined)){
                         var res = '';
                         var sc;
                         var listType = ob.canselectmultiple;
@@ -3189,6 +3194,7 @@ function contentTable(newTestScriptDataLS) {
                         else if(obType =='select'){ sc = Object.keys(keywordArrayList.select);selectedKeywordList = "select";}
                         else if(obType =='list_item')     {sc = Object.keys(keywordArrayList.list);selectedKeywordList = "list";}
                         else if(obType =='tab')     {sc = Object.keys(keywordArrayList.tab);selectedKeywordList = "tab";}
+                        else if(obType =='datepicker')     {sc = Object.keys(keywordArrayList.datepicker);selectedKeywordList = "datepicker";}
                         else if (obType == 'list_item' || obType == 'list') {
                                if (listType == 'true') {
                                       sc = Object.keys(keywordArrayList.list);
@@ -3219,7 +3225,7 @@ function contentTable(newTestScriptDataLS) {
                         break;
 					}
 					else if(appTypeLocal == 'Desktop' &&(!(obType =='push_button' ||obType =='text' ||obType =='combo_box' || obType =='list_item'|| obType =='hyperlink' || obType =='lbl'
-						||obType =='list' || obType == 'edit' || obType == null || obType == 'Static' || obType == 'check_box'|| obType == 'radio_button' || obType =='tab'))){
+						||obType =='list' || obType == 'edit' || obType == null || obType == 'Static' || obType == 'check_box'|| obType == 'radio_button' || obType =='tab' || obType =='datepicker'))){
 						var res = '';
 						var sc = Object.keys(keywordArrayList.element);
 						selectedKeywordList = "element";
@@ -3288,15 +3294,18 @@ function contentTable(newTestScriptDataLS) {
 					}
 					else if (appTypeLocal == 'MobileApp'
 						&& (obType.indexOf("RadioButton") >= 0 || obType.indexOf("ImageButton") >= 0 || obType.indexOf("Button") >= 0|| obType.indexOf("EditText") >= 0 
-								|| obType.indexOf("Switch") >= 0 || obType.indexOf("CheckBox") >= 0 || obType.indexOf("Spinner") >= 0 || obType.indexOf("TimePicker") >= 0 || obType.indexOf("DatePicker") >= 0 || obType.indexOf("NumberPicker") >= 0 || obType.indexOf("RangeSeekBar") >= 0 || obType.indexOf("SeekBar") >= 0 || obType.indexOf("ListView") >= 0)) {
+								|| obType.indexOf("Switch") >= 0 || obType.indexOf("CheckBox") >= 0 || obType.indexOf("Spinner") >= 0 || obType.indexOf("TimePicker") >= 0 || obType.indexOf("DatePicker") >= 0 || obType.indexOf("NumberPicker") >= 0 || obType.indexOf("RangeSeekBar") >= 0 || obType.indexOf("SeekBar") >= 0 || obType.indexOf("ListView") >= 0 || obType.indexOf("XCUIElementTypeTextField") >= 0 || obType.indexOf("XCUIElementTypePickerWheel") >= 0)) {
 						var res = '';
 						var sc;
 						if (obType.indexOf("RadioButton") >= 0)
 						{sc = Object.keys(keywordArrayList.radiobutton);
 						selectedKeywordList = "radiobutton";}
-						else if (obType.indexOf("EditText") >= 0)
+						else if (obType.indexOf("EditText") >= 0 || obType.indexOf("XCUIElementTypeTextField") >= 0)
 						{sc = Object.keys(keywordArrayList.input);
 						selectedKeywordList = "input";}
+						else if (obType.indexOf("XCUIElementTypePickerWheel") >= 0)
+						{sc = Object.keys(keywordArrayList.pickerwheel);
+						selectedKeywordList = "pickerwheel";}
 						else if (obType.indexOf("Switch") >= 0)
 						{sc = Object.keys(keywordArrayList.togglebutton);
 						selectedKeywordList = "togglebutton";}
@@ -3335,7 +3344,7 @@ function contentTable(newTestScriptDataLS) {
 						$grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
 						break;
 					} else if (appTypeLocal == 'MobileApp' && (!(obType.indexOf("RadioButton") >= 0 || obType.indexOf("ImageButton") >= 0 || obType.indexOf("Button") >= 0 || obType.indexOf("EditText") >= 0 
-							|| obType.indexOf("Switch") >= 0  || obType.indexOf("CheckBox") >= 0 || obType.indexOf("Spinner") >= 0 || obType.indexOf("TimePicker") >= 0 || obType.indexOf("DatePicker") >= 0 || obType.indexOf("NumberPicker") >= 0 || obType.indexOf("RangeSeekBar") >= 0 || obType.indexOf("SeekBar") >= 0 || obType.indexOf("ListView") >= 0))) {
+							|| obType.indexOf("Switch") >= 0  || obType.indexOf("CheckBox") >= 0 || obType.indexOf("Spinner") >= 0 || obType.indexOf("TimePicker") >= 0 || obType.indexOf("DatePicker") >= 0 || obType.indexOf("NumberPicker") >= 0 || obType.indexOf("RangeSeekBar") >= 0 || obType.indexOf("SeekBar") >= 0 || obType.indexOf("ListView") >= 0 || obType.indexOf("XCUIElementTypeTextField") >= 0 || obType.indexOf("XCUIElementTypePickerWheel") >= 0))) {
 						var res = '';
 						var sc = Object.keys(keywordArrayList.element);
 						selectedKeywordList = "element";

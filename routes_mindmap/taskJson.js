@@ -25,7 +25,7 @@ exports.getTaskJson_mindmaps = function(obj,cb,data){
                             if(err){
                                 cb(null,err);
                             }else{
-                                console.log(data);
+                                //console.log(data);
                                 cb(null,data);
                             }
                         });
@@ -95,7 +95,7 @@ function next_function(resultobj,cb,data){
     var result=resultobj.result;
     var prjId = resultobj.prjId.projectId;
     //var prjName = resultobj.prjId[0].projectName;
-	console.log(resultobj);
+	//console.log(resultobj);
 	try{
 	var jsonData=JSON.parse(result);
 	var alltasks=jsonData[0].data;

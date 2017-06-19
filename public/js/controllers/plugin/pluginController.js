@@ -66,7 +66,6 @@ mySPA.controller('pluginController',['$scope','$window','$http','$location','$ti
 			}, function (error) { console.log("Error:::::::::::::", error) })
 	}
 	
-	
 	//Search form
 	    
         var isOpen = false;
@@ -115,6 +114,9 @@ mySPA.controller('pluginController',['$scope','$window','$http','$location','$ti
     //Plugin click event 
     $scope.pluginFunction = function(name){
 		window.localStorage["_VP"] = true;
+		if(name == "p_Mindmap"){
+			name = 'home'
+		}
     	$window.location.assign(name)
     }
     window.localStorage['_TJ'] = "";
@@ -178,17 +180,16 @@ mySPA.controller('pluginController',['$scope','$window','$http','$location','$ti
     	else if(subtask == "TestSuite")		$window.location.assign("/execute")
     	else if(subtask == "Scheduling")	$window.location.assign("/scheduling")
     }
-
 }]);
 
 //Plugin click event - Creating Scope to define the function and returning back to controller
-function p_event(name){
-    angular.element(document.getElementsByClassName("plugin-block")).scope().pluginFunction(name)
-	if(name == "p_Mindmap")
+function p_event(name){    
+	/*if(name == "p_Mindmap")
 	{
 		window.localStorage["_VM"] = true;
 		window.location.href = '/home';
 	}
+	else*/	angular.element(document.getElementsByClassName("plugin-block")).scope().pluginFunction(name)
 }
 
 function taskRedirection(assignedtestscenarioids,scenarioflag,subtask,screenid,screenname,projectid,taskname,testcaseid,testcasename,apptype,releaseid,cycleid,testsuiteid,scenarioid,testsuitename,subtaskid){

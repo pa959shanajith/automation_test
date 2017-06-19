@@ -719,7 +719,7 @@ exports.createProject_ICE = function createProject_ICE(req, res) {
 			if (err) {
 				console.log(err);
 			} else {
-				console.log(data);
+				//console.log(data);
 			}
 		})
 	}
@@ -814,7 +814,7 @@ exports.updateProject_ICE = function updateProject_ICE(req, res){
 		{
 		var updateProjectDetails=req.body.updateProjectObj;
 		// var updateProjectDetails={projectId:"f9409e26-cb50-489b-9527-623ce9f23672"};
-		console.log(JSON.stringify(req.body.updateProjectObj));
+		//console.log(JSON.stringify(req.body.updateProjectObj));
 		var userinfo = req.body.userDetails;
 		var date = new Date().getTime();
 		var requestedskucode = "skucode";
@@ -1218,7 +1218,7 @@ exports.getNames_ICE = function(req, res){
 										responsedata.projectIds.push(response[i].projectid);
 										responsedata.projectNames.push(response[i].projectname);
 										if(i==response.length-1){
-											console.log(responsedata);
+											//console.log(responsedata);
 											res.send(responsedata);
 										}
 									}
@@ -1256,7 +1256,7 @@ exports.getNames_ICE = function(req, res){
 	
 								if(index == requestedidslist.length){
 									res.send(responsedata);
-									console.log(responsedata);
+									//console.log(responsedata);
 								}	                		
 							}
 							catch(exception){
@@ -1274,7 +1274,7 @@ exports.getNames_ICE = function(req, res){
 	
 								if(index == requestedidslist.length){
 									res.send(responsedata);
-									console.log(responsedata);
+									//console.log(responsedata);
 								}	                		
 							}
 							catch(exception){
@@ -1568,7 +1568,7 @@ exports.getDetails_ICE = function(req, res) {
 		}
 
 		function finalDataReturn() {
-			console.log(JSON.stringify(responsedata));
+			//console.log(JSON.stringify(responsedata));
 			try {
 				res.send(responsedata);
 			} catch (exception) {
@@ -1640,7 +1640,7 @@ if(req.cookies['connect.sid'] != undefined)
 		var assignedProjectIds =[];
 		var assignedProjObj = [];
 		var getAssignedProjects = "Select projectids from icepermissions where userid = "+requestDetails.userId+" and domainid = "+requestDetails.domainId+"";
-		console.log(getAssignedProjects);
+		//console.log(getAssignedProjects);
 		dbConnICE.execute(getAssignedProjects, function (err, result) {
 			try{
 				if (err) {
@@ -1662,7 +1662,7 @@ if(req.cookies['connect.sid'] != undefined)
 										res.send("fail");
 									}
 									else{
-										console.log(result);
+										//console.log(result);
 										if(result.rows.length > 0){
 											var assignedProjects = {};
 											assignedProjects.projectId = iterator;

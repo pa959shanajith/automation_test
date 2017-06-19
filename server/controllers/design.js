@@ -77,7 +77,7 @@ exports.initScraping_ICE = function (req, res) {
 				});
 			}
 			else if(req.body.screenViewObject.appType == "MobileWeb"){
-				console.log(req.body.screenViewObject)
+				//console.log(req.body.screenViewObject)
 				var mobileSerial = req.body.screenViewObject.mobileSerial;
 				var androidVersion = req.body.screenViewObject.androidVersion;
 				var data = "LAUNCH_MOBILE_WEB";
@@ -559,7 +559,7 @@ exports.updateScreen_ICE = function(req, res){
 												}
 											}
 											deleteindex=deleteindex.sort(sortNumber);
-											console.log("dummyObjectsToDelete:::",deleteindex.join());
+											//console.log("dummyObjectsToDelete:::",deleteindex.join());
 											for(var deletingelementindex=0;deletingelementindex<deleteindex.length;deletingelementindex++){
 												delete viewString[deleteindex[deletingelementindex]];
 											}
@@ -662,8 +662,8 @@ exports.updateScreen_ICE = function(req, res){
 											uiUserProvidedNamesList=updateData.editedListoldCustName;
 											uiElementsCustnameList=updateData.editedListmodifiedCustNames;
 											//fetching tag names 
-											console.log("Cust Names with no Xpath :",uiUserProvidedNamesList);
-											console.log("Scraped Cust Names:",uiElementsCustnameList);
+											//console.log("Cust Names with no Xpath :",uiUserProvidedNamesList);
+											//console.log("Scraped Cust Names:",uiElementsCustnameList);
 											async.forEachSeries(uiUserProvidedNamesList,function(addedObjectCustName,addedObjectCustNameCallback){
 													async.forEachSeries(viewString,function(eachScrapedObject,scrapedObjectCallback){
 													try{
@@ -685,7 +685,7 @@ exports.updateScreen_ICE = function(req, res){
 											* fetching the appropriate xpath of the actual elements.
 											* to change the custom name
 											*/
-											console.log("dbElementsTagList:::",dbElementsTagList.join());
+											//console.log("dbElementsTagList:::",dbElementsTagList.join());
 											var indexOfUiElement=-1;			
 											async.forEachSeries(uiElementsCustnameList,function(userCustName,userCustNameCallback){
 												indexOfUiElement=indexOfUiElement+1;
@@ -724,8 +724,8 @@ exports.updateScreen_ICE = function(req, res){
 													}	
 												},userCustNameCallback);
 											});
-											console.log("requiredXpathList:::",requiredXpathList.join());
-											console.log("requiredURLList:::",requiredURLList.join());
+											//console.log("requiredXpathList:::",requiredXpathList.join());
+											//console.log("requiredURLList:::",requiredURLList.join());
 											/*
 											* the method call below checks if 
 											* multiple elements with same xpath are found for mapped elements.
@@ -748,7 +748,7 @@ exports.updateScreen_ICE = function(req, res){
 													console.log(exception);
 												}	
 											});
-											console.log("multipleObjectsCustnameSet:::",multipleObjectsCustnameSet.join());
+											//console.log("multipleObjectsCustnameSet:::",multipleObjectsCustnameSet.join());
 											if(tagMatch != "sAmEoBjEcTrEpeAtEd"){
 												/*
 												*if the size of xpath list is same as user provided custom names list
@@ -782,10 +782,10 @@ exports.updateScreen_ICE = function(req, res){
 													});
 												}else{
 													tagMatch="TagMissMatch";
-													console.log("Response sent to the front end:",tagMatch);
+													//console.log("Response sent to the front end:",tagMatch);
 													res.send(tagMatch);
 												}
-												console.log("addedObjectIndexes:::",addedObjectIndexes.join());
+												//console.log("addedObjectIndexes:::",addedObjectIndexes.join());
 												/*
 												* if the tagMatch status is empty, ie., if its not TagMissMatch
 												* then remove the dummy objects
@@ -814,7 +814,7 @@ exports.updateScreen_ICE = function(req, res){
 														},addedObjectCustNameCallback);
 													});
 													dummyObjectsToDelete=dummyObjectsToDelete.sort(sortNumber);
-													console.log("dummyObjectsToDelete:::",dummyObjectsToDelete.join());
+													//console.log("dummyObjectsToDelete:::",dummyObjectsToDelete.join());
 													for(var deleteelementindex=0;deleteelementindex<dummyObjectsToDelete.length;deleteelementindex++){
 														delete viewString[dummyObjectsToDelete[deleteelementindex]];
 													}
@@ -845,7 +845,7 @@ exports.updateScreen_ICE = function(req, res){
 												}
 													
 											}else{
-												console.log("These are the repeated objects:",multipleObjectsCustnameSet);
+												//console.log("These are the repeated objects:",multipleObjectsCustnameSet);
 												tagMatch=tagMatch+"maPinGScraPedDaTa"+multipleObjectsCustnameSet.join();
 												res.send(tagMatch);
 											}
@@ -989,9 +989,9 @@ exports.updateScreen_ICE = function(req, res){
 																								// console.log("before eachTestCaseStep:",eachTestCaseStep);
 																								if('custname' in eachTestCaseStep){
 																									if(eachTestCaseStep.custname.replace(/\s/g,' ').replace('&nbsp;',' ').trim() == userCustName.replace(/\s/g,' ').replace('&nbsp;',' ').trim()){
-																										console.log("Removing Custom Object Value:",eachTestCaseStep.custname.replace(/\s/g,' ').replace('&nbsp;',' ').trim());
+																										//console.log("Removing Custom Object Value:",eachTestCaseStep.custname.replace(/\s/g,' ').replace('&nbsp;',' ').trim());
 																										eachTestCaseStep.custname=uiUserProvidedNamesList[uiCustNameIndex];
-																										console.log("Replaced Custom Object Value:",userCustName.replace(/\s/g,' ').replace('&nbsp;',' ').trim());
+																										//console.log("Replaced Custom Object Value:",userCustName.replace(/\s/g,' ').replace('&nbsp;',' ').trim());
 																									}
 																								}
 																								if('custname' in eachTestCaseStep){
@@ -1118,7 +1118,7 @@ function repeatedXpath(viewString, xpath) {
                             xpathIndex = xpathIndex + 1;
                         }
                         if (xpathIndex > 1) {
-                            console.log("scrapedCustName:::", scrapedCustName);
+                            //console.log("scrapedCustName:::", scrapedCustName);
                             result = scrapedCustName;
                             break;
                         }
@@ -1714,7 +1714,7 @@ exports.debugTestCase_ICE = function (req, res) {
 								}else{
 									var responsedata={listofoperations:[]};
 									if(listGenResponse != "None" && listGenResponse != "fail" && listGenResponse != undefined && listGenResponse != ""){
-										console.log(listGenResponse);
+										//console.log(listGenResponse);
 										listGenResponse=listGenResponse.replace(/'+/g,"\"");
 										var listGenResponse=JSON.parse(listGenResponse);
 										responsedata.listofoperations=listGenResponse;
@@ -1765,8 +1765,8 @@ exports.debugTestCase_ICE = function (req, res) {
 										console.log(exception);
 									}
 								}else{
-									console.log(wsdlurl.split('?')[0]);
-									console.log(operations);
+									//console.log(wsdlurl.split('?')[0]);
+									//console.log(operations);
 									var responsedata={
 										endPointURL:[],
 										method:["POST"],
