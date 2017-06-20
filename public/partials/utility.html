@@ -1,0 +1,367 @@
+<!--Header-->
+<header header></header>
+<!--Header-->
+
+<!--Content Area-->
+<section class="container-fluid container-fluid-inner">
+	<!--Left Panel-->
+	<div id="left-nav-section">
+		<div class="scrollbar-macosx">
+			<div id="left-top-section" class="left-top-section-utility">
+				<ul>
+					<li><span><a class='scrapeOnTxt'>Utilities</a></span></li>
+					<li><a href='#' id="utilityEncrytpion" ng-click=" getScreenView = 'utility-Encrytpion'; encrypt_optimize('utility-Encrytpion')" title="Encryption" class="selectAutility"><span><img
+								src='imgs/ic-encryption-utility.png' alt='Encryption' /></span>Encryption</a></li>
+					<li><a href='#' id="utilityOptimization" ng-click="encrypt_optimize('utility-Optimization')" title="Optimization" class="selectAutility"><span><img
+								src='imgs/ic-optimization.png' alt='Optimization' /></span>Optimization</a></li>
+				</ul>
+			</div>
+
+		</div>
+	</div>
+	<!--Left Panel-->
+
+	<!--Middle Panel-->
+	<div id="middle-content-section">
+
+		<!-- Encryption div -->
+		<div ng-if="getScreenView == 'utility-Encrytpion'"
+			id="utility-encrytpion">
+			<!--Task Name-->
+			<div id="page-taskName">
+				<span>Encryption</span>
+
+			</div>
+			<!--Task Name-->
+
+			<!-- checkbox and button START -->
+			<div id="methodSel-utility">
+
+				<select id="utilityMethods"
+					class="form-control utilityMethods pull-left">
+					<option value="Select Method" selected>Select Method</option>
+					<option value="AES">AES Encryption</option>
+					<option value="MD5">MD5 Encryption</option>
+					<option value="Base64">Base64 Encryption</option>
+
+				</select>
+
+				<button ng-click="ImportEncryption()"
+					class="btn btn-xs btn-xs-custom pull-left saveWS" title="Import">Import</button>
+
+			</div>
+			<!-- checkbox and button END -->
+
+			<!-- requestWrap -->
+			<div id="Encryption" class="utility-ecryptionData">
+				<textarea id="encryptData"
+					class="encryptionData-body encryptionData"
+					placeholder="Enter Data for Encryption"></textarea>
+				<button style="padding: 2px 25px" class="btn btn-md pull-right"
+					ng-click="EncryptData()" title="Encrypt">Encrypt</button>
+				<textarea id="encryptedData"
+					class="encryptionData-body encryptedData"
+					readonly="readonly"
+					placeholder="Encrypted Data"></textarea>
+			</div>
+			<!-- requestWrap -->
+
+		</div>
+		<!-- Encryption div ends -->
+
+		<!-- OPTIMIZATION div -->
+		<div ng-if="getScreenView == 'utility-Optimization'"
+			id="utilityOptimization">
+			<!--Task Name-->
+
+			<div id="page-taskName">
+				<span>Optimization</span>
+
+			</div>
+			<!--Task Name-->
+
+			<div id="optimization-fn">
+
+				<div class="pairwise">
+					<div title="Pairwise" id="pairwise-inner">
+						<div ng-click="encrypt_optimize('utility-Pairwise')" class="pairwiseOrtho-img">
+							<img src='imgs/ic-pairwise.png' alt='Pairwise' />
+						</div>
+						<div ng-click="encrypt_optimize('utility-Pairwise')" style="padding-left: 17px; font-size: 16px;cursor: pointer;">Pairwise</div>
+					</div>
+				</div>
+
+				<!-- border -->
+				<div
+					style="float: left; /* min-width: 96px; */ align-content: center; border: 1px solid #D5D8DC; height: 120px; margin: 19px 0px 19px 0;"></div>
+				<!-- border -->
+
+				<div class="ortho-array">
+					<div title="Orthogonal Array" id="ortho-inner">
+						<div class="pairwiseOrtho-img">
+							<img style="padding-left: 16px;"
+								src='imgs/ic-orthogonal-array.png' alt='Orthogonal Array' />
+						</div>
+						<div style="font-size: 16px; cursor: pointer;">Orthogonal Array</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- Optimization div ends -->
+
+		<!-- After pairwise selection -->
+		<div ng-if="getScreenView == 'utility-Pairwise'" style="height: 100%;">
+		
+		<!--Task Name-->
+			<div id="page-taskName">
+				<span>Pairwise</span>
+			</div>
+		<!--Task Name-->
+		
+		<!-- Generate DIV -->
+		
+		<div>
+		<span id="pairwise-level">Factor</span><input id="level-row" type="text" class="level-factor validationPairwise" placeholder="Enter factor" />
+		<span id="pairwise-factor">Level</span><input id="factor-col" type="text" class="level-factor validationPairwise" placeholder="Enter level" />
+		<button ng-click="CreateFactors()" class="btn btn-xs btn-xs-custom pull-left saveWS pairwise-createBtn" title="Create">Create</button>
+		<button style="padding: 2px 25px" class="btn btn-md pull-right pairwise-GenBtn" ng-click="pairwiseGenerate()" title="Encrypt">Generate</button>
+		</div>
+		
+		<!-- Generate DIV -->
+		
+		<!-- Table DnD -->
+		<div id="factorsTbl" class="scroll-wrapper pairwiseFactorsTbl">
+		<table  class="factorsTbl level-factors-pairwiseTbl" cellspacing="0" cellpadding="0">
+			<thead><tr></tr></thead>
+			<tbody  class="pairwiseFactorsTbl"></tbody>
+		</table>
+		</div>
+
+
+			<!-- <div id="factorsTbl" class="factorsTbl level-factors-pairwiseTbl" >
+				<div id="factorsTblHeader" class="factorsTblHeader"> </div>
+				<div id="pairwiseFactorsTblbody" class="pairwiseFactorsTblbody"> </div>
+			</div> -->
+
+			<!-- Table DnD -->
+				
+				<!-- Pairwise popup -->
+	<div id="dialog-addObject" class="modal fade" role="dialog" data-keyboard="false" data-backdrop="static">
+		<div class="modal-dialog" style="width: 700px">
+			<!-- Modal content-->
+			<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">&times;</button>
+				<h4 class="modal-title">Pairwise</h4>
+			</div>
+			<div class="modal-body modal-body-pairwise">
+			<table id="modal-body-pairwise" class="factorsTbl level-factors-pairwiseTbl" cellspacing="0" cellpadding="0">
+				<thead><tr></tr></thead>
+			    <tbody></tbody>
+			</table>
+			</div>
+			<div class="modal-footer">
+				<button ng-click="ExportPairwise()" type="button" id="resetObjRow" class="btn btn-default">Export</button>
+			</div>
+			</div>
+		</div>
+	</div>
+	<!-- Pairwise popup -->
+			
+		</div>
+		<!-- After pairwise selection -->
+
+	</div>
+	<!--Middle Panel-->
+
+	<!--Right Panel-->
+	<div id="right-dependencies-section">
+
+		<!--Images Blocks-->
+		<div class="thumbnail thumbnail-custom">
+			<a class="slidePopup"> <img class="thumb-ic"
+				src="imgs/ic-task.png" alt="Tasks">
+				<div class="caption">
+					<p>Tasks</p>
+				</div>
+			</a>
+			<!--Popup-->
+			<div tabindex="0" id="window-task" class="popupWrap">
+				<h4 class="h4-custom closePopup">
+					My task(s)<img class="closePopup pull-right"
+						src="imgs/ic-arrow.png" />
+				</h4>
+				<div class="popupContent popupTasks">
+					<div class="scrollbar-inner scrollbar-innerpages">
+						<!--Tasks-->
+						<div class="panel-group task-content-inner" id="accordion"></div>
+						<!--Tasks-->
+					</div>
+				</div>
+			</div>
+			<!--Popup-->
+		</div>
+		<!--Images Blocks-->
+
+		<!--Images Blocks-->
+		<div class="thumbnail thumbnail-custom">
+			<a class="slidePopup"> <img class="thumb-ic"
+				src="imgs/ic-info.png" alt="Project Info">
+				<div class="caption">
+					<p>Info</p>
+				</div>
+			</a>
+			<!--Popup-->
+			<div tabindex="0" id="window-pi" class="popupWrap">
+				<h4 class="h4-custom closePopup">
+					Project Information <img class="closePopup pull-right"
+						src="imgs/ic-arrow.png" />
+				</h4>
+				<div class="popupContent">
+					<p class="proj-info-wrap">
+						<span class="content-label">Project :</span> <span class="content">AHRI
+							Implementation</span>
+					</p>
+					<p class="proj-info-wrap">
+						<span class="content-label">Module :</span> <span class="content">AHRI
+							Implementation_Module_1</span>
+					</p>
+					<p class="proj-info-wrap">
+						<span class="content-label">Screen :</span> <span class="content">AHRI
+							Implementation_Screen_1</span>
+					</p>
+				</div>
+			</div>
+			<!--Popup-->
+		</div>
+		<!--Images Blocks-->
+
+		<!--Images Blocks-->
+		<!-- <div class="thumbnail thumbnail-custom thumbnail-custom-wiki">
+        	<a class="slide_popup" href="#">
+          		<img class="thumb-ic" src="imgs/ic-wiki.png" alt="Project Info">
+          		<div class="caption">
+            		<p>Wiki</p>
+          		</div>
+        	</a>
+      	</div> -->
+
+		<div class="thumbnail thumbnail-custom thumbnail-custom-wiki">
+			<a class="slide_popup slide_assist" href="#" title="Assist"> <img
+				class="thumb-ic" src="imgs/ic-assist.png" alt="Assist">
+				<div class="caption">
+					<p>Assist</p>
+				</div>
+			</a>
+			<!--Popup-->
+			<div id="assistWindow" class="assistWrap">
+				<h4 class="h4-custom h4-custom-assist">
+					<span class="assist-left pull-left"> <img
+						src="imgs/ic-message.png" />Assist
+					</span> <span class="assist-right pull-right"> <img
+						src="imgs/ic-up.png" class="animateAssistUp"
+						style="margin-right: 10px" /> <img src="imgs/ic-close.png"
+						class="animateAssistClose" />
+					</span>
+				</h4>
+				<div class="assistContent">
+					<!-- Chat Container -->
+					<div
+						class="chatContainer scrollbar-inner scrollbar-chatArea chatArea">
+						<ul class="chatList">
+							<li>Choose from the available browser icons from the action
+								bar</li>
+							<li>Enter the URL of the AUT (Application under test)</li>
+							<li>Click on one of the options available in the Scrape
+								Options window</li>
+							<li>Identify the required objects</li>
+							<li>Rename the objects as per the naming convention</li>
+							<li>Click on the save button in the work area</li>
+							<li>Click on submit to complete task.</li>
+						</ul>
+					</div>
+
+					<div class="chatContainer">
+						<textarea rows="3" cols="" class="chatTextArea form-control"
+							placeholder="Ask Prof.J"></textarea>
+						<button class="btn btn-md pull-right">Send</button>
+					</div>
+					<!-- Chat Container -->
+				</div>
+			</div>
+			<!--Popup-->
+		</div>
+
+		<!--Images Blocks-->
+
+		<!-- Global Modal  -->
+		<div class="modal fade" id="globalModal" role="dialog"
+			data-keyboard="false" data-backdrop="static">
+			<div class="modal-dialog modal-sm">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">&times;</button>
+						<h4 class="modal-title"></h4>
+					</div>
+					<div class="modal-body">
+						<p></p>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Ok</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- Global Modal  -->
+
+		<!-- Global Modal for Input field -->
+		<div id="modalDialog-inputField" class="modal fade" role="dialog"
+			data-keyboard="false" data-backdrop="static">
+			<div class="modal-dialog modal-sm">
+				<!-- Modal content-->
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">&times;</button>
+						<h4 class="modal-title"></h4>
+					</div>
+					<div class="modal-body">
+						<!--Modal Content-->
+						<form class="form-inline">
+							<!--Inputs Seprators-->
+							<div class="row row-modal">
+								<!-- <div class="form-group">
+								<label>Object Type</label>
+								<select class="form-control"><option>Select</option></select>
+							</div> -->
+								<div class="form-group" style="width: 100% !important;">
+									<label id="labelContent" style="margin-bottom: 0px;"></label> <input
+										type="text" class="form-control" id="getInputData"
+										placeholder="Enter object name">
+								</div>
+								<div>
+									<span id="errorMsgs1" class="errorMsg" style="display: none;"></span>
+									<span id="errorMsgs2" class="errorMsg" style="display: none;"></span>
+									<span id="errorMsgs3" class="errorMsg" style="display: none;"></span>
+								</div>
+							</div>
+							<!--Inputs Seprators-->
+						</form>
+						<!--Modal Content-->
+					</div>
+					<div class="modal-footer">
+						<!-- <button type="button" class="btn btn-default pull-left">Add More</button> -->
+						<button type="button" class="btn btn-default" id="">Submit</button>
+						<!-- <button type="button" class="btn btn-default">Reset</button> -->
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- Global Modal for Input field -->
+	</div>
+	<!--Right Panel-->
+</section>
+<!--Content Area-->
+
+<!--Footer-->
+<footer footer id="footer" class="footer-global"></footer>
+<!--Footer-->

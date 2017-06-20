@@ -60,6 +60,10 @@ mySPA.controller('loginController', function ($scope, $http, $location, LoginSer
 											"pluginValue" : data.plugindetails[i].keyValue
 										})
 									}
+									availablePlugins.push({
+										"pluginName" : "Utility",
+										"pluginValue" : "true"
+									})
 									data.pluginsInfo = availablePlugins;
 									window.localStorage['LoginSuccess'] = "True";
 									window.localStorage['_UI'] = JSON.stringify(data);
