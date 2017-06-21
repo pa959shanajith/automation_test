@@ -302,6 +302,7 @@ if (cluster.isMaster) {
     var report = require('./server/controllers/report');
     var header = require('./server/controllers/header');
     var plugin = require('./server/controllers/plugin');
+    var utility = require('./server/controllers/utility');
     //Login Routes
     app.post('/authenticateUser_Nineteen68', login.authenticateUser_Nineteen68);
     app.post('/loadUserInfo_Nineteen68', login.loadUserInfo_Nineteen68);
@@ -354,6 +355,8 @@ if (cluster.isMaster) {
     //Plugin Routes
     app.post('/getProjectIDs_Nineteen68', plugin.getProjectIDs_Nineteen68);
     app.post('/getTaskJson_Nineteen68', plugin.getTaskJson_Nineteen68);
+    //Utility plugins
+    app.post('/Encrypt_ICE', utility.Encrypt_ICE);
 
 
 
