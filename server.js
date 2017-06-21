@@ -205,6 +205,18 @@ if (cluster.isMaster) {
                                             if (req.cookies['connect.sid'] && req.cookies['connect.sid'] != undefined) { res.sendFile("index.html", { root: __dirname + "/public/" });} else {req.session.destroy(); res.status(200).send('<br><br>Your session has been expired. Please <a href="/">Login</a> Again');}
                                        }
                                   }
+                                  else if(req.url == "/p_Utility")
+                                  {
+                                     if (req.session.defaultRole == "Admin" || req.session.defaultRole == "Business Analyst" || req.session.defaultRole == "Tech Lead")
+                                       {
+                                               res.redirect("/");
+                                               req.session.destroy(); //Clear Session
+                                       }
+                                       else
+                                       {
+                                            if (req.cookies['connect.sid'] && req.cookies['connect.sid'] != undefined) { res.sendFile("index.html", { root: __dirname + "/public/" });} else {req.session.destroy(); res.status(200).send('<br><br>Your session has been expired. Please <a href="/">Login</a> Again');}
+                                       }
+                                  }
                                   else
                                   {
                                                res.redirect("/");
