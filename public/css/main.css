@@ -781,7 +781,9 @@ body {
     width: 100%;
     border-bottom: 2px solid #461F6E;
 }
-
+.left-top-section-utility{
+	border-bottom: none !important;
+}
 #left-bottom-section {
     min-height: 39%;
     float: left;
@@ -1088,6 +1090,206 @@ input[disabled]{
     font-size: 14px;
     padding: 2px 25px;
 }
+
+/* utility plugins */
+
+#methodSel-utility{
+	float: left;
+    width: 100%;
+    margin-bottom: 15px;
+    margin-top: -6px;
+    padding-bottom: 10px;
+    margin-left: -8px;
+    }
+    
+.utilityMethods{
+	padding: 3px;
+    height: 24px;
+    border: 1px solid #909090 !important;
+    margin-bottom: 0;
+    width: 23%;
+    margin: 0 10px;
+    margin-top: 6px;
+}
+
+.utilityMethods:focus{
+
+    outline: 0 !important;
+    -webkit-box-shadow: none !important;
+    -moz-box-shadow: none !important;
+    box-shadow: none !important;
+    border: 1px solid #909090;
+}
+
+.utility-ecryptionData{
+	float: left;
+	width:100%;
+	margin-top: -10px;
+}
+
+.encryptionData-body{
+	height: 318px;
+	float: left;
+	width:100%;
+	resize:none;
+	padding: 10px;
+	border: 1px solid #909090 !important;
+}
+
+.encryptionData{
+	margin-bottom: 13px;
+}
+
+.encryptedData{
+	margin-top: 16px;
+}
+
+#optimization-fn{
+	border-radius: 1em;
+	float: left;
+	background: #eee;
+	transform: translateX(94%) translateY(132%);
+}
+
+.pairwise{
+	
+	float: left;
+    min-width: 96px;
+    align-content: center;
+    /* margin-right: 54px; */
+	
+}
+.ortho-array{
+	float: left;
+	border: none;
+}
+
+.pairwiseOrtho-img{
+	cursor: pointer;
+	padding-left: 13px;
+    padding-top: 13px;
+    padding-bottom: 6px;
+}
+
+#pairwise-inner{
+	padding-top: 29px;
+    padding-left: 39px;
+    padding-bottom: 36px;
+    padding-right: 52px;
+}
+
+#ortho-inner{
+	
+	padding-top: 29px;
+    padding-right: 39px;
+    padding-bottom: 36px;
+    padding-left: 17px;
+}
+
+#encrypt-utility{
+	cursor: pointer;
+}
+
+#optimize-utility{
+	cursor: pointer;
+}
+.select-utility{
+	background: rgb(51, 29, 76);
+    border-radius: 5px;
+}
+
+.level-factor{
+	padding: 3px;
+    height: 24px;
+    border: 1px solid #909090 !important;
+    margin-bottom: 0;
+    width: 113px;
+    margin: 0px 6px;
+    float: left;
+    border-radius: 5px;
+  }
+
+ #pairwise-factor{
+  float: left;
+  margin-top: 2px;
+  margin-left: 10px;
+ }
+
+#pairwise-level{
+	float: left;
+	margin-top: 2px;
+}
+
+.pairwise-createBtn{
+	margin-bottom: 2px;
+	margin-top: 2px;
+	margin-left: 15px;
+}
+
+.pairwise-GenBtn{
+	float: right;
+}
+
+.pairwiseInput{
+	height: 23px;
+}
+
+.pairwiseInput, .level-factor{
+	border: 1px solid #5e636b !important;
+	border-radius: 4px;
+	box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+	outline: none;
+}
+
+.level-factor{
+   text-align: center;
+}
+
+.factorsTbl{
+	position: relative;
+    top: 35px;
+    width: 100%;
+    height: calc(100% - 90px);
+    float: left;
+}
+.factorsTblHeader{
+	background: #5e626b;
+    width: 100%;
+    height: 34px;
+    font-family: 'LatoWebLight';
+    border-radius: 6px;
+    -moz-border-radius: 6px;
+    -webkit-border-radius: 6px;
+    float: left;
+}
+.pairwiseHeader{
+	float: left;
+    color: #fff;
+    font-size: 17px;
+    text-align: center;
+    border-right: 1px solid #fff;
+    height: 100%;
+    padding-top: 5px;
+}
+.pairwiseFactorsTblbody{
+	position: relative;
+    width: 100%;
+    height: calc(100% - 33px);
+    float: left;
+}
+.pairwiseTableRow{
+	width: 100%;
+	float: left;
+}
+.pairwiseTableTD{
+	float: left;
+	text-align: center;
+    padding: 5px 0;
+}
+.pairwiseTableInput{
+	
+}
+/* utility plugins */
 
 #wsdlActionsButton{
 	float: left;

@@ -52,6 +52,11 @@ mySPA.config(function($routeProvider, $locationProvider,$provide) {
 			 	templateUrl: 'partials/Reports.html',
 			 	controller: 'reportsController'
 			})
+			.when('/p_Utility', 
+			{
+			 	templateUrl: 'partials/utility.html',
+			 	controller: 'utilityController'
+			})
 			.when('/Reports', 
 			{
 			 	controller: 'reportsController'
