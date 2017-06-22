@@ -205,6 +205,18 @@ if (cluster.isMaster) {
                                             if (req.cookies['connect.sid'] && req.cookies['connect.sid'] != undefined) { res.sendFile("index.html", { root: __dirname + "/public/" });} else {req.session.destroy(); res.status(200).send('<br><br>Your session has been expired. Please <a href="/">Login</a> Again');}
                                        }
                                   }
+                                  else if(req.url == "/p_Utility")
+                                  {
+                                     if (req.session.defaultRole == "Admin" || req.session.defaultRole == "Business Analyst" || req.session.defaultRole == "Tech Lead")
+                                       {
+                                               res.redirect("/");
+                                               req.session.destroy(); //Clear Session
+                                       }
+                                       else
+                                       {
+                                            if (req.cookies['connect.sid'] && req.cookies['connect.sid'] != undefined) { res.sendFile("index.html", { root: __dirname + "/public/" });} else {req.session.destroy(); res.status(200).send('<br><br>Your session has been expired. Please <a href="/">Login</a> Again');}
+                                       }
+                                  }
                                   else
                                   {
                                                res.redirect("/");
@@ -290,6 +302,7 @@ if (cluster.isMaster) {
     var report = require('./server/controllers/report');
     var header = require('./server/controllers/header');
     var plugin = require('./server/controllers/plugin');
+    var utility = require('./server/controllers/utility');
     //Login Routes
     app.post('/authenticateUser_Nineteen68', login.authenticateUser_Nineteen68);
     app.post('/loadUserInfo_Nineteen68', login.loadUserInfo_Nineteen68);
@@ -342,6 +355,8 @@ if (cluster.isMaster) {
     //Plugin Routes
     app.post('/getProjectIDs_Nineteen68', plugin.getProjectIDs_Nineteen68);
     app.post('/getTaskJson_Nineteen68', plugin.getTaskJson_Nineteen68);
+    //Utility plugins
+    app.post('/Encrypt_ICE', utility.Encrypt_ICE);
 
 
 
