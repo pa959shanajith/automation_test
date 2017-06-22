@@ -707,7 +707,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			$(".enableActions").addClass("disableActions").removeClass("enableActions");
 			$("#enableAppend").prop("disabled", false).css('cursor','pointer')
 		}
-		enableScreenShotHighlight = true;
+		//enableScreenShotHighlight = true;
 		DesignServices.getScrapeDataScreenLevel_ICE() 
 		.then(function(data){
 			if(data == "Invalid Session")
@@ -1244,7 +1244,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		if(e.currentTarget.className == "disableActions") return false
 		else{
 			eaCheckbox = $("#enableAppend").is(":checked")
-			enableScreenShotHighlight = false;
+			//enableScreenShotHighlight = false;
 			screenViewObject = {}
 			var blockMsg = 'Scrapping in progress. Please Wait...';
 			$(document).find("#desktopPath").removeClass("inputErrorBorder");
@@ -1552,7 +1552,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 	//Highlight Element on browser
 	$scope.highlightScrapElement = function(xpath,url) {
 		var appType = $scope.getScreenView;
-		if(enableScreenShotHighlight == true){
+		//if(enableScreenShotHighlight == true){
 			console.log("Init ScreenShot Highlight")
 			var data = {
 				args : [$("#scrapTree").find(".focus-highlight").parents("a")[0]],
@@ -1641,8 +1641,8 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			} else {
 				$(".hightlight").remove();
 			}
-		}	
-		else{
+		//}	
+	//	else{
 			DesignServices.highlightScrapElement_ICE(xpath,url, appType)
 			.then(function(data) {
 					if(data == "Invalid Session")
@@ -1654,7 +1654,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				}
 				console.log("success!::::"+data);
 			}, function(error) { });
-		}    
+	//	}    
 	};
 	//Highlight Element on browser
 	
@@ -2028,14 +2028,14 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			}
 			if(data == "success"){
 				window.localStorage['_modified'] = "";
-				enableScreenShotHighlight = true;
+				//enableScreenShotHighlight = true;
 				localStorage.removeItem("_modified");
 				openDialog("Save Scraped data", "Scraped data saved successfully.")
 				angular.element(document.getElementById("left-nav-section")).scope().getScrapeData();
 				$("#saveObjects").attr('disabled', true);
 			}
 			else{
-				enableScreenShotHighlight = false;
+				//enableScreenShotHighlight = false;
 				openDialog("Save Scraped data", "Failed to save")
 			}
 

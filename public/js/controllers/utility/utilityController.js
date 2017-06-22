@@ -97,6 +97,12 @@ mySPA.controller('utilityController', ['$scope', '$http', '$location', '$timeout
 				//$(TableData).appendTo("#modal-body-pairwise tbody");		
 		}
 	
+	//Reset Encrypt
+	$scope.resetEncrypt = function(){
+		$('#encryptData').val('');
+		$('#encryptedData').val('');
+	};
+	
 //Export Pairwise
 	
 	$scope.ExportPairwise=function(){
@@ -228,7 +234,24 @@ mySPA.controller('utilityController', ['$scope', '$http', '$location', '$timeout
 			$('.scrollbar-inner').scrollbar();
 		}	
 		
-//Generating table in popup
+		//button hide and show
+		$scope.utilityMethods = function(){
+			if($("#utilityMethods option:selected").val() == "AES") {
+				$("#encrypt_btn").text('Encrypt','value').attr('title','Encrypt');
+				$("#encryption_btns").show();
+			}
+			else if($("#utilityMethods option:selected").val() == "MD5") {
+				$("#encrypt_btn").text('Generate','value').attr('title','Generate');
+				$("#encryption_btns").show();
+			}
+			else if($("#utilityMethods option:selected").val() == "Base64") {
+				$("#encrypt_btn").text('Encode','value').attr('title','Encode');
+				$("#encryption_btns").show();
+			}
+			else{
+				$("#encryption_btns").hide();
+			}
+		}	
 		
 		
 //Encryption

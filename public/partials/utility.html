@@ -37,12 +37,12 @@
 			<!-- checkbox and button START -->
 			<div id="methodSel-utility">
 
-				<select id="utilityMethods"
+				<select id="utilityMethods" ng-click="utilityMethods()"
 					class="form-control utilityMethods pull-left">
 					<option value="Select Method" selected>Select Method</option>
-					<option value="AES">AES Encryption</option>
-					<option value="MD5">MD5 Encryption</option>
-					<option value="Base64">Base64 Encryption</option>
+					<option value="AES">AES</option>
+					<option value="MD5">MD5</option>
+					<option value="Base64">Base64</option>
 
 				</select>
 
@@ -57,8 +57,14 @@
 				<textarea id="encryptData"
 					class="encryptionData-body encryptionData"
 					placeholder="Enter Data for Encryption"></textarea>
-				<button style="padding: 2px 25px" class="btn btn-md pull-right"
+				
+				<div id="encryption_btns" style="display:none;">
+				<button id="encrypt_btn" style="padding: 2px 25px;" class="btn btn-md pull-right"
 					ng-click="EncryptData()" title="Encrypt">Encrypt</button>
+				<button id="reset_btn" style="padding: 2px 25px; margin-right: 10px;" class="btn btn-md pull-right"
+					ng-click="resetEncrypt()" title="Reset">Reset</button>
+				</div>
+				
 				<textarea id="encryptedData"
 					class="encryptionData-body encryptedData"
 					readonly="readonly"
