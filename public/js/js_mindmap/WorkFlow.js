@@ -135,7 +135,7 @@ var initiate_W = function(){
 	// var mapSvgDiv = canvas.append('div').attr("class","ct-mapSvgContainer");
 	// var mapSvg=mapSvgDiv.append('svg').attr('id','ct-mapSvg').call(zoom).on('click.hideElements',clickHideElements);
 	var mapSvg=canvas.append('svg').attr('id','ct-mapSvg').call(zoom_W).on('click.hideElements',clickHideElements);
-	var dataAdder=[{c:'#5c5ce5',t:'modules'},{c:'#4299e2',t:'Scenarios'},{c:'#19baae',t:'Screens'},{c:'#efa022',t:'Test Cases'}];
+	var dataAdder=[{c:'#5c5ce5',t:'Modules'},{c:'#4299e2',t:'Scenarios'},{c:'#19baae',t:'Screens'},{c:'#efa022',t:'Test Cases'}];
 	u=canvas.append('svg').attr('id','ct-legendBox').append('g').attr('transform','translate(10,10)');
 	dataAdder.forEach(function(e,i) {
 		t=u.append('g');
