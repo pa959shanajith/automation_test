@@ -115,6 +115,7 @@ mySPA.controller('pluginController',['$scope','$window','$http','$location','$ti
     $scope.pluginFunction = function(name){
 		window.localStorage["_VP"] = true;
 		if(name == "p_Mindmap"){
+	    	window.localStorage["_VM"] = true;
 			name = 'home'
 		}
     	$window.location.assign(name)

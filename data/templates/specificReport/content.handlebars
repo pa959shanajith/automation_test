@@ -78,6 +78,35 @@
                     })
                 })
 
+				$(document).on('click', '.openscreenshot', function(){
+					var path = $(this).attr("data-screenshot");
+                    var hostName = window.location.host;
+                    console.log(path+"-----"+hostName);
+                    $.ajax({
+				        type: 'POST',
+				        url: 'https://'+hostName+'/openScreenShot',
+				        responseType: 'arraybuffer',
+				        data: {
+				        	"absPath" : path
+				        },
+				        success: function(data){
+				        	if(data == "unavailableLocalServer"){
+				        		alert("Local Server unavailable");
+				        	}
+				        	else if(data == "fail"){
+				        		alert("Failed to open image");
+				        	}
+				        	else{
+				        		var b64Response = window.btoa(unescape(encodeURIComponent(data)));
+    							var imageUrl = 'data:image/PNG;base64,'+ data;
+				    			var WindowObject = window.open();
+				    			var strHtml = "<html>\n<head>\n </head><body><div style='padding: 10px;'>\n<img style='width: 100%; height: calc(100% - 40px); border: 1px solid #ccc;' src='" + imageUrl + "'/>\n</div>\n</body>\n</html>";
+				    			WindowObject.document.writeln(strHtml);				        	
+				        	}
+					    }
+				    });
+                })
+                
                 $(document).on('click', '.expand', function(){
                     var getID = $(this).parents('.reportdetailsrow').attr('data-id');
                     $(this).removeClass('expand').addClass('unexpand');
@@ -88,7 +117,8 @@
                         }
                     })
                 })
-			}, 300);
+                
+			}, 400);
 		</script>     
         <style>
             body{font-family: LatoWeb; height: 98%;}
@@ -144,6 +174,8 @@
             .tabCont{display: table-cell; border-bottom: 1px solid #ececec; border-right: 1px solid #ececec;}
             .reportsDetail{line-height: 2; text-align: center; height: calc(100% - 35px); overflow: auto;font-size: 14px;}
             .rDstepDes{text-align: left; word-break: break-word;}
+            .openscreenshot{cursor: pointer;}
+            .openscreenshot:hover{text-decoration: underline;}
             .progress {
                 margin-bottom: 20px;
                 overflow: hidden;
@@ -332,7 +364,7 @@
                         <div class="rDid tabCont">{{slno}}</div>
                         <div class="rDstep tabCont">{{Step}}</div>
                         <div class="rDstepDes tabCont" style="padding-left: 10px;">{{StepDescription}}</div>
-                        <div class="rDstatus tabCont" style="padding-left: 10px;">{{status}}</div>
+                        <div class="rDstatus tabCont openscreenshot"  data-screenshot={{screenshot_path}}>{{status}}</div>
                         <div class="rDellaps tabCont">{{EllapsedTime}}</div>
                         <div class="rDcomments tabCont" style="padding-left: 10px;">{{Comments}}</div>
                     </div>

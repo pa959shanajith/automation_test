@@ -7,10 +7,12 @@ var async = require('async');
 var uuid = require('uuid-random');
 var dbConnICE = require('../../server/config/icetestautomation');
 var request = require('request');
+var myserver = require('../../server.js');
 var http = require('http');
 var https = require('https');
 var fs = require('fs');
 var certificate = fs.readFileSync('server/https/server.crt','utf-8');
+
 exports.getMainReport_ICE = function(req, res){
 	try{
 		if(req.cookies['connect.sid'] != undefined)
@@ -58,6 +60,33 @@ exports.getMainReport_ICE = function(req, res){
 	}
 }
 
+//to open screen shot
+exports.openScreenShot = function(req, res){
+	try{
+		var path = req.body.absPath;
+		var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+		console.log(Object.keys(myserver.allSocketsMap),"<<all people, asking person:",ip);
+		if('allSocketsMap' in myserver && ip in myserver.allSocketsMap){
+			var mySocket = myserver.allSocketsMap[ip];
+			mySocket._events.render_screenshot = [];
+			mySocket.emit('render_screenshot', path);
+			mySocket.on('render_screenshot', function (resultData) {
+				if(resultData != "fail"){
+					res.send(resultData);
+				}
+				else res.send(resultData);
+			})
+		}
+		else{
+			console.log("Socket not Available");
+			res.send("unavailableLocalServer");
+		}
+	}
+	catch(exception){
+		console.log(exception);
+	}
+}
+
 exports.renderReport_ICE = function(req, res){
 	try{
 		if(req.cookies['connect.sid'] != undefined)
@@ -71,64 +100,10 @@ exports.renderReport_ICE = function(req, res){
 			var finalReports = req.body.finalreports;
 			var reportType = req.body.reporttype;
 			var shortId = "rkE973-5l";
+			if(reportType != "html")	shortId = "H1Orcdvhg";
 			var IP = req.headers.host.split(":")[0];//req.connection.servername;//localAddress.split(":")[req.connection.localAddress.split(":").length-1];
 			//console.log("Jsreport server IP:::::",IP);
 			var client = require("jsreport-client")("https://"+IP+":8001/");
-			//console.log("Jsreport server ::::::",client)
-			/*if(reportType != "html"){
-				var options = {
-						host: IP,
-						port: '8001',
-						uri: 'https://'+IP+':8001/api/report',
-						method: 'POST',
-						ca:certificate,
-						headers: {
-						    'Content-Type': 'application/json; charset=utf-8',
-						    'Content-Length': Buffer.byteLength(data)
-						},
-						data: {
-							"template": {shortid: 'H1Orcdvhg', recipe: reportType},
-							"data": {
-								"overallstatus": finalReports.overallstatus,
-								"rows": finalReports.rows
-							}
-						}
-				};
-				try{
-					options.agent= new https.Agent(options);
-					https.request(options,function(resp){
-						resp.setEncoding('utf-8');
-						resp.on('data', function(result) {
-							console.log(result);
-						});
-						resp.on('error', (e) => {
-							  console.error(e);
-						});
-						resp.on('end', function(chunk) {
-							console.log(chunk);
-							callback(null,resp.statusCode,result);
-						});
-					});
-					postRequest.on('error',function(e){
-						callback(e.message,400,null);
-					});
-					postRequest.end();
-					request(options, function (error, response, body) {
-						if(error){
-							console.log(error);
-						}
-						else{
-							console.log(response);
-							console.log(body);
-						}
-					});				
-				}
-				catch(exception){
-					console.log(exception);
-					res.send("fail");
-				}
-			}
-			else{*/
 				client.render({
 					template: { 
 						shortid: shortId, 
@@ -153,8 +128,7 @@ exports.renderReport_ICE = function(req, res){
 							res.send("fail");
 						}
 					}
-				});				
-			//}		
+				});	
 		}
 		else{
 			res.send("Invalid Session");

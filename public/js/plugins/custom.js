@@ -28,7 +28,7 @@ $(document).ready(function() {
 		{
 			return true;
 		}
-		else if(e.keyCode == 222 || e.shiftKey && e.keyCode == 222 || e.shiftKey && e.keyCode == 188 || e.shiftKey && e.keyCode == 190 || e.keyCode == 189)
+		else if(e.keyCode == 222 || e.shiftKey && e.keyCode == 222 || e.shiftKey && e.keyCode == 188 || e.shiftKey && e.keyCode == 190)
 		{
 			return false;
 		}
@@ -95,9 +95,14 @@ $(document).ready(function() {
     				$(this).trigger("click");
     				return false;
     			}
-    		})
-    		
+    		})    		
          }, 200)
+         if(JSON.parse(window.localStorage['_CT']).appType == "MobileApp"){
+             $("#window-scrape-screenshot").css({"width":""+(viewString.mirrorwidth+12)+"px", "height": ""+viewString.mirrorheight+"px"});
+       	 	 $("#window-scrape-screenshot .scroll-wrapper.scrollbar-screenshot").css({"height": "initial !important;"});
+        	 $("#window-scrape-screenshot .scroll-wrapper > .scrollbar-screenshot").css({"max-height": "664px !important;"});
+        	 $("#window-scrape-screenshot .scroll-wrapper .scroll-scrolly_visible #screenshot").css({"width":""+viewString.mirrorwidth+"px", "height":""+viewString.mirrorheight+"px"}); 
+         }
     })
     .on("click", ".closePopup", function(){
         $(".popupWrap").animate({ opacity: 0, right: "70px" }, 100).css({'z-index':'0','pointer-events':'none'})

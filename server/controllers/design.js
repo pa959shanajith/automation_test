@@ -69,9 +69,12 @@ exports.initScraping_ICE = function (req, res) {
 			else if(req.body.screenViewObject.appType == "MobileApp"){
 				var apkPath = req.body.screenViewObject.apkPath;
 				var serial = req.body.screenViewObject.mobileSerial;
+				var mobileDeviceName = req.body.screenViewObject.mobileDeviceName;
+				var mobileIosVersion = req.body.screenViewObject.mobileIosVersion;
+				var mobileUDID = req.body.screenViewObject.mobileUDID;
 				var data = "LAUNCH_MOBILE";
 				mySocket._events.scrape = [];                                                                                                  
-				mySocket.emit("LAUNCH_MOBILE", apkPath,serial);
+				mySocket.emit("LAUNCH_MOBILE", apkPath,serial,mobileDeviceName,mobileIosVersion,mobileUDID);
 				mySocket.on('scrape', function (data) {
 								res.send(data);
 				});

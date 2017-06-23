@@ -80,7 +80,14 @@ input[type="checkbox"]{cursor: default !important; margin-top: 0;}
 	float: none !important;
     vertical-align: text-top;
 }
-
+.launchPopupInputiOSVisibility{
+	display: none;
+}
+.checkForApp{
+	padding: 0 0 0 13px;
+}
+.checkForApp input{margin: 0 5px 0 0;}
+.checkForApp input:nth-child(2){margin-left: 30px;}
 body {
     font-family: LatoWeb;
     margin: 0;
@@ -1923,7 +1930,7 @@ input[disabled]{
 	float:left;
 	width:100%;
 	opacity:0;
-	height: calc(100% - 45px);
+	height: calc(100% - 31px);
 }
 .designTableDnd{height: calc(100% - 80px);}
 .btnAddToSchedule{
@@ -2221,9 +2228,8 @@ input[disabled]{
 	width:69px;
 	display: inline-block;
 	height: 81px;
-	background: url("../imgs/ic-andrd-inactive.png") left top no-repeat;
 }
-
+#mobilityUDID,#mobilityiOSVersion,#mobilityDeviceName{display: none;}
 .androidIconActive{
 	 transition: 0.2s ease-in ease-in-out;
     -moz-transition: 0.2s ease-in-out;
@@ -3763,31 +3769,6 @@ select:-webkit-autofill:focus {
 	.formatpdfbrwsrexport{left: 75px;}
 }
 
-/* @media only screen and (min-width:1366px) {
-    .login-bg-img {
-        width: 45%;
-    }
-    .jumbotron-nobg {
-        margin-top: 11%;
-    }
-    .jumbotron-nobg h2 {
-        font-size: 40px;
-    }
-    .jumbotron-nobg h3 {
-        font-size: 25px;
-    }
-    .bg-img {
-        width: 410px;
-    }
-    .h1-header-margin {
-        margin: 2% 0 3%
-    }
-    .plugin-block {
-        margin-bottom: 3%
-    }
-}
- */
-
 @media screen and (max-height: 675px) {
     .login-bg-img {
         width: 42%;
@@ -3843,7 +3824,28 @@ select:-webkit-autofill:focus {
 	}
 }
 
+@media screen and (min-device-width: 1440px) and (max-device-height: 900px) {
+	.middle-section-testsuites, .bottom-section-testsuites{ 
+		height: calc(100% - 410px);
+	}
+	.reportStatus{margin-top: 55px;}
+	.suitestartend thead, .scenarioReports thead    width: calc(100% - 797px); 
+	.scroll-wrapper.scrollbar-inner-rep     max-height: 242px !important; 
+}
 
+@media screen and (min-height: 1000px) and (max-height: 1080px){
+	#left-bottom-section ul li{margin-bottom:12px;}
+	.list-inline-right{padding-right: 0;}
+	.list-inline-right li:first-child{margin-right:6px;}
+	.list-inline-right li:nth-child(2){margin-right:-24px;}
+	.mindmap-left-section{margin-top:65px;}
+	.suitestartend thead{width: calc(100% - 729px);}
+	.reportStatus{margin-top:12px;}
+	.scroll-wrapper.scrollbar-inner-rep{max-height: 154px !important;}
+	.project-left2{padding: 0 47px 0 0;}
+	#allProjectAP,#assignedProjectAP, #allProjectAP[size],#assignedProjectAP[size]{min-height: 258px; !important;}
+	
+}
 /**********Specifically for Firefox**********/
 @-moz-document url-prefix() {
 
@@ -3859,6 +3861,12 @@ select:-webkit-autofill:focus {
 	    margin-top: 0;
 	    margin-bottom: 20%;
 	}
+	.list-inline-right > li.list-inline-item:nth-child(2){margin-right: -32px !important;}
+	.searchIcon img{margin-top: 0 !important;}
+	.list-inline-right{padding-right: 0px !important;}
+	.list-inline{margin-left: -6px !important;}
+	.searchIcon{left: 27px !important; padding-bottom: 1px !important; top: 1px !important;}
+	.searchInput{left: 26px !important;height: 29px !important;}
 }
 
 /**********Search field style**********/

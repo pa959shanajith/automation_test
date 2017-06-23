@@ -1232,9 +1232,23 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 	
 	
 	//Mobile Serial Number Keyup Function
-	$("#mobilitySerialPath, #mobilityWebSerialNo").on("keyup", function(){
-		if($(this).val() != "") $(".androidIcon").addClass("androidIconActive")
-		else $(".androidIcon").removeClass("androidIconActive")
+	$("#mobilityAPKPath").on("keyup", function(){
+		if($(this).val().toLowerCase().indexOf(".apk") >= 0){
+			$("#mobilityDeviceName, #mobilityiOSVersion, #mobilityUDID").hide();
+			$("#mobilitySerialPath").show();
+			$("#launchMobilityApps").find(".androidIcon").css("background","url('../imgs/ic-andrd-active.png') left top no-repeat !important;");			
+		}
+		else if($(this).val().toLowerCase().indexOf(".ipa") >= 0 || $(this).val().toLowerCase().indexOf(".app") >= 0){
+			if($(this).val().toLowerCase().indexOf(".app") >= 0){
+				$("#mobilitySerialPath, #mobilityUDID").hide();
+				$("#mobilityDeviceName, #mobilityiOSVersion").show();			
+			}
+			else if($(this).val().toLowerCase().indexOf(".ipa") >= 0){
+				$("#mobilitySerialPath").hide();
+				$("#mobilityDeviceName, #mobilityiOSVersion, #mobilityUDID").show();			
+			}
+			$("#launchMobilityApps").find(".androidIcon").css({"background":"url('../imgs/ic-ios-active.png') left top no-repeat !important;","width":"88px; !important;"});			
+		}
 	})
 	//Mobile Serial Number Keyup Function
 	
@@ -1249,7 +1263,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			var blockMsg = 'Scrapping in progress. Please Wait...';
 			$(document).find("#desktopPath").removeClass("inputErrorBorder");
 			$(document).find("#OEBSPath").removeClass("inputErrorBorder");
-			$(document).find("#mobilityAPKPath, #mobilitySerialPath").removeClass("inputErrorBorder");
+			$(document).find("#mobilityAPKPath, #mobilitySerialPath, #mobilityDeviceName, #mobilityiOSVersion, #mobilityUDID").removeClass("inputErrorBorder");
 			$(document).find("#mobilityWebSerialNo, #mobilityAndroidVersion").removeClass("inputErrorBorder");
 			//For Desktop
 			if($scope.getScreenView == "Desktop"){
@@ -1283,21 +1297,51 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			
 			//For Mobility
 			else if($scope.getScreenView == "MobileApp"){
-				if($(document).find("#mobilityAPKPath").val() == ""){
-					$(document).find("#mobilityAPKPath").addClass("inputErrorBorder")
-					return false
+				if($("#mobilityAPKPath").val().toLowerCase().indexOf(".apk") >= 0){
+					if($(document).find("#mobilityAPKPath").val() == ""){
+						$(document).find("#mobilityAPKPath").addClass("inputErrorBorder")
+						return false
+					}
+					else if($(document).find("#mobilitySerialPath").val() == ""){
+						$(document).find("#mobilitySerialPath").addClass("inputErrorBorder")
+						return false
+					}
+					else{
+						$(document).find("#mobilityAPKPath, #mobilitySerialPath").removeClass("inputErrorBorder")
+						screenViewObject.appType = $scope.getScreenView,
+						screenViewObject.apkPath = $(document).find("#mobilityAPKPath").val();
+						screenViewObject.mobileSerial = $(document).find("#mobilitySerialPath").val();
+						$("#launchMobilityApps").modal("hide");
+						blockUI(blockMsg);
+					}					
 				}
-				else if($(document).find("#mobilitySerialPath").val() == ""){
-					$(document).find("#mobilitySerialPath").addClass("inputErrorBorder")
-					return false
-				}
-				else{
-					$(document).find("#mobilityAPKPath, #mobilitySerialPath").removeClass("inputErrorBorder")
-					screenViewObject.appType = $scope.getScreenView,
-					screenViewObject.apkPath = $(document).find("#mobilityAPKPath").val();
-					screenViewObject.mobileSerial = $(document).find("#mobilitySerialPath").val();
-					$("#launchMobilityApps").modal("hide");
-					blockUI(blockMsg);
+				else if($("#mobilityAPKPath").val().toLowerCase().indexOf(".ipa") >= 0 || $("#mobilityAPKPath").val().toLowerCase().indexOf(".app") >= 0){
+					if($(document).find("#mobilityAPKPath").val() == ""){
+						$(document).find("#mobilityAPKPath").addClass("inputErrorBorder")
+						return false
+					}
+					else if($(document).find("#mobilityDeviceName").val() == ""){
+						$(document).find("#mobilityDeviceName").addClass("inputErrorBorder")
+						return false
+					}
+					else if($(document).find("#mobilityiOSVersion").val() == ""){
+						$(document).find("#mobilityiOSVersion").addClass("inputErrorBorder")
+						return false
+					}
+					else if($(document).find("#mobilityUDID").val() == "" && $("#mobilityAPKPath").val().toLowerCase().indexOf(".ipa") >= 0){
+						$(document).find("#mobilityUDID").addClass("inputErrorBorder")
+						return false
+					}
+					else{
+						$(document).find("#mobilityAPKPath,#mobilityDeviceName,#mobilityiOSVersion,#mobilityUDID").removeClass("inputErrorBorder")
+						screenViewObject.appType = $scope.getScreenView,
+						screenViewObject.apkPath = $(document).find("#mobilityAPKPath").val();
+						screenViewObject.mobileDeviceName = $(document).find("#mobilityDeviceName").val();
+						screenViewObject.mobileIosVersion = $(document).find("#mobilityiOSVersion").val();
+						screenViewObject.mobileUDID = $(document).find("#mobilityUDID").val();
+						$("#launchMobilityApps").modal("hide");
+						blockUI(blockMsg);
+					}					
 				}
 			}
 			//For Mobility
@@ -1597,7 +1641,8 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 
 				var screen_width = document.getElementById('screenshot').height;
 				var real_width = document.getElementById('screenshot').naturalHeight;
-				scale_highlight = 1 / (real_width / screen_width)
+				if(appType == "MobileApp")	scale_highlight = viewString.mirrorheight;
+				else scale_highlight = 1 / (real_width / screen_width);
 				d.appendTo("#screenShotScrape");
 				d.css('border', "1px solid red");
 				if(appType == "MobileWeb"){
@@ -1613,10 +1658,10 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					d.css('width', Math.round(rect.w) * scale_highlight + 'px');
 				}
 				else if(appType == "MobileApp"){
-					d.css('left', Math.round(rect.x) * 1.8 * scale_highlight + 'px');
-					d.css('top', Math.round(rect.y) * 2 * scale_highlight + 'px');
-					d.css('height', Math.round(rect.h) * 1.7 * scale_highlight + 'px');
-					d.css('width', Math.round(rect.w) * 2.1 * scale_highlight + 'px');
+					d.css('left', rect.x + 'px');
+					d.css('top', rect.y + 'px');
+					d.css('height', rect.h + 'px');
+					d.css('width', rect.w + 'px');
 				}
 				else{
 					d.css('left', Math.round(rect.x)  * scale_highlight + 'px');
@@ -3304,20 +3349,23 @@ function contentTable(newTestScriptDataLS) {
 					}
 					else if (appTypeLocal == 'MobileApp'
 						&& (obType.indexOf("RadioButton") >= 0 || obType.indexOf("ImageButton") >= 0 || obType.indexOf("Button") >= 0|| obType.indexOf("EditText") >= 0 
-								|| obType.indexOf("Switch") >= 0 || obType.indexOf("CheckBox") >= 0 || obType.indexOf("Spinner") >= 0 || obType.indexOf("TimePicker") >= 0 
-								|| obType.indexOf("DatePicker") >= 0 || obType.indexOf("NumberPicker") >= 0 || obType.indexOf("RangeSeekBar") >= 0 || obType.indexOf("SeekBar") >= 0 || obType.indexOf("ListView") >= 0
-								|| obType.indexOf("XCUIElementTypeTextField") >= 0 || obType.indexOf("XCUIElementTypePickerWheel") >= 0)) {
+								|| obType.indexOf("Switch") >= 0 || obType.indexOf("CheckBox") >= 0 || obType.indexOf("Spinner") >= 0 || obType.indexOf("TimePicker") >= 0 || obType.indexOf("DatePicker") >= 0 
+								|| obType.indexOf("NumberPicker") >= 0 || obType.indexOf("RangeSeekBar") >= 0 || obType.indexOf("SeekBar") >= 0 || obType.indexOf("ListView") >= 0 || obType.indexOf("XCUIElementTypeTextField") >= 0 
+								|| obType.indexOf("XCUIElementTypePickerWheel") >= 0 || obType.indexOf("XCUIElementTypeSlider") >= 0)) {
 						var res = '';
 						var sc;
 						if (obType.indexOf("RadioButton") >= 0)
 						{sc = Object.keys(keywordArrayList.radiobutton);
 						selectedKeywordList = "radiobutton";}
-						else if (obType.indexOf("EditText") >= 0  || obType.indexOf("XCUIElementTypeTextField") >= 0)
+						else if (obType.indexOf("EditText") >= 0 || obType.indexOf("XCUIElementTypeTextField") >= 0)
 						{sc = Object.keys(keywordArrayList.input);
 						selectedKeywordList = "input";}
 						else if (obType.indexOf("XCUIElementTypePickerWheel") >= 0)
-						{sc = Object.keys(keywordArrayList.pickerwheel);	
+						{sc = Object.keys(keywordArrayList.pickerwheel);
 						selectedKeywordList = "pickerwheel";}
+						else if (obType.indexOf("XCUIElementTypeSlider") >= 0)
+						{sc = Object.keys(keywordArrayList.slider);
+						selectedKeywordList = "slider";}
 						else if (obType.indexOf("Switch") >= 0)
 						{sc = Object.keys(keywordArrayList.togglebutton);
 						selectedKeywordList = "togglebutton";}
@@ -3357,8 +3405,8 @@ function contentTable(newTestScriptDataLS) {
 						break;
 					} else if (appTypeLocal == 'MobileApp' && (!(obType.indexOf("RadioButton") >= 0 || obType.indexOf("ImageButton") >= 0 || obType.indexOf("Button") >= 0 || obType.indexOf("EditText") >= 0 
 							|| obType.indexOf("Switch") >= 0  || obType.indexOf("CheckBox") >= 0 || obType.indexOf("Spinner") >= 0 || obType.indexOf("TimePicker") >= 0 || obType.indexOf("DatePicker") >= 0 
-							|| obType.indexOf("NumberPicker") >= 0 || obType.indexOf("RangeSeekBar") >= 0 || obType.indexOf("SeekBar") >= 0 || obType.indexOf("ListView") >= 0
-							|| obType.indexOf("XCUIElementTypeTextField") >= 0 || obType.indexOf("XCUIElementTypePickerWheel") >= 0))) {
+							|| obType.indexOf("NumberPicker") >= 0 || obType.indexOf("RangeSeekBar") >= 0 || obType.indexOf("SeekBar") >= 0 || obType.indexOf("ListView") >= 0 || obType.indexOf("XCUIElementTypeTextField") >= 0 
+							|| obType.indexOf("XCUIElementTypePickerWheel") >= 0 || obType.indexOf("XCUIElementTypeSlider") >= 0))) {
 						var res = '';
 						var sc = Object.keys(keywordArrayList.element);
 						selectedKeywordList = "element";

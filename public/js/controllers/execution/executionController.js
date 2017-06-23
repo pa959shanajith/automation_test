@@ -15,6 +15,15 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 
 	//Task Listing
 	loadUserTasks()
+	var taskAuth;
+	if(window.localStorage['_CT'] == "")
+	{
+		taskAuth = false;
+	}
+	if(window.localStorage['_CT'] == "" && taskAuth == false)
+	{
+		window.location.href = "/";
+	}
 	var getTaskName = JSON.parse(window.localStorage['_CT']).taskName;
 	appType = JSON.parse(window.localStorage['_CT']).appType;
 

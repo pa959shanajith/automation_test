@@ -249,16 +249,6 @@ if (cluster.isMaster) {
     app.get('/logout', api.logout);
     app.post('/casQuerya', api.casScriptA);
     app.post('/neoQuerya', api.neoScriptA);
-    /*cmd.get('node index.js',
-    		function(data, err, stderr){
-    			if (!err) {
-    			console.log('the node-cmd:',data)
-    			} else {
-    			//console.log('error', err)
-				console.log('********************************* Port for jsreport is in use... *********************************');
-    			}
-    		}
-    );*/
     //Starting jsreport server
     cmd.get('netstat -ano | find "LISTENING" | find "8001"', function(data, err, stderr){
     	if(data){
@@ -268,7 +258,7 @@ if (cluster.isMaster) {
     		var cmdtoexe = "Taskkill /PID "+thisResult+" /F";
     		cmd.get(cmdtoexe, function(data, err, stderr){
     			if(data){
-    				console.log('===== Killed jsreport server =====',data);
+    				//console.log('===== Killed jsreport server =====',data);
     				cmd.get('node index.js', function(data, err, stderr){
     					if (!err) {
     						console.log('the node-cmd:',data)
@@ -346,6 +336,7 @@ if (cluster.isMaster) {
     app.post('/getMainReport_ICE', report.getMainReport_ICE);
     app.post('/getReport_Nineteen68', report.getReport_Nineteen68);
     app.post('/exportToJson_ICE', report.exportToJson_ICE);
+    app.post('/openScreenShot', report.openScreenShot);
     //Generic Routes
     app.post('/getProjectDetails_ICE', header.getProjectDetails_ICE);
     app.post('/getReleaseNameByReleaseId_ICE', header.getReleaseNameByReleaseId_ICE);
