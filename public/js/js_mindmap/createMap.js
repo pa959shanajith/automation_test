@@ -42,6 +42,7 @@ function loadMindmapData(){
 	});
 }
 function loadMindmapData1(){
+	var selectedTab = window.localStorage['tabMindMap'];
 	uNix=0;uLix=0;dNodes=[];dLinks=[];nCount=[0,0,0,0];scrList=[];tcList=[];cSpan=[0,0];cScale=1;mapSaved=!1;
 	//Adding task to scenario
 	taskAssign={"modules_endtoend":{"task":["Execute"],"attributes":["at","rw","sd","ed","re","cy"]},"modules":{"task":["Execute"],"attributes":["at","rw","sd","ed","re","cy"]},"scenarios":{"task":["Execute Scenario"],"attributes":["at","rw","sd","ed"]},"screens":{"task":["Scrape","Append","Compare","Add","Map"],"attributes":["at","rw","sd","ed"]},"testcases":{"task":["Update","Design"],"attributes":["at","rw","sd","ed"]}};
@@ -91,6 +92,7 @@ function loadMindmapData1(){
 				node.append('img').attr('class','ct-nodeIcon').attr('src',img_src).attr('alt','Module').attr('aria-hidden',true);
 				node.append('span').attr('class','ct-nodeLabel').html(t);
 			});
+			if(selectedTab=='tabCreate')
 			populateDynamicInputList();
 			setModuleBoxHeight();
 		}
@@ -491,11 +493,14 @@ var nodeClick = function(e){
 	var p=d3.select(activeNode);
 	var pi=parseInt(p.attr('id').split('-')[2]);
 	var t=p.attr('data-nodetype');
-	if(t!='testcases' && (dNodes[pi].children == undefined || dNodes[pi].children == null)){
+	if(t!='sceanrios' && dNodes[pi].parent.type!='modules_endtoend'){
+		if(t!='testcases' && (dNodes[pi].children == undefined || dNodes[pi].children == null)){
 		//380-Mindmap-Unable to create node when parent node is collapsed .- Error msg changed to Expand the node
 		openDialogMindmap('Error','Expand the node');
 		return;
 	}
+	}
+	
 	
 	//if(t=='scenarios') return;
 	var nt=(dNodes[pi].task!==undefined||dNodes[pi].task!=null)?dNodes[pi].task:!1;
@@ -1229,11 +1234,12 @@ var actionEvent = function(e){
 				node.append('span').attr('class','ct-nodeLabel').html(res.name.replace(/_/g,' '));
 			}
 			setModuleBoxHeight();
-			populateDynamicInputList();
+			if(selectedTab=='tabCreate') populateDynamicInputList();
+			
 			clearSvg();
 			treeBuilder(allMMaps[mid]);
 			unassignTask=[];
-			//var selectedTab = window.localStorage['tabMindMap']
+			
 			if(selectedTab=='tabAssign'){
 				openDialogMindmap("Success", "Tasks saved successfully");
 			}else{
@@ -1256,7 +1262,7 @@ var actionEvent = function(e){
 							node.append('img').attr('class','ct-nodeIcon').attr('src',img_src).attr('alt','Module').attr('aria-hidden',true);
 							node.append('span').attr('class','ct-nodeLabel').html(t);
 						});
-						
+						if(selectedTab=='tabCreate') 
 						populateDynamicInputList();
 						setModuleBoxHeight();
 				 	}

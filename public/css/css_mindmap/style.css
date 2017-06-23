@@ -123,6 +123,9 @@ p,a,img,text,span,.noselect{-webkit-touch-callout:none;-webkit-user-select:none;
 	width: 88px !important;
     margin-left: 20px;
 }
+.eteMboxETE{
+    height:48px;
+}
 .endtoend-modules-right-lower button{
 	float: right;
     border-radius: 13px;

@@ -505,18 +505,18 @@ var toggleNode_W = function(e){
 		p.select('.ct-cRight').classed('ct-nodeBubble',!1);
 		dNodes_W[pi]._children=dNodes_W[pi].children;
 		dNodes_W[pi].children=null;
-		recurseTogChild(dNodes_W[pi],!0);
+		recurseTogChild_W(dNodes_W[pi],!0);
 	}
 	else if(dNodes_W[pi]._children){
 		p.select('.ct-cRight').classed('ct-nodeBubble',!0);
 		dNodes_W[pi].children=dNodes_W[pi]._children;
 		dNodes_W[pi]._children=null;
-		recurseTogChild(dNodes_W[pi],!1);
+		recurseTogChild_W(dNodes_W[pi],!1);
 	}
 };
-var recurseTogChild = function(d,v){
+var recurseTogChild_W = function(d,v){
 	if(d.children) d.children.forEach(function(e){
-		recurseTogChild(e,v);
+		recurseTogChild_W(e,v);
 		d3.select('#ct-node-'+e.id).classed('no-disp',v);
 		for(j=dLinks_W.length-1;j>=0;j--){
 			if(dLinks_W[j].source.id==d.id){
@@ -525,7 +525,7 @@ var recurseTogChild = function(d,v){
 		}
 	});
 	else if(d._children) d._children.forEach(function(e){
-		recurseTogChild(e,!0);
+		recurseTogChild_W(e,!0);
 		d3.select('#ct-node-'+e.id).classed('no-disp',!0);
 		for(j=dLinks_W.length-1;j>=0;j--){
 			if(dLinks_W[j].source.id==d.id){
@@ -707,6 +707,11 @@ var actionEvent_W = function(e){
 	}
 	if(selectedProject!=cur_project){
 		openDialogMindmap('Error',"Module belongs to project: '"+$("#selectProjectEtem option[value='"+selectedProject+"']").text()+"'");
+		return;
+	}
+	if(mapData.length<=1) {
+		openDialogMindmap('Error','Incomplete flow! Moudles->Scenarios flow should be present');
+		s.classed('no-access',!1);
 		return;
 	}
 	dataSender({task:'endTOend',data:{write:flag,map:mapData,user_name:username,abc:deletednode_W,xyz:unassignTask,prjId:selectedProject,relId:$('#ct-assignRel').val(),cycId:$('#ct-assignCyc').val()}},function(err,result){
