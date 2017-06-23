@@ -44,7 +44,7 @@ function loadMindmapData(){
 function loadMindmapData1(){
 	uNix=0;uLix=0;dNodes=[];dLinks=[];nCount=[0,0,0,0];scrList=[];tcList=[];cSpan=[0,0];cScale=1;mapSaved=!1;
 	//Adding task to scenario
-	taskAssign={"modules":{"task":["Execute"],"attributes":["at","rw","sd","ed","re","cy"]},"scenarios":{"task":["Execute Scenario"],"attributes":["at","rw","sd","ed"]},"screens":{"task":["Scrape","Append","Compare","Add","Map"],"attributes":["at","rw","sd","ed"]},"testcases":{"task":["Update","Design"],"attributes":["at","rw","sd","ed"]}};
+	taskAssign={"modules_endtoend":{"task":["Execute"],"attributes":["at","rw","sd","ed","re","cy"]},"modules":{"task":["Execute"],"attributes":["at","rw","sd","ed","re","cy"]},"scenarios":{"task":["Execute Scenario"],"attributes":["at","rw","sd","ed"]},"screens":{"task":["Scrape","Append","Compare","Add","Map"],"attributes":["at","rw","sd","ed"]},"testcases":{"task":["Update","Design"],"attributes":["at","rw","sd","ed"]}};
 	zoom=d3.behavior.zoom().scaleExtent([0.1,3]).on("zoom", zoomed);
 	faRef={"plus":"fa-plus","edit":"fa-pencil-square-o","delete":"fa-trash-o"};
 	
@@ -76,7 +76,7 @@ function loadMindmapData1(){
 			// svgTileG.append('path').attr('d','M55,75L95,75');
 	}
 	d3.select('#ct-assignBox').classed('no-disp',!0);
-	dataSender({task:'getModules',prjId:$(".project-list").val()},function(err,result){
+	dataSender({task:'getModules',tab:window.localStorage['tabMindMap'],prjId:$(".project-list").val()},function(err,result){
 		if(err) console.log(result);
 		else{
 			var nodeBox=d3.select('.ct-nodeBox');
@@ -85,8 +85,10 @@ function loadMindmapData1(){
 			allMMaps.forEach(function(e,i){
 				//var t=e.name.replace(/_/g,' ');
 				var t = $.trim(e.name);
+				var img_src='images_mindmap/node-modules-no.png';
+				if (e.type=='modules_endtoend') img_src='images_mindmap/MM5.png';
 				var node=nodeBox.append('div').attr('class','ct-node fl-left').attr('data-mapid',i).attr('title',t).on('click',loadMap);
-				node.append('img').attr('class','ct-nodeIcon').attr('src','images_mindmap/node-modules-no.png').attr('alt','Module').attr('aria-hidden',true);
+				node.append('img').attr('class','ct-nodeIcon').attr('src',img_src).attr('alt','Module').attr('aria-hidden',true);
 				node.append('span').attr('class','ct-nodeLabel').html(t);
 			});
 			populateDynamicInputList();
@@ -121,7 +123,7 @@ var initiate = function(){
 	// var mapSvgDiv = canvas.append('div').attr("class","ct-mapSvgContainer");
 	// var mapSvg=mapSvgDiv.append('svg').attr('id','ct-mapSvg').call(zoom).on('click.hideElements',clickHideElements);
 	var mapSvg=canvas.append('svg').attr('id','ct-mapSvg').call(zoom).on('click.hideElements',clickHideElements);
-	var dataAdder=[{c:'#5c5ce5',t:'Modules'},{c:'#4299e2',t:'Scenarios'},{c:'#19baae',t:'Screens'},{c:'#efa022',t:'Test Cases'}];
+	var dataAdder=[{c:'#5c5ce5',t:'Modules'},{c:'#5c5ce5',t:'Modules'},{c:'#4299e2',t:'Scenarios'},{c:'#19baae',t:'Screens'},{c:'#efa022',t:'Test Cases'}];
 	u=canvas.append('svg').attr('id','ct-legendBox').append('g').attr('transform','translate(10,10)');
 	dataAdder.forEach(function(e,i) {
 		t=u.append('g');
@@ -187,15 +189,18 @@ var addNode = function(n,m,pi){
 	
 	var v=d3.select('#ct-mindMap').append('g').attr('id','ct-node-'+n.id).attr('class','ct-node').attr('data-nodetype',n.type).attr('transform',"translate("+(n.x).toString()+","+(n.y).toString()+")");
 	// To fix rendering issue in FF issue #415
+	
+	var img_src='images_mindmap/node-'+n.type+'.png';
+	if (n.type=='modules_endtoend') img_src='images_mindmap/MM5.png';
 	if($("#ct-canvas").attr('class')=='tabCreate ng-scope'){
-		v.append('image').attr('height','40px').attr('width','40px').attr('class','ct-nodeIcon').attr('xlink:href','images_mindmap/node-'+n.type+'.png').on('click',nodeCtrlClick);
+		v.append('image').attr('height','40px').attr('width','40px').attr('class','ct-nodeIcon').attr('xlink:href',img_src).on('click',nodeCtrlClick);
 	}else{
-		v.append('image').attr('height','40px').attr('width','40px').attr('class','ct-nodeIcon').attr('xlink:href','images_mindmap/node-'+n.type+'.png').on('click',nodeClick);
+		v.append('image').attr('height','40px').attr('width','40px').attr('class','ct-nodeIcon').attr('xlink:href',img_src).on('click',nodeClick);
 	}
 	
 	n.display_name=n.name;
 	var ch=15;
-	if(n.name.length>15 && n.type!='modules'){
+	if(n.name.length>15 && n.type!='modules' && n.type!='modules_endtoend'){
 		if(n.type=='testcases') ch=9;
 		n.display_name=n.display_name.slice(0,ch)+'...';
 	}
@@ -310,7 +315,7 @@ var addTask = function(e){
 	if(dateFlag && reviewerFlag){
 		Object.keys(tObj).forEach(function(k){if(tObj[k]===undefined) tObj[k]=null;});
 		//if(p.select('.ct-nodeTask')[0][0]==null) p.append('image').attr('class','ct-nodeTask').attr('xlink:href','images_mindmap/node-task-assigned.png').attr('x',29).attr('y',-10);
-		if(nType=="modules"){
+		if(nType=="modules" || nType=="modules_endtoend"){
 			if(tObj.cy != 'select cycle' && tObj.re != 'select release'){
 				if(dNodes[pi].id_c!="null"){
 					dNodes[pi].task={id:tObj.id,oid:tObj.oid,task:tObj.t,assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,release:tObj.re,cycle:tObj.cy,details:tObj.det,parent:(tObj.parent!=null)?tObj.parent:[dNodes[pi].id_c]};
@@ -332,36 +337,39 @@ var addTask = function(e){
 							}
 
 					}
-					tSc.children.forEach(function(scr){
-						if(scr.task===undefined||scr.task==null){
-							if(dNodes[pi].id_c!='null' && tSc.id_c!='null' && scr.id_c!='null'){
-								taskflag=true;
-								scr.task={id:null,oid:null,task:"Scrape",assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,details:tObj.det,parent:[dNodes[pi].id_c,tSc.id_c,scr.id_c]};
-								d3.select('#ct-node-'+scr.id).append('image').attr('class','ct-nodeTask').attr('xlink:href','images_mindmap/node-task-assigned.png').attr('x',29).attr('y',-10);
+					if(tSc.children != undefined){				
+						tSc.children.forEach(function(scr){
+							if(scr.task===undefined||scr.task==null){
+								if(dNodes[pi].id_c!='null' && tSc.id_c!='null' && scr.id_c!='null'){
+									taskflag=true;
+									scr.task={id:null,oid:null,task:"Scrape",assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,details:tObj.det,parent:[dNodes[pi].id_c,tSc.id_c,scr.id_c]};
+									d3.select('#ct-node-'+scr.id).append('image').attr('class','ct-nodeTask').attr('xlink:href','images_mindmap/node-task-assigned.png').attr('x',29).attr('y',-10);
+								}
+								
+							}else{
+								if(scr.task.parent.indexOf(null)==-1 && scr.task.parent!=[dNodes[pi].id_c,tSc.id_c,scr.id_c]){
+									scr.task['updatedParent']=[dNodes[pi].id_c,tSc.id_c,scr.id_c];
+								}
+
 							}
 							
-						}else{
-							if(scr.task.parent.indexOf(null)==-1 && scr.task.parent!=[dNodes[pi].id_c,tSc.id_c,scr.id_c]){
-								scr.task['updatedParent']=[dNodes[pi].id_c,tSc.id_c,scr.id_c];
-							}
-
-						}
-						
-						scr.children.forEach(function(tCa){
-							if(tCa.task===undefined||tCa.task==null){
-								if(dNodes[pi].id_c!='null' && tSc.id_c!='null' && scr.id_c!='null' && tCa.id_c != 'null' ){
+							scr.children.forEach(function(tCa){
+								if(tCa.task===undefined||tCa.task==null){
+									if(dNodes[pi].id_c!='null' && tSc.id_c!='null' && scr.id_c!='null' && tCa.id_c != 'null' ){
+										taskflag=true;
+										tCa.task={id:null,oid:null,task:"Design",assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,details:tObj.det,parent:[dNodes[pi].id_c,tSc.id_c,scr.id_c,tCa.id_c]};
+										d3.select('#ct-node-'+tCa.id).append('image').attr('class','ct-nodeTask').attr('xlink:href','images_mindmap/node-task-assigned.png').attr('x',29).attr('y',-10);
+									}
+								}else{
+									if(tCa.task.parent!=[dNodes[pi].id_c,tSc.id_c,scr.id_c,tCa.id_c]){
+										tCa.task['updatedParent']=[dNodes[pi].id_c,tSc.id_c,scr.id_c,tCa.id_c];
+									}
 									taskflag=true;
-									tCa.task={id:null,oid:null,task:"Design",assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,details:tObj.det,parent:[dNodes[pi].id_c,tSc.id_c,scr.id_c,tCa.id_c]};
-									d3.select('#ct-node-'+tCa.id).append('image').attr('class','ct-nodeTask').attr('xlink:href','images_mindmap/node-task-assigned.png').attr('x',29).attr('y',-10);
 								}
-							}else{
-								if(tCa.task.parent!=[dNodes[pi].id_c,tSc.id_c,scr.id_c,tCa.id_c]){
-									tCa.task['updatedParent']=[dNodes[pi].id_c,tSc.id_c,scr.id_c,tCa.id_c];
-								}
-								taskflag=true;
-							}
+							});
 						});
-					});
+					}else if(nType=='modules_endtoend') taskflag =true;
+
 				});
 			}else{
 				taskflag='';
@@ -864,7 +872,6 @@ var recurseDelChild = function(d){
 };
 var moveNode = function(e){
 	e=e||window.event;
-	// console.log("translate("+parseFloat((e.pageX-14-cSpan[0])/cScale+2)+","+parseFloat((e.pageY-70-cSpan[1])/cScale-20)+")");
 	d3.select('.ct-movable').attr('transform', "translate("+parseFloat((e.pageX-14-cSpan[0])/cScale+2)+","+parseFloat((e.pageY-70-cSpan[1])/cScale-20)+")");
 };
 var moveNodeBegin = function(e){
@@ -1153,9 +1160,15 @@ var submit_task=function(e){
 }
 
 var actionEvent = function(e){
+	var selectedTab = window.localStorage['tabMindMap'];
 	var s=d3.select(this);
+	var cur_module=null;
 	var error=!1,mapData=[],flag=0,alertMsg;
 	error=treeIterator(mapData,dNodes[0],error);
+	if(dNodes[0].type=='modules_endtoend'){
+		cur_module='end_to_end';
+		error=false;
+	} 
 	if(error){
 		openDialogMindmap("Error", "Mindmap flow must be complete! Modules -> Scenarios -> Screens -> Testcases")
 		//$('#Mindmap_error').modal('show');
@@ -1182,7 +1195,7 @@ var actionEvent = function(e){
 		openDialogMindmap('Error','No projects is assigned to User');
 		return !1;
 	}
-	dataSender({task:'writeMap',data:{write:flag,map:mapData,user_name:username,abc:deletednode,xyz:unassignTask,prjId:$('.project-list').val(),relId:$('#ct-assignRel').val(),cycId:$('#ct-assignCyc').val()}},function(err,result){
+	dataSender({task:'writeMap',data:{write:flag,tab:cur_module,map:mapData,user_name:username,abc:deletednode,xyz:unassignTask,prjId:$('.project-list').val(),relId:$('#ct-assignRel').val(),cycId:$('#ct-assignCyc').val()}},function(err,result){
 		s.classed('no-access',!1);
 		if(err){
 			console.log(result);
@@ -1220,14 +1233,14 @@ var actionEvent = function(e){
 			clearSvg();
 			treeBuilder(allMMaps[mid]);
 			unassignTask=[];
-			var selectedTab = window.localStorage['tabMindMap']
-			if(selectedTab=='tabCreate'){
-				openDialogMindmap("Success", "Data saved successfully");
-			}else{
+			//var selectedTab = window.localStorage['tabMindMap']
+			if(selectedTab=='tabAssign'){
 				openDialogMindmap("Success", "Tasks saved successfully");
+			}else{
+				openDialogMindmap("Success", "Data saved successfully");
 			}
 			
-			 dataSender({task:'getModules',prjId:$(".project-list").val()},function(err,result){
+			 dataSender({task:'getModules',tab:window.localStorage['tabMindMap'],prjId:$(".project-list").val()},function(err,result){
 				 	if(err) console.log(result);
 				 	else{
 						// console.log(result);
@@ -1236,11 +1249,14 @@ var actionEvent = function(e){
 						allMMaps=JSON.parse(result);
 						allMMaps.forEach(function(e,i){
 							//var t=e.name.replace(/_/g,' ');
+							var img_src='images_mindmap/node-modules-no.png';
+							if (e.type=='modules_endtoend') img_src='images_mindmap/MM5.png';
 							var t = $.trim(e.name);
 							var node=nodeBox.append('div').attr('class','ct-node fl-left').attr('data-mapid',i).attr('title',t).on('click',loadMap);
-							node.append('img').attr('class','ct-nodeIcon').attr('src','images_mindmap/node-modules-no.png').attr('alt','Module').attr('aria-hidden',true);
+							node.append('img').attr('class','ct-nodeIcon').attr('src',img_src).attr('alt','Module').attr('aria-hidden',true);
 							node.append('span').attr('class','ct-nodeLabel').html(t);
 						});
+						
 						populateDynamicInputList();
 						setModuleBoxHeight();
 				 	}
@@ -1400,7 +1416,7 @@ var callme=function(){
 var treeBuilder = function(tree){
 	node_names_tc=[];
 	var pidx=0,levelCount=[1],cSize=getElementDimm(d3.select("#ct-mapSvg"));
-	var typeNum={'modules':0,'scenarios':1,'screens':2,'testcases':3};
+	var typeNum={'modules':0,'modules_endtoend':0,'scenarios':1,'screens':2,'testcases':3};
 	var childCounter = function(l,s){
 		if(levelCount.length<=l) levelCount.push(0);
 		if(s.children) {
