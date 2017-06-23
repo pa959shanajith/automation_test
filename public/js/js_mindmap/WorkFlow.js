@@ -48,6 +48,7 @@ function loadMindmapData_W(){
 }
 
 function loadMindmapData1_W(){
+	$('#eteScenarioContainer').empty();
 	d3.select('.addScenarios-ete').classed('disableButton',!0);
 	$('#ct-saveAction_W').removeClass('no-access');
 	//uNix=0;uLix=0;dNodes=[];dLinks=[];nCount=[0,0,0,0];scrList=[];tcList=[];cSpan_W=[0,0];cScale_W=1;mapSaved=!1;
@@ -706,7 +707,7 @@ var actionEvent_W = function(e){
 		} 
 	}
 	if(selectedProject!=cur_project){
-		openDialogMindmap('Error',"Module belongs to project: '"+$("#selectProjectEtem option[value='"+selectedProject+"']").text()+"'");
+		openDialogMindmap('Error',"Module belongs to project: '"+$("#selectProjectEtem option[value='"+selectedProject+"']").text()+"' Please go back to the same project and Save");
 		return;
 	}
 	if(mapData.length<=1) {
