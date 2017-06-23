@@ -376,6 +376,30 @@
 	background: rgb(211, 211, 211)
 }
 
+/* End to End Modules */
+.scrollbar-inner.endtoend-modules-left-lower, .scrollbar-inner.endtoend-modules-rightfirst-lower {
+    margin-top: 0px;
+    height: calc(100% - 41px);
+}
+
+.scroll-wrapper > .endtoend-modules-left-lower, .scroll-wrapper > .endtoend-modules-rightfirst-lower{
+	min-height:auto;
+	width: 100% !important;
+	height: 100% !important;
+}
+
+.endtoend-modules-left-lower > .scroll-element.scroll-y, .endtoend-modules-rightfirst-lower > .scroll-element.scroll-y{
+	top: 3px;
+    height: calc(100% - 4px);
+}
+.endtoend-modules-left-lower > .scroll-element.scroll-y .scroll-bar, .endtoend-modules-rightfirst-lower > .scroll-element.scroll-y .scroll-bar{
+	background: #321e4f;
+	min-height: 20px;
+}
+.endtoend-modules-left-lower > .scroll-element .scroll-element_track, .endtoend-modules-rightfirst-lower > .scroll-element .scroll-element_track{
+	background: rgb(211, 211, 211)
+}
+/* */
 
 .scroll-wrapper > .scrollbar-inner-report{
 	padding: 0px;
@@ -707,4 +731,8 @@
 	.scroll-wrapper > .scrollbar-inner-rep{
 	    height: 155px !important;
 	}
+}
+@media screen and (max-height: 1080px){
+	.scroll-wrapper > .scrollbar-screenshot{max-height: 360px !important;}
+	.scroll-wrapper > .scrollbar-screenshotTs{max-height: 268px !important;}
 }

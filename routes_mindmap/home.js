@@ -67,58 +67,62 @@ router.post('/', function(req, res, next) {
 				}
 			});
 		}
-		else if(d.task=='loadMap'){
-			qList.push({"statement":"MATCH path=(n:MODULES{projectID:'"+prjId+"'})-[r*1..]->(t) RETURN path","resultDataContents":["graph"]});
-			reqToAPI({"data":{"statements":qList}},urlData,'/neoQuerya',function(err,status,result){
-				res.setHeader('Content-Type','application/json');
-				if(err) res.status(status).send(err);
-				else if(status!=200) res.status(status).send(result);
-				else{
-					var k=0,rIndex,lbl,neoIdDict={};
-					idDict={};
-					var attrDict={"modules":{"childIndex":"childIndex","projectID":"pid_n","moduleName":"name","moduleID":"id_n","moduleID_c":"id_c"},"scenarios":{"childIndex":"childIndex","moduleID":"pid_n","testScenarioName":"name","testScenarioID":"id_n","testScenarioID_c":"id_c"},"screens":{"childIndex":"childIndex","testScenarioID":"pid_n","screenName":"name","screenID":"id_n","screenID_c":"id_c"},"testcases":{"childIndex":"childIndex","screenID":"pid_n","testCaseName":"name","testCaseID":"id_n","testCaseID_c":"id_c"},"tasks":{"taskID":"id_n","task":"t","assignedTo":"at","reviewer":"rw","startDate":"sd","endDate":"ed","release":"re","cycle":"cy","details":"det","nodeID":"pid","parent":"anc"}};
-					var jsonData=JSON.parse(result);
-					jsonData[0].data.forEach(function(row){
-						row.graph.nodes.forEach(function(n){
-							if (idDict[n.id] === undefined) {
-								lbl=n.labels[0].toLowerCase();
-								if(lbl=='testscenarios') lbl='scenarios';
-								for (var attrs in n.properties){
-									if(attrDict[lbl][attrs] !== undefined) n[attrDict[lbl][attrs]]=n.properties[attrs];
-									delete n.properties[attrs];
-								}
-								if(lbl=="tasks") nData.push({id:n.id_n,oid:n.id,task:n.t,assignedTo:n.at,reviewer:n.rw,startDate:n.sd,endDate:n.ed,release:n.re,cycle:n.cy,details:n.det,nodeID:n.pid,parent:n.anc.slice(1,-1).split(',')});
-								else{
-									if(lbl=="modules") n.childIndex=0;
-									nData.push({childIndex:n.childIndex,id:n.id,"type":lbl,name:n.name,id_n:n.id_n,pid_n:n.pid_n,id_c:n.id_c,children:[],task:null});
-								} 
-								if(lbl=="modules") rIndex=k;
-								idDict[n.id]=k;neoIdDict[n.id_n]=k;
-								k++;
-							}
-						});
-						row.graph.relationships.forEach(function(r){
-							var srcIndex=idDict[r.startNode.toString()];
-							var tgtIndex=idDict[r.endNode.toString()];
-							if(nData[tgtIndex].children===undefined) nData[srcIndex].task=nData[tgtIndex];
-							else if(nData[srcIndex].children.indexOf(nData[tgtIndex])==-1){
-								nData[srcIndex].children.push(nData[tgtIndex]);
-								if(nData[tgtIndex].childIndex==undefined) nData[tgtIndex].childIndex=nData[srcIndex].children.length;
-							} 
-						});
-					});
-					nData.forEach(function(e){
-						if(e.pid_n){
-							if(neoIdDict[e.pid_n]!==undefined) e.pid_n=nData[neoIdDict[e.pid_n]].id;
-							else e.pid_n=null;
-						}
-					});
-					res.status(status).send(nData[rIndex]);
-				}
-			});
-		}
+		
+		// else if(d.task=='loadMap'){
+		// 	qList.push({"statement":"MATCH path=(n:MODULES{projectID:'"+prjId+"'})-[r*1..]->(t) RETURN path","resultDataContents":["graph"]});
+		// 	reqToAPI({"data":{"statements":qList}},urlData,'/neoQuerya',function(err,status,result){
+		// 		res.setHeader('Content-Type','application/json');
+		// 		if(err) res.status(status).send(err);
+		// 		else if(status!=200) res.status(status).send(result);
+		// 		else{
+		// 			var k=0,rIndex,lbl,neoIdDict={};
+		// 			idDict={};
+		// 			var attrDict={"modules":{"childIndex":"childIndex","projectID":"pid_n","moduleName":"name","moduleID":"id_n","moduleID_c":"id_c"},"scenarios":{"childIndex":"childIndex","moduleID":"pid_n","testScenarioName":"name","testScenarioID":"id_n","testScenarioID_c":"id_c"},"screens":{"childIndex":"childIndex","testScenarioID":"pid_n","screenName":"name","screenID":"id_n","screenID_c":"id_c"},"testcases":{"childIndex":"childIndex","screenID":"pid_n","testCaseName":"name","testCaseID":"id_n","testCaseID_c":"id_c"},"tasks":{"taskID":"id_n","task":"t","assignedTo":"at","reviewer":"rw","startDate":"sd","endDate":"ed","release":"re","cycle":"cy","details":"det","nodeID":"pid","parent":"anc"}};
+		// 			var jsonData=JSON.parse(result);
+		// 			jsonData[0].data.forEach(function(row){
+		// 				row.graph.nodes.forEach(function(n){
+		// 					if (idDict[n.id] === undefined) {
+		// 						lbl=n.labels[0].toLowerCase();
+		// 						if(lbl=='testscenarios') lbl='scenarios';
+		// 						for (var attrs in n.properties){
+		// 							if(attrDict[lbl][attrs] !== undefined) n[attrDict[lbl][attrs]]=n.properties[attrs];
+		// 							delete n.properties[attrs];
+		// 						}
+		// 						if(lbl=="tasks") nData.push({id:n.id_n,oid:n.id,task:n.t,assignedTo:n.at,reviewer:n.rw,startDate:n.sd,endDate:n.ed,release:n.re,cycle:n.cy,details:n.det,nodeID:n.pid,parent:n.anc.slice(1,-1).split(',')});
+		// 						else{
+		// 							if(lbl=="modules") n.childIndex=0;
+		// 							nData.push({childIndex:n.childIndex,id:n.id,"type":lbl,name:n.name,id_n:n.id_n,pid_n:n.pid_n,id_c:n.id_c,children:[],task:null});
+		// 						} 
+		// 						if(lbl=="modules") rIndex=k;
+		// 						idDict[n.id]=k;neoIdDict[n.id_n]=k;
+		// 						k++;
+		// 					}
+		// 				});
+		// 				row.graph.relationships.forEach(function(r){
+		// 					var srcIndex=idDict[r.startNode.toString()];
+		// 					var tgtIndex=idDict[r.endNode.toString()];
+		// 					if(nData[tgtIndex].children===undefined) nData[srcIndex].task=nData[tgtIndex];
+		// 					else if(nData[srcIndex].children.indexOf(nData[tgtIndex])==-1){
+		// 						nData[srcIndex].children.push(nData[tgtIndex]);
+		// 						if(nData[tgtIndex].childIndex==undefined) nData[tgtIndex].childIndex=nData[srcIndex].children.length;
+		// 					} 
+		// 				});
+		// 			});
+		// 			nData.forEach(function(e){
+		// 				if(e.pid_n){
+		// 					if(neoIdDict[e.pid_n]!==undefined) e.pid_n=nData[neoIdDict[e.pid_n]].id;
+		// 					else e.pid_n=null;
+		// 				}
+		// 			});
+		// 			res.status(status).send(nData[rIndex]);
+		// 		}
+		// 	});
+		// }
 		else if(d.task=='getModules'){
 			prjId=d.prjId;
+			if(d.tab=='tabAssign' || d.tab=='endToend'){
+				qList.push({"statement":"MATCH path=(n:MODULES_ENDTOEND{projectID:'"+prjId+"'})-[r*1..]->(t) RETURN path","resultDataContents":["graph"]});
+			}
 			qList.push({"statement":"MATCH path=(n:MODULES{projectID:'"+prjId+"'})-[r*1..]->(t) RETURN path","resultDataContents":["graph"]});
 			reqToAPI({"data":{"statements":qList}},urlData,'/neoQuerya',function(err,status,result){
 				res.setHeader('Content-Type','application/json');
@@ -126,9 +130,14 @@ router.post('/', function(req, res, next) {
 				else if(status!=200) res.status(status).send(result);
 				else{
 					var k=0,rIndex=[],lbl,neoIdDict={},maps=[],tList=[];
-					var attrDict={"modules":{"childIndex":"childIndex","projectID":"pid_n","moduleName":"name","moduleID":"id_n","moduleID_c":"id_c"},"scenarios":{"childIndex":"childIndex","moduleID":"pid_n","testScenarioName":"name","testScenarioID":"id_n","testScenarioID_c":"id_c"},"screens":{"childIndex":"childIndex","testScenarioID":"pid_n","screenName":"name","screenID":"id_n","screenID_c":"id_c"},"testcases":{"childIndex":"childIndex","screenID":"pid_n","testCaseName":"name","testCaseID":"id_n","testCaseID_c":"id_c"},"tasks":{"taskID":"id_n","task":"t","assignedTo":"at","reviewer":"rw","startDate":"sd","endDate":"ed","release":"re","cycle":"cy","details":"det","nodeID":"pid","parent":"anc"}};
+					var attrDict={"modules_endtoend":{"childIndex":"childIndex","projectID":"projectID","moduleName":"name","moduleID":"id_n","moduleID_c":"id_c"},"modules":{"childIndex":"childIndex","projectID":"pid_n","moduleName":"name","moduleID":"id_n","moduleID_c":"id_c"},"scenarios":{"projectID":"projectID","childIndex":"childIndex","moduleID":"pid_n","testScenarioName":"name","testScenarioID":"id_n","testScenarioID_c":"id_c"},"screens":{"childIndex":"childIndex","testScenarioID":"pid_n","screenName":"name","screenID":"id_n","screenID_c":"id_c"},"testcases":{"childIndex":"childIndex","screenID":"pid_n","testCaseName":"name","testCaseID":"id_n","testCaseID_c":"id_c"},"tasks":{"taskID":"id_n","task":"t","assignedTo":"at","reviewer":"rw","startDate":"sd","endDate":"ed","release":"re","cycle":"cy","details":"det","nodeID":"pid","parent":"anc"}};
 					var jsonData=JSON.parse(result);
-					jsonData[0].data.forEach(function(row){
+					var all_modules=jsonData[0].data;
+					if (qList.length>1){
+						all_modules=jsonData[0].data.concat(jsonData[1].data);
+						//all_modules.push(jsonData[1].data);
+					}
+					all_modules.forEach(function(row){
 						row.graph.nodes.forEach(function(n){
 							if (idDict[n.id] === undefined) {
 								lbl=n.labels[0].toLowerCase();
@@ -147,11 +156,11 @@ router.post('/', function(req, res, next) {
 									}
 								}
 								else{
-									if(lbl=="modules") n.childIndex=0;
-									nData.push({childIndex:n.childIndex,id:n.id,"type":lbl,name:n.name,id_n:n.id_n,pid_n:n.pid_n,id_c:n.id_c,children:[],task:null});
+									if(lbl=="modules" || lbl=="modules_endtoend") n.childIndex=0;
+									nData.push({projectID:n.projectID,childIndex:n.childIndex,id:n.id,"type":lbl,name:n.name,id_n:n.id_n,pid_n:n.pid_n,id_c:n.id_c,children:[],task:null});
 
 								} 
-								if(lbl=="modules") rIndex.push(k);
+								if(lbl=="modules" || lbl=="modules_endtoend") rIndex.push(k);
 								idDict[n.id]=k;neoIdDict[n.id_n]=k;
 								k++;
 							}
@@ -185,10 +194,12 @@ router.post('/', function(req, res, next) {
 				}
 			});
 		}
-		else if(d.task=='writeMap'){
+		else if(d.task=='endTOend'){
+
 			data=d.data.map;
 			prjId=d.data.prjId;
 			var deletednodes=d.data.abc;
+			var user=d.data.user_name
 			//TO support task deletion
 			var removeTask=d.data.xyz;
 			if(d.data.write==10){
@@ -206,12 +217,12 @@ router.post('/', function(req, res, next) {
 					e.id=idDict[e.id];
 					t=e.task;
 					var taskstatus='inprogress';
-					if(e.type=='modules'){
-						if(e.oid!=null){
-							qList.push({"statement":"MATCH (n)-[r:FMTTS{id:'"+e.id+"'}]->(o:TESTSCENARIOS)-[s]->(p:SCREENS)-[t]->(q:TESTCASES) DETACH DELETE r,s,t,o,p,q"});
-							if(e.renamed) qList.push({"statement":"MATCH(n:MODULES{moduleID:'"+e.id+"'}) SET n.moduleName='"+e.name+"'"+",n.unique_property='["+e.name+','+prjId+"]'"});
+					if(e.type=='modules_endtoend'){
+						if(e.oid!=null){			
+							qList.push({"statement":"MATCH (n)-[r:FMTTS{id:'"+e.id+"'}]->(o:TESTSCENARIOS) DETACH DELETE r,o;"});
+							if(e.renamed) qList.push({"statement":"MATCH(n:MODULES_ENDTOEND{moduleID:'"+e.id+"'}) SET n.moduleName='"+e.name+"'"+",n.unique_property='["+e.name+','+e.projectID+"]'"});
 						}
-						else qList.push({"statement":"MERGE(n:MODULES{projectID:'"+prjId+"',moduleName:'"+e.name+"',moduleID:'"+e.id+"',createdBy:'null',createdOn:'null',moduleID_c:'"+e.id_c+"',unique_property:'["+e.name+','+prjId+"]'}) SET n.childIndex='"+e.childIndex+"'"});
+						else qList.push({"statement":"MERGE(n:MODULES_ENDTOEND{projectID:'"+e.projectID+"',moduleName:'"+e.name+"',moduleID:'"+e.id+"',createdBy:'"+user+"',createdOn:'null',moduleID_c:'"+e.id_c+"',unique_property:'["+e.name+','+e.projectID+"]'}) SET n.childIndex='"+e.childIndex+"'"});
 						if(t!=null && e.id_c !=null){
 							t.parent=[prjId].concat(e.id_c);
 							t.id=(t.id!=null)?t.id:uuidV4();
@@ -229,7 +240,216 @@ router.post('/', function(req, res, next) {
 					}
  					else if(e.type=='scenarios'){
 						if(e.renamed && e.id_n) rnmList.push({"statement":"MATCH(n:TESTSCENARIOS{testScenarioID:'"+e.id+"'}) SET n.testScenarioName='"+e.name+"'"+",n.projectID='"+prjId+"'"});
-						qList.push({"statement":"MERGE(n:TESTSCENARIOS{projectID:'"+prjId+"',moduleID:'"+idDict[e.pid]+"',testScenarioName:'"+e.name+"',testScenarioID:'"+e.id+"',createdBy:'null',createdOn:'null',testScenarioID_c:'"+e.id_c+"'}) SET n.childIndex='"+e.childIndex+"'"});
+						qList.push({"statement":"MERGE(n:TESTSCENARIOS{projectID:'"+e.projectID+"',moduleID:'"+idDict[e.pid]+"',testScenarioName:'"+e.name+"',testScenarioID:'"+e.id+"',createdBy:'"+user+"',createdOn:'null',testScenarioID_c:'"+e.id_c+"'}) SET n.childIndex='"+e.childIndex+"'"});
+						//Supporting task assignmnet for scenarios
+						if(t!=null && e.id_c!=null){
+							t.parent=[prjId].concat(e.pid_c,e.id_c);
+							t.id=(t.id!=null)?t.id:uuidV4();
+		
+							if(t.oid!=null){
+								if (t.updatedParent != undefined){
+									qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',nodeID:'"+e.id+"',parent:'["+t.parent+"]'}) SET n.task='"+t.task+"',n.status='"+taskstatus+"',n.assignedTo='"+t.assignedTo+"',n.reviewer='"+t.reviewer+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.release='"+t.release+"',n.cycle='"+t.cycle+"',n.details='"+t.details+"',n.parent='["+[prjId].concat(t.updatedParent)+"]'"});
+								}else{
+									qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',nodeID:'"+e.id+"',parent:'["+t.parent+"]'}) SET n.task='"+t.task+"',n.status='"+taskstatus+"',n.assignedTo='"+t.assignedTo+"',n.reviewer='"+t.reviewer+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.release='"+t.release+"',n.cycle='"+t.cycle+"',n.details='"+t.details+"'"});
+								}
+								
+							} 
+							else qList.push({"statement":"MERGE(n:TASKS{taskID:'"+t.id+"',task:'"+t.task+"',assignedTo:'"+t.assignedTo+"',reviewer:'"+t.reviewer+"',status:'"+taskstatus+"',startDate:'"+t.startDate+"',endDate:'"+t.endDate+"',release:'"+t.release+"',cycle:'"+t.cycle+"',details:'"+t.details+"',nodeID:'"+e.id+"',parent:'["+t.parent+"]'})"});
+						}
+						//qList.push({"statement":"MATCH(n:TESTSCENARIOS{testScenarioID:'"+e.id+"'}) SET n.testScenarioName='"+e.name+"'"+",n.projectID='"+prjId+"'"});
+					}
+					
+					
+				});
+				qList.push({"statement":"MATCH (a:MODULES_ENDTOEND),(b:TESTSCENARIOS) WHERE a.moduleID=b.moduleID MERGE (a)-[r:FMTTS {id:b.moduleID}]-(b)"});
+				// qList.push({"statement":"MATCH (a:TESTSCENARIOS),(b:SCREENS) WHERE a.testScenarioID=b.testScenarioID MERGE (a)-[r:FTSTS {id:b.testScenarioID}]-(b)"});
+				// qList.push({"statement":"MATCH (a:SCREENS),(b:TESTCASES) WHERE a.screenID=b.screenID and a.uid=b.uid MERGE (a)-[r:FSTTS {id:b.screenID}]-(b)"});
+				qList.push({"statement":"MATCH (a:MODULES_ENDTOEND),(b:TASKS) WHERE a.moduleID=b.nodeID MERGE (a)-[r:FNTT {id:b.nodeID}]-(b)"});
+				qList.push({"statement":"MATCH (a:TESTSCENARIOS),(b:TASKS) WHERE a.testScenarioID=b.nodeID MERGE (a)-[r:FNTT {id:b.nodeID}]-(b)"});
+				// qList.push({"statement":"MATCH (a:SCREENS),(b:TASKS) WHERE a.screenID=b.nodeID and a.uid=b.uid MERGE (a)-[r:FNTT {id:b.nodeID}]-(b)"});
+				// qList.push({"statement":"MATCH (a:TESTCASES),(b:TASKS) WHERE a.testCaseID=b.nodeID and a.uid=b.uid MERGE (a)-[r:FNTT {id:b.nodeID}]-(b)"});
+				qList.push({"statement":"MATCH (a) remove a.uid"});
+				qList=qList.concat(rnmList);
+				qList.push({"statement":"MATCH path=(n:MODULES_ENDTOEND{moduleID:'"+data[0].id+"'})-[r*1..]->(t) RETURN path","resultDataContents":["graph"]});
+				//qList=qList.concat(rnmList);
+				//var index=(qList.length-rnmList.length)-1;
+				
+				reqToAPI({"data":{"statements":qList}},urlData,'/neoQuerya',function(err,status,result){
+					res.setHeader('Content-Type','application/json');
+					if(err) res.status(status).send(err);
+					else if(status!=200) res.status(status).send(result);
+					else{
+						var k=0,rIndex,lbl,neoIdDict={};
+						idDict={};
+						var attrDict={"modules_endtoend":{"childIndex":"childIndex","projectID":"projectID","moduleName":"name","moduleID":"id_n","moduleID_c":"id_c"},"modules":{"childIndex":"childIndex","projectID":"pid_n","moduleName":"name","moduleID":"id_n","moduleID_c":"id_c"},"scenarios":{"projectID":"projectID","childIndex":"childIndex","moduleID":"pid_n","testScenarioName":"name","testScenarioID":"id_n","testScenarioID_c":"id_c"},"screens":{"childIndex":"childIndex","testScenarioID":"pid_n","screenName":"name","screenID":"id_n","screenID_c":"id_c"},"testcases":{"childIndex":"childIndex","screenID":"pid_n","testCaseName":"name","testCaseID":"id_n","testCaseID_c":"id_c"},"tasks":{"taskID":"id_n","task":"t","assignedTo":"at","reviewer":"rw","startDate":"sd","endDate":"ed","release":"re","cycle":"cy","details":"det","nodeID":"pid","parent":"anc"}};
+						var jsonData=JSON.parse(result);
+						jsonData[jsonData.length-1].data.forEach(function(row){
+							row.graph.nodes.forEach(function(n){
+								if (idDict[n.id] === undefined) {
+									lbl=n.labels[0].toLowerCase();
+									if(lbl=='testscenarios') lbl='scenarios';
+									for (var attrs in n.properties){
+										if(attrDict[lbl][attrs] !== undefined) n[attrDict[lbl][attrs]]=n.properties[attrs];
+										delete n.properties[attrs];
+									}
+									if(lbl=="tasks") nData.push({id:n.id_n,oid:n.id,task:n.t,assignedTo:n.at,reviewer:n.rw,startDate:n.sd,endDate:n.ed,release:n.re,cycle:n.cy,details:n.det,nodeID:n.pid,parent:n.anc.slice(1,-1).split(',')});
+									else{
+										if(lbl=="modules_endtoend") n.childIndex=0;
+										nData.push({projectID:n.projectID,childIndex:n.childIndex,id:n.id,"type":lbl,name:n.name,id_n:n.id_n,pid_n:n.pid_n,id_c:n.id_c,children:[],task:null});
+									} 
+									if(lbl=="modules_endtoend") rIndex=k;
+									idDict[n.id]=k;neoIdDict[n.id_n]=k;
+									k++;
+								}
+							});
+							row.graph.relationships.forEach(function(r){
+								var srcIndex=idDict[r.startNode.toString()];
+								var tgtIndex=idDict[r.endNode.toString()];
+								if(nData[tgtIndex].children===undefined) nData[srcIndex].task=nData[tgtIndex];
+								else if(nData[srcIndex].children.indexOf(nData[tgtIndex])==-1){
+									nData[srcIndex].children.push(nData[tgtIndex]);
+									if(nData[tgtIndex].childIndex==undefined) nData[tgtIndex].childIndex=nData[srcIndex].children.length;
+									
+								} 
+							});
+						});
+						nData.forEach(function(e){
+							if(e.pid_n){
+								if(neoIdDict[e.pid_n]!==undefined) e.pid_n=nData[neoIdDict[e.pid_n]].id;
+								else e.pid_n=null;
+							}
+						});
+						
+					
+						res.status(status).send(nData[rIndex]);
+					}
+				});
+		}	else if(d.data.write==20){
+				var uidx=0,rIndex;
+				var relId=d.data.relId;
+				var cycId=d.data.cycId;
+			
+				var qObj={"projectId":prjId,"releaseId":relId,"cycleId":cycId,"appType":"Web","testsuiteDetails":[]};
+				var nObj=[],tsList=[];
+				data.forEach(function(e,i){
+					if(e.type=="modules_endtoend") rIndex=uidx;
+					if(e.task!=null) delete e.task.oid;
+					nObj.push({projectID:e.projectID,id:e.id_n,id_c:e.id_c,name:e.name,task:e.task,children:[]});
+					//if(e.type=="testcases") nObj[nObj.length-1]['pid_c']=e.pid_c;
+					//if(e.type=="scenarios") 
+					//nObj[nObj.length-1]['projectID']=e.projectID;
+					if(idDict[e.pid]!==undefined) nObj[idDict[e.pid]].children.push(nObj[uidx]);
+					idDict[e.id]=uidx++;
+				});
+				nObj[rIndex].children.forEach(function(ts,i){
+					var sList=[];
+					ts.children.forEach(function(s,i){
+						var tcList=[];
+						s.children.forEach(function(tc,i){
+							tcList.push({"screenID_c":tc.pid_c,"testcaseId":tc.id,"testcaseId_c":tc.id_c,"testcaseName":tc.name,"task":tc.task});
+						});
+						sList.push({"screenId":s.id,"screenId_c":s.id_c,"screenName":s.name,"task":s.task,"testcaseDetails":tcList});
+					});
+					tsList.push({"projectID":ts.projectID,"testscenarioId":ts.id,"testscenarioId_c":ts.id_c,"testscenarioName":ts.name,"tasks":ts.task,"screenDetails":sList});
+				});
+				qObj.testsuiteDetails=[{"projectID":nObj[rIndex].projectID,"testsuiteId":nObj[rIndex].id,"testsuiteId_c":nObj[rIndex].id_c,"testsuiteName":nObj[rIndex].name,"task":nObj[rIndex].task,"testscenarioDetails":tsList}];
+				qObj.userName=d.data.user_name;
+				//fs.writeFileSync('assets_mindmap/req_json.json',JSON.stringify(qObj),'utf8');
+				create_ice.createE2E_Structure_Nineteen68(qObj,function(err,data){
+				//res.setHeader('Content-Type', 'application/json');
+				if(err)
+				res.status(500).send(err);
+				else{
+					datatosend=data;
+					
+				}
+				//fs.writeFileSync('assets_mindmap/req_json_cassandra.txt',JSON.stringify(data),'utf8');
+				//var data = JSON.stringify(data);
+				var module_type='modules_endtoend';
+				var parsing_result=parsing(data,urlData,module_type);
+				//var qList_new=parsing(data,urlData);
+				 
+				reqToAPI({"data":{"statements":parsing_result[0]}},urlData,'/neoQuerya',function(err,status,result){
+					//res.setHeader('Content-Type','application/json');
+					if(err) res.status(status).send(err);
+					res.status(200).send(parsing_result[1]);
+					
+				});
+				
+
+
+				});
+
+			}
+		}
+		else if(d.task=='writeMap'){
+			data=d.data.map;
+			prjId=d.data.prjId;
+			var tab=d.data.tab;
+			var deletednodes=d.data.abc;
+			var user=d.data.user_name;
+			//TO support task deletion
+			var removeTask=d.data.xyz;
+			if(d.data.write==10){
+				var uidx=0,t,lts,rnmList=[];
+				deletednodes.forEach(function(t,i){
+					qList.push({"statement":"MATCH (N) WHERE ID(N)="+t+" MATCH (N)-[r:FNTT]-(b) DETACH DELETE b"});
+				});
+				//TO support task deletion
+				removeTask.forEach(function(t,i){
+					qList.push({"statement":"MATCH (N) WHERE ID(N)="+t+" MATCH (N)-[r:FNTT]-(b) DETACH DELETE b"});
+				});
+				
+				data.forEach(function(e,i){
+					idDict[e.id]=(e.id_n)?e.id_n:uuidV4();
+					e.id=idDict[e.id];
+					t=e.task;
+					var taskstatus='inprogress';
+					if(e.type=='modules_endtoend'){
+						if(e.oid!=null){
+							qList.push({"statement":"MATCH (n)-[r:FMTTS{id:'"+e.id+"'}]->(o:TESTSCENARIOS) DETACH DELETE r,o"});
+							if(e.renamed) qList.push({"statement":"MATCH(n:MODULES_ENDTOEND{moduleID:'"+e.id+"'}) SET n.moduleName='"+e.name+"'"+",n.unique_property='["+e.name+','+prjId+"]'"});
+						}
+						else qList.push({"statement":"MERGE(n:MODULES_ENDTOEND{projectID:'"+prjId+"',moduleName:'"+e.name+"',moduleID:'"+e.id+"',createdBy:'"+user+"',createdOn:'null',moduleID_c:'"+e.id_c+"',unique_property:'["+e.name+','+prjId+"]'}) SET n.childIndex='"+e.childIndex+"'"});
+						if(t!=null && e.id_c !=null){
+							t.parent=[prjId].concat(e.id_c);
+							t.id=(t.id!=null)?t.id:uuidV4();
+							
+							if(t.oid!=null){
+								if (t.updatedParent != undefined){
+									qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',nodeID:'"+e.id+"',parent:'["+t.parent+"]'}) SET n.task='"+t.task+"',n.assignedTo='"+t.assignedTo+"',n.reviewer='"+t.reviewer+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.release='"+t.release+"',n.cycle='"+t.cycle+"',n.details='"+t.details+",n.status='"+taskstatus+"',n.parent='["+[prjId].concat(t.updatedParent)+"]'"});
+								}else{
+									qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',nodeID:'"+e.id+"',parent:'["+t.parent+"]'}) SET n.task='"+t.task+"',n.status='"+taskstatus+"',n.assignedTo='"+t.assignedTo+"',n.reviewer='"+t.reviewer+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.release='"+t.release+"',n.cycle='"+t.cycle+"',n.details='"+t.details+"'"});
+								}
+								
+							} 
+							else qList.push({"statement":"MERGE(n:TASKS{taskID:'"+t.id+"',task:'"+t.task+"',assignedTo:'"+t.assignedTo+"',status:'"+taskstatus+"',reviewer:'"+t.reviewer+"',startDate:'"+t.startDate+"',endDate:'"+t.endDate+"',release:'"+t.release+"',cycle:'"+t.cycle+"',details:'"+t.details+"',nodeID:'"+e.id+"',parent:'["+t.parent+"]'})"});
+						}
+					}
+					else if(e.type=='modules'){
+						if(e.oid!=null){
+							qList.push({"statement":"MATCH (n)-[r:FMTTS{id:'"+e.id+"'}]->(o:TESTSCENARIOS)-[s]->(p:SCREENS)-[t]->(q:TESTCASES) DETACH DELETE r,s,t,o,p,q"});
+							if(e.renamed) qList.push({"statement":"MATCH(n:MODULES{moduleID:'"+e.id+"'}) SET n.moduleName='"+e.name+"'"+",n.unique_property='["+e.name+','+prjId+"]'"});
+						}
+						else qList.push({"statement":"MERGE(n:MODULES{projectID:'"+prjId+"',moduleName:'"+e.name+"',moduleID:'"+e.id+"',createdBy:'"+user+"',createdOn:'null',moduleID_c:'"+e.id_c+"',unique_property:'["+e.name+','+prjId+"]'}) SET n.childIndex='"+e.childIndex+"'"});
+						if(t!=null && e.id_c !=null){
+							t.parent=[prjId].concat(e.id_c);
+							t.id=(t.id!=null)?t.id:uuidV4();
+							
+							if(t.oid!=null){
+								if (t.updatedParent != undefined){
+									qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',nodeID:'"+e.id+"',parent:'["+t.parent+"]'}) SET n.task='"+t.task+"',n.assignedTo='"+t.assignedTo+"',n.reviewer='"+t.reviewer+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.release='"+t.release+"',n.cycle='"+t.cycle+"',n.details='"+t.details+",n.status='"+taskstatus+"',n.parent='["+[prjId].concat(t.updatedParent)+"]'"});
+								}else{
+									qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',nodeID:'"+e.id+"',parent:'["+t.parent+"]'}) SET n.task='"+t.task+"',n.status='"+taskstatus+"',n.assignedTo='"+t.assignedTo+"',n.reviewer='"+t.reviewer+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.release='"+t.release+"',n.cycle='"+t.cycle+"',n.details='"+t.details+"'"});
+								}
+								
+							} 
+							else qList.push({"statement":"MERGE(n:TASKS{taskID:'"+t.id+"',task:'"+t.task+"',assignedTo:'"+t.assignedTo+"',status:'"+taskstatus+"',reviewer:'"+t.reviewer+"',startDate:'"+t.startDate+"',endDate:'"+t.endDate+"',release:'"+t.release+"',cycle:'"+t.cycle+"',details:'"+t.details+"',nodeID:'"+e.id+"',parent:'["+t.parent+"]'})"});
+						}
+					}
+ 					else if(e.type=='scenarios'){
+						if(e.renamed && e.id_n) rnmList.push({"statement":"MATCH(n:TESTSCENARIOS{testScenarioID:'"+e.id+"'}) SET n.testScenarioName='"+e.name+"'"+",n.projectID='"+prjId+"'"});
+						qList.push({"statement":"MERGE(n:TESTSCENARIOS{projectID:'"+prjId+"',moduleID:'"+idDict[e.pid]+"',testScenarioName:'"+e.name+"',testScenarioID:'"+e.id+"',createdBy:'"+user+"',createdOn:'null',testScenarioID_c:'"+e.id_c+"'}) SET n.childIndex='"+e.childIndex+"'"});
 						//Supporting task assignmnet for scenarios
 						if(t!=null && e.id_c!=null){
 							t.parent=[prjId].concat(e.pid_c,e.id_c);
@@ -251,7 +471,7 @@ router.post('/', function(req, res, next) {
 						uidx++;lts=idDict[e.pid];
 						if(e.renamed && e.id_n && e.orig_name) rnmList.push({"statement":"MATCH(n:SCREENS{screenName:'"+e.orig_name+"',testScenarioID:'"+idDict[e.pid]+"'}) SET n.screenName='"+e.name+"'"+",n.projectID='"+prjId+"'"});
 						//qList.push({"statement":"MATCH(n:SCREENS{screenID:'"+e.id+"'}) SET n.screenName='"+e.name+"'"+",n.projectID='"+prjId+"'"});
-						qList.push({"statement":"MERGE(n:SCREENS{projectID:'"+prjId+"',testScenarioID:'"+idDict[e.pid]+"',screenName:'"+e.name+"',screenID:'"+e.id+"',createdBy:'null',createdOn:'null',uid:'"+uidx+"',screenID_c:'"+e.id_c+"'})SET n.childIndex='"+e.childIndex+"'"});
+						qList.push({"statement":"MERGE(n:SCREENS{projectID:'"+prjId+"',testScenarioID:'"+idDict[e.pid]+"',screenName:'"+e.name+"',screenID:'"+e.id+"',createdBy:'"+user+"',createdOn:'null',uid:'"+uidx+"',screenID_c:'"+e.id_c+"'})SET n.childIndex='"+e.childIndex+"'"});
 						if(t!=null && e.id_c!=null){
 							t.id=(t.id!=null)?t.id:uuidV4();
 		
@@ -280,9 +500,9 @@ router.post('/', function(req, res, next) {
 						}
 						
 						if(e.pid_c!='null' && e.pid_c!=undefined){
-							qList.push({"statement":"MERGE(n:TESTCASES{screenID:'"+idDict[e.pid]+"',testScenarioID:'"+lts+"',testCaseName:'"+e.name+"',testCaseID:'"+e.id+"',createdBy:'null',createdOn:'null',uid:'"+uidx+"',testCaseID_c:'"+e.id_c+"'}) SET n.screenID_c='"+e.pid_c+"',n.childIndex='"+e.childIndex+"'"});
+							qList.push({"statement":"MERGE(n:TESTCASES{screenID:'"+idDict[e.pid]+"',testScenarioID:'"+lts+"',testCaseName:'"+e.name+"',testCaseID:'"+e.id+"',createdBy:'"+user+"',createdOn:'null',uid:'"+uidx+"',testCaseID_c:'"+e.id_c+"'}) SET n.screenID_c='"+e.pid_c+"',n.childIndex='"+e.childIndex+"'"});
 						}else{
-							qList.push({"statement":"MERGE(n:TESTCASES{screenID:'"+idDict[e.pid]+"',testScenarioID:'"+lts+"',testCaseName:'"+e.name+"',testCaseID:'"+e.id+"',createdBy:'null',createdOn:'null',uid:'"+uidx+"',testCaseID_c:'"+e.id_c+"'}) SET n.childIndex='"+e.childIndex+"'"});
+							qList.push({"statement":"MERGE(n:TESTCASES{screenID:'"+idDict[e.pid]+"',testScenarioID:'"+lts+"',testCaseName:'"+e.name+"',testCaseID:'"+e.id+"',createdBy:'"+user+"',createdOn:'null',uid:'"+uidx+"',testCaseID_c:'"+e.id_c+"'}) SET n.childIndex='"+e.childIndex+"'"});
 						}
 						
 						
@@ -308,18 +528,30 @@ router.post('/', function(req, res, next) {
 						}
 					}
 				});
-				qList.push({"statement":"MATCH (a:MODULES),(b:TESTSCENARIOS) WHERE a.moduleID=b.moduleID MERGE (a)-[r:FMTTS {id:b.moduleID}]-(b)"});
-				qList.push({"statement":"MATCH (a:TESTSCENARIOS),(b:SCREENS) WHERE a.testScenarioID=b.testScenarioID MERGE (a)-[r:FTSTS {id:b.testScenarioID}]-(b)"});
-				qList.push({"statement":"MATCH (a:SCREENS),(b:TESTCASES) WHERE a.screenID=b.screenID and a.uid=b.uid MERGE (a)-[r:FSTTS {id:b.screenID}]-(b)"});
-				qList.push({"statement":"MATCH (a:MODULES),(b:TASKS) WHERE a.moduleID=b.nodeID MERGE (a)-[r:FNTT {id:b.nodeID}]-(b)"});
-				qList.push({"statement":"MATCH (a:TESTSCENARIOS),(b:TASKS) WHERE a.testScenarioID=b.nodeID MERGE (a)-[r:FNTT {id:b.nodeID}]-(b)"});
-				qList.push({"statement":"MATCH (a:SCREENS),(b:TASKS) WHERE a.screenID=b.nodeID and a.uid=b.uid MERGE (a)-[r:FNTT {id:b.nodeID}]-(b)"});
-				qList.push({"statement":"MATCH (a:TESTCASES),(b:TASKS) WHERE a.testCaseID=b.nodeID and a.uid=b.uid MERGE (a)-[r:FNTT {id:b.nodeID}]-(b)"});
-				qList.push({"statement":"MATCH (a) remove a.uid"});
-				qList=qList.concat(rnmList);
-				qList.push({"statement":"MATCH path=(n:MODULES{moduleID:'"+data[0].id+"'})-[r*1..]->(t) RETURN path","resultDataContents":["graph"]});
-				//qList=qList.concat(rnmList);
-				//var index=(qList.length-rnmList.length)-1;
+				if(tab!='end_to_end'){
+					qList.push({"statement":"MATCH (a:MODULES),(b:TESTSCENARIOS) WHERE a.moduleID=b.moduleID MERGE (a)-[r:FMTTS {id:b.moduleID}]-(b)"});
+					qList.push({"statement":"MATCH (a:TESTSCENARIOS),(b:SCREENS) WHERE a.testScenarioID=b.testScenarioID MERGE (a)-[r:FTSTS {id:b.testScenarioID}]-(b)"});
+					qList.push({"statement":"MATCH (a:SCREENS),(b:TESTCASES) WHERE a.screenID=b.screenID and a.uid=b.uid MERGE (a)-[r:FSTTS {id:b.screenID}]-(b)"});
+					qList.push({"statement":"MATCH (a:MODULES),(b:TASKS) WHERE a.moduleID=b.nodeID MERGE (a)-[r:FNTT {id:b.nodeID}]-(b)"});
+					qList.push({"statement":"MATCH (a:TESTSCENARIOS),(b:TASKS) WHERE a.testScenarioID=b.nodeID MERGE (a)-[r:FNTT {id:b.nodeID}]-(b)"});
+					qList.push({"statement":"MATCH (a:SCREENS),(b:TASKS) WHERE a.screenID=b.nodeID and a.uid=b.uid MERGE (a)-[r:FNTT {id:b.nodeID}]-(b)"});
+					qList.push({"statement":"MATCH (a:TESTCASES),(b:TASKS) WHERE a.testCaseID=b.nodeID and a.uid=b.uid MERGE (a)-[r:FNTT {id:b.nodeID}]-(b)"});
+					qList.push({"statement":"MATCH (a) remove a.uid"});
+					qList=qList.concat(rnmList);
+					qList.push({"statement":"MATCH path=(n:MODULES{moduleID:'"+data[0].id+"'})-[r*1..]->(t) RETURN path","resultDataContents":["graph"]});
+				}else{
+					qList.push({"statement":"MATCH (a:MODULES_ENDTOEND),(b:TESTSCENARIOS) WHERE a.moduleID=b.moduleID MERGE (a)-[r:FMTTS {id:b.moduleID}]-(b)"});
+					// qList.push({"statement":"MATCH (a:TESTSCENARIOS),(b:SCREENS) WHERE a.testScenarioID=b.testScenarioID MERGE (a)-[r:FTSTS {id:b.testScenarioID}]-(b)"});
+					// qList.push({"statement":"MATCH (a:SCREENS),(b:TESTCASES) WHERE a.screenID=b.screenID and a.uid=b.uid MERGE (a)-[r:FSTTS {id:b.screenID}]-(b)"});
+					qList.push({"statement":"MATCH (a:MODULES_ENDTOEND),(b:TASKS) WHERE a.moduleID=b.nodeID MERGE (a)-[r:FNTT {id:b.nodeID}]-(b)"});
+					qList.push({"statement":"MATCH (a:TESTSCENARIOS),(b:TASKS) WHERE a.testScenarioID=b.nodeID MERGE (a)-[r:FNTT {id:b.nodeID}]-(b)"});
+					// qList.push({"statement":"MATCH (a:SCREENS),(b:TASKS) WHERE a.screenID=b.nodeID and a.uid=b.uid MERGE (a)-[r:FNTT {id:b.nodeID}]-(b)"});
+					// qList.push({"statement":"MATCH (a:TESTCASES),(b:TASKS) WHERE a.testCaseID=b.nodeID and a.uid=b.uid MERGE (a)-[r:FNTT {id:b.nodeID}]-(b)"});
+					qList.push({"statement":"MATCH (a) remove a.uid"});
+					qList=qList.concat(rnmList);
+					qList.push({"statement":"MATCH path=(n:MODULES_ENDTOEND{moduleID:'"+data[0].id+"'})-[r*1..]->(t) RETURN path","resultDataContents":["graph"]});
+				}
+				
 				
 				reqToAPI({"data":{"statements":qList}},urlData,'/neoQuerya',function(err,status,result){
 					res.setHeader('Content-Type','application/json');
@@ -328,7 +560,7 @@ router.post('/', function(req, res, next) {
 					else{
 						var k=0,rIndex,lbl,neoIdDict={};
 						idDict={};
-						var attrDict={"modules":{"childIndex":"childIndex","projectID":"pid_n","moduleName":"name","moduleID":"id_n","moduleID_c":"id_c"},"scenarios":{"childIndex":"childIndex","moduleID":"pid_n","testScenarioName":"name","testScenarioID":"id_n","testScenarioID_c":"id_c"},"screens":{"childIndex":"childIndex","testScenarioID":"pid_n","screenName":"name","screenID":"id_n","screenID_c":"id_c"},"testcases":{"childIndex":"childIndex","screenID":"pid_n","testCaseName":"name","testCaseID":"id_n","testCaseID_c":"id_c"},"tasks":{"taskID":"id_n","task":"t","assignedTo":"at","reviewer":"rw","startDate":"sd","endDate":"ed","release":"re","cycle":"cy","details":"det","nodeID":"pid","parent":"anc"}};
+						var attrDict={"modules_endtoend":{"childIndex":"childIndex","projectID":"pid_n","moduleName":"name","moduleID":"id_n","moduleID_c":"id_c"},"modules":{"childIndex":"childIndex","projectID":"pid_n","moduleName":"name","moduleID":"id_n","moduleID_c":"id_c"},"scenarios":{"childIndex":"childIndex","moduleID":"pid_n","testScenarioName":"name","testScenarioID":"id_n","testScenarioID_c":"id_c"},"screens":{"childIndex":"childIndex","testScenarioID":"pid_n","screenName":"name","screenID":"id_n","screenID_c":"id_c"},"testcases":{"childIndex":"childIndex","screenID":"pid_n","testCaseName":"name","testCaseID":"id_n","testCaseID_c":"id_c"},"tasks":{"taskID":"id_n","task":"t","assignedTo":"at","reviewer":"rw","startDate":"sd","endDate":"ed","release":"re","cycle":"cy","details":"det","nodeID":"pid","parent":"anc"}};
 						var jsonData=JSON.parse(result);
 						jsonData[jsonData.length-1].data.forEach(function(row){
 							row.graph.nodes.forEach(function(n){
@@ -341,10 +573,10 @@ router.post('/', function(req, res, next) {
 									}
 									if(lbl=="tasks") nData.push({id:n.id_n,oid:n.id,task:n.t,assignedTo:n.at,reviewer:n.rw,startDate:n.sd,endDate:n.ed,release:n.re,cycle:n.cy,details:n.det,nodeID:n.pid,parent:n.anc.slice(1,-1).split(',')});
 									else{
-										if(lbl=="modules") n.childIndex=0;
+										if(lbl=="modules" || lbl=="modules_endtoend") n.childIndex=0;
 										nData.push({childIndex:n.childIndex,id:n.id,"type":lbl,name:n.name,id_n:n.id_n,pid_n:n.pid_n,id_c:n.id_c,children:[],task:null});
 									} 
-									if(lbl=="modules") rIndex=k;
+									if(lbl=="modules" || lbl=="modules_endtoend") rIndex=k;
 									idDict[n.id]=k;neoIdDict[n.id_n]=k;
 									k++;
 								}
@@ -411,7 +643,8 @@ router.post('/', function(req, res, next) {
 				}
 				//fs.writeFileSync('assets_mindmap/req_json_cassandra.txt',JSON.stringify(data),'utf8');
 				//var data = JSON.stringify(data);
-				var parsing_result=parsing(data,urlData);
+				var module_type='modules';
+				var parsing_result=parsing(data,urlData,module_type);
 				//var qList_new=parsing(data,urlData);
 				 
 				reqToAPI({"data":{"statements":parsing_result[0]}},urlData,'/neoQuerya',function(err,status,result){
@@ -524,6 +757,30 @@ router.post('/', function(req, res, next) {
 						}
 					}
 				});
+		}else if(d.task=='populateScenarios'){
+			var moduleId=d.moduleId;
+			//var taskID=d.taskId;
+			
+			query={'statement':"MATCH (a{moduleID:'"+moduleId+"'})-[:FMTTS]->(b) RETURN b"};
+			var qlist_query=[query];
+			var scenarioList=[];
+			reqToAPI({"data":{"statements":qlist_query}},urlData,'/neoQuerya',function(err,status,result){
+					//res.setHeader('Content-Type','application/json');
+					if(err) {
+						res.status(status).send(err);
+					}else{
+						try{
+							res_data=JSON.parse(result);
+							res_data[0].data.forEach(function(row){
+								scenarioList.push(row.row[0])
+							});
+							res.status(200).send(scenarioList);
+						}catch(ex){
+							console.log(ex);
+							res.status(200).send('fail');
+						}
+					}
+				});
 		}
 	}
 });
@@ -531,7 +788,7 @@ router.post('/', function(req, res, next) {
 
 
 
-var parsing = function(d,urlData) {
+var parsing = function(d,urlData,module_type) {
 	var data = d;
 	var qList_new=[];
 
@@ -546,7 +803,10 @@ var parsing = function(d,urlData) {
 		var moduleID_c_json=e.testsuiteId_c;
 		//var modulename_json=e.testsuiteName;
 		var testscenarioDetails_json=e.testscenarioDetails;
-		qList_new.push({"statement":"MATCH (a:MODULES) WHERE a.moduleName='"+modulename_json+"' and a.projectID='"+data.projectId+"' SET a.moduleID_c='"+moduleID_c_json+"'"});
+		if (module_type=='modules'){
+			qList_new.push({"statement":"MATCH (a:MODULES) WHERE a.moduleName='"+modulename_json+"' and a.projectID='"+data.projectId+"' SET a.moduleID_c='"+moduleID_c_json+"'"});
+		}else 
+		qList_new.push({"statement":"MATCH (a:MODULES_ENDTOEND) WHERE a.moduleName='"+modulename_json+"' and a.projectID='"+data.projectId+"' SET a.moduleID_c='"+moduleID_c_json+"'"});
 		cassandraId_dict[moduleID_json]=moduleID_c_json;
 		//updateJson.push(cassandraId_dict);
 			testscenarioDetails_json.forEach(function(sc,i){
@@ -556,10 +816,14 @@ var parsing = function(d,urlData) {
 				//var modulename_json=sc.testsuiteName;
 				var screenDetails_json=sc.screenDetails;
 				//console.log(testscenarioId_json,testscenarioId_c_json);
-				qList_new.push({"statement":"MATCH (a:TESTSCENARIOS) WHERE a.testScenarioName='"+testscenarioname_json+"' and a.projectID='"+data.projectId+"' SET a.testScenarioID_c='"+testscenarioId_c_json+"'"});
-				//updateJson.push({testscenarioId_json:testscenarioId_c_json});
+				if (module_type=='modules')
+					qList_new.push({"statement":"MATCH (a:TESTSCENARIOS) WHERE a.testScenarioName='"+testscenarioname_json+"' and a.projectID='"+data.projectId+"' SET a.testScenarioID_c='"+testscenarioId_c_json+"'"});
+				else{
+					qList_new.push({"statement":"MATCH (a:TESTSCENARIOS) WHERE a.testScenarioName='"+testscenarioname_json+"' and a.projectID='"+sc.scenario_PrjId+"' SET a.testScenarioID_c='"+testscenarioId_c_json+"'"});
+				}
+					
 				cassandraId_dict[testscenarioId_json]=testscenarioId_c_json;
-				//updateJson.push(cassandraId_dict);
+			
 
 				screenDetails_json.forEach(function(scr,i){
 					var screenId_json=scr.screenId;
@@ -586,10 +850,8 @@ var parsing = function(d,urlData) {
 							qList_new.push({"statement":"MATCH (a:TESTCASES) WHERE a.testCaseName='"+testcaseName_json+"' and a.screenID_c='"+screenId_c_json+"' SET a.testCaseID_c='"+testcaseId_c_json+"'"});
 						}
 						
-						
-						//updateJson.push({testcaseId_json:testcaseId_c_json});
 						cassandraId_dict[testcaseId_json]=testcaseId_c_json;
-				//updateJson.push(cassandraId_dict);
+				
 
 					});
 					
@@ -606,9 +868,7 @@ var parsing = function(d,urlData) {
 	}
 	
 updateJson.push(cassandraId_dict);
-//console.log('cassandraId_dict',cassandraId_dict);
-//console.log('updateJson',updateJson);
-//return qList_new;
+
 return [ qList_new,updateJson];
 };
 

@@ -267,7 +267,7 @@ exports.createStructure_Nineteen68 = function(req, res) {
                             var screendetailslist = [];
                             var taskscenario = iterator.task;
                             var scenarioidneo = iterator.testscenarioId;
-                            
+                           
                             
                             testscenariosid_exists({"testscenarioname":scenarioName,"testscenarioid":scenarioid_c,"pid":projectid},function(err,scenariodata){
                                 if(err){
@@ -1210,3 +1210,140 @@ exports.getProjectType_Nineteen68 = function(req, res){
 	});
 };
 
+exports.createE2E_Structure_Nineteen68 = function(req, res) {
+
+    var RequestedJSON =req;
+    var projectid = RequestedJSON.projectId;
+    var cycleId = RequestedJSON.cycleId;
+    var releaseId = RequestedJSON.releaseId;
+    var appType = RequestedJSON.appType;
+   
+
+    var username=RequestedJSON.userName;
+    var suite = RequestedJSON.testsuiteDetails.length;
+    var suiteID = uuid();
+    var suitedetails = RequestedJSON.testsuiteDetails[0];
+    var testsuiteName = suitedetails.testsuiteName;
+    var moduleid_c = suitedetails.testsuiteId_c;
+    var scenarioidlist = [];
+    var scenario =[];
+    
+    var suitedetailslist = [];
+    async.series({
+
+            projectsUnderDomain: function(callback) {
+                var suiteflag = false;
+                var suiteidTemp = '';
+                var scenariodetailslist = [];
+                var testsuiteidneo = suitedetails.testsuiteId;
+                var tasksuite = suitedetails.task;
+                projectid=suitedetails.projectID;
+         
+
+
+               testsuiteid_exists({"modulename":testsuiteName,"moduleid":moduleid_c,'modifiedby':username,"pid":projectid},function(err,data){
+						
+						if(err){
+							console.log(err);
+						}else{
+							suiteflag = data.flag;
+                            suiteidTemp = data.suiteid;			
+						}
+
+                            var insertInSuite ='';
+                if(!suiteflag){
+                insertInSuite = "INSERT INTO modules (projectid,modulename,moduleid,versionnumber,createdby,createdon,createdthrough,deleted,history,modifiedby,modifiedbyrole,modifiedon,skucodemodule,tags,testscenarioids) VALUES (" + projectid + ",'" + testsuiteName + "'," + suiteID + ",1,'"+username+"'," + new Date().getTime() + ",null,null,null,null,null," + new Date().getTime() + ",null,null,null);";
+                }else{
+                insertInSuite = "SELECT moduleid FROM modules where modulename='"+testsuiteName+"' ALLOW FILTERING";
+                suiteID = suiteidTemp; 
+               }
+               var testsuiteobj = {"testsuiteId":testsuiteidneo,"testsuiteId_c":suiteID,"testsuiteName":testsuiteName,"task":tasksuite,"testscenarioDetails":scenariodetailslist};
+               suitedetailslist.push(testsuiteobj);
+               console.log(insertInSuite);
+                dbConnICE.execute(insertInSuite, function(err, testsuiteresult) {
+                    if (err) {
+                        console.log(err);
+                    } else {
+                        scenario = suitedetails.testscenarioDetails;
+                        var scenariosarray = [];
+                         var testcaseidlist = []; 
+                        async.forEachSeries(scenario, function(iterator, callback2) {
+                           
+                            var scenarioId = uuid();
+                            scenariosarray.push(scenarioId);
+                           
+                            var modifiedon = new Date().getTime();
+                            //var scenariodetails = iterator.testscenarioDetails[scenario];
+                            var scenarioName = iterator.testscenarioName;
+                            var scenarioid_c = iterator.testscenarioId_c;
+                            var scenarioflag = false;
+                            var scenarioidTemp = '';
+                            var screendetailslist = [];
+                            var taskscenario = iterator.task;
+                            var scenarioidneo = iterator.testscenarioId;
+                            var prjID=iterator.projectID;
+                            
+                            
+                            testscenariosid_exists({"testscenarioname":scenarioName,"testscenarioid":scenarioid_c,"pid":prjID},function(err,scenariodata){
+                                if(err){
+                                    console.log(err);
+                                    cb(null,err);
+                                }else{
+                                    scenarioflag = scenariodata.flag;
+                                    scenarioidTemp = scenariodata.scenarioid;
+                                }
+                                var insertInScenario='';
+                                if(!scenarioflag){
+                                    console.log("Scenario does not exists");
+									
+                                }else{
+                                    
+                                    scenarioId =  scenarioidTemp;
+									scenarioidlist.push(scenarioId);
+                                    var scenariodetailsobj = {"scenario_PrjId":prjID,"testscenarioId":scenarioidneo,"testscenarioId_c":scenarioId,"screenDetails":screendetailslist,"tasks":taskscenario,"testscenarioName":scenarioName};
+                                    scenariodetailslist.push(scenariodetailsobj);
+                                    
+                                }
+                                callback2();
+                          
+                            })
+                            
+                        }, callback);
+                    }
+                });
+
+					});
+               
+
+                
+
+            },
+            updatescenarioids:function(callback){
+                var versionnumber = 1;
+                var updatescenarioidsinsuite = "UPDATE modules SET testscenarioids = ["+scenarioidlist+"] WHERE moduleid="+suiteID+" and projectid="+projectid+" and modulename='"+testsuiteName+"' and versionnumber="+versionnumber;
+                dbConnICE.execute(updatescenarioidsinsuite,function(err,result){
+                    if(err){
+                        console.log(err);
+                    }else{
+                        console.log("sucess scenario");
+                      
+                    }callback();
+
+                });
+            }
+
+        },
+        function(err, results) {
+           
+            if (err) {
+                console.log(err);
+                res(null,err);
+            } else {
+                var returnJsonmindmap = {"projectId":projectid,"cycleId":cycleId,"releaseId":releaseId,"appType":appType,"testsuiteDetails":suitedetailslist}
+                res(null,returnJsonmindmap);
+
+
+            }
+        }
+    );
+}
