@@ -493,7 +493,11 @@ var nodeClick = function(e){
 	var p=d3.select(activeNode);
 	var pi=parseInt(p.attr('id').split('-')[2]);
 	var t=p.attr('data-nodetype');
-	if(t!='sceanrios' && dNodes[pi].parent.type!='modules_endtoend'){
+	var flag=true;
+	if(t=='scenarios' && dNodes[pi].parent.type=='modules_endtoend'){
+		flag=false;
+	}
+	if(flag){
 		if(t!='testcases' && (dNodes[pi].children == undefined || dNodes[pi].children == null)){
 		//380-Mindmap-Unable to create node when parent node is collapsed .- Error msg changed to Expand the node
 		openDialogMindmap('Error','Expand the node');
