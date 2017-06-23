@@ -152,6 +152,7 @@ mySPA.controller('mindmapController', ['$scope', '$http', '$location', '$timeout
             $('#reqImg').addClass('selectedIcon');
         }
         else if($scope.tab=='mindmapCreateOption'){
+            $('.selectProject').hide();
         	$("img.selectedIcon").removeClass("selectedIcon");
 	        $('#createImg').addClass('selectedIcon');
             if($("#left-nav-section").is(":visible") == true && $("#right-dependencies-section").is(":visible") == false)
