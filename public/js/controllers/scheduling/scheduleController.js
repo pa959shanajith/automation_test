@@ -11,7 +11,15 @@ mySPA.controller('scheduleController',['$scope','$http','$timeout','$location','
     
     //Task Listing
     loadUserTasks()
-    
+    var taskAuth;
+	if(window.localStorage['_CT'] == "")
+	{
+		taskAuth = false;
+	}
+	if(window.localStorage['_CT'] == "" && taskAuth == false)
+	{
+		window.location.href = "/";
+	}  
    	var getTaskName = JSON.parse(window.localStorage['_CT']).taskName;
 	var	appType = JSON.parse(window.localStorage['_CT']).appType;
 			$("#page-taskName").empty().append('<span class="taskname">'+getTaskName+'</span>');

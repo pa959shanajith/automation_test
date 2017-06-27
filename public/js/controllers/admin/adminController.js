@@ -407,14 +407,14 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 			$("#password").addClass("inputErrorBorder");
 		} 
 		else if (regexPassword.test($("#password").val()) == false && $("#password").is(":visible")) {
-			openModelPopup("Error", "Password must contain atleast 1 special character, 1 numeric, 1 uppercase, length should be minimum 8 character and maximum 12 character.");
+			openModelPopup("Error", "Password must contain atleast 1 special character, 1 numeric, 1 uppercase and lowercase, length should be minimum 8 characters and maximum 12 characters..");
 			$("#password").addClass("inputErrorBorder");
 		}
 		else if ($("#confirmPassword").val() == "" && $("#confirmPassword").is(":visible")) {
 			$("#confirmPassword").addClass("inputErrorBorder");
 		}
 		else if (regexPassword.test($("#confirmPassword").val()) == false && $("#confirmPassword").is(":visible")) {
-			openModelPopup("Error","Password must contain atleast 1 special character, 1 numeric, 1 uppercase, length should be minimum 8 character and maximum 12 character.");
+			openModelPopup("Error","Password must contain atleast 1 special character, 1 numeric, 1 uppercase and lowercase, length should be minimum 8 characters and maximum 12 characters..");
 			$("#confirmPassword").addClass("inputErrorBorder");
 		}
 		else if($("#password").val() != $("#confirmPassword").val() && $("#password").is(":visible") && $("#confirmPassword").is(":visible")){
@@ -1910,14 +1910,14 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 			$("#password").addClass("inputErrorBorder");
 		}*/ 
 		else if ($("#password").val().length > 0 && regexPassword.test($("#password").val()) == false) {
-			openModelPopup("Error", "Password must contain atleast 1 special character, 1 numeric, 1 uppercase, length should be minimum 8 character and maximum 12 character.");
+			openModelPopup("Error", "Password must contain atleast 1 special character, 1 numeric, 1 uppercase and lowercase, length should be minimum 8 characters and maximum 12 characters..");
 			$("#password").addClass("inputErrorBorder");
 		}
 		/*else if ($("#confirmPassword").val() == "") {
 			$("#confirmPassword").addClass("inputErrorBorder");
 		}*/
 		else if ($("#confirmPassword").val().length > 0 && regexPassword.test($("#confirmPassword").val()) == false ) {
-			openModelPopup("Error","Password must contain atleast 1 special character, 1 numeric, 1 uppercase, length should be minimum 8 character and maximum 12 character.");
+			openModelPopup("Error","Password must contain atleast 1 special character, 1 numeric, 1 uppercase and lowercase, length should be minimum 8 characters and maximum 12 characters..");
 			$("#confirmPassword").addClass("inputErrorBorder");
 		}
 		else if($("#password").val() != $("#confirmPassword").val() && ($("#password").val().length > 0 && $("#confirmPassword").val().length > 0)){

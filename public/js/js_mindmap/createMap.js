@@ -125,7 +125,7 @@ var initiate = function(){
 	// var mapSvgDiv = canvas.append('div').attr("class","ct-mapSvgContainer");
 	// var mapSvg=mapSvgDiv.append('svg').attr('id','ct-mapSvg').call(zoom).on('click.hideElements',clickHideElements);
 	var mapSvg=canvas.append('svg').attr('id','ct-mapSvg').call(zoom).on('click.hideElements',clickHideElements);
-	var dataAdder=[{c:'#5c5ce5',t:'Modules'},{c:'#5c5ce5',t:'Modules'},{c:'#4299e2',t:'Scenarios'},{c:'#19baae',t:'Screens'},{c:'#efa022',t:'Test Cases'}];
+	var dataAdder=[{c:'#5c5ce5',t:'Modules'},{c:'#4299e2',t:'Scenarios'},{c:'#19baae',t:'Screens'},{c:'#efa022',t:'Test Cases'}];
 	u=canvas.append('svg').attr('id','ct-legendBox').append('g').attr('transform','translate(10,10)');
 	dataAdder.forEach(function(e,i) {
 		t=u.append('g');
@@ -493,7 +493,11 @@ var nodeClick = function(e){
 	var p=d3.select(activeNode);
 	var pi=parseInt(p.attr('id').split('-')[2]);
 	var t=p.attr('data-nodetype');
-	if(t!='sceanrios' && dNodes[pi].parent.type!='modules_endtoend'){
+	var flag=true;
+	if(t=='scenarios' && dNodes[pi].parent.type=='modules_endtoend'){
+		flag=false;
+	}
+	if(flag){
 		if(t!='testcases' && (dNodes[pi].children == undefined || dNodes[pi].children == null)){
 		//380-Mindmap-Unable to create node when parent node is collapsed .- Error msg changed to Expand the node
 		openDialogMindmap('Error','Expand the node');

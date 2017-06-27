@@ -48,6 +48,7 @@ function loadMindmapData_W(){
 }
 
 function loadMindmapData1_W(){
+	$('#eteScenarioContainer').empty();
 	d3.select('.addScenarios-ete').classed('disableButton',!0);
 	$('#ct-saveAction_W').removeClass('no-access');
 	//uNix=0;uLix=0;dNodes=[];dLinks=[];nCount=[0,0,0,0];scrList=[];tcList=[];cSpan_W=[0,0];cScale_W=1;mapSaved=!1;
@@ -135,7 +136,7 @@ var initiate_W = function(){
 	// var mapSvgDiv = canvas.append('div').attr("class","ct-mapSvgContainer");
 	// var mapSvg=mapSvgDiv.append('svg').attr('id','ct-mapSvg').call(zoom).on('click.hideElements',clickHideElements);
 	var mapSvg=canvas.append('svg').attr('id','ct-mapSvg').call(zoom_W).on('click.hideElements',clickHideElements);
-	var dataAdder=[{c:'#5c5ce5',t:'modules'},{c:'#4299e2',t:'Scenarios'},{c:'#19baae',t:'Screens'},{c:'#efa022',t:'Test Cases'}];
+	var dataAdder=[{c:'#5c5ce5',t:'Modules'},{c:'#4299e2',t:'Scenarios'},{c:'#19baae',t:'Screens'},{c:'#efa022',t:'Test Cases'}];
 	u=canvas.append('svg').attr('id','ct-legendBox').append('g').attr('transform','translate(10,10)');
 	dataAdder.forEach(function(e,i) {
 		t=u.append('g');
@@ -706,7 +707,7 @@ var actionEvent_W = function(e){
 		} 
 	}
 	if(selectedProject!=cur_project){
-		openDialogMindmap('Error',"Module belongs to project: '"+$("#selectProjectEtem option[value='"+selectedProject+"']").text()+"'");
+		openDialogMindmap('Error',"Module belongs to project: '"+$("#selectProjectEtem option[value='"+selectedProject+"']").text()+"' Please go back to the same project and Save");
 		return;
 	}
 	if(mapData.length<=1) {

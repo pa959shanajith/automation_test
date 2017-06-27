@@ -117,6 +117,7 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 						if(data.length > 2){
 							$("#dateDESC").show();
 						}
+						else $("#dateDESC, #dateASC").hide();
 						var dateArray = $('tbody.scrollbar-inner-scenariostatus').children('.scenariostatusreport');
 						dateASC(dateArray);
 						$("tbody.scrollbar-inner-scenariostatus").empty();
@@ -277,6 +278,10 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 					}
 					if(data.length > 2){
 						$("#scenarioReportsTable #dateDESC").show();
+					}
+					else{
+						$("#scenarioReportsTable #dateDESC").hide();
+						$("#scenarioReportsTable #dateASC").hide();
 					}
 					$("#scenarioReportsTable").find("#dateASC").hide();
 					var dateArray = $('tbody.scrollbar-inner-scenarioreports').children('tr');
@@ -459,8 +464,7 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 					            link.href=window.URL.createObjectURL(file);
 					            link.download = scenarioName+".pdf";
 					            link.click();*/
-								var fileURL = URL.createObjectURL(file);//.split(":");
-								//var finalURL = fileURL[0]+":"+fileURL[1]+":"+window.location.href.split(":")[1]+":"+fileURL[3]
+								var fileURL = URL.createObjectURL(file);								
 								$window.open(fileURL, '_blank');
 						}).error(function(data, status) {
 								console.error('Repos error', status, data);
@@ -473,7 +477,6 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 							window.location.href = "/";
 						}
 						if(data1 != "fail"){
-							var path = "/specificreports";
 							openWindow = 0;
 							if(openWindow == 0)
 							{

@@ -9,6 +9,7 @@ mySPA.controller('pluginController',['$scope','$window','$http','$location','$ti
     		$("#plugin-container").append('<div class="col-md-4 plugin-block"><span onclick="p_event(this.dataset.name)" data-name="p_'+availablePlugins[i].pluginName.replace(/\s/g,'')+'" id="'+availablePlugins[i].pluginName+'" title="'+availablePlugins[i].pluginName+'">'+availablePlugins[i].pluginName+'</span></div>').fadeIn()
     	}        
     }
+    $("#plugin-container").addClass("inactiveLink");
     //Integration with Mindmaps
 	$(".plugin-block span").each(function() {
 		if($(this).text() == "RAID")
@@ -57,6 +58,9 @@ mySPA.controller('pluginController',['$scope','$window','$http','$location','$ti
 							 counter++
 						 }
 					 }
+					 
+					 $("#plugin-container").removeClass("inactiveLink");
+					 
 					}
 				 }, function (error) { console.log("Error:::::::::::::", error) })
 			 }	
@@ -115,6 +119,7 @@ mySPA.controller('pluginController',['$scope','$window','$http','$location','$ti
     $scope.pluginFunction = function(name){
 		window.localStorage["_VP"] = true;
 		if(name == "p_Mindmap"){
+	    	window.localStorage["_VM"] = true;
 			name = 'home'
 		}
     	$window.location.assign(name)

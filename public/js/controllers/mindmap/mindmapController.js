@@ -3,6 +3,15 @@ mySPA.controller('mindmapController', ['$scope', '$http', '$location', '$timeout
     	$("body").css("background","#eee");
     	$("head").append('<link id="mindmapCSS1" rel="stylesheet" type="text/css" href="css/css_mindmap/style.css" /><link id="mindmapCSS2" rel="stylesheet" type="text/css" href="fonts/font-awesome_mindmap/css/font-awesome.min.css" />')
 	
+    var taskAuth;
+	if(window.localStorage["_VM"] == "false")
+	{
+		taskAuth = false;
+	}
+	if(window.localStorage["_VM"] == "false" && taskAuth == false)
+	{
+		window.location.href = "/";
+	}
 	$timeout(function(){
 		$('.scrollbar-inner').scrollbar();
 		$('.scrollbar-macosx').scrollbar();
@@ -152,6 +161,7 @@ mySPA.controller('mindmapController', ['$scope', '$http', '$location', '$timeout
             $('#reqImg').addClass('selectedIcon');
         }
         else if($scope.tab=='mindmapCreateOption'){
+            $('.selectProject').hide();
         	$("img.selectedIcon").removeClass("selectedIcon");
 	        $('#createImg').addClass('selectedIcon');
             if($("#left-nav-section").is(":visible") == true && $("#right-dependencies-section").is(":visible") == false)
@@ -257,7 +267,7 @@ mySPA.controller('mindmapController', ['$scope', '$http', '$location', '$timeout
 				id == "etemModuleContainer"? $(this).parent().hide() : $(this).hide()
 			}
 		});
-	} 
+	}
 
 	$(document).on('click', '.eteScenrios', function(){
 		$.each($('.eteScenrios'), function(){
