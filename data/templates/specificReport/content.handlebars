@@ -121,7 +121,7 @@
 			}, 400);
 		</script>     
         <style>
-            body{font-family: LatoWeb; height: 98%;}
+            body{font-family: LatoWeb; height: 98%; overflow: hidden;}
             .mainContainer{ border: 1px solid #B5AAAA; margin: 4px; float: left; padding: 14px; width: 97%; height: calc(100% - 50px);}
             .hearderCon{position: relative; width: 100%; float: left; border: 1px solid #cfcfcf; background: linear-gradient(to bottom, #FFFFFF 0%, #E6E6E6 100%); height: 50px; margin-bottom: 10px;border-radius: 5px; font-size: 16px; padding-top: 7px;}
             .headerRepDetails{ width: 50%; padding: 3px 40px;}
@@ -144,13 +144,14 @@
             }
             .summaryCon{position: relative; float: left; width: 100%; border: 1px solid #cfcfcf; background: linear-gradient(to bottom, #FFFFFF 0%, #E6E6E6 100%); height: 38px; border-radius: 5px;}
             .summaryCon span{position: absolute; top: 10px; left: 40px;}
+            .midSection{float: left; width: 100%;}
             .midContainer{
                 border-collapse: collapse;
                 border: 1px solid #cfcfcf;
                 width: 100%;
                 font: 14px cabin_Regular;
                 float: left;
-                margin: 1% 0;
+                margin: 0 0 1% 0;
                 font-family: LatoWeb;
     			font-size: 14px;
             }
@@ -170,7 +171,7 @@
             .reportsDetails th:nth-child(4){width: 10%;} .rDstatus{width: 10.1%;}
             .reportsDetails th:nth-child(5){width: 12%;} .rDellaps{width: 12.1%;}
             .reportsDetails th:nth-child(6), .rDcomments{width: 13%; word-break: break-word; word-break: break-all;}
-            .maintabCont{float: left; width: 100%; border: 1px solid #dcdcdc; height: 49%;}
+            .maintabCont{float: left; width: 100%; border: 1px solid #dcdcdc; height: 51%;}
             .tabCont{display: table-cell; border-bottom: 1px solid #ececec; border-right: 1px solid #ececec;}
             .reportsDetail{line-height: 2; text-align: center; height: calc(100% - 35px); overflow: auto;font-size: 14px;}
             .rDstepDes{text-align: left; word-break: break-word;}
@@ -240,10 +241,18 @@
 			    border-radius: 10px;
 			    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5); 
 			}
-			@media screen and (max-height: 675px) {
+			@media screen and (max-height: 680px) {
 				.reportsDetail{
 					height: 174px;
 				}
+				.hearderCon{height: 40px;}
+				.headerRepDetails{padding: 1px 40px;}
+				.summaryCon{height: 30px;}
+				.summaryCon span{top: 6px;}
+				.leftSummary{padding: 15px 0 6px 0;}
+				.rightSummaryFunc{margin-top: 74px;}
+				.maintabCont{height: 33%;}
+				.reportsDetail{height: 148px;}
 			}
 			@media screen and (min-device-width: 1440px) and (max-device-height: 900px){
 				.hearderCon{height: 38px;}
@@ -322,7 +331,7 @@
             		</div>
                 </div>
             </div>
-            <div style="margin-top: 280px;">
+            <div class="midSection">
                 <table cellpadding="3" cellspacing="0" class="midContainer" id="staustable">
                     <tbody>
                         <tr>
