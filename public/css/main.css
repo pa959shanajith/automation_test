@@ -1100,6 +1100,11 @@ input[disabled]{
 
 /* utility plugins */
 
+.inactiveLink {
+   pointer-events: none;
+   cursor: default;
+}
+
 #methodSel-utility{
 	float: left;
     width: 100%;
