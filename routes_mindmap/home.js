@@ -43,7 +43,15 @@ router.get('/', function(req, res, next) {
 /* POST Mindmap*/
 router.post('/', function(req, res, next) {
 	//if(!req.session.uniqueID) res.status(401).send('Session Timed Out! Login Again');
-	if(1>2) res.status(401).send('Session Timed Out! Login Again');
+	if(req.cookies['connect.sid'] != undefined)
+	{
+		var sessionCookie = req.cookies['connect.sid'].split(".");
+		var sessionToken = sessionCookie[0].split(":");
+		sessionToken = sessionToken[1];
+	}
+	if(sessionToken != undefined && req.session.id == sessionToken)
+	{
+		if(!req.session.id) res.status(401).send('<br><br>Your session has been expired.Please <a href="/">Login</a> Again');
 	else {
 		var d=req.body;
 		//var sessObj=req.session.uniqueID;
@@ -783,6 +791,10 @@ router.post('/', function(req, res, next) {
 				});
 		}
 	}
+}
+else{
+			res.send("Invalid Session");
+		}
 });
 
 

@@ -202,8 +202,10 @@ var addNode = function(n,m,pi){
 	
 	n.display_name=n.name;
 	var ch=15;
-	if(n.name.length>15 && n.type!='modules' && n.type!='modules_endtoend'){
-		if(n.type=='testcases') ch=9;
+	//Issue 697
+	if(n.type=='testcases') ch=9;
+	if((n.name.length>15 && n.type!='modules' && n.type!='modules_endtoend') || (n.name.length>9 && n.type=='testcases')){
+		
 		n.display_name=n.display_name.slice(0,ch)+'...';
 	}
 	v.append('text').attr('class','ct-nodeLabel').text(n.display_name).attr('text-anchor','middle').attr('x',20).attr('title',n.name).attr('y',50);
@@ -628,11 +630,12 @@ var nodeClick = function(e){
 							
 							result1=JSON.parse(result);
 							releaseResult = result1;
-							default_releaseid=result1.r_ids[0];
+							default_releaseid='';
 							for(i=0; i<result1.r_ids.length && result1.rel.length; i++){
 								$('#ct-assignRel').append("<option data-id='"+result1.rel[i]+"' value='"+result1.r_ids[i]+"'>"+result1.rel[i]+"</option>");
 							}
 							$('#ct-assignRel').change(function(){
+								default_releaseid=$('#ct-assignRel').val();
 								loadCycles();
 							});
 							//var selectedRel=result1.r_ids[0];

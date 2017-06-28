@@ -714,7 +714,7 @@
 		max-height: 500px !important
 	}
 }
-@media screen and (max-height:675px){
+@media screen and (max-height:680px){
 	.scroll-wrapper > .scrollbar-screenshot{
 		padding: 0px;
 		height: auto !important;
@@ -726,7 +726,8 @@
 	}
 
 	.scroll-wrapper.scrollbar-inner-rep{
-		max-height: 184px !important;
+		/* max-height: 184px !important; */
+		max-height: 167px !important;
 	}
 	.scroll-wrapper > .scrollbar-inner-rep{
 	    height: 155px !important;
