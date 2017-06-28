@@ -19,7 +19,7 @@ window.addEventListener('popstate', function () {
 //Document Ready Function
 $(document).ready(function() {
 	//prevent special characters(such as <,>,',"",-) for all the Inputs except for password field, testcase grid inputs and edit on scrapedobjects.
-	$(document).on("keydown","input:not([type=password]):not(.editObjectName):not(.editable)", function(e) {
+	$(document).on("keydown","input[type='text']:not([type=password]):not(.editObjectName):not(.editable), textarea", function(e) {
 		if(e.shiftKey && e.keyCode == 189)
 		{
 			return true;
@@ -33,6 +33,13 @@ $(document).ready(function() {
 			return false;
 		}
 	});
+//Prevent special characters(such as <,>,',"",-) for all the Inputs except for password field, testcase grid inputs and edit on scrapedobjects on cut copy paste
+	$(document).on("cut copy paste","input[type='text']:not([type=password]):not(.editObjectName):not(.editable), textarea", function(e){
+		 var val = e.originalEvent.clipboardData.getData('text').replace (/[<>'"]/g ,"");
+		 $(this).val(val);
+		 return false;
+	});
+    // console.log('Pasted ' + clipText.length + ' characters.');
     //Task Function - Plugin Page
     $(document).on("click", ".task-content .collapse-head", function(){
         $(".caret-absolute").hide()

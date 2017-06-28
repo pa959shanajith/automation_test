@@ -181,9 +181,9 @@ if (cluster.isMaster) {
            //Test Lead and Test Manager can access mindmap plugin
           else if(req.url == "/home")
           {
-             if (req.session.defaultRole == "Admin" || req.session.defaultRole == "Business Analyst" || req.session.defaultRole == "Tech Lead" || req.session.defaultRole == "Test Engineer")
+              if (req.session.defaultRole == "Admin" || req.session.defaultRole == "Business Analyst" || req.session.defaultRole == "Tech Lead")
                {
-                          req.session.destroy(); res.status(401).send('<br><br>Your session has been expired.Please <a href="/">Login</a> Again');
+                         req.session.destroy(); res.status(401).send('<br><br>Your session has been expired.Please <a href="/">Login</a> Again');
                }
                else
                {
@@ -201,9 +201,12 @@ if (cluster.isMaster) {
                     if (req.cookies['connect.sid'] && req.cookies['connect.sid'] != undefined) { res.sendFile("index.html", { root: __dirname + "/public/" });} else {req.session.destroy(); res.status(401).send('<br><br>Your session has been expired. Please <a href="/">Login</a> Again');}
                }
           }
-          else if(req.url == '/favicon.ico')
+          else if(req.url == '/favicon.ico' || req.url == "/css/fonts/Lato/Lato-Regular.ttf")
           {
                if (req.cookies['connect.sid'] && req.cookies['connect.sid'] != undefined) { res.sendFile("index.html", { root: __dirname + "/public/" });} else {req.session.destroy(); res.status(401).send('<br><br>Your session has been expired. Please <a href="/">Login</a> Again');}
+          }
+          else{
+               req.session.destroy(); res.status(401).send('<br><br>Your Session has been expired.Please <a href="/"> Login</a> Again');
           }
      });
     
