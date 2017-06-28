@@ -1641,27 +1641,34 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 
 				var screen_width = document.getElementById('screenshot').height;
 				var real_width = document.getElementById('screenshot').naturalHeight;
-				if(appType == "MobileApp")	scale_highlight = viewString.mirrorheight;
-				else scale_highlight = 1 / (real_width / screen_width);
+				scale_highlight = 1 / (real_width / screen_width);
 				d.appendTo("#screenShotScrape");
 				d.css('border', "1px solid red");
-				if(appType == "MobileWeb"){
-					d.css('left', Math.round(rect.x) * 1.5 * scale_highlight + 'px');
-					d.css('top', Math.round(rect.y) * 1.5 * scale_highlight + 'px');
-					d.css('height', Math.round(rect.h) * 1.5 * scale_highlight + 'px');
-					d.css('width', Math.round(rect.w) * 1.5 * scale_highlight + 'px');
+				if(appType == "MobileApp"){
+					if(navigator.appVersion.indexOf("Win")!=-1){
+						d.css('left', (rect.x/3) + 'px');
+						d.css('top', (rect.y/3) + 'px');
+						d.css('height', (rect.h/3) + 'px');
+						d.css('width', (rect.w/3) + 'px');						
+					}
+					else if(navigator.appVersion.indexOf("Mac")!=-1){
+						d.css('left', rect.x + 'px');
+						d.css('top', rect.y + 'px');
+						d.css('height', rect.h + 'px');
+						d.css('width', rect.w + 'px');						
+					}
+				}
+				else if(appType == "MobileWeb"){
+					d.css('left', (rect.x - 2) + 'px');
+					d.css('top', (rect.y - 6)+ 'px');
+					d.css('height', rect.h + 'px');
+					d.css('width', rect.w + 'px');
 				}
 				else if(appType == "SAP"){
 					d.css('left', (Math.round(rect.x) * scale_highlight) + 3 + 'px');
 					d.css('top', (Math.round(rect.y) * scale_highlight) + 2 + 'px');
 					d.css('height', Math.round(rect.h) * scale_highlight + 'px');
 					d.css('width', Math.round(rect.w) * scale_highlight + 'px');
-				}
-				else if(appType == "MobileApp"){
-					d.css('left', rect.x + 'px');
-					d.css('top', rect.y + 'px');
-					d.css('height', rect.h + 'px');
-					d.css('width', rect.w + 'px');
 				}
 				else{
 					d.css('left', Math.round(rect.x)  * scale_highlight + 'px');
@@ -1674,7 +1681,10 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				d.css('z-index', '3');
 				d.css('opacity', '0.7');
 				getTopValue = Math.round(rect.y) * scale_highlight + 'px'
-				$(".scroll-wrapper > .scrollbar-screenshot").animate({ scrollTop: parseInt(getTopValue) },500);
+				if(appType == "MobileApp" || appType == "MobileWeb")
+					$(".scroll-wrapper > .scrollbar-screenshot").animate({ scrollTop: parseInt(Math.round(rect.y) + 'px') },500);
+				else 
+					$(".scroll-wrapper > .scrollbar-screenshot").animate({ scrollTop: parseInt(getTopValue) },500);
 				//$('.scroll-wrapper > .scrollbar-screenshot').scrollTo(d.offset().top);
 				var color;
 				if (translationFound) {
@@ -1690,10 +1700,10 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 	//	else{
 			DesignServices.highlightScrapElement_ICE(xpath,url, appType)
 			.then(function(data) {
-					if(data == "Invalid Session")
-			{
-				window.location.href = "/";
-			}
+				if(data == "Invalid Session")
+				{
+					window.location.href = "/";
+				}
 				if(data == "fail"){
 					openDialog("Fail", "Failed to highlight")
 				}
@@ -2361,8 +2371,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 	}
 
 	//var isDependentTestCaseChecked = $("#addDependent").is(":checked");
-	$(".addDependentTestCase").css("pointer-events","none");
-	//alert(isDependentTestCaseChecked);
+	/*$(".addDependentTestCase").css("pointer-events","none");
 	$(document).on('click','#addDependent', function() {
 			var isDependentTestCaseChecked = $("#addDependent").is(":checked");
 			if(isDependentTestCaseChecked == false)
@@ -2382,75 +2391,74 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				$(this).nextAll('.testcaseListItem').children('input.checkTestCase').attr("disabled",true);
 				$(".checkTestCase[disabled=disabled]").prop('checked',false);
 			}
-	});
+	});*/
 		
 	//Click on add dependent testcase
-	$(document).on("click",".addDependentTestCase",function() {
-		$("input[type=checkbox]:checked").prop("checked",false);
-		$("span.errTestCase").addClass("hide");
-		$(document).on('shown.bs.modal','#dialog-addDependentTestCase', function () {
-			$("input[type=checkbox].checkTestCase").prop("checked",true);
-				var currentTestCase = JSON.parse(window.localStorage['_CT']).testCaseName;
-				$("span.testcaseListItem").each(function(){
-					if(currentTestCase == $(this).children("label").text()){
-						$(this).children('input.checkTestCase').attr("disabled",true)
-						//$(".checkTestCase[disabled=disabled]").prop('checked',false);
-						$(this).nextAll('.testcaseListItem').children('input.checkTestCase').attr("disabled",true);
-						$(".checkTestCase[disabled=disabled]").prop('checked',false);
-					}
-				});
-		});
-		$("#dialog-addDependentTestCase").modal("show");
-
-		//subTask = JSON.parse(window.localStorage['_CT']).subtask;
-		//var testScenarioId = "e191bb4a-2c4f-4909-acef-32bc60e527bc";
-		var testScenarioId = JSON.parse(window.localStorage['_CT']).scenarioId;
-		DesignServices.getTestcasesByScenarioId_ICE(testScenarioId)
-		.then(function(data) {
-				if(data == "Invalid Session")
-			{
-				window.location.href = "/";
-			}
-			$("#dependentTestCasesContent").empty();
-			//data = data.sort();
-			for(var i=0;i<data.length;i++)
-			{
-				$("#dependentTestCasesContent").append("<span class='testcaseListItem'><input data-attr = "+data[i].testcaseId+" class='checkTestCase' type='checkbox' id='dependentTestCase_"+i+"' /><label title="+data[i].testcaseName+" class='dependentTestcases' for='dependentTestCase_"+i+"'>"+data[i].testcaseName+"</label></span><br />");
-			}
-
-
-			$(document).on('click','#debugOn',function() {
-				var checkedLength = $(".checkTestCase:checked").length;
-				checkedTestcases = [];
-				if(checkedLength == 0)
-				{
-					$("span.errTestCase").removeClass("hide");
-					return false;
-				}
-				else{
-					$("span.errTestCase").addClass("hide");
-					$("input[type=checkbox].checkTestCase:checked").each(function() {
-						checkedTestcases.push($(this).attr("data-attr"));
+	$(document).on("click","#addDependent",function() {
+		if(!$(this).is(":checked")){
+			$("input[type=checkbox]:checked").prop("checked",false);			
+		}
+		else{
+			$("span.errTestCase").addClass("hide");
+			$(document).on('shown.bs.modal','#dialog-addDependentTestCase', function () {
+				$("input[type=checkbox].checkTestCase").prop("checked",true);
+					var currentTestCase = JSON.parse(window.localStorage['_CT']).testCaseName;
+					$("span.testcaseListItem").each(function(){
+						if(currentTestCase == $(this).children("label").text()){
+							$(this).children('input.checkTestCase').attr("disabled",true)
+							//$(".checkTestCase[disabled=disabled]").prop('checked',false);
+							$(this).nextAll('.testcaseListItem').children('input.checkTestCase').attr("disabled",true);
+							$(".checkTestCase[disabled=disabled]").prop('checked',false);
+						}
 					});
-					if(checkedTestcases.length > 0)
-					{
-						checkedTestcases.push(JSON.parse(window.localStorage['_CT']).testCaseId);
-						$("button.close:visible").trigger('click');
-						$("#globalModal").find('.modal-title').text("Dependent Test Cases");
-						$("#globalModal").find('.modal-body p').html("Dependent Test Cases saved successfully");
-						$("#globalModal").modal("show");
-						dependentTestCaseFlag = true;
+			});
+			$("#dialog-addDependentTestCase").modal("show");
+			//subTask = JSON.parse(window.localStorage['_CT']).subtask;
+			//var testScenarioId = "e191bb4a-2c4f-4909-acef-32bc60e527bc";
+			var testScenarioId = JSON.parse(window.localStorage['_CT']).scenarioId;
+			DesignServices.getTestcasesByScenarioId_ICE(testScenarioId)
+			.then(function(data) {
+				if(data == "Invalid Session")
+				{
+					window.location.href = "/";
+				}
+				$("#dependentTestCasesContent").empty();
+				//data = data.sort();
+				for(var i=0;i<data.length;i++)
+				{
+					$("#dependentTestCasesContent").append("<span class='testcaseListItem'><input data-attr = "+data[i].testcaseId+" class='checkTestCase' type='checkbox' id='dependentTestCase_"+i+"' /><label title="+data[i].testcaseName+" class='dependentTestcases' for='dependentTestCase_"+i+"'>"+data[i].testcaseName+"</label></span><br />");
+				}
+
+				$(document).on('click','#debugOn',function() {
+					var checkedLength = $(".checkTestCase:checked").length;
+					checkedTestcases = [];
+					if(checkedLength == 0){
+						$("span.errTestCase").removeClass("hide");
+						return false;
 					}
 					else{
-						$("button.close:visible").trigger('click');
-						$("#globalModal").find('.modal-title').text("Dependent Test Cases");
-						$("#globalModal").find('.modal-body p').html("Failed to save dependent testcases");
-						$("#globalModal").modal("show");
+						$("span.errTestCase").addClass("hide");
+						$("input[type=checkbox].checkTestCase:checked").each(function() {
+							checkedTestcases.push($(this).attr("data-attr"));
+						});
+						if(checkedTestcases.length > 0){
+							checkedTestcases.push(JSON.parse(window.localStorage['_CT']).testCaseId);
+							$("button.close:visible").trigger('click');
+							$("#globalModal").find('.modal-title').text("Dependent Test Cases");
+							$("#globalModal").find('.modal-body p').html("Dependent Test Cases saved successfully");
+							$("#globalModal").modal("show");
+							dependentTestCaseFlag = true;
+						}
+						else{
+							$("button.close:visible").trigger('click');
+							$("#globalModal").find('.modal-title').text("Dependent Test Cases");
+							$("#globalModal").find('.modal-body p').html("Failed to save dependent testcases");
+							$("#globalModal").modal("show");
+						}
 					}
-				}
-			});
-		}, function(error) {
-	   });
+				});
+			}, function(error) {});
+		}		
 	});
 	//Filter Scrape Objects
 }]);
@@ -2567,7 +2575,7 @@ function contentTable(newTestScriptDataLS) {
 			        			   $(this).parent().css("background","linear-gradient(90deg, red 0.6%, white 0)").focus();		        				   
 		        			   }
 		        			   $(this).css('color','red');
-		        		   }
+		        		   }background: linear-gradient(to right, #d41e2d, #b31f2d) !important;
 		        	   });*/
 		        	   var gridArrayData = $("#jqGrid").jqGrid('getRowData');
 		        	   for(i=0; i<gridArrayData.length; i++){
@@ -2578,7 +2586,7 @@ function contentTable(newTestScriptDataLS) {
 		        		   }
 		        		   else{
 		        			   $(this).find('tr.jqgrow')[i].style.borderLeft = "5px solid transparent";
-		        			   $(this).find('tr.jqgrow')[i].childNodes[0].style.marginLeft = "-4px"
+		        			   //$(this).find('tr.jqgrow')[i].childNodes[0].style.marginLeft = "-4px"
 		        			   $(this).find('tr.jqgrow')[i].childNodes[7].style.color = "";
 		        		   }
 		        	   }
