@@ -241,7 +241,7 @@ var addLink = function(r,p,c){
 };
 //To Unassign the task of a particular node
 var removeTask= function(e){
-	
+	if ($("#ct-unassignButton a").attr('class')=='disableButton') return;
 	var p=d3.select(activeNode);
 	p.select('.ct-nodeTask').classed('no-disp',!0);
 	var pi=parseInt(p.attr('id').split('-')[2]);
@@ -653,7 +653,7 @@ var nodeClick = function(e){
 							//'46974ffa-d02a-49d8-978d-7da3b2304255'
 							dataSender({task:'populateCycles',relId:default_releaseid},function(err,result){
 								if(err){ 
-									console.log(err);
+									//console.log(err);
 									callback(null,err);
 								}
 								else{
@@ -695,10 +695,11 @@ var nodeClick = function(e){
 	
 	//condition to disable unassign task button
 	setTimeout(function(){
-		if($("#ct-assignedTo option:selected").text().toLowerCase() == "select user"  && $("#ct-assignRevw option:selected").text().toLowerCase() == "select reviewer" && $("#startDate").val() == "" && $("#endDate").val() == "") {
-		  $('#ct-unassignButton a').addClass("disableButton");
-		}
-		else	$('#ct-unassignButton a').removeClass("disableButton");
+		$('#ct-unassignButton a').addClass("disableButton");
+		
+		 if(dNodes[pi].task!=null && dNodes[pi].task!=undefined && dNodes[pi].task.oid!=null){
+			$('#ct-unassignButton a').removeClass("disableButton");
+		}	
 	},30)
 	
 	
@@ -1022,20 +1023,7 @@ var validNodeDetails = function(value,p){
 	return flag;
 };
 
-var validNodeDetails1 = function(p){
-	var nName,flag=!0;
-	nName=d3.select(p).property('value');
-	if(!(/^[a-zA-Z0-9_]+$/.test(nName))){
-		flag=!1;
-		//d3.select('#dt-c-inp-box a.dt-c-nerror').style('visibility','visible');
-		d3.select(p).classed('ct-inperror',!0);
-	}
-	else{
-		//d3.select('#dt-c-inp-box a.dt-c-nerror').style('visibility','hidden');
-		d3.select(p).classed('ct-inperror',!1);
-	}
-	return flag;
-};
+
 var inpChange = function(e){
 	var inp=d3.select('#ct-inpAct');
 	var val=inp.property('value');
