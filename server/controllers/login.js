@@ -24,39 +24,157 @@ exports.authenticateUser_Nineteen68 = function(req, res){
             req.session.username = username;
             req.session.uniqueId = sessId;
             var flag= 'inValidCredential';
-            var authUser = "select password from users where username = '"+ req.session.username+"' allow filtering;"
+			var authUser = "select password from users where username = '"+ req.session.username+"' allow filtering;"
             //console.log(req);
-            dbConn.execute(authUser, function (err, result) {
-                  if(err) {
-                        console.log("Error occured in authenticateUser_Nineteen68 : Fail");
-                        res.send("fail");
-                  }else{
-                        try{
-                              if (result.rows.length == 0){
-                                    res.send(flag);
-                              }else{
-                                    for (var i = 0; i < result.rows.length; i++) {
-                                          dbHashedPassword = result.rows[i].password;
-                                    }
-                                    var validUser = bcrypt.compareSync(password, dbHashedPassword);         // true
-                                    if(validUser == true){
-                                          flag = 'validCredential';
-                                          res.send(flag);
-                                    }else{
-                                          res.send(flag);
-                                    }  
-                              }
-                        }catch(exception){
-                              console.log(exception);
-                              res.send("fail");
-                        }
-                  }
-            });
-      }catch(exception){
-            console.log(exception);
-            res.send("fail");
-      }
+			checkldapuser(req,function(err,data){
+				if(data){
+					ldapCheck(req,function(err,ldapdata){
+						if(ldapdata == 'pass'){
+							flag = 'validCredential';
+							res.setHeader('Set-Cookie', sessId);
+							res.send(flag);
+						}else{
+							res.send(flag);
+						}
+					});
+				}else{
+					dbConn.execute(authUser, function (err, result) {
+					if(err) {
+						console.log("Error occured in authenticateUser_Nineteen68 : Fail");
+						res.send("fail");
+					}else{
+						try{
+							if (result.rows.length == 0){
+								res.send(flag);
+							}else{
+								for (var i = 0; i < result.rows.length; i++) {
+									dbHashedPassword = result.rows[i].password;
+								}
+								var validUser = bcrypt.compareSync(password, dbHashedPassword);         // true
+								if(validUser == true){
+									flag = 'validCredential';
+									res.setHeader('Set-Cookie', sessId);
+									res.send(flag);
+									
+								}else{
+									res.send(flag);
+								}  
+							}
+						}catch(exception){
+							console.log(exception);
+							res.send("fail");
+						}
+					}
+					});
+				}
+			});
+				
+		}catch(exception){
+				console.log(exception);
+				res.send("fail");
+		}
 };
+
+/** 
+ * @see : function to check whether user exists or not
+ * @author : shree.p 
+*/
+function checkuserexists(req,callback,data){
+	var flag = false;
+	var authUser = "select password from users where username = '"+ req.session.username+"' allow filtering;"
+            //console.log(req);
+	dbConn.execute(authUser, function (err, result) {
+		if(err) {
+			console.log("Error occured in authenticateUser_Nineteen68 : Fail");
+			callback(null,flag);
+		}else{
+			try{
+				if (result.rows.length == 0){
+					callback(null,flag);
+				}else{
+					flag = true;
+					callback(null,flag);
+				}
+			}catch(exception){
+				console.log(exception);
+				callback(null,flag);
+			}
+		}
+	});
+
+}
+
+/** 
+ * @see : function to check whether existing user is ldap user or not
+ * @author : shree.p 
+*/
+function checkldapuser(req,callback,data){
+	var flag = false;
+	var authUser = "select ldapuser from users where username = '"+ req.session.username+"' allow filtering;"
+            //console.log(req);
+	dbConn.execute(authUser, function (err, result) {
+		if(err) {
+			console.log("Error occured in authenticateUser_Nineteen68 : Fail");
+			callback(null,flag);
+		}else{
+			try{
+				if (result.rows.length == 0){
+					callback(null,flag);
+				}else{
+					flag = result.rows[0].ldapuser;
+					if(flag == null || flag == undefined){
+						flag = false;
+					}
+					callback(null,flag);
+				}
+			}catch(exception){
+				console.log(exception);
+				callback(null,flag);
+			}
+		}
+	});
+
+}
+
+function ldapCheck(req,cb){
+	var config = require('../../server/config/config');
+	var ldap_ip = '',ldap_port='',ldap_domain='';
+	var username = req.body.username;
+	var password = req.body.password;
+	ldap_ip = config.ldap_ip;
+	ldap_port = config.ldap_port;
+	ldap_domain = config.ldap_domain;
+	var dcarray = [];
+	var dcstringarr = []
+	try{
+		if(ldap_domain.indexOf(".") !== -1){
+		 dcarray = ldap_domain.split(".");
+		}
+		for(var i=0;i<dcarray.length;i++){
+			dcstringarr.push("dc="+dcarray[i]);
+		}
+	}catch(ex){
+		console.log("Exception occured : ",ex);
+	}
+	
+	var ActiveDirectory = require('activedirectory');
+	var ad = new ActiveDirectory({ url: 'ldap://'+ldap_ip+':'+ldap_port,
+				baseDN: dcstringarr.toString()});
+	ad.authenticate(username, password, function(err, auth) {
+		if (err) {
+			console.log('ERROR: '+JSON.stringify(err));
+			//console.log('Authentication failed!');
+			//cb(null,'fail');
+		}
+		if (auth) {
+			console.log("LDAP user");
+			cb(null,'pass');
+		} else {
+			console.log('Authentication failed!');
+			cb(null,'fail');
+		}
+	});
+}
 
 //Load User Information - Nineteen68
 exports.loadUserInfo_Nineteen68 = function(req, res){

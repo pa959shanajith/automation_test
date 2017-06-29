@@ -19,7 +19,7 @@ window.addEventListener('popstate', function () {
 //Document Ready Function
 $(document).ready(function() {
 	//prevent special characters(such as <,>,',"",-) for all the Inputs except for password field, testcase grid inputs and edit on scrapedobjects.
-	$(document).on("keydown","input:not([type=password]):not(.editObjectName):not(.editable)", function(e) {
+	$(document).on("keydown","input[type='text']:not([type=password]):not(.editObjectName):not(.editable), textarea", function(e) {
 		if(e.shiftKey && e.keyCode == 189)
 		{
 			return true;
@@ -33,6 +33,13 @@ $(document).ready(function() {
 			return false;
 		}
 	});
+//Prevent special characters(such as <,>,',"",-) for all the Inputs except for password field, testcase grid inputs and edit on scrapedobjects on cut copy paste
+	$(document).on("cut copy paste","input[type='text']:not([type=password]):not(.editObjectName):not(.editable), textarea", function(e){
+		 var val = e.originalEvent.clipboardData.getData('text').replace (/[<>'"]/g ,"");
+		 $(this).val(val);
+		 return false;
+	});
+    // console.log('Pasted ' + clipText.length + ' characters.');
     //Task Function - Plugin Page
     $(document).on("click", ".task-content .collapse-head", function(){
         $(".caret-absolute").hide()
@@ -97,11 +104,19 @@ $(document).ready(function() {
     			}
     		})    		
          }, 200)
-         if(JSON.parse(window.localStorage['_CT']).appType == "MobileApp"){
-             $("#window-scrape-screenshot").css({"width":""+(viewString.mirrorwidth+12)+"px", "height": ""+viewString.mirrorheight+"px"});
-       	 	 $("#window-scrape-screenshot .scroll-wrapper.scrollbar-screenshot").css({"height": "initial !important;"});
-        	 $("#window-scrape-screenshot .scroll-wrapper > .scrollbar-screenshot").css({"max-height": "664px !important;"});
-        	 $("#window-scrape-screenshot .scroll-wrapper .scroll-scrolly_visible #screenshot").css({"width":""+viewString.mirrorwidth+"px", "height":""+viewString.mirrorheight+"px"}); 
+         if(JSON.parse(window.localStorage['_CT']).appType == "MobileWeb"){
+             $("#window-scrape-screenshot").css({"width":""+viewString.mirrorwidth+"px", /*"height": ""+viewString.mirrorheight+"px",*/ "max-height":""+viewString.mirrorheight+"px !important"});        	 
+             $("#window-scrape-screenshot .popupContent").css({"width":""+viewString.mirrorwidth+"px", "height": ""+viewString.mirrorheight+"px"});
+         }
+         else if(JSON.parse(window.localStorage['_CT']).appType == "MobileApp"){
+        	 if(navigator.appVersion.indexOf("Win")!=-1){
+            	 $("#window-scrape-screenshot").css({"width":""+(parseInt(viewString.mirrorwidth)/3)+"px", /*"height": ""+viewString.mirrorheight+"px",*/ "max-height":""+(parseInt(viewString.mirrorheight)/3)+"px !important"});        	 
+                 $("#window-scrape-screenshot .popupContent").css({"width":""+(parseInt(viewString.mirrorwidth)/3)+"px", "height": ""+(parseInt(viewString.mirrorheight)/3)+"px"});        		 
+        	 }
+        	 else if(navigator.appVersion.indexOf("Mac")!=-1){
+            	 $("#window-scrape-screenshot").css({"width":""+viewString.mirrorwidth+"px", /*"height": ""+viewString.mirrorheight+"px",*/ "max-height":""+viewString.mirrorheight+"px !important"});        	 
+                 $("#window-scrape-screenshot .popupContent").css({"width":""+viewString.mirrorwidth+"px", "height": ""+viewString.mirrorheight+"px"});        		 
+        	 }
          }
     })
     .on("click", ".closePopup", function(){

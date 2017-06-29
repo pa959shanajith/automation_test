@@ -454,21 +454,22 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 								"overallstatus": finalReports.overallstatus,
 								"rows": finalReports.rows
 							}
-						}
+					}
 					$http.defaults.headers.post["Content-Type"] = "application/json; charset=utf-8";
 					$http.post(reportUrl,parameter, {responseType: 'arraybuffer' })
-						.success(function (result) {
-								console.log(result);
-								var file = new Blob([result], {type: 'application/pdf'});
-								/*var link=document.createElement('a');
+					.success(function (result) {
+						console.log(result);
+						var file = new Blob([result], {type: 'application/pdf'});
+						/*var link=document.createElement('a');
 					            link.href=window.URL.createObjectURL(file);
 					            link.download = scenarioName+".pdf";
 					            link.click();*/
-								var fileURL = URL.createObjectURL(file);								
-								$window.open(fileURL, '_blank');
-						}).error(function(data, status) {
-								console.error('Repos error', status, data);
-						});
+						var fileURL = URL.createObjectURL(file);								
+						$window.open(fileURL, '_blank');
+					}).error(function(data, status) {
+						console.error('Repos error', status, data);
+					});
+					$('.formatpdfbrwsrexport').remove();
 				}
 				else{
 					reportService.renderReport_ICE(finalReports, reportType)
