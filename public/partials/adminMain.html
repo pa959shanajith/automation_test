@@ -50,7 +50,7 @@
 					<button title="LDAP" class="btn btn-xs ldapBtn" ng-click="ldapFn()">LDAP</button>
 					<input type="text" id="userName" name="userName"
 						ng-model="userName" maxlength="50"
-						class="form-control form-control-custom" placeholder="User Name"><span
+						class="form-control form-control-custom validationKeydown" placeholder="User Name"><span
 						ng-show="userNameRequired" class="error-msg ng-cloak errorlbl">{{userNameRequired}}</span>
 				</div>
 				<div class='leftControl adminControl'>
@@ -127,13 +127,13 @@
 				<div class='leftControl adminControl'>
 					<input type="text" name="firstName" id="firstName"
 						ng-model="firstName" maxlength="12"
-						class="form-control form-control-custom" placeholder="First Name"><span
+						class="form-control form-control-custom validationKeydown" placeholder="First Name"><span
 						ng-show="firstNameRequired" class="error-msg ng-cloak errorlbl">{{firstNameRequired}}</span>
 				</div>
 				<div class='rightControl adminControl'>
 					<input type="text" name="lastName" id="lastName"
 						ng-model="lastName" maxlength="12"
-						class="form-control form-control-custom" placeholder="Last Name"><span
+						class="form-control form-control-custom validationKeydown" placeholder="Last Name"><span
 						ng-show="lastNameRequired" class="error-msg ng-cloak errorlbl">{{lastNameRequired}}</span>
 				</div>
 				<div class='leftControl adminControl'>

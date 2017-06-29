@@ -2369,29 +2369,6 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		$("html").css({'cursor':'auto'});
 		cfpLoadingBar.complete()
 	}
-
-	//var isDependentTestCaseChecked = $("#addDependent").is(":checked");
-	/*$(".addDependentTestCase").css("pointer-events","none");
-	$(document).on('click','#addDependent', function() {
-			var isDependentTestCaseChecked = $("#addDependent").is(":checked");
-			if(isDependentTestCaseChecked == false)
-			{
-				$(".addDependentTestCase").css("pointer-events","none");
-				dependentTestCaseFlag = false;
-			}
-			else{				
-				var currentTestCase = JSON.parse(window.localStorage['_CT']).testCaseName;
-				$(".addDependentTestCase").css("pointer-events","visible");
-				$("#dialog-addDependentTestCase").modal("show");
-			}
-			
-			if(currentTestCase == $(this).children("label").text()){
-				$(this).children('input.checkTestCase').attr("disabled",true)
-				//$(".checkTestCase[disabled=disabled]").prop('checked',false);
-				$(this).nextAll('.testcaseListItem').children('input.checkTestCase').attr("disabled",true);
-				$(".checkTestCase[disabled=disabled]").prop('checked',false);
-			}
-	});*/
 		
 	//Click on add dependent testcase
 	$(document).on("click","#addDependent",function() {
