@@ -34,7 +34,14 @@ mySPA.controller('headerController', function($scope,$http,$location,headerServi
 	});
 	$scope.switchRole_Yes = function () 
 	{
-		window.location.href = '/plugin';
+		//window.location.href = '/plugin';
+		$("#dialog-changeRole").modal("show");
+		$("#switchRoleModal").modal("hide");
+		
+	}
+	
+	$scope.Switch_Role = function(){
+		
 	}
 	/*if(window.localStorage['_CT'])
 	 {

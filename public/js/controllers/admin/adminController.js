@@ -338,7 +338,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 		$("img.selectedIcon").removeClass("selectedIcon");
 		$(this).children().find('img').addClass('selectedIcon');
 			setTimeout(function() {
-				$("#preferencesTable").find("input[type=checkbox]").each(function() {
+				$("#preferencesTable").find("input[type=checkbox]:not(.switchRole)").each(function() {
 					$(this).attr("disabled","disabled");
 				});
 			}, 50);
