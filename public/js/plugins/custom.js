@@ -33,12 +33,15 @@ $(document).ready(function() {
 			return false;
 		}
 	});
-//Prevent special characters(such as <,>,',"",-) for all the Inputs except for password field, testcase grid inputs and edit on scrapedobjects on cut copy paste
-//	$(document).on("cut copy paste","input[type='text']:not([type=password]):not(.editObjectName):not(.editable), textarea", function(e){
-//		 var val = e.originalEvent.clipboardData.getData('text').replace (/[<>'"]/g ,"");
-//		 $(this).val(val);
-//		 return false;
-//	});
+	//Prevent special characters(such as <,>,',"",-) for all the Inputs except for password field, testcase grid inputs and edit on scrapedobjects on cut copy paste
+	$(document).on("cut copy paste","input[type='text']:not([type=password]):not(.editObjectName):not(.editable), textarea", function(e){
+		 var element = this;
+    	setTimeout(function () {
+        var userEnteredText = $(element).val();  
+		userEnteredText = userEnteredText.replace (/[<>'"]/g ,"");
+		$(element).val(userEnteredText);
+    }, 5); //html5 min is 4ms.
+	});
     // console.log('Pasted ' + clipText.length + ' characters.');
     //Task Function - Plugin Page
     $(document).on("click", ".task-content .collapse-head", function(){
