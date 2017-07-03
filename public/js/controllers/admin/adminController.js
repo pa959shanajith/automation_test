@@ -1940,7 +1940,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 			updateUserObj.passWord = $("#password").val();
 			updateUserObj.firstName = $("#firstName").val();
 			updateUserObj.lastName = $("#lastName").val();
-			updateUserObj.role = $("#userRoles option:selected").val();
+			//updateUserObj.role = $("#userRoles option:selected").val();
 			updateUserObj.email = $("#email").val();
 			updateUserObj.userId = $("#userSelect option:selected").data("id");
 			adminServices.updateUser_nineteen68(updateUserObj)

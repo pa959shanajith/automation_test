@@ -366,7 +366,8 @@ exports.updateUser_nineteen68 = function updateUser_nineteen68(req, res) {
 		var local_password = userObj.passWord;
 		var local_firstname = userObj.firstName;
 		var local_lastname = userObj.lastName;
-		var local_role = userObj.role;
+		var local_role;
+		//var local_role = userObj.role;
 		var local_email_id = userObj.email;
 		var local_user_Id = userObj.userId;
 		var db_password='';
@@ -415,10 +416,10 @@ exports.updateUser_nineteen68 = function updateUser_nineteen68(req, res) {
 					}
 					if(db_password != "" && db_password != undefined)
 					{
-						var updateUser = "UPDATE users set username='"+local_username+"', password='"+db_password+"', firstname='"+local_firstname+"', lastname='"+local_lastname+"', modifiedby='"+local_username+"', modifiedon="+new Date().getTime()+", defaultrole="+local_role+", emailid='"+local_email_id+"' where userid="+local_user_Id;
+						var updateUser = "UPDATE users set username='"+local_username+"', password='"+db_password+"', firstname='"+local_firstname+"', lastname='"+local_lastname+"', modifiedby='"+local_username+"', modifiedon="+new Date().getTime()+", emailid='"+local_email_id+"' where userid="+local_user_Id;
 					}
 					else{
-						var updateUser = "UPDATE users set username='"+local_username+"', password='"+req_hashedPassword+"', firstname='"+local_firstname+"', lastname='"+local_lastname+"', modifiedby='"+local_username+"', modifiedon="+new Date().getTime()+", defaultrole="+local_role+", emailid='"+local_email_id+"' where userid="+local_user_Id;
+						var updateUser = "UPDATE users set username='"+local_username+"', password='"+req_hashedPassword+"', firstname='"+local_firstname+"', lastname='"+local_lastname+"', modifiedby='"+local_username+"', modifiedon="+new Date().getTime()+", emailid='"+local_email_id+"' where userid="+local_user_Id;
 					}
 
 					dbConn.execute(updateUser, function (err, result) {
