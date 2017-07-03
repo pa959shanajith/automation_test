@@ -24,12 +24,22 @@ exports.Encrypt_ICE = function getDomains_ICE(req, res) {
 					try{
 						var dirName = __dirname.split("\\");
 							dirName.pop();
-							dirName.push("python");
+							dirName.pop();
+							dirName.push("Portable_python");
 							var strPath = dirName.join("\\");
 							console.log(strPath);
+							
+							var dir_name = __dirname.split("\\");
+							dir_name.pop();
+							dir_name.pop();
+							dir_name.push("Portable_python");
+							dir_name.push("python");
+							var pyPath = dir_name.join("\\");
+							console.log(pyPath);
 
 						var options = {
 							mode: 'text',
+							pythonPath:pyPath,
 							scriptPath: strPath,
 							args: [encrytData]
 							};
