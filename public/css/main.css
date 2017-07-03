@@ -3772,6 +3772,33 @@ select:-webkit-autofill:focus {
     -webkit-transition: width 0.3s;
     transition: width 0.3s;
 }
+.searchTasksBox
+{
+    float:left;
+    width:100%;
+}
+.searchMytasks
+{
+    float: left;
+    width: inherit;
+    color: #333;
+}
+.inputMyTask,.searchInputMyTask
+{
+    background-color: #fafafa !important;
+}
+.searchInputMyTask{
+    font-family: LatoWeb;
+    font-size: 13px;
+    color: #333;
+}
+.searchInputMyTask:focus{
+    outline: 0px !important;
+    box-shadow: none;
+    -moz-box-shadow: none;
+    -webkit-box-shadow: none;
+    border: 1px solid #ccc;
+}
 /*****************Custom Media Queries*****************/
 
 @media screen and (min-width:1280px) and (max-height:960px) {

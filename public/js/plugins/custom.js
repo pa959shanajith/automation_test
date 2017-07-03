@@ -89,7 +89,10 @@ $(document).ready(function() {
             	$(this).siblings(".popupWrap").animate({ opacity: 1, right: "92px" }, 100).css({'z-index':'12','pointer-events':'all','display':'block'}).focus()
             } 
     	}
-		var subTaskID = JSON.parse(window.localStorage['_CT']).subTaskId;
+		if(window.localStorage['_CT'])
+		{
+			var subTaskID = JSON.parse(window.localStorage['_CT']).subTaskId;
+		}
     	var selectedTask = $("#window-task").find("#accordion").find(".assignedTaskInner");
     	$.each(selectedTask, function(){
     		if($(this)[0].dataset.subtaskid == subTaskID){
@@ -107,6 +110,8 @@ $(document).ready(function() {
     			}
     		})    		
          }, 200)
+		 if(window.localStorage['_CT'])
+		{
          if(JSON.parse(window.localStorage['_CT']).appType == "MobileWeb"){
              $("#window-scrape-screenshot").css({"width":""+viewString.mirrorwidth+"px", /*"height": ""+viewString.mirrorheight+"px",*/ "max-height":""+viewString.mirrorheight+"px !important"});        	 
              $("#window-scrape-screenshot .popupContent").css({"width":""+viewString.mirrorwidth+"px", "height": ""+viewString.mirrorheight+"px"});
@@ -121,6 +126,27 @@ $(document).ready(function() {
                  $("#window-scrape-screenshot .popupContent").css({"width":""+viewString.mirrorwidth+"px", "height": ""+viewString.mirrorheight+"px"});        		 
         	 }
          }
+		}
+		 	//Filter My Tasks
+			$(document).find('.searchInputMyTask').keyup(function() {
+				filterMyTasks(this); 
+			});
+
+			function filterMyTasks(element) {
+				var value = $(element).val();
+				$(".panel-default span.assignedTaskInner").each(function () {
+					if ($(this).text().toLowerCase().indexOf(value.toLowerCase()) > -1) {
+						$(this).parents(".panel-default").show();
+					} else {
+						$(this).parents(".panel-default").hide();
+					}
+				});
+				var counter=1;
+				$(".panel-default h4:visible").each(function () {
+					$(this).text(counter) 
+					counter++;
+				});
+			} 
     })
     .on("click", ".closePopup", function(){
         $(".popupWrap").animate({ opacity: 0, right: "70px" }, 100).css({'z-index':'0','pointer-events':'none'})
