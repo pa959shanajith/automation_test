@@ -1006,6 +1006,24 @@ input[disabled]{
 
 
 /***Design Mid Section CSS***/
+
+/* switch role css */
+ #roles{
+    float: left;
+    padding: 3px;
+    height: 24px;
+    border: 1px solid #909090 !important;
+    width: 33%;
+    margin-left: 8px;
+    margin-top: -2px;
+ }
+ 
+ .modal-body-switchRole{
+    height: 99px;
+    padding-left: 40px;
+ }
+/* switch role css */
+
 /*** Web service Screen **/
 .WebServcieScreen{
 	float: left;
@@ -3784,7 +3802,7 @@ select:-webkit-autofill:focus {
 	.suitestartend thead, .scenarioReports thead{position: relative;}
 }
 
-/* @media only screen and (max-height:680px){
+@media only screen and (height:1080px){
 	.designDataTable{width: 1617px;}
 	.container-plugins{width: 1510px;}
 	.plugin-block span{
@@ -3817,9 +3835,6 @@ select:-webkit-autofill:focus {
     .plugin-block {
         margin-bottom: 3%
     }
-    .task-bar{padding: 5px 15px;}
-    .searchInput{left: 50px;}
-    .searchIcon{left: 51px;}
     .lbs-single {
         min-height: calc(100% - 67%) !important;
     }
@@ -3905,4 +3920,26 @@ select:-webkit-autofill:focus {
 	.list-inline{margin-left: -6px !important;}
 	.searchIcon{left: 27px !important; padding-bottom: 1px !important; top: 1px !important;}
 	.searchInput{left: 26px !important;height: 29px !important;}
+}
+
+/**********Search field style**********/
+.searchIcon{
+	cursor: pointer;
+	background: white;
+    padding: 4px;
+    border-radius: 7px 7px 7px 7px;
+    position: relative;
+    left: 61px;
+}
+.searchInput{
+	border-radius: 7px 0px 0px 7px;
+    border: none;
+    position: relative;
+    left: 60px;
+    height: 28px;
+    outline: none;
+    color: black;
+    padding-left: 5px;
+    -webkit-transition: width 0.3s;
+    transition: width 0.3s;
 }

@@ -1,6 +1,7 @@
 //node
-
 var myserver = require('../../server.js');
+var PythonShell = require('python-shell');
+
 
 exports.Encrypt_ICE = function getDomains_ICE(req, res) {
 	try {
@@ -21,11 +22,31 @@ exports.Encrypt_ICE = function getDomains_ICE(req, res) {
 				}
 				else if(methodSelected == "AES"){
 					try{
-						var buffer = new Buffer(encrytData);
-						var base64Value = buffer.toString('base64');
-						var aes256 = require('nodejs-aes256');
-						encryptedValue = aes256.encrypt(encrytData, base64Value);
-						console.log(encryptedValue);
+						var dirName = __dirname.split("\\");
+							dirName.pop();
+							dirName.push("python");
+							var strPath = dirName.join("\\");
+							console.log(strPath);
+
+						var options = {
+							mode: 'text',
+							scriptPath: strPath,
+							args: [encrytData]
+							};
+
+						PythonShell.run("AES_encryption.py", options, function (err, results) {
+							if (err){
+								console.log("error occured : ",err);
+								res.send("fail");
+							}else{
+									// results is an array consisting of messages collected during execution 
+									console.log('results: %j', results);
+									encryptedValue = results[2];
+									console.log(encryptedValue);
+									res.send(encryptedValue);
+							}
+						});
+						
 					}
 					catch(exception){
 						console.log(exception);
@@ -42,12 +63,11 @@ exports.Encrypt_ICE = function getDomains_ICE(req, res) {
 						console.log(exception);
 						res.send("fail");
 					}
+					res.send(encryptedValue);
 				}
 				else if(methodSelected == "Base64"){
 					try{
-						/*var bytes = utf8.encode(encrytData);
-						encryptedValue = base64.encode(bytes);
-								*/
+						
 						var buffer = new Buffer(encrytData);
 						var encryptedValue = buffer.toString('base64');
 						console.log(encryptedValue);
@@ -56,8 +76,8 @@ exports.Encrypt_ICE = function getDomains_ICE(req, res) {
 						console.log(exception);
 						res.send("fail");
 					}
+					res.send(encryptedValue);
 				}
-				res.send(encryptedValue);
 			}
 			catch(exception){
 				console.log(exception);

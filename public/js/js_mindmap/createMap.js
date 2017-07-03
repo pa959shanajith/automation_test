@@ -285,8 +285,13 @@ var addTask = function(e){
 		$("#ct-assignCyc").css('border','').addClass("inputErrorBorderFull");
 		return false;
 	}
+	var ed=$("#endDate").val().split('/');
+	var sd=$("#startDate").val().split('/');
+	start_date=new Date(sd[2]+'-'+sd[1]+'-'+sd[0]);
+	end_date=new Date(ed[2]+'-'+ed[1]+'-'+ed[0]);
 
-	if(new Date($("#endDate").val())<=(new Date($("#startDate").val()))){
+
+	if(end_date<start_date){
 		$("#endDate").css('border','').addClass("inputErrorBorderFull");
 		return false;
 	}
@@ -390,6 +395,7 @@ var addTask = function(e){
 				
 				if(tscid!='null'){
 					dNodes[pi].task={id:tObj.id,oid:tObj.oid,task:tObj.t,assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,release:parentTask.release,cycle:parentTask.cycle,details:tObj.det,parent:(tObj.parent!=null)?tObj.parent:[modid,dNodes[pi].id_c]};
+					if(dNodes[pi].parent.type=='modules_endtoend') taskflag=true;
 				}
 
 				

@@ -50,5 +50,33 @@
 	  </div>
 	</div>
 	<!-- SwitchRole Modal  -->
+	
+	<!-- Popup for Role change -->
+	<div id="dialog-changeRole" class="modal fade" role="dialog" data-keyboard="false" data-backdrop="static">
+		<div class="modal-dialog" style="width: 700px">
+			<!-- Modal content-->
+			<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">&times;</button>
+				<h4 class="modal-title">Switch Role</h4>
+			</div>
+			<div class="modal-body modal-body-switchRole">
+			<span style="float: left;">Swicth Role:</span>
+			<select id="roles" ng-click=""
+					class="form-control roleChange pull-left">
+					<option value="Select Method" selected>Select Role</option>
+					<option value="Test Engineer">Test Engineer</option>
+					<option value="Test Lead">Test Lead</option>
+					<option value="Test Manager">Test Manager</option>
+					<option value="Admin">Admin</option>
+				</select> 
+			</div>
+			<div class="modal-footer">
+				<button ng-click="Switch_Role()" type="button" id="resetObjRow" class="btn btn-default">Switch Role</button>
+			</div>
+			</div>
+		</div>
+	</div>
+	<!-- Popup for Role change -->
 
 </div>
