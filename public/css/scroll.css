@@ -540,7 +540,55 @@
        background: rgb(211, 211, 211)
 }
 
+/* Execution mid section  */
+.scroll-wrapper > .batchSuites{
+	width: 100% !important;
+    float: left;
+    height: 100% !important;
+}
+.scroll-wrapper.batchSuites {    
+    position: relative !important;
+    top: 22px;
+    height: calc(100% - 105px);
+    width: 100%;
+    /*z-index: 50;*/
+    /* overflow: auto; */
+}
+.batchSuites > .scroll-element.scroll-y{
+	z-index:60;
+}
+.batchSuites > .scroll-element.scroll-y .scroll-bar{
+	background: #321e4f
+}
+.batchSuites > .scroll-element .scroll-element_track{
+	background: rgb(211, 211, 211)
+}
+/* Execution mid section  */
 
+/*****************Scrollbar for testscenarios in execution*******************/
+.scroll-wrapper > .testScenarioScroll{
+	width: 100% !important;
+    float: left;
+    height: 100% !important;
+}
+.scroll-wrapper.testScenarioScroll {    
+    /*position: absolute !important;*/
+    top: 22px;
+    height: calc(100% - 22px);
+    width: 100%;
+    /*z-index: 50;*/
+    /* overflow: auto; */
+}
+.testScenarioScroll > .scroll-element.scroll-y{
+	z-index:60;
+}
+.testScenarioScroll > .scroll-element.scroll-y .scroll-bar{
+	background: #321e4f
+}
+.testScenarioScroll > .scroll-element .scroll-element_track{
+	background: rgb(211, 211, 211)
+}
+/*****************Scrollbar for testscenarios in execution*******************/
 
 /* Testsuite scenarios mid section  */
 .scroll-wrapper > .scrollbar-inner-scenariostatus{

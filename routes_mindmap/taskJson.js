@@ -68,6 +68,7 @@ var tasktypes={'Design':['TestCase','Design','Create Testcase'],
 'UpdateSuite' :['TestSuite','Execution','Execute'],
 'Execute' :['TestSuite','Execution','Execute'],
 'Execute Scenario':['TestSuite','Execution','Execute'],
+'Execute Batch':['TestSuite','Execution','Execute'],
 'Scrape':['Scrape','Design','Create Screen'],
 'Append':['Scrape','Design','Create Screen'],
 'Compare':['Scrape','Design','Create Screen'],
@@ -101,23 +102,24 @@ function next_function(resultobj,cb,data){
 	var alltasks=jsonData[0].data;
 	var user_task_json=[];
 	var taskDetails={};
-	
+	var batch_dict={};
 	
 	async.forEachSeries(alltasks,function(a,maincallback){
 		var task_json={'appType':'',
 			'projectId':'',
-			'releaseId':'',
-			'cycleId':'',
+			// 'releaseId':'',
+			// 'cycleId':'',
 			'screenId':'',
 			'screenName':'',
 			'testCaseId':'',
 			'testCaseName':'',
 			'scenarioId':'',
 			'scenarioName':'',
-			'assignedTestScenarioIds':'',
-			'testSuiteId':'',
-			'testSuiteName':'',
-			'taskDetails':[]
+			//'assignedTestScenarioIds':'',
+			// 'testSuiteId':'',
+			// 'testSuiteName':'',
+			'taskDetails':[],
+			'testSuiteDetails': []
 
 };
 	taskDetails={'taskName':'',
@@ -131,12 +133,22 @@ function next_function(resultobj,cb,data){
 	'expectedEndDate':'',
 	'status':'assigned'
 	};
+	testSuiteDetails_obj={
+		"releaseid": "",
+		"cycleid": "",
+		"testsuiteid": "",
+		"testsuitename": "",
+		"projectidts": "",
+		"assignedTestScenarioIds": [],
+		//"scenarioFlag": "True",
+	}
 	var t=a.row[0];
 		var abc=tasktypes[t.task];
+		var batch_flag=false;
 		//To support the task assignmnet in scenario
-        if (t.task=='Execute' || t.task=='Execute Scenario'){
-            task_json.releaseId=t.release;
-            task_json.cycleId=t.cycle;
+        if (t.task=='Execute' || t.task=='Execute Scenario' || t.task=='Execute Batch'){
+            testSuiteDetails_obj.releaseid=t.release;
+            testSuiteDetails_obj.cycleid=t.cycle;
         }
         taskDetails.taskName=abc[2];
 		taskDetails.subTaskType=abc[0];
@@ -157,7 +169,7 @@ function next_function(resultobj,cb,data){
 					}else{
 						task_json.appType=projectTypes[data.projectType];
 						if (parent_length>=2){
-							task_json.testSuiteId=parent[1];
+							testSuiteDetails_obj.testsuiteid=parent[1];
 							if(parent_length>=3){
 								task_json.scenarioId=parent[2];
 							}
@@ -179,8 +191,9 @@ function next_function(resultobj,cb,data){
 										console.log(err);
 									}else{
 										try{
-											task_json.testSuiteName=data.modulename;
-										task_json.assignedTestScenarioIds=data.testscenarioIds[0];
+											testSuiteDetails_obj.testsuitename=data.modulename;
+											testSuiteDetails_obj.projectidts=parent[0];
+										testSuiteDetails_obj.assignedTestScenarioIds=data.testscenarioIds[0];
 										task_json.screenName=data.screenname;
 										task_json.scenarioName=data.scenarioname;
 										task_json.testCaseName=data.testcasename;
@@ -188,24 +201,40 @@ function next_function(resultobj,cb,data){
 											taskDetails.taskName=t.task+' '+data.testcasename;
 										}else if(t.task=='Execute'){
 											taskDetails.taskName=t.task+' '+data.modulename;
+										}else if(t.task=='Execute Batch'){
+											task_json.projectId="";
+											taskDetails.taskName=t.task+' '+t.batchName;
+											if(batch_dict[t.batchName]==undefined)
+											batch_dict[t.batchName]=user_task_json.length;
+											else{
+												parent_index=batch_dict[t.batchName];
+												batch_task=user_task_json[parent_index];
+												batch_task.testSuiteDetails.push(testSuiteDetails_obj);
+												batch_flag=true;
+											}
+											
 										}
 										else if(t.task=='Execute Scenario'){
-											taskDetails['scenario']='True';
+											testSuiteDetails_obj['scenarioFlag']='True';
 											taskDetails.taskName=t.task+' '+data.scenarioname;
-											task_json.assignedTestScenarioIds=[task_json.scenarioId];
+											testSuiteDetails_obj.assignedTestScenarioIds=[task_json.scenarioId];
 										}
 										else{
 											taskDetails.taskName=t.task+' '+data.screenname;
 										}
 									
 										//task_json.assignedTestScenarioIds=data.assignedTestScenarioIds;
-										task_json.taskDetails.push(taskDetails);
-										user_task_json.push(task_json);
+										if(!batch_flag){
+											task_json.testSuiteDetails.push(testSuiteDetails_obj);
+											task_json.taskDetails.push(taskDetails);
+											user_task_json.push(task_json);
+										}
+										
 										//console.log(user_task_json);
 										//fs.writeFileSync('assets_mindmap/task_json.json',JSON.stringify(user_task_json),'utf8');
 										maincallback();
 										}catch(Ex){
-											console.log(ex);
+											console.log(Ex);
 										}
 										
 

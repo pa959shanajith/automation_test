@@ -1,44 +1,34 @@
 mySPA.factory('ExecutionService', ['$http','$q', function ($http, $httpProvider, $q)   {
 	return{
-		readTestSuite_ICE : function(cycleId, testSuiteId,testSuiteName){
+		readTestSuite_ICE : function(readTestSuite){
 			return $http.post('/readTestSuite_ICE',{
 				param : 'readTestSuite_ICE',
-				cycleid : cycleId,
-				testsuiteid : testSuiteId,
-				testsuitename : testSuiteName
+				readTestSuite : readTestSuite
 			})
 			.then(function(response)  { return response.data},
 			function(response)        {return $q.reject(response.data)})
 		},
 		
-		updateTestSuite_ICE: function(cycleId, testSuiteId, testSuiteName, testScenarioIds, executeStatus, conditionCheck, getParamPaths, userinfo){
+		updateTestSuite_ICE: function(batchDetails){
 			return $http.post('/updateTestSuite_ICE',{
 				param : 'updateTestSuite_ICE',
-				testscycleid : cycleId,
-				requestedtestsuiteid : testSuiteId,
-				requestedtestsuitename : testSuiteName,
-				testscenarioids : testScenarioIds,
-				condtioncheck : conditionCheck,
-				donotexecute : executeStatus,
-				getparampaths : getParamPaths,
-				executionids : "",
-				userinfo : userinfo
+				batchDetails: batchDetails
 			})
 			.then(function(response)  { return response.data},
 			function(response)        {return $q.reject(response.data)})
 		},
 		
-		ExecuteTestSuite_ICE : function(selectedRowData, browserTypeExe, testSuiteId){
+		ExecuteTestSuite_ICE : function(moduleInfo){
 			return $http.post('/ExecuteTestSuite_ICE',{
 				param : 'ExecuteTestSuite_ICE',
-				jsonData : JSON.stringify(selectedRowData),
-				browserType : browserTypeExe,
-				testsuiteId : testSuiteId
+				moduleInfo: moduleInfo
+			//	jsonData : JSON.stringify(selectedRowData),
+			//	browserType : browserTypeExe,
+			//	testsuiteId : testSuiteId
 			})
 			.then(function(response)  { return response.data},
 			function(response)        {return $q.reject(response.data)})
 		},
-		
 		QClogin : function(url, userName, passWord){
 			return $http.post('/QCLOGIN_ICE',{
 				param : 'QCLOGIN_ICE',

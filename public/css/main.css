@@ -1384,7 +1384,7 @@ input[disabled]{
     height: 100%;
 }
 
-#page-taskName {
+#page-taskName,[id^=page-taskName] {
     float: left;
     width: 100%;
 	margin-bottom: 10px;
@@ -1394,7 +1394,7 @@ input[disabled]{
 	display: none
 }
 
-#page-taskName span {
+#page-taskName span,[id^=page-taskName] span {
     display: inline-block;
     /*background: #2f1c49;*/
     background: #331d4e;
@@ -1407,10 +1407,7 @@ input[disabled]{
     -webkit-border-radius: 5px;
 }
 
-#scrapTree ul:first-child {
-    
 
-}
 
 #scrapTree ul li a {
     font-family: 'LatoWeb';
@@ -1955,6 +1952,10 @@ input[disabled]{
 	opacity:0;
 	height: calc(100% - 31px);
 }
+.executionTableDnd
+{
+    height: calc(100% - 65px) !important;
+}
 .designTableDnd{height: calc(100% - 80px);}
 .btnAddToSchedule{
 	padding: 2px 30px !important;
@@ -1988,6 +1989,11 @@ input[disabled]{
     -moz-border-radius: 6px;
     -webkit-border-radius: 6px;
 }
+		
+.executionDataTable thead		
+{		
+    position: relative !important;		
+}
 .executionDataTable thead tr, .designDataTable thead tr{
 	width: 100%;
 	display: block;
@@ -2005,6 +2011,13 @@ input[disabled]{
     width: 100%;
     margin-top: 28px;
 }
+.executionDataTable tbody		
+{		
+    max-height: 100px !important;		
+    overflow: auto;	
+    margin-top: 0px !important;			
+}		
+
 #scheduleDataBody, #scheduledDataBody{
 	float:left;
 	width:100%;
@@ -2109,6 +2122,45 @@ input[disabled]{
 }
 .alertRed{
 	background: #fff url("../imgs/ic-false.png") 90% center no-repeat !important
+}
+.testSuiteBatch		
+{		
+    float: left;		
+    width: 97%;		
+    padding-bottom: 12%;		
+    /*max-height: 500px;*/		
+}		
+.oveflowMisdSection		
+{		
+    /*max-height: 100%;*/		
+    overflow: hidden;		
+}		
+.parentSuiteChk		
+{		
+    position: relative;		
+    left: -5px;		
+    vertical-align: middle;		
+    height: 20px;		
+    width: 16px;		
+    top: -1px;		
+}		
+.parentBatchContainer		
+{		
+    display: inline-block;		
+    position: relative;		
+    top: 30px;		
+}		
+.btnPanel		
+{		
+    position: relative;		
+    left: 13%;		
+}		
+.checkParentBatch		
+{		
+    width: 17px;		
+    height: 17px;		
+    position: relative;		
+    top: 2px;		
 }
 /******Exectuion Mid Section******/
 

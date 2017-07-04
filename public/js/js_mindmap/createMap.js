@@ -45,7 +45,7 @@ function loadMindmapData1(){
 	var selectedTab = window.localStorage['tabMindMap'];
 	uNix=0;uLix=0;dNodes=[];dLinks=[];nCount=[0,0,0,0];scrList=[];tcList=[];cSpan=[0,0];cScale=1;mapSaved=!1;
 	//Adding task to scenario
-	taskAssign={"modules_endtoend":{"task":["Execute"],"attributes":["at","rw","sd","ed","re","cy"]},"modules":{"task":["Execute"],"attributes":["at","rw","sd","ed","re","cy"]},"scenarios":{"task":["Execute Scenario"],"attributes":["at","rw","sd","ed"]},"screens":{"task":["Scrape","Append","Compare","Add","Map"],"attributes":["at","rw","sd","ed"]},"testcases":{"task":["Update","Design"],"attributes":["at","rw","sd","ed"]}};
+	taskAssign={"modules_endtoend":{"task":["Execute","Execute Batch"],"attributes":["bn","at","rw","sd","ed","re","cy"]},"modules":{"task":["Execute","Execute Batch"],"attributes":["bn","at","rw","sd","ed","re","cy"]},"scenarios":{"task":["Execute Scenario"],"attributes":["at","rw","sd","ed"]},"screens":{"task":["Scrape","Append","Compare","Add","Map"],"attributes":["at","rw","sd","ed"]},"testcases":{"task":["Update","Design"],"attributes":["at","rw","sd","ed"]}};
 	zoom=d3.behavior.zoom().scaleExtent([0.1,3]).on("zoom", zoomed);
 	faRef={"plus":"fa-plus","edit":"fa-pencil-square-o","delete":"fa-trash-o"};
 	
@@ -299,7 +299,7 @@ var addTask = function(e){
 	var a,b,p=d3.select(activeNode);
 	var pi=parseInt(p.attr('id').split('-')[2]);
 	var nType=p.attr('data-nodetype');
-	var tObj={t:/*d3.select('#ct-assignTask').html()*/$('#ct-assignTask').val(),at:$('#ct-assignedTo').val(),rw:/*(d3.select('#ct-assignRevw')[0][0])?*/$('#ct-assignRevw').val()/*:null*/,sd:$('#startDate').val(),ed:$('#endDate').val(),re:(d3.select('#ct-assignRel')[0][0])?$('#ct-assignRel').val():null,cy:(d3.select('#ct-assignCyc')[0][0])?$('#ct-assignCyc').val():null,det:d3.select('#ct-assignDetails').property('value'),app:$('option:selected', '.project-list').attr('app-type')};
+	var tObj={t:/*d3.select('#ct-assignTask').html()*/$('#ct-assignTask').val(),bn:$('#ct-executeBatch').val(),at:$('#ct-assignedTo').val(),rw:/*(d3.select('#ct-assignRevw')[0][0])?*/$('#ct-assignRevw').val()/*:null*/,sd:$('#startDate').val(),ed:$('#endDate').val(),re:(d3.select('#ct-assignRel')[0][0])?$('#ct-assignRel').val():null,cy:(d3.select('#ct-assignCyc')[0][0])?$('#ct-assignCyc').val():null,det:d3.select('#ct-assignDetails').property('value'),app:$('option:selected', '.project-list').attr('app-type')};
 	//console.log(tObj);
 	if(dNodes[pi].task){
 		tObj.id=dNodes[pi].task.id;
@@ -327,7 +327,7 @@ var addTask = function(e){
 		if(nType=="modules" || nType=="modules_endtoend"){
 			if(tObj.cy != 'select cycle' && tObj.re != 'select release'){
 				if(dNodes[pi].id_c!="null"){
-					dNodes[pi].task={id:tObj.id,oid:tObj.oid,task:tObj.t,assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,release:tObj.re,cycle:tObj.cy,details:tObj.det,parent:(tObj.parent!=null)?tObj.parent:[dNodes[pi].id_c]};
+					dNodes[pi].task={id:tObj.id,oid:tObj.oid,batchName:tObj.bn,task:tObj.t,assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,release:tObj.re,cycle:tObj.cy,details:tObj.det,parent:(tObj.parent!=null)?tObj.parent:[dNodes[pi].id_c]};
 				}
 				//Logic to add tasks for the scenario
 				if(dNodes[pi].children) dNodes[pi].children.forEach(function(tSc){
@@ -516,7 +516,7 @@ var nodeClick = function(e){
 	
 	//if(t=='scenarios') return;
 	var nt=(dNodes[pi].task!==undefined||dNodes[pi].task!=null)?dNodes[pi].task:!1;
-	var tObj={t:(nt)?nt.task:'',at:(nt)?nt.assignedTo:'',rw:(nt&&nt.reviewer!=null)?nt.reviewer:'',sd:(nt)?nt.startDate:'',ed:(nt)?nt.endDate:'',re:(nt&&nt.release!=null)?nt.release:'',cy:(nt&&nt.cycle!=null)?nt.cycle:'',det:(nt)?nt.details:''};
+	var tObj={t:(nt)?nt.task:'',bn:(nt)?nt.batchName:'',at:(nt)?nt.assignedTo:'',rw:(nt&&nt.reviewer!=null)?nt.reviewer:'',sd:(nt)?nt.startDate:'',ed:(nt)?nt.endDate:'',re:(nt&&nt.release!=null)?nt.release:'',cy:(nt&&nt.cycle!=null)?nt.cycle:'',det:(nt)?nt.details:''};
 	d3.select('#ct-assignDetails').property('value',tObj.det);
 	d3.select('#ct-assignTable').select('ul').remove();
 	u=d3.select('#ct-assignTable').append('ul');
@@ -526,16 +526,47 @@ var nodeClick = function(e){
 	taskAssign[t].task.forEach(function(tsk,i){
 		$('#ct-assignTask').append("<option data-id='"+tsk+"' value='"+tsk+"'>"+tsk+"</option>");
 	});
-	if (tObj.t==null){
+	if (tObj.t==null || tObj.t==""){
 		tObj.t=taskAssign[t].task[0];
 	}
 	$("#ct-assignTask option[value='" + tObj.t + "']").attr('selected', 'selected'); 
 
+	$("#ct-assignTask").change(function () {
+            if($("#ct-assignTask").val()=='Execute Batch'){
+				$('#ct-executeBatch').removeAttr("disabled");
+			}
+	})
+	
 	
 	var default_releaseid='';
 	taskAssign[t].attributes.forEach(function(tk){
 		v=u.append('li');
-		
+		if(tk=="bn"){	
+			v.append('span').attr('class','ct-assignItem fl-left').html('Batch Name');
+			
+			var d = v.append('input').attr('type','text').attr('id','ct-executeBatch');
+			$('#ct-executeBatch').attr('value',tObj.bn);
+			if(tObj.t!='Execute Batch'){
+				$('#ct-executeBatch').attr('disabled','true')
+			} 
+			
+			// $('#ct-executeBatch').append("<option value='select user' >Select User</option>");
+			// //PAssing selected projectid to the service
+			// dataSender({task:'populateUsers',projectId:$(".project-list").val()},function(err,result){
+			// 	if(err){ console.log(result);callback(null,err);}
+			// 	else{
+			// 		result1=JSON.parse(result);
+			// 		//alert(assignedUser);
+				
+			// 			for(i=0; i<result1.userRoles.length && result1.r_ids.length; i++){
+			// 				$('#ct-executeBatch').append("<option data-id='"+result1.userRoles[i]+"' value='"+result1.r_ids[i]+"'>"+result1.userRoles[i]+"</option>");	
+			// 			}
+			// 				$("#ct-executeBatch option[value='" + tObj.bn + "']").attr('selected', 'selected');					
+			// 	}
+				
+			// });
+			
+		}
 		if(tk=='at'){			
 			var result1 = {};
 			v.append('span').attr('class','ct-assignItem fl-left').html('Assigned to');
