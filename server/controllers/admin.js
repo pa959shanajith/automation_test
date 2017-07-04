@@ -310,6 +310,9 @@ exports.createUser_Nineteen68 = function(req, res){
 						break;
 					}
 				}
+				if(req_ldapuser){
+					req_hashedPassword = null;
+				}
 				if(status === false){
 					var createUser = "INSERT INTO users (userid,deactivated,additionalroles,createdby,createdon,defaultrole,emailid,firstname,history,lastname,ldapuser,modifiedby,modifiedon,password,username) VALUES ("+uuid()+",null,null,'"+req_username+"',"+ new Date().getTime()+","+req_defaultRole+",'"+req_email_id+"','"+req_firstname+"',null,'"+req_lastname+"',"+req_ldapuser+",'"+req_username+"',"+new Date().getTime()+",'"+req_hashedPassword+"','"+req_username+"')";
 					dbConn.execute(createUser, function (err, userResult) {
@@ -363,7 +366,8 @@ exports.updateUser_nineteen68 = function updateUser_nineteen68(req, res) {
 		var local_password = userObj.passWord;
 		var local_firstname = userObj.firstName;
 		var local_lastname = userObj.lastName;
-		var local_role = userObj.role;
+		var local_role;
+		//var local_role = userObj.role;
 		var local_email_id = userObj.email;
 		var local_user_Id = userObj.userId;
 		var db_password='';
@@ -373,7 +377,7 @@ exports.updateUser_nineteen68 = function updateUser_nineteen68(req, res) {
 			var salt = bcrypt.genSaltSync(10);
 			var req_hashedPassword = bcrypt.hashSync(local_password, salt);
 		}
-		var getUserDetails = "select username,password,firstname,lastname,defaultrole,emailid from users where userid="+local_user_Id;
+		var getUserDetails = "select username,password,firstname,lastname,defaultrole,emailid,ldapuser from users where userid="+local_user_Id;
 		dbConn.execute(getUserDetails, function (err, result) {
 			try{
 				if (typeof result === 'undefined') {
@@ -404,12 +408,18 @@ exports.updateUser_nineteen68 = function updateUser_nineteen68(req, res) {
 					if(local_email_id == undefined || local_email_id == 'undefined' || local_email_id == ''){
 						local_email_id = service.emailid;
 					}
+					if(result.rows[0].ldapuser !=null || result.rows[0].ldapuser !=undefined){
+						if(result.rows[0].ldapuser){
+							db_password = null;
+							req_hashedPassword = null;
+						}
+					}
 					if(db_password != "" && db_password != undefined)
 					{
-						var updateUser = "UPDATE users set username='"+local_username+"', password='"+db_password+"', firstname='"+local_firstname+"', lastname='"+local_lastname+"', modifiedby='"+local_username+"', modifiedon="+new Date().getTime()+", defaultrole="+local_role+", emailid='"+local_email_id+"' where userid="+local_user_Id;
+						var updateUser = "UPDATE users set username='"+local_username+"', password='"+db_password+"', firstname='"+local_firstname+"', lastname='"+local_lastname+"', modifiedby='"+local_username+"', modifiedon="+new Date().getTime()+", emailid='"+local_email_id+"' where userid="+local_user_Id;
 					}
 					else{
-						var updateUser = "UPDATE users set username='"+local_username+"', password='"+req_hashedPassword+"', firstname='"+local_firstname+"', lastname='"+local_lastname+"', modifiedby='"+local_username+"', modifiedon="+new Date().getTime()+", defaultrole="+local_role+", emailid='"+local_email_id+"' where userid="+local_user_Id;
+						var updateUser = "UPDATE users set username='"+local_username+"', password='"+req_hashedPassword+"', firstname='"+local_firstname+"', lastname='"+local_lastname+"', modifiedby='"+local_username+"', modifiedon="+new Date().getTime()+", emailid='"+local_email_id+"' where userid="+local_user_Id;
 					}
 
 					dbConn.execute(updateUser, function (err, result) {

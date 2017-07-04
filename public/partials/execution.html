@@ -35,10 +35,10 @@
 	<!--Left Panel-->
 
 	<!--Middle Panel-->
-	<div id="middle-content-section">
+	<div id="middle-content-section" class='oveflowMisdSection'>
 		<!--Task Name-->
 		<div id="page-taskName">
-			<span>AHRI-Identify objects related to login location screen</span>	
+			<span>Execution</span>	
 		</div>
 		<!--Task Name-->
 		
@@ -46,8 +46,9 @@
 		<div id="pageContent">
 			<!-- Table Buttons -->
 			<div id="tableActionButtons">
-				<button class="btn btn-xs btn-xs-custom" ng-click="updateTestSuite()"  title="Save">Save</button>
-				<button disabled class="btn btn-xs btn-xs-custom"  title="Configure">Configure</button>
+				<div><span class='parentBatchContainer'><input title='Select Batch' type='checkbox' class='checkStylebox checkParentBatch' /><span class='parentObject'>Select Batch</span></span></div>
+				<button class="btn btn-xs btn-xs-custom btnPanel" ng-click="updateTestSuite()"  title="Save">Save</button>
+				<button disabled class="btn btn-xs btn-xs-custom btnPanel"  title="Configure">Configure</button>
 				<button class="btn btn-md pull-right submitTaskBtn" ng-click="submitTaskExecution()"  title="Submit Task">Submit</button>
 				<button class="btn btn-md pull-right executeBtn" style="margin-right:10px" ng-click="ExecuteTestSuite()"  title="Execute">Execute</button>
 				<button disabled class="btn btn-md pull-right scheduleBtn" style="margin-right:10px"  title="Schedule">Schedule</button>
@@ -55,8 +56,9 @@
 			<!-- Table Buttons -->
 			
 			<!-- Table DnD -->
+		 <div class='scrollbar-inner batchSuites'>
 			<div class="executionTableDnd">
-				<div class="scrollbar-inner exeDataTable">
+				<!--<div class="scrollbar-inner exeDataTable">
 					<table id="executionDataTable" class="executionDataTable" cellspacing="0" cellpadding="0">
 						<thead>
 							<tr>
@@ -71,8 +73,9 @@
 						</thead>
 						<tbody></tbody>
 					</table>
-				</div>
+				</div>-->
 			</div>
+	   </div>
 			<!-- Table DnD -->
 		</div>
 		<!--Page Contents-->
@@ -92,6 +95,10 @@
 			<!--Popup-->
 			<div tabindex="0" id="window-task" class="popupWrap">
 				<h4 class="h4-custom closePopup">My task(s)<img class="closePopup pull-right" src="imgs/ic-arrow.png" /></h4>
+				<div class="input-group">
+						<span class="input-group-addon inputMyTask" id="basic-addon1"><img src="imgs/ic-search-icon.png"></span>
+						<input type="text" class="form-control searchInputMyTask" placeholder="Search My task(s)" aria-describedby="basic-addon1">
+				</div>
 				<div class="popupContent popupTasks">
 					<div class="scrollbar-inner scrollbar-innerpages">
 						<!--Tasks-->

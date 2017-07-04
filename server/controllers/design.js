@@ -140,12 +140,13 @@ exports.initScraping_ICE = function (req, res) {
 		}
 			if(sessionToken != undefined && req.session.id == sessionToken)
 		{
-	 	var focusParam = req.body.elementXpath+","+req.body.elementUrl;
+	 	var focusParam = req.body.elementXpath;
+		var elementURL = req.body.elementUrl;
 		var appType = req.body.appType;
 		var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 		console.log(Object.keys(myserver.allSocketsMap),"<<all people, asking person:",ip);
 		var mySocket =  myserver.allSocketsMap[ip];
-		mySocket.emit("focus", focusParam, appType);
+		mySocket.emit("focus", focusParam , elementURL, appType);
 		var flag = 'success';
 		res.send(flag);
 	}
