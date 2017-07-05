@@ -469,7 +469,6 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 					}).error(function(data, status) {
 						console.error('Repos error', status, data);
 					});
-					$('.formatpdfbrwsrexport').remove();
 				}
 				else{
 					reportService.renderReport_ICE(finalReports, reportType)
@@ -494,7 +493,8 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 					function(error) {
 						console.log("Error-------"+error);
 					})
-				}				
+				}
+				$('.formatpdfbrwsrexport').remove();
 			}
 			else console.log("Failed to get reports details");
 		},

@@ -1,7 +1,7 @@
 
 mySPA.controller('mindmapController', ['$scope', '$http', '$location', '$timeout', 'mindmapServices','cfpLoadingBar','$window', function($scope,$http,$location,$timeout,mindmapServices,cfpLoadingBar,$window) {
-    	$("body").css("background","#eee");
-    	$("head").append('<link id="mindmapCSS1" rel="stylesheet" type="text/css" href="css/css_mindmap/style.css" /><link id="mindmapCSS2" rel="stylesheet" type="text/css" href="fonts/font-awesome_mindmap/css/font-awesome.min.css" />')
+    $("body").css("background","#eee");
+    $("head").append('<link id="mindmapCSS1" rel="stylesheet" type="text/css" href="css/css_mindmap/style.css" /><link id="mindmapCSS2" rel="stylesheet" type="text/css" href="fonts/font-awesome_mindmap/css/font-awesome.min.css" />')
 	
     var taskAuth;
 	if(window.localStorage["_VM"] == "false")
@@ -232,15 +232,29 @@ mySPA.controller('mindmapController', ['$scope', '$http', '$location', '$timeout
     var collapseEteflag = true;
     $(document).on('click', '.collapseEte', function(){
     	if(collapseEteflag){
-        	$(".endtoend-modulesContainer").css("height","calc(100% - 430px)");
+    		if(screen.height < 1024){
+    			$(".endtoend-modulesContainer").prop("style","height: 48% !important;");
+    			$("#ct-canvas").prop("style","height: 250px !important");
+    			$("#ct-legendBox").prop("style","top: calc(100% - 24px) !important; left: 8px !important;");
+    			$("#ct-actionBox_W").prop("style","top: calc(100% - 34px) !important; left: (100% - 285px) !important;");
+    		}
+    		else{
+    			$(".endtoend-modulesContainer").css("height","calc(100% - 430px)");
+                $("#ct-canvas").prop("style","height: 410px !important")
+    		}
         	$(this).attr("src","imgs/ic-collapseup.png");
-            $("#ct-canvas").prop("style","height: 410px !important")
         	collapseEteflag = false;
     	}
     	else{
-    		$(".endtoend-modulesContainer").css("height","calc(100% - 643px)");
+    		if(screen.height < 1024){
+    			$(".endtoend-modulesContainer").prop("style","height: 28% !important;");
+    			$("#ct-canvas").prop("style","height: 352px !important")
+    		}
+    		else{
+    			$(".endtoend-modulesContainer").css("height","calc(100% - 643px)");
+                $("#ct-canvas").prop("style","height: 660px !important")
+    		}
         	$(this).attr("src","imgs/ic-collapse.png");
-            $("#ct-canvas").prop("style","height: 660px !important")
         	collapseEteflag = true;
     	}
     })

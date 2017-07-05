@@ -56,6 +56,9 @@
                     var name = getRows[i].children[2].innerHTML;
                     var rowCount = 0;
                     var getParentId;
+                    if(getRows[i].children[3].getAttribute("data-screenshot").length <= 0){
+                    	getRows[i].children[3].classList.remove("openscreenshot");
+                    }
                     for(j=i; j<getRows.length; j++){
                         if(parseInt(getRows[j].getAttribute('data-parentid')).length == NaN)    getParentId = parseInt(getRows[j].getAttribute('data-parentid').split(",")[1]);
                         else    getParentId = parseInt(getRows[j].getAttribute('data-parentid'));
