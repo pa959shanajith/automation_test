@@ -284,10 +284,24 @@ function taskRedirectionInner(testsuitedetails,subtasktype,screenid,screenname,p
 		taskObj.subTaskId=subtaskid;
 		taskObj.testSuiteDetails = JSON.parse(testsuitedetails);
 		window.localStorage['_CT'] = JSON.stringify(taskObj);
-	if(subtasktype == "Scrape")                       window.location.pathname = "/design"
-		else if(subtasktype == "TestCase")      	  window.location.pathname = "/designTestCase"
-			else if(subtasktype == "TestSuite")       window.location.pathname = "/execute"
-				else if(subtasktype == "Scheduling")  window.location.pathname = "/scheduling"
+		if(subtask == "Scrape"){
+			window.localStorage['navigateScreen'] = "Scrape";
+			window.localStorage['navigateScrape'] = true;
+			window.location.pathname = "/design"
+		}
+		else if(subtask == "TestCase"){
+			window.localStorage['navigateScreen'] = "TestCase";
+			window.localStorage['navigateTestcase'] = true;
+			window.location.pathname = "/designTestCase"
+		}
+		else if(subtask == "TestSuite"){
+			window.localStorage['navigateScreen'] = "TestSuite";
+			window.location.pathname = "/execute"
+		}
+		else if(subtask == "Scheduling"){
+			window.localStorage['navigateScreen'] = "Scheduling";
+			window.location.pathname = "/scheduling"
+		}
 }
 
 
@@ -307,6 +321,7 @@ function unblockUI(){
 
 function p_redirect(name){
 	window.localStorage["_VP"] = true;
+	window.localStorage['navigateScreen'] = name;
 	window.location.assign(name);
 }
 

@@ -15,12 +15,12 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 
 	//Task Listing
 	loadUserTasks()
-	var taskAuth;
+	/*var taskAuth;
 	if(window.localStorage['_CT'] == "")
 	{
 		taskAuth = false;
-	}
-	if(window.localStorage['_CT'] == "" && taskAuth == false)
+	}*/
+	if(window.localStorage['navigateScreen'] != "TestSuite")
 	{
 		window.location.href = "/";
 	}

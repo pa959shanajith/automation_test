@@ -18,14 +18,18 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 
 	//Task Listing
 	loadUserTasks()
-	if(window.localStorage['_CT'] == "")
+	var taskAuth = false;
+	if(window.localStorage['navigateScreen'] == "Scrape" && window.localStorage['navigateScrape'] == "true" && window.location.href.split("/")[3] == "design")
 	{
-		var taskAuth = false;
+		taskAuth = true;
+		window.localStorage['navigateTestcase'] = false;
 	}
-
-	if(window.localStorage['_CT'] == "" && taskAuth == false)
-	{
-		window.location.href = "/";
+	else if(window.localStorage['navigateScreen'] == "TestCase" && window.localStorage['navigateTestcase'] == "true" && window.location.href.split("/")[3] == "designTestCase"){
+		taskAuth = true;
+		window.localStorage['navigateScrape'] = false;
+	}
+	if(taskAuth == false){
+		window.location.href = "/";		
 	}
 	//Default Function to reset all input, select
 	$scope.resetTextFields = function(){
@@ -3340,13 +3344,13 @@ function contentTable(newTestScriptDataLS) {
 						&& (obType.indexOf("RadioButton") >= 0 || obType.indexOf("ImageButton") >= 0 || obType.indexOf("Button") >= 0|| obType.indexOf("EditText") >= 0 
 								|| obType.indexOf("Switch") >= 0 || obType.indexOf("CheckBox") >= 0 || obType.indexOf("Spinner") >= 0 || obType.indexOf("TimePicker") >= 0 || obType.indexOf("DatePicker") >= 0 
 								|| obType.indexOf("NumberPicker") >= 0 || obType.indexOf("RangeSeekBar") >= 0 || obType.indexOf("SeekBar") >= 0 || obType.indexOf("ListView") >= 0 || obType.indexOf("XCUIElementTypeTextField") >= 0 
-								|| obType.indexOf("XCUIElementTypePickerWheel") >= 0 || obType.indexOf("XCUIElementTypeSlider") >= 0)) {
+								|| obType.indexOf("XCUIElementTypePickerWheel") >= 0 || obType.indexOf("XCUIElementTypeSlider") >= 0 || obType.indexOf("XCUIElementTypeSearchField") >= 0)) {
 						var res = '';
 						var sc;
 						if (obType.indexOf("RadioButton") >= 0)
 						{sc = Object.keys(keywordArrayList.radiobutton);
 						selectedKeywordList = "radiobutton";}
-						else if (obType.indexOf("EditText") >= 0 || obType.indexOf("XCUIElementTypeTextField") >= 0)
+						else if (obType.indexOf("EditText") >= 0 || obType.indexOf("XCUIElementTypeTextField") >= 0 || obType.indexOf("XCUIElementTypeSearchField") >= 0)
 						{sc = Object.keys(keywordArrayList.input);
 						selectedKeywordList = "input";}
 						else if (obType.indexOf("XCUIElementTypePickerWheel") >= 0)
@@ -3395,7 +3399,7 @@ function contentTable(newTestScriptDataLS) {
 					} else if (appTypeLocal == 'MobileApp' && (!(obType.indexOf("RadioButton") >= 0 || obType.indexOf("ImageButton") >= 0 || obType.indexOf("Button") >= 0 || obType.indexOf("EditText") >= 0 
 							|| obType.indexOf("Switch") >= 0  || obType.indexOf("CheckBox") >= 0 || obType.indexOf("Spinner") >= 0 || obType.indexOf("TimePicker") >= 0 || obType.indexOf("DatePicker") >= 0 
 							|| obType.indexOf("NumberPicker") >= 0 || obType.indexOf("RangeSeekBar") >= 0 || obType.indexOf("SeekBar") >= 0 || obType.indexOf("ListView") >= 0 || obType.indexOf("XCUIElementTypeTextField") >= 0 
-							|| obType.indexOf("XCUIElementTypePickerWheel") >= 0 || obType.indexOf("XCUIElementTypeSlider") >= 0))) {
+							|| obType.indexOf("XCUIElementTypePickerWheel") >= 0 || obType.indexOf("XCUIElementTypeSlider") >= 0 || obType.indexOf("XCUIElementTypeSearchField") >= 0))) {
 						var res = '';
 						var sc = Object.keys(keywordArrayList.element);
 						selectedKeywordList = "element";

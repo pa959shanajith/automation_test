@@ -10,15 +10,15 @@ mySPA.controller('utilityController', ['$scope', '$http', '$location', '$timeout
 	//$scope.getScreenView = "utility-Encrytpion";
 	$("#utilityEncrytpion img").addClass("select-utility");
 	loadUserTasks()
-	if(window.localStorage['_VP'] == "false")
+	/*if(window.localStorage['_VP'] == "false")
 	{
 		var taskAuth = false;
-	}
+	}*/
 
-	if(window.localStorage['_VP'] == "false" && taskAuth == false)
+	if(window.localStorage['navigateScreen'] != "p_Utility")
 	{
 		window.location.href = "/";
-	}
+	} 
 	
 	cfpLoadingBar.start()
 	

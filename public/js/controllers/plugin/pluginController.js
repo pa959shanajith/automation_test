@@ -3,7 +3,12 @@ mySPA.controller('pluginController',['$scope','$window','$http','$location','$ti
 	document.getElementById("currentYear").innerHTML = new Date().getFullYear()
 	var userInfo = JSON.parse(window.localStorage['_UI']);
 	var availablePlugins = userInfo.pluginsInfo;
-	$("#plugin-container").empty().hide()
+	$("#plugin-container").empty().hide();
+	
+	if(window.localStorage['navigateScreen'] != "plugin")
+	{
+		window.location.href = "/";
+	} 
 	for(i=0; i<availablePlugins.length; i++){
 		if(availablePlugins[i].pluginValue != false){
 			$("#plugin-container").append('<div class="col-md-4 plugin-block"><span onclick="p_event(this.dataset.name)" data-name="p_'+availablePlugins[i].pluginName.replace(/\s/g,'')+'" id="'+availablePlugins[i].pluginName+'" title="'+availablePlugins[i].pluginName+'">'+availablePlugins[i].pluginName+'</span></div>').fadeIn()
@@ -17,8 +22,8 @@ mySPA.controller('pluginController',['$scope','$window','$http','$location','$ti
 			$(this).parent().hide();
 		}
 	});
-	window.localStorage["_VP"] = false;
-	window.localStorage["_VM"] = false;
+	/*window.localStorage["_VP"] = false;
+	window.localStorage["_VM"] = false;*/
 	if(window.localStorage['_UI'])
 	{
 		var userInfo =  JSON.parse(window.localStorage['_UI']);
@@ -152,9 +157,10 @@ mySPA.controller('pluginController',['$scope','$window','$http','$location','$ti
 	$scope.pluginFunction = function(name){
 		window.localStorage["_VP"] = true;
 		if(name == "p_Mindmap"){
-			window.localStorage["_VM"] = true;
+			//window.localStorage["_VM"] = true;
 			name = 'home'
 		}
+		window.localStorage['navigateScreen'] = name;
 		$window.location.assign(name)
 	}
 	window.localStorage['_TJ'] = "";
@@ -216,21 +222,30 @@ mySPA.controller('pluginController',['$scope','$window','$http','$location','$ti
 	//	taskObj.scenarioFlag = scenarioflag;
 	
 		window.localStorage['_CT'] = JSON.stringify(taskObj);
-		if(subtask == "Scrape") 			$window.location.assign("/design")
-		else if(subtask == "TestCase")		$window.location.assign("/designTestCase")
-		else if(subtask == "TestSuite")		$window.location.assign("/execute")
-		else if(subtask == "Scheduling")	$window.location.assign("/scheduling")
+		if(subtask == "Scrape"){
+			window.localStorage['navigateScreen'] = "Scrape";
+			window.localStorage['navigateScrape'] = true;
+			$window.location.assign("/design")
+		}
+		else if(subtask == "TestCase"){
+			window.localStorage['navigateScreen'] = "TestCase";
+			window.localStorage['navigateTestcase'] = true;
+			$window.location.assign("/designTestCase")
+		}
+		else if(subtask == "TestSuite"){
+			window.localStorage['navigateScreen'] = "TestSuite";
+			$window.location.assign("/execute")
+		}
+		else if(subtask == "Scheduling"){
+			window.localStorage['navigateScreen'] = "Scheduling";
+			$window.location.assign("/scheduling")
+		}
 	}
 }]);
 
 //Plugin click event - Creating Scope to define the function and returning back to controller
 function p_event(name){    
-	/*if(name == "p_Mindmap")
-	{
-		window.localStorage["_VM"] = true;
-		window.location.href = '/home';
-	}
-	else*/	angular.element(document.getElementsByClassName("plugin-block")).scope().pluginFunction(name)
+	angular.element(document.getElementsByClassName("plugin-block")).scope().pluginFunction(name)
 }
 
 function taskRedirection(testsuitedetails,subtask,screenid,screenname,projectid,taskname,testcaseid,testcasename,apptype,scenarioid,subtaskid){
