@@ -858,10 +858,8 @@ $(document).on('click', '.createNew-ete', function(e){
 				d3.select('.addScenarios-ete').classed('disableButton',!1);
 				result=JSON.parse(result);
 				result.forEach(function(row){
-					container.append("<span class='eteScenrios' data-scenarioId='"+row.testScenarioID_c+"'>"+row.testScenarioName+"</span>")
-				});
-				
-				
+					container.append("<div class='sltEteScenario'><input type='checkbox'/><span class='eteScenrios' data-scenarioId='"+row.testScenarioID_c+"'>"+row.testScenarioName+"</span></div>")
+				});				
 			}
 	});
 })

@@ -10,12 +10,12 @@ mySPA.controller('utilityController', ['$scope', '$http', '$location', '$timeout
 	//$scope.getScreenView = "utility-Encrytpion";
 	$("#utilityEncrytpion img").addClass("select-utility");
 	loadUserTasks()
-	if(window.localStorage['_VM'] == "false")
+	if(window.localStorage['_VP'] == "false")
 	{
 		var taskAuth = false;
 	}
 
-	if(window.localStorage['_VM'] == "false" && taskAuth == false)
+	if(window.localStorage['_VP'] == "false" && taskAuth == false)
 	{
 		window.location.href = "/";
 	}
