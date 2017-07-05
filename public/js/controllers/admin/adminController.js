@@ -478,6 +478,8 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 	})
 
 	//Get User Roles in the select container
+	
+	var userRolesList;
 	$scope.getUserRoles = function () {	//Yes---------------------------------
 		$("#passwordIcon").parent().show()
 		adminServices.getUserRoles_Nineteen68()
@@ -486,6 +488,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 							window.location.href = "/";
 							}
 			userRoleArrayList = response.userRoles;
+			userRolesList = response;
 			var getDropDown;
 			// if (getTab == "create") {
 			getDropDown = $('#userRoles');
@@ -501,7 +504,19 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 			window.localStorage['_R'] = response.r_ids;
 		}, function (error) { console.log("Error:::::::::::::", error) })
 	};
-
+	
+		
+  $(document).on('change', '#userRoles', function() {
+	  var getDropDown;
+	  getDropDown = $('#additionalRoles');
+	  getDropDown.empty();
+	  getDropDown.append('<option value="" selected>Select additional Role</option>');
+	  for(i=0; i<userRolesList.r_ids.length; i++){
+		  if($('#userRoles option:selected').val() != userRolesList.r_ids[i]){
+			  getDropDown.append("<option value="+ userRolesList.r_ids[i] +">"+userRolesList.userRoles[i]+"</option>");  
+		  }
+	  }	  
+  });
 	// Create Project Action
 	$scope.create_project = function () {
 		$("#selDomain").removeClass("selectErrorBorder");

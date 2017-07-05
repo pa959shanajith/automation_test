@@ -77,7 +77,7 @@ $(document).ready(function() {
     //Popup Function - Screen Level (Screenshot, Filter, Tasks, Project Info)
     $(document).on("click", ".slidePopup", function(e){
     	if($(this).attr('title') == "Filter" && $('#scraplist li').length <= 0){
-               		
+    		   		
     	}
     	else{
     		$(".thumb-ic").removeClass("thumb-ic-highlight")
@@ -87,6 +87,7 @@ $(document).ready(function() {
             	$(this).siblings(".popupWrap").animate({ opacity: 1, right: "97px" }, 100).css({'z-index':'12','pointer-events':'all','display':'block'}).focus()
             } else{
             	$(this).siblings(".popupWrap").animate({ opacity: 1, right: "92px" }, 100).css({'z-index':'12','pointer-events':'all','display':'block'}).focus()
+            	$(".searchInputMyTask").focus();
             } 
     	}
 		if(window.localStorage['_CT'])

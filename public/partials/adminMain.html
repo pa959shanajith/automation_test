@@ -96,6 +96,20 @@
 						</select> <span ng-show="roleRequired" class="error-msg ng-cloak errorlbl">{{roleRequired}}</span>
 					</div>
 				</div>
+				
+				<!-- Secondary role  -->
+				<div>
+					<div class="col-xs-6 selectRole">
+						<label class="leftControl primaryRole">Additional Role</label> 
+						<select class='adminSelect form-control'
+							x-ng-model="addrole" id="additionalRoles"
+							class="form-control rightControl selectControl">
+							<option value="" disabled selected>Select additional Role</option>
+						</select> <span ng-show="additionalRoleRequired" class="error-msg ng-cloak errorlbl">{{additionalRoleRequired}}</span>
+					</div>
+				</div>
+				<!-- Secondary role -->
+				
 			</div>
 			<!-- Action area -->
 		</div>
@@ -157,7 +171,7 @@
 						placeholder="Email Id"><span ng-show="emailRequired"
 						class="error-msg ng-cloak errorlbl">{{emailRequired}}</span>
 				</div>
-				<!--<div>
+				<div>
 					<div class="col-xs-6 selectRole">
 						<label class="leftControl primaryRole">Primary Role</label> 
 						<select class='adminSelect form-control'
@@ -166,7 +180,19 @@
 							<option value="" disabled selected>Select User Role</option>
 						</select> <span ng-show="roleRequired" class="error-msg ng-cloak errorlbl">{{roleRequired}}</span>
 					</div>
-				</div>-->
+				</div>
+				<!-- Secondary role  -->
+				<div>
+					<div class="col-xs-6 selectRole">
+						<label class="leftControl primaryRole">Additional Role</label> 
+						<select class='adminSelect form-control'
+							x-ng-model="addrole" id="additionalRoles"
+							class="form-control rightControl selectControl">
+							<option value="" disabled selected>Select additional Role</option>
+						</select> <span ng-show="additionalRoleRequired" class="error-msg ng-cloak errorlbl">{{additionalRoleRequired}}</span>
+					</div>
+				</div>
+				<!-- Secondary role -->
 			</div>
 			<!-- Edit User Form -->
 		</div>
