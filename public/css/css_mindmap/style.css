@@ -134,7 +134,7 @@ p,a,img,text,span,.noselect{-webkit-touch-callout:none;-webkit-user-select:none;
     top: 4px;
     width: 65px;
     height: 23px;
-    right:62px;
+    right:1px;
 }
 .moduleContainer{
 	width: 23%;
@@ -277,9 +277,9 @@ p,a,img,text,span,.noselect{-webkit-touch-callout:none;-webkit-user-select:none;
 .ct-nodeLabel{font-size:12px}
 .ct-link{stroke:#333;stroke-width:1px;fill:none}
 #ct-mapSvg{height:100%;width:100%}
-#ct-legendBox{position:absolute;z-index:10;height:20px;width:351px;top: calc(100% - 55px);left: 172px;}
+#ct-legendBox{position:absolute;z-index:10;height:20px;width:351px;top: calc(100% - 62px);left: 12px;}
 #ct-actionBox{position:absolute;z-index:10;height:25px;width:180px;top: calc(100% - 63px);left: calc(100% - 265px)}
-#ct-actionBox_W{position:absolute;z-index:10;height:25px;width:280px;top: calc(100% - 63px);left: calc(100% - 340px)}
+#ct-actionBox_W{position:absolute;z-index:10;height:25px;width:280px;top: calc(100% - 63px);left: calc(100% - 290px)}
 .ct-actionButton,.ct-actionButton_W{cursor:pointer}
 .ct-actionButton>rect,.ct-actionButton_W>rect{fill:#633690;height:25px;width:80px}
 .ct-actionButton>text,.ct-actionButton_W>text{font-size:17px;fill:#fff}
@@ -582,4 +582,10 @@ select
 @media only screen and (height:1080px){
 	.content-div-req{width: 86.8% !important;}
 	#ct-moduleBox, .ct-moduleBoxOptional{width: 89%;}
+}
+@media screen and (max-height: 680px) {
+	.mindmap-left-section{margin-top: 60px !important;}
+	.endtoend-modulesContainer{height: 28% !important;}
+	.endtoend-modules-right-lower button{right: 0px !important;}
+	.ct-canvas-Container{height: 352px !important;}
 }

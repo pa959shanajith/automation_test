@@ -3890,7 +3890,7 @@ select:-webkit-autofill:focus {
 	.tabeleCellPadding{width: 4%;}
 	.suitestartend thead{width: calc(100% - 1004px);}
 	.formatpdfbrwsrexport{left: 75px;}
-} */
+}
 
 @media screen and (max-height: 680px) {
     .login-bg-img {
@@ -3976,7 +3976,7 @@ select:-webkit-autofill:focus {
 	.scroll-wrapper.scrollbar-inner-rep{max-height: 154px !important;}
 	.project-left2{padding: 0 47px 0 0;}
 	#allProjectAP,#assignedProjectAP, #allProjectAP[size],#assignedProjectAP[size]{min-height: 258px; !important;}
-	
+	.endtoend-modulesContainer{height: 28% !important;}	
 }
 /**********Specifically for Firefox**********/
 @-moz-document url-prefix() {

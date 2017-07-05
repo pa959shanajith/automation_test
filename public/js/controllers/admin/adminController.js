@@ -1303,6 +1303,12 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 							updateProjectDetails = updateProjectDetails.filter(function(n){ return n != undefined });
 						}
 					}
+					for(var j=0; j<newProjectDetails.length;j++){
+						if(newProjectDetails[j].releaseName == $("#"+deleteReleaseId).parent().prev('span.releaseName').text()){
+							delete newProjectDetails[j];
+							newProjectDetails = newProjectDetails.filter(function(n){ return n != undefined });
+						}
+					}
 					goahead = true;
 				}
 			}
@@ -1764,6 +1770,57 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 			}, function (error) { console.log("Error:::::::::::::", error) })
 			clearUpdateProjectObjects();
 		});
+		
+		/************************default roles****************************************/
+		$(document).on('change','#userRoles', function() {
+			//get Projects Service
+			var domainId = $("#userRoles option:selected").val();
+			var requestedids = [domainId];
+			var domains = [];
+			domains.push(domainId);
+			//console.log("Domain", domains);
+			//var requestedids = domains.push(domainId);
+			var idtype=["userRoles"];
+			adminServices.getDetails_ICE(idtype,requestedids)
+			.then(function (response) {
+				if(response == "Invalid Session"){
+							  window.location.href = "/";
+							}
+				if(response.projectNames.length > 0)
+				{
+					$('#selProject').empty();
+					$('#selProject').append($("<option value=''  disabled selected>Please Select Your Project</option>"));
+					for (var i = 0; i < response.projectNames.length; i++) {
+						$('#selProject').append($("<option value=" + response.projectIds[i] + "></option>").text(response.projectNames[i]));
+					}
+
+				}
+				else{
+					$('#selProject').empty();
+					$('#selProject').append($("<option value=''  disabled selected>Please Select Your Project</option>"));
+					for (var i = 0; i < response.projectNames.length; i++) {
+						$('#selProject').append($("<option value=" + response.projectIds[i] + "></option>").text(response.projectNames[i]));
+					}
+				}
+				
+				//sorting the dropdown values in alphabetical order 
+				var selectOptions = $("#selProject option:not(:first)");
+				selectOptions.sort(function(a,b) {
+					if (a.text > b.text) return 1;
+				    else if (a.text < b.text) return -1;
+				    else return 0;
+				})
+				$("#selProject").empty()
+				$("#selProject").append('<option data-id="" value disabled selected>Please Select Your Project</option>');
+				for(i=0; i<selectOptions.length;i++){
+					$("#selProject").append(selectOptions[i])				
+				}
+				$("#selProject").prop('selectedIndex', 0);
+				
+			}, function (error) { console.log("Error:::::::::::::", error) })
+			clearUpdateProjectObjects();
+		});
+		/***************************************default roles*************************/
 		
 		$(document).on('change','#selProject', function() {
 			updateProjectDetails = [];

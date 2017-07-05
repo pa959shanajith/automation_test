@@ -825,14 +825,14 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			}
 			else if($scope.getScreenView == "MobileApp"){
 				$("#launchMobilityApps").modal("show")
-				$(document).find("#mobilityAPKPath, #mobilitySerialPath").val('')
-				$(document).find("#mobilityAPKPath, #mobilitySerialPath").removeClass("inputErrorBorder");
+				$(document).find("#mobilityAPKPath, #mobilitySerialPath, #mobilityDeviceName, #mobilityiOSVersion, #mobilityUDID").val('')
+				$(document).find("#mobilityAPKPath, #mobilitySerialPath, #mobilityDeviceName, #mobilityiOSVersion, #mobilityUDID").removeClass("inputErrorBorder");
 				$(".androidIcon").removeClass("androidIconActive")
 			}
 			else if($scope.getScreenView == "MobileWeb"){
 				$("#launchMobilityWeb").modal("show")
-				$(document).find("#mobilityWebSerialNo, #mobilityAndroidVersion").val('')
-				$(document).find("#mobilityWebSerialNo, #mobilityAndroidVersion").removeClass("inputErrorBorder");
+				$(document).find("#mobilityWebSerialNo, #mobilityAndroidVersion, #mobilityDeviceName, #mobilityiOSVersion, #mobilityUDID").val('')
+				$(document).find("#mobilityWebSerialNo, #mobilityAndroidVersion, #mobilityDeviceName, #mobilityiOSVersion, #mobilityUDID").removeClass("inputErrorBorder");
 				$(".androidIcon").removeClass("androidIconActive")
 			}
 		}
@@ -1297,7 +1297,11 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			
 			//For Mobility
 			else if($scope.getScreenView == "MobileApp"){
-				if($("#mobilityAPKPath").val().toLowerCase().indexOf(".apk") >= 0){
+				if(!$("#mobilityAPKPath").val()){
+					$(document).find("#mobilityAPKPath").addClass("inputErrorBorder")
+					return false
+				}
+				else if($("#mobilityAPKPath").val().toLowerCase().indexOf(".apk") >= 0){
 					if($(document).find("#mobilityAPKPath").val() == ""){
 						$(document).find("#mobilityAPKPath").addClass("inputErrorBorder")
 						return false
@@ -2562,7 +2566,7 @@ function contentTable(newTestScriptDataLS) {
 		        			   $(this).find('tr.jqgrow')[i].childNodes[7].style.color = "red";
 		        		   }
 		        		   else{
-		        			   $(this).find('tr.jqgrow')[i].style.borderLeft = "5px solid transparent";
+		        			   //$(this).find('tr.jqgrow')[i].style.borderLeft = "5px solid transparent";
 		        			   //$(this).find('tr.jqgrow')[i].childNodes[0].style.marginLeft = "-4px"
 		        			   $(this).find('tr.jqgrow')[i].childNodes[7].style.color = "";
 		        		   }
@@ -3909,6 +3913,10 @@ function pasteTestStep(){
 		openDialog("Paste Testcase step", "Copy steps to paste")
 	}
 	else{
+		if($("#jqGrid tr.ui-state-highlight td:nth-child(5)").find("select").length > 0){
+			var esc = $.Event("keydown", { keyCode: 27 });
+			$("#jqGrid tr.ui-state-highlight td:nth-child(7)").find("input").trigger(esc);
+		}
 		if(window.localStorage['anotherScriptId'] != JSON.parse(window.localStorage['_CT']).testCaseId){
 			if (window.localStorage['emptyTestStep'] == "true" || getRowJsonToPaste == undefined) return false
 			else if(window.localStorage['getAppTypeForPaste'] != JSON.parse(window.localStorage['_CT']).appType){
