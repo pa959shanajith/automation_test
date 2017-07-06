@@ -284,21 +284,21 @@ function taskRedirectionInner(testsuitedetails,subtasktype,screenid,screenname,p
 		taskObj.subTaskId=subtaskid;
 		taskObj.testSuiteDetails = JSON.parse(testsuitedetails);
 		window.localStorage['_CT'] = JSON.stringify(taskObj);
-		if(subtask == "Scrape"){
+		if(subtasktype == "Scrape"){
 			window.localStorage['navigateScreen'] = "Scrape";
 			window.localStorage['navigateScrape'] = true;
 			window.location.pathname = "/design"
 		}
-		else if(subtask == "TestCase"){
+		else if(subtasktype == "TestCase"){
 			window.localStorage['navigateScreen'] = "TestCase";
 			window.localStorage['navigateTestcase'] = true;
 			window.location.pathname = "/designTestCase"
 		}
-		else if(subtask == "TestSuite"){
+		else if(subtasktype == "TestSuite"){
 			window.localStorage['navigateScreen'] = "TestSuite";
 			window.location.pathname = "/execute"
 		}
-		else if(subtask == "Scheduling"){
+		else if(subtasktype == "Scheduling"){
 			window.localStorage['navigateScreen'] = "Scheduling";
 			window.location.pathname = "/scheduling"
 		}
