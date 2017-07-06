@@ -5,6 +5,7 @@ var Joi = require('joi');
 var client_cas = require('../../server/config/cassandra');
 var dbConn = require('../../server/config/cassandra');
 var cassandra = require('cassandra-driver');
+var dbConnICE = require('../../server/config/icetestautomation');
 var bcrypt = require('bcrypt');
 var async = require('async');
 //Global Variables
@@ -24,6 +25,8 @@ exports.authenticateUser_Nineteen68 = function(req, res){
             req.session.username = username;
             req.session.uniqueId = sessId;
             var flag= 'inValidCredential';
+			var assignedProjects = false;
+			var validUser = false;
 			var authUser = "select password from users where username = '"+ req.session.username+"' allow filtering;"
             //console.log(req);
 			checkldapuser(req,function(err,data){
@@ -50,15 +53,42 @@ exports.authenticateUser_Nineteen68 = function(req, res){
 								for (var i = 0; i < result.rows.length; i++) {
 									dbHashedPassword = result.rows[i].password;
 								}
-								var validUser = bcrypt.compareSync(password, dbHashedPassword);         // true
-								if(validUser == true){
-									flag = 'validCredential';
-									res.setHeader('Set-Cookie', sessId);
-									res.send(flag);
-									
-								}else{
-									res.send(flag);
-								}  
+								validUser = bcrypt.compareSync(password, dbHashedPassword); // true
+								//Check whether projects are assigned for a user
+								checkAssignedProjects(req,function(err,assignedProjectsData,role){
+										if(role != "Admin" && role != "Business Analyst" && role != "Tech Lead")
+										{
+												if(assignedProjectsData > 0 )
+												{
+													assignedProjects = true;
+												}
+												if(validUser == true && assignedProjects == true){
+												
+													flag = 'validCredential';
+													res.setHeader('Set-Cookie', sessId);
+													res.send(flag);
+												}
+												else if(validUser == true && assignedProjects == false)
+												{
+													flag = 'noProjectsAssigned';
+													res.send(flag);
+												}
+												else{
+													res.send(flag);
+												}  
+										}
+										else{
+											if(validUser == true){
+													flag = 'validCredential';
+													res.setHeader('Set-Cookie', sessId);
+													res.send(flag);
+												}
+											else{
+													res.send(flag);
+												}  
+										}
+										
+								});
 							}
 						}catch(exception){
 							console.log(exception);
@@ -74,6 +104,90 @@ exports.authenticateUser_Nineteen68 = function(req, res){
 				res.send("fail");
 		}
 };
+
+/** 
+ * @see : function to check whether projects are assigned for user
+ * @author : vinay 
+*/
+function checkAssignedProjects(req,callback,data){
+var userid = '';
+var roleid = '';
+var assignedProjectsLen = '';
+async.series({
+getUserId: function(callback){
+		var getUserId = "select userid,defaultrole from users where username = '"+ req.body.username+"' allow filtering;"
+		dbConn.execute(getUserId, function (err, result) {
+					if(err) {
+						console.log("Error occured in authenticateUser_Nineteen68 : Fail");
+						res.send("fail");
+					}else{
+						userid = result.rows[0].userid;
+						roleid = result.rows[0].defaultrole;
+						callback(null,userid,roleid);
+					}
+		});
+},
+getUserRole: function(callback){
+	try{
+	var getUserRole = "select rolename from roles where roleid = "+roleid+" allow filtering;"
+		dbConn.execute(getUserRole, function (err, rolesResult) {
+					if(err) {
+						console.log("Error occured in authenticateUser_Nineteen68 : Fail");
+						res.send("fail");
+					}else{
+						rolename = rolesResult.rows[0].rolename;
+						callback(null,userid,rolename);
+					}
+		});
+		}
+		catch(exception)
+		{
+				console.log(exception);
+				res.send('fail');
+		}
+},
+ getAssignedProjects: function(callback){
+	try{
+	  var getAssignedProjects = "select projectids from icepermissions where userid = "+userid+" allow filtering;"
+	  dbConnICE.execute(getAssignedProjects, function (err, projectsResult) {
+					if(err) {
+						console.log("Error occured in authenticateUser_Nineteen68 : Fail");
+						res.send("fail");
+					}else{
+						if(projectsResult.rowLength > 0)
+						{
+							assignedProjectsLen = projectsResult.rows[0].projectids.length;
+							callback(null,assignedProjectsLen,rolename);
+						}
+						else{
+							assignedProjectsLen = projectsResult.rowLength;
+							callback(null,assignedProjectsLen,rolename);
+						}
+					}
+		});
+		}
+		catch(exception)
+		{
+				console.log(exception);
+				res.send('fail');
+		}
+},
+  },function(err,data){
+	  	try{
+	    	  if(err){
+	    		 res.send("fail");
+	    	  }else{
+	    		callback(null,assignedProjectsLen,rolename);
+	    	  }
+		 }
+		catch(exception)
+			{
+					console.log(exception);
+					res.send('fail');
+			}
+	      })
+}
+
 
 /** 
  * @see : function to check whether user exists or not
