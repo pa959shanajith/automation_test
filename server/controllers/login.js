@@ -67,6 +67,7 @@ exports.authenticateUser_Nineteen68 = function(req, res){
 													flag = 'validCredential';
 													res.setHeader('Set-Cookie', sessId);
 													res.send(flag);
+													
 												}
 												else if(validUser == true && assignedProjects == false)
 												{

@@ -5,6 +5,7 @@ mySPA.controller('loginController', function ($scope, $http, $location, LoginSer
 	window.localStorage['LoginSuccess'] = "False";
 	document.getElementById("currentYear").innerHTML = new Date().getFullYear()
 
+	
 	$scope.check_credentials = function (path) {
 		cfpLoadingBar.start();
 		$scope.loginValidation = "";
