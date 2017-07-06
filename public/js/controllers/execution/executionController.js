@@ -326,7 +326,7 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 			}
 
 			//select all checkboxes by default on load
-			$("input[type=checkbox]:visible").prop('checked',true)
+			//$("input[type=checkbox]:visible").prop('checked',true)
 			
 			// //check parent checkbox by default if all child checkboxes are checked
 			// if($("#executionDataTable_"+m+" tbody tr").length == $("#executionDataTable_"+m+" tbody tr td.exe-ExecuteStatus input:checked").length)
@@ -393,7 +393,7 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 					
 			}
 		
-			if($(this).is(":checked") == true){
+			//if($(this).is(":checked") == true){
 				//Getting ScenarioIds
 				$.each($(this).parents('.suiteNameTxt').next('div').find('.exe-scenarioIds'), function(){
 					testScenarioIds.push($(this).attr("sId"))
@@ -445,7 +445,7 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 				batchDetails.userinfo = userinfo;
 				loopingtimes = loopingtimes + 1;
 				//console.log("batchDetails",batchDetails);
-			}
+			//}
 		
 	 });
 		
