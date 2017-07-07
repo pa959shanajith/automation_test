@@ -2261,8 +2261,8 @@ input[disabled]{
 .designDataTable thead tr th:nth-child(2){padding-left: 3px;}
 .loading, .jqgfirstrow, #alertmod_jqGrid{display: none !important;}
 .errorMsg{color: #cc3300; font-size: 11px;}
-.ui-widget-content:focus,.ui-row-highlight
-{outline: none; background-color: #e3caff !important;}
+.ui-widget-content:focus,.ui-row-highlight{outline: none; background-color: #e3caff !important;}
+.row-highlight-background{background-color: #e3caff !important;}
 /*****************Design CSS*****************/
 
 /******Custom Bootstrap Dialog CSS******/

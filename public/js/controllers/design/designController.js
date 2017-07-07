@@ -52,6 +52,9 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 	//Loading Project Info
 	
 	//Getting Apptype or Screen Type
+	if(appType != "Web"){
+		$("#left-bottom-section").hide();
+	}
 	//console.log(appType);
 	$scope.getScreenView = appType
 	//Getting Apptype orScreen Type
@@ -2335,14 +2338,16 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		if(gsElement.length > 0){
 			for(i=0; i<gsElement.length; i++){
 				$.each($("#scraplist li"), function(){
-					if(gsElement[i] == $(this).data("tag") || ($(this).data("tag").toLowerCase().indexOf(gsElement[i].toLowerCase()) >= 0 && gsElement[i] != "a")
+					if(gsElement[i] == $(this).data("tag") || ($(this).data("tag").toLowerCase().indexOf(gsElement[i].toLowerCase()) >= 0 && gsElement[i] != "a" && $(this).data("tag").toLowerCase() != "radio button")
 							|| (gsElement[i] == "input" && ($(this).data("tag").indexOf("edit") >= 0 || $(this).data("tag").indexOf("Edit Box") >= 0 || $(this).data("tag").indexOf("text") >= 0 || $(this).data("tag").indexOf("EditText") >= 0))
 							|| (gsElement[i] == "select" && $(this).data("tag").indexOf("combo box") >= 0)
 							|| (gsElement[i] == "a" && $(this).data("tag").indexOf("hyperlink") >= 0 || $(this).data("tag").indexOf("Static") >= 0)
 							|| (gsElement[i] == "checkbox" && $(this).data("tag").indexOf("check box") >= 0)
 							|| (gsElement[i] == "radiobutton" && $(this).data("tag").indexOf("radio button") >= 0)
-							|| (gsElement[i] == "scrollbar" && $(this).data("tag").indexOf("scroll bar") >= 0)
-							|| (gsElement[i] == "internalframe" && $(this).data("tag").indexOf("internal frame") >= 0)
+							|| (gsElement[i] == "others" && $(this).data("tag").indexOf("scroll bar") >= 0)
+							|| (gsElement[i] == "others" && $(this).data("tag").indexOf("internal frame") >= 0)
+							|| (gsElement[i] == "others" && $(this).data("tag").indexOf("tab") >= 0)
+							|| (gsElement[i] == "others" && $(this).data("tag").indexOf("table") >= 0)
 					){
 						$(this).show();
 					}
@@ -2359,8 +2364,8 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 								$(this).data("tag") != "input" &&
 								$(this).data("tag") != "list" &&
 								$(this).data("tag") != "link" &&
-								$(this).data("tag") != "scrollbar" &&
-								$(this).data("tag") != "internalframe" &&
+								$(this).data("tag") != "scroll bar" &&
+								$(this).data("tag") != "internal frame" &&
 								$(this).data("tag") != "table" &&
 								$(this).data("tag") != "tab")
 							{
@@ -2381,7 +2386,8 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 	//Click on add dependent testcase
 	$(document).on("click","#addDependent",function() {
 		if(!$(this).is(":checked")){
-			$("input[type=checkbox]:checked").prop("checked",false);			
+			$("input[type=checkbox]:checked").prop("checked",false);
+			dependentTestCaseFlag = false;
 		}
 		else{
 			$("span.errTestCase").addClass("hide");
@@ -3344,7 +3350,7 @@ function contentTable(newTestScriptDataLS) {
 						&& (obType.indexOf("RadioButton") >= 0 || obType.indexOf("ImageButton") >= 0 || obType.indexOf("Button") >= 0|| obType.indexOf("EditText") >= 0 
 								|| obType.indexOf("Switch") >= 0 || obType.indexOf("CheckBox") >= 0 || obType.indexOf("Spinner") >= 0 || obType.indexOf("TimePicker") >= 0 || obType.indexOf("DatePicker") >= 0 
 								|| obType.indexOf("NumberPicker") >= 0 || obType.indexOf("RangeSeekBar") >= 0 || obType.indexOf("SeekBar") >= 0 || obType.indexOf("ListView") >= 0 || obType.indexOf("XCUIElementTypeTextField") >= 0 
-								|| obType.indexOf("XCUIElementTypePickerWheel") >= 0 || obType.indexOf("XCUIElementTypeSlider") >= 0 || obType.indexOf("XCUIElementTypeSearchField") >= 0)) {
+								|| obType.indexOf("XCUIElementTypePickerWheel") >= 0 || obType.indexOf("XCUIElementTypeSlider") >= 0 || obType.indexOf("XCUIElementTypeSearchField") >= 0 || obType.indexOf("XCUIElementTypeTable") >=0)) {
 						var res = '';
 						var sc;
 						if (obType.indexOf("RadioButton") >= 0)
@@ -3379,7 +3385,9 @@ function contentTable(newTestScriptDataLS) {
 						else if (obType.indexOf("SeekBar") >= 0)
 						{sc = Object.keys(keywordArrayList.seekbar);selectedKeywordList = "seekbar";}
 						else if (obType.indexOf("ListView") >= 0)
-						{sc = Object.keys(keywordArrayList.listview);selectedKeywordList = "listview";}	
+						{sc = Object.keys(keywordArrayList.listview);selectedKeywordList = "listview";}
+						else if(obType.indexOf("XCUIElementTypeTable") >=0)
+						{sc = Object.keys(keywordArrayList.table);selectedKeywordList = "table";}
 						for (var i = 0; i < sc.length; i++) {
 							if (selectedKeyword == sc[i]) {
 								res += '<option role="option" value="' + sc[i]
@@ -3399,7 +3407,7 @@ function contentTable(newTestScriptDataLS) {
 					} else if (appTypeLocal == 'MobileApp' && (!(obType.indexOf("RadioButton") >= 0 || obType.indexOf("ImageButton") >= 0 || obType.indexOf("Button") >= 0 || obType.indexOf("EditText") >= 0 
 							|| obType.indexOf("Switch") >= 0  || obType.indexOf("CheckBox") >= 0 || obType.indexOf("Spinner") >= 0 || obType.indexOf("TimePicker") >= 0 || obType.indexOf("DatePicker") >= 0 
 							|| obType.indexOf("NumberPicker") >= 0 || obType.indexOf("RangeSeekBar") >= 0 || obType.indexOf("SeekBar") >= 0 || obType.indexOf("ListView") >= 0 || obType.indexOf("XCUIElementTypeTextField") >= 0 
-							|| obType.indexOf("XCUIElementTypePickerWheel") >= 0 || obType.indexOf("XCUIElementTypeSlider") >= 0 || obType.indexOf("XCUIElementTypeSearchField") >= 0))) {
+							|| obType.indexOf("XCUIElementTypePickerWheel") >= 0 || obType.indexOf("XCUIElementTypeSlider") >= 0 || obType.indexOf("XCUIElementTypeSearchField") >= 0 || obType.indexOf("XCUIElementTypeTable") >=0 ))) {
 						var res = '';
 						var sc = Object.keys(keywordArrayList.element);
 						selectedKeywordList = "element";
@@ -4121,9 +4129,10 @@ function pasteInGrid(){
 		$.each($("#jqGrid tr"), function(){
 			for(j=0;j<highlightPasted.length;j++){
 				if(parseInt($(this).children("td:nth-child(1)").text()) == highlightPasted[j]){				
-					$(this).find("input.cbox").prop("checked",true);
+					//$(this).find("input.cbox").prop("checked",true);
+					$(this).addClass("row-highlight-background");
 					$(this).addClass("ui-state-highlight");
-					$(this).siblings().removeClass("ui-state-highlight");
+					//$(this).siblings().removeClass("ui-state-highlight");
 				}
 			}
 			$(this).attr("id",$(this).index());

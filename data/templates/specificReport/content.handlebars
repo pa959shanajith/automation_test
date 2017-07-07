@@ -56,7 +56,7 @@
                     var name = getRows[i].children[2].innerHTML;
                     var rowCount = 0;
                     var getParentId;
-                    if(getRows[i].children[3].getAttribute("data-screenshot").length <= 0){
+                    if(getRows[i].children[3].getAttribute("data-screenshot").length <= 0 || getRows[i].children[3].getAttribute("data-screenshot").toLowerCase().indexOf(".png") == -1){
                     	getRows[i].children[3].classList.remove("openscreenshot");
                     }
                     for(j=i; j<getRows.length; j++){
