@@ -208,15 +208,19 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 					//check,uncheck parentSuite onload
 					$('#parentExecute_'+m).each(function() {
 						var checkedLen = $(this).parents('table').find('tbody tr input[type=checkbox]:checked').length;
+						if(parseInt(checkedLen) > 0)
+							$('#parentSuite_'+m).prop("checked", true);
+						else
+							$('#parentSuite_'+m).prop("checked", false);
 						var totalLen =  $(this).parents('table').find('tbody tr input[type=checkbox]').length;
 						if(totalLen == checkedLen)
 						{
 							$('#parentExecute_'+m).prop("checked", true);
-							$('#parentSuite_'+m).prop("checked", true);
+							//$('#parentSuite_'+m).prop("checked", true);
 						}
 						else{
 							$('#parentExecute_'+m).prop("checked", false);
-							$('#parentSuite_'+m).prop("checked", false);
+							//$('#parentSuite_'+m).prop("checked", false);
 						}
 					});
 

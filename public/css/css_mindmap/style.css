@@ -162,7 +162,7 @@ p,a,img,text,span,.noselect{-webkit-touch-callout:none;-webkit-user-select:none;
     width: 85%;
     display: inline-block;
 }
-.sltEteScenario{
+/* .sltEteScenario{
 	float: left;
     width: calc(100% - 68%);
     margin: 0 0 0 0;
@@ -171,14 +171,15 @@ p,a,img,text,span,.noselect{-webkit-touch-callout:none;-webkit-user-select:none;
 .sltEteScenario input{
 	float: left;
     margin-top: 3px;
-}
+} */
 .eteScenrios{
+	width: calc(100% - 68%);
 	float: left;
     margin: 0 6px 4px 0;
     border-radius: 5px;
     font-size: 13px;
     font-family: 'LatoWebLight';
-    padding: 3px 0 3px 2px;
+    padding: 3px 0 3px 10px;
     font-weight: 700;
     text-align: left;
     cursor: pointer;
@@ -187,7 +188,7 @@ p,a,img,text,span,.noselect{-webkit-touch-callout:none;-webkit-user-select:none;
 	background: #cae0f3;
 	color: inherit;
 }
-/* .selectScenariobg{background-color: #4299e2; color: #fff;} */
+.selectScenariobg{background-color: #4299e2; color: #fff;}
 #etemModuleContainer{margin: 0;}
 .fl-left{float:left!important}
 .fl-right{float:right!important}
