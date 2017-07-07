@@ -27,7 +27,8 @@ mySPA.controller('headerController', function($scope,$http,$location,headerServi
 			//window.location.href = '/admin';
 		}
 		else{
-			window.localStorage["_VP"] = true;
+			//window.localStorage["_VP"] = true;
+			window.localStorage['navigateScreen'] = "plugin";
 			window.location.assign('plugin');
 		}
 

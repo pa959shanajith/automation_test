@@ -5,6 +5,7 @@ mySPA.controller('loginController', function ($scope, $http, $location, LoginSer
 	window.localStorage['LoginSuccess'] = "False";
 	document.getElementById("currentYear").innerHTML = new Date().getFullYear()
 
+	
 	$scope.check_credentials = function (path) {
 		cfpLoadingBar.start();
 		$scope.loginValidation = "";
@@ -30,7 +31,7 @@ mySPA.controller('loginController', function ($scope, $http, $location, LoginSer
 			var password = $scope.password;
 			LoginService.authenticateUser_Nineteen68(username, password)
 			.then(function (data) {
-				if(data != "fail"){
+				if(data != "fail" && data != "noProjectsAssigned"){
 					if (data == 'inValidCredential') {
 						$(".ic-username").children().attr("src", "imgs/ic-username-error.png");
 						$(".ic-password").children().attr("src", "imgs/ic-password-error.png");
@@ -73,9 +74,11 @@ mySPA.controller('loginController', function ($scope, $http, $location, LoginSer
 										if(data != "fail"){
 											window.localStorage['_SR'] = data;
 											if(data == "Admin"){
+												window.localStorage['navigateScreen'] = "admin";
 												window.location.href = "/admin";
 											}
 											else{
+												window.localStorage['navigateScreen'] = "plugin";
 												window.location.href = "/plugin";
 											}											
 										}
@@ -87,6 +90,11 @@ mySPA.controller('loginController', function ($scope, $http, $location, LoginSer
 						}
 					}
 				}
+				else if(data == 'noProjectsAssigned')
+				{
+						$scope.loginValidation = "To Login, user must be allocated to a Domain and Project. Please contact Admin.";
+						cfpLoadingBar.complete();
+				}						
 				else{
 					console.log("Fail to Login.")
 				}

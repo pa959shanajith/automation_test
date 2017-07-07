@@ -3,12 +3,12 @@ mySPA.controller('mindmapController', ['$scope', '$http', '$location', '$timeout
     $("body").css("background","#eee");
     $("head").append('<link id="mindmapCSS1" rel="stylesheet" type="text/css" href="css/css_mindmap/style.css" /><link id="mindmapCSS2" rel="stylesheet" type="text/css" href="fonts/font-awesome_mindmap/css/font-awesome.min.css" />')
 	
-    var taskAuth;
+    /*var taskAuth;
 	if(window.localStorage["_VM"] == "false")
 	{
 		taskAuth = false;
-	}
-	if(window.localStorage["_VM"] == "false" && taskAuth == false)
+	}*/
+	if(window.localStorage['navigateScreen'] != "home")
 	{
 		window.location.href = "/";
 	}
@@ -284,10 +284,15 @@ mySPA.controller('mindmapController', ['$scope', '$http', '$location', '$timeout
 	}
 
 	$(document).on('click', '.eteScenrios', function(){
-		$.each($('.eteScenrios'), function(){
-			$(this).removeClass('selectScenariobg');
-		})
-		$(this).addClass('selectScenariobg');
+		/*$.each($('.eteScenrios'), function(){
+			//$(this).removeClass('selectScenariobg');
+			$(this).siblings("input").prop("checked",false);
+		})*/
+		if($(this).siblings("input").is(":checked")){
+			$(this).siblings("input").prop("checked",false);
+		}
+		else $(this).siblings("input").prop("checked",true);
+		//$(this).addClass('selectScenariobg');
 	})
     // $(".highlightImg").on('click',function(e) {
     //     if(e.target.id == "reqImg" || e.target.id == "createImg" ||  e.target.id == "assignImg" || 

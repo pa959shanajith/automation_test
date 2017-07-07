@@ -1,6 +1,6 @@
 var activeNode,childNode,uNix,uLix,node,link,dNodes,dLinks,allMMaps,temp,rootIndex,faRef,nCount,scrList,tcList,mapSaved,zoom,cSpan,cScale,taskAssign,releaseResult;
 //unassignTask is an array to store whose task to be deleted
-var deletednode=[],unassignTask=[];
+var deletednode=[],unassignTask=[],deletednode_info=[];
 var userInfo =  JSON.parse(window.localStorage['_UI']);
 var userid = userInfo.user_id;
 // node_names_tc keep track of testcase names to decide reusability of testcases
@@ -257,6 +257,10 @@ var addTask = function(e){
 	$("#startDate,#endDate").removeClass("inputErrorBorder");
 	if($("ct-assignTask option:selected").val() == "select user") {
 			$("#ct-assignedTo").css('border','').addClass("inputErrorBorderFull");
+			return false;
+		}
+	else if($("#ct-assignTask option:selected").val() == "Execute Batch" && $("#ct-executeBatch").val() == "") {
+			$("#ct-executeBatch").css('border','').addClass("inputErrorBorderFull");
 			return false;
 		}
 	else if($("#ct-assignedTo option:selected").val() == "select user") {
@@ -534,6 +538,8 @@ var nodeClick = function(e){
 	$("#ct-assignTask").change(function () {
             if($("#ct-assignTask").val()=='Execute Batch'){
 				$('#ct-executeBatch').removeAttr("disabled");
+			}else{
+				$('#ct-executeBatch').attr('disabled','true');
 			}
 	})
 	
@@ -550,21 +556,6 @@ var nodeClick = function(e){
 				$('#ct-executeBatch').attr('disabled','true')
 			} 
 			
-			// $('#ct-executeBatch').append("<option value='select user' >Select User</option>");
-			// //PAssing selected projectid to the service
-			// dataSender({task:'populateUsers',projectId:$(".project-list").val()},function(err,result){
-			// 	if(err){ console.log(result);callback(null,err);}
-			// 	else{
-			// 		result1=JSON.parse(result);
-			// 		//alert(assignedUser);
-				
-			// 			for(i=0; i<result1.userRoles.length && result1.r_ids.length; i++){
-			// 				$('#ct-executeBatch').append("<option data-id='"+result1.userRoles[i]+"' value='"+result1.r_ids[i]+"'>"+result1.userRoles[i]+"</option>");	
-			// 			}
-			// 				$("#ct-executeBatch option[value='" + tObj.bn + "']").attr('selected', 'selected');					
-			// 	}
-				
-			// });
 			
 		}
 		if(tk=='at'){			
@@ -638,8 +629,6 @@ var nodeClick = function(e){
 			v.append('span').attr('class','ct-assignItem fl-left').html('End Date');
 			$(".fl-right").append("<img src='images_mindmap/ic-datepicker.png' />").attr('alt','calIcon');
 			w=v.append('div').attr('class','ct-assignItem btn-group dropdown fl-right dateBoxEd');
-			//w.append('button').attr('class','ct-asValBox btn dropdown-toggle').attr('data-toggle','dropdown').append('a').attr('id','ct-assignEnd').html(tObj.ed);
-			//w.append('button').attr('class','ct-asValBoxIcon ct-asItemCal btn dropdown-toggle').attr('data-toggle','dropdown').append('img').attr('src','images_mindmap/ic-datepicker.png').attr('alt','calIcon');
 			w.append('input').attr('class', 'datepicker').attr('id','endDate');
 			$(".dateBoxEd").append("<img id='dateIconEndDate' class='dateIcon' src='images_mindmap/ic-datepicker.png' />").attr('alt','calIcon');
 			    $('#endDate').datepicker({
@@ -841,6 +830,7 @@ var createNode = function(e){
 var editNode = function(e,node){
 	
 	$('#ct-inpAct').removeClass('errorClass');
+	d3.select('#ct-inpAct').classed('no-disp',!1);
 	e=e||window.event;
 	e.cancelbubble=!0;
 	if(e.stopPropagation) e.stopPropagation();
@@ -910,6 +900,7 @@ var recurseDelChild = function(d){
 	d.children=null;
 	d.task=null;
 	d3.select('#ct-node-'+d.id).remove();
+	deletednode_info.push(d);
 	if(d.oid != undefined){
 		deletednode.push(d.oid)
 	}
@@ -927,6 +918,8 @@ var moveNode = function(e){
 var moveNodeBegin = function(e){
 	e=e||window.event;
 	e.cancelbubble=!0;
+	//Issue #763 is fixed,Mindmap - If node is moved in edit mode ,then Textbox is not been moved with the Node.
+	d3.select('#ct-inpAct').classed('no-disp',!0);
 	if(e.stopPropagation) e.stopPropagation();
 	//To check whether browser Is IE or not issue #415
 	var isIE = /*@cc_on!@*/false || !!document.documentMode;
@@ -1002,9 +995,14 @@ var moveNodeEnd = function(e){
 	dNodes[pi].y=parseFloat(l[1]);
 	addLink(temp.t,dLinks[temp.t].source,dLinks[temp.t].target);
 	var v=(dNodes[pi].children)?!1:!0;
+	
+	//Issue fixed #374: 'Mindmap - Blank nodes are retained if we delete the connected nodes'
 	temp.s.forEach(function(d){
-		addLink(d,dLinks[d].source,dLinks[d].target);
-		d3.select('#ct-link-'+d).classed('no-disp',v);
+		if(deletednode_info.indexOf(dLinks[d].target)==-1){
+			addLink(d,dLinks[d].source,dLinks[d].target);
+			d3.select('#ct-link-'+d).classed('no-disp',v);
+		}
+			
 	});
 	p.classed('ct-movable',!1);
 };

@@ -115,12 +115,12 @@ function next_function(resultobj,cb,data){
 			'testCaseName':'',
 			'scenarioId':'',
 			'scenarioName':'',
-			//'assignedTestScenarioIds':'',
+			'assignedTestScenarioIds':[],
 			// 'testSuiteId':'',
 			// 'testSuiteName':'',
 			'taskDetails':[],
-			'testSuiteDetails': []
-
+			'testSuiteDetails': [],
+			'scenarioFlag':'False'					
 };
 	taskDetails={'taskName':'',
 	'taskDescription':'',
@@ -215,9 +215,10 @@ function next_function(resultobj,cb,data){
 											
 										}
 										else if(t.task=='Execute Scenario'){
-											testSuiteDetails_obj['scenarioFlag']='True';
+											task_json.scenarioFlag='True';
+											task_json.assignedTestScenarioIds=[task_json.scenarioId];
 											taskDetails.taskName=t.task+' '+data.scenarioname;
-											testSuiteDetails_obj.assignedTestScenarioIds=[task_json.scenarioId];
+											//testSuiteDetails_obj.assignedTestScenarioIds=[task_json.scenarioId];
 										}
 										else{
 											taskDetails.taskName=t.task+' '+data.screenname;

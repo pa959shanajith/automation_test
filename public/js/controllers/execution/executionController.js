@@ -15,12 +15,12 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 
 	//Task Listing
 	loadUserTasks()
-	var taskAuth;
+	/*var taskAuth;
 	if(window.localStorage['_CT'] == "")
 	{
 		taskAuth = false;
-	}
-	if(window.localStorage['_CT'] == "" && taskAuth == false)
+	}*/
+	if(window.localStorage['navigateScreen'] != "TestSuite")
 	{
 		window.location.href = "/";
 	}
@@ -49,7 +49,7 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 	// var cycleId = JSON.parse(window.localStorage['_CT']).cycleId;
 	// var testSuiteId = JSON.parse(window.localStorage['_CT']).testSuiteId;
 	// var testSuiteName = JSON.parse(window.localStorage['_CT']).testSuiteName;
-	// var assignedTestScenarioId = JSON.parse(window.localStorage['_CT']).assignedTestScenarioIds;
+	var assignedTestScenarioId = JSON.parse(window.localStorage['_CT']).assignedTestScenarioIds;
 
 
 	if(window.localStorage['_CT'])
@@ -326,7 +326,7 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 			}
 
 			//select all checkboxes by default on load
-			$("input[type=checkbox]:visible").prop('checked',true)
+			//$("input[type=checkbox]:visible").prop('checked',true)
 			
 			// //check parent checkbox by default if all child checkboxes are checked
 			// if($("#executionDataTable_"+m+" tbody tr").length == $("#executionDataTable_"+m+" tbody tr td.exe-ExecuteStatus input:checked").length)
@@ -393,7 +393,7 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 					
 			}
 		
-			if($(this).is(":checked") == true){
+			//if($(this).is(":checked") == true){
 				//Getting ScenarioIds
 				$.each($(this).parents('.suiteNameTxt').next('div').find('.exe-scenarioIds'), function(){
 					testScenarioIds.push($(this).attr("sId"))
@@ -445,7 +445,7 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 				batchDetails.userinfo = userinfo;
 				loopingtimes = loopingtimes + 1;
 				//console.log("batchDetails",batchDetails);
-			}
+			//}
 		
 	 });
 		

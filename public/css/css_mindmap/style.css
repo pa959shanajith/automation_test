@@ -162,14 +162,23 @@ p,a,img,text,span,.noselect{-webkit-touch-callout:none;-webkit-user-select:none;
     width: 85%;
     display: inline-block;
 }
-.eteScenrios{
+.sltEteScenario{
 	float: left;
     width: calc(100% - 68%);
-    margin: 0 6px 5px 0;
+    margin: 0 0 0 0;
+    padding: 2px 2px;
+}
+.sltEteScenario input{
+	float: left;
+    margin-top: 3px;
+}
+.eteScenrios{
+	float: left;
+    margin: 0 6px 4px 0;
     border-radius: 5px;
     font-size: 13px;
     font-family: 'LatoWebLight';
-    padding: 3px 0 3px 10px;
+    padding: 3px 0 3px 2px;
     font-weight: 700;
     text-align: left;
     cursor: pointer;
@@ -178,7 +187,7 @@ p,a,img,text,span,.noselect{-webkit-touch-callout:none;-webkit-user-select:none;
 	background: #cae0f3;
 	color: inherit;
 }
-.selectScenariobg{background-color: #4299e2; color: #fff;}
+/* .selectScenariobg{background-color: #4299e2; color: #fff;} */
 #etemModuleContainer{margin: 0;}
 .fl-left{float:left!important}
 .fl-right{float:right!important}
@@ -358,6 +367,7 @@ p,a,img,text,span,.noselect{-webkit-touch-callout:none;-webkit-user-select:none;
 .ghostCircle,.activeDrag .ghostCircle{display:none}
 /*.assignedTo{ position: relative; left: 10px; width: 64%;}*/
 #ct-assignTask{ position: relative; left: 54px; width: 64%;}
+#ct-executeBatch{ position: relative; left: 10px; width: 64%;}
 #ct-assignedTo{ position: relative; left: 10px; width: 64%;}
 #ct-assignRevw{ position: relative; left: 24px; width: 64%;}
 #ct-assignRel{ position: relative; left: 24px; width: 64%;}
@@ -426,7 +436,7 @@ p,a,img,text,span,.noselect{-webkit-touch-callout:none;-webkit-user-select:none;
 }
 .content-div-right-expand
 {
-    width: 87% !important;
+    width: 100% !important;
     margin-left: 163px;
     float: left;
 }
@@ -544,11 +554,11 @@ select
     width: 81% !important;
     margin-left: 12% !important;
 }
-.rightBarClose
+/*.rightBarClose
 {
     width: 89% !important;
     z-index: 0;
-}
+}*/
 .rightBarOpen
 {
     width: 81% !important;
