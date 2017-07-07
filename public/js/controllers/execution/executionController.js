@@ -49,7 +49,7 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 	// var cycleId = JSON.parse(window.localStorage['_CT']).cycleId;
 	// var testSuiteId = JSON.parse(window.localStorage['_CT']).testSuiteId;
 	// var testSuiteName = JSON.parse(window.localStorage['_CT']).testSuiteName;
-	// var assignedTestScenarioId = JSON.parse(window.localStorage['_CT']).assignedTestScenarioIds;
+	var assignedTestScenarioId = JSON.parse(window.localStorage['_CT']).assignedTestScenarioIds;
 
 
 	if(window.localStorage['_CT'])
