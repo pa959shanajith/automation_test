@@ -92,7 +92,6 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 	
 		ExecutionService.readTestSuite_ICE(readTestSuite)
 		.then(function(data) {
-			debugger;
 			// var data ={
 			// 			"Testsuitename1": {
 			// 				"executestatus": [1, 1],
@@ -292,7 +291,6 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 				});
 
 				 $('[id^=parentSuite_]').on('click',function(e){
-					 debugger;
 					if($(this).is(":checked") == true)
 						{
 							$(this).parents('.suiteNameTxt').next().children().find('input[type=checkbox]').prop('checked', true);
@@ -313,7 +311,6 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 				 });
 
 				 $("input[type='checkbox'].checkStylebox").on('click',function(e){
-					 debugger;
 						if($(this).is(":checked") == true)
 						{
 							$('[id^=parentSuite_]').prop('checked', true);
@@ -376,13 +373,12 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 		var batchInfo = [];
 		var batchDetails = {};
 		userinfo = {
-			username : JSON.parse(window.localStorage['_UI']).username,
-			role : window.localStorage['_SR']	
+				username : JSON.parse(window.localStorage['_UI']).username,
+				role : window.localStorage['_SR']	
 		}
 		//updateTestSuite
 		var loopingtimes=0;
-		 $.each($(".parentSuiteChk"), function(){
-			debugger;
+		$.each($(".parentSuiteChk"), function(){
 			var suiteInfo = {};
 			var suiteDetails = {};
 			var testSuiteName = "";
@@ -391,18 +387,21 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 			var getParamPaths = [];
 			var conditionCheck = [];
 			var executeStatus = [];
-			if(window.localStorage['_CT'])
-			{
-					var cycleid = JSON.parse(window.localStorage['_CT']).testSuiteDetails;
-					
+			if(window.localStorage['_CT']){
+				var cycleid = JSON.parse(window.localStorage['_CT']).testSuiteDetails;
 			}
-		
 			//if($(this).is(":checked") == true){
-				//Getting ScenarioIds
-				$.each($(this).parents('.suiteNameTxt').next('div').find('.exe-scenarioIds'), function(){
-					testScenarioIds.push($(this).attr("sId"))
-				})
-				//Getting DataParamPaths
+			//Getting ScenarioIds
+			$.each($(this).parents('.suiteNameTxt').next('div').find('.exe-scenarioIds'), function(){
+				testScenarioIds.push($(this).attr("sId"));
+				getParamPaths.push("\'"+$(this).parent().find(".getParamPath").val().trim()+"\'");
+				conditionCheck.push($(this).parent().find(".conditionCheck option:selected").val());
+				if($(this).parent().find(".doNotExecuteScenario").is(":checked")) 
+					executeStatus.push(1);
+				else
+					executeStatus.push(0);
+			})
+			/*//Getting DataParamPaths
 				$.each($(this).parents('.suiteNameTxt').next('div').find('.exe-dataParam'), function(){
 					getParamPaths.push("\'"+$(this).find("input").val()+"\'")
 				})
@@ -414,56 +413,50 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 				$.each($(this).parents('.suiteNameTxt').next('div').find('.exe-ExecuteStatus'), function(){
 					if($(this).find("input").is(":checked")) executeStatus.push(1)
 					else executeStatus.push(0)
-				})
-				testSuiteName = $(this).parents('span.taskname').text();
-				testSuiteId =  $(this).parents('.suiteNameTxt').next().find('thead').children('input[type=hidden]').val();
-				// console.log("testScenarioIds",testScenarioIds);
-				// console.log("getParamPaths",getParamPaths);
-				// console.log("conditionCheck",conditionCheck);
-				// console.log("executeStatus",executeStatus);
-				// console.log("suiteName", testSuiteName);
-				// console.log("suiteId", testSuiteId);
-				// console.log("cycleId", cycleId);// cycleId to be changed from taskJson
-				// suiteDetails.push({
-				// 		testSuiteId: testSuiteId,
-				// 		testSuiteName: testSuiteName,
-				// 		testScenarioIds :testScenarioIds,
-				// 		getParamPaths : getParamPaths,
-				// 		conditionCheck : conditionCheck,
-				// 		executeStatus : executeStatus,
-				// 		testscycleid : cycleId
-				// 	})
-				suiteDetails.requestedtestsuiteid = testSuiteId;
-				suiteDetails.requestedtestsuitename= testSuiteName;
-				suiteDetails.testscenarioids =testScenarioIds;
-				suiteDetails.getparampaths = getParamPaths;
-				suiteDetails.conditioncheck = conditionCheck;
-				suiteDetails.donotexecute = executeStatus;
-				suiteDetails.testscycleid = JSON.parse(window.localStorage['_CT']).testSuiteDetails[loopingtimes].cycleid;
-				//console.log("suiteDetails",suiteDetails);
-				suiteInfo[testSuiteName] = suiteDetails;
-				//console.log("suiteInfo", suiteInfo);
-				batchInfo.push(suiteInfo);
-				//console.log("batchInfo", batchInfo);
-				batchDetails.suiteDetails = batchInfo;
-				batchDetails.userinfo = userinfo;
-				loopingtimes = loopingtimes + 1;
-				//console.log("batchDetails",batchDetails);
+				})*/
+			testSuiteName = $(this).parents('span.taskname').text();
+			testSuiteId =  $(this).parents('.suiteNameTxt').next().find('thead').children('input[type=hidden]').val();
+			// console.log("testScenarioIds",testScenarioIds);
+			// console.log("getParamPaths",getParamPaths);
+			// console.log("conditionCheck",conditionCheck);
+			// console.log("executeStatus",executeStatus);
+			// console.log("suiteName", testSuiteName);
+			// console.log("suiteId", testSuiteId);
+			// console.log("cycleId", cycleId);// cycleId to be changed from taskJson
+			// suiteDetails.push({
+			// 		testSuiteId: testSuiteId,
+			// 		testSuiteName: testSuiteName,
+			// 		testScenarioIds :testScenarioIds,
+			// 		getParamPaths : getParamPaths,
+			// 		conditionCheck : conditionCheck,
+			// 		executeStatus : executeStatus,
+			// 		testscycleid : cycleId
+			// 	})
+			suiteDetails.requestedtestsuiteid = testSuiteId;
+			suiteDetails.requestedtestsuitename= testSuiteName;
+			suiteDetails.testscenarioids =testScenarioIds;
+			suiteDetails.getparampaths = getParamPaths;
+			suiteDetails.conditioncheck = conditionCheck;
+			suiteDetails.donotexecute = executeStatus;
+			suiteDetails.testscycleid = JSON.parse(window.localStorage['_CT']).testSuiteDetails[loopingtimes].cycleid;
+			//console.log("suiteDetails",suiteDetails);
+			suiteInfo[testSuiteName] = suiteDetails;
+			//console.log("suiteInfo", suiteInfo);
+			batchInfo.push(suiteInfo);
+			//console.log("batchInfo", batchInfo);
+			batchDetails.suiteDetails = batchInfo;
+			batchDetails.userinfo = userinfo;
+			loopingtimes = loopingtimes + 1;
+			//console.log("batchDetails",batchDetails);
 			//}
-		
-	 });
-		
-			console.log("batchdetails",batchDetails);
-	
-			
-		
-
+		});
+		console.log("batchdetails",batchDetails);
 		//Getting ConditionChecks
 		ExecutionService.updateTestSuite_ICE(batchDetails)
 		.then(function(data) {
 			if(data == "Invalid Session"){
-					window.location.href = "/";
-			 }
+				window.location.href = "/";
+			}
 			if(data != "fail"){
 				openDialogExe("Save Test Suite", "Test suite saved successfully.")
 				//$("#saveSuitesModal").modal("show")
@@ -482,12 +475,11 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 	
 	//Execute TestSuite Functionality
 	$scope.ExecuteTestSuite = function(){
-	
 		var moduleInfo = [];
-	 $.each($(".parentSuiteChk"), function(){
-		 var suiteInfo = {};
-		 var selectedRowData = [];
-		 //suiteInfo.suiteDetails = [];
+		$.each($(".parentSuiteChk"), function(){
+			var suiteInfo = {};
+			var selectedRowData = [];
+			//suiteInfo.suiteDetails = [];
 			if($(this).is(":checked") == true){
 				$(this).parent().parent().next().find('tbody input[type=checkbox]:checked').each(function() {
 					selectedRowData.push({
@@ -504,17 +496,11 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 				suiteInfo.browserType = browserTypeExe;
 				//console.log("suiteInfo:::" + suiteInfo)
 				moduleInfo.push(suiteInfo);
-			
 			}
-		
-	 });
-	 	console.log("moduleInfo:::" + moduleInfo)
-	 	//moduleInfo.push(suiteInfo);
-
+		});
+		console.log("moduleInfo:::" + moduleInfo)
+		//moduleInfo.push(suiteInfo);
 		//Getting each row data as an object
-		
-	
-		
 		if(appType != "SAP" && browserTypeExe.length == 0)	openDialogExe("Execute Test Suite", "Please select a browser")//$("#selectBrowserAlert").modal("show");
 		else if($(".exe-ExecuteStatus input:checked").length == 0) openDialogExe("Execute Test Suite", "Please select atleast one scenario(s) to execute")//$("#selectScenarioAlert").modal("show");
 		else{
@@ -524,7 +510,7 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 			.then(function(data){
 				if(data == "Invalid Session"){
 					window.location.href = "/";
-			 }
+				}
 				if(data == "Terminate"){
 					$('#executionTerminated').modal('show');
 					$('#executionTerminated').find('.btn-default').focus();

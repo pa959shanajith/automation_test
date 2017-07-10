@@ -240,7 +240,7 @@ mySPA.controller('pluginController',['$scope','$window','$http','$location','$ti
 			$window.location.assign("/execute")
 		}
 		else if(subtask == "Scheduling"){
-			window.localStorage['navigateScreen'] = "Scheduling";
+			window.localStorage['navigateScreen'] = "scheduling";
 			$window.location.assign("/scheduling")
 		}
 	}
