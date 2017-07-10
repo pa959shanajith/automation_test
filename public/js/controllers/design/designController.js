@@ -52,7 +52,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 	//Loading Project Info
 	
 	//Getting Apptype or Screen Type
-	if(appType != "Web"){
+	if(appType != "Web" && window.location.href.split("/")[3] == "design"){
 		$("#left-bottom-section").hide();
 	}
 	//console.log(appType);

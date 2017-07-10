@@ -16,7 +16,7 @@ mySPA.controller('scheduleController',['$scope','$http','$timeout','$location','
 	{
 		taskAuth = false;
 	}*/
-	if(window.localStorage['navigateScreen'] != "Scheduling")
+	if(window.localStorage['navigateScreen'] != "scheduling")
 	{
 		window.location.href = "/";
 	}  
