@@ -19,7 +19,7 @@ window.addEventListener('popstate', function () {
 //Document Ready Function
 $(document).ready(function() {
 	//prevent special characters(such as <,>,',"",-) for all the Inputs except for password field, testcase grid inputs and edit on scrapedobjects.
-	$(document).on("keydown","input[type='text']:not([type=password]):not(.editObjectName):not(.editable):not(#userName):not(#firstName):not(#lastName):not(.launchPopupInput), textarea", function(e) {
+	$(document).on("keydown","input[type='text']:not([type=password]):not(.editObjectName):not(.editable):not(#userName):not(#firstName):not(#lastName):not(.launchPopupInput), textarea:not(.editable)", function(e) {
 		if(e.shiftKey && e.keyCode == 189)
 		{
 			return true;
@@ -34,7 +34,7 @@ $(document).ready(function() {
 		}
 	});
 	//Prevent special characters(such as <,>,',"",-) for all the Inputs except for password field, testcase grid inputs and edit on scrapedobjects on cut copy paste
-	$(document).on("cut copy paste","input[type='text']:not([type=password]):not(.editObjectName):not(.editable), textarea", function(e){
+	$(document).on("cut copy paste","input[type='text']:not([type=password]):not(.editObjectName):not(.editable), textarea:not(.editable)", function(e){
 		if(e.target.className != "wsdlTextAreaBody"){
 			var element = this;
 			setTimeout(function () {
