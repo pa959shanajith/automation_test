@@ -1444,6 +1444,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				$("#finalScrap").append("<div id='scrapTree' class='scrapTree'><ul><li><span class='parentObjContainer'><input title='Select all' type='checkbox' class='checkStylebox' disabled /><span class='parentObject'><a id='aScrapper'>Select all </a><button id='saveObjects' class='btn btn-xs btn-xs-custom objBtn' style='margin-left: 10px'>Save</button><button data-toggle='modal' id='deleteObjects' data-target='#deleteObjectsModal' class='btn btn-xs btn-xs-custom objBtn' style='margin-right: 0' disabled>Delete</button></span><span></span></span><ul id='scraplist' class='scraplistStyle'></ul></li></ul></div>");
 				var innerUL = $("#finalScrap").children('#scrapTree').children('ul').children().children('#scraplist');
 
+				console.log("data", viewString);
 				//If enable append is active
 				if(eaCheckbox){
 					//Getting the Existing Scrape Data					
@@ -2035,6 +2036,21 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 	
 	//Save Scrape Objects
 	$(document).on('click', "#saveObjects", function(){
+		// Start of Filter Duplicate Values in ViewString based on custname
+		var arr = newScrapedList.view; //Scraped objects obtained after enable append
+		var temp=[];
+		arr=arr.filter((x, i)=> {
+			var xpath = x.xpath.split(";");
+				xpath = xpath[0];
+		if (temp.indexOf(xpath) < 0) {
+			temp.push(xpath);
+			return true;
+		}
+		return false;
+		})
+		//End of Filter Duplicate Values in ViewString based on custname
+		newScrapedList.view = arr;
+		console.log("noduplicates", newScrapedList.view);
 		window.localStorage['disableEditing'] = "false";
 		//var tasks = JSON.parse(window.localStorage['_TJ']);
 		var tasks = JSON.parse(window.localStorage['_CT'])
