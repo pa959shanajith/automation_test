@@ -1243,19 +1243,24 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		if($(this).val().toLowerCase().indexOf(".apk") >= 0){
 			$("#mobilityDeviceName, #mobilityiOSVersion, #mobilityUDID").hide();
 			$("#mobilitySerialPath").show();
-			$("#launchMobilityApps").find(".androidIcon").css("background","url('../imgs/ic-andrd-active.png') left top no-repeat !important;");			
+			$(".rightAlign").prop("style","top: 20px;");
+			$("#launchMobilityApps").find(".androidIcon").prop("style","background: url('../imgs/ic-andrd-active.png') left top no-repeat !important;");			
 		}
 		else if($(this).val().toLowerCase().indexOf(".ipa") >= 0 || $(this).val().toLowerCase().indexOf(".app") >= 0){
 			if($(this).val().toLowerCase().indexOf(".app") >= 0){
 				$("#mobilitySerialPath, #mobilityUDID").hide();
-				$("#mobilityDeviceName, #mobilityiOSVersion").show();			
+				$("#mobilityDeviceName, #mobilityiOSVersion").show();
+				$(".rightAlign").prop("style","top: 20px;");
 			}
 			else if($(this).val().toLowerCase().indexOf(".ipa") >= 0){
 				$("#mobilitySerialPath").hide();
-				$("#mobilityDeviceName, #mobilityiOSVersion, #mobilityUDID").show();			
+				$("#mobilityDeviceName, #mobilityiOSVersion, #mobilityUDID").show();
+				$(".rightAlign").prop("style","top: -10px;");
 			}
-			$("#launchMobilityApps").find(".androidIcon").css({"background":"url('../imgs/ic-ios-active.png') left top no-repeat !important;","width":"88px; !important;"});			
+			$("#launchMobilityApps").find(".androidIcon").prop("style","background: url('../imgs/ic-ios-active.png') left top no-repeat !important;");			
 		}
+		else
+			$("#launchMobilityApps").find(".androidIcon").prop("style","background: ''");
 	})
 	//Mobile Serial Number Keyup Function
 	
@@ -2354,7 +2359,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		if(gsElement.length > 0){
 			for(i=0; i<gsElement.length; i++){
 				$.each($("#scraplist li"), function(){
-					if(gsElement[i] == $(this).data("tag") || ($(this).data("tag").toLowerCase().indexOf(gsElement[i].toLowerCase()) >= 0 && gsElement[i] != "a" && $(this).data("tag").toLowerCase() != "radio button")
+					if(gsElement[i] == $(this).data("tag") || ($(this).data("tag").toLowerCase().indexOf(gsElement[i].toLowerCase()) >= 0 && gsElement[i] != "a" && $(this).data("tag").toLowerCase() != "radio button" && $(this).data("tag").toLowerCase() != "radiobutton")
 							|| (gsElement[i] == "input" && ($(this).data("tag").indexOf("edit") >= 0 || $(this).data("tag").indexOf("Edit Box") >= 0 || $(this).data("tag").indexOf("text") >= 0 || $(this).data("tag").indexOf("EditText") >= 0))
 							|| (gsElement[i] == "select" && $(this).data("tag").indexOf("combo box") >= 0)
 							|| (gsElement[i] == "a" && $(this).data("tag").indexOf("hyperlink") >= 0 || $(this).data("tag").indexOf("Static") >= 0)
@@ -2363,7 +2368,17 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 							|| (gsElement[i] == "others" && $(this).data("tag").indexOf("scroll bar") >= 0)
 							|| (gsElement[i] == "others" && $(this).data("tag").indexOf("internal frame") >= 0)
 							|| (gsElement[i] == "others" && $(this).data("tag").indexOf("tab") >= 0)
-							|| (gsElement[i] == "others" && $(this).data("tag").indexOf("table") >= 0)
+							|| (gsElement[i] == "others" && $(this).data("tag").indexOf("XCUIElementTypeTable") >= 0)
+							|| (gsElement[i] == "others" && $(this).data("tag").indexOf("SeekBar") >= 0)
+							|| (gsElement[i] == "others" && $(this).data("tag").indexOf("RangeSeekBar") >= 0)
+							|| (gsElement[i] == "others" && $(this).data("tag").indexOf("NumberPicker") >= 0)
+							|| (gsElement[i] == "others" && $(this).data("tag").indexOf("DatePicker") >= 0)
+							|| (gsElement[i] == "others" && $(this).data("tag").indexOf("TimePicker") >= 0)
+							|| (gsElement[i] == "others" && $(this).data("tag").indexOf("Spinner") >= 0)
+							|| (gsElement[i] == "others" && $(this).data("tag").indexOf("XCUIElementTypeSlider") >= 0)
+							|| (gsElement[i] == "others" && $(this).data("tag").indexOf("XCUIElementTypePickerWheel") >= 0)
+							|| (gsElement[i] == "others" && $(this).data("tag").indexOf("XCUIElementTypeTextField") >= 0)
+							|| (gsElement[i] == "others" && $(this).data("tag").indexOf("XCUIElementTypeSearchField") >= 0)
 					){
 						$(this).show();
 					}
