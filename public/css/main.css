@@ -3886,7 +3886,27 @@ select:-webkit-autofill:focus {
 @media only screen and (height:1024px){
 	.suitestartend thead, .scenarioReports thead{position: relative;}
 }
-
+@media only screen and (height:768px){
+	.plugin-block{height: 116px; background-size: 115px;}
+	.plugin-block span{
+		font-size: 15px;
+		line-height: 19px;
+		width: 41%;
+		-webkit-transform: translateX(-99%) translateY(-50%);
+		transform: translateX(-99%) translateY(-50%);
+    	-moz-transform: translateX(-99%) translateY(-50%);
+    	-ms-transform: translateX(-99%) translateY(-50%);
+		padding: 20px 5px;
+	}
+	.middle-section-testsuites, .bottom-section-testsuites{height: calc(100% - 397px);}
+	.suitestartend thead{width: calc(100% - 732px);}
+	.reportStatus { margin-top: 46px;}
+	.formatpdfbrwsrexport{left: 25px;}
+	.encryptionData-body{height: 258px;}
+	.encryptionData {margin-bottom: 8px;}
+	.encryptedData {margin-top: 8px;}
+	#encrypt_btn, #reset_btn{padding: 0px 25px !important;}
+}
 @media only screen and (height:1080px){
 	.designDataTable{width: 1617px;}
 	.container-plugins{width: 1510px;}
@@ -3960,6 +3980,17 @@ select:-webkit-autofill:focus {
 	.encryptionData-body{height: 176px;}
 	#optimization-fn{position: relative; top: 50%; left: 50%; transform: translateX(-50%) translateY(70%);}
 	.col-md-5{width: 43.5%;}
+	.plugin-block{height: 116px; background-size: 115px;}
+	.plugin-block span{
+		font-size: 15px;
+		line-height: 19px;
+		width: 41%;
+		-webkit-transform: translateX(-99%) translateY(-50%);
+		transform: translateX(-99%) translateY(-50%);
+    	-moz-transform: translateX(-99%) translateY(-50%);
+    	-ms-transform: translateX(-99%) translateY(-50%);
+		padding: 20px 5px;
+	}
 }
 
 @media screen and (min-device-width: 1440px) and (max-device-height: 900px) {

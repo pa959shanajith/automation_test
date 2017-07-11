@@ -13,7 +13,7 @@ setTimeout(function(){
 //To prevent Back Button in browser
 history.pushState(null, null, document.URL);
 window.addEventListener('popstate', function () {
-    history.pushState(null, null, document.URL);
+	history.pushState(null, null, document.URL);
 });
 
 //Document Ready Function
@@ -35,145 +35,147 @@ $(document).ready(function() {
 	});
 	//Prevent special characters(such as <,>,',"",-) for all the Inputs except for password field, testcase grid inputs and edit on scrapedobjects on cut copy paste
 	$(document).on("cut copy paste","input[type='text']:not([type=password]):not(.editObjectName):not(.editable), textarea", function(e){
-		 var element = this;
-    	setTimeout(function () {
-        var userEnteredText = $(element).val();  
-		userEnteredText = userEnteredText.replace (/[<>'"]/g ,"");
-		$(element).val(userEnteredText);
-    }, 5); //html5 min is 4ms.
+		if(e.target.className != "wsdlTextAreaBody"){
+			var element = this;
+			setTimeout(function () {
+				var userEnteredText = $(element).val();  
+				userEnteredText = userEnteredText.replace (/[<>'"]/g ,"");
+				$(element).val(userEnteredText);
+			}, 5); //html5 min is 4ms.			
+		}
 	});
-    // console.log('Pasted ' + clipText.length + ' characters.');
-    //Task Function - Plugin Page
-    $(document).on("click", ".task-content .collapse-head", function(){
-        $(".caret-absolute").hide()
-        $(".panel-heading").css({'background':''})
-        $(this).parents(".panel-heading").css({'background':'#efefef'})
-        if($(this).hasClass("collapsed")) {
-            $(".panel-heading").css({'background':''})
-            $(this).find(".caret-absolute").fadeOut()
-        } 
-        else{
-            $(this).find(".caret-absolute").fadeIn(function(){
-                $(this).css({
-                    'border-top': '4px solid ' + $(this).parent().css("background-color")                    
-                })
-            })
-        }
-    })  
+	// console.log('Pasted ' + clipText.length + ' characters.');
+	//Task Function - Plugin Page
+	$(document).on("click", ".task-content .collapse-head", function(){
+		$(".caret-absolute").hide()
+		$(".panel-heading").css({'background':''})
+		$(this).parents(".panel-heading").css({'background':'#efefef'})
+		if($(this).hasClass("collapsed")) {
+			$(".panel-heading").css({'background':''})
+			$(this).find(".caret-absolute").fadeOut()
+		} 
+		else{
+			$(this).find(".caret-absolute").fadeIn(function(){
+				$(this).css({
+					'border-top': '4px solid ' + $(this).parent().css("background-color")                    
+				})
+			})
+		}
+	})  
 
-    //Task Function - Design Page
-    $(document).on("click", ".task-content-inner .collapse-head", function(){
-        $(".caret-absolute").hide()
-        if($(this).hasClass("collapsed")) $(this).find(".caret-absolute").fadeOut()
-        else{
-            $(this).find(".caret-absolute").fadeIn(function(){
-                $(this).css({
-                    'border-top': '4px solid ' + $(this).parent().css("background-color")                    
-                })
-            })
-        }
-    }) 
+	//Task Function - Design Page
+	$(document).on("click", ".task-content-inner .collapse-head", function(){
+		$(".caret-absolute").hide()
+		if($(this).hasClass("collapsed")) $(this).find(".caret-absolute").fadeOut()
+		else{
+			$(this).find(".caret-absolute").fadeIn(function(){
+				$(this).css({
+					'border-top': '4px solid ' + $(this).parent().css("background-color")                    
+				})
+			})
+		}
+	}) 
 
-    //Popup Function - Screen Level (Screenshot, Filter, Tasks, Project Info)
-    $(document).on("click", ".slidePopup", function(e){
-    	if($(this).attr('title') == "Filter" && $('#scraplist li').length <= 0){
-    		   		
-    	}
-    	else{
-    		$(".thumb-ic").removeClass("thumb-ic-highlight")
-            $(".popupWrap").animate({ opacity: 0, right: "70px" }, 100).css({'z-index':'0','pointer-events':'none'})
-            $(this).children(".thumb-ic").addClass("thumb-ic-highlight")
-            if($(this).siblings(".popupWrap").attr("id") == "window-scrape-screenshot" || $(this).siblings(".popupWrap").attr("id") == "window-scrape-screenshotTs"){
-            	$(this).siblings(".popupWrap").animate({ opacity: 1, right: "97px" }, 100).css({'z-index':'12','pointer-events':'all','display':'block'}).focus()
-            } else{
-            	$(this).siblings(".popupWrap").animate({ opacity: 1, right: "92px" }, 100).css({'z-index':'12','pointer-events':'all','display':'block'}).focus()
-            	$(".searchInputMyTask").focus();
-            } 
-    	}
+	//Popup Function - Screen Level (Screenshot, Filter, Tasks, Project Info)
+	$(document).on("click", ".slidePopup", function(e){
+		if($(this).attr('title') == "Filter" && $('#scraplist li').length <= 0){
+
+		}
+		else{
+			$(".thumb-ic").removeClass("thumb-ic-highlight")
+			$(".popupWrap").animate({ opacity: 0, right: "70px" }, 100).css({'z-index':'0','pointer-events':'none'})
+			$(this).children(".thumb-ic").addClass("thumb-ic-highlight")
+			if($(this).siblings(".popupWrap").attr("id") == "window-scrape-screenshot" || $(this).siblings(".popupWrap").attr("id") == "window-scrape-screenshotTs"){
+				$(this).siblings(".popupWrap").animate({ opacity: 1, right: "97px" }, 100).css({'z-index':'12','pointer-events':'all','display':'block'}).focus()
+			} else{
+				$(this).siblings(".popupWrap").animate({ opacity: 1, right: "92px" }, 100).css({'z-index':'12','pointer-events':'all','display':'block'}).focus()
+				$(".searchInputMyTask").focus();
+			} 
+		}
 		if(window.localStorage['_CT'])
 		{
 			var subTaskID = JSON.parse(window.localStorage['_CT']).subTaskId;
 		}
-    	var selectedTask = $("#window-task").find("#accordion").find(".assignedTaskInner");
-    	$.each(selectedTask, function(){
-    		if($(this)[0].dataset.subtaskid == subTaskID){
-    			$(this).parents(".panel-default").addClass("disableActions");
-    			$(this)[0].setAttribute("onclick","");
-    			$(this).css("cursor","default");
-    			
-    		}
-    	})
-    	setTimeout(function(){
-    		$(".assignedTaskInner").each(function(){
-    			if($(this)[0].dataset.subtaskid == subTaskID){
-    				$(this).trigger("click");
-    				return false;
-    			}
-    		})    		
-         }, 200)
-		 if(window.localStorage['_CT'])
-		{
-         if(JSON.parse(window.localStorage['_CT']).appType == "MobileWeb"){
-             $("#window-scrape-screenshot").css({"width":""+viewString.mirrorwidth+"px", /*"height": ""+viewString.mirrorheight+"px",*/ "max-height":""+viewString.mirrorheight+"px !important"});        	 
-             $("#window-scrape-screenshot .popupContent").css({"width":""+viewString.mirrorwidth+"px", "height": ""+viewString.mirrorheight+"px"});
-         }
-         else if(JSON.parse(window.localStorage['_CT']).appType == "MobileApp"){
-        	 if(navigator.appVersion.indexOf("Win")!=-1){
-            	 $("#window-scrape-screenshot").css({"width":""+(parseInt(viewString.mirrorwidth)/3)+"px", /*"height": ""+viewString.mirrorheight+"px",*/ "max-height":""+(parseInt(viewString.mirrorheight)/3)+"px !important"});        	 
-                 $("#window-scrape-screenshot .popupContent").css({"width":""+(parseInt(viewString.mirrorwidth)/3)+"px", "height": ""+(parseInt(viewString.mirrorheight)/3)+"px"});        		 
-        	 }
-        	 else if(navigator.appVersion.indexOf("Mac")!=-1){
-            	 $("#window-scrape-screenshot").css({"width":""+viewString.mirrorwidth+"px", /*"height": ""+viewString.mirrorheight+"px",*/ "max-height":""+viewString.mirrorheight+"px !important"});        	 
-                 $("#window-scrape-screenshot .popupContent").css({"width":""+viewString.mirrorwidth+"px", "height": ""+viewString.mirrorheight+"px"});        		 
-        	 }
-         }
-		}
-		 	//Filter My Tasks
-			$(document).find('.searchInputMyTask').keyup(function() {
-				filterMyTasks(this); 
-			});
+		var selectedTask = $("#window-task").find("#accordion").find(".assignedTaskInner");
+		$.each(selectedTask, function(){
+			if($(this)[0].dataset.subtaskid == subTaskID){
+				$(this).parents(".panel-default").addClass("disableActions");
+				$(this)[0].setAttribute("onclick","");
+				$(this).css("cursor","default");
 
-			function filterMyTasks(element) {
-				var value = $(element).val();
-				$(".panel-default span.assignedTaskInner").each(function () {
-					if ($(this).text().toLowerCase().indexOf(value.toLowerCase()) > -1) {
-						$(this).parents(".panel-default").show();
-					} else {
-						$(this).parents(".panel-default").hide();
-					}
-				});
-				var counter=1;
-				$(".panel-default h4:visible").each(function () {
-					$(this).text(counter) 
-					counter++;
-				});
-			} 
-    })
-    .on("click", ".closePopup", function(){
-        $(".popupWrap").animate({ opacity: 0, right: "70px" }, 100).css({'z-index':'0','pointer-events':'none'})
-        $(".thumb-ic").removeClass("thumb-ic-highlight");
-    })
-
-    //Filter Function - Screen Level
-    $(document).on("click", ".popupContent-default", function(){
-        $(this).removeClass("popupContent-default").addClass("popupContent-filter-active"); 
-    })
-    
-    $(document).on("click", ".popupContent-filter-active", function(){
-        $(this).removeClass("popupContent-filter-active").addClass("popupContent-default"); 
-    })
-    
-    //To Select All Element Filters
-	$(document).on('click', ".checkStyleboxFilter", function(){
-		if($(this).is(":checked"))
-			{
-			 $('.popupContent-filter div span:not(.selectAllTxt)').addClass('popupContent-filter-active').removeClass('popupContent-default');
 			}
-		else{
-			 $('.popupContent-filter div span:not(.selectAllTxt)').removeClass('popupContent-filter-active').addClass('popupContent-default');
+		})
+		setTimeout(function(){
+			$(".assignedTaskInner").each(function(){
+				if($(this)[0].dataset.subtaskid == subTaskID){
+					$(this).trigger("click");
+					return false;
+				}
+			})    		
+		}, 200)
+		if(window.localStorage['_CT'])
+		{
+			if(JSON.parse(window.localStorage['_CT']).appType == "MobileWeb"){
+				$("#window-scrape-screenshot").css({"width":""+viewString.mirrorwidth+"px", /*"height": ""+viewString.mirrorheight+"px",*/ "max-height":""+viewString.mirrorheight+"px !important"});        	 
+				$("#window-scrape-screenshot .popupContent").css({"width":""+viewString.mirrorwidth+"px", "height": ""+viewString.mirrorheight+"px"});
+			}
+			else if(JSON.parse(window.localStorage['_CT']).appType == "MobileApp"){
+				if(navigator.appVersion.indexOf("Win")!=-1){
+					$("#window-scrape-screenshot").css({"width":""+(parseInt(viewString.mirrorwidth)/3)+"px", /*"height": ""+viewString.mirrorheight+"px",*/ "max-height":""+(parseInt(viewString.mirrorheight)/3)+"px !important"});        	 
+					$("#window-scrape-screenshot .popupContent").css({"width":""+(parseInt(viewString.mirrorwidth)/3)+"px", "height": ""+(parseInt(viewString.mirrorheight)/3)+"px"});        		 
+				}
+				else if(navigator.appVersion.indexOf("Mac")!=-1){
+					$("#window-scrape-screenshot").css({"width":""+viewString.mirrorwidth+"px", /*"height": ""+viewString.mirrorheight+"px",*/ "max-height":""+viewString.mirrorheight+"px !important"});        	 
+					$("#window-scrape-screenshot .popupContent").css({"width":""+viewString.mirrorwidth+"px", "height": ""+viewString.mirrorheight+"px"});        		 
+				}
+			}
+		}
+		//Filter My Tasks
+		$(document).find('.searchInputMyTask').keyup(function() {
+			filterMyTasks(this); 
+		});
+
+		function filterMyTasks(element) {
+			var value = $(element).val();
+			$(".panel-default span.assignedTaskInner").each(function () {
+				if ($(this).text().toLowerCase().indexOf(value.toLowerCase()) > -1) {
+					$(this).parents(".panel-default").show();
+				} else {
+					$(this).parents(".panel-default").hide();
+				}
+			});
+			var counter=1;
+			$(".panel-default h4:visible").each(function () {
+				$(this).text(counter) 
+				counter++;
+			});
 		} 
 	})
-	
+	.on("click", ".closePopup", function(){
+		$(".popupWrap").animate({ opacity: 0, right: "70px" }, 100).css({'z-index':'0','pointer-events':'none'})
+		$(".thumb-ic").removeClass("thumb-ic-highlight");
+	})
+
+	//Filter Function - Screen Level
+	$(document).on("click", ".popupContent-default", function(){
+		$(this).removeClass("popupContent-default").addClass("popupContent-filter-active"); 
+	})
+
+	$(document).on("click", ".popupContent-filter-active", function(){
+		$(this).removeClass("popupContent-filter-active").addClass("popupContent-default"); 
+	})
+
+	//To Select All Element Filters
+	$(document).on('click', ".checkStyleboxFilter", function(){
+		if($(this).is(":checked"))
+		{
+			$('.popupContent-filter div span:not(.selectAllTxt)').addClass('popupContent-filter-active').removeClass('popupContent-default');
+		}
+		else{
+			$('.popupContent-filter div span:not(.selectAllTxt)').removeClass('popupContent-filter-active').addClass('popupContent-default');
+		} 
+	})
+
 	//If all filters get selected then parent select all get selected
 	$(document).on('click', ".popupContent-filter div span", function(){
 		var defaultFilterLen = $('.popupContent-filter div span:not(.selectAllTxt)').length;
@@ -186,32 +188,33 @@ $(document).ready(function() {
 			$(".checkStyleboxFilter").prop('checked', false);
 		}
 	})
-	
+
 	//Assist functionality
 	$(document).on("click", ".animateAssistUp", function(){
 		$(this).attr("src","imgs/ic-down.png").attr("class","animateAssistDown")
 		$(".assistContent").fadeIn()
 	})
-	
+
 	$(document).on("click", ".animateAssistDown", function(){
 		$(this).attr("src","imgs/ic-up.png").attr("class","animateAssistUp")
 		$(".assistContent").fadeOut(100)
 	})
-	
+
 	$(document).on("click", ".animateAssistClose", function(){
 		$(".assistWrap").fadeOut(100)
 	})
-	
+
 	$(document).on("click", ".slide_assist", function(){
 		$(".assistWrap").fadeIn(100)
 	})
 
 	$(document).on("click", ".globalSubmit", function(){
+		window.localStorage['navigateScreen'] = "plugin"
 		window.location.href = "/plugin";
 	});
-	
-  //Special character validation
-    /*$(document).on('keypress','.forValidation', function(e){	
+
+	//Special character validation
+	/*$(document).on('keypress','.forValidation', function(e){	
     	var targetName = e.target.parentElement.firstChild.textContent.trim();
     	var targetClass = e.target.className.split(" ")[0];
     	var className = e.target.className;
@@ -254,7 +257,7 @@ function loadUserTasks(){
 		for(j=0;j<tasksJson[i].taskDetails.length;j++){
 			if(tasksJson[i].taskDetails[j].taskType == "Design"){
 				var testSuiteDetails = JSON.stringify(tasksJson[i].testSuiteDetails);
-					$(".task-content-inner").append('<div class="panel panel-default"><div class="panel-heading"><div style="margin-top: 9px;min-height: 40px;margin-top: 15px;" href="#collapse' + counter + '"><h4 class="taskNo-Inner-Pgs" style="margin-top: -1px;">' + counter + '</h4><span class="assignedTask-Inner-Pgs assignedTaskInner" data-testsuitedetails='+testSuiteDetails+' data-scenarioflag='+tasksJson[i].scenarioFlag+'  data-apptype="' + tasksJson[i].appType + '" data-projectid="' + tasksJson[i].projectId + '" data-screenid="' + tasksJson[i].screenId + '"  data-screenname="' + tasksJson[i].screenName + '" data-testcaseid="' + tasksJson[i].testCaseId + '" data-testcasename="' + tasksJson[i].testCaseName + '"  data-scenarioid="' + tasksJson[i].scenarioId + '" data-taskname="' + tasksJson[i].taskDetails[j].taskName + '" data-taskdes="' + tasksJson[i].taskDetails[j].taskDescription + '" data-tasktype="' + tasksJson[i].taskDetails[j].taskType + '" data-subtasktype="' + tasksJson[i].taskDetails[j].subTaskType + '" data-subtaskid="' + tasksJson[i].taskDetails[j].subTaskId + '"  data-assignedtestscenarioids='+tasksJson[i].assignedTestScenarioIds+' data-assignedto="' + tasksJson[i].taskDetails[j].assignedTo + '" data-startdate="' + tasksJson[i].taskDetails[j].startDate + '" data-exenddate="' + tasksJson[i].taskDetails[j].expectedEndDate + '" data-status="' + tasksJson[i].taskDetails[j].status + '" onclick="taskRedirectionInner(this.dataset.testsuitedetails,this.dataset.scenarioflag,this.dataset.assignedtestscenarioids,this.dataset.subtasktype,this.dataset.screenid,this.dataset.screenname,this.dataset.projectid,this.dataset.taskname,this.dataset.testcaseid,this.dataset.testcasename,this.dataset.apptype,this.dataset.scenarioid,this.dataset.subtaskid)">' + tasksJson[i].taskDetails[j].taskName + '</span><!--Addition--><div class="panel-additional-details"><img style="height: 20px;opacity: 0.7;" src="imgs/ic-taskType-yellow-plus.png"/><button class="panel-head-tasktype-Inner-Pgs">' + tasksJson[i].taskDetails[j].taskType + '</button></div><!--Addition--></div></div></div>').fadeIn()
+				$(".task-content-inner").append('<div class="panel panel-default"><div class="panel-heading"><div style="margin-top: 9px;min-height: 40px;margin-top: 15px;" href="#collapse' + counter + '"><h4 class="taskNo-Inner-Pgs" style="margin-top: -1px;">' + counter + '</h4><span class="assignedTask-Inner-Pgs assignedTaskInner" data-testsuitedetails='+testSuiteDetails+' data-scenarioflag='+tasksJson[i].scenarioFlag+'  data-apptype="' + tasksJson[i].appType + '" data-projectid="' + tasksJson[i].projectId + '" data-screenid="' + tasksJson[i].screenId + '"  data-screenname="' + tasksJson[i].screenName + '" data-testcaseid="' + tasksJson[i].testCaseId + '" data-testcasename="' + tasksJson[i].testCaseName + '"  data-scenarioid="' + tasksJson[i].scenarioId + '" data-taskname="' + tasksJson[i].taskDetails[j].taskName + '" data-taskdes="' + tasksJson[i].taskDetails[j].taskDescription + '" data-tasktype="' + tasksJson[i].taskDetails[j].taskType + '" data-subtasktype="' + tasksJson[i].taskDetails[j].subTaskType + '" data-subtaskid="' + tasksJson[i].taskDetails[j].subTaskId + '"  data-assignedtestscenarioids='+tasksJson[i].assignedTestScenarioIds+' data-assignedto="' + tasksJson[i].taskDetails[j].assignedTo + '" data-startdate="' + tasksJson[i].taskDetails[j].startDate + '" data-exenddate="' + tasksJson[i].taskDetails[j].expectedEndDate + '" data-status="' + tasksJson[i].taskDetails[j].status + '" onclick="taskRedirectionInner(this.dataset.testsuitedetails,this.dataset.scenarioflag,this.dataset.assignedtestscenarioids,this.dataset.subtasktype,this.dataset.screenid,this.dataset.screenname,this.dataset.projectid,this.dataset.taskname,this.dataset.testcaseid,this.dataset.testcasename,this.dataset.apptype,this.dataset.scenarioid,this.dataset.subtaskid)">' + tasksJson[i].taskDetails[j].taskName + '</span><!--Addition--><div class="panel-additional-details"><img style="height: 20px;opacity: 0.7;" src="imgs/ic-taskType-yellow-plus.png"/><button class="panel-head-tasktype-Inner-Pgs">' + tasksJson[i].taskDetails[j].taskType + '</button></div><!--Addition--></div></div></div>').fadeIn()
 			}
 			else if(tasksJson[i].taskDetails[j].taskType == "Execution"){
 				var testSuiteDetails = JSON.stringify(tasksJson[i].testSuiteDetails);
@@ -268,42 +271,42 @@ function loadUserTasks(){
 
 function taskRedirectionInner(testsuitedetails,scenarioflag,assignedtestscenarioids,subtasktype,screenid,screenname,projectid,taskname,testcaseid,testcasename,apptype,scenarioid,subtaskid){
 	var taskObj = {};
-		taskObj.scenarioFlag = scenarioflag;
-		taskObj.assignedTestScenarioIds = assignedtestscenarioids;
-		taskObj.screenId = screenid;
-		taskObj.screenName = screenname;
-		taskObj.projectId = projectid;
-		taskObj.taskName = taskname;
-		taskObj.testCaseId = testcaseid;
-		taskObj.testCaseName = testcasename;
+	taskObj.scenarioFlag = scenarioflag;
+	taskObj.assignedTestScenarioIds = assignedtestscenarioids;
+	taskObj.screenId = screenid;
+	taskObj.screenName = screenname;
+	taskObj.projectId = projectid;
+	taskObj.taskName = taskname;
+	taskObj.testCaseId = testcaseid;
+	taskObj.testCaseName = testcasename;
 	//	taskObj.releaseId = releaseid;
 	//	taskObj.cycleId = cycleid;
 	//	taskObj.testSuiteId = testsuiteid;
-		taskObj.scenarioId = scenarioid;
+	taskObj.scenarioId = scenarioid;
 	//	taskObj.testSuiteName = testsuitename;
-		taskObj.appType = apptype;
-		taskObj.subTaskType = subtasktype;
-		taskObj.subTaskId=subtaskid;
-		taskObj.testSuiteDetails = JSON.parse(testsuitedetails);
-		window.localStorage['_CT'] = JSON.stringify(taskObj);
-		if(subtasktype == "Scrape"){
-			window.localStorage['navigateScreen'] = "Scrape";
-			window.localStorage['navigateScrape'] = true;
-			window.location.pathname = "/design"
-		}
-		else if(subtasktype == "TestCase"){
-			window.localStorage['navigateScreen'] = "TestCase";
-			window.localStorage['navigateTestcase'] = true;
-			window.location.pathname = "/designTestCase"
-		}
-		else if(subtasktype == "TestSuite"){
-			window.localStorage['navigateScreen'] = "TestSuite";
-			window.location.pathname = "/execute"
-		}
-		else if(subtasktype == "Scheduling"){
-			window.localStorage['navigateScreen'] = "Scheduling";
-			window.location.pathname = "/scheduling"
-		}
+	taskObj.appType = apptype;
+	taskObj.subTaskType = subtasktype;
+	taskObj.subTaskId=subtaskid;
+	taskObj.testSuiteDetails = JSON.parse(testsuitedetails);
+	window.localStorage['_CT'] = JSON.stringify(taskObj);
+	if(subtasktype == "Scrape"){
+		window.localStorage['navigateScreen'] = "Scrape";
+		window.localStorage['navigateScrape'] = true;
+		window.location.pathname = "/design"
+	}
+	else if(subtasktype == "TestCase"){
+		window.localStorage['navigateScreen'] = "TestCase";
+		window.localStorage['navigateTestcase'] = true;
+		window.location.pathname = "/designTestCase"
+	}
+	else if(subtasktype == "TestSuite"){
+		window.localStorage['navigateScreen'] = "TestSuite";
+		window.location.pathname = "/execute"
+	}
+	else if(subtasktype == "Scheduling"){
+		window.localStorage['navigateScreen'] = "scheduling";
+		window.location.pathname = "/scheduling"
+	}
 }
 
 
@@ -331,7 +334,7 @@ function replaceHtmlEntites(selectedText) {
 	var translate_re = /&(nbsp|amp|quot|lt|gt);/g;
 	var translate = {"nbsp": " ","amp" : "&","quot": "\"","lt"  : "<","gt"  : ">"};
 	return ( selectedText.replace(translate_re, function(match, entity) {
-	  return translate[entity];
+		return translate[entity];
 	}) );
 };
 

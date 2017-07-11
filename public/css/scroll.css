@@ -781,6 +781,9 @@
 	    height: 155px !important;
 	}
 }
+@media only screen and (height:768px){
+	.scroll-wrapper.scrollbar-inner-rep{max-height: 228px !important;}
+}
 @media screen and (max-height: 1080px){
 	.scroll-wrapper > .scrollbar-screenshot{max-height: 360px !important;}
 	.scroll-wrapper > .scrollbar-screenshotTs{max-height: 268px !important;}
