@@ -546,7 +546,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 			var relNames ="";
 			for(i=0; i<projectDetails.length; i++){
 				if(projectDetails[i].cycleNames.length <= 0){
-					relNames = i > 0? relNames + ", " + projectDetails[i].releaseName : relNames + projectDetails[i].releaseName;
+					relNames = relNames.length > 0? relNames + ", " + projectDetails[i].releaseName : projectDetails[i].releaseName;
 					proceedToCreate = false;
 					//break;
 				}
@@ -606,8 +606,8 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 								adminServices.createProject_ICE(createprojectObj,userDetails)
 								.then(function (response) {
 									if(response == "Invalid Session"){
-							  window.location.href = "/";
-							}
+									  window.location.href = "/";
+									}
 									if(response == 'success')
 									{
 										openModelPopup("Create Project", "Project created successfully");

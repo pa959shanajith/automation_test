@@ -765,10 +765,10 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					else imgTag = tag;
 					if(path == "")	addcusOb = 'addCustObj';
 					if(tag == "a" || tag == "input" || tag == "table" || tag == "list" || tag == "select" || tag == "img" || tag == "button" || tag == "radiobutton" || tag == "checkbox" || tag == "tablecell"){
-						var li = "<li data-xpath='"+ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"' data-left='"+ob.left+"' data-top='"+ob.top+"' data-width='"+ob.width+"' data-height='"+ob.height+"' data-tag='"+tag+"' data-url='"+ob.url+"' data-hiddentag='"+ob.hiddentag+"' class='item select_all "+tag+"x' val="+ob.tempId+"><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' /><span title='"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;')+"' class='ellipsis "+addcusOb+"'>"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"</span></a></li>";
+						var li = "<li data-xpath='"+ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"' data-left='"+ob.left+"' data-top='"+ob.top+"' data-width='"+ob.width+"' data-height='"+ob.height+"' data-tag='"+tag+"' data-url='"+ob.url+"' data-hiddentag='"+ob.hiddentag+"' class='item select_all "+tag+"x' val="+ob.tempId+"><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' /><span title='"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;')+"' class='ellipsis'>"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"</span></a></li>";
 					} 
 					else {
-						var li = "<li data-xpath='"+ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"' data-left='"+ob.left+"' data-top='"+ob.top+"' data-width='"+ob.width+"' data-height='"+ob.height+"' data-tag='"+tag+"' data-url='"+ob.url+"' data-hiddentag='"+ob.hiddentag+"' class='item select_all "+tag+"x' val="+ob.tempId+"><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' /><span title='"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;')+"' class='ellipsis "+addcusOb+"'>"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"</span></a></li>";
+						var li = "<li data-xpath='"+ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"' data-left='"+ob.left+"' data-top='"+ob.top+"' data-width='"+ob.width+"' data-height='"+ob.height+"' data-tag='"+tag+"' data-url='"+ob.url+"' data-hiddentag='"+ob.hiddentag+"' class='item select_all "+tag+"x' val="+ob.tempId+"><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' /><span title='"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;')+"' class='ellipsis'>"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"</span></a></li>";
 					}
 					angular.element(innerUL).append(li);
 				}
@@ -2620,6 +2620,18 @@ function contentTable(newTestScriptDataLS) {
 		        	   }
 		        	   hideOtherFuncOnEdit();
 		        	   $("#jqGrid").parent('div').css('height','auto');
+		        	   
+		        	   /*for(i=0; i<getScrapeDataforCustomObj.length; i++){
+		        			if(getScrapeDataforCustomObj[i].xpath == ""){
+		        				var testGridData = $("#jqGrid tbody tr:not(.jqgfirstrow)");
+		        				$.each(testGridData, function(){
+		        					if($(this).find("td[aria-describedby='jqGrid_custname']").text() == scrappedData[i].custname){
+		        						$(this).find("td[aria-describedby='jqGrid_custname']").addClass("addCustObj");
+		        						return false
+		        					}
+		        				})
+		        			}
+		        		}*/
 		           },
 	})
 
@@ -2643,18 +2655,6 @@ function contentTable(newTestScriptDataLS) {
 		}
 	});
 
-	//console.log(scrappedData);
-	/*for(i=0; i<getScrapeDataforCustomObj.length; i++){
-		if(getScrapeDataforCustomObj[i].xpath == ""){
-			var testGridData = $("#jqGrid tbody tr:not(.jqgfirstrow)");
-			$.each(testGridData, function(){
-				if($(this).find("td[aria-describedby='jqGrid_custname']").text() == scrappedData[i].custname){
-					$(this).find("td[aria-describedby='jqGrid_custname']").addClass("addCustObj");
-					return false
-				}
-			})
-		}
-	}*/
 	//Focus JqGrid onLoad 
 	$("#jqGrid").focus().css("outline","none");
 	
