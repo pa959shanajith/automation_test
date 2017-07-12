@@ -1,26 +1,26 @@
-//Module Dependencies
-var cluster = require('cluster');
-if (cluster.isMaster) {
-    //    cluster.fork();
-    cluster.fork();
-    cluster.on('disconnect', function(worker) {
-        console.log('disconnect!');
-        // cluster.fork();
-    });
-    cluster.on('exit', function(worker) {
+// //Module Dependencies
+// var cluster = require('cluster');
+// if (cluster.isMaster) {
+//     //    cluster.fork();
+//     cluster.fork();
+//     cluster.on('disconnect', function(worker) {
+//         console.log('disconnect!');
+//         // cluster.fork();
+//     });
+//     cluster.on('exit', function(worker) {
 
-        // Replace the dead worker,
-        // we're not sentimental
-        console.log('Let\'s not have Sentiments... Worker %d is killed.', worker.id);
-        cluster.fork();
-    });
-} else {
+//         // Replace the dead worker,
+//         // we're not sentimental
+//         console.log('Let\'s not have Sentiments... Worker %d is killed.', worker.id);
+//         cluster.fork();
+//     });
+// } else {
     var express = require('express');
     var app = express();
     
     //var io = require('socket.io')(server);
     var bodyParser = require('body-parser');
-    var morgan = require('morgan');
+    // var morgan = require('morgan');
     var sessions = require('express-session')
     var cookieParser = require('cookie-parser');
     // var errorhandler = require('errorhandler');
@@ -46,7 +46,7 @@ if (cluster.isMaster) {
         limit: '10mb',
         extended: true
     }));
-    app.use(morgan('combined'))
+    // app.use(morgan('combined'))
     app.use(cookieParser());
     app.use(sessions({
         secret: '$^%EDE%^tfd65e7ufyCYDR^%IU',
@@ -71,63 +71,145 @@ if (cluster.isMaster) {
     app.use("/images_mindmap", express.static(__dirname + "/public/images_mindmap"));
     app.use("/css", express.static(__dirname + "/public/css"));
     app.use("/fonts", express.static(__dirname + "/public/fonts"));
-    // app.get("/", function(req, res) {
-    //     // console.log("/--------",req);
-    //     res.clearCookie('connect.sid');
-    //     res.sendFile("index.html", {
-    //         root: __dirname + "/public/"
-    //     });
-    // });
+    app.get("/", function(req, res) {
+        // console.log("/--------",req);
+        res.clearCookie('connect.sid');
+        res.sendFile("index.html", {
+            root: __dirname + "/public/"
+        });
+    });
     app.get('/partials/:name', function(req, res) {
         // console.log("/partials-----",req);
         res.sendFile(__dirname + "/public/partials/" + req.params.name); //To render partials
     });
-
-    app.get('/', function(req, res) {
-            console.log("\n\n***************** SESSION IS DESTROYING\n\n");
-            res.clearCookie('connect.sid');
-            req.session.destroy();
-            res.sendFile("index.html", {
-                root: __dirname + "/public/"
-            });
-    });
-
-     app.get('/admin', function(req, res) {
-        if(!req.session.defaultRole || req.session.defaultRole != 'Admin'){
-            req.session.destroy(); res.status(401).send('<br><br>Your session has been expired.Please <a href="/">Login</a> Again');
-        }else{
-            if (req.cookies['connect.sid'] && req.cookies['connect.sid'] != undefined) { res.sendFile("index.html", { root: __dirname + "/public/" });} else {req.session.destroy(); res.status(401).send('<br><br>Your session has been expired.Please <a href="/">Login</a>Again');}
-        }
-    });
-
-    //Only Test Engineer and Test Lead have access
-    app.get(/^\/(design|designTestCase|execute|scheduling)$/, function(req, res){
-        if(!req.session.defaultRole || req.session.defaultRole == "Admin" || req.session.defaultRole == "Business Analyst" || req.session.defaultRole == "Tech Lead" || req.session.defaultRole == "Test Manager")
-        {
-            req.session.destroy(); res.status(401).send('<br><br>Your session has been expired.Please <a href="/">Login</a> Again');
-        }else{
-            if (req.cookies['connect.sid'] && req.cookies['connect.sid'] != undefined) { res.sendFile("index.html", { root: __dirname + "/public/" });} else {req.session.destroy(); res.status(401).send('<br><br>Your session has been expired. Please <a href="/">Login</a> Again');}
-        }
-    });
-
-    //Test Engineer,Test Lead and Test Manager can access
-    app.get(/^\/(specificreports|home|p_Utility|p_Reports|plugin)$/, function(req, res){
-        if (!req.session.defaultRole || req.session.defaultRole == "Admin" || req.session.defaultRole == "Business Analyst" || req.session.defaultRole == "Tech Lead")
-        {
-            req.session.destroy(); res.status(401).send('<br><br>Your session has been expired.Please <a href="/">Login</a> Again');
-        }else{
-            if (req.cookies['connect.sid'] && req.cookies['connect.sid'] != undefined) { res.sendFile("index.html", { root: __dirname + "/public/" });} else {req.session.destroy(); res.status(401).send('<br><br>Your session has been expired. Please <a href="/">Login</a> Again');}
-        }
-    });  
-
-    app.get('/favicon.ico', function(req, res){
-        if (req.cookies['connect.sid'] && req.cookies['connect.sid'] != undefined) { res.sendFile("index.html", { root: __dirname + "/public/" });} else {req.session.destroy(); res.status(401).send('<br><br>Your session has been expired. Please <a href="/">Login</a> Again');}
-    });
-
-    app.get('/css/fonts/Lato/Lato-Regular.ttf', function(req, res){
-        if (req.cookies['connect.sid'] && req.cookies['connect.sid'] != undefined) { res.sendFile("index.html", { root: __dirname + "/public/" });} else {req.session.destroy(); res.status(401).send('<br><br>Your session has been expired. Please <a href="/">Login</a> Again');}
-    });
-
+    
+     app.get('*', function(req, res) {
+        if(req.url == "/admin" )
+          {
+              if(req.session.defaultRole != 'Admin')
+              {
+                   req.session.destroy(); res.status(401).send('<br><br>Your session has been expired.Please <a href="/">Login</a> Again');
+              }
+              else
+              {
+                      if (req.cookies['connect.sid'] && req.cookies['connect.sid'] != undefined) { res.sendFile("index.html", { root: __dirname + "/public/" });} else {req.session.destroy(); res.status(401).send('<br><br>Your session has been expired.Please <a href="/">Login</a>Again');}
+              }
+          }
+          //Only Test Engineer,Test Lead and Test Manager have plugin page access
+          else if(req.url == "/plugin")
+          {
+                  if(req.session.defaultRole == "Admin" || req.session.defaultRole == "Business Analyst" || req.session.defaultRole == "Tech Lead")
+                  {
+                          req.session.destroy(); res.status(401).send('<br><br>Your session has been expired.Please <a href="/">Login</a> Again');
+                  }
+                  else
+                  {
+                      if (req.cookies['connect.sid'] && req.cookies['connect.sid'] != undefined) { res.sendFile("index.html", { root: __dirname + "/public/" });} else {req.session.destroy(); res.status(401).send('<br><br>Your session has been expired. Please <a href="/">Login</a> Again');}
+                  }
+          }
+         //Only Test Engineer and Test Lead have ICE plugin access
+          else if(req.url == "/design")
+          {
+                  if(req.session.defaultRole == "Admin" || req.session.defaultRole == "Business Analyst" || req.session.defaultRole == "Tech Lead" || req.session.defaultRole == "Test Manager")
+                  {
+                           req.session.destroy(); res.status(401).send('<br><br>Your session has been expired.Please <a href="/">Login</a> Again');
+                  }
+                  else
+                  {
+                      if (req.cookies['connect.sid'] && req.cookies['connect.sid'] != undefined) { res.sendFile("index.html", { root: __dirname + "/public/" });} else {req.session.destroy(); res.status(401).send('<br><br>Your session has been expired. Please <a href="/">Login</a> Again');}
+                  }
+          }
+          //Test Engineer and Test Lead have ICE plugin access
+          else if(req.url == "/designTestCase")
+          {
+                  if (req.session.defaultRole == "Admin" || req.session.defaultRole == "Business Analyst" || req.session.defaultRole == "Tech Lead" || req.session.defaultRole == "Test Manager")
+                  {
+                          req.session.destroy(); res.status(401).send('<br><br>Your session has been expired.Please <a href="/">Login</a> Again');
+                  }
+                  else
+                  {
+                      if (req.cookies['connect.sid'] && req.cookies['connect.sid'] != undefined) { res.sendFile("index.html", { root: __dirname + "/public/" });} else {req.session.destroy(); res.status(401).send('<br><br>Your session has been expired. Please <a href="/">Login</a> Again');}
+                  }
+          }
+            //Test Engineer and Test Lead have ICE plugin access
+          else if(req.url == "/execute")
+          {
+                  if (req.session.defaultRole == "Admin" || req.session.defaultRole == "Business Analyst" || req.session.defaultRole == "Tech Lead" || req.session.defaultRole == "Test Manager")
+                  {
+                         req.session.destroy(); res.status(401).send('<br><br>Your session has been expired.Please <a href="/">Login</a> Again');
+                  }
+                  else
+                  {
+                      if (req.cookies['connect.sid'] && req.cookies['connect.sid'] != undefined) { res.sendFile("index.html", { root: __dirname + "/public/" });} else {req.session.destroy(); res.status(401).send('<br><br>Your session has been expired. Please <a href="/">Login</a> Again');}
+                  }
+          }
+           //Test Engineer and Test Lead have ICE plugin access
+          else if(req.url == "/scheduling")
+          {
+              if (req.session.defaultRole == "Admin" || req.session.defaultRole == "Business Analyst" || req.session.defaultRole == "Tech Lead" || req.session.defaultRole == "Test Manager")
+              {
+                       req.session.destroy(); res.status(401).send('<br><br>Your session has been expired.Please <a href="/">Login</a> Again');
+              }
+              else
+              {
+                  if (req.cookies['connect.sid'] && req.cookies['connect.sid'] != undefined) { res.sendFile("index.html", { root: __dirname + "/public/" });} else {req.session.destroy(); res.status(401).send('<br><br>Your session has been expired. Please <a href="/">Login</a> Again');}
+              }
+          }//Test Engineer,Test Lead and Test Manager can access reports plugin
+          else if(req.url == "/p_Reports")
+          {
+              if (req.session.defaultRole == "Admin" || req.session.defaultRole == "Business Analyst" || req.session.defaultRole == "Tech Lead")
+               {
+                         req.session.destroy(); res.status(401).send('<br><br>Your session has been expired.Please <a href="/">Login</a> Again');
+               }
+               else
+               {
+                    if (req.cookies['connect.sid'] && req.cookies['connect.sid'] != undefined) { res.sendFile("index.html", { root: __dirname + "/public/" });} else {req.session.destroy(); res.status(401).send('<br><br>Your session has been expired. Please <a href="/">Login</a> Again');}
+               }
+          }
+          //Test Engineer,Test Lead and Test Manager can access reports plugin
+          else if(req.url == "/specificreports")
+          {
+              if (req.session.defaultRole == "Admin" || req.session.defaultRole == "Business Analyst" || req.session.defaultRole == "Tech Lead")
+               {
+                          req.session.destroy(); res.status(401).send('<br><br>Your session has been expired.Please <a href="/">Login</a> Again');
+               }
+               else
+               {
+                    if (req.cookies['connect.sid'] && req.cookies['connect.sid'] != undefined) { res.sendFile("index.html", { root: __dirname + "/public/" });} else {req.session.destroy(); res.status(401).send('<br><br>Your session has been expired. Please <a href="/">Login</a> Again');}
+               }
+          }
+           //Test Lead and Test Manager can access mindmap plugin
+          else if(req.url == "/home")
+          {
+              if (req.session.defaultRole == "Admin" || req.session.defaultRole == "Business Analyst" || req.session.defaultRole == "Tech Lead")
+               {
+                         req.session.destroy(); res.status(401).send('<br><br>Your session has been expired.Please <a href="/">Login</a> Again');
+               }
+               else
+               {
+                    if (req.cookies['connect.sid'] && req.cookies['connect.sid'] != undefined) { res.sendFile("index.html", { root: __dirname + "/public/" });} else {req.session.destroy(); res.status(401).send('<br><br>Your session has been expired. Please <a href="/">Login</a> Again');}
+               }
+          }
+          else if(req.url == "/p_Utility")
+          {
+              if (req.session.defaultRole == "Admin" || req.session.defaultRole == "Business Analyst" || req.session.defaultRole == "Tech Lead")
+               {
+                         req.session.destroy(); res.status(401).send('<br><br>Your session has been expired.Please <a href="/">Login</a> Again');
+               }
+               else
+               {
+                    if (req.cookies['connect.sid'] && req.cookies['connect.sid'] != undefined) { res.sendFile("index.html", { root: __dirname + "/public/" });} else {req.session.destroy(); res.status(401).send('<br><br>Your session has been expired. Please <a href="/">Login</a> Again');}
+               }
+          }
+          else if(req.url == '/favicon.ico' || req.url == "/css/fonts/Lato/Lato-Regular.ttf")
+          {
+               if (req.cookies['connect.sid'] && req.cookies['connect.sid'] != undefined) { res.sendFile("index.html", { root: __dirname + "/public/" });} else {req.session.destroy(); res.status(401).send('<br><br>Your session has been expired. Please <a href="/">Login</a> Again');}
+          }
+          else{
+               req.session.destroy(); res.status(401).send('<br><br>Your Session has been expired.Please <a href="/"> Login</a> Again');
+          }
+     });
+    
     app.post('/designTestCase', function(req, res) {
         // console.log("*--------",req);
         res.sendFile("index.html", {
@@ -139,6 +221,8 @@ if (cluster.isMaster) {
     var home = require('./routes_mindmap/home.js');
     var index = require('./routes_mindmap/index.js');
     var templates = require('./routes_mindmap/tmTemplates.js');
+    var Client = require("node-rest-client").Client;
+    var apiclient = new Client();
     app.use('/home', home);
     app.use('/templates', templates);
     app.get('/import', api.importToNeo);
@@ -252,7 +336,28 @@ if (cluster.isMaster) {
     var hostFamilyType = '0.0.0.0';
 	var portNumber=8443;
     httpsServer.listen(portNumber, hostFamilyType); //Https Server
-	console.log("Nineteen68 Server Ready...")
+    try{
+        var apireq = apiclient.get("http://127.0.0.1:1990/",function(data,response){
+            try{
+                if(response.statusCode != 200){
+                    httpsServer.close();
+                    console.log("Please run the Service API and Restart the Server");
+                }else{
+                    console.log("Nineteen68 Server Ready...");
+                }
+            }catch(exception){
+                httpsServer.close();
+                console.log("Please run the Service API and Restart the Server");
+            }
+        });
+        apireq.on('error', function (err) {
+            httpsServer.close();
+            console.log("Please run the Service API and Restart the Server");   
+        });
+    }catch(exception){
+        httpsServer.close();
+        console.log("Please run the Service API");
+    }
     // httpsServer.listen(8443); //Https Server
 
 
@@ -330,4 +435,4 @@ if (cluster.isMaster) {
     //SOCKET CONNECTION USING SOCKET.IO
 
     // console.log("module.exports.allSocketsMap=-------------------------\n", module.exports.allSocketsMap);
-}
+// }
