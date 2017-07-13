@@ -1,7 +1,7 @@
 var screenshotObj,scrapedGlobJson,enableScreenShotHighlight,mirrorObj, eaCheckbox, finalViewString, scrapedData, deleteFlag, globalSelectedBrowserType,selectedKeywordList,keywordListData,dependentTestCaseFlag = false;checkedTestcases = []; pasteSelecteStepNo = [];
 var initScraping = {}; var mirrorObj = {}; var scrapeTypeObj = {}; var newScrapedList; var viewString = {}; var scrapeObject = {}; var screenViewObject = {}; var readTestCaseData; var getRowJsonCopy;
 var selectRowStepNoFlag = false; //var deleteStep = false;
-var dataFormat12;
+var dataFormat12, getScrapeDataforCustomObj;
 var getAllAppendedObj; //Getting all appended scraped objects
 var gsElement = []; window.localStorage['selectRowStepNo'] = '';
 var getWSTemplateData = {} //Contains Webservice saved data
@@ -124,7 +124,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				{
 					window.location.href = "/";
 				}
-				console.log(data);
+				//console.log(data);
 				var appType = taskInfo.appType;
 				$('#jqGrid').removeClass('visibility-hide').addClass('visibility-show');
 				// removing the down arrow from grid header columns - disabling the grid menu pop-up
@@ -149,6 +149,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					var indexCounter = '';
 					//window.localStorage['newTestScriptDataList'] = data2.view;
 					$scope.newTestScriptDataLS = data2.view;
+					getScrapeDataforCustomObj = data2.view;
 					$("#window-scrape-screenshotTs .popupContent").empty()
 					$("#window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrapeTS"><img id="screenshotTS" src="data:image/PNG;base64,'+data2.mirror+'" /></div>')
 					
@@ -748,19 +749,21 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				$("#finalScrap").append("<div id='scrapTree' class='scrapTree'><ul><li><span class='parentObjContainer'><input title='Select all' type='checkbox' class='checkStylebox'><span class='parentObject'><a id='aScrapper'>Select all </a><button id='saveObjects' class='btn btn-xs btn-xs-custom objBtn' style='margin-left: 10px' data-toggle='tooltip' title='Save Objects'>Save</button><button data-toggle='modal' id='deleteObjects' data-target='#deleteObjectsModal' class='btn btn-xs btn-xs-custom objBtn' style='margin-right: 0' data-toggle='tooltip' title='Delete Objects' disabled>Delete</button></span><span></span></span><ul id='scraplist' class='scraplistStyle'></ul></li></ul></div>");
 				$("#saveObjects").attr('disabled', true);
 				var custN;
-				var imgTag;
+				var imgTag, addcusOb;
 				var scrapTree = $("#finalScrap").children('#scrapTree');
 				var innerUL = $("#finalScrap").children('#scrapTree').children('ul').children().children('#scraplist');
 				
 				for (var i = 0; i < viewString.view.length; i++) {        			
 					var path = viewString.view[i].xpath;
 					var ob = viewString.view[i];
+					addcusOb = '';
 					ob.tempId= i; 
 					custN = ob.custname;
 					var tag = ob.tag;
 					if(tag == "dropdown"){imgTag = "select"}
 					else if(tag == "textbox/textarea"){imgTag = "input"}
 					else imgTag = tag;
+					if(path == "")	addcusOb = 'addCustObj';
 					if(tag == "a" || tag == "input" || tag == "table" || tag == "list" || tag == "select" || tag == "img" || tag == "button" || tag == "radiobutton" || tag == "checkbox" || tag == "tablecell"){
 						var li = "<li data-xpath='"+ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"' data-left='"+ob.left+"' data-top='"+ob.top+"' data-width='"+ob.width+"' data-height='"+ob.height+"' data-tag='"+tag+"' data-url='"+ob.url+"' data-hiddentag='"+ob.hiddentag+"' class='item select_all "+tag+"x' val="+ob.tempId+"><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' /><span title='"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;')+"' class='ellipsis'>"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"</span></a></li>";
 					} 
@@ -2042,20 +2045,23 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 	//Save Scrape Objects
 	$(document).on('click', "#saveObjects", function(){
 		// Start of Filter Duplicate Values in ViewString based on custname
-		var arr = newScrapedList.view; //Scraped objects obtained after enable append
-		var temp=[];
-		arr=arr.filter((x, i)=> {
-			var xpath = x.xpath.split(";");
+		var arr;
+		if(newScrapedList.length > 0){
+			arr = newScrapedList.view; //Scraped objects obtained after enable append
+			var temp=[];
+			arr=arr.filter((x, i)=> {
+				var xpath = x.xpath.split(";");
 				xpath = xpath[0];
-		if (temp.indexOf(xpath) < 0) {
-			temp.push(xpath);
-			return true;
+				if (temp.indexOf(xpath) < 0 || xpath == '') {
+					temp.push(xpath);
+					return true;
+				}
+				return false;
+			})
+			newScrapedList.view = arr;
+			console.log("noduplicates", newScrapedList.view);
 		}
-		return false;
-		})
 		//End of Filter Duplicate Values in ViewString based on custname
-		newScrapedList.view = arr;
-		console.log("noduplicates", newScrapedList.view);
 		window.localStorage['disableEditing'] = "false";
 		//var tasks = JSON.parse(window.localStorage['_TJ']);
 		var tasks = JSON.parse(window.localStorage['_CT'])
@@ -2614,6 +2620,18 @@ function contentTable(newTestScriptDataLS) {
 		        	   }
 		        	   hideOtherFuncOnEdit();
 		        	   $("#jqGrid").parent('div').css('height','auto');
+		        	   
+		        	   /*for(i=0; i<getScrapeDataforCustomObj.length; i++){
+		        			if(getScrapeDataforCustomObj[i].xpath == ""){
+		        				var testGridData = $("#jqGrid tbody tr:not(.jqgfirstrow)");
+		        				$.each(testGridData, function(){
+		        					if($(this).find("td[aria-describedby='jqGrid_custname']").text() == scrappedData[i].custname){
+		        						$(this).find("td[aria-describedby='jqGrid_custname']").addClass("addCustObj");
+		        						return false
+		        					}
+		        				})
+		        			}
+		        		}*/
 		           },
 	})
 
@@ -2636,6 +2654,7 @@ function contentTable(newTestScriptDataLS) {
 			//tsrows_reorder();
 		}
 	});
+
 	//Focus JqGrid onLoad 
 	$("#jqGrid").focus().css("outline","none");
 	
@@ -3717,7 +3736,10 @@ function deleteTestScriptRow(e){
 }
 
 $(document).on('click','#btnDeleteStepYes', function(){
-	var selectedRowIds = $("#jqGrid").jqGrid('getGridParam','selarrrow').map(Number);
+	var selectedRowIds = [];//$("#jqGrid").jqGrid('getGridParam','selarrrow').map(Number);
+	$.each($(".ui-state-highlight"), function(){
+		selectedRowIds.push($(this).attr("id"));
+	})
 	var gridArrayData = $("#jqGrid").jqGrid('getRowData');
 	console.log("array data test ***** "+JSON.stringify(gridArrayData));
 	for(var i=0;i<selectedRowIds.length;i++){

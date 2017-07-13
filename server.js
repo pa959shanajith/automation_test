@@ -139,6 +139,8 @@ if (cluster.isMaster) {
     var home = require('./routes_mindmap/home.js');
     var index = require('./routes_mindmap/index.js');
     var templates = require('./routes_mindmap/tmTemplates.js');
+    var Client = require("node-rest-client").Client;
+    var apiclient = new Client();
     app.use('/home', home);
     app.use('/templates', templates);
     app.get('/import', api.importToNeo);
@@ -252,7 +254,28 @@ if (cluster.isMaster) {
     var hostFamilyType = '0.0.0.0';
 	var portNumber=8443;
     httpsServer.listen(portNumber, hostFamilyType); //Https Server
-	console.log("Nineteen68 Server Ready...")
+    try{
+        var apireq = apiclient.get("http://127.0.0.1:1990/",function(data,response){
+            try{
+                if(response.statusCode != 200){
+                    httpsServer.close();
+                    console.log("Please run the Service API and Restart the Server");
+                }else{
+                    console.log("Nineteen68 Server Ready...");
+                }
+            }catch(exception){
+                httpsServer.close();
+                console.log("Please run the Service API and Restart the Server");
+            }
+        });
+        apireq.on('error', function (err) {
+            httpsServer.close();
+            console.log("Please run the Service API and Restart the Server");   
+        });
+    }catch(exception){
+        httpsServer.close();
+        console.log("Please run the Service API");
+    }
     // httpsServer.listen(8443); //Https Server
 
 

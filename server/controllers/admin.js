@@ -11,6 +11,9 @@ var uuid = require('uuid-random');
 //var passwordHash = require('password-hash');
 var bcrypt = require('bcrypt');
 var async = require('async');
+
+var Client = require("node-rest-client").Client;
+var client = new Client();
 //var set = require('set');
 var dbConnICE = require('../../server/config/icetestautomation');
 
@@ -29,9 +32,13 @@ exports.getUserRoles_Nineteen68 = function(req, res){
 		}
 			if(sessionToken != undefined && req.session.id == sessionToken)
 		{
-		var getUserRoles = "select roleid, rolename from roles";
-		dbConn.execute(getUserRoles, function (err, result) {
-			if (err) {
+		// var getUserRoles = "select roleid, rolename from roles";
+		
+		// dbConn.execute(getUserRoles, function (err, result) {
+		client.post("http://127.0.0.1:1990/admin/getUserRoles_Nineteen68",
+						function (result, response) {
+			// if (err) {
+			if (response.statusCode != 200) {
 				res.send("fail");
 			}
 			else {

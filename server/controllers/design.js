@@ -7,6 +7,8 @@ var cassandra = require('cassandra-driver');
 var myserver = require('../../server.js');
 var async = require('async');
 var parse = require('xml-parser');
+var Client = require("node-rest-client").Client;
+var client = new Client();
 /**
  * @author vinay.niranjan
  * @modified author vinay.niranjan
@@ -229,7 +231,7 @@ function fetchScrapedData(scrapeQuery,fetchScrapedDatacallback){
 * @author vinay.niranjan
 * @modified author vishvas.a
 * service updates the screen data in screens table
-* on user action of NEW SAVING/EDIT/UPDATE/DELETE in Design screen. 
+* on user action of NEW SAVING/EDIT/UPDATE/DELETE/Mapping of Objects/Compare and Update in Design screen. 
 */
 exports.updateScreen_ICE = function(req, res){
 	try{
@@ -1492,213 +1494,215 @@ exports.debugTestCase_ICE = function (req, res) {
 			try{
 				var action=req.body.param;
 				if(action == 'debugTestCase_ICE'){
-					try{
-						var requestedbrowsertypes = req.body.browsertypes;
-						var requestedtestcaseids = req.body.testcaseids;
-						var responsedata = [];
-						var counter=-1;
-						// var responseobject = {
-						// 	template: "",
-						// 	testcasename: "",
-						// 	testcase: []
-						// };
-						var browsertypeobject = { browsertype: requestedbrowsertypes };
-						var flag = "";
-						//for (var indexes = 0; indexes < requestedtestcaseids.length; indexes++) {
-							async.forEachSeries(requestedtestcaseids, function(testcaseIDs,eachTestcaseIDsCallback){
-								var getProjectTestcasedata = "select screenid,testcasename,testcasesteps from testcases where testcaseid=" + testcaseIDs;
-								dbConn.execute(getProjectTestcasedata, function (errgetTestcasedata, testcasedataresult) {
-									try{
-										if (errgetTestcasedata) {
-											flag = "Error in getProjectTestcasedata : Fail";
-											try{
-												res.send(flag);
-											}catch(exception){
-												console.log(exception);
-											}
-										} else {
-											//for (var ids = 0; ids < testcasedataresult.rows.length; ids++) {
-											async.forEachSeries(testcasedataresult.rows, function(eachTestcaseData, testcasedataCallback){
-												var responseobject = {
-														template: "",
-														testcasename: "",
-														testcase: []
-												};
-												responseobject.testcase = eachTestcaseData.testcasesteps;
-												responseobject.testcasename = eachTestcaseData.testcasename;
-												responsedata.push(responseobject);
-												responsedata.push(browsertypeobject);
-												var scrapedDataQuery="select screendata from screens where screenid="+
-												testcasedataresult.rows[0].screenid+" allow filtering ;";
-												fetchScrapedData(scrapedDataQuery,function(err,scrapedobjects,querycallback){
-													counter++;
-													try{
-														if(scrapedobjects != null && scrapedobjects != '' && scrapedobjects != undefined){
-															var newParse = JSON.parse(scrapedobjects);
-															if('body' in newParse){
-																var screen_obj=responsedata[counter];
-																screen_obj.template = newParse.body[0];
+					try {
+					    var requestedbrowsertypes = req.body.browsertypes;
+					    var requestedtestcaseids = req.body.testcaseids;
+					    var responsedata = [];
+					    var counter = -1;
+					    // var responseobject = {
+					    //            template: "",
+					    //            testcasename: "",
+					    //            testcase: []
+					    // };
+					    var browsertypeobject = {
+					        browsertype: requestedbrowsertypes
+					    };
+					    var flag = "";
+					    //for (var indexes = 0; indexes < requestedtestcaseids.length; indexes++) {
+					    async.forEachSeries(requestedtestcaseids, function(testcaseIDs, eachTestcaseIDsCallback) {
+					        var getProjectTestcasedata = "select screenid,testcasename,testcasesteps from testcases where testcaseid=" + testcaseIDs;
+					        dbConn.execute(getProjectTestcasedata, function(errgetTestcasedata, testcasedataresult) {
+					            try {
+					                if (errgetTestcasedata) {
+					                    flag = "Error in getProjectTestcasedata : Fail";
+					                    try {
+					                        res.send(flag);
+					                    } catch (exception) {
+					                        console.log(exception);
+					                    }
+					                } else {
+					                    //for (var ids = 0; ids < testcasedataresult.rows.length; ids++) {
+					                    async.forEachSeries(testcasedataresult.rows, function(eachTestcaseData, testcasedataCallback) {
+					                        var responseobject = {
+					                            template: "",
+					                            testcasename: "",
+					                            testcase: []
+					                        };
+					                        responseobject.testcase = eachTestcaseData.testcasesteps;
+					                        responseobject.testcasename = eachTestcaseData.testcasename;
+					                        responsedata.push(responseobject);
+					                        responsedata.push(browsertypeobject);
+					                        var scrapedDataQuery = "select screendata from screens where screenid=" +
+					                            testcasedataresult.rows[0].screenid + " allow filtering ;";
+					                        fetchScrapedData(scrapedDataQuery, function(err, scrapedobjects, querycallback) {
+					                            counter++;
+					                            try {
+					                                if (scrapedobjects != null && scrapedobjects != '' && scrapedobjects != undefined) {
+					                                    var newParse = JSON.parse(scrapedobjects);
+					                                    if ('body' in newParse) {
+					                                        var screen_obj = responsedata[counter];
+					                                        screen_obj.template = newParse.body[0];
 
-															}
-														}
-														// responsedata.push(responseobject);
-														// responsedata.push(browsertypeobject);
-														if(counter==requestedtestcaseids.length-1){
-															mySocket._events.result_debugTestCase = [];
-															mySocket.emit('debugTestCase',responsedata);
-															mySocket.on('result_debugTestCase', function (responsedata) {
-																try{
-																	res.send(responsedata);
-																}catch(exception){
-																	console.log(exception);
-																}
-															})
-														}
-													}catch(exception){
-														console.log(exception);
-													}
-												});
-												testcasedataCallback();
-											},eachTestcaseIDsCallback);
-										}
-									}catch(exception){
-										console.log(exception);
-									}
-								});
-							});
-							///////////
-							/*requestedtestcaseids.forEach(function(testcase,i){
-							var getProjectTestcasedata = "select screenid,testcasename,testcasesteps from testcases where testcaseid=" + testcase;
-							dbConn.execute(getProjectTestcasedata, function (errgetTestcasedata, testcasedataresult) {
-								try{
-									if (errgetTestcasedata) {
-										flag = "Error in getProjectTestcasedata : Fail";
-										try{
-											res.send(flag);
-										}catch(exception){
-											console.log(exception);
-										}
-									} else {
-										//for (var ids = 0; ids < testcasedataresult.rows.length; ids++) {
-											testcasedataresult.rows.forEach(function(ids,j){
-												var responseobject = {
-													template: "",
-													testcasename: "",
-													testcase: []
-												};
-											responseobject.testcase = ids.testcasesteps;
-											responseobject.testcasename = ids.testcasename;
-											responsedata.push(responseobject);
-											responsedata.push(browsertypeobject);
-											var scrapedDataQuery="select screendata from screens where screenid="+
-													testcasedataresult.rows[0].screenid+" allow filtering ;";
-											fetchScrapedData(scrapedDataQuery,function(err,scrapedobjects,querycallback){
-												counter++;
-												try{
-													if(scrapedobjects != null && scrapedobjects != '' && scrapedobjects != undefined){
-														var newParse = JSON.parse(scrapedobjects);
-														if('body' in newParse){
-															var screen_obj=responsedata[counter];
-															screen_obj.template = newParse.body[0];
+					                                    }
+					                                }
+					                                // responsedata.push(responseobject);
+					                                // responsedata.push(browsertypeobject);
+					                                if (counter == requestedtestcaseids.length - 1) {
+					                                    mySocket._events.result_debugTestCase = [];
+					                                    mySocket.emit('debugTestCase', responsedata);
+					                                    mySocket.on('result_debugTestCase', function(responsedata) {
+					                                        try {
+					                                            res.send(responsedata);
+					                                        } catch (exception) {
+					                                            console.log(exception);
+					                                        }
+					                                    })
+					                                }
+					                            } catch (exception) {
+					                                console.log(exception);
+					                            }
+					                        });
+					                        testcasedataCallback();
+					                    }, eachTestcaseIDsCallback);
+					                }
+					            } catch (exception) {
+					                console.log(exception);
+					            }
+					        });
+					    });
+					    ///////////
+					    /*requestedtestcaseids.forEach(function(testcase,i){
+					                                                                                                                var getProjectTestcasedata = "select screenid,testcasename,testcasesteps from testcases where testcaseid=" + testcase;
+					                                                                                                                dbConn.execute(getProjectTestcasedata, function (errgetTestcasedata, testcasedataresult) {
+					                                                                                                                                try{
+					                                                                                                                                                if (errgetTestcasedata) {
+					                                                                                                                                                                flag = "Error in getProjectTestcasedata : Fail";
+					                                                                                                                                                                try{
+					                                                                                                                                                                                res.send(flag);
+					                                                                                                                                                                }catch(exception){
+					                                                                                                                                                                                console.log(exception);
+					                                                                                                                                                                }
+					                                                                                                                                                } else {
+					                                                                                                                                                                //for (var ids = 0; ids < testcasedataresult.rows.length; ids++) {
+					                                                                                                                                                                                testcasedataresult.rows.forEach(function(ids,j){
+					                                                                                                                                                                                                var responseobject = {
+					                                                                                                                                                                                                                template: "",
+					                                                                                                                                                                                                                testcasename: "",
+					                                                                                                                                                                                                                testcase: []
+					                                                                                                                                                                                                };
+					                                                                                                                                                                                responseobject.testcase = ids.testcasesteps;
+					                                                                                                                                                                                responseobject.testcasename = ids.testcasename;
+					                                                                                                                                                                                responsedata.push(responseobject);
+					                                                                                                                                                                                responsedata.push(browsertypeobject);
+					                                                                                                                                                                                var scrapedDataQuery="select screendata from screens where screenid="+
+					                                                                                                                                                                                                                testcasedataresult.rows[0].screenid+" allow filtering ;";
+					                                                                                                                                                                                fetchScrapedData(scrapedDataQuery,function(err,scrapedobjects,querycallback){
+					                                                                                                                                                                                                counter++;
+					                                                                                                                                                                                                try{
+					                                                                                                                                                                                                                if(scrapedobjects != null && scrapedobjects != '' && scrapedobjects != undefined){
+					                                                                                                                                                                                                                                var newParse = JSON.parse(scrapedobjects);
+					                                                                                                                                                                                                                                if('body' in newParse){
+					                                                                                                                                                                                                                                                var screen_obj=responsedata[counter];
+					                                                                                                                                                                                                                                                screen_obj.template = newParse.body[0];
 
-														}
-													}
-													// responsedata.push(responseobject);
-													// responsedata.push(browsertypeobject);
-													if(counter==requestedtestcaseids.length-1){
-														mySocket._events.result_debugTestCase = [];
-														mySocket.emit('debugTestCase',responsedata);
-														mySocket.on('result_debugTestCase', function (responsedata) {
-															try{
-																res.send(responsedata);
-															}catch(exception){
-																console.log(exception);
-															}
-														})
-													}
-														
-													
-													
-												}catch(exception){
-													console.log(exception);
-												}
-											});
-										//}
-										});
-									}
-								}catch(exception){
-									console.log(exception);
-								}
-							});
-						//}
-							});*/
-						
-					}catch(exception){
-						console.log(exception);
+					                                                                                                                                                                                                                                }
+					                                                                                                                                                                                                                }
+					                                                                                                                                                                                                                // responsedata.push(responseobject);
+					                                                                                                                                                                                                                // responsedata.push(browsertypeobject);
+					                                                                                                                                                                                                                if(counter==requestedtestcaseids.length-1){
+					                                                                                                                                                                                                                                mySocket._events.result_debugTestCase = [];
+					                                                                                                                                                                                                                                mySocket.emit('debugTestCase',responsedata);
+					                                                                                                                                                                                                                                mySocket.on('result_debugTestCase', function (responsedata) {
+					                                                                                                                                                                                                                                                try{
+					                                                                                                                                                                                                                                                                res.send(responsedata);
+					                                                                                                                                                                                                                                                }catch(exception){
+					                                                                                                                                                                                                                                                                console.log(exception);
+					                                                                                                                                                                                                                                                }
+					                                                                                                                                                                                                                                })
+					                                                                                                                                                                                                                }
+					                                                                                                                                                                                                                                
+					                                                                                                                                                                                                                
+					                                                                                                                                                                                                                
+					                                                                                                                                                                                                }catch(exception){
+					                                                                                                                                                                                                                console.log(exception);
+					                                                                                                                                                                                                }
+					                                                                                                                                                                                });
+					                                                                                                                                                                //}
+					                                                                                                                                                                });
+					                                                                                                                                                }
+					                                                                                                                                }catch(exception){
+					                                                                                                                                                console.log(exception);
+					                                                                                                                                }
+					                                                                                                                });
+					                                                                                                //}
+					                                                                                                                });*/
+
+					} catch (exception) {
+					    console.log(exception);
 					}
 					// try{
-					// 	var requestedbrowsertypes = req.body.browsertypes;
-					// 	var requestedtestcaseids = req.body.testcaseids;
-					// 	var responsedata = [];
-					// 	var responseobject = {
-					// 		template: "",
-					// 		testcasename: "",
-					// 		testcase: []
-					// 	};
-					// 	var browsertypeobject = { browsertype: requestedbrowsertypes };
-					// 	var flag = "";
-					// 	for (var indexes = 0; indexes < requestedtestcaseids.length; indexes++) {
-					// 		var getProjectTestcasedata = "select screenid,testcasename,testcasesteps from testcases where testcaseid=" + requestedtestcaseids[indexes];
-					// 		dbConn.execute(getProjectTestcasedata, function (errgetTestcasedata, testcasedataresult) {
-					// 			try{
-					// 				if (errgetTestcasedata) {
-					// 					flag = "Error in getProjectTestcasedata : Fail";
-					// 					try{
-					// 						res.send(flag);
-					// 					}catch(exception){
-					// 						console.log(exception);
-					// 					}
-					// 				} else {
-					// 					for (var ids = 0; ids < testcasedataresult.rows.length; ids++) {
-					// 						responseobject.testcase = testcasedataresult.rows[ids].testcasesteps;
-					// 						responseobject.testcasename = testcasedataresult.rows[ids].testcasename;
-					// 						var scrapedDataQuery="select screendata from screens where screenid="+
-					// 								testcasedataresult.rows[0].screenid+" allow filtering ;";
-					// 						fetchScrapedData(scrapedDataQuery,function(err,scrapedobjects,querycallback){
-					// 							try{
-					// 								if(scrapedobjects != null && scrapedobjects != '' && scrapedobjects != undefined){
-					// 									var newParse = JSON.parse(scrapedobjects);
-					// 									if('body' in newParse){
-					// 										responseobject.template = newParse.body[0];
-					// 									}
-					// 								}
-					// 								responsedata.push(responseobject);
-					// 								responsedata.push(browsertypeobject);
-					// 									mySocket._events.result_debugTestCase = [];
-					// 									mySocket.emit('debugTestCase',responsedata);
-					// 									mySocket.on('result_debugTestCase', function (responsedata) {
-					// 										try{
-					// 											res.send(responsedata);
-					// 										}catch(exception){
-					// 											console.log(exception);
-					// 										}
-					// 									})
-													
-													
-					// 							}catch(exception){
-					// 								console.log(exception);
-					// 							}
-					// 						});
-					// 					}
-					// 				}
-					// 			}catch(exception){
-					// 				console.log(exception);
-					// 			}
-					// 		});
-					// 	}
-						
+//					            var requestedbrowsertypes = req.body.browsertypes;
+//					            var requestedtestcaseids = req.body.testcaseids;
+//					            var responsedata = [];
+//					            var responseobject = {
+//					                            template: "",
+//					                            testcasename: "",
+//					                            testcase: []
+//					            };
+//					            var browsertypeobject = { browsertype: requestedbrowsertypes };
+//					            var flag = "";
+//					            for (var indexes = 0; indexes < requestedtestcaseids.length; indexes++) {
+//					                            var getProjectTestcasedata = "select screenid,testcasename,testcasesteps from testcases where testcaseid=" + requestedtestcaseids[indexes];
+//					                            dbConn.execute(getProjectTestcasedata, function (errgetTestcasedata, testcasedataresult) {
+//					                                            try{
+//					                                                            if (errgetTestcasedata) {
+//					                                                                            flag = "Error in getProjectTestcasedata : Fail";
+//					                                                                            try{
+//					                                                                                            res.send(flag);
+//					                                                                            }catch(exception){
+//					                                                                                            console.log(exception);
+//					                                                                            }
+//					                                                            } else {
+//					                                                                            for (var ids = 0; ids < testcasedataresult.rows.length; ids++) {
+//					                                                                                            responseobject.testcase = testcasedataresult.rows[ids].testcasesteps;
+//					                                                                                            responseobject.testcasename = testcasedataresult.rows[ids].testcasename;
+//					                                                                                            var scrapedDataQuery="select screendata from screens where screenid="+
+//					                                                                                                                            testcasedataresult.rows[0].screenid+" allow filtering ;";
+//					                                                                                            fetchScrapedData(scrapedDataQuery,function(err,scrapedobjects,querycallback){
+//					                                                                                                            try{
+//					                                                                                                                            if(scrapedobjects != null && scrapedobjects != '' && scrapedobjects != undefined){
+//					                                                                                                                                            var newParse = JSON.parse(scrapedobjects);
+//					                                                                                                                                            if('body' in newParse){
+//					                                                                                                                                                            responseobject.template = newParse.body[0];
+//					                                                                                                                                            }
+//					                                                                                                                            }
+//					                                                                                                                            responsedata.push(responseobject);
+//					                                                                                                                            responsedata.push(browsertypeobject);
+//					                                                                                                                                            mySocket._events.result_debugTestCase = [];
+//					                                                                                                                                            mySocket.emit('debugTestCase',responsedata);
+//					                                                                                                                                            mySocket.on('result_debugTestCase', function (responsedata) {
+//					                                                                                                                                                            try{
+//					                                                                                                                                                                            res.send(responsedata);
+//					                                                                                                                                                            }catch(exception){
+//					                                                                                                                                                                            console.log(exception);
+//					                                                                                                                                                            }
+//					                                                                                                                                            })
+
+
+//					                                                                                                            }catch(exception){
+//					                                                                                                                            console.log(exception);
+//					                                                                                                            }
+//					                                                                                            });
+//					                                                                            }
+//					                                                            }
+//					                                            }catch(exception){
+//					                                                            console.log(exception);
+//					                                            }
+//					                            });
+//					            }
+
 					// }catch(exception){
-					// 	console.log(exception);
+//					            console.log(exception);
 					// }
 				}else if(action == 'debugTestCaseWS_ICE'){
 					try{
@@ -1919,13 +1923,20 @@ exports.getKeywordDetails_ICE = function getKeywordDetails_ICE(req, res) {
 		var individualsyntax = {};
 	
 		var flag = "Error in errProjectBasedKeywords : Fail";
-		var getProjectBasedKeywords = "select objecttype, keywords from keywords where projecttypename in ('"
-				+ requestedprojecttypename + "','Generic') ALLOW FILTERING";
-		dbConn.execute(getProjectBasedKeywords,
-			function(errProjectBasedKeywords,projectBasedKeywordsresult) {
+		// var getProjectBasedKeywords = "select objecttype, keywords from keywords where projecttypename in ('"
+		// 		+ requestedprojecttypename + "','Generic') ALLOW FILTERING";
+		// dbConn.execute(getProjectBasedKeywords,
+		// 	function(errProjectBasedKeywords,projectBasedKeywordsresult) {
+			var args = {
+				data: requestedprojecttypename,
+				headers:{'Content-Type': 'application/json'}
+			};
+			client.post("http://127.0.0.1:1990/design/getKeywordDetails_ICE",args,
+						function (projectBasedKeywordsresult, response) {
 				try{
-					if (errProjectBasedKeywords) {
-						flag = "Error in errProjectBasedKeywords : Fail";
+					// if (errProjectBasedKeywords) {
+					if (response.statusCode != 200) {
+						flag = "Server data rendering failed: Fail";
 						try{
 							res.send(flag);
 						}catch(exception){
@@ -1934,7 +1945,8 @@ exports.getKeywordDetails_ICE = function getKeywordDetails_ICE(req, res) {
 					} else {
 						for (var objectindex = 0; objectindex < projectBasedKeywordsresult.rows.length; objectindex++) {
 							var objecttype = projectBasedKeywordsresult.rows[objectindex].objecttype;
-							var keywords = projectBasedKeywordsresult.rows[objectindex].keywords;
+							// var keywords = projectBasedKeywordsresult.rows[objectindex].keywords;
+							var keywords = JSON.parse(projectBasedKeywordsresult.rows[objectindex].keywords);
 							individualsyntax[objecttype] = keywords;
 						}
 						try{	
