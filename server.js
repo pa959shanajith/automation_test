@@ -193,6 +193,7 @@ if (cluster.isMaster) {
     var utility = require('./server/controllers/utility');
     //Login Routes
     app.post('/authenticateUser_Nineteen68', login.authenticateUser_Nineteen68);
+    app.post('/authenticateUser_Nineteen68_CI', login.authenticateUser_Nineteen68_CI);
     app.post('/loadUserInfo_Nineteen68', login.loadUserInfo_Nineteen68);
     app.post('/getRoleNameByRoleId_Nineteen68', login.getRoleNameByRoleId_Nineteen68);
     //Admin Routes
@@ -225,6 +226,7 @@ if (cluster.isMaster) {
     app.post('/updateTestScenario_ICE', suite.updateTestScenario_ICE);
     app.post('/ExecuteTestSuite_ICE', suite.ExecuteTestSuite_ICE);
     app.post('/getTestcaseDetailsForScenario_ICE', suite.getTestcaseDetailsForScenario_ICE);
+    app.post('/ExecuteTestSuite_ICE_CI', suite.ExecuteTestSuite_ICE_CI);
     //app.post('/readTestScenarios_ICE', suite.readTestScenarios_ICE);
     //Report Screen Routes
     app.post('/getAllSuites_ICE', report.getAllSuites_ICE);
