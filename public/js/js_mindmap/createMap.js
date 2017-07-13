@@ -185,6 +185,7 @@ var genPathData = function(s,t){
 };
 var addNode = function(n,m,pi){
 	
+	var selectedTab = window.localStorage['tabMindMap'];
 	if(n.type=='testcases'){
 		node_names_tc.push(n.name);
 	}
@@ -229,6 +230,7 @@ var addNode = function(n,m,pi){
 		if(!p.select('circle.ct-cRight')[0][0]) p.append('circle').attr('class','ct-'+pi.type+' ct-cRight ct-nodeBubble').attr('cx',20).attr('cy',55).attr('r',4).on('click',toggleNode);
 		//Logic to change the layout
 		v.append('circle').attr('class','ct-'+n.type+' ct-cLeft ct-nodeBubble').attr('cx',20).attr('cy',-3).attr('r',4);//.on('mousedown',moveNodeBegin).on('mouseup',moveNodeEnd);
+		if(selectedTab=='tabCreate')
 		v.append('circle').attr('class','ct-'+n.type+' ct-cLeft ct-nodeBubble').attr('cx',-3).attr('cy',20).attr('r',4).on('mousedown',moveNodeBegin).on('mouseup',moveNodeEnd);
 	}
 	return v;
