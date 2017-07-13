@@ -546,6 +546,170 @@ exports.ExecuteTestSuite_ICE = function(req, res) {
     }
 }
 
+/**
+ * @author shree.p
+ * @see function to execute test suites from jenkins
+ */
+exports.ExecuteTestSuite_ICE_CI = function(req, res) {
+    if(req.sessionStore.sessions != undefined) {
+        session_list = req.sessionStore.sessions;
+        if(Object.keys(session_list).length !=0){
+            var sessionCookie = session_list[req.body.session_id];
+            var sessionToken = JSON.parse(sessionCookie).uniqueId;
+            sessionToken = Object.keys(session_list)[Object.keys(session_list).length - 1];
+        }
+        
+    }
+        if(sessionToken != undefined && req.body.session_id == sessionToken)
+    {
+        
+        var batchExecutionData = req.body.moduleInfo;
+        var testsuitedetailslist = [];
+        var testsuiteIds=[];
+        var executionRequest={"executionId":"","suitedetails":[],"testsuiteIds":[]};
+        var executionId = uuid();
+        var starttime = new Date().getTime();
+        async.forEachSeries(batchExecutionData,function(eachbatchExecutionData,batchExecutionDataCallback){
+            //required values
+            var suiteDetails=eachbatchExecutionData.suiteDetails;
+            var testsuitename=eachbatchExecutionData.testsuitename;
+            var testsuiteid=eachbatchExecutionData.testsuiteid;
+            var browserType=eachbatchExecutionData.browserType;
+            var listofscenarioandtestcases = [];
+            var scenarioIdList = [];
+            var dataparamlist = [];
+            var conditionchecklist = [];
+            var browserTypelist=[];
+            var scenarioindex=0;
+            testsuiteIds.push(testsuiteid);
+            async.forEachSeries(suiteDetails, function(eachsuiteDetails, eachsuiteDetailscallback) {
+                
+                var executionjson = {
+                "scenarioIds": [],
+                "browserType": [],
+                "dataparampath":[],
+                "condition":[],
+                "testsuitename":""
+                };
+                var currentscenarioid = "";
+
+                scenarioIdList.push(eachsuiteDetails.scenarioids);
+                dataparamlist.push(eachsuiteDetails.dataparam[0]);
+                conditionchecklist.push(eachsuiteDetails.condition);
+                browserTypelist.push(eachsuiteDetails.browserType);
+                currentscenarioid=eachsuiteDetails.scenarioids;
+                TestCaseDetails_Suite_ICE(currentscenarioid, function(currentscenarioidError, currentscenarioidResponse) {
+                    var scenariotestcaseobj = {};
+                    // scenarioindex=scenarioindex + 1;
+                    if (currentscenarioidError) {
+                        console.log(currentscenarioidError);
+                    } else {
+                        if (currentscenarioidResponse != null || currentscenarioidResponse != undefined) {
+                            scenariotestcaseobj[currentscenarioid] = currentscenarioidResponse;
+                            listofscenarioandtestcases.push(scenariotestcaseobj);
+                            eachsuiteDetailscallback();
+                        }
+                        if(listofscenarioandtestcases.length == suiteDetails.length){
+                            updateData();
+                            batchExecutionDataCallback();
+                            if(testsuitedetailslist.length == batchExecutionData.length){
+                                var a=executionFunction(executionRequest);
+                                console.log(a);
+                            }
+                        }
+                    }
+                });
+                function updateData(){
+                    executionjson[testsuiteid] = listofscenarioandtestcases;
+                    executionjson.scenarioIds = scenarioIdList;
+                    executionjson.browserType = browserType;
+                    executionjson.condition = conditionchecklist;
+                    executionjson.dataparampath = dataparamlist;
+                    executionjson.testsuiteid = testsuiteid;
+                    executionjson.testsuitename = testsuitename;
+                    testsuitedetailslist.push(executionjson);
+                    if(testsuitedetailslist.length == batchExecutionData.length){
+                        excutionObjectBuilding(testsuitedetailslist);
+                    }
+                }
+            });
+
+        });
+        function excutionObjectBuilding(testsuitedetailslist){
+            executionRequest.executionId=executionId;
+            executionRequest.suitedetails=testsuitedetailslist;
+            executionRequest.testsuiteIds=testsuiteIds;
+        }
+        
+        function executionFunction(executionRequest){
+            console.log(executionRequest);
+            var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+            console.log(Object.keys(myserver.allSocketsMap), "<<all people, asking person:", ip);
+            if ('allSocketsMap' in myserver && ip in myserver.allSocketsMap) {
+                var mySocket = myserver.allSocketsMap[ip];
+                mySocket._events.result_executeTestSuite = [];
+                mySocket.emit('executeTestSuite', executionRequest);
+                mySocket.on('result_executeTestSuite', function(resultData) {
+                    if (resultData != "success" && resultData != "Terminate") {
+                        try {
+                            var scenarioid = resultData.scenarioId;
+                            var executionid = resultData.executionId;
+                            var reportdata = resultData.reportData;
+                            var testsuiteid = resultData.testsuiteId; 
+                            var req_report = resultData.reportdata;
+                            var req_reportStepsArray = reportdata.rows;
+                            var req_overAllStatus = reportdata.overallstatus
+                            var req_browser = reportdata.overallstatus[0].browserType;
+                            reportdata = JSON.stringify(reportdata).replace(/'/g, "''");
+                            reportdata = JSON.parse(reportdata);
+                            
+                            var insertReport = "INSERT INTO reports (reportid,executionid,testsuiteid,testscenarioid,executedtime,browser,modifiedon,status,report) VALUES (" + uuid() + "," + executionid + "," + testsuiteid + "," + scenarioid + "," + new Date().getTime() + ",'" + req_browser + "'," + new Date().getTime() + ",'" + resultData.reportData.overallstatus[0].overallstatus + "','" + JSON.stringify(reportdata) + "')";
+                            var dbquery = dbConnICE.execute(insertReport, function(err, result) {
+                                if (err) {
+                                    flag = "fail";
+                                } else {
+                                    flag = "success";
+                                }
+                            });
+                            var insertIntoExecution = "INSERT INTO execution (testsuiteid,executionid,starttime,endtime) VALUES (" + testsuiteid + "," + executionid + "," + starttime + "," + new Date().getTime() + ");"
+                            var dbqueryexecution = dbConnICE.execute(insertIntoExecution, function(err, resultexecution) {
+                                if (err) {
+                                    flag = "fail";
+                                } else {
+                                    flag = "success";
+								
+                                }
+
+                            });
+                            //console.log("this is the value:",resultData);
+							
+                        } catch (ex) {
+                            console.log(ex);
+                        }
+                    }
+					if(resultData =="success" || resultData == "Terminate"){
+						try{
+								res.send(resultData);
+						}
+						catch (ex) {
+                            console.log(ex);
+                            res.send("fail");
+                        }	
+					}
+                });
+            } else {
+                console.log("Socket not Available");
+                res.send("unavailableLocalServer");
+            }
+        }
+ 
+    } else {
+        res.send("Invalid Session");
+    }
+}
+
+
+
 function TestCaseDetails_Suite_ICE(req, cb, data) {
         var requestedtestscenarioid = req;
         var testscenarioslist = "select testcaseids from testscenarios where testscenarioid=" + requestedtestscenarioid + ";";
