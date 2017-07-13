@@ -84,7 +84,6 @@ if (cluster.isMaster) {
     });
 
     app.get('/', function(req, res) {
-            console.log("\n\n***************** SESSION IS DESTROYING\n\n");
             res.clearCookie('connect.sid');
             req.session.destroy();
             res.sendFile("index.html", {
