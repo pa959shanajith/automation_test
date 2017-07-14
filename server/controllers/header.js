@@ -57,6 +57,22 @@ exports.logoutUser_Nineteen68 = function (req, res) {
             res.send('Session Expired');
         }
 };
+/**
+ * @author shree.p
+ * @see function to logout in Nineteen68 from jenkins
+ */
+exports.logoutUser_Nineteen68_CI = function (req, res) {
+       if(req.sessionStore.sessions != undefined) {
+        session_list = req.sessionStore.sessions;
+        if(Object.keys(session_list).length !=0){
+            req.sessionStore.clear()
+			res.send('Logout successful');
+        }else{
+			res.send('Session Expired');
+		}
+        
+    }
+};
 
 //getReleaseName Functionality
 	exports.getReleaseNameByReleaseId_ICE = function (req, res) {

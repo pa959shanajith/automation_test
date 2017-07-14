@@ -84,7 +84,6 @@ if (cluster.isMaster) {
     });
 
     app.get('/', function(req, res) {
-            console.log("\n\n***************** SESSION IS DESTROYING\n\n");
             res.clearCookie('connect.sid');
             req.session.destroy();
             res.sendFile("index.html", {
@@ -193,6 +192,7 @@ if (cluster.isMaster) {
     var utility = require('./server/controllers/utility');
     //Login Routes
     app.post('/authenticateUser_Nineteen68', login.authenticateUser_Nineteen68);
+    app.post('/authenticateUser_Nineteen68_CI', login.authenticateUser_Nineteen68_CI);
     app.post('/loadUserInfo_Nineteen68', login.loadUserInfo_Nineteen68);
     app.post('/getRoleNameByRoleId_Nineteen68', login.getRoleNameByRoleId_Nineteen68);
     //Admin Routes
@@ -225,6 +225,7 @@ if (cluster.isMaster) {
     app.post('/updateTestScenario_ICE', suite.updateTestScenario_ICE);
     app.post('/ExecuteTestSuite_ICE', suite.ExecuteTestSuite_ICE);
     app.post('/getTestcaseDetailsForScenario_ICE', suite.getTestcaseDetailsForScenario_ICE);
+    app.post('/ExecuteTestSuite_ICE_CI', suite.ExecuteTestSuite_ICE_CI);
     //app.post('/readTestScenarios_ICE', suite.readTestScenarios_ICE);
     //Report Screen Routes
     app.post('/getAllSuites_ICE', report.getAllSuites_ICE);
@@ -241,6 +242,7 @@ if (cluster.isMaster) {
     app.post('/getCycleNameByCycleId_ICE', header.getCycleNameByCycleId_ICE);
     //Logout Routes
     app.post('/logoutUser_Nineteen68', header.logoutUser_Nineteen68);
+    app.post('/logoutUser_Nineteen68_CI', header.logoutUser_Nineteen68_CI);
     //Plugin Routes
     app.post('/getProjectIDs_Nineteen68', plugin.getProjectIDs_Nineteen68);
     app.post('/getTaskJson_Nineteen68', plugin.getTaskJson_Nineteen68);

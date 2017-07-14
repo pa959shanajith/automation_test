@@ -106,6 +106,133 @@ exports.authenticateUser_Nineteen68 = function(req, res){
 		}
 };
 
+
+/** 
+ * @see : function to authenticate users from jenkins
+ * @author : vinay 
+*/
+exports.authenticateUser_Nineteen68_CI = function(req, res){
+      try{
+		
+            console.log("Inside Authenticate User");
+            var username = req.body.username;
+            var password = req.body.password;
+            var session = req.session;
+            var sessId = req.session.id;
+            req.session.username = username;
+            req.session.uniqueId = sessId;
+            var flag= 'inValidCredential';
+			var authUser = "select password from users where username = '"+ req.session.username+"' allow filtering;"
+            //console.log(req);
+			checkldapuser(req,function(err,data){
+				if(data){
+					ldapCheck(req,function(err,ldapdata){
+						if(ldapdata == 'pass'){
+							flag = 'validCredential';
+							status ={"status":flag,"session_id":sessId};
+							res.setHeader('set-cookie', sessId);
+							res.writeHead(200,{'Content-Type': 'text/plain'});
+							res.write("status : "+flag+" , session_id : "+sessId);
+							res.end();
+						}else{
+							res.setHeader('set-cookie', sessId);
+							res.writeHead(401,{'Content-Type': 'text/plain'});
+							res.write("status : "+flag+" , session_id : "+"");
+							res.end();
+						}
+					});
+				}else{
+					dbConn.execute(authUser, function (err, result) {
+					if(err) {
+						console.log("Error occured in authenticateUser_Nineteen68 : Fail");
+						res.setHeader('set-cookie', sessId);
+						res.writeHead(500,{'Content-Type': 'text/plain'});
+						res.write("status : fail , session_id : ");
+						res.end();
+					}else{
+						try{
+							if (result.rows.length == 0){
+								res.setHeader('set-cookie', sessId);
+								res.writeHead(401,{'Content-Type': 'text/plain'});
+								res.write("status : "+flag+" , session_id : "+"");
+								res.end();
+							}else{
+								for (var i = 0; i < result.rows.length; i++) {
+									dbHashedPassword = result.rows[i].password;
+								}
+								var validUser = bcrypt.compareSync(password, dbHashedPassword);         // true
+								checkAssignedProjects(req,function(err,assignedProjectsData,role){
+										if(role != "Admin" && role != "Business Analyst" && role != "Tech Lead")
+										{
+												if(assignedProjectsData > 0 )
+												{
+													assignedProjects = true;
+												}
+												if(validUser == true && assignedProjects == true){
+												
+													flag = 'validCredential';
+													status ={"status":flag,"session_id":sessId};
+													res.setHeader('set-cookie', sessId);
+													res.writeHead(200,{'Content-Type': 'text/plain'});
+													res.write("status : "+flag+" , session_id : "+sessId);
+													res.end();
+													
+												}
+												else if(validUser == true && assignedProjects == false)
+												{
+													flag = 'noProjectsAssigned';
+													res.writeHead(401,{'Content-Type': 'text/plain'});
+													res.write("status : "+flag+" , session_id : "+"");
+													res.end();
+												}
+												else{
+													res.setHeader('set-cookie', sessId);
+													res.writeHead(401,{'Content-Type': 'text/plain'});
+													res.write("status : "+flag+" , session_id : "+"");
+													res.end();
+												}  
+										}
+										else{
+											if(validUser == true){
+													flag = 'validCredential';
+													status ={"status":flag,"session_id":sessId};
+													res.setHeader('set-cookie', sessId);
+													res.writeHead(200,{'Content-Type': 'text/plain'});
+													res.write("status : "+flag+" , session_id : "+sessId);
+													res.end();
+												}
+											else{
+													res.setHeader('set-cookie', sessId);
+													res.writeHead(401,{'Content-Type': 'text/plain'});
+													res.write("status : "+flag+" , session_id : "+"");
+													res.end();
+												}  
+										}
+										
+								});
+ 
+							}
+						}catch(exception){
+							console.log(exception);
+							res.setHeader('set-cookie', sessId);
+							res.writeHead(500,{'Content-Type': 'text/plain'});
+							res.write("status : fail , session_id : ");
+							res.end();
+						}
+					}
+					});
+				}
+			});
+				
+		}catch(exception){
+				console.log(exception);
+				res.setHeader('set-cookie', sessId);
+				res.writeHead(500,{'Content-Type': 'text/plain'});
+				res.write("status : fail , session_id : ");
+				res.end();
+		}
+};
+
 /** 
  * @see : function to check whether projects are assigned for user
  * @author : vinay 
