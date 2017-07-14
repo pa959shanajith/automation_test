@@ -211,6 +211,9 @@ mySPA.controller('mindmapController', ['$scope', '$http', '$location', '$timeout
             $timeout(function(){
                 $('#ct-moduleBox').prop("style","width:100% !important; left:0px !important;");
             },10);
+            $timeout(function(){
+                $('#ct-AssignBox').prop("style","width:100% !important; left:0px !important;");
+            },10);
             
           
             
