@@ -201,7 +201,22 @@ mySPA.controller('mindmapController', ['$scope', '$http', '$location', '$timeout
                 }
                 $("#ct-main").css("display","block");
             }
-            loadMindmapData()
+            
+            if($('.scrollbar-macosx').is(':visible'))
+                $("#ct-collapse").trigger("click");
+            if($('#right-dependencies-section').is(':visible'))
+                $("#ct-expand-right").trigger("click");
+            
+            loadMindmapData();
+            $timeout(function(){
+                $('#ct-moduleBox').prop("style","width:100% !important; left:0px !important;");
+            },10);
+            $timeout(function(){
+                $('#ct-AssignBox').prop("style","width:100% !important; left:0px !important;");
+            },10);
+            
+          
+            
         }
         window.localStorage['tabMindMap'] = $scope.tab;
     }

@@ -184,7 +184,6 @@ var genPathData = function(s,t){
 	return ('M'+s[0]+','+s[1]+'C'+(s[0]+t[0])/2+','+s[1]+' '+(s[0]+t[0])/2+','+t[1]+' '+t[0]+','+t[1]);
 };
 var addNode = function(n,m,pi){
-	
 	var selectedTab = window.localStorage['tabMindMap'];
 	if(n.type=='testcases'){
 		node_names_tc.push(n.name);
@@ -229,6 +228,7 @@ var addNode = function(n,m,pi){
 		var p=d3.select('#ct-node-'+pi.id);
 		if(!p.select('circle.ct-cRight')[0][0]) p.append('circle').attr('class','ct-'+pi.type+' ct-cRight ct-nodeBubble').attr('cx',20).attr('cy',55).attr('r',4).on('click',toggleNode);
 		//Logic to change the layout
+		
 		v.append('circle').attr('class','ct-'+n.type+' ct-cLeft ct-nodeBubble').attr('cx',20).attr('cy',-3).attr('r',4);//.on('mousedown',moveNodeBegin).on('mouseup',moveNodeEnd);
 		if(selectedTab=='tabCreate')
 		v.append('circle').attr('class','ct-'+n.type+' ct-cLeft ct-nodeBubble').attr('cx',-3).attr('cy',20).attr('r',4).on('mousedown',moveNodeBegin).on('mouseup',moveNodeEnd);
@@ -754,6 +754,7 @@ function loadCycles(){
 }
 
 var nodeCtrlClick = function(e){
+	d3.select('#ct-inpBox').classed('no-disp',!0);
 	e=e||window.event;
 	e.cancelbubble=!0;
 	if(e.stopPropagation) e.stopPropagation();
@@ -791,9 +792,55 @@ var nodeCtrlClick = function(e){
 		c.select('p.'+faRef.delete+' .ct-tooltiptext').html('Delete Testcase');
 	}
 };
+
+var getNewPosition=function(node,pi,arr_co){
+	if(dNodes[pi].children.length >0){
+			
+			index=dNodes[pi].children.length-1;
+			new_one={x:parseInt(dNodes[pi].children[index].x)+80,y:parseInt(dNodes[pi].children[index].y)};
+			
+			if(JSON.stringify(arr_co).indexOf(JSON.stringify(new_one))>-1){
+				node.x=dNodes[pi].children[index].x+160;
+				node.y=dNodes[pi].children[index].y;
+			}else{
+				
+				node.x=dNodes[pi].children[index].x+80;
+				node.y=dNodes[pi].children[index].y;
+			}
+		
+			
+	}else{
+			
+			if(dNodes[pi].parent != null){
+				arr=dNodes[pi].parent.children;
+				index=dNodes[pi].parent.children.length-1;
+				
+				//new_one={x:parseInt(arr[index].x),y:parseInt(arr[index].y)+125};
+				
+				new_one={x:parseInt(dNodes[pi].x),y:parseInt(dNodes[pi].y)+125};
+				if(JSON.stringify(arr_co).indexOf(JSON.stringify(new_one))>-1){
+					
+					node.x=arr[index].x+80;
+					node.y=arr[index].y+125;
+				}else{
+					node.x=dNodes[pi].x;
+					node.y=dNodes[pi].y+125;
+					// node.x=arr[index].x;
+					// node.y=arr[index].y+125;
+				}
+			}else{
+				node.x=dNodes[pi].x;
+				node.y=dNodes[pi].y+125;
+			}
+			
+	}
+	return node;
+}
+
 var createNode = function(e){
 	//If module is in edit mode, then return do not add any node
 	if(d3.select('#ct-inpBox').attr('class')=="") return;
+
 	d3.select('#ct-inpBox').classed('no-disp',!0);
 	d3.select('#ct-ctrlBox').classed('no-disp',!0);
 	var p=d3.select(activeNode);
@@ -801,20 +848,32 @@ var createNode = function(e){
 	if(pt=='testcases') return;
 	var pi = p.attr('id').split('-')[2];
 	
-	if(dNodes[pi].children != undefined || dNodes[pi].children != null){
+	if(dNodes[pi]._children == null){
+		if(dNodes[pi].children == undefined) dNodes[pi]['children']=[];
 		var nNext={'modules':['Scenario',1],'scenarios':['Screen',2],'screens':['Testcase',3]};
 		var mapSvg=d3.select('#ct-mapSvg');
 		var w=parseFloat(mapSvg.style('width'));
 		var h=parseFloat(mapSvg.style('height'));
 		//name:nNext[pt][0]+'_'+nCount[nNext[pt][1]]
+		var arr_co=[];
+		dNodes.forEach(function(d,i){
+			var objj={x:parseInt(d.x),y:parseInt(d.y)};
+			arr_co.push(objj);
+			
+		});
+
 		node={id:uNix,childIndex:'',path:'',name:nNext[pt][0]+'_'+nCount[nNext[pt][1]],type:(nNext[pt][0]).toLowerCase()+'s',y:h*(0.15*(1.34+nNext[pt][1])+Math.random()*0.1),x:90+30*Math.floor(Math.random()*(Math.floor((w-150)/80))),children:[],parent:dNodes[pi]};
+		
+		node=getNewPosition(node,pi,arr_co);
+		var curNode=node;
 		dNodes.push(node);nCount[nNext[pt][1]]++;
 		dNodes[pi].children.push(dNodes[uNix]);
-		dNodes[uNix].childIndex=dNodes[pi].children.length
+		dNodes[uNix].childIndex=dNodes[pi].children.length;
+
 		var currentNode=addNode(dNodes[uNix],!0,dNodes[pi]);
 		if(currentNode != null){
-			childNode=currentNode
-			//console.log(currentNode);
+			childNode=currentNode;
+			
 			link={id:uLix,source:dNodes[pi],target:dNodes[uNix]};
 			dLinks.push(link);
 			addLink(uLix,dNodes[pi],dNodes[uNix]);
@@ -1206,11 +1265,11 @@ var actionEvent = function(e){
 		cur_module='end_to_end';
 		error=false;
 	} 
-	if(error){
-		openDialogMindmap("Error", "Mindmap flow must be complete! Modules -> Scenarios -> Screens -> Testcases")
-		//$('#Mindmap_error').modal('show');
-		return;
-	}
+	// if(error){
+	// 	openDialogMindmap("Error", "Mindmap flow must be complete! Modules -> Scenarios -> Screens -> Testcases")
+	// 	//$('#Mindmap_error').modal('show');
+	// 	return;
+	// }
 	if(s.attr('id')=='ct-saveAction'){
 		flag=10;
 		d3.select('#ct-inpBox').classed('no-disp',!0);
@@ -1219,6 +1278,11 @@ var actionEvent = function(e){
 		
 	}
 	else if(s.attr('id')=='ct-createAction'){
+		if(error){
+			openDialogMindmap("Error", "Mindmap flow must be complete! Modules -> Scenarios -> Screens -> Testcases")
+			//$('#Mindmap_error').modal('show');
+			return;
+		}
 		flag=20;
 		d3.select('#ct-inpBox').classed('no-disp',!0);
 		
