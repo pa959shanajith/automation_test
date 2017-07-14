@@ -242,6 +242,7 @@ if (cluster.isMaster) {
     app.post('/getCycleNameByCycleId_ICE', header.getCycleNameByCycleId_ICE);
     //Logout Routes
     app.post('/logoutUser_Nineteen68', header.logoutUser_Nineteen68);
+    app.post('/logoutUser_Nineteen68_CI', header.logoutUser_Nineteen68_CI);
     //Plugin Routes
     app.post('/getProjectIDs_Nineteen68', plugin.getProjectIDs_Nineteen68);
     app.post('/getTaskJson_Nineteen68', plugin.getTaskJson_Nineteen68);
