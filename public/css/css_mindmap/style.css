@@ -287,7 +287,7 @@ p,a,img,text,span,.noselect{-webkit-touch-callout:none;-webkit-user-select:none;
 .ct-nodeLabel{font-size:12px}
 .ct-link{stroke:#333;stroke-width:1px;fill:none}
 #ct-mapSvg{height:100%;width:100%}
-#ct-legendBox{position:absolute;z-index:10;height:20px;width:351px;top: calc(100% - 62px);left: 12px;}
+#ct-legendBox{position:absolute;z-index:10;height:20px;width:351px;top: calc(100% - 62px);left: 161px;}
 #ct-actionBox{position:absolute;z-index:10;height:25px;width:180px;top: calc(100% - 63px);left: calc(100% - 265px)}
 #ct-actionBox_W{position:absolute;z-index:10;height:25px;width:280px;top: calc(100% - 63px);left: calc(100% - 290px)}
 .ct-actionButton,.ct-actionButton_W{cursor:pointer}
