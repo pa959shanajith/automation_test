@@ -1,5 +1,5 @@
 var uNix_W,uLix_W,node,link,dNodes_W,dLinks_W,allMMaps_W,temp_W,faRef,mapSaved,zoom_W,cSpan_W,cScale_W,taskAssign;
-var cur_module,allMaps_info;
+var cur_module,allMaps_info,activeNode_W,childNode_W;
 //unassignTask is an array to store whose task to be deleted
 var deletednode_W=[],unassignTask=[];
 var userInfo =  JSON.parse(window.localStorage['_UI']);
@@ -176,7 +176,7 @@ var createNewMap_W = function(e){
 	dNodes_W.push(node);nCount[0]++;uNix_W++;
 	//To fix issue 710-Create a module and see that module name does not display in edit mode
 	v=addNode_W(dNodes_W[uNix_W-1],!1,null);
-	childNode=v;
+	childNode_W=v;
 	editNode_W(e);
 };
 var loadScenarios = function(e){
@@ -257,6 +257,7 @@ var addLink_W = function(r,p,c){
 //To Unassign the task of a particular node
 
 
+
 var createScenario_Node = function(text,scenario_prjId){
 	if(text=='') return;
 	//If module is in edit mode, then return do not add any node
@@ -272,12 +273,23 @@ var createScenario_Node = function(text,scenario_prjId){
 		//name:nNext[pt][0]+'_'+nCount[nNext[pt][1]]
 
 		node={projectID:scenario_prjId,id:uNix_W,childIndex:'',path:'',name:text,type:'scenarios',y:h*(0.15*(1.34+1)+Math.random()*0.1),x:90+30*Math.floor(Math.random()*(Math.floor((w-150)/80))),children:[],parent:dNodes_W[pi]};
+		//TO fix issue with random positions of newly created nodes
+		if(dNodes_W[pi].children.length >0){
+			arr=dNodes_W[pi].children;
+			index=dNodes_W[pi].children.length-1;
+			node.x=arr[index].x+80;
+			node.y=arr[index].y;
+		}else{
+			node.x=dNodes_W[pi].x;
+			node.y=dNodes_W[pi].y+125;
+		}
+		
 		dNodes_W.push(node);
 		dNodes_W[pi].children.push(dNodes_W[uNix_W]);
 		dNodes_W[uNix_W].childIndex=dNodes_W[pi].children.length
 		var currentNode=addNode_W(dNodes_W[uNix_W],!0,dNodes_W[pi]);
 		if(currentNode != null){
-			childNode=currentNode
+			childNode_W=currentNode;
 			//console.log(currentNode);
 			link={id:uLix_W,source:dNodes_W[pi],target:dNodes_W[uNix_W]};
 			dLinks_W.push(link);
@@ -296,9 +308,9 @@ var nodeCtrlClick_W = function(e){
 	e=e||window.event;
 	e.cancelbubble=!0;
 	if(e.stopPropagation) e.stopPropagation();
-	if(isIE) activeNode=this.parentNode;
-	else activeNode=this.parentElement;
-	var p=d3.select(activeNode);
+	if(isIE) activeNode_W=this.parentNode;
+	else activeNode_W=this.parentElement;
+	var p=d3.select(activeNode_W);
 	var t=p.attr('data-nodetype');
 	var split_char=',';
 	if(isIE) split_char=' ';
@@ -331,9 +343,9 @@ var editNode_W = function(e,node){
 	if(e.stopPropagation) e.stopPropagation();
 	//logic to create the node in editable mode
 	if(node==0){
-		childNode=null;
-		var p=d3.select(activeNode);
-	}else var p=childNode;
+		childNode_W=null;
+		var p=d3.select(activeNode_W);
+	}else var p=childNode_W;
 	var pi = p.attr('id').split('-')[2];
 	var t=p.attr('data-nodetype');
 	if(t=='scenarios') return;
@@ -366,7 +378,7 @@ var deleteNode_W = function(e){
 	//If module is in edit mode, then return do not add any node
 	if(d3.select('#ct-inpBox').attr('class')=="") return;
 	d3.select('#ct-ctrlBox').classed('no-disp',!0);
-	var s=d3.select(activeNode);
+	var s=d3.select(activeNode_W);
 	//513-'Mindmap: When we delete an existing Module and create another module in the same work space  then a new Module instance is being appended .
 	var t=s.attr('data-nodetype');
 	if(t=='modules_endtoend') return;
@@ -570,10 +582,10 @@ var inpChange_W = function(e){
 	} 
 	if(!validNodeDetails(val,this)) return;
 	//if(!validNodeDetails(this)) return;
-	if(childNode!=null){
-		var p=childNode;
+	if(childNode_W!=null){
+		var p=childNode_W;
 	 }else{
-		var p=d3.select(activeNode);
+		var p=d3.select(activeNode_W);
 	}
 	var pi=p.attr('id').split('-')[2];
 		var pt=p.select('.ct-nodeLabel');
@@ -583,23 +595,24 @@ var inpChange_W = function(e){
 		dNodes_W[pi].original_name=p.text();
 		dNodes_W[pi].rnm=!0;
 	} 
-	else{
-		dNodes_W[pi].name=val;
-		pt.text(dNodes_W[pi].name);
-		d3.select('#ct-inpBox').classed('no-disp',!0);
-	}
+	//To fix issue 378: In Mindmap, in End to end flow screen , for scenarios, tootlip is not present.
+	dNodes_W[pi].name=val;
+	pt.text(dNodes_W[pi].name);
+	d3.select('#ct-inpBox').classed('no-disp',!0);
+		
+	
 };
 var inpKeyUp_W = function(e){
 	e=e||window.event;
 	temp_W=[];
 	var t,list;
 	//To fix issue with suggestions
-	if(childNode!=null){
-		var p=childNode;
+	if(childNode_W!=null){
+		var p=childNode_W;
 	 }else{
-		var p=d3.select(activeNode);
+		var p=d3.select(activeNode_W);
 	}
-	//var p=d3.select(activeNode);
+	//var p=d3.select(activeNode_W);
 	var val=d3.select(this).property('value');
 	var iul=d3.select('#ct-inpSugg');
 	if(e.keyCode==13) {
@@ -858,7 +871,7 @@ $(document).on('click', '.createNew-ete', function(e){
 				d3.select('.addScenarios-ete').classed('disableButton',!1);
 				result=JSON.parse(result);
 				result.forEach(function(row){
-					container.append("<span class='eteScenrios' data-scenarioId='"+row.testScenarioID_c+"'>"+row.testScenarioName+"</span>")
+					container.append("<span class='eteScenrios' data-scenarioId='"+row.testScenarioID_c+"' title='"+row.testScenarioName+"'>"+row.testScenarioName+"</span>")
 					//container.append("<div class='sltEteScenario'><input type='checkbox'/><span class='eteScenrios' data-scenarioId='"+row.testScenarioID_c+"'>"+row.testScenarioName+"</span></div>")
 				});				
 			}
@@ -944,7 +957,7 @@ var clearSvg_W = function(){
 
 //FUnction is tagged to every click on 'cnavas' element to validate the names of nodes when created
 var callme=function(){
-	if(childNode != null && (childNode.text()=='Module_0' || childNode.text()=='Screen_0' || childNode.text()=='Scenario_0' || childNode.text()=='Testcase_0')){
+	if(childNode_W != null && (childNode_W.text()=='Module_0' || childNode_W.text()=='Screen_0' || childNode_W.text()=='Scenario_0' || childNode_W.text()=='Testcase_0')){
 		d3.select('#ct-inpBox').classed('no-disp',!1);
 	}
 	
@@ -990,28 +1003,3 @@ var treeBuilder_W = function(tree){
 	zoom_W.translate([(cSize[0]/2)-dNodes_W[0].x,(cSize[1]/5)-dNodes_W[0].y]);
 	zoom_W.event(d3.select('#ct-mapSvg'));
 };
-// var dataSender = function(data,callback){
-// 	var xhttp;
-// 	try{xhttp=new XMLHttpRequest();}catch(e){try{xhttp=new ActiveXObject("Msxml2.XMLHTTP");}catch(e){try{xhttp=new ActiveXObject("Microsoft.XMLHTTP");}catch(e){alert("Your Browser is outdated!\nPlease Update!");return false;}}}
-// 	xhttp.onreadystatechange = function(){4==this.readyState&&(200==this.status?callback(!1,this.responseText):(400==this.status||401==this.status||402==this.status||403==this.status||404==this.status)&&callback(!0,this.responseText));};
-// 	//xhttp.open("POST",window.location.pathname,!0);
-// 	xhttp.open("POST",'/home',!0);
-// 	xhttp.setRequestHeader("Content-Type", "application/json");
-// 	xhttp.send(JSON.stringify(data));
-// };
-
-// //Dialog used through out mindmap
-// function openDialogMindmap(title, body){
-// 	if (window.location.pathname == '/home'){
-// 		$("#mindmapGlobalDialog").find('.modal-title').text(title);
-// 		$("#mindmapGlobalDialog").find('.modal-body p').text(body).css('color','black');
-// 		$("#mindmapGlobalDialog").modal("show");
-// 		setTimeout(function(){
-// 			$("#mindmapGlobalDialog").find('.btn-default').focus();					
-// 		}, 300);
-// 	}else if(window.location.pathname == '/designTestCase' || window.location.pathname == '/design' ||window.location.pathname == '/execute'){
-// 		$("#globalTaskSubmit").modal("show");
-// 	}
-	
-	
-// }
