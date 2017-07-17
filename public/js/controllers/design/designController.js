@@ -2129,7 +2129,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			}
 			// Start of Filter Duplicate Values in ViewString based on custname		
 			var arr;
-			if(newScrapedList.length > 0){
+			if("view" in newScrapedList && newScrapedList.view.length > 0){
 				arr = newScrapedList.view; //Scraped objects obtained after enable append
 				var temp=[];
 				arr=arr.filter((x, i)=> {
