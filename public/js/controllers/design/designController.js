@@ -2129,20 +2129,22 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			}
 			// Start of Filter Duplicate Values in ViewString based on custname		
 			var arr;
-			if("view" in newScrapedList && newScrapedList.view.length > 0){
-				arr = newScrapedList.view; //Scraped objects obtained after enable append
-				var temp=[];
-				arr=arr.filter((x, i)=> {
-					var xpath = x.xpath.split(";");
-					xpath = xpath[0];
-					if (temp.indexOf(xpath) < 0 || xpath == '') {
-						temp.push(xpath);
-						return true;
-					}
-					return false;
-				})
-				newScrapedList.view = arr;
-				console.log("noduplicates", newScrapedList.view);
+			if(newScrapedList != ""){
+				if(newScrapedList.view.length > 0){
+					arr = newScrapedList.view; //Scraped objects obtained after enable append
+					var temp=[];
+					arr=arr.filter((x, i)=> {
+						var xpath = x.xpath.split(";");
+						xpath = xpath[0];
+						if (temp.indexOf(xpath) < 0 || xpath == '') {
+							temp.push(xpath);
+							return true;
+						}
+						return false;
+					})
+					newScrapedList.view = arr;
+					console.log("noduplicates", newScrapedList.view);
+				}
 			}
 			//End of Filter Duplicate Values in ViewString based on custname
 			window.localStorage['disableEditing'] = "false";
