@@ -547,32 +547,7 @@ var recurseTogChild_W = function(d,v){
 		}
 	});
 };
-var validNodeDetails = function(value,p){
-	var nName,flag=!0;
-	nName=value;
-	//var specials=/[*|\":<>[\]{}`\\()'!;@&$~#%^-]/;
-	var regex = /^[a-zA-Z0-9_]*$/;;
-	if (nName.length==0 || nName.length>40|| !(regex.test(nName))){
-		$('#ct-inpAct').addClass('errorClass');
-		flag=!1;
-	}
-	return flag;
-};
 
-var validNodeDetails1 = function(p){
-	var nName,flag=!0;
-	nName=d3.select(p).property('value');
-	if(!(/^[a-zA-Z0-9_]+$/.test(nName))){
-		flag=!1;
-		//d3.select('#dt-c-inp-box a.dt-c-nerror').style('visibility','visible');
-		d3.select(p).classed('ct-inperror',!0);
-	}
-	else{
-		//d3.select('#dt-c-inp-box a.dt-c-nerror').style('visibility','hidden');
-		d3.select(p).classed('ct-inperror',!1);
-	}
-	return flag;
-};
 var inpChange_W = function(e){
 	var inp=d3.select('#ct-inpAct');
 	var val=inp.property('value');

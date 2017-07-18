@@ -1112,7 +1112,7 @@ var validNodeDetails = function(value,p){
 	nName=value;
 	//var specials=/[*|\":<>[\]{}`\\()'!;@&$~#%^-]/;
 	var regex = /^[a-zA-Z0-9_]*$/;;
-	if (nName.length==0 || nName.length>40|| !(regex.test(nName))){
+	if (nName.length==0 || nName.length>40|| nName.indexOf('_')<0 || !(regex.test(nName))){
 		$('#ct-inpAct').addClass('errorClass');
 		flag=!1;
 	}
