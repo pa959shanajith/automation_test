@@ -8,6 +8,10 @@ var cassandra = require('cassandra-driver');
 var dbConnICE = require('../../server/config/icetestautomation');
 var bcrypt = require('bcrypt');
 var async = require('async');
+
+var Client = require("node-rest-client").Client;
+var client = new Client();
+
 //Global Variables
 var roles = [];
 var userRoles = {};
@@ -27,8 +31,9 @@ exports.authenticateUser_Nineteen68 = function(req, res){
             var flag= 'inValidCredential';
 			var assignedProjects = false;
 			var validUser = false;
-			var authUser = "select password from users where username = '"+ req.session.username+"' allow filtering;"
-            //console.log(req);
+			var inputs = {"username":req.session.username};
+			var args = {data:inputs,headers:{"Content-Type" : "application/json"}};
+			// var authUser = "select password from users where username = '"+ req.session.username+"' allow filtering;"
 			checkldapuser(req,function(err,data){
 				if(data){
 					ldapCheck(req,function(err,ldapdata){
@@ -41,8 +46,11 @@ exports.authenticateUser_Nineteen68 = function(req, res){
 						}
 					});
 				}else{
-					dbConn.execute(authUser, function (err, result) {
-					if(err) {
+					// dbConn.execute(authUser, function (err, result) {
+					client.post("http://127.0.0.1:1990/login/authenticateUser_Nineteen68",args,
+						function (result, response) {
+					if(response.statusCode != 200 || result.rows == "fail"){
+					// if(err) {
 						console.log("Error occured in authenticateUser_Nineteen68 : Fail");
 						res.send("fail");
 					}else{
@@ -122,7 +130,10 @@ exports.authenticateUser_Nineteen68_CI = function(req, res){
             req.session.username = username;
             req.session.uniqueId = sessId;
             var flag= 'inValidCredential';
-			var authUser = "select password from users where username = '"+ req.session.username+"' allow filtering;"
+			
+			var inputs = {"username":req.session.username};
+			var args = {data:inputs,headers:{"Content-Type" : "application/json"}};
+			// var authUser = "select password from users where username = '"+ req.session.username+"' allow filtering;"
             //console.log(req);
 			checkldapuser(req,function(err,data){
 				if(data){
@@ -142,8 +153,11 @@ exports.authenticateUser_Nineteen68_CI = function(req, res){
 						}
 					});
 				}else{
-					dbConn.execute(authUser, function (err, result) {
-					if(err) {
+					// dbConn.execute(authUser, function (err, result) {
+					// if(err) {
+					client.post("http://127.0.0.1:1990/login/authenticateUser_Nineteen68",args,
+						function (result, response) {
+					if(response.statusCode != 200 || result.rows == "fail"){
 						console.log("Error occured in authenticateUser_Nineteen68 : Fail");
 						res.setHeader('set-cookie', sessId);
 						res.writeHead(500,{'Content-Type': 'text/plain'});
@@ -243,9 +257,15 @@ var roleid = '';
 var assignedProjectsLen = '';
 async.series({
 getUserId: function(callback){
-		var getUserId = "select userid,defaultrole from users where username = '"+ req.body.username+"' allow filtering;"
-		dbConn.execute(getUserId, function (err, result) {
-					if(err) {
+	
+		// var getUserId = "select userid,defaultrole from users where username = '"+ req.body.username+"' allow filtering;"
+		// dbConn.execute(getUserId, function (err, result) {
+		// 			if(err) {
+		var inputs = {"username":req.session.username, "query":"getUserId"};
+		var args = {data:inputs,headers:{"Content-Type" : "application/json"}};
+		client.post("http://127.0.0.1:1990/login/authenticateUser_Nineteen68/projassigned",args,
+						function (result, response) {
+				if(response.statusCode != 200 || result.rows == "fail"){
 						console.log("Error occured in authenticateUser_Nineteen68 : Fail");
 						res.send("fail");
 					}else{
@@ -257,9 +277,14 @@ getUserId: function(callback){
 },
 getUserRole: function(callback){
 	try{
-	var getUserRole = "select rolename from roles where roleid = "+roleid+" allow filtering;"
-		dbConn.execute(getUserRole, function (err, rolesResult) {
-					if(err) {
+	// var getUserRole = "select rolename from roles where roleid = "+roleid+" allow filtering;"
+	// 	dbConn.execute(getUserRole, function (err, rolesResult) {
+	// 				if(err) {
+		var inputs = {"roleid":roleid, "query":"getUserRole"};
+		var args = {data:inputs,headers:{"Content-Type" : "application/json"}};
+		client.post("http://127.0.0.1:1990/login/authenticateUser_Nineteen68/projassigned",args,
+			function (rolesResult, response) {
+				if(response.statusCode != 200 || rolesResult.rows == "fail"){	
 						console.log("Error occured in authenticateUser_Nineteen68 : Fail");
 						res.send("fail");
 					}else{
@@ -276,19 +301,24 @@ getUserRole: function(callback){
 },
  getAssignedProjects: function(callback){
 	try{
-	  var getAssignedProjects = "select projectids from icepermissions where userid = "+userid+" allow filtering;"
-	  dbConnICE.execute(getAssignedProjects, function (err, projectsResult) {
-					if(err) {
+	//   var getAssignedProjects = "select projectids from icepermissions where userid = "+userid+" allow filtering;"
+	//   dbConnICE.execute(getAssignedProjects, function (err, projectsResult) {
+	// 				if(err) {
+		var inputs = {"userid":userid, "query":"getAssignedProjects"};
+		var args = {data:inputs,headers:{"Content-Type" : "application/json"}};
+		client.post("http://127.0.0.1:1990/login/authenticateUser_Nineteen68/projassigned",args,
+					function (projectsResult, response) {
+						if(response.statusCode != 200 || projectsResult.rows == "fail"){	
 						console.log("Error occured in authenticateUser_Nineteen68 : Fail");
 						res.send("fail");
 					}else{
-						if(projectsResult.rowLength > 0)
+						if(projectsResult.rows.length > 0)
 						{
 							assignedProjectsLen = projectsResult.rows[0].projectids.length;
 							callback(null,assignedProjectsLen,rolename);
 						}
 						else{
-							assignedProjectsLen = projectsResult.rowLength;
+							assignedProjectsLen = projectsResult.rows.length;
 							callback(null,assignedProjectsLen,rolename);
 						}
 					}
@@ -352,10 +382,15 @@ function checkuserexists(req,callback,data){
 */
 function checkldapuser(req,callback,data){
 	var flag = false;
-	var authUser = "select ldapuser from users where username = '"+ req.session.username+"' allow filtering;"
+	// var authUser = "select ldapuser from users where username = '"+ req.session.username+"' allow filtering;"
             //console.log(req);
-	dbConn.execute(authUser, function (err, result) {
-		if(err) {
+	// dbConn.execute(authUser, function (err, result) {
+		var inputs = {"username":req.session.username};
+		var args = {data:inputs,headers:{"Content-Type" : "application/json"}};
+		client.post("http://127.0.0.1:1990/login/authenticateUser_Nineteen68/ldap",args,
+					function (result, response) {
+		// if(err) {
+		if(response.statusCode != 200 || result.rows == "fail"){
 			console.log("Error occured in authenticateUser_Nineteen68 : Fail");
 			callback(null,flag);
 		}else{
@@ -436,9 +471,14 @@ exports.loadUserInfo_Nineteen68 = function(req, res){
 	      async.series({
 	            userInfo: function(callback){
 	            	try{
-	            		var getUserInfo = "select userid, emailid, firstname, lastname, defaultrole, additionalroles, username from users where username = '"+userName+"' allow filtering";
-	                    dbConn.execute(getUserInfo, function (err, userResult) {
-	                		if (err){
+	            		// var getUserInfo = "select userid, emailid, firstname, lastname, defaultrole, additionalroles, username from users where username = '"+userName+"' allow filtering";
+	                    // dbConn.execute(getUserInfo, function (err, userResult) {
+	                	// 	if (err){
+						var inputs = {"username": userName,"query":"userInfo"};
+						var args = {data:inputs,headers:{"Content-Type" : "application/json"}};
+						client.post("http://127.0.0.1:1990/login/loadUserInfo_Nineteen68",args,
+							function (userResult, response) {
+							if(response.statusCode != 200 || userResult.rows == "fail"){	
 	                			var flag = "fail";
 	                			console.log("Failed to get user details from users.");
 	                			res.send(flag);
@@ -479,9 +519,15 @@ exports.loadUserInfo_Nineteen68 = function(req, res){
 	            	}
 	            },
 			 loggedinRole: function(callback){
-				 var getRoleInfo = "select rolename from roles where roleid = "+req.session.defaultRoleId +" allow filtering";
-					dbConn.execute(getRoleInfo, function (err, rolesResult) {
-						if(err){
+				
+				//  var getRoleInfo = "select rolename from roles where roleid = "+req.session.defaultRoleId +" allow filtering";
+				// 	dbConn.execute(getRoleInfo, function (err, rolesResult) {
+				// 		if(err){
+					var inputs = {"roleid": req.session.defaultRoleId, "query":"loggedinRole"}
+					var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
+					client.post("http://127.0.0.1:1990/login/loadUserInfo_Nineteen68",args,
+								function (rolesResult, response) {
+						if(response.statusCode != 200 || rolesResult.rows == "fail"){	
 							console.log("Error occured in getRoleNameByRoleId_Nineteen68 : Fail");
 							res.send("fail");
 						}else{
@@ -512,9 +558,14 @@ exports.loadUserInfo_Nineteen68 = function(req, res){
 	          //Service call to get the plugins accessible for the user
 	            userPlugins: function(callback){
 	            	try{
-	            		var getUserPlugins = "select dashboard,deadcode,mindmap,neuron2d,neuron3d,oxbowcode,reports from userpermissions WHERE roleid = "+jsonService.role+" allow filtering";
-	                	dbConn.execute(getUserPlugins, function(err, pluginResult){
-	                		if(err){
+	            		// var getUserPlugins = "select dashboard,deadcode,mindmap,neuron2d,neuron3d,oxbowcode,reports from userpermissions WHERE roleid = "+jsonService.role+" allow filtering";
+	                	// dbConn.execute(getUserPlugins, function(err, pluginResult){
+	                	// 	if(err){
+						var inputs = {"roleid": jsonService.role, "query":"userPlugins"}
+						var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
+						client.post("http://127.0.0.1:1990/login/loadUserInfo_Nineteen68",args,
+								function (pluginResult, response) {
+							if(response.statusCode != 200 || pluginResult.rows == "fail"){
 	                			console.log("Error occured in loadUserInfo_Nineteen68 : Fail");
 	                			res.send("fail");
 	                		}
@@ -525,13 +576,13 @@ exports.loadUserInfo_Nineteen68 = function(req, res){
 								    var pluginsArr = [];
 								    var count = 0;
 								    for(var k in pluginResult.rows[0]){
-								    	if(count < pluginResult.columns.length){
+								    	// if(count < pluginResult.columns.length){
 								    		pluginsArr.push({
 								    			"keyName" : k,
 								    			"keyValue" : (pluginResult.rows[0])[k]
 								    		})
-								    		count++;
-								    	}
+								    	// 	count++;
+								    	// }
 								    }
 		                			//userpermissiondetails.push(pluginResult.rows[0]);
 		                			jsonService.plugindetails = pluginsArr
@@ -585,9 +636,14 @@ exports.getRoleNameByRoleId_Nineteen68 = function(req, res){
 		{
            var roleId= req.body.role;
            var flag="";
-           var getRoleInfo = "select rolename from roles where roleid = "+roleId+" allow filtering";
-           dbConn.execute(getRoleInfo, function (err, rolesResult) {
-                 if(err){
+        //    var getRoleInfo = "select rolename from roles where roleid = "+roleId+" allow filtering";
+        //    dbConn.execute(getRoleInfo, function (err, rolesResult) {
+        //          if(err){
+			var inputs = {"roleid": roleId}
+			var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
+			client.post("htt;p://127.0.0.1:1990/login/getRoleNameByRoleId_Nineteen68",args,
+					function (rolesResult, response) {
+				if(response.statusCode != 200 || rolesResult.rows == "fail"){	
                        console.log("Error occured in getRoleNameByRoleId_Nineteen68 : Fail");
                        res.send("fail");
                  }else{
