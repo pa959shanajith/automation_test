@@ -1266,10 +1266,22 @@ exports.readTestCase_ICE = function (req, res) {
 		var testcasesteps = "";
 		var testcasename = "";
 		var template = "";
-		// base request elements
-		var requestedscreenid = req.body.screenid;
-		var requestedtestscasename=req.body.testcasename;
+		
+		// base request elements 		
+		var requestedscreenid = req.body.screenid; 		
+		var requestedtestscasename=req.body.testcasename; 		
 		var requestedtestscaseid = req.body.testcaseid;
+
+		// base request elements sent in request
+		inputs={"screenid": requestedscreenid,
+			"testcasename":requestedtestscasename,
+			"testcaseid" : requestedtestscaseid,
+            "versionnumber" : 1}
+		var args = {
+					data:inputs,
+					headers:{"Content-Type" : "application/json"}
+				}
+
 		// var requestedversionnumber = req.body.versionnumber;
 		 var requestedversionnumber = 1;
 		//complete response data
@@ -1278,14 +1290,19 @@ exports.readTestCase_ICE = function (req, res) {
 			testcase: "",
 			testcasename: ""
 		};
+		
+		// var getTestCases = "select testcasesteps,testcasename from testcases where screenid= " + requestedscreenid +
+		// 				" and testcasename='"+requestedtestscasename+"'" +
+		// 				" and versionnumber="+requestedversionnumber+
+		// 	" and testcaseid=" + requestedtestscaseid;
+		// dbConn.execute(getTestCases, function (err, result) {
+
 		//Query 1 fetching the testcasesteps from the test cases based on requested screenid,testcasename,testcaseid
-		var getTestCases = "select testcasesteps,testcasename from testcases where screenid= " + requestedscreenid +
-						" and testcasename='"+requestedtestscasename+"'" +
-						" and versionnumber="+requestedversionnumber+
-			" and testcaseid=" + requestedtestscaseid;
-		dbConn.execute(getTestCases, function (err, result) {
+		client.post("http://127.0.0.1:1990/design/readTestCase_ICE",args,
+						function (result, response) {
 			try{
-				if (err) {
+				if(response.statusCode != 200 || result.rows == "fail"){
+				// if (err) {
 					var flag = "Error in readTestCase_ICE : Fail";
 					try{
 						res.send(flag);
@@ -1935,7 +1952,7 @@ exports.getKeywordDetails_ICE = function getKeywordDetails_ICE(req, res) {
 						function (projectBasedKeywordsresult, response) {
 				try{
 					// if (errProjectBasedKeywords) {
-					if (response.statusCode != 200) {
+					if (response.statusCode != 200 || projectBasedKeywordsresult.rows == "fail") {
 						flag = "Server data rendering failed: Fail";
 						try{
 							res.send(flag);

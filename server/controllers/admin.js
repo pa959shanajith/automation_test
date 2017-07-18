@@ -38,7 +38,7 @@ exports.getUserRoles_Nineteen68 = function(req, res){
 		client.post("http://127.0.0.1:1990/admin/getUserRoles_Nineteen68",
 						function (result, response) {
 			// if (err) {
-			if (response.statusCode != 200) {
+			if (response.statusCode != 200 || result.rows == "fail") {
 				res.send("fail");
 			}
 			else {

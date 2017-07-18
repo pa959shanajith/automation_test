@@ -1,7 +1,7 @@
 var screenshotObj,scrapedGlobJson,enableScreenShotHighlight,mirrorObj, eaCheckbox, finalViewString, scrapedData, deleteFlag, globalSelectedBrowserType,selectedKeywordList,keywordListData,dependentTestCaseFlag = false;checkedTestcases = []; pasteSelecteStepNo = [];
 var initScraping = {}; var mirrorObj = {}; var scrapeTypeObj = {}; var newScrapedList; var viewString = {}; var scrapeObject = {}; var screenViewObject = {}; var readTestCaseData; var getRowJsonCopy;
 var selectRowStepNoFlag = false; //var deleteStep = false;
-var dataFormat12, getScrapeDataforCustomObj;
+var dataFormat12, getScrapeDataforCustomObj, deleteScrapeDataservice = true;
 var getAllAppendedObj; //Getting all appended scraped objects
 var gsElement = []; window.localStorage['selectRowStepNo'] = '';
 var getWSTemplateData = {} //Contains Webservice saved data
@@ -746,7 +746,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					$("#enableAppend").prop("disabled", false).css('cursor','pointer')
 				}
 				//console.log("response data: ", viewString);
-				$("#finalScrap").append("<div id='scrapTree' class='scrapTree'><ul><li><span class='parentObjContainer'><input title='Select all' type='checkbox' class='checkStylebox'><span class='parentObject'><a id='aScrapper'>Select all </a><button id='saveObjects' class='btn btn-xs btn-xs-custom objBtn' style='margin-left: 10px' data-toggle='tooltip' title='Save Objects'>Save</button><button data-toggle='modal' id='deleteObjects' data-target='#deleteObjectsModal' class='btn btn-xs btn-xs-custom objBtn' style='margin-right: 0' data-toggle='tooltip' title='Delete Objects' disabled>Delete</button></span><span></span></span><ul id='scraplist' class='scraplistStyle'></ul></li></ul></div>");
+				$("#finalScrap").append("<div id='scrapTree' class='scrapTree'><ul><li><span class='parentObjContainer'><input title='Select all' type='checkbox' class='checkStylebox'><span class='parentObject'><a id='aScrapper'>Select all </a><button id='saveObjects' class='btn btn-xs btn-xs-custom objBtn' style='margin-left: 10px' data-toggle='tooltip' title='Save Objects'>Save</button><button data-toggle='modal' id='deleteObjects' data-target='#deleteObjectsModal' class='btn btn-xs btn-xs-custom objBtn' style='margin-right: 0' data-toggle='tooltip' title='Delete Objects' disabled>Delete</button></span><span class='searchScrapEle'><img src='imgs/ic-search-icon.png'></input></span><span><input type='text' class='searchScrapInput'></span></span><ul id='scraplist' class='scraplistStyle'></ul></li></ul></div>");
 				$("#saveObjects").attr('disabled', true);
 				var custN;
 				var imgTag, addcusOb;
@@ -1410,10 +1410,10 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			//For Web
 			DesignServices.initScraping_ICE(screenViewObject)
 			.then(function (data) {
-					if(data == "Invalid Session")
-			{
-				window.location.href = "/";
-			}
+				if(data == "Invalid Session")
+				{
+					window.location.href = "/";
+				}
 				window.localStorage['disableEditing'] = "true";
 				unblockUI();
 				if(data == "Response Body exceeds max. Limit.")
@@ -1449,7 +1449,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				$("#window-scrape-screenshot .popupContent, #window-scrape-screenshotTs .popupContent").empty()
 				$("#window-scrape-screenshot .popupContent, #window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrape"><img id="screenshot" src="data:image/PNG;base64,'+viewString.mirror+'" /></div>')
 				$("#finalScrap").empty()
-				$("#finalScrap").append("<div id='scrapTree' class='scrapTree'><ul><li><span class='parentObjContainer'><input title='Select all' type='checkbox' class='checkStylebox' disabled /><span class='parentObject'><a id='aScrapper'>Select all </a><button id='saveObjects' class='btn btn-xs btn-xs-custom objBtn' style='margin-left: 10px'>Save</button><button data-toggle='modal' id='deleteObjects' data-target='#deleteObjectsModal' class='btn btn-xs btn-xs-custom objBtn' style='margin-right: 0' disabled>Delete</button></span><span></span></span><ul id='scraplist' class='scraplistStyle'></ul></li></ul></div>");
+				$("#finalScrap").append("<div id='scrapTree' class='scrapTree'><ul><li><span class='parentObjContainer'><input title='Select all' type='checkbox' class='checkStylebox'/><span class='parentObject'><a id='aScrapper'>Select all </a><button id='saveObjects' class='btn btn-xs btn-xs-custom objBtn' style='margin-left: 10px'>Save</button><button data-toggle='modal' id='deleteObjects' data-target='#deleteObjectsModal' class='btn btn-xs btn-xs-custom objBtn' style='margin-right: 0' disabled>Delete</button></span><span></span></span><ul id='scraplist' class='scraplistStyle'></ul></li></ul></div>");
 				var innerUL = $("#finalScrap").children('#scrapTree').children('ul').children().children('#scraplist');
 
 				console.log("data", viewString);
@@ -1466,10 +1466,10 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 						else if(tag == "textbox/textarea"){imgTag = "input"}
 						else imgTag = tag;
 						if(tag == "a" || tag == "input" || tag == "table" || tag == "list" || tag == "select" || tag == "img" || tag == "button" || tag == "radiobutton" || tag == "checkbox" || tag == "tablecell"){
-							var li = "<li data-xpath='"+ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"' data-left='"+ob.left+"' data-top='"+ob.top+"' data-width='"+ob.width+"' data-height='"+ob.height+"' data-tag='"+tag+"' data-url='"+ob.url+"' data-hiddentag='"+ob.hiddentag+"' class='item select_all "+tag+"x' val="+ob.tempId+"><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' disabled /><span title='"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;')+"' class='ellipsis'>"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"</span></a></li>";
+							var li = "<li data-xpath='"+ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"' data-left='"+ob.left+"' data-top='"+ob.top+"' data-width='"+ob.width+"' data-height='"+ob.height+"' data-tag='"+tag+"' data-url='"+ob.url+"' data-hiddentag='"+ob.hiddentag+"' class='item select_all "+tag+"x' val="+ob.tempId+"><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;')+"' class='ellipsis'>"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"</span></a></li>";
 						} 
 						else {
-							var li = "<li data-xpath='"+ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"' data-left='"+ob.left+"' data-top='"+ob.top+"' data-width='"+ob.width+"' data-height='"+ob.height+"' data-tag='"+tag+"' data-url='"+ob.url+"' data-hiddentag='"+ob.hiddentag+"' class='item select_all "+tag+"x' val="+ob.tempId+"><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' disabled /><span title='"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;')+"' class='ellipsis'>"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"</span></a></li>";
+							var li = "<li data-xpath='"+ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"' data-left='"+ob.left+"' data-top='"+ob.top+"' data-width='"+ob.width+"' data-height='"+ob.height+"' data-tag='"+tag+"' data-url='"+ob.url+"' data-hiddentag='"+ob.hiddentag+"' class='item select_all "+tag+"x' val="+ob.tempId+"><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;')+"' class='ellipsis'>"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"</span></a></li>";
 						}
 						angular.element(innerUL).append(li)
 					}
@@ -1494,16 +1494,16 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 							var tag2;
 
 							if(tag == "a" || tag == "input" || tag == "table" || tag == "list" || tag == "select" || tag == "img" || tag == "button" || tag == "radiobutton" || tag == "checkbox" || tag == "tablecell"){
-								var li = "<li data-xpath='"+ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"' data-left='"+ob.left+"' data-top='"+ob.top+"' data-width='"+ob.width+"' data-height='"+ob.height+"' data-tag='"+tag+"' data-url='"+ob.url+"' data-hiddentag='"+ob.hiddentag+"' class='item select_all "+tag+"x' val="+tempId+"><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' disabled /><span title='"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;')+"' class='ellipsis'>"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"</span></a></li>";
+								var li = "<li data-xpath='"+ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"' data-left='"+ob.left+"' data-top='"+ob.top+"' data-width='"+ob.width+"' data-height='"+ob.height+"' data-tag='"+tag+"' data-url='"+ob.url+"' data-hiddentag='"+ob.hiddentag+"' class='item select_all "+tag+"x' val="+tempId+"><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;')+"' class='ellipsis'>"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"</span></a></li>";
 							} 
 							else {
-								var li = "<li data-xpath='"+ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"' data-left='"+ob.left+"' data-top='"+ob.top+"' data-width='"+ob.width+"' data-height='"+ob.height+"' data-tag='"+tag+"' data-url='"+ob.url+"' data-hiddentag='"+ob.hiddentag+"' class='item select_all "+tag+"x' val="+tempId+"><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' disabled /><span title='"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;')+"' class='ellipsis'>"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"</span></a></li>";
+								var li = "<li data-xpath='"+ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"' data-left='"+ob.left+"' data-top='"+ob.top+"' data-width='"+ob.width+"' data-height='"+ob.height+"' data-tag='"+tag+"' data-url='"+ob.url+"' data-hiddentag='"+ob.hiddentag+"' class='item select_all "+tag+"x' val="+tempId+"><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;')+"' class='ellipsis'>"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"</span></a></li>";
 							}
 							angular.element(innerUL).append(li)
-							newScrapedList.view.push(viewString.view[i]);
+							//newScrapedList.view.push(viewString.view[i]);
 						}
-						newScrapedList.mirror = viewString.mirror;
-						newScrapedList.scrapetype = viewString.scrapetype;
+						//newScrapedList.mirror = viewString.mirror;
+						//newScrapedList.scrapetype = viewString.scrapetype;
 					}
 					//Getting appended scraped object irrespective to the dynamic value
 				}
@@ -1513,7 +1513,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				else{
 					//Before Saving the Scrape JSON to the Database
 					for (var i = 0; i < viewString.view.length; i++) {
-						
+
 						var innerUL = $("#finalScrap").children('#scrapTree').children('ul').children().children('#scraplist');
 						var path = viewString.view[i].xpath;
 						var ob = viewString.view[i];
@@ -1526,10 +1526,10 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 						var tag1 = tag.replace(/ /g, "_");
 						var tag2;
 						if(tag == "a" || tag == "input" || tag == "table" || tag == "list" || tag == "select" || tag == "img" || tag == "button" || tag == "radiobutton" || tag == "checkbox" || tag == "tablecell"){
-							var li = "<li data-xpath='"+ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"' data-left='"+ob.left+"' data-top='"+ob.top+"' data-width='"+ob.width+"' data-height='"+ob.height+"' data-tag='"+tag+"' data-url='"+ob.url+"' data-hiddentag='"+ob.hiddentag+"' class='item select_all "+tag+"x' val="+ob.tempId+"><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' disabled /><span title='"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;')+"' class='ellipsis'>"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"</span></a></li>";
+							var li = "<li data-xpath='"+ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"' data-left='"+ob.left+"' data-top='"+ob.top+"' data-width='"+ob.width+"' data-height='"+ob.height+"' data-tag='"+tag+"' data-url='"+ob.url+"' data-hiddentag='"+ob.hiddentag+"' class='item select_all "+tag+"x' val="+ob.tempId+"><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;')+"' class='ellipsis'>"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"</span></a></li>";
 						} 
 						else {
-							var li = "<li data-xpath='"+ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"' data-left='"+ob.left+"' data-top='"+ob.top+"' data-width='"+ob.width+"' data-height='"+ob.height+"' data-tag='"+tag+"' data-url='"+ob.url+"' data-hiddentag='"+ob.hiddentag+"' class='item select_all "+tag+"x' val="+ob.tempId+"><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' disabled /><span title='"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;')+"' class='ellipsis'>"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"</span></a></li>";
+							var li = "<li data-xpath='"+ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"' data-left='"+ob.left+"' data-top='"+ob.top+"' data-width='"+ob.width+"' data-height='"+ob.height+"' data-tag='"+tag+"' data-url='"+ob.url+"' data-hiddentag='"+ob.hiddentag+"' class='item select_all "+tag+"x' val="+ob.tempId+"><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;')+"' class='ellipsis'>"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"</span></a></li>";
 						}
 						angular.element(innerUL).append(li);
 					}
@@ -1546,9 +1546,13 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					editable: true,
 					radio: true
 				});   
-				
+
 				//Build Scrape Tree using dmtree.scrapper.js file
-				if(viewString.view.length > 0) $("#saveObjects").removeClass('hide');
+				if(viewString.view.length > 0){
+					$("#saveObjects").removeClass('hide');
+					$("#deleteObjects").prop("disabled", false);
+					deleteScrapeDataservice = false;
+				}
 				else $("#saveObjects").addClass('hide');
 			}, function (error) { console.log("Fail to Load design_ICE") });
 		}
@@ -1557,62 +1561,116 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 //To delete Scrape Objects 
 	$scope.del_Objects = function() 
 	{
-		$("#deleteObjectsModal").modal("hide")
-		var userinfo = JSON.parse(window.localStorage['_UI']);
-		//var tasks = JSON.parse(window.localStorage['_TJ']);
-		var tasks = JSON.parse(window.localStorage['_CT']);
-		var delList = {};
-		var deletedCustNames = [];
-		var deletedCustPath = [];
+		$("#deleteObjectsModal").modal("hide");
+		if(deleteScrapeDataservice){
+			var userinfo = JSON.parse(window.localStorage['_UI']);
+			//var tasks = JSON.parse(window.localStorage['_TJ']);
+			var tasks = JSON.parse(window.localStorage['_CT']);
+			var delList = {};
+			var deletedCustNames = [];
+			var deletedCustPath = [];
 
-		var checkCondLen = $("#scraplist li").children('a').find('input[type=checkbox].checkall:checked').length;
-		if(checkCondLen > 0)
-		{		
-			$('input[type=checkbox].checkall:checked').each(function() {
-				var id = $(this).parent().attr('id').split("_");
-				id = id[1];
-				deletedCustNames.push(viewString.view[id].custname);
-				deletedCustPath.push(viewString.view[id].xpath);
-				// console.log(viewString.view[id])
-			});	
-			delList.deletedCustName = deletedCustNames;
-			delList.deletedXpath = deletedCustPath;
-			//console.log(deletedCustNames);
-		}
-		//console.log("Delete", viewString);
-	    var screenId = tasks.screenId;
-	    var screenName = tasks.screenName;
-		var projectId = tasks.projectId;
-		scrapeObject = {};
-		scrapeObject.param = 'deleteScrapeData_ICE';
-		scrapeObject.getScrapeData = viewString;
-	    scrapeObject.projectId = projectId;
-	    scrapeObject.screenId = screenId;
-	    scrapeObject.screenName = screenName;
-		scrapeObject.deletedList = delList;
-		scrapeObject.userinfo = userinfo;
-		DesignServices.updateScreen_ICE(scrapeObject)
-		.then(function(data) {
-				if(data == "Invalid Session")
-			{
-				window.location.href = "/";
+			var checkCondLen = $("#scraplist li").children('a').find('input[type=checkbox].checkall:checked').length;
+			if(checkCondLen > 0)
+			{		
+				$('input[type=checkbox].checkall:checked').each(function() {
+					var id = $(this).parent().attr('id').split("_");
+					id = id[1];
+					deletedCustNames.push(viewString.view[id].custname);
+					deletedCustPath.push(viewString.view[id].xpath);
+					// console.log(viewString.view[id])
+				});	
+				delList.deletedCustName = deletedCustNames;
+				delList.deletedXpath = deletedCustPath;
+				//console.log(deletedCustNames);
 			}
-			if(data == "success")
-			{
-				openDialog("Delete Scrape Objects", "Scraped Objects deleted successfully.")
-                deleteFlag = true;
-				$(".checkStylebox").prop("checked", false);
-                angular.element(document.getElementById("left-nav-section")).scope().getScrapeData();	
+			//console.log("Delete", viewString);
+		    var screenId = tasks.screenId;
+		    var screenName = tasks.screenName;
+			var projectId = tasks.projectId;
+			scrapeObject = {};
+			scrapeObject.param = 'deleteScrapeData_ICE';
+			scrapeObject.getScrapeData = viewString;
+		    scrapeObject.projectId = projectId;
+		    scrapeObject.screenId = screenId;
+		    scrapeObject.screenName = screenName;
+			scrapeObject.deletedList = delList;
+			scrapeObject.userinfo = userinfo;
+			DesignServices.updateScreen_ICE(scrapeObject)
+			.then(function(data) {
+				if(data == "Invalid Session")
+				{
+					window.location.href = "/";
+				}
+				if(data == "success")
+				{
+					openDialog("Delete Scrape Objects", "Scraped Objects deleted successfully.")
+	                deleteFlag = true;
+					$(".checkStylebox").prop("checked", false);
+	                angular.element(document.getElementById("left-nav-section")).scope().getScrapeData();	
+				}
+				else{
+					openDialog("Delete Scrape Objects", "Scraped Objects fail to delete.")
+	                deleteFlag = false;
+				}
+				//Service to be integrated as it has dependency of ($scope.newTestScriptDataLS)
+			}, function(error) {
+
+			});
+		}
+		else{
+			if(!$("input[type=checkbox].checkall").is(":checked")){
+				openDialog("Delete Scrape data", "Please select objects to delete.")
 			}
 			else{
-				openDialog("Delete Scrape Objects", "Scraped Objects fail to delete.")
-                deleteFlag = false;
+				$.each($("input[type=checkbox].checkall:checked"), function(){
+					for (var i = 0; i < viewString.view.length; i++) {
+						if($(this).parents("li").data("xpath") == viewString.view[i].xpath && $(this).parent('.objectNames').siblings(".ellipsis").text().trim() == viewString.view[i].custname.trim()){
+							viewString.view.splice(viewString.view.indexOf(viewString.view[i]), 1);
+							$(this).parents("li.select_all").remove();
+							break;
+						}
+					}
+				})
+				if($("input[type=checkbox].checkall:checked").length > 0){
+					$.each($("input[type=checkbox].checkall:checked"), function(){
+						for (var i = 0; i < newScrapedList.view.length; i++) {
+							if($(this).parents("li").data("xpath") == newScrapedList.view[i].xpath && $(this).parent('.objectNames').siblings(".ellipsis").text().trim() == newScrapedList.view[i].custname.trim()){
+								newScrapedList.view.splice(newScrapedList.view.indexOf(newScrapedList.view[i]), 1);
+								$(this).parents("li.select_all").remove();
+								break;
+							}
+						}
+					})
+				}
 			}
-			//Service to be integrated as it has dependency of ($scope.newTestScriptDataLS)
-		}, function(error) {
-
-		});
+		}
+		
 	}
+	
+	var showSearchBox = true;
+	//Search scraped objects
+	$(document).on("click", ".searchScrapEle", function(){
+		if(showSearchBox){
+			$(".searchScrapInput").show(); 
+			showSearchBox=false;
+			$(".searchScrapInput").focus();
+		}
+		else{$(".searchScrapInput").hide(); showSearchBox=true;}
+	})
+	
+	//Search Scrape objects filter
+	$(document).on('keyup', '.searchScrapInput', function() {		
+		var value = $(this).val();
+		$(".select_all").each(function () {
+			if ($(this).find("span.ellipsis").text().toLowerCase().indexOf(value.toLowerCase()) > -1) {
+				$(this).show();
+			} else {
+				$(this).hide();
+			}
+		});
+	});
+	
 	//Highlight Element on browser
 	$scope.highlightScrapElement = function(xpath,url) {
 		var appType = $scope.getScreenView;
@@ -2044,108 +2102,134 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 	
 	//Save Scrape Objects
 	$(document).on('click', "#saveObjects", function(){
-		// Start of Filter Duplicate Values in ViewString based on custname
-		var arr;
-		if(newScrapedList.length > 0){
-			arr = newScrapedList.view; //Scraped objects obtained after enable append
-			var temp=[];
-			arr=arr.filter((x, i)=> {
-				var xpath = x.xpath.split(";");
-				xpath = xpath[0];
-				if (temp.indexOf(xpath) < 0 || xpath == '') {
-					temp.push(xpath);
-					return true;
+		if(!$(".checkall").is(":checked")){
+			openDialog("Save Scrape data", "Please select objects to save.")
+		}
+		else{
+			var checkedData = $("input[type='checkbox'].checkall:checked");
+			if(checkedData.length > 0 && (viewString.view.length != checkedData.length)){
+				var sltdListData = [];
+				$.each(checkedData, function(){
+					for (var i = 0; i < viewString.view.length; i++) {
+						if($(this).parents("li").data("xpath") == viewString.view[i].xpath && $(this).parent('.objectNames').siblings(".ellipsis").text() == viewString.view[i].custname.trim()){
+							sltdListData.push(viewString.view[i]);
+							//viewString.view.splice(viewString.view.indexOf(viewString.view[i]), 1);
+							break;
+						}
+					}
+				})
+				viewString.view = sltdListData;
+			}
+			if(eaCheckbox){
+				for (var j = 0; j < viewString.view.length; j++) {
+					newScrapedList.view.push(viewString.view[j]);
 				}
-				return false;
-			})
-			newScrapedList.view = arr;
-			console.log("noduplicates", newScrapedList.view);
-		}
-		//End of Filter Duplicate Values in ViewString based on custname
-		window.localStorage['disableEditing'] = "false";
-		//var tasks = JSON.parse(window.localStorage['_TJ']);
-		var tasks = JSON.parse(window.localStorage['_CT'])
-		if(eaCheckbox) var getScrapeData = JSON.stringify(newScrapedList);
-		else var getScrapeData = JSON.stringify(viewString);		
-		var screenId = tasks.screenId;
-		var screenName = tasks.screenName;
-		var projectId = tasks.projectId;
-		var userinfo = JSON.parse(window.localStorage['_UI']);
-		scrapeObject = {};
-		scrapeObject.getScrapeData = getScrapeData;
-		scrapeObject.projectId = projectId;
-		scrapeObject.screenId = screenId;
-		scrapeObject.screenName = screenName;
-		scrapeObject.userinfo = userinfo;
-		scrapeObject.param = "updateScrapeData_ICE";
-		scrapeObject.appType = tasks.appType;
-		
-		if(window.localStorage['checkEditWorking'] == "true")
-		{
-			console.log("inside edit");
-			var modifiedCust = JSON.parse(window.localStorage['_modified']);
-			var currlistItems = [];
-        	var modifiedListItems = [];
-        	var modList = [];
-        	var screenId = tasks.screenId;
-        	var userinfo = JSON.parse(window.localStorage['_UI']);
-        	getScrapeData = JSON.parse(getScrapeData);
-        	scrapeObject.projectId = projectId;
-    		scrapeObject.screenId = screenId;
-    		scrapeObject.screenName = screenName;
-    		scrapeObject.userinfo = userinfo;
-        	scrapeObject.param = "editScrapeData_ICE";
-        	scrapeObject.appType = tasks.appType;
-        	for(i=0; i<getScrapeData.view.length; i++){
-        		currlistItems.push(getScrapeData.view[i].custname);
-        	}
-        	$(".ellipsis").children().parent().parent().parent().remove();
-        	$.each($(".ellipsis"), function(){            
-    			modifiedListItems.push($(this).text());
-    		});
-    		for(i=0; i<modifiedListItems.length; i++){
-    			if(modifiedListItems[i] != "" || modifiedListItems[i] != undefined){
-    				modList.push(modifiedListItems[i])
-    			}
-    		}
-    		scrapeObject.getScrapeData = getScrapeData; 
-    		scrapeObject.editedList = modifiedCust; 
-		}
-		
-		//Update Service to Save Scrape Objects
-		DesignServices.updateScreen_ICE(scrapeObject)
-		.then(function(data){
-				if(data == "Invalid Session")
+				newScrapedList.mirror = viewString.mirror;
+				newScrapedList.scrapetype = viewString.scrapetype;
+			}
+			// Start of Filter Duplicate Values in ViewString based on custname		
+			var arr;
+			if("view" in newScrapedList && newScrapedList.view.length > 0){
+				arr = newScrapedList.view; //Scraped objects obtained after enable append
+				var temp=[];
+				arr=arr.filter((x, i)=> {
+					var xpath = x.xpath.split(";");
+					xpath = xpath[0];
+					if (temp.indexOf(xpath) < 0 || xpath == '') {
+						temp.push(xpath);
+						return true;
+					}
+					return false;
+				})
+				newScrapedList.view = arr;
+				console.log("noduplicates", newScrapedList.view);
+			}
+			//End of Filter Duplicate Values in ViewString based on custname
+			window.localStorage['disableEditing'] = "false";
+			//var tasks = JSON.parse(window.localStorage['_TJ']);
+			var tasks = JSON.parse(window.localStorage['_CT'])
+			if(eaCheckbox) var getScrapeData = JSON.stringify(newScrapedList);
+			else var getScrapeData = JSON.stringify(viewString);		
+			var screenId = tasks.screenId;
+			var screenName = tasks.screenName;
+			var projectId = tasks.projectId;
+			var userinfo = JSON.parse(window.localStorage['_UI']);
+			scrapeObject = {};
+			scrapeObject.getScrapeData = getScrapeData;
+			scrapeObject.projectId = projectId;
+			scrapeObject.screenId = screenId;
+			scrapeObject.screenName = screenName;
+			scrapeObject.userinfo = userinfo;
+			scrapeObject.param = "updateScrapeData_ICE";
+			scrapeObject.appType = tasks.appType;
+			
+			if(window.localStorage['checkEditWorking'] == "true")
 			{
-				window.location.href = "/";
+				console.log("inside edit");
+				var modifiedCust = JSON.parse(window.localStorage['_modified']);
+				var currlistItems = [];
+	        	var modifiedListItems = [];
+	        	var modList = [];
+	        	var screenId = tasks.screenId;
+	        	var userinfo = JSON.parse(window.localStorage['_UI']);
+	        	getScrapeData = JSON.parse(getScrapeData);
+	        	scrapeObject.projectId = projectId;
+	    		scrapeObject.screenId = screenId;
+	    		scrapeObject.screenName = screenName;
+	    		scrapeObject.userinfo = userinfo;
+	        	scrapeObject.param = "editScrapeData_ICE";
+	        	scrapeObject.appType = tasks.appType;
+	        	for(i=0; i<getScrapeData.view.length; i++){
+	        		currlistItems.push(getScrapeData.view[i].custname);
+	        	}
+	        	$(".ellipsis").children().parent().parent().parent().remove();
+	        	$.each($(".ellipsis"), function(){            
+	    			modifiedListItems.push($(this).text());
+	    		});
+	    		for(i=0; i<modifiedListItems.length; i++){
+	    			if(modifiedListItems[i] != "" || modifiedListItems[i] != undefined){
+	    				modList.push(modifiedListItems[i])
+	    			}
+	    		}
+	    		scrapeObject.getScrapeData = getScrapeData; 
+	    		scrapeObject.editedList = modifiedCust; 
 			}
-			if(data == "success"){
-				window.localStorage['_modified'] = "";
-				//enableScreenShotHighlight = true;
-				localStorage.removeItem("_modified");
-				openDialog("Save Scraped data", "Scraped data saved successfully.")
-				angular.element(document.getElementById("left-nav-section")).scope().getScrapeData();
-				$("#saveObjects").attr('disabled', true);
-			}
-			else{
-				//enableScreenShotHighlight = false;
-				openDialog("Save Scraped data", "Failed to save")
-			}
-
-		}, function(error){})
-		
-		if($("#window-filter").is(":visible")){
-			var filters = $(".popupContent-filter .filterObjects");
-			$.each(filters, function(){
-				if($(this).hasClass('popupContent-filter-active')){
-					$(this).removeClass('popupContent-filter-active').addClass("popupContent-default");
+			
+			//Update Service to Save Scrape Objects
+			DesignServices.updateScreen_ICE(scrapeObject)
+			.then(function(data){
+					if(data == "Invalid Session")
+				{
+					window.location.href = "/";
 				}
-			})
-			if($('.checkStyleboxFilter').is(':checked')){
-				$('.checkStyleboxFilter').prop('checked',false);
+				if(data == "success"){
+					window.localStorage['_modified'] = "";
+					//enableScreenShotHighlight = true;
+					localStorage.removeItem("_modified");
+					openDialog("Save Scraped data", "Scraped data saved successfully.")
+					angular.element(document.getElementById("left-nav-section")).scope().getScrapeData();
+					$("#saveObjects").attr('disabled', true);
+					deleteScrapeDataservice = true;
+				}
+				else{
+					//enableScreenShotHighlight = false;
+					openDialog("Save Scraped data", "Failed to save")
+				}
+
+			}, function(error){})
+			
+			if($("#window-filter").is(":visible")){
+				var filters = $(".popupContent-filter .filterObjects");
+				$.each(filters, function(){
+					if($(this).hasClass('popupContent-filter-active')){
+						$(this).removeClass('popupContent-filter-active').addClass("popupContent-default");
+					}
+				})
+				if($('.checkStyleboxFilter').is(':checked')){
+					$('.checkStyleboxFilter').prop('checked',false);
+				}
 			}
 		}
-
 	})
 
 	//To Select and unSelect all objects 
@@ -2368,10 +2452,10 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					if(gsElement[i] == $(this).data("tag") || ($(this).data("tag").toLowerCase().indexOf(gsElement[i].toLowerCase()) >= 0 && gsElement[i] != "a" && $(this).data("tag").toLowerCase() != "radio button" && $(this).data("tag").toLowerCase() != "radiobutton")
 							|| (gsElement[i] == "input" && ($(this).data("tag").indexOf("edit") >= 0 || $(this).data("tag").indexOf("Edit Box") >= 0 || $(this).data("tag").indexOf("text") >= 0 || $(this).data("tag").indexOf("EditText") >= 0))
 							|| (gsElement[i] == "select" && $(this).data("tag").indexOf("combo box") >= 0)
-							|| (gsElement[i] == "a" && $(this).data("tag").indexOf("hyperlink") >= 0 || $(this).data("tag").indexOf("Static") >= 0)
+							|| (gsElement[i] == "a" && ($(this).data("tag").indexOf("hyperlink") >= 0/* || $(this).data("tag").indexOf("Static") >= 0*/))
 							|| (gsElement[i] == "checkbox" && $(this).data("tag").indexOf("check box") >= 0)
 							|| (gsElement[i] == "radiobutton" && $(this).data("tag").indexOf("radio button") >= 0)
-							|| (gsElement[i] == "others" && $(this).data("tag").indexOf("scroll bar") >= 0)
+							/*|| (gsElement[i] == "others" && $(this).data("tag").indexOf("scroll bar") >= 0)
 							|| (gsElement[i] == "others" && $(this).data("tag").indexOf("internal frame") >= 0)
 							|| (gsElement[i] == "others" && $(this).data("tag").indexOf("tab") >= 0)
 							|| (gsElement[i] == "others" && $(this).data("tag").indexOf("XCUIElementTypeTable") >= 0)
@@ -2384,13 +2468,13 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 							|| (gsElement[i] == "others" && $(this).data("tag").indexOf("XCUIElementTypeSlider") >= 0)
 							|| (gsElement[i] == "others" && $(this).data("tag").indexOf("XCUIElementTypePickerWheel") >= 0)
 							|| (gsElement[i] == "others" && $(this).data("tag").indexOf("XCUIElementTypeTextField") >= 0)
-							|| (gsElement[i] == "others" && $(this).data("tag").indexOf("XCUIElementTypeSearchField") >= 0)
+							|| (gsElement[i] == "others" && $(this).data("tag").indexOf("XCUIElementTypeSearchField") >= 0)*/
 					){
 						$(this).show();
 					}
 				})
 				$.each($("#scraplist li"), function(){
-					if(gsElement[i] == "Element"){
+					if(gsElement[i] == "others"){
 						$.each($("#scraplist li"), function(){
 							if($(this).data("tag") != "button" &&
 								$(this).data("tag") != "checkbox" &&
@@ -2427,20 +2511,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			dependentTestCaseFlag = false;
 		}
 		else{
-			$("span.errTestCase").addClass("hide");
-			$(document).on('shown.bs.modal','#dialog-addDependentTestCase', function () {
-				$("input[type=checkbox].checkTestCase").prop("checked",true);
-					var currentTestCase = JSON.parse(window.localStorage['_CT']).testCaseName;
-					$("span.testcaseListItem").each(function(){
-						if(currentTestCase == $(this).children("label").text()){
-							$(this).children('input.checkTestCase').attr("disabled",true)
-							//$(".checkTestCase[disabled=disabled]").prop('checked',false);
-							$(this).nextAll('.testcaseListItem').children('input.checkTestCase').attr("disabled",true);
-							$(".checkTestCase[disabled=disabled]").prop('checked',false);
-						}
-					});
-			});
-			$("#dialog-addDependentTestCase").modal("show");
+			$("span.errTestCase").addClass("hide");			
 			//subTask = JSON.parse(window.localStorage['_CT']).subtask;
 			//var testScenarioId = "e191bb4a-2c4f-4909-acef-32bc60e527bc";
 			var testScenarioId = JSON.parse(window.localStorage['_CT']).scenarioId;
@@ -2457,6 +2528,28 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					$("#dependentTestCasesContent").append("<span class='testcaseListItem'><input data-attr = "+data[i].testcaseId+" class='checkTestCase' type='checkbox' id='dependentTestCase_"+i+"' /><label title="+data[i].testcaseName+" class='dependentTestcases' for='dependentTestCase_"+i+"'>"+data[i].testcaseName+"</label></span><br />");
 				}
 
+				//$(document).on('shown.bs.modal','#dialog-addDependentTestCase', function () {
+				if(checkedTestcases.length > 0)
+					$("input[type=checkbox].checkTestCase").prop("checked",false);
+				else	$("input[type=checkbox].checkTestCase").prop("checked",true);
+				var currentTestCase = JSON.parse(window.localStorage['_CT']).testCaseName;
+				$("span.testcaseListItem").each(function(){
+					if(currentTestCase == $(this).children("label").text()){
+						$(this).children('input.checkTestCase').attr("disabled",true)
+						//$(".checkTestCase[disabled=disabled]").prop('checked',false);
+						$(this).nextAll('.testcaseListItem').children('input.checkTestCase').attr("disabled",true);
+						$(".checkTestCase[disabled=disabled]").prop('checked',false);
+					}
+					for(i=0;i<checkedTestcases.length;i++){
+						if($(this).children('input.checkTestCase').data("attr") == checkedTestcases[i] && currentTestCase != $(this).children("label").text()){
+							$(this).children('input.checkTestCase').prop("checked",true);
+						}
+					}
+				});
+				//});
+				//Display testcase in the modal
+				$("#dialog-addDependentTestCase").modal("show");
+				
 				$(document).on('click','#debugOn',function() {
 					var checkedLength = $(".checkTestCase:checked").length;
 					checkedTestcases = [];

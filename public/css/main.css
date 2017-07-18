@@ -1472,7 +1472,24 @@ input[disabled]{
     border-radius: 11px;
     margin-top: 0;
 }
-
+.searchScrapEle{
+	padding: 5px;
+    margin-left: 10px;
+    position: relative;
+    bottom: 4px;
+    border: 1px solid #633693;
+    border-radius: 5px;
+}
+.searchScrapInput{
+	padding: 3px;
+    position: relative;
+    bottom: 5px;
+    border: 1px solid #633693;
+    border-radius: 5px;
+    width: 200px;
+    display: none;
+    height: 25px;
+}
 .scrapTree{
 	float: left;
     width: 100%;
@@ -2568,7 +2585,9 @@ input[disabled]{
 	width: 100% !important;
 	padding-right:20px;
 }
-
+.addCustObj{
+	color: blue;
+}
 #scrapedObjforMap li span{
 	font-size: 15px;
 	top:2px;	

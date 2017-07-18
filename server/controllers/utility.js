@@ -15,7 +15,7 @@ exports.Encrypt_ICE = function getDomains_ICE(req, res) {
 		if(sessionToken != undefined && req.session.id == sessionToken)
 		{
 			var methodSelected = req.body.encryptionType;
-			// var encrytData = req.body.encryptionValue;
+			var encrytData = req.body.encryptionValue;
 			var encryptedValue;
 			try{
 				// if (methodSelected === 'undefined') {
