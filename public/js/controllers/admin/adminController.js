@@ -1,8 +1,8 @@
 /***
- * 
+ *
  */
 var DOMAINID, releaseName, cycleName, count=0,delCount=0,editReleaseId='',editCycleId='',deleteReleaseId='',deleteCycleId='',taskName;releaseNamesArr =[];
-var createprojectObj = {}; var projectDetails = [];var flag;var projectExists;var updateProjectDetails = []; 
+var createprojectObj = {}; var projectDetails = [];var flag;var projectExists;var updateProjectDetails = [];
 var editedProjectDetails = [];
 var deletedProjectDetails = [];
 var newProjectDetails = [];
@@ -43,11 +43,11 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 			$("#selAssignUser").append('<option data-id="" value disabled selected>Select User</option>')
 			for(i=0; i<response.userIds.length && response.user_names.length; i++){
 				if(response.d_roles[i] != "b5e9cb4a-5299-4806-b7d7-544c30593a6e"){
-					$("#selAssignUser").append('<option data-id="'+response.userIds[i]+'" value="'+response.user_names[i]+'">'+response.user_names[i]+'</option>')	
+					$("#selAssignUser").append('<option data-id="'+response.userIds[i]+'" value="'+response.user_names[i]+'">'+response.user_names[i]+'</option>')
 				}
 			}
-			
-			//sorting the dropdown values in alphabetical order 
+
+			//sorting the dropdown values in alphabetical order
 			var selectOptions = $("#selAssignUser option:not(:first)");
 			selectOptions.sort(function(a,b) {
 				if (a.text > b.text) return 1;
@@ -57,11 +57,11 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 			$("#selAssignUser").empty()
 			$("#selAssignUser").append('<option data-id="" value disabled selected>Select User</option>');
 			for(i=0; i<selectOptions.length;i++){
-				$("#selAssignUser").append(selectOptions[i])				
+				$("#selAssignUser").append(selectOptions[i])
 			}
 			$("#selAssignUser").prop('selectedIndex', 0);
-		}, 		
-		function (error) { console.log("Error:::::::::::::", error) })		
+		},
+		function (error) { console.log("Error:::::::::::::", error) })
 
 		$(document).on('change','#selAssignUser', function() {
 			$('#allProjectAP, #assignedProjectAP').empty();
@@ -85,8 +85,8 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 						$('#selAssignProject').append($("<option value=" + domainList[i].domainId + "></option>").text(domainList[i].domainName));
 					}
 				}
-				
-				//sorting the dropdown values in alphabetical order 
+
+				//sorting the dropdown values in alphabetical order
 				var selectOptions = $("#selAssignProject option:not(:first)");
 				selectOptions.sort(function(a,b) {
 					if (a.text > b.text) return 1;
@@ -96,10 +96,10 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 				$("#selAssignProject").empty()
 				$("#selAssignProject").append('<option data-id="" value disabled selected>Please Select Your Domain</option>');
 				for(i=0; i<selectOptions.length;i++){
-					$("#selAssignProject").append(selectOptions[i])				
+					$("#selAssignProject").append(selectOptions[i])
 				}
 				$("#selAssignProject").prop('selectedIndex', 0);
-				
+
 			}, function (error) { console.log("Error:::::::::::::", error) })
 		});
 
@@ -170,16 +170,16 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 									}
 								}
 								return false;
-							}	
+							}
 							unAssignedProjects.projectIds =  unassignedProjectIds;
 							unAssignedProjects.projectNames =  unassignedProjectNames;
 							for(var m=0;m<unAssignedProjects.projectIds.length;m++)
 							{
 								$('#allProjectAP').append($("<option value=" +unAssignedProjects.projectIds[m]+ "></option>").text(unAssignedProjects.projectNames[m]));
 							}
-						}						
+						}
 					}, function (error) { console.log("Error:::::::::::::", error) })
-				} 
+				}
 				else{
 					adminServices.getDetails_ICE(idtype,requestedids)
 					.then(function (res) {
@@ -222,7 +222,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 			unAssignedProjects.push(unassignedProj);
 		});
 
-	
+
 		$("#assignedProjectAP option").each(function() {
 			var assignedProj = {};
 			assignedProj.projectId = $(this).val();
@@ -297,8 +297,8 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 					$('#selDomain').append($("<option value=" + domainList[i].domainId + "></option>").text(domainList[i].domainName));
 				}
 			}
-			
-			//sorting the dropdown values in alphabetical order 
+
+			//sorting the dropdown values in alphabetical order
 			var selectOptions = $("#selDomain option:not(:first)");
 			selectOptions.sort(function(a,b) {
 				if (a.text > b.text) return 1;
@@ -308,10 +308,10 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 			$("#selDomain").empty()
 			$("#selDomain").append('<option data-id="" value disabled selected>Please Select Your Domain</option>');
 			for(i=0; i<selectOptions.length;i++){
-				$("#selDomain").append(selectOptions[i])				
+				$("#selDomain").append(selectOptions[i])
 			}
 			$("#selDomain").prop('selectedIndex', 0);
-			
+
 		}, function (error) { console.log("Error:::::::::::::", error) })
 
 	});
@@ -342,9 +342,9 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 					$(this).attr("disabled","disabled");
 				});
 			}, 50);
-			
+
 	});
-	
+
 
 	toggleMenu = function() {
 		var elem = document.getElementById("sidebar-wrapper");
@@ -362,7 +362,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 			document.getElementsByClassName("sidebar-toggle")[0].style.left="200px";
 			// adding overlay to darken #page-wrapper and dismiss the left drawer...
 			$overlay = $('<div id="overlay" style="position: absolute; height: 100%; width: 100%; top: 0; left: 0; background: rgb(0, 0, 0); opacity: 0; transition: ease-in-out all .3s"></div>');
-			$overlay.click(toggleMenu);            
+			$overlay.click(toggleMenu);
 			setTimeout(function() {
 				$overlay.css('opacity', .1);
 			}, 200);
@@ -371,7 +371,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 	}
 	$("#menu-toggle").click(function(e) {
 		e.preventDefault();
-		toggleMenu();        
+		toggleMenu();
 	});
 
 	$("[data-parent]").click(function(e) {
@@ -405,7 +405,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 		}
 		else if ($("#password").val() == "" && $("#password").is(":visible")) {
 			$("#password").addClass("inputErrorBorder");
-		} 
+		}
 		else if (regexPassword.test($("#password").val()) == false && $("#password").is(":visible")) {
 			openModelPopup("Error", "Password must contain atleast 1 special character, 1 numeric, 1 uppercase and lowercase, length should be minimum 8 characters and maximum 12 characters..");
 			$("#password").addClass("inputErrorBorder");
@@ -423,15 +423,15 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 		}
 		else if ($("#email").val() == "") {
 			$("#email").addClass("inputErrorBorder");
-		} 
+		}
 		else if (reg.test($("#email").val()) == false) {
 			openModelPopup("Error", "Email address is not valid");
 			$("#email").addClass("inputErrorBorder");
 			// $scope.emailRequired = 'Email address is not valid';
-		} 
+		}
 		else if($('#userRoles option:selected').val() == "") {
 			$("#userRoles").css('border','').addClass("selectErrorBorder");
-		} 
+		}
 		else {
 			//role = $('#userRoles option:selected').text();
 			var createUser = {};
@@ -445,7 +445,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 			createUser.ldapUser = $(".ldapBtn").hasClass("ldapBtnActive")? true : false;
 
 			adminServices.createUser_Nineteen68(createUser)
-			.then(function (data) { 
+			.then(function (data) {
 				if(data == "Invalid Session"){
 							window.location.href = "/";
 							}
@@ -478,7 +478,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 	})
 
 	//Get User Roles in the select container
-	
+
 	var userRolesList;
 	$scope.getUserRoles = function () {	//Yes---------------------------------
 		$("#passwordIcon").parent().show()
@@ -504,8 +504,8 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 			window.localStorage['_R'] = response.r_ids;
 		}, function (error) { console.log("Error:::::::::::::", error) })
 	};
-	
-		
+
+
   $(document).on('change', '#userRoles', function() {
 	  var getDropDown;
 	  getDropDown = $('#additionalRoles');
@@ -513,28 +513,22 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 	  getDropDown.append('<option value="" selected>Select additional Role</option>');
 	  for(i=0; i<userRolesList.r_ids.length; i++){
 		  if($('#userRoles option:selected').val() != userRolesList.r_ids[i]){
-			  getDropDown.append("<option value="+ userRolesList.r_ids[i] +">"+userRolesList.userRoles[i]+"</option>");  
+			  getDropDown.append("<option value="+ userRolesList.r_ids[i] +">"+userRolesList.userRoles[i]+"</option>");
 		  }
-	  }	  
+	  }
   });
 	// Create Project Action
 	$scope.create_project = function () {
 		$("#selDomain").removeClass("selectErrorBorder");
 		$("#projectName").removeClass("inputErrorBorder");
-		if($('#selDomain option:selected').val() == "")
-		{
+
+		if($('#selDomain option:selected').val() == ""){
 			$("#selDomain").addClass("selectErrorBorder");
-		}
-		else if($("#projectName").val() == "")
-		{
+		}else if($("#projectName").val() == ""){
 			$("#projectName").addClass("inputErrorBorder");
-		}
-		else if($(".projectTypeSelected").length == 0)
-		{
+		}else if($(".projectTypeSelected").length == 0){
 			openModelPopup("Create Project", "Please select Application Type");
-		}
-		else if($("#releaseList").children("li").length == 0)
-		{
+		}else if($("#releaseList").children("li").length == 0){
 			openModelPopup("Create Project", "Please add atleast one release");
 		}
 		/*else if($("#cycleList").children("li").length == 0)
@@ -552,21 +546,17 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 				}
 			}
 			if(proceedToCreate == false){
-				openModelPopup("Update Project", "Please add atleast one cycle for release: "+relNames);				
-			}
-			else if(proceedToCreate == true){
+				openModelPopup("Update Project", "Please add atleast one cycle for release: "+relNames);
+			}else if(proceedToCreate == true){
 				projectExists = false;
 				var requestedids = [];
 				var idtype = [];
 				checkCycle(flag);
-				if(valid == "false")
-				{
-					return false;
-				}
-				else{
 
-					if($('#selDomain option:selected').val() != "")
-					{
+				if(valid == "false"){
+					return false;
+				}else{
+					if($('#selDomain option:selected').val() != ""){
 						requestedids.push($('#selDomain option:selected').val());
 						idtype.push('domainsall');
 						var proceeed = false;
@@ -577,7 +567,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 							}
 							if(response == "No Projects"){
 								proceeed = true;
-							}							
+							}
 							else if(response.projectNames.length > 0)
 							{
 								for(var i=0;i<response.projectNames.length;i++)
@@ -650,32 +640,25 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 	}
 
 	//Update Project Action
-	$scope.update_project = function () {		
+	$scope.update_project = function () {
+
 		$("#selDomainEdit,#selProject").removeClass("selectErrorBorder");
-		if($('#selDomainEdit option:selected').val() == "")
-		{
+
+
+		if($('#selDomainEdit option:selected').val() == ""){
 			$("#selDomainEdit").addClass("selectErrorBorder");
-		}
-		else if($('#selProject option:selected').val() == "")
-		{
+		}else if($('#selProject option:selected').val() == ""){
 			$("#selProject").addClass("selectErrorBorder");
-		}
-		else if($("#releaseList").children("li").length == 0)
-		{
+		}else if($("#releaseList").children("li").length == 0){
 			openModelPopup("Update Project", "Please add atleast one release");
 		}
-		else if($("#cycleList").children("li").length == 0)
-		{
-			openModelPopup("Update Project", "Please add atleast one cycle for a release");
-		}
+		// else if($("#cycleList").children("li").length == 0){
+		// 	console.log("Update PPPPPPPPPPP");
+		// 	openModelPopup("Update Project", "Please add atleast one cycle for a release");
+		// }
 		else{
-			flag = false;
+				flag = false;
 
-			if(flag == true)
-			{
-				return false;
-			}
-			else{
 				//Update project details json with editedProjectDetails, deletedProjectDetails, newProjectDetails
 				updateProjectObj = {};
 				var userDetails = JSON.parse(window.localStorage['_UI']);
@@ -695,21 +678,43 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 				else	updateProjectObj.deletedProjectDetails.push(deletedProjectDetails);
 
 				var proceedFlag = true;
+				var relName="";
 				if(newProjectDetails.length > 0){
-					var relName="";
+
 					for(i=0;i<newProjectDetails.length;i++){
 						if(newProjectDetails[i].cycleDetails.length > 0){
 							proceedFlag = true;
-						}
-						else{
-							relName = i > 0? relName + ", " + newProjectDetails[i].releaseName : relName + newProjectDetails[i].releaseName;
-							proceedFlag = false;
+						}else{
+							relName = relName.length > 0? relName + ", " + newProjectDetails[i].releaseName : relName + newProjectDetails[i].releaseName;
+								proceedFlag = false;
 						}
 					}
-					if(proceedFlag == false){						
-						openModelPopup("Update Project", "Please add atleast one cycle for release: "+relName);
-						return false;
+				}
+
+				if (updateProjectDetails.length > 0) {
+					for(i=0;i<updateProjectDetails.length;i++){
+						if(updateProjectDetails[i].cycleDetails.length <= 0){
+							var testFlag  = true;
+							for (var j = 0; j < newProjectDetails.length; j++) {
+								if (updateProjectDetails[i].releaseName == newProjectDetails[j].releaseName ) {
+									testFlag = false;
+									if (newProjectDetails[j].cycleDetails.length <= 0) {
+										relName = relName.length > 0? relName + ", " + updateProjectDetails[i].releaseName : relName + updateProjectDetails[i].releaseName;
+										proceedFlag = false;
+									}
+								}
+							}
+							if (newProjectDetails.length <= 0 || testFlag) {
+								relName = relName.length > 0? relName + ", " + updateProjectDetails[i].releaseName : relName + updateProjectDetails[i].releaseName;
+								proceedFlag = false;
+							}
+						}
 					}
+
+				}
+				if(proceedFlag == false){
+					openModelPopup("Update Project", "Please add atleast one cycle for release: "+relName);
+					return false;
 				}
 				if(proceedFlag==true){
 					if(updateProjectObj.newProjectDetails.length <= 0)
@@ -742,7 +747,6 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 						}
 					}, function (error) { console.log("Error:::::::::::::", error) })
 				}
-			}
 
 		}
 	};
@@ -771,7 +775,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 	{
 		$("#selAssignUser, #selAssignProject").prop('selectedIndex', 0);
 		$("#allProjectAP,#assignedProjectAP,#selAssignProject").empty();
-		$("#selAssignProject").append('<option data-id="" value disabled selected>Please Select your domain</option>') 
+		$("#selAssignProject").append('<option data-id="" value disabled selected>Please Select your domain</option>')
 	}
 
 	//Add Release Name Functionality
@@ -841,14 +845,14 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 						}
 						count = $("#releaseList li").length;
 						$("#releaseList").append("<li class='createRelease' id='releaseList_"+count+"'><img src='imgs/ic-release.png' /><span title="+releaseName+" class='releaseName'>"+releaseName+"</span><span class='actionOnHover'><img id=editReleaseName_"+count+" title='Edit Release Name' src='imgs/ic-edit-sm.png' class='editReleaseName'><img id=deleteReleaseName_"+count+" title='Delete Release' src='imgs/ic-delete-sm.png' class='deleteRelease'></span></li>");
-						/*releCycObj = {};
-						releCycObj.releaseName = releaseName;
-						releCycObj.releaseId = "";
-						releCycObj.cycleDetails = [];
-						updateProjectDetails.push(releCycObj);*/
+						// releCycObj = {};
+						// releCycObj.releaseName = releaseName;
+						// releCycObj.releaseId = "";
+						// releCycObj.cycleDetails = [];
+						// updateProjectDetails.push(releCycObj);
 						//for update project json
 						createNewRelCyc.releaseName = releaseName;
-						newProjectDetails.push(createNewRelCyc);					
+						newProjectDetails.push(createNewRelCyc);
 						toggleCycleClick();
 						$("#releaseList li#releaseList_"+count+"").trigger('click');
 						count++;
@@ -922,7 +926,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 					{
 						if(projectDetails[i].releaseName == $("li.active").children('span.releaseName').text())
 						{
-							projectDetails[i].cycleNames.push(cycleName);	
+							projectDetails[i].cycleNames.push(cycleName);
 						}
 					}
 					/*for(i=0;i<releaseNamesArr.length;i++)
@@ -947,7 +951,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 										projectDetails[j].cycleNames = cycleArr;
 									}
 								}
-							}	
+							}
 						}
 					}*/
 					toggleCycleClick();
@@ -1012,9 +1016,12 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 							newProjectDetails.push(createNewRelCyc);
 						}
 					}
+					//console.log(newProjectDetails);
 					toggleCycleClick();
 					delCount++;
 				}
+				console.log(updateProjectDetails);
+				console.log(newProjectDetails);
 				e.stopImmediatePropagation();
 			}
 		})
@@ -1094,7 +1101,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 							}
 						}
 					}
-					
+
 					//Check Release details if newly added
 					if(newProjectDetails.length > 0)
 					{
@@ -1268,7 +1275,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 							goahead = true;
 							projectDetails = projectDetails.filter(function(n){ return n != undefined });
 						}
-					}					
+					}
 				}
 			}
 			else if(taskName == "Update Project")
@@ -1331,7 +1338,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 				$("#"+deleteReleaseId).parent().parent("li").remove();
 				$("#releaseList li:last").trigger('click');
 				openModelPopup("Delete Release", "Release deleted successfully");
-				toggleCycleClick();				
+				toggleCycleClick();
 			}
 			event.stopImmediatePropagation();
 		});
@@ -1446,7 +1453,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 											if(editedProjectDetails.length <= 0){
 												//building release details
 												editRelCyc.releaseId = relID;//updateProjectDetails[i].releaseId;
-												editRelCyc.releaseName = $("li.active").children('span.releaseName').text();//updateProjectDetails[i].releaseName;												
+												editRelCyc.releaseName = $("li.active").children('span.releaseName').text();//updateProjectDetails[i].releaseName;
 												//building cycle details with release
 												editCycle.oldCycleName = oldCycText;
 												editCycle.cycleName = $("#cycleName").val();//updateProjectDetails[i].cycleDetails[j].cycleName;
@@ -1477,7 +1484,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 															editCycle.cycleId = editCycId;//updateProjectDetails[i].cycleDetails[j].cycleId;
 															editCycle.editStatus = true;
 															editedProjectDetails[m].cycleDetails.push(editCycle);
-															break;															
+															break;
 														}
 														chkRelPresent = false;
 													}
@@ -1498,10 +1505,10 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 											}
 											break;
 										}
-										//For update project json									
+										//For update project json
 										if(objectType == "string" && j == cycleIndex){
 											updateProjectDetails[i].cycleDetails[j] =  $("#cycleName").val();
-										}											
+										}
 									}
 								}
 							}
@@ -1546,7 +1553,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 				if(goahead == true){
 					$("#"+deleteCycleId).parent().parent("li").remove();
 					openModelPopup("Delete Cycle", "Cycle deleted successfully");
-					toggleCycleClick();				
+					toggleCycleClick();
 				}
 			}
 			else if(taskName == "Update Project")
@@ -1557,7 +1564,20 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 					if(response == "Invalid Session"){
 							  window.location.href = "/";
 							}
-					if((response.testsuiteIds == undefined && cycId == undefined) || response.testsuiteIds.length <= 0){
+
+					for(var i=0;i<newProjectDetails.length;i++){
+						if(newProjectDetails[i].releaseName == $("li.active").children("span.releaseName").text()){
+							for(var j=0;j<newProjectDetails[i].cycleDetails.length;j++){
+								if(newProjectDetails[i].cycleDetails[j].cycleName == $("#"+deleteCycleId).parent().prev('span.cycleName').text())
+								{
+									delete newProjectDetails[i].cycleDetails[j];
+									newProjectDetails[i].cycleDetails =  newProjectDetails[i].cycleDetails.filter(function(n){ return n != null });
+									goahead = true;
+								}
+							}
+						}
+					}
+					if((response.testsuiteIds == undefined && cycId == undefined) || (response.testsuiteIds && response.testsuiteIds.length <= 0)){
 						for(var i=0;i<updateProjectDetails.length;i++)
 						{
 							if(updateProjectDetails[i].releaseName == $("li.active").children("span.releaseName").text())
@@ -1611,7 +1631,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 															deleteCycle.cycleName = $("#"+deleteCycleId).parent().prev('span.cycleName').text();//updateProjectDetails[i].cycleDetails[j].cycleName;
 															deleteCycle.cycleId = cycId;//updateProjectDetails[i].cycleDetails[j].cycleId;
 															deleteCycle.deleteStatus = true;
-															deletedProjectDetails[k].cycleDetails.push(deleteCycle)															
+															deletedProjectDetails[k].cycleDetails.push(deleteCycle)
 														}
 														chk = false;
 													}
@@ -1630,7 +1650,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 													deletedProjectDetails.push(deleteRelCyc);
 												}
 											}
-											//For update project json											
+											//For update project json
 											delete updateProjectDetails[i].cycleDetails[j];
 											updateProjectDetails[i].cycleDetails =  updateProjectDetails[i].cycleDetails.filter(function(n){ return n != null });
 										}
@@ -1648,14 +1668,14 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 						}
 						goahead = true;
 					}
-					else if(response.testsuiteIds.length > 0){
+					else if(response.testsuiteIds && response.testsuiteIds.length > 0){
 						goahead = false;
 						openModelPopup("Delete Cycle", "Cycle contains Test suites. Cannot delete");
 					}
 					if(goahead == true){
 						$("#"+deleteCycleId).parent().parent("li").remove();
 						openModelPopup("Delete Cycle", "Cycle deleted successfully");
-						toggleCycleClick();				
+						toggleCycleClick();
 					}
 				})
 			}
@@ -1676,8 +1696,8 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 			for(i=0; i<response.userIds.length && response.user_names.length; i++){
 				$("#userSelect").append('<option data-id="'+response.userIds[i]+'" value="'+response.user_names[i]+'">'+response.user_names[i]+'</option>')
 			}
-			
-			//sorting the dropdown values in alphabetical order 
+
+			//sorting the dropdown values in alphabetical order
 			var selectOptions = $("#userSelect option:not(:first)");
 			selectOptions.sort(function(a,b) {
 				if (a.text > b.text) return 1;
@@ -1687,11 +1707,11 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 			$("#userSelect").empty()
 			$("#userSelect").append('<option data-id="" value disabled selected>Select User</option>');
 			for(i=0; i<selectOptions.length;i++){
-				$("#userSelect").append(selectOptions[i])				
+				$("#userSelect").append(selectOptions[i])
 			}
 			$("#userSelect").prop('selectedIndex', 0);
-			
-		}, 
+
+		},
 		function (error) { console.log("Error:::::::::::::", error) })
 	};
 
@@ -1720,8 +1740,8 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 					$('#selDomainEdit').append($("<option value=" + domainList[i].domainId + "></option>").text(domainList[i].domainName));
 				}
 			}
-			
-			//sorting the dropdown values in alphabetical order 
+
+			//sorting the dropdown values in alphabetical order
 			var selectOptions = $("#selDomainEdit option:not(:first)");
 			selectOptions.sort(function(a,b) {
 				if (a.text > b.text) return 1;
@@ -1731,10 +1751,10 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 			$("#selDomainEdit").empty()
 			$("#selDomainEdit").append('<option data-id="" value disabled selected>Please Select Your Domain</option>');
 			for(i=0; i<selectOptions.length;i++){
-				$("#selDomainEdit").append(selectOptions[i])				
+				$("#selDomainEdit").append(selectOptions[i])
 			}
 			$("#selDomainEdit").prop('selectedIndex', 0);
-			
+
 		}, function (error) { console.log("Error:::::::::::::", error) })
 
 		$(document).on('change','#selDomainEdit', function() {
@@ -1767,8 +1787,8 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 						$('#selProject').append($("<option value=" + response.projectIds[i] + "></option>").text(response.projectNames[i]));
 					}
 				}
-				
-				//sorting the dropdown values in alphabetical order 
+
+				//sorting the dropdown values in alphabetical order
 				var selectOptions = $("#selProject option:not(:first)");
 				selectOptions.sort(function(a,b) {
 					if (a.text > b.text) return 1;
@@ -1778,14 +1798,14 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 				$("#selProject").empty()
 				$("#selProject").append('<option data-id="" value disabled selected>Please Select Your Project</option>');
 				for(i=0; i<selectOptions.length;i++){
-					$("#selProject").append(selectOptions[i])				
+					$("#selProject").append(selectOptions[i])
 				}
 				$("#selProject").prop('selectedIndex', 0);
-				
+
 			}, function (error) { console.log("Error:::::::::::::", error) })
 			clearUpdateProjectObjects();
 		});
-		
+
 		/************************default roles****************************************/
 		$(document).on('change','#userRoles', function() {
 			//get Projects Service
@@ -1817,8 +1837,8 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 						$('#selProject').append($("<option value=" + response.projectIds[i] + "></option>").text(response.projectNames[i]));
 					}
 				}
-				
-				//sorting the dropdown values in alphabetical order 
+
+				//sorting the dropdown values in alphabetical order
 				var selectOptions = $("#selProject option:not(:first)");
 				selectOptions.sort(function(a,b) {
 					if (a.text > b.text) return 1;
@@ -1828,15 +1848,15 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 				$("#selProject").empty()
 				$("#selProject").append('<option data-id="" value disabled selected>Please Select Your Project</option>');
 				for(i=0; i<selectOptions.length;i++){
-					$("#selProject").append(selectOptions[i])				
+					$("#selProject").append(selectOptions[i])
 				}
 				$("#selProject").prop('selectedIndex', 0);
-				
+
 			}, function (error) { console.log("Error:::::::::::::", error) })
 			clearUpdateProjectObjects();
 		});
 		/***************************************default roles*************************/
-		
+
 		$(document).on('change','#selProject', function() {
 			updateProjectDetails = [];
 			var domaiprojectId = $("#selProject option:selected").val();
@@ -1862,31 +1882,31 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 					$("div.projectTypeSelected").removeClass("projectTypeSelected");
 					$(".projectTypes[data-app='Webservice']").addClass("projectTypeSelected");
 					break;
-				case "Mainframe": 
+				case "Mainframe":
 					$("div.projectTypeSelected").removeClass("projectTypeSelected");
 					$(".projectTypes[data-app='Mainframe']").addClass("projectTypeSelected");
 					break;
-				case "Desktop": 
+				case "Desktop":
 					$("div.projectTypeSelected").removeClass("projectTypeSelected");
 					$(".projectTypes[data-app='Desktop']").addClass("projectTypeSelected");
 					break;
-				case "DesktopJava": 
+				case "DesktopJava":
 					$("div.projectTypeSelected").removeClass("projectTypeSelected");
 					$(".projectTypes[data-app='DesktopJava']").addClass("projectTypeSelected");
 					break;
-				case "MobileApp": 
+				case "MobileApp":
 					$("div.projectTypeSelected").removeClass("projectTypeSelected");
 					$(".projectTypes[data-app='MobileApp']").addClass("projectTypeSelected");
 					break;
-				case "MobileWeb": 
+				case "MobileWeb":
 					$("div.projectTypeSelected").removeClass("projectTypeSelected");
 					$(".projectTypes[data-app='MobileWeb']").addClass("projectTypeSelected");
 					break;
-				case "SAP": 
+				case "SAP":
 					$("div.projectTypeSelected").removeClass("projectTypeSelected");
 					$(".projectTypes[data-app='SAP']").addClass("projectTypeSelected");
 					break;
-				default: 
+				default:
 				}
 				$(".projectTypes").each(function(){
 					if(!$(this).hasClass("projectTypeSelected")){
@@ -1894,7 +1914,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 						$(this).find("label").css("cursor","default");
 					}
 				})
-				
+
 				updateProjectDetails = [];
 				updateProjectDetails =  response.projectDetails;
 				$("#releaseList li,#cycleList li").remove()
@@ -1906,9 +1926,9 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 				showHideEditDeleteIcons();
 			}, function (error) { console.log("Error:::::::::::::", error) })
 			clearUpdateProjectObjects();
-		});		
+		});
 	};
-	//Toggle Release Edit Delete Icons 
+	//Toggle Release Edit Delete Icons
 	function showHideEditDeleteIcons()
 	{
 		$("#releaseList li").each(function() {
@@ -1957,9 +1977,9 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 						$("#userRoles").append('<option value="'+response.r_ids[i]+'">'+response.userRoles[i]+'</option>')
 					}
 				}
-			}, 
+			},
 			function (error) { console.log("Error:::::::::::::", error) })
-		}, 
+		},
 		function (error) { console.log("Error:::::::::::::", error) })
 	};
 
@@ -1980,7 +2000,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 		}
 		/*else if ($("#password").val() == "") {
 			$("#password").addClass("inputErrorBorder");
-		}*/ 
+		}*/
 		else if ($("#password").val().length > 0 && regexPassword.test($("#password").val()) == false) {
 			openModelPopup("Error", "Password must contain atleast 1 special character, 1 numeric, 1 uppercase and lowercase, length should be minimum 8 characters and maximum 12 characters..");
 			$("#password").addClass("inputErrorBorder");
@@ -1998,11 +2018,11 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 		}
 		else if ($("#email").val() == "") {
 			$("#email").addClass("inputErrorBorder");
-		} 
+		}
 		else if (reg.test($("#email").val()) == false) {
 			openModelPopup("Error", "Email address is not valid");
 			$("#email").addClass("inputErrorBorder");
-		} 
+		}
 		else if($("#userRoles option:selected").val() == "") {
 			$("#userRoles").css('border','').addClass("selectErrorBorder");
 		}
@@ -2023,31 +2043,31 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 				if(response == "success"){
 					openModelPopup("Edit User", "User has been edited successfully.");
 					resetUpdateUser();
-					
+
 					$timeout(function(){
-						
+
 						$("#userTab").trigger("click");
 						$timeout(function(){
 							$(".adminActionBtn").children("button:first-child").trigger("click");
-							
+
 						}, 50)
 					}, 50)
 				}
 				else{
 					openModelPopup("Edit User", "Failed to edit user.");
 					resetUpdateUser();
-					
+
 					$timeout(function(){
-						
+
 						$("#userTab").trigger("click");
 						$timeout(function(){
 							$(".adminActionBtn").children("button:first-child").trigger("click");
-							
+
 						}, 50)
 
 					}, 50)
 				}
-			}, 
+			},
 			function (error) { console.log("Error:::::::::::::", error) })
 		}
 	};
@@ -2057,7 +2077,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 		var taskName = $("#page-taskName").children("span").text();
 		if(taskName == "Create Project"){
 			$(this).toggleClass("projectTypeSelected");
-			$(this).siblings().removeClass("projectTypeSelected")			
+			$(this).siblings().removeClass("projectTypeSelected")
 		}
 		else return false;
 	});
@@ -2097,7 +2117,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 			return true;
 		}
 	});
-//	Prevents special characters on blur/paste 
+//	Prevents special characters on blur/paste
 	$(document).on("blur", ".validationBlur", function(e) {
 		var id = e.target.id;
 		var val = $(this).val();
@@ -2152,10 +2172,10 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 		$("#adminModal").find('.modal-body p').text(body);
 		$("#adminModal").modal("show");
 		setTimeout(function(){
-			$("#adminModal").find('.btn-default').focus();					
+			$("#adminModal").find('.btn-default').focus();
 		}, 300);
 	}
-	
+
 	//Global edit model popup
 	function openEditGlobalModel(title,inputID,placeholder,buttonID){
 		$("#editGlobalModal").find('.modal-title').text(title);
@@ -2163,16 +2183,16 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 	    $("#editGlobalModal").find('button.btnGlobalSave').prop("id",buttonID);
 		$("#editGlobalModal").modal("show");
 		setTimeout(function(){
-			$("#editGlobalModal").find('input').focus();					
+			$("#editGlobalModal").find('input').focus();
 		}, 300);
 	}
-	
+
 	function clearUpdateProjectObjects(){
 		newProjectDetails = [];
 		deletedProjectDetails = [];
-		editedProjectDetails = [];		
+		editedProjectDetails = [];
 	}
-	//Special character validation 
+	//Special character validation
 	function moveItems(origin, dest) {
 		$(origin).find(':selected').appendTo(dest);
 	}
@@ -2197,4 +2217,3 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 		moveAllItems(from,to);
 	}
 }]);
-
