@@ -1100,16 +1100,16 @@ exports.updateScreen_ICE = function(req, res){
 																				try{
 																					testcasessize=testcasessize + 1;
 																					if(testcasessize==testcaseDataQueryresult.rows.length){
-																							fnCreateScreenHistory(createScreenHistoryQuery, function(err, data) {
-																								if (err) {
-																									console.log(err);
-																								} else {
-																									//Edit,Delete Scrape Objects final response
-																									if (data == "success")
-																									res.send(response);
-																								}
-																							});
-																						//res.send(response);
+																							// fnCreateScreenHistory(createScreenHistoryQuery, function(err, data) {
+																							// 	if (err) {
+																							// 		console.log(err);
+																							// 	} else {
+																							// 		//Edit,Delete Scrape Objects final response
+																							// 		if (data == "success")
+																							// 		res.send(response);
+																							// 	}
+																							// });
+																						res.send(response);
 																					}
 																				}catch(exception){
 																					console.log(exception);
@@ -1145,16 +1145,16 @@ exports.updateScreen_ICE = function(req, res){
 									
 								statusFlag = "success";
 									try{
-									fnCreateScreenHistory(createScreenHistoryQuery, function(err, dataResult) {
-																	if (err) {
-																		console.log(err);
-																	} else {
-																		//updateScreen_ICE final response
-																		if (dataResult == "success")
-																		res.send(statusFlag);
-																	}
-																});
-										//res.send(statusFlag);
+									// fnCreateScreenHistory(createScreenHistoryQuery, function(err, dataResult) {
+									// 								if (err) {
+									// 									console.log(err);
+									// 								} else {
+									// 									//updateScreen_ICE final response
+									// 									if (dataResult == "success")
+									// 									res.send(statusFlag);
+									// 								}
+									// 							});
+										res.send(statusFlag);
 									}catch(exception){
 										console.log(exception);
 									}
