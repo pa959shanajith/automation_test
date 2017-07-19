@@ -7,6 +7,7 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 	var open = 0;	var openWindow = 0;
 	var executionId, testsuiteId;
 	$("#page-taskName").empty().append('<span>Reports</span>')
+
 	cfpLoadingBar.start()
 	$timeout(function(){
 		$('.scrollbar-inner').scrollbar();
@@ -29,7 +30,7 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 
 	//$(".projectInfoWrap").empty()
 	//$(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">Project :</span><span class="content">'+getProjInfo.projectName+'</span></p><p class="proj-info-wrap"><span class="content-label">Module :</span><span class="content">'+getProjInfo.moduleName+'</span></p><p class="proj-info-wrap"><span class="content-label">Screen :</span><span class="content">'+getProjInfo.screenName+'</span></p>')
-	//Loading Project Info
+	//Loading Project
 
 	$scope.getReports_ICE = function(){
 		reportService.getMainReport_ICE()
@@ -54,21 +55,22 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 									if(container.find('.suiteContainer').length >= 6){
 										$('.dynamicTestsuiteContainer').append("<span class='suiteContainer' data-suiteId='"+data[i].testsuiteid+"'><img alt='Test suite icon' class='reportbox' src='imgs/ic-reportbox.png' title='"+data[i].testsuitename+"'><br/><span class='repsuitename' title='"+data[i].testsuitename+"'>"+data[i].testsuitename+"</span></span>");
 									}
-									else
+									else{
 										container.append("<span class='suiteContainer' data-suiteId='"+data[i].testsuiteid+"'><img alt='Test suite icon' class='reportbox' src='imgs/ic-reportbox.png' title='"+data[i].testsuitename+"'><br/><span class='repsuitename' title='"+data[i].testsuitename+"'>"+data[i].testsuitename+"</span></span>");
-								}					
+									}
+								}
 							}
 						}
-						else{}
+						$('.searchScrapEle').css('display', 'none');
 						if($('.dynamicTestsuiteContainer').find('.suiteContainer').length <= 0){
 							$('.suitedropdownicon').hide();
 						}
 						cfpLoadingBar.complete();
 						$("#middle-content-section").css('visibility','visible');
-						$('[data-toggle="tooltip"]').tooltip();						
+						$('[data-toggle="tooltip"]').tooltip();
 					}
 					else	console.log("Unable to load test suites.");
-				}, 
+				},
 				function(error) {
 					console.log("Error-------"+error);
 				})
@@ -77,6 +79,30 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 		}, function(error) {
 		});
 	}
+	var showSearchBox = true;
+	$(document).on("click", ".searchScrapEle", function(){
+	if(showSearchBox){
+		$(".searchScrapInput").show();
+		showSearchBox=false;
+		$(".searchScrapInput").focus();
+	}	else{
+		$(".searchScrapInput").hide();
+		 showSearchBox=true;
+	 }
+})
+
+	$(document).on('keyup', '#searchModule', function(){
+		input = document.getElementById("searchModule");
+    filter = input.value.toUpperCase();
+		elems = $('.dynamicTestsuiteContainer .suiteContainer');
+		for (i = 0; i < elems.length; i++) {
+				if (elems[i].textContent.toUpperCase().indexOf(filter) > -1) {
+						elems[i].style.display = "";
+				} else {
+						elems[i].style.display = "none";
+				}
+		}
+	});
 
 	//Service call to get start and end details of suites
 	$(document).on('click', '.suiteContainer', function(){
@@ -89,7 +115,7 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 		else if($(this).parent().hasClass('dynamicTestsuiteContainer')){
 			$(this).siblings().find('.reportbox').parent().removeClass('reportboxselected');
 			$('.staticTestsuiteContainer').find('.reportbox').parent().removeClass('reportboxselected');
-		}		
+		}
 		testsuiteId = $(this).attr('data-suiteId');
 		$('#scenarioReportsTable').find('tbody').empty();
 		reportService.getSuiteDetailsInExecution_ICE(testsuiteId)
@@ -133,7 +159,7 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 					}
 				}
 				$('.progress-bar-success, .progress-bar-danger, .progress-bar-warning, .progress-bar-norun').css('width','0%');
-				$('.passPercent, .failPercent, .terminatePercent, .incompletePercent').text('');				
+				$('.passPercent, .failPercent, .terminatePercent, .incompletePercent').text('');
 			}
 			else	console.log("Unable to load Test suite details in execution.")
 		},
@@ -147,7 +173,7 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 
 	//Date sorting
 	$(document).on('click', '#dateDESC', function(){
-		$(this).hide();    	
+		$(this).hide();
 		var dateArray;
 		if($(this).parents('table').attr("id") == "testSuitesTimeTable"){
 			$('#dateASC').show();
@@ -179,7 +205,7 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 			for(i=0; i<dateArray.length; i++){
 				dateArray[i].firstChild.innerText = i+1;
 				$("tbody.scrollbar-inner-scenariostatus").append(dateArray[i]);
-			}    		
+			}
 		}
 		else if($(this).parents('table').attr("id") == "scenarioReportsTable"){
 			$("#scenarioReportsTable #dateDESC").show();
@@ -224,7 +250,7 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 				aA = a.children.item(1).innerText;
 				timeA = a.children.item(2).innerText;
 				bB = b.children.item(1).innerText;
-				timeB = b.children.item(2).innerText;    			
+				timeB = b.children.item(2).innerText;
 			}
 			else{
 				aA = a.children.item(1).children.item(0).innerText;
@@ -299,13 +325,13 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 						$('.progress-bar-success').css('width',P+"%");	$('.passPercent').text(P+" %");
 						$('.progress-bar-danger').css('width',F+"%");	$('.failPercent').text(F+" %");
 						$('.progress-bar-warning').css('width',T+"%");	$('.terminatePercent').text(T+" %");
-						$('.progress-bar-norun').css('width',I+"%");	$('.incompletePercent').text(I+" %");					
+						$('.progress-bar-norun').css('width',I+"%");	$('.incompletePercent').text(I+" %");
 					}
 					else{
 						$('.progress-bar-success, .progress-bar-danger, .progress-bar-warning, .progress-bar-norun').css('width','0%');
 						$('.passPercent, .failPercent, .terminatePercent, .incompletePercent').text('');
 					}
-				}				
+				}
 			}
 			else	console.log("Failed to get scenario status");
 		},
@@ -325,7 +351,7 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 		$('.formatpdfbrwsrexport').remove();
 	})
 
-	$(document).on('click','.iconSpace', function(){	
+	$(document).on('click','.iconSpace', function(){
 		$elem = $(this);
 		if(open == 0){
 			//getting the next element
@@ -338,8 +364,11 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 			$(".suitedropdownicon").children(".iconSpace").attr("src","imgs/ic-collapseup.png")
 			$content.slideDown(200, function () {
 				//execute this after slideToggle is done
-				//change text of header based on visibility of content div		    	
+				//change text of header based on visibility of content div
 			});
+
+			$('.searchScrapEle').css('display', '');
+
 			open = 1;
 		}
 		else {
@@ -353,6 +382,10 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 				$(".upper-section-testsuites").append($elem.parent());
 				$(".suitedropdownicon").children(".iconSpace").attr("src","imgs/ic-collapse.png")
 			});
+
+			$('.searchScrapEle').css('display', 'none');
+			$(".searchScrapInput").hide();
+			showSearchBox = true;
 			open = 0;
 		}
 
@@ -363,7 +396,7 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 		var reportType = $(this).attr('data-getrep');
 		var testsuitename = $(".reportboxselected").text();
 		var scenarioName = $('.openreportstatus').parents('tr').find('td:first-child').text();
-		//var d = new Date();		
+		//var d = new Date();
 		//var DATE = ("0" + (d.getMonth()+1)).slice(-2) + "/" + ("0" + d.getDate()).slice(-2) + "/" + d.getFullYear();
 		//var TIME = ("0" + d.getHours()).slice(-2) +":"+ ("0" + d.getMinutes()).slice(-2) +":"+ ("0" + d.getSeconds()).slice(-2);
 		var pass = fail = terminated = total = 0;
@@ -387,7 +420,7 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 					"terminate": ""
 				}],
 				rows : []
-		}		
+		}
 		reportService.getReport_Nineteen68(reportID, testsuiteId,testsuitename)
 		.then(function(data) {
 			if(data == "Invalid Session"){
@@ -420,7 +453,7 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 						finalReports.rows.push(obj2.rows[k]);
 						finalReports.rows[k].slno = k+1;
 						if(finalReports.rows[k]["Step "] != undefined && finalReports.rows[k]["Step "].indexOf("Step") !== -1){
-							finalReports.rows[k].Step = finalReports.rows[k]["Step "];						
+							finalReports.rows[k].Step = finalReports.rows[k]["Step "];
 						}
 						if(finalReports.rows[k].hasOwnProperty("EllapsedTime") && finalReports.rows[k].EllapsedTime.trim() != ""){
 							elapTym = (finalReports.rows[k].EllapsedTime.split(".")[0]).split(":")
@@ -431,7 +464,7 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 								finalReports.rows[k].EllapsedTime = ("0" + 0).slice(-2) +":"+ ("0" + 0).slice(-2) +":"+ ("0" + elapTym[0]).slice(-2) +":"+ ("0" + 0).slice(-2);
 							}
 							else{
-								finalReports.rows[k].EllapsedTime = ("0" + elapTym[0]).slice(-2) +":"+ ("0" + elapTym[1]).slice(-2) +":"+ ("0" + elapTym[2]).slice(-2) +":"+ finalReports.rows[k].EllapsedTime.split(".")[1].slice(0, 3);							
+								finalReports.rows[k].EllapsedTime = ("0" + elapTym[0]).slice(-2) +":"+ ("0" + elapTym[1]).slice(-2) +":"+ ("0" + elapTym[2]).slice(-2) +":"+ finalReports.rows[k].EllapsedTime.split(".")[1].slice(0, 3);
 							}
 						}
 						if(finalReports.rows[k].hasOwnProperty("status") && finalReports.rows[k].status != ""){
@@ -464,7 +497,7 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 					            link.href=window.URL.createObjectURL(file);
 					            link.download = scenarioName+".pdf";
 					            link.click();*/
-						var fileURL = URL.createObjectURL(file);								
+						var fileURL = URL.createObjectURL(file);
 						$window.open(fileURL, '_blank');
 					}).error(function(data, status) {
 						console.error('Repos error', status, data);
@@ -486,7 +519,7 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 							}
 							openWindow++;
 							e.stopImmediatePropagation();
-							$('.formatpdfbrwsrexport').remove();						
+							$('.formatpdfbrwsrexport').remove();
 						}
 						else console.log("Failed to render reports.");
 					},
@@ -506,7 +539,7 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 
 	//Export To JSON
 	$(document).on('click', '.exportToJSON', function(e){
-		var repId = $(this).attr('data-reportid');		
+		var repId = $(this).attr('data-reportid');
 		reportService.exportToJson_ICE(repId)
 		.then(function(response) {
 			if(response == "Invalid Session"){
@@ -523,42 +556,42 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 				var objfullVersion = ''+parseFloat(navigator.appVersion);
 				var objBrMajorVersion = parseInt(navigator.appVersion,10);
 				var objOffsetName,objOffsetVersion,ix;
-				// In Chrome 
-				if ((objOffsetVersion=objAgent.indexOf("Chrome"))!=-1) { 
+				// In Chrome
+				if ((objOffsetVersion=objAgent.indexOf("Chrome"))!=-1) {
 					objbrowserName = "Chrome";
 					objfullVersion = objAgent.substring(objOffsetVersion+7);
-				} 
+				}
 				// In Microsoft internet explorer
-				else if ((objOffsetVersion=objAgent.indexOf("MSIE"))!=-1) { 
-					objbrowserName = "Microsoft Internet Explorer"; 
+				else if ((objOffsetVersion=objAgent.indexOf("MSIE"))!=-1) {
+					objbrowserName = "Microsoft Internet Explorer";
 					objfullVersion = objAgent.substring(objOffsetVersion+5);
-				} 
-				// In Firefox 
-				else if ((objOffsetVersion=objAgent.indexOf("Firefox"))!=-1) { 
+				}
+				// In Firefox
+				else if ((objOffsetVersion=objAgent.indexOf("Firefox"))!=-1) {
 					objbrowserName = "Firefox";
-				} 
-				// In Safari 
-				else if ((objOffsetVersion=objAgent.indexOf("Safari"))!=-1) { 
-					objbrowserName = "Safari"; 
-					objfullVersion = objAgent.substring(objOffsetVersion+7); 
+				}
+				// In Safari
+				else if ((objOffsetVersion=objAgent.indexOf("Safari"))!=-1) {
+					objbrowserName = "Safari";
+					objfullVersion = objAgent.substring(objOffsetVersion+7);
 					if ((objOffsetVersion=objAgent.indexOf("Version"))!=-1)
 						objfullVersion = objAgent.substring(objOffsetVersion+8);
 				}
-				// For other browser "name/version" is at the end of userAgent 
+				// For other browser "name/version" is at the end of userAgent
 				else if ( (objOffsetName=objAgent.lastIndexOf(' ')+1) < (objOffsetVersion=objAgent.lastIndexOf('/')) ) {
-					objbrowserName = objAgent.substring(objOffsetName,objOffsetVersion); 
-					objfullVersion = objAgent.substring(objOffsetVersion+1); 
-					if (objbrowserName.toLowerCase()==objbrowserName.toUpperCase()) { 
-						objbrowserName = navigator.appName; 
-					} 
-				} 
-				// trimming the fullVersion string at semicolon/space if present 
+					objbrowserName = objAgent.substring(objOffsetName,objOffsetVersion);
+					objfullVersion = objAgent.substring(objOffsetVersion+1);
+					if (objbrowserName.toLowerCase()==objbrowserName.toUpperCase()) {
+						objbrowserName = navigator.appName;
+					}
+				}
+				// trimming the fullVersion string at semicolon/space if present
 				if ((ix=objfullVersion.indexOf(";"))!=-1) objfullVersion=objfullVersion.substring(0,ix);
-				if ((ix=objfullVersion.indexOf(" "))!=-1) objfullVersion=objfullVersion.substring(0,ix); 
+				if ((ix=objfullVersion.indexOf(" "))!=-1) objfullVersion=objfullVersion.substring(0,ix);
 				objBrMajorVersion = parseInt(''+objfullVersion,10);
-				if (isNaN(objBrMajorVersion)) { 
-					objfullVersion = ''+parseFloat(navigator.appVersion); 
-					objBrMajorVersion = parseInt(navigator.appVersion,10); 
+				if (isNaN(objBrMajorVersion)) {
+					objfullVersion = ''+parseFloat(navigator.appVersion);
+					objBrMajorVersion = parseInt(navigator.appVersion,10);
 				}
 				if(objBrMajorVersion== "9"){
 					if(objbrowserName == "Microsoft Internet Explorer"){
@@ -584,7 +617,7 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 						counter++;*/
 						a.dispatchEvent(e);
 					}
-				}				
+				}
 			}
 			else	console.log("Error while exporting JSON.\n");
 		},
