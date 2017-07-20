@@ -6,4 +6,4 @@ module.exports = new cassandra.Client({
     authProvider: authProvider
 });
 
-console.log('Connected to cassandra with keyspace nineteen68');  
+console.log('Keyspace nineteen68 will be enabled.');  
