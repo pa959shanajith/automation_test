@@ -177,8 +177,11 @@ mySPA.controller('mindmapController', ['$scope', '$http', '$location', '$timeout
             {
                $("#ct-moduleBox,.tabAssign").addClass("ct-expand-module");
             }
-            $("#ct-collapse").trigger("click");
-            $("#ct-expand-right").trigger("click");
+           
+            if($('.scrollbar-macosx').is(':visible'))
+                $("#ct-collapse").trigger("click");
+            if($('.rsSlide').is(':visible'))
+                $("#ct-expand-right").trigger("click");
             loadMindmapData_W();
         }
         else{

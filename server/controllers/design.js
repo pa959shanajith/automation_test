@@ -9,6 +9,7 @@ var async = require('async');
 var parse = require('xml-parser');
 var Client = require("node-rest-client").Client;
 var client = new Client();
+var dbConnICEHistory = require('../../server/config/ICEHistory');
 /**
  * @author vinay.niranjan
  * @modified author vinay.niranjan
@@ -268,11 +269,14 @@ exports.updateScreen_ICE = function(req, res){
 		var requestedtags = "tags";
 		// var requestedversionnumber = req.body.versionnumber;
 		var requestedversionnumber = 1;
-		var requestscreenhistorydetails = "'updated screens action by " + userInfo.username + " having role:" + userInfo.role + "" +
-						" skucode=" + requestedskucodeScreens + ", tags=" + requestedtags + ", versionnumber=" + requestedversionnumber+
-						" with the service action="+param+" '";
-		var dateScreen = new Date().getTime();
-		var requestedScreenhistory =  dateScreen + ":" + requestscreenhistorydetails;
+		// var requestscreenhistorydetails = "'updated screens action by " + userInfo.username + " having role:" + userInfo.role + "" +
+		// 				" skucode=" + requestedskucodeScreens + ", tags=" + requestedtags + ", versionnumber=" + requestedversionnumber+
+		// 				" with the service action="+param+" '";
+		// var dateScreen = new Date().getTime();
+		// var requestedScreenhistory =  dateScreen + ":" + requestscreenhistorydetails;
+		var requestedScreenhistory;
+		var requesthistorydetails;
+		var createScreenHistoryQuery;
 		var updateScreenQuery="";
 		var statusFlag = "";
 		if(param == "updateScrapeData_ICE"){	
@@ -343,6 +347,15 @@ exports.updateScreen_ICE = function(req, res){
 											scrapedObjects=baseData;
 											scrapedObjects=JSON.stringify(scrapedObjects);
 											scrapedObjects = scrapedObjects.replace(/'+/g,"''");
+											var requestscreenhistorydetails = "'updated screens action by " + userInfo.username + " having role:" + userInfo.role + "" +
+															" skucode=" + requestedskucodeScreens + ", tags=" + requestedtags + ", versionnumber=" + requestedversionnumber+
+															"  screendata=" + scrapedObjects+
+															"with the service action="+param+" '";
+											var dateScreen = new Date().getTime();
+											requestedScreenhistory =  dateScreen + ":" + requestscreenhistorydetails;
+											createScreenHistoryQuery = "update screens set history= history + { "+requestedScreenhistory+" }" +
+												" where screenid = "+screenID+" and projectid ="+projectID+ //" and screenname ='" + screenName +
+												" and versionnumber = "+requestedversionnumber+" ";	
 											updateScreenQuery = "update icetestautomation.screens set"+
 												" screendata ='"+ scrapedObjects +"',"+
 												" modifiedby ='" + modifiedBy + "',"+
@@ -384,6 +397,15 @@ exports.updateScreen_ICE = function(req, res){
 						console.log(exception);
 					}
 				}else{
+																var requestscreenhistorydetails = "'updated screens action by " + userInfo.username + " having role:" + userInfo.role + "" +
+															" skucode=" + requestedskucodeScreens + ", tags=" + requestedtags + ", versionnumber=" + requestedversionnumber+
+															"  screendata=" + scrapedObjects+
+															"with the service action="+param+" '";
+											var dateScreen = new Date().getTime();
+											requestedScreenhistory =  dateScreen + ":" + requestscreenhistorydetails;
+											createScreenHistoryQuery = "update screens set history= history + { "+requestedScreenhistory+" }" +
+												" where screenid = "+screenID+" and projectid ="+projectID+ //" and screenname ='" + screenName +
+												" and versionnumber = "+requestedversionnumber+" ";	
 					updateScreenQuery = "update icetestautomation.screens set"+
 										" screendata ='"+ scrapedObjects +"',"+
 										" modifiedby ='" + modifiedBy + "',"+
@@ -465,6 +487,15 @@ exports.updateScreen_ICE = function(req, res){
 										if(elementschanged <= newCustNamesList.length){
 											scrapedObjects=JSON.stringify(scrapedObjects);
 											scrapedObjects = scrapedObjects.replace(/'+/g,"''");
+																						var requestscreenhistorydetails = "'updated screens action by " + userInfo.username + " having role:" + userInfo.role + "" +
+															" skucode=" + requestedskucodeScreens + ", tags=" + requestedtags + ", versionnumber=" + requestedversionnumber+
+															"  screendata=" + scrapedObjects+
+															"with the service action="+param+" '";
+											var dateScreen = new Date().getTime();
+											 requestedScreenhistory =  dateScreen + ":" + requestscreenhistorydetails;
+											 createScreenHistoryQuery = "update screens set history= history + { "+requestedScreenhistory+" }" +
+												" where screenid = "+screenID+" and projectid ="+projectID+ //" and screenname ='" + screenName +
+												" and versionnumber = "+requestedversionnumber+" ";	
 											updateScreenQuery = "update icetestautomation.screens set"+
 																" screendata ='"+ scrapedObjects +"',"+
 																" modifiedby ='" + modifiedBy + "',"+
@@ -582,6 +613,15 @@ exports.updateScreen_ICE = function(req, res){
 										if(elementschanged<=deleteXpathNames.length){
 											scrapedObjects=JSON.stringify(scrapedObjects);
 											scrapedObjects = scrapedObjects.replace(/'+/g,"''");
+																					var requestscreenhistorydetails = "'updated screens action by " + userInfo.username + " having role:" + userInfo.role + "" +
+															" skucode=" + requestedskucodeScreens + ", tags=" + requestedtags + ", versionnumber=" + requestedversionnumber+
+															"  screendata=" + scrapedObjects+
+															"with the service action="+param+" '";
+											var dateScreen = new Date().getTime();
+											 requestedScreenhistory =  dateScreen + ":" + requestscreenhistorydetails;
+											 createScreenHistoryQuery = "update screens set history= history + { "+requestedScreenhistory+" }" +
+												" where screenid = "+screenID+" and projectid ="+projectID+ //" and screenname ='" + screenName +
+												" and versionnumber = "+requestedversionnumber+" ";	
 											updateScreenQuery = "update icetestautomation.screens set"+
 																" screendata ='"+ scrapedObjects +"',"+
 																" modifiedby ='" + modifiedBy + "',"+
@@ -835,6 +875,15 @@ exports.updateScreen_ICE = function(req, res){
 													scrapedObjects.scrapetype=scrapedobjects.scrapetype;
 													scrapedObjects=JSON.stringify(scrapedObjects);
 													scrapedObjects = scrapedObjects.replace(/'+/g,"''");
+																								var requestscreenhistorydetails = "'updated screens action by " + userInfo.username + " having role:" + userInfo.role + "" +
+															" skucode=" + requestedskucodeScreens + ", tags=" + requestedtags + ", versionnumber=" + requestedversionnumber+
+															"  screendata=" + scrapedObjects+
+															"with the service action="+param+" '";
+														var dateScreen = new Date().getTime();
+														 requestedScreenhistory =  dateScreen + ":" + requestscreenhistorydetails;
+														 createScreenHistoryQuery = "update screens set history= history + { "+requestedScreenhistory+" }" +
+												" where screenid = "+screenID+" and projectid ="+projectID+ //" and screenname ='" + screenName +
+												" and versionnumber = "+requestedversionnumber+" ";	
 													updateScreenQuery = "update icetestautomation.screens set"+
 																" screendata ='"+ scrapedObjects +"',"+
 																" modifiedby ='" + modifiedBy + "',"+
@@ -886,6 +935,8 @@ exports.updateScreen_ICE = function(req, res){
 		function sortNumber(a,b) {
 			return a - b;
 		}
+		//update screen history transaction
+		
 		//console.log("scraped:",scrapedObjects);
 		//this code will be called only if the statusFlag is empty.
 		function finalFunction(scrapedObjects,finalcallback){
@@ -899,6 +950,7 @@ exports.updateScreen_ICE = function(req, res){
 								statusFlag="Error occured in updateScreenData : Fail";
 								// console.log(err);
 								try{
+								
 									res.send(statusFlag);
 								}catch(exception){
 									console.log(exception);
@@ -1020,7 +1072,7 @@ exports.updateScreen_ICE = function(req, res){
 																					console.log(exception);
 																				}
 																			}
-																		var requesthistorydetails = "'updated testcase action by " + userInfo.username + " having role:" + userInfo.role + "" +
+																		 requesthistorydetails = "'updated testcase action by " + userInfo.username + " having role:" + userInfo.role + "" +
 																			" skucodetestcase=" + requestedskucodeScreens + ", tags=" + requestedtags + "," +
 																			" testcasesteps=" + updatingtestcasedata + ", versionnumber=" + requestedversionnumber+
 																			" with the service action="+param+" '";
@@ -1048,6 +1100,15 @@ exports.updateScreen_ICE = function(req, res){
 																				try{
 																					testcasessize=testcasessize + 1;
 																					if(testcasessize==testcaseDataQueryresult.rows.length){
+																							// fnCreateScreenHistory(createScreenHistoryQuery, function(err, data) {
+																							// 	if (err) {
+																							// 		console.log(err);
+																							// 	} else {
+																							// 		//Edit,Delete Scrape Objects final response
+																							// 		if (data == "success")
+																							// 		res.send(response);
+																							// 	}
+																							// });
 																						res.send(response);
 																					}
 																				}catch(exception){
@@ -1061,6 +1122,7 @@ exports.updateScreen_ICE = function(req, res){
 																	testcaserendercallback();
 																});
 															}else{
+																//console.log(1);
 																statusFlag = "success";
 																try{
 																	res.send(statusFlag);
@@ -1080,8 +1142,18 @@ exports.updateScreen_ICE = function(req, res){
 										}
 									]);
 								}else{
+									
 								statusFlag = "success";
 									try{
+									// fnCreateScreenHistory(createScreenHistoryQuery, function(err, dataResult) {
+									// 								if (err) {
+									// 									console.log(err);
+									// 								} else {
+									// 									//updateScreen_ICE final response
+									// 									if (dataResult == "success")
+									// 									res.send(statusFlag);
+									// 								}
+									// 							});
 										res.send(statusFlag);
 									}catch(exception){
 										console.log(exception);
@@ -1107,6 +1179,22 @@ exports.updateScreen_ICE = function(req, res){
 	catch(exception){
 		console.log(exception);
 	}
+
+	//Screen History Transaction 
+	function fnCreateScreenHistory(createScreenHistoryQuery, createScreenHistoryCallback) {
+				//console.log("History", createScreenHistoryQuery);
+				var statusFlag = "";
+				dbConnICEHistory.execute(createScreenHistoryQuery,
+					function(createScreenHistoryQuery, createScreenHistoryQueryRes) {
+						if (createScreenHistoryQuery) {
+							statusFlag = "Error occured in createScreenTransactionHistory for screen : Fail";
+							createScreenHistoryCallback(null, statusFlag);
+						} else {
+							statusFlag = "success";
+							createScreenHistoryCallback(null, statusFlag);
+						}
+					});
+			};
 };
 
 function repeatedXpath(viewString, xpath) {
@@ -1403,6 +1491,7 @@ exports.updateTestCase_ICE = function (req, res) {
 		/*
 		 * base request elements
 		 */
+		var updateTestCaseQuery;
 		var requestedscreenid = req.body.screenid;
 		var requestedtestcaseid = req.body.testcaseid;
 		var requestedtestcasename = req.body.testcasename;
@@ -1456,6 +1545,11 @@ exports.updateTestCase_ICE = function (req, res) {
 							"', history= history + { "+requestedhistory+" }" +
 							",  testcasesteps='" + requestedtestcasesteps + "'"+
 							" where versionnumber = "+requestedversionnumber+" and screenid=" + requestedscreenid + " and testcaseid=" + requestedtestcaseid + " and testcasename='" + requestedtestcasename + "' IF EXISTS;";
+
+		                 updateTestCaseQuery =  "UPDATE testcases SET  history= history + { "+requestedhistory+" }" +
+							" where versionnumber = "+requestedversionnumber+" and screenid=" + requestedscreenid + " and testcaseid=" + requestedtestcaseid + " and testcasename='" + requestedtestcasename + "' ";
+							console.log(updateTestCaseQuery);
+						
 							uploadTestCaseData(updateTestCaseData,function(error,response){
 								if(error){
 									try{
@@ -1465,7 +1559,16 @@ exports.updateTestCase_ICE = function (req, res) {
 									}
 								}else{
 									try{
-										res.send(response);
+										fnUpdateTestcasesHistory(updateTestCaseQuery, function(err, dataResult) {
+																	if (err) {
+																		console.log(err);
+																	} else {
+																		//console.log(response);
+																		if (dataResult == "success")
+																		res.send(response);
+																	}
+																});
+										//res.send(response);
 									}catch(exception){
 										console.log(exception);
 									}
@@ -1488,6 +1591,24 @@ exports.updateTestCase_ICE = function (req, res) {
 		console.log(exception);
 	}
 };
+	//Testcases History Transaction 
+	function fnUpdateTestcasesHistory(updateTestCaseQuery, updateTestcaseHistoryCallback) {
+				//console.log("History", createScreenHistoryQuery);
+				var statusFlag = "";
+				dbConnICEHistory.execute(updateTestCaseQuery,
+					function(updateTestCaseQuery, updateTestcaseHistoryQueryRes) {
+						if (updateTestCaseQuery) {
+							statusFlag = "Error occured in updateTestcaseHistory for screen : Fail";
+							updateTestcaseHistoryCallback(null, statusFlag);
+						} else {
+							statusFlag = "success";
+							updateTestcaseHistoryCallback(null, statusFlag);
+						}
+					});
+			};
+
+
+
 
 /**
 * @author vishvas.a

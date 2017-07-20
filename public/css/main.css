@@ -431,7 +431,7 @@ body {
     width: 1110px;
     height: 100%;
 }
-.container-plugins .col-md-12:nth-child(2){height: calc(100% - 256px);} 
+.container-plugins .col-md-12:nth-child(2){height: calc(100% - 256px);}
 .dropdown-userPart{
     float: right;
     width: auto;
@@ -532,7 +532,7 @@ body {
 .list-inline-right {
     float: right;
     margin-bottom: 0;
-    padding-right: 35px;	
+    padding-right: 35px;
 }
 
 .color-block {
@@ -699,17 +699,17 @@ body {
 }
 
 .task-details{
-	
+
     border-radius: 20px;
     outline: none;
 	border: none;
-	cursor: default;    
-    padding: 0px 10px; 
+	cursor: default;
+    padding: 0px 10px;
     outline: none;
 }
 
 .task-details-content{
-	
+
 	color: white;
 	font-family: LatoWebMedium;
 }
@@ -1017,7 +1017,7 @@ input[disabled]{
     margin-left: 8px;
     margin-top: -2px;
  }
- 
+
  .modal-body-switchRole{
     height: 99px;
     padding-left: 40px;
@@ -1131,7 +1131,7 @@ input[disabled]{
     padding-bottom: 10px;
     margin-left: -8px;
     }
-    
+
 .utilityMethods{
 	padding: 3px;
     height: 24px;
@@ -1182,12 +1182,12 @@ input[disabled]{
 }
 
 .pairwise{
-	
+
 	float: left;
     min-width: 96px;
     align-content: center;
     /* margin-right: 54px; */
-	
+
 }
 .ortho-array{
 	float: left;
@@ -1209,7 +1209,7 @@ input[disabled]{
 }
 
 #ortho-inner{
-	
+
 	padding-top: 29px;
     padding-right: 39px;
     padding-bottom: 36px;
@@ -1317,7 +1317,7 @@ input[disabled]{
     padding: 5px 0;
 }
 .pairwiseTableInput{
-	
+
 }
 /* utility plugins */
 
@@ -1374,7 +1374,7 @@ input[disabled]{
     top: 0;
 }
 .middle-content-section-reports{
-    visibility: hidden;	
+    visibility: hidden;
 }
 
 #wrapper-sc{
@@ -1801,7 +1801,7 @@ input[disabled]{
 }
 
 .assist-right{
-	
+
 }
 .assist-right img{
 	cursor: pointer;
@@ -2006,10 +2006,10 @@ input[disabled]{
     -moz-border-radius: 6px;
     -webkit-border-radius: 6px;
 }
-		
-.executionDataTable thead		
-{		
-    position: relative !important;		
+
+.executionDataTable thead
+{
+    position: relative !important;
 }
 .executionDataTable thead tr, .designDataTable thead tr{
 	width: 100%;
@@ -2028,12 +2028,12 @@ input[disabled]{
     width: 100%;
     margin-top: 28px;
 }
-.executionDataTable tbody		
-{		
-    max-height: 100px !important;		
-    overflow: auto;	
-    margin-top: 0px !important;			
-}		
+.executionDataTable tbody
+{
+    max-height: 100px !important;
+    overflow: auto;
+    margin-top: 0px !important;
+}
 
 #scheduleDataBody, #scheduledDataBody{
 	float:left;
@@ -2057,7 +2057,7 @@ input[disabled]{
 	display: inline-block;
 	text-align: center;
 	float:left;
-}    
+}
 .executionDataTable .form-control, #scheduleDataBody .form-control, .designDataTable .form-control{
 	display: inline-block;
 	width: 90%;
@@ -2140,44 +2140,44 @@ input[disabled]{
 .alertRed{
 	background: #fff url("../imgs/ic-false.png") 90% center no-repeat !important
 }
-.testSuiteBatch		
-{		
-    float: left;		
-    width: 97%;		
-    padding-bottom: 12%;		
-    /*max-height: 500px;*/		
-}		
-.oveflowMisdSection		
-{		
-    /*max-height: 100%;*/		
-    overflow: hidden;		
-}		
-.parentSuiteChk		
-{		
-    position: relative;		
-    left: -5px;		
-    vertical-align: middle;		
-    height: 20px;		
-    width: 16px;		
-    top: -1px;		
-}		
-.parentBatchContainer		
-{		
-    display: inline-block;		
-    position: relative;		
-    top: 30px;		
-}		
-.btnPanel		
-{		
-    position: relative;		
-    left: 13%;		
-}		
-.checkParentBatch		
-{		
-    width: 17px;		
-    height: 17px;		
-    position: relative;		
-    top: 2px;		
+.testSuiteBatch
+{
+    float: left;
+    width: 97%;
+    padding-bottom: 12%;
+    /*max-height: 500px;*/
+}
+.oveflowMisdSection
+{
+    /*max-height: 100%;*/
+    overflow: hidden;
+}
+.parentSuiteChk
+{
+    position: relative;
+    left: -5px;
+    vertical-align: middle;
+    height: 20px;
+    width: 16px;
+    top: -1px;
+}
+.parentBatchContainer
+{
+    display: inline-block;
+    position: relative;
+    top: 30px;
+}
+.btnPanel
+{
+    position: relative;
+    left: 13%;
+}
+.checkParentBatch
+{
+    width: 17px;
+    height: 17px;
+    position: relative;
+    top: 2px;
 }
 /******Exectuion Mid Section******/
 
@@ -2233,7 +2233,7 @@ input[disabled]{
 
 .sDInnerContentsWrap:nth-child(odd){
 	background: #e8e6fe;
-}    
+}
 
 .sDInnerContents{
 	float: left;
@@ -2345,9 +2345,9 @@ input[disabled]{
 .modal-dialog {
     /* display: inline-block;
     text-align: left;
-    vertical-align: middle; */  
+    vertical-align: middle; */
     text-align: left;
-    position:absolute;      
+    position:absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%) !important;
@@ -2456,7 +2456,7 @@ input[disabled]{
 	border-right:0 !important;
 	border-top:0 !important;
 	border-radius:0;
-	box-shadow: none; 
+	box-shadow: none;
 	color:#333;
 }
 
@@ -2590,7 +2590,7 @@ input[disabled]{
 }
 #scrapedObjforMap li span{
 	font-size: 15px;
-	top:2px;	
+	top:2px;
 }
 
 .accd-Obj, .accd-Obj-head, .accd-Obj-body{
@@ -3006,14 +3006,14 @@ input[disabled]{
     width: 100%;
 }
 
-#releaseList li.active, #cycleList li.active {		
-    background: #f1f1f1;		
+#releaseList li.active, #cycleList li.active {
+    background: #f1f1f1;
 }
 
-.disableAddCycle		
-{		
-    cursor: not-allowed !important;	
-    pointer-events: none;	
+.disableAddCycle
+{
+    cursor: not-allowed !important;
+    pointer-events: none;
 }
 .createProjectBtn
 {
@@ -3414,7 +3414,7 @@ float: left;
 select[multiple]:focus option:checked {
   background: #633691 linear-gradient(0deg, #633691 0%, #633691 100%);
 }
-select[multiple]:-internal-list-box option:checked 
+select[multiple]:-internal-list-box option:checked
 {
 background: none;
 }
@@ -3524,7 +3524,7 @@ background: none;
 }
 .suitestartend thead tr, .scenarioReports thead tr{
     float: left;
-    width: 100%;	
+    width: 100%;
 }
 .suitestartend th, .scenarioReports th{
 	font-weight: normal !important;
@@ -3561,7 +3561,7 @@ background: none;
 .suitestartend tbody tr td:nth-child(4){width: 30%; text-align: left; padding-left: 74px;}
 .suitestartend tbody tr td:nth-child(5){width: 20%; text-align: left; padding-left: 15px;}
 .scenarioReports tbody tr:nth-child(odd){
-	background:#e8e6ff;	
+	background:#e8e6ff;
 }
 .scenarioReports tbody tr:nth-child(even) {
     background: #fff;
@@ -3612,7 +3612,7 @@ background: none;
     background-color: #e0e0e0;
 }
 .customprogress .progress-bar{
-	border-radius: 20px;	
+	border-radius: 20px;
 }
 .progresspercentage{width: 13%; text-align: center;}
 
@@ -3715,7 +3715,7 @@ select:-webkit-autofill:focus {
 	top: 50%;
 	left: 50%;
 	transform: translate(-50%, -50%);
-} 
+}
 .leftSummary label{
 	text-align: right;
     float: left;
@@ -4013,7 +4013,7 @@ select:-webkit-autofill:focus {
 }
 
 @media screen and (min-device-width: 1440px) and (max-device-height: 900px) {
-	.middle-section-testsuites, .bottom-section-testsuites{ 
+	.middle-section-testsuites, .bottom-section-testsuites{
 		height: calc(100% - 410px);
 	}
 	.reportStatus{margin-top: 55px;}
@@ -4032,7 +4032,7 @@ select:-webkit-autofill:focus {
 	.scroll-wrapper.scrollbar-inner-rep{max-height: 154px !important;}
 	.project-left2{padding: 0 47px 0 0;}
 	#allProjectAP,#assignedProjectAP, #allProjectAP[size],#assignedProjectAP[size]{min-height: 258px; !important;}
-	.endtoend-modulesContainer{height: 28% !important;}	
+	.endtoend-modulesContainer{height: 28% !important;}
 }
 /**********Specifically for Firefox**********/
 @-moz-document url-prefix() {
@@ -4044,7 +4044,7 @@ select:-webkit-autofill:focus {
 	#left-bottom-section{
 		min-height: 36%;
 	}
-	
+
 	#left-bottom-section ul li {
 	    margin-top: 0;
 	    margin-bottom: 20%;
@@ -4067,7 +4067,7 @@ select:-webkit-autofill:focus {
     left: 61px;
 }
 .searchInput{
-	border-radius: 7px 0px 0px 7px;
+	  border-radius: 7px 0px 0px 7px;
     border: none;
     position: relative;
     left: 60px;
@@ -4077,4 +4077,20 @@ select:-webkit-autofill:focus {
     padding-left: 5px;
     -webkit-transition: width 0.3s;
     transition: width 0.3s;
+}
+.dynamicTestsuiteContainer{
+  border-top: 1px solid white;
+}
+
+.search-reports{
+  float: right;
+}
+
+.search-reports span{
+  background: white !important;
+  padding: 2px 7px 1px !important
+}
+
+.search-reports .searchScrapInput{
+  height: 29px;
 }

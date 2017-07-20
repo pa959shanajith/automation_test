@@ -11,6 +11,8 @@ var uuid = require('uuid-random');
 //var passwordHash = require('password-hash');
 var bcrypt = require('bcrypt');
 var async = require('async');
+var dbConnHistory = require('../../server/config/nineteen68History');
+var dbConnICEHistory = require('../../server/config/ICEHistory');
 
 var Client = require("node-rest-client").Client;
 var client = new Client();
@@ -283,186 +285,384 @@ exports.getEditUsersInfo_Nineteen68 = function(req, res){
 
 
 //CreateUser   
-exports.createUser_Nineteen68 = function(req, res){
-	try{
-		if(req.cookies['connect.sid'] != undefined)
-		{
-			var sessionCookie = req.cookies['connect.sid'].split(".");
-			var sessionToken = sessionCookie[0].split(":");
-			sessionToken = sessionToken[1];
-		}
-			if(sessionToken != undefined && req.session.id == sessionToken)
-		{
+exports.createUser_Nineteen68 = function(req, res) {
+    try {
+        if (req.cookies['connect.sid'] != undefined) {
+            var sessionCookie = req.cookies['connect.sid'].split(".");
+            var sessionToken = sessionCookie[0].split(":");
+            sessionToken = sessionToken[1];
+        }
+        if (sessionToken != undefined && req.session.id == sessionToken) {
+            var createUserHistory;
+            var createUserHistoryTxn; //History Txn Variable for create user in nineteen68
+            var createUserHistoryQuery;
+            var date;
+            var flag = "fail";
+            var status = false;
+            var req_username = req.body.createUser.username;
+            var req_password = req.body.createUser.password;
+            var req_firstname = req.body.createUser.firstName;
+            var req_lastname = req.body.createUser.lastName;
+            var req_ldapuser = req.body.createUser.ldapUser;
+            var req_defaultRole = req.body.createUser.role;
+            var req_email_id = req.body.createUser.email;
+            var salt = bcrypt.genSaltSync(10);
+            var req_hashedPassword = bcrypt.hashSync(req_password, salt);
 
-		var flag = "fail";
-		var status = false;
-		var req_username = req.body.createUser.username;
-		var req_password = req.body.createUser.password;
-		var req_firstname = req.body.createUser.firstName;
-		var req_lastname =  req.body.createUser.lastName;
-		var req_ldapuser = req.body.createUser.ldapUser;
-		var req_defaultRole = req.body.createUser.role;
-		var req_email_id = req.body.createUser.email;
-		var salt = bcrypt.genSaltSync(10);
-		var req_hashedPassword = bcrypt.hashSync(req_password, salt);
+            var getUsername = "SELECT username FROM users";
+            dbConn.execute(getUsername, function(err, userNameresult) {
+                try {
+                    for (var i = 0; i < userNameresult.rows.length; i++) {
+                        dbResult = userNameresult.rows[i];
+                        if (req_username === dbResult.username) {
+                            status = true;
+                            break;
+                        }
+                    }
+                    if (req_ldapuser) {
+                        req_hashedPassword = null;
+                    }
+                    if (status === false) {
+                        var userId = uuid();
+                        var createUser = "INSERT INTO users (userid,deactivated,additionalroles,createdby,createdon,defaultrole,emailid,firstname,history,lastname,ldapuser,modifiedby,modifiedon,password,username) VALUES (" + userId + ",null,null,'" + req_username + "'," + new Date().getTime() + "," + req_defaultRole + ",'" + req_email_id + "','" + req_firstname + "',null,'" + req_lastname + "'," + req_ldapuser + ",'" + req_username + "'," + new Date().getTime() + ",'" + req_hashedPassword + "','" + req_username + "')";
+                        dbConn.execute(createUser, function(err, userResult) {
+                            try {
+                                flag = "Success";
 
-		var getUsername = "SELECT username FROM users";
-		dbConn.execute(getUsername, function (err, userNameresult) {
-			try{
-				for (var i = 0; i < userNameresult.rows.length; i++) {
-					dbResult = userNameresult.rows[i];
-					if(req_username === dbResult.username)
-					{
-						status = true;
-						break;
-					}
-				}
-				if(req_ldapuser){
-					req_hashedPassword = null;
-				}
-				if(status === false){
-					var createUser = "INSERT INTO users (userid,deactivated,additionalroles,createdby,createdon,defaultrole,emailid,firstname,history,lastname,ldapuser,modifiedby,modifiedon,password,username) VALUES ("+uuid()+",null,null,'"+req_username+"',"+ new Date().getTime()+","+req_defaultRole+",'"+req_email_id+"','"+req_firstname+"',null,'"+req_lastname+"',"+req_ldapuser+",'"+req_username+"',"+new Date().getTime()+",'"+req_hashedPassword+"','"+req_username+"')";
-					dbConn.execute(createUser, function (err, userResult) {
-						try{
-							flag = "Success";
-							res.send(flag);
-						}
-						catch(exception){
-							console.log(exception);
-							res.send(flag);
-						}
-					})
-				}
-				else{
-					flag = "User Exists";
-					res.send(flag);
-				}				
-			}
-			catch(exception){
-				console.log(exception);
-				res.send(flag);
-			}
-		})
-	}
-	else{
-		res.send("Invalid Session");
-	}
-	}
-	catch(exception){
-		console.log(exception);
-		res.send("fail");
-	}
+                                //Create User History Update
+                                createUserHistory = "'userid=" + userId + ", deactivated=null, additionalroles=null, createdby=" + req_username + ", " +
+                                    "createdon=" + new Date().getTime() + ", defaultrole=" + req_defaultRole + ", emailid=" + req_email_id + ", " +
+                                    "firstname=" + req_firstname + ", lastname=" + req_lastname + ", ldapuser=" + req_ldapuser + ", modifiedby=" + req_username + ", modifiedon=" + new Date().getTime() + ", password=" + req_hashedPassword + ", username= " + req_username + " '";
+                                date = new Date().getTime();
+                                createUserHistoryQuery = "INSERT INTO users (userid,history) VALUES (" + userId + ",{" + date + ":" + createUserHistory + "})";
+                                fnCreateUserHistory(createUserHistoryQuery, function(err, response) {
+                                    if (response == 'success') {
+                                        res.send(flag);
+                                    } else {
+                                        flag = "fail";
+                                        res.send(flag);
+                                    }
+                                });
+                                //res.send(flag);
+                            } catch (exception) {
+                                console.log(exception);
+                                res.send(flag);
+                            }
+                        })
+                    } else {
+                        flag = "User Exists";
+                        res.send(flag);
+                    }
+                } catch (exception) {
+                    console.log(exception);
+                    res.send(flag);
+                }
+            })
+        } else {
+            res.send("Invalid Session");
+        }
+    } catch (exception) {
+        console.log(exception);
+        res.send("fail");
+    }
+};
+
+//create user history
+function fnCreateUserHistory(createUserHistoryQuery, createUserHistoryCallback) {
+
+    var statusFlag = "";
+    dbConnHistory.execute(createUserHistoryQuery,
+        function(createUserHistoryQuery, createUserHistoryQueryRes) {
+            if (createUserHistoryQuery) {
+                statusFlag = "Error occured in createUserTransactionHistory for screen : Fail";
+                createUserHistoryCallback(null, statusFlag);
+            } else {
+                statusFlag = "success";
+                createUserHistoryCallback(null, statusFlag);
+            }
+        });
+};
+
+//Edit User
+exports.updateUser_nineteen68 = function updateUser_nineteen68(req, res) {
+    try {
+        if (req.cookies['connect.sid'] != undefined) {
+            var sessionCookie = req.cookies['connect.sid'].split(".");
+            var sessionToken = sessionCookie[0].split(":");
+            sessionToken = sessionToken[1];
+        }
+        if (sessionToken != undefined && req.session.id == sessionToken) {
+            var updateUserHistory;
+            var updateUserHistoryTxn; //History Txn Variable for create user in nineteen68
+            var updateUserHistoryQuery;
+            var date;
+            var flag = "fail";
+            var status = false;
+            var userObj = req.body.updateUserObj;
+            var local_username = userObj.userName;
+            var local_password = userObj.passWord;
+            var local_firstname = userObj.firstName;
+            var local_lastname = userObj.lastName;
+            var local_role;
+            //var local_role = userObj.role;
+            var local_email_id = userObj.email;
+            var local_user_Id = userObj.userId;
+            var db_password = '';
+            date = new Date().getTime();
+            if (local_password != "") {
+                var salt = bcrypt.genSaltSync(10);
+                var req_hashedPassword = bcrypt.hashSync(local_password, salt);
+            }
+            var getUserDetails = "select username,password,firstname,lastname,defaultrole,emailid,ldapuser from users where userid=" + local_user_Id;
+            dbConn.execute(getUserDetails, function(err, result) {
+                try {
+                    if (typeof result === 'undefined') {
+                        var flag = "fail";
+                        res.send(flag);
+                    } else {
+                        service = result.rows[0];
+                        if (local_username == undefined || local_username == 'undefined' || local_username == '') {
+                            local_username = service.username;
+                        }
+                        if (local_password.trim().length == 0) {
+                            db_password = service.password;
+                        } else {
+                            var salt = bcrypt.genSaltSync(10);
+                            var req_hashedPassword = bcrypt.hashSync(local_password, salt);
+                        }
+                        if (local_firstname == undefined || local_firstname == 'undefined' || local_firstname == '') {
+                            local_firstname = service.firstname;
+                        }
+                        if (local_lastname == undefined || local_lastname == 'undefined' || local_lastname == '') {
+                            local_lastname = service.lastname;
+                        }
+                        if (local_role == undefined || local_role == 'undefined' || local_role == '') {
+                            local_role = service.role;
+                        }
+                        if (local_email_id == undefined || local_email_id == 'undefined' || local_email_id == '') {
+                            local_email_id = service.emailid;
+                        }
+                        if (result.rows[0].ldapuser != null || result.rows[0].ldapuser != undefined) {
+                            if (result.rows[0].ldapuser) {
+                                db_password = null;
+                                req_hashedPassword = null;
+                            }
+                        }
+                        if (db_password != "" && db_password != undefined) {
+                            var updateUser = "UPDATE users set username='" + local_username + "', password='" + db_password + "', firstname='" + local_firstname + "', lastname='" + local_lastname + "', modifiedby='" + local_username + "', modifiedon=" + new Date().getTime() + ", emailid='" + local_email_id + "' where userid=" + local_user_Id;
+
+                            updateUserHistory = "'username=" + local_username + ",password=" + db_password + "," +
+                                "firstname=" + local_firstname + ", lastname=" + local_lastname + ",modifiedby=" + local_username + "," +
+                                "modifiedon=" + new Date().getTime() + ",emailid=" + local_email_id + " '";
+
+                            updateUserHistoryTxn = date + ":" + updateUserHistory;
+                            updateUserHistoryQuery = "update users set history= history + { " + updateUserHistoryTxn + " }" + " where userid = " + local_user_Id + " ";
+
+                        } else {
+                            var updateUser = "UPDATE users set username='" + local_username + "', password='" + req_hashedPassword + "', firstname='" + local_firstname + "', lastname='" + local_lastname + "', modifiedby='" + local_username + "', modifiedon=" + new Date().getTime() + ", emailid='" + local_email_id + "' where userid=" + local_user_Id;
+
+                            updateUserHistory = "'username=" + local_username + ",password=" + db_password + "," +
+                                "firstname=" + local_firstname + ", lastname=" + local_lastname + ",modifiedby=" + local_username + "," +
+                                "modifiedon=" + new Date().getTime() + ",emailid=" + local_email_id + " '";
+
+                            updateUserHistoryTxn = date + ":" + updateUserHistory;
+                            updateUserHistoryQuery = "update users set history= history + { " + updateUserHistoryTxn + " }" + " where userid = " + local_user_Id + " ";
+
+                        }
+
+                        dbConn.execute(updateUser, function(err, result) {
+                            try {
+                                if (typeof result === 'undefined') {
+                                    var flag = "fail";
+                                    res.send(flag);
+                                } else {
+                                    flag = "success";
+                                    fnUpdateUserHistory(updateUserHistoryQuery, function(err, response) {
+                                        if (response == 'success') {
+                                            res.send(flag);
+                                        } else {
+                                            flag = "fail";
+                                            res.send(flag);
+                                        }
+                                    });
+                                    //res.send(flag);
+                                }
+                            } catch (exception) {
+                                console.log(exception);
+                                res.send(flag);
+                            }
+                        });
+                    }
+                } catch (exception) {
+                    console.log(exception);
+                    res.send(flag);
+                }
+            });
+        } else {
+            res.send("Invalid Session");
+        }
+    } catch (exception) {
+        console.log(exception);
+        res.send("fail");
+    }
+};
+
+//Update User History Transaction
+function fnUpdateUserHistory(updateUserHistoryQuery, updateUserHistoryCallback) {
+
+    var statusFlag = "";
+    dbConnHistory.execute(updateUserHistoryQuery,
+        function(updateUserHistoryQuery, updateUserHistoryQueryRes) {
+            if (updateUserHistoryQuery) {
+                statusFlag = "Error occured in updateUserTransactionHistory for screen : Fail";
+                updateUserHistoryCallback(null, statusFlag);
+            } else {
+                statusFlag = "success";
+                updateUserHistoryCallback(null, statusFlag);
+            }
+        });
 };
 
 
 //Edit User
 exports.updateUser_nineteen68 = function updateUser_nineteen68(req, res) {
-	try{
-		if(req.cookies['connect.sid'] != undefined)
-		{
-			var sessionCookie = req.cookies['connect.sid'].split(".");
-			var sessionToken = sessionCookie[0].split(":");
-			sessionToken = sessionToken[1];
-		}
-			if(sessionToken != undefined && req.session.id == sessionToken)
-		{
-		var flag = "fail";
-		var status = false;
-		var userObj = req.body.updateUserObj;
-		var local_username = userObj.userName;
-		var local_password = userObj.passWord;
-		var local_firstname = userObj.firstName;
-		var local_lastname = userObj.lastName;
-		var local_role;
-		//var local_role = userObj.role;
-		var local_email_id = userObj.email;
-		var local_user_Id = userObj.userId;
-		var db_password='';
+    try {
+        if (req.cookies['connect.sid'] != undefined) {
+            var sessionCookie = req.cookies['connect.sid'].split(".");
+            var sessionToken = sessionCookie[0].split(":");
+            sessionToken = sessionToken[1];
+        }
+        if (sessionToken != undefined && req.session.id == sessionToken) {
+            var updateUserHistory;
+            var updateUserHistoryTxn; //History Txn Variable for create user in nineteen68
+            var updateUserHistoryQuery;
+            var date;
+            var flag = "fail";
+            var status = false;
+            var userObj = req.body.updateUserObj;
+            var local_username = userObj.userName;
+            var local_password = userObj.passWord;
+            var local_firstname = userObj.firstName;
+            var local_lastname = userObj.lastName;
+            var local_role;
+            //var local_role = userObj.role;
+            var local_email_id = userObj.email;
+            var local_user_Id = userObj.userId;
+            var db_password = '';
+            date = new Date().getTime();
+            if (local_password != "") {
+                var salt = bcrypt.genSaltSync(10);
+                var req_hashedPassword = bcrypt.hashSync(local_password, salt);
+            }
+            var getUserDetails = "select username,password,firstname,lastname,defaultrole,emailid,ldapuser from users where userid=" + local_user_Id;
+            dbConn.execute(getUserDetails, function(err, result) {
+                try {
+                    if (typeof result === 'undefined') {
+                        var flag = "fail";
+                        res.send(flag);
+                    } else {
+                        service = result.rows[0];
+                        if (local_username == undefined || local_username == 'undefined' || local_username == '') {
+                            local_username = service.username;
+                        }
+                        if (local_password.trim().length == 0) {
+                            db_password = service.password;
+                        } else {
+                            var salt = bcrypt.genSaltSync(10);
+                            var req_hashedPassword = bcrypt.hashSync(local_password, salt);
+                        }
+                        if (local_firstname == undefined || local_firstname == 'undefined' || local_firstname == '') {
+                            local_firstname = service.firstname;
+                        }
+                        if (local_lastname == undefined || local_lastname == 'undefined' || local_lastname == '') {
+                            local_lastname = service.lastname;
+                        }
+                        if (local_role == undefined || local_role == 'undefined' || local_role == '') {
+                            local_role = service.role;
+                        }
+                        if (local_email_id == undefined || local_email_id == 'undefined' || local_email_id == '') {
+                            local_email_id = service.emailid;
+                        }
+                        if (result.rows[0].ldapuser != null || result.rows[0].ldapuser != undefined) {
+                            if (result.rows[0].ldapuser) {
+                                db_password = null;
+                                req_hashedPassword = null;
+                            }
+                        }
+                        if (db_password != "" && db_password != undefined) {
+                            var updateUser = "UPDATE users set username='" + local_username + "', password='" + db_password + "', firstname='" + local_firstname + "', lastname='" + local_lastname + "', modifiedby='" + local_username + "', modifiedon=" + new Date().getTime() + ", emailid='" + local_email_id + "' where userid=" + local_user_Id;
 
-		if(local_password != "")
-		{
-			var salt = bcrypt.genSaltSync(10);
-			var req_hashedPassword = bcrypt.hashSync(local_password, salt);
-		}
-		var getUserDetails = "select username,password,firstname,lastname,defaultrole,emailid,ldapuser from users where userid="+local_user_Id;
-		dbConn.execute(getUserDetails, function (err, result) {
-			try{
-				if (typeof result === 'undefined') {
-					var flag = "fail";
-					res.send(flag);
-				}
-				else {
-					service = result.rows[0];
-					if(local_username == undefined || local_username == 'undefined' || local_username == ''){
-						local_username = service.username;
-					}
-					if(local_password.trim().length == 0) {
-						db_password = service.password;
-					}
-					else{
-						var salt = bcrypt.genSaltSync(10);
-						var req_hashedPassword = bcrypt.hashSync(local_password, salt);
-					}
-					if(local_firstname == undefined || local_firstname == 'undefined' || local_firstname == ''){
-						local_firstname = service.firstname;
-					}
-					if(local_lastname == undefined || local_lastname == 'undefined' || local_lastname == ''){
-						local_lastname = service.lastname;
-					}
-					if(local_role == undefined || local_role == 'undefined' || local_role == ''){
-						local_role = service.role;
-					}
-					if(local_email_id == undefined || local_email_id == 'undefined' || local_email_id == ''){
-						local_email_id = service.emailid;
-					}
-					if(result.rows[0].ldapuser !=null || result.rows[0].ldapuser !=undefined){
-						if(result.rows[0].ldapuser){
-							db_password = null;
-							req_hashedPassword = null;
-						}
-					}
-					if(db_password != "" && db_password != undefined)
-					{
-						var updateUser = "UPDATE users set username='"+local_username+"', password='"+db_password+"', firstname='"+local_firstname+"', lastname='"+local_lastname+"', modifiedby='"+local_username+"', modifiedon="+new Date().getTime()+", emailid='"+local_email_id+"' where userid="+local_user_Id;
-					}
-					else{
-						var updateUser = "UPDATE users set username='"+local_username+"', password='"+req_hashedPassword+"', firstname='"+local_firstname+"', lastname='"+local_lastname+"', modifiedby='"+local_username+"', modifiedon="+new Date().getTime()+", emailid='"+local_email_id+"' where userid="+local_user_Id;
-					}
+                            updateUserHistory = "'username=" + local_username + ",password=" + db_password + "," +
+                                "firstname=" + local_firstname + ", lastname=" + local_lastname + ",modifiedby=" + local_username + "," +
+                                "modifiedon=" + new Date().getTime() + ",emailid=" + local_email_id + " '";
 
-					dbConn.execute(updateUser, function (err, result) {
-						try{
-							if (typeof result === 'undefined') {
-								var flag = "fail";
-								res.send(flag); 
-							}
-							else {
-								flag = "success";
-								res.send(flag);
-							}
-						}
-						catch(exception){
-							console.log(exception);
-							res.send(flag);
-						}
-					});
-				}
-			}
-			catch(exception){
-				console.log(exception);
-				res.send(flag);
-			}
-		});		
-	}
-	else{
-		res.send("Invalid Session");
-	}
-	}
-	catch(exception){
-		console.log(exception);
-		res.send("fail");
-	}
+                            updateUserHistoryTxn = date + ":" + updateUserHistory;
+                            updateUserHistoryQuery = "update users set history= history + { " + updateUserHistoryTxn + " }" + " where userid = " + local_user_Id + " ";
+
+                        } else {
+                            var updateUser = "UPDATE users set username='" + local_username + "', password='" + req_hashedPassword + "', firstname='" + local_firstname + "', lastname='" + local_lastname + "', modifiedby='" + local_username + "', modifiedon=" + new Date().getTime() + ", emailid='" + local_email_id + "' where userid=" + local_user_Id;
+
+                            updateUserHistory = "'username=" + local_username + ",password=" + db_password + "," +
+                                "firstname=" + local_firstname + ", lastname=" + local_lastname + ",modifiedby=" + local_username + "," +
+                                "modifiedon=" + new Date().getTime() + ",emailid=" + local_email_id + " '";
+
+                            updateUserHistoryTxn = date + ":" + updateUserHistory;
+                            updateUserHistoryQuery = "update users set history= history + { " + updateUserHistoryTxn + " }" + " where userid = " + local_user_Id + " ";
+
+                        }
+
+                        dbConn.execute(updateUser, function(err, result) {
+                            try {
+                                if (typeof result === 'undefined') {
+                                    var flag = "fail";
+                                    res.send(flag);
+                                } else {
+                                    flag = "success";
+                                    fnUpdateUserHistory(updateUserHistoryQuery, function(err, response) {
+                                        if (response == 'success') {
+                                            res.send(flag);
+                                        } else {
+                                            flag = "fail";
+                                            res.send(flag);
+                                        }
+                                    });
+                                    //res.send(flag);
+                                }
+                            } catch (exception) {
+                                console.log(exception);
+                                res.send(flag);
+                            }
+                        });
+                    }
+                } catch (exception) {
+                    console.log(exception);
+                    res.send(flag);
+                }
+            });
+        } else {
+            res.send("Invalid Session");
+        }
+    } catch (exception) {
+        console.log(exception);
+        res.send("fail");
+    }
 };
 
+//Update User History Transaction
+function fnUpdateUserHistory(updateUserHistoryQuery, updateUserHistoryCallback) {
+
+    var statusFlag = "";
+    dbConnHistory.execute(updateUserHistoryQuery,
+        function(updateUserHistoryQuery, updateUserHistoryQueryRes) {
+            if (updateUserHistoryQuery) {
+                statusFlag = "Error occured in createUserTransactionHistory for screen : Fail";
+                updateUserHistoryCallback(null, statusFlag);
+            } else {
+                statusFlag = "success";
+                updateUserHistoryCallback(null, statusFlag);
+            }
+        });
+};
 //Get Domains
 exports.getDomains_ICE = function getDomains_ICE(req, res) {
 	try {
@@ -615,136 +815,241 @@ exports.checkCycleNameExists_ICE =  function checkCycleNameExists_ICE(req, res) 
 };
 
 exports.createProject_ICE = function createProject_ICE(req, res) {
-	try{
-		if(req.cookies['connect.sid'] != undefined)
-		{
-			var sessionCookie = req.cookies['connect.sid'].split(".");
-			var sessionToken = sessionCookie[0].split(":");
-			sessionToken = sessionToken[1];
-		}
-			if(sessionToken != undefined && req.session.id == sessionToken)
-		{
-		var createProjectObj = req.body.createProjectObj;
-		var userinfo = req.body.userDetails;
-		var dateScreen = new Date().getTime();
-		var requestedskucode = "skucodetestcase";
-		var requestedtags = "tags";
-		var requestedversionnumber = 1;
-		var projectTypeId = "";
-		var newProjectID = "";
+    try {
+        if (req.cookies['connect.sid'] != undefined) {
+            var sessionCookie = req.cookies['connect.sid'].split(".");
+            var sessionToken = sessionCookie[0].split(":");
+            sessionToken = sessionToken[1];
+        }
+        if (sessionToken != undefined && req.session.id == sessionToken) {
+            var createProjectHistory;
+            var createProjectHistoryQuery
+            var date;
+            var createProjectObj = req.body.createProjectObj;
+            var userinfo = req.body.userDetails;
+            var dateScreen = new Date().getTime();
+            var requestedskucode = "skucodetestcase";
+            var requestedtags = "tags";
+            var requestedversionnumber = 1;
+            var projectTypeId = "";
+            var newProjectID = "";
 
-		async.series({
-			projecttype: function(callback) {
-				try{
-					var queryGetProjectTypeId = "SELECT projecttypeid from projecttype where projecttypename = '" + createProjectObj.appType + "' ALLOW FILTERING";
-					dbConnICE.execute(queryGetProjectTypeId, function(err, projectTypeData) {
-						try{
-							if (err) {
+            async.series({
+                projecttype: function(callback) {
+                    try {
+                        var queryGetProjectTypeId = "SELECT projecttypeid from projecttype where projecttypename = '" + createProjectObj.appType + "' ALLOW FILTERING";
+                        dbConnICE.execute(queryGetProjectTypeId, function(err, projectTypeData) {
+                            try {
+                                if (err) {
 
-							} else {
-								projectTypeId = projectTypeData.rows[0].projecttypeid;
-							}
-							callback();		            		
-						}
-						catch(exception){console.log(exception);}
-					});	        		
-				}
-				catch(exception){console.log(exception);}
-			},
-			createproject: function(callback) {
-				try{
-					var requestprojecthistorydetails = "'inserted project action by " + userinfo.username + " having role:" + userinfo.role + "" +
-					" skucodetestcase=" + requestedskucode + ", tags=" + requestedtags + ", versionnumber=" + requestedversionnumber +
-					" with the project Name " + createProjectObj.projectName + " '";
-					newProjectID = uuid();
-					//console.log("insideProject", newProjectID);
-					var createProjectQuery = "INSERT INTO projects (domainid,projectname,projectid,createdby,createdon,deleted,history,projecttypeid,skucodeproject,tags) values(" +
-					createProjectObj.domainId + ",'" + createProjectObj.projectName + "'," + newProjectID + ",'" + userinfo.username +
-					"','" + new Date().getTime() + "'," + false + ",{" + dateScreen + ":" + requestprojecthistorydetails + "}," +
-					projectTypeId + ",'" + requestedskucode + "',['" + requestedtags + "']);"
-					// console.log(createProjectQuery);
-					dbConnICE.execute(createProjectQuery, function(err, insertProjectData) {
-						if (err) {
-							console.log(err);
-						} else {
+                                } else {
+                                    projectTypeId = projectTypeData.rows[0].projecttypeid;
+                                }
+                                callback();
+                            } catch (exception) {
+                                console.log(exception);
+                            }
+                        });
+                    } catch (exception) {
+                        console.log(exception);
+                    }
+                },
+                createproject: function(callback) {
+                    try {
+                        var requestprojecthistorydetails = "'inserted project action by " + userinfo.username + " having role:" + userinfo.role + "" +
+                            " skucodetestcase=" + requestedskucode + ", tags=" + requestedtags + ", versionnumber=" + requestedversionnumber +
+                            " with the project Name " + createProjectObj.projectName + " '";
+                        newProjectID = uuid();
+                        var createProjectQuery = "INSERT INTO projects (domainid,projectname,projectid,createdby,createdon,deleted,history,projecttypeid,skucodeproject,tags) values(" +
+                            createProjectObj.domainId + ",'" + createProjectObj.projectName + "'," + newProjectID + ",'" + userinfo.username +
+                            "','" + new Date().getTime() + "'," + false + ",{" + dateScreen + ":" + requestprojecthistorydetails + "}," +
+                            projectTypeId + ",'" + requestedskucode + "',['" + requestedtags + "']);"
 
-						}
-						callback();
-					});
-				}
-				catch(exception){console.log(exception);}
-			},
-			createreleases: function(callback) {
-				try{
-					var numberOfReleases = createProjectObj.projectDetails;
-					// console.log(numberOfReleases);
-					var releasesLength = numberOfReleases.length;
-					async.forEachSeries(numberOfReleases, function(eachrelease, numberOfReleasescallback) {
-						try{
-							var releaseDetails = eachrelease;
-							var releaseName = releaseDetails.releaseName;
-							var cycleNames = releaseDetails.cycleNames;
-							var cyclesLength = cycleNames.length;
-							var cycleindex = 0;
-							// cyclesLength=cycleNames.length;
-							var requestReleasehistorydetails = "'inserted release action by " + userinfo.username + " having role:" + userinfo.role + "" +
-							" skucodetestcase=" + requestedskucode + ", tags=" + requestedtags + ", with the release Name " + releaseName + " '";
-							var newReleaseID = uuid();
-							//console.log("insideRelease", newProjectID);
-							var createReleaseQuery = "INSERT INTO releases (projectid,releasename,releaseid,createdby,createdon,deleted,history,skucoderelease,tags) values(" +
-							newProjectID + ",'" + releaseName + "'," + newReleaseID + ",'" + userinfo.username + "','" +
-							new Date().getTime() + "'," + false + ",{" + dateScreen + ":" + requestReleasehistorydetails + "},'" +
-							requestedskucode + "',['" + requestedtags + "']);"
+                        createProjectHistory = "'domainid=" + createProjectObj.domainId + ", projectname=" + createProjectObj.projectName + ", projectid=" + newProjectID + ", createdby=" + userinfo.username + ", " +
+                            "createdon=" + new Date().getTime() + ", deleted=" + false + ", projecttypeid=" + projectTypeId + ", " +
+                            "skucodeproject=" + requestedskucode + ", tags=[" + requestedtags + "] '";
+                        date = new Date().getTime();
 
-							dbConnICE.execute(createReleaseQuery, function(err, data) {
-								if (err) {
-									console.log(err);
-								} else {
-									async.forEachSeries(cycleNames, function(cycleName, cycleNamescallback) {
-										try{
-											var eachCycleName = cycleName;
-											var requestCyclehistorydetails = "'inserted cycle action by " + userinfo.username + " having role:" + userinfo.role + "" +
-											" skucodetestcase=" + requestedskucode + ", tags=" + requestedtags + ",with the cycle Name " + eachCycleName + " '";
-											var newCycleID = uuid();
-											var getCycleQuery = "INSERT INTO cycles (releaseid,cyclename,cycleid,createdby,createdon,deleted,history,skucodecycle,tags) VALUES (" + newReleaseID + ",'" + eachCycleName + "'," + newCycleID + ",'" + userinfo.username + "','" +
-											new Date().getTime() + "'," + false + ",{" + dateScreen + ":" + requestCyclehistorydetails + "},'" +
-											requestedskucode + "',['" + requestedtags + "']);"
-											createCycle(getCycleQuery, function(error, response) {
-												try{
-													if (error) {
-														res.send(error);
+                        createProjectHistoryQuery = "INSERT INTO projects (projectid,history) VALUES (" + newProjectID + ",{" + date + ":" + createProjectHistory + "})";
+                        dbConnICE.execute(createProjectQuery, function(err, insertProjectData) {
+                            if (err) {
+                                console.log(err);
+                            } else {
+                                fnCreateProjectHistory(createProjectHistoryQuery, function(err, response) {
+                                    if (err) {
+                                        console.log(err);
+                                    } else {
+
+                                        callback();
+                                    }
+                                });
+                            }
+
+                        });
+                    } catch (exception) {
+                        console.log(exception);
+                    }
+                },
+                createreleases: function(callback) {
+                    try {
+                        var numberOfReleases = createProjectObj.projectDetails;
+                        // console.log(numberOfReleases);
+                        var releasesLength = numberOfReleases.length;
+                        async.forEachSeries(numberOfReleases, function(eachrelease, numberOfReleasescallback) {
+                            try {
+                                var createReleaseHistory;
+                                var createReleaseHistoryQuery;
+                                var date;
+                                var releaseDetails = eachrelease;
+                                var releaseName = releaseDetails.releaseName;
+                                var cycleNames = releaseDetails.cycleNames;
+                                var cyclesLength = cycleNames.length;
+                                var cycleindex = 0;
+                                // cyclesLength=cycleNames.length;
+                                var requestReleasehistorydetails = "'inserted release action by " + userinfo.username + " having role:" + userinfo.role + "" +
+                                    " skucodetestcase=" + requestedskucode + ", tags=" + requestedtags + ", with the release Name " + releaseName + " '";
+                               var newReleaseID = uuid();
+                                //console.log("insideRelease", newProjectID);
+                                var createReleaseQuery = "INSERT INTO releases (projectid,releasename,releaseid,createdby,createdon,deleted,history,skucoderelease,tags) values(" +
+                                    newProjectID + ",'" + releaseName + "'," + newReleaseID + ",'" + userinfo.username + "','" +
+                                    new Date().getTime() + "'," + false + ",{" + dateScreen + ":" + requestReleasehistorydetails + "},'" +
+                                    requestedskucode + "',['" + requestedtags + "']);"
+                                createReleaseHistory = "'projectid=" + newProjectID + ", releasename=" + releaseName + ", releaseid=" + newReleaseID + ", createdby=" + userinfo.username + ", " +
+                                    "createdon=" + new Date().getTime() + ", deleted=" + false + ", skucoderelease=" + requestedskucode + ", " +
+                                    "tags=" + requestedtags + " '";
+                                date = new Date().getTime();
+
+                                createReleaseHistoryQuery = "INSERT INTO releases (projectid,releaseid,history) VALUES (" + newProjectID + "," + newReleaseID + ",{" + date + ":" + createReleaseHistory + "})";
+								
+
+                                //History Insert for release name
+                                dbConnICE.execute(createReleaseQuery, function(err, data) {
+                                    if (err) {
+                                        console.log(err);
+                                    } else {
+											fnCreateReleaseHistory(createReleaseHistoryQuery, function(err, response) {
+													if (err) {
+														console.log(err);
 													} else {
-														cycleNamescallback();
-													}				                            		
-												}
-												catch(exception){console.log(exception);}
-											});
-										}
-										catch(exception){console.log(exception);}
-									}, numberOfReleasescallback);
-								}
-							});
-						}
-						catch(exception){console.log(exception);}
-					}, callback(null, ""));
-					res.send('success');
-				}
-				catch(exception){console.log(exception);}
-			}
+														console.log(response);
+													}
+											  async.forEachSeries(cycleNames, function(cycleName, cycleNamescallback) {
+                                                try {
+                                                var createCycleHistory;
+                                                var createCycleHistoryQuery
+                                                var date;
+                                                var eachCycleName = cycleName;
+                                                var requestCyclehistorydetails = "'inserted cycle action by " + userinfo.username + " having role:" + userinfo.role + "" +
+                                                    " skucodetestcase=" + requestedskucode + ", tags=" + requestedtags + ",with the cycle Name " + eachCycleName + " '";
+                                                var newCycleID = uuid();
+                                                var getCycleQuery = "INSERT INTO cycles (releaseid,cyclename,cycleid,createdby,createdon,deleted,history,skucodecycle,tags) VALUES (" + newReleaseID + ",'" + eachCycleName + "'," + newCycleID + ",'" + userinfo.username + "','" +
+                                                    new Date().getTime() + "'," + false + ",{" + dateScreen + ":" + requestCyclehistorydetails + "},'" +
+                                                    requestedskucode + "',['" + requestedtags + "']);"
+                                                createCycleHistory = "'releaseid=" + newReleaseID + ", cyclename=" + eachCycleName + ", cycleid=" + newCycleID + ", createdby=" + userinfo.username + ", " +
+                                                    "createdon=" + new Date().getTime() + ", deleted=" + false + ", skucodecycle=" + requestedskucode + ", " +
+                                                    "tags=" + requestedtags + " '";
+                                                date = new Date().getTime();
+                                                createCycleHistoryQuery = "INSERT INTO cycles (releaseid,cycleid,history) VALUES (" + newReleaseID + "," + newCycleID + ",{" + date + ":" + createCycleHistory + "})";
+                                                createCycle(getCycleQuery, function(error, response) {
+                                                    try {
+                                                        if (error) {
+                                                            res.send(error);
+                                                        } else {
+                                                            //
+                                                            fnCreateCycleHistory(createCycleHistoryQuery, function(err, response) {
+                                                                if (err) {
+                                                                    console.log(err);
+                                                                } else {
+                                                                    console.log(response);
+                                                                    if (response == "success")
+                                                                        cycleNamescallback();
+                                                                }
+                                                            });
 
-		}, function(err, data) {
-			if (err) {
-				console.log(err);
-			} else {
-				//console.log(data);
-			}
-		})
-	}
-	else{
-		res.send("Invalid Session");
-	}
-	}
-	catch(exception){console.log(exception);}
+                                                        }
+                                                    } catch (exception) {
+                                                        console.log(exception);
+                                                    }
+                                                });
+                                            } catch (exception) {
+                                                console.log(exception);
+                                            }
+                                        }, numberOfReleasescallback);
+												});
+                                       
+                                    }
+                                });
+                            } catch (exception) {
+                                console.log(exception);
+                            }
+                        }, callback(null, ""));
+                        res.send('success');
+                    } catch (exception) {
+                        console.log(exception);
+                    }
+                }
+
+            }, function(err, data) {
+                if (err) {
+                    console.log(err);
+                } else {
+                    //console.log(data);
+                }
+            })
+        } else {
+            res.send("Invalid Session");
+        }
+    } catch (exception) {
+        console.log(exception);
+    }
+};
+
+//Create Project History Transaction
+function fnCreateProjectHistory(createProjectHistoryQuery, createProjectHistoryCallback) {
+    console.log("History", createProjectHistoryQuery);
+    var statusFlag = "";
+    dbConnICEHistory.execute(createProjectHistoryQuery,
+        function(createProjectHistoryQuery, createProjectHistoryQueryRes) {
+            if (createProjectHistoryQuery) {
+                statusFlag = "Error occured in createProjectTransactionHistory : Fail";
+                createProjectHistoryCallback(null, statusFlag);
+            } else {
+                statusFlag = "success";
+                createProjectHistoryCallback(null, statusFlag);
+            }
+        });
+};
+
+//Create Release History Transaction
+function fnCreateReleaseHistory(createReleaseHistoryQuery, createReleaseHistoryCallback) {
+	console.log(createReleaseHistoryQuery);
+    var statusFlag = "";
+    dbConnICEHistory.execute(createReleaseHistoryQuery,
+        function(createReleaseHistoryQuery, createReleaseHistoryQueryRes) {
+            if (createReleaseHistoryQuery) {
+                statusFlag = "Error occured in createReleaseTransactionHistory : Fail";
+                createReleaseHistoryCallback(null, statusFlag);
+            } else {
+                statusFlag = "success";
+                createReleaseHistoryCallback(null, statusFlag);
+            }
+        });
+};
+
+//Create Cycle History Transaction
+function fnCreateCycleHistory(createCycleHistoryQuery, createCycleHistoryCallback) {
+
+    var statusFlag = "";
+    dbConnICEHistory.execute(createCycleHistoryQuery,
+        function(createCycleHistoryQuery, createCycleHistoryQueryRes) {
+            if (createCycleHistoryQuery) {
+                statusFlag = "Error occured in createCycleTransactionHistory : Fail";
+                createCycleHistoryCallback(null, statusFlag);
+            } else {
+                statusFlag = "success";
+                createCycleHistoryCallback(null, statusFlag);
+            }
+        });
 };
 
 /**
@@ -1604,41 +1909,70 @@ exports.getDetails_ICE = function(req, res) {
 };
 
 //Save Assigned Projects
-exports.assignProjects_ICE = function(req, res){
-	try{
-		if(req.cookies['connect.sid'] != undefined)
-		{
-			var sessionCookie = req.cookies['connect.sid'].split(".");
-			var sessionToken = sessionCookie[0].split(":");
-			sessionToken = sessionToken[1];
-		}
-			if(sessionToken != undefined && req.session.id == sessionToken)
-		{
-		var assignProjectsDetails = req.body.assignProjectsObj;
-		var projectDetails = assignProjectsDetails.assignedProjects;
-		var projectIds = [];
-		for(var i=0;i<projectDetails.length;i++)
-		{
-			projectIds.push(projectDetails[i].projectId);
-		}
-		var assignProjectsToUsers = "INSERT INTO icepermissions (userid,domainid,createdby,createdon,history,modifiedby,modifiedbyrole,modifiedon,projectids) VALUES ("+assignProjectsDetails.userId+","+assignProjectsDetails.domainId+",'"+assignProjectsDetails.userInfo.username+"','" + new Date().getTime() + "',null,'"+assignProjectsDetails.userInfo.username+"','"+assignProjectsDetails.userInfo.role+"','" + new Date().getTime() + "',["+projectIds+"]);"
-		dbConnICE.execute(assignProjectsToUsers, function (err, result) {
-			if (err) {
-				res.send("fail");
-			}
-			else {
-				res.send('success');
-			}
-		});		
-	}
-	else{
-		res.send("Invalid Session");
-	}
-	}
-	catch (exception) {
-		console.log(exception);
-		res.send("fail");
-	}
+exports.assignProjects_ICE = function(req, res) {
+    try {
+        if (req.cookies['connect.sid'] != undefined) {
+            var sessionCookie = req.cookies['connect.sid'].split(".");
+            var sessionToken = sessionCookie[0].split(":");
+            sessionToken = sessionToken[1];
+        }
+        if (sessionToken != undefined && req.session.id == sessionToken) {
+            var assignProjectsHistory;
+            var assignProjectsHistoryTxn; //History Txn Variable for create user in nineteen68
+            var assignProjectsHistoryQuery;
+            var date;
+            var assignProjectsDetails = req.body.assignProjectsObj;
+            var projectDetails = assignProjectsDetails.assignedProjects;
+            var projectIds = [];
+            for (var i = 0; i < projectDetails.length; i++) {
+                projectIds.push(projectDetails[i].projectId);
+            }
+            var assignProjectsToUsers = "INSERT INTO icepermissions (userid,domainid,createdby,createdon,history,modifiedby,modifiedbyrole,modifiedon,projectids) VALUES (" + assignProjectsDetails.userId + "," + assignProjectsDetails.domainId + ",'" + assignProjectsDetails.userInfo.username + "','" + new Date().getTime() + "',null,'" + assignProjectsDetails.userInfo.username + "','" + assignProjectsDetails.userInfo.role + "','" + new Date().getTime() + "',[" + projectIds + "]);"
+
+            assignProjectsHistory = "'userid=" + assignProjectsDetails.userId + ", domainid=" + assignProjectsDetails.domainId + ", createdby=" + assignProjectsDetails.userInfo.username + ", createdon=" + new Date().getTime() + ", " +
+                "modifiedby=" + assignProjectsDetails.userInfo.username + ", modifiedbyrole=" + assignProjectsDetails.userInfo.role + ", modifiedon=" + new Date().getTime() + ", " +
+                "projectids=[" + projectIds + "] '";
+            date = new Date().getTime();
+            assignProjectsHistoryQuery = "INSERT INTO icepermissions (userid,history) VALUES (" + userId + ",{" + date + ":" + assignProjectsHistory + "})";
+            dbConnICE.execute(assignProjectsToUsers, function(err, result) {
+                if (err) {
+                    res.send("fail");
+                } else {
+                    fnAssignProjectsHistory(assignProjectsHistoryQuery, function(err, response) {
+                        console.log("response", response);
+                        if (response == 'success') {
+                            res.send(response);
+                        } else {
+                            flag = "fail";
+                            res.send(flag);
+                        }
+                    });
+                    // res.send('success');
+                }
+            });
+        } else {
+            res.send("Invalid Session");
+        }
+    } catch (exception) {
+        console.log(exception);
+        res.send("fail");
+    }
+};
+
+//Assign Projects History Transaction
+function fnAssignProjectsHistory(assignProjectsHistoryQuery, assignProjectsHistoryCallback) {
+    console.log("History", assignProjectsHistoryQuery);
+    var statusFlag = "";
+    dbConnICEHistory.execute(assignProjectsHistoryQuery,
+        function(assignProjectsHistoryQuery, assignProjectsHistoryQueryRes) {
+            if (assignProjectsHistoryQuery) {
+                statusFlag = "Error occured in assignProjectsHistory for screen : Fail";
+                assignProjectsHistoryCallback(null, statusFlag);
+            } else {
+                statusFlag = "success";
+                assignProjectsHistoryCallback(null, statusFlag);
+            }
+        });
 };
 
 //get Assigned Projects

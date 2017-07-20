@@ -1,9 +1,8 @@
 var cassandra = require('cassandra-driver');
 const authProvider = new cassandra.auth.PlainTextAuthProvider('nineteen68', 'TA@SLK2017');
 module.exports = new cassandra.Client({
-    contactPoints: ['10.44.10.55'], 
-    keyspace: 'nineteen68',
+    contactPoints: ['10.41.31.5'], 
+    keyspace: 'icetestautomationhistory',
     authProvider: authProvider
 });
-
-console.log('Keyspace nineteen68 will be enabled.');  
+console.log('Keyspace icetestautomationhistory will be enabled.');  

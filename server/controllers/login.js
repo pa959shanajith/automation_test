@@ -641,7 +641,7 @@ exports.getRoleNameByRoleId_Nineteen68 = function(req, res){
         //          if(err){
 			var inputs = {"roleid": roleId}
 			var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
-			client.post("htt;p://127.0.0.1:1990/login/getRoleNameByRoleId_Nineteen68",args,
+			client.post("http://127.0.0.1:1990/login/getRoleNameByRoleId_Nineteen68",args,
 					function (rolesResult, response) {
 				if(response.statusCode != 200 || rolesResult.rows == "fail"){	
                        console.log("Error occured in getRoleNameByRoleId_Nineteen68 : Fail");

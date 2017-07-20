@@ -6,7 +6,7 @@
 var uuid = require('uuid-random');
 var async=require('async');
 var dbConnICE = require('../../server/config/icetestautomation');
-
+var dbConnICEHistory = require('../../server/config/ICEHistory');
 
 function get_moduleName(moduleId,cb,data){
         var flag = false;
@@ -224,7 +224,10 @@ exports.createStructure_Nineteen68 = function(req, res) {
                 var scenariodetailslist = [];
                 var testsuiteidneo = suitedetails.testsuiteId;
                 var tasksuite = suitedetails.task;
-         
+                var inserInSuiteHistory;
+                var inserInSuiteQuery;
+                var date;
+
 
 
                testsuiteid_exists({"modulename":testsuiteName,"moduleid":moduleid_c,'modifiedby':username,"pid":projectid},function(err,data){
@@ -239,6 +242,13 @@ exports.createStructure_Nineteen68 = function(req, res) {
                             var insertInSuite ='';
                 if(!suiteflag){
                 insertInSuite = "INSERT INTO modules (projectid,modulename,moduleid,versionnumber,createdby,createdon,createdthrough,deleted,history,modifiedby,modifiedbyrole,modifiedon,skucodemodule,tags,testscenarioids) VALUES (" + projectid + ",'" + testsuiteName + "'," + suiteID + ",1,'"+username+"'," + new Date().getTime() + ",null,null,null,null,null," + new Date().getTime() + ",null,null,null);";
+
+                  //Modules History
+                inserInSuiteHistory =  "' projectid="+projectid+",modulename="+testsuiteName+",moduleid=" + suiteID +",versionnumber=1,createdby=" + username + ",createdon=" + new Date().getTime().toString() + ",createdthrough=null,deleted=null,modifiedby=null,modifiedbyrole=null,modifiedon=" + new Date().getTime() + ",skucodemodule=null,tags=null,testscenarioids=null '";
+                date = new Date().getTime();
+                inserInSuiteQuery = "INSERT INTO modules (projectid,moduleid,modulename,versionnumber,history) VALUES ("+projectid+"," + suiteID +",'"+testsuiteName+"',1,{" + date + ":" + inserInSuiteHistory + "})";
+
+
                 }else{
                 insertInSuite = "SELECT moduleid FROM modules where modulename='"+testsuiteName+"' ALLOW FILTERING";
                 suiteID = suiteidTemp; 
@@ -250,11 +260,23 @@ exports.createStructure_Nineteen68 = function(req, res) {
                     if (err) {
                         console.log(err);
                     } else {
+                          //Start of Insert Module History
+                          fnCreateModuleHistory(inserInSuiteQuery, function(err, response) {
+                              if(err){
+                                  console.log(err);
+                              }
+                                    if (response == 'success') {
+                                        console.log('success');
+                                    } 
+                                });
+                         //End of Insert Module History
                         scenario = suitedetails.testscenarioDetails;
                         var scenariosarray = [];
                          var testcaseidlist = []; 
                         async.forEachSeries(scenario, function(iterator, callback2) {
-                           
+                             var inserInScenarioHistory;
+                            var inserInScenarioQuery;
+                            var date;
                             var scenarioId = uuid();
                             scenariosarray.push(scenarioId);
                            
@@ -280,8 +302,16 @@ exports.createStructure_Nineteen68 = function(req, res) {
                                 var insertInScenario='';
                                 if(!scenarioflag){
                                     insertInScenario   = "insert into testscenarios(projectid,testscenarioname,testscenarioid,createdby,createdon,history,modifiedby,modifiedbyrole,modifiedon,skucodetestscenario,tags,testcaseids) VALUES (" + projectid + ",'" + scenarioName + "'," + scenarioId + ",'"+username+"'," + new Date().getTime() + ",null,null,null," + new Date().getTime() + ",null,null,[])";
+
+                                    
+                                     //Scenarios History
+                                    inserInScenarioHistory =  "' projectid="+projectid+",testscenarioname="+scenarioName+",testscenarioid=" + scenarioId +",createdby=" + username + ",createdon=" + new Date().getTime().toString() + ",modifiedby=null,modifiedbyrole=null,modifiedon=" + new Date().getTime() + ",skucodetestscenario=null,tags=null,testcaseids=[] '";
+                                    date = new Date().getTime();
+                                    inserInScenarioQuery = "INSERT INTO testscenarios(projectid,testscenarioname,testscenarioid,history) VALUES ("+projectid+",'" + scenarioName +"',"+scenarioId+",{" + date + ":" + inserInScenarioHistory + "})";
                                 }else{
                                     insertInScenario = "DELETE testcaseids FROM testscenarios WHERE testscenarioid="+scenarioidTemp+" and testscenarioname='"+scenarioName +"' and projectid = "+projectid;
+                                      inserInScenarioHistory =  "testscenarioid="+scenarioidTemp+",testscenarioname="+scenarioName+",projectid=" + projectid +" ";
+                                    //Delete Query
                                     scenarioId =  scenarioidTemp;
                                 }
                                 var scenariodetailsobj = {"testscenarioId":scenarioidneo,"testscenarioId_c":scenarioId,"screenDetails":screendetailslist,"tasks":taskscenario,"testscenarioName":scenarioName};
@@ -291,10 +321,19 @@ exports.createStructure_Nineteen68 = function(req, res) {
                                 if (err) {
                                     console.log(err);
                                 } else {
+                                     //Scenarios History
+                                      fnCreateScenarioHistory(inserInScenarioQuery, function(err, response) {
+                                        if(err){console.log(err);}
+                                                if (response == 'success') {
+                                                    console.log('success');
+                                                } 
+                                            });
                                     scenarioidlist.push(scenarioId);
                                     var screen = iterator.screenDetails;
                                     async.forEachSeries(screen, function(screenitr, callback3) {
-
+                                          var inserInScreenHistory;
+                                        var inserInScreenQuery;
+                                        var date; 
                                         var screenId = uuid();
                                         var screenDetails = screenitr;
                                         var screenName = screenitr.screenName;
@@ -316,7 +355,11 @@ exports.createStructure_Nineteen68 = function(req, res) {
                                             var insertInScreen = '';
                                             if(!screenflag){
                                                 insertInScreen = "INSERT INTO screens (projectid,screenname,screenid,versionnumber,createdby,createdon,createdthrough,deleted,history,modifiedby,modifiedon,screendata,skucodescreen,tags) VALUES (" + projectid + ",'" + screenName + "'," + screenId + ",1,'"+username+"'," + new Date().getTime() + ",null,null,null,null," + new Date().getTime() + ",'',null,null)";
-
+                                                
+                                            //Screens History
+                                            inserInScreenHistory =  "'projectid="+projectid+",screenname="+scenarioName+",screenid=" + screenId +",versionnumber=1,createdby=" + username + ",createdon=" + new Date().getTime().toString() + ",createdthrough=null,deleted=null,modifiedby=" + new Date().getTime() + ",modifiedon=null,skucodescreen=null,tags=[] '";
+                                            date = new Date().getTime();
+                                            inserInScreenQuery = "INSERT INTO screens(projectid,screenid,screenname,versionnumber,history) VALUES ("+projectid+"," + screenId +",'"+scenarioName+"',1,{" + date + ":" + inserInScreenHistory + "})";
                                             }else{
                                                 insertInScreen = "select screenid from screens where screenname='"+screenName+"' ALLOW FILTERING";
                                                 screenId = screenidTemp;
@@ -328,12 +371,27 @@ exports.createStructure_Nineteen68 = function(req, res) {
                                                     if (err) {
                                                         console.log(err);
                                                     } else {
+                                                        //Screen History
+                                                         fnCreateScreenHistory(inserInScreenQuery, function(err, response) {
+                                                            if(err){
+                                                                console.log(err);
+                                                            }
+                                                            if (response == 'success') {
+                                                                console.log('success');
+                                                            } 
+                                                        });
+                                                          //Screen History
                                                         var testcase = screenDetails.testcaseDetails;
                                                         var testcasesarray = [];
                                                         async.forEachSeries(testcase, function(testcaseitr, callback4) {
                                                             var testcaseID = uuid();
                                                             // testcasesarray.push(testcaseID);
+                                                               var inserInTestcaseHistory;
+                                                            var inserInTestcaseQuery;
+                                                            var date;
 
+                                                            var updateTestScenariosHistory;
+                                                            var updateTestScenarioQuery;
                                                             var testcaseDetails = testcaseitr;
                                                             var testcaseName = testcaseitr.testcaseName;
                                                             var testcaseid_c = testcaseitr.testcaseId_c;
@@ -353,7 +411,10 @@ exports.createStructure_Nineteen68 = function(req, res) {
                                                                 var insertInTescase = '';
                                                                 if(!testcaseflag){
                                                                     insertInTescase = "INSERT INTO testcases (screenid,testcasename,testcaseid,versionnumber,createdby,createdon,createdthrough,deleted,history,modifiedby,modifiedon,skucodetestcase,tags,testcasesteps)VALUES (" + screenId + ",'" + testcaseName + "'," + testcaseID + ",1,'"+username+"'," + new Date().getTime() + ",null,null,null,null," + new Date().getTime() + ",'skucodetestcase',null,'')";
-
+                                                                     //Testcases History
+                                                                    inserInTestcaseHistory =  "' screenid="+screenId+",testcasename="+testcaseName+",testcaseid=" + testcaseID +",versionnumber=1,createdby=" + username + ",createdon=" + new Date().getTime().toString() + ",createdthrough=null,deleted=null,modifiedby=" + new Date().getTime() + ",modifiedon=null,skucodetestcase=null,tags=null,testcasesteps='' '";
+                                                                    date = new Date().getTime();
+                                                                    inserInTestcaseQuery = "INSERT INTO testcases(screenid,testcasename,testcaseid,versionnumber,history) VALUES ("+screenId+",'" + testcaseName +"',"+testcaseID+",1,{" + date + ":" + inserInTestcaseHistory + "})";
                                                                 }else{
                                                                     insertInTescase = "select testcaseid from testcases where testcasename='"+testcaseName+"' ALLOW FILTERING";
                                                                     testcaseID = testcaseidTemp;
@@ -366,8 +427,20 @@ exports.createStructure_Nineteen68 = function(req, res) {
                                                                 if (err) {
                                                                     console.log(err);
                                                                 } else {
+                                                                     fnCreateTestcaseHistory(inserInTestcaseQuery, function(err, response) {
+                                                                       if(err){
+                                                                           console.log(err);
+                                                                       }
+                                                                       if(response == "success")
+                                                                       {
+                                                                           console.log(response);
+                                                                       }
+                                                                    });
                                                                     testcaseidlist.push(testcaseID);
                                                                 	var updateTestscenario="update testscenarios set testcaseids=testcaseids+["+testcaseID+"],modifiedby='"+username+"',modifiedon="+modifiedon+"   where projectid ="+projectid+"and testscenarioid ="+scenarioId+" and testscenarioname = '"+scenarioName+"' ";
+                                                                      //Update Test Scenarios history
+                                                                 //   updateTestScenariosHistory = "'updated testcaseids=testcaseids+["+testcaseID+"]","modifiedby='"+username+"',modifiedon="+modifiedon+" '";
+                                                                   // updateTestScenarioQuery = "";
                                                                     var update =dbConnICE.execute(updateTestscenario,function(err,result){});
                                                                 }
                                                                 
@@ -440,6 +513,68 @@ exports.createStructure_Nineteen68 = function(req, res) {
         }
     );
 }
+	
+//create module history transaction(createStructure_Nineteen68)
+function fnCreateModuleHistory(inserInSuiteQuery, createModuleHistoryCallback) {
+        //console.log("History", createModuleHistoryQuery);
+        var statusFlag = "";
+        dbConnICEHistory.execute(inserInSuiteQuery,
+            function(inserInSuiteQuery, createModuleHistoryQueryRes) {
+                if (inserInSuiteQuery) {
+                    statusFlag = "Error occured in createModuleTransactionHistory : Fail";
+                    createModuleHistoryCallback(null, statusFlag);
+                } else {
+                    statusFlag = "success";
+                    createModuleHistoryCallback(null, statusFlag);
+                }
+            });
+    };
+//create scenario history transaction(createStructure_Nineteen68)
+function fnCreateScenarioHistory(inserInScenarioQuery, createScenarioHistoryCallback) {
+        //console.log("History", createScenarioHistoryQuery);
+        var statusFlag = "";
+        dbConnICEHistory.execute(inserInScenarioQuery,
+            function(inserInScenarioQuery, createScenarioHistoryQueryRes) {
+                if (inserInScenarioQuery) {
+                    statusFlag = "Error occured in createScenarioTransactionHistory : Fail";
+                    createScenarioHistoryCallback(null, statusFlag);
+                } else {
+                    statusFlag = "success";
+                    createScenarioHistoryCallback(null, statusFlag);
+                }
+            });
+    };
+//create screen history transaction(createStructure_Nineteen68)
+function fnCreateScreenHistory(inserInScreenQuery, createScreenHistoryCallback) {
+        //console.log("History", inserInScreenQuery);
+        var statusFlag = "";
+        dbConnICEHistory.execute(inserInScreenQuery,
+            function(inserInScreenQuery, createScreenHistoryQueryRes) {
+                if (inserInScreenQuery) {
+                    statusFlag = "Error occured in createTestcaseTransactionHistory : Fail";
+                    createScreenHistoryCallback(null, statusFlag);
+                } else {
+                    statusFlag = "success";
+                    createScreenHistoryCallback(null, statusFlag);
+                }
+            });
+    };
+
+//create testcase history transaction(createStructure_Nineteen68)
+function fnCreateTestcaseHistory(inserInTestcaseQuery, createTestcaseHistoryCallback) {
+        //console.log("History", inserInTestcaseQuery);
+        var statusFlag = "";
+        dbConnICEHistory.execute(inserInTestcaseQuery,
+            function(inserInTestcaseQuery, createTestcaseHistoryQueryRes) {
+                if (inserInTestcaseQuery) {
+                    statusFlag = "Error occured in createTestcaseTransactionHistory : Fail";
+                    createTestcaseHistoryCallback(null, statusFlag);
+                } else {
+                    statusFlag = "success";
+                    createTestcaseHistoryCallback(null, statusFlag);
+                }
+            });
+    };
 
 
 
@@ -1217,7 +1352,10 @@ exports.createE2E_Structure_Nineteen68 = function(req, res) {
     var cycleId = RequestedJSON.cycleId;
     var releaseId = RequestedJSON.releaseId;
     var appType = RequestedJSON.appType;
-   
+    var inserInSuiteHistory;
+    var inserInSuiteQuery;
+    var date;
+
 
     var username=RequestedJSON.userName;
     var suite = RequestedJSON.testsuiteDetails.length;
@@ -1253,6 +1391,13 @@ exports.createE2E_Structure_Nineteen68 = function(req, res) {
                             var insertInSuite ='';
                 if(!suiteflag){
                 insertInSuite = "INSERT INTO modules (projectid,modulename,moduleid,versionnumber,createdby,createdon,createdthrough,deleted,history,modifiedby,modifiedbyrole,modifiedon,skucodemodule,tags,testscenarioids) VALUES (" + projectid + ",'" + testsuiteName + "'," + suiteID + ",1,'"+username+"'," + new Date().getTime() + ",null,null,null,null,null," + new Date().getTime() + ",null,null,null);";
+
+                       //Modules History
+                inserInSuiteHistory =  "'projectid="+projectid+",modulename="+testsuiteName+",moduleid=" + suiteID +",versionnumber=1,createdby=" + username + ",createdon=" + new Date().getTime().toString() + ",createdthrough=null,deleted=null,modifiedby=null,modifiedbyrole=null,modifiedon=" + new Date().getTime() + ",skucodemodule=null,tags=null,testscenarioids=null '";
+                date = new Date().getTime();
+                inserInSuiteQuery = "INSERT INTO modules (projectid,moduleid,modulename,versionnumber,history) VALUES ("+projectid+"," + suiteID +",'"+testsuiteName+"',1,{" + date + ":" + inserInSuiteHistory + "})";
+                
+
                 }else{
                 insertInSuite = "SELECT moduleid FROM modules where modulename='"+testsuiteName+"' ALLOW FILTERING";
                 suiteID = suiteidTemp; 
@@ -1264,6 +1409,16 @@ exports.createE2E_Structure_Nineteen68 = function(req, res) {
                     if (err) {
                         console.log(err);
                     } else {
+                           //Start of Insert Module History
+                          fnCreateModuleHistory(inserInSuiteQuery, function(err, response) {
+                              if(err){
+                                  console.log(err);
+                              }
+                                    if (response == 'success') {
+                                        console.log('success');
+                                    } 
+                                });
+                         //End of Insert Module History
                         scenario = suitedetails.testscenarioDetails;
                         var scenariosarray = [];
                          var testcaseidlist = []; 

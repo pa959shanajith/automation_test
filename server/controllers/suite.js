@@ -7,6 +7,7 @@ var async = require('async');
 var myserver = require('../../server.js');
 var uuid = require('uuid-random');
 var dbConnICE = require('../../server/config/icetestautomation');
+var dbConnICEHistory = require('../../server/config/ICEHistory');
 
 /**
  * @author vishvas.a
@@ -326,6 +327,11 @@ exports.updateTestScenario_ICE = function(req, res) {
             sessionToken = sessionToken[1];
         }
         if (sessionToken != undefined && req.session.id == sessionToken) {
+
+            var updatetestscenarioHistory;
+            var updatedtestscenarioHistoryQuery;
+            var date;
+
             var requestedtestscycleId = req.body.cycleId;
             var requestedtestscenarioid = req.body.testscenarioid;
             var requestedtestscenarioname = req.body.testscenarioname;
@@ -362,6 +368,14 @@ exports.updateTestScenario_ICE = function(req, res) {
                 var updateTestScenarioData = "update testscenarios set testcaseids=testcaseids+[" + requestedetestcaseids[i] + "] ,modifiedby ='" + requestedmodifiedby +
                     "' , modifiedon = " + requestedmodifiedon + " where projectid =" + requestedprojectid + " and testscenarioid = " + requestedtestscenarioid + " and testscenarioname = '" + requestedtestscenarioname + "';";
 
+               updatetestscenarioHistory =   "testcaseids=testcaseids+[" + requestedetestcaseids[i] + "] ,modifiedby ='" + requestedmodifiedby +
+                    "' , modifiedon = " + requestedmodifiedon + "";
+              updatetestscenarioHistory = dateScreen + ":" + updatetestscenarioHistory;
+              updatedtestscenarioHistoryQuery = "UPDATE testscenarios SET  history= history + { "+updatetestscenarioHistory+" }" +
+																			"' where projectid=" + requestedprojectid + " and testscenarioid=" + requestedtestscenarioid + 
+																			" and testscenarioname='" + requestedtestscenarioname + "' ";
+                console.log(updatedtestscenarioHistoryQuery);
+
                 dbConnICE.execute(updateTestScenarioData, function(err, result) {
                     if (err) {
                         var flag = "Error in Query 1 updateTestScenarioData: Fail";
@@ -369,10 +383,23 @@ exports.updateTestScenario_ICE = function(req, res) {
                         //cb(null, flag);
                         res.send(flag);
                     } else {
-                        var flag = "updateTestScenarioData updation : Success";
-                        console.log(flag);
-                        //cb(null,flag);
-                        res.send(flag);
+                        	fnUpdateTestScenariosHistory(updatedtestscenarioHistoryQuery, function(err, response) {
+																	if (err) {
+																		console.log(err);
+																	} else {
+																		//console.log(response);
+																		if (response == "success")
+																		 var flag = "updateTestScenarioData updation : Success";
+                                                                            console.log(flag);
+                                                                            //cb(null,flag);
+                                                                            res.send(flag);
+																	}
+																});
+
+                        // var flag = "updateTestScenarioData updation : Success";
+                        // console.log(flag);
+                        // //cb(null,flag);
+                        // res.send(flag);
                     }
                 });
             }
@@ -380,7 +407,22 @@ exports.updateTestScenario_ICE = function(req, res) {
             res.send("Invalid Session");
         }
     }
-
+//UpdateTestScenario History
+          function fnUpdateTestScenariosHistory(updatedtestscenarioHistoryQuery, updateScenarioHistoryCallback)
+            {
+                    console.log("History", updatedtestscenarioHistoryQuery);
+                    var statusFlag = "";
+            dbConnICEHistory.execute(updatedtestscenarioHistoryQuery,
+                function(updatedtestscenarioHistoryQuery, updateScenarioHistoryQueryRes) {
+                    if (updatedtestscenarioHistoryQuery) {
+                        statusFlag = "Error occured in updateScenarioHistoryQueryRes: Fail";
+                        updateScenarioHistoryCallback(null, statusFlag);
+                    } else {
+                        statusFlag = "success";
+                        updateScenarioHistoryCallback(null, statusFlag);
+                    }
+                });
+            }
 //UpdateTestSscnario Functionality
 
 
@@ -488,6 +530,13 @@ exports.ExecuteTestSuite_ICE = function(req, res) {
                 mySocket.on('result_executeTestSuite', function(resultData) {
                     if (resultData != "success" && resultData != "Terminate") {
                         try {
+                            var insertReportHistory;
+                            var insertReportQuery;
+                            var date;
+
+                            var insertExecutionHistory;
+                            var insertExecutionQuery;
+
                             var scenarioid = resultData.scenarioId;
                             var executionid = resultData.executionId;
                             var reportdata = resultData.reportData;
@@ -499,20 +548,50 @@ exports.ExecuteTestSuite_ICE = function(req, res) {
                             reportdata = JSON.stringify(reportdata).replace(/'/g, "''");
                             reportdata = JSON.parse(reportdata);
                             
-                            var insertReport = "INSERT INTO reports (reportid,executionid,testsuiteid,testscenarioid,executedtime,browser,modifiedon,status,report) VALUES (" + uuid() + "," + executionid + "," + testsuiteid + "," + scenarioid + "," + new Date().getTime() + ",'" + req_browser + "'," + new Date().getTime() + ",'" + resultData.reportData.overallstatus[0].overallstatus + "','" + JSON.stringify(reportdata) + "')";
+                            var reportId = uuid();
+
+                            var insertReport = "INSERT INTO reports (reportid,executionid,testsuiteid,testscenarioid,executedtime,browser,modifiedon,status,report) VALUES (" + reportId + "," + executionid + "," + testsuiteid + "," + scenarioid + "," + new Date().getTime() + ",'" + req_browser + "'," + new Date().getTime() + ",'" + resultData.reportData.overallstatus[0].overallstatus + "','" + JSON.stringify(reportdata) + "')";
+                             date = new Date().getTime();
+                            insertReportHistory = "'reportid=" + reportId + ", executionid=" + executionid + ", testsuiteid=" + testsuiteid + ", testscenarioid=" + scenarioid + ", " +
+                                    "executedtime=" + new Date().getTime() + ", browser=" + req_browser + ", modifiedon=" + new Date().getTime() + ", " +
+                                    "status=" + resultData.reportData.overallstatus[0].overallstatus +",report=" + JSON.stringify(reportdata) + " '";
+                            
+                            insertReportQuery =  "INSERT INTO reports (reportid,executionid,history) VALUES (" + reportId + "," + executionid + ",{" + date + ":" + insertReportHistory + "})";
+
                             var dbquery = dbConnICE.execute(insertReport, function(err, result) {
                                 if (err) {
                                     flag = "fail";
                                 } else {
-                                    flag = "success";
+                                  	 fnCreateReportHistory(insertReportQuery, function(err, response) {
+                                                                if (err) {
+                                                                    console.log(err);
+                                                                } else {
+                                                                    if (response == "success")
+                                                                        flag = "success";
+                                                                }
+                                                            });
+                                    //flag = "success";
                                 }
                             });
                             var insertIntoExecution = "INSERT INTO execution (testsuiteid,executionid,starttime,endtime) VALUES (" + testsuiteid + "," + executionid + "," + starttime + "," + new Date().getTime() + ");"
+
+                            insertExecutionHistory = "'testsuiteid=" + testsuiteid + ", executionid=" + executionid + ", starttime=" + starttime + ", endtime=" + new Date().getTime() + " '";
+                            insertExecutionQuery = "INSERT INTO execution (testsuiteid,executionid,history) VALUES (" + testsuiteid + "," + executionid + ",{" + date + ":" + insertExecutionHistory + "});"
+
+
                             var dbqueryexecution = dbConnICE.execute(insertIntoExecution, function(err, resultexecution) {
                                 if (err) {
                                     flag = "fail";
                                 } else {
-                                    flag = "success";
+                                    fnCreateExecutionHistory(insertExecutionQuery, function(err, response) {
+                                                                if (err) {
+                                                                    console.log(err);
+                                                                } else {
+                                                                    if (response == "success")
+                                                                        flag = "success";
+                                                                }
+                                                            });
+                                   // flag = "success";
 								
                                 }
 
@@ -537,6 +616,38 @@ exports.ExecuteTestSuite_ICE = function(req, res) {
                 res.send("unavailableLocalServer");
             }
         }
+        //Create Report History while Execution
+        function fnCreateReportHistory(insertReportQuery, createReportHistoryCallback)
+        {
+                console.log("History", insertReportQuery);
+                var statusFlag = "";
+        dbConnICEHistory.execute(insertReportQuery,
+            function(insertReportQuery, createReportHistoryQueryRes) {
+                if (insertReportQuery) {
+                    statusFlag = "Error occured in createReportHistory: Fail";
+                    createReportHistoryCallback(null, statusFlag);
+                } else {
+                    statusFlag = "success";
+                    createReportHistoryCallback(null, statusFlag);
+                }
+            });
+        }
+        //Create Execution insert history
+          function fnCreateExecutionHistory(insertExecutionQuery, createExecutionHistoryCallback)
+            {
+                    console.log("History", insertExecutionQuery);
+                    var statusFlag = "";
+            dbConnICEHistory.execute(insertExecutionQuery,
+                function(insertExecutionQuery, createExecuteHistoryQueryRes) {
+                    if (insertExecutionQuery) {
+                        statusFlag = "Error occured in createExecuteHistory: Fail";
+                        createExecutionHistoryCallback(null, statusFlag);
+                    } else {
+                        statusFlag = "success";
+                        createExecutionHistoryCallback(null, statusFlag);
+                    }
+                });
+            }
         //old code 
         //commented by vishvas(21/June/2017) with regard to Batch Execution
         // var browserType = req.body.browserType; // var testsuiteid = req.body.testsuiteId // var scenarioIdinfor = ''; //var json = "[{ 	\"scenarioname\": \"Scenario Name1\", 	\"scenarioid\": \"72bcc08e-15a7-4de6-ad59-389aee2230cb\", 	\"conditon\": [\"false\"], 	\"dataParam\": \"http://10.41.31.92:3000/execute\", 	\"executeStatus\": [\"1\"] }]"; // var json1 = JSON.parse(json); // var executionId = uuid(); // var starttime = new Date().getTime(); //internal values // var testsuitedetails = { // "suitedetails": "", // "executionId":"", // "testsuiteIds": "" // }; // async.forEachSeries(json1, function(itr, callback3) { // scenarioIdList.push(itr.scenarioids); // dataparamlist.push(itr.dataparam[0]); // conditionchecklist.push(itr.condition); // scenarioIdinfor = itr.scenarioids; // TestCaseDetails_Suite_ICE(scenarioIdinfor, function(err, data) {  // if (err) { // console.log(err); // } else { // if (data != null || data != undefined) { // scenariotestcaseobj[scenarioIdinfor] = data; // listofscenarioandtestcases.push(scenariotestcaseobj); // } // } // callback3(); // }) // }, function(callback3) { // executionjson[testsuiteid] = listofscenarioandtestcases; // executionjson.scenarioIds = scenarioIdList; // executionjson.browserType = browserType; // executionjson.condition = conditionchecklist; // executionjson.dataparampath = dataparamlist; // testsuitedetailslist.push(executionjson)  // testsuiteidslist.push(testsuiteid); // testsuitedetails.suitedetails = testsuitedetailslist; // testsuitedetails.testsuiteIds = testsuiteidslist; // testsuitedetails.executionId = executionId; // //					console.log(JSON.stringfy(testsuitedetails)); // var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress; // console.log(Object.keys(myserver.allSocketsMap), "<<all people, asking person:", ip); // if ('allSocketsMap' in myserver && ip in myserver.allSocketsMap) { // var mySocket = myserver.allSocketsMap[ip]; // mySocket._events.result_executeTestSuite = []; // mySocket.emit('executeTestSuite', testsuitedetails); // mySocket.on('result_executeTestSuite', function(resultData) {  // if (resultData != "success" && resultData != "Terminate") { // try { // var scenarioid = resultData.scenarioId; // var executionid = resultData.executionId; // var reportdata = resultData.reportData; // var req_report = resultData.reportdata; // var req_reportStepsArray = reportdata.rows; // var req_overAllStatus = reportdata.overallstatus // var req_browser = reportdata.overallstatus[0].browserType; // reportdata = JSON.stringify(reportdata).replace(/'/g, "''"); // reportdata = JSON.parse(reportdata);  // var insertReport = "INSERT INTO reports (reportid,executionid,testsuiteid,testscenarioid,executedtime,browser,modifiedon,status,report) VALUES (" + uuid() + "," + executionid + "," + testsuiteid + "," + scenarioid + "," + new Date().getTime() + ",'" + req_browser + "'," + new Date().getTime() + ",'" + resultData.reportData.overallstatus[0].overallstatus + "','" + JSON.stringify(reportdata) + "')"; // var dbquery = dbConnICE.execute(insertReport, function(err, result) { // if (err) { // flag = "fail"; // } else { // flag = "success"; // } // });  // var insertIntoExecution = "INSERT INTO execution (testsuiteid,executionid,starttime,endtime) VALUES (" + testsuiteid + "," + executionid + "," + starttime + "," + new Date().getTime() + ");" // var dbqueryexecution = dbConnICE.execute(insertIntoExecution, function(err, resultexecution) { // if (err) { // flag = "fail"; // } else { // flag = "success"; // } // }); // //console.log("this is the value:",resultData); // } catch (ex) { // console.log(ex);  // } // } // //console.log("Response data in execution : ",resultData); // try { // if (resultData == "success" || resultData == "Terminate") // res.send(resultData); // } catch (ex) { // console.log("Exception occured is : ", ex) // }  // //} // }); // } else { // console.log("Socket not Available"); // res.send("unavailableLocalServer"); // }  // });
@@ -1062,7 +1173,9 @@ function TestSuiteDetails_Module_ICE(req, cb1, data) {
                 var testscenarioids = resultdata.testscenarioids;
                 //async.forEachSeries(resultdata, function(quest, callback2) {					var responsedata={template: "",testcase:[],testcasename:""};
                 var requiredversionnumber = 1;
-
+                var createTestSuitesHistory;
+                var insertTestSuiteQuery;
+                var date;
                 //var testcasestepsquery = "select testcasesteps,testcasename from testcases where testcaseid = "+quest;
                 if (!flag) {
                     var conditioncheckvalues = [];
@@ -1074,13 +1187,25 @@ function TestSuiteDetails_Module_ICE(req, cb1, data) {
                         getparampathvalues.push('\' \'');
                     }
                     var testsuiteexe = "INSERT INTO testsuites (cycleid,testsuitename,testsuiteid,versionnumber,conditioncheck,createdby,createdon,createdthrough,deleted,donotexecute,getparampaths,history,modifiedby,modifiedon,skucodetestsuite,tags,testscenarioids) VALUES (" + requiredcycleid + ",'" + requiredtestsuitename + "'," + requiredtestsuiteid + ",1,[" + conditioncheckvalues + "],'Ninteen68_admin'," + new Date().getTime().toString() + ",null,null,[" + donotexecutevalues + "],[" + getparampathvalues + "],null,null," + new Date().getTime().toString() + ",null,null,[" + testscenarioids + "])";
+
+                    createTestSuitesHistory = "Inserted by Ninteen68_admin cycleid="+requiredcycleid+",testsuitename="+requiredtestsuitename+",testsuiteid=" + requiredtestsuiteid +",versionnumber=1,conditioncheck=[" + conditioncheckvalues + "],createdby= 'Ninteen68_admin',createdon=" + new Date().getTime().toString() + ",createdthrough=null,deleted=null,donotexecute=[" + donotexecutevalues + "],getparampaths=[" + getparampathvalues + "],modifiedby=null,modifiedon=" + new Date().getTime().toString() + ",skucodetestsuite=null,tags=null,testscenarioids=[" + testscenarioids + "] ";
+                   date = new Date().getTime();
+
+                    insertTestSuiteQuery = "INSERT INTO testsuites (cycleid,testsuiteid,testsuitename,versionnumber,history) VALUES ("+requiredcycleid+"," + requiredtestsuiteid +","+requiredtestsuitename+",1,{" + date + ":" + createTestSuitesHistory + "})";
+
+
                     dbConnICE.execute(testsuiteexe, function(err, answers) {
                         if (err) {
                             console.log(err);
                             cb1(null, flag);
                         } else {
                             //cb1(null,flag);
-                            callback(null, flag);
+                            fnCreateTestsuiteHistory(insertTestSuiteQuery, function(err, response) {
+                                    if (response == 'success') {
+                                       callback(null, flag);
+                                    } 
+                                });
+                          //  callback(null, flag);
                         }
 
 
@@ -1131,11 +1256,31 @@ function TestSuiteDetails_Module_ICE(req, cb1, data) {
     );
 }
 
+//Create TestSuite History Transaction
+function fnCreateTestsuiteHistory(insertTestSuiteQuery,createTestSuiteHistoryCallback){
+	//console.log("History", insertTestSuiteQuery);
+	 var statusFlag="";
+	dbConnICEHistory.execute(insertTestSuiteQuery, 
+		function(insertTestSuiteQuery, createTestSuiteHistoryQueryRes){
+			if(insertTestSuiteQuery){
+				statusFlag="Error occured in createTestSuiteHistory for screen : Fail";
+				createTestSuiteHistoryCallback(null,statusFlag);
+			}else{
+				statusFlag = "success";						
+				createTestSuiteHistoryCallback(null,statusFlag);
+		}
+	});
+};
+
 function updatescenariodetailsinsuite(req, cb, data) {
     var suiterowdetails = {};
     var getparampath1 = [];
     var conditioncheck1 = [];
     var donotexecute1 = [];
+    var createTestSuitesHistory;
+    var insertTestSuiteQuery;
+    var date;
+				
     async.series({
         fetchdata: function(simplecallback) {
             var selectsuierows = "SELECT * FROM testsuites where testsuiteid = " + req.testsuiteid + " and cycleid=" + req.cycleid + " ALLOW FILTERING;";
@@ -1201,15 +1346,31 @@ function updatescenariodetailsinsuite(req, cb, data) {
         updatescenarioinnsuite: function(simplecallback) {
             var updatetestsuitefrommodule = "INSERT INTO testsuites (cycleid,testsuitename,testsuiteid,versionnumber,conditioncheck,createdby,createdon,createdthrough,deleted,donotexecute,getparampaths,history,modifiedby,modifiedon,skucodetestsuite,tags,testscenarioids) VALUES (" + req.cycleid + ",'" + req.testsuitename + "'," + req.testsuiteid + "," + suiterowdetails.versionnumber + ",[" + conditioncheck1 + "],'" + suiterowdetails.createdby + "'," + suiterowdetails.createdon.valueOf() + ",null,null,[" + donotexecute1 + "],[" + getparampath1 + "],null,'" + suiterowdetails.modifiedby + "'," + new Date().getTime().toString() + ",null,null,[" + req.testscenarioids + "])";
 
+            // createTestSuitesHistory = "Inserted by Ninteen68_admin cycleid="+req.cycleid+",testsuitename="+req.testsuitename+",testsuiteid=" + req.testsuiteid +",versionnumber="+suiterowdetails.versionnumber+",conditioncheck=[" + conditioncheck1 + "],createdby= " + suiterowdetails.createdby + ",createdon=" + suiterowdetails.createdon.valueOf() + ",createdthrough=null,deleted=null,donotexecute=[" + donotexecute1 + "],getparampaths=[" + getparampath1 + "],modifiedby=" + suiterowdetails.modifiedby + ",modifiedon=" + new Date().getTime().toString() + ",skucodetestsuite=null,tags=null,testscenarioids=[" + req.testscenarioids + "] ";
+             date = new Date().getTime();
+            
+            createTestSuitesHistory = "'cycleid=" + req.cycleid + ", testsuitename="+req.testsuitename+", testsuiteid=" + req.testsuiteid +", versionnumber="+suiterowdetails.versionnumber+", conditioncheck=["+conditioncheck1+"], createdby= " + suiterowdetails.createdby + ",createdon=" + suiterowdetails.createdon.valueOf() + ",createdthrough=null, deleted=null, donotexecute=["+donotexecute1+"],getparampaths=[],modifiedby=" + suiterowdetails.modifiedby + ", modifiedon=" + new Date().getTime().toString() + ", skucodetestsuite=null,tags=null,testscenarioids=[" + req.testscenarioids + "] '";  
+
+            console.log(createTestSuitesHistory);
+
+            insertTestSuiteQuery = "INSERT INTO testsuites (cycleid,testsuiteid,testsuitename,versionnumber,history) VALUES ("+req.cycleid+"," +  req.testsuiteid +",'"+ req.testsuitename +"',1,{" + date + ":" + createTestSuitesHistory + "})";
+          
             //var updatetestsuitefrommodule = "UPDATE testsuites SET testscenarioids = ["+req.testscenarioids+"], conditioncheck=["+conditioncheck1+"] ,getparampaths=["+getparampath1+"], donotexecute=["+donotexecute1+"] WHERE testsuiteid="+req.testsuiteid+" and cycleid="+req.cycleid+" and testsuitename='"+req.testsuitename+"' and versionnumber="+req.versionnumber;
             dbConnICE.execute(updatetestsuitefrommodule, function(err, answers) {
                 if (err) {
                     cb(null, err);
                 } else {
-
+                      fnCreateTestsuiteHistory(insertTestSuiteQuery, function(err, response) {
+                                    if (response == 'success') {
+                                           simplecallback(null, answers);
+                                    } else {
+                                        flag = "fail";
+                                       console.log(err);
+                                    }
+                                });
                 }
                 //data=answers;
-                simplecallback(null, answers);
+                //simplecallback(null, answers);
             });
 
         }
