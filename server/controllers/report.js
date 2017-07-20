@@ -12,6 +12,8 @@ var http = require('http');
 var https = require('https');
 var fs = require('fs');
 var certificate = fs.readFileSync('server/https/server.crt','utf-8');
+var Client = require("node-rest-client").Client;
+var client = new Client();
 
 exports.getMainReport_ICE = function(req, res){
 	try{
@@ -149,26 +151,31 @@ exports.getAllSuites_ICE = function (req, res) {
 	}
 	if(sessionToken != undefined && req.session.id == sessionToken)
 	{
-		console.log("coming into getAllSuites_ICE service")
 		var req_userId=req.body.userId;
+		var args={}
 		//req_userId = 'a144b468-e84f-4e7c-9a8a-0a658330212e';
-		var getDomain="SELECT domainid FROM icepermissions WHERE userid="+req_userId+";";
+		// var getDomain="SELECT domainid FROM icepermissions WHERE userid="+req_userId+";";
 		var testSuiteDetails=[];
 		var flag="";
 		async.series({
 			domainAssignedWithUserID: function(callback){
-				dbConnICE.execute(getDomain,function(err,result){
-					console.log("Exe getAllSuites_ICE service")
-					if(err){
+				// dbConnICE.execute(getDomain,function(err,result){
+					// console.log("Exe getAllSuites_ICE service")
+					// if(err){
+					var inputs = {"userid": req.body.userId, "query": "domainid"}
+					var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
+					client.post("http://127.0.0.1:1990/reports/getAllSuites_ICE",args,
+							function (result, response) {
+					if(response.statusCode != 200 || result.rows == "fail"){	
 						flag="fail";
 						res.send(flag);
-						console.log(err);
+						// console.log(err);
 					}else{
 						try{
 							var domainid = JSON.parse(JSON.stringify(result.rows[0].domainid));
 							resultdata = domainid;
 							//console.log(resultdata);
-							callback(err,resultdata);					
+							callback(null,resultdata);					
 						}catch(ex){
 							console.log("Exception occured in fetching domain_id getAllSuites_ICE : ",ex);
 							res.send("fail");
@@ -177,32 +184,52 @@ exports.getAllSuites_ICE = function (req, res) {
 				});
 			},
 			projectsUnderDomain: function(callback){
-				var getProjectIDs="SELECT projectid FROM projects WHERE domainid="+resultdata+";";
-				dbConnICE.execute(getProjectIDs,function(err,result){
-					if(err){
+				// var getProjectIDs="SELECT projectid FROM projects WHERE domainid="+resultdata+";";
+				// dbConnICE.execute(getProjectIDs,function(err,result){
+				// 	if(err){
+				var inputs = {"domainid": resultdata, "query": "projectsUnderDomain"}
+				var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
+				client.post("http://127.0.0.1:1990/reports/getAllSuites_ICE",args,
+						function (result, response) {
+					if(response.statusCode != 200 || result.rows == "fail"){	
 						flag="fail";
 						console.log("Error occured in getAllSuites_ICE : Fail");
 						res.send(flag);
 					}else{
 						async.forEachSeries(result.rows, function(iterator, callback2) {
 							try{
-								var releaseids = "SELECT releaseid FROM releases WHERE projectid="+iterator.projectid;
-								dbConnICE.execute(releaseids,function(err,releaseidsdata){
-									if(err){
+								// var releaseids = "SELECT releaseid FROM releases WHERE projectid="+iterator.projectid;
+								// dbConnICE.execute(releaseids,function(err,releaseidsdata){
+								// 	if(err){
+								var inputs = {"projectid": iterator.projectid, "query": "releasesUnderProject"}
+								var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
+								client.post("http://127.0.0.1:1990/reports/getAllSuites_ICE",args,
+										function (releaseidsdata, response) {
+									if(response.statusCode != 200 || releaseidsdata.rows == "fail"){	
 										console.log(err);
 									}else{
 										async.forEachSeries(releaseidsdata.rows,function(releaseiditr,callback3){
 											try{
-												var cycleids = "SELECT cycleid FROM cycles WHERE releaseid="+releaseiditr.releaseid;
-												dbConnICE.execute(cycleids,function(err,cycleidsdata){
-													if(err){
+												// var cycleids = "SELECT cycleid FROM cycles WHERE releaseid="+releaseiditr.releaseid;
+												// dbConnICE.execute(cycleids,function(err,cycleidsdata){
+												// 	if(err){
+												var inputs = {"releaseid": releaseiditr.releaseid, "query": "cycleidUnderRelease"}
+												var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
+												client.post("http://127.0.0.1:1990/reports/getAllSuites_ICE",args,
+															function (cycleidsdata, response) {
+													if(response.statusCode != 200 || result.rows == "fail"){	
 														console.log(err);  
 													}else{
 														async.forEachSeries(cycleidsdata.rows,function(cycleiditr,callback4){
 															try{
-																var testsuiteids = "SELECT testsuiteid,testsuitename FROM testsuites WHERE cycleid="+cycleiditr.cycleid;
-																dbConnICE.execute(testsuiteids,function(err,testsuiteidsdata){
-																	if(err){
+																// var testsuiteids = "SELECT testsuiteid,testsuitename FROM testsuites WHERE cycleid="+cycleiditr.cycleid;
+																// dbConnICE.execute(testsuiteids,function(err,testsuiteidsdata){
+																// 	if(err){
+																var inputs = {"cycleid": cycleiditr.cycleid, "query": "suitesUnderCycle"}
+																var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
+																client.post("http://127.0.0.1:1990/reports/getAllSuites_ICE",args,
+																			function (testsuiteidsdata, response) {
+																	if(response.statusCode != 200 || testsuiteidsdata.rows == "fail"){	
 																		console.log(err);  
 																	}else{
 																		async.forEachSeries(testsuiteidsdata.rows,function(testsuiteiditr,callback5){
@@ -278,18 +305,23 @@ exports.getSuiteDetailsInExecution_ICE = function (req, res) {
 			var req_testsuiteId=req.body.testsuiteid;
 			var startTime, endTime, starttime, endtime;
 			var executionDetailsJSON=[];
-			var getExecutionDetails="SELECT executionid,starttime,endtime FROM execution WHERE testsuiteid="
-				+ req_testsuiteId ;
+			// var getExecutionDetails="SELECT executionid,starttime,endtime FROM execution WHERE testsuiteid="
+			// 	+ req_testsuiteId ;
 
-			dbConnICE.execute(getExecutionDetails,function(err,executionData){
+			// dbConnICE.execute(getExecutionDetails,function(err,executionData){
+			var inputs = {"suiteid" :req_testsuiteId}
+			var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
+			client.post("http://127.0.0.1:1990/reports/getSuiteDetailsInExecution_ICE",args,
+			function (executionData, response) {
 				try{
-					if(err){
+					// if(err){
+					if(response.statusCode != 200 || executionData.rows == "fail"){	
 						console.log(err);
 						res.send("fail");
 					}else{
 						for (var i = 0; i < executionData.rows.length; i++) {
-							startTime = executionData.rows[i].starttime;
-							endTime = executionData.rows[i].endtime;
+							startTime = new Date(executionData.rows[i].starttime);
+							endTime = new Date(executionData.rows[i].endtime);
 							starttime = startTime.getDate()+"-"+(startTime.getMonth()+1)+"-"+startTime.getFullYear()+" "+startTime.getHours()+":"+startTime.getMinutes();
 							endtime =  endTime.getDate()+"-"+(endTime.getMonth()+1)+"-"+endTime.getFullYear()+" "+endTime.getHours()+":"+endTime.getMinutes();
 							executionDetailsJSON.push({
@@ -335,16 +367,21 @@ exports.reportStatusScenarios_ICE = function (req, res) {
 			var report=[];
 			async.series({
 				executiondetails:function(callback){
-					var reportFetchQuery = "SELECT * FROM reports where executionid="+req_executionId+" ALLOW FILTERING";
-					dbConnICE.execute(reportFetchQuery, function (err, result) {
-						if (err) {
+					// var reportFetchQuery = "SELECT * FROM reports where executionid="+req_executionId+" ALLOW FILTERING";
+					// dbConnICE.execute(reportFetchQuery, function (err, result) {
+					var inputs = { "query":"executiondetails","executionid" :req_executionId}
+					var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
+					client.post("http://127.0.0.1:1990/reports/reportStatusScenarios_ICE",args,
+							function (result, response) {
+						// if (err) {
+						if(response.statusCode != 200 || result.rows == "fail"){	
 							var flag = "fail";
-							console.log(err);
+							// console.log(err);
 							res.send(flag);
 						}else {
 							async.forEachSeries(result.rows, function(iterator, callback2) {
 								try{
-									var executedtimeTemp = iterator.executedtime;
+									var executedtimeTemp = new Date(iterator.executedtime);
 									if(executedtimeTemp != null){
 										executedtimeTemp = executedtimeTemp.getDate()+"-"+(executedtimeTemp.getMonth()+1)+"-"+executedtimeTemp.getFullYear()+" "+executedtimeTemp.getHours()+":"+executedtimeTemp.getMinutes();
 									}						
@@ -352,11 +389,16 @@ exports.reportStatusScenarios_ICE = function (req, res) {
 									var statusTemp = iterator.status;
 									var reportidTemp = iterator.reportid;
 									var testscenarioidTemp = iterator.testscenarioid;
-									var scenarioName = "SELECT testscenarioname FROM testscenarios where testscenarioid="+iterator.testscenarioid+" ALLOW FILTERING";
-									dbConnICE.execute(scenarioName,function(err,scenarioNameDetails){
-										if(err){
+									// var scenarioName = "SELECT testscenarioname FROM testscenarios where testscenarioid="+iterator.testscenarioid+" ALLOW FILTERING";
+									// dbConnICE.execute(scenarioName,function(err,scenarioNameDetails){
+									// 	if(err){
+									var inputs = { "query" : "scenarioname","scenarioid":iterator.testscenarioid}
+									var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
+									client.post("http://127.0.0.1:1990/reports/reportStatusScenarios_ICE",args,
+											function (scenarioNameDetails, response) {
+										if(response.statusCode != 200 || scenarioNameDetails.rows == "fail"){	
 											var flag = "fail";
-											console.log(err);
+											// console.log(err);
 											res.send(flag);  
 										}else{
 											async.forEachSeries(scenarioNameDetails.rows,function(testScenarioNameitr,callback3){
@@ -471,10 +513,15 @@ exports.getReport_Nineteen68 = function(req, res) {
 			var flag="";
 			async.series({
 				projectsUnderDomain: function(callback) {
-					var getReportQuery = "select report,executedtime,testscenarioid from reports where reportid=" +
-					reportId + " ALLOW FILTERING";
-					dbConnICE.execute(getReportQuery, function(err, reportResult) {
-						if (err) {
+					// var getReportQuery = "select report,executedtime,testscenarioid from reports where reportid=" +
+					// reportId + " ALLOW FILTERING";
+					// dbConnICE.execute(getReportQuery, function(err, reportResult) {
+					// 	if (err) {
+					var inputs = {"query":"projectsUnderDomain", "reportid" :reportId}
+					var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
+					client.post("http://127.0.0.1:1990/reports/getReport_Nineteen68",args,
+							function (reportResult, response) {
+						if(response.statusCode != 200 || reportResult.rows == "fail"){	
 							flag="fail";
 							console.log("Failed to get report, executed time and scenarioIds from reports");
 							res.send(flag);
@@ -489,9 +536,14 @@ exports.getReport_Nineteen68 = function(req, res) {
 									reportInfoObj.reportId = reportId;
 									reportInfoObj.executedtime = executedtime;
 									reportInfoObj.testscenarioid = testscenarioid;
-									var getReportQuery2 = "select testscenarioname,projectid from testscenarios where testscenarioid=" + testscenarioid + " ALLOW FILTERING";
-									dbConnICE.execute(getReportQuery2, function(err, scenarioResult) {
-										if (err) {
+									// var getReportQuery2 = "select testscenarioname,projectid from testscenarios where testscenarioid=" + testscenarioid + " ALLOW FILTERING";
+									// dbConnICE.execute(getReportQuery2, function(err, scenarioResult) {
+									// 	if (err) {
+									var inputs = {"query":"scenariodetails", "scenarioid" :testscenarioid}
+									var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
+									client.post("http://127.0.0.1:1990/reports/getReport_Nineteen68",args,
+											function (scenarioResult, response) {
+										if(response.statusCode != 200 || scenarioResult.rows == "fail"){	
 											console.log("Failed to get scenario name and projectId from scenarios.");
 										} else {
 											async.forEachSeries(scenarioResult.rows, function(sceiditr, callback2) {
@@ -501,9 +553,14 @@ exports.getReport_Nineteen68 = function(req, res) {
 													reportInfoObj.testscenarioname = testscenarioname;
 													reportInfoObj.projectid = projectid;
 													//	var getReportQuery3 = "select testscenarioids,cycleid from testsuites ";
-													var getReportQuery3 = "select cycleid from testsuites where testsuiteid=" + testsuiteId + " and testsuitename = '" + testsuitename + "' ALLOW FILTERING";
-													dbConnICE.execute(getReportQuery3, function(err, suiteResult) {
-														if (err) {
+													// var getReportQuery3 = "select cycleid from testsuites where testsuiteid=" + testsuiteId + " and testsuitename = '" + testsuitename + "' ALLOW FILTERING";
+													// dbConnICE.execute(getReportQuery3, function(err, suiteResult) {
+													// 	if (err) {
+													var inputs = {"query":"cycleid", "suiteid" :testsuiteId,"suitename" :testsuitename}
+													var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
+													client.post("http://127.0.0.1:1990/reports/getReport_Nineteen68",args,
+																function (suiteResult, response) {
+														if(response.statusCode != 200 || suiteResult.rows == "fail"){	
 															console.log("Failed to get cycle Ids from test suites.");
 														} else {
 															// var   testscenarioids=[];
@@ -525,9 +582,14 @@ exports.getReport_Nineteen68 = function(req, res) {
 	                                                    	}*/
 																	//   callback3();
 																	//	var cycledetails = "select cyclename,releaseid from cycles";
-																	var cycledetails = "select cyclename,releaseid from cycles where cycleid=" + cycleid + "ALLOW FILTERING";
-																	dbConnICE.execute(cycledetails, function(err, cycleResult) {
-																		if (err) {
+																	// var cycledetails = "select cyclename,releaseid from cycles where cycleid=" + cycleid + "ALLOW FILTERING";
+																	// dbConnICE.execute(cycledetails, function(err, cycleResult) {
+																	// 	if (err) {
+																	var inputs = {"query":"cycledetails", "cycleid" :cycleid}
+																	var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
+																		client.post("http://127.0.0.1:1990/reports/getReport_Nineteen68",args,
+																			function (cycleResult, response) {
+																		if(response.statusCode != 200 || cycleResult.rows == "fail"){	
 																			console.log("Failed to get cycle name and releaseId from cycles.");
 																		} else {
 																			async.forEachSeries(cycleResult.rows, function(cycleiditr, callback4) {
@@ -537,9 +599,14 @@ exports.getReport_Nineteen68 = function(req, res) {
 																					reportInfoObj.cyclename = cyclename;
 																					reportInfoObj.releaseid = releaseid;
 																					// callback4();
-																					var releasedetails = "select releasename,projectid from releases where releaseid=" + releaseid + " ALLOW FILTERING";
-																					dbConnICE.execute(releasedetails, function(err, releaseResult) {
-																						if (err) {
+																					// var releasedetails = "select releasename,projectid from releases where releaseid=" + releaseid + " ALLOW FILTERING";
+																					// dbConnICE.execute(releasedetails, function(err, releaseResult) {
+																					// 	if (err) {
+																					var inputs = {"query":"releasedetails", "releaseid" :releaseid}
+																					var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
+																					client.post("http://127.0.0.1:1990/reports/getReport_Nineteen68",args,
+																							function (releaseResult, response) {
+																						if(response.statusCode != 200 || releaseResult.rows == "fail"){	
 																							console.log("Failed to get release name and projectsId from releases.");
 																						} else {
 																							async.forEachSeries(releaseResult.rows, function(reliditr, callback5) {
@@ -549,9 +616,14 @@ exports.getReport_Nineteen68 = function(req, res) {
 																									reportInfoObj.releasename = releasename;
 																									reportInfoObj.projectid = projectid;
 																									//console.log('final reportInfoObj in release deatails', reportInfoObj);
-																									var projectdeatils = "select projectname,domainid from projects where projectid=" + projectid + " ALLOW FILTERING";
-																									dbConnICE.execute(projectdeatils, function(err, projectResult) {
-																										if (err) {
+																									// var projectdeatils = "select projectname,domainid from projects where projectid=" + projectid + " ALLOW FILTERING";
+																									// dbConnICE.execute(projectdeatils, function(err, projectResult) {
+																									// 	if (err) {
+																									var inputs = {"query":"projectdetails", "projectid" :projectid}
+																									var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
+																									client.post("http://127.0.0.1:1990/reports/getReport_Nineteen68",args,
+																											function (projectResult, response) {
+																										if(response.statusCode != 200 || projectResult.rows == "fail"){	
 																											console.log("Failed to get project name and domainId from projects.");
 																										} else {
 																											async.forEachSeries(projectResult.rows, function(proiditr, callback6) {
@@ -561,9 +633,14 @@ exports.getReport_Nineteen68 = function(req, res) {
 																													reportInfoObj.projectname = projectname;
 																													reportInfoObj.domainid = domainid;
 
-																													var domaindetails = "select domainname from domains where domainid=" + domainid + " ALLOW FILTERING";
-																													dbConnICE.execute(domaindetails, function(err, domainResult) {
-																														if (err) {
+																													// var domaindetails = "select domainname from domains where domainid=" + domainid + " ALLOW FILTERING";
+																													// dbConnICE.execute(domaindetails, function(err, domainResult) {
+																													// 	if (err) {
+																													var inputs = {"query":"domaindetails", "domainid" :domainid}
+																													var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
+																													client.post("http://127.0.0.1:1990/reports/getReport_Nineteen68",args,
+																															function (domainResult, response) {
+																														if(response.statusCode != 200 || domainResult.rows == "fail"){	
 																															console.log("Failed to get domain name from domains.");
 																														} else {
 																															async.forEachSeries(domainResult.rows, function(domainiditr, callback7) {
@@ -666,9 +743,14 @@ exports.exportToJson_ICE = function(req, res) {
 			var reportInfoObj = {};
 			async.series({
 				projectsUnderDomain: function(callback) {
-					var getReportQuery = "select report from reports where reportid =" +reportId + " ALLOW FILTERING ";
-					dbConnICE.execute(getReportQuery, function(err, reportResult) {
-						if (err) {
+					// var getReportQuery = "select report from reports where reportid =" +reportId + " ALLOW FILTERING ";
+					// dbConnICE.execute(getReportQuery, function(err, reportResult) {
+					// 	if (err) {
+					var inputs = {"query":"reportdata","reportid" :reportId}
+					var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
+					client.post("http://127.0.0.1:1990/reports/exportToJson_ICE",args,
+								function (reportResult, response) {
+						if(response.statusCode != 200 || reportResult.rows == "fail"){	
 							console.log("Failed to get reports.");
 							res.send("fail");
 						} 
@@ -679,19 +761,29 @@ exports.exportToJson_ICE = function(req, res) {
 									try{
 										var reportdata = iterator.report;
 										reportInfoObj.reportdata = reportdata;
-										var testScenarioQuery = "select testscenarioid from reports where reportid ="+ reportId + " ALLOW FILTERING ";
-										dbConnICE.execute(testScenarioQuery, function(err, scenarioResult) {
-											if (err) {
+										// var testScenarioQuery = "select testscenarioid from reports where reportid ="+ reportId + " ALLOW FILTERING ";
+										// dbConnICE.execute(testScenarioQuery, function(err, scenarioResult) {
+										// 	if (err) {
+										var inputs = {"query":"scenarioid","reportid" :reportId}
+										var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
+										client.post("http://127.0.0.1:1990/reports/exportToJson_ICE",args,
+													function (scenarioResult, response) {
+											if(response.statusCode != 200 || scenarioResult.rows == "fail"){	
 												console.log("Failed to get scenario Id from reports.");
 											} else {
 												var reportres = scenarioResult.rows.length;
 												async.forEachSeries(scenarioResult.rows, function(sceiditr, callback2) {
 													try{
 														var scenarioid=sceiditr.testscenarioid;
-														var testScenarionameQuery = "select testscenarioname from testscenarios where testscenarioid ="
-															+ scenarioid + " ALLOW FILTERING ";
-														dbConnICE.execute(testScenarionameQuery, function(err, scenarionameResult) {
-															if (err) {
+														// var testScenarionameQuery = "select testscenarioname from testscenarios where testscenarioid ="
+														// 	+ scenarioid + " ALLOW FILTERING ";
+														// dbConnICE.execute(testScenarionameQuery, function(err, scenarionameResult) {
+														// 	if (err) {
+														var inputs = {"query":"scenarioname","scenarioid" :scenarioid}
+														var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
+														client.post("http://127.0.0.1:1990/reports/exportToJson_ICE",args,
+																	function (scenarionameResult, response) {
+															if(response.statusCode != 200 || scenarionameResult.rows == "fail"){	
 																console.log("Failed to get testscenarioname from testscenarios.");
 															} 
 															else {

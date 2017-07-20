@@ -5,4 +5,4 @@ module.exports = new cassandra.Client({
     keyspace: 'nineteen68history',
     authProvider: authProvider
 });
-console.log('Connected to cassandra with keyspace nineteen68history');  
+console.log('Keyspace nineteen68history will be enabled.');  

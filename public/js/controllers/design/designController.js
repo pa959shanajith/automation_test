@@ -2451,10 +2451,11 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		if(gsElement.length > 0){
 			for(i=0; i<gsElement.length; i++){
 				$.each($("#scraplist li"), function(){
-					if(gsElement[i] == $(this).data("tag") || ($(this).data("tag").toLowerCase().indexOf(gsElement[i].toLowerCase()) >= 0 && gsElement[i] != "a" && $(this).data("tag").toLowerCase() != "radio button" && $(this).data("tag").toLowerCase() != "radiobutton")
-							|| (gsElement[i] == "input" && ($(this).data("tag").indexOf("edit") >= 0 || $(this).data("tag").indexOf("Edit Box") >= 0 || $(this).data("tag").indexOf("text") >= 0 || $(this).data("tag").indexOf("EditText") >= 0))
+					if(gsElement[i] == $(this).data("tag") || ($(this).data("tag").toLowerCase().indexOf(gsElement[i].toLowerCase()) >= 0 && gsElement[i] != "a" && $(this).data("tag").toLowerCase() != "radio button" && $(this).data("tag").toLowerCase() != "radiobutton" && 
+							$(this).data("tag").toLowerCase().indexOf("listview") < 0)
+							|| (gsElement[i] == "input" && ($(this).data("tag").indexOf("edit") >= 0 || $(this).data("tag").indexOf("Edit Box") >= 0 || $(this).data("tag").indexOf("text") >= 0 || $(this).data("tag").indexOf("EditText") >= 0 || $(this).data("tag").indexOf("TextField") >= 0))
 							|| (gsElement[i] == "select" && $(this).data("tag").indexOf("combo box") >= 0)
-							|| (gsElement[i] == "a" && ($(this).data("tag").indexOf("hyperlink") >= 0/* || $(this).data("tag").indexOf("Static") >= 0*/))
+							|| (gsElement[i] == "a" && ($(this).data("tag").indexOf("hyperlink") >= 0 /* || $(this).data("tag").indexOf("Static") >= 0*/))
 							|| (gsElement[i] == "checkbox" && $(this).data("tag").indexOf("check box") >= 0)
 							|| (gsElement[i] == "radiobutton" && $(this).data("tag").indexOf("radio button") >= 0)
 							/*|| (gsElement[i] == "others" && $(this).data("tag").indexOf("scroll bar") >= 0)
@@ -2490,7 +2491,19 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 								$(this).data("tag") != "scroll bar" &&
 								$(this).data("tag") != "internal frame" &&
 								$(this).data("tag") != "table" &&
-								$(this).data("tag") != "tab")
+								$(this).data("tag") != "tab" &&
+								$(this).data("tag").toLowerCase().indexOf("button") == -1 &&
+								$(this).data("tag").toLowerCase().indexOf("edit") == -1 &&
+								$(this).data("tag").toLowerCase().indexOf("edit box") == -1 &&
+								$(this).data("tag").toLowerCase().indexOf("text") == -1 &&
+								$(this).data("tag").toLowerCase().indexOf("edittext") == -1 &&
+								$(this).data("tag").toLowerCase().indexOf("combo box") == -1 &&
+								$(this).data("tag").toLowerCase().indexOf("hyperlink") == -1 &&
+								$(this).data("tag").toLowerCase().indexOf("check box") == -1 &&
+								$(this).data("tag").toLowerCase().indexOf("checkbox") == -1 &&
+								$(this).data("tag").toLowerCase().indexOf("image") == -1 &&
+								$(this).data("tag").toLowerCase().indexOf("table") == -1 &&
+								$(this).data("tag").toLowerCase().indexOf("radio button") == -1)
 							{
 									$(this).show();
 							}

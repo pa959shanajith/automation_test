@@ -5,4 +5,4 @@ module.exports = new cassandra.Client({
     keyspace: 'icetestautomationhistory',
     authProvider: authProvider
 });
-console.log('Connected to cassandra with keyspace icetestautomationhistory');  
+console.log('Keyspace icetestautomationhistory will be enabled.');  
