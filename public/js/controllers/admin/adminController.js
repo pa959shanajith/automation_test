@@ -436,11 +436,11 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 			//role = $('#userRoles option:selected').text();
 			var createUser = {};
 			createUser.role = $('#userRoles option:selected').val();
-			createUser.username = $("#userName").val();
+			createUser.username = $.trim($("#userName").val());
 			createUser.password = $("#password").val();
 			createUser.confirmPassword = $("#confirmPassword").val();
-			createUser.firstName = $("#firstName").val();
-			createUser.lastName =  $("#lastName").val();
+			createUser.firstName = $.trim($("#firstName").val());
+			createUser.lastName =  $.trim($("#lastName").val());
 			createUser.email =  $("#email").val();
 			createUser.ldapUser = $(".ldapBtn").hasClass("ldapBtnActive")? true : false;
 
@@ -2048,8 +2048,8 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 			var updateUserObj = {};
 			updateUserObj.userName = $("#userSelect option:selected").text();
 			updateUserObj.passWord = $("#password").val();
-			updateUserObj.firstName = $("#firstName").val();
-			updateUserObj.lastName = $("#lastName").val();
+			updateUserObj.firstName = $.trim($("#firstName").val());
+			updateUserObj.lastName = $.trim($("#lastName").val());
 			//updateUserObj.role = $("#userRoles option:selected").val();
 			updateUserObj.email = $("#email").val();
 			updateUserObj.userId = $("#userSelect option:selected").data("id");
@@ -2120,6 +2120,13 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 
 //	Prevents special characters on keydown
 	$(document).on("keydown", ".validationKeydown", function(e) {
+		if(e.target.id = 'userName')
+		{
+			if(e.keyCode == 32)
+			{
+				return false;
+			}
+		}
 		/*if(($(this).attr("id") == "projectName" || $(this).attr("id") == "releaseTxt" || $(this).attr("id") == "cycleTxt" || $(this).attr("id") == "releaseName" || $(this).attr("id") == "cycleName") && (e.shiftKey && e.keyCode == 189 || e.keyCode == 189 || e.keyCode >= 96 && e.keyCode <= 105 || e.keyCode >= 48 && e.keyCode <= 57)){
 			return true;
 		}
@@ -2141,7 +2148,16 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 		var val = $(this).val();
 		preventSpecialCharOnBlur(id,val);
 	});
-
+$(document).on('cut copy paste','#userName', function(e){ 
+			var element = this;
+			setTimeout(function () {
+				var userEnteredText = $(element).val();  
+				userEnteredText = userEnteredText.replace(/\s/g,"");
+				$(element).val(userEnteredText);
+			}, 5); //html5 min is 4ms.	
+		//$(this).val($(this).val().replace(/\S/g, ''));
+		
+ });
 
 	function preventSpecialCharOnBlur(id, val)
 	{
