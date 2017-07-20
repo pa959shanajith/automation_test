@@ -4,7 +4,7 @@
         <title>SLK Nineteen68</title>
         <link rel="stylesheet" type="text/css" href="{#asset latofonts.css @encoding=link}"/>
         <link rel="stylesheet" type="text/css" href="{#asset font-awesome.min.css @encoding=link}"/>
-        <script type="text/javascript" src="{#asset jquery.min.js @encoding=link}"></script> 
+        <script type="text/javascript" src="{#asset jquery.min.js @encoding=link}"></script>
         <script>
 			setTimeout(function(){
 				if($("#overAllStat").text() == "Pass"){$("#overAllStat").css('color','green')}
@@ -24,7 +24,7 @@
 					$('.rDstepDes').css('width','49.6%');
 					$('.rDstatus').css('width','10%');
 				}
-				
+
 				var getRows = $('.reportdetailsrow');
 				// for(i=0; i<getRows.length; i++){
 				// 	var parentid;
@@ -69,6 +69,8 @@
                         rowCount = 0;
                     }
                 }
+                
+                window.stop();
 
                 $(document).on('click', '.unexpand', function(){
                     var getID = $(this).parents('.reportdetailsrow').attr('data-id');
@@ -104,12 +106,12 @@
     							var imageUrl = 'data:image/PNG;base64,'+ data;
 				    			var WindowObject = window.open();
 				    			var strHtml = "<html>\n<head>\n </head><body><div style='padding: 10px;'>\n<img style='width: 100%; height: calc(100% - 40px); border: 1px solid #ccc;' src='" + imageUrl + "'/>\n</div>\n</body>\n</html>";
-				    			WindowObject.document.writeln(strHtml);				        	
+				    			WindowObject.document.writeln(strHtml);
 				        	}
 					    }
 				    });
                 })
-                
+
                 $(document).on('click', '.expand', function(){
                     var getID = $(this).parents('.reportdetailsrow').attr('data-id');
                     $(this).removeClass('expand').addClass('unexpand');
@@ -120,9 +122,9 @@
                         }
                     })
                 })
-                
+
 			}, 400);
-		</script>     
+		</script>
         <style>
             body{font-family: LatoWeb; height: 98%; overflow: hidden;}
             .mainContainer{ border: 1px solid #B5AAAA; margin: 4px; float: left; padding: 14px; width: 97%; height: calc(100% - 50px);}
@@ -235,14 +237,14 @@
             .reportsDetail div.reportdetailsrow:nth-child(even){background: #f9f9f9;}
 			::-webkit-scrollbar{
 			    width: 8px;
-			}			 
+			}
 			::-webkit-scrollbar-track{
-			    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3); 
+			    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
 			    border-radius: 4px;
-			}			 
+			}
 			::-webkit-scrollbar-thumb{
 			    border-radius: 10px;
-			    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5); 
+			    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5);
 			}
 			@media screen and (max-height: 680px) {
 				.reportsDetail{
@@ -262,7 +264,7 @@
 				.summaryCon{height: 30px;}
 				.leftSummary{padding: 15px 0;}
 				.rightSummaryFunc{margin-top: 72px;}
-				.maintabCont{height: 325px;}				
+				.maintabCont{height: 325px;}
 				.headerRepDetails{padding: 1px 40px;}
 				.summaryCon span{top: 6px;}
 			}
@@ -321,7 +323,7 @@
                     <label>Browser Version :</label><span>{{browserVersion}}</span>
                 </div>
                 <div id="rightSummaryFunc" class="rightSummaryFunc">
-                    <div class="reportStatus">				
+                    <div class="reportStatus">
             			<div class="reportStatusBlk">
             				<span class="progresslabel">Pass</span>
             				<div class="progress customprogress">
@@ -335,7 +337,7 @@
             					<span class="progress-bar progress-bar-danger" style="width: {{fail}}%" role="progressbar"></span>
             				</div>
             				<span class="progresspercentage">{{fail}} %</span>
-            			</div>	
+            			</div>
             			<div class="reportStatusBlk">
             				<span class="progresslabel">Terminated</span>
             				<div class="progress customprogress">
@@ -395,6 +397,6 @@
                     {{/each}}
                 </div>
             </div>
-        </div>      
+        </div>
     </body>
 </html>

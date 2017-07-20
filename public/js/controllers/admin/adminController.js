@@ -682,11 +682,19 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 				if(newProjectDetails.length > 0){
 
 					for(i=0;i<newProjectDetails.length;i++){
-						if(newProjectDetails[i].cycleDetails.length > 0){
-							proceedFlag = true;
-						}else{
-							relName = relName.length > 0? relName + ", " + newProjectDetails[i].releaseName : relName + newProjectDetails[i].releaseName;
+						var testFlag = true;
+						if(newProjectDetails[i].cycleDetails.length <= 0){
+							for (var j = 0; j < updateProjectDetails.length; j++) {
+								if (updateProjectDetails[j].releaseName == newProjectDetails[i].releaseName && updateProjectDetails[j].cycleDetails.length <= 0) {
+									relName = relName.length > 0? relName + ", " + newProjectDetails[i].releaseName : relName + newProjectDetails[i].releaseName;
+									proceedFlag = false;
+									testFlag =false;
+								}
+							}
+							if (testFlag) {
+								relName = relName.length > 0? relName + ", " + newProjectDetails[i].releaseName : relName + newProjectDetails[i].releaseName;
 								proceedFlag = false;
+							}
 						}
 					}
 				}
@@ -1020,8 +1028,6 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 					toggleCycleClick();
 					delCount++;
 				}
-				console.log(updateProjectDetails);
-				console.log(newProjectDetails);
 				e.stopImmediatePropagation();
 			}
 		})
@@ -1191,6 +1197,18 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 									return false;
 								}
 							}
+							for(i=0; i<newProjectDetails.length; i++){
+								if($("#releaseName").val().trim() == newProjectDetails[i].releaseName){
+									$(".close:visible").trigger('click');
+									openModelPopup("Edit Release Name", "Release Name already exists");
+									return false;
+								}else{
+									if ( $("#"+editReleaseId).parent().prev('span').text() == newProjectDetails[i].releaseName) {
+										newProjectDetails[i].releaseName = $("#releaseName").val().trim();
+									}
+								}
+							}
+
 							$(".close:visible").trigger('click');
 							var index = '';
 							index = $('li.active').index();

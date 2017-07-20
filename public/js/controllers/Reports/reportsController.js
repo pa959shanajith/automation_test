@@ -516,6 +516,10 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 								var myWindow;
 								myWindow = window.open();
 								myWindow.document.write(data1);
+
+								setTimeout(function(){
+									myWindow.stop();
+								}, 5000);
 							}
 							openWindow++;
 							e.stopImmediatePropagation();
