@@ -5,7 +5,7 @@ var dataFormat12, getScrapeDataforCustomObj, deleteScrapeDataservice = true;
 var getAllAppendedObj; //Getting all appended scraped objects
 var gsElement = []; window.localStorage['selectRowStepNo'] = '';
 var getWSTemplateData = {} //Contains Webservice saved data
-var appType;var projectId;var projectDetails;var screenName;var testCaseName;var subTaskType;var subTask; var draggedEle; var getDraggedEle; 
+var appType;var projectId;var projectDetails;var screenName;var testCaseName;var subTaskType;var subTask; var draggedEle; var getDraggedEle;
 window.localStorage['disableEditing'] = "false";
 mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout', 'DesignServices','cfpLoadingBar','$window', function($scope,$http,$location,$timeout,DesignServices,cfpLoadingBar,$window) {
 	$("body").css("background","#eee");
@@ -29,7 +29,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		window.localStorage['navigateScrape'] = false;
 	}
 	if(taskAuth == false){
-		window.location.href = "/";		
+		window.location.href = "/";
 	}
 	//Default Function to reset all input, select
 	$scope.resetTextFields = function(){
@@ -40,7 +40,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		$scope.errorMessage = "";
 	}
 	//Default Function to reset all input, select
-	
+
 	var getTaskName = JSON.parse(window.localStorage['_CT']).taskName;
 	appType = JSON.parse(window.localStorage['_CT']).appType;
 	screenName =  JSON.parse(window.localStorage['_CT']).screenName;
@@ -50,7 +50,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 	$("#page-taskName").empty().append('<span class="taskname">'+getTaskName+'</span>');
 	$(".projectInfoWrap").empty()
 	//Loading Project Info
-	
+
 	//Getting Apptype or Screen Type
 	if(appType != "Web" && window.location.href.split("/")[3] == "design"){
 		$("#left-bottom-section").hide();
@@ -65,7 +65,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			angular.element(document.getElementById("tableActionButtons")).scope().readTestCase_ICE();
 		}
 		else if(window.location.href.split("/")[3] == "design" && $scope.getScreenView != "Webservice"){
-			angular.element(document.getElementById("left-nav-section")).scope().getScrapeData();			
+			angular.element(document.getElementById("left-nav-section")).scope().getScrapeData();
 		}
 		if($scope.getScreenView == "Webservice" && window.location.href.split("/")[3] != "designTestCase"){
 			angular.element(document.getElementById("left-nav-section")).scope().getWSData();
@@ -91,25 +91,25 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		}
 
 	}, 3000)
-	
+
 
 	var custnameArr = [];
 	var keywordValArr = [];
 	var proceed = false;
-	
+
 	//Submit Task Screen
 	$scope.submitTasksScreen = function(){
 		$("#submitTasksScreen").modal("show")
-	} 
+	}
 	//Submit Task Screen
-	
+
 	//Submit Tast Test Case
 	$scope.submitTasksTestCase = function(){
 		$("#submitTasksTestCase").modal("show")
-	} 
+	}
 	//Submit task Test Case
 
-	$scope.readTestCase_ICE = function()	{	
+	$scope.readTestCase_ICE = function()	{
 		var taskInfo = JSON.parse(window.localStorage['_CT']);
 		var screenId = taskInfo.screenId;
 		var testCaseId = taskInfo.testCaseId;
@@ -118,7 +118,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		enabledEdit = "false";
 		blockUI("Loading...");
 			// service call # 1 - getTestScriptData service call
-			DesignServices.readTestCase_ICE(screenId, testCaseId, testCaseName)	
+			DesignServices.readTestCase_ICE(screenId, testCaseId, testCaseName)
 			.then(function(data) {
 				if(data == "Invalid Session")
 				{
@@ -152,7 +152,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					getScrapeDataforCustomObj = data2.view;
 					$("#window-scrape-screenshotTs .popupContent").empty()
 					$("#window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrapeTS"><img id="screenshotTS" src="data:image/PNG;base64,'+data2.mirror+'" /></div>')
-					
+
 					// service call # 3 -objectType service call
 					DesignServices.getKeywordDetails_ICE(appType)
 					.then(function(data3)	{
@@ -161,12 +161,12 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 							window.location.href = "/";
 						}
 						keywordValArr.length = 0;
-						keywordListData = angular.toJson(data3);						
+						keywordListData = angular.toJson(data3);
 						var emptyStr = "{}";
 						var len = data.testcase.length;
 						if (data == "" || data == null || data == emptyStr || data == "[]" || data.testcase.toString() == "" || data.testcase == "[]"|| len == 1)	{
 							var appTypeLocal1 = "Generic";
-							var datalist = [{  
+							var datalist = [{
 								"stepNo":"1",
 								"custname":"",
 								"objectName":"",
@@ -193,7 +193,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 								}else $('#triggerDialog').prop('disabled',false);
 							}else{
 								$('.cbox').prop('disabled',false);
-								$('.cbox').parent().removeClass('disable_a_href');			
+								$('.cbox').parent().removeClass('disable_a_href');
 							}*/
 							$('.cbox').prop('disabled',false);
 							$('.cbox').parent().removeClass('disable_a_href');
@@ -209,10 +209,10 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 									}
 								}
 								testcase[i].stepNo = (i + 1).toString();
-								testcaseArray.push(testcase[i]);						
+								testcaseArray.push(testcase[i]);
 							}
 							console.log("readTestCase:::", testcaseArray)
-											
+
 							readTestCaseData = JSON.stringify(testcaseArray)
 							$("#jqGrid_addNewTestScript").jqGrid('clearGridData');
 							$("#jqGrid").jqGrid('GridUnload');
@@ -240,7 +240,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 									$("#jqGrid").find("tr[id='"+window.localStorage['selectRowStepNo']+"']").prev().focus();
 								}else{
 									$("#jqGrid").find("tr[id='"+window.localStorage['selectRowStepNo']+"']").focus().trigger('click');
-								}					
+								}
 								selectRowStepNoFlag = false;
 							}*/
 							return;
@@ -253,9 +253,9 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				function(error) {	console.log("Error in designController.js file getObjectType method! \r\n "+(error.data));
 				}); //	getScrapeData end
 			},
-			function(error) {	console.log("Error in designController.js file getTestScriptData method! \r\n "+(error.data));	
+			function(error) {	console.log("Error in designController.js file getTestScriptData method! \r\n "+(error.data));
 			});
-	
+
 	};//	getTestScriptData end
 
 	// browser icon clicked
@@ -268,10 +268,10 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		if(appType == "MobileWeb") browserType = [];
 		globalSelectedBrowserType = selectedBrowserType;
 		//if(jQuery("#addDependent").is(":checked"))	triggerPopUp();
-		var blockMsg = 'Debug in Progress. Please Wait...';		
+		var blockMsg = 'Debug in Progress. Please Wait...';
 		if(dependentTestCaseFlag == true)
 		{
-			blockUI(blockMsg); 
+			blockUI(blockMsg);
 			DesignServices.debugTestCase_ICE(browserType,checkedTestcases)
 			.then(function(data)	{
 				if(data == "Invalid Session")
@@ -300,10 +300,10 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					openDialog("Debug Testcase", "Browser is not available")
 				}
 			},
-			function(error) {console.log("Error while traversing while executing debugTestcase method!! \r\n "+(error.data));});		
+			function(error) {console.log("Error while traversing while executing debugTestcase method!! \r\n "+(error.data));});
 		}
 		else {
-			blockUI(blockMsg);    
+			blockUI(blockMsg);
 			DesignServices.debugTestCase_ICE(browserType,testcaseID)
 			.then(function(data)	{
 					if(data == "Invalid Session")
@@ -332,10 +332,10 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					openDialog("Debug Testcase", "Browser is not available")
 				}
 			},
-			function(error) {console.log("Error while traversing while executing debugTestcase method!! \r\n "+(error.data));});			
+			function(error) {console.log("Error while traversing while executing debugTestcase method!! \r\n "+(error.data));});
 		}
 	};	// browser invocation ends
-	
+
 	//Add Dependence
 	/*$scope.multipleDebugOnBrowser1 = function (selectedBrowserType) {
 		selectedBrowserType = window.localStorage['selectedBrowserType'];
@@ -345,13 +345,13 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			triggerPopUp();
 			window.localStorage['selectedBrowserType'] = selectedBrowserType;
 		}
-		$.blockUI({ message: '<h1><img src="imgs/busy.gif" />Debug in Progress<a id="btnTerminate">Terminate?<img src="imgs/terminate.png"/></a></h1>' }); 
+		$.blockUI({ message: '<h1><img src="imgs/busy.gif" />Debug in Progress<a id="btnTerminate">Terminate?<img src="imgs/terminate.png"/></a></h1>' });
 		DesignServices.multiDebugOnBrowser(selectedBrowserType)
 		.then(function(data) 	{
 			if (data == "unavailableLocalServer"){
 				showDialogMesgs("Server not found", "Local Server is not available. Please run the batch file from the Bundle.");
 				$.unblockUI();
-			} 
+			}
 			else if(data.indexOf("<!") == 0  ){
 				location.href = 'login_post.html';
 			}
@@ -367,7 +367,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 							$("#terminateDialog").hide();
 							$("#browserUnavailableDialog").hide();
 							$("#serverNotFoundDialog").hide();
-							console.log("data is here:::"+data);			       			
+							console.log("data is here:::"+data);
 							if (data == "complete"){
 								$.unblockUI();
 								showDialogMesgsBtn("Success", "Debug completed.", "btnDebugOk");
@@ -402,7 +402,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		function(error){
 		});
 	};*/
-	
+
 	//Import Test case
 	$scope.importTestCase=function(){
 		var counter1 = 0;
@@ -467,14 +467,14 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			});
 		} else{
 			$("#fileInputJson").removeAttr("type","file");
-			$("#fileInputJson").attr("type","text");			
+			$("#fileInputJson").attr("type","text");
 			$("#globalModalYesNo").find('.modal-title').text("Table Consists of Data");
 			$("#globalModalYesNo").find('.modal-body p').text("Import will erase your old data. Do you want to continue??").css('color','black');
 			$("#globalModalYesNo").find('.modal-footer button:nth-child(1)').attr("id","btnImportEmptyErrorYes")
 			$("#globalModalYesNo").modal("show");
 		}
 	}
-	
+
 	$(document).on('click', '#btnImportEmptyErrorYes', function(){
 		$("#globalModalYesNo").modal("hide");
 		var counter2 = 0;
@@ -510,6 +510,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 						else{
 							DesignServices.updateTestCase_ICE(screenId,testCaseId,testCaseName,resultString,userInfo)
 							.then(function(data) {
+								console.log("hello");
 											if(data == "Invalid Session")
 										{
 											window.location.href = "/";
@@ -522,22 +523,23 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 										} /*else if (data == "appTypeError"){
 											showDialogMesgsBtn("App Type Error", "Project application type and Imported JSON application type doesn't match, please check!!", "btnAppTypeErrorOk");
 											$.unblockUI();
-										}	*/											
+										}	*/
 									}, function(error) {
 							});
 						}
 					}
 					else{
 						openDialog("Import Testcase", "Please Check the file format you have uploaded!")
-					}					
+					}
 				}
+
 				reader.readAsText(file);
 				counter2 = 1;
 				$("#overWriteJson").val('');
 			}
 		});
 	})
-	
+
 	$("#overWriteJson").on("click", function(){
 		angular.element(document.getElementById("left-bottom-section")).scope().importTestCase1();
 	})
@@ -587,10 +589,10 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 								} /*else if (data == "appTypeError"){
 									showDialogMesgsBtn("App Type Error", "Project application type and Imported JSON application type doesn't match, please check!!", "btnAppTypeErrorOk");
 									$.unblockUI();
-								}*/												
+								}*/
 							}, function(error) {});
-						}						
-					}	
+						}
+					}
 					reader.readAsText(file);
 					$("#overWriteJson").val('');
 				}
@@ -598,11 +600,11 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					openDialog("Import Testcase", "Please Check the file format you have uploaded!")
 				}
 				counter = 1;
-			}				
+			}
 		});
 	}
 	//Import Test case
-	
+
 	//Export Test case
 	$scope.exportTestCase=function() {
 		var taskInfo = JSON.parse(window.localStorage['_CT']);
@@ -610,7 +612,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		var testCaseId = taskInfo.testCaseId;
 		var testCaseName = taskInfo.testCaseName;
 		DesignServices.readTestCase_ICE(screenId, testCaseId, testCaseName)
-		.then(function(response) {	
+		.then(function(response) {
 			if(response == "Invalid Session")
 				{
 					window.location.href = "/";
@@ -626,49 +628,49 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			var objfullVersion = ''+parseFloat(navigator.appVersion);
 			var objBrMajorVersion = parseInt(navigator.appVersion,10);
 			var objOffsetName,objOffsetVersion,ix;
-			// In Chrome 
-			if ((objOffsetVersion=objAgent.indexOf("Chrome"))!=-1) { 
+			// In Chrome
+			if ((objOffsetVersion=objAgent.indexOf("Chrome"))!=-1) {
 				objbrowserName = "Chrome";
 				objfullVersion = objAgent.substring(objOffsetVersion+7);
 			}
 			// In Microsoft internet explorer
-			else if ((objOffsetVersion=objAgent.indexOf("MSIE"))!=-1) { 
-				objbrowserName = "Microsoft Internet Explorer"; 
+			else if ((objOffsetVersion=objAgent.indexOf("MSIE"))!=-1) {
+				objbrowserName = "Microsoft Internet Explorer";
 				objfullVersion = objAgent.substring(objOffsetVersion+5);
 			}
-			// In Firefox 
-			else if ((objOffsetVersion=objAgent.indexOf("Firefox"))!=-1) { 
+			// In Firefox
+			else if ((objOffsetVersion=objAgent.indexOf("Firefox"))!=-1) {
 				objbrowserName = "Firefox";
 
-			} 
-			// In Safari 
-			else if ((objOffsetVersion=objAgent.indexOf("Safari"))!=-1) { 
-				objbrowserName = "Safari"; 
-				objfullVersion = objAgent.substring(objOffsetVersion+7); 
+			}
+			// In Safari
+			else if ((objOffsetVersion=objAgent.indexOf("Safari"))!=-1) {
+				objbrowserName = "Safari";
+				objfullVersion = objAgent.substring(objOffsetVersion+7);
 				if ((objOffsetVersion=objAgent.indexOf("Version"))!=-1)
 					objfullVersion = objAgent.substring(objOffsetVersion+8);
 			}
-			// For other browser "name/version" is at the end of userAgent 
+			// For other browser "name/version" is at the end of userAgent
 			else if ( (objOffsetName=objAgent.lastIndexOf(' ')+1) < (objOffsetVersion=objAgent.lastIndexOf('/')) ) {
-				objbrowserName = objAgent.substring(objOffsetName,objOffsetVersion); 
-				objfullVersion = objAgent.substring(objOffsetVersion+1); 
-				if (objbrowserName.toLowerCase()==objbrowserName.toUpperCase()) { 
-					objbrowserName = navigator.appName; 
-				} 
-			} 
-			// trimming the fullVersion string at semicolon/space if present 
+				objbrowserName = objAgent.substring(objOffsetName,objOffsetVersion);
+				objfullVersion = objAgent.substring(objOffsetVersion+1);
+				if (objbrowserName.toLowerCase()==objbrowserName.toUpperCase()) {
+					objbrowserName = navigator.appName;
+				}
+			}
+			// trimming the fullVersion string at semicolon/space if present
 			if ((ix=objfullVersion.indexOf(";"))!=-1) objfullVersion=objfullVersion.substring(0,ix);
-			if ((ix=objfullVersion.indexOf(" "))!=-1) objfullVersion=objfullVersion.substring(0,ix); 
+			if ((ix=objfullVersion.indexOf(" "))!=-1) objfullVersion=objfullVersion.substring(0,ix);
 			objBrMajorVersion = parseInt(''+objfullVersion,10);
-			if (isNaN(objBrMajorVersion)) { 
-				objfullVersion = ''+parseFloat(navigator.appVersion); 
-				objBrMajorVersion = parseInt(navigator.appVersion,10); 
-			}	
+			if (isNaN(objBrMajorVersion)) {
+				objfullVersion = ''+parseFloat(navigator.appVersion);
+				objBrMajorVersion = parseInt(navigator.appVersion,10);
+			}
 			if(objBrMajorVersion== "9"){
 				if(objbrowserName == "Microsoft Internet Explorer"){
 					window.navigator.msSaveOrOpenBlob(new Blob([responseData], {type:"text/json;charset=utf-8"}), filename);
 				}
-			}else{	
+			}else{
 				var blob = new Blob([responseData], {type: 'text/json'}),
 				e = document.createEvent('MouseEvents'),
 				a = document.createElement('a');
@@ -688,7 +690,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		});
 	}
 	//Export Test Case
-	
+
 	//Enable Append Checkbox (if after checking the, browser doesn't enables)
 	$(document).on("click", "#enableAppend", function(){
 		if($(this).is(":checked") == true){
@@ -700,13 +702,13 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		}
 	})
 	//Enable Append Checkbox (if after checking the, browser doesn't enables)
-	
-	
+
+
 	//Populating Saved Scrape Data
 	$scope.getScrapeData = function(){
 		blockUI("Loading...");
 		$("#enableAppend").prop("checked", false)
-		window.localStorage['checkEditWorking'] = "false";	
+		window.localStorage['checkEditWorking'] = "false";
 		if($("#finalScrap").find("#scrapTree").length == 0){
 			$(".disableActions").addClass("enableActions").removeClass("disableActions");
 			$("#enableAppend").prop("disabled", true).css('cursor','no-drop')
@@ -716,7 +718,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			$("#enableAppend").prop("disabled", false).css('cursor','pointer')
 		}
 		//enableScreenShotHighlight = true;
-		DesignServices.getScrapeDataScreenLevel_ICE() 
+		DesignServices.getScrapeDataScreenLevel_ICE()
 		.then(function(data){
 			if(data == "Invalid Session")
 			{
@@ -732,7 +734,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				$("#window-scrape-screenshot .popupContent, #window-scrape-screenshotTs .popupContent").empty()
 				$("#window-scrape-screenshot .popupContent, #window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrape"><img id="screenshot" src="data:image/PNG;base64,'+viewString.mirror+'" /></div>')
 				$("#finalScrap").empty()
-				if (jQuery.isEmptyObject(viewString)){	
+				if (jQuery.isEmptyObject(viewString)){
 					console.log("Data is Empty");
 					$(".disableActions").addClass("enableActions").removeClass("disableActions");
 					$("#enableAppend").prop("disabled", true).css('cursor','no-drop');
@@ -752,12 +754,12 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				var imgTag, addcusOb;
 				var scrapTree = $("#finalScrap").children('#scrapTree');
 				var innerUL = $("#finalScrap").children('#scrapTree').children('ul').children().children('#scraplist');
-				
-				for (var i = 0; i < viewString.view.length; i++) {        			
+
+				for (var i = 0; i < viewString.view.length; i++) {
 					var path = viewString.view[i].xpath;
 					var ob = viewString.view[i];
 					addcusOb = '';
-					ob.tempId= i; 
+					ob.tempId= i;
 					custN = ob.custname;
 					var tag = ob.tag;
 					if(tag == "dropdown"){imgTag = "select"}
@@ -766,7 +768,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					if(path == "")	addcusOb = 'addCustObj';
 					if(tag == "a" || tag == "input" || tag == "table" || tag == "list" || tag == "select" || tag == "img" || tag == "button" || tag == "radiobutton" || tag == "checkbox" || tag == "tablecell"){
 						var li = "<li data-xpath='"+ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"' data-left='"+ob.left+"' data-top='"+ob.top+"' data-width='"+ob.width+"' data-height='"+ob.height+"' data-tag='"+tag+"' data-url='"+ob.url+"' data-hiddentag='"+ob.hiddentag+"' class='item select_all "+tag+"x' val="+ob.tempId+"><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' /><span title='"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;')+"' class='ellipsis "+addcusOb+"'>"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"</span></a></li>";
-					} 
+					}
 					else {
 						var li = "<li data-xpath='"+ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"' data-left='"+ob.left+"' data-top='"+ob.top+"' data-width='"+ob.width+"' data-height='"+ob.height+"' data-tag='"+tag+"' data-url='"+ob.url+"' data-hiddentag='"+ob.hiddentag+"' class='item select_all "+tag+"x' val="+ob.tempId+"><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' /><span title='"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;')+"' class='ellipsis "+addcusOb+"'>"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"</span></a></li>";
 					}
@@ -781,9 +783,9 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					editable: true,
 					radio: true
 				});
-				
+
 				$(".checkStylebox, .checkall").prop("disabled", false)
-				
+
 				if(viewString.view.length == 0){
 					$(".disableActions").addClass("enableActions").removeClass("disableActions");
 					$("#enableAppend").prop("disabled", true).css('cursor','no-drop');
@@ -791,11 +793,11 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				}
 			}
 			unblockUI();
-		}, 
+		},
 		function(error){console.log("error");})
 	}
 	//Populating Saved Scrape Data
-	
+
 	//Disabling Filter
 	$("a[title='Filter']").mouseover(function(){
 		if(viewString == ""){
@@ -811,7 +813,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			$(this).parent().css("cursor", "pointer");
 		}
 	})
-	
+
 	//Initialization for apptype(Desktop, Mobility, OEBS) to redirect on initScraping function
 	$scope.initScrape = function(e){
 		if(e.currentTarget.className == "disableActions") return false
@@ -848,12 +850,12 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		}
 	}
 	//Initialization for apptype(Desktop, Mobility, OEBS) to redirect on initScraping function
-	
-	
+
+
 	//Get Webservice Data
 	$(".wsdlRqstWrap").show();
 	$("#showWsdlRequest").addClass("wsButtonActive")
-	
+
 	$scope.showWsdlRequest = function(){
 		$(".wsdlRqstWrap").show();
 		$(".wsdlRspnsWrap").hide();
@@ -881,7 +883,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			$(".disableActionsWS").addClass("enableActionsWS").removeClass("disableActionsWS")
 			$("#endPointURL, #wsdlMethods, #wsdlOperation, #wsdlRequestHeader, #wsdlRequestBody").prop("disabled", false)
 		}*/
-		DesignServices.getScrapeDataScreenLevel_ICE() 
+		DesignServices.getScrapeDataScreenLevel_ICE()
 		.then(function(data){
 				if(data == "Invalid Session")
 			{
@@ -943,9 +945,9 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				$("#enbledWS").prop("disabled", true)
 				$(".disableActionsWS").addClass("enableActionsWS").removeClass("disableActionsWS")
 			}
-		}, 
-		function(error){ 
-			console.log(error) 
+		},
+		function(error){
+			console.log(error)
 		})
 		/*if($("#wsdlRequestHeader, #wsdlRequestBody").val().length > 0){
 			$(".saveWS").prop("disabled", true);
@@ -959,8 +961,8 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		}*/
 	}
 	//Get Webservice Data
-	
-	
+
+
 	//Save Webservice Data
 	$scope.saveWS = function(){
 		$("#endPointURL, #wsdlMethods, #wsdlRequestHeader").removeClass("inputErrorBorderFull").removeClass("selectErrorBorder")
@@ -1019,8 +1021,8 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		}
 	}
 	//Save Webservice Data
-	
-	
+
+
 	//Enable Save WS Button
 	$(document).on("click", "#enbledWS", function(){
 		if($(this).is(":checked") == true){
@@ -1039,7 +1041,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			$("#endPointURL, #wsdlMethods, #wsdlOperation, #wsdlRequestHeader, #wsdlRequestBody").prop("disabled", true)
 		}
 	})
-	
+
 	//Init Webservice
 	$scope.initScrapeWS = function(e){
 		$("#endPointURL, #wsdlMethods, #wsdlRequestHeader, #wsdlOperation, #wsdlRequestBody").removeClass("inputErrorBorderFull").removeClass("selectErrorBorder")
@@ -1140,13 +1142,13 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					openDialog("Debug Web Service", "Debug Terminated.");
 					//$("#webserviceDeubgFail").modal("show")
 				}
-			}, function (error) { 
-				console.log("Error") 
+			}, function (error) {
+				console.log("Error")
 			});
 		}
 	};
 	//Init Webservice
-	
+
 	//Launch WSDL Functionality
 	$scope.launchWSDLGo = function(){
 		var blockMsg = 'Please Wait...';
@@ -1178,14 +1180,14 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					$("#wsldSelect").append('<option value="'+data.listofoperations[i]+'">'+data.listofoperations[i]+'</option>')
 				}
 				unblockUI()
-			}, 
-			function (error) { 
-				console.log("Error") 
+			},
+			function (error) {
+				console.log("Error")
 			});
 		}
 	}
 	//Launch WSDL Functionality
-	
+
 	//WSDL Add Functionality
 	$scope.wsdlAdd = function(){
 		$("#endPointURL, #wsdlOperation, #wsdlRequestHeader, #wsdlRequestBody, #wsdlResponseHeader, #wsdlResponseBody").val("");
@@ -1232,22 +1234,22 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					}
 					$(".saveWS").prop("disabled", false)
 				}
-			}, 
-			function (error) { 
-				console.log("Error") 
+			},
+			function (error) {
+				console.log("Error")
 			});
 		}
 	}
 	//WSDL Add Functionality
-	
-	
+
+
 	//Mobile Serial Number Keyup Function
 	$("#mobilityAPKPath").on("keyup", function(){
 		if($(this).val().toLowerCase().indexOf(".apk") >= 0){
 			$("#mobilityDeviceName, #mobilityiOSVersion, #mobilityUDID").hide();
 			$("#mobilitySerialPath").show();
 			$(".rightAlign").prop("style","top: 20px;");
-			$("#launchMobilityApps").find(".androidIcon").prop("style","background: url('../imgs/ic-andrd-active.png') left top no-repeat !important;");			
+			$("#launchMobilityApps").find(".androidIcon").prop("style","background: url('../imgs/ic-andrd-active.png') left top no-repeat !important;");
 		}
 		else if($(this).val().toLowerCase().indexOf(".ipa") >= 0 || $(this).val().toLowerCase().indexOf(".app") >= 0){
 			if($(this).val().toLowerCase().indexOf(".app") >= 0){
@@ -1260,14 +1262,14 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				$("#mobilityDeviceName, #mobilityiOSVersion, #mobilityUDID").show();
 				$(".rightAlign").prop("style","top: -10px;");
 			}
-			$("#launchMobilityApps").find(".androidIcon").prop("style","background: url('../imgs/ic-ios-active.png') left top no-repeat !important;");			
+			$("#launchMobilityApps").find(".androidIcon").prop("style","background: url('../imgs/ic-ios-active.png') left top no-repeat !important;");
 		}
 		else
 			$("#launchMobilityApps").find(".androidIcon").prop("style","background: ''");
 	})
 	//Mobile Serial Number Keyup Function
-	
- 	
+
+
 	//Initiating Scraping
 	$scope.initScraping = function(e, browserType){
 		if(e.currentTarget.className == "disableActions") return false
@@ -1309,7 +1311,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					blockUI(blockMsg);
 				}
 			}
-			
+
 			//For Mobility
 			else if($scope.getScreenView == "MobileApp"){
 				if(!$("#mobilityAPKPath").val()){
@@ -1332,7 +1334,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 						screenViewObject.mobileSerial = $(document).find("#mobilitySerialPath").val();
 						$("#launchMobilityApps").modal("hide");
 						blockUI(blockMsg);
-					}					
+					}
 				}
 				else if($("#mobilityAPKPath").val().toLowerCase().indexOf(".ipa") >= 0 || $("#mobilityAPKPath").val().toLowerCase().indexOf(".app") >= 0){
 					if($(document).find("#mobilityAPKPath").val() == ""){
@@ -1360,11 +1362,11 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 						screenViewObject.mobileUDID = $(document).find("#mobilityUDID").val();
 						$("#launchMobilityApps").modal("hide");
 						blockUI(blockMsg);
-					}					
+					}
 				}
 			}
 			//For Mobility
-			
+
 			//For Mobility Web
 			else if($scope.getScreenView == "MobileWeb"){
 				if($(document).find("#mobilityWebSerialNo").val() == ""){
@@ -1385,7 +1387,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				}
 			}
 			//For Mobility Web
-			
+
 			//For OEBS
 			else if($scope.getScreenView == "DesktopJava"){
 				if($(document).find("#OEBSPath").val() == "") {
@@ -1401,7 +1403,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				}
 			}
 			//For OEBS
-			
+
 			//For Web
 			else{
 				screenViewObject.browserType = browserType
@@ -1434,7 +1436,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				}
 				if(data == "wrongWindowName"){
 					openDialog("Scrape", "Wrong window name.")
-				} 
+				}
 				if(data.view.length > 0)
 				{
 					$("#finalScrap").show();
@@ -1455,11 +1457,11 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				console.log("data", viewString);
 				//If enable append is active
 				if(eaCheckbox){
-					//Getting the Existing Scrape Data					
+					//Getting the Existing Scrape Data
 					for (var i = 0; i < newScrapedList.view.length; i++) {
 						var path = newScrapedList.view[i].xpath;
 						var ob = newScrapedList.view[i];
-						ob.tempId= i; 
+						ob.tempId= i;
 						custN = ob.custname;
 						var tag = ob.tag;
 						if(tag == "dropdown"){imgTag = "select"}
@@ -1467,7 +1469,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 						else imgTag = tag;
 						if(tag == "a" || tag == "input" || tag == "table" || tag == "list" || tag == "select" || tag == "img" || tag == "button" || tag == "radiobutton" || tag == "checkbox" || tag == "tablecell"){
 							var li = "<li data-xpath='"+ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"' data-left='"+ob.left+"' data-top='"+ob.top+"' data-width='"+ob.width+"' data-height='"+ob.height+"' data-tag='"+tag+"' data-url='"+ob.url+"' data-hiddentag='"+ob.hiddentag+"' class='item select_all "+tag+"x' val="+ob.tempId+"><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;')+"' class='ellipsis'>"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"</span></a></li>";
-						} 
+						}
 						else {
 							var li = "<li data-xpath='"+ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"' data-left='"+ob.left+"' data-top='"+ob.top+"' data-width='"+ob.width+"' data-height='"+ob.height+"' data-tag='"+tag+"' data-url='"+ob.url+"' data-hiddentag='"+ob.hiddentag+"' class='item select_all "+tag+"x' val="+ob.tempId+"><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;')+"' class='ellipsis'>"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"</span></a></li>";
 						}
@@ -1478,9 +1480,9 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					generateScrape()
 
 					//Getting appended scraped object irrespective to the dynamic value
-					function generateScrape(){ 
+					function generateScrape(){
 						var tempId = newScrapedList.view.length - 1;
-						for (var i = 0; i < viewString.view.length; i++) { 
+						for (var i = 0; i < viewString.view.length; i++) {
 							tempId++
 							var path = viewString.view[i].xpath;
 							var ob = viewString.view[i];
@@ -1495,7 +1497,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 
 							if(tag == "a" || tag == "input" || tag == "table" || tag == "list" || tag == "select" || tag == "img" || tag == "button" || tag == "radiobutton" || tag == "checkbox" || tag == "tablecell"){
 								var li = "<li data-xpath='"+ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"' data-left='"+ob.left+"' data-top='"+ob.top+"' data-width='"+ob.width+"' data-height='"+ob.height+"' data-tag='"+tag+"' data-url='"+ob.url+"' data-hiddentag='"+ob.hiddentag+"' class='item select_all "+tag+"x' val="+tempId+"><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;')+"' class='ellipsis'>"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"</span></a></li>";
-							} 
+							}
 							else {
 								var li = "<li data-xpath='"+ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"' data-left='"+ob.left+"' data-top='"+ob.top+"' data-width='"+ob.width+"' data-height='"+ob.height+"' data-tag='"+tag+"' data-url='"+ob.url+"' data-hiddentag='"+ob.hiddentag+"' class='item select_all "+tag+"x' val="+tempId+"><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;')+"' class='ellipsis'>"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"</span></a></li>";
 							}
@@ -1527,7 +1529,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 						var tag2;
 						if(tag == "a" || tag == "input" || tag == "table" || tag == "list" || tag == "select" || tag == "img" || tag == "button" || tag == "radiobutton" || tag == "checkbox" || tag == "tablecell"){
 							var li = "<li data-xpath='"+ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"' data-left='"+ob.left+"' data-top='"+ob.top+"' data-width='"+ob.width+"' data-height='"+ob.height+"' data-tag='"+tag+"' data-url='"+ob.url+"' data-hiddentag='"+ob.hiddentag+"' class='item select_all "+tag+"x' val="+ob.tempId+"><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;')+"' class='ellipsis'>"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"</span></a></li>";
-						} 
+						}
 						else {
 							var li = "<li data-xpath='"+ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"' data-left='"+ob.left+"' data-top='"+ob.top+"' data-width='"+ob.width+"' data-height='"+ob.height+"' data-tag='"+tag+"' data-url='"+ob.url+"' data-hiddentag='"+ob.hiddentag+"' class='item select_all "+tag+"x' val="+ob.tempId+"><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;')+"' class='ellipsis'>"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"</span></a></li>";
 						}
@@ -1545,7 +1547,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					},
 					editable: true,
 					radio: true
-				});   
+				});
 
 				//Build Scrape Tree using dmtree.scrapper.js file
 				if(viewString.view.length > 0){
@@ -1558,8 +1560,8 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		}
 	}
 
-//To delete Scrape Objects 
-	$scope.del_Objects = function() 
+//To delete Scrape Objects
+	$scope.del_Objects = function()
 	{
 		$("#deleteObjectsModal").modal("hide");
 		if(deleteScrapeDataservice){
@@ -1572,14 +1574,14 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 
 			var checkCondLen = $("#scraplist li").children('a').find('input[type=checkbox].checkall:checked').length;
 			if(checkCondLen > 0)
-			{		
+			{
 				$('input[type=checkbox].checkall:checked').each(function() {
 					var id = $(this).parent().attr('id').split("_");
 					id = id[1];
 					deletedCustNames.push(viewString.view[id].custname);
 					deletedCustPath.push(viewString.view[id].xpath);
 					// console.log(viewString.view[id])
-				});	
+				});
 				delList.deletedCustName = deletedCustNames;
 				delList.deletedXpath = deletedCustPath;
 				//console.log(deletedCustNames);
@@ -1607,7 +1609,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					openDialog("Delete Scrape Objects", "Scraped Objects deleted successfully.")
 	                deleteFlag = true;
 					$(".checkStylebox").prop("checked", false);
-	                angular.element(document.getElementById("left-nav-section")).scope().getScrapeData();	
+	                angular.element(document.getElementById("left-nav-section")).scope().getScrapeData();
 				}
 				else{
 					openDialog("Delete Scrape Objects", "Scraped Objects fail to delete.")
@@ -1645,22 +1647,22 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				}
 			}
 		}
-		
+
 	}
-	
+
 	var showSearchBox = true;
 	//Search scraped objects
 	$(document).on("click", ".searchScrapEle", function(){
 		if(showSearchBox){
-			$(".searchScrapInput").show(); 
+			$(".searchScrapInput").show();
 			showSearchBox=false;
 			$(".searchScrapInput").focus();
 		}
 		else{$(".searchScrapInput").hide(); showSearchBox=true;}
 	})
-	
+
 	//Search Scrape objects filter
-	$(document).on('keyup', '.searchScrapInput', function() {		
+	$(document).on('keyup', '.searchScrapInput', function() {
 		var value = $(this).val();
 		$(".select_all").each(function () {
 			if ($(this).find("span.ellipsis").text().toLowerCase().indexOf(value.toLowerCase()) > -1) {
@@ -1670,7 +1672,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			}
 		});
 	});
-	
+
 	//Highlight Element on browser
 	$scope.highlightScrapElement = function(xpath,url) {
 		var appType = $scope.getScreenView;
@@ -1727,13 +1729,13 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 						d.css('left', (rect.x/3) + 'px');
 						d.css('top', (rect.y/3) + 'px');
 						d.css('height', (rect.h/3) + 'px');
-						d.css('width', (rect.w/3) + 'px');						
+						d.css('width', (rect.w/3) + 'px');
 					}
 					else if(navigator.appVersion.indexOf("Mac")!=-1){
 						d.css('left', rect.x + 'px');
 						d.css('top', rect.y + 'px');
 						d.css('height', rect.h + 'px');
-						d.css('width', rect.w + 'px');						
+						d.css('width', rect.w + 'px');
 					}
 				}
 				else if(appType == "MobileWeb"){
@@ -1761,7 +1763,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				getTopValue = Math.round(rect.y) * scale_highlight + 'px'
 				if(appType == "MobileApp" || appType == "MobileWeb")
 					$(".scroll-wrapper > .scrollbar-screenshot").animate({ scrollTop: parseInt(Math.round(rect.y) + 'px') },500);
-				else 
+				else
 					$(".scroll-wrapper > .scrollbar-screenshot").animate({ scrollTop: parseInt(getTopValue) },500);
 				//$('.scroll-wrapper > .scrollbar-screenshot').scrollTo(d.offset().top);
 				var color;
@@ -1774,7 +1776,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			} else {
 				$(".hightlight").remove();
 			}
-		//}	
+		//}
 	//	else{
 			DesignServices.highlightScrapElement_ICE(xpath,url, appType)
 			.then(function(data) {
@@ -1787,11 +1789,11 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				}
 				console.log("success!::::"+data);
 			}, function(error) { });
-	//	}    
+	//	}
 	};
 	//Highlight Element on browser
-	
-	
+
+
 	//Add Object Functionality
 	$scope.addObj = function(){
 		$scope.errorMessage = "";
@@ -1801,24 +1803,24 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		$("#addObjContainer").append('<div class="row row-modal addObj-row"><div class="form-group"><input type="text" class="form-control form-control-custom" placeholder="Enter object name"></div><div class="form-group form-group-2"><select class="form-control form-control-custom"><option selected disabled>Select Object Type</option><option value="a">Link</option><option value="input">Textbox/Textarea</option><option value="table">Table</option><option value="list">List</option><option value="select">Dropdown</option><option value="img">Image</option><option value="button">Button</option><option value="radiobutton">Radiobutton</option><option value="checkbox">Checkbox</option><option value="Element">Element</option></select></div><img class="deleteAddObjRow" src="imgs/ic-delete.png" /></div>')
 	};
 	//Add Object Functionality
-	
-	
+
+
 	//Delete Custom Object Row
 	$(document).on("click", ".deleteAddObjRow", function(){
 		$(this).parent(".addObj-row").remove();
 	});
-	
+
 	//Add More Object Functionality
 	$scope.addMoreObject = function(){
 		$("#addObjContainer").append('<div class="row row-modal addObj-row"><div class="form-group"><input type="text" class="form-control form-control-custom" placeholder="Enter object name"></div><div class="form-group form-group-2"><select class="form-control form-control-custom"><option selected disabled>Select Object Type</option><option value="a">Link</option><option value="input">Textbox/Textarea</option><option value="table">Table</option><option value="list">List</option><option value="select">Dropdown</option><option value="img">Image</option><option value="button">Button</option><option value="radiobutton">Radiobutton</option><option value="checkbox">Checkbox</option><option value="Element">Element</option></select></div><img class="deleteAddObjRow" src="imgs/ic-delete.png" /></div>')
 	};
 	//Add More Object Functionality
-	
+
 	//WSDL Functionality
 	$scope.selectedWsdlTab = "requestWrap"
 	//WSDL Functionality
-	
-	
+
+
 	//Submit Custom Object Functionality
 	$scope.submitCustomObject = function(){
 		$scope.errorMessage = "";
@@ -1861,7 +1863,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					xpath : ''
 				})
 			})
-			
+
 			if(viewString == "" || viewString.view == undefined){
 				viewString = {view: []}
 			}
@@ -1869,7 +1871,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			for(i=0; i<customObj.length; i++){
 				viewString.view.push(customObj[i])
 			}
-			
+
 			//Reloading List Items
 			$("#finalScrap").empty()
 			$("#finalScrap").append("<div id='scrapTree' class='scrapTree'><ul><li><span class='parentObjContainer'><input title='Select all' type='checkbox' class='checkStylebox' disabled /><span class='parentObject'><a id='aScrapper'>Select all </a><button id='saveObjects' class='btn btn-xs btn-xs-custom objBtn' style='margin-left: 10px'>Save</button><button data-toggle='modal' id='deleteObjects' data-target='#deleteObjectsModal' class='btn btn-xs btn-xs-custom objBtn' style='margin-right: 0' disabled>Delete</button></span><span class='searchScrapEle'><img src='imgs/ic-search-icon.png'></input></span><span><input type='text' class='searchScrapInput'></span></span><ul id='scraplist' class='scraplistStyle'></ul></li></ul></div>");
@@ -1888,7 +1890,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				var tag2;
 				if(tag == "a" || tag == "input" || tag == "table" || tag == "list" || tag == "select" || tag == "img" || tag == "button" || tag == "radiobutton" || tag == "checkbox" || tag == "tablecell"){
 					var li = "<li data-xpath='"+ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"' data-left='"+ob.left+"' data-top='"+ob.top+"' data-width='"+ob.width+"' data-height='"+ob.height+"' data-tag='"+tag+"' data-url='"+ob.url+"' data-hiddentag='"+ob.hiddentag+"' class='item select_all "+tag+"x' val="+ob.tempId+"><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' disabled /><span title='"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;')+"' class='ellipsis'>"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"</span></a></li>";
-				} 
+				}
 				else {
 					var li = "<li data-xpath='"+ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"' data-left='"+ob.left+"' data-top='"+ob.top+"' data-width='"+ob.width+"' data-height='"+ob.height+"' data-tag='"+tag+"' data-url='"+ob.url+"' data-hiddentag='"+ob.hiddentag+"' class='item select_all "+tag+"x' val="+ob.tempId+"><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' disabled /><span title='"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;')+"' class='ellipsis'>"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"</span></a></li>";
 				}
@@ -1905,7 +1907,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			$("#saveObjects").prop("disabled", false)
 			flag = "false";
 		}
-		
+
 		//Building Tree
 		$(document).find('#scrapTree').scrapTree({
 			multipleSelection : {
@@ -1917,8 +1919,8 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		});
 	};
 	//Submit Custom Object Functionality
-	
-	
+
+
 	//Map Object Drag and Drop Functionality
 	$scope.generateMapObj = function(){
 		$(".submitObjectWarning, .objectExistMap, .noObjectToMap").hide();
@@ -1943,7 +1945,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			else {
 				var li = "<li data-xpath='"+ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"' data-tag='"+tag+"' class='item select_all "+tag+"x' dropzone='move s:text/plain' ondrop='drop(event)' ondragover='allowDrop(event)'><span title='"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;')+"' data-xpath='"+ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"' class='ellipsis'>"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"</span></li>";
 				$('#customObjforMap').append('<div class="accd-Obj"><div class="accd-Obj-head">'+tag+'</div><div class="accd-Obj-body">'+li+'</div></div>')
-				
+
 				/****Filtering same object type in one container****/
 				$(".accd-Obj .accd-Obj-head").each(function(){
 					if($(this).text() == $(li).data("tag") && $(this).siblings().text() != $(li).children("span").text()){
@@ -1953,7 +1955,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				/****Filtering same object type in one container****/
 			}
 		}
-		
+
 		/****Removing same objects type for custom objects****/
 		var seen = {};
 		$('.accd-Obj .accd-Obj-head').each(function() {
@@ -1962,13 +1964,51 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		    else seen[txt] = true;
 		});
 		/****Removing same objects type for custom objects****/
-		
+
 		$(".accd-Obj-head").append('<span class="showactiveArrow"></span>');
 		$(".accd-Obj-body li").append('<span class="showPreviousVal" title="Show Previous Text"></span>');
 	}
-	
+
+
+
+	$(document).on("click", ".showAllObjects", function(){
+		//console.log("hello");
+		$('#scrapedObjforMap li').each(function(){
+			$(this).show();
+			$(".accd-Obj-body").slideUp("fast");
+			$(".accd-Obj-head").find(".showactiveArrow").fadeOut("fast");
+		});
+
+	})
+
 	/****Custom object Accoridan****/
 	$(document).on("click", ".accd-Obj-head", function(){
+		var clickElem = $(this).text().trim();
+		$('#scrapedObjforMap li').each(function(){
+			if ($(this).data("tag").trim() != clickElem && clickElem != "Element") {
+				$(this).hide();
+			}else if(clickElem == "Element"){
+				var elem = $(this).data("tag")
+				if(elem == "a" || elem == "input" || elem == "table" || elem == "list" || elem == "select" || elem == "img" || elem == "button" || elem == "radiobutton" || elem == "checkbox" ){
+					$(this).hide();
+				}else{
+					$(this).show();
+				}
+			}else{
+				$(this).show();
+			}
+			//  if (clickElem == "Element" && ($(this).data("tag") == "a" || $(this).data("tag") == "image")) {
+			// 	$(this).hide();
+			// }
+		});
+		// for (var i = 0; i < viewString.view.length; i++) {
+		// 	if (viewString.view[i].tag == $(this).text() && viewString.view[i].xpath != "") {
+		// 		//console.log(viewString.view[i].tag);
+		// 		console.log(innerUL);
+		//
+		// 	}
+		// 	//console.log(viewString.view[i].tag);
+		// }
 		$(this).siblings(".accd-Obj-body").slideToggle("fast", function(){
 			$(this).siblings(".accd-Obj-head").find(".showactiveArrow").fadeIn("fast");
 			if($(this).parent().siblings().children(".accd-Obj-body").is(":visible") == true){
@@ -1982,17 +2022,17 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		});
 	})
 	/****Custom object Accoridan****/
-	
-	
+
+
 	/***Un-link Functonality***/
 	$(document).on("click", ".valueMerged", function(){
 		$(this).toggleClass("valueMergedSelected")
-		
+
 		//Enable-Disable Unlink button based on the valueMergedSelected Class
 		if($(".valueMergedSelected").length > 0) $(".unlinkButton").prop("disabled", false)
 		else $(".unlinkButton").prop("disabled", true)
 	});
-	
+
 	$scope.unlinkMapObj = function(){
 		$(".submitObjectWarning, .objectExistMap").hide();
 		var mergedObj = $(".valueMergedSelected");
@@ -2003,7 +2043,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			$(this).children(".fromMergeObj").remove();
 			$(this).children(".toMergeObj").show().removeClass("toMergeObj")
 			$(this).removeClass("valueMerged valueMergedSelected");
-			
+
 			/***Reseting Selected Dragged Object for Left Scrapped Tree***/
 			$.each($("#scrapedObjforMap li"), function(){
 				if($(this).data("xpath") == sXpath){
@@ -2016,8 +2056,8 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		$(".unlinkButton").prop("disabled", true)
 	}
 	/***Un-link Functonality***/
-	
-	
+
+
 	/****Show prev value functionality for map object****/
 	$(document).on("click", function(e){
 		if(e.target.className == "showPreviousVal"){
@@ -2030,8 +2070,8 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		}
 	})
 	/****Show prev value functionality for map object****/
-	
-	
+
+
 	/****Submit Map Object Functionality****/
 	$scope.submitMapObject = function(){
 		$(".submitObjectWarning, .objectExistMap, .noObjectToMap").hide()
@@ -2061,7 +2101,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				scrapeObject.editedListoldCustName = [];
 				scrapeObject.editedListoldXpath = [];
 				scrapeObject.editedListmodifiedXpaths = [];
-				
+
 				//Filtering the Object which has been mapped
 				var valueToMap = $(".valueMerged")
 				$.each(valueToMap, function(){
@@ -2069,7 +2109,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					scrapeObject.editedListoldCustName.push($(this).children(".toMergeObj").text());
 					scrapeObject.editedListoldXpath.push($(this).children(".toMergeObj").data("xpath"));
 					scrapeObject.editedListmodifiedXpaths.push($(this).children(".fromMergeObj").data("xpath"));
-					
+
 					/***Resetting Values to Default***/
 					$(this).children(".showPreviousVal").hide();
 					$(this).children(".fromMergeObj").remove();
@@ -2078,7 +2118,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					/***Resetting Values to Default***/
 				})
 				//Filtering the Object which has been mapped
-				
+
 				DesignServices.mapScrapeData_ICE(scrapeObject)
 				.then(function(data){
 						if(data == "Invalid Session")
@@ -2090,11 +2130,11 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					else if(data == "TagMissMatch") 	openDialog("Map Object", "Failed to map objects.");//$("#mapObjTagMissMatch").modal("show");
 					else if(typeof data == "object") 	openDialog("Map Object", "Failed to map objects.");//$("mapObjSameObject").modal("show");
 					angular.element(document.getElementById("left-nav-section")).scope().getScrapeData();
-				}, 
+				},
 				function(error){
 					console.log("Error::::", error)
 				})
-				
+
 				$("#scrapedObjforMap li").attr("draggable", true);
 				$("#scrapedObjforMap li").children(".ellipsis").css({'background':'', 'cursor':'auto'});
 			}
@@ -2103,10 +2143,10 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 	/****Submit Map Object Functionality****/
 	//Map Object Drag and Drop Functionality
 
-	
+
 	//Save Scrape Objects
 	$(document).on('click', "#saveObjects", function(){
-		if(!$(".checkall").is(":checked")){
+		/*if(!$(".checkall").is(":checked")){
 			openDialog("Save Scrape data", "Please select objects to save.")
 		}
 		else{
@@ -2123,7 +2163,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					}
 				})
 				viewString.view = sltdListData;
-			}
+			}*/
 			if(eaCheckbox){
 				for (var j = 0; j < viewString.view.length; j++) {
 					newScrapedList.view.push(viewString.view[j]);
@@ -2131,13 +2171,13 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				newScrapedList.mirror = viewString.mirror;
 				newScrapedList.scrapetype = viewString.scrapetype;
 			}
-			// Start of Filter Duplicate Values in ViewString based on custname		
+			// Start of Filter Duplicate Values in ViewString based on custname
 			// var arr;
 			// if(newScrapedList != ""){
 			// 	if(newScrapedList.view.length > 0){
 			// 		arr = newScrapedList.view; //Scraped objects obtained after enable append
 			// 		var temp=[];
-			// 		arr=arr.filter((x, i)=> {
+			// 		arr=arr.filter(function(x, i) {
 			// 			var xpath = x.xpath.split(";");
 			// 			xpath = xpath[0];
 			// 			if (temp.indexOf(xpath) < 0 || xpath == '') {
@@ -2155,7 +2195,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			//var tasks = JSON.parse(window.localStorage['_TJ']);
 			var tasks = JSON.parse(window.localStorage['_CT'])
 			if(eaCheckbox) var getScrapeData = JSON.stringify(newScrapedList);
-			else var getScrapeData = JSON.stringify(viewString);		
+			else var getScrapeData = JSON.stringify(viewString);
 			var screenId = tasks.screenId;
 			var screenName = tasks.screenName;
 			var projectId = tasks.projectId;
@@ -2168,7 +2208,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			scrapeObject.userinfo = userinfo;
 			scrapeObject.param = "updateScrapeData_ICE";
 			scrapeObject.appType = tasks.appType;
-			
+
 			if(window.localStorage['checkEditWorking'] == "true")
 			{
 				console.log("inside edit");
@@ -2189,7 +2229,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 	        		currlistItems.push(getScrapeData.view[i].custname);
 	        	}
 	        	$(".ellipsis").children().parent().parent().parent().remove();
-	        	$.each($(".ellipsis"), function(){            
+	        	$.each($(".ellipsis"), function(){
 	    			modifiedListItems.push($(this).text());
 	    		});
 	    		for(i=0; i<modifiedListItems.length; i++){
@@ -2197,10 +2237,10 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 	    				modList.push(modifiedListItems[i])
 	    			}
 	    		}
-	    		scrapeObject.getScrapeData = getScrapeData; 
-	    		scrapeObject.editedList = modifiedCust; 
+	    		scrapeObject.getScrapeData = getScrapeData;
+	    		scrapeObject.editedList = modifiedCust;
 			}
-			
+
 			//Update Service to Save Scrape Objects
 			DesignServices.updateScreen_ICE(scrapeObject)
 			.then(function(data){
@@ -2223,7 +2263,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				}
 
 			}, function(error){})
-			
+
 			if($("#window-filter").is(":visible")){
 				var filters = $(".popupContent-filter .filterObjects");
 				$.each(filters, function(){
@@ -2235,10 +2275,10 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					$('.checkStyleboxFilter').prop('checked',false);
 				}
 			}
-		}
+		//}
 	})
 
-	//To Select and unSelect all objects 
+	//To Select and unSelect all objects
 	$(document).on("click", ".checkStylebox", function(){
 		if($(this).is(":checked")){
 			$("#scraplist li").find('input[name="selectAllListItems"]:visible').prop("checked", true).addClass('checked');
@@ -2265,7 +2305,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		}
 		else{
 			$('.checkStylebox').prop("checked", false);
-		}		
+		}
 
 		if(checkedLength > 0 )
 		{
@@ -2306,7 +2346,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 						}
 					}
 				}
-				
+
 				for(var i=0; i<mydata.length;i++){
 					mydata[i].stepNo = i+1;
 					if(mydata[i].custname == undefined || mydata[i].custname == ""){
@@ -2354,12 +2394,12 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 							}
 						     else{
 								  mydata[i].remarks = $("#jqGrid tbody tr td:nth-child(10)")[i+1].textContent;
-							 }	 
+							 }
 					     }
 					}
 					else{
 						mydata[i].remarks = $("#jqGrid tbody tr td:nth-child(10)")[i+1].textContent;
-					}						
+					}
 				}
 				if(serviceCallFlag  == true)
 				{
@@ -2384,7 +2424,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 							openDialog("Save Testcase", "Testcase saved successfully")
 							/*if(deleteStep == false){
 								selectRowStepNoFlag = true;
-								
+
 							}
 							else{
 								$("#globalModal").find('.modal-title').text("Delete Testcase step");
@@ -2409,7 +2449,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		}
 		cfpLoadingBar.complete();
 	}
-	
+
 	//Filter Scrape Objects
 	$(document).on("click", ".checkStyleboxFilter", function(){
 		cfpLoadingBar.start();
@@ -2441,7 +2481,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			var getSpliceIndex = gsElement.indexOf($(this).data("tag"))
 			gsElement.splice(getSpliceIndex, 1)
 		}
-		else gsElement.push($(this).data("tag"))	
+		else gsElement.push($(this).data("tag"))
 		$timeout(function(){
 			filter()
 			if(($("#scraplist li").find('input[name="selectAllListItems"]:checked').length == $("#scraplist li").find('input[name="selectAllListItems"]:visible').length) && $("#scraplist li").find('input[name="selectAllListItems"]:visible').length != 0){
@@ -2450,7 +2490,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			else $(".checkStylebox").prop("checked",false);
 		}, 500);
 	})
-	
+
 	function filter(){
 		if(gsElement.length > 0){
 			for(i=0; i<gsElement.length; i++){
@@ -2514,14 +2554,14 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					}
 				})
 			}
-		} 
+		}
 		else{
 			$("#scraplist li").show()
 		}
 		$("html").css({'cursor':'auto'});
 		cfpLoadingBar.complete()
 	}
-		
+
 	//Click on add dependent testcase
 	$(document).on("click","#addDependent",function() {
 		if(!$(this).is(":checked")){
@@ -2529,7 +2569,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			dependentTestCaseFlag = false;
 		}
 		else{
-			$("span.errTestCase").addClass("hide");			
+			$("span.errTestCase").addClass("hide");
 			//subTask = JSON.parse(window.localStorage['_CT']).subtask;
 			//var testScenarioId = "e191bb4a-2c4f-4909-acef-32bc60e527bc";
 			var testScenarioId = JSON.parse(window.localStorage['_CT']).scenarioId;
@@ -2567,7 +2607,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				//});
 				//Display testcase in the modal
 				$("#dialog-addDependentTestCase").modal("show");
-				
+
 				$(document).on('click','#debugOn',function() {
 					var checkedLength = $(".checkTestCase:checked").length;
 					checkedTestcases = [];
@@ -2597,7 +2637,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					}
 				});
 			}, function(error) {});
-		}		
+		}
 	});
 	//Filter Scrape Objects
 }]);
@@ -2620,12 +2660,12 @@ function contentTable(newTestScriptDataLS) {
 	if(newTestScriptData == "undefined" || newTestScriptData == null || newTestScriptData == ""){
 		scrappedData = "";
 	}
-	else{	
+	else{
 		scrappedData = newTestScriptData;
 	}
 
 	$("#jqGrid").jqGrid({
-		datastr: obj,    
+		datastr: obj,
 		datatype: "jsonstring",
 		editUrl:'obj',
 		page:1,
@@ -2633,11 +2673,11 @@ function contentTable(newTestScriptDataLS) {
 		colModel: [
 		           { label: 'Step No', 	name: 'stepNo', key:true, editable: false, sortable:false, resizable:false, hidden: true},
 		           { name: 'objectName', editable: false, sortable:false, resizable:false, hidden: true},
-		           { label: 'Object Name', name: 'custname', editable: true,  resizable:false, sortable:false, 
-		        	   edittype:'select', 
+		           { label: 'Object Name', name: 'custname', editable: true,  resizable:false, sortable:false,
+		        	   edittype:'select',
 		        	   editoptions : {
 		        		   value : getTags(scrappedData),
-		        		   dataEvents : [{            					
+		        		   dataEvents : [{
 		        			   type : 'change',
 		        			   'fn' : editCell
 		        		   }]
@@ -2647,7 +2687,7 @@ function contentTable(newTestScriptDataLS) {
 		        	   edittype:'select',
 		        	   editoptions :{
 		        		   value : getKeywordList(keywordArrayList),
-		        		   dataEvents : [{            					
+		        		   dataEvents : [{
 		        			   type : 'change' ,
 		        			   'fn' : editkeyWord
 		        		   }]
@@ -2704,14 +2744,14 @@ function contentTable(newTestScriptDataLS) {
 		        			   $(".commentIcon,.unCommentIcon,.deleteIcon").hide();
 		        		   }
 		        		   window.localStorage['selectRowStepNo']='';*/
-		        	   //});		        	   
+		        	   //});
 		        	   /*$("#jqGrid tr").children("td[aria-describedby='jqGrid_outputVal']").each(function(){
 		        		   if($(this).text().trim() == "##" || $(this).is(":contains(';##')")){
 		        			   if($(this).parent('tr:nth-child(odd)').length > 0){
 		        				   $(this).parent().css("background","linear-gradient(90deg, red 0.6%, #e8e6ff 0)").focus();
 		        			   }
 		        			   else{
-			        			   $(this).parent().css("background","linear-gradient(90deg, red 0.6%, white 0)").focus();		        				   
+			        			   $(this).parent().css("background","linear-gradient(90deg, red 0.6%, white 0)").focus();
 		        			   }
 		        			   $(this).css('color','red');
 		        		   }background: linear-gradient(to right, #d41e2d, #b31f2d) !important;
@@ -2731,18 +2771,20 @@ function contentTable(newTestScriptDataLS) {
 		        	   }
 		        	   hideOtherFuncOnEdit();
 		        	   $("#jqGrid").parent('div').css('height','auto');
-		        	   
-		        	   for(i=0; i<getScrapeDataforCustomObj.length; i++){
-		        			if(getScrapeDataforCustomObj[i].xpath == ""){
-		        				var testGridData = $("#jqGrid tbody tr:not(.jqgfirstrow)");
-		        				$.each(testGridData, function(){
-		        					if($(this).find("td[aria-describedby='jqGrid_custname']").text() == scrappedData[i].custname){
-		        						$(this).find("td[aria-describedby='jqGrid_custname']").addClass("addCustObj");
-		        						return false
-		        					}
-		        				})
-		        			}
-		        		}
+
+					   if(getScrapeDataforCustomObj != "" && getScrapeDataforCustomObj != undefined){						   
+							for(i=0; i<getScrapeDataforCustomObj.length; i++){
+								if(getScrapeDataforCustomObj[i].xpath == ""){
+									var testGridData = $("#jqGrid tbody tr:not(.jqgfirstrow)");
+									$.each(testGridData, function(){
+										if($(this).find("td[aria-describedby='jqGrid_custname']").text() == scrappedData[i].custname){
+											$(this).find("td[aria-describedby='jqGrid_custname']").addClass("addCustObj");
+											return false
+										}
+									})
+								}
+							}
+					   }
 		           },
 	})
 
@@ -2766,14 +2808,14 @@ function contentTable(newTestScriptDataLS) {
 		}
 	});
 
-	//Focus JqGrid onLoad 
+	//Focus JqGrid onLoad
 	$("#jqGrid").focus().css("outline","none");
-	
+
 	$(document).on('click', "[name='inputVal'],[name='custname'],[name='keywordVal'],[name='outputVal']", function() {
-		if($("[name='inputVal']").parent().siblings("[aria-describedby='jqGrid_keywordVal']").children().val() == "getBody" 
+		if($("[name='inputVal']").parent().siblings("[aria-describedby='jqGrid_keywordVal']").children().val() == "getBody"
 			|| $("[name='inputVal']").parent().siblings("[aria-describedby='jqGrid_keywordVal']").children().val() == "setHeader"
 				|| $("[name='inputVal']").parent().siblings("[aria-describedby='jqGrid_keywordVal']").children().val() == "setWholeBody"
-					|| $("[name='inputVal']").parent().siblings("[aria-describedby='jqGrid_keywordVal']").children().val() == "setHeaderTemplate"	){    	
+					|| $("[name='inputVal']").parent().siblings("[aria-describedby='jqGrid_keywordVal']").children().val() == "setHeaderTemplate"	){
 			var getValueInput =$("[name='inputVal']").parent().attr('title');
 			if(getValueInput == undefined){
 				$("[name='inputVal']").parent().html("<textarea rows='1' style='resize:none;width:98%;min-height:25px;' class='form-control'></textarea>")
@@ -2803,8 +2845,8 @@ function contentTable(newTestScriptDataLS) {
 	$('#jqGrid').navGrid("#jqGridPager", {edit: false, add: false, del: false, refresh: false, view: false, search:false, position:"left", cloneToTop: true });
 	$('#jqGrid').inlineNav('#jqGrid_toppager',{
 		// the buttons to appear on the toolbar of the grid
-		edit: false, 
-		add: false, 
+		edit: false,
+		add: false,
 		del: false,
 		save: false,
 		cancel: false,
@@ -2825,7 +2867,7 @@ function contentTable(newTestScriptDataLS) {
 	$("#jqGrid").jqGrid("setColProp", "url", {editable: false});
 	$("#jqGrid").jqGrid("setColProp", "appType", {editable: false});
 	$("#jqGrid").resetSelection();
-	
+
 	$(document).on('click', '.remarksIcon', function(){
 		$(this).parent('td').next('td[aria-describedby="jqGrid_remarks"]').addClass('selectedRemarkCell');
 		var historyDetails = $(this).parent('td').next('td[aria-describedby="jqGrid_remarks"]').text().trim();
@@ -2837,13 +2879,13 @@ function contentTable(newTestScriptDataLS) {
 		else{
 			if(historyDetails)	historyArray.push(historyDetails);
 		}
-		
+
 		if(historyArray.length > 0){
 			$(".historyContents").empty();
 			for(i=0; i<historyArray.length; i++){
 				if(historyArray[i] != "" && historyArray[i] != " "){
-					$(".historyContents").append("<span class=''>"+historyArray[i]+"</span>");					
-				}		
+					$(".historyContents").append("<span class=''>"+historyArray[i]+"</span>");
+				}
 			}
 			$(".historyDetailsContainer").show();
 		}
@@ -2871,10 +2913,10 @@ function contentTable(newTestScriptDataLS) {
 				$("#jqGrid tbody tr td.selectedRemarkCell").attr('title',getremarks);
 				$("#jqGrid tbody tr td.selectedRemarkCell").removeClass('selectedRemarkCell');
 				$(this).parent(".modal-footer").parent(".modal-content").find(".close").trigger('click');
-			}			
+			}
 		}
 	})
-	
+
 	function hideOtherFuncOnEdit()
 	{
 		$("#jqGrid").each(function() {
@@ -2918,15 +2960,15 @@ function contentTable(newTestScriptDataLS) {
 					$(".cbox:not(:checked):not(#cb_jqGrid)").parent().parent("tr.ui-state-highlight").removeClass('ui-state-highlight');
 				}
 			});
-		});	
+		});
 
-		$(".cbox:checked:not(#cb_jqGrid)").parent().parent().siblings("tr.jqgrow").each(function() { 
+		$(".cbox:checked:not(#cb_jqGrid)").parent().parent().siblings("tr.jqgrow").each(function() {
 			var checkedBoxLen = $(".cbox:checked").length;
-			if ($(this).hasClass('ui-state-highlight') && checkedBoxLen == 1 ) 
-			{ 
-				$(this).removeClass('ui-state-highlight'); 
+			if ($(this).hasClass('ui-state-highlight') && checkedBoxLen == 1 )
+			{
+				$(this).removeClass('ui-state-highlight');
 				$(this).find(".cbox").attr("checked",false);
-			} 
+			}
 		});
 
 		//Hide EditTestStep when multiple rows selected
@@ -2934,7 +2976,7 @@ function contentTable(newTestScriptDataLS) {
 		if(checkedLen > 1 )
 		{
 			$("#editTestStep").hide();
-		} 
+		}
 		else{
 			$("#editTestStep").show();
 		}
@@ -2958,7 +3000,7 @@ function contentTable(newTestScriptDataLS) {
 			if(grid[0].children[0].children[id].children[1].children[0].checked){
 				var selectedText = grid.jqGrid('getRowData',id).custname;
 				var selectedKeyword = grid.jqGrid('getRowData', id).keywordVal;
-				grid.jqGrid('restoreRow',lastSelection);                        
+				grid.jqGrid('restoreRow',lastSelection);
 				grid.jqGrid('editRow',id, {keys: true} );
 				setKeyword(e,selectedText,grid,selectedKeyword);
 				lastSelection = id;
@@ -2999,10 +3041,10 @@ function contentTable(newTestScriptDataLS) {
 		var taskInfo = JSON.parse(window.localStorage['_CT']);
 		var appTypeLocal = taskInfo.appType;//window.localStorage['appTypeScreen'];
 		if(selectedText == ""){selectedText = "@Generic"}
-		if(selectedText == "@Generic" || selectedText == undefined) 
+		if(selectedText == "@Generic" || selectedText == undefined)
 		{
 			objName = " ";
-			url = " ";    
+			url = " ";
 			if(appTypeLocal == "MobileApp"){
 				var sc = Object.keys(keywordArrayList.defaultListMobility);
 				selectedKeywordList = "defaultListMobilityiOS";
@@ -3045,7 +3087,7 @@ function contentTable(newTestScriptDataLS) {
 				$grid.jqGrid('setCell', rowId, 'appType', "Generic");
 				$grid.jqGrid('setCell', rowId, 'url', url);
 				$grid.jqGrid('setCell', rowId, 'objectName', objName);
-			}			
+			}
 		}
 
 		else if(selectedText == "@Browser" )
@@ -3136,9 +3178,9 @@ function contentTable(newTestScriptDataLS) {
 			}
 			var row = $(e.target).closest('tr.jqgrow');
 			var rowId = row.attr('id');
-			$("select#" + rowId + "_keywordVal", row[0]).html(res);			
+			$("select#" + rowId + "_keywordVal", row[0]).html(res);
 			selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
-			$grid.jqGrid('setCell', rowId, 'objectName', objName); 
+			$grid.jqGrid('setCell', rowId, 'objectName', objName);
 			$grid.jqGrid('setCell', rowId, 'url', url);
 			$grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
 		}
@@ -3322,10 +3364,10 @@ function contentTable(newTestScriptDataLS) {
 			$grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
 		}
 		//Adding @Excel to the objectName dropdown
-		else if(selectedText == "@Excel") 
+		else if(selectedText == "@Excel")
 		{
 			objName = " ";
-			url = " ";    		
+			url = " ";
 			//new
 			var sc = Object.keys(keywordArrayList.excelList);
 			selectedKeywordList = "excelList";
@@ -3348,17 +3390,17 @@ function contentTable(newTestScriptDataLS) {
 			for (var i=0; i<scrappedData.length; i++){
 				var ob = scrappedData[i];
 				var custname1;
-				var custval=ob.custname;	
+				var custval=ob.custname;
 				custname1 = $('<input>').html(custval).text().trim();
 				if (custname1.replace(/\s/g, ' ') == selectedText.replace('/\s/g', ' ')){
 					objName = ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ');
-					url = ob.url;					
+					url = ob.url;
 					var obType = ob.tag;
 					var listType=ob.canselectmultiple;
 
 					//changes from wasim
-					if(obType!='a' && obType!='select' && obType!='radiobutton' && obType!='checkbox' && obType!='input' && obType!='list' 
-						&& obType!='tablecell' && obType!='table' && obType!='img' && obType!='button' && (appTypeLocal == 'Web' || appTypeLocal == 'MobileWeb')){						
+					if(obType!='a' && obType!='select' && obType!='radiobutton' && obType!='checkbox' && obType!='input' && obType!='list'
+						&& obType!='tablecell' && obType!='table' && obType!='img' && obType!='button' && (appTypeLocal == 'Web' || appTypeLocal == 'MobileWeb')){
 						var sc = Object.keys(keywordArrayList.element);
 						selectedKeywordList = "element";
 						var res = '';
@@ -3374,10 +3416,10 @@ function contentTable(newTestScriptDataLS) {
 						$("select#" + rowId + "_keywordVal", row[0]).html(res);
 						selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
 						$grid.jqGrid('setCell', rowId, 'url', url);
-						$grid.jqGrid('setCell', rowId, 'objectName', objName); 
+						$grid.jqGrid('setCell', rowId, 'objectName', objName);
 						$grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
 						break;
-					}	
+					}
 					else if(obType =='elementWS'){
 						var sc = Object.keys(keywordArrayList.elementWS);
 						selectedKeywordList = "elementWS";
@@ -3394,7 +3436,7 @@ function contentTable(newTestScriptDataLS) {
 						$("select#" + rowId + "_keywordVal", row[0]).html(res);
 						selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
 						$grid.jqGrid('setCell', rowId, 'url', url);
-						$grid.jqGrid('setCell', rowId, 'objectName', objName); 
+						$grid.jqGrid('setCell', rowId, 'objectName', objName);
 						$grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
 						break;
 					}
@@ -3403,7 +3445,7 @@ function contentTable(newTestScriptDataLS) {
                         var res = '';
                         var sc;
                         var listType = ob.canselectmultiple;
-                        if(obType =='button')      {sc = Object.keys(keywordArrayList.button);selectedKeywordList = "button";}             
+                        if(obType =='button')      {sc = Object.keys(keywordArrayList.button);selectedKeywordList = "button";}
                         else if(obType =='input' || obType == 'edit'){  sc = Object.keys(keywordArrayList.text);selectedKeywordList = "text";}
                         else if(obType =='select'){ sc = Object.keys(keywordArrayList.select);selectedKeywordList = "select";}
                         else if(obType =='list_item')     {sc = Object.keys(keywordArrayList.list);selectedKeywordList = "list";}
@@ -3434,7 +3476,7 @@ function contentTable(newTestScriptDataLS) {
                         $("select#" + rowId + "_keywordVal", row[0]).html(res);
                         selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
                         $grid.jqGrid('setCell', rowId, 'url', url);
-                        $grid.jqGrid('setCell', rowId, 'objectName', objName); 
+                        $grid.jqGrid('setCell', rowId, 'objectName', objName);
                         $grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
                         break;
 					}
@@ -3455,20 +3497,20 @@ function contentTable(newTestScriptDataLS) {
 						$("select#" + rowId + "_keywordVal", row[0]).html(res);
 						selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
 						$grid.jqGrid('setCell', rowId, 'url', url);
-						$grid.jqGrid('setCell', rowId, 'objectName', objName); 
+						$grid.jqGrid('setCell', rowId, 'objectName', objName);
 						$grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
 						break;
 					}
 					//adding for SAP
-					else if(appTypeLocal == 'SAP' &&(obType =='GuiTextField' ||obType =='GuiTitlebar' ||obType =='GuiButton' ||obType =='GuiUserArea'||obType =='GuiRadioButton' 
+					else if(appTypeLocal == 'SAP' &&(obType =='GuiTextField' ||obType =='GuiTitlebar' ||obType =='GuiButton' ||obType =='GuiUserArea'||obType =='GuiRadioButton'
 					    ||obType =='GuiLabel' ||obType =='GuiBox' ||obType =='GuiSimpleContainer' ||obType =='GuiPasswordField'||obType=='GuiComboBox'||obType=='GuiCheckBox'
 						||obType =='GuiStatusbar' ||obType =='GuiStatusPane' ||obType =='text' ||obType =='combo_box' || obType =='list_item' || obType =='GuiCTextField'
-						|| obType =='hyperlink' || obType =='lbl'||obType =='list' || obType == 'edit' || obType == null || obType == 'check_box'|| obType== 'GuiTableControl' 
+						|| obType =='hyperlink' || obType =='lbl'||obType =='list' || obType == 'edit' || obType == null || obType == 'check_box'|| obType== 'GuiTableControl'
 						|| obType == 'radio_button' || obType=='button' || obType=='checkbox' || obType=='radiobutton' || obType=='table' || obType=='a' || obType=='input' || obType == 'GuiScrollContainer' || obType == 'GuiTab' || obType == 'scroll' ||obType != undefined)){
 						var res = '';
 						var sc;
 						var listType = '';
-						if(obType =='push_button' || obType =='GuiButton' || obType =='button' )	{sc = Object.keys(keywordArrayList.button);selectedKeywordList = "button";}		
+						if(obType =='push_button' || obType =='GuiButton' || obType =='button' )	{sc = Object.keys(keywordArrayList.button);selectedKeywordList = "button";}
 						else if(obType =='GuiTextField' || obType =='GuiCTextField' || obType =='text' || obType=='input'){	sc = Object.keys(keywordArrayList.text);selectedKeywordList = "text";}
 						else if(obType =='GuiLabel' || obType =='lbl'){	sc = Object.keys(keywordArrayList.element);selectedKeywordList = "element";}
 						else if(obType =='GuiPasswordField'){	sc = Object.keys(keywordArrayList.text);selectedKeywordList = "text";}
@@ -3477,7 +3519,7 @@ function contentTable(newTestScriptDataLS) {
 						else if(obType =='combo_box'||obType =='GuiBox'|| obType=='GuiComboBox' || obType=='select'){	sc = Object.keys(keywordArrayList.select);selectedKeywordList = "select";}
 						else if(obType =='list_item')	{sc = Object.keys(keywordArrayList.list);selectedKeywordList = "list";}
 						else if(obType =='GuiTableControl' || obType=='table')	{sc = Object.keys(keywordArrayList.table);selectedKeywordList = "table";}
-						else if(obType =='GuiShell' || obType=='shell')	{sc = Object.keys(keywordArrayList.shell);selectedKeywordList = "shell";} 
+						else if(obType =='GuiShell' || obType=='shell')	{sc = Object.keys(keywordArrayList.shell);selectedKeywordList = "shell";}
 						else if (obType == 'list_item' || obType == 'list') {
 							if (listType == 'true') {
 								sc = Object.keys(keywordArrayList.list);
@@ -3503,14 +3545,14 @@ function contentTable(newTestScriptDataLS) {
 						$("select#" + rowId + "_keywordVal", row[0]).html(res);
 						selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
 						$grid.jqGrid('setCell', rowId, 'url', url);
-						$grid.jqGrid('setCell', rowId, 'objectName', objName); 
+						$grid.jqGrid('setCell', rowId, 'objectName', objName);
 						$grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
 						break;
 					}
 					else if (appTypeLocal == 'MobileApp'
-						&& (obType.indexOf("RadioButton") >= 0 || obType.indexOf("ImageButton") >= 0 || obType.indexOf("Button") >= 0|| obType.indexOf("EditText") >= 0 
-								|| obType.indexOf("Switch") >= 0 || obType.indexOf("CheckBox") >= 0 || obType.indexOf("Spinner") >= 0 || obType.indexOf("TimePicker") >= 0 || obType.indexOf("DatePicker") >= 0 
-								|| obType.indexOf("NumberPicker") >= 0 || obType.indexOf("RangeSeekBar") >= 0 || obType.indexOf("SeekBar") >= 0 || obType.indexOf("ListView") >= 0 || obType.indexOf("XCUIElementTypeTextField") >= 0 
+						&& (obType.indexOf("RadioButton") >= 0 || obType.indexOf("ImageButton") >= 0 || obType.indexOf("Button") >= 0|| obType.indexOf("EditText") >= 0
+								|| obType.indexOf("Switch") >= 0 || obType.indexOf("CheckBox") >= 0 || obType.indexOf("Spinner") >= 0 || obType.indexOf("TimePicker") >= 0 || obType.indexOf("DatePicker") >= 0
+								|| obType.indexOf("NumberPicker") >= 0 || obType.indexOf("RangeSeekBar") >= 0 || obType.indexOf("SeekBar") >= 0 || obType.indexOf("ListView") >= 0 || obType.indexOf("XCUIElementTypeTextField") >= 0
 								|| obType.indexOf("XCUIElementTypePickerWheel") >= 0 || obType.indexOf("XCUIElementTypeSlider") >= 0 || obType.indexOf("XCUIElementTypeSearchField") >= 0 || obType.indexOf("XCUIElementTypeTable") >=0 || obType.indexOf("android.widget.TimePicker") >=0 || obType.indexOf("android.widget.DatePicker") >=0)) {
 						var res = '';
 						var sc;
@@ -3535,6 +3577,10 @@ function contentTable(newTestScriptDataLS) {
 						{sc = Object.keys(keywordArrayList.spinners);selectedKeywordList = "spinners";}
 						else if (obType.indexOf("CheckBox") >= 0)
 						{sc = Object.keys(keywordArrayList.checkbox);selectedKeywordList = "checkbox";}
+						else if(obType.indexOf("android.widget.TimePicker") >=0)
+						{sc = Object.keys(keywordArrayList.timepicker);selectedKeywordList = "timepicker";}
+						else if(obType.indexOf("android.widget.DatePicker") >=0)
+						{sc = Object.keys(keywordArrayList.datepicker);selectedKeywordList = "datepicker";}
 						else if (obType.indexOf("TimePicker") >= 0)
 						{sc = Object.keys(keywordArrayList.time);selectedKeywordList = "time";}
 						else if (obType.indexOf("DatePicker") >= 0)
@@ -3549,10 +3595,6 @@ function contentTable(newTestScriptDataLS) {
 						{sc = Object.keys(keywordArrayList.listview);selectedKeywordList = "listview";}
 						else if(obType.indexOf("XCUIElementTypeTable") >=0)
 						{sc = Object.keys(keywordArrayList.table);selectedKeywordList = "table";}
-						else if(obType.indexOf("android.widget.TimePicker") >=0)
-						{sc = Object.keys(keywordArrayList.timepicker);selectedKeywordList = "timepicker";}
-						else if(obType.indexOf("android.widget.DatePicker") >=0)
-						{sc = Object.keys(keywordArrayList.datepicker);selectedKeywordList = "datepicker";}
 						for (var i = 0; i < sc.length; i++) {
 							if (selectedKeyword == sc[i]) {
 								res += '<option role="option" value="' + sc[i]
@@ -3569,9 +3611,9 @@ function contentTable(newTestScriptDataLS) {
 						$grid.jqGrid('setCell', rowId, 'objectName', objName);
 						$grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
 						break;
-					} else if (appTypeLocal == 'MobileApp' && (!(obType.indexOf("RadioButton") >= 0 || obType.indexOf("ImageButton") >= 0 || obType.indexOf("Button") >= 0 || obType.indexOf("EditText") >= 0 
-							|| obType.indexOf("Switch") >= 0  || obType.indexOf("CheckBox") >= 0 || obType.indexOf("Spinner") >= 0 || obType.indexOf("TimePicker") >= 0 || obType.indexOf("DatePicker") >= 0 
-							|| obType.indexOf("NumberPicker") >= 0 || obType.indexOf("RangeSeekBar") >= 0 || obType.indexOf("SeekBar") >= 0 || obType.indexOf("ListView") >= 0 || obType.indexOf("XCUIElementTypeTextField") >= 0 
+					} else if (appTypeLocal == 'MobileApp' && (!(obType.indexOf("RadioButton") >= 0 || obType.indexOf("ImageButton") >= 0 || obType.indexOf("Button") >= 0 || obType.indexOf("EditText") >= 0
+							|| obType.indexOf("Switch") >= 0  || obType.indexOf("CheckBox") >= 0 || obType.indexOf("Spinner") >= 0 || obType.indexOf("TimePicker") >= 0 || obType.indexOf("DatePicker") >= 0
+							|| obType.indexOf("NumberPicker") >= 0 || obType.indexOf("RangeSeekBar") >= 0 || obType.indexOf("SeekBar") >= 0 || obType.indexOf("ListView") >= 0 || obType.indexOf("XCUIElementTypeTextField") >= 0
 							|| obType.indexOf("XCUIElementTypePickerWheel") >= 0 || obType.indexOf("XCUIElementTypeSlider") >= 0 || obType.indexOf("XCUIElementTypeSearchField") >= 0 || obType.indexOf("XCUIElementTypeTable") >=0 || obType.indexOf("android.widget.TimePicker") >=0 || obType.indexOf("android.widget.DatePicker") >=0))) {
 						var res = '';
 						var sc = Object.keys(keywordArrayList.element);
@@ -3615,9 +3657,9 @@ function contentTable(newTestScriptDataLS) {
 						$("select#" + rowId + "_keywordVal", row[0]).html(res);
 						selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
 						$grid.jqGrid('setCell', rowId, 'url', url);
-						$grid.jqGrid('setCell', rowId, 'objectName', objName); 
+						$grid.jqGrid('setCell', rowId, 'objectName', objName);
 						$grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
-						break;						
+						break;
 					}
 					else if(appTypeLocal == 'MobileApp' && (!(obType == 'UIATableView' || obType == 'UIASecureTextField' || obType == 'UIATextField' || obType=='UIASwitch' || obType=='UIAButton'  || obType == 'UIASearchBar' || obType == 'UIASlider' || obType =='UIAPickerWheel'))){
 						var res = '';
@@ -3635,15 +3677,15 @@ function contentTable(newTestScriptDataLS) {
 						$("select#" + rowId + "_keywordVal", row[0]).html(res);
 						selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
 						$grid.jqGrid('setCell', rowId, 'url', url);
-						$grid.jqGrid('setCell', rowId, 'objectName', objName); 
+						$grid.jqGrid('setCell', rowId, 'objectName', objName);
 						$grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
 						break;
 					}
-					else if(appTypeLocal == 'DesktopJava' && (obType =='push button' ||obType =='text' ||obType =='combo box' || obType =='list item'|| obType =='hyperlink' || obType =='label' || obType =='scroll bar' || obType =='toggle button' || obType =='menu' 
+					else if(appTypeLocal == 'DesktopJava' && (obType =='push button' ||obType =='text' ||obType =='combo box' || obType =='list item'|| obType =='hyperlink' || obType =='label' || obType =='scroll bar' || obType =='toggle button' || obType =='menu'
 						||obType =='list' || obType == 'edit' || obType == 'Edit Box' || obType == null || obType == 'Static' || obType == 'check box'|| obType == 'radio button' || obType == 'panel' || obType != undefined || obType == 'table') || obType == 'password text'){
 						var sc;
 						if(obType =='push button' || obType =='toggle button'){
-							sc = Object.keys(keywordArrayList.button);		
+							sc = Object.keys(keywordArrayList.button);
 							selectedKeywordList = "button";
 						}
 						else if(obType == 'edit'|| obType == 'Edit Box' || obType =='text' || obType =='password text'){
@@ -3699,7 +3741,7 @@ function contentTable(newTestScriptDataLS) {
 						$("select#" + rowId + "_keywordVal", row[0]).html(res);
 						selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
 						$grid.jqGrid('setCell', rowId, 'url', url);
-						$grid.jqGrid('setCell', rowId, 'objectName', objName); 
+						$grid.jqGrid('setCell', rowId, 'objectName', objName);
 						$grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
 						break;
 					}
@@ -3719,7 +3761,7 @@ function contentTable(newTestScriptDataLS) {
 						$("select#" + rowId + "_keywordVal", row[0]).html(res);
 						selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
 						$grid.jqGrid('setCell', rowId, 'url', url);
-						$grid.jqGrid('setCell', rowId, 'objectName', objName); 
+						$grid.jqGrid('setCell', rowId, 'objectName', objName);
 						$grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
 						break;
 					}
@@ -3794,17 +3836,17 @@ function contentTable(newTestScriptDataLS) {
 		var selName = 'custname';
 		var $grid = $('#jqGrid');
 		//get current selected row
-		var currRowId = $grid.jqGrid('getGridParam','selrow'); 
-		var selId = '#' + currRowId + '_'+selName;             	
+		var currRowId = $grid.jqGrid('getGridParam','selrow');
+		var selId = '#' + currRowId + '_'+selName;
 		var selectedText = $(selId+' option:selected').val();
 		var url = " " ;
 		var objName = " ";
 		setKeyword(e,selectedText,$grid,"empty");
-		//uncomment below two sections to verify change in URL 
+		//uncomment below two sections to verify change in URL
 		//set the URL to the cell 'url'
 		if(selectedText == "@Generic" || selectedText == undefined || selectedText == "@Browser" || selectedText == "@Excel" || selectedText == "@BrowserPopUp"){
-			$grid.jqGrid('setCell', currRowId, 'objectName', objName); 
-			$grid.jqGrid('setCell', currRowId, 'url', url); 
+			$grid.jqGrid('setCell', currRowId, 'objectName', objName);
+			$grid.jqGrid('setCell', currRowId, 'url', url);
 		}
 		//get Input and Output Syntax for selected Keyword
 		$.each(keywordArrayList, function( index, value ) {
@@ -3825,13 +3867,13 @@ function contentTable(newTestScriptDataLS) {
 		});
 	}
 	$("#load_jqGrid").hide();
-}	
+}
 //contentTable
 
 //Delete Testscripts
 function deleteTestScriptRow(e){
 	if($('.ui-state-highlight').find('td:nth-child(2)').find('input').is(":checked") && $('.ui-state-highlight').find('td:nth-child(7)').find('input').length > 0){
-		
+
 	}
 	else if($('#jqGrid tbody tr.ui-widget-content').length <= 0){
 		openDialog("Delete Testcase step", "No steps to Delete")
@@ -3842,7 +3884,7 @@ function deleteTestScriptRow(e){
 			$("#globalModalYesNo").find('.modal-body p').text("Are you sure, you want to delete?").css('color','black');
 			$("#globalModalYesNo").find('.modal-footer button:nth-child(1)').attr("id","btnDeleteStepYes")
 			$("#globalModalYesNo").modal("show");
-			/*angular.element(document.getElementById("tableActionButtons")).scope().updateTestCase_ICE();*/		
+			/*angular.element(document.getElementById("tableActionButtons")).scope().updateTestCase_ICE();*/
 		}
 		else{
 			openDialog("Delete Test step", "Select steps to delete")
@@ -3874,7 +3916,7 @@ $(document).on('click','#btnDeleteStepYes', function(){
 
 function addTestScriptRow(){
 	if($('.ui-state-highlight').find('td:nth-child(2)').find('input').is(":checked") && $('.ui-state-highlight').find('td:nth-child(7)').find('input').length > 0){
-		
+
 	}
 	else{
 		var flagClass;
@@ -3899,13 +3941,13 @@ function addTestScriptRow(){
 				"remarksStatus": "",
 			    "remarks": ""
 		};
-		
+
 		$("#jqGrid tr").each(function(){
 			if($(this).find("td:nth-child(9)").find(".remarksIcon").length > 0){
 				$(this).find("td:nth-child(9)").find(".remarksIcon").remove();
 			}
 		})
-		   
+
 		var gridArrayData = $("#jqGrid").jqGrid('getRowData');
 		var arrayLength = gridArrayData.length;
 		if(arrayLength <= 0){
@@ -3926,7 +3968,7 @@ function addTestScriptRow(){
 						gridArrayData[i].stepNo = i+1;
 					}
 				}
-			} 
+			}
 			else{
 				gridArrayData.splice(arrayLength,0,emptyRowData);
 				gridArrayData[arrayLength].stepNo = parseInt(gridArrayData[arrayLength-1].stepNo)+1;
@@ -3946,11 +3988,11 @@ function addTestScriptRow(){
 			})
 			flagClass == "false"
 		}
-	}	
+	}
 }
 
 function rearrangeTestScriptRow(){
-	$("#jqGrid").trigger("reloadGrid");	
+	$("#jqGrid").trigger("reloadGrid");
 	$("#jqGrid").jqGrid("setColProp", "stepNo", {editable: false});
 	$("#jqGrid").jqGrid("setColProp", "objectName", {editable: false});
 	$("#jqGrid").jqGrid("setColProp", "custname", {editable: false});
@@ -3983,7 +4025,7 @@ function editTestCaseRow(){
 	else{
 		var editSelRow = parseInt(rowSelect) + parseInt(1);
 		var rowIsChecked =  $(document).find(".ui-state-highlight").find(".cbox").is(":checked");
-		var checkedLen = $(".cbox:checked").length;	
+		var checkedLen = $(".cbox:checked").length;
 		$("#jqGrid").jqGrid("setColProp", "stepNo", {editable: false });
 		$("#jqGrid").jqGrid("setColProp", "objectName", {editable: false});
 		$("#jqGrid").jqGrid("setColProp", "custname", {editable: true});
@@ -4063,13 +4105,13 @@ function copyTestStep(){
 					"remarksIcon"		: $(this).children("td:nth-child(9)").text(),
 					"remarks"		: $(this).children("td:nth-child(10)").text(),
 					"url"			: $(this).children("td:nth-child(11)").text().trim(),
-					"appType"		: $(this).children("td:nth-child(12)").text()					
+					"appType"		: $(this).children("td:nth-child(12)").text()
 				});
 			}
 		});
 		window.localStorage['getRowJsonCopy'] = angular.toJson(getRowJsonCopy);
 		//Reloading Row
-		$("#jqGrid").trigger("reloadGrid");	
+		$("#jqGrid").trigger("reloadGrid");
 		$("#jqGrid").jqGrid("setColProp", "stepNo", {editable: false});
 		$("#jqGrid").jqGrid("setColProp", "objectName", {editable: false});
 		$("#jqGrid").jqGrid("setColProp", "custname", {editable: false});
@@ -4110,13 +4152,13 @@ function pasteTestStep(){
 				$("#globalModalYesNo").modal("show");
 				//showDialogMesgsYesNo("Paste Test Step", "Copied step(s) might contain object reference which will not be supported for other screen. Do you still want to continue ?", "btnPasteTestStepYes", "btnPasteTestStepNo")
 			}
-		} 
+		}
 		else{
 			if (window.localStorage['emptyTestStep'] == "true" || getRowJsonToPaste == undefined) return false
 			else if($("#jqGrid").jqGrid('getRowData').length == 1 && $("#jqGrid").jqGrid('getRowData')[0].custname == "") showDialogMesgsYesNo("Paste Test Step", "Copied step(s) might contain object reference which will not be supported for other screen. Do you still want to continue ?", "btnPasteTestStepYes", "btnPasteTestStepNo")
 			else{
 				$("#modalDialog-inputField").find('.modal-title').text("Paste Test Step");
-				$("#modalDialog-inputField").find('#labelContent').html("Paste after step no:").css('color','black').append("<br/><span style='font-size:11px; color: #000;'>For multiple paste. Eg: 5;10;20</span>");				
+				$("#modalDialog-inputField").find('#labelContent').html("Paste after step no:").css('color','black').append("<br/><span style='font-size:11px; color: #000;'>For multiple paste. Eg: 5;10;20</span>");
 				$("#modalDialog-inputField").find('.modal-footer button').attr("id","btnPasteTestStep");
 				$("#modalDialog-inputField").find('#getInputData').attr("placeholder","Enter a value");
 				$("#modalDialog-inputField").find('#getInputData').addClass("copyPasteValidation");
@@ -4129,7 +4171,7 @@ function pasteTestStep(){
 				$("#textBoxID").css({'margin-bottom':'0'})*/
 			}
 		}
-	}	
+	}
 }
 // TO Clear Input Val on Close of Bootstrap Modal Dialog
 $(document).on('hide.bs.modal','#modalDialog-inputField', function () {
@@ -4199,7 +4241,7 @@ $(document).on("click","#btnPasteTestStep", function(){
 			$("#dialogOverlay, #dialogContainer").remove();*/
 			$("#modalDialog-inputField").find(".close").trigger("click");
 		}
-	}	
+	}
 })
 
 $(document).on('keypress', '.copyPasteValidation', function(e){
@@ -4217,7 +4259,7 @@ $(document).on('focusout', '.copyPasteValidation', function(){
 	}
 })
 $(document).on('focus', '.copyPasteValidation', function(){
-	$('#errorMsgs1, #errorMsgs2, #errorMsgs3').hide();	
+	$('#errorMsgs1, #errorMsgs2, #errorMsgs3').hide();
 })
 
 function pasteInGrid(){
@@ -4276,7 +4318,7 @@ function pasteInGrid(){
 			for(var i=parseInt(pasteSelecteStepNo[a])+1; i<=parseInt(pasteSelecteStepNo[a])+getRowJsonToPaste.length; i++){
 				highlightPasted.push(i);
 				/*$.each($("#jqGrid tr"), function(){
-					if(parseInt($(this).children("td:nth-child(1)").text()) == i){				
+					if(parseInt($(this).children("td:nth-child(1)").text()) == i){
 						$(this).find("input.cbox").trigger("click")
 						return false;
 					}
@@ -4287,7 +4329,7 @@ function pasteInGrid(){
 			for(var i=parseInt(pasteSelecteStepNo[a])+1; i<=getRowJsonToPaste.length; i++){
 				highlightPasted.push(i);
 				/*$.each($("#jqGrid tr"), function(){
-					if(parseInt($(this).children("td:nth-child(1)").text()) == i){				
+					if(parseInt($(this).children("td:nth-child(1)").text()) == i){
 						$(this).find("input.cbox").trigger("click")
 						return false;
 					}
@@ -4296,7 +4338,7 @@ function pasteInGrid(){
 		}
 		$.each($("#jqGrid tr"), function(){
 			for(j=0;j<highlightPasted.length;j++){
-				if(parseInt($(this).children("td:nth-child(1)").text()) == highlightPasted[j]){				
+				if(parseInt($(this).children("td:nth-child(1)").text()) == highlightPasted[j]){
 					//$(this).find("input.cbox").prop("checked",true);
 					$(this).addClass("row-highlight-background");
 					$(this).addClass("ui-state-highlight");
@@ -4349,7 +4391,7 @@ function commentStep(){
 							{
 								myData[i].outputVal = myData[i].outputVal.concat(";##");
 								$("#jqGrid").trigger("reloadGrid");
-							}								
+							}
 						}
 						else if(($.inArray(myData[i].stepNo, (selectedRowIds.map(String)) ) != -1 && myData[i].outputVal != "")) {
 							if(myData[i].outputVal.match(";##") == null && myData[i].outputVal != "##"){
@@ -4385,7 +4427,7 @@ function commentStep(){
 								var lastTwo = myData[i].outputVal.substr(myData[i].outputVal.length - 2);
 								myData[i].outputVal = 	myData[i].outputVal.replace(lastTwo,"");
 								$("#jqGrid").trigger("reloadGrid");
-							}						
+							}
 						}
 						else if(($.inArray(myData[i].stepNo, (selectedRowIds.map(String)) ) != -1 && myData[i].outputVal != "")) {
 							if(myData[i].outputVal.match("##") == '##' && myData[i].outputVal.length > 2)
@@ -4553,8 +4595,8 @@ function drop(ev) {
 	draggedEle.setAttribute("draggable", false)
 	draggedEle.childNodes[1].style.background = "#e0e0e0";
 	draggedEle.childNodes[1].style.cursor = "no-drop"
-	//Enable-Disable dragged element based on drop event	
-	$(".submitObjectWarning").hide();	
+	//Enable-Disable dragged element based on drop event
+	$(".submitObjectWarning").hide();
 	if($(ev.target).parent().children(".ellipsis").hasClass("fromMergeObj") == true){
 		draggedEle.setAttribute("draggable", true)
 		draggedEle.childNodes[1].style.background = "";
@@ -4619,7 +4661,7 @@ function openDialog(title, body){
     $("#globalModal").find('.modal-body p').text(body).css('color','black');
 	$("#globalModal").modal("show");
 	setTimeout(function(){
-		$("#globalModal").find('.btn-default').focus();					
+		$("#globalModal").find('.btn-default').focus();
 	}, 300);
 }
 //XML Beatuifier

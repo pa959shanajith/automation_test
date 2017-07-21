@@ -26,6 +26,7 @@ mySPA.controller('mindmapController', ['$scope', '$http', '$location', '$timeout
         }
         
 	}, 500)
+    loadUserTasks()
 		/*Sidebar-toggle*/
     $scope.tab = "tabRequirement";
     $(".left-sec-mindmap,.rsSlide").show();
@@ -212,10 +213,10 @@ mySPA.controller('mindmapController', ['$scope', '$http', '$location', '$timeout
             
             loadMindmapData();
             $timeout(function(){
-                $('#ct-moduleBox').prop("style","width:100% !important; left:0px !important;");
+                $('#ct-moduleBox').prop("style","width:100% ; left:0px ;");
             },10);
             $timeout(function(){
-                $('#ct-AssignBox').prop("style","width:100% !important; left:0px !important;");
+                $('#ct-AssignBox').prop("style","width:100% ; left:0px ;");
             },10);
             
           
