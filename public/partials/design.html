@@ -18,7 +18,7 @@
 				</ul>
 			</div>
 			<!-- Apptype Web -->
-			
+
 			<!-- Apptype Desktop -->
 			<div ng-if="getScreenView == 'Desktop'" id="left-top-section" class="ApptypeScreenView">
 				<ul>
@@ -28,7 +28,7 @@
 				</ul>
 			</div>
 			<!-- Apptype Desktop -->
-			
+
 			<!-- Apptype SAP -->
 			<div ng-if="getScreenView == 'SAP'" id="left-top-section" class="ApptypeScreenView">
 				<ul>
@@ -38,7 +38,7 @@
 				</ul>
 			</div>
 			<!-- Apptype SAP -->
-			
+
 			<!-- Apptype OEBS -->
 			<div ng-if="getScreenView == 'DesktopJava'" id="left-top-section" class="ApptypeScreenView">
 				<ul>
@@ -48,7 +48,7 @@
 				</ul>
 			</div>
 			<!-- Apptype OEBS -->
-			
+
 			<!-- Apptype Mobilty -->
 			<div ng-if="getScreenView == 'MobileApp'" id="left-top-section" class="ApptypeScreenView">
 				<ul>
@@ -58,7 +58,7 @@
 				</ul>
 			</div>
 			<!-- Apptype Mobilty -->
-			
+
 			<!-- Apptype Mobilty -->
 			<div ng-if="getScreenView == 'MobileWeb'" id="left-top-section" class="ApptypeScreenView">
 				<ul>
@@ -68,7 +68,7 @@
 				</ul>
 			</div>
 			<!-- Apptype Mobilty -->
-			
+
 			<!-- Apptype Webservice -->
 			<div style="border-bottom:0" ng-if="getScreenView == 'Webservice'" id="left-top-section" class="ApptypeScreenView">
 				<ul>
@@ -96,7 +96,7 @@
 		<!--Task Name-->
 		<div id="page-taskName"></div>
 		<!--Task Name-->
-		
+
 		<!-- Specificly Webservice Screen -->
 		<div ng-class="getScreenView == 'Webservice' ? 'showContainer' : 'hideContainer'" class="WebServcieScreen">
 			<!-- Top -->
@@ -107,20 +107,20 @@
 						<input type="text" class="form-control wsldInput" placeholder="Enter WSDL Url" ng-model="wsldInput" id="wsldInput" />
 						<button ng-click="launchWSDLGo()" class="btn btn-md launchWSDL">Go</button>
 					</span>
-					
+
 					<span class="wsdlInputButton wsdlSelectButton">
 						<select class="form-control wsldSelect" id="wsldSelect">
 							<option value disabled selected>Select Operation</option>
 						</select>
 					</span>
 				</div>
-				
+
 				<!-- Submit Task Button-->
 				<button class="btn btn-md pull-right submitTaskBtn submitTaskBtn-abs" ng-click="submitTasksScreen()"  title="Submit">Submit</button>
 				<!-- Submit Task Button-->
 			</div>
 			<!-- Top -->
-			
+
 			<!-- Middle -->
 			<div class="wsdlRow wsdlActions">
 				<div id="wsdlActionsButton">
@@ -141,7 +141,7 @@
 				</div>
 			</div>
 			<!-- Middle -->
-			
+
 			<!-- Bottom -->
 			<div class="wsdlRow wsdlRqstRspns">
 				<!-- requestWrap -->
@@ -150,7 +150,7 @@
 					<textarea id="wsdlRequestBody" class="wsdlTextAreaBody" placeholder="Request Body"></textarea>
 				</div>
 				<!-- requestWrap -->
-				
+
 				<!-- responseWrap -->
 				<div id="wsdlResponse" class="wsdlRqstRspnsWrap wsdlRspnsWrap">
 					<textarea id="wsdlResponseHeader" class="wsdlTextAreaHeader" placeholder="Response Header"></textarea>
@@ -161,7 +161,7 @@
 			<!-- Bottom -->
 		</div>
 		<!-- Specificly Webservice Screen -->
-		
+
 		<!-- Submit Task Button-->
 		<button ng-class="getScreenView == 'Webservice' ? 'hideContainer' : 'showContainer'" class="btn btn-md pull-right submitTaskBtn" ng-click="submitTasksScreen()"  title="Submit Task">Submit</button>
 		<!-- Submit Task Button-->
@@ -225,8 +225,8 @@
 				</div>
 			</div>
 			<!--Popup-->
-      	</div>	
-		<!--Images Blocks-->	
+      	</div>
+		<!--Images Blocks-->
 
 		<!--Images Blocks-->
 		<div class="thumbnail thumbnail-custom">
@@ -255,7 +255,7 @@
       	</div>
 		<!--Images Blocks-->
 
-		<!--Images Blocks-->  		
+		<!--Images Blocks-->
 		<div class="thumbnail thumbnail-custom">
         	<a class="slidePopup"  title="Info">
           		<img class="thumb-ic" src="imgs/ic-info.png" alt="Project Info">
@@ -304,7 +304,7 @@
 							<li>Click on submit to complete task.</li>
 						</ul>
 					</div>
-			
+
 					<div class="chatContainer">
 						<textarea rows="3" cols="" class="chatTextArea form-control"
 							placeholder="Ask Prof.J"></textarea>
@@ -318,7 +318,7 @@
 		<!--Images Blocks-->
 	</div>
 	<!--Right Panel-->
-</section>	
+</section>
 <!--Content Area-->
 
 <!--Footer-->
@@ -342,7 +342,7 @@
 					<button ng-click="addMoreObject()" type="button" id="addMoreObjRow" class="btn btn-default btn-no-bg pull-left"><img src="imgs/ic-add.png" /> Add</button>
 				</div>
 				<!-- Add Button -->
-				
+
 				<!--Modal Content-->
 				<form class="form-inline scrollbar-inner addObjectScroll" id="addObjContainer"></form>
 				<!--Modal Content-->
@@ -367,7 +367,7 @@
 				</div>
 				<div class="modal-body">
 					<p class="labelAsHeading">Please select the objects to drag and drop</p>
-					
+
 					<!-- Left Scraped Object -->
 					<div id="leftScrapedObjects" class="mapObjContainer" style="width: 45%; margin-left: 30px; margin-right: 15%;">
 						<p class="labelAsHeading">Scraped Objects</p>
@@ -376,7 +376,7 @@
 						<!-- Data Appends Here -->
 					</div>
 					<!-- Left Scraped Object -->
-					
+
 					<!-- Right Custom Object -->
 					<div id="rightCustomObjects" class="mapObjContainer" style="width:30%">
 						<p class="labelAsHeading">Custom Objects</p>
@@ -390,6 +390,7 @@
 					<span class="error-msg-abs error-msg-abs3 ng-cloak submitObjectWarning">Please select atleast one object to Map</span>
 					<span class="error-msg-abs error-msg-abs3 ng-cloak noObjectToMap">Please add custom object to Map</span>
 					<span class="error-msg-abs error-msg-abs3 ng-cloak objectExistMap">Object already merged</span>
+					<button type="button"  class="btn btn-default showAllObjects" >Show all Objects</button>
 					<button type="button" disabled class="btn btn-default unlinkButton" ng-click="unlinkMapObj()">Un-link</button>
 					<button type="button" class="btn btn-default" ng-click="submitMapObject()">Submit</button>
 				</div>
@@ -397,7 +398,7 @@
 		</div>
 	</div>
 	<!-- Map Object -->
-	
+
 	<!-- Global Modal  -->
        <div class="modal fade" id="globalModal" role="dialog" data-keyboard="false" data-backdrop="static">
          <div class="modal-dialog modal-sm">
@@ -416,7 +417,7 @@
          </div>
        </div>
        <!-- Global Modal  -->
-       
+
 	 <!-- DeleteObjects Modal  -->
 	<div class="modal fade" id="deleteObjectsModal" role="dialog" data-keyboard="false" data-backdrop="static">
 	  <div class="modal-dialog modal-sm">
@@ -436,7 +437,7 @@
 	  </div>
 	</div>
 	<!-- DeleteObjects Modal  -->
-	
+
 	<!-- Submitting Task -->
 	<div class="modal fade" id="submitTasksScreen" role="dialog" data-keyboard="false" data-backdrop="static">
 		<div class="modal-dialog modal-sm">
@@ -456,7 +457,7 @@
 		</div>
 	</div>
 	<!-- Submitting Task -->
-	
+
 	<!-- Desktop Launch Popup -->
 	<div class="modal fade" id="launchDesktopApps" role="dialog" data-keyboard="false" data-backdrop="static">
 		<div class="modal-dialog modal-md">
@@ -475,7 +476,7 @@
 		</div>
 	</div>
 	<!-- Desktop Launch Popup -->
-		
+
 	<!-- SAP Launch Popup -->
 	<div class="modal fade" id="launchSAPApps" role="dialog" data-keyboard="false" data-backdrop="static">
 		<div class="modal-dialog modal-md">
@@ -494,7 +495,7 @@
 		</div>
 	</div>
 	<!-- SAP Launch Popup -->
-	
+
 	<!-- OEBS Launch Popup -->
 	<div class="modal fade" id="launchOEBSApps" role="dialog" data-keyboard="false" data-backdrop="static">
 		<div class="modal-dialog modal-md">
@@ -513,7 +514,7 @@
 		</div>
 	</div>
 	<!-- OEBS Launch Popup -->
-	
+
 	<!-- Mobility App Launch Popup -->
 	<div class="modal fade" id="launchMobilityApps" role="dialog" data-keyboard="false" data-backdrop="static">
 		<div class="modal-dialog modal-md">
@@ -530,7 +531,7 @@
 						<p><input class='launchPopupInput form-control' type='text' placeholder='Enter iOS Version' id='mobilityiOSVersion'/></p>
 						<p><input class='launchPopupInput form-control' type='text' placeholder='Enter UDID' id='mobilityUDID'/></p>
 					</div>
-					
+
 					<div class="rightAlign"><span class="androidIcon"></span></div>
 				</div>
 				<div class="modal-footer">
@@ -540,7 +541,7 @@
 		</div>
 	</div>
 	<!-- Mobility App Launch Popup -->
-	
+
 	<!-- Mobility Web Launch Popup -->
 	<div class="modal fade" id="launchMobilityWeb" role="dialog" data-keyboard="false" data-backdrop="static">
 		<div class="modal-dialog modal-md">
@@ -554,7 +555,7 @@
 						<p><input class='launchPopupInput form-control' type='text' placeholder='Enter mobile serial number' id='mobilityWebSerialNo'/></p>
 						<p><input class='launchPopupInput form-control' type='text' placeholder='Enter Android Version' id='mobilityAndroidVersion'/></p>
 					</div>
-					
+
 					<div class="rightAlign"><span class="androidIcon"></span></div>
 				</div>
 				<div class="modal-footer">
@@ -564,11 +565,11 @@
 		</div>
 	</div>
 	<!-- Mobility Web Launch Popup -->
-	
+
 	<!-- HiddenTagModal  -->
 	<div class="modal fade" id="hiddenTagBox" role="dialog" data-keyboard="false" data-backdrop="static">
 	  <div class="modal-dialog modal-sm">
-	
+
 	    <div class="modal-content">
 	      <div class="modal-header">
 	        <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -583,5 +584,5 @@
 	    </div>
 	  </div>
 	</div>
-	<!-- HiddenTagModal Modal  -->	
+	<!-- HiddenTagModal Modal  -->
 <!--Bootstrap Popup-->
