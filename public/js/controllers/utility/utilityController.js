@@ -236,6 +236,10 @@ mySPA.controller('utilityController', ['$scope', '$http', '$location', '$timeout
 		
 		//button hide and show
 		$scope.utilityMethods = function(){
+
+			$('#encryptData').val('');
+		    $('#encryptedData').val('');
+
 			if($("#utilityMethods option:selected").val() == "AES") {
 				$("#encrypt_btn").text('Encrypt','value').attr('title','Encrypt');
 				$("#encryption_btns").show();

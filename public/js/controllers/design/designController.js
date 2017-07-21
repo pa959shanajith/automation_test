@@ -767,10 +767,10 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					else imgTag = tag;
 					if(path == "")	addcusOb = 'addCustObj';
 					if(tag == "a" || tag == "input" || tag == "table" || tag == "list" || tag == "select" || tag == "img" || tag == "button" || tag == "radiobutton" || tag == "checkbox" || tag == "tablecell"){
-						var li = "<li data-xpath='"+ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"' data-left='"+ob.left+"' data-top='"+ob.top+"' data-width='"+ob.width+"' data-height='"+ob.height+"' data-tag='"+tag+"' data-url='"+ob.url+"' data-hiddentag='"+ob.hiddentag+"' class='item select_all "+tag+"x' val="+ob.tempId+"><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' /><span title='"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;')+"' class='ellipsis'>"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"</span></a></li>";
+						var li = "<li data-xpath='"+ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"' data-left='"+ob.left+"' data-top='"+ob.top+"' data-width='"+ob.width+"' data-height='"+ob.height+"' data-tag='"+tag+"' data-url='"+ob.url+"' data-hiddentag='"+ob.hiddentag+"' class='item select_all "+tag+"x' val="+ob.tempId+"><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' /><span title='"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;')+"' class='ellipsis "+addcusOb+"'>"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"</span></a></li>";
 					}
 					else {
-						var li = "<li data-xpath='"+ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"' data-left='"+ob.left+"' data-top='"+ob.top+"' data-width='"+ob.width+"' data-height='"+ob.height+"' data-tag='"+tag+"' data-url='"+ob.url+"' data-hiddentag='"+ob.hiddentag+"' class='item select_all "+tag+"x' val="+ob.tempId+"><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' /><span title='"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;')+"' class='ellipsis'>"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"</span></a></li>";
+						var li = "<li data-xpath='"+ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"' data-left='"+ob.left+"' data-top='"+ob.top+"' data-width='"+ob.width+"' data-height='"+ob.height+"' data-tag='"+tag+"' data-url='"+ob.url+"' data-hiddentag='"+ob.hiddentag+"' class='item select_all "+tag+"x' val="+ob.tempId+"><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' /><span title='"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;')+"' class='ellipsis "+addcusOb+"'>"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"</span></a></li>";
 					}
 					angular.element(innerUL).append(li);
 				}
@@ -1451,7 +1451,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				$("#window-scrape-screenshot .popupContent, #window-scrape-screenshotTs .popupContent").empty()
 				$("#window-scrape-screenshot .popupContent, #window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrape"><img id="screenshot" src="data:image/PNG;base64,'+viewString.mirror+'" /></div>')
 				$("#finalScrap").empty()
-				$("#finalScrap").append("<div id='scrapTree' class='scrapTree'><ul><li><span class='parentObjContainer'><input title='Select all' type='checkbox' class='checkStylebox'/><span class='parentObject'><a id='aScrapper'>Select all </a><button id='saveObjects' class='btn btn-xs btn-xs-custom objBtn' style='margin-left: 10px'>Save</button><button data-toggle='modal' id='deleteObjects' data-target='#deleteObjectsModal' class='btn btn-xs btn-xs-custom objBtn' style='margin-right: 0' disabled>Delete</button></span><span></span></span><ul id='scraplist' class='scraplistStyle'></ul></li></ul></div>");
+				$("#finalScrap").append("<div id='scrapTree' class='scrapTree'><ul><li><span class='parentObjContainer'><input title='Select all' type='checkbox' class='checkStylebox'/><span class='parentObject'><a id='aScrapper'>Select all </a><button id='saveObjects' class='btn btn-xs btn-xs-custom objBtn' style='margin-left: 10px'>Save</button><button data-toggle='modal' id='deleteObjects' data-target='#deleteObjectsModal' class='btn btn-xs btn-xs-custom objBtn' style='margin-right: 0' disabled>Delete</button></span><span class='searchScrapEle'><img src='imgs/ic-search-icon.png'></input></span><span><input type='text' class='searchScrapInput'></span></span><ul id='scraplist' class='scraplistStyle'></ul></li></ul></div>");
 				var innerUL = $("#finalScrap").children('#scrapTree').children('ul').children().children('#scraplist');
 
 				console.log("data", viewString);
@@ -1874,7 +1874,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 
 			//Reloading List Items
 			$("#finalScrap").empty()
-			$("#finalScrap").append("<div id='scrapTree' class='scrapTree'><ul><li><span class='parentObjContainer'><input title='Select all' type='checkbox' class='checkStylebox' disabled /><span class='parentObject'><a id='aScrapper'>Select all </a><button id='saveObjects' class='btn btn-xs btn-xs-custom objBtn' style='margin-left: 10px'>Save</button><button data-toggle='modal' id='deleteObjects' data-target='#deleteObjectsModal' class='btn btn-xs btn-xs-custom objBtn' style='margin-right: 0' disabled>Delete</button></span><span></span></span><ul id='scraplist' class='scraplistStyle'></ul></li></ul></div>");
+			$("#finalScrap").append("<div id='scrapTree' class='scrapTree'><ul><li><span class='parentObjContainer'><input title='Select all' type='checkbox' class='checkStylebox' disabled /><span class='parentObject'><a id='aScrapper'>Select all </a><button id='saveObjects' class='btn btn-xs btn-xs-custom objBtn' style='margin-left: 10px'>Save</button><button data-toggle='modal' id='deleteObjects' data-target='#deleteObjectsModal' class='btn btn-xs btn-xs-custom objBtn' style='margin-right: 0' disabled>Delete</button></span><span class='searchScrapEle'><img src='imgs/ic-search-icon.png'></input></span><span><input type='text' class='searchScrapInput'></span></span><ul id='scraplist' class='scraplistStyle'></ul></li></ul></div>");
 			$('#scraplist').empty()
 			for(i=0; i<viewString.view.length; i++){
 				var innerUL = $('#scraplist');
@@ -1896,7 +1896,11 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				}
 				angular.element(innerUL).append(li);
 			}
-			$("#saveObjects").trigger("click");
+			$(".checkStylebox, .checkall").prop("disabled",false);
+			$(".checkStylebox").trigger("click");
+			$timeout(function(){
+				$("#saveObjects").trigger("click");
+			},500)
 			$("#dialog-addObject").modal("hide");
 			openDialog("Add Object", "Objects has been added successfully.")
 			//$("#addObjectSuccess").modal("show")
@@ -2491,8 +2495,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		if(gsElement.length > 0){
 			for(i=0; i<gsElement.length; i++){
 				$.each($("#scraplist li"), function(){
-					if(gsElement[i] == $(this).data("tag") || ($(this).data("tag").toLowerCase().indexOf(gsElement[i].toLowerCase()) >= 0 && gsElement[i] != "a" && $(this).data("tag").toLowerCase() != "radio button" && $(this).data("tag").toLowerCase() != "radiobutton" &&
-							$(this).data("tag").toLowerCase().indexOf("listview") < 0)
+					if(gsElement[i] == $(this).data("tag") || ($(this).data("tag").toLowerCase().indexOf(gsElement[i].toLowerCase()) >= 0 && gsElement[i] != "a" && $(this).data("tag").toLowerCase() != "radio button" && $(this).data("tag").toLowerCase() != "radiobutton" && $(this).data("tag").toLowerCase().indexOf("listview") < 0)
 							|| (gsElement[i] == "input" && ($(this).data("tag").indexOf("edit") >= 0 || $(this).data("tag").indexOf("Edit Box") >= 0 || $(this).data("tag").indexOf("text") >= 0 || $(this).data("tag").indexOf("EditText") >= 0 || $(this).data("tag").indexOf("TextField") >= 0))
 							|| (gsElement[i] == "select" && $(this).data("tag").indexOf("combo box") >= 0)
 							|| (gsElement[i] == "a" && ($(this).data("tag").indexOf("hyperlink") >= 0 /* || $(this).data("tag").indexOf("Static") >= 0*/))
@@ -2769,7 +2772,7 @@ function contentTable(newTestScriptDataLS) {
 		        	   hideOtherFuncOnEdit();
 		        	   $("#jqGrid").parent('div').css('height','auto');
 
-		        	   /*for(i=0; i<getScrapeDataforCustomObj.length; i++){
+		        	   for(i=0; i<getScrapeDataforCustomObj.length; i++){
 		        			if(getScrapeDataforCustomObj[i].xpath == ""){
 		        				var testGridData = $("#jqGrid tbody tr:not(.jqgfirstrow)");
 		        				$.each(testGridData, function(){
@@ -2779,7 +2782,7 @@ function contentTable(newTestScriptDataLS) {
 		        					}
 		        				})
 		        			}
-		        		}*/
+		        		}
 		           },
 	})
 
@@ -3548,7 +3551,7 @@ function contentTable(newTestScriptDataLS) {
 						&& (obType.indexOf("RadioButton") >= 0 || obType.indexOf("ImageButton") >= 0 || obType.indexOf("Button") >= 0|| obType.indexOf("EditText") >= 0
 								|| obType.indexOf("Switch") >= 0 || obType.indexOf("CheckBox") >= 0 || obType.indexOf("Spinner") >= 0 || obType.indexOf("TimePicker") >= 0 || obType.indexOf("DatePicker") >= 0
 								|| obType.indexOf("NumberPicker") >= 0 || obType.indexOf("RangeSeekBar") >= 0 || obType.indexOf("SeekBar") >= 0 || obType.indexOf("ListView") >= 0 || obType.indexOf("XCUIElementTypeTextField") >= 0
-								|| obType.indexOf("XCUIElementTypePickerWheel") >= 0 || obType.indexOf("XCUIElementTypeSlider") >= 0 || obType.indexOf("XCUIElementTypeSearchField") >= 0 || obType.indexOf("XCUIElementTypeTable") >=0)) {
+								|| obType.indexOf("XCUIElementTypePickerWheel") >= 0 || obType.indexOf("XCUIElementTypeSlider") >= 0 || obType.indexOf("XCUIElementTypeSearchField") >= 0 || obType.indexOf("XCUIElementTypeTable") >=0 || obType.indexOf("android.widget.TimePicker") >=0 || obType.indexOf("android.widget.DatePicker") >=0)) {
 						var res = '';
 						var sc;
 						if (obType.indexOf("RadioButton") >= 0)
@@ -3586,6 +3589,10 @@ function contentTable(newTestScriptDataLS) {
 						{sc = Object.keys(keywordArrayList.listview);selectedKeywordList = "listview";}
 						else if(obType.indexOf("XCUIElementTypeTable") >=0)
 						{sc = Object.keys(keywordArrayList.table);selectedKeywordList = "table";}
+						else if(obType.indexOf("android.widget.TimePicker") >=0)
+						{sc = Object.keys(keywordArrayList.timepicker);selectedKeywordList = "timepicker";}
+						else if(obType.indexOf("android.widget.DatePicker") >=0)
+						{sc = Object.keys(keywordArrayList.datepicker);selectedKeywordList = "datepicker";}
 						for (var i = 0; i < sc.length; i++) {
 							if (selectedKeyword == sc[i]) {
 								res += '<option role="option" value="' + sc[i]
@@ -3605,7 +3612,7 @@ function contentTable(newTestScriptDataLS) {
 					} else if (appTypeLocal == 'MobileApp' && (!(obType.indexOf("RadioButton") >= 0 || obType.indexOf("ImageButton") >= 0 || obType.indexOf("Button") >= 0 || obType.indexOf("EditText") >= 0
 							|| obType.indexOf("Switch") >= 0  || obType.indexOf("CheckBox") >= 0 || obType.indexOf("Spinner") >= 0 || obType.indexOf("TimePicker") >= 0 || obType.indexOf("DatePicker") >= 0
 							|| obType.indexOf("NumberPicker") >= 0 || obType.indexOf("RangeSeekBar") >= 0 || obType.indexOf("SeekBar") >= 0 || obType.indexOf("ListView") >= 0 || obType.indexOf("XCUIElementTypeTextField") >= 0
-							|| obType.indexOf("XCUIElementTypePickerWheel") >= 0 || obType.indexOf("XCUIElementTypeSlider") >= 0 || obType.indexOf("XCUIElementTypeSearchField") >= 0 || obType.indexOf("XCUIElementTypeTable") >=0 ))) {
+							|| obType.indexOf("XCUIElementTypePickerWheel") >= 0 || obType.indexOf("XCUIElementTypeSlider") >= 0 || obType.indexOf("XCUIElementTypeSearchField") >= 0 || obType.indexOf("XCUIElementTypeTable") >=0 || obType.indexOf("android.widget.TimePicker") >=0 || obType.indexOf("android.widget.DatePicker") >=0))) {
 						var res = '';
 						var sc = Object.keys(keywordArrayList.element);
 						selectedKeywordList = "element";

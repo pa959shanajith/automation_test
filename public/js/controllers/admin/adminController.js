@@ -2119,18 +2119,13 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 
 
 //	Prevents special characters on keydown
-	$(document).on("keydown", ".validationKeydown", function(e) {
-		if(e.target.id == 'userName')
-		{
-			if(e.keyCode == 32)
-			{
+$(document).on("keydown", ".validationKeydown", function(e) {
+		if(e.target.id == 'userName'){
+			if(e.keyCode == 32){
 				return false;
 			}
 		}
-		/*if(($(this).attr("id") == "projectName" || $(this).attr("id") == "releaseTxt" || $(this).attr("id") == "cycleTxt" || $(this).attr("id") == "releaseName" || $(this).attr("id") == "cycleName") && (e.shiftKey && e.keyCode == 189 || e.keyCode == 189 || e.keyCode >= 96 && e.keyCode <= 105 || e.keyCode >= 48 && e.keyCode <= 57)){
-			return true;
-		}
-		else*/ if(e.shiftKey && e.keyCode == 190 || (e.shiftKey && (e.keyCode > 46 && e.keyCode < 58)) || e.keyCode == 17 || e.keyCode == 190 || e.keyCode == 219 || e.keyCode == 221 || e.keyCode == 222 || e.keyCode == 186 || e.keyCode == 189 || e.keyCode == 220 || e.keyCode == 188 || e.keyCode == 191 || e.keyCode == 187 || e.keyCode == 110 || e.keyCode == 107 || e.keyCode == 111 || e.keyCode == 106 || e.keyCode == 109 || (e.keyCode >= 96 && e.keyCode <= 105) || (e.keyCode >= 48 && e.keyCode <= 57))
+ 		if(e.shiftKey && e.keyCode == 190 || (e.shiftKey && (e.keyCode > 46 && e.keyCode < 58)) || e.keyCode == 17 || e.keyCode == 190 || e.keyCode == 219 || e.keyCode == 221 || e.keyCode == 222 || e.keyCode == 186 || e.keyCode == 189 || e.keyCode == 220 || e.keyCode == 188 || e.keyCode == 191 || e.keyCode == 187 || e.keyCode == 110 || e.keyCode == 107 || e.keyCode == 111 || e.keyCode == 106 || e.keyCode == 109 || (e.keyCode >= 96 && e.keyCode <= 105) || (e.keyCode >= 48 && e.keyCode <= 57))
 		{
 			if(($(this).attr("id") == "userName" || $(this).attr("id") == "projectName" || $(this).attr("id") == "releaseTxt" || $(this).attr("id") == "cycleTxt" || $(this).attr("id") == "releaseName" || $(this).attr("id") == "cycleName") && ((e.keyCode >= 96 && e.keyCode <= 105) || (e.keyCode >= 48 && e.keyCode <= 57) || (e.shiftKey && e.keyCode == 189) || e.keyCode == 190) && !(e.shiftKey && ((e.keyCode >= 96 && e.keyCode <= 105) || (e.keyCode >= 48 && e.keyCode <= 57) || e.keyCode == 190))){
 				return true
@@ -2148,16 +2143,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 		var val = $(this).val();
 		preventSpecialCharOnBlur(id,val);
 	});
-$(document).on('cut copy paste','#userName', function(e){ 
-			var element = this;
-			setTimeout(function () {
-				var userEnteredText = $(element).val();  
-				userEnteredText = userEnteredText.replace(/\s/g,"");
-				$(element).val(userEnteredText);
-			}, 5); //html5 min is 4ms.	
-		//$(this).val($(this).val().replace(/\S/g, ''));
-		
- });
+
 
 	function preventSpecialCharOnBlur(id, val)
 	{
