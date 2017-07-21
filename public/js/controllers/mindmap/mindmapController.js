@@ -26,6 +26,7 @@ mySPA.controller('mindmapController', ['$scope', '$http', '$location', '$timeout
         }
         
 	}, 500)
+    loadUserTasks()
 		/*Sidebar-toggle*/
     $scope.tab = "tabRequirement";
     $(".left-sec-mindmap,.rsSlide").show();
