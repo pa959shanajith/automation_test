@@ -55,6 +55,9 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 	if(appType != "Web" && window.location.href.split("/")[3] == "design"){
 		$("#left-bottom-section").hide();
 	}
+	if(appType == "Webservice" && window.location.href.split("/")[3] == "designTestCase"){
+		$("#right-dependencies-section .thumbnail:first-child").hide();
+	} 
 	//console.log(appType);
 	$scope.getScreenView = appType
 	//Getting Apptype orScreen Type
