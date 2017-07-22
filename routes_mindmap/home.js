@@ -81,8 +81,13 @@ router.post('/', function(req, res, next) {
 			prjId=d.prjId;
 			if(d.tab=='tabAssign' || d.tab=='endToend'){
 				qList.push({"statement":"MATCH path=(n:MODULES_ENDTOEND{projectID:'"+prjId+"'})-[r*1..]->(t) RETURN path","resultDataContents":["graph"]});
+				qList.push({"statement":"MATCH path=(n:MODULES_ENDTOEND{projectID:'"+prjId+"'}) WHERE NOT (n)-[:FMTTS]->() RETURN n","resultDataContents":["graph"]});
+							
 			}
-			qList.push({"statement":"MATCH path=(n:MODULES{projectID:'"+prjId+"'})-[r*1..]->(t) RETURN path","resultDataContents":["graph"]});
+			qList.push({"statement":" MATCH path=(n:MODULES{projectID:'"+prjId+"'})-[r*1..]->(t) RETURN path","resultDataContents":["graph"]});
+			qList.push({"statement":"MATCH path=(n:MODULES{projectID:'"+prjId+"'}) WHERE NOT (n)-[:FMTTS]->() RETURN n","resultDataContents":["graph"]});
+			//MATCH (a:MODULES) WHERE NOT (a)-[:FMTTS]->() return a
+
 			reqToAPI({"data":{"statements":qList}},urlData,'/neoQuerya',function(err,status,result){
 				res.setHeader('Content-Type','application/json');
 				if(err) res.status(status).send(err);
@@ -92,9 +97,12 @@ router.post('/', function(req, res, next) {
 					var attrDict={"modules_endtoend":{"childIndex":"childIndex","projectID":"projectID","moduleName":"name","moduleID":"id_n","moduleID_c":"id_c"},"modules":{"childIndex":"childIndex","projectID":"pid_n","moduleName":"name","moduleID":"id_n","moduleID_c":"id_c"},"scenarios":{"projectID":"projectID","childIndex":"childIndex","moduleID":"pid_n","testScenarioName":"name","testScenarioID":"id_n","testScenarioID_c":"id_c"},"screens":{"childIndex":"childIndex","testScenarioID":"pid_n","screenName":"name","screenID":"id_n","screenID_c":"id_c"},"testcases":{"childIndex":"childIndex","screenID":"pid_n","testCaseName":"name","testCaseID":"id_n","testCaseID_c":"id_c"},"tasks":{"taskID":"id_n","task":"t","batchName":"bn","assignedTo":"at","reviewer":"rw","startDate":"sd","endDate":"ed","release":"re","cycle":"cy","details":"det","nodeID":"pid","parent":"anc"}};
 					var jsonData=JSON.parse(result);
 					var all_modules=jsonData[0].data;
-					if (qList.length>1){
+					
+					if (d.tab=='tabAssign' || d.tab=='endToend'){
+						all_modules=jsonData[0].data.concat(jsonData[1].data).concat(jsonData[2].data).concat(jsonData[3].data);
+						
+					}else{
 						all_modules=jsonData[0].data.concat(jsonData[1].data);
-						//all_modules.push(jsonData[1].data);
 					}
 					all_modules.forEach(function(row){
 						row.graph.nodes.forEach(function(n){
@@ -179,6 +187,7 @@ router.post('/', function(req, res, next) {
 					if(e.type=='modules_endtoend'){
 						if(e.oid!=null){			
 							qList.push({"statement":"MATCH (n)-[r:FMTTS{id:'"+e.id+"'}]->(o:TESTSCENARIOS) DETACH DELETE r,o;"});
+							
 							if(e.renamed) qList.push({"statement":"MATCH(n:MODULES_ENDTOEND{moduleID:'"+e.id+"'}) SET n.moduleName='"+e.name+"'"+",n.unique_property='["+e.name+','+e.projectID+"]'"});
 						}
 						else qList.push({"statement":"MERGE(n:MODULES_ENDTOEND{projectID:'"+e.projectID+"',moduleName:'"+e.name+"',moduleID:'"+e.id+"',createdBy:'"+user+"',createdOn:'null',moduleID_c:'"+e.id_c+"',unique_property:'["+e.name+','+e.projectID+"]'}) SET n.childIndex='"+e.childIndex+"'"});
@@ -229,6 +238,7 @@ router.post('/', function(req, res, next) {
 				// qList.push({"statement":"MATCH (a:TESTCASES),(b:TASKS) WHERE a.testCaseID=b.nodeID and a.uid=b.uid MERGE (a)-[r:FNTT {id:b.nodeID}]-(b)"});
 				qList.push({"statement":"MATCH (a) remove a.uid"});
 				qList=qList.concat(rnmList);
+				qList.push({"statement":"MATCH path=(n:MODULES_ENDTOEND{moduleID:'"+data[0].id+"'}) WHERE NOT (n)-[:FMTTS]->() RETURN n","resultDataContents":["graph"]});
 				qList.push({"statement":"MATCH path=(n:MODULES_ENDTOEND{moduleID:'"+data[0].id+"'})-[r*1..]->(t) RETURN path","resultDataContents":["graph"]});
 				//qList=qList.concat(rnmList);
 				//var index=(qList.length-rnmList.length)-1;
@@ -242,7 +252,12 @@ router.post('/', function(req, res, next) {
 						idDict={};
 						var attrDict={"modules_endtoend":{"childIndex":"childIndex","projectID":"projectID","moduleName":"name","moduleID":"id_n","moduleID_c":"id_c"},"modules":{"childIndex":"childIndex","projectID":"pid_n","moduleName":"name","moduleID":"id_n","moduleID_c":"id_c"},"scenarios":{"projectID":"projectID","childIndex":"childIndex","moduleID":"pid_n","testScenarioName":"name","testScenarioID":"id_n","testScenarioID_c":"id_c"},"screens":{"childIndex":"childIndex","testScenarioID":"pid_n","screenName":"name","screenID":"id_n","screenID_c":"id_c"},"testcases":{"childIndex":"childIndex","screenID":"pid_n","testCaseName":"name","testCaseID":"id_n","testCaseID_c":"id_c"},"tasks":{"taskID":"id_n","task":"t","assignedTo":"at","reviewer":"rw","startDate":"sd","endDate":"ed","release":"re","cycle":"cy","details":"det","nodeID":"pid","parent":"anc"}};
 						var jsonData=JSON.parse(result);
-						jsonData[jsonData.length-1].data.forEach(function(row){
+						var new_res=jsonData[jsonData.length-1].data;
+						if(new_res.length==0){
+							new_res=jsonData[jsonData.length-2].data
+						}
+						new_res.forEach(function(row){ 
+						//jsonData[jsonData.length-1].data.forEach(function(row){
 							row.graph.nodes.forEach(function(n){
 								if (idDict[n.id] === undefined) {
 									lbl=n.labels[0].toLowerCase();
@@ -391,7 +406,7 @@ router.post('/', function(req, res, next) {
 							//qList.push({"statement":"MATCH (n)-[r:FMTTS{id:'"+e.id+"'}]->(o:TESTSCENARIOS)-[s]->(p:SCREENS)-[t]->(q:TESTCASES) DETACH DELETE r,s,t,o,p,q"});
 							qList.push({"statement":"MATCH (n)-[r:FMTTS{id:'"+e.id+"'}]->(o:TESTSCENARIOS)-[s]->(p:SCREENS)-[t]->(q:TESTCASES) DETACH DELETE t,q"});
 							qList.push({"statement":"MATCH (n)-[r:FMTTS{id:'"+e.id+"'}]->(o:TESTSCENARIOS)-[s]->(p:SCREENS) DETACH DELETE s,p"});
-							qList.push({"statement":"MATCH (n)-[r:FMTTS{id:'"+e.id+"'}]->(o:TESTSCENARIOS) DETACH DELETE o"});
+							qList.push({"statement":"MATCH (n)-[r:FMTTS{id:'"+e.id+"'}]->(o:TESTSCENARIOS) DETACH DELETE r,o"});
 
 							if(e.renamed) qList.push({"statement":"MATCH(n:MODULES{moduleID:'"+e.id+"'}) SET n.moduleName='"+e.name+"'"+",n.unique_property='["+e.name+','+prjId+"]'"});
 						}
@@ -448,9 +463,7 @@ router.post('/', function(req, res, next) {
 								
 							} 
 							else{
-								if(t.parent) t.parent.forEach(function(tPrt,tIdx){
-									//t.parent[tIdx]=idDict[tPrt];
-								});
+								
 								t.parent=[prjId].concat(t.parent);
 								qList.push({"statement":"MERGE(n:TASKS{taskID:'"+t.id+"',task:'"+t.task+"',assignedTo:'"+t.assignedTo+"',reviewer:'"+t.reviewer+"',status:'"+taskstatus+"',startDate:'"+t.startDate+"',endDate:'"+t.endDate+"',details:'"+t.details+"',nodeID:'"+e.id+"',parent:'["+t.parent+"]',uid:'"+uidx+"'})"});
 							}
@@ -482,10 +495,7 @@ router.post('/', function(req, res, next) {
 								
 							} 
 							else{
-								if(t.parent){ t.parent.forEach(function(tPrt,tIdx){
-									//t.parent[tIdx]=idDict[tPrt];
-									});
-								}
+								
 								t.parent=[prjId].concat(t.parent);
 								qList.push({"statement":"MERGE(n:TASKS{taskID:'"+t.id+"',task:'"+t.task+"',assignedTo:'"+t.assignedTo+"',status:'"+taskstatus+"',reviewer:'"+t.reviewer+"',startDate:'"+t.startDate+"',endDate:'"+t.endDate+"',details:'"+t.details+"',nodeID:'"+e.id+"',parent:'["+t.parent+"]',uid:'"+uidx+"'})"});
 							}
@@ -502,6 +512,7 @@ router.post('/', function(req, res, next) {
 					qList.push({"statement":"MATCH (a:TESTCASES),(b:TASKS) WHERE a.testCaseID=b.nodeID and a.uid=b.uid MERGE (a)-[r:FNTT {id:b.nodeID}]-(b)"});
 					qList.push({"statement":"MATCH (a) remove a.uid"});
 					qList=qList.concat(rnmList);
+					qList.push({"statement":"MATCH path=(n:MODULES{moduleID:'"+data[0].id+"'}) WHERE NOT (n)-[:FMTTS]->() RETURN n","resultDataContents":["graph"]});
 					qList.push({"statement":"MATCH path=(n:MODULES{moduleID:'"+data[0].id+"'})-[r*1..]->(t) RETURN path","resultDataContents":["graph"]});
 				}else{
 					qList.push({"statement":"MATCH (a:MODULES_ENDTOEND),(b:TESTSCENARIOS) WHERE a.moduleID=b.moduleID MERGE (a)-[r:FMTTS {id:b.moduleID}]-(b)"});
@@ -513,7 +524,9 @@ router.post('/', function(req, res, next) {
 					// qList.push({"statement":"MATCH (a:TESTCASES),(b:TASKS) WHERE a.testCaseID=b.nodeID and a.uid=b.uid MERGE (a)-[r:FNTT {id:b.nodeID}]-(b)"});
 					qList.push({"statement":"MATCH (a) remove a.uid"});
 					qList=qList.concat(rnmList);
+					qList.push({"statement":"MATCH path=(n:MODULES_ENDTOEND{moduleID:'"+data[0].id+"'}) WHERE NOT (n)-[:FMTTS]->() RETURN n","resultDataContents":["graph"]});
 					qList.push({"statement":"MATCH path=(n:MODULES_ENDTOEND{moduleID:'"+data[0].id+"'})-[r*1..]->(t) RETURN path","resultDataContents":["graph"]});
+					
 				}
 				
 				
@@ -526,7 +539,12 @@ router.post('/', function(req, res, next) {
 						idDict={};
 						var attrDict={"modules_endtoend":{"childIndex":"childIndex","projectID":"pid_n","moduleName":"name","moduleID":"id_n","moduleID_c":"id_c"},"modules":{"childIndex":"childIndex","projectID":"pid_n","moduleName":"name","moduleID":"id_n","moduleID_c":"id_c"},"scenarios":{"childIndex":"childIndex","moduleID":"pid_n","testScenarioName":"name","testScenarioID":"id_n","testScenarioID_c":"id_c"},"screens":{"childIndex":"childIndex","testScenarioID":"pid_n","screenName":"name","screenID":"id_n","screenID_c":"id_c"},"testcases":{"childIndex":"childIndex","screenID":"pid_n","testCaseName":"name","testCaseID":"id_n","testCaseID_c":"id_c"},"tasks":{"taskID":"id_n","task":"t","batchName":"bn","assignedTo":"at","reviewer":"rw","startDate":"sd","endDate":"ed","release":"re","cycle":"cy","details":"det","nodeID":"pid","parent":"anc"}};
 						var jsonData=JSON.parse(result);
-						jsonData[jsonData.length-1].data.forEach(function(row){
+						
+						var new_res=jsonData[jsonData.length-1].data;
+						if(new_res.length==0){
+							new_res=jsonData[jsonData.length-2].data
+						}
+						new_res.forEach(function(row){
 							row.graph.nodes.forEach(function(n){
 								if (idDict[n.id] === undefined) {
 									lbl=n.labels[0].toLowerCase();
