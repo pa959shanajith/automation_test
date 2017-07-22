@@ -292,6 +292,7 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 						else if(data[i].browser.toLowerCase() == "firefox")	browserIcon = "ic-reports-firefox.png";
 						else if(data[i].browser.toLowerCase() == "internet explorer")	browserIcon = "ic-reports-ie.png";
 						if(browserIcon)	brow = "imgs/"+browserIcon;
+						else brow = "imgs/no_img.png"
 						if(data[i].status == "Pass"){	pass++;	styleColor="style='color: #009444 !important; text-decoration-line: none;'";}
 						else if(data[i].status == "Fail"){	fail++;	styleColor="style='color: #b31f2d !important; text-decoration-line: none;'";}
 						else if(data[i].status == "Terminate"){	terminated++;	styleColor="style='color: #faa536 !important; text-decoration-line: none;'";}
