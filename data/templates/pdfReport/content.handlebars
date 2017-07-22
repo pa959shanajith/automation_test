@@ -1,16 +1,23 @@
 <style>
             body{font-family: LatoWeb; height: 98%; margin: 0;}
-            .mainContainer{   
+            .mainContainer{
                 float: left;
                 padding: 5px;
                 width: calc(100% - 12px);
             }
             .h2Header{
+                font-size: 12px;
                 width: 100%;
                 float: left;
-                text-align: center;
+                /*text-align: center;*/
                 border: 1px solid #cfcfcf;
                 background-color: #dfd0fa;
+            }
+            .h2Header h3{
+              //border: 2px solid;
+              position: relative;
+              text-align: center;
+              left: -110px;
             }
             .leftSummary{width: 50%; float: left; padding: 25px 0 25px 25px; font-size: 14px;}
             .leftSummary label{
@@ -112,27 +119,44 @@
             .reportsDetail{line-height: 2; text-align: center; height: calc(100% - 35px); overflow: auto;font-size: 14px;}
             .rDstepDes{text-align: left; word-break: break-word;}
             .reportsDetail div.reportdetailsrow:nth-child(even){background: #f9f9f9;}
-			@media screen and (max-height: 675px) {
-				.reportsDetail{
-					height: 174px;
-				}
-			}
+      			@media screen and (max-height: 675px) {
+      				.reportsDetail{
+      					height: 174px;
+      				}
+      			}
+            .headerRepDetails{
+              left: 10px;
+              float:left;
+              display: block;
+              position: relative;
+              top: 7px;
+            }
+
         </style>
 <div class="mainContainer">
-    <div class="h2Header"><h3>SLK Nineteen68 Execution Report</h3></div>
     {{#each overallstatus}}
+    <div class="h2Header" >
+      <div class="headerRepDetails" >
+          <label>Report Generated Date : </label><span>{{date}}</span>
+          <br>
+          <label>Report Generated Time : </label><span>{{time}}</span>
+      </div>
+      <h3>SLK Nineteen68 Execution Report</h3>
+    </div>
+
+
     <div class="leftSummary">
         <h3>Result Summary</h3>
-        <label>Senario</label><span>: {{scenarioName}}</span><br/>
-        <label>Domain</label><span>: {{domainName}}</span><br/>
-        <label>Project</label><span>: {{projectName}}</span><br/>
-        <label>Release</label><span>: {{releaseName}}</span><br/>
+        <label>Scenario</label><span>: {{scenarioName}}</span><br/>
         <label>Cycle</label><span>: {{cycleName}}</span><br/>
+        <label>Release</label><span>: {{releaseName}}</span><br/>
+        <label>Project</label><span>: {{projectName}}</span><br/>
+        <label>Domain</label><span>: {{domainName}}</span><br/>
         <label>Browser Type</label><span>: {{browserType}}</span><br/>
         <label>Browser Version</label><span>: {{browserVersion}}</span>
     </div>
     <div id="rightSummaryFunc" class="rightSummaryFunc">
-		<div class="reportStatus">				
+		<div class="reportStatus">
 			<div class="reportStatusBlk">
             	<span class="progresslabel">Pass</span>
             	<div class="progress customprogress">
@@ -146,7 +170,7 @@
             		<span class="progress-bar progress-bar-danger" style="width: {{fail}}%" role="progressbar"></span>
             	</div>
             	<span class="progresspercentage">{{fail}} %</span>
-			</div>	
+			</div>
         	<div class="reportStatusBlk">
         		<span class="progresslabel">Terminated</span>
             	<div class="progress customprogress">

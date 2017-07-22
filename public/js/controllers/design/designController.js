@@ -1663,14 +1663,35 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 
 	//Search Scrape objects filter
 	$(document).on('keyup', '.searchScrapInput', function() {
+		var count = 0;
+		var numberOfElems = 0;
 		var value = $(this).val();
 		$(".select_all").each(function () {
+			//console.log($(this).find(".checkall"));
 			if ($(this).find("span.ellipsis").text().toLowerCase().indexOf(value.toLowerCase()) > -1) {
+				numberOfElems++;
 				$(this).show();
+				//console.log($(this).find("input").hasClass("checked"));
+				if (!$(this).find("input").hasClass("checked")) {
+					count = 1;
+				}
 			} else {
 				$(this).hide();
 			}
 		});
+		if (numberOfElems == 0) {
+			$("#deleteObjects").prop("disabled", "disabled");
+		}else{
+			$("#deleteObjects").prop("disabled", false);
+		}
+		if (numberOfElems == 0 && count == 0) {
+			$('.checkStylebox').prop("checked", false);
+		}
+		if (numberOfElems != 0 && count == 0) {
+			$('.checkStylebox').prop("checked", true);
+		}else{
+			$('.checkStylebox').prop("checked", false);
+		}
 	});
 
 	//Highlight Element on browser
