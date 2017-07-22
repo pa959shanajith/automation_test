@@ -2167,7 +2167,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 
 	//Save Scrape Objects
 	$(document).on('click', "#saveObjects", function(){
-		if(!$(".checkall").is(":checked")){
+		/*if(!$(".checkall").is(":checked")){
 			openDialog("Save Scrape data", "Please select objects to save.")
 		}
 		else{
@@ -2184,7 +2184,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					}
 				})
 				viewString.view = sltdListData;
-			}
+			}*/
 			if(eaCheckbox){
 				for (var j = 0; j < viewString.view.length; j++) {
 					newScrapedList.view.push(viewString.view[j]);
@@ -2296,7 +2296,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					$('.checkStyleboxFilter').prop('checked',false);
 				}
 			}
-		}
+		//}
 	})
 
 	//To Select and unSelect all objects
@@ -2555,7 +2555,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 								$(this).data("tag") != "scroll bar" &&
 								$(this).data("tag") != "internal frame" &&
 								$(this).data("tag") != "table" &&
-								$(this).data("tag") != "tab" &&
+								//$(this).data("tag") != "tab" &&
 								$(this).data("tag").toLowerCase().indexOf("button") == -1 &&
 								$(this).data("tag").toLowerCase().indexOf("edit") == -1 &&
 								$(this).data("tag").toLowerCase().indexOf("edit box") == -1 &&
@@ -2793,17 +2793,19 @@ function contentTable(newTestScriptDataLS) {
 		        	   hideOtherFuncOnEdit();
 		        	   $("#jqGrid").parent('div').css('height','auto');
 
-		        	   for(i=0; i<getScrapeDataforCustomObj.length; i++){
-		        			if(getScrapeDataforCustomObj[i].xpath == ""){
-		        				var testGridData = $("#jqGrid tbody tr:not(.jqgfirstrow)");
-		        				$.each(testGridData, function(){
-		        					if($(this).find("td[aria-describedby='jqGrid_custname']").text() == scrappedData[i].custname){
-		        						$(this).find("td[aria-describedby='jqGrid_custname']").addClass("addCustObj");
-		        						return false
-		        					}
-		        				})
-		        			}
-		        		}
+					   if(getScrapeDataforCustomObj != "" && getScrapeDataforCustomObj != undefined){						   
+							for(i=0; i<getScrapeDataforCustomObj.length; i++){
+								if(getScrapeDataforCustomObj[i].xpath == ""){
+									var testGridData = $("#jqGrid tbody tr:not(.jqgfirstrow)");
+									$.each(testGridData, function(){
+										if($(this).find("td[aria-describedby='jqGrid_custname']").text() == scrappedData[i].custname){
+											$(this).find("td[aria-describedby='jqGrid_custname']").addClass("addCustObj");
+											return false
+										}
+									})
+								}
+							}
+					   }
 		           },
 	})
 
@@ -3596,6 +3598,10 @@ function contentTable(newTestScriptDataLS) {
 						{sc = Object.keys(keywordArrayList.spinners);selectedKeywordList = "spinners";}
 						else if (obType.indexOf("CheckBox") >= 0)
 						{sc = Object.keys(keywordArrayList.checkbox);selectedKeywordList = "checkbox";}
+						else if(obType.indexOf("android.widget.TimePicker") >=0)
+						{sc = Object.keys(keywordArrayList.timepicker);selectedKeywordList = "timepicker";}
+						else if(obType.indexOf("android.widget.DatePicker") >=0)
+						{sc = Object.keys(keywordArrayList.datepicker);selectedKeywordList = "datepicker";}
 						else if (obType.indexOf("TimePicker") >= 0)
 						{sc = Object.keys(keywordArrayList.time);selectedKeywordList = "time";}
 						else if (obType.indexOf("DatePicker") >= 0)
@@ -3610,10 +3616,6 @@ function contentTable(newTestScriptDataLS) {
 						{sc = Object.keys(keywordArrayList.listview);selectedKeywordList = "listview";}
 						else if(obType.indexOf("XCUIElementTypeTable") >=0)
 						{sc = Object.keys(keywordArrayList.table);selectedKeywordList = "table";}
-						else if(obType.indexOf("android.widget.TimePicker") >=0)
-						{sc = Object.keys(keywordArrayList.timepicker);selectedKeywordList = "timepicker";}
-						else if(obType.indexOf("android.widget.DatePicker") >=0)
-						{sc = Object.keys(keywordArrayList.datepicker);selectedKeywordList = "datepicker";}
 						for (var i = 0; i < sc.length; i++) {
 							if (selectedKeyword == sc[i]) {
 								res += '<option role="option" value="' + sc[i]

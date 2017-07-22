@@ -2143,7 +2143,16 @@ $(document).on("keydown", ".validationKeydown", function(e) {
 		var val = $(this).val();
 		preventSpecialCharOnBlur(id,val);
 	});
-
+$(document).on('cut copy paste','#userName', function(e){ 
+			var element = this;
+			setTimeout(function () {
+				var userEnteredText = $(element).val();  
+				userEnteredText = userEnteredText.replace(/\s/g,"");
+				$(element).val(userEnteredText);
+			}, 5); //html5 min is 4ms.	
+		//$(this).val($(this).val().replace(/\S/g, ''));
+		
+ });
 
 	function preventSpecialCharOnBlur(id, val)
 	{

@@ -265,7 +265,8 @@ var createScenario_Node = function(text,scenario_prjId){
 	d3.select('#ct-inpBox').classed('no-disp',!0);
 	d3.select('#ct-ctrlBox').classed('no-disp',!0);
 	var pi=0;
-	if(dNodes_W[pi].children != undefined || dNodes_W[pi].children != null){
+	if(dNodes_W[pi]._children == null){
+		if(dNodes_W[pi].children == undefined) dNodes_W[pi]['children']=[];
 		//var nNext={'modules_endtoend':['Scenario',1],'scenarios':['Screen',2],'screens':['Testcase',3]};
 		var mapSvg=d3.select('#ct-mapSvg');
 		var w=parseFloat(mapSvg.style('width'));
@@ -659,11 +660,7 @@ var actionEvent_W = function(e){
 	var s=d3.select(this);
 	var error=!1,mapData=[],flag=0,alertMsg;
 	error=treeIterator_W(mapData,dNodes_W[0],error);
-	if(error){
-		openDialogMindmap("Error", "Mindmap flow must be complete! Modules -> Scenarios -> Screens -> Testcases")
-		//$('#Mindmap_error').modal('show');
-		return;
-	}
+	
 	if(s.attr('id')=='ct-saveAction_W'){
 		flag=10;
 		d3.select('#ct-inpBox').classed('no-disp',!0);
@@ -673,6 +670,11 @@ var actionEvent_W = function(e){
 	}
 	else if(s.attr('id')=='ct-createAction_W'){
 		flag=20;
+		if(error){
+			openDialogMindmap("Error", "Mindmap flow must be complete! Modules -> Scenarios -> Screens -> Testcases")
+			//$('#Mindmap_error').modal('show');
+			return;
+		}
 		d3.select('#ct-inpBox').classed('no-disp',!0);
 		
 	}
@@ -698,7 +700,7 @@ var actionEvent_W = function(e){
 		openDialogMindmap('Error',"Module belongs to project: '"+$("#selectProjectEtem option[value='"+selectedProject+"']").text()+"' Please go back to the same project and Save");
 		return;
 	}
-	if(mapData.length<=1) {
+	if(mapData.length<=1 && flag==20) {
 		openDialogMindmap('Error','Incomplete flow! Moudles->Scenarios flow should be present');
 		s.classed('no-access',!1);
 		return;
@@ -843,8 +845,11 @@ $(document).on('click', '.createNew-ete', function(e){
 		dataSender({task:'populateScenarios',moduleId:moduleid},function(err,result){
 			if(err) console.log(result);
 			else{
-				d3.select('.addScenarios-ete').classed('disableButton',!1);
+				d3.select('.addScenarios-ete').classed('disableButton',!0);
 				result=JSON.parse(result);
+				if(result!=''){
+					d3.select('.addScenarios-ete').classed('disableButton',!1);
+				}
 				result.forEach(function(row){
 					container.append("<span class='eteScenrios' data-scenarioId='"+row.testScenarioID_c+"' title='"+row.testScenarioName+"'>"+row.testScenarioName+"</span>")
 					//container.append("<div class='sltEteScenario'><input type='checkbox'/><span class='eteScenrios' data-scenarioId='"+row.testScenarioID_c+"'>"+row.testScenarioName+"</span></div>")
