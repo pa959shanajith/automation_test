@@ -2534,7 +2534,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 								$(this).data("tag") != "scroll bar" &&
 								$(this).data("tag") != "internal frame" &&
 								$(this).data("tag") != "table" &&
-								$(this).data("tag") != "tab" &&
+								//$(this).data("tag") != "tab" &&
 								$(this).data("tag").toLowerCase().indexOf("button") == -1 &&
 								$(this).data("tag").toLowerCase().indexOf("edit") == -1 &&
 								$(this).data("tag").toLowerCase().indexOf("edit box") == -1 &&
