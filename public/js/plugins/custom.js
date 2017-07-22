@@ -249,7 +249,9 @@ $(document).ready(function() {
 
 //Innerpages Tasks Implementation
 function loadUserTasks(){
-	$("#mindmapCSS1, #mindmapCSS2").remove()
+	if(window.location.pathname != "/home"){
+		$("#mindmapCSS1, #mindmapCSS2").remove()
+	}
 	var tasksJson = JSON.parse(window.localStorage['_TJ'])
 	$(".task-content-inner").empty().hide()
 	var counter = 1;
