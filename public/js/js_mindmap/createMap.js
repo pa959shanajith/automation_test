@@ -512,11 +512,14 @@ var nodeClick = function(e){
 		flag=false;
 	}
 	if(flag){
-		if(t!='testcases' && (dNodes[pi].children == undefined || dNodes[pi].children == null)){
-		//380-Mindmap-Unable to create node when parent node is collapsed .- Error msg changed to Expand the node
-		openDialogMindmap('Error','Expand the node');
-		return;
-	}
+		if(t!='testcases' && (dNodes[pi]._children != null)){
+			//380-Mindmap-Unable to create node when parent node is collapsed .- Error msg changed to Expand the node
+			openDialogMindmap('Error','Expand the node');
+			return;
+		}else if(t!='testcases' && (dNodes[pi].children == null)){
+			openDialogMindmap('Error','Incomplete Flow');
+			return;
+		}
 	}
 	
 	
