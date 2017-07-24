@@ -55,6 +55,9 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 	if(appType != "Web" && window.location.href.split("/")[3] == "design"){
 		$("#left-bottom-section").hide();
 	}
+	if(appType == "Webservice" && window.location.href.split("/")[3] == "designTestCase"){
+		$("#right-dependencies-section .thumbnail:first-child").hide();
+	} 
 	//console.log(appType);
 	$scope.getScreenView = appType
 	//Getting Apptype orScreen Type
@@ -1667,7 +1670,6 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		var numberOfElems = 0;
 		var value = $(this).val();
 		$(".select_all").each(function () {
-			//console.log($(this).find(".checkall"));
 			if ($(this).find("span.ellipsis").text().toLowerCase().indexOf(value.toLowerCase()) > -1) {
 				numberOfElems++;
 				$(this).show();
@@ -1923,7 +1925,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				$("#saveObjects").trigger("click");
 			},500)
 			$("#dialog-addObject").modal("hide");
-			openDialog("Add Object", "Objects has been added successfully.")
+			//openDialog("Add Object", "Objects has been added successfully.")
 			//$("#addObjectSuccess").modal("show")
 			$("#saveObjects").prop("disabled", false)
 			flag = "false";
@@ -2185,7 +2187,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				})
 				viewString.view = sltdListData;
 			}*/
-			if(eaCheckbox){
+			if(eaCheckbox && window.localStorage['checkEditWorking'] != "true"){
 				for (var j = 0; j < viewString.view.length; j++) {
 					newScrapedList.view.push(viewString.view[j]);
 				}
