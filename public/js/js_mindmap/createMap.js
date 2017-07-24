@@ -1481,24 +1481,33 @@ var populateDynamicInputList = function(){
 	scrList=[];tcList=[];scenarioList=[];
 	var scrDict={},tcDict={},scenarioDict={};
 	allMMaps.forEach(function(m){
-		m.children.forEach(function(ts){
+		if (m.children != undefined){
+			m.children.forEach(function(ts){
 			// if(scenarioDict[ts.id_n]===undefined){
 			// 		scenarioList.push({id:ts.id,name:ts.name,id_n:ts.id_n,id_c:ts.id_c});
 			// 		scenarioDict[ts.id_n]=!0;
 			// }
-			ts.children.forEach(function(s){
-				if(scrDict[s.id_n]===undefined){
-					scrList.push({id:s.id,name:s.name,id_n:s.id_n,id_c:s.id_c});
-					scrDict[s.id_n]=!0;
-				}
-				s.children.forEach(function(tc){
-					if(tcDict[tc.id_n]===undefined){
-						tcList.push({id:tc.id,name:tc.name,id_n:tc.id_n,id_c:tc.id_c});
-						tcDict[tc.id_n]=!0;
+			if (ts.children != undefined){
+				ts.children.forEach(function(s){
+					if(scrDict[s.id_n]===undefined){
+						scrList.push({id:s.id,name:s.name,id_n:s.id_n,id_c:s.id_c});
+						scrDict[s.id_n]=!0;
 					}
+					if (s.children != undefined){
+						s.children.forEach(function(tc){
+							if(tcDict[tc.id_n]===undefined){
+								tcList.push({id:tc.id,name:tc.name,id_n:tc.id_n,id_c:tc.id_c});
+								tcDict[tc.id_n]=!0;
+							}
+						});
+					}
+					
 				});
-			});
+			}
+			
 		});
+	}
+		
 	});
 };
 var clearSvg = function(){
