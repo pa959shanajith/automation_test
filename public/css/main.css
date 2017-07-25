@@ -1400,6 +1400,14 @@ input[disabled]{
     position: relative;
     left: -3%;
 }
+.compareObjectDisable
+{
+    pointer-events: none;
+}
+.searchScrapInput:focus
+{
+    outline:none;
+}
 /*******Compare Objects **********/
 
 /* utility plugins */

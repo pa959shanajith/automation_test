@@ -9,6 +9,7 @@ var editedList = {};
 var modifiedCustNames =[];
 var xpathListofCustNames = [];
 var oldCustName = [];
+var listId;
 
 (function ( $ ) {
 
@@ -26,11 +27,13 @@ var oldCustName = [];
             radio: false
         };
         var settings = $.extend( {}, defaults, options );//.css({"color":"red","border":"2px solid red"});
-       // console.log("settings: ", settings);
-        
-        //get the id of the menu div
-        var id = $("#scrapTree");
-        return this.each(function() {
+       console.log("settings: ", settings);
+
+		if(settings.editable == true && settings.radio == true)
+		{
+			  var id = $("#scrapTree"); 
+
+		     return this.each(function() {
         	
             var $ul = $(this).find('ul');
             var $li = $(this).find('li');
@@ -301,6 +304,174 @@ var oldCustName = [];
                 $(this).parent().children('ul:first').toggle(150);
             });
         });
+		} 
+		else if(settings.editable == false && settings.radio == false)
+		{
+			if(settings.multipleSelection.classes[0] == ".item .treeChangedObjects")
+			{
+				var id = $('#changedOrdList');
+				listId = id;
+			}
+			else if(settings.multipleSelection.classes[0] == ".item .treeUnChangedObjects")
+			{
+				var id = $('#unchangedOrdList');
+				listId = id;
+			}
+			else if(settings.multipleSelection.classes[0] == ".item .treenotFoundObjects")
+			{
+				var id = $('#notfoundOrdList');
+				listId = id;
+			}
+			return this.each(function() {
+            var $ul = $(this);
+            var $li = $(this).find('li');
+            //var $folder = $li.has("ul");
+            
+            if (settings.editable == false){
+            	//console.log('preparing editable tree .......');
+            	//var sel = id+' li a';
+            	var sel = $(id).find("li a");
+            	var index = 0;
+            	//var radioStr = '<span><input type="radio"  name="radio"></input></span>';
+            	var radioStr = '<img class="focus-icon" style="margin-top:2px;" src="imgs/ic-highlight-element-inactive.png"/>';
+            	var ri = 0;
+                if (settings.radio == false){
+                       $('li.item').each(function(i, v){
+						   console.log("ul", listId);
+                    	   if($(this).parent().attr('id') == listId[0].id){
+                    		  //$(this).append(radioStr);
+                    		 //  $(this).children("a").append(radioStr);
+                    		 $(this).children("a").children("span.highlight").html(radioStr);
+                    	   }
+                           var xpath = $(this).data('xpath');
+						   var uid = $(this).parent().attr('id'); 
+                           //new change to highlight webelement in iframe
+                           var url = $(this).data('url')
+                           var hiddentag = $(this).data('hiddentag');
+                            // $(this).find("input[type='radio']").on('click',function(){    
+                           $(this).find(".focus-icon").on('click',function(){ 
+                        		
+                        	    $(".hightlight").remove();
+                        		$('.focus-highlight').removeAttr('src').attr('src','imgs/ic-highlight-element-inactive.png').removeClass('focus-highlight');
+                    		    $(this).addClass('focus-highlight');
+                             	$(this).attr('src','imgs/ic-highlight-element-active.png');
+                            	 if(hiddentag == "Yes"){
+                            		 $('#hiddenTagBox').modal('show'); 
+                            	 }
+                            	 else
+                            		 {
+                            		 	$('.focus-highlight').removeAttr('src').attr('src','imgs/ic-highlight-element-inactive.png').removeClass('focus-highlight');
+                            		    $(this).addClass('focus-highlight');
+	                                 	$(this).attr('src','imgs/ic-highlight-element-active.png');
+                            		    angular.element(document.getElementById("finalScrap")).scope().highlightComparedScrapElements(xpath,url,uid);
+                            		 
+                            		 }
+                            		
+                             });
+                       });
+                }
+            }            
+            //multiple selection
+			if (settings.multipleSelection.checkbox) {
+				//console.log("multipleSelection: ", settings.multipleSelection);
+				
+				var chkSelector = '';
+				
+				for (var i=0; i<settings.multipleSelection.classes.length; i++){
+					chkSelector += (settings.multipleSelection.classes[i] +' ');
+				}
+				
+				//console.log ("chkSelector: "+chkSelector);
+				
+				$(id+' '+chkSelector+' a').prepend("<span class='input'><input type='checkbox'/></input></span>");
+				//$("<span class='input'><input type='checkbox'/></input></span>").insertBefore($($(id+' '+chkSelector+' img')));
+				$("#customInfo").html("<div class='info-msg custom-msg-info'><img src='imgs/info-icon.png'><span>Please provide unique name to object(s)</span></div>")
+				
+				//$("#custnameSelection").html("Please provide unique name to object(s)");
+				$("input[type='checkbox']").change(
+						function() {
+							$(this).parentsUntil('ul').siblings('ul')
+									.find("input[type='checkbox']")
+									.prop('checked', this.checked);
+						});
+			}
+                      
+            //$folder.prepend("<span class=\"plus\"></span><span class=\"folder\"></span>");
+            //$li.not($folder).prepend("<span class=\"join\"></span><span class=\"page\"></span>");
+            //$ul.parent("li").addClass("folder-group");
+            
+            //$ul.children('li:last-child').not($folder).addClass("join-last");
+			//$.fn.scrapTree.tree_first_element($li.first());
+                        
+		    /**
+			 * only <li> elements of root UL having <ul> as child will be treated as project
+			var $projects = $(this).find('ul:first-child').children('li').has('ul');			
+			$projects.each(function(){				
+				$.fn.scrapTree.tree_project_element($(this).first());
+			});
+		     */
+			
+			/**
+			 * find all projects and apply .bg class
+			 */
+            
+			var $projects = $(this).find('li.project');
+						
+			$projects.each(function(){				
+				$.fn.scrapTree.tree_project_element($(this).first());
+			});
+			
+            if (settings.bgHightlight){
+            	$.fn.scrapTree.tree_project_element($li.first());
+            }
+           
+            $ul.children('li.folder-group:last-child').addClass("last");
+                       
+            if(settings.useCookie && $.fn.scrapTree.check_cookie("scrapTree"))
+            {
+                var object_index = JSON.parse($.fn.scrapTree.get_cookie("scrapTree"));
+                $.each( object_index, function( key, value ) {
+                    $this = $ul.find("li.folder-group").eq(value);
+                    $.fn.scrapTree.set_icons($this.children('span:first')); 
+                    $this.children('ul:first').toggle();
+                });
+            } else if($li.hasClass("active"))
+            {
+                $active = $ul.find("li.folder-group.active");
+                $active.each(function(){
+                    $.fn.scrapTree.set_icons($(this).children('span:first')); 
+                    $(this).children('ul:first').toggle();
+                });
+                
+                $active.parentsUntil("div", ".folder-group").each(function(){
+                    $.fn.scrapTree.set_icons($(this).children('span:first')); 
+                    $(this).children('ul:first').toggle();
+                });    
+            }   
+            
+            $(this).on('click', '.plus, .minus, .bg', function(){
+                
+            	
+                if(settings.useCookie)
+                {
+                    var obect_index = [];
+                    $(this).parentsUntil("div", ".folder-group").each(function(){
+                        obect_index.push($(this).index(".folder-group"));
+                    });
+                    $.fn.scrapTree.set_cookie("scrapTree", JSON.stringify(obect_index));
+                }
+                
+                if(settings.closeSameLevel)
+                {
+                    $.fn.scrapTree.close_same_level($(this));
+                }
+                
+                $.fn.scrapTree.set_icons($(this));
+                $(this).parent().children('ul:first').toggle(150);
+            });
+        });
+		}
+        //get the id of the menu div
     };
     
     $.fn.scrapTree.set_cookie = function(name, value)
@@ -393,5 +564,4 @@ var oldCustName = [];
 	$.fn.scrapTree.tree_project_element = function($selected) {
 		$selected.contents().not('ul').wrapAll("<span class='bg'/>");
 	};
-          
 }( jQuery ));

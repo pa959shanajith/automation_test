@@ -94,18 +94,41 @@ exports.initScraping_ICE = function (req, res) {
 				});
 			}
 			else{	
+			var data = {};
 				var browserType = req.body.screenViewObject.browserType;
+				if(req.body.screenViewObject.action == 'compare')
+				{
+				
+					data.viewString = req.body.screenViewObject.viewString.view;
+					data.action = req.body.screenViewObject.action; 
 					if (browserType == "chrome") {
-						var data = "OPEN BROWSER CH";
+						data.task = "OPEN BROWSER CH";
 					}
-					else if (browserType == "ie") {
-						var data = "OPEN BROWSER IE";
+						else if (browserType == "ie") {
+						data.task = "OPEN BROWSER IE";
 					}
 					else if (browserType == "mozilla") {
-						var data = "OPEN BROWSER FX";
+						data.task = "OPEN BROWSER FX";
 					}
+				
+				}
+				else{
+					data.action = "scrape";
+						if (browserType == "chrome") {	
+						data.task = "OPEN BROWSER CH";
+						//var data = "OPEN BROWSER CH";
+					}
+					else if (browserType == "ie") {
+						data.task = "OPEN BROWSER IE";
+						//var data =  "OPEN BROWSER IE";
+					}
+					else if (browserType == "mozilla") {
+						data.task =  "OPEN BROWSER FX";
+						//var data =   "OPEN BROWSER FX";
+					}
+				}
 				mySocket._events.scrape = [];               						
-				mySocket.send(data);
+				mySocket.emit("webscrape",data);
 				mySocket.on('scrape', function (data) {
 					res.send(data);
 				});
@@ -931,7 +954,124 @@ exports.updateScreen_ICE = function(req, res){
 				}
 			});
 		}
+	else if(param == 'updateComparedObjects')
+		{
+			//Update changed objects
+			try{
+				var elementschanged = 0;
+				var updatedIndex = [];
+				async.series([
+					function(comparecallback){
+						try{
+							var scrapedDataQuery="select screendata from screens where screenid="+screenID
+								" and projectid="+projectID+
+								" allow filtering ;";
+						fetchScrapedData(scrapedDataQuery,function(err,scrapedobjects,querycallback){
+							 try{
+								
+								  if(scrapedobjects == null && scrapedobjects == '' && scrapedobjects == undefined){
+										scrapedobjects='{}';
+									}
+									if(scrapedobjects.length>0){
+										var viewString;
+										scrapedobjects=JSON.parse(scrapedobjects);
+										if('view' in scrapedobjects){
+											viewString = scrapedobjects.view;
+										}else{
+											viewString=[];
+											scrapedobjects.mirror='';
+											scrapedobjects.scrapedin='';
+											scrapedobjects.scrapetype='';
+										}
+										console.log("DBSCRAPEOBJECTS",scrapedobjects);
+										console.log("updateData",updateData);
+										var updatedViewString = updateData.updatedViewString.view[0].changedobject;
+										for(var i=0;i<updatedViewString.length;i++){
+											for(var j=0;j<viewString.length;j++)
+											{
+												var updatedXpath = updatedViewString[i].xpath.replace(/\s/g,' ').replace('&nbsp;',' ');
+												updatedXpath = updatedViewString[i].xpath.split(";"); 
+												updatedXpath = updatedXpath[0];
 
+												var fetchedXpath = viewString[j].xpath.replace(/\s/g,' ').replace('&nbsp;',' ');
+												fetchedXpath = viewString[j].xpath.split(";"); 
+												fetchedXpath = fetchedXpath[0];
+												
+												if(updatedXpath == fetchedXpath)
+												{
+													updatedIndex.push(j);
+													viewString[j] = updatedViewString[i];
+													elementschanged=elementschanged+1;
+												}
+											}
+										}
+										console.log("updatedIndex", updatedIndex);
+										updatedIndex=updatedIndex.sort(sortNumber);
+										viewString =  viewString.filter(function(n){ return n != null });
+											
+										scrapedObjects.view=viewString;
+										scrapedObjects.mirror=updateData.updatedViewString.mirror;
+										scrapedObjects.scrapedin=scrapedobjects.scrapedin;
+										scrapedObjects.scrapetype=scrapedobjects.scrapetype;
+										if('view' in scrapedObjects)
+										{
+											scrapedObjects=JSON.stringify(scrapedObjects);
+											scrapedObjects = scrapedObjects.replace(/'+/g,"''");
+											var requestscreenhistorydetails = "'updated screens action by " + userInfo.username + " having role:" + userInfo.role + "" +
+															" skucode=" + requestedskucodeScreens + ", tags=" + requestedtags + ", versionnumber=" + requestedversionnumber+
+															"  screendata=" + scrapedObjects+
+															"with the service action="+param+" '";
+											var dateScreen = new Date().getTime();
+											requestedScreenhistory =  dateScreen + ":" + requestscreenhistorydetails;
+											updateScreenQuery = "update icetestautomation.screens set"+
+																" screendata ='"+ scrapedObjects +"',"+
+																" modifiedby ='" + modifiedBy + "',"+
+																" modifiedon = '" + new Date().getTime()+ "'"+
+																" , skucodescreen ='" + requestedskucodeScreens +
+																"' , history= history + { "+requestedScreenhistory+" }" +
+																" where screenid = "+screenID+
+																" and projectid ="+projectID+
+																" and screenname ='" + screenName +
+																"' and versionnumber = "+requestedversionnumber+
+																" IF EXISTS; "
+				
+											//console.log("UPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP",updateScreenQuery);
+				
+											finalFunction(scrapedObjects);	
+										}else{
+											statusFlag="No Objects to compare.";
+											try{
+												res.send(statusFlag);
+											}catch(exception){
+												console.log(exception);
+											}
+										}
+										
+									}
+									else{
+										statusFlag="Error occured in updateScreenData : Fail";
+										try{
+											res.send(statusFlag);
+										}catch(exception){
+											console.log(exception);
+										}
+									}
+								}
+							catch(exception){
+								console.log(exception);
+							}
+						});//End of fetchScrapedData
+						}
+						catch(exception){
+							console.log(exception);
+						}
+					}//End of Async function callback
+				  ]);//End of Async series
+				}
+			catch(exception){
+				console.log(exception);
+			}
+		}
 		function sortNumber(a,b) {
 			return a - b;
 		}
@@ -967,7 +1107,13 @@ exports.updateScreen_ICE = function(req, res){
 												oldCustnames=updateData.editedList.oldCustName;
 												xpathofCustnames=updateData.editedList.xpathListofCustNames;
 											}else if(param == 'mapScrapeData_ICE'){
-											}else{
+											}
+											else if(param == 'updateComparedObjects'){
+												//CHANGE JSON FOR COMPARED OBJECTS -- INVALID JSON FORMAT FROM CORE
+												oldCustnames = updateData.updatedViewString.view[0].changedobject;
+												console.log("oldcustnames", oldCustnames)
+											}
+											else{
 												oldCustnames = updateData.deletedList.deletedCustName;
 												xpathofCustnames = updateData.deletedList.deletedXpath;
 											}
@@ -1009,7 +1155,8 @@ exports.updateScreen_ICE = function(req, res){
 																							if('custname' in testcasestep && 'objectName' in testcasestep){
 																								// console.log((testcasestep.custname == oldCustnames[updatingindex]
 																								// && testcasestep.objectName == xpathofCustnames[updatingindex]));
-																								if(testcasestep.custname.trim() == oldCustnames[updatingindex].trim()
+																								if((param == 'editScrapeData_ICE' || param == 'deleteScrapeData_ICE') 
+																								&& testcasestep.custname.trim() == oldCustnames[updatingindex].trim()
 																								&& testcasestep.objectName.trim() == xpathofCustnames[updatingindex].trim()){
 																									if(param == 'editScrapeData_ICE'){
 																										testcasestep.custname=newCustnames[updatingindex];
@@ -1019,6 +1166,12 @@ exports.updateScreen_ICE = function(req, res){
 																											deletingStepindex.push(eachtestcasestepindex);
 																										}
 																									}
+																								}else if((param == 'updateComparedObjects') 
+																									&& testcasestep.custname.trim() == oldCustnames[updatingindex].custname.trim()
+																									&& testcasestep.objectName.trim() != ''){
+																										testcasestep.objectName = oldCustnames[updatingindex].xpath;
+																									console.log("custname", oldCustnames[updatingindex].custname);
+																									console.log("xpath", oldCustnames[updatingindex].xpath);	
 																								}
 																							}
 																						}
