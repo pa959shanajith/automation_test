@@ -1316,9 +1316,100 @@ input[disabled]{
 	text-align: center;
     padding: 5px 0;
 }
-.pairwiseTableInput{
-
+/*******Compare Objects **********/
+.custList
+{
+    padding-left: 1px;
+    overflow: auto;
+    max-height: 60px;
+    color: #000;
+} 
+.compareObj
+{
+    float: left;
+    width: 80%;
+    margin-top: 2%;
 }
+.compareObjHeading
+{
+    padding: 1px 15px !important;
+    background-color: #633691 !important;
+    font-size: 16px !important;
+    color: #fff !important;
+    font-family: 'LatoWebLight' !important;
+}
+.compareObjPanelBody
+{
+    max-height: 200px;
+    overflow:auto;
+    padding: 0px !important;
+}
+.parentCompareObj
+{
+    float: left;
+    width: 85%;
+    margin-top: 2%;
+}
+.customTxtName,.customTxtName:hover
+{
+    font-family: 'LatoWeb' !important;
+    text-decoration: none !important;
+    color: #33363B !important;
+    font-size: 16px !important;
+    line-height: 20px !important;
+    position: relative !important;
+    height: 18px !important;
+}
+
+/*.lblChangedObj
+{
+    position: relative;
+    left: -7%;
+}*/
+.comparedListItems
+{
+    float: left;
+    width: 100%;
+    position: relative;
+    left: -7%;
+    padding-top: 1%;
+}
+.viewscrapedObjects
+{
+    float: right;
+    position: relative;
+    left: -32%;
+    top: -10px;
+}
+.changedObjOrdList,.unchangedObjOrdList,.notfoundObjOrdList
+{
+    float: left;
+    width: 100%;
+    margin-top: 1%;
+}
+.saveCompareDiv
+{
+    float: right;
+    width: auto;
+    /* margin-right: 31%; */
+    position: relative;
+    left: -32%;
+} 
+.saveComapredObj
+{
+    position: relative;
+    left: -3%;
+}
+.compareObjectDisable
+{
+    pointer-events: none;
+}
+.searchScrapInput:focus
+{
+    outline:none;
+}
+/*******Compare Objects **********/
+
 /* utility plugins */
 
 #wsdlActionsButton{
