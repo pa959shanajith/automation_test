@@ -1557,7 +1557,7 @@ var treeBuilder = function(tree){
 		if(d.oid===undefined)d.oid=d.id;
 		d.id=uNix++;
 		addNode(d,!0,d.parent);
-		if(d.task!=null) d3.select('#ct-node-'+d.id).append('image').attr('class','ct-nodeTask').attr('xlink:href','images_mindmap/node-task-assigned.png').attr('x',29).attr('y',-10);
+		if(d.task!=null) d3.select('#ct-node-'+d.id).append('image').attr('class','ct-nodeTask').attr('width','21px').attr('height','21px').attr('xlink:href','images_mindmap/node-task-assigned.png').attr('x',29).attr('y',-10);
 	});
 	dLinks=d3Tree.links(dNodes);
 	dLinks.forEach(function(d){

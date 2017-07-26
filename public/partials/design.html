@@ -85,6 +85,7 @@
 				<ul>
 					<li><a ng-click="addObj()" href='#'  title="Add Objects"><span><img src='imgs/ic-addobject.png' alt='Add Object' /></span>Add Object</a></li>
 					<li><a ng-click="generateMapObj()" href='#'  title="Map Objects"><span><img src='imgs/ic-mapobject.png' alt='Map Object' /></span>Map Object</a></li>
+					<li class='compareObjects'><a ng-click="compareObj()" href='#'  title="Compare Objects"><span><img src='imgs/ic-compareobject.png' alt='Compare Object' /></span>Compare Object</a></li>
 				</ul>
 			</div>
 		</div>
@@ -96,7 +97,35 @@
 		<!--Task Name-->
 		<div id="page-taskName"></div>
 		<!--Task Name-->
-
+			<div class='saveCompareDiv'><button style='display:none;' id='saveComparedObjects' title="Save Scraped Objects" class="btn btn-md saveComapredObj" ng-click="updateComparedObjects()">Update</button><button style='display:none;' id='viewscrapedObjects' title="View Scraped Objects" class="btn btn-md" ng-click="">View Scraped Objects</button></div>
+		<div class='parentCompareObj'>
+		<!---- Compare Object Div ------>
+		<div class="panel panel-default compareObj" id='compareChangedObjectsBox' style='display:none;'>
+				<div class="panel-heading compareObjHeading">
+					<h3 class="panel-title">Changed Objects</h3>
+				</div>
+				<div class="panel-body compareObjPanelBody">
+					<ul id='changedOrdList' class='changedObjOrdList'></ul>
+				</div>
+		</div>
+		<div class="panel panel-default compareObj" id='compareUnchangedObjectsBox' style='display:none;'>
+				<div class="panel-heading compareObjHeading">
+					<h3 class="panel-title">Unchanged Objects</h3>
+				</div>
+				<div class="panel-body compareObjPanelBody">
+					<ul id='unchangedOrdList' class='unchangedObjOrdList'></ul>
+				</div>
+		</div>
+		<div class="panel panel-default compareObj" id='compareNotFoundObjectsBox' style='display:none;'>
+				<div class="panel-heading compareObjHeading">
+					<h3 class="panel-title">Objects Not Found</h3>
+				</div>
+				<div class="panel-body compareObjPanelBody">
+					<ul id='notfoundOrdList' class='notfoundObjOrdList'></ul>
+				</div>
+		</div>
+	</div>
+		<!---- Compare Object Div ------>
 		<!-- Specificly Webservice Screen -->
 		<div ng-class="getScreenView == 'Webservice' ? 'showContainer' : 'hideContainer'" class="WebServcieScreen">
 			<!-- Top -->
@@ -585,4 +614,22 @@
 	  </div>
 	</div>
 	<!-- HiddenTagModal Modal  -->
+	<!-- compareModal  -->
+	<div class="modal fade" id="compareBox" role="dialog" data-keyboard="false" data-backdrop="static">
+	  <div class="modal-dialog modal-sm">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal">&times;</button>
+	        <h4 class="modal-title">Compared Objects</h4>
+	      </div>
+	      <div class="modal-body">
+	        <p></p>
+	      </div>
+	      <div class="modal-footer">
+	        <button type="button" id='btnNavDesign' class="btn btn-default" data-dismiss="modal">Ok</button>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+	<!-- compareModal  -->	
 <!--Bootstrap Popup-->

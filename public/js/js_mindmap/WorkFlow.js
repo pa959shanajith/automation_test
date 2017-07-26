@@ -690,12 +690,19 @@ var actionEvent_W = function(e){
 	var cur_project=$('#selectProjectEtem').val();
 	var selectedProject='';
 	
-	for(var d of mapData) {
+	mapData.forEach(function(d){
 		if(d.type=='modules_endtoend'){
 			selectedProject=d.projectID;
-			break;
+			return;
 		} 
-	}
+	});
+
+	// for(var d of mapData) {
+	// 	if(d.type=='modules_endtoend'){
+	// 		selectedProject=d.projectID;
+	// 		break;
+	// 	} 
+	// }
 	if(selectedProject!=cur_project){
 		openDialogMindmap('Error',"Module belongs to project: '"+$("#selectProjectEtem option[value='"+selectedProject+"']").text()+"' Please go back to the same project and Save");
 		return;

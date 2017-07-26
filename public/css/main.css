@@ -1400,6 +1400,14 @@ input[disabled]{
     position: relative;
     left: -3%;
 }
+.compareObjectDisable
+{
+    pointer-events: none;
+}
+.searchScrapInput:focus
+{
+    outline:none;
+}
 /*******Compare Objects **********/
 
 /* utility plugins */
@@ -2150,7 +2158,7 @@ input[disabled]{
 .executionDataTable tbody, .designDataTable tbody {
 	position: absolute;
     width: 100%;
-    margin-top: 28px;
+    /*margin-top: 28px;*/
 }
 .executionDataTable tbody
 {
@@ -2268,7 +2276,7 @@ input[disabled]{
     border-radius: 4px;
  }
 .scenarioBody tr td select{
-	width: 70px; 
+	width: 70px;
 	height: 25px;
 	border: 1px solid #5e636b;
     border-radius: 4px;
@@ -4299,4 +4307,14 @@ select:-webkit-autofill:focus {
 
 .search-reports .searchScrapInput{
   height: 29px;
+}
+
+
+.expandTable{
+  margin: -9px;
+  padding: 3px;
+  margin-right: 9px;
+  margin-bottom: -7px;
+  height: 24px;
+  cursor: pointer;
 }

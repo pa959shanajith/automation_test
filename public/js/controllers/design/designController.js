@@ -6,6 +6,7 @@ var getAllAppendedObj; //Getting all appended scraped objects
 var gsElement = []; window.localStorage['selectRowStepNo'] = '';
 var getWSTemplateData = {} //Contains Webservice saved data
 var appType;var projectId;var projectDetails;var screenName;var testCaseName;var subTaskType;var subTask; var draggedEle; var getDraggedEle;
+var compareFlag; var updatedViewString = {};
 window.localStorage['disableEditing'] = "false";
 mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout', 'DesignServices','cfpLoadingBar','$window', function($scope,$http,$location,$timeout,DesignServices,cfpLoadingBar,$window) {
 	$("body").css("background","#eee");
@@ -746,6 +747,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					return;
 				}
 				else{
+					
 					console.log("Data There");
 					$(".enableActions").addClass("disableActions").removeClass("enableActions");
 					$("#enableAppend").prop("disabled", false).css('cursor','pointer')
@@ -793,6 +795,20 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					$(".disableActions").addClass("enableActions").removeClass("disableActions");
 					$("#enableAppend").prop("disabled", true).css('cursor','no-drop');
 					$(document).find(".checkStylebox").prop("disabled", true);
+				}
+
+				if(appType == 'Web')
+				{
+						if($(".ellipsis").length > 0 )
+						{
+							$("li.compareObjects").removeClass('disableActions compareObjectDisable').addClass('enableActions');
+						}
+						else{
+							$("li.compareObjects").removeClass('enableActions').addClass('disableActions compareObjectDisable');
+						}
+				}
+				else{
+					$("li.compareObjects").hide();
 				}
 			}
 			unblockUI();
@@ -1407,14 +1423,20 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			}
 			//For OEBS
 
-			//For Web
 			else{
+				if(compareFlag == true)
+				{
+				   screenViewObject.viewString = viewString;
+				   screenViewObject.action = "compare";
+				}
 				screenViewObject.browserType = browserType
 				blockUI(blockMsg);
 			}
 			//For Web
 			DesignServices.initScraping_ICE(screenViewObject)
 			.then(function (data) {
+				console.log("UI", data);
+				
 				if(data == "Invalid Session")
 				{
 					window.location.href = "/";
@@ -1440,6 +1462,126 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				if(data == "wrongWindowName"){
 					openDialog("Scrape", "Wrong window name.")
 				}
+				//COMPARE & UPDATE SCRAPE OPERATION
+				if(data.action == "compare")
+				{
+					updatedViewString = data;
+					$("#changedOrdList li,#compareUnchangedObjectsBox li ,#compareNotFoundObjectsBox li").empty();
+					$("#viewscrapedObjects").hide();
+					//Hide Scrape Objects
+					$("#scrapTree,.fsScroll").hide();
+					if(data.view[0].changedobject.length > 0)
+					{
+						$("#compareChangedObjectsBox,#saveComparedObjects").show();
+						//changed objects list
+						for(var i=0; i<data.view[0].changedobject.length; i++){
+							var innerUL = $('.changedObjOrdList');
+							var path = data.view[0].changedobject[i].xpath;
+							var ob =  data.view[0].changedobject[i];
+							//ob.tempId= i;
+							var custN = ob.custname.replace(/[<>]/g, '').trim();
+							var tag = ob.tag;
+							if(tag == "dropdown"){imgTag = "select"}
+							else if(tag == "textbox/textarea"){imgTag = "input"}
+							else imgTag = tag;
+							var tag1 = tag.replace(/ /g, "_");
+							var tag2;
+							if(tag == "a" || tag == "input" || tag == "table" || tag == "list" || tag == "select" || tag == "img" || tag == "button" || tag == "radiobutton" || tag == "checkbox" || tag == "tablecell"){
+								var li = "<li data-xpath='"+ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"' data-left='"+ob.left+"' data-top='"+ob.top+"' data-width='"+ob.width+"' data-height='"+ob.height+"' data-tag='"+tag+"' data-url='"+ob.url+"' data-hiddentag='"+ob.hiddentag+"' class='item select_all "+tag+"x'><a class='customTxtName'><span class='highlight'></span><span title='"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;')+"' class='ellipsis'>"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"</span></a></li>";
+							} 
+							else {
+								var li = "<li data-xpath='"+ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"' data-left='"+ob.left+"' data-top='"+ob.top+"' data-width='"+ob.width+"' data-height='"+ob.height+"' data-tag='"+tag+"' data-url='"+ob.url+"' data-hiddentag='"+ob.hiddentag+"' class='item select_all "+tag+"x'><a class='customTxtName'><span class='highlight'></span><span title='"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;')+"' class='ellipsis'>"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"</span></a></li>";
+							}
+							angular.element(innerUL).append(li);
+						}
+						$(document).find('#changedOrdList').scrapTree({
+									multipleSelection : {
+										//checkbox : checked,
+										classes : [ '.item .treeChangedObjects' ]
+									},
+									editable: false,
+									radio: false
+								});
+					}
+					else{
+						$("#compareChangedObjectsBox").hide();
+					}
+					if(data.view[1].notchangedobject.length > 0)
+					{
+						$("#compareUnchangedObjectsBox").show();
+
+							//unchanged objects list
+							for(var j=0; j<data.view[1].notchangedobject.length; j++){
+								var innerUL = $('.unchangedObjOrdList');
+								var path = data.view[1].notchangedobject[j].xpath;
+								var ob =  data.view[1].notchangedobject[j];
+								//ob.tempId= j;
+								var custN = ob.custname.replace(/[<>]/g, '').trim();
+								var tag = ob.tag;
+								if(tag == "dropdown"){imgTag = "select"}
+								else if(tag == "textbox/textarea"){imgTag = "input"}
+								else imgTag = tag;
+								var tag1 = tag.replace(/ /g, "_");
+								var tag2;
+								if(tag == "a" || tag == "input" || tag == "table" || tag == "list" || tag == "select" || tag == "img" || tag == "button" || tag == "radiobutton" || tag == "checkbox" || tag == "tablecell"){
+									var li = "<li data-xpath='"+ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"' data-left='"+ob.left+"' data-top='"+ob.top+"' data-width='"+ob.width+"' data-height='"+ob.height+"' data-tag='"+tag+"' data-url='"+ob.url+"' data-hiddentag='"+ob.hiddentag+"' class='item select_all "+tag+"x'><a class='customTxtName'><span class='highlight'></span><span title='"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;')+"' class='ellipsis'>"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"</span></a></li>";
+								} 
+								else {
+									var li = "<li data-xpath='"+ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"' data-left='"+ob.left+"' data-top='"+ob.top+"' data-width='"+ob.width+"' data-height='"+ob.height+"' data-tag='"+tag+"' data-url='"+ob.url+"' data-hiddentag='"+ob.hiddentag+"' class='item select_all "+tag+"x'><a class='customTxtName'><span class='highlight'></span><span title='"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;')+"' class='ellipsis'>"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"</span></a></li>";
+								}
+								angular.element(innerUL).append(li);
+							}
+							$(document).find('#unchangedOrdList').scrapTree({
+									multipleSelection : {
+										//checkbox : checked,
+										classes : [ '.item .treeUnChangedObjects' ]
+									},
+									editable: false,
+									radio: false
+								});
+					}
+					else{
+						$("#compareUnchangedObjectsBox").hide();
+					}
+					console.log("nf",data.view[2].notfoundobject);
+					if(data.view[2].notfoundobject.length > 0)
+					{
+						$("#compareNotFoundObjectsBox").show();
+						// //Objects not found
+							for(var k=0; k<data.view[2].notfoundobject.length; k++){
+							var innerUL = $('.notfoundObjOrdList');
+							var path = data.view[2].notfoundobject[k].xpath;
+							var ob =  data.view[2].notfoundobject[k];
+							//ob.tempId= i;
+							var custN = ob.custname.replace(/[<>]/g, '').trim();
+							var tag = ob.tag;
+							if(tag == "dropdown"){imgTag = "select"}
+							else if(tag == "textbox/textarea"){imgTag = "input"}
+							else imgTag = tag;
+							var tag1 = tag.replace(/ /g, "_");
+							var tag2;
+							if(tag == "a" || tag == "input" || tag == "table" || tag == "list" || tag == "select" || tag == "img" || tag == "button" || tag == "radiobutton" || tag == "checkbox" || tag == "tablecell"){
+								var li = "<li data-xpath='"+ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"' data-left='"+ob.left+"' data-top='"+ob.top+"' data-width='"+ob.width+"' data-height='"+ob.height+"' data-tag='"+tag+"' data-url='"+ob.url+"' data-hiddentag='"+ob.hiddentag+"' class='item select_all "+tag+"x'><a class='customTxtName'><span class='highlight'></span><span title='"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;')+"' class='ellipsis'>"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"</span></a></li>";
+							} 
+							else {
+								var li = "<li data-xpath='"+ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"' data-left='"+ob.left+"' data-top='"+ob.top+"' data-width='"+ob.width+"' data-height='"+ob.height+"' data-tag='"+tag+"' data-url='"+ob.url+"' data-hiddentag='"+ob.hiddentag+"' class='item select_all "+tag+"x'><a class='customTxtName'><span class='highlight'></span><span title='"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;')+"' class='ellipsis'>"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"</span></a></li>";
+							}
+							angular.element(innerUL).append(li);
+						}
+						$(document).find('#notfoundOrdList').scrapTree({
+							multipleSelection : {
+								//checkbox : checked,
+								classes : [ '.item .treenotFoundObjects' ]
+							},
+							editable: false,
+							radio: false
+						});
+					}
+					else{
+						$("#compareNotFoundObjectsBox").hide();
+					}
+				}
+				else{
 				if(data.view.length > 0)
 				{
 					$("#finalScrap").show();
@@ -1513,7 +1655,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					//Getting appended scraped object irrespective to the dynamic value
 				}
 				//If enable append is active
-
+				
 				//If enable append is inactive
 				else{
 					//Before Saving the Scrape JSON to the Database
@@ -1559,10 +1701,101 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					deleteScrapeDataservice = false;
 				}
 				else $("#saveObjects").addClass('hide');
+				}
 			}, function (error) { console.log("Fail to Load design_ICE") });
 		}
 	}
+	$scope.updateComparedObjects = function(event) 
+	{
+//			var xpath;
+//		var duplicateCustnames = [];
+//		var duplicateXpathElements = {};
+//		var duplicateCustnamesElements = {}
+//
+//		if($("ul.changedObjOrdList").find(".ellipsis").length > 0){
+//			$.each($("ul.changedObjOrdList").find(".ellipsis"), function(){
+//				var count = 0;
+//				if($(this).parent().parent().attr("data-xpath") != ""){
+//					xpath = $(this).parent().parent().attr("data-xpath");
+//					console.log("spath",xpath);
+//					xpath = xpath.split(";")[2];
+//					console.log("sp",xpath);
+//					if (!duplicateXpathElements.hasOwnProperty(xpath)){
+//						duplicateXpathElements[xpath] = $(this).text();
+//					}else{
+//						console.log($(this).text());
+//						duplicateCustnames.push($(this).text());
+//						count = 1;
+//					}
+//
+//					if (count == 0 && !duplicateCustnamesElements.hasOwnProperty($(this).text())){
+//						duplicateCustnamesElements[$(this).text()] = xpath;
+//					}else if(count == 0 && duplicateCustnamesElements.hasOwnProperty($(this).text())){
+//						console.log($(this).text());
+//						duplicateCustnames.push($(this).text());
+//					}
+//				}else {
+//					xpath= "";
+//					if (!duplicateCustnamesElements.hasOwnProperty($(this).text())){
+//						duplicateCustnamesElements[$(this).text()] = xpath;
+//					}else{
+//						console.log($(this).text());
+//						duplicateCustnames.push($(this).text());
+//					}
+//				}
+//	   });
+//
+//			if(duplicateCustnames.length > 0){
+//				openDialog("Save Scrape data", "");
+//				$("#globalModal").find('.modal-body p').text("Object characterstics are same for:").css("color","#000").append("<ul class='custList'></ul>");
+//
+//				for(var j=0;j<duplicateCustnames.length;j++){
+//					$("#globalModal").find('.modal-body p ul').append("<li>"+duplicateCustnames[j]+"</li>");
+//				}
+//				return false;
+//			}
+//		}
+		var tasks = JSON.parse(window.localStorage['_CT']);
+		var userinfo = JSON.parse(window.localStorage['_UI']);
+		var scrapeObject = {};
+		scrapeObject.param = 'updateComparedObjects';
+		scrapeObject.updatedViewString = updatedViewString;
+		scrapeObject.userinfo =  userinfo;
+		scrapeObject.screenId = tasks.screenId;
+		scrapeObject.screenName = tasks.screenName;
+		scrapeObject.projectId = tasks.projectId;
+		scrapeObject.appType = tasks.app
+			DesignServices.updateScreen_ICE(scrapeObject)
+		    .then(function(data) {
+				debugger;
+				console.log("out", data);
+			if(data == "Invalid Session")
+			{
+				window.location.href = "/";
+			}
+			if(data == 'success')
+			{
+				//openDialog("Compared Objects", "Scraped data updated successfully.");
+				$("#compareBox").modal("show");
+				$("#compareBox .modal-body p").text("Scraped data updated successfully.");
+				$(document).on('click', '#btnNavDesign', function() {
+					window.location.href = "/design";
+				});
+			}
+			else{
+				openDialog("Compared Objects", "Failed to update objects");
+			}
+		}, function(error) {
 
+		});
+	}
+	
+	//Show compared objects
+	$(document).on('click','#comparedObjects', function () {
+			$("#scrapTree,.fsScroll").hide();
+			$("#compareChangedObjectsBox,#compareUnchangedObjectsBox,#compareNotFoundObjectsBox").show();
+			//$("#viewScrapedObjects").show();
+	});
 //To delete Scrape Objects
 	$scope.del_Objects = function()
 	{
@@ -1682,9 +1915,9 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			}
 		});
 		if (numberOfElems == 0) {
-			$("#deleteObjects").prop("disabled", "disabled");
+			$("#deleteObjects,.checkStylebox").prop("disabled", "disabled");
 		}else{
-			$("#deleteObjects").prop("disabled", false);
+			$("#deleteObjects,.checkStylebox").prop("disabled", false);
 		}
 		if (numberOfElems == 0 && count == 0) {
 			$('.checkStylebox').prop("checked", false);
@@ -1816,6 +2049,98 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 	};
 	//Highlight Element on browser
 
+	//Highlight compared and updated objects
+		//Highlight Element on browser
+	$scope.highlightComparedScrapElements = function(xpath,url,uid) {
+		var appType = $scope.getScreenView;
+		//console.log("uid",uid);
+		//if(enableScreenShotHighlight == true){
+			console.log("Init ScreenShot Highlight");
+			var data = {
+				args : [$("#"+uid).find(".focus-highlight").parents("a")[0]],
+				rlbk : false,
+				rslt :	{
+					obj : $("#"+uid).find(".focus-highlight").closest("li")
+				}
+			}
+			console.log(data)
+			var rect, type, ref, name, id, value, label, visible, l10n, source;
+			rect = {
+					x : data.rslt.obj.data("left"),
+					y : data.rslt.obj.data("top"),
+					w : data.rslt.obj.data("width"),
+					h : data.rslt.obj.data("height")
+			}
+
+			type = data.rslt.obj.data("tag");
+			ref = data.rslt.obj.data("reference");
+			name = data.rslt.obj.find(".ellipsis").text();
+			id = data.rslt.obj.attr("val");
+			value = data.rslt.obj.attr("val");
+			label = data.rslt.obj.find(".ellipsis").text();
+			visible = data.rslt.obj.data('hiddentag');
+			l10n = {
+					matches: 0
+			};
+
+			source = "";
+			if (rect === undefined) return;
+			var translationFound = false;
+			if (l10n) {
+				translationFound = (l10n.matches != 0);
+			}
+
+			if (typeof rect.x != 'undefined') {
+				$(".hightlight").remove();
+				var d = $("<div></div>", {
+					"class": "hightlight"
+				});
+				var getTopValue;
+
+				var screen_width = document.getElementById('screenshot').height;
+				var real_width = document.getElementById('screenshot').naturalHeight;
+				scale_highlight = 1 / (real_width / screen_width)
+				d.appendTo("#screenShotScrape");
+				d.css('border', "1px solid red");
+				if(appType == "MobileWeb"){
+					d.css('left', Math.round(rect.x) * 1.5 * scale_highlight + 'px');
+					d.css('top', Math.round(rect.y) * 1.5 * scale_highlight + 'px');
+					d.css('height', Math.round(rect.h) * 1.5 * scale_highlight + 'px');
+					d.css('width', Math.round(rect.w) * 1.5 * scale_highlight + 'px');
+				}
+				else if(appType == "SAP"){
+					d.css('left', (Math.round(rect.x) * scale_highlight) + 3 + 'px');
+					d.css('top', (Math.round(rect.y) * scale_highlight) + 2 + 'px');
+					d.css('height', Math.round(rect.h) * scale_highlight + 'px');
+					d.css('width', Math.round(rect.w) * scale_highlight + 'px');
+				}
+
+				else{
+					d.css('left', Math.round(rect.x)  * scale_highlight + 'px');
+					d.css('top', Math.round(rect.y) * scale_highlight + 'px');
+					d.css('height', Math.round(rect.h) * scale_highlight + 'px');
+					d.css('width', Math.round(rect.w) * scale_highlight + 'px');
+				}
+				d.css('position', 'absolute');
+				d.css('background-color', 'yellow');
+				d.css('z-index', '3');
+				d.css('opacity', '0.7');
+				getTopValue = Math.round(rect.y) * scale_highlight + 'px'
+				$(".scroll-wrapper > .scrollbar-screenshot").animate({ scrollTop: parseInt(getTopValue) },500);
+				//$('.scroll-wrapper > .scrollbar-screenshot').scrollTo(d.offset().top);
+				var color;
+				if (translationFound) {
+					color = "blue";
+				} else {
+					color = "yellow";
+				}
+				d.css("background-color", color);
+			} else {
+				$(".hightlight").remove();
+			}
+		//}	
+	};
+	//Highlight compared and updated objects
 
 	//Add Object Functionality
 	$scope.addObj = function(){
@@ -1868,6 +2193,18 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				return false
 			}
 			else{
+				if(Object.keys(viewString.view).length > 0)
+				{
+							for(var i=0;i<viewString.view.length;i++)
+							{
+								if($(this).find("input").val() == viewString.view[i].custname)
+								{
+										$("#dialog-addObject").modal("hide");
+										openDialog("Add Object", "Object characterstics are same for "+$(this).find("input").val()+"");
+										return false;
+								}
+							}
+				}
 				//If no field is empty, proceed to service call
 				flag = "true";
 				$scope.errorMessage = "";
@@ -1920,10 +2257,10 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				angular.element(innerUL).append(li);
 			}
 			$(".checkStylebox, .checkall").prop("disabled",false);
-			$(".checkStylebox").trigger("click");
-			$timeout(function(){
-				$("#saveObjects").trigger("click");
-			},500)
+			// $(".checkStylebox").trigger("click");
+			// $timeout(function(){
+			// 	$("#saveObjects").trigger("click");
+			// },500)
 			$("#dialog-addObject").modal("hide");
 			//openDialog("Add Object", "Objects has been added successfully.")
 			//$("#addObjectSuccess").modal("show")
@@ -1991,7 +2328,20 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		$(".accd-Obj-head").append('<span class="showactiveArrow"></span>');
 		$(".accd-Obj-body li").append('<span class="showPreviousVal" title="Show Previous Text"></span>');
 	}
-
+		compareFlag = false;
+		//Compare Objects
+		$scope.compareObj = function(){
+			openDialog("Compare Object", "Please select browser icon to compare and update objects.");
+			compareFlag = true;
+			if(compareFlag == true)
+			{
+				$("#enableAppend").prop("disabled", true).css('cursor','no-drop');
+				$("li.addObjects,li.mapObjects").addClass("disableActions");
+				$("a.disableActions").removeClass("disableActions");
+				$("input[type='checkbox'].checkall,.checkStylebox,#saveObjects").attr("disabled", true);
+			}
+		};
+		
 
 
 	$(document).on("click", ".showAllObjects", function(){
@@ -2165,10 +2515,109 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 	}
 	/****Submit Map Object Functionality****/
 	//Map Object Drag and Drop Functionality
+// function validateDuplicateObjects(e)
+// {
+// 	var xpath;
+// 		var duplicateCustnames = [];
+// 		var duplicateXpathElements = {};
+// 		var duplicateCustnamesElements = {}
+// 		alert(e.target.id);
+// 		if($(".ellipsis").length > 0){
+// 			$.each($("span.ellipsis"), function(){
+// 				var count = 0;
+// 				if($(this).parent().parent().attr("data-xpath") != ""){
+// 					xpath = $(this).parent().parent().attr("data-xpath");
+// 					console.log("spath",xpath);
+// 					xpath = xpath.split(";")[2];
+// 					console.log("sp",xpath);
+// 					if (!duplicateXpathElements.hasOwnProperty(xpath)){
+// 						duplicateXpathElements[xpath] = $(this).text();
+// 					}else{
+// 						console.log("a",$(this).text());
+// 						duplicateCustnames.push($(this).text());
+// 						count = 1;
+// 					}
 
+// 					if (count == 0 && !duplicateCustnamesElements.hasOwnProperty($(this).text())){
+// 						duplicateCustnamesElements[$(this).text()] = xpath;
+// 					}else if(count == 0 && duplicateCustnamesElements.hasOwnProperty($(this).text())){
+// 						console.log("b",$(this).text());
+// 						duplicateCustnames.push($(this).text());
+// 					}
+// 				}else {
+// 					xpath= "";
+// 					if (!duplicateCustnamesElements.hasOwnProperty($(this).text())){
+// 						duplicateCustnamesElements[$(this).text()] = xpath;
+// 					}else{
+// 						console.log("c",$(this).text());
+// 						duplicateCustnames.push($(this).text());
+// 					}
+// 				}
+// 	   });
+
+// 			if(duplicateCustnames.length > 0){
+// 				openDialog("Save Scrape data", "");
+// 				$("#globalModal").find('.modal-body p').text("Object characterstics are same for:").css("color","#000").append("<ul class='custList'></ul>");
+
+// 				for(var j=0;j<duplicateCustnames.length;j++){
+// 					$("#globalModal").find('.modal-body p ul').append("<li>"+duplicateCustnames[j]+"</li>");
+// 				}
+// 				return false;
+// 			}
+// 		}
+// }
 
 	//Save Scrape Objects
-	$(document).on('click', "#saveObjects", function(){
+	$(document).on('click', "#saveObjects", function(e){
+		var xpath;
+		var duplicateCustnames = [];
+		var duplicateXpathElements = {};
+		var duplicateCustnamesElements = {}
+		//validateDuplicateObjects
+//		if($(".ellipsis").length > 0){
+//			$.each($("span.ellipsis"), function(){
+//				var count = 0;
+//				if($(this).parent().parent().attr("data-xpath") != ""){
+//					xpath = $(this).parent().parent().attr("data-xpath");
+//					console.log("spath",xpath);
+//					xpath = xpath.split(";")[2];
+//					console.log("sp",xpath);
+//					if (!duplicateXpathElements.hasOwnProperty(xpath)){
+//						duplicateXpathElements[xpath] = $(this).text();
+//					}else{
+//						console.log($(this).text());
+//						duplicateCustnames.push($(this).text());
+//						count = 1;
+//					}
+//
+//					if (count == 0 && !duplicateCustnamesElements.hasOwnProperty($(this).text())){
+//						duplicateCustnamesElements[$(this).text()] = xpath;
+//					}else if(count == 0 && duplicateCustnamesElements.hasOwnProperty($(this).text())){
+//						console.log($(this).text());
+//						duplicateCustnames.push($(this).text());
+//					}
+//				}else {
+//					xpath= "";
+//					if (!duplicateCustnamesElements.hasOwnProperty($(this).text())){
+//						duplicateCustnamesElements[$(this).text()] = xpath;
+//					}else{
+//						console.log($(this).text());
+//						duplicateCustnames.push($(this).text());
+//					}
+//				}
+//	   });
+//
+//			if(duplicateCustnames.length > 0){
+//				openDialog("Save Scrape data", "");
+//				$("#globalModal").find('.modal-body p').text("Object characterstics are same for:").css("color","#000").append("<ul class='custList'></ul>");
+//
+//				for(var j=0;j<duplicateCustnames.length;j++){
+//					$("#globalModal").find('.modal-body p ul').append("<li>"+duplicateCustnames[j]+"</li>");
+//				}
+//				return false;
+//			}
+//		}
+		
 		/*if(!$(".checkall").is(":checked")){
 			openDialog("Save Scrape data", "Please select objects to save.")
 		}

@@ -344,19 +344,15 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 			console.log("Error")
 		})
 	};
-	var collapseIcon = false;
+
 	$(document).on('click', '.expandTable', function(){
-		//console.log("hello");
-		if (collapseIcon) {
+		if ($(this).attr('src') ==  "imgs/icon-plus.png" ) {
 			$(this).prop("src", "imgs/icon-minus.png")
 			$(this).parent().parent().next().slideDown();
-			collapseIcon = false;
 		}else {
 			$(this).prop("src", "imgs/icon-plus.png")
 			$(this).parent().parent().next().slideUp();
-			collapseIcon = true;
 		}
-
 	});
 	//Load Location Details of Scenario
 	$scope.loadLocationDetails = function(scenarioName, scenarioId) {
