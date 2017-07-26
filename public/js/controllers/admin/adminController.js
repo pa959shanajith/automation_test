@@ -2059,7 +2059,9 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 			//updateUserObj.role = $("#userRoles option:selected").val();
 			updateUserObj.email = $("#email").val();
 			updateUserObj.userId = $("#userSelect option:selected").data("id");
-			adminServices.updateUser_nineteen68(updateUserObj)
+
+			var userDetails = JSON.parse(window.localStorage['_UI']);
+			adminServices.updateUser_nineteen68(updateUserObj,userDetails)
 			.then(function (response) {
 				if(response == "Invalid Session"){
 							  window.location.href = "/";
