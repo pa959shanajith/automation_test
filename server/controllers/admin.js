@@ -1927,8 +1927,14 @@ exports.assignProjects_ICE = function(req, res) {
             for (var i = 0; i < projectDetails.length; i++) {
                 projectIds.push(projectDetails[i].projectId);
             }
-            var assignProjectsToUsers = "INSERT INTO icepermissions (userid,domainid,createdby,createdon,history,modifiedby,modifiedbyrole,modifiedon,projectids) VALUES (" + assignProjectsDetails.userId + "," + assignProjectsDetails.domainId + ",'" + assignProjectsDetails.userInfo.username + "','" + new Date().getTime() + "',null,'" + assignProjectsDetails.userInfo.username + "','" + assignProjectsDetails.userInfo.role + "','" + new Date().getTime() + "',[" + projectIds + "]);"
-
+			if(assignProjectsDetails.getAssignedProjectsLen > 0)
+			{
+				var assignProjectsToUsers = "UPDATE icepermissions set modifiedby='" + assignProjectsDetails.userInfo.username + "', modifiedon=" + new Date().getTime() + ",modifiedbyrole='" + assignProjectsDetails.userInfo.role + "', projectids=[" + projectIds + "] where userid=" + assignProjectsDetails.userId;
+			}
+			else{
+				   var assignProjectsToUsers = "INSERT INTO icepermissions (userid,domainid,createdby,createdon,history,projectids) VALUES (" + assignProjectsDetails.userId + "," + assignProjectsDetails.domainId + ",'" + assignProjectsDetails.userInfo.username + "','" + new Date().getTime() + "',null,[" + projectIds + "]);"
+			}
+         
             assignProjectsHistory = "'userid=" + assignProjectsDetails.userId + ", domainid=" + assignProjectsDetails.domainId + ", createdby=" + assignProjectsDetails.userInfo.username + ", createdon=" + new Date().getTime() + ", " +
                 "modifiedby=" + assignProjectsDetails.userInfo.username + ", modifiedbyrole=" + assignProjectsDetails.userInfo.role + ", modifiedon=" + new Date().getTime() + ", " +
                 "projectids=[" + projectIds + "] '";
