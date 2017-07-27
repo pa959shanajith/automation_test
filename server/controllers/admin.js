@@ -75,71 +75,90 @@ exports.getUsers_Nineteen68 = function(req, res){
 	var r_ids = [];
     var prjId=req.prjId;
 	var userRoles = {userRoles:[],r_ids:[]};
-	var getUserId = "select userid,projectids from icepermissions;"
-    var i=0,j=0;
-	dbConnICE.execute(getUserId, function (err, result) {
-		if (err) {
-			res(null, err);
-		}
-		else {
-
-
-			async.forEachSeries(result.rows,function(iterator,callback1){
-				try{
-					j++;
-					if (iterator.projectids != null && iterator.projectids.length>0 && JSON.parse(JSON.stringify(iterator.projectids)).indexOf(prjId)>-1){
-						roles.push(iterator.userid);
-					}
-					if(j<result.rows.length){
-						callback1();
+	var args = {headers:{"Content-Type" : "application/json"}}
+	client.post("http://127.0.0.1:1990/admin/getUserRoles_Nineteen68",args,
+				function (userrolesresult, userrolesresponse) {
+					if(userrolesresponse.statusCode != 200 || userrolesresult.rows == "fail"){	
+							console.log("fail");
+							res(null,"fail");
 					}else{
-						getNames();
+						inputs = { "userroles":userrolesresult.rows,"projectid":prjId };
+						args = {data:inputs,headers:{"Content-Type" : "application/json"}}
+						client.post("http://127.0.0.1:1990/admin/getUsers_Nineteen68",args,
+								function (getUsers, response) {
+						if(response.statusCode != 200 || getUsers.rows == "fail"){	
+									console.log("fail");
+									res(null,"fail");
+								}else{
+									res(null,getUsers);
+								}
+						});
 					}
-				}catch(ex){
-					console.log(ex);
-				}
+	});
+
+	// var getUserId = "select userid,projectids from icepermissions;"
+    // var i=0,j=0;
+	// dbConnICE.execute(getUserId, function (err, result) {
+	// 	if (err) {
+	// 		res(null, err);
+	// 	}
+	// 	else {
+
+
+	// 		async.forEachSeries(result.rows,function(iterator,callback1){
+	// 			try{
+	// 				j++;
+	// 				if (iterator.projectids != null && iterator.projectids.length>0 && JSON.parse(JSON.stringify(iterator.projectids)).indexOf(prjId)>-1){
+	// 					roles.push(iterator.userid);
+	// 				}
+	// 				if(j<result.rows.length){
+	// 					callback1();
+	// 				}else{
+	// 					getNames();
+	// 				}
+	// 			}catch(ex){
+	// 				console.log(ex);
+	// 			}
                 
 				
-			});
+	// 		});
             
-            function getNames(){
-				var userid=[];
-                async.forEachSeries(roles,function(iterator,callback2){
-					i++;
+    //         function getNames(){
+	// 			var userid=[];
+    //             async.forEachSeries(roles,function(iterator,callback2){
+	// 				i++;
 					
-					var getUserName = "select username,defaultrole from users where userid="+iterator;
-					dbConn.execute(getUserName, function (err, result2) {
-						if (err) {
-							res(null, err);
-						}
-						else {
-							try{
-								if(result2.rows.length>0 && result2.rows[0] != undefined && (result2.rows[0].defaultrole!='160d3943-e6d9-4630-a824-cabf54f225d2' && result2.rows[0].defaultrole!='b5e9cb4a-5299-4806-b7d7-544c30593a6e')){
-									r_ids.push(result2.rows[0].username);
-									userid.push(iterator);
-								}
+	// 				var getUserName = "select username,defaultrole from users where userid="+iterator;
+	// 				dbConn.execute(getUserName, function (err, result2) {
+	// 					if (err) {
+	// 						res(null, err);
+	// 					}
+	// 					else {
+	// 						try{
+	// 							if(result2.rows.length>0 && result2.rows[0] != undefined && (result2.rows[0].defaultrole!='160d3943-e6d9-4630-a824-cabf54f225d2' && result2.rows[0].defaultrole!='b5e9cb4a-5299-4806-b7d7-544c30593a6e')){
+	// 								r_ids.push(result2.rows[0].username);
+	// 								userid.push(iterator);
+	// 							}
 							
-								if(i<roles.length){
-									callback2();
-								}else{
-									userRoles.userRoles =r_ids ;
-									userRoles.r_ids = userid;
-									//console.log('----------------------------'+userid);
-									//console.log('----------------------------'+r_ids);
-									res(null,userRoles);
-								}
-							}catch(ex){
-								console.log(ex);
-							}
+	// 							if(i<roles.length){
+	// 								callback2();
+	// 							}else{
+	// 								userRoles.userRoles =r_ids ;
+	// 								userRoles.r_ids = userid;
+	// 								//console.log('----------------------------'+userid);
+	// 								//console.log('----------------------------'+r_ids);
+	// 								res(null,userRoles);
+	// 							}
+	// 						}catch(ex){
+	// 							console.log(ex);
+	// 						}
 								
-						}
-					});
-				});
-            }
-            
-
-		}
-	});
+	// 					}
+	// 				});
+	// 			});
+    //         } 
+	// 	}
+	// });
 };
 
 //GetUsers
@@ -324,11 +343,16 @@ exports.createUser_Nineteen68 = function(req, res) {
                     }
                     if (status === false) {
                         var userId = uuid();
-                        var createUser = "INSERT INTO users (userid,deactivated,additionalroles,createdby,createdon,defaultrole,emailid,firstname,history,lastname,ldapuser,modifiedby,modifiedon,password,username) VALUES (" + userId + ",null,null,'" + req_username + "'," + new Date().getTime() + "," + req_defaultRole + ",'" + req_email_id + "','" + req_firstname + "',null,'" + req_lastname + "'," + req_ldapuser + ",'" + req_username + "'," + new Date().getTime() + ",'" + req_hashedPassword + "','" + req_username + "')";
-                        dbConn.execute(createUser, function(err, userResult) {
+                        // var createUser = "INSERT INTO users (userid,deactivated,additionalroles,createdby,createdon,defaultrole,emailid,firstname,history,lastname,ldapuser,modifiedby,modifiedon,password,username) VALUES (" + userId + ",null,null,'" + req_username + "'," + new Date().getTime() + "," + req_defaultRole + ",'" + req_email_id + "','" + req_firstname + "',null,'" + req_lastname + "'," + req_ldapuser + ",'" + req_username + "'," + new Date().getTime() + ",'" + req_hashedPassword + "','" + req_username + "')";
+                        // dbConn.execute(createUser, function(err, userResult) {
+						var inputs = {"query":"createuser", "createdby":req_username,"defaultrole":req_defaultRole, "emailid":req_email_id
+						, "firstname":req_firstname, "lastname":req_lastname, "ldapuser":req_ldapuser, "password":req_hashedPassword, 
+						"username":req_username}
+						var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
+						client.post("http://127.0.0.1:1990/admin/createUser_Nineteen68",args,
+								function (result, response) {
                             try {
                                 flag = "Success";
-
                                 //Create User History Update
                                 createUserHistory = "'userid=" + userId + ", deactivated=null, additionalroles=null, createdby=" + req_username + ", " +
                                     "createdon=" + new Date().getTime() + ", defaultrole=" + req_defaultRole + ", emailid=" + req_email_id + ", " +
@@ -348,7 +372,7 @@ exports.createUser_Nineteen68 = function(req, res) {
                                 console.log(exception);
                                 res.send(flag);
                             }
-                        })
+                        });
                     } else {
                         flag = "User Exists";
                         res.send(flag);
@@ -398,8 +422,11 @@ exports.updateUser_nineteen68 = function updateUser_nineteen68(req, res) {
             var date;
             var flag = "fail";
             var status = false;
+			var userdetails=req.body.userinfo;
             var userObj = req.body.updateUserObj;
             var local_username = userObj.userName;
+			//needs to be sent from front end further on
+			var local_additionalroles = [""];
             var local_password = userObj.passWord;
             var local_firstname = userObj.firstName;
             var local_lastname = userObj.lastName;
@@ -413,10 +440,15 @@ exports.updateUser_nineteen68 = function updateUser_nineteen68(req, res) {
                 var salt = bcrypt.genSaltSync(10);
                 var req_hashedPassword = bcrypt.hashSync(local_password, salt);
             }
-            var getUserDetails = "select username,password,firstname,lastname,defaultrole,emailid,ldapuser from users where userid=" + local_user_Id;
-            dbConn.execute(getUserDetails, function(err, result) {
+            // var getUserDetails = "select username,password,firstname,lastname,defaultrole,emailid,ldapuser from users where userid=" + local_user_Id;
+            // dbConn.execute(getUserDetails, function(err, result) {
+			var inputs = {"query":"userdetails","userid":local_user_Id}
+			var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
+			client.post("http://127.0.0.1:1990/admin/updateUser_Nineteen68",args,
+					function (result, response) {
                 try {
-                    if (typeof result === 'undefined') {
+                    // if (typeof result === 'undefined') {
+					if(response.statusCode != 200 || result.rows == "fail"){	
                         var flag = "fail";
                         res.send(flag);
                     } else {
@@ -436,6 +468,7 @@ exports.updateUser_nineteen68 = function updateUser_nineteen68(req, res) {
                         if (local_lastname == undefined || local_lastname == 'undefined' || local_lastname == '') {
                             local_lastname = service.lastname;
                         }
+
                         if (local_role == undefined || local_role == 'undefined' || local_role == '') {
                             local_role = service.role;
                         }
@@ -448,8 +481,15 @@ exports.updateUser_nineteen68 = function updateUser_nineteen68(req, res) {
                                 req_hashedPassword = null;
                             }
                         }
+						var inputs = {};
                         if (db_password != "" && db_password != undefined) {
-                            var updateUser = "UPDATE users set username='" + local_username + "', password='" + db_password + "', firstname='" + local_firstname + "', lastname='" + local_lastname + "', modifiedby='" + local_username + "', modifiedon=" + new Date().getTime() + ", emailid='" + local_email_id + "' where userid=" + local_user_Id;
+                            // var updateUser = "UPDATE users set username='" + local_username + "', password='" + db_password + "', firstname='" + local_firstname + "', lastname='" + local_lastname + "', modifiedby='" + local_username + "', modifiedon=" + new Date().getTime() + ", emailid='" + local_email_id + "' where userid=" + local_user_Id;
+
+							inputs = {"query":"updateuser",
+							"userid":local_user_Id, "additionalroles":local_additionalroles,
+							"deactivated" :false,"emailid": local_email_id, "firstname":local_firstname, "lastname":local_lastname,
+							"ldapuser":result.rows[0].ldapuser, "modifiedby":userdetails.username,"modifiedbyrole":userdetails.role,
+							"password":db_password, "username":local_username};
 
                             updateUserHistory = "'username=" + local_username + ",password=" + db_password + "," +
                                 "firstname=" + local_firstname + ", lastname=" + local_lastname + ",modifiedby=" + local_username + "," +
@@ -459,7 +499,13 @@ exports.updateUser_nineteen68 = function updateUser_nineteen68(req, res) {
                             updateUserHistoryQuery = "update users set history= history + { " + updateUserHistoryTxn + " }" + " where userid = " + local_user_Id + " ";
 
                         } else {
-                            var updateUser = "UPDATE users set username='" + local_username + "', password='" + req_hashedPassword + "', firstname='" + local_firstname + "', lastname='" + local_lastname + "', modifiedby='" + local_username + "', modifiedon=" + new Date().getTime() + ", emailid='" + local_email_id + "' where userid=" + local_user_Id;
+                            // var updateUser = "UPDATE users set username='" + local_username + "', password='" + req_hashedPassword + "', firstname='" + local_firstname + "', lastname='" + local_lastname + "', modifiedby='" + local_username + "', modifiedon=" + new Date().getTime() + ", emailid='" + local_email_id + "' where userid=" + local_user_Id;
+
+							inputs = {"query":"updateuser",
+							"userid":local_user_Id, "additionalroles":local_additionalroles,
+							"deactivated" :false,"emailid": local_email_id, "firstname":local_firstname, "lastname":local_lastname,
+							"ldapuser":result.rows[0].ldapuser, "modifiedby":userdetails.username,"modifiedbyrole":userdetails.role,
+							"password":req_hashedPassword, "username":local_username};
 
                             updateUserHistory = "'username=" + local_username + ",password=" + db_password + "," +
                                 "firstname=" + local_firstname + ", lastname=" + local_lastname + ",modifiedby=" + local_username + "," +
@@ -469,10 +515,14 @@ exports.updateUser_nineteen68 = function updateUser_nineteen68(req, res) {
                             updateUserHistoryQuery = "update users set history= history + { " + updateUserHistoryTxn + " }" + " where userid = " + local_user_Id + " ";
 
                         }
-
-                        dbConn.execute(updateUser, function(err, result) {
+						var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
+							
+                        // dbConn.execute(updateUser, function(err, result) {
+						client.post("http://127.0.0.1:1990/admin/updateUser_Nineteen68",args,
+								function (result, response) {
                             try {
-                                if (typeof result === 'undefined') {
+                                // if (typeof result === 'undefined') {
+								if(response.statusCode != 200 || result.rows == "fail"){	
                                     var flag = "fail";
                                     res.send(flag);
                                 } else {
@@ -523,146 +573,6 @@ function fnUpdateUserHistory(updateUserHistoryQuery, updateUserHistoryCallback) 
         });
 };
 
-
-//Edit User
-exports.updateUser_nineteen68 = function updateUser_nineteen68(req, res) {
-    try {
-        if (req.cookies['connect.sid'] != undefined) {
-            var sessionCookie = req.cookies['connect.sid'].split(".");
-            var sessionToken = sessionCookie[0].split(":");
-            sessionToken = sessionToken[1];
-        }
-        if (sessionToken != undefined && req.session.id == sessionToken) {
-            var updateUserHistory;
-            var updateUserHistoryTxn; //History Txn Variable for create user in nineteen68
-            var updateUserHistoryQuery;
-            var date;
-            var flag = "fail";
-            var status = false;
-            var userObj = req.body.updateUserObj;
-            var local_username = userObj.userName;
-            var local_password = userObj.passWord;
-            var local_firstname = userObj.firstName;
-            var local_lastname = userObj.lastName;
-            var local_role;
-            //var local_role = userObj.role;
-            var local_email_id = userObj.email;
-            var local_user_Id = userObj.userId;
-            var db_password = '';
-            date = new Date().getTime();
-            if (local_password != "") {
-                var salt = bcrypt.genSaltSync(10);
-                var req_hashedPassword = bcrypt.hashSync(local_password, salt);
-            }
-            var getUserDetails = "select username,password,firstname,lastname,defaultrole,emailid,ldapuser from users where userid=" + local_user_Id;
-            dbConn.execute(getUserDetails, function(err, result) {
-                try {
-                    if (typeof result === 'undefined') {
-                        var flag = "fail";
-                        res.send(flag);
-                    } else {
-                        service = result.rows[0];
-                        if (local_username == undefined || local_username == 'undefined' || local_username == '') {
-                            local_username = service.username;
-                        }
-                        if (local_password.trim().length == 0) {
-                            db_password = service.password;
-                        } else {
-                            var salt = bcrypt.genSaltSync(10);
-                            var req_hashedPassword = bcrypt.hashSync(local_password, salt);
-                        }
-                        if (local_firstname == undefined || local_firstname == 'undefined' || local_firstname == '') {
-                            local_firstname = service.firstname;
-                        }
-                        if (local_lastname == undefined || local_lastname == 'undefined' || local_lastname == '') {
-                            local_lastname = service.lastname;
-                        }
-                        if (local_role == undefined || local_role == 'undefined' || local_role == '') {
-                            local_role = service.role;
-                        }
-                        if (local_email_id == undefined || local_email_id == 'undefined' || local_email_id == '') {
-                            local_email_id = service.emailid;
-                        }
-                        if (result.rows[0].ldapuser != null || result.rows[0].ldapuser != undefined) {
-                            if (result.rows[0].ldapuser) {
-                                db_password = null;
-                                req_hashedPassword = null;
-                            }
-                        }
-                        if (db_password != "" && db_password != undefined) {
-                            var updateUser = "UPDATE users set username='" + local_username + "', password='" + db_password + "', firstname='" + local_firstname + "', lastname='" + local_lastname + "', modifiedby='" + local_username + "', modifiedon=" + new Date().getTime() + ", emailid='" + local_email_id + "' where userid=" + local_user_Id;
-
-                            updateUserHistory = "'username=" + local_username + ",password=" + db_password + "," +
-                                "firstname=" + local_firstname + ", lastname=" + local_lastname + ",modifiedby=" + local_username + "," +
-                                "modifiedon=" + new Date().getTime() + ",emailid=" + local_email_id + " '";
-
-                            updateUserHistoryTxn = date + ":" + updateUserHistory;
-                            updateUserHistoryQuery = "update users set history= history + { " + updateUserHistoryTxn + " }" + " where userid = " + local_user_Id + " ";
-
-                        } else {
-                            var updateUser = "UPDATE users set username='" + local_username + "', password='" + req_hashedPassword + "', firstname='" + local_firstname + "', lastname='" + local_lastname + "', modifiedby='" + local_username + "', modifiedon=" + new Date().getTime() + ", emailid='" + local_email_id + "' where userid=" + local_user_Id;
-
-                            updateUserHistory = "'username=" + local_username + ",password=" + db_password + "," +
-                                "firstname=" + local_firstname + ", lastname=" + local_lastname + ",modifiedby=" + local_username + "," +
-                                "modifiedon=" + new Date().getTime() + ",emailid=" + local_email_id + " '";
-
-                            updateUserHistoryTxn = date + ":" + updateUserHistory;
-                            updateUserHistoryQuery = "update users set history= history + { " + updateUserHistoryTxn + " }" + " where userid = " + local_user_Id + " ";
-
-                        }
-
-                        dbConn.execute(updateUser, function(err, result) {
-                            try {
-                                if (typeof result === 'undefined') {
-                                    var flag = "fail";
-                                    res.send(flag);
-                                } else {
-                                    flag = "success";
-                                    fnUpdateUserHistory(updateUserHistoryQuery, function(err, response) {
-                                        if (response == 'success') {
-                                            res.send(flag);
-                                        } else {
-                                            flag = "fail";
-                                            res.send(flag);
-                                        }
-                                    });
-                                    //res.send(flag);
-                                }
-                            } catch (exception) {
-                                console.log(exception);
-                                res.send(flag);
-                            }
-                        });
-                    }
-                } catch (exception) {
-                    console.log(exception);
-                    res.send(flag);
-                }
-            });
-        } else {
-            res.send("Invalid Session");
-        }
-    } catch (exception) {
-        console.log(exception);
-        res.send("fail");
-    }
-};
-
-//Update User History Transaction
-function fnUpdateUserHistory(updateUserHistoryQuery, updateUserHistoryCallback) {
-
-    var statusFlag = "";
-    dbConnHistory.execute(updateUserHistoryQuery,
-        function(updateUserHistoryQuery, updateUserHistoryQueryRes) {
-            if (updateUserHistoryQuery) {
-                statusFlag = "Error occured in createUserTransactionHistory for screen : Fail";
-                updateUserHistoryCallback(null, statusFlag);
-            } else {
-                statusFlag = "success";
-                updateUserHistoryCallback(null, statusFlag);
-            }
-        });
-};
 //Get Domains
 exports.getDomains_ICE = function getDomains_ICE(req, res) {
 	try {
@@ -675,14 +585,17 @@ exports.getDomains_ICE = function getDomains_ICE(req, res) {
 			if(sessionToken != undefined && req.session.id == sessionToken)
 		{
 		var responsedata = [];
-		var domainsQuery = "select domainid,domainname from domains";
-		dbConnICE.execute(domainsQuery, function(error, response) {
+		// var domainsQuery = "select domainid,domainname from domains";
+		// dbConnICE.execute(domainsQuery, function(error, response) {
+			var args = {headers:{"Content-Type" : "application/json"}}
+			client.post("http://127.0.0.1:1990/admin/getDomains_ICE",args,
+						function (result, response) {
 			try{
-				if (error) {
+				// if (error) {
+				if(response.statusCode != 200 || result.rows == "fail"){	
 					res.send("fail");
-				} 
-				else {
-					async.forEachSeries(response.rows, function(eachdomain, domainscallback) {
+				}else {
+					async.forEachSeries(result.rows, function(eachdomain, domainscallback) {
 						try {
 							var reponseobj = {
 									domainId: "",
@@ -837,11 +750,15 @@ exports.createProject_ICE = function createProject_ICE(req, res) {
             async.series({
                 projecttype: function(callback) {
                     try {
-                        var queryGetProjectTypeId = "SELECT projecttypeid from projecttype where projecttypename = '" + createProjectObj.appType + "' ALLOW FILTERING";
-                        dbConnICE.execute(queryGetProjectTypeId, function(err, projectTypeData) {
+                        // var queryGetProjectTypeId = "SELECT projecttypeid from projecttype where projecttypename = '" + createProjectObj.appType + "' ALLOW FILTERING";
+                        // dbConnICE.execute(queryGetProjectTypeId, function(err, projectTypeData) {
+							var inputs={"query":"projecttype", "projecttype":createProjectObj.appType};
+							var args = {data:inputs,headers:{"Content-Type" : "application/json"}};
+							client.post("http://127.0.0.1:1990/admin/createProject_ICE",args,
+									function (projectTypeData, response) {
                             try {
-                                if (err) {
-
+                                // if (err) {
+								if(response.statusCode != 200 || projectTypeData.rows == "fail"){	
                                 } else {
                                     projectTypeId = projectTypeData.rows[0].projecttypeid;
                                 }
@@ -856,25 +773,34 @@ exports.createProject_ICE = function createProject_ICE(req, res) {
                 },
                 createproject: function(callback) {
                     try {
-                        var requestprojecthistorydetails = "'inserted project action by " + userinfo.username + " having role:" + userinfo.role + "" +
-                            " skucodetestcase=" + requestedskucode + ", tags=" + requestedtags + ", versionnumber=" + requestedversionnumber +
-                            " with the project Name " + createProjectObj.projectName + " '";
-                        newProjectID = uuid();
-                        var createProjectQuery = "INSERT INTO projects (domainid,projectname,projectid,createdby,createdon,deleted,history,projecttypeid,skucodeproject,tags) values(" +
-                            createProjectObj.domainId + ",'" + createProjectObj.projectName + "'," + newProjectID + ",'" + userinfo.username +
-                            "','" + new Date().getTime() + "'," + false + ",{" + dateScreen + ":" + requestprojecthistorydetails + "}," +
-                            projectTypeId + ",'" + requestedskucode + "',['" + requestedtags + "']);"
-
+                        // var requestprojecthistorydetails = "'inserted project action by " + userinfo.username + " having role:" + userinfo.role + "" +
+                        //     " skucodetestcase=" + requestedskucode + ", tags=" + requestedtags + ", versionnumber=" + requestedversionnumber +
+                        //     " with the project Name " + createProjectObj.projectName + " '";
+                        // newProjectID = uuid();
+                        // var createProjectQuery = "INSERT INTO projects (domainid,projectname,projectid,createdby,createdon,deleted,history,projecttypeid,skucodeproject,tags) values(" +
+                        //     createProjectObj.domainId + ",'" + createProjectObj.projectName + "'," + newProjectID + ",'" + userinfo.username +
+                        //     "','" + new Date().getTime() + "'," + false + ",{" + dateScreen + ":" + requestprojecthistorydetails + "}," +
+                        //     projectTypeId + ",'" + requestedskucode + "',['" + requestedtags + "']);"
+						var inputs={"query":"createproject", "domainid":createProjectObj.domainId,
+						"projectname": createProjectObj.projectName, "createdby":userinfo.username,"projecttypeid":projectTypeId,
+						"skucodeproject" : "skucodeproject", "tags":"tags"};
+						var args = {data:inputs,headers:{"Content-Type" : "application/json"}};
+						
                         createProjectHistory = "'domainid=" + createProjectObj.domainId + ", projectname=" + createProjectObj.projectName + ", projectid=" + newProjectID + ", createdby=" + userinfo.username + ", " +
                             "createdon=" + new Date().getTime() + ", deleted=" + false + ", projecttypeid=" + projectTypeId + ", " +
                             "skucodeproject=" + requestedskucode + ", tags=[" + requestedtags + "] '";
                         date = new Date().getTime();
 
                         createProjectHistoryQuery = "INSERT INTO projects (projectid,history) VALUES (" + newProjectID + ",{" + date + ":" + createProjectHistory + "})";
-                        dbConnICE.execute(createProjectQuery, function(err, insertProjectData) {
-                            if (err) {
-                                console.log(err);
+                        // dbConnICE.execute(createProjectQuery, function(err, insertProjectData) {
+                        //     if (err) {
+						newProjectID = "";
+						client.post("http://127.0.0.1:1990/admin/createProject_ICE",args,
+									function (insertProjectData, response) {
+							if(response.statusCode != 200 || insertProjectData.rows == "fail"){
+                                console.log(response.statusCode);
                             } else {
+								newProjectID = insertProjectData.rows[0].projectid;
                                 fnCreateProjectHistory(createProjectHistoryQuery, function(err, response) {
                                     if (err) {
                                         console.log(err);
@@ -906,14 +832,19 @@ exports.createProject_ICE = function createProject_ICE(req, res) {
                                 var cyclesLength = cycleNames.length;
                                 var cycleindex = 0;
                                 // cyclesLength=cycleNames.length;
-                                var requestReleasehistorydetails = "'inserted release action by " + userinfo.username + " having role:" + userinfo.role + "" +
-                                    " skucodetestcase=" + requestedskucode + ", tags=" + requestedtags + ", with the release Name " + releaseName + " '";
-                               var newReleaseID = uuid();
-                                //console.log("insideRelease", newProjectID);
-                                var createReleaseQuery = "INSERT INTO releases (projectid,releasename,releaseid,createdby,createdon,deleted,history,skucoderelease,tags) values(" +
-                                    newProjectID + ",'" + releaseName + "'," + newReleaseID + ",'" + userinfo.username + "','" +
-                                    new Date().getTime() + "'," + false + ",{" + dateScreen + ":" + requestReleasehistorydetails + "},'" +
-                                    requestedskucode + "',['" + requestedtags + "']);"
+                            //     var requestReleasehistorydetails = "'inserted release action by " + userinfo.username + " having role:" + userinfo.role + "" +
+                            //         " skucodetestcase=" + requestedskucode + ", tags=" + requestedtags + ", with the release Name " + releaseName + " '";
+                               var newReleaseID = "";
+                            //     //console.log("insideRelease", newProjectID);
+                            //     var createReleaseQuery = "INSERT INTO releases (projectid,releasename,releaseid,createdby,createdon,deleted,history,skucoderelease,tags) values(" +
+                            //         newProjectID + ",'" + releaseName + "'," + newReleaseID + ",'" + userinfo.username + "','" +
+                            //         new Date().getTime() + "'," + false + ",{" + dateScreen + ":" + requestReleasehistorydetails + "},'" +
+                            //         requestedskucode + "',['" + requestedtags + "']);"
+								var inputs={"query":"createrelease", "projectid":newProjectID,
+									"releasename": releaseName, "createdby":userinfo.username,
+									"skucoderelease" : "skucoderelease", "tags":"tags"};
+								var args = {data:inputs,headers:{"Content-Type" : "application/json"}};
+
                                 createReleaseHistory = "'projectid=" + newProjectID + ", releasename=" + releaseName + ", releaseid=" + newReleaseID + ", createdby=" + userinfo.username + ", " +
                                     "createdon=" + new Date().getTime() + ", deleted=" + false + ", skucoderelease=" + requestedskucode + ", " +
                                     "tags=" + requestedtags + " '";
@@ -921,12 +852,16 @@ exports.createProject_ICE = function createProject_ICE(req, res) {
 
                                 createReleaseHistoryQuery = "INSERT INTO releases (projectid,releaseid,history) VALUES (" + newProjectID + "," + newReleaseID + ",{" + date + ":" + createReleaseHistory + "})";
 								
-
+								client.post("http://127.0.0.1:1990/admin/createProject_ICE",args,
+									function (data, response) {
+								if(response.statusCode != 200 || data.rows == "fail"){
                                 //History Insert for release name
-                                dbConnICE.execute(createReleaseQuery, function(err, data) {
-                                    if (err) {
-                                        console.log(err);
+                                // dbConnICE.execute(createReleaseQuery, function(err, data) {
+                                //     if (err) {
+                                        // console.log(err);
+										 console.log(response.statusCode);
                                     } else {
+											newReleaseID  = data.rows[0].releaseid;
 											fnCreateReleaseHistory(createReleaseHistoryQuery, function(err, response) {
 													if (err) {
 														console.log(err);
@@ -939,18 +874,24 @@ exports.createProject_ICE = function createProject_ICE(req, res) {
                                                 var createCycleHistoryQuery
                                                 var date;
                                                 var eachCycleName = cycleName;
-                                                var requestCyclehistorydetails = "'inserted cycle action by " + userinfo.username + " having role:" + userinfo.role + "" +
-                                                    " skucodetestcase=" + requestedskucode + ", tags=" + requestedtags + ",with the cycle Name " + eachCycleName + " '";
+                                                // var requestCyclehistorydetails = "'inserted cycle action by " + userinfo.username + " having role:" + userinfo.role + "" +
+                                                //     " skucodetestcase=" + requestedskucode + ", tags=" + requestedtags + ",with the cycle Name " + eachCycleName + " '";
                                                 var newCycleID = uuid();
-                                                var getCycleQuery = "INSERT INTO cycles (releaseid,cyclename,cycleid,createdby,createdon,deleted,history,skucodecycle,tags) VALUES (" + newReleaseID + ",'" + eachCycleName + "'," + newCycleID + ",'" + userinfo.username + "','" +
-                                                    new Date().getTime() + "'," + false + ",{" + dateScreen + ":" + requestCyclehistorydetails + "},'" +
-                                                    requestedskucode + "',['" + requestedtags + "']);"
+                                                // var getCycleQuery = "INSERT INTO cycles (releaseid,cyclename,cycleid,createdby,createdon,deleted,history,skucodecycle,tags) VALUES (" + newReleaseID + ",'" + eachCycleName + "'," + newCycleID + ",'" + userinfo.username + "','" +
+                                                //     new Date().getTime() + "'," + false + ",{" + dateScreen + ":" + requestCyclehistorydetails + "},'" +
+                                                //     requestedskucode + "',['" + requestedtags + "']);"
+
+												var inputs={"query":"createcycle", "releaseid":newReleaseID,
+													"cyclename": eachCycleName, "createdby":userinfo.username,
+													"skucodecycle" : "skucodecycle", "tags":"tags"};
+												var args = {data:inputs,headers:{"Content-Type" : "application/json"}};
+
                                                 createCycleHistory = "'releaseid=" + newReleaseID + ", cyclename=" + eachCycleName + ", cycleid=" + newCycleID + ", createdby=" + userinfo.username + ", " +
                                                     "createdon=" + new Date().getTime() + ", deleted=" + false + ", skucodecycle=" + requestedskucode + ", " +
                                                     "tags=" + requestedtags + " '";
                                                 date = new Date().getTime();
                                                 createCycleHistoryQuery = "INSERT INTO cycles (releaseid,cycleid,history) VALUES (" + newReleaseID + "," + newCycleID + ",{" + date + ":" + createCycleHistory + "})";
-                                                createCycle(getCycleQuery, function(error, response) {
+                                                createCycle(args, function(error, response) {
                                                     try {
                                                         if (error) {
                                                             res.send(error);
@@ -1104,11 +1045,14 @@ function createRelease(createReleaseQuery,createReleaseCallback){
 	});
 };
 
-function createCycle(createCycleQuery,createCycleCallback){
+function createCycle(args,createCycleCallback){
 	var statusFlag="";
-	dbConnICE.execute(createCycleQuery,function(createCycleerror, createCycleresponse){
+	// dbConnICE.execute(createCycleQuery,function(createCycleerror, createCycleresponse){
+	client.post("http://127.0.0.1:1990/admin/createProject_ICE",args,
+			function (result, response) {
 		try{
-			if(createCycleerror){
+			// if(createCycleerror){
+			if(response.statusCode != 200 || result.rows == "fail"){	
 				statusFlag="Error occured in createCycle of createProject_ICE : Fail";
 				createCycleCallback(statusFlag,null);
 			}else{
@@ -1159,26 +1103,41 @@ exports.updateProject_ICE = function updateProject_ICE(req, res){
 								" skucoderelease=" + requestedskucode + ", tags=" + requestedtags + ", with the release Name " + releaseName + " '";
 								var newReleaseID = uuid();
 								//console.log("insideRelease", newProjectID);
-								var createReleaseQuery = "INSERT INTO releases (projectid,releasename,releaseid,createdby,createdon,deleted,history,skucoderelease,tags) values(" +
-								requestedprojectid + ",'" + releaseName + "'," + newReleaseID + ",'" + userinfo.username + "','" +
-								new Date().getTime() + "'," + false + ",{" + date + ":" + requestReleasehistorydetails + "},'" +
-								requestedskucode + "',['" + requestedtags + "']);"
-								dbConnICE.execute(createReleaseQuery, function(err, data) {
+								// var createReleaseQuery = "INSERT INTO releases (projectid,releasename,releaseid,createdby,createdon,deleted,history,skucoderelease,tags) values(" +
+								// requestedprojectid + ",'" + releaseName + "'," + newReleaseID + ",'" + userinfo.username + "','" +
+								// new Date().getTime() + "'," + false + ",{" + date + ":" + requestReleasehistorydetails + "},'" +
+								// requestedskucode + "',['" + requestedtags + "']);"
+								// dbConnICE.execute(createReleaseQuery, function(err, data) {
+									var inputs={"query":"createrelease", "projectid":requestedprojectid,
+									"releasename": releaseName, "createdby":userinfo.username,
+									"skucoderelease" : "skucoderelease", "tags":"tags"};
+									var args = {data:inputs,headers:{"Content-Type" : "application/json"}};
+									client.post("http://127.0.0.1:1990/admin/createProject_ICE",args,
+									function (data, response) {
+								
 									try{    
-										if (err) {
-											console.log(err);
+										// if (err) {
+										// 	console.log(err);
+										if(response.statusCode != 200 || data.rows == "fail"){
+											console.log(response.statusCode);
 										} else {
+											newReleaseID  = data.rows[0].releaseid;
 											async.forEachSeries(cycleDetails, function(eachCycleDetail, cycleNamescallback) {
 												try{     
 													var eachCycleName = eachCycleDetail.cycleName;
 													var requestCyclehistorydetails = "'inserted cycle action by " + userinfo.username + " having role:" + userinfo.role + "" +
 													" skucodecycle=" + requestedskucode + ", tags=" + requestedtags + ",with the cycle Name " + eachCycleName + " '";
 													var newCycleID = uuid();
-													var getCycleQuery = "INSERT INTO cycles (releaseid,cyclename,cycleid,createdby,createdon,deleted,history,skucodecycle,tags) VALUES (" + 
-													newReleaseID + ",'" + eachCycleName + "'," + newCycleID + ",'" + userinfo.username + "','" +
-													new Date().getTime() + "'," + false + ",{" + date + ":" + requestCyclehistorydetails + "},'" +
-													requestedskucode + "',['" + requestedtags + "']);"
-													createCycle(getCycleQuery, function(error, response) {
+													// var getCycleQuery = "INSERT INTO cycles (releaseid,cyclename,cycleid,createdby,createdon,deleted,history,skucodecycle,tags) VALUES (" + 
+													// newReleaseID + ",'" + eachCycleName + "'," + newCycleID + ",'" + userinfo.username + "','" +
+													// new Date().getTime() + "'," + false + ",{" + date + ":" + requestCyclehistorydetails + "},'" +
+													// requestedskucode + "',['" + requestedtags + "']);"
+													var inputs={"query":"createcycle", "releaseid":newReleaseID,
+													"cyclename": eachCycleName, "createdby":userinfo.username,
+													"skucodecycle" : "skucodecycle", "tags":"tags"};
+													var args = {data:inputs,headers:{"Content-Type" : "application/json"}};
+													createCycle(args, function(error, response) {
+													// createCycle(getCycleQuery, function(error, response) {
 														if (error) {
 															res.send(error);
 														} else {
@@ -1214,11 +1173,17 @@ exports.updateProject_ICE = function updateProject_ICE(req, res){
 										var requestCyclehistorydetails = "'inserted cycle action by " + userinfo.username + " having role:" + userinfo.role + "" +
 										" skucodecycle=" + requestedskucode + ", tags=" + requestedtags + ",with the cycle Name " + eachCycleName + " '";
 										var newCycleID = uuid();
-										var getCycleQuery = "INSERT INTO cycles (releaseid,cyclename,cycleid,createdby,createdon,deleted,history,skucodecycle,tags) VALUES (" + 
-										releaseId + ",'" + eachCycleName + "'," + newCycleID + ",'" + userinfo.username + "','" +
-										new Date().getTime() + "'," + false + ",{" + date + ":" + requestCyclehistorydetails + "},'" +
-										requestedskucode + "',['" + requestedtags + "']);"
-										createCycle(getCycleQuery, function(error, response) {
+										// var getCycleQuery = "INSERT INTO cycles (releaseid,cyclename,cycleid,createdby,createdon,deleted,history,skucodecycle,tags) VALUES (" + 
+										// releaseId + ",'" + eachCycleName + "'," + newCycleID + ",'" + userinfo.username + "','" +
+										// new Date().getTime() + "'," + false + ",{" + date + ":" + requestCyclehistorydetails + "},'" +
+										// requestedskucode + "',['" + requestedtags + "']);"
+										// createCycle(getCycleQuery, function(error, response) {
+											
+										var inputs={"query":"createcycle", "releaseid":releaseId,
+										"cyclename": eachCycleName, "createdby":userinfo.username,
+										"skucodecycle" : "skucodecycle", "tags":"tags"};
+										var args = {data:inputs,headers:{"Content-Type" : "application/json"}};
+										createCycle(args, function(error, response) {
 											if (error) {
 												res.send(error);
 											} else {
@@ -1249,22 +1214,34 @@ exports.updateProject_ICE = function updateProject_ICE(req, res){
 						try{   
 							var deleteStatus=eachprojectDetail.deleteStatus;
 							if(deleteStatus){
-								var deleteReleaseQuery="delete from releases where releasename='"+eachprojectDetail.releaseName+
-								"' and projectid="+requestedprojectid+" and releaseid="+eachprojectDetail.releaseId;
+								// var deleteReleaseQuery="delete from releases where releasename='"+eachprojectDetail.releaseName+
+								// "' and projectid="+requestedprojectid+" and releaseid="+eachprojectDetail.releaseId;
 								// console.log(deleteReleaseQuery);
-								dbConnICE.execute(deleteReleaseQuery, function(deleteReleaseQueryerror, deleteReleaseQueryresponse) {
+								// dbConnICE.execute(deleteReleaseQuery, function(deleteReleaseQueryerror, deleteReleaseQueryresponse) {
+									var inputs = {"query": "deleterelease","releasename":eachprojectDetail.releaseName,
+									"projectid":requestedprojectid,"releaseid":eachprojectDetail.releaseId};
+									var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
+									client.post("http://127.0.0.1:1990/admin/updateProject_ICE",args,
+												function (result, response) {
 									try{
-										if(deleteReleaseQueryerror){
+										// if(deleteReleaseQueryerror){
+										if(response.statusCode != 200 || result.rows == "fail"){	
 											flag="Error in deleteRelease-updateProject_ICE : Fail";
 											res.send(flag);
 										}else{
 											var cyclesOfRelease=eachprojectDetail.cycleDetails;
 											async.forEachSeries(cyclesOfRelease, function(eachCycleDetail, eachCycleCallback) {
 												try{
-													var deleteCyclesQuery="delete from cycles where cyclename='"+eachCycleDetail.cycleName+
-													"' and releaseid="+eachprojectDetail.releaseId+" and cycleid="+eachCycleDetail.cycleId;
-													dbConnICE.execute(deleteCyclesQuery, function(deleteCyclesQueryerror, deleteCyclesQueryresponse) {
-														if(deleteCyclesQueryerror){
+													// var deleteCyclesQuery="delete from cycles where cyclename='"+eachCycleDetail.cycleName+
+													// "' and releaseid="+eachprojectDetail.releaseId+" and cycleid="+eachCycleDetail.cycleId;
+													// dbConnICE.execute(deleteCyclesQuery, function(deleteCyclesQueryerror, deleteCyclesQueryresponse) {
+													var inputs = {"query": "deletecycle","cyclename":eachCycleDetail.cycleName,
+														"releaseid":eachprojectDetail.releaseId,"cycleid":eachCycleDetail.cycleId};
+													var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
+													client.post("http://127.0.0.1:1990/admin/updateProject_ICE",args,
+																function (result, response) {
+														// if(deleteCyclesQueryerror){
+														if(response.statusCode != 200 || result.rows == "fail"){	
 															flag="Error in deleteCycles(true)-updateProject_ICE : Fail";
 															res.send(flag);
 														}else{
@@ -1289,10 +1266,17 @@ exports.updateProject_ICE = function updateProject_ICE(req, res){
 											if(deleteStatusCycles){
 												try{
 													var cyclesOfRelease=eachCycleDetail.cycleDetails;
-													var deleteCyclesQuery="delete from cycles where cyclename='"+eachCycleDetail.cycleName+
-													"' and releaseid="+eachprojectDetail.releaseId+" and cycleid="+eachCycleDetail.cycleId;
-													dbConnICE.execute(deleteCyclesQuery, function(deleteCyclesQueryerror, deleteCyclesQueryresponse) {
-														if(deleteCyclesQueryerror){
+													// var deleteCyclesQuery="delete from cycles where cyclename='"+eachCycleDetail.cycleName+
+													// "' and releaseid="+eachprojectDetail.releaseId+" and cycleid="+eachCycleDetail.cycleId;
+													// dbConnICE.execute(deleteCyclesQuery, function(deleteCyclesQueryerror, deleteCyclesQueryresponse) {
+													// 	if(deleteCyclesQueryerror){
+													var inputs = {"query": "deletecycle","cyclename":eachCycleDetail.cycleName,
+														"releaseid":eachprojectDetail.releaseId,"cycleid":eachCycleDetail.cycleId};
+													var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
+													client.post("http://127.0.0.1:1990/admin/updateProject_ICE",args,
+																function (result, response) {
+														// if(deleteCyclesQueryerror){
+														if(response.statusCode != 200 || result.rows == "fail"){
 															flag="Error in deleteCycles(false)-updateProject_ICE : Fail";
 															res.send(flag);
 														}else{
@@ -1371,11 +1355,16 @@ exports.updateProject_ICE = function updateProject_ICE(req, res){
 																						try{
 																							var requestCyclehistorydetails = "'inserted cycle action by " + userinfo.username + " having role:" + userinfo.role + "" +
 																							" skucodecycle=" + requestedskucode + ", tags=" + requestedtags + ",with the cycle Name " + newCycleName + " '";
-																							var getCycleQuery = "INSERT INTO cycles (releaseid,cyclename,cycleid,createdby,createdon,deleted,history,skucodecycle,tags) VALUES (" + 
-																							releaseId + ",'" + newCycleName + "'," + cycleId + ",'" + userinfo.username + "','" +
-																							new Date().getTime() + "'," + false + ",{" + date + ":" + requestCyclehistorydetails + "},'" +
-																							requestedskucode + "',['" + requestedtags + "']);"
-																							createCycle(getCycleQuery, function(error, response) {
+																							// var getCycleQuery = "INSERT INTO cycles (releaseid,cyclename,cycleid,createdby,createdon,deleted,history,skucodecycle,tags) VALUES (" + 
+																							// releaseId + ",'" + newCycleName + "'," + cycleId + ",'" + userinfo.username + "','" +
+																							// new Date().getTime() + "'," + false + ",{" + date + ":" + requestCyclehistorydetails + "},'" +
+																							// requestedskucode + "',['" + requestedtags + "']);"
+																							// createCycle(getCycleQuery, function(error, response) {
+																							var inputs={"query":"createcycle", "releaseid":releaseId,
+																								"cyclename": newCycleName, "createdby":userinfo.username,
+																								"skucodecycle" : "skucodecycle", "tags":"tags"};
+																							var args = {data:inputs,headers:{"Content-Type" : "application/json"}};
+																							createCycle(args, function(error, response) {
 																								if (error) {
 																									res.send(error);
 																								} else {
@@ -1437,11 +1426,16 @@ exports.updateProject_ICE = function updateProject_ICE(req, res){
 															try{
 																var requestCyclehistorydetails = "'inserted cycle action by " + userinfo.username + " having role:" + userinfo.role + "" +
 																" skucodecycle=" + requestedskucode + ", tags=" + requestedtags + ",with the cycle Name " + newCycleName + " '";
-																var getCycleQuery = "INSERT INTO cycles (releaseid,cyclename,cycleid,createdby,createdon,deleted,history,skucodecycle,tags) VALUES (" + 
-																releaseId + ",'" + newCycleName + "'," + cycleId + ",'" + userinfo.username + "','" +
-																new Date().getTime() + "'," + false + ",{" + date + ":" + requestCyclehistorydetails + "},'" +
-																requestedskucode + "',['" + requestedtags + "']);"
-																createCycle(getCycleQuery, function(error, response) {
+																// var getCycleQuery = "INSERT INTO cycles (releaseid,cyclename,cycleid,createdby,createdon,deleted,history,skucodecycle,tags) VALUES (" + 
+																// releaseId + ",'" + newCycleName + "'," + cycleId + ",'" + userinfo.username + "','" +
+																// new Date().getTime() + "'," + false + ",{" + date + ":" + requestCyclehistorydetails + "},'" +
+																// requestedskucode + "',['" + requestedtags + "']);"
+																// createCycle(getCycleQuery, function(error, response) {
+																var inputs={"query":"createcycle", "releaseid":releaseId,
+																		"cyclename": newCycleName, "createdby":userinfo.username,
+																		"skucodecycle" : "skucodecycle", "tags":"tags"};
+																var args = {data:inputs,headers:{"Content-Type" : "application/json"}};
+																createCycle(args, function(error, response) {
 																	if (error) {
 																		res.send(error);
 																	} else {
@@ -1520,7 +1514,7 @@ exports.getNames_ICE = function(req, res){
 				idtypes:[]
 		}
 		if(requestedidslist.length == idtypes.length){
-			var queryString="";
+			// var queryString="";
 			for(var eachid=0; eachid<requestedidslist.length; eachid++){
 				if(requestedidslist[eachid] != null && requestedidslist[eachid] != undefined && requestedidslist[eachid].trim() != ''){
 					//in this block all projects under the domain is the response.
@@ -1529,8 +1523,9 @@ exports.getNames_ICE = function(req, res){
 								projectIds:[],
 								projectNames:[]
 						}
-						queryString="select projectid,projectname from projects where domainid="+requestedidslist[eachid];
-						namesfetcher(queryString,function(error,response){
+						// queryString="select projectid,projectname from projects where domainid="+requestedidslist[eachid];
+
+						namesfetcher(requestedidslist[eachid],"domainsall",function(error,response){
 							try{
 								if(response.length<=0){
 									res.send("No Projects");
@@ -1552,8 +1547,8 @@ exports.getNames_ICE = function(req, res){
 						});
 					}else if(idtypes[eachid] == 'projects'){
 						//in this block project name and project id of the respective id is sent
-						queryString="select projectid,projectname from projects where projectid="+requestedidslist[eachid];
-						namesfetcher(queryString,function(error,response){
+						// queryString="select projectid,projectname from projects where projectid="+requestedidslist[eachid];
+						namesfetcher(requestedidslist[eachid],"projects",function(error,response){
 							try{
 								responsedata.idtypes.push('projects');
 								responsedata.requestedids.push(response[0].projectid);
@@ -1569,8 +1564,8 @@ exports.getNames_ICE = function(req, res){
 						});
 					}else if(idtypes[eachid] == 'releases'){
 						//in this block release name and release id of the respective id is sent
-						queryString="select releaseid,releasename from releases where releaseid="+requestedidslist[eachid];
-						namesfetcher(queryString,function(error,response){
+						// queryString="select releaseid,releasename from releases where releaseid="+requestedidslist[eachid];
+						namesfetcher(requestedidslist[eachid],"releases",function(error,response){
 							try{
 								responsedata.idtypes.push('releases');
 								responsedata.requestedids.push(response[0].releaseid);
@@ -1587,8 +1582,8 @@ exports.getNames_ICE = function(req, res){
 						});
 					}else if(idtypes[eachid] == 'cycles'){
 						//in this block cycle name and cycle id of the respective id is sent
-						queryString="select cycleid,cyclename from cycles where cycleid="+requestedidslist[eachid];
-						namesfetcher(queryString,function(error,response){
+						// queryString="select cycleid,cyclename from cycles where cycleid="+requestedidslist[eachid];
+						namesfetcher(requestedidslist[eachid],"cycles",function(error,response){
 							try{
 								responsedata.idtypes.push('cycles');
 								responsedata.requestedids.push(response[0].cycleid);
@@ -1615,10 +1610,16 @@ exports.getNames_ICE = function(req, res){
 			res.send("fail");
 		}
 
-		function namesfetcher(queryString,namesfetchercallback){
-			dbConnICE.execute(queryString, function(queryStringerr, queryStringresult){
+		function namesfetcher(id,query,namesfetchercallback){
+			// dbConnICE.execute(queryString, function(queryStringerr, queryStringresult){
+			// 	try{
+			// 		if(queryStringerr){
+			var inputs = {"id" :id, "query" : query}
+			var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
+			client.post("http://127.0.0.1:1990/admin/getNames_ICE",args,
+						function (queryStringresult, response) {
 				try{
-					if(queryStringerr){
+					if(response.statusCode != 200 || queryStringresult.rows == "fail"){
 						statusFlag="Error occured in namesfetcher : Fail";
 						namesfetchercallback(statusFlag,null);
 					}else{
@@ -1647,6 +1648,7 @@ exports.getNames_ICE = function(req, res){
  * service renders all the details of the child type
  * if domainid is provided all projects in domain is returned
  * if projectid is provided all release and cycle details is returned
+ * if cycleid is provided, testsuite details is returned
  * date 03/04/2017
  */
 exports.getDetails_ICE = function(req, res) {
@@ -1677,8 +1679,8 @@ exports.getDetails_ICE = function(req, res) {
 									projectIds: [],
 									projectNames: []
 							}
-							queryString = "select projectid,projectname from projects where domainid=" + requestedid;
-							queryExecutor(queryString, function(error, response) {
+							// queryString = "select projectid,projectname from projects where domainid=" + requestedid;
+							queryExecutor(requestedid,"domaindetails","subquery", function(error, response) {
 								if (error) {
 									try {
 										res.send("Error in getDetails_ICE_domaindetails : Fail");
@@ -1718,8 +1720,10 @@ exports.getDetails_ICE = function(req, res) {
 									projectId: "",
 									projectDetails: []
 							}
-							var queryForProjectTypeId = "select projecttypeid,projectname from projects where projectid=" + requestedid;
-							queryExecutor(queryForProjectTypeId, function(queryForProjectTypeIderror, queryForProjectTypeIdresponse) {
+							// var queryForProjectTypeId = "select projecttypeid,projectname from projects where projectid=" + requestedid;
+
+							queryExecutor(requestedid,"projectsdetails","projecttypeid", 
+										function(queryForProjectTypeIderror, queryForProjectTypeIdresponse) {
 								if (queryForProjectTypeIderror) {
 									try {
 										res.send(queryForProjectTypeIderror);
@@ -1731,8 +1735,9 @@ exports.getDetails_ICE = function(req, res) {
 										for (var i = 0; i < queryForProjectTypeIdresponse.length; i++) {
 											responsedata.projectName = queryForProjectTypeIdresponse[i].projectname;
 											responsedata.projectId = queryForProjectTypeIdresponse[i].projecttypeid;
-											var queryForProjectType = "select projecttypename from projecttype where projecttypeid=" + queryForProjectTypeIdresponse[i].projecttypeid;
-											queryExecutor(queryForProjectType, function(queryForProjectTypeerror, queryForProjectTyperesponse) {
+											// var queryForProjectType = "select projecttypename from projecttype where projecttypeid=" + queryForProjectTypeIdresponse[i].projecttypeid;
+											queryExecutor(queryForProjectTypeIdresponse[i].projecttypeid,"projectsdetails","projecttypename", 
+													function(queryForProjectTypeerror, queryForProjectTyperesponse) {
 												if (queryForProjectTypeerror) {
 													try {
 														res.send(queryForProjectTypeerror);
@@ -1743,8 +1748,9 @@ exports.getDetails_ICE = function(req, res) {
 													try {
 														for (var indexofName = 0; indexofName < queryForProjectTyperesponse.length; indexofName++) {
 															responsedata.appType = queryForProjectTyperesponse[indexofName].projecttypename;
-															var queryGetReleases = "select releaseid,releasename from releases where projectid=" + requestedid;
-															queryExecutor(queryGetReleases, function(queryGetReleaseserror, queryGetReleasesresponse) {
+															// var queryGetReleases = "select releaseid,releasename from releases where projectid=" + requestedid;
+															queryExecutor(requestedid,"projectsdetails","releasedetails", 
+																	 function(queryGetReleaseserror, queryGetReleasesresponse) {
 																if (queryGetReleaseserror) {
 																	try {
 																		res.send(queryGetReleasesQueryerror);
@@ -1757,8 +1763,9 @@ exports.getDetails_ICE = function(req, res) {
 																			function(eachRelease, releasecallback) {
 																		try {
 																			eachProjectDetail = {};
-																			var queryGetCycles = "select cycleid,cyclename from cycles where releaseid=" + eachRelease.releaseid;
-																			queryExecutor(queryGetCycles, function(queryGetCycleserror, queryGetCyclesresponse) {
+																			// var queryGetCycles = "select cycleid,cyclename from cycles where releaseid=" + eachRelease.releaseid;
+																			queryExecutor(eachRelease.releaseid,"projectsdetails","cycledetails",  
+																					function(queryGetCycleserror, queryGetCyclesresponse) {
 																				try {
 																					if (queryGetCycleserror) {
 																						try {
@@ -1828,8 +1835,9 @@ exports.getDetails_ICE = function(req, res) {
 								testsuiteIds: [],
 								testsuiteNames: []
 						}
-						queryString = "select testsuiteid,testsuitename from testsuites where cycleid=" + requestedid;
-						queryExecutor(queryString, function(error, response) {
+						//queryString = "select testsuiteid,testsuitename from testsuites where cycleid=" + requestedid;
+						queryExecutor(requestedid,"cycledetails","subquery",
+									function(error, response) {
 							if (error) {
 								try {
 									res.send("Error in getDetails_ICE_cycledetails : Fail");
@@ -1870,12 +1878,17 @@ exports.getDetails_ICE = function(req, res) {
 			}
 		}
 
-		function queryExecutor(queryString, queryExecutorcallback) {
+		function queryExecutor(id,query,subquery, queryExecutorcallback) {
 			// console.log(queryString);
-			dbConnICE.execute(queryString,
-					function(queryStringerr, queryStringresult) {
+			
+			var inputs = {"id" :id, "query" : query, "subquery":subquery}
+			var args = {data:inputs,headers:{"Content-Type" : "application/json"}}	
+			// dbConnICE.execute(queryString,function(queryStringerr, queryStringresult) {
+			client.post("http://127.0.0.1:1990/admin/getDetails_ICE",args,
+				function (queryStringresult, response) {
 				try{
-					if (queryStringerr) {
+					// if (queryStringerr) {
+					if(response.statusCode != 200 || queryStringresult.rows == "fail"){
 						statusFlag = "Error occured in queryExecutor : Fail";
 						queryExecutorcallback(statusFlag, null);
 					} else {
@@ -1924,18 +1937,38 @@ exports.assignProjects_ICE = function(req, res) {
             var assignProjectsDetails = req.body.assignProjectsObj;
             var projectDetails = assignProjectsDetails.assignedProjects;
             var projectIds = [];
+			var alreadyassigned=false;
             for (var i = 0; i < projectDetails.length; i++) {
                 projectIds.push(projectDetails[i].projectId);
             }
-            var assignProjectsToUsers = "INSERT INTO icepermissions (userid,domainid,createdby,createdon,history,modifiedby,modifiedbyrole,modifiedon,projectids) VALUES (" + assignProjectsDetails.userId + "," + assignProjectsDetails.domainId + ",'" + assignProjectsDetails.userInfo.username + "','" + new Date().getTime() + "',null,'" + assignProjectsDetails.userInfo.username + "','" + assignProjectsDetails.userInfo.role + "','" + new Date().getTime() + "',[" + projectIds + "]);"
-
+			var inputs={};
+            if(assignProjectsDetails.getAssignedProjectsLen > 0)
+			{
+				// var assignProjectsToUsers = "UPDATE icepermissions set modifiedby='" + assignProjectsDetails.userInfo.username + "', modifiedon=" + new Date().getTime() + ",modifiedbyrole='" + assignProjectsDetails.userInfo.role + "', projectids=[" + projectIds + "] where userid=" + assignProjectsDetails.userId;
+				alreadyassigned=true;
+				inputs = {"alreadyassigned":alreadyassigned, "userid":assignProjectsDetails.userId,"domainid":assignProjectsDetails.domainId,
+				"modifiedbyrole":assignProjectsDetails.userInfo.role,"modifiedby":assignProjectsDetails.userInfo.username,
+				"projectids":projectIds}
+			}
+			else{
+				//    var assignProjectsToUsers = "INSERT INTO icepermissions (userid,domainid,createdby,createdon,history,projectids) VALUES (" + assignProjectsDetails.userId + "," + assignProjectsDetails.domainId + ",'" + assignProjectsDetails.userInfo.username + "','" + new Date().getTime() + "',null,[" + projectIds + "]);"
+				inputs = {"alreadyassigned":alreadyassigned, "userid":assignProjectsDetails.userId,"domainid":assignProjectsDetails.domainId,
+				"createdby":assignProjectsDetails.userInfo.username,
+				"projectids":projectIds}
+			}
             assignProjectsHistory = "'userid=" + assignProjectsDetails.userId + ", domainid=" + assignProjectsDetails.domainId + ", createdby=" + assignProjectsDetails.userInfo.username + ", createdon=" + new Date().getTime() + ", " +
                 "modifiedby=" + assignProjectsDetails.userInfo.username + ", modifiedbyrole=" + assignProjectsDetails.userInfo.role + ", modifiedon=" + new Date().getTime() + ", " +
                 "projectids=[" + projectIds + "] '";
             date = new Date().getTime();
             assignProjectsHistoryQuery = "INSERT INTO icepermissions (userid,history) VALUES (" + userId + ",{" + date + ":" + assignProjectsHistory + "})";
-            dbConnICE.execute(assignProjectsToUsers, function(err, result) {
-                if (err) {
+
+			var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
+			client.post("http://127.0.0.1:1990/admin/assignProjects_ICE",args,
+			function (result, response) {
+				if(response.statusCode != 200 || result.rows == "fail"){	
+            // dbConnICE.execute(assignProjectsToUsers, function(err, result) {
+            //     if (err) {
+
                     res.send("fail");
                 } else {
                     fnAssignProjectsHistory(assignProjectsHistoryQuery, function(err, response) {
@@ -1990,12 +2023,17 @@ if(req.cookies['connect.sid'] != undefined)
 		var requestDetails = req.body.getAssignProj;
 		var assignedProjectIds =[];
 		var assignedProjObj = [];
-		var getAssignedProjects = "Select projectids from icepermissions where userid = "+requestDetails.userId+" and domainid = "+requestDetails.domainId+"";
+		// var getAssignedProjects = "Select projectids from icepermissions where userid = "+requestDetails.userId+" and domainid = "+requestDetails.domainId+"";
 		//console.log(getAssignedProjects);
-		dbConnICE.execute(getAssignedProjects, function (err, result) {
+		// dbConnICE.execute(getAssignedProjects, function (err, result) {
+			var inputs = { "query":"projectid","domainid":requestDetails.domainId,"userid":requestDetails.userId}
+			var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
+			client.post("http://127.0.0.1:1990/admin/getAssignedProjects_ICE",args,
+					function (result, response) {
 			try{
-				if (err) {
-					console.log("Error::::",err);
+				// if (err) {
+				if(response.statusCode != 200 || result.rows == "fail"){	
+					// console.log("Error::::",err);
 					res.send("fail");
 				}
 				else {
@@ -2005,11 +2043,16 @@ if(req.cookies['connect.sid'] != undefined)
 					}
 					async.forEachSeries(assignedProjectIds,function(iterator,assignProjectCallback){
 						try{
-							var getProjectNames = "Select projectname from projects where projectid = "+iterator+"";
-							dbConnICE.execute(getProjectNames, function (err, result) {
+							// var getProjectNames = "Select projectname from projects where projectid = "+iterator+"";
+							// dbConnICE.execute(getProjectNames, function (err, result) {
+							var inputs = {"query":"projectname","projectid":iterator}
+							var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
+							client.post("http://127.0.0.1:1990/admin/getAssignedProjects_ICE",args,
+									function (result, response) {
 								try{
-									if (err) {
-										console.log("Error::::",err);
+									// if (err) {
+									if(response.statusCode != 200 || result.rows == "fail"){
+										// console.log("Error::::",err);
 										res.send("fail");
 									}
 									else{

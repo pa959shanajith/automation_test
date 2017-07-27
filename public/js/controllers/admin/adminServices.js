@@ -42,11 +42,12 @@ mySPA.factory('adminServices', ['$http', '$q', function ($http, $q) {
     				function (response) { return $q.reject(response.data); });
     	},
     	
-    	updateUser_nineteen68: function (updateUserObj) {
+    	updateUser_nineteen68: function (updateUserObj,userDetails) {
     		var param = "updateUser_nineteen68";
     		return $http.post('/updateUser_nineteen68', {
     			action: param,
-				updateUserObj : updateUserObj
+				updateUserObj : updateUserObj,
+				userinfo : userDetails
     		})
     		.then(function (response) { return response.data; },
     				function (response) { return $q.reject(response.data); });

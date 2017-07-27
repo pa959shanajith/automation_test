@@ -747,7 +747,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					return;
 				}
 				else{
-					
+
 					console.log("Data There");
 					$(".enableActions").addClass("disableActions").removeClass("enableActions");
 					$("#enableAppend").prop("disabled", false).css('cursor','pointer')
@@ -796,7 +796,6 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					$("#enableAppend").prop("disabled", true).css('cursor','no-drop');
 					$(document).find(".checkStylebox").prop("disabled", true);
 				}
-
 				if(appType == 'Web')
 				{
 						if($(".ellipsis").length > 0 )
@@ -1423,6 +1422,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			}
 			//For OEBS
 
+			//For Web
 			else{
 				if(compareFlag == true)
 				{
@@ -1435,8 +1435,8 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			//For Web
 			DesignServices.initScraping_ICE(screenViewObject)
 			.then(function (data) {
-				console.log("UI", data);
-				
+				console.log("UI", data);				
+
 				if(data == "Invalid Session")
 				{
 					window.location.href = "/";
@@ -1655,7 +1655,8 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					//Getting appended scraped object irrespective to the dynamic value
 				}
 				//If enable append is active
-				
+
+
 				//If enable append is inactive
 				else{
 					//Before Saving the Scrape JSON to the Database
@@ -2050,7 +2051,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 	//Highlight Element on browser
 
 	//Highlight compared and updated objects
-		//Highlight Element on browser
+	//Highlight Element on browser
 	$scope.highlightComparedScrapElements = function(xpath,url,uid) {
 		var appType = $scope.getScreenView;
 		//console.log("uid",uid);
@@ -2257,10 +2258,10 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				angular.element(innerUL).append(li);
 			}
 			$(".checkStylebox, .checkall").prop("disabled",false);
-			// $(".checkStylebox").trigger("click");
-			// $timeout(function(){
-			// 	$("#saveObjects").trigger("click");
-			// },500)
+			//$(".checkStylebox").trigger("click");
+			//$timeout(function(){
+				//$("#saveObjects").trigger("click");
+			//},500)
 			$("#dialog-addObject").modal("hide");
 			//openDialog("Add Object", "Objects has been added successfully.")
 			//$("#addObjectSuccess").modal("show")
@@ -2341,7 +2342,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				$("input[type='checkbox'].checkall,.checkStylebox,#saveObjects").attr("disabled", true);
 			}
 		};
-		
+
 
 
 	$(document).on("click", ".showAllObjects", function(){
@@ -4024,7 +4025,7 @@ function contentTable(newTestScriptDataLS) {
 					else if (appTypeLocal == 'MobileApp'
 						&& (obType.indexOf("RadioButton") >= 0 || obType.indexOf("ImageButton") >= 0 || obType.indexOf("Button") >= 0|| obType.indexOf("EditText") >= 0
 								|| obType.indexOf("Switch") >= 0 || obType.indexOf("CheckBox") >= 0 || obType.indexOf("Spinner") >= 0 || obType.indexOf("TimePicker") >= 0 || obType.indexOf("DatePicker") >= 0
-								|| obType.indexOf("NumberPicker") >= 0 || obType.indexOf("RangeSeekBar") >= 0 || obType.indexOf("SeekBar") >= 0 || obType.indexOf("ListView") >= 0 || obType.indexOf("XCUIElementTypeTextField") >= 0
+								|| obType.indexOf("android.widget.NumberPicker") >= 0 || obType.indexOf("RangeSeekBar") >= 0 || obType.indexOf("android.widget.SeekBar") >= 0 || obType.indexOf("ListView") >= 0 || obType.indexOf("XCUIElementTypeTextField") >= 0
 								|| obType.indexOf("XCUIElementTypePickerWheel") >= 0 || obType.indexOf("XCUIElementTypeSlider") >= 0 || obType.indexOf("XCUIElementTypeSearchField") >= 0 || obType.indexOf("XCUIElementTypeTable") >=0 || obType.indexOf("android.widget.TimePicker") >=0 || obType.indexOf("android.widget.DatePicker") >=0)) {
 						var res = '';
 						var sc;
@@ -4057,11 +4058,11 @@ function contentTable(newTestScriptDataLS) {
 						{sc = Object.keys(keywordArrayList.time);selectedKeywordList = "time";}
 						else if (obType.indexOf("DatePicker") >= 0)
 						{sc = Object.keys(keywordArrayList.date);selectedKeywordList = "date";}
-						else if (obType.indexOf("NumberPicker") >= 0)
+						else if (obType.indexOf("android.widget.NumberPicker") >= 0)
 						{sc = Object.keys(keywordArrayList.numberpicker);selectedKeywordList = "numberpicker";}
 						else if (obType.indexOf("RangeSeekBar") >= 0)
 						{sc = Object.keys(keywordArrayList.rangeseekbar);selectedKeywordList = "rangeseekbar";}
-						else if (obType.indexOf("SeekBar") >= 0)
+						else if (obType.indexOf("android.widget.SeekBar") >= 0)
 						{sc = Object.keys(keywordArrayList.seekbar);selectedKeywordList = "seekbar";}
 						else if (obType.indexOf("ListView") >= 0)
 						{sc = Object.keys(keywordArrayList.listview);selectedKeywordList = "listview";}
@@ -4085,7 +4086,7 @@ function contentTable(newTestScriptDataLS) {
 						break;
 					} else if (appTypeLocal == 'MobileApp' && (!(obType.indexOf("RadioButton") >= 0 || obType.indexOf("ImageButton") >= 0 || obType.indexOf("Button") >= 0 || obType.indexOf("EditText") >= 0
 							|| obType.indexOf("Switch") >= 0  || obType.indexOf("CheckBox") >= 0 || obType.indexOf("Spinner") >= 0 || obType.indexOf("TimePicker") >= 0 || obType.indexOf("DatePicker") >= 0
-							|| obType.indexOf("NumberPicker") >= 0 || obType.indexOf("RangeSeekBar") >= 0 || obType.indexOf("SeekBar") >= 0 || obType.indexOf("ListView") >= 0 || obType.indexOf("XCUIElementTypeTextField") >= 0
+							|| obType.indexOf("android.widget.NumberPicker") >= 0 || obType.indexOf("RangeSeekBar") >= 0 || obType.indexOf("android.widget.SeekBar") >= 0 || obType.indexOf("ListView") >= 0 || obType.indexOf("XCUIElementTypeTextField") >= 0
 							|| obType.indexOf("XCUIElementTypePickerWheel") >= 0 || obType.indexOf("XCUIElementTypeSlider") >= 0 || obType.indexOf("XCUIElementTypeSearchField") >= 0 || obType.indexOf("XCUIElementTypeTable") >=0 || obType.indexOf("android.widget.TimePicker") >=0 || obType.indexOf("android.widget.DatePicker") >=0))) {
 						var res = '';
 						var sc = Object.keys(keywordArrayList.element);

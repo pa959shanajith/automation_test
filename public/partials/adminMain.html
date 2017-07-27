@@ -176,14 +176,14 @@
 						<label class="leftControl primaryRole">Primary Role</label> 
 						<select class='adminSelect form-control'
 							x-ng-model="role" id="userRoles"
-							class="form-control rightControl selectControl">
+							class="form-control rightControl selectControl" disabled>
 							<option value="" disabled selected>Select User Role</option>
 						</select> <span ng-show="roleRequired" class="error-msg ng-cloak errorlbl">{{roleRequired}}</span>
 					</div>
 				</div>
 				<!-- Secondary role  -->
 				<div>
-					<div class="col-xs-6 selectRole">
+					<div style='display:none;' class="col-xs-6 selectRole">
 						<label class="leftControl primaryRole">Additional Role</label> 
 						<select class='adminSelect form-control'
 							x-ng-model="addrole" id="additionalRoles"

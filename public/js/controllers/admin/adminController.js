@@ -6,7 +6,7 @@ var createprojectObj = {}; var projectDetails = [];var flag;var projectExists;va
 var editedProjectDetails = [];
 var deletedProjectDetails = [];
 var newProjectDetails = [];
-var unAssignedProjects = []; var assignedProjects = [];var projectData =[];var valid = "";
+var unAssignedProjects = []; var assignedProjects = [];var projectData =[];var valid = "";var getAssignedProjectsLen=0;
 mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeout','cfpLoadingBar', function ($scope, $http, adminServices, $timeout, cfpLoadingBar) {
 	$("body").css("background","#eee");
 	$('.dropdown').on('show.bs.dropdown', function(e){
@@ -122,8 +122,11 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 			var unassignedProjectIds = [];
 			var unassignedProjectNames = [];
 			var unAssignedProjects = {};
+		//	getAssignedProjectsLen = 0;
+	
 			adminServices.getAssignedProjects_ICE(getAssignProj)
 			.then(function (data) {
+				getAssignedProjectsLen = data.length;
 				if(data == "Invalid Session"){
 				window.location.href = "/";
 				}
@@ -141,7 +144,8 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 						assignedProjectsArr.push(projectData[j].projectId);
 						assignedProjectNames.push(projectData[j].projectName)
 					}
-
+					
+					//getAssignedProjectsLen = assignedProjectsArr.length;
 					adminServices.getDetails_ICE(idtype,requestedids)
 					.then(function (response) {
 						if(response == "Invalid Session"){
@@ -239,7 +243,8 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 			assignProjectsObj.userInfo = userDetails;
 			assignProjectsObj.userId = userId;
 //			assignProjectsObj.unAssignedProjects = unAssignedProjects;
-			assignProjectsObj.assignedProjects = assignedProjects;
+			assignProjectsObj.assignedProjects = assignedProjects;;
+			assignProjectsObj.getAssignedProjectsLen = getAssignedProjectsLen;
 
 			console.log(assignProjectsObj);
 			adminServices.assignProjects_ICE(assignProjectsObj)
@@ -251,6 +256,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 				{
 					openModelPopup("Assign Projects", "Projects assigned to user successfully");
 					resetAssignProjectForm();
+					
 				}
 				else{
 					openModelPopup("Assign Projects", "Failed to assign projects to user");
@@ -1989,10 +1995,10 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 				$("#userRoles").empty().append('<option value disabled>Select User Role</option>')
 				for(i=0; i<response.r_ids.length && response.userRoles.length; i++){
 					if(roleId == response.r_ids[i]){
-						$("#userRoles").append('<option selected value="'+response.r_ids[i]+'">'+response.userRoles[i]+'</option>')
+						$("#userRoles").attr("disabled",true).append('<option selected value="'+response.r_ids[i]+'">'+response.userRoles[i]+'</option>')
 					}
 					else{
-						$("#userRoles").append('<option value="'+response.r_ids[i]+'">'+response.userRoles[i]+'</option>')
+						$("#userRoles").attr("disabled",true).append('<option value="'+response.r_ids[i]+'">'+response.userRoles[i]+'</option>')
 					}
 				}
 			},
@@ -2053,7 +2059,9 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 			//updateUserObj.role = $("#userRoles option:selected").val();
 			updateUserObj.email = $("#email").val();
 			updateUserObj.userId = $("#userSelect option:selected").data("id");
-			adminServices.updateUser_nineteen68(updateUserObj)
+
+			var userDetails = JSON.parse(window.localStorage['_UI']);
+			adminServices.updateUser_nineteen68(updateUserObj,userDetails)
 			.then(function (response) {
 				if(response == "Invalid Session"){
 							  window.location.href = "/";
