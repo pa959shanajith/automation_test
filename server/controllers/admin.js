@@ -457,7 +457,7 @@ exports.updateUser_nineteen68 = function updateUser_nineteen68(req, res) {
                             local_username = service.username;
                         }
                         if (local_password.trim().length == 0) {
-                            db_password = service.password;
+                            db_password = "existing";
                         } else {
                             var salt = bcrypt.genSaltSync(10);
                             var req_hashedPassword = bcrypt.hashSync(local_password, salt);
