@@ -288,11 +288,12 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 					var browserIcon, brow="";
 					var styleColor, exeDate, exeDat, exeTime;
 					for(i=0; i<data.length; i++){
+						browserIcon=""; brow="";
 						if(data[i].browser.toLowerCase() == "chrome")	browserIcon = "ic-reports-chrome.png";
 						else if(data[i].browser.toLowerCase() == "firefox")	browserIcon = "ic-reports-firefox.png";
 						else if(data[i].browser.toLowerCase() == "internet explorer")	browserIcon = "ic-reports-ie.png";
 						if(browserIcon)	brow = "imgs/"+browserIcon;
-						else brow = "imgs/no_img.png"
+						else brow = "imgs/no_img1.png"
 						if(data[i].status == "Pass"){	pass++;	styleColor="style='color: #009444 !important; text-decoration-line: none;'";}
 						else if(data[i].status == "Fail"){	fail++;	styleColor="style='color: #b31f2d !important; text-decoration-line: none;'";}
 						else if(data[i].status == "Terminate"){	terminated++;	styleColor="style='color: #faa536 !important; text-decoration-line: none;'";}
@@ -475,9 +476,9 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 						else if(finalReports.rows[k].status == "Fail"){	fail++;}
 						else if(finalReports.rows[k].status == "Terminate"){terminated++;}
 					}
-					finalReports.overallstatus[0].pass = parseFloat((pass/total)*100).toFixed(2);
-					finalReports.overallstatus[0].fail = parseFloat((fail/total)*100).toFixed(2);
-					finalReports.overallstatus[0].terminate = parseFloat((terminated/total)*100).toFixed(2);
+					finalReports.overallstatus[0].pass = (parseFloat((pass/total)*100).toFixed(2)) > 0? parseFloat((pass/total)*100).toFixed(2) : parseInt(0);
+					finalReports.overallstatus[0].fail = (parseFloat((fail/total)*100).toFixed(2)) > 0? parseFloat((fail/total)*100).toFixed(2) : parseInt(0);
+					finalReports.overallstatus[0].terminate = (parseFloat((terminated/total)*100).toFixed(2)) > 0? parseFloat((terminated/total)*100).toFixed(2) : parseInt(0);
 				}
 				if(reportType == "phantom-pdf"){
 					var getCurrentUrl = window.location.href.split(":")
