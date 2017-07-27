@@ -213,10 +213,14 @@
 			<!-- Button -->
 			<div class="col-xs-9 form-group" style="width: 83%">
 				<div class='userForm projectForm'>
-					<div class='domainTxt'>Domain</div>
+					<!--<div class='domainTxt'>Domain</div>
 					<select class="adminSelect form-control" style="width: 91%" id="selDomain">
 						<option value="" disabled selected>Please Select Your Domain</option>
-					</select> 
+					</select> -->
+				<label class='domainTxt' style="margin-left: 11px;">Domain :</label>		
+					<input type="text" id="selDomain" name="projectName"		
+						readonly="readonly" 		
+						placeholder="Domain Name">
 					<span ng-show="domainNameRequired" class="error-msg ng-cloak errorlbl">{{domainNameRequired}}</span>
 				</div>
 				<div class='userForm adminControl'>
@@ -316,10 +320,12 @@
 					<span ng-show="userNameRequired" class="error-msg ng-cloak errorlbl">{{userNameRequired}}</span>
 				</div>
 				<div class='userForm projectForm'>
-					<div class='domainTxt'>Domain</div>
+					<label class='domainTxt' style="margin-left: 1px;">Domain </label>		
+					<input type="text" id="selAssignProject" name="projectName" readonly="readonly"	placeholder="Domain Name">
+					<!--<div class='domainTxt'>Domain</div>
 					<select class="adminSelect form-control selectDomain" style="width: 91%" id="selAssignProject">
 						<option value="" disabled selected>Please Select Your Domain</option>
-					</select> 
+					</select> -->
 					<span ng-show="domainNameRequired" class="error-msg ng-cloak errorlbl">{{domainNameRequired}}</span>
 				</div>
 			</div>
@@ -391,10 +397,12 @@
 			<!-- Button -->
 			<div class="col-xs-9 form-group" style="width: 83%">
 				<div class='userForm projectForm'>
-					<div class='domainTxt'>Domain</div>
+					<!--<div class='domainTxt'>Domain</div>
 					<select class="adminSelect form-control" style="width: 91%" id="selDomainEdit">
 						<option value="" disabled selected>Please Select Your Domain</option>
-					</select> 
+					</select> -->
+					<label class='domainTxt' style="margin-left: -1px;">Domain  </label>		
+					<input type="text" id="selDomainEdit" name="projectName" readonly="readonly" placeholder="Domain Name">
 					<span ng-show="domainNameRequired" class="error-msg ng-cloak errorlbl">{{domainNameRequired}}</span>
 				</div>
 				<div class='userForm adminControl'>
@@ -518,13 +526,6 @@
 						<td><input type="checkbox" value="" class='module_admin'></td>
 						<td><input type="checkbox" value="" class='module_admin'></td>
 						<td><input type="checkbox" value="" checked = "checked" class='module_admin'></td>
-					</tr>
-					<tr>
-						<td>Switch Role</td>
-						<td><input type="checkbox" checked = "checked" value="" class='switchRole'></td>
-						<td><input type="checkbox" checked = "checked" value="" class='switchRole'></td>
-						<td><input type="checkbox" checked = "checked" value="" class='switchRole'></td>
-						<td><input type="checkbox" checked = "checked" value="" class='switchRole'></td>
 					</tr>
 					</tbody>
 				</table>

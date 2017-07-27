@@ -3,6 +3,7 @@
  */
 var DOMAINID, releaseName, cycleName, count=0,delCount=0,editReleaseId='',editCycleId='',deleteReleaseId='',deleteCycleId='',taskName;releaseNamesArr =[];
 var createprojectObj = {}; var projectDetails = [];var flag;var projectExists;var updateProjectDetails = [];
+var domainId;
 var editedProjectDetails = [];
 var deletedProjectDetails = [];
 var newProjectDetails = [];
@@ -63,45 +64,116 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 		},
 		function (error) { console.log("Error:::::::::::::", error) })
 
-		$(document).on('change','#selAssignUser', function() {
+			$(document).on('change','#selAssignUser', function() {
 			$('#allProjectAP, #assignedProjectAP').empty();
 			adminServices.getDomains_ICE()
 			.then(function (data) {
 				if(data == "Invalid Session"){
 				window.location.href = "/";
-				}
-				if (data == "No Records Found") {
-					var domainList = data;
-					$('#selAssignProject').empty();
-					$('#selAssignProject').append($("<option value=''  disabled selected>Please Select Your Domain</option>"));
-					for (var i = 0; i < domainList.length; i++) {
-						$('#selAssignProject').append($("<option value=" + domainList[i].domainId + "></option>").text(domainList[i].domainName));
-					}
-				} else {
-					var domainList = data;
-					$('#selAssignProject').empty();
-					$('#selAssignProject').append($("<option value='' disabled selected>Please Select Your Domain</option>"));
-					for (var i = 0; i < domainList.length; i++) {
-						$('#selAssignProject').append($("<option value=" + domainList[i].domainId + "></option>").text(domainList[i].domainName));
-					}
-				}
+				} 
+				else {
+					domainId =  data[0].domainId;					
+					$("#selAssignProject").val(data[0].domainName);
+					$('#allProjectAP, #assignedProjectAP').empty();
+            //var domainId = data[0].domainId;
+			//var requestedids = domainId;
+			//var domains = [];
+			var requestedids =[];
+			requestedids.push(domainId);
+			//console.log("Domain", domains);
+			//var requestedids = domains.push(domainId);
+			var idtype=["domaindetails"];
+			var userId = $("#selAssignUser option:selected").attr("data-id");
 
-				//sorting the dropdown values in alphabetical order
-				var selectOptions = $("#selAssignProject option:not(:first)");
-				selectOptions.sort(function(a,b) {
-					if (a.text > b.text) return 1;
-				    else if (a.text < b.text) return -1;
-				    else return 0;
-				})
-				$("#selAssignProject").empty()
-				$("#selAssignProject").append('<option data-id="" value disabled selected>Please Select Your Domain</option>');
-				for(i=0; i<selectOptions.length;i++){
-					$("#selAssignProject").append(selectOptions[i])
+			var getAssignProj = {};
+			getAssignProj.domainId = domainId;
+			getAssignProj.userId = userId;
+			var assignedProjectsArr = [];
+			var assignedProjectNames = [];
+			var unassignedProjectIds = [];
+			var unassignedProjectNames = [];
+			var unAssignedProjects = {};
+		//	getAssignedProjectsLen = 0;
+	
+			adminServices.getAssignedProjects_ICE(getAssignProj)
+			.then(function (data1) {
+			getAssignedProjectsLen = data1.length;
+				if(data1 == "Invalid Session"){
+				window.location.href = "/";
 				}
-				$("#selAssignProject").prop('selectedIndex', 0);
+				$('#assignedProjectAP').empty();
+				projectData = [];
+				projectData = data1;
+				if(data1.length > 0)
+				{
+					for(var i=0;i<data1.length;i++)
+					{
+						$('#assignedProjectAP').append($("<option value=" +data1[i].projectId+ "></option>").text(data1[i].projectName));
+					}
+					for(var j=0;j<projectData.length;j++)
+					{
+						assignedProjectsArr.push(projectData[j].projectId);
+						assignedProjectNames.push(projectData[j].projectName)
+					}
 
-			}, function (error) { console.log("Error:::::::::::::", error) })
-		});
+					adminServices.getDetails_ICE(idtype,requestedids)
+					.then(function (response) {
+						if(response == "Invalid Session"){
+							window.location.href = "/";
+							}
+						$('#allProjectAP').empty();
+						if(response.projectIds.length > 0)
+						{
+							for(var k=0;k<response.projectIds.length;k++){
+								if(!eleContainsInArray(assignedProjectsArr,response.projectIds[k])){
+									unassignedProjectIds.push(response.projectIds[k]);
+								}
+							}
+
+							for(var l=0;l<response.projectNames.length;l++){
+								if(!eleContainsInArray(assignedProjectNames,response.projectNames[l])){
+									unassignedProjectNames.push(response.projectNames[l]);
+								}
+							}
+
+							function eleContainsInArray(arr,element){
+								if(arr != null && arr.length >0){
+									for(var s=0;s<arr.length;s++){
+										if(arr[s] == element)
+											return true;
+									}
+								}
+								return false;
+							}
+							unAssignedProjects.projectIds =  unassignedProjectIds;
+							unAssignedProjects.projectNames =  unassignedProjectNames;
+							for(var m=0;m<unAssignedProjects.projectIds.length;m++)
+							{
+								$('#allProjectAP').append($("<option value=" +unAssignedProjects.projectIds[m]+ "></option>").text(unAssignedProjects.projectNames[m]));
+							}
+						}
+					}, function (error) { console.log("Error:::::::::::::", error) })
+				}
+				else{
+					adminServices.getDetails_ICE(idtype,requestedids)
+					.then(function (res) {
+						if(res == "Invalid Session"){
+							window.location.href = "/";
+							}
+						if(res.projectIds.length > 0)
+						{
+							$("#assignedProjectAP,#allProjectAP").empty();
+							for(var n=0;n<res.projectIds.length;n++)
+							{
+								$('#allProjectAP').append($("<option value=" +res.projectIds[n]+ "></option>").text(res.projectNames[n]));
+							}
+						}
+					}, function (error) { console.log("Error:::::::::::::", error) })
+				}
+			},function (error) { console.log("Error:::::::::::::", error) })
+				}
+	});
+});
 
 		$(document).on('change','#selAssignProject', function() {
 			$('#allProjectAP, #assignedProjectAP').empty();
@@ -214,7 +286,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 			$("#selAssignUser").css('border','').addClass("selectErrorBorder");
 			return false;
 		}
-		else if($('#selAssignProject option:selected').val() == "") {
+		else if($('#selAssignProject').val() == "") {
 			$("#selAssignProject").css('border','').addClass("selectErrorBorder");
 			return false;
 		}
@@ -234,7 +306,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 			assignedProjects.push(assignedProj);
 		});
 		if (assignedProjects.length != 0){
-			var domainId = $('#selAssignProject option:selected').val();
+			//var domainId = $('#selAssignProject option:selected').val();
 			var userDetails = JSON.parse(window.localStorage['_UI']);
 			var userId = $("#selAssignUser option:selected").attr("data-id");
 
@@ -288,38 +360,12 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 			if(data == "Invalid Session"){
 							window.location.href = "/";
 							}
-			if (data == "No Records Found") {
-				var domainList = data;
-				$('#selDomain').empty();
-				$('#selDomain').append($("<option value=''  disabled selected>Please Select Your Domain</option>"));
-				for (var i = 0; i < domainList.length; i++) {
-					$('#selDomain').append($("<option value=" + domainList[i].domainId + "></option>").text(domainList[i].domainName));
-				}
-			} else {
-				var domainList = data;
-				$('#selDomain').empty();
-				$('#selDomain').append($("<option value=''  disabled selected>Please Select Your Domain</option>"));
-				for (var i = 0; i < domainList.length; i++) {
-					$('#selDomain').append($("<option value=" + domainList[i].domainId + "></option>").text(domainList[i].domainName));
-				}
+			else {
+				$("#selDomain").val(data[0].domainName);
+				domainId = data[0].domainId;
 			}
-
-			//sorting the dropdown values in alphabetical order
-			var selectOptions = $("#selDomain option:not(:first)");
-			selectOptions.sort(function(a,b) {
-				if (a.text > b.text) return 1;
-			    else if (a.text < b.text) return -1;
-			    else return 0;
-			})
-			$("#selDomain").empty()
-			$("#selDomain").append('<option data-id="" value disabled selected>Please Select Your Domain</option>');
-			for(i=0; i<selectOptions.length;i++){
-				$("#selDomain").append(selectOptions[i])
-			}
-			$("#selDomain").prop('selectedIndex', 0);
 
 		}, function (error) { console.log("Error:::::::::::::", error) })
-
 	});
 
 	function toggleCycleClick()
@@ -525,11 +571,11 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
   });
 	// Create Project Action
 	$scope.create_project = function () {
-		$("#selDomain").removeClass("selectErrorBorder");
+		$("#selDomain").removeClass("inputErrorBorder");
 		$("#projectName").removeClass("inputErrorBorder");
 
-		if($('#selDomain option:selected').val() == ""){
-			$("#selDomain").addClass("selectErrorBorder");
+		if($('#selDomain').val() == ""){
+			$("#selDomain").addClass("inputErrorBorder");
 		}else if($("#projectName").val() == ""){
 			$("#projectName").addClass("inputErrorBorder");
 		}else if($(".projectTypeSelected").length == 0){
@@ -562,8 +608,8 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 				if(valid == "false"){
 					return false;
 				}else{
-					if($('#selDomain option:selected').val() != ""){
-						requestedids.push($('#selDomain option:selected').val());
+					if($('#selDomain').val() != ""){
+						requestedids.push(domainId);
 						idtype.push('domainsall');
 						var proceeed = false;
 						adminServices.getNames_ICE(requestedids,idtype)
@@ -594,7 +640,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 							}
 							if(proceeed == true){
 								var userDetails = JSON.parse(window.localStorage['_UI']);
-								createprojectObj.domainId =  $('#selDomain option:selected').val();
+								createprojectObj.domainId =  domainId;
 								createprojectObj.projectName = $.trim($("#projectName").val());
 								createprojectObj.appType = $(".projectTypeSelected").attr('data-app');
 								createprojectObj.projectDetails = projectDetails;
@@ -774,12 +820,12 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 	function resetUpdateUser()
 	{
 		$("#userSelect,#userRoles").prop('selectedIndex', 0);
-		$("#firstName,#lastName,#password,#confirmPassword,#email").val("");
+		$("#firstName,#lastName,#selDomain,#password,#confirmPassword,#email").val("");
 	}
 
 	function resetForm()
 	{
-		$("#selDomain").prop('selectedIndex', 0);
+		//$("#selDomain").prop('selectedIndex', 0);
 		$("#projectName").val("");
 		$("div.projectTypeSelected").removeClass("projectTypeSelected");
 		$("#releaseList li, #cycleList li").remove();
@@ -1739,7 +1785,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 		function (error) { console.log("Error:::::::::::::", error) })
 	};
 
-	//Load Projects for Edit
+//Load Projects for Edit
 	$scope.editProjectTab = function(){
 		projectDetails = [];
 		updateProjectDetails = [];
@@ -1749,86 +1795,125 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 			if(data == "Invalid Session"){
 							  window.location.href = "/";
 							}
-			if (data == "No Records Found") {
-				var domainList = data;
-				$('#selDomainEdit').empty();
-				$('#selDomainEdit').append($("<option value=''  disabled selected>Please Select Your Domain</option>"));
-				for (var i = 0; i < domainList.length; i++) {
-					$('#selDomainEdit').append($("<option value=" + domainList[i].domainId + "></option>").text(domainList[i].domainName));
-				}
-			} else {
-				var domainList = data;
-				$('#selDomainEdit').empty();
-				$('#selDomainEdit').append($("<option value=''  disabled selected>Please Select Your Domain</option>"));
-				for (var i = 0; i < domainList.length; i++) {
-					$('#selDomainEdit').append($("<option value=" + domainList[i].domainId + "></option>").text(domainList[i].domainName));
-				}
+			else {				
+				domainId = data[0].domainId;
+				$("#selDomainEdit").val(data[0].domainName);
+				
+				//to populate the projects:
+				// var requestedids = [domainId];
+				var domains = [domainId];
+				// var domains = [];
+				var requestedids = [];
+				//domains.push(domainId);
+				requestedids.push(domainId);
+				//console.log("Domain", domains);
+				//var requestedids = domains.push(domainId);
+				var idtype=["domaindetails"];
+				adminServices.getDetails_ICE(idtype,requestedids)
+				.then(function (response) {
+					if(response == "Invalid Session"){
+								  window.location.href = "/";
+								}
+					if(response.projectNames.length > 0)
+					{
+						$('#selProject').empty();
+						$('#selProject').append($("<option value=''  disabled selected>Please Select Your Project</option>"));
+						for (var i = 0; i < response.projectNames.length; i++) {
+							$('#selProject').append($("<option value=" + response.projectIds[i] + "></option>").text(response.projectNames[i]));
+						}
+
+					}
+					else{
+						$('#selProject').empty();
+						$('#selProject').append($("<option value=''  disabled selected>Please Select Your Project</option>"));
+						for (var i = 0; i < response.projectNames.length; i++) {
+							$('#selProject').append($("<option value=" + response.projectIds[i] + "></option>").text(response.projectNames[i]));
+						}
+					}
+
+					//sorting the dropdown values in alphabetical order
+					var selectOptions = $("#selProject option:not(:first)");
+					selectOptions.sort(function(a,b) {
+						if (a.text > b.text) return 1;
+					    else if (a.text < b.text) return -1;
+					    else return 0;
+					})
+					$("#selProject").empty()
+					$("#selProject").append('<option data-id="" value disabled selected>Please Select Your Project</option>');
+					for(i=0; i<selectOptions.length;i++){
+						$("#selProject").append(selectOptions[i])
+					}
+					$("#selProject").prop('selectedIndex', 0);
+
+				}, function (error) { console.log("Error:::::::::::::", error) })
+				clearUpdateProjectObjects();
+				
 			}
 
 			//sorting the dropdown values in alphabetical order
-			var selectOptions = $("#selDomainEdit option:not(:first)");
-			selectOptions.sort(function(a,b) {
-				if (a.text > b.text) return 1;
-			    else if (a.text < b.text) return -1;
-			    else return 0;
-			})
-			$("#selDomainEdit").empty()
-			$("#selDomainEdit").append('<option data-id="" value disabled selected>Please Select Your Domain</option>');
-			for(i=0; i<selectOptions.length;i++){
-				$("#selDomainEdit").append(selectOptions[i])
-			}
-			$("#selDomainEdit").prop('selectedIndex', 0);
+			// var selectOptions = $("#selDomainEdit option:not(:first)");
+			// selectOptions.sort(function(a,b) {
+			// 	if (a.text > b.text) return 1;
+			//     else if (a.text < b.text) return -1;
+			//     else return 0;
+			// })
+			// $("#selDomainEdit").empty()
+			// $("#selDomainEdit").append('<option data-id="" value disabled selected>Please Select Your Domain</option>');
+			// for(i=0; i<selectOptions.length;i++){
+			// 	$("#selDomainEdit").append(selectOptions[i])
+			// }
+			// $("#selDomainEdit").prop('selectedIndex', 0);
 
 		}, function (error) { console.log("Error:::::::::::::", error) })
 
-		$(document).on('change','#selDomainEdit', function() {
-			//get Projects Service
-			var domainId = $("#selDomainEdit option:selected").val();
-			var requestedids = [domainId];
-			var domains = [];
-			domains.push(domainId);
-			//console.log("Domain", domains);
-			//var requestedids = domains.push(domainId);
-			var idtype=["domaindetails"];
-			adminServices.getDetails_ICE(idtype,requestedids)
-			.then(function (response) {
-				if(response == "Invalid Session"){
-							  window.location.href = "/";
-							}
-				if(response.projectNames.length > 0)
-				{
-					$('#selProject').empty();
-					$('#selProject').append($("<option value=''  disabled selected>Please Select Your Project</option>"));
-					for (var i = 0; i < response.projectNames.length; i++) {
-						$('#selProject').append($("<option value=" + response.projectIds[i] + "></option>").text(response.projectNames[i]));
-					}
-
-				}
-				else{
-					$('#selProject').empty();
-					$('#selProject').append($("<option value=''  disabled selected>Please Select Your Project</option>"));
-					for (var i = 0; i < response.projectNames.length; i++) {
-						$('#selProject').append($("<option value=" + response.projectIds[i] + "></option>").text(response.projectNames[i]));
-					}
-				}
-
-				//sorting the dropdown values in alphabetical order
-				var selectOptions = $("#selProject option:not(:first)");
-				selectOptions.sort(function(a,b) {
-					if (a.text > b.text) return 1;
-				    else if (a.text < b.text) return -1;
-				    else return 0;
-				})
-				$("#selProject").empty()
-				$("#selProject").append('<option data-id="" value disabled selected>Please Select Your Project</option>');
-				for(i=0; i<selectOptions.length;i++){
-					$("#selProject").append(selectOptions[i])
-				}
-				$("#selProject").prop('selectedIndex', 0);
-
-			}, function (error) { console.log("Error:::::::::::::", error) })
-			clearUpdateProjectObjects();
-		});
+//		$(document).on('change','#selDomainEdit', function() {
+//			//get Projects Service
+//			var domainId = $("#selDomainEdit option:selected").val();
+//			var requestedids = [domainId];
+//			var domains = [];
+//			domains.push(domainId);
+//			//console.log("Domain", domains);
+//			//var requestedids = domains.push(domainId);
+//			var idtype=["domaindetails"];
+//			adminServices.getDetails_ICE(idtype,requestedids)
+//			.then(function (response) {
+//				if(response == "Invalid Session"){
+//							  window.location.href = "/";
+//							}
+//				if(response.projectNames.length > 0)
+//				{
+//					$('#selProject').empty();
+//					$('#selProject').append($("<option value=''  disabled selected>Please Select Your Project</option>"));
+//					for (var i = 0; i < response.projectNames.length; i++) {
+//						$('#selProject').append($("<option value=" + response.projectIds[i] + "></option>").text(response.projectNames[i]));
+//					}
+//
+//				}
+//				else{
+//					$('#selProject').empty();
+//					$('#selProject').append($("<option value=''  disabled selected>Please Select Your Project</option>"));
+//					for (var i = 0; i < response.projectNames.length; i++) {
+//						$('#selProject').append($("<option value=" + response.projectIds[i] + "></option>").text(response.projectNames[i]));
+//					}
+//				}
+//
+//				//sorting the dropdown values in alphabetical order
+//				var selectOptions = $("#selProject option:not(:first)");
+//				selectOptions.sort(function(a,b) {
+//					if (a.text > b.text) return 1;
+//				    else if (a.text < b.text) return -1;
+//				    else return 0;
+//				})
+//				$("#selProject").empty()
+//				$("#selProject").append('<option data-id="" value disabled selected>Please Select Your Project</option>');
+//				for(i=0; i<selectOptions.length;i++){
+//					$("#selProject").append(selectOptions[i])
+//				}
+//				$("#selProject").prop('selectedIndex', 0);
+//
+//			}, function (error) { console.log("Error:::::::::::::", error) })
+//			clearUpdateProjectObjects();
+//		});
 
 		/************************default roles****************************************/
 		$(document).on('change','#userRoles', function() {
@@ -2036,7 +2121,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 			openModelPopup("Error","Password must contain atleast 1 special character, 1 numeric, 1 uppercase and lowercase, length should be minimum 8 characters and maximum 12 characters..");
 			$("#confirmPassword").addClass("inputErrorBorder");
 		}
-		else if($("#password").val() != $("#confirmPassword").val() && ($("#password").val().length > 0 && $("#confirmPassword").val().length > 0)){
+		else if($("#password").val() != $("#confirmPassword").val()){
 			openModelPopup("Error", "Password and Confirm Password did not match");
 			$("#confirmPassword").addClass("inputErrorBorder");
 		}
@@ -2129,7 +2214,13 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 //	Prevents special characters on keydown
 $(document).on("keydown", ".validationKeydown", function(e) {
 		if(e.target.id == 'userName'){
-			if(e.keyCode == 32){
+			if(e.keyCode == 32 || e.keyCode == 192 ){
+				return false;
+			}
+		}
+		if(e.target.id == 'firstName' || e.target.id == 'lastName')
+		{
+			if(e.keyCode == 192 ){
 				return false;
 			}
 		}
