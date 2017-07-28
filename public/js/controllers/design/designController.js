@@ -3250,9 +3250,10 @@ function contentTable(newTestScriptDataLS) {
 								if(getScrapeDataforCustomObj[i].xpath == ""){
 									var testGridData = $("#jqGrid tbody tr:not(.jqgfirstrow)");
 									$.each(testGridData, function(){
+										debugger;
 										if($(this).find("td[aria-describedby='jqGrid_custname']").text() == scrappedData[i].custname){
 											$(this).find("td[aria-describedby='jqGrid_custname']").addClass("addCustObj");
-											return false
+											
 										}
 									})
 								}
