@@ -2976,6 +2976,7 @@ li.select_all .addCustObj{
 }
 .domainTxt {
 	float: left;
+    font-weight: normal;
 }
 
 .projectForm:first-child {
@@ -3043,7 +3044,7 @@ li.select_all .addCustObj{
     -ms-border-radius: 6px;
 }
 
-#selDomain, #selDomainEdit, #selAssignDomain, #selAssignUser {
+#selAssignDomain, #selAssignUser {
 	    position: relative;
         left: 10px
 }
@@ -3051,11 +3052,6 @@ li.select_all .addCustObj{
 #selAssignUser
 {
     margin-left: 6.5%;
-}
-
-#selAssignProject
-{
-    margin-left: 8%;
 }
 
 .appTypesContainer {
@@ -3360,9 +3356,25 @@ li.select_all .addCustObj{
     -ms-border-radius: 6px;
 }
 
-#selDomain {
-	margin-left: 2%;
-}
+#selDomain, #selDomainEdit, #selAssignProject{		
+    margin-left: 10px;		
+    margin-top: -12px;		
+    background-color: #eeeeee;		
+    width: 90%;		
+    opacity: 1;		
+    border: 1px solid #656565 !important;		
+    border-left: 0 !important;		
+    border-right: 0 !important;		
+    border-top: 0 !important;		
+    border-radius: 0;		
+    box-shadow: none;		
+    color: #333;		
+    height: 34px;		
+    padding: 6px 12px;		
+    font-size: 14px;		
+    line-height: 1.42857143;		
+}		
+
 
 .appTypesContainer {
 	float: right;
