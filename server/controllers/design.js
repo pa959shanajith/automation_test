@@ -200,11 +200,13 @@ exports.getScrapeDataScreenLevel_ICE = function(req, res){
 			if(sessionToken != undefined && req.session.id == sessionToken)
 		{
 		var flag = "";
-		var getScrapeDataQuery = "select screenid,screenname,screendata from screens where "+
-				" screenid ="+ req.body.screenId + 
-				" and projectid="+req.body.projectId+
-				" allow filtering ;";
-			fetchScrapedData(getScrapeDataQuery,function(getScrapeDataQueryerror,getScrapeDataQueryresponse){
+		// var getScrapeDataQuery = "select screenid,screenname,screendata from screens where "+
+		// 		" screenid ="+ req.body.screenId + 
+		// 		" and projectid="+req.body.projectId+
+		// 		" allow filtering ;";
+			var inputs = {"screenid":req.body.screenId,"projectid":req.body.projectId,"query":"getscrapedata" }
+			// fetchScrapedData(getScrapeDataQuery,function(getScrapeDataQueryerror,getScrapeDataQueryresponse){
+				fetchScrapedData(inputs,function(getScrapeDataQueryerror,getScrapeDataQueryresponse){
 					try{
 						res.send(getScrapeDataQueryresponse);
 					}catch(exception){
@@ -225,13 +227,19 @@ exports.getScrapeDataScreenLevel_ICE = function(req, res){
  * generic function for DB call to fetch the screendata
  * @author vishvas.a
  */
-function fetchScrapedData(scrapeQuery,fetchScrapedDatacallback){
+// function fetchScrapedData(scrapeQuery,fetchScrapedDatacallback){
+	function fetchScrapedData(inputs,fetchScrapedDatacallback){
 	try{
 		var responsedata;
 		var flag;
-		dbConn.execute(scrapeQuery, function(getScrapeDataQueryerr, getScrapeDataQueryresult){
+		// dbConn.execute(scrapeQuery, function(getScrapeDataQueryerr, getScrapeDataQueryresult){
+		var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
+		client.post("http://127.0.0.1:1990/design/getScrapeDataScreenLevel_ICE",args,
+			function (getScrapeDataQueryresult, response) {
+				
 			try{
-				if (getScrapeDataQueryerr) {
+				if(response.statusCode != 200 || getScrapeDataQueryresult.rows == "fail"){
+				// if (getScrapeDataQueryerr) {
 					//console.log("scrape data error: Fail",getScrapeDataQueryerr);
 					flag="getScrapeData Fail.";
 					fetchScrapedDatacallback(flag,null);
@@ -258,7 +266,7 @@ function fetchScrapedData(scrapeQuery,fetchScrapedDatacallback){
 * on user action of NEW SAVING/EDIT/UPDATE/DELETE/Mapping of Objects/Compare and Update in Design screen. 
 */
 exports.updateScreen_ICE = function(req, res){
-	try{
+	try{	
 		/*
 		 * internal variables 
 		 */
@@ -301,6 +309,8 @@ exports.updateScreen_ICE = function(req, res){
 		var requesthistorydetails;
 		var createScreenHistoryQuery;
 		var updateScreenQuery="";
+		var inputs={};
+		var inputstestcase={};
 		var statusFlag = "";
 		if(param == "updateScrapeData_ICE"){	
 			try{
@@ -390,6 +400,8 @@ exports.updateScreen_ICE = function(req, res){
 												" and screenname ='" + screenName +
 												"' and versionnumber = "+requestedversionnumber+
 												" IF EXISTS; ";	
+												inputs={"query":"updatescreen","scrapedata":scrapedObjects,"modifiedby":modifiedBy,"skucodescreen":requestedskucodeScreens,
+												"screenid":screenID,"projectid":projectID,"screenname":screenName,"versionnumber":requestedversionnumber};
 											finalFunction(scrapedObjects);	
 										}else{
 											//JSON with view string empty
@@ -420,10 +432,10 @@ exports.updateScreen_ICE = function(req, res){
 						console.log(exception);
 					}
 				}else{
-																var requestscreenhistorydetails = "'updated screens action by " + userInfo.username + " having role:" + userInfo.role + "" +
-															" skucode=" + requestedskucodeScreens + ", tags=" + requestedtags + ", versionnumber=" + requestedversionnumber+
-															"  screendata=" + scrapedObjects+
-															"with the service action="+param+" '";
+								var requestscreenhistorydetails = "'updated screens action by " + userInfo.username + " having role:" + userInfo.role + "" +
+							" skucode=" + requestedskucodeScreens + ", tags=" + requestedtags + ", versionnumber=" + requestedversionnumber+
+							"  screendata=" + scrapedObjects+
+							"with the service action="+param+" '";
 											var dateScreen = new Date().getTime();
 											requestedScreenhistory =  dateScreen + ":" + requestscreenhistorydetails;
 											createScreenHistoryQuery = "update screens set history= history + { "+requestedScreenhistory+" }" +
@@ -440,6 +452,8 @@ exports.updateScreen_ICE = function(req, res){
 										" and screenname ='" + screenName +
 										"' and versionnumber = "+requestedversionnumber+
 										" IF EXISTS; ";	
+						inputs={"scrapedata":scrapedObjects,"modifiedby":modifiedBy,"skucodescreen":requestedskucodeScreens,
+						"screenid":screenID,"projectid":projectID,"screenname":screenName,"versionnumber":requestedversionnumber};
 										finalFunction(scrapedObjects);						
 				// console.log(updateScreenQuery);
 				}
@@ -465,12 +479,13 @@ exports.updateScreen_ICE = function(req, res){
 				async.series([
 					function(editcallback){
 						try{
-							var scrapedDataQuery="select screendata from screens where screenid="+screenID+
-								" and projectid="+projectID+
-								" and screenname = '"+screenName+
-								"' and versionnumber = "+requestedversionnumber+
-								" allow filtering ;";
-							fetchScrapedData(scrapedDataQuery,function(err,scrapedobjects,querycallback){
+							// var scrapedDataQuery="select screendata from screens where screenid="+screenID+
+							// 	" and projectid="+projectID+
+							// 	" and screenname = '"+screenName+
+							// 	"' and versionnumber = "+requestedversionnumber+
+							// 	" allow filtering ;";
+							inputs = {"query": "getscrapedata", "screenid":screenID,"projectid":projectID};
+							fetchScrapedData(inputs,function(err,scrapedobjects,querycallback){
 								try{
 									// console.log(err,scrapedobjects,);
 									if(scrapedobjects == null && scrapedobjects == '' && scrapedobjects == undefined){
@@ -519,17 +534,19 @@ exports.updateScreen_ICE = function(req, res){
 											 createScreenHistoryQuery = "update screens set history= history + { "+requestedScreenhistory+" }" +
 												" where screenid = "+screenID+" and projectid ="+projectID+ //" and screenname ='" + screenName +
 												" and versionnumber = "+requestedversionnumber+" ";	
-											updateScreenQuery = "update icetestautomation.screens set"+
-																" screendata ='"+ scrapedObjects +"',"+
-																" modifiedby ='" + modifiedBy + "',"+
-																" modifiedon = '" + new Date().getTime()+ "'"+
-																" , skucodescreen ='" + requestedskucodeScreens +
-																"' , history= history + { "+requestedScreenhistory+" }" +
-																" where screenid = "+screenID+
-																" and projectid ="+projectID+
-																" and screenname ='" + screenName +
-																"' and versionnumber = "+requestedversionnumber+
-																" IF EXISTS; "
+											// updateScreenQuery = "update icetestautomation.screens set"+
+											// 					" screendata ='"+ scrapedObjects +"',"+
+											// 					" modifiedby ='" + modifiedBy + "',"+
+											// 					" modifiedon = '" + new Date().getTime()+ "'"+
+											// 					" , skucodescreen ='" + requestedskucodeScreens +
+											// 					"' , history= history + { "+requestedScreenhistory+" }" +
+											// 					" where screenid = "+screenID+
+											// 					" and projectid ="+projectID+
+											// 					" and screenname ='" + screenName +
+											// 					"' and versionnumber = "+requestedversionnumber+
+											// 					" IF EXISTS; "
+											inputs={"scrapedata":scrapedObjects,"modifiedby":modifiedBy,"skucodescreen":requestedskucodeScreens,
+											"screenid":screenID,"projectid":projectID,"screenname":screenName,"versionnumber":requestedversionnumber};
 											finalFunction(scrapedObjects);
 										}else{
 											statusFlag="All objects are not edited.";
@@ -577,10 +594,11 @@ exports.updateScreen_ICE = function(req, res){
 				async.series([
 					function(deletecallback){
 						try{
-							var scrapedDataQuery="select screendata from screens where screenid="+screenID
-								" and projectid="+projectID+
-								" allow filtering ;";
-							fetchScrapedData(scrapedDataQuery,function(err,scrapedobjects,querycallback){
+							// var scrapedDataQuery="select screendata from screens where screenid="+screenID
+							// 	" and projectid="+projectID+
+							// 	" allow filtering ;";
+							inputs = {"query": "getscrapedata", "screenid":screenID,"projectid":projectID};
+							fetchScrapedData(inputs,function(err,scrapedobjects,querycallback){
 								try{
 									//console.log(err,scrapedobjects,querycallback);
 									if(scrapedobjects == null && scrapedobjects == '' && scrapedobjects == undefined){
@@ -656,7 +674,8 @@ exports.updateScreen_ICE = function(req, res){
 																" and screenname ='" + screenName +
 																"' and versionnumber = "+requestedversionnumber+
 																" IF EXISTS; "
-				
+											inputs={"scrapedata":scrapedObjects,"modifiedby":modifiedBy,"skucodescreen":requestedskucodeScreens,
+											"screenid":screenID,"projectid":projectID,"screenname":screenName,"versionnumber":requestedversionnumber};
 											//console.log(updateScreenQuery);
 				
 											finalFunction(scrapedObjects);	
@@ -712,12 +731,13 @@ exports.updateScreen_ICE = function(req, res){
 			async.series({
 				function(mappingCallback){
 					try{
-						var scrapedDataQuery="select screendata from screens where screenid="+screenID+
-									" and projectid="+projectID+
-									" and screenname = '"+screenName+
-									"' and versionnumber = "+requestedversionnumber+
-									" allow filtering ;";
-						fetchScrapedData(scrapedDataQuery,function(err,scrapedobjects,querycallback){
+						// var scrapedDataQuery="select screendata from screens where screenid="+screenID+
+						// 			" and projectid="+projectID+
+						// 			" and screenname = '"+screenName+
+						// 			"' and versionnumber = "+requestedversionnumber+
+						// 			" allow filtering ;";
+						inputs = {"query": "getscrapedata", "screenid":screenID,"projectid":projectID};
+						fetchScrapedData(inputs,function(err,scrapedobjects,querycallback){
 							try{
 								if(scrapedobjects == null && scrapedobjects == '' && scrapedobjects == undefined){
 									scrapedobjects=JSON.parse("{}");
@@ -918,6 +938,8 @@ exports.updateScreen_ICE = function(req, res){
 																" and screenname ='" + screenName +
 																"' and versionnumber = "+requestedversionnumber+
 																" IF EXISTS; "
+													inputs={"scrapedata":scrapedObjects,"modifiedby":modifiedBy,"skucodescreen":requestedskucodeScreens,
+													"screenid":screenID,"projectid":projectID,"screenname":screenName,"versionnumber":requestedversionnumber};
 													//console.log(updateScreenQuery);
 													finalFunction(scrapedObjects);	
 												}
@@ -963,10 +985,11 @@ exports.updateScreen_ICE = function(req, res){
 				async.series([
 					function(comparecallback){
 						try{
-							var scrapedDataQuery="select screendata from screens where screenid="+screenID
-								" and projectid="+projectID+
-								" allow filtering ;";
-						fetchScrapedData(scrapedDataQuery,function(err,scrapedobjects,querycallback){
+							// var scrapedDataQuery="select screendata from screens where screenid="+screenID
+							// 	" and projectid="+projectID+
+							// 	" allow filtering ;";
+						inputs = {"query": "getscrapedata", "screenid":screenID,"projectid":projectID};
+						fetchScrapedData(inputs,function(err,scrapedobjects,querycallback){
 							 try{
 								
 								  if(scrapedobjects == null && scrapedobjects == '' && scrapedobjects == undefined){
@@ -1034,7 +1057,8 @@ exports.updateScreen_ICE = function(req, res){
 																" and screenname ='" + screenName +
 																"' and versionnumber = "+requestedversionnumber+
 																" IF EXISTS; "
-				
+											inputs={"scrapedata":scrapedObjects,"modifiedby":modifiedBy,"skucodescreen":requestedskucodeScreens,
+											"screenid":screenID,"projectid":projectID,"screenname":screenName,"versionnumber":requestedversionnumber};
 											//console.log("UPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP",updateScreenQuery);
 				
 											finalFunction(scrapedObjects);	
@@ -1083,14 +1107,17 @@ exports.updateScreen_ICE = function(req, res){
 			try{
 				if(statusFlag=="" && scrapedObjects != "scrape data error: Fail"){
 					//console.log(updateScreenQuery);
-					dbConn.execute(updateScreenQuery, function(err, result){
+					// dbConn.execute(updateScreenQuery, function(err, result){
+					var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
+					client.post("http://127.0.0.1:1990/design/updateScreen_ICE",args,
+						function (result, response) {
 						try{
-							if (err) {
+							// if (err) {
+							if(response.statusCode != 200 || result.rows == "fail"){	
 								// console.log(err);
 								statusFlag="Error occured in updateScreenData : Fail";
 								// console.log(err);
 								try{
-								
 									res.send(statusFlag);
 								}catch(exception){
 									console.log(exception);
@@ -1100,7 +1127,8 @@ exports.updateScreen_ICE = function(req, res){
 									async.waterfall([
 									function(testcasecallback){
 										try{
-											var testcaseDataQuery="select testcaseid,testcasename,testcasesteps from testcases where screenid="+screenID;
+											// var testcaseDataQuery="select testcaseid,testcasename,testcasesteps from testcases where screenid="+screenID;
+											inputstestcase={"query":"screenid","screenid":screenID};
 											var newCustnames,oldCustnames,xpathofCustnames;
 											if(param == 'editScrapeData_ICE'){
 												newCustnames=updateData.editedList.modifiedCustNames;
@@ -1117,8 +1145,13 @@ exports.updateScreen_ICE = function(req, res){
 												oldCustnames = updateData.deletedList.deletedCustName;
 												xpathofCustnames = updateData.deletedList.deletedXpath;
 											}
-												dbConn.execute(testcaseDataQuery, function(testcaseDataQueryerr, testcaseDataQueryresult){
-													if(testcaseDataQueryerr){
+												var args = {data:inputstestcase,headers:{"Content-Type" : "application/json"}}
+												client.post("http://127.0.0.1:1990/design/readTestCase_ICE",args,
+														function (testcaseDataQueryresult, response) {
+												// dbConn.execute(testcaseDataQuery, function(testcaseDataQueryerr, testcaseDataQueryresult){
+													// if(testcaseDataQueryerr){
+														
+													if(response.statusCode != 200 || testcaseDataQueryresult.rows == "fail"){	
 														statusFlag="Error occured in testcaseDataQuery : Fail";
 														try{
 															res.send(statusFlag);
@@ -1242,7 +1275,9 @@ exports.updateScreen_ICE = function(req, res){
 																			"' where screenid=" + screenID + " and testcaseid=" + updatingTestcaseid + 
 																			" and testcasename='" + updatingtestcasename + 
 																			"' and versionnumber = "+requestedversionnumber+" IF EXISTS;";
-																		uploadTestCaseData(updateTestCaseQuery,function(error,response){
+																		inputs={"query":"updatetestcasedata","modifiedby":userInfo.username,"skucodetestcase":"skucodetestcase","testcaseid":updatingTestcaseid,
+																		"testcasesteps":updatingtestcasedata,"screenid":screenID,"testcasename":updatingtestcasename,"versionnumber":requestedversionnumber}
+																		uploadTestCaseData(inputs,function(error,response){
 																			if(error){
 																				try{
 																					res.send(error);
@@ -1406,7 +1441,9 @@ function buildObject(scrapedObjects,modifiedBy,requestedskucodeScreens,
 			" and projectid ="+projectID+
 			" and screenname ='" + screenName +
 			"' and versionnumber = "+requestedversionnumber+
-		" IF EXISTS; ";	
+		" IF EXISTS; ";
+		inputs={"scrapedata":scrapedObjects,"modifiedby":modifiedBy,"skucodescreen":requestedskucodeScreens,
+		"screenid":screenID,"projectid":projectID,"screenname":screenName,"versionnumber":requestedversionnumber};
 		return updateScreenQuery;
 	}catch(exception){
 		console.log(exception);
@@ -1468,12 +1505,17 @@ function parseRequest(readChild){
  * generic function for DB to update the testcases table
  * @author vishvas.a
  */
-function uploadTestCaseData(updateTestCasesQuery,uploadTestCaseDatacallback){
+function uploadTestCaseData(inputs,uploadTestCaseDatacallback){
 	try{
+
 		var statusFlag="";
-		dbConn.execute(updateTestCasesQuery, 
-			function(updateTestCaseQueryerr, updateTestCaseQueryresult){
-				if(updateTestCaseQueryerr){
+		// dbConn.execute(updateTestCasesQuery, 
+			// function(updateTestCaseQueryerr, updateTestCaseQueryresult){
+		var args = {data:inputs,headers:{"Content-Type" : "application/json"}};
+		client.post("http://127.0.0.1:1990/design/updateTestCase_ICE",args,
+					function (result, response) {
+				// if(updateTestCaseQueryerr){
+				if(response.statusCode != 200 || result.rows == "fail"){
 					statusFlag="Error occured in updateTestCaseQuery : Fail";
 					uploadTestCaseDatacallback(statusFlag,null);
 				}else{
@@ -1517,7 +1559,8 @@ exports.readTestCase_ICE = function (req, res) {
 		inputs={"screenid": requestedscreenid,
 			"testcasename":requestedtestscasename,
 			"testcaseid" : requestedtestscaseid,
-            "versionnumber" : 1}
+            "versionnumber" : 1,
+		"query": "readtestcase"}
 		var args = {
 					data:inputs,
 					headers:{"Content-Type" : "application/json"}
@@ -1556,9 +1599,11 @@ exports.readTestCase_ICE = function (req, res) {
 							testcasesteps = result.rows[i].testcasesteps;
 							testcasename = result.rows[i].testcasename;
 						}
-						var scrapedDataQuery="select screendata from screens where screenid="+requestedscreenid+
-							" allow filtering ;";
-						fetchScrapedData(scrapedDataQuery,function(err,scrapedobjects,querycallback){
+						// var scrapedDataQuery="select screendata from screens where screenid="+requestedscreenid+
+						// 	" allow filtering ;";
+						var inputs = {"query": "debugtestcase", "screenid":requestedscreenid};
+					    fetchScrapedData(inputs, function(err, scrapedobjects, querycallback) {						
+						// fetchScrapedData(scrapedDataQuery,function(err,scrapedobjects,querycallback){
 							try{
 								if(scrapedobjects != null && scrapedobjects != '' && scrapedobjects != undefined){
 									var newParse = JSON.parse(scrapedobjects);
@@ -1668,10 +1713,15 @@ exports.updateTestCase_ICE = function (req, res) {
 		 * based on requested screenid,testcasename,testcaseid and testcasesteps
 		 */
 		var checktestcaseexist = "select testcaseid from testcases where screenid=" + requestedscreenid;
-	
-		dbConn.execute(checktestcaseexist, function (err, result) {
+		var inputs = {"screenid":requestedscreenid, "query":"checktestcaseexist"};
+		var args = {data:inputs,headers:{"Content-Type" : "application/json"}};
+		client.post("http://127.0.0.1:1990/design/updateTestCase_ICE",args,
+					function (result, response) {
+		console.log('-------------',response);
+		//dbConn.execute(checktestcaseexist, function (err, result) {
 			try{
-				if (err) {
+			//	if (err) {
+				if(response.statusCode != 200 || result.rows == "fail"){	
 					var flag = "Error in Query 1 testcaseexist: Fail";
 					try{
 						res.send(flag);
@@ -1692,18 +1742,27 @@ exports.updateTestCase_ICE = function (req, res) {
 						 */
 						requestedtestcasesteps = JSON.stringify(requestedtestcasesteps);
 						requestedtestcasesteps = requestedtestcasesteps.replace(/'+/g,"''");
-						var updateTestCaseData = "UPDATE testcases SET modifiedby='" + userinfo.username +
-							"', modifiedon='" + new Date().getTime() +
-							"',  skucodetestcase='" + requestedskucodetestcase +
-							"', history= history + { "+requestedhistory+" }" +
-							",  testcasesteps='" + requestedtestcasesteps + "'"+
-							" where versionnumber = "+requestedversionnumber+" and screenid=" + requestedscreenid + " and testcaseid=" + requestedtestcaseid + " and testcasename='" + requestedtestcasename + "' IF EXISTS;";
+						var inputs = {"screenid":requestedscreenid,
+										 "query":"updatetestcasedata",
+										"modifiedby" : userinfo.username,
+										"skucodetestcase" : requestedskucodetestcase,
+										"testcasesteps" : requestedtestcasesteps,
+										"versionnumber" : requestedversionnumber,
+										"testcaseid" :  requestedtestcaseid,
+										"testcasename"  : requestedtestcasename
+										};
+						// var updateTestCaseData = "UPDATE testcases SET modifiedby='" + userinfo.username +
+						// 	"', modifiedon='" + new Date().getTime() +
+						// 	"',  skucodetestcase='" + requestedskucodetestcase +
+						// 	//"', history= history + { "+requestedhistory+" }" +
+						// 	"',  testcasesteps='" + requestedtestcasesteps + "'"+
+						// 	" where versionnumber = "+requestedversionnumber+" and screenid=" + requestedscreenid + " and testcaseid=" + requestedtestcaseid + " and testcasename='" + requestedtestcasename + "' IF EXISTS;";
 
 		                 updateTestCaseQuery =  "UPDATE testcases SET  history= history + { "+requestedhistory+" }" +
 							" where versionnumber = "+requestedversionnumber+" and screenid=" + requestedscreenid + " and testcaseid=" + requestedtestcaseid + " and testcasename='" + requestedtestcasename + "' ";
 							console.log(updateTestCaseQuery);
-						
-							uploadTestCaseData(updateTestCaseData,function(error,response){
+							uploadTestCaseData(inputs,function(error,response){
+							// uploadTestCaseData(updateTestCaseData,function(error,response){
 								if(error){
 									try{
 										res.send(error);
@@ -1801,10 +1860,15 @@ exports.debugTestCase_ICE = function (req, res) {
 					    var flag = "";
 					    //for (var indexes = 0; indexes < requestedtestcaseids.length; indexes++) {
 					    async.forEachSeries(requestedtestcaseids, function(testcaseIDs, eachTestcaseIDsCallback) {
-					        var getProjectTestcasedata = "select screenid,testcasename,testcasesteps from testcases where testcaseid=" + testcaseIDs;
-					        dbConn.execute(getProjectTestcasedata, function(errgetTestcasedata, testcasedataresult) {
+					        // var getProjectTestcasedata = "select screenid,testcasename,testcasesteps from testcases where testcaseid=" + testcaseIDs;
+					        // dbConn.execute(getProjectTestcasedata, function(errgetTestcasedata, testcasedataresult) {
+								var inputs = {"query": "testcaseid", "testcaseid":testcaseIDs};
+								var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
+								client.post("http://127.0.0.1:1990/design/readTestCase_ICE",args,
+										function (testcasedataresult, response) {
 					            try {
-					                if (errgetTestcasedata) {
+					                // if (errgetTestcasedata) {
+									if(response.statusCode != 200 || testcasedataresult.rows == "fail"){	
 					                    flag = "Error in getProjectTestcasedata : Fail";
 					                    try {
 					                        res.send(flag);
@@ -1823,9 +1887,10 @@ exports.debugTestCase_ICE = function (req, res) {
 					                        responseobject.testcasename = eachTestcaseData.testcasename;
 					                        responsedata.push(responseobject);
 					                        responsedata.push(browsertypeobject);
-					                        var scrapedDataQuery = "select screendata from screens where screenid=" +
-					                            testcasedataresult.rows[0].screenid + " allow filtering ;";
-					                        fetchScrapedData(scrapedDataQuery, function(err, scrapedobjects, querycallback) {
+					                        // var scrapedDataQuery = "select screendata from screens where screenid=" +
+					                        //     testcasedataresult.rows[0].screenid + " allow filtering ;";
+											var inputs = {"query": "debugtestcase", "screenid":testcasedataresult.rows[0].screenid};
+					                        fetchScrapedData(inputs, function(err, scrapedobjects, querycallback) {
 					                            counter++;
 					                            try {
 					                                if (scrapedobjects != null && scrapedobjects != '' && scrapedobjects != undefined) {
@@ -1862,139 +1927,11 @@ exports.debugTestCase_ICE = function (req, res) {
 					        });
 					    });
 					    ///////////
-					    /*requestedtestcaseids.forEach(function(testcase,i){
-					                                                                                                                var getProjectTestcasedata = "select screenid,testcasename,testcasesteps from testcases where testcaseid=" + testcase;
-					                                                                                                                dbConn.execute(getProjectTestcasedata, function (errgetTestcasedata, testcasedataresult) {
-					                                                                                                                                try{
-					                                                                                                                                                if (errgetTestcasedata) {
-					                                                                                                                                                                flag = "Error in getProjectTestcasedata : Fail";
-					                                                                                                                                                                try{
-					                                                                                                                                                                                res.send(flag);
-					                                                                                                                                                                }catch(exception){
-					                                                                                                                                                                                console.log(exception);
-					                                                                                                                                                                }
-					                                                                                                                                                } else {
-					                                                                                                                                                                //for (var ids = 0; ids < testcasedataresult.rows.length; ids++) {
-					                                                                                                                                                                                testcasedataresult.rows.forEach(function(ids,j){
-					                                                                                                                                                                                                var responseobject = {
-					                                                                                                                                                                                                                template: "",
-					                                                                                                                                                                                                                testcasename: "",
-					                                                                                                                                                                                                                testcase: []
-					                                                                                                                                                                                                };
-					                                                                                                                                                                                responseobject.testcase = ids.testcasesteps;
-					                                                                                                                                                                                responseobject.testcasename = ids.testcasename;
-					                                                                                                                                                                                responsedata.push(responseobject);
-					                                                                                                                                                                                responsedata.push(browsertypeobject);
-					                                                                                                                                                                                var scrapedDataQuery="select screendata from screens where screenid="+
-					                                                                                                                                                                                                                testcasedataresult.rows[0].screenid+" allow filtering ;";
-					                                                                                                                                                                                fetchScrapedData(scrapedDataQuery,function(err,scrapedobjects,querycallback){
-					                                                                                                                                                                                                counter++;
-					                                                                                                                                                                                                try{
-					                                                                                                                                                                                                                if(scrapedobjects != null && scrapedobjects != '' && scrapedobjects != undefined){
-					                                                                                                                                                                                                                                var newParse = JSON.parse(scrapedobjects);
-					                                                                                                                                                                                                                                if('body' in newParse){
-					                                                                                                                                                                                                                                                var screen_obj=responsedata[counter];
-					                                                                                                                                                                                                                                                screen_obj.template = newParse.body[0];
-
-					                                                                                                                                                                                                                                }
-					                                                                                                                                                                                                                }
-					                                                                                                                                                                                                                // responsedata.push(responseobject);
-					                                                                                                                                                                                                                // responsedata.push(browsertypeobject);
-					                                                                                                                                                                                                                if(counter==requestedtestcaseids.length-1){
-					                                                                                                                                                                                                                                mySocket._events.result_debugTestCase = [];
-					                                                                                                                                                                                                                                mySocket.emit('debugTestCase',responsedata);
-					                                                                                                                                                                                                                                mySocket.on('result_debugTestCase', function (responsedata) {
-					                                                                                                                                                                                                                                                try{
-					                                                                                                                                                                                                                                                                res.send(responsedata);
-					                                                                                                                                                                                                                                                }catch(exception){
-					                                                                                                                                                                                                                                                                console.log(exception);
-					                                                                                                                                                                                                                                                }
-					                                                                                                                                                                                                                                })
-					                                                                                                                                                                                                                }
-					                                                                                                                                                                                                                                
-					                                                                                                                                                                                                                
-					                                                                                                                                                                                                                
-					                                                                                                                                                                                                }catch(exception){
-					                                                                                                                                                                                                                console.log(exception);
-					                                                                                                                                                                                                }
-					                                                                                                                                                                                });
-					                                                                                                                                                                //}
-					                                                                                                                                                                });
-					                                                                                                                                                }
-					                                                                                                                                }catch(exception){
-					                                                                                                                                                console.log(exception);
-					                                                                                                                                }
-					                                                                                                                });
-					                                                                                                //}
-					                                                                                                                });*/
-
+					    /*requestedtestcaseids.forEach(function(testcase,i){vargetProjectTestcasedata="selectscreenid,testcasename,testcasestepsfromtestcaseswheretestcaseid="+testcase;dbConn.execute(getProjectTestcasedata,function(errgetTestcasedata,testcasedataresult){try{if(errgetTestcasedata){flag="ErroringetProjectTestcasedata:Fail";try{res.send(flag);}catch(exception){console.log(exception);}}else{//for(varids=0;ids<testcasedataresult.rows.length;ids++){testcasedataresult.rows.forEach(function(ids,j){varresponseobject={template:"",testcasename:"",testcase:[]};responseobject.testcase=ids.testcasesteps;responseobject.testcasename=ids.testcasename;responsedata.push(responseobject);responsedata.push(browsertypeobject);varscrapedDataQuery="selectscreendatafromscreenswherescreenid="+testcasedataresult.rows[0].screenid+"allowfiltering;";fetchScrapedData(scrapedDataQuery,function(err,scrapedobjects,querycallback){counter++;try{if(scrapedobjects!=null&&scrapedobjects!=''&&scrapedobjects!=undefined){varnewParse=JSON.parse(scrapedobjects);if('body'innewParse){varscreen_obj=responsedata[counter];screen_obj.template=newParse.body[0];}}//responsedata.push(responseobject);//responsedata.push(browsertypeobject);if(counter==requestedtestcaseids.length-1){mySocket._events.result_debugTestCase=[];mySocket.emit('debugTestCase',responsedata);mySocket.on('result_debugTestCase',function(responsedata){try{res.send(responsedata);}catch(exception){console.log(exception);}})}}catch(exception){console.log(exception);}});//}});}}catch(exception){console.log(exception);}});//}});*/
 					} catch (exception) {
 					    console.log(exception);
 					}
-					// try{
-//					            var requestedbrowsertypes = req.body.browsertypes;
-//					            var requestedtestcaseids = req.body.testcaseids;
-//					            var responsedata = [];
-//					            var responseobject = {
-//					                            template: "",
-//					                            testcasename: "",
-//					                            testcase: []
-//					            };
-//					            var browsertypeobject = { browsertype: requestedbrowsertypes };
-//					            var flag = "";
-//					            for (var indexes = 0; indexes < requestedtestcaseids.length; indexes++) {
-//					                            var getProjectTestcasedata = "select screenid,testcasename,testcasesteps from testcases where testcaseid=" + requestedtestcaseids[indexes];
-//					                            dbConn.execute(getProjectTestcasedata, function (errgetTestcasedata, testcasedataresult) {
-//					                                            try{
-//					                                                            if (errgetTestcasedata) {
-//					                                                                            flag = "Error in getProjectTestcasedata : Fail";
-//					                                                                            try{
-//					                                                                                            res.send(flag);
-//					                                                                            }catch(exception){
-//					                                                                                            console.log(exception);
-//					                                                                            }
-//					                                                            } else {
-//					                                                                            for (var ids = 0; ids < testcasedataresult.rows.length; ids++) {
-//					                                                                                            responseobject.testcase = testcasedataresult.rows[ids].testcasesteps;
-//					                                                                                            responseobject.testcasename = testcasedataresult.rows[ids].testcasename;
-//					                                                                                            var scrapedDataQuery="select screendata from screens where screenid="+
-//					                                                                                                                            testcasedataresult.rows[0].screenid+" allow filtering ;";
-//					                                                                                            fetchScrapedData(scrapedDataQuery,function(err,scrapedobjects,querycallback){
-//					                                                                                                            try{
-//					                                                                                                                            if(scrapedobjects != null && scrapedobjects != '' && scrapedobjects != undefined){
-//					                                                                                                                                            var newParse = JSON.parse(scrapedobjects);
-//					                                                                                                                                            if('body' in newParse){
-//					                                                                                                                                                            responseobject.template = newParse.body[0];
-//					                                                                                                                                            }
-//					                                                                                                                            }
-//					                                                                                                                            responsedata.push(responseobject);
-//					                                                                                                                            responsedata.push(browsertypeobject);
-//					                                                                                                                                            mySocket._events.result_debugTestCase = [];
-//					                                                                                                                                            mySocket.emit('debugTestCase',responsedata);
-//					                                                                                                                                            mySocket.on('result_debugTestCase', function (responsedata) {
-//					                                                                                                                                                            try{
-//					                                                                                                                                                                            res.send(responsedata);
-//					                                                                                                                                                            }catch(exception){
-//					                                                                                                                                                                            console.log(exception);
-//					                                                                                                                                                            }
-//					                                                                                                                                            })
-
-
-//					                                                                                                            }catch(exception){
-//					                                                                                                                            console.log(exception);
-//					                                                                                                            }
-//					                                                                                            });
-//					                                                                            }
-//					                                                            }
-//					                                            }catch(exception){
-//					                                                            console.log(exception);
-//					                                            }
-//					                            });
-//					            }
-
-					// }catch(exception){
-//					            console.log(exception);
-					// }
+					//try{//varrequestedbrowsertypes=req.body.browsertypes;//varrequestedtestcaseids=req.body.testcaseids;//varresponsedata=[];//varresponseobject={//template:"",//testcasename:"",//testcase:[]//};//varbrowsertypeobject={browsertype:requestedbrowsertypes};//varflag="";//for(varindexes=0;indexes<requestedtestcaseids.length;indexes++){//vargetProjectTestcasedata="selectscreenid,testcasename,testcasestepsfromtestcaseswheretestcaseid="+requestedtestcaseids[indexes];//dbConn.execute(getProjectTestcasedata,function(errgetTestcasedata,testcasedataresult){//try{//if(errgetTestcasedata){//flag="ErroringetProjectTestcasedata:Fail";//try{//res.send(flag);//}catch(exception){//console.log(exception);//}//}else{//for(varids=0;ids<testcasedataresult.rows.length;ids++){//responseobject.testcase=testcasedataresult.rows[ids].testcasesteps;//responseobject.testcasename=testcasedataresult.rows[ids].testcasename;//varscrapedDataQuery="selectscreendatafromscreenswherescreenid="+//testcasedataresult.rows[0].screenid+"allowfiltering;";//fetchScrapedData(scrapedDataQuery,function(err,scrapedobjects,querycallback){//try{//if(scrapedobjects!=null&&scrapedobjects!=''&&scrapedobjects!=undefined){//varnewParse=JSON.parse(scrapedobjects);//if('body'innewParse){//responseobject.template=newParse.body[0];//}//}//responsedata.push(responseobject);//responsedata.push(browsertypeobject);//mySocket._events.result_debugTestCase=[];//mySocket.emit('debugTestCase',responsedata);//mySocket.on('result_debugTestCase',function(responsedata){//try{//res.send(responsedata);//}catch(exception){//console.log(exception);//}//})//}catch(exception){//console.log(exception);//}//});//}//}//}catch(exception){//console.log(exception);//}//});//}//}catch(exception){//console.log(exception);//}
 				}else if(action == 'debugTestCaseWS_ICE'){
 					try{
 						mySocket._events.result_debugTestCaseWS = [];
@@ -2272,12 +2209,17 @@ exports.getTestcasesByScenarioId_ICE = function getTestcasesByScenarioId_ICE(req
 		{
 		var testcasesArr = [];
 		var testScenarioId = req.body.testScenarioId;
-		var getTestcaseIds = "select testcaseids from testscenarios where testscenarioid = "+testScenarioId+" ALLOW FILTERING";
+		// var getTestcaseIds = "select testcaseids from testscenarios where testscenarioid = "+testScenarioId+" ALLOW FILTERING";
 		//console.log(getTestcaseIds);
-		dbConn.execute(getTestcaseIds,
-			function(errGetTestCaseIds,testcasesResult) {
+		// dbConn.execute(getTestcaseIds,
+		// 	function(errGetTestCaseIds,testcasesResult) {
+		var inputs = {"testscenarioid":testScenarioId, "query":"gettestcaseids"};
+		var args = {data:inputs,headers:{"Content-Type" : "application/json"}};
+		client.post("http://127.0.0.1:1990/design/getTestcasesByScenarioId_ICE",args,
+						function (testcasesResult, response) {
 				try{
-					if (errGetTestCaseIds) {
+					
+					if(response.statusCode != 200 || testcasesResult.rows == "fail"){	
 						flag = "Error in fetching testcaseIds : Fail";
 						try{
 							res.send(flag);
@@ -2286,18 +2228,23 @@ exports.getTestcasesByScenarioId_ICE = function getTestcasesByScenarioId_ICE(req
 						}
 					} else {
 						//console.log("testcaseIds", testcasesResult.rows[0].testcaseids);
+						
 						var testcaseIds = testcasesResult.rows[0].testcaseids
 						
 						async.forEachSeries(testcaseIds,function(eachtestcaseid,fetchtestcaseNameCallback){
 							
 							var testcasesObj={};
 							try{
-							var getTestCaseDetails = "select testcasename from testcases where testcaseid = "+eachtestcaseid+" ALLOW FILTERING";
-							dbConn.execute(getTestCaseDetails,
-			                      function(errGetTestCaseDetails,testcaseNamesResult) {
+							// var getTestCaseDetails = "select testcasename from testcases where testcaseid = "+eachtestcaseid+" ALLOW FILTERING";
+							// dbConn.execute(getTestCaseDetails,
+			                //       function(errGetTestCaseDetails,testcaseNamesResult) {
+							var inputs = {"eachtestcaseid":eachtestcaseid, "query":"gettestcasedetails"};
+							var args = {data:inputs,headers:{"Content-Type" : "application/json"}};
+							client.post("http://127.0.0.1:1990/design/getTestcasesByScenarioId_ICE",args,
+							function (testcaseNamesResult, response) {
 									try{
-											if(errGetTestCaseDetails)
-											{
+											// if(errGetTestCaseDetails)
+											if(response.statusCode != 200 || testcaseNamesResult.rows == "fail"){	
 												flag = "Error in fetching testcaseNames : Fail";
 												try{
 														res.send(flag);
