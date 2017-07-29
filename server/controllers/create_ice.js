@@ -13,11 +13,17 @@ var client = new Client();
 function get_moduleName(moduleId,cb,data){
         var flag = false;
         var obj = {flag:false,modulename:'',testscenarioids:[]};
-        var moduleCheck = "SELECT modulename,testscenarioids FROM modules where moduleid="+moduleId;
-        dbConnICE.execute(moduleCheck,function(err,modulename){
-            if(err){
-                console.log(err);
-                cb(null,err);
+        //var moduleCheck = "SELECT modulename,testscenarioids FROM modules where moduleid="+moduleId;
+        //dbConnICE.execute(moduleCheck,function(err,modulename){
+        var inputs={"id": moduleId,"name":"module"}
+	
+		var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
+
+        client.post("http://127.0.0.1:1990/create_ice/getNames_Ninteen68",args,
+						function (modulename, response) {
+            //if(err){
+            if(response.statusCode != 200 || modulename.rows == "fail"){
+                cb(null,modulename.rows);
             }else{
                 if(modulename.rows.length!=0){
                     obj.flag = true; 
@@ -31,12 +37,18 @@ function get_moduleName(moduleId,cb,data){
 
 };
 function get_screenName(screenId,cb,data){
-         var screenCheck = "SELECT screenname FROM screens where screenid="+screenId;
+         //var screenCheck = "SELECT screenname FROM screens where screenid="+screenId;
          var obj2 = {flag:false,screenname:''};
-         dbConnICE.execute(screenCheck,function(err,screenname){
-             if(err){
-                        console.log(err);
-                        cb(null,err);
+         //dbConnICE.execute(screenCheck,function(err,screenname){
+        var inputs={"id": screenId,"name":"screen"}
+		var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
+        client.post("http://127.0.0.1:1990/create_ice/getNames_Ninteen68",args,
+						function (screenname, response) {
+                    //if(err){
+                    if(response.statusCode != 200 || screenname.rows == "fail"){
+                         // cb(null,err);
+                        console.log(screenname.rows);
+                        cb(null,screenname.rows);
                     }else{
                         if(screenname.rows.length!=0){
                             obj2.flag = true; 
@@ -52,10 +64,16 @@ function get_screenName(screenId,cb,data){
 function get_scenarioName(testscenarioId,cb,data){
          var testscenarioCheck = "SELECT testscenarioname FROM testscenarios where testscenarioid="+testscenarioId;
          var obj2 = {flag:false,testscenarioname:''};
-        dbConnICE.execute(testscenarioCheck,function(err,testscenarioname){
-                if(err){
-                        console.log(err);
-                        cb(null,err);
+        //dbConnICE.execute(testscenarioCheck,function(err,testscenarioname){
+        var inputs={"id": testscenarioId,"name":"scenario"}
+		var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
+        client.post("http://127.0.0.1:1990/create_ice/getNames_Ninteen68",args,
+                    function (testscenarioname, response) {
+                //if(err){
+                     if(response.statusCode != 200 || testscenarioname.rows == "fail"){
+                        // cb(null,err);
+                        console.log(testscenarioname.rows);
+                        cb(null,testscenarioname.rows);
                     }else{
                         if(testscenarioname.rows.length!=0){
                             obj2.flag = true; 
@@ -139,12 +157,18 @@ exports.getAllNames = function(parent,cb,data){
 };
 
 function get_testcaseName(testcaseId,cb,data){
-         var testcaseCheck = "SELECT testcasename FROM testcases where testcaseid="+testcaseId;
+        // var testcaseCheck = "SELECT testcasename FROM testcases where testcaseid="+testcaseId;
          var obj3 = {flag:false,testcasename:''};
-        dbConnICE.execute(testcaseCheck,function(err,testcasename){
-            if(err){
-                console.log(err);
-                cb(null,err);
+        
+        //dbConnICE.execute(testcaseCheck,function(err,testcasename){
+         var inputs={"id": testcaseId,"name":"testcase"}
+		 var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
+        client.post("http://127.0.0.1:1990/create_ice/getNames_Ninteen68",args,
+						function (testcasename, response) {
+           // if(err){
+            if(response.statusCode != 200 || testcasename.rows == "fail"){
+                console.log(testcasename.rows);
+                cb(null,testcasename.rows);
             }else{
                 if(testcasename.rows.length!=0){
                     obj3.flag = true; 
