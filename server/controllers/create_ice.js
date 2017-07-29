@@ -1279,12 +1279,20 @@ exports.getProjectIDs_Nineteen68 = function(req, res){
     var projectdetails = {projectId:[],projectName:[],apptype:[]};
     var user_id = req.userid;
     //var user_id='e348b7e0-aad7-47d5-ae43-23ec64e83747';
+    inputs1 = { "userid":user_id,"query":"getprojids"};
+	args1 = {data:inputs1,headers:{"Content-Type" : "application/json"}}
     async.series({
         function(callback){
-               var getProjIds = "select projectids FROM icetestautomation.icepermissions where userid"+'='+ user_id;
-        dbConnICE.execute(getProjIds, function (err, result) {
-            if (err) {
-                res(null, err);
+        //var getProjIds = "select projectids FROM icetestautomation.icepermissions where userid"+'='+ user_id;
+        //dbConnICE.execute(getProjIds, function (err, result) {
+        client.post("http://127.0.0.1:1990/create_ice/getProjectIDs_Nineteen68",args1,
+								function (result, response) {
+
+            //if (err) {
+
+             if(response.statusCode != 200 || result.rows == "fail"){
+                //res(null, err);
+                res(null,result.rows);
             }
             else {
                 var res_projectid=[];
@@ -1292,12 +1300,17 @@ exports.getProjectIDs_Nineteen68 = function(req, res){
                     res_projectid=result.rows[0].projectids;
                 }
                 async.forEachSeries(res_projectid,function(iterator,callback1){
-                    
-                    var getProjectName = "select projectName,projecttypeid FROM icetestautomation.projects where projectID"+'='+iterator;
-                    dbConnICE.execute(getProjectName,function(err,projectnamedata){
+                    inputs2 = { "projectid":iterator,"query":"getprojectname"};
+                    args2 = {data:inputs2,headers:{"Content-Type" : "application/json"}}
+                    //var getProjectName = "select projectName,projecttypeid FROM icetestautomation.projects where projectID"+'='+iterator;
+                   // dbConnICE.execute(getProjectName,function(err,projectnamedata){
+                       client.post("http://127.0.0.1:1990/create_ice/getProjectIDs_Nineteen68",args2,
+								function (projectnamedata, response) {
                         try{
-                            if(err){
-                            res(null,err);
+                            //if(err){
+                            if(response.statusCode != 200 || projectnamedata.rows == "fail"){
+                                //res(null,err);
+                                res(null,projectnamedata.rows);
                             }else{
                                 if (projectnamedata.rows[0] != undefined ){
                                     project_names.push(projectnamedata.rows[0].projectname);
