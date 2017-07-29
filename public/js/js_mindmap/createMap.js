@@ -1142,17 +1142,19 @@ var inpChange = function(e){
 		var t=p.attr('data-nodetype');
 	if(!d3.select('#ct-inpSugg').classed('no-disp') && temp && temp.length>0) return;
 	if(dNodes[pi].id_n){
-		dNodes[pi].original_name=p.text();
+		dNodes[pi].original_name=pt.text();
 		dNodes[pi].rnm=!0;
 	} 
 	if(t=='screens' && scrList[inp.attr('data-nodeid')]!==undefined){
-		dNodes[pi].id_n=scrList[inp.attr('data-nodeid')].id_n;
+		//The below line leads to duplicate id_n of nodes when the node name is selected from suggestions list (only via mouse click)
+		//dNodes[pi].id_n=scrList[inp.attr('data-nodeid')].id_n;
 		dNodes[pi].name=scrList[inp.attr('data-nodeid')].name;
 		pt.text(dNodes[pi].name);
 		d3.select('#ct-inpBox').classed('no-disp',!0);
 	}
 	else if(t=='testcases' && tcList[inp.attr('data-nodeid')]!==undefined){
-		dNodes[pi].id_n=tcList[inp.attr('data-nodeid')].id_n;
+		//The below line leads to duplicate id_n of nodes when the node name is selected from suggestions list (only via mouse click)
+		//dNodes[pi].id_n=tcList[inp.attr('data-nodeid')].id_n;
 		dNodes[pi].name=tcList[inp.attr('data-nodeid')].name;
 		pt.text(dNodes[pi].name);
 		d3.select('#ct-inpBox').classed('no-disp',!0);
