@@ -1040,7 +1040,7 @@ function testcasedetails_testscenarios(req, cb, data) {
             //         console.log(err);
             var inputs = {"query": "testscenariotable", "testscenarioid":req};
             var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
-            client.post(epurl+"admin/getTestcaseDetailsForScenario_ICE",args,
+            client.post(epurl+"suite/getTestcaseDetailsForScenario_ICE",args,
 			function (testscenarioresult, response) {
 				if(response.statusCode != 200 || testscenarioresult.rows == "fail"){	
                     console.log(response.statusCode);
@@ -1060,7 +1060,7 @@ function testcasedetails_testscenarios(req, cb, data) {
                 //         console.log(err);
                 var inputs = {"query": "testcasetable", "testcaseid":itr};
                 var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
-                client.post(epurl+"admin/getTestcaseDetailsForScenario_ICE",args,
+                client.post(epurl+"suite/getTestcaseDetailsForScenario_ICE",args,
                 function (testcaseresult, response) {
                     if(response.statusCode != 200 || testcaseresult.rows == "fail"){	
                         console.log(response.statusCode);
@@ -1084,7 +1084,7 @@ function testcasedetails_testscenarios(req, cb, data) {
                 //         console.log(err);
                 var inputs = {"query": "screentable", "screenid":screenitr};
                 var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
-                client.post(epurl+"admin/getTestcaseDetailsForScenario_ICE",args,
+                client.post(epurl+"suite/getTestcaseDetailsForScenario_ICE",args,
                 function (screenresult, response) {
                     if(response.statusCode != 200 || screenresult.rows == "fail"){	
                         console.log(response.statusCode);
@@ -1109,7 +1109,7 @@ function testcasedetails_testscenarios(req, cb, data) {
                     //         console.log(err);
                     var inputs = {"query": "projecttable", "projectid":projectitr};
                     var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
-                    client.post(epurl+"admin/getTestcaseDetailsForScenario_ICE",args,
+                    client.post(epurl+"suite/getTestcaseDetailsForScenario_ICE",args,
                     function (projectresult, response) {
                         if(response.statusCode != 200 || projectresult.rows == "fail"){	
                             console.log(response.statusCode);
