@@ -439,8 +439,8 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 					var obj2 = JSON.parse(data[1].reportdata);
 					var elapTym;
 					for(j=0; j<obj2.overallstatus.length; j++){
-						finalReports.overallstatus[0].browserVersion = obj2.overallstatus[j].browserVersion;
-						finalReports.overallstatus[0].browserType = obj2.overallstatus[j].browserType;
+						finalReports.overallstatus[0].browserVersion = (obj2.overallstatus[j].browserVersion) == ""? "-" : obj2.overallstatus[j].browserVersion;
+						finalReports.overallstatus[0].browserType = (obj2.overallstatus[j].browserType) ==""? "-" : obj2.overallstatus[j].browserType;
 						finalReports.overallstatus[0].StartTime = obj2.overallstatus[j].StartTime.split(".")[0];
 						finalReports.overallstatus[0].EndTime = obj2.overallstatus[j].EndTime.split(".")[0];
 						var getTym = obj2.overallstatus[j].EndTime.split(".")[0];

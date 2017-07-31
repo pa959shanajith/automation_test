@@ -2315,7 +2315,6 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				})
 				/****Filtering same object type in one container****/
 			}
-		
 		}
 
 		/****Removing same objects type for custom objects****/
@@ -2514,13 +2513,12 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 
 				DesignServices.mapScrapeData_ICE(scrapeObject)
 				.then(function(data){
-					console.log("daaata",data);
 						if(data == "Invalid Session")
 			{
 				window.location.href = "/";
 			}
 					$("#dialog-mapObject").modal("hide");
-					if(data == "Success") 				openDialog("Map Object", "Objects has been mapped successfully.");//$("#mapObjSuccess").modal("show");
+					if(data == "success") 				openDialog("Map Object", "Objects has been mapped successfully.");//$("#mapObjSuccess").modal("show");
 					else if(data == "TagMissMatch") 	openDialog("Map Object", "Failed to map objects.");//$("#mapObjTagMissMatch").modal("show");
 					else if(typeof data == "object") 	openDialog("Map Object", "Failed to map objects.");//$("mapObjSameObject").modal("show");
 					angular.element(document.getElementById("left-nav-section")).scope().getScrapeData();
