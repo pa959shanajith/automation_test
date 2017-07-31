@@ -2331,7 +2331,6 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		$(".accd-Obj-body li").append('<span class="showPreviousVal" title="Show Previous Text"></span>');
 
 		$(document).on('shown.bs.modal','#dialog-mapObject', function () {
-			console.log("Len", $("#scrapedObjforMap").find(".ellipsis:visible").length);
 			$(".unlinkButton").attr("disabled", true);
 				if($("#scrapedObjforMap").find(".ellipsis:visible").length > 0)
 					{
