@@ -8,14 +8,22 @@ var async=require('async');
 var dbConnICE = require('../../server/config/icetestautomation');
 var dbConnICEHistory = require('../../server/config/ICEHistory');
 
+var Client = require("node-rest-client").Client;
+var client = new Client();
 function get_moduleName(moduleId,cb,data){
         var flag = false;
         var obj = {flag:false,modulename:'',testscenarioids:[]};
-        var moduleCheck = "SELECT modulename,testscenarioids FROM modules where moduleid="+moduleId;
-        dbConnICE.execute(moduleCheck,function(err,modulename){
-            if(err){
-                console.log(err);
-                cb(null,err);
+        //var moduleCheck = "SELECT modulename,testscenarioids FROM modules where moduleid="+moduleId;
+        //dbConnICE.execute(moduleCheck,function(err,modulename){
+        var inputs={"id": moduleId,"name":"module"}
+	
+		var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
+
+        client.post("http://127.0.0.1:1990/create_ice/getNames_Ninteen68",args,
+						function (modulename, response) {
+            //if(err){
+            if(response.statusCode != 200 || modulename.rows == "fail"){
+                cb(null,modulename.rows);
             }else{
                 if(modulename.rows.length!=0){
                     obj.flag = true; 
@@ -29,12 +37,18 @@ function get_moduleName(moduleId,cb,data){
 
 };
 function get_screenName(screenId,cb,data){
-         var screenCheck = "SELECT screenname FROM screens where screenid="+screenId;
+         //var screenCheck = "SELECT screenname FROM screens where screenid="+screenId;
          var obj2 = {flag:false,screenname:''};
-         dbConnICE.execute(screenCheck,function(err,screenname){
-             if(err){
-                        console.log(err);
-                        cb(null,err);
+         //dbConnICE.execute(screenCheck,function(err,screenname){
+        var inputs={"id": screenId,"name":"screen"}
+		var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
+        client.post("http://127.0.0.1:1990/create_ice/getNames_Ninteen68",args,
+						function (screenname, response) {
+                    //if(err){
+                    if(response.statusCode != 200 || screenname.rows == "fail"){
+                         // cb(null,err);
+                        console.log(screenname.rows);
+                        cb(null,screenname.rows);
                     }else{
                         if(screenname.rows.length!=0){
                             obj2.flag = true; 
@@ -50,10 +64,16 @@ function get_screenName(screenId,cb,data){
 function get_scenarioName(testscenarioId,cb,data){
          var testscenarioCheck = "SELECT testscenarioname FROM testscenarios where testscenarioid="+testscenarioId;
          var obj2 = {flag:false,testscenarioname:''};
-        dbConnICE.execute(testscenarioCheck,function(err,testscenarioname){
-                if(err){
-                        console.log(err);
-                        cb(null,err);
+        //dbConnICE.execute(testscenarioCheck,function(err,testscenarioname){
+        var inputs={"id": testscenarioId,"name":"scenario"}
+		var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
+        client.post("http://127.0.0.1:1990/create_ice/getNames_Ninteen68",args,
+                    function (testscenarioname, response) {
+                //if(err){
+                     if(response.statusCode != 200 || testscenarioname.rows == "fail"){
+                        // cb(null,err);
+                        console.log(testscenarioname.rows);
+                        cb(null,testscenarioname.rows);
                     }else{
                         if(testscenarioname.rows.length!=0){
                             obj2.flag = true; 
@@ -137,12 +157,18 @@ exports.getAllNames = function(parent,cb,data){
 };
 
 function get_testcaseName(testcaseId,cb,data){
-         var testcaseCheck = "SELECT testcasename FROM testcases where testcaseid="+testcaseId;
+        // var testcaseCheck = "SELECT testcasename FROM testcases where testcaseid="+testcaseId;
          var obj3 = {flag:false,testcasename:''};
-        dbConnICE.execute(testcaseCheck,function(err,testcasename){
-            if(err){
-                console.log(err);
-                cb(null,err);
+        
+        //dbConnICE.execute(testcaseCheck,function(err,testcasename){
+         var inputs={"id": testcaseId,"name":"testcase"}
+		 var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
+        client.post("http://127.0.0.1:1990/create_ice/getNames_Ninteen68",args,
+						function (testcasename, response) {
+           // if(err){
+            if(response.statusCode != 200 || testcasename.rows == "fail"){
+                console.log(testcasename.rows);
+                cb(null,testcasename.rows);
             }else{
                 if(testcasename.rows.length!=0){
                     obj3.flag = true; 
@@ -1202,12 +1228,18 @@ exports.getReleaseIDs_Ninteen68 = function(req,res){
     var r_ids = [];
     var rel = {rel:[],r_ids:[]};
     var project_id = req.projectId;
+    inputs = { "projectid":project_id};
+	args = {data:inputs,headers:{"Content-Type" : "application/json"}}
    //var project_id = 'd4965851-a7f1-4499-87a3-ce53e8bf8e66'
-   var getReleaseDetails = "select releasename,releaseid from icetestautomation.releases where projectid"+'='+ project_id;
-        dbConnICE.execute(getReleaseDetails, function (err, result) {
+  // var getReleaseDetails = "select releasename,releaseid from icetestautomation.releases where projectid"+'='+ project_id;
+        //dbConnICE.execute(getReleaseDetails, function (err, result) {
+        client.post("http://127.0.0.1:1990/create_ice/getReleaseIDs_Ninteen68",args,
+								function (result, response) {
             try{
-                if (err) {
-                    res(null, err);
+               // if (err) {
+                if(response.statusCode != 200 || result.rows == "fail"){
+                   // res(null, err);
+                   res(null,result.rows);
                 }
                 else {
                     async.forEachSeries(result.rows,function(iterator,callback1){
@@ -1232,12 +1264,18 @@ exports.getCycleIDs_Ninteen68 = function(req,res){
     var c_ids = [];
     var cyc = {cyc:[],c_ids:[]};
     var release_id = req.relId;
+    inputs = { "releaseid":release_id};
+	args = {data:inputs,headers:{"Content-Type" : "application/json"}}
     //var release_id = '7f71b58f-ad8c-46ac-80f5-5c4145585c08'
-    var getCycleDetails = "select cyclename,cycleid from icetestautomation.cycles where releaseid"+'='+ release_id;
-    dbConnICE.execute(getCycleDetails, function (err, result) {
+    //var getCycleDetails = "select cyclename,cycleid from icetestautomation.cycles where releaseid"+'='+ release_id;
+   // dbConnICE.execute(getCycleDetails, function (err, result) {
+       client.post("http://127.0.0.1:1990/create_ice/getCycleIDs_Ninteen68",args,
+								function (result, response) {
         try{
-            if (err) {
-                res(null, err);
+            //if (err) {
+            if(response.statusCode != 200 || result.rows == "fail"){
+                   // res(null, err);
+                   res(null,result.rows);
             }
             else {
                 async.forEachSeries(result.rows,function(iterator,callback1){
@@ -1265,12 +1303,20 @@ exports.getProjectIDs_Nineteen68 = function(req, res){
     var projectdetails = {projectId:[],projectName:[],apptype:[]};
     var user_id = req.userid;
     //var user_id='e348b7e0-aad7-47d5-ae43-23ec64e83747';
+    inputs1 = { "userid":user_id,"query":"getprojids"};
+	args1 = {data:inputs1,headers:{"Content-Type" : "application/json"}}
     async.series({
         function(callback){
-               var getProjIds = "select projectids FROM icetestautomation.icepermissions where userid"+'='+ user_id;
-        dbConnICE.execute(getProjIds, function (err, result) {
-            if (err) {
-                res(null, err);
+        //var getProjIds = "select projectids FROM icetestautomation.icepermissions where userid"+'='+ user_id;
+        //dbConnICE.execute(getProjIds, function (err, result) {
+        client.post("http://127.0.0.1:1990/create_ice/getProjectIDs_Nineteen68",args1,
+								function (result, response) {
+
+            //if (err) {
+
+             if(response.statusCode != 200 || result.rows == "fail"){
+                //res(null, err);
+                res(null,result.rows);
             }
             else {
                 var res_projectid=[];
@@ -1278,12 +1324,17 @@ exports.getProjectIDs_Nineteen68 = function(req, res){
                     res_projectid=result.rows[0].projectids;
                 }
                 async.forEachSeries(res_projectid,function(iterator,callback1){
-                    
-                    var getProjectName = "select projectName,projecttypeid FROM icetestautomation.projects where projectID"+'='+iterator;
-                    dbConnICE.execute(getProjectName,function(err,projectnamedata){
+                    inputs2 = { "projectid":iterator,"query":"getprojectname"};
+                    args2 = {data:inputs2,headers:{"Content-Type" : "application/json"}}
+                    //var getProjectName = "select projectName,projecttypeid FROM icetestautomation.projects where projectID"+'='+iterator;
+                   // dbConnICE.execute(getProjectName,function(err,projectnamedata){
+                       client.post("http://127.0.0.1:1990/create_ice/getProjectIDs_Nineteen68",args2,
+								function (projectnamedata, response) {
                         try{
-                            if(err){
-                            res(null,err);
+                            //if(err){
+                            if(response.statusCode != 200 || projectnamedata.rows == "fail"){
+                                //res(null,err);
+                                res(null,projectnamedata.rows);
                             }else{
                                 if (projectnamedata.rows[0] != undefined ){
                                     project_names.push(projectnamedata.rows[0].projectname);
@@ -1324,12 +1375,20 @@ exports.getProjectIDs_Nineteen68 = function(req, res){
 exports.getProjectType_Nineteen68 = function(req, res){
 
 	var projectDetails = {projectType:'',project_id:''};
-	var getProjectType = "select projecttypeid FROM icetestautomation.projects where projectID"+'='+req;
-	dbConnICE.execute(getProjectType, function (err, result) {
+	//var getProjectType = "select projecttypeid FROM icetestautomation.projects where projectID"+'='+req;
+    var project_id=req;
+    inputs = { "projectid":project_id};
+	args = {data:inputs,headers:{"Content-Type" : "application/json"}}
+        
+	//dbConnICE.execute(getProjectType, function (err, result) {
+    client.post("http://127.0.0.1:1990/create_ice/getProjectType_Nineteen68",args,
+								function (result, response) {
         try{
-            if (err) {
-			    res(null, err);
-		    }
+           // if (err) {
+			if(response.statusCode != 200 || result.rows == "fail"){
+                   // res(null, err);
+                   res(null,result.rows);
+            }
 		    else {
 			
 			 if(result.rows.length!=0){
