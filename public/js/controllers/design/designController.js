@@ -2300,7 +2300,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			var tag2;
 			if(path != ""){
 				var innerUL = $('#scrapedObjforMap');
-				var li = "<li data-xpath='"+ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"' data-left='"+ob.left+"' data-top='"+ob.top+"' data-width='"+ob.width+"' data-height='"+ob.height+"' data-tag='"+tag+"' data-url='"+ob.url+"' data-hiddentag='"+ob.hiddentag+"' class='item select_all "+tag+"x' val="+ob.tempId+" draggable='true' ondragstart='drag(event)'><input type='checkbox' class='checkall' name='selectAllListItems' disabled /><span title='"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;')+"' data-xpath='"+ob.xpath+"' class='ellipsis'>"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"</span></li>";
+				var li = "<li data-xpath='"+ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"' data-left='"+ob.left+"' data-top='"+ob.top+"' data-width='"+ob.width+"' data-height='"+ob.height+"' data-tag='"+tag+"' data-url='"+ob.url+"' data-hiddentag='"+ob.hiddentag+"' class='item select_all "+tag+"x' val="+ob.tempId+" draggable='true' ondragstart='drag(event)'> <span title='"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;')+"' data-xpath='"+ob.xpath+"' class='ellipsis'>"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"</span></li>";
 				angular.element(innerUL).append(li);
 			}
 			else {
@@ -2315,6 +2315,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				})
 				/****Filtering same object type in one container****/
 			}
+		
 		}
 
 		/****Removing same objects type for custom objects****/
@@ -2328,6 +2329,25 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 
 		$(".accd-Obj-head").append('<span class="showactiveArrow"></span>');
 		$(".accd-Obj-body li").append('<span class="showPreviousVal" title="Show Previous Text"></span>');
+
+		$(document).on('shown.bs.modal','#dialog-mapObject', function () {
+			console.log("Len", $("#scrapedObjforMap").find(".ellipsis:visible").length);
+			$(".unlinkButton").attr("disabled", true);
+				if($("#scrapedObjforMap").find(".ellipsis:visible").length > 0)
+					{
+						$(".showAllObjects,#submitMapObj").attr("disabled",false);
+					}
+					else{
+						$(".showAllObjects,#submitMapObj").attr("disabled",true);
+					}
+				if($(".accd-Obj-head").length > 0)
+				{
+					$("#submitMapObj").attr("disabled",false);
+				}
+				else{
+					$("#submitMapObj").attr("disabled",true);
+				}
+		});
 	}
 		compareFlag = false;
 		//Compare Objects
@@ -2495,6 +2515,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 
 				DesignServices.mapScrapeData_ICE(scrapeObject)
 				.then(function(data){
+					console.log("daaata",data);
 						if(data == "Invalid Session")
 			{
 				window.location.href = "/";
