@@ -8,7 +8,9 @@ var myserver = require('../../server.js');
 var uuid = require('uuid-random');
 var dbConnICE = require('../../server/config/icetestautomation');
 var dbConnICEHistory = require('../../server/config/ICEHistory');
-
+var epurl="http://127.0.0.1:1990/";
+var Client = require("node-rest-client").Client;
+var client = new Client();
 /**
  * @author vishvas.a
  * @modifiedauthor shree.p (fetching the scenario names from the scenarios table)
@@ -1032,24 +1034,36 @@ function testcasedetails_testscenarios(req, cb, data) {
     var projectnamelist = [];
     async.series({
         testscenariotable: function(callback) {
-            var testscenarioquery = "SELECT testcaseids FROM testscenarios where testscenarioid=" + req;
-            dbConnICE.execute(testscenarioquery, function(err, testscenarioresult) {
-                if (err) {
-                    console.log(err);
+            // var testscenarioquery = "SELECT testcaseids FROM testscenarios where testscenarioid=" + req;
+            // dbConnICE.execute(testscenarioquery, function(err, testscenarioresult) {
+            //     if (err) {
+            //         console.log(err);
+            var inputs = {"query": "testscenariotable", "testscenarioid":req};
+            var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
+            client.post(epurl+"admin/getTestcaseDetailsForScenario_ICE",args,
+			function (testscenarioresult, response) {
+				if(response.statusCode != 200 || testscenarioresult.rows == "fail"){	
+                    console.log(response.statusCode);
                 } else {
                     if (testscenarioresult.rows.length != 0)
                         testcaseids = testscenarioresult.rows[0].testcaseids;
                 }
-                callback(err, testcaseids);
+                callback(null, testcaseids);
             });
         },
         testcasetable: function(callback) {
             var testcasename = '';
             async.forEachSeries(testcaseids, function(itr, callback2) {
-                var testcasequery = "SELECT testcasename,screenid FROM testcases WHERE testcaseid=" + itr;
-                dbConnICE.execute(testcasequery, function(err, testcaseresult) {
-                    if (err) {
-                        console.log(err);
+                // var testcasequery = "SELECT testcasename,screenid FROM testcases WHERE testcaseid=" + itr;
+                // dbConnICE.execute(testcasequery, function(err, testcaseresult) {
+                //     if (err) {
+                //         console.log(err);
+                var inputs = {"query": "testcasetable", "testcaseid":itr};
+                var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
+                client.post(epurl+"admin/getTestcaseDetailsForScenario_ICE",args,
+                function (testcaseresult, response) {
+                    if(response.statusCode != 200 || testcaseresult.rows == "fail"){	
+                        console.log(response.statusCode);
                     } else {
                         if (testcaseresult.rows.length != 0) {
                             testcasenamelist.push(testcaseresult.rows[0].testcasename);
@@ -1064,10 +1078,16 @@ function testcasedetails_testscenarios(req, cb, data) {
         },
         screentable: function(callback) {
             async.forEachSeries(screenidlist, function(screenitr, callback3) {
-                var screenquery = "SELECT screenname,projectid FROM screens where screenid=" + screenitr;
-                dbConnICE.execute(screenquery, function(err, screenresult) {
-                    if (err) {
-                        console.log(err);
+                // var screenquery = "SELECT screenname,projectid FROM screens where screenid=" + screenitr;
+                // dbConnICE.execute(screenquery, function(err, screenresult) {
+                //     if (err) {
+                //         console.log(err);
+                var inputs = {"query": "screentable", "screenid":screenitr};
+                var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
+                client.post(epurl+"admin/getTestcaseDetailsForScenario_ICE",args,
+                function (screenresult, response) {
+                    if(response.statusCode != 200 || screenresult.rows == "fail"){	
+                        console.log(response.statusCode);
                     } else {
                         if (screenresult.rows.length != 0) {
                             screennamelist.push(screenresult.rows[0].screenname);
@@ -1083,10 +1103,16 @@ function testcasedetails_testscenarios(req, cb, data) {
         },
         projecttable: function(callback) {
             async.forEachSeries(projectidlist, function(projectitr, callback4) {
-                    var projectquery = "SELECT projectname FROM projects where projectid=" + projectitr;
-                    dbConnICE.execute(projectquery, function(err, projectresult) {
-                        if (err) {
-                            console.log(err);
+                    // var projectquery = "SELECT projectname FROM projects where projectid=" + projectitr;
+                    // dbConnICE.execute(projectquery, function(err, projectresult) {
+                    //     if (err) {
+                    //         console.log(err);
+                    var inputs = {"query": "projecttable", "projectid":projectitr};
+                    var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
+                    client.post(epurl+"admin/getTestcaseDetailsForScenario_ICE",args,
+                    function (projectresult, response) {
+                        if(response.statusCode != 200 || projectresult.rows == "fail"){	
+                            console.log(response.statusCode);
                         } else {
                             if (projectresult.rows.length != 0)
                                 projectnamelist.push(projectresult.rows[0].projectname);
