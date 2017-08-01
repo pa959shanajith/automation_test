@@ -2,10 +2,10 @@
  * Dependencies.
  */
 var Joi = require('joi');
-var cassandra = require('cassandra-driver');
+// var cassandra = require('cassandra-driver');
 var async = require('async');
 var uuid = require('uuid-random');
-var dbConnICE = require('../../server/config/icetestautomation');
+// var dbConnICE = require('../../server/config/icetestautomation');
 var request = require('request');
 var myserver = require('../../server.js');
 var http = require('http');
@@ -710,7 +710,6 @@ exports.getReport_Nineteen68 = function(req, res) {
 					cb(err);
 					res.send("fail");
 				} else {
-					console.log('in last function');
 					var finalReport = [];
 					finalReport.push(reportInfoObj);
 					finalReport.push(reportjson)
