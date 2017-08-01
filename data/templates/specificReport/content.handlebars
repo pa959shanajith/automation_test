@@ -87,29 +87,33 @@
 					var path = $(this).attr("data-screenshot");
                     var hostName = window.location.host;
                     console.log(path+"-----"+hostName);
-                    $.ajax({
-				        type: 'POST',
-				        url: 'https://'+hostName+'/openScreenShot',
-				        responseType: 'arraybuffer',
-				        data: {
-				        	"absPath" : path
-				        },
-				        success: function(data){
-				        	if(data == "unavailableLocalServer"){
-				        		alert("Local Server unavailable");
-				        	}
-				        	else if(data == "fail"){
-				        		alert("Failed to open image");
-				        	}
-				        	else{
-				        		var b64Response = window.btoa(unescape(encodeURIComponent(data)));
-    							var imageUrl = 'data:image/PNG;base64,'+ data;
-				    			var WindowObject = window.open();
-				    			var strHtml = "<html>\n<head>\n </head><body><div style='padding: 10px;'>\n<img style='width: 100%; height: calc(100% - 40px); border: 1px solid #ccc;' src='" + imageUrl + "'/>\n</div>\n</body>\n</html>";
-				    			WindowObject.document.writeln(strHtml);
-				        	}
-					    }
-				    });
+                    if($.trim(path) != "")
+                    {
+                            $.ajax({
+                            type: 'POST',
+                            url: 'https://'+hostName+'/openScreenShot',
+                            responseType: 'arraybuffer',
+                            data: {
+                                "absPath" : path
+                            },
+                            success: function(data){
+                                if(data == "unavailableLocalServer"){
+                                    alert("Local Server unavailable");
+                                }
+                                else if(data == "fail"){
+                                    alert("Failed to open image");
+                                }
+                                else{
+                                    var b64Response = window.btoa(unescape(encodeURIComponent(data)));
+                                    var imageUrl = 'data:image/PNG;base64,'+ data;
+                                    var WindowObject = window.open();
+                                    var strHtml = "<html>\n<head>\n </head><body><div style='padding: 10px;'>\n<img style='width: 100%; height: calc(100% - 40px); border: 1px solid #ccc;' src='" + imageUrl + "'/>\n</div>\n</body>\n</html>";
+                                    WindowObject.document.writeln(strHtml);
+                                }
+                            }
+                        });
+                    }
+                   
                 })
 
                 $(document).on('click', '.expand', function(){
