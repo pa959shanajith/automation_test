@@ -384,7 +384,7 @@ exports.reportStatusScenarios_ICE = function (req, res) {
 								try{
 									var executedtimeTemp = new Date(iterator.executedtime);
 									if(executedtimeTemp != null){
-										executedtimeTemp = executedtimeTemp.getDate()+"-"+(executedtimeTemp.getMonth()+1)+"-"+executedtimeTemp.getFullYear()+" "+executedtimeTemp.getHours()+":"+executedtimeTemp.getMinutes();
+										executedtimeTemp = executedtimeTemp.getDate()+"-"+(executedtimeTemp.getMonth()+1)+"-"+executedtimeTemp.getFullYear()+" "+executedtimeTemp.getHours()+":"+executedtimeTemp.getMinutes()+":"+executedtimeTemp.getSeconds();
 									}						
 									var browserTemp = iterator.browser;
 									var statusTemp = iterator.status;
@@ -438,6 +438,33 @@ exports.reportStatusScenarios_ICE = function (req, res) {
 					res.send("fail");
 				} 
 				else{
+					if(report.length > 0)
+					{
+								for(var i=0;i<report.length;i++)
+								{
+									if(report[i].executedtime != "")
+									{
+										var dateString = report[i].executedtime,
+										dateTimeParts = dateString.split(' '),
+										timeParts = dateTimeParts[1].split(':'),
+										dateParts = dateTimeParts[0].split('-'),
+										date;
+										date = new Date(dateParts[2], parseInt(dateParts[1], 10) - 1, dateParts[0], timeParts[0], timeParts[1],timeParts[2]);
+										report[i].executedtime = date.getTime();
+									}
+								}
+								report.sort(function(a,b){
+									return a.executedtime - b.executedtime;
+								})
+								for(var k=0;k<report.length;k++)
+								{
+									if(report[k].executedtime != "")
+									{
+									report[k].executedtime = new Date(report[k].executedtime);
+									report[k].executedtime = report[k].executedtime.getDate()+"-"+(report[k].executedtime.getMonth()+1)+"-"+report[k].executedtime.getFullYear()+" "+report[k].executedtime.getHours()+":"+("0" + report[k].executedtime.getMinutes()).slice(-2)+":"+("0" + report[k].executedtime.getSeconds()).slice(-2) ;
+									}
+								}
+					}
 					res.send(JSON.stringify(report));
 				} 
 			})		

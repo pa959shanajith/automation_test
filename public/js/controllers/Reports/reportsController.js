@@ -228,10 +228,10 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 				timeB = b.children.item(2).innerText;
 			}
 			else{
-				dateA = a.children.item(1).children.item(0).innerText;
-				timeA = a.children.item(1).children.item(1).innerText;
-				dateB = b.children.item(1).children.item(0).innerText;
-				timeB = b.children.item(1).children.item(1).innerText;
+				dateA = a.children.item(1).children.item(0).innerText.split(" ")[0];
+				timeA = a.children.item(1).children.item(0).innerText.split(" ")[1];
+				dateB = b.children.item(1).children.item(0).innerText.split(" ")[0];
+				timeB = b.children.item(1).children.item(0).innerText.split(" ")[1];
 			}
 			var fDate = dateA.split("-"); var lDate = dateB.split("-");
 			//var fFDate = fDate[0].split("/"); var lLDate = lDate[0].split("/");
@@ -253,10 +253,10 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 				timeB = b.children.item(2).innerText;
 			}
 			else{
-				aA = a.children.item(1).children.item(0).innerText;
-				timeA = a.children.item(1).children.item(1).innerText;
-				bB = b.children.item(1).children.item(0).innerText;
-				timeB = b.children.item(1).children.item(1).innerText;
+				aA = a.children.item(1).children.item(0).innerText.split(" ")[0];
+				timeA = a.children.item(1).children.item(0).innerText.split(" ")[1];
+				bB = b.children.item(1).children.item(0).innerText.split(" ")[0];
+				timeB = b.children.item(1).children.item(0).innerText.split(" ")[1];
 			}
 			var fDate = aA.split("-"); var lDate = bB.split("-");
 			//var fFDate = fDate[0].split("/"); var lLDate = lDate[0].split("/");
@@ -276,6 +276,7 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 		$('.formatpdfbrwsrexport').remove();
 		reportService.reportStatusScenarios_ICE(executionId)
 		.then(function(data) {
+			console.log("data",data);
 			if(data == "Invalid Session"){
 				window.location.href = "/";
 			}
@@ -298,11 +299,12 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 						else if(data[i].status == "Fail"){	fail++;	styleColor="style='color: #b31f2d !important; text-decoration-line: none;'";}
 						else if(data[i].status == "Terminate"){	terminated++;	styleColor="style='color: #faa536 !important; text-decoration-line: none;'";}
 						else if(data[i].status == "Incomplete"){	incomplete++;	styleColor="style='color: #58595b !important; text-decoration-line: none;'";}
-						exeDate = data[i].executedtime.split(" ")[0].split("-");
-						exeDat = ("0" + exeDate[0]).slice(-2) +"-"+ ("0" + exeDate[1]).slice(-2) +"-"+ exeDate[2];
-						var fst = data[i].executedtime.split(" ")[1].split(":");
-						exeTime = ("0" + fst[0]).slice(-2) +":"+ ("0" + fst[1]).slice(-2);
-						scenarioContainer.find('tbody').append("<tr><td title='"+data[i].testscenarioname+"'>"+data[i].testscenarioname+"</td><td><span style='margin-right: 28px;'>"+exeDat+"</span><span>"+exeTime+"</span></td><td><img class='sap' alt='-' src='"+brow+"'></td><td class='openReports' data-reportid='"+data[i].reportid+"'><a class='openreportstatus' "+styleColor+">"+data[i].status+"</a></td><td data-reportid='"+data[i].reportid+"'><img alt='Select format' class='selectFormat' src='imgs/ic-export-json.png' style='cursor: pointer;' title='Select format'></td></tr>");
+						// exeDate = data[i].executedtime.split(" ")[0].split("-");
+						// exeDat = ("0" + exeDate[0]).slice(-2) +"-"+ ("0" + exeDate[1]).slice(-2) +"-"+ exeDate[2];
+						// var fst = data[i].executedtime.split(" ")[1].split(":");
+						// exeTime = ("0" + fst[0]).slice(-2) +":"+ ("0" + fst[1]).slice(-2);
+					
+						scenarioContainer.find('tbody').append("<tr><td title='"+data[i].testscenarioname+"'>"+data[i].testscenarioname+"</td><td><span style='margin-right: 28px;'>"+data[i].executedtime.trim()+"</span></td><td><img class='sap' alt='-' src='"+brow+"'></td><td class='openReports' data-reportid='"+data[i].reportid+"'><a class='openreportstatus' "+styleColor+">"+data[i].status+"</a></td><td data-reportid='"+data[i].reportid+"'><img alt='Select format' class='selectFormat' src='imgs/ic-export-json.png' style='cursor: pointer;' title='Select format'></td></tr>");
 					}
 					if(data.length > 2){
 						$("#scenarioReportsTable #dateDESC").show();
