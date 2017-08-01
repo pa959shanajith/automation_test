@@ -2054,6 +2054,8 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 
 	//Get Selected User Data
 	$scope.getUserData = function(){
+		$("#firstName,#lastName,#password,#confirmPassword").removeClass("inputErrorBorder");
+		$("#password,#confirmPassword").val("");
 		var userId = $("#userSelect option:selected").data("id");
 		var userName = $("#userSelect option:selected").val();
 		adminServices.getUsersInfo(userId, userName)
@@ -2253,6 +2255,26 @@ $(document).on('cut copy paste','#userName', function(e){
 		
  });
 
+$(document).on('cut copy paste','#firstName', function(e){ 
+			var element = this;
+			setTimeout(function () {
+				var userEnteredText = $(element).val();  
+				userEnteredText = userEnteredText.replace(/\_/g,"");
+				$(element).val(userEnteredText);
+			}, 5); //html5 min is 4ms.	
+		//$(this).val($(this).val().replace(/\S/g, ''));
+		
+ });
+ $(document).on('cut copy paste','#lastName', function(e){ 
+			var element = this;
+			setTimeout(function () {
+				var userEnteredText = $(element).val();  
+				userEnteredText = userEnteredText.replace(/\_/g,"");
+				$(element).val(userEnteredText);
+			}, 5); //html5 min is 4ms.	
+		//$(this).val($(this).val().replace(/\S/g, ''));
+		
+ });
 	function preventSpecialCharOnBlur(id, val)
 	{
 		var reg = /^[a-zA-Z0-9\_]+$/

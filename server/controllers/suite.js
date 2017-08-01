@@ -49,10 +49,18 @@ exports.readTestSuite_ICE = function(req, res) {
 				if (TestSuiteDetailserror) {
 					console.log(TestSuiteDetailserror);
 				} else {
-					var getTestSuites = "select donotexecute,conditioncheck,getparampaths,testscenarioids from testsuites where testsuiteid= " +
-						eachSuite.testsuiteid + " and cycleid=" + eachSuite.cycleid + " and testsuitename='" + eachSuite.testsuitename + "'";
-					dbConnICE.execute(getTestSuites, function(getTestSuiteserr, getTestSuitesresult) {
-						if (getTestSuiteserr) {
+					// var getTestSuites = "select donotexecute,conditioncheck,getparampaths,testscenarioids from testsuites where testsuiteid= " +
+					// 	eachSuite.testsuiteid + " and cycleid=" + eachSuite.cycleid + " and testsuitename='" + eachSuite.testsuitename + "'";
+					//dbConnICE.execute(getTestSuites, function(getTestSuiteserr, getTestSuitesresult) {
+                    var inputs = {"testsuiteid":eachSuite.testsuiteid,"cycleid":eachSuite.cycleid ,"testsuitename":eachSuite.testsuitename,"query":"readTestSuite_ICE"}
+                    var args = {
+                        data:inputs,
+                        headers:{"Content-Type" : "application/json"}
+                        
+                    }
+                    client.post(epurl+"suite/readTestSuite_ICE",args,
+                        function (result, response) {
+						if (response.statusCode != 200 || result.rows == "fail") {
 							var flag = "Error in readTestSuite_ICE : Fail";
 							res.send(flag);
 						} else {
@@ -65,7 +73,7 @@ exports.readTestSuite_ICE = function(req, res) {
 								scenarionames: [],
 								projectnames: []
 							};
-							async.forEachSeries(getTestSuitesresult.rows, function(eachSuiterow, eachSuitecallback) {
+							async.forEachSeries(result.rows, function(eachSuiterow, eachSuitecallback) {
 								outscenarioids = eachSuiterow.testscenarioids;
 								respeachscenario.scenarioids = outscenarioids;
 								if (eachSuiterow.donotexecute == null) {
@@ -158,14 +166,22 @@ function Projectnametestcasename_ICE(req, cb, data) {
     };
     async.series({
         testcasename: function(callback_name) {
-            var testcasestepsquery = "SELECT testscenarioname,projectid FROM testscenarios where testscenarioid=" + req;
-            dbConnICE.execute(testcasestepsquery, function(err, answers) {
-                if (err) {
-                    console.log(err);
+            var inputs = {"testscenarioid":req,"query":"testcasename"}
+            var args = {
+                data:inputs,
+                headers:{"Content-Type" : "application/json"}
+                
+            }
+            client.post(epurl+"suite/readTestSuite_ICE",args,
+                function (result, response) {
+            //var testcasestepsquery = "SELECT testscenarioname,projectid FROM testscenarios where testscenarioid=" + req;
+            //dbConnICE.execute(testcasestepsquery, function(err, answers) {
+                if (response.statusCode != 200 || result.rows == "fail") {
+                    console.log("Error occured in Projectnametestcasename_ICE : fail");
                 } else {
-                    if (answers.rows.length != 0) {
-                        projectid = answers.rows[0].projectid;
-                        testcaseNproject.testcasename = answers.rows[0].testscenarioname;
+                    if (result.rows.length != 0) {
+                        projectid = result.rows[0].projectid;
+                        testcaseNproject.testcasename = result.rows[0].testscenarioname;
                     }
                     callback_name(null, projectid);
                 }
@@ -173,14 +189,22 @@ function Projectnametestcasename_ICE(req, cb, data) {
             });
         },
         projectname: function(callback_name) {
-            var projectnamequery = "SELECT projectname FROM projects where projectid = " + projectid + " ALLOW FILTERING;";
-            dbConnICE.execute(projectnamequery, function(err, projectnameresult) {
-                if (err) {
-
+            var inputs = {"projectid":projectid,"query":"projectname"}
+            var args = {
+                data:inputs,
+                headers:{"Content-Type" : "application/json"}
+                
+            }
+            client.post(epurl+"suite/readTestSuite_ICE",args,
+                function (result, response) {
+            // var projectnamequery = "SELECT projectname FROM projects where projectid = " + projectid + " ALLOW FILTERING;";
+            // dbConnICE.execute(projectnamequery, function(err, projectnameresult) {
+                if (response.statusCode != 200 || result.rows == "fail") {
+                    console.log("Error occured in Projectnametestcasename_ICE : fail");
                 } else {
-                    if (projectnameresult.rows.length != 0)
-                        testcaseNproject.projectname = projectnameresult.rows[0].projectname;
-                    callback_name(err, testcaseNproject);
+                    if (result.rows.length != 0)
+                        testcaseNproject.projectname = result.rows[0].projectname;
+                    callback_name(null, testcaseNproject);
                 }
             });
         }
@@ -236,14 +260,18 @@ exports.updateTestSuite_ICE = function(req, res) {
                 var deleteTestSuiteQuery = "";
                 var updateTestSuiteData = "";
                 var flag="";
-                deleteTestSuiteQuery = "DELETE conditioncheck,donotexecute,getparampaths,testscenarioids FROM testsuites " +
+                var inputs = {"query": "deletetestsuitequery","cycleid":testscycleid,
+						"testsuitename":requestedtestsuitename,"testsuiteid":requestedtestsuiteid,"versionnumber":requestedversionnumber};
+                /*deleteTestSuiteQuery = "DELETE conditioncheck,donotexecute,getparampaths,testscenarioids FROM testsuites " +
                                         "where cycleid=" + testscycleid +
                                         " and testsuitename='" + requestedtestsuitename + "'" +
-                                        " and testsuiteid=" + requestedtestsuiteid + " and versionnumber = " + requestedversionnumber;
-                deleteSuite(deleteTestSuiteQuery, function(err, response) {
+                                        " and testsuiteid=" + requestedtestsuiteid + " and versionnumber = " + requestedversionnumber;*/
+                //deleteSuite(deleteTestSuiteQuery, function(err, response) {
+                deleteSuite(inputs, function(err, response) {
                     if (response == "success") {
                         saveSuite(function(err, response) {
                             if (err) {
+  
                                 flag = "fail";
                                 // index = index + 1;
                                 // if (index == testscenarioids.length) {
@@ -267,12 +295,16 @@ exports.updateTestSuite_ICE = function(req, res) {
                     }
                 });
 
-                function deleteSuite(deleteTestSuiteQuery, deleteSuitecallback) {
-                    dbConnICE.execute(deleteTestSuiteQuery, function(err, deleteQueryresults) {
-                        if (err) {
-                            flag = "failed to execute update query: Fail";
-                            res.send("fail");
-                        } else {
+                //function deleteSuite(deleteTestSuiteQuery, deleteSuitecallback) {
+                function deleteSuite(inputs, deleteSuitecallback) {
+                	var args = {data:inputs,headers:{"Content-Type" : "application/json"}};
+					client.post(epurl+"suite/updateTestSuite_ICE",args,
+					function (data, response) {
+                    //dbConnICE.execute(deleteTestSuiteQuery, function(err, deleteQueryresults) {
+                        //if (err) {
+						if(response.statusCode != 200 || data.rows == "fail"){
+							console.log(response.statusCode);
+						} else {
                             flag = "success";
                             deleteSuitecallback(null, flag);
                         }
@@ -281,7 +313,12 @@ exports.updateTestSuite_ICE = function(req, res) {
 
                 function saveSuite(saveSuite) {
                     for (var scenarioidindex = 0; scenarioidindex < testscenarioids.length; scenarioidindex++) {
-                        updateTestSuiteData = "update testsuites set" +
+                    	var inputs2 = {"query": "updatetestsuitedataquery","conditioncheck":conditioncheck[scenarioidindex],
+        						"donotexecute":donotexecute[scenarioidindex],"getparampaths":getparampaths[scenarioidindex],
+        						"testscenarioids":testscenarioids[scenarioidindex],"modifiedby":userinfo.username,"modifiedbyrole":userinfo.role,
+        						"cycleid":testscycleid,"testsuiteid":requestedtestsuiteid,"testsuitename":requestedtestsuitename,
+        						"versionnumber":requestedversionnumber ,"skucodetestsuite":"skucodetestsuite","tags":"tags"};
+                        /*updateTestSuiteData = "update testsuites set" +
                             " conditioncheck=conditioncheck+[" + conditioncheck[scenarioidindex] + "], " +
                             "donotexecute=donotexecute+[" + donotexecute[scenarioidindex] + "], " +
                             "getparampaths=getparampaths+[" + getparampaths[scenarioidindex] + "], " +
@@ -290,11 +327,20 @@ exports.updateTestSuite_ICE = function(req, res) {
                             "where cycleid=" + testscycleid +
                             " and testsuiteid=" + requestedtestsuiteid +
                             " and testsuitename='" + requestedtestsuitename +
-                            "' and versionnumber = " + requestedversionnumber + " ;";
-                        dbConnICE.execute(updateTestSuiteData, function(err, updateQueryresults) {
-                            if (err) {
+                            "' and versionnumber = " + requestedversionnumber + " ;";*/
+                        
+                        //dbConnICE.execute(updateTestSuiteData, function(err, updateQueryresults) {
+                    	var args = {data:inputs2,headers:{"Content-Type" : "application/json"}};
+    					client.post(epurl+"suite/updateTestSuite_ICE",args,
+    					function (data, response) {
+                            /*if (err) {
                                 flag = "fail";
-                                saveSuite(flag, null);
+                                saveSuite(flag, null);*/
+    						console.log(response);
+    						if(response.statusCode != 200 || data.rows == "fail"){
+    							
+    							console.log(response.statusCode);
+    						
                             } else {
                                 flag = "success";
                                 saveSuite(null, flag);
@@ -552,16 +598,32 @@ exports.ExecuteTestSuite_ICE = function(req, res) {
                             
                             var reportId = uuid();
 
-                            var insertReport = "INSERT INTO reports (reportid,executionid,testsuiteid,testscenarioid,executedtime,browser,modifiedon,status,report) VALUES (" + reportId + "," + executionid + "," + testsuiteid + "," + scenarioid + "," + new Date().getTime() + ",'" + req_browser + "'," + new Date().getTime() + ",'" + resultData.reportData.overallstatus[0].overallstatus + "','" + JSON.stringify(reportdata) + "')";
+                            // var insertReport = "INSERT INTO reports (reportid,executionid,testsuiteid,testscenarioid,executedtime,browser,modifiedon,status,report) VALUES (" + reportId + "," + executionid + "," + testsuiteid + "," + scenarioid + "," + new Date().getTime() + ",'" + req_browser + "'," + new Date().getTime() + ",'" + resultData.reportData.overallstatus[0].overallstatus + "','" + JSON.stringify(reportdata) + "')";
                              date = new Date().getTime();
                             insertReportHistory = "'reportid=" + reportId + ", executionid=" + executionid + ", testsuiteid=" + testsuiteid + ", testscenarioid=" + scenarioid + ", " +
                                     "executedtime=" + new Date().getTime() + ", browser=" + req_browser + ", modifiedon=" + new Date().getTime() + ", " +
                                     "status=" + resultData.reportData.overallstatus[0].overallstatus +",report=" + JSON.stringify(reportdata) + " '";
                             
                             insertReportQuery =  "INSERT INTO reports (reportid,executionid,history) VALUES (" + reportId + "," + executionid + ",{" + date + ":" + insertReportHistory + "})";
-
-                            var dbquery = dbConnICE.execute(insertReport, function(err, result) {
-                                if (err) {
+                            var inputs = {"reportid":reportId,
+                            "executionid":executionid,
+                            "testsuiteid":testsuiteid,
+                            "testscenarioid":scenarioid,
+                            "browser":req_browser,
+                            "status":resultData.reportData.overallstatus[0].overallstatus,
+                            "report":JSON.stringify(reportdata),
+                            "query":"insertreportquery"}
+                            var args = {
+                                data:inputs,
+                                headers:{"Content-Type" : "application/json"}
+                                
+                            }
+                            client.post(epurl+"suite/ExecuteTestSuite_ICE",args,
+                                function (result, response) {
+                                if (response.statusCode != 200 || result.rows == "fail") {
+                                    console.log("Error occured in TestCaseDetails_Suite_ICE : fail , insertreportquery");
+                            // var dbquery = dbConnICE.execute(insertReport, function(err, result) {
+                            //     if (err) {
                                     flag = "fail";
                                 } else {
                                   	 fnCreateReportHistory(insertReportQuery, function(err, response) {
@@ -579,10 +641,21 @@ exports.ExecuteTestSuite_ICE = function(req, res) {
 
                             insertExecutionHistory = "'testsuiteid=" + testsuiteid + ", executionid=" + executionid + ", starttime=" + starttime + ", endtime=" + new Date().getTime() + " '";
                             insertExecutionQuery = "INSERT INTO execution (testsuiteid,executionid,history) VALUES (" + testsuiteid + "," + executionid + ",{" + date + ":" + insertExecutionHistory + "});"
-
-
-                            var dbqueryexecution = dbConnICE.execute(insertIntoExecution, function(err, resultexecution) {
-                                if (err) {
+                            var inputs = {"testsuiteid":testsuiteid,
+                            "executionid":executionid,
+                            "starttime":starttime.toString(),
+                            "query":"inserintotexecutionquery"}
+                            var args = {
+                                data:inputs,
+                                headers:{"Content-Type" : "application/json"}
+                                
+                            }
+                            var dbqueryexecution = client.post(epurl+"suite/ExecuteTestSuite_ICE",args,
+                                function (result, response) {
+                                if (response.statusCode != 200 || result.rows == "fail") {
+                                    console.log("Error occured in TestCaseDetails_Suite_ICE : fail , insertIntoExecution");
+                            // var dbqueryexecution = dbConnICE.execute(insertIntoExecution, function(err, resultexecution) {
+                            //     if (err) {
                                     flag = "fail";
                                 } else {
                                     fnCreateExecutionHistory(insertExecutionQuery, function(err, response) {
@@ -776,17 +849,47 @@ exports.ExecuteTestSuite_ICE_CI = function(req, res) {
                             reportdata = JSON.stringify(reportdata).replace(/'/g, "''");
                             reportdata = JSON.parse(reportdata);
                             
-                            var insertReport = "INSERT INTO reports (reportid,executionid,testsuiteid,testscenarioid,executedtime,browser,modifiedon,status,report) VALUES (" + uuid() + "," + executionid + "," + testsuiteid + "," + scenarioid + "," + new Date().getTime() + ",'" + req_browser + "'," + new Date().getTime() + ",'" + resultData.reportData.overallstatus[0].overallstatus + "','" + JSON.stringify(reportdata) + "')";
-                            var dbquery = dbConnICE.execute(insertReport, function(err, result) {
-                                if (err) {
+                            // var insertReport = "INSERT INTO reports (reportid,executionid,testsuiteid,testscenarioid,executedtime,browser,modifiedon,status,report) VALUES (" + uuid() + "," + executionid + "," + testsuiteid + "," + scenarioid + "," + new Date().getTime() + ",'" + req_browser + "'," + new Date().getTime() + ",'" + resultData.reportData.overallstatus[0].overallstatus + "','" + JSON.stringify(reportdata) + "')";
+                            var inputs = {"reportid":reportId,
+                            "executionid":executionid,
+                            "testsuiteid":testsuiteid,
+                            "testscenarioid":scenarioid,
+                            "browser":req_browser,
+                            "status":resultData.reportData.overallstatus[0].overallstatus,
+                            "report":JSON.stringify(reportdata),
+                            "query":"insertreportquery"}
+                            var args = {
+                                data:inputs,
+                                headers:{"Content-Type" : "application/json"}
+                                
+                            }
+                            var dbquery = client.post(epurl+"suite/ExecuteTestSuite_ICE",args,
+                                function (result, response) {
+                                if (response.statusCode != 200 || result.rows == "fail") {
+                                    console.log("Error occured in TestCaseDetails_Suite_ICE : fail , insertreportquery");
+                            // var dbquery = dbConnICE.execute(insertReport, function(err, result) {
+                            //     if (err) {
                                     flag = "fail";
                                 } else {
                                     flag = "success";
                                 }
                             });
-                            var insertIntoExecution = "INSERT INTO execution (testsuiteid,executionid,starttime,endtime) VALUES (" + testsuiteid + "," + executionid + "," + starttime + "," + new Date().getTime() + ");"
-                            var dbqueryexecution = dbConnICE.execute(insertIntoExecution, function(err, resultexecution) {
-                                if (err) {
+                            // var insertIntoExecution = "INSERT INTO execution (testsuiteid,executionid,starttime,endtime) VALUES (" + testsuiteid + "," + executionid + "," + starttime + "," + new Date().getTime() + ");"
+                            var inputs = {"testsuiteid":testsuiteid,
+                            "executionid":executionid,
+                            "starttime":starttime.toString(),
+                            "query":"inserintotexecutionquery"}
+                            var args = {
+                                data:inputs,
+                                headers:{"Content-Type" : "application/json"}
+                                
+                            }
+                            var dbqueryexecution = client.post(epurl+"suite/ExecuteTestSuite_ICE",args,
+                                function (result, response) {
+                                if (response.statusCode != 200 || result.rows == "fail") {
+                                    console.log("Error occured in TestCaseDetails_Suite_ICE : fail , insertIntoExecution");
+                            // var dbqueryexecution = dbConnICE.execute(insertIntoExecution, function(err, resultexecution) {
+                            //     if (err) {
                                     flag = "fail";
                                 } else {
                                     flag = "success";
@@ -833,15 +936,25 @@ function TestCaseDetails_Suite_ICE(req, cb, data) {
         var listoftestcasedata = [];
         async.series({
                 testcaseid: function(callback) {
-                    dbConnICE.execute(testscenarioslist, function(err, result) {
-                        if (err) {
-                            console.log(err);
+                    var inputs = {"testscenarioid":requestedtestscenarioid,"query":"testcaseid"}
+                    var args = {
+                        data:inputs,
+                        headers:{"Content-Type" : "application/json"}
+                        
+                    }
+                    client.post(epurl+"suite/ExecuteTestSuite_ICE",args,
+                        function (result, response) {
+                        if (response.statusCode != 200 || result.rows == "fail") {
+                            console.log("Error occured in TestCaseDetails_Suite_ICE : fail , testcaseid");
+                    // dbConnICE.execute(testscenarioslist, function(err, result) {
+                    //     if (err) {
+                    //         console.log(err);
                         } else {
                             if (result.rows.length != 0)
                                 data = JSON.parse(JSON.stringify(result.rows[0].testcaseids));
                             resultdata = data;
                             //console.log(data);
-                            callback(err, resultdata);
+                            callback(null, resultdata);
                         }
                     });
                 },
@@ -852,17 +965,36 @@ function TestCaseDetails_Suite_ICE(req, cb, data) {
                             testcase: [],
                             testcasename: ""
                         };
-                        var getscreenidquery = "select screenid from testcases where testcaseid=" + quest;
-                        dbConnICE.execute(getscreenidquery, function(err, screenidresponse) {
-                            if (err) {
-                                console.log(err);
+                        var inputs = {"testcaseid":quest,"query":"testcasesteps"}
+                        var args = {
+                            data:inputs,
+                            headers:{"Content-Type" : "application/json"}
+                            
+                        }
+                        client.post(epurl+"suite/ExecuteTestSuite_ICE",args,
+                            function (screenidresponse, response) {
+                            if (response.statusCode != 200 || screenidresponse.rows == "fail") {
+                                console.log("Error occured in TestCaseDetails_Suite_ICE : fail , testcasesteps");
+                        // var getscreenidquery = "select screenid from testcases where testcaseid=" + quest;
+                        // dbConnICE.execute(getscreenidquery, function(err, screenidresponse) {
+                        //     if (err) {
                             } else {
                                 try {
                                     if (screenidresponse.rows.length != 0) {
-                                        var getscreendataquery = "select screendata from screens where screenid=" + screenidresponse.rows[0].screenid;
-                                        dbConnICE.execute(getscreendataquery, function(err, screendataresponse) {
-                                            if (err) {
-                                                console.log(err);
+                                        var inputs = {"screenid":screenidresponse.rows[0].screenid,"query":"getscreendataquery"}
+                                        var args = {
+                                            data:inputs,
+                                            headers:{"Content-Type" : "application/json"}
+                                            
+                                        }
+                                        client.post(epurl+"suite/ExecuteTestSuite_ICE",args,
+                                            function (screendataresponse, response) {
+                                            if (response.statusCode != 200 || screendataresponse.rows == "fail") {
+                                                console.log("Error occured in TestCaseDetails_Suite_ICE : fail , testcasesteps");
+                                        // var getscreendataquery = "select screendata from screens where screenid=" + screenidresponse.rows[0].screenid;
+                                        // dbConnICE.execute(getscreendataquery, function(err, screendataresponse) {
+                                            // if (err) {
+                                            //     console.log(err);
                                             } else {
                                                 try {
                                                     try {
@@ -873,10 +1005,20 @@ function TestCaseDetails_Suite_ICE(req, cb, data) {
                                                     if (screendataresponse != null && screendataresponse != "") {
                                                         if ('body' in screendataresponse) {
                                                             var wsscreentemplate = screendataresponse.body[0];
-                                                            var testcasestepsquery = "select testcasesteps,testcasename from testcases where testcaseid = " + quest;
-                                                            dbConnICE.execute(testcasestepsquery, function(err, answers) {
-                                                                if (err) {
-                                                                    console.log(err);
+                                                            var inputs = {"testcaseid":quest,"query":"testcasestepsquery"}
+                                                            var args = {
+                                                                data:inputs,
+                                                                headers:{"Content-Type" : "application/json"}
+                                                                
+                                                            }
+                                                            client.post(epurl+"suite/ExecuteTestSuite_ICE",args,
+                                                                function (answers, response) {
+                                                                if (response.statusCode != 200 || answers.rows == "fail") {
+                                                                    console.log("Error occured in TestCaseDetails_Suite_ICE : fail , testcasesteps");
+                                                            // var testcasestepsquery = "select testcasesteps,testcasename from testcases where testcaseid = " + quest;
+                                                            // dbConnICE.execute(testcasestepsquery, function(err, answers) {
+                                                            //     if (err) {
+                                                                    // console.log(err);
                                                                 } else {
                                                                     responsedata.template = wsscreentemplate;
                                                                     if (answers.rows.length != 0) {
@@ -888,10 +1030,20 @@ function TestCaseDetails_Suite_ICE(req, cb, data) {
                                                                 callback2();
                                                             });
                                                         } else {
-                                                            var testcasestepsquery = "select testcasesteps,testcasename from testcases where testcaseid = " + quest;
-                                                            dbConnICE.execute(testcasestepsquery, function(err, answers) {
-                                                                if (err) {
-                                                                    console.log(err);
+                                                            var inputs = {"testcaseid":quest,"query":"testcasestepsquery"}
+                                                            var args = {
+                                                                data:inputs,
+                                                                headers:{"Content-Type" : "application/json"}
+                                                                
+                                                            }
+                                                            client.post(epurl+"suite/ExecuteTestSuite_ICE",args,
+                                                                function (answers, response) {
+                                                                if (response.statusCode != 200 || answers.rows == "fail") {
+                                                                    console.log("Error occured in TestCaseDetails_Suite_ICE : fail , testcasesteps");
+                                                            // var testcasestepsquery = "select testcasesteps,testcasename from testcases where testcaseid = " + quest;
+                                                            // dbConnICE.execute(testcasestepsquery, function(err, answers) {
+                                                            //     if (err) {
+                                                            //         console.log(err);
                                                                 } else {
                                                                     responsedata.template = "";
                                                                     if (answers.rows.length != 0) {
@@ -905,10 +1057,20 @@ function TestCaseDetails_Suite_ICE(req, cb, data) {
                                                             });
                                                         }
                                                     } else {
-                                                        var testcasestepsquery = "select testcasesteps,testcasename from testcases where testcaseid = " + quest;
-                                                        dbConnICE.execute(testcasestepsquery, function(err, answers) {
-                                                            if (err) {
-                                                                console.log(err);
+                                                        var inputs = {"testcaseid":quest,"query":"testcasestepsquery"}
+                                                        var args = {
+                                                            data:inputs,
+                                                            headers:{"Content-Type" : "application/json"}
+                                                            
+                                                        }
+                                                        client.post(epurl+"suite/ExecuteTestSuite_ICE",args,
+                                                            function (answers, response) {
+                                                            if (response.statusCode != 200 || answers.rows == "fail") {
+                                                                console.log("Error occured in TestCaseDetails_Suite_ICE : fail , testcasesteps");
+                                                        // var testcasestepsquery = "select testcasesteps,testcasename from testcases where testcaseid = " + quest;
+                                                        // dbConnICE.execute(testcasestepsquery, function(err, answers) {
+                                                        //     if (err) {
+                                                                // console.log(err);
                                                             } else {
                                                                 responsedata.template = "";
                                                                 if (answers.rows.length != 0) {
@@ -921,10 +1083,20 @@ function TestCaseDetails_Suite_ICE(req, cb, data) {
                                                         });
                                                     }
                                                 } catch (exception) {
-                                                    var testcasestepsquery = "select testcasesteps,testcasename from testcases where testcaseid = " + quest;
-                                                    dbConnICE.execute(testcasestepsquery, function(err, answers) {
-                                                        if (err) {
-                                                            console.log(err);
+                                                    var inputs = {"testcaseid":quest,"query":"testcasestepsquery"}
+                                                    var args = {
+                                                        data:inputs,
+                                                        headers:{"Content-Type" : "application/json"}
+                                                        
+                                                    }
+                                                    client.post(epurl+"suite/ExecuteTestSuite_ICE",args,
+                                                        function (answers, response) {
+                                                        if (response.statusCode != 200 || answers.rows == "fail") {
+                                                            console.log("Error occured in TestCaseDetails_Suite_ICE : fail , testcasesteps");
+                                                    // var testcasestepsquery = "select testcasesteps,testcasename from testcases where testcaseid = " + quest;
+                                                    // dbConnICE.execute(testcasestepsquery, function(err, answers) {
+                                                    //     if (err) {
+                                                    //         console.log(err);
                                                         } else {
                                                             responsedata.template = "";
                                                             if (answers.rows.length != 0) {
@@ -939,10 +1111,20 @@ function TestCaseDetails_Suite_ICE(req, cb, data) {
                                             }
                                         });
                                     } else {
-                                        var testcasestepsquery = "select testcasesteps,testcasename from testcases where testcaseid = " + quest;
-                                        dbConnICE.execute(testcasestepsquery, function(err, answers) {
-                                            if (err) {
-                                                console.log(err);
+                                        var inputs = {"testcaseid":quest,"query":"testcasestepsquery"}
+                                        var args = {
+                                            data:inputs,
+                                            headers:{"Content-Type" : "application/json"}
+                                            
+                                        }
+                                        client.post(epurl+"suite/ExecuteTestSuite_ICE",args,
+                                            function (answers, response) {
+                                            if (response.statusCode != 200 || answers.rows == "fail") {
+                                                console.log("Error occured in TestCaseDetails_Suite_ICE : fail , testcasesteps");
+                                        // var testcasestepsquery = "select testcasesteps,testcasename from testcases where testcaseid = " + quest;
+                                        // dbConnICE.execute(testcasestepsquery, function(err, answers) {
+                                        //     if (err) {
+                                        //         console.log(err);
                                             } else {
                                                 responsedata.template = "";
                                                 if (answers.rows.length != 0) {
@@ -1167,23 +1349,45 @@ function TestSuiteDetails_Module_ICE(req, cb1, data) {
     var listoftestcasedata = [];
     async.series({
             testsuitecheck: function(callback) {
-                var getTestSuites = "select donotexecute,conditioncheck,getparampaths,testscenarioids from testsuites where testsuiteid= " + requiredtestsuiteid + " and cycleid=" + requiredcycleid;
-                dbConnICE.execute(getTestSuites, function(err, result) {
-                    if (err) {
-                        console.log(err);
-                    } else {
-                        if (result.rows.length != 0) {
-                            flag = true;
-                        }
-                        callback();
-                    }
-                });
+                var inputs = {"testsuiteid":requiredtestsuiteid,"cycleid":requiredcycleid,"query":"testsuitecheck"}
+                var args = {
+					data:inputs,
+					headers:{"Content-Type" : "application/json"}
+                    
+				}
+                //var getTestSuites = "select donotexecute,conditioncheck,getparampaths,testscenarioids from testsuites where testsuiteid= " + requiredtestsuiteid + " and cycleid=" + requiredcycleid;
+                //dbConnICE.execute(getTestSuites, function(err, result) {
+                    client.post(epurl+"suite/readTestSuite_ICE",args,
+						function (result, response) {
+                            // if (err) {
+                            if (response.statusCode != 200 || result.rows == "fail") {
+                                console.log("Error occured in TestSuiteDetails_Module_ICE : fail , testsuitecheck");
+                            
+                             } else {
+                                if (result.rows.length != 0) {
+                                    flag = true;
+                                }
+                                callback();
+                            }
+                        });
+                    
+                //});
             },
             selectmodule: function(callback) {
-                var moduledetails = "SELECT * FROM modules where moduleid=" + requiredtestsuiteid + " and modulename='" + requiredtestsuitename + "' ALLOW FILTERING";
-                dbConnICE.execute(moduledetails, function(err, result) {
-                    if (err) {
-                        console.log(err);
+                var inputs = {"moduleid":requiredtestsuiteid,"modulename":requiredtestsuitename,"query":"selectmodule"}
+                var args = {
+					data:inputs,
+					headers:{"Content-Type" : "application/json"}
+                    
+				}
+                //var moduledetails = "SELECT * FROM modules where moduleid=" + requiredtestsuiteid + " and modulename='" + requiredtestsuitename + "' ALLOW FILTERING";
+                //dbConnICE.execute(moduledetails, function(err, result) {
+                    client.post(epurl+"suite/readTestSuite_ICE",args,
+						function (result, response) {
+                    // if (err) {
+                    //     console.log(err);
+                    if (response.statusCode != 200 || result.rows == "fail") {
+                            console.log("Error occured in TestSuiteDetails_Module_ICE : fail, selectmodule");
                     } else {
                         if (result.rows.length != 0) {
                             data = JSON.parse(JSON.stringify(result.rows[0]));
@@ -1191,7 +1395,7 @@ function TestSuiteDetails_Module_ICE(req, cb1, data) {
                         }
 
                         //console.log(data);
-                        callback(err, resultdata);
+                        callback(null, resultdata);
                     }
                 });
             },
@@ -1210,9 +1414,28 @@ function TestSuiteDetails_Module_ICE(req, cb1, data) {
                     for (var i = 0; i < testscenarioids.length; i++) {
                         conditioncheckvalues.push('0');
                         donotexecutevalues.push('1');
-                        getparampathvalues.push('\' \'');
+                        getparampathvalues.push('');
                     }
-                    var testsuiteexe = "INSERT INTO testsuites (cycleid,testsuitename,testsuiteid,versionnumber,conditioncheck,createdby,createdon,createdthrough,deleted,donotexecute,getparampaths,history,modifiedby,modifiedon,skucodetestsuite,tags,testscenarioids) VALUES (" + requiredcycleid + ",'" + requiredtestsuitename + "'," + requiredtestsuiteid + ",1,[" + conditioncheckvalues + "],'Ninteen68_admin'," + new Date().getTime().toString() + ",null,null,[" + donotexecutevalues + "],[" + getparampathvalues + "],null,null," + new Date().getTime().toString() + ",null,null,[" + testscenarioids + "])";
+                    var inputs = {"cycleid":requiredcycleid,
+                    "testsuitename":requiredtestsuitename,
+                    "testsuiteid":requiredtestsuiteid,
+                    "versionnumber":"1",
+                    "conditioncheck":conditioncheckvalues,
+                    "createdby":"Ninteen68_admin",
+                    "createdthrough":"createdthrough",
+                    "deleted":"FALSE",
+                    "donotexecute":donotexecutevalues,
+                    "getparampaths": getparampathvalues,
+                    "skucodetestsuite":"skucodetestsuite",
+                    "tags":"tags",
+                    "testscenarioids":testscenarioids,
+                    "query":"testcasesteps"}
+                    var args = {
+                        data:inputs,
+                        headers:{"Content-Type" : "application/json"}
+                        
+                    }
+                    // var testsuiteexe = "INSERT INTO testsuites (cycleid,testsuitename,testsuiteid,versionnumber,conditioncheck,createdby,createdon,createdthrough,deleted,donotexecute,getparampaths,history,modifiedby,modifiedon,skucodetestsuite,tags,testscenarioids) VALUES (" + requiredcycleid + ",'" + requiredtestsuitename + "'," + requiredtestsuiteid + ",1,[" + conditioncheckvalues+ "],'Ninteen68_admin'," + new Date().getTime().toString() + ",null,null,[" + donotexecutevalues + "],["+ getparampathvalues + "],null,null," + new Date().getTime().toString() + ",null,null,["+ testscenarioids + "])";
 
                     createTestSuitesHistory = "Inserted by Ninteen68_admin cycleid="+requiredcycleid+",testsuitename="+requiredtestsuitename+",testsuiteid=" + requiredtestsuiteid +",versionnumber=1,conditioncheck=[" + conditioncheckvalues + "],createdby= 'Ninteen68_admin',createdon=" + new Date().getTime().toString() + ",createdthrough=null,deleted=null,donotexecute=[" + donotexecutevalues + "],getparampaths=[" + getparampathvalues + "],modifiedby=null,modifiedon=" + new Date().getTime().toString() + ",skucodetestsuite=null,tags=null,testscenarioids=[" + testscenarioids + "] ";
                    date = new Date().getTime();
@@ -1220,15 +1443,20 @@ function TestSuiteDetails_Module_ICE(req, cb1, data) {
                     insertTestSuiteQuery = "INSERT INTO testsuites (cycleid,testsuiteid,testsuitename,versionnumber,history) VALUES ("+requiredcycleid+"," + requiredtestsuiteid +","+requiredtestsuitename+",1,{" + date + ":" + createTestSuitesHistory + "})";
 
 
-                    dbConnICE.execute(testsuiteexe, function(err, answers) {
-                        if (err) {
-                            console.log(err);
+                   // dbConnICE.execute(testsuiteexe, function(err, answers) {
+                    client.post(epurl+"suite/readTestSuite_ICE",args,
+						function (result, response) {
+                        //if (err) {
+                        if (response.statusCode != 200 || result.rows == "fail") {
+                            console.log("Error occured in TestSuiteDetails_Module_ICE : fail, testcasesteps");
                             cb1(null, flag);
                         } else {
                             //cb1(null,flag);
                             fnCreateTestsuiteHistory(insertTestSuiteQuery, function(err, response) {
                                     if (response == 'success') {
                                        callback(null, flag);
+                                    }else{
+                                        callback(null, flag);
                                     } 
                                 });
                           //  callback(null, flag);
@@ -1309,13 +1537,22 @@ function updatescenariodetailsinsuite(req, cb, data) {
 				
     async.series({
         fetchdata: function(simplecallback) {
-            var selectsuierows = "SELECT * FROM testsuites where testsuiteid = " + req.testsuiteid + " and cycleid=" + req.cycleid + " ALLOW FILTERING;";
-            dbConnICE.execute(selectsuierows, function(err, answers) {
-                if (err) {
-                    console.log(err);
+             var inputs = {"testsuiteid":req.testsuiteid,"cycleid":req.cycleid,"query":"fetchdata"}
+                var args = {
+					data:inputs,
+					headers:{"Content-Type" : "application/json"}
+                    
+				}
+            //var selectsuierows = "SELECT * FROM testsuites where testsuiteid = " + req.testsuiteid + " and cycleid=" + req.cycleid + " ALLOW FILTERING;";
+            //dbConnICE.execute(selectsuierows, function(err, answers) {
+            client.post(epurl+"suite/readTestSuite_ICE",args,
+                    function (result, response) {
+                //if (err) {
+                if (response.statusCode != 200 || result.rows == "fail") {
+                    console.log("Error occured in TestSuiteDetails_Module_ICE : fail, fetchdata");
                 } else {
-                    if (answers.rows.length != 0)
-                        suiterowdetails = answers.rows[0]
+                    if (result.rows.length != 0)
+                        suiterowdetails = result.rows[0]
                 }
                 simplecallback();
             });
@@ -1343,7 +1580,7 @@ function updatescenariodetailsinsuite(req, cb, data) {
 
                     }
                     if (conditioncheck != null) {
-                        conditioncheck1.push(conditioncheck[index]);
+                        conditioncheck1.push(conditioncheck[index].toString());
                     }
                     if (donotexecute != null) {
                         donotexecute1.push(donotexecute[index]);
@@ -1359,10 +1596,19 @@ function updatescenariodetailsinsuite(req, cb, data) {
         },
         delete: function(simplecallback) {
             // if(flagtocheckifexists){
-            var deletequery = "DELETE FROM testsuites WHERE testsuiteid=" + req.testsuiteid + " and cycleid=" + req.cycleid + " and testsuitename='" + suiterowdetails.testsuitename + "'";
-            dbConnICE.execute(deletequery, function(err, deleted) {
-                if (err) {
-                    console.log(err);
+            // var deletequery = "DELETE FROM testsuites WHERE testsuiteid=" + req.testsuiteid + " and cycleid=" + req.cycleid + " and testsuitename='" + suiterowdetails.testsuitename + "'";
+            var inputs = {"testsuiteid":req.testsuiteid,"cycleid":req.cycleid,"testsuitename":suiterowdetails.testsuitename ,"query":"delete"}
+                var args = {
+					data:inputs,
+					headers:{"Content-Type" : "application/json"}
+                    
+				}
+            //dbConnICE.execute(deletequery, function(err, deleted) {
+                client.post(epurl+"suite/readTestSuite_ICE",args,
+                    function (result, response) {
+                //if (err) {
+                if (response.statusCode != 200 || result.rows == "fail") {
+                    console.log("Error occured in TestSuiteDetails_Module_ICE : fail, delete");
                 } else {}
                 simplecallback();
             });
@@ -1370,8 +1616,29 @@ function updatescenariodetailsinsuite(req, cb, data) {
 
         },
         updatescenarioinnsuite: function(simplecallback) {
-            var updatetestsuitefrommodule = "INSERT INTO testsuites (cycleid,testsuitename,testsuiteid,versionnumber,conditioncheck,createdby,createdon,createdthrough,deleted,donotexecute,getparampaths,history,modifiedby,modifiedon,skucodetestsuite,tags,testscenarioids) VALUES (" + req.cycleid + ",'" + req.testsuitename + "'," + req.testsuiteid + "," + suiterowdetails.versionnumber + ",[" + conditioncheck1 + "],'" + suiterowdetails.createdby + "'," + suiterowdetails.createdon.valueOf() + ",null,null,[" + donotexecute1 + "],[" + getparampath1 + "],null,'" + suiterowdetails.modifiedby + "'," + new Date().getTime().toString() + ",null,null,[" + req.testscenarioids + "])";
 
+            // var updatetestsuitefrommodule = "INSERT INTO testsuites (cycleid,testsuitename,testsuiteid,versionnumber,conditioncheck,createdby,createdon,createdthrough,deleted,donotexecute,getparampaths,history,modifiedby,modifiedon,skucodetestsuite,tags,testscenarioids) VALUES (" + req.cycleid + ",'" + req.testsuitename + "'," + req.testsuiteid + "," + suiterowdetails.versionnumber + ",[" + conditioncheck1 + "],'" + suiterowdetails.createdby + "'," + suiterowdetails.createdon.valueOf() + ",null,null,[" + donotexecute1 + "],[" + getparampath1 + "],null,'" + suiterowdetails.modifiedby + "'," + new Date().getTime().toString() + ",null,null,[" + req.testscenarioids + "])";
+            var inputs = {"cycleid":req.cycleid,
+                    "testsuitename":req.testsuitename,
+                    "testsuiteid":req.testsuiteid,
+                    "versionnumber":suiterowdetails.versionnumber.toString(),
+                    "conditioncheck":conditioncheck1,
+                    "createdby":suiterowdetails.createdby,
+                    "createdon":new Date(suiterowdetails.createdon).getTime().toString(),
+                    "createdthrough":"createdthrough",
+                    "deleted":"FALSE",
+                    "donotexecute":donotexecute1,
+                    "getparampaths": getparampath1,
+                    "modifiedby":"Ninteen68_admin",
+                    "skucodetestsuite":"skucodetestsuite",
+                    "tags":"tags",
+                    "testscenarioids":req.testscenarioids,
+                    "query":"updatescenarioinnsuite"}
+            var args = {
+                data:inputs,
+                headers:{"Content-Type" : "application/json"}
+                
+            }
             // createTestSuitesHistory = "Inserted by Ninteen68_admin cycleid="+req.cycleid+",testsuitename="+req.testsuitename+",testsuiteid=" + req.testsuiteid +",versionnumber="+suiterowdetails.versionnumber+",conditioncheck=[" + conditioncheck1 + "],createdby= " + suiterowdetails.createdby + ",createdon=" + suiterowdetails.createdon.valueOf() + ",createdthrough=null,deleted=null,donotexecute=[" + donotexecute1 + "],getparampaths=[" + getparampath1 + "],modifiedby=" + suiterowdetails.modifiedby + ",modifiedon=" + new Date().getTime().toString() + ",skucodetestsuite=null,tags=null,testscenarioids=[" + req.testscenarioids + "] ";
              date = new Date().getTime();
             
@@ -1382,13 +1649,15 @@ function updatescenariodetailsinsuite(req, cb, data) {
             insertTestSuiteQuery = "INSERT INTO testsuites (cycleid,testsuiteid,testsuitename,versionnumber,history) VALUES ("+req.cycleid+"," +  req.testsuiteid +",'"+ req.testsuitename +"',1,{" + date + ":" + createTestSuitesHistory + "})";
           
             //var updatetestsuitefrommodule = "UPDATE testsuites SET testscenarioids = ["+req.testscenarioids+"], conditioncheck=["+conditioncheck1+"] ,getparampaths=["+getparampath1+"], donotexecute=["+donotexecute1+"] WHERE testsuiteid="+req.testsuiteid+" and cycleid="+req.cycleid+" and testsuitename='"+req.testsuitename+"' and versionnumber="+req.versionnumber;
-            dbConnICE.execute(updatetestsuitefrommodule, function(err, answers) {
-                if (err) {
-                    cb(null, err);
+            //dbConnICE.execute(updatetestsuitefrommodule, function(err, answers) {
+            client.post(epurl+"suite/readTestSuite_ICE",args,
+                    function (result, response) {
+                if (response.statusCode != 200 || result.rows == "fail") {
+                    cb(null, "fail");
                 } else {
                       fnCreateTestsuiteHistory(insertTestSuiteQuery, function(err, response) {
                                     if (response == 'success') {
-                                           simplecallback(null, answers);
+                                           simplecallback(null, result);
                                     } else {
                                         flag = "fail";
                                        console.log(err);
