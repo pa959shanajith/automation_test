@@ -2054,6 +2054,8 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 
 	//Get Selected User Data
 	$scope.getUserData = function(){
+		$("#firstName,#lastName,#password,#confirmPassword").removeClass("inputErrorBorder");
+		$("#password,#confirmPassword").val("");
 		var userId = $("#userSelect option:selected").data("id");
 		var userName = $("#userSelect option:selected").val();
 		adminServices.getUsersInfo(userId, userName)
