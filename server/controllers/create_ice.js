@@ -187,13 +187,18 @@ function get_testcaseName(testcaseId,cb,data){
 function testscreen_exists(testscreenname,cb,data){
     var flag = false;
     var obj = {flag:false,screenid:''};
-        var screenCheck = "select screenid from screens where screenname='"+testscreenname+"' ALLOW FILTERING";
-        dbConnICE.execute(screenCheck,function(err,screenid){
-            if(err){
-                console.log(err);
-                cb(null,err);
+    var inputs={"screen_name": testscreenname}
+	var args = {data:inputs,headers:{"Content-Type" : "application/json"}}    
+    //var screenCheck = "select screenid from screens where screenname='"+testscreenname+"' ALLOW FILTERING";
+        //dbConnICE.execute(screenCheck,function(err,screenid){
+        client.post("http://127.0.0.1:1990/create_ice/testscreen_exists_ICE",args,
+						function (result, response) {
+           // if(err){
+            if(response.statusCode != 200 || result.rows == "fail"){
+                console.log(result.rows);
+                cb(null,result.rows);
             }else{
-                if(screenid.rows.length!=0){ obj.flag = true; obj.screenid = screenid.rows[0].screenid}
+                if(result.rows.length!=0){ obj.flag = true; obj.screenid = result.rows[0].screenid}
                 cb(null,obj) 
             }
             
@@ -203,13 +208,18 @@ function testscreen_exists(testscreenname,cb,data){
 function testcase_exists(testcasename,cb,data){
     var flag = false;
     var obj = {flag:false,testcaseid:''}; 
-        var screenCheck = "select testcaseid from testcases where testcasename='"+testcasename+"' ALLOW FILTERING";
-        dbConnICE.execute(screenCheck,function(err,testcaseid){
-            if(err){
-                console.log(err);
-                cb(null,err);
+    var inputs={"testcase_name": testcasename}
+	var args = {data:inputs,headers:{"Content-Type" : "application/json"}} 
+        //var screenCheck = "select testcaseid from testcases where testcasename='"+testcasename+"' ALLOW FILTERING";
+        //dbConnICE.execute(screenCheck,function(err,testcaseid){
+        client.post("http://127.0.0.1:1990/create_ice/testcase_exists_ICE",args,
+						function (result, response) {
+            // if(err){
+            if(response.statusCode != 200 || result.rows == "fail"){
+                console.log(result.rows);
+                cb(null,result.rows);
             }else{
-                if(testcaseid.rows.length!=0){ obj.flag = true; obj.testcaseid = testcaseid.rows[0].testcaseid; }
+                if(result.rows.length!=0){ obj.flag = true; obj.testcaseid = result.rows[0].testcaseid; }
                 cb(null,obj) 
             }
             
@@ -223,7 +233,7 @@ function testcase_exists(testcasename,cb,data){
 
 //CreateStrcutre 
 exports.createStructure_Nineteen68 = function(req, res) {
-
+    var createdthrough='Mindmaps Creation';
     var RequestedJSON =req;
     var projectid = RequestedJSON.projectId;
     var cycleId = RequestedJSON.cycleId;
@@ -255,7 +265,7 @@ exports.createStructure_Nineteen68 = function(req, res) {
                 var date;
 
 
-
+                var suite_query='';
                testsuiteid_exists({"modulename":testsuiteName,"moduleid":moduleid_c,'modifiedby':username,"pid":projectid},function(err,data){
 						
 						if(err){
@@ -267,7 +277,8 @@ exports.createStructure_Nineteen68 = function(req, res) {
 
                             var insertInSuite ='';
                 if(!suiteflag){
-                insertInSuite = "INSERT INTO modules (projectid,modulename,moduleid,versionnumber,createdby,createdon,createdthrough,deleted,history,modifiedby,modifiedbyrole,modifiedon,skucodemodule,tags,testscenarioids) VALUES (" + projectid + ",'" + testsuiteName + "'," + suiteID + ",1,'"+username+"'," + new Date().getTime() + ",null,null,null,null,null," + new Date().getTime() + ",null,null,null);";
+                     suite_query='notflagsuite';
+                // insertInSuite = "INSERT INTO modules (projectid,modulename,moduleid,versionnumber,createdby,createdon,createdthrough,deleted,history,modifiedby,modifiedbyrole,modifiedon,skucodemodule,tags,testscenarioids) VALUES (" + projectid + ",'" + testsuiteName + "'," + suiteID + ",1,'"+username+"'," + new Date().getTime() + ",null,null,null,null,null," + new Date().getTime() + ",null,null,null);";
 
                   //Modules History
                 inserInSuiteHistory =  "' projectid="+projectid+",modulename="+testsuiteName+",moduleid=" + suiteID +",versionnumber=1,createdby=" + username + ",createdon=" + new Date().getTime().toString() + ",createdthrough=null,deleted=null,modifiedby=null,modifiedbyrole=null,modifiedon=" + new Date().getTime() + ",skucodemodule=null,tags=null,testscenarioids=null '";
@@ -276,15 +287,24 @@ exports.createStructure_Nineteen68 = function(req, res) {
 
 
                 }else{
-                insertInSuite = "SELECT moduleid FROM modules where modulename='"+testsuiteName+"' ALLOW FILTERING";
+                     suite_query='selectsuite';
+                //insertInSuite = "SELECT moduleid FROM modules where modulename='"+testsuiteName+"' ALLOW FILTERING";
                 suiteID = suiteidTemp; 
                }
                var testsuiteobj = {"testsuiteId":testsuiteidneo,"testsuiteId_c":suiteID,"testsuiteName":testsuiteName,"task":tasksuite,"testscenarioDetails":scenariodetailslist};
                suitedetailslist.push(testsuiteobj);
                //console.log(insertInSuite);
-                dbConnICE.execute(insertInSuite, function(err, testsuiteresult) {
-                    if (err) {
-                        console.log(err);
+                //dbConnICE.execute(insertInSuite, function(err, testsuiteresult) {
+                var testsuiteobj = {"testsuiteId":testsuiteidneo,"testsuiteId_c":suiteID,"testsuiteName":testsuiteName,"task":tasksuite,"testscenarioDetails":scenariodetailslist};
+               suitedetailslist.push(testsuiteobj);
+               console.log(insertInSuite);
+               var inputs={"query":suite_query,'projectid':projectid,'modulename':testsuiteName,'moduleid':suiteID,'versionnumber':'1','createdby':username,'createdthrough':createdthrough,'deleted':false,'skucodemodule':'skucodemodule','tags':'tags'};
+			   var args = {data:inputs,headers:{"Content-Type" : "application/json"}};
+				client.post("http://127.0.0.1:1990/create_ice/insertInSuite_ICE",args,
+								function (result, response) {
+                    //if (err) {
+                    if(response.statusCode != 200 || result.rows == "fail"){	
+                        console.log(result.rows);
                     } else {
                           //Start of Insert Module History
                           fnCreateModuleHistory(inserInSuiteQuery, function(err, response) {
@@ -325,9 +345,11 @@ exports.createStructure_Nineteen68 = function(req, res) {
                                     scenarioflag = scenariodata.flag;
                                     scenarioidTemp = scenariodata.scenarioid;
                                 }
+                                var scenario_query='';
                                 var insertInScenario='';
                                 if(!scenarioflag){
-                                    insertInScenario   = "insert into testscenarios(projectid,testscenarioname,testscenarioid,createdby,createdon,history,modifiedby,modifiedbyrole,modifiedon,skucodetestscenario,tags,testcaseids) VALUES (" + projectid + ",'" + scenarioName + "'," + scenarioId + ",'"+username+"'," + new Date().getTime() + ",null,null,null," + new Date().getTime() + ",null,null,[])";
+                                    scenario_query='notflagscenarios';
+                                    // insertInScenario   = "insert into testscenarios(projectid,testscenarioname,testscenarioid,createdby,createdon,history,modifiedby,modifiedbyrole,modifiedon,skucodetestscenario,tags,testcaseids) VALUES (" + projectid + ",'" + scenarioName + "'," + scenarioId + ",'"+username+"'," + new Date().getTime() + ",null,null,null," + new Date().getTime() + ",null,null,[])";
 
                                     
                                      //Scenarios History
@@ -335,17 +357,22 @@ exports.createStructure_Nineteen68 = function(req, res) {
                                     date = new Date().getTime();
                                     inserInScenarioQuery = "INSERT INTO testscenarios(projectid,testscenarioname,testscenarioid,history) VALUES ("+projectid+",'" + scenarioName +"',"+scenarioId+",{" + date + ":" + inserInScenarioHistory + "})";
                                 }else{
-                                    insertInScenario = "DELETE testcaseids FROM testscenarios WHERE testscenarioid="+scenarioidTemp+" and testscenarioname='"+scenarioName +"' and projectid = "+projectid;
+                                    scenario_query='deletescenarios';
+                                    //insertInScenario = "DELETE testcaseids FROM testscenarios WHERE testscenarioid="+scenarioidTemp+" and testscenarioname='"+scenarioName +"' and projectid = "+projectid;
                                       inserInScenarioHistory =  "testscenarioid="+scenarioidTemp+",testscenarioname="+scenarioName+",projectid=" + projectid +" ";
                                     //Delete Query
                                     scenarioId =  scenarioidTemp;
                                 }
                                 var scenariodetailsobj = {"testscenarioId":scenarioidneo,"testscenarioId_c":scenarioId,"screenDetails":screendetailslist,"tasks":taskscenario,"testscenarioName":scenarioName};
                                 scenariodetailslist.push(scenariodetailsobj);
-                                dbConnICE.execute(insertInScenario, function(err, scenarioresult) {
-
-                                if (err) {
-                                    console.log(err);
+                                var inputs={"query":scenario_query,'projectid':projectid,'testscenarioname':scenarioName,'testscenarioid':scenarioId,'createdby':username,'createdthrough':createdthrough,'deleted':false,'skucodetestscenario':'skucodetestscenario','tags':'tags'};
+			                    var args = {data:inputs,headers:{"Content-Type" : "application/json"}};
+                                //dbConnICE.execute(insertInScenario, function(err, scenarioresult) {
+                                client.post("http://127.0.0.1:1990/create_ice/insertInScenarios_ICE",args,
+								        function (result, response) {
+                                //if (err) {
+                                if(response.statusCode != 200 || result.rows == "fail"){	
+                                    console.log(result.rows);
                                 } else {
                                      //Scenarios History
                                       fnCreateScenarioHistory(inserInScenarioQuery, function(err, response) {
@@ -379,23 +406,33 @@ exports.createStructure_Nineteen68 = function(req, res) {
                                                 screenidTemp = screendata.screenid;
                                             }
                                             var insertInScreen = '';
+                                            var screen_query=''
                                             if(!screenflag){
-                                                insertInScreen = "INSERT INTO screens (projectid,screenname,screenid,versionnumber,createdby,createdon,createdthrough,deleted,history,modifiedby,modifiedon,screendata,skucodescreen,tags) VALUES (" + projectid + ",'" + screenName + "'," + screenId + ",1,'"+username+"'," + new Date().getTime() + ",null,null,null,null," + new Date().getTime() + ",'',null,null)";
+                                                screen_query='notflagscreen';
+                                                // insertInScreen = "INSERT INTO screens (projectid,screenname,screenid,versionnumber,createdby,createdon,createdthrough,deleted,history,modifiedby,modifiedon,screendata,skucodescreen,tags) VALUES (" + projectid + ",'" + screenName + "'," + screenId + ",1,'"+username+"'," + new Date().getTime() + ",null,null,null,null," + new Date().getTime() + ",'',null,null)";
                                                 
                                             //Screens History
                                             inserInScreenHistory =  "'projectid="+projectid+",screenname="+scenarioName+",screenid=" + screenId +",versionnumber=1,createdby=" + username + ",createdon=" + new Date().getTime().toString() + ",createdthrough=null,deleted=null,modifiedby=" + new Date().getTime() + ",modifiedon=null,skucodescreen=null,tags=[] '";
                                             date = new Date().getTime();
                                             inserInScreenQuery = "INSERT INTO screens(projectid,screenid,screenname,versionnumber,history) VALUES ("+projectid+"," + screenId +",'"+scenarioName+"',1,{" + date + ":" + inserInScreenHistory + "})";
                                             }else{
-                                                insertInScreen = "select screenid from screens where screenname='"+screenName+"' ALLOW FILTERING";
+                                                screen_query='selectscreen';
+                                                //insertInScreen = "select screenid from screens where screenname='"+screenName+"' ALLOW FILTERING";
                                                 screenId = screenidTemp;
                                             }
                                             var screendetailsobj = {"testcaseDetails":testcasedetailslist,"screenName":screenName,"screenId_c":screenId,"screenId":screenidneo,"task":taskscreen};
                                             screendetailslist.push(screendetailsobj);
-
-                                                dbConnICE.execute(insertInScreen, function(err, screenresult) {
-                                                    if (err) {
-                                                        console.log(err);
+                                            var inputs={"query":screen_query,'projectid':projectid,'screenname':screenName,'screenid':screenId,'versionnumber':'1',
+                                            'createdby':username,'createdthrough':createdthrough,'deleted':false,'skucodescreen':'skucodescreen','tags':'tags'};
+			                                var args = {data:inputs,headers:{"Content-Type" : "application/json"}};
+                                                // dbConnICE.execute(insertInScreen, function(err, screenresult) {
+                                                //     if (err) {
+                                                client.post("http://127.0.0.1:1990/create_ice/insertInScreen_ICE",args,
+								                        function (result, response) {
+                                                //if (err) {
+                                                if(response.statusCode != 200 || result.rows == "fail"){	
+                                                        console.log(result.rows);
+                                                    //console.log(err);
                                                     } else {
                                                         //Screen History
                                                          fnCreateScreenHistory(inserInScreenQuery, function(err, response) {
@@ -435,23 +472,32 @@ exports.createStructure_Nineteen68 = function(req, res) {
                                                                 }
 
                                                                 var insertInTescase = '';
+                                                                var testcase_query='';
                                                                 if(!testcaseflag){
-                                                                    insertInTescase = "INSERT INTO testcases (screenid,testcasename,testcaseid,versionnumber,createdby,createdon,createdthrough,deleted,history,modifiedby,modifiedon,skucodetestcase,tags,testcasesteps)VALUES (" + screenId + ",'" + testcaseName + "'," + testcaseID + ",1,'"+username+"'," + new Date().getTime() + ",null,null,null,null," + new Date().getTime() + ",'skucodetestcase',null,'')";
+                                                                    testcase_query='notflagtestcase';
+                                                                    // insertInTescase = "INSERT INTO testcases (screenid,testcasename,testcaseid,versionnumber,createdby,createdon,createdthrough,deleted,history,modifiedby,modifiedon,skucodetestcase,tags,testcasesteps)VALUES (" + screenId + ",'" + testcaseName + "'," + testcaseID + ",1,'"+username+"'," + new Date().getTime() + ",null,null,null,null," + new Date().getTime() + ",'skucodetestcase',null,'')";
                                                                      //Testcases History
                                                                     inserInTestcaseHistory =  "' screenid="+screenId+",testcasename="+testcaseName+",testcaseid=" + testcaseID +",versionnumber=1,createdby=" + username + ",createdon=" + new Date().getTime().toString() + ",createdthrough=null,deleted=null,modifiedby=" + new Date().getTime() + ",modifiedon=null,skucodetestcase=null,tags=null,testcasesteps='' '";
                                                                     date = new Date().getTime();
                                                                     inserInTestcaseQuery = "INSERT INTO testcases(screenid,testcasename,testcaseid,versionnumber,history) VALUES ("+screenId+",'" + testcaseName +"',"+testcaseID+",1,{" + date + ":" + inserInTestcaseHistory + "})";
                                                                 }else{
-                                                                    insertInTescase = "select testcaseid from testcases where testcasename='"+testcaseName+"' ALLOW FILTERING";
+                                                                    testcase_query='selecttestcase';
+                                                                   // insertInTescase = "select testcaseid from testcases where testcasename='"+testcaseName+"' ALLOW FILTERING";
                                                                     testcaseID = testcaseidTemp;
 
                                                                 } 
                                                                  var testcasedetailsobj = {"screenID_c":screenID_c_neo,"testcaseId":testcaseidneo,"testcaseId_c":testcaseID,"testcaseName":testcaseName,"task":tasktestcase};
                                                                 testcasedetailslist.push(testcasedetailsobj);                                                           
                                                             //   var testsuiteids = "SELECT testsuiteid,testsuitename FROM testsuites WHERE cycleid="+cycleiditr.cycleid;
-                                                            dbConnICE.execute(insertInTescase, function(err, testsuiteidsdata) {
-                                                                if (err) {
-                                                                    console.log(err);
+                                                            // dbConnICE.execute(insertInTescase, function(err, testsuiteidsdata) {
+                                                            //     if (err) {
+                                                            var inputs={"query":testcase_query,'screenid':screenId,'testcasename':testcaseName,'testcaseid':testcaseID,'versionnumber':'1',
+                                                            'createdby':username,'createdthrough':createdthrough,'deleted':false,'skucodetestcase':'skucodetestcase','tags':'tags'};
+                                                            var args = {data:inputs,headers:{"Content-Type" : "application/json"}};
+                                                            client.post("http://127.0.0.1:1990/create_ice/insertInTestcase_ICE",args,
+								                                            function (result, response) {
+                                                                if(response.statusCode != 200 || result.rows == "fail"){	
+                                                                    console.log(result.rows);
                                                                 } else {
                                                                      fnCreateTestcaseHistory(inserInTestcaseQuery, function(err, response) {
                                                                        if(err){
@@ -467,7 +513,19 @@ exports.createStructure_Nineteen68 = function(req, res) {
                                                                       //Update Test Scenarios history
                                                                  //   updateTestScenariosHistory = "'updated testcaseids=testcaseids+["+testcaseID+"]","modifiedby='"+username+"',modifiedon="+modifiedon+" '";
                                                                    // updateTestScenarioQuery = "";
-                                                                    var update =dbConnICE.execute(updateTestscenario,function(err,result){});
+                                                                    //var update =dbConnICE.execute(updateTestscenario,function(err,result){});
+                                                                    var inputs={'testcaseid':testcaseID,'modifiedby':username,'projectid':projectid,
+                                                                    'testscenarioid':scenarioId,'testscenarioname':scenarioName};
+                                                                    var args = {data:inputs,headers:{"Content-Type" : "application/json"}};
+                                                                    client.post("http://127.0.0.1:1990/create_ice/updateTestScenario_ICE",args,
+								                                            function (result, response) {
+                                                                    if(response.statusCode != 200 || result.rows == "fail"){	
+                                                                            console.log(result.rows);
+                                                                        } else {
+                                                                            console.log("Successfully updated testscenarios");
+
+                                                                        }
+                                                                    });
                                                                 }
                                                                 
                                                              callback4();
@@ -507,13 +565,19 @@ exports.createStructure_Nineteen68 = function(req, res) {
 
             },
             updatescenarioids:function(callback){
-                var versionnumber = 1;
-                var updatescenarioidsinsuite = "UPDATE modules SET testscenarioids = ["+scenarioidlist+"] WHERE moduleid="+suiteID+" and projectid="+projectid+" and modulename='"+testsuiteName+"' and versionnumber="+versionnumber;
-                dbConnICE.execute(updatescenarioidsinsuite,function(err,result){
-                    if(err){
-                        console.log(err);
+                //var versionnumber = 1;
+                //var updatescenarioidsinsuite = "UPDATE modules SET testscenarioids = ["+scenarioidlist+"] WHERE moduleid="+suiteID+" and projectid="+projectid+" and modulename='"+testsuiteName+"' and versionnumber="+versionnumber;
+               // dbConnICE.execute(updatescenarioidsinsuite,function(err,result){
+                var inputs={'testscenarioids':scenarioidlist,'moduleid':suiteID,'projectid':projectid,
+                'modulename':testsuiteName,'versionnumber':'1'};
+                var args = {data:inputs,headers:{"Content-Type" : "application/json"}};
+                client.post("http://127.0.0.1:1990/create_ice/updateModule_ICE",args,
+						function (result, response) {
+                    //if(err){
+                    if(response.statusCode != 200 || result.rows == "fail"){
+                        console.log(result.rows);
                     }else{
-                        console.log("sucess scenario");
+                        console.log("Successfully updated Modules");
                       
                     }callback();
 
@@ -612,16 +676,21 @@ function testsuiteid_exists(moduledetails,cb,data){
 
 
             modulename:function(modulecallback){
-                var suiteCheck = "SELECT moduleid FROM modules where projectid="+moduledetails.pid+" and modulename='"+moduledetails.modulename+"' ALLOW FILTERING";
-                dbConnICE.execute(suiteCheck,function(err,suiteid){
-                    if(err){
-                        console.log(err);
+               // var suiteCheck = "SELECT moduleid FROM modules where projectid="+moduledetails.pid+" and modulename='"+moduledetails.modulename+"' ALLOW FILTERING";
+                //dbConnICE.execute(suiteCheck,function(err,suiteid){
+                var inputs={'project_id': moduledetails.pid,'module_name':moduledetails.modulename,'name':'suite_check'}
+	            var args = {data:inputs,headers:{"Content-Type" : "application/json"}} 
+                client.post("http://127.0.0.1:1990/create_ice/testsuiteid_exists_ICE",args,
+						function (result, response) {
+                   // if(err){
+                if(response.statusCode != 200 || result.rows == "fail"){	
+                        console.log(result.rows);
                         cb(null,obj);
                     }else{
-                        if(suiteid.rows.length!=0){
+                        if(result.rows.length!=0){
                             obj.flag = true; 
                             flagId=true;
-                            obj.suiteid = suiteid.rows[0].moduleid
+                            obj.suiteid = result.rows[0].moduleid
                             statusflag = true;
                             //cb(null,obj);
                         }
@@ -634,15 +703,20 @@ function testsuiteid_exists(moduledetails,cb,data){
 
             moduledetails:function(modulecallback){
                 if(!flagId){
-                    var suiteCheck = "SELECT moduleid FROM modules where projectid="+moduledetails.pid+" and modulename='"+moduledetails.modulename+"' and moduleid="+moduledetails.moduleid+" ALLOW FILTERING";
-                dbConnICE.execute(suiteCheck,function(err,suiteid){
-                    if(err){
-                        console.log(err);
+                //var suiteCheck = "SELECT moduleid FROM modules where projectid="+moduledetails.pid+" and modulename='"+moduledetails.modulename+"' and moduleid="+moduledetails.moduleid+" ALLOW FILTERING";
+                //dbConnICE.execute(suiteCheck,function(err,suiteid){
+                 var inputs={'project_id': moduledetails.pid,'module_name':moduledetails.modulename,'module_id':moduledetails.moduleid,'name':'suite_check_id'}
+	            var args = {data:inputs,headers:{"Content-Type" : "application/json"}} 
+                client.post("http://127.0.0.1:1990/create_ice/testsuiteid_exists_ICE",args,
+						function (result, response) {
+                    //if(err){
+                     if(response.statusCode != 200 || result.rows == "fail"){	
+                        console.log(result.rows);
                         cb(null,obj);
                     }else{
-                        if(suiteid.rows.length!=0){
+                        if(result.rows.length!=0){
                             obj.flag = true; 
-                            obj.suiteid = suiteid.rows[0].moduleid
+                            obj.suiteid = result.rows[0].moduleid
                             statusflag = true;
                             //cb(null,obj);
                         }
@@ -693,14 +767,19 @@ function updatetestsuitename(moduledetails,cb,data){
     var flagtocheckifdeleted = false;
     async.series({
         select:function(callback){
-            var completesuite = "select * from modules where moduleid="+moduledetails.moduleid;
-            dbConnICE.execute(completesuite,function(err,suitedata){
-                if(err){
-                    console.log(err);
+            //var completesuite = "select * from modules where moduleid="+moduledetails.moduleid;
+            //dbConnICE.execute(completesuite,function(err,suitedata){
+            var inputs={'name':'module_details','id':moduledetails.moduleid}
+	        var args = {data:inputs,headers:{"Content-Type" : "application/json"}} 
+            client.post("http://127.0.0.1:1990/create_ice/get_node_details_ICE",args,
+						function (result, response) {
+                //if(err){
+                if(response.statusCode != 200 || result.rows == "fail"){	
+                    console.log(result.rows);
                 }else{
-                    if(suitedata.rows.length!=0){
+                    if(result.rows.length!=0){
                         flagtocheckifexists = true;
-                        suitedatatoupdate = suitedata.rows[0];
+                        suitedatatoupdate = result.rows[0];
                     }
                     
                 }
@@ -709,12 +788,18 @@ function updatetestsuitename(moduledetails,cb,data){
         },
         delete:function(callback){
             if(flagtocheckifexists){
-                var deletequery = "DELETE FROM modules WHERE moduleid="+moduledetails.moduleid+" and modulename='"+suitedatatoupdate.modulename+"' and versionnumber="+suitedatatoupdate.versionnumber+" and projectid="+suitedatatoupdate.projectid;
-                dbConnICE.execute(deletequery,function(err,deleted){
-                    if(err) 
-                     {
-                     console.log(err);
-                     }else{
+                //var deletequery = "DELETE FROM modules WHERE moduleid="+moduledetails.moduleid+" and modulename='"+suitedatatoupdate.modulename+"' and versionnumber="+suitedatatoupdate.versionnumber+" and projectid="+suitedatatoupdate.projectid;
+                //dbConnICE.execute(deletequery,function(err,deleted){
+                   // if(err) 
+                var inputs={'name':'delete_module','id':moduledetails.moduleid,'node_name':suitedatatoupdate.modulename,'version_number':suitedatatoupdate.versionnumber.toString(),'parent_node_id':suitedatatoupdate.projectid}
+	            var args = {data:inputs,headers:{"Content-Type" : "application/json"}} 
+                client.post("http://127.0.0.1:1990/create_ice/delete_node_ICE",args,
+						function (result, response) {
+                //if(err){
+                    if(response.statusCode != 200 || result.rows == "fail"){	
+                        
+                        console.log(result.rows);
+                    }else{
                         // if(deleted.rows != undefined && deleted.rows.length!=0){
                              flagtocheckifdeleted=true;
                         // }
@@ -740,8 +825,36 @@ function updatetestsuitename(moduledetails,cb,data){
                     console.log(ex);
                     console.log(insertquery);
                 }
-                
-                dbConnICE.execute(insertquery,function(err,deleted){
+                if(suitedatatoupdate.deleted==null){
+                    suitedatatoupdate.deleted = false;
+                }
+                if(suitedatatoupdate.createdthrough == null){
+                    suitedatatoupdate.createdthrough = "created_through";
+                }
+                var inputs={'projectid':suitedatatoupdate.projectid,
+                'modulename':moduledetails.modulename,
+                'moduleid':suitedatatoupdate.moduleid,
+                'versionnumber':suitedatatoupdate.versionnumber.toString(),
+                'modifiedby':"Nineteen68_Admin",
+                'modifiedbyrole':"Nineteen68_Admin",
+                'createdby':suitedatatoupdate.createdby,
+                'createdthrough':suitedatatoupdate.createdthrough
+                ,'deleted':suitedatatoupdate.deleted.toString(),
+                'skucodemodule':'skucodemodule',
+                'tags':'tags',
+                'testscenarioids':suitedatatoupdate.testscenarioids,
+                'createdon':new Date(suitedatatoupdate.createdon).getTime().toString()
+                }
+	            var args = {data:inputs,headers:{"Content-Type" : "application/json"}} 
+                client.post("http://127.0.0.1:1990/create_ice/updateModulename_ICE",args,
+						function (result, response) {
+                //if(err){
+                if(response.statusCode != 200 || result.rows == "fail"){	
+                    console.log(result.rows);
+                }else{
+                    console.log('Succesfully renamed module name');
+                }
+                //dbConnICE.execute(insertquery,function(err,deleted){
                     // if(err){
                     //     console.log(err);
                     // }else{
@@ -766,16 +879,22 @@ function testscenariosid_exists(testscenariodetails,cb,data){
     
         async.series({
             scenarioname:function(scenariocallback){
-                var scenarioCheck = "select testscenarioid from testscenarios where projectid="+testscenariodetails.pid+" and testscenarioname='"+testscenariodetails.testscenarioname+"' ALLOW FILTERING";
-                dbConnICE.execute(scenarioCheck,function(err,scenarioid){
-                    if(err){
-                        console.log(err);
+                // var scenarioCheck = "select testscenarioid from testscenarios where projectid="+testscenariodetails.pid+" and testscenarioname='"+testscenariodetails.testscenarioname+"' ALLOW FILTERING";
+                // dbConnICE.execute(scenarioCheck,function(err,scenarioid){
+                //     if(err){
+                var inputs={'project_id': testscenariodetails.pid,'scenario_name':testscenariodetails.testscenarioname,'name':'scenario_check'}
+	            var args = {data:inputs,headers:{"Content-Type" : "application/json"}} 
+                client.post("http://127.0.0.1:1990/create_ice/testscenariosid_exists_ICE",args,
+						function (result, response) {
+                    //if(err){
+                     if(response.statusCode != 200 || result.rows == "fail"){	
+                        console.log(result.rows);
                         cb(null,obj);
                     }else{
-                        if(scenarioid.rows.length!=0){ 
+                        if(result.rows.length!=0){ 
                             flagId=true;
                             obj.flag = true; 
-                            obj.scenarioid = scenarioid.rows[0].testscenarioid;
+                            obj.scenarioid = result.rows[0].testscenarioid;
                             statusflag = true;
                         }
                         scenariocallback();
@@ -786,15 +905,21 @@ function testscenariosid_exists(testscenariodetails,cb,data){
             },
             scenariodetails:function(scenariocallback){
                 if(!flagId){
-                    var scenarioCheck = "select testscenarioid from testscenarios where projectid="+testscenariodetails.pid+" and testscenarioname='"+testscenariodetails.testscenarioname+"' and testscenarioid = "+testscenariodetails.testscenarioid+" ALLOW FILTERING";
-                    dbConnICE.execute(scenarioCheck,function(err,scenarioid){
-                        if(err){
-                            console.log(err);
+                    // var scenarioCheck = "select testscenarioid from testscenarios where projectid="+testscenariodetails.pid+" and testscenarioname='"+testscenariodetails.testscenarioname+"' and testscenarioid = "+testscenariodetails.testscenarioid+" ALLOW FILTERING";
+                    // dbConnICE.execute(scenarioCheck,function(err,scenarioid){
+                    //     if(err){
+                    var inputs={'project_id': testscenariodetails.pid,'scenario_name':testscenariodetails.testscenarioname,'scenario_id':testscenariodetails.testscenarioid,'name':'scenario_check_id'}
+	                var args = {data:inputs,headers:{"Content-Type" : "application/json"}} 
+                     client.post("http://127.0.0.1:1990/create_ice/testscenariosid_exists_ICE",args,
+						function (result, response) {
+                    //if(err){
+                     if(response.statusCode != 200 || result.rows == "fail"){	
+                        console.log(result.rows);
                             cb(null,obj);
                         }else{
-                            if(scenarioid.rows.length!=0){ 
+                            if(result.rows.length!=0){ 
                                 obj.flag = true; 
-                                obj.scenarioid = scenarioid.rows[0].testscenarioid;
+                                obj.scenarioid = result.rows[0].testscenarioid;
                                 statusflag = true;
                             }
                             scenariocallback();
@@ -843,14 +968,20 @@ function updatetestscenarioname(testscenariodetails,cb,data){
     var flagtocheckifdeleted = false;
     async.series({
         select:function(callback){
-            var completesuite = "select * from testscenarios where testscenarioid="+testscenariodetails.testscenarioid;
-            dbConnICE.execute(completesuite,function(err,scenariodata){
-                if(err){
-                    console.log(err);
+            // var completesuite = "select * from testscenarios where testscenarioid="+testscenariodetails.testscenarioid;
+            // dbConnICE.execute(completesuite,function(err,scenariodata){
+            //     if(err){
+            var inputs={'name':'testscenario_details','id':testscenariodetails.testscenarioid}
+	        var args = {data:inputs,headers:{"Content-Type" : "application/json"}} 
+            client.post("http://127.0.0.1:1990/create_ice/get_node_details_ICE",args,
+						function (result, response) {
+                //if(err){
+                if(response.statusCode != 200 || result.rows == "fail"){	
+                    console.log(result.rows);
                 }else{
-                    if(scenariodata.rows.length!=0){
+                    if(result.rows.length!=0){
                         flagtocheckifexists = true;
-                        scenariodatatoupdate = scenariodata.rows[0];
+                        scenariodatatoupdate = result.rows[0];
                     }
                     
                 }
@@ -859,11 +990,16 @@ function updatetestscenarioname(testscenariodetails,cb,data){
         },
         delete:function(callback){
             if(flagtocheckifexists){
-                var deletequery = "DELETE FROM testscenarios WHERE testscenarioid="+testscenariodetails.testscenarioid+" and testscenarioname='"+scenariodatatoupdate.testscenarioname+"' and projectid="+scenariodatatoupdate.projectid;
-                dbConnICE.execute(deletequery,function(err,deleted){
-                    if(err) 
-                    {
-                     console.log(err);
+                // var deletequery = "DELETE FROM testscenarios WHERE testscenarioid="+testscenariodetails.testscenarioid+" and testscenarioname='"+scenariodatatoupdate.testscenarioname+"' and projectid="+scenariodatatoupdate.projectid;
+                // dbConnICE.execute(deletequery,function(err,deleted){
+                //     if(err) 
+                //     {
+                 var inputs={'name':'delete_testscenario','id':testscenariodetails.testscenarioid,'node_name':scenariodatatoupdate.testscenarioname,'version_number':'1','parent_node_id':scenariodatatoupdate.projectid}
+	            var args = {data:inputs,headers:{"Content-Type" : "application/json"}} 
+                client.post("http://127.0.0.1:1990/create_ice/delete_node_ICE",args,
+						function (result, response) {
+                    if(response.statusCode != 200 || result.rows == "fail"){
+                     console.log(result.rows);
                     }else{
                        // if(deleted.rows != undefined && deleted.rows.length!=0){
                             flagtocheckifdeleted=true;
@@ -888,15 +1024,30 @@ function updatetestscenarioname(testscenariodetails,cb,data){
                     if (scenariodatatoupdate.testcaseids==null){
                         scenariodatatoupdate.testcaseids='';
                     }
-                    insertquery = "INSERT INTO testscenarios (projectid,testscenarioname,testscenarioid,createdby,createdon,deleted,history,modifiedby,modifiedbyrole,modifiedon,skucodetestscenario,tags,testcaseids) VALUES ("+
-                scenariodatatoupdate.projectid+",'"+testscenariodetails.testscenarioname+"',"+testscenariodetails.testscenarioid+",'"+scenariodatatoupdate.createdby+"',"+scenariodatatoupdate.createdon.valueOf()
-                +","+scenariodatatoupdate.deleted+",null,'"+scenariodatatoupdate.modifiedby+"',"+scenariodatatoupdate.modifiedbyrole+","+new Date().getTime()+",'"+scenariodatatoupdate.skucodetestscenario
-                +"',"+scenariodatatoupdate.tags+",["+scenariodatatoupdate.testcaseids+"]);";
+                //     insertquery = "INSERT INTO testscenarios (projectid,testscenarioname,testscenarioid,createdby,createdon,deleted,history,modifiedby,modifiedbyrole,modifiedon,skucodetestscenario,tags,testcaseids) VALUES ("+
+                // scenariodatatoupdate.projectid+",'"+testscenariodetails.testscenarioname+"',"+testscenariodetails.testscenarioid+",'"+scenariodatatoupdate.createdby+"',"+scenariodatatoupdate.createdon.valueOf()
+                // +","+scenariodatatoupdate.deleted+",null,'"+scenariodatatoupdate.modifiedby+"',"+scenariodatatoupdate.modifiedbyrole+","+new Date().getTime()+",'"+scenariodatatoupdate.skucodetestscenario
+                // +"',"+scenariodatatoupdate.tags+",["+scenariodatatoupdate.testcaseids+"]);";
                 }catch(ex){
                     console.log(ex);
                 }
-
-                dbConnICE.execute(insertquery,function(err,deleted){
+                if(scenariodatatoupdate.deleted == null || scenariodatatoupdate.deleted == undefined){
+                    scenariodatatoupdate.deleted = false;
+                }
+                //dbConnICE.execute(insertquery,function(err,deleted){
+                 var inputs={'projectid': scenariodatatoupdate.projectid,'testscenarioname':testscenariodetails.testscenarioname,'testscenarioid':testscenariodetails.testscenarioid,
+                 'modifiedby':'Ninteen68_admin','modifiedbyrole':'Ninteen68_admin','createdon':new Date(scenariodatatoupdate.createdon).getTime().toString(),
+                'createdby':scenariodatatoupdate.createdby,'deleted':scenariodatatoupdate.deleted.toString(),'skucodetestscenario':'skucodetestscenario','tags':'tags',
+                'testcaseids':scenariodatatoupdate.testcaseids}
+	            var args = {data:inputs,headers:{"Content-Type" : "application/json"}} 
+                client.post("http://127.0.0.1:1990/create_ice/updateTestscenarioname_ICE",args,
+						function (result, response) {
+                //if(err){
+                if(response.statusCode != 200 || result.rows == "fail"){	
+                    console.log(result.rows);
+                }else{
+                    console.log('Succesfully renamed Testscenario name');
+                }
                     // if(err){
                     //     console.log(err);
                     // }else{
@@ -919,16 +1070,22 @@ function testscreen_exists(testscreendetails,cb,data){
 
         async.series({
             screenname:function(screencallback){
-                var screenCheck =  "select screenid from screens where projectid="+testscreendetails.pid+" and screenname='"+testscreendetails.testscreenname+"' ALLOW FILTERING";
-                dbConnICE.execute(screenCheck,function(err,screenid){
-                    if(err){
-                        console.log(err);
+                // var screenCheck =  "select screenid from screens where projectid="+testscreendetails.pid+" and screenname='"+testscreendetails.testscreenname+"' ALLOW FILTERING";
+                // dbConnICE.execute(screenCheck,function(err,screenid){
+                //     if(err){
+                    var inputs={'project_id': testscreendetails.pid,'screen_name':testscreendetails.testscreenname,'name':'screen_check'}
+	                var args = {data:inputs,headers:{"Content-Type" : "application/json"}} 
+                    client.post("http://127.0.0.1:1990/create_ice/testscreenid_exists_ICE",args,
+						function (result, response) {
+                    //if(err){
+                     if(response.statusCode != 200 || result.rows == "fail"){	
+                        console.log(result.rows);
                         cb(null,obj);
                     }else{
-                        if(screenid.rows.length!=0){ 
+                        if(result.rows.length!=0){ 
                             flagId=true;
                             obj.flag = true; 
-                            obj.screenid = screenid.rows[0].screenid;
+                            obj.screenid = result.rows[0].screenid;
                             statusflag = true;
                         }
                         screencallback();
@@ -940,15 +1097,21 @@ function testscreen_exists(testscreendetails,cb,data){
 
             screendetails:function(screencallback){
                 if (!flagId){
-                    var screenCheck =  "select screenid from screens where projectid="+testscreendetails.pid+" and screenname='"+testscreendetails.testscreenname+"' and screenid="+testscreendetails.testscreenid+" ALLOW FILTERING";
-                    dbConnICE.execute(screenCheck,function(err,screenid){
-                        if(err){
-                            console.log(err);
+                    // var screenCheck =  "select screenid from screens where projectid="+testscreendetails.pid+" and screenname='"+testscreendetails.testscreenname+"' and screenid="+testscreendetails.testscreenid+" ALLOW FILTERING";
+                    // dbConnICE.execute(screenCheck,function(err,screenid){
+                    //     if(err){
+                    var inputs={'project_id': testscreendetails.pid,'screen_name':testscreendetails.testscreenname,'screen_id':testscreendetails.testscreenid,'name':'screen_check_id'}
+	                var args = {data:inputs,headers:{"Content-Type" : "application/json"}} 
+                    client.post("http://127.0.0.1:1990/create_ice/testscreenid_exists_ICE",args,
+						function (result, response) {
+                    //if(err){
+                     if(response.statusCode != 200 || result.rows == "fail"){	
+                            console.log(result.rows);
                             cb(null,obj);
                         }else{
-                            if(screenid.rows.length!=0){ 
+                            if(result.rows.length!=0){ 
                                 obj.flag = true; 
-                                obj.screenid = screenid.rows[0].screenid;
+                                obj.screenid = result.rows[0].screenid;
                                 statusflag = true;
                             }
                             screencallback();
@@ -998,14 +1161,20 @@ var screendatatoupdate = [];
     var flagtocheckifdeleted=false;
     async.series({
         select:function(callback){
-            var completescreen = "select * from screens where screenid="+testscreendetails.testscreenid;
-            dbConnICE.execute(completescreen,function(err,screendata){
-                if(err){
-                    console.log(err);
+            // var completescreen = "select * from screens where screenid="+testscreendetails.testscreenid;
+            // dbConnICE.execute(completescreen,function(err,screendata){
+            //     if(err){
+            var inputs={'name':'screen_details','id':testscreendetails.testscreenid}
+	        var args = {data:inputs,headers:{"Content-Type" : "application/json"}} 
+            client.post("http://127.0.0.1:1990/create_ice/get_node_details_ICE",args,
+						function (result, response) {
+                //if(err){
+                if(response.statusCode != 200 || result.rows == "fail"){
+                    console.log(result.rows);
                 }else{
-                    if(screendata.rows.length!=0){
+                    if(result.rows.length!=0){
                         flagtocheckifexists = true;
-                        screendatatoupdate = screendata.rows[0];
+                        screendatatoupdate = result.rows[0];
                     }
                     
                 }
@@ -1015,11 +1184,18 @@ var screendatatoupdate = [];
         delete:function(callback){
             if(flagtocheckifexists){
                 
-                var deletequery = "DELETE FROM screens WHERE screenid="+testscreendetails.testscreenid+" and screenname='"+screendatatoupdate.screenname+"' and versionnumber="+screendatatoupdate.versionnumber+" and projectid="+screendatatoupdate.projectid;
-                dbConnICE.execute(deletequery,function(err,deleted){
-                    if(err)  
-                    {
-                        console.log(err);
+                // var deletequery = "DELETE FROM screens WHERE screenid="+testscreendetails.testscreenid+" and screenname='"+screendatatoupdate.screenname+"' and versionnumber="+screendatatoupdate.versionnumber+" and projectid="+screendatatoupdate.projectid;
+                // dbConnICE.execute(deletequery,function(err,deleted){
+                //     if(err)  
+                //     {
+                var inputs={'name':'delete_screen','id':testscreendetails.testscreenid,'node_name':screendatatoupdate.screenname,'version_number':screendatatoupdate.versionnumber,'parent_node_id':screendatatoupdate.projectid}
+	            var args = {data:inputs,headers:{"Content-Type" : "application/json"}} 
+                client.post("http://127.0.0.1:1990/create_ice/delete_node_ICE",args,
+						function (result, response) {
+                    if(response.statusCode != 200 || result.rows == "fail"){
+                     console.log(result.rows);
+                
+                        //console.log(err);
                     }else{
                        // if(deleted.rows != undefined && deleted.rows.length!=0){
                             flagtocheckifdeleted=true;
@@ -1039,16 +1215,28 @@ var screendatatoupdate = [];
                     if(screendatatoupdate.screendata==null){
                         screendatatoupdate.screendata='';
                     }
-                     insertquery = "INSERT INTO screens (projectid,screenname,screenid,versionnumber,createdby,createdon,createdthrough,deleted,history,modifiedby,modifiedbyrole,modifiedon,screendata,skucodescreen,tags) VALUES ("+screendatatoupdate.projectid
-                +",'"+testscreendetails.testscreenname+"',"+screendatatoupdate.screenid+","+screendatatoupdate.versionnumber+",'"+screendatatoupdate.createdby+"',"+screendatatoupdate.createdon.valueOf()
-                +","+screendatatoupdate.createdthrough+","+screendatatoupdate.deleted+",null,'"+screendatatoupdate.modifiedby+"',"+screendatatoupdate.modifiedbyrole
-                +","+new Date().getTime()+",'"+screendatatoupdate.screendata+"','"+screendatatoupdate.skucodescreen+"',"+screendatatoupdate.tags+");"
+                //      insertquery = "INSERT INTO screens (projectid,screenname,screenid,versionnumber,createdby,createdon,createdthrough,deleted,history,modifiedby,modifiedbyrole,modifiedon,screendata,skucodescreen,tags) VALUES ("+screendatatoupdate.projectid
+                // +",'"+testscreendetails.testscreenname+"',"+screendatatoupdate.screenid+","+screendatatoupdate.versionnumber+",'"+screendatatoupdate.createdby+"',"+screendatatoupdate.createdon.valueOf()
+                // +","+screendatatoupdate.createdthrough+","+screendatatoupdate.deleted+",null,'"+screendatatoupdate.modifiedby+"',"+screendatatoupdate.modifiedbyrole
+                // +","+new Date().getTime()+",'"+screendatatoupdate.screendata+"','"+screendatatoupdate.skucodescreen+"',"+screendatatoupdate.tags+");"
                 }catch(ex){
                     console.log(ex);
                 }
                 
-
-                dbConnICE.execute(insertquery,function(err,deleted){
+                 var inputs={'projectid': screendatatoupdate.projectid,'screenname':testscreendetails.testscreenname,'screenid':screendatatoupdate.screenid,
+                 'modifiedby':'Ninteen68_admin','modifiedbyrole':'Ninteen68_admin','createdon':new Date(screendatatoupdate.createdon).getTime().toString(),
+                'createdby':screendatatoupdate.createdby,'createdthrough':screendatatoupdate.createdthrough,'deleted':screendatatoupdate.deleted.toString(),'skucodescreen':'skucodescreen','tags':'tags',
+                'screendata':screendatatoupdate.screendata,'versionnumber':screendatatoupdate.versionnumber.toString()}
+	            var args = {data:inputs,headers:{"Content-Type" : "application/json"}} 
+                client.post("http://127.0.0.1:1990/create_ice/updateScreenname_ICE",args,
+						function (result, response) {
+                //if(err){
+                if(response.statusCode != 200 || result.rows == "fail"){	
+                    console.log(result.rows);
+                }else{
+                    console.log('Succesfully renamed Screen name');
+                }
+               // dbConnICE.execute(insertquery,function(err,deleted){
                     // if(err){
                     //     console.log(err);
                     // }else{
@@ -1072,16 +1260,22 @@ function testcase_exists(testcasedetails,cb,data){
         
         async.series({
             testcasename:function(testcasecallback){
-                var testcaseCheck =  "select testcaseid from testcases where screenid="+testcasedetails.screenId+" and testcasename='"+testcasedetails.testcasename+"' ALLOW FILTERING";
-                dbConnICE.execute(testcaseCheck,function(err,testcaseid){
-                    if(err){
-                        console.log(err);
+                // var testcaseCheck =  "select testcaseid from testcases where screenid="+testcasedetails.screenId+" and testcasename='"+testcasedetails.testcasename+"' ALLOW FILTERING";
+                // dbConnICE.execute(testcaseCheck,function(err,testcaseid){
+                //     if(err){
+                    var inputs={'screen_id': testcasedetails.screenId,'testcase_name':testcasedetails.testcasename,'name':'testcase_check'}
+	                var args = {data:inputs,headers:{"Content-Type" : "application/json"}} 
+                    client.post("http://127.0.0.1:1990/create_ice/testcaseid_exists_ICE",args,
+						function (result, response) {
+                    //if(err){
+                     if(response.statusCode != 200 || result.rows == "fail"){
+                        console.log(result.rows);
                         cb(null,obj);
                     }else{
-                        if(testcaseid.rows.length!=0){ 
+                        if(result.rows.length!=0){ 
                             obj.flag = true; 
                             flagId=true;
-                            obj.testcaseid = testcaseid.rows[0].testcaseid;
+                            obj.testcaseid = result.rows[0].testcaseid;
                             statusflag = true;
                         }
                         testcasecallback();
@@ -1093,15 +1287,21 @@ function testcase_exists(testcasedetails,cb,data){
 
             testcasedetails:function(testcasecallback){
                 if(!flagId){
-                    var testcaseCheck =  "select testcaseid from testcases where screenid="+testcasedetails.screenId+" and testcasename='"+testcasedetails.testcasename+"' and testcaseid="+testcasedetails.testcaseid+" ALLOW FILTERING";
-                    dbConnICE.execute(testcaseCheck,function(err,testcaseid){
-                        if(err){
-                            console.log(err);
+                    // var testcaseCheck =  "select testcaseid from testcases where screenid="+testcasedetails.screenId+" and testcasename='"+testcasedetails.testcasename+"' and testcaseid="+testcasedetails.testcaseid+" ALLOW FILTERING";
+                    // dbConnICE.execute(testcaseCheck,function(err,testcaseid){
+                    //     if(err){
+                    var inputs={'screen_id': testcasedetails.screenId,'testcase_name':testcasedetails.testcasename,'testcase_id':testcasedetails.testcaseid,'name':'testcase_check_id'}
+	                var args = {data:inputs,headers:{"Content-Type" : "application/json"}} 
+                    client.post("http://127.0.0.1:1990/create_ice/testcaseid_exists_ICE",args,
+						function (result, response) {
+                    //if(err){
+                     if(response.statusCode != 200 || result.rows == "fail"){
+                            console.log(result.rows);
                             cb(null,obj);
                         }else{
-                            if(testcaseid.rows.length!=0){ 
+                            if(result.rows.length!=0){ 
                                 obj.flag = true; 
-                                obj.testcaseid = testcaseid.rows[0].testcaseid;
+                                obj.testcaseid = result.rows[0].testcaseid;
                                 statusflag = true;
                             }
                             testcasecallback();
@@ -1150,14 +1350,20 @@ var testcasedatatoupdate = [];
     var flagtocheckifdeleted=false;
     async.series({
         select:function(callback){
-            var completetestcase = "select * from testcases where testcaseid="+testcasedetails.testcaseid;
-            dbConnICE.execute(completetestcase,function(err,testcasedata){
-                if(err){
-                    console.log(err);
+            // var completetestcase = "select * from testcases where testcaseid="+testcasedetails.testcaseid;
+            // dbConnICE.execute(completetestcase,function(err,testcasedata){
+            //     if(err){
+            var inputs={'name':'testcase_details','id':testcasedetails.testcaseid}
+	        var args = {data:inputs,headers:{"Content-Type" : "application/json"}} 
+            client.post("http://127.0.0.1:1990/create_ice/get_node_details_ICE",args,
+						function (result, response) {
+                //if(err){
+                if(response.statusCode != 200 || result.rows == "fail"){
+                    console.log(result.rows);
                 }else{
-                    if(testcasedata.rows.length!=0){
+                    if(result.rows.length!=0){
                         flagtocheckifexists = true;
-                        testcasedatatoupdate = testcasedata.rows[0];
+                        testcasedatatoupdate = result.rows[0];
                     }
                     
                 }
@@ -1168,12 +1374,17 @@ var testcasedatatoupdate = [];
         delete:function(callback){
             if(flagtocheckifexists){
                 
-                var deletequery = "DELETE FROM testcases WHERE testcaseid="+testcasedetails.testcaseid+" and testcasename='"+testcasedatatoupdate.testcasename+"' and versionnumber="+testcasedatatoupdate.versionnumber+" and screenid="+testcasedatatoupdate.screenid;
-                dbConnICE.execute(deletequery,function(err,deleted){
-                    if(err)  
-                     {
-                         console.log(err);
-                     }else{
+                // var deletequery = "DELETE FROM testcases WHERE testcaseid="+testcasedetails.testcaseid+" and testcasename='"+testcasedatatoupdate.testcasename+"' and versionnumber="+testcasedatatoupdate.versionnumber+" and screenid="+testcasedatatoupdate.screenid;
+                // dbConnICE.execute(deletequery,function(err,deleted){
+                //     if(err)
+                var inputs={'name':'delete_testcase','id':testcasedetails.testcaseid,'node_name':testcasedatatoupdate.testcasename,'version_number':testcasedatatoupdate.versionnumber,'parent_node_id':testcasedatatoupdate.screenid}
+	            var args = {data:inputs,headers:{"Content-Type" : "application/json"}} 
+                client.post("http://127.0.0.1:1990/create_ice/delete_node_ICE",args,
+						function (result, response) {
+                //if(err){
+                if(response.statusCode != 200 || result.rows == "fail"){
+                         console.log(result.rows);
+                }else{
                         // if(deleted.rows != undefined && deleted.rows.length!=0){
                         flagtocheckifdeleted = true;
                         
@@ -1196,18 +1407,30 @@ var testcasedatatoupdate = [];
                 var insertquery = "";
                 try{
                    if( testcasedatatoupdate.testcasesteps == null){
-                       testcasedatatoupdate.testcasesteps="";
+                       testcasedatatoupdate.testcasesteps='';
                    }
                      insertquery = "INSERT INTO testcases (screenid,testcasename,testcaseid,versionnumber,createdby,createdon,createdthrough,deleted,history,modifiedby,modifiedbyrole,modifiedon,skucodetestcase,tags,testcasesteps) VALUES ("+
-                testcasedatatoupdate.screenid+",'"+testcasedetails.testcasename+"',"+testcasedetails.testcaseid+","+testcasedatatoupdate.versionnumber+",'"+testcasedatatoupdate.createdby
-                +"',"+testcasedatatoupdate.createdon.valueOf()+","+testcasedatatoupdate.createdthrough+","+testcasedatatoupdate.deleted+",null,'"+testcasedatatoupdate.modifiedby+"',"+testcasedatatoupdate.modifiedbyrole+","+new Date().getTime()
+                testcasedatatoupdate.screenid+",'"+testcasedetails.testcasename+"',"+testcasedetails.testcaseid+","+testcasedatatoupdate.versionnumber.toString()+",'"+testcasedatatoupdate.createdby
+                +"',"+testcasedatatoupdate.createdon.valueOf()+","+testcasedatatoupdate.createdthrough+","+testcasedatatoupdate.deleted.toString()+",null,'"+testcasedatatoupdate.modifiedby+"',"+testcasedatatoupdate.modifiedbyrole+","+new Date().getTime()
                 +",'"+testcasedatatoupdate.skucodetestcase+"',"+testcasedatatoupdate.tags+",'"+testcasedatatoupdate.testcasesteps+"');";
                 }catch(ex){
                     console.log(ex);
                 }
                 
-
-                dbConnICE.execute(insertquery,function(err,deleted){
+                var inputs={'screenid': testcasedatatoupdate.screenid,'testcasename':testcasedetails.testcasename,'testcaseid':testcasedetails.testcaseid,
+                 'modifiedby':'Ninteen68_admin','modifiedbyrole':'Ninteen68_admin','createdon':new Date(testcasedatatoupdate.createdon).getTime().toString(),
+                'createdby':testcasedatatoupdate.createdby,'createdthrough':testcasedatatoupdate.createdthrough,'deleted':testcasedatatoupdate.deleted.toString(),'skucodetestcase':'skucodetestcase','tags':'tags',
+                'testcasesteps':testcasedatatoupdate.testcasesteps,"versionnumber":testcasedatatoupdate.versionnumber.toString()}
+	            var args = {data:inputs,headers:{"Content-Type" : "application/json"}} 
+                client.post("http://127.0.0.1:1990/create_ice/updateTestcasename_ICE  ",args,
+						function (result, response) {
+                //if(err){
+                if(response.statusCode != 200 || result.rows == "fail"){	
+                    console.log(result.rows);
+                }else{
+                    console.log('Succesfully renamed Testcase name');
+                }
+                //dbConnICE.execute(insertquery,function(err,deleted){
                     // if(err){
                     //     console.log(err);
                     // }else{
@@ -1405,7 +1628,7 @@ exports.getProjectType_Nineteen68 = function(req, res){
 };
 
 exports.createE2E_Structure_Nineteen68 = function(req, res) {
-
+    var createdthrough='Mindmaps Creation'
     var RequestedJSON =req;
     var projectid = RequestedJSON.projectId;
     var cycleId = RequestedJSON.cycleId;
@@ -1448,8 +1671,10 @@ exports.createE2E_Structure_Nineteen68 = function(req, res) {
 						}
 
                             var insertInSuite ='';
+                var query_name
                 if(!suiteflag){
-                insertInSuite = "INSERT INTO modules (projectid,modulename,moduleid,versionnumber,createdby,createdon,createdthrough,deleted,history,modifiedby,modifiedbyrole,modifiedon,skucodemodule,tags,testscenarioids) VALUES (" + projectid + ",'" + testsuiteName + "'," + suiteID + ",1,'"+username+"'," + new Date().getTime() + ",null,null,null,null,null," + new Date().getTime() + ",null,null,null);";
+                    query_name='notflagsuite';
+                // insertInSuite = "INSERT INTO modules (projectid,modulename,moduleid,versionnumber,createdby,createdon,createdthrough,deleted,history,modifiedby,modifiedbyrole,modifiedon,skucodemodule,tags,testscenarioids) VALUES (" + projectid + ",'" + testsuiteName + "'," + suiteID + ",1,'"+username+"'," + new Date().getTime() + ",null,null,null,null,null," + new Date().getTime() + ",null,null,null);";
 
                        //Modules History
                 inserInSuiteHistory =  "'projectid="+projectid+",modulename="+testsuiteName+",moduleid=" + suiteID +",versionnumber=1,createdby=" + username + ",createdon=" + new Date().getTime().toString() + ",createdthrough=null,deleted=null,modifiedby=null,modifiedbyrole=null,modifiedon=" + new Date().getTime() + ",skucodemodule=null,tags=null,testscenarioids=null '";
@@ -1458,15 +1683,21 @@ exports.createE2E_Structure_Nineteen68 = function(req, res) {
                 
 
                 }else{
-                insertInSuite = "SELECT moduleid FROM modules where modulename='"+testsuiteName+"' ALLOW FILTERING";
+                 query_name='selectsuite';
+                //insertInSuite = "SELECT moduleid FROM modules where modulename='"+testsuiteName+"' ALLOW FILTERING";
                 suiteID = suiteidTemp; 
                }
                var testsuiteobj = {"testsuiteId":testsuiteidneo,"testsuiteId_c":suiteID,"testsuiteName":testsuiteName,"task":tasksuite,"testscenarioDetails":scenariodetailslist};
                suitedetailslist.push(testsuiteobj);
                console.log(insertInSuite);
-                dbConnICE.execute(insertInSuite, function(err, testsuiteresult) {
-                    if (err) {
-                        console.log(err);
+               var inputs={"query":query_name,'projectid':projectid,'modulename':testsuiteName,'moduleid':suiteID,'versionnumber':'1','createdby':username,'createdthrough':createdthrough,'deleted':false,'skucodemodule':'skucodemodule','tags':'tags'};
+			   var args = {data:inputs,headers:{"Content-Type" : "application/json"}};
+				client.post("http://127.0.0.1:1990/create_ice/insertInSuite_ICE",args,
+								function (result, response) {
+                //dbConnICE.execute(insertInSuite, function(err, testsuiteresult) {
+                    //if (err) {
+                    if(response.statusCode != 200 || result.rows == "fail"){	
+                        console.log(result.rows);
                     } else {
                            //Start of Insert Module History
                           fnCreateModuleHistory(inserInSuiteQuery, function(err, response) {
