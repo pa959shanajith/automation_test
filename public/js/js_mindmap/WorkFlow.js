@@ -808,6 +808,12 @@ if(flag==20){
 					});
 			});
 		});
+		//To update cassandra_ids (id_c) of nodes in dNodes_W variable
+		dNodes_W.forEach(function(d){
+			if (d.type=='modules') d.id_c=res[resMap[0]];
+			else d.id_c=res[d.id_n];
+
+		});
 		
 		openDialogMindmap("Success", "Structure created successfully");
 		saveFlag=false;
