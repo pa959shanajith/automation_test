@@ -2194,18 +2194,18 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				return false
 			}
 			else{
-				if(Object.keys(viewString.view).length > 0)
-				{
-							for(var i=0;i<viewString.view.length;i++)
-							{
-								if($(this).find("input").val() == viewString.view[i].custname)
-								{
-										$("#dialog-addObject").modal("hide");
-										openDialog("Add Object", "Object characterstics are same for "+$(this).find("input").val()+"");
-										return false;
-								}
-							}
-				}
+				// if(Object.keys(viewString.view).length > 0)
+				// {
+				// 			for(var i=0;i<viewString.view.length;i++)
+				// 			{
+				// 				if($(this).find("input").val() == viewString.view[i].custname)
+				// 				{
+				// 						$("#dialog-addObject").modal("hide");
+				// 						openDialog("Add Object", "Object characterstics are same for "+$(this).find("input").val()+"");
+				// 						return false;
+				// 				}
+				// 			}
+				// }
 				//If no field is empty, proceed to service call
 				flag = "true";
 				$scope.errorMessage = "";
