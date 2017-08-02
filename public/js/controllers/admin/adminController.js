@@ -2244,37 +2244,26 @@ $(document).on("keydown", ".validationKeydown", function(e) {
 		var val = $(this).val();
 		preventSpecialCharOnBlur(id,val);
 	});
+//Special characters prevented for username except (-_.) on copy paste
 $(document).on('cut copy paste','#userName', function(e){ 
 			var element = this;
 			setTimeout(function () {
 				var userEnteredText = $(element).val();  
-				userEnteredText = userEnteredText.replace(/\s/g,"");
+				//userEnteredText = userEnteredText.replace(/\s/g,"");
+					userEnteredText = userEnteredText.replace (/[[\]\~`!@#$%^&*()+={}|;:"',<>?/\s]/g ,"");
 				$(element).val(userEnteredText);
-			}, 5); //html5 min is 4ms.	
-		//$(this).val($(this).val().replace(/\S/g, ''));
-		
+			}, 5); 	
+ });
+//All Special characters prevented for firstname & lastname on copy paste
+$(document).on('cut copy paste','.preventSpecialChar', function(e){ 
+			var element = this;
+			setTimeout(function () {
+				var userEnteredText = $(element).val();  
+				userEnteredText = userEnteredText.replace (/[[\]\~`!@#$%^&*()-_+={}|;:"',.<>?/\s]/g ,"");
+				$(element).val(userEnteredText);
+			}, 5); 
  });
 
-$(document).on('cut copy paste','#firstName', function(e){ 
-			var element = this;
-			setTimeout(function () {
-				var userEnteredText = $(element).val();  
-				userEnteredText = userEnteredText.replace(/\_/g,"");
-				$(element).val(userEnteredText);
-			}, 5); //html5 min is 4ms.	
-		//$(this).val($(this).val().replace(/\S/g, ''));
-		
- });
- $(document).on('cut copy paste','#lastName', function(e){ 
-			var element = this;
-			setTimeout(function () {
-				var userEnteredText = $(element).val();  
-				userEnteredText = userEnteredText.replace(/\_/g,"");
-				$(element).val(userEnteredText);
-			}, 5); //html5 min is 4ms.	
-		//$(this).val($(this).val().replace(/\S/g, ''));
-		
- });
 	function preventSpecialCharOnBlur(id, val)
 	{
 		var reg = /^[a-zA-Z0-9\_]+$/
