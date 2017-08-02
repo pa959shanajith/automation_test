@@ -9,6 +9,7 @@ var async = require('async');
 var parse = require('xml-parser');
 var Client = require("node-rest-client").Client;
 var client = new Client();
+var epurl="http://127.0.0.1:1990/";
 var dbConnICEHistory = require('../../server/config/ICEHistory');
 /**
  * @author vinay.niranjan
@@ -24,6 +25,7 @@ var allXpaths=[];
 var allCustnames=[];
 var objectLevel=1;
 var xpath="";
+var inputsWS={}
 
 exports.initScraping_ICE = function (req, res) {
 	try{
@@ -234,7 +236,7 @@ exports.getScrapeDataScreenLevel_ICE = function(req, res){
 		var flag;
 		// dbConn.execute(scrapeQuery, function(getScrapeDataQueryerr, getScrapeDataQueryresult){
 		var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
-		client.post("http://127.0.0.1:1990/design/getScrapeDataScreenLevel_ICE",args,
+		client.post(epurl+"design/getScrapeDataScreenLevel_ICE",args,
 			function (getScrapeDataQueryresult, response) {
 				
 			try{
@@ -406,26 +408,31 @@ exports.updateScreen_ICE = function(req, res){
 										}else{
 											//JSON with view string empty
 											updateScreenQuery=buildObject(scrapedObjects,modifiedBy,requestedskucodeScreens,requestedScreenhistory,screenID,projectID,screenName,requestedversionnumber);
+											inputs=inputsWS
 											finalFunction(scrapedObjects);
 										}
 									}else{
 										//JSON with view string empty
 										updateScreenQuery=buildObject(scrapedObjects,modifiedBy,requestedskucodeScreens,requestedScreenhistory,screenID,projectID,screenName,requestedversionnumber);
+										inputs=inputsWS
 										finalFunction(scrapedObjects);
 									}
 								}else{
 									//JSON with view string empty
 									updateScreenQuery=buildObject(scrapedObjects,modifiedBy,requestedskucodeScreens,requestedScreenhistory,screenID,projectID,screenName,requestedversionnumber);
+									inputs=inputsWS
 									finalFunction(scrapedObjects);
 								}
 							}else{
 								//JSON with view string empty
 								updateScreenQuery=buildObject(scrapedObjects,modifiedBy,requestedskucodeScreens,requestedScreenhistory,screenID,projectID,screenName,requestedversionnumber);
+								inputs=inputsWS
 								finalFunction(scrapedObjects);
 							}
 						}else{
 							//JSON with view string empty
 							updateScreenQuery=buildObject(scrapedObjects,modifiedBy,requestedskucodeScreens,requestedScreenhistory,screenID,projectID,screenName,requestedversionnumber);
+							inputs=inputsWS
 							finalFunction(scrapedObjects);
 						}
 					}catch(exception){
@@ -1109,7 +1116,7 @@ exports.updateScreen_ICE = function(req, res){
 					//console.log(updateScreenQuery);
 					// dbConn.execute(updateScreenQuery, function(err, result){
 					var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
-					client.post("http://127.0.0.1:1990/design/updateScreen_ICE",args,
+					client.post(epurl+"design/updateScreen_ICE",args,
 						function (result, response) {
 						try{
 							// if (err) {
@@ -1146,7 +1153,7 @@ exports.updateScreen_ICE = function(req, res){
 												xpathofCustnames = updateData.deletedList.deletedXpath;
 											}
 												var args = {data:inputstestcase,headers:{"Content-Type" : "application/json"}}
-												client.post("http://127.0.0.1:1990/design/readTestCase_ICE",args,
+												client.post(epurl+"design/readTestCase_ICE",args,
 														function (testcaseDataQueryresult, response) {
 												// dbConn.execute(testcaseDataQuery, function(testcaseDataQueryerr, testcaseDataQueryresult){
 													// if(testcaseDataQueryerr){
@@ -1442,7 +1449,7 @@ function buildObject(scrapedObjects,modifiedBy,requestedskucodeScreens,
 			" and screenname ='" + screenName +
 			"' and versionnumber = "+requestedversionnumber+
 		" IF EXISTS; ";
-		inputs={"scrapedata":scrapedObjects,"modifiedby":modifiedBy,"skucodescreen":requestedskucodeScreens,
+		inputsWS={"scrapedata":scrapedObjects,"modifiedby":modifiedBy,"skucodescreen":requestedskucodeScreens,
 		"screenid":screenID,"projectid":projectID,"screenname":screenName,"versionnumber":requestedversionnumber};
 		return updateScreenQuery;
 	}catch(exception){
@@ -1512,7 +1519,7 @@ function uploadTestCaseData(inputs,uploadTestCaseDatacallback){
 		// dbConn.execute(updateTestCasesQuery, 
 			// function(updateTestCaseQueryerr, updateTestCaseQueryresult){
 		var args = {data:inputs,headers:{"Content-Type" : "application/json"}};
-		client.post("http://127.0.0.1:1990/design/updateTestCase_ICE",args,
+		client.post(epurl+"design/updateTestCase_ICE",args,
 					function (result, response) {
 				// if(updateTestCaseQueryerr){
 				if(response.statusCode != 200 || result.rows == "fail"){
@@ -1582,7 +1589,7 @@ exports.readTestCase_ICE = function (req, res) {
 		// dbConn.execute(getTestCases, function (err, result) {
 
 		//Query 1 fetching the testcasesteps from the test cases based on requested screenid,testcasename,testcaseid
-		client.post("http://127.0.0.1:1990/design/readTestCase_ICE",args,
+		client.post(epurl+"design/readTestCase_ICE",args,
 						function (result, response) {
 			try{
 				if(response.statusCode != 200 || result.rows == "fail"){
@@ -1715,7 +1722,7 @@ exports.updateTestCase_ICE = function (req, res) {
 		var checktestcaseexist = "select testcaseid from testcases where screenid=" + requestedscreenid;
 		var inputs = {"screenid":requestedscreenid, "query":"checktestcaseexist"};
 		var args = {data:inputs,headers:{"Content-Type" : "application/json"}};
-		client.post("http://127.0.0.1:1990/design/updateTestCase_ICE",args,
+		client.post(epurl+"design/updateTestCase_ICE",args,
 					function (result, response) {
 		console.log('-------------',response);
 		//dbConn.execute(checktestcaseexist, function (err, result) {
@@ -1864,7 +1871,7 @@ exports.debugTestCase_ICE = function (req, res) {
 					        // dbConn.execute(getProjectTestcasedata, function(errgetTestcasedata, testcasedataresult) {
 								var inputs = {"query": "testcaseid", "testcaseid":testcaseIDs};
 								var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
-								client.post("http://127.0.0.1:1990/design/readTestCase_ICE",args,
+								client.post(epurl+"design/readTestCase_ICE",args,
 										function (testcasedataresult, response) {
 					            try {
 					                // if (errgetTestcasedata) {
@@ -2159,7 +2166,7 @@ exports.getKeywordDetails_ICE = function getKeywordDetails_ICE(req, res) {
 				data: requestedprojecttypename,
 				headers:{'Content-Type': 'application/json'}
 			};
-			client.post("http://127.0.0.1:1990/design/getKeywordDetails_ICE",args,
+			client.post(epurl+"design/getKeywordDetails_ICE",args,
 						function (projectBasedKeywordsresult, response) {
 				try{
 					// if (errProjectBasedKeywords) {
@@ -2215,7 +2222,7 @@ exports.getTestcasesByScenarioId_ICE = function getTestcasesByScenarioId_ICE(req
 		// 	function(errGetTestCaseIds,testcasesResult) {
 		var inputs = {"testscenarioid":testScenarioId, "query":"gettestcaseids"};
 		var args = {data:inputs,headers:{"Content-Type" : "application/json"}};
-		client.post("http://127.0.0.1:1990/design/getTestcasesByScenarioId_ICE",args,
+		client.post(epurl+"design/getTestcasesByScenarioId_ICE",args,
 						function (testcasesResult, response) {
 				try{
 					
@@ -2240,7 +2247,7 @@ exports.getTestcasesByScenarioId_ICE = function getTestcasesByScenarioId_ICE(req
 			                //       function(errGetTestCaseDetails,testcaseNamesResult) {
 							var inputs = {"eachtestcaseid":eachtestcaseid, "query":"gettestcasedetails"};
 							var args = {data:inputs,headers:{"Content-Type" : "application/json"}};
-							client.post("http://127.0.0.1:1990/design/getTestcasesByScenarioId_ICE",args,
+							client.post(epurl+"design/getTestcasesByScenarioId_ICE",args,
 							function (testcaseNamesResult, response) {
 									try{
 											// if(errGetTestCaseDetails)

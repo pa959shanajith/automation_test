@@ -2054,6 +2054,8 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 
 	//Get Selected User Data
 	$scope.getUserData = function(){
+		$("#firstName,#lastName,#password,#confirmPassword").removeClass("inputErrorBorder");
+		$("#password,#confirmPassword").val("");
 		var userId = $("#userSelect option:selected").data("id");
 		var userName = $("#userSelect option:selected").val();
 		adminServices.getUsersInfo(userId, userName)
@@ -2242,15 +2244,24 @@ $(document).on("keydown", ".validationKeydown", function(e) {
 		var val = $(this).val();
 		preventSpecialCharOnBlur(id,val);
 	});
+//Special characters prevented for username except (-_.) on copy paste
 $(document).on('cut copy paste','#userName', function(e){ 
 			var element = this;
 			setTimeout(function () {
 				var userEnteredText = $(element).val();  
-				userEnteredText = userEnteredText.replace(/\s/g,"");
+				//userEnteredText = userEnteredText.replace(/\s/g,"");
+					userEnteredText = userEnteredText.replace (/[[\]\~`!@#$%^&*()+={}|;:"',<>?/\s]/g ,"");
 				$(element).val(userEnteredText);
-			}, 5); //html5 min is 4ms.	
-		//$(this).val($(this).val().replace(/\S/g, ''));
-		
+			}, 5); 	
+ });
+//All Special characters prevented for firstname & lastname on copy paste
+$(document).on('cut copy paste','.preventSpecialChar', function(e){ 
+			var element = this;
+			setTimeout(function () {
+				var userEnteredText = $(element).val();  
+				userEnteredText = userEnteredText.replace (/[[\]\~`!@#$%^&*()-_+={}|;:"',.<>?/\s]/g ,"");
+				$(element).val(userEnteredText);
+			}, 5); 
  });
 
 	function preventSpecialCharOnBlur(id, val)

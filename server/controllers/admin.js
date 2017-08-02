@@ -16,6 +16,7 @@ var dbConnICEHistory = require('../../server/config/ICEHistory');
 
 var Client = require("node-rest-client").Client;
 var client = new Client();
+var epurl="http://127.0.0.1:1990/";
 //var set = require('set');
 var dbConnICE = require('../../server/config/icetestautomation');
 
@@ -37,7 +38,7 @@ exports.getUserRoles_Nineteen68 = function(req, res){
 		// var getUserRoles = "select roleid, rolename from roles";
 		
 		// dbConn.execute(getUserRoles, function (err, result) {
-		client.post("http://127.0.0.1:1990/admin/getUserRoles_Nineteen68",
+		client.post(epurl+"admin/getUserRoles_Nineteen68",
 						function (result, response) {
 			// if (err) {
 			if (response.statusCode != 200 || result.rows == "fail") {
@@ -76,7 +77,7 @@ exports.getUsers_Nineteen68 = function(req, res){
     var prjId=req.prjId;
 	var userRoles = {userRoles:[],r_ids:[]};
 	var args = {headers:{"Content-Type" : "application/json"}}
-	client.post("http://127.0.0.1:1990/admin/getUserRoles_Nineteen68",args,
+	client.post(epurl+"admin/getUserRoles_Nineteen68",args,
 				function (userrolesresult, userrolesresponse) {
 					if(userrolesresponse.statusCode != 200 || userrolesresult.rows == "fail"){	
 							console.log("fail");
@@ -84,7 +85,7 @@ exports.getUsers_Nineteen68 = function(req, res){
 					}else{
 						inputs = { "userroles":userrolesresult.rows,"projectid":prjId };
 						args = {data:inputs,headers:{"Content-Type" : "application/json"}}
-						client.post("http://127.0.0.1:1990/admin/getUsers_Nineteen68",args,
+						client.post(epurl+"admin/getUsers_Nineteen68",args,
 								function (getUsers, response) {
 						if(response.statusCode != 200 || getUsers.rows == "fail"){	
 									console.log("fail");
@@ -349,7 +350,7 @@ exports.createUser_Nineteen68 = function(req, res) {
 						, "firstname":req_firstname, "lastname":req_lastname, "ldapuser":req_ldapuser, "password":req_hashedPassword, 
 						"username":req_username}
 						var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
-						client.post("http://127.0.0.1:1990/admin/createUser_Nineteen68",args,
+						client.post(epurl+"admin/createUser_Nineteen68",args,
 								function (result, response) {
                             try {
                                 flag = "Success";
@@ -444,7 +445,7 @@ exports.updateUser_nineteen68 = function updateUser_nineteen68(req, res) {
             // dbConn.execute(getUserDetails, function(err, result) {
 			var inputs = {"query":"userdetails","userid":local_user_Id}
 			var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
-			client.post("http://127.0.0.1:1990/admin/updateUser_Nineteen68",args,
+			client.post(epurl+"admin/updateUser_Nineteen68",args,
 					function (result, response) {
                 try {
                     // if (typeof result === 'undefined') {
@@ -518,7 +519,7 @@ exports.updateUser_nineteen68 = function updateUser_nineteen68(req, res) {
 						var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
 							
                         // dbConn.execute(updateUser, function(err, result) {
-						client.post("http://127.0.0.1:1990/admin/updateUser_Nineteen68",args,
+						client.post(epurl+"admin/updateUser_Nineteen68",args,
 								function (result, response) {
                             try {
                                 // if (typeof result === 'undefined') {
@@ -588,7 +589,7 @@ exports.getDomains_ICE = function getDomains_ICE(req, res) {
 		// var domainsQuery = "select domainid,domainname from domains";
 		// dbConnICE.execute(domainsQuery, function(error, response) {
 			var args = {headers:{"Content-Type" : "application/json"}}
-			client.post("http://127.0.0.1:1990/admin/getDomains_ICE",args,
+			client.post(epurl+"admin/getDomains_ICE",args,
 						function (result, response) {
 			try{
 				// if (error) {
@@ -754,7 +755,7 @@ exports.createProject_ICE = function createProject_ICE(req, res) {
                         // dbConnICE.execute(queryGetProjectTypeId, function(err, projectTypeData) {
 							var inputs={"query":"projecttype", "projecttype":createProjectObj.appType};
 							var args = {data:inputs,headers:{"Content-Type" : "application/json"}};
-							client.post("http://127.0.0.1:1990/admin/createProject_ICE",args,
+							client.post(epurl+"admin/createProject_ICE",args,
 									function (projectTypeData, response) {
                             try {
                                 // if (err) {
@@ -795,7 +796,7 @@ exports.createProject_ICE = function createProject_ICE(req, res) {
                         // dbConnICE.execute(createProjectQuery, function(err, insertProjectData) {
                         //     if (err) {
 						newProjectID = "";
-						client.post("http://127.0.0.1:1990/admin/createProject_ICE",args,
+						client.post(epurl+"admin/createProject_ICE",args,
 									function (insertProjectData, response) {
 							if(response.statusCode != 200 || insertProjectData.rows == "fail"){
                                 console.log(response.statusCode);
@@ -852,7 +853,7 @@ exports.createProject_ICE = function createProject_ICE(req, res) {
 
                                 createReleaseHistoryQuery = "INSERT INTO releases (projectid,releaseid,history) VALUES (" + newProjectID + "," + newReleaseID + ",{" + date + ":" + createReleaseHistory + "})";
 								
-								client.post("http://127.0.0.1:1990/admin/createProject_ICE",args,
+								client.post(epurl+"admin/createProject_ICE",args,
 									function (data, response) {
 								if(response.statusCode != 200 || data.rows == "fail"){
                                 //History Insert for release name
@@ -1048,7 +1049,7 @@ function createRelease(createReleaseQuery,createReleaseCallback){
 function createCycle(args,createCycleCallback){
 	var statusFlag="";
 	// dbConnICE.execute(createCycleQuery,function(createCycleerror, createCycleresponse){
-	client.post("http://127.0.0.1:1990/admin/createProject_ICE",args,
+	client.post(epurl+"admin/createProject_ICE",args,
 			function (result, response) {
 		try{
 			// if(createCycleerror){
@@ -1112,7 +1113,7 @@ exports.updateProject_ICE = function updateProject_ICE(req, res){
 									"releasename": releaseName, "createdby":userinfo.username,
 									"skucoderelease" : "skucoderelease", "tags":"tags"};
 									var args = {data:inputs,headers:{"Content-Type" : "application/json"}};
-									client.post("http://127.0.0.1:1990/admin/createProject_ICE",args,
+									client.post(epurl+"admin/createProject_ICE",args,
 									function (data, response) {
 								
 									try{    
@@ -1221,7 +1222,7 @@ exports.updateProject_ICE = function updateProject_ICE(req, res){
 									var inputs = {"query": "deleterelease","releasename":eachprojectDetail.releaseName,
 									"projectid":requestedprojectid,"releaseid":eachprojectDetail.releaseId};
 									var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
-									client.post("http://127.0.0.1:1990/admin/updateProject_ICE",args,
+									client.post(epurl+"admin/updateProject_ICE",args,
 												function (result, response) {
 									try{
 										// if(deleteReleaseQueryerror){
@@ -1238,7 +1239,7 @@ exports.updateProject_ICE = function updateProject_ICE(req, res){
 													var inputs = {"query": "deletecycle","cyclename":eachCycleDetail.cycleName,
 														"releaseid":eachprojectDetail.releaseId,"cycleid":eachCycleDetail.cycleId};
 													var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
-													client.post("http://127.0.0.1:1990/admin/updateProject_ICE",args,
+													client.post(epurl+"admin/updateProject_ICE",args,
 																function (result, response) {
 														// if(deleteCyclesQueryerror){
 														if(response.statusCode != 200 || result.rows == "fail"){	
@@ -1273,7 +1274,7 @@ exports.updateProject_ICE = function updateProject_ICE(req, res){
 													var inputs = {"query": "deletecycle","cyclename":eachCycleDetail.cycleName,
 														"releaseid":eachprojectDetail.releaseId,"cycleid":eachCycleDetail.cycleId};
 													var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
-													client.post("http://127.0.0.1:1990/admin/updateProject_ICE",args,
+													client.post(epurl+"admin/updateProject_ICE",args,
 																function (result, response) {
 														// if(deleteCyclesQueryerror){
 														if(response.statusCode != 200 || result.rows == "fail"){
@@ -1616,7 +1617,7 @@ exports.getNames_ICE = function(req, res){
 			// 		if(queryStringerr){
 			var inputs = {"id" :id, "query" : query}
 			var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
-			client.post("http://127.0.0.1:1990/admin/getNames_ICE",args,
+			client.post(epurl+"admin/getNames_ICE",args,
 						function (queryStringresult, response) {
 				try{
 					if(response.statusCode != 200 || queryStringresult.rows == "fail"){
@@ -1884,7 +1885,7 @@ exports.getDetails_ICE = function(req, res) {
 			var inputs = {"id" :id, "query" : query, "subquery":subquery}
 			var args = {data:inputs,headers:{"Content-Type" : "application/json"}}	
 			// dbConnICE.execute(queryString,function(queryStringerr, queryStringresult) {
-			client.post("http://127.0.0.1:1990/admin/getDetails_ICE",args,
+			client.post(epurl+"admin/getDetails_ICE",args,
 				function (queryStringresult, response) {
 				try{
 					// if (queryStringerr) {
@@ -1963,7 +1964,7 @@ exports.assignProjects_ICE = function(req, res) {
             assignProjectsHistoryQuery = "INSERT INTO icepermissions (userid,history) VALUES (" + userId + ",{" + date + ":" + assignProjectsHistory + "})";
 
 			var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
-			client.post("http://127.0.0.1:1990/admin/assignProjects_ICE",args,
+			client.post(epurl+"admin/assignProjects_ICE",args,
 			function (result, response) {
 				if(response.statusCode != 200 || result.rows == "fail"){	
             // dbConnICE.execute(assignProjectsToUsers, function(err, result) {
@@ -2028,7 +2029,7 @@ if(req.cookies['connect.sid'] != undefined)
 		// dbConnICE.execute(getAssignedProjects, function (err, result) {
 			var inputs = { "query":"projectid","domainid":requestDetails.domainId,"userid":requestDetails.userId}
 			var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
-			client.post("http://127.0.0.1:1990/admin/getAssignedProjects_ICE",args,
+			client.post(epurl+"admin/getAssignedProjects_ICE",args,
 					function (result, response) {
 			try{
 				// if (err) {
@@ -2047,7 +2048,7 @@ if(req.cookies['connect.sid'] != undefined)
 							// dbConnICE.execute(getProjectNames, function (err, result) {
 							var inputs = {"query":"projectname","projectid":iterator}
 							var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
-							client.post("http://127.0.0.1:1990/admin/getAssignedProjects_ICE",args,
+							client.post(epurl+"admin/getAssignedProjects_ICE",args,
 									function (result, response) {
 								try{
 									// if (err) {

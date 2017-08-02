@@ -1616,6 +1616,16 @@ input[disabled]{
     float: left;
 }*/
 
+.error-mapObj
+{
+    color: #d33c3c;
+    font-family: "LatoWebMedium";
+}
+#scrapedObjforMap li
+{
+    margin-left: -3%;
+}
+
 .ellipsis
 {
 	overflow: hidden;

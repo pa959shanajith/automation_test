@@ -3,7 +3,7 @@ var myserver = require('../../server.js');
 // var PythonShell = require('python-shell');
 var Client = require("node-rest-client").Client;
 var client = new Client();
-
+var epurl="http://127.0.0.1:1990/";
 exports.Encrypt_ICE = function getDomains_ICE(req, res) {
 	try {
 		if(req.cookies['connect.sid'] != undefined)
@@ -50,7 +50,7 @@ exports.Encrypt_ICE = function getDomains_ICE(req, res) {
 							headers:{'Content-Type': 'plain/text'}
 						};
 						// PythonShell.run("AES_encryption.py", options, function (err, results) {
-						client.post("http://127.0.0.1:1990/utility/encrypt_ICE/aes",args,
+						client.post(epurl+"utility/encrypt_ICE/aes",args,
 							function (results, response) {
 							// if (err){
 								if(response.statusCode != 200){

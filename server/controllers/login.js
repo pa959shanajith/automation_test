@@ -8,7 +8,7 @@ var cassandra = require('cassandra-driver');
 var dbConnICE = require('../../server/config/icetestautomation');
 var bcrypt = require('bcrypt');
 var async = require('async');
-
+var epurl="http://127.0.0.1:1990/";
 var Client = require("node-rest-client").Client;
 var client = new Client();
 
@@ -47,7 +47,7 @@ exports.authenticateUser_Nineteen68 = function(req, res){
 					});
 				}else{
 					// dbConn.execute(authUser, function (err, result) {
-					client.post("http://127.0.0.1:1990/login/authenticateUser_Nineteen68",args,
+					client.post(epurl+"login/authenticateUser_Nineteen68",args,
 						function (result, response) {
 					if(response.statusCode != 200 || result.rows == "fail"){
 					// if(err) {
@@ -155,7 +155,7 @@ exports.authenticateUser_Nineteen68_CI = function(req, res){
 				}else{
 					// dbConn.execute(authUser, function (err, result) {
 					// if(err) {
-					client.post("http://127.0.0.1:1990/login/authenticateUser_Nineteen68",args,
+					client.post(epurl+"login/authenticateUser_Nineteen68",args,
 						function (result, response) {
 					if(response.statusCode != 200 || result.rows == "fail"){
 						console.log("Error occured in authenticateUser_Nineteen68 : Fail");
@@ -263,7 +263,7 @@ getUserId: function(callback){
 		// 			if(err) {
 		var inputs = {"username":req.session.username, "query":"getUserId"};
 		var args = {data:inputs,headers:{"Content-Type" : "application/json"}};
-		client.post("http://127.0.0.1:1990/login/authenticateUser_Nineteen68/projassigned",args,
+		client.post(epurl+"login/authenticateUser_Nineteen68/projassigned",args,
 						function (result, response) {
 				if(response.statusCode != 200 || result.rows == "fail"){
 						console.log("Error occured in authenticateUser_Nineteen68 : Fail");
@@ -282,7 +282,7 @@ getUserRole: function(callback){
 	// 				if(err) {
 		var inputs = {"roleid":roleid, "query":"getUserRole"};
 		var args = {data:inputs,headers:{"Content-Type" : "application/json"}};
-		client.post("http://127.0.0.1:1990/login/authenticateUser_Nineteen68/projassigned",args,
+		client.post(epurl+"login/authenticateUser_Nineteen68/projassigned",args,
 			function (rolesResult, response) {
 				if(response.statusCode != 200 || rolesResult.rows == "fail"){	
 						console.log("Error occured in authenticateUser_Nineteen68 : Fail");
@@ -306,7 +306,7 @@ getUserRole: function(callback){
 	// 				if(err) {
 		var inputs = {"userid":userid, "query":"getAssignedProjects"};
 		var args = {data:inputs,headers:{"Content-Type" : "application/json"}};
-		client.post("http://127.0.0.1:1990/login/authenticateUser_Nineteen68/projassigned",args,
+		client.post(epurl+"login/authenticateUser_Nineteen68/projassigned",args,
 					function (projectsResult, response) {
 						if(response.statusCode != 200 || projectsResult.rows == "fail"){	
 						console.log("Error occured in authenticateUser_Nineteen68 : Fail");
@@ -387,7 +387,7 @@ function checkldapuser(req,callback,data){
 	// dbConn.execute(authUser, function (err, result) {
 		var inputs = {"username":req.session.username};
 		var args = {data:inputs,headers:{"Content-Type" : "application/json"}};
-		client.post("http://127.0.0.1:1990/login/authenticateUser_Nineteen68/ldap",args,
+		client.post(epurl+"login/authenticateUser_Nineteen68/ldap",args,
 					function (result, response) {
 		// if(err) {
 		if(response.statusCode != 200 || result.rows == "fail"){
@@ -476,7 +476,7 @@ exports.loadUserInfo_Nineteen68 = function(req, res){
 	                	// 	if (err){
 						var inputs = {"username": userName,"query":"userInfo"};
 						var args = {data:inputs,headers:{"Content-Type" : "application/json"}};
-						client.post("http://127.0.0.1:1990/login/loadUserInfo_Nineteen68",args,
+						client.post(epurl+"login/loadUserInfo_Nineteen68",args,
 							function (userResult, response) {
 							if(response.statusCode != 200 || userResult.rows == "fail"){	
 	                			var flag = "fail";
@@ -525,7 +525,7 @@ exports.loadUserInfo_Nineteen68 = function(req, res){
 				// 		if(err){
 					var inputs = {"roleid": req.session.defaultRoleId, "query":"loggedinRole"}
 					var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
-					client.post("http://127.0.0.1:1990/login/loadUserInfo_Nineteen68",args,
+					client.post(epurl+"login/loadUserInfo_Nineteen68",args,
 								function (rolesResult, response) {
 						if(response.statusCode != 200 || rolesResult.rows == "fail"){	
 							console.log("Error occured in getRoleNameByRoleId_Nineteen68 : Fail");
@@ -563,7 +563,7 @@ exports.loadUserInfo_Nineteen68 = function(req, res){
 	                	// 	if(err){
 						var inputs = {"roleid": jsonService.role, "query":"userPlugins"}
 						var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
-						client.post("http://127.0.0.1:1990/login/loadUserInfo_Nineteen68",args,
+						client.post(epurl+"login/loadUserInfo_Nineteen68",args,
 								function (pluginResult, response) {
 							if(response.statusCode != 200 || pluginResult.rows == "fail"){
 	                			console.log("Error occured in loadUserInfo_Nineteen68 : Fail");
@@ -641,7 +641,7 @@ exports.getRoleNameByRoleId_Nineteen68 = function(req, res){
         //          if(err){
 			var inputs = {"roleid": roleId}
 			var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
-			client.post("http://127.0.0.1:1990/login/getRoleNameByRoleId_Nineteen68",args,
+			client.post(epurl+"login/getRoleNameByRoleId_Nineteen68",args,
 					function (rolesResult, response) {
 				if(response.statusCode != 200 || rolesResult.rows == "fail"){	
                        console.log("Error occured in getRoleNameByRoleId_Nineteen68 : Fail");

@@ -14,6 +14,7 @@ var fs = require('fs');
 var certificate = fs.readFileSync('server/https/server.crt','utf-8');
 var Client = require("node-rest-client").Client;
 var client = new Client();
+var epurl="http://127.0.0.1:1990/";
 
 exports.getMainReport_ICE = function(req, res){
 	try{
@@ -164,7 +165,7 @@ exports.getAllSuites_ICE = function (req, res) {
 					// if(err){
 					var inputs = {"userid": req.body.userId, "query": "domainid"}
 					var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
-					client.post("http://127.0.0.1:1990/reports/getAllSuites_ICE",args,
+					client.post(epurl+"reports/getAllSuites_ICE",args,
 							function (result, response) {
 					if(response.statusCode != 200 || result.rows == "fail"){	
 						flag="fail";
@@ -189,7 +190,7 @@ exports.getAllSuites_ICE = function (req, res) {
 				// 	if(err){
 				var inputs = {"domainid": resultdata, "query": "projectsUnderDomain"}
 				var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
-				client.post("http://127.0.0.1:1990/reports/getAllSuites_ICE",args,
+				client.post(epurl+"reports/getAllSuites_ICE",args,
 						function (result, response) {
 					if(response.statusCode != 200 || result.rows == "fail"){	
 						flag="fail";
@@ -203,7 +204,7 @@ exports.getAllSuites_ICE = function (req, res) {
 								// 	if(err){
 								var inputs = {"projectid": iterator.projectid, "query": "releasesUnderProject"}
 								var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
-								client.post("http://127.0.0.1:1990/reports/getAllSuites_ICE",args,
+								client.post(epurl+"reports/getAllSuites_ICE",args,
 										function (releaseidsdata, response) {
 									if(response.statusCode != 200 || releaseidsdata.rows == "fail"){	
 										console.log(err);
@@ -215,7 +216,7 @@ exports.getAllSuites_ICE = function (req, res) {
 												// 	if(err){
 												var inputs = {"releaseid": releaseiditr.releaseid, "query": "cycleidUnderRelease"}
 												var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
-												client.post("http://127.0.0.1:1990/reports/getAllSuites_ICE",args,
+												client.post(epurl+"reports/getAllSuites_ICE",args,
 															function (cycleidsdata, response) {
 													if(response.statusCode != 200 || result.rows == "fail"){	
 														console.log(err);  
@@ -227,7 +228,7 @@ exports.getAllSuites_ICE = function (req, res) {
 																// 	if(err){
 																var inputs = {"cycleid": cycleiditr.cycleid, "query": "suitesUnderCycle"}
 																var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
-																client.post("http://127.0.0.1:1990/reports/getAllSuites_ICE",args,
+																client.post(epurl+"reports/getAllSuites_ICE",args,
 																			function (testsuiteidsdata, response) {
 																	if(response.statusCode != 200 || testsuiteidsdata.rows == "fail"){	
 																		console.log(err);  
@@ -311,7 +312,7 @@ exports.getSuiteDetailsInExecution_ICE = function (req, res) {
 			// dbConnICE.execute(getExecutionDetails,function(err,executionData){
 			var inputs = {"suiteid" :req_testsuiteId}
 			var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
-			client.post("http://127.0.0.1:1990/reports/getSuiteDetailsInExecution_ICE",args,
+			client.post(epurl+"reports/getSuiteDetailsInExecution_ICE",args,
 			function (executionData, response) {
 				try{
 					// if(err){
@@ -371,7 +372,7 @@ exports.reportStatusScenarios_ICE = function (req, res) {
 					// dbConnICE.execute(reportFetchQuery, function (err, result) {
 					var inputs = { "query":"executiondetails","executionid" :req_executionId}
 					var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
-					client.post("http://127.0.0.1:1990/reports/reportStatusScenarios_ICE",args,
+					client.post(epurl+"reports/reportStatusScenarios_ICE",args,
 							function (result, response) {
 						// if (err) {
 						if(response.statusCode != 200 || result.rows == "fail"){	
@@ -383,7 +384,7 @@ exports.reportStatusScenarios_ICE = function (req, res) {
 								try{
 									var executedtimeTemp = new Date(iterator.executedtime);
 									if(executedtimeTemp != null){
-										executedtimeTemp = executedtimeTemp.getDate()+"-"+(executedtimeTemp.getMonth()+1)+"-"+executedtimeTemp.getFullYear()+" "+executedtimeTemp.getHours()+":"+executedtimeTemp.getMinutes();
+										executedtimeTemp = executedtimeTemp.getDate()+"-"+(executedtimeTemp.getMonth()+1)+"-"+executedtimeTemp.getFullYear()+" "+executedtimeTemp.getHours()+":"+executedtimeTemp.getMinutes()+":"+executedtimeTemp.getSeconds();
 									}						
 									var browserTemp = iterator.browser;
 									var statusTemp = iterator.status;
@@ -394,7 +395,7 @@ exports.reportStatusScenarios_ICE = function (req, res) {
 									// 	if(err){
 									var inputs = { "query" : "scenarioname","scenarioid":iterator.testscenarioid}
 									var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
-									client.post("http://127.0.0.1:1990/reports/reportStatusScenarios_ICE",args,
+									client.post(epurl+"reports/reportStatusScenarios_ICE",args,
 											function (scenarioNameDetails, response) {
 										if(response.statusCode != 200 || scenarioNameDetails.rows == "fail"){	
 											var flag = "fail";
@@ -437,6 +438,33 @@ exports.reportStatusScenarios_ICE = function (req, res) {
 					res.send("fail");
 				} 
 				else{
+					if(report.length > 0)
+					{
+								for(var i=0;i<report.length;i++)
+								{
+									if(report[i].executedtime != "")
+									{
+										var dateString = report[i].executedtime,
+										dateTimeParts = dateString.split(' '),
+										timeParts = dateTimeParts[1].split(':'),
+										dateParts = dateTimeParts[0].split('-'),
+										date;
+										date = new Date(dateParts[2], parseInt(dateParts[1], 10) - 1, dateParts[0], timeParts[0], timeParts[1],timeParts[2]);
+										report[i].executedtime = date.getTime();
+									}
+								}
+								report.sort(function(a,b){
+									return a.executedtime - b.executedtime;
+								})
+								for(var k=0;k<report.length;k++)
+								{
+									if(report[k].executedtime != "")
+									{
+									report[k].executedtime = new Date(report[k].executedtime);
+									report[k].executedtime = report[k].executedtime.getDate()+"-"+(report[k].executedtime.getMonth()+1)+"-"+report[k].executedtime.getFullYear()+" "+report[k].executedtime.getHours()+":"+("0" + report[k].executedtime.getMinutes()).slice(-2)+":"+("0" + report[k].executedtime.getSeconds()).slice(-2) ;
+									}
+								}
+					}
 					res.send(JSON.stringify(report));
 				} 
 			})		
@@ -519,7 +547,7 @@ exports.getReport_Nineteen68 = function(req, res) {
 					// 	if (err) {
 					var inputs = {"query":"projectsUnderDomain", "reportid" :reportId}
 					var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
-					client.post("http://127.0.0.1:1990/reports/getReport_Nineteen68",args,
+					client.post(epurl+"reports/getReport_Nineteen68",args,
 							function (reportResult, response) {
 						if(response.statusCode != 200 || reportResult.rows == "fail"){	
 							flag="fail";
@@ -541,7 +569,7 @@ exports.getReport_Nineteen68 = function(req, res) {
 									// 	if (err) {
 									var inputs = {"query":"scenariodetails", "scenarioid" :testscenarioid}
 									var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
-									client.post("http://127.0.0.1:1990/reports/getReport_Nineteen68",args,
+									client.post(epurl+"reports/getReport_Nineteen68",args,
 											function (scenarioResult, response) {
 										if(response.statusCode != 200 || scenarioResult.rows == "fail"){	
 											console.log("Failed to get scenario name and projectId from scenarios.");
@@ -558,7 +586,7 @@ exports.getReport_Nineteen68 = function(req, res) {
 													// 	if (err) {
 													var inputs = {"query":"cycleid", "suiteid" :testsuiteId,"suitename" :testsuitename}
 													var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
-													client.post("http://127.0.0.1:1990/reports/getReport_Nineteen68",args,
+													client.post(epurl+"reports/getReport_Nineteen68",args,
 																function (suiteResult, response) {
 														if(response.statusCode != 200 || suiteResult.rows == "fail"){	
 															console.log("Failed to get cycle Ids from test suites.");
@@ -587,7 +615,7 @@ exports.getReport_Nineteen68 = function(req, res) {
 																	// 	if (err) {
 																	var inputs = {"query":"cycledetails", "cycleid" :cycleid}
 																	var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
-																		client.post("http://127.0.0.1:1990/reports/getReport_Nineteen68",args,
+																		client.post(epurl+"reports/getReport_Nineteen68",args,
 																			function (cycleResult, response) {
 																		if(response.statusCode != 200 || cycleResult.rows == "fail"){	
 																			console.log("Failed to get cycle name and releaseId from cycles.");
@@ -604,7 +632,7 @@ exports.getReport_Nineteen68 = function(req, res) {
 																					// 	if (err) {
 																					var inputs = {"query":"releasedetails", "releaseid" :releaseid}
 																					var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
-																					client.post("http://127.0.0.1:1990/reports/getReport_Nineteen68",args,
+																					client.post(epurl+"reports/getReport_Nineteen68",args,
 																							function (releaseResult, response) {
 																						if(response.statusCode != 200 || releaseResult.rows == "fail"){	
 																							console.log("Failed to get release name and projectsId from releases.");
@@ -621,7 +649,7 @@ exports.getReport_Nineteen68 = function(req, res) {
 																									// 	if (err) {
 																									var inputs = {"query":"projectdetails", "projectid" :projectid}
 																									var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
-																									client.post("http://127.0.0.1:1990/reports/getReport_Nineteen68",args,
+																									client.post(epurl+"reports/getReport_Nineteen68",args,
 																											function (projectResult, response) {
 																										if(response.statusCode != 200 || projectResult.rows == "fail"){	
 																											console.log("Failed to get project name and domainId from projects.");
@@ -638,7 +666,7 @@ exports.getReport_Nineteen68 = function(req, res) {
 																													// 	if (err) {
 																													var inputs = {"query":"domaindetails", "domainid" :domainid}
 																													var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
-																													client.post("http://127.0.0.1:1990/reports/getReport_Nineteen68",args,
+																													client.post(epurl+"reports/getReport_Nineteen68",args,
 																															function (domainResult, response) {
 																														if(response.statusCode != 200 || domainResult.rows == "fail"){	
 																															console.log("Failed to get domain name from domains.");
@@ -748,7 +776,7 @@ exports.exportToJson_ICE = function(req, res) {
 					// 	if (err) {
 					var inputs = {"query":"reportdata","reportid" :reportId}
 					var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
-					client.post("http://127.0.0.1:1990/reports/exportToJson_ICE",args,
+					client.post(epurl+"reports/exportToJson_ICE",args,
 								function (reportResult, response) {
 						if(response.statusCode != 200 || reportResult.rows == "fail"){	
 							console.log("Failed to get reports.");
@@ -766,7 +794,7 @@ exports.exportToJson_ICE = function(req, res) {
 										// 	if (err) {
 										var inputs = {"query":"scenarioid","reportid" :reportId}
 										var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
-										client.post("http://127.0.0.1:1990/reports/exportToJson_ICE",args,
+										client.post(epurl+"reports/exportToJson_ICE",args,
 													function (scenarioResult, response) {
 											if(response.statusCode != 200 || scenarioResult.rows == "fail"){	
 												console.log("Failed to get scenario Id from reports.");
@@ -781,7 +809,7 @@ exports.exportToJson_ICE = function(req, res) {
 														// 	if (err) {
 														var inputs = {"query":"scenarioname","scenarioid" :scenarioid}
 														var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
-														client.post("http://127.0.0.1:1990/reports/exportToJson_ICE",args,
+														client.post(epurl+"reports/exportToJson_ICE",args,
 																	function (scenarionameResult, response) {
 															if(response.statusCode != 200 || scenarionameResult.rows == "fail"){	
 																console.log("Failed to get testscenarioname from testscenarios.");
