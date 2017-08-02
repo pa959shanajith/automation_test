@@ -448,7 +448,7 @@ router.post('/', function(req, res, next) {
 					}
 					else if(e.type=='screens'){
 						uidx++;lts=idDict[e.pid];
-						if(e.renamed && e.id_n && e.orig_name) rnmList.push({"statement":"MATCH(n:SCREENS{screenName:'"+e.orig_name+"',testScenarioID:'"+idDict[e.pid]+"'}) SET n.screenName='"+e.name+"'"+",n.projectID='"+prjId+"'"});
+						if(e.renamed && e.id_n && e.orig_name) rnmList.push({"statement":"MATCH(n:SCREENS{screenName:'"+e.orig_name+"'}) SET n.screenName='"+e.name+"'"+",n.projectID='"+prjId+"'"});
 						//qList.push({"statement":"MATCH(n:SCREENS{screenID:'"+e.id+"'}) SET n.screenName='"+e.name+"'"+",n.projectID='"+prjId+"'"});
 						qList.push({"statement":"MERGE(n:SCREENS{projectID:'"+prjId+"',testScenarioID:'"+idDict[e.pid]+"',screenName:'"+e.name+"',screenID:'"+e.id+"',createdBy:'"+user+"',createdOn:'null',uid:'"+uidx+"',screenID_c:'"+e.id_c+"'})SET n.childIndex='"+e.childIndex+"'"});
 						if(t!=null && e.id_c!=null){
