@@ -188,7 +188,7 @@
                         <label>Start Date and Time :</label><span id="startTime"><b>{{StartTime}}</b></span>
                     </td>
                     <td rowspan="3">
-                        <label>Status :</label><span id="overAllStat"><span style="color:Green;"></span><b>{{overAllStatus}}</b></span>
+                        <label>Status :</label><span id="overAllStat" style="color: {{getColor overAllStatus}}"><span></span><b>{{overAllStatus}}</b></span>
                     </td>
                 </tr>
                 <tr>
@@ -222,7 +222,7 @@
                 <div class="rDid tabCont">{{slno}}</div>
                 <div class="rDstep tabCont">{{Step}}</div>
                 <div class="rDstepDes tabCont" style="padding-left: 10px;">{{StepDescription}}</div>
-                <div class="rDstatus tabCont" style="padding-left: 10px;">{{status}}</div>
+                <div class="rDstatus tabCont" style="padding-left: 10px; color: {{getColor status}}">{{status}}</div>
                 <div class="rDellaps tabCont">{{EllapsedTime}}</div>
                 <div class="rDcomments tabCont" style="padding-left: 10px;">{{Comments}}</div>
             </div>
