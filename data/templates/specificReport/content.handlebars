@@ -71,6 +71,14 @@
                     })
                 })
 
+                $(".rDstatus").each(function() {
+                    if($.trim($(this).text()) == "")
+                    {
+                        $(this).css("pointer-events","none");
+                    }
+                });
+
+
 				$(document).on('click', '.openscreenshot', function(){
 					var path = $(this).attr("data-screenshot");
                     var hostName = window.location.host;
