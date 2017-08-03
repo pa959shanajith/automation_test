@@ -190,6 +190,7 @@ if (cluster.isMaster) {
     var header = require('./server/controllers/header');
     var plugin = require('./server/controllers/plugin');
     var utility = require('./server/controllers/utility');
+    var qc = require('./server/controllers/qualityCenter');
     //Login Routes
     app.post('/authenticateUser_Nineteen68', login.authenticateUser_Nineteen68);
     app.post('/authenticateUser_Nineteen68_CI', login.authenticateUser_Nineteen68_CI);
@@ -227,6 +228,9 @@ if (cluster.isMaster) {
     app.post('/getTestcaseDetailsForScenario_ICE', suite.getTestcaseDetailsForScenario_ICE);
     app.post('/ExecuteTestSuite_ICE_CI', suite.ExecuteTestSuite_ICE_CI);
     //app.post('/readTestScenarios_ICE', suite.readTestScenarios_ICE);
+    //Scheduling Screen Routes
+    /*app.post('/testSuitesScheduler_ICE', suite.testSuitesScheduler_ICE);
+    app.post('/getScheduledDetails_ICE', suite.getScheduledDetails_ICE);*/
     //Report Screen Routes
     app.post('/getAllSuites_ICE', report.getAllSuites_ICE);
     app.post('/getSuiteDetailsInExecution_ICE', report.getSuiteDetailsInExecution_ICE);
@@ -248,8 +252,11 @@ if (cluster.isMaster) {
     app.post('/getTaskJson_Nineteen68', plugin.getTaskJson_Nineteen68);
     //Utility plugins
     app.post('/Encrypt_ICE', utility.Encrypt_ICE);
-
-
+    //QC Plugin
+    app.post('/loginQCServer_ICE', qc.loginQCServer_ICE);
+    app.post('/qcProjectDetails_ICE', qc.qcProjectDetails_ICE);
+    app.post('/qcFolderDetails_ICE', qc.qcFolderDetails_ICE);
+    //app.post('/saveQcDetails_ICE', qc.saveQcDetails_ICE);
 
     //-------------SERVER START------------//
     //server.listen(3000);      //Http Server
