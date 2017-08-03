@@ -16,7 +16,6 @@ var client = new Client();
 var roles = [];
 var userRoles = {};
 
-
 //Authenticate User - Nineteen68
 exports.authenticateUser_Nineteen68 = function(req, res){
       try{
@@ -464,6 +463,8 @@ exports.loadUserInfo_Nineteen68 = function(req, res){
 		}
 		if(sessionToken != undefined && req.session.id == sessionToken)
 		{
+		var flag = req.body.flag;
+		var switchedRole = req.body.selRole;
 		
 		userName = req.body.username;
 		jsonService = {};
@@ -493,6 +494,7 @@ exports.loadUserInfo_Nineteen68 = function(req, res){
 		                				
 		                				jsonService.user_id = userId;
 		        						jsonService.email_id = service.emailid;
+										jsonService.additionalrole = service.additionalroles;
 		        						jsonService.firstname = service.firstname;
 		        						jsonService.lastname = service.lastname;
 		        						jsonService.role = service.defaultrole;
@@ -523,7 +525,14 @@ exports.loadUserInfo_Nineteen68 = function(req, res){
 				//  var getRoleInfo = "select rolename from roles where roleid = "+req.session.defaultRoleId +" allow filtering";
 				// 	dbConn.execute(getRoleInfo, function (err, rolesResult) {
 				// 		if(err){
-					var inputs = {"roleid": req.session.defaultRoleId, "query":"loggedinRole"}
+					var inputs;
+					if(flag == true){
+						inputs = {"roleid": switchedRole, "query":"loggedinRole"}
+					}
+					if(flag == false || flag == undefined){
+						inputs = {"roleid": req.session.defaultRoleId, "query":"loggedinRole"}
+					}
+					//var inputs = {"roleid": req.session.defaultRoleId, "query":"loggedinRole"}
 					var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
 					client.post(epurl+"login/loadUserInfo_Nineteen68",args,
 								function (rolesResult, response) {
@@ -561,7 +570,14 @@ exports.loadUserInfo_Nineteen68 = function(req, res){
 	            		// var getUserPlugins = "select dashboard,deadcode,mindmap,neuron2d,neuron3d,oxbowcode,reports from userpermissions WHERE roleid = "+jsonService.role+" allow filtering";
 	                	// dbConn.execute(getUserPlugins, function(err, pluginResult){
 	                	// 	if(err){
-						var inputs = {"roleid": jsonService.role, "query":"userPlugins"}
+						var inputs;
+						if(flag == true){
+							inputs = {"roleid": switchedRole, "query":"userPlugins"}
+						}
+						if(flag == false || flag == undefined){
+							inputs = {"roleid": jsonService.role, "query":"userPlugins"}
+						}
+					    //var inputs = {"roleid": req.session.defaultRoleId, "query":"loggedinRole"}
 						var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
 						client.post(epurl+"login/loadUserInfo_Nineteen68",args,
 								function (pluginResult, response) {
@@ -634,12 +650,16 @@ exports.getRoleNameByRoleId_Nineteen68 = function(req, res){
 		}
 			if(sessionToken != undefined && req.session.id == sessionToken)
 		{
-           var roleId= req.body.role;
+           var roleId = [];
+		   roleId = req.body.role;
+		   var role = [];
+		   //var role = roleId[0]; 
            var flag="";
         //    var getRoleInfo = "select rolename from roles where roleid = "+roleId+" allow filtering";
         //    dbConn.execute(getRoleInfo, function (err, rolesResult) {
         //          if(err){
-			var inputs = {"roleid": roleId}
+		 async.forEachSeries(roleId,function(roleid,callback){
+			var inputs = {"roleid": roleid}
 			var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
 			client.post(epurl+"login/getRoleNameByRoleId_Nineteen68",args,
 					function (rolesResult, response) {
@@ -653,22 +673,32 @@ exports.getRoleNameByRoleId_Nineteen68 = function(req, res){
                                   res.send("fail");
                              }else{
                                    try{
-                                         var role="";
+                                         //var role="";
                                          for (var i = 0; i < rolesResult.rows.length; i++) {
-                                               role = rolesResult.rows[i].rolename;
+                                               role.push(rolesResult.rows[i].rolename);
                                          }
-                                         res.send(role);
+                                        // res.send(role);
                                    }catch(exception){
                                          console.log(exception);
                                          res.send("fail");
                                    }
-                             }
+                            callback(); 
+							}
                        }catch(exception){
                              console.log(exception);
                              res.send("fail");
                        }
                  }
+				// callback();
            });
+		}, function() {
+			if(role == undefined){
+				res.send("fail");
+			}
+			else {
+				res.send(role);
+			}
+		})
      }
      else{
 	     res.send("Invalid Session");

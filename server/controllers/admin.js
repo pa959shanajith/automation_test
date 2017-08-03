@@ -271,7 +271,7 @@ exports.getEditUsersInfo_Nineteen68 = function(req, res){
 		var reuestedUserName = req.body.userName;
 		var reuestedUserId = req.body.userId;
 		var userDetails = {};
-		var getUserRoles = "select username,defaultrole,emailid,firstname,lastname,ldapuser from users where userid="+reuestedUserId+"";
+		var getUserRoles = "select username,defaultrole,additionalroles,emailid,firstname,lastname,ldapuser from users where userid="+reuestedUserId+"";
 		dbConn.execute(getUserRoles, function (err, result) {
 			try{
 				if (err) {
@@ -282,6 +282,7 @@ exports.getEditUsersInfo_Nineteen68 = function(req, res){
 						try{
 							userDetails.userName = iterator.username,
 							userDetails.roleId = iterator.defaultrole,
+							userDetails.additionalroles = iterator.additionalroles,
 							userDetails.emailId = iterator.emailid,
 							userDetails.firstName = iterator.firstname,
 							userDetails.lastName = iterator.lastname,
@@ -427,7 +428,7 @@ exports.updateUser_nineteen68 = function updateUser_nineteen68(req, res) {
             var userObj = req.body.updateUserObj;
             var local_username = userObj.userName;
 			//needs to be sent from front end further on
-			var local_additionalroles = [""];
+			var local_additionalroles = userObj.additionalRole;
             var local_password = userObj.passWord;
             var local_firstname = userObj.firstName;
             var local_lastname = userObj.lastName;
@@ -473,6 +474,9 @@ exports.updateUser_nineteen68 = function updateUser_nineteen68(req, res) {
                         if (local_role == undefined || local_role == 'undefined' || local_role == '') {
                             local_role = service.role;
                         }
+						if(local_additionalroles == undefined || local_additionalroles == 'undefined' || local_additionalroles == ''){
+						    local_additionalroles = service.additionalroles;
+					    }
                         if (local_email_id == undefined || local_email_id == 'undefined' || local_email_id == '') {
                             local_email_id = service.emailid;
                         }
@@ -492,7 +496,7 @@ exports.updateUser_nineteen68 = function updateUser_nineteen68(req, res) {
 							"ldapuser":result.rows[0].ldapuser, "modifiedby":userdetails.username,"modifiedbyrole":userdetails.role,
 							"password":db_password, "username":local_username};
 
-                            updateUserHistory = "'username=" + local_username + ",password=" + db_password + "," +
+                            updateUserHistory = "'username=" + local_username + ",password=" + db_password + ","
                                 "firstname=" + local_firstname + ", lastname=" + local_lastname + ",modifiedby=" + local_username + "," +
                                 "modifiedon=" + new Date().getTime() + ",emailid=" + local_email_id + " '";
 
@@ -508,7 +512,7 @@ exports.updateUser_nineteen68 = function updateUser_nineteen68(req, res) {
 							"ldapuser":result.rows[0].ldapuser, "modifiedby":userdetails.username,"modifiedbyrole":userdetails.role,
 							"password":req_hashedPassword, "username":local_username};
 
-                            updateUserHistory = "'username=" + local_username + ",password=" + db_password + "," +
+                            updateUserHistory = "'username=" + local_username + ",password=" + db_password + ","
                                 "firstname=" + local_firstname + ", lastname=" + local_lastname + ",modifiedby=" + local_username + "," +
                                 "modifiedon=" + new Date().getTime() + ",emailid=" + local_email_id + " '";
 
@@ -529,7 +533,7 @@ exports.updateUser_nineteen68 = function updateUser_nineteen68(req, res) {
                                 } else {
                                     flag = "success";
                                     fnUpdateUserHistory(updateUserHistoryQuery, function(err, response) {
-                                        if (response == 'success') {
+                                        if (flag == 'success') {
                                             res.send(flag);
                                         } else {
                                             flag = "fail";

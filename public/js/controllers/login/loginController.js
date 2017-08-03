@@ -48,8 +48,9 @@ mySPA.controller('loginController', function ($scope, $http, $location, LoginSer
 							var username = $scope.userName;
 							var password = $scope.password;
 							$scope.loginButtonValidation = '';
+							var selRole;
 
-							LoginService.loadUserInfo_Nineteen68(username)
+							LoginService.loadUserInfo_Nineteen68(username,selRole,false)
 							.then(function (data) {
 								if(data != "fail"){
 									//To be removed - Has to come from database
@@ -68,8 +69,9 @@ mySPA.controller('loginController', function ($scope, $http, $location, LoginSer
 									data.pluginsInfo = availablePlugins;
 									window.localStorage['LoginSuccess'] = "True";
 									window.localStorage['_UI'] = JSON.stringify(data);
-									var role = data.role;
-									LoginService.getRoleNameByRoleId_Nineteen68(role)
+									var roleasarray=[];
+									roleasarray.push(data.role);
+									LoginService.getRoleNameByRoleId_Nineteen68(roleasarray)
 									.then(function (data) {
 										if(data != "fail"){
 											window.localStorage['_SR'] = data;

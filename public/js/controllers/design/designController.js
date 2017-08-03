@@ -3884,7 +3884,7 @@ function contentTable(newTestScriptDataLS) {
 				var custname1;
 				var custval=ob.custname;
 				custname1 = $('<input>').html(custval).text().trim();
-				if (custname1.replace(/\s/g, ' ') == selectedText.replace('/\s/g', ' ')){
+				if (custname1.replace(/\s/g, ' ') ==(selectedText.replace('/\s/g', ' ')).replace('\n', ' ')){
 					objName = ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ');
 					url = ob.url;
 					var obType = ob.tag;

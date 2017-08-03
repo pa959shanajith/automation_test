@@ -1,9 +1,9 @@
 /***
  *
  */
+var domainId;
 var DOMAINID, releaseName, cycleName, count=0,delCount=0,editReleaseId='',editCycleId='',deleteReleaseId='',deleteCycleId='',taskName;releaseNamesArr =[];
 var createprojectObj = {}; var projectDetails = [];var flag;var projectExists;var updateProjectDetails = [];
-var domainId;
 var editedProjectDetails = [];
 var deletedProjectDetails = [];
 var newProjectDetails = [];
@@ -25,6 +25,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 
 
 	$("#userTab").on('click',function() {
+		resetCreateUser();
 		$("img.selectedIcon").removeClass("selectedIcon");
 		$(this).children().find('img').addClass('selectedIcon');
 		angular.element(document.getElementById("left-nav-section")).scope().getUserRoles();
@@ -216,13 +217,12 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 						assignedProjectsArr.push(projectData[j].projectId);
 						assignedProjectNames.push(projectData[j].projectName)
 					}
-					
-					//getAssignedProjectsLen = assignedProjectsArr.length;
+
 					adminServices.getDetails_ICE(idtype,requestedids)
 					.then(function (response) {
 						if(response == "Invalid Session"){
-				window.location.href = "/";
-				}
+							window.location.href = "/";
+							}
 						$('#allProjectAP').empty();
 						if(response.projectIds.length > 0)
 						{
@@ -275,7 +275,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 			}, function (error) { console.log("Error:::::::::::::", error) })
 		});
 
-	});
+	 });
 
 //	Assign Projects Button Click
 	$scope.assignProjects = function() {
@@ -328,7 +328,6 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 				{
 					openModelPopup("Assign Projects", "Projects assigned to user successfully");
 					resetAssignProjectForm();
-					
 				}
 				else{
 					openModelPopup("Assign Projects", "Failed to assign projects to user");
@@ -344,8 +343,8 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 
 	};
 
-
 	$("#projectTab").on('click',function() {
+		resetForm();
 		projectDetails = [];
 		updateProjectDetails = [];
 		$("img.selectedIcon").removeClass("selectedIcon");
@@ -366,6 +365,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 			}
 
 		}, function (error) { console.log("Error:::::::::::::", error) })
+
 	});
 
 	function toggleCycleClick()
@@ -558,17 +558,17 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 	};
 
 
-  $(document).on('change', '#userRoles', function() {
-	  var getDropDown;
-	  getDropDown = $('#additionalRoles');
-	  getDropDown.empty();
-	  getDropDown.append('<option value="" selected>Select additional Role</option>');
-	  for(i=0; i<userRolesList.r_ids.length; i++){
-		  if($('#userRoles option:selected').val() != userRolesList.r_ids[i]){
-			  getDropDown.append("<option value="+ userRolesList.r_ids[i] +">"+userRolesList.userRoles[i]+"</option>");
-		  }
-	  }
-  });
+//   $(document).on('change', '#userRoles', function() {
+// 	  var getDropDown;
+// 	  getDropDown = $('#additionalRoles');
+// 	  getDropDown.empty();
+// 	  getDropDown.append('<option value="" selected>Select additional Role</option>');
+// 	  for(i=0; i<userRolesList.r_ids.length; i++){
+// 		  if($('#userRoles option:selected').val() != userRolesList.r_ids[i]){
+// 			  getDropDown.append("<option value="+ userRolesList.r_ids[i] +">"+userRolesList.userRoles[i]+"</option>");
+// 		  }
+// 	  }
+//   });
 	// Create Project Action
 	$scope.create_project = function () {
 		$("#selDomain").removeClass("inputErrorBorder");
@@ -1785,7 +1785,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 		function (error) { console.log("Error:::::::::::::", error) })
 	};
 
-//Load Projects for Edit
+	//Load Projects for Edit
 	$scope.editProjectTab = function(){
 		projectDetails = [];
 		updateProjectDetails = [];
@@ -2074,25 +2074,83 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 				$("#password, #confirmPassword").parent().show();
 			}
 			var roleId = userDataRes.roleId;
+			var addRole = userDataRes.additionalroles;
 			adminServices.getUserRoles_Nineteen68()
-			.then(function (res) {
-				if(res == "Invalid Session"){
+			.then(function (response) {
+				if(response == "Invalid Session"){
 							  window.location.href = "/";
 							}
 				$("#userRoles").empty().append('<option value disabled>Select User Role</option>')
-				for(i=0; i<res.r_ids.length && res.userRoles.length; i++){
-					if(roleId == res.r_ids[i]){
-						$("#userRoles").attr("disabled",true).append('<option selected value="'+res.r_ids[i]+'">'+res.userRoles[i]+'</option>')
+				for(i=0; i<response.r_ids.length && response.userRoles.length; i++){
+					if(roleId == response.r_ids[i]){
+						$("#userRoles").append('<option selected value="'+response.r_ids[i]+'">'+response.userRoles[i]+'</option>')
 					}
 					else{
-						$("#userRoles").attr("disabled",true).append('<option value="'+res.r_ids[i]+'">'+res.userRoles[i]+'</option>')
+						$("#userRoles").append('<option value="'+response.r_ids[i]+'">'+response.userRoles[i]+'</option>')
 					}
 				}
+//Secondary
+  // populating Secondary roles list 
+	       var getDropDown;
+				  getDropDown = $('#additionalRoles');
+				  getDropDown.empty();
+
+				  for(i=0; i<userRolesList.r_ids.length; i++){
+					  if(($('#userRoles option:selected').val() != userRolesList.r_ids[i]) && (userRolesList.r_ids[i] != "b5e9cb4a-5299-4806-b7d7-544c30593a6e")){
+						  getDropDown.append("<li class='RolesCheck'><span class='rolesSpan'><input class='addcheckBox' type='checkbox' value="+ userRolesList.r_ids[i] +"><label class='rolesChecklabel'>"+userRolesList.userRoles[i]+"</label></span></li>");
+					  } 
+				  }
+				  
+				  if(addRole != null){
+						$.each($(document).find(".addcheckBox"), function(){
+							for(j=0;j<addRole.length;j++){
+								if($(this).val() == addRole[j]){
+									$(this).prop("checked", true);
+								}
+							}
+						})
+				  }
+	// populating Secondary roles list 
+			document.getElementById("userRoles").disabled=true;
+				/*Secondary*/			
+		    $(document).on('click',".rolesChecklabel", function(){
+			   
+				if(($(this).siblings('input').prop('checked')) == true){
+					$(this).siblings('input').prop('checked',false);
+				}
+				else{
+					$(this).siblings('input').prop('checked',true);
+				}
+			})
+
+			$(document).mouseup(function(e) {
+				var roleSel = $("#additionalRole_options");
+				var roleOpt = $("#additionalRoles");
+				
+				if ((!roleSel.is(e.target) && roleSel.has(e.target).length === 0) && (!roleOpt.is(e.target) && roleOpt.has(e.target).length === 0))
+				{
+					$('#additionalRoles').hide();
+				}
+			});
+			   /*Secondary*/
 			},
 			function (error) { console.log("Error:::::::::::::", error) })
 		},
 		function (error) { console.log("Error:::::::::::::", error) })
 	};
+
+//populating secondary role drop down
+			$(document).on('click', "#additionalRole_options", function() {
+			      // .is( ":hidden" )
+				  // if ($('#additionalRoles').is(':visible'))							  
+					if ($('#additionalRoles').is(':hidden')){
+						$('#additionalRoles').show();
+					}
+					
+					else{
+						$('#additionalRoles').hide();
+					}
+	        });
 
 	//Update Edit User
 	$scope.updateUser = function(){
@@ -2123,7 +2181,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 			openModelPopup("Error","Password must contain atleast 1 special character, 1 numeric, 1 uppercase and lowercase, length should be minimum 8 characters and maximum 12 characters..");
 			$("#confirmPassword").addClass("inputErrorBorder");
 		}
-		else if($("#password").val() != $("#confirmPassword").val()){
+		else if($("#password").val() != $("#confirmPassword").val() && ($("#password").val().length > 0 && $("#confirmPassword").val().length > 0)){
 			openModelPopup("Error", "Password and Confirm Password did not match");
 			$("#confirmPassword").addClass("inputErrorBorder");
 		}
@@ -2139,14 +2197,19 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 		}
 		else{
 			var updateUserObj = {};
+            var allVals = [];
+			$('#additionalRoles :checked').each(function() {
+               allVals.push($(this).val());
+            });
+			//$('#additional_Roles').val(allVals);
 			updateUserObj.userName = $("#userSelect option:selected").text();
+			updateUserObj.additionalRole = allVals;
 			updateUserObj.passWord = $("#password").val();
 			updateUserObj.firstName = $.trim($("#firstName").val());
 			updateUserObj.lastName = $.trim($("#lastName").val());
-			//updateUserObj.role = $("#userRoles option:selected").val();
+			updateUserObj.role = $("#userRoles option:selected").val();
 			updateUserObj.email = $("#email").val();
 			updateUserObj.userId = $("#userSelect option:selected").data("id");
-
 			var userDetails = JSON.parse(window.localStorage['_UI']);
 			adminServices.updateUser_nineteen68(updateUserObj,userDetails)
 			.then(function (updateUserRes) {
@@ -2254,15 +2317,18 @@ $(document).on('cut copy paste','#userName', function(e){
 				$(element).val(userEnteredText);
 			}, 5); 	
  });
+
 //All Special characters prevented for firstname & lastname on copy paste
 $(document).on('cut copy paste','.preventSpecialChar', function(e){ 
 			var element = this;
 			setTimeout(function () {
 				var userEnteredText = $(element).val();  
-				userEnteredText = userEnteredText.replace (/[[\]\~`!@#$%^&*()-_+={}|;:"',.<>?/\s]/g ,"");
+				//userEnteredText = userEnteredText.replace (/[[\]\~`!@#$%^&*()-_+={}|;:"',.<>?/\s]_/g ,"");
+				userEnteredText = userEnteredText.replace (/[[\]\~`!@#$%^&*()-+={}|;:"',.<>?/\s_]/g ,"");
 				$(element).val(userEnteredText);
 			}, 5); 
  });
+
 
 	function preventSpecialCharOnBlur(id, val)
 	{
@@ -2278,32 +2344,6 @@ $(document).on('cut copy paste','.preventSpecialChar', function(e){
 			return false;
 		}
 	}
-
-
-
-	//Edit Release Name Functionality
-	/*$(document).on("click", ".editReleaseName", function(){
-		$("#editReleaseNameModal").modal("show");
-		var existingReleaseName = $(this).parents("li").children(".releaseName").text()
-		$("#releaseName").val(existingReleaseName)
-	});*/
-
-	//Delete Release Functionality
-	/*$(document).on("click", ".deleteRelease", function(){
-		$("#deleteReleaseModal").modal("show")
-	});*/
-
-	//Edit Cycle Name Functionality
-	/*$(document).on("click", ".editCycleName", function(){
-		$("#editCycleNameModal").modal("show");
-		var existingCycleName = $(this).parents("li").children(".cycleName").text()
-		$("#cycleName").val(existingCycleName)
-	});*/
-
-	//Delete Release Functionality
-	/*$(document).on("click", ".deleteCycle", function(){
-		$("#deleteCycleModal").modal("show")
-	});*/
 
 	//Global moded popup
 	function openModelPopup(title, body){
