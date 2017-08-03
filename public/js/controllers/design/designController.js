@@ -2194,18 +2194,18 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				return false
 			}
 			else{
-				if(Object.keys(viewString.view).length > 0)
-				{
-							for(var i=0;i<viewString.view.length;i++)
-							{
-								if($(this).find("input").val() == viewString.view[i].custname)
-								{
-										$("#dialog-addObject").modal("hide");
-										openDialog("Add Object", "Object characterstics are same for "+$(this).find("input").val()+"");
-										return false;
-								}
-							}
-				}
+				// if(Object.keys(viewString.view).length > 0)
+				// {
+				// 			for(var i=0;i<viewString.view.length;i++)
+				// 			{
+				// 				if($(this).find("input").val() == viewString.view[i].custname)
+				// 				{
+				// 						$("#dialog-addObject").modal("hide");
+				// 						openDialog("Add Object", "Object characterstics are same for "+$(this).find("input").val()+"");
+				// 						return false;
+				// 				}
+				// 			}
+				// }
 				//If no field is empty, proceed to service call
 				flag = "true";
 				$scope.errorMessage = "";
@@ -2986,7 +2986,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		if(gsElement.length > 0){
 			for(i=0; i<gsElement.length; i++){
 				$.each($("#scraplist li"), function(){
-					if(gsElement[i] == $(this).data("tag") || ($(this).data("tag").toLowerCase().indexOf(gsElement[i].toLowerCase()) >= 0 && gsElement[i] != "a" && $(this).data("tag").toLowerCase() != "radio button" && $(this).data("tag").toLowerCase() != "radiobutton" && $(this).data("tag").toLowerCase().indexOf("listview") < 0)
+					if(gsElement[i] == $(this).data("tag") || ($(this).data("tag").toLowerCase().indexOf(gsElement[i].toLowerCase()) >= 0 && gsElement[i] != "a" && $(this).data("tag").toLowerCase() != "radio button" && $(this).data("tag").toLowerCase() != "radiobutton" && $(this).data("tag").toLowerCase().indexOf("listview") < 0 && $(this).data("tag").toLowerCase().indexOf("tablecell") < 0)
 							|| (gsElement[i] == "input" && ($(this).data("tag").indexOf("edit") >= 0 || $(this).data("tag").indexOf("Edit Box") >= 0 || $(this).data("tag").indexOf("text") >= 0 || $(this).data("tag").indexOf("EditText") >= 0 || $(this).data("tag").indexOf("TextField") >= 0))
 							|| (gsElement[i] == "select" && $(this).data("tag").indexOf("combo box") >= 0)
 							|| (gsElement[i] == "a" && ($(this).data("tag").indexOf("hyperlink") >= 0 /* || $(this).data("tag").indexOf("Static") >= 0*/))
@@ -3036,7 +3036,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 								$(this).data("tag").toLowerCase().indexOf("check box") == -1 &&
 								$(this).data("tag").toLowerCase().indexOf("checkbox") == -1 &&
 								$(this).data("tag").toLowerCase().indexOf("image") == -1 &&
-								$(this).data("tag").toLowerCase().indexOf("table") == -1 &&
+								($(this).data("tag").toLowerCase().indexOf("table") == -1 || $(this).data("tag").toLowerCase() == "tablecell") &&
 								$(this).data("tag").toLowerCase().indexOf("radio button") == -1)
 							{
 									$(this).show();
@@ -3884,7 +3884,7 @@ function contentTable(newTestScriptDataLS) {
 				var custname1;
 				var custval=ob.custname;
 				custname1 = $('<input>').html(custval).text().trim();
-				if (custname1.replace(/\s/g, ' ') == selectedText.replace('/\s/g', ' ')){
+				if (custname1.replace(/\s/g, ' ') ==(selectedText.replace('/\s/g', ' ')).replace('\n', ' ')){
 					objName = ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ');
 					url = ob.url;
 					var obType = ob.tag;
@@ -5099,7 +5099,7 @@ function drop(ev) {
 	else{
 		$(".objectExistMap").hide()
 		getDraggedEle = ev.dataTransfer.getData("text/plain").trim()
-		getDraggedEle = $(getDraggedEle)[1];
+		getDraggedEle = $(getDraggedEle)[0];
 		$(getDraggedEle).addClass("fromMergeObj");
 		$(ev.target).parent("li").addClass("valueMerged");
 		$(ev.target).parent("li").find(".ellipsis").hide().addClass("toMergeObj");

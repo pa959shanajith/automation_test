@@ -1018,6 +1018,10 @@ input[disabled]{
     margin-top: -2px;
  }
 
+#switchRole{
+ cursor: pointer;
+}
+
  .modal-body-switchRole{
     height: 99px;
     padding-left: 40px;
@@ -1411,6 +1415,93 @@ input[disabled]{
 /*******Compare Objects **********/
 
 /* utility plugins */
+
+/* multi-select-dropdown */
+
+.chooseRole{
+    /*cursor: pointer;*/
+    float: left;
+    width: 47%;
+    vertical-align: middle;
+	font-weight: normal;
+	line-height: 2;
+    padding-right: 4px;
+    padding-left: 4px;
+    padding-bottom: 0px;
+    border-radius: 4px;
+    height: 25px;
+    width: 60%;
+    margin-left: 4%;
+    margin-top: 0%;
+    line-height: 1.7; 
+    border: 1px solid #656565 !important;
+}
+
+.dropdown-menu-multiselect>li>input {
+    display: block;
+    padding: 3px 20px;
+    clear: both;
+    font-weight: 400;
+    line-height: 1.42857143;
+    color: #333;
+    white-space: nowrap;
+}
+
+.dropdown-menu-multiselect>li> :hover{
+    background:#633691;
+    color: white;
+    /*cursor: pointer;*/
+}
+
+.dropdown-menu-multiselect{
+    margin-left: 15px;
+    margin-top: -5px;
+    z-index: 1000;
+    display: none;
+    float: left;
+    min-width: 187px;
+    padding: 5px 0;
+    font-size: 14px;
+    text-align: left;
+    list-style: none;
+    background-color: #fff;
+    -webkit-background-clip: padding-box;
+    background-clip: padding-box;
+    border: 1px solid #adabab;
+    border-radius: 1px;
+    
+}
+
+.rolesSpan>label{
+  font-weight: normal;
+  padding-left: 7px;
+  width: calc(100% - 26px);
+}
+
+.rolesSpan>input{
+  margin-top: 3px;
+  margin-left: 12px;
+} 
+
+.rolesSpan{
+    padding-top: 9px;
+    padding-bottom: 9px;
+}
+
+/*.RolesCheck{
+  cursor: pointer;
+}*/
+
+.dropdown-menu-multiselect>li{
+  border-bottom: 1px solid #eceaea;
+  margin-top: 3px;
+}
+
+.dropdown-menu-multiselect>li:last-child { border-bottom: none; }
+
+.dropdown-menu-multiselect>li:first-child { margin-top: none; }
+
+/* multi-select-dropdown end */
 
 #wsdlActionsButton{
 	float: left;
@@ -2282,9 +2373,10 @@ input[disabled]{
 	text-align: center;
 }
 .scenarioBody tr td input{
-	height: 25px;
+	height: 24px;
     border: 1px solid #5e636b;
     border-radius: 4px;
+    padding-left: 5px;
  }
 .scenarioBody tr td select{
 	width: 70px;
@@ -2901,6 +2993,14 @@ li.select_all .addCustObj{
 	height: 100%
 }
 
+.adminActionBtn {
+	float: right;
+	width: auto;
+}
+.adminBtn {
+	padding: 2px 25px !important;
+}
+
 .adminForm {
 	padding-top: 5%;
 }
@@ -2933,6 +3033,13 @@ li.select_all .addCustObj{
 }
 
 .primaryRole {
+	width: auto;
+	vertical-align: middle;
+	font-weight: normal;
+	line-height: 2;
+}
+
+.secondaryRole{
 	width: auto;
 	vertical-align: middle;
 	font-weight: normal;
@@ -2985,8 +3092,8 @@ li.select_all .addCustObj{
     padding: 10px;
 }
 .domainTxt {
-	float: left;
     font-weight: normal;
+	float: left;
 }
 
 .projectForm:first-child {
@@ -3204,8 +3311,10 @@ li.select_all .addCustObj{
 
 #additionalRoles{
 	position: relative;
-    left: 10px;
-    top: 2px;
+    /*left: 10px;
+    top: 2px;*/
+    left: 0px;
+    top: 0px;
 }
 /*****************ADMIN CSS NEW ************************/
 .containerWrap {
@@ -3260,6 +3369,14 @@ li.select_all .addCustObj{
 	font-weight: normal;
 	line-height: 2;
 }
+
+.secondaryRole{
+	width: auto;
+	vertical-align: middle;
+	font-weight: normal;
+	line-height: 2;
+}		
+
 
 .selectControl {
 	position: relative;
@@ -3366,25 +3483,24 @@ li.select_all .addCustObj{
     -ms-border-radius: 6px;
 }
 
-#selDomain, #selDomainEdit, #selAssignProject{		
-    margin-left: 10px;		
-    margin-top: -12px;		
-    background-color: #eeeeee;		
-    width: 90%;		
-    opacity: 1;		
-    border: 1px solid #656565 !important;		
-    border-left: 0 !important;		
-    border-right: 0 !important;		
-    border-top: 0 !important;		
-    border-radius: 0;		
-    box-shadow: none;		
-    color: #333;		
-    height: 34px;		
-    padding: 6px 12px;		
-    font-size: 14px;		
-    line-height: 1.42857143;		
-}		
-
+#selDomain, #selDomainEdit, #selAssignProject{
+    margin-left: 10px;
+    margin-top: -12px;
+    background-color: #eeeeee;
+    width: 90%;
+    opacity: 1;
+    border: 1px solid #656565 !important;
+    border-left: 0 !important;
+    border-right: 0 !important;
+    border-top: 0 !important;
+    border-radius: 0;
+    box-shadow: none;
+    color: #333;
+    height: 34px;
+    padding: 6px 12px;
+    font-size: 14px;
+    line-height: 1.42857143;
+}
 
 .appTypesContainer {
 	float: right;
@@ -3657,6 +3773,7 @@ background: none;
     height: 626px;
     margin-top: 20px;
     padding: 0 6px 0 6px;
+    overflow: scroll;
 }
 .qcTreeContainer ul, .qcN68TreeContainer ul{padding: 0 !important;}
 .qcTreeContainer ul label{margin-left: 10px;}

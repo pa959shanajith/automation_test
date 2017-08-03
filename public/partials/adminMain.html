@@ -97,13 +97,13 @@
 					</div>
 				</div>
 				
-				<!-- Secondary role  -->
-				<!-- <div>
+				<!-- Secondary role  
+				 <div>
 					<div class="col-xs-6 selectRole">
 						<label class="leftControl primaryRole">Additional Role</label> 
 						<select class='adminSelect form-control'
 							x-ng-model="addrole" id="additionalRoles"
-							class="form-control rightControl selectControl">
+							class="form-control rightControl selectControl" multiple="multiple">
 							<option value="" disabled selected>Select additional Role</option>
 						</select> <span ng-show="additionalRoleRequired" class="error-msg ng-cloak errorlbl">{{additionalRoleRequired}}</span>
 					</div>
@@ -176,20 +176,24 @@
 						<label class="leftControl primaryRole">Primary Role</label> 
 						<select class='adminSelect form-control'
 							x-ng-model="role" id="userRoles"
-							class="form-control rightControl selectControl" disabled>
+							class="form-control rightControl selectControl">
 							<option value="" disabled selected>Select User Role</option>
 						</select> <span ng-show="roleRequired" class="error-msg ng-cloak errorlbl">{{roleRequired}}</span>
 					</div>
 				</div>
 				<!-- Secondary role  -->
-				<div>
-					<div style='display:none;' class="col-xs-6 selectRole">
-						<label class="leftControl primaryRole">Additional Role</label> 
-						<select class='adminSelect form-control'
-							x-ng-model="addrole" id="additionalRoles"
+			     <div>
+					<div class="col-xs-6 selectRole">
+						<label class="leftControl secondaryRole">Additional Role: </label>
+						<label class="chooseRole dropdown-toggle" id="additionalRole_options" data-toggle="dropdown"> Select Additionalrole</label>
+						<ul class="dropdown-menu-multiselect" id="additionalRoles">
+						</ul>
+						<!--<select class='adminSelect form-control multiselect-ui'
+							x-ng-model="addrole" id="additionalRoles" multiple="multiple"
 							class="form-control rightControl selectControl">
 							<option value="" disabled selected>Select additional Role</option>
-						</select> <span ng-show="additionalRoleRequired" class="error-msg ng-cloak errorlbl">{{additionalRoleRequired}}</span>
+						</select>  -->
+						<span ng-show="additionalRoleRequired" class="error-msg ng-cloak errorlbl">{{additionalRoleRequired}}</span>
 					</div>
 				</div>
 				<!-- Secondary role -->
@@ -217,9 +221,9 @@
 					<select class="adminSelect form-control" style="width: 91%" id="selDomain">
 						<option value="" disabled selected>Please Select Your Domain</option>
 					</select> -->
-				<label class='domainTxt' style="margin-left: 11px;">Domain :</label>		
-					<input type="text" id="selDomain" name="projectName"		
-						readonly="readonly" 		
+					<label class='domainTxt' style="margin-left: 11px;">Domain :</label>
+					<input type="text" id="selDomain" name="projectName"
+						readonly="readonly" 
 						placeholder="Domain Name">
 					<span ng-show="domainNameRequired" class="error-msg ng-cloak errorlbl">{{domainNameRequired}}</span>
 				</div>
@@ -326,6 +330,7 @@
 					<select class="adminSelect form-control selectDomain" style="width: 91%" id="selAssignProject">
 						<option value="" disabled selected>Please Select Your Domain</option>
 					</select> -->
+					
 					<span ng-show="domainNameRequired" class="error-msg ng-cloak errorlbl">{{domainNameRequired}}</span>
 				</div>
 			</div>
@@ -401,8 +406,10 @@
 					<select class="adminSelect form-control" style="width: 91%" id="selDomainEdit">
 						<option value="" disabled selected>Please Select Your Domain</option>
 					</select> -->
-					<label class='domainTxt' style="margin-left: -1px;">Domain  </label>		
-					<input type="text" id="selDomainEdit" name="projectName" readonly="readonly" placeholder="Domain Name">
+					<label class='domainTxt' style="margin-left: -1px;">Domain  </label>
+					<input type="text" id="selDomainEdit" name="projectName"
+						readonly="readonly"
+						placeholder="Domain Name">
 					<span ng-show="domainNameRequired" class="error-msg ng-cloak errorlbl">{{domainNameRequired}}</span>
 				</div>
 				<div class='userForm adminControl'>
@@ -526,7 +533,7 @@
 						<td><input type="checkbox" value="" class='module_admin'></td>
 						<td><input type="checkbox" value="" class='module_admin'></td>
 						<td><input type="checkbox" value="" checked = "checked" class='module_admin'></td>
-					</tr>
+					</tr>					
 					</tbody>
 				</table>
 				</div>

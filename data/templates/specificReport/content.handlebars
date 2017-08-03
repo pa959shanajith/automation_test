@@ -7,18 +7,6 @@
         <script type="text/javascript" src="{#asset jquery.min.js @encoding=link}"></script>
         <script>
 			setTimeout(function(){
-				if($("#overAllStat").text() == "Pass"){$("#overAllStat").css('color','green')}
-				else if($("#overAllStat").text() == "Fail"){$("#overAllStat").css('color','red')}
-				else if($("#overAllStat").text() == "Terminate"){$("#overAllStat").css('color','#faa536')}
-				var getStatus = $('.reportdetailsrow');
-				for(i=0; i<getStatus.length; i++){
-					if(getStatus[i].getElementsByClassName("rDstatus")[0].innerHTML == "Pass"){getStatus[i].getElementsByClassName("rDstatus")[0].style.color = "green"}
-					else if(getStatus[i].getElementsByClassName("rDstatus")[0].innerHTML == "Fail"){getStatus[i].getElementsByClassName("rDstatus")[0].style.color = "red"}
-					else if(getStatus[i].getElementsByClassName("rDstatus")[0].innerHTML == "Terminate"){getStatus[i].getElementsByClassName("rDstatus")[0].style.color = "#faa536"}
-					if(getStatus[i].getElementsByClassName("rDstepDes")[0].innerHTML.indexOf("Testscriptname") !== -1 || getStatus[i].getElementsByClassName("rDstepDes")[0].innerHTML.indexOf("TestCase Name") !== -1){
-						getStatus[i].getElementsByClassName("rDstepDes")[0].style.fontWeight = "bold";
-					}
-				}
 				if($('.reportsDetail .reportdetailsrow').length < 12){
 					$('.rDstep').css('width','10.1%');
 					$('.rDstepDes').css('width','49.6%');
@@ -82,6 +70,14 @@
                         }
                     })
                 })
+
+                $(".rDstatus").each(function() {
+                    if($.trim($(this).text()) == "")
+                    {
+                        $(this).css("pointer-events","none");
+                    }
+                });
+
 
 				$(document).on('click', '.openscreenshot', function(){
 					var path = $(this).attr("data-screenshot");
@@ -360,7 +356,7 @@
                                 <label>Start Date and Time :</label><span id="startTime"><b>{{StartTime}}</b></span>
                             </td>
                             <td rowspan="3">
-                                <label>Status :</label><span id="overAllStat"><span style="color:Green;"></span><b>{{overAllStatus}}</b></span>
+                                <label>Status :</label><span id="overAllStat" style="color:{{getColor overAllStatus}}"><span></span><b>{{overAllStatus}}</b></span>
                             </td>
                         </tr>
                         <tr>
@@ -393,8 +389,8 @@
                     <div style="width: 100%; display: table;" class="reportdetailsrow" data-id={{id}} data-parentid={{parentId}}>
                         <div class="rDid tabCont">{{slno}}</div>
                         <div class="rDstep tabCont">{{Step}}</div>
-                        <div class="rDstepDes tabCont" style="padding-left: 10px;">{{StepDescription}}</div>
-                        <div class="rDstatus tabCont openscreenshot"  data-screenshot={{screenshot_path}}>{{status}}</div>
+                        <div class="rDstepDes tabCont" style="padding-left: 10px; font-weight:{{getStyle StepDescription}}">{{StepDescription}}</div>
+                        <div class="rDstatus tabCont openscreenshot"  style="color:{{getColor status}}" data-screenshot={{screenshot_path}}>{{status}}</div>
                         <div class="rDellaps tabCont">{{EllapsedTime}}</div>
                         <div class="rDcomments tabCont" style="padding-left: 10px;">{{Comments}}</div>
                     </div>

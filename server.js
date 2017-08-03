@@ -100,7 +100,7 @@ if (cluster.isMaster) {
     });
 
     //Only Test Engineer and Test Lead have access
-    app.get(/^\/(design|designTestCase|execute|scheduling)$/, function(req, res){
+    app.get(/^\/(design|designTestCase|execute|scheduling|p_QualityCenter)$/, function(req, res){
         if(!req.session.defaultRole || req.session.defaultRole == "Admin" || req.session.defaultRole == "Business Analyst" || req.session.defaultRole == "Tech Lead" || req.session.defaultRole == "Test Manager")
         {
             req.session.destroy(); res.status(401).send('<br><br>Your session has been expired.Please <a href="/">Login</a> Again');
@@ -110,7 +110,7 @@ if (cluster.isMaster) {
     });
 
     //Test Engineer,Test Lead and Test Manager can access
-    app.get(/^\/(specificreports|home|p_Utility|p_Reports|plugin)$/, function(req, res){
+    app.get(/^\/(specificreports|home|p_Utility|p_Reports|plugin|p_QualityCenter)$/, function(req, res){
         if (!req.session.defaultRole || req.session.defaultRole == "Admin" || req.session.defaultRole == "Business Analyst" || req.session.defaultRole == "Tech Lead")
         {
             req.session.destroy(); res.status(401).send('<br><br>Your session has been expired.Please <a href="/">Login</a> Again');
@@ -190,6 +190,7 @@ if (cluster.isMaster) {
     var header = require('./server/controllers/header');
     var plugin = require('./server/controllers/plugin');
     var utility = require('./server/controllers/utility');
+    var qc = require('./server/controllers/qualityCenter');
     //Login Routes
     app.post('/authenticateUser_Nineteen68', login.authenticateUser_Nineteen68);
     app.post('/authenticateUser_Nineteen68_CI', login.authenticateUser_Nineteen68_CI);
@@ -227,6 +228,9 @@ if (cluster.isMaster) {
     app.post('/getTestcaseDetailsForScenario_ICE', suite.getTestcaseDetailsForScenario_ICE);
     app.post('/ExecuteTestSuite_ICE_CI', suite.ExecuteTestSuite_ICE_CI);
     //app.post('/readTestScenarios_ICE', suite.readTestScenarios_ICE);
+    //Scheduling Screen Routes
+    /*app.post('/testSuitesScheduler_ICE', suite.testSuitesScheduler_ICE);
+    app.post('/getScheduledDetails_ICE', suite.getScheduledDetails_ICE);*/
     //Report Screen Routes
     app.post('/getAllSuites_ICE', report.getAllSuites_ICE);
     app.post('/getSuiteDetailsInExecution_ICE', report.getSuiteDetailsInExecution_ICE);
@@ -248,8 +252,12 @@ if (cluster.isMaster) {
     app.post('/getTaskJson_Nineteen68', plugin.getTaskJson_Nineteen68);
     //Utility plugins
     app.post('/Encrypt_ICE', utility.Encrypt_ICE);
-
-
+    //QC Plugin
+    app.post('/loginQCServer_ICE', qc.loginQCServer_ICE);
+    app.post('/qcProjectDetails_ICE', qc.qcProjectDetails_ICE);
+    app.post('/qcFolderDetails_ICE', qc.qcFolderDetails_ICE);
+    app.post('/saveQcDetails_ICE', qc.saveQcDetails_ICE);
+    app.post('/viewQcMappedList_ICE', qc.viewQcMappedList_ICE);
 
     //-------------SERVER START------------//
     //server.listen(3000);      //Http Server

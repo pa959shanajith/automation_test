@@ -1,0 +1,222 @@
+<!--Header-->
+<header header></header>
+<!--Header-->
+
+<!--Content Area-->
+<section class="container-fluid container-fluid-inner">
+	<!--Left Panel-->
+	<div id="left-nav-section">
+		<div class="scrollbar-macosx">
+			<div id="left-top-section" style='border-bottom: 0px !important'>
+				<ul>
+					<li><span><a class='scrapeOnTxt'>QC Integration</a></span></li>
+					<li><a id='testPlanTab' ng-click="tab = 'testPlan'; hideMappedFilesTab(); loadDomains();" title="Test Plan" class="selectBrowser">
+						<span><img src='imgs/testplan.png' class='selectedIcon' alt='Test Plan' /></span>Test Plan</a></li>
+					<li><a id='TestLabTab' ng-click="tab = 'testLab'" title="Test Lab" class="selectBrowser" style="display: none;">
+						<span><img src='imgs/testlab.png' alt='Test Lab' /></span>Test Lab</a></li>
+					<li><a id='reportTab' ng-click="tab = 'reportTab'" title="Report" class="selectBrowser" style="display: none;">
+						<span><img src='' alt='Report' /></span>Report</a></li>
+				</ul>
+			</div>
+			<div class='clear-both'></div>
+		</div>
+	</div>
+	<!--Left Panel-->
+	
+	<!--Middle Panel-->
+	<div id="middle-content-section">
+		<!-- Test Plan -->
+		<div ng-if="tab == 'testPlan'" style="height: 100%;">
+			<!--Task Name-->
+			<div id="page-taskName">
+				<span>QC Integration</span>
+			</div>
+			<!--Task Name-->
+			<!-- Button -->
+			<div class="qcActionBtn">
+				<a class="viewMapbtn" ng-click="displayMappedFilesTab()" title="View Mapped Files">View Mapped Files</a>
+				<button class="saveQcbtn" ng-click="mapTestcaseToN68()" title="Save">Save</button>
+			</div>
+			<!-- Button -->
+			<!-- Action area -->
+			<div class="leftQcStructure">
+				<div class="qcDomProContainer">
+					<select class="qcSelectDomain"><option value="" selected>Select Domain</option></select>
+					<select class="qcSelectProject"><option value="" selected>Select Project</option></select>
+				</div>
+				<div class="qcTreeContainer"></div>		
+			</div>
+			<div class="rightQcStructure">
+				<div class="qcProContainer">
+					<select class="qcN68SelectProject"><option value="" selected>Select Project</option></select>
+				</div>
+				<div class="qcN68TreeContainer"></div>	
+			</div>
+			<!-- Action area -->
+			<!-- Map Files -->
+			<div class="mappedFiles scrollbar-inner" style="display: none;">
+			</div>
+			<!-- Map Files -->
+		</div>
+		<!-- Test Plan -->
+		
+		<!-- Test Lab -->
+		<div class="containerWrap" ng-if="tab == 'testLab'">
+			<!--Task Name-->
+			<div id="page-taskName">
+				<span>Test Lab</span>
+			</div>
+			<!--Task Name-->
+			
+			<!-- Button -->
+			<div class="adminActionBtn">
+				<button class="btn btn-md pull-right adminBtn" ng-click="updateUser()" title="Update User">Update</button>
+			</div>
+			<!-- Button -->
+			
+			<!--  Form -->
+			<div class="col-xs-9 form-group adminForm">
+				
+			</div>
+			<!--  Form -->
+		</div>
+		<!-- Test Lab -->
+
+		<!-- Reports -->
+		<div class="containerWrap" ng-if="tab == 'reportTab'">
+			<!--Task Name-->
+			<div id="page-taskName">
+				<span>Report</span>
+			</div>
+			<!--Task Name-->
+			<div class="adminActionBtn">
+				<!-- <button title="Save" class="btn btn-md pull-right adminBtn" ng-click="assignProjects()" style="margin-right:10px">Save</button> -->
+			</div>
+			<div class="col-xs-9 form-group" style="width: 83%">
+				
+			</div>
+		</div>
+		<!-- Reports -->
+	</div>
+	<!--Middle Panel-->
+
+	<!--Right Panel-->
+	<div id="right-dependencies-section">
+		<!--Images Blocks-->
+		<div class="thumbnail thumbnail-custom">
+			<a class="slidePopup"> <img class="thumb-ic" title="Info"
+				src="imgs/ic-info.png" alt="Project Info">
+				<div class="caption">
+					<p>Info</p>
+				</div>
+			</a>
+			<!--Popup-->
+			<div tabindex="0" id="window-pi" class="popupWrap">
+				<h4 class="h4-custom closePopup">
+					Information <img class="closePopup pull-right"
+						src="imgs/ic-arrow.png" />
+				</h4>
+				<div class="popupContent projectInfoWrap"></div>
+			</div>
+			<!--Popup-->
+		</div>
+		<!--Images Blocks-->
+
+		<!--Images Blocks-->
+		<div class="thumbnail thumbnail-custom thumbnail-custom-wiki">
+			<a class="slide_popup slide_assist" href="#" title="Assist"> <img
+				class="thumb-ic" src="imgs/ic-assist.png" alt="Assist">
+				<div class="caption">
+					<p>Assist</p>
+				</div>
+			</a>
+			<!--Popup-->
+			<div id="assistWindow" class="assistWrap">
+				<h4 class="h4-custom h4-custom-assist">
+					<span class="assist-left pull-left"> <img
+						src="imgs/ic-message.png" />Assist
+					</span> <span class="assist-right pull-right"> <img
+						src="imgs/ic-up.png" class="animateAssistUp"
+						style="margin-right: 10px" /> <img src="imgs/ic-close.png"
+						class="animateAssistClose" />
+					</span>
+				</h4>
+				<div class="assistContent">
+					<!-- Chat Container -->
+					<div
+						class="chatContainer scrollbar-inner scrollbar-chatArea chatArea">
+						<ul class="chatList">
+							<li>Choose from the available browser icons from the action
+								bar</li>
+							<li>Enter the URL of the AUT (Application under test)</li>
+							<li>Click on one of the options available in the Scrape
+								Options window</li>
+							<li>Identify the required objects</li>
+							<li>Rename the objects as per the naming convention</li>
+							<li>Click on the save button in the work area</li>
+							<li>Click on submit to complete task.</li>
+						</ul>
+					</div>
+
+					<div class="chatContainer">
+						<textarea rows="3" cols="" class="chatTextArea form-control"
+							placeholder="Ask Prof.J"></textarea>
+						<button class="btn btn-md pull-right" title="Send">Send</button>
+					</div>
+					<!-- Chat Container -->
+				</div>
+			</div>
+			<!--Popup-->
+		</div>
+		<!--Images Blocks-->
+	</div>
+	<!--Right Panel-->
+</section>
+<!--Content Area-->
+
+<!--Footer-->
+<footer footer id="footer" class="footer-global"></footer>
+<!--Footer-->
+
+<!-- Edit Global Model  -->
+<div class="modal fade" id="globalModal" role="dialog" data-keyboard="false" data-backdrop="static">
+	<div class="modal-dialog modal-sm">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">&times;</button>
+				<h4 class="modal-title"></h4>
+			</div>
+			<div class="modal-body">
+				<p></p>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Ok</button>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- Edit Global Model  -->
+
+<!-- QC Login Popup -->
+	<div class="modal fade" id="loginToQCpop" role="dialog" data-keyboard="false" data-backdrop="static">
+		<div class="modal-dialog modal-md">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" ng-click="goBacktoPlugin()">&times;</button>
+					<h4 class="modal-title">QC Login</h4>
+				</div>
+				<div class="modal-body">
+					<div class="leftAlign">
+						<p><input class='launchPopupInput form-control' type='text' placeholder='Enter QC URL' id='qcName'/></p>
+						<p><input class='launchPopupInput form-control' type='text' placeholder='Enter User Name' id='qcUserName'/></p>
+						<p><input class='launchPopupInput form-control' type='password' placeholder='Enter Password' id='qcPwd'/></p>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<span id="qcErrorMsg" style="color: red; float: left; margin-left: 15px; margin-top: 5px;"></span>
+					<button type="button" class="btn btn-default btn-default-modal" ng-click="loginQCServer()">Submit</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- QC Login Popup -->

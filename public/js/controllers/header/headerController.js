@@ -1,11 +1,12 @@
 /**
  * 
  */
-var userDetails,userRole,task;
+var userDetails,userRole,task,switchedRoleId;
 var projectId = []
 var releaseId = [];
 var cycleId = [];
-mySPA.controller('headerController', function($scope,$http,$location,headerServices,cfpLoadingBar) {
+var selectedROleID;	
+mySPA.controller('headerController', function($scope,$http,$location,headerServices,LoginService,cfpLoadingBar) {
 	if(window.localStorage['_UI'])
 	{
 		userDetails = JSON.parse(window.localStorage['_UI']);
@@ -20,6 +21,15 @@ mySPA.controller('headerController', function($scope,$http,$location,headerServi
 		$("#naviPg").css("cursor", "default");
 	}
 
+	//Global model popup
+	function openModelPopup(title, body){
+		$("#switchRoleModal").find('.modal-title').text(title);
+		$("#switchRoleModal").find('.modal-body p').text(body);
+		$("#switchRoleModal").modal("show");
+		setTimeout(function(){
+			$("#switchRoleModal").find('.btn-default').focus();			
+		}, 300);
+	}
 
 	$(document).on("click", "#naviPg", function(e){
 		if(userRole == 'Admin')
@@ -27,23 +37,132 @@ mySPA.controller('headerController', function($scope,$http,$location,headerServi
 			//window.location.href = '/admin';
 		}
 		else{
-			//window.localStorage["_VP"] = true;
+			window.localStorage["_VP"] = true;
 			window.localStorage['navigateScreen'] = "plugin";
-			window.location.assign('plugin');
+			//window.location.assign('plugin');
+			window.location.href = '/plugin';
 		}
 
 	});
-	$scope.switchRole_Yes = function () 
-	{
-		//window.location.href = '/plugin';
-		$("#dialog-changeRole").modal("show");
+
+	var additionalRoleName;
+	var userId = JSON.parse(window.localStorage['_UI']).user_id;
+
+	$(document).on('click', ".switchRole_confirm",function() {
+		additionalRoleName = $(this).text(); 
+		selectedROleID = $(this).valueOf("outerHTML").data("id");
+		console.log($(this).text());
+		openModelPopup("Switch Role", "Are you sure you want to switch role to: "+additionalRoleName);
+				
+		//$("#switchRoleModal").modal("show");
+	})
+
+	//$(document).on('click', ".switchRole_confirm",
+	$scope.switchedRole = function() {
+		//additionalRoleName = $(this).text(); 
+		//selectedROleID = $(this).valueOf("outerHTML").data("id");
+		//console.log($(this).text());
+		//openModelPopup("Switch Role", "Your role is changed to "+additionalRoleName);
+		changedRole =  $('#changedRole');	
+		changedRole.append($("<p>Your role is changed to "+ additionalRoleName +"</p>"))
 		$("#switchRoleModal").modal("hide");
-		
+		$("#switchedRoleModal").modal("show");
 	}
-	
+
+
 	$scope.Switch_Role = function(){
 		
+		//var userId = JSON.parse(window.localStorage['_UI']).user_id;
+		var username = JSON.parse(window.localStorage['_UI']).username;
+		var userRolesList;
+		var selRole;
+			LoginService.loadUserInfo_Nineteen68(username,selRole,false)
+			.then(function (response) {
+				if(response == "Invalid Session"){
+								window.location.href = "/";
+								}
+				var roleasarray=[];
+				//roleasarray.push(response.additionalrole);
+				var roleasarray = response.additionalrole;
+				console.log(roleasarray);
+				LoginService.getRoleNameByRoleId_Nineteen68(roleasarray)
+									.then(function (data) {
+									
+				  if(response == "Invalid Session"){
+					window.location.href = "/";
+				  }
+				  else if(data.length == 0){
+					  $("#noRoles").modal("show");
+				  }
+				  else{
+					  //alert("success"); $(this).valueOf("outerHTML").data("id")
+					   getAdditionalRoles = $('#switchRoles');
+						getAdditionalRoles.empty();
+						for (var i = 0; i < data.length; i++) {
+							if($('#switchRole').val() != response){
+								getAdditionalRoles.append($("<li class='switchRole_confirm' data-id="+ response.additionalrole[i] +" ><a href='#' data-toggle='modal' id="+ response.additionalrole[i] +" data-target='#switchRoleModal'>"+ data[i] +"</a></li>"));
+								// selectedROleID = $(this).valueOf("outerHTML").data("id");
+							}
+						}
+				  }
+					
+				});
+				window.localStorage['_R'] = response.r_ids;
+			
+			}, function (error) { console.log("Error:::::::::::::", error) })
+				
 	}
+
+	$scope.switchRole_Yes = function () 
+	{
+		var currentRole = window.localStorage['_SR'];
+		var username = JSON.parse(window.localStorage['_UI']).username;
+		var selRole = selectedROleID;
+
+		LoginService.loadUserInfo_Nineteen68(username,selRole,true)
+			.then(function (data) {
+				if(data != "fail"){
+					//To be removed - Has to come from database
+						var availablePlugins = [];
+						var key = ["Dashboard", "Dead Code Identifier", "Mindmap", "Neuron 2D", "Neuron 3D", "Oxbow Code Identifier", "Reports"];
+						for(i=0; i<data.plugindetails.length; i++){
+						availablePlugins.push({
+							"pluginName" : key[i],
+							"pluginValue" : data.plugindetails[i].keyValue
+						})
+					}
+						availablePlugins.push({
+							"pluginName" : "Utility",
+							"pluginValue" : "true"
+						})
+							data.pluginsInfo = availablePlugins;
+							//window.localStorage['LoginSuccess'] = "True";
+							window.localStorage['_SR'] = additionalRoleName;
+							window.localStorage['_UI'] = JSON.stringify(data);
+							var roleasarray=[];
+							roleasarray.push(selectedROleID);
+							LoginService.getRoleNameByRoleId_Nineteen68(roleasarray)
+							.then(function (data) {
+								if(data != "fail"){
+									window.localStorage['_SR'] = data;
+									if(data == "Admin"){
+										window.localStorage['navigateScreen'] = "admin";
+										window.location.href = "/admin";
+										}
+									else{
+										window.localStorage['navigateScreen'] = "plugin";
+										window.location.href = "/plugin";
+									}											
+								}
+								else	console.log("Fail to get role name by role Id.");
+									}, function (error) { console.log("Fail to Load UserInfo") });									
+							window.location.href = "/plugin";	
+							}
+								else	console.log("Failed to Load UserInfo.");
+							}, function (error) { console.log("Fail to Load UserInfo") });
+
+	}
+	
 	/*if(window.localStorage['_CT'])
 	 {
 			   projectId =  JSON.parse(window.localStorage['_CT']).projectId;
@@ -108,4 +227,3 @@ mySPA.controller('headerController', function($scope,$http,$location,headerServi
 		}, function(error) {	console.log("Failed to Logout")});
 	}
 });
-

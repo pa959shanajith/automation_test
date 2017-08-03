@@ -4,7 +4,8 @@
 var Joi = require('joi');
 var dbConn = require('../../server/config/icetestautomation');
 var cassandra = require('cassandra-driver');
-
+var client_cas = require('../../server/config/cassandra');		
+var async = require('async');
 
 exports.getProjectDetails_ICE = function (req, res) {
 	if(req.cookies['connect.sid'] != undefined)
@@ -158,5 +159,182 @@ exports.getCycleNameByCycleId_ICE = function (req, res) {
 		}
 		else{
 		res.send("Invalid Session");
+	}
+}
+//Get Additional roles		
+var secondaryRoles ={};		
+var r_ids = [];		
+exports.getAdditionalRoles_Nineteen68 = function(req, res){		
+	try{		
+		if(req.cookies['connect.sid'] != undefined)		
+		{		
+			var sessionCookie = req.cookies['connect.sid'].split(".");		
+			var sessionToken = sessionCookie[0].split(":");		
+			sessionToken = sessionToken[1];		
+		}		
+			if(sessionToken != undefined && req.session.id == sessionToken)		
+		{		
+         var userID = userId;		
+				
+		var getAdditionalRoles = "select additionalroles from users where userid="+userID+";"		
+		client_cas.execute(getAdditionalRoles, function (err, result) {		
+			if (err) {		
+				res.send("fail");		
+			}		
+			else {		
+				try{		
+					var rolename = [];		
+					var roleid = [];		
+					//var roleName = [];		
+					//var roleID = [];		
+					secondaryRoles = result.rows[0].additionalroles;		
+					//for(i=0;i<secondaryRoles.length;i++){		
+					async.forEachSeries(secondaryRoles,function(iterator,callback2){		
+					var obj = {"name":'',"id":''}		
+					var getNamesOfRoles = "select rolename from roles where roleid="+iterator+";"		
+							
+					client_cas.execute(getNamesOfRoles, function (err, result) {		
+	                    		
+			              		
+						  //rolename.push(result.rows[0].rolename);		
+						  //roleid.push(iterator);		
+						  obj["name"] = result.rows[0].rolename;		
+						  obj["id"] = iterator;		
+						  rolename.push(obj);		
+						  //console.log("inside async:",rolename);		
+						  callback2();		
+						  		
+					})		
+							
+				},function(){		
+							
+					if (typeof rolename === 'undefined') {		
+								var flag = "fail";		
+								console.log(rolename);		
+								res.send(flag); 		
+							}		
+							else {		
+								flag = "success";		
+								console.log(rolename);		
+								res.send(rolename);		
+							}		
+				})		
+				//}		 		
+					//res.send(secondaryRoles);		
+				}catch(exception){		
+					console.log(exception);		
+					res.send("fail");		
+				}		
+			}		
+		});		
+	}		
+	else{		
+		res.send("Invalid Session");		
+	}		
+	}catch(exception){		
+		console.log(exception);		
+		res.send("fail");		
+	}		
+}		
+exports.modifyRoles_Nineteen68 = function(req, res){		
+		try{		
+		if(req.cookies['connect.sid'] != undefined)		
+		{		
+			var sessionCookie = req.cookies['connect.sid'].split(".");		
+			var sessionToken = sessionCookie[0].split(":");		
+			sessionToken = sessionToken[1];		
+		}		
+		if(sessionToken != undefined && req.session.id == sessionToken){		
+			var selected_RoleName = req.body.additionalRoleName;		
+			var selected_RoleID = req.body.selectedROleID;		
+			var current_Rolename = req.body.currentRole;		
+			var userID = req.body.userId;		
+			if(selected_RoleName == current_Rolename){		
+				res.send("Invalid");		
+			}		
+			else{		
+				var data = {"roleName":'',"roleId":''}			
+				var roleChanges = [];									
+				var updateCurrentRole = "update users set role="+selected_RoleID+" where userid="+userID+";"		
+		        client_cas.execute(updateCurrentRole, function (err, result){		
+					if(result === undefined){		
+						res.send("Invalid Session");		
+					}		
+					else{		
+						data["roleName"] = selected_RoleName;		
+						data["roleId"] = selected_RoleID;		
+						roleChanges.push(data);		
+					}		
+					res.send(data);		
+			})		
+			}		
+					
+		}		
+		}catch(exception){		
+		console.log(exception);		
+		res.send("fail");		
+	}		
+}		
+exports.userPlugins_Nineteen68 = function(req, res){		
+		try{		
+		if(req.cookies['connect.sid'] != undefined)		
+		{		
+			var sessionCookie = req.cookies['connect.sid'].split(".");		
+			var sessionToken = sessionCookie[0].split(":");		
+			sessionToken = sessionToken[1];		
+		}		
+		if(sessionToken != undefined && req.session.id == sessionToken){		
+			var username = req.body.username;		
+			var roleName = req.body.rolename;		
+			var roleID = req.body.roleId;		
+			//display plugins		
+					
+			try{		
+	            		var getUserPlugins = "select dashboard,deadcode,mindmap,neuron2d,neuron3d,oxbowcode,reports from userpermissions WHERE roleid = "+roleID+" allow filtering";		
+	                	client_cas.execute(getUserPlugins, function(err, pluginResult){		
+	                		if(err){		
+	                			console.log("Error occured in loadUserInfo_Nineteen68 : Fail");		
+	                			res.send("fail");		
+	                		}		
+	                		else{		
+								var pluginsArr = [];		
+	                			try{		
+		                			if(pluginResult.rows.length > 0){		
+								    var objKeys = Object.keys(pluginResult.rows[0]);		
+								    // var pluginsArr = [];		
+								    var count = 0;		
+								    for(var k in pluginResult.rows[0]){		
+								    	if(count < pluginResult.columns.length){		
+								    		pluginsArr.push({		
+								    			"keyName" : k,		
+								    			"keyValue" : (pluginResult.rows[0])[k]		
+								    		})		
+								    		count++;		
+								    	}		
+								    }		
+		                			//userpermissiondetails.push(pluginResult.rows[0]);		
+		                			// jsonService.plugindetails = pluginsArr		
+		                			}		
+		                			else{		
+		                				console.log("No Records Found");		
+		                				res.send("fail");		
+		                			}		
+	                			}		
+	                			catch(exception){		
+	                				console.log(exception);		
+	                				res.send("fail");		
+	                			}		
+								res.send(pluginsArr);		
+	                		}		
+	                	})		
+	            	}		
+	            	catch(exception){		
+	            		console.log(exception);		
+	            		res.send("fail");		
+	            	}		
+		}		
+		}catch(exception){		
+		console.log(exception);		
+		res.send("fail");		
 	}
 }

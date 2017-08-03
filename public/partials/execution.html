@@ -49,9 +49,10 @@
 				<div><span class='parentBatchContainer'><input title='Select Batch' type='checkbox' class='checkStylebox checkParentBatch' /><span class='parentObject'>Select Batch</span></span></div>
 				<button class="btn btn-xs btn-xs-custom btnPanel" ng-click="updateTestSuite()"  title="Save">Save</button>
 				<button disabled class="btn btn-xs btn-xs-custom btnPanel"  title="Configure">Configure</button>
+				<button class="btn btn-xs btn-xs-custom btnPanel" id='syncScenario' ng-click="()"  title='Sync Test Scenario'><!--<img src='../imgs/ic-alm.png'/>-->ALM</button>
 				<button class="btn btn-md pull-right submitTaskBtn" ng-click="submitTaskExecution()"  title="Submit Task">Submit</button>
 				<button class="btn btn-md pull-right executeBtn" style="margin-right:10px" ng-click="ExecuteTestSuite()"  title="Execute">Execute</button>
-				<button disabled class="btn btn-md pull-right scheduleBtn" style="margin-right:10px"  title="Schedule">Schedule</button>
+				<!--<button disabled class="btn btn-md pull-right scheduleBtn" style="margin-right:10px"  title="Schedule">Schedule</button>-->
 			</div>
 			<!-- Table Buttons -->
 			
@@ -181,7 +182,7 @@
 <footer footer id="footer" class="footer-global"></footer>
 <!--Footer-->
 
-<!-- Save TestSuite Success -->
+<!-- Global Popup -->
 <div class="modal fade" id="executeGlobalModal" role="dialog" data-keyboard="false" data-backdrop="static">
 	<div class="modal-dialog modal-sm">
 		<div class="modal-content">
@@ -198,7 +199,7 @@
 		</div>
 	</div>
 </div>
-<!-- Save TestSuite Success -->
+<!-- Global Popup -->
 
 <!-- Execution Done -->
 <div class="modal fade" id="executionCompleted" role="dialog" data-keyboard="false" data-backdrop="static">
@@ -329,13 +330,13 @@
 					</p>
 					<p align="right">
 						<span class="error-msg-abs error-msg-abs2" ng-show="errorMessage2">{{errorMessage2}}</span>
-						<button type="button" class="btn btn-default btn-default-modal" ng-click="testConnection()">Connect</button>
+						<button type="button" class="btn btn-default btn-default-modal" ng-click="saveQcCredentials()" data-dismiss="modal">Save</button>
 					</p>
 				</div>
 				<!-- Top -->
 				
 				<!-- Bottom -->
-				<div class="textFieldsContainer">
+				<!--<div class="textFieldsContainer">
 					<p class="halfWrap" style="margin-right: 3%">
 						<input type="text" class="form-control form-control-custom" placeholder="Enter Domain Name" ng-model="almDomainName" id="almDomainName" />
 					</p>
@@ -355,7 +356,7 @@
 						<span class="error-msg-abs error-msg-abs2" ng-show="errorMessage3">{{errorMessage3}}</span>
 						<button type="button" class="btn btn-default btn-default-modal" ng-click="saveQcScenarioDetails()">Save</button>
 					</p>
-				</div>
+				</div>-->
 				<!-- Bottom -->
 				</div>
 			</div>
