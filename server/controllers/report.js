@@ -324,7 +324,7 @@ exports.getSuiteDetailsInExecution_ICE = function (req, res) {
 							startTime = new Date(executionData.rows[i].starttime);
 							endTime = new Date(executionData.rows[i].endtime);
 							starttime = startTime.getDate()+"-"+(startTime.getMonth()+1)+"-"+startTime.getFullYear()+" "+startTime.getHours()+":"+startTime.getMinutes();
-							endtime =  endTime.getDate()+"-"+(endTime.getMonth()+1)+"-"+endTime.getFullYear()+" "+endTime.getHours()+":"+endTime.getMinutes();
+							endtime =  endTime.getDate()+"-"+(endTime.getMonth()+1)+"-"+endTime.getFullYear()+" "+(endTime.getUTCHours())+":"+(+endTime.getUTCMinutes());
 							executionDetailsJSON.push({
 								execution_id :  executionData.rows[i].executionid,
 								start_time: starttime,
@@ -384,7 +384,7 @@ exports.reportStatusScenarios_ICE = function (req, res) {
 								try{
 									var executedtimeTemp = new Date(iterator.executedtime);
 									if(executedtimeTemp != null){
-										executedtimeTemp = executedtimeTemp.getDate()+"-"+(executedtimeTemp.getMonth()+1)+"-"+executedtimeTemp.getFullYear()+" "+executedtimeTemp.getHours()+":"+executedtimeTemp.getMinutes()+":"+executedtimeTemp.getSeconds();
+										executedtimeTemp = executedtimeTemp.getDate()+"-"+(executedtimeTemp.getMonth()+1)+"-"+executedtimeTemp.getFullYear()+" "+(executedtimeTemp.getUTCHours())+":"+(executedtimeTemp.getUTCMinutes())+":"+executedtimeTemp.getSeconds();
 									}						
 									var browserTemp = iterator.browser;
 									var statusTemp = iterator.status;
@@ -461,7 +461,7 @@ exports.reportStatusScenarios_ICE = function (req, res) {
 									if(report[k].executedtime != "")
 									{
 									report[k].executedtime = new Date(report[k].executedtime);
-									report[k].executedtime = report[k].executedtime.getDate()+"-"+(report[k].executedtime.getMonth()+1)+"-"+report[k].executedtime.getFullYear()+" "+report[k].executedtime.getHours()+":"+("0" + report[k].executedtime.getMinutes()).slice(-2)+":"+("0" + report[k].executedtime.getSeconds()).slice(-2) ;
+									report[k].executedtime = ("0"+report[k].executedtime.getDate()).slice(-2)+"-"+("0"+(report[k].executedtime.getMonth()+1)).slice(-2)+"-"+(report[k].executedtime.getFullYear())+" "+("0"+report[k].executedtime.getHours()).slice(-2)+":"+("0" + report[k].executedtime.getMinutes()).slice(-2)+":"+("0" + report[k].executedtime.getSeconds()).slice(-2) ;
 									}
 								}
 					}
