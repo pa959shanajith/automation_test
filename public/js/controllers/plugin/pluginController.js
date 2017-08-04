@@ -9,13 +9,12 @@ mySPA.controller('pluginController',['$scope','$window','$http','$location','$ti
 	if(window.localStorage['navigateScreen'] != "plugin")
 	{
 		window.location.href = "/";
-	}
+	} 
 	for(i=0; i<availablePlugins.length; i++){
 		if(availablePlugins[i].pluginValue != false){
 			$("#plugin-container").append('<div class="col-md-4 plugin-block"><span onclick="p_event(this.dataset.name)" data-name="p_'+availablePlugins[i].pluginName.replace(/\s/g,'')+'" id="'+availablePlugins[i].pluginName+'" title="'+availablePlugins[i].pluginName+'">'+availablePlugins[i].pluginName+'</span></div>').fadeIn()
 		}        
 	}
-	//$("#plugin-container").addClass("inactiveLink");
 	//Integration with Mindmaps
 	$(".plugin-block span").each(function() {
 		if($(this).text() == "RAID")
@@ -25,6 +24,7 @@ mySPA.controller('pluginController',['$scope','$window','$http','$location','$ti
 	});
 	/*window.localStorage["_VP"] = false;
 	window.localStorage["_VM"] = false;*/
+	$("#plugin-container").addClass("inactiveLink");
 	if(window.localStorage['_UI'])
 	{
 		var userInfo =  JSON.parse(window.localStorage['_UI']);
@@ -98,11 +98,11 @@ mySPA.controller('pluginController',['$scope','$window','$http','$location','$ti
 						  }
 						}
 					
-				//	$("#plugin-container").removeClass("inactiveLink");
+					$("#plugin-container").removeClass("inactiveLink");
 				}, function (error) { 
 					console.log("Error:::::::::::::", error);
 				})
-				$("#plugin-container").removeClass("inactiveLink");
+				//$("#plugin-container").removeClass("inactiveLink");
 			}	
 			else{
 				window.location.href = "/";
