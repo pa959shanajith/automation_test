@@ -2313,18 +2313,25 @@ $(document).on('cut copy paste','#userName', function(e){
 			setTimeout(function () {
 				var userEnteredText = $(element).val();  
 				//userEnteredText = userEnteredText.replace(/\s/g,"");
-					userEnteredText = userEnteredText.replace (/[[\]\~`!@#$%^&*()+={}|;:"',<>?/\s]/g ,"");
+					userEnteredText = userEnteredText.replace (/[\\[\]\~`!@#$%^&*()+={}|;:"',<>?/\s]/g ,"");
 				$(element).val(userEnteredText);
 			}, 5); 	
  });
 
 //All Special characters prevented for firstname & lastname on copy paste
 $(document).on('cut copy paste','.preventSpecialChar', function(e){ 
+			
 			var element = this;
 			setTimeout(function () {
 				var userEnteredText = $(element).val();  
+				if(e.target.id == 'projectName' || e.target.id == 'releaseTxt' || e.target.id == 'cycleTxt')
+				{
+					userEnteredText = userEnteredText.replace (/[-\\[\]\~`!@#$%^&*()+={}|;:"',.<>?/\s]/g ,"");
+				}
+				else{
+					userEnteredText = userEnteredText.replace (/[-\\0-9[\]\~`!@#$%^&*()-+={}|;:"',.<>?/\s_]/g ,"");
+				}
 				//userEnteredText = userEnteredText.replace (/[[\]\~`!@#$%^&*()-_+={}|;:"',.<>?/\s]_/g ,"");
-				userEnteredText = userEnteredText.replace (/[[\]\~`!@#$%^&*()-+={}|;:"',.<>?/\s_]/g ,"");
 				$(element).val(userEnteredText);
 			}, 5); 
  });
