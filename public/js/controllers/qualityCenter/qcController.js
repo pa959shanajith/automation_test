@@ -75,7 +75,7 @@ mySPA.controller('qcController',['$scope','$window','$http','$location','$timeou
 
 	$scope.hideMappedFilesTab = function(){
 		$(".mappedFiles").hide();
-		$("#page-taskName span").text("QC Integration");
+		$("#page-taskName span").text("ALM Integration");
 		$(".qcActionBtn, .leftQcStructure, .rightQcStructure").show();
 	}
 
@@ -86,10 +86,10 @@ mySPA.controller('qcController',['$scope','$window','$http','$location','$timeou
 			.then(function(data){
 				nineteen68_projects_details = data.nineteen68_projects;
 				if(data == "unavailableLocalServer"){
-					openModelPopup("QC Connection", "unavailableLocalServer")
+					openModelPopup("ALM Connection", "unavailableLocalServer")
 				}
 				else if(data == "Invalid Session"){
-					openModelPopup("QC Connection", "Invalid Session")
+					openModelPopup("ALM Connection", "Invalid Session")
 				}
 				else if(data){
 					$(".qcSelectProject").empty();

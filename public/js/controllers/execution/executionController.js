@@ -456,6 +456,7 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 			openDialogExe("Execute Test Suite", "Please select atleast one scenario(s) to execute");
 		}
 		else{
+			$scope.moduleInfo = [];
 			$.each($(".parentSuiteChk"), function(){
 				var suiteInfo = {};
 				var selectedRowData = [];
@@ -483,6 +484,7 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 					$scope.moduleInfo.push(suiteInfo);
 				}
 			});
+			$("#syncScenario").prop("disabled",true);
 		}
 	}
 
@@ -520,10 +522,11 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 		console.log("moduleInfo:::" + $scope.moduleInfo)
 		//moduleInfo.push(suiteInfo);
 		//Getting each row data as an object
-		if(appType != "SAP" && browserTypeExe.length == 0)	openDialogExe("Execute Test Suite", "Please select a browser")//$("#selectBrowserAlert").modal("show");
-		else if($(".exe-ExecuteStatus input:checked").length == 0) openDialogExe("Execute Test Suite", "Please select atleast one scenario(s) to execute")//$("#selectScenarioAlert").modal("show");
+		if(appType != "SAP" && browserTypeExe.length == 0)	openDialogExe("Execute Test Suite", "Please select a browser")
+		else if(appType == "SAP" && browserTypeExe.length == 0)	openDialogExe("Execute Test Suite", "Please select SAP Apps option")
+		else if($(".exe-ExecuteStatus input:checked").length == 0) openDialogExe("Execute Test Suite", "Please select atleast one scenario(s) to execute")
 		else{
-			if(appType == "SAP") browserTypeExe = ["1"];
+			//if(appType == "SAP") browserTypeExe = ["1"];
 			blockUI("Execution in progress. Please Wait...")
 			ExecutionService.ExecuteTestSuite_ICE($scope.moduleInfo)
 			.then(function(data){
@@ -549,6 +552,7 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 				browserTypeExe = [];
 				angular.element(document.getElementById("left-nav-section")).scope().readTestSuite_ICE();
 				$scope.moduleInfo = [];
+				$("#syncScenario").prop("disabled",false);
 			},
 			function(error){
 				unblockUI()
@@ -558,6 +562,7 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 				browserTypeExe = [];
 				angular.element(document.getElementById("left-nav-section")).scope().readTestSuite_ICE();
 				$scope.moduleInfo = [];
+				$("#syncScenario").prop("disabled",false);
 			})
 		}
 	}
@@ -566,17 +571,8 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 
 	//ALM Functionality
 	$(document).on("click", "#syncScenario", function(){
-		scenarioIdQC = $(this).parent().siblings("td:nth-child(3)").attr("sId")
 		$("#ALMSyncWindow").modal("show");
-		$("#almURL, #almUserName, #almPassword, #almDomainName, #almProjectName, #almTestSetName, #almTestCaseName, #almFolderPath").val('')
-		$("#almFolderPath").val('Root\\')
-		/*ExecutionServices.getQcScenarioDetails(scenarioIdQC)
-		.then(function(data) {
-			console.log(data)
-		},
-		function(error) {
-			console.log("Error while traversing executionController.js file testConnection method!! \r\n "+(error.data));
-		});*/
+		$("#almURL, #almUserName, #almPassword").val('')
 	})
 
 	$scope.testConnection = function(){
@@ -609,47 +605,6 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 			});*/
 		}
 	};
-
-	$scope.saveQcScenarioDetails = function(){
-		$scope.errorMessage3 = "";
-		$("#almDomainName, #almProjectName, #almTestSetName, #almTestCaseName, #almFolderPath").removeClass('inputErrorBorder')
-		if(!$scope.almDomainName) {
-			$scope.errorMessage3 = "Enter Domain Name";
-			$("#almDomainName").addClass('inputErrorBorder')
-		}
-		else if(!$scope.almProjectName){
-			$scope.errorMessage3 = "Enter Project Name";
-			$("#almProjectName").addClass('inputErrorBorder')
-		}
-		else if(!$scope.almTestSetName){
-			$scope.errorMessage3 = "Enter Testset Name";
-			$("#almTestSetName").addClass('inputErrorBorder')
-		}
-		else if(!$scope.almTestCaseName){
-			$scope.errorMessage3 = "Enter Testcase Name";
-			$("#almTestCaseName").addClass('inputErrorBorder')
-		}
-		else if(!$scope.almFolderPath){
-			$scope.errorMessage3 = "Enter Folder Name";
-			$("#almFolderPath").addClass('inputErrorBorder')
-		}
-		else{
-			$scope.errorMessage3 = "";
-			$("#almDomainName, #almProjectName, #almTestSetName, #almTestCaseName, #almFolderPath").removeClass('inputErrorBorder')
-			var domainName = $scope.almDomainName;
-			var projectName = $scope.almProjectName;
-			var testSetName = $scope.almTestSetName;
-			var testCaseName = $scope.almTestCaseName;
-			var folderPath = $scope.almFolderPath;
-			/*ExecutionServices.saveQcScenarioDetails(scenarioIdQC,domainName,projectName,testSetName,testCaseName,folderPath)
-			.then(function(data) {
-				console.log(data)
-			},
-			function(error) {
-				console.log("Error while traversing executionController.js file testConnection method!! \r\n "+(error.data));
-			});*/
-		}
-	}
 	//ALM Functionality
 
 
