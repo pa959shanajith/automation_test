@@ -230,7 +230,7 @@
 				<div class='userForm adminControl'>
 					<input type="text" id="projectName" name="projectName"
 						ng-model="projectName" maxlength="50"
-						class="form-control form-control-custom validationKeydown"
+						class="form-control form-control-custom validationKeydown preventSpecialChar"
 						placeholder="Project Name"><span
 						ng-show="projectNameRequired" class="error-msg ng-cloak errorlbl">{{projectNameRequired}}</span>
 				</div>
@@ -628,7 +628,7 @@
 				<h4 class="modal-title"></h4>
 			</div>
 			<div class="modal-body">
-				<p><input maxlength="50" type="text" class="form-control form-control-custom" placeholder="" id="" /></p>
+				<p><input maxlength="50" type="text" class="form-control form-control-custom preventSpecialChar" placeholder="" id="" /></p>
 			</div>
 			<div class="modal-footer">
 				<button id='' type="button" class="btn btn-default btnGlobalSave validationBlur">Save</button> 
