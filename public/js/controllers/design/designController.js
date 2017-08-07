@@ -206,14 +206,20 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 						else{
 							var testcase = JSON.parse(data.testcase);
 							var testcaseArray = [];
-							for(var i = 0; i < testcase.length; i++)	{
-								if(appType == "Webservice"){
-									if(testcase[i].keywordVal == "setHeader" || testcase[i].keywordVal == "setHeaderTemplate"){
-										testcase[i].inputVal[0] = testcase[i].inputVal[0].split("##").join("\n")
-									}
+							for(var i = 0; i < testcase.length; i++){								
+								if("comments" in testcase[i]){
+									delete testcase[i];
+									testcase =  testcase.filter(function(n){ return n != null });
 								}
-								testcase[i].stepNo = (i + 1).toString();
-								testcaseArray.push(testcase[i]);
+								else{									
+									if(appType == "Webservice"){
+										if(testcase[i].keywordVal == "setHeader" || testcase[i].keywordVal == "setHeaderTemplate"){
+											testcase[i].inputVal[0] = testcase[i].inputVal[0].split("##").join("\n")
+										}
+									}
+									testcase[i].stepNo = (i + 1).toString();
+									testcaseArray.push(testcase[i]);
+								}
 							}
 							console.log("readTestCase:::", testcaseArray)
 
@@ -1996,10 +2002,18 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					}
 				}
 				else if(appType == "MobileWeb"){
-					d.css('left', (rect.x - 2) + 'px');
-					d.css('top', (rect.y - 6)+ 'px');
-					d.css('height', rect.h + 'px');
-					d.css('width', rect.w + 'px');
+					if(navigator.appVersion.indexOf("Mac")!=-1){						
+						d.css('left', (rect.x + 15) + 'px');
+						d.css('top', (rect.y + 112) + 'px');
+						d.css('height', rect.h + 'px');
+						d.css('width', rect.w + 'px');
+					}
+					else{
+						d.css('left', (rect.x - 2) + 'px');
+						d.css('top', (rect.y - 6)+ 'px');
+						d.css('height', rect.h + 'px');
+						d.css('width', rect.w + 'px');
+					}
 				}
 				else if(appType == "SAP"){
 					d.css('left', (Math.round(rect.x) * scale_highlight) + 3 + 'px');
@@ -2019,7 +2033,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				d.css('opacity', '0.7');
 				getTopValue = Math.round(rect.y) * scale_highlight + 'px'
 				if(appType == "MobileApp" || appType == "MobileWeb")
-					$(".scroll-wrapper > .scrollbar-screenshot").animate({ scrollTop: parseInt(Math.round(rect.y) + 'px') },500);
+					$(".scroll-wrapper > .scrollbar-screenshot").animate({ scrollTop: parseInt(Math.round(rect.y) - 200) + 'px' },500);
 				else
 					$(".scroll-wrapper > .scrollbar-screenshot").animate({ scrollTop: parseInt(getTopValue) },500);
 				//$('.scroll-wrapper > .scrollbar-screenshot').scrollTo(d.offset().top);
@@ -2828,68 +2842,67 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				//#D5E7FF  DBF5DF
 				var serviceCallFlag = false;
 				var mydata = $("#jqGrid").jqGrid('getGridParam','data');
+				var getTR = $("#jqGrid tbody tr:visible td:nth-child(10)");
 				for(var i=0; i<mydata.length;i++){
-					//new to parse str to int (step No)
 					if(mydata[i].hasOwnProperty("_id_")){
 						if(mydata[i]._id_.indexOf('jpg') !== -1 || mydata[i]._id_.indexOf('jqg') !== -1){
 							var index = mydata.indexOf(mydata[i]);
-							mydata.splice(index, 1)
+							mydata.splice(index, 1);
 						}
-					}
-				}
-
-				for(var i=0; i<mydata.length;i++){
-					mydata[i].stepNo = i+1;
-					if(mydata[i].custname == undefined || mydata[i].custname == ""){
-						var stepNoPos = parseInt(mydata[i].stepNo);
-						openDialog("Save Testcase", "Please select Object Name at Step No. "+stepNoPos)
-						serviceCallFlag  = true;
-						break;
-					}
-					else{
-						//check - keyword column should be mandatorily populated by User
-						mydata[i].custname = mydata[i].custname.trim();
-						if(mydata[i].keywordVal == undefined || mydata[i].keywordVal == ""){
-							var stepNoPos = parseInt(mydata[i].stepNo);
-							openDialog("Save Testcase", "Please select keyword at Step No. "+stepNoPos)
-							serviceCallFlag  = true;
-							break;
-						}
-						else if(mydata[i].keywordVal == 'SwitchToFrame'){
-							if($scope.newTestScriptDataLS != "undefined" || $scope.newTestScriptDataLS != undefined){
-								var testScriptTableData = $scope.newTestScriptDataLS;
-								for(j=0;j<testScriptTableData.length;j++){
-									if(testScriptTableData[j].custname != '@Browser' && testScriptTableData[j].custname != '@Oebs' && testScriptTableData[j].custname != '@Window' && testScriptTableData[j].custname != '@Generic' && testScriptTableData[j].custname != '@Custom'){
-										if(testScriptTableData[j].url != ""){
-											mydata[i].url = testScriptTableData[j].url;
-											break;
+						else{
+							mydata[i].stepNo = i+1;
+							if(mydata[i].custname == undefined || mydata[i].custname == ""){
+								var stepNoPos = parseInt(mydata[i].stepNo);
+								openDialog("Save Testcase", "Please select Object Name at Step No. "+stepNoPos)
+								serviceCallFlag  = true;
+								break;
+							}
+							else{
+								//check - keyword column should be mandatorily populated by User
+								mydata[i].custname = mydata[i].custname.trim();
+								if(mydata[i].keywordVal == undefined || mydata[i].keywordVal == ""){
+									var stepNoPos = parseInt(mydata[i].stepNo);
+									openDialog("Save Testcase", "Please select keyword at Step No. "+stepNoPos)
+									serviceCallFlag  = true;
+									break;
+								}
+								else if(mydata[i].keywordVal == 'SwitchToFrame'){
+									if($scope.newTestScriptDataLS != "undefined" || $scope.newTestScriptDataLS != undefined){
+										var testScriptTableData = $scope.newTestScriptDataLS;
+										for(j=0;j<testScriptTableData.length;j++){
+											if(testScriptTableData[j].custname != '@Browser' && testScriptTableData[j].custname != '@Oebs' && testScriptTableData[j].custname != '@Window' && testScriptTableData[j].custname != '@Generic' && testScriptTableData[j].custname != '@Custom'){
+												if(testScriptTableData[j].url != ""){
+													mydata[i].url = testScriptTableData[j].url;
+													break;
+												}
+											}
 										}
 									}
 								}
+								if(mydata[i].keywordVal == "setHeader" || mydata[i].keywordVal == "setHeaderTemplate"){
+									if(typeof(mydata[i].inputVal) === "string"){
+										mydata[i].inputVal = mydata[i].inputVal.replace(/[\n\r]/g,'##');
+									}
+									else mydata[i].inputVal[0] = mydata[i].inputVal[0].replace(/[\n\r]/g,'##');
+								}
+								console.log("updateTestCase:::", mydata)
+							}
+							if(mydata[i].url == undefined){mydata[i].url="";}
+							if(mydata[i].remarks != undefined)
+							{	
+								if(  mydata[i].remarks != getTR[i].textContent  && getTR[i].textContent.trim().length > 0 )	{
+									if( mydata[i].remarks.length > 0 ){
+										mydata[i].remarks = mydata[i].remarks.concat( " ; " + getTR[i].textContent);
+									}
+									else{
+										mydata[i].remarks = getTR[i].textContent;
+									}
+								}
+							}
+							else{
+								mydata[i].remarks = getTR[i].textContent;
 							}
 						}
-						if(mydata[i].keywordVal == "setHeader" || mydata[i].keywordVal == "setHeaderTemplate"){
-							if(typeof(mydata[i].inputVal) === "string"){
-								mydata[i].inputVal = mydata[i].inputVal.replace(/[\n\r]/g,'##');
-							}
-							else mydata[i].inputVal[0] = mydata[i].inputVal[0].replace(/[\n\r]/g,'##');
-						}
-						console.log("updateTestCase:::", mydata)
-					}
-					if(mydata[i].url == undefined){mydata[i].url="";}
-					if(mydata[i].remarks != undefined)
-					{
-						if(  mydata[i].remarks != $("#jqGrid tbody tr td:nth-child(10)")[i+1].textContent  && $("#jqGrid tbody tr td:nth-child(10)")[i+1].textContent.trim().length > 0 )	{
-							if( mydata[i].remarks.length > 0 ){
-								mydata[i].remarks = mydata[i].remarks.concat( " ; " + $("#jqGrid tbody tr td:nth-child(10)")[i+1].textContent);
-							}
-						     else{
-								  mydata[i].remarks = $("#jqGrid tbody tr td:nth-child(10)")[i+1].textContent;
-							 }
-					     }
-					}
-					else{
-						mydata[i].remarks = $("#jqGrid tbody tr td:nth-child(10)")[i+1].textContent;
 					}
 				}
 				if(serviceCallFlag  == true)
