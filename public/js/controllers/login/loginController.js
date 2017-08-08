@@ -75,6 +75,8 @@ mySPA.controller('loginController', function ($scope, $http, $location, LoginSer
 									.then(function (data) {
 										if(data != "fail"){
 											window.localStorage['_SR'] = data;
+											window.localStorage['_pR'] = data+";"+roleasarray;
+											
 											if(data == "Admin"){
 												window.localStorage['navigateScreen'] = "admin";
 												window.location.href = "/admin";
