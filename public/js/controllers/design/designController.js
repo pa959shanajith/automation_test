@@ -46,7 +46,6 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 	}
 	//Default Function to reset all input, select
 
-
 	var getTaskName = JSON.parse(window.localStorage['_CT']).taskName;
 	appType = JSON.parse(window.localStorage['_CT']).appType;
 	screenName =  JSON.parse(window.localStorage['_CT']).screenName;
@@ -98,8 +97,6 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		else{
 			$(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">Project: </span><span class="content">'+projectDetails.respnames[0]+'</span></p><p class="proj-info-wrap"><span class="content-label">Screen: </span><span class="content">'+screenName+'</span></p><p class="proj-info-wrap"><span class="content-label">TestCase: </span><span class="content">'+testCaseName+'</span></p>')
 		}
-		
-	
 
 	}, 3000)
 
@@ -223,7 +220,6 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				// service call # 2 - objectType service call
 				DesignServices.getScrapeDataScreenLevel_ICE(screenId)
 				.then(function(data2)	{
-				//	console.log("reused", reused);
 						if(data2 == "Invalid Session")
 						{
 							window.location.href = "/";
@@ -813,7 +809,6 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		//enableScreenShotHighlight = true;
 		DesignServices.getScrapeDataScreenLevel_ICE()
 		.then(function(data){
-			
 			if(data == "Invalid Session")
 			{
 				window.location.href = "/";
@@ -993,7 +988,6 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		}*/
 		DesignServices.getScrapeDataScreenLevel_ICE()
 		.then(function(data){
-				//console.log("reused", reused);
 				if(data == "Invalid Session")
 			{
 				window.location.href = "/";
@@ -1789,7 +1783,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				//Build Scrape Tree using dmtree.scrapper.js file
 				if(viewString.view.length > 0){
 					$("#saveObjects").removeClass('hide');
-					$("#deleteObjects").prop("disabled", false);
+					//$("#deleteObjects").prop("disabled", false);
 					deleteScrapeDataservice = false;
 				}
 				else $("#saveObjects").addClass('hide');
@@ -2951,10 +2945,6 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 
 	$(document).find('#load_jqGrid').prop('display','none !important');
 
-
-
-	
-
 	//save button clicked - save the testcase steps
 	$scope.updateTestCase_ICE = function()	{
 		if(reusedTestcaseNames == true)
@@ -2989,7 +2979,6 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		cfpLoadingBar.start();
 		var userInfo = JSON.parse(window.localStorage['_UI']);
 		var taskInfo = JSON.parse(window.localStorage['_CT']);
-
 		if(userInfo.role == "Viewer") return false;
 		else{
 			var screenId = taskInfo.screenId;
@@ -4814,8 +4803,15 @@ function pasteTestStep(){
 			$("#jqGrid tr.ui-state-highlight td:nth-child(7)").find("input").trigger(esc);
 		}
 		if(window.localStorage['anotherScriptId'] != JSON.parse(window.localStorage['_CT']).testCaseId){
+			var flg = true;
+			for(var i=0; i<getRowJsonToPaste.length; i++){
+				if(getRowJsonToPaste[i].appType == "Web" || getRowJsonToPaste[i].appType == "Desktop" || getRowJsonToPaste[i].appType == "Mainframe" || getRowJsonToPaste[i].appType == "DesktopJava" || getRowJsonToPaste[i].appType == "MobileApp" ||getRowJsonToPaste[i].appType == "MobileWeb" ||getRowJsonToPaste[i].appType == "MobileApp" || getRowJsonToPaste[i].appType == "SAP"){
+					flg = false;
+					break;
+				}
+			}
 			if (window.localStorage['emptyTestStep'] == "true" || getRowJsonToPaste == undefined) return false
-			else if(window.localStorage['getAppTypeForPaste'] != JSON.parse(window.localStorage['_CT']).appType){
+			else if(window.localStorage['getAppTypeForPaste'] != JSON.parse(window.localStorage['_CT']).appType && flg == false){
 				openDialog("Paste Test Step", "Project type is not same");
 				return false
 			}

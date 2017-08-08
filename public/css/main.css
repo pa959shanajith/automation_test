@@ -2271,7 +2271,7 @@ input[disabled]{
 
 #scheduledDataBody{
 	float:left;
-	width:100%;
+	width:100% !important;
 	margin-top: 28px;
 	overflow: auto;
 	-ms-overflow-style: none;
@@ -3741,7 +3741,8 @@ background: none;
 .viewMapbtn{
     padding: 0px 15px !important;
     font-size: 15px;
-    float: left !important;
+    float: right !important;
+    margin-left: 12px;
 }
 .saveQcbtn{
     float: right !important;

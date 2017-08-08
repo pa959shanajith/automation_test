@@ -495,7 +495,7 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 				}
 			});
 			$("#ALMSyncWindow").find("button.close").trigger("click");
-			$("#syncScenario").prop("disabled",true);
+			//$("#syncScenario").prop("disabled",true);
 		}
 	}
 
@@ -563,7 +563,7 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 				browserTypeExe = [];
 				angular.element(document.getElementById("left-nav-section")).scope().readTestSuite_ICE();
 				$scope.moduleInfo = [];
-				$("#syncScenario").prop("disabled",false);
+				$("#syncScenario").prop("disabled",true);
 			},
 			function(error){
 				unblockUI()
@@ -573,7 +573,7 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 				browserTypeExe = [];
 				angular.element(document.getElementById("left-nav-section")).scope().readTestSuite_ICE();
 				$scope.moduleInfo = [];
-				$("#syncScenario").prop("disabled",false);
+				$("#syncScenario").prop("disabled",true);
 			})
 		}
 	}
@@ -583,7 +583,12 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 	//ALM Functionality
 	$(document).on("click", "#syncScenario", function(){
 		$("#ALMSyncWindow").modal("show");
-		$("#almURL, #almUserName, #almPassword").val('')
+		if($scope.moduleInfo.length > 0){
+			$("#almURL").val($scope.moduleInfo.suiteDetails.qccredentials.qcurl);
+			$("#almUserName").val($scope.moduleInfo.suiteDetails.qccredentials.qcusername);
+			$("#almPassword").val($scope.moduleInfo.suiteDetails.qccredentials.qcpassword);
+		}
+		else	$("#almURL, #almUserName, #almPassword").val('')
 	})
 	//ALM Functionality
 
@@ -620,7 +625,10 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 			//browserTypeExe.push($(this).data("name"))
 			browserTypeExe.push(''+$(this).data("name")+'')
 		}
-		console.log(browserTypeExe)
+		if(browserTypeExe.length > 0){
+			$("#syncScenario").prop("disabled",false);
+		}
+		else $("#syncScenario").prop("disabled",true);
 	})
 	//Select Browser Function
 

@@ -93,12 +93,12 @@ mySPA.controller('qcController',['$scope','$window','$http','$location','$timeou
 				}
 				else if(data){
 					$(".qcSelectProject").empty();
-					$(".qcSelectProject").append("<option value='' selected>Select Project</option>");
+					$(".qcSelectProject").append("<option value='' selected disabled>Select Project</option>");
 					for(var i=0;i<data.qc_projects.length;i++){
 						$(".qcSelectProject").append("<option value='"+data.qc_projects[i]+"'>"+data.qc_projects[i]+"</option>");
 					}
 					$(".qcN68SelectProject").empty();					
-					$(".qcN68SelectProject").append("<option value='' selected>Select Project</option>");
+					$(".qcN68SelectProject").append("<option value='' selected disabled>Select Project</option>");
 					for(var i=0;i<data.nineteen68_projects.length;i++){
 						$(".qcN68SelectProject").append("<option value='"+data.nineteen68_projects[i].project_id+"'>"+data.nineteen68_projects[i].project_name+"</option>");
 					}

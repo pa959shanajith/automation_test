@@ -115,11 +115,12 @@ $(document).ready(function() {
 		}, 200)
 		if(window.localStorage['_CT'])
 		{
-			if(JSON.parse(window.localStorage['_CT']).appType == "MobileWeb"){
+			if(JSON.parse(window.localStorage['_CT']).appType == "MobileWeb" && navigator.appVersion.indexOf("Win")!=-1){
 				$("#window-scrape-screenshot").css({"width":""+viewString.mirrorwidth+"px", /*"height": ""+viewString.mirrorheight+"px",*/ "max-height":""+viewString.mirrorheight+"px !important"});        	 
 				$("#window-scrape-screenshot .popupContent").css({"width":""+viewString.mirrorwidth+"px", "height": ""+viewString.mirrorheight+"px"});
 			}
-			else if(JSON.parse(window.localStorage['_CT']).appType == "MobileApp"){
+			else 
+			if(JSON.parse(window.localStorage['_CT']).appType == "MobileApp"){
 				if(navigator.appVersion.indexOf("Win")!=-1){
 					$("#window-scrape-screenshot").css({"width":""+(parseInt(viewString.mirrorwidth)/3)+"px", /*"height": ""+viewString.mirrorheight+"px",*/ "max-height":""+(parseInt(viewString.mirrorheight)/3)+"px !important"});        	 
 					$("#window-scrape-screenshot .popupContent").css({"width":""+(parseInt(viewString.mirrorwidth)/3)+"px", "height": ""+(parseInt(viewString.mirrorheight)/3)+"px"});        		 
