@@ -7,6 +7,10 @@ var gsElement = []; window.localStorage['selectRowStepNo'] = '';
 var getWSTemplateData = {} //Contains Webservice saved data
 var appType;var projectId;var projectDetails;var screenName;var testCaseName;var subTaskType;var subTask; var draggedEle; var getDraggedEle;
 var compareFlag; var updatedViewString = {};
+var allTasks;var allScreenNames = [];	var reusedScreens = [];var reusedScreenNames=false;var noSave="false";
+var allScreenTestcaseNames =[];var reusedScreensTestcase = [];var reusedScreenTestcaseNames = false;
+var allTestcases =[];var reusedTestcases =[];var reusedTestcaseNames = false;var noSaveTestcase="false";
+		
 window.localStorage['disableEditing'] = "false";
 mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout', 'DesignServices','cfpLoadingBar','$window', function($scope,$http,$location,$timeout,DesignServices,cfpLoadingBar,$window) {
 	$("body").css("background","#eee");
@@ -41,6 +45,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		$scope.errorMessage = "";
 	}
 	//Default Function to reset all input, select
+
 
 	var getTaskName = JSON.parse(window.localStorage['_CT']).taskName;
 	appType = JSON.parse(window.localStorage['_CT']).appType;
@@ -93,10 +98,87 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		else{
 			$(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">Project: </span><span class="content">'+projectDetails.respnames[0]+'</span></p><p class="proj-info-wrap"><span class="content-label">Screen: </span><span class="content">'+screenName+'</span></p><p class="proj-info-wrap"><span class="content-label">TestCase: </span><span class="content">'+testCaseName+'</span></p>')
 		}
+		
+	
 
 	}, 3000)
 
 
+	if(window.localStorage['_TJ'])
+		{
+			allTasks = JSON.parse(window.localStorage['_TJ']);
+			for(var i=0;i<allTasks.length;i++)
+			{
+				//Screen with no testcases
+				if(allTasks[i].screenName != "" && allTasks[i].testCaseId == "")
+				{
+					allScreenNames.push(allTasks[i].screenName);
+				}
+				//screen with testcases
+				if(allTasks[i].screenName != "" && allTasks[i].testCaseId != "")
+				{
+					allScreenTestcaseNames.push(allTasks[i].screenName);
+				}
+				//testcases
+				if(allTasks[i].testCaseName != "" && allTasks[i].testCaseId != "")
+				{
+					allTestcases.push(allTasks[i].testCaseName);
+				}
+			}
+			var sorted_screens = allScreenNames.slice().sort();
+			for (var i = 0; i < allScreenNames.length - 1; i++) {
+				if (sorted_screens[i + 1] == sorted_screens[i]) {
+					reusedScreens.push(sorted_screens[i]);
+				}
+			}
+			var sorted_screensTestcase = allScreenTestcaseNames.slice().sort();
+			for (var i = 0; i < allScreenTestcaseNames.length - 1; i++) {
+				if (sorted_screensTestcase[i + 1] == sorted_screensTestcase[i]) {
+					reusedScreensTestcase.push(sorted_screensTestcase[i]);
+				}
+			}
+			var sorted_testcases = allTestcases.slice().sort();
+			for (var i = 0; i < allTestcases.length - 1; i++) {
+				if (sorted_testcases[i + 1] == sorted_testcases[i]) {
+					reusedTestcases.push(sorted_testcases[i]);
+				}
+			}
+			//console.log("reusedScreens",reusedScreens);
+			//console.log("reusedScreensTestcase",reusedScreensTestcase);
+			console.log("reusedTestcases",reusedTestcases);
+			if(reusedScreens.length > 0)
+				{
+					for(var j=0;j<reusedScreens.length;j++)
+					{
+						if($.trim(reusedScreens[j]) == $.trim(screenName))
+						{
+							reusedScreenNames = true;
+						}
+					}
+				}
+			if(reusedScreens.length > 0)
+				{
+					for(var j=0;j<reusedScreensTestcase.length;j++)
+					{
+						if($.trim(reusedScreensTestcase[j]) == $.trim(screenName))
+						{
+							reusedScreenTestcaseNames = true;
+						}
+					}
+				}
+			if(reusedTestcases.length > 0)
+				{
+					for(var j=0;j<reusedTestcases.length;j++)
+					{
+						if($.trim(reusedTestcases[j]) == $.trim(testCaseName))
+						{
+							reusedTestcaseNames = true;
+						}
+					}
+				}
+		}
+
+		
 	var custnameArr = [];
 	var keywordValArr = [];
 	var proceed = false;
@@ -141,6 +223,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				// service call # 2 - objectType service call
 				DesignServices.getScrapeDataScreenLevel_ICE(screenId)
 				.then(function(data2)	{
+				//	console.log("reused", reused);
 						if(data2 == "Invalid Session")
 						{
 							window.location.href = "/";
@@ -730,6 +813,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		//enableScreenShotHighlight = true;
 		DesignServices.getScrapeDataScreenLevel_ICE()
 		.then(function(data){
+			
 			if(data == "Invalid Session")
 			{
 				window.location.href = "/";
@@ -909,6 +993,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		}*/
 		DesignServices.getScrapeDataScreenLevel_ICE()
 		.then(function(data){
+				//console.log("reused", reused);
 				if(data == "Invalid Session")
 			{
 				window.location.href = "/";
@@ -1803,6 +1888,15 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			$("#compareChangedObjectsBox,#compareUnchangedObjectsBox,#compareNotFoundObjectsBox").show();
 			//$("#viewScrapedObjects").show();
 	});
+	$(document).on('shown.bs.modal','#deleteObjectsModal', function () {
+			if(reusedScreenNames == true || reusedScreenTestcaseNames == true)
+			{
+				$("#deleteObjectsModal").find('.modal-body p').text("Screen is been reused. Are you sure you want to delete objects?").css('color','black');
+			}
+			else{
+				$("#deleteObjectsModal").find('.modal-body p').text("Are you sure you want to delete objects?").css('color','black');
+			}	
+	});
 //To delete Scrape Objects
 	$scope.del_Objects = function()
 	{
@@ -2602,6 +2696,37 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 
 	//Save Scrape Objects
 	$(document).on('click', "#saveObjects", function(e){
+		console.log("reused", reusedScreenNames);
+		console.log("reusedT", reusedScreenTestcaseNames);
+		if(reusedScreenNames == true || reusedScreenTestcaseNames == true)
+		{
+			$("#reUsedObjectsModal").find('.modal-title').text("Save Scraped data");
+			$("#reUsedObjectsModal").find('.modal-body p').text("Screen is been reused. Are you sure you want to save objects?").css('color','black');
+			$("#reUsedObjectsModal").modal("show");
+			return false;
+		}
+		saveScrapedObjects();
+		
+	})
+
+	$scope.saveScrapedObjects = function()
+	{
+		$("#reUsedObjectsModal").modal("hide");
+		noSave = "false";
+		saveScrapedObjects();
+	};
+
+	$scope.noSaveScrapedObjects = function()
+	{
+		$("#reUsedObjectsModal").modal("hide");
+		noSave = "true";
+		return false;
+	};
+
+	function saveScrapedObjects()
+	{
+		if(	noSave = "false")
+		{
 		var xpath;
 		var duplicateCustnames = [];
 		var duplicateXpathElements = {};
@@ -2781,7 +2906,10 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				}
 			}
 		//}
-	})
+		}
+	}
+
+		
 
 	//To Select and unSelect all objects
 	$(document).on("click", ".checkStylebox", function(){
@@ -2823,11 +2951,45 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 
 	$(document).find('#load_jqGrid').prop('display','none !important');
 
+
+
+	
+
 	//save button clicked - save the testcase steps
 	$scope.updateTestCase_ICE = function()	{
+		if(reusedTestcaseNames == true)
+		{
+			//$("#reUsedTestcaseModal").find('.modal-title').text("");
+			$("#reUsedTestcaseModal").find('.modal-body p').text("Testcase is been reused. Are you sure you want to save ?").css('color','black');
+			$("#reUsedTestcaseModal").modal("show");
+			return false;
+		}
+		updateTestCase();
+	};
+
+	$scope.saveTestcase = function()
+	{
+		$("#reUsedTestcaseModal").modal("hide");
+		noSaveTestcase = "false";
+		updateTestCase();
+	};
+
+	$scope.noSaveTestcaseFn = function()
+	{
+		$("#reUsedTestcaseModal").modal("hide");
+		noSaveTestcase = "true";
+		return false;
+	};
+
+
+	function updateTestCase()
+	{
+		if(noSaveTestcase == "false")
+		{
 		cfpLoadingBar.start();
 		var userInfo = JSON.parse(window.localStorage['_UI']);
 		var taskInfo = JSON.parse(window.localStorage['_CT']);
+
 		if(userInfo.role == "Viewer") return false;
 		else{
 			var screenId = taskInfo.screenId;
@@ -2952,6 +3114,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			}
 		}
 		cfpLoadingBar.complete();
+		}
 	}
 
 	//Filter Scrape Objects
@@ -4386,7 +4549,13 @@ function deleteTestScriptRow(e){
 	else{
 		if($(document).find("#cb_jqGrid:checked").length > 0 || $("#jqGrid").find(".cbox:checked").length > 0 ){
 			$("#globalModalYesNo").find('.modal-title').text("Delete Test Step");
-			$("#globalModalYesNo").find('.modal-body p').text("Are you sure, you want to delete?").css('color','black');
+			if(reusedTestcaseNames == true)
+			{
+					$("#globalModalYesNo").find('.modal-body p').text("Testcase is been reused. Are you sure, you want to delete?").css('color','black');
+			}
+			else{
+					$("#globalModalYesNo").find('.modal-body p').text("Are you sure, you want to delete?").css('color','black');
+			}
 			$("#globalModalYesNo").find('.modal-footer button:nth-child(1)').attr("id","btnDeleteStepYes")
 			$("#globalModalYesNo").modal("show");
 			/*angular.element(document.getElementById("tableActionButtons")).scope().updateTestCase_ICE();*/
