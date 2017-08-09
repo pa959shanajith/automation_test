@@ -5,7 +5,7 @@ mySPA.controller('loginController', function ($scope, $http, $location, LoginSer
 	window.localStorage['LoginSuccess'] = "False";
 	document.getElementById("currentYear").innerHTML = new Date().getFullYear()
 
-	
+
 	$scope.check_credentials = function (path) {
 		cfpLoadingBar.start();
 		$scope.loginValidation = "";
@@ -66,6 +66,10 @@ mySPA.controller('loginController', function ($scope, $http, $location, LoginSer
 										"pluginName" : "Utility",
 										"pluginValue" : "true"
 									})
+									availablePlugins.push({
+										"pluginName" : "Weboccular",
+										"pluginValue" : "true"
+									})
 									data.pluginsInfo = availablePlugins;
 									window.localStorage['LoginSuccess'] = "True";
 									window.localStorage['_UI'] = JSON.stringify(data);
@@ -82,10 +86,10 @@ mySPA.controller('loginController', function ($scope, $http, $location, LoginSer
 											else{
 												window.localStorage['navigateScreen'] = "plugin";
 												window.location.href = "/plugin";
-											}											
+											}
 										}
 										else	console.log("Fail to get role name by role Id.");
-									}, function (error) { console.log("Fail to Load UserInfo") });									
+									}, function (error) { console.log("Fail to Load UserInfo") });
 								}
 								else	console.log("Failed to Load UserInfo.");
 							}, function (error) { console.log("Fail to Load UserInfo") });
@@ -96,7 +100,7 @@ mySPA.controller('loginController', function ($scope, $http, $location, LoginSer
 				{
 						$scope.loginValidation = "To Login, user must be allocated to a Domain and Project. Please contact Admin.";
 						cfpLoadingBar.complete();
-				}						
+				}
 				else{
 					console.log("Fail to Login.")
 				}
@@ -104,4 +108,3 @@ mySPA.controller('loginController', function ($scope, $http, $location, LoginSer
 		}
 	}
 });
-

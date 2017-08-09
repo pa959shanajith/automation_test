@@ -3,7 +3,7 @@
  */
 mySPA.config(function($routeProvider, $locationProvider,$provide) {
 	$routeProvider
-			.when('/', 
+			.when('/',
 			{
 				templateUrl: 'partials/login.html',
 				controller: 'loginController'
@@ -17,67 +17,71 @@ mySPA.config(function($routeProvider, $locationProvider,$provide) {
 				templateUrl: 'partials/footer.html',
 				controller:	'footerController'
 			})
-			.when('/admin', 
+			.when('/admin',
 			{
 				templateUrl: 'partials/adminMain.html',
 				controller: 'adminController'
 			})
-			.when('/plugin', 
+			.when('/plugin',
 			{
 				templateUrl: 'partials/plugin.html',
 				controller: 'pluginController'
 			})
-			.when('/design', 
+			.when('/design',
 			{
 				templateUrl: 'partials/design.html',
 				controller: 'designController'
 			})
-			.when('/designTestCase', 
+			.when('/designTestCase',
 			{
 				templateUrl: 'partials/designTestCase.html',
 				controller: 'designController'
 			})
-			.when('/execute', 
+			.when('/execute',
 			{
 				templateUrl: 'partials/execution.html',
 				controller: 'executionController'
 			})
-			.when('/scheduling', 
+			.when('/scheduling',
 			{
 				templateUrl: 'partials/scheduling.html',
 				controller: 'scheduleController'
 			})
-			.when('/p_Reports', 
+			.when('/p_Reports',
 			{
 			 	templateUrl: 'partials/Reports.html',
 			 	controller: 'reportsController'
 			})
-			.when('/p_Utility', 
+			.when('/p_Utility',
 			{
 			 	templateUrl: 'partials/utility.html',
 			 	controller: 'utilityController'
 			})
-			.when('/Reports', 
+			.when('/Reports',
 			{
 			 	controller: 'reportsController'
 			})
 			.when('/specificreports',{
 				controller:	'reportsController'
 			})
-			.when('/home', 
+			.when('/home',
 			{
 			 	templateUrl: 'partials/home_mindmap.html',
 			 	controller: 'mindmapController'
 			})
-			.when('/p_QualityCenter', 
+			.when('/p_Weboccular',{
+				templateUrl: 'partials/webCrawler.html',
+				controller: 'webCrawlerController'
+			})
+			.when('/p_QualityCenter',
 			{
 			 	templateUrl: 'partials/qualityCenter.html',
 			 	controller: 'qcController'
 			})
 			.otherwise({redirectTo: '/'});
-	
+
 	//$locationProvider.html5Mode(true);      //to remove angular hash(#) in the url
-	$locationProvider.html5Mode({	
+	$locationProvider.html5Mode({
 		enabled: true,	requireBase: false
 	});
 });
