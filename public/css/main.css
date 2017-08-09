@@ -491,7 +491,7 @@ body {
 }
 
 .plugin-block span {
-    font-size: 17px;
+    font-size: 15px;
     line-height: 21px;
     color: #fff;
     position: absolute;
@@ -1327,7 +1327,7 @@ input[disabled]{
     overflow: auto;
     max-height: 60px;
     color: #000;
-} 
+}
 .compareObj
 {
     float: left;
@@ -1398,7 +1398,7 @@ input[disabled]{
     /* margin-right: 31%; */
     position: relative;
     left: -32%;
-} 
+}
 .saveComapredObj
 {
     position: relative;
@@ -1433,7 +1433,7 @@ input[disabled]{
     width: 60%;
     margin-left: 4%;
     margin-top: 0%;
-    line-height: 1.7; 
+    line-height: 1.7;
     border: 1px solid #656565 !important;
 }
 
@@ -1469,7 +1469,7 @@ input[disabled]{
     background-clip: padding-box;
     border: 1px solid #adabab;
     border-radius: 1px;
-    
+
 }
 
 .rolesSpan>label{
@@ -1481,7 +1481,7 @@ input[disabled]{
 .rolesSpan>input{
   margin-top: 3px;
   margin-left: 12px;
-} 
+}
 
 .rolesSpan{
     padding-top: 9px;
@@ -3375,7 +3375,7 @@ li.select_all .addCustObj{
 	vertical-align: middle;
 	font-weight: normal;
 	line-height: 2;
-}		
+}
 
 
 .selectControl {
@@ -3797,7 +3797,7 @@ background: none;
 .linkedTestset label{
     width: 425px;
     float: left;
-    background-color: #E1CAFF; 
+    background-color: #E1CAFF;
     border-radius: 5px;
     padding: 5px 5px 5px 30px;
     font-size: 16px;
@@ -4299,14 +4299,14 @@ select:-webkit-autofill:focus {
 @media only screen and (height:768px){
 	.plugin-block{height: 116px; background-size: 115px;}
 	.plugin-block span{
-		font-size: 15px;
+		font-size: 13px;
 		line-height: 19px;
 		width: 41%;
 		-webkit-transform: translateX(-99%) translateY(-50%);
 		transform: translateX(-99%) translateY(-50%);
     	-moz-transform: translateX(-99%) translateY(-50%);
     	-ms-transform: translateX(-99%) translateY(-50%);
-		padding: 20px 5px;
+		padding: 20px 4px;
 	}
 	.middle-section-testsuites, .bottom-section-testsuites{height: calc(100% - 397px);}
 	.suitestartend thead{width: calc(100% - 732px);}
@@ -4495,3 +4495,270 @@ select:-webkit-autofill:focus {
   height: 24px;
   cursor: pointer;
 }
+.urlInput {
+  border: 1px solid #5e636b !important;
+  border-radius: 4px;
+  box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+  outline: none;
+  margin-left: 5px;
+  margin-right: 15px;
+  padding: 2px 15px;
+  width: 450px;
+}
+
+#ex1Slider .tooltip-inner {
+  background-color: #9e62e1;
+}
+
+ #ex1Slider .tooltip-arrow{
+    border-top-color : #9e62e1;
+ }
+
+#ex1Slider .slider-selection{
+  background-color: #9971c1;
+}
+
+.crawl-result{
+    margin-top: 30px;
+    border: 1px solid black;
+    height: 350px;
+    overflow: auto;
+    border-radius: 10px;
+    padding: 30px;
+}
+.url-btn{
+      color: #fff;
+      border: 0;
+      border-radius: 0 4px 4px 0;
+      padding: 2px 15px;
+      font-size: 17px;
+      background: #643693;
+      font-family: 'LatoWebLight';
+      outline: 0;
+
+}
+
+.url-div{
+  margin-bottom: 30px;
+}
+
+
+.btn-crawl.focus,
+.btn-crawl,
+.btn-crawl:active:focus,
+.btn-crawl:focus,
+.btn-crawl:hover{
+  color: black;
+  border-radius: 20px;
+  padding: 0px 15px;
+  font-family: 'LatoWebLight';
+  outline: 0;
+}
+
+.theme.focus,
+.theme,
+.theme:active:focus,
+.theme:focus,
+.theme:hover{
+  background: #643693;
+  color: #fff;
+}
+
+
+.crawl-result{
+    margin-top: 30px;
+    border: 1px solid black;
+    height: 350px;
+    overflow: auto;
+    border-radius: 10px;
+    padding: 30px;
+}
+
+.dot {
+    display: inline-block;
+    position :relative;
+    background: #41d1e1;
+    cursor:pointer;
+    z-index: 9999;
+    box-shadow: 0 5px 5px rgba(29,47,62,0.4);
+    border-radius: 500px;
+    transition: all 1s ease;
+    -webkit-animation: rotate 2.8s  5 linear;
+}
+
+#progress-canvas{
+  top:40px;
+  position: relative;
+  //border:1px solid;
+  max-height: 600px;
+  height : 80%;
+}
+
+#crawler-slider {
+    width: 50px;
+    height: 7px;
+    border-radius: 10px;
+    background-color: rgb(87, 37, 175);
+    position: relative;
+    -webkit-animation-name: example; /* Safari 4.0 - 8.0 */
+    -webkit-animation-duration: 4s; /* Safari 4.0 - 8.0 */
+    animation-name: example;
+    animation-duration: 4s;
+    animation-iteration-count:infinite;
+}
+
+/* Safari 4.0 - 8.0 */
+@-webkit-keyframes example {
+  0%   {left:0px;}
+  50% {left:200px;}
+  100% {left:0px;}
+}
+
+/* Standard syntax */
+@keyframes example {
+  0%   {left:0px;}
+  50% {left:200px;}
+  100% {left:0px;}
+}
+
+#slider-container {
+  top: 102%;
+  margin: 0px auto;
+  /*//left: 35%;*/
+  display: -webkit-box;
+  position: relative;
+  bottom:-60px;
+  width: 250px;
+  border-radius: 10px;
+  background: #e3e4e6;
+  height: 7px;
+}
+.square {
+      display: inline-block;
+      position :relative;
+      width : 32px;
+      height: 32px;
+      border-radius : 4px;
+      background: #41d1e1;
+      cursor:pointer;
+}
+
+
+.sqdot {
+    display: inline-block;
+    position :relative;
+    background: #41d1e1;
+    cursor:pointer;
+    z-index: 9999;
+}
+
+.sqSize1 {
+  width : 12px;
+  height: 12px;
+  border-radius : 2px;
+}
+
+.sqSize2{
+  width : 16px;
+  height: 16px;
+  border-radius : 3px;
+}
+
+.sqSize3 {
+  width : 20px;
+  height: 20px;
+  border-radius : 4px;
+}
+
+.dotSize1 {
+  width : 12px;
+  height: 12px;
+  border-radius : 6px;
+}
+
+.dotSize2{
+  width : 16px;
+  height: 16px;
+  border-radius : 8px;
+}
+
+.dotSize3 {
+  width : 20px;
+  height: 20px;
+  border-radius : 10px;
+}
+
+.dotText{
+  z-index: 9999999;
+  max-width: 350px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow:ellipsis;
+}
+
+.redDot {
+  background: red;
+}
+
+/*
+Directed Graph
+*/
+
+.node circle {
+  cursor: pointer;
+}
+
+.node text {
+  font: 10px sans-serif;
+  pointer-events: none;
+  text-anchor: middle;
+}
+
+line.link {
+  fill: none;
+  stroke: #9ecae1;
+  stroke-width: 1.5px;
+}
+
+@-keyframes rotate{
+	0%{
+		box-shadow:0 2px 3px rgba(29,47,62,0.4);-webkit-box-shadow:0 2px 3px rgba(29,47,62,0.4);-moz-box-shadow:0 2px 3px rgba(29,47,62,0.4);-ms-box-shadow:0 2px 3px rgba(29,47,62,0.4);-o-box-shadow:0 2px 3px rgba(29,47,62,0.4);
+	}
+
+	25%{
+		box-shadow:2px 0 3px rgba(29,47,62,0.4);-webkit-box-shadow:2px 0 3px rgba(29,47,62,0.4);-moz-box-shadow:2px 0 3px rgba(29,47,62,0.4);-ms-box-shadow:2px 0 3px rgba(29,47,62,0.4);-o-box-shadow:2px 0 3px rgba(29,47,62,0.4);
+	}
+	50%{
+		box-shadow:0 -2px 3px rgba(29,47,62,0.4);-webkit-box-shadow:0 -2px 3px rgba(29,47,62,0.4);-moz-box-shadow:0 -2px 3px rgba(29,47,62,0.4);-o-box-shadow:0 -2px 3px rgba(29,47,62,0.4);-ms-box-shadow:0 -2px 3px rgba(29,47,62,0.4);
+	}
+	75%{
+		box-shadow:-2px 0 3px rgba(29,47,62,0.4);-webkit-box-shadow:-2px 0 3px rgba(29,47,62,0.4);-moz-box-shadow:-2px 0 3px rgba(29,47,62,0.4);-ms-box-shadow:-2px 0 3px rgba(29,47,62,0.4);-o-box-shadow:-2px 0 3px rgba(29,47,62,0.4);
+	}
+	100%{
+		box-shadow:0 0px 0px rgba(29,47,62,0.4);
+	}
+}
+@-webkit-keyframes rotate{
+	0%{
+		box-shadow:0 2px 3px rgba(29,47,62,0.4);-webkit-box-shadow:0 2px 3px rgba(29,47,62,0.4);-moz-box-shadow:0 2px 3px rgba(29,47,62,0.4);-ms-box-shadow:0 2px 3px rgba(29,47,62,0.4);-o-box-shadow:0 2px 3px rgba(29,47,62,0.4);
+	}
+
+	25%{
+		box-shadow:2px 0 3px rgba(29,47,62,0.4);-webkit-box-shadow:2px 0 3px rgba(29,47,62,0.4);-moz-box-shadow:2px 0 3px rgba(29,47,62,0.4);-ms-box-shadow:2px 0 3px rgba(29,47,62,0.4);-o-box-shadow:2px 0 3px rgba(29,47,62,0.4);
+	}
+	50%{
+		box-shadow:0 -2px 3px rgba(29,47,62,0.4);-webkit-box-shadow:0 -2px 3px rgba(29,47,62,0.4);-moz-box-shadow:0 -2px 3px rgba(29,47,62,0.4);-o-box-shadow:0 -2px 3px rgba(29,47,62,0.4);-ms-box-shadow:0 -2px 3px rgba(29,47,62,0.4);
+	}
+	75%{
+		box-shadow:-2px 0 3px rgba(29,47,62,0.4);-webkit-box-shadow:-2px 0 3px rgba(29,47,62,0.4);-moz-box-shadow:-2px 0 3px rgba(29,47,62,0.4);-ms-box-shadow:-2px 0 3px rgba(29,47,62,0.4);-o-box-shadow:-2px 0 3px rgba(29,47,62,0.4);
+	}
+	100%{
+		box-shadow:0 0px 0px rgba(29,47,62,0.4);
+	}
+}
+/*#result-canvas {
+  border: 1px solid;
+top: 100px;
+position: relative;
+}*/
