@@ -80,8 +80,13 @@ mySPA.controller('headerController', function($scope,$http,$location,headerServi
 		var username = JSON.parse(window.localStorage['_UI']).username;
 		var userRolesList;
 		var selRole;
+
+		$("#switchRoles").hide();
+		$('#sRole ul').hide();
 			LoginService.loadUserInfo_Nineteen68(username,selRole,false)
 			.then(function (response) {
+				$("#switchRoles").hide();
+				$('#sRole ul').hide();
 				if(response == "Invalid Session"){
 								window.location.href = "/";
 								}
@@ -96,6 +101,8 @@ mySPA.controller('headerController', function($scope,$http,$location,headerServi
 					window.location.href = "/";
 				  }
 				  else if(data.length == 0){
+					  $('#sRole ul').hide();
+					  //$("#switchRoles").hide();
 					  $("#noRoles").modal("show");
 				  }
 				  else{
@@ -108,12 +115,8 @@ mySPA.controller('headerController', function($scope,$http,$location,headerServi
 						if(pR[0] != sr){
                          for (var i = 0; i < data.length; i++) {
 							if(($('#switchRole').val() != response) && (data[i] != sr) && (response.additionalrole[i] != ar)){
-								//if(pR[0] != data[i]){
+								
 									getAdditionalRoles.append($("<li class='switchRole_confirm' data-id="+ response.additionalrole[i] +" ><a href='#' data-toggle='modal' id="+ response.additionalrole[i] +" data-target='#switchRoleModal'>"+ data[i] +"</a></li>"));
-							    // }
-								//  else{
-								// 		 getAdditionalRoles.append($("<li class='switchRole_confirm' data-id="+ response.additionalrole[i] +" ><a href='#' data-toggle='modal' id="+ response.additionalrole[i] +" data-target='#switchRoleModal'>"+ data[i] +"</a></li>"));
-								//  }
 							}
 						}
 						getAdditionalRoles.append($("<li class='switchRole_confirm' data-id="+ pR[1] +" ><a href='#' data-toggle='modal' id="+ pR[1] +" data-target='#switchRoleModal'>"+ pR[0] +"</a></li>"));
@@ -123,21 +126,6 @@ mySPA.controller('headerController', function($scope,$http,$location,headerServi
 								getAdditionalRoles.append($("<li class='switchRole_confirm' data-id="+ response.additionalrole[i] +" ><a href='#' data-toggle='modal' id="+ response.additionalrole[i] +" data-target='#switchRoleModal'>"+ data[i] +"</a></li>"));
 							}							
 						}
-				// 	if($('#switchRole').val() != response){
-				// 	 if(response.additionalrole[i] != selectedROleID){
-				// 			getAdditionalRoles.append($("<li class='switchRole_confirm' data-id="+ response.additionalrole[i] +" ><a href='#' data-toggle='modal' id="+ response.additionalrole[i] +" data-target='#switchRoleModal'>"+ data[i] +"</a></li> <li class='switchRole_confirm' data-id="+ primaryRole +" ><a href='#' data-toggle='modal' id="+ primaryRole +" data-target='#switchRoleModal'>"+ primaryRoleName +"</a></li>"));
-				// 	 }
-				// 	 else{
-				// 		// for(i=0; i<userRolesList.r_ids.length; i++){
-				// 		// 	if(($('#userRoles option:selected').val() != userRolesList.r_ids[i]) && (userRolesList.r_ids[i] != "b5e9cb4a-5299-4806-b7d7-544c30593a6e")){
-				// 		// 		getDropDown.append("<li class='RolesCheck'><span class='rolesSpan'><input class='addcheckBox' type='checkbox' value="+ userRolesList.r_ids[i] +"><label class='rolesChecklabel'>"+userRolesList.userRoles[i]+"</label></span></li>");
-				// 		// 	} 
-				// 		// }
-				// 		//if($('#switchRole').val() != response){
-				// 			getAdditionalRoles.append($("<li class='switchRole_confirm' data-id="+ response.additionalrole[i] +" ><a href='#' data-toggle='modal' id="+ response.additionalrole[i] +" data-target='#switchRoleModal'>"+ data[i] +"</a></li>"));
-				// 		//}
-				//   }
-				//   }
 				  }
 				});
 				window.localStorage['_R'] = response.r_ids;
