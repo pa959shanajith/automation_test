@@ -26,7 +26,10 @@ mySPA.controller('mindmapController', ['$scope', '$http', '$location', '$timeout
         }
         
 	}, 500)
+    var blockMsg = 'Please Wait...';
+    blockUI(blockMsg);
     loadUserTasks()
+    unblockUI();
 		/*Sidebar-toggle*/
     $scope.tab = "tabRequirement";
     $(".left-sec-mindmap,.rsSlide").show();

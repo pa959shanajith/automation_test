@@ -447,7 +447,17 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 
 	//Save QC Details
 	$scope.saveQcCredentials = function(){
-		if(appType != "SAP" && browserTypeExe.length == 0){
+		$("#almURL, #almUserName, #almPassword").removeClass('inputErrorBorder')
+		if(!$scope.almURL) {
+			$("#almURL").addClass('inputErrorBorder')
+		}
+		else if(!$scope.almUserName){
+			$("#almUserName").addClass('inputErrorBorder')
+		}
+		else if(!$scope.almPassword){
+			$("#almPassword").addClass('inputErrorBorder')
+		}
+		else if(appType != "SAP" && browserTypeExe.length == 0){
 			$("#ALMSyncWindow").find("button.close").trigger("click");
 			openDialogExe("Execute Test Suite", "Please select a browser");
 		}
@@ -484,7 +494,8 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 					$scope.moduleInfo.push(suiteInfo);
 				}
 			});
-			$("#syncScenario").prop("disabled",true);
+			$("#ALMSyncWindow").find("button.close").trigger("click");
+			//$("#syncScenario").prop("disabled",true);
 		}
 	}
 
@@ -552,7 +563,7 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 				browserTypeExe = [];
 				angular.element(document.getElementById("left-nav-section")).scope().readTestSuite_ICE();
 				$scope.moduleInfo = [];
-				$("#syncScenario").prop("disabled",false);
+				$("#syncScenario").prop("disabled",true);
 			},
 			function(error){
 				unblockUI()
@@ -562,7 +573,7 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 				browserTypeExe = [];
 				angular.element(document.getElementById("left-nav-section")).scope().readTestSuite_ICE();
 				$scope.moduleInfo = [];
-				$("#syncScenario").prop("disabled",false);
+				$("#syncScenario").prop("disabled",true);
 			})
 		}
 	}
@@ -572,39 +583,13 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 	//ALM Functionality
 	$(document).on("click", "#syncScenario", function(){
 		$("#ALMSyncWindow").modal("show");
-		$("#almURL, #almUserName, #almPassword").val('')
+		if($scope.moduleInfo.length > 0){
+			$("#almURL").val($scope.moduleInfo.suiteDetails.qccredentials.qcurl);
+			$("#almUserName").val($scope.moduleInfo.suiteDetails.qccredentials.qcusername);
+			$("#almPassword").val($scope.moduleInfo.suiteDetails.qccredentials.qcpassword);
+		}
+		else	$("#almURL, #almUserName, #almPassword").val('')
 	})
-
-	$scope.testConnection = function(){
-		$scope.errorMessage2 = "";
-		$("#almURL, #almUserName, #almPassword").removeClass('inputErrorBorder')
-		if(!$scope.almURL) {
-			$scope.errorMessage2 = "Enter ALM Url";
-			$("#almURL").addClass('inputErrorBorder')
-		}
-		else if(!$scope.almUserName){
-			$scope.errorMessage2 = "Enter User Name";
-			$("#almUserName").addClass('inputErrorBorder')
-		}
-		else if(!$scope.almPassword){
-			$scope.errorMessage2 = "Enter Password";
-			$("#almPassword").addClass('inputErrorBorder')
-		}
-		else{
-			$scope.errorMessage2 = "";
-			$("#almURL, #almUserName, #almPassword").removeClass('inputErrorBorder')
-			var alURL = $scope.almURL;
-			var almUserName = $scope.almUserName;
-			var almPassword = $scope.almPassword;
-			/*ExecutionService.QClogin(alURL,almUserName,almPassword)
-			.then(function(data) {
-				console.log(data)
-			},
-			function(error) {
-				console.log("Error while traversing executionController.js file testConnection method!! \r\n "+(error.data));
-			});*/
-		}
-	};
 	//ALM Functionality
 
 
@@ -640,7 +625,10 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 			//browserTypeExe.push($(this).data("name"))
 			browserTypeExe.push(''+$(this).data("name")+'')
 		}
-		console.log(browserTypeExe)
+		if(browserTypeExe.length > 0){
+			$("#syncScenario").prop("disabled",false);
+		}
+		else $("#syncScenario").prop("disabled",true);
 	})
 	//Select Browser Function
 

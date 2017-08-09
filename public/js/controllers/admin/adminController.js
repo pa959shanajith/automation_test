@@ -31,6 +31,8 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 		angular.element(document.getElementById("left-nav-section")).scope().getUserRoles();
 	});
 
+
+
 //	Assign Projects Tab Click
 	$("#assignProjectTab").on('click',function() {
 		$("img.selectedIcon").removeClass("selectedIcon");
@@ -66,7 +68,10 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 		function (error) { console.log("Error:::::::::::::", error) })
 
 			$(document).on('change','#selAssignUser', function() {
+			var blockMsg = 'Please wait...';
 			$('#allProjectAP, #assignedProjectAP').empty();
+			blockUI(blockMsg);
+			//$("#overlayContainer").prop("style","opacity: 0.5;")
 			adminServices.getDomains_ICE()
 			.then(function (data) {
 				if(data == "Invalid Session"){
@@ -174,6 +179,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 			},function (error) { console.log("Error:::::::::::::", error) })
 				}
 	});
+	unblockUI();
 });
 
 		$(document).on('change','#selAssignProject', function() {
