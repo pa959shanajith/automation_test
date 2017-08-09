@@ -491,7 +491,7 @@ body {
 }
 
 .plugin-block span {
-    font-size: 17px;
+    font-size: 15px;
     line-height: 21px;
     color: #fff;
     position: absolute;
@@ -4298,14 +4298,14 @@ select:-webkit-autofill:focus {
 @media only screen and (height:768px){
 	.plugin-block{height: 116px; background-size: 115px;}
 	.plugin-block span{
-		font-size: 15px;
+		font-size: 13px;
 		line-height: 19px;
 		width: 41%;
 		-webkit-transform: translateX(-99%) translateY(-50%);
 		transform: translateX(-99%) translateY(-50%);
     	-moz-transform: translateX(-99%) translateY(-50%);
     	-ms-transform: translateX(-99%) translateY(-50%);
-		padding: 20px 5px;
+		padding: 20px 4px;
 	}
 	.middle-section-testsuites, .bottom-section-testsuites{height: calc(100% - 397px);}
 	.suitestartend thead{width: calc(100% - 732px);}
@@ -4717,8 +4717,8 @@ line.link {
 }
 
 
-#result-canvas {
+/*#result-canvas {
   border: 1px solid;
 top: 100px;
 position: relative;
-}
+}*/

@@ -46,7 +46,7 @@ if (cluster.isMaster) {
         limit: '10mb',
         extended: true
     }));
-    app.use(morgan('combined'))
+    //app.use(morgan('combined'))
     app.use(cookieParser());
     app.use(sessions({
         secret: '$^%EDE%^tfd65e7ufyCYDR^%IU',
@@ -333,6 +333,7 @@ if (cluster.isMaster) {
 
         socket.send('connected');
         module.exports.allSocketsMap = socketMap;
+        module.exports.allSocketsMapUI = socketMapUI;
         httpsServer.setTimeout();
 
         socket.on('message', function(data) {
