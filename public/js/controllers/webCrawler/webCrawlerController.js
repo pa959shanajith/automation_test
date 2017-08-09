@@ -172,7 +172,7 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
         parent.removeChild(child);
     }
 
-    $scope.createDot = function createDot(x, y, obj){
+    $scope.createDot = function (x, y, obj){
       //console.log("in create dot");
       var parentElem = document.createElement("div");
     	var elem = document.createElement("div");
@@ -480,7 +480,12 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
 
         nodeEnter.append("image")
       	.attr("xlink:href", function(d) {
+
       		if(d.isTerminal == true){
+            console.log(d.status , d.name);
+            if (d.status != 200) {
+              return "imgs/circle-128.png"
+            }
       			return "imgs/wc-cr.png"; // terminal node
       		}else if(d.nodeOpen == false){
       			return "imgs/wc-p-cr.png"; // collapsed node
@@ -497,6 +502,9 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
 
 
       	 node.select("image").attr("xlink:href", function(d) {
+           if (d.status != 200) {
+             return "imgs/circle-128.png"
+           }
           if(d.isTerminal == true){
       			return "imgs/wc-cr.png"; // terminal node
       		}else if(d.nodeOpen == false){
