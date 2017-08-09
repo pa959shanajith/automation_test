@@ -317,6 +317,20 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 			$(this).parent().parent().next().slideUp();
 		}
 	});
+
+	//Show scenarios of testsuites
+	$(document).dblclick(".taskname", function(e){
+		if($("."+e.target.className)[0].className == "taskname"){			
+			var scenarioNames = $("."+e.target.className).parent().siblings(".testSuiteBatch").find("tbody.testScenarioScroll tr");
+			$("#suiteDetailsContent").empty();
+			$("#modalSuiteDetails").find(".modal-title").text($("."+e.target.className)[0].textContent);
+			for(var i=0; i<scenarioNames.length;i++){
+				$("#suiteDetailsContent").append('<div class="sDInnerContentsWrap"><div class="sDInnerContents" style="width: 50%;">'+scenarioNames[i].childNodes[2].textContent+'</div><div class="sDInnerContents" style="width: 50%;">'+scenarioNames[i].childNodes[5].textContent+'</div></div>');
+			}
+			$("#modalSuiteDetails").modal("show");
+			$('#modalSuiteDetails').find('.btn-default').focus();
+		}
+	})
 	//Load Location Details of Scenario
 	$scope.loadLocationDetails = function(scenarioName, scenarioId) {
 		//document.getElementById("scenarioDetailsContent").innerHTML = "";
