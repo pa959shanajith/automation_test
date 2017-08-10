@@ -4579,10 +4579,10 @@ select:-webkit-autofill:focus {
     background: #41d1e1;
     cursor:pointer;
     z-index: 9999;
-    box-shadow: 0 5px 5px rgba(29,47,62,0.4);
+    /*box-shadow: 0 5px 5px rgba(29,47,62,0.4);*/
     border-radius: 500px;
     transition: all 1s ease;
-    -webkit-animation: rotate 2.8s  5 linear;
+    -webkit-animation: rotate 2.8s  4 linear;
 }
 
 #progress-canvas{
@@ -4722,38 +4722,38 @@ line.link {
 
 @-keyframes rotate{
 	0%{
-		box-shadow:0 2px 3px rgba(29,47,62,0.4);-webkit-box-shadow:0 2px 3px rgba(29,47,62,0.4);-moz-box-shadow:0 2px 3px rgba(29,47,62,0.4);-ms-box-shadow:0 2px 3px rgba(29,47,62,0.4);-o-box-shadow:0 2px 3px rgba(29,47,62,0.4);
+		box-shadow:0 2px 3px rgba(29,47,62,0.7);-webkit-box-shadow:0 2px 3px rgba(29,47,62,0.7);-moz-box-shadow:0 2px 3px rgba(29,47,62,0.7);-ms-box-shadow:0 2px 3px rgba(29,47,62,0.7);-o-box-shadow:0 2px 3px rgba(29,47,62,0.7);
 	}
 
 	25%{
-		box-shadow:2px 0 3px rgba(29,47,62,0.4);-webkit-box-shadow:2px 0 3px rgba(29,47,62,0.4);-moz-box-shadow:2px 0 3px rgba(29,47,62,0.4);-ms-box-shadow:2px 0 3px rgba(29,47,62,0.4);-o-box-shadow:2px 0 3px rgba(29,47,62,0.4);
+		box-shadow:2px 0 3px rgba(29,47,62,0.7);-webkit-box-shadow:2px 0 3px rgba(29,47,62,0.7);-moz-box-shadow:2px 0 3px rgba(29,47,62,0.7);-ms-box-shadow:2px 0 3px rgba(29,47,62,0.7);-o-box-shadow:2px 0 3px rgba(29,47,62,0.7);
 	}
 	50%{
-		box-shadow:0 -2px 3px rgba(29,47,62,0.4);-webkit-box-shadow:0 -2px 3px rgba(29,47,62,0.4);-moz-box-shadow:0 -2px 3px rgba(29,47,62,0.4);-o-box-shadow:0 -2px 3px rgba(29,47,62,0.4);-ms-box-shadow:0 -2px 3px rgba(29,47,62,0.4);
+		box-shadow:0 -2px 3px rgba(29,47,62,0.7);-webkit-box-shadow:0 -2px 3px rgba(29,47,62,0.7);-moz-box-shadow:0 -2px 3px rgba(29,47,62,0.7);-o-box-shadow:0 -2px 3px rgba(29,47,62,074);-ms-box-shadow:0 -2px 3px rgba(29,47,62,0.7);
 	}
 	75%{
-		box-shadow:-2px 0 3px rgba(29,47,62,0.4);-webkit-box-shadow:-2px 0 3px rgba(29,47,62,0.4);-moz-box-shadow:-2px 0 3px rgba(29,47,62,0.4);-ms-box-shadow:-2px 0 3px rgba(29,47,62,0.4);-o-box-shadow:-2px 0 3px rgba(29,47,62,0.4);
+		box-shadow:-2px 0 3px rgba(29,47,62,0.7);-webkit-box-shadow:-2px 0 3px rgba(29,47,62,0.7);-moz-box-shadow:-2px 0 3px rgba(29,47,62,0.7);-ms-box-shadow:-2px 0 3px rgba(29,47,62,0.7);-o-box-shadow:-2px 0 3px rgba(29,47,62,0.7);
 	}
 	100%{
-		box-shadow:0 0px 0px rgba(29,47,62,0.4);
+		box-shadow:0 2px 3px rgba(29,47,62,0.7);
 	}
 }
 @-webkit-keyframes rotate{
 	0%{
-		box-shadow:0 2px 3px rgba(29,47,62,0.4);-webkit-box-shadow:0 2px 3px rgba(29,47,62,0.4);-moz-box-shadow:0 2px 3px rgba(29,47,62,0.4);-ms-box-shadow:0 2px 3px rgba(29,47,62,0.4);-o-box-shadow:0 2px 3px rgba(29,47,62,0.4);
+		box-shadow:0 2px 3px rgba(29,47,62,0.7);-webkit-box-shadow:0 2px 3px rgba(29,47,62,0.7);-moz-box-shadow:0 2px 3px rgba(29,47,62,0.4);-ms-box-shadow:0 2px 3px rgba(29,47,62,0.4);-o-box-shadow:0 2px 3px rgba(29,47,62,0.4);
 	}
 
 	25%{
-		box-shadow:2px 0 3px rgba(29,47,62,0.4);-webkit-box-shadow:2px 0 3px rgba(29,47,62,0.4);-moz-box-shadow:2px 0 3px rgba(29,47,62,0.4);-ms-box-shadow:2px 0 3px rgba(29,47,62,0.4);-o-box-shadow:2px 0 3px rgba(29,47,62,0.4);
+		box-shadow:2px 0 3px rgba(29,47,62,0.7);-webkit-box-shadow:2px 0 3px rgba(29,47,62,0.7);-moz-box-shadow:2px 0 3px rgba(29,47,62,0.4);-ms-box-shadow:2px 0 3px rgba(29,47,62,0.4);-o-box-shadow:2px 0 3px rgba(29,47,62,0.4);
 	}
 	50%{
-		box-shadow:0 -2px 3px rgba(29,47,62,0.4);-webkit-box-shadow:0 -2px 3px rgba(29,47,62,0.4);-moz-box-shadow:0 -2px 3px rgba(29,47,62,0.4);-o-box-shadow:0 -2px 3px rgba(29,47,62,0.4);-ms-box-shadow:0 -2px 3px rgba(29,47,62,0.4);
+		box-shadow:0 -2px 3px rgba(29,47,62,0.7);-webkit-box-shadow:0 -2px 3px rgba(29,47,62,0.7);-moz-box-shadow:0 -2px 3px rgba(29,47,62,0.4);-o-box-shadow:0 -2px 3px rgba(29,47,62,0.4);-ms-box-shadow:0 -2px 3px rgba(29,47,62,0.4);
 	}
 	75%{
-		box-shadow:-2px 0 3px rgba(29,47,62,0.4);-webkit-box-shadow:-2px 0 3px rgba(29,47,62,0.4);-moz-box-shadow:-2px 0 3px rgba(29,47,62,0.4);-ms-box-shadow:-2px 0 3px rgba(29,47,62,0.4);-o-box-shadow:-2px 0 3px rgba(29,47,62,0.4);
+		box-shadow:-2px 0 3px rgba(29,47,62,0.7);-webkit-box-shadow:-2px 0 3px rgba(29,47,62,0.7);-moz-box-shadow:-2px 0 3px rgba(29,47,62,0.4);-ms-box-shadow:-2px 0 3px rgba(29,47,62,0.4);-o-box-shadow:-2px 0 3px rgba(29,47,62,0.4);
 	}
 	100%{
-		box-shadow:0 0px 0px rgba(29,47,62,0.4);
+		box-shadow:0 0px 0px rgba(29,47,62,0.7);
 	}
 }
 /*#result-canvas {
