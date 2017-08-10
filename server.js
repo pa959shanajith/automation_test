@@ -46,7 +46,7 @@ if (cluster.isMaster) {
         limit: '10mb',
         extended: true
     }));
-    //app.use(morgan('combined'))
+    app.use(morgan('combined'))
     app.use(cookieParser());
     app.use(sessions({
         secret: '$^%EDE%^tfd65e7ufyCYDR^%IU',
@@ -100,7 +100,7 @@ if (cluster.isMaster) {
     });
 
     //Only Test Engineer and Test Lead have access
-    app.get(/^\/(design|designTestCase|execute|scheduling|p_QualityCenter|p_Weboccular)$/, function(req, res){
+    app.get(/^\/(design|designTestCase|execute|scheduling|p_QualityCenter)$/, function(req, res){
         if(!req.session.defaultRole || req.session.defaultRole == "Admin" || req.session.defaultRole == "Business Analyst" || req.session.defaultRole == "Tech Lead" || req.session.defaultRole == "Test Manager")
         {
             req.session.destroy(); res.status(401).send('<br><br>Your session has been expired.Please <a href="/">Login</a> Again');
