@@ -10,7 +10,7 @@ mySPA.controller('qcController',['$scope','$window','$http','$location','$timeou
 		$("#loginToQCpop").modal("show");
 	}, 500)
 	var mappedList = [];
-	if(window.localStorage['navigateScreen'] != "p_QualityCenter")
+	if(window.localStorage['navigateScreen'] != "p_ALM")
 	{
 		window.location.href = "/";
 	}
@@ -61,6 +61,7 @@ mySPA.controller('qcController',['$scope','$window','$http','$location','$timeou
 						$(".qcSelectDomain").append("<option value='"+data.domain[i]+"'>"+data.domain[i]+"</option>");
 					}
 					$("#loginToQCpop").modal("hide");
+					$(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">User Name :</span><span class="content">'+qcUserName+'</span></p>')
 				}
 			},
 			function(error) {	console.log("Error in qcController.js file loginQCServer method! \r\n "+(error.data));
@@ -74,7 +75,7 @@ mySPA.controller('qcController',['$scope','$window','$http','$location','$timeou
 	}
 
 	$scope.hideMappedFilesTab = function(){
-		$(".mappedFiles").hide();
+		$(".mappedFiles, .mappedFilesLabel").hide();
 		$("#page-taskName span").text("ALM Integration");
 		$(".qcActionBtn, .leftQcStructure, .rightQcStructure").show();
 	}
@@ -82,6 +83,7 @@ mySPA.controller('qcController',['$scope','$window','$http','$location','$timeou
 	//Select Domains
 	$(document).on('change', ".qcSelectDomain", function(){
 		var getDomain = $(this).children("option:selected").val();
+		$(".loadALM").show();
 		qcServices.qcProjectDetails_ICE(getDomain)
 			.then(function(data){
 				nineteen68_projects_details = data.nineteen68_projects;
@@ -104,6 +106,7 @@ mySPA.controller('qcController',['$scope','$window','$http','$location','$timeou
 					}
 					
 				}
+				$(".loadALM").hide();
 			},
 			function(error) {	console.log("Error in qcController.js file loginQCServer method! \r\n "+(error.data));
 			});
@@ -113,8 +116,9 @@ mySPA.controller('qcController',['$scope','$window','$http','$location','$timeou
 	$(document).on("change", ".qcSelectProject", function(){
 		var getProjectName = $(".qcSelectProject option:selected").val();
 		var getDomainName = $(".qcSelectDomain option:selected").val();
+		$(".loadALM").show();
 		qcServices.qcFolderDetails_ICE("folder",getProjectName,getDomainName,"root")
-			.then(function(data){				
+			.then(function(data){
 				var structContainer = $(".qcTreeContainer");
 				structContainer.empty();
 				structContainer.append("<ul class='root'><li class='testfolder_'><img class='qcCollapse' title='expand' style='height: 16px;' src='imgs/ic-qcCollapse.png'><label title='Root'>Root</label></li></ul>")
@@ -135,6 +139,7 @@ mySPA.controller('qcController',['$scope','$window','$http','$location','$timeou
 			function(error) {	console.log("Error in qcController.js file loginQCServer method! \r\n "+(error.data));
 			});
 			$('.scrollbar-inner').scrollbar();
+			$(".loadALM").hide();
 	});
 
 	//Select Nineteen68 projects
@@ -168,6 +173,7 @@ mySPA.controller('qcController',['$scope','$window','$http','$location','$timeou
 				getParent.addClass("qcCollapse");
 			}
 			else{
+				$(".loadALM").show();
 				getParent.addClass("qcCollapse");
 				if(getParent.hasClass("Tfolnode"))	$(this).prop("src","imgs/ic-qcCollapse.png");
 				var getProjectName = $(".qcSelectProject option:selected").val();
@@ -213,7 +219,8 @@ mySPA.controller('qcController',['$scope','$window','$http','$location','$timeou
 					function(error) {	console.log("Error in qcController.js file loginQCServer method! \r\n "+(error.data));
 					});
 					$('.scrollbar-inner').scrollbar();
-			}
+					$(".loadALM").hide();
+				}
 		}	
 	})
 	
@@ -289,6 +296,7 @@ mySPA.controller('qcController',['$scope','$window','$http','$location','$timeou
 	}
 
 	$scope.displayMappedFilesTab = function(){
+		blockUI("Loading...")
 		var userid = JSON.parse(window.localStorage['_UI']).user_id;
 		qcServices.viewQcMappedList_ICE(userid)
 		.then(function(data){
@@ -296,6 +304,7 @@ mySPA.controller('qcController',['$scope','$window','$http','$location','$timeou
 				$(".qcActionBtn, .leftQcStructure, .rightQcStructure").hide();
 				$("#page-taskName span").text("Mapped Files");
 				$(".mappedFiles").empty().show();
+				$(".mappedFilesLabel").show();
 				for(var i=0;i<data.length;i++){
 					$(".mappedFiles").append('<div class="linkedTestset"><label data-qcdomain="'+data[i].qcdomain+'" data-qcfolderpath="'+data[i].qcfolderpath+'" data-qcproject="'+data[i].qcproject+'" data-qctestset="'+data[i].qctestset+'">'+data[i].qctestcase+'</label><span class="linkedLine"></span><label data-scenarioid="'+data[i].testscenarioid+'">'+data[i].testscenarioname+'</label></div>')
 				}				
@@ -304,6 +313,7 @@ mySPA.controller('qcController',['$scope','$window','$http','$location','$timeou
 			else{
 				openModelPopup("Mapped Testcase", "No mapped details")
 			}
+			unblockUI()
 		},
 		function(error) {	console.log("Error in qcController.js file viewQcMappedList_ICE method! \r\n "+(error.data));
 		});		

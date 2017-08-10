@@ -3,7 +3,7 @@ mySPA.controller('pluginController',['$scope','$window','$http','$location','$ti
 	document.getElementById("currentYear").innerHTML = new Date().getFullYear()
 	var userInfo = JSON.parse(window.localStorage['_UI']);
 	var availablePlugins = userInfo.pluginsInfo;
-	availablePlugins.push({"pluginName":"Quality Center","pluginValue":true});
+	availablePlugins.push({"pluginName":"ALM","pluginValue":true});
 	$("#plugin-container").empty().hide();
 	
 	if(window.localStorage['navigateScreen'] != "plugin")

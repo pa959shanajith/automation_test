@@ -34,8 +34,8 @@
 			<!--Task Name-->
 			<!-- Button -->
 			<div class="qcActionBtn">
-				<label style="margin-bottom: 0;">ALM Tests</label>
-				<label style="margin-bottom: 0; position: relative; left: 431px;">Nineteen68 Sceanrios</label>
+				<label style="margin-bottom: 0;">ALM Tests</label><img class="loadALM" style="position: relative; left: 388px; display: none;" src="imgs/loader.gif" alt="Loading...">
+				<label style="margin-bottom: 0; position: relative; left: 415px;">Nineteen68 Scenarios</label>
 				<a class="viewMapbtn" ng-click="displayMappedFilesTab()" title="View Mapped Files">View Mapped Files</a>
 				<button class="saveQcbtn" ng-click="mapTestcaseToN68()" title="Save">Save</button>
 			</div>
@@ -56,6 +56,7 @@
 			</div>
 			<!-- Action area -->
 			<!-- Map Files -->
+			<div class="mappedFilesLabel" style="display: none;"><label style="margin: 0 0 0 11px;">ALM Testcases</label><label style="position: relative; left: 422px;">Ninteen68 Scenarios</label></div>
 			<div class="mappedFiles scrollbar-inner" style="display: none;">
 			</div>
 			<!-- Map Files -->
@@ -209,7 +210,7 @@
 				</div>
 				<div class="modal-body">
 					<div class="leftAlign">
-						<p><input class='launchPopupInput form-control' type='text' placeholder='Enter QC URL' id='qcName'/></p>
+						<p><input class='launchPopupInput form-control' type='text' placeholder='Enter ALM URL' id='qcName'/></p>
 						<p><input class='launchPopupInput form-control' type='text' placeholder='Enter User Name' id='qcUserName'/></p>
 						<p><input class='launchPopupInput form-control' type='password' placeholder='Enter Password' id='qcPwd'/></p>
 					</div>
