@@ -20,11 +20,12 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
 
 
     $scope.showWeboccularHome = function(){
+      if (!$scope.enableGenerate) {
+        return;
+      }
       $("#result-canvas").hide();
       $scope.hideBaseContent = { message: 'false' };
       $scope.check = true;
-
-
     }
 
 
@@ -70,7 +71,7 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
           if (!parent.endsWith("/")) {
             obj.parent = obj.parent+ "/";
           }
-          
+
           $scope.crawledLinks.push(obj);
           if (obj.type == "subdomain") {
             $scope.arr.push(obj.name);
@@ -494,11 +495,19 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
       	.attr("xlink:href", function(d) {
 
       		if(d.isTerminal == true){
-            console.log(d.status , d.name);
+            console.log(d, d.status , d.name);
             if (d.status != 200) {
+              if(d.type == "subdomain"){
+                return "imgs/wc-red-sq.png"
+              }
               return "imgs/circle-128.png"
+            }else{
+              if(d.type == "subdomain"){
+                return "imgs/wc-sq.png"
+              }
+              return "imgs/wc-cr.png"; // terminal node
             }
-      			return "imgs/wc-cr.png"; // terminal node
+
       		}else if(d.nodeOpen == false){
       			return "imgs/wc-p-cr.png"; // collapsed node
       		}else{
@@ -510,21 +519,32 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
         .attr("width", 25)
       	.attr("height", 25)
       	.append("svg:title")
-      	 .text(function(d){return d._children ? "" : d.children ? "" : d.name;});
+      	 .text(function(d){return  d.name;});
 
 
-      	 node.select("image").attr("xlink:href", function(d) {
-           if (d.status != 200) {
-             return "imgs/circle-128.png"
-           }
-          if(d.isTerminal == true){
-      			return "imgs/wc-cr.png"; // terminal node
-      		}else if(d.nodeOpen == false){
-      			return "imgs/wc-p-cr.png"; // collapsed node
-      		}else{
-      			return "imgs/wc-m-cr.png";
-      		}
-      	})
+      	 node.select("image")
+        	.attr("xlink:href", function(d) {
+
+         		if(d.isTerminal == true){
+               console.log(d, d.status , d.name);
+               if (d.status != 200) {
+                 if(d.type == "subdomain"){
+                   return "imgs/wc-red-sq.png"
+                 }
+                 return "imgs/circle-128.png"
+               }else{
+                 if(d.type == "subdomain"){
+                   return "imgs/wc-sq.png"
+                 }
+                 return "imgs/wc-cr.png"; // terminal node
+               }
+
+         		}else if(d.nodeOpen == false){
+         			return "imgs/wc-p-cr.png"; // collapsed node
+         		}else{
+         			return "imgs/wc-m-cr.png";
+         		}
+         	})
 
 
         nodeEnter.transition()
@@ -533,7 +553,7 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
 
         nodeEnter.append("text")
             .attr("dy", ".35em")
-      	  .text(function(d) { return d._children ? d.name : d.children ? d.name : ""; });
+      	//  .text(function(d) { return d._children ? d.name : d.children ? d.name : ""; });
 
       	node.select("circle")
       		.style("fill", color);
