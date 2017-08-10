@@ -31,10 +31,9 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 		angular.element(document.getElementById("left-nav-section")).scope().getUserRoles();
 	});
 
-
-
 //	Assign Projects Tab Click
 	$("#assignProjectTab").on('click',function() {
+		resetAssignProjectForm();
 		$("img.selectedIcon").removeClass("selectedIcon");
 		$(this).children().find('img').addClass('selectedIcon');
 
@@ -71,7 +70,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 			var blockMsg = 'Please wait...';
 			$('#allProjectAP, #assignedProjectAP').empty();
 			blockUI(blockMsg);
-			//$("#overlayContainer").prop("style","opacity: 0.5;")
+			$("#overlayContainer").prop("style","opacity: 1;")
 			adminServices.getDomains_ICE()
 			.then(function (data) {
 				if(data == "Invalid Session"){
@@ -2057,7 +2056,6 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 		});
 	}
 
-
 	//Get Selected User Data
 	$scope.getUserData = function(){
 		$("#firstName,#lastName,#password,#confirmPassword").removeClass("inputErrorBorder");
@@ -2081,6 +2079,16 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 			}
 			var roleId = userDataRes.roleId;
 			var addRole = userDataRes.additionalroles;
+
+// to show additional Role options for non-admin Users
+			if(roleId == "b5e9cb4a-5299-4806-b7d7-544c30593a6e"){
+				$('#additionalRole_options').hide();
+				$('#additionalRoleTxt').hide();
+			}
+			else{
+				$('#additionalRole_options').show();
+				$('#additionalRoleTxt').show();
+			}
 			adminServices.getUserRoles_Nineteen68()
 			.then(function (response) {
 				if(response == "Invalid Session"){
@@ -2097,7 +2105,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 				}
 //Secondary
   // populating Secondary roles list 
-	       var getDropDown;
+	              var getDropDown;
 				  getDropDown = $('#additionalRoles');
 				  getDropDown.empty();
 
@@ -2116,7 +2124,8 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 							}
 						})
 				  }
-	// populating Secondary roles list 
+	// END of populating Secondary roles list 
+			
 			document.getElementById("userRoles").disabled=true;
 				/*Secondary*/			
 		    $(document).on('click',".rolesChecklabel", function(){

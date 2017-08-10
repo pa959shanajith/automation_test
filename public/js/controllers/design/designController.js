@@ -817,7 +817,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			$(".popupWrap").animate({ opacity: 0, right: "70px" }, 100).css({'z-index':'0','pointer-events':'none'});
 			$(".filterObjects").removeClass("popupContent-filter-active").addClass("popupContent-default");
 			$(".thumb-ic").removeClass("thumb-ic-highlight");
-			if(data != null && data != "getScrapeData Fail."){
+			if(data != null && data != "getScrapeData Fail." && data != " "){
 				viewString = data;
 				newScrapedList = viewString
 				$("#window-scrape-screenshot .popupContent, #window-scrape-screenshotTs .popupContent").empty()
