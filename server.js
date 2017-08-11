@@ -326,6 +326,7 @@ if (cluster.isMaster) {
             socketMapUI[address] = socket;
         //  }
         }else{
+          isUISocketRequest = false;
           if (!(address in socketMap)) {
               socketMap[address] = socket;
           }
