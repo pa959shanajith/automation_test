@@ -72,14 +72,25 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 
 		$scope.readTestSuite_ICE = function(){
 
+            $('.checkStylebox').attr("disabled", true); 
+			$('#excSaveBtn').attr("disabled", true);
+			// $('.checkStylebox').hide(); 
+			// $('#excSaveBtn').hide();
 		ExecutionService.readTestSuite_ICE(readTestSuite)
 		.then(function(data) {
 			//var jsonData = JSON.parse(data);
 			if(data == "Invalid Session"){
 					window.location.href = "/";
 			 }
-			if(data == ""){}
+			if(data == ""){
+				// $('.checkStylebox').attr("disabled", true); 
+				// $('#excSaveBtn').attr("disabled", true);
+				// $('.checkStylebox').hide(); 
+				// $('#excSaveBtn').hide();
+			}
 			else{
+                $('.checkStylebox').attr("disabled", false); 
+			    $('#excSaveBtn').attr("disabled", false);
 				$(".executionTableDnd").empty()
 				cfpLoadingBar.complete();
 				// console.log("Jdata", data);

@@ -1021,24 +1021,25 @@ var moveNodeEnd = function(e){
 	//Logic to implement rearranging of nodes
 	var curNode=dNodes[pi];
 	//logic change dto the change in layout
-	var changeOrderRight = function(curNode,ci,p){
+	var changeOrderRight = function(curNode,ci,totalChildren){
 		var counter=-1;
 		var flag=false;
-		dNodes[pi].parent.children.forEach(function(a,i){
+		totalChildren.forEach(function(a,i){
 			if(ci<=(i+1)){
 				return false;
 			}
 			if(l[0]<a.x){
 				if(counter==-1) counter=(i+1);
+				
 				a.childIndex++;
 				curNode.childIndex=counter;
 			}
 		});
 	};
-	var changeOrderLeft = function(curNode,ci,p){
+	var changeOrderLeft = function(curNode,ci,totalChildren){
 		var counter=0;
 		var flag=false;
-		dNodes[pi].parent.children.forEach(function(a,ci){
+		totalChildren.forEach(function(a,ci){
 			if(l[0]>a.x){
 				counter=(ci+1);
 				a.childIndex--;
@@ -1048,6 +1049,10 @@ var moveNodeEnd = function(e){
 	};
 	var currentChildIndex=curNode.childIndex;
 	var totalChildren=curNode.parent.children;
+	if(currentChildIndex!=totalChildren.indexOf(curNode)+1){
+		currentChildIndex=totalChildren.indexOf(curNode)+1
+
+	}
 	if(l[0]<curNode.x){
 		//alert('moved up');
 		changeOrderRight(curNode,currentChildIndex,totalChildren);

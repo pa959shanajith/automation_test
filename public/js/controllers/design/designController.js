@@ -1940,6 +1940,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					openDialog("Delete Scrape Objects", "Scraped Objects deleted successfully.")
 	                deleteFlag = true;
 					$(".checkStylebox").prop("checked", false);
+					$("#deleteObjects").prop("disabled", true);
 	                angular.element(document.getElementById("left-nav-section")).scope().getScrapeData();
 				}
 				else{
@@ -1976,6 +1977,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 						}
 					})
 				}
+				$("#deleteObjects").prop("disabled", true);
 			}
 		}
 
@@ -3055,6 +3057,21 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 							}
 						}
 					}
+					else{
+						if(mydata[i].remarks != undefined){	
+							if(mydata[i].remarks != getTR[i].textContent  && getTR[i].textContent.trim().length > 0 )	{
+								if(mydata[i].remarks.length > 0 ){
+									mydata[i].remarks = mydata[i].remarks.concat( " ; " + getTR[i].textContent);
+								}
+								else{
+									mydata[i].remarks = getTR[i].textContent;
+								}
+							}
+						}
+						else{
+							mydata[i].remarks = getTR[i].textContent;
+						}
+					}
 				}
 				if(serviceCallFlag  == true)
 				{
@@ -3526,6 +3543,7 @@ function contentTable(newTestScriptDataLS) {
 	$("#jqGrid").resetSelection();
 
 	$(document).on('click', '.remarksIcon', function(){
+		$('td[aria-describedby="jqGrid_remarks"]').removeClass('selectedRemarkCell');
 		$(this).parent('td').next('td[aria-describedby="jqGrid_remarks"]').addClass('selectedRemarkCell');
 		var historyDetails = $(this).parent('td').next('td[aria-describedby="jqGrid_remarks"]').text().trim();
 		var historyArray = [];
@@ -3567,7 +3585,7 @@ function contentTable(newTestScriptDataLS) {
 			var getremarks = $("#getremarksData").val().trim() + " (From: "+userinfo.firstname+" "+userinfo.lastname+" On: "+ DATE + " " + TIME +")";
 			if(getremarks.length > 0){
 				$("#jqGrid tbody tr td.selectedRemarkCell").text(getremarks);
-				$("#jqGrid tbody tr td.selectedRemarkCell").attr('title',getremarks);
+				//$("#jqGrid tbody tr td.selectedRemarkCell").attr('title',getremarks);
 				$("#jqGrid tbody tr td.selectedRemarkCell").removeClass('selectedRemarkCell');
 				$(this).parent(".modal-footer").parent(".modal-content").find(".close").trigger('click');
 			}

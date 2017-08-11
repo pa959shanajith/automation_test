@@ -66,120 +66,120 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 		},
 		function (error) { console.log("Error:::::::::::::", error) })
 
-			$(document).on('change','#selAssignUser', function() {
-			var blockMsg = 'Please wait...';
+		$(document).on('change','#selAssignUser', function() {			
 			$('#allProjectAP, #assignedProjectAP').empty();
-			blockUI(blockMsg);
+			$(".load").show();
 			$("#overlayContainer").prop("style","opacity: 1;")
 			adminServices.getDomains_ICE()
 			.then(function (data) {
 				if(data == "Invalid Session"){
-				window.location.href = "/";
+					window.location.href = "/";
 				} 
 				else {
 					domainId =  data[0].domainId;					
 					$("#selAssignProject").val(data[0].domainName);
 					$('#allProjectAP, #assignedProjectAP').empty();
-            //var domainId = data[0].domainId;
-			//var requestedids = domainId;
-			//var domains = [];
-			var requestedids =[];
-			requestedids.push(domainId);
-			//console.log("Domain", domains);
-			//var requestedids = domains.push(domainId);
-			var idtype=["domaindetails"];
-			var userId = $("#selAssignUser option:selected").attr("data-id");
+					//var domainId = data[0].domainId;
+					//var requestedids = domainId;
+					//var domains = [];
+					var requestedids =[];
+					requestedids.push(domainId);
+					//console.log("Domain", domains);
+					//var requestedids = domains.push(domainId);
+					var idtype=["domaindetails"];
+					var userId = $("#selAssignUser option:selected").attr("data-id");
 
-			var getAssignProj = {};
-			getAssignProj.domainId = domainId;
-			getAssignProj.userId = userId;
-			var assignedProjectsArr = [];
-			var assignedProjectNames = [];
-			var unassignedProjectIds = [];
-			var unassignedProjectNames = [];
-			var unAssignedProjects = {};
-		//	getAssignedProjectsLen = 0;
+					var getAssignProj = {};
+					getAssignProj.domainId = domainId;
+					getAssignProj.userId = userId;
+					var assignedProjectsArr = [];
+					var assignedProjectNames = [];
+					var unassignedProjectIds = [];
+					var unassignedProjectNames = [];
+					var unAssignedProjects = {};
+					//	getAssignedProjectsLen = 0;
 	
-			adminServices.getAssignedProjects_ICE(getAssignProj)
-			.then(function (data1) {
-			getAssignedProjectsLen = data1.length;
-				if(data1 == "Invalid Session"){
-				window.location.href = "/";
-				}
-				$('#assignedProjectAP').empty();
-				projectData = [];
-				projectData = data1;
-				if(data1.length > 0)
-				{
-					for(var i=0;i<data1.length;i++)
-					{
-						$('#assignedProjectAP').append($("<option value=" +data1[i].projectId+ "></option>").text(data1[i].projectName));
-					}
-					for(var j=0;j<projectData.length;j++)
-					{
-						assignedProjectsArr.push(projectData[j].projectId);
-						assignedProjectNames.push(projectData[j].projectName)
-					}
-
-					adminServices.getDetails_ICE(idtype,requestedids)
-					.then(function (detResponse) {
-						if(detResponse == "Invalid Session"){
+					adminServices.getAssignedProjects_ICE(getAssignProj)
+					.then(function (data1) {
+					getAssignedProjectsLen = data1.length;
+						if(data1 == "Invalid Session"){
 							window.location.href = "/";
-							}
-						$('#allProjectAP').empty();
-						if(detResponse.projectIds.length > 0)
+						}
+						$('#assignedProjectAP').empty();
+						projectData = [];
+						projectData = data1;
+						if(data1.length > 0)
 						{
-							for(var k=0;k<detResponse.projectIds.length;k++){
-								if(!eleContainsInArray(assignedProjectsArr,detResponse.projectIds[k])){
-									unassignedProjectIds.push(detResponse.projectIds[k]);
-								}
+							for(var i=0;i<data1.length;i++)
+							{
+								$('#assignedProjectAP').append($("<option value=" +data1[i].projectId+ "></option>").text(data1[i].projectName));
+							}
+							for(var j=0;j<projectData.length;j++)
+							{
+								assignedProjectsArr.push(projectData[j].projectId);
+								assignedProjectNames.push(projectData[j].projectName)
 							}
 
-							for(var l=0;l<detResponse.projectNames.length;l++){
-								if(!eleContainsInArray(assignedProjectNames,detResponse.projectNames[l])){
-									unassignedProjectNames.push(detResponse.projectNames[l]);
+							adminServices.getDetails_ICE(idtype,requestedids)
+							.then(function (detResponse) {
+								if(detResponse == "Invalid Session"){
+									window.location.href = "/";
 								}
-							}
-
-							function eleContainsInArray(arr,element){
-								if(arr != null && arr.length >0){
-									for(var s=0;s<arr.length;s++){
-										if(arr[s] == element)
-											return true;
+								$('#allProjectAP').empty();
+								if(detResponse.projectIds.length > 0)
+								{
+									for(var k=0;k<detResponse.projectIds.length;k++){
+										if(!eleContainsInArray(assignedProjectsArr,detResponse.projectIds[k])){
+											unassignedProjectIds.push(detResponse.projectIds[k]);
+										}
 									}
+
+									for(var l=0;l<detResponse.projectNames.length;l++){
+										if(!eleContainsInArray(assignedProjectNames,detResponse.projectNames[l])){
+											unassignedProjectNames.push(detResponse.projectNames[l]);
+										}
+									}
+
+									function eleContainsInArray(arr,element){
+										if(arr != null && arr.length >0){
+											for(var s=0;s<arr.length;s++){
+												if(arr[s] == element)
+													return true;
+											}
+										}
+										return false;
+									}
+									unAssignedProjects.projectIds =  unassignedProjectIds;
+									unAssignedProjects.projectNames =  unassignedProjectNames;
+									for(var m=0;m<unAssignedProjects.projectIds.length;m++)
+									{
+										$('#allProjectAP').append($("<option value=" +unAssignedProjects.projectIds[m]+ "></option>").text(unAssignedProjects.projectNames[m]));
+									}
+									$(".load").hide();
 								}
-								return false;
-							}
-							unAssignedProjects.projectIds =  unassignedProjectIds;
-							unAssignedProjects.projectNames =  unassignedProjectNames;
-							for(var m=0;m<unAssignedProjects.projectIds.length;m++)
-							{
-								$('#allProjectAP').append($("<option value=" +unAssignedProjects.projectIds[m]+ "></option>").text(unAssignedProjects.projectNames[m]));
-							}
+							}, function (error) { console.log("Error:::::::::::::", error) })
 						}
-					}, function (error) { console.log("Error:::::::::::::", error) })
-				}
-				else{
-					adminServices.getDetails_ICE(idtype,requestedids)
-					.then(function (res) {
-						if(res == "Invalid Session"){
-							window.location.href = "/";
-							}
-						if(res.projectIds.length > 0)
-						{
-							$("#assignedProjectAP,#allProjectAP").empty();
-							for(var n=0;n<res.projectIds.length;n++)
-							{
-								$('#allProjectAP').append($("<option value=" +res.projectIds[n]+ "></option>").text(res.projectNames[n]));
-							}
+						else{
+							adminServices.getDetails_ICE(idtype,requestedids)
+							.then(function (res) {
+								if(res == "Invalid Session"){
+									window.location.href = "/";
+								}
+								if(res.projectIds.length > 0)
+								{
+									$("#assignedProjectAP,#allProjectAP").empty();
+									for(var n=0;n<res.projectIds.length;n++)
+									{
+										$('#allProjectAP').append($("<option value=" +res.projectIds[n]+ "></option>").text(res.projectNames[n]));
+									}
+								}								
+								$(".load").hide();
+							}, function (error) { console.log("Error:::::::::::::", error) })
 						}
-					}, function (error) { console.log("Error:::::::::::::", error) })
+					},function (error) { console.log("Error:::::::::::::", error) })
 				}
-			},function (error) { console.log("Error:::::::::::::", error) })
-				}
-	});
-	unblockUI();
-});
+			});
+		});
 
 		$(document).on('change','#selAssignProject', function() {
 			$('#allProjectAP, #assignedProjectAP').empty();
@@ -2185,20 +2185,25 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 		/*else if ($("#password").val() == "") {
 			$("#password").addClass("inputErrorBorder");
 		}*/
-		else if ($("#password").val().length > 0 && regexPassword.test($("#password").val()) == false) {
-			openModelPopup("Error", "Password must contain atleast 1 special character, 1 numeric, 1 uppercase and lowercase, length should be minimum 8 characters and maximum 12 characters..");
-			$("#password").addClass("inputErrorBorder");
-		}
-		/*else if ($("#confirmPassword").val() == "") {
+        /*else if ($("#confirmPassword").val() == "") {
 			$("#confirmPassword").addClass("inputErrorBorder");
 		}*/
-		else if ($("#confirmPassword").val().length > 0 && regexPassword.test($("#confirmPassword").val()) == false ) {
-			openModelPopup("Error","Password must contain atleast 1 special character, 1 numeric, 1 uppercase and lowercase, length should be minimum 8 characters and maximum 12 characters..");
+		else if ($("#password").val()) {
+			if ($("#confirmPassword").val() == "") {
 			$("#confirmPassword").addClass("inputErrorBorder");
-		}
-		else if($("#password").val() != $("#confirmPassword").val() && ($("#password").val().length > 0 && $("#confirmPassword").val().length > 0)){
-			openModelPopup("Error", "Password and Confirm Password did not match");
-			$("#confirmPassword").addClass("inputErrorBorder");
+		    }
+			else if ($("#password").val().length > 0 && regexPassword.test($("#password").val()) == false) {
+				openModelPopup("Error", "Password must contain atleast 1 special character, 1 numeric, 1 uppercase and lowercase, length should be minimum 8 characters and maximum 12 characters..");
+				$("#password").addClass("inputErrorBorder");
+			}
+			else if ($("#confirmPassword").val().length > 0 && regexPassword.test($("#confirmPassword").val()) == false ) {
+				openModelPopup("Error","Password must contain atleast 1 special character, 1 numeric, 1 uppercase and lowercase, length should be minimum 8 characters and maximum 12 characters..");
+				$("#confirmPassword").addClass("inputErrorBorder");
+			}
+			else if($("#password").val() != $("#confirmPassword").val() && ($("#password").val().length > 0 && $("#confirmPassword").val().length > 0)){
+				openModelPopup("Error", "Password and Confirm Password did not match");
+				$("#confirmPassword").addClass("inputErrorBorder");
+			}
 		}
 		else if ($("#email").val() == "") {
 			$("#email").addClass("inputErrorBorder");
