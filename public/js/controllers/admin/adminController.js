@@ -69,6 +69,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 		$(document).on('change','#selAssignUser', function() {			
 			$('#allProjectAP, #assignedProjectAP').empty();
 			$(".load").show();
+			$("#selAssignUser, #rightall, #rightgo, #leftgo, #leftall, .adminBtn").prop("disabled",true);
 			$("#overlayContainer").prop("style","opacity: 1;")
 			adminServices.getDomains_ICE()
 			.then(function (data) {
@@ -156,6 +157,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 										$('#allProjectAP').append($("<option value=" +unAssignedProjects.projectIds[m]+ "></option>").text(unAssignedProjects.projectNames[m]));
 									}
 									$(".load").hide();
+									$("#selAssignUser, #rightall, #rightgo, #leftgo, #leftall, .adminBtn").prop("disabled",false);
 								}
 							}, function (error) { console.log("Error:::::::::::::", error) })
 						}
@@ -174,6 +176,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 									}
 								}								
 								$(".load").hide();
+								$("#selAssignUser, #rightall, #rightgo, #leftgo, #leftall, .adminBtn").prop("disabled",false);
 							}, function (error) { console.log("Error:::::::::::::", error) })
 						}
 					},function (error) { console.log("Error:::::::::::::", error) })

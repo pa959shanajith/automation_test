@@ -48,6 +48,7 @@ function loadMindmapData_W(){
 }
 
 function loadMindmapData1_W(){
+	blockUI("Loading...");
 	$('#eteScenarioContainer').empty();
 	d3.select('.addScenarios-ete').classed('disableButton',!0);
 	$('#ct-saveAction_W').removeClass('no-access');
@@ -108,6 +109,7 @@ function loadMindmapData1_W(){
 			setModuleBoxHeight_W();
 		}
 	});
+	unblockUI();
 }
 window.onresize=function() {
 	var w=window.innerWidth-28,h=window.innerHeight-123;

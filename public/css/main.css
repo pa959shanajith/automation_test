@@ -2481,7 +2481,6 @@ input[disabled]{
 	-webkit-transform:translate(-50%, -50%);
 	-ms-transform:translate(-50%, -50%);
 }
-
 .scenarioDetails{
 	float:left;
 	width:100%;
@@ -3488,7 +3487,7 @@ li.select_all .addCustObj{
 #selDomain, #selDomainEdit, #selAssignProject{
     margin-left: 10px;
     margin-top: -12px;
-    background-color: #eeeeee;
+    /*background-color: #eeeeee;*/
     width: 90%;
     opacity: 1;
     border: 1px solid #656565 !important;
