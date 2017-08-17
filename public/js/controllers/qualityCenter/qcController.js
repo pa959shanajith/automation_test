@@ -150,8 +150,12 @@ mySPA.controller('qcController',['$scope','$window','$http','$location','$timeou
 				var N68Container = $(".qcN68TreeContainer");
 				N68Container.empty();
 				N68Container.append("<ul></ul>")
-				for(var j=0; j<nineteen68_projects_details[i].scenario_details.length; j++){
-					N68Container.find("ul").append("<li class='testSet testScenariolink' data-scenarioid='"+nineteen68_projects_details[i].scenario_details[j].testscenarioid+"'><label title='"+nineteen68_projects_details[i].scenario_details[j].testscenarioname+"'>"+nineteen68_projects_details[i].scenario_details[j].testscenarioname+"</label></li>")
+				if(nineteen68_projects_details[i].scenario_details.length >0){
+					for(var j=0; j<nineteen68_projects_details[i].scenario_details.length; j++){
+						N68Container.find("ul").append("<li class='testSet testScenariolink' data-scenarioid='"+nineteen68_projects_details[i].scenario_details[j].testscenarioid+"'><label title='"+nineteen68_projects_details[i].scenario_details[j].testscenarioname+"'>"+nineteen68_projects_details[i].scenario_details[j].testscenarioname+"</label></li>")
+					}
+				}else{
+					N68Container.append("This project does not contain any scenarios");
 				}
 			}
 		}

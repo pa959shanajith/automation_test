@@ -208,6 +208,9 @@ function projectandscenario(projectid,cb){
                         projectDetails.project_id = projectid;
                         projectDetails.scenario_details = scenarios_list;
                         projectDetails.project_name = projectname;
+                    }else{
+                        projectDetails.project_id = projectid;
+                        projectDetails.project_name = projectname;
                     }
                 }
                 callback1();
@@ -325,26 +328,27 @@ exports.saveQcDetails_ICE = function(req,res){
                 }
                     if(sessionToken != undefined && req.session.id == sessionToken)
                     {
-                        var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-                        console.log(Object.keys(myserver.allSocketsMap),"<<all people, asking person:",ip);
-                        var mySocket = myserver.allSocketsMap[ip];
-                        if('allSocketsMap' in myserver && ip in myserver.allSocketsMap){
-                                mySocket._events.qcresponse = [];
-                                var qcDetails = {"qcaction":"qcquit"};               						
-                                mySocket.emit("qclogin", qcDetails);
-                                mySocket.on('qcresponse', function (data) {
-                                    res.send("success");
+                        // var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+                        // console.log(Object.keys(myserver.allSocketsMap),"<<all people, asking person:",ip);
+                        // var mySocket = myserver.allSocketsMap[ip];
+                        // if('allSocketsMap' in myserver && ip in myserver.allSocketsMap){
+                        //         mySocket._events.qcresponse = [];
+                        //         var qcDetails = {"qcaction":"qcquit"};               						
+                        //         mySocket.emit("qclogin", qcDetails);
+                        //         mySocket.on('qcresponse', function (data) {
+                        //             res.send("success");
                                     
-                                });
+                        //         });
                             
-                        }else{
-                            console.log("Socket not Available");
-                            try{
-                                res.send("unavailableLocalServer");
-                            }catch(exception){
-                                console.log(exception);
-                            }
-                        }
+                        // }else{
+                        //     console.log("Socket not Available");
+                        //     try{
+                        //         res.send("unavailableLocalServer");
+                        //     }catch(exception){
+                        //         console.log(exception);
+                        //     }
+                        // }
+                        res.send("success");
                     }
                 else{
                     res.send("Invalid Session");
