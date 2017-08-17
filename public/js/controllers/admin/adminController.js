@@ -496,6 +496,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 			//role = $('#userRoles option:selected').text();
 			var createUser = {};
 			createUser.role = $('#userRoles option:selected').val();
+			//createUser.username = $.trim($("#userName").val().toLowerCase());
 			createUser.username = $.trim($("#userName").val());
 			createUser.password = $("#password").val();
 			createUser.confirmPassword = $("#confirmPassword").val();
@@ -2131,6 +2132,46 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 			
 			document.getElementById("userRoles").disabled=true;
 				/*Secondary*/			
+		    // $(document).on('click',".rolesChecklabel", function(){
+			   
+			// 	if(($(this).siblings('input').prop('checked')) == true){
+			// 		$(this).siblings('input').prop('checked',false);
+			// 	}
+			// 	else{
+			// 		$(this).siblings('input').prop('checked',true);
+			// 	}
+			// })
+
+			// $(document).mouseup(function(e) {
+			// 	var roleSel = $("#additionalRole_options");
+			// 	var roleOpt = $("#additionalRoles");
+				
+			// 	if ((!roleSel.is(e.target) && roleSel.has(e.target).length === 0) && (!roleOpt.is(e.target) && roleOpt.has(e.target).length === 0))
+			// 	{
+			// 		$('#additionalRoles').hide();
+			// 	}
+			// });
+			   /*Secondary*/
+			},
+			function (error) { console.log("Error:::::::::::::", error) })
+		},
+		function (error) { console.log("Error:::::::::::::", error) })
+	};
+
+//populating secondary role drop down
+			$(document).on('click', "#additionalRole_options", function() {
+			      // .is( ":hidden" )
+				  // if ($('#additionalRoles').is(':visible'))							  
+					if ($('#additionalRoles').is(':hidden')){
+						$('#additionalRoles').show();
+					}
+					
+					else{
+						$('#additionalRoles').hide();
+					}
+	        });
+
+/*Secondary*/			
 		    $(document).on('click',".rolesChecklabel", function(){
 			   
 				if(($(this).siblings('input').prop('checked')) == true){
@@ -2151,24 +2192,6 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 				}
 			});
 			   /*Secondary*/
-			},
-			function (error) { console.log("Error:::::::::::::", error) })
-		},
-		function (error) { console.log("Error:::::::::::::", error) })
-	};
-
-//populating secondary role drop down
-			$(document).on('click', "#additionalRole_options", function() {
-			      // .is( ":hidden" )
-				  // if ($('#additionalRoles').is(':visible'))							  
-					if ($('#additionalRoles').is(':hidden')){
-						$('#additionalRoles').show();
-					}
-					
-					else{
-						$('#additionalRoles').hide();
-					}
-	        });
 
 	//Update Edit User
 	$scope.updateUser = function(){
