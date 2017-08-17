@@ -3742,13 +3742,17 @@ background: none;
 .viewMapbtn{
     padding: 0px 15px !important;
     font-size: 15px;
-    float: right !important;
-    margin-left: 12px;
+    float: left !important;
+    margin-left: 6px;
+    margin-right: 6px;
 }
 .saveQcbtn{
-    float: right !important;
+    float: left !important;
     padding: 0px 19px !important;
     font-size: 16px;
+}
+.stopPointerEvent{
+    pointer-events: none;
 }
 .leftQcStructure, .rightQcStructure{
     border: 1px solid #000;
@@ -3779,11 +3783,11 @@ background: none;
 }
 .qcTreeContainer ul, .qcN68TreeContainer ul{padding: 0 !important;}
 .qcTreeContainer ul label{margin-left: 10px;}
-.qcTreeContainer ul li.testSet label{margin-left: 34px !important; position: relative; top: 3px;}
+.qcTreeContainer ul li.testSet label{margin-left: 34px !important; position: relative; top: 3px; overflow: hidden; text-overflow: ellipsis; width: 265px; white-space: nowrap;margin-bottom: 0;}
 .qcTreeContainer ul li.testSet img{float: right; margin-right: 8px; height: 13px; position: relative; top: 6px; cursor: pointer;}
 .qcN68TreeContainer ul li.testSet{padding-left: 10px;}
 .qcN68TreeContainer ul li.testSet label{position: relative;top: 3px;}
-.testSet:hover{background-color: #E1CAFF; border-radius: 5px;}
+.testSet:hover{background-color: #f3eaff; border-radius: 5px !important;}
 .root ul{margin-left: 17px;}
 .mappedFiles{
     height: calc(100% - 27px) !important;

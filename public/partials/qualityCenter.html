@@ -34,10 +34,12 @@
 			<!--Task Name-->
 			<!-- Button -->
 			<div class="qcActionBtn">
-				<label style="margin-bottom: 0;">ALM Tests</label><img class="loadALM" style="position: relative; left: 388px; display: none;" src="imgs/loader.gif" alt="Loading...">
-				<label style="margin-bottom: 0; position: relative; left: 415px;">Nineteen68 Scenarios</label>
+				<label style="margin-bottom: 0; float: left;">ALM Tests</label>
+				<!--<img class="loadALM" style="position: relative; left: 388px; display: none;" src="imgs/loader.gif" alt="Loading...">-->
+				<label style="margin-bottom: 0; position: relative; left: 435px; float: left;">Nineteen68 Scenarios</label>
+				<button class="saveQcbtn" ng-click="mapTestcaseToN68()" title="Save" style="margin-left: 470px;">Save</button>
 				<a class="viewMapbtn" ng-click="displayMappedFilesTab()" title="View Mapped Files">View Mapped Files</a>
-				<button class="saveQcbtn" ng-click="mapTestcaseToN68()" title="Save">Save</button>
+				<button class="saveQcbtn" ng-click="exitQcConnection()" title="Exit">Exit</button>
 			</div>
 			<!-- Button -->
 			<!-- Action area -->
@@ -217,7 +219,8 @@
 				</div>
 				<div class="modal-footer">
 					<span id="qcErrorMsg" style="color: red; float: left; margin-left: 15px; margin-top: 5px;"></span>
-					<button type="button" class="btn btn-default btn-default-modal" ng-click="loginQCServer()">Submit</button>
+					<img class="qcLoginload" src="imgs/loader.gif" alt="Loading..." style="float: left; display: none;">
+					<button type="button" class="btn btn-default btn-default-modal qcConnsubmit" ng-click="loginQCServer()">Submit</button>
 				</div>
 			</div>
 		</div>
