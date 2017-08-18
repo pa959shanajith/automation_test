@@ -817,7 +817,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			$(".popupWrap").animate({ opacity: 0, right: "70px" }, 100).css({'z-index':'0','pointer-events':'none'});
 			$(".filterObjects").removeClass("popupContent-filter-active").addClass("popupContent-default");
 			$(".thumb-ic").removeClass("thumb-ic-highlight");
-			if(data != null && data != "getScrapeData Fail." && data != " "){
+			if(data != null && data != "getScrapeData Fail."){
 				viewString = data;
 				newScrapedList = viewString
 				$("#window-scrape-screenshot .popupContent, #window-scrape-screenshotTs .popupContent").empty()
@@ -829,7 +829,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					$("#enableAppend").prop("disabled", true).css('cursor','no-drop');
 					$("#screenShotScrape").text("No Screenshot Available");
 					unblockUI();
-					return;
+					//return;
 				}
 				else{
 
@@ -845,24 +845,34 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				var scrapTree = $("#finalScrap").children('#scrapTree');
 				var innerUL = $("#finalScrap").children('#scrapTree').children('ul').children().children('#scraplist');
 
-				for (var i = 0; i < viewString.view.length; i++) {
-					var path = viewString.view[i].xpath;
-					var ob = viewString.view[i];
-					addcusOb = '';
-					ob.tempId= i;
-					custN = ob.custname;
-					var tag = ob.tag;
-					if(tag == "dropdown"){imgTag = "select"}
-					else if(tag == "textbox/textarea"){imgTag = "input"}
-					else imgTag = tag;
-					if(path == "")	addcusOb = 'addCustObj';
-					if(tag == "a" || tag == "input" || tag == "table" || tag == "list" || tag == "select" || tag == "img" || tag == "button" || tag == "radiobutton" || tag == "checkbox" || tag == "tablecell"){
-						var li = "<li data-xpath='"+ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"' data-left='"+ob.left+"' data-top='"+ob.top+"' data-width='"+ob.width+"' data-height='"+ob.height+"' data-tag='"+tag+"' data-url='"+ob.url+"' data-hiddentag='"+ob.hiddentag+"' class='item select_all "+tag+"x' val="+ob.tempId+"><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' /><span title='"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;')+"' class='ellipsis "+addcusOb+"'>"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"</span></a></li>";
+				if(viewString.view != undefined){					
+					for (var i = 0; i < viewString.view.length; i++) {
+						var path = viewString.view[i].xpath;
+						var ob = viewString.view[i];
+						addcusOb = '';
+						ob.tempId= i;
+						custN = ob.custname;
+						var tag = ob.tag;
+						if(tag == "dropdown"){imgTag = "select"}
+						else if(tag == "textbox/textarea"){imgTag = "input"}
+						else imgTag = tag;
+						if(path == "")	addcusOb = 'addCustObj';
+						if(tag == "a" || tag == "input" || tag == "table" || tag == "list" || tag == "select" || tag == "img" || tag == "button" || tag == "radiobutton" || tag == "checkbox" || tag == "tablecell"){
+							var li = "<li data-xpath='"+ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"' data-left='"+ob.left+"' data-top='"+ob.top+"' data-width='"+ob.width+"' data-height='"+ob.height+"' data-tag='"+tag+"' data-url='"+ob.url+"' data-hiddentag='"+ob.hiddentag+"' class='item select_all "+tag+"x' val="+ob.tempId+"><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' /><span title='"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;')+"' class='ellipsis "+addcusOb+"'>"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"</span></a></li>";
+						}
+						else {
+							var li = "<li data-xpath='"+ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"' data-left='"+ob.left+"' data-top='"+ob.top+"' data-width='"+ob.width+"' data-height='"+ob.height+"' data-tag='"+tag+"' data-url='"+ob.url+"' data-hiddentag='"+ob.hiddentag+"' class='item select_all "+tag+"x' val="+ob.tempId+"><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' /><span title='"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;')+"' class='ellipsis "+addcusOb+"'>"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"</span></a></li>";
+						}
+						angular.element(innerUL).append(li);
 					}
-					else {
-						var li = "<li data-xpath='"+ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"' data-left='"+ob.left+"' data-top='"+ob.top+"' data-width='"+ob.width+"' data-height='"+ob.height+"' data-tag='"+tag+"' data-url='"+ob.url+"' data-hiddentag='"+ob.hiddentag+"' class='item select_all "+tag+"x' val="+ob.tempId+"><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' /><span title='"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;')+"' class='ellipsis "+addcusOb+"'>"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"</span></a></li>";
+					
+					$(".checkStylebox, .checkall").prop("disabled", false);
+					
+					if(viewString.view.length == 0){
+						$(".disableActions").addClass("enableActions").removeClass("disableActions");
+						$("#enableAppend").prop("disabled", true).css('cursor','no-drop');
+						$(document).find(".checkStylebox").prop("disabled", true);
 					}
-					angular.element(innerUL).append(li);
 				}
 
 				$(document).find('#scrapTree').scrapTree({
@@ -873,14 +883,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					editable: true,
 					radio: true
 				});
-
-				$(".checkStylebox, .checkall").prop("disabled", false)
-
-				if(viewString.view.length == 0){
-					$(".disableActions").addClass("enableActions").removeClass("disableActions");
-					$("#enableAppend").prop("disabled", true).css('cursor','no-drop');
-					$(document).find(".checkStylebox").prop("disabled", true);
-				}
+				
 				if(appType == 'Web')
 				{
 						if($(".ellipsis").length > 0 )
@@ -3057,7 +3060,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 							}
 						}
 					}
-					else{
+					/*else{
 						if(mydata[i].remarks != undefined){	
 							if(mydata[i].remarks != getTR[i].textContent  && getTR[i].textContent.trim().length > 0 )	{
 								if(mydata[i].remarks.length > 0 ){
@@ -3071,7 +3074,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 						else{
 							mydata[i].remarks = getTR[i].textContent;
 						}
-					}
+					}*/
 				}
 				if(serviceCallFlag  == true)
 				{
@@ -4620,7 +4623,8 @@ function addTestScriptRow(){
 				"url": "",
 				"appType": "Generic",
 				"remarksStatus": "",
-			    "remarks": ""
+			    "remarks": "",
+				"_id_":""
 		};
 
 		$("#jqGrid tr").each(function(){
@@ -4653,6 +4657,11 @@ function addTestScriptRow(){
 			else{
 				gridArrayData.splice(arrayLength,0,emptyRowData);
 				gridArrayData[arrayLength].stepNo = parseInt(gridArrayData[arrayLength-1].stepNo)+1;
+			}
+		}
+		for(var i=0;i<gridArrayData.length;i++){
+			if(!gridArrayData[i].hasOwnProperty("_id_")){
+				gridArrayData[i]._id_ = "";
 			}
 		}
 		$("#jqGrid").jqGrid('clearGridData');
@@ -5261,12 +5270,15 @@ function getTags(data) {
 }
 
 function getKeywordList(data) {
-	var arr = Object.keys(data.defaultList);
 	var keywordList = [];
-	for (var i=0; i<arr.length; i++){
-		keywordList.push(arr[i]);
+	if("defaultList" in data){		
+		var arr = Object.keys(data.defaultList);
+		for (var i=0; i<arr.length; i++){
+			keywordList.push(arr[i]);
+		}
+		return keywordList;
 	}
-	return keywordList;
+	else return keywordList;
 }
 //Map Object Drag nad Drop Functionality
 function allowDrop(ev) {

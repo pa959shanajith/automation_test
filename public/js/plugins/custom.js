@@ -28,7 +28,7 @@ $(document).ready(function() {
 		{
 			return true;
 		}
-		else if(e.keyCode == 222 || e.shiftKey && e.keyCode == 222 || e.shiftKey && e.keyCode == 188 || e.shiftKey && e.keyCode == 190)
+		else if(e.keyCode == 222 || e.shiftKey && e.keyCode == 222 || e.shiftKey && e.keyCode == 188 || e.shiftKey && e.keyCode == 190 || (e.currentTarget.getAttribute("id") == "getremarksData" && e.keyCode == 186 && !e.shiftKey))
 		{
 			return false;
 		}
@@ -38,13 +38,14 @@ $(document).ready(function() {
 		if(e.target.className != "wsdlTextAreaBody"){
 			var element = this;
 			setTimeout(function () {
-				var userEnteredText = $(element).val();  
-				userEnteredText = userEnteredText.replace (/[<>'"]/g ,"");
+				var userEnteredText = $(element).val();
+				if(e.target.id == "getremarksData") userEnteredText = userEnteredText.replace (/[<>'";]/g ,"");
+				else userEnteredText = userEnteredText.replace (/[<>'"]/g ,"");
 				$(element).val(userEnteredText);
 			}, 5); //html5 min is 4ms.			
 		}
 	});
-	// console.log('Pasted ' + clipText.length + ' characters.');
+	
 	//Task Function - Plugin Page
 	$(document).on("click", ".task-content .collapse-head", function(){
 		$(".caret-absolute").hide()
@@ -102,7 +103,6 @@ $(document).ready(function() {
 				$(this).parents(".panel-default").addClass("disableActions");
 				$(this)[0].setAttribute("onclick","");
 				$(this).css("cursor","default");
-
 			}
 		})
 		setTimeout(function(){
@@ -271,7 +271,6 @@ function loadUserTasks(){
 	}
 }
 
-
 function taskRedirectionInner(testsuitedetails,scenarioflag,assignedtestscenarioids,subtasktype,screenid,screenname,projectid,taskname,testcaseid,testcasename,apptype,scenarioid,subtaskid){
 	var taskObj = {};
 	taskObj.scenarioFlag = scenarioflag;
@@ -311,13 +310,10 @@ function taskRedirectionInner(testsuitedetails,scenarioflag,assignedtestscenario
 		window.location.pathname = "/scheduling"
 	}
 }
-
-
 //Innerpages Tasks Implementation
 
 //Function to Block UI & unBlockUI
-function blockUI(content)
-{
+function blockUI(content){
 	$("body").append("<div id='overlayContainer'><div class='contentOverlay'>"+content+"</div></div>");
 	$("#overlayContainer").fadeIn(300);
 }

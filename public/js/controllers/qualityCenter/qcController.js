@@ -31,20 +31,33 @@ mySPA.controller('qcController',['$scope','$window','$http','$location','$timeou
 	}
 	//login to QC
 	$scope.loginQCServer = function(){
+		$(".qcLoginload").show();
+		$("#qcName,#qcUserName,#qcPwd,.qcConnsubmit").prop("disabled",true);
+		$("#qcName,#qcUserName,#qcPwd").css("background","none");
 		$("#qcErrorMsg").text("");
 		$("#qcName,#qcUserName,#qcPwd").removeClass("inputErrorBorder");
 		var qcURL = $("#qcName").val();
 		var qcUserName = $("#qcUserName").val();
 		var qcPassword = $("#qcPwd").val();
-		if(!qcURL)	$("#qcName").addClass("inputErrorBorder");
-		else if(!qcUserName)	$("#qcUserName").addClass("inputErrorBorder");
-		else if(!qcPassword)	$("#qcPwd").addClass("inputErrorBorder");
+		if(!qcURL){
+			$("#qcName").addClass("inputErrorBorder");
+			$(".qcLoginload").hide();
+		}
+		else if(!qcUserName){
+			$("#qcUserName").addClass("inputErrorBorder");
+			$(".qcLoginload").hide();
+		}
+		else if(!qcPassword){
+			$("#qcPwd").addClass("inputErrorBorder");
+			$(".qcLoginload").hide();
+		}
 		else{
 			$("#qcPwd").removeClass("inputErrorBorder");
 			qcServices.loginQCServer_ICE(qcURL,qcUserName,qcPassword)
 			.then(function(data){
 				$scope.domainData = data;
-				//$("#loginToQCpop").modal("hide");
+				$(".qcLoginload").hide();
+				$("#qcName,#qcUserName,#qcPwd,.qcConnsubmit").prop("disabled",false);
 				if(data == "unavailableLocalServer"){
 					$("#qcErrorMsg").text("Unavailable LocalServer");
 				}
@@ -53,7 +66,10 @@ mySPA.controller('qcController',['$scope','$window','$http','$location','$timeou
 				}
 				else if(data == "invalidcredentials"){
 					$("#qcErrorMsg").text("Invalid Credentials");
-				}				
+				}
+				else if(data == "invalidurl"){
+					$("#qcErrorMsg").text("Invalid URL");
+				}			
 				else if(data){
 					$(".qcSelectDomain").empty();
 					$(".qcSelectDomain").append("<option selected disabled>Select Domain</option>")
@@ -82,8 +98,9 @@ mySPA.controller('qcController',['$scope','$window','$http','$location','$timeou
 
 	//Select Domains
 	$(document).on('change', ".qcSelectDomain", function(){
+		$(document.body).css({'cursor' : 'wait'});
+		$(".qcSelectDomain, .qcSelectProject").prop("disabled", true);
 		var getDomain = $(this).children("option:selected").val();
-		$(".loadALM").show();
 		qcServices.qcProjectDetails_ICE(getDomain)
 			.then(function(data){
 				nineteen68_projects_details = data.nineteen68_projects;
@@ -104,9 +121,9 @@ mySPA.controller('qcController',['$scope','$window','$http','$location','$timeou
 					for(var i=0;i<data.nineteen68_projects.length;i++){
 						$(".qcN68SelectProject").append("<option value='"+data.nineteen68_projects[i].project_id+"'>"+data.nineteen68_projects[i].project_name+"</option>");
 					}
-					
+					$(document.body).css({'cursor' : 'default'});
 				}
-				$(".loadALM").hide();
+				$(".qcSelectDomain, .qcSelectProject").prop("disabled", false);
 			},
 			function(error) {	console.log("Error in qcController.js file loginQCServer method! \r\n "+(error.data));
 			});
@@ -116,7 +133,7 @@ mySPA.controller('qcController',['$scope','$window','$http','$location','$timeou
 	$(document).on("change", ".qcSelectProject", function(){
 		var getProjectName = $(".qcSelectProject option:selected").val();
 		var getDomainName = $(".qcSelectDomain option:selected").val();
-		$(".loadALM").show();
+		blockUI("Loading...");
 		qcServices.qcFolderDetails_ICE("folder",getProjectName,getDomainName,"root")
 			.then(function(data){
 				var structContainer = $(".qcTreeContainer");
@@ -134,12 +151,12 @@ mySPA.controller('qcController',['$scope','$window','$http','$location','$timeou
 					for(var j=0; j<data[1].TestSet.length; j++){
 						structContainer.find(".root ul").append("<li class='Tsetnode testSet_"+(j+1)+"' data-testsetpath='"+data[1].TestSet[j].testsetpath+"' data-testsetid='"+data[1].TestSet[j].testsetid+"'><img class='qcExpand qcExpandTestset selectedQcNode' title='expand' style='height: 16px;' src='imgs/ic-taskType-blue-plus.png'><label title='"+data[1].TestSet[j].testset+"'>"+data[1].TestSet[j].testset+"</label></li>")
 					}
-				}				
+				}
+				unblockUI();				
 			},
 			function(error) {	console.log("Error in qcController.js file loginQCServer method! \r\n "+(error.data));
 			});
 			$('.scrollbar-inner').scrollbar();
-			$(".loadALM").hide();
 	});
 
 	//Select Nineteen68 projects
@@ -150,8 +167,12 @@ mySPA.controller('qcController',['$scope','$window','$http','$location','$timeou
 				var N68Container = $(".qcN68TreeContainer");
 				N68Container.empty();
 				N68Container.append("<ul></ul>")
-				for(var j=0; j<nineteen68_projects_details[i].scenario_details.length; j++){
-					N68Container.find("ul").append("<li class='testSet testScenariolink' data-scenarioid='"+nineteen68_projects_details[i].scenario_details[j].testscenarioid+"'><label title='"+nineteen68_projects_details[i].scenario_details[j].testscenarioname+"'>"+nineteen68_projects_details[i].scenario_details[j].testscenarioname+"</label></li>")
+				if(nineteen68_projects_details[i].scenario_details.length >0){
+					for(var j=0; j<nineteen68_projects_details[i].scenario_details.length; j++){
+						N68Container.find("ul").append("<li class='testSet testScenariolink' data-scenarioid='"+nineteen68_projects_details[i].scenario_details[j].testscenarioid+"'><label title='"+nineteen68_projects_details[i].scenario_details[j].testscenarioname+"'>"+nineteen68_projects_details[i].scenario_details[j].testscenarioname+"</label></li>")
+					}
+				}else{
+					N68Container.append("This project does not contain any scenarios");
 				}
 			}
 		}
@@ -173,9 +194,10 @@ mySPA.controller('qcController',['$scope','$window','$http','$location','$timeou
 				getParent.addClass("qcCollapse");
 			}
 			else{
-				$(".loadALM").show();
+				$(".qcExpand").addClass("stopPointerEvent");
+				$(document.body).css({'cursor' : 'wait'});
 				getParent.addClass("qcCollapse");
-				if(getParent.hasClass("Tfolnode"))	$(this).prop("src","imgs/ic-qcCollapse.png");
+				//if(getParent.hasClass("Tfolnode"))	$(this).prop("src","imgs/ic-qcCollapse.png");
 				var getProjectName = $(".qcSelectProject option:selected").val();
 				var getDomainName = $(".qcSelectDomain option:selected").val();
 				var datapath, dataAction;
@@ -214,12 +236,14 @@ mySPA.controller('qcController',['$scope','$window','$http','$location','$timeou
 									}
 								}
 							}
-						}		
+						}
+						$(".qcExpand").removeClass("stopPointerEvent");
+						$(document.body).css({'cursor' : 'default'});	
 					},
 					function(error) {	console.log("Error in qcController.js file loginQCServer method! \r\n "+(error.data));
 					});
+					if(getParent.hasClass("Tfolnode"))	$(this).prop("src","imgs/ic-qcCollapse.png");
 					$('.scrollbar-inner').scrollbar();
-					$(".loadALM").hide();
 				}
 		}	
 	})
@@ -240,7 +264,7 @@ mySPA.controller('qcController',['$scope','$window','$http','$location','$timeou
 		$(this).siblings().prop("style","background-color:none;border-radius:0px;");
 	})
 
-	//Mapping
+	//Undo Mapping
 	$(document).on('click', ".qcUndoSyncronise", function(){
 		var qcTestcaseName = $(this).siblings("label").text();
 		var qcTestsetName = $(this).parent("li").parent("ul").prev("li").find('label').text();
@@ -250,49 +274,64 @@ mySPA.controller('qcController',['$scope','$window','$http','$location','$timeou
 				mappedList =  mappedList.filter(function(n){ return n != null });
 				$('.testScenariolink').removeClass("selectedToMap");
 				$('.testScenariolink').prop("style","background-color:none;border-radius:0px;");
+				$(this).parent().css({"background-color":"rgb(225, 202, 255)"});
+				$(this).siblings(".qcSyncronise").show();
 				break;
 			}
 		}
 	})
 
-	//Undo Mapping
-	$(document).on('click', ".qcSyncronise", function(){
+	// Mapping
+	$(document).on('click', ".qcSyncronise", function(event){
 		var getDomainName = $(".qcSelectDomain option:selected").val();
 		var getProjectName = $(".qcSelectProject option:selected").val();
 		var qcTestcaseName = $(this).siblings("label").text();
 		var qcTestsetName = $(this).parent("li").parent("ul").prev("li").find('label').text();
 		var qcFolderPath = $(this).parent("li").parent("ul").prev("li").parent("ul").prev("li").data("folderpath");
 		var N68ScenarioId = $(".qcN68TreeContainer").find(".selectedToMap").data("scenarioid");
-		mappedList.push({
-			'domain': getDomainName,
-			'project': getProjectName,			
-			'testcase': qcTestcaseName,
-			'testset': qcTestsetName,
-			'folderpath': qcFolderPath,
-			'scenarioId': N68ScenarioId,
-		})
+		if(!getDomainName)	openModelPopup("Save Mapped Testcase", "Please select domain");
+		else if(!getProjectName)	openModelPopup("Save Mapped Testcase", "Please select project");
+		else if(!qcTestcaseName)	openModelPopup("Save Mapped Testcase", "Please select Testcase");
+		else if(!qcTestsetName)	openModelPopup("Save Mapped Testcase", "Please select Testset");
+		else if(!N68ScenarioId)	openModelPopup("Save Mapped Testcase", "Please select scenario");
+		else{
+			mappedList.push({
+				'domain': getDomainName,
+				'project': getProjectName,			
+				'testcase': qcTestcaseName,
+				'testset': qcTestsetName,
+				'folderpath': qcFolderPath,
+				'scenarioId': N68ScenarioId,
+			})
+			$(this).parent().css({"background-color":"#ddd"});
+			$(this).hide();
+			event.stopPropagation();
+		}
 	})
 
 	//Submit mapped details
 	$scope.mapTestcaseToN68 = function(){
-		qcServices.saveQcDetails_ICE(mappedList)
-		.then(function(data){
-			if(data == "unavailableLocalServer"){
-				openModelPopup("Save Mapped Testcase", "unavailableLocalServer")
-			}
-			else if(data == "fail"){
-				openModelPopup("Save Mapped Testcase", "failed to save")
-			}
-			else if(data == "success"){
-				mappedList = [];
-				$('.testcaselink, .testScenariolink').removeClass("selectedToMap");
-				$('.testcaselink').find(".qcSyncronise, .qcUndoSyncronise").hide();
-				$('.testcaselink, .testScenariolink').prop("style","background-color:none;border-radius:0px;");
-				openModelPopup("Save Mapped Testcase", "Saved successfully")
-			}
-		},
-		function(error) {	console.log("Error in qcController.js file mapTestcaseToN68 method! \r\n "+(error.data));
-		});		
+		if(mappedList.length > 0){
+			qcServices.saveQcDetails_ICE(mappedList)
+			.then(function(data){
+				if(data == "unavailableLocalServer"){
+					openModelPopup("Save Mapped Testcase", "unavailableLocalServer");
+				}
+				else if(data == "fail"){
+					openModelPopup("Save Mapped Testcase", "failed to save");
+				}
+				else if(data == "success"){
+					mappedList = [];
+					$('.testcaselink, .testScenariolink').removeClass("selectedToMap");
+					$('.testcaselink').find(".qcSyncronise, .qcUndoSyncronise").hide();
+					$('.testcaselink, .testScenariolink').prop("style","background-color:none;border-radius:0px;");
+					openModelPopup("Save Mapped Testcase", "Saved successfully");
+				}
+			},
+			function(error) {	console.log("Error in qcController.js file mapTestcaseToN68 method! \r\n "+(error.data));
+			});
+		}
+		else 	openModelPopup("Save Mapped Testcase", "Map Testcases before save");
 	}
 
 	$scope.displayMappedFilesTab = function(){
@@ -317,6 +356,19 @@ mySPA.controller('qcController',['$scope','$window','$http','$location','$timeou
 		},
 		function(error) {	console.log("Error in qcController.js file viewQcMappedList_ICE method! \r\n "+(error.data));
 		});		
+	}
+
+	$scope.exitQcConnection = function(){
+		var dataAction = "qcquit";
+		qcServices.qcFolderDetails_ICE(dataAction,"","","","")
+		.then(function(data){
+			if(data == "closedqc"){
+				window.localStorage['navigateScreen'] = "plugin"
+				window.location.href = "/plugin";
+			}		
+		},
+		function(error) {	console.log("Error in qcController.js file loginQCServer method! \r\n "+(error.data));
+		});
 	}
 	//Global moded popup
 	function openModelPopup(title, body){

@@ -42,6 +42,7 @@ function loadMindmapData(){
 	});
 }
 function loadMindmapData1(){
+	blockUI("Loading...");
 	var selectedTab = window.localStorage['tabMindMap'];
 	uNix=0;uLix=0;dNodes=[];dLinks=[];nCount=[0,0,0,0];scrList=[];tcList=[];cSpan=[0,0];cScale=1;mapSaved=!1;
 	//Adding task to scenario
@@ -97,6 +98,7 @@ function loadMindmapData1(){
 			setModuleBoxHeight();
 		}
 	});
+	unblockUI();
 }
 window.onresize=function() {
 	var w=window.innerWidth-28,h=window.innerHeight-123;

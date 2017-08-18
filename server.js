@@ -100,7 +100,7 @@ if (cluster.isMaster) {
     });
 
     //Only Test Engineer and Test Lead have access
-    app.get(/^\/(design|designTestCase|execute|scheduling|p_QualityCenter)$/, function(req, res){
+    app.get(/^\/(design|designTestCase|execute|scheduling|p_ALM)$/, function(req, res){
         if(!req.session.defaultRole || req.session.defaultRole == "Admin" || req.session.defaultRole == "Business Analyst" || req.session.defaultRole == "Tech Lead" || req.session.defaultRole == "Test Manager")
         {
             req.session.destroy(); res.status(401).send('<br><br>Your session has been expired.Please <a href="/">Login</a> Again');
@@ -110,7 +110,7 @@ if (cluster.isMaster) {
     });
 
     //Test Engineer,Test Lead and Test Manager can access
-    app.get(/^\/(specificreports|home|p_Utility|p_Reports|plugin|p_QualityCenter|p_Weboccular)$/, function(req, res){
+    app.get(/^\/(specificreports|home|p_Utility|p_Reports|plugin|p_ALM|p_Weboccular)$/, function(req, res){
         if (!req.session.defaultRole || req.session.defaultRole == "Admin" || req.session.defaultRole == "Business Analyst" || req.session.defaultRole == "Tech Lead")
         {
             req.session.destroy(); res.status(401).send('<br><br>Your session has been expired.Please <a href="/">Login</a> Again');
@@ -230,8 +230,8 @@ if (cluster.isMaster) {
     app.post('/ExecuteTestSuite_ICE_CI', suite.ExecuteTestSuite_ICE_CI);
     //app.post('/readTestScenarios_ICE', suite.readTestScenarios_ICE);
     //Scheduling Screen Routes
-    /*app.post('/testSuitesScheduler_ICE', suite.testSuitesScheduler_ICE);
-    app.post('/getScheduledDetails_ICE', suite.getScheduledDetails_ICE);*/
+    //app.post('/testSuitesScheduler_ICE', suite.testSuitesScheduler_ICE);
+    //app.post('/getScheduledDetails_ICE', suite.getScheduledDetails_ICE);
     //Report Screen Routes
     app.post('/getAllSuites_ICE', report.getAllSuites_ICE);
     app.post('/getSuiteDetailsInExecution_ICE', report.getSuiteDetailsInExecution_ICE);

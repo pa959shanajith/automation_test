@@ -80,13 +80,13 @@ mySPA.controller('headerController', function($scope,$http,$location,headerServi
 		var username = JSON.parse(window.localStorage['_UI']).username;
 		var userRolesList;
 		var selRole;
-
-		$("#switchRoles").hide();
-		$('#sRole ul').hide();
+		if(JSON.parse(window.localStorage['_UI']).additionalrole.length == 0){
+           $("#switchRoles").hide();
+		   $('#sRole ul').hide();
+		}
 			LoginService.loadUserInfo_Nineteen68(username,selRole,false)
 			.then(function (response) {
-				$("#switchRoles").hide();
-				$('#sRole ul').hide();
+
 				if(response == "Invalid Session"){
 								window.location.href = "/";
 								}
@@ -101,13 +101,13 @@ mySPA.controller('headerController', function($scope,$http,$location,headerServi
 					window.location.href = "/";
 				  }
 				  else if(data.length == 0){
-					  $('#sRole ul').hide();
-					  //$("#switchRoles").hide();
+					  $("#switchRoles").hide();
+		              $('#sRole ul').hide();
 					  $("#noRoles").modal("show");
 				  }
 				  else{
 					  //alert("success"); $(this).valueOf("outerHTML").data("id")
-					 getAdditionalRoles = $('#switchRoles');
+					    getAdditionalRoles = $('#switchRoles');
 						getAdditionalRoles.empty();
 						var pR = window.localStorage['_pR'].split(";")
 						var sr = window.localStorage['_SR'];

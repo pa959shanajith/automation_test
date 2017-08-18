@@ -31,8 +31,13 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 	//$("#page-taskName").empty().append('<span class="taskname">'+getTaskName+'</span>');
 	$(".projectInfoWrap").empty()
 	testSuiteName = JSON.parse(window.localStorage['_CT']).testSuiteName;
-
-	$timeout(function(){
+	if(getTaskName.indexOf("Execute Batch") < 0){
+		$(".parentBatchContainer").parent().hide();
+		$(".btnPanel").css("left","0");
+		$("#page-taskName span").text("Scenario Execution");
+	}
+	else	$("#page-taskName span").text("Batch Execution");
+	//$timeout(function(){
   		//var releaseId = JSON.parse(window.localStorage['_CT']).releaseId;
 	//	var cycleId = JSON.parse(window.localStorage['_CT']).cycleId;
 	//	var projectId = JSON.parse(window.localStorage['_CT']).projectId;
@@ -43,42 +48,32 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 		// {
 		// 	$(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">Project :</span><span class="content">'+projectDetails.respnames[0]+'</span></p><p class="proj-info-wrap"><span class="content-label">Release :</span><span class="content">'+releaseName+'</span></p><p class="proj-info-wrap"><span class="content-label">Cycle :</span><span class="content">'+cycleName+'</span></p><p class="proj-info-wrap"><span class="content-label">TestSuite :</span><span class="content">'+testSuiteName+'</span></p>')
 		// }
-	}, 2000)
+	//}, 2000)
 
 	//Global Information
 	// var cycleId = JSON.parse(window.localStorage['_CT']).cycleId;
 	// var testSuiteId = JSON.parse(window.localStorage['_CT']).testSuiteId;
 	// var testSuiteName = JSON.parse(window.localStorage['_CT']).testSuiteName;
 	var assignedTestScenarioId = JSON.parse(window.localStorage['_CT']).assignedTestScenarioIds;
-
-
-	if(window.localStorage['_CT'])
-	{
+	if(window.localStorage['_CT']){
 		var readTestSuite = JSON.parse(window.localStorage['_CT']).testSuiteDetails;
 		console.log("read",readTestSuite);
 	}
 
 	//Global Information
-
 	//Getting Apptype or Screen Type
-	//console.log(appType);
 	$scope.getScreenView = appType
-	//Getting Apptype orScreen Type
 
 	//Onload ServiceCall
 	$timeout(function(){
 		angular.element(document.getElementById("left-nav-section")).scope().readTestSuite_ICE();
 	}, 1000)
 
-		$scope.readTestSuite_ICE = function(){
-
-            $('.checkStylebox').attr("disabled", true); 
-			$('#excSaveBtn').attr("disabled", true);
-			// $('.checkStylebox').hide(); 
-			// $('#excSaveBtn').hide();
+	$scope.readTestSuite_ICE = function(){
+        $('.checkStylebox').attr("disabled", true); 
+		$('#excSaveBtn').attr("disabled", true);
 		ExecutionService.readTestSuite_ICE(readTestSuite)
 		.then(function(data) {
-			//var jsonData = JSON.parse(data);
 			if(data == "Invalid Session"){
 					window.location.href = "/";
 			 }
@@ -93,7 +88,6 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 			    $('#excSaveBtn').attr("disabled", false);
 				$(".executionTableDnd").empty()
 				cfpLoadingBar.complete();
-				// console.log("Jdata", data);
 				 var dataLen = Object.keys(data).length;
 				 for(var m =0;m<dataLen;m++)
 				 {
@@ -101,18 +95,15 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 					//create header for table
 					$("#executionDataTable_"+m+" tbody tr").remove();
 					var keys = Object.keys(data);
-				//	var eachData = Object.values(data);
 					var eachData = Object.keys(data).map(function(itm) { return data[itm]; });
 					eachData = eachData[m];
 					rowData = eachData;
 					$("div.executionTableDnd").attr('id','batch_'+m);
-					//console.log("TBODY", $("tbody").text());
 					console.log(keys[m]);
 					$("#batch_"+m+"").append("<div class='suiteNameTxt' id='page-taskName_"+m+"'><span class='taskname'><input id='parentSuite_"+m+"' class='parentSuiteChk' type='checkbox' name='' />"+keys[m]+"</span></div><div id='exeData_"+m+"' class='exeDataTable testSuiteBatch'><table id='executionDataTable_"+m+"' class='executionDataTable' cellspacing='0' cellpadding='0'><thead><tr><th style='width: 4%' id='contextmenu'></th><th style='width: 3%; padding: 5px 0px'><i class='fa fa-ban' title='Do Not Execute' aria-hidden='true' style='font-size: 14px;'></i><input id='parentExecute_"+m+"' class='d-execute' type='checkbox' /></th>	<th style='width: 28%; text-align:left; border-right: 1px solid #fff;'>Scenario Name</th><th style='width: 24%; border-right: 1px solid #fff'>Data Parameterization</th>	<th style='width: 18%; border-right: 1px solid #fff'>Condition</th><th style='width: 23%;'>Project Name</th></tr><input type='hidden' value='"+rowData.testsuiteid+"'/></thead><tbody class='scrollbar-inner testScenarioScroll'></tbody></table></div>");//<th style='width: 8%; text-align: center;'>ALM</th>
 					//<img class='expandTable' src='imgs/icon-minus.png'>
 
 				    var row = $("#executionDataTable_"+m+"").find('tbody');
-					//var row = $("<tbody />");
 					console.log("row",row);
 					var count = 1
 
@@ -144,11 +135,10 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 						}
 					}
 
-					//Building object for each row after getting the data from server
+				//Building object for each row after getting the data from server
 				var projectName=['Project Name'];
 				//Creating Table Rows for each of the Scenarios
 				for (var i = 0; i < getEachScenario.length; i++) {
-
 					row = $("<tr id=\"" + count + "\"/>");
 					$("#executionDataTable_"+m+"").append(row);
 					row.append($("<td class='tabeleCellPadding' style='width:4%;' id=\"" + count + "\">"+ count + "</td>"));
@@ -202,21 +192,19 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 					if($("#executionDataTable_"+m+" tbody tr").length == $("#executionDataTable_"+m+" tbody tr td.exe-ExecuteStatus input:checked").length)
 					{
 						$("#parentExecute").prop("checked", true);
-
 					}
 					else{
 						$("#parentExecute").prop("checked", false);
 					}
 				 }
-				 if(dataLen == $(".parentSuiteChk:checked").length)
-				 {
+				 if(dataLen == $(".parentSuiteChk:checked").length){
 					 $(".checkStylebox").prop("checked", true);
 				 }
 				 else{
 					 $(".checkStylebox").prop("checked", false);
 				 }
 
-				 	$('[id^=parentExecute_]').on('click',function(e){
+				$('[id^=parentExecute_]').on('click',function(e){
 						if($(this).is(":checked") == true)
 						{
 							$(this).parents('table').find('tbody tr input[type=checkbox]').prop('checked', true);
@@ -235,7 +223,7 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 					else{
 						$("input[type='checkbox'].checkStylebox").prop('checked', false);
 					}
-					});
+				});
 
 				$('[id^=executionDataTable]').find('tbody tr td input').on('click',function(e){
 					var totalLen = $(this).parent().parent().parent().children().find('input[type=checkbox]').length;
@@ -265,7 +253,7 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 					}
 				});
 
-				 $('[id^=parentSuite_]').on('click',function(e){
+				$('[id^=parentSuite_]').on('click',function(e){
 					if($(this).is(":checked") == true)
 						{
 							$(this).parents('.suiteNameTxt').next().children().find('input[type=checkbox]').prop('checked', true);
@@ -283,9 +271,9 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 					 {
 						 $("input[type='checkbox'].checkStylebox").prop('checked', false);
 					 }
-				 });
+				});
 
-				 $("input[type='checkbox'].checkStylebox").on('click',function(e){
+				$("input[type='checkbox'].checkStylebox").on('click',function(e){
 						if($(this).is(":checked") == true)
 						{
 							$('[id^=parentSuite_]').prop('checked', true);
@@ -297,10 +285,13 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 							$('[id^=parentExecute_]').prop('checked', false);
 							$("tbody").find('input[type=checkbox]').prop('checked', false);
 						}
-				  });
+				});
 
 			}
 
+			if(getTaskName.indexOf("Execute Batch") < 0){
+				$(".parentSuiteChk").hide();
+			}
 			//select all checkboxes by default on load
 			//$("input[type=checkbox]:visible").prop('checked',true)
 
@@ -331,12 +322,12 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 
 	//Show scenarios of testsuites
 	$(document).dblclick(".taskname", function(e){
-		if($("."+e.target.className)[0].className == "taskname"){			
-			var scenarioNames = $("."+e.target.className).parent().siblings(".testSuiteBatch").find("tbody.testScenarioScroll tr");
+		if(e.target.className == "taskname"){			
+			var scenarioNames = e.target.parentElement.nextSibling.getElementsByClassName("testScenarioScroll")[0].children;
 			$("#suiteDetailsContent").empty();
-			$("#modalSuiteDetails").find(".modal-title").text($("."+e.target.className)[0].textContent);
+			$("#modalSuiteDetails").find(".modal-title").text(e.target.textContent);
 			for(var i=0; i<scenarioNames.length;i++){
-				$("#suiteDetailsContent").append('<div class="sDInnerContentsWrap"><div class="sDInnerContents" style="width: 50%;">'+scenarioNames[i].childNodes[2].textContent+'</div><div class="sDInnerContents" style="width: 50%;">'+scenarioNames[i].childNodes[5].textContent+'</div></div>');
+				$("#suiteDetailsContent").append('<div class="sDInnerContentsWrap"><div class="sDInnerContents" style="width: 50%;">'+scenarioNames[i].getElementsByClassName("exe-scenarioIds")[0].textContent+'</div><div class="sDInnerContents" style="width: 50%;">'+scenarioNames[i].getElementsByClassName("exe-scenarioIds")[0].textContent+'</div></div>');
 			}
 			$("#modalSuiteDetails").modal("show");
 			$('#modalSuiteDetails').find('.btn-default').focus();

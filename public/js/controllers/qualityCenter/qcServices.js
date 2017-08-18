@@ -33,12 +33,12 @@ mySPA.factory('qcServices', ['$http','$q', function ($http, $httpProvider, $q)  
 										project: getProjectName,
 										qcaction: qcaction,
 										testset: testCasename
-							})
-							.then(function(response) {
-									return response.data;
-							},function(response) {
-									return $q.reject(response.data);
-							});
+						})
+						.then(function(response) {
+								return response.data;
+						},function(response) {
+								return $q.reject(response.data);
+						});
 				},
 				saveQcDetails_ICE: function(mappedList){
 						var param = "saveQcDetails_ICE";
