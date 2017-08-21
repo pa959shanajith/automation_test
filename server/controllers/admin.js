@@ -177,7 +177,7 @@ exports.getUsersOld_Nineteen68 = function(req, res){
 				try{
 					async.forEachSeries(result.rows,function(iterator,callback1){
 						try{
-							roles.push(iterator.username);
+							roles.push(iterator.username.toLowerCase());
 							r_ids.push(iterator.userid);
 							callback1();
 						}
@@ -223,7 +223,7 @@ exports.getAllUsers_Nineteen68 = function(req, res){
 				else {
 					async.forEachSeries(result.rows,function(iterator,callback1){
 						try{
-							user_names.push(iterator.username);
+							user_names.push(iterator.username.toLowerCase());
 							userIds.push(iterator.userid);
 							d_role.push(iterator.defaultrole);
 							callback1();							
@@ -280,7 +280,7 @@ exports.getEditUsersInfo_Nineteen68 = function(req, res){
 				else {
 					async.forEachSeries(result.rows,function(iterator,callback1){
 						try{
-							userDetails.userName = iterator.username,
+							userDetails.userName = iterator.username.toLowerCase(),
 							userDetails.roleId = iterator.defaultrole,
 							userDetails.additionalroles = iterator.additionalroles,
 							userDetails.emailId = iterator.emailid,
@@ -320,7 +320,7 @@ exports.createUser_Nineteen68 = function(req, res) {
             var date;
             var flag = "fail";
             var status = false;
-            var req_username = req.body.createUser.username;
+            var req_username = req.body.createUser.username.toLowerCase();
             var req_password = req.body.createUser.password;
             var req_firstname = req.body.createUser.firstName;
             var req_lastname = req.body.createUser.lastName;
@@ -335,7 +335,7 @@ exports.createUser_Nineteen68 = function(req, res) {
                 try {
                     for (var i = 0; i < userNameresult.rows.length; i++) {
                         dbResult = userNameresult.rows[i];
-                        if (req_username === dbResult.username) {
+                        if (req_username.toLowerCase() === dbResult.username.toLowerCase()) {
                             status = true;
                             break;
                         }
@@ -426,7 +426,7 @@ exports.updateUser_nineteen68 = function updateUser_nineteen68(req, res) {
             var status = false;
 			var userdetails=req.body.userinfo;
             var userObj = req.body.updateUserObj;
-            var local_username = userObj.userName;
+            var local_username = userObj.userName.toLowerCase();
 			//needs to be sent from front end further on
 			var local_additionalroles = userObj.additionalRole;
             var local_password = userObj.passWord;
@@ -456,7 +456,7 @@ exports.updateUser_nineteen68 = function updateUser_nineteen68(req, res) {
                     } else {
                         service = result.rows[0];
                         if (local_username == undefined || local_username == 'undefined' || local_username == '') {
-                            local_username = service.username;
+                            local_username = service.username.toLowerCase();
                         }
                         if (local_password.trim().length == 0) {
                             db_password = "existing";
@@ -474,9 +474,9 @@ exports.updateUser_nineteen68 = function updateUser_nineteen68(req, res) {
                         if (local_role == undefined || local_role == 'undefined' || local_role == '') {
                             local_role = service.role;
                         }
-						if(local_additionalroles == undefined || local_additionalroles == 'undefined' || local_additionalroles == ''){
-						    local_additionalroles = service.additionalroles;
-					    }
+						// if(local_additionalroles == undefined || local_additionalroles == 'undefined' || local_additionalroles == ''){
+						//     local_additionalroles = service.additionalroles;
+					    // }
                         if (local_email_id == undefined || local_email_id == 'undefined' || local_email_id == '') {
                             local_email_id = service.emailid;
                         }
@@ -509,7 +509,7 @@ exports.updateUser_nineteen68 = function updateUser_nineteen68(req, res) {
 							inputs = {"query":"updateuser",
 							"userid":local_user_Id, "additionalroles":local_additionalroles,
 							"deactivated" :false,"emailid": local_email_id, "firstname":local_firstname, "lastname":local_lastname,
-							"ldapuser":result.rows[0].ldapuser, "modifiedby":userdetails.username,"modifiedbyrole":userdetails.role,
+							"ldapuser":result.rows[0].ldapuser, "modifiedby":userdetails.username.toLowerCase(),"modifiedbyrole":userdetails.role,
 							"password":req_hashedPassword, "username":local_username};
 
                             updateUserHistory = "'username=" + local_username + ",password=" + db_password + ","
@@ -787,11 +787,11 @@ exports.createProject_ICE = function createProject_ICE(req, res) {
                         //     "','" + new Date().getTime() + "'," + false + ",{" + dateScreen + ":" + requestprojecthistorydetails + "}," +
                         //     projectTypeId + ",'" + requestedskucode + "',['" + requestedtags + "']);"
 						var inputs={"query":"createproject", "domainid":createProjectObj.domainId,
-						"projectname": createProjectObj.projectName, "createdby":userinfo.username,"projecttypeid":projectTypeId,
+						"projectname": createProjectObj.projectName, "createdby":userinfo.username.toLowerCase(),"projecttypeid":projectTypeId,
 						"skucodeproject" : "skucodeproject", "tags":"tags"};
 						var args = {data:inputs,headers:{"Content-Type" : "application/json"}};
 						
-                        createProjectHistory = "'domainid=" + createProjectObj.domainId + ", projectname=" + createProjectObj.projectName + ", projectid=" + newProjectID + ", createdby=" + userinfo.username + ", " +
+                        createProjectHistory = "'domainid=" + createProjectObj.domainId + ", projectname=" + createProjectObj.projectName + ", projectid=" + newProjectID + ", createdby=" + userinfo.username.toLowerCase() + ", " +
                             "createdon=" + new Date().getTime() + ", deleted=" + false + ", projecttypeid=" + projectTypeId + ", " +
                             "skucodeproject=" + requestedskucode + ", tags=[" + requestedtags + "] '";
                         date = new Date().getTime();
@@ -850,7 +850,7 @@ exports.createProject_ICE = function createProject_ICE(req, res) {
 									"skucoderelease" : "skucoderelease", "tags":"tags"};
 								var args = {data:inputs,headers:{"Content-Type" : "application/json"}};
 
-                                createReleaseHistory = "'projectid=" + newProjectID + ", releasename=" + releaseName + ", releaseid=" + newReleaseID + ", createdby=" + userinfo.username + ", " +
+                                createReleaseHistory = "'projectid=" + newProjectID + ", releasename=" + releaseName + ", releaseid=" + newReleaseID + ", createdby=" + userinfo.username.toLowerCase() + ", " +
                                     "createdon=" + new Date().getTime() + ", deleted=" + false + ", skucoderelease=" + requestedskucode + ", " +
                                     "tags=" + requestedtags + " '";
                                 date = new Date().getTime();
@@ -887,11 +887,11 @@ exports.createProject_ICE = function createProject_ICE(req, res) {
                                                 //     requestedskucode + "',['" + requestedtags + "']);"
 
 												var inputs={"query":"createcycle", "releaseid":newReleaseID,
-													"cyclename": eachCycleName, "createdby":userinfo.username,
+													"cyclename": eachCycleName, "createdby":userinfo.username.toLowerCase(),
 													"skucodecycle" : "skucodecycle", "tags":"tags"};
 												var args = {data:inputs,headers:{"Content-Type" : "application/json"}};
 
-                                                createCycleHistory = "'releaseid=" + newReleaseID + ", cyclename=" + eachCycleName + ", cycleid=" + newCycleID + ", createdby=" + userinfo.username + ", " +
+                                                createCycleHistory = "'releaseid=" + newReleaseID + ", cyclename=" + eachCycleName + ", cycleid=" + newCycleID + ", createdby=" + userinfo.username.toLowerCase() + ", " +
                                                     "createdon=" + new Date().getTime() + ", deleted=" + false + ", skucodecycle=" + requestedskucode + ", " +
                                                     "tags=" + requestedtags + " '";
                                                 date = new Date().getTime();
@@ -1104,7 +1104,7 @@ exports.updateProject_ICE = function updateProject_ICE(req, res){
 								var releaseDetails = eachprojectDetail;
 								var releaseName = releaseDetails.releaseName;
 								var cycleDetails = releaseDetails.cycleDetails;
-								var requestReleasehistorydetails = "'inserted release action on Update project service by " + userinfo.username + " having role:" + userinfo.role + "" +
+								var requestReleasehistorydetails = "'inserted release action on Update project service by " + userinfo.username.toLowerCase() + " having role:" + userinfo.role + "" +
 								" skucoderelease=" + requestedskucode + ", tags=" + requestedtags + ", with the release Name " + releaseName + " '";
 								var newReleaseID = uuid();
 								//console.log("insideRelease", newProjectID);
@@ -1130,7 +1130,7 @@ exports.updateProject_ICE = function updateProject_ICE(req, res){
 											async.forEachSeries(cycleDetails, function(eachCycleDetail, cycleNamescallback) {
 												try{     
 													var eachCycleName = eachCycleDetail.cycleName;
-													var requestCyclehistorydetails = "'inserted cycle action by " + userinfo.username + " having role:" + userinfo.role + "" +
+													var requestCyclehistorydetails = "'inserted cycle action by " + userinfo.username.toLowerCase() + " having role:" + userinfo.role + "" +
 													" skucodecycle=" + requestedskucode + ", tags=" + requestedtags + ",with the cycle Name " + eachCycleName + " '";
 													var newCycleID = uuid();
 													// var getCycleQuery = "INSERT INTO cycles (releaseid,cyclename,cycleid,createdby,createdon,deleted,history,skucodecycle,tags) VALUES (" + 
@@ -1138,7 +1138,7 @@ exports.updateProject_ICE = function updateProject_ICE(req, res){
 													// new Date().getTime() + "'," + false + ",{" + date + ":" + requestCyclehistorydetails + "},'" +
 													// requestedskucode + "',['" + requestedtags + "']);"
 													var inputs={"query":"createcycle", "releaseid":newReleaseID,
-													"cyclename": eachCycleName, "createdby":userinfo.username,
+													"cyclename": eachCycleName, "createdby":userinfo.username.toLowerCase(),
 													"skucodecycle" : "skucodecycle", "tags":"tags"};
 													var args = {data:inputs,headers:{"Content-Type" : "application/json"}};
 													createCycle(args, function(error, response) {
@@ -1175,7 +1175,7 @@ exports.updateProject_ICE = function updateProject_ICE(req, res){
 								async.forEachSeries(cycleDetails, function(eachCycleDetail, cycleNamescallback) {
 									try{
 										var eachCycleName = eachCycleDetail.cycleName;
-										var requestCyclehistorydetails = "'inserted cycle action by " + userinfo.username + " having role:" + userinfo.role + "" +
+										var requestCyclehistorydetails = "'inserted cycle action by " + userinfo.username.toLowerCase() + " having role:" + userinfo.role + "" +
 										" skucodecycle=" + requestedskucode + ", tags=" + requestedtags + ",with the cycle Name " + eachCycleName + " '";
 										var newCycleID = uuid();
 										// var getCycleQuery = "INSERT INTO cycles (releaseid,cyclename,cycleid,createdby,createdon,deleted,history,skucodecycle,tags) VALUES (" + 
@@ -1185,7 +1185,7 @@ exports.updateProject_ICE = function updateProject_ICE(req, res){
 										// createCycle(getCycleQuery, function(error, response) {
 											
 										var inputs={"query":"createcycle", "releaseid":releaseId,
-										"cyclename": eachCycleName, "createdby":userinfo.username,
+										"cyclename": eachCycleName, "createdby":userinfo.username.toLowerCase(),
 										"skucodecycle" : "skucodecycle", "tags":"tags"};
 										var args = {data:inputs,headers:{"Content-Type" : "application/json"}};
 										createCycle(args, function(error, response) {
@@ -1328,10 +1328,10 @@ exports.updateProject_ICE = function updateProject_ICE(req, res){
 												res.send(flag);
 											}else{
 												try{
-													var requestReleasehistorydetails = "'inserted release action on Update project service by " + userinfo.username + " having role:" + userinfo.role + "" +
+													var requestReleasehistorydetails = "'inserted release action on Update project service by " + userinfo.username.toLowerCase() + " having role:" + userinfo.role + "" +
 													" skucoderelease=" + requestedskucode + ", tags=" + requestedtags + ", with the release Name " + newReleaseName + " '";
 													var createReleaseQuery = "INSERT INTO releases (projectid,releasename,releaseid,createdby,createdon,deleted,history,skucoderelease,tags) values(" +
-													requestedprojectid + ",'" + newReleaseName + "'," + releaseId + ",'" + userinfo.username + "','" +
+													requestedprojectid + ",'" + newReleaseName + "'," + releaseId + ",'" + userinfo.username.toLowerCase() + "','" +
 													new Date().getTime() + "'," + false + ",{" + date + ":" + requestReleasehistorydetails + "},'" +
 													requestedskucode + "',['" + requestedtags + "']);"
 													dbConnICE.execute(createReleaseQuery, function(error, response) {
@@ -1358,7 +1358,7 @@ exports.updateProject_ICE = function updateProject_ICE(req, res){
 																						res.send(flag);
 																					}else{
 																						try{
-																							var requestCyclehistorydetails = "'inserted cycle action by " + userinfo.username + " having role:" + userinfo.role + "" +
+																							var requestCyclehistorydetails = "'inserted cycle action by " + userinfo.username.toLowerCase() + " having role:" + userinfo.role + "" +
 																							" skucodecycle=" + requestedskucode + ", tags=" + requestedtags + ",with the cycle Name " + newCycleName + " '";
 																							// var getCycleQuery = "INSERT INTO cycles (releaseid,cyclename,cycleid,createdby,createdon,deleted,history,skucodecycle,tags) VALUES (" + 
 																							// releaseId + ",'" + newCycleName + "'," + cycleId + ",'" + userinfo.username + "','" +
@@ -1366,7 +1366,7 @@ exports.updateProject_ICE = function updateProject_ICE(req, res){
 																							// requestedskucode + "',['" + requestedtags + "']);"
 																							// createCycle(getCycleQuery, function(error, response) {
 																							var inputs={"query":"createcycle", "releaseid":releaseId,
-																								"cyclename": newCycleName, "createdby":userinfo.username,
+																								"cyclename": newCycleName, "createdby":userinfo.username.toLowerCase(),
 																								"skucodecycle" : "skucodecycle", "tags":"tags"};
 																							var args = {data:inputs,headers:{"Content-Type" : "application/json"}};
 																							createCycle(args, function(error, response) {
@@ -1429,7 +1429,7 @@ exports.updateProject_ICE = function updateProject_ICE(req, res){
 															res.send(flag);
 														}else{
 															try{
-																var requestCyclehistorydetails = "'inserted cycle action by " + userinfo.username + " having role:" + userinfo.role + "" +
+																var requestCyclehistorydetails = "'inserted cycle action by " + userinfo.username.toLowerCase() + " having role:" + userinfo.role + "" +
 																" skucodecycle=" + requestedskucode + ", tags=" + requestedtags + ",with the cycle Name " + newCycleName + " '";
 																// var getCycleQuery = "INSERT INTO cycles (releaseid,cyclename,cycleid,createdby,createdon,deleted,history,skucodecycle,tags) VALUES (" + 
 																// releaseId + ",'" + newCycleName + "'," + cycleId + ",'" + userinfo.username + "','" +
@@ -1437,7 +1437,7 @@ exports.updateProject_ICE = function updateProject_ICE(req, res){
 																// requestedskucode + "',['" + requestedtags + "']);"
 																// createCycle(getCycleQuery, function(error, response) {
 																var inputs={"query":"createcycle", "releaseid":releaseId,
-																		"cyclename": newCycleName, "createdby":userinfo.username,
+																		"cyclename": newCycleName, "createdby":userinfo.username.toLowerCase(),
 																		"skucodecycle" : "skucodecycle", "tags":"tags"};
 																var args = {data:inputs,headers:{"Content-Type" : "application/json"}};
 																createCycle(args, function(error, response) {
@@ -1952,17 +1952,17 @@ exports.assignProjects_ICE = function(req, res) {
 				// var assignProjectsToUsers = "UPDATE icepermissions set modifiedby='" + assignProjectsDetails.userInfo.username + "', modifiedon=" + new Date().getTime() + ",modifiedbyrole='" + assignProjectsDetails.userInfo.role + "', projectids=[" + projectIds + "] where userid=" + assignProjectsDetails.userId;
 				alreadyassigned=true;
 				inputs = {"alreadyassigned":alreadyassigned, "userid":assignProjectsDetails.userId,"domainid":assignProjectsDetails.domainId,
-				"modifiedbyrole":assignProjectsDetails.userInfo.role,"modifiedby":assignProjectsDetails.userInfo.username,
+				"modifiedbyrole":assignProjectsDetails.userInfo.role,"modifiedby":assignProjectsDetails.userInfo.username.toLowerCase(),
 				"projectids":projectIds}
 			}
 			else{
 				//    var assignProjectsToUsers = "INSERT INTO icepermissions (userid,domainid,createdby,createdon,history,projectids) VALUES (" + assignProjectsDetails.userId + "," + assignProjectsDetails.domainId + ",'" + assignProjectsDetails.userInfo.username + "','" + new Date().getTime() + "',null,[" + projectIds + "]);"
 				inputs = {"alreadyassigned":alreadyassigned, "userid":assignProjectsDetails.userId,"domainid":assignProjectsDetails.domainId,
-				"createdby":assignProjectsDetails.userInfo.username,
+				"createdby":assignProjectsDetails.userInfo.username.toLowerCase(),
 				"projectids":projectIds}
 			}
-            assignProjectsHistory = "'userid=" + assignProjectsDetails.userId + ", domainid=" + assignProjectsDetails.domainId + ", createdby=" + assignProjectsDetails.userInfo.username + ", createdon=" + new Date().getTime() + ", " +
-                "modifiedby=" + assignProjectsDetails.userInfo.username + ", modifiedbyrole=" + assignProjectsDetails.userInfo.role + ", modifiedon=" + new Date().getTime() + ", " +
+            assignProjectsHistory = "'userid=" + assignProjectsDetails.userId + ", domainid=" + assignProjectsDetails.domainId + ", createdby=" + assignProjectsDetails.userInfo.username.toLowerCase() + ", createdon=" + new Date().getTime() + ", " +
+                "modifiedby=" + assignProjectsDetails.userInfo.username.toLowerCase() + ", modifiedbyrole=" + assignProjectsDetails.userInfo.role + ", modifiedon=" + new Date().getTime() + ", " +
                 "projectids=[" + projectIds + "] '";
             date = new Date().getTime();
             assignProjectsHistoryQuery = "INSERT INTO icepermissions (userid,history) VALUES (" + userId + ",{" + date + ":" + assignProjectsHistory + "})";

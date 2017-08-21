@@ -362,7 +362,7 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 		var batchInfo = [];
 		var batchDetails = {};
 		userinfo = {
-				username : JSON.parse(window.localStorage['_UI']).username,
+				username : JSON.parse(window.localStorage['_UI']).username.toLowerCase(),
 				role : window.localStorage['_SR']
 		}
 		//updateTestSuite

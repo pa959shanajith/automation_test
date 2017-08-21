@@ -817,7 +817,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			$(".popupWrap").animate({ opacity: 0, right: "70px" }, 100).css({'z-index':'0','pointer-events':'none'});
 			$(".filterObjects").removeClass("popupContent-filter-active").addClass("popupContent-default");
 			$(".thumb-ic").removeClass("thumb-ic-highlight");
-			if(data != null && data != "getScrapeData Fail."){
+				if(data != null && data != "getScrapeData Fail." && data != "" && data != " "){
 				viewString = data;
 				newScrapedList = viewString
 				$("#window-scrape-screenshot .popupContent, #window-scrape-screenshotTs .popupContent").empty()
@@ -829,7 +829,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					$("#enableAppend").prop("disabled", true).css('cursor','no-drop');
 					$("#screenShotScrape").text("No Screenshot Available");
 					unblockUI();
-					//return;
+				//	return;
 				}
 				else{
 
@@ -883,7 +883,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					editable: true,
 					radio: true
 				});
-				
+
 				if(appType == 'Web')
 				{
 						if($(".ellipsis").length > 0 )
@@ -2083,7 +2083,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				if(appType == "MobileApp"){
 					if(navigator.appVersion.indexOf("Win")!=-1){
 						d.css('left', (rect.x/3) + 'px');
-						d.css('top', (rect.y/3) + 'px');
+						d.css('top', (rect.y/3) - 3 + 'px');
 						d.css('height', (rect.h/3) + 'px');
 						d.css('width', (rect.w/3) + 'px');
 					}
@@ -2126,7 +2126,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				d.css('opacity', '0.7');
 				getTopValue = Math.round(rect.y) * scale_highlight + 'px'
 				if(appType == "MobileApp" || appType == "MobileWeb")
-					$(".scroll-wrapper > .scrollbar-screenshot").animate({ scrollTop: parseInt(Math.round(rect.y) - 200) + 'px' },500);
+					$(".scroll-wrapper > .scrollbar-screenshot").animate({ scrollTop: parseInt(Math.round(rect.y) - 600) + 'px' },500);
 				else
 					$(".scroll-wrapper > .scrollbar-screenshot").animate({ scrollTop: parseInt(getTopValue) },500);
 				//$('.scroll-wrapper > .scrollbar-screenshot').scrollTo(d.offset().top);
@@ -4231,13 +4231,13 @@ function contentTable(newTestScriptDataLS) {
 						&& (obType.indexOf("RadioButton") >= 0 || obType.indexOf("ImageButton") >= 0 || obType.indexOf("Button") >= 0|| obType.indexOf("EditText") >= 0
 								|| obType.indexOf("Switch") >= 0 || obType.indexOf("CheckBox") >= 0 || obType.indexOf("Spinner") >= 0 || obType.indexOf("TimePicker") >= 0 || obType.indexOf("DatePicker") >= 0
 								|| obType.indexOf("android.widget.NumberPicker") >= 0 || obType.indexOf("RangeSeekBar") >= 0 || obType.indexOf("android.widget.SeekBar") >= 0 || obType.indexOf("ListView") >= 0 || obType.indexOf("XCUIElementTypeTextField") >= 0
-								|| obType.indexOf("XCUIElementTypePickerWheel") >= 0 || obType.indexOf("XCUIElementTypeSlider") >= 0 || obType.indexOf("XCUIElementTypeSearchField") >= 0 || obType.indexOf("XCUIElementTypeTable") >=0 || obType.indexOf("android.widget.TimePicker") >=0 || obType.indexOf("android.widget.DatePicker") >=0)) {
+								|| obType.indexOf("XCUIElementTypePickerWheel") >= 0 || obType.indexOf("XCUIElementTypeSlider") >= 0 || obType.indexOf("XCUIElementTypeSearchField") >= 0 || obType.indexOf("XCUIElementTypeTable") >=0 || obType.indexOf("android.widget.TimePicker") >=0 || obType.indexOf("android.widget.DatePicker") >=0 || obType.indexOf("XCUIElementTypeSecureTextField") >= 0)) {
 						var res = '';
 						var sc;
 						if (obType.indexOf("RadioButton") >= 0)
 						{sc = Object.keys(keywordArrayList.radiobutton);
 						selectedKeywordList = "radiobutton";}
-						else if (obType.indexOf("EditText") >= 0 || obType.indexOf("XCUIElementTypeTextField") >= 0 || obType.indexOf("XCUIElementTypeSearchField") >= 0)
+						else if (obType.indexOf("EditText") >= 0 || obType.indexOf("XCUIElementTypeTextField") >= 0 || obType.indexOf("XCUIElementTypeSearchField") >= 0 || obType.indexOf("XCUIElementTypeSecureTextField") >= 0)
 						{sc = Object.keys(keywordArrayList.input);
 						selectedKeywordList = "input";}
 						else if (obType.indexOf("XCUIElementTypePickerWheel") >= 0)
@@ -4664,6 +4664,26 @@ function addTestScriptRow(){
 				gridArrayData[i]._id_ = "";
 			}
 		}
+		for(var i=0;i<gridArrayData.length;i++){
+			if(!gridArrayData[i].hasOwnProperty("_id_")){
+				gridArrayData[i]._id_ = "";
+			}
+		}
+		for(var i=0;i<gridArrayData.length;i++){
+			if(!gridArrayData[i].hasOwnProperty("_id_")){
+				gridArrayData[i]._id_ = "";
+			}
+		}
+		for(var i=0;i<gridArrayData.length;i++){
+			if(!gridArrayData[i].hasOwnProperty("_id_")){
+				gridArrayData[i]._id_ = "";
+			}
+		}	
+		for(var i=0;i<gridArrayData.length;i++){
+			if(!gridArrayData[i].hasOwnProperty("_id_")){
+				gridArrayData[i]._id_ = "";
+			}
+		}	
 		$("#jqGrid").jqGrid('clearGridData');
 		$("#jqGrid").jqGrid('setGridParam',{data: gridArrayData});
 		$("#jqGrid").trigger("reloadGrid");

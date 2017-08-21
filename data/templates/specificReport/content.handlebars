@@ -52,8 +52,12 @@
                         else    getParentId = parseInt(getRows[j].getAttribute('data-parentid'));
                         if(getParentId == getRowId && name.indexOf('TestCase Name') === -1) rowCount++;
                     }
-                    if(rowCount > 0){
-                        getRows[i].children[1].innerHTML += '<i class="fa fa-caret-down unexpand" aria-hidden="true" style="position: relative; left: -58px;"></i>';
+                    if (rowCount > 0) {
+                        if (getRows[i].children[1].innerText.indexOf("Step") >= 0) {
+                            getRows[i].children[1].innerHTML += '<i class="fa fa-caret-down unexpand" aria-hidden="true" style="position: relative; left: -58px;"></i>';
+                        } else {
+                            getRows[i].children[1].innerHTML += '<i class="fa fa-caret-down unexpand" aria-hidden="true" style="position: relative; left: -97px;"></i>';
+                        }
                         rowCount = 0;
                     }
                 }
