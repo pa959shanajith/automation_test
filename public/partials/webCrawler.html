@@ -11,10 +11,10 @@
 			<div id="left-top-section" class="left-top-section-utility">
 				<ul>
 					<li><span><a class='scrapeOnTxt'>Weboccular</a></span></li>
-					<li><a href='#'  title="Launch Internet Explorer"><span><img src='imgs/ic-ie.png' alt='Internet Explorer' /></span>Internet Explorer</a></li>
-					<li><a href='#'  title="Launch Google Chrome"><span><img src='imgs/ic-chrome.png' alt='Google Chrome' /></span>Google Chrome</a></li>
-					<li><a href='#'  title="Launch Mozilla Firefox"><span><img src='imgs/ic-mozilla.png' alt='Mozilla Firefox' /></span>Mozilla Firefox</a></li>
-					<li><a href='#'  title="Launch Safari"><span><img src='imgs/ic-safari.png' alt='Safari' /></span>Safari</a></li>
+					<li><a id='ie_img1' ng-click="selectedAgent = 'ie'" href="#" title="Internet Explorer"><span><img id='ie_img' class="highlightImg" ng-class="{'selectedIcon': selectedAgent === 'ie'}" src="imgs/ic-ie.png" alt="Internet Explorer"></span>Internet Explorer</a></li>
+					<li><a id='gc_img1' ng-click="selectedAgent = 'chrome'" href="#" title="Google Chrome"><span><img id='gc_img' class="highlightImg" ng-class="{'selectedIcon': selectedAgent === 'chrome'}" src="imgs/ic-chrome.png" alt="Google Chrome"></span>Google Chrome</a></li>
+					<li><a id='mf_img1' ng-click="selectedAgent = 'firefox'" href="#" title="Mozilla Firefox"><span><img id='mf_img' class="highlightImg " ng-class="{'selectedIcon': selectedAgent === 'firefox'}" src="imgs/ic-mozilla.png" alt="Mozilla Firefox"></span>Mozilla Firefox</a></li>
+					<li><a id='sf_img1' ng-click="selectedAgent = 'safari'" href="#" title="Safari"><span><img id='sf_img' class="highlightImg " ng-class="{'selectedIcon': selectedAgent === 'safari'}" src="imgs/ic-safari.png" alt="Safari"></span>Safari</a></li>
 				</ul>
 			</div>
 		</div>
@@ -49,9 +49,11 @@
 			</div>
 
 			<div class="scrollbar-inner crawl-result" >
-				<h4>Subdomains </h4>
+				<h4 ng-if="arr.length > 0">Subdomains </h4>
 				<p ng-repeat= "a in arr track by $index">{{a}} </p>
-				<h4 ng-if="false">Other Links</h4>
+				<br>
+				<h4 ng-if="otherLinks.length > 0">Other Links</h4>
+				<p ng-repeat= "a in otherLinks track by $index">{{a.name}} </p>
 			</div>
 		</div>
 
@@ -165,3 +167,23 @@
 <!--Footer-->
 <footer footer id="footer" class="footer-global"></footer>
 <!--Footer-->
+
+
+<!-- Global Popup -->
+<div class="modal fade" id="WebCrawlerGlobalModal" role="dialog" data-keyboard="false" data-backdrop="static">
+	<div class="modal-dialog modal-sm">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">&times;</button>
+				<h4 class="modal-title"></h4>
+			</div>
+			<div class="modal-body">
+				<p></p>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default btn-accept" data-dismiss="modal">Ok</button>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- Global Popup -->

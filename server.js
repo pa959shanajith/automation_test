@@ -311,19 +311,21 @@ if (cluster.isMaster) {
     var socketMap = {};
     var socketMapUI = {};
     var isUISocketRequest = false;
+
     io.on('connection', function(socket) {
         // console.log("-------------------------------------------------------------------------------------------------------");
         var address = socket.request.connection.remoteAddress || socket.request.headers['x-forwarded-for'];
         // console.log("IPTYPE:::::", socket.request.connection.address().family);
         // console.log("socket.handshake.address:::::", socket.handshake.address);
 
-        console.log("scoket connecting address" , address);
-        console.log("middleware:", socket.request._query['check']);
+        console.log("socket connecting address" , address);
+        //console.log("middleware:", socket.request._query['check']);
         if (socket.request._query['check'] == "true" ) {
         //  if ( !(address in socketMapUI) ) {
             isUISocketRequest = true;
             console.log("socket request from UI");
             socketMapUI[address] = socket;
+            socket.emit("connectionAck", "Success");
         //  }
         }else{
           isUISocketRequest = false;

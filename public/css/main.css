@@ -1327,7 +1327,7 @@ input[disabled]{
     overflow: auto;
     max-height: 60px;
     color: #000;
-} 
+}
 .compareObj
 {
     float: left;
@@ -1398,7 +1398,7 @@ input[disabled]{
     /* margin-right: 31%; */
     position: relative;
     left: -32%;
-} 
+}
 .saveComapredObj
 {
     position: relative;
@@ -1433,7 +1433,7 @@ input[disabled]{
     width: 60%;
     margin-left: 4%;
     margin-top: 0%;
-    line-height: 1.7; 
+    line-height: 1.7;
     border: 1px solid #656565 !important;
 }
 
@@ -1469,7 +1469,7 @@ input[disabled]{
     background-clip: padding-box;
     border: 1px solid #adabab;
     border-radius: 1px;
-    
+
 }
 
 .rolesSpan>label{
@@ -1481,7 +1481,7 @@ input[disabled]{
 .rolesSpan>input{
   margin-top: 3px;
   margin-left: 12px;
-} 
+}
 
 .rolesSpan{
     padding-top: 9px;
@@ -3376,7 +3376,7 @@ li.select_all .addCustObj{
 	vertical-align: middle;
 	font-weight: normal;
 	line-height: 2;
-}		
+}
 
 
 .selectControl {
@@ -3802,7 +3802,7 @@ background: none;
 .linkedTestset label{
     width: 425px;
     float: left;
-    background-color: #E1CAFF; 
+    background-color: #E1CAFF;
     border-radius: 5px;
     padding: 5px 5px 5px 30px;
     font-size: 16px;
@@ -4533,6 +4533,7 @@ select:-webkit-autofill:focus {
     overflow: auto;
     border-radius: 10px;
     padding: 30px;
+    overflow-wrap: break-word;
 }
 .url-btn{
       color: #fff;
@@ -4770,3 +4771,21 @@ line.link {
 top: 100px;
 position: relative;
 }*/
+
+line.reverse_T {
+  stroke : red;
+  stroke-dasharray: 0,2 1;
+}
+line.reverse_T::after {
+	    content: " - Remember this";
+    background-color: yellow;
+    color: red;
+    font-weight: bold;
+}
+line.subdomain {
+  stroke : green;
+}
+
+.hidden {
+	display : none;
+}
