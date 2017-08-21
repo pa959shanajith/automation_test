@@ -11,6 +11,9 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 		$('.scrollbar-inner').scrollbar();
 		$('.scrollbar-macosx').scrollbar();
 		document.getElementById("currentYear").innerHTML = new Date().getFullYear()
+		if(navigator.appVersion.indexOf("Mac")!=-1){
+			$(".safariBrowser").show();
+		}
 	}, 500)
 
 	//Task Listing
@@ -26,7 +29,6 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 	}
 	var getTaskName = JSON.parse(window.localStorage['_CT']).taskName;
 	appType = JSON.parse(window.localStorage['_CT']).appType;
-
 	//Task Name Commented
 	//$("#page-taskName").empty().append('<span class="taskname">'+getTaskName+'</span>');
 	$(".projectInfoWrap").empty()
@@ -482,36 +484,58 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 			openDialogExe("Execute Test Suite", "Please select atleast one scenario(s) to execute");
 		}
 		else{
-			$scope.moduleInfo = [];
-			$.each($(".parentSuiteChk"), function(){
-				var suiteInfo = {};
-				var selectedRowData = [];
-				//suiteInfo.suiteDetails = [];
-				if($(this).is(":checked") == true){
-					$(this).parent().parent().next().find('tbody input[type=checkbox]:checked').each(function() {
-						selectedRowData.push({
-							condition : parseInt($(this).parent().siblings(".exe-conditionCheck").find("select option:selected").val()),
-							dataparam : [$(this).parent().siblings(".exe-dataParam").find("input").val().trim()],
-							executestatus : 1,
-							scenarioids : $(this).parent().siblings(".exe-scenarioIds").attr("sId"),
-							qccredentials: {
-								qcurl: $("#almURL").val(),
-								qcusername: $("#almUserName").val(),
-								qcpassword:	$("#almPassword").val()
-							}
-						})
-					});
-					//console.log("selectedRowData:::" + selectedRowData)
-					suiteInfo.suiteDetails = selectedRowData;
-					suiteInfo.testsuitename = $(this).parents('span.taskname').text();
-					suiteInfo.testsuiteid = $(this).parents('.suiteNameTxt').next().find('thead').children('input[type=hidden]').val();
-					suiteInfo.browserType = browserTypeExe;
-					//console.log("suiteInfo:::" + suiteInfo)
-					$scope.moduleInfo.push(suiteInfo);
+			$("#almURL,#almUserName,#almPassword,.almQclogin").prop("disabled",true);
+			$("#almURL,#almUserName,#almPassword").css({"background":"none"});
+			$(".error-msg-exeQc").text("");
+			ExecutionService.loginQCServer_ICE($scope.almURL,$scope.almUserName,$scope.almPassword)
+			.then(function(data){
+				$("#almURL,#almUserName,#almPassword,.almQclogin").prop("disabled",false);
+				if(data == "unavailableLocalServer"){
+					$(".error-msg-exeQc").text("Unavailable LocalServer");
 				}
+				else if(data == "Invalid Session"){
+					$(".error-msg-exeQc").text("Invalid Session");
+				}
+				else if(data == "invalidcredentials"){
+					$(".error-msg-exeQc").text("Invalid Credentials");
+				}
+				else if(data == "invalidurl"){
+					$(".error-msg-exeQc").text("Invalid URL");
+				}			
+				else{
+					$scope.moduleInfo = [];
+					$.each($(".parentSuiteChk"), function(){
+						var suiteInfo = {};
+						var selectedRowData = [];
+						//suiteInfo.suiteDetails = [];
+						if($(this).is(":checked") == true){
+							$(this).parent().parent().next().find('tbody input[type=checkbox]:checked').each(function() {
+								selectedRowData.push({
+									condition : parseInt($(this).parent().siblings(".exe-conditionCheck").find("select option:selected").val()),
+									dataparam : [$(this).parent().siblings(".exe-dataParam").find("input").val().trim()],
+									executestatus : 1,
+									scenarioids : $(this).parent().siblings(".exe-scenarioIds").attr("sId"),
+									qccredentials: {
+										qcurl: $("#almURL").val(),
+										qcusername: $("#almUserName").val(),
+										qcpassword:	$("#almPassword").val()
+									}
+								})
+							});
+							//console.log("selectedRowData:::" + selectedRowData)
+							suiteInfo.suiteDetails = selectedRowData;
+							suiteInfo.testsuitename = $(this).parents('span.taskname').text();
+							suiteInfo.testsuiteid = $(this).parents('.suiteNameTxt').next().find('thead').children('input[type=hidden]').val();
+							suiteInfo.browserType = browserTypeExe;
+							//console.log("suiteInfo:::" + suiteInfo)
+							$scope.moduleInfo.push(suiteInfo);
+						}
+					});
+					$("#ALMSyncWindow").find("button.close").trigger("click");
+				}
+			},
+			function(error) {	console.log("Error in qcController.js file loginQCServer method! \r\n "+(error.data));
 			});
-			$("#ALMSyncWindow").find("button.close").trigger("click");
-			//$("#syncScenario").prop("disabled",true);
 		}
 	}
 
@@ -599,6 +623,7 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 	//ALM Functionality
 	$(document).on("click", "#syncScenario", function(){
 		$("#ALMSyncWindow").modal("show");
+		$(".error-msg-exeQc").text('');
 		if($scope.moduleInfo.length > 0){
 			$("#almURL").val($scope.moduleInfo.suiteDetails.qccredentials.qcurl);
 			$("#almUserName").val($scope.moduleInfo.suiteDetails.qccredentials.qcusername);
