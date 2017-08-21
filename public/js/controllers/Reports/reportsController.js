@@ -456,7 +456,7 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 					for(k=0; k<obj2.rows.length; k++){
 						finalReports.rows.push(obj2.rows[k]);
 						finalReports.rows[k].slno = k+1;
-						if(finalReports.rows[k]["Step "] != undefined && finalReports.rows[k]["Step "].indexOf("Step") !== -1){
+						if(finalReports.rows[k]["Step "] != undefined){// && finalReports.rows[k]["Step "].indexOf("Step") !== -1){
 							finalReports.rows[k].Step = finalReports.rows[k]["Step "];
 						}
 						if(finalReports.rows[k].hasOwnProperty("EllapsedTime") && finalReports.rows[k].EllapsedTime.trim() != ""){
