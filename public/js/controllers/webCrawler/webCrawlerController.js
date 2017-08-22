@@ -10,59 +10,105 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
     }, 10);
 
 
+    function openDialog(title, body){
+    	$("#WebCrawlerGlobalModal").find('.modal-title').text(title);
+        $("#WebCrawlerGlobalModal").find('.modal-body p').text(body).css('color','black');
+    	$("#WebCrawlerGlobalModal").modal("show");
+    	setTimeout(function(){
+    		$("#WebCrawlerGlobalModal").find('.btn-accept').focus();
+    	}, 300);
+    }
+
     var start = false;  // Flag to start the removal of dots from the dom
-    var currentDot = 0;
+    var currentDot = 0; // used to store the count of dots displayed in progess canvas
     $scope.hideBaseContent = { message: 'false' };
     $scope.level = 4;
     $scope.arr = [];
     $scope.crawledLinks = [];
     $scope.enableGenerate = false;
-
+    $scope.selectedAgent = "chrome";
 
     $scope.showWeboccularHome = function(){
-      if (!$scope.enableGenerate) {
+      if (!$scope.enableGenerate)
         return;
-      }
+
       $("#result-canvas").hide();
       $scope.hideBaseContent = { message: 'false' };
       $scope.check = true;
     }
 
-
     $scope.executeGo = function(){
+      //console.log($scope.url, $scope.level, $scope.selectedAgent);
       $scope.enableGenerate = false;
       $scope.crawledLinks = [];
-      var socket = io.connect('', { query: "check=true" });
+      $scope.arr = [];
+
       start = false;   // Flag to start the removal of dots from the dom
       currentDot = 0;
-      $scope.arr = [];
-      $scope.hideBaseContent = { message: 'true' };;
+
+      // remove all dots from previous run which are present already on canvas
       for( var k = 1 ; k <  $('#progress-canvas').children().length; ){
         var child = document.getElementById('progress-canvas').children[k];
         child.parentNode.removeChild(child);
       }
 
+      $scope.hideBaseContent = { message: 'true' };
+      // Display the progress canvas after clearing all dots.
       $('#progress-canvas').fadeIn();
-      console.log($scope.url, $scope.level);
 
-      var getLocation = function(href) {
+      var getDomain = function(href) {
           var l = document.createElement("a");
           l.href = href;
           return l.hostname;
       };
-      $scope.domain = getLocation($scope.url);
 
-      webCrawlerServices.getResults($scope.url, $scope.level);
+      $scope.domain = getDomain($scope.url);
 
       $scope.addDomainDot();
 
       setTimeout(function(){
         var w = document.getElementById('domain').offsetWidth/2;
         document.getElementById('domain').setAttribute("style", " display: block;  position:absolute; bottom: -40px; text-align:center;  left: calc(50% - "+w+"px)");
-      },100)
+      },100);
+
+      // socket connection ....
+      var socket = io('', { forceNew: true, reconnect: true, query: "check=true" });
+
+      // fired when the connection acknowledgment is received from the server
+      socket.on('connectionAck', function(value){
+        webCrawlerServices.getResults($scope.url, $scope.level, $scope.selectedAgent).then(function(data){
+          console.log("Data from service", data);
+          if (data == "unavailableLocalServer") {
+            $scope.hideBaseContent = { message: 'false' };
+            // Display the progress canvas after clearing all dots.
+            $('#progress-canvas').hide();
+            openDialog("Weboccular Screen", "ICE Engine is not available. Please run the batch file and connect to the Server.");
+            return false;
+          }else{
+
+          }
+        }, function(err){
+          console.log("Error :", err)
+        });
+      });
+
+      // fired when the socket attempts to reconnect
+      socket.on('reconnecting', function(attemptNumber){
+        console.log(attemptNumber);
+      });
+
+      // fired on socket connection timeout
+      socket.on('connect_timeout', (timeout) => {
+        console.log("timeout" , timeout);
+      });
+
+      // fired on socket error
+      socket.on('error', (error) => {
+        console.log("error", error);
+      });
 
       socket.on('newdata', function(obj){
-          console.log(obj);
+          //console.log(obj);
           var name = obj.name;
           var parent = obj.parent;
           if (!name.endsWith("/")) {
@@ -76,12 +122,30 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
           if (obj.type == "subdomain") {
             $scope.arr.push(obj.name);
           }
+
           $scope.addDot(obj);
           $scope.$apply();
       });
 
       socket.on('endData', function(obj){
-        console.log(obj);
+      //  console.log(obj);
+      // TODO var reverseLinks = obj.sdata.links;
+      var reverseLinks = [];
+        //console.log(reverseLinks);
+
+        for (var i = 0; i < reverseLinks.length; i++) {
+          var name = reverseLinks[i].name;
+          var parent = reverseLinks[i].parent;
+          if (!name.endsWith("/")) {
+            reverseLinks[i].name = reverseLinks[i].name+ "/";
+          }
+          if (!parent.endsWith("/")) {
+            reverseLinks[i].parent = reverseLinks[i].parent+ "/";
+          }
+          $scope.crawledLinks.push(reverseLinks[i])
+        }
+
+        $scope.otherLinks = obj.notParsedURLs;
         $('#progress-canvas').fadeOut(800, function(){
           $scope.hideBaseContent = { message: 'false' };
           $scope.$apply();
@@ -160,7 +224,7 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
     var removeIndex = 2; // 0 and 1 index is for slider and domain dot. We don't have to remove that
     var maxDots =  dotsPosition.length-1;
     $scope.addDot = function(obj){
-      console.log("in add dot", currentDot);
+      //console.log("in add dot", currentDot);
 			if(currentDot >= 40){
 				currentDot = 0;
 				start = true;
@@ -233,11 +297,12 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
       for(var i = 0 ; i< arr.length; i++){
         modified[arr[i].level].push(arr[i]);
       }
-      console.log("modified");
+      //console.log("modified");
       return modified;
     }
 
     function parseRelations(obj){
+      console.log(obj);
       for(var i = $scope.level; i>=1; i--){
         var levelObjects = obj[i];
         for(var k = 0; k < levelObjects.length; k++){
@@ -247,6 +312,7 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
           }else if (obj[i][k].status != 200) {
             obj[i][k].isTerminal = true;
           }
+
           for(var j = 0; j <= (obj[i-1].length)-1; j++){
               if(thisNode.parent == obj[i-1][j].name){
                 if (obj[i-1][j].children) {
@@ -255,19 +321,13 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
                   obj[i-1][j].children =  [];
                   obj[i-1][j].children.push(thisNode);
                 }
-
-
                 break;
-
               }
           }
         }
       }
       return obj[0];
     }
-    // var svgMain = d3.select("#result-canvas").append("svg").attr("id","base-svg")
-    //     .attr("width", "1300px")
-    //     .attr("height", "800px");
 
     $scope.generateGraph = function(){
       $("#result-canvas").show();
@@ -280,170 +340,61 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
         document.getElementById("result-canvas").removeChild(document.getElementById("base-svg"));
       }
 
+      var fill = d3.scale.category20();
+      var trans1 = [ 0, 0 ] , scale1= 1;
+      var trans = [0,0];
+      //trans
+      var scale =1;
+      var rescale = function()  {
+        //console.log(d3.event.scale);
+    //    if (d3.event.translate[0] !=  trans1[0]) {
+    //      d3.event.translate[0] = d3.event.translate[0] + trans1[0];
+    //     }
+    //    if (d3.event.translate[1] != trans1[1]) {
+      //      d3.event.translate[1] = d3.event.translate[1] + trans1[1];
+      //  }
+      //  d3.event.scale = d3.event.scale + scale1 - 1 ;
+        zoomReset = false;
+        trans=d3.event.translate;
+        scale=d3.event.scale;
+        svg.attr("transform",
+            "translate(" + trans + ")"
+            + " scale(" + scale + ")");
+      }
 
-
-
+      var zoom = d3.behavior.zoom().scale(scale1).translate(trans1).scaleExtent([0.5, 7.5]).on("zoom", rescale);
+      var zoomReset = false;
       var svgMain = d3.select("#result-canvas").append("svg").attr("id","base-svg")
           .attr("width", "1300px")
-          .attr("height", "800px");
-
-    //  $("#result-canvas").fadeIn();
+          .attr("height", "800px")
+          .attr("pointer-events", "all").call(zoom).on("dblclick.zoom", null);
 
       console.log($scope.crawledLinks);
-      //var LevelOrderObjects = createLevelObject($scope.crawledLinks);
+      console.log("Number of Crawled Links ", $scope.crawledLinks.length)
+
       var root = parseRelations(createLevelObject($scope.crawledLinks));
       console.log(root);
       root = root[0];
-
-      // var parentsArray = [];
-      // for(var k = 0; k < $scope.crawledLinks.length; k++){
-      //
-      //   if(isUnique($scope.crawledLinks[k].parent)){
-      //     var json= {
-      //       "name": $scope.crawledLinks[k].parent,
-      //       "children" : [
-      //         {
-      //           "name" : $scope.crawledLinks[k].name ,
-      //           "children" : []
-      //         }
-      //       ]
-      //     }
-      //     parentsArray.push(json)
-      //   }else{
-      //     for(var i = 0 ; i<parentsArray.length; i++){
-      //
-      //       if(parentsArray[i].name == $scope.crawledLinks[k].parent){
-      //         var json= {
-      //           "name": $scope.crawledLinks[k].name,
-      //           "children" :[]
-      //         }
-      //         parentsArray[i].children.push(json)
-      //         break;
-      //       }
-      //     }
-      //   }
-      // }
-
-      // function isUnique(name){
-      //   for(var i = 0 ; i<parentsArray.length; i++){
-      //     if(parentsArray[i].name == name){
-      //       return false;
-      //     }
-      //   }
-      //   return true;
-      // }
-
 
       var width = window.innerWidth,
         height = window.innerHeight,
         root,
     	  nodes,
-    	   links
-         nodeFocus = false;
+    	  links
+        nodeFocus = false;
 
       var force = d3.layout.force()
-          .linkDistance(80)
-          .charge(-900)
+          .linkDistance(function(d){  return 180})
+          .charge(-500)
           .size([width, height])
           .on("tick", tick);
 
-      //d3.select("#base-svg").select("g").remove();
       var svg = d3.select("#base-svg").append("g").attr("id", "parent-g").attr("transform", "translate(-130,-30)")
-        //  $("svg").css({top: "-45px", left: "-113px", position:'relative'});
 
       var link = svg.selectAll(".link"),
           node = svg.selectAll(".node");
-      // var root = {
-      //  "name": "Center",
-      //  "color":1,
-      //  "children": [
-      //   {
-      // 	"name": "First_1",
-      // 	"color":2,
-      // 	"collapse":1,
-      // 	"size": 40,
-      // 	"children": [
-      // 		{"name": "First_3", "size": 10},
-      // 		{"name": "First_3", "size": 10},
-      // 		{"name": "First_3", "size": 10},
-      // 		{"name": "First_3", "size": 10},
-      // 		{"name": "First_3", "size": 10},
-      // 		{"name": "First_3", "size": 10}
-      //    ]
-      //   },
-      // 	{
-      //    "name": "Second_1",
-      // 	 "color":2,
-      // 	 "collapse":1,
-      //    "children": [
-      //     {
-      //      "name": "Second_2",
-      // 	 "color":3,
-      // 	 "collapse":1,
-      //      "children": [
-      //       {"name": "Second_3", "size": 10},
-      //       {"name": "Second_3", "size": 10},
-      // 			{"name": "Second_3", "size": 10},
-      //       {"name": "Second_3", "size": 10},
-      //       {"name": "Second_3", "size": 10},
-      // 			{"name": "Second_3", "size": 10}
-      //      ]
-      //     },
-      //     {
-      //      "name": "Second_2",
-      // 		 "color":3,
-      // 		 "collapse":1,
-      //      "children": [
-      //       {"name": "Second_3", "size": 15}
-      //      ]
-      //     },
-      // 		{
-      //      "name": "Second_2",
-      // 		 "color":3,
-      //
-      //
-      //     },
-      // 	{
-      // 		"name": "Second_2",
-      // 		"color":3,
-      // 		"collapse":1,
-      // 		"children": [
-      // 			{"name": "Second_3", "size": 25},
-      // 			{"name": "Second_3", "size": 25},
-      // 			{"name": "Second_3", "size": 25}
-      // 		]
-      //     },
-      // 	{
-      // 		"name": "Second_2",
-      // 		"color":3,
-      // 		"collapse":1,
-      // 		"children": [
-      // 			{"name": "Second_3", "size": 30},
-      // 			{"name": "Second_3", "size": 30},
-      // 			{"name": "Second_3", "size": 30}
-      // 		]
-      //     },{
-      //      "name": "Second_2",
-      // 	 "color":3,
-      // 	 "collapse":1,
-      //      "children": [
-      //       {"name": "Second_3", "size": 35},
-      //       {"name": "Second_3", "size": 35}
-      //      ]
-      //     },{
-      //      "name": "Second_2",
-      // 	 "color":3,
-      // 	 "collapse":1,
-      //      "children": [
-      //       {"name": "Second_3", "size": 40}
-      //      ]
-      //     }
-      //    ]
-      //   }
-      //  ]
-      // }
 
-        start();
+      start();
 
 
       function start(){
@@ -451,7 +402,6 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
       	links = d3.layout.tree().links(nodes);
       	for(var i=0; i<nodes.length; i++){
       		if(nodes[i].collapse){
-      			// console.log(nodes[i].name);
       			toggle(nodes[i]);
       		}
       	}
@@ -461,6 +411,44 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
       function restart(){
       	nodes = flatten(root),
       	links = d3.layout.tree().links(nodes);
+        //console.log(links);
+          count1 = 0;
+        for(i = 0; i < links.length -1 ; i ++ ){
+          d = links[i];
+
+          if(d.target.type == "reverse"){
+          //  console.log("target", d.target.name);
+          //  console.log("source", d.source.name);
+            for(j = 0; j < links.length; j ++ ){
+              if(links[j].source.name == d.target.name ){
+                count1 ++;
+                var json = {};
+
+                //d.target.lost = true;
+                json["source"] = d.source;
+                json["target"] = links[j].source;
+                json["reverse"] = "reverse_T";
+                links.splice(i, 1);
+                i--;
+                links.push(json);
+                break;
+              }else if(links[j].target.name == d.target.name && links[j].target.isTerminal && links[j].target.type != "reverse" && links["reverse"] != "reverse" ){
+                var json = {};
+                d.target.lost = true;
+                json["source"] = d.source;
+                json["target"] = links[j].target;
+                json["reverse"] = "reverse_T";
+                links.splice(i, 1);
+                i--;
+                links.push(json);
+                break;
+              }else{
+                d.target.lost = false;
+              }
+            }
+          }
+        }
+        //console.log(count1);
       	update();
       }
 
@@ -471,21 +459,25 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
             .links(links)
             .start();
 
-        // Update links.
-        link = link.data(links, function(d) { return d.target.id; });
+            // Update links.
+        var count = 0;
+        link = link.data(links, function(d) { count++;  return count; });
 
         link.exit().remove();
 
         link.enter().insert("line", ".node")
-            .attr("class", "link");
+            .attr("class", function(d){ return "link "+ d.reverse});
+            //.attr("class", "link");
 
         // Update nodes.
         node = node.data(nodes, function(d) { return d.id; });
 
         node.exit().remove();
+      //  console.log(node.exit());
 
         var nodeEnter = node.enter().append("g")
-            .attr("class", "node")
+            .attr("class", function(d){  if(d.type == "reverse") return  "node hidden";  return  "node"})
+          //  .attr("class", "node")
             .on("click", click)
             .on("mouseover", nodeOver)
             .on("mouseout", nodeOut)
@@ -494,11 +486,23 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
         nodeEnter.append("image")
       	.attr("xlink:href", function(d) {
 
-      		if(d.isTerminal == true){
-            console.log(d, d.status , d.name);
-            if (d.status != 200) {
+          if (d.status!=200) {
+            if(d.type == "subdomain"){
+              return "imgs/wc-red-sq.png"
+            }else if(d.type == "reverse"){
+              return "imgs/ic-cycle.png"
+            }
+            return "imgs/circle-128.png"
+          }
+
+          if(d.isTerminal == true){
+          //  console.log(d, d.status , d.name);
+
+            if (d.status != 200 ) {
               if(d.type == "subdomain"){
                 return "imgs/wc-red-sq.png"
+              }else if(d.type == "reverse"){
+                return "imgs/ic-cycle.png"
               }
               return "imgs/circle-128.png"
             }else{
@@ -510,7 +514,9 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
 
       		}else if(d.nodeOpen == false){
       			return "imgs/wc-p-cr.png"; // collapsed node
-      		}else{
+      		}else if (!d.children && !d._children) {
+            return "imgs/circle-128.png"
+          }else{
       			return "imgs/wc-m-cr.png";
       		}
       	})
@@ -524,12 +530,23 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
 
       	 node.select("image")
         	.attr("xlink:href", function(d) {
+            if (d.status!=200) {
+              if(d.type == "subdomain"){
+                return "imgs/wc-red-sq.png"
+              }else if(d.type == "reverse"){
+                return "imgs/ic-cycle.png"
+              }
+              return "imgs/circle-128.png"
+            }
 
-         		if(d.isTerminal == true){
-               console.log(d, d.status , d.name);
+
+            if(d.isTerminal == true){
+              // console.log(d, d.status , d.name);
                if (d.status != 200) {
                  if(d.type == "subdomain"){
                    return "imgs/wc-red-sq.png"
+                 }else if(d.type == "reverse"){
+                   return "imgs/ic-cycle.png"
                  }
                  return "imgs/circle-128.png"
                }else{
@@ -541,7 +558,9 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
 
          		}else if(d.nodeOpen == false){
          			return "imgs/wc-p-cr.png"; // collapsed node
-         		}else{
+         		}else if (!d.children && !d._children) {
+              return "imgs/wc-cr.png"
+            }else{
          			return "imgs/wc-m-cr.png";
          		}
          	})
@@ -597,6 +616,19 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
           if (nodeFocus) {
             return;
           }
+
+          if (!zoomReset) {
+            trans1[0] = trans[0];
+            trans1[1] = trans[1];
+            scale1 = scale;
+          }else{
+            trans1 = [0,0];
+            scale1 = 1;
+          }
+
+          svgMain.call(d3.behavior.zoom().scaleExtent([0.5, 7.5]).on("zoom", function(){
+            //  scale=d3.event.scale;
+          }));
           //Only do the element stuff if this came from mouseover
           el.parentNode.appendChild(el);
           d3.select(el).append("text").attr("class", "hoverLabel").attr("stroke", "white").attr("stroke-width", "5px")
@@ -610,17 +642,30 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
           highlightNeighbors(d,i);
         }
 
-
       function nodeOut() {
           if (nodeFocus) {
-            //return;
+            return;
           }
 
+          svgMain.call(d3.behavior.zoom().scale(scale1).translate(trans1).scaleExtent([0.5, 7.5]).on("zoom", rescale)).on("dblclick.zoom", null);
           d3.selectAll(".hoverLabel").remove();
-          d3.selectAll("image").style("opacity", 1).style("stroke", "black").style("stroke-width", "1px");
-          d3.selectAll("line").style("opacity", .25);
-  		      restart();
+          d3.selectAll("image").style("opacity", 1).style("stroke", "black").style("stroke-width", "1.5px");
+          d3.selectAll("line").style("opacity", 1);
+  		    //restart();
         }
+
+        document.getElementById("result-canvas").addEventListener("dblclick", () => {
+          console.log("reset the zoom ");
+          //  zoom.transform(svg, d3.zoomIdentity);//Works
+          //trans=d3.event.translate;
+        //  scale=d3.event.scale;
+          zoomReset = true;
+          svgMain.call(d3.behavior.zoom().scale(1).translate([0,0]).scaleExtent([0.5, 7.5]).on("zoom", rescale)).on("dblclick.zoom", null);
+          svg.attr("transform",
+              "translate(" + [0,0] + ")"
+              + " scale(" + 1 + ")");
+        });
+
       function tick() {
         link.attr("x1", function(d) { return d.source.x+12.5 ; })
             .attr("y1", function(d) { return d.source.y+12.5 ; })
@@ -651,8 +696,10 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
       }
 
       function toggle(d) {
+        //console.log("losssssssssssssst", d.lost);
+        //console.log(d.children)
         if (d.children) {
-      	   d.nodeOpen = false;
+      	  d.nodeOpen = false;
           d._children = d.children;
           d.children = null;
       } else {
@@ -665,8 +712,8 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
 
       // Toggle children on click.
       function click(d){
-
-        if (d3.event.defaultPrevented) return; // ignore drag
+      //  console.log()
+      //  if (d3.event.defaultPrevented) return; // ignore drag
         toggle(d);
         restart();
       }

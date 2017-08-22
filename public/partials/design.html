@@ -13,6 +13,7 @@
 					<li><span><a class='scrapeOnTxt'>Scrape On</a></span></li>
 					<li><a href='#'  title="Launch Internet Explorer" ng-class="enbledChecked ? 'enableActions' : 'disableActions'" ng-click="initScraping($event, 'ie'); $event.preventDefault(); $event.stopPropagation();"><span><img src='imgs/ic-ie.png' alt='Internet Explorer' /></span>Internet Explorer</a></li>
 					<li><a href='#'  title="Launch Google Chrome" ng-class="enbledChecked ? 'enableActions' : 'disableActions'" ng-click="initScraping($event, 'chrome'); $event.preventDefault(); $event.stopPropagation();"><span><img src='imgs/ic-chrome.png' alt='Google Chrome' /></span>Google Chrome</a></li>
+					<li class="safariBrowser" style="display: none;"><a href='#'  title="Launch Safari" ng-class="enbledChecked ? 'enableActions' : 'disableActions'" ng-click="initScraping($event, 'safari'); $event.preventDefault(); $event.stopPropagation();"><span><img src='imgs/ic-safari.png' alt='Safari' /></span>Safari</a></li>
 					<li><a href='#'  title="Launch Mozilla Firefox" ng-class="enbledChecked ? 'enableActions' : 'disableActions'" ng-click="initScraping($event, 'mozilla'); $event.preventDefault(); $event.stopPropagation();"><span><img src='imgs/ic-mozilla.png' alt='Mozilla Firefox' /></span>Mozilla Firefox</a></li>
 					<li class="last"  title="Enable Append"><span style="margin-bottom:-5px"><input ng-model="enbledChecked" id="enableAppend" type='checkbox' value=""></span><label for="enableAppend">Append</label></li>
 				</ul>

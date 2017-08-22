@@ -69,6 +69,18 @@ mySPA.factory('ExecutionService', ['$http','$q', function ($http, $httpProvider,
 			})
 			.then(function(response)  { return response.data},
 			function(response)        {return $q.reject(response.data)})
-	    },   
+	    },
+		loginQCServer_ICE: function(qcURL,qcUserName,qcPassword){
+    		var param = "loginQCServer_ICE";
+	        return $http.post('/loginQCServer_ICE', {
+				action: param,
+              	qcURL: qcURL,
+				qcUsername: qcUserName,
+				qcPassword : qcPassword,
+				qcaction: "domain"
+	        })
+			.then (function(response)	{return response.data;	},
+			function(response){	return $q.reject(response.data);});	
+    	}
 	}
 }]);

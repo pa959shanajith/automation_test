@@ -18,7 +18,10 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 	$timeout(function(){
 		$('.scrollbar-inner').scrollbar();
 		$('.scrollbar-macosx').scrollbar();
-		document.getElementById("currentYear").innerHTML = new Date().getFullYear()
+		document.getElementById("currentYear").innerHTML = new Date().getFullYear()			
+		if(navigator.appVersion.indexOf("Mac")!=-1){
+			$(".safariBrowser").show();
+		}
 	}, 500)
 
 	//Task Listing
@@ -62,7 +65,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 	}
 	if(appType == "Webservice" && window.location.href.split("/")[3] == "designTestCase"){
 		$("#right-dependencies-section .thumbnail:first-child").hide();
-	} 
+	}
 	//console.log(appType);
 	$scope.getScreenView = appType
 	//Getting Apptype orScreen Type
@@ -175,7 +178,6 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				}
 		}
 
-		
 	var custnameArr = [];
 	var keywordValArr = [];
 	var proceed = false;
@@ -817,7 +819,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			$(".popupWrap").animate({ opacity: 0, right: "70px" }, 100).css({'z-index':'0','pointer-events':'none'});
 			$(".filterObjects").removeClass("popupContent-filter-active").addClass("popupContent-default");
 			$(".thumb-ic").removeClass("thumb-ic-highlight");
-			if(data != null && data != "getScrapeData Fail."){
+			if(data != null && data != "getScrapeData Fail." && data != "" && data != " "){
 				viewString = data;
 				newScrapedList = viewString
 				$("#window-scrape-screenshot .popupContent, #window-scrape-screenshotTs .popupContent").empty()
@@ -4231,13 +4233,13 @@ function contentTable(newTestScriptDataLS) {
 						&& (obType.indexOf("RadioButton") >= 0 || obType.indexOf("ImageButton") >= 0 || obType.indexOf("Button") >= 0|| obType.indexOf("EditText") >= 0
 								|| obType.indexOf("Switch") >= 0 || obType.indexOf("CheckBox") >= 0 || obType.indexOf("Spinner") >= 0 || obType.indexOf("TimePicker") >= 0 || obType.indexOf("DatePicker") >= 0
 								|| obType.indexOf("android.widget.NumberPicker") >= 0 || obType.indexOf("RangeSeekBar") >= 0 || obType.indexOf("android.widget.SeekBar") >= 0 || obType.indexOf("ListView") >= 0 || obType.indexOf("XCUIElementTypeTextField") >= 0
-								|| obType.indexOf("XCUIElementTypePickerWheel") >= 0 || obType.indexOf("XCUIElementTypeSlider") >= 0 || obType.indexOf("XCUIElementTypeSearchField") >= 0 || obType.indexOf("XCUIElementTypeTable") >=0 || obType.indexOf("android.widget.TimePicker") >=0 || obType.indexOf("android.widget.DatePicker") >=0)) {
+								|| obType.indexOf("XCUIElementTypePickerWheel") >= 0 || obType.indexOf("XCUIElementTypeSlider") >= 0 || obType.indexOf("XCUIElementTypeSearchField") >= 0 || obType.indexOf("XCUIElementTypeTable") >=0 || obType.indexOf("android.widget.TimePicker") >=0 || obType.indexOf("android.widget.DatePicker") >=0 || obType.indexOf("XCUIElementTypeSecureTextField") >= 0)) {
 						var res = '';
 						var sc;
 						if (obType.indexOf("RadioButton") >= 0)
 						{sc = Object.keys(keywordArrayList.radiobutton);
 						selectedKeywordList = "radiobutton";}
-						else if (obType.indexOf("EditText") >= 0 || obType.indexOf("XCUIElementTypeTextField") >= 0 || obType.indexOf("XCUIElementTypeSearchField") >= 0)
+						else if (obType.indexOf("EditText") >= 0 || obType.indexOf("XCUIElementTypeTextField") >= 0 || obType.indexOf("XCUIElementTypeSearchField") >= 0 || obType.indexOf("XCUIElementTypeSecureTextField") >= 0)
 						{sc = Object.keys(keywordArrayList.input);
 						selectedKeywordList = "input";}
 						else if (obType.indexOf("XCUIElementTypePickerWheel") >= 0)

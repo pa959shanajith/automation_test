@@ -8,9 +8,12 @@ var node_names_tc=[];
 var saveFlag=false;
 var isIE = /*@cc_on!@*/false || !!document.documentMode;
 function loadMindmapData(){
-	
+	blockUI("Loading...");
 	dataSender({task:'populateProjects',user_id:userid},function(err,result){
-		if(err) console.log(result);
+		if(err){
+			console.log(result);
+			unblockUI();
+		}
 		else{
 			 if($("#left-nav-section").is(":visible") == true && $("#right-dependencies-section").is(":visible") == false)
                 {
@@ -38,6 +41,7 @@ function loadMindmapData(){
 			});
 			//Calling the function to restrict the user to give default node names
 			$("#ct-canvas").click(callme);
+			unblockUI();
 		}
 	});
 }
@@ -48,8 +52,7 @@ function loadMindmapData1(){
 	//Adding task to scenario
 	taskAssign={"modules_endtoend":{"task":["Execute","Execute Batch"],"attributes":["bn","at","rw","sd","ed","re","cy"]},"modules":{"task":["Execute","Execute Batch"],"attributes":["bn","at","rw","sd","ed","re","cy"]},"scenarios":{"task":["Execute Scenario"],"attributes":["at","rw","sd","ed"]},"screens":{"task":["Scrape","Append","Compare","Add","Map"],"attributes":["at","rw","sd","ed"]},"testcases":{"task":["Update","Design"],"attributes":["at","rw","sd","ed"]}};
 	zoom=d3.behavior.zoom().scaleExtent([0.1,3]).on("zoom", zoomed);
-	faRef={"plus":"fa-plus","edit":"fa-pencil-square-o","delete":"fa-trash-o"};
-	
+	faRef={"plus":"fa-plus","edit":"fa-pencil-square-o","delete":"fa-trash-o"};	
 		$(document).on('click',".ct-tile", function() {
 			createNewMap();
 			});
@@ -79,7 +82,10 @@ function loadMindmapData1(){
 	}
 	d3.select('#ct-assignBox').classed('no-disp',!0);
 	dataSender({task:'getModules',tab:window.localStorage['tabMindMap'],prjId:$(".project-list").val()},function(err,result){
-		if(err) console.log(result);
+		if(err){
+			console.log(result);
+			unblockUI();
+		}
 		else{
 			var nodeBox=d3.select('.ct-nodeBox');
 			$(nodeBox[0]).empty();
@@ -96,9 +102,9 @@ function loadMindmapData1(){
 			if(selectedTab=='tabCreate')
 			populateDynamicInputList();
 			setModuleBoxHeight();
+			unblockUI();
 		}
 	});
-	unblockUI();
 }
 window.onresize=function() {
 	var w=window.innerWidth-28,h=window.innerHeight-123;
