@@ -67,7 +67,7 @@ mySPA.controller('headerController', function($scope,$http,$location,headerServi
 		//selectedROleID = $(this).valueOf("outerHTML").data("id");
 		//console.log($(this).text());
 		//openModelPopup("Switch Role", "Your role is changed to "+additionalRoleName);
-		changedRole =  $('#changedRole');	
+		changedRole =  $('#changedRole');
 		changedRole.append($("<p>Your role is changed to "+ additionalRoleName +"</p>"))
 		$("#switchRoleModal").modal("hide");
 		$("#switchedRoleModal").modal("show");
@@ -77,6 +77,7 @@ mySPA.controller('headerController', function($scope,$http,$location,headerServi
 	$scope.Switch_Role = function(){
 		
 		//var userId = JSON.parse(window.localStorage['_UI']).user_id;
+		// var username = JSON.parse(window.localStorage['_UI']).username.toLowerCase();
 		var username = JSON.parse(window.localStorage['_UI']).username;
 		var userRolesList;
 		var selRole;
@@ -137,6 +138,7 @@ mySPA.controller('headerController', function($scope,$http,$location,headerServi
 	$scope.switchRole_Yes = function () 
 	{
 		var currentRole = window.localStorage['_SR'];
+		// var username = JSON.parse(window.localStorage['_UI']).username.toLowerCase();
 		var username = JSON.parse(window.localStorage['_UI']).username;
 		var selRole = selectedROleID;
 
@@ -147,11 +149,11 @@ mySPA.controller('headerController', function($scope,$http,$location,headerServi
 						var availablePlugins = [];
 						var key = ["Dashboard", "Dead Code Identifier", "Mindmap", "Neuron 2D", "Neuron 3D", "Oxbow Code Identifier", "Reports"];
 						for(i=0; i<data.plugindetails.length; i++){
-						availablePlugins.push({
-							"pluginName" : key[i],
-							"pluginValue" : data.plugindetails[i].keyValue
-						})
-					}
+							availablePlugins.push({
+								"pluginName" : key[i],
+								"pluginValue" : data.plugindetails[i].keyValue
+							})
+						}
 						availablePlugins.push({
 							"pluginName" : "Utility",
 							"pluginValue" : "true"
@@ -164,10 +166,10 @@ mySPA.controller('headerController', function($scope,$http,$location,headerServi
 							var roleasarray=[];
 							roleasarray.push(selectedROleID);
 							LoginService.getRoleNameByRoleId_Nineteen68(roleasarray)
-							.then(function (data) {
-								if(data != "fail"){
-									window.localStorage['_SR'] = data;
-									if(data == "Admin"){
+							.then(function (data1) {
+								if(data1 != "fail"){
+									window.localStorage['_SR'] = data1;
+									if(data1 == "Admin"){
 										window.localStorage['navigateScreen'] = "admin";
 										window.location.href = "/admin";
 										}
@@ -177,11 +179,18 @@ mySPA.controller('headerController', function($scope,$http,$location,headerServi
 									}											
 								}
 								else	console.log("Fail to get role name by role Id.");
-									}, function (error) { console.log("Fail to Load UserInfo") });									
-							window.location.href = "/plugin";	
-							}
-								else	console.log("Failed to Load UserInfo.");
-							}, function (error) { console.log("Fail to Load UserInfo") });
+							}, 
+							function (error) { 
+								console.log("Fail to Load UserInfo") 
+							});									
+							//window.location.href = "/plugin";	
+					}
+					else	
+						console.log("Failed to Load UserInfo.");
+			},
+			function (error) { 
+				console.log("Fail to Load UserInfo") 
+			});
 
 	}
 	
