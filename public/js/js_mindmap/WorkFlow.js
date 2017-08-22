@@ -84,7 +84,10 @@ function loadMindmapData1_W(){
 	}
 	d3.select('#ct-assignBox').classed('no-disp',!0);
 	dataSender({task:'getModules',tab:'endToend',prjId:$("#selectProjectEtem").val()},function(err,result){
-		if(err) console.log(result);
+		if(err){
+			console.log(result);
+			unblockUI();
+		}
 		else{
 			var nodeBox=d3.select('#etemModuleContainer');
 			$(nodeBox[0]).empty();
@@ -107,9 +110,9 @@ function loadMindmapData1_W(){
 			});
 			initScroller();
 			setModuleBoxHeight_W();
+			unblockUI();
 		}
 	});
-	unblockUI();
 }
 window.onresize=function() {
 	var w=window.innerWidth-28,h=window.innerHeight-123;
