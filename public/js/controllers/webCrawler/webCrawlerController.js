@@ -302,6 +302,7 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
     }
 
     function parseRelations(obj){
+      console.log(obj);
       for(var i = $scope.level; i>=1; i--){
         var levelObjects = obj[i];
         for(var k = 0; k < levelObjects.length; k++){
@@ -311,6 +312,7 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
           }else if (obj[i][k].status != 200) {
             obj[i][k].isTerminal = true;
           }
+
           for(var j = 0; j <= (obj[i-1].length)-1; j++){
               if(thisNode.parent == obj[i-1][j].name){
                 if (obj[i-1][j].children) {
@@ -344,13 +346,15 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
       //trans
       var scale =1;
       var rescale = function()  {
-        if (d3.event.translate[0] !=  trans1[0]) {
-          d3.event.translate[0] = d3.event.translate[0] + trans1[0];
-         }
-        if (d3.event.translate[1] != trans1[1]) {
-            d3.event.translate[1] = d3.event.translate[1] + trans1[1];
-        }
-        d3.event.scale = d3.event.scale + scale1 - 1 ;
+        //console.log(d3.event.scale);
+    //    if (d3.event.translate[0] !=  trans1[0]) {
+    //      d3.event.translate[0] = d3.event.translate[0] + trans1[0];
+    //     }
+    //    if (d3.event.translate[1] != trans1[1]) {
+      //      d3.event.translate[1] = d3.event.translate[1] + trans1[1];
+      //  }
+      //  d3.event.scale = d3.event.scale + scale1 - 1 ;
+        zoomReset = false;
         trans=d3.event.translate;
         scale=d3.event.scale;
         svg.attr("transform",
@@ -358,10 +362,12 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
             + " scale(" + scale + ")");
       }
 
+      var zoom = d3.behavior.zoom().scale(scale1).translate(trans1).scaleExtent([0.5, 7.5]).on("zoom", rescale);
+      var zoomReset = false;
       var svgMain = d3.select("#result-canvas").append("svg").attr("id","base-svg")
           .attr("width", "1300px")
           .attr("height", "800px")
-          .attr("pointer-events", "all").call(d3.behavior.zoom().on("zoom", rescale)).on("dblclick.zoom", null);
+          .attr("pointer-events", "all").call(zoom).on("dblclick.zoom", null);
 
       console.log($scope.crawledLinks);
       console.log("Number of Crawled Links ", $scope.crawledLinks.length)
@@ -480,8 +486,18 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
         nodeEnter.append("image")
       	.attr("xlink:href", function(d) {
 
+          if (d.status!=200) {
+            if(d.type == "subdomain"){
+              return "imgs/wc-red-sq.png"
+            }else if(d.type == "reverse"){
+              return "imgs/ic-cycle.png"
+            }
+            return "imgs/circle-128.png"
+          }
+
           if(d.isTerminal == true){
           //  console.log(d, d.status , d.name);
+
             if (d.status != 200 ) {
               if(d.type == "subdomain"){
                 return "imgs/wc-red-sq.png"
@@ -498,7 +514,9 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
 
       		}else if(d.nodeOpen == false){
       			return "imgs/wc-p-cr.png"; // collapsed node
-      		}else{
+      		}else if (!d.children && !d._children) {
+            return "imgs/circle-128.png"
+          }else{
       			return "imgs/wc-m-cr.png";
       		}
       	})
@@ -512,6 +530,15 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
 
       	 node.select("image")
         	.attr("xlink:href", function(d) {
+            if (d.status!=200) {
+              if(d.type == "subdomain"){
+                return "imgs/wc-red-sq.png"
+              }else if(d.type == "reverse"){
+                return "imgs/ic-cycle.png"
+              }
+              return "imgs/circle-128.png"
+            }
+
 
             if(d.isTerminal == true){
               // console.log(d, d.status , d.name);
@@ -531,7 +558,9 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
 
          		}else if(d.nodeOpen == false){
          			return "imgs/wc-p-cr.png"; // collapsed node
-         		}else{
+         		}else if (!d.children && !d._children) {
+              return "imgs/wc-cr.png"
+            }else{
          			return "imgs/wc-m-cr.png";
          		}
          	})
@@ -588,10 +617,16 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
             return;
           }
 
-          trans1[0]=trans[0] ;
-          trans1[1] = trans[1];
-          scale1 = scale;
-          svgMain.call(d3.behavior.zoom().on("zoom", function(){
+          if (!zoomReset) {
+            trans1[0] = trans[0];
+            trans1[1] = trans[1];
+            scale1 = scale;
+          }else{
+            trans1 = [0,0];
+            scale1 = 1;
+          }
+
+          svgMain.call(d3.behavior.zoom().scaleExtent([0.5, 7.5]).on("zoom", function(){
             //  scale=d3.event.scale;
           }));
           //Only do the element stuff if this came from mouseover
@@ -607,17 +642,29 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
           highlightNeighbors(d,i);
         }
 
-
       function nodeOut() {
           if (nodeFocus) {
             return;
           }
-          svgMain.call(d3.behavior.zoom().on("zoom", rescale)).on("dblclick.zoom", null);
+
+          svgMain.call(d3.behavior.zoom().scale(scale1).translate(trans1).scaleExtent([0.5, 7.5]).on("zoom", rescale)).on("dblclick.zoom", null);
           d3.selectAll(".hoverLabel").remove();
           d3.selectAll("image").style("opacity", 1).style("stroke", "black").style("stroke-width", "1.5px");
           d3.selectAll("line").style("opacity", 1);
   		    //restart();
         }
+
+        document.getElementById("result-canvas").addEventListener("dblclick", () => {
+          console.log("reset the zoom ");
+          //  zoom.transform(svg, d3.zoomIdentity);//Works
+          //trans=d3.event.translate;
+        //  scale=d3.event.scale;
+          zoomReset = true;
+          svgMain.call(d3.behavior.zoom().scale(1).translate([0,0]).scaleExtent([0.5, 7.5]).on("zoom", rescale)).on("dblclick.zoom", null);
+          svg.attr("transform",
+              "translate(" + [0,0] + ")"
+              + " scale(" + 1 + ")");
+        });
 
       function tick() {
         link.attr("x1", function(d) { return d.source.x+12.5 ; })
