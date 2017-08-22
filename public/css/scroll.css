@@ -658,6 +658,95 @@
 	background: rgb(211, 211, 211)
 }
 
+/*********************Scheduling sscroller***********************/
+/****Main Content****/
+.scroll-wrapper > .scheduleSuiteTable{
+	width: calc(100% - 27px)!important;
+    float: left;
+    height: 100% !important;
+}
+.scroll-wrapper.scheduleSuiteTable {
+    max-height: 263px;
+}
+.scroll-wrapper .scheduleSuiteTable{
+    padding: 1px !important;
+}
+.scheduleSuiteTable > .scroll-element.scroll-y{
+	z-index:10;
+}
+.scheduleSuiteTable > .scroll-element.scroll-y .scroll-bar{
+	background: #321e4f
+}
+.scheduleSuiteTable > .scroll-element .scroll-element_track{
+	background: rgb(211, 211, 211)
+}
+
+/*****Each Suite Content******/
+/*.scroll-wrapper > .scenarioBody{
+	width: calc(100% - 27px)!important;
+    float: left;
+    height: 100% !important;
+}
+.scroll-wrapper.scenarioBody{
+    max-height: 60px;
+}
+.scroll-wrapper .scenarioBody{
+    padding: 1px !important;
+}
+.scenarioBody > .scroll-element.scroll-y{
+	z-index:60;
+}
+.scenarioBody > .scroll-element.scroll-y .scroll-bar{
+	background: #321e4f
+}
+.scenarioBody > .scroll-element .scroll-element_track{
+	background: rgb(211, 211, 211)
+}*/
+
+/*********QC*********/
+.scroll-wrapper > .mappedFiles{
+	/*width: 100% !important;*/
+    float: left;
+    height: 100% !important;
+}
+.scroll-wrapper.mappedFiles {    
+    min-height: 100px;
+    max-height: 708px;
+}
+.scroll-wrapper .mappedFiles{
+    padding: 10px !important;
+}
+.mappedFiles > .scroll-element.scroll-y{
+	z-index:60;
+}
+.mappedFiles > .scroll-element.scroll-y .scroll-bar{
+	background: #321e4f
+}
+.mappedFiles > .scroll-element .scroll-element_track{
+	background: rgb(211, 211, 211)
+}
+
+/*******Left and Right Section Scroller********/
+.scroll-wrapper > .qcTreeContainer, .scroll-wrapper > .qcN68TreeContainer{
+	/*width: 100% !important;*/
+    float: left;
+    height: 100% !important;
+}
+.scroll-wrapper.qcTreeContainer, .scroll-wrapper.qcN68TreeContainer {
+    max-height: 626px;
+}
+.scroll-wrapper .qcTreeContainer, .scroll-wrapper .qcN68TreeContainer{
+    padding: 0 6px 0 6px;
+}
+.qcTreeContainer > .scroll-element.scroll-y, .qcN68TreeContainer > .scroll-element.scroll-y{
+	z-index:10;
+}
+.qcTreeContainer > .scroll-element.scroll-y .scroll-bar, .qcN68TreeContainer > .scroll-element.scroll-y .scroll-bar{
+	background: #321e4f
+}
+.qcTreeContainer > .scroll-element .scroll-element_track, .qcN68TreeContainer > .scroll-element .scroll-element_track{
+	background: rgb(211, 211, 211)
+}
 /**********Specifically for Firefox**********/
 @-moz-document url-prefix() {
 	.scroll-wrapper > .scenarioDetailsContent{

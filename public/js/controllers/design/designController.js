@@ -178,7 +178,6 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				}
 		}
 
-		
 	var custnameArr = [];
 	var keywordValArr = [];
 	var proceed = false;
@@ -832,7 +831,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					$("#enableAppend").prop("disabled", true).css('cursor','no-drop');
 					$("#screenShotScrape").text("No Screenshot Available");
 					unblockUI();
-				//	return;
+					//return;
 				}
 				else{
 
@@ -886,7 +885,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					editable: true,
 					radio: true
 				});
-
+				
 				if(appType == 'Web')
 				{
 						if($(".ellipsis").length > 0 )
@@ -1959,13 +1958,22 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			});
 		}
 		else{
-			if(!$("input[type=checkbox].checkall").is(":checked")){
+			if($(".parentObjContainer").find(".checkStylebox").is(":checked")){
+				viewString.view = [];
+				viewString.mirror = "";
+				newScrapedList.view = [];
+				newScrapedList.mirror = "";
+				$("#scraplist").empty();
+				$("#deleteObjects").prop("disabled", true);
+				$(".checkStylebox").prop("checked", false);
+			}
+			else if(!$("input[type=checkbox].checkall").is(":checked")){
 				openDialog("Delete Scrape data", "Please select objects to delete.")
 			}
 			else{
 				$.each($("input[type=checkbox].checkall:checked"), function(){
 					for (var i = 0; i < viewString.view.length; i++) {
-						if($(this).parents("li").data("xpath") == viewString.view[i].xpath && $(this).parent('.objectNames').siblings(".ellipsis").text().trim() == viewString.view[i].custname.trim()){
+						if($(this).parents("li").data("xpath") == viewString.view[i].xpath && ($(this).parent('.objectNames').siblings(".ellipsis").text().trim().replace('/\s/g', ' ')).replace('\n', ' ') == viewString.view[i].custname.trim()){
 							viewString.view.splice(viewString.view.indexOf(viewString.view[i]), 1);
 							$(this).parents("li.select_all").remove();
 							break;
@@ -1975,7 +1983,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				if($("input[type=checkbox].checkall:checked").length > 0){
 					$.each($("input[type=checkbox].checkall:checked"), function(){
 						for (var i = 0; i < newScrapedList.view.length; i++) {
-							if($(this).parents("li").data("xpath") == newScrapedList.view[i].xpath && $(this).parent('.objectNames').siblings(".ellipsis").text().trim() == newScrapedList.view[i].custname.trim()){
+							if($(this).parents("li").data("xpath") == newScrapedList.view[i].xpath && ($(this).parent('.objectNames').siblings(".ellipsis").text().trim().replace('/\s/g', ' ')).replace('\n', ' ') == newScrapedList.view[i].custname.trim()){
 								newScrapedList.view.splice(newScrapedList.view.indexOf(newScrapedList.view[i]), 1);
 								$(this).parents("li.select_all").remove();
 								break;
@@ -4073,7 +4081,7 @@ function contentTable(newTestScriptDataLS) {
 				var custname1;
 				var custval=ob.custname;
 				custname1 = $('<input>').html(custval).text().trim();
-				if (custname1.replace(/\s/g, ' ') ==(selectedText.replace('/\s/g', ' ')).replace('\n', ' ')){
+				if (custname1.replace(/\s/g, ' ') == (selectedText.replace('/\s/g', ' ')).replace('\n', ' ')){
 					objName = ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ');
 					url = ob.url;
 					var obType = ob.tag;
