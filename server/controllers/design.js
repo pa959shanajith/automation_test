@@ -2,8 +2,8 @@
  * Dependencies.
  */
 var Joi = require('joi');
-var dbConn = require('../../server/config/icetestautomation');
-var cassandra = require('cassandra-driver');
+// var dbConn = require('../../server/config/icetestautomation');
+// var cassandra = require('cassandra-driver');
 var myserver = require('../../server.js');
 var async = require('async');
 var parse = require('xml-parser');
@@ -1724,7 +1724,7 @@ exports.updateTestCase_ICE = function (req, res) {
 		var args = {data:inputs,headers:{"Content-Type" : "application/json"}};
 		client.post(epurl+"design/updateTestCase_ICE",args,
 					function (result, response) {
-		console.log('-------------',response);
+		// console.log('-------------',response);
 		//dbConn.execute(checktestcaseexist, function (err, result) {
 			try{
 			//	if (err) {
@@ -1767,7 +1767,7 @@ exports.updateTestCase_ICE = function (req, res) {
 
 		                 updateTestCaseQuery =  "UPDATE testcases SET  history= history + { "+requestedhistory+" }" +
 							" where versionnumber = "+requestedversionnumber+" and screenid=" + requestedscreenid + " and testcaseid=" + requestedtestcaseid + " and testcasename='" + requestedtestcasename + "' ";
-							console.log(updateTestCaseQuery);
+							// console.log(updateTestCaseQuery);
 							uploadTestCaseData(inputs,function(error,response){
 							// uploadTestCaseData(updateTestCaseData,function(error,response){
 								if(error){

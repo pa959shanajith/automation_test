@@ -1688,7 +1688,8 @@ function updatescenariodetailsinsuite(req, cb, data) {
                                            simplecallback(null, result);
                                     } else {
                                         flag = "fail";
-                                       console.log(err);
+                                        console.log(err);
+                                        simplecallback(null, result);
                                     }
                                 });
                 }

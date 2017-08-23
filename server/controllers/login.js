@@ -527,7 +527,7 @@ exports.loadUserInfo_Nineteen68 = function(req, res){
 				// 		if(err){
 					var inputs;
 					if(flag == true){
-						inputs = {"roleid": switchedRole, "query":"loggedinRole"}
+						inputs = {"roleid": req.body.selRole, "query":"loggedinRole"}
 					}
 					if(flag == false || flag == undefined){
 						inputs = {"roleid": req.session.defaultRoleId, "query":"loggedinRole"}
@@ -572,10 +572,10 @@ exports.loadUserInfo_Nineteen68 = function(req, res){
 	                	// 	if(err){
 						var inputs;
 						if(flag == true){
-							inputs = {"roleid": switchedRole, "query":"userPlugins"}
+							inputs = {"roleid": req.body.selRole, "query":"userPlugins"}
 						}
 						if(flag == false || flag == undefined){
-							inputs = {"roleid": jsonService.role, "query":"userPlugins"}
+							inputs = {"roleid": req.session.defaultRoleId, "query":"userPlugins"}
 						}
 					    //var inputs = {"roleid": req.session.defaultRoleId, "query":"loggedinRole"}
 						var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
