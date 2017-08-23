@@ -1398,7 +1398,7 @@ input[disabled]{
     /* margin-right: 31%; */
     position: relative;
     left: -32%;
-}
+} 
 .saveComapredObj
 {
     position: relative;
@@ -1433,7 +1433,7 @@ input[disabled]{
     width: 60%;
     margin-left: 4%;
     margin-top: 0%;
-    line-height: 1.7;
+    line-height: 1.7; 
     border: 1px solid #656565 !important;
 }
 
@@ -1469,7 +1469,7 @@ input[disabled]{
     background-clip: padding-box;
     border: 1px solid #adabab;
     border-radius: 1px;
-
+    
 }
 
 .rolesSpan>label{
@@ -1481,7 +1481,7 @@ input[disabled]{
 .rolesSpan>input{
   margin-top: 3px;
   margin-left: 12px;
-}
+} 
 
 .rolesSpan{
     padding-top: 9px;
@@ -2982,7 +2982,10 @@ li.select_all .addCustObj{
     overflow: hidden;
     text-overflow: ellipsis;
 }
-
+#userName		
+{		
+    text-transform: lowercase;		
+}
 
 /******************Header CSS***************************/
 
@@ -3376,7 +3379,7 @@ li.select_all .addCustObj{
 	vertical-align: middle;
 	font-weight: normal;
 	line-height: 2;
-}
+}		
 
 
 .selectControl {
@@ -4647,7 +4650,7 @@ line.link {
 		box-shadow:2px 0 3px rgba(29,47,62,0.7);-webkit-box-shadow:2px 0 3px rgba(29,47,62,0.7);-moz-box-shadow:2px 0 3px rgba(29,47,62,0.7);-ms-box-shadow:2px 0 3px rgba(29,47,62,0.7);-o-box-shadow:2px 0 3px rgba(29,47,62,0.7);
 	}
 	50%{
-		box-shadow:0 -2px 3px rgba(29,47,62,0.7);-webkit-box-shadow:0 -2px 3px rgba(29,47,62,0.7);-moz-box-shadow:0 -2px 3px rgba(29,47,62,0.7);-o-box-shadow:0 -2px 3px rgba(29,47,62,074);-ms-box-shadow:0 -2px 3px rgba(29,47,62,0.7);
+	box-shadow:0 -2px 3px rgba(29,47,62,0.7);-webkit-box-shadow:0 -2px 3px rgba(29,47,62,0.7);-moz-box-shadow:0 -2px 3px rgba(29,47,62,0.7);-o-box-shadow:0 -2px 3px rgba(29,47,62,074);-ms-box-shadow:0 -2px 3px rgba(29,47,62,0.7);
 	}
 	75%{
 		box-shadow:-2px 0 3px rgba(29,47,62,0.7);-webkit-box-shadow:-2px 0 3px rgba(29,47,62,0.7);-moz-box-shadow:-2px 0 3px rgba(29,47,62,0.7);-ms-box-shadow:-2px 0 3px rgba(29,47,62,0.7);-o-box-shadow:-2px 0 3px rgba(29,47,62,0.7);

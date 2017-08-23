@@ -27,7 +27,7 @@ mySPA.controller('loginController', function ($scope, $http, $location, LoginSer
 			cfpLoadingBar.complete();
 		}
 		else {
-			var username = $scope.userName;
+			var username = $scope.userName.toLowerCase();
 			var password = $scope.password;
 			LoginService.authenticateUser_Nineteen68(username, password)
 			.then(function (data) {
@@ -45,7 +45,7 @@ mySPA.controller('loginController', function ($scope, $http, $location, LoginSer
 							$(".ic-username").children().attr("src", "imgs/ic-username.png");
 							$(".ic-password").children().attr("src", "imgs/ic-password.png");
 							$(".ic-username, .ic-password").parent().removeClass("input-border-error")
-							var username = $scope.userName;
+							var username = $scope.userName.toLowerCase();
 							var password = $scope.password;
 							$scope.loginButtonValidation = '';
 							var selRole;
