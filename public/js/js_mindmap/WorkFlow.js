@@ -150,12 +150,13 @@ var initiate_W = function(){
 	});
 	u=canvas.append('svg').attr('id','ct-actionBox_W').append('g');
 	t=u.append('g').attr('id','ct-saveAction_W').attr('class','ct-actionButton_W').on('click',actionEvent_W);
-	t.append('rect').attr('x',100).attr('y',0).attr('rx',12).attr('ry',12);
-	t.append('text').attr('x',125).attr('y',18).text('Save');
+	// 886: Unable to rearrange nodes in e2e
+	t.append('rect').attr('x',0).attr('y',0).attr('rx',12).attr('ry',12);
+	t.append('text').attr('x',23).attr('y',18).text('Save');
 	if(selectedTab == "tabCreate" || 'mindmapEndtoEndModules'){
 		t=u.append('g').attr('id','ct-createAction_W').attr('class','ct-actionButton_W disableButton').on('click',actionEvent_W);
-		t.append('rect').attr('x',200).attr('y',0).attr('rx',12).attr('ry',12);
-		t.append('text').attr('x',215).attr('y',18).text('Create');
+		t.append('rect').attr('x',100).attr('y',0).attr('rx',12).attr('ry',12);
+		t.append('text').attr('x',114).attr('y',18).text('Create');
 		// //create new button
 		// t=u.append('g').attr('id','ct-createNewAction_W').attr('class','ct-actionButton_W').on('click',createNewMap_W);
 		// t.append('rect').attr('x',0).attr('y',0).attr('rx',12).attr('ry',12);
@@ -426,8 +427,8 @@ var recurseDelChild_W = function(d){
 };
 var moveNode_W = function(e){
 	e=e||window.event;
-	
-	d3.select('.ct-movable').attr('transform', "translate("+parseFloat((e.pageX-20-cSpan_W[0])/cScale_W+2)+","+parseFloat((e.pageY-240-cSpan_W[1])/cScale_W-20)+")");
+	//#886 Unable to rearrange nodes in e2e
+	d3.select('.ct-movable').attr('transform', "translate("+parseFloat((e.pageX-14-cSpan_W[0])/cScale_W+2)+","+parseFloat((e.pageY-210-cSpan_W[1])/cScale_W-20)+")");
 };
 var moveNodeBegin_W = function(e){
 	e=e||window.event;
@@ -856,6 +857,9 @@ $(document).on('click', '.createNew-ete', function(e){
 })
 
  $(document).on('click', '.moduleContainer', function(e){
+		//#821 UI issues in e2e
+ 	    $('#eteSearchScenarios').val("");
+
     	var container = $("#eteScenarioContainer");
 		container.empty();
     	
