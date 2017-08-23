@@ -1,6 +1,7 @@
 mySPA.factory('reportService', ['$http','$q', function ($http, $httpProvider, $q)   {
 	return{
 		renderReport_ICE : function(finalReports, reportType){
+			if(reportType == "html"){
 				return $http.post('/renderReport_ICE',{
 					param : 'renderReport_ICE',				
 					finalreports: finalReports,
@@ -12,6 +13,20 @@ mySPA.factory('reportService', ['$http','$q', function ($http, $httpProvider, $q
 				function(response){
 					return $q.reject(response.data)
 				})
+			}
+			else{
+				return $http.post('/renderReport_ICE',{
+					param : 'renderReport_ICE',				
+					finalreports: finalReports,
+					reporttype: reportType
+				},{responseType: 'arraybuffer' })
+				.then(function(response)  {
+					return response.data
+				},
+				function(response){
+					return $q.reject(response.data)
+				}, {responseType: 'arraybuffer' })
+			}
 		},
 		getMainReport_ICE : function(){
 			return $http.post('/getMainReport_ICE',{

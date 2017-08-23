@@ -17,7 +17,7 @@ if (cluster.isMaster) {
 } else {
     var express = require('express');
     var app = express();
-    
+
     //var io = require('socket.io')(server);
     var bodyParser = require('body-parser');
     var morgan = require('morgan');
@@ -55,7 +55,7 @@ if (cluster.isMaster) {
         secure: true,
         rolling: true,
         resave: false,
-        saveUninitialized: false,  //Should always be false for cookie to clear 
+        saveUninitialized: false,  //Should always be false for cookie to clear
         cookie: {
             maxAge: (30 * 60 * 1000)
         }
@@ -100,7 +100,7 @@ if (cluster.isMaster) {
     });
 
     //Only Test Engineer and Test Lead have access
-    app.get(/^\/(design|designTestCase|execute|scheduling)$/, function(req, res){
+    app.get(/^\/(design|designTestCase|execute|scheduling|p_ALM)$/, function(req, res){
         if(!req.session.defaultRole || req.session.defaultRole == "Admin" || req.session.defaultRole == "Business Analyst" || req.session.defaultRole == "Tech Lead" || req.session.defaultRole == "Test Manager")
         {
             req.session.destroy(); res.status(401).send('<br><br>Your session has been expired.Please <a href="/">Login</a> Again');
@@ -110,14 +110,14 @@ if (cluster.isMaster) {
     });
 
     //Test Engineer,Test Lead and Test Manager can access
-    app.get(/^\/(specificreports|home|p_Utility|p_Reports|plugin)$/, function(req, res){
+    app.get(/^\/(specificreports|home|p_Utility|p_Reports|plugin|p_ALM|p_Weboccular)$/, function(req, res){
         if (!req.session.defaultRole || req.session.defaultRole == "Admin" || req.session.defaultRole == "Business Analyst" || req.session.defaultRole == "Tech Lead")
         {
             req.session.destroy(); res.status(401).send('<br><br>Your session has been expired.Please <a href="/">Login</a> Again');
         }else{
             if (req.cookies['connect.sid'] && req.cookies['connect.sid'] != undefined) { res.sendFile("index.html", { root: __dirname + "/public/" });} else {req.session.destroy(); res.status(401).send('<br><br>Your session has been expired. Please <a href="/">Login</a> Again');}
         }
-    });  
+    });
 
     app.get('/favicon.ico', function(req, res){
         if (req.cookies['connect.sid'] && req.cookies['connect.sid'] != undefined) { res.sendFile("index.html", { root: __dirname + "/public/" });} else {req.session.destroy(); res.status(401).send('<br><br>Your session has been expired. Please <a href="/">Login</a> Again');}
@@ -190,6 +190,8 @@ if (cluster.isMaster) {
     var header = require('./server/controllers/header');
     var plugin = require('./server/controllers/plugin');
     var utility = require('./server/controllers/utility');
+    var qc = require('./server/controllers/qualityCenter');
+    var webCrawler = require('./server/controllers/webCrawler');
     //Login Routes
     app.post('/authenticateUser_Nineteen68', login.authenticateUser_Nineteen68);
     app.post('/authenticateUser_Nineteen68_CI', login.authenticateUser_Nineteen68_CI);
@@ -227,6 +229,9 @@ if (cluster.isMaster) {
     app.post('/getTestcaseDetailsForScenario_ICE', suite.getTestcaseDetailsForScenario_ICE);
     app.post('/ExecuteTestSuite_ICE_CI', suite.ExecuteTestSuite_ICE_CI);
     //app.post('/readTestScenarios_ICE', suite.readTestScenarios_ICE);
+    //Scheduling Screen Routes
+    //app.post('/testSuitesScheduler_ICE', suite.testSuitesScheduler_ICE);
+    //app.post('/getScheduledDetails_ICE', suite.getScheduledDetails_ICE);
     //Report Screen Routes
     app.post('/getAllSuites_ICE', report.getAllSuites_ICE);
     app.post('/getSuiteDetailsInExecution_ICE', report.getSuiteDetailsInExecution_ICE);
@@ -248,8 +253,13 @@ if (cluster.isMaster) {
     app.post('/getTaskJson_Nineteen68', plugin.getTaskJson_Nineteen68);
     //Utility plugins
     app.post('/Encrypt_ICE', utility.Encrypt_ICE);
-
-
+    app.post('/crawResults', webCrawler.getCrawlResults);
+    //QC Plugin
+    app.post('/loginQCServer_ICE', qc.loginQCServer_ICE);
+    app.post('/qcProjectDetails_ICE', qc.qcProjectDetails_ICE);
+    app.post('/qcFolderDetails_ICE', qc.qcFolderDetails_ICE);
+    app.post('/saveQcDetails_ICE', qc.saveQcDetails_ICE);
+    app.post('/viewQcMappedList_ICE', qc.viewQcMappedList_ICE);
 
     //-------------SERVER START------------//
     //server.listen(3000);      //Http Server
@@ -272,7 +282,7 @@ if (cluster.isMaster) {
         });
         apireq.on('error', function (err) {
             httpsServer.close();
-            console.log("Please run the Service API and Restart the Server");   
+            console.log("Please run the Service API and Restart the Server");
         });
     }catch(exception){
         httpsServer.close();
@@ -282,7 +292,7 @@ if (cluster.isMaster) {
 
 
 
-    //To prevent can't send header response 
+    //To prevent can't send header response
     app.use(function(req, res, next) {
         var _send = res.send;
         var sent = false;
@@ -299,39 +309,63 @@ if (cluster.isMaster) {
 
     var allSockets = [];
     var socketMap = {};
+    var socketMapUI = {};
+    var isUISocketRequest = false;
+
     io.on('connection', function(socket) {
         // console.log("-------------------------------------------------------------------------------------------------------");
         var address = socket.request.connection.remoteAddress || socket.request.headers['x-forwarded-for'];
         // console.log("IPTYPE:::::", socket.request.connection.address().family);
         // console.log("socket.handshake.address:::::", socket.handshake.address);
-        if (!(address in socketMap)) {
-            socketMap[address] = socket;
+
+        console.log("socket connecting address" , address);
+        //console.log("middleware:", socket.request._query['check']);
+        if (socket.request._query['check'] == "true" ) {
+        //  if ( !(address in socketMapUI) ) {
+            isUISocketRequest = true;
+            console.log("socket request from UI");
+            socketMapUI[address] = socket;
+            socket.emit("connectionAck", "Success");
+        //  }
+        }else{
+          isUISocketRequest = false;
+          if (!(address in socketMap)) {
+              socketMap[address] = socket;
+          }
         }
+
         socket.send('connected');
         module.exports.allSocketsMap = socketMap;
+        module.exports.allSocketsMapUI = socketMapUI;
         httpsServer.setTimeout();
 
         socket.on('message', function(data) {
             //console.log("SER", data);
         });
+        if (!isUISocketRequest) {
         var socketFlag = false;
-        if (allSockets.length > 0) {
-            for (var socketIndexes = 0; socketIndexes < allSockets.length; socketIndexes++) {
-                if (allSockets[socketIndexes].handshake.address.indexOf(socket.handshake.address) != -1) {
-                    socketFlag = true;
-                }
-            }
-        } else {
-            allSockets.push(socket);
-            allClients.push(socket.conn.id);
-            socketFlag = true;
-        }
-        if (socketFlag == false) {
-            allSockets.push(socket);
-            allClients.push(socket.conn.id)
+          if (allSockets.length > 0) {
+              for (var socketIndexes = 0; socketIndexes < allSockets.length; socketIndexes++) {
+                  if (allSockets[socketIndexes].handshake.address.indexOf(socket.handshake.address) != -1) {
+                      socketFlag = true;
+                  }
+              }
+          } else {
+              allSockets.push(socket);
+              allClients.push(socket.conn.id);
+              socketFlag = true;
+          }
+          if (socketFlag == false) {
+              allSockets.push(socket);
+              allClients.push(socket.conn.id)
+          }
         }
         module.exports.abc = allSockets;
         socket.on('disconnect', function() {
+          if (socket.request._query['check'] == "true" ) {
+            var address = socket.request.connection.remoteAddress || socket.request.headers['x-forwarded-for'];
+            console.log("\n\n Disconnecting ... from UI socket " , address);
+          }else{
             var i = allSockets.indexOf(socket);
             if (i > -1) {
                 console.log('Socket Connection got disconnected for :', allSockets[i].handshake.address);
@@ -343,6 +377,7 @@ if (cluster.isMaster) {
                 //		console.log("------------------------SOCKET DISCONNECTED----------------------------------------");
                 console.log("NO. OF CLIENTS CONNECTED:", allSockets.length,'\nIP\'s connected :',Object.keys(socketMap).join());
             }
+          }
         });
         //	Socket Connection Failed
         socket.on('connect_failed', function() {

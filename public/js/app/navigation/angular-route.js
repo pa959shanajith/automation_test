@@ -10,12 +10,12 @@ mySPA.config(function($routeProvider, $locationProvider,$provide) {
 			})
 			.when('/header',
 			{
-				templateUrl:	'partials/header.html'
+				templateUrl: 'partials/header.html'
 			})
 			.when('/footer',
 			{
-				templateUrl:	'partials/footer.html',
-				controller:		'footerController'
+				templateUrl: 'partials/footer.html',
+				controller:	'footerController'
 			})
 			.when('/admin', 
 			{
@@ -62,12 +62,21 @@ mySPA.config(function($routeProvider, $locationProvider,$provide) {
 			 	controller: 'reportsController'
 			})
 			.when('/specificreports',{
-				controller:		'reportsController'
+				controller:	'reportsController'
 			})
 			.when('/home', 
 			{
 			 	templateUrl: 'partials/home_mindmap.html',
 			 	controller: 'mindmapController'
+			})
+			.when('/p_Weboccular',{
+				templateUrl: 'partials/webCrawler.html',
+				controller: 'webCrawlerController'
+			})
+			.when('/p_ALM',
+			{
+			 	templateUrl: 'partials/qualityCenter.html',
+			 	controller: 'qcController'
 			})
 			.otherwise({redirectTo: '/'});
 	

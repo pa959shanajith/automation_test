@@ -5,7 +5,7 @@ mySPA.controller('loginController', function ($scope, $http, $location, LoginSer
 	window.localStorage['LoginSuccess'] = "False";
 	document.getElementById("currentYear").innerHTML = new Date().getFullYear()
 
-	
+
 	$scope.check_credentials = function (path) {
 		cfpLoadingBar.start();
 		$scope.loginValidation = "";
@@ -48,8 +48,9 @@ mySPA.controller('loginController', function ($scope, $http, $location, LoginSer
 							var username = $scope.userName;
 							var password = $scope.password;
 							$scope.loginButtonValidation = '';
+							var selRole;
 
-							LoginService.loadUserInfo_Nineteen68(username)
+							LoginService.loadUserInfo_Nineteen68(username,selRole,false)
 							.then(function (data) {
 								if(data != "fail"){
 									//To be removed - Has to come from database
@@ -65,14 +66,21 @@ mySPA.controller('loginController', function ($scope, $http, $location, LoginSer
 										"pluginName" : "Utility",
 										"pluginValue" : "true"
 									})
+									availablePlugins.push({
+										"pluginName" : "Weboccular",
+										"pluginValue" : "true"
+									})
 									data.pluginsInfo = availablePlugins;
 									window.localStorage['LoginSuccess'] = "True";
 									window.localStorage['_UI'] = JSON.stringify(data);
-									var role = data.role;
-									LoginService.getRoleNameByRoleId_Nineteen68(role)
+									var roleasarray=[];
+									roleasarray.push(data.role);
+									LoginService.getRoleNameByRoleId_Nineteen68(roleasarray)
 									.then(function (data) {
 										if(data != "fail"){
 											window.localStorage['_SR'] = data;
+											window.localStorage['_pR'] = data+";"+roleasarray;
+											
 											if(data == "Admin"){
 												window.localStorage['navigateScreen'] = "admin";
 												window.location.href = "/admin";
@@ -80,10 +88,10 @@ mySPA.controller('loginController', function ($scope, $http, $location, LoginSer
 											else{
 												window.localStorage['navigateScreen'] = "plugin";
 												window.location.href = "/plugin";
-											}											
+											}
 										}
 										else	console.log("Fail to get role name by role Id.");
-									}, function (error) { console.log("Fail to Load UserInfo") });									
+									}, function (error) { console.log("Fail to Load UserInfo") });
 								}
 								else	console.log("Failed to Load UserInfo.");
 							}, function (error) { console.log("Fail to Load UserInfo") });
@@ -94,7 +102,7 @@ mySPA.controller('loginController', function ($scope, $http, $location, LoginSer
 				{
 						$scope.loginValidation = "To Login, user must be allocated to a Domain and Project. Please contact Admin.";
 						cfpLoadingBar.complete();
-				}						
+				}
 				else{
 					console.log("Fail to Login.")
 				}
@@ -102,4 +110,3 @@ mySPA.controller('loginController', function ($scope, $http, $location, LoginSer
 		}
 	}
 });
-

@@ -531,7 +531,9 @@ exports.ExecuteTestSuite_ICE = function(req, res) {
                         console.log(currentscenarioidError);
                     } else {
                         if (currentscenarioidResponse != null || currentscenarioidResponse != undefined) {
-                            scenariotestcaseobj[currentscenarioid] = currentscenarioidResponse;
+                            scenariotestcaseobj[currentscenarioid] = currentscenarioidResponse.listoftestcasedata;
+                            scenariotestcaseobj["qccredentials"] = eachsuiteDetails.qccredentials
+                            scenariotestcaseobj["qcdetails"] = currentscenarioidResponse.qcdetails;
                             listofscenarioandtestcases.push(scenariotestcaseobj);
                             eachsuiteDetailscallback();
                         }
@@ -932,6 +934,7 @@ function TestCaseDetails_Suite_ICE(req, cb, data) {
         var resultstring = [];
         var data = [];
         var resultdata = '';
+        var qcdetails = {};
 
         var listoftestcasedata = [];
         async.series({
@@ -1154,14 +1157,39 @@ function TestCaseDetails_Suite_ICE(req, cb, data) {
                             }
                         });
                     }, callback);
+                },
+                qcscenariodetails : function(callback){
+                    var qcdetailsquery = "SELECT * FROM qualitycenterdetails where testscenarioid="+requestedtestscenarioid;
+                    var inputs = {"testscenarioid":requestedtestscenarioid,"query":"qcdetails"}
+                    var args = {
+                        data:inputs,
+                        headers:{"Content-Type" : "application/json"}
+                        
+                    }
+                    client.post(epurl+"qualityCenter/viewQcMappedList_ICE",args,
+                        function (qcdetailsows, response) {
+                        if (response.statusCode != 200 || qcdetailsows.rows == "fail") {
+                    // dbConnICE.execute(qcdetailsquery,function(err,qcdetailsows){
+                    //     if(err){
+                    //         console.log(err);
+                            console.log("Exception occured in TestCaseDetails_Suite_ICE : fail, qcscenariodetails ");
+                        }else{
+                            if(qcdetailsows.rows.length!=0){
+                                flagtocheckifexists = true;
+                                qcdetails = JSON.parse(JSON.stringify(qcdetailsows.rows[0]));
+                            }
+                        }
+                        callback(null,qcdetails);
+                    });
                 }
             },
             function(err, results) {
+                var obj = {"listoftestcasedata":JSON.stringify(listoftestcasedata),"qcdetails":qcdetails};
                 //data.setHeader('Content-Type','application/json');
                 if (err) {
                     cb(err);
                 } else {
-                    cb(null, JSON.stringify(listoftestcasedata));
+                    cb(null, obj);
                 }
             }
         );

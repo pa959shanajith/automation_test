@@ -56,13 +56,13 @@
 				<div class='leftControl adminControl'>
 					<input type="text" name="firstName" id="firstName"
 						ng-model="firstName" maxlength="12"
-						class="form-control form-control-custom validationKeydown" placeholder="First Name"><span
+						class="form-control form-control-custom validationKeydown preventSpecialChar" placeholder="First Name"><span
 						ng-show="firstNameRequired" class="error-msg ng-cloak errorlbl">{{firstNameRequired}}</span>
 				</div>
 				<div class='rightControl adminControl'>
 					<input type="text" name="lastName" id="lastName"
 						ng-model="lastName" maxlength="12"
-						class="form-control form-control-custom validationKeydown" placeholder="Last Name"><span
+						class="form-control form-control-custom validationKeydown preventSpecialChar" placeholder="Last Name"><span
 						ng-show="lastNameRequired" class="error-msg ng-cloak errorlbl">{{lastNameRequired}}</span>
 				</div>
 				<div class='leftControl adminControl'>
@@ -97,13 +97,13 @@
 					</div>
 				</div>
 				
-				<!-- Secondary role  -->
-				<!-- <div>
+				<!-- Secondary role  
+				 <div>
 					<div class="col-xs-6 selectRole">
 						<label class="leftControl primaryRole">Additional Role</label> 
 						<select class='adminSelect form-control'
 							x-ng-model="addrole" id="additionalRoles"
-							class="form-control rightControl selectControl">
+							class="form-control rightControl selectControl" multiple="multiple">
 							<option value="" disabled selected>Select additional Role</option>
 						</select> <span ng-show="additionalRoleRequired" class="error-msg ng-cloak errorlbl">{{additionalRoleRequired}}</span>
 					</div>
@@ -141,13 +141,13 @@
 				<div class='leftControl adminControl'>
 					<input type="text" name="firstName" id="firstName"
 						ng-model="firstName" maxlength="12"
-						class="form-control form-control-custom validationKeydown" placeholder="First Name"><span
+						class="form-control form-control-custom validationKeydown preventSpecialChar" placeholder="First Name"><span
 						ng-show="firstNameRequired" class="error-msg ng-cloak errorlbl">{{firstNameRequired}}</span>
 				</div>
 				<div class='rightControl adminControl'>
 					<input type="text" name="lastName" id="lastName"
 						ng-model="lastName" maxlength="12"
-						class="form-control form-control-custom validationKeydown" placeholder="Last Name"><span
+						class="form-control form-control-custom validationKeydown preventSpecialChar" placeholder="Last Name"><span
 						ng-show="lastNameRequired" class="error-msg ng-cloak errorlbl">{{lastNameRequired}}</span>
 				</div>
 				<div class='leftControl adminControl'>
@@ -176,20 +176,24 @@
 						<label class="leftControl primaryRole">Primary Role</label> 
 						<select class='adminSelect form-control'
 							x-ng-model="role" id="userRoles"
-							class="form-control rightControl selectControl" disabled>
+							class="form-control rightControl selectControl">
 							<option value="" disabled selected>Select User Role</option>
 						</select> <span ng-show="roleRequired" class="error-msg ng-cloak errorlbl">{{roleRequired}}</span>
 					</div>
 				</div>
 				<!-- Secondary role  -->
-				<div>
-					<div style='display:none;' class="col-xs-6 selectRole">
-						<label class="leftControl primaryRole">Additional Role</label> 
-						<select class='adminSelect form-control'
-							x-ng-model="addrole" id="additionalRoles"
+			     <div>
+					<div class="col-xs-6 selectRole">
+						<label class="leftControl secondaryRole" id="additionalRoleTxt" style="display: none !important">Additional Role: </label>
+						<label class="chooseRole dropdown-toggle" id="additionalRole_options" data-toggle="dropdown" style="display: none !important"> Select Additionalrole</label>
+						<ul class="dropdown-menu-multiselect" id="additionalRoles">
+						</ul>
+						<!--<select class='adminSelect form-control multiselect-ui'
+							x-ng-model="addrole" id="additionalRoles" multiple="multiple"
 							class="form-control rightControl selectControl">
 							<option value="" disabled selected>Select additional Role</option>
-						</select> <span ng-show="additionalRoleRequired" class="error-msg ng-cloak errorlbl">{{additionalRoleRequired}}</span>
+						</select>  -->
+						<span ng-show="additionalRoleRequired" class="error-msg ng-cloak errorlbl">{{additionalRoleRequired}}</span>
 					</div>
 				</div>
 				<!-- Secondary role -->
@@ -217,16 +221,16 @@
 					<select class="adminSelect form-control" style="width: 91%" id="selDomain">
 						<option value="" disabled selected>Please Select Your Domain</option>
 					</select> -->
-				<label class='domainTxt' style="margin-left: 11px;">Domain :</label>		
-					<input type="text" id="selDomain" name="projectName"		
-						readonly="readonly" 		
+					<label class='domainTxt' style="margin-left: 11px;">Domain :</label>
+					<input type="text" id="selDomain" name="projectName"
+						readonly="readonly" 
 						placeholder="Domain Name">
 					<span ng-show="domainNameRequired" class="error-msg ng-cloak errorlbl">{{domainNameRequired}}</span>
 				</div>
 				<div class='userForm adminControl'>
 					<input type="text" id="projectName" name="projectName"
 						ng-model="projectName" maxlength="50"
-						class="form-control form-control-custom validationKeydown"
+						class="form-control form-control-custom validationKeydown preventSpecialChar"
 						placeholder="Project Name"><span
 						ng-show="projectNameRequired" class="error-msg ng-cloak errorlbl">{{projectNameRequired}}</span>
 				</div>
@@ -326,6 +330,7 @@
 					<select class="adminSelect form-control selectDomain" style="width: 91%" id="selAssignProject">
 						<option value="" disabled selected>Please Select Your Domain</option>
 					</select> -->
+					
 					<span ng-show="domainNameRequired" class="error-msg ng-cloak errorlbl">{{domainNameRequired}}</span>
 				</div>
 			</div>
@@ -335,9 +340,8 @@
 					<!--Left Select Box-->
 					<div class="wrap left-select scrollbar-inner">
 						<!--Labels-->
-						<label class="labelStyle1">All Projects</label>
-						<!--Labels-->
-						 
+						<label class="labelStyle1">All Projects</label><img class="load" style="position: relative; left: 10px; bottom: 4px; display: none;" src="imgs/loader.gif" alt="Loading...">
+						<!--Labels-->						 
 						<div class="seprator" style="margin-bottom:0px;">
 							<!-- <select multiple id="allProjectEU" ng-model="allProjectNameEU" size="13" ng-options="p as p.ProjectName for p in projBox1 track by p.ProjectId"></select> -->
 							<select multiple="" id="allProjectAP" ng-model="allProjectNameAP" size="" ng-options="p as p.ProjectName for p in projBox1 track by p.ProjectId" class="ng-pristine ng-untouched ng-valid"></select>
@@ -363,7 +367,7 @@
 					<!--Right Select Box-->
 					<div class="wrap right-select">
 						<!--Labels-->
-						<label class="labelStyle1">Assign Projects</label>
+						<label class="labelStyle1">Assign Projects</label><img class="load" style="position: relative; left: 10px; bottom: 4px; display: none;" src="imgs/loader.gif" alt="Loading...">
 						<!--Labels-->
 						
 						<!--Print Selected Domain-->
@@ -401,8 +405,10 @@
 					<select class="adminSelect form-control" style="width: 91%" id="selDomainEdit">
 						<option value="" disabled selected>Please Select Your Domain</option>
 					</select> -->
-					<label class='domainTxt' style="margin-left: -1px;">Domain  </label>		
-					<input type="text" id="selDomainEdit" name="projectName" readonly="readonly" placeholder="Domain Name">
+					<label class='domainTxt' style="margin-left: -1px;">Domain  </label>
+					<input type="text" id="selDomainEdit" name="projectName"
+						readonly="readonly"
+						placeholder="Domain Name">
 					<span ng-show="domainNameRequired" class="error-msg ng-cloak errorlbl">{{domainNameRequired}}</span>
 				</div>
 				<div class='userForm adminControl'>
@@ -526,7 +532,7 @@
 						<td><input type="checkbox" value="" class='module_admin'></td>
 						<td><input type="checkbox" value="" class='module_admin'></td>
 						<td><input type="checkbox" value="" checked = "checked" class='module_admin'></td>
-					</tr>
+					</tr>					
 					</tbody>
 				</table>
 				</div>
@@ -621,7 +627,7 @@
 				<h4 class="modal-title"></h4>
 			</div>
 			<div class="modal-body">
-				<p><input maxlength="50" type="text" class="form-control form-control-custom" placeholder="" id="" /></p>
+				<p><input maxlength="50" type="text" class="form-control form-control-custom preventSpecialChar" placeholder="" id="" /></p>
 			</div>
 			<div class="modal-footer">
 				<button id='' type="button" class="btn btn-default btnGlobalSave validationBlur">Save</button> 

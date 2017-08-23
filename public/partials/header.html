@@ -7,13 +7,13 @@
 
     <!--Right Navigation-->
     <div class="dropdown dropdown-userPart">
-        <div class="col-md-6" id='sRole'>
+        <div class="col-md-6" id='sRole' ng-click="Switch_Role()">
             <button class="btn dropdown-toggle dropdown-userrole" type="button" data-toggle="dropdown">
                 <span><img class="header-ic" src="imgs/ic-switch-user.png" /></span>
                 <span class='userInfo'>Switch Role</span>
             </button>
-            <ul class="dropdown-menu">
-                <li><a href="#" data-toggle="modal" data-target="#switchRoleModal">Test Engineer</a></li>
+            <ul class="dropdown-menu" id="switchRoles">
+                <!--<li class="switchRole_confirm"><a href="#" data-toggle="modal" data-target="#switchRoleModal">Test Engineer</a></li>-->
                 <!--<li><a href="#" data-toggle="modal" data-target="#switchRoleModal">Test Lead</a></li>-->
             </ul>
         </div>
@@ -37,13 +37,13 @@
 	    <div class="modal-content">
 	      <div class="modal-header">
 	        <button type="button" class="close" data-dismiss="modal">&times;</button>
-	        <h4 class="modal-title">Modal Header</h4>
+	        <h4 class="modal-title">Switch Role</h4>
 	      </div>
 	      <div class="modal-body">
-	        <p>Are you sure you want to switch role ?</p>
+	        <p></p>
 	      </div>
 	      <div class="modal-footer">
-	        <button type="button" class="btn btn-default" ng-click="switchRole_Yes()">Yes</button>
+	        <button type="button" class="btn btn-default" ng-click="switchedRole()">Yes</button>
 	        <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
 	      </div>
 	    </div>
@@ -52,31 +52,42 @@
 	<!-- SwitchRole Modal  -->
 	
 	<!-- Popup for Role change -->
-	<div id="dialog-changeRole" class="modal fade" role="dialog" data-keyboard="false" data-backdrop="static">
-		<div class="modal-dialog" style="width: 700px">
-			<!-- Modal content-->
-			<div class="modal-content">
-			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal">&times;</button>
-				<h4 class="modal-title">Switch Role</h4>
-			</div>
-			<div class="modal-body modal-body-switchRole">
-			<span style="float: left;">Swicth Role:</span>
-			<select id="roles" ng-click=""
-					class="form-control roleChange pull-left">
-					<option value="Select Method" selected>Select Role</option>
-					<option value="Test Engineer">Test Engineer</option>
-					<option value="Test Lead">Test Lead</option>
-					<option value="Test Manager">Test Manager</option>
-					<option value="Admin">Admin</option>
-				</select> 
-			</div>
-			<div class="modal-footer">
-				<button ng-click="Switch_Role()" type="button" id="resetObjRow" class="btn btn-default">Switch Role</button>
-			</div>
-			</div>
-		</div>
+	<div class="modal fade" id="switchedRoleModal" role="dialog" data-keyboard="false" data-backdrop="static">
+	  <div class="modal-dialog modal-sm">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal">&times;</button>
+	        <h4 class="modal-title">Switch Role</h4>
+	      </div>
+	      <div class="modal-body" id="changedRole">
+	        <!--<p></p>-->
+	      </div>
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-default" ng-click="switchRole_Yes()">OK</button>
+	        <!--<button type="button" class="btn btn-default" data-dismiss="modal">No</button>-->
+	      </div>
+	    </div>
+	  </div>
 	</div>
 	<!-- Popup for Role change -->
+
+		<!-- Popup for NO Role change -->
+	<div class="modal fade" id="noRoles" role="dialog" data-keyboard="false" data-backdrop="static">
+	  <div class="modal-dialog modal-sm">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal">&times;</button>
+	        <h4 class="modal-title">Switch Role</h4>
+	      </div>
+	      <div class="modal-body" id="changedRole">
+	        <p>There are no roles to switch</p>
+	      </div>
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-default" data-dismiss="modal">OK</button>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+	<!-- Popup for NO Role change -->
 
 </div>

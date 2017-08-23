@@ -5,12 +5,15 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 	var userinfo = {} //Contains Userinfo
 	var browserTypeExe = []; // Contains selected browser id for execution
 	var scenarioIdQC;
-
+	$scope.moduleInfo = [];
 	$("body").css("background","#eee");
 	$timeout(function(){
 		$('.scrollbar-inner').scrollbar();
 		$('.scrollbar-macosx').scrollbar();
 		document.getElementById("currentYear").innerHTML = new Date().getFullYear()
+		if(navigator.appVersion.indexOf("Mac")!=-1){
+			$(".safariBrowser").show();
+		}
 	}, 500)
 
 	//Task Listing
@@ -26,13 +29,17 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 	}
 	var getTaskName = JSON.parse(window.localStorage['_CT']).taskName;
 	appType = JSON.parse(window.localStorage['_CT']).appType;
-
 	//Task Name Commented
 	//$("#page-taskName").empty().append('<span class="taskname">'+getTaskName+'</span>');
 	$(".projectInfoWrap").empty()
 	testSuiteName = JSON.parse(window.localStorage['_CT']).testSuiteName;
-
-	$timeout(function(){
+	if(getTaskName.indexOf("Execute Batch") < 0){
+		$(".parentBatchContainer").parent().hide();
+		$(".btnPanel").css("left","0");
+		$("#page-taskName span").text("Scenario Execution");
+	}
+	else	$("#page-taskName span").text("Batch Execution");
+	//$timeout(function(){
   		//var releaseId = JSON.parse(window.localStorage['_CT']).releaseId;
 	//	var cycleId = JSON.parse(window.localStorage['_CT']).cycleId;
 	//	var projectId = JSON.parse(window.localStorage['_CT']).projectId;
@@ -43,83 +50,46 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 		// {
 		// 	$(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">Project :</span><span class="content">'+projectDetails.respnames[0]+'</span></p><p class="proj-info-wrap"><span class="content-label">Release :</span><span class="content">'+releaseName+'</span></p><p class="proj-info-wrap"><span class="content-label">Cycle :</span><span class="content">'+cycleName+'</span></p><p class="proj-info-wrap"><span class="content-label">TestSuite :</span><span class="content">'+testSuiteName+'</span></p>')
 		// }
-	}, 2000)
+	//}, 2000)
 
 	//Global Information
 	// var cycleId = JSON.parse(window.localStorage['_CT']).cycleId;
 	// var testSuiteId = JSON.parse(window.localStorage['_CT']).testSuiteId;
 	// var testSuiteName = JSON.parse(window.localStorage['_CT']).testSuiteName;
 	var assignedTestScenarioId = JSON.parse(window.localStorage['_CT']).assignedTestScenarioIds;
-
-
-	if(window.localStorage['_CT'])
-	{
+	if(window.localStorage['_CT']){
 		var readTestSuite = JSON.parse(window.localStorage['_CT']).testSuiteDetails;
 		console.log("read",readTestSuite);
 	}
 
 	//Global Information
-
 	//Getting Apptype or Screen Type
-	//console.log(appType);
 	$scope.getScreenView = appType
-	//Getting Apptype orScreen Type
 
 	//Onload ServiceCall
 	$timeout(function(){
 		angular.element(document.getElementById("left-nav-section")).scope().readTestSuite_ICE();
 	}, 1000)
 
-		//readTestSuite service input
-
-	// var readTestSuite = [{
-	// 		"assignedTestScenarioIds": ["deb28c38-f338-4491-8cd4-7bb0ef87c79e"],
-	// 		"cycleid":"b0a7e66b-a459-40b8-991c-dcaa29f8912b",
-	// 		"projectidts":"5122b95c-84ad-40fd-9f10-e29988323fb5",
-	// 		"releaseid":"8b4878e7-9b8c-48e9-8d92-348a72f390a5",
-	// 		"testsuiteid":"139b6815-e2a9-4df0-9b08-5274f08d7bc8",
-	// 		"testsuitename":"Module_web3"
-	// 		},{
-	// 		"assignedTestScenarioIds": ["deb28c38-f338-4491-8cd4-7bb0ef87c79e"],
-	// 		"cycleid":"b0a7e66b-a459-40b8-991c-dcaa29f8912b",
-	// 		"projectidts":"5122b95c-84ad-40fd-9f10-e29988323fb5",
-	// 		"releaseid":"8b4878e7-9b8c-48e9-8d92-348a72f390a5",
-	// 		"testsuiteid":"139b6815-e2a9-4df0-9b08-5274f08d7bc8",
-	// 		"testsuitename":"Module_web3"
-	// 		}]
-
-		$scope.readTestSuite_ICE = function(){
-
+	$scope.readTestSuite_ICE = function(){
+        $('.checkStylebox').attr("disabled", true); 
+		$('#excSaveBtn').attr("disabled", true);
 		ExecutionService.readTestSuite_ICE(readTestSuite)
 		.then(function(data) {
-			// var data ={
-			// 			"Testsuitename1": {
-			// 				"executestatus": [1, 1],
-			// 				"condition": [0, 0],
-			// 				"dataparam": [" ", " "],
-			// 				"scenarioids": ["0e86ff7a-97a7-45be-8e97-473ad881dbce", "0e86ff7a-97a7-45be-8e97-473ad881dbce"],
-			// 				"scenarionames": ["Module_Scenario1", "Module_Scenario2"],
-			// 				"projectnames": ["New Project_SLK_1", "New Project_SLK_2"]
-			// 			},
-			// 			"Testsuitename2": {
-			// 				"executestatus": [1, 1],
-			// 				"condition": [0, 0],
-			// 				"dataparam": [" ", " "],
-			// 				"scenarioids": ["0e86ff7a-97a7-45be-8e97-473ad881dbce", "0e86ff7a-97a7-45be-8e97-473ad881dbce"],
-			// 				"scenarionames": ["Module_Scenario3", "Module_Scenario4"],
-			// 				"projectnames": ["New Project_SLK_3", "New Project_SLK_4"]
-			// 			}
-            //           }
-
-			//var jsonData = JSON.parse(data);
 			if(data == "Invalid Session"){
 					window.location.href = "/";
 			 }
-			if(data == ""){}
+			if(data == ""){
+				// $('.checkStylebox').attr("disabled", true); 
+				// $('#excSaveBtn').attr("disabled", true);
+				// $('.checkStylebox').hide(); 
+				// $('#excSaveBtn').hide();
+			}
 			else{
+                $('.checkStylebox').attr("disabled", false); 
+			    $('#excSaveBtn').attr("disabled", false);
 				$(".executionTableDnd").empty()
 				cfpLoadingBar.complete();
-				// console.log("Jdata", data);
 				 var dataLen = Object.keys(data).length;
 				 for(var m =0;m<dataLen;m++)
 				 {
@@ -127,18 +97,15 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 					//create header for table
 					$("#executionDataTable_"+m+" tbody tr").remove();
 					var keys = Object.keys(data);
-				//	var eachData = Object.values(data);
 					var eachData = Object.keys(data).map(function(itm) { return data[itm]; });
 					eachData = eachData[m];
 					rowData = eachData;
 					$("div.executionTableDnd").attr('id','batch_'+m);
-					//console.log("TBODY", $("tbody").text());
 					console.log(keys[m]);
-					$("#batch_"+m+"").append("<div class='suiteNameTxt' id='page-taskName_"+m+"'><span class='taskname'><input id='parentSuite_"+m+"' class='parentSuiteChk' type='checkbox' name='' />"+keys[m]+"</span></div><div id='exeData_"+m+"' class='exeDataTable testSuiteBatch'><table id='executionDataTable_"+m+"' class='executionDataTable' cellspacing='0' cellpadding='0'><thead><tr><th style='width: 4%' id='contextmenu'></th><th style='width: 3%; padding: 5px 0px'><i class='fa fa-ban' title='Do Not Execute' aria-hidden='true' style='font-size: 14px;'></i><input id='parentExecute_"+m+"' class='d-execute' type='checkbox' /></th>	<th style='width: 25%; text-align:left; border-right: 1px solid #fff;'>Scenario Name</th><th style='width: 22%; border-right: 1px solid #fff'>Data Parameterization</th>	<th style='width: 15%; border-right: 1px solid #fff'>Condition</th><th style='width: 23%; border-right: 1px solid #fff'>Project Name</th><th style='width: 8%; text-align: center;'>ALM</th></tr><input type='hidden' value='"+rowData.testsuiteid+"'/></thead><tbody class='scrollbar-inner testScenarioScroll'></tbody></table></div>");
+					$("#batch_"+m+"").append("<div class='suiteNameTxt' id='page-taskName_"+m+"'><span class='taskname'><input id='parentSuite_"+m+"' class='parentSuiteChk' type='checkbox' name='' />"+keys[m]+"</span></div><div id='exeData_"+m+"' class='exeDataTable testSuiteBatch'><table id='executionDataTable_"+m+"' class='executionDataTable' cellspacing='0' cellpadding='0'><thead><tr><th style='width: 4%' id='contextmenu'></th><th style='width: 3%; padding: 5px 0px'><i class='fa fa-ban' title='Do Not Execute' aria-hidden='true' style='font-size: 14px;'></i><input id='parentExecute_"+m+"' class='d-execute' type='checkbox' /></th>	<th style='width: 28%; text-align:left; border-right: 1px solid #fff;'>Scenario Name</th><th style='width: 24%; border-right: 1px solid #fff'>Data Parameterization</th>	<th style='width: 18%; border-right: 1px solid #fff'>Condition</th><th style='width: 23%;'>Project Name</th></tr><input type='hidden' value='"+rowData.testsuiteid+"'/></thead><tbody class='scrollbar-inner testScenarioScroll'></tbody></table></div>");//<th style='width: 8%; text-align: center;'>ALM</th>
 					//<img class='expandTable' src='imgs/icon-minus.png'>
 
 				    var row = $("#executionDataTable_"+m+"").find('tbody');
-					//var row = $("<tbody />");
 					console.log("row",row);
 					var count = 1
 
@@ -170,35 +137,34 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 						}
 					}
 
-					//Building object for each row after getting the data from server
+				//Building object for each row after getting the data from server
 				var projectName=['Project Name'];
 				//Creating Table Rows for each of the Scenarios
 				for (var i = 0; i < getEachScenario.length; i++) {
-
 					row = $("<tr id=\"" + count + "\"/>");
 					$("#executionDataTable_"+m+"").append(row);
-					row.append($("<td class='tabeleCellPadding' style='width:3.7%;' id=\"" + count + "\">"+ count + "</td>"));
+					row.append($("<td class='tabeleCellPadding' style='width:4%;' id=\"" + count + "\">"+ count + "</td>"));
 					if(getEachScenario[i].executeStatus == undefined || getEachScenario[i].executeStatus == 0){
 						row.append($("<td class='tabeleCellPadding exe-ExecuteStatus noExe' style='width: 3%; padding-top: 7px !important'><input ng-checked='executeAll' type='checkbox' title='Select to execute this scenario' class='doNotExecuteScenario d-execute'></td>"));
 					}
 					else if(getEachScenario[i].executeStatus == 1){
 						row.append($("<td class='tabeleCellPadding exe-ExecuteStatus' style='width:3%; padding-top: 7px !important'><input ng-checked='executeAll' type='checkbox' title='Select to execute this scenario' class='doNotExecuteScenario d-execute' checked></td>"));
 					}
-					row.append($("<td class='tabeleCellPadding exe-scenarioIds' onclick='loadLocationDetails(this.innerHTML, this.getAttribute(\"sId\"))' sId="+getEachScenario[i].scenarioIds+" style='width: 23%; margin-right: 2%; cursor:pointer; word-break: break-all; text-align:left'>" + getEachScenario[i].scenarionames+ "</td>"));
+					row.append($("<td class='tabeleCellPadding exe-scenarioIds' onclick='loadLocationDetails(this.innerHTML, this.getAttribute(\"sId\"))' sId="+getEachScenario[i].scenarioIds+" style='width: 26%; margin-right: 2%; cursor:pointer; word-break: break-all; text-align:left'>" + getEachScenario[i].scenarionames+ "</td>"));
 					if(getEachScenario[i].dataParam == undefined){
-						row.append($('<td style="width: 22%" class="tabeleCellPadding exe-dataParam"><input class="getParamPath form-control" type="text" value=""/></td>'));
+						row.append($('<td style="width: 24%" class="tabeleCellPadding exe-dataParam"><input class="getParamPath form-control" type="text" value=""/></td>'));
 					}
 					else {
-						row.append($('<td style="width: 22%" class="tabeleCellPadding exe-dataParam"><input class="getParamPath form-control" type="text" value="'+ getEachScenario[i].dataParam +'"/></td>'));
+						row.append($('<td style="width: 24%" class="tabeleCellPadding exe-dataParam"><input class="getParamPath form-control" type="text" value="'+ getEachScenario[i].dataParam +'"/></td>'));
 					}
 					if(getEachScenario[i].condition == 0){
-						row.append($('<td style="width:15%" class="tabeleCellPadding exe-conditionCheck"><select class="conditionCheck form-control alertRed"><option value="1">True</option><option value="'+getEachScenario[i].condition+'" selected>False</option></select> </td>'));
+						row.append($('<td style="width:18%" class="tabeleCellPadding exe-conditionCheck"><select class="conditionCheck form-control alertRed"><option value="1">True</option><option value="'+getEachScenario[i].condition+'" selected>False</option></select> </td>'));
 					}
 					else{
-						row.append($('<td style="width:15%" class="tabeleCellPadding exe-conditionCheck"><select class="conditionCheck form-control alertGreen"><option value="'+getEachScenario[i].condition+'" selected>True</option><option value="0">False</option></select> </td>'));
+						row.append($('<td style="width:18%" class="tabeleCellPadding exe-conditionCheck"><select class="conditionCheck form-control alertGreen"><option value="'+getEachScenario[i].condition+'" selected>True</option><option value="0">False</option></select> </td>'));
 					}
 					row.append($("<td style='width:23%; word-break: break-all; padding-left: 1% !important; padding-right: 1% !important' class='tabeleCellPadding'>" + getEachScenario[i].projectnames + "</td>"));
-					row.append($("<td style='width:8%' class='tabeleCellPadding'><img src='../imgs/ic-alm.png' id='syncScenario' title='Sync Test Scenario' style='cursor: pointer;'/></td>"));
+					//row.append($("<td style='width:8%' class='tabeleCellPadding'><img src='../imgs/ic-alm.png' id='syncScenario' title='Sync Test Scenario' style='cursor: pointer;'/></td>"));
 					count++;
 				    }
 					//No Execution Status Marking Red
@@ -228,21 +194,19 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 					if($("#executionDataTable_"+m+" tbody tr").length == $("#executionDataTable_"+m+" tbody tr td.exe-ExecuteStatus input:checked").length)
 					{
 						$("#parentExecute").prop("checked", true);
-
 					}
 					else{
 						$("#parentExecute").prop("checked", false);
 					}
 				 }
-				 if(dataLen == $(".parentSuiteChk:checked").length)
-				 {
+				 if(dataLen == $(".parentSuiteChk:checked").length){
 					 $(".checkStylebox").prop("checked", true);
 				 }
 				 else{
 					 $(".checkStylebox").prop("checked", false);
 				 }
 
-				 	$('[id^=parentExecute_]').on('click',function(e){
+				$('[id^=parentExecute_]').on('click',function(e){
 						if($(this).is(":checked") == true)
 						{
 							$(this).parents('table').find('tbody tr input[type=checkbox]').prop('checked', true);
@@ -261,7 +225,7 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 					else{
 						$("input[type='checkbox'].checkStylebox").prop('checked', false);
 					}
-					});
+				});
 
 				$('[id^=executionDataTable]').find('tbody tr td input').on('click',function(e){
 					var totalLen = $(this).parent().parent().parent().children().find('input[type=checkbox]').length;
@@ -291,7 +255,7 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 					}
 				});
 
-				 $('[id^=parentSuite_]').on('click',function(e){
+				$('[id^=parentSuite_]').on('click',function(e){
 					if($(this).is(":checked") == true)
 						{
 							$(this).parents('.suiteNameTxt').next().children().find('input[type=checkbox]').prop('checked', true);
@@ -309,9 +273,9 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 					 {
 						 $("input[type='checkbox'].checkStylebox").prop('checked', false);
 					 }
-				 });
+				});
 
-				 $("input[type='checkbox'].checkStylebox").on('click',function(e){
+				$("input[type='checkbox'].checkStylebox").on('click',function(e){
 						if($(this).is(":checked") == true)
 						{
 							$('[id^=parentSuite_]').prop('checked', true);
@@ -323,10 +287,13 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 							$('[id^=parentExecute_]').prop('checked', false);
 							$("tbody").find('input[type=checkbox]').prop('checked', false);
 						}
-				  });
+				});
 
 			}
 
+			if(getTaskName.indexOf("Execute Batch") < 0){
+				$(".parentSuiteChk").hide();
+			}
 			//select all checkboxes by default on load
 			//$("input[type=checkbox]:visible").prop('checked',true)
 
@@ -354,6 +321,20 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 			$(this).parent().parent().next().slideUp();
 		}
 	});
+
+	//Show scenarios of testsuites
+	$(document).dblclick(".taskname", function(e){
+		if(e.target.className == "taskname"){			
+			var scenarioNames = e.target.parentElement.nextSibling.getElementsByClassName("testScenarioScroll")[0].children;
+			$("#suiteDetailsContent").empty();
+			$("#modalSuiteDetails").find(".modal-title").text(e.target.textContent);
+			for(var i=0; i<scenarioNames.length;i++){
+				$("#suiteDetailsContent").append('<div class="sDInnerContentsWrap"><div class="sDInnerContents" style="width: 50%;">'+scenarioNames[i].getElementsByClassName("exe-scenarioIds")[0].textContent+'</div><div class="sDInnerContents" style="width: 50%;">'+scenarioNames[i].getElementsByClassName("exe-scenarioIds")[0].textContent+'</div></div>');
+			}
+			$("#modalSuiteDetails").modal("show");
+			$('#modalSuiteDetails').find('.btn-default').focus();
+		}
+	})
 	//Load Location Details of Scenario
 	$scope.loadLocationDetails = function(scenarioName, scenarioId) {
 		//document.getElementById("scenarioDetailsContent").innerHTML = "";
@@ -383,7 +364,7 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 		var batchInfo = [];
 		var batchDetails = {};
 		userinfo = {
-				username : JSON.parse(window.localStorage['_UI']).username,
+				username : JSON.parse(window.localStorage['_UI']).username.toLowerCase(),
 				role : window.localStorage['_SR']
 		}
 		//updateTestSuite
@@ -482,41 +463,123 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 	}
 	//Save TestSuite Functionality
 
+	//Save QC Details
+	$scope.saveQcCredentials = function(){
+		$("#almURL, #almUserName, #almPassword").removeClass('inputErrorBorder')
+		if(!$scope.almURL) {
+			$("#almURL").addClass('inputErrorBorder')
+		}
+		else if(!$scope.almUserName){
+			$("#almUserName").addClass('inputErrorBorder')
+		}
+		else if(!$scope.almPassword){
+			$("#almPassword").addClass('inputErrorBorder')
+		}
+		else if(appType != "SAP" && browserTypeExe.length == 0){
+			$("#ALMSyncWindow").find("button.close").trigger("click");
+			openDialogExe("Execute Test Suite", "Please select a browser");
+		}
+		else if($(".exe-ExecuteStatus input:checked").length == 0){
+			$("#ALMSyncWindow").find("button.close").trigger("click");
+			openDialogExe("Execute Test Suite", "Please select atleast one scenario(s) to execute");
+		}
+		else{
+			$("#almURL,#almUserName,#almPassword,.almQclogin").prop("disabled",true);
+			$("#almURL,#almUserName,#almPassword").css({"background":"none"});
+			$(".error-msg-exeQc").text("");
+			ExecutionService.loginQCServer_ICE($scope.almURL,$scope.almUserName,$scope.almPassword)
+			.then(function(data){
+				$("#almURL,#almUserName,#almPassword,.almQclogin").prop("disabled",false);
+				if(data == "unavailableLocalServer"){
+					$(".error-msg-exeQc").text("Unavailable LocalServer");
+				}
+				else if(data == "Invalid Session"){
+					$(".error-msg-exeQc").text("Invalid Session");
+				}
+				else if(data == "invalidcredentials"){
+					$(".error-msg-exeQc").text("Invalid Credentials");
+				}
+				else if(data == "invalidurl"){
+					$(".error-msg-exeQc").text("Invalid URL");
+				}			
+				else{
+					$scope.moduleInfo = [];
+					$.each($(".parentSuiteChk"), function(){
+						var suiteInfo = {};
+						var selectedRowData = [];
+						//suiteInfo.suiteDetails = [];
+						if($(this).is(":checked") == true){
+							$(this).parent().parent().next().find('tbody input[type=checkbox]:checked').each(function() {
+								selectedRowData.push({
+									condition : parseInt($(this).parent().siblings(".exe-conditionCheck").find("select option:selected").val()),
+									dataparam : [$(this).parent().siblings(".exe-dataParam").find("input").val().trim()],
+									executestatus : 1,
+									scenarioids : $(this).parent().siblings(".exe-scenarioIds").attr("sId"),
+									qccredentials: {
+										qcurl: $("#almURL").val(),
+										qcusername: $("#almUserName").val(),
+										qcpassword:	$("#almPassword").val()
+									}
+								})
+							});
+							//console.log("selectedRowData:::" + selectedRowData)
+							suiteInfo.suiteDetails = selectedRowData;
+							suiteInfo.testsuitename = $(this).parents('span.taskname').text();
+							suiteInfo.testsuiteid = $(this).parents('.suiteNameTxt').next().find('thead').children('input[type=hidden]').val();
+							suiteInfo.browserType = browserTypeExe;
+							//console.log("suiteInfo:::" + suiteInfo)
+							$scope.moduleInfo.push(suiteInfo);
+						}
+					});
+					$("#ALMSyncWindow").find("button.close").trigger("click");
+				}
+			},
+			function(error) {	console.log("Error in qcController.js file loginQCServer method! \r\n "+(error.data));
+			});
+		}
+	}
 
 	//Execute TestSuite Functionality
 	$scope.ExecuteTestSuite = function(){
-		var moduleInfo = [];
-		$.each($(".parentSuiteChk"), function(){
-			var suiteInfo = {};
-			var selectedRowData = [];
-			//suiteInfo.suiteDetails = [];
-			if($(this).is(":checked") == true){
-				$(this).parent().parent().next().find('tbody input[type=checkbox]:checked').each(function() {
-					selectedRowData.push({
-						condition : parseInt($(this).parent().siblings(".exe-conditionCheck").find("select option:selected").val()),
-						dataparam : [$(this).parent().siblings(".exe-dataParam").find("input").val().trim()],
-						executestatus : 1,
-						scenarioids : $(this).parent().siblings(".exe-scenarioIds").attr("sId"),
-					})
-				});
-				//console.log("selectedRowData:::" + selectedRowData)
-				suiteInfo.suiteDetails = selectedRowData;
-				suiteInfo.testsuitename = $(this).parents('span.taskname').text();
-				suiteInfo.testsuiteid = $(this).parents('.suiteNameTxt').next().find('thead').children('input[type=hidden]').val();
-				suiteInfo.browserType = browserTypeExe;
-				//console.log("suiteInfo:::" + suiteInfo)
-				moduleInfo.push(suiteInfo);
-			}
-		});
-		console.log("moduleInfo:::" + moduleInfo)
+		if($scope.moduleInfo.length <= 0){
+			$.each($(".parentSuiteChk"), function(){
+				var suiteInfo = {};
+				var selectedRowData = [];
+				//suiteInfo.suiteDetails = [];
+				if($(this).is(":checked") == true){
+					$(this).parent().parent().next().find('tbody input[type=checkbox]:checked').each(function() {
+						selectedRowData.push({
+							condition : parseInt($(this).parent().siblings(".exe-conditionCheck").find("select option:selected").val()),
+							dataparam : [$(this).parent().siblings(".exe-dataParam").find("input").val().trim()],
+							executestatus : 1,
+							scenarioids : $(this).parent().siblings(".exe-scenarioIds").attr("sId"),
+							qccredentials: {
+								qcurl: "",
+								qcusername: "",
+								qcpassword:	""
+							}
+						})
+					});
+					//console.log("selectedRowData:::" + selectedRowData)
+					suiteInfo.suiteDetails = selectedRowData;
+					suiteInfo.testsuitename = $(this).parents('span.taskname').text();
+					suiteInfo.testsuiteid = $(this).parents('.suiteNameTxt').next().find('thead').children('input[type=hidden]').val();
+					suiteInfo.browserType = browserTypeExe;
+					//console.log("suiteInfo:::" + suiteInfo)
+					$scope.moduleInfo.push(suiteInfo);
+				}
+			});
+		}
+		console.log("moduleInfo:::" + $scope.moduleInfo)
 		//moduleInfo.push(suiteInfo);
 		//Getting each row data as an object
-		if(appType != "SAP" && browserTypeExe.length == 0)	openDialogExe("Execute Test Suite", "Please select a browser")//$("#selectBrowserAlert").modal("show");
-		else if($(".exe-ExecuteStatus input:checked").length == 0) openDialogExe("Execute Test Suite", "Please select atleast one scenario(s) to execute")//$("#selectScenarioAlert").modal("show");
+		if(appType != "SAP" && browserTypeExe.length == 0)	openDialogExe("Execute Test Suite", "Please select a browser")
+		else if(appType == "SAP" && browserTypeExe.length == 0)	openDialogExe("Execute Test Suite", "Please select SAP Apps option")
+		else if($(".exe-ExecuteStatus input:checked").length == 0) openDialogExe("Execute Test Suite", "Please select atleast one scenario(s) to execute")
 		else{
-			if(appType == "SAP") browserTypeExe = ["1"];
+			//if(appType == "SAP") browserTypeExe = ["1"];
 			blockUI("Execution in progress. Please Wait...")
-			ExecutionService.ExecuteTestSuite_ICE(moduleInfo)
+			ExecutionService.ExecuteTestSuite_ICE($scope.moduleInfo)
 			.then(function(data){
 				if(data == "Invalid Session"){
 					window.location.href = "/";
@@ -538,7 +601,9 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 				unblockUI()
 				$(".selectBrowser").find("img").removeClass("sb");
 				browserTypeExe = [];
-				angular.element(document.getElementById("left-nav-section")).scope().readTestSuite_ICE()
+				angular.element(document.getElementById("left-nav-section")).scope().readTestSuite_ICE();
+				$scope.moduleInfo = [];
+				$("#syncScenario").prop("disabled",true);
 			},
 			function(error){
 				unblockUI()
@@ -546,7 +611,9 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 				//$('#executionFailed').modal('show');
 				$(".selectBrowser").find("img").removeClass("sb");
 				browserTypeExe = [];
-				angular.element(document.getElementById("left-nav-section")).scope().readTestSuite_ICE()
+				angular.element(document.getElementById("left-nav-section")).scope().readTestSuite_ICE();
+				$scope.moduleInfo = [];
+				$("#syncScenario").prop("disabled",true);
 			})
 		}
 	}
@@ -555,90 +622,15 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 
 	//ALM Functionality
 	$(document).on("click", "#syncScenario", function(){
-		scenarioIdQC = $(this).parent().siblings("td:nth-child(3)").attr("sId")
 		$("#ALMSyncWindow").modal("show");
-		$("#almURL, #almUserName, #almPassword, #almDomainName, #almProjectName, #almTestSetName, #almTestCaseName, #almFolderPath").val('')
-		$("#almFolderPath").val('Root\\')
-		/*ExecutionServices.getQcScenarioDetails(scenarioIdQC)
-		.then(function(data) {
-			console.log(data)
-		},
-		function(error) {
-			console.log("Error while traversing executionController.js file testConnection method!! \r\n "+(error.data));
-		});*/
+		$(".error-msg-exeQc").text('');
+		if($scope.moduleInfo.length > 0){
+			$("#almURL").val($scope.moduleInfo.suiteDetails.qccredentials.qcurl);
+			$("#almUserName").val($scope.moduleInfo.suiteDetails.qccredentials.qcusername);
+			$("#almPassword").val($scope.moduleInfo.suiteDetails.qccredentials.qcpassword);
+		}
+		else	$("#almURL, #almUserName, #almPassword").val('')
 	})
-
-	$scope.testConnection = function(){
-		$scope.errorMessage2 = "";
-		$("#almURL, #almUserName, #almPassword").removeClass('inputErrorBorder')
-		if(!$scope.almURL) {
-			$scope.errorMessage2 = "Enter ALM Url";
-			$("#almURL").addClass('inputErrorBorder')
-		}
-		else if(!$scope.almUserName){
-			$scope.errorMessage2 = "Enter User Name";
-			$("#almUserName").addClass('inputErrorBorder')
-		}
-		else if(!$scope.almPassword){
-			$scope.errorMessage2 = "Enter Password";
-			$("#almPassword").addClass('inputErrorBorder')
-		}
-		else{
-			$scope.errorMessage2 = "";
-			$("#almURL, #almUserName, #almPassword").removeClass('inputErrorBorder')
-			var alURL = $scope.almURL;
-			var almUserName = $scope.almUserName;
-			var almPassword = $scope.almPassword;
-			/*ExecutionService.QClogin(alURL,almUserName,almPassword)
-			.then(function(data) {
-				console.log(data)
-			},
-			function(error) {
-				console.log("Error while traversing executionController.js file testConnection method!! \r\n "+(error.data));
-			});*/
-		}
-	};
-
-	$scope.saveQcScenarioDetails = function(){
-		$scope.errorMessage3 = "";
-		$("#almDomainName, #almProjectName, #almTestSetName, #almTestCaseName, #almFolderPath").removeClass('inputErrorBorder')
-		if(!$scope.almDomainName) {
-			$scope.errorMessage3 = "Enter Domain Name";
-			$("#almDomainName").addClass('inputErrorBorder')
-		}
-		else if(!$scope.almProjectName){
-			$scope.errorMessage3 = "Enter Project Name";
-			$("#almProjectName").addClass('inputErrorBorder')
-		}
-		else if(!$scope.almTestSetName){
-			$scope.errorMessage3 = "Enter Testset Name";
-			$("#almTestSetName").addClass('inputErrorBorder')
-		}
-		else if(!$scope.almTestCaseName){
-			$scope.errorMessage3 = "Enter Testcase Name";
-			$("#almTestCaseName").addClass('inputErrorBorder')
-		}
-		else if(!$scope.almFolderPath){
-			$scope.errorMessage3 = "Enter Folder Name";
-			$("#almFolderPath").addClass('inputErrorBorder')
-		}
-		else{
-			$scope.errorMessage3 = "";
-			$("#almDomainName, #almProjectName, #almTestSetName, #almTestCaseName, #almFolderPath").removeClass('inputErrorBorder')
-			var domainName = $scope.almDomainName;
-			var projectName = $scope.almProjectName;
-			var testSetName = $scope.almTestSetName;
-			var testCaseName = $scope.almTestCaseName;
-			var folderPath = $scope.almFolderPath;
-			/*ExecutionServices.saveQcScenarioDetails(scenarioIdQC,domainName,projectName,testSetName,testCaseName,folderPath)
-			.then(function(data) {
-				console.log(data)
-			},
-			function(error) {
-				console.log("Error while traversing executionController.js file testConnection method!! \r\n "+(error.data));
-			});*/
-		}
-	}
 	//ALM Functionality
 
 
@@ -674,7 +666,10 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 			//browserTypeExe.push($(this).data("name"))
 			browserTypeExe.push(''+$(this).data("name")+'')
 		}
-		console.log(browserTypeExe)
+		if(browserTypeExe.length > 0){
+			$("#syncScenario").prop("disabled",false);
+		}
+		else $("#syncScenario").prop("disabled",true);
 	})
 	//Select Browser Function
 

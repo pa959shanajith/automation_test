@@ -48,6 +48,7 @@ function loadMindmapData_W(){
 }
 
 function loadMindmapData1_W(){
+	blockUI("Loading...");
 	$('#eteScenarioContainer').empty();
 	d3.select('.addScenarios-ete').classed('disableButton',!0);
 	$('#ct-saveAction_W').removeClass('no-access');
@@ -83,7 +84,10 @@ function loadMindmapData1_W(){
 	}
 	d3.select('#ct-assignBox').classed('no-disp',!0);
 	dataSender({task:'getModules',tab:'endToend',prjId:$("#selectProjectEtem").val()},function(err,result){
-		if(err) console.log(result);
+		if(err){
+			console.log(result);
+			unblockUI();
+		}
 		else{
 			var nodeBox=d3.select('#etemModuleContainer');
 			$(nodeBox[0]).empty();
@@ -106,6 +110,7 @@ function loadMindmapData1_W(){
 			});
 			initScroller();
 			setModuleBoxHeight_W();
+			unblockUI();
 		}
 	});
 }
@@ -807,6 +812,12 @@ if(flag==20){
 						}
 					});
 			});
+		});
+		//To update cassandra_ids (id_c) of nodes in dNodes_W variable
+		dNodes_W.forEach(function(d){
+			if (d.type=='modules') d.id_c=res[resMap[0]];
+			else d.id_c=res[d.id_n];
+
 		});
 		
 		openDialogMindmap("Success", "Structure created successfully");

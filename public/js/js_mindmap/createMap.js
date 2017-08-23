@@ -8,9 +8,12 @@ var node_names_tc=[];
 var saveFlag=false;
 var isIE = /*@cc_on!@*/false || !!document.documentMode;
 function loadMindmapData(){
-	
+	blockUI("Loading...");
 	dataSender({task:'populateProjects',user_id:userid},function(err,result){
-		if(err) console.log(result);
+		if(err){
+			console.log(result);
+			unblockUI();
+		}
 		else{
 			 if($("#left-nav-section").is(":visible") == true && $("#right-dependencies-section").is(":visible") == false)
                 {
@@ -38,17 +41,18 @@ function loadMindmapData(){
 			});
 			//Calling the function to restrict the user to give default node names
 			$("#ct-canvas").click(callme);
+			unblockUI();
 		}
 	});
 }
 function loadMindmapData1(){
+	blockUI("Loading...");
 	var selectedTab = window.localStorage['tabMindMap'];
 	uNix=0;uLix=0;dNodes=[];dLinks=[];nCount=[0,0,0,0];scrList=[];tcList=[];cSpan=[0,0];cScale=1;mapSaved=!1;
 	//Adding task to scenario
 	taskAssign={"modules_endtoend":{"task":["Execute","Execute Batch"],"attributes":["bn","at","rw","sd","ed","re","cy"]},"modules":{"task":["Execute","Execute Batch"],"attributes":["bn","at","rw","sd","ed","re","cy"]},"scenarios":{"task":["Execute Scenario"],"attributes":["at","rw","sd","ed"]},"screens":{"task":["Scrape","Append","Compare","Add","Map"],"attributes":["at","rw","sd","ed"]},"testcases":{"task":["Update","Design"],"attributes":["at","rw","sd","ed"]}};
 	zoom=d3.behavior.zoom().scaleExtent([0.1,3]).on("zoom", zoomed);
-	faRef={"plus":"fa-plus","edit":"fa-pencil-square-o","delete":"fa-trash-o"};
-	
+	faRef={"plus":"fa-plus","edit":"fa-pencil-square-o","delete":"fa-trash-o"};	
 		$(document).on('click',".ct-tile", function() {
 			createNewMap();
 			});
@@ -78,7 +82,10 @@ function loadMindmapData1(){
 	}
 	d3.select('#ct-assignBox').classed('no-disp',!0);
 	dataSender({task:'getModules',tab:window.localStorage['tabMindMap'],prjId:$(".project-list").val()},function(err,result){
-		if(err) console.log(result);
+		if(err){
+			console.log(result);
+			unblockUI();
+		}
 		else{
 			var nodeBox=d3.select('.ct-nodeBox');
 			$(nodeBox[0]).empty();
@@ -95,6 +102,7 @@ function loadMindmapData1(){
 			if(selectedTab=='tabCreate')
 			populateDynamicInputList();
 			setModuleBoxHeight();
+			unblockUI();
 		}
 	});
 }
@@ -1021,24 +1029,25 @@ var moveNodeEnd = function(e){
 	//Logic to implement rearranging of nodes
 	var curNode=dNodes[pi];
 	//logic change dto the change in layout
-	var changeOrderRight = function(curNode,ci,p){
+	var changeOrderRight = function(curNode,ci,totalChildren){
 		var counter=-1;
 		var flag=false;
-		dNodes[pi].parent.children.forEach(function(a,i){
+		totalChildren.forEach(function(a,i){
 			if(ci<=(i+1)){
 				return false;
 			}
 			if(l[0]<a.x){
 				if(counter==-1) counter=(i+1);
+				
 				a.childIndex++;
 				curNode.childIndex=counter;
 			}
 		});
 	};
-	var changeOrderLeft = function(curNode,ci,p){
+	var changeOrderLeft = function(curNode,ci,totalChildren){
 		var counter=0;
 		var flag=false;
-		dNodes[pi].parent.children.forEach(function(a,ci){
+		totalChildren.forEach(function(a,ci){
 			if(l[0]>a.x){
 				counter=(ci+1);
 				a.childIndex--;
@@ -1048,6 +1057,10 @@ var moveNodeEnd = function(e){
 	};
 	var currentChildIndex=curNode.childIndex;
 	var totalChildren=curNode.parent.children;
+	if(currentChildIndex!=totalChildren.indexOf(curNode)+1){
+		currentChildIndex=totalChildren.indexOf(curNode)+1
+
+	}
 	if(l[0]<curNode.x){
 		//alert('moved up');
 		changeOrderRight(curNode,currentChildIndex,totalChildren);
@@ -1395,6 +1408,12 @@ if(flag==20){
 						}
 					});
 			});
+		});
+		//To update cassandra_ids (id_c) of nodes in dNodes variable
+		dNodes.forEach(function(d){
+			if (d.type=='modules') d.id_c=res[resMap[0]];
+			else d.id_c=res[d.id_n];
+
 		});
 		
 		openDialogMindmap("Success", "Structure created successfully");

@@ -13,6 +13,7 @@
 					<li><span><a class='scrapeOnTxt'>Scrape On</a></span></li>
 					<li><a href='#'  title="Launch Internet Explorer" ng-class="enbledChecked ? 'enableActions' : 'disableActions'" ng-click="initScraping($event, 'ie'); $event.preventDefault(); $event.stopPropagation();"><span><img src='imgs/ic-ie.png' alt='Internet Explorer' /></span>Internet Explorer</a></li>
 					<li><a href='#'  title="Launch Google Chrome" ng-class="enbledChecked ? 'enableActions' : 'disableActions'" ng-click="initScraping($event, 'chrome'); $event.preventDefault(); $event.stopPropagation();"><span><img src='imgs/ic-chrome.png' alt='Google Chrome' /></span>Google Chrome</a></li>
+					<li class="safariBrowser" style="display: none;"><a href='#'  title="Launch Safari" ng-class="enbledChecked ? 'enableActions' : 'disableActions'" ng-click="initScraping($event, 'safari'); $event.preventDefault(); $event.stopPropagation();"><span><img src='imgs/ic-safari.png' alt='Safari' /></span>Safari</a></li>
 					<li><a href='#'  title="Launch Mozilla Firefox" ng-class="enbledChecked ? 'enableActions' : 'disableActions'" ng-click="initScraping($event, 'mozilla'); $event.preventDefault(); $event.stopPropagation();"><span><img src='imgs/ic-mozilla.png' alt='Mozilla Firefox' /></span>Mozilla Firefox</a></li>
 					<li class="last"  title="Enable Append"><span style="margin-bottom:-5px"><input ng-model="enbledChecked" id="enableAppend" type='checkbox' value=""></span><label for="enableAppend">Append</label></li>
 				</ul>
@@ -456,7 +457,7 @@
 	        <h4 class="modal-title">Delete</h4>
 	      </div>
 	      <div class="modal-body">
-	        <p>Are you sure you want to delete objects ?</p>
+	        <p></p>
 	      </div>
 	      <div class="modal-footer">
 	        <button type="button" class="btn btn-default" ng-click="del_Objects()">Yes</button>
@@ -650,4 +651,23 @@
 	</div>
 </div>
 <!-- Submitting Task Success -->	
+ <!-- reused Modal  -->
+	<div class="modal fade" id="reUsedObjectsModal" role="dialog" data-keyboard="false" data-backdrop="static">
+	  <div class="modal-dialog modal-sm">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <button type="button" class="close" data-dismiss="modal">&times;</button>
+	        <h4 class="modal-title">Save scraped data</h4>
+	      </div>
+	      <div class="modal-body">
+	        <p></p>
+	      </div>
+	      <div class="modal-footer">
+	        <button type="button" id='saveYes' class="btn btn-default" ng-click="saveScrapedObjects()" >Yes</button>
+	        <button type="button" id='saveNo' class="btn btn-default"  ng-click="noSaveScrapedObjects()" data-dismiss="modal">No</button>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+	<!-- reused Modal -->
 <!--Bootstrap Popup-->
