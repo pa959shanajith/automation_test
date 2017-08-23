@@ -838,15 +838,19 @@ if(flag==20){
 
 
 
- $(document).on('click', '.addScenarios-ete', function(e){
-		var text=$('.selectScenariobg').text();
-		if($('.selectScenariobg').attr('data-scenarioId') != 'null'){
+
+ $(document).on('click', '.addScenarios-ete', function(e){	
+//// #817 To select multiple scenarios in e2e (Himanshu)
+	 $('.selectScenariobg').each(function(i,obj){
+		var text=$(obj).text();
+		if($(obj).attr('data-scenarioId') != 'null'){
 			createScenario_Node(text,$('#selectProjectEtem').val());
 		}else{
 			openDialogMindmap('Error','Scenario is not created');
 		}
-		
+ 		});
 })
+
 $(document).on('click', '.createNew-ete', function(e){
 		createNewMap_W();
 })

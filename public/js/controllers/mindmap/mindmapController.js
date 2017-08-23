@@ -332,15 +332,18 @@ mySPA.controller('mindmapController', ['$scope', '$http', '$location', '$timeout
 		});
 	}
 
+// #817 To select multiple scenarios in e2e (Himanshu)
 	$(document).on('click', '.eteScenrios', function(){
-		$.each($('.eteScenrios'), function(){
-			$(this).removeClass('selectScenariobg');
-		})
+//		$.each($('.eteScenrios'), function(){
+//			$(this).removeClass('selectScenariobg');
+//		})
+
+
 		/*if($(this).siblings("input").is(":checked")){
 			$(this).siblings("input").prop("checked",false);
 		}
 		else $(this).siblings("input").prop("checked",true);*/
-		$(this).addClass('selectScenariobg');
+		$(this).toggleClass('selectScenariobg');
 	})
     // $(".highlightImg").on('click',function(e) {
     //     if(e.target.id == "reqImg" || e.target.id == "createImg" ||  e.target.id == "assignImg" || 
