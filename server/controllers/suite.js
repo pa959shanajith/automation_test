@@ -315,7 +315,7 @@ exports.updateTestSuite_ICE = function(req, res) {
                     for (var scenarioidindex = 0; scenarioidindex < testscenarioids.length; scenarioidindex++) {
                     	var inputs2 = {"query": "updatetestsuitedataquery","conditioncheck":conditioncheck[scenarioidindex],
         						"donotexecute":donotexecute[scenarioidindex],"getparampaths":getparampaths[scenarioidindex],
-        						"testscenarioids":testscenarioids[scenarioidindex],"modifiedby":userinfo.username,"modifiedbyrole":userinfo.role,
+        						"testscenarioids":testscenarioids[scenarioidindex],"modifiedby":userinfo.username.toLowerCase(),"modifiedbyrole":userinfo.role,
         						"cycleid":testscycleid,"testsuiteid":requestedtestsuiteid,"testsuitename":requestedtestsuitename,
         						"versionnumber":requestedversionnumber ,"skucodetestsuite":"skucodetestsuite","tags":"tags"};
                         /*updateTestSuiteData = "update testsuites set" +
@@ -1688,8 +1688,8 @@ function updatescenariodetailsinsuite(req, cb, data) {
                                            simplecallback(null, result);
                                     } else {
                                         flag = "fail";
-                                        console.log(err);
                                         simplecallback(null, result);
+                                       console.log(err);
                                     }
                                 });
                 }

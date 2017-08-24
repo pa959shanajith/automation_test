@@ -77,8 +77,8 @@ mySPA.controller('headerController', function($scope,$http,$location,headerServi
 	$scope.Switch_Role = function(){
 		
 		//var userId = JSON.parse(window.localStorage['_UI']).user_id;
-		// var username = JSON.parse(window.localStorage['_UI']).username.toLowerCase();
-		var username = JSON.parse(window.localStorage['_UI']).username;
+		 var username = JSON.parse(window.localStorage['_UI']).username.toLowerCase();
+		//var username = JSON.parse(window.localStorage['_UI']).username;
 		var userRolesList;
 		var selRole;
 		if(JSON.parse(window.localStorage['_UI']).additionalrole.length == 0){
@@ -138,8 +138,8 @@ mySPA.controller('headerController', function($scope,$http,$location,headerServi
 	$scope.switchRole_Yes = function () 
 	{
 		var currentRole = window.localStorage['_SR'];
-		// var username = JSON.parse(window.localStorage['_UI']).username.toLowerCase();
-		var username = JSON.parse(window.localStorage['_UI']).username;
+		 var username = JSON.parse(window.localStorage['_UI']).username.toLowerCase();
+		//var username = JSON.parse(window.localStorage['_UI']).username;
 		var selRole = selectedROleID;
 
 		LoginService.loadUserInfo_Nineteen68(username,selRole,true)

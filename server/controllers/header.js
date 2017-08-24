@@ -284,7 +284,7 @@ exports.userPlugins_Nineteen68 = function(req, res){
 			sessionToken = sessionToken[1];		
 		}		
 		if(sessionToken != undefined && req.session.id == sessionToken){		
-			var username = req.body.username;		
+			var username = req.body.username.toLowerCase();		
 			var roleName = req.body.rolename;		
 			var roleID = req.body.roleId;		
 			//display plugins		

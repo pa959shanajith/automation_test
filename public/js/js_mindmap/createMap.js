@@ -985,7 +985,8 @@ var recurseDelChild = function(d){
 };
 var moveNode = function(e){
 	e=e||window.event;
-	d3.select('.ct-movable').attr('transform', "translate("+parseFloat((e.pageX-14-cSpan[0])/cScale+2)+","+parseFloat((e.pageY-70-cSpan[1])/cScale-20)+")");
+	//#886 Unable to rearrange nodes in e2e
+	d3.select('.ct-movable').attr('transform', "translate("+parseFloat((e.pageX-14-cSpan[0])/cScale+2)+","+parseFloat((e.pageY-188-cSpan[1])/cScale-20)+")");
 };
 var moveNodeBegin = function(e){
 	e=e||window.event;

@@ -242,7 +242,7 @@ exports.createStructure_Nineteen68 = function(req, res) {
     /*console.log('projectid', projectid);
     console.log('cycleId', cycleId);*/
 
-    var username=RequestedJSON.userName;
+    var username=RequestedJSON.userName.toLowerCase();
     var suite = RequestedJSON.testsuiteDetails.length;
     var suiteID = uuid();
     var suitedetails = RequestedJSON.testsuiteDetails[0];
@@ -1639,7 +1639,7 @@ exports.createE2E_Structure_Nineteen68 = function(req, res) {
     var date;
 
 
-    var username=RequestedJSON.userName;
+    var username=RequestedJSON.userName.toLowerCase();
     var suite = RequestedJSON.testsuiteDetails.length;
     var suiteID = uuid();
     var suitedetails = RequestedJSON.testsuiteDetails[0];

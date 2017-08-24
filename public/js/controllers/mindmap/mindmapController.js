@@ -50,7 +50,7 @@ mySPA.controller('mindmapController', ['$scope', '$http', '$location', '$timeout
                 // $("#ct-moduleBox,.tabAssign").css({'left':'147px !important','width':'100%'})
                 $(".ct-tileBox").css({'left':'52% !important'});
                 //endtoend
-                $(".endtoend-modulesContainer").prop("style","width:calc(100% - 174px) !important; left:160px !important;");
+                $(".endtoend-modulesContainer").prop("style","width:calc(100% - 172px) !important; left:166px !important;");
                 $(".searchModuleimg").prop("style","right:91px !important;");
                 $(".endtoend-modules-right-upper img").prop("style","left:195px !important;");
                 $(".eteLabel").prop("style","left:392px !important; width:140px !important; bottom:23px !important;");
@@ -59,14 +59,7 @@ mySPA.controller('mindmapController', ['$scope', '$http', '$location', '$timeout
                 $(".ct-tileBox").css({'left':'50%'})
                 $("#ct-moduleBox,.tabAssign").removeClass("leftBarClose rightBarClose rightBarOpen bar-collapse leftOpenRightClose rightOpenLeftClose bar-expand").addClass("leftBarOpen");
                 //endtoend
-                $(".endtoend-modulesContainer").prop("style","width:calc(100% - 256px) !important; left:160px !important;");
-                $(".searchModuleimg").prop("style","right:86px !important;");
-                $(".endtoend-modules-right-upper img").prop("style","left:180px !important;");
-                $(".eteLabel").prop("style","left:366px !important; width:140px !important; bottom:23px !important;");
-           }
-           else if($(".left-sec-mindmap").is(":visible") == false && $('#right-dependencies-section').is(':visible') == true){
-                //endtoend
-                $(".endtoend-modulesContainer").prop("style","width:calc(100% - 256px) !important; left:160px !important;");
+                $(".endtoend-modulesContainer").prop("style","width:calc(100% - 256px) !important; left:166px !important;");
                 $(".searchModuleimg").prop("style","right:86px !important;");
                 $(".endtoend-modules-right-upper img").prop("style","left:180px !important;");
                 $(".eteLabel").prop("style","left:366px !important; width:140px !important; bottom:23px !important;");
@@ -95,7 +88,7 @@ mySPA.controller('mindmapController', ['$scope', '$http', '$location', '$timeout
                     $("div.content-div").addClass("content-div-both-collapse");
                     $("#ct-moduleBox,.tabAssign").removeClass("leftBarOpen leftBarClose rightBarClose rightBarOpen bar-expand leftOpenRightClose rightOpenLeftClose").addClass("bar-collaspe");
                     //endtoend
-                    $(".endtoend-modulesContainer").prop("style","width:calc(100% - 32px) !important; left:10px !important;");
+                    $(".endtoend-modulesContainer").prop("style","width:calc(100% - 10px) !important;");
                     $(".searchModuleimg").prop("style","right:100px !important;");
                     $(".endtoend-modules-right-upper img").prop("style","left:222px !important;");
                     $(".eteLabel").prop("style","left:0 !important; width:140px !important; bottom:18px !important;");
@@ -104,7 +97,7 @@ mySPA.controller('mindmapController', ['$scope', '$http', '$location', '$timeout
             {
                 $("#ct-moduleBox,.tabAssign").removeClass("leftBarOpen leftBarClose rightBarClose rightBarOpen bar-collapse leftOpenRightClose bar-expand").addClass("rightOpenLeftClose");
                 //endtoend
-                $(".endtoend-modulesContainer").prop("style","width:calc(100% - 100px) !important; left:2px !important;");
+                $(".endtoend-modulesContainer").prop("style","width:calc(100% - 96px) !important;");
                 $(".searchModuleimg").prop("style","right:95px !important;");
                 $(".endtoend-modules-right-upper img").prop("style","left:210px !important;");
                 $(".eteLabel").prop("style","left:420px !important; width:140px !important; bottom:18px !important;");
@@ -129,7 +122,7 @@ mySPA.controller('mindmapController', ['$scope', '$http', '$location', '$timeout
                     $("select.selectProject").removeClass("selectProjectPri");
                 },300)
                 //endtoend
-                $(".endtoend-modulesContainer").prop("style","width:calc(100% - 256px) !important; left:160px !important;");
+                $(".endtoend-modulesContainer").prop("style","width:calc(100% - 256px) !important; left:166px !important;");
                 $(".searchModuleimg").prop("style","right:86px !important;");
                 $(".endtoend-modules-right-upper img").prop("style","left:180px !important;");
                 $(".eteLabel").prop("style","left:366px !important; width:140px !important; bottom:23px !important;");
@@ -142,14 +135,14 @@ mySPA.controller('mindmapController', ['$scope', '$http', '$location', '$timeout
                 $(".project-list").addClass("selectProject");
                 if(($("#left-nav-section").is(":visible") == true &&  $("#right-dependencies-section").is(":visible") == false)){
                     //endtoend
-                    $(".endtoend-modulesContainer").prop("style","width:calc(100% - 176px) !important; left:162px !important;");
+                    $(".endtoend-modulesContainer").prop("style","width:calc(100% - 172px) !important; left:166px !important;");
                     $(".searchModuleimg").prop("style","right:91px !important;");
                     $(".endtoend-modules-right-upper img").prop("style","left:195px !important;");
                     $(".eteLabel").prop("style","left:390px !important; width:140px !important; bottom:23px !important;");
                 }
                 else if(($("#left-nav-section").is(":visible") == false &&  $("#right-dependencies-section").is(":visible") == true)){
                     //endtoend
-                    $(".endtoend-modulesContainer").prop("style","width:calc(100% - 108px) !important; left:10px !important;");
+                    $(".endtoend-modulesContainer").prop("style","width:calc(100% - 96px) !important;");
                     $(".searchModuleimg").prop("style","right:95px !important;");
                     $(".endtoend-modules-right-upper img").prop("style","left:208px !important;");
                     $(".eteLabel").prop("style","left:417px !important; width:140px !important; bottom:23px !important;");
@@ -159,7 +152,7 @@ mySPA.controller('mindmapController', ['$scope', '$http', '$location', '$timeout
                 }
                 else if(($("#left-nav-section").is(":visible") == false && $("#right-dependencies-section").is(":visible") == false)){
                     //endtoend
-                    $(".endtoend-modulesContainer").prop("style","width:calc(100% - 16px) !important; left:10px !important;");
+                    $(".endtoend-modulesContainer").prop("style","width:calc(100% - 12px) !important;");
                     $(".searchModuleimg").prop("style","right:102px !important;");
                     $(".endtoend-modules-right-upper img").prop("style","left:225px !important;");
                     $(".eteLabel").prop("style","left:0px !important; width:140px !important; bottom:18px !important;");
@@ -332,15 +325,18 @@ mySPA.controller('mindmapController', ['$scope', '$http', '$location', '$timeout
 		});
 	}
 
+// #817 To select multiple scenarios in e2e (Himanshu)
 	$(document).on('click', '.eteScenrios', function(){
-		$.each($('.eteScenrios'), function(){
-			$(this).removeClass('selectScenariobg');
-		})
+//		$.each($('.eteScenrios'), function(){
+//			$(this).removeClass('selectScenariobg');
+//		})
+
+
 		/*if($(this).siblings("input").is(":checked")){
 			$(this).siblings("input").prop("checked",false);
 		}
 		else $(this).siblings("input").prop("checked",true);*/
-		$(this).addClass('selectScenariobg');
+		$(this).toggleClass('selectScenariobg');
 	})
     // $(".highlightImg").on('click',function(e) {
     //     if(e.target.id == "reqImg" || e.target.id == "createImg" ||  e.target.id == "assignImg" || 

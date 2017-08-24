@@ -493,7 +493,7 @@ exports.updateUser_nineteen68 = function updateUser_nineteen68(req, res) {
 							inputs = {"query":"updateuser",
 							"userid":local_user_Id, "additionalroles":local_additionalroles,
 							"deactivated" :false,"emailid": local_email_id, "firstname":local_firstname, "lastname":local_lastname,
-							"ldapuser":result.rows[0].ldapuser, "modifiedby":userdetails.username,"modifiedbyrole":userdetails.role,
+							"ldapuser":result.rows[0].ldapuser, "modifiedby":userdetails.username.toLowerCase(),"modifiedbyrole":userdetails.role,
 							"password":db_password, "username":local_username};
 
                             updateUserHistory = "'username=" + local_username + ",password=" + db_password + ","
@@ -846,7 +846,7 @@ exports.createProject_ICE = function createProject_ICE(req, res) {
                             //         new Date().getTime() + "'," + false + ",{" + dateScreen + ":" + requestReleasehistorydetails + "},'" +
                             //         requestedskucode + "',['" + requestedtags + "']);"
 								var inputs={"query":"createrelease", "projectid":newProjectID,
-									"releasename": releaseName, "createdby":userinfo.username,
+									"releasename": releaseName, "createdby":userinfo.username.toLowerCase(),
 									"skucoderelease" : "skucoderelease", "tags":"tags"};
 								var args = {data:inputs,headers:{"Content-Type" : "application/json"}};
 
@@ -1114,7 +1114,7 @@ exports.updateProject_ICE = function updateProject_ICE(req, res){
 								// requestedskucode + "',['" + requestedtags + "']);"
 								// dbConnICE.execute(createReleaseQuery, function(err, data) {
 									var inputs={"query":"createrelease", "projectid":requestedprojectid,
-									"releasename": releaseName, "createdby":userinfo.username,
+									"releasename": releaseName, "createdby":userinfo.username.toLowerCase(),
 									"skucoderelease" : "skucoderelease", "tags":"tags"};
 									var args = {data:inputs,headers:{"Content-Type" : "application/json"}};
 									client.post(epurl+"admin/createProject_ICE",args,
