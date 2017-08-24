@@ -1511,15 +1511,15 @@ var populateDynamicInputList = function(){
 			// }
 			if (ts.children != undefined){
 				ts.children.forEach(function(s){
-					if(scrDict[s.id_n]===undefined){
+					if(scrDict[s.name]===undefined ){
 						scrList.push({id:s.id,name:s.name,id_n:s.id_n,id_c:s.id_c});
-						scrDict[s.id_n]=!0;
+						scrDict[s.name]=!0;
 					}
 					if (s.children != undefined){
 						s.children.forEach(function(tc){
-							if(tcDict[tc.id_n]===undefined){
+							if(tcDict[tc.name]===undefined){
 								tcList.push({id:tc.id,name:tc.name,id_n:tc.id_n,id_c:tc.id_c});
-								tcDict[tc.id_n]=!0;
+								tcDict[tc.name]=!0;
 							}
 						});
 					}
