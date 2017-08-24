@@ -48,38 +48,39 @@
    			<div title="Import from Excel"><img alt="Import from Excel" class="" src="images_mindmap/ic-importfromexcel-mindmap.png"><label>Import from Excel</label></div>
    		</div>
    </div>   
-   <div class="endtoend-modulesContainer" ng-if="tab == 'mindmapEndtoEndModules'">
-   		<div class="endtoend-modules-left endtoend-module-upperSection">
-   			<div class="endtoend-modules-left-upper">
-				<select class="makeElementFloatleft" id="selectProjectEtem">
-					<option value="" disabled selected>Please Select Project</option>
-					<option value="project1">Project1</option>
-					<option value="project2">Project2</option>
-				</select>
-				<input type="text" class="makeElementFloatleft" id="eteSearchModules"/><img alt="Search Icon" class="searchModuleimg" src="imgs/ic-search-icon.png">
-				<span class="eteLabel makeElementFloatleft">End to End Modules</span>
-   			</div>
-   			<div class="scrollbar-inner endtoend-modules-left-lower makeElementFloatleft" id="etemModuleContainer"></div>
-   		</div>
-   		<div class="endtoend-modules-right endtoend-module-upperSection">
-   			<div class="endtoend-modules-right-upper">
-				<label class="makeElementFloatleft">Scenarios</label>
-				<input type="text" class="makeElementFloatleft" id="eteSearchScenarios"/><img alt="Search Icon" class="searchModuleimg" src="imgs/ic-search-icon.png">
-   			</div>
-   			<div class="endtoend-modules-right-lower makeElementFloatleft">
-   				<div class="scrollbar-inner endtoend-modules-rightfirst-lower makeElementFloatleft" id="eteScenarioContainer"></div>
-                <button class="createNew-ete">CreateNew</button>
-   				<button class="addScenarios-ete">Add</button>
-   			</div>
-   		</div>
-   		<span class="suitedropdownicon"><img alt="Collapse Icon" class="iconSpace collapseEte" src="imgs/ic-collapse.png"></span>
-        
-            <div class="ct-canvas-Container" id="ct-canvas">
-                <!--<img alt="Create New" class="createcontainericon" src="images_mindmap/ic-create-newMindmap.png">
-                <label class="createcontainerlabel">Create New</label>-->
-            </div>
+   <div id="ct-main-e2e" class="fl-left" ng-if="tab == 'mindmapEndtoEndModules'">
+        <div class="endtoend-modulesContainer" ng-if="tab == 'mindmapEndtoEndModules'">
+                <div class="endtoend-modules-left endtoend-module-upperSection">
+                    <div class="endtoend-modules-left-upper">
+                        <select class="makeElementFloatleft" id="selectProjectEtem">
+                            <option value="" disabled selected>Please Select Project</option>
+                            <option value="project1">Project1</option>
+                            <option value="project2">Project2</option>
+                        </select>
+                        <input type="text" class="makeElementFloatleft" id="eteSearchModules"/><img alt="Search Icon" class="searchModuleimg" src="imgs/ic-search-icon.png">
+                        <span class="eteLabel makeElementFloatleft">End to End Modules</span>
+                    </div>
+                    <div class="scrollbar-inner endtoend-modules-left-lower makeElementFloatleft" id="etemModuleContainer"></div>
+                </div>
+                <div class="endtoend-modules-right endtoend-module-upperSection">
+                    <div class="endtoend-modules-right-upper">
+                        <label class="makeElementFloatleft">Scenarios</label>
+                        <input type="text" class="makeElementFloatleft" id="eteSearchScenarios"/><img alt="Search Icon" class="searchModuleimg" src="imgs/ic-search-icon.png">
+                    </div>
+                    <div class="endtoend-modules-right-lower makeElementFloatleft">
+                        <div class="scrollbar-inner endtoend-modules-rightfirst-lower makeElementFloatleft" id="eteScenarioContainer"></div>
+                        <button class="createNew-ete">CreateNew</button>
+                        <button class="addScenarios-ete">Add</button>
+                    </div>
+                </div>
+                <span class="suitedropdownicon"><img alt="Collapse Icon" class="iconSpace collapseEte" src="imgs/ic-collapse.png"></span>
+        </div>
+        <div class="ct-canvas-Container" id="ct-canvas">
+            <!--<img alt="Create New" class="createcontainericon" src="images_mindmap/ic-create-newMindmap.png">
+            <label class="createcontainerlabel">Create New</label>-->
+        </div>
    </div>
-   <div class="fl-left" id="ct-main">
+   <div id="ct-main" class="fl-left">
       <div id="ct-projectList">
          <div class="ct-project"></div>
          <div class="ct-expand"></div>

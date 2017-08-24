@@ -3,7 +3,7 @@ mySPA.factory('LoginService', ['$http','$q', function ($http, $httpProvider, $q)
     //Checking User Validation
     authenticateUser_Nineteen68 : function(username, password){
       return $http.post('/authenticateUser_Nineteen68',{
-        username : username, 
+        username : username.toLowerCase(), 
         password : password
       })
       .then(function(response)  { return response.data},
@@ -13,7 +13,7 @@ mySPA.factory('LoginService', ['$http','$q', function ($http, $httpProvider, $q)
     		var param = "loadUserInfo_Nineteen68";
 	        return $http.post('/loadUserInfo_Nineteen68', {
 	        		action: param,
-              username : username, 
+              username : username.toLowerCase(), 
               selRole : selRole,
               flag : flag
 	        })

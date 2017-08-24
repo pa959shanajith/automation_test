@@ -65,7 +65,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 	}
 	if(appType == "Webservice" && window.location.href.split("/")[3] == "designTestCase"){
 		$("#right-dependencies-section .thumbnail:first-child").hide();
-	}
+	} 
 	//console.log(appType);
 	$scope.getScreenView = appType
 	//Getting Apptype orScreen Type
@@ -1958,13 +1958,22 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			});
 		}
 		else{
-			if(!$("input[type=checkbox].checkall").is(":checked")){
+			if($(".parentObjContainer").find(".checkStylebox").is(":checked")){
+				viewString.view = [];
+				viewString.mirror = "";
+				newScrapedList.view = [];
+				newScrapedList.mirror = "";
+				$("#scraplist").empty();
+				$("#deleteObjects").prop("disabled", true);
+				$(".checkStylebox").prop("checked", false);
+			}
+			else if(!$("input[type=checkbox].checkall").is(":checked")){
 				openDialog("Delete Scrape data", "Please select objects to delete.")
 			}
 			else{
 				$.each($("input[type=checkbox].checkall:checked"), function(){
 					for (var i = 0; i < viewString.view.length; i++) {
-						if($(this).parents("li").data("xpath") == viewString.view[i].xpath && $(this).parent('.objectNames').siblings(".ellipsis").text().trim() == viewString.view[i].custname.trim()){
+						if($(this).parents("li").data("xpath") == viewString.view[i].xpath && ($(this).parent('.objectNames').siblings(".ellipsis").text().trim().replace('/\s/g', ' ')).replace('\n', ' ') == viewString.view[i].custname.trim()){
 							viewString.view.splice(viewString.view.indexOf(viewString.view[i]), 1);
 							$(this).parents("li.select_all").remove();
 							break;
@@ -1974,7 +1983,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				if($("input[type=checkbox].checkall:checked").length > 0){
 					$.each($("input[type=checkbox].checkall:checked"), function(){
 						for (var i = 0; i < newScrapedList.view.length; i++) {
-							if($(this).parents("li").data("xpath") == newScrapedList.view[i].xpath && $(this).parent('.objectNames').siblings(".ellipsis").text().trim() == newScrapedList.view[i].custname.trim()){
+							if($(this).parents("li").data("xpath") == newScrapedList.view[i].xpath && ($(this).parent('.objectNames').siblings(".ellipsis").text().trim().replace('/\s/g', ' ')).replace('\n', ' ') == newScrapedList.view[i].custname.trim()){
 								newScrapedList.view.splice(newScrapedList.view.indexOf(newScrapedList.view[i]), 1);
 								$(this).parents("li.select_all").remove();
 								break;
@@ -2085,7 +2094,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				if(appType == "MobileApp"){
 					if(navigator.appVersion.indexOf("Win")!=-1){
 						d.css('left', (rect.x/3) + 'px');
-						d.css('top', (rect.y/3) + 'px');
+						d.css('top', (rect.y/3) - 3 + 'px');
 						d.css('height', (rect.h/3) + 'px');
 						d.css('width', (rect.w/3) + 'px');
 					}
@@ -2128,7 +2137,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				d.css('opacity', '0.7');
 				getTopValue = Math.round(rect.y) * scale_highlight + 'px'
 				if(appType == "MobileApp" || appType == "MobileWeb")
-					$(".scroll-wrapper > .scrollbar-screenshot").animate({ scrollTop: parseInt(Math.round(rect.y) - 200) + 'px' },500);
+					$(".scroll-wrapper > .scrollbar-screenshot").animate({ scrollTop: parseInt(Math.round(rect.y) - 600) + 'px' },500);
 				else
 					$(".scroll-wrapper > .scrollbar-screenshot").animate({ scrollTop: parseInt(getTopValue) },500);
 				//$('.scroll-wrapper > .scrollbar-screenshot').scrollTo(d.offset().top);
@@ -4072,7 +4081,7 @@ function contentTable(newTestScriptDataLS) {
 				var custname1;
 				var custval=ob.custname;
 				custname1 = $('<input>').html(custval).text().trim();
-				if (custname1.replace(/\s/g, ' ') ==(selectedText.replace('/\s/g', ' ')).replace('\n', ' ')){
+				if (custname1.replace(/\s/g, ' ') == (selectedText.replace('/\s/g', ' ')).replace('\n', ' ')){
 					objName = ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ');
 					url = ob.url;
 					var obType = ob.tag;

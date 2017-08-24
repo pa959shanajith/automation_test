@@ -2,8 +2,8 @@
  * Dependencies.
  */
 var Joi = require('joi');
-var dbConn = require('../../server/config/icetestautomation');
-var cassandra = require('cassandra-driver');
+// var dbConn = require('../../server/config/icetestautomation');
+// var cassandra = require('cassandra-driver');
 var myserver = require('../../server.js');
 var async = require('async');
 var parse = require('xml-parser');
@@ -286,7 +286,7 @@ exports.updateScreen_ICE = function(req, res){
 		screenID   = updateData.screenId;
 		screenName = updateData.screenName;
 		userInfo   = updateData.userinfo;
-		modifiedBy = userInfo.username;
+		modifiedBy = userInfo.username.toLowerCase();
 		param      = updateData.param;
 		appType    = updateData.appType;
 		//xpaths required to be mapped(used only when param is mapScrapeData_ICE)
@@ -382,7 +382,7 @@ exports.updateScreen_ICE = function(req, res){
 											scrapedObjects=baseData;
 											scrapedObjects=JSON.stringify(scrapedObjects);
 											scrapedObjects = scrapedObjects.replace(/'+/g,"''");
-											var requestscreenhistorydetails = "'updated screens action by " + userInfo.username + " having role:" + userInfo.role + "" +
+											var requestscreenhistorydetails = "'updated screens action by " + userInfo.username.toLowerCase() + " having role:" + userInfo.role + "" +
 															" skucode=" + requestedskucodeScreens + ", tags=" + requestedtags + ", versionnumber=" + requestedversionnumber+
 															"  screendata=" + scrapedObjects+
 															"with the service action="+param+" '";
@@ -439,7 +439,7 @@ exports.updateScreen_ICE = function(req, res){
 						console.log(exception);
 					}
 				}else{
-								var requestscreenhistorydetails = "'updated screens action by " + userInfo.username + " having role:" + userInfo.role + "" +
+								var requestscreenhistorydetails = "'updated screens action by " + userInfo.username.toLowerCase() + " having role:" + userInfo.role + "" +
 							" skucode=" + requestedskucodeScreens + ", tags=" + requestedtags + ", versionnumber=" + requestedversionnumber+
 							"  screendata=" + scrapedObjects+
 							"with the service action="+param+" '";
@@ -532,7 +532,7 @@ exports.updateScreen_ICE = function(req, res){
 										if(elementschanged <= newCustNamesList.length){
 											scrapedObjects=JSON.stringify(scrapedObjects);
 											scrapedObjects = scrapedObjects.replace(/'+/g,"''");
-																						var requestscreenhistorydetails = "'updated screens action by " + userInfo.username + " having role:" + userInfo.role + "" +
+																						var requestscreenhistorydetails = "'updated screens action by " + userInfo.username.toLowerCase() + " having role:" + userInfo.role + "" +
 															" skucode=" + requestedskucodeScreens + ", tags=" + requestedtags + ", versionnumber=" + requestedversionnumber+
 															"  screendata=" + scrapedObjects+
 															"with the service action="+param+" '";
@@ -661,7 +661,7 @@ exports.updateScreen_ICE = function(req, res){
 										if(elementschanged<=deleteXpathNames.length){
 											scrapedObjects=JSON.stringify(scrapedObjects);
 											scrapedObjects = scrapedObjects.replace(/'+/g,"''");
-																					var requestscreenhistorydetails = "'updated screens action by " + userInfo.username + " having role:" + userInfo.role + "" +
+																					var requestscreenhistorydetails = "'updated screens action by " + userInfo.username.toLowerCase() + " having role:" + userInfo.role + "" +
 															" skucode=" + requestedskucodeScreens + ", tags=" + requestedtags + ", versionnumber=" + requestedversionnumber+
 															"  screendata=" + scrapedObjects+
 															"with the service action="+param+" '";
@@ -925,7 +925,7 @@ exports.updateScreen_ICE = function(req, res){
 													scrapedObjects.scrapetype=scrapedobjects.scrapetype;
 													scrapedObjects=JSON.stringify(scrapedObjects);
 													scrapedObjects = scrapedObjects.replace(/'+/g,"''");
-																								var requestscreenhistorydetails = "'updated screens action by " + userInfo.username + " having role:" + userInfo.role + "" +
+																								var requestscreenhistorydetails = "'updated screens action by " + userInfo.username.toLowerCase() + " having role:" + userInfo.role + "" +
 															" skucode=" + requestedskucodeScreens + ", tags=" + requestedtags + ", versionnumber=" + requestedversionnumber+
 															"  screendata=" + scrapedObjects+
 															"with the service action="+param+" '";
@@ -1047,7 +1047,7 @@ exports.updateScreen_ICE = function(req, res){
 										{
 											scrapedObjects=JSON.stringify(scrapedObjects);
 											scrapedObjects = scrapedObjects.replace(/'+/g,"''");
-											var requestscreenhistorydetails = "'updated screens action by " + userInfo.username + " having role:" + userInfo.role + "" +
+											var requestscreenhistorydetails = "'updated screens action by " + userInfo.username.toLowerCase() + " having role:" + userInfo.role + "" +
 															" skucode=" + requestedskucodeScreens + ", tags=" + requestedtags + ", versionnumber=" + requestedversionnumber+
 															"  screendata=" + scrapedObjects+
 															"with the service action="+param+" '";
@@ -1265,7 +1265,7 @@ exports.updateScreen_ICE = function(req, res){
 																					console.log(exception);
 																				}
 																			}
-																		 requesthistorydetails = "'updated testcase action by " + userInfo.username + " having role:" + userInfo.role + "" +
+																		 requesthistorydetails = "'updated testcase action by " + userInfo.username.toLowerCase() + " having role:" + userInfo.role + "" +
 																			" skucodetestcase=" + requestedskucodeScreens + ", tags=" + requestedtags + "," +
 																			" testcasesteps=" + updatingtestcasedata + ", versionnumber=" + requestedversionnumber+
 																			" with the service action="+param+" '";
@@ -1274,7 +1274,7 @@ exports.updateScreen_ICE = function(req, res){
 																		if(updatingtestcasedata == "[]"){
 																			updatingtestcasedata = "";											
 																		}
-																		var updateTestCaseQuery = "UPDATE testcases SET modifiedby='" + userInfo.username +
+																		var updateTestCaseQuery = "UPDATE testcases SET modifiedby='" + userInfo.username.toLowerCase() +
 																			"', modifiedon='" + new Date().getTime() +
 																			"',  skucodetestcase='" + requestedskucodeScreens +
 																			"', history= history + { "+requestedhistory+" }" +
@@ -1282,7 +1282,7 @@ exports.updateScreen_ICE = function(req, res){
 																			"' where screenid=" + screenID + " and testcaseid=" + updatingTestcaseid + 
 																			" and testcasename='" + updatingtestcasename + 
 																			"' and versionnumber = "+requestedversionnumber+" IF EXISTS;";
-																		inputs={"query":"updatetestcasedata","modifiedby":userInfo.username,"skucodetestcase":"skucodetestcase","testcaseid":updatingTestcaseid,
+																		inputs={"query":"updatetestcasedata","modifiedby":userInfo.username.toLowerCase(),"skucodetestcase":"skucodetestcase","testcaseid":updatingTestcaseid,
 																		"testcasesteps":updatingtestcasedata,"screenid":screenID,"testcasename":updatingtestcasename,"versionnumber":requestedversionnumber}
 																		uploadTestCaseData(inputs,function(error,response){
 																			if(error){
@@ -1710,7 +1710,7 @@ exports.updateTestCase_ICE = function (req, res) {
 		var requestedversionnumber = 1;
 		historyRemarks = JSON.stringify(historyRemarks);
 		historyRemarks = historyRemarks.replace(/'+/g,"''");
-		var requesthistorydetails = "'updated testcase action by " + userinfo.username + " having role:" + userinfo.role + "" +
+		var requesthistorydetails = "'updated testcase action by " + userinfo.username.toLowerCase() + " having role:" + userinfo.role + "" +
 			" skucodetestcase=" + requestedskucodetestcase + ", tags=" + requestedtags + "," +
 			" testcasesteps=" + historyRemarks + ", versionnumber=" + requestedversionnumber+" '";
 		var date = new Date().getTime();
@@ -1724,7 +1724,7 @@ exports.updateTestCase_ICE = function (req, res) {
 		var args = {data:inputs,headers:{"Content-Type" : "application/json"}};
 		client.post(epurl+"design/updateTestCase_ICE",args,
 					function (result, response) {
-		console.log('-------------',response);
+		// console.log('-------------',response);
 		//dbConn.execute(checktestcaseexist, function (err, result) {
 			try{
 			//	if (err) {
@@ -1751,7 +1751,7 @@ exports.updateTestCase_ICE = function (req, res) {
 						requestedtestcasesteps = requestedtestcasesteps.replace(/'+/g,"''");
 						var inputs = {"screenid":requestedscreenid,
 										 "query":"updatetestcasedata",
-										"modifiedby" : userinfo.username,
+										"modifiedby" : userinfo.username.toLowerCase(),
 										"skucodetestcase" : requestedskucodetestcase,
 										"testcasesteps" : requestedtestcasesteps,
 										"versionnumber" : requestedversionnumber,
@@ -1767,7 +1767,7 @@ exports.updateTestCase_ICE = function (req, res) {
 
 		                 updateTestCaseQuery =  "UPDATE testcases SET  history= history + { "+requestedhistory+" }" +
 							" where versionnumber = "+requestedversionnumber+" and screenid=" + requestedscreenid + " and testcaseid=" + requestedtestcaseid + " and testcasename='" + requestedtestcasename + "' ";
-							console.log(updateTestCaseQuery);
+							// console.log(updateTestCaseQuery);
 							uploadTestCaseData(inputs,function(error,response){
 							// uploadTestCaseData(updateTestCaseData,function(error,response){
 								if(error){

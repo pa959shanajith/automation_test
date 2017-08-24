@@ -293,6 +293,7 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 						if(data[i].browser.toLowerCase() == "chrome")	browserIcon = "ic-reports-chrome.png";
 						else if(data[i].browser.toLowerCase() == "firefox")	browserIcon = "ic-reports-firefox.png";
 						else if(data[i].browser.toLowerCase() == "internet explorer")	browserIcon = "ic-reports-ie.png";
+						else if(data[i].browser.toLowerCase() == "safari")	browserIcon = "ic-reports-safari.png";
 						if(browserIcon)	brow = "imgs/"+browserIcon;
 						else brow = "imgs/no_img1.png"
 						if(data[i].status == "Pass"){	pass++;	styleColor="style='color: #009444 !important; text-decoration-line: none;'";}
@@ -347,7 +348,7 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 	$(document).on('click', '.selectFormat', function(){
 		$('.formatpdfbrwsrexport').remove();
 		var repID = $(this).parent().attr("data-reportid");
-		$(this).parent().append("<span class='formatpdfbrwsrexport'><img alt='Pdf Icon' class='getSpecificReportBrowser openreportstatus' data-getrep='phantom-pdf' data-reportid='"+repID+"' style='cursor: pointer; margin-right: 10px;' src='imgs/ic-pdf.png' title='PDF Report'><img alt='-' class='getSpecificReportBrowser openreportstatus' data-getrep='html' data-reportid='"+repID+"' style='cursor: pointer; margin-right: 10px;' src='imgs/ic-reports-chrome.png' title='Browser Report'><img alt='Export JSON' class='exportToJSON' data-reportid='"+repID+"' style='cursor: pointer;' src='imgs/ic-export-to-json.png' title='Export to Json'></span>")
+		$(this).parent().append("<span class='formatpdfbrwsrexport'><img alt='Pdf Icon' class='getSpecificReportBrowser openreportstatus' data-getrep='phantom-pdf' data-reportid='"+repID+"' style='cursor: pointer; margin-right: 10px;' src='imgs/ic-pdf.png' title='PDF Report'><img alt='-' class='getSpecificReportBrowser openreportstatus' data-getrep='html' data-reportid='"+repID+"' style='cursor: pointer; margin-right: 10px; width: 23px;' src='imgs/ic-web.png' title='Browser Report'><img alt='Export JSON' class='exportToJSON' data-reportid='"+repID+"' style='cursor: pointer;' src='imgs/ic-export-to-json.png' title='Export to Json'></span>")
 		$('.formatpdfbrwsrexport').focus();
 	})
 
@@ -482,33 +483,8 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 					finalReports.overallstatus[0].fail = (parseFloat((fail/total)*100).toFixed(2)) > 0? parseFloat((fail/total)*100).toFixed(2) : parseInt(0);
 					finalReports.overallstatus[0].terminate = (parseFloat((terminated/total)*100).toFixed(2)) > 0? parseFloat((terminated/total)*100).toFixed(2) : parseInt(0);
 				}
-				if(reportType == "phantom-pdf"){
-					var getCurrentUrl = window.location.href.split(":")
-					var reportUrl = "https:"+getCurrentUrl[1]+":8001/api/report";
-					var parameter = {
-							"template": {shortid: 'H1Orcdvhg', recipe: reportType},
-							"data": {
-								"overallstatus": finalReports.overallstatus,
-								"rows": finalReports.rows
-							}
-					}
-					$http.defaults.headers.post["Content-Type"] = "application/json; charset=utf-8";
-					$http.post(reportUrl,parameter, {responseType: 'arraybuffer' })
-					.success(function (result) {
-						console.log(result);
-						var file = new Blob([result], {type: 'application/pdf'});
-						/*var link=document.createElement('a');
-					            link.href=window.URL.createObjectURL(file);
-					            link.download = scenarioName+".pdf";
-					            link.click();*/
-						var fileURL = URL.createObjectURL(file);
-						$window.open(fileURL, '_blank');
-					}).error(function(data, status) {
-						console.error('Repos error', status, data);
-					});
-				}
-				else{
-					reportService.renderReport_ICE(finalReports, reportType)
+				//Service call to get Pdf/Html reports
+				reportService.renderReport_ICE(finalReports, reportType)
 					.then(function(data1) {
 						if(data1 == "Invalid Session"){
 							window.location.href = "/";
@@ -517,13 +493,28 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 							openWindow = 0;
 							if(openWindow == 0)
 							{
-								var myWindow;
-								myWindow = window.open();
-								myWindow.document.write(data1);
+								if(reportType == "html"){									
+									var myWindow;
+									myWindow = window.open();
+									myWindow.document.write(data1);
 
-								setTimeout(function(){
-									myWindow.stop();
-								}, 5000);
+									setTimeout(function(){
+										myWindow.stop();
+									}, 5000);
+								}
+								else{
+									var file = new Blob([data1], {type: 'application/pdf'});
+									var fileURL = URL.createObjectURL(file);
+									// var a = document.createElement('a');
+									// a.href = fileURL;
+									// a.download = finalReports.overallstatus[0].scenarioName;
+									// a.target="_new";
+									// document.body.appendChild(a);
+									// a.click();
+									// document.body.removeChild(a);
+									$window.open(fileURL, '_blank');
+									URL.revokeObjectURL(fileURL);
+								}
 							}
 							openWindow++;
 							e.stopImmediatePropagation();
@@ -533,8 +524,7 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 					},
 					function(error) {
 						console.log("Error-------"+error);
-					})
-				}
+				})
 				$('.formatpdfbrwsrexport').remove();
 			}
 			else console.log("Failed to get reports details");
