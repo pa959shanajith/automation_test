@@ -158,6 +158,10 @@ mySPA.controller('headerController', function($scope,$http,$location,headerServi
 							"pluginName" : "Utility",
 							"pluginValue" : "true"
 						})
+						availablePlugins.push({
+										"pluginName" : "Weboccular",
+										"pluginValue" : "true"
+						})
 							data.pluginsInfo = availablePlugins;
 							//window.localStorage['LoginSuccess'] = "True";
 							window.localStorage['_SR'] = additionalRoleName;
