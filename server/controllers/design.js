@@ -1612,7 +1612,7 @@ exports.readTestCase_ICE = function (req, res) {
 					    fetchScrapedData(inputs, function(err, scrapedobjects, querycallback) {						
 						// fetchScrapedData(scrapedDataQuery,function(err,scrapedobjects,querycallback){
 							try{
-								if(scrapedobjects != null && scrapedobjects != '' && scrapedobjects != undefined){
+								if(scrapedobjects != null && scrapedobjects.trim() != '' && scrapedobjects != undefined){
 									var newParse = JSON.parse(scrapedobjects);
 									if('body' in newParse){
 										//this is checked
@@ -1634,7 +1634,7 @@ exports.readTestCase_ICE = function (req, res) {
 											console.log(exception);
 										}
 									}
-								}else if((scrapedobjects == null || scrapedobjects == '' || scrapedobjects == undefined ) 
+								}else if((scrapedobjects == null || scrapedobjects.trim() == '' || scrapedobjects == undefined) 
 										 && (testcasesteps != null && testcasesteps != '' || testcasesteps != undefined)){
 									//this is checked
 									responsedata = { template: "", testcase: testcasesteps, testcasename: testcasename }
