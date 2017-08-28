@@ -110,8 +110,18 @@ if (cluster.isMaster) {
     });
 
     //Test Engineer,Test Lead and Test Manager can access
-    app.get(/^\/(specificreports|home|p_Utility|p_Reports|plugin|p_ALM|p_Weboccular)$/, function(req, res){
+    app.get(/^\/(specificreports|home|p_Utility|p_Reports|plugin|p_ALM)$/, function(req, res){
         if (!req.session.defaultRole || req.session.defaultRole == "Admin" || req.session.defaultRole == "Business Analyst" || req.session.defaultRole == "Tech Lead")
+        {
+            req.session.destroy(); res.status(401).send('<br><br>Your session has been expired.Please <a href="/">Login</a> Again');
+        }else{
+            if (req.cookies['connect.sid'] && req.cookies['connect.sid'] != undefined) { res.sendFile("index.html", { root: __dirname + "/public/" });} else {req.session.destroy(); res.status(401).send('<br><br>Your session has been expired. Please <a href="/">Login</a> Again');}
+        }
+    });
+
+    //Test Lead and Test Manager can access Weboccular Plugin
+    app.get(/^\/(p_Weboccular)$/, function(req, res){
+      if (!req.session.defaultRole || req.session.defaultRole == "Admin" || req.session.defaultRole == "Business Analyst" || req.session.defaultRole == "Tech Lead" || req.session.defaultRole == "Test Engineer")
         {
             req.session.destroy(); res.status(401).send('<br><br>Your session has been expired.Please <a href="/">Login</a> Again');
         }else{

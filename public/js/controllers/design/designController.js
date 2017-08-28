@@ -10,7 +10,7 @@ var compareFlag; var updatedViewString = {};
 var allTasks;var allScreenNames = [];	var reusedScreens = [];var reusedScreenNames=false;var noSave="false";
 var allScreenTestcaseNames =[];var reusedScreensTestcase = [];var reusedScreenTestcaseNames = false;
 var allTestcases =[];var reusedTestcases =[];var reusedTestcaseNames = false;var noSaveTestcase="false";
-		
+
 window.localStorage['disableEditing'] = "false";
 mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout', 'DesignServices','cfpLoadingBar','$window', function($scope,$http,$location,$timeout,DesignServices,cfpLoadingBar,$window) {
 	$("body").css("background","#eee");
@@ -18,7 +18,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 	$timeout(function(){
 		$('.scrollbar-inner').scrollbar();
 		$('.scrollbar-macosx').scrollbar();
-		document.getElementById("currentYear").innerHTML = new Date().getFullYear()			
+		document.getElementById("currentYear").innerHTML = new Date().getFullYear()
 		if(navigator.appVersion.indexOf("Mac")!=-1){
 			$(".safariBrowser").show();
 		}
@@ -65,7 +65,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 	}
 	if(appType == "Webservice" && window.location.href.split("/")[3] == "designTestCase"){
 		$("#right-dependencies-section .thumbnail:first-child").hide();
-	} 
+	}
 	//console.log(appType);
 	$scope.getScreenView = appType
 	//Getting Apptype orScreen Type
@@ -287,12 +287,12 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 						else{
 							var testcase = JSON.parse(data.testcase);
 							var testcaseArray = [];
-							for(var i = 0; i < testcase.length; i++){								
+							for(var i = 0; i < testcase.length; i++){
 								if("comments" in testcase[i]){
 									delete testcase[i];
 									testcase =  testcase.filter(function(n){ return n != null });
 								}
-								else{									
+								else{
 									if(appType == "Webservice"){
 										if(testcase[i].keywordVal == "setHeader" || testcase[i].keywordVal == "setHeaderTemplate"){
 											testcase[i].inputVal[0] = testcase[i].inputVal[0].split("##").join("\n")
@@ -847,7 +847,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				var scrapTree = $("#finalScrap").children('#scrapTree');
 				var innerUL = $("#finalScrap").children('#scrapTree').children('ul').children().children('#scraplist');
 
-				if(viewString.view != undefined){					
+				if(viewString.view != undefined){
 					for (var i = 0; i < viewString.view.length; i++) {
 						var path = viewString.view[i].xpath;
 						var ob = viewString.view[i];
@@ -867,9 +867,9 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 						}
 						angular.element(innerUL).append(li);
 					}
-					
+
 					$(".checkStylebox, .checkall").prop("disabled", false);
-					
+
 					if(viewString.view.length == 0){
 						$(".disableActions").addClass("enableActions").removeClass("disableActions");
 						$("#enableAppend").prop("disabled", true).css('cursor','no-drop');
@@ -885,7 +885,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					editable: true,
 					radio: true
 				});
-				
+
 				if(appType == 'Web')
 				{
 						if($(".ellipsis").length > 0 )
@@ -1385,7 +1385,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			eaCheckbox = $("#enableAppend").is(":checked")
 			//enableScreenShotHighlight = false;
 			screenViewObject = {}
-			var blockMsg = 'Scrapping in progress. Please Wait...';
+			var blockMsg = 'Scraping in progress. Please Wait...';
 			$(document).find("#desktopPath").removeClass("inputErrorBorder");
 			$(document).find("#OEBSPath").removeClass("inputErrorBorder");
 			$(document).find("#mobilityAPKPath, #mobilitySerialPath, #mobilityDeviceName, #mobilityiOSVersion, #mobilityUDID").removeClass("inputErrorBorder");
@@ -1525,7 +1525,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			//For Web
 			DesignServices.initScraping_ICE(screenViewObject)
 			.then(function (data) {
-				console.log("UI", data);				
+				console.log("UI", data);
 
 				if(data == "Invalid Session")
 				{
@@ -1578,7 +1578,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 							var tag2;
 							if(tag == "a" || tag == "input" || tag == "table" || tag == "list" || tag == "select" || tag == "img" || tag == "button" || tag == "radiobutton" || tag == "checkbox" || tag == "tablecell"){
 								var li = "<li data-xpath='"+ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"' data-left='"+ob.left+"' data-top='"+ob.top+"' data-width='"+ob.width+"' data-height='"+ob.height+"' data-tag='"+tag+"' data-url='"+ob.url+"' data-hiddentag='"+ob.hiddentag+"' class='item select_all "+tag+"x'><a class='customTxtName'><span class='highlight'></span><span title='"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;')+"' class='ellipsis'>"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"</span></a></li>";
-							} 
+							}
 							else {
 								var li = "<li data-xpath='"+ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"' data-left='"+ob.left+"' data-top='"+ob.top+"' data-width='"+ob.width+"' data-height='"+ob.height+"' data-tag='"+tag+"' data-url='"+ob.url+"' data-hiddentag='"+ob.hiddentag+"' class='item select_all "+tag+"x'><a class='customTxtName'><span class='highlight'></span><span title='"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;')+"' class='ellipsis'>"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"</span></a></li>";
 							}
@@ -1615,7 +1615,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 								var tag2;
 								if(tag == "a" || tag == "input" || tag == "table" || tag == "list" || tag == "select" || tag == "img" || tag == "button" || tag == "radiobutton" || tag == "checkbox" || tag == "tablecell"){
 									var li = "<li data-xpath='"+ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"' data-left='"+ob.left+"' data-top='"+ob.top+"' data-width='"+ob.width+"' data-height='"+ob.height+"' data-tag='"+tag+"' data-url='"+ob.url+"' data-hiddentag='"+ob.hiddentag+"' class='item select_all "+tag+"x'><a class='customTxtName'><span class='highlight'></span><span title='"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;')+"' class='ellipsis'>"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"</span></a></li>";
-								} 
+								}
 								else {
 									var li = "<li data-xpath='"+ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"' data-left='"+ob.left+"' data-top='"+ob.top+"' data-width='"+ob.width+"' data-height='"+ob.height+"' data-tag='"+tag+"' data-url='"+ob.url+"' data-hiddentag='"+ob.hiddentag+"' class='item select_all "+tag+"x'><a class='customTxtName'><span class='highlight'></span><span title='"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;')+"' class='ellipsis'>"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"</span></a></li>";
 								}
@@ -1652,7 +1652,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 							var tag2;
 							if(tag == "a" || tag == "input" || tag == "table" || tag == "list" || tag == "select" || tag == "img" || tag == "button" || tag == "radiobutton" || tag == "checkbox" || tag == "tablecell"){
 								var li = "<li data-xpath='"+ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"' data-left='"+ob.left+"' data-top='"+ob.top+"' data-width='"+ob.width+"' data-height='"+ob.height+"' data-tag='"+tag+"' data-url='"+ob.url+"' data-hiddentag='"+ob.hiddentag+"' class='item select_all "+tag+"x'><a class='customTxtName'><span class='highlight'></span><span title='"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;')+"' class='ellipsis'>"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"</span></a></li>";
-							} 
+							}
 							else {
 								var li = "<li data-xpath='"+ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"' data-left='"+ob.left+"' data-top='"+ob.top+"' data-width='"+ob.width+"' data-height='"+ob.height+"' data-tag='"+tag+"' data-url='"+ob.url+"' data-hiddentag='"+ob.hiddentag+"' class='item select_all "+tag+"x'><a class='customTxtName'><span class='highlight'></span><span title='"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;')+"' class='ellipsis'>"+custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ')+"</span></a></li>";
 							}
@@ -1796,7 +1796,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			}, function (error) { console.log("Fail to Load design_ICE") });
 		}
 	}
-	$scope.updateComparedObjects = function(event) 
+	$scope.updateComparedObjects = function(event)
 	{
 //			var xpath;
 //		var duplicateCustnames = [];
@@ -1880,7 +1880,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 
 		});
 	}
-	
+
 	//Show compared objects
 	$(document).on('click','#comparedObjects', function () {
 			$("#scrapTree,.fsScroll").hide();
@@ -1894,7 +1894,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			}
 			else{
 				$("#deleteObjectsModal").find('.modal-body p').text("Are you sure you want to delete objects?").css('color','black');
-			}	
+			}
 	});
 //To delete Scrape Objects
 	$scope.del_Objects = function()
@@ -2106,7 +2106,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 					}
 				}
 				else if(appType == "MobileWeb"){
-					if(navigator.appVersion.indexOf("Mac")!=-1){						
+					if(navigator.appVersion.indexOf("Mac")!=-1){
 						d.css('left', (rect.x + 15) + 'px');
 						d.css('top', (rect.y + 112) + 'px');
 						d.css('height', rect.h + 'px');
@@ -2257,7 +2257,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			} else {
 				$(".hightlight").remove();
 			}
-		//}	
+		//}
 	};
 	//Highlight compared and updated objects
 
@@ -2716,7 +2716,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			return false;
 		}
 		saveScrapedObjects();
-		
+
 	})
 
 	$scope.saveScrapedObjects = function()
@@ -2785,7 +2785,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 //				return false;
 //			}
 //		}
-		
+
 		/*if(!$(".checkall").is(":checked")){
 			openDialog("Save Scrape data", "Please select objects to save.")
 		}
@@ -2919,7 +2919,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 		}
 	}
 
-		
+
 
 	//To Select and unSelect all objects
 	$(document).on("click", ".checkStylebox", function(){
@@ -3056,7 +3056,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 							}
 							if(mydata[i].url == undefined){mydata[i].url="";}
 							if(mydata[i].remarks != undefined)
-							{	
+							{
 								if(  mydata[i].remarks != getTR[i].textContent  && getTR[i].textContent.trim().length > 0 )	{
 									if( mydata[i].remarks.length > 0 ){
 										mydata[i].remarks = mydata[i].remarks.concat( " ; " + getTR[i].textContent);
@@ -3072,7 +3072,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 						}
 					}
 					/*else{
-						if(mydata[i].remarks != undefined){	
+						if(mydata[i].remarks != undefined){
 							if(mydata[i].remarks != getTR[i].textContent  && getTR[i].textContent.trim().length > 0 )	{
 								if(mydata[i].remarks.length > 0 ){
 									mydata[i].remarks = mydata[i].remarks.concat( " ; " + getTR[i].textContent);
@@ -3459,7 +3459,7 @@ function contentTable(newTestScriptDataLS) {
 		        	   hideOtherFuncOnEdit();
 		        	   $("#jqGrid").parent('div').css('height','auto');
 
-					   if(getScrapeDataforCustomObj != "" && getScrapeDataforCustomObj != undefined){						   
+					   if(getScrapeDataforCustomObj != "" && getScrapeDataforCustomObj != undefined){
 							for(i=0; i<getScrapeDataforCustomObj.length; i++){
 								if(getScrapeDataforCustomObj[i].xpath == ""){
 									var testGridData = $("#jqGrid tbody tr:not(.jqgfirstrow)");
@@ -3467,7 +3467,7 @@ function contentTable(newTestScriptDataLS) {
 										debugger;
 										if($(this).find("td[aria-describedby='jqGrid_custname']").text() == scrappedData[i].custname){
 											$(this).find("td[aria-describedby='jqGrid_custname']").addClass("addCustObj");
-											
+
 										}
 									})
 								}
@@ -5282,7 +5282,7 @@ function getTags(data) {
 
 function getKeywordList(data) {
 	var keywordList = [];
-	if("defaultList" in data){		
+	if("defaultList" in data){
 		var arr = Object.keys(data.defaultList);
 		for (var i=0; i<arr.length; i++){
 			keywordList.push(arr[i]);
