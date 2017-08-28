@@ -1,5 +1,5 @@
 
-mySPA.controller('mindmapController', ['$scope', '$http', '$location', '$timeout', 'mindmapServices','cfpLoadingBar','$window', function($scope,$http,$location,$timeout,mindmapServices,cfpLoadingBar,$window) {
+mySPA.controller('mindmapController', ['$scope', '$http', '$location', '$timeout', 'chatbotService','mindmapServices','cfpLoadingBar','$window', function($scope,$http,$location,$timeout,chatbotService,mindmapServices,cfpLoadingBar,$window) {
     $("body").css("background","#eee");
     $("head").append('<link id="mindmapCSS1" rel="stylesheet" type="text/css" href="css/css_mindmap/style.css" /><link id="mindmapCSS2" rel="stylesheet" type="text/css" href="fonts/font-awesome_mindmap/css/font-awesome.min.css" />')
 	
@@ -350,6 +350,40 @@ mySPA.controller('mindmapController', ['$scope', '$http', '$location', '$timeout
     function initScroller(){
     	$('.scrollbar-inner').scrollbar();
 		$('.scrollbar-macosx').scrollbar();
+    }
+     // Prof J Assist
+    $scope.conversation = []
+    $scope.querySend = function (){
+        var query = $scope.query;
+        $scope.visible = 0;
+        $scope.conversation.push({'text' : query,'pos': "assistFrom-me",'type': 0});
+        console.log(query);
+        $scope.query = "";
+        chatbotService.getTopMatches(query).then(function(data){ 
+        console.log("Reporting from controller.. i have this object:");
+        console.log(data);
+        $scope.topMatches = data;
+        $scope.conversation.push({'text' : $scope.topMatches,'pos': "assistFrom-them",'type':0});
+        console.log($scope.conversation)
+        });
+    }
+  $scope.displayAnswer = function (index){
+        $scope.conversation.push({'text' : $scope.topMatches[index][2],'pos':  "assistFrom-them",'type':1});
+        $scope.answer = $scope.topMatches[index][2];
+        
+        var qid = $scope.topMatches[index][0];
+        console.log($scope.topMatches[index][2]);
+        chatbotService.updateFrequency(qid).then(function(data){ 
+            console.log("Reporting from controller.. after updating question frequency:");
+            console.log(data);
+        });
+    }
+
+    $scope.myFunct = function(keyEvent) {
+        if (keyEvent.which === 13)
+            $scope.querySend();
+            var objDiv = document.getElementById("hello");
+            objDiv.scrollTop = objDiv.scrollHeight;
     }
     // Changes made for End to end module implementation
 }]);
