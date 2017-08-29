@@ -2381,7 +2381,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				//$("#saveObjects").trigger("click");
 			//},500)
 			$("#dialog-addObject").modal("hide");
-			//openDialog("Add Object", "Objects has been added successfully.")
+			openDialog("Add Object", "Objects has been added successfully.")
 			//$("#addObjectSuccess").modal("show")
 			$("#saveObjects").prop("disabled", false)
 			flag = "false";

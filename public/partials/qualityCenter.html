@@ -12,7 +12,7 @@
 					<li><span><a class='scrapeOnTxt'>ALM Integration</a></span></li>
 					<li><a id='testPlanTab' ng-click="tab = 'testPlan'; hideMappedFilesTab(); loadDomains();" title="Test Plan" class="selectBrowser">
 						<span><img src='imgs/testplan.png' class='selectedIcon' alt='Test Plan' /></span>Test Plan</a></li>
-					<li><a id='TestLabTab' ng-click="tab = 'testLab'" title="Test Lab" class="selectBrowser" style="display: none;">
+					<li><a id='TestLabTab' ng-click="tab = 'testLab'; getDetailsforMTG();" title="Test Lab" style="display: none;" class="selectBrowser">
 						<span><img src='imgs/testlab.png' alt='Test Lab' /></span>Test Lab</a></li>
 					<li><a id='reportTab' ng-click="tab = 'reportTab'" title="Report" class="selectBrowser" style="display: none;">
 						<span><img src='' alt='Report' /></span>Report</a></li>
@@ -45,7 +45,7 @@
 			<!-- Action area -->
 			<div class="leftQcStructure">
 				<div class="qcDomProContainer">
-					<select class="qcSelectDomain"><option value="" selected disabled>Select Domain</option></select>
+					<select class="qcSelectDomain"></select>
 					<select class="qcSelectProject"><option value="" selected disabled>Select Project</option></select>
 				</div>
 				<div class="qcTreeContainer"></div>		
@@ -53,6 +53,8 @@
 			<div class="rightQcStructure">
 				<div class="qcProContainer">
 					<select class="qcN68SelectProject"><option value="" selected disabled>Select Project</option></select>
+					<input type="text" placeholder="Scenario Name" class="searchScenarioQC"></input>
+					<span class="searchScenarioN68"><img src='imgs/ic-searchIcon-black.png' alt='Search Scenarios' /></span>
 				</div>
 				<div class="qcN68TreeContainer"></div>	
 			</div>
@@ -69,19 +71,48 @@
 		<div class="containerWrap" ng-if="tab == 'testLab'">
 			<!--Task Name-->
 			<div id="page-taskName">
-				<span>Test Lab</span>
+				<span>Manual Testcase Generator</span>
 			</div>
-			<!--Task Name-->
-			
-			<!-- Button -->
-			<div class="adminActionBtn">
-				<button class="btn btn-md pull-right adminBtn" ng-click="updateUser()" title="Update User">Update</button>
-			</div>
-			<!-- Button -->
-			
+			<!--Task Name-->			
 			<!--  Form -->
-			<div class="col-xs-9 form-group adminForm">
-				
+			<div class="upperTestlabSection">
+				<div class="upperTestlabLeftSec">
+					<label>Projects:</label><select class="mtgProjects"><option value="" selected disabled>Select Project</option></select>
+					<label>Modules:</label><select class="mtgModules"><option value="" selected disabled>Select Modules</option></select>
+					<label>Scenarios:</label><select class="mtgScenarios"><option value="" selected disabled>Select Scenarios</option></select>
+				</div>
+				<div class="upperTestlabRightSec">
+					<label>Test Case</label>
+					<ul class="mtgScenarioList scrollbar-inner"></ul>
+				</div>			
+			</div>
+			
+			<div class="lowerTestlabSection">
+				<div class="almfieldsList">
+					<label>Fields Required</label>
+					<ul>
+						<li>Description</li>
+						<li>Step Name</li>
+						<li>Step Description</li>
+						<li>Expected Results</li>
+						<li>Author</li>
+						<li>Creation Date</li>
+						<li>Status</li>
+					</ul>
+				</div>
+				<div class="addAlmfields">
+					<button type="button" id="moveRight" ng-click="addToAlmFields()" title="Add ALM Field"> &gt; </button>			
+					<button type="button" id="moveleft" ng-click="removeFromAlmField()" title="Remove ALM Field"> &lt; </button>
+				</div>
+				<div class="editableAlmfields">
+					<label class="editableAlmfieldslabel">ALM Fields</label><label class="editableAlmfieldslabel">Excel Column</label>
+					<ul class="almFieldExcel scrollbar-inner">
+						<li><label style="color: red;">Subject</label><span><input type="text"></input></span></li>
+						<li><label style="color: red;">Test Case</label><span><input type="text" disabled></input></span></li>
+						<li><label style="color: red;">Type</label><span><input type="text" value="Manual" disabled></input></span></li>
+					</ul>
+				</div>
+				<button class="saveTestlabdetails" ng-click="saveTestlabdetails()" title="Generate Manual Testcase">Generate</button>
 			</div>
 			<!--  Form -->
 		</div>

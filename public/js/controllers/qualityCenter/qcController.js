@@ -15,6 +15,10 @@ mySPA.controller('qcController',['$scope','$window','$http','$location','$timeou
 		window.location.href = "/";
 	}
 
+	$(".selectBrowser").click(function(){
+		$(".selectBrowser").find("img").removeClass("selectedIcon");
+		$(this).find("img").addClass("selectedIcon");
+	})
 	$scope.loadDomains = function(){
 		var domainData = $scope.domainData;
 		if(domainData){
@@ -138,7 +142,7 @@ mySPA.controller('qcController',['$scope','$window','$http','$location','$timeou
 			.then(function(data){
 				var structContainer = $(".qcTreeContainer");
 				structContainer.empty();
-				structContainer.append("<ul class='root'><li class='testfolder_'><img class='qcCollapse' title='expand' style='height: 16px;' src='imgs/ic-qcCollapse.png'><label title='Root'>Root</label></li></ul>")
+				structContainer.append("<ul class='root scrollbar-inner'><li class='testfolder_'><img class='qcCollapse' title='expand' style='height: 16px;' src='imgs/ic-qcCollapse.png'><label title='Root'>Root</label></li></ul>")
 				if("testfolder" in data[0] && data[0].testfolder.length > 0){
 					for(var i=0; i<data[0].testfolder.length; i++){
 						if(i == 0){				
@@ -166,17 +170,50 @@ mySPA.controller('qcController',['$scope','$window','$http','$location','$timeou
 			if(getProject == nineteen68_projects_details[i].project_id){
 				var N68Container = $(".qcN68TreeContainer");
 				N68Container.empty();
-				N68Container.append("<ul></ul>")
+				N68Container.append("<ul class='scrollbar-inner'></ul>")
 				if(nineteen68_projects_details[i].scenario_details.length >0){
 					for(var j=0; j<nineteen68_projects_details[i].scenario_details.length; j++){
 						N68Container.find("ul").append("<li class='testSet testScenariolink' data-scenarioid='"+nineteen68_projects_details[i].scenario_details[j].testscenarioid+"'><label title='"+nineteen68_projects_details[i].scenario_details[j].testscenarioname+"'>"+nineteen68_projects_details[i].scenario_details[j].testscenarioname+"</label></li>")
 					}
+					if(nineteen68_projects_details[i].scenario_details.length >= 25)	$('.scrollbar-inner').scrollbar();
+					$(".searchScenarioN68").show();
 				}else{
 					N68Container.append("This project does not contain any scenarios");
+					$(".searchScenarioN68").hide();
 				}
 			}
 		}
 	});
+
+	//Search scenarios
+	var flgTog = 1;
+	$(document).on('click', ".searchScenarioN68", function(){
+		$('.searchScenarioQC').val('');
+		if(flgTog){
+			$(this).siblings("input").css({"opacity":1});
+			flgTog = 0;
+		}
+		else{
+			$(this).siblings("input").css({"opacity":0});
+			flgTog = 1;
+		}
+		filter($(this).siblings("input"));
+	})
+
+	$(document).on('keyup', '.searchScenarioQC', function() {
+		filter(this);
+	});
+
+	function filter(element) {
+		var value = $(element).val();
+		$(".qcN68TreeContainer ul li").each(function () {
+			if ($(this).children("label").text().toLowerCase().indexOf(value.toLowerCase()) > -1) {
+				$(this).show();
+			} else {
+				$(this).hide();
+			}
+		});
+	}
 
 	//Select selectedQcNode
 	$(document).on('click','.selectedQcNode', function(){
@@ -243,9 +280,11 @@ mySPA.controller('qcController',['$scope','$window','$http','$location','$timeou
 					function(error) {	console.log("Error in qcController.js file loginQCServer method! \r\n "+(error.data));
 					});
 					if(getParent.hasClass("Tfolnode"))	$(this).prop("src","imgs/ic-qcCollapse.png");
-					$('.scrollbar-inner').scrollbar();
 				}
-		}	
+		}
+		if(($(".qcTreeContainer ul").length + $(".qcTreeContainer li").length) >= 25){
+			$('.scrollbar-inner').scrollbar();			
+		}
 	})
 	
 	//Select testset
@@ -369,6 +408,155 @@ mySPA.controller('qcController',['$scope','$window','$http','$location','$timeou
 		},
 		function(error) {	console.log("Error in qcController.js file loginQCServer method! \r\n "+(error.data));
 		});
+	}
+
+	/*****************Manual Test Case Generator*******************/
+	//Get all project details for Manual Testcase Generator
+	//Load projects
+	$scope.getDetailsforMTG = function(){
+		blockUI("Loading...");
+		qcServices.manualTestcaseDetails_ICE()
+		.then(function(data){
+			if(data){
+				$scope.manualTestcaseDetails = data;
+				$(".mtgProjects").empty();
+				$(".mtgProjects").append("<option value='' selected disabled>Select Project</option>");
+				for(var i=0; i<data.length; i++){
+					$(".mtgProjects").append("<option value='"+data[i].project_id+"'>"+data[i].project_name+"</option>");
+				}
+			}
+			unblockUI();		
+		},
+		function(error) {	console.log("Error in qcController.js file loginQCServer method! \r\n "+(error.data));
+		});
+	}
+
+	//Load Modules
+	$(document).on('change', '.mtgProjects', function(){
+		var projId = $(this).find("option:selected").val();
+		var getDetails = $scope.manualTestcaseDetails;
+		for(var i=0; i<getDetails.length; i++){
+			if(projId == getDetails[i].project_id){
+				$scope.scenariosformodule = getDetails[i].module_details;
+				$(".mtgModules").empty();
+				$(".mtgModules").append("<option value='' selected disabled>Select Module</option>");
+				for(var j=0; j<getDetails[i].module_details.length; j++){
+					$(".mtgModules").append("<option value='"+getDetails[i].module_details[j].module_id+"'>"+getDetails[i].module_details[j].module_name+"</option>");
+				}
+				break;
+			}
+		}
+	})
+
+	//Load Scenarios
+	$(document).on('change', '.mtgModules', function(){
+		var moduleId = $(this).find("option:selected").val();
+		var getDetails = $scope.scenariosformodule;
+		for(var i=0; i<getDetails.length; i++){
+			if(moduleId == getDetails[i].module_id){
+				$scope.testcaseforscenario = getDetails[i].scenario_details;
+				$(".mtgScenarios").empty();
+				$(".mtgScenarios").append("<option value='' selected disabled>Select Scenario</option>");
+				for(var j=0; j<getDetails[i].scenario_details.length; j++){
+					$(".mtgScenarios").append("<option value='"+getDetails[i].scenario_details[j].scenario_id+"'>"+getDetails[i].scenario_details[j].scenario_name+"</option>");
+				}
+				break;
+			}
+		}
+	})
+
+	//Load Test Case
+	$(document).on('change', '.mtgScenarios', function(){
+		var scenarioId = $(this).find("option:selected").val();
+		var getDetails = $scope.testcaseforscenario;
+		for(var i=0; i<getDetails.length; i++){
+			if(scenarioId == getDetails[i].scenario_id){
+				$(".mtgScenarioList").empty();
+				for(var j=0; j<getDetails[i].testcase_details.length; j++){
+					$(".mtgScenarioList").append("<li data-testcaseid='"+getDetails[i].testcase_details[j].testcase_id+"'>"+getDetails[i].testcase_details[j].testcase_name+"</li>");
+				}
+				break;
+			}
+		}
+		if($(".mtgScenarioList").find("li").length > 11){
+			$('.scrollbar-inner').scrollbar();
+		}
+	})
+
+	//Adding selection class for Testcase option(right upper section of Test Lab)
+	$(document).on('click', '.mtgScenarioList li', function(){
+		$(this).siblings().removeClass("selectTestcaseMTG");
+		$(this).addClass("selectTestcaseMTG");
+	})
+
+	//Adding selection class for Fields required option(left bottom section of Test Lab)
+	$(document).on('click', '.almfieldsList ul li', function(){
+		$(this).siblings().removeClass("selectfieldsList");
+		$(this).addClass("selectfieldsList");
+	})
+
+	//Adding selection class for ALM Fileds option(right bottom section of Test Lab)
+	$(document).on('click', '.almFieldExcel li', function(){
+		if($(this).find("label").text() != "Subject" && $(this).find("label").text() != "Test Case" && $(this).find("label").text() != "Type"){
+			$(this).siblings().removeClass("selectALMExcel");
+			$(this).addClass("selectALMExcel");
+		}
+	})
+
+	//Move to Fields required list(left bottom section of Test Lab)
+	$scope.addToAlmFields = function(){
+		var fieldName = $(".selectfieldsList:not(.selectfieldsListAdded)").text();
+		$(".selectfieldsList").addClass("selectfieldsListAdded");
+		switch (fieldName){
+			case "Description":
+			case "Step Name":
+			case "Step Description":
+			case "Author":
+			case "Creation Date":
+				$(".almFieldExcel").append("<li><label>"+fieldName+"</label><span><input type='text' disabled></input></span></li>");
+				break;
+			case "Expected Results":
+				$(".almFieldExcel").append("<li><label>"+fieldName+"</label><span><input type='text'></input></span></li>");
+				break;
+			case "Status":
+				$(".almFieldExcel").append("<li><label>"+fieldName+"</label><span><input type='text' disabled value='Design'></input></span></li>");
+				break;
+			default:
+				return;
+		}
+		$(".selectfieldsListAdded").hide();
+		if($(".almFieldExcel").find("li").length > 7){
+			$('.scrollbar-inner').scrollbar();
+		}
+	}
+
+	//Remove from ALM Field(right bottom section of Test Lab)
+	$scope.removeFromAlmField = function(){
+		var ListName = $(".selectALMExcel label").text();
+		if(ListName){
+			$(".selectALMExcel").remove();
+			$.each($(".almfieldsList li.selectfieldsListAdded"), function(){
+				if($(this).text() == ListName){
+					$(this).show();
+					$(this).removeClass("selectfieldsListAdded");
+				}
+			})
+		}
+	}
+
+	//Generate Manual Testcase details
+	$scope.saveTestlabdetails = function(){
+		var tCaseId = $(".selectTestcaseMTG").data("testcaseid");
+		var getMTGColumns = $(".almFieldExcel li");
+		var testcasedetails = {};
+		var testLabdetails = {};
+		testcasedetails["testcase_id"] = tCaseId;
+		$.each(getMTGColumns, function(){
+			var key = $(this).children("label").text();
+			var value = $(this).find("span input").val();
+			testLabdetails[key] = value;
+		})
+		testcasedetails["testLabdetails"] = testLabdetails;
 	}
 	//Global moded popup
 	function openModelPopup(title, body){
