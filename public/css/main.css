@@ -4111,8 +4111,8 @@ select:-webkit-autofill:focus {
 		height: calc(100% - 410px);
 	}
 	.reportStatus{margin-top: 55px;}
-	.suitestartend thead, .scenarioReports thead    width: calc(100% - 797px); 
-	.scroll-wrapper.scrollbar-inner-rep     max-height: 242px !important; 
+	.suitestartend thead, .scenarioReports thead{width: calc(100% - 797px);} 
+	.scroll-wrapper.scrollbar-inner-rep{max-height: 242px !important;}
 }
 
 @media screen and (min-height: 1000px) and (max-height: 1080px){
@@ -4125,7 +4125,7 @@ select:-webkit-autofill:focus {
 	.reportStatus{margin-top:12px;}
 	.scroll-wrapper.scrollbar-inner-rep{max-height: 154px !important;}
 	.project-left2{padding: 0 47px 0 0;}
-	#allProjectAP,#assignedProjectAP, #allProjectAP[size],#assignedProjectAP[size]{min-height: 258px; !important;}
+	#allProjectAP,#assignedProjectAP, #allProjectAP[size],#assignedProjectAP[size]{min-height: 258px !important;}
 	.endtoend-modulesContainer{height: 28% !important;}
 }
 /**********Specifically for Firefox**********/

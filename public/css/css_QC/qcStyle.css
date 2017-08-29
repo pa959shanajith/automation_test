@@ -33,7 +33,7 @@
     border: 1px solid #000;
     position: relative;
     top: 14px;
-    height: 700px;
+    height: 680px;
     padding: 5px;
     width: calc(100% - 500px);
     float: left;
@@ -53,11 +53,11 @@
 .qcTreeContainer, .qcN68TreeContainer{
     float: left;
     width: 100%;
-    height: 626px;
+    height: 616px;
     margin-top: 20px;
     padding: 0 6px 0 6px;
 }
-.qcTreeContainer ul:nth-child(1), .qcN68TreeContainer ul:nth-child(1){height: 626px !important;}
+.qcTreeContainer ul:nth-child(1), .qcN68TreeContainer ul:nth-child(1){height: 616px !important;}
 .qcTreeContainer ul, .qcN68TreeContainer ul{padding: 0 !important;}
 .qcTreeContainer ul label{margin-left: 10px;}
 .qcTreeContainer ul li.testSet label{margin-left: 34px !important; position: relative; top: 3px; overflow: hidden; text-overflow: ellipsis; width: 265px; white-space: nowrap;margin-bottom: 0;}
@@ -189,4 +189,9 @@
     .leftQcStructure, .rightQcStructure{
         height: 400px;
     }
+}
+/**********Specifically for Internet Explorer**********/
+@media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {    
+    .qcActionBtnFirstChild{margin-left: 458px !important;}
+    .qcTreeContainer, .qcN68TreeContainer{height: 600px;}
 }
