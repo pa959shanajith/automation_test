@@ -503,7 +503,7 @@ body {
     -moz-transform: translateX(-84%) translateY(-50%);
     -webkit-transform: translateX(-84%) translateY(-50%);
     -ms-transform: translateX(-84%) translateY(-50%);
-    padding: 20px 10px;
+    padding: 20px 0px;
     cursor: pointer
 }
 
@@ -4408,7 +4408,7 @@ select:-webkit-autofill:focus {
 		transform: translateX(-99%) translateY(-50%);
     	-moz-transform: translateX(-99%) translateY(-50%);
     	-ms-transform: translateX(-99%) translateY(-50%);
-		padding: 20px 5px;
+		/*padding: 20px 5px;*/
 	}
 }
 
