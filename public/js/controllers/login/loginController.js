@@ -31,7 +31,7 @@ mySPA.controller('loginController', function ($scope, $http, $location, LoginSer
 			var password = $scope.password;
 			LoginService.authenticateUser_Nineteen68(username, password)
 			.then(function (data) {
-				if(data != "fail" && data != "noProjectsAssigned"){
+				if(data.flag != "fail" && data.flag != "noProjectsAssigned"){
 					if (data == 'inValidCredential') {
 						$(".ic-username").children().attr("src", "imgs/ic-username-error.png");
 						$(".ic-password").children().attr("src", "imgs/ic-password-error.png");
@@ -39,6 +39,10 @@ mySPA.controller('loginController', function ($scope, $http, $location, LoginSer
 						$scope.loginValidation = "The username or password you entered isn't correct. Please try again.";
 						cfpLoadingBar.complete();
 					}
+                    // else if(data == "userLogged"){
+                    //     $scope.loginValidation = "User is already logged in!";
+					// 	cfpLoadingBar.complete();
+				    // }
 					else {
 						if (data == 'validCredential') {
 							cfpLoadingBar.complete();
@@ -95,6 +99,10 @@ mySPA.controller('loginController', function ($scope, $http, $location, LoginSer
 								}
 								else	console.log("Failed to Load UserInfo.");
 							}, function (error) { console.log("Fail to Load UserInfo") });
+						}
+						else if(data == "userLogged"){
+							 $scope.loginValidation = "User is already logged in! Please logout from the previous session.";
+						     cfpLoadingBar.complete();
 						}
 					}
 				}

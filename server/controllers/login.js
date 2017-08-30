@@ -10,6 +10,7 @@ var bcrypt = require('bcrypt');
 var async = require('async');
 var epurl="http://127.0.0.1:1990/";
 var Client = require("node-rest-client").Client;
+var myserver = require('../../server.js');
 var client = new Client();
 
 //Global Variables
@@ -18,6 +19,8 @@ var userRoles = {};
 
 //Authenticate User - Nineteen68
 exports.authenticateUser_Nineteen68 = function(req, res){
+      // console.log("session value ",myserver.sessionCreated.length);
+      // myserver.sessionCreated.push("name")
       try{
               
             console.log("Inside Authenticate User");
@@ -27,6 +30,10 @@ exports.authenticateUser_Nineteen68 = function(req, res){
             var sessId = req.session.id;
             req.session.username = username;
             req.session.uniqueId = sessId;
+            console.log(myserver.sessionCreated);
+            if(myserver.sessionCreated.indexOf(username) >= 1){
+                  return res.send("userLogged");
+            }
             var flag= 'inValidCredential';
                      var assignedProjects = false;
                      var validUser = false;
@@ -70,9 +77,11 @@ exports.authenticateUser_Nineteen68 = function(req, res){
                                                                                          assignedProjects = true;
                                                                                   }
                                                                                   if(validUser == true && assignedProjects == true){
-                                                                                  
-                                                                                         flag = 'validCredential';
+                                                                                         flag = 'validCredential';                                                                                 
+                                                                                         myserver.sessionCreated.push(username)
+                                                                                         console.log("session value ",myserver.sessionCreated);
                                                                                          res.setHeader('Set-Cookie', sessId);
+                                                                                         console.log();
                                                                                          res.send(flag);
                                                                                          
                                                                                   }
@@ -83,17 +92,21 @@ exports.authenticateUser_Nineteen68 = function(req, res){
                                                                                   }
                                                                                   else{
                                                                                          res.send(flag);
+                                                                                         console.log("session value ",myserver.sessionCreated);
+                                                                                         myserver.sessionCreated.push(username)
                                                                                   }  
                                                                      }
                                                                      else{
                                                                            if(validUser == true){
                                                                                          flag = 'validCredential';
+                                                                                         myserver.sessionCreated.push(username)
+                                                                                         console.log("session value ",myserver.sessionCreated.length);
                                                                                          res.setHeader('Set-Cookie', sessId);
                                                                                          res.send(flag);
                                                                                   }
                                                                            else{
                                                                                          res.send(flag);
-                                                                                  }  
+                                                                              }  
                                                                      }
                                                                      
                                                        });

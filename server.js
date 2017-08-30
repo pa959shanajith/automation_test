@@ -1,4 +1,4 @@
-//Module Dependencies
+// Module Dependencies
 var cluster = require('cluster');
 if (cluster.isMaster) {
     //    cluster.fork();
@@ -38,7 +38,8 @@ if (cluster.isMaster) {
     var httpsServer = require('https').createServer(credentials, app);
     var io = require('socket.io')(httpsServer);
     module.exports = app;
-    module.exports.allSocketsMap = {}
+    module.exports.allSocketsMap = {};
+    module.exports.sessionCreated = ["name1"];
     app.use(bodyParser.json({
         limit: '10mb'
     }));
@@ -324,7 +325,7 @@ if (cluster.isMaster) {
 
 	//SOCKET CONNECTION USING SOCKET.IO
     var allClients = [];
-
+    var sessionCreated = []
     var allSockets = [];
     var socketMap = {};
     var socketMapUI = {};
@@ -355,6 +356,7 @@ if (cluster.isMaster) {
         socket.send('connected');
         module.exports.allSocketsMap = socketMap;
         module.exports.allSocketsMapUI = socketMapUI;
+        module.exports.sessionCreated = ["name1"];
         httpsServer.setTimeout();
 
         socket.on('message', function(data) {

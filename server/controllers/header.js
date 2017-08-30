@@ -6,7 +6,8 @@ var dbConn = require('../../server/config/icetestautomation');
 var cassandra = require('cassandra-driver');
 var client_cas = require('../../server/config/cassandra');		
 var async = require('async');
-
+var myserver = require('../../server.js');
+var username;
 exports.getProjectDetails_ICE = function (req, res) {
 	if(req.cookies['connect.sid'] != undefined)
 		{
@@ -50,14 +51,7 @@ exports.getProjectDetails_ICE = function (req, res) {
 				res.send("Invalid Session");
 			}
         }
-exports.logoutUser_Nineteen68 = function (req, res) {
-       req.cookies['connect.sid'] = '';
-		req.session.destroy();
-        if(req.session == undefined)
-        {
-            res.send('Session Expired');
-        }
-};
+
 /**
  * @author shree.p
  * @see function to logout in Nineteen68 from jenkins
@@ -284,7 +278,7 @@ exports.userPlugins_Nineteen68 = function(req, res){
 			sessionToken = sessionToken[1];		
 		}		
 		if(sessionToken != undefined && req.session.id == sessionToken){		
-			var username = req.body.username.toLowerCase();		
+			username = req.body.username.toLowerCase();		
 			var roleName = req.body.rolename;		
 			var roleID = req.body.roleId;		
 			//display plugins		
@@ -306,7 +300,7 @@ exports.userPlugins_Nineteen68 = function(req, res){
 								    for(var k in pluginResult.rows[0]){		
 								    	if(count < pluginResult.columns.length){		
 								    		pluginsArr.push({		
-								    			"keyName" : k,		
+								    			"keyName" : k,	
 								    			"keyValue" : (pluginResult.rows[0])[k]		
 								    		})		
 								    		count++;		
@@ -338,3 +332,19 @@ exports.userPlugins_Nineteen68 = function(req, res){
 		res.send("fail");		
 	}
 }
+
+exports.logoutUser_Nineteen68 = function (req, res) {
+	var username = req.body.UserName;
+	var index = myserver.sessionCreated.indexOf(username);
+       req.cookies['connect.sid'] = '';
+		req.session.destroy();
+        if(req.session == undefined)
+        {
+			myserver.sessionCreated.splice(index, 1);
+	        console.log("session value header : ",myserver.sessionCreated);
+            res.send('Session Expired');
+        }
+};
+
+//var index = array.indexOf(username); 
+//array.splice(index, 1); 
