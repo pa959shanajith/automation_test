@@ -178,7 +178,7 @@ var createNewMap_W = function(e){
 	clearSvg_W();
 	var s=getElementDimm(d3.select("#ct-mapSvg"));
 	//X and y changed to implement layout change
-	node={projectID:$('#selectProjectEtem').val(),id:uNix_W,childIndex:0,name:'Module_0',type:'modules_endtoend',y:s[0]*0.2,x:s[1]*0.4,children:[],parent:null};
+	node={projectID:$('#selectProjectEtem').val(),id:uNix_W,childIndex:0,name:'Module_0',type:'modules_endtoend',y:s[1]*0.4,x:s[0]*0.2,children:[],parent:null};
 	dNodes_W.push(node);nCount[0]++;uNix_W++;
 	//To fix issue 710-Create a module and see that module name does not display in edit mode
 	v=addNode_W(dNodes_W[uNix_W-1],!1,null);
@@ -247,16 +247,17 @@ var addNode_W = function(n,m,pi){
 	
 	if(m&&pi){
 		var p=d3.select('#ct-node-'+pi.id);
-		if(!p.select('circle.ct-cRight')[0][0]) p.append('circle').attr('class','ct-'+pi.type+' ct-cRight ct-nodeBubble').attr('cx',20).attr('cy',55).attr('r',4).on('click',toggleNode_W);
+		if(!p.select('circle.ct-cRight')[0][0]) p.append('circle').attr('class','ct-'+pi.type+' ct-cRight ct-nodeBubble').attr('cx',43).attr('cy',20).attr('r',4).on('click',toggleNode_W);
 		//Logic to change the layout
-		v.append('circle').attr('class','ct-'+n.type+' ct-cLeft ct-nodeBubble').attr('cx',20).attr('cy',-3).attr('r',4);//.on('mousedown',moveNodeBegin).on('mouseup',moveNodeEnd);
+		//v.append('circle').attr('class','ct-'+n.type+' ct-cLeft ct-nodeBubble').attr('cx',20).attr('cy',-3).attr('r',4);//.on('mousedown',moveNodeBegin).on('mouseup',moveNodeEnd);
 		v.append('circle').attr('class','ct-'+n.type+' ct-cLeft ct-nodeBubble').attr('cx',-3).attr('cy',20).attr('r',4).on('mousedown',moveNodeBegin_W).on('mouseup',moveNodeEnd_W);
 	}
 	return v;
 };
 var addLink_W = function(r,p,c){
-	var s=[p.x+20,p.y+55];
-	var t=[c.x+20,c.y-3];
+	//Modified parameters to change the layout
+	var s=[p.x+43,p.y+20];
+	var t=[c.x-3,c.y+20];
 	var d=genPathData_W(s,t);
 	var l=d3.select('#ct-mindMap').insert('path','g').attr('id','ct-link-'+r).attr('class','ct-link').attr('d',d);
 };
@@ -284,11 +285,14 @@ var createScenario_Node = function(text,scenario_prjId){
 		if(dNodes_W[pi].children.length >0){
 			arr=dNodes_W[pi].children;
 			index=dNodes_W[pi].children.length-1;
-			node.x=arr[index].x+80;
-			node.y=arr[index].y;
+//			layout_change
+			node.y=arr[index].y+80;
+			node.x=arr[index].x;
+
 		}else{
-			node.x=dNodes_W[pi].x;
-			node.y=dNodes_W[pi].y+125;
+			//Modified parameters to change the layout
+			node.y=dNodes_W[pi].y;
+			node.x=dNodes_W[pi].x+125;
 		}
 		
 		dNodes_W.push(node);
@@ -381,6 +385,7 @@ var editNode_W = function(e,node){
 	d3.select('#ct-inpAct').attr('data-nodeid',null).property('value',name).node().focus();
 	d3.select('#ct-inpSugg').classed('no-disp',!0);
 };
+
 var deleteNode_W = function(e){
 	//If module is in edit mode, then return do not add any node
 	if(d3.select('#ct-inpBox').attr('class')=="") return;
@@ -477,7 +482,8 @@ var moveNodeEnd_W = function(e){
 			if(ci<=(i+1)){
 				return false;
 			}
-			if(l[0]<a.x){
+			//layout change
+			if(l[1]<a.y){
 				if(counter==-1) counter=(i+1);
 				a.childIndex++;
 				curNode.childIndex=counter;
@@ -488,7 +494,8 @@ var moveNodeEnd_W = function(e){
 		var counter=0;
 		var flag=false;
 		dNodes_W[pi].parent.children.forEach(function(a,ci){
-			if(l[0]>a.x){
+			//layout change
+			if(l[1]>a.y){
 				counter=(ci+1);
 				a.childIndex--;
 				curNode.childIndex=counter;
@@ -497,7 +504,7 @@ var moveNodeEnd_W = function(e){
 	};
 	var currentChildIndex=curNode.childIndex;
 	var totalChildren=curNode.parent.children;
-	if(l[0]<curNode.x){
+	if(l[1]<curNode.y){
 		//alert('moved up');
 		changeOrderRight(curNode,currentChildIndex,totalChildren);
 	}else{
@@ -756,7 +763,7 @@ var actionEvent_W = function(e){
 			unassignTask=[];
 			//var selectedTab = window.localStorage['tabMindMap']
 			openDialogMindmap("Success", "Data saved successfully");
-			
+						
 			
 			 dataSender({task:'getModules',tab:'endToend',prjId:$("#selectProjectEtem").val()},function(err,result){
 				 	if(err) console.log(result);
@@ -989,9 +996,9 @@ var treeBuilder_W = function(tree){
 	dNodes_W=d3Tree.nodes(tree);
 	//dLinks_W=d3Tree.links(dNodes_W);
 	dNodes_W.forEach(function(d){
-		//d.y=d.x;
+		d.y=d.x;
 		//Logic to change the layout and to reduce the length of the links
-		d.y=cSize[0]*0.1*(0.9+typeNum[d.type]);
+		d.x=cSize[0]*0.1*(0.9+typeNum[d.type]);
 
 
 
@@ -1006,6 +1013,6 @@ var treeBuilder_W = function(tree){
 		addLink_W(d.id,d.source,d.target);
 	});
 	//zoom.translate([0,(cSize[1]/2)-dNodes_W[0].y]);
-	zoom_W.translate([(cSize[0]/2)-dNodes_W[0].x,(cSize[1]/5)-dNodes_W[0].y]);
+	zoom_W.translate([(cSize[0]/3)-dNodes_W[0].x,(cSize[1]/2)-dNodes_W[0].y]);
 	zoom_W.event(d3.select('#ct-mapSvg'));
 };
