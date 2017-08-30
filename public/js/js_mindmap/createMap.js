@@ -731,7 +731,10 @@ var nodeClick = function(e){
 
 	});
 	//var cSize=getElementDimm(c);
-	var cSize=[270,386];
+	// Removed assgin box overflow (Himanshu)
+	var cSize=[268,386];
+	if(t=='modules' || t=='modules_endtoend') cSize=[268,452];
+	//var cSize1=[270,386];
 	var canvSize=getElementDimm(d3.select("#ct-mapSvg"));
 	var split_char=',';
 	if(isIE) split_char=' ';
@@ -739,6 +742,14 @@ var nodeClick = function(e){
 	l=[(parseFloat(l[0])+50)*cScale+cSpan[0],(parseFloat(l[1])-20)*cScale+cSpan[1]];
 	if(canvSize[0]-l[0]<cSize[0]) l[0]=l[0]-cSize[0]-60*cScale;
 	if(canvSize[1]-l[1]<cSize[1]) l[1]=canvSize[1]-cSize[1]-10*cScale;
+	c.style('top',l[1]+'px').style('left',l[0]+'px').classed('no-disp',!1);
+
+
+	if(l[1]<0)
+		l[1]=0;
+	else if(l[1]>sizesvg[1]-cSize[1])
+		l[1]=sizesvg[1]-cSize[1]-50;
+
 	c.style('top',l[1]+'px').style('left',l[0]+'px').classed('no-disp',!1);
 	
 	//condition to disable unassign task button

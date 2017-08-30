@@ -336,7 +336,17 @@ mySPA.controller('mindmapController', ['$scope', '$http', '$location', '$timeout
 			$(this).siblings("input").prop("checked",false);
 		}
 		else $(this).siblings("input").prop("checked",true);*/
+// #894: Add button should be enabled only if some scenario is selected
 		$(this).toggleClass('selectScenariobg');
+        var classflag=false;
+        d3.select('.addScenarios-ete').classed('disableButton',!0);
+		$.each($('.eteScenrios'), function(){
+			if($(this).hasClass('selectScenariobg')){
+                classflag=true;
+                console.log(classflag);
+                d3.select('.addScenarios-ete').classed('disableButton',!1);
+        }})
+        
 	})
     // $(".highlightImg").on('click',function(e) {
     //     if(e.target.id == "reqImg" || e.target.id == "createImg" ||  e.target.id == "assignImg" || 

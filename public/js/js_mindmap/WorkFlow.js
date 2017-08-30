@@ -866,6 +866,8 @@ $(document).on('click', '.createNew-ete', function(e){
 })
 
  $(document).on('click', '.moduleContainer', function(e){
+ // #894: Add button disabled by default
+	 	$('.addScenarios-ete').addClass('disableButton');
 		//#821 UI issues in e2e
  	    $('#eteSearchScenarios').val("");
 
@@ -880,10 +882,10 @@ $(document).on('click', '.createNew-ete', function(e){
 		dataSender({task:'populateScenarios',moduleId:moduleid},function(err,result){
 			if(err) console.log(result);
 			else{
-				d3.select('.addScenarios-ete').classed('disableButton',!0);
+				//d3.select('.addScenarios-ete').classed('disableButton',!0);
 				result=JSON.parse(result);
 				if(result!=''){
-					d3.select('.addScenarios-ete').classed('disableButton',!1);
+					//d3.select('.addScenarios-ete').classed('disableButton',!1);
 				}
 				result.forEach(function(row){
 					container.append("<span class='eteScenrios' data-scenarioId='"+row.testScenarioID_c+"' title='"+row.testScenarioName+"'>"+row.testScenarioName+"</span>")
