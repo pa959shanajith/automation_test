@@ -677,8 +677,8 @@ var actionEvent_W = function(e){
 	if(s.attr('id')=='ct-saveAction_W'){
 		flag=10;
 		d3.select('#ct-inpBox').classed('no-disp',!0);
-		saveFlag=true;
-		$('#ct-createAction_W').removeClass('disableButton');
+//		saveFlag=true;
+//		$('#ct-createAction_W').removeClass('disableButton');
 		
 	}
 	else if(s.attr('id')=='ct-createAction_W'){
@@ -763,7 +763,9 @@ var actionEvent_W = function(e){
 			unassignTask=[];
 			//var selectedTab = window.localStorage['tabMindMap']
 			openDialogMindmap("Success", "Data saved successfully");
-						
+			// fix for 1046:  "Create" does not work when we add scenarios from different projects
+			saveFlag=true;
+			$('#ct-createAction_W').removeClass('disableButton');	
 			
 			 dataSender({task:'getModules',tab:'endToend',prjId:$("#selectProjectEtem").val()},function(err,result){
 				 	if(err) console.log(result);
