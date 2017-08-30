@@ -112,6 +112,7 @@ mySPA.controller('loginController', function ($scope, $http, $location, LoginSer
 						cfpLoadingBar.complete();
 				}
 				else{
+					$scope.loginValidation = "Failed to Login.";
 					console.log("Fail to Login.")
 				}
 			}, function (error) { console.log("Failed to Authenticate User") });
