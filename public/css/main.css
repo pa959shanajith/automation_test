@@ -1,4 +1,5 @@
 @charset "utf-8";
+
 .ngViewCustom,
 .viewAreaStyle,
 body,
@@ -491,7 +492,7 @@ body {
 }
 
 .plugin-block span {
-    font-size: 15px;
+    font-size: 17px;
     line-height: 21px;
     color: #fff;
     position: absolute;
@@ -1017,7 +1018,6 @@ input[disabled]{
     margin-left: 8px;
     margin-top: -2px;
  }
-
 #switchRole{
  cursor: pointer;
 }
@@ -1027,6 +1027,51 @@ input[disabled]{
     padding-left: 40px;
  }
 /* switch role css */
+/*******Compare Objects **********/
+.custList
+{
+    padding-left: 1px;
+    overflow: auto;
+    max-height: 60px;
+    color: #000;
+}
+.compareObj
+{
+    float: left;
+    width: 80%;
+    margin-top: 2%;
+}
+.compareObjHeading
+{
+    padding: 1px 15px !important;
+    background-color: #633691 !important;
+    font-size: 16px !important;
+    color: #fff !important;
+    font-family: 'LatoWebLight' !important;
+}
+.compareObjPanelBody
+{
+    max-height: 200px;
+    overflow:auto;
+    padding: 0px !important;
+}
+.parentCompareObj
+{
+    float: left;
+    width: 85%;
+    margin-top: 2%;
+}
+.customTxtName,.customTxtName:hover
+{
+    font-family: 'LatoWeb' !important;
+    text-decoration: none !important;
+    color: #33363B !important;
+    font-size: 16px !important;
+    line-height: 20px !important;
+    position: relative !important;
+    height: 18px !important;
+}
+
 
 /*** Web service Screen **/
 .WebServcieScreen{
@@ -1320,56 +1365,10 @@ input[disabled]{
 	text-align: center;
     padding: 5px 0;
 }
-/*******Compare Objects **********/
-.custList
-{
-    padding-left: 1px;
-    overflow: auto;
-    max-height: 60px;
-    color: #000;
-}
-.compareObj
-{
-    float: left;
-    width: 80%;
-    margin-top: 2%;
-}
-.compareObjHeading
-{
-    padding: 1px 15px !important;
-    background-color: #633691 !important;
-    font-size: 16px !important;
-    color: #fff !important;
-    font-family: 'LatoWebLight' !important;
-}
-.compareObjPanelBody
-{
-    max-height: 200px;
-    overflow:auto;
-    padding: 0px !important;
-}
-.parentCompareObj
-{
-    float: left;
-    width: 85%;
-    margin-top: 2%;
-}
-.customTxtName,.customTxtName:hover
-{
-    font-family: 'LatoWeb' !important;
-    text-decoration: none !important;
-    color: #33363B !important;
-    font-size: 16px !important;
-    line-height: 20px !important;
-    position: relative !important;
-    height: 18px !important;
-}
+.pairwiseTableInput{
 
-/*.lblChangedObj
-{
-    position: relative;
-    left: -7%;
-}*/
+}
+/* utility plugins */
 .comparedListItems
 {
     float: left;
@@ -1503,6 +1502,7 @@ input[disabled]{
 
 /* multi-select-dropdown end */
 
+
 #wsdlActionsButton{
 	float: left;
     width: 100%;
@@ -1510,6 +1510,9 @@ input[disabled]{
     margin-top: 20px;
     padding-bottom: 10px;
     border-bottom: 1px solid #888;
+}
+.taskname{
+    cursor: pointer;
 }
 
 .wsdlRqstRspns{
@@ -1588,11 +1591,6 @@ input[disabled]{
     -moz-border-radius: 5px;
     -webkit-border-radius: 5px;
 }
-
-.taskname{
-    cursor: pointer;
-}
-
 #scrapTree ul li a {
     font-family: 'LatoWeb';
     text-decoration: none;
@@ -1600,6 +1598,15 @@ input[disabled]{
     font-size: 16px;
     line-height: 20px;
     position: relative;
+}
+.error-mapObj
+{
+    color: #d33c3c;
+    font-family: "LatoWebMedium";
+}
+#scrapedObjforMap li
+{
+    margin-left: -3%;
 }
 
 .highlight{
@@ -1708,16 +1715,6 @@ input[disabled]{
     cursor: pointer;
     float: left;
 }*/
-
-.error-mapObj
-{
-    color: #d33c3c;
-    font-family: "LatoWebMedium";
-}
-#scrapedObjforMap li
-{
-    margin-left: -3%;
-}
 
 .ellipsis
 {
@@ -2038,6 +2035,99 @@ input[disabled]{
 .chatList li{
 	margin-bottom: 10px
 }
+.assistBody {
+	font-family: "Myriad";
+	font-size: 14px;
+	font-weight: normal;
+}
+
+.assistSection {
+	max-width: 450px;
+	margin: 50px auto;
+
+	/*div {
+		max-width: 300px;
+		word-wrap: break-word;
+		margin-bottom: 20px;
+    line-height: 24px;
+	}*/
+}
+
+.assistClear {clear: both}
+.assistFrom-me {
+	position:relative;
+	padding:10px 20px;
+	color:white; 
+	background:#643693;
+	border-radius:25px;
+	/*float: right;*/
+    margin-top: 5px;
+    display: -webkit-inline-box;
+
+		
+	/*&:before {
+		content:"";
+		position:absolute;
+		z-index:-1;
+		bottom:-2px;
+		right:-7px;
+		height:20px;
+		border-right:20px solid #643693;
+		border-bottom-left-radius: 16px 14px;
+		-webkit-transform:translate(0, -2px);
+	}
+
+	&:after {
+		content:"";
+		position:absolute;
+		z-index:1;
+		bottom:-2px;
+		right:-56px;
+		width:26px;
+		height:20px;
+		background:white;
+		border-bottom-left-radius: 10px;
+		-webkit-transform:translate(-30px, -2px);
+	}*/
+}
+.assistFrom-them {
+	position:relative;
+	padding:10px 20px;
+	background:#E5E5EA;
+	border-radius:25px;
+	color: black;
+  /*float: left;*/
+
+    display: -webkit-inline-box;
+    margin-top: 5px;
+    /* border: 1px solid; */
+
+		
+	/*&:before {
+		content:"";
+		position:absolute;
+		z-index:2;
+		bottom:-2px;
+		left:-7px;
+		height:20px;
+		border-left:20px solid #E5E5EA;
+		border-bottom-right-radius: 16px 14px;
+		-webkit-transform:translate(0, -2px);
+	}
+
+	&:after {
+		content:"";
+		position:absolute;
+		z-index:3;
+		bottom:-2px;
+		left:4px;
+		width:26px;
+		height:20px;
+		background:white;
+		border-bottom-right-radius: 10px;
+		-webkit-transform:translate(-30px, -2px);
+	}*/
+}
 
 .animateAssistUp, .animateAssistDown{
 	padding:5px 0px
@@ -2210,48 +2300,6 @@ input[disabled]{
 	display: block;
 	float: left;
 }
-
-/* Batch Scheduling */
-.scheduleSuiteTable{
-	float:left;
-	width:100%;
-	height: calc(100% - 31px);
-	overflow: scroll;
-}
-.scheduleSuite{
-    background: #331d4e;
-    width: 100%;
-    padding: 2px;
-    height: 35px;
-    border-radius: 6px;
-}
-.scheduleSuite .ipContainer{
-	float: left;
-    margin-right: 10px;
-}
-.scheduleSuite .ipformating{
-	height: 27px;
-    margin-top: 2px;
-}
-.scheduleSuite .datePicContainer{
-	position: relative;
-    float: left;
-    margin-right: 10px;
-}
-.scheduleSuite .timePicContainer{
-	position: relative; display: inline-block;
-}
-.datePicContainer input, .timePicContainer input{margin-top: 2px; height: 27px;}
-.selectScheduleSuite{float: left; margin: 10px 6px 0 6px !important;}
-.scheduleSuiteName{
-	float: left;
-	color: white;
-    margin-top: 7px;
-    width: 327px;
-    padding: 0 10px 0 2px;
-}
-/* Batch Scheduling */
-
 .executionDataTable tbody tr:nth-child(odd), .scheduleDataBodyRow:nth-child(odd), .designDataTable tbody tr:nth-child(odd){
 	/*background:#e8e6ff;	*/
     background: #e8e6fe;
@@ -2271,7 +2319,7 @@ input[disabled]{
     margin-top: 0px !important;
 }
 
-#scheduledDataBody{
+#scheduleDataBody, #scheduledDataBody{
 	float:left;
 	width:100% !important;
 	margin-top: 28px;
@@ -2389,6 +2437,7 @@ input[disabled]{
 .scenarioBody tr td:first-child{text-align: left;}
 .scenarioBody tr td:first-child span{margin-right: 10px; margin-left: 4px;}
 .scenarioBody tr td:first-child input{position: relative;top: 2px;}
+
 .selectBrowser, .selectBrowserSc{
 	cursor: pointer;
 }
@@ -2452,6 +2501,46 @@ input[disabled]{
     top: 2px;
 }
 /******Exectuion Mid Section******/
+/* Batch Scheduling */
+.scheduleSuiteTable{
+	float:left;
+	width:100%;
+	height: calc(100% - 31px);
+	overflow: scroll;
+}
+.scheduleSuite{
+    background: #331d4e;
+    width: 100%;
+    padding: 2px;
+    height: 35px;
+    border-radius: 6px;
+}
+.scheduleSuite .ipContainer{
+	float: left;
+    margin-right: 10px;
+}
+.scheduleSuite .ipformating{
+	height: 27px;
+    margin-top: 2px;
+}
+.scheduleSuite .datePicContainer{
+	position: relative;
+    float: left;
+    margin-right: 10px;
+}
+.scheduleSuite .timePicContainer{
+	position: relative; display: inline-block;
+}
+.datePicContainer input, .timePicContainer input{margin-top: 2px; height: 27px;}
+.selectScheduleSuite{float: left; margin: 10px 6px 0 6px !important;}
+.scheduleSuiteName{
+	float: left;
+	color: white;
+    margin-top: 7px;
+    width: 327px;
+    padding: 0 10px 0 2px;
+}
+/* Batch Scheduling */
 
 
 /******Scenario Details Modal******/
@@ -2481,6 +2570,7 @@ input[disabled]{
 	-webkit-transform:translate(-50%, -50%);
 	-ms-transform:translate(-50%, -50%);
 }
+
 .scenarioDetails{
 	float:left;
 	width:100%;
@@ -2857,8 +2947,9 @@ input[disabled]{
 	padding-right:20px;
 }
 .addCustObj{
-	background: linear-gradient(to right, #bb9cda, transparent 40%);
+    background: linear-gradient(to right, #bb9cda, transparent 40%);
     border-radius: 5px;
+	color: blue;
 }
 li.select_all .addCustObj{
     padding-left: 5px;
@@ -2867,6 +2958,10 @@ li.select_all .addCustObj{
 #scrapedObjforMap li span{
 	font-size: 15px;
 	top:2px;
+}
+#userName		
+{		
+    text-transform: lowercase;		
 }
 
 .accd-Obj, .accd-Obj-head, .accd-Obj-body{
@@ -2982,10 +3077,7 @@ li.select_all .addCustObj{
     overflow: hidden;
     text-overflow: ellipsis;
 }
-#userName		
-{		
-    text-transform: lowercase;		
-}
+
 
 /******************Header CSS***************************/
 
@@ -3001,8 +3093,15 @@ li.select_all .addCustObj{
 	float: right;
 	width: auto;
 }
+
 .adminBtn {
 	padding: 2px 25px !important;
+}
+.secondaryRole{
+	width: auto;
+	vertical-align: middle;
+	font-weight: normal;
+	line-height: 2;
 }
 
 .adminForm {
@@ -3037,13 +3136,6 @@ li.select_all .addCustObj{
 }
 
 .primaryRole {
-	width: auto;
-	vertical-align: middle;
-	font-weight: normal;
-	line-height: 2;
-}
-
-.secondaryRole{
 	width: auto;
 	vertical-align: middle;
 	font-weight: normal;
@@ -3165,14 +3257,36 @@ li.select_all .addCustObj{
     -ms-border-radius: 6px;
 }
 
-#selAssignDomain, #selAssignUser {
+#selDomain, #selDomainEdit, #selAssignDomain, #selAssignUser {
 	    position: relative;
         left: 10px
 }
-
+#selDomain, #selDomainEdit, #selAssignProject{
+    margin-left: 10px;
+    margin-top: -12px;
+    /*background-color: #eeeeee;*/
+    width: 90%;
+    opacity: 1;
+    border: 1px solid #656565 !important;
+    border-left: 0 !important;
+    border-right: 0 !important;
+    border-top: 0 !important;
+    border-radius: 0;
+    box-shadow: none;
+    color: #333;
+    height: 34px;
+    padding: 6px 12px;
+    font-size: 14px;
+    line-height: 1.42857143;
+}
 #selAssignUser
 {
     margin-left: 6.5%;
+}
+
+#selAssignProject
+{
+    margin-left: 8%;
 }
 
 .appTypesContainer {
@@ -3315,8 +3429,6 @@ li.select_all .addCustObj{
 
 #additionalRoles{
 	position: relative;
-    /*left: 10px;
-    top: 2px;*/
     left: 0px;
     top: 0px;
 }
@@ -3373,14 +3485,6 @@ li.select_all .addCustObj{
 	font-weight: normal;
 	line-height: 2;
 }
-
-.secondaryRole{
-	width: auto;
-	vertical-align: middle;
-	font-weight: normal;
-	line-height: 2;
-}		
-
 
 .selectControl {
 	position: relative;
@@ -3487,23 +3591,8 @@ li.select_all .addCustObj{
     -ms-border-radius: 6px;
 }
 
-#selDomain, #selDomainEdit, #selAssignProject{
-    margin-left: 10px;
-    margin-top: -12px;
-    /*background-color: #eeeeee;*/
-    width: 90%;
-    opacity: 1;
-    border: 1px solid #656565 !important;
-    border-left: 0 !important;
-    border-right: 0 !important;
-    border-top: 0 !important;
-    border-radius: 0;
-    box-shadow: none;
-    color: #333;
-    height: 34px;
-    padding: 6px 12px;
-    font-size: 14px;
-    line-height: 1.42857143;
+#selDomain {
+	margin-left: 2%;
 }
 
 .appTypesContainer {
@@ -3958,6 +4047,7 @@ background: none;
     padding: 16px 0 0 12px;
     color: red;
 }
+
 .halfWrap{
 	width:48%;
 	display: inline-block;
@@ -4327,7 +4417,7 @@ select:-webkit-autofill:focus {
 		height: calc(100% - 410px);
 	}
 	.reportStatus{margin-top: 55px;}
-	.suitestartend thead, .scenarioReports thead{width: calc(100% - 797px);}
+	.suitestartend thead, .scenarioReports thead{width: calc(100% - 797px);} 
 	.scroll-wrapper.scrollbar-inner-rep{max-height: 242px !important;}
 }
 
@@ -4341,7 +4431,7 @@ select:-webkit-autofill:focus {
 	.reportStatus{margin-top:12px;}
 	.scroll-wrapper.scrollbar-inner-rep{max-height: 154px !important;}
 	.project-left2{padding: 0 47px 0 0;}
-	#allProjectAP,#assignedProjectAP, #allProjectAP[size],#assignedProjectAP[size]{min-height: 258px; !important;}
+	#allProjectAP,#assignedProjectAP, #allProjectAP[size],#assignedProjectAP[size]{min-height: 258px !important;}
 	.endtoend-modulesContainer{height: 28% !important;}
 }
 /**********Specifically for Firefox**********/
@@ -4404,8 +4494,6 @@ select:-webkit-autofill:focus {
 .search-reports .searchScrapInput{
   height: 29px;
 }
-
-
 .expandTable{
   margin: -9px;
   padding: 3px;
@@ -4509,7 +4597,7 @@ select:-webkit-autofill:focus {
 #progress-canvas{
   top:40px;
   position: relative;
-  //border:1px solid;
+  /*border:1px solid;*/
   max-height: 600px;
   height : 80%;
 }

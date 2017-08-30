@@ -2381,7 +2381,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				//$("#saveObjects").trigger("click");
 			//},500)
 			$("#dialog-addObject").modal("hide");
-			//openDialog("Add Object", "Objects has been added successfully.")
+			openDialog("Add Object", "Objects has been added successfully.")
 			//$("#addObjectSuccess").modal("show")
 			$("#saveObjects").prop("disabled", false)
 			flag = "false";
@@ -3506,10 +3506,10 @@ function contentTable(newTestScriptDataLS) {
 					|| $("[name='inputVal']").parent().siblings("[aria-describedby='jqGrid_keywordVal']").children().val() == "setHeaderTemplate"	){
 			var getValueInput =$("[name='inputVal']").parent().attr('title');
 			if(getValueInput == undefined){
-				$("[name='inputVal']").parent().html("<textarea rows='1' style='resize:none;width:98%;min-height:25px;' class='form-control'></textarea>")
+				$("[name='inputVal']").parent().html("<textarea rows='1' style='resize:none;width:98%;min-height:25px;' class='editable form-control'></textarea>")
 			}
 			else{
-				$("[name='inputVal']").parent().html("<textarea rows='1' style='resize:none;width:98%;min-height:25px;' class='form-control'>"+getValueInput.split('##').join('\n')+"</textarea>")
+				$("[name='inputVal']").parent().html("<textarea rows='1' style='resize:none;width:98%;min-height:25px;' class='editable form-control'>"+getValueInput.split('##').join('\n')+"</textarea>")
 			}
 		}
 	});
@@ -3520,10 +3520,10 @@ function contentTable(newTestScriptDataLS) {
 					|| $("[name='inputVal']").parent().siblings("[aria-describedby='jqGrid_keywordVal']").children().val() == "setHeaderTemplate"){
 			var getValueInput =$("[name='inputVal']").parent().attr('title');
 			if(getValueInput == undefined){
-				$("[name='inputVal']").parent().html("<textarea rows='1' style='resize:none;width:98%;min-height:25px;' class='form-control'></textarea>")
+				$("[name='inputVal']").parent().html("<textarea rows='1' style='resize:none;width:98%;min-height:25px;' class='editable form-control'></textarea>")
 			}
 			else{
-				$("[name='inputVal']").parent().html("<textarea rows='1' style='resize:none;width:98%;min-height:25px;' class='form-control'>"+getValueInput.split('##').join('\n')+"</textarea>")
+				$("[name='inputVal']").parent().html("<textarea rows='1' style='resize:none;width:98%;min-height:25px;' class='editable form-control'>"+getValueInput.split('##').join('\n')+"</textarea>")
 			}
 		}
 		e.preventDefault();

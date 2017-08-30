@@ -199,20 +199,36 @@
                </span>
             </h4>
             <div class="assistContent">
+                <!--==============================================================================-->
                <!-- Chat Container -->
-               <div class="scroll-wrapper chatContainer scrollbar-inner scrollbar-chatArea chatArea" style="position: relative;">
-                  <div class="chatContainer scrollbar-inner scrollbar-chatArea chatArea scroll-content" style="height: 100px; margin-bottom: 0px; margin-right: 0px; max-height: none;">
-                     <ul class="chatList">
-                        <li>Choose from the available browser icons from the action bar</li>
-                        <li>Enter the URL of the AUT (Application under test)</li>
-                        <li>Click on one of the options available in the Scrape Options
-                           window
-                        </li>
-                        <li>Identify the required objects</li>
-                        <li>Rename the objects as per the naming convention</li>
-                        <li>Click on the save button in the work area</li>
-                        <li>Click on submit to complete task.</li>
-                     </ul>
+               <div id="hello" class="scroll-wrapper chatContainer scrollbar-inner scrollbar-chatArea chatArea" style="position: relative;">
+                  <div id='chatContainerBox' class="chatContainer scrollbar-inner scrollbar-chatArea chatArea scroll-content" style="height: 100px; margin-bottom: 0px; margin-right: 0px; max-height: none;">
+                        <div class="assistFrom-them">
+                            <p> Hello, I’m Prof J. I try to be helpful. (But I’m still just a bot. Sorry!) *Type keywords* and hit _enter_ to send your message. </p><br ng-if="($index+1)%1==0">
+                        </div>
+                        <div ng-repeat="c in conversation">
+                            <div style="text-align: right">
+                            <p ng-if="c.pos == 'assistFrom-me'" class="assistFrom-me">
+                                {{c.text}}
+                            </p>
+                            </div>
+                            <div >
+                            <div ng-if="c.pos == 'assistFrom-them'" class="assistFrom-them">
+                                <!-- 2 cases: 1. If server returned responses-->
+                                <div ng-if="c.text && c.text[0][0] != -1 ">
+                                    <p ng-if="c.type==0">
+                                        Did you mean to ask about one of these? Please click any of the links below or type more keywords if you don’t see the right option.</p>
+                                    <p style="cursor:pointer" ng-repeat="x in c.text" ng-click = "displayAnswer($index)">
+                                         <u>[{{$index + 1}}] {{x[1]}}</u>
+                                    </p>
+                                </div>
+                                <p ng-if="c.text && c.text[0][0] == -1">{{c.text[0][1]}}</p>
+                                <span ng-if="c.type == 1">{{c.text}}</span>
+                                </div>
+                            </div>
+                        
+            
+                        </div>
                   </div>
                   <div class="scroll-element scroll-x">
                      <div class="scroll-element_outer">
@@ -230,9 +246,10 @@
                   </div>
                </div>
                <div class="chatContainer">
-                  <textarea rows="3" cols="" class="chatTextArea form-control" placeholder="Ask Prof.J"></textarea>
-                  <button class="btn btn-md pull-right">Send</button>
+                  <textarea ng-model = "query" rows="3" cols="" class="chatTextArea form-control" ng-keypress="myFunct($event)" placeholder="Ask Prof.J"></textarea>
+                  <button ng-click = "querySend()" class="btn btn-md pull-right">Send</button>
                </div>
+               <!--==============================================================================-->
                <!-- Chat Container -->
             </div>
          </div>
