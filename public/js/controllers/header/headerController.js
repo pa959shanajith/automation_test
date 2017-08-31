@@ -158,6 +158,10 @@ mySPA.controller('headerController', function($scope,$http,$location,headerServi
 							"pluginName" : "Utility",
 							"pluginValue" : "true"
 						})
+						availablePlugins.push({
+										"pluginName" : "Weboccular",
+										"pluginValue" : "true"
+						})
 							data.pluginsInfo = availablePlugins;
 							//window.localStorage['LoginSuccess'] = "True";
 							window.localStorage['_SR'] = additionalRoleName;
@@ -247,8 +251,9 @@ mySPA.controller('headerController', function($scope,$http,$location,headerServi
 	}
 	$scope.logout = function() 
 	{
+		var UserName = JSON.parse(window.localStorage['_UI']).username;
 		//Logout User Service to be called
-		headerServices.logoutUser_Nineteen68() 
+		headerServices.logoutUser_Nineteen68(UserName) 
 		.then(function(data){
 			if(data == "Session Expired")
 			{

@@ -1,4 +1,4 @@
-//Module Dependencies
+// Module Dependencies
 var cluster = require('cluster');
 if (cluster.isMaster) {
     //    cluster.fork();
@@ -51,7 +51,8 @@ if (cluster.isMaster) {
     }
     console.error = console.log;
     module.exports = app;
-    module.exports.allSocketsMap = {}
+    module.exports.allSocketsMap = {};
+    module.exports.sessionCreated = ["name1"];
     app.use(bodyParser.json({
         limit: '10mb'
     }));
@@ -217,6 +218,8 @@ if (cluster.isMaster) {
     var utility = require('./server/controllers/utility');
     var qc = require('./server/controllers/qualityCenter');
     var webCrawler = require('./server/controllers/webCrawler');
+    var chatbot = require('./server/controllers/chatbot');
+
     //Login Routes
     app.post('/authenticateUser_Nineteen68', login.authenticateUser_Nineteen68);
     app.post('/authenticateUser_Nineteen68_CI', login.authenticateUser_Nineteen68_CI);
@@ -279,12 +282,18 @@ if (cluster.isMaster) {
     //Utility plugins
     app.post('/Encrypt_ICE', utility.Encrypt_ICE);
     app.post('/crawResults', webCrawler.getCrawlResults);
+
+    //Chatbot Routes
+    app.post('/getTopMatches_ProfJ', chatbot.getTopMatches_ProfJ);
+    app.post('/updateFrequency_ProfJ', chatbot.updateFrequency_ProfJ);
+
     //QC Plugin
     app.post('/loginQCServer_ICE', qc.loginQCServer_ICE);
     app.post('/qcProjectDetails_ICE', qc.qcProjectDetails_ICE);
     app.post('/qcFolderDetails_ICE', qc.qcFolderDetails_ICE);
     app.post('/saveQcDetails_ICE', qc.saveQcDetails_ICE);
     app.post('/viewQcMappedList_ICE', qc.viewQcMappedList_ICE);
+
 
     //-------------SERVER START------------//
     //server.listen(3000);      //Http Server
@@ -331,7 +340,7 @@ if (cluster.isMaster) {
 
 	//SOCKET CONNECTION USING SOCKET.IO
     var allClients = [];
-
+    var sessionCreated = []
     var allSockets = [];
     var socketMap = {};
     var socketMapUI = {};
@@ -362,6 +371,7 @@ if (cluster.isMaster) {
         socket.send('connected');
         module.exports.allSocketsMap = socketMap;
         module.exports.allSocketsMapUI = socketMapUI;
+        module.exports.sessionCreated = ["name1"];
         httpsServer.setTimeout();
 
         socket.on('message', function(data) {

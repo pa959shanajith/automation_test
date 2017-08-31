@@ -58,6 +58,16 @@ mySPA.factory('qcServices', ['$http','$q', function ($http, $httpProvider, $q)  
 						})
 					.then (function(response)	{return response.data;	},
 					function(response){	return $q.reject(response.data);});	
-    		}
+    		},
+				manualTestcaseDetails_ICE: function(userid){
+						var param = "manualTestcaseDetails_ICE";
+						var userid = JSON.parse(window.localStorage['_UI']).user_id
+						return $http.post('/manualTestcaseDetails_ICE', {
+								action: param,
+								user_id : userid
+						})
+					.then (function(response)	{return response.data;	},
+					function(response){	return $q.reject(response.data);});	
+    		},
   }
 }]);

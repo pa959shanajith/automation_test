@@ -46,7 +46,7 @@
 
 .scroll-element .scroll-bar,
 .scroll-element .scroll-arrow {
-    cursor: default;
+    cursor: pointer;
 }
 
 .scroll-textarea {
@@ -132,7 +132,7 @@
 }
 
 .scrollbar-inner > .scroll-element .scroll-element_track { background-color: #eee; }
-.scrollbar-inner > .scroll-element .scroll-bar { background-color: #8c8c8c; }
+.scrollbar-inner > .scroll-element .scroll-bar { background-color: #321e4f; }
 .scrollbar-inner > .scroll-element:hover .scroll-bar { background-color: #8c8c8c }
 .scrollbar-inner > .scroll-element.scroll-draggable .scroll-bar { background-color: #8c8c8c }
 
@@ -704,6 +704,7 @@
 }*/
 
 /*********QC*********/
+/*Mapped Files*/ 
 .scroll-wrapper > .mappedFiles{
 	/*width: 100% !important;*/
     float: left;
@@ -726,25 +727,72 @@
 	background: rgb(211, 211, 211)
 }
 
-/*******Left and Right Section Scroller********/
-.scroll-wrapper > .qcTreeContainer, .scroll-wrapper > .qcN68TreeContainer{
+/*****Manual Test case generator*****/
+.scroll-wrapper > .mtgScenarioList{
+	width: 100% !important;
+    float: left;
+    height: 100% !important;
+}
+.scroll-wrapper.mtgScenarioList {    
+    height: 304px;
+    max-height: 304px;
+}
+/*.scroll-wrapper .mtgScenarioList{
+    padding: 10px !important;
+}*/
+.mtgScenarioList > .scroll-element.scroll-y{
+	z-index:60;
+}
+.mtgScenarioList > .scroll-element.scroll-y .scroll-bar{
+	background: #321e4f
+}
+.mtgScenarioList > .scroll-element .scroll-element_track{
+	background: rgb(211, 211, 211)
+}
+
+/*********MTG Lower**********/
+.scroll-wrapper > .almFieldExcel{
 	/*width: 100% !important;*/
     float: left;
     height: 100% !important;
 }
-.scroll-wrapper.qcTreeContainer, .scroll-wrapper.qcN68TreeContainer {
-    max-height: 626px;
+.scroll-wrapper.almFieldExcel {
+    height: 266px;
+    max-height: 266px;
 }
-.scroll-wrapper .qcTreeContainer, .scroll-wrapper .qcN68TreeContainer{
-    padding: 0 6px 0 6px;
+.scroll-wrapper .almFieldExcel{
+    padding-right: 12px;
 }
-.qcTreeContainer > .scroll-element.scroll-y, .qcN68TreeContainer > .scroll-element.scroll-y{
-	z-index:10;
+.almFieldExcel > .scroll-element.scroll-y{
+	z-index:60;
 }
-.qcTreeContainer > .scroll-element.scroll-y .scroll-bar, .qcN68TreeContainer > .scroll-element.scroll-y .scroll-bar{
+.almFieldExcel > .scroll-element.scroll-y .scroll-bar{
 	background: #321e4f
 }
-.qcTreeContainer > .scroll-element .scroll-element_track, .qcN68TreeContainer > .scroll-element .scroll-element_track{
+.almFieldExcel > .scroll-element .scroll-element_track{
+	background: rgb(211, 211, 211)
+}
+
+/*******Left and Right Section Scroller********/
+.scroll-wrapper > .qcTreeContainer ul, .scroll-wrapper > .qcN68TreeContainer ul{
+	/*width: 100% !important;*/
+    float: left;
+    height: 100% !important;
+}
+.scroll-wrapper.qcTreeContainer ul, .scroll-wrapper.qcN68TreeContainer ul{
+    height: 616px !important;
+    max-height: 616px;
+}
+.scroll-wrapper .qcTreeContainer ul, .scroll-wrapper .qcN68TreeContainer ul{
+    padding: 0 6px 0 6px;
+}
+.qcTreeContainer ul > .scroll-element.scroll-y, .qcN68TreeContainer ul > .scroll-element.scroll-y{
+	z-index:10;
+}
+.qcTreeContainer ul > .scroll-element.scroll-y .scroll-bar, .qcN68TreeContainer ul > .scroll-element.scroll-y .scroll-bar{
+	background: #321e4f
+}
+.qcTreeContainer ul > .scroll-element .scroll-element_track, .qcN68TreeContainer ul > .scroll-element .scroll-element_track{
 	background: rgb(211, 211, 211)
 }
 /**********Specifically for Firefox**********/

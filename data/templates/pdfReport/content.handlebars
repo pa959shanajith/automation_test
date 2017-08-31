@@ -118,12 +118,13 @@
             .tabCont{display: table-cell; border-bottom: 1px solid #ececec; border-right: 1px solid #ececec;}
             .reportsDetail{line-height: 2; text-align: center; height: calc(100% - 35px); overflow: auto;font-size: 14px;}
             .rDstepDes{text-align: left; word-break: break-word;}
-            .reportsDetail div.reportdetailsrow:nth-child(even){background: #f9f9f9;}
-      			@media screen and (max-height: 675px) {
-      				.reportsDetail{
-      					height: 174px;
-      				}
+            .reportsDetail tr.reportdetailsrow:nth-child(even){background: #f9f9f9;}
+            .reportdetailsrow td{padding-top: 9px;}
+      		@media screen and (max-height: 675px) {
+      			.reportsDetail{
+      				height: 174px;
       			}
+      		}
             .headerRepDetails{
               left: 10px;
               float:left;
@@ -131,7 +132,6 @@
               position: relative;
               top: 7px;
             }
-
         </style>
 <div class="mainContainer">
     {{#each overallstatus}}
@@ -215,8 +215,20 @@
                 <th>Elapsed Time</th>
                 <th>Comments</th>
             </thead>
+            <tbody class="reportsDetail">
+                {{#each rows}}
+                <tr style="width: 100%;" class="reportdetailsrow">
+                    <td class="rDid tabCont">{{slno}}</td>
+                    <td class="rDstep tabCont">{{Step}}</td>
+                    <td class="rDstepDes tabCont" style="padding-left: 10px;">{{StepDescription}}</td>
+                    <td class="rDstatus tabCont" style="padding-left: 10px; color: {{getColor status}}">{{status}}</td>
+                    <td class="rDellaps tabCont">{{EllapsedTime}}</td>
+                    <td class="rDcomments tabCont" style="padding-left: 10px;">{{Comments}}</td>
+                </tr>
+                {{/each}}
+            </tbody>
         </table>
-        <div class="reportsDetail">
+        <!--<div class="reportsDetail">
             {{#each rows}}
             <div style="width: 100%; display: table;" class="reportdetailsrow">
                 <div class="rDid tabCont">{{slno}}</div>
@@ -227,6 +239,6 @@
                 <div class="rDcomments tabCont" style="padding-left: 10px;">{{Comments}}</div>
             </div>
             {{/each}}
-        </div>
+        </div>-->
     </div>
 </div>

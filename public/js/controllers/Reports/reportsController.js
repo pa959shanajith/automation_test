@@ -505,14 +505,14 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 								else{
 									var file = new Blob([data1], {type: 'application/pdf'});
 									var fileURL = URL.createObjectURL(file);
-									// var a = document.createElement('a');
-									// a.href = fileURL;
-									// a.download = finalReports.overallstatus[0].scenarioName;
+									var a = document.createElement('a');
+									a.href = fileURL;
+									a.download = finalReports.overallstatus[0].scenarioName;
 									// a.target="_new";
-									// document.body.appendChild(a);
-									// a.click();
-									// document.body.removeChild(a);
-									$window.open(fileURL, '_blank');
+									document.body.appendChild(a);
+									a.click();
+									document.body.removeChild(a);
+									//$window.open(fileURL, '_blank');
 									URL.revokeObjectURL(fileURL);
 								}
 							}
