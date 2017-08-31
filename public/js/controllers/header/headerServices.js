@@ -8,9 +8,10 @@ mySPA.factory('headerServices', ['$http','$q', function ($http, $httpProvider, $
 			.then(function(response)  { return response.data},
 					function(response)        {return $q.reject(response.data)})
 		},
-		logoutUser_Nineteen68 : function(){	
+		logoutUser_Nineteen68 : function(UserName){	
 			return $http.post('/logoutUser_Nineteen68',{
-				param : 'logoutUser_Nineteen68'
+				param : 'logoutUser_Nineteen68',
+				UserName :UserName
 			})
 			.then(function(response)  { return response.data},
 					function(response)        {return $q.reject(response.data)})

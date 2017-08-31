@@ -276,13 +276,13 @@ mySPA.controller('mindmapController', ['$scope', '$http', '$location', '$timeout
     	if(collapseEteflag){
     		if(screen.height < 1024){
     			$(".endtoend-modulesContainer").prop("style","height: 48% !important;");
-    			$("#ct-canvas").prop("style","height: 250px !important");
+    			//$("#ct-canvas").prop("style","height: 250px !important");
     			$("#ct-legendBox").prop("style","top: calc(100% - 24px) !important; left: 8px !important;");
     			$("#ct-actionBox_W").prop("style","top: calc(100% - 34px) !important; left: (100% - 285px) !important;");
     		}
     		else{
     			$(".endtoend-modulesContainer").css("height","calc(100% - 430px)");
-                $("#ct-canvas").prop("style","height: 410px !important")
+                //$("#ct-canvas").prop("style","height: 410px !important")
     		}
         	$(this).attr("src","imgs/ic-collapseup.png");
         	collapseEteflag = false;
@@ -290,11 +290,11 @@ mySPA.controller('mindmapController', ['$scope', '$http', '$location', '$timeout
     	else{
     		if(screen.height < 1024){
     			$(".endtoend-modulesContainer").prop("style","height: 28% !important;");
-    			$("#ct-canvas").prop("style","height: 352px !important")
+    			//$("#ct-canvas").prop("style","height: 352px !important")
     		}
     		else{
     			$(".endtoend-modulesContainer").css("height","calc(100% - 643px)");
-                $("#ct-canvas").prop("style","height: 660px !important")
+                //$("#ct-canvas").prop("style","height: 660px !important")
     		}
         	$(this).attr("src","imgs/ic-collapse.png");
         	collapseEteflag = true;
@@ -336,7 +336,17 @@ mySPA.controller('mindmapController', ['$scope', '$http', '$location', '$timeout
 			$(this).siblings("input").prop("checked",false);
 		}
 		else $(this).siblings("input").prop("checked",true);*/
+// #894: Add button should be enabled only if some scenario is selected
 		$(this).toggleClass('selectScenariobg');
+        var classflag=false;
+        d3.select('.addScenarios-ete').classed('disableButton',!0);
+		$.each($('.eteScenrios'), function(){
+			if($(this).hasClass('selectScenariobg')){
+                classflag=true;
+                console.log(classflag);
+                d3.select('.addScenarios-ete').classed('disableButton',!1);
+        }})
+        
 	})
     // $(".highlightImg").on('click',function(e) {
     //     if(e.target.id == "reqImg" || e.target.id == "createImg" ||  e.target.id == "assignImg" || 

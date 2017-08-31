@@ -503,7 +503,7 @@ body {
     -moz-transform: translateX(-84%) translateY(-50%);
     -webkit-transform: translateX(-84%) translateY(-50%);
     -ms-transform: translateX(-84%) translateY(-50%);
-    padding: 20px 10px;
+    padding: 20px 0px;
     cursor: pointer
 }
 
@@ -3265,7 +3265,7 @@ li.select_all .addCustObj{
     margin-left: 10px;
     margin-top: -12px;
     /*background-color: #eeeeee;*/
-    width: 90%;
+    width: 91.5%;
     opacity: 1;
     border: 1px solid #656565 !important;
     border-left: 0 !important;
@@ -3286,7 +3286,8 @@ li.select_all .addCustObj{
 
 #selAssignProject
 {
-    margin-left: 8%;
+    margin-left: 2%;
+    width: 90%;
 }
 
 .appTypesContainer {
@@ -3416,9 +3417,9 @@ li.select_all .addCustObj{
 }
 #selProject
 {
-    margin-left: 21px;
+    margin-left: 0;
     position: relative;
-    left: 15px;
+    left: 24px;
 }
 #userRoles
 {
@@ -3592,7 +3593,7 @@ li.select_all .addCustObj{
 }
 
 #selDomain {
-	margin-left: 2%;
+	margin-left: 0;
 }
 
 .appTypesContainer {
@@ -4408,7 +4409,7 @@ select:-webkit-autofill:focus {
 		transform: translateX(-99%) translateY(-50%);
     	-moz-transform: translateX(-99%) translateY(-50%);
     	-ms-transform: translateX(-99%) translateY(-50%);
-		padding: 20px 5px;
+		/*padding: 20px 5px;*/
 	}
 }
 
