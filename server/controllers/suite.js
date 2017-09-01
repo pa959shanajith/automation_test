@@ -572,9 +572,11 @@ exports.ExecuteTestSuite_ICE = function(req, res) {
         function executionFunction(executionRequest){
             console.log(executionRequest);
             var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-            console.log(Object.keys(myserver.allSocketsMap), "<<all people, asking person:", ip);
-            if ('allSocketsMap' in myserver && ip in myserver.allSocketsMap) {
-                var mySocket = myserver.allSocketsMap[ip];
+            console.log("IP:",ip);
+            var name = req.session.username;
+    		console.log(Object.keys(myserver.allSocketsMap),"<<all people, asking person:",name);
+    		if('allSocketsMap' in myserver && name in myserver.allSocketsMap){
+    			var mySocket = myserver.allSocketsMap[name];
                 mySocket._events.result_executeTestSuite = [];
                 mySocket.emit('executeTestSuite', executionRequest);
                 mySocket.on('result_executeTestSuite', function(resultData) {
@@ -832,9 +834,11 @@ exports.ExecuteTestSuite_ICE_CI = function(req, res) {
         function executionFunction(executionRequest){
             console.log(executionRequest);
             var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-            console.log(Object.keys(myserver.allSocketsMap), "<<all people, asking person:", ip);
-            if ('allSocketsMap' in myserver && ip in myserver.allSocketsMap) {
-                var mySocket = myserver.allSocketsMap[ip];
+            console.log("IP:",ip);
+            var name = req.session.username;
+    		console.log(Object.keys(myserver.allSocketsMap),"<<all people, asking person:",name);
+    		if('allSocketsMap' in myserver && name in myserver.allSocketsMap){
+    			var mySocket = myserver.allSocketsMap[name];
                 mySocket._events.result_executeTestSuite = [];
                 mySocket.emit('executeTestSuite', executionRequest);
                 mySocket.on('result_executeTestSuite', function(resultData) {
@@ -1672,10 +1676,10 @@ function updatescenariodetailsinsuite(req, cb, data) {
 
             createTestSuitesHistory = "'cycleid=" + req.cycleid + ", testsuitename="+req.testsuitename+", testsuiteid=" + req.testsuiteid +", versionnumber="+suiterowdetails.versionnumber+", conditioncheck=["+conditioncheck1+"], createdby= " + suiterowdetails.createdby + ",createdon=" + suiterowdetails.createdon.valueOf() + ",createdthrough=null, deleted=null, donotexecute=["+donotexecute1+"],getparampaths=[],modifiedby=" + suiterowdetails.modifiedby + ", modifiedon=" + new Date().getTime().toString() + ", skucodetestsuite=null,tags=null,testscenarioids=[" + req.testscenarioids + "] '";
 
-            console.log(createTestSuitesHistory);
+            //console.log(createTestSuitesHistory);
 
             insertTestSuiteQuery = "INSERT INTO testsuites (cycleid,testsuiteid,testsuitename,versionnumber,history) VALUES ("+req.cycleid+"," +  req.testsuiteid +",'"+ req.testsuitename +"',1,{" + date + ":" + createTestSuitesHistory + "})";
-
+          
             //var updatetestsuitefrommodule = "UPDATE testsuites SET testscenarioids = ["+req.testscenarioids+"], conditioncheck=["+conditioncheck1+"] ,getparampaths=["+getparampath1+"], donotexecute=["+donotexecute1+"] WHERE testsuiteid="+req.testsuiteid+" and cycleid="+req.cycleid+" and testsuitename='"+req.testsuitename+"' and versionnumber="+req.versionnumber;
             //dbConnICE.execute(updatetestsuitefrommodule, function(err, answers) {
             client.post(epurl+"suite/readTestSuite_ICE",args,
