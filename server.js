@@ -37,6 +37,19 @@ if (cluster.isMaster) {
     };
     var httpsServer = require('https').createServer(credentials, app);
     var io = require('socket.io')(httpsServer);
+    var fs = require('fs');
+    var util = require('util');
+    var logFile = fs.createWriteStream('logs/node_server.log', { flags: 'a' });
+      // Or 'w' to truncate the file every time the process starts.
+    var logStdout = process.stdout;
+
+    console.log = function () {
+      var d = new Date();
+      var n = d.toLocaleString();
+      logFile.write('['+n+']'+util.format.apply(null, arguments) + '\n');
+      logStdout.write(util.format.apply(null, arguments) + '\n');
+    }
+    console.error = console.log;
     module.exports = app;
     module.exports.allSocketsMap = {};
     module.exports.sessionCreated = ["name1"];
@@ -144,6 +157,8 @@ if (cluster.isMaster) {
             root: __dirname + "/public/"
         });
     });
+
+
     // Mindmap Routes
     var api = require('./routes_mindmap/api.js');
     var home = require('./routes_mindmap/home.js');
@@ -399,6 +414,7 @@ if (cluster.isMaster) {
             }
           }
         });
+
         //	Socket Connection Failed
         socket.on('connect_failed', function() {
             console.log("Sorry, there seems to be an issue with the connection!");

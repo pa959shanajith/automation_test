@@ -4418,7 +4418,7 @@ select:-webkit-autofill:focus {
 		height: calc(100% - 410px);
 	}
 	.reportStatus{margin-top: 55px;}
-	.suitestartend thead, .scenarioReports thead{width: calc(100% - 797px);} 
+	.suitestartend thead, .scenarioReports thead{width: calc(100% - 797px);} 
 	.scroll-wrapper.scrollbar-inner-rep{max-height: 242px !important;}
 }
 
