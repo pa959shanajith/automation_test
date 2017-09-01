@@ -340,24 +340,28 @@ if (cluster.isMaster) {
 
 	//SOCKET CONNECTION USING SOCKET.IO
     var allClients = [];
-    var sessionCreated = []
+    var sessionCreated = [];
     var allSockets = [];
     var socketMap = {};
     var socketMapUI = {};
+    var sokcetMapScheduling={};
     var isUISocketRequest = false;
 
     io.on('connection', function(socket) {
         // console.log("-------------------------------------------------------------------------------------------------------");
-        var address = socket.request.connection.remoteAddress || socket.request.headers['x-forwarded-for'];
-        // console.log("IPTYPE:::::", socket.request.connection.address().family);
-        // console.log("socket.handshake.address:::::", socket.handshake.address);
-
+        var ip = socket.request.connection.remoteAddress || socket.request.headers['x-forwarded-for'];
+        console.log("Normal Mode Enabled for  IP :",ip);
+        var address=socket.handshake.query['username'];
         console.log("socket connecting address" , address);
+        console.log('Param ',socket.handshake.query['username']);
         //console.log("middleware:", socket.request._query['check']);
+       
+        
         if (socket.request._query['check'] == "true" ) {
         //  if ( !(address in socketMapUI) ) {
             isUISocketRequest = true;
             console.log("socket request from UI");
+            address=socket.request._query['username'];
             socketMapUI[address] = socket;
             socket.emit("connectionAck", "Success");
         //  }
@@ -365,65 +369,114 @@ if (cluster.isMaster) {
           isUISocketRequest = false;
           if (!(address in socketMap)) {
               socketMap[address] = socket;
+              socket.send('connected');
+          }else{
+              socket.send('connectionExists');
           }
         }
 
-        socket.send('connected');
+        
         module.exports.allSocketsMap = socketMap;
         module.exports.allSocketsMapUI = socketMapUI;
-        module.exports.sessionCreated = ["name1"];
+        module.exports.allSchedulingSocketsMap=sokcetMapScheduling;
         httpsServer.setTimeout();
 
-        socket.on('message', function(data) {
-            //console.log("SER", data);
-        });
-        if (!isUISocketRequest) {
-        var socketFlag = false;
-          if (allSockets.length > 0) {
-              for (var socketIndexes = 0; socketIndexes < allSockets.length; socketIndexes++) {
-                  if (allSockets[socketIndexes].handshake.address.indexOf(socket.handshake.address) != -1) {
-                      socketFlag = true;
-                  }
-              }
-          } else {
-              allSockets.push(socket);
-              allClients.push(socket.conn.id);
-              socketFlag = true;
-          }
-          if (socketFlag == false) {
-              allSockets.push(socket);
-              allClients.push(socket.conn.id)
-          }
-        }
-        module.exports.abc = allSockets;
+        // socket.on('message', function(data) {
+        //     console.log("SER", data);
+        // });
+        // if (!isUISocketRequest) {
+        // var socketFlag = false;
+        //   if (allSockets.length > 0) {
+        //       for (var socketIndexes = 0; socketIndexes < allSockets.length; socketIndexes++) {
+        //           if (allSockets[socketIndexes].handshake.query['username'].indexOf(socket.handshake.query['username']) != -1) {
+        //               socketFlag = true;
+        //           }
+        //       }
+        //   } else {
+        //       allSockets.push(socket);
+        //       allClients.push(socket.conn.id);
+        //       socketFlag = true;
+        //   }
+        //   if (socketFlag == false) {
+        //       allSockets.push(socket);
+        //       allClients.push(socket.conn.id)
+        //   }
+        // }
+        //module.exports.abc = allSockets;
         socket.on('disconnect', function() {
+            var ip = socket.request.connection.remoteAddress || socket.request.headers['x-forwarded-for'];
+            console.log("disconnect IP:",ip);
           if (socket.request._query['check'] == "true" ) {
-            var address = socket.request.connection.remoteAddress || socket.request.headers['x-forwarded-for'];
+            //var address = socket.request.connection.remoteAddress || socket.request.headers['x-forwarded-for'];
+            var address=socket.handshake.query['username'];
             console.log("\n\n Disconnecting ... from UI socket " , address);
           }else{
-            var i = allSockets.indexOf(socket);
-            if (i > -1) {
-                console.log('Socket Connection got disconnected for :', allSockets[i].handshake.address);
-                delete socketMap[allSockets[i].handshake.address];
-                allClients.splice(i, 1);
-                allSockets.splice(i, 1);
-                // console.log("socketMap:", socketMap);
+            //var i = socketMap.indexOf(socket);
+            var address=socket.handshake.query['username'];
+            
+             if (socketMap[address] != undefined) {
+                 console.log('Socket Connection got disconnected for :', address);
+                delete socketMap[address];
                 module.exports.allSocketsMap = socketMap;
                 //		console.log("------------------------SOCKET DISCONNECTED----------------------------------------");
-                console.log("NO. OF CLIENTS CONNECTED:", allSockets.length,'\nIP\'s connected :',Object.keys(socketMap).join());
+                console.log("NO. OF CLIENTS CONNECTED:", Object.keys(socketMap).length,'\nIP\'s connected :',Object.keys(socketMap).join());
+            }
+            else if (sokcetMapScheduling[address] != undefined) {
+                 console.log('Socket Connection got disconnected for :', address);
+                delete sokcetMapScheduling[address];
+                module.exports.allSchedulingSocketsMap = sokcetMapScheduling;
+                //		console.log("------------------------SOCKET DISCONNECTED----------------------------------------");
+                console.log("NO. OF CLIENTS CONNECTED:", Object.keys(sokcetMapScheduling).length,'\nIP\'s connected :',Object.keys(sokcetMapScheduling).join());
             }
           }
         });
 
-        //	Socket Connection Failed
+        socket.on('reconnect', function(data) {
+            console.log("ReEstablish connection for Scheduling");
+            var ip = socket.request.connection.remoteAddress || socket.request.headers['x-forwarded-for'];
+            console.log("Scheduling Mode Enabled for  IP:",ip);
+           var address=socket.handshake.query['username'];
+           console.log(data);
+            if (data && socketMap[address] != undefined) {
+               
+                console.log('Socket Connection got disconnected for Normal Mode :', address);
+                delete socketMap[address];
+               
+                module.exports.allSocketsMap = socketMap;
+                
+                console.log("NO. OF CLIENTS CONNECTED:", Object.keys(socketMap).length,'\nIP\'s connected :',Object.keys(socketMap).join());
+
+           
+              sokcetMapScheduling[address] = socket;
+              socket.send('reconnected');
+           
+              module.exports.allSchedulingSocketsMap = sokcetMapScheduling;
+              console.log("NO. OF CLIENTS CONNECTED For Scheduling:", Object.keys(sokcetMapScheduling).length,'\nIP\'s connected :',Object.keys(sokcetMapScheduling).join());
+
+         
+            }else if(!data && sokcetMapScheduling!=undefined){
+                console.log('Socket Connection got disconnected for Scheduling mode:', address);
+                delete sokcetMapScheduling[address];
+               
+                module.exports.allSchedulingSocketsMap = sokcetMapScheduling;
+                console.log("NO. OF CLIENTS CONNECTED For Scheduling:", Object.keys(sokcetMapScheduling).length,'\nIP\'s connected :',Object.keys(sokcetMapScheduling).join());
+
+           
+              socketMap[address] = socket;
+              module.exports.allSocketsMap = socketMap;
+              socket.send('connected');
+           
+              
+
+            }
+            
+        });
+       
         socket.on('connect_failed', function() {
             console.log("Sorry, there seems to be an issue with the connection!");
         });
-        console.log("NO. OF CLIENTS CONNECTED:", allSockets.length,'\nIP\'s connected :',Object.keys(socketMap).join());
-        // console.log("module.exports.allSocketsMap:", module.exports.allSocketsMap);
-        // console.log("allSockets:::",socketMap)
+        console.log("NO. OF CLIENTS CONNECTED:", Object.keys(socketMap).length,'\nIP\'s connected :',Object.keys(socketMap).join());
+       
     });
-    //SOCKET CONNECTION USING SOCKET.IO
-
-    // console.log("module.exports.allSocketsMap=-------------------------\n", module.exports.allSocketsMap);
+   
 }
