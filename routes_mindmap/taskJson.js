@@ -12,7 +12,9 @@ exports.getTaskJson_mindmaps = function(obj,cb,data){
 	//var userid="482fa3f8-7db6-4512-a35f-adef7f07a6c2";
     //obj.userid=userid;
     
-	query={'statement':"MATCH (n:TASKS) WHERE n.assignedTo='"+obj.userid+"' RETURN n"};
+	//query={'statement':"MATCH (n:TASKS) WHERE n.assignedTo='"+obj.userid+"' RETURN n"};
+	/*Neo4j query changed to return both the task node and it's associated module/screen/scenario/testcase node */
+	query={'statement':"MATCH (a)-[r:FNTT {id:b.nodeID}]-(b) where b.assignedTo='"+obj.userid+"' return a,b"};
 	var qlist_query=[query];
 	reqToAPI({"data":{"statements":qlist_query}},obj.urlData,'/neoQuerya',function(err,status,result){
 					//res.setHeader('Content-Type','application/json');
@@ -20,7 +22,7 @@ exports.getTaskJson_mindmaps = function(obj,cb,data){
 						console.log(err);
 						//res.status(status).send(err);
 					} else{
-                        var resultobj = {"result":result,"prjId":obj.prjId}; 
+                        var resultobj = {"result":result,"prjId":obj.prjId,"urlData":obj.urlData}; 
 						next_function(resultobj,function(err,data){
                             if(err){
                                 cb(null,err);
@@ -95,6 +97,8 @@ function next_function(resultobj,cb,data){
 
     var result=resultobj.result;
     var prjId = resultobj.prjId.projectId;
+	var appTypes=resultobj.prjId.appType;
+	var urlData=resultobj.urlData;
     //var prjName = resultobj.prjId[0].projectName;
 	//console.log(resultobj);
 	try{
@@ -142,7 +146,9 @@ function next_function(resultobj,cb,data){
 		"assignedTestScenarioIds": [],
 		//"scenarioFlag": "True",
 	}
-	var t=a.row[0];
+	/*t refers to task node, and m refers to its respective node */
+	var t=a.row[1];
+	var m=a.row[0];
 		var abc=tasktypes[t.task];
 		var batch_flag=false;
 		//To support the task assignmnet in scenario
@@ -163,44 +169,43 @@ function next_function(resultobj,cb,data){
 		var parent=t.parent.substring(1, t.parent.length-1).split(",");
 		var parent_length=parent.length;
         task_json.projectId=parent[0];
-		create_ice.getProjectType_Nineteen68(parent[0],function(err,data){
-					if(err){
-						console.log(err);
-					}else{
-						task_json.appType=projectTypes[data.projectType];
+		//create_ice.getProjectType_Nineteen68(parent[0],function(err,data){
+					// if(err){
+					// 	console.log(err);
+					// }else{
+						
 						if (parent_length>=2){
-							testSuiteDetails_obj.testsuiteid=parent[1];
-							if(parent_length>=3){
-								task_json.scenarioId=parent[2];
-							}
-							if(parent_length>=4){
-								task_json.screenId=parent[3];
-								
-
-							}if(parent_length==5){
-								task_json.testCaseId=parent[4];
-								//task_json.scenarioId=parent[2];
-
-							}	
+							
 							//Checking if the user is assigned to that project before showing the task to the user
 							if(prjId!= undefined && prjId.length>0 && prjId.indexOf(parent[0]) > -1 ){
+										var index=prjId.indexOf(parent[0]);
+										task_json.appType=projectTypes[appTypes[index]];
+										testSuiteDetails_obj.testsuiteid=parent[1];
+										if(parent_length>=3){
+											task_json.scenarioId=parent[2];
+										}
+										if(parent_length>=4){
+											task_json.screenId=parent[3];
+											
 
-							
-								create_ice.getAllNames(parent,function(err,data){
-									if(err){
-										console.log(err);
-									}else{
-										try{
-											testSuiteDetails_obj.testsuitename=data.modulename;
-											testSuiteDetails_obj.projectidts=parent[0];
-										testSuiteDetails_obj.assignedTestScenarioIds=data.testscenarioIds[0];
-										task_json.screenName=data.screenname;
-										task_json.scenarioName=data.scenarioname;
-										task_json.testCaseName=data.testcasename;
+										}if(parent_length==5){
+											task_json.testCaseId=parent[4];
+											//task_json.scenarioId=parent[2];
+
+										}	
+
+										testSuiteDetails_obj.testsuitename='modulename';
+										testSuiteDetails_obj.projectidts=parent[0];
+										testSuiteDetails_obj.assignedTestScenarioIds='data.testscenarioIds[0]';
+										task_json.screenName='screenname';
+										task_json.scenarioName='scenarioname';
+										task_json.testCaseName='testcasename';
 										if(t.task=='Design' || t.task=='Update' ){
-											taskDetails.taskName=t.task+' '+data.testcasename;
+											taskDetails.taskName=t.task+' '+m.testCaseName;
+											task_json.testCaseName=m.testCaseName;
 										}else if(t.task=='Execute'){
-											taskDetails.taskName=t.task+' '+data.modulename;
+											taskDetails.taskName=t.task+' '+m.moduleName;
+											testSuiteDetails_obj.testsuitename=m.moduleName;
 										}else if(t.task=='Execute Batch'){
 											task_json.projectId="";
 											taskDetails.taskName=t.task+' '+t.batchName;
@@ -215,13 +220,18 @@ function next_function(resultobj,cb,data){
 											
 										}
 										else if(t.task=='Execute Scenario'){
+
 											task_json.scenarioFlag='True';
 											task_json.assignedTestScenarioIds=[task_json.scenarioId];
-											taskDetails.taskName=t.task+' '+data.scenarioname;
+											taskDetails.taskName=t.task+' '+m.testScenarioName;
+											task_json.scenarioName=m.testScenarioName;
+											
+	
 											//testSuiteDetails_obj.assignedTestScenarioIds=[task_json.scenarioId];
 										}
 										else{
-											taskDetails.taskName=t.task+' '+data.screenname;
+											taskDetails.taskName=t.task+' '+m.screenName;
+											task_json.screenName=m.screenName;
 										}
 									
 										//task_json.assignedTestScenarioIds=data.assignedTestScenarioIds;
@@ -231,19 +241,120 @@ function next_function(resultobj,cb,data){
 											user_task_json.push(task_json);
 										}
 										
-										//console.log(user_task_json);
-										//fs.writeFileSync('assets_mindmap/task_json.json',JSON.stringify(user_task_json),'utf8');
-										maincallback();
-										}catch(Ex){
-											console.log(Ex);
+										if(t.task=='Execute Scenario'){
+											console.log(m.moduleID);
+											query={'statement':"MATCH (n:MODULES{moduleID:'"+m.moduleID+"'}) RETURN n.moduleName"};
+											query1={'statement':"MATCH (n:MODULES_ENDTOEND{moduleID:'"+m.moduleID+"'}) RETURN n.moduleName"};
+											var qlist_query=[query];
+										
+												reqToAPI({"data":{"statements":qlist_query}},urlData,'/neoQuerya',function(err,status,result){
+																//res.setHeader('Content-Type','application/json');
+																if(err){
+																
+																	console.log(err);
+																	maincallback();
+																	//res.status(status).send(err);
+																} else{
+																	try{
+																		result1=JSON.parse(result);
+																		testSuiteDetails_obj.testsuitename=result1[0].data[0].row[0];
+																		maincallback();	
+																	}catch(ex){
+																		qlist_query=[query1];
+																		reqToAPI({"data":{"statements":qlist_query}},urlData,'/neoQuerya',function(err,status,result){
+																		//res.setHeader('Content-Type','application/json');
+																		if(err){
+																			console.log(err);
+																			maincallback();
+																			
+																		} else{
+																			try{
+																				result1=JSON.parse(result);
+																				testSuiteDetails_obj.testsuitename=result1[0].data[0].row[0];
+																				maincallback();	
+																			}catch(ex){
+																				maincallback();
+																				
+																			}												
+																		}
+
+																		});
+																		
+																	}												
+																}
+
+												});
+											
+										
+										}else{
+											maincallback();
 										}
+										//maincallback();
+										
+										
 										
 
-									}
+
+
+							
+								// create_ice.getAllNames(parent,function(err,data){
+								// 	if(err){
+								// 		console.log(err);
+								// 	}else{
+								// 		try{
+								// 			testSuiteDetails_obj.testsuitename=data.modulename;
+								// 			testSuiteDetails_obj.projectidts=parent[0];
+								// 		testSuiteDetails_obj.assignedTestScenarioIds=data.testscenarioIds[0];
+								// 		task_json.screenName=data.screenname;
+								// 		task_json.scenarioName=data.scenarioname;
+								// 		task_json.testCaseName=data.testcasename;
+								// 		if(t.task=='Design' || t.task=='Update' ){
+								// 			taskDetails.taskName=t.task+' '+data.testcasename;
+								// 		}else if(t.task=='Execute'){
+								// 			taskDetails.taskName=t.task+' '+data.modulename;
+								// 		}else if(t.task=='Execute Batch'){
+								// 			task_json.projectId="";
+								// 			taskDetails.taskName=t.task+' '+t.batchName;
+								// 			if(batch_dict[t.batchName]==undefined)
+								// 			batch_dict[t.batchName]=user_task_json.length;
+								// 			else{
+								// 				parent_index=batch_dict[t.batchName];
+								// 				batch_task=user_task_json[parent_index];
+								// 				batch_task.testSuiteDetails.push(testSuiteDetails_obj);
+								// 				batch_flag=true;
+								// 			}
+											
+								// 		}
+								// 		else if(t.task=='Execute Scenario'){
+								// 			task_json.scenarioFlag='True';
+								// 			task_json.assignedTestScenarioIds=[task_json.scenarioId];
+								// 			taskDetails.taskName=t.task+' '+data.scenarioname;
+								// 			//testSuiteDetails_obj.assignedTestScenarioIds=[task_json.scenarioId];
+								// 		}
+								// 		else{
+								// 			taskDetails.taskName=t.task+' '+data.screenname;
+								// 		}
+									
+								// 		//task_json.assignedTestScenarioIds=data.assignedTestScenarioIds;
+								// 		if(!batch_flag){
+								// 			task_json.testSuiteDetails.push(testSuiteDetails_obj);
+								// 			task_json.taskDetails.push(taskDetails);
+								// 			user_task_json.push(task_json);
+								// 		}
+										
+								// 		//console.log(user_task_json);
+								// 		//fs.writeFileSync('assets_mindmap/task_json.json',JSON.stringify(user_task_json),'utf8');
+								// 		maincallback();
+								// 		}catch(Ex){
+								// 			console.log(Ex);
+								// 		}
+										
+
+								// 	}
 
 									
 
-								});
+								// });
 							}else{
 								maincallback();
 							}
@@ -251,11 +362,11 @@ function next_function(resultobj,cb,data){
 			
 					}
 
-				}
+				//}
 
 					
 
-				});
+			//	});
 		
 		
 

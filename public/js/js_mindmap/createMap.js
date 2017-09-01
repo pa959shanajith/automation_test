@@ -970,12 +970,20 @@ var editNode = function(e,node){
 	//name=p.text();
 	l=[(parseFloat(l[0])-20)*cScale+cSpan[0],(parseFloat(l[1])+42)*cScale+cSpan[1]];
 // If editing right after the node is added and node goes beyond the screen size
-	if(CreateEditFlag==true && l[1]>600){
+	cSize=getElementDimm(d3.select("#ct-mapSvg"));
+	if(CreateEditFlag==true && l[1]>cSize[1]){
 		CreateEditFlag=false;
 		//cSpanX=cSpan[0]-l[0]/2;
 		//cSpanY=cSpan[1]-l[1]/2;
 		cSpanX=cSpan[0];
-		cSpanY=cSpan[1]-l[1]/2;
+		cSpanY=cSpan[1];
+		var temp=l[1];
+		while(temp>cSize[1]){
+			temp=temp/2;
+			cSpanY=cSpanY-temp;
+		}
+
+		
 		d3.select('#ct-mindMap').attr('transform', "translate("+cSpanX+","+cSpanY+")scale("+cScale+")");
 		//cSpan[0]=cSpan[0]-l[0]/2 //after edit mindmap doesn't move to orignal position
 		l=p.attr('transform').slice(10,-1).split(split_char);
@@ -986,6 +994,7 @@ var editNode = function(e,node){
 	d3.select('#ct-inpAct').attr('data-nodeid',null).property('value',name).node().focus();
 	d3.select('#ct-inpSugg').classed('no-disp',!0);
 };
+
 var deleteNode = function(e){
 	//If module is in edit mode, then return do not add any node
 	if(d3.select('#ct-inpBox').attr('class')=="") return;

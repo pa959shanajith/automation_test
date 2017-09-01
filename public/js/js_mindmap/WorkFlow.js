@@ -765,7 +765,7 @@ var actionEvent_W = function(e){
 			openDialogMindmap("Success", "Data saved successfully");
 			// fix for 1046:  "Create" does not work when we add scenarios from different projects
 			saveFlag=true;
-			$('#ct-createAction_W').removeClass('disableButton');	
+			$('#ct-createAction_W').removeClass('disableButton').removeClass('no-access');	
 			
 			 dataSender({task:'getModules',tab:'endToend',prjId:$("#selectProjectEtem").val()},function(err,result){
 				 	if(err) console.log(result);

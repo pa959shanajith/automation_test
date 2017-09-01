@@ -1430,8 +1430,8 @@ input[disabled]{
     border-radius: 4px;
     height: 25px;
     width: 60%;
-    margin-left: 4%;
-    margin-top: 0%;
+    margin-left: 34%;
+    margin-top: -10%;
     line-height: 1.7; 
     border: 1px solid #656565 !important;
 }
@@ -4418,7 +4418,7 @@ select:-webkit-autofill:focus {
 		height: calc(100% - 410px);
 	}
 	.reportStatus{margin-top: 55px;}
-	.suitestartend thead, .scenarioReports thead{width: calc(100% - 797px);} 
+	.suitestartend thead, .scenarioReports thead{width: calc(100% - 797px);} 
 	.scroll-wrapper.scrollbar-inner-rep{max-height: 242px !important;}
 }
 

@@ -126,9 +126,11 @@ exports.pairwise_ICE = function(req, res) {
 			var abc = {}
 			abc.key = req.body.dataObj;
 			var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-			console.log(Object.keys(myserver.allSocketsMap),"<<all people, asking person:",ip);
-			if('allSocketsMap' in myserver && ip in myserver.allSocketsMap){
-				var mySocket = myserver.allSocketsMap[ip];
+			console.log("IP:",ip);
+			var name = req.session.username;
+			console.log(Object.keys(myserver.allSocketsMap),"<<all people, asking person:",name);
+			if('allSocketsMap' in myserver && name in myserver.allSocketsMap){
+				var mySocket = myserver.allSocketsMap[name];
 				mySocket._events.pairwise = [];               						
 			//mySocket.send(dataObj);
 				mySocket.emit("pairwise", abc );//Sending

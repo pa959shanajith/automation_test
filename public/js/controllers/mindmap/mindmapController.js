@@ -367,14 +367,14 @@ mySPA.controller('mindmapController', ['$scope', '$http', '$location', '$timeout
         var query = $scope.query;
         $scope.visible = 0;
         $scope.conversation.push({'text' : query,'pos': "assistFrom-me",'type': 0});
-        console.log(query);
+        //console.log(query);
         $scope.query = "";
         chatbotService.getTopMatches(query).then(function(data){ 
-        console.log("Reporting from controller.. i have this object:");
-        console.log(data);
+       // console.log("Reporting from controller.. i have this object:");
+        //console.log(data);
         $scope.topMatches = data;
         $scope.conversation.push({'text' : $scope.topMatches,'pos': "assistFrom-them",'type':0});
-        console.log($scope.conversation)
+        //console.log($scope.conversation)
         });
     }
   $scope.displayAnswer = function (index){
@@ -382,10 +382,10 @@ mySPA.controller('mindmapController', ['$scope', '$http', '$location', '$timeout
         $scope.answer = $scope.topMatches[index][2];
         
         var qid = $scope.topMatches[index][0];
-        console.log($scope.topMatches[index][2]);
+        //console.log($scope.topMatches[index][2]);
         chatbotService.updateFrequency(qid).then(function(data){ 
-            console.log("Reporting from controller.. after updating question frequency:");
-            console.log(data);
+            //console.log("Reporting from controller.. after updating question frequency:");
+            //console.log(data);
         });
     }
 
