@@ -606,10 +606,13 @@ exports.loadUserInfo_Nineteen68 = function(req, res){
                                                            var count = 0;
                                                            for(var k in pluginResult.rows[0]){
                                                               // if(count < pluginResult.columns.length){
-                                                                     pluginsArr.push({
-                                                                            "keyName" : k,
-                                                                            "keyValue" : (pluginResult.rows[0])[k]
-                                                                     })
+                                                                    if(k !='roleid' && k != 'permissionid'){
+                                                                        pluginsArr.push({
+                                                                              "keyName" : k,
+                                                                              "keyValue" : (pluginResult.rows[0])[k]
+                                                                        })
+                                                                    }
+                                                                     
                                                               //     count++;
                                                               // }
                                                            }
