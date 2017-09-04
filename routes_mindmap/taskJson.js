@@ -209,6 +209,7 @@ function next_function(resultobj,cb,data){
 										}else if(t.task=='Execute Batch'){
 											task_json.projectId="";
 											taskDetails.taskName=t.task+' '+t.batchName;
+											testSuiteDetails_obj.testsuitename=m.moduleName;
 											if(batch_dict[t.batchName]==undefined)
 											batch_dict[t.batchName]=user_task_json.length;
 											else{

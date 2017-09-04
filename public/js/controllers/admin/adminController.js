@@ -1446,6 +1446,18 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 			//Edit cycle name save button
 			$(document).on('click', '#updateCycleName', function(event) {
 				var reg = /^[a-zA-Z0-9\s\.\-\_]+$/
+				$("#cycleList li:visible").each(function() {
+					if($(this).children('span.cycleName').text().trim() == $("#cycleName").val().trim())
+					{
+						$(".close:visible").trigger('click');
+						openModelPopup("Add Cycle", "Cycle Name already exists for this release");
+						flag = true;
+					}
+				});
+				if(flag == true)
+				{
+					return false;
+				}
 					if($("#cycleName").val() == "")
 					{
 						$("#cycleName").addClass('inputErrorBorder');
@@ -1772,7 +1784,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 							}
 			$("#userSelect").empty()
 			$("#userSelect").append('<option data-id="" value disabled selected>Select User</option>')
-			for(i=0; i<allUsersRes.userIds.length && allUsersRes.user_names.length; i++){
+			for(i=0; i<allUsersRes.userIds.length; i++){
 				$("#userSelect").append('<option data-id="'+allUsersRes.userIds[i]+'" value="'+allUsersRes.user_names[i]+'">'+allUsersRes.user_names[i]+'</option>')
 			}
 
