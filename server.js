@@ -1,20 +1,20 @@
 // Module Dependencies
-var cluster = require('cluster');
-if (cluster.isMaster) {
-    //    cluster.fork();
-    cluster.fork();
-    cluster.on('disconnect', function(worker) {
-        console.log('disconnect!');
-        // cluster.fork();
-    });
-    cluster.on('exit', function(worker) {
+// var cluster = require('cluster');
+// if (cluster.isMaster) {
+//     //    cluster.fork();
+//     cluster.fork();
+//     cluster.on('disconnect', function(worker) {
+//         console.log('disconnect!');
+//         // cluster.fork();
+//     });
+//     cluster.on('exit', function(worker) {
 
-        // Replace the dead worker,
-        // we're not sentimental
-        console.log('Let\'s not have Sentiments... Worker %d is killed.', worker.id);
-        cluster.fork();
-    });
-} else {
+//         // Replace the dead worker,
+//         // we're not sentimental
+//         console.log('Let\'s not have Sentiments... Worker %d is killed.', worker.id);
+//         cluster.fork();
+//     });
+// } else {
     var express = require('express');
     var app = express();
 
@@ -106,7 +106,10 @@ if (cluster.isMaster) {
     });
 
      app.get('/admin', function(req, res) {
+        var usrName = req.session.username
         if(!req.session.defaultRole || req.session.defaultRole != 'Admin'){
+            var index = sessionCreated.indexOf(usrName);
+            sessionCreated.splice(index, 1);
             req.session.destroy(); res.status(401).send('<br><br>Your session has been expired.Please <a href="/">Login</a> Again');
         }else{
             if (req.cookies['connect.sid'] && req.cookies['connect.sid'] != undefined) { res.sendFile("index.html", { root: __dirname + "/public/" });} else {req.session.destroy(); res.status(401).send('<br><br>Your session has been expired.Please <a href="/">Login</a>Again');}
@@ -115,18 +118,24 @@ if (cluster.isMaster) {
 
     //Only Test Engineer and Test Lead have access
     app.get(/^\/(design|designTestCase|execute|scheduling|p_ALM)$/, function(req, res){
+        var usrName = req.session.username
         if(!req.session.defaultRole || req.session.defaultRole == "Admin" || req.session.defaultRole == "Business Analyst" || req.session.defaultRole == "Tech Lead" || req.session.defaultRole == "Test Manager")
         {
+            var index = sessionCreated.indexOf(usrName);
+            sessionCreated.splice(index, 1);
             req.session.destroy(); res.status(401).send('<br><br>Your session has been expired.Please <a href="/">Login</a> Again');
         }else{
             if (req.cookies['connect.sid'] && req.cookies['connect.sid'] != undefined) { res.sendFile("index.html", { root: __dirname + "/public/" });} else {req.session.destroy(); res.status(401).send('<br><br>Your session has been expired. Please <a href="/">Login</a> Again');}
         }
     });
-
+    
     //Test Engineer,Test Lead and Test Manager can access
     app.get(/^\/(specificreports|home|p_Utility|p_Reports|plugin|p_ALM)$/, function(req, res){
+        var usrName = req.session.username
         if (!req.session.defaultRole || req.session.defaultRole == "Admin" || req.session.defaultRole == "Business Analyst" || req.session.defaultRole == "Tech Lead")
         {
+            var index = sessionCreated.indexOf(usrName);
+            sessionCreated.splice(index, 1);
             req.session.destroy(); res.status(401).send('<br><br>Your session has been expired.Please <a href="/">Login</a> Again');
         }else{
             if (req.cookies['connect.sid'] && req.cookies['connect.sid'] != undefined) { res.sendFile("index.html", { root: __dirname + "/public/" });} else {req.session.destroy(); res.status(401).send('<br><br>Your session has been expired. Please <a href="/">Login</a> Again');}
@@ -135,8 +144,11 @@ if (cluster.isMaster) {
 
     //Test Lead and Test Manager can access Weboccular Plugin
     app.get(/^\/(p_Weboccular)$/, function(req, res){
+        var usrName = req.session.username
       if (!req.session.defaultRole || req.session.defaultRole == "Admin" || req.session.defaultRole == "Business Analyst" || req.session.defaultRole == "Tech Lead" || req.session.defaultRole == "Test Engineer")
         {
+            var index = sessionCreated.indexOf(usrName);
+            sessionCreated.splice(index, 1);
             req.session.destroy(); res.status(401).send('<br><br>Your session has been expired.Please <a href="/">Login</a> Again');
         }else{
             if (req.cookies['connect.sid'] && req.cookies['connect.sid'] != undefined) { res.sendFile("index.html", { root: __dirname + "/public/" });} else {req.session.destroy(); res.status(401).send('<br><br>Your session has been expired. Please <a href="/">Login</a> Again');}
@@ -479,4 +491,4 @@ if (cluster.isMaster) {
        
     });
    
-}
+//}
