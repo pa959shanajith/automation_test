@@ -31,43 +31,11 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 		angular.element(document.getElementById("left-nav-section")).scope().getUserRoles();
 	});
 
-//	Assign Projects Tab Click
-	$("#assignProjectTab").on('click',function() {
-		resetAssignProjectForm();
-		$("img.selectedIcon").removeClass("selectedIcon");
-		$(this).children().find('img').addClass('selectedIcon');
 
-		adminServices.getAllUsers_Nineteen68()
-		.then(function (userRes) {
-			if(userRes == "Invalid Session"){
-				window.location.href = "/";
-				}
-			$("#selAssignUser").empty()
-			$("#selAssignUser").append('<option data-id="" value disabled selected>Select User</option>')
-			for(i=0; i<userRes.userIds.length && userRes.user_names.length; i++){
-				if(userRes.d_roles[i] != "b5e9cb4a-5299-4806-b7d7-544c30593a6e"){
-					$("#selAssignUser").append('<option data-id="'+userRes.userIds[i]+'" value="'+userRes.user_names[i]+'">'+userRes.user_names[i]+'</option>')
-				}
-			}
 
-			//sorting the dropdown values in alphabetical order
-			var selectOptions = $("#selAssignUser option:not(:first)");
-			selectOptions.sort(function(a,b) {
-				if (a.text > b.text) return 1;
-			    else if (a.text < b.text) return -1;
-			    else return 0;
-			})
-			$("#selAssignUser").empty()
-			$("#selAssignUser").append('<option data-id="" value disabled selected>Select User</option>');
-			for(i=0; i<selectOptions.length;i++){
-				$("#selAssignUser").append(selectOptions[i])
-			}
-			$("#selAssignUser").prop('selectedIndex', 0);
-		},
-		function (error) { console.log("Error:::::::::::::", error) })
-
-		$(document).on('change','#selAssignUser', function() {			
+	 		$(document).on('change','#selAssignUser', function(e) {
 			$('#allProjectAP, #assignedProjectAP').empty();
+		
 			$(".load").show();
 			$("#selAssignUser, #rightall, #rightgo, #leftgo, #leftall, .adminBtn").prop("disabled",true);
 			$("#overlayContainer").prop("style","opacity: 1;")
@@ -182,9 +150,49 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 					},function (error) { console.log("Error:::::::::::::", error) })
 				}
 			});
+		
 		});
 
-		$(document).on('change','#selAssignProject', function() {
+		//	Assign Projects Tab Click
+	$(document).on('click','#assignProjectTab',function(event) {
+	//	$scope.tabAssignProject = function() {
+		resetAssignProjectForm();
+		$("img.selectedIcon").removeClass("selectedIcon");
+		$(this).children().find('img').addClass('selectedIcon');
+		adminServices.getAllUsers_Nineteen68()
+		.then(function (userRes) {
+			if(userRes == "Invalid Session"){
+				window.location.href = "/";
+				}
+			$("#selAssignUser").empty()
+			$("#selAssignUser").append('<option data-id="" value disabled selected>Select User</option>')
+			for(i=0; i<userRes.userIds.length && userRes.user_names.length; i++){
+				if(userRes.d_roles[i] != "b5e9cb4a-5299-4806-b7d7-544c30593a6e"){
+					$("#selAssignUser").append('<option data-id="'+userRes.userIds[i]+'" value="'+userRes.user_names[i]+'">'+userRes.user_names[i]+'</option>')
+				}
+			}
+
+			//sorting the dropdown values in alphabetical order
+			var selectOptions = $("#selAssignUser option:not(:first)");
+			selectOptions.sort(function(a,b) {
+				if (a.text > b.text) return 1;
+			    else if (a.text < b.text) return -1;
+			    else return 0;
+			})
+			$("#selAssignUser").empty()
+			$("#selAssignUser").append('<option data-id="" value disabled selected>Select User</option>');
+			for(i=0; i<selectOptions.length;i++){
+				$("#selAssignUser").append(selectOptions[i])
+			}
+			$("#selAssignUser").prop('selectedIndex', 0);
+			$("#allProjectAP,#assignedProjectAP,#selAssignProject").empty();
+			
+		},
+		function (error) { console.log("Error:::::::::::::", error) })
+		//};
+	 });
+
+	 	$(document).on('change','#selAssignProject', function() {
 			$('#allProjectAP, #assignedProjectAP').empty();
 			var domainId = $("#selAssignProject option:selected").val();
 			var requestedids = [domainId];
@@ -282,8 +290,6 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 				}
 			}, function (error) { console.log("Error:::::::::::::", error) })
 		});
-
-	 });
 
 //	Assign Projects Button Click
 	$scope.assignProjects = function() {
@@ -842,9 +848,11 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 	}
 	function resetAssignProjectForm()
 	{
+		
 		$("#selAssignUser, #selAssignProject").prop('selectedIndex', 0);
 		$("#allProjectAP,#assignedProjectAP,#selAssignProject").empty();
 		$("#selAssignProject").append('<option data-id="" value disabled selected>Please Select your domain</option>')
+	
 	}
 
 	//Add Release Name Functionality
@@ -2050,8 +2058,8 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 				$("#releaseList li,#cycleList li").remove()
 				for(var i=0;i<updateProjectDetails.length;i++)
 				{
-					$("#releaseList").append("<li class='updateRelease' id='releaseList_"+i+"'><img src='imgs/ic-release.png' /><span title="+updateProjectDetails[i].releaseName+" data-releaseid="+updateProjectDetails[i].releaseId+" class='releaseName'>"+updateProjectDetails[i].releaseName+"</span><span class='actionOnHover'><img id=editReleaseName_"+i+" title='Edit Release Name' src='imgs/ic-edit-sm.png' class='editReleaseName'><img id=deleteReleaseName_"+i+" title='Delete Release' src='imgs/ic-delete-sm.png' class='deleteRelease'></span></li>");
-					$("#releaseList li:first").trigger('click');
+					$("#releaseList:not(.createRelBox)").append("<li class='updateRelease' id='releaseList_"+i+"'><img src='imgs/ic-release.png' /><span title="+updateProjectDetails[i].releaseName+" data-releaseid="+updateProjectDetails[i].releaseId+" class='releaseName'>"+updateProjectDetails[i].releaseName+"</span><span class='actionOnHover'><img id=editReleaseName_"+i+" title='Edit Release Name' src='imgs/ic-edit-sm.png' class='editReleaseName'><img id=deleteReleaseName_"+i+" title='Delete Release' src='imgs/ic-delete-sm.png' class='deleteRelease'></span></li>");
+					$("#releaseList:not(.createRelBox) li:first").trigger('click');
 				}
 				showHideEditDeleteIcons();
 			}, function (error) { console.log("Error:::::::::::::", error) })
@@ -2309,7 +2317,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 	};
 
 	//AppTypeSelect Functionality
-	$(document).on("click", ".projectTypes", function(){
+	$(document).on("click", ".projectTypes, .projectTypes_create", function(){
 		var taskName = $("#page-taskName").children("span").text();
 		if(taskName == "Create Project"){
 			$(this).toggleClass("projectTypeSelected");
