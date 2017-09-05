@@ -1035,6 +1035,12 @@ input[disabled]{
     max-height: 60px;
     color: #000;
 }
+.custList li{
+    white-space: nowrap;
+    width: 17em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 .compareObj
 {
     float: left;
@@ -2522,6 +2528,8 @@ input[disabled]{
 .scheduleSuite .ipformating{
 	height: 27px;
     margin-top: 2px;
+    width: 196px;
+    padding: 0px;
 }
 .scheduleSuite .datePicContainer{
 	position: relative;
