@@ -996,7 +996,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 				});
 				if(flag == true)
 				{
-					return false;
+					return;
 				}
 				$("#cycleTxt").removeClass('inputErrorBorder');
 				cycleName = $("#cycleTxt").val();
@@ -1461,6 +1461,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 			$('#cycleName').focus();
 			//Edit cycle name save button
 			$(document).on('click', '#updateCycleName', function(event) {
+				flag = false;
 				var reg = /^[a-zA-Z0-9\s\.\-\_]+$/
 				$("#cycleList li:visible").each(function() {
 					if($(this).children('span.cycleName').text().trim() == $("#cycleName").val().trim())
