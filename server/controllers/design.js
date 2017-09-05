@@ -26,6 +26,8 @@ var allCustnames=[];
 var objectLevel=1;
 var xpath="";
 var inputsWS={}
+var sessionExtend = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes 
+
 
 exports.initScraping_ICE = function (req, res) {
 	try{
@@ -51,6 +53,7 @@ exports.initScraping_ICE = function (req, res) {
 				mySocket._events.scrape = [];               						
 				mySocket.emit("LAUNCH_DESKTOP", applicationPath);
 				mySocket.on('scrape', function (data) {
+					req.session.cookie.expires = sessionExtend;
 					res.send(data);
 				});
 			}
@@ -60,6 +63,7 @@ exports.initScraping_ICE = function (req, res) {
 				mySocket._events.scrape = [];               						
 				mySocket.emit("LAUNCH_SAP", applicationPath);
 				mySocket.on('scrape', function (data) {
+					req.session.cookie.expires = sessionExtend;
 					res.send(data);
 				});
 			}
@@ -70,6 +74,7 @@ exports.initScraping_ICE = function (req, res) {
 				// mySocket.send(data);
 				mySocket.emit("LAUNCH_OEBS", applicationPath);
 				mySocket.on('scrape', function (data) {
+					req.session.cookie.expires = sessionExtend;
 					res.send(data);
 				});
 			}
@@ -83,6 +88,7 @@ exports.initScraping_ICE = function (req, res) {
 				mySocket._events.scrape = [];                                                                                                  
 				mySocket.emit("LAUNCH_MOBILE", apkPath,serial,mobileDeviceName,mobileIosVersion,mobileUDID);
 				mySocket.on('scrape', function (data) {
+					req.session.cookie.expires = sessionExtend;
 								res.send(data);
 				});
 			}
@@ -94,6 +100,7 @@ exports.initScraping_ICE = function (req, res) {
 				mySocket._events.scrape = [];                                                                                                  
 				mySocket.emit("LAUNCH_MOBILE_WEB", mobileSerial, androidVersion);
 				mySocket.on('scrape', function (data) {
+					req.session.cookie.expires = sessionExtend;
 								res.send(data);
 				});
 			}
@@ -134,6 +141,7 @@ exports.initScraping_ICE = function (req, res) {
 				mySocket._events.scrape = [];               						
 				mySocket.emit("webscrape",data);
 				mySocket.on('scrape', function (data) {
+					req.session.cookie.expires = sessionExtend;
 					res.send(data);
 				});
 			}
@@ -179,6 +187,7 @@ exports.initScraping_ICE = function (req, res) {
 		console.log(Object.keys(myserver.allSocketsMap),"<<all people, asking person:",name);
 		var mySocket = myserver.allSocketsMap[name];
 		mySocket.emit("focus", focusParam , elementURL, appType);
+		req.session.cookie.expires = sessionExtend;
 		var flag = 'success';
 		res.send(flag);
 	}
@@ -1920,6 +1929,7 @@ exports.debugTestCase_ICE = function (req, res) {
 					                                    mySocket._events.result_debugTestCase = [];
 					                                    mySocket.emit('debugTestCase', responsedata);
 					                                    mySocket.on('result_debugTestCase', function(responsedata) {
+															req.session.cookie.expires = sessionExtend;
 					                                        try {
 					                                            res.send(responsedata);
 					                                        } catch (exception) {
@@ -1952,6 +1962,7 @@ exports.debugTestCase_ICE = function (req, res) {
 						testcaseWS.push(req.body.testCaseWS);
 						mySocket.emit('debugTestCase',testcaseWS);
 						mySocket.on('result_debugTestCaseWS', function (value) {
+							req.session.cookie.expires = sessionExtend;
 							try{
 								if(value.toUpperCase() === 'TERMINATE'){
 									try{
@@ -2015,6 +2026,7 @@ exports.debugTestCase_ICE = function (req, res) {
 						mySocket._events.result_wsdl_listOfOperation = []
 						mySocket.emit('wsdl_listOfOperation',wsdlurl);
 						mySocket.on('result_wsdl_listOfOperation', function (listGenResponse) {
+							req.session.cookie.expires = sessionExtend;
 							try{
 								if(listGenResponse.toUpperCase() === 'TERMINATE'){
 									try{
@@ -2068,6 +2080,7 @@ exports.debugTestCase_ICE = function (req, res) {
 						mySocket._events.result_wsdl_ServiceGenerator = [];
 						mySocket.emit('wsdl_ServiceGenerator',serviceGenRequest);
 						mySocket.on('result_wsdl_ServiceGenerator', function (serviceGenResponse) {
+							req.session.cookie.expires = sessionExtend;
 							try{
 								if(serviceGenResponse.toUpperCase() === 'TERMINATE'){
 									try{

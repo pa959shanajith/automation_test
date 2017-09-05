@@ -15,7 +15,7 @@ var certificate = fs.readFileSync('server/https/server.crt','utf-8');
 var Client = require("node-rest-client").Client;
 var client = new Client();
 var epurl="http://127.0.0.1:1990/";
-
+var sessionExtend = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes 
 exports.getMainReport_ICE = function(req, res){
 	try{
 		if(req.cookies['connect.sid'] != undefined)
@@ -76,6 +76,7 @@ exports.openScreenShot = function(req, res){
 			mySocket._events.render_screenshot = [];
 			mySocket.emit('render_screenshot', path);
 			mySocket.on('render_screenshot', function (resultData) {
+				req.session.cookie.expires = sessionExtend;
 				if(resultData != "fail"){
 					res.send(resultData);
 				}

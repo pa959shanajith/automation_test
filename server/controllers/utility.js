@@ -4,6 +4,7 @@ var myserver = require('../../server.js');
 var Client = require("node-rest-client").Client;
 var client = new Client();
 var epurl="http://127.0.0.1:1990/";
+var sessionExtend = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes 
 exports.Encrypt_ICE = function getDomains_ICE(req, res) {
 	try {
 		if(req.cookies['connect.sid'] != undefined)
@@ -137,6 +138,7 @@ exports.pairwise_ICE = function(req, res) {
 
 				//Receiving				
 				mySocket.on('result_pairs', function (data) {
+					req.session.cookie.expires = sessionExtend;
 					res.send(data);
 				});
 			}else{

@@ -11,6 +11,7 @@ var dbConnICEHistory = require('../../server/config/ICEHistory');
 var epurl="http://127.0.0.1:1990/";
 var Client = require("node-rest-client").Client;
 var client = new Client();
+var sessionExtend = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes 
 
 exports.loginQCServer_ICE = function (req, res) {
 	try{
@@ -37,6 +38,7 @@ exports.loginQCServer_ICE = function (req, res) {
 	            mySocket._events.qcresponse = [];               						
 	            mySocket.emit("qclogin", qcDetails);
 	            mySocket.on('qcresponse', function (data) {
+                   	req.session.cookie.expires = sessionExtend;
 	                res.send(data);
 	            });
 		}else{
@@ -85,6 +87,7 @@ exports.qcProjectDetails_ICE = function (req, res) {
                     mySocket._events.qcresponse = [];               						
                     mySocket.emit("qclogin", qcDetails);
                     mySocket.on('qcresponse', function (data) {
+                        	req.session.cookie.expires = sessionExtend;
 						try{
 							projectDetailList.nineteen68_projects = projectdata;
 							projectDetailList.qc_projects = data.project;
@@ -251,6 +254,7 @@ exports.qcFolderDetails_ICE = function (req, res) {
                     mySocket._events.qcresponse = [];               						
                     mySocket.emit("qclogin", req.body);
                     mySocket.on('qcresponse', function (data) {
+                        	req.session.cookie.expires = sessionExtend;
 						// try{
 						// 	projectDetailList.nineteen68_projects = projectdata;
 						// 	projectDetailList.qc_projects = data.project;

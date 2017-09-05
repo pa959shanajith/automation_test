@@ -11,6 +11,7 @@ var dbConnICEHistory = require('../../server/config/ICEHistory');
 var epurl="http://127.0.0.1:1990/";
 var Client = require("node-rest-client").Client;
 var client = new Client();
+var sessionExtend = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes 
 /**
  * @author vishvas.a
  * @modifiedauthor shree.p (fetching the scenario names from the scenarios table)
@@ -580,6 +581,7 @@ exports.ExecuteTestSuite_ICE = function(req, res) {
                 mySocket._events.result_executeTestSuite = [];
                 mySocket.emit('executeTestSuite', executionRequest);
                 mySocket.on('result_executeTestSuite', function(resultData) {
+                    req.session.cookie.expires = new Date(Date.now() + 30 * 60 * 1000); 
                     if (resultData != "success" && resultData != "Terminate") {
                         try {
                             var insertReportHistory;
@@ -842,6 +844,7 @@ exports.ExecuteTestSuite_ICE_CI = function(req, res) {
                 mySocket._events.result_executeTestSuite = [];
                 mySocket.emit('executeTestSuite', executionRequest);
                 mySocket.on('result_executeTestSuite', function(resultData) {
+                    	req.session.cookie.expires = sessionExtend;
                     if (resultData != "success" && resultData != "Terminate") {
                         try {
                             var scenarioid = resultData.scenarioId;
