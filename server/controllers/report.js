@@ -68,9 +68,11 @@ exports.openScreenShot = function(req, res){
 	try{
 		var path = req.body.absPath;
 		var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-		console.log(Object.keys(myserver.allSocketsMap),"<<all people, asking person:",ip);
-		if('allSocketsMap' in myserver && ip in myserver.allSocketsMap){
-			var mySocket = myserver.allSocketsMap[ip];
+		var name = req.session.username;
+		console.log("IP:",ip);
+		console.log(Object.keys(myserver.allSocketsMap),"<<all people, asking person:",name);
+		if('allSocketsMap' in myserver && name in myserver.allSocketsMap){
+			var mySocket = myserver.allSocketsMap[name];
 			mySocket._events.render_screenshot = [];
 			mySocket.emit('render_screenshot', path);
 			mySocket.on('render_screenshot', function (resultData) {

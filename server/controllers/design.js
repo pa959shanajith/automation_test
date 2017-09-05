@@ -38,9 +38,11 @@ exports.initScraping_ICE = function (req, res) {
 			if(sessionToken != undefined && req.session.id == sessionToken)
 		{
 		var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-		console.log(Object.keys(myserver.allSocketsMap),"<<all people, asking person:",ip);
-		var mySocket = myserver.allSocketsMap[ip];
-		if('allSocketsMap' in myserver && ip in myserver.allSocketsMap){
+		console.log("IP:",ip);
+		var name = req.session.username;
+		console.log(Object.keys(myserver.allSocketsMap),"<<all people, asking person:",name);
+		if('allSocketsMap' in myserver && name in myserver.allSocketsMap){
+			var mySocket = myserver.allSocketsMap[name];
 			var reqScrapJson = {};
 			reqScrapJson.action = "SCRAPE"
 			if(req.body.screenViewObject.appType == "Desktop"){
@@ -172,8 +174,10 @@ exports.initScraping_ICE = function (req, res) {
 		var elementURL = req.body.elementUrl;
 		var appType = req.body.appType;
 		var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-		console.log(Object.keys(myserver.allSocketsMap),"<<all people, asking person:",ip);
-		var mySocket =  myserver.allSocketsMap[ip];
+		console.log("IP:",ip);
+		var name = req.session.username;
+		console.log(Object.keys(myserver.allSocketsMap),"<<all people, asking person:",name);
+		var mySocket = myserver.allSocketsMap[name];
 		mySocket.emit("focus", focusParam , elementURL, appType);
 		var flag = 'success';
 		res.send(flag);
@@ -1845,9 +1849,11 @@ exports.debugTestCase_ICE = function (req, res) {
 			if(sessionToken != undefined && req.session.id == sessionToken)
 		{
 		var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-		console.log(Object.keys(myserver.allSocketsMap),"<<all people, asking person:",ip);
-		var mySocket = myserver.allSocketsMap[ip];
-		if('allSocketsMap' in myserver && ip in myserver.allSocketsMap){
+		console.log("IP:",ip);
+		var name = req.session.username;
+		console.log(Object.keys(myserver.allSocketsMap),"<<all people, asking person:",name);
+		if('allSocketsMap' in myserver && name in myserver.allSocketsMap){
+			var mySocket = myserver.allSocketsMap[name];
 			try{
 				var action=req.body.param;
 				if(action == 'debugTestCase_ICE'){

@@ -72,7 +72,9 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
       },100);
 
       // socket connection ....
-      var socket = io('', { forceNew: true, reconnect: true, query: "check=true" });
+      var userName=JSON.parse(window.localStorage['_UI']).username;
+      var param={check:true,username:userName};
+      var socket = io('', { forceNew: true, reconnect: true, query: param});
 
       // fired when the connection acknowledgment is received from the server
       socket.on('connectionAck', function(value){

@@ -330,60 +330,69 @@ exports.createUser_Nineteen68 = function(req, res) {
             var salt = bcrypt.genSaltSync(10);
             var req_hashedPassword = bcrypt.hashSync(req_password, salt);
 
-            var getUsername = "SELECT username FROM users";
-            dbConn.execute(getUsername, function(err, userNameresult) {
-                try {
-                    for (var i = 0; i < userNameresult.rows.length; i++) {
-                        dbResult = userNameresult.rows[i];
-                        if (req_username.toLowerCase() === dbResult.username.toLowerCase()) {
-                            status = true;
-                            break;
-                        }
-                    }
-                    if (req_ldapuser) {
-                        req_hashedPassword = null;
-                    }
-                    if (status === false) {
-                        var userId = uuid();
-                        // var createUser = "INSERT INTO users (userid,deactivated,additionalroles,createdby,createdon,defaultrole,emailid,firstname,history,lastname,ldapuser,modifiedby,modifiedon,password,username) VALUES (" + userId + ",null,null,'" + req_username + "'," + new Date().getTime() + "," + req_defaultRole + ",'" + req_email_id + "','" + req_firstname + "',null,'" + req_lastname + "'," + req_ldapuser + ",'" + req_username + "'," + new Date().getTime() + ",'" + req_hashedPassword + "','" + req_username + "')";
-                        // dbConn.execute(createUser, function(err, userResult) {
-						var inputs = {"query":"createuser", "createdby":req_username,"defaultrole":req_defaultRole, "emailid":req_email_id
-						, "firstname":req_firstname, "lastname":req_lastname, "ldapuser":req_ldapuser, "password":req_hashedPassword, 
-						"username":req_username}
-						var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
-						client.post(epurl+"admin/createUser_Nineteen68",args,
-								function (result, response) {
-                            try {
-                                flag = "Success";
-                                //Create User History Update
-                                createUserHistory = "'userid=" + userId + ", deactivated=null, additionalroles=null, createdby=" + req_username + ", " +
-                                    "createdon=" + new Date().getTime() + ", defaultrole=" + req_defaultRole + ", emailid=" + req_email_id + ", " +
-                                    "firstname=" + req_firstname + ", lastname=" + req_lastname + ", ldapuser=" + req_ldapuser + ", modifiedby=" + req_username + ", modifiedon=" + new Date().getTime() + ", password=" + req_hashedPassword + ", username= " + req_username + " '";
-                                date = new Date().getTime();
-                                createUserHistoryQuery = "INSERT INTO users (userid,history) VALUES (" + userId + ",{" + date + ":" + createUserHistory + "})";
-                                fnCreateUserHistory(createUserHistoryQuery, function(err, response) {
-                                    if (response == 'success') {
-                                        res.send(flag);
-                                    } else {
-                                        flag = "fail";
-                                        res.send(flag);
-                                    }
-                                });
-                                //res.send(flag);
-                            } catch (exception) {
-                                console.log(exception);
-                                res.send(flag);
-                            }
-                        });
-                    } else {
-                        flag = "User Exists";
-                        res.send(flag);
-                    }
-                } catch (exception) {
-                    console.log(exception);
-                    res.send(flag);
-                }
-            })
+            // var getUsername = "SELECT username FROM users";
+			var inputs = {"query":"allusernames"}
+			var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
+            // dbConn.execute(getUsername, function(err, userNameresult) {
+			client.post(epurl+"admin/createUser_Nineteen68",args,
+								function (userNameresult, response) {
+				if(response.statusCode != 200 || userNameresult.rows == "fail"){
+					console.log("Error occured in createUser_Nineteen68 : Fail");
+					res.send("fail");
+				}else{
+					try {
+						for (var i = 0; i < userNameresult.rows.length; i++) {
+							dbResult = userNameresult.rows[i];
+							if (req_username.toLowerCase() === dbResult.username.toLowerCase()) {
+								status = true;
+								break;
+							}
+						}
+						if (req_ldapuser) {
+							req_hashedPassword = null;
+						}
+						if (status === false) {
+							var userId = uuid();
+							// var createUser = "INSERT INTO users (userid,deactivated,additionalroles,createdby,createdon,defaultrole,emailid,firstname,history,lastname,ldapuser,modifiedby,modifiedon,password,username) VALUES (" + userId + ",null,null,'" + req_username + "'," + new Date().getTime() + "," + req_defaultRole + ",'" + req_email_id + "','" + req_firstname + "',null,'" + req_lastname + "'," + req_ldapuser + ",'" + req_username + "'," + new Date().getTime() + ",'" + req_hashedPassword + "','" + req_username + "')";
+							// dbConn.execute(createUser, function(err, userResult) {
+							var inputs = {"query":"createuser", "createdby":req_username,"defaultrole":req_defaultRole, "emailid":req_email_id
+							, "firstname":req_firstname, "lastname":req_lastname, "ldapuser":req_ldapuser, "password":req_hashedPassword, 
+							"username":req_username}
+							var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
+							client.post(epurl+"admin/createUser_Nineteen68",args,
+									function (result, response) {
+								try {
+									flag = "Success";
+									//Create User History Update
+									createUserHistory = "'userid=" + userId + ", deactivated=null, additionalroles=null, createdby=" + req_username + ", " +
+										"createdon=" + new Date().getTime() + ", defaultrole=" + req_defaultRole + ", emailid=" + req_email_id + ", " +
+										"firstname=" + req_firstname + ", lastname=" + req_lastname + ", ldapuser=" + req_ldapuser + ", modifiedby=" + req_username + ", modifiedon=" + new Date().getTime() + ", password=" + req_hashedPassword + ", username= " + req_username + " '";
+									date = new Date().getTime();
+									createUserHistoryQuery = "INSERT INTO users (userid,history) VALUES (" + userId + ",{" + date + ":" + createUserHistory + "})";
+									// fnCreateUserHistory(createUserHistoryQuery, function(err, response) {
+									// 	if (response == 'success') {
+									// 		res.send(flag);
+									// 	} else {
+									// 		flag = "fail";
+									// 		res.send(flag);
+									// 	}
+									// });
+									res.send(flag);
+								} catch (exception) {
+									console.log(exception);
+									res.send(flag);
+								}
+							});
+						} else {
+							flag = "User Exists";
+							res.send(flag);
+						}
+					} catch (exception) {
+						console.log(exception);
+						res.send(flag);
+					}
+				}
+            });
         } else {
             res.send("Invalid Session");
         }

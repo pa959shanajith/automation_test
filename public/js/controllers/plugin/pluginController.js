@@ -3,7 +3,6 @@ mySPA.controller('pluginController',['$scope','$window','$http','$location','$ti
 	document.getElementById("currentYear").innerHTML = new Date().getFullYear()
 	var userInfo = JSON.parse(window.localStorage['_UI']);
 	var availablePlugins = userInfo.pluginsInfo;
-	availablePlugins.push({"pluginName":"ALM","pluginValue":true});
 	$("#plugin-container").empty().hide();
 	
 	if(window.localStorage['navigateScreen'] != "plugin")
@@ -99,11 +98,11 @@ mySPA.controller('pluginController',['$scope','$window','$http','$location','$ti
 						  }
 						}
 					
-					$("#plugin-container").removeClass("inactiveLink");
+					// $("#plugin-container").removeClass("inactiveLink");
 				}, function (error) { 
 					console.log("Error:::::::::::::", error);
 				})
-				//$("#plugin-container").removeClass("inactiveLink");
+				$("#plugin-container").removeClass("inactiveLink");
 			}	
 			else{
 				window.location.href = "/";

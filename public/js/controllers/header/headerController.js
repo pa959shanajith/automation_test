@@ -147,7 +147,7 @@ mySPA.controller('headerController', function($scope,$http,$location,headerServi
 				if(data != "fail"){
 					//To be removed - Has to come from database
 						var availablePlugins = [];
-						var key = ["Dashboard", "Dead Code Identifier", "Mindmap", "Neuron 2D", "Neuron 3D", "Oxbow Code Identifier", "Reports"];
+						var key = ["ALM","Auto Gen Path", "Dashboard", "Dead Code Identifier", "ICE" ,"Mindmap" ,"Neuron 2D", "Neuron 3D", "Oxbow Code Identifier", "Reports", "Weboccular"];
 						for(i=0; i<data.plugindetails.length; i++){
 							availablePlugins.push({
 								"pluginName" : key[i],
@@ -158,10 +158,10 @@ mySPA.controller('headerController', function($scope,$http,$location,headerServi
 							"pluginName" : "Utility",
 							"pluginValue" : "true"
 						})
-						availablePlugins.push({
-										"pluginName" : "Weboccular",
-										"pluginValue" : "true"
-						})
+						// availablePlugins.push({
+						// 				"pluginName" : "Weboccular",
+						// 				"pluginValue" : "true"
+						// })
 							data.pluginsInfo = availablePlugins;
 							//window.localStorage['LoginSuccess'] = "True";
 							window.localStorage['_SR'] = additionalRoleName;

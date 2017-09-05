@@ -22,21 +22,23 @@ exports.loginQCServer_ICE = function (req, res) {
 		}
 			if(sessionToken != undefined && req.session.id == sessionToken)
 		{
-		var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-		console.log(Object.keys(myserver.allSocketsMap),"<<all people, asking person:",ip);
-		var mySocket = myserver.allSocketsMap[ip];
-		if('allSocketsMap' in myserver && ip in myserver.allSocketsMap){
-			var username = req.body.qcUsername;
-            var password = req.body.qcPassword;
-            var url = req.body.qcURL;
-			var qcaction = req.body.qcaction;
-            var qcDetails = {"qcUsername":username,"qcPassword":password,"qcURL":url,"qcaction":qcaction};
-           // var data = "LAUNCH_SAP";
-            mySocket._events.qcresponse = [];               						
-            mySocket.emit("qclogin", qcDetails);
-            mySocket.on('qcresponse', function (data) {
-                res.send(data);
-            });
+		    var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+			console.log("IP:",ip);
+			var name = req.session.username;
+			console.log(Object.keys(myserver.allSocketsMap),"<<all people, asking person:",name);
+			if('allSocketsMap' in myserver && name in myserver.allSocketsMap){
+				var mySocket = myserver.allSocketsMap[name];
+				var username = req.body.qcUsername;
+	            var password = req.body.qcPassword;
+	            var url = req.body.qcURL;
+				var qcaction = req.body.qcaction;
+	            var qcDetails = {"qcUsername":username,"qcPassword":password,"qcURL":url,"qcaction":qcaction};
+	           // var data = "LAUNCH_SAP";
+	            mySocket._events.qcresponse = [];               						
+	            mySocket.emit("qclogin", qcDetails);
+	            mySocket.on('qcresponse', function (data) {
+	                res.send(data);
+	            });
 		}else{
 			console.log("Socket not Available");
 			try{
@@ -66,10 +68,11 @@ exports.qcProjectDetails_ICE = function (req, res) {
 		}
 			if(sessionToken != undefined && req.session.id == sessionToken)
 		{
-		var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-		console.log(Object.keys(myserver.allSocketsMap),"<<all people, asking person:",ip);
-		var mySocket = myserver.allSocketsMap[ip];
-		if('allSocketsMap' in myserver && ip in myserver.allSocketsMap){
+		//var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+			var name = req.session.username;
+			console.log(Object.keys(myserver.allSocketsMap),"<<all people, asking person:",name);
+		if('allSocketsMap' in myserver && name in myserver.allSocketsMap){
+			var mySocket = myserver.allSocketsMap[name];
             // var userid = req.body.qcUsername;
 			// var username = req.body.qcUsername;
             // var password = req.body.qcPassword;
@@ -232,10 +235,10 @@ exports.qcFolderDetails_ICE = function (req, res) {
 		}
 			if(sessionToken != undefined && req.session.id == sessionToken)
 		{
-		var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-		console.log(Object.keys(myserver.allSocketsMap),"<<all people, asking person:",ip);
-		var mySocket = myserver.allSocketsMap[ip];
-		if('allSocketsMap' in myserver && ip in myserver.allSocketsMap){
+			var name = req.session.username;
+			console.log(Object.keys(myserver.allSocketsMap),"<<all people, asking person:",name);
+			if('allSocketsMap' in myserver && name in myserver.allSocketsMap){
+				var mySocket = myserver.allSocketsMap[name];
             // var userid = req.body.qcUsername;
 			// var username = req.body.qcUsername;
             // var password = req.body.qcPassword;

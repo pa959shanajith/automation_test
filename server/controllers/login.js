@@ -31,7 +31,7 @@ exports.authenticateUser_Nineteen68 = function(req, res){
             req.session.username = username;
             req.session.uniqueId = sessId;
             console.log(myserver.sessionCreated);
-            if(myserver.sessionCreated.indexOf(username) >= 1){
+            if(myserver.sessionCreated.indexOf(username) > 0){
                   return res.send("userLogged");
             }
             var flag= 'inValidCredential';
@@ -93,14 +93,14 @@ exports.authenticateUser_Nineteen68 = function(req, res){
                                                                                   else{
                                                                                          res.send(flag);
                                                                                          console.log("session value ",myserver.sessionCreated);
-                                                                                         myserver.sessionCreated.push(username)
+                                                                                         //myserver.sessionCreated.push(username)
                                                                                   }  
                                                                      }
                                                                      else{
                                                                            if(validUser == true){
                                                                                          flag = 'validCredential';
-                                                                                         myserver.sessionCreated.push(username)
-                                                                                         console.log("session value ",myserver.sessionCreated.length);
+                                                                                    //      myserver.sessionCreated.push(username)
+                                                                                    //      console.log("session value ",myserver.sessionCreated.length);
                                                                                          res.setHeader('Set-Cookie', sessId);
                                                                                          res.send(flag);
                                                                                   }
@@ -606,10 +606,12 @@ exports.loadUserInfo_Nineteen68 = function(req, res){
                                                            var count = 0;
                                                            for(var k in pluginResult.rows[0]){
                                                               // if(count < pluginResult.columns.length){
-                                                                     pluginsArr.push({
+                                                                    if(k !='roleid' && k != 'permissionid'){
+                                                                          pluginsArr.push({
                                                                             "keyName" : k,
                                                                             "keyValue" : (pluginResult.rows[0])[k]
                                                                      })
+                                                                    }
                                                               //     count++;
                                                               // }
                                                            }
