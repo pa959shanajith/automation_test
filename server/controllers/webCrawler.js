@@ -44,8 +44,12 @@ exports.getCrawlResults = function(req, res){
                   return res.status(500).json({ success: false, data: err});
                 }
              });
+
+             mySocket.on('disconnect', function(){
+               return res.send("localServerDisconnected")
+             });
           }else{
-            res.send("Invalid Session");
+            return res.send("Invalid Session");
           }
       }catch(exception){
         console.log(exception);
