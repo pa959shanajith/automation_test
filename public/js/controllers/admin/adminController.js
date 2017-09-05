@@ -33,7 +33,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 
 
 
-	 		$(document).on('change','#selAssignUser', function(e) {
+	 	$(document).on('change','#selAssignUser', function(e) {
 			$('#allProjectAP, #assignedProjectAP').empty();
 		
 			$(".load").show();
@@ -79,6 +79,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 						projectData = data1;
 						if(data1.length > 0)
 						{
+							 
 							for(var i=0;i<data1.length;i++)
 							{
 								$('#assignedProjectAP').append($("<option value=" +data1[i].projectId+ "></option>").text(data1[i].projectName));
@@ -124,6 +125,10 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 									{
 										$('#allProjectAP').append($("<option value=" +unAssignedProjects.projectIds[m]+ "></option>").text(unAssignedProjects.projectNames[m]));
 									}
+									if($("#selAssignUser").find("option:selected").text() == 'Select User')
+									{
+										$("#assignedProjectAP,#allProjectAP").empty();
+									}
 									$(".load").hide();
 									$("#selAssignUser, #rightall, #rightgo, #leftgo, #leftall, .adminBtn").prop("disabled",false);
 								}
@@ -150,11 +155,13 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 					},function (error) { console.log("Error:::::::::::::", error) })
 				}
 			});
-		
+			
 		});
 
 		//	Assign Projects Tab Click
-	$(document).on('click','#assignProjectTab',function(event) {
+	$(document).on('click','#assignProjectTab',function(e) {
+		e.preventDefault();
+		//alert('click');
 	//	$scope.tabAssignProject = function() {
 		resetAssignProjectForm();
 		$("img.selectedIcon").removeClass("selectedIcon");
@@ -186,13 +193,13 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 			}
 			$("#selAssignUser").prop('selectedIndex', 0);
 			$("#allProjectAP,#assignedProjectAP,#selAssignProject").empty();
-			
 		},
 		function (error) { console.log("Error:::::::::::::", error) })
 		//};
 	 });
 
 	 	$(document).on('change','#selAssignProject', function() {
+			
 			$('#allProjectAP, #assignedProjectAP').empty();
 			var domainId = $("#selAssignProject option:selected").val();
 			var requestedids = [domainId];
@@ -281,6 +288,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 						if(resDetails.projectIds.length > 0)
 						{
 							$("#assignedProjectAP,#allProjectAP").empty();
+							
 							for(var n=0;n<resDetails.projectIds.length;n++)
 							{
 								$('#allProjectAP').append($("<option value=" +resDetails.projectIds[n]+ "></option>").text(resDetails.projectNames[n]));
@@ -2091,9 +2099,9 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 			if(userDataRes == "Invalid Session"){
 							  window.location.href = "/";
 							}
-			$("#firstName").val(userDataRes.firstName);
-			$("#lastName").val(userDataRes.lastName);
-			$("#email").val(userDataRes.emailId != undefined? userDataRes.emailId : "");
+			$("#firstName:not(.create)").val(userDataRes.firstName);
+			$("#lastName:not(.create)").val(userDataRes.lastName);
+			$("#email:not(.create)").val(userDataRes.emailId != undefined? userDataRes.emailId : "");
 			if(userDataRes.ldapuser == true){
 				$("#userSelect").siblings(".ldapBtn").addClass("ldapBtnActive");
 				$("#password, #confirmPassword").parent().hide();
