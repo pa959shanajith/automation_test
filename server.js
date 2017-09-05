@@ -1,48 +1,5 @@
 // Module Dependencies
 var cluster = require('cluster');
-var fs = require('fs');
-var util = require('util');
-var logFile = fs.createWriteStream('logs/node_server.log', { flags: 'a' });
-// Or 'w' to truncate the file every time the process starts.
-var logStdout = process.stdout;
-
-function _getCallerFile() {
-  var count = 0;
-    try {
-        var err = new Error();
-        var callerfile;
-        var currentfile;
-        var oFunc = Error.prepareStackTrace;
-        Error.prepareStackTrace = function (err, stack) { return stack; };
-
-        currentfile = err.stack.shift().getFileName();
-        while (err.stack.length) {
-          var a = err.stack.shift();
-          callerfile =a.getFileName();
-          if(currentfile !== callerfile){
-              callerLine = a.getLineNumber();
-              column = a.getColumnNumber();
-              Error.prepareStackTrace = oFunc; return {file : callerfile, number : callerLine, column: column};
-          }else{
-            count++;
-            callerLine = a.getLineNumber();
-            column = a.getColumnNumber();
-            if(count > 1){Error.prepareStackTrace = oFunc; return {file : callerfile, number : callerLine, column: column};}
-          }
-        }
-    } catch (err) {}
-}
-
-console.log = function () {
-  var d = new Date();
-  var n = d.toLocaleString();
-  var a = _getCallerFile();
-  logFile.write('['+n+']['+a.file+':'+a.number+ ':'+a.column+'] >> '+ util.format.apply(null, arguments) + '\n');
-//  logFile.write('['+n+'] ['+a+']; '+ util.format.apply(null, arguments) + '\n');
-  logStdout.write(util.format.apply(null, arguments) + '\n');
-}
-console.error = console.log;
-
 if (cluster.isMaster) {
     //    cluster.fork();
     cluster.fork();
@@ -57,9 +14,7 @@ if (cluster.isMaster) {
         console.log('Let\'s not have Sentiments... Worker %d is killed.', worker.id);
         cluster.fork();
     });
-
 } else {
-  try {
     var express = require('express');
     var app = express();
 
@@ -71,7 +26,7 @@ if (cluster.isMaster) {
     // var errorhandler = require('errorhandler');
     var cmd = require('node-cmd');
     var helmet = require('helmet');
-
+    var fs = require('fs');
     var async = require('async');
     //HTTPS Configuration
     var privateKey = fs.readFileSync('server/https/server.key', 'utf-8');
@@ -82,7 +37,19 @@ if (cluster.isMaster) {
     };
     var httpsServer = require('https').createServer(credentials, app);
     var io = require('socket.io')(httpsServer);
+    var fs = require('fs');
+    var util = require('util');
+    var logFile = fs.createWriteStream('logs/node_server.log', { flags: 'a' });
+      // Or 'w' to truncate the file every time the process starts.
+    var logStdout = process.stdout;
 
+    console.log = function () {
+      var d = new Date();
+      var n = d.toLocaleString();
+      logFile.write('['+n+']'+util.format.apply(null, arguments) + '\n');
+      logStdout.write(util.format.apply(null, arguments) + '\n');
+    }
+    console.error = console.log;
     module.exports = app;
     module.exports.allSocketsMap = {};
     module.exports.sessionCreated = ["name1"];
@@ -94,7 +61,6 @@ if (cluster.isMaster) {
         extended: true
     }));
     app.use(morgan('combined'))
-
     app.use(cookieParser());
     app.use(sessions({
         secret: '$^%EDE%^tfd65e7ufyCYDR^%IU',
@@ -142,8 +108,10 @@ if (cluster.isMaster) {
      app.get('/admin', function(req, res) {
         var usrName = req.session.username
         if(!req.session.defaultRole || req.session.defaultRole != 'Admin'){
-            var index = sessionCreated.indexOf(usrName);
-            sessionCreated.splice(index, 1);
+            console.log(usrName)
+            var index = module.exports.sessionCreated.indexOf(usrName);
+            module.exports.sessionCreated.splice(index, 1);
+            console.log(module.exports.sessionCreated)
             req.session.destroy(); res.status(401).send('<br><br>Your session has been expired.Please <a href="/">Login</a> Again');
         }else{
             if (req.cookies['connect.sid'] && req.cookies['connect.sid'] != undefined) { res.sendFile("index.html", { root: __dirname + "/public/" });} else {req.session.destroy(); res.status(401).send('<br><br>Your session has been expired.Please <a href="/">Login</a>Again');}
@@ -155,8 +123,10 @@ if (cluster.isMaster) {
         var usrName = req.session.username
         if(!req.session.defaultRole || req.session.defaultRole == "Admin" || req.session.defaultRole == "Business Analyst" || req.session.defaultRole == "Tech Lead" || req.session.defaultRole == "Test Manager")
         {
-            var index = sessionCreated.indexOf(usrName);
-            sessionCreated.splice(index, 1);
+            console.log(usrName)
+            var index = module.exports.sessionCreated.indexOf(usrName);
+            module.exports.sessionCreated.splice(index, 1);
+            console.log(module.exports.sessionCreated)
             req.session.destroy(); res.status(401).send('<br><br>Your session has been expired.Please <a href="/">Login</a> Again');
         }else{
             if (req.cookies['connect.sid'] && req.cookies['connect.sid'] != undefined) { res.sendFile("index.html", { root: __dirname + "/public/" });} else {req.session.destroy(); res.status(401).send('<br><br>Your session has been expired. Please <a href="/">Login</a> Again');}
@@ -168,8 +138,10 @@ if (cluster.isMaster) {
         var usrName = req.session.username
         if (!req.session.defaultRole || req.session.defaultRole == "Admin" || req.session.defaultRole == "Business Analyst" || req.session.defaultRole == "Tech Lead")
         {
-            var index = sessionCreated.indexOf(usrName);
-            sessionCreated.splice(index, 1);
+            console.log(usrName)
+            var index = module.exports.sessionCreated.indexOf(usrName);
+            module.exports.sessionCreated.splice(index, 1);
+            console.log(module.exports.sessionCreated)
             req.session.destroy(); res.status(401).send('<br><br>Your session has been expired.Please <a href="/">Login</a> Again');
         }else{
             if (req.cookies['connect.sid'] && req.cookies['connect.sid'] != undefined) { res.sendFile("index.html", { root: __dirname + "/public/" });} else {req.session.destroy(); res.status(401).send('<br><br>Your session has been expired. Please <a href="/">Login</a> Again');}
@@ -181,8 +153,10 @@ if (cluster.isMaster) {
         var usrName = req.session.username
       if (!req.session.defaultRole || req.session.defaultRole == "Admin" || req.session.defaultRole == "Business Analyst" || req.session.defaultRole == "Tech Lead" || req.session.defaultRole == "Test Engineer")
         {
-            var index = sessionCreated.indexOf(usrName);
-            sessionCreated.splice(index, 1);
+            console.log(usrName)
+            var index = module.exports.sessionCreated.indexOf(usrName);
+            module.exports.sessionCreated.splice(index, 1);
+            console.log(module.exports.sessionCreated)
             req.session.destroy(); res.status(401).send('<br><br>Your session has been expired.Please <a href="/">Login</a> Again');
         }else{
             if (req.cookies['connect.sid'] && req.cookies['connect.sid'] != undefined) { res.sendFile("index.html", { root: __dirname + "/public/" });} else {req.session.destroy(); res.status(401).send('<br><br>Your session has been expired. Please <a href="/">Login</a> Again');}
@@ -220,36 +194,36 @@ if (cluster.isMaster) {
     app.post('/neoQuerya', api.neoScriptA);
     //Starting jsreport server
     cmd.get('netstat -ano | find "LISTENING" | find "8001"', function(data, err, stderr){
-      if(data){
-          //console.log('killing JS report server and restarting');
-        //console.log('===== Process ID of jsreport =====',data);
-        var thisResult = data.split("\r\n")[0].split(" ")[data.split("\r\n")[0].split(" ").length-1];
-        var cmdtoexe = "Taskkill /PID "+thisResult+" /F";
-        cmd.get(cmdtoexe, function(data, err, stderr){
-          if(data){
-            //console.log('===== Killed jsreport server =====',data);
-            cmd.get('node index.js', function(data, err, stderr){
-              if (!err) {
-                console.log('the node-cmd:',data)
-              } else {
-                console.log("Cannot start Jsreport server")
-              }
-            });
-          }
-          else{
-            console.log("Cannot kill jsreport report");
-          }
-        })
-      }
-      else{
-        cmd.get('node index.js', function(data, err, stderr){
-          if (!err) {
-              console.log('JS report server started normally');
-          } else {
-            console.log("Cannot start Jsreport server")
-          }
-        });
-      }
+    	if(data){
+        	//console.log('killing JS report server and restarting');
+    		//console.log('===== Process ID of jsreport =====',data);
+    		var thisResult = data.split("\r\n")[0].split(" ")[data.split("\r\n")[0].split(" ").length-1];
+    		var cmdtoexe = "Taskkill /PID "+thisResult+" /F";
+    		cmd.get(cmdtoexe, function(data, err, stderr){
+    			if(data){
+    				//console.log('===== Killed jsreport server =====',data);
+    				cmd.get('node index.js', function(data, err, stderr){
+    					if (!err) {
+    						console.log('the node-cmd:',data)
+    					} else {
+    						console.log("Cannot start Jsreport server")
+    					}
+    				});
+    			}
+    			else{
+    				console.log("Cannot kill jsreport report");
+    			}
+    		})
+    	}
+    	else{
+    		cmd.get('node index.js', function(data, err, stderr){
+    			if (!err) {
+    	    		console.log('JS report server started normally');
+    			} else {
+    				console.log("Cannot start Jsreport server")
+    			}
+    		});
+    	}
     });
 
 
@@ -344,7 +318,7 @@ if (cluster.isMaster) {
     //-------------SERVER START------------//
     //server.listen(3000);      //Http Server
     var hostFamilyType = '0.0.0.0';
-  var portNumber=8443;
+	var portNumber=8443;
     httpsServer.listen(portNumber, hostFamilyType); //Https Server
     try{
         var apireq = apiclient.get("http://127.0.0.1:1990/",function(data,response){
@@ -384,7 +358,7 @@ if (cluster.isMaster) {
         next();
     });
 
-  //SOCKET CONNECTION USING SOCKET.IO
+	//SOCKET CONNECTION USING SOCKET.IO
     var allClients = [];
     var sessionCreated = [];
     var allSockets = [];
@@ -401,8 +375,8 @@ if (cluster.isMaster) {
         console.log("socket connecting address" , address);
         console.log('Param ',socket.handshake.query['username']);
         //console.log("middleware:", socket.request._query['check']);
-
-
+       
+        
         if (socket.request._query['check'] == "true" ) {
         //  if ( !(address in socketMapUI) ) {
             isUISocketRequest = true;
@@ -421,7 +395,7 @@ if (cluster.isMaster) {
           }
         }
 
-
+        
         module.exports.allSocketsMap = socketMap;
         module.exports.allSocketsMapUI = socketMapUI;
         module.exports.allSchedulingSocketsMap=sokcetMapScheduling;
@@ -459,7 +433,7 @@ if (cluster.isMaster) {
           }else{
             //var i = socketMap.indexOf(socket);
             var address=socket.handshake.query['username'];
-
+            
              if (socketMap[address] != undefined) {
                  console.log('Socket Connection got disconnected for :', address);
                 delete socketMap[address];
@@ -484,54 +458,45 @@ if (cluster.isMaster) {
            var address=socket.handshake.query['username'];
            console.log(data);
             if (data && socketMap[address] != undefined) {
-
+               
                 console.log('Socket Connection got disconnected for Normal Mode :', address);
                 delete socketMap[address];
-
+               
                 module.exports.allSocketsMap = socketMap;
-
+                
                 console.log("NO. OF CLIENTS CONNECTED:", Object.keys(socketMap).length,'\nIP\'s connected :',Object.keys(socketMap).join());
 
-
+           
               sokcetMapScheduling[address] = socket;
               socket.send('reconnected');
-
+           
               module.exports.allSchedulingSocketsMap = sokcetMapScheduling;
               console.log("NO. OF CLIENTS CONNECTED For Scheduling:", Object.keys(sokcetMapScheduling).length,'\nIP\'s connected :',Object.keys(sokcetMapScheduling).join());
 
-
+         
             }else if(!data && sokcetMapScheduling!=undefined){
                 console.log('Socket Connection got disconnected for Scheduling mode:', address);
                 delete sokcetMapScheduling[address];
-
+               
                 module.exports.allSchedulingSocketsMap = sokcetMapScheduling;
                 console.log("NO. OF CLIENTS CONNECTED For Scheduling:", Object.keys(sokcetMapScheduling).length,'\nIP\'s connected :',Object.keys(sokcetMapScheduling).join());
 
-
+           
               socketMap[address] = socket;
               module.exports.allSocketsMap = socketMap;
               socket.send('connected');
-
-
+           
+              
 
             }
-
+            
         });
-
+       
         socket.on('connect_failed', function() {
             console.log("Sorry, there seems to be an issue with the connection!");
         });
         console.log("NO. OF CLIENTS CONNECTED:", Object.keys(socketMap).length,'\nIP\'s connected :',Object.keys(socketMap).join());
-
+       
     });
-    //SOCKET CONNECTION USING SOCKET.IO
-
-    // console.log("module.exports.allSocketsMap=-------------------------\n", module.exports.allSocketsMap);
-  } catch (e) {
-    console.log(e);
-    setTimeout(function(){
-      cluster.worker.kill();
-    }, 2)
-  }
-
+   
 }
