@@ -401,7 +401,8 @@ var addTask = function(e){
 								}
 							});
 						});
-					}else if(nType=='modules_endtoend') taskflag =true;
+						//Removed a condition to fix assign issue in end to end flow
+					}
 
 				});
 			}else{
