@@ -183,7 +183,7 @@ console.error = console.log;
     });
 
     //Test Lead and Test Manager can access Weboccular Plugin
-    app.get(/^\/(p_Weboccular)$/, function(req, res){
+    app.get(/^\/(p_Weboccular|neuronGraphs2D)$/, function(req, res){
         var usrName = req.session.username
       if (!req.session.defaultRole || req.session.defaultRole == "Admin" || req.session.defaultRole == "Business Analyst" || req.session.defaultRole == "Tech Lead" || req.session.defaultRole == "Test Engineer")
         {
