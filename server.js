@@ -216,12 +216,9 @@ console.error = console.log;
     // Mindmap Routes
     var api = require('./routes_mindmap/api.js');
     var home = require('./routes_mindmap/home.js');
-    var index = require('./routes_mindmap/index.js');
-    var templates = require('./routes_mindmap/tmTemplates.js');
     var Client = require("node-rest-client").Client;
     var apiclient = new Client();
     app.use('/home', home);
-    app.use('/templates', templates);
     app.get('/import', api.importToNeo);
     app.get('/logout', api.logout);
     app.post('/casQuerya', api.casScriptA);
@@ -273,6 +270,7 @@ console.error = console.log;
     var qc = require('./server/controllers/qualityCenter');
     var webCrawler = require('./server/controllers/webCrawler');
     var chatbot = require('./server/controllers/chatbot');
+    var neuronGraphs2D = require('./server/controllers/neuronGraphs2D');
 
     //Login Routes
     app.post('/authenticateUser_Nineteen68', login.authenticateUser_Nineteen68);
@@ -336,11 +334,12 @@ console.error = console.log;
     //Utility plugins
     app.post('/Encrypt_ICE', utility.Encrypt_ICE);
     app.post('/crawResults', webCrawler.getCrawlResults);
-
     //Chatbot Routes
     app.post('/getTopMatches_ProfJ', chatbot.getTopMatches_ProfJ);
     app.post('/updateFrequency_ProfJ', chatbot.updateFrequency_ProfJ);
-
+	//NeuronGraphs Plugin Routes
+    app.post('/hierarchy_nGraphs2D', neuronGraphs2D.getHierarchy);
+    app.post('/getGraph_nGraphs2D', neuronGraphs2D.getGraphData);
     //QC Plugin
     app.post('/loginQCServer_ICE', qc.loginQCServer_ICE);
     app.post('/qcProjectDetails_ICE', qc.qcProjectDetails_ICE);

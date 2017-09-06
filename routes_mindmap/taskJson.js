@@ -344,7 +344,7 @@ function next_function(resultobj,cb,data){
 								// 		}
 										
 								// 		//console.log(user_task_json);
-								// 		//fs.writeFileSync('assets_mindmap/task_json.json',JSON.stringify(user_task_json),'utf8');
+								// 		//fs.writeFileSync('assets/task_json.json',JSON.stringify(user_task_json),'utf8');
 								// 		maincallback();
 								// 		}catch(Ex){
 								// 			console.log(Ex);

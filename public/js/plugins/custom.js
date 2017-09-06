@@ -79,10 +79,7 @@ $(document).ready(function() {
 
 	//Popup Function - Screen Level (Screenshot, Filter, Tasks, Project Info)
 	$(document).on("click", ".slidePopup", function(e){
-		if($(this).attr('title') == "Filter" && $('#scraplist li').length <= 0){
-
-		}
-		else{
+		if(!($(this).attr('title') == "Filter" && (window.localStorage['navigateScreen'] == "Scrape" && $('#scraplist li').length <= 0))){
 			$(".thumb-ic").removeClass("thumb-ic-highlight")
 			$(".popupWrap").animate({ opacity: 0, right: "70px" }, 100).css({'z-index':'0','pointer-events':'none'})
 			$(this).children(".thumb-ic").addClass("thumb-ic-highlight")
@@ -252,6 +249,9 @@ $(document).ready(function() {
 function loadUserTasks(){
 	if(window.location.pathname != "/home"){
 		$("#mindmapCSS1, #mindmapCSS2").remove()
+	}
+	else if(window.location.pathname != "/neuronGraphs2D"){
+		$("#nGraphsCSS").remove()
 	}
 	var tasksJson = JSON.parse(window.localStorage['_TJ'])
 	$(".task-content-inner").empty().hide()
