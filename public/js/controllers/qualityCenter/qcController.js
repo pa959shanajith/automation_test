@@ -378,6 +378,12 @@ mySPA.controller('qcController',['$scope','$window','$http','$location','$timeou
 		var userid = JSON.parse(window.localStorage['_UI']).user_id;
 		qcServices.viewQcMappedList_ICE(userid)
 		.then(function(data){
+			// var selectOptions = $("#selAssignUser option:not(:first)");
+			data.sort(function(a,b) {
+				if (a.qctestcase > b.qctestcase) return 1;
+			    else if (a.qctestcase < b.qctestcase) return -1;
+			    else return 0;
+			})
 			if(data.length > 0){
 				$(".qcActionBtn, .leftQcStructure, .rightQcStructure").hide();
 				$("#page-taskName span").text("Mapped Files");

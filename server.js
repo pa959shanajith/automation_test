@@ -106,7 +106,12 @@ if (cluster.isMaster) {
     });
 
      app.get('/admin', function(req, res) {
+        var usrName = req.session.username
         if(!req.session.defaultRole || req.session.defaultRole != 'Admin'){
+            console.log(usrName)
+            var index = module.exports.sessionCreated.indexOf(usrName);
+            module.exports.sessionCreated.splice(index, 1);
+            console.log(module.exports.sessionCreated)
             req.session.destroy(); res.status(401).send('<br><br>Your session has been expired.Please <a href="/">Login</a> Again');
         }else{
             if (req.cookies['connect.sid'] && req.cookies['connect.sid'] != undefined) { res.sendFile("index.html", { root: __dirname + "/public/" });} else {req.session.destroy(); res.status(401).send('<br><br>Your session has been expired.Please <a href="/">Login</a>Again');}
@@ -115,8 +120,13 @@ if (cluster.isMaster) {
 
     //Only Test Engineer and Test Lead have access
     app.get(/^\/(design|designTestCase|execute|scheduling|p_ALM)$/, function(req, res){
+        var usrName = req.session.username
         if(!req.session.defaultRole || req.session.defaultRole == "Admin" || req.session.defaultRole == "Business Analyst" || req.session.defaultRole == "Tech Lead" || req.session.defaultRole == "Test Manager")
         {
+            console.log(usrName)
+            var index = module.exports.sessionCreated.indexOf(usrName);
+            module.exports.sessionCreated.splice(index, 1);
+            console.log(module.exports.sessionCreated)
             req.session.destroy(); res.status(401).send('<br><br>Your session has been expired.Please <a href="/">Login</a> Again');
         }else{
             if (req.cookies['connect.sid'] && req.cookies['connect.sid'] != undefined) { res.sendFile("index.html", { root: __dirname + "/public/" });} else {req.session.destroy(); res.status(401).send('<br><br>Your session has been expired. Please <a href="/">Login</a> Again');}
@@ -125,8 +135,13 @@ if (cluster.isMaster) {
 
     //Test Engineer,Test Lead and Test Manager can access
     app.get(/^\/(specificreports|home|p_Utility|p_Reports|plugin|p_ALM)$/, function(req, res){
+        var usrName = req.session.username
         if (!req.session.defaultRole || req.session.defaultRole == "Admin" || req.session.defaultRole == "Business Analyst" || req.session.defaultRole == "Tech Lead")
         {
+            console.log(usrName)
+            var index = module.exports.sessionCreated.indexOf(usrName);
+            module.exports.sessionCreated.splice(index, 1);
+            console.log(module.exports.sessionCreated)
             req.session.destroy(); res.status(401).send('<br><br>Your session has been expired.Please <a href="/">Login</a> Again');
         }else{
             if (req.cookies['connect.sid'] && req.cookies['connect.sid'] != undefined) { res.sendFile("index.html", { root: __dirname + "/public/" });} else {req.session.destroy(); res.status(401).send('<br><br>Your session has been expired. Please <a href="/">Login</a> Again');}
@@ -135,8 +150,13 @@ if (cluster.isMaster) {
 
     //Test Lead and Test Manager can access Weboccular Plugin
     app.get(/^\/(p_Weboccular)$/, function(req, res){
+        var usrName = req.session.username
       if (!req.session.defaultRole || req.session.defaultRole == "Admin" || req.session.defaultRole == "Business Analyst" || req.session.defaultRole == "Tech Lead" || req.session.defaultRole == "Test Engineer")
         {
+            console.log(usrName)
+            var index = module.exports.sessionCreated.indexOf(usrName);
+            module.exports.sessionCreated.splice(index, 1);
+            console.log(module.exports.sessionCreated)
             req.session.destroy(); res.status(401).send('<br><br>Your session has been expired.Please <a href="/">Login</a> Again');
         }else{
             if (req.cookies['connect.sid'] && req.cookies['connect.sid'] != undefined) { res.sendFile("index.html", { root: __dirname + "/public/" });} else {req.session.destroy(); res.status(401).send('<br><br>Your session has been expired. Please <a href="/">Login</a> Again');}

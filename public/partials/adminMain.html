@@ -50,39 +50,39 @@
 					<button title="LDAP" class="btn btn-xs ldapBtn" ng-click="ldapFn()">LDAP</button>
 					<input type="text" id="userName" name="userName"
 						ng-model="userName" maxlength="50"
-						class="form-control form-control-custom validationKeydown" placeholder="User Name"><span
+						class="form-control form-control-custom validationKeydown create" placeholder="User Name"><span
 						ng-show="userNameRequired" class="error-msg ng-cloak errorlbl">{{userNameRequired}}</span>
 				</div>
 				<div class='leftControl adminControl'>
 					<input type="text" name="firstName" id="firstName"
 						ng-model="firstName" maxlength="12"
-						class="form-control form-control-custom validationKeydown preventSpecialChar" placeholder="First Name"><span
+						class="form-control form-control-custom validationKeydown preventSpecialChar create" placeholder="First Name"><span
 						ng-show="firstNameRequired" class="error-msg ng-cloak errorlbl">{{firstNameRequired}}</span>
 				</div>
 				<div class='rightControl adminControl'>
 					<input type="text" name="lastName" id="lastName"
 						ng-model="lastName" maxlength="12"
-						class="form-control form-control-custom validationKeydown preventSpecialChar" placeholder="Last Name"><span
+						class="form-control form-control-custom validationKeydown preventSpecialChar create" placeholder="Last Name"><span
 						ng-show="lastNameRequired" class="error-msg ng-cloak errorlbl">{{lastNameRequired}}</span>
 				</div>
 				<div class='leftControl adminControl'>
 					<input type="password" name="passWord" id="password"
 						ng-model="passWord" maxlength="12"
-						class="form-control form-control-custom" placeholder="Password"
+						class="form-control form-control-custom create" placeholder="Password"
 						autocomplete="off"><span ng-show="passwordRequired"
 						class="error-msg error-msg-password ng-cloak errorlbl">{{passwordRequired}}</span>
 				</div>
 				<div class='rightControl adminControl'>
 					<input type="password" name='confirmPassword' id='confirmPassword'
 						ng-model="confirmPassword" maxlength="12"
-						class="form-control form-control-custom"
+						class="form-control form-control-custom create"
 						placeholder="Confirm Password" autocomplete="off"><span
 						ng-show="confirmPasswordRequired"
 						class="error-msg error-msg-password ng-cloak errorlbl">{{confirmPasswordRequired}}</span>
 				</div>
 				<div class='adminControl'>
 					<input type="email" name="email" id="email" ng-model="email"
-						maxlength="50" class="form-control form-control-custom"
+						maxlength="50" class="form-control form-control-custom create"
 						placeholder="Email Id"><span ng-show="emailRequired"
 						class="error-msg ng-cloak errorlbl">{{emailRequired}}</span>
 				</div>
@@ -238,35 +238,35 @@
 				<div class='domainTxt appTypeTxt'>Application Type</div>
 				
 				<div class="appTypesContainer">
-					<div class='projectTypes' data-app="Web" title="Web">
+					<div class='projectTypes_create' data-app="Web" title="Web">
 						<img src='imgs/web.png' alt='Web' />
 						<label>Web</label>
 					</div>
-					<div class='projectTypes' data-app="Webservice" title="Web Service">
+					<div class='projectTypes_create' data-app="Webservice" title="Web Service">
 						<img src='imgs/webservice.png' alt='WebService' />
 						<label>Web Services</label>
 					</div>
-					<div class='projectTypes' data-app="Mainframe" title="Mainframe">
+					<div class='projectTypes_create' data-app="Mainframe" title="Mainframe">
 						<img src='imgs/mainframe.png' alt='Mainframe' />
 						<label>Mainframe</label>
 					</div>
-					<div class='projectTypes' data-app="Desktop" title="Desktop Apps">
+					<div class='projectTypes_create' data-app="Desktop" title="Desktop Apps">
 						<img src='imgs/desktop.png' alt='Desktop' />
 						<label>Desktop Apps</label>
 					</div>
-					<div class='projectTypes' data-app="DesktopJava" title="Oracle Apps">
+					<div class='projectTypes_create' data-app="DesktopJava" title="Oracle Apps">
 						<img src='imgs/oracleApps.png' alt='Oracle Apps' />
 						<label>Oracle Apps</label>
 					</div>
-					<div class='projectTypes' data-app="MobileApp" title="Mobile Apps">
+					<div class='projectTypes_create' data-app="MobileApp" title="Mobile Apps">
 						<img src='imgs/mobileApps.png' alt='Mobile Apps' />
 						<label>Mobile Apps</label>
 					</div>
-					<div class='projectTypes' data-app="MobileWeb" title="Mobile Web">
+					<div class='projectTypes_create' data-app="MobileWeb" title="Mobile Web">
 						<img src='imgs/mobileWeb.png' alt='Mobile Web' />
 						<label>Mobile Web</label>
 					</div>
-					<div class='projectTypes' data-app="SAP" title="SAP Apps">
+					<div class='projectTypes_create' data-app="SAP" title="SAP Apps">
 						<img src='imgs/sapApps.png' alt='SAP Apps' />
 						<label>SAP Apps</label>
 					</div>
@@ -274,7 +274,7 @@
 			</div>
 			
 			<!-- Relase Cycle -->
-			<div class="containerWrap relCycContainer">
+			<div class="containerWrap relCycContainer" id='createRelContainer'>
 				 <!-- Release Container -->
 				 <div class="containerWrap releaseContainer rcContainer">
 				 	<!-- Add Release -->
@@ -282,7 +282,7 @@
 				 	<!-- Add Release -->
 				 	
 				 	<!-- Releases List -->
-				 	<ul id="releaseList" class="containerWrap scrollbar-inner relCycScroll">
+				 	<ul id="releaseList" class="containerWrap scrollbar-inner relCycScroll createRelBox">
 				 	</ul>
 				 	<!-- Releases List -->
 				 </div>
@@ -399,8 +399,8 @@
 				<button class="btn btn-md pull-right adminBtn createProjectBtn" ng-click="update_project()">Update</button>
 			</div>
 			<!-- Button -->
-			<div class="col-xs-9 form-group" style="width: 83%">
-				<div class='userForm projectForm'>
+			<div class="col-xs-9 form-group" style="width: 83%" id='updateProjectForm'>
+				<div class='userForm projectForm' >
 					<!--<div class='domainTxt'>Domain</div>
 					<select class="adminSelect form-control" style="width: 91%" id="selDomainEdit">
 						<option value="" disabled selected>Please Select Your Domain</option>

@@ -1,6 +1,6 @@
 var myserver = require('../../server.js');
 var url=require('url');
-
+var sessionExtend = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes 
 exports.getCrawlResults = function(req, res){
        try{
            if(req.cookies['connect.sid'] != undefined){
@@ -24,6 +24,7 @@ exports.getCrawlResults = function(req, res){
              }
              mySocket.emit("webCrawlerGo", input_url, level, agent);
              mySocket.on('result_web_crawler', function (value) {
+               req.session.cookie.expires = sessionExtend;
                try{
                 //  console.log(value);
                   var mySocketUI =  myserver.allSocketsMapUI[name];
@@ -33,6 +34,7 @@ exports.getCrawlResults = function(req, res){
                 }
              });
              mySocket.on('result_web_crawler_finished', function (value) {
+               req.session.cookie.expires = sessionExtend;
                try{
                   //console.log(value);
                   var mySocketUI =  myserver.allSocketsMapUI[name];
@@ -46,8 +48,12 @@ exports.getCrawlResults = function(req, res){
                   return res.status(500).json({ success: false, data: err});
                 }
              });
+
+             mySocket.on('disconnect', function(){
+               return res.send("localServerDisconnected")
+             });
           }else{
-            res.send("Invalid Session");
+            return res.send("Invalid Session");
           }
       }catch(exception){
         console.log(exception);

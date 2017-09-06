@@ -98,11 +98,11 @@ mySPA.controller('pluginController',['$scope','$window','$http','$location','$ti
 						  }
 						}
 					
-					$("#plugin-container").removeClass("inactiveLink");
+					// $("#plugin-container").removeClass("inactiveLink");
 				}, function (error) { 
 					console.log("Error:::::::::::::", error);
 				})
-				//$("#plugin-container").removeClass("inactiveLink");
+				$("#plugin-container").removeClass("inactiveLink");
 			}	
 			else{
 				window.location.href = "/";

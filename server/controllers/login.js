@@ -99,8 +99,8 @@ exports.authenticateUser_Nineteen68 = function(req, res){
                                                                      else{
                                                                            if(validUser == true){
                                                                                          flag = 'validCredential';
-                                                                                         myserver.sessionCreated.push(username)
-                                                                                         console.log("session value ",myserver.sessionCreated.length);
+                                                                                    //      myserver.sessionCreated.push(username)
+                                                                                    //      console.log("session value ",myserver.sessionCreated.length);
                                                                                          res.setHeader('Set-Cookie', sessId);
                                                                                          res.send(flag);
                                                                                   }

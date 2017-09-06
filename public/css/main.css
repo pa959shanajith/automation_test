@@ -1035,6 +1035,12 @@ input[disabled]{
     max-height: 60px;
     color: #000;
 }
+.custList li{
+    white-space: nowrap;
+    width: 17em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 .compareObj
 {
     float: left;
@@ -2522,6 +2528,8 @@ input[disabled]{
 .scheduleSuite .ipformating{
 	height: 27px;
     margin-top: 2px;
+    width: 196px;
+    padding: 0px;
 }
 .scheduleSuite .datePicContainer{
 	position: relative;
@@ -3206,7 +3214,7 @@ li.select_all .addCustObj{
 	top: 20px;
 }
 
-.projectTypes {
+.projectTypes,.projectTypes_create {
 	float: left;
 	width: 12.5%;
 	padding: 7px;
@@ -3214,7 +3222,7 @@ li.select_all .addCustObj{
 	cursor: pointer
 }
 
-.projectTypes label {
+.projectTypes label,.projectTypes_create label {
 	float: left;
 	width: 100%;
 	font-size: 11px;
@@ -3225,22 +3233,22 @@ li.select_all .addCustObj{
 	cursor: pointer
 }
 
-.projectTypes:nth-child(3) label,
-.projectTypes:nth-child(4) label,
-.projectTypes:nth-child(6) label,
-.projectTypes:nth-child(7) label{
+.projectTypes:nth-child(3) label,.projectTypes_create:nth-child(3) label,
+.projectTypes:nth-child(4) label,.projectTypes_create:nth-child(4) label,
+.projectTypes:nth-child(6) label,.projectTypes_create:nth-child(6) label,
+.projectTypes:nth-child(7) label,.projectTypes_create:nth-child(7) label{
 	margin-top: 9px;
 }
 
-.projectTypes:nth-child(5) label{
+.projectTypes:nth-child(5) label,.projectTypes_create:nth-child(5) label {
 	margin-top: 14px;
 }
 
-.projectTypes:nth-child(8) label{
+.projectTypes:nth-child(8) label,projectTypes_create:nth-child(8){
 	margin-top: 19px;
 }
 
-.projectTypes:hover{
+.projectTypes:hover,.projectTypes_create:hover{
 	background: #e4e4e4;
     border-radius: 6px;
     transition: 0.3s ease-in-out;
@@ -3537,7 +3545,7 @@ li.select_all .addCustObj{
 	top: 20px;
 }
 
-.projectTypes {
+.projectTypes,.projectTypes_create {
 	float: left;
 	width: 12.5%;
 	padding: 7px;
@@ -3545,7 +3553,7 @@ li.select_all .addCustObj{
 	cursor: pointer
 }
 
-.projectTypes label {
+.projectTypes label,.projectTypes_create label {
 	float: left;
 	width: 100%;
 	font-size: 11px;
@@ -3556,29 +3564,29 @@ li.select_all .addCustObj{
 	cursor: pointer
 }
 
-.projectTypes:nth-child(3) label,
-.projectTypes:nth-child(4) label,
-.projectTypes:nth-child(6) label,
-.projectTypes:nth-child(7) label{
+.projectTypes:nth-child(3) label,.projectTypes_create:nth-child(3) label,
+.projectTypes:nth-child(4) label,.projectTypes_create:nth-child(4) label,
+.projectTypes:nth-child(6) label,.projectTypes_create:nth-child(6) label,
+.projectTypes:nth-child(7) label,.projectTypes_create:nth-child(7) label{
 	margin-top: 9px;
 }
 
-.projectTypes:nth-child(5) label{
+.projectTypes:nth-child(5) label,.projectTypes_create:nth-child(5) label{
 	margin-top: 14px;
 }
 
-.projectTypes:nth-child(8) label{
+.projectTypes:nth-child(8) label,.projectTypes:nth-child(8) label{
 	margin-top: 19px;
 }
 
-.projectTypes:hover{
+.projectTypes:hover,.projectTypes_create:hover{
 	background: #e4e4e4;
     border-radius: 6px;
     transition: 0.3s ease-in-out;
     -moz-transition: 0.3s ease-in-out;
     -webkit-transition: 0.3s ease-in-out;
 }
-.projectTypesremovefunc:hover{
+.projectTypesremovefunc:hover,.projectTypesremovefunc_create:hover{
 	background:none !important;
 	cursor:default !important;
 }

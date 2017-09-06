@@ -361,6 +361,7 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 
 	//Save TestSuite Functionality
 	$scope.updateTestSuite = function(){
+		blockUI("Saving in progress. Please Wait...");
 		var batchInfo = [];
 		var batchDetails = {};
 		userinfo = {
@@ -445,6 +446,7 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 		//Getting ConditionChecks
 		ExecutionService.updateTestSuite_ICE(batchDetails)
 		.then(function(data) {
+			unblockUI();
 			if(data == "Invalid Session"){
 				window.location.href = "/";
 			}
