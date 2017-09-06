@@ -1446,11 +1446,14 @@ function TestSuiteDetails_Module_ICE(req, cb1, data) {
                     var conditioncheckvalues = [];
                     var donotexecutevalues = [];
                     var getparampathvalues = [];
-                    for (var i = 0; i < testscenarioids.length; i++) {
+                    if(testscenarioids!=null && testscenarioids !=undefined){
+                        for (var i = 0; i < testscenarioids.length; i++) {
                         conditioncheckvalues.push('0');
                         donotexecutevalues.push('1');
                         getparampathvalues.push('');
+                        }
                     }
+                    
                     var inputs = {"cycleid":requiredcycleid,
                     "testsuitename":requiredtestsuitename,
                     "testsuiteid":requiredtestsuiteid,
