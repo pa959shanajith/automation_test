@@ -91,20 +91,42 @@
       <div ng-if="tab == 'tabRequirement'" class="content-div content-div-req"></div>
       <div ng-if="tab == 'tabRequirement'" class="content-div content-div-req"></div>
       <div ng-if="tab == 'tabRequirement'" class="content-div content-div-req"></div>
-       <div class="selectProject"><label class="selectProjectLabel">Select Project:</label>
-             <select class="project-list"></select>
-         </div>
-      <div ng-if="tab == 'tabCreate'" id="ct-moduleBox" class="ct-moduleBoxOptional tabCreate">         
-         <div class="ct-nodeBox"></div>
+
+      <div ng-if="tab == 'tabCreate'" id="ct-moduleBox" class="ct-moduleBoxOptional tabCreate">      
+		<div class="ct-project-tab">
+                <span class="selectProject"> 
+                    <label class="selectProjectLabel">Select Project:</label>
+                        <select class="project-list"></select>
+                </span>		
+		</div>
+	  <div class="ct-nodeBox"></div>
          <span id='ctExpandCreate' class=''><img alt="Collapse Icon" class="iconSpaceArrow" src="imgs/ic-collapse.png"></span>
          <!--<div id="ctExpandCreate" class="ct-expand"></div>-->
       </div>
+
+
       <div ng-if="tab == 'tabAssign'" id="ct-AssignBox" class="ct-moduleBoxOptional tabAssign">
-         <div class="ct-nodeBox"></div>
+      
+          <div class='ct-project-tab'>
+                <span ng-if="tab == 'tabAssign'" id='SearchAssign-ete'>
+                    <span class="search-assign"><img alt="Search Icon" class="searchModuleimg-assign" src="imgs/ic-search-icon.png"></span>
+                    <input type="text" id="searchModule-assign" class="searchbox-assign" placeholder="Search">
+                </span>
+
+                <span class="selectProject"> 
+                    <label class="selectProjectLabel">Select Project:</label>
+                        <select class="project-list"></select>
+                </span>
+          </div> 
+         <div class="ct-nodeBox">              
+         </div>
         <span id='ctExpandAssign' class=''><img alt="Collapse Icon" class="iconSpaceArrow" src="imgs/ic-collapse.png"></span>
          <!--<div id="ctExpandAssign" class="ct-expand"></div>-->
       </div>
+
       <div ng-if="tab == 'tabAssign'" id="ct-canvasforAssign" class="tabAssign">
+
+         
             <!--<div class="ct-tileBox">
                 <div class="ct-tile">
                 <svg class="ct-svgTile" height="150px" width="150px">
@@ -204,7 +226,7 @@
                <div id="hello" class="scroll-wrapper chatContainer scrollbar-inner scrollbar-chatArea chatArea" style="position: relative;">
                   <div id='chatContainerBox' class="chatContainer scrollbar-inner scrollbar-chatArea chatArea scroll-content" style="height: 100px; margin-bottom: 0px; margin-right: 0px; max-height: none;">
                         <div class="assistFrom-them">
-                            <p> Hello, I’m Prof J. I try to be helpful. (But I’m still just a bot. Sorry!) *Type keywords* and hit _enter_ to send your message. </p><br ng-if="($index+1)%1==0">
+                            <p> Hello, I'm Prof J. I try to be helpful. (But I'm still just a bot. Sorry!) *Type keywords* and hit _enter_ to send your message. </p><br ng-if="($index+1)%1==0">
                         </div>
                         <div ng-repeat="c in conversation">
                             <div style="text-align: right">
@@ -217,7 +239,7 @@
                                 <!-- 2 cases: 1. If server returned responses-->
                                 <div ng-if="c.text && c.text[0][0] != -1 ">
                                     <p ng-if="c.type==0">
-                                        Did you mean to ask about one of these? Please click any of the links below or type more keywords if you don’t see the right option.</p>
+                                        Did you mean to ask about one of these? Please click any of the links below or type more keywords if you don't see the right option.</p>
                                     <p style="cursor:pointer" ng-repeat="x in c.text" ng-click = "displayAnswer($index)">
                                          <u>[{{$index + 1}}] {{x[1]}}</u>
                                     </p>
