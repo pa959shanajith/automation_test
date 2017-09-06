@@ -246,8 +246,9 @@ var addNode = function(n,m,pi){
 		//Logic to change the layout
 		
 		//v.append('circle').attr('class','ct-'+n.type+' ct-cLeft ct-nodeBubble').attr('cx',20).attr('cy',-3).attr('r',4);//.on('mousedown',moveNodeBegin).on('mouseup',moveNodeEnd);
-		//if(selectedTab=='tabCreate')
-		v.append('circle').attr('class','ct-'+n.type+' ct-cLeft ct-nodeBubble').attr('cx',-3).attr('cy',20).attr('r',4).on('mousedown',moveNodeBegin).on('mouseup',moveNodeEnd);
+		//Removed moving node feature from assign tab
+		if(selectedTab=='tabCreate')
+		 v.append('circle').attr('class','ct-'+n.type+' ct-cLeft ct-nodeBubble').attr('cx',-3).attr('cy',20).attr('r',4).on('mousedown',moveNodeBegin).on('mouseup',moveNodeEnd);
 	}
 	return v;
 };
