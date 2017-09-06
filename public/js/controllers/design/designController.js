@@ -124,6 +124,13 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 
     if (window.localStorage['_TJ']) {
         allTasks = JSON.parse(window.localStorage['_TJ']);
+        if(allTasks.length > 0)
+        {
+                allTasks =  allTasks.filter(function(n){
+                    return n.appType === appType
+                });
+        }
+
         for (var i = 0; i < allTasks.length; i++) {
             //Screen with no testcases
             if (allTasks[i].screenName != "" && allTasks[i].testCaseId == "") {
@@ -158,7 +165,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
         }
         //console.log("reusedScreens",reusedScreens);
         //console.log("reusedScreensTestcase",reusedScreensTestcase);
-        console.log("reusedTestcases", reusedTestcases);
+        //console.log("reusedTestcases", reusedTestcases);
         if (reusedScreens.length > 0) {
             for (var j = 0; j < reusedScreens.length; j++) {
                 if ($.trim(reusedScreens[j]) == $.trim(screenName)) {
