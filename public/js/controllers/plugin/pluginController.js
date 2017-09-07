@@ -98,11 +98,11 @@ mySPA.controller('pluginController',['$scope','$window','$http','$location','$ti
 						  }
 						}
 					
-					// $("#plugin-container").removeClass("inactiveLink");
+					$("#plugin-container").removeClass("inactiveLink");
 				}, function (error) { 
 					console.log("Error:::::::::::::", error);
 				})
-				$("#plugin-container").removeClass("inactiveLink");
+				// $("#plugin-container").removeClass("inactiveLink");
 			}	
 			else{
 				window.location.href = "/";
@@ -162,6 +162,8 @@ mySPA.controller('pluginController',['$scope','$window','$http','$location','$ti
 			//window.localStorage["_VM"] = true;
 			name = 'home'
 		}
+		else if(name == "p_NeuronGraphs2D") name = 'neuronGraphs2D';
+		else if(name == "p_NeuronGraphs3D") name = 'neuronGraphs3D';
 		window.localStorage['navigateScreen'] = name;
 		$window.location.assign(name)
 	}

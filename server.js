@@ -1,20 +1,65 @@
 // Module Dependencies
 var cluster = require('cluster');
-if (cluster.isMaster) {
-    //    cluster.fork();
-    cluster.fork();
-    cluster.on('disconnect', function(worker) {
-        console.log('disconnect!');
-        // cluster.fork();
-    });
-    cluster.on('exit', function(worker) {
+var fs = require('fs');
+var util = require('util');
+var logFile = fs.createWriteStream('logs/node_server.log', { flags: 'a' });
+// Or 'w' to truncate the file every time the process starts.
+var logStdout = process.stdout;
 
-        // Replace the dead worker,
-        // we're not sentimental
-        console.log('Let\'s not have Sentiments... Worker %d is killed.', worker.id);
-        cluster.fork();
-    });
-} else {
+function _getCallerFile() {
+  var count = 0;
+    try {
+        var err = new Error();
+        var callerfile;
+        var currentfile;
+        var oFunc = Error.prepareStackTrace;
+        Error.prepareStackTrace = function (err, stack) { return stack; };
+
+        currentfile = err.stack.shift().getFileName();
+        while (err.stack.length) {
+          var a = err.stack.shift();
+          callerfile =a.getFileName();
+          if(currentfile !== callerfile){
+              callerLine = a.getLineNumber();
+              column = a.getColumnNumber();
+             Error.prepareStackTrace = oFunc; return {file : callerfile, number : callerLine, column: column};
+          }else{
+            count++;
+            callerLine = a.getLineNumber();
+            column = a.getColumnNumber();
+            if(count > 1){Error.prepareStackTrace = oFunc; return {file : callerfile, number : callerLine, column: column};}
+          }
+        }
+    } catch (err) {}
+}
+
+console.log = function () {
+  var d = new Date();
+  var n = d.toLocaleString();
+  var a = _getCallerFile();
+  logFile.write('['+n+']['+a.file+':'+a.number+ ':'+a.column+'] >> '+ util.format.apply(null, arguments) + '\n');
+//  logFile.write('['+n+'] ['+a+']; '+ util.format.apply(null, arguments) + '\n');
+  logStdout.write(util.format.apply(null, arguments) + '\n');
+}
+console.error = console.log;
+
+// if (cluster.isMaster) {
+//     //    cluster.fork();
+//     cluster.fork();
+//     cluster.on('disconnect', function(worker) {
+//         console.log('disconnect!');
+//         // cluster.fork();
+//     });
+//     cluster.on('exit', function(worker) {
+
+//         // Replace the dead worker,
+//         // we're not sentimental
+//         console.log('Let\'s not have Sentiments... Worker %d is killed.', worker.id);
+//         cluster.fork();
+//     });
+
+// } else {
+  try {
     var express = require('express');
     var app = express();
 
@@ -26,7 +71,7 @@ if (cluster.isMaster) {
     // var errorhandler = require('errorhandler');
     var cmd = require('node-cmd');
     var helmet = require('helmet');
-    var fs = require('fs');
+
     var async = require('async');
     //HTTPS Configuration
     var privateKey = fs.readFileSync('server/https/server.key', 'utf-8');
@@ -37,22 +82,10 @@ if (cluster.isMaster) {
     };
     var httpsServer = require('https').createServer(credentials, app);
     var io = require('socket.io')(httpsServer);
-    var fs = require('fs');
-    var util = require('util');
-    var logFile = fs.createWriteStream('logs/node_server.log', { flags: 'a' });
-      // Or 'w' to truncate the file every time the process starts.
-    var logStdout = process.stdout;
 
-    console.log = function () {
-      var d = new Date();
-      var n = d.toLocaleString();
-      logFile.write('['+n+']'+util.format.apply(null, arguments) + '\n');
-      logStdout.write(util.format.apply(null, arguments) + '\n');
-    }
-    console.error = console.log;
     module.exports = app;
     module.exports.allSocketsMap = {};
-    module.exports.sessionCreated = ["name1"];
+    module.exports.sessionCreated = [];
     app.use(bodyParser.json({
         limit: '10mb'
     }));
@@ -60,7 +93,8 @@ if (cluster.isMaster) {
         limit: '10mb',
         extended: true
     }));
-    app.use(morgan('combined'))
+    //app.use(morgan('combined'))
+
     app.use(cookieParser());
     app.use(sessions({
         secret: '$^%EDE%^tfd65e7ufyCYDR^%IU',
@@ -71,7 +105,7 @@ if (cluster.isMaster) {
         resave: false,
         saveUninitialized: false,  //Should always be false for cookie to clear
         cookie: {
-            maxAge: (30 * 60 * 1000)
+            maxAge: (0.5 * 60 * 1000)
         }
     }));
     app.use(helmet());
@@ -149,7 +183,7 @@ if (cluster.isMaster) {
     });
 
     //Test Lead and Test Manager can access Weboccular Plugin
-    app.get(/^\/(p_Weboccular)$/, function(req, res){
+    app.get(/^\/(p_Weboccular|neuronGraphs2D)$/, function(req, res){
         var usrName = req.session.username
       if (!req.session.defaultRole || req.session.defaultRole == "Admin" || req.session.defaultRole == "Business Analyst" || req.session.defaultRole == "Tech Lead" || req.session.defaultRole == "Test Engineer")
         {
@@ -182,48 +216,45 @@ if (cluster.isMaster) {
     // Mindmap Routes
     var api = require('./routes_mindmap/api.js');
     var home = require('./routes_mindmap/home.js');
-    var index = require('./routes_mindmap/index.js');
-    var templates = require('./routes_mindmap/tmTemplates.js');
     var Client = require("node-rest-client").Client;
     var apiclient = new Client();
     app.use('/home', home);
-    app.use('/templates', templates);
     app.get('/import', api.importToNeo);
     app.get('/logout', api.logout);
     app.post('/casQuerya', api.casScriptA);
     app.post('/neoQuerya', api.neoScriptA);
     //Starting jsreport server
     cmd.get('netstat -ano | find "LISTENING" | find "8001"', function(data, err, stderr){
-    	if(data){
-        	//console.log('killing JS report server and restarting');
-    		//console.log('===== Process ID of jsreport =====',data);
-    		var thisResult = data.split("\r\n")[0].split(" ")[data.split("\r\n")[0].split(" ").length-1];
-    		var cmdtoexe = "Taskkill /PID "+thisResult+" /F";
-    		cmd.get(cmdtoexe, function(data, err, stderr){
-    			if(data){
-    				//console.log('===== Killed jsreport server =====',data);
-    				cmd.get('node index.js', function(data, err, stderr){
-    					if (!err) {
-    						console.log('the node-cmd:',data)
-    					} else {
-    						console.log("Cannot start Jsreport server")
-    					}
-    				});
-    			}
-    			else{
-    				console.log("Cannot kill jsreport report");
-    			}
-    		})
-    	}
-    	else{
-    		cmd.get('node index.js', function(data, err, stderr){
-    			if (!err) {
-    	    		console.log('JS report server started normally');
-    			} else {
-    				console.log("Cannot start Jsreport server")
-    			}
-    		});
-    	}
+      if(data){
+          //console.log('killing JS report server and restarting');
+        //console.log('===== Process ID of jsreport =====',data);
+        var thisResult = data.split("\r\n")[0].split(" ")[data.split("\r\n")[0].split(" ").length-1];
+        var cmdtoexe = "Taskkill /PID "+thisResult+" /F";
+        cmd.get(cmdtoexe, function(data, err, stderr){
+          if(data){
+            //console.log('===== Killed jsreport server =====',data);
+            cmd.get('node index.js', function(data, err, stderr){
+              if (!err) {
+                console.log('the node-cmd:',data)
+              } else {
+                console.log("Cannot start Jsreport server")
+              }
+            });
+          }
+          else{
+            console.log("Cannot kill jsreport report");
+          }
+        })
+      }
+      else{
+        cmd.get('node index.js', function(data, err, stderr){
+          if (!err) {
+              console.log('JS report server started normally');
+          } else {
+            console.log("Cannot start Jsreport server")
+          }
+        });
+      }
     });
 
 
@@ -239,6 +270,7 @@ if (cluster.isMaster) {
     var qc = require('./server/controllers/qualityCenter');
     var webCrawler = require('./server/controllers/webCrawler');
     var chatbot = require('./server/controllers/chatbot');
+    var neuronGraphs2D = require('./server/controllers/neuronGraphs2D');
 
     //Login Routes
     app.post('/authenticateUser_Nineteen68', login.authenticateUser_Nineteen68);
@@ -302,11 +334,12 @@ if (cluster.isMaster) {
     //Utility plugins
     app.post('/Encrypt_ICE', utility.Encrypt_ICE);
     app.post('/crawResults', webCrawler.getCrawlResults);
-
     //Chatbot Routes
     app.post('/getTopMatches_ProfJ', chatbot.getTopMatches_ProfJ);
     app.post('/updateFrequency_ProfJ', chatbot.updateFrequency_ProfJ);
-
+	//NeuronGraphs Plugin Routes
+    app.post('/hierarchy_nGraphs2D', neuronGraphs2D.getHierarchy);
+    app.post('/getGraph_nGraphs2D', neuronGraphs2D.getGraphData);
     //QC Plugin
     app.post('/loginQCServer_ICE', qc.loginQCServer_ICE);
     app.post('/qcProjectDetails_ICE', qc.qcProjectDetails_ICE);
@@ -318,7 +351,7 @@ if (cluster.isMaster) {
     //-------------SERVER START------------//
     //server.listen(3000);      //Http Server
     var hostFamilyType = '0.0.0.0';
-	var portNumber=8443;
+  var portNumber=8443;
     httpsServer.listen(portNumber, hostFamilyType); //Https Server
     try{
         var apireq = apiclient.get("http://127.0.0.1:1990/",function(data,response){
@@ -358,30 +391,26 @@ if (cluster.isMaster) {
         next();
     });
 
-	//SOCKET CONNECTION USING SOCKET.IO
+  //SOCKET CONNECTION USING SOCKET.IO
     var allClients = [];
-    var sessionCreated = [];
+    var sessionCreated = []
     var allSockets = [];
     var socketMap = {};
     var socketMapUI = {};
-    var sokcetMapScheduling={};
     var isUISocketRequest = false;
 
     io.on('connection', function(socket) {
         // console.log("-------------------------------------------------------------------------------------------------------");
-        var ip = socket.request.connection.remoteAddress || socket.request.headers['x-forwarded-for'];
-        console.log("Normal Mode Enabled for  IP :",ip);
-        var address=socket.handshake.query['username'];
+        var address = socket.request.connection.remoteAddress || socket.request.headers['x-forwarded-for'];
+        // console.log("IPTYPE:::::", socket.request.connection.address().family);
+        // console.log("socket.handshake.address:::::", socket.handshake.address);
+
         console.log("socket connecting address" , address);
-        console.log('Param ',socket.handshake.query['username']);
         //console.log("middleware:", socket.request._query['check']);
-       
-        
         if (socket.request._query['check'] == "true" ) {
         //  if ( !(address in socketMapUI) ) {
             isUISocketRequest = true;
             console.log("socket request from UI");
-            address=socket.request._query['username'];
             socketMapUI[address] = socket;
             socket.emit("connectionAck", "Success");
         //  }
@@ -389,114 +418,71 @@ if (cluster.isMaster) {
           isUISocketRequest = false;
           if (!(address in socketMap)) {
               socketMap[address] = socket;
-              socket.send('connected');
-          }else{
-              socket.send('connectionExists');
           }
         }
 
-        
+        socket.send('connected');
         module.exports.allSocketsMap = socketMap;
         module.exports.allSocketsMapUI = socketMapUI;
-        module.exports.allSchedulingSocketsMap=sokcetMapScheduling;
         httpsServer.setTimeout();
 
-        // socket.on('message', function(data) {
-        //     console.log("SER", data);
-        // });
-        // if (!isUISocketRequest) {
-        // var socketFlag = false;
-        //   if (allSockets.length > 0) {
-        //       for (var socketIndexes = 0; socketIndexes < allSockets.length; socketIndexes++) {
-        //           if (allSockets[socketIndexes].handshake.query['username'].indexOf(socket.handshake.query['username']) != -1) {
-        //               socketFlag = true;
-        //           }
-        //       }
-        //   } else {
-        //       allSockets.push(socket);
-        //       allClients.push(socket.conn.id);
-        //       socketFlag = true;
-        //   }
-        //   if (socketFlag == false) {
-        //       allSockets.push(socket);
-        //       allClients.push(socket.conn.id)
-        //   }
-        // }
-        //module.exports.abc = allSockets;
+        socket.on('message', function(data) {
+            //console.log("SER", data);
+        });
+        if (!isUISocketRequest) {
+        var socketFlag = false;
+          if (allSockets.length > 0) {
+              for (var socketIndexes = 0; socketIndexes < allSockets.length; socketIndexes++) {
+                  if (allSockets[socketIndexes].handshake.address.indexOf(socket.handshake.address) != -1) {
+                      socketFlag = true;
+                  }
+              }
+          } else {
+              allSockets.push(socket);
+              allClients.push(socket.conn.id);
+              socketFlag = true;
+          }
+          if (socketFlag == false) {
+              allSockets.push(socket);
+              allClients.push(socket.conn.id)
+          }
+        }
+        module.exports.abc = allSockets;
         socket.on('disconnect', function() {
-            var ip = socket.request.connection.remoteAddress || socket.request.headers['x-forwarded-for'];
-            console.log("disconnect IP:",ip);
           if (socket.request._query['check'] == "true" ) {
-            //var address = socket.request.connection.remoteAddress || socket.request.headers['x-forwarded-for'];
-            var address=socket.handshake.query['username'];
+            var address = socket.request.connection.remoteAddress || socket.request.headers['x-forwarded-for'];
             console.log("\n\n Disconnecting ... from UI socket " , address);
           }else{
-            //var i = socketMap.indexOf(socket);
-            var address=socket.handshake.query['username'];
-            
-             if (socketMap[address] != undefined) {
-                 console.log('Socket Connection got disconnected for :', address);
-                delete socketMap[address];
+            var i = allSockets.indexOf(socket);
+            if (i > -1) {
+                console.log('Socket Connection got disconnected for :', allSockets[i].handshake.address);
+                delete socketMap[allSockets[i].handshake.address];
+                allClients.splice(i, 1);
+                allSockets.splice(i, 1);
+                // console.log("socketMap:", socketMap);
                 module.exports.allSocketsMap = socketMap;
                 //		console.log("------------------------SOCKET DISCONNECTED----------------------------------------");
-                console.log("NO. OF CLIENTS CONNECTED:", Object.keys(socketMap).length,'\nIP\'s connected :',Object.keys(socketMap).join());
-            }
-            else if (sokcetMapScheduling[address] != undefined) {
-                 console.log('Socket Connection got disconnected for :', address);
-                delete sokcetMapScheduling[address];
-                module.exports.allSchedulingSocketsMap = sokcetMapScheduling;
-                //		console.log("------------------------SOCKET DISCONNECTED----------------------------------------");
-                console.log("NO. OF CLIENTS CONNECTED:", Object.keys(sokcetMapScheduling).length,'\nIP\'s connected :',Object.keys(sokcetMapScheduling).join());
+                console.log("NO. OF CLIENTS CONNECTED:", allSockets.length,'\nIP\'s connected :',Object.keys(socketMap).join());
             }
           }
         });
 
-        socket.on('reconnect', function(data) {
-            console.log("ReEstablish connection for Scheduling");
-            var ip = socket.request.connection.remoteAddress || socket.request.headers['x-forwarded-for'];
-            console.log("Scheduling Mode Enabled for  IP:",ip);
-           var address=socket.handshake.query['username'];
-           console.log(data);
-            if (data && socketMap[address] != undefined) {
-               
-                console.log('Socket Connection got disconnected for Normal Mode :', address);
-                delete socketMap[address];
-               
-                module.exports.allSocketsMap = socketMap;
-                
-                console.log("NO. OF CLIENTS CONNECTED:", Object.keys(socketMap).length,'\nIP\'s connected :',Object.keys(socketMap).join());
-
-           
-              sokcetMapScheduling[address] = socket;
-              socket.send('reconnected');
-           
-              module.exports.allSchedulingSocketsMap = sokcetMapScheduling;
-              console.log("NO. OF CLIENTS CONNECTED For Scheduling:", Object.keys(sokcetMapScheduling).length,'\nIP\'s connected :',Object.keys(sokcetMapScheduling).join());
-
-         
-            }else if(!data && sokcetMapScheduling!=undefined){
-                console.log('Socket Connection got disconnected for Scheduling mode:', address);
-                delete sokcetMapScheduling[address];
-               
-                module.exports.allSchedulingSocketsMap = sokcetMapScheduling;
-                console.log("NO. OF CLIENTS CONNECTED For Scheduling:", Object.keys(sokcetMapScheduling).length,'\nIP\'s connected :',Object.keys(sokcetMapScheduling).join());
-
-           
-              socketMap[address] = socket;
-              module.exports.allSocketsMap = socketMap;
-              socket.send('connected');
-           
-              
-
-            }
-            
-        });
-       
+        //	Socket Connection Failed
         socket.on('connect_failed', function() {
             console.log("Sorry, there seems to be an issue with the connection!");
         });
-        console.log("NO. OF CLIENTS CONNECTED:", Object.keys(socketMap).length,'\nIP\'s connected :',Object.keys(socketMap).join());
-       
+        console.log("NO. OF CLIENTS CONNECTED:", allSockets.length,'\nIP\'s connected :',Object.keys(socketMap).join());
+        // console.log("module.exports.allSocketsMap:", module.exports.allSocketsMap);
+        // console.log("allSockets:::",socketMap)
     });
-   
-}
+    //SOCKET CONNECTION USING SOCKET.IO
+
+    // console.log("module.exports.allSocketsMap=-------------------------\n", module.exports.allSocketsMap);
+  } catch (e) {
+    console.log(e);
+    setTimeout(function(){
+      cluster.worker.kill();
+    }, 2)
+  }
+
+// }

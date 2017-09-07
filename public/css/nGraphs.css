@@ -1,0 +1,53 @@
+p,a,img,text,span,.noselect{-webkit-touch-callout:none;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}
+.fl-left{float:left!important}
+.fl-right{float:right!important}
+.bg-blank{background:transparent!important}
+.no-disp{display:none!important}
+.no-access{cursor:not-allowed!important}
+#ct-main{position:absolute;padding:5px;left:6px;height:100%;width:calc(100% - 12px);box-sizing:border-box;/*z-index:-1!important*/}
+#ct-main.leftBarOpen{left:166px;width:calc(100% - 172px)}
+#ct-main.rightBarOpen{left:6px;width:calc(100% - 96px)}
+#ct-main.leftBarOpen.rightBarOpen{left:166px;width:calc(100% - 256px)}
+#ct-canvas{position:relative;height:100%;overflow:hidden;border:1px solid transparent; /*z-index: -99 !important;*/ width: 100%;display:none}
+
+.createFirstContainer{position:absolute;display:block;left:50%;top:50%;transform:translateX(50%) translateY(50%);-moz-transform:translateX(50%) translateY(50%);-webkit-transform:translateX(-50%) translateY(-50%);background-color:#e6e7e9;width:330px;height:200px;border-radius:16px;text-align:center}
+.createOptionContainer{padding:28px 0;display:block;width:100%;height:100%}
+.createOptionContainer div{border-right:1px solid #ccc;float:left;padding:28px 1px 10px;width:164px;height:100%;cursor:pointer}
+.createOptionContainer div:last-child{border-right:none}
+.createOptionContainer label{float:left;position:relative;width:100%;font-size:18px;font-weight:100}
+
+/*For Side bars*/
+.ct-side{height:100%;width:6px;color:#fff;background-color:#633690}
+.ct-side .ct-expand{top:50%;width:6px;height:25px}
+.ct-expand{position:absolute;cursor:pointer;overflow:hidden;background-color:rgba(255,255,255,.7)}
+.ct-expand::after{position:absolute;content:'';top:7.5px;border:5px solid transparent}
+#ct-lSide{left:0}
+#ct-expand-left::after{left:1px;border-left-color:#333;border-right-color:transparent}
+#ct-expand-left.ct-rev{position:relative;left:160px;z-index:9999}
+#ct-expand-left.ct-rev::after{left:-5px;border-left-color:transparent;border-right-color:#333}
+#ct-rSide{right:0; position: relative}
+#ct-expand-right.ct-rev{position:relative;right:84px;z-index:9999}
+#ct-expand-right.ct-expand::after{left:-5px;border-left-color:transparent;border-right-color:#333}
+#ct-expand-right.ct-expand.ct-rev::after{left:1px;border-left-color:#333;border-right-color:transparent}
+/*For Side bars*/
+
+/* Neuron Canvas Starts */
+.link-nG {
+	width: 5px;
+	height: 10px;
+	background: #757575;
+	display: block;
+}
+#ct-canvas{
+	background-color: #050505;
+	background: rgb(43,45,48); /* Old browsers */
+	background: -moz-radial-gradient(center, ellipse cover,  rgba(43,45,48,1) 0%, rgba(0,0,0,1) 100%); /* FF3.6+ */
+	background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%,rgba(43,45,48,1)), color-stop(100%,rgba(0,0,0,1))); /* Chrome,Safari4+ */
+	background: -webkit-radial-gradient(center, ellipse cover,  rgba(43,45,48,1) 0%,rgba(0,0,0,1) 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-radial-gradient(center, ellipse cover,  rgba(43,45,48,1) 0%,rgba(0,0,0,1) 100%); /* Opera 12+ */
+	background: -ms-radial-gradient(center, ellipse cover,  rgba(43,45,48,1) 0%,rgba(0,0,0,1) 100%); /* IE10+ */
+	background: radial-gradient(ellipse at center,  rgba(43,45,48,1) 0%,rgba(0,0,0,1) 100%); /* W3C */
+	margin: 0;
+	overflow: hidden;
+}
+/* Neuron Canvas Ends */
