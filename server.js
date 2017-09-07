@@ -248,6 +248,7 @@ if (cluster.isMaster) {
     var qc = require('./server/controllers/qualityCenter');
     var webCrawler = require('./server/controllers/webCrawler');
     var chatbot = require('./server/controllers/chatbot');
+    var neuronGraphs2D = require('./server/controllers/neuronGraphs2D');
 
 
     //Login Routes

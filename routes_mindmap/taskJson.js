@@ -11,7 +11,7 @@ exports.getTaskJson_mindmaps = function(obj,cb,data){
 	try {
 	//var userid="482fa3f8-7db6-4512-a35f-adef7f07a6c2";
     //obj.userid=userid;
-    
+
 	//query={'statement':"MATCH (n:TASKS) WHERE n.assignedTo='"+obj.userid+"' RETURN n"};
 	/*Neo4j query changed to return both the task node and it's associated module/screen/scenario/testcase node */
 	query={'statement':"MATCH (a)-[r:FNTT {id:b.nodeID}]-(b) where b.assignedTo='"+obj.userid+"' return a,b"};
@@ -22,7 +22,7 @@ exports.getTaskJson_mindmaps = function(obj,cb,data){
 						console.log(err);
 						//res.status(status).send(err);
 					} else{
-                        var resultobj = {"result":result,"prjId":obj.prjId,"urlData":obj.urlData}; 
+                        var resultobj = {"result":result,"prjId":obj.prjId,"urlData":obj.urlData};
 						next_function(resultobj,function(err,data){
                             if(err){
                                 cb(null,err);
@@ -39,8 +39,8 @@ exports.getTaskJson_mindmaps = function(obj,cb,data){
 	});
 	} catch (error) {
 		console.log(error);
-		
-	}	
+
+	}
 };
 
 var reqToAPI = function(d,u,p,callback) {
@@ -62,7 +62,7 @@ var reqToAPI = function(d,u,p,callback) {
 	}catch(ex){
 		console.log(ex);
 	}
-	
+
 };
 
 var tasktypes={'Design':['TestCase','Design','Create Testcase'],
@@ -107,7 +107,7 @@ function next_function(resultobj,cb,data){
 	var user_task_json=[];
 	var taskDetails={};
 	var batch_dict={};
-	
+
 	async.forEachSeries(alltasks,function(a,maincallback){
 		var task_json={'appType':'',
 			'projectId':'',
@@ -124,7 +124,7 @@ function next_function(resultobj,cb,data){
 			// 'testSuiteName':'',
 			'taskDetails':[],
 			'testSuiteDetails': [],
-			'scenarioFlag':'False'					
+			'scenarioFlag':'False'
 };
 	taskDetails={'taskName':'',
 	'taskDescription':'',
@@ -173,9 +173,9 @@ function next_function(resultobj,cb,data){
 					// if(err){
 					// 	console.log(err);
 					// }else{
-						
+
 						if (parent_length>=2){
-							
+
 							//Checking if the user is assigned to that project before showing the task to the user
 							if(prjId!= undefined && prjId.length>0 && prjId.indexOf(parent[0]) > -1 ){
 										var index=prjId.indexOf(parent[0]);
@@ -186,13 +186,13 @@ function next_function(resultobj,cb,data){
 										}
 										if(parent_length>=4){
 											task_json.screenId=parent[3];
-											
+
 
 										}if(parent_length==5){
 											task_json.testCaseId=parent[4];
 											//task_json.scenarioId=parent[2];
 
-										}	
+										}
 
 										testSuiteDetails_obj.testsuitename='modulename';
 										testSuiteDetails_obj.projectidts=parent[0];
@@ -218,7 +218,7 @@ function next_function(resultobj,cb,data){
 												batch_task.testSuiteDetails.push(testSuiteDetails_obj);
 												batch_flag=true;
 											}
-											
+
 										}
 										else if(t.task=='Execute Scenario'){
 
@@ -226,32 +226,32 @@ function next_function(resultobj,cb,data){
 											task_json.assignedTestScenarioIds=[task_json.scenarioId];
 											taskDetails.taskName=t.task+' '+m.testScenarioName;
 											task_json.scenarioName=m.testScenarioName;
-											
-	
+
+
 											//testSuiteDetails_obj.assignedTestScenarioIds=[task_json.scenarioId];
 										}
 										else{
 											taskDetails.taskName=t.task+' '+m.screenName;
 											task_json.screenName=m.screenName;
 										}
-									
+
 										//task_json.assignedTestScenarioIds=data.assignedTestScenarioIds;
 										if(!batch_flag){
 											task_json.testSuiteDetails.push(testSuiteDetails_obj);
 											task_json.taskDetails.push(taskDetails);
 											user_task_json.push(task_json);
 										}
-										
+
 										if(t.task=='Execute Scenario'){
-											console.log(m.moduleID);
+											//console.log(m.moduleID);
 											query={'statement':"MATCH (n:MODULES{moduleID:'"+m.moduleID+"'}) RETURN n.moduleName"};
 											query1={'statement':"MATCH (n:MODULES_ENDTOEND{moduleID:'"+m.moduleID+"'}) RETURN n.moduleName"};
 											var qlist_query=[query];
-										
+
 												reqToAPI({"data":{"statements":qlist_query}},urlData,'/neoQuerya',function(err,status,result){
 																//res.setHeader('Content-Type','application/json');
 																if(err){
-																
+
 																	console.log(err);
 																	maincallback();
 																	//res.status(status).send(err);
@@ -259,7 +259,7 @@ function next_function(resultobj,cb,data){
 																	try{
 																		result1=JSON.parse(result);
 																		testSuiteDetails_obj.testsuitename=result1[0].data[0].row[0];
-																		maincallback();	
+																		maincallback();
 																	}catch(ex){
 																		qlist_query=[query1];
 																		reqToAPI({"data":{"statements":qlist_query}},urlData,'/neoQuerya',function(err,status,result){
@@ -267,37 +267,37 @@ function next_function(resultobj,cb,data){
 																		if(err){
 																			console.log(err);
 																			maincallback();
-																			
+
 																		} else{
 																			try{
 																				result1=JSON.parse(result);
 																				testSuiteDetails_obj.testsuitename=result1[0].data[0].row[0];
-																				maincallback();	
+																				maincallback();
 																			}catch(ex){
 																				maincallback();
-																				
-																			}												
+
+																			}
 																		}
 
 																		});
-																		
-																	}												
+
+																	}
 																}
 
 												});
-											
-										
+
+
 										}else{
 											maincallback();
 										}
 										//maincallback();
-										
-										
-										
 
 
 
-							
+
+
+
+
 								// create_ice.getAllNames(parent,function(err,data){
 								// 	if(err){
 								// 		console.log(err);
@@ -324,7 +324,7 @@ function next_function(resultobj,cb,data){
 								// 				batch_task.testSuiteDetails.push(testSuiteDetails_obj);
 								// 				batch_flag=true;
 								// 			}
-											
+
 								// 		}
 								// 		else if(t.task=='Execute Scenario'){
 								// 			task_json.scenarioFlag='True';
@@ -335,48 +335,48 @@ function next_function(resultobj,cb,data){
 								// 		else{
 								// 			taskDetails.taskName=t.task+' '+data.screenname;
 								// 		}
-									
+
 								// 		//task_json.assignedTestScenarioIds=data.assignedTestScenarioIds;
 								// 		if(!batch_flag){
 								// 			task_json.testSuiteDetails.push(testSuiteDetails_obj);
 								// 			task_json.taskDetails.push(taskDetails);
 								// 			user_task_json.push(task_json);
 								// 		}
-										
+
 								// 		//console.log(user_task_json);
 								// 		//fs.writeFileSync('assets/task_json.json',JSON.stringify(user_task_json),'utf8');
 								// 		maincallback();
 								// 		}catch(Ex){
 								// 			console.log(Ex);
 								// 		}
-										
+
 
 								// 	}
 
-									
+
 
 								// });
 							}else{
 								maincallback();
 							}
 
-			
+
 					}
 
 				//}
 
-					
+
 
 			//	});
-		
-		
 
-	
-		
+
+
+
+
 	},function(maincallback){
 
-            cb(null,user_task_json);      
-      
+            cb(null,user_task_json);
+
     });
 
 	}catch (ex){
@@ -384,5 +384,5 @@ function next_function(resultobj,cb,data){
 	}
 
 
-	
+
 }
