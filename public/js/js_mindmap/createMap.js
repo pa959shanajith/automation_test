@@ -169,7 +169,13 @@ var createNewMap = function(e){
 	var s=getElementDimm(d3.select("#ct-mapSvg"));
 
 	//X and y changed to implement layout change
-	node={id:uNix,childIndex:0,name:'Module_0',type:'modules',y:s[1]*0.4,x:s[0]*0.2,children:[],parent:null};
+	// switch-layout feature
+	if($('#switch-layout').hasClass('vertical-layout')){
+		node={id:uNix,childIndex:0,name:'Module_0',type:'modules',y:s[0]*0.2,x:s[1]*0.4,children:[],parent:null};
+	}
+	else{
+		node={id:uNix,childIndex:0,name:'Module_0',type:'modules',y:s[1]*0.4,x:s[0]*0.2,children:[],parent:null};
+	}
 	
 	dNodes.push(node);nCount[0]++;uNix++;
 	//To fix issue 710-Create a module and see that module name does not display in edit mode
@@ -192,6 +198,23 @@ var loadMap = function(e){
 		treeBuilder(allMMaps[reqMap]);
 	}
 };
+// to load the map again after switching the layout 
+var loadMap2 = function(){
+	var selectedTab = window.localStorage['tabMindMap'];
+    if(selectedTab=='mindmapEndtoEndModules'){
+		var tbd=dNodes_W[0];
+		initiate_W();
+		clearSvg_W();
+		treeBuilder_W(tbd);
+	}
+	else{
+		var tbd=dNodes[0];	
+		initiate();
+		clearSvg();	
+		treeBuilder(tbd);
+	}
+};
+
 var genPathData = function(s,t){
 	/*if(s[1]<t[1]) return ('M'+s[0]+','+s[1]+' H'+(((s[0]+t[0])/2)-10)+' Q'+((s[0]+t[0])/2)+','+s[1]+' '+((s[0]+t[0])/2)+','+(s[1]+10)+'  V'+(t[1]-10)+' Q'+((s[0]+t[0])/2)+','+t[1]+' '+(((s[0]+t[0])/2)+10)+','+t[1]+' H'+t[0]);
 	else return ('M'+s[0]+','+s[1]+' H'+(((s[0]+t[0])/2)-10)+' Q'+((s[0]+t[0])/2)+','+s[1]+' '+((s[0]+t[0])/2)+','+(s[1]-10)+'  V'+(t[1]+10)+' Q'+((s[0]+t[0])/2)+','+t[1]+' '+(((s[0]+t[0])/2)+10)+','+t[1]+' H'+t[0]);*/
@@ -242,23 +265,42 @@ var addNode = function(n,m,pi){
 	if(m&&pi){
 		var p=d3.select('#ct-node-'+pi.id);
 		//modified params for layout change
-		if(!p.select('circle.ct-cRight')[0][0]) p.append('circle').attr('class','ct-'+pi.type+' ct-cRight ct-nodeBubble').attr('cx',43).attr('cy',20).attr('r',4).on('click',toggleNode);
-		//Logic to change the layout
-		
-		//v.append('circle').attr('class','ct-'+n.type+' ct-cLeft ct-nodeBubble').attr('cx',20).attr('cy',-3).attr('r',4);//.on('mousedown',moveNodeBegin).on('mouseup',moveNodeEnd);
-		//Removed moving node feature from assign tab
-		if(selectedTab=='tabCreate')
-			v.append('circle').attr('class','ct-'+n.type+' ct-cLeft ct-nodeBubble').attr('cx',-3).attr('cy',20).attr('r',4).on('mousedown',moveNodeBegin).on('mouseup',moveNodeEnd);
-		else
-			v.append('circle').attr('class','ct-'+n.type+' ct-cLeft ct-nodeBubble').attr('cx',-3).attr('cy',20).attr('r',4)
+			// switch-layout feature
+			if($('#switch-layout').hasClass('vertical-layout')){
+				if(!p.select('circle.ct-cRight')[0][0]){
+					p.append('circle').attr('class','ct-'+pi.type+' ct-cRight ct-nodeBubble').attr('cx',20).attr('cy',55).attr('r',4).on('click',toggleNode);
+				}
+				v.append('circle').attr('class','ct-'+n.type+' ct-cLeft ct-nodeBubble').attr('cx',20).attr('cy',-3).attr('r',4);//.on('mousedown',moveNodeBegin).on('mouseup',moveNodeEnd);
+				if(selectedTab=='tabAssign')
+					v.append('circle').attr('class','ct-'+n.type+' ct-cLeft ct-nodeBubble').attr('cx',-3).attr('cy',20).attr('r',4);
+				else
+					v.append('circle').attr('class','ct-'+n.type+' ct-cLeft ct-nodeBubble').attr('cx',-3).attr('cy',20).attr('r',4).on('mousedown',moveNodeBegin).on('mouseup',moveNodeEnd);
+			}
+			else{
+				if(!p.select('circle.ct-cRight')[0][0]){
+					p.append('circle').attr('class','ct-'+pi.type+' ct-cRight ct-nodeBubble').attr('cx',43).attr('cy',20).attr('r',4).on('click',toggleNode);
+				}
+				if(selectedTab=='tabAssign')
+					v.append('circle').attr('class','ct-'+n.type+' ct-cLeft ct-nodeBubble').attr('cx',-3).attr('cy',20).attr('r',4);
+				else
+					v.append('circle').attr('class','ct-'+n.type+' ct-cLeft ct-nodeBubble').attr('cx',-3).attr('cy',20).attr('r',4).on('mousedown',moveNodeBegin).on('mouseup',moveNodeEnd);
+			}
 
 	}
 	return v;
 };
 var addLink = function(r,p,c){
 //Modified parameters for layout change
+
+	// switch-layout feature
+	if($('#switch-layout').hasClass('vertical-layout')){
+	var s=[p.x+20,p.y+55];
+	var t=[c.x+20,c.y-3];
+	}
+	else{
 	var s=[p.x+43,p.y+20];
 	var t=[c.x-3,c.y+20];
+	}
 	var d=genPathData(s,t);
 	var l=d3.select('#ct-mindMap').insert('path','g').attr('id','ct-link-'+r).attr('class','ct-link').attr('d',d);
 };
@@ -752,8 +794,8 @@ var nodeClick = function(e){
 
 	if(l[1]<0)
 		l[1]=0;
-	else if(l[1]>sizesvg[1]-cSize[1])
-		l[1]=sizesvg[1]-cSize[1]-50;
+	else if(l[1]>canvSize[1]-cSize[1])
+		l[1]=(canvSize[1]-cSize[1])-150;
 
 	c.style('top',l[1]+'px').style('left',l[0]+'px').classed('no-disp',!1);
 	
@@ -830,23 +872,36 @@ var nodeCtrlClick = function(e){
 };
 
 var getNewPosition=function(node,pi,arr_co){
+	// Switch_layout functionality
+	var layout_vertical=$('#switch-layout').hasClass('vertical-layout');
 	if(dNodes[pi].children.length >0){
 			index=dNodes[pi].children.length-1;
-			new_one={x:parseInt(dNodes[pi].children[index].x),y:parseInt(dNodes[pi].children[index].y+80)};
+			if(layout_vertical)
+				new_one={x:parseInt(dNodes[pi].children[index].x)+80,y:parseInt(dNodes[pi].children[index].y)};
+			else
+				new_one={x:parseInt(dNodes[pi].children[index].x),y:parseInt(dNodes[pi].children[index].y+80)};
 			
 			if(JSON.stringify(arr_co).indexOf(JSON.stringify(new_one))>-1){
-//				layout_change
-//				node.x=dNodes[pi].children[index].x+160;
-//				node.y=dNodes[pi].children[index].y;
+				if(layout_vertical){
+				node.x=dNodes[pi].children[index].x+160;
+				node.y=dNodes[pi].children[index].y;
+				}
+				else{
 				node.y=dNodes[pi].children[index].y+160;
 				node.x=dNodes[pi].children[index].x;
+				}
 
 			}else{
 				//layout_change
-//				node.x=dNodes[pi].children[index].x+80;
-//				node.y=dNodes[pi].children[index].y;
+				if(layout_vertical){
+				node.x=dNodes[pi].children[index].x+80;
+				node.y=dNodes[pi].children[index].y;
+
+				}
+				else{
 				node.y=dNodes[pi].children[index].y+80;
 				node.x=dNodes[pi].children[index].x;
+				}
 
 			}
 		
@@ -857,31 +912,46 @@ var getNewPosition=function(node,pi,arr_co){
 				arr=dNodes[pi].parent.children;
 				index=dNodes[pi].parent.children.length-1;
 				//new_one={x:parseInt(arr[index].x),y:parseInt(arr[index].y)+125};
+
+				if(layout_vertical){
+				new_one={x:parseInt(dNodes[pi].x),y:parseInt(dNodes[pi].y)+125};
+				}
+				else{
 				new_one={x:parseInt(dNodes[pi].x)+125,y:parseInt(dNodes[pi].y)};
+				}
+
 				if(JSON.stringify(arr_co).indexOf(JSON.stringify(new_one))>-1){
 					//layout_change
-					//node.x=arr[index].x+80;
-					//node.y=arr[index].y+125;
+					if(layout_vertical){
+					node.x=arr[index].x+80;
+					node.y=arr[index].y+125;
+					}
+					else{
 					node.y=arr[index].y+80;
 					node.x=arr[index].x+125;
+					}
 
 				}else{
 					//layout_Change
-//					node.x=dNodes[pi].x;
-//					node.y=dNodes[pi].y+125;
+					if(layout_vertical){
+					node.x=dNodes[pi].x;
+					node.y=dNodes[pi].y+125;
+					}
+					else{
 					node.y=dNodes[pi].y;
 					node.x=dNodes[pi].x+125;
-
-					// node.x=arr[index].x;
-					// node.y=arr[index].y+125;
+					}
 				}
 			}else{
 				//layout_change
-//				node.x=dNodes[pi].x;
-//				node.y=dNodes[pi].y+125;
+				if(layout_vertical){
+				node.x=dNodes[pi].x;
+				node.y=dNodes[pi].y+125;
+				}
+				else{
 				node.y=dNodes[pi].y;
 				node.x=dNodes[pi].x+125;
-
+				}
 			}
 			
 	}
@@ -912,8 +982,13 @@ var createNode = function(e){
 			arr_co.push(objj);
 			
 		});
-
+	// switch-layout feature
+		if($('#switch-layout').hasClass('vertical-layout')){
+		node={id:uNix,childIndex:'',path:'',name:nNext[pt][0]+'_'+nCount[nNext[pt][1]],type:(nNext[pt][0]).toLowerCase()+'s',y:h*(0.15*(1.34+nNext[pt][1])+Math.random()*0.1),x:90+30*Math.floor(Math.random()*(Math.floor((w-150)/80))),children:[],parent:dNodes[pi]};
+		}
+		else{
 		node={id:uNix,childIndex:'',path:'',name:nNext[pt][0]+'_'+nCount[nNext[pt][1]],type:(nNext[pt][0]).toLowerCase()+'s',y:h*(0.15*(1.34+nNext[pt][1])+Math.random()*0.1),x:90+30*Math.floor(Math.random()*(Math.floor((w-150)/80))),children:[],parent:dNodes[pi]};		
+		}
 
 		node=getNewPosition(node,pi,arr_co);
 		var curNode=node;
@@ -975,11 +1050,10 @@ var editNode = function(e,node){
 	//name=p.text();
 	l=[(parseFloat(l[0])-20)*cScale+cSpan[0],(parseFloat(l[1])+42)*cScale+cSpan[1]];
 // If editing right after the node is added and node goes beyond the screen size
+
 	cSize=getElementDimm(d3.select("#ct-mapSvg"));
 	if(CreateEditFlag==true && l[1]>cSize[1]){
 		CreateEditFlag=false;
-		//cSpanX=cSpan[0]-l[0]/2;
-		//cSpanY=cSpan[1]-l[1]/2;
 		cSpanX=cSpan[0];
 		cSpanY=cSpan[1];
 		var temp=l[1];
@@ -994,6 +1068,20 @@ var editNode = function(e,node){
 		l=p.attr('transform').slice(10,-1).split(split_char);
 		l=[(parseFloat(l[0])-20)*cScale+cSpanX,(parseFloat(l[1])+42)*cScale+cSpanY];
 	}
+	
+	// If created node is beyond screen size on horizontal side
+	if(CreateEditFlag==true && l[0]>cSize[0]){
+		CreateEditFlag=false;
+		cSpanX=cSpan[0];
+		cSpanY=cSpan[1];
+		var temp=l[0];
+		while(temp>cSize[0]){
+			temp=temp/2;
+			cSpanX=cSpanX-temp;
+		}
+	}
+
+
 	d3.select('#ct-inpBox').style('top',l[1]+'px').style('left',l[0]+'px').classed('no-disp',!1);
 	d3.select('#ct-inpPredict').property('value','');
 	d3.select('#ct-inpAct').attr('data-nodeid',null).property('value',name).node().focus();
@@ -1101,12 +1189,24 @@ var moveNodeEnd = function(e){
 			}
 //			Layout_change
 //			if(l[0]<a.x){
+	// switch-layout feature
+		if($('#switch-layout').hasClass('vertical-layout')){
+			if(l[0]<a.x){
+				if(counter==-1) counter=(i+1);
+				
+				a.childIndex++;
+				curNode.childIndex=counter;
+			}						
+		}
+		else{
 			if(l[1]<a.y){
 				if(counter==-1) counter=(i+1);
 				
 				a.childIndex++;
 				curNode.childIndex=counter;
-			}
+			}			
+		}
+
 		});
 	};
 	var changeOrderLeft = function(curNode,ci,totalChildren){
@@ -1115,11 +1215,22 @@ var moveNodeEnd = function(e){
 		totalChildren.forEach(function(a,ci){
 //			Layout_change
 //			if(l[0]>a.x){
+	// switch-layout feature
+		if($('#switch-layout').hasClass('vertical-layout')){
+			if(l[0]>a.x){
+				counter=(ci+1);
+				a.childIndex--;
+				curNode.childIndex=counter;
+			}
+		}
+		else
+		{
 			if(l[1]>a.y){
 				counter=(ci+1);
 				a.childIndex--;
 				curNode.childIndex=counter;
 			}
+		}
 		});
 	};
 	var currentChildIndex=curNode.childIndex;
@@ -1130,12 +1241,25 @@ var moveNodeEnd = function(e){
 	}
 	//layout change
 //	if(l[0]<curNode.x){
+	// switch-layout feature
+	if($('#switch-layout').hasClass('vertical-layout')){
+	if(l[0]<curNode.x){
+		//alert('moved up');
+		changeOrderRight(curNode,currentChildIndex,totalChildren);
+	}else{
+		//alert('moved down');
+		changeOrderLeft(curNode,currentChildIndex,totalChildren);
+		}
+	}
+	else{
 	if(l[1]<curNode.y){
 		//alert('moved up');
 		changeOrderRight(curNode,currentChildIndex,totalChildren);
 	}else{
 		//alert('moved down');
 		changeOrderLeft(curNode,currentChildIndex,totalChildren);
+		}
+
 	}
 	dNodes[pi].x=parseFloat(l[0]);
 	dNodes[pi].y=parseFloat(l[1]);
@@ -1640,9 +1764,16 @@ var treeBuilder = function(tree){
 	dNodes=d3Tree.nodes(tree);
 	//dLinks=d3Tree.links(dNodes);
 	dNodes.forEach(function(d){
+
+		// switch-layout feature
+		if($('#switch-layout').hasClass('vertical-layout')){
+		d.y=cSize[0]*0.1*(0.9+typeNum[d.type]);
+		}
+		else{
 		d.y=d.x;
 		//Logic to change the layout and to reduce the length of the links
 		d.x=cSize[0]*0.1*(0.9+typeNum[d.type]);
+		}
 
 
 
@@ -1657,6 +1788,11 @@ var treeBuilder = function(tree){
 		addLink(d.id,d.source,d.target);
 	});
 	//zoom.translate([0,(cSize[1]/2)-dNodes[0].y]);
+
+// switch-layout feature
+if($('#switch-layout').hasClass('vertical-layout'))
+	zoom.translate([(cSize[0]/2)-dNodes[0].x,(cSize[1]/5)-dNodes[0].y]);
+else
 	zoom.translate([(cSize[0]/3)-dNodes[0].x,(cSize[1]/2)-dNodes[0].y]);
 	//zoom.translate([(cSize[0]/2),(cSize[1]/2)]);
 	zoom.event(d3.select('#ct-mapSvg'));
