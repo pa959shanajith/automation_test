@@ -76,7 +76,7 @@ exports.openScreenShot = function(req, res){
 			mySocket._events.render_screenshot = [];
 			mySocket.emit('render_screenshot', path);
 			mySocket.on('render_screenshot', function (resultData) {
-				req.session.cookie.expires = sessionExtend;
+				//req.session.cookie.expires = sessionExtend;
 				if(resultData != "fail"){
 					res.send(resultData);
 				}

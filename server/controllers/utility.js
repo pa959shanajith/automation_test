@@ -138,7 +138,7 @@ exports.pairwise_ICE = function(req, res) {
 
 				//Receiving				
 				mySocket.on('result_pairs', function (data) {
-					req.session.cookie.expires = sessionExtend;
+					//req.session.cookie.expires = sessionExtend;
 					res.send(data);
 				});
 			}else{

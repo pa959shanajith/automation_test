@@ -24,7 +24,7 @@ exports.getCrawlResults = function(req, res){
              }
              mySocket.emit("webCrawlerGo", input_url, level, agent);
              mySocket.on('result_web_crawler', function (value) {
-               req.session.cookie.expires = sessionExtend;
+               //req.session.cookie.expires = sessionExtend;
                try{
                 //  console.log(value);
                   var mySocketUI =  myserver.allSocketsMapUI[name];
@@ -34,7 +34,7 @@ exports.getCrawlResults = function(req, res){
                 }
              });
              mySocket.on('result_web_crawler_finished', function (value) {
-               req.session.cookie.expires = sessionExtend;
+              // req.session.cookie.expires = sessionExtend;
                try{
                   //console.log(value);
                   var mySocketUI =  myserver.allSocketsMapUI[name];
