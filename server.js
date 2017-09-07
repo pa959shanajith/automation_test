@@ -43,22 +43,22 @@ console.log = function () {
 }
 console.error = console.log;
 
-// if (cluster.isMaster) {
-//     //    cluster.fork();
-//     cluster.fork();
-//     cluster.on('disconnect', function(worker) {
-//         console.log('disconnect!');
-//         // cluster.fork();
-//     });
-//     cluster.on('exit', function(worker) {
+if (cluster.isMaster) {
+    //    cluster.fork();
+    cluster.fork();
+    cluster.on('disconnect', function(worker) {
+        console.log('disconnect!');
+        // cluster.fork();
+    });
+    cluster.on('exit', function(worker) {
 
-//         // Replace the dead worker,
-//         // we're not sentimental
-//         console.log('Let\'s not have Sentiments... Worker %d is killed.', worker.id);
-//         cluster.fork();
-//     });
+        // Replace the dead worker,
+        // we're not sentimental
+        console.log('Let\'s not have Sentiments... Worker %d is killed.', worker.id);
+        cluster.fork();
+    });
 
-// } else {
+} else {
   try {
     var express = require('express');
     var app = express();
@@ -105,7 +105,7 @@ console.error = console.log;
         resave: false,
         saveUninitialized: false,  //Should always be false for cookie to clear
         cookie: {
-            maxAge: (0.5 * 60 * 1000)
+            maxAge: (30 * 60 * 1000)
         }
     }));
     app.use(helmet());
@@ -485,4 +485,4 @@ console.error = console.log;
     }, 2)
   }
 
-// }
+}
