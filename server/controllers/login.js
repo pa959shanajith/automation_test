@@ -31,7 +31,7 @@ exports.authenticateUser_Nineteen68 = function(req, res){
             req.session.username = username;
             req.session.uniqueId = sessId;
             console.log(myserver.sessionCreated);
-            if(myserver.sessionCreated.indexOf(username) > 0){
+            if(myserver.sessionCreated.indexOf(username) >= 0){
                   return res.send("userLogged");
             }
             var flag= 'inValidCredential';
