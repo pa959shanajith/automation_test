@@ -11,7 +11,7 @@ mySPA.controller('pluginController',['$scope','$window','$http','$location','$ti
 	} 
 	for(i=0; i<availablePlugins.length; i++){
 		if(availablePlugins[i].pluginValue != false){
-			$("#plugin-container").append('<div class="col-md-4 plugin-block"><span onclick="p_event(this.dataset.name)" data-name="p_'+availablePlugins[i].pluginName.replace(/\s/g,'')+'" id="'+availablePlugins[i].pluginName+'" title="'+availablePlugins[i].pluginName+'">'+availablePlugins[i].pluginName+'</span></div>').fadeIn()
+			$("#plugin-container").append('<div class="col-md-4 plugin-block"><span class="toggleClick" onclick="p_event(this.dataset.name)" data-name="p_'+availablePlugins[i].pluginName.replace(/\s/g,'')+'" id="'+availablePlugins[i].pluginName+'" title="'+availablePlugins[i].pluginName+'">'+availablePlugins[i].pluginName+'</span></div>').fadeIn()
 		}        
 	}
 	//Integration with Mindmaps
@@ -35,6 +35,7 @@ mySPA.controller('pluginController',['$scope','$window','$http','$location','$ti
 		var userid = userInfo.user_id;
 		PluginService.getProjectIDs_Nineteen68(userid)
 		.then(function (data) {
+		
 			if(data != "Fail" && data != "Invalid Session")
 			{
 				var obj={'userid':userid,'prjId':data};
@@ -96,6 +97,8 @@ mySPA.controller('pluginController',['$scope','$window','$http','$location','$ti
 								counter++
 							}
 						  }
+						  	//prevent mouseclick before loading tasks
+						  	$("span.toggleClick").removeClass('toggleClick');
 						}
 					
 					$("#plugin-container").removeClass("inactiveLink");
