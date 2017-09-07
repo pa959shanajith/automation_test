@@ -844,7 +844,7 @@ exports.ExecuteTestSuite_ICE_CI = function(req, res) {
                 mySocket._events.result_executeTestSuite = [];
                 mySocket.emit('executeTestSuite', executionRequest);
                 mySocket.on('result_executeTestSuite', function(resultData) {
-                    	req.session.cookie.expires = sessionExtend;
+                    	//req.session.cookie.expires = sessionExtend;
                     if (resultData != "success" && resultData != "Terminate") {
                         try {
                             var scenarioid = resultData.scenarioId;

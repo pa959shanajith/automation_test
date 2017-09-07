@@ -421,4 +421,28 @@ mySPA.controller('mindmapController', ['$scope', '$http', '$location', '$timeout
             objDiv.scrollTop = objDiv.scrollHeight;
     }
     // Changes made for End to end module implementation
+//To toggle the view when user clicks on switch layout (Himanshu)
+$scope.toggleview = function(){
+    var selectedTab = window.localStorage['tabMindMap'];
+    if(selectedTab=='mindmapEndtoEndModules')
+        var temp=dNodes_W.length;
+    else
+        var temp=dNodes.length;
+    
+if(temp==0){
+        alert('Please select a module first');
+}
+else if((selectedTab=='mindmapEndtoEndModules' || selectedTab=='tabCreate') && !$('#ct-inpBox').hasClass('no-disp'))
+{
+        alert('Please complete editing first');    
+        d3.select('#ct-inpAct').node().focus();
+}
+else if(selectedTab=='tabAssign' && !$('#ct-assignBox').hasClass('no-disp')){
+        alert('Please complete assign step first');    
+}
+else{
+        $('#switch-layout').toggleClass('vertical-layout');
+        loadMap2();
+}
+    };
 }]);
