@@ -565,7 +565,7 @@ select
     left: 0% !important;
 }
 
-.searchbox-assign{
+.searchbox-assign, .searchbox-create{
     margin-left:33%;
     width: calc(100% - 85%);
 	border-radius: 6px;
@@ -574,7 +574,7 @@ select
     bottom: 2px;
 }
 
-.searchModuleimg-assign{
+.searchModuleimg-assign, .searchModuleimg-create{
 	position: absolute;
     margin-left: 45%;
     top: 3px;

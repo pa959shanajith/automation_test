@@ -369,6 +369,25 @@ mySPA.controller('mindmapController', ['$scope', '$http', '$location', '$timeout
 		}
 	});
 
+	// Search for modules in create tab (Himanshu)
+ 	$(document).on('keyup', '#searchModule-create', function(){
+		input = document.getElementById("searchModule-create");
+    filter_elem = input.value.toUpperCase();
+		elems = $('#ct-moduleBox .ct-node');
+        console.log(elems)
+		for (i = 0; i < elems.length; i++) {
+				if (elems[i].textContent.toUpperCase().indexOf(filter_elem) > -1) {
+						elems[i].style.display = "";
+				} else {
+						elems[i].style.display = "none";
+				}
+		}
+	});
+	
+	$(document).on('click','#ct-moduleBox .ct-node',function(){
+		$('#searchModule-create').val("");
+	})
+
 	$(document).on('click','#ct-AssignBox .ct-node',function(){
 		$('#searchModule-assign').val("");
 	})
