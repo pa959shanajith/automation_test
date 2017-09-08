@@ -492,7 +492,7 @@ body {
 }
 
 .plugin-block span {
-    font-size: 17px;
+    font-size: 14px;
     line-height: 21px;
     color: #fff;
     position: absolute;
@@ -3438,8 +3438,8 @@ li.select_all .addCustObj{
 
 #additionalRoles{
 	position: relative;
-    left: 0px;
-    top: 0px;
+    left: 95px;
+    top: -1px;
 }
 /*****************ADMIN CSS NEW ************************/
 .containerWrap {
@@ -4309,6 +4309,11 @@ select:-webkit-autofill:focus {
     .plugin-block {
         margin-bottom: 6%
     }
+	.leftQcStructure, .rightQcStructure{width: calc(100% - 505px) !important; height: 720px !important;}
+	.qcActionBtnFirstChild{margin-left: 480px !important;}
+	.qcActionBtn label:nth-child(2){left: 440px !important;}
+	.qcDomProContainer select, .qcProContainer select{width: calc(100% - 226px) !important;}
+    .mappedFiles{height: calc(100% - 53px) !important;}   
 }
 
 @media only screen and (height:1024px){
@@ -4334,6 +4339,21 @@ select:-webkit-autofill:focus {
 	.encryptionData {margin-bottom: 8px;}
 	.encryptedData {margin-top: 8px;}
 	#encrypt_btn, #reset_btn{padding: 0px 25px !important;}
+
+    .leftQcStructure, .rightQcStructure{width: calc(100% - 505px) !important; height: 550px !important;}
+	.qcActionBtnFirstChild{margin-left: 472px !important;}
+	.qcActionBtn label:nth-child(2){left: 440px !important;}
+	.qcDomProContainer select, .qcProContainer select{width: calc(100% - 226px) !important;}
+    .mappedFiles{height: calc(100% - 53px) !important;}
+}
+@media only screen and (height:790px){
+     .leftQcStructure, .rightQcStructure{width: calc(100% - 506px) !important; height: 570px !important;}
+	.qcActionBtnFirstChild{margin-left: 480px !important;}
+	.qcActionBtn label:nth-child(2){left: 438px !important;}
+	.qcDomProContainer select, .qcProContainer select{width: calc(100% - 225px) !important;}
+    .mappedFiles{height: calc(100% - 54px) !important;}
+    .middle-section-testsuites, .bottom-section-testsuites{height: calc(100% - 408px);}
+    .suitestartend thead{width: calc(100% - 732px);}
 }
 @media only screen and (height:1080px){
 	.designDataTable{width: 1617px;}
@@ -4442,6 +4462,14 @@ select:-webkit-autofill:focus {
 	.project-left2{padding: 0 47px 0 0;}
 	#allProjectAP,#assignedProjectAP, #allProjectAP[size],#assignedProjectAP[size]{min-height: 258px !important;}
 	.endtoend-modulesContainer{height: 28% !important;}
+}
+
+@media only screen and (width: 1440px) and (height: 794px){
+    .leftQcStructure, .rightQcStructure{width: calc(100% - 580px) !important; height: 578px !important;}
+	.qcActionBtnFirstChild{margin-left: 630px !important;}
+	.qcActionBtn label:nth-child(2){left: 514px !important;}
+	.qcDomProContainer select, .qcProContainer select{width: calc(100% - 264px) !important;}
+    .scenarioReports thead {width: calc(100% - 312px);}
 }
 /**********Specifically for Firefox**********/
 @-moz-document url-prefix() {
@@ -4796,4 +4824,8 @@ line.subdomain {
 
 .hidden {
 	display : none;
+}
+.toggleClick
+{
+    pointer-events: none;
 }

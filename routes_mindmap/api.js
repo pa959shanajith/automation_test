@@ -6,7 +6,7 @@ var cassandra = require('node-cassandra-cql');
 
 module.exports = {
 	importToNeo: function(req,res){
-		var impData = fs.readFileSync('./assets_mindmap/import.txt','utf8');
+		var impData = fs.readFileSync('./assets/import.txt','utf8');
 		var sheet=impData.split('\n');
 		var nameDict={};
 		var qList=[];
@@ -49,7 +49,7 @@ module.exports = {
 		res.status(200).send(qObj);
 	},
 	saveConfig: function(req,res){
-		var rawData = fs.readFileSync('./assets_mindmap/config.txt');
+		var rawData = fs.readFileSync('./assets/config.txt');
 		if(rawData.length === 0) rawData='{"cassandra":{"host":"xxx.xxx.xxx.xxx","port":0,"keyspace":""},"neo4j":{"host":"xxx.xxx.xxx.xxx","port":0,"username":"???","password":"???"}}';
 		var configData = JSON.parse(rawData);
 		var data = req.body;
@@ -68,7 +68,7 @@ module.exports = {
 				configData.neo4j[dbInst].password=tList[1];
 			}
 		}
-		fs.writeFileSync('./assets_mindmap/config.txt', JSON.stringify(configData), 'utf8');
+		fs.writeFileSync('./assets/config.txt', JSON.stringify(configData), 'utf8');
 		res.setHeader('Content-Type', 'application/json');
 		res.status(200).send('Success');
 	},
@@ -79,7 +79,7 @@ module.exports = {
 	},
 
 	neoScriptA: function(req,res){
-		var neoData = JSON.parse(fs.readFileSync('./assets_mindmap/config.txt')).neo4j;
+		var neoData = JSON.parse(fs.readFileSync('./assets/config.txt')).neo4j;
 		var data = JSON.stringify(req.body.data);
 		var result="";
 		var postOptions = {
@@ -117,7 +117,7 @@ module.exports = {
 	casScriptA: function(req,res){
 		var reqb=req.body;
 		var sessObj = reqb.uid;
-		var casData = JSON.parse(fs.readFileSync('./assets_mindmap/config.txt')).cassandra;
+		var casData = JSON.parse(fs.readFileSync('./assets/config.txt')).cassandra;
 		var casOptions={hosts:[casData.host+':'+casData.port], keyspace:casData.keyspace};
 		var casSession = new cassandra.Client(casOptions);
 		var query = reqb.query;

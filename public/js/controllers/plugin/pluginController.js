@@ -11,7 +11,7 @@ mySPA.controller('pluginController',['$scope','$window','$http','$location','$ti
 	} 
 	for(i=0; i<availablePlugins.length; i++){
 		if(availablePlugins[i].pluginValue != false){
-			$("#plugin-container").append('<div class="col-md-4 plugin-block"><span onclick="p_event(this.dataset.name)" data-name="p_'+availablePlugins[i].pluginName.replace(/\s/g,'')+'" id="'+availablePlugins[i].pluginName+'" title="'+availablePlugins[i].pluginName+'">'+availablePlugins[i].pluginName+'</span></div>').fadeIn()
+			$("#plugin-container").append('<div class="col-md-4 plugin-block"><span class="toggleClick" onclick="p_event(this.dataset.name)" data-name="p_'+availablePlugins[i].pluginName.replace(/\s/g,'')+'" id="'+availablePlugins[i].pluginName+'" title="'+availablePlugins[i].pluginName+'">'+availablePlugins[i].pluginName+'</span></div>').fadeIn()
 		}        
 	}
 	//Integration with Mindmaps
@@ -23,7 +23,7 @@ mySPA.controller('pluginController',['$scope','$window','$http','$location','$ti
 	});
 	/*window.localStorage["_VP"] = false;
 	window.localStorage["_VM"] = false;*/
-	$("#plugin-container").addClass("inactiveLink");
+	//$("#plugin-container").addClass("inactiveLink");
 	if(window.localStorage['_UI'])
 	{
 		var userInfo =  JSON.parse(window.localStorage['_UI']);
@@ -35,6 +35,7 @@ mySPA.controller('pluginController',['$scope','$window','$http','$location','$ti
 		var userid = userInfo.user_id;
 		PluginService.getProjectIDs_Nineteen68(userid)
 		.then(function (data) {
+		
 			if(data != "Fail" && data != "Invalid Session")
 			{
 				var obj={'userid':userid,'prjId':data};
@@ -96,13 +97,15 @@ mySPA.controller('pluginController',['$scope','$window','$http','$location','$ti
 								counter++
 							}
 						  }
+						  	//prevent mouseclick before loading tasks
+						  	$("span.toggleClick").removeClass('toggleClick');
 						}
 					
-					// $("#plugin-container").removeClass("inactiveLink");
+					//$("#plugin-container").removeClass("inactiveLink");
 				}, function (error) { 
 					console.log("Error:::::::::::::", error);
 				})
-				$("#plugin-container").removeClass("inactiveLink");
+				// $("#plugin-container").removeClass("inactiveLink");
 			}	
 			else{
 				window.location.href = "/";
@@ -162,6 +165,8 @@ mySPA.controller('pluginController',['$scope','$window','$http','$location','$ti
 			//window.localStorage["_VM"] = true;
 			name = 'home'
 		}
+		else if(name == "p_NeuronGraphs2D") name = 'neuronGraphs2D';
+		else if(name == "p_NeuronGraphs3D") name = 'neuronGraphs3D';
 		window.localStorage['navigateScreen'] = name;
 		$window.location.assign(name)
 	}

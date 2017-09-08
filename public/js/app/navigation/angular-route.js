@@ -78,6 +78,11 @@ mySPA.config(function($routeProvider, $locationProvider,$provide) {
 			 	templateUrl: 'partials/qualityCenter.html',
 			 	controller: 'qcController'
 			})
+			.when('/neuronGraphs2D',
+			{
+			 	templateUrl: 'partials/neuronGraphs2D.html',
+			 	controller: 'neuronGraphs2DController'
+			})
 			.otherwise({redirectTo: '/'});
 	
 	//$locationProvider.html5Mode(true);      //to remove angular hash(#) in the url

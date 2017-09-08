@@ -31,7 +31,7 @@ mySPA.controller('loginController', function ($scope, $http, $location, LoginSer
 			var password = $scope.password;
 			LoginService.authenticateUser_Nineteen68(username, password)
 			.then(function (data) {
-				if(data.flag != "fail" && data.flag != "noProjectsAssigned"){
+				if(data != "fail" && data != "noProjectsAssigned"){
 					if (data == 'inValidCredential') {
 						$(".ic-username").children().attr("src", "imgs/ic-username-error.png");
 						$(".ic-password").children().attr("src", "imgs/ic-password-error.png");
@@ -59,7 +59,7 @@ mySPA.controller('loginController', function ($scope, $http, $location, LoginSer
 								if(data != "fail"){
 									//To be removed - Has to come from database
 									var availablePlugins = [];
-									var key = ["ALM","Auto Gen Path", "Dashboard", "Dead Code Identifier", "ICE" ,"Mindmap" ,"Neuron 2D", "Neuron 3D", "Oxbow Code Identifier", "Reports", "Weboccular"];
+									var key = ["ALM","Auto Gen Path", "Dashboard", "Dead Code Identifier", "ICE" ,"Mindmap" ,"Neuron Graphs 2D", "Neuron Graphs 3D", "Oxbow Code Identifier", "Reports", "Weboccular"];
 									for(i=0; i<data.plugindetails.length; i++){
 										availablePlugins.push({
 											"pluginName" : key[i],
@@ -103,9 +103,10 @@ mySPA.controller('loginController', function ($scope, $http, $location, LoginSer
 						else if(data == "userLogged"){
 							 $scope.loginValidation = "User is already logged in! Please logout from the previous session.";
 						     cfpLoadingBar.complete();
-						}
+				         }
 					}
 				}
+				
 				else if(data == 'noProjectsAssigned')
 				{
 						$scope.loginValidation = "To Login, user must be allocated to a Domain and Project. Please contact Admin.";

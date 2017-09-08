@@ -844,7 +844,7 @@ exports.ExecuteTestSuite_ICE_CI = function(req, res) {
                 mySocket._events.result_executeTestSuite = [];
                 mySocket.emit('executeTestSuite', executionRequest);
                 mySocket.on('result_executeTestSuite', function(resultData) {
-                    	req.session.cookie.expires = sessionExtend;
+                    	//req.session.cookie.expires = sessionExtend;
                     if (resultData != "success" && resultData != "Terminate") {
                         try {
                             var scenarioid = resultData.scenarioId;
@@ -1446,11 +1446,14 @@ function TestSuiteDetails_Module_ICE(req, cb1, data) {
                     var conditioncheckvalues = [];
                     var donotexecutevalues = [];
                     var getparampathvalues = [];
-                    for (var i = 0; i < testscenarioids.length; i++) {
+                    if(testscenarioids!=null && testscenarioids !=undefined){
+                        for (var i = 0; i < testscenarioids.length; i++) {
                         conditioncheckvalues.push('0');
                         donotexecutevalues.push('1');
                         getparampathvalues.push('');
+                        }
                     }
+                    
                     var inputs = {"cycleid":requiredcycleid,
                     "testsuitename":requiredtestsuitename,
                     "testsuiteid":requiredtestsuiteid,

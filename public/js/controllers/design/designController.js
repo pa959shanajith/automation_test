@@ -124,6 +124,13 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 
     if (window.localStorage['_TJ']) {
         allTasks = JSON.parse(window.localStorage['_TJ']);
+        if(allTasks.length > 0)
+        {
+                allTasks =  allTasks.filter(function(n){
+                    return n.appType === appType
+                });
+        }
+
         for (var i = 0; i < allTasks.length; i++) {
             //Screen with no testcases
             if (allTasks[i].screenName != "" && allTasks[i].testCaseId == "") {
@@ -158,7 +165,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
         }
         //console.log("reusedScreens",reusedScreens);
         //console.log("reusedScreensTestcase",reusedScreensTestcase);
-        console.log("reusedTestcases", reusedTestcases);
+        //console.log("reusedTestcases", reusedTestcases);
         if (reusedScreens.length > 0) {
             for (var j = 0; j < reusedScreens.length; j++) {
                 if ($.trim(reusedScreens[j]) == $.trim(screenName)) {
@@ -1910,14 +1917,10 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
             d.css('z-index', '3');
             d.css('opacity', '0.7');
             getTopValue = Math.round(rect.y) * scale_highlight + 'px'
-            if (appType == "MobileApp" || appType == "MobileWeb")
-                $(".scroll-wrapper > .scrollbar-screenshot").animate({
-                    scrollTop: parseInt(Math.round(rect.y) - 600) + 'px'
-                }, 500);
+            if (appType == "MobileApp")
+                $(".scroll-wrapper > .scrollbar-screenshot").animate({scrollTop: parseInt(Math.round(rect.y) - 600) + 'px'}, 500);
             else
-                $(".scroll-wrapper > .scrollbar-screenshot").animate({
-                    scrollTop: parseInt(getTopValue)
-                }, 500);
+                $(".scroll-wrapper > .scrollbar-screenshot").animate({scrollTop: parseInt(getTopValue)}, 500);
             //$('.scroll-wrapper > .scrollbar-screenshot').scrollTo(d.offset().top);
             var color;
             if (translationFound) {

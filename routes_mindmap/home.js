@@ -328,7 +328,7 @@ router.post('/', function(req, res, next) {
 				});
 				qObj.testsuiteDetails=[{"projectID":nObj[rIndex].projectID,"testsuiteId":nObj[rIndex].id,"testsuiteId_c":nObj[rIndex].id_c,"testsuiteName":nObj[rIndex].name,"task":nObj[rIndex].task,"testscenarioDetails":tsList}];
 				qObj.userName=d.data.user_name;
-				//fs.writeFileSync('assets_mindmap/req_json.json',JSON.stringify(qObj),'utf8');
+				//fs.writeFileSync('assets/req_json.json',JSON.stringify(qObj),'utf8');
 				create_ice.createE2E_Structure_Nineteen68(qObj,function(err,data){
 				//res.setHeader('Content-Type', 'application/json');
 				if(err)
@@ -337,7 +337,7 @@ router.post('/', function(req, res, next) {
 					datatosend=data;
 					
 				}
-				//fs.writeFileSync('assets_mindmap/req_json_cassandra.txt',JSON.stringify(data),'utf8');
+				//fs.writeFileSync('assets/req_json_cassandra.txt',JSON.stringify(data),'utf8');
 				//var data = JSON.stringify(data);
 				var module_type='modules_endtoend';
 				var parsing_result=parsing(data,urlData,module_type);
@@ -614,7 +614,7 @@ router.post('/', function(req, res, next) {
 				});
 				qObj.testsuiteDetails=[{"testsuiteId":nObj[rIndex].id,"testsuiteId_c":nObj[rIndex].id_c,"testsuiteName":nObj[rIndex].name,"task":nObj[rIndex].task,"testscenarioDetails":tsList}];
 				qObj.userName=d.data.user_name;
-				//fs.writeFileSync('assets_mindmap/req_json.json',JSON.stringify(qObj),'utf8');
+				//fs.writeFileSync('assets/req_json.json',JSON.stringify(qObj),'utf8');
 				create_ice.createStructure_Nineteen68(qObj,function(err,data){
 				//res.setHeader('Content-Type', 'application/json');
 				if(err)
@@ -623,7 +623,7 @@ router.post('/', function(req, res, next) {
 					datatosend=data;
 					
 				}
-				//fs.writeFileSync('assets_mindmap/req_json_cassandra.txt',JSON.stringify(data),'utf8');
+				//fs.writeFileSync('assets/req_json_cassandra.txt',JSON.stringify(data),'utf8');
 				//var data = JSON.stringify(data);
 				var module_type='modules';
 				var parsing_result=parsing(data,urlData,module_type);

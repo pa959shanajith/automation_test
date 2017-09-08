@@ -1,7 +1,6 @@
 var uuid = require('uuid-random');
 var async=require('async');
 var dbConnICE = require('../../server/config/icetestautomation');
-var home_file=require('../../routes_mindmap/index.js');
 var myserver = require('../../server.js');
 var taskJson=require('../../routes_mindmap/taskJson');
 var create_ice=require('../controllers/create_ice');

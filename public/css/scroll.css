@@ -925,3 +925,9 @@
 	.scroll-wrapper > .scrollbar-screenshot{max-height: 360px !important;}
 	.scroll-wrapper > .scrollbar-screenshotTs{max-height: 268px !important;}
 }
+@media only screen and (height:790px){
+    .scroll-wrapper.scrollbar-inner-rep{max-height: 241px !important;}
+}
+@media only screen and (width: 1440px) and (height: 794px){
+    .scroll-wrapper.scrollbar-inner-rep {max-height: 243px !important;}                                                                                                                                                                       
+}

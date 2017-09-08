@@ -38,7 +38,7 @@ exports.loginQCServer_ICE = function (req, res) {
 	            mySocket._events.qcresponse = [];               						
 	            mySocket.emit("qclogin", qcDetails);
 	            mySocket.on('qcresponse', function (data) {
-                   	req.session.cookie.expires = sessionExtend;
+                   	//req.session.cookie.expires = sessionExtend;
 	                res.send(data);
 	            });
 		}else{
@@ -87,7 +87,7 @@ exports.qcProjectDetails_ICE = function (req, res) {
                     mySocket._events.qcresponse = [];               						
                     mySocket.emit("qclogin", qcDetails);
                     mySocket.on('qcresponse', function (data) {
-                        	req.session.cookie.expires = sessionExtend;
+                        	//req.session.cookie.expires = sessionExtend;
 						try{
 							projectDetailList.nineteen68_projects = projectdata;
 							projectDetailList.qc_projects = data.project;
@@ -254,7 +254,7 @@ exports.qcFolderDetails_ICE = function (req, res) {
                     mySocket._events.qcresponse = [];               						
                     mySocket.emit("qclogin", req.body);
                     mySocket.on('qcresponse', function (data) {
-                        	req.session.cookie.expires = sessionExtend;
+                        	//req.session.cookie.expires = sessionExtend;
 						// try{
 						// 	projectDetailList.nineteen68_projects = projectdata;
 						// 	projectDetailList.qc_projects = data.project;
