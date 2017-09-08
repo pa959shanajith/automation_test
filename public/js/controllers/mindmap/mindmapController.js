@@ -384,13 +384,7 @@ mySPA.controller('mindmapController', ['$scope', '$http', '$location', '$timeout
 		}
 	});
 	
-	$(document).on('click','#ct-moduleBox .ct-node',function(){
-		$('#searchModule-create').val("");
-	})
 
-	$(document).on('click','#ct-AssignBox .ct-node',function(){
-		$('#searchModule-assign').val("");
-	})
 
     // $(".highlightImg").on('click',function(e) {
     //     if(e.target.id == "reqImg" || e.target.id == "createImg" ||  e.target.id == "assignImg" || 
