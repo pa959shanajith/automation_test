@@ -195,3 +195,6 @@
     .qcActionBtnFirstChild{margin-left: 458px !important;}
     .qcTreeContainer, .qcN68TreeContainer{height: 600px;}
 }
+@media only screen and (width: 1440px) and (height: 794px){
+    .mappedFiles{height: calc(100% - 74px) !important;}
+}

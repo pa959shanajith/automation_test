@@ -14,7 +14,6 @@ function _getCallerFile() {
         var currentfile;
         var oFunc = Error.prepareStackTrace;
         Error.prepareStackTrace = function (err, stack) { return stack; };
-
         currentfile = err.stack.shift().getFileName();
         while (err.stack.length) {
           var a = err.stack.shift();
@@ -154,19 +153,22 @@ if (cluster.isMaster) {
     });
 
     //Only Test Engineer and Test Lead have access
-    app.get(/^\/(design|designTestCase|execute|scheduling|p_ALM)$/, function(req, res){
+    app.get(/^\/(design|designTestCase|execute|scheduling)$/, function(req, res){
+        //Denied roles
         roles = ["Admin", "Business Analyst", "Tech Lead", "Test Manager"];
         sessionCheck(req, res, roles);
     });
 
     //Test Engineer,Test Lead and Test Manager can access
-    app.get(/^\/(specificreports|home|p_Utility|p_Reports|plugin|p_ALM)$/, function(req, res){
+    app.get(/^\/(specificreports|home|p_Utility|p_Reports|plugin)$/, function(req, res){
+        //Denied roles
         roles = ["Admin", "Business Analyst", "Tech Lead"];
         sessionCheck(req, res, roles);
     });
 
     //Test Lead and Test Manager can access Weboccular Plugin
-    app.get(/^\/(p_Weboccular|neuronGraphs2D)$/, function(req, res){
+    app.get(/^\/(p_Weboccular|neuronGraphs2D|p_ALM)$/, function(req, res){
+        //Denied roles
         roles=  ["Admin", "Business Analyst", "Tech Lead", "Test Engineer"];
         sessionCheck(req, res, roles);
     });
@@ -337,6 +339,7 @@ if (cluster.isMaster) {
     app.post('/qcFolderDetails_ICE', qc.qcFolderDetails_ICE);
     app.post('/saveQcDetails_ICE', qc.saveQcDetails_ICE);
     app.post('/viewQcMappedList_ICE', qc.viewQcMappedList_ICE);
+    //app.post('/manualTestcaseDetails_ICE', qc.manualTestcaseDetails_ICE);
 
 
     //-------------SERVER START------------//
@@ -351,6 +354,7 @@ if (cluster.isMaster) {
                     httpsServer.close();
                     console.log("Please run the Service API and Restart the Server");
                 }else{
+					//suite.reScheduleTestsuite();
                     console.log("Nineteen68 Server Ready...");
                 }
             }catch(exception){
@@ -367,8 +371,6 @@ if (cluster.isMaster) {
         console.log("Please run the Service API");
     }
     // httpsServer.listen(8443); //Https Server
-
-
 
     //To prevent can't send header response
     app.use(function(req, res, next) {
@@ -400,7 +402,6 @@ if (cluster.isMaster) {
         console.log('Param ',socket.handshake.query['username']);
         //console.log("middleware:", socket.request._query['check']);
 
-
         if (socket.request._query['check'] == "true" ) {
         //  if ( !(address in socketMapUI) ) {
             isUISocketRequest = true;
@@ -418,7 +419,6 @@ if (cluster.isMaster) {
               socket.send('connectionExists');
           }
         }
-
 
         module.exports.allSocketsMap = socketMap;
         module.exports.allSocketsMapUI = socketMapUI;
@@ -457,16 +457,15 @@ if (cluster.isMaster) {
           }else{
             //var i = socketMap.indexOf(socket);
             var address=socket.handshake.query['username'];
-
-             if (socketMap[address] != undefined) {
-                 console.log('Socket Connection got disconnected for :', address);
+            if (socketMap[address] != undefined) {
+                console.log('Socket Connection got disconnected for :', address);
                 delete socketMap[address];
                 module.exports.allSocketsMap = socketMap;
                 //		console.log("------------------------SOCKET DISCONNECTED----------------------------------------");
                 console.log("NO. OF CLIENTS CONNECTED:", Object.keys(socketMap).length,'\nIP\'s connected :',Object.keys(socketMap).join());
             }
             else if (sokcetMapScheduling[address] != undefined) {
-                 console.log('Socket Connection got disconnected for :', address);
+                console.log('Socket Connection got disconnected for :', address);
                 delete sokcetMapScheduling[address];
                 module.exports.allSchedulingSocketsMap = sokcetMapScheduling;
                 //		console.log("------------------------SOCKET DISCONNECTED----------------------------------------");
@@ -476,42 +475,28 @@ if (cluster.isMaster) {
         });
 
         socket.on('reconnect', function(data) {
-            console.log("ReEstablish connection for Scheduling");
-            var ip = socket.request.connection.remoteAddress || socket.request.headers['x-forwarded-for'];
-            console.log("Scheduling Mode Enabled for  IP:",ip);
+           console.log("ReEstablish connection for Scheduling");
+           var ip = socket.request.connection.remoteAddress || socket.request.headers['x-forwarded-for'];
+           console.log("Scheduling Mode Enabled for  IP:",ip);
            var address=socket.handshake.query['username'];
            console.log(data);
             if (data && socketMap[address] != undefined) {
-
                 console.log('Socket Connection got disconnected for Normal Mode :', address);
                 delete socketMap[address];
-
                 module.exports.allSocketsMap = socketMap;
-
                 console.log("NO. OF CLIENTS CONNECTED:", Object.keys(socketMap).length,'\nIP\'s connected :',Object.keys(socketMap).join());
-
-
-              sokcetMapScheduling[address] = socket;
-              socket.send('reconnected');
-
-              module.exports.allSchedulingSocketsMap = sokcetMapScheduling;
-              console.log("NO. OF CLIENTS CONNECTED For Scheduling:", Object.keys(sokcetMapScheduling).length,'\nIP\'s connected :',Object.keys(sokcetMapScheduling).join());
-
-
+                sokcetMapScheduling[address] = socket;
+                socket.send('reconnected');
+                module.exports.allSchedulingSocketsMap = sokcetMapScheduling;
+                console.log("NO. OF CLIENTS CONNECTED For Scheduling:", Object.keys(sokcetMapScheduling).length,'\nIP\'s connected :',Object.keys(sokcetMapScheduling).join());
             }else if(!data && sokcetMapScheduling!=undefined){
                 console.log('Socket Connection got disconnected for Scheduling mode:', address);
                 delete sokcetMapScheduling[address];
-
                 module.exports.allSchedulingSocketsMap = sokcetMapScheduling;
                 console.log("NO. OF CLIENTS CONNECTED For Scheduling:", Object.keys(sokcetMapScheduling).length,'\nIP\'s connected :',Object.keys(sokcetMapScheduling).join());
-
-
-              socketMap[address] = socket;
-              module.exports.allSocketsMap = socketMap;
-              socket.send('connected');
-
-
-
+                socketMap[address] = socket;
+                module.exports.allSocketsMap = socketMap;
+                socket.send('connected');
             }
 
         });

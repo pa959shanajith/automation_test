@@ -1917,14 +1917,10 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
             d.css('z-index', '3');
             d.css('opacity', '0.7');
             getTopValue = Math.round(rect.y) * scale_highlight + 'px'
-            if (appType == "MobileApp" || appType == "MobileWeb")
-                $(".scroll-wrapper > .scrollbar-screenshot").animate({
-                    scrollTop: parseInt(Math.round(rect.y) - 600) + 'px'
-                }, 500);
+            if (appType == "MobileApp")
+                $(".scroll-wrapper > .scrollbar-screenshot").animate({scrollTop: parseInt(Math.round(rect.y) - 600) + 'px'}, 500);
             else
-                $(".scroll-wrapper > .scrollbar-screenshot").animate({
-                    scrollTop: parseInt(getTopValue)
-                }, 500);
+                $(".scroll-wrapper > .scrollbar-screenshot").animate({scrollTop: parseInt(getTopValue)}, 500);
             //$('.scroll-wrapper > .scrollbar-screenshot').scrollTo(d.offset().top);
             var color;
             if (translationFound) {

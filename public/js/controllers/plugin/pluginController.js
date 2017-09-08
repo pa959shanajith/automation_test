@@ -23,7 +23,7 @@ mySPA.controller('pluginController',['$scope','$window','$http','$location','$ti
 	});
 	/*window.localStorage["_VP"] = false;
 	window.localStorage["_VM"] = false;*/
-	$("#plugin-container").addClass("inactiveLink");
+	//$("#plugin-container").addClass("inactiveLink");
 	if(window.localStorage['_UI'])
 	{
 		var userInfo =  JSON.parse(window.localStorage['_UI']);
@@ -101,7 +101,7 @@ mySPA.controller('pluginController',['$scope','$window','$http','$location','$ti
 						  	$("span.toggleClick").removeClass('toggleClick');
 						}
 					
-					$("#plugin-container").removeClass("inactiveLink");
+					//$("#plugin-container").removeClass("inactiveLink");
 				}, function (error) { 
 					console.log("Error:::::::::::::", error);
 				})
