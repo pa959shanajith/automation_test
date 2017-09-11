@@ -972,8 +972,7 @@ exports.ExecuteTestSuite_ICE_CI = function(req, res) {
 
 
 
-function TestCaseDetails_Suite_ICE(req, cb, data) {
-        console.log(cb);
+function TestCaseDetails_Suite_ICE(req,userid, cb, data) {
         var requestedtestscenarioid = req;
         var testscenarioslist = "select testcaseids from testscenarios where testscenarioid=" + requestedtestscenarioid + ";";
         var resultstring = [];
@@ -984,7 +983,7 @@ function TestCaseDetails_Suite_ICE(req, cb, data) {
         var listoftestcasedata = [];
         async.series({
                 testcaseid: function(callback) {
-                    var inputs = {"testscenarioid":requestedtestscenarioid,"query":"testcaseid"}
+                    var inputs = {"testscenarioid":requestedtestscenarioid,"query":"testcaseid","userid":userid}
                     var args = {
                         data:inputs,
                         headers:{"Content-Type" : "application/json"}
