@@ -131,6 +131,9 @@ if (cluster.isMaster) {
     });
 
     app.get('/', function(req, res) {
+            var usrName = req.session.username
+            var index = module.exports.sessionCreated.indexOf(usrName);
+            module.exports.sessionCreated.splice(index, 1);
             res.clearCookie('connect.sid');
             req.session.destroy();
             res.sendFile("index.html", {
@@ -177,10 +180,8 @@ if (cluster.isMaster) {
       var usrName = req.session.username;
       if (!req.session.defaultRole || roles.indexOf(req.session.defaultRole) >=0)
         {
-            console.log(usrName)
             var index = module.exports.sessionCreated.indexOf(usrName);
             module.exports.sessionCreated.splice(index, 1);
-            console.log(module.exports.sessionCreated)
             req.session.destroy(); res.status(401).send('<br><br>Your session has been expired.Please <a href="/">Login</a> Again');
         }else{
             if (req.cookies['connect.sid'] && req.cookies['connect.sid'] != undefined) { res.sendFile("index.html", { root: __dirname + "/public/" });} else {req.session.destroy(); res.status(401).send('<br><br>Your session has been expired. Please <a href="/">Login</a> Again');}

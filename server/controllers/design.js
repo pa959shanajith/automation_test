@@ -1909,7 +1909,7 @@ exports.debugTestCase_ICE = function (req, res) {
 					    async.forEachSeries(requestedtestcaseids, function(testcaseIDs, eachTestcaseIDsCallback) {
 					        // var getProjectTestcasedata = "select screenid,testcasename,testcasesteps from testcases where testcaseid=" + testcaseIDs;
 					        // dbConn.execute(getProjectTestcasedata, function(errgetTestcasedata, testcasedataresult) {
-								var inputs = {"query": "testcaseid", "testcaseid":testcaseIDs};
+								var inputs = {"query": "testcaseid", "testcaseid":testcaseIDs,"userid":req.body.userInfo.user_id};
 								var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
 								client.post(epurl+"design/readTestCase_ICE",args,
 										function (testcasedataresult, response) {
