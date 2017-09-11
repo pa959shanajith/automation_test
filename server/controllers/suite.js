@@ -490,12 +490,25 @@ exports.ExecuteTestSuite_ICE = function(req, res) {
 
     //    var batchExecutionData=[{ 	"suiteDetails": [{ 		"condition": 0, 		"browserType": ["1"], 		"dataparam": [""], 		"executestatus": 1, 		"scenarioids": "4c1142f8-7851-477c-b25b-6504c86fe6b4", 		"scenarionames": "Module_Scenario1" 	}, { 		"condition": 0, 		"dataparam": [""], 		"executestatus": 1, 		"scenarioids": "bdda93ff-63ed-4809-84f7-396ae203cc3c", 		"scenarionames": "Module_Scenario2" 	}], 	"testsuitename": "Execution_ModuleLevel1", 	"testsuiteid": "df6120fe-aaf1-456b-9b6c-0615c792d8d8", 	"browserType": ["1"] }, { 	"suiteDetails": [{ 		"condition": 0, 		"browserType": ["1"], 		"dataparam": [""], 		"executestatus": 1, 		"scenarioids": "061c89a6-c171-45f9-bcf8-397c4e9abecd", 		"scenarionames": "BatchExecution_Scenario1_Level2" 	}, { 		"condition": 0, 		"dataparam": [""], 		"executestatus": 1, 		"scenarioids": "82b734e9-5c1f-4828-88ec-37eb24ab086b", 		"scenarionames": "BatchExecution_Scenario2_Level2" 	}], 	"testsuitename": "Execution_ModuleLevel2", 	"testsuiteid": "558c720b-fe3c-48d4-b6b7-7d1c39f35063", 	"browserType": ["1"] },]
         var batchExecutionData = req.body.moduleInfo;
+        var userInfo = req.body.userInfo;
         var testsuitedetailslist = [];
         // var testsuiteidslist = [];
         var testsuiteIds=[];
         var executionRequest={"executionId":"","suitedetails":[],"testsuiteIds":[]};
         var executionId = uuid();
         var starttime = new Date().getTime();
+        //updating number of executions happened
+        batchlength = batchExecutionData.length;
+        var updateinp = {"query":"testsuites","count":batchlength,"userid":userInfo.user_id}
+        var args = { data:updateinp,headers:{"Content-Type" : "application/json"}}
+        client.post(epurl+"utility/dataUpdator_ICE",args,
+                        function (result, response) {
+            if(response.statusCode != 200 || result.rows == "fail"){
+                    console.log("Data Updator Fail");
+            } else {
+                console.log("Data Updator Success");
+            }
+        });
         async.forEachSeries(batchExecutionData,function(eachbatchExecutionData,batchExecutionDataCallback){
             //required values
             var suiteDetails=eachbatchExecutionData.suiteDetails;
@@ -525,7 +538,7 @@ exports.ExecuteTestSuite_ICE = function(req, res) {
                 conditionchecklist.push(eachsuiteDetails.condition);
                 browserTypelist.push(eachsuiteDetails.browserType);
                 currentscenarioid=eachsuiteDetails.scenarioids;
-                TestCaseDetails_Suite_ICE(currentscenarioid, function(currentscenarioidError, currentscenarioidResponse) {
+                TestCaseDetails_Suite_ICE(currentscenarioid,userInfo.user_id, function(currentscenarioidError, currentscenarioidResponse) {
                     var scenariotestcaseobj = {};
                     // scenarioindex=scenarioindex + 1;
                     if (currentscenarioidError) {
@@ -756,11 +769,25 @@ exports.ExecuteTestSuite_ICE_CI = function(req, res) {
     {
 
         var batchExecutionData = req.body.moduleInfo;
+        var userInfo = req.body.userInfo;
         var testsuitedetailslist = [];
         var testsuiteIds=[];
         var executionRequest={"executionId":"","suitedetails":[],"testsuiteIds":[]};
         var executionId = uuid();
         var starttime = new Date().getTime();
+        
+        //updating number of executions happened
+        batchlength = batchExecutionData.length;
+        var updateinp = {"query":"testsuites","count":batchlength,"userid":userInfo.user_id}
+        var args = { data:updateinp,headers:{"Content-Type" : "application/json"}}
+        client.post(epurl+"utility/dataUpdator_ICE",args,
+                        function (result, response) {
+            if(response.statusCode != 200 || result.rows == "fail"){
+                    console.log("Data Updator Fail");
+            } else {
+                console.log("Data Updator Success");
+            }
+        });
         async.forEachSeries(batchExecutionData,function(eachbatchExecutionData,batchExecutionDataCallback){
             //required values
             var suiteDetails=eachbatchExecutionData.suiteDetails;
@@ -790,7 +817,7 @@ exports.ExecuteTestSuite_ICE_CI = function(req, res) {
                 conditionchecklist.push(eachsuiteDetails.condition);
                 browserTypelist.push(eachsuiteDetails.browserType);
                 currentscenarioid=eachsuiteDetails.scenarioids;
-                TestCaseDetails_Suite_ICE(currentscenarioid, function(currentscenarioidError, currentscenarioidResponse) {
+                TestCaseDetails_Suite_ICE(currentscenarioid,userInfo.user_id, function(currentscenarioidError, currentscenarioidResponse) {
                     var scenariotestcaseobj = {};
                     // scenarioindex=scenarioindex + 1;
                     if (currentscenarioidError) {
