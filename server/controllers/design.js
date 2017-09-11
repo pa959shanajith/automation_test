@@ -14,7 +14,7 @@ var dbConnICEHistory = require('../../server/config/ICEHistory');
 /**
  * @author vinay.niranjan
  * @modified author vinay.niranjan
- * the service is used to init scraping & fetch scrape objects 
+ * the service is used to init scraping & fetch scrape objects
  */
 
 //base RequestElement
@@ -26,8 +26,9 @@ var allCustnames=[];
 var objectLevel=1;
 var xpath="";
 var inputsWS={}
-var sessionExtend = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes 
-
+//var sessionExtend = new Date(Date.now() + ); // 30 minutes 
+var sessionTime = 30 * 60 * 1000;
+var updateSessionTimeEvery = 20 * 60 * 1000;
 
 exports.initScraping_ICE = function (req, res) {
 	try{
@@ -50,31 +51,43 @@ exports.initScraping_ICE = function (req, res) {
 			if(req.body.screenViewObject.appType == "Desktop"){
 				var applicationPath = req.body.screenViewObject.applicationPath;
 				var data = "LAUNCH_DESKTOP";
-				mySocket._events.scrape = [];               						
+				mySocket._events.scrape = [];
 				mySocket.emit("LAUNCH_DESKTOP", applicationPath);
+				var updateSessionExpiry = setInterval(function () {
+					req.session.cookie.maxAge = sessionTime;
+				},updateSessionTimeEvery);
 				mySocket.on('scrape', function (data) {
-				//	req.session.cookie.expires = sessionExtend;
+					//	req.session.cookie.expires = sessionExtend;
+					clearInterval(updateSessionExpiry);
 					res.send(data);
 				});
 			}
 			else if(req.body.screenViewObject.appType == "SAP"){
 				var applicationPath = req.body.screenViewObject.applicationPath;
 				var data = "LAUNCH_SAP";
-				mySocket._events.scrape = [];               						
+				mySocket._events.scrape = [];
 				mySocket.emit("LAUNCH_SAP", applicationPath);
+				var updateSessionExpiry = setInterval(function () {
+					req.session.cookie.maxAge = sessionTime;
+				},updateSessionTimeEvery);
 				mySocket.on('scrape', function (data) {
 					//req.session.cookie.expires = sessionExtend;
+					clearInterval(updateSessionExpiry);
 					res.send(data);
 				});
 			}
 			else if(req.body.screenViewObject.appType == "DesktopJava"){
 				var applicationPath = req.body.screenViewObject.applicationPath;
 				var data = "LAUNCH_OEBS";
-				mySocket._events.scrape = [];               						
+				mySocket._events.scrape = [];
 				// mySocket.send(data);
 				mySocket.emit("LAUNCH_OEBS", applicationPath);
+				var updateSessionExpiry = setInterval(function () {
+					req.session.cookie.maxAge = sessionTime;
+				},updateSessionTimeEvery);
 				mySocket.on('scrape', function (data) {
 					//req.session.cookie.expires = sessionExtend;
+					clearInterval(updateSessionExpiry);
 					res.send(data);
 				});
 			}
@@ -85,11 +98,15 @@ exports.initScraping_ICE = function (req, res) {
 				var mobileIosVersion = req.body.screenViewObject.mobileIosVersion;
 				var mobileUDID = req.body.screenViewObject.mobileUDID;
 				var data = "LAUNCH_MOBILE";
-				mySocket._events.scrape = [];                                                                                                  
+				mySocket._events.scrape = [];
 				mySocket.emit("LAUNCH_MOBILE", apkPath,serial,mobileDeviceName,mobileIosVersion,mobileUDID);
+				var updateSessionExpiry = setInterval(function () {
+					req.session.cookie.maxAge = sessionTime;
+				},updateSessionTimeEvery);
 				mySocket.on('scrape', function (data) {
 					//req.session.cookie.expires = sessionExtend;
-								res.send(data);
+					clearInterval(updateSessionExpiry);
+					res.send(data);
 				});
 			}
 			else if(req.body.screenViewObject.appType == "MobileWeb"){
@@ -97,21 +114,25 @@ exports.initScraping_ICE = function (req, res) {
 				var mobileSerial = req.body.screenViewObject.mobileSerial;
 				var androidVersion = req.body.screenViewObject.androidVersion;
 				var data = "LAUNCH_MOBILE_WEB";
-				mySocket._events.scrape = [];                                                                                                  
+				mySocket._events.scrape = [];
 				mySocket.emit("LAUNCH_MOBILE_WEB", mobileSerial, androidVersion);
+				var updateSessionExpiry = setInterval(function () {
+					req.session.cookie.maxAge = sessionTime;
+				},updateSessionTimeEvery);
 				mySocket.on('scrape', function (data) {
 					//req.session.cookie.expires = sessionExtend;
-								res.send(data);
+					clearInterval(updateSessionExpiry);
+					res.send(data);
 				});
 			}
-			else{	
+			else{
 			var data = {};
 				var browserType = req.body.screenViewObject.browserType;
 				if(req.body.screenViewObject.action == 'compare')
 				{
-				
+
 					data.viewString = req.body.screenViewObject.viewString.view;
-					data.action = req.body.screenViewObject.action; 
+					data.action = req.body.screenViewObject.action;
 					if (browserType == "chrome") {
 						data.task = "OPEN BROWSER CH";
 					}
@@ -121,11 +142,11 @@ exports.initScraping_ICE = function (req, res) {
 					else if (browserType == "mozilla") {
 						data.task = "OPEN BROWSER FX";
 					}
-				
+
 				}
 				else{
 					data.action = "scrape";
-						if (browserType == "chrome") {	
+						if (browserType == "chrome") {
 						data.task = "OPEN BROWSER CH";
 						//var data = "OPEN BROWSER CH";
 					}
@@ -138,10 +159,14 @@ exports.initScraping_ICE = function (req, res) {
 						//var data =   "OPEN BROWSER FX";
 					}
 				}
-				mySocket._events.scrape = [];               						
+				mySocket._events.scrape = [];
 				mySocket.emit("webscrape",data);
+				var updateSessionExpiry = setInterval(function () {
+					req.session.cookie.maxAge = sessionTime;
+				},updateSessionTimeEvery);
 				mySocket.on('scrape', function (data) {
 					//req.session.cookie.expires = sessionExtend;
+					clearInterval(updateSessionExpiry);
 					res.send(data);
 				});
 			}
@@ -216,7 +241,7 @@ exports.getScrapeDataScreenLevel_ICE = function(req, res){
 		{
 		var flag = "";
 		// var getScrapeDataQuery = "select screenid,screenname,screendata from screens where "+
-		// 		" screenid ="+ req.body.screenId + 
+		// 		" screenid ="+ req.body.screenId +
 		// 		" and projectid="+req.body.projectId+
 		// 		" allow filtering ;";
 			var inputs = {"screenid":req.body.screenId,"projectid":req.body.projectId,"query":"getscrapedata" }
@@ -251,7 +276,7 @@ exports.getScrapeDataScreenLevel_ICE = function(req, res){
 		var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
 		client.post(epurl+"design/getScrapeDataScreenLevel_ICE",args,
 			function (getScrapeDataQueryresult, response) {
-				
+
 			try{
 				if(response.statusCode != 200 || getScrapeDataQueryresult.rows == "fail"){
 				// if (getScrapeDataQueryerr) {
@@ -278,12 +303,12 @@ exports.getScrapeDataScreenLevel_ICE = function(req, res){
 * @author vinay.niranjan
 * @modified author vishvas.a
 * service updates the screen data in screens table
-* on user action of NEW SAVING/EDIT/UPDATE/DELETE/Mapping of Objects/Compare and Update in Design screen. 
+* on user action of NEW SAVING/EDIT/UPDATE/DELETE/Mapping of Objects/Compare and Update in Design screen.
 */
 exports.updateScreen_ICE = function(req, res){
-	try{	
+	try{
 		/*
-		 * internal variables 
+		 * internal variables
 		 */
 		if(req.cookies['connect.sid'] != undefined)
 		{
@@ -294,7 +319,7 @@ exports.updateScreen_ICE = function(req, res){
 			if(sessionToken != undefined && req.session.id == sessionToken)
 		{
 		var projectID, screenID, screenName,getScrapeData,scrapedObjects, modifiedBy, userInfo,appType, requestedversionnumber ,param;
-		var updateData = req.body.scrapeObject; 
+		var updateData = req.body.scrapeObject;
 		projectID   = updateData.projectId;
 		screenID   = updateData.screenId;
 		screenName = updateData.screenName;
@@ -303,7 +328,7 @@ exports.updateScreen_ICE = function(req, res){
 		param      = updateData.param;
 		appType    = updateData.appType;
 		//xpaths required to be mapped(used only when param is mapScrapeData_ICE)
-		var requiredXpathList=[];	
+		var requiredXpathList=[];
 		//urls required to be mapped(used only when param is mapScrapeData_ICE)
 		var requiredURLList=[];
 		scrapedObjects={};
@@ -327,7 +352,7 @@ exports.updateScreen_ICE = function(req, res){
 		var inputs={};
 		var inputstestcase={};
 		var statusFlag = "";
-		if(param == "updateScrapeData_ICE"){	
+		if(param == "updateScrapeData_ICE"){
 			try{
 				scrapedObjects = updateData.getScrapeData;
 				// single quote is replaced with double single quote for scraped data.
@@ -346,14 +371,14 @@ exports.updateScreen_ICE = function(req, res){
 				}else{
 					newParse=JSON.parse("{}");
 				}
-					
+
 				scrapedObjects=newParse;
 				if(appType.toUpperCase() === 'WEBSERVICE'){
 					try{
 						//scrapedObjects=JSON.parse(newParse);
 						var viewArray=[];
 						if('method' in scrapedObjects &&
-							'header' in scrapedObjects && 
+							'header' in scrapedObjects &&
 							'body' in scrapedObjects){
 							if(scrapedObjects.method == 'POST'){
 								var requestedBody=scrapedObjects.body[0];
@@ -403,7 +428,7 @@ exports.updateScreen_ICE = function(req, res){
 											requestedScreenhistory =  dateScreen + ":" + requestscreenhistorydetails;
 											createScreenHistoryQuery = "update screens set history= history + { "+requestedScreenhistory+" }" +
 												" where screenid = "+screenID+" and projectid ="+projectID+ //" and screenname ='" + screenName +
-												" and versionnumber = "+requestedversionnumber+" ";	
+												" and versionnumber = "+requestedversionnumber+" ";
 											updateScreenQuery = "update icetestautomation.screens set"+
 												" screendata ='"+ scrapedObjects +"',"+
 												" modifiedby ='" + modifiedBy + "',"+
@@ -414,10 +439,10 @@ exports.updateScreen_ICE = function(req, res){
 												" and projectid ="+projectID+
 												" and screenname ='" + screenName +
 												"' and versionnumber = "+requestedversionnumber+
-												" IF EXISTS; ";	
+												" IF EXISTS; ";
 												inputs={"query":"updatescreen","scrapedata":scrapedObjects,"modifiedby":modifiedBy,"skucodescreen":requestedskucodeScreens,
 												"screenid":screenID,"projectid":projectID,"screenname":screenName,"versionnumber":requestedversionnumber};
-											finalFunction(scrapedObjects);	
+											finalFunction(scrapedObjects);
 										}else{
 											//JSON with view string empty
 											updateScreenQuery=buildObject(scrapedObjects,modifiedBy,requestedskucodeScreens,requestedScreenhistory,screenID,projectID,screenName,requestedversionnumber);
@@ -460,7 +485,7 @@ exports.updateScreen_ICE = function(req, res){
 											requestedScreenhistory =  dateScreen + ":" + requestscreenhistorydetails;
 											createScreenHistoryQuery = "update screens set history= history + { "+requestedScreenhistory+" }" +
 												" where screenid = "+screenID+" and projectid ="+projectID+ //" and screenname ='" + screenName +
-												" and versionnumber = "+requestedversionnumber+" ";	
+												" and versionnumber = "+requestedversionnumber+" ";
 					updateScreenQuery = "update icetestautomation.screens set"+
 										" screendata ='"+ scrapedObjects +"',"+
 										" modifiedby ='" + modifiedBy + "',"+
@@ -471,10 +496,10 @@ exports.updateScreen_ICE = function(req, res){
 										" and projectid ="+projectID+
 										" and screenname ='" + screenName +
 										"' and versionnumber = "+requestedversionnumber+
-										" IF EXISTS; ";	
+										" IF EXISTS; ";
 						inputs={"scrapedata":scrapedObjects,"modifiedby":modifiedBy,"skucodescreen":requestedskucodeScreens,
 						"screenid":screenID,"projectid":projectID,"screenname":screenName,"versionnumber":requestedversionnumber};
-										finalFunction(scrapedObjects);						
+										finalFunction(scrapedObjects);
 				// console.log(updateScreenQuery);
 				}
 			}catch(exception){
@@ -486,13 +511,13 @@ exports.updateScreen_ICE = function(req, res){
 				* @author vishvas.a
 				* editing of the scraped data
 				* based on the changed custom names
-				* data used : old custom names, new custom names and xpath. 
+				* data used : old custom names, new custom names and xpath.
 				*/
-				var oldCustNamesList = updateData.editedList.oldCustName; 
+				var oldCustNamesList = updateData.editedList.oldCustName;
 				for(i=0;i<oldCustNamesList.length;i++)
 				{
 					oldCustNamesList[i] = oldCustNamesList[i].replace(/&amp;/g, '&');
-				} 
+				}
 				var newCustNamesList = updateData.editedList.modifiedCustNames;
 				var xpathListofCustName = updateData.editedList.xpathListofCustNames;
 				var elementschanged = 0;
@@ -527,12 +552,12 @@ exports.updateScreen_ICE = function(req, res){
 											for(var elementsindex=0;elementsindex<xpathListofCustName.length;elementsindex++){
 													for(var scrapedobjectindex=0;scrapedobjectindex<viewString.length;scrapedobjectindex++){
 														if(elementschanged<newCustNamesList.length){
-														if((viewString[scrapedobjectindex].xpath.replace(/\s/g,' ').replace('&nbsp;',' ') == xpathListofCustName[elementsindex].replace(/\s/g,' ').replace('&nbsp;',' ')) 
+														if((viewString[scrapedobjectindex].xpath.replace(/\s/g,' ').replace('&nbsp;',' ') == xpathListofCustName[elementsindex].replace(/\s/g,' ').replace('&nbsp;',' '))
 															&& (viewString[scrapedobjectindex].custname.replace(/\s/g,' ').replace('&nbsp;',' ').trim() == oldCustNamesList[elementsindex].replace(/\s/g,' ').replace('&nbsp;',' ').trim())){
 																viewString[scrapedobjectindex].custname=newCustNamesList[elementsindex];
 																//elementschanged increments only when edit has occured
 																elementschanged=elementschanged+1;
-														} 
+														}
 													}
 												}
 											}
@@ -553,7 +578,7 @@ exports.updateScreen_ICE = function(req, res){
 											 requestedScreenhistory =  dateScreen + ":" + requestscreenhistorydetails;
 											 createScreenHistoryQuery = "update screens set history= history + { "+requestedScreenhistory+" }" +
 												" where screenid = "+screenID+" and projectid ="+projectID+ //" and screenname ='" + screenName +
-												" and versionnumber = "+requestedversionnumber+" ";	
+												" and versionnumber = "+requestedversionnumber+" ";
 											// updateScreenQuery = "update icetestautomation.screens set"+
 											// 					" screendata ='"+ scrapedObjects +"',"+
 											// 					" modifiedby ='" + modifiedBy + "',"+
@@ -602,7 +627,7 @@ exports.updateScreen_ICE = function(req, res){
 				/*
 				* @author vishvas.a
 				* deleting of the scraped data
-				* based on the custom names and xpath. 
+				* based on the custom names and xpath.
 				*/
 				var deleteCustNames, deleteXpathNames;
 				deleteCustNames = updateData.deletedList.deletedCustName;
@@ -644,7 +669,7 @@ exports.updateScreen_ICE = function(req, res){
 											for(var elementsindex=0;elementsindex<deleteXpathNames.length;elementsindex++){
 												for(var scrapedobjectindex=0;scrapedobjectindex<viewString.length;scrapedobjectindex++){
 													//console.log(scrapedobjectindex,"---",viewString[scrapedobjectindex].custname,"====",deleteCustNames[elementsindex]);
-													if((viewString[scrapedobjectindex].xpath.replace(/\s/g,' ').replace('&nbsp;',' ') == deleteXpathNames[elementsindex].replace(/\s/g,' ').replace('&nbsp;',' ')) 
+													if((viewString[scrapedobjectindex].xpath.replace(/\s/g,' ').replace('&nbsp;',' ') == deleteXpathNames[elementsindex].replace(/\s/g,' ').replace('&nbsp;',' '))
 															&& (viewString[scrapedobjectindex].custname.replace(/\s/g,' ').replace('&nbsp;',' ').trim() == deleteCustNames[elementsindex].replace(/\s/g,' ').replace('&nbsp;',' ').trim())){
 														if(elementschanged<deleteCustNames.length){
 															//console.log(viewString[scrapedobjectindex].custname);
@@ -682,7 +707,7 @@ exports.updateScreen_ICE = function(req, res){
 											 requestedScreenhistory =  dateScreen + ":" + requestscreenhistorydetails;
 											 createScreenHistoryQuery = "update screens set history= history + { "+requestedScreenhistory+" }" +
 												" where screenid = "+screenID+" and projectid ="+projectID+ //" and screenname ='" + screenName +
-												" and versionnumber = "+requestedversionnumber+" ";	
+												" and versionnumber = "+requestedversionnumber+" ";
 											updateScreenQuery = "update icetestautomation.screens set"+
 																" screendata ='"+ scrapedObjects +"',"+
 																" modifiedby ='" + modifiedBy + "',"+
@@ -697,8 +722,8 @@ exports.updateScreen_ICE = function(req, res){
 											inputs={"scrapedata":scrapedObjects,"modifiedby":modifiedBy,"skucodescreen":requestedskucodeScreens,
 											"screenid":screenID,"projectid":projectID,"screenname":screenName,"versionnumber":requestedversionnumber};
 											//console.log(updateScreenQuery);
-				
-											finalFunction(scrapedObjects);	
+
+											finalFunction(scrapedObjects);
 										}else{
 											statusFlag="All objects are not edited.";
 											try{
@@ -738,7 +763,7 @@ exports.updateScreen_ICE = function(req, res){
 			var tagMatch = "";
 			//list of custom names of objects scraped and asked to map
 			var uiElementsCustnameList=[];
-			//tag names of objects scraped(available in DB) 
+			//tag names of objects scraped(available in DB)
 			var dbElementsTagList=[];
 			//mapped custom names(has no xpath)
 			var uiUserProvidedNamesList=[];
@@ -770,7 +795,7 @@ exports.updateScreen_ICE = function(req, res){
 										if(viewString.length > 0){
 											uiUserProvidedNamesList=updateData.editedListoldCustName;
 											uiElementsCustnameList=updateData.editedListmodifiedCustNames;
-											//fetching tag names 
+											//fetching tag names
 											//console.log("Cust Names with no Xpath :",uiUserProvidedNamesList);
 											//console.log("Scraped Cust Names:",uiElementsCustnameList);
 											async.forEachSeries(uiUserProvidedNamesList,function(addedObjectCustName,addedObjectCustNameCallback){
@@ -787,7 +812,7 @@ exports.updateScreen_ICE = function(req, res){
 														scrapedObjectCallback();
 													}catch(exception){
 														console.log(exception);
-													}		
+													}
 												},addedObjectCustNameCallback);
 											});
 											/*
@@ -795,7 +820,7 @@ exports.updateScreen_ICE = function(req, res){
 											* to change the custom name
 											*/
 											//console.log("dbElementsTagList:::",dbElementsTagList.join());
-											var indexOfUiElement=-1;			
+											var indexOfUiElement=-1;
 											async.forEachSeries(uiElementsCustnameList,function(userCustName,userCustNameCallback){
 												indexOfUiElement=indexOfUiElement+1;
 												async.forEachSeries(viewString,function(eachScrapedObject,scrapedObjectCallback){
@@ -808,8 +833,8 @@ exports.updateScreen_ICE = function(req, res){
 																	/*
 																	* checks the tag name, if matches take the xpath
 																	* if does not match then checks if the dbElementsTagList
-																	* at the index is 'element'. if 'element' then without any 
-																	* check, match the object.  
+																	* at the index is 'element'. if 'element' then without any
+																	* check, match the object.
 																	*/
 																	if(dbTagName.toLowerCase() == dbElementsTagList[indexOfUiElement]){
 																		if('xpath' in eachScrapedObject){
@@ -830,15 +855,15 @@ exports.updateScreen_ICE = function(req, res){
 														scrapedObjectCallback();
 													}catch(exception){
 														console.log(exception);
-													}	
+													}
 												},userCustNameCallback);
 											});
 											//console.log("requiredXpathList:::",requiredXpathList.join());
 											//console.log("requiredURLList:::",requiredURLList.join());
 											/*
-											* the method call below checks if 
+											* the method call below checks if
 											* multiple elements with same xpath are found for mapped elements.
-											* if found true mapping of objects is stopped 
+											* if found true mapping of objects is stopped
 											* and user is alerted with an appropriate error message.
 											*/
 											var multipleObjectsCustnameSet=[];
@@ -855,14 +880,14 @@ exports.updateScreen_ICE = function(req, res){
 													requiredXpathListCallback();
 												}catch(exception){
 													console.log(exception);
-												}	
+												}
 											});
 											//console.log("multipleObjectsCustnameSet:::",multipleObjectsCustnameSet.join());
 											if(tagMatch != "sAmEoBjEcTrEpeAtEd"){
 												/*
 												*if the size of xpath list is same as user provided custom names list
-												* replacing the custom names of actual elements with xpath with 
-												* the user provided custom names   
+												* replacing the custom names of actual elements with xpath with
+												* the user provided custom names
 												*/
 												if(requiredXpathList.length == uiUserProvidedNamesList.length){
 													var xpathindex=-1;
@@ -883,7 +908,7 @@ exports.updateScreen_ICE = function(req, res){
 																	scrapedObjectCallback();
 																}catch(exception){
 																console.log(exception);
-															}	
+															}
 															},requiredXpathListCallback);
 														}catch(exception){
 															console.log(exception);
@@ -908,7 +933,7 @@ exports.updateScreen_ICE = function(req, res){
 																objectindexes=objectindexes+1;
 																if(addedObjectIndexes.indexOf(objectindexes) === -1){
 																	if((!('xpath' in eachScrapedObject) ||(eachScrapedObject.xpath.trim() == "")) &&
-																	('custname' in eachScrapedObject && 
+																	('custname' in eachScrapedObject &&
 																	uiUserProvidedNamesList.indexOf(eachScrapedObject.custname) !== -1
 																	)){
 																		if(dummyObjectsToDelete.indexOf(objectindexes) === -1){
@@ -918,8 +943,8 @@ exports.updateScreen_ICE = function(req, res){
 																}
 															}catch(exception){
 																console.log(exception);
-															}	
-															scrapedObjectCallback();	
+															}
+															scrapedObjectCallback();
 														},addedObjectCustNameCallback);
 													});
 													dummyObjectsToDelete=dummyObjectsToDelete.sort(sortNumber);
@@ -946,7 +971,7 @@ exports.updateScreen_ICE = function(req, res){
 														 requestedScreenhistory =  dateScreen + ":" + requestscreenhistorydetails;
 														 createScreenHistoryQuery = "update screens set history= history + { "+requestedScreenhistory+" }" +
 												" where screenid = "+screenID+" and projectid ="+projectID+ //" and screenname ='" + screenName +
-												" and versionnumber = "+requestedversionnumber+" ";	
+												" and versionnumber = "+requestedversionnumber+" ";
 													updateScreenQuery = "update icetestautomation.screens set"+
 																" screendata ='"+ scrapedObjects +"',"+
 																" modifiedby ='" + modifiedBy + "',"+
@@ -961,9 +986,9 @@ exports.updateScreen_ICE = function(req, res){
 													inputs={"scrapedata":scrapedObjects,"modifiedby":modifiedBy,"skucodescreen":requestedskucodeScreens,
 													"screenid":screenID,"projectid":projectID,"screenname":screenName,"versionnumber":requestedversionnumber};
 													//console.log(updateScreenQuery);
-													finalFunction(scrapedObjects);	
+													finalFunction(scrapedObjects);
 												}
-													
+
 											}else{
 												//console.log("These are the repeated objects:",multipleObjectsCustnameSet);
 												tagMatch=tagMatch+"maPinGScraPedDaTa"+multipleObjectsCustnameSet.join();
@@ -976,7 +1001,7 @@ exports.updateScreen_ICE = function(req, res){
 											res.send(statusFlag);
 										}catch(exception){
 											console.log(exception);
-										}	
+										}
 									}
 								}else{
 									statusFlag="Error occured in updateScreenData : Fail";
@@ -1011,7 +1036,7 @@ exports.updateScreen_ICE = function(req, res){
 						inputs = {"query": "getscrapedata", "screenid":screenID,"projectid":projectID};
 						fetchScrapedData(inputs,function(err,scrapedobjects,querycallback){
 							 try{
-								
+
 								  if(scrapedobjects == null && scrapedobjects == '' && scrapedobjects == undefined){
 										scrapedobjects='{}';
 									}
@@ -1033,13 +1058,13 @@ exports.updateScreen_ICE = function(req, res){
 											for(var j=0;j<viewString.length;j++)
 											{
 												var updatedXpath = updatedViewString[i].xpath.replace(/\s/g,' ').replace('&nbsp;',' ');
-												updatedXpath = updatedViewString[i].xpath.split(";"); 
+												updatedXpath = updatedViewString[i].xpath.split(";");
 												updatedXpath = updatedXpath[0];
 
 												var fetchedXpath = viewString[j].xpath.replace(/\s/g,' ').replace('&nbsp;',' ');
-												fetchedXpath = viewString[j].xpath.split(";"); 
+												fetchedXpath = viewString[j].xpath.split(";");
 												fetchedXpath = fetchedXpath[0];
-												
+
 												if(updatedXpath == fetchedXpath)
 												{
 													updatedIndex.push(j);
@@ -1051,7 +1076,7 @@ exports.updateScreen_ICE = function(req, res){
 										console.log("updatedIndex", updatedIndex);
 										updatedIndex=updatedIndex.sort(sortNumber);
 										viewString =  viewString.filter(function(n){ return n != null });
-											
+
 										scrapedObjects.view=viewString;
 										scrapedObjects.mirror=updateData.updatedViewString.mirror;
 										scrapedObjects.scrapedin=scrapedobjects.scrapedin;
@@ -1080,8 +1105,8 @@ exports.updateScreen_ICE = function(req, res){
 											inputs={"scrapedata":scrapedObjects,"modifiedby":modifiedBy,"skucodescreen":requestedskucodeScreens,
 											"screenid":screenID,"projectid":projectID,"screenname":screenName,"versionnumber":requestedversionnumber};
 											//console.log("UPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP",updateScreenQuery);
-				
-											finalFunction(scrapedObjects);	
+
+											finalFunction(scrapedObjects);
 										}else{
 											statusFlag="No Objects to compare.";
 											try{
@@ -1090,7 +1115,7 @@ exports.updateScreen_ICE = function(req, res){
 												console.log(exception);
 											}
 										}
-										
+
 									}
 									else{
 										statusFlag="Error occured in updateScreenData : Fail";
@@ -1120,7 +1145,7 @@ exports.updateScreen_ICE = function(req, res){
 			return a - b;
 		}
 		//update screen history transaction
-		
+
 		//console.log("scraped:",scrapedObjects);
 		//this code will be called only if the statusFlag is empty.
 		function finalFunction(scrapedObjects,finalcallback){
@@ -1133,7 +1158,7 @@ exports.updateScreen_ICE = function(req, res){
 						function (result, response) {
 						try{
 							// if (err) {
-							if(response.statusCode != 200 || result.rows == "fail"){	
+							if(response.statusCode != 200 || result.rows == "fail"){
 								// console.log(err);
 								statusFlag="Error occured in updateScreenData : Fail";
 								// console.log(err);
@@ -1170,8 +1195,8 @@ exports.updateScreen_ICE = function(req, res){
 														function (testcaseDataQueryresult, response) {
 												// dbConn.execute(testcaseDataQuery, function(testcaseDataQueryerr, testcaseDataQueryresult){
 													// if(testcaseDataQueryerr){
-														
-													if(response.statusCode != 200 || testcaseDataQueryresult.rows == "fail"){	
+
+													if(response.statusCode != 200 || testcaseDataQueryresult.rows == "fail"){
 														statusFlag="Error occured in testcaseDataQuery : Fail";
 														try{
 															res.send(statusFlag);
@@ -1197,7 +1222,7 @@ exports.updateScreen_ICE = function(req, res){
 																			var updatingtestcasename=eachTestcase.testcasename;
 																			if(!(param == 'mapScrapeData_ICE')){
 																				//replacing/deleting all the custnames based on xpath and old custnames
-																				var deletingStepindex=[]; 
+																				var deletingStepindex=[];
 																				//console.log(updatingtestcasedata);
 																				if(updatingtestcasedata.length>0){
 																					for(var updatingindex=0;updatingindex<oldCustnames.length;updatingindex++){
@@ -1208,7 +1233,7 @@ exports.updateScreen_ICE = function(req, res){
 																							if('custname' in testcasestep && 'objectName' in testcasestep){
 																								// console.log((testcasestep.custname == oldCustnames[updatingindex]
 																								// && testcasestep.objectName == xpathofCustnames[updatingindex]));
-																								if((param == 'editScrapeData_ICE' || param == 'deleteScrapeData_ICE') 
+																								if((param == 'editScrapeData_ICE' || param == 'deleteScrapeData_ICE')
 																								&& testcasestep.custname.trim() == oldCustnames[updatingindex].trim()
 																								&& testcasestep.objectName.trim() == xpathofCustnames[updatingindex].trim()){
 																									if(param == 'editScrapeData_ICE'){
@@ -1219,12 +1244,12 @@ exports.updateScreen_ICE = function(req, res){
 																											deletingStepindex.push(eachtestcasestepindex);
 																										}
 																									}
-																								}else if((param == 'updateComparedObjects') 
+																								}else if((param == 'updateComparedObjects')
 																									&& testcasestep.custname.trim() == oldCustnames[updatingindex].custname.trim()
 																									&& testcasestep.objectName.trim() != ''){
 																										testcasestep.objectName = oldCustnames[updatingindex].xpath;
 																									console.log("custname", oldCustnames[updatingindex].custname);
-																									console.log("xpath", oldCustnames[updatingindex].xpath);	
+																									console.log("xpath", oldCustnames[updatingindex].xpath);
 																								}
 																							}
 																						}
@@ -1235,7 +1260,7 @@ exports.updateScreen_ICE = function(req, res){
 																					deletingStepindex=deletingStepindex.sort(sortNumber);
 																					for(var deletingcaseindex=0;deletingcaseindex<deletingStepindex.length;deletingcaseindex++){
 																						delete updatingtestcasedata[deletingStepindex[deletingcaseindex]];
-																					}	
+																					}
 																				//removing null values from the array JSON
 																				updatingtestcasedata =  updatingtestcasedata.filter(function(n){ return n != null });
 																				}
@@ -1285,15 +1310,15 @@ exports.updateScreen_ICE = function(req, res){
 																		var date = new Date().getTime();
 																		var requestedhistory =  date + ":" + requesthistorydetails;
 																		if(updatingtestcasedata == "[]"){
-																			updatingtestcasedata = "";											
+																			updatingtestcasedata = "";
 																		}
 																		var updateTestCaseQuery = "UPDATE testcases SET modifiedby='" + userInfo.username.toLowerCase() +
 																			"', modifiedon='" + new Date().getTime() +
 																			"',  skucodetestcase='" + requestedskucodeScreens +
 																			"', history= history + { "+requestedhistory+" }" +
-																			",  testcasesteps='" + updatingtestcasedata + 
-																			"' where screenid=" + screenID + " and testcaseid=" + updatingTestcaseid + 
-																			" and testcasename='" + updatingtestcasename + 
+																			",  testcasesteps='" + updatingtestcasedata +
+																			"' where screenid=" + screenID + " and testcaseid=" + updatingTestcaseid +
+																			" and testcasename='" + updatingtestcasename +
 																			"' and versionnumber = "+requestedversionnumber+" IF EXISTS;";
 																		inputs={"query":"updatetestcasedata","modifiedby":userInfo.username.toLowerCase(),"skucodetestcase":"skucodetestcase","testcaseid":updatingTestcaseid,
 																		"testcasesteps":updatingtestcasedata,"screenid":screenID,"testcasename":updatingtestcasename,"versionnumber":requestedversionnumber}
@@ -1350,7 +1375,7 @@ exports.updateScreen_ICE = function(req, res){
 										}
 									]);
 								}else{
-									
+
 								statusFlag = "success";
 									try{
 									// fnCreateScreenHistory(createScreenHistoryQuery, function(err, dataResult) {
@@ -1388,7 +1413,7 @@ exports.updateScreen_ICE = function(req, res){
 		console.log(exception);
 	}
 
-	//Screen History Transaction 
+	//Screen History Transaction
 	function fnCreateScreenHistory(createScreenHistoryQuery, createScreenHistoryCallback) {
 				//console.log("History", createScreenHistoryQuery);
 				var statusFlag = "";
@@ -1473,7 +1498,7 @@ function buildObject(scrapedObjects,modifiedBy,requestedskucodeScreens,
 function parseRequest(readChild){
 	try{
 	   if('name' in readChild){
-	       if(xpath==""){  
+	       if(xpath==""){
 	            xpath="/"+readChild.name
 	            allXpaths.push(xpath);
 	            allCustnames.push(readChild.name);
@@ -1495,7 +1520,7 @@ function parseRequest(readChild){
 	                    xpath = basexpath;
 	                }
 	            }
-	        }   
+	        }
 	        if('children' in readChild){
 	            if(readChild.children.length >= 1){
 	                var basexpath=xpath;
@@ -1529,7 +1554,7 @@ function uploadTestCaseData(inputs,uploadTestCaseDatacallback){
 	try{
 
 		var statusFlag="";
-		// dbConn.execute(updateTestCasesQuery, 
+		// dbConn.execute(updateTestCasesQuery,
 			// function(updateTestCaseQueryerr, updateTestCaseQueryresult){
 		var args = {data:inputs,headers:{"Content-Type" : "application/json"}};
 		client.post(epurl+"design/updateTestCase_ICE",args,
@@ -1539,7 +1564,7 @@ function uploadTestCaseData(inputs,uploadTestCaseDatacallback){
 					statusFlag="Error occured in updateTestCaseQuery : Fail";
 					uploadTestCaseDatacallback(statusFlag,null);
 				}else{
-					statusFlag = "success";						
+					statusFlag = "success";
 					uploadTestCaseDatacallback(null,statusFlag);
 			}
 		});
@@ -1569,10 +1594,10 @@ exports.readTestCase_ICE = function (req, res) {
 		var testcasesteps = "";
 		var testcasename = "";
 		var template = "";
-		
-		// base request elements 		
-		var requestedscreenid = req.body.screenid; 		
-		var requestedtestscasename=req.body.testcasename; 		
+
+		// base request elements
+		var requestedscreenid = req.body.screenid;
+		var requestedtestscasename=req.body.testcasename;
 		var requestedtestscaseid = req.body.testcaseid;
 
 		// base request elements sent in request
@@ -1594,7 +1619,7 @@ exports.readTestCase_ICE = function (req, res) {
 			testcase: "",
 			testcasename: ""
 		};
-		
+
 		// var getTestCases = "select testcasesteps,testcasename from testcases where screenid= " + requestedscreenid +
 		// 				" and testcasename='"+requestedtestscasename+"'" +
 		// 				" and versionnumber="+requestedversionnumber+
@@ -1622,7 +1647,7 @@ exports.readTestCase_ICE = function (req, res) {
 						// var scrapedDataQuery="select screendata from screens where screenid="+requestedscreenid+
 						// 	" allow filtering ;";
 						var inputs = {"query": "debugtestcase", "screenid":requestedscreenid};
-					    fetchScrapedData(inputs, function(err, scrapedobjects, querycallback) {						
+					    fetchScrapedData(inputs, function(err, scrapedobjects, querycallback) {
 						// fetchScrapedData(scrapedDataQuery,function(err,scrapedobjects,querycallback){
 							try{
 								if(scrapedobjects != null && scrapedobjects.trim() != '' && scrapedobjects != undefined){
@@ -1647,7 +1672,7 @@ exports.readTestCase_ICE = function (req, res) {
 											console.log(exception);
 										}
 									}
-								}else if((scrapedobjects == null || scrapedobjects.trim() == '' || scrapedobjects == undefined) 
+								}else if((scrapedobjects == null || scrapedobjects.trim() == '' || scrapedobjects == undefined)
 										 && (testcasesteps != null && testcasesteps != '' || testcasesteps != undefined)){
 									//this is checked
 									responsedata = { template: "", testcase: testcasesteps, testcasename: testcasename }
@@ -1668,7 +1693,7 @@ exports.readTestCase_ICE = function (req, res) {
 							}catch(exception){
 								console.log(exception);
 							}
-						});		
+						});
 					}catch(exception){
 						console.log(exception);
 					}
@@ -1703,7 +1728,7 @@ exports.updateTestCase_ICE = function (req, res) {
 			if(sessionToken != undefined && req.session.id == sessionToken)
 		{
 		/*
-		 *internal variables 
+		 *internal variables
 		 */
 		var hasrow = false;
 		/*
@@ -1741,7 +1766,7 @@ exports.updateTestCase_ICE = function (req, res) {
 		//dbConn.execute(checktestcaseexist, function (err, result) {
 			try{
 			//	if (err) {
-				if(response.statusCode != 200 || result.rows == "fail"){	
+				if(response.statusCode != 200 || result.rows == "fail"){
 					var flag = "Error in Query 1 testcaseexist: Fail";
 					try{
 						res.send(flag);
@@ -1823,7 +1848,7 @@ exports.updateTestCase_ICE = function (req, res) {
 		console.log(exception);
 	}
 };
-	//Testcases History Transaction 
+	//Testcases History Transaction
 	function fnUpdateTestcasesHistory(updateTestCaseQuery, updateTestcaseHistoryCallback) {
 				//console.log("History", createScreenHistoryQuery);
 				var statusFlag = "";
@@ -1884,13 +1909,13 @@ exports.debugTestCase_ICE = function (req, res) {
 					    async.forEachSeries(requestedtestcaseids, function(testcaseIDs, eachTestcaseIDsCallback) {
 					        // var getProjectTestcasedata = "select screenid,testcasename,testcasesteps from testcases where testcaseid=" + testcaseIDs;
 					        // dbConn.execute(getProjectTestcasedata, function(errgetTestcasedata, testcasedataresult) {
-					    	var inputs = {"query": "testcaseid", "testcaseid":testcaseIDs,"userid":req.body.userInfo.user_id};
+								var inputs = {"query": "testcaseid", "testcaseid":testcaseIDs};
 								var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
 								client.post(epurl+"design/readTestCase_ICE",args,
 										function (testcasedataresult, response) {
 					            try {
 					                // if (errgetTestcasedata) {
-									if(response.statusCode != 200 || testcasedataresult.rows == "fail"){	
+									if(response.statusCode != 200 || testcasedataresult.rows == "fail"){
 					                    flag = "Error in getProjectTestcasedata : Fail";
 					                    try {
 					                        res.send(flag);
@@ -1928,8 +1953,11 @@ exports.debugTestCase_ICE = function (req, res) {
 					                                if (counter == requestedtestcaseids.length - 1) {
 					                                    mySocket._events.result_debugTestCase = [];
 					                                    mySocket.emit('debugTestCase', responsedata);
+																							var updateSessionExpiry = setInterval(function () {
+																								req.session.cookie.maxAge = sessionTime;
+																							},updateSessionTimeEvery);
 					                                    mySocket.on('result_debugTestCase', function(responsedata) {
-															//req.session.cookie.expires = sessionExtend;
+																								clearInterval(updateSessionExpiry);
 					                                        try {
 					                                            res.send(responsedata);
 					                                        } catch (exception) {
@@ -1961,8 +1989,12 @@ exports.debugTestCase_ICE = function (req, res) {
 						var testcaseWS=[];
 						testcaseWS.push(req.body.testCaseWS);
 						mySocket.emit('debugTestCase',testcaseWS);
+						var updateSessionExpiry = setInterval(function () {
+							req.session.cookie.maxAge = sessionTime;
+						},updateSessionTimeEvery);
 						mySocket.on('result_debugTestCaseWS', function (value) {
 							//req.session.cookie.expires = sessionExtend;
+							clearInterval(updateSessionExpiry);
 							try{
 								if(value.toUpperCase() === 'TERMINATE'){
 									try{
@@ -1977,7 +2009,7 @@ exports.debugTestCase_ICE = function (req, res) {
 										};
 									if(value != "fail" && value != undefined && value != ""){
 										var response=value.split('rEsPONseBOdY:');
-										
+
 										if(response.length == 2){
 											responsedata.responseHeader.push(response[0]);
 											responsedata.responseBody.push(response[1].replace("&gt;",">").replace("&lt;","<"));
@@ -2025,8 +2057,12 @@ exports.debugTestCase_ICE = function (req, res) {
 						var wsdlurl=req.body.wsdlurl;
 						mySocket._events.result_wsdl_listOfOperation = []
 						mySocket.emit('wsdl_listOfOperation',wsdlurl);
+						var updateSessionExpiry = setInterval(function () {
+							req.session.cookie.maxAge = sessionTime;
+						},updateSessionTimeEvery);
 						mySocket.on('result_wsdl_listOfOperation', function (listGenResponse) {
 							//req.session.cookie.expires = sessionExtend;
+							clearInterval(updateSessionExpiry);
 							try{
 								if(listGenResponse.toUpperCase() === 'TERMINATE'){
 									try{
@@ -2079,8 +2115,12 @@ exports.debugTestCase_ICE = function (req, res) {
 						}
 						mySocket._events.result_wsdl_ServiceGenerator = [];
 						mySocket.emit('wsdl_ServiceGenerator',serviceGenRequest);
+						var updateSessionExpiry = setInterval(function () {
+							req.session.cookie.maxAge = sessionTime;
+						},updateSessionTimeEvery);
 						mySocket.on('result_wsdl_ServiceGenerator', function (serviceGenResponse) {
 							//req.session.cookie.expires = sessionExtend;
+							clearInterval(updateSessionExpiry);
 							try{
 								if(serviceGenResponse.toUpperCase() === 'TERMINATE'){
 									try{
@@ -2156,7 +2196,7 @@ exports.debugTestCase_ICE = function (req, res) {
 
 
 /**
-* getKeywordDetails_ICE for fetching the objects,keywords 
+* getKeywordDetails_ICE for fetching the objects,keywords
 * based on projecttype sent by front end
 * @author vishvas.a
 */
@@ -2175,7 +2215,7 @@ exports.getKeywordDetails_ICE = function getKeywordDetails_ICE(req, res) {
 		//var requestedprojecttypename = "Web";
 		// Query 1 fetching the objecttype,keywords basked on projecttypename
 		var individualsyntax = {};
-	
+
 		var flag = "Error in errProjectBasedKeywords : Fail";
 		// var getProjectBasedKeywords = "select objecttype, keywords from keywords where projecttypename in ('"
 		// 		+ requestedprojecttypename + "','Generic') ALLOW FILTERING";
@@ -2203,7 +2243,7 @@ exports.getKeywordDetails_ICE = function getKeywordDetails_ICE(req, res) {
 							var keywords = JSON.parse(projectBasedKeywordsresult.rows[objectindex].keywords);
 							individualsyntax[objecttype] = keywords;
 						}
-						try{	
+						try{
 							res.send(individualsyntax);
 						}catch(exception){
 							console.log(exception);
@@ -2244,8 +2284,8 @@ exports.getTestcasesByScenarioId_ICE = function getTestcasesByScenarioId_ICE(req
 		client.post(epurl+"design/getTestcasesByScenarioId_ICE",args,
 						function (testcasesResult, response) {
 				try{
-					
-					if(response.statusCode != 200 || testcasesResult.rows == "fail"){	
+
+					if(response.statusCode != 200 || testcasesResult.rows == "fail"){
 						flag = "Error in fetching testcaseIds : Fail";
 						try{
 							res.send(flag);
@@ -2254,11 +2294,11 @@ exports.getTestcasesByScenarioId_ICE = function getTestcasesByScenarioId_ICE(req
 						}
 					} else {
 						//console.log("testcaseIds", testcasesResult.rows[0].testcaseids);
-						
+
 						var testcaseIds = testcasesResult.rows[0].testcaseids
-						
+
 						async.forEachSeries(testcaseIds,function(eachtestcaseid,fetchtestcaseNameCallback){
-							
+
 							var testcasesObj={};
 							try{
 							// var getTestCaseDetails = "select testcasename from testcases where testcaseid = "+eachtestcaseid+" ALLOW FILTERING";
@@ -2270,7 +2310,7 @@ exports.getTestcasesByScenarioId_ICE = function getTestcasesByScenarioId_ICE(req
 							function (testcaseNamesResult, response) {
 									try{
 											// if(errGetTestCaseDetails)
-											if(response.statusCode != 200 || testcaseNamesResult.rows == "fail"){	
+											if(response.statusCode != 200 || testcaseNamesResult.rows == "fail"){
 												flag = "Error in fetching testcaseNames : Fail";
 												try{
 														res.send(flag);
@@ -2294,7 +2334,7 @@ exports.getTestcasesByScenarioId_ICE = function getTestcasesByScenarioId_ICE(req
 							});
 							}catch(exception){
 								console.log(exception);
-							}	
+							}
 						},finalfunction);
 					}
 				}catch(exception){
@@ -2302,7 +2342,7 @@ exports.getTestcasesByScenarioId_ICE = function getTestcasesByScenarioId_ICE(req
 				}
 
 				function finalfunction(){
-					try{	
+					try{
 						res.send(testcasesArr);
 						}catch(exception){
 							console.log(exception);

@@ -16,6 +16,8 @@ var Client = require("node-rest-client").Client;
 var client = new Client();
 var epurl="http://127.0.0.1:1990/";
 var sessionExtend = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes 
+var sessionTime = 30 * 60 * 1000;
+var updateSessionTimeEvery = 20 * 60 * 1000;
 exports.getMainReport_ICE = function(req, res){
 	try{
 		if(req.cookies['connect.sid'] != undefined)
@@ -31,10 +33,10 @@ exports.getMainReport_ICE = function(req, res){
 			var client = require("jsreport-client")("https://"+IP+":8001/");
 			//console.log("Jsreport server ::::::",client)
 			client.render({
-				template: { 
-					shortid: "HJP1pqMcg", 
+				template: {
+					shortid: "HJP1pqMcg",
 					recipe: "html",
-					engine: "none" 
+					engine: "none"
 				}
 			}, function(err, response) {
 				if (err) {
@@ -75,8 +77,12 @@ exports.openScreenShot = function(req, res){
 			var mySocket = myserver.allSocketsMap[name];
 			mySocket._events.render_screenshot = [];
 			mySocket.emit('render_screenshot', path);
+			var updateSessionExpiry = setInterval(function () {
+				req.session.cookie.maxAge = sessionTime;
+			},updateSessionTimeEvery);
 			mySocket.on('render_screenshot', function (resultData) {
-				//req.session.cookie.expires = sessionExtend;
+				//req.session.cookie.expires = sessionExtend
+				clearInterval(updateSessionExpiry);
 				if(resultData != "fail"){
 					res.send(resultData);
 				}
@@ -111,10 +117,10 @@ exports.renderReport_ICE = function(req, res){
 			//console.log("Jsreport server IP:::::",IP);
 			var client = require("jsreport-client")("https://"+IP+":8001/");
 				client.render({
-					template: { 
-						shortid: shortId, 
+					template: {
+						shortid: shortId,
 						recipe: reportType,
-						engine: "handlebars" 
+						engine: "handlebars"
 					},
 					data: {
 						"overallstatus": finalReports.overallstatus,
@@ -134,7 +140,7 @@ exports.renderReport_ICE = function(req, res){
 							res.send("fail");
 						}
 					}
-				});	
+				});
 		}
 		else{
 			res.send("Invalid Session");
@@ -170,7 +176,7 @@ exports.getAllSuites_ICE = function (req, res) {
 					var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
 					client.post(epurl+"reports/getAllSuites_ICE",args,
 							function (result, response) {
-					if(response.statusCode != 200 || result.rows == "fail"){	
+					if(response.statusCode != 200 || result.rows == "fail"){
 						flag="fail";
 						res.send(flag);
 						// console.log(err);
@@ -179,7 +185,7 @@ exports.getAllSuites_ICE = function (req, res) {
 							var domainid = JSON.parse(JSON.stringify(result.rows[0].domainid));
 							resultdata = domainid;
 							//console.log(resultdata);
-							callback(null,resultdata);					
+							callback(null,resultdata);
 						}catch(ex){
 							console.log("Exception occured in fetching domain_id getAllSuites_ICE : ",ex);
 							res.send("fail");
@@ -195,7 +201,7 @@ exports.getAllSuites_ICE = function (req, res) {
 				var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
 				client.post(epurl+"reports/getAllSuites_ICE",args,
 						function (result, response) {
-					if(response.statusCode != 200 || result.rows == "fail"){	
+					if(response.statusCode != 200 || result.rows == "fail"){
 						flag="fail";
 						console.log("Error occured in getAllSuites_ICE : Fail");
 						res.send(flag);
@@ -209,7 +215,7 @@ exports.getAllSuites_ICE = function (req, res) {
 								var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
 								client.post(epurl+"reports/getAllSuites_ICE",args,
 										function (releaseidsdata, response) {
-									if(response.statusCode != 200 || releaseidsdata.rows == "fail"){	
+									if(response.statusCode != 200 || releaseidsdata.rows == "fail"){
 										console.log(err);
 									}else{
 										async.forEachSeries(releaseidsdata.rows,function(releaseiditr,callback3){
@@ -221,8 +227,8 @@ exports.getAllSuites_ICE = function (req, res) {
 												var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
 												client.post(epurl+"reports/getAllSuites_ICE",args,
 															function (cycleidsdata, response) {
-													if(response.statusCode != 200 || result.rows == "fail"){	
-														console.log(err);  
+													if(response.statusCode != 200 || result.rows == "fail"){
+														console.log(err);
 													}else{
 														async.forEachSeries(cycleidsdata.rows,function(cycleiditr,callback4){
 															try{
@@ -233,8 +239,8 @@ exports.getAllSuites_ICE = function (req, res) {
 																var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
 																client.post(epurl+"reports/getAllSuites_ICE",args,
 																			function (testsuiteidsdata, response) {
-																	if(response.statusCode != 200 || testsuiteidsdata.rows == "fail"){	
-																		console.log(err);  
+																	if(response.statusCode != 200 || testsuiteidsdata.rows == "fail"){
+																		console.log(err);
 																	}else{
 																		async.forEachSeries(testsuiteidsdata.rows,function(testsuiteiditr,callback5){
 																			try{
@@ -283,16 +289,16 @@ exports.getAllSuites_ICE = function (req, res) {
 			if(err){
 				console.log("Error::::::",err)
 				res.send("fail");
-			} 
+			}
 			else{
 				//console.log(JSON.stringify(testSuiteDetails));
 				res.send(JSON.stringify(testSuiteDetails));
-			} 
+			}
 		})
 	}
 	else{
 		res.send("Invalid Session");
-	}	
+	}
 }
 
 
@@ -319,7 +325,7 @@ exports.getSuiteDetailsInExecution_ICE = function (req, res) {
 			function (executionData, response) {
 				try{
 					// if(err){
-					if(response.statusCode != 200 || executionData.rows == "fail"){	
+					if(response.statusCode != 200 || executionData.rows == "fail"){
 						console.log(err);
 						res.send("fail");
 					}else{
@@ -378,7 +384,7 @@ exports.reportStatusScenarios_ICE = function (req, res) {
 					client.post(epurl+"reports/reportStatusScenarios_ICE",args,
 							function (result, response) {
 						// if (err) {
-						if(response.statusCode != 200 || result.rows == "fail"){	
+						if(response.statusCode != 200 || result.rows == "fail"){
 							var flag = "fail";
 							// console.log(err);
 							res.send(flag);
@@ -388,7 +394,7 @@ exports.reportStatusScenarios_ICE = function (req, res) {
 									var executedtimeTemp = new Date(iterator.executedtime);
 									if(executedtimeTemp != null){
 										executedtimeTemp = executedtimeTemp.getDate()+"-"+(executedtimeTemp.getMonth()+1)+"-"+executedtimeTemp.getFullYear()+" "+(executedtimeTemp.getUTCHours())+":"+(executedtimeTemp.getUTCMinutes())+":"+executedtimeTemp.getSeconds();
-									}						
+									}
 									var browserTemp = iterator.browser;
 									var statusTemp = iterator.status;
 									var reportidTemp = iterator.reportid;
@@ -400,10 +406,10 @@ exports.reportStatusScenarios_ICE = function (req, res) {
 									var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
 									client.post(epurl+"reports/reportStatusScenarios_ICE",args,
 											function (scenarioNameDetails, response) {
-										if(response.statusCode != 200 || scenarioNameDetails.rows == "fail"){	
+										if(response.statusCode != 200 || scenarioNameDetails.rows == "fail"){
 											var flag = "fail";
 											// console.log(err);
-											res.send(flag);  
+											res.send(flag);
 										}else{
 											async.forEachSeries(scenarioNameDetails.rows,function(testScenarioNameitr,callback3){
 												try{
@@ -430,7 +436,7 @@ exports.reportStatusScenarios_ICE = function (req, res) {
 									console.log(exception);
 									res.send("fail");
 								}
-							},callback);  
+							},callback);
 						}
 					});
 				}
@@ -439,7 +445,7 @@ exports.reportStatusScenarios_ICE = function (req, res) {
 				if(err){
 					console.log('Error:--',err);
 					res.send("fail");
-				} 
+				}
 				else{
 					if(report.length > 0)
 					{
@@ -469,8 +475,8 @@ exports.reportStatusScenarios_ICE = function (req, res) {
 								}
 					}
 					res.send(JSON.stringify(report));
-				} 
-			})		
+				}
+			})
 		}
 		else{
 			res.send("Invalid Session");
@@ -493,13 +499,13 @@ exports.getReport = function (req, res) {
 	if(sessionToken != undefined && req.session.id == sessionToken)
 	{
 		var reportDetails=[];
-		async.series({	
+		async.series({
 			reportdetails:function(callback){
 				var reportDetailsQuery = "select report,time,testscenario_id from reports where report_id="
 					+ reportId + "ALLOW FILTERING";
 				dbConnICE.execute(reportDetailsQuery, function (err, result) {
 					if(err){
-						console.log(err);  
+						console.log(err);
 					}else{
 						async.forEachSeries(result.rows,function(reportitr,callback2){
 							reportDetails.push({
@@ -509,7 +515,7 @@ exports.getReport = function (req, res) {
 							var releaseids = "SELECT testsuiteid,cycleid,testsuitename FROM testsuites WHERE testscenarioids CONTAINS "+iterator.projectid;
 							dbConnICE.execute(releaseids,function(err,releaseidsdata){
 								if(err){
-									console.log(err);  
+									console.log(err);
 								}else{
 
 								}
@@ -552,7 +558,7 @@ exports.getReport_Nineteen68 = function(req, res) {
 					var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
 					client.post(epurl+"reports/getReport_Nineteen68",args,
 							function (reportResult, response) {
-						if(response.statusCode != 200 || reportResult.rows == "fail"){	
+						if(response.statusCode != 200 || reportResult.rows == "fail"){
 							flag="fail";
 							console.log("Failed to get report, executed time and scenarioIds from reports");
 							res.send(flag);
@@ -574,7 +580,7 @@ exports.getReport_Nineteen68 = function(req, res) {
 									var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
 									client.post(epurl+"reports/getReport_Nineteen68",args,
 											function (scenarioResult, response) {
-										if(response.statusCode != 200 || scenarioResult.rows == "fail"){	
+										if(response.statusCode != 200 || scenarioResult.rows == "fail"){
 											console.log("Failed to get scenario name and projectId from scenarios.");
 										} else {
 											async.forEachSeries(scenarioResult.rows, function(sceiditr, callback2) {
@@ -591,7 +597,7 @@ exports.getReport_Nineteen68 = function(req, res) {
 													var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
 													client.post(epurl+"reports/getReport_Nineteen68",args,
 																function (suiteResult, response) {
-														if(response.statusCode != 200 || suiteResult.rows == "fail"){	
+														if(response.statusCode != 200 || suiteResult.rows == "fail"){
 															console.log("Failed to get cycle Ids from test suites.");
 														} else {
 															// var   testscenarioids=[];
@@ -620,7 +626,7 @@ exports.getReport_Nineteen68 = function(req, res) {
 																	var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
 																		client.post(epurl+"reports/getReport_Nineteen68",args,
 																			function (cycleResult, response) {
-																		if(response.statusCode != 200 || cycleResult.rows == "fail"){	
+																		if(response.statusCode != 200 || cycleResult.rows == "fail"){
 																			console.log("Failed to get cycle name and releaseId from cycles.");
 																		} else {
 																			async.forEachSeries(cycleResult.rows, function(cycleiditr, callback4) {
@@ -637,7 +643,7 @@ exports.getReport_Nineteen68 = function(req, res) {
 																					var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
 																					client.post(epurl+"reports/getReport_Nineteen68",args,
 																							function (releaseResult, response) {
-																						if(response.statusCode != 200 || releaseResult.rows == "fail"){	
+																						if(response.statusCode != 200 || releaseResult.rows == "fail"){
 																							console.log("Failed to get release name and projectsId from releases.");
 																						} else {
 																							async.forEachSeries(releaseResult.rows, function(reliditr, callback5) {
@@ -654,7 +660,7 @@ exports.getReport_Nineteen68 = function(req, res) {
 																									var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
 																									client.post(epurl+"reports/getReport_Nineteen68",args,
 																											function (projectResult, response) {
-																										if(response.statusCode != 200 || projectResult.rows == "fail"){	
+																										if(response.statusCode != 200 || projectResult.rows == "fail"){
 																											console.log("Failed to get project name and domainId from projects.");
 																										} else {
 																											async.forEachSeries(projectResult.rows, function(proiditr, callback6) {
@@ -671,7 +677,7 @@ exports.getReport_Nineteen68 = function(req, res) {
 																													var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
 																													client.post(epurl+"reports/getReport_Nineteen68",args,
 																															function (domainResult, response) {
-																														if(response.statusCode != 200 || domainResult.rows == "fail"){	
+																														if(response.statusCode != 200 || domainResult.rows == "fail"){
 																															console.log("Failed to get domain name from domains.");
 																														} else {
 																															async.forEachSeries(domainResult.rows, function(domainiditr, callback7) {
@@ -711,21 +717,21 @@ exports.getReport_Nineteen68 = function(req, res) {
 																}catch(exception){
 																	console.log(exception);
 																	res.send("fail");
-																} 
+																}
 															}, callback2);
 														}
 													});
 												}catch(exception){
 													console.log(exception);
 													res.send("fail");
-												} 
+												}
 											}, callback1);
 										}
 									});
 								}catch(exception){
 									console.log(exception);
 									res.send("fail");
-								} 
+								}
 							}, callback);
 						}
 					});
@@ -745,7 +751,7 @@ exports.getReport_Nineteen68 = function(req, res) {
 					finalReport.push(reportjson)
 					res.send(finalReport);
 				}
-			});		
+			});
 		}
 		else{
 			res.send("Invalid Session");
@@ -780,10 +786,10 @@ exports.exportToJson_ICE = function(req, res) {
 					var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
 					client.post(epurl+"reports/exportToJson_ICE",args,
 								function (reportResult, response) {
-						if(response.statusCode != 200 || reportResult.rows == "fail"){	
+						if(response.statusCode != 200 || reportResult.rows == "fail"){
 							console.log("Failed to get reports.");
 							res.send("fail");
-						} 
+						}
 						else {
 							try{
 								var reportres = reportResult.rows.length;
@@ -798,7 +804,7 @@ exports.exportToJson_ICE = function(req, res) {
 										var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
 										client.post(epurl+"reports/exportToJson_ICE",args,
 													function (scenarioResult, response) {
-											if(response.statusCode != 200 || scenarioResult.rows == "fail"){	
+											if(response.statusCode != 200 || scenarioResult.rows == "fail"){
 												console.log("Failed to get scenario Id from reports.");
 											} else {
 												var reportres = scenarioResult.rows.length;
@@ -813,21 +819,21 @@ exports.exportToJson_ICE = function(req, res) {
 														var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
 														client.post(epurl+"reports/exportToJson_ICE",args,
 																	function (scenarionameResult, response) {
-															if(response.statusCode != 200 || scenarionameResult.rows == "fail"){	
+															if(response.statusCode != 200 || scenarionameResult.rows == "fail"){
 																console.log("Failed to get testscenarioname from testscenarios.");
-															} 
+															}
 															else {
 																var scenameres = scenarionameResult.rows.length;
 																async.forEachSeries(scenarionameResult.rows, function(scenameitr, callback3) {
 																	try{
 																		var scenarioname=scenameitr.testscenarioname;
 																		reportInfoObj.scenarioname = scenarioname;
-																		callback3(); 
+																		callback3();
 																	}
 																	catch(exception){
 																		console.log(exception);
 																		res.send("fail");
-																	}                    
+																	}
 																},callback2);
 															}
 														});
@@ -863,7 +869,7 @@ exports.exportToJson_ICE = function(req, res) {
 					console.log('in last function');
 					res.send(reportInfoObj);
 				}
-			});		
+			});
 		}
 		else{
 			res.send("Invalid Session");
@@ -885,7 +891,7 @@ exports.exportToJson_ICE = function(req, res) {
 //console.log('before async calllllllllllll');
 //async.forEachSeries(suite, function(suiteiterator, callback1) {
 //console.log('inside suite async series')
-//var suiteID=uuid(); 
+//var suiteID=uuid();
 //var suitedetails=RequestedJSON.testsuiteDetails[i];
 //var testsuiteName=suitedetails.testsuiteName;
 //var insertInSuite="INSERT INTO testsuites (cycleid,testsuitename,testsuiteid,versionnumber,condtitioncheck,createdby,createdon,createdthrough,deleted,donotexecute,getparampaths,history,modifiedby,modifiedon,skucodetestsuite,tags,testscenarioids) VALUES ("+cycleId+",'"+testsuiteName+"',"+suiteID+",1,null,'Kavyashree',"+new Date().getTime()+",null,null,null,null,null,null,"+new Date().getTime()+",null,null,null);";
@@ -952,7 +958,3 @@ exports.exportToJson_ICE = function(req, res) {
 //}
 //})
 //};
-
-
-
-

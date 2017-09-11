@@ -12,6 +12,8 @@ var epurl="http://127.0.0.1:1990/";
 var Client = require("node-rest-client").Client;
 var client = new Client();
 var sessionExtend = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes 
+var sessionTime = 30 * 60 * 1000;
+var updateSessionTimeEvery = 20 * 60 * 1000;
 /**
  * @author vishvas.a
  * @modifiedauthor shree.p (fetching the scenario names from the scenarios table)
@@ -593,8 +595,12 @@ exports.ExecuteTestSuite_ICE = function(req, res) {
     			var mySocket = myserver.allSocketsMap[name];
                 mySocket._events.result_executeTestSuite = [];
                 mySocket.emit('executeTestSuite', executionRequest);
+                var updateSessionExpiry = setInterval(function () {
+                  req.session.cookie.maxAge = sessionTime;
+                },updateSessionTimeEvery);
                 mySocket.on('result_executeTestSuite', function(resultData) {
-                    req.session.cookie.expires = new Date(Date.now() + 30 * 60 * 1000); 
+                    //req.session.cookie.expires = new Date(Date.now() + 30 * 60 * 1000); 
+                    clearInterval(updateSessionExpiry);
                     if (resultData != "success" && resultData != "Terminate") {
                         try {
                             var insertReportHistory;
@@ -775,7 +781,7 @@ exports.ExecuteTestSuite_ICE_CI = function(req, res) {
         var executionRequest={"executionId":"","suitedetails":[],"testsuiteIds":[]};
         var executionId = uuid();
         var starttime = new Date().getTime();
-        
+
         //updating number of executions happened
         batchlength = batchExecutionData.length;
         var updateinp = {"query":"testsuites","count":batchlength,"userid":userInfo.user_id}
@@ -870,8 +876,12 @@ exports.ExecuteTestSuite_ICE_CI = function(req, res) {
     			var mySocket = myserver.allSocketsMap[name];
                 mySocket._events.result_executeTestSuite = [];
                 mySocket.emit('executeTestSuite', executionRequest);
+                var updateSessionExpiry = setInterval(function () {
+                  req.session.cookie.maxAge = sessionTime;
+                },updateSessionTimeEvery);
                 mySocket.on('result_executeTestSuite', function(resultData) {
                     	//req.session.cookie.expires = sessionExtend;
+                      clearInterval(updateSessionExpiry);
                     if (resultData != "success" && resultData != "Terminate") {
                         try {
                             var scenarioid = resultData.scenarioId;
@@ -963,6 +973,7 @@ exports.ExecuteTestSuite_ICE_CI = function(req, res) {
 
 
 function TestCaseDetails_Suite_ICE(req, cb, data) {
+        console.log(cb);
         var requestedtestscenarioid = req;
         var testscenarioslist = "select testcaseids from testscenarios where testscenarioid=" + requestedtestscenarioid + ";";
         var resultstring = [];
@@ -1480,7 +1491,7 @@ function TestSuiteDetails_Module_ICE(req, cb1, data) {
                         getparampathvalues.push('');
                         }
                     }
-                    
+
                     var inputs = {"cycleid":requiredcycleid,
                     "testsuitename":requiredtestsuitename,
                     "testsuiteid":requiredtestsuiteid,
@@ -1712,7 +1723,7 @@ function updatescenariodetailsinsuite(req, cb, data) {
             //console.log(createTestSuitesHistory);
 
             insertTestSuiteQuery = "INSERT INTO testsuites (cycleid,testsuiteid,testsuitename,versionnumber,history) VALUES ("+req.cycleid+"," +  req.testsuiteid +",'"+ req.testsuitename +"',1,{" + date + ":" + createTestSuitesHistory + "})";
-          
+
             //var updatetestsuitefrommodule = "UPDATE testsuites SET testscenarioids = ["+req.testscenarioids+"], conditioncheck=["+conditioncheck1+"] ,getparampaths=["+getparampath1+"], donotexecute=["+donotexecute1+"] WHERE testsuiteid="+req.testsuiteid+" and cycleid="+req.cycleid+" and testsuitename='"+req.testsuitename+"' and versionnumber="+req.versionnumber;
             //dbConnICE.execute(updatetestsuitefrommodule, function(err, answers) {
             client.post(epurl+"suite/readTestSuite_ICE",args,

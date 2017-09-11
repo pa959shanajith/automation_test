@@ -101,7 +101,7 @@ if (cluster.isMaster) {
         httpOnly: true,
         secure: true,
         rolling: true,
-        resave: false,
+        resave: true,
         saveUninitialized: false,  //Should always be false for cookie to clear
         cookie: {
             maxAge: (30 * 60 * 1000)
@@ -514,7 +514,7 @@ if (cluster.isMaster) {
     console.log(e);
     setTimeout(function(){
       cluster.worker.kill();
-    }, 2)
+    }, 2000)
   }
 
 }
