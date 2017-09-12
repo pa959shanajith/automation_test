@@ -3,13 +3,17 @@
 <!--Header-->
 
 <!--Content Area-->
-<section class="container-fluid container-fluid-inner" ng-init="tab='defaultTab'">
+<section class="container-fluid container-fluid-inner" ng-init="assignTab('viewTab');tab='viewTab';loadNGraphs()">
 	<!--Left Panel-->
 	<div class="ct-side fl-left" id="ct-lSide">
-		<div id="left-nav-section" class='lsSlide' style='z-index:9999'>
+		<div id="left-nav-section" class='lsSlide' style='z-index:999'>
 			<div class="scrollbar-macosx">
-				<div id="left-top-section" style="border-bottom: 0 !important" ng-if="tab == 'actionTab'">
+				<div id="left-top-section" style="border-bottom: 0 !important">
 					<ul>
+						<li><a id='viewImg1' ng-click="assignTab('viewTab');tab='viewTab'" href="#" title="View Graphs"><span><img id='viewImg' class="selectedIcon" src="imgs/ngr-view.png" alt="View"></span>View Graphs</a></li>
+						<li><a id='actionImg1' ng-click="assignTab('actionTab');tab='actionTab'" href="#" title="Perform Action"><span><img id='actionImg' src="imgs/ngr-action.png" alt="View"></span>Perform Action</a></li>
+					</ul>
+					<ul ng-if="tab=='hidden'">
 						<li><span><a class='scrapeOnTxt'>Execute On</a></span></li>
 						<li><a class="selectBrowser" data-name="3"  title="Execute on IE"><span><img src='imgs/ic-ie.png' alt='Internet Explorer' /></span>Internet Explorer</a></li>
 						<li><a class="selectBrowser" data-name="1"  title="Execute on Chrome"><span><img src='imgs/ic-chrome.png' alt='Google Chrome' /></span>Google Chrome</a></li>
@@ -25,11 +29,9 @@
 
 	<!--Middle Panel-->
 	<div id="ct-main" class="fl-left rightBarOpen leftBarOpen">
-		<div id="ct-canvas">
-			<!--<iframe id="frame" src="" width="100%" height="100%"></iframe>-->
-		</div>
+		<div id="ct-canvas"></div>
 	</div>
-	<div class="createFirstContainer" ng-if="tab == 'defaultTab'">
+	<div class="createFirstContainer" ng-if="tab=='hidden'">
 		<div class="createOptionContainer">
 			<div ng-click="assignTab('viewTab'); tab = 'viewTab'; loadNGraphs()" title="View Graph"><img alt="View" class="" src="imgs/ngr-view.png"><label>View Graph</label></div>
 			<div ng-click="assignTab('actionTab'); tab = 'actionTab'; loadNGraphs()" title="Perform Action"><img alt="Action" class="" src="imgs/ngr-action.png"><label>Perform Action</label></div>
@@ -39,7 +41,7 @@
 
 	<!-- Right Section -->
 	<div class="ct-side fl-right" id="ct-rSide">
-		<div id="right-dependencies-section" class="rsSlide" style='z-index:9999'>
+		<div id="right-dependencies-section" class="rsSlide" style='z-index:999'>
 			<!--Images Blocks-->
 			<div class="thumbnail thumbnail-custom">
 				<a class="slidePopup"  title="Filter">

@@ -28,13 +28,12 @@ var reqToAPI = function(d,u,p,callback) {
 var parseData = function(data){
 	var rootIndex=-1;
 	var nodeTypes={"DOMAINS_NG":"Domain","PROJECTS_NG":"Project","RELEASES_NG":"Release","CYCLES_NG":"Cycle","TESTSUITES_NG":"TestSuite","TESTSCENARIOS_NG":"TestScenario","TESTCASES_NG":"TestCase","SCREENS_NG":"Screen"};
-	var nodeColor={"Domain":"#eeeeee","Project":"#744730","Release":"#ffa448","Cycle":"#28d05a","TestSuite":"#be0e16","TestScenario":"#a448a4","TestCase":"#005580","Screen":"#3d3d29"};
 	var nc=0,lc=0,nodes=[],links=[],nodeIdDict={},linkIdDict={};
 	var attrDict={"browser":"Browser Name","comments":"Comments","complexity":"Complexity","createdby":"Created By","createdon":"Created On","cyclename":"Name","domainname":"Domain","endtime":"End Time","executedtime":"Executed Time","firstname":"First Name","modifiedby":"Modified By","modifiedon":"Modified On","name":"Name","objecttype":"Object Type","projectname":"Name","projecttypename":"Type","releasename":"Name","risk":"Risk","screenname":"Name","starttime":"Start Time","status":"Status","steps":"Steps","testsuitename":"Name","testscenarioname":"Name","testcasename":"Name","time":"Time"};
 	data.forEach(function(row){
 		d=row.graph;
 		d.nodes.forEach(function (n) {
-			if (nodeIdDict[n.id]===undefined){
+			if (nodeIdDict[n.id]===undefined && nodeTypes[n.labels[0]]!==undefined){
 				if(n.labels[0]=="DOMAINS_NG") rootIndex=nc;
 				if(n.labels[0]=="TESTCASES_NG"){
 					n.properties.complexity=Math.floor((Math.random()*10))%3+1;
@@ -46,8 +45,8 @@ var parseData = function(data){
 					}
 					delete n.properties[attrs];
 				}
-				nodes.push({"id":n.id,"idx":nc,"type":nodeTypes[n.labels[0]],"name":n.properties.Name,"parent":[],"children":[]});
-				//nodes.push({"id":n.id,"idx":nc,"type":nodeTypes[n.labels[0]],"name":n.properties.Name,"attributes": n.properties,"parent":[],"children":[]});
+				//nodes.push({"id":n.id,"idx":nc,"type":nodeTypes[n.labels[0]],"name":n.properties.Name,"parent":[],"children":[]});
+				nodes.push({"id":n.id,"idx":nc,"type":nodeTypes[n.labels[0]],"name":n.properties.Name,"attributes": n.properties,"parent":[],"children":[]});
 				nodeIdDict[n.id]=nc;
 				nc++;
 			}
@@ -56,21 +55,19 @@ var parseData = function(data){
 			if (linkIdDict[l.id]===undefined){
 				var source=l.startNode.toString();
 				var target=l.endNode.toString();
-				//links.push({"start":source,"end":target});
 				srcIndex=nodeIdDict[source];
 				tgtIndex=nodeIdDict[target];
-				links.push({"start":srcIndex,"end":tgtIndex});
-				linkIdDict[l.id]=lc;
-				lc++;
-				if (nodes[srcIndex].children.indexOf(nodes[tgtIndex]) == -1)
-					nodes[srcIndex].children.push(nodes[tgtIndex]);
-				/*if (nodes[tgtIndex].parent.indexOf(nodes[srcIndex]) == -1)
-					nodes[tgtIndex].parent.push(nodes[srcIndex]);
-				*/
+				if(srcIndex!==undefined && tgtIndex!==undefined){
+					links.push({"start":source,"end":target});
+					linkIdDict[l.id]=lc;
+					lc++;
+					if (nodes[srcIndex].children.indexOf(nodes[tgtIndex]) == -1) nodes[srcIndex].children.push(nodes[tgtIndex]);
+					//if (nodes[tgtIndex].parent.indexOf(nodes[srcIndex]) == -1) nodes[tgtIndex].parent.push(nodes[srcIndex]);
+				}
 			}
 		});
 	});
-	return {nodes:nodes,links:links,type:nodeTypes,color:nodeColor,root:rootIndex};
+	return {nodes:nodes,links:links,type:nodeTypes,root:rootIndex};
 };
 
 var get2DCoordsData = function(data){
