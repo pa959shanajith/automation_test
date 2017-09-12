@@ -1,6 +1,9 @@
 var myserver = require('../../server.js');
 var url=require('url');
 var sessionExtend = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes 
+var sessionTime = 30 * 60 * 1000;
+var updateSessionTimeEvery = 20 * 60 * 1000;
+
 exports.getCrawlResults = function(req, res){
        try{
            if(req.cookies['connect.sid'] != undefined){
@@ -23,6 +26,9 @@ exports.getCrawlResults = function(req, res){
                return res.send("unavailableLocalServer");
              }
              mySocket.emit("webCrawlerGo", input_url, level, agent);
+            //  var updateSessionExpiry = setInterval(function () {
+            //    req.session.cookie.maxAge = sessionTime;
+            //  },updateSessionTimeEvery);
              mySocket.on('result_web_crawler', function (value) {
                //req.session.cookie.expires = sessionExtend;
                try{
@@ -35,6 +41,8 @@ exports.getCrawlResults = function(req, res){
              });
              mySocket.on('result_web_crawler_finished', function (value) {
               // req.session.cookie.expires = sessionExtend;
+            //  clearInterval(updateSessionExpiry);
+
                try{
                   //console.log(value);
                   var mySocketUI =  myserver.allSocketsMapUI[name];

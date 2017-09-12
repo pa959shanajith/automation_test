@@ -107,7 +107,7 @@
                 padding-bottom: 5px;
             }
             .reportsDetails{border: 1px solid #cfcfcf;     background-color: #dfd0fa; font-size: 15px;}
-            .reportsDetails tr{height: 32px;}
+            .reportsDetails tr{height: 50px;} 
             .reportsDetails th:nth-child(1){width: 5%;} .rDid{width: 5.25%;}
             .reportsDetails th:nth-child(2){width: 10%;} .rDstep{width: 10.25%;}
             .reportsDetails th:nth-child(3){width: 50%;} .rDstepDes{width: 49.8%;}
@@ -117,6 +117,7 @@
             .maintabCont{float: left; width: 100%; border: 1px solid #dcdcdc; height: 49%;}
             .tabCont{display: table-cell; border-bottom: 1px solid #ececec; border-right: 1px solid #ececec;}
             .reportsDetail{line-height: 2; text-align: center; height: calc(100% - 35px); overflow: auto;font-size: 14px;}
+            .reportsDetail tr { page-break-inside: avoid; }
             .rDstepDes{text-align: left; word-break: break-word;}
             .reportsDetail tr.reportdetailsrow:nth-child(even){background: #f9f9f9;}
             .reportdetailsrow td{padding-top: 9px;}
@@ -206,16 +207,16 @@
     </div>
     {{/each}}
     <div class="maintabCont">
-        <table style="width: 100%;">
+        <table style="width: 100%;" >
             <thead class="reportsDetails">
-                <th>Sl No.</th>
+               <tr><th>Sl No.</th>
                 <th>Test Step No.</th>
                 <th>Test Step Description</th>
                 <th>Status</th>
                 <th>Elapsed Time</th>
-                <th>Comments</th>
+                <th>Comments</th></tr>
             </thead>
-            <tbody class="reportsDetail">
+            <tbody class="reportsDetail" >
                 {{#each rows}}
                 <tr style="width: 100%;" class="reportdetailsrow">
                     <td class="rDid tabCont">{{slno}}</td>

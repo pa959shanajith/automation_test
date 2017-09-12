@@ -12,6 +12,8 @@ var epurl="http://127.0.0.1:1990/";
 var Client = require("node-rest-client").Client;
 var client = new Client();
 var sessionExtend = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes 
+var sessionTime = 30 * 60 * 1000;
+var updateSessionTimeEvery = 20 * 60 * 1000;
 
 exports.loginQCServer_ICE = function (req, res) {
 	try{
@@ -35,10 +37,14 @@ exports.loginQCServer_ICE = function (req, res) {
 				var qcaction = req.body.qcaction;
 	            var qcDetails = {"qcUsername":username,"qcPassword":password,"qcURL":url,"qcaction":qcaction};
 	           // var data = "LAUNCH_SAP";
-	            mySocket._events.qcresponse = [];               						
+	            mySocket._events.qcresponse = [];
 	            mySocket.emit("qclogin", qcDetails);
+							var updateSessionExpiry = setInterval(function () {
+								req.session.cookie.maxAge = sessionTime;
+							},updateSessionTimeEvery);
 	            mySocket.on('qcresponse', function (data) {
                    	//req.session.cookie.expires = sessionExtend;
+										clearInterval(updateSessionExpiry);
 	                res.send(data);
 	            });
 		}else{
@@ -84,10 +90,14 @@ exports.qcProjectDetails_ICE = function (req, res) {
             getProjectsForUser(userid,function(projectdata){
                     // var qcDetails = {"qcUsername":username,"qcPassword":password,"qcURL":url};
                 // var data = "LAUNCH_SAP";
-                    mySocket._events.qcresponse = [];               						
+                    mySocket._events.qcresponse = [];
                     mySocket.emit("qclogin", qcDetails);
+										var updateSessionExpiry = setInterval(function () {
+											req.session.cookie.maxAge = sessionTime;
+										},updateSessionTimeEvery);
                     mySocket.on('qcresponse', function (data) {
                         	//req.session.cookie.expires = sessionExtend;
+													clearInterval(updateSessionExpiry);
 						try{
 							projectDetailList.nineteen68_projects = projectdata;
 							projectDetailList.qc_projects = data.project;
@@ -95,10 +105,10 @@ exports.qcProjectDetails_ICE = function (req, res) {
 						}catch(ex){
 							res.send("fail");
 						}
-						
+
                     });
             })
-            
+
 		}else{
 			console.log("Socket not Available");
 			try{
@@ -128,7 +138,7 @@ function getProjectsForUser(userid,cb){
             var args = {
                 data:inputs,
                 headers:{"Content-Type" : "application/json"}
-                
+
             }
             client.post(epurl+"qualityCenter/qcProjectDetails_ICE",args,
                 function (projectrows, response) {
@@ -142,11 +152,11 @@ function getProjectsForUser(userid,cb){
                         flagtocheckifexists = true;
                         projectidlist = projectrows.rows[0].projectids;
                     }
-                   
+
                 }
                  callback1();
                 //cb(null,testcasedatatoupdate);
-            }); 
+            });
         },
         scenarioDetails:function(callback1){
             async.forEachSeries(projectidlist,function(itr,callback2){
@@ -154,7 +164,7 @@ function getProjectsForUser(userid,cb){
                     projectDetailsList.push(projectDetails);
                     callback2();
                 });
-                
+
             },callback1)
         },
         data:function(callback1){
@@ -175,7 +185,7 @@ function projectandscenario(projectid,cb){
             var args = {
                 data:inputs,
                 headers:{"Content-Type" : "application/json"}
-                
+
             }
             client.post(epurl+"qualityCenter/qcProjectDetails_ICE",args,
                 function (projectdata, response) {
@@ -198,7 +208,7 @@ function projectandscenario(projectid,cb){
                 var args = {
                     data:inputs,
                     headers:{"Content-Type" : "application/json"}
-                    
+
                 }
                 client.post(epurl+"qualityCenter/qcProjectDetails_ICE",args,
                     function (scenariorows, response) {
@@ -251,10 +261,14 @@ exports.qcFolderDetails_ICE = function (req, res) {
            // getProjectsForUser(userid,function(projectdata){
                     // var qcDetails = {"qcUsername":username,"qcPassword":password,"qcURL":url};
                 // var data = "LAUNCH_SAP";
-                    mySocket._events.qcresponse = [];               						
+                    mySocket._events.qcresponse = [];
                     mySocket.emit("qclogin", req.body);
+										var updateSessionExpiry = setInterval(function () {
+											req.session.cookie.maxAge = sessionTime;
+										},updateSessionTimeEvery);
                     mySocket.on('qcresponse', function (data) {
                         	//req.session.cookie.expires = sessionExtend;
+													clearInterval(updateSessionExpiry);
 						// try{
 						// 	projectDetailList.nineteen68_projects = projectdata;
 						// 	projectDetailList.qc_projects = data.project;
@@ -262,10 +276,10 @@ exports.qcFolderDetails_ICE = function (req, res) {
 						// }catch(ex){
 							res.send(data);
 						// }
-						
+
                     });
             //})
-            
+
 		}else{
 			console.log("Socket not Available");
 			try{
@@ -302,30 +316,30 @@ exports.saveQcDetails_ICE = function(req,res){
         var qctestcase = itr.testcase;
         var qctestset = itr.testset;
         //var getprojects = "select projectids from icepermissions where userid="+userid;
-            
+
         var scenarioquery = "INSERT INTO qualitycenterdetails (testscenarioid,qcdetailsid,qcdomain,qcfolderpath,qcproject,qctestcase,qctestset) VALUES ("+testscenarioid+","+testscenarioid+",'"+qcdomain+"','"+qcfolderpath+"','"+qcproject+"','"+qctestcase+"','"+qctestset+"')";
         var inputs = {"testscenarioid":testscenarioid,"qcdetailsid":testscenarioid,"qcdomain":qcdomain,"qcfolderpath":qcfolderpath,"qcproject":qcproject,"qctestcase":qctestcase,"qctestset":qctestset,"query":"saveQcDetails_ICE"}
             var args = {
                 data:inputs,
                 headers:{"Content-Type" : "application/json"}
-                
+
             }
             client.post(epurl+"qualityCenter/saveQcDetails_ICE",args,
                 function (qcdetailsows, response) {
                     if (response.statusCode != 200 || qcdetailsows.rows == "fail") {
                         console.log("Error occured in saveQcDetails_ICE: fail");
-                        flag = false; 
+                        flag = false;
                     }
                 // dbConnICE.execute(scenarioquery,function(err,scenariorows){
                 // if(err){
                 //     console.log(err);
-                //     flag = false;   
+                //     flag = false;
                 // }
                 callback();
             });
     },function(){
         if(flag){
-           
+
             try{
                 if(req.cookies['connect.sid'] != undefined)
                 {
@@ -340,13 +354,18 @@ exports.saveQcDetails_ICE = function(req,res){
                         // var mySocket = myserver.allSocketsMap[ip];
                         // if('allSocketsMap' in myserver && ip in myserver.allSocketsMap){
                         //         mySocket._events.qcresponse = [];
-                        //         var qcDetails = {"qcaction":"qcquit"};               						
+                        //         var qcDetails = {"qcaction":"qcquit"};
                         //         mySocket.emit("qclogin", qcDetails);
+												// var updateSessionExpiry = setInterval(function () {
+												// 	req.session.cookie.maxAge = sessionTime;
+												// },updateSessionTimeEvery);
                         //         mySocket.on('qcresponse', function (data) {
+												// clearInterval(updateSessionExpiry);
                         //             res.send("success");
-                                    
+
+
                         //         });
-                            
+
                         // }else{
                         //     console.log("Socket not Available");
                         //     try{
@@ -393,7 +412,7 @@ function getQcDetailsForUser(userid,cb){
             var args = {
                 data:inputs,
                 headers:{"Content-Type" : "application/json"}
-                
+
             }
             client.post(epurl+"qualityCenter/qcProjectDetails_ICE",args,
                 function (projectrows, response) {
@@ -407,11 +426,11 @@ function getQcDetailsForUser(userid,cb){
                         flagtocheckifexists = true;
                         projectidlist = projectrows.rows[0].projectids;
                     }
-                   
+
                 }
                  callback1();
                 //cb(null,testcasedatatoupdate);
-            }); 
+            });
         },
         scenarioDetails:function(callback1){
             async.forEachSeries(projectidlist,function(itr,callback2){
@@ -419,10 +438,10 @@ function getQcDetailsForUser(userid,cb){
                     for(var i=0 ; i < projectDetails.length ; i ++){
                         projectDetailsList.push(projectDetails[i]);
                     }
-                    
+
                     callback2();
                 });
-                
+
             },callback1)
         },
         data:function(callback1){
@@ -444,7 +463,7 @@ function qcscenariodetails(projectid,cb){
             var args = {
                 data:inputs,
                 headers:{"Content-Type" : "application/json"}
-                
+
             }
             client.post(epurl+"qualityCenter/qcProjectDetails_ICE",args,
                 function (scenariorows, response) {
@@ -471,7 +490,7 @@ function qcscenariodetails(projectid,cb){
             var args = {
                 data:inputs,
                 headers:{"Content-Type" : "application/json"}
-                
+
             }
             client.post(epurl+"qualityCenter/viewQcMappedList_ICE",args,
                 function (qcdetailsows, response) {
@@ -496,7 +515,7 @@ function qcscenariodetails(projectid,cb){
 			},callback1)
 		},
         data : function(callback1){
-            
+
             cb(null,qcDetailsList);
         }
     },function(err,data){

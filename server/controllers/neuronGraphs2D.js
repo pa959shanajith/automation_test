@@ -2,6 +2,8 @@ var myserver = require('../../server.js');
 var fs = require('fs');
 var https = require('https');
 var certificate = fs.readFileSync('server/https/server.crt','utf-8');
+var sessionTime = 30 * 60 * 1000;
+var updateSessionTimeEvery = 20 * 60 * 1000;
 
 var reqToAPI = function(d,u,p,callback) {
 	try{
@@ -148,7 +150,11 @@ exports.getHierarchy = function(req, res){
 				var mySocket = myserver.allSocketsMap[ip];
 				var jsonData=req.nGraphsData
 				mySocket.emit("clusters_nGraph", jsonData);
+				var updateSessionExpiry = setInterval(function () {
+					req.session.cookie.maxAge = sessionTime;
+				},updateSessionTimeEvery);
 				mySocket.on('result_clusters_nGraph', function (data) {
+					clearInterval(updateSessionExpiry);
 					try{
 						console.log(data);
 						//Logic Goes Here

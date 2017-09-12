@@ -5,6 +5,8 @@ var Client = require("node-rest-client").Client;
 var client = new Client();
 var epurl="http://127.0.0.1:1990/";
 var sessionExtend = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes 
+var sessionTime = 30 * 60 * 1000;
+var updateSessionTimeEvery = 20 * 60 * 1000;
 exports.Encrypt_ICE = function getDomains_ICE(req, res) {
 	try {
 		if(req.cookies['connect.sid'] != undefined)
@@ -22,7 +24,7 @@ exports.Encrypt_ICE = function getDomains_ICE(req, res) {
 				// if (methodSelected === 'undefined') {
 				// 	res.send("fail");
 				// }
-				// else 
+				// else
 				if(methodSelected == "AES"){
 					try{
 						// var dirName = __dirname.split("\\");
@@ -31,7 +33,7 @@ exports.Encrypt_ICE = function getDomains_ICE(req, res) {
 						// 	dirName.push("Portable_python");
 						// 	var strPath = dirName.join("\\");
 						// 	console.log(strPath);
-							
+
 							// var dir_name = __dirname.split("\\");
 							// dir_name.pop();
 							// dir_name.pop();
@@ -58,7 +60,7 @@ exports.Encrypt_ICE = function getDomains_ICE(req, res) {
 								console.log("error occured : ",err);
 								res.send("fail");
 							}else{
-									// results is an array consisting of messages collected during execution 
+									// results is an array consisting of messages collected during execution
 									// console.log('results: %j', results);
 									// encryptedValue = results[2];
 									if(results.rows != "fail"){
@@ -70,7 +72,7 @@ exports.Encrypt_ICE = function getDomains_ICE(req, res) {
 									}
 							}
 						});
-						
+
 					}catch(exception){
 						console.log(exception);
 						res.send("fail");
@@ -79,7 +81,7 @@ exports.Encrypt_ICE = function getDomains_ICE(req, res) {
 					try{
 						var crypto = require('crypto');
 						encryptedValue = crypto.createHash('md5').update(encrytData).digest("hex");
-						console.log(encryptedValue);						
+						console.log(encryptedValue);
 					}
 					catch(exception){
 						console.log(exception);
@@ -88,7 +90,7 @@ exports.Encrypt_ICE = function getDomains_ICE(req, res) {
 					res.send(encryptedValue);
 				}else if(methodSelected == "Base64"){
 					try{
-						
+
 						var buffer = new Buffer(encrytData);
 						var encryptedValue = buffer.toString('base64');
 						console.log(encryptedValue);
@@ -108,14 +110,14 @@ exports.Encrypt_ICE = function getDomains_ICE(req, res) {
 		}
 		else{
 			res.send("Invalid Session");
-		} 
+		}
 	}catch (exception) {
 		console.log(exception);
 		res.send("fail");
 	}
 };
 
-exports.pairwise_ICE = function(req, res) {	
+exports.pairwise_ICE = function(req, res) {
 		if(req.cookies['connect.sid'] != undefined)
 		{
 			var sessionCookie = req.cookies['connect.sid'].split(".");
@@ -132,21 +134,23 @@ exports.pairwise_ICE = function(req, res) {
 			console.log(Object.keys(myserver.allSocketsMap),"<<all people, asking person:",name);
 			if('allSocketsMap' in myserver && name in myserver.allSocketsMap){
 				var mySocket = myserver.allSocketsMap[name];
-				mySocket._events.pairwise = [];               						
+				mySocket._events.pairwise = [];
 			//mySocket.send(dataObj);
 				mySocket.emit("pairwise", abc );//Sending
-
-				//Receiving				
+				var updateSessionExpiry = setInterval(function () {
+					req.session.cookie.maxAge = sessionTime;
+				},updateSessionTimeEvery);
+				//Receiving
 				mySocket.on('result_pairs', function (data) {
 					//req.session.cookie.expires = sessionExtend;
+					clearInterval(updateSessionExpiry);
 					res.send(data);
 				});
 			}else{
 				console.log("Socket not Available");
 				res.send("unavailableLocalServer");
 			}
-			
+
 		}
 
 	}
-

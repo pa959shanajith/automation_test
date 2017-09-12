@@ -109,6 +109,7 @@ mySPA.factory('DesignServices', ['$http','$q', function ($http, $httpProvider, $
 		debugTestCase_ICE : function(browserType,testcaseID){
 			return $http.post('/debugTestCase_ICE',{
 				param : 'debugTestCase_ICE',
+				userInfo: JSON.parse(window.localStorage['_UI']),
 				browsertypes: browserType,
 				testcaseids: testcaseID
 			})
