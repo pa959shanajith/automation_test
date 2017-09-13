@@ -42,22 +42,22 @@ console.log = function () {
 }
 console.error = console.log;
 
-if (cluster.isMaster) {
-    //    cluster.fork();
-    cluster.fork();
-    cluster.on('disconnect', function(worker) {
-        console.log('disconnect!');
-        // cluster.fork();
-    });
-    cluster.on('exit', function(worker) {
+// if (cluster.isMaster) {
+//     //    cluster.fork();
+//     cluster.fork();
+//     cluster.on('disconnect', function(worker) {
+//         console.log('disconnect!');
+//         // cluster.fork();
+//     });
+//     cluster.on('exit', function(worker) {
 
-        // Replace the dead worker,
-        // we're not sentimental
-        console.log('Let\'s not have Sentiments... Worker %d is killed.', worker.id);
-        cluster.fork();
-    });
+//         // Replace the dead worker,
+//         // we're not sentimental
+//         console.log('Let\'s not have Sentiments... Worker %d is killed.', worker.id);
+//         cluster.fork();
+//     });
 
-} else {
+// } else {
   try {
     var express = require('express');
     var app = express();
@@ -387,7 +387,6 @@ if (cluster.isMaster) {
 
   //SOCKET CONNECTION USING SOCKET.IO
     var allClients = [];
-    var sessionCreated = [];
     var allSockets = [];
     var socketMap = {};
     var socketMapUI = {};
@@ -515,7 +514,7 @@ if (cluster.isMaster) {
     console.log(e);
     setTimeout(function(){
       cluster.worker.kill();
-    }, 2000)
+    }, 2)
   }
 
-}
+// }
