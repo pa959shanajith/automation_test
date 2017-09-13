@@ -30,7 +30,6 @@ exports.authenticateUser_Nineteen68 = function(req, res){
             var sessId = req.session.id;
             req.session.username = username;
             req.session.uniqueId = sessId;
-            console.log(myserver.sessionCreated);
             if(myserver.sessionCreated.indexOf(username) >= 0){
                   return res.send("userLogged");
             }
@@ -93,8 +92,7 @@ exports.authenticateUser_Nineteen68 = function(req, res){
                                                                                   else{
                                                                                          res.send(flag);
                                                                                          console.log("session value ",myserver.sessionCreated);
-                                                                                         //myserver.sessionCreated.push(username)
-                                                                                  }  
+                                                                                  }
                                                                      }
                                                                      else{
                                                                            if(validUser == true){
