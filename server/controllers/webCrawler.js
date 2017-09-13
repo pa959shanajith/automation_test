@@ -30,7 +30,7 @@ exports.getCrawlResults = function(req, res){
             //    req.session.cookie.maxAge = sessionTime;
             //  },updateSessionTimeEvery);
              mySocket.on('result_web_crawler', function (value) {
-               //req.session.cookie.expires = sessionExtend;
+              // req.session.cookie.expires = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes 
                try{
                 //  console.log(value);
                   var mySocketUI =  myserver.allSocketsMapUI[name];

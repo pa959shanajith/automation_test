@@ -308,6 +308,9 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
       for(var i = $scope.level; i>=1; i--){
         var levelObjects = obj[i];
         for(var k = 0; k < levelObjects.length; k++){
+          if (i>=1) {
+            obj[i][k].collapse = 1
+          }
           var thisNode = levelObjects[k];
           if (!obj[i][k].children || !obj[i][k].children.length > 0 ) {
              obj[i][k].isTerminal = true;
@@ -330,6 +333,19 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
       }
       return obj[0];
     }
+
+    function addParents(arr, parent){
+      for (var i = 0; i < arr.length; i++) {
+        arr[i].parentsAll = [];
+        arr[i].parentsAll.push(arr[i].parent);
+        arr[i].parentsAll = arr[i].parentsAll.concat(parent);
+        if (arr[i].children && arr[i].children.length > 0) {
+          addParents(arr[i].children, arr[i].parentsAll);
+        }
+      }
+      return arr;
+    }
+
 
     $scope.generateGraph = function(){
       $("#result-canvas").show();
@@ -376,6 +392,8 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
 
       var root = parseRelations(createLevelObject($scope.crawledLinks));
       console.log(root);
+      var init = []
+      root = addParents(root, init);
       root = root[0];
 
       var width = window.innerWidth,
@@ -384,10 +402,11 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
     	  nodes,
     	  links
         nodeFocus = false;
-
+      var count11= 0;
       var force = d3.layout.force()
           .linkDistance(function(d){  return 180})
-          .charge(-500)
+          .linkStrength(1)
+          .charge(-1000)
           .size([width, height])
           .on("tick", tick);
 
@@ -398,18 +417,26 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
 
       start();
 
+      //
+      // function start(){
+      //
+      // 	restart();
+      // }
 
       function start(){
-      	nodes = flatten(root),
-      	links = d3.layout.tree().links(nodes);
-      	for(var i=0; i<nodes.length; i++){
-      		if(nodes[i].collapse){
-      			toggle(nodes[i]);
-      		}
-      	}
-      	restart();
-      }
 
+        restart();
+      }
+      function startAgain(){
+        nodes = flatten(root),
+        links = d3.layout.tree().links(nodes);
+        for(var i=0; i<nodes.length; i++){
+          if(nodes[i].collapse){
+            toggle(nodes[i], false);
+          }
+        }
+        restart();
+      }
       function restart(){
       	nodes = flatten(root),
       	links = d3.layout.tree().links(nodes);
@@ -569,18 +596,17 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
 
 
         nodeEnter.transition()
-            .attr("width", function(d) { return d.children ? 4.5 : 3.5 ; })
+          .attr("width", function(d) { return d.children ? 4.5 : 3.5 ; })
       	  .attr("height", function(d) { return d.children ? 4.5 :3.5 ; });
 
         nodeEnter.append("text")
             .attr("dy", ".35em")
       	//  .text(function(d) { return d._children ? d.name : d.children ? d.name : ""; });
-
-      	node.select("circle")
-      		.style("fill", color);
-      	node.select("rect")
-      		.style("fill", color);
-      	//console.log(node.children);
+        if(count11 == 0){
+          console.log("sa");
+        	count11++;
+        		startAgain();
+        	}
       }
 
       function highlightNeighbors(d,i) {
@@ -696,28 +722,55 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
 
 
       }
-
-      function toggle(d) {
+      var activeD = [];
+      function toggle(d, check) {
         //console.log("losssssssssssssst", d.lost);
         //console.log(d.children)
         if (d.children) {
       	  d.nodeOpen = false;
           d._children = d.children;
           d.children = null;
+
       } else {
-      	d.nodeOpen = true;
+      	  d.nodeOpen = true;
           d.children = d._children;
           d._children = null;
+          if (check) {
+            activeD.push(d);
+          }
         }
       }
 
 
       // Toggle children on click.
       function click(d){
-      //  console.log()
-      //  if (d3.event.defaultPrevented) return; // ignore drag
-        toggle(d);
+        console.log(activeD)
+      // if (d3.event.defaultPrevented) return; // ignore drag
+        console.log();
+      //  console.log(d.parentsAll.indexOf(activeD[activeD.length-1].name))
+        if (activeD.length > 0 && d.name != activeD[activeD.length-1].name ) {
+          console.log("into somehtg");
+          var i = activeD.length-1;
+          while(i>=0){
+            if (d.parentsAll.indexOf(activeD[i].name) < 0 && d.name != activeD[i].name) {
+              activeD[i].nodeOpen = false;
+              activeD[i]._children = activeD[i].children;
+              activeD[i].children = null;
+              activeD.pop();
+            }else if(d.name == activeD[i].name){
+              activeD.pop();
+              break;
+            }else{
+              break;
+            }
+            i = activeD.length-1;
+          }
+        }else if( activeD.length > 0 && d.name == activeD[activeD.length-1].name ){
+          activeD.pop();
+        }
+        toggle(d, true);
         restart();
+        //update();
       }
 
       // Returns a list of all nodes under the root.
