@@ -1349,7 +1349,7 @@ var inpChange = function(e){
 		var t=p.attr('data-nodetype');
 	if(!d3.select('#ct-inpSugg').classed('no-disp') && temp && temp.length>0) return;
 	if(dNodes[pi].id_n){
-		dNodes[pi].original_name=pt.text();
+		dNodes[pi].original_name=pt.attr('title');
 		dNodes[pi].rnm=!0;
 	} 
 	if(t=='screens' && scrList[inp.attr('data-nodeid')]!==undefined){
