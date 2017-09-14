@@ -40,6 +40,7 @@ mySPA.controller('neuronGraphs2DController', ['$scope', '$http', '$location', '$
 		delete $scope.nodes;
 		delete $scope.fetchedData;
 		delete $scope.objects;
+		$scope.objects=[];
 	};
 
 	/*---------------Sidebar Toggle Starts Here---------------*/
@@ -302,7 +303,6 @@ mySPA.controller('neuronGraphs2DController', ['$scope', '$http', '$location', '$
 
 	/*---------------UI Logic Starts Here---------------*/
 	var camera,scene,renderer,controls,root,activeNode;
-	$scope.objects=[];
 	var tmpVec1=new THREE.Vector3();
 	var tmpVec2=new THREE.Vector3();
 	var tmpVec3=new THREE.Vector3();
