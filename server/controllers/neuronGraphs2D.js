@@ -29,7 +29,7 @@ var parseData = function(data){
 	var rootIndex=-1;
 	var nodeTypes={"DOMAINS_NG":"Domain","PROJECTS_NG":"Project","RELEASES_NG":"Release","CYCLES_NG":"Cycle","TESTSUITES_NG":"TestSuite","TESTSCENARIOS_NG":"TestScenario","TESTCASES_NG":"TestCase","SCREENS_NG":"Screen"};
 	var nc=0,lc=0,nodes=[],links=[],nodeIdDict={},linkIdDict={};
-	var attrDict={"browser":"Browser Name","comments":"Comments","complexity":"Complexity","createdby":"Created By","createdon":"Created On","cyclename":"Name","domainname":"Domain","endtime":"End Time","executedtime":"Executed Time","firstname":"First Name","modifiedby":"Modified By","modifiedon":"Modified On","name":"Name","objecttype":"Object Type","projectname":"Name","projecttypename":"Type","releasename":"Name","risk":"Risk","screenname":"Name","starttime":"Start Time","status":"Status","steps":"Steps","testsuitename":"Name","testscenarioname":"Name","testcasename":"Name","time":"Time"};
+	var attrDict={"browser":"Browser Name","comments":"Comments","complexity":"Complexity","createdby":"Created By","createdon":"Created On","cyclename":"Name","domainname":"Name","endtime":"End Time","executedtime":"Executed Time","firstname":"First Name","modifiedby":"Modified By","modifiedon":"Modified On","name":"Name","objecttype":"Object Type","projectname":"Name","projecttypename":"Type","releasename":"Name","risk":"Risk","screenname":"Name","starttime":"Start Time","status":"Status","steps":"Steps","testsuitename":"Name","testscenarioname":"Name","testcasename":"Name","time":"Time"};
 	data.forEach(function(row){
 		d=row.graph;
 		d.nodes.forEach(function (n) {
@@ -106,9 +106,9 @@ exports.getGraphData = function(req, res){
 			var qList=[]
 			var urlData=req.get('host').split(':');
 			var userid=req.body.uid;
-			//userid='686d69a5-b519-4b4f-a813-8299235a2e97';
-			//qList.push({"statement":"MATCH(a:ICEPERMISSIONS_NG{userid:'"+userid+"'})-[r1]->(b:DOMAINS_NG) WITH b as d MATCH path=(d)-[r*1..]->(s:SCREENS_NG) RETURN path","resultDataContents":["graph"]});
-			qList.push({"statement":"MATCH(a:ICEPERMISSIONS_NG{userid:'"+userid+"'})-[r1]->(b:DOMAINS_NG) WITH b as d MATCH path=(d)-[r*1..]->(x) RETURN path","resultDataContents":["graph"]});
+			//'686d69a5-b519-4b4f-a813-8299235a2e97';'9c017f14-5a1c-4f2f-85a9-52728c86684c';
+			//qList.push({"statement":"MATCH(a:ICEPERMISSIONS_NG{userid:'"+userid+"'})-[r1]->(b:DOMAINS_NG) WITH b as d MATCH path=(d)-[r*1..]->(x) RETURN path","resultDataContents":["graph"]});
+			qList.push({"statement":"MATCH(a:ICEPERMISSIONS_NG{userid:'"+userid+"'})-[r1]->(d:DOMAINS_NG) WITH a.projectids as pids,d as d MATCH (p:PROJECTS_NG) WHERE p.projectid in pids WITH p as p,d as d MATCH path=(d)-[r2]->(p)-[r3*1..]->(x) RETURN path","resultDataContents":["graph"]});
 			reqToAPI({"data":{"statements":qList}},urlData,'/neoQuerya',function(err,status,result){
 				res.setHeader('Content-Type', 'application/json');
 				if(err) res.status(status).send(err);

@@ -1939,6 +1939,10 @@ input[disabled]{
     width: 100%;
 }
 
+#window-nodesearch .popupContent {
+	padding: 10px 0;
+}
+
 .proj-info-wrap {
     font-size: 15px;
     margin-bottom: 5px;
@@ -1953,6 +1957,18 @@ input[disabled]{
 .proj-info-wrap .content {
     display: inline-block;
     width: 70%;
+}
+
+#popupSearchResult .searchNodeItem {
+	display: block;
+	border-radius: 2px;
+	cursor: pointer;
+	padding: 2px;
+	border-bottom: 1px solid #643693;
+}
+
+#popupSearchResult .searchNodeItem:hover {
+	background-color: #633691;
 }
 
 .closePopup {
@@ -4269,16 +4285,16 @@ select:-webkit-autofill:focus {
     width: inherit;
     color: #333;
 }
-.inputMyTask,.searchInputMyTask
-{
+.inputMyTask,.searchInputMyTask,.searchInputNodes{
     background-color: #fafafa !important;
 }
-.searchInputMyTask{
+.searchInputMyTask,.searchInputNodes{
     font-family: LatoWeb;
     font-size: 13px;
     color: #333;
 }
-.searchInputMyTask:focus{
+.searchInputMyTask:focus,
+.searchInputNodes:focus{
     outline: 0px !important;
     box-shadow: none;
     -moz-box-shadow: none;

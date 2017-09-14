@@ -1,15 +1,10 @@
 mySPA.controller('neuronGraphs2DController', ['$scope', '$http', '$location', '$timeout', 'neuronGraphs2DService','cfpLoadingBar','$window', function($scope,$http,$location,$timeout,neuronGraphs2DService,cfpLoadingBar,$window) {
-    //$("head").append('<link id="mindmapCSS1" rel="stylesheet" type="text/css" href="css/css_mindmap/style.css" /><link id="mindmapCSS2" rel="stylesheet" type="text/css" href="fonts/font-awesome_mindmap/css/font-awesome.min.css" />')
     $("head").append('<link id="nGraphsCSS" rel="stylesheet" type="text/css" href="css/nGraphs.css" />')
 	if(window.localStorage['navigateScreen'] != "neuronGraphs2D") window.location.href = "/";
 	var nodeColor={"Domain":"#111111","Project":"#744730","Release":"#ffa448","Cycle":"#28d05a","TestSuite":"#be0e16","TestScenario":"#a448a4","TestCase":"#005580","Screen":"#3d3d29"};
-	var PI=Math.PI;
-	var fCos=Math.cos;
-	var fAcos=Math.acos;
-	var fSin=Math.sin;
-	var fAsin=Math.asin;
-	var nodeTypes,rootIndex,mapN2DCoords;
+	var nodeTypes,rootIndex,mapN2DCoords,enabledFilters,visibleNodeNames;
 	var nodeIdDict={};
+	var PI=Math.PI, fCos=Math.cos, fAcos=Math.acos, fSin=Math.sin, fAsin=Math.asin;
 
 	$timeout(function(){
 		$('.scrollbar-inner').scrollbar();
@@ -18,10 +13,10 @@ mySPA.controller('neuronGraphs2DController', ['$scope', '$http', '$location', '$
 	}, 500);
 
 	//Select Browser Function
-	$(document).on("click", ".selectBrowser", function(){
+	/*$(document).on("click", ".selectBrowser", function(){
 		//$(".selectBrowser").find("img").removeClass("sb");
 		$(this).find("img").toggleClass("sb")
-	})
+	});*/
 
 	$scope.assignTab = function(option){
 		$scope.tab = option;
@@ -36,13 +31,18 @@ mySPA.controller('neuronGraphs2DController', ['$scope', '$http', '$location', '$
 		if($("#ct-expand-right").hasClass('ct-rev'))
 			$("#ct-expand-right").trigger("click");
 
-		$scope.clearData();
-		var blockMsg = 'Please wait while graphs are being fetched...';
-		blockUI(blockMsg);
+		clearData();
+		blockUI('Please wait while graphs are being fetched...');
 		loadGraphData()
 	}
 
-	/*Sidebar-toggle*/
+	var clearData = function(){
+		delete $scope.nodes;
+		delete $scope.fetchedData;
+		delete $scope.objects;
+	};
+
+	/*---------------Sidebar Toggle Starts Here---------------*/
 	$(".lsSlide,.rsSlide").show();
 	$("#ct-expand-left").click(function(e){
 		if($("#ct-expand-left").hasClass("ct-rev")) $(".lsSlide").hide();
@@ -57,13 +57,56 @@ mySPA.controller('neuronGraphs2DController', ['$scope', '$http', '$location', '$
 		$("#ct-expand-right").toggleClass("ct-rev")
 		$("#ct-main").toggleClass("rightBarOpen");
 	});
-	/*Sidebar-toggle*/
+	/*---------------Sidebar Toggle Ends Here---------------*/
 
-	
-	$scope.clearData = function(){
-		delete $scope.nodes;
-		delete $scope.fetchedData;
+	/*---------------Filter Objects Start Here---------------*/
+	$(document).on("click", ".filterObjects", function(){
+		enabledFilters=[];
+		$('.popupContent-filter-active').each(function(){
+			enabledFilters.push($(this).data('tag'));
+		});
+		applyFilters(1);
+	});
+
+	$("#selectAllFilters span.selectAllTxt").on("click", function(){applyFilters(0);});
+	$("#selectAllFilters input.checkStyleboxFilter").on("click", function(){applyFilters(0);});
+
+	var applyFilters = function(k){
+		if (k==0||enabledFilters.length==0){
+			enabledFilters=[];
+			$('.node-nG.no-disp').removeClass('no-disp');
+		}
+		else{
+			$('.node-nG').addClass('no-disp');
+			for(var i=0,l=enabledFilters.length;i<l;i++){
+				$('.node-nG.node-'+enabledFilters[i]).removeClass('no-disp');
+			}
+		}
+		if(activeNode!==undefined) highlightNodes(d3.select(activeNode).datum());
 	};
+	/*---------------Filter Objects Ends Here---------------*/
+
+	/*---------------Search Node Starts Here---------------*/
+	//$(".slidePopup").click(function(e){
+	$("#slidePopupSearchBox").click(function(e){
+		visibleNodeNames=[];
+		d3.selectAll('.node-nG').each(function(d){if(!(d3.select(this).classed('no-disp'))) visibleNodeNames.push([d.idx,d.name]);});
+		$('#popupSearchResult').empty();
+		$timeout(function(){$(".searchInputNodes").val('').focus();},5);
+	});
+
+	$(".searchInputNodes").on('keyup',function(e){
+		e=e||window.event;
+		var searchKey=$(this).val().toLowerCase();
+		var searchResults='';
+		visibleNodeNames.forEach(function(o){if(o[1].toLowerCase().indexOf(searchKey)>-1) searchResults+="<span class='searchNodeItem' data-lindex="+o[0]+">"+o[1]+"</span>";});
+		$('#popupSearchResult').html(searchResults);
+	});
+
+	$(document).on("click", ".searchNodeItem", function(e){
+		$("#node-"+$scope.nodes[$(this).data("lindex")].id).trigger("click");
+	});
+	/*---------------Search Node Ends Here---------------*/
 
 	/*---------------Data Processing Logic Starts Here---------------*/
 
@@ -72,9 +115,13 @@ mySPA.controller('neuronGraphs2DController', ['$scope', '$http', '$location', '$
 			var userInfo =  JSON.parse(window.localStorage['_UI']);
 			var userid = userInfo.user_id;
 			neuronGraphs2DService.getGraphData(userid).then(function(data){
-				if (data.nodes.length==0){
+				var blockMsg='';
+				if(data=='fail') blockMsg='Internal Error! Please contact admin';
+				else if(data=='Invalid Session') blockMsg='Your session has been expired. Please login again';
+				else if(data.nodes.length==0) blockMsg='No graphs found. Try again later!';
+				if(blockMsg.length>0){
 					unblockUI();
-					blockUI('No Graphs Found. Try Again Later!');
+					blockUI(blockMsg);
 					$timeout(function(){unblockUI();},2000);
 					return false;
 				}
@@ -89,6 +136,7 @@ mySPA.controller('neuronGraphs2DController', ['$scope', '$http', '$location', '$
 				//console.log($scope.nodes);
 				nginit($scope.nodes,data.links);animate();
 			},function(error){
+				unblockUI();
 				console.error("Error:::::::::::::", error)
 			});
 		}
@@ -252,19 +300,17 @@ mySPA.controller('neuronGraphs2DController', ['$scope', '$http', '$location', '$
 	};
 	/*---------------Positioning Logic Ends Here---------------*/
 
-
 	/*---------------UI Logic Starts Here---------------*/
 	var camera,scene,renderer,controls,root,activeNode;
-	var objects=[];
+	$scope.objects=[];
 	var tmpVec1=new THREE.Vector3();
 	var tmpVec2=new THREE.Vector3();
 	var tmpVec3=new THREE.Vector3();
 	var tmpVec4=new THREE.Vector3();
-	var visualizationType=2;
 	var nodeImgDataURL={};
 	var baseSprite=document.createElement('img');
 
-	function nginit(n,l){
+	var nginit = function(n,l){
 		canvDimm=getDimms('#ct-canvas');
 		camera=new THREE.PerspectiveCamera(70,canvDimm[0]/canvDimm[1],1,5000);
 		camera.position.z=1500;
@@ -280,7 +326,7 @@ mySPA.controller('neuronGraphs2DController', ['$scope', '$http', '$location', '$
 		baseSprite.onload=function(){drawGraph(n,l);};
 		baseSprite.src='imgs/ngr-node.png';
 		window.addEventListener('resize',onWindowResize,false);
-	}
+	};
 
 	function render(){
 		renderer.render(scene,camera);
@@ -304,33 +350,7 @@ mySPA.controller('neuronGraphs2DController', ['$scope', '$http', '$location', '$
 	}
 
 	function showAtoms(){
-		var i,o;
-		for(i=0;i<objects.length;i++){
-			o=objects[i];
-			if(o instanceof THREE.CSS3DSprite){
-				o.element.style.display="";
-				o.visible=true;
-			}
-			else{
-				o.element.style.display="none";
-				o.visible=false;
-			}
-		}
-	}
-
-	function showBonds(){
-		var i,o;
-		for(i=0;i<objects.length;i++){
-			o=objects[i];
-			if(o instanceof THREE.CSS3DSprite){
-				o.element.style.display="none";
-				o.visible=false;
-			}
-			else{
-				o.element.style.display="";
-				o.element.style.height=o.userData.bondLengthFull;
-				o.visible=true;
-			}
+		if(o instanceof THREE.CSS3DSprite){
 		}
 	}
 
@@ -340,11 +360,10 @@ mySPA.controller('neuronGraphs2DController', ['$scope', '$http', '$location', '$
 			o=objects[i];
 			o.element.style.display="";
 			o.visible=true;
-			if(!(o instanceof THREE.CSS3DSprite)) o.element.style.height=o.userData.bondLengthShort;
 		}
 	}
 
-	function getNodeImgDataURL(img){
+	var getNodeImgDataURL = function(img){
 		var i,hex,r,g,b,durl,w,h,c,ctx,k,x,y,dImg,m;
 		var dMap={};
 		for (i in nodeColor){
@@ -371,15 +390,16 @@ mySPA.controller('neuronGraphs2DController', ['$scope', '$http', '$location', '$
 			dMap[i]=durl;
 		}
 		return dMap;
-	}
+	};
 
-	function drawGraph(nodes,links){
+	var drawGraph = function(nodes,links){
 		var i,o
-		for(i=0;i<objects.length;i++){
-			o=objects[i];
+		for(i=0;i<$scope.objects.length;i++){
+			o=$scope.objects[i];
 			o.parent.remove(o);
 		}
-		objects=[];
+		delete $scope.objects;
+		$scope.objects=[];
 		nodeImgDataURL=getNodeImgDataURL(baseSprite);
 		var coords3D=new THREE.Vector3();
 		var nImg;
@@ -397,7 +417,7 @@ mySPA.controller('neuronGraphs2DController', ['$scope', '$http', '$location', '$
 			o.matrixAutoUpdate = false;
 			o.updateMatrix();
 			root.add(o);
-			objects.push(o);
+			$scope.objects.push(o);
 			//}
 		});
 		var start=new THREE.Vector3();
@@ -417,12 +437,10 @@ mySPA.controller('neuronGraphs2DController', ['$scope', '$http', '$location', '$
 			tmpVec1.subVectors(end,start);
 			lLen=tmpVec1.length()-50;
 			lo=document.createElement('div');
-			d3.select(lo).datum(e).attr('id','link-1-'+i).attr('class','link-nG').style('height',lLen);
+			d3.select(lo).datum(e).attr('id','link-1-'+i).attr('class','link-nG').style('height',lLen+'px');
 			o = new THREE.CSS3DObject( lo );
 			o.position.copy( start );
 			o.position.lerp( end, 0.5 );
-			o.userData.bondLengthShort = lLen + "px";
-			o.userData.bondLengthFull = ( lLen + 55 ) + "px";
 			axis = tmpVec2.set( 0, 1, 0 ).cross( tmpVec1 );
 			rads = Math.acos( tmpVec3.set( 0, 1, 0 ).dot( tmpVec4.copy( tmpVec1 ).normalize() ) );
 			oM = new THREE.Matrix4().makeRotationAxis( axis.normalize(), rads );
@@ -431,9 +449,9 @@ mySPA.controller('neuronGraphs2DController', ['$scope', '$http', '$location', '$
 			o.matrixAutoUpdate = false;
 			o.updateMatrix();
 			root.add( o );
-			objects.push( o );
+			$scope.objects.push( o );
 			lo = document.createElement( 'div' );
-			d3.select(lo).datum(e).attr('id','link-2-'+i).attr('class','link-nG').style('height',lLen);
+			d3.select(lo).datum(e).attr('id','link-2-'+i).attr('class','link-nG').style('height',lLen+'px');
 			joint = new THREE.Object3D( lo );
 			joint.position.copy( start );
 			joint.position.lerp( end, 0.5 );
@@ -445,64 +463,63 @@ mySPA.controller('neuronGraphs2DController', ['$scope', '$http', '$location', '$
 			o.rotation.y = Math.PI/2;
 			o.matrixAutoUpdate = false;
 			o.updateMatrix();
-			o.userData.bondLengthShort = lLen + "px";
-			o.userData.bondLengthFull = ( lLen + 55 ) + "px";
 			o.userData.joint = joint;
 			joint.add( o );
 			root.add( joint );
-			objects.push( o );
+			$scope.objects.push( o );
 		});
-		switch ( visualizationType ) {
-			case 0: showAtoms(); break;
-			case 1: showBonds(); break;
-			case 2: showAtomsBonds(); break;
-		}
 		render();
-	}
+	};
 
-	function isDisplayed(el){
+	var isDisplayed = function(el){
 		var disp=d3.select(el).style('display');
 		if (disp.toLowerCase()=='none') return false;
 		else return true;
-	}
+	};
 
-	function nodeClick(e){
-		if (activeNode==this){
-			activeNode=undefined;
-			d3.selectAll('.link-nG-visible').classed('link-nG-visible',false);
-			d3.selectAll('.node-nG-dimmed').classed('node-nG-dimmed',false);
-			d3.select('p.proj-info-wrap').html('');
-		}
+	var nodeClick = function(e){
+		if (activeNode==this) clearHighlightNodes();
 		else{
 			activeNode=this;
 			var d=d3.select(this).datum();
 			highlightNodes(d);
 			addInfo(d);
 		}
-	}
+	};
 
-	function addInfo(d){
+	var addInfo = function(d){
 		attrArr="<strong>Group:</strong> "+d.type;
 		for (attrs in d.attributes){ attrArr+= "<br><strong>"+attrs+":</strong> "+d.attributes[attrs]; }
-		d3.select('p.proj-info-wrap').html(attrArr);
-	}
+		d3.select('#window-pi p.proj-info-wrap').html(attrArr);
+	};
 
-	function highlightNodes(d){
+	var highlightNodes = function(d){
+		if(!isDisplayed("#node-"+d.id)){
+			clearHighlightNodes();
+			return;
+		}
 		var neighborArray = [d.id];
 		d3.selectAll(".link-nG").each(function(p) {
 			//if(nodeIdDict[p.start]==d.idx || nodeIdDict[p.end]==d.idx){
 			if((nodeIdDict[p.start]==d.idx && isDisplayed("#node-"+p.end)) || (nodeIdDict[p.end]==d.idx && isDisplayed("#node-"+p.start))){
 				if (neighborArray.indexOf(p.start) == -1) neighborArray.push(p.start);
 				if (neighborArray.indexOf(p.end) == -1) neighborArray.push(p.end);
-				d3.select(this).classed('link-nG-visible',true);
+				d3.select(this).classed('allow-disp',true);
 			}
-			else d3.select(this).classed('link-nG-visible',false);
+			else d3.select(this).classed('allow-disp',false);
 		});
-		console.log(neighborArray);
 		d3.selectAll(".node-nG").each(function(p) {
 			if (neighborArray.indexOf(p.id) > -1) d3.select(this).classed('node-nG-dimmed',false);
 			else d3.select(this).classed('node-nG-dimmed',true);
 		});
-	}
+	};
+
+	var clearHighlightNodes = function(){
+		activeNode=undefined;
+		$('.link-nG.allow-disp').removeClass('allow-disp');
+		$('.node-nG.node-nG-dimmed').removeClass('node-nG-dimmed');
+		$('#window-pi p.proj-info-wrap').empty();
+	};
+
 	/*---------------UI Logic Ends Here---------------*/
 }]);
