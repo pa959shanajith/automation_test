@@ -536,6 +536,7 @@ exports.updateScreen_ICE = function(req, res){
 									if(scrapedobjects == null && scrapedobjects == '' && scrapedobjects == undefined){
 										scrapedobjects=JSON.parse("{}");
 									}
+									
 									if(scrapedobjects.length>0){
 										//this viewString is an array of scraped objects
 										var viewString;
@@ -645,10 +646,11 @@ exports.updateScreen_ICE = function(req, res){
 							inputs = {"query": "getscrapedata", "screenid":screenID,"projectid":projectID};
 							fetchScrapedData(inputs,function(err,scrapedobjects,querycallback){
 								try{
-									//console.log(err,scrapedobjects,querycallback);
+									//console.log(updateData);
 									if(scrapedobjects == null && scrapedobjects == '' && scrapedobjects == undefined){
 										scrapedobjects='{}';
 									}
+									scrapedobjects = JSON.stringify(updateData.getScrapeData);
 									if(scrapedobjects.length>0){
 										var viewString;
 										scrapedobjects=JSON.parse(scrapedobjects);

@@ -334,17 +334,9 @@ exports.userPlugins_Nineteen68 = function(req, res){
 }
 
 exports.logoutUser_Nineteen68 = function (req, res) {
-	var username = req.body.UserName;
-	var index = myserver.sessionCreated.indexOf(username);
-       req.cookies['connect.sid'] = '';
-		req.session.destroy();
-        if(req.session == undefined)
-        {
-			myserver.sessionCreated.splice(index, 1);
-	        console.log("session value header : ",myserver.sessionCreated);
-            res.send('Session Expired');
-        }
+	req.cookies['connect.sid'] = '';
+	req.session.destroy();
+	if(req.session == undefined){
+		res.send('Session Expired');
+	}
 };
-
-//var index = array.indexOf(username); 
-//array.splice(index, 1); 

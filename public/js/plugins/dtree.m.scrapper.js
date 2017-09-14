@@ -148,6 +148,13 @@ var listId;
                                                 } else {
                                                     var flagEdit = true;
                                                     window.localStorage['checkEditWorking'] = "true";
+                                                    if(window.localStorage['_modified']){                                                        
+                                                        var modifiedLS = JSON.parse(window.localStorage['_modified']);
+                                                        modifiedCustNames = modifiedLS;
+                                                    }
+                                                    else{
+                                                        modifiedCustNames = [];
+                                                    }
                                                     // var id = e.target.id.split("_");
                                                     // id = id[1];
                                                     // if(editedList.modifiedCustNames != undefined){
