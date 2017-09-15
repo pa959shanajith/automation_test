@@ -2973,7 +2973,7 @@ input[disabled]{
 .addCustObj{
     background: linear-gradient(to right, #bb9cda, transparent 40%);
     border-radius: 5px;
-	color: blue;
+	/*color: blue;*/
 }
 li.select_all .addCustObj{
     padding-left: 5px;
