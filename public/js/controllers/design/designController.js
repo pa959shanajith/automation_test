@@ -34,6 +34,7 @@ var noSaveTestcase = "false";
 var saveFlag = '';
 var copiedViewstring = false;
 var getIndexOfDeletedObjects = [];
+var newScrapedData;
 window.localStorage['disableEditing'] = "false";
 mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout', 'DesignServices', 'cfpLoadingBar', '$window', function($scope, $http, $location, $timeout, DesignServices, cfpLoadingBar, $window) {
     $("body").css("background", "#eee");
@@ -715,6 +716,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
                     $(".thumb-ic").removeClass("thumb-ic-highlight");
                     if (data != null && data != "getScrapeData Fail." && data != "" && data != " ") {
                         viewString = data;
+
                         newScrapedList = viewString
                         $("#window-scrape-screenshot .popupContent, #window-scrape-screenshotTs .popupContent").empty()
                         $("#window-scrape-screenshot .popupContent, #window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrape"><img id="screenshot" src="data:image/PNG;base64,' + viewString.mirror + '" /></div>')
@@ -2191,13 +2193,17 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
                 //         }
                 //     }
                 // }find("span.ellipsis").text()
-                for (var i = 0; i < viewString.view.length; i++) {
+                if(viewString.view != undefined && viewString.view.length !=undefined)
+                {
+                      for (var i = 0; i < viewString.view.length; i++) {
 						if ($(this).find("input").val().indexOf(viewString.view[i].custname) != -1) {
 							$("#dialog-addObject").modal("hide");
 							openDialog("Add Object", "Object characterstics are same for " + $(this).find("input").val() + "");
 							return false;
 						}
-				}
+				    }
+                }
+              
                 //If no field is empty, proceed to service call
                 flag = "true";
                 $scope.errorMessage = "";
