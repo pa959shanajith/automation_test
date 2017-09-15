@@ -34,6 +34,9 @@ function loadMindmapData(){
 			$(".project-list option[value='" + selectedProject + "']").attr('selected', 'selected');
 			loadMindmapData1(); 
 			$(".project-list").change(function () {
+			//Mindmap clear search box on selecting different project
+				$('#searchModule-create').val('');
+				$('#searchModule-assign').val('');
 				selectedProject=$(".project-list").val();
             //alert($(".project-list").val());
 				if($("img.iconSpaceArrow").hasClass("iconSpaceArrowTop"))
@@ -1331,6 +1334,7 @@ var validNodeDetails = function(value,p){
 
 
 var inpChange = function(e){
+	console.log('inpchange executed')
 	var inp=d3.select('#ct-inpAct');
 	var val=inp.property('value');
 	if(val=='Screen_0' || val=='Scenario_0' || val=='Testcase_0' ){

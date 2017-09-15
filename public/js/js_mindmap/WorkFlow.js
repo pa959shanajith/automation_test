@@ -35,6 +35,7 @@ function loadMindmapData_W(){
 			loadMindmapData1_W(); 
 			$("#selectProjectEtem").change(function () {
             //alert($(".project-list").val());
+				$('#eteSearchModules').val('')
 				if($("img.iconSpaceArrow").hasClass("iconSpaceArrowTop"))
 				{
 					$("img.iconSpaceArrow").removeClass("iconSpaceArrowTop");
