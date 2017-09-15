@@ -29,7 +29,7 @@ var parseData = function(data){
 	var rootIndex=-1;
 	var nodeTypes={"DOMAINS_NG":"Domain","PROJECTS_NG":"Project","RELEASES_NG":"Release","CYCLES_NG":"Cycle","TESTSUITES_NG":"TestSuite","TESTSCENARIOS_NG":"TestScenario","TESTCASES_NG":"TestCase","SCREENS_NG":"Screen"};
 	var nc=0,lc=0,nodes=[],links=[],nodeIdDict={},linkIdDict={};
-	var attrDict={"browser":"Browser Name","comments":"Comments","complexity":"Complexity","createdby":"Created By","createdon":"Created On","cyclename":"Name","domainname":"Name","endtime":"End Time","executedtime":"Executed Time","firstname":"First Name","modifiedby":"Modified By","modifiedon":"Modified On","name":"Name","objecttype":"Object Type","projectname":"Name","projecttypename":"Type","releasename":"Name","risk":"Risk","screenname":"Name","starttime":"Start Time","status":"Status","steps":"Steps","testsuitename":"Name","testscenarioname":"Name","testcasename":"Name","time":"Time"};
+	var attrDict={"complexity":"Complexity","createdby":"Created By","cyclename":"Name","domainname":"Name","projectname":"Name","releasename":"Name","risk":"Risk","screenname":"Name","testsuitename":"Name","testscenarioname":"Name","testcasename":"Name"};
 	data.forEach(function(row){
 		d=row.graph;
 		d.nodes.forEach(function (n) {
@@ -116,20 +116,24 @@ exports.getGraphData = function(req, res){
 				else{
 					var jsonData=JSON.parse(result);
 					var pData=parseData(jsonData[0].data);
-					var coords=get2DCoordsData(pData.nodes[pData.root]);
-					var cData=cleanData(pData.nodes);
-					pData['coords2D']=coords;
-					res.status(status).send(pData);
+					if(pData.nodes.length==0) res.status(status).send({"err":true,"ecode":"DB_NOT_FOUND","msg":"Neuron Graphs DB not found!"});
+					else{
+						var coords=get2DCoordsData(pData.nodes[pData.root]);
+						var cData=cleanData(pData.nodes);
+						pData['coords2D']=coords;
+						pData['err']=false;
+						res.status(status).send(pData);
+					}
 				}
 			});
 		}
 		else{
-			res.send("Invalid Session");
+			res.send({"err":true,"ecode":"INVALID_SESSION","msg":"Your session has been expired. Please login again"});
 		}
 	}
 	catch(exception){
 		console.log(exception);
-		res.send("fail");
+		res.send({"err":true,"ecode":"FAIL","msg":"Internal Error! Please contact admin"});
 	}
 };
 

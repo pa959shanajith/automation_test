@@ -33,7 +33,22 @@ mySPA.controller('neuronGraphs2DController', ['$scope', '$http', '$location', '$
 
 		clearData();
 		blockUI('Please wait while graphs are being fetched...');
-		loadGraphData()
+		addLegends();
+		loadGraphData();
+	}
+
+	var addLegends = function(){
+		var i=0;
+		//var nodeTypeList=Object.keys(nodeColor);
+		//var canvX=getDimms('#ct-canvas')[0]-50;
+		//var y=Math.round(nodeTypeList.length/Math.floor(canvX/100));
+		var u=d3.select('#ct-canvas').append('svg').attr('id','ct-legendBox').append('g').attr('transform','translate(10,10)');
+		for(e in nodeColor){
+			t=u.append('g');
+			t.append('circle').attr('style','fill:'+nodeColor[e]).attr('cx',i).attr('cy',0).attr('r',10);
+			t.append('text').attr('style','font-size:12px').attr('x',i+15).attr('y',3).text(e);
+			i+=100;
+		}
 	}
 
 	var clearData = function(){
@@ -116,14 +131,11 @@ mySPA.controller('neuronGraphs2DController', ['$scope', '$http', '$location', '$
 			var userInfo =  JSON.parse(window.localStorage['_UI']);
 			var userid = userInfo.user_id;
 			neuronGraphs2DService.getGraphData(userid).then(function(data){
-				var blockMsg='';
-				if(data=='fail') blockMsg='Internal Error! Please contact admin';
-				else if(data=='Invalid Session') blockMsg='Your session has been expired. Please login again';
-				else if(data.nodes.length==0) blockMsg='No graphs found. Try again later!';
-				if(blockMsg.length>0){
+				if(data.err){
 					unblockUI();
-					blockUI(blockMsg);
-					$timeout(function(){unblockUI();},2000);
+					blockUI(data.msg);
+					$timeout(function(){unblockUI();},3000);
+					console.error(data.ecode);
 					return false;
 				}
 				$("#ct-canvas").show();
