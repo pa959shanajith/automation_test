@@ -1,4 +1,4 @@
-var activeNode,childNode,uNix,uLix,node,link,dNodes,dLinks,allMMaps,temp,rootIndex,faRef,nCount,scrList,tcList,mapSaved,zoom,cSpan,cScale,taskAssign,releaseResult;
+var activeNode,childNode,uNix,uLix,node,link,dNodes,dLinks,allMMaps,temp,rootIndex,faRef,nCount,scrList,tcList,mapSaved,zoom,cSpan,cScale,taskAssign,releaseResult,selectedProject;
 //unassignTask is an array to store whose task to be deleted
 var deletednode=[],unassignTask=[],deletednode_info=[];
 var userInfo =  JSON.parse(window.localStorage['_UI']);
@@ -22,7 +22,7 @@ function loadMindmapData(){
                    $("#ct-moduleBox,.tabAssign").addClass("ct-expand-module");
                 }
 			result1=JSON.parse(result);
-			var selectedProject=$(".project-list").val();
+			//selectedProject=$(".project-list").val();
 			$(".project-list").empty();
 			for(i=0; i<result1.projectId.length && result1.projectName.length; i++){
 				$('.project-list').append("<option app-type='"+result1.appType[i]+"' data-id='"+result1.projectName[i]+"' value='"+result1.projectId[i]+"'>"+result1.projectName[i]+"</option>");	
@@ -34,6 +34,10 @@ function loadMindmapData(){
 			$(".project-list option[value='" + selectedProject + "']").attr('selected', 'selected');
 			loadMindmapData1(); 
 			$(".project-list").change(function () {
+			//Mindmap clear search box on selecting different project
+				$('#searchModule-create').val('');
+				$('#searchModule-assign').val('');
+				selectedProject=$(".project-list").val();
             //alert($(".project-list").val());
 				if($("img.iconSpaceArrow").hasClass("iconSpaceArrowTop"))
 				{
@@ -1330,6 +1334,7 @@ var validNodeDetails = function(value,p){
 
 
 var inpChange = function(e){
+	console.log('inpchange executed')
 	var inp=d3.select('#ct-inpAct');
 	var val=inp.property('value');
 	if(val=='Screen_0' || val=='Scenario_0' || val=='Testcase_0' ){
@@ -1348,7 +1353,7 @@ var inpChange = function(e){
 		var t=p.attr('data-nodetype');
 	if(!d3.select('#ct-inpSugg').classed('no-disp') && temp && temp.length>0) return;
 	if(dNodes[pi].id_n){
-		dNodes[pi].original_name=pt.text();
+		dNodes[pi].original_name=pt.attr('title');
 		dNodes[pi].rnm=!0;
 	} 
 	if(t=='screens' && scrList[inp.attr('data-nodeid')]!==undefined){

@@ -4,6 +4,7 @@ p,a,img,text,span,.noselect{-webkit-touch-callout:none;-webkit-user-select:none;
 .bg-blank{background:transparent!important}
 .no-disp{display:none!important}
 .no-access{cursor:not-allowed!important}
+.allow-disp{display:block!important}
 #ct-main{position:absolute;padding:5px;left:6px;height:100%;width:calc(100% - 12px);box-sizing:border-box;/*z-index:-1!important*/}
 #ct-main.leftBarOpen{left:166px;width:calc(100% - 172px)}
 #ct-main.rightBarOpen{left:6px;width:calc(100% - 96px)}
@@ -33,7 +34,6 @@ p,a,img,text,span,.noselect{-webkit-touch-callout:none;-webkit-user-select:none;
 
 /* Neuron Canvas Starts */
 .link-nG{width:5px;height:10px;background:#757575;display:none}
-.link-nG-visible{display:block!important}
 .node-nG-dimmed{opacity:0.25!important}
 #ct-canvas{background:#f5f5f5;background:-moz-radial-gradient(center,ellipse cover,rgba(210,212,214,1) 0,rgba(255,255,255,1) 100%);background:-webkit-gradient(radial,center center,0,center center,100%,color-stop(0,rgba(210,212,214,1)),color-stop(100%,rgba(255,255,255,1)));background:-webkit-radial-gradient(center,ellipse cover,rgba(210,212,214,1) 0,rgba(255,255,255,1) 100%);background:-o-radial-gradient(center,ellipse cover,rgba(210,212,214,1) 0,rgba(255,255,255,1) 100%);background:-ms-radial-gradient(center,ellipse cover,rgba(210,212,214,1) 0,rgba(255,255,255,1) 100%);background:radial-gradient(ellipse at center,rgba(210,212,214,1) 0,rgba(255,255,255,1) 100%);margin:0;overflow:hidden}
 /*#ct-canvas{background:#2b2d30;background:-moz-radial-gradient(center,ellipse cover,rgba(43,45,48,1) 0,rgba(0,0,0,1) 100%);background:-webkit-gradient(radial,center center,0,center center,100%,color-stop(0,rgba(43,45,48,1)),color-stop(100%,rgba(0,0,0,1)));background:-webkit-radial-gradient(center,ellipse cover,rgba(43,45,48,1) 0,rgba(0,0,0,1) 100%);background:-o-radial-gradient(center,ellipse cover,rgba(43,45,48,1) 0,rgba(0,0,0,1) 100%);background:-ms-radial-gradient(center,ellipse cover,rgba(43,45,48,1) 0,rgba(0,0,0,1) 100%);background:radial-gradient(ellipse at center,rgba(43,45,48,1) 0,rgba(0,0,0,1) 100%);margin:0;overflow:hidden}

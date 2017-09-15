@@ -33,6 +33,8 @@ var reusedTestcaseNames = false;
 var noSaveTestcase = "false";
 var saveFlag = '';
 var copiedViewstring = false;
+var getIndexOfDeletedObjects = [];
+var newScrapedData;
 window.localStorage['disableEditing'] = "false";
 mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout', 'DesignServices', 'cfpLoadingBar', '$window', function($scope, $http, $location, $timeout, DesignServices, cfpLoadingBar, $window) {
     $("body").css("background", "#eee");
@@ -685,7 +687,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
     //Populating Saved Scrape Data
     $scope.getScrapeData = function() {
         blockUI("Loading...");
-		window.localStorage['_modified'] = "";
+		//window.localStorage['_modified'] = "";
 		modifiednames = [];
         $("#enableAppend").prop("checked", false)
         window.localStorage['checkEditWorking'] = "false";
@@ -714,6 +716,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
                     $(".thumb-ic").removeClass("thumb-ic-highlight");
                     if (data != null && data != "getScrapeData Fail." && data != "" && data != " ") {
                         viewString = data;
+
                         newScrapedList = viewString
                         $("#window-scrape-screenshot .popupContent, #window-scrape-screenshotTs .popupContent").empty()
                         $("#window-scrape-screenshot .popupContent, #window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrape"><img id="screenshot" src="data:image/PNG;base64,' + viewString.mirror + '" /></div>')
@@ -1714,6 +1717,47 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
                 delList.deletedXpath = deletedCustPath;
                 //console.log(deletedCustNames);
             }
+
+            //updating renamed objects
+            var tempModifiednames;
+            if(window.localStorage['_modified']){
+                modifiednames = JSON.parse(window.localStorage['_modified']);
+                tempModifiednames = JSON.parse(window.localStorage['_modified']);
+            }
+            if (eaCheckbox) {
+                if(copiedViewstring != true){
+                    for (var j = 0; j < viewString.view.length; j++) {
+                        newScrapedList.view.push(viewString.view[j]);
+                    }
+                    copiedViewstring = true;
+                }
+            }
+            if(modifiednames.length > 0){
+                var mdName;
+                for(var i=0; i<modifiednames.length; i++){
+                    mdName = modifiednames[i].split("^^");
+                    if (eaCheckbox){
+                        if(mdName[1] != undefined){
+                            if(newScrapedList.view[mdName[1]])
+                                newScrapedList.view[mdName[1]].custname = mdName[0];
+                            tempModifiednames[i] = mdName[0];
+                            //tempModifiednames = tempModifiednames.filter(function(n) {return n != null});
+                            window.localStorage['_modified'] = JSON.stringify(tempModifiednames)
+                        }
+                    }
+                    else{
+                        if(mdName[1] != undefined){
+                            if(viewString.view[mdName[1]])                         
+                                viewString.view[mdName[1]].custname = mdName[0];
+                            tempModifiednames[i] = mdName[0];
+                            //tempModifiednames = tempModifiednames.filter(function(n) {return n != null});
+                            window.localStorage['_modified'] = JSON.stringify(tempModifiednames)
+                        }
+                    }
+                }
+            }
+            //updating renamed objects ends
+
             //console.log("Delete", viewString);
             var screenId = tasks.screenId;
             var screenName = tasks.screenName;
@@ -1752,27 +1796,30 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
                 tempModifiednames = JSON.parse(window.localStorage['_modified']);
             }
             if (eaCheckbox) {
-                for (var j = 0; j < viewString.view.length; j++) {
-                    newScrapedList.view.push(viewString.view[j]);
+                if(copiedViewstring != true){
+                    for (var j = 0; j < viewString.view.length; j++) {
+                        newScrapedList.view.push(viewString.view[j]);
+                    }
+                    copiedViewstring = true;
                 }
-                copiedViewstring = true;
-            }
-            
+            }            
             if(modifiednames.length > 0){
                 var mdName;
                 for(var i=0; i<modifiednames.length; i++){
                     mdName = modifiednames[i].split("^^");
                     if (eaCheckbox){
                         if(mdName[1] != undefined){
-                            newScrapedList.view[mdName[1]].custname = mdName[0];
+                            if(newScrapedList.view[mdName[1]])
+                                newScrapedList.view[mdName[1]].custname = mdName[0];
                             tempModifiednames[i] = mdName[0];
                             //tempModifiednames = tempModifiednames.filter(function(n) {return n != null});
                             window.localStorage['_modified'] = JSON.stringify(tempModifiednames)
                         }
                     }
                     else{
-                        if(mdName[1] != undefined){                            
-                            viewString.view[mdName[1]].custname = mdName[0];
+                        if(mdName[1] != undefined){
+                            if(viewString.view[mdName[1]])                           
+                                viewString.view[mdName[1]].custname = mdName[0];
                             tempModifiednames[i] = mdName[0];
                             //tempModifiednames = tempModifiednames.filter(function(n) {return n != null});
                             window.localStorage['_modified'] = JSON.stringify(tempModifiednames)
@@ -1795,7 +1842,8 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
                     $.each($("input[type=checkbox].checkall:checked"), function() {
                         for (var i = 0; i < newScrapedList.view.length; i++) {
                             if ($(this).parents("li").data("xpath") == newScrapedList.view[i].xpath && ($(this).parent('.objectNames').siblings(".ellipsis").text().trim().replace('/\s/g', ' ')).replace('\n', ' ') == newScrapedList.view[i].custname.trim()) {
-                                newScrapedList.view.splice(newScrapedList.view.indexOf(newScrapedList.view[i]), 1);
+                                //newScrapedList.view.splice(newScrapedList.view.indexOf(newScrapedList.view[i]), 1);
+                                getIndexOfDeletedObjects.push(newScrapedList.view.indexOf(newScrapedList.view[i]))
                                 $(this).parents("li.select_all").remove();
                                 break;
                             }
@@ -1806,7 +1854,8 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
                     $.each($("input[type=checkbox].checkall:checked"), function() {
                         for (var i = 0; i < viewString.view.length; i++) {
                             if ($(this).parents("li").data("xpath") == viewString.view[i].xpath && ($(this).parent('.objectNames').siblings(".ellipsis").text().trim().replace('/\s/g', ' ')).replace('\n', ' ') == viewString.view[i].custname.trim()) {
-                                viewString.view.splice(viewString.view.indexOf(viewString.view[i]), 1);
+                                //viewString.view.splice(viewString.view.indexOf(viewString.view[i]), 1);
+                                getIndexOfDeletedObjects.push(viewString.view.indexOf(viewString.view[i]))
                                 $(this).parents("li.select_all").remove();
                                 break;
                             }
@@ -2144,13 +2193,17 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
                 //         }
                 //     }
                 // }find("span.ellipsis").text()
-				     for (var i = 0; i < viewString.view.length; i++) {
+                if(viewString.view != undefined && viewString.view.length !=undefined)
+                {
+                      for (var i = 0; i < viewString.view.length; i++) {
 						if ($(this).find("input").val().indexOf(viewString.view[i].custname) != -1) {
 							$("#dialog-addObject").modal("hide");
 							openDialog("Add Object", "Object characterstics are same for " + $(this).find("input").val() + "");
 							return false;
 						}
-					 }
+				    }
+                }
+              
                 //If no field is empty, proceed to service call
                 flag = "true";
                 $scope.errorMessage = "";
@@ -2568,10 +2621,10 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			// }
 			// console.log("Modified strings------",modifiednames);
             //validateDuplicateObjects
-            if ($(".ellipsis").length > 0) {
-                $.each($("span.ellipsis"), function() {
+            if ($("#scraplist .ellipsis").length > 0) {
+                $.each($("#scraplist span.ellipsis"), function() {
                     var count = 0;
-                    if ($(this).parent().parent().attr("data-xpath") != "") {
+                    if ($(this).parent().parent().attr("data-xpath") != "" && $(this).parent().parent().attr("data-xpath") != undefined) {
                         xpath = $(this).parent().parent().attr("data-xpath");
 						if(appType == 'Web' || appType == 'MobileWeb'){
 							xpath = xpath.split(";")[2];
@@ -2673,12 +2726,16 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 			for(var i=0; i<modifiednames.length; i++){
 				mdName = modifiednames[i].split("^^");
 				if (eaCheckbox){
-                    if(mdName[1])
-                        newScrapedList.view[mdName[1]].custname = mdName[0];
+                    if(mdName[1]){
+                        if(newScrapedList.view[mdName[1]])
+                            newScrapedList.view[mdName[1]].custname = mdName[0];
+                    }
                 }
 				else{
-                    if(mdName[1])
-                        viewString.view[mdName[1]].custname = mdName[0];
+                    if(mdName[1]){
+                        if(viewString.view[mdName[1]])
+                            viewString.view[mdName[1]].custname = mdName[0];
+                    }
                 }
 			}
 		}
@@ -2787,9 +2844,26 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
         //End of Filter Duplicate Values in ViewString based on custname
         window.localStorage['disableEditing'] = "false";
         //var tasks = JSON.parse(window.localStorage['_TJ']);
-        var tasks = JSON.parse(window.localStorage['_CT'])
-        if (eaCheckbox) var getScrapeData = JSON.stringify(newScrapedList);
-        else var getScrapeData = JSON.stringify(viewString);
+        var tasks = JSON.parse(window.localStorage['_CT']);
+        var getScrapeData;
+        if (eaCheckbox){
+            for(var i=0; i<getIndexOfDeletedObjects.length;i++){
+                delete newScrapedList.view[getIndexOfDeletedObjects[i]];
+                //newScrapedList.view.splice(getIndexOfDeletedObjects[i], 1);
+            }
+            newScrapedList.view =  newScrapedList.view.filter(function(n){ return n != null });
+            getScrapeData = JSON.stringify(newScrapedList);
+            console.log(newScrapedList.view)
+        }
+        else{
+            for(var i=0; i<getIndexOfDeletedObjects.length;i++){
+                delete viewString.view[getIndexOfDeletedObjects[i]];
+                //viewString.view.splice(getIndexOfDeletedObjects[i], 1);
+            }
+            viewString.view =  viewString.view.filter(function(n){ return n != null });
+            getScrapeData = JSON.stringify(viewString);
+            console.log(viewString.view)
+        }
         var screenId = tasks.screenId;
         var screenName = tasks.screenName;
         var projectId = tasks.projectId;
@@ -2811,8 +2885,9 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
                 }
                 if (data == "success") {
 					eaCheckbox = false;
-                    window.localStorage['_modified'] = "";
+                    //window.localStorage['_modified'] = "";
 					modifiednames = [];
+                    getIndexOfDeletedObjects = [];
                     copiedViewstring = false;
                     //enableScreenShotHighlight = true;
                     localStorage.removeItem("_modified");
