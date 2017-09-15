@@ -301,6 +301,7 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
     }
 
     function parseRelations(obj){
+      console.log(obj);
       for(var i = $scope.level; i>=1; i--){
         var levelObjects = obj[i];
         for(var k = 0; k < levelObjects.length; k++){
@@ -362,7 +363,14 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
       //trans
       var scale =1;
       var rescale = function()  {
-
+        //console.log(d3.event.scale);
+    //    if (d3.event.translate[0] !=  trans1[0]) {
+    //      d3.event.translate[0] = d3.event.translate[0] + trans1[0];
+    //     }
+    //    if (d3.event.translate[1] != trans1[1]) {
+      //      d3.event.translate[1] = d3.event.translate[1] + trans1[1];
+      //  }
+      //  d3.event.scale = d3.event.scale + scale1 - 1 ;
         zoomReset = false;
         trans=d3.event.translate;
         scale=d3.event.scale;
@@ -460,17 +468,20 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
       	nodes = flatten(root),
       	links = d3.layout.tree().links(nodes);
         //console.log(links);
+        console.log(activeD);
 
         for(i = 0; i < links.length -1 ; i ++ ){
           d = links[i];
           var isFound = true;
           if(d.target.type == "duplicate"|| d.target.type == "reverse"){
+            console.log("yes duplicate");
             for(var j = 0; j< links.length; j++){
               if(links[j].source.name == d.target.name  ){
                 var json= {}
                 isFound =false;
                 d.target.status = links[j].source.status;
                 if(d.target.parentsAll.indexOf(d.target.name) >= 0){
+                  console.log("i am a reverse link");
                   d.target.type = "reverse";
                   json["source"] = d.source;
                   json["target"] = links[j].source;
@@ -490,7 +501,9 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
                     break;
                 }
 
+              //  for(var )
             }else if(links[j].target.name == d.target.name && links[j].target.isTerminal && (links[j].target.type == "page" || links[j].target.type == "subdomain")){
+                 console.log("duplicate");
                  isFound =false;
                 //       d.target.status = links[j].target.status;
                        var json = {};
@@ -502,6 +515,7 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
                        links.push(json);
                      break;
               }else if(links[j].target.name == d.target.name  && links[j].target.nodeOpen == false && (links[j].target.type == "page" || links[j].target.type == "subdomain")){
+                console.log("duplicate");
                //       d.target.status = links[j].target.status;
                isFound =false;
                       var json = {};
@@ -518,6 +532,44 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
               d.target.type = "page"
             }
           }
+          //
+          // if(d.target.type == "duplicate"){
+          // //  console.log("target", d.target.name);
+          //   for(j = 0; j < links.length; j ++ ){
+          //     if(links[j].source.name == d.target.name ){
+          //       count1 ++;
+          //       var json = {};
+          //       if (d.target.parentsAll.indexOf(d.target.name) >= 0) {
+          //         console.log("hello");
+          //         d.target.type = "reverse";
+          //         json["source"] = d.source;
+          //         json["target"] = links[j].source;
+          //         json["reverse"] = "reverse_T";
+          //       }else{
+          //         json["source"] = d.source;
+          //         json["target"] = links[j].source;
+          //         json["duplicate"] = "duplicate";
+          //       }
+          //       //d.target.lost = true;
+          //
+          //       links.splice(i, 1);
+          //       i--;
+          //       links.push(json);
+          //       break;
+          //     }else if(links[j].target.name == d.target.name && links[j].target.isTerminal && links[j].target.type != "reverse" && links["reverse"] != "reverse" ){
+          //       var json = {};
+          //       json["source"] = d.source;
+          //       json["target"] = links[j].target;
+          //       json["reverse"] = "duplicate";
+          //       links.splice(i, 1);
+          //       i--;
+          //       links.push(json);
+          //       break;
+          //     }else{
+          //       //d.target.lost = false;
+          //     }
+          //   }
+          // }
         }
         //console.log(count1);
       	update();
@@ -544,9 +596,11 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
         node = node.data(nodes, function(d) { return d.id; });
 
         node.exit().remove();
+      //  console.log(node.exit());
 
       var nodeEnter = node.enter().append("g")
           .attr("class", function(d){
+            // console.log("type", d.type);
              if(d.type == "duplicate" || d.type == "reverse")
               return  "node hidden";
              return  "node";
@@ -559,6 +613,7 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
 
         nodeEnter.append("image")
       	.attr("xlink:href", function(d) {
+          // //  console.log("source", d.source.name);
 
           if (d.status!=200) {
             if(d.type == "subdomain"){
@@ -571,6 +626,7 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
 
           if(d.isTerminal == true){
           //  console.log(d, d.status , d.name);
+
             if (d.status != 200 ) {
               if(d.type == "subdomain"){
                 return "imgs/wc-red-sq.png"
@@ -584,6 +640,7 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
               }
               return "imgs/wc-cr.png"; // terminal node
             }
+
       		}else if(d.nodeOpen == false){
       			return "imgs/wc-p-cr.png"; // collapsed node
       		}else if (!d.children && !d._children) {
@@ -591,8 +648,9 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
           }else{
       			return "imgs/wc-m-cr.png";
       		}
-      	});
-
+      	})
+          //attr("rx", 2)
+      	//.attr("ry", 2)
         .attr("width", 25)
       	.attr("height", 25)
       	.append("svg:title")
@@ -609,6 +667,7 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
               }
               return "imgs/circle-128.png"
             }
+
 
             if(d.isTerminal == true){
               // console.log(d, d.status , d.name);
@@ -635,6 +694,7 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
          		}
          	})
 
+
         nodeEnter.transition()
           .attr("width", function(d) { return d.children ? 4.5 : 3.5 ; })
       	  .attr("height", function(d) { return d.children ? 4.5 :3.5 ; });
@@ -643,6 +703,7 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
             .attr("dy", ".35em")
       	//  .text(function(d) { return d._children ? d.name : d.children ? d.name : ""; });
         if(count11 == 0){
+          console.log("sa");
         	count11++;
         		startAgain();
         	}
@@ -671,6 +732,7 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
           neighborArray.indexOf(p.target) == -1 ? neighborArray.push(p.target) : null;
           linkArray.push(p);
         })
+//        neighborArray = d3.set(neighborArray).keys();
         return {nodes: neighborArray, links: linkArray};
       }
 
@@ -757,14 +819,18 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
       			return "#66aadd" // second tier node
       		}
       	}
+
+
       }
 
       function toggle(d, check) {
+        //console.log("losssssssssssssst", d.lost);
         //console.log(d.children)
         if (d.children) {
       	  d.nodeOpen = false;
           d._children = d.children;
           d.children = null;
+
       } else {
       	  d.nodeOpen = true;
           d.children = d._children;
@@ -779,6 +845,8 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
       function click(d){
         console.log(activeD)
       // if (d3.event.defaultPrevented) return; // ignore drag
+        console.log();
+      //  console.log(d.parentsAll.indexOf(activeD[activeD.length-1].name))
         if (activeD.length > 0 && d.name != activeD[activeD.length-1].name ) {
           var i = activeD.length-1;
           while(i>=0){
