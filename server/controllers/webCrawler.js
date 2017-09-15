@@ -32,7 +32,6 @@ exports.getCrawlResults = function(req, res){
              mySocket.on('result_web_crawler', function (value) {
               // req.session.cookie.expires = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes 
                try{
-                //  console.log(value);
                   var mySocketUI =  myserver.allSocketsMapUI[name];
                   mySocketUI.emit("newdata", JSON.parse(value));
                 }catch(exception){
@@ -56,10 +55,10 @@ exports.getCrawlResults = function(req, res){
                   return res.status(500).json({ success: false, data: err});
                 }
              });
-
-             mySocket.on('disconnect', function(){
-               return res.send("localServerDisconnected")
-             });
+             //
+            //  mySocket.on('disconnect', function(){
+            //    return res.send("localServerDisconnected")
+            //  });
           }else{
             return res.send("Invalid Session");
           }
