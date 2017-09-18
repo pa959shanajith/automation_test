@@ -1392,8 +1392,8 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
                     }
                     if (data == "unavailableLocalServer") {
                         unblockUI();
-                        eaCheckbox = false;
-                        $("#enableAppend").prop('checked',false);
+                        //eaCheckbox = false;
+                        //$("#enableAppend").prop('checked',false);
                         openDialog("Scrape Screen", "ICE Engine is not available. Please run the batch file and connect to the Server.");
                         return false
                     }
