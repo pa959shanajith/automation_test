@@ -91,7 +91,7 @@ if (cluster.isMaster) {
         limit: '10mb',
         extended: true
     }));
-   // app.use(morgan('combined'))
+    app.use(morgan('combined'))
 
     app.use(cookieParser());
     app.use(sessions({
@@ -132,13 +132,8 @@ if (cluster.isMaster) {
 
     app.get('/', function(req, res) {
             res.clearCookie('connect.sid');
-            //
-            // req.session.cookie._expires = new Date();
-            var username = req.session.username;
-            console.log("username = ", username);
-            console.log("req url", req.url);
             req.session.destroy();
-            
+
             res.sendFile("index.html", {
                 root: __dirname + "/public/"
             });
@@ -175,13 +170,12 @@ if (cluster.isMaster) {
     });
 
     function sessionCheck(req, res, roles) {
-        console.log("session check ", req.url)
       if (!req.session.defaultRole || roles.indexOf(req.session.defaultRole) >=0)
         {
             req.session.destroy(); res.status(401).send('<br><br>Your session has been expired.Please <a href="/">Login</a> Again');
         }else{
             if (req.cookies['connect.sid'] && req.cookies['connect.sid'] != undefined) {
-                
+
                  res.sendFile("index.html", { root: __dirname + "/public/" });
                 } else {
                      req.session.destroy();

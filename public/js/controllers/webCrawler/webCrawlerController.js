@@ -246,7 +246,6 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
     }
 
     $scope.createDot = function (x, y, obj){
-      //console.log("in create dot");
       var parentElem = document.createElement("div");
     	var elem = document.createElement("div");
       var size= Math.floor((Math.random() * 3) + 1);
@@ -268,10 +267,8 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
     	parentElem.appendChild(elem);
     	parentElem.appendChild(text);
     	document.getElementById("progress-canvas").appendChild(parentElem);
-      //console.log(parentElem);
 
     	text.style.visibility = "hidden";
-      //console.log(text.offsetWidth);
       text.style.left = "-"+(text.offsetWidth/2)+"px";
       text.style.position="absolute";
     	elem.addEventListener("mouseover", onDotMouseOver, false);
@@ -287,16 +284,13 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
     }
 
     function createLevelObject(arr){
-      var modified = {
-
-      };
-      for(var i = 0 ; i<= $scope.level; i++){
-        modified[i] = [];
-      }
+      var modified = {};
       for(var i = 0 ; i< arr.length; i++){
+        if (!modified[arr[i].level]) {
+          modified[arr[i].level] = []
+        }
         modified[arr[i].level].push(arr[i]);
       }
-      //console.log("modified");
       return modified;
     }
 
@@ -363,14 +357,6 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
       //trans
       var scale =1;
       var rescale = function()  {
-        //console.log(d3.event.scale);
-    //    if (d3.event.translate[0] !=  trans1[0]) {
-    //      d3.event.translate[0] = d3.event.translate[0] + trans1[0];
-    //     }
-    //    if (d3.event.translate[1] != trans1[1]) {
-      //      d3.event.translate[1] = d3.event.translate[1] + trans1[1];
-      //  }
-      //  d3.event.scale = d3.event.scale + scale1 - 1 ;
         zoomReset = false;
         trans=d3.event.translate;
         scale=d3.event.scale;
@@ -442,8 +428,6 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
         }
     	});
 
-
-
       var link = svg.selectAll(".link"),
           node = svg.selectAll(".node");
 
@@ -467,21 +451,17 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
       function restart(){
       	nodes = flatten(root),
       	links = d3.layout.tree().links(nodes);
-        //console.log(links);
-        console.log(activeD);
 
         for(i = 0; i < links.length -1 ; i ++ ){
           d = links[i];
           var isFound = true;
           if(d.target.type == "duplicate"|| d.target.type == "reverse"){
-            console.log("yes duplicate");
             for(var j = 0; j< links.length; j++){
               if(links[j].source.name == d.target.name  ){
                 var json= {}
                 isFound =false;
                 d.target.status = links[j].source.status;
                 if(d.target.parentsAll.indexOf(d.target.name) >= 0){
-                  console.log("i am a reverse link");
                   d.target.type = "reverse";
                   json["source"] = d.source;
                   json["target"] = links[j].source;
@@ -500,78 +480,35 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
                     links.push(json)
                     break;
                 }
-
-              //  for(var )
             }else if(links[j].target.name == d.target.name && links[j].target.isTerminal && (links[j].target.type == "page" || links[j].target.type == "subdomain")){
-                 console.log("duplicate");
                  isFound =false;
                 //       d.target.status = links[j].target.status;
-                       var json = {};
-                       json["source"] = d.source;
-                       json["target"] = links[j].target;
-                       json["reverse"] = "duplicate";
-                       links.splice(i, 1);
-                       i--;
-                       links.push(json);
-                     break;
+                 var json = {};
+                 json["source"] = d.source;
+                 json["target"] = links[j].target;
+                 json["reverse"] = "duplicate";
+                 links.splice(i, 1);
+                 i--;
+                 links.push(json);
+                 break;
               }else if(links[j].target.name == d.target.name  && links[j].target.nodeOpen == false && (links[j].target.type == "page" || links[j].target.type == "subdomain")){
-                console.log("duplicate");
                //       d.target.status = links[j].target.status;
-               isFound =false;
-                      var json = {};
-                      json["source"] = d.source;
-                      json["target"] = links[j].target;
-                      json["reverse"] = "duplicate";
-                      links.splice(i, 1);
-                      i--;
-                      links.push(json);
-                    break;
+                  isFound =false;
+                  var json = {};
+                  json["source"] = d.source;
+                  json["target"] = links[j].target;
+                  json["reverse"] = "duplicate";
+                  links.splice(i, 1);
+                  i--;
+                  links.push(json);
+                  break;
               }
             }
             if (isFound) {
               d.target.type = "page"
             }
           }
-          //
-          // if(d.target.type == "duplicate"){
-          // //  console.log("target", d.target.name);
-          //   for(j = 0; j < links.length; j ++ ){
-          //     if(links[j].source.name == d.target.name ){
-          //       count1 ++;
-          //       var json = {};
-          //       if (d.target.parentsAll.indexOf(d.target.name) >= 0) {
-          //         console.log("hello");
-          //         d.target.type = "reverse";
-          //         json["source"] = d.source;
-          //         json["target"] = links[j].source;
-          //         json["reverse"] = "reverse_T";
-          //       }else{
-          //         json["source"] = d.source;
-          //         json["target"] = links[j].source;
-          //         json["duplicate"] = "duplicate";
-          //       }
-          //       //d.target.lost = true;
-          //
-          //       links.splice(i, 1);
-          //       i--;
-          //       links.push(json);
-          //       break;
-          //     }else if(links[j].target.name == d.target.name && links[j].target.isTerminal && links[j].target.type != "reverse" && links["reverse"] != "reverse" ){
-          //       var json = {};
-          //       json["source"] = d.source;
-          //       json["target"] = links[j].target;
-          //       json["reverse"] = "duplicate";
-          //       links.splice(i, 1);
-          //       i--;
-          //       links.push(json);
-          //       break;
-          //     }else{
-          //       //d.target.lost = false;
-          //     }
-          //   }
-          // }
         }
-        //console.log(count1);
       	update();
       }
 
@@ -600,7 +537,6 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
 
       var nodeEnter = node.enter().append("g")
           .attr("class", function(d){
-            // console.log("type", d.type);
              if(d.type == "duplicate" || d.type == "reverse")
               return  "node hidden";
              return  "node";
@@ -613,7 +549,6 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
 
         nodeEnter.append("image")
       	.attr("xlink:href", function(d) {
-          // //  console.log("source", d.source.name);
 
           if (d.status!=200) {
             if(d.type == "subdomain"){
@@ -625,8 +560,6 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
           }
 
           if(d.isTerminal == true){
-          //  console.log(d, d.status , d.name);
-
             if (d.status != 200 ) {
               if(d.type == "subdomain"){
                 return "imgs/wc-red-sq.png"
@@ -649,13 +582,10 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
       			return "imgs/wc-m-cr.png";
       		}
       	})
-          //attr("rx", 2)
-      	//.attr("ry", 2)
         .attr("width", 25)
       	.attr("height", 25)
       	.append("svg:title")
       	 .text(function(d){return  d.name;});
-
 
       	 node.select("image")
         	.attr("xlink:href", function(d) {
@@ -668,9 +598,7 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
               return "imgs/circle-128.png"
             }
 
-
             if(d.isTerminal == true){
-              // console.log(d, d.status , d.name);
                if (d.status != 200) {
                  if(d.type == "subdomain"){
                    return "imgs/wc-red-sq.png"
@@ -694,16 +622,13 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
          		}
          	})
 
-
         nodeEnter.transition()
           .attr("width", function(d) { return d.children ? 4.5 : 3.5 ; })
       	  .attr("height", function(d) { return d.children ? 4.5 :3.5 ; });
 
         nodeEnter.append("text")
             .attr("dy", ".35em")
-      	//  .text(function(d) { return d._children ? d.name : d.children ? d.name : ""; });
         if(count11 == 0){
-          console.log("sa");
         	count11++;
         		startAgain();
         	}
@@ -732,7 +657,6 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
           neighborArray.indexOf(p.target) == -1 ? neighborArray.push(p.target) : null;
           linkArray.push(p);
         })
-//        neighborArray = d3.set(neighborArray).keys();
         return {nodes: neighborArray, links: linkArray};
       }
 
@@ -784,9 +708,6 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
 
         document.getElementById("result-canvas").addEventListener("dblclick", () => {
           console.log("reset the zoom ");
-          //  zoom.transform(svg, d3.zoomIdentity);//Works
-          //trans=d3.event.translate;
-        //  scale=d3.event.scale;
           zoomReset = true;
           svgMain.call(d3.behavior.zoom().scale(1).translate([0,0]).scaleExtent([0.5, 7.5]).on("zoom", rescale)).on("dblclick.zoom", null);
           svg.attr("transform",
@@ -824,8 +745,6 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
       }
 
       function toggle(d, check) {
-        //console.log("losssssssssssssst", d.lost);
-        //console.log(d.children)
         if (d.children) {
       	  d.nodeOpen = false;
           d._children = d.children;
@@ -845,8 +764,6 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
       function click(d){
         console.log(activeD)
       // if (d3.event.defaultPrevented) return; // ignore drag
-        console.log();
-      //  console.log(d.parentsAll.indexOf(activeD[activeD.length-1].name))
         if (activeD.length > 0 && d.name != activeD[activeD.length-1].name ) {
           var i = activeD.length-1;
           while(i>=0){
