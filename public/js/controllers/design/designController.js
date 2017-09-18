@@ -1392,6 +1392,8 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
                     }
                     if (data == "unavailableLocalServer") {
                         unblockUI();
+                        eaCheckbox = false;
+                        $("#enableAppend").prop('checked',false);
                         openDialog("Scrape Screen", "ICE Engine is not available. Please run the batch file and connect to the Server.");
                         return false
                     }
@@ -2196,7 +2198,8 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
                 if(viewString.view != undefined && viewString.view.length !=undefined)
                 {
                       for (var i = 0; i < viewString.view.length; i++) {
-						if ($(this).find("input").val().indexOf(viewString.view[i].custname) != -1) {
+                         
+						if ( $.trim($(this).find("input").val()) == $.trim(viewString.view[i].custname)) {
 							$("#dialog-addObject").modal("hide");
 							openDialog("Add Object", "Object characterstics are same for " + $(this).find("input").val() + "");
 							return false;
