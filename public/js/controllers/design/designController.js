@@ -1929,12 +1929,40 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
         }
         console.log(data)
         var rect, type, ref, name, id, value, label, visible, l10n, source;
-        rect = {
-            x: data.rslt.obj.data("left"),
-            y: data.rslt.obj.data("top"),
-            w: data.rslt.obj.data("width"),
-            h: data.rslt.obj.data("height")
+        if (appType == "MobileWeb" ) {
+            if(parseInt(viewString.mirrorwidth) > 500)
+            {
+                x = (parseInt(data.rslt.obj.data("left") * 490)/ parseInt(viewString.mirrorwidth))
+                y = (parseInt(data.rslt.obj.data("top") * 761)/ parseInt(viewString.mirrorheight))
+                w = (parseInt(data.rslt.obj.data("width") * 490)/ parseInt(viewString.mirrorwidth))
+                h = (parseInt(data.rslt.obj.data("height") * 761)/ parseInt(viewString.mirrorheight))
+                  rect = {
+                            x: x.toString(),
+                            y: y.toString(),
+                            w: w.toString(),
+                            h: h.toString()
+                        }
+
+            }
+             else{
+             rect = {
+                        x: data.rslt.obj.data("left"),
+                        y: data.rslt.obj.data("top"),
+                        w: data.rslt.obj.data("width"),
+                        h: data.rslt.obj.data("height")
+                    }
+                }
+
         }
+        else{
+             rect = {
+                        x: data.rslt.obj.data("left"),
+                        y: data.rslt.obj.data("top"),
+                        w: data.rslt.obj.data("width"),
+                        h: data.rslt.obj.data("height")
+                    }
+        }
+       
 
         type = data.rslt.obj.data("tag");
         ref = data.rslt.obj.data("reference");
@@ -1984,10 +2012,20 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
                     d.css('height', rect.h + 'px');
                     d.css('width', rect.w + 'px');
                 } else {
-                    d.css('left', (rect.x - 2) + 'px');
-                    d.css('top', (rect.y - 6) + 'px');
-                    d.css('height', rect.h + 'px');
-                    d.css('width', rect.w + 'px');
+                     if(parseInt(viewString.mirrorwidth) > 500)
+                     {
+                            d.css('left', (rect.x) + 'px');
+                            d.css('top', (rect.y) + 'px');
+                            d.css('height', rect.h + 'px');
+                            d.css('width', rect.w + 'px');
+                     }
+                     else{
+                            d.css('left', (rect.x - 2) + 'px');
+                            d.css('top', (rect.y - 6) + 'px');
+                            d.css('height', rect.h + 'px');
+                            d.css('width', rect.w + 'px');
+                     }
+                   
                 }
             } else if (appType == "SAP") {
                 d.css('left', (Math.round(rect.x) * scale_highlight) + 3 + 'px');
