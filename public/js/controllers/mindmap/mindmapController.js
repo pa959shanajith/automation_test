@@ -399,10 +399,15 @@ mySPA.controller('mindmapController', ['$scope', '$http', '$location', '$timeout
     	$('.scrollbar-inner').scrollbar();
 		$('.scrollbar-macosx').scrollbar();
     }
-     // Prof J Assist
+     // Prof J Assist (Yashi)
     $scope.conversation = []
-    $scope.querySend = function (){
+     $scope.querySend = function (){
         var query = $scope.query;
+        console.log(query.length);
+        if(query.length == 0 ){
+             alert("Please enter a query!");
+        }
+        else{
         $scope.visible = 0;
         $scope.conversation.push({'text' : query,'pos': "assistFrom-me",'type': 0});
         //console.log(query);
@@ -414,6 +419,7 @@ mySPA.controller('mindmapController', ['$scope', '$http', '$location', '$timeout
         $scope.conversation.push({'text' : $scope.topMatches,'pos': "assistFrom-them",'type':0});
         //console.log($scope.conversation)
         });
+        } 
     }
   $scope.displayAnswer = function (index){
         $scope.conversation.push({'text' : $scope.topMatches[index][2],'pos':  "assistFrom-them",'type':1});

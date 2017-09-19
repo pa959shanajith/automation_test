@@ -19,8 +19,6 @@ var userRoles = {};
 
 //Authenticate User - Nineteen68
 exports.authenticateUser_Nineteen68 = function(req, res){
-      // console.log("session value ",myserver.sessionCreated.length);
-      // myserver.sessionCreated.push("name")
       try{
               
             console.log("Inside Authenticate User");
@@ -28,12 +26,28 @@ exports.authenticateUser_Nineteen68 = function(req, res){
             var password = req.body.password;
             var session = req.session;
             var sessId = req.session.id;
-            req.session.username = username;
-            req.session.uniqueId = sessId;
-            console.log(myserver.sessionCreated);
-            if(myserver.sessionCreated.indexOf(username) >= 0){
+   
+            var maxTime =0;
+            console.log(req.sessionStore.sessions);
+            for(key in req.sessionStore.sessions){
+                  var sessionStore = req.sessionStore.sessions[key];
+                  if(sessionStore){
+                        var obj =  JSON.parse(sessionStore)
+                        if(username == obj.username){
+                        var dateEx = new Date(obj.cookie.expires);
+                              if(dateEx.getTime() > maxTime)
+                              maxTime =  dateEx.getTime();
+                        }
+                  }
+            }
+
+            var dateNow = new Date();
+            if(dateNow.getTime() < maxTime ){
                   return res.send("userLogged");
             }
+            req.session.username = username;
+            req.session.uniqueId = sessId;
+    
             var flag= 'inValidCredential';
                      var assignedProjects = false;
                      var validUser = false;
@@ -72,41 +86,31 @@ exports.authenticateUser_Nineteen68 = function(req, res){
                                                        checkAssignedProjects(req,function(err,assignedProjectsData,role){
                                                                      if(role != "Admin" && role != "Business Analyst" && role != "Tech Lead")
                                                                      {
-                                                                                  if(assignedProjectsData > 0 )
-                                                                                  {
-                                                                                         assignedProjects = true;
-                                                                                  }
-                                                                                  if(validUser == true && assignedProjects == true){
-                                                                                         flag = 'validCredential';                                                                                 
-                                                                                         myserver.sessionCreated.push(username)
-                                                                                         console.log("session value ",myserver.sessionCreated);
-                                                                                         res.setHeader('Set-Cookie', sessId);
-                                                                                         console.log();
-                                                                                         res.send(flag);
-                                                                                         
-                                                                                  }
-                                                                                  else if(validUser == true && assignedProjects == false)
-                                                                                  {
-                                                                                         flag = 'noProjectsAssigned';
-                                                                                         res.send(flag);
-                                                                                  }
-                                                                                  else{
-                                                                                         res.send(flag);
-                                                                                         console.log("session value ",myserver.sessionCreated);
-                                                                                         //myserver.sessionCreated.push(username)
-                                                                                  }  
-                                                                     }
-                                                                     else{
-                                                                           if(validUser == true){
-                                                                                         flag = 'validCredential';
-                                                                                         myserver.sessionCreated.push(username)
-                                                                                         console.log("session value ",myserver.sessionCreated.length);
-                                                                                         res.setHeader('Set-Cookie', sessId);
-                                                                                         res.send(flag);
-                                                                                  }
-                                                                           else{
-                                                                                         res.send(flag);
-                                                                              }  
+                                                                        if(assignedProjectsData > 0 ){
+                                                                              assignedProjects = true;
+                                                                        }
+                                                                        if(validUser == true && assignedProjects == true){
+                                                                              flag = 'validCredential';  
+                                                                              res.setHeader('Set-Cookie', sessId);
+                                                                              res.send(flag);
+                                                                              
+                                                                        }else if(validUser == true && assignedProjects == false){
+                                                                              flag = 'noProjectsAssigned';
+                                                                              req.session.destroy();
+                                                                              res.send(flag);
+                                                                        }else{
+                                                                              req.session.destroy();
+                                                                              res.send(flag);
+                                                                        }
+                                                                     }else{
+                                                                        if(validUser == true){
+                                                                              flag = 'validCredential';
+                                                                              res.setHeader('Set-Cookie', sessId);
+                                                                              res.send(flag);
+                                                                        }else{
+                                                                              req.session.destroy();
+                                                                              res.send(flag);
+                                                                        }  
                                                                      }
                                                                      
                                                        });

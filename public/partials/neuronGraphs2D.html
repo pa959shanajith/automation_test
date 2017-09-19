@@ -3,13 +3,17 @@
 <!--Header-->
 
 <!--Content Area-->
-<section class="container-fluid container-fluid-inner" ng-init="tab='defaultTab'">
+<section class="container-fluid container-fluid-inner" ng-init="assignTab('viewTab');tab='viewTab';loadNGraphs()">
 	<!--Left Panel-->
 	<div class="ct-side fl-left" id="ct-lSide">
-		<div id="left-nav-section" class='lsSlide' style='z-index:9999'>
+		<div id="left-nav-section" class='lsSlide' style='z-index:999'>
 			<div class="scrollbar-macosx">
-				<div id="left-top-section" style="border-bottom: 0 !important" ng-if="tab == 'actionTab'">
+				<div id="left-top-section" style="border-bottom: 0 !important">
 					<ul>
+						<li><a id='viewImg1' ng-click="assignTab('viewTab');tab='viewTab'" href="#" title="View Graphs"><span><img id='viewImg' class="selectedIcon" src="imgs/ngr-view.png" alt="View"></span>View Graphs</a></li>
+						<li><a id='actionImg1' ng-click="assignTab('actionTab');tab='actionTab'" href="#" title="Perform Action"><span><img id='actionImg' src="imgs/ngr-action.png" alt="View"></span>Perform Action</a></li>
+					</ul>
+					<ul ng-if="tab=='hidden'">
 						<li><span><a class='scrapeOnTxt'>Execute On</a></span></li>
 						<li><a class="selectBrowser" data-name="3"  title="Execute on IE"><span><img src='imgs/ic-ie.png' alt='Internet Explorer' /></span>Internet Explorer</a></li>
 						<li><a class="selectBrowser" data-name="1"  title="Execute on Chrome"><span><img src='imgs/ic-chrome.png' alt='Google Chrome' /></span>Google Chrome</a></li>
@@ -25,11 +29,9 @@
 
 	<!--Middle Panel-->
 	<div id="ct-main" class="fl-left rightBarOpen leftBarOpen">
-		<div id="ct-canvas">
-			<!--<iframe id="frame" src="" width="100%" height="100%"></iframe>-->
-		</div>
+		<div id="ct-canvas"></div>
 	</div>
-	<div class="createFirstContainer" ng-if="tab == 'defaultTab'">
+	<div class="createFirstContainer" ng-if="tab=='hidden'">
 		<div class="createOptionContainer">
 			<div ng-click="assignTab('viewTab'); tab = 'viewTab'; loadNGraphs()" title="View Graph"><img alt="View" class="" src="imgs/ngr-view.png"><label>View Graph</label></div>
 			<div ng-click="assignTab('actionTab'); tab = 'actionTab'; loadNGraphs()" title="Perform Action"><img alt="Action" class="" src="imgs/ngr-action.png"><label>Perform Action</label></div>
@@ -39,7 +41,7 @@
 
 	<!-- Right Section -->
 	<div class="ct-side fl-right" id="ct-rSide">
-		<div id="right-dependencies-section" class="rsSlide" style='z-index:9999'>
+		<div id="right-dependencies-section" class="rsSlide" style='z-index:999'>
 			<!--Images Blocks-->
 			<div class="thumbnail thumbnail-custom">
 				<a class="slidePopup"  title="Filter">
@@ -52,84 +54,108 @@
 				<div tabindex="0" id="window-filter" class="popupWrap popupWrap-filter">
 					<h4 class="h4-custom closePopup">Filters <img class="closePopup pull-right" src="imgs/ic-arrow.png" /></h4>
 					<div class="popupContent popupContent-filter">
-					<div id ='selectAllFilters'><label><input title="Select all" type="checkbox" class="checkStyleboxFilter"><span class='selectAllTxt'>Select all</span></label></div>
-						<div><span class='popupContent-default filterObjects' data-tag="tscripts">Test Case</span></div>
-						<div><span class='popupContent-default filterObjects' data-tag="tscenario">Test Scenario</span></div>
-						<div><span class='popupContent-default filterObjects' data-tag="tsuite">Test Suite</span></div>
-						<div><span class='popupContent-default filterObjects' data-tag="cycle">Cycle</span></div>
-						<div><span class='popupContent-default filterObjects' data-tag="release">Release</span></div>
-						<div><span class='popupContent-default filterObjects' data-tag="project">Project</span></div>
-						<div><span class='popupContent-default filterObjects' data-tag="screen">Screen</span></div>
-						<div><span class='popupContent-default filterObjects' data-tag="domain">Domain</span></div>
+						<div id ='selectAllFilters'><label><input title="Select all" type="checkbox" class="checkStyleboxFilter"><span class='selectAllTxt'>Select all</span></label></div>
+						<div><span class='popupContent-default filterObjects' data-tag="TestCase">Test Case</span></div>
+						<div><span class='popupContent-default filterObjects' data-tag="TestScenario">Test Scenario</span></div>
+						<div><span class='popupContent-default filterObjects' data-tag="TestSuite">Test Suite</span></div>
+						<div><span class='popupContent-default filterObjects' data-tag="Cycle">Cycle</span></div>
+						<div><span class='popupContent-default filterObjects' data-tag="Release">Release</span></div>
+						<div><span class='popupContent-default filterObjects' data-tag="Project">Project</span></div>
+						<div><span class='popupContent-default filterObjects' data-tag="Screen">Screen</span></div>
+						<div><span class='popupContent-default filterObjects' data-tag="Domain">Domain</span></div>
 					</div>
 				</div>
 				<!--Popup-->
 			</div>
 			<!--Images Blocks-->
-			<!--Images Blocks-->		
+			<!--Images Blocks-->
 			<div class="thumbnail thumbnail-custom">
-			 <a class="slidePopup" title="Info">
-				<img class="thumb-ic" src="imgs/ic-info.png" alt="Project Info">
-				<div class="caption">
-				   <p>Info</p>
+				<a class="slidePopup" title="Info">
+					<img class="thumb-ic" src="imgs/ic-info.png" alt="Project Info">
+					<div class="caption">
+						<p>Info</p>
+					</div>
+				</a>
+				<!--Popup-->
+				<div tabindex="0" id="window-pi" class="popupWrap">
+					<h4 class="h4-custom closePopup">Information <img class="closePopup pull-right" src="imgs/ic-arrow.png"></h4>
+					<div class="popupContent projectInfoWrap">
+						<p class="proj-info-wrap"></p>
+					</div>
 				</div>
-			 </a>
-			 <!--Popup-->
-			 <div tabindex="0" id="window-pi" class="popupWrap">
-				<h4 class="h4-custom closePopup">Information <img class="closePopup pull-right" src="imgs/ic-arrow.png"></h4>
-				<div class="popupContent projectInfoWrap">
-				   <p class="proj-info-wrap"></p>
+				<!--Popup-->
+			</div>
+			<!--Images Blocks-->
+			<!--Images Blocks-->
+			<div class="thumbnail thumbnail-custom">
+				<a class="slidePopup" id="slidePopupSearchBox" title="Info">
+					<img class="thumb-ic" src="imgs/ic-search.png" alt="Search Node">
+					<div class="caption">
+						<p>Search</p>
+					</div>
+				</a>
+				<!--Popup-->
+				<div tabindex="0" id="window-nodesearch" class="popupWrap">
+					<h4 class="h4-custom closePopup">Search Node<img class="closePopup pull-right" src="imgs/ic-arrow.png" /></h4>
+					<div class="input-group">
+							<span class="input-group-addon inputMyTask" id="basic-addon1"><img src="imgs/ic-search-icon.png"></span>
+							<input type="text" class="form-control searchInputNodes" placeholder="Search Node" aria-describedby="basic-addon1">
+					</div>
+					<div class="popupContent">
+						<div class="scrollbar-inner scrollbar-innerpages">
+							<div class="panel-group" id="popupSearchResult"></div>
+						</div>
+					</div>
 				</div>
-			 </div>
-			 <!--Popup-->
+				<!--Popup-->
 			</div>
 			<!--Images Blocks-->
 			<!--Images Blocks-->
 			<div class="thumbnail thumbnail-custom thumbnail-custom-wiki">
-			 <a class="slide_popup slide_assist" href="#" title="Assist">
+				<a class="slide_popup slide_assist" href="#" title="Assist">
 				<img class="thumb-ic" src="imgs/ic-assist.png" alt="Assist">
 				<div class="caption">
-				   <p>Assist</p>
+					<p>Assist</p>
 				</div>
-			 </a>
-			 <!--Popup-->
-			 <div id="assistWindow" class="assistWrap">
-				<h4 class="h4-custom h4-custom-assist">
-				   <span class="assist-left pull-left"><img src="imgs/ic-message.png">Assist
-				   </span><span class="assist-right pull-right"><img src="imgs/ic-up.png" class="animateAssistUp" style="margin-right: 10px"><img src="imgs/ic-close.png" class="animateAssistClose">
-				   </span>
-				</h4>
-				<div class="assistContent">
-				   <!-- Chat Container -->
-				   <div class="scroll-wrapper chatContainer scrollbar-inner scrollbar-chatArea chatArea" style="position: relative;">
-					  <div class="chatContainer scrollbar-inner scrollbar-chatArea chatArea scroll-content" style="height: 100px; margin-bottom: 0px; margin-right: 0px; max-height: none;">
-						 <ul class="chatList">
-							<li>Assist will be available soon!</li>
-						 </ul>
-					  </div>
-					  <div class="scroll-element scroll-x">
-						 <div class="scroll-element_outer">
-							<div class="scroll-element_size"></div>
-							<div class="scroll-element_track"></div>
-							<div class="scroll-bar"></div>
-						 </div>
-					  </div>
-					  <div class="scroll-element scroll-y">
-						 <div class="scroll-element_outer">
-							<div class="scroll-element_size"></div>
-							<div class="scroll-element_track"></div>
-							<div class="scroll-bar"></div>
-						 </div>
-					  </div>
-				   </div>
-				   <div class="chatContainer">
-					  <textarea rows="3" cols="" class="chatTextArea form-control" placeholder="Ask Prof.J"></textarea>
-					  <button class="btn btn-md pull-right">Send</button>
-				   </div>
-				   <!-- Chat Container -->
+				</a>
+				<!--Popup-->
+				<div id="assistWindow" class="assistWrap">
+					<h4 class="h4-custom h4-custom-assist">
+						<span class="assist-left pull-left"><img src="imgs/ic-message.png">Assist
+						</span><span class="assist-right pull-right"><img src="imgs/ic-up.png" class="animateAssistUp" style="margin-right: 10px"><img src="imgs/ic-close.png" class="animateAssistClose">
+						</span>
+					</h4>
+					<div class="assistContent">
+						<!-- Chat Container -->
+						<div class="scroll-wrapper chatContainer scrollbar-inner scrollbar-chatArea chatArea" style="position: relative;">
+							<div class="chatContainer scrollbar-inner scrollbar-chatArea chatArea scroll-content" style="height: 100px; margin-bottom: 0px; margin-right: 0px; max-height: none;">
+								<ul class="chatList">
+								<li>Assist will be available soon!</li>
+								</ul>
+							</div>
+							<div class="scroll-element scroll-x">
+								<div class="scroll-element_outer">
+								<div class="scroll-element_size"></div>
+								<div class="scroll-element_track"></div>
+								<div class="scroll-bar"></div>
+								</div>
+							</div>
+							<div class="scroll-element scroll-y">
+								<div class="scroll-element_outer">
+								<div class="scroll-element_size"></div>
+								<div class="scroll-element_track"></div>
+								<div class="scroll-bar"></div>
+								</div>
+							</div>
+						</div>
+						<div class="chatContainer">
+							<textarea rows="3" cols="" class="chatTextArea form-control" placeholder="Ask Prof.J"></textarea>
+							<button class="btn btn-md pull-right">Send</button>
+						</div>
+						<!-- Chat Container -->
+					</div>
 				</div>
-			 </div>
-			 <!--Popup-->
+				<!--Popup-->
 			</div>
 			<!--Images Blocks-->
 		</div>

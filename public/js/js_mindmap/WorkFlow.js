@@ -35,6 +35,7 @@ function loadMindmapData_W(){
 			loadMindmapData1_W(); 
 			$("#selectProjectEtem").change(function () {
             //alert($(".project-list").val());
+				$('#eteSearchModules').val('')
 				if($("img.iconSpaceArrow").hasClass("iconSpaceArrowTop"))
 				{
 					$("img.iconSpaceArrow").removeClass("iconSpaceArrowTop");
@@ -926,6 +927,19 @@ $(document).on('click', '.createNew-ete', function(e){
 })
 
  $(document).on('click', '.moduleContainer', function(e){
+		 if($($(this).children()[0]).hasClass('eteMbox')){
+		 	var som='Module Name: '+$(this)[0].title;
+			if(som.length>31)
+				 $('.endtoend-modules-right-upper label').text(som.substring(0,30)+'...');
+			else
+				 $('.endtoend-modules-right-upper label').text(som);
+			$('.endtoend-modules-right-upper label').attr('title',som.substring(13))
+ 		 }
+		 else{
+			 $('.endtoend-modules-right-upper label').attr('title','')
+  		 	 $('.endtoend-modules-right-upper label').text('Scenarios');
+		 }
+
  // #894: Add button disabled by default
 	 	$('.addScenarios-ete').addClass('disableButton');
 		//#821 UI issues in e2e

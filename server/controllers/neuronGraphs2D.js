@@ -28,13 +28,12 @@ var reqToAPI = function(d,u,p,callback) {
 var parseData = function(data){
 	var rootIndex=-1;
 	var nodeTypes={"DOMAINS_NG":"Domain","PROJECTS_NG":"Project","RELEASES_NG":"Release","CYCLES_NG":"Cycle","TESTSUITES_NG":"TestSuite","TESTSCENARIOS_NG":"TestScenario","TESTCASES_NG":"TestCase","SCREENS_NG":"Screen"};
-	var nodeColor={"Domain":"#eeeeee","Project":"#744730","Release":"#ffa448","Cycle":"#28d05a","TestSuite":"#be0e16","TestScenario":"#a448a4","TestCase":"#005580","Screen":"#3d3d29"};
 	var nc=0,lc=0,nodes=[],links=[],nodeIdDict={},linkIdDict={};
-	var attrDict={"browser":"Browser Name","comments":"Comments","complexity":"Complexity","createdby":"Created By","createdon":"Created On","cyclename":"Name","domainname":"Domain","endtime":"End Time","executedtime":"Executed Time","firstname":"First Name","modifiedby":"Modified By","modifiedon":"Modified On","name":"Name","objecttype":"Object Type","projectname":"Name","projecttypename":"Type","releasename":"Name","risk":"Risk","screenname":"Name","starttime":"Start Time","status":"Status","steps":"Steps","testsuitename":"Name","testscenarioname":"Name","testcasename":"Name","time":"Time"};
+	var attrDict={"complexity":"Complexity","createdby":"Created By","cyclename":"Name","domainname":"Name","projectname":"Name","releasename":"Name","risk":"Risk","screenname":"Name","testsuitename":"Name","testscenarioname":"Name","testcasename":"Name"};
 	data.forEach(function(row){
 		d=row.graph;
 		d.nodes.forEach(function (n) {
-			if (nodeIdDict[n.id]===undefined){
+			if (nodeIdDict[n.id]===undefined && nodeTypes[n.labels[0]]!==undefined){
 				if(n.labels[0]=="DOMAINS_NG") rootIndex=nc;
 				if(n.labels[0]=="TESTCASES_NG"){
 					n.properties.complexity=Math.floor((Math.random()*10))%3+1;
@@ -46,8 +45,8 @@ var parseData = function(data){
 					}
 					delete n.properties[attrs];
 				}
-				nodes.push({"id":n.id,"idx":nc,"type":nodeTypes[n.labels[0]],"name":n.properties.Name,"parent":[],"children":[]});
-				//nodes.push({"id":n.id,"idx":nc,"type":nodeTypes[n.labels[0]],"name":n.properties.Name,"attributes": n.properties,"parent":[],"children":[]});
+				//nodes.push({"id":n.id,"idx":nc,"type":nodeTypes[n.labels[0]],"name":n.properties.Name,"parent":[],"children":[]});
+				nodes.push({"id":n.id,"idx":nc,"type":nodeTypes[n.labels[0]],"name":n.properties.Name,"attributes": n.properties,"parent":[],"children":[]});
 				nodeIdDict[n.id]=nc;
 				nc++;
 			}
@@ -56,21 +55,19 @@ var parseData = function(data){
 			if (linkIdDict[l.id]===undefined){
 				var source=l.startNode.toString();
 				var target=l.endNode.toString();
-				//links.push({"start":source,"end":target});
 				srcIndex=nodeIdDict[source];
 				tgtIndex=nodeIdDict[target];
-				links.push({"start":srcIndex,"end":tgtIndex});
-				linkIdDict[l.id]=lc;
-				lc++;
-				if (nodes[srcIndex].children.indexOf(nodes[tgtIndex]) == -1)
-					nodes[srcIndex].children.push(nodes[tgtIndex]);
-				/*if (nodes[tgtIndex].parent.indexOf(nodes[srcIndex]) == -1)
-					nodes[tgtIndex].parent.push(nodes[srcIndex]);
-				*/
+				if(srcIndex!==undefined && tgtIndex!==undefined){
+					links.push({"start":source,"end":target});
+					linkIdDict[l.id]=lc;
+					lc++;
+					if (nodes[srcIndex].children.indexOf(nodes[tgtIndex]) == -1) nodes[srcIndex].children.push(nodes[tgtIndex]);
+					//if (nodes[tgtIndex].parent.indexOf(nodes[srcIndex]) == -1) nodes[tgtIndex].parent.push(nodes[srcIndex]);
+				}
 			}
 		});
 	});
-	return {nodes:nodes,links:links,type:nodeTypes,color:nodeColor,root:rootIndex};
+	return {nodes:nodes,links:links,type:nodeTypes,root:rootIndex};
 };
 
 var get2DCoordsData = function(data){
@@ -109,9 +106,9 @@ exports.getGraphData = function(req, res){
 			var qList=[]
 			var urlData=req.get('host').split(':');
 			var userid=req.body.uid;
-			//userid='686d69a5-b519-4b4f-a813-8299235a2e97';
-			//qList.push({"statement":"MATCH(a:ICEPERMISSIONS_NG{userid:'"+userid+"'})-[r1]->(b:DOMAINS_NG) WITH b as d MATCH path=(d)-[r*1..]->(s:SCREENS_NG) RETURN path","resultDataContents":["graph"]});
-			qList.push({"statement":"MATCH(a:ICEPERMISSIONS_NG{userid:'"+userid+"'})-[r1]->(b:DOMAINS_NG) WITH b as d MATCH path=(d)-[r*1..]->(x) RETURN path","resultDataContents":["graph"]});
+			//'686d69a5-b519-4b4f-a813-8299235a2e97';'9c017f14-5a1c-4f2f-85a9-52728c86684c';
+			//qList.push({"statement":"MATCH(a:ICEPERMISSIONS_NG{userid:'"+userid+"'})-[r1]->(b:DOMAINS_NG) WITH b as d MATCH path=(d)-[r*1..]->(x) RETURN path","resultDataContents":["graph"]});
+			qList.push({"statement":"MATCH(a:ICEPERMISSIONS_NG{userid:'"+userid+"'})-[r1]->(d:DOMAINS_NG) WITH a.projectids as pids,d as d MATCH (p:PROJECTS_NG) WHERE p.projectid in pids WITH p as p,d as d MATCH path=(d)-[r2]->(p)-[r3*1..]->(x) RETURN path","resultDataContents":["graph"]});
 			reqToAPI({"data":{"statements":qList}},urlData,'/neoQuerya',function(err,status,result){
 				res.setHeader('Content-Type', 'application/json');
 				if(err) res.status(status).send(err);
@@ -119,20 +116,24 @@ exports.getGraphData = function(req, res){
 				else{
 					var jsonData=JSON.parse(result);
 					var pData=parseData(jsonData[0].data);
-					var coords=get2DCoordsData(pData.nodes[pData.root]);
-					var cData=cleanData(pData.nodes);
-					pData['coords2D']=coords;
-					res.status(status).send(pData);
+					if(pData.nodes.length==0) res.status(status).send({"err":true,"ecode":"DB_NOT_FOUND","msg":"Neuron Graphs DB not found!"});
+					else{
+						var coords=get2DCoordsData(pData.nodes[pData.root]);
+						var cData=cleanData(pData.nodes);
+						pData['coords2D']=coords;
+						pData['err']=false;
+						res.status(status).send(pData);
+					}
 				}
 			});
 		}
 		else{
-			res.send("Invalid Session");
+			res.send({"err":true,"ecode":"INVALID_SESSION","msg":"Your session has been expired. Please login again"});
 		}
 	}
 	catch(exception){
 		console.log(exception);
-		res.send("fail");
+		res.send({"err":true,"ecode":"FAIL","msg":"Internal Error! Please contact admin"});
 	}
 };
 

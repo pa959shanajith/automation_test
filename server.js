@@ -84,7 +84,6 @@ if (cluster.isMaster) {
 
     module.exports = app;
     module.exports.allSocketsMap = {};
-    module.exports.sessionCreated = [];
     app.use(bodyParser.json({
         limit: '10mb'
     }));
@@ -107,6 +106,7 @@ if (cluster.isMaster) {
             maxAge: (30 * 60 * 1000)
         }
     }));
+
     app.use(helmet());
     //write stream for logs
     //var accessLogStream = fs.createWriteStream(__dirname + '/access.log', {flags: 'a'})
@@ -131,23 +131,16 @@ if (cluster.isMaster) {
     });
 
     app.get('/', function(req, res) {
-            var usrName = req.session.username
-            var index = module.exports.sessionCreated.indexOf(usrName);
-            module.exports.sessionCreated.splice(index, 1);
             res.clearCookie('connect.sid');
             req.session.destroy();
+
             res.sendFile("index.html", {
                 root: __dirname + "/public/"
             });
     });
 
      app.get('/admin', function(req, res) {
-          var usrName = req.session.username
         if(!req.session.defaultRole || req.session.defaultRole != 'Admin'){
-            console.log(usrName)
-            var index = module.exports.sessionCreated.indexOf(usrName);
-            module.exports.sessionCreated.splice(index, 1);
-            console.log(module.exports.sessionCreated)
             req.session.destroy(); res.status(401).send('<br><br>Your session has been expired.Please <a href="/">Login</a> Again');
         }else{
             if (req.cookies['connect.sid'] && req.cookies['connect.sid'] != undefined) { res.sendFile("index.html", { root: __dirname + "/public/" });} else {req.session.destroy(); res.status(401).send('<br><br>Your session has been expired.Please <a href="/">Login</a>Again');}
@@ -177,14 +170,17 @@ if (cluster.isMaster) {
     });
 
     function sessionCheck(req, res, roles) {
-      var usrName = req.session.username;
       if (!req.session.defaultRole || roles.indexOf(req.session.defaultRole) >=0)
         {
-            var index = module.exports.sessionCreated.indexOf(usrName);
-            module.exports.sessionCreated.splice(index, 1);
             req.session.destroy(); res.status(401).send('<br><br>Your session has been expired.Please <a href="/">Login</a> Again');
         }else{
-            if (req.cookies['connect.sid'] && req.cookies['connect.sid'] != undefined) { res.sendFile("index.html", { root: __dirname + "/public/" });} else {req.session.destroy(); res.status(401).send('<br><br>Your session has been expired. Please <a href="/">Login</a> Again');}
+            if (req.cookies['connect.sid'] && req.cookies['connect.sid'] != undefined) {
+
+                 res.sendFile("index.html", { root: __dirname + "/public/" });
+                } else {
+                     req.session.destroy();
+                      res.status(401).send('<br><br>Your session has been expired. Please <a href="/">Login</a> Again');
+                    }
         }
     }
     app.get('/favicon.ico', function(req, res){
@@ -387,8 +383,6 @@ if (cluster.isMaster) {
 
   //SOCKET CONNECTION USING SOCKET.IO
     var allClients = [];
-    var sessionCreated = [];
-    var allSockets = [];
     var socketMap = {};
     var socketMapUI = {};
     var sokcetMapScheduling={};
@@ -515,7 +509,7 @@ if (cluster.isMaster) {
     console.log(e);
     setTimeout(function(){
       cluster.worker.kill();
-    }, 2000)
+    }, 2)
   }
 
 }

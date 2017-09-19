@@ -566,7 +566,8 @@ select
 }
 
 .searchbox-assign, .searchbox-create{
-    margin-left:33%;
+    margin-left:6.5%;
+    float:left;
     width: calc(100% - 85%);
 	border-radius: 6px;
     border: 1px solid darkgrey;
@@ -575,8 +576,9 @@ select
 }
 
 .searchModuleimg-assign, .searchModuleimg-create{
+    float:left;
 	position: absolute;
-    margin-left: 45%;
+    margin-left: -30.25%;
     top: 3px;
     border-left: 1px solid #ccc;
     padding-left: 3px;

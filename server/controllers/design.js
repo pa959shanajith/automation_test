@@ -366,7 +366,7 @@ exports.updateScreen_ICE = function(req, res){
 				scrapedObjects = JSON.stringify(scrapedObjects);
 				scrapedObjects = scrapedObjects.replace(/'+/g,"''");
 				var newParse;
-				if(scrapedObjects !=null && scrapedObjects !='' && scrapedObjects != undefined){
+				if(scrapedObjects !=null && scrapedObjects.trim() !='' && scrapedObjects != undefined){
 					newParse = JSON.parse(scrapedObjects);
 				}else{
 					newParse=JSON.parse("{}");
@@ -536,6 +536,7 @@ exports.updateScreen_ICE = function(req, res){
 									if(scrapedobjects == null && scrapedobjects == '' && scrapedobjects == undefined){
 										scrapedobjects=JSON.parse("{}");
 									}
+									
 									if(scrapedobjects.length>0){
 										//this viewString is an array of scraped objects
 										var viewString;
@@ -645,10 +646,11 @@ exports.updateScreen_ICE = function(req, res){
 							inputs = {"query": "getscrapedata", "screenid":screenID,"projectid":projectID};
 							fetchScrapedData(inputs,function(err,scrapedobjects,querycallback){
 								try{
-									//console.log(err,scrapedobjects,querycallback);
+									//console.log(updateData);
 									if(scrapedobjects == null && scrapedobjects == '' && scrapedobjects == undefined){
 										scrapedobjects='{}';
 									}
+									scrapedobjects = JSON.stringify(updateData.getScrapeData);
 									if(scrapedobjects.length>0){
 										var viewString;
 										scrapedobjects=JSON.parse(scrapedobjects);
@@ -1940,7 +1942,7 @@ exports.debugTestCase_ICE = function (req, res) {
 					                        fetchScrapedData(inputs, function(err, scrapedobjects, querycallback) {
 					                            counter++;
 					                            try {
-					                                if (scrapedobjects != null && scrapedobjects != '' && scrapedobjects != undefined) {
+					                                if (scrapedobjects != null && scrapedobjects.trim() != '' && scrapedobjects != undefined) {
 					                                    var newParse = JSON.parse(scrapedobjects);
 					                                    if ('body' in newParse) {
 					                                        var screen_obj = responsedata[counter];

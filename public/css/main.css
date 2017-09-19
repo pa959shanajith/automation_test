@@ -1403,7 +1403,7 @@ input[disabled]{
     /* margin-right: 31%; */
     position: relative;
     left: -32%;
-} 
+}
 .saveComapredObj
 {
     position: relative;
@@ -1438,7 +1438,7 @@ input[disabled]{
     width: 60%;
     margin-left: 34%;
     margin-top: -10%;
-    line-height: 1.7; 
+    line-height: 1.7;
     border: 1px solid #656565 !important;
 }
 
@@ -1474,7 +1474,7 @@ input[disabled]{
     background-clip: padding-box;
     border: 1px solid #adabab;
     border-radius: 1px;
-    
+
 }
 
 .rolesSpan>label{
@@ -1486,7 +1486,7 @@ input[disabled]{
 .rolesSpan>input{
   margin-top: 3px;
   margin-left: 12px;
-} 
+}
 
 .rolesSpan{
     padding-top: 9px;
@@ -1939,6 +1939,10 @@ input[disabled]{
     width: 100%;
 }
 
+#window-nodesearch .popupContent {
+	padding: 10px 0;
+}
+
 .proj-info-wrap {
     font-size: 15px;
     margin-bottom: 5px;
@@ -1953,6 +1957,18 @@ input[disabled]{
 .proj-info-wrap .content {
     display: inline-block;
     width: 70%;
+}
+
+#popupSearchResult .searchNodeItem {
+	display: block;
+	border-radius: 2px;
+	cursor: pointer;
+	padding: 2px;
+	border-bottom: 1px solid #643693;
+}
+
+#popupSearchResult .searchNodeItem:hover {
+	background-color: #633691;
 }
 
 .closePopup {
@@ -2063,14 +2079,14 @@ input[disabled]{
 .assistFrom-me {
 	position:relative;
 	padding:10px 20px;
-	color:white; 
+	color:white;
 	background:#643693;
 	border-radius:25px;
 	/*float: right;*/
     margin-top: 5px;
     display: -webkit-inline-box;
 
-		
+
 	/*&:before {
 		content:"";
 		position:absolute;
@@ -2108,7 +2124,7 @@ input[disabled]{
     margin-top: 5px;
     /* border: 1px solid; */
 
-		
+
 	/*&:before {
 		content:"";
 		position:absolute;
@@ -2957,7 +2973,7 @@ input[disabled]{
 .addCustObj{
     background: linear-gradient(to right, #bb9cda, transparent 40%);
     border-radius: 5px;
-	color: blue;
+	/*color: blue;*/
 }
 li.select_all .addCustObj{
     padding-left: 5px;
@@ -2967,9 +2983,9 @@ li.select_all .addCustObj{
 	font-size: 15px;
 	top:2px;
 }
-#userName		
-{		
-    text-transform: lowercase;		
+#userName
+{
+    text-transform: lowercase;
 }
 
 .accd-Obj, .accd-Obj-head, .accd-Obj-body{
@@ -4269,16 +4285,16 @@ select:-webkit-autofill:focus {
     width: inherit;
     color: #333;
 }
-.inputMyTask,.searchInputMyTask
-{
+.inputMyTask,.searchInputMyTask,.searchInputNodes{
     background-color: #fafafa !important;
 }
-.searchInputMyTask{
+.searchInputMyTask,.searchInputNodes{
     font-family: LatoWeb;
     font-size: 13px;
     color: #333;
 }
-.searchInputMyTask:focus{
+.searchInputMyTask:focus,
+.searchInputNodes:focus{
     outline: 0px !important;
     box-shadow: none;
     -moz-box-shadow: none;
@@ -4313,7 +4329,7 @@ select:-webkit-autofill:focus {
 	.qcActionBtnFirstChild{margin-left: 480px !important;}
 	.qcActionBtn label:nth-child(2){left: 440px !important;}
 	.qcDomProContainer select, .qcProContainer select{width: calc(100% - 226px) !important;}
-    .mappedFiles{height: calc(100% - 53px) !important;}   
+    .mappedFiles{height: calc(100% - 53px) !important;}
 }
 
 @media only screen and (height:1024px){
@@ -4446,7 +4462,7 @@ select:-webkit-autofill:focus {
 		height: calc(100% - 410px);
 	}
 	.reportStatus{margin-top: 55px;}
-	.suitestartend thead, .scenarioReports thead{width: calc(100% - 797px);} 
+	.suitestartend thead, .scenarioReports thead{width: calc(100% - 797px);}
 	.scroll-wrapper.scrollbar-inner-rep{max-height: 242px !important;}
 }
 
@@ -4802,11 +4818,9 @@ line.link {
 		box-shadow:0 0px 0px rgba(29,47,62,0.7);
 	}
 }
-/*#result-canvas {
-  border: 1px solid;
-top: 100px;
-position: relative;
-}*/
+#result-canvas {
+  height: 100%;
+}
 
 line.reverse_T {
   stroke : red;
