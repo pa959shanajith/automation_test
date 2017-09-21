@@ -109,6 +109,20 @@ mySPA.factory('reportService', ['$http','$q', function ($http, $httpProvider, $q
 			function(response){
 				return $q.reject(response.data)
 			})
+		},
+		
+		//Get screenshots dataURLs
+		getScreenshotDataURL_ICE : function(paths){
+			return $http.post('/openScreenShot',{
+				param : 'getScreenshotDataURL_ICE',
+				absPath : paths
+			})
+			.then(function(response)  {
+				return response.data
+			},
+			function(response){
+				return $q.reject(response.data)
+			})
 		}
 	}
 }]);

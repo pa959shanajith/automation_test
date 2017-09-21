@@ -1,6 +1,6 @@
 {
     "shortid": "H1Orcdvhg",
-    "recipe": "phantom-pdf",
+    "recipe": "wkhtmltopdf",
     "engine": "handlebars",
     "modificationDate": {
         "$$date": 1490685713793
