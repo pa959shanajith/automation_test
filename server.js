@@ -70,6 +70,7 @@ if (cluster.isMaster) {
     // var errorhandler = require('errorhandler');
     var cmd = require('node-cmd');
     var helmet = require('helmet');
+	const os = require('os');
 
     var async = require('async');
     //HTTPS Configuration
@@ -210,6 +211,13 @@ if (cluster.isMaster) {
     app.post('/casQuerya', api.casScriptA);
     app.post('/neoQuerya', api.neoScriptA);
     //Starting jsreport server
+	if(os.type()=='Windows_NT') {
+		try{
+			var tmp=os.tmpdir();
+			fs.unlinkSync(tmp+'\\jsreport-temp\\extensions\\locations.json');
+			fs.unlinkSync(tmp+'\\jsreport-temp\\licensing\\cache.json');
+		} catch(e){}
+	}
     cmd.get('netstat -ano | find "LISTENING" | find "8001"', function(data, err, stderr){
       if(data){
           //console.log('killing JS report server and restarting');

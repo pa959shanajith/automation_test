@@ -112,7 +112,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
         projectDetails = angular.element(document.getElementById("left-nav-section")).scope().projectDetails;
         var getTaskName = JSON.parse(window.localStorage['_CT']).taskName;
         appType = JSON.parse(window.localStorage['_CT']).appType;
-        screenName = JSON.parse(window.localStorage['_CT']).screenName;
+        screenName = angular.element(document.getElementById("left-nav-section")).scope().screenName;
         testCaseName = JSON.parse(window.localStorage['_CT']).testCaseName;
         subTaskType = JSON.parse(window.localStorage['_CT']).subTaskType;
         subTask = JSON.parse(window.localStorage['_CT']).subTask;
@@ -124,7 +124,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 
     }, 3000)
 
-
+console.log("screenName:", screenName);
     if (window.localStorage['_TJ']) {
         allTasks = JSON.parse(window.localStorage['_TJ']);
         if(allTasks.length > 0)
@@ -1929,12 +1929,40 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
         }
         console.log(data)
         var rect, type, ref, name, id, value, label, visible, l10n, source;
-        rect = {
-            x: data.rslt.obj.data("left"),
-            y: data.rslt.obj.data("top"),
-            w: data.rslt.obj.data("width"),
-            h: data.rslt.obj.data("height")
+        if (appType == "MobileWeb" ) {
+            if(parseInt(viewString.mirrorwidth) > 500)
+            {
+                x = (parseInt(data.rslt.obj.data("left") * 490)/ parseInt(viewString.mirrorwidth))
+                y = (parseInt(data.rslt.obj.data("top") * 761)/ parseInt(viewString.mirrorheight))
+                w = (parseInt(data.rslt.obj.data("width") * 490)/ parseInt(viewString.mirrorwidth))
+                h = (parseInt(data.rslt.obj.data("height") * 761)/ parseInt(viewString.mirrorheight))
+                  rect = {
+                            x: x.toString(),
+                            y: y.toString(),
+                            w: w.toString(),
+                            h: h.toString()
+                        }
+
+            }
+             else{
+             rect = {
+                        x: data.rslt.obj.data("left"),
+                        y: data.rslt.obj.data("top"),
+                        w: data.rslt.obj.data("width"),
+                        h: data.rslt.obj.data("height")
+                    }
+                }
+
         }
+        else{
+             rect = {
+                        x: data.rslt.obj.data("left"),
+                        y: data.rslt.obj.data("top"),
+                        w: data.rslt.obj.data("width"),
+                        h: data.rslt.obj.data("height")
+                    }
+        }
+       
 
         type = data.rslt.obj.data("tag");
         ref = data.rslt.obj.data("reference");
@@ -1984,10 +2012,20 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
                     d.css('height', rect.h + 'px');
                     d.css('width', rect.w + 'px');
                 } else {
-                    d.css('left', (rect.x - 2) + 'px');
-                    d.css('top', (rect.y - 6) + 'px');
-                    d.css('height', rect.h + 'px');
-                    d.css('width', rect.w + 'px');
+                     if(parseInt(viewString.mirrorwidth) > 500)
+                     {
+                            d.css('left', (rect.x) + 'px');
+                            d.css('top', (rect.y) + 'px');
+                            d.css('height', rect.h + 'px');
+                            d.css('width', rect.w + 'px');
+                     }
+                     else{
+                            d.css('left', (rect.x - 2) + 'px');
+                            d.css('top', (rect.y - 6) + 'px');
+                            d.css('height', rect.h + 'px');
+                            d.css('width', rect.w + 'px');
+                     }
+                   
                 }
             } else if (appType == "SAP") {
                 d.css('left', (Math.round(rect.x) * scale_highlight) + 3 + 'px');
@@ -2993,11 +3031,11 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
                     var mydata = $("#jqGrid").jqGrid('getGridParam', 'data');
                     var getTR = $("#jqGrid tbody tr:visible td:nth-child(10)");
                     for (var i = 0; i < mydata.length; i++) {
-                        if (mydata[i].hasOwnProperty("_id_")) {
-                            if (mydata[i]._id_.indexOf('jpg') !== -1 || mydata[i]._id_.indexOf('jqg') !== -1) {
-                                var index = mydata.indexOf(mydata[i]);
-                                mydata.splice(index, 1);
-                            } else {
+//                        if (mydata[i].hasOwnProperty("_id_")) {
+//                            if (mydata[i]._id_.indexOf('jpg') !== -1 || mydata[i]._id_.indexOf('jqg') !== -1) {
+//                                var index = mydata.indexOf(mydata[i]);
+//                                mydata.splice(index, 1);
+//                            } else {
                                 mydata[i].stepNo = i + 1;
                                 if (mydata[i].custname == undefined || mydata[i].custname == "") {
                                     var stepNoPos = parseInt(mydata[i].stepNo);
@@ -3046,8 +3084,8 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
                                 } else {
                                     mydata[i].remarks = getTR[i].textContent;
                                 }
-                            }
-                        }
+//                            }
+//                        }
                         /*else{
                         	if(mydata[i].remarks != undefined){
                         		if(mydata[i].remarks != getTR[i].textContent  && getTR[i].textContent.trim().length > 0 )	{
@@ -5320,11 +5358,11 @@ function drag(ev) {
 }
 
 function drop(ev) {
-    //Enable-Disable dragged element based on drop event
-    draggedEle.setAttribute("draggable", false)
-    draggedEle.childNodes[1].style.background = "#e0e0e0";
-    draggedEle.childNodes[1].style.cursor = "no-drop"
-    //Enable-Disable dragged element based on drop event
+    // //Enable-Disable dragged element based on drop event
+    // draggedEle.setAttribute("draggable", false)
+    // draggedEle.childNodes[1].style.background = "#e0e0e0";
+    // draggedEle.childNodes[1].style.cursor = "no-drop"
+    // //Enable-Disable dragged element based on drop event
     $(".submitObjectWarning").hide();
     if ($(ev.target).parent().children(".ellipsis").hasClass("fromMergeObj") == true) {
         draggedEle.setAttribute("draggable", true)
@@ -5333,6 +5371,7 @@ function drop(ev) {
         $(".objectExistMap").show();
         return false
     } else {
+        debugger;
         $(".objectExistMap").hide()
         getDraggedEle = ev.dataTransfer.getData("text/plain").trim()
         getDraggedEle = $(getDraggedEle)[0];
@@ -5343,6 +5382,14 @@ function drop(ev) {
         $(ev.target).parent("li").append(getDraggedEle);
     }
     ev.preventDefault();
+    if($(ev.target).parent("li").find(".ellipsis").hide().hasClass("toMergeObj") == true){
+    //Enable-Disable dragged element based on drop event
+    draggedEle.setAttribute("draggable", false)
+    draggedEle.childNodes[1].style.background = "#e0e0e0";
+    draggedEle.childNodes[1].style.cursor = "no-drop";
+    $(".modal-body:visible").trigger('click');
+    //Enable-Disable dragged element based on drop event
+    }
 }
 //Map Object Drag nad Drop Functionality
 

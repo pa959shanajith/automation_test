@@ -20,15 +20,14 @@ var userRoles = {};
 //Authenticate User - Nineteen68
 exports.authenticateUser_Nineteen68 = function(req, res){
       try{
-              
+
             console.log("Inside Authenticate User");
             var username = req.body.username.toLowerCase();
             var password = req.body.password;
             var session = req.session;
             var sessId = req.session.id;
-   
+
             var maxTime =0;
-            console.log(req.sessionStore.sessions);
             for(key in req.sessionStore.sessions){
                   var sessionStore = req.sessionStore.sessions[key];
                   if(sessionStore){
@@ -47,7 +46,7 @@ exports.authenticateUser_Nineteen68 = function(req, res){
             }
             req.session.username = username;
             req.session.uniqueId = sessId;
-    
+
             var flag= 'inValidCredential';
                      var assignedProjects = false;
                      var validUser = false;
@@ -90,10 +89,10 @@ exports.authenticateUser_Nineteen68 = function(req, res){
                                                                               assignedProjects = true;
                                                                         }
                                                                         if(validUser == true && assignedProjects == true){
-                                                                              flag = 'validCredential';  
+                                                                              flag = 'validCredential';
                                                                               res.setHeader('Set-Cookie', sessId);
                                                                               res.send(flag);
-                                                                              
+
                                                                         }else if(validUser == true && assignedProjects == false){
                                                                               flag = 'noProjectsAssigned';
                                                                               req.session.destroy();
@@ -110,9 +109,9 @@ exports.authenticateUser_Nineteen68 = function(req, res){
                                                                         }else{
                                                                               req.session.destroy();
                                                                               res.send(flag);
-                                                                        }  
+                                                                        }
                                                                      }
-                                                                     
+
                                                        });
                                                 }
                                          }catch(exception){
@@ -123,7 +122,7 @@ exports.authenticateUser_Nineteen68 = function(req, res){
                                   });
                            }
                      });
-                           
+
               }catch(exception){
                            console.log(exception);
                            res.send("fail");
@@ -131,13 +130,13 @@ exports.authenticateUser_Nineteen68 = function(req, res){
 };
 
 
-/** 
+/**
  * @see : function to authenticate users from jenkins
-* @author : vinay 
+* @author : vinay
 */
 exports.authenticateUser_Nineteen68_CI = function(req, res){
       try{
-              
+
             console.log("Inside Authenticate User");
             var username = req.body.username.toLowerCase();
             var password = req.body.password;
@@ -146,7 +145,7 @@ exports.authenticateUser_Nineteen68_CI = function(req, res){
             req.session.username = username;
             req.session.uniqueId = sessId;
             var flag= 'inValidCredential';
-                     
+
                      var inputs = {"username":req.session.username};
                      var args = {data:inputs,headers:{"Content-Type" : "application/json"}};
                      // var authUser = "select password from users where username = '"+ req.session.username+"' allow filtering;"
@@ -199,14 +198,14 @@ exports.authenticateUser_Nineteen68_CI = function(req, res){
                                                                                          assignedProjects = true;
                                                                                   }
                                                                                   if(validUser == true && assignedProjects == true){
-                                                                                  
+
                                                                                          flag = 'validCredential';
                                                                                          status ={"status":flag,"session_id":sessId};
                                                                                          res.setHeader('set-cookie', sessId);
                                                                                          res.writeHead(200,{'Content-Type': 'text/plain'});
                                                                                          res.write("status : "+flag+" , session_id : "+sessId);
                                                                                          res.end();
-                                                                                         
+
                                                                                   }
                                                                                   else if(validUser == true && assignedProjects == false)
                                                                                   {
@@ -220,7 +219,7 @@ exports.authenticateUser_Nineteen68_CI = function(req, res){
                                                                                          res.writeHead(401,{'Content-Type': 'text/plain'});
                                                                                          res.write("status : "+flag+" , session_id : "+"");
                                                                                          res.end();
-                                                                                  }  
+                                                                                  }
                                                                      }
                                                                      else{
                                                                            if(validUser == true){
@@ -236,9 +235,9 @@ exports.authenticateUser_Nineteen68_CI = function(req, res){
                                                                                          res.writeHead(401,{'Content-Type': 'text/plain'});
                                                                                          res.write("status : "+flag+" , session_id : "+"");
                                                                                          res.end();
-                                                                                  }  
+                                                                                  }
                                                                      }
-                                                                     
+
                                                        });
 
                                                 }
@@ -253,7 +252,7 @@ exports.authenticateUser_Nineteen68_CI = function(req, res){
                                   });
                            }
                      });
-                           
+
               }catch(exception){
                            console.log(exception);
                            res.setHeader('set-cookie', sessId);
@@ -263,9 +262,9 @@ exports.authenticateUser_Nineteen68_CI = function(req, res){
               }
 };
 
-/** 
+/**
  * @see : function to check whether projects are assigned for user
-* @author : vinay 
+* @author : vinay
 */
 function checkAssignedProjects(req,callback,data){
 var userid = '';
@@ -273,7 +272,7 @@ var roleid = '';
 var assignedProjectsLen = '';
 async.series({
 getUserId: function(callback){
-       
+
               // var getUserId = "select userid,defaultrole from users where username = '"+ req.body.username+"' allow filtering;"
               // dbConn.execute(getUserId, function (err, result) {
               //                   if(err) {
@@ -300,7 +299,7 @@ getUserRole: function(callback){
               var args = {data:inputs,headers:{"Content-Type" : "application/json"}};
               client.post(epurl+"login/authenticateUser_Nineteen68/projassigned",args,
                      function (rolesResult, response) {
-                           if(response.statusCode != 200 || rolesResult.rows == "fail"){ 
+                           if(response.statusCode != 200 || rolesResult.rows == "fail"){
                                          console.log("Error occured in authenticateUser_Nineteen68 : Fail");
                                          res.send("fail");
                                   }else{
@@ -324,7 +323,7 @@ getAssignedProjects: function(callback){
               var args = {data:inputs,headers:{"Content-Type" : "application/json"}};
               client.post(epurl+"login/authenticateUser_Nineteen68/projassigned",args,
                                   function (projectsResult, response) {
-                                         if(response.statusCode != 200 || projectsResult.rows == "fail"){      
+                                         if(response.statusCode != 200 || projectsResult.rows == "fail"){
                                          console.log("Error occured in authenticateUser_Nineteen68 : Fail");
                                          res.send("fail");
                                   }else{
@@ -363,9 +362,9 @@ getAssignedProjects: function(callback){
 }
 
 
-/** 
+/**
  * @see : function to check whether user exists or not
-* @author : shree.p 
+* @author : shree.p
 */
 function checkuserexists(req,callback,data){
        var flag = false;
@@ -392,9 +391,9 @@ function checkuserexists(req,callback,data){
 
 }
 
-/** 
+/**
  * @see : function to check whether existing user is ldap user or not
-* @author : shree.p 
+* @author : shree.p
 */
 function checkldapuser(req,callback,data){
        var flag = false;
@@ -449,7 +448,7 @@ function ldapCheck(req,cb){
        }catch(ex){
               console.log("Exception occured : ",ex);
        }
-       
+
        var ActiveDirectory = require('activedirectory');
        var ad = new ActiveDirectory({ url: 'ldap://'+ldap_ip+':'+ldap_port,
                            baseDN: dcstringarr.toString()});
@@ -482,7 +481,7 @@ exports.loadUserInfo_Nineteen68 = function(req, res){
               {
               var flag = req.body.flag;
               var switchedRole = req.body.selRole;
-              
+
               userName = req.body.username.toLowerCase();
               jsonService = {};
               userpermissiondetails = [];
@@ -496,7 +495,7 @@ exports.loadUserInfo_Nineteen68 = function(req, res){
                                          var args = {data:inputs,headers:{"Content-Type" : "application/json"}};
                                          client.post(epurl+"login/loadUserInfo_Nineteen68",args,
                                                 function (userResult, response) {
-                                                if(response.statusCode != 200 || userResult.rows == "fail"){      
+                                                if(response.statusCode != 200 || userResult.rows == "fail"){
                                          var flag = "fail";
                                          console.log("Failed to get user details from users.");
                                          res.send(flag);
@@ -508,7 +507,7 @@ exports.loadUserInfo_Nineteen68 = function(req, res){
                                                        AlljsonServices = [];
                                                        service = userResult.rows[0];
                                                        userId = service.userid;
-                                                       
+
                                                        jsonService.user_id = userId;
                                                               jsonService.email_id = service.emailid;
                                                               jsonService.additionalrole = service.additionalroles;
@@ -517,7 +516,7 @@ exports.loadUserInfo_Nineteen68 = function(req, res){
                                                               jsonService.role = service.defaultrole;
                                                               jsonService.username = service.username.toLowerCase();
                                                               req.session.defaultRoleId = jsonService.role;
-                                                              
+
                                                 }
                                                 else{
                                                        console.log("No records found.");
@@ -538,7 +537,7 @@ exports.loadUserInfo_Nineteen68 = function(req, res){
                      }
                    },
                      loggedinRole: function(callback){
-                           
+
                            //  var getRoleInfo = "select rolename from roles where roleid = "+req.session.defaultRoleId +" allow filtering";
                            //     dbConn.execute(getRoleInfo, function (err, rolesResult) {
                            //            if(err){
@@ -553,7 +552,7 @@ exports.loadUserInfo_Nineteen68 = function(req, res){
                                   var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
                                   client.post(epurl+"login/loadUserInfo_Nineteen68",args,
                                                        function (rolesResult, response) {
-                                         if(response.statusCode != 200 || rolesResult.rows == "fail"){      
+                                         if(response.statusCode != 200 || rolesResult.rows == "fail"){
                                                 console.log("Error occured in getRoleNameByRoleId_Nineteen68 : Fail");
                                                 res.send("fail");
                                          }else{
@@ -672,7 +671,7 @@ exports.getRoleNameByRoleId_Nineteen68 = function(req, res){
            var roleId = [];
                  roleId = req.body.role;
                  var role = [];
-                 //var role = roleId[0]; 
+                 //var role = roleId[0];
            var flag="";
         //    var getRoleInfo = "select rolename from roles where roleid = "+roleId+" allow filtering";
         //    dbConn.execute(getRoleInfo, function (err, rolesResult) {
@@ -682,7 +681,7 @@ exports.getRoleNameByRoleId_Nineteen68 = function(req, res){
                      var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
                      client.post(epurl+"login/getRoleNameByRoleId_Nineteen68",args,
                                   function (rolesResult, response) {
-                           if(response.statusCode != 200 || rolesResult.rows == "fail"){ 
+                           if(response.statusCode != 200 || rolesResult.rows == "fail"){
                        console.log("Error occured in getRoleNameByRoleId_Nineteen68 : Fail");
                        res.send("fail");
                  }else{
@@ -701,7 +700,7 @@ exports.getRoleNameByRoleId_Nineteen68 = function(req, res){
                                          console.log(exception);
                                          res.send("fail");
                                    }
-                            callback(); 
+                            callback();
                                                 }
                        }catch(exception){
                              console.log(exception);
@@ -728,4 +727,3 @@ catch(exception){
            res.send("fail");
      }
 };
-

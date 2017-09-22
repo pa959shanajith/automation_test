@@ -4826,12 +4826,7 @@ line.reverse_T {
   stroke : red;
   stroke-dasharray: 0,2 1;
 }
-line.reverse_T::after {
-	    content: " - Remember this";
-    background-color: yellow;
-    color: red;
-    font-weight: bold;
-}
+
 line.subdomain {
   stroke : green;
 }
