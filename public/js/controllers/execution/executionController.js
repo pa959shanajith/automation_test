@@ -36,9 +36,10 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 	if(getTaskName.indexOf("Execute Batch") < 0){
 		$(".parentBatchContainer").parent().hide();
 		$(".btnPanel").css("left","0");
-		$("#page-taskName span").text("Scenario Execution");
+		$("#page-taskName span").text("Suite Execution");
 	}
 	else	$("#page-taskName span").text("Batch Execution");
+
 	//$timeout(function(){
   		//var releaseId = JSON.parse(window.localStorage['_CT']).releaseId;
 	//	var cycleId = JSON.parse(window.localStorage['_CT']).cycleId;
