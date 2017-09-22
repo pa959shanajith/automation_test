@@ -1,4 +1,4 @@
-var jsreport = require('jsreport')()
+var jsreport = require('jsreport')({wkhtmltopdf:{allowLocalFilesAccess:true}});
 
 jsreport.init(function () {
   // running

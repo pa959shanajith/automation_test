@@ -1612,6 +1612,21 @@ exports.getNames_ICE = function(req, res){
 								console.log(exception);
 							}
 						});
+					}else if (idtypes[eachid] == 'screens'){
+						namesfetcher(requestedidslist[eachid],"screens",function(error,response){
+							try{
+								responsedata.idtypes.push('screens');
+								responsedata.requestedids.push(response[0].screenid);
+								responsedata.respnames.push(response[0].screenname);
+								if(index == requestedidslist.length){
+									res.send(responsedata);
+									console.log(responsedata);
+								}	                		
+							}
+							catch(exception){
+								console.log(exception);
+							}
+						});
 					}else{
 						res.send("fail");
 						break;

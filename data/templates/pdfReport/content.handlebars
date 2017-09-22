@@ -1,139 +1,142 @@
 <style>
-            body{font-family: LatoWeb; height: 98%; margin: 0;}
-            .mainContainer{
-                float: left;
-                padding: 5px;
-                width: calc(100% - 12px);
-            }
-            .h2Header{
-                font-size: 12px;
-                width: 100%;
-                float: left;
-                /*text-align: center;*/
-                border: 1px solid #cfcfcf;
-                background-color: #dfd0fa;
-            }
-            .h2Header h3{
-              //border: 2px solid;
-              position: relative;
-              text-align: center;
-              left: -110px;
-            }
-            .leftSummary{width: 50%; float: left; padding: 25px 0 25px 25px; font-size: 14px;}
-            .leftSummary label{
-                text-align: left;
-                float: left;
-                width: 29%;
-                padding-right: 5px;
-                padding-bottom: 5px;
-            }
-            .leftSummary span{
-                float: left;
-                width: 64%;
-                padding-bottom: 5px;
-                font-weight: bold;
-            }
-            .progress {
-                margin-bottom: 20px;
-                overflow: hidden;
-                box-shadow: inset 0 1px 2px rgba(0,0,0,.1);
-            }
-            .progress-bar {
-                float: left;
-                height: 100%;
-                font-size: 12px;
-                line-height: 20px;
-                color: #fff;
-                text-align: center;
-                box-shadow: inset 0 -1px 0 rgba(0,0,0,.15);
-                transition: width .6s ease;
-            }
-            .reportStatusBlk {
-                float: left;
-                width: 100%;
-            }
-            .progresslabel {
-                float: left;
-                display: inline-block;
-                width: 20%;
-                padding-left: 14px;
-            }
-            .customprogress{
-                float: left;
-                width: 45% !important;
-                height: 12px;
-                border-radius: 8px;
-                margin-top: 3px;
-                background-color: #e0e0e0;
-            }
-            .customprogress .progress-bar {
-                border-radius: 20px;
-            }
-            .progress-bar-success {
-                /*background: linear-gradient(to right, #39b54a, #009444) !important;*/
-                background-color: #39b54a;
-            }
-            .progress-bar-danger {
-                /*background: linear-gradient(to right, #d41e2d, #b31f2d) !important;*/
-                background-color: #d41e2d;
-            }
-            .progresspercentage{margin-left: 20px;}
-            .rightSummaryFunc{
-                    width: 46%;
-                    float: left;
-                    margin-top: 80px;
-                    font-size: 14px;
-            }
-            .progress-bar-warning {
-                /*background: linear-gradient(to right, #f7b91e, #faa536) !important;*/
-                background-color: #f7b91e;
-            }
-            .midContainer{
-                border-collapse: collapse;
-                border: 1px solid #cfcfcf;
-                width: 100%;
-                font: 14px cabin_Regular;
-                float: left;
-                margin: 1% 0;
-                font-family: LatoWeb;
-    			font-size: 14px;
-            }
-            .midContainer td{padding-top: 5px; border: 1px solid #cfcfcf;}
-            .midContainer td label{
-                text-align: right;
-                float: left;
-                width: 29%;
-                padding-right: 5px;
-                padding-bottom: 5px;
-            }
-            .reportsDetails{border: 1px solid #cfcfcf;     background-color: #dfd0fa; font-size: 15px;}
-            .reportsDetails tr{height: 50px;} 
-            .reportsDetails th:nth-child(1){width: 5%;} .rDid{width: 5.25%;}
-            .reportsDetails th:nth-child(2){width: 10%;} .rDstep{width: 10.25%;}
-            .reportsDetails th:nth-child(3){width: 50%;} .rDstepDes{width: 49.8%;}
-            .reportsDetails th:nth-child(4){width: 10%;} .rDstatus{width: 10.1%;}
-            .reportsDetails th:nth-child(5){width: 12%;} .rDellaps{width: 12.1%;}
-            .reportsDetails th:nth-child(6), .rDcomments{width: 13%; word-break: break-word; word-break: break-all;}
-            .maintabCont{float: left; width: 100%; border: 1px solid #dcdcdc; height: 49%;}
-            .tabCont{display: table-cell; border-bottom: 1px solid #ececec; border-right: 1px solid #ececec;}
-            .reportsDetail{line-height: 2; text-align: center; height: calc(100% - 35px); overflow: auto;font-size: 14px;}
-            .reportsDetail tr { page-break-inside: avoid; }
-            .rDstepDes{text-align: left; word-break: break-word;}
-            .reportsDetail tr.reportdetailsrow:nth-child(even){background: #f9f9f9;}
-            .reportdetailsrow td{padding-top: 9px;}
-      		@media screen and (max-height: 675px) {
-      			.reportsDetail{
-      				height: 174px;
-      			}
-      		}
-            .headerRepDetails{
-              left: 10px;
-              float:left;
-              display: block;
-              position: relative;
-              top: 7px;
-            }
-        </style>
+    body{font-family: LatoWeb; height: 98%; margin: 0;}
+    .mainContainer{
+        float: left;
+        padding: 5px;
+        width: calc(100% - 12px);
+    }
+    .h2Header{
+        font-size: 12px;
+        width: 100%;
+        float: left;
+        /*text-align: center;*/
+        border: 1px solid #cfcfcf;
+        background-color: #dfd0fa;
+    }
+    .h2Header h3{
+      //border: 2px solid;
+      position: relative;
+      text-align: center;
+      left: -110px;
+    }
+    .leftSummary{width: 50%; float: left; padding: 25px 0 25px 25px; font-size: 14px;}
+    .leftSummary label{
+        text-align: left;
+        float: left;
+        width: 29%;
+        padding-right: 5px;
+        padding-bottom: 5px;
+    }
+    .leftSummary span{
+        float: left;
+        width: 64%;
+        padding-bottom: 5px;
+        font-weight: bold;
+    }
+    .progress {
+        margin-bottom: 20px;
+        overflow: hidden;
+        box-shadow: inset 0 1px 2px rgba(0,0,0,.1);
+    }
+    .progress-bar {
+        float: left;
+        height: 100%;
+        font-size: 12px;
+        line-height: 20px;
+        color: #fff;
+        text-align: center;
+        box-shadow: inset 0 -1px 0 rgba(0,0,0,.15);
+        transition: width .6s ease;
+    }
+    .reportStatusBlk {
+        float: left;
+        width: 100%;
+    }
+    .progresslabel {
+        float: left;
+        display: inline-block;
+        width: 20%;
+        padding-left: 14px;
+    }
+    .customprogress{
+        float: left;
+        width: 45% !important;
+        height: 12px;
+        border-radius: 8px;
+        margin-top: 3px;
+        background-color: #e0e0e0;
+    }
+    .customprogress .progress-bar {
+        border-radius: 20px;
+    }
+    .progress-bar-success {
+        /*background: linear-gradient(to right, #39b54a, #009444) !important;*/
+        background-color: #39b54a;
+    }
+    .progress-bar-danger {
+        /*background: linear-gradient(to right, #d41e2d, #b31f2d) !important;*/
+        background-color: #d41e2d;
+    }
+    .progresspercentage{margin-left: 20px;}
+    .rightSummaryFunc{
+            width: 46%;
+            float: left;
+            margin-top: 80px;
+            font-size: 14px;
+    }
+    .progress-bar-warning {
+        /*background: linear-gradient(to right, #f7b91e, #faa536) !important;*/
+        background-color: #f7b91e;
+    }
+    .midContainer{
+        border-collapse: collapse;
+        border: 1px solid #cfcfcf;
+        width: 100%;
+        font: 14px cabin_Regular;
+        float: left;
+        margin: 1% 0;
+        font-family: LatoWeb;
+        font-size: 14px;
+    }
+    .midContainer td{padding-top: 5px; border: 1px solid #cfcfcf;}
+    .midContainer td label{
+        text-align: right;
+        float: left;
+        width: 29%;
+        padding-right: 5px;
+        padding-bottom: 5px;
+    }
+    .reportsDetails{border: 1px solid #cfcfcf;     background-color: #dfd0fa; font-size: 15px;}
+    .reportsDetails tr{height: 50px;} 
+    .reportsDetails th:nth-child(1){width: 5%;} .rDid{width: 5.25%;}
+    .reportsDetails th:nth-child(2){width: 10%;} .rDstep{width: 10.25%;}
+    .reportsDetails th:nth-child(3){width: 50%;} .rDstepDes{width: 49.8%;}
+    .reportsDetails th:nth-child(4){width: 10%;} .rDstatus{width: 10.1%;}
+    .reportsDetails th:nth-child(5){width: 12%;} .rDellaps{width: 12.1%;}
+    .reportsDetails th:nth-child(6), .rDcomments{width: 13%; word-break: break-word; word-break: break-all;}
+    .maintabCont{float: left; width: 100%; border: 1px solid #dcdcdc; height: 49%;}
+    .tabCont{display: table-cell; border-bottom: 1px solid #ececec; border-right: 1px solid #ececec;}
+    .reportsDetail{line-height: 2; text-align: center; height: calc(100% - 35px); overflow: auto;font-size: 14px;}
+    .reportsDetail tr { page-break-inside: avoid; }
+    .rDstepDes{text-align: left; word-break: break-word;}
+    .reportsDetail tr.reportdetailsrow:nth-child(even){background: #f9f9f9;}
+    .reportdetailsrow td{padding-top: 9px;}
+    @media screen and (max-height: 675px) {
+        .reportsDetail{
+            height: 174px;
+        }
+    }
+    .headerRepDetails{
+      left: 10px;
+      float:left;
+      display: block;
+      position: relative;
+      top: 7px;
+    }
+    .screenshot-container{text-align:center;padding:20px}
+    .screenshot-container img{border:1px solid #ccc;min-height:100px}
+    .screenshot-container a{font-size:20px;color:inherit;text-decoration:none}
+</style>
 <div class="mainContainer">
     {{#each overallstatus}}
     <div class="h2Header" >
@@ -218,11 +221,11 @@
             </thead>
             <tbody class="reportsDetail" >
                 {{#each rows}}
-                <tr style="width: 100%;" class="reportdetailsrow">
+                <tr id="report-slno{{slno}}" style="width: 100%;" class="reportdetailsrow">
                     <td class="rDid tabCont">{{slno}}</td>
                     <td class="rDstep tabCont">{{Step}}</td>
                     <td class="rDstepDes tabCont" style="padding-left: 10px;">{{StepDescription}}</td>
-                    <td class="rDstatus tabCont" style="padding-left: 10px; color: {{getColor status}}">{{status}}</td>
+                    <td class="rDstatus tabCont" style="padding-left: 10px; color: {{getColor status}}"><a style="color:inherit;text-decoration:none" href="{{validateImageID screenshot_path slno}}">{{status}}</a></td>
                     <td class="rDellaps tabCont">{{EllapsedTime}}</td>
                     <td class="rDcomments tabCont" style="padding-left: 10px;">{{Comments}}</td>
                 </tr>
@@ -241,5 +244,11 @@
             </div>
             {{/each}}
         </div>-->
+        {{#each rows}}
+        <div class="screenshot-container" style="display:{{validateImagePath screenshot_path}}">
+            <img id="img-{{slno}}" src="{{getDataURI screenshot_dataURI}}" style="width:100%;display:block;" alt="Image for Sl No. {{slno}}">
+            <a href="#report-slno{{slno}}">Above Image belongs to Sl No. {{slno}}</a>
+        </div>
+        {{/each}}
     </div>
 </div>
