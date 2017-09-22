@@ -3031,11 +3031,11 @@ console.log("screenName:", screenName);
                     var mydata = $("#jqGrid").jqGrid('getGridParam', 'data');
                     var getTR = $("#jqGrid tbody tr:visible td:nth-child(10)");
                     for (var i = 0; i < mydata.length; i++) {
-                        if (mydata[i].hasOwnProperty("_id_")) {
-                            if (mydata[i]._id_.indexOf('jpg') !== -1 || mydata[i]._id_.indexOf('jqg') !== -1) {
-                                var index = mydata.indexOf(mydata[i]);
-                                mydata.splice(index, 1);
-                            } else {
+//                        if (mydata[i].hasOwnProperty("_id_")) {
+//                            if (mydata[i]._id_.indexOf('jpg') !== -1 || mydata[i]._id_.indexOf('jqg') !== -1) {
+//                                var index = mydata.indexOf(mydata[i]);
+//                                mydata.splice(index, 1);
+//                            } else {
                                 mydata[i].stepNo = i + 1;
                                 if (mydata[i].custname == undefined || mydata[i].custname == "") {
                                     var stepNoPos = parseInt(mydata[i].stepNo);
@@ -3084,8 +3084,8 @@ console.log("screenName:", screenName);
                                 } else {
                                     mydata[i].remarks = getTR[i].textContent;
                                 }
-                            }
-                        }
+//                            }
+//                        }
                         /*else{
                         	if(mydata[i].remarks != undefined){
                         		if(mydata[i].remarks != getTR[i].textContent  && getTR[i].textContent.trim().length > 0 )	{
