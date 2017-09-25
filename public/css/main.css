@@ -2322,7 +2322,7 @@ input[disabled]{
 	display: block;
 	float: left;
 }
-.executionDataTable tbody tr:nth-child(odd), .scheduleDataBodyRow:nth-child(odd), .designDataTable tbody tr:nth-child(odd){
+.executionDataTable tbody tr:nth-child(odd), .designDataTable tbody tr:nth-child(odd){
 	/*background:#e8e6ff;	*/
     background: #e8e6fe;
 }
@@ -2349,12 +2349,12 @@ input[disabled]{
 	-ms-overflow-style: none;
 	-webkit-overflow-style: none;
 }
-.executionDataTable tbody tr, .scheduleDataBodyRow, .designDataTable tbody tr{
+.executionDataTable tbody tr, .designDataTable tbody tr, .scheduleDataBodyRowChild{
 	width: 100%;
-    display: block;
-    float: left;
-    padding-top: 5px;
-    padding-bottom: 5px;
+    /*display: block !important;*/
+    float: left !important;
+    padding-top: 5px !important;
+    padding-bottom: 5px !important;
 }
 .designDataTable tbody tr, .ui-widget-content{cursor: pointer;}
 .executionDataTable th, .executionDataTable td, .scheduleDataHeader span, .scheduleDataBodyRow div, .designDataTable th, .designDataTable td{
@@ -2364,6 +2364,7 @@ input[disabled]{
 	text-align: center;
 	float:left;
 }
+
 .executionDataTable .form-control, #scheduleDataBody .form-control, .designDataTable .form-control{
 	display: inline-block;
 	width: 90%;
@@ -2563,6 +2564,13 @@ input[disabled]{
     margin-top: 7px;
     width: 327px;
     padding: 0 10px 0 2px;
+}
+.cancelJob{
+    position: relative;
+    left: 5px;
+    background: #331d4e;
+    border: 1px solid #331d4e;
+    cursor: pointer;
 }
 /* Batch Scheduling */
 

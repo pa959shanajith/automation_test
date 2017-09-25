@@ -71,7 +71,6 @@ if (cluster.isMaster) {
     var cmd = require('node-cmd');
     var helmet = require('helmet');
 	const os = require('os');
-
     var async = require('async');
     //HTTPS Configuration
     var privateKey = fs.readFileSync('server/https/server.key', 'utf-8');
@@ -107,7 +106,6 @@ if (cluster.isMaster) {
             maxAge: (30 * 60 * 1000)
         }
     }));
-
     app.use(helmet());
     //write stream for logs
     //var accessLogStream = fs.createWriteStream(__dirname + '/access.log', {flags: 'a'})
@@ -146,7 +144,6 @@ if (cluster.isMaster) {
         }else{
             if (req.cookies['connect.sid'] && req.cookies['connect.sid'] != undefined) { res.sendFile("index.html", { root: __dirname + "/public/" });} else {req.session.destroy(); res.status(401).send('<br><br>Your session has been expired.Please <a href="/">Login</a>Again');}
         }
-
     });
 
     //Only Test Engineer and Test Lead have access
@@ -171,12 +168,13 @@ if (cluster.isMaster) {
     });
 
     function sessionCheck(req, res, roles) {
+        console.log("session check ", req.url)
       if (!req.session.defaultRole || roles.indexOf(req.session.defaultRole) >=0)
         {
             req.session.destroy(); res.status(401).send('<br><br>Your session has been expired.Please <a href="/">Login</a> Again');
         }else{
             if (req.cookies['connect.sid'] && req.cookies['connect.sid'] != undefined) {
-
+                
                  res.sendFile("index.html", { root: __dirname + "/public/" });
                 } else {
                      req.session.destroy();
@@ -211,7 +209,7 @@ if (cluster.isMaster) {
     app.post('/casQuerya', api.casScriptA);
     app.post('/neoQuerya', api.neoScriptA);
     //Starting jsreport server
-	if(os.type()=='Windows_NT') {
+    if(os.type()=='Windows_NT') {
 		try{
 			var tmp=os.tmpdir();
 			fs.unlinkSync(tmp+'\\jsreport-temp\\extensions\\locations.json');
@@ -266,7 +264,6 @@ if (cluster.isMaster) {
     var chatbot = require('./server/controllers/chatbot');
     var neuronGraphs2D = require('./server/controllers/neuronGraphs2D');
 
-
     //Login Routes
     app.post('/authenticateUser_Nineteen68', login.authenticateUser_Nineteen68);
     app.post('/authenticateUser_Nineteen68_CI', login.authenticateUser_Nineteen68_CI);
@@ -299,14 +296,15 @@ if (cluster.isMaster) {
     //Execute Screen Routes
     app.post('/readTestSuite_ICE', suite.readTestSuite_ICE);
     app.post('/updateTestSuite_ICE', suite.updateTestSuite_ICE);
-    app.post('/updateTestScenario_ICE', suite.updateTestScenario_ICE);
+    //app.post('/updateTestScenario_ICE', suite.updateTestScenario_ICE);
     app.post('/ExecuteTestSuite_ICE', suite.ExecuteTestSuite_ICE);
     app.post('/getTestcaseDetailsForScenario_ICE', suite.getTestcaseDetailsForScenario_ICE);
     app.post('/ExecuteTestSuite_ICE_CI', suite.ExecuteTestSuite_ICE_CI);
     //app.post('/readTestScenarios_ICE', suite.readTestScenarios_ICE);
     //Scheduling Screen Routes
-    //app.post('/testSuitesScheduler_ICE', suite.testSuitesScheduler_ICE);
-    //app.post('/getScheduledDetails_ICE', suite.getScheduledDetails_ICE);
+    app.post('/testSuitesScheduler_ICE', suite.testSuitesScheduler_ICE);
+    app.post('/getScheduledDetails_ICE', suite.getScheduledDetails_ICE);
+    app.post('/cancelScheduledJob_ICE', suite.cancelScheduledJob_ICE);
     //Report Screen Routes
     app.post('/getAllSuites_ICE', report.getAllSuites_ICE);
     app.post('/getSuiteDetailsInExecution_ICE', report.getSuiteDetailsInExecution_ICE);
@@ -350,7 +348,7 @@ if (cluster.isMaster) {
     //-------------SERVER START------------//
     //server.listen(3000);      //Http Server
     var hostFamilyType = '0.0.0.0';
-  var portNumber=8443;
+    var portNumber=8443;
     httpsServer.listen(portNumber, hostFamilyType); //Https Server
     try{
         var apireq = apiclient.get("http://127.0.0.1:1990/",function(data,response){
@@ -359,7 +357,7 @@ if (cluster.isMaster) {
                     httpsServer.close();
                     console.log("Please run the Service API and Restart the Server");
                 }else{
-					//suite.reScheduleTestsuite();
+					suite.reScheduleTestsuite();
                     console.log("Nineteen68 Server Ready...");
                 }
             }catch(exception){
