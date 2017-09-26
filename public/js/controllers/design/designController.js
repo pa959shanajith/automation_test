@@ -93,7 +93,6 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
     //console.log(appType);
     $scope.getScreenView = appType
     //Getting Apptype orScreen Type
-
     cfpLoadingBar.start()
     $timeout(function() {
         if (window.location.href.split("/")[3] == "designTestCase" || $scope.getScreenView == "Webservice" && window.location.href.split("/")[3] == "designTestCase") {
@@ -1767,6 +1766,8 @@ console.log("screenName:", screenName);
             scrapeObject = {};
             scrapeObject.param = 'deleteScrapeData_ICE';
             scrapeObject.getScrapeData = viewString;
+            scrapeObject.getScrapeData.mirrorheight = viewString.mirrorheight;
+            scrapeObject.getScrapeData.mirrorwidth = viewString.mirrorwidth;
             scrapeObject.projectId = projectId;
             scrapeObject.screenId = screenId;
             scrapeObject.screenName = screenName;
@@ -1841,25 +1842,45 @@ console.log("screenName:", screenName);
                 openDialog("Delete Scrape data", "Please select objects to delete.")
             } else {
                 if (eaCheckbox){
+                    var dontChkViewString = 0;
                     $.each($("input[type=checkbox].checkall:checked"), function() {
                         for (var i = 0; i < newScrapedList.view.length; i++) {
                             if ($(this).parents("li").data("xpath") == newScrapedList.view[i].xpath && ($(this).parent('.objectNames').siblings(".ellipsis").text().trim().replace('/\s/g', ' ')).replace('\n', ' ') == newScrapedList.view[i].custname.trim()) {
                                 //newScrapedList.view.splice(newScrapedList.view.indexOf(newScrapedList.view[i]), 1);
-                                getIndexOfDeletedObjects.push(newScrapedList.view.indexOf(newScrapedList.view[i]))
-                                $(this).parents("li.select_all").remove();
-                                break;
+                                if(!(isInArray(newScrapedList.view.indexOf(newScrapedList.view[i]), getIndexOfDeletedObjects))){
+                                    getIndexOfDeletedObjects.push(newScrapedList.view.indexOf(newScrapedList.view[i]))
+                                    $(this).parents("li.select_all").remove();
+                                    dontChkViewString++;
+                                    break;
+                                }
                             }
                         }
                     })
+                    if($("input[type=checkbox].checkall:checked").length != dontChkViewString){
+                        $.each($("input[type=checkbox].checkall:checked"), function() {
+                            for (var i = 0; i < viewString.view.length; i++) {
+                                if ($(this).parents("li").data("xpath") == viewString.view[i].xpath && ($(this).parent('.objectNames').siblings(".ellipsis").text().trim().replace('/\s/g', ' ')).replace('\n', ' ') == viewString.view[i].custname.trim()) {
+                                    //viewString.view.splice(viewString.view.indexOf(viewString.view[i]), 1);
+                                    if(!(isInArray(viewString.view.indexOf(viewString.view[i]), getIndexOfDeletedObjects))){
+                                        getIndexOfDeletedObjects.push(viewString.view.indexOf(viewString.view[i]))
+                                        $(this).parents("li.select_all").remove();
+                                        break;
+                                    }
+                                }
+                            }
+                        })
+                    }
                 }
                 else{
                     $.each($("input[type=checkbox].checkall:checked"), function() {
                         for (var i = 0; i < viewString.view.length; i++) {
                             if ($(this).parents("li").data("xpath") == viewString.view[i].xpath && ($(this).parent('.objectNames').siblings(".ellipsis").text().trim().replace('/\s/g', ' ')).replace('\n', ' ') == viewString.view[i].custname.trim()) {
                                 //viewString.view.splice(viewString.view.indexOf(viewString.view[i]), 1);
-                                getIndexOfDeletedObjects.push(viewString.view.indexOf(viewString.view[i]))
-                                $(this).parents("li.select_all").remove();
-                                break;
+                                if(!(isInArray(viewString.view.indexOf(viewString.view[i]), getIndexOfDeletedObjects))){
+                                    getIndexOfDeletedObjects.push(viewString.view.indexOf(viewString.view[i]))
+                                    $(this).parents("li.select_all").remove();
+                                    break;
+                                }
                             }
                         }
                     })
@@ -1867,7 +1888,10 @@ console.log("screenName:", screenName);
                 $("#deleteObjects").prop("disabled", true);
             }
         }
+    }
 
+    function isInArray(value, array) {
+        return array.indexOf(value) > -1;
     }
 
     var showSearchBox = true;

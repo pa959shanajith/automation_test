@@ -1457,7 +1457,7 @@ var submit_task=function(e){
 	var taskinfo=JSON.parse(window.localStorage['_CT']);
 	var taskid=taskinfo.subTaskId;
 	//alert(taskinfo.subTaskId);
-	dataSender({task:'reviewTask',prjId:$(".project-list").val(),taskId:taskid,userId:userid},function(err,result){
+	dataSender({task:'reviewTask',prjId:taskinfo.projectId,taskId:taskid,userId:userid},function(err,result){
 		if(err) console.log(result);
 		else{
 			console.log(result);
