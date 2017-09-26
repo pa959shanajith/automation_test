@@ -1013,7 +1013,7 @@ function TestCaseDetails_Suite_ICE(req,userid, cb, data) {
             testcaseid: function(callback) {
                 var inputs = {
                     "testscenarioid": requestedtestscenarioid,
-                    "query": "testcaseid"
+                    "query": "testcaseid","userid":userid
                 }
                 var args = {
                     data: inputs,
@@ -1048,7 +1048,7 @@ function TestCaseDetails_Suite_ICE(req,userid, cb, data) {
                     };
                     var inputs = {
                         "testcaseid": quest,
-                        "query": "testcasesteps"
+                        "query": "testcasesteps","userid":userid
                     }
                     var args = {
                         data: inputs,
