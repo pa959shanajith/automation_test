@@ -695,6 +695,8 @@ exports.updateScreen_ICE = function(req, res){
 										}
 										scrapedObjects.view=viewString;
 										scrapedObjects.mirror=scrapedobjects.mirror;
+										scrapedObjects.mirrorheight = scrapedobjects.mirrorheight;
+            							scrapedObjects.mirrorwidth = scrapedobjects.mirrorwidth;
 										scrapedObjects.scrapedin=scrapedobjects.scrapedin;
 										scrapedObjects.scrapetype=scrapedobjects.scrapetype;
 										//this query will be called only if ALL objects are identified.
