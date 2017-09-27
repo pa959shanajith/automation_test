@@ -1246,12 +1246,17 @@ console.log("screenName:", screenName);
 
     //Initiating Scraping
     $scope.initScraping = function(e, browserType) {
+
+        $(".addObject span img").removeClass("left-bottom-selection");
+        $(".compareObject span img").removeClass("left-bottom-selection");
+        $(".generateObj span img").removeClass("left-bottom-selection");
         if (e.currentTarget.className == "disableActions") return false
         else {
             eaCheckbox = $("#enableAppend").is(":checked")
             //enableScreenShotHighlight = false;
             screenViewObject = {}
             var blockMsg = 'Scraping in progress. Please Wait...';
+            var blockMsg2 = 'Comparing objects in progress...';
             $(document).find("#desktopPath").removeClass("inputErrorBorder");
             $(document).find("#OEBSPath").removeClass("inputErrorBorder");
             $(document).find("#mobilityAPKPath, #mobilitySerialPath, #mobilityDeviceName, #mobilityiOSVersion, #mobilityUDID").removeClass("inputErrorBorder");
@@ -1266,7 +1271,12 @@ console.log("screenName:", screenName);
                     screenViewObject.appType = $scope.getScreenView,
                         screenViewObject.applicationPath = $(document).find("#desktopPath").val();
                     $("#launchDesktopApps").modal("hide");
-                    blockUI(blockMsg);
+                    if(compareFlag == true){
+                        blockUI(blockMsg2);
+                    }
+                    else{
+                        blockUI(blockMsg);
+                    }
                 }
             }
             //For Desktop
@@ -1280,7 +1290,13 @@ console.log("screenName:", screenName);
                     screenViewObject.appType = $scope.getScreenView,
                         screenViewObject.applicationPath = $(document).find("#SAPPath").val();
                     $("#launchSAPApps").modal("hide");
-                    blockUI(blockMsg);
+                    //blockUI(blockMsg);
+                    if(compareFlag == true){
+                        blockUI(blockMsg2);
+                    }
+                    else{
+                        blockUI(blockMsg);
+                    }
                 }
             }
 
@@ -1302,7 +1318,13 @@ console.log("screenName:", screenName);
                             screenViewObject.apkPath = $(document).find("#mobilityAPKPath").val();
                         screenViewObject.mobileSerial = $(document).find("#mobilitySerialPath").val();
                         $("#launchMobilityApps").modal("hide");
+                        // blockUI(blockMsg);
+                        if(compareFlag == true){
+                        blockUI(blockMsg2);
+                    }
+                    else{
                         blockUI(blockMsg);
+                    }
                     }
                 } else if ($("#mobilityAPKPath").val().toLowerCase().indexOf(".ipa") >= 0 || $("#mobilityAPKPath").val().toLowerCase().indexOf(".app") >= 0) {
                     if ($(document).find("#mobilityAPKPath").val() == "") {
@@ -1325,7 +1347,13 @@ console.log("screenName:", screenName);
                         screenViewObject.mobileIosVersion = $(document).find("#mobilityiOSVersion").val();
                         screenViewObject.mobileUDID = $(document).find("#mobilityUDID").val();
                         $("#launchMobilityApps").modal("hide");
-                        blockUI(blockMsg);
+                        // blockUI(blockMsg);
+                        if(compareFlag == true){
+                        blockUI(blockMsg2);
+                        }
+                        else{
+                            blockUI(blockMsg);
+                        }
                     }
                 }
             }
@@ -1345,7 +1373,13 @@ console.log("screenName:", screenName);
                         screenViewObject.mobileSerial = $(document).find("#mobilityWebSerialNo").val();
                     screenViewObject.androidVersion = $(document).find("#mobilityAndroidVersion").val();
                     $("#launchMobilityWeb").modal("hide");
-                    blockUI(blockMsg);
+                    // blockUI(blockMsg);
+                    if(compareFlag == true){
+                        blockUI(blockMsg2);
+                    }
+                    else{
+                        blockUI(blockMsg);
+                    }
                 }
             }
             //For Mobility Web
@@ -1360,7 +1394,13 @@ console.log("screenName:", screenName);
                     screenViewObject.appType = $scope.getScreenView,
                         screenViewObject.applicationPath = $(document).find("#OEBSPath").val();
                     $("#launchOEBSApps").modal("hide");
-                    blockUI(blockMsg);
+                    // blockUI(blockMsg);
+                    if(compareFlag == true){
+                        blockUI(blockMsg2);
+                    }
+                    else{
+                        blockUI(blockMsg);
+                    }
                 }
             }
             //For OEBS
@@ -1372,7 +1412,13 @@ console.log("screenName:", screenName);
                     screenViewObject.action = "compare";
                 }
                 screenViewObject.browserType = browserType
-                blockUI(blockMsg);
+                // blockUI(blockMsg);
+                if(compareFlag == true){
+                        blockUI(blockMsg2);
+                    }
+                    else{
+                        blockUI(blockMsg);
+                    }
             }
             //For Web
             DesignServices.initScraping_ICE(screenViewObject)
@@ -2192,6 +2238,11 @@ console.log("screenName:", screenName);
 
     //Add Object Functionality
     $scope.addObj = function() {
+
+        $(".generateObj span img").removeClass("left-bottom-selection");
+        $(".compareObject span img").removeClass("left-bottom-selection");
+        $(".addObject span img").addClass("left-bottom-selection");
+
         $scope.errorMessage = "";
         $("#dialog-addObject").modal("show");
         $("#addObjContainer").empty()
@@ -2354,6 +2405,11 @@ console.log("screenName:", screenName);
 
     //Map Object Drag and Drop Functionality
     $scope.generateMapObj = function() {
+
+        $(".addObject span img").removeClass("left-bottom-selection");
+        $(".compareObject span img").removeClass("left-bottom-selection");
+        $(".generateObj span img").addClass("left-bottom-selection");
+
         $(".submitObjectWarning, .objectExistMap, .noObjectToMap").hide();
         $("#dialog-mapObject").modal("show");
         $('#scrapedObjforMap, #customObjforMap').empty();
@@ -2417,6 +2473,11 @@ console.log("screenName:", screenName);
     compareFlag = false;
     //Compare Objects
     $scope.compareObj = function() {
+
+        $(".generateObj span img").removeClass("left-bottom-selection");
+        $(".addObject span img").removeClass("left-bottom-selection");
+        $(".compareObject span img").addClass("left-bottom-selection");
+
         openDialog("Compare Object", "Please select browser icon to compare and update objects.");
         compareFlag = true;
         if (compareFlag == true) {
@@ -4137,7 +4198,7 @@ function contentTable(newTestScriptDataLS) {
                         $grid.jqGrid('setCell', rowId, 'objectName', objName);
                         $grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
                         break;
-                    } else if (appTypeLocal == 'Desktop' && (obType == 'button' || obType == 'input' || obType == 'select' || obType == 'list_item' || obType == 'hyperlink' || obType == 'lbl' ||
+                    } else if (appTypeLocal == 'Desktop' && (obType == 'button' || obType == 'input' || obType == 'select' || obType == 'list_item' || obType == 'hyperlink' || obType == 'lbl' || obType =='treeview'|| obType=='TreeView' || obType=='tree' ||
                             obType == 'list' || obType == 'edit' || obType == null || obType == 'checkbox' || obType == 'radiobutton' || obType == 'tab' || obType == 'datepicker' || obType != undefined)) {
                         var res = '';
                         var sc;
@@ -4177,6 +4238,9 @@ function contentTable(newTestScriptDataLS) {
                         } else if (obType == 'hyperlink' || obType == 'lbl') {
                             sc = Object.keys(keywordArrayList.link);
                             selectedKeywordList = "link";
+                        } else if(obType =='treeview'|| obType=='TreeView' || obType=='tree'){
+                            sc = Object.keys(keywordArrayList.tree);
+                            selectedKeywordList = "tree";
                         } else {
                             sc = Object.keys(keywordArrayList.element);
                             selectedKeywordList = "element";
@@ -4195,7 +4259,7 @@ function contentTable(newTestScriptDataLS) {
                         $grid.jqGrid('setCell', rowId, 'objectName', objName);
                         $grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
                         break;
-                    } else if (appTypeLocal == 'Desktop' && (!(obType == 'push_button' || obType == 'text' || obType == 'combo_box' || obType == 'list_item' || obType == 'hyperlink' || obType == 'lbl' ||
+                    } else if (appTypeLocal == 'Desktop' && (!(obType == 'push_button' || obType == 'text' || obType == 'combo_box' || obType == 'list_item' || obType == 'hyperlink' || obType == 'lbl' || obType =='treeview'|| obType=='TreeView' || obType=='tree' ||
                             obType == 'list' || obType == 'edit' || obType == null || obType == 'Static' || obType == 'check_box' || obType == 'radio_button' || obType == 'tab' || obType == 'datepicker'))) {
                         var res = '';
                         var sc = Object.keys(keywordArrayList.element);

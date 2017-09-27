@@ -840,7 +840,7 @@ body {
 
 #left-bottom-section ul li {
     margin-top: 0;
-    margin-bottom: 25%;
+    margin-bottom: 16%;
 }
 
 #left-bottom-section ul li:last-child {
@@ -863,9 +863,12 @@ body {
     margin-bottom: 2px;
 }
 
-#left-bottom-section ul li span {
-    margin-bottom: 8px;
-}
+/*#left-bottom-section ul li span img {
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-top: 6px;
+    margin-bottom: 8px; 
+}*/
 
 #left-top-section ul li a,
 #left-bottom-section ul li a {
@@ -880,16 +883,21 @@ body {
     margin: 0 auto;
 }
 
+.left-bottom-selection{
+    background: rgb(51, 29, 76);
+    border-radius: 5px;
+}
+
 #left-top-section ul li a:focus,
 #left-bottom-section ul li a:focus {
     outline: 0
 }
 
-#left-top-section ul li a span img {
+#left-top-section ul li a span img, #left-bottom-section ul li a span img {
     padding: 8px 10px;
 }
 
-#left-top-section ul li a:hover span img {
+#left-top-section ul li a:hover span img, #left-bottom-section ul li a:hover span img {
     /*background: #331d4c;*/
     background: #523176;
     border-radius: 5px;
@@ -1438,7 +1446,7 @@ input[disabled]{
     width: 60%;
     margin-left: 34%;
     margin-top: -10%;
-    line-height: 1.7;
+    line-height: 1.7; 
     border: 1px solid #656565 !important;
 }
 
@@ -1474,7 +1482,7 @@ input[disabled]{
     background-clip: padding-box;
     border: 1px solid #adabab;
     border-radius: 1px;
-
+    
 }
 
 .rolesSpan>label{
@@ -1486,7 +1494,7 @@ input[disabled]{
 .rolesSpan>input{
   margin-top: 3px;
   margin-left: 12px;
-}
+} 
 
 .rolesSpan{
     padding-top: 9px;
@@ -4506,10 +4514,6 @@ select:-webkit-autofill:focus {
 		min-height: 36%;
 	}
 
-	#left-bottom-section ul li {
-	    margin-top: 0;
-	    margin-bottom: 20%;
-	}
 	.list-inline-right > li.list-inline-item:nth-child(2){margin-right: -32px !important;}
 	.searchIcon img{margin-top: 0 !important;}
 	.list-inline-right{padding-right: 0px !important;}
