@@ -77,7 +77,26 @@ if (cluster.isMaster) {
     var certificate = fs.readFileSync('server/https/server.crt', 'utf-8');
     var credentials = {
         key: privateKey,
-        cert: certificate
+        cert: certificate,
+        ciphers: [
+            "ECDHE-RSA-AES256-SHA384",
+            "DHE-RSA-AES256-SHA384",
+            "ECDHE-RSA-AES256-SHA256",
+            "DHE-RSA-AES256-SHA256",
+            "ECDHE-RSA-AES128-SHA256",
+            "DHE-RSA-AES128-SHA256",
+            "HIGH",
+            "!aNULL",
+            "!eNULL",
+            "!EXPORT",
+            "!DES",
+            "!RC4",
+            "!MD5",
+            "!PSK",
+            "!SRP",
+            "!CAMELLIA"
+        ].join(':'),
+        honorCipherOrder: true
     };
     var httpsServer = require('https').createServer(credentials, app);
     var io = require('socket.io')(httpsServer);
