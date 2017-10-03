@@ -161,143 +161,210 @@ exports.getAllSuites_ICE = function (req, res) {
 	}
 	if(sessionToken != undefined && req.session.id == sessionToken)
 	{
-		var req_userId=req.body.userId;
-		var args={}
-		//req_userId = 'a144b468-e84f-4e7c-9a8a-0a658330212e';
-		// var getDomain="SELECT domainid FROM icepermissions WHERE userid="+req_userId+";";
-		var testSuiteDetails=[];
-		var flag="";
-		async.series({
-			domainAssignedWithUserID: function(callback){
-				// dbConnICE.execute(getDomain,function(err,result){
-					// console.log("Exe getAllSuites_ICE service")
-					// if(err){
-					var inputs = {"userid": req.body.userId, "query": "domainid"}
-					var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
-					client.post(epurl+"reports/getAllSuites_ICE",args,
-							function (result, response) {
-					if(response.statusCode != 200 || result.rows == "fail"){
-						flag="fail";
-						res.send(flag);
-						// console.log(err);
-					}else{
-						try{
-							var domainid = JSON.parse(JSON.stringify(result.rows[0].domainid));
-							resultdata = domainid;
-							//console.log(resultdata);
-							callback(null,resultdata);
-						}catch(ex){
-							console.log("Exception occured in fetching domain_id getAllSuites_ICE : ",ex);
+		//the code below is commented as per the new requirement
+		//ALM #460 - Reports - HTML report takes very long time to open/ hangs when report size is 5MB above
+		// author - vishvas.a modified date:27-Sep-2017
+		var requestedaction = req.body.readme;
+		if (requestedaction == 'projects'){
+			try{
+				var userid = req.body.userId;
+				getprojectdetails(userid,function(getprojectdetailserror,getprojectdetailsresponse){
+					try{
+						if(getprojectdetailserror){
+							console.log("Error in getAllSuites_ICE:Projects");
 							res.send("fail");
+						}else{
+							res.send(getprojectdetailsresponse);
 						}
+					}catch(exception){
+						console.log(exception);
+						res.send("fail");
 					}
 				});
-			},
-			projectsUnderDomain: function(callback){
-				// var getProjectIDs="SELECT projectid FROM projects WHERE domainid="+resultdata+";";
-				// dbConnICE.execute(getProjectIDs,function(err,result){
-				// 	if(err){
-				var inputs = {"domainid": resultdata, "query": "projectsUnderDomain"}
-				var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
-				client.post(epurl+"reports/getAllSuites_ICE",args,
-						function (result, response) {
-					if(response.statusCode != 200 || result.rows == "fail"){
-						flag="fail";
-						console.log("Error occured in getAllSuites_ICE : Fail");
-						res.send(flag);
-					}else{
-						async.forEachSeries(result.rows, function(iterator, callback2) {
-							try{
-								// var releaseids = "SELECT releaseid FROM releases WHERE projectid="+iterator.projectid;
-								// dbConnICE.execute(releaseids,function(err,releaseidsdata){
-								// 	if(err){
-								var inputs = {"projectid": iterator.projectid, "query": "releasesUnderProject"}
-								var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
-								client.post(epurl+"reports/getAllSuites_ICE",args,
-										function (releaseidsdata, response) {
-									if(response.statusCode != 200 || releaseidsdata.rows == "fail"){
-										console.log(err);
-									}else{
-										async.forEachSeries(releaseidsdata.rows,function(releaseiditr,callback3){
-											try{
-												// var cycleids = "SELECT cycleid FROM cycles WHERE releaseid="+releaseiditr.releaseid;
-												// dbConnICE.execute(cycleids,function(err,cycleidsdata){
-												// 	if(err){
-												var inputs = {"releaseid": releaseiditr.releaseid, "query": "cycleidUnderRelease"}
-												var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
-												client.post(epurl+"reports/getAllSuites_ICE",args,
-															function (cycleidsdata, response) {
-													if(response.statusCode != 200 || result.rows == "fail"){
-														console.log(err);
-													}else{
-														async.forEachSeries(cycleidsdata.rows,function(cycleiditr,callback4){
-															try{
-																// var testsuiteids = "SELECT testsuiteid,testsuitename FROM testsuites WHERE cycleid="+cycleiditr.cycleid;
-																// dbConnICE.execute(testsuiteids,function(err,testsuiteidsdata){
-																// 	if(err){
-																var inputs = {"cycleid": cycleiditr.cycleid, "query": "suitesUnderCycle"}
-																var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
-																client.post(epurl+"reports/getAllSuites_ICE",args,
-																			function (testsuiteidsdata, response) {
-																	if(response.statusCode != 200 || testsuiteidsdata.rows == "fail"){
-																		console.log(err);
-																	}else{
-																		async.forEachSeries(testsuiteidsdata.rows,function(testsuiteiditr,callback5){
-																			try{
-																				testSuiteDetails.push({
-																					testsuiteid :  testsuiteiditr.testsuiteid ,
-																					testsuitename: testsuiteiditr.testsuitename
-																				});
-																				callback5();
-																			}
-																			catch(exception){
-																				console.log(exception);
-																				res.send("fail");
-																			}
-																		},callback4);
-																	}
-																});
-															}
-															catch(exception){
-																console.log(exception);
-																res.send("fail");
-															}
-														},callback3);
-													}
-												});
-											}
-											catch(exception){
-												console.log(exception);
-												res.send("fail");
-											}
-										},callback2);
-									}
-								});
-							}
-							catch(exception){
-								console.log(exception);
-								res.send("fail");
-							}
-						}, callback);
-					}
-				});
-
-			}
-		},
-		function(err,results){
-			//data.setHeader('Content-Type','application/json');
-			if(err){
-				console.log("Error::::::",err)
+			}catch(exception){
+				console.log(exception);
 				res.send("fail");
 			}
-			else{
-				//console.log(JSON.stringify(testSuiteDetails));
-				res.send(JSON.stringify(testSuiteDetails));
+		}else if (requestedaction == 'reports'){
+			try{
+				var projectid=req.body.projectId;
+				getsuitedetails(projectid,function(getsuitedetailserror,getsuitedetailsresponse){
+					try{
+						if(getsuitedetailserror){
+							console.log("Error in getAllSuites_ICE:Suites");
+							res.send("fail");
+						}else{
+							res.send(getsuitedetailsresponse);
+						}
+					}catch(exception){
+						console.log(exception);
+						res.send("fail");
+					}
+				});
+			}catch(exception){
+				console.log(exception);
+				res.send("fail");
 			}
-		})
-	}
-	else{
+		}else{
+			res.send('Invalid input fail');
+		}
+	}else{
 		res.send("Invalid Session");
+	}
+	//var req_userId=req.body.userId;var args={}req_userId = 'a144b468-e84f-4e7c-9a8a-0a658330212e';// var getDomain="SELECT domainid FROM icepermissions WHERE userid="+req_userId+";";var testSuiteDetails=[];var flag="";async.series({domainAssignedWithUserID: function(callback){// dbConnICE.execute(getDomain,function(err,result){// console.log("Exe getAllSuites_ICE service")// if(err){var inputs = {"userid": req.body.userId, "query": "domainid"}var args = {data:inputs,headers:{"Content-Type" : "application/json"}}client.post(epurl+"reports/getAllSuites_ICE",args,function (result, response) {if(response.statusCode != 200 || result.rows == "fail"){flag="fail";res.send(flag);// console.log(err);}else{try{var domainid = JSON.parse(JSON.stringify(result.rows[0].domainid));resultdata = domainid;//console.log(resultdata);callback(null,resultdata);}catch(ex){console.log("Exception occured in fetching domain_id getAllSuites_ICE : ",ex);res.send("fail");}}});},projectsUnderDomain: function(callback){// var getProjectIDs="SELECT projectid FROM projects WHERE domainid="+resultdata+";";// dbConnICE.execute(getProjectIDs,function(err,result){// if(err){var inputs = {"domainid": resultdata, "query": "projectsUnderDomain"}var args = {data:inputs,headers:{"Content-Type" : "application/json"}}client.post(epurl+"reports/getAllSuites_ICE",args,function (result, response) {if(response.statusCode != 200 || result.rows == "fail"){flag="fail";console.log("Error occured in getAllSuites_ICE : Fail");res.send(flag);}else{async.forEachSeries(result.rows, function(iterator, callback2) {try{// var releaseids = "SELECT releaseid FROM releases WHERE projectid="+iterator.projectid;// dbConnICE.execute(releaseids,function(err,releaseidsdata){// if(err){var inputs = {"projectid": iterator.projectid, "query": "releasesUnderProject"}var args = {data:inputs,headers:{"Content-Type" : "application/json"}}client.post(epurl+"reports/getAllSuites_ICE",args,function (releaseidsdata, response) {if(response.statusCode != 200 || releaseidsdata.rows == "fail"){console.log(err);}else{async.forEachSeries(releaseidsdata.rows,function(releaseiditr,callback3){try{// var cycleids = "SELECT cycleid FROM cycles WHERE releaseid="+releaseiditr.releaseid;// dbConnICE.execute(cycleids,function(err,cycleidsdata){// if(err){var inputs = {"releaseid": releaseiditr.releaseid, "query": "cycleidUnderRelease"}var args = {data:inputs,headers:{"Content-Type" : "application/json"}}client.post(epurl+"reports/getAllSuites_ICE",args,function (cycleidsdata, response) {if(response.statusCode != 200 || result.rows == "fail"){console.log(err);}else{async.forEachSeries(cycleidsdata.rows,function(cycleiditr,callback4){try{// var testsuiteids = "SELECT testsuiteid,testsuitename FROM testsuites WHERE cycleid="+cycleiditr.cycleid;// dbConnICE.execute(testsuiteids,function(err,testsuiteidsdata){// if(err){var inputs = {"cycleid": cycleiditr.cycleid, "query": "suitesUnderCycle"}var args = {data:inputs,headers:{"Content-Type" : "application/json"}}client.post(epurl+"reports/getAllSuites_ICE",args,function (testsuiteidsdata, response) {if(response.statusCode != 200 || testsuiteidsdata.rows == "fail"){console.log(err);}else{async.forEachSeries(testsuiteidsdata.rows,function(testsuiteiditr,callback5){try{testSuiteDetails.push({testsuiteid :  testsuiteiditr.testsuiteid ,testsuitename: testsuiteiditr.testsuitename});callback5();}catch(exception){console.log(exception);res.send("fail");}},callback4);}});}catch(exception){console.log(exception);res.send("fail");}},callback3);}});}catch(exception){console.log(exception);res.send("fail");}},callback2);}});}catch(exception){console.log(exception);res.send("fail");}}, callback);}});}},function(err,results){//data.setHeader('Content-Type','application/json');if(err){console.log("Error::::::",err)res.send("fail");}else{//console.log(JSON.stringify(testSuiteDetails));res.send(JSON.stringify(testSuiteDetails));}})
+	function getprojectdetails(userid,getprojectdetailscallback){
+		try{
+		var responsedata = {projectids:[],projectnames:[]};
+		var inputs = { "query":"projects","userid" :userid};
+		var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
+		client.post(epurl+"reports/getAllSuites_ICE",args,
+			function (allprojectids, response) {
+				if (response.statusCode != 200 || allprojectids.rows == "fail") {
+					getprojectdetailscallback("fail",null);
+				}else {
+					try{
+						var projectssize = allprojectids.rows[0].projectids.length;
+						var index=0;
+						async.forEachSeries(allprojectids.rows[0].projectids,function(eachprojectid,allprojectidscallback){
+							try{
+								var inputs = {"id" :eachprojectid, "query" : "projects"};
+								var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
+								client.post(epurl+"admin/getNames_ICE",args,
+									function (eachprojectdata, response) {
+										if (response.statusCode != 200 || eachprojectdata.rows == "fail") {
+											getprojectdetailscallback("fail",null);
+										}else {
+											try{
+												if(eachprojectdata.rows.length > 0){
+													responsedata.projectids.push(eachprojectdata.rows[0].projectid);
+													responsedata.projectnames.push(eachprojectdata.rows[0].projectname);
+													index+=1;
+													allprojectidscallback();
+												}
+												if (projectssize == index){
+													getprojectdetailscallback(null,responsedata);
+												}
+											}catch(exception){
+												console.log(exception);
+												// getprojectdetailscallback("fail",null);
+											}
+										}
+									});
+							}catch(exception){
+								console.log(exception);
+								// getprojectdetailscallback("fail",null);
+							}
+						});
+					}catch(exception){
+						console.log(exception);
+						// getprojectdetailscallback("fail",null);
+					}
+				}	
+			});
+		}catch(exception){
+			console.log(exception);
+			// getprojectdetailscallback("fail",null);
+		}
+	}
+
+	function getsuitedetails(projectid,getsuitedetailscallback){
+		try{
+			var responsedata = {suiteids:[],suitenames:[]};
+			var inputs = { "query":"suites","subquery":"releases","projectid" :projectid};
+			var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
+			client.post(epurl+"reports/getAllSuites_ICE",args,
+				function (allreleaseids, releaseidresponse) {
+				if (releaseidresponse.statusCode != 200 || allreleaseids.rows == "fail") {
+					getsuitedetailscallback("fail",null);
+				}else {
+					try{
+						var releasessize=allreleaseids.rows.length;
+						var releaseindex=0;
+						if(releasessize >0){
+							async.forEachSeries(allreleaseids.rows,function(releaseid,releaseidcallback){
+								var inputs = { "query":"suites","subquery":"cycles","releaseid" :releaseid.releaseid};
+								var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
+								client.post(epurl+"reports/getAllSuites_ICE",args,
+									function (allcycleids, cycleidresponse) {
+										if (cycleidresponse.statusCode != 200 || allcycleids.rows == "fail") {
+											getsuitedetailscallback("fail",null);
+										}else {
+											try{
+												var cyclelength=allcycleids.rows.length;
+												var cycleindex=0;
+												if(cyclelength > 0){
+													async.forEachSeries(allcycleids.rows,function(cycleid,cycleidcallback){
+														try{
+															var inputs = {"id" :cycleid.cycleid, "query" : "cycledetails", "subquery":"subquery"}
+															var args = {data:inputs,headers:{"Content-Type" : "application/json"}}	
+															client.post(epurl+"admin/getDetails_ICE",args,
+																function (allsuitesdata, allsuitesresponse) {	
+																	if (allsuitesresponse.statusCode != 200 || allsuitesdata.rows == "fail") {
+																			getsuitedetailscallback("fail",null);
+																	}else {
+																		try{
+																			var suitesize=allsuitesdata.rows.length;
+																			var suiteindex=0; 
+																			if(suitesize > 0){
+																				async.forEachSeries(allsuitesdata.rows,function(eachsuite,eachsuitecallback){
+																					suiteindex+=1;
+																					responsedata.suiteids.push(eachsuite.testsuiteid);
+																					responsedata.suitenames.push(eachsuite.testsuitename);
+																					eachsuitecallback();
+																				});
+																			}
+																			if(suitesize == suiteindex){
+																				cycleidcallback();
+																				cycleindex+=1;	
+																			}
+																		}catch(exception){
+																			console.log(exception);
+																			getsuitedetailscallback("fail",null);
+																		}
+																	}
+																	if(cyclelength == cycleindex){
+																		releaseidcallback();
+																		releaseindex+=1;
+																	}
+																	
+																	if(releaseindex == releasessize){
+																		finalfunction();
+																	}
+																});
+														}catch(exception){
+															console.log(exception);
+															// getsuitedetailscallback("fail",null);
+														}
+													});
+												}else{
+													releaseidcallback();
+													releaseindex+=1;
+												}
+											}catch(exception){
+												console.log(exception);
+												// getsuitedetailscallback("fail",null);
+											}
+										}
+								});
+							});
+						}else{
+							finalfunction();
+						}
+						function finalfunction(){
+							// console.log("This is the response:",responsedata.suitenames.length);
+							// console.log("This is the response:",responsedata);
+							getsuitedetailscallback(null,responsedata);
+						}
+					}catch(exception){
+						console.log(exception);
+						// getsuitedetailscallback("fail",null);
+					}	
+				}
+				});
+		}catch(exception){
+			console.log(exception);
+			// getsuitedetailscallback("fail",null);
+		}
 	}
 }
 
