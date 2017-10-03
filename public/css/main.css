@@ -1681,9 +1681,10 @@ input[disabled]{
 	padding: 5px;
     margin-left: 10px;
     position: relative;
-    bottom: 4px;
+    bottom: 2px;
     border: 1px solid #633693;
     border-radius: 5px;
+    height: 24px;
 }
 .searchScrapInput{
 	padding: 3px;
@@ -4341,9 +4342,9 @@ select:-webkit-autofill:focus {
     .plugin-block {
         margin-bottom: 6%
     }
-	.leftQcStructure, .rightQcStructure{width: calc(100% - 505px) !important; height: 720px !important;}
+	/*.leftQcStructure, .rightQcStructure{width: calc(100% - 505px) !important; height: 720px !important;}
 	.qcActionBtnFirstChild{margin-left: 480px !important;}
-	.qcActionBtn label:nth-child(2){left: 440px !important;}
+	.qcActionBtn label:nth-child(2){left: 440px !important;}*/
 	.qcDomProContainer select, .qcProContainer select{width: calc(100% - 226px) !important;}
     .mappedFiles{height: calc(100% - 53px) !important;}
 }
@@ -4546,18 +4547,35 @@ select:-webkit-autofill:focus {
 .dynamicTestsuiteContainer{
   border-top: 1px solid white;
 }
-
+.rpSelectProjects{
+    float: left;
+    margin-left: 18px;
+    margin-top: 3px;
+}
+.rpSelectProjects>label{
+    margin: 0;
+    position: relative;
+    top: 6px;
+}
+.rpSelectProjects .rpProjects{
+    width: 200px;
+    height: 24px;
+    border-radius: 4px;
+    border-color: #633693;
+}
 .search-reports{
-  float: right;
+    float: right;
+    position: relative;
+    top: 5px;
 }
 
 .search-reports span{
   background: white !important;
-  padding: 2px 7px 1px !important
+  padding: 0px 5px 0px !important
 }
-
+.searchScrapEle img{margin-bottom: 3px;}
 .search-reports .searchScrapInput{
-  height: 29px;
+  height: 24px;
 }
 .expandTable{
   margin: -9px;

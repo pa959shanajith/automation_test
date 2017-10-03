@@ -2269,7 +2269,7 @@ function updateStatus(sessObj, updateStatuscallback) {
                         console.log(err);
                         updateStatuscallback(null, "fail");
                     } else {
-                        console.log("Status updated successfully----", scheduleStatus);
+                        //console.log("Status updated successfully----", scheduleStatus);
                         updateStatuscallback(null, "success");
                     }
                 })
@@ -2375,7 +2375,7 @@ function getScheduledDetails(dbquery, schedDetailscallback) {
 
 //Re-Scheduling the tasks
 exports.reScheduleTestsuite = function(req, res) {
-    var dbquery = "SELECT * from scheduledexecution;"
+    var dbquery = "SELECT * from scheduledexecution where schedulestatus='scheduled' allow filtering;"
     var getscheduleData = [];
     try {
         getScheduledDetails(dbquery, function(err, reSchedcallback) {

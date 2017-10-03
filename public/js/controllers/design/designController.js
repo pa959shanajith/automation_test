@@ -4656,6 +4656,10 @@ function contentTable(newTestScriptDataLS) {
             $grid.jqGrid('setCell', currRowId, 'objectName', objName);
             $grid.jqGrid('setCell', currRowId, 'url', url);
         }
+        else{
+            $grid.jqGrid('setCell', currRowId, 'objectName', objName);
+            $grid.jqGrid('setCell', currRowId, 'url', url);
+        }
         //get Input and Output Syntax for selected Keyword
         $.each(keywordArrayList, function(index, value) {
             keywordArrayKey = index;

@@ -15,23 +15,35 @@
             	<div id="middle-content-section" class="middle-content-section-reports">
             		<!--Task Name-->
                 <div>
-            		<div id="page-taskName">
-            			<span>Reports</span>
-                  <div class="search-reports">
-                    <span class="searchScrapEle"><img src="imgs/ic-search-icon.png"></span>
-                    <input type="search" id="searchModule" class="searchScrapInput" placeholder="Search">
-                  </div>
-            		</div>
+            	<div id="page-taskName">
+            		<span style="float: left;">Reports</span>
+            		<div class="rpSelectProjects">
+						<label>Projects:</label>
+						<select class="rpProjects" ng-model="" ng-options=""></select>
+					</div>
+					<div class="search-reports">
+						<span class="searchScrapEle"><img src="imgs/ic-search-icon.png"></span>
+						<input type="search" id="searchModule" class="searchScrapInput" placeholder="Search">
+					</div>
+            	</div>
 
               </div>
             		<!--Task Name-->
 
             		<!-- Test suites -->
             		<div class="upper-section-testsuites staticTestsuiteContainer">
+						<!--<span class='suiteContainer' ng-model="firstConSuites" ng-repeat="fSuites in firstConSuites" data-suiteId={{fSuites.testsuiteid}}>
+							<img alt='Test suite icon' class='reportbox' src='imgs/ic-reportbox.png' title={{fSuites.testsuitename}}><br/>
+							<span class='repsuitename' title={{fSuites.testsuitename}}>{{fSuites.testsuitename}}</span>
+						</span>-->
             			<span class="suitedropdownicon"><img alt="Collapse Icon" class="iconSpace" src='{#image ic-collapse}'></span>
             		</div>
             		<div class="upper-section-testsuites dynamicTestsuiteContainer upper-collapsible-section scrollbar-inner scrollbar-inner-rep">
-            		</div>
+						<!--<span class='suiteContainer' ng-model="secondConSuites" ng-repeat="sSuites in secondConSuites"  data-suiteId={{sSuites.testsuiteid}}>
+							<img alt='Test suite icon' class='reportbox' src='imgs/ic-reportbox.png' title={{sSuites.testsuitename}}><br/>
+							<span class='repsuitename' title={{sSuites.testsuitename}}>{{sSuites.testsuitename}}</span>
+						</span>-->
+					</div>
             		<!-- Middle Section -->
             		<div class="middle-section-testsuites">
             			<div class="left-section-testsuites">
