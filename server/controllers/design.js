@@ -1,7 +1,6 @@
 /**
  * Dependencies.
  */
-var Joi = require('joi');
 // var dbConn = require('../../server/config/icetestautomation');
 // var cassandra = require('cassandra-driver');
 var myserver = require('../../server.js');

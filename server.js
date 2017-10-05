@@ -217,16 +217,8 @@ if (cluster.isMaster) {
     });
 
 
-    // Mindmap Routes
-    var api = require('./routes_mindmap/api.js');
-    var home = require('./routes_mindmap/home.js');
     var Client = require("node-rest-client").Client;
     var apiclient = new Client();
-    app.use('/home', home);
-    app.get('/import', api.importToNeo);
-    app.get('/logout', api.logout);
-    app.post('/casQuerya', api.casScriptA);
-    app.post('/neoQuerya', api.neoScriptA);
     //Starting jsreport server
     if(os.type()=='Windows_NT') {
         try{
@@ -272,6 +264,8 @@ if (cluster.isMaster) {
     var screenShotPath=uiConfig.storageConfig.screenShotPath;
 
     //Route Directories
+    var neo4jAPI = require('./server/controllers/neo4jAPI');
+    var mindmap = require('./server/controllers/mindmap');
     var login = require('./server/controllers/login');
     var admin = require('./server/controllers/admin');
     var design = require('./server/controllers/design');
@@ -285,6 +279,10 @@ if (cluster.isMaster) {
     var chatbot = require('./server/controllers/chatbot');
     var neuronGraphs2D = require('./server/controllers/neuronGraphs2D');
 
+    // Mindmap Routes
+    app.use('/home', mindmap);
+    //Neo4j API Routes
+    app.post('/neo4jAPI', neo4jAPI.executeQueries);
     //Login Routes
     app.post('/authenticateUser_Nineteen68', login.authenticateUser_Nineteen68);
     app.post('/authenticateUser_Nineteen68_CI', login.authenticateUser_Nineteen68_CI);

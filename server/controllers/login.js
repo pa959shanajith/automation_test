@@ -1,8 +1,6 @@
 /**
 * Dependencies.
 */
-var Joi = require('joi');
-var client_cas = require('../../server/config/cassandra');
 var dbConn = require('../../server/config/cassandra');
 var cassandra = require('cassandra-driver');
 var dbConnICE = require('../../server/config/icetestautomation');

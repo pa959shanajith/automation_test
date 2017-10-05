@@ -1,6 +1,5 @@
-var create_ice=require('../server/controllers/create_ice');
+var create_ice=require('../controllers/create_ice');
 var fs = require('fs');
-var http = require('http');
 var async=require('async');
 var https = require('https');
 var certificate = fs.readFileSync('server/https/server.crt','utf-8');
@@ -16,7 +15,7 @@ exports.getTaskJson_mindmaps = function(obj,cb,data){
 	/*Neo4j query changed to return both the task node and it's associated module/screen/scenario/testcase node */
 	query={'statement':"MATCH (a)-[r:FNTT {id:b.nodeID}]-(b) where b.assignedTo='"+obj.userid+"' return a,b"};
 	var qlist_query=[query];
-	reqToAPI({"data":{"statements":qlist_query}},obj.urlData,'/neoQuerya',function(err,status,result){
+	reqToAPI({"data":{"statements":qlist_query}},obj.urlData,'/neo4jAPI',function(err,status,result){
 					//res.setHeader('Content-Type','application/json');
 					if(err){
 						console.log(err);
@@ -248,7 +247,7 @@ function next_function(resultobj,cb,data){
 											query1={'statement':"MATCH (n:MODULES_ENDTOEND{moduleID:'"+m.moduleID+"'}) RETURN n.moduleName"};
 											var qlist_query=[query];
 
-												reqToAPI({"data":{"statements":qlist_query}},urlData,'/neoQuerya',function(err,status,result){
+												reqToAPI({"data":{"statements":qlist_query}},urlData,'/neo4jAPI',function(err,status,result){
 																//res.setHeader('Content-Type','application/json');
 																if(err){
 
@@ -262,7 +261,7 @@ function next_function(resultobj,cb,data){
 																		maincallback();
 																	}catch(ex){
 																		qlist_query=[query1];
-																		reqToAPI({"data":{"statements":qlist_query}},urlData,'/neoQuerya',function(err,status,result){
+																		reqToAPI({"data":{"statements":qlist_query}},urlData,'/neo4jAPI',function(err,status,result){
 																		//res.setHeader('Content-Type','application/json');
 																		if(err){
 																			console.log(err);
