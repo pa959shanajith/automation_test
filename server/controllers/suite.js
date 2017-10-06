@@ -2026,7 +2026,7 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
                             conditionchecklist.push(eachsuiteDetails.condition);
                             browserTypelist = browserType;
                             currentscenarioid = eachsuiteDetails.scenarioids;
-                            TestCaseDetails_Suite_ICE(currentscenarioid, schedulingData.user_id, function(currentscenarioidError, currentscenarioidResponse) {
+                            TestCaseDetails_Suite_ICE(currentscenarioid, schedulingData[0].userInfo.user_id, function(currentscenarioidError, currentscenarioidResponse) {
                                 var scenariotestcaseobj = {};
                                 // scenarioindex=scenarioindex + 1;
                                 if (currentscenarioidError) {
