@@ -1,11 +1,10 @@
 var fs = require('fs');
-var http = require('http');
 var https = require('https');
 var uuidV4 = require('uuid/v4');
 var express = require('express');
 var router = express.Router();
-var admin = require('../server/controllers/admin');
-var create_ice=require('../server/controllers/create_ice');
+var admin = require('../controllers/admin');
+var create_ice=require('../controllers/create_ice');
 var async = require('async');
 var certificate = fs.readFileSync('server/https/server.crt','utf-8');
 
@@ -62,7 +61,7 @@ router.post('/', function(req, res, next) {
 		var urlData=req.get('host').split(':');
 		if(d.task=='getList'){
 			qList.push({"statement":"MATCH (n:MODULES{projectID:'"+prjId+"'}) RETURN n.moduleID,n.moduleName"});
-			reqToAPI({"data":{"statements":qList}},urlData,'/neoQuerya',function(err,status,result){
+			reqToAPI({"data":{"statements":qList}},urlData,'/neo4jAPI',function(err,status,result){
 				res.setHeader('Content-Type', 'application/json');
 				if(err) res.status(status).send(err);
 				else if(status!=200) res.status(status).send(result);
@@ -88,7 +87,7 @@ router.post('/', function(req, res, next) {
 			qList.push({"statement":"MATCH path=(n:MODULES{projectID:'"+prjId+"'}) WHERE NOT (n)-[:FMTTS]->() RETURN n","resultDataContents":["graph"]});
 			//MATCH (a:MODULES) WHERE NOT (a)-[:FMTTS]->() return a
 
-			reqToAPI({"data":{"statements":qList}},urlData,'/neoQuerya',function(err,status,result){
+			reqToAPI({"data":{"statements":qList}},urlData,'/neo4jAPI',function(err,status,result){
 				res.setHeader('Content-Type','application/json');
 				if(err) res.status(status).send(err);
 				else if(status!=200) res.status(status).send(result);
@@ -243,7 +242,7 @@ router.post('/', function(req, res, next) {
 				//qList=qList.concat(rnmList);
 				//var index=(qList.length-rnmList.length)-1;
 				
-				reqToAPI({"data":{"statements":qList}},urlData,'/neoQuerya',function(err,status,result){
+				reqToAPI({"data":{"statements":qList}},urlData,'/neo4jAPI',function(err,status,result){
 					res.setHeader('Content-Type','application/json');
 					if(err) res.status(status).send(err);
 					else if(status!=200) res.status(status).send(result);
@@ -343,7 +342,7 @@ router.post('/', function(req, res, next) {
 				var parsing_result=parsing(data,urlData,module_type);
 				//var qList_new=parsing(data,urlData);
 				 
-				reqToAPI({"data":{"statements":parsing_result[0]}},urlData,'/neoQuerya',function(err,status,result){
+				reqToAPI({"data":{"statements":parsing_result[0]}},urlData,'/neo4jAPI',function(err,status,result){
 					//res.setHeader('Content-Type','application/json');
 					if(err) res.status(status).send(err);
 					res.status(200).send(parsing_result[1]);
@@ -530,7 +529,7 @@ router.post('/', function(req, res, next) {
 				}
 				
 				
-				reqToAPI({"data":{"statements":qList}},urlData,'/neoQuerya',function(err,status,result){
+				reqToAPI({"data":{"statements":qList}},urlData,'/neo4jAPI',function(err,status,result){
 					res.setHeader('Content-Type','application/json');
 					if(err) res.status(status).send(err);
 					else if(status!=200) res.status(status).send(result);
@@ -629,7 +628,7 @@ router.post('/', function(req, res, next) {
 				var parsing_result=parsing(data,urlData,module_type);
 				//var qList_new=parsing(data,urlData);
 				 
-				reqToAPI({"data":{"statements":parsing_result[0]}},urlData,'/neoQuerya',function(err,status,result){
+				reqToAPI({"data":{"statements":parsing_result[0]}},urlData,'/neo4jAPI',function(err,status,result){
 					//res.setHeader('Content-Type','application/json');
 					if(err) res.status(status).send(err);
 					res.status(200).send(parsing_result[1]);
@@ -710,7 +709,7 @@ router.post('/', function(req, res, next) {
 			var taskID=d.taskId;
 			query={'statement':"MATCH (n:TASKS) WHERE n.taskID='"+taskID+"' and n.assignedTo='"+d.userId+"' RETURN n.reviewer"};
 			var qlist_query=[query];
-			reqToAPI({"data":{"statements":qlist_query}},urlData,'/neoQuerya',function(err,status,result){
+			reqToAPI({"data":{"statements":qlist_query}},urlData,'/neo4jAPI',function(err,status,result){
 					//res.setHeader('Content-Type','application/json');
 					if(err) {
 						res.status(status).send(err);
@@ -721,7 +720,7 @@ router.post('/', function(req, res, next) {
 								if(res_data[0].data[0].row[0] != null && res_data[0].data[0].row[0] != 'select reviewer'){
 									query={'statement':"MATCH (n:TASKS) WHERE n.taskID='"+taskID+"' and n.assignedTo='"+d.userId+"' set n.task_owner=n.assignedTo,n.assignedTo=n.reviewer,n.status='review' RETURN n"};
 									var qlist_query=[query];
-									reqToAPI({"data":{"statements":qlist_query}},urlData,'/neoQuerya',function(err,status,result){
+									reqToAPI({"data":{"statements":qlist_query}},urlData,'/neo4jAPI',function(err,status,result){
 											//res.setHeader('Content-Type','application/json');
 											if(err) res.status(status).send(err);
 											res.status(200).send('success');
@@ -746,7 +745,7 @@ router.post('/', function(req, res, next) {
 			query={'statement':"MATCH (a{moduleID:'"+moduleId+"'})-[:FMTTS]->(b) RETURN b"};
 			var qlist_query=[query];
 			var scenarioList=[];
-			reqToAPI({"data":{"statements":qlist_query}},urlData,'/neoQuerya',function(err,status,result){
+			reqToAPI({"data":{"statements":qlist_query}},urlData,'/neo4jAPI',function(err,status,result){
 					//res.setHeader('Content-Type','application/json');
 					if(err) {
 						res.status(status).send(err);

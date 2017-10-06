@@ -332,6 +332,9 @@ function unblockUI(){
 function p_redirect(name){
 	window.localStorage["_VP"] = true;
 	window.localStorage['navigateScreen'] = name;
+	if(name == 'p_Reports'){
+		localStorage.setItem('fromExecution','true');
+	}
 	window.location.assign(name);
 }
 

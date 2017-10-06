@@ -109,7 +109,7 @@ exports.getGraphData = function(req, res){
 			//'686d69a5-b519-4b4f-a813-8299235a2e97';'9c017f14-5a1c-4f2f-85a9-52728c86684c';
 			//qList.push({"statement":"MATCH(a:ICEPERMISSIONS_NG{userid:'"+userid+"'})-[r1]->(b:DOMAINS_NG) WITH b as d MATCH path=(d)-[r*1..]->(x) RETURN path","resultDataContents":["graph"]});
 			qList.push({"statement":"MATCH(a:ICEPERMISSIONS_NG{userid:'"+userid+"'})-[r1]->(d:DOMAINS_NG) WITH a.projectids as pids,d as d MATCH (p:PROJECTS_NG) WHERE p.projectid in pids WITH p as p,d as d MATCH path=(d)-[r2]->(p)-[r3*1..]->(x) RETURN path","resultDataContents":["graph"]});
-			reqToAPI({"data":{"statements":qList}},urlData,'/neoQuerya',function(err,status,result){
+			reqToAPI({"data":{"statements":qList}},urlData,'/neo4jAPI',function(err,status,result){
 				res.setHeader('Content-Type', 'application/json');
 				if(err) res.status(status).send(err);
 				else if(status!=200) res.status(status).send(result);

@@ -36,7 +36,7 @@ var xlsToCSV = function(workbook) {
 var reqToNeo4j = function(d,u,callback) {
 	var data = JSON.stringify(d);
 	var result="";
-	var postOptions = {host: u[0], port: u[1], path: '/neoQuerya', method: 'POST',	headers: {'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(data)}};
+	var postOptions = {host: u[0], port: u[1], path: '/neo4jAPI', method: 'POST',	headers: {'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(data)}};
 	var postRequest = http.request(postOptions,function(resp){
 		resp.setEncoding('utf-8');
 		resp.on('data', function(chunk) {result+=chunk;});

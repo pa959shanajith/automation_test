@@ -1,10 +1,6 @@
 /**
  * Dependencies.
  */
-var Joi = require('joi');
-var client_cas = require('../../server/config/cassandra');
-var cassandra = require('cassandra-driver');
-var Joi = require('joi');
 var dbConn = require('../../server/config/cassandra');
 var cassandra = require('cassandra-driver');
 var uuid = require('uuid-random');
