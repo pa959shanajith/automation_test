@@ -108,7 +108,7 @@
                                     alert("Failed to open image");
                                 }
                                 else{
-									data=data[0]
+                                    data=data[0]
                                     var b64Response = window.btoa(unescape(encodeURIComponent(data)));
                                     var imageUrl = 'data:image/PNG;base64,'+ data;
                                     var WindowObject = window.open();
@@ -409,7 +409,7 @@
                         <div class="rDid tabCont">{{slno}}</div>
                         <div class="rDstep tabCont">{{Step}}</div>
                         <div class="rDstepDes tabCont" style="padding-left: 10px; font-weight:{{getStyle StepDescription}}">{{StepDescription}}</div>
-                        <div class="rDstatus tabCont openscreenshot"  style="color:{{getColor status}}" data-screenshot={{screenshot_path}}>{{status}}</div>
+                        <div class="rDstatus tabCont openscreenshot"  style="color:{{getColor status}}" data-screenshot="{{screenshot_path}}">{{status}}</div>
                         <div class="rDellaps tabCont">{{EllapsedTime}}</div>
                         <div class="rDcomments tabCont" style="padding-left: 10px;">{{Comments}}</div>
                     </div>

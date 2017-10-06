@@ -4,6 +4,9 @@
     "ldap_domain":"psys.com",
     "host":"10.41.31.66",
     "username": "nineteen68",
-    "password": "TA@SLK2017"
+    "password": "TA@SLK2017",
+    "screenShotPath": "",
+    "n4jhost": "localhost:7474",
+    "n4jusername": "neo4j",
+    "n4jpassword": "local7474"
 }
-

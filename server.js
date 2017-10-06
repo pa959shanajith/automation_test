@@ -163,7 +163,7 @@ if (cluster.isMaster) {
     });
 
     //Test Lead and Test Manager can access Weboccular Plugin
-    app.get(/^\/(p_Weboccular|neuronGraphs2D|p_ALM)$/, function(req, res){
+    app.get(/^\/(p_Weboccular|neuronGraphs2D|p_ALM|p_Dashboard)$/, function(req, res){
         //Denied roles
         roles=  ["Admin", "Business Analyst", "Tech Lead", "Test Engineer"];
         sessionCheck(req, res, roles);
@@ -175,12 +175,11 @@ if (cluster.isMaster) {
             req.session.destroy(); res.status(401).send('<br><br>Your session has been expired.Please <a href="/">Login</a> Again');
         }else{
             if (req.cookies['connect.sid'] && req.cookies['connect.sid'] != undefined) {
-
                  res.sendFile("index.html", { root: __dirname + "/public/" });
                 } else {
                      req.session.destroy();
                       res.status(401).send('<br><br>Your session has been expired. Please <a href="/">Login</a> Again');
-                    }
+                }
         }
     }
     app.get('/favicon.ico', function(req, res){
@@ -257,6 +256,7 @@ if (cluster.isMaster) {
     var webCrawler = require('./server/controllers/webCrawler');
     var chatbot = require('./server/controllers/chatbot');
     var neuronGraphs2D = require('./server/controllers/neuronGraphs2D');
+    var dashboard = require('./server/controllers/dashboard');
 
 
     //Login Routes
@@ -336,6 +336,8 @@ if (cluster.isMaster) {
     app.post('/qcFolderDetails_ICE', qc.qcFolderDetails_ICE);
     app.post('/saveQcDetails_ICE', qc.saveQcDetails_ICE);
     app.post('/viewQcMappedList_ICE', qc.viewQcMappedList_ICE);
+    app.post('/loadDashboard', dashboard.loadDashboard);
+    app.post('/loadDashboardData', dashboard.loadDashboardData);
     //app.post('/manualTestcaseDetails_ICE', qc.manualTestcaseDetails_ICE);
 
 
