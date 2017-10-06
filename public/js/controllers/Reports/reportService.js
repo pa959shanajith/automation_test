@@ -40,10 +40,12 @@ mySPA.factory('reportService', ['$http','$q', function ($http, $httpProvider, $q
 			})
 		},
 		//Get all Testsuites 
-		getAllSuites_ICE : function(userID){
+		getAllSuites_ICE : function(userID, getData){
 			return $http.post('/getAllSuites_ICE',{
 				param : 'getAllSuites_ICE',
-				userId : userID
+				userId : userID,
+				projectId: userID,
+				readme: getData
 			})
 			.then(function(response)  {
 				return response.data

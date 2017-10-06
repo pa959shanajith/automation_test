@@ -840,7 +840,7 @@ body {
 
 #left-bottom-section ul li {
     margin-top: 0;
-    margin-bottom: 25%;
+    margin-bottom: 16%;
 }
 
 #left-bottom-section ul li:last-child {
@@ -863,9 +863,12 @@ body {
     margin-bottom: 2px;
 }
 
-#left-bottom-section ul li span {
-    margin-bottom: 8px;
-}
+/*#left-bottom-section ul li span img {
+    margin-left: 10px;
+    margin-right: 10px;
+    margin-top: 6px;
+    margin-bottom: 8px; 
+}*/
 
 #left-top-section ul li a,
 #left-bottom-section ul li a {
@@ -880,16 +883,21 @@ body {
     margin: 0 auto;
 }
 
+.left-bottom-selection{
+    background: rgb(51, 29, 76);
+    border-radius: 5px;
+}
+
 #left-top-section ul li a:focus,
 #left-bottom-section ul li a:focus {
     outline: 0
 }
 
-#left-top-section ul li a span img {
+#left-top-section ul li a span img, #left-bottom-section ul li a span img {
     padding: 8px 10px;
 }
 
-#left-top-section ul li a:hover span img {
+#left-top-section ul li a:hover span img, #left-bottom-section ul li a:hover span img {
     /*background: #331d4c;*/
     background: #523176;
     border-radius: 5px;
@@ -1438,7 +1446,7 @@ input[disabled]{
     width: 60%;
     margin-left: 34%;
     margin-top: -10%;
-    line-height: 1.7;
+    line-height: 1.7; 
     border: 1px solid #656565 !important;
 }
 
@@ -1474,7 +1482,7 @@ input[disabled]{
     background-clip: padding-box;
     border: 1px solid #adabab;
     border-radius: 1px;
-
+    
 }
 
 .rolesSpan>label{
@@ -1486,7 +1494,7 @@ input[disabled]{
 .rolesSpan>input{
   margin-top: 3px;
   margin-left: 12px;
-}
+} 
 
 .rolesSpan{
     padding-top: 9px;
@@ -1673,9 +1681,10 @@ input[disabled]{
 	padding: 5px;
     margin-left: 10px;
     position: relative;
-    bottom: 4px;
+    bottom: 2px;
     border: 1px solid #633693;
     border-radius: 5px;
+    height: 24px;
 }
 .searchScrapInput{
 	padding: 3px;
@@ -2322,7 +2331,7 @@ input[disabled]{
 	display: block;
 	float: left;
 }
-.executionDataTable tbody tr:nth-child(odd), .scheduleDataBodyRow:nth-child(odd), .designDataTable tbody tr:nth-child(odd){
+.executionDataTable tbody tr:nth-child(odd), .designDataTable tbody tr:nth-child(odd){
 	/*background:#e8e6ff;	*/
     background: #e8e6fe;
 }
@@ -2349,12 +2358,12 @@ input[disabled]{
 	-ms-overflow-style: none;
 	-webkit-overflow-style: none;
 }
-.executionDataTable tbody tr, .scheduleDataBodyRow, .designDataTable tbody tr{
+.executionDataTable tbody tr, .designDataTable tbody tr, .scheduleDataBodyRowChild{
 	width: 100%;
-    display: block;
-    float: left;
-    padding-top: 5px;
-    padding-bottom: 5px;
+    /*display: block !important;*/
+    float: left !important;
+    padding-top: 5px !important;
+    padding-bottom: 5px !important;
 }
 .designDataTable tbody tr, .ui-widget-content{cursor: pointer;}
 .executionDataTable th, .executionDataTable td, .scheduleDataHeader span, .scheduleDataBodyRow div, .designDataTable th, .designDataTable td{
@@ -2364,6 +2373,7 @@ input[disabled]{
 	text-align: center;
 	float:left;
 }
+
 .executionDataTable .form-control, #scheduleDataBody .form-control, .designDataTable .form-control{
 	display: inline-block;
 	width: 90%;
@@ -2563,6 +2573,13 @@ input[disabled]{
     margin-top: 7px;
     width: 327px;
     padding: 0 10px 0 2px;
+}
+.cancelJob{
+    position: relative;
+    left: 5px;
+    background: #331d4e;
+    border: 1px solid #331d4e;
+    cursor: pointer;
 }
 /* Batch Scheduling */
 
@@ -4325,9 +4342,9 @@ select:-webkit-autofill:focus {
     .plugin-block {
         margin-bottom: 6%
     }
-	.leftQcStructure, .rightQcStructure{width: calc(100% - 505px) !important; height: 720px !important;}
+	/*.leftQcStructure, .rightQcStructure{width: calc(100% - 505px) !important; height: 720px !important;}
 	.qcActionBtnFirstChild{margin-left: 480px !important;}
-	.qcActionBtn label:nth-child(2){left: 440px !important;}
+	.qcActionBtn label:nth-child(2){left: 440px !important;}*/
 	.qcDomProContainer select, .qcProContainer select{width: calc(100% - 226px) !important;}
     .mappedFiles{height: calc(100% - 53px) !important;}
 }
@@ -4498,10 +4515,6 @@ select:-webkit-autofill:focus {
 		min-height: 36%;
 	}
 
-	#left-bottom-section ul li {
-	    margin-top: 0;
-	    margin-bottom: 20%;
-	}
 	.list-inline-right > li.list-inline-item:nth-child(2){margin-right: -32px !important;}
 	.searchIcon img{margin-top: 0 !important;}
 	.list-inline-right{padding-right: 0px !important;}
@@ -4534,18 +4547,35 @@ select:-webkit-autofill:focus {
 .dynamicTestsuiteContainer{
   border-top: 1px solid white;
 }
-
+.rpSelectProjects{
+    float: left;
+    margin-left: 18px;
+    margin-top: 3px;
+}
+.rpSelectProjects>label{
+    margin: 0;
+    position: relative;
+    top: 6px;
+}
+.rpSelectProjects .rpProjects{
+    width: 200px;
+    height: 24px;
+    border-radius: 4px;
+    border-color: #633693;
+}
 .search-reports{
-  float: right;
+    float: right;
+    position: relative;
+    top: 5px;
 }
 
 .search-reports span{
   background: white !important;
-  padding: 2px 7px 1px !important
+  padding: 0px 5px 0px !important
 }
-
+.searchScrapEle img{margin-bottom: 3px;}
 .search-reports .searchScrapInput{
-  height: 29px;
+  height: 24px;
 }
 .expandTable{
   margin: -9px;

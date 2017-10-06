@@ -36,7 +36,7 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 	if(getTaskName.indexOf("Execute Batch") < 0){
 		$(".parentBatchContainer").parent().hide();
 		$(".btnPanel").css("left","0");
-		$("#page-taskName span").text("Scenario Execution");
+		$("#page-taskName span").text("Suite Execution");
 	}
 	else	$("#page-taskName span").text("Batch Execution");
 	//$timeout(function(){
@@ -74,7 +74,7 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 	$scope.readTestSuite_ICE = function(){
         $('.checkStylebox').attr("disabled", true); 
 		$('#excSaveBtn').attr("disabled", true);
-		ExecutionService.readTestSuite_ICE(readTestSuite)
+		ExecutionService.readTestSuite_ICE(readTestSuite, "execute")
 		.then(function(data) {
 			if(data == "Invalid Session"){
 					window.location.href = "/";

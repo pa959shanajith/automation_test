@@ -93,7 +93,6 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
     //console.log(appType);
     $scope.getScreenView = appType
     //Getting Apptype orScreen Type
-
     cfpLoadingBar.start()
     $timeout(function() {
         if (window.location.href.split("/")[3] == "designTestCase" || $scope.getScreenView == "Webservice" && window.location.href.split("/")[3] == "designTestCase") {
@@ -112,7 +111,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
         projectDetails = angular.element(document.getElementById("left-nav-section")).scope().projectDetails;
         var getTaskName = JSON.parse(window.localStorage['_CT']).taskName;
         appType = JSON.parse(window.localStorage['_CT']).appType;
-        screenName = JSON.parse(window.localStorage['_CT']).screenName;
+        screenName = angular.element(document.getElementById("left-nav-section")).scope().screenName;
         testCaseName = JSON.parse(window.localStorage['_CT']).testCaseName;
         subTaskType = JSON.parse(window.localStorage['_CT']).subTaskType;
         subTask = JSON.parse(window.localStorage['_CT']).subTask;
@@ -124,7 +123,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 
     }, 3000)
 
-
+console.log("screenName:", screenName);
     if (window.localStorage['_TJ']) {
         allTasks = JSON.parse(window.localStorage['_TJ']);
         if(allTasks.length > 0)
@@ -1247,12 +1246,17 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 
     //Initiating Scraping
     $scope.initScraping = function(e, browserType) {
+
+        $(".addObject span img").removeClass("left-bottom-selection");
+        $(".compareObject span img").removeClass("left-bottom-selection");
+        $(".generateObj span img").removeClass("left-bottom-selection");
         if (e.currentTarget.className == "disableActions") return false
         else {
             eaCheckbox = $("#enableAppend").is(":checked")
             //enableScreenShotHighlight = false;
             screenViewObject = {}
             var blockMsg = 'Scraping in progress. Please Wait...';
+            var blockMsg2 = 'Comparing objects in progress...';
             $(document).find("#desktopPath").removeClass("inputErrorBorder");
             $(document).find("#OEBSPath").removeClass("inputErrorBorder");
             $(document).find("#mobilityAPKPath, #mobilitySerialPath, #mobilityDeviceName, #mobilityiOSVersion, #mobilityUDID").removeClass("inputErrorBorder");
@@ -1267,7 +1271,12 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
                     screenViewObject.appType = $scope.getScreenView,
                         screenViewObject.applicationPath = $(document).find("#desktopPath").val();
                     $("#launchDesktopApps").modal("hide");
-                    blockUI(blockMsg);
+                    if(compareFlag == true){
+                        blockUI(blockMsg2);
+                    }
+                    else{
+                        blockUI(blockMsg);
+                    }
                 }
             }
             //For Desktop
@@ -1281,7 +1290,13 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
                     screenViewObject.appType = $scope.getScreenView,
                         screenViewObject.applicationPath = $(document).find("#SAPPath").val();
                     $("#launchSAPApps").modal("hide");
-                    blockUI(blockMsg);
+                    //blockUI(blockMsg);
+                    if(compareFlag == true){
+                        blockUI(blockMsg2);
+                    }
+                    else{
+                        blockUI(blockMsg);
+                    }
                 }
             }
 
@@ -1303,7 +1318,13 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
                             screenViewObject.apkPath = $(document).find("#mobilityAPKPath").val();
                         screenViewObject.mobileSerial = $(document).find("#mobilitySerialPath").val();
                         $("#launchMobilityApps").modal("hide");
+                        // blockUI(blockMsg);
+                        if(compareFlag == true){
+                        blockUI(blockMsg2);
+                    }
+                    else{
                         blockUI(blockMsg);
+                    }
                     }
                 } else if ($("#mobilityAPKPath").val().toLowerCase().indexOf(".ipa") >= 0 || $("#mobilityAPKPath").val().toLowerCase().indexOf(".app") >= 0) {
                     if ($(document).find("#mobilityAPKPath").val() == "") {
@@ -1326,7 +1347,13 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
                         screenViewObject.mobileIosVersion = $(document).find("#mobilityiOSVersion").val();
                         screenViewObject.mobileUDID = $(document).find("#mobilityUDID").val();
                         $("#launchMobilityApps").modal("hide");
-                        blockUI(blockMsg);
+                        // blockUI(blockMsg);
+                        if(compareFlag == true){
+                        blockUI(blockMsg2);
+                        }
+                        else{
+                            blockUI(blockMsg);
+                        }
                     }
                 }
             }
@@ -1346,7 +1373,13 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
                         screenViewObject.mobileSerial = $(document).find("#mobilityWebSerialNo").val();
                     screenViewObject.androidVersion = $(document).find("#mobilityAndroidVersion").val();
                     $("#launchMobilityWeb").modal("hide");
-                    blockUI(blockMsg);
+                    // blockUI(blockMsg);
+                    if(compareFlag == true){
+                        blockUI(blockMsg2);
+                    }
+                    else{
+                        blockUI(blockMsg);
+                    }
                 }
             }
             //For Mobility Web
@@ -1361,7 +1394,13 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
                     screenViewObject.appType = $scope.getScreenView,
                         screenViewObject.applicationPath = $(document).find("#OEBSPath").val();
                     $("#launchOEBSApps").modal("hide");
-                    blockUI(blockMsg);
+                    // blockUI(blockMsg);
+                    if(compareFlag == true){
+                        blockUI(blockMsg2);
+                    }
+                    else{
+                        blockUI(blockMsg);
+                    }
                 }
             }
             //For OEBS
@@ -1373,7 +1412,13 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
                     screenViewObject.action = "compare";
                 }
                 screenViewObject.browserType = browserType
-                blockUI(blockMsg);
+                // blockUI(blockMsg);
+                if(compareFlag == true){
+                        blockUI(blockMsg2);
+                    }
+                    else{
+                        blockUI(blockMsg);
+                    }
             }
             //For Web
             DesignServices.initScraping_ICE(screenViewObject)
@@ -1393,7 +1438,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
                     if (data == "unavailableLocalServer") {
                         unblockUI();
                         eaCheckbox = false;
-                        $("#enableAppend").prop('checked',false); 
+                        $("#enableAppend").prop('checked',false);
                         openDialog("Scrape Screen", "ICE Engine is not available. Please run the batch file and connect to the Server.");
                         return false
                     }
@@ -1767,6 +1812,8 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
             scrapeObject = {};
             scrapeObject.param = 'deleteScrapeData_ICE';
             scrapeObject.getScrapeData = viewString;
+            scrapeObject.getScrapeData.mirrorheight = viewString.mirrorheight;
+            scrapeObject.getScrapeData.mirrorwidth = viewString.mirrorwidth;
             scrapeObject.projectId = projectId;
             scrapeObject.screenId = screenId;
             scrapeObject.screenName = screenName;
@@ -1841,25 +1888,45 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
                 openDialog("Delete Scrape data", "Please select objects to delete.")
             } else {
                 if (eaCheckbox){
+                    var dontChkViewString = 0;
                     $.each($("input[type=checkbox].checkall:checked"), function() {
                         for (var i = 0; i < newScrapedList.view.length; i++) {
                             if ($(this).parents("li").data("xpath") == newScrapedList.view[i].xpath && ($(this).parent('.objectNames').siblings(".ellipsis").text().trim().replace('/\s/g', ' ')).replace('\n', ' ') == newScrapedList.view[i].custname.trim()) {
                                 //newScrapedList.view.splice(newScrapedList.view.indexOf(newScrapedList.view[i]), 1);
-                                getIndexOfDeletedObjects.push(newScrapedList.view.indexOf(newScrapedList.view[i]))
-                                $(this).parents("li.select_all").remove();
-                                break;
+                                if(!(isInArray(newScrapedList.view.indexOf(newScrapedList.view[i]), getIndexOfDeletedObjects))){
+                                    getIndexOfDeletedObjects.push(newScrapedList.view.indexOf(newScrapedList.view[i]))
+                                    $(this).parents("li.select_all").remove();
+                                    dontChkViewString++;
+                                    break;
+                                }
                             }
                         }
                     })
+                    if($("input[type=checkbox].checkall:checked").length != dontChkViewString){
+                        $.each($("input[type=checkbox].checkall:checked"), function() {
+                            for (var i = 0; i < viewString.view.length; i++) {
+                                if ($(this).parents("li").data("xpath") == viewString.view[i].xpath && ($(this).parent('.objectNames').siblings(".ellipsis").text().trim().replace('/\s/g', ' ')).replace('\n', ' ') == viewString.view[i].custname.trim()) {
+                                    //viewString.view.splice(viewString.view.indexOf(viewString.view[i]), 1);
+                                    if(!(isInArray(viewString.view.indexOf(viewString.view[i]), getIndexOfDeletedObjects))){
+                                        getIndexOfDeletedObjects.push(viewString.view.indexOf(viewString.view[i]))
+                                        $(this).parents("li.select_all").remove();
+                                        break;
+                                    }
+                                }
+                            }
+                        })
+                    }
                 }
                 else{
                     $.each($("input[type=checkbox].checkall:checked"), function() {
                         for (var i = 0; i < viewString.view.length; i++) {
                             if ($(this).parents("li").data("xpath") == viewString.view[i].xpath && ($(this).parent('.objectNames').siblings(".ellipsis").text().trim().replace('/\s/g', ' ')).replace('\n', ' ') == viewString.view[i].custname.trim()) {
                                 //viewString.view.splice(viewString.view.indexOf(viewString.view[i]), 1);
-                                getIndexOfDeletedObjects.push(viewString.view.indexOf(viewString.view[i]))
-                                $(this).parents("li.select_all").remove();
-                                break;
+                                if(!(isInArray(viewString.view.indexOf(viewString.view[i]), getIndexOfDeletedObjects))){
+                                    getIndexOfDeletedObjects.push(viewString.view.indexOf(viewString.view[i]))
+                                    $(this).parents("li.select_all").remove();
+                                    break;
+                                }
                             }
                         }
                     })
@@ -1867,7 +1934,10 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
                 $("#deleteObjects").prop("disabled", true);
             }
         }
+    }
 
+    function isInArray(value, array) {
+        return array.indexOf(value) > -1;
     }
 
     var showSearchBox = true;
@@ -2168,6 +2238,11 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 
     //Add Object Functionality
     $scope.addObj = function() {
+
+        $(".generateObj span img").removeClass("left-bottom-selection");
+        $(".compareObject span img").removeClass("left-bottom-selection");
+        $(".addObject span img").addClass("left-bottom-selection");
+
         $scope.errorMessage = "";
         $("#dialog-addObject").modal("show");
         $("#addObjContainer").empty()
@@ -2330,6 +2405,11 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 
     //Map Object Drag and Drop Functionality
     $scope.generateMapObj = function() {
+
+        $(".addObject span img").removeClass("left-bottom-selection");
+        $(".compareObject span img").removeClass("left-bottom-selection");
+        $(".generateObj span img").addClass("left-bottom-selection");
+
         $(".submitObjectWarning, .objectExistMap, .noObjectToMap").hide();
         $("#dialog-mapObject").modal("show");
         $('#scrapedObjforMap, #customObjforMap').empty();
@@ -2393,6 +2473,11 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
     compareFlag = false;
     //Compare Objects
     $scope.compareObj = function() {
+
+        $(".generateObj span img").removeClass("left-bottom-selection");
+        $(".addObject span img").removeClass("left-bottom-selection");
+        $(".compareObject span img").addClass("left-bottom-selection");
+
         openDialog("Compare Object", "Please select browser icon to compare and update objects.");
         compareFlag = true;
         if (compareFlag == true) {
@@ -3031,11 +3116,11 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
                     var mydata = $("#jqGrid").jqGrid('getGridParam', 'data');
                     var getTR = $("#jqGrid tbody tr:visible td:nth-child(10)");
                     for (var i = 0; i < mydata.length; i++) {
-                        // if (mydata[i].hasOwnProperty("_id_")) {
-                        //     if (mydata[i]._id_.indexOf('jpg') !== -1 || mydata[i]._id_.indexOf('jqg') !== -1) {
-                        //         var index = mydata.indexOf(mydata[i]);
-                        //         mydata.splice(index, 1);
-                        //     } else {
+//                        if (mydata[i].hasOwnProperty("_id_")) {
+//                            if (mydata[i]._id_.indexOf('jpg') !== -1 || mydata[i]._id_.indexOf('jqg') !== -1) {
+//                                var index = mydata.indexOf(mydata[i]);
+//                                mydata.splice(index, 1);
+//                            } else {
                                 mydata[i].stepNo = i + 1;
                                 if (mydata[i].custname == undefined || mydata[i].custname == "") {
                                     var stepNoPos = parseInt(mydata[i].stepNo);
@@ -3084,8 +3169,8 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
                                 } else {
                                     mydata[i].remarks = getTR[i].textContent;
                                 }
-                        //     }
-                        // }
+//                            }
+//                        }
                         /*else{
                         	if(mydata[i].remarks != undefined){
                         		if(mydata[i].remarks != getTR[i].textContent  && getTR[i].textContent.trim().length > 0 )	{
@@ -4113,7 +4198,7 @@ function contentTable(newTestScriptDataLS) {
                         $grid.jqGrid('setCell', rowId, 'objectName', objName);
                         $grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
                         break;
-                    } else if (appTypeLocal == 'Desktop' && (obType == 'button' || obType == 'input' || obType == 'select' || obType == 'list_item' || obType == 'hyperlink' || obType == 'lbl' ||
+                    } else if (appTypeLocal == 'Desktop' && (obType == 'button' || obType == 'input' || obType == 'select' || obType == 'list_item' || obType == 'hyperlink' || obType == 'lbl' || obType =='treeview'|| obType=='TreeView' || obType=='tree' ||
                             obType == 'list' || obType == 'edit' || obType == null || obType == 'checkbox' || obType == 'radiobutton' || obType == 'tab' || obType == 'datepicker' || obType != undefined)) {
                         var res = '';
                         var sc;
@@ -4153,6 +4238,9 @@ function contentTable(newTestScriptDataLS) {
                         } else if (obType == 'hyperlink' || obType == 'lbl') {
                             sc = Object.keys(keywordArrayList.link);
                             selectedKeywordList = "link";
+                        } else if(obType =='treeview'|| obType=='TreeView' || obType=='tree'){
+                            sc = Object.keys(keywordArrayList.tree);
+                            selectedKeywordList = "tree";
                         } else {
                             sc = Object.keys(keywordArrayList.element);
                             selectedKeywordList = "element";
@@ -4171,7 +4259,7 @@ function contentTable(newTestScriptDataLS) {
                         $grid.jqGrid('setCell', rowId, 'objectName', objName);
                         $grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
                         break;
-                    } else if (appTypeLocal == 'Desktop' && (!(obType == 'push_button' || obType == 'text' || obType == 'combo_box' || obType == 'list_item' || obType == 'hyperlink' || obType == 'lbl' ||
+                    } else if (appTypeLocal == 'Desktop' && (!(obType == 'push_button' || obType == 'text' || obType == 'combo_box' || obType == 'list_item' || obType == 'hyperlink' || obType == 'lbl' || obType =='treeview'|| obType=='TreeView' || obType=='tree' ||
                             obType == 'list' || obType == 'edit' || obType == null || obType == 'Static' || obType == 'check_box' || obType == 'radio_button' || obType == 'tab' || obType == 'datepicker'))) {
                         var res = '';
                         var sc = Object.keys(keywordArrayList.element);
@@ -4565,6 +4653,10 @@ function contentTable(newTestScriptDataLS) {
         //uncomment below two sections to verify change in URL
         //set the URL to the cell 'url'
         if (selectedText == "@Generic" || selectedText == undefined || selectedText == "@Browser" || selectedText == "@Excel" || selectedText == "@BrowserPopUp") {
+            $grid.jqGrid('setCell', currRowId, 'objectName', objName);
+            $grid.jqGrid('setCell', currRowId, 'url', url);
+        }
+        else{
             $grid.jqGrid('setCell', currRowId, 'objectName', objName);
             $grid.jqGrid('setCell', currRowId, 'url', url);
         }
@@ -5358,11 +5450,11 @@ function drag(ev) {
 }
 
 function drop(ev) {
-    //Enable-Disable dragged element based on drop event
-    draggedEle.setAttribute("draggable", false)
-    draggedEle.childNodes[1].style.background = "#e0e0e0";
-    draggedEle.childNodes[1].style.cursor = "no-drop"
-    //Enable-Disable dragged element based on drop event
+    // //Enable-Disable dragged element based on drop event
+    // draggedEle.setAttribute("draggable", false)
+    // draggedEle.childNodes[1].style.background = "#e0e0e0";
+    // draggedEle.childNodes[1].style.cursor = "no-drop"
+    // //Enable-Disable dragged element based on drop event
     $(".submitObjectWarning").hide();
     if ($(ev.target).parent().children(".ellipsis").hasClass("fromMergeObj") == true) {
         draggedEle.setAttribute("draggable", true)
@@ -5371,6 +5463,7 @@ function drop(ev) {
         $(".objectExistMap").show();
         return false
     } else {
+        debugger;
         $(".objectExistMap").hide()
         getDraggedEle = ev.dataTransfer.getData("text/plain").trim()
         getDraggedEle = $(getDraggedEle)[0];
@@ -5381,6 +5474,14 @@ function drop(ev) {
         $(ev.target).parent("li").append(getDraggedEle);
     }
     ev.preventDefault();
+    if($(ev.target).parent("li").find(".ellipsis").hide().hasClass("toMergeObj") == true){
+    //Enable-Disable dragged element based on drop event
+    draggedEle.setAttribute("draggable", false)
+    draggedEle.childNodes[1].style.background = "#e0e0e0";
+    draggedEle.childNodes[1].style.cursor = "no-drop";
+    $(".modal-body:visible").trigger('click');
+    //Enable-Disable dragged element based on drop event
+    }
 }
 //Map Object Drag nad Drop Functionality
 

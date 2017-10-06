@@ -1,7 +1,6 @@
 /**
  * Dependencies.
  */
-var Joi = require('joi');
 var cassandra = require('cassandra-driver');
 var async = require('async');
 var myserver = require('../../server.js');

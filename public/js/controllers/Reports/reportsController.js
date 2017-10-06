@@ -39,61 +39,108 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 				window.location.href = "/";
 			}
 			if(data1 != "fail"){
-				$("#reportSection").append(data1)
-				reportService.getAllSuites_ICE(userID)
-				.then(function(data) {
-					if(data == "Invalid Session"){
-						window.location.href = "/";
-					}
-					if(data != "fail"){
-						$('.scrollbar-inner').scrollbar();
-						$('.scrollbar-macosx').scrollbar();
-						var container = $('.staticTestsuiteContainer');
-						if(Object.prototype.toString.call( data ) === '[object Array]'){
-							if(data.length > 0){
-								for(i=0; i<data.length; i++){
-									if(container.find('.suiteContainer').length >= 6){
-										$('.dynamicTestsuiteContainer').append("<span class='suiteContainer' data-suiteId='"+data[i].testsuiteid+"'><img alt='Test suite icon' class='reportbox' src='imgs/ic-reportbox.png' title='"+data[i].testsuitename+"'><br/><span class='repsuitename' title='"+data[i].testsuitename+"'>"+data[i].testsuitename+"</span></span>");
-									}
-									else{
-										container.append("<span class='suiteContainer' data-suiteId='"+data[i].testsuiteid+"'><img alt='Test suite icon' class='reportbox' src='imgs/ic-reportbox.png' title='"+data[i].testsuitename+"'><br/><span class='repsuitename' title='"+data[i].testsuitename+"'>"+data[i].testsuitename+"</span></span>");
-									}
-								}
-							}
-						}
-						$('.searchScrapEle').css('display', 'none');
-						if($('.dynamicTestsuiteContainer').find('.suiteContainer').length <= 0){
-							$('.suitedropdownicon').hide();
-						}
-						cfpLoadingBar.complete();
-						$("#middle-content-section").css('visibility','visible');
-						$('[data-toggle="tooltip"]').tooltip();
-					}
-					else	console.log("Unable to load test suites.");
-				},
-				function(error) {
-					console.log("Error-------"+error);
-				})
+				$("#reportSection").append(data1);
+				$("#middle-content-section").css('visibility','visible');
+				getProjectsAndSuites(userID, "projects");
 			}
 			else	console.log("Failed to get reports.")
 		}, function(error) {
 		});
 	}
+
+	//service call to get projects and testsuites
+	$(document).on('change', ".rpProjects", function(){
+		var projectId = $(this).children("option:selected").val();
+		if(projectId){
+			$('.suiteContainer, .scenariostatusreport').remove();
+			$('.scenarioReportstbody tr').remove();
+			$('.progress-bar-success, .progress-bar-danger, .progress-bar-warning, .progress-bar-norun').css('width','0%');
+			$('.passPercent, .failPercent, .terminatePercent, .incompletePercent').text('');
+			if($(".dynamicTestsuiteContainer").is(":Visible")){
+				$('.iconSpace').trigger('click');
+			}
+			getProjectsAndSuites(projectId, "reports");
+		}
+	})
+	
+	//getAllSuites_ICE function call
+	function getProjectsAndSuites(ID, type){
+		reportService.getAllSuites_ICE(ID, type)
+		.then(function(data) {
+			if(data == "Invalid Session"){
+				window.location.href = "/";
+			}
+			if(type == "projects"){
+				if(data != "fail" && data.projectids.length != 0){
+					$(".rpProjects").empty();
+					$(".rpProjects").append("<option selected disabled>Select Project</option>");
+					for(i=0; i<data.projectids.length; i++){
+						$(".rpProjects").append("<option value='"+data.projectids[i]+"'>"+data.projectnames[i]+"</option>");
+					}
+					var proId;
+					if(localStorage.getItem('fromExecution') == "true"){						
+						proId = JSON.parse(localStorage.getItem("_CT")).projectId;
+						var options = $(".rpProjects option");
+						for(var i=0; i<options.length; i++){
+							if(options[i].value == proId){
+								$(".rpProjects").prop('selectedIndex', i);
+								localStorage.setItem('fromExecution','false')
+								break;
+							}
+						}
+					}
+					else{
+						$(".rpProjects").prop('selectedIndex', 1);
+						proId = data.projectids[0];
+					}
+					getProjectsAndSuites(proId, "reports");					
+				}
+				else	console.log("Unable to load test suites.");
+			}
+			else if(type == "reports"){
+				$('.scrollbar-inner').scrollbar();
+				$('.scrollbar-macosx').scrollbar();
+				var container = $('.staticTestsuiteContainer');
+				if(Object.prototype.toString.call( data ) === '[object Object]'){
+					if(data.suiteids.length > 0){
+						for(i=0; i<data.suiteids.length; i++){
+							if(container.find('.suiteContainer').length >= 6){
+								$('.dynamicTestsuiteContainer').append("<span class='suiteContainer' data-suiteId='"+data.suiteids[i]+"'><img alt='Test suite icon' class='reportbox' src='imgs/ic-reportbox.png' title='"+data.suitenames[i]+"'><br/><span class='repsuitename' title='"+data.suitenames[i]+"'>"+data.suitenames[i]+"</span></span>");
+							}
+							else{
+								container.append("<span class='suiteContainer' data-suiteId='"+data.suiteids[i]+"'><img alt='Test suite icon' class='reportbox' src='imgs/ic-reportbox.png' title='"+data.suitenames[i]+"'><br/><span class='repsuitename' title='"+data.suitenames[i]+"'>"+data.suitenames[i]+"</span></span>");
+							}
+						}
+					}
+				}
+				$('.searchScrapEle').css('display', 'none');
+				if($('.dynamicTestsuiteContainer').find('.suiteContainer').length <= 0){
+					$('.suitedropdownicon, .dynamicTestsuiteContainer').hide();
+				}
+				else $('.suitedropdownicon').show();
+				$('[data-toggle="tooltip"]').tooltip();
+				cfpLoadingBar.complete();
+			}
+		}, function(error) {
+			console.log("Error-------"+error);
+			return "fail";
+		})
+	}
 	var showSearchBox = true;
 	$(document).on("click", ".searchScrapEle", function(){
-	if(showSearchBox){
-		$(".searchScrapInput").show();
-		showSearchBox=false;
-		$(".searchScrapInput").focus();
-	}	else{
-		$(".searchScrapInput").hide();
-		 showSearchBox=true;
-	 }
-})
+		if(showSearchBox){
+			$(".searchScrapInput").show();
+			showSearchBox=false;
+			$(".searchScrapInput").focus();
+		}	else{
+			$(".searchScrapInput").hide();
+			showSearchBox=true;
+		}
+	})
 
 	$(document).on('keyup', '#searchModule', function(){
 		input = document.getElementById("searchModule");
-    filter = input.value.toUpperCase();
+    	filter = input.value.toUpperCase();
 		elems = $('.dynamicTestsuiteContainer .suiteContainer');
 		for (i = 0; i < elems.length; i++) {
 				if (elems[i].textContent.toUpperCase().indexOf(filter) > -1) {
@@ -370,10 +417,10 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 			$content.slideDown(200, function () {
 				//execute this after slideToggle is done
 				//change text of header based on visibility of content div
+				$('.scrollbar-inner').scrollbar();
+				$('.scrollbar-macosx').scrollbar();
 			});
-
 			$('.searchScrapEle').css('display', '');
-
 			open = 1;
 		}
 		else {
@@ -393,7 +440,6 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 			showSearchBox = true;
 			open = 0;
 		}
-
 	})
 
 	$(document).on('click', '.openreportstatus', function(e){

@@ -1,14 +1,14 @@
 var releaseName,cycleName,testSuiteName;
-mySPA.controller('scheduleController',['$scope','$http','$timeout','$location','ScheduleService','cfpLoadingBar', function ($scope, $http, $timeout, $location, ScheduleService, cfpLoadingBar) {
+mySPA.controller('scheduleController',['$scope','$http','$timeout','$location','ScheduleService','cfpLoadingBar','$compile', function ($scope, $http, $timeout, $location, ScheduleService, cfpLoadingBar, $compile) {
 	cfpLoadingBar.start();
 	$("body").css("background","#eee");
-	
+	$("head").append('<link rel="stylesheet" type="text/css" href="fonts/font-awesome_mindmap/css/font-awesome.min.css" />')
 	$timeout(function(){
-		$('.scrollbar-inner').scrollbar();
-	    $('.scrollbar-macosx').scrollbar();
+		//$('.scrollbar-inner').scrollbar();
+	    //$('.scrollbar-macosx').scrollbar();
 	    document.getElementById("currentYear").innerHTML = new Date().getFullYear()
 	}, 500)
-    
+    var browserTypeExe = [];
     //Task Listing
     loadUserTasks()
     /*var taskAuth;
@@ -19,15 +19,21 @@ mySPA.controller('scheduleController',['$scope','$http','$timeout','$location','
 	if(window.localStorage['navigateScreen'] != "scheduling")
 	{
 		window.location.href = "/";
-	}  
-   	var getTaskName = JSON.parse(window.localStorage['_CT']).taskName;
-	var	appType = JSON.parse(window.localStorage['_CT']).appType;
-			$("#page-taskName").empty().append('<span class="taskname">'+getTaskName+'</span>');
-			$(".projectInfoWrap").empty()
-			 testSuiteName = JSON.parse(window.localStorage['_CT']).testSuiteName;
+	}
 	
-	$timeout(function(){
-		var releaseId = JSON.parse(window.localStorage['_CT']).releaseId;
+	if(window.localStorage['_CT'])
+	{
+		var readTestSuite = JSON.parse(window.localStorage['_CT']).testSuiteDetails;
+		//console.log("read",readTestSuite);
+	   	var getTaskName = JSON.parse(window.localStorage['_CT']).taskName;
+		var	appType = JSON.parse(window.localStorage['_CT']).appType;
+		//$("#page-taskName").empty().append('<span class="taskname">'+getTaskName+'</span>');
+		$(".projectInfoWrap").empty()
+		//testSuiteName = JSON.parse(window.localStorage['_CT']).testSuiteName;
+	}
+	
+	/*$timeout(function(){
+		var releaseId = JSON.parse(window.localStorage['_CT']).testSuiteDetails[0].releaseId;
 		var cycleId = JSON.parse(window.localStorage['_CT']).cycleId;
 		var projectId = JSON.parse(window.localStorage['_CT']).projectId;
 		var	projectDetails = angular.element(document.getElementById("left-nav-section")).scope().projectDetails;
@@ -37,98 +43,143 @@ mySPA.controller('scheduleController',['$scope','$http','$timeout','$location','
 			{
 				$(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">Project :</span><span class="content">'+projectDetails.respnames[0]+'</span></p><p class="proj-info-wrap"><span class="content-label">Release :</span><span class="content">'+releaseName+'</span></p><p class="proj-info-wrap"><span class="content-label">Cycle :</span><span class="content">'+cycleName+'</span></p>')
 			}
-	}, 2000)
+	}, 2000)*/
     
-    //Sample JSON to load Test Suite Data
-    var testSuiteData = [{
-		"test_suite_id": "13afa0b6-69c0-4ec2-aaf8-e8ce40651b09",
-		"project_name": "Web",
-		"cycleId": "65422140-9b1f-4ccc-982f-308af047ca15",
-		"project_id": "3217b6a8-7178-48c0-ac10-b14638fd2af4",
-		"test_suite_name": "OEBS-Web-Suit"
-	}, {
-		"test_suite_id": "13b56827-8de4-4a94-bf53-db4e52d5bc15",
-		"project_name": "Web",
-		"cycleId": "65422140-9b1f-4ccc-982f-308af047ca15",
-		"project_id": "3217b6a8-7178-48c0-ac10-b14638fd2af4",
-		"test_suite_name": "OEBS-Web-Suit"
-	}, {
-		"test_suite_id": "159549b3-bfcf-4c1e-b747-01e8a2832dc3",
-		"project_name": "Web",
-		"cycleId": "65422140-9b1f-4ccc-982f-308af047ca15",
-		"project_id": "3217b6a8-7178-48c0-ac10-b14638fd2af4",
-		"test_suite_name": "OEBS-Web-Suit"
-	}, {
-		"test_suite_id": "15aff91b-903d-423a-82b8-4d84b3b3fadd",
-		"project_name": "Web",
-		"cycleId": "65422140-9b1f-4ccc-982f-308af047ca15",
-		"project_id": "3217b6a8-7178-48c0-ac10-b14638fd2af4",
-		"test_suite_name": "OEBS-Web-Suit"
-	}, {
-		"test_suite_id": "13b56827-8de4-4a94-bf53-db4e52d5bc15",
-		"project_name": "Web",
-		"cycleId": "65422140-9b1f-4ccc-982f-308af047ca15",
-		"project_id": "3217b6a8-7178-48c0-ac10-b14638fd2af4",
-		"test_suite_name": "OEBS-Web-Suit"
-	}, {
-		"test_suite_id": "159549b3-bfcf-4c1e-b747-01e8a2832dc3",
-		"project_name": "Web",
-		"cycleId": "65422140-9b1f-4ccc-982f-308af047ca15",
-		"project_id": "3217b6a8-7178-48c0-ac10-b14638fd2af4",
-		"test_suite_name": "OEBS-Web-Suit"
-	}, {
-		"test_suite_id": "15aff91b-903d-423a-82b8-4d84b3b3fadd",
-		"project_name": "Web",
-		"cycleId": "65422140-9b1f-4ccc-982f-308af047ca15",
-		"project_id": "3217b6a8-7178-48c0-ac10-b14638fd2af4",
-		"test_suite_name": "OEBS-Web-Suit"
-	}, {
-		"test_suite_id": "13b56827-8de4-4a94-bf53-db4e52d5bc15",
-		"project_name": "Web",
-		"cycleId": "65422140-9b1f-4ccc-982f-308af047ca15",
-		"project_id": "3217b6a8-7178-48c0-ac10-b14638fd2af4",
-		"test_suite_name": "OEBS-Web-Suit"
-	}];
+	//Onload ServiceCall
+	$timeout(function(){
+		angular.element(document.getElementById("left-nav-section")).scope().readTestSuite_ICE();
+	}, 1000)
 	
-	//Populating Data in Scheduling Table
+	$scope.readTestSuite_ICE = function(){
+		ScheduleService.readTestSuite_ICE(readTestSuite, "schedule")
+		.then(function(result) {
+			if(result == "Invalid Session"){
+				window.location.href = "/";
+			}
+			else if(result.testSuiteDetails){
+				var data = result.testSuiteDetails;
+				//Populating Data in Scheduling Table
+				var dataLen = Object.keys(data).length;
+				$(".scheduleSuiteTable").empty();
+				var keys = Object.keys(data);
+				var eachData = Object.keys(data).map(function(itm) { return data[itm]; });
+				for(i=0; i<dataLen; i++){
+					var count=1;
+					// $(".scheduleSuiteTable").append('<div class="batchSuite"><div class="scheduleSuite"><input type="checkbox" class="selectScheduleSuite"/><span class="scheduleSuiteName" data-testsuiteid="'+eachData[i].testsuiteid+'">'+keys[i]+'</span><span class="ipContainer"><input class="form-control ipformating" type="text" title="Enter IP" placeholder="Enter IP" value=""/></span><span class="datePicContainer"><input class="form-control fc-datePicker" type="text" title="Select Date" placeholder="Select Date" value="" readonly/><img class="datepickerIcon" src="../imgs/ic-datepicker.png" /></span><span class="timePicContainer"><input class="form-control fc-timePicker" type="text" value="" title="Select Time" placeholder="Select Time" readonly disabled/><img class="timepickerIcon" src="../imgs/ic-timepicker.png" /></span></div>'
+					// 		+'<table class="scenarioSchdCon scenarioSch_'+i+'"><thead class="scenarioHeaders"><tr><td></td><td>Scenario Name</td><td>Data Parameterization</td><td>Condition Check</td><td>Project Name</td></tr></thead><tbody class="scenarioBody scenarioTbCon_'+i+'"></tbody></table>');//<input type="checkbox" class="slctAllScenarioSchdule"/>
+
+					$(".scheduleSuiteTable").append('<div class="batchSuite"><div class="scheduleSuite"><input type="checkbox" class="selectScheduleSuite"/><span class="scheduleSuiteName" data-testsuiteid="'+eachData[i].testsuiteid+'">'+keys[i]+'</span><span class="ipContainer"><select class="form-control ipformating"><option selected disabled>Select User</option></select></span><span class="datePicContainer"><input class="form-control fc-datePicker" type="text" title="Select Date" placeholder="Select Date" value="" readonly/><img class="datepickerIcon" src="../imgs/ic-datepicker.png" /></span><span class="timePicContainer"><input class="form-control fc-timePicker" type="text" value="" title="Select Time" placeholder="Select Time" readonly disabled/><img class="timepickerIcon" src="../imgs/ic-timepicker.png" /></span></div>'
+							+'<table class="scenarioSchdCon scenarioSch_'+i+'"><thead class="scenarioHeaders"><tr><td></td><td>Scenario Name</td><td>Data Parameterization</td><td>Condition Check</td><td>Project Name</td></tr></thead><tbody class="scenarioBody scenarioTbCon_'+i+'"></tbody></table>');
+							
+
+					// $(".scheduleSuiteTable").append('<div class="batchSuite"><div class="scheduleSuite"><input type="checkbox" class="selectScheduleSuite"/><span class="scheduleSuiteName" data-testsuiteid="'+eachData[i].testsuiteid+'">'+keys[i]+'</span><span class="ipContainer"><select class="form-control ipformating"><option selected disabled>Select User</option></select></span><div class="datePicContainer">   <div id="datetimepicker1" class="input-group date">     <input data-format="dd/MM/yyyy hh:mm:ss" class="datepickerinput" type="text" placeholder="Select Date and Time"></input>     <span class="input-group-addon">       <img class="datepickerIcon" src="../imgs/ic-datepicker.png" />       </i>     </span>   </div> </div></div>'+'<table class="scenarioSchdCon scenarioSch_'+i+'"><thead class="scenarioHeaders"><tr><td></td><td>Scenario Name</td><td>Data Parameterization</td><td>Condition Check</td><td>Project Name</td></tr></thead><tbody class="scenarioBody scenarioTbCon_'+i+'"></tbody></table>');
+										
+					if(result.connectedUsers != "" && result.connectedUsers.length >0){
+						for(k=0; k<result.connectedUsers.length; k++){
+							$(".ipformating").append("<option value='"+result.connectedUsers[k]+"'>"+result.connectedUsers[k]+"</option>")
+						}
+					}
+					else{
+						openModelPopup("Schedule Test Suite", "Please enable scheduling in Local Server. And refresh the page.");
+					}
+					for(j=0;j<eachData[i].scenarioids.length;j++){
+						if(eachData[i].condition[j] == 0)
+							$(document).find(".scenarioTbCon_"+i+"").append('<tr><td><span>'+count+'</span></td><td data-scenarioid="'+eachData[i].scenarioids[j]+'">'+eachData[i].scenarionames[j]+'</td><td style="padding: 2px 0 2px 0;"><input type="text" value="'+eachData[i].dataparam[j]+'" disabled/></td><td><select disabled><option value="1">True</option><option value="0" selected>False</option></select></td><td>'+eachData[i].projectnames[j]+'</td></tr>');//<input type="checkbox" class="scenarioCheck"/>
+						else
+							$(document).find(".scenarioTbCon_"+i+"").append('<tr><td><span>'+count+'</span></td><td data-scenarioid="'+eachData[i].scenarioids[j]+'">'+eachData[i].scenarionames[j]+'</td><td style="padding: 2px 0 2px 0;"><input type="text" value="'+eachData[i].dataparam[j]+'" disabled/></td><td><select disabled><option value="1" selected>True</option><option value="0">False</option></select></td><td>'+eachData[i].projectnames[j]+'</td></tr>');//<input type="checkbox" class="scenarioCheck"/>
+						count++;
+					}		
+							//+'<div id="scheduleDataBody" class="scrollbar-inner scheduleDataBody"><label>'+(i+1)+'</label><input type="checkbox"/><label>scenario</label><span><input type="text" class="dataParamValue"/></span><span><select><option value="false" selected>False</option><option>True</option></select></span><label>project</label></div></div>')
+				}				
+				$('.scrollbar-inner').scrollbar();
+				ScheduleService.getScheduledDetails_ICE()
+				.then(function(result) {
+					console.log(result)
+					if(result == "fail"){}
+					else if(result && result.length > 0){
+						for(var k=0; k<result.length; k++){
+							result[k].browserlist = JSON.parse(result[k].browserlist);
+							result[k].scenariodetails = JSON.parse(result[k].scenariodetails);
+						}
+						$scope.scheduledData = result;
+						// $("#scheduledDataBody").empty();
+						// for(var k=0; k<result.length; k++){
+						// 	var browser = JSON.parse(result[k].browserlist);
+						// 	var browImg="";
+						// 	for(var a=0;a<browser.length;a++){
+						// 		if(browser[a] == 1)	browImg = browImg + "<img src='imgs/ic-ch-schedule.png'/>";
+						// 		else if(browser[a] == 2)	browImg = browImg + "<img src='imgs/ic-ff-schedule.png'/>";
+						// 		if(browser[a] == 3)	browImg = browImg + "<img src='imgs/ic-ie-schedule.png'/>";
+						// 	}
+						// 	var scenarios = JSON.parse(result[k].scenariodetails);
+						// 	for(var l=0; l<scenarios.length; l++){
+						// 		if(result[k].schedulestatus == "scheduled"){
+						// 			var $el = $("<div class='scheduleDataBodyRow'><div style='width: 20%'>"+result[k].scheduledatetime.split("T")[0]+" "+result[k].scheduledatetime.split("T")[1].split(".")[0]+"</div><div style='width: 13%'>"+result[k].clientipaddress+"</div><div style='width: 20%'>"+scenarios[l].scenarioname+"</div><div style='width: 20%'>"+result[k].testsuitename+"</div><div style='width: 15%'>"+browImg+"</div><div style='width: 12%' data-cycleid='"+result[k].cycleid+"' data-scheduleid='"+result[k].scheduleid+"' data-scheduledatetime='"+result[k].scheduledatetime.valueOf().toString()+"'>"+result[k].schedulestatus+"<img src='imgs/ic-close.png' class='cancelJob' ng-click='cancelThisJob($event)' title='Cancel Job'/></div></div>");
+
+						// 			$("#scheduledDataBody").append($el);
+						// 			$compile($el)($scope);
+						// 		}
+						// 		else{
+						// 			$("#scheduledDataBody").append("<div class='scheduleDataBodyRow'><div style='width: 20%'>"+result[k].scheduledatetime.split("T")[0]+" "+result[k].scheduledatetime.split("T")[1].split(".")[0]+"</div><div style='width: 13%'>"+result[k].clientipaddress+"</div><div style='width: 20%'>"+scenarios[l].scenarioname+"</div><div style='width: 20%'>"+result[k].testsuitename+"</div><div style='width: 15%'>"+browImg+"</div><div style='width: 12%' data-cycleid='"+result[k].cycleid+"' data-scheduleid='"+result[k].scheduleid+"' data-scheduledatetime='"+result[k].scheduledatetime.valueOf().toString()+"'>"+result[k].schedulestatus+"</div></div>");
+						// 		}
+						// 	}
+						// }						
+						$timeout(function(){
+							changeBackground();
+						},100)
+					}
+				},
+				function(error) {
+					console.log(error)
+				});		
+			}
+			cfpLoadingBar.complete();
+		}, 
+		function(error) {
+			console.log("Error")
+		});
+	}
+    
+	$scope.browImg = function(brow){
+		if(parseInt(brow) == 1)	return './imgs/ic-ch-schedule.png';
+		else if(parseInt(brow) == 2)	return './imgs/ic-ff-schedule.png';
+		else if(parseInt(brow) == 3)	return './imgs/ic-ie-schedule.png';
+	}
+	/*//Populating Data in Scheduling Table	
 	$("#scheduleDataBody").empty()
 	for(i=0; i<testSuiteData.length; i++){
 		$("#scheduleDataBody").append('<div class="scheduleDataBodyRow"><div style="width: 4%" class="tabeleCellPadding"><input type="checkbox" class="d-schedule"></div><div style="width: 23%; text-align:left" class="tabeleCellPadding" data-SuiteId="'+testSuiteData[i].test_suite_id+'">'+testSuiteData[i].test_suite_name+'</div><div style="width: 17%"><input class="form-control ipformating" type="text" value=""/></div><div style="width: 20%"><input class="form-control" type="text" value=""/></div><div style="width: 25%"><span style="position: relative; display: inline-block; width:50%; margin-right:5%" title="Select Date"><input class="form-control fc-datePicker" type="text" value="" readonly/><img class="datepickerIcon" src="../imgs/ic-datepicker.png" /></span><span style="position: relative; display: inline-block; width:40%" title="Select Time"><input class="form-control fc-timePicker" type="text" value="" readonly disabled/><img class="timepickerIcon" src="../imgs/ic-timepicker.png" /></span></div><div style="width: 11%" class="tabeleCellPadding"><img src="../imgs/ic-alm.png" style="cursor:pointer" /></div></div>')
 	}
-	
-	cfpLoadingBar.complete();
+	*/
 	$("#tableActionButtons, .scheduleDataTable").delay(400).animate({opacity: "1"}, 300)
 	
 	
 	//Datepicker Function
-	$('.fc-datePicker').datepicker({
-		autoclose:"true",
-		format:"dd-mm-yyyy",
-		todayHighlight: true,
-		startDate: new Date()
+	$(document).on('focus', '.fc-datePicker', function(){
+		$(this).datepicker({
+			autoclose:"true",
+			format:"dd-mm-yyyy",
+			todayHighlight: true,
+			startDate: new Date()
+		}).on('hide.datepicker', function(e){
+			if($(this).val().length > 0){
+				$(this).parent().siblings('span').find('.fc-timePicker').prop('disabled',false);
+			}
+		})
+		
 	})
-	$('.fc-datePicker').datepicker().on('hide.datepicker', function(e){
-		if($(this).val().length > 0){
-			$(this).parent().siblings('span').find('.fc-timePicker').prop('disabled',false);
-		}
+	$(document).on('focus', '#datetimepicker1', function(){
+		$(this).datetimepicker({
+			minDate: moment()
+		});
 	})
-	
-	$(".fc-timePicker").timepicker({
-		minuteStep: 1
+	$(document).on('focus', '.fc-timePicker', function(){
+		$(this).timepicker({
+			minuteStep: 1,
+			showMeridian: false,
+			'minTime': (new Date().getHours() + ':' + new Date().getMinutes())
+		})
 	})
-	$('.fc-timePicker').timepicker().on('changeTime.timepicker', function(e) {
-	    console.log('The time is ' + e.time.value);
-	    console.log('The hour is ' + e.time.hours);
-	    console.log('The minute is ' + e.time.minutes);
-	    console.log('The meridian is ' + e.time.meridian);
-	});
-	$('.fc-timePicker').timepicker().on('hide.timepicker', function(e) {
-		var date = new Date();
-	    console.log('The time is ' + e.time.value);
-	    console.log('The hour is ' + e.time.hour);
-	    console.log('The minute is ' + e.time.minute);
-	    console.log('The meridian is ' + e.time.meridian);
-	});
 	
 	$(document).on('click', ".datepickerIcon", function(){
 		$(this).siblings(".fc-datePicker").focus()
@@ -139,14 +190,16 @@ mySPA.controller('scheduleController',['$scope','$http','$timeout','$location','
 	//Datepicker Function
 	
 	//IP Address masking
-	$('.ipformating').mask('0ZZ.0ZZ.0ZZ.0ZZ', {
-		translation: {
-	        'Z': {
-	          pattern: /[0-9]/, optional: true
-	         }
-	    }
-	});
-    $('.ipformating').mask('099.099.099.099');
+	/*$(document).on('keyup', '.ipformating', function(){
+		$(this).mask('0ZZ.0ZZ.0ZZ.0ZZ', {
+			translation: {
+		        'Z': {
+		          pattern: /[0-9]/, optional: true
+		         }
+		    }
+		});
+	    $(this).mask('099.099.099.099');
+	})*/
 	
 	//Select Browser Function
 	$(document).on("click", ".selectBrowserSc", function(){
@@ -161,10 +214,191 @@ mySPA.controller('scheduleController',['$scope','$http','$timeout','$location','
 	}
 	//Submit Task Scheduling
 	
+	//select all scenario in testSuite
+	$(document).on('click', '.slctAllScenarioSchdule', function(){
+		if($(this).is(":checked")){
+			$(this).parents(".scenarioHeaders").siblings("tbody.scenarioBody").find(".scenarioCheck").prop("checked",true);
+		}
+		else{
+			$(this).parents(".scenarioHeaders").siblings("tbody.scenarioBody").find(".scenarioCheck").prop("checked",false);
+		}
+	})
+
+	$(document).on('click', '.scenarioCheck', function(){
+		if($(this).is(":checked")){
+			if($(this).parents("tbody").children("tr").length == $(this).parents("tbody").children("tr").find(".scenarioCheck:checked").length){
+				$(this).parents("tbody").siblings("thead.scenarioHeaders").find(".slctAllScenarioSchdule").prop("checked", true);
+			}
+			else{
+				$(this).parents("tbody").siblings("thead.scenarioHeaders").find(".slctAllScenarioSchdule").prop("checked", false);
+			}
+		}
+		else{
+			$(this).parents("tbody").siblings("thead.scenarioHeaders").find(".slctAllScenarioSchdule").prop("checked", false);
+		}
+	})
+
+	//Select Browser Function
+	$(document).on("click", ".selectBrowserSc", function(){
+		//$(this).find("img").toggleClass("sb")
+		if($(this).find("img").hasClass("sb") == false) {
+			var getSpliceIndex = browserTypeExe.indexOf(''+$(this).data("name")+'')
+			browserTypeExe.splice(getSpliceIndex, 1)
+			$(this).find("img").removeClass("sb")
+		}
+		else {
+			$(this).find("img").addClass("sb")
+			browserTypeExe.push('"'+$(this).data("name")+'"')
+		}
+		console.log(browserTypeExe)
+	})
+	//Select Browser Function
+
+	//Filter the scheduled jobs based on status
+	$("#scheduledSuitesFilterData").change(function(){
+		var slctdOption = $(this).children("option:selected").val();
+		if(slctdOption == "Show All"){
+			$("#scheduledDataBody>.scheduleDataBodyRow .scheduleDataBodyRowChild").show();
+			$("#scheduledSuitesFilterData").prop('selectedIndex', 0);
+			changeBackground();
+		}
+		else{
+			var keySlctd;
+			if(slctdOption == "Completed")	keySlctd = "success";
+			else if(slctdOption == "In Progress")	keySlctd = "Inprogress";
+			else if(slctdOption == "Terminated")	keySlctd = "Terminate";
+			else if(slctdOption == "Failed")	keySlctd = "Failed";
+			else if(slctdOption == "Cancelled")	keySlctd = "cancelled";
+			var content = $("#scheduledDataBody>.scheduleDataBodyRow .scheduleDataBodyRowChild");
+			$.each(content, function(){
+				if($(this).children("div:nth-child(6)").text().indexOf(keySlctd) >= 0){
+					$(this).show();
+				}
+				else if($(this).children("div:nth-child(6)").text() != keySlctd){
+					$(this).hide();
+				}				 
+				else $(this).show();
+			})
+			changeBackground();
+		}
+	})
+
 	
-	//Add to list and schedule
-	$scope.initSchedule = function(){
-		
+	function changeBackground(){
+		var oddColorify = $(".scheduleDataBodyRowChild:visible");
+		oddColorify.css("background","white");
+		var l=0;
+		while(l < oddColorify.length){
+			oddColorify[l].style.background = "#e8e6fe";
+			l = l+2;
+		}
 	}
 	//Add to list and schedule
+	$scope.initSchedule = function(){
+		var moduleInfo = [];
+		var doNotSchedule = false;
+		if(appType != "SAP" && browserTypeExe.length == 0)	openModelPopup("Schedule Test Suite", "Please select a browser");
+		else if($(".selectScheduleSuite:checked").length == 0) openModelPopup("Schedule Test Suite", "Please select atleast one Suite(s) to schedule");
+		else{
+			if(appType == "SAP") browserTypeExe = ["1"];
+			$.each($(".batchSuite"), function(){
+				var suiteInfo = {};
+				var selectedScenarioData = [];
+				if($(this).find(".selectScheduleSuite").is(":checked")){
+					$(this).find(".scenarioSchdCon tbody tr").each(function(){
+						selectedScenarioData.push({
+							condition : parseInt($(this).children("td:nth-child(4)").find("select option:selected").val()),
+							dataparam : [$(this).children("td:nth-child(3)").find("input").val()],
+							executestatus : 1,
+							scenarioids : $(this).children("td:nth-child(2)").data("scenarioid"),
+							scenarioname: $(this).children("td:nth-child(2)").text()
+						})
+					})
+					suiteInfo.suiteDetails = selectedScenarioData;
+					suiteInfo.testsuitename = $(this).children('.scheduleSuite').find(".scheduleSuiteName").text();
+					suiteInfo.testsuiteid = $(this).children('.scheduleSuite').find(".scheduleSuiteName").data("testsuiteid");
+					if($(this).children('.scheduleSuite').find(".ipContainer .ipformating").children("option:selected").val() != "Select User")
+						suiteInfo.Ip = $(this).children('.scheduleSuite').find(".ipContainer .ipformating").children("option:selected").val();
+					else{$(this).children('.scheduleSuite').find(".ipContainer .ipformating").prop("style","border: 2px solid red;"); doNotSchedule = true; return false;}
+					if($(this).children('.scheduleSuite').find(".datePicContainer .fc-datePicker").val())
+						suiteInfo.date = $(this).children('.scheduleSuite').find(".datePicContainer .fc-datePicker").val();
+					else{$(this).children('.scheduleSuite').find(".datePicContainer .fc-datePicker").prop("style","border: 2px solid red;"); doNotSchedule = true; return false;}
+					if($(this).children('.scheduleSuite').find(".timePicContainer .fc-timePicker").val())
+						suiteInfo.time = $(this).children('.scheduleSuite').find(".timePicContainer .fc-timePicker").val();
+					else{$(this).children('.scheduleSuite').find(".timePicContainer .fc-timePicker").prop("style","border: 2px solid red;"); doNotSchedule = true; return false;}
+					suiteInfo.browserType = browserTypeExe;
+					suiteInfo.reschedule = false;
+					suiteInfo.scheduleid = "";
+					suiteInfo.userInfo = JSON.parse(window.localStorage['_UI'])
+					var scenarioDetails = JSON.parse(window.localStorage["_CT"]).testSuiteDetails;
+					for(var i=0; i<scenarioDetails.length;i++){
+						if(scenarioDetails[i].testsuiteid == suiteInfo.testsuiteid){
+							suiteInfo.cycleid = scenarioDetails[i].cycleid;
+							break;
+						}
+					}
+					moduleInfo.push(suiteInfo);
+				}
+			})
+			if(doNotSchedule == false){				
+				for(var i=0; i<moduleInfo.length; i++){
+					for(var j=0; j<moduleInfo.length; j++){
+						if(moduleInfo[i].Ip == moduleInfo[j].Ip && i!=j){
+							if(moduleInfo[i].date == moduleInfo[j].date){
+								if(moduleInfo[i].time == moduleInfo[j].time){
+									doNotSchedule = true;
+									openModelPopup("Schedule Test Suite", "Time's are matching for testsuite's containing following IP: "+moduleInfo[i].Ip+"");
+								}
+							}
+						}
+					}
+				}
+			}
+			if(doNotSchedule == false){				
+				ScheduleService.testSuitesScheduler_ICE(moduleInfo)
+				.then(function(data){
+					if(data == "success"){
+						openModelPopup("Schedule Test Suite", "Successfully scheduled.");
+						$(".selectScheduleSuite").prop("checked", false);
+						$(".ipformating, .fc-datePicker, .fc-timePicker").val("");
+					}
+					else if(data == "few"){
+						openModelPopup("Schedule Test Suite", "Few suites are failed to schedule");
+						$(".selectScheduleSuite").prop("checked", false);
+						$(".ipformating, .fc-datePicker, .fc-timePicker").val("");
+					}
+					else	openModelPopup("Schedule Test Suite", "Failed to schedule Testsuite.");
+				},
+				function(error){
+					console.log(error);
+				})
+			}
+		}		
+	}
+
+	//Cancel scheduled jobs
+	$scope.cancelThisJob = function($event){
+		var suiteDetailsObj = $event.currentTarget.parentElement.dataset;
+		ScheduleService.cancelScheduledJob_ICE(suiteDetailsObj)
+		.then(function(data){
+			if(data == "success"){
+				openModelPopup("Scheduled Test Suite", "Job is cancelled.");
+				$event.target.parentElement.textContent = "cancelled"
+			}
+			else if(data == "inprogress"){
+				openModelPopup("Scheduled Test Suite", "Job is in progress.. cannot be cancelled.");
+			}
+			else{
+				openModelPopup("Scheduled Test Suite", "Failed to cancel Job");
+			}
+		})
+	}
 }]);
+function openModelPopup(title, body){
+	$("#scheduleGlobalModal").find('.modal-title').text(title);
+    $("#scheduleGlobalModal").find('.modal-body p').text(body).css('color','black');
+	$("#scheduleGlobalModal").modal("show");
+	setTimeout(function(){
+		$("#scheduleGlobalModal").find('.btn-accept').focus();
+	}, 300);
+}

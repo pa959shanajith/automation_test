@@ -5,6 +5,7 @@ var userDetails,userRole,task,switchedRoleId;
 var projectId = []
 var releaseId = [];
 var cycleId = [];
+var screenId = [];
 var selectedROleID;	
 var primaryRole = [];
 primaryRole = JSON.parse(window.localStorage['_UI']).role;
@@ -229,7 +230,9 @@ mySPA.controller('headerController', function($scope,$http,$location,headerServi
 				}
 			$scope.projectDetails = data;
 			task = JSON.parse(window.localStorage['_CT']);
+
 			releaseId.push(task.releaseId);
+			screenId.push(task.screenId);
 			headerServices.getNames_ICE(releaseId, ['releases']) 
 			.then(function(data){
 					if(data == "Invalid Session"){
@@ -244,9 +247,18 @@ mySPA.controller('headerController', function($scope,$http,$location,headerServi
 				}
 					console.log("cycleDetails", data);
 					$scope.cycleDetails = data;
+
 				}, function(error) {	console.log("Failed to get cycle name")});
 			}, function(error) {	console.log("Failed to get release name")});
-
+			headerServices.getNames_ICE(screenId,['screens']) 
+		.then(function(data){
+			if(data == "Invalid Session"){
+				  window.location.href = "/";
+				}
+					console.log("screenId", data);
+					$scope.screenName = data.respnames[0];
+		}, 
+		function(error) {	console.log("Failed to fetch info")});
 		}, function(error) {	console.log("Failed to fetch projectInfo")});
 	}
 	$scope.logout = function() 

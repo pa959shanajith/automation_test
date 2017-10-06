@@ -70,14 +70,33 @@ if (cluster.isMaster) {
     // var errorhandler = require('errorhandler');
     var cmd = require('node-cmd');
     var helmet = require('helmet');
-
+    const os = require('os');
     var async = require('async');
     //HTTPS Configuration
     var privateKey = fs.readFileSync('server/https/server.key', 'utf-8');
     var certificate = fs.readFileSync('server/https/server.crt', 'utf-8');
     var credentials = {
         key: privateKey,
-        cert: certificate
+        cert: certificate,
+        ciphers: [
+            "ECDHE-RSA-AES256-SHA384",
+            "DHE-RSA-AES256-SHA384",
+            "ECDHE-RSA-AES256-SHA256",
+            "DHE-RSA-AES256-SHA256",
+            "ECDHE-RSA-AES128-SHA256",
+            "DHE-RSA-AES128-SHA256",
+            "HIGH",
+            "!aNULL",
+            "!eNULL",
+            "!EXPORT",
+            "!DES",
+            "!RC4",
+            "!MD5",
+            "!PSK",
+            "!SRP",
+            "!CAMELLIA"
+        ].join(':'),
+        honorCipherOrder: true
     };
     var httpsServer = require('https').createServer(credentials, app);
     var io = require('socket.io')(httpsServer);
@@ -106,7 +125,6 @@ if (cluster.isMaster) {
             maxAge: (30 * 60 * 1000)
         }
     }));
-
     app.use(helmet());
     //write stream for logs
     //var accessLogStream = fs.createWriteStream(__dirname + '/access.log', {flags: 'a'})
@@ -145,7 +163,6 @@ if (cluster.isMaster) {
         }else{
             if (req.cookies['connect.sid'] && req.cookies['connect.sid'] != undefined) { res.sendFile("index.html", { root: __dirname + "/public/" });} else {req.session.destroy(); res.status(401).send('<br><br>Your session has been expired.Please <a href="/">Login</a>Again');}
         }
-
     });
 
     //Only Test Engineer and Test Lead have access
@@ -170,16 +187,18 @@ if (cluster.isMaster) {
     });
 
     function sessionCheck(req, res, roles) {
+        console.log("session check ", req.url)
       if (!req.session.defaultRole || roles.indexOf(req.session.defaultRole) >=0)
         {
             req.session.destroy(); res.status(401).send('<br><br>Your session has been expired.Please <a href="/">Login</a> Again');
         }else{
             if (req.cookies['connect.sid'] && req.cookies['connect.sid'] != undefined) {
+
                  res.sendFile("index.html", { root: __dirname + "/public/" });
                 } else {
                      req.session.destroy();
                       res.status(401).send('<br><br>Your session has been expired. Please <a href="/">Login</a> Again');
-                }
+                    }
         }
     }
     app.get('/favicon.ico', function(req, res){
@@ -198,17 +217,16 @@ if (cluster.isMaster) {
     });
 
 
-    // Mindmap Routes
-    var api = require('./routes_mindmap/api.js');
-    var home = require('./routes_mindmap/home.js');
     var Client = require("node-rest-client").Client;
     var apiclient = new Client();
-    app.use('/home', home);
-    app.get('/import', api.importToNeo);
-    app.get('/logout', api.logout);
-    app.post('/casQuerya', api.casScriptA);
-    app.post('/neoQuerya', api.neoScriptA);
     //Starting jsreport server
+    if(os.type()=='Windows_NT') {
+        try{
+            var tmp=os.tmpdir();
+            fs.unlinkSync(tmp+'\\jsreport-temp\\extensions\\locations.json');
+            fs.unlinkSync(tmp+'\\jsreport-temp\\licensing\\cache.json');
+        } catch(e){}
+    }
     cmd.get('netstat -ano | find "LISTENING" | find "8001"', function(data, err, stderr){
       if(data){
           //console.log('killing JS report server and restarting');
@@ -242,8 +260,12 @@ if (cluster.isMaster) {
       }
     });
 
+    var uiConfig = require('./server/config/options');
+    var screenShotPath=uiConfig.storageConfig.screenShotPath;
 
     //Route Directories
+    var neo4jAPI = require('./server/controllers/neo4jAPI');
+    var mindmap = require('./server/controllers/mindmap');
     var login = require('./server/controllers/login');
     var admin = require('./server/controllers/admin');
     var design = require('./server/controllers/design');
@@ -258,7 +280,10 @@ if (cluster.isMaster) {
     var neuronGraphs2D = require('./server/controllers/neuronGraphs2D');
     var dashboard = require('./server/controllers/dashboard');
 
-
+    // Mindmap Routes
+    app.use('/home', mindmap);
+    //Neo4j API Routes
+    app.post('/neo4jAPI', neo4jAPI.executeQueries);
     //Login Routes
     app.post('/authenticateUser_Nineteen68', login.authenticateUser_Nineteen68);
     app.post('/authenticateUser_Nineteen68_CI', login.authenticateUser_Nineteen68_CI);
@@ -291,14 +316,15 @@ if (cluster.isMaster) {
     //Execute Screen Routes
     app.post('/readTestSuite_ICE', suite.readTestSuite_ICE);
     app.post('/updateTestSuite_ICE', suite.updateTestSuite_ICE);
-    app.post('/updateTestScenario_ICE', suite.updateTestScenario_ICE);
+    //app.post('/updateTestScenario_ICE', suite.updateTestScenario_ICE);
     app.post('/ExecuteTestSuite_ICE', suite.ExecuteTestSuite_ICE);
     app.post('/getTestcaseDetailsForScenario_ICE', suite.getTestcaseDetailsForScenario_ICE);
     app.post('/ExecuteTestSuite_ICE_CI', suite.ExecuteTestSuite_ICE_CI);
     //app.post('/readTestScenarios_ICE', suite.readTestScenarios_ICE);
     //Scheduling Screen Routes
-    //app.post('/testSuitesScheduler_ICE', suite.testSuitesScheduler_ICE);
-    //app.post('/getScheduledDetails_ICE', suite.getScheduledDetails_ICE);
+    app.post('/testSuitesScheduler_ICE', suite.testSuitesScheduler_ICE);
+    app.post('/getScheduledDetails_ICE', suite.getScheduledDetails_ICE);
+    app.post('/cancelScheduledJob_ICE', suite.cancelScheduledJob_ICE);
     //Report Screen Routes
     app.post('/getAllSuites_ICE', report.getAllSuites_ICE);
     app.post('/getSuiteDetailsInExecution_ICE', report.getSuiteDetailsInExecution_ICE);
@@ -326,7 +352,7 @@ if (cluster.isMaster) {
     //Chatbot Routes
     app.post('/getTopMatches_ProfJ', chatbot.getTopMatches_ProfJ);
     app.post('/updateFrequency_ProfJ', chatbot.updateFrequency_ProfJ);
-	//NeuronGraphs Plugin Routes
+    //NeuronGraphs Plugin Routes
     app.post('/hierarchy_nGraphs2D', neuronGraphs2D.getHierarchy);
     app.post('/getGraph_nGraphs2D', neuronGraphs2D.getGraphData);
 
@@ -336,6 +362,7 @@ if (cluster.isMaster) {
     app.post('/qcFolderDetails_ICE', qc.qcFolderDetails_ICE);
     app.post('/saveQcDetails_ICE', qc.saveQcDetails_ICE);
     app.post('/viewQcMappedList_ICE', qc.viewQcMappedList_ICE);
+    // Dashboard Routes
     app.post('/loadDashboard', dashboard.loadDashboard);
     app.post('/loadDashboardData', dashboard.loadDashboardData);
     //app.post('/manualTestcaseDetails_ICE', qc.manualTestcaseDetails_ICE);
@@ -344,7 +371,7 @@ if (cluster.isMaster) {
     //-------------SERVER START------------//
     //server.listen(3000);      //Http Server
     var hostFamilyType = '0.0.0.0';
-  var portNumber=8443;
+    var portNumber=8443;
     httpsServer.listen(portNumber, hostFamilyType); //Https Server
     try{
         var apireq = apiclient.get("http://127.0.0.1:1990/",function(data,response){
@@ -353,7 +380,7 @@ if (cluster.isMaster) {
                     httpsServer.close();
                     console.log("Please run the Service API and Restart the Server");
                 }else{
-					//suite.reScheduleTestsuite();
+                    suite.reScheduleTestsuite();
                     console.log("Nineteen68 Server Ready...");
                 }
             }catch(exception){
@@ -412,6 +439,7 @@ if (cluster.isMaster) {
           if (!(address in socketMap)) {
               socketMap[address] = socket;
               socket.send('connected');
+              socket.emit('update_screenshot_path',screenShotPath);
           }else{
               socket.send('connectionExists');
           }
@@ -458,14 +486,14 @@ if (cluster.isMaster) {
                 console.log('Socket Connection got disconnected for :', address);
                 delete socketMap[address];
                 module.exports.allSocketsMap = socketMap;
-                //		console.log("------------------------SOCKET DISCONNECTED----------------------------------------");
+                //console.log("------------------------SOCKET DISCONNECTED----------------------------------------");
                 console.log("NO. OF CLIENTS CONNECTED:", Object.keys(socketMap).length,'\nIP\'s connected :',Object.keys(socketMap).join());
             }
             else if (sokcetMapScheduling[address] != undefined) {
                 console.log('Socket Connection got disconnected for :', address);
                 delete sokcetMapScheduling[address];
                 module.exports.allSchedulingSocketsMap = sokcetMapScheduling;
-                //		console.log("------------------------SOCKET DISCONNECTED----------------------------------------");
+                //console.log("------------------------SOCKET DISCONNECTED----------------------------------------");
                 console.log("NO. OF CLIENTS CONNECTED:", Object.keys(sokcetMapScheduling).length,'\nIP\'s connected :',Object.keys(sokcetMapScheduling).join());
             }
           }
@@ -511,7 +539,7 @@ if (cluster.isMaster) {
     console.log(e);
     setTimeout(function(){
       cluster.worker.kill();
-    }, 2)
+    }, 200)
   }
 
 }

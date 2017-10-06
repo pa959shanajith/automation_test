@@ -10,19 +10,19 @@
 			<div id="left-top-section">
 				<ul>
 					<li><span><a class='scrapeOnTxt'>Schedule On</a></span></li>
-					<li><a class="selectBrowserSc"  title="Schedule On IE"><span><img src='imgs/ic-ie.png' alt='Internet Explorer' /></span>Internet Explorer</a></li>
-					<li><a class="selectBrowserSc"  title="Schedule On Chrome"><span><img src='imgs/ic-chrome.png' alt='Google Chrome' /></span>Google Chrome</a></li>
-					<li style="margin-bottom: 30px"><a class="selectBrowserSc"  title="Schedule On Firefox"><span><img src='imgs/ic-mozilla.png' alt='Mozilla Firefox' /></span>Mozilla Firefox</a></li>
+					<li><a class="selectBrowserSc"  data-name="3" title="Schedule On IE"><span><img src='imgs/ic-ie.png' alt='Internet Explorer' /></span>Internet Explorer</a></li>
+					<li><a class="selectBrowserSc"  data-name="1" title="Schedule On Chrome"><span><img src='imgs/ic-chrome.png' alt='Google Chrome' /></span>Google Chrome</a></li>
+					<li style="margin-bottom: 30px"><a class="selectBrowserSc"  data-name="2" title="Schedule On Firefox"><span><img src='imgs/ic-mozilla.png' alt='Mozilla Firefox' /></span>Mozilla Firefox</a></li>
 				</ul>
 			</div>
 
-			<div class='clear-both'></div>
+			<!--<div class='clear-both'></div>-->
 
-			<div id="left-bottom-section" class="lbs-single">
+			<!--<div id="left-bottom-section" class="lbs-single">
 				<ul>
 					<li><a href='/scheduling'  title="Scheduling"><span><img src='imgs/ic-scheduling.png' alt='Scheduling' /></span>Schedule</a></li>
 				</ul>
-			</div>
+			</div>-->
 		</div>
 	</div>
 	<!--Left Panel-->
@@ -33,7 +33,7 @@
 		<div id="wrapper-sc">
 			<!--Task Name-->
 			<div id="page-taskName">
-				<span>AHRI-Identify objects related to login location screen</span>	
+				<span>Schedule</span>	
 			</div>
 			<!--Task Name-->
 			
@@ -44,25 +44,25 @@
 					<!-- Table Buttons -->
 					<div id="tableActionButtons">
 						<button class="btn btn-md pull-right submitTaskBtn" ng-click="submitTaskScheduling()"  title="Submit Task">Submit</button>
-						<button class="btn btn-md pull-right btnAddToSchedule" style="margin-right:10px" ng-click="initSchedule()"  title="Add">Add</button>
+						<button class="btn btn-md pull-right btnAddToSchedule" style="margin-right:10px" ng-click="initSchedule()" title="Add">Schedule</button>
 					</div>
 					<!-- Table Buttons -->
 					
 					<!-- Schedule Data Table -->
-					<div class="scheduleDataTable">
+					<div class="scheduleSuiteTable scrollbar-inner">
 						<!-- Schedule Table Header -->
-						<div class="scheduleDataHeader">
+						<!-- <div class="scheduleDataHeader">
 							<span style="width: 4%">&nbsp;</span>
 							<span style="width: 23%; text-align:left; border-right: 1px solid #fff;">Scenario Name</span>
 							<span style="width: 17%; border-right: 1px solid #fff;">IP Address</span>
 							<span style="width: 20%; border-right: 1px solid #fff;">Data Parameterization</span>
 							<span style="width: 25%; border-right: 1px solid #fff;">Date & Time</span>
 							<span style="width: 11%">ALM</span>
-						</div>
+						</div> -->
 						<!-- Schedule Table Header -->
 						
 						<!-- Schedule Table Body -->
-						<div id="scheduleDataBody" class="scrollbar-inner scheduleDataBody"></div>
+						<!-- <div id="scheduleDataBody" class="scrollbar-inner scheduleDataBody"></div> -->
 						<!-- Schedule Table Body -->
 					</div>
 					<!-- Schedule Data Table -->
@@ -75,9 +75,13 @@
 					<div id="page-taskName">
 						<span>Scheduled</span>	
 						<select id="scheduledSuitesFilterData" class="form-control">
+							<option selected disabled>Select Status</option>
 							<option>Completed</option>
 							<option>In Progress</option>
 							<option>Terminated</option>
+							<option>Cancelled</option>
+							<option>Failed</option>
+							<option>Show All</option>
 						</select>
 					</div>
 					<!--Task Name-->
@@ -86,95 +90,36 @@
 					<div class="scheduleDataTable">
 						<!-- Schedule Table Header -->
 						<div class="scheduleDataHeader">
-							<span style="width: 15%; border-right: 1px solid #fff">Date & Time</span>
-							<span style="width: 15%; border-right: 1px solid #fff">IP Address</span>
+							<span style="width: 20%; border-right: 1px solid #fff; cursor: pointer;" title="Click to sort" ng-click="reverse=!reverse;predicate='scheduledatetime'">Date & Time</span>
+							<span style="width: 13%; border-right: 1px solid #fff">IP Address</span>
 							<span style="width: 20%; border-right: 1px solid #fff">Scenario Name</span>
 							<span style="width: 20%; border-right: 1px solid #fff">Test Suite</span>
-							<span style="width: 18%; border-right: 1px solid #fff">Browsers</span>
+							<span style="width: 15%; border-right: 1px solid #fff">Browsers</span>
 							<span style="width: 12%">Status</span>
 						</div>
 						<!-- Schedule Table Header -->
 						
 						<!-- Schedule Table Body -->
+						<!--<div id="scheduledDataBody" class="scrollbar-inner scheduledDataBody">
+							<!--<div class="scheduleDataBodyRow">
+								<div style="width: 15%">Date & Time</div>
+								<div style="width: 15%">IP Address</div>
+								<div style="width: 20%">Scenario Name</div>
+								<div style="width: 20%">Project Name</div>
+								<div style="width: 18%">Browser</div>
+								<div style="width: 12%">Completed</div>
+							</div>
+						</div>-->
 						<div id="scheduledDataBody" class="scrollbar-inner scheduledDataBody">
-							<div class="scheduleDataBodyRow">
-								<div style="width: 15%">Date & Time</div>
-								<div style="width: 15%">IP Address</div>
-								<div style="width: 20%">Scenario Name</div>
-								<div style="width: 20%">Project Name</div>
-								<div style="width: 18%">Browser</div>
-								<div style="width: 12%">Completed</div>
-							</div>
-							<div class="scheduleDataBodyRow">
-								<div style="width: 15%">Date & Time</div>
-								<div style="width: 15%">IP Address</div>
-								<div style="width: 20%">Scenario Name</div>
-								<div style="width: 20%">Project Name</div>
-								<div style="width: 18%">Browser</div>
-								<div style="width: 12%">Completed</div>
-							</div>
-							<div class="scheduleDataBodyRow">
-								<div style="width: 15%">Date & Time</div>
-								<div style="width: 15%">IP Address</div>
-								<div style="width: 20%">Scenario Name</div>
-								<div style="width: 20%">Project Name</div>
-								<div style="width: 18%">Browser</div>
-								<div style="width: 12%">Completed</div>
-							</div>
-							<div class="scheduleDataBodyRow">
-								<div style="width: 15%">Date & Time</div>
-								<div style="width: 15%">IP Address</div>
-								<div style="width: 20%">Scenario Name</div>
-								<div style="width: 20%">Project Name</div>
-								<div style="width: 18%">Browser</div>
-								<div style="width: 12%">Completed</div>
-							</div>
-							<div class="scheduleDataBodyRow">
-								<div style="width: 15%">Date & Time</div>
-								<div style="width: 15%">IP Address</div>
-								<div style="width: 20%">Scenario Name</div>
-								<div style="width: 20%">Project Name</div>
-								<div style="width: 18%">Browser</div>
-								<div style="width: 12%">Completed</div>
-							</div>
-							<div class="scheduleDataBodyRow">
-								<div style="width: 15%">Date & Time</div>
-								<div style="width: 15%">IP Address</div>
-								<div style="width: 20%">Scenario Name</div>
-								<div style="width: 20%">Project Name</div>
-								<div style="width: 18%">Browser</div>
-								<div style="width: 12%">Completed</div>
-							</div>
-							<div class="scheduleDataBodyRow">
-								<div style="width: 15%">Date & Time</div>
-								<div style="width: 15%">IP Address</div>
-								<div style="width: 20%">Scenario Name</div>
-								<div style="width: 20%">Project Name</div>
-								<div style="width: 18%">Browser</div>
-								<div style="width: 12%">Completed</div>
-							</div>
-							<div class="scheduleDataBodyRow">
-								<div style="width: 15%">Date & Time</div>
-								<div style="width: 15%">IP Address</div>
-								<div style="width: 20%">Scenario Name</div>
-								<div style="width: 20%">Project Name</div>
-								<div style="width: 18%">Browser</div>
-								<div style="width: 12%">Completed</div>
-							</div>
-							<div class="scheduleDataBodyRow">
-								<div style="width: 15%">Date & Time</div>
-								<div style="width: 15%">IP Address</div>
-								<div style="width: 20%">Scenario Name</div>
-								<div style="width: 20%">Project Name</div>
-								<div style="width: 18%">Browser</div>
-								<div style="width: 12%">Completed</div>
-							</div><div class="scheduleDataBodyRow">
-								<div style="width: 15%">Date & Time</div>
-								<div style="width: 15%">IP Address</div>
-								<div style="width: 20%">Scenario Name</div>
-								<div style="width: 20%">Project Name</div>
-								<div style="width: 18%">Browser</div>
-								<div style="width: 12%">Completed</div>
+							<div class='scheduleDataBodyRow' ng-repeat="schdata in scheduledData | orderBy:predicate:reverse">
+								<div ng-repeat="data in schdata.scenariodetails" class="scheduleDataBodyRowChild">
+									<div style='width: 20%'>{{schdata.scheduledatetime.split("T")[0]}} {{schdata.scheduledatetime.split("T")[1].split(".")[0]}}</div>
+									<div style='width: 13%'>{{schdata.clientipaddress}}</div>
+									<div style='width: 20%'>{{data.scenarioname}}</div>
+									<div style='width: 20%'>{{schdata.testsuitename}}</div>
+									<div style='width: 15%' ng-repeat="brow in schdata.browserlist"><img ng-src={{browImg(brow)}} /></div>
+									<div style='width: 12%' data-cycleid={{schdata.cycleid}} data-scheduleid={{schdata.scheduleid}} data-scheduledatetime={{schdata.scheduledatetime.valueOf().toString()}}>{{schdata.schedulestatus}} <img src='imgs/ic-close.png' ng-if="schdata.schedulestatus == 'scheduled'" class='cancelJob' ng-click='cancelThisJob($event)' title='Cancel Job'/></div>
+								</div>
 							</div>
 						</div>
 						<!-- Schedule Table Body -->
@@ -307,3 +252,21 @@
 	</div>
 </div>
 <!-- Submitting Task -->
+<!-- Global Popup -->
+<div class="modal fade" id="scheduleGlobalModal" role="dialog" data-keyboard="false" data-backdrop="static">
+	<div class="modal-dialog modal-sm">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">&times;</button>
+				<h4 class="modal-title"></h4>
+			</div>
+			<div class="modal-body">
+				<p></p>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default btn-accept" data-dismiss="modal">Ok</button>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- Global Popup -->

@@ -712,7 +712,7 @@
 }
 .scroll-wrapper.mappedFiles {    
     min-height: 100px;
-    max-height: 708px;
+    max-height: 680px;
 }
 .scroll-wrapper .mappedFiles{
     padding: 10px !important;
@@ -929,5 +929,5 @@
     .scroll-wrapper.scrollbar-inner-rep{max-height: 241px !important;}
 }
 @media only screen and (width: 1440px) and (height: 794px){
-    .scroll-wrapper.scrollbar-inner-rep {max-height: 243px !important;}                                                                                                                                                                       
+    .scroll-wrapper.scrollbar-inner-repï¿½{max-height:ï¿½243px !important;}                                                                                                                                                                       
 }
