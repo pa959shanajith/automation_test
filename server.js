@@ -110,7 +110,7 @@ if (cluster.isMaster) {
         limit: '10mb',
         extended: true
     }));
-    app.use(morgan('combined'))
+    //app.use(morgan('combined'))
 
     app.use(cookieParser());
     app.use(sessions({
@@ -365,6 +365,7 @@ if (cluster.isMaster) {
     // Dashboard Routes
     app.post('/loadDashboard', dashboard.loadDashboard);
     app.post('/loadDashboardData', dashboard.loadDashboardData);
+    app.post('/loadDashboard_2', dashboard.loadDashboard_2);
     //app.post('/manualTestcaseDetails_ICE', qc.manualTestcaseDetails_ICE);
 
 

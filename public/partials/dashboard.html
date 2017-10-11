@@ -4,25 +4,90 @@
 
 <!--Content Area-->
 <section class="container-fluid container-fluid-inner" id="dashboard" >
-  <div class="container " style="margin-top:40px">
-    <div class="row">
-      <div class="col-sm-3 col-sm-offset-2 section-1">
+  <div class="container " style="margin:20px;">
+    <!-- <div class="row">
+      <div class="col-sm-2 col-sm-offset-1 section-1">
         <h4>Automation Percentage(%)</h4>
         <h2> 40 </h2>
       </div>
-      <div class="col-sm-3 col-sm-offset-2 section-1">
+      <div class="col-sm-2 col-sm-offset-1 section-1">
         <h4>Total Execution Time(seconds)</h4>
         <h2 ng-bind="totalExTime" ng-click="showButtonsSection()" style="cursor:pointer">  </h2>
       </div>
+      <div class="col-sm-2 col-sm-offset-1 section-1">
+        <h4>Total Re-Estimation Count</h4>
+        <h2 ng-bind="totalReestimationCount"> </h2>
+      </div>
+      <div class="col-sm-2 col-sm-offset-1 section-1">
+        <h4>Schedule Adherence</h4>
+        <h2>PASS</h2>
+      </div>
+    </div> -->
+      <div class="dropdown pull-right">
+        <button class="btn  dropdown-toggle btn-default" type="button" data-toggle="dropdown">Select
+        <span class="caret"></span></button>
+        <ul class="dropdown-menu" >
+          <li><a href="#">{{HTML}}</a></li>
+        </ul>
+      </div>
     </div>
+    <div class="row">
+    <div class="col-sm-12">
+      <div class="row">
+        <div class="col-md-3">
+          <div class="well">
+            <h4 class="text-danger"><span class="label label-danger pull-right label-modified">40%</span><span class="box-dashboard"> Automation Percentage(%) </span></h4>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="well">
+            <h4 class="text-success"><span class="label label-success pull-right label-modified" ng-bind="totalExTime" ng-click="showButtonsSection()" style="cursor:pointer"></span><span class="box-dashboard"> Total Execution Time </span></h4>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="well">
+            <h4 class="text-primary"><span class="label label-primary pull-right label-modified" ng-bind="totalReestimationCount"></span><span class="box-dashboard"> Total Re-Estimation Count </span></h4>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="well">
+            <h4 class="text-success"><span class="label label-success pull-right label-modified">+ 24%</span><span class="box-dashboard"> Schedule Adherence </span></h4>
+          </div>
+        </div>
+      </div><!--/row-->
+    </div><!--/col-12-->
+  </div><!--/row-->
   </div>
+
   <div id="dashboardSection" ng-show="showButtons">
-    <div class="btn-cotainer" >
-      <button class="d-button" ng-class="{'actBtn': selBtn === 'ts'}" ng-click="updateBtn('ts')">Test Suites</button>
-      <button class="d-button" ng-class="{'actBtn': selBtn === 'cy'}" ng-click="updateBtn('cy')">Cycles</button>
-      <button class="d-button" ng-class="{'actBtn': selBtn === 'rl'}" ng-click="updateBtn('rl')">Releases</button>
-      <button class="d-button" ng-class="{'actBtn': selBtn === 'pj'}" ng-click="updateBtn('pj')">Projects</button>
-    </div>
+    <div class="row">
+    <div class="col-sm-12">
+      <div class="row">
+        <div class="col-md-1">
+          <div class="btn-cotainer" >
+            <button class="d-button" ng-class="{'actBtn': selBtn === 'ts'}" ng-click="updateBtn('ts')">Test Suites</button>
+            <button class="d-button" ng-class="{'actBtn': selBtn === 'cy'}" ng-click="updateBtn('cy')">Cycles</button>
+            <button class="d-button" ng-class="{'actBtn': selBtn === 'rl'}" ng-click="updateBtn('rl')">Releases</button>
+            <button class="d-button" ng-class="{'actBtn': selBtn === 'pj'}" ng-click="updateBtn('pj')">Projects</button>
+          </div>
+        </div>
+        <div class="col-md-5">
+          <div id="first_graph" class="well"></div>
+        </div>
+        <div class="col-md-3" >
+          <div id="second_graph"  class="well"></div>
+        </div>
+        <div class="col-md-3">
+          <div id="third_graph"  class="well"></div>
+        </div>
+      </div><!--/row-->
+    </div><!--/col-12-->
+  </div><!--/row-->
+<!--
+    <div id="first_graph"></div>
+    <div id="second_graph"></div>
+    <div id="third_graph"></div>
+    <div style="clear:both"></div> -->
   </div>
   <!-- <select class="d-dropdown" ng-model="selectedLevel" ng-options="x for x in levels" ng-change="update($index)">
 </select> -->

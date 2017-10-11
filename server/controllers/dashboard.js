@@ -84,7 +84,7 @@ var reqToAPI = function(d,u,p,callback) {
       qList.push({"statement":"MATCH (n:TASKS) where n.parent CONTAINS '"+id+"' RETURN n"});
     })
 
-    reqToAPI({"data":{"statements":qList}},urlData,'/neoQuerya', function(err,status,result){
+    reqToAPI({"data":{"statements":qList}},urlData,'/neo4jAPI', function(err,status,result){
       if(err) res.status(status).send(err);
       else if(status!=200) res.status(status).send(result);
       else{
@@ -92,6 +92,17 @@ var reqToAPI = function(d,u,p,callback) {
         callback(jsonData);
       }
     });
+  }
+  function getProjectNames(projectID, allExecutionData, callback){
+    inputs = { "projectid":projectID, "query":"getprojectname"};
+    args = {data:inputs, headers:{"Content-Type" : "application/json"}}
+
+    client.post(epurl+'create_ice/getProjectIDs_Nineteen68', args,
+    function(projectDetails, response){
+      allExecutionData.projectDetails[projectID] = projectDetails.rows[0].projectname;
+      callback(allExecutionData);
+    });
+
   }
 
   function getExecutionData(req, res, projectIds, callback){
@@ -172,7 +183,7 @@ var reqToAPI = function(d,u,p,callback) {
                     executionTime.rows.forEach(function(e){
                       var dStart = new Date(e.starttime);
                       var dEnd = new Date(e.endtime);
-                      ex = ex + dEnd.getTime() - dStart.getTime();
+                      ex = ex + dEnd.getTime() - dStart.getTime() - 19800000;
                       count++;
                     });
 
@@ -200,7 +211,10 @@ var reqToAPI = function(d,u,p,callback) {
           });
         }, function(err){
           console.log("all release ids of a project with "+projectId+" completed fetching cycleIds");
-          getCycleIds();
+          getProjectNames(projectId, allExecutionData, function(data){
+            allExecutionData.projectDetails = data.projectDetails;
+            getCycleIds();
+          });
         });
       });
     }, function(err){
@@ -225,6 +239,7 @@ var reqToAPI = function(d,u,p,callback) {
             var arr = [];
             async.parallel([
               function ( callback ) {
+                //console.log("hellosads");
                 getTasksData(req, res, projectIds, function(data){
                   jsonData = data;
                   callback();
@@ -237,6 +252,7 @@ var reqToAPI = function(d,u,p,callback) {
                 });
               }
             ], function ( error, results ) {
+
               res.send({
                 eData : arr,
                 tData : jsonData
@@ -253,5 +269,46 @@ var reqToAPI = function(d,u,p,callback) {
     }catch (e) {
       console.log(e);
       res.send('fail')
+    }
+  }
+
+
+  exports.loadDashboard_2 = function(req, res){
+    try {
+      if(isSessionActive(req, res)){
+        var IP = req.headers.host.split(":")[0];
+        //req.connection.servername;//localAddress.split(":")[req.connection.localAddress.split(":").length-1];
+        console.log("\n\n\n\n\n\n\n ", req.body);
+        var client = require("jsreport-client")("https://"+IP+":8001/");
+        client.render({
+          template: {
+            shortid: "rk00qKOn-",
+            recipe: "html",
+            engine: "handlebars"
+          },
+          data: {
+            "pieChartID": req.body.chart_id,
+            "labels" : req.body.labels,
+            "values" : req.body.values
+          }
+        }, function(err, response){
+          if(err) {
+            console.log('Error when trying to render report:', err);
+            res.send("fail");
+          }else{
+            try{
+              response.pipe(res);
+            }catch(exception){
+              console.log(exception);
+              res.send("fail");
+            }
+          }
+        });
+      }else{
+        res.send("Invalid Session");
+      }
+    }catch (e) {
+      console.log(exception);
+      res.sed("fail");
     }
   }

@@ -56,11 +56,13 @@ mySPA.controller('loginController', function ($scope, $http, $location, LoginSer
 
 							LoginService.loadUserInfo_Nineteen68(username,selRole,false)
 							.then(function (data) {
+								console.log(data);
 								if(data != "fail"){
 									//To be removed - Has to come from database
 									var availablePlugins = [];
 									var key = ["ALM","Auto Gen Path", "Dashboard", "Dead Code Identifier", "ICE" ,"Mindmap" ,"Neuron Graphs 2D", "Neuron Graphs 3D", "Oxbow Code Identifier", "Reports", "Weboccular"];
 									for(i=0; i<data.plugindetails.length; i++){
+										console.log(key[i] , data.plugindetails[i].keyValue)
 										availablePlugins.push({
 											"pluginName" : key[i],
 											"pluginValue" : data.plugindetails[i].keyValue
@@ -70,10 +72,10 @@ mySPA.controller('loginController', function ($scope, $http, $location, LoginSer
 										"pluginName" : "Utility",
 										"pluginValue" : "true"
 									})
-									// availablePlugins.push({
-									// 	"pluginName" : "Weboccular",
-									// 	"pluginValue" : "true"
-									// })
+									availablePlugins.push({
+										"pluginName" : "Dashboard",
+										"pluginValue" : "true"
+									})
 									data.pluginsInfo = availablePlugins;
 									window.localStorage['LoginSuccess'] = "True";
 									window.localStorage['_UI'] = JSON.stringify(data);
@@ -84,7 +86,7 @@ mySPA.controller('loginController', function ($scope, $http, $location, LoginSer
 										if(data != "fail"){
 											window.localStorage['_SR'] = data;
 											window.localStorage['_pR'] = data+";"+roleasarray;
-											
+
 											if(data == "Admin"){
 												window.localStorage['navigateScreen'] = "admin";
 												window.location.href = "/admin";
@@ -106,7 +108,7 @@ mySPA.controller('loginController', function ($scope, $http, $location, LoginSer
 				         }
 					}
 				}
-				
+
 				else if(data == 'noProjectsAssigned')
 				{
 						$scope.loginValidation = "To Login, user must be allocated to a Domain and Project. Please contact Admin.";
