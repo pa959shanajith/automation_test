@@ -164,7 +164,7 @@ exports.readTestSuite_ICE = function(req, res) {
                 }
             });
         });
-        //old code 
+        //old code
         //commented by vishvas(21/June/2017) with regard to Batch Execution
         // /*  * Query 1 fetching the donotexecute,conditioncheck,getparampaths,testscenarioids  * based on testsuiteid,testsuitename and cycleid  */ TestSuiteDetails_Module_ICE(req.body, function(err, data) { if (err) { console.log(err); } else {  async.series({ testsuitesdata: function(callback) { var getTestSuites = "select donotexecute,conditioncheck,getparampaths,testscenarioids from testsuites where testsuiteid= " + requiredtestsuiteid + " and cycleid=" + requiredcycleid + " and testsuitename='" + requiredtestsuitename + "'"; //var getTestSuites="select donotexecute,condtitioncheck,getparampaths,testscenarioids from testsuites where testsuiteid= 13bbacaf-82c7-4c4a-9f91-0933462b10d4 AND cycleid=e6e5b473-34cd-4963-9bda-cb78c727e413 and testsuitename='Dev Suite 1'"; dbConnICE.execute(getTestSuites, function(err, result) { if (err) { var flag = "Error in readTestSuite_ICE : Fail"; res.send(""); } else { async.forEachSeries(result.rows, function(quest, callback2) {  outscenarioids = quest.testscenarioids;  if (quest.donotexecute == null) { var arrTemp = []; for (var i = 0; i < outscenarioids.length; i++) { arrTemp.push(1); } outexecutestatus = arrTemp; } else { outexecutestatus = quest.donotexecute; }  if (quest.conditioncheck == null) { var arrTemp = []; for (var i = 0; i < outscenarioids.length; i++) { arrTemp.push(0); } outcondition = arrTemp; } else { outcondition = quest.conditioncheck; }  if (quest.getparampaths == null) { var arrTemp = []; for (var i = 0; i < outscenarioids.length; i++) { arrTemp.push(''); } outdataparam = arrTemp; } else { outdataparam = quest.getparampaths; }   //var responsedata={template: "",testcase:[],testcas	ename:""}; async.forEachSeries(outscenarioids, function(quest1, callback3) { // var testcasestepsquery = "SELECT testscenarioname,projectid FROM testscenarios where testscenarioid="+quest1; // dbConnICE.execute(testcasestepsquery, function(err, answers) { // 	if(err){ // 		console.log(err); // 	}else{ // 		// var projectnamequery = "SELECT projectname FROM projects where projectid = "+answers.rows[0].projectid+" ALLOW FILTERING;"; // 		// var runquery = dbConnICE.execute(projectnamequery, function(err, projectnameresult) {if(err){ }else{outprojectnames.push(projectnameresult.rows[0].projectname)}}); // 		outscenarionames.push(answers.rows[0].testscenarioname); // 	} // 	callback3(); // }); /**  *  Projectnametestcasename_ICE is a function to fetch testscenario name and project name  * 	modified shreeram p on 15th mar 2017  * */ Projectnametestcasename_ICE(quest1, function(err, data) { if (err) { console.log(err); } else { if (data != null || data != undefined) { outscenarionames.push(data.testcasename); outprojectnames.push(data.projectname); }  } callback3(); }); }, callback2); }, callback); responsedata.executestatus = outexecutestatus; responsedata.condition = outcondition; responsedata.dataparam = outdataparam; responsedata.scenarioids = outscenarioids; responsedata.scenarionames = outscenarionames; responsedata.projectnames = outprojectnames; //cb(null, responsedata); } }); }, }, function(err, results) { //data.setHeader('Content-Type','application/json'); if (err) {  try { res.send(err); } catch (ex) { console.log("Exception occured in read test suite : ", ex); }  } else { //console.log(responsedata); try { res.send(JSON.stringify(responsedata)); } catch (ex) { console.log("Exception occured in read test suite : ", ex); } } }) } });
     } else {
@@ -530,12 +530,14 @@ exports.ExecuteTestSuite_ICE = function(req, res) {
         };
         var executionId = uuid();
         var starttime = new Date().getTime();
+        console.log("*** start time" ,starttime);
         //updating number of executions happened
         batchlength = batchExecutionData.length;
         var updateinp = {"query":"testsuites","count":batchlength,"userid":userInfo.user_id}
         var args = { data:updateinp,headers:{"Content-Type" : "application/json"}}
         client.post(epurl+"utility/dataUpdator_ICE",args,
                         function (result, response) {
+                          console.log("response",response);
             if(response.statusCode != 200 || result.rows == "fail"){
                     console.log("Data Updator Fail");
             } else {
@@ -777,7 +779,7 @@ exports.ExecuteTestSuite_ICE = function(req, res) {
                 });
         }
 
-        //old code 
+        //old code
         //commented by vishvas(21/June/2017) with regard to Batch Execution
         // var browserType = req.body.browserType; // var testsuiteid = req.body.testsuiteId // var scenarioIdinfor = ''; //var json = "[{ 	\"scenarioname\": \"Scenario Name1\", 	\"scenarioid\": \"72bcc08e-15a7-4de6-ad59-389aee2230cb\", 	\"conditon\": [\"false\"], 	\"dataParam\": \"http://10.41.31.92:3000/execute\", 	\"executeStatus\": [\"1\"] }]"; // var json1 = JSON.parse(json); // var executionId = uuid(); // var starttime = new Date().getTime(); //internal values // var testsuitedetails = { // "suitedetails": "", // "executionId":"", // "testsuiteIds": "" // }; // async.forEachSeries(json1, function(itr, callback3) { // scenarioIdList.push(itr.scenarioids); // dataparamlist.push(itr.dataparam[0]); // conditionchecklist.push(itr.condition); // scenarioIdinfor = itr.scenarioids; // TestCaseDetails_Suite_ICE(scenarioIdinfor, function(err, data) {  // if (err) { // console.log(err); // } else { // if (data != null || data != undefined) { // scenariotestcaseobj[scenarioIdinfor] = data; // listofscenarioandtestcases.push(scenariotestcaseobj); // } // } // callback3(); // }) // }, function(callback3) { // executionjson[testsuiteid] = listofscenarioandtestcases; // executionjson.scenarioIds = scenarioIdList; // executionjson.browserType = browserType; // executionjson.condition = conditionchecklist; // executionjson.dataparampath = dataparamlist; // testsuitedetailslist.push(executionjson)  // testsuiteidslist.push(testsuiteid); // testsuitedetails.suitedetails = testsuitedetailslist; // testsuitedetails.testsuiteIds = testsuiteidslist; // testsuitedetails.executionId = executionId; // //					console.log(JSON.stringfy(testsuitedetails)); // var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress; // console.log(Object.keys(myserver.allSocketsMap), "<<all people, asking person:", ip); // if ('allSocketsMap' in myserver && ip in myserver.allSocketsMap) { // var mySocket = myserver.allSocketsMap[ip]; // mySocket._events.result_executeTestSuite = []; // mySocket.emit('executeTestSuite', testsuitedetails); // mySocket.on('result_executeTestSuite', function(resultData) {  // if (resultData != "success" && resultData != "Terminate") { // try { // var scenarioid = resultData.scenarioId; // var executionid = resultData.executionId; // var reportdata = resultData.reportData; // var req_report = resultData.reportdata; // var req_reportStepsArray = reportdata.rows; // var req_overAllStatus = reportdata.overallstatus // var req_browser = reportdata.overallstatus[0].browserType; // reportdata = JSON.stringify(reportdata).replace(/'/g, "''"); // reportdata = JSON.parse(reportdata);  // var insertReport = "INSERT INTO reports (reportid,executionid,testsuiteid,testscenarioid,executedtime,browser,modifiedon,status,report) VALUES (" + uuid() + "," + executionid + "," + testsuiteid + "," + scenarioid + "," + new Date().getTime() + ",'" + req_browser + "'," + new Date().getTime() + ",'" + resultData.reportData.overallstatus[0].overallstatus + "','" + JSON.stringify(reportdata) + "')"; // var dbquery = dbConnICE.execute(insertReport, function(err, result) { // if (err) { // flag = "fail"; // } else { // flag = "success"; // } // });  // var insertIntoExecution = "INSERT INTO execution (testsuiteid,executionid,starttime,endtime) VALUES (" + testsuiteid + "," + executionid + "," + starttime + "," + new Date().getTime() + ");" // var dbqueryexecution = dbConnICE.execute(insertIntoExecution, function(err, resultexecution) { // if (err) { // flag = "fail"; // } else { // flag = "success"; // } // }); // //console.log("this is the value:",resultData); // } catch (ex) { // console.log(ex);  // } // } // //console.log("Response data in execution : ",resultData); // try { // if (resultData == "success" || resultData == "Terminate") // res.send(resultData); // } catch (ex) { // console.log("Exception occured is : ", ex) // }  // //} // }); // } else { // console.log("Socket not Available"); // res.send("unavailableLocalServer"); // }  // });
     } else {
@@ -1659,7 +1661,7 @@ function TestSuiteDetails_Module_ICE(req, cb1, data) {
                     // 	console.log("Exception occured in the updating scenarios",ex);
                     // }
                 }
-                //callback(); 
+                //callback();
                 //}, callback);
             }
         },
@@ -1896,7 +1898,7 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
         scheduleStatus = "scheduled";
         testSuiteId = itr.testsuiteid;
         testSuitename = itr.testsuitename
-        scenarioDetails = JSON.stringify(itr.suiteDetails);        
+        scenarioDetails = JSON.stringify(itr.suiteDetails);
         var sessObj;
         //Normal scheduling
         if (rescheduleflag != true) {
@@ -1978,7 +1980,7 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
     })
 
     //Executing test suites on scheduled time
-    function executeScheduling(sessObj, schedulingData, req){   
+    function executeScheduling(sessObj, schedulingData, req){
         var dbQuery = "SELECT * from scheduledexecution WHERE cycleid=" + sessObj.split(";")[0] + " AND scheduledatetime=" + sessObj.split(";")[2] + " AND scheduleid=" + sessObj.split(";")[1] + " ALLOW FILTERING;";
         console.log(dbQuery);
         try {
@@ -2090,7 +2092,7 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
                                 mySocket.emit('executeTestSuite', executionRequest);
                                 var updateSessionExpiry = setInterval(function () {
                                     req.session.cookie.maxAge = sessionTime;
-                                },updateSessionTimeEvery);                                                    
+                                },updateSessionTimeEvery);
                                 mySocket.on('result_executeTestSuite', function(resultData) {
                                     clearInterval(updateSessionExpiry);
                                     if (resultData != "success" && resultData != "Terminate") {
@@ -2134,7 +2136,7 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
                                                     //flag = "success";
                                                 }
                                             });
-                                            
+
                                             var insertIntoExecution = "INSERT INTO execution (testsuiteid,executionid,starttime,endtime) VALUES (" + testsuiteid + "," + executionid + "," + starttime + "," + new Date().getTime() + ");"
                                             insertExecutionHistory = "'testsuiteid=" + testsuiteid + ", executionid=" + executionid + ", starttime=" + starttime + ", endtime=" + new Date().getTime() + " '";
                                             insertExecutionQuery = "INSERT INTO execution (testsuiteid,executionid,history) VALUES (" + testsuiteid + "," + executionid + ",{" + date + ":" + insertExecutionHistory + "});"
@@ -2190,7 +2192,7 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
                                 });
                             }
                         }
-                    }//only jobs with scheduled status executes                    
+                    }//only jobs with scheduled status executes
                 }
             });
         } catch (exception) {
@@ -2257,7 +2259,7 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
     }
 }
 
-//Update status of current scheduled job 
+//Update status of current scheduled job
 function updateStatus(sessObj, updateStatuscallback) {
     try{
         if (scheduleStatus != "") {
@@ -2281,7 +2283,7 @@ function updateStatus(sessObj, updateStatuscallback) {
     catch(exception){
         console.log(exception);
         updateStatuscallback(null, "fail");
-    }    
+    }
 }
 
 exports.getScheduledDetails_ICE = function(req, res) {
@@ -2290,7 +2292,7 @@ exports.getScheduledDetails_ICE = function(req, res) {
         var sessionToken = sessionCookie[0].split(":");
         sessionToken = sessionToken[1];
     }
-    if (sessionToken != undefined && req.session.id == sessionToken) {        
+    if (sessionToken != undefined && req.session.id == sessionToken) {
         var dbquery = "SELECT * from scheduledexecution;"
         getScheduledDetails(dbquery, function(err, getSchedcallback) {
             if (err) {
