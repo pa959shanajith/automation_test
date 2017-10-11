@@ -1323,24 +1323,37 @@ exports.updateProject_ICE = function updateProject_ICE(req, res){
 								try{
 									var newReleaseName=eachprojectDetail.releaseName;
 									var releaseId=eachprojectDetail.releaseId;
-									var deleteReleaseQuery="delete from releases where releasename='"+eachprojectDetail.oldreleaseName+
-									"' and projectid="+requestedprojectid+" and releaseid="+releaseId;
+									// var deleteReleaseQuery="delete from releases where releasename='"+eachprojectDetail.oldreleaseName+
+									// "' and projectid="+requestedprojectid+" and releaseid="+releaseId;
 									// console.log(deleteReleaseQuery);
-									dbConnICE.execute(deleteReleaseQuery, function(deleteReleaseQueryerror, deleteReleaseQueryresponse) {
+									// dbConnICE.execute(deleteReleaseQuery, function(deleteReleaseQueryerror, deleteReleaseQueryresponse) {
+									var inputs = {"query": "deleterelease","releasename":eachprojectDetail.releaseName,
+									"projectid":requestedprojectid,"releaseid":eachprojectDetail.releaseId};
+									var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
+									client.post(epurl+"admin/updateProject_ICE",args,
+												function (result, response) {
 										try{
-											if(deleteReleaseQueryerror){
+											// if(deleteReleaseQueryerror){
+											if(response.statusCode != 200 || result.rows == "fail"){	
 												flag="Error in delete-Release(true)-updateProject_ICE : Fail";
 												res.send(flag);
 											}else{
 												try{
 													var requestReleasehistorydetails = "'inserted release action on Update project service by " + userinfo.username.toLowerCase() + " having role:" + userinfo.role + "" +
 													" skucoderelease=" + requestedskucode + ", tags=" + requestedtags + ", with the release Name " + newReleaseName + " '";
-													var createReleaseQuery = "INSERT INTO releases (projectid,releasename,releaseid,createdby,createdon,deleted,history,skucoderelease,tags) values(" +
-													requestedprojectid + ",'" + newReleaseName + "'," + releaseId + ",'" + userinfo.username.toLowerCase() + "','" +
-													new Date().getTime() + "'," + false + ",{" + date + ":" + requestReleasehistorydetails + "},'" +
-													requestedskucode + "',['" + requestedtags + "']);"
-													dbConnICE.execute(createReleaseQuery, function(error, response) {
-														if(error){
+													// var createReleaseQuery = "INSERT INTO releases (projectid,releasename,releaseid,createdby,createdon,deleted,history,skucoderelease,tags) values(" +
+													// requestedprojectid + ",'" + newReleaseName + "'," + releaseId + ",'" + userinfo.username.toLowerCase() + "','" +
+													// new Date().getTime() + "'," + false + ",{" + date + ":" + requestReleasehistorydetails + "},'" +
+													// requestedskucode + "',['" + requestedtags + "']);"
+													// dbConnICE.execute(createReleaseQuery, function(error, response) {
+													// 	if(error){
+													var inputs={"query":"createrelease", "projectid":requestedprojectid,"releaseid":releaseId,
+														"releasename": newReleaseName, "createdby":userinfo.username.toLowerCase(),
+														"skucoderelease" : "skucoderelease", "tags":"tags"};
+													var args = {data:inputs,headers:{"Content-Type" : "application/json"}};
+													client.post(epurl+"admin/createProject_ICE",args,
+													function (data, response) {
+														if(response.statusCode != 200 || data.rows == "fail"){
 															flag="Error in update-Release(true)-updateProject_ICE : Fail";
 															res.send(flag);
 														}else{
@@ -1355,10 +1368,16 @@ exports.updateProject_ICE = function updateProject_ICE(req, res){
 																			try{
 																				newCycleName=eachCycleDetail.cycleName;
 																				cycleId=eachCycleDetail.cycleId;
-																				var deleteCyclesQuery="delete from cycles where cyclename='"+eachCycleDetail.oldCycleName+
-																				"' and releaseid="+releaseId+" and cycleid="+cycleId;
-																				dbConnICE.execute(deleteCyclesQuery, function(deleteCyclesQueryerror, deleteCyclesQueryresponse) {
-																					if(deleteCyclesQueryerror){
+																				// var deleteCyclesQuery="delete from cycles where cyclename='"+eachCycleDetail.oldCycleName+
+																				// "' and releaseid="+releaseId+" and cycleid="+cycleId;
+																				// dbConnICE.execute(deleteCyclesQuery, function(deleteCyclesQueryerror, deleteCyclesQueryresponse) {
+																				// 	if(deleteCyclesQueryerror){
+																				var inputs = {"query": "deletecycle","cyclename":eachCycleDetail.oldCycleName,
+																					"releaseid":releaseId,"cycleid":cycleId};
+																				var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
+																				client.post(epurl+"admin/updateProject_ICE",args,
+																				function (result, response) {
+																					if(response.statusCode != 200 || result.rows == "fail"){
 																						flag="Error in delete-Cycle(true)-updateProject_ICE : Fail";
 																						res.send(flag);
 																					}else{
@@ -1426,10 +1445,16 @@ exports.updateProject_ICE = function updateProject_ICE(req, res){
 												try{   
 													newCycleName=eachCycleDetail.cycleName;
 													cycleId=eachCycleDetail.cycleId;
-													var deleteCyclesQuery="delete from cycles where cyclename='"+eachCycleDetail.oldCycleName+
-													"' and releaseid="+releaseId+" and cycleid="+cycleId;
-													dbConnICE.execute(deleteCyclesQuery, function(deleteCyclesQueryerror, deleteCyclesQueryresponse) {
-														if(deleteCyclesQueryerror){
+													// var deleteCyclesQuery="delete from cycles where cyclename='"+eachCycleDetail.oldCycleName+
+													// "' and releaseid="+releaseId+" and cycleid="+cycleId;
+													// dbConnICE.execute(deleteCyclesQuery, function(deleteCyclesQueryerror, deleteCyclesQueryresponse) {
+													// 	if(deleteCyclesQueryerror){
+													var inputs = {"query": "deletecycle","cyclename":eachCycleDetail.oldCycleName,
+																"releaseid":releaseId,"cycleid":cycleId};
+													var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
+													client.post(epurl+"admin/updateProject_ICE",args,
+														function (result, response) {
+														if(response.statusCode != 200 || result.rows == "fail"){
 															flag="Error in delete-Cycle(true)-updateProject_ICE : Fail";
 															res.send(flag);
 														}else{
@@ -1441,7 +1466,7 @@ exports.updateProject_ICE = function updateProject_ICE(req, res){
 																// new Date().getTime() + "'," + false + ",{" + date + ":" + requestCyclehistorydetails + "},'" +
 																// requestedskucode + "',['" + requestedtags + "']);"
 																// createCycle(getCycleQuery, function(error, response) {
-																var inputs={"query":"createcycle", "releaseid":releaseId,
+																var inputs={"query":"createcycle", "releaseid":releaseId,"cycleid":cycleId,
 																		"cyclename": newCycleName, "createdby":userinfo.username.toLowerCase(),
 																		"skucodecycle" : "skucodecycle", "tags":"tags"};
 																var args = {data:inputs,headers:{"Content-Type" : "application/json"}};
