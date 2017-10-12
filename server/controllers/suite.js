@@ -59,6 +59,7 @@ exports.readTestSuite_ICE = function(req, res) {
                         "testsuiteid": eachSuite.testsuiteid,
                         "cycleid": eachSuite.cycleid,
                         "testsuitename": eachSuite.testsuitename,
+                        "versionnumber": eachSuite.versionnumber,
                         "query": "readTestSuite_ICE"
                     }
                     var args = {
@@ -237,7 +238,7 @@ function Projectnametestcasename_ICE(req, cb, data) {
         }
     }, function(err, data) {
         cb(null, testcaseNproject);
-    })
+    });
 }
 
 /**
@@ -258,7 +259,6 @@ exports.updateTestSuite_ICE = function(req, res) {
         var batchDetails = req.body.batchDetails.suiteDetails;
         // var batchDetails = [{ 		"Execution_ModuleLevel1": { 			"requestedtestsuiteid": "df6120fe-aaf1-456b-9b6c-0615c792d8d8", 			"requestedtestsuitename": "Execution_ModuleLevel1", 			"conditioncheck": ["0", "0"], 			"donotexecute": ["1", "1"], 			"getparampaths": ["'a'", "'a'"], 			"testscenarioids": ["4c1142f8-7851-477c-b25b-6504c86fe6b4", "bdda93ff-63ed-4809-84f7-396ae203cc3c"], 			"testscycleid": "472b2499-761c-4e5d-bf8b-19d85e377bc4" 		}, 		"Execution_ModuleLevel2": { 			"requestedtestsuiteid": "558c720b-fe3c-48d4-b6b7-7d1c39f35063", 			"requestedtestsuitename": "Execution_ModuleLevel2", 			"conditioncheck": ["0", "0"], 			"donotexecute": ["1", "1"], 			"getparampaths": ["'a'", "'a'"], 			"testscenarioids": ["061c89a6-c171-45f9-bcf8-397c4e9abecd", "82b734e9-5c1f-4828-88ec-37eb24ab086b"], 			"testscycleid": "5c4b2a0c-c294-4d76-ba51-da995e8a177c" 		} 	}];
         // var requestedversionnumber = req.body.versionnumber;
-        var requestedversionnumber = 1;
         var batchDetailslength = batchDetails.length;
         var batchindex = 0;
         var totalnumberofsuites = 0;
@@ -275,6 +275,7 @@ exports.updateTestSuite_ICE = function(req, res) {
                 var getparampaths = eachbatchDetails[eachsuitename].getparampaths;
                 var testscenarioids = eachbatchDetails[eachsuitename].testscenarioids;
                 var testscycleid = eachbatchDetails[eachsuitename].testscycleid;
+				var versionnumber = eachbatchDetails[eachsuitename].versionnumber;
                 console.log(requestedtestsuitename);
                 var index = 0;
                 /*
@@ -290,12 +291,12 @@ exports.updateTestSuite_ICE = function(req, res) {
                     "cycleid": testscycleid,
                     "testsuitename": requestedtestsuitename,
                     "testsuiteid": requestedtestsuiteid,
-                    "versionnumber": requestedversionnumber
+                    "versionnumber": versionnumber
                 };
                 /*deleteTestSuiteQuery = "DELETE conditioncheck,donotexecute,getparampaths,testscenarioids FROM testsuites " +
                                         "where cycleid=" + testscycleid +
                                         " and testsuitename='" + requestedtestsuitename + "'" +
-                                        " and testsuiteid=" + requestedtestsuiteid + " and versionnumber = " + requestedversionnumber;*/
+                                        " and testsuiteid=" + requestedtestsuiteid + " and versionnumber = " + versionnumber;*/
                 //deleteSuite(deleteTestSuiteQuery, function(err, response) {
                 deleteSuite(inputs, function(err, response) {
                     if (response == "success") {
@@ -358,7 +359,7 @@ exports.updateTestSuite_ICE = function(req, res) {
                             "cycleid": testscycleid,
                             "testsuiteid": requestedtestsuiteid,
                             "testsuitename": requestedtestsuitename,
-                            "versionnumber": requestedversionnumber,
+                            "versionnumber": versionnumber,
                             "skucodetestsuite": "skucodetestsuite",
                             "tags": "tags"
                         };
@@ -371,7 +372,7 @@ exports.updateTestSuite_ICE = function(req, res) {
                             "where cycleid=" + testscycleid +
                             " and testsuiteid=" + requestedtestsuiteid +
                             " and testsuitename='" + requestedtestsuitename +
-                            "' and versionnumber = " + requestedversionnumber + " ;";*/
+                            "' and versionnumber = " + versionnumber + " ;";*/
                         //dbConnICE.execute(updateTestSuiteData, function(err, updateQueryresults) {
                         var args = {
                             data: inputs2,
@@ -1571,7 +1572,7 @@ function TestSuiteDetails_Module_ICE(req, cb1, data) {
             testcasesteps: function(callback) {
                 var testscenarioids = resultdata.testscenarioids;
                 //async.forEachSeries(resultdata, function(quest, callback2) {					var responsedata={template: "",testcase:[],testcasename:""};
-                var requiredversionnumber = 1;
+                var versionnumber = resultdata.versionnumber;
                 var createTestSuitesHistory;
                 var insertTestSuiteQuery;
                 var date;
@@ -1591,11 +1592,11 @@ function TestSuiteDetails_Module_ICE(req, cb1, data) {
                         "cycleid": requiredcycleid,
                         "testsuitename": requiredtestsuitename,
                         "testsuiteid": requiredtestsuiteid,
-                        "versionnumber": "1",
+                        "versionnumber": versionnumber,
                         "conditioncheck": conditioncheckvalues,
                         "createdby": "Ninteen68_admin",
                         "createdthrough": "createdthrough",
-                        "deleted": "FALSE",
+                        "deleted": false,
                         "donotexecute": donotexecutevalues,
                         "getparampaths": getparampathvalues,
                         "skucodetestsuite": "skucodetestsuite",
@@ -1611,10 +1612,10 @@ function TestSuiteDetails_Module_ICE(req, cb1, data) {
                     }
                     // var testsuiteexe = "INSERT INTO testsuites (cycleid,testsuitename,testsuiteid,versionnumber,conditioncheck,createdby,createdon,createdthrough,deleted,donotexecute,getparampaths,history,modifiedby,modifiedon,skucodetestsuite,tags,testscenarioids) VALUES (" + requiredcycleid + ",'" + requiredtestsuitename + "'," + requiredtestsuiteid + ",1,[" + conditioncheckvalues+ "],'Ninteen68_admin'," + new Date().getTime().toString() + ",null,null,[" + donotexecutevalues + "],["+ getparampathvalues + "],null,null," + new Date().getTime().toString() + ",null,null,["+ testscenarioids + "])";
 
-                    createTestSuitesHistory = "Inserted by Ninteen68_admin cycleid=" + requiredcycleid + ",testsuitename=" + requiredtestsuitename + ",testsuiteid=" + requiredtestsuiteid + ",versionnumber=1,conditioncheck=[" + conditioncheckvalues + "],createdby= 'Ninteen68_admin',createdon=" + new Date().getTime().toString() + ",createdthrough=null,deleted=null,donotexecute=[" + donotexecutevalues + "],getparampaths=[" + getparampathvalues + "],modifiedby=null,modifiedon=" + new Date().getTime().toString() + ",skucodetestsuite=null,tags=null,testscenarioids=[" + testscenarioids + "] ";
+                    createTestSuitesHistory = "Inserted by Ninteen68_admin cycleid=" + requiredcycleid + ",testsuitename=" + requiredtestsuitename + ",testsuiteid=" + requiredtestsuiteid + ",versionnumber="+versionnumber+",conditioncheck=[" + conditioncheckvalues + "],createdby= 'Ninteen68_admin',createdon=" + new Date().getTime().toString() + ",createdthrough=null,deleted=null,donotexecute=[" + donotexecutevalues + "],getparampaths=[" + getparampathvalues + "],modifiedby=null,modifiedon=" + new Date().getTime().toString() + ",skucodetestsuite=null,tags=null,testscenarioids=[" + testscenarioids + "] ";
                     date = new Date().getTime();
 
-                    insertTestSuiteQuery = "INSERT INTO testsuites (cycleid,testsuiteid,testsuitename,versionnumber,history) VALUES (" + requiredcycleid + "," + requiredtestsuiteid + "," + requiredtestsuitename + ",1,{" + date + ":" + createTestSuitesHistory + "})";
+                    insertTestSuiteQuery = "INSERT INTO testsuites (cycleid,testsuiteid,testsuitename,versionnumber,history) VALUES (" + requiredcycleid + "," + requiredtestsuiteid + "," + requiredtestsuitename + ","+versionnumber+",{" + date + ":" + createTestSuitesHistory + "})";
 
                     // dbConnICE.execute(testsuiteexe, function(err, answers) {
                     client.post(epurl + "suite/readTestSuite_ICE", args,
@@ -1636,13 +1637,13 @@ function TestSuiteDetails_Module_ICE(req, cb1, data) {
                             }
                         });
                 } else {
-                    //var updatetestsuitefrommodule = "UPDATE testsuites SET testscenarioids = ["+testscenarioids+"] WHERE testsuiteid="+requiredtestsuiteid+" and cycleid="+requiredcycleid+" and testsuitename='"+requiredtestsuitename+"' and versionnumber="+requiredversionnumber;
+                    //var updatetestsuitefrommodule = "UPDATE testsuites SET testscenarioids = ["+testscenarioids+"] WHERE testsuiteid="+requiredtestsuiteid+" and cycleid="+requiredcycleid+" and testsuitename='"+requiredtestsuitename+"' and versionnumber="+versionnumber;
                     var jsondata = {
                         "testsuiteid": requiredtestsuiteid,
                         "testscenarioid": testscenarioids,
                         "cycleid": requiredcycleid,
                         "testsuitename": requiredtestsuitename,
-                        "versionnumber": requiredversionnumber,
+                        "versionnumber": versionnumber,
                         "testscenarioids": testscenarioids
                     }
                     // try{
@@ -1764,6 +1765,7 @@ function updatescenariodetailsinsuite(req, cb, data) {
                 "testsuiteid": req.testsuiteid,
                 "cycleid": req.cycleid,
                 "testsuitename": suiterowdetails.testsuitename,
+                "versionnumber": suiterowdetails.versionnumber,
                 "query": "delete"
             }
             var args = {
@@ -1789,12 +1791,12 @@ function updatescenariodetailsinsuite(req, cb, data) {
                 "cycleid": req.cycleid,
                 "testsuitename": req.testsuitename,
                 "testsuiteid": req.testsuiteid,
-                "versionnumber": suiterowdetails.versionnumber.toString(),
+                "versionnumber": suiterowdetails.versionnumber,
                 "conditioncheck": conditioncheck1,
                 "createdby": suiterowdetails.createdby,
                 "createdon": new Date(suiterowdetails.createdon).getTime().toString(),
                 "createdthrough": "createdthrough",
-                "deleted": "FALSE",
+                "deleted": false,
                 "donotexecute": donotexecute1,
                 "getparampaths": getparampath1,
                 "modifiedby": "Ninteen68_admin",

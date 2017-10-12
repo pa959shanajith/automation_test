@@ -58,7 +58,11 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 	// var testSuiteName = JSON.parse(window.localStorage['_CT']).testSuiteName;
 	var assignedTestScenarioId = JSON.parse(window.localStorage['_CT']).assignedTestScenarioIds;
 	if(window.localStorage['_CT']){
-		var readTestSuite = JSON.parse(window.localStorage['_CT']).testSuiteDetails;
+		var window_ct=JSON.parse(window.localStorage['_CT']);
+		var readTestSuite = window_ct.testSuiteDetails;
+		for(var rti=0;rti<readTestSuite.length;rti++){
+			readTestSuite[rti].versionnumber = parseInt(window_ct.versionnumber);
+		}
 		console.log("read",readTestSuite);
 	}
 
@@ -381,6 +385,7 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 			var executeStatus = [];
 			if(window.localStorage['_CT']){
 				var cycleid = JSON.parse(window.localStorage['_CT']).testSuiteDetails;
+				var versionnumber = parseInt(JSON.parse(window.localStorage['_CT']).versionnumber);
 			}
 			//if($(this).is(":checked") == true){
 			//Getting ScenarioIds
@@ -430,6 +435,7 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 			suiteDetails.getparampaths = getParamPaths;
 			suiteDetails.conditioncheck = conditionCheck;
 			suiteDetails.donotexecute = executeStatus;
+			suiteDetails.versionnumber = versionnumber;
 			suiteDetails.testscycleid = JSON.parse(window.localStorage['_CT']).testSuiteDetails[loopingtimes].cycleid;
 			//console.log("suiteDetails",suiteDetails);
 			suiteInfo[testSuiteName] = suiteDetails;

@@ -115,6 +115,7 @@ function next_function(resultobj,cb,data){
 			'screenId':'',
 			'screenName':'',
 			'testCaseId':'',
+			'versionnumber': '',
 			'testCaseName':'',
 			'scenarioId':'',
 			'scenarioName':'',
@@ -155,6 +156,8 @@ function next_function(resultobj,cb,data){
             testSuiteDetails_obj.releaseid=t.release;
             testSuiteDetails_obj.cycleid=t.cycle;
         }
+        if (t.versionNumber!==undefined) task_json.versionnumber=t.versionNumber;
+		else task_json.versionnumber=0;
         taskDetails.taskName=abc[2];
 		taskDetails.subTaskType=abc[0];
 		taskDetails.taskType=abc[1];
@@ -190,7 +193,6 @@ function next_function(resultobj,cb,data){
 										}if(parent_length==5){
 											task_json.testCaseId=parent[4];
 											//task_json.scenarioId=parent[2];
-
 										}
 
 										testSuiteDetails_obj.testsuitename='modulename';
