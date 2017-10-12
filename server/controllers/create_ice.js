@@ -312,10 +312,10 @@ exports.createStructure_Nineteen68 = function (req, res) {
 	var suitedetailslist = [];
 	var versionnumber = 0;
 	var newversionnumber = 0;
+	var suiteflag = false;
 	async.series({
-
 		projectsUnderDomain: function (callback) {
-			var suiteflag = false;
+			suiteflag = false;
 			var suiteidTemp = '';
 			var scenariodetailslist = [];
 			var testsuiteidneo = suitedetails.testsuiteId;
@@ -754,6 +754,9 @@ exports.createStructure_Nineteen68 = function (req, res) {
 				'moduleid': suiteID,
 				'projectid': projectid,
 				'modulename': testsuiteName,
+				'modifiedflag': suiteflag,
+				'modifiedby': username,
+				'modifiedbyrole':username_role,
 				'versionnumber': newversionnumber
 			};
 			var args = {
@@ -877,7 +880,7 @@ function testsuiteid_exists(moduledetails, cb, data) {
 				'project_id': moduledetails.pid,
 				'module_name': moduledetails.modulename,
 				'name': 'suite_check',
-				'versionnumber': moduledetails.versionnumber
+				'versionnumber': moduledetails.newversionnumber
 			}
 			var args = {
 				data: inputs,
@@ -914,7 +917,7 @@ function testsuiteid_exists(moduledetails, cb, data) {
 					'module_name': moduledetails.modulename,
 					'module_id': moduledetails.moduleid,
 					'name': 'suite_check_id',
-					'versionnumber': moduledetails.versionnumber
+					'versionnumber': moduledetails.newversionnumber
 				}
 				var args = {
 					data: inputs,
@@ -1126,7 +1129,7 @@ function testscenariosid_exists(testscenariodetails, cb, data) {
 				'project_id': testscenariodetails.pid,
 				'scenario_name': testscenariodetails.testscenarioname,
 				'name': 'scenario_check',
-				'versionnumber': testscenariodetails.versionnumber
+				'versionnumber': testscenariodetails.newversionnumber
 			}
 			var args = {
 				data: inputs,
@@ -1163,7 +1166,7 @@ function testscenariosid_exists(testscenariodetails, cb, data) {
 					'scenario_name': testscenariodetails.testscenarioname,
 					'scenario_id': testscenariodetails.testscenarioid,
 					'name': 'scenario_check_id',
-					'versionnumber': testscenariodetails.versionnumber
+					'versionnumber': testscenariodetails.newversionnumber
 				}
 				var args = {
 					data: inputs,
@@ -1375,7 +1378,7 @@ function testscreen_exists(testscreendetails, cb, data) {
 				'project_id': testscreendetails.pid,
 				'screen_name': testscreendetails.testscreenname,
 				'name': 'screen_check',
-				'versionnumber': testscreendetails.versionnumber
+				'versionnumber': testscreendetails.newversionnumber
 			}
 			var args = {
 				data: inputs,
@@ -1413,7 +1416,7 @@ function testscreen_exists(testscreendetails, cb, data) {
 					'screen_name': testscreendetails.testscreenname,
 					'screen_id': testscreendetails.testscreenid,
 					'name': 'screen_check_id',
-					'versionnumber': testscreendetails.versionnumber
+					'versionnumber': testscreendetails.newversionnumber
 				}
 				var args = {
 					data: inputs,
@@ -1624,7 +1627,7 @@ function testcase_exists(testcasedetails, cb, data) {
 				'screen_id': testcasedetails.screenId,
 				'testcase_name': testcasedetails.testcasename,
 				'name': 'testcase_check',
-				'versionnumber': testcasedetails.versionnumber
+				'versionnumber': testcasedetails.newversionnumber
 			}
 			var args = {
 				data: inputs,
@@ -1662,7 +1665,7 @@ function testcase_exists(testcasedetails, cb, data) {
 					'testcase_name': testcasedetails.testcasename,
 					'testcase_id': testcasedetails.testcaseid,
 					'name': 'testcase_check_id',
-					'versionnumber': testcasedetails.versionnumber
+					'versionnumber': testcasedetails.newversionnumber
 				}
 				var args = {
 					data: inputs,
@@ -2101,12 +2104,12 @@ exports.createE2E_Structure_Nineteen68 = function (req, res) {
 	var moduleid_c = suitedetails.testsuiteId_c;
 	var scenarioidlist = [];
 	var scenario = [];
-
 	var suitedetailslist = [];
 	var versionnumber = 0;
+	var suiteflag = false;
 	async.series({
 		projectsUnderDomain: function (callback) {
-			var suiteflag = false;
+			suiteflag = false;
 			var suiteidTemp = '';
 			var scenariodetailslist = [];
 			var testsuiteidneo = suitedetails.testsuiteId;
@@ -2260,6 +2263,9 @@ exports.createE2E_Structure_Nineteen68 = function (req, res) {
 				'moduleid': suiteID,
 				'projectid': projectid,
 				'modulename': testsuiteName,
+				'modifiedflag': suiteflag,
+				'modifiedby': username,
+				'modifiedbyrole':username_role,
 				'versionnumber': versionnumber
 			};
 			var args = {
