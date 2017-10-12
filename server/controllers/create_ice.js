@@ -690,6 +690,7 @@ exports.createStructure_Nineteen68 = function (req, res) {
 																		var inputs = {
 																			'testcaseid': testcaseID,
 																			'modifiedby': username,
+																			'modifiedbyrole': username_role,
 																			'projectid': projectid,
 																			'testscenarioid': scenarioId,
 																			'modifiedflag': scenarioflag,
