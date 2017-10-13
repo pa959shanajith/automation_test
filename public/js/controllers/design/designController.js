@@ -212,11 +212,12 @@ console.log("screenName:", screenName);
         var screenId = taskInfo.screenId;
         var testCaseId = taskInfo.testCaseId;
         var testCaseName = taskInfo.testCaseName;
+		var versionnumber = taskInfo.versionnumber;
         appType = taskInfo.appType;
         enabledEdit = "false";
         blockUI("Loading...");
         // service call # 1 - getTestScriptData service call
-        DesignServices.readTestCase_ICE(screenId, testCaseId, testCaseName)
+        DesignServices.readTestCase_ICE(screenId, testCaseId, testCaseName, versionnumber)
             .then(function(data) {
                     if (data == "Invalid Session") {
                         window.location.href = "/";
@@ -403,6 +404,7 @@ console.log("screenName:", screenName);
         var taskInfo = JSON.parse(window.localStorage['_CT']);
         var screenId = taskInfo.screenId;
         var testCaseId = taskInfo.testCaseId;
+		var versionnumber = taskInfo.versionnumber;
         var testCaseName = taskInfo.testCaseName;
         var appType = taskInfo.appType;
         var flag = false;
@@ -432,7 +434,7 @@ console.log("screenName:", screenName);
                             if (flag == false) {
                                 openDialog("App Type Error", "Project application type and Imported JSON application type doesn't match, please check!!")
                             } else {
-                                DesignServices.updateTestCase_ICE(screenId, testCaseId, testCaseName, resultString, userInfo)
+                                DesignServices.updateTestCase_ICE(screenId, testCaseId, testCaseName, resultString, userInfo, versionnumber)
                                     .then(function(data) {
                                         if (data == "Invalid Session") {
                                             window.location.href = "/";
@@ -472,6 +474,7 @@ console.log("screenName:", screenName);
         var screenId = taskInfo.screenId;
         var testCaseId = taskInfo.testCaseId;
         var testCaseName = taskInfo.testCaseName;
+		var versionnumber = taskInfo.versionnumber;
         var appType = taskInfo.appType;
         var flag = false;
         $("#overWriteJson").trigger("click");
@@ -496,7 +499,7 @@ console.log("screenName:", screenName);
                         if (flag == false) {
                             openDialog("App Type Error", "Project application type and Imported JSON application type doesn't match, please check!!")
                         } else {
-                            DesignServices.updateTestCase_ICE(screenId, testCaseId, testCaseName, resultString, userInfo)
+                            DesignServices.updateTestCase_ICE(screenId, testCaseId, testCaseName, resultString, userInfo, versionnumber)
                                 .then(function(data) {
                                     console.log("hello");
                                     if (data == "Invalid Session") {
@@ -533,6 +536,7 @@ console.log("screenName:", screenName);
         var screenId = taskInfo.screenId;
         var testCaseId = taskInfo.testCaseId;
         var testCaseName = taskInfo.testCaseName;
+		var versionnumber = taskInfo.versionnumber;
         var appType = taskInfo.appType;
         var flag = false;
         overWriteJson.addEventListener('change', function(e) {
@@ -556,7 +560,7 @@ console.log("screenName:", screenName);
                         if (flag == false) {
                             openDialog("App Type Error", "Project application type and Imported JSON application type doesn't match, please check!!")
                         } else {
-                            DesignServices.updateTestCase_ICE(screenId, testCaseId, testCaseName, resultString, userInfo)
+                            DesignServices.updateTestCase_ICE(screenId, testCaseId, testCaseName, resultString, userInfo, versionnumber)
                                 .then(function(data) {
                                     if (data == "Invalid Session") {
                                         window.location.href = "/";
@@ -989,6 +993,7 @@ console.log("screenName:", screenName);
             scrapeObject.screenId = screenId;
             scrapeObject.screenName = screenName;
             scrapeObject.userinfo = userinfo;
+			scrapeObject.versionnumber = tasks.versionnumber;
             DesignServices.updateScreen_ICE(scrapeObject)
                 .then(function(data) {
                     if (data == "Invalid Session") {
@@ -1705,6 +1710,7 @@ console.log("screenName:", screenName);
         scrapeObject.screenName = tasks.screenName;
         scrapeObject.projectId = tasks.projectId;
         scrapeObject.appType = tasks.app
+		scrapeObject.versionnumber = tasks.versionnumber;
         DesignServices.updateScreen_ICE(scrapeObject)
             .then(function(data) {
                 debugger;
@@ -1819,6 +1825,7 @@ console.log("screenName:", screenName);
             scrapeObject.screenName = screenName;
             scrapeObject.deletedList = delList;
             scrapeObject.userinfo = userinfo;
+			scrapeObject.versionnumber = tasks.versionnumber;
             DesignServices.updateScreen_ICE(scrapeObject)
                 .then(function(data) {
                     if (data == "Invalid Session") {
@@ -3002,7 +3009,7 @@ console.log("screenName:", screenName);
         scrapeObject.userinfo = userinfo;
         scrapeObject.param = "updateScrapeData_ICE";
         scrapeObject.appType = tasks.appType;
-
+		scrapeObject.versionnumber = tasks.versionnumber;
         //Update Service to Save Scrape Objects
         DesignServices.updateScreen_ICE(scrapeObject)
             .then(function(data) {
@@ -3110,6 +3117,7 @@ console.log("screenName:", screenName);
                 }*/
                 var testCaseId = taskInfo.testCaseId;
                 var testCaseName = taskInfo.testCaseName;
+                var versionnumber = taskInfo.versionnumber;
                 if ((screenId != undefined) && (screenId != "undefined") && (testCaseId != undefined) && (testCaseId != "undefined")) {
                     //#D5E7FF  DBF5DF
                     var serviceCallFlag = false;
@@ -3190,7 +3198,7 @@ console.log("screenName:", screenName);
                     if (serviceCallFlag == true) {
                         console.log("no service call being made");
                     } else {
-                        DesignServices.updateTestCase_ICE(screenId, testCaseId, testCaseName, mydata, userInfo)
+                        DesignServices.updateTestCase_ICE(screenId, testCaseId, testCaseName, mydata, userInfo, versionnumber)
                             .then(function(data) {
                                     if (data == "Invalid Session") {
                                         window.location.href = "/";
