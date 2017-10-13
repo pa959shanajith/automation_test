@@ -202,49 +202,66 @@ exports.getAllUsers_Nineteen68 = function(req, res){
 			var sessionToken = sessionCookie[0].split(":");
 			sessionToken = sessionToken[1];
 		}
-			if(sessionToken != undefined && req.session.id == sessionToken)
+		if(sessionToken != undefined && req.session.id == sessionToken)
 		{
-
-		var user_names = [];
-		var userIds = [];
-		var d_role = [];
-		var userDetails = {user_names:[], userIds : [], d_roles:[]};
-		var getUsers = "select userid, username, defaultrole from nineteen68.users ";
-		dbConn.execute(getUsers, function (err, result) {
-			try{
-				if (err) {
-					console.log("Error::::::",err);
+			var user_names = [];
+			var userIds = [];
+			var d_role = [];
+			var userDetails = {user_names:[], userIds : [], d_roles:[]};
+			var args = {headers:{"Content-Type" : "application/json"}}
+			/*var getUsers = "select userid, username, defaultrole from nineteen68.users ";
+			dbConn.execute(getUsers, function (err, result) {
+				try{
+					if (err) {
+						console.log("Error::::::",err);
+						res.send("fail");
+					}
+					else {
+						async.forEachSeries(result.rows,function(iterator,callback1){
+							try{
+								user_names.push(iterator.username.toLowerCase());
+								userIds.push(iterator.userid);
+								d_role.push(iterator.defaultrole);
+								callback1();							
+							}
+							catch(exception){
+								console.log(exception);
+								res.send("fail");
+							}
+						});
+						userDetails.userIds = userIds;
+						userDetails.user_names = user_names;
+						userDetails.d_roles = d_role;
+						//console.log(userDetails);
+						res.send(userDetails);
+					}
+				}
+				catch(exception){
+					console.log(exception);
 					res.send("fail");
 				}
-				else {
-					async.forEachSeries(result.rows,function(iterator,callback1){
-						try{
-							user_names.push(iterator.username.toLowerCase());
-							userIds.push(iterator.userid);
-							d_role.push(iterator.defaultrole);
-							callback1();							
+			});*/
+			client.post(epurl+"admin/getAllUsers_Nineteen68",args,
+					function (allusersresult, allusersresponse) {
+						if(allusersresponse.statusCode != 200 || allusersresult.rows == "fail"){	
+								console.log("fail");
+								res(null,"fail");
+						}else{
+							for (var i = 0; i < allusersresult.rows.length; i++) {
+								user_names[i] = allusersresult.rows[i].username.toLowerCase();
+								userIds[i] = allusersresult.rows[i].userid;
+								d_role[i] = allusersresult.rows[i].defaultrole;
+							}
+							userDetails.userIds = userIds;
+							userDetails.user_names = user_names;
+							userDetails.d_roles = d_role;
+							res.send(userDetails);
 						}
-						catch(exception){
-							console.log(exception);
-							res.send("fail");
-						}
-					});
-					userDetails.userIds = userIds;
-					userDetails.user_names = user_names;
-					userDetails.d_roles = d_role;
-					//console.log(userDetails);
-					res.send(userDetails);
-				}
-			}
-			catch(exception){
-				console.log(exception);
-				res.send("fail");
-			}
-		});
-	}
-	else{
-		res.send("Invalid Session");
-	}
+			});
+		}
+		else{
+			res.send("Invalid Session");
+		}
 	}
 	catch(exception){
 		console.log(exception);
@@ -753,7 +770,6 @@ exports.createProject_ICE = function createProject_ICE(req, res) {
             var dateScreen = new Date().getTime();
             var requestedskucode = "skucodetestcase";
             var requestedtags = "tags";
-            var requestedversionnumber = 1;
             var projectTypeId = "";
             var newProjectID = "";
 
@@ -1096,7 +1112,6 @@ exports.updateProject_ICE = function updateProject_ICE(req, res){
 		var requestedskucode = "skucode";
 		var requestedtags = "tags";
 		var flag="";
-		var requestedversionnumber = 1;
 		var requestedprojectid=updateProjectDetails.projectId;
 		async.series({
 			newProjectDetails : function(newProjectDetailsCallback){
