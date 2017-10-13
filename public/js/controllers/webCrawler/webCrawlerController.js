@@ -831,14 +831,14 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
 
   /* function to show a table report*/
   $scope.showReport = function(){
-
+    $scope.hideBaseContent = { message: 'true' };;
     var myNode = document.getElementById("report-canvas");
     while (myNode.firstChild) {
         myNode.removeChild(myNode.firstChild);
     }
      //if report alreardy exists
     //if($scope.reportGenerated)
-    $scope.hideBaseContent = { message: 'true' };;
+    $("#result-canvas").hide();
     $("#report-canvas").show();
     $scope.reportGenerated = true;
     
@@ -879,7 +879,11 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
         //7 is the number of attributes from Level to title
         for(j=0 ; j<6; j++){
           var data = document.createElement('td');
-          data.appendChild(document.createTextNode($scope.crawledLinks[i][jsonStruct[j]]));
+          text = $scope.crawledLinks[i][jsonStruct[j]]
+          
+          if(text == undefined)
+            text = "-";
+          data.appendChild(document.createTextNode(text));
           newRow.appendChild(data);
         }
         tbdy.appendChild(newRow);
