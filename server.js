@@ -39,7 +39,7 @@ console.log = function () {
   logFile.write('['+n+']['+a.file+':'+a.number+ ':'+a.column+'] >> '+ util.format.apply(null, arguments) + '\n');
 //  logFile.write('['+n+'] ['+a+']; '+ util.format.apply(null, arguments) + '\n');
   logStdout.write(util.format.apply(null, arguments) + '\n');
-}
+};
 console.error = console.log;
 
 if (cluster.isMaster) {
@@ -65,7 +65,7 @@ if (cluster.isMaster) {
     //var io = require('socket.io')(server);
     var bodyParser = require('body-parser');
     var morgan = require('morgan');
-    var sessions = require('express-session')
+    var sessions = require('express-session');
     var cookieParser = require('cookie-parser');
     // var errorhandler = require('errorhandler');
     var cmd = require('node-cmd');
@@ -110,7 +110,7 @@ if (cluster.isMaster) {
         limit: '10mb',
         extended: true
     }));
-    app.use(morgan('combined'))
+    app.use(morgan('combined'));
 
     app.use(cookieParser());
     app.use(sessions({
@@ -187,7 +187,7 @@ if (cluster.isMaster) {
     });
 
     function sessionCheck(req, res, roles) {
-        console.log("session check ", req.url)
+        console.log("session check ", req.url);
       if (!req.session.defaultRole || roles.indexOf(req.session.defaultRole) >=0)
         {
             req.session.destroy(); res.status(401).send('<br><br>Your session has been expired.Please <a href="/">Login</a> Again');
@@ -238,23 +238,23 @@ if (cluster.isMaster) {
             //console.log('===== Killed jsreport server =====',data);
             cmd.get('node index.js', function(data, err, stderr){
               if (!err) {
-                console.log('the node-cmd:',data)
+                console.log('the node-cmd:',data);
               } else {
-                console.log("Cannot start Jsreport server")
+                console.log("Cannot start Jsreport server");
               }
             });
           }
           else{
             console.log("Cannot kill jsreport report");
           }
-        })
+        });
       }
       else{
         cmd.get('node index.js', function(data, err, stderr){
           if (!err) {
               console.log('JS report server started normally');
           } else {
-            console.log("Cannot start Jsreport server")
+            console.log("Cannot start Jsreport server");
           }
         });
       }
@@ -271,7 +271,6 @@ if (cluster.isMaster) {
     var design = require('./server/controllers/design');
     var suite = require('./server/controllers/suite');
     var report = require('./server/controllers/report');
-    var header = require('./server/controllers/header');
     var plugin = require('./server/controllers/plugin');
     var utility = require('./server/controllers/utility');
     var qc = require('./server/controllers/qualityCenter');
@@ -280,7 +279,7 @@ if (cluster.isMaster) {
     var neuronGraphs2D = require('./server/controllers/neuronGraphs2D');
 
     // Mindmap Routes
-    app.use('/home', mindmap);
+    app.post('/home', mindmap.mindmapService);
     //Neo4j API Routes
     app.post('/neo4jAPI', neo4jAPI.executeQueries);
     //Login Routes
@@ -288,6 +287,8 @@ if (cluster.isMaster) {
     app.post('/authenticateUser_Nineteen68_CI', login.authenticateUser_Nineteen68_CI);
     app.post('/loadUserInfo_Nineteen68', login.loadUserInfo_Nineteen68);
     app.post('/getRoleNameByRoleId_Nineteen68', login.getRoleNameByRoleId_Nineteen68);
+    app.post('/logoutUser_Nineteen68', login.logoutUser_Nineteen68);
+    app.post('/logoutUser_Nineteen68_CI', login.logoutUser_Nineteen68_CI);
     //Admin Routes
     app.post('/getUserRoles_Nineteen68', admin.getUserRoles_Nineteen68);
     app.post('/createUser_Nineteen68', admin.createUser_Nineteen68);
@@ -333,13 +334,6 @@ if (cluster.isMaster) {
     app.post('/getReport_Nineteen68', report.getReport_Nineteen68);
     app.post('/exportToJson_ICE', report.exportToJson_ICE);
     app.post('/openScreenShot', report.openScreenShot);
-    //Generic Routes
-    app.post('/getProjectDetails_ICE', header.getProjectDetails_ICE);
-    app.post('/getReleaseNameByReleaseId_ICE', header.getReleaseNameByReleaseId_ICE);
-    app.post('/getCycleNameByCycleId_ICE', header.getCycleNameByCycleId_ICE);
-    //Logout Routes
-    app.post('/logoutUser_Nineteen68', header.logoutUser_Nineteen68);
-    app.post('/logoutUser_Nineteen68_CI', header.logoutUser_Nineteen68_CI);
     //Plugin Routes
     app.post('/getProjectIDs_Nineteen68', plugin.getProjectIDs_Nineteen68);
     app.post('/getTaskJson_Nineteen68', plugin.getTaskJson_Nineteen68);
@@ -535,7 +529,7 @@ if (cluster.isMaster) {
     console.log(e);
     setTimeout(function(){
       cluster.worker.kill();
-    }, 2)
+    }, 2);
   }
 
 }

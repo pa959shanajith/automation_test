@@ -1,11 +1,8 @@
 var fs = require('fs');
 var https = require('https');
 var uuidV4 = require('uuid/v4');
-var express = require('express');
-var router = express.Router();
 var admin = require('../controllers/admin');
 var create_ice=require('../controllers/create_ice');
-var async = require('async');
 var certificate = fs.readFileSync('server/https/server.crt','utf-8');
 
 /* Send queries to Neo4J/ICE API. */
@@ -30,17 +27,7 @@ var reqToAPI = function(d,u,p,callback) {
 	
 };
 
-/* GET Home page. */
-router.get('/', function(req, res, next) {
-	if(!req.session.uniqueID) {res.status(200).send('<br><br>Your session has been invalidated. Please <a href=\'/logout\'>Login</a> Again');}
-	else {
-		var e = req.session.uniqueID.attributes;
-		res.status(200).render('home.jade', { title: 'Mindmap', fname: e.fName, lname: e.lName, urole: e.role});
-	}
-});
-
-/* POST Mindmap*/
-router.post('/', function(req, res, next) {
+exports.mindmapService = function(req, res) {
 	//if(!req.session.uniqueID) res.status(401).send('Session Timed Out! Login Again');
 	if(req.cookies['connect.sid'] != undefined)
 	{
@@ -768,9 +755,7 @@ router.post('/', function(req, res, next) {
 else{
 			res.send("Invalid Session");
 		}
-});
-
-
+};
 
 
 var parsing = function(d,urlData,module_type) {
@@ -857,8 +842,5 @@ updateJson.push(cassandraId_dict);
 return [ qList_new,updateJson];
 };
 
-
-
-module.exports = router;
 
 //MATCH (n)-[r:FMTTS{id:'bad100b6-c223-4888-a8e9-ad26a2de4a61'}]->(o:TESTSCENARIOS) DETACH DELETE r,o
