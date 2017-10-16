@@ -1,26 +1,20 @@
 var create_ice = require('../controllers/create_ice');
-var fs = require('fs');
 var async = require('async');
-var https = require('https');
-var certificate = fs.readFileSync('server/https/server.crt', 'utf-8');
+var neo4jAPI = require('../controllers/neo4jAPI');
 
 exports.getTaskJson_mindmaps = function (obj, cb, data) {
 	try {
 		//query={'statement':"MATCH (n:TASKS) WHERE n.assignedTo='"+obj.userid+"' RETURN n"};
 		/*Neo4j query changed to return both the task node and it's associated module/screen/scenario/testcase node */
 		var qlist_query = [{'statement': "MATCH (a)-[r:FNTT {id:b.nodeID}]-(b) where b.assignedTo='" + obj.userid + "' return a,b"}];
-		reqToAPI({
-			"data": {
-				"statements": qlist_query
+		neo4jAPI.executeQueries(qlist_query,function(status,result){
+			if(status!=200) {
+				console.log(result);
 			}
-		}, obj.urlData, '/neo4jAPI', function (err, status, result) {
-			if (err) {
-				console.log(err);
-			} else {
+			else {
 				var resultobj = {
 					"result": result,
-					"prjId": obj.prjId,
-					"urlData": obj.urlData
+					"prjId": obj.prjId
 				};
 				next_function(resultobj, function (err, data) {
 					if (err) {
@@ -33,27 +27,6 @@ exports.getTaskJson_mindmaps = function (obj, cb, data) {
 		});
 	} catch (error) {
 		console.log(error);
-	}
-};
-
-var reqToAPI = function(d,u,p,callback) {
-	try{
-		var data = JSON.stringify(d);
-		var result="";
-		u=u.split(':');
-		var postOptions = {host: u[0], port: u[1], path: p, method: 'POST',ca:certificate,checkServerIdentity: function (host, cert) {
-		return undefined; },headers: {'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(data)}};
-		postOptions.agent= new https.Agent(postOptions);
-		var postRequest = https.request(postOptions,function(resp){
-			resp.setEncoding('utf-8');
-			resp.on('data', function(chunk) {result+=chunk;});
-			resp.on('end', function(chunk) {callback(null,resp.statusCode,result);});
-		});
-		postRequest.on('error',function(e){callback(e.message,400,null);});
-		postRequest.write(data);
-		postRequest.end();
-	}catch(ex){
-		console.log(ex);
 	}
 };
 
@@ -87,7 +60,6 @@ function next_function(resultobj, cb, data) {
 	var result = resultobj.result;
 	var prjId = resultobj.prjId.projectId;
 	var appTypes = resultobj.prjId.appType;
-	var urlData = resultobj.urlData;
 	try {
 		var jsonData = JSON.parse(result);
 		var alltasks = jsonData[0].data;
@@ -224,30 +196,24 @@ function next_function(resultobj, cb, data) {
 							'statement': "MATCH (n:MODULES_ENDTOEND{moduleID:'" + m.moduleID + "'}) RETURN n.moduleName"
 						};
 						var qlist_query = [query];
-						reqToAPI({
-							"data": {
-								"statements": qlist_query
-							}
-						}, urlData, '/neo4jAPI', function (err, status, result) {
-							if (err) {
-								console.log(err);
+						neo4jAPI.executeQueries(qlist_query,function(status,result){
+							if(status!=200) {
+								console.log(result);
 								maincallback();
-							} else {
+							}
+							else {
 								try {
 									result1 = JSON.parse(result);
 									testSuiteDetails_obj.testsuitename = result1[0].data[0].row[0];
 									maincallback();
 								} catch (ex) {
 									qlist_query = [query1];
-									reqToAPI({
-										"data": {
-											"statements": qlist_query
-										}
-									}, urlData, '/neo4jAPI', function (err, status, result) {
-										if (err) {
-											console.log(err);
+									neo4jAPI.executeQueries(qlist_query,function(status,result){
+										if(status!=200) {
+											console.log(result);
 											maincallback();
-										} else {
+										}
+										else {
 											try {
 												result1 = JSON.parse(result);
 												testSuiteDetails_obj.testsuitename = result1[0].data[0].row[0];

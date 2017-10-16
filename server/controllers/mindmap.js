@@ -1,34 +1,9 @@
-var fs = require('fs');
-var https = require('https');
 var uuidV4 = require('uuid/v4');
+var neo4jAPI = require('../controllers/neo4jAPI');
 var admin = require('../controllers/admin');
 var create_ice=require('../controllers/create_ice');
-var certificate = fs.readFileSync('server/https/server.crt','utf-8');
-
-/* Send queries to Neo4J/ICE API. */
-var reqToAPI = function(d,u,p,callback) {
-	try{
-		var data = JSON.stringify(d);
-		var result="";
-		var postOptions = {host: u[0], port: u[1], path: p, method: 'POST',ca:certificate,checkServerIdentity: function (host, cert) {
-		return undefined; },headers: {'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(data)}};
-		postOptions.agent= new https.Agent(postOptions);
-		var postRequest = https.request(postOptions,function(resp){
-			resp.setEncoding('utf-8');
-			resp.on('data', function(chunk) {result+=chunk;});
-			resp.on('end', function(chunk) {callback(null,resp.statusCode,result);});
-		});
-		postRequest.on('error',function(e){callback(e.message,400,null);});
-		postRequest.write(data);
-		postRequest.end();
-	}catch(ex){
-		console.log(ex);
-	}
-	
-};
 
 exports.mindmapService = function(req, res) {
-	//if(!req.session.uniqueID) res.status(401).send('Session Timed Out! Login Again');
 	if(req.cookies['connect.sid'] != undefined)
 	{
 		var sessionCookie = req.cookies['connect.sid'].split(".");
@@ -48,10 +23,9 @@ exports.mindmapService = function(req, res) {
 		var urlData=req.get('host').split(':');
 		if(d.task=='getList'){
 			qList.push({"statement":"MATCH (n:MODULES{projectID:'"+prjId+"'}) RETURN n.moduleID,n.moduleName"});
-			reqToAPI({"data":{"statements":qList}},urlData,'/neo4jAPI',function(err,status,result){
+			neo4jAPI.executeQueries(qList,function(status,result){
 				res.setHeader('Content-Type', 'application/json');
-				if(err) res.status(status).send(err);
-				else if(status!=200) res.status(status).send(result);
+				if(status!=200) res.status(status).send(result);
 				else{
 					var jsonData=JSON.parse(result);
 					jsonData[0].data.forEach(function(e,i){
@@ -74,10 +48,9 @@ exports.mindmapService = function(req, res) {
 			qList.push({"statement":"MATCH path=(n:MODULES{projectID:'"+prjId+"'}) WHERE NOT (n)-[:FMTTS]->() RETURN n","resultDataContents":["graph"]});
 			//MATCH (a:MODULES) WHERE NOT (a)-[:FMTTS]->() return a
 
-			reqToAPI({"data":{"statements":qList}},urlData,'/neo4jAPI',function(err,status,result){
-				res.setHeader('Content-Type','application/json');
-				if(err) res.status(status).send(err);
-				else if(status!=200) res.status(status).send(result);
+			neo4jAPI.executeQueries(qList,function(status,result){
+				res.setHeader('Content-Type', 'application/json');
+				if(status!=200) res.status(status).send(result);
 				else{
 					var k=0,rIndex=[],lbl,neoIdDict={},maps=[],tList=[];
 					var attrDict={"modules_endtoend":{"childIndex":"childIndex","projectID":"projectID","moduleName":"name","moduleID":"id_n","moduleID_c":"id_c"},"modules":{"childIndex":"childIndex","projectID":"pid_n","moduleName":"name","moduleID":"id_n","moduleID_c":"id_c"},"scenarios":{"projectID":"projectID","childIndex":"childIndex","moduleID":"pid_n","testScenarioName":"name","testScenarioID":"id_n","testScenarioID_c":"id_c"},"screens":{"childIndex":"childIndex","testScenarioID":"pid_n","screenName":"name","screenID":"id_n","screenID_c":"id_c"},"testcases":{"childIndex":"childIndex","screenID":"pid_n","testCaseName":"name","testCaseID":"id_n","testCaseID_c":"id_c"},"tasks":{"taskID":"id_n","task":"t","batchName":"bn","assignedTo":"at","reviewer":"rw","startDate":"sd","endDate":"ed","release":"re","cycle":"cy","details":"det","nodeID":"pid","parent":"anc"}};
@@ -229,10 +202,9 @@ exports.mindmapService = function(req, res) {
 				//qList=qList.concat(rnmList);
 				//var index=(qList.length-rnmList.length)-1;
 				
-				reqToAPI({"data":{"statements":qList}},urlData,'/neo4jAPI',function(err,status,result){
-					res.setHeader('Content-Type','application/json');
-					if(err) res.status(status).send(err);
-					else if(status!=200) res.status(status).send(result);
+				neo4jAPI.executeQueries(qList,function(status,result){
+					res.setHeader('Content-Type', 'application/json');
+					if(status!=200) res.status(status).send(result);
 					else{
 						var k=0,rIndex,lbl,neoIdDict={};
 						idDict={};
@@ -279,12 +251,10 @@ exports.mindmapService = function(req, res) {
 								else e.pid_n=null;
 							}
 						});
-						
-					
 						res.status(status).send(nData[rIndex]);
 					}
 				});
-		}	else if(d.data.write==20){
+			}	else if(d.data.write==20){
 				var uidx=0,rIndex;
 				var relId=d.data.relId;
 				var cycId=d.data.cycId;
@@ -316,30 +286,22 @@ exports.mindmapService = function(req, res) {
 				qObj.userName=d.data.user_name;
 				//fs.writeFileSync('assets/req_json.json',JSON.stringify(qObj),'utf8');
 				create_ice.createE2E_Structure_Nineteen68(qObj,function(err,data){
-				//res.setHeader('Content-Type', 'application/json');
-				if(err)
-				res.status(500).send(err);
-				else{
-					datatosend=data;
-					
-				}
-				//fs.writeFileSync('assets/req_json_cassandra.txt',JSON.stringify(data),'utf8');
-				//var data = JSON.stringify(data);
-				var module_type='modules_endtoend';
-				var parsing_result=parsing(data,urlData,module_type);
-				//var qList_new=parsing(data,urlData);
-				 
-				reqToAPI({"data":{"statements":parsing_result[0]}},urlData,'/neo4jAPI',function(err,status,result){
-					//res.setHeader('Content-Type','application/json');
-					if(err) res.status(status).send(err);
-					res.status(200).send(parsing_result[1]);
-					
+					//res.setHeader('Content-Type', 'application/json');
+					if(err)
+					res.status(500).send(err);
+					else{
+						datatosend=data;
+					}
+					//fs.writeFileSync('assets/req_json_cassandra.txt',JSON.stringify(data),'utf8');
+					//var data = JSON.stringify(data);
+					var module_type='modules_endtoend';
+					var parsing_result=parsing(data,urlData,module_type);
+					//var qList_new=parsing(data,urlData);
+					neo4jAPI.executeQueries(parsing_result[0],function(status,result){
+						if(status!=200) res.status(status).send(result);
+						else res.status(200).send(parsing_result[1]);
+					});
 				});
-				
-
-
-				});
-
 			}
 		}
 		else if(d.task=='writeMap'){
@@ -516,10 +478,9 @@ exports.mindmapService = function(req, res) {
 				}
 				
 				
-				reqToAPI({"data":{"statements":qList}},urlData,'/neo4jAPI',function(err,status,result){
-					res.setHeader('Content-Type','application/json');
-					if(err) res.status(status).send(err);
-					else if(status!=200) res.status(status).send(result);
+				neo4jAPI.executeQueries(qList,function(status,result){
+					res.setHeader('Content-Type', 'application/json');
+					if(status!=200) res.status(status).send(result);
 					else{
 						var k=0,rIndex,lbl,neoIdDict={};
 						idDict={};
@@ -602,30 +563,24 @@ exports.mindmapService = function(req, res) {
 				qObj.userName=d.data.user_name;
 				//fs.writeFileSync('assets/req_json.json',JSON.stringify(qObj),'utf8');
 				create_ice.createStructure_Nineteen68(qObj,function(err,data){
-				//res.setHeader('Content-Type', 'application/json');
-				if(err)
-				res.status(500).send(err);
-				else{
-					datatosend=data;
-					
-				}
-				//fs.writeFileSync('assets/req_json_cassandra.txt',JSON.stringify(data),'utf8');
-				//var data = JSON.stringify(data);
-				var module_type='modules';
-				var parsing_result=parsing(data,urlData,module_type);
-				//var qList_new=parsing(data,urlData);
-				 
-				reqToAPI({"data":{"statements":parsing_result[0]}},urlData,'/neo4jAPI',function(err,status,result){
-					//res.setHeader('Content-Type','application/json');
-					if(err) res.status(status).send(err);
-					res.status(200).send(parsing_result[1]);
-					
+					//res.setHeader('Content-Type', 'application/json');
+					if(err)
+					res.status(500).send(err);
+					else{
+						datatosend=data;
+						
+					}
+					//fs.writeFileSync('assets/req_json_cassandra.txt',JSON.stringify(data),'utf8');
+					//var data = JSON.stringify(data);
+					var module_type='modules';
+					var parsing_result=parsing(data,urlData,module_type);
+					//var qList_new=parsing(data,urlData);
+					neo4jAPI.executeQueries(parsing_result[0],function(status,result){
+						//res.setHeader('Content-Type', 'application/json');
+						if(status!=200) res.status(status).send(result);
+						else res.status(200).send(parsing_result[1]);
+					});
 				});
-				
-
-
-				});
-
 			}
 		}
 		else if(d.task=='populateUsers'){
@@ -696,22 +651,20 @@ exports.mindmapService = function(req, res) {
 			var taskID=d.taskId;
 			query={'statement':"MATCH (n:TASKS) WHERE n.taskID='"+taskID+"' and n.assignedTo='"+d.userId+"' RETURN n.reviewer"};
 			var qlist_query=[query];
-			reqToAPI({"data":{"statements":qlist_query}},urlData,'/neo4jAPI',function(err,status,result){
-					//res.setHeader('Content-Type','application/json');
-					if(err) {
-						res.status(status).send(err);
-					}else{
+			neo4jAPI.executeQueries(qlist_query,function(status,result){
+					//res.setHeader('Content-Type', 'application/json');
+					if(status!=200) res.status(status).send(result);
+					else{
 						try{
 							res_data=JSON.parse(result);
 							if(res_data[0].data.length!= 0){
 								if(res_data[0].data[0].row[0] != null && res_data[0].data[0].row[0] != 'select reviewer'){
 									query={'statement':"MATCH (n:TASKS) WHERE n.taskID='"+taskID+"' and n.assignedTo='"+d.userId+"' set n.task_owner=n.assignedTo,n.assignedTo=n.reviewer,n.status='review' RETURN n"};
 									var qlist_query=[query];
-									reqToAPI({"data":{"statements":qlist_query}},urlData,'/neo4jAPI',function(err,status,result){
-											//res.setHeader('Content-Type','application/json');
-											if(err) res.status(status).send(err);
-											res.status(200).send('success');
-									
+										neo4jAPI.executeQueries(qlist_query,function(status,result){
+											res.setHeader('Content-Type', 'application/json');
+											if(status!=200) res.status(status).send(result);
+											else res.status(200).send('success');
 									});
 								}else{
 									res.status(200).send('fail');
@@ -728,27 +681,25 @@ exports.mindmapService = function(req, res) {
 		}else if(d.task=='populateScenarios'){
 			var moduleId=d.moduleId;
 			//var taskID=d.taskId;
-			
 			query={'statement':"MATCH (a{moduleID:'"+moduleId+"'})-[:FMTTS]->(b) RETURN b"};
 			var qlist_query=[query];
 			var scenarioList=[];
-			reqToAPI({"data":{"statements":qlist_query}},urlData,'/neo4jAPI',function(err,status,result){
-					//res.setHeader('Content-Type','application/json');
-					if(err) {
-						res.status(status).send(err);
-					}else{
-						try{
-							res_data=JSON.parse(result);
-							res_data[0].data.forEach(function(row){
-								scenarioList.push(row.row[0])
-							});
-							res.status(200).send(scenarioList);
-						}catch(ex){
-							console.log(ex);
-							res.status(200).send('fail');
-						}
+			neo4jAPI.executeQueries(qlist_query,function(status,result){
+				res.setHeader('Content-Type', 'application/json');
+				if(status!=200) res.status(status).send(result);
+				else{
+					try{
+						res_data=JSON.parse(result);
+						res_data[0].data.forEach(function(row){
+							scenarioList.push(row.row[0])
+						});
+						res.status(200).send(scenarioList);
+					}catch(ex){
+						console.log(ex);
+						res.status(200).send('fail');
 					}
-				});
+				}
+			});
 		}
 	}
 }

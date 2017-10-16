@@ -264,7 +264,7 @@ if (cluster.isMaster) {
     var screenShotPath=uiConfig.storageConfig.screenShotPath;
 
     //Route Directories
-    var neo4jAPI = require('./server/controllers/neo4jAPI');
+    //var neo4jAPI = require('./server/controllers/neo4jAPI');
     var mindmap = require('./server/controllers/mindmap');
     var login = require('./server/controllers/login');
     var admin = require('./server/controllers/admin');
@@ -281,7 +281,7 @@ if (cluster.isMaster) {
     // Mindmap Routes
     app.post('/home', mindmap.mindmapService);
     //Neo4j API Routes
-    app.post('/neo4jAPI', neo4jAPI.executeQueries);
+    //app.post('/neo4jAPI', neo4jAPI.executeQueriesOverRestAPI);
     //Login Routes
     app.post('/authenticateUser_Nineteen68', login.authenticateUser_Nineteen68);
     app.post('/authenticateUser_Nineteen68_CI', login.authenticateUser_Nineteen68_CI);
