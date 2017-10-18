@@ -61,7 +61,7 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 		var window_ct=JSON.parse(window.localStorage['_CT']);
 		var readTestSuite = window_ct.testSuiteDetails;
 		for(var rti=0;rti<readTestSuite.length;rti++){
-			readTestSuite[rti].versionnumber = parseInt(window_ct.versionnumber);
+			readTestSuite[rti].versionnumber = parseFloat(window_ct.versionnumber);
 		}
 		console.log("read",readTestSuite);
 	}
@@ -384,8 +384,9 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 			var conditionCheck = [];
 			var executeStatus = [];
 			if(window.localStorage['_CT']){
-				var cycleid = JSON.parse(window.localStorage['_CT']).testSuiteDetails;
-				var versionnumber = parseInt(JSON.parse(window.localStorage['_CT']).versionnumber);
+				var window_ct=JSON.parse(window.localStorage['_CT']);
+				var cycleid = window_ct.testSuiteDetails;
+				var versionnumber = parseFloat(window_ct.versionnumber);
 			}
 			//if($(this).is(":checked") == true){
 			//Getting ScenarioIds
