@@ -61,7 +61,7 @@ function next_function(resultobj, cb, data) {
 	var prjId = resultobj.prjId.projectId;
 	var appTypes = resultobj.prjId.appType;
 	try {
-		var jsonData = JSON.parse(result);
+		var jsonData = result;
 		var alltasks = jsonData[0].data;
 		var user_task_json = [];
 		var taskDetails = {};
@@ -155,14 +155,14 @@ function next_function(resultobj, cb, data) {
 					task_json.scenarioName = 'scenarioname';
 					task_json.testCaseName = 'testcasename';
 					if (t.task == 'Design' || t.task == 'Update') {
-						taskDetails.taskName = t.task + ' ' + m.testCaseName;
+						taskDetails.taskName = t.task + ' version_'+ task_json.versionnumber+ ' ' + m.testCaseName;
 						task_json.testCaseName = m.testCaseName;
 					} else if (t.task == 'Execute') {
-						taskDetails.taskName = t.task + ' ' + m.moduleName;
+						taskDetails.taskName = t.task + ' version_'+ task_json.versionnumber+' ' + m.moduleName;
 						testSuiteDetails_obj.testsuitename = m.moduleName;
 					} else if (t.task == 'Execute Batch') {
 						task_json.projectId = "";
-						taskDetails.taskName = t.task + ' ' + t.batchName;
+						taskDetails.taskName = t.task + ' version_'+ task_json.versionnumber+ ' ' + t.batchName;
 						testSuiteDetails_obj.testsuitename = m.moduleName;
 						if (batch_dict[t.batchName] == undefined) {
 							batch_dict[t.batchName] = user_task_json.length;
@@ -175,11 +175,11 @@ function next_function(resultobj, cb, data) {
 					} else if (t.task == 'Execute Scenario') {
 						task_json.scenarioFlag = 'True';
 						task_json.assignedTestScenarioIds = [task_json.scenarioId];
-						taskDetails.taskName = t.task + ' ' + m.testScenarioName;
+						taskDetails.taskName = t.task + ' version_'+ task_json.versionnumber+ ' ' + m.testScenarioName;
 						task_json.scenarioName = m.testScenarioName;
 						//testSuiteDetails_obj.assignedTestScenarioIds=[task_json.scenarioId];
 					} else {
-						taskDetails.taskName = t.task + ' ' + m.screenName;
+						taskDetails.taskName = t.task +' version_'+ task_json.versionnumber+ ' ' + m.screenName;
 						task_json.screenName = m.screenName;
 					}
 					//task_json.assignedTestScenarioIds=data.assignedTestScenarioIds;
