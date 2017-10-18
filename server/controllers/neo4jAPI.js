@@ -32,6 +32,6 @@ exports.executeQueries = function (d, cb) {
 	client.post(neoURL, args, function (result, resp) {
 		if (resp.statusCode != 200) cb(500, "fail");
 		else if (result.errors.length !== 0) cb(400, result.errors);
-		else cb(200, JSON.stringify(result.results));
+		else cb(200, result.results);
 	});
 };

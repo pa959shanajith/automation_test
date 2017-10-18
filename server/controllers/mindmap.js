@@ -15,9 +15,6 @@ exports.mindmapService = function(req, res) {
 		if(!req.session.id) res.status(401).send('<br><br>Your session has been expired.Please <a href="/">Login</a> Again');
 	else {
 		var d=req.body;
-		//var sessObj=req.session.uniqueID;
-		//var prjId=sessObj.project.id;
-		//var prjId='d4965851-a7f1-4499-87a3-ce53e8bf8e66';
 		var prjId=d.prjId;
 		var nData=[],qList=[],idDict={};
 		var urlData=req.get('host').split(':');
@@ -27,7 +24,7 @@ exports.mindmapService = function(req, res) {
 				res.setHeader('Content-Type', 'application/json');
 				if(status!=200) res.status(status).send(result);
 				else{
-					var jsonData=JSON.parse(result);
+					var jsonData=result;
 					jsonData[0].data.forEach(function(e,i){
 						nData.push({id:e.row[0],name:e.row[1]});
 					});
@@ -54,7 +51,7 @@ exports.mindmapService = function(req, res) {
 				else{
 					var k=0,rIndex=[],lbl,neoIdDict={},maps=[],tList=[];
 					var attrDict={"modules_endtoend":{"childIndex":"childIndex","projectID":"projectID","moduleName":"name","moduleID":"id_n","moduleID_c":"id_c"},"modules":{"childIndex":"childIndex","projectID":"pid_n","moduleName":"name","moduleID":"id_n","moduleID_c":"id_c"},"scenarios":{"projectID":"projectID","childIndex":"childIndex","moduleID":"pid_n","testScenarioName":"name","testScenarioID":"id_n","testScenarioID_c":"id_c"},"screens":{"childIndex":"childIndex","testScenarioID":"pid_n","screenName":"name","screenID":"id_n","screenID_c":"id_c"},"testcases":{"childIndex":"childIndex","screenID":"pid_n","testCaseName":"name","testCaseID":"id_n","testCaseID_c":"id_c"},"tasks":{"taskID":"id_n","task":"t","batchName":"bn","assignedTo":"at","reviewer":"rw","startDate":"sd","endDate":"ed","release":"re","cycle":"cy","details":"det","nodeID":"pid","parent":"anc"}};
-					var jsonData=JSON.parse(result);
+					var jsonData=result;
 					var all_modules=jsonData[0].data;
 					
 					if (d.tab=='tabAssign' || d.tab=='endToend'){
@@ -209,7 +206,7 @@ exports.mindmapService = function(req, res) {
 						var k=0,rIndex,lbl,neoIdDict={};
 						idDict={};
 						var attrDict={"modules_endtoend":{"childIndex":"childIndex","projectID":"projectID","moduleName":"name","moduleID":"id_n","moduleID_c":"id_c"},"modules":{"childIndex":"childIndex","projectID":"pid_n","moduleName":"name","moduleID":"id_n","moduleID_c":"id_c"},"scenarios":{"projectID":"projectID","childIndex":"childIndex","moduleID":"pid_n","testScenarioName":"name","testScenarioID":"id_n","testScenarioID_c":"id_c"},"screens":{"childIndex":"childIndex","testScenarioID":"pid_n","screenName":"name","screenID":"id_n","screenID_c":"id_c"},"testcases":{"childIndex":"childIndex","screenID":"pid_n","testCaseName":"name","testCaseID":"id_n","testCaseID_c":"id_c"},"tasks":{"taskID":"id_n","task":"t","assignedTo":"at","reviewer":"rw","startDate":"sd","endDate":"ed","release":"re","cycle":"cy","details":"det","nodeID":"pid","parent":"anc"}};
-						var jsonData=JSON.parse(result);
+						var jsonData=result;
 						var new_res=jsonData[jsonData.length-1].data;
 						if(new_res.length==0){
 							new_res=jsonData[jsonData.length-2].data
@@ -256,18 +253,17 @@ exports.mindmapService = function(req, res) {
 				});
 			}	else if(d.data.write==20){
 				var uidx=0,rIndex;
-				var relId=d.data.relId;
-				var cycId=d.data.cycId;
+				var vn_from=d.data.vn_from;
+				var vn_to=d.data.vn_from;
+				var userRole=d.data.userRole;
 			
-				var qObj={"projectId":prjId,"releaseId":relId,"cycleId":cycId,"appType":"Web","testsuiteDetails":[]};
+				//var qObj={"projectId":prjId,"releaseId":relId,"cycleId":cycId,"appType":"Web","testsuiteDetails":[]};
+				var qObj={"projectId":prjId,"testsuiteDetails":[],userRole:userRole,from_version:parseFloat(vn_from),new_version:vn_to};
 				var nObj=[],tsList=[];
 				data.forEach(function(e,i){
 					if(e.type=="modules_endtoend") rIndex=uidx;
 					if(e.task!=null) delete e.task.oid;
 					nObj.push({projectID:e.projectID,id:e.id_n,id_c:e.id_c,name:e.name,task:e.task,children:[]});
-					//if(e.type=="testcases") nObj[nObj.length-1]['pid_c']=e.pid_c;
-					//if(e.type=="scenarios") 
-					//nObj[nObj.length-1]['projectID']=e.projectID;
 					if(idDict[e.pid]!==undefined) nObj[idDict[e.pid]].children.push(nObj[uidx]);
 					idDict[e.id]=uidx++;
 				});
@@ -295,7 +291,7 @@ exports.mindmapService = function(req, res) {
 					//fs.writeFileSync('assets/req_json_cassandra.txt',JSON.stringify(data),'utf8');
 					//var data = JSON.stringify(data);
 					var module_type='modules_endtoend';
-					var parsing_result=parsing(data,urlData,module_type);
+					var parsing_result=update_cassandraID(data,urlData,module_type);
 					//var qList_new=parsing(data,urlData);
 					neo4jAPI.executeQueries(parsing_result[0],function(status,result){
 						if(status!=200) res.status(status).send(result);
@@ -485,7 +481,7 @@ exports.mindmapService = function(req, res) {
 						var k=0,rIndex,lbl,neoIdDict={};
 						idDict={};
 						var attrDict={"modules_endtoend":{"childIndex":"childIndex","projectID":"pid_n","moduleName":"name","moduleID":"id_n","moduleID_c":"id_c"},"modules":{"childIndex":"childIndex","projectID":"pid_n","moduleName":"name","moduleID":"id_n","moduleID_c":"id_c"},"scenarios":{"childIndex":"childIndex","moduleID":"pid_n","testScenarioName":"name","testScenarioID":"id_n","testScenarioID_c":"id_c"},"screens":{"childIndex":"childIndex","testScenarioID":"pid_n","screenName":"name","screenID":"id_n","screenID_c":"id_c"},"testcases":{"childIndex":"childIndex","screenID":"pid_n","testCaseName":"name","testCaseID":"id_n","testCaseID_c":"id_c"},"tasks":{"taskID":"id_n","task":"t","batchName":"bn","assignedTo":"at","reviewer":"rw","startDate":"sd","endDate":"ed","release":"re","cycle":"cy","details":"det","nodeID":"pid","parent":"anc"}};
-						var jsonData=JSON.parse(result);
+						var jsonData=result;
 						
 						var new_res=jsonData[jsonData.length-1].data;
 						if(new_res.length==0){
@@ -573,7 +569,7 @@ exports.mindmapService = function(req, res) {
 					//fs.writeFileSync('assets/req_json_cassandra.txt',JSON.stringify(data),'utf8');
 					//var data = JSON.stringify(data);
 					var module_type='modules';
-					var parsing_result=parsing(data,urlData,module_type);
+					var parsing_result=update_cassandraID(data,urlData,module_type);
 					//var qList_new=parsing(data,urlData);
 					neo4jAPI.executeQueries(parsing_result[0],function(status,result){
 						//res.setHeader('Content-Type', 'application/json');
@@ -656,7 +652,7 @@ exports.mindmapService = function(req, res) {
 					if(status!=200) res.status(status).send(result);
 					else{
 						try{
-							res_data=JSON.parse(result);
+							res_data=result;
 							if(res_data[0].data.length!= 0){
 								if(res_data[0].data[0].row[0] != null && res_data[0].data[0].row[0] != 'select reviewer'){
 									query={'statement':"MATCH (n:TASKS) WHERE n.taskID='"+taskID+"' and n.assignedTo='"+d.userId+"' set n.task_owner=n.assignedTo,n.assignedTo=n.reviewer,n.status='review' RETURN n"};
@@ -689,7 +685,7 @@ exports.mindmapService = function(req, res) {
 				if(status!=200) res.status(status).send(result);
 				else{
 					try{
-						res_data=JSON.parse(result);
+						res_data=result;
 						res_data[0].data.forEach(function(row){
 							scenarioList.push(row.row[0])
 						});
@@ -709,7 +705,7 @@ else{
 };
 
 
-var parsing = function(d,urlData,module_type) {
+var update_cassandraID = function(d,urlData,module_type) {
 	var data = d;
 	var qList_new=[];
 
@@ -752,8 +748,8 @@ var parsing = function(d,urlData,module_type) {
 					var screenname_json=scr.screenName;
 					//var modulename_json=sc.testsuiteName;
 					var testcaseDetails_json=scr.testcaseDetails;
-					//console.log(screenId_json,screenId_c_json);
-					qList_new.push({"statement":"MATCH (a:SCREENS) WHERE a.screenName='"+screenname_json+"' and a.projectID='"+data.projectId+"' SET a.screenID_c='"+screenId_c_json+"'"});
+					qList_new.push({"statement":"MATCH (a:SCREENS) WHERE a.screenName='"+screenname_json+" and a.projectID='"+data.projectId+"' SET a.screenID_c='"+screenId_c_json+"'"});
+					//qList_new.push({"statement":"MATCH (a:SCREENS) WHERE a.screenName='"+screenname_json+"' and a.projectID='"+data.projectId+"' SET a.screenID_c='"+screenId_c_json+"'"});
 					//updateJson.push({screenId_json:screenId_c_json});
 					cassandraId_dict[screenId_json]=screenId_c_json;
 				//updateJson.push(cassandraId_dict);
