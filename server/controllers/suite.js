@@ -253,7 +253,6 @@ exports.updateTestSuite_ICE = function (req, res) {
 				var testscenarioids = eachbatchDetails[eachsuitename].testscenarioids;
 				var testscycleid = eachbatchDetails[eachsuitename].testscycleid;
 				var versionnumber = eachbatchDetails[eachsuitename].versionnumber;
-				console.log(requestedtestsuitename);
 				var index = 0;
 				/*
 				 * Query 1 checking whether the requestedtestsuiteid belongs to the same requestedtestscycleid
@@ -1556,7 +1555,7 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 				client.post(epurl + "suite/ScheduleTestSuite_ICE", args,
 					function (result, response) {
 					if (response.statusCode != 200 || result.rows == "fail") {
-						console.log(result);
+						console.log(response.statusCode);
 						schedFlag = "fail";
 						schedcallback(null, schedFlag);
 					} else {
@@ -1638,7 +1637,7 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 			client.post(epurl + "suite/ScheduleTestSuite_ICE", args,
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
-					console.log(result);
+					console.log(response.statusCode);
 					scheduleStatus = "Failed 02";
 					updateStatus(sessObj, function (err, data) {
 						if (!err) {
@@ -1815,7 +1814,7 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 												}
 											});
 											//res.send(resultData);
-											console.log(resultData);
+											//console.log(resultData);
 										} catch (ex) {
 											console.log(ex);
 										}
@@ -1897,7 +1896,7 @@ function updateStatus(sessObj, updateStatuscallback) {
 				client.post(epurl + "suite/ScheduleTestSuite_ICE", args,
 					function (result, response) {
 					if (response.statusCode != 200 || result.rows == "fail") {
-						console.log(result);
+						console.log(response.statusCode);
 						updateStatuscallback(null, "fail");
 					} else {
 						updateStatuscallback(null, "success");
@@ -1969,7 +1968,7 @@ exports.cancelScheduledJob_ICE = function (req, res) {
 			client.post(epurl + "suite/ScheduleTestSuite_ICE", args,
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
-					console.log(result);
+					console.log(response.statusCode);
 					res.send("fail");
 				} else {
 					var status = result.rows[0].schedulestatus;
@@ -2012,7 +2011,7 @@ function getScheduledDetails(dbquery, schedDetailscallback) {
 		client.post(epurl + "suite/ScheduleTestSuite_ICE", args,
 			function (result, response) {
 			if (response.statusCode != 200 || result.rows == "fail") {
-				console.log(result);
+				console.log(response.statusCode);
 				schedDetailscallback(null, "fail");
 			} else {
 				schedDetailscallback(null, result.rows);
