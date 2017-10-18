@@ -559,7 +559,6 @@ exports.versioning= function(req, res, next) {
 								//Condition to check incomplete flow of Modules, if so do not create structure in cassandra
 								if(nData[rIndex].children.length==0){
 									incompleteFlow=true;
-									return false;
 								} else{
 									nData[rIndex].children.forEach(function(ts,i){
 										var sList=[];
@@ -586,6 +585,7 @@ exports.versioning= function(req, res, next) {
 										tsList.push({"testscenarioId":ts.attrs.testScenarioID,"testscenarioId_c":null,"testscenarioName":ts.attrs.testScenarioName,"tasks":ts.attrs.task,"screenDetails":sList});
 										}
 									});
+								}
 										if(!incompleteFlow){
 											qObj.testsuiteDetails=[{"testsuiteId":nData[rIndex].attrs.moduleID,"testsuiteId_c":null,"testsuiteName":nData[rIndex].attrs.moduleName,"task":nData[rIndex].attrs.task,"testscenarioDetails":tsList}];
 											//Passing the details of hierarchical structure of module and its children to NDAC service to create Structure in Cassandra 	
@@ -605,8 +605,7 @@ exports.versioning= function(req, res, next) {
 										}else{
 											maincallback();
 										}
-									
-								}
+
 							},function(maincallback){
 								res.status(status).send({status:"Success"});
 							});
