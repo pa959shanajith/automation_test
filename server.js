@@ -279,6 +279,12 @@ if (cluster.isMaster) {
     var neuronGraphs2D = require('./server/controllers/neuronGraphs2D');
 
     // Mindmap Routes
+    try{
+        var version = require('./server/controllers/project_versioning');
+        app.post('/version', version.versioning);
+    }catch(Ex){
+        console.log('Not found');
+    }
     app.post('/home', mindmap.mindmapService);
     //Neo4j API Routes
     //app.post('/neo4jAPI', neo4jAPI.executeQueriesOverRestAPI);

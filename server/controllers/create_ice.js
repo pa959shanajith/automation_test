@@ -270,7 +270,7 @@ exports.createStructure_Nineteen68 = function (req, res) {
 	var cycleId = RequestedJSON.cycleId;
 	var releaseId = RequestedJSON.releaseId;
 	var appType = RequestedJSON.appType;
-	var username_role = 'Nineteen68_Admin';
+	var username_role = RequestedJSON.userRole;
 	var username = RequestedJSON.userName.toLowerCase();
 	var suite = RequestedJSON.testsuiteDetails.length;
 	var suiteID = uuid();
@@ -280,8 +280,8 @@ exports.createStructure_Nineteen68 = function (req, res) {
 	var scenarioidlist = [];
 	var scenario = [];
 	var suitedetailslist = [];
-	var versionnumber = 0;
-	var newversionnumber = 0;
+	var versionnumber = RequestedJSON.from_version;;
+	var newversionnumber =  RequestedJSON.new_version;
 	var suiteflag = false;
 	async.series({
 		projectsUnderDomain: function (callback) {
