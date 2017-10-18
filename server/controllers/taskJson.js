@@ -177,7 +177,8 @@ function next_function(resultobj, cb, data) {
 						task_json.assignedTestScenarioIds = [task_json.scenarioId];
 						taskDetails.taskName = t.task + ' version_'+ task_json.versionnumber+ ' ' + m.testScenarioName;
 						task_json.scenarioName = m.testScenarioName;
-						//testSuiteDetails_obj.assignedTestScenarioIds=[task_json.scenarioId];
+						//testSuiteDetails_obj.testsuitename = m.moduleName;
+						testSuiteDetails_obj.assignedTestScenarioIds=[task_json.scenarioId];
 					} else {
 						taskDetails.taskName = t.task +' version_'+ task_json.versionnumber+ ' ' + m.screenName;
 						task_json.screenName = m.screenName;
@@ -203,7 +204,7 @@ function next_function(resultobj, cb, data) {
 							}
 							else {
 								try {
-									result1 = JSON.parse(result);
+									result1 = result;
 									testSuiteDetails_obj.testsuitename = result1[0].data[0].row[0];
 									maincallback();
 								} catch (ex) {
@@ -215,7 +216,7 @@ function next_function(resultobj, cb, data) {
 										}
 										else {
 											try {
-												result1 = JSON.parse(result);
+												result1 = result;
 												testSuiteDetails_obj.testsuitename = result1[0].data[0].row[0];
 												maincallback();
 											} catch (ex) {
