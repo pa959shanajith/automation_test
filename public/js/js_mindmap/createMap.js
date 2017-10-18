@@ -2,14 +2,16 @@ var activeNode,childNode,uNix,uLix,node,link,dNodes,dLinks,allMMaps,temp,rootInd
 //unassignTask is an array to store whose task to be deleted
 var deletednode=[],unassignTask=[],deletednode_info=[];
 var userInfo =  JSON.parse(window.localStorage['_UI']);
+var user_role=window.localStorage['_SR'];
 var userid = userInfo.user_id;
+var versioning_enabled=0;
 // node_names_tc keep track of testcase names to decide reusability of testcases
 var node_names_tc=[];
 var saveFlag=false;
 //for handling the case when creatednode goes beyond screensize
 var CreateEditFlag=false;
 var isIE = /*@cc_on!@*/false || !!document.documentMode;
-function loadMindmapData(){
+function loadMindmapData(param){
 	blockUI("Loading...");
 	dataSender({task:'populateProjects',user_id:userid},function(err,result){
 		if(err){
@@ -32,7 +34,17 @@ function loadMindmapData(){
 				selectedProject=result1.projectName[0];
 			}
 			$(".project-list option[value='" + selectedProject + "']").attr('selected', 'selected');
-			loadMindmapData1(); 
+			if (param==1){
+				versioning_enabled=1;
+				dataSender({task:'getVersions',projectId:$(".project-list").val(),versioning:1},function(err,result){
+				if(err){ console.log(err);callback(null,err);}
+				else{
+					addVersioning(result);			
+				}
+			});
+			}
+			
+			loadMindmapData1(param); 
 			$(".project-list").change(function () {
 			//Mindmap clear search box on selecting different project
 				$('#searchModule-create').val('');
@@ -43,7 +55,15 @@ function loadMindmapData(){
 				{
 					$("img.iconSpaceArrow").removeClass("iconSpaceArrowTop");
 				}
-				loadMindmapData1();
+				if (param==1){
+					dataSender({task:'getVersions',projectId:$(".project-list").val(),versioning:1},function(err,result){
+					if(err){ console.log(err);callback(null,err);}
+					else{
+						addVersioning(result);			
+					}
+				});
+				}
+				loadMindmapData1(param);
 			});
 			//Calling the function to restrict the user to give default node names
 			$("#ct-canvas").click(callme);
@@ -51,7 +71,7 @@ function loadMindmapData(){
 		}
 	});
 }
-function loadMindmapData1(){
+function loadMindmapData1(param){
 	blockUI("Loading...");
 	var selectedTab = window.localStorage['tabMindMap'];
 	uNix=0;uLix=0;dNodes=[];dLinks=[];nCount=[0,0,0,0];scrList=[];tcList=[];cSpan=[0,0];cScale=1;mapSaved=!1;
@@ -87,7 +107,11 @@ function loadMindmapData1(){
 			// svgTileG.append('path').attr('d','M55,75L95,75');
 	}
 	d3.select('#ct-assignBox').classed('no-disp',!0);
-	dataSender({task:'getModules',tab:window.localStorage['tabMindMap'],prjId:$(".project-list").val()},function(err,result){
+	var version_num='';
+	if(param==1){
+		version_num=0;
+	}
+	dataSender({task:'getModules',tab:window.localStorage['tabMindMap'],prjId:$(".project-list").val(),versioning:param,version:version_num},function(err,result){
 		if(err){
 			console.log(result);
 			unblockUI();
@@ -372,7 +396,10 @@ var addTask = function(e){
 	var a,b,p=d3.select(activeNode);
 	var pi=parseInt(p.attr('id').split('-')[2]);
 	var nType=p.attr('data-nodetype');
-	var tObj={t:/*d3.select('#ct-assignTask').html()*/$('#ct-assignTask').val(),bn:$('#ct-executeBatch').val(),at:$('#ct-assignedTo').val(),rw:/*(d3.select('#ct-assignRevw')[0][0])?*/$('#ct-assignRevw').val()/*:null*/,sd:$('#startDate').val(),ed:$('#endDate').val(),re:(d3.select('#ct-assignRel')[0][0])?$('#ct-assignRel').val():null,cy:(d3.select('#ct-assignCyc')[0][0])?$('#ct-assignCyc').val():null,det:d3.select('#ct-assignDetails').property('value'),app:$('option:selected', '.project-list').attr('app-type')};
+	tvn=0;
+	if ($('.version-list') !== undefined)
+	tvn=$('.version-list').val();
+	var tObj={tvn:tvn,t:$('#ct-assignTask').val(),bn:$('#ct-executeBatch').val(),at:$('#ct-assignedTo').val(),rw:/*(d3.select('#ct-assignRevw')[0][0])?*/$('#ct-assignRevw').val()/*:null*/,sd:$('#startDate').val(),ed:$('#endDate').val(),re:(d3.select('#ct-assignRel')[0][0])?$('#ct-assignRel').val():null,cy:(d3.select('#ct-assignCyc')[0][0])?$('#ct-assignCyc').val():null,det:d3.select('#ct-assignDetails').property('value'),app:$('option:selected', '.project-list').attr('app-type')};
 	//console.log(tObj);
 	if(dNodes[pi].task){
 		tObj.id=dNodes[pi].task.id;
@@ -400,7 +427,7 @@ var addTask = function(e){
 		if(nType=="modules" || nType=="modules_endtoend"){
 			if(tObj.cy != 'select cycle' && tObj.re != 'select release'){
 				if(dNodes[pi].id_c!="null"){
-					dNodes[pi].task={id:tObj.id,oid:tObj.oid,batchName:tObj.bn,task:tObj.t,assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,release:tObj.re,cycle:tObj.cy,details:tObj.det,parent:(tObj.parent!=null)?tObj.parent:[dNodes[pi].id_c]};
+					dNodes[pi].task={taskvn:tObj.tvn,id:tObj.id,oid:tObj.oid,batchName:tObj.bn,task:tObj.t,assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,release:tObj.re,cycle:tObj.cy,details:tObj.det,parent:(tObj.parent!=null)?tObj.parent:[dNodes[pi].id_c]};
 				}
 				//Logic to add tasks for the scenario
 				if(dNodes[pi].children) dNodes[pi].children.forEach(function(tSc){
@@ -408,7 +435,7 @@ var addTask = function(e){
 							if(dNodes[pi].id_c!='null' && tSc.id_c!='null'){
 								taskflag=true;
 								//Issue- 711 Assign directly to the module and see that scenario gets assign but on click of "Save" scenario gets unassign.
-								tSc.task={id:null,oid:null,task:"Execute Scenario",assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,release:tObj.re,cycle:tObj.cy,details:tObj.det,parent:(tObj.parent!=null)?tObj.parent:[dNodes[pi].id_c,tSc.id_c]};
+								tSc.task={taskvn:tObj.tvn,id:null,oid:null,task:"Execute Scenario",assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,release:tObj.re,cycle:tObj.cy,details:tObj.det,parent:(tObj.parent!=null)?tObj.parent:[dNodes[pi].id_c,tSc.id_c]};
 								d3.select('#ct-node-'+tSc.id).append('image').attr('class','ct-nodeTask').attr('xlink:href','images_mindmap/node-task-assigned.png').attr('x',29).attr('y',-10);
 							}
 							
@@ -424,7 +451,7 @@ var addTask = function(e){
 							if(scr.task===undefined||scr.task==null){
 								if(dNodes[pi].id_c!='null' && tSc.id_c!='null' && scr.id_c!='null'){
 									taskflag=true;
-									scr.task={id:null,oid:null,task:"Scrape",assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,details:tObj.det,parent:[dNodes[pi].id_c,tSc.id_c,scr.id_c]};
+									scr.task={taskvn:tObj.tvn,id:null,oid:null,task:"Scrape",assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,details:tObj.det,parent:[dNodes[pi].id_c,tSc.id_c,scr.id_c]};
 									d3.select('#ct-node-'+scr.id).append('image').attr('class','ct-nodeTask').attr('xlink:href','images_mindmap/node-task-assigned.png').attr('x',29).attr('y',-10);
 								}
 								
@@ -439,7 +466,7 @@ var addTask = function(e){
 								if(tCa.task===undefined||tCa.task==null){
 									if(dNodes[pi].id_c!='null' && tSc.id_c!='null' && scr.id_c!='null' && tCa.id_c != 'null' ){
 										taskflag=true;
-										tCa.task={id:null,oid:null,task:"Design",assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,details:tObj.det,parent:[dNodes[pi].id_c,tSc.id_c,scr.id_c,tCa.id_c]};
+										tCa.task={taskvn:tObj.tvn,id:null,oid:null,task:"Design",assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,details:tObj.det,parent:[dNodes[pi].id_c,tSc.id_c,scr.id_c,tCa.id_c]};
 										d3.select('#ct-node-'+tCa.id).append('image').attr('class','ct-nodeTask').attr('xlink:href','images_mindmap/node-task-assigned.png').attr('x',29).attr('y',-10);
 									}
 								}else{
@@ -468,7 +495,7 @@ var addTask = function(e){
 					
 				
 				if(tscid!='null'){
-					dNodes[pi].task={id:tObj.id,oid:tObj.oid,task:tObj.t,assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,release:parentTask.release,cycle:parentTask.cycle,details:tObj.det,parent:(tObj.parent!=null)?tObj.parent:[modid,dNodes[pi].id_c]};
+					dNodes[pi].task={taskvn:tObj.tvn,id:tObj.id,oid:tObj.oid,task:tObj.t,assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,release:parentTask.release,cycle:parentTask.cycle,details:tObj.det,parent:(tObj.parent!=null)?tObj.parent:[modid,dNodes[pi].id_c]};
 					if(dNodes[pi].parent.type=='modules_endtoend') taskflag=true;
 				}
 
@@ -478,7 +505,7 @@ var addTask = function(e){
 						if(scr.task===undefined||scr.task==null){
 							if(modid!='null' && tscid!='null' && scr.id_c!='null'){
 								taskflag=true;
-								scr.task={id:null,oid:null,task:"Scrape",assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,details:tObj.det,parent:[modid,tscid,scr.id_c]};
+								scr.task={taskvn:tObj.tvn,id:null,oid:null,task:"Scrape",assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,details:tObj.det,parent:[modid,tscid,scr.id_c]};
 								d3.select('#ct-node-'+scr.id).append('image').attr('class','ct-nodeTask').attr('xlink:href','images_mindmap/node-task-assigned.png').attr('x',29).attr('y',-10);
 							}
 							
@@ -493,7 +520,7 @@ var addTask = function(e){
 							if(tCa.task===undefined||tCa.task==null){
 								if(modid!='null' && tscid!='null' && scr.id_c!='null' && tCa.id_c != 'null' ){
 									taskflag=true;
-									tCa.task={id:null,oid:null,task:"Design",assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,details:tObj.det,parent:[modid,tscid,scr.id_c,tCa.id_c]};
+									tCa.task={taskvn:tObj.tvn,id:null,oid:null,task:"Design",assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,details:tObj.det,parent:[modid,tscid,scr.id_c,tCa.id_c]};
 									d3.select('#ct-node-'+tCa.id).append('image').attr('class','ct-nodeTask').attr('xlink:href','images_mindmap/node-task-assigned.png').attr('x',29).attr('y',-10);
 								}
 							}else{
@@ -513,7 +540,7 @@ var addTask = function(e){
 		else if(nType=="screens"){
 			var modid=dNodes[pi].parent.parent.id_c,tscid=dNodes[pi].parent.id_c,scrid=dNodes[pi].id_c;
 			if(dNodes[pi].id_c!='null'){
-				dNodes[pi].task={id:tObj.id,oid:tObj.oid,task:tObj.t,assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,details:tObj.det,parent:(tObj.parent!=null)?tObj.parent:[modid,tscid,scrid]};
+				dNodes[pi].task={taskvn:tObj.tvn,id:tObj.id,oid:tObj.oid,task:tObj.t,assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,details:tObj.det,parent:(tObj.parent!=null)?tObj.parent:[modid,tscid,scrid]};
 			}
 			
 			if(tObj.parent!=[modid,tscid,scrid]){
@@ -525,7 +552,7 @@ var addTask = function(e){
 				if(tCa.task===undefined||tCa.task==null){
 					if (modid !='null' && tscid !='null' && scrid!='null' && tcid!='null'){
 						taskflag=true;
-						tCa.task={id:null,oid:null,task:cTask,assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,details:tObj.det,parent:[modid,tscid,scrid,tcid]};
+						tCa.task={taskvn:tObj.tvn,id:null,oid:null,task:cTask,assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,details:tObj.det,parent:[modid,tscid,scrid,tcid]};
 						d3.select('#ct-node-'+tCa.id).append('image').attr('class','ct-nodeTask').attr('xlink:href','images_mindmap/node-task-assigned.png').attr('x',29).attr('y',-10);
 					}
 				}else{
@@ -540,7 +567,7 @@ var addTask = function(e){
 			var modid=dNodes[pi].parent.parent.parent.id_c,tscid=dNodes[pi].parent.parent.id_c,scrid=dNodes[pi].parent.id_c;var tcid=dNodes[pi].id_c;
 			if (modid !='null' && tscid !='null' && scrid!='null' && tcid!='null'){
 				taskflag=true;
-				dNodes[pi].task={id:tObj.id,oid:tObj.oid,task:tObj.t,assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,details:tObj.det,parent:(tObj.parent!=null)?tObj.parent:[modid,tscid,scrid,tcid]};
+				dNodes[pi].task={taskvn:tObj.tvn,id:tObj.id,oid:tObj.oid,task:tObj.t,assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,details:tObj.det,parent:(tObj.parent!=null)?tObj.parent:[modid,tscid,scrid,tcid]};
 				if(tObj.parent!=[modid,tscid,scrid,tcid]){
 					dNodes[pi].task['updatedParent']=[modid,tscid,scrid,tcid];
 				}
@@ -756,7 +783,7 @@ var nodeClick = function(e){
 									callback(null,err);
 								}
 								else{
-									result2=JSON.parse(result);
+									result2=result;
 									for(i=0; i<result2.c_ids.length && result2.cyc.length; i++){
 										$('#ct-assignCyc').append("<option data-id='"+result2.cyc[i]+"' value='"+result2.c_ids[i]+"'>"+result2.cyc[i]+"</option>");
 									}
@@ -1457,7 +1484,7 @@ var submit_task=function(e){
 	var taskinfo=JSON.parse(window.localStorage['_CT']);
 	var taskid=taskinfo.subTaskId;
 	//alert(taskinfo.subTaskId);
-	dataSender({task:'reviewTask',prjId:taskinfo.projectId,taskId:taskid,userId:userid},function(err,result){
+	dataSender({task:'reviewTask',prjId:$(".project-list").val(),taskId:taskid,userId:userid},function(err,result){
 		if(err) console.log(result);
 		else{
 			console.log(result);
@@ -1513,7 +1540,10 @@ var actionEvent = function(e){
 		openDialogMindmap('Error','No projects is assigned to User');
 		return !1;
 	}
-	dataSender({task:'writeMap',data:{write:flag,tab:cur_module,map:mapData,user_name:username,abc:deletednode,xyz:unassignTask,prjId:$('.project-list').val(),relId:$('#ct-assignRel').val(),cycId:$('#ct-assignCyc').val()}},function(err,result){
+	var from_v=to_v=0;
+	if ($('.version-list') !== undefined)
+	from_v=to_v=$('.version-list').val();
+	dataSender({task:'writeMap',data:{write:flag,userRole:user_role,vn_from: from_v, vn_to: to_v,tab:cur_module,map:mapData,user_name:username,abc:deletednode,xyz:unassignTask,prjId:$('.project-list').val(),relId:$('#ct-assignRel').val(),cycId:$('#ct-assignCyc').val()},role:user_role,versioning:versioning_enabled},function(err,result){
 		s.classed('no-access',!1);
 		if(err){
 			console.log(result);
@@ -1558,8 +1588,11 @@ var actionEvent = function(e){
 			}else{
 				openDialogMindmap("Success", "Data saved successfully");
 			}
-			
-			 dataSender({task:'getModules',tab:window.localStorage['tabMindMap'],prjId:$(".project-list").val()},function(err,result){
+			var vn='';
+			if ($('.version-list')!== undefined)
+			from_v=to_v=$('.version-list').val()
+
+			 dataSender({task:'getModules',tab:window.localStorage['tabMindMap'],prjId:$(".project-list").val(),versioning:versioning_enabled,version:parseFloat(from_v)},function(err,result){
 				 	if(err) console.log(result);
 				 	else{
 						// console.log(result);
@@ -1592,7 +1625,7 @@ if(flag==20){
 			mid=i;
 			return !0;
 		}
-			return !1;
+			//return !1;
 	});
 	//263-'Mindmap- Module: Currently allowing to create 2 modules with same name- Error msg is given on click of Create button
 	if(allMMaps[mid] != undefined){
@@ -1809,14 +1842,17 @@ var dataSender = function(data,callback){
 	try{xhttp=new XMLHttpRequest();}catch(e){try{xhttp=new ActiveXObject("Msxml2.XMLHTTP");}catch(e){try{xhttp=new ActiveXObject("Microsoft.XMLHTTP");}catch(e){alert("Your Browser is outdated!\nPlease Update!");return false;}}}
 	xhttp.onreadystatechange = function(){4==this.readyState&&(200==this.status?callback(!1,this.responseText):(400==this.status||401==this.status||402==this.status||403==this.status||404==this.status)&&callback(!0,this.responseText));};
 	//xhttp.open("POST",window.location.pathname,!0);
-	xhttp.open("POST",'/home',!0);
+	if(data.versioning==1)
+		xhttp.open("POST",'/version',!0);
+	else
+		xhttp.open("POST",'/home',!0);
 	xhttp.setRequestHeader("Content-Type", "application/json");
 	xhttp.send(JSON.stringify(data));
 };
 
 //Dialog used through out mindmap
 function openDialogMindmap(title, body){
-	if (window.location.pathname == '/home'){
+	if (window.location.pathname == '/home' || window.location.pathname == '/version'){
 		$("#mindmapGlobalDialog").find('.modal-title').text(title);
 		$("#mindmapGlobalDialog").find('.modal-body p').text(body).css('color','black');
 		$("#mindmapGlobalDialog").modal("show");
