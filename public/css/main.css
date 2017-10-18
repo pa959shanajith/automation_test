@@ -2345,7 +2345,7 @@ input[disabled]{
 }
 .executionDataTable tbody
 {
-    max-height: 100px !important;
+    /*max-height: 100px !important;*/
     overflow: auto;
     margin-top: 0px !important;
 }
@@ -2364,6 +2364,11 @@ input[disabled]{
     float: left !important;
     padding-top: 5px !important;
     padding-bottom: 5px !important;
+}
+.scheduleDataBodyRowChild div:nth-child(2),.scheduleDataBodyRowChild div:nth-child(3),.scheduleDataBodyRowChild div:nth-child(4){
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 .designDataTable tbody tr, .ui-widget-content{cursor: pointer;}
 .executionDataTable th, .executionDataTable td, .scheduleDataHeader span, .scheduleDataBodyRow div, .designDataTable th, .designDataTable td{
@@ -2449,7 +2454,7 @@ input[disabled]{
 	border-right: 1px solid #fff;
 	text-align: center;
 }
-.scenarioHeaders tr td:first-child{border-right: none; text-align: left; padding-left: 8px; padding-top: 2px;}
+.scenarioHeaders tr td:first-child{text-align: left; padding-left: 8px; padding-top: 2px;}
 .scenarioBody tr td{
 	padding: 0 5px 0 5px;
 	text-align: center;
@@ -2575,10 +2580,6 @@ input[disabled]{
     padding: 0 10px 0 2px;
 }
 .cancelJob{
-    position: relative;
-    left: 5px;
-    background: #331d4e;
-    border: 1px solid #331d4e;
     cursor: pointer;
 }
 /* Batch Scheduling */
@@ -4593,7 +4594,7 @@ select:-webkit-autofill:focus {
   margin-left: 5px;
   margin-right: 15px;
   padding: 2px 15px;
-  width: 680px;
+  width: 450px;
 }
 
 #ex1Slider .tooltip-inner {
@@ -4868,7 +4869,6 @@ line.subdomain {
 {
     pointer-events: none;
 }
-
 
 /*
 Weboccular report css
