@@ -182,7 +182,7 @@ function createNewTab(from_v,to_v){
     
    if ($('.ct-nodeBox')[0].children !== undefined && $('.ct-nodeBox')[0].children.length == 0) {
     openDialogMindmap('Error', "Cannot create Empty Version");
-    versionInputDialogClose()
+    //versionInputDialogClose()
     return;
   }
   blockUI('Loading...');
@@ -197,7 +197,7 @@ function createNewTab(from_v,to_v){
     }).text(to_v))
     unblockUI();
     openDialogMindmap('Mindmap', "New Version created successfully.");
-    versionInputDialogClose()
+    //versionInputDialogClose()
   });
 
 }
@@ -293,7 +293,7 @@ function createNewVersion(from_v) {
   }
   else {
     //show an error dialog
-    versionInputDialogClose();
+    //versionInputDialogClose();
     if(getAllVersionsUI().includes(inputVersion))
       openDialogMindmap('Error', "Version Number already exists");
 
