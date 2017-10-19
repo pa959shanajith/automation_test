@@ -119,6 +119,7 @@ function addVersioning(versions) {
   if(getCookie('mm_pvid') != ''){
     $('.version-list').val(getCookie('mm_pvid'));
   }
+  loadMindmapData1(1);
   //loadModules(versions)
 }
 

@@ -50,9 +50,11 @@ function loadMindmapData(param){
 					}		
 				}
 			});
+			}else{
+				loadMindmapData1(param); 
 			}
 			
-			loadMindmapData1(param); 
+			
 			$(".project-list").change(function () {
 			//Mindmap clear search box on selecting different project
 				$('#searchModule-create').val('');
@@ -69,12 +71,14 @@ function loadMindmapData(param){
 					else{
 						addVersioning(result);
 						setCookie('mm_pvid',$('.version-list').children()[0].value,15);
-						$('.version-list').val($('.version-list').children()[0].value);			
-					}
-				});
+						$('.version-list').val($('.version-list').children()[0].value);
+						}
+					});
+				}else{
+					loadMindmapData1(param);
 				}
-				loadMindmapData1(param);
 				setCookie('mm_pid',selectedProject,15);
+				
 			});
 			//Calling the function to restrict the user to give default node names
 			$("#ct-canvas").click(callme);
@@ -119,9 +123,11 @@ function loadMindmapData1(param){
 	}
 	d3.select('#ct-assignBox').classed('no-disp',!0);
 	var version_num='';
+
 	if(param==1){
-		version_num=0;
+		version_num=$('.version-list').val();
 	}
+	
 	dataSender({task:'getModules',tab:window.localStorage['tabMindMap'],prjId:$(".project-list").val(),versioning:param,version:version_num},function(err,result){
 		if(err){
 			console.log(result);
