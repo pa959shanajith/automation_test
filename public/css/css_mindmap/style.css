@@ -374,16 +374,23 @@ p,a,img,text,span,.noselect{-webkit-touch-callout:none;-webkit-user-select:none;
 .selectProject
 {
     margin-left: -41% !important;
+    position: relative;
+}
+.selectProjectAssign
+{
+    margin-left: -46% !important;
+    position: relative;
 }
 /*.selectProjectPri{    
     left: 0px !important;
 }*/
 .selectProjectLabel{
+    position: relative;
     margin: 2px 8px 0 0;
     font-size: 14px;
     font-family: LatoWeb;
 }
-.project-list{width: 200px;position: absolute;}
+.project-list{width: 200px;position: relative;}
 /*FOR MINDMAP ENDS HERE*/
 .ct-show-left{
     width: 10px !important;
@@ -572,7 +579,7 @@ select
 
 .searchModuleimg-assign, .searchModuleimg-create{
 	position: absolute;
-    margin-left: 54.4%;
+    margin-left: 55.4%;
     top: 3px;
     border-left: 1px solid #ccc;
     padding-left: 3px;
@@ -600,6 +607,7 @@ select
     margin-left:20px;
 }
 .selectVersionLabel{
+    position: relative;
     margin-right:1%;
     margin-left:-2%;
 }
@@ -607,12 +615,15 @@ select
     margin-left: 1%;
 }
 .selectVersion{
-   margin-left: 19%;
+   position: relative;
+   margin-left: 3%;
 }
 .searchbox-assign, .searchbox-create{
-    margin-left:0%;
     float:right;
 }
 #destProjects{
     width:94%;
+}
+.searchModuleimg-assign1{
+    margin-left:50.4%;
 }
