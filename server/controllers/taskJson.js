@@ -164,10 +164,10 @@ function next_function(resultobj, cb, data) {
 						task_json.projectId = "";
 						taskDetails.taskName = t.task + ' version_'+ task_json.versionnumber+ ' ' + t.batchName;
 						testSuiteDetails_obj.testsuitename = m.moduleName;
-						if (batch_dict[t.batchName] == undefined) {
-							batch_dict[t.batchName] = user_task_json.length;
+						if (batch_dict[t.batchName+t.taskvn] == undefined) {
+							batch_dict[t.batchName+t.taskvn] = user_task_json.length;
 						} else {
-							parent_index = batch_dict[t.batchName];
+							parent_index = batch_dict[t.batchName+t.taskvn];
 							batch_task = user_task_json[parent_index];
 							batch_task.testSuiteDetails.push(testSuiteDetails_obj);
 							batch_flag = true;
