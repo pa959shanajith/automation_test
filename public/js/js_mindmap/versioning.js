@@ -116,6 +116,7 @@ function addVersioning(versions) {
       value: versions[i]
     }).text(versions[i]))
   }
+  loadMindmapData1(1);
   //loadModules(versions)
 }
 
