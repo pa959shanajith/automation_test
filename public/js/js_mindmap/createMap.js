@@ -783,7 +783,7 @@ var nodeClick = function(e){
 									callback(null,err);
 								}
 								else{
-									result2=result;
+									result2=JSON.parse(result);
 									for(i=0; i<result2.c_ids.length && result2.cyc.length; i++){
 										$('#ct-assignCyc').append("<option data-id='"+result2.cyc[i]+"' value='"+result2.c_ids[i]+"'>"+result2.cyc[i]+"</option>");
 									}
