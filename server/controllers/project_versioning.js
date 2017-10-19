@@ -162,6 +162,7 @@ exports.versioning= function(req, res, next) {
 		}
 		else if(d.task=='writeMap'){
 			var nData=[],qList=[],idDict={};
+			var createdOn=new Date().toLocaleString();
 			data=d.data.map;
 			prjId=d.data.prjId;
 			var vn_from=d.data.vn_from;
@@ -195,11 +196,11 @@ exports.versioning= function(req, res, next) {
 							qList.push({"statement":"MATCH (n)-[r:FMTTS{id:'"+e.id+"'}]->(o:TESTSCENARIOS)-[s]->(p:SCREENS) DETACH DELETE s,p"});
 							qList.push({"statement":"MATCH (n)-[r:FMTTS{id:'"+e.id+"'}]->(o:TESTSCENARIOS) DETACH DELETE r,o"});
 
-							if(e.renamed) qList.push({"statement":"MATCH(n:MODULES{moduleID:'"+e.id+"'}) SET n.moduleName='"+e.name+"'"+",n.unique_property='["+e.name+','+prjId+','+vn_from+"]'"});
+							if(e.renamed) qList.push({"statement":"MATCH(n:MODULES{moduleID:'"+e.id+"'}) SET n.modifiedOn='"+createdOn+"',n.moduleName='"+e.name+"'"+",n.unique_property='["+e.name+','+prjId+','+vn_from+"]'"});
 						}
 						else{
 							//qList.push({"statement":"MERGE(n:MODULES{projectID:'"+prjId+"',moduleName:'"+e.name+"',moduleID:'"+e.id+"',createdBy:'"+user+"',createdOn:'null',moduleID_c:'"+e.id_c+"',unique_property:'["+e.name+','+prjId+"]'}) SET n.childIndex='"+e.childIndex+"'"});
-							qList.push({"statement":"MERGE(n:MODULES{projectID:'"+prjId+"',moduleName:'"+e.name+"',moduleID:'"+e.id+"',createdBy:'"+user+"',createdOn:'null',moduleID_c:'"+e.id_c+"',unique_property:'["+e.name+','+prjId+','+vn_from+"]'}) SET n.childIndex='"+e.childIndex+"'"});
+							qList.push({"statement":"MERGE(n:MODULES{projectID:'"+prjId+"',moduleName:'"+e.name+"',moduleID:'"+e.id+"',createdBy:'"+user+"',createdOn:'"+createdOn+"',moduleID_c:'"+e.id_c+"',unique_property:'["+e.name+','+prjId+','+vn_from+"]'}) SET n.childIndex='"+e.childIndex+"'"});
 							qList.push({"statement":"MATCH (a:VERSION{versionNumber:"+parseFloat(vn_from)+",projectID:'"+prjId+"'}) set a.moduleIDs=a.moduleIDs+[\""+e.id+"\"]"});
 							qList.push({"statement":"MATCH (a:VERSION),(b:MODULES) WHERE b.moduleID IN a.moduleIDs MERGE (a)-[r:FVTM {id:b.moduleID}]->(b)"});
 						} 
@@ -220,7 +221,7 @@ exports.versioning= function(req, res, next) {
 					}
  					else if(e.type=='scenarios'){
 						if(e.renamed && e.id_n) rnmList.push({"statement":"MATCH(n:TESTSCENARIOS{testScenarioID:'"+e.id+"'}) SET n.testScenarioName='"+e.name+"'"+",n.projectID='"+prjId+"'"});
-						qList.push({"statement":"MERGE(n:TESTSCENARIOS{projectID:'"+prjId+"',moduleID:'"+idDict[e.pid]+"',testScenarioName:'"+e.name+"',testScenarioID:'"+e.id+"',createdBy:'"+user+"',createdOn:'null',testScenarioID_c:'"+e.id_c+"'}) SET n.childIndex='"+e.childIndex+"'"});
+						qList.push({"statement":"MERGE(n:TESTSCENARIOS{projectID:'"+prjId+"',moduleID:'"+idDict[e.pid]+"',testScenarioName:'"+e.name+"',testScenarioID:'"+e.id+"',createdBy:'"+user+"',createdOn:'"+createdOn+"',testScenarioID_c:'"+e.id_c+"'}) SET n.childIndex='"+e.childIndex+"'"});
 						//Supporting task assignmnet for scenarios
 						if(t!=null && e.id_c!=null){
 							t.parent=[prjId].concat(e.pid_c,e.id_c);
@@ -245,7 +246,7 @@ exports.versioning= function(req, res, next) {
 							rnmList.push({"statement":"MATCH(n:SCREENS{screenName:'"+e.orig_name+"',projectID:'"+prjId+"',vn:"+parseFloat(vn_from)+"}) SET n.screenName='"+e.name+"'"});
 						} 
 						//qList.push({"statement":"MATCH(n:SCREENS{screenID:'"+e.id+"'}) SET n.screenName='"+e.name+"'"+",n.projectID='"+prjId+"'"});
-						qList.push({"statement":"MERGE(n:SCREENS{projectID:'"+prjId+"',testScenarioID:'"+idDict[e.pid]+"',screenName:'"+e.name+"',screenID:'"+e.id+"',createdBy:'"+user+"',createdOn:'null',uid:'"+uidx+"',screenID_c:'"+e.id_c+"'})SET n.childIndex='"+e.childIndex+"',n.vn="+parseFloat(vn_from)});
+						qList.push({"statement":"MERGE(n:SCREENS{projectID:'"+prjId+"',testScenarioID:'"+idDict[e.pid]+"',screenName:'"+e.name+"',screenID:'"+e.id+"',createdBy:'"+user+"',createdOn:'"+createdOn+"',uid:'"+uidx+"',screenID_c:'"+e.id_c+"'})SET n.childIndex='"+e.childIndex+"',n.vn="+parseFloat(vn_from)});
 						if(t!=null && e.id_c!=null){
 							t.id=(t.id!=null)?t.id:uuidV4();
 		
@@ -272,9 +273,9 @@ exports.versioning= function(req, res, next) {
 						}
 						
 						if(e.pid_c!='null' && e.pid_c!=undefined){
-							qList.push({"statement":"MERGE(n:TESTCASES{screenID:'"+idDict[e.pid]+"',testScenarioID:'"+lts+"',testCaseName:'"+e.name+"',testCaseID:'"+e.id+"',createdBy:'"+user+"',createdOn:'null',uid:'"+uidx+"',testCaseID_c:'"+e.id_c+"'}) SET n.screenID_c='"+e.pid_c+"',n.childIndex='"+e.childIndex+"'"});
+							qList.push({"statement":"MERGE(n:TESTCASES{screenID:'"+idDict[e.pid]+"',testScenarioID:'"+lts+"',testCaseName:'"+e.name+"',testCaseID:'"+e.id+"',createdBy:'"+user+"',createdOn:'"+createdOn+"',uid:'"+uidx+"',testCaseID_c:'"+e.id_c+"'}) SET n.screenID_c='"+e.pid_c+"',n.childIndex='"+e.childIndex+"'"});
 						}else{
-							qList.push({"statement":"MERGE(n:TESTCASES{screenID:'"+idDict[e.pid]+"',testScenarioID:'"+lts+"',testCaseName:'"+e.name+"',testCaseID:'"+e.id+"',createdBy:'"+user+"',createdOn:'null',uid:'"+uidx+"',testCaseID_c:'"+e.id_c+"'}) SET n.childIndex='"+e.childIndex+"'"});
+							qList.push({"statement":"MERGE(n:TESTCASES{screenID:'"+idDict[e.pid]+"',testScenarioID:'"+lts+"',testCaseName:'"+e.name+"',testCaseID:'"+e.id+"',createdBy:'"+user+"',createdOn:'"+createdOn+"',uid:'"+uidx+"',testCaseID_c:'"+e.id_c+"'}) SET n.childIndex='"+e.childIndex+"'"});
 						}
 						
 						
@@ -426,7 +427,7 @@ exports.versioning= function(req, res, next) {
             //id's must be new
 			var nData=[];
             prjId = d.projectId;
-
+			var user_name=d.user_name;
             vn_from = d.vn_from;
             vn_to = d.vn_to;
 			userRole=d.userRole;
@@ -520,24 +521,25 @@ exports.versioning= function(req, res, next) {
                     
                   
                     var uidx=0,t,lts,qList=[];
+					var createdOn=new Date().toLocaleString();
                     nData.forEach(function(e,i){
                         t=e.attrs;
                         if(e.type=='version'){
-                            qList.push({"statement":"MERGE(n:VERSION{projectID:'"+prjId+"',moduleIDs:"+t.moduleIDs+",versionNumber:"+vn_to+",vn:'"+vn_to+"',versionID:'"+uuidV4()+"'})"});
+                            qList.push({"statement":"MERGE(n:VERSION{projectID:'"+prjId+"',moduleIDs:"+t.moduleIDs+",versionNumber:"+vn_to+",vn:'"+vn_to+"',versionID:'"+uuidV4()+"'}) SET n.createdBy='"+user_name+"',n.createdOn='"+createdOn+"'"});
                         }
                         else if(e.type=='modules'){
 							var new_property=t.unique_property.slice(0,-1).concat(','+vn_to+']')
-                            qList.push({"statement":"MERGE(n:MODULES{projectID:'"+t.projectID+"',moduleName:'"+t.moduleName+"',moduleID:'"+t.moduleID+"',createdBy:'"+t.createdBy+"',createdOn:'"+t.createdOn+"',moduleID_c:'null',unique_property:'"+new_property+"',childIndex:'"+t.childIndex+"'})"});
+                            qList.push({"statement":"MERGE(n:MODULES{projectID:'"+t.projectID+"',moduleName:'"+t.moduleName+"',moduleID:'"+t.moduleID+"',createdBy:'"+t.createdBy+"',createdOn:'"+createdOn+"',moduleID_c:'null',unique_property:'"+new_property+"',childIndex:'"+t.childIndex+"'})"});
                         }
                         else if(e.type=='testscenarios'){
-                            qList.push({"statement":"MERGE(n:TESTSCENARIOS{projectID:'"+t.projectID+"',moduleID:'"+t.moduleID+"',testScenarioName:'"+t.testScenarioName+"',testScenarioID:'"+t.testScenarioID+"',createdBy:'"+t.createdBy+"',createdOn:'"+t.createdOn+"',testScenarioID_c:'null', childIndex:'"+t.childIndex+"'})"});
+                            qList.push({"statement":"MERGE(n:TESTSCENARIOS{projectID:'"+t.projectID+"',moduleID:'"+t.moduleID+"',testScenarioName:'"+t.testScenarioName+"',testScenarioID:'"+t.testScenarioID+"',createdBy:'"+t.createdBy+"',createdOn:'"+createdOn+"',testScenarioID_c:'null', childIndex:'"+t.childIndex+"'})"});
                         }
                         else if(e.type=='screens'){
                             uidx++;lts=t.testScenarioID;
-                            qList.push({"statement":"MERGE(n:SCREENS{projectID:'"+t.projectID+"',testScenarioID:'"+t.testScenarioID+"',screenName:'"+t.screenName+"',screenID:'"+t.screenID+"',createdBy:'"+t.createdBy+"',createdOn:'"+t.createdOn+"',uid:'"+uidx+"',screenID_c:'null',childIndex:'"+t.childIndex+"'})"});
+                            qList.push({"statement":"MERGE(n:SCREENS{projectID:'"+t.projectID+"',testScenarioID:'"+t.testScenarioID+"',screenName:'"+t.screenName+"',screenID:'"+t.screenID+"',createdBy:'"+t.createdBy+"',createdOn:'"+createdOn+"',uid:'"+uidx+"',screenID_c:'null',childIndex:'"+t.childIndex+"'})"});
                         }
                         else if(e.type=='testcases'){
-                            qList.push({"statement":"MERGE(n:TESTCASES{screenID:'"+t.screenID+"',testScenarioID:'"+lts+"',testCaseName:'"+t.testCaseName+"',testCaseID:'"+t.testCaseID+"',createdBy:'"+t.createdBy+"',createdOn:'"+t.createdOn+"',uid:'"+uidx+"',testCaseID_c:'null',screenID_c:'"+t.screenID_c+"',childIndex:'"+t.childIndex+"'})"});
+                            qList.push({"statement":"MERGE(n:TESTCASES{screenID:'"+t.screenID+"',testScenarioID:'"+lts+"',testCaseName:'"+t.testCaseName+"',testCaseID:'"+t.testCaseID+"',createdBy:'"+t.createdBy+"',createdOn:'"+createdOn+"',uid:'"+uidx+"',testCaseID_c:'null',screenID_c:'"+t.screenID_c+"',childIndex:'"+t.childIndex+"'})"});
                         }
                     });
                     qList.push({"statement":"MATCH (a:VERSION),(b:MODULES) WHERE b.moduleID IN a.moduleIDs MERGE (a)-[r:FVTM {id:b.moduleID}]->(b)"});
