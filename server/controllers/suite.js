@@ -520,6 +520,7 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 								"testsuiteid": testsuiteid,
 								"executionid": executionid,
 								"starttime": starttime.toString(),
+								"status": resultData.reportData.overallstatus[0].overallstatus,
 								"query": "inserintotexecutionquery"
 							};
 							var args = {
