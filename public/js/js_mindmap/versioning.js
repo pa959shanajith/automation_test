@@ -116,6 +116,10 @@ function addVersioning(versions) {
       value: versions[i]
     }).text(versions[i]))
   }
+
+  setCookie('mm_pvid',$('.version-list').children()[0].value,15);
+	$('.version-list').val($('.version-list').children()[0].value);
+
   if(getCookie('mm_pvid') != ''){
     $('.version-list').val(getCookie('mm_pvid'));
   }

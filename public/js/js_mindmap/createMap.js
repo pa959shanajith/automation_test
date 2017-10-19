@@ -70,8 +70,7 @@ function loadMindmapData(param){
 					if(err){ console.log(err);callback(null,err);}
 					else{
 						addVersioning(result);
-						setCookie('mm_pvid',$('.version-list').children()[0].value,15);
-						$('.version-list').val($('.version-list').children()[0].value);
+						
 						}
 					});
 				}else{
