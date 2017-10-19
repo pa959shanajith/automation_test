@@ -481,7 +481,7 @@ console.log("screenName:", screenName);
                 var file = overWriteJson.files[0];
                 var textType = /json.*/;
                 var reader = new FileReader();
-                reader.onload = function(e) {
+                reader.onload = function(e) {                    
                     if ((file.name.split('.')[file.name.split('.').length - 1]).toLowerCase() == "json") {
                         var resultString = JSON.parse(reader.result);
                         for (i = 0; i < resultString.length; i++) {
@@ -514,7 +514,6 @@ console.log("screenName:", screenName);
                         openDialog("Import Testcase", "Please Check the file format you have uploaded!")
                     }
                 }
-
                 reader.readAsText(file);
                 counter2 = 1;
                 $("#overWriteJson").val('');
@@ -4656,10 +4655,10 @@ function contentTable(newTestScriptDataLS) {
             $grid.jqGrid('setCell', currRowId, 'objectName', objName);
             $grid.jqGrid('setCell', currRowId, 'url', url);
         }
-        else{
-            $grid.jqGrid('setCell', currRowId, 'objectName', objName);
-            $grid.jqGrid('setCell', currRowId, 'url', url);
-        }
+        // else{
+        //     $grid.jqGrid('setCell', currRowId, 'objectName', objName);
+        //     $grid.jqGrid('setCell', currRowId, 'url', url);
+        // }
         //get Input and Output Syntax for selected Keyword
         $.each(keywordArrayList, function(index, value) {
             keywordArrayKey = index;
