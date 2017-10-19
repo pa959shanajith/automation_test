@@ -116,6 +116,9 @@ function addVersioning(versions) {
       value: versions[i]
     }).text(versions[i]))
   }
+  if(getCookie('mm_pvid') != ''){
+    $('.version-list').val(getCookie('mm_pvid'));
+  }
   loadMindmapData1(1);
   //loadModules(versions)
 }
@@ -163,6 +166,8 @@ function loadModules(){
 			unblockUI();
 		}
 	});
+  //finally set the version in the cookie
+  setCookie('mm_pvid',active_version,15);
 
 }
 
@@ -177,7 +182,7 @@ function createNewTab(from_v,to_v){
     
    if ($('.ct-nodeBox')[0].children !== undefined && $('.ct-nodeBox')[0].children.length == 0) {
     openDialogMindmap('Error', "Cannot create Empty Version");
-    versionInputDialogClose()
+    //versionInputDialogClose()
     return;
   }
   blockUI('Loading...');
@@ -192,7 +197,7 @@ function createNewTab(from_v,to_v){
     }).text(to_v))
     unblockUI();
     openDialogMindmap('Mindmap', "New Version created successfully.");
-    versionInputDialogClose()
+    //versionInputDialogClose()
   });
 
 }
@@ -288,7 +293,7 @@ function createNewVersion(from_v) {
   }
   else {
     //show an error dialog
-    versionInputDialogClose();
+    //versionInputDialogClose();
     if(getAllVersionsUI().includes(inputVersion))
       openDialogMindmap('Error', "Version Number already exists");
 
