@@ -523,7 +523,7 @@ exports.versioning= function(req, res, next) {
                     nData.forEach(function(e,i){
                         t=e.attrs;
                         if(e.type=='version'){
-                            qList.push({"statement":"MERGE(n:VERSION{projectID:'"+prjId+"',moduleIDs:"+t.moduleIDs+",versionNumber:"+vn_to+",vn:'"+vn_to+"',versionID:'"+t.versionID+"'})"});
+                            qList.push({"statement":"MERGE(n:VERSION{projectID:'"+prjId+"',moduleIDs:"+t.moduleIDs+",versionNumber:"+vn_to+",vn:'"+vn_to+"',versionID:'"+uuidV4()+"'})"});
                         }
                         else if(e.type=='modules'){
 							var new_property=t.unique_property.slice(0,-1).concat(','+vn_to+']')
