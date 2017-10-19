@@ -29,17 +29,25 @@ function loadMindmapData(param){
 			for(i=0; i<result1.projectId.length && result1.projectName.length; i++){
 				$('.project-list').append("<option app-type='"+result1.appType[i]+"' data-id='"+result1.projectName[i]+"' value='"+result1.projectId[i]+"'>"+result1.projectName[i]+"</option>");	
 			}
-
-			if (selectedProject == null){
-				selectedProject=result1.projectName[0];
+			if(getCookie('mm_pid') != ''){
+				selectedProject=getCookie('mm_pid');
 			}
-			$(".project-list option[value='" + selectedProject + "']").attr('selected', 'selected');
+			if (selectedProject == null){
+				setCookie('mm_pid',result1.projectId[0],15);
+				selectedProject=result1.projectId[0];
+			}
+			$(".project-list").val(selectedProject);
+			//$(".project-list option[value='" + selectedProject + "']").attr('selected', 'selected');
 			if (param==1){
 				versioning_enabled=1;
 				dataSender({task:'getVersions',projectId:$(".project-list").val(),versioning:1},function(err,result){
 				if(err){ console.log(err);callback(null,err);}
 				else{
-					addVersioning(result);			
+					addVersioning(result);	
+					if(getCookie('mm_pvid') ==''){
+					setCookie('mm_pvid',$('.version-list').children()[0].value,15);
+					$('.version-list').val($('.version-list').children()[0].value);		
+					}		
 				}
 			});
 			}
@@ -59,11 +67,14 @@ function loadMindmapData(param){
 					dataSender({task:'getVersions',projectId:$(".project-list").val(),versioning:1},function(err,result){
 					if(err){ console.log(err);callback(null,err);}
 					else{
-						addVersioning(result);			
+						addVersioning(result);
+						setCookie('mm_pvid',$('.version-list').children()[0].value,15);
+						$('.version-list').val($('.version-list').children()[0].value);			
 					}
 				});
 				}
 				loadMindmapData1(param);
+				setCookie('mm_pid',selectedProject,15);
 			});
 			//Calling the function to restrict the user to give default node names
 			$("#ct-canvas").click(callme);
@@ -1864,4 +1875,28 @@ function openDialogMindmap(title, body){
 	}
 	
 	
+}
+
+/* function to set a Browser cookie */
+function setCookie(cname, cvalue, exdays) {
+    var d = new Date();
+    d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+    var expires = "expires="+d.toUTCString();
+    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+}
+
+/* function to get a Browser cookie */
+function getCookie(cname) {
+    var name = cname + "=";
+    var ca = document.cookie.split(';');
+    for(var i = 0; i < ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0) == ' ') {
+            c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length);
+        }
+    }
+    return "";
 }

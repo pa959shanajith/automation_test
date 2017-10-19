@@ -116,6 +116,9 @@ function addVersioning(versions) {
       value: versions[i]
     }).text(versions[i]))
   }
+  if(getCookie('mm_pvid') != ''){
+    $('.version-list').val(getCookie('mm_pvid'));
+  }
   //loadModules(versions)
 }
 
@@ -162,6 +165,8 @@ function loadModules(){
 			unblockUI();
 		}
 	});
+  //finally set the version in the cookie
+  setCookie('mm_pvid',active_version,15);
 
 }
 
