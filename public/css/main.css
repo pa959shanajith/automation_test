@@ -3712,6 +3712,7 @@ li.select_all .addCustObj{
     position: absolute;
     right: 45px;
     top: 5px;
+    visibility: hidden;
 }
 
 .actionOnHover img{
