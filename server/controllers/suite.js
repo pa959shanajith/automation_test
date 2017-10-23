@@ -1445,6 +1445,7 @@ function updatescenariodetailsinsuite(req, cb, data) {
 				"createdon": new Date(suiterowdetails.createdon).getTime().toString(),
 				"createdthrough": "createdthrough",
 				"deleted": false,
+				"history":suiterowdetails.history,
 				"donotexecute": donotexecute1,
 				"getparampaths": getparampath1,
 				"modifiedby": "Ninteen68_admin",
