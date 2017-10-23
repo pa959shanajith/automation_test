@@ -321,18 +321,6 @@ mySPA.controller('scheduleController',['$scope','$http','$timeout','$location','
 				var suiteInfo = {};
 				var selectedScenarioData = [];
 				if($(this).find(".selectScheduleSuite").is(":checked")){
-					$(this).find(".scenarioSchdCon tbody tr").each(function(){
-						selectedScenarioData.push({
-							condition : parseInt($(this).children("td:nth-child(4)").find("select option:selected").val()),
-							dataparam : [$(this).children("td:nth-child(3)").find("input").val()],
-							executestatus : 1,
-							scenarioids : $(this).children("td:nth-child(2)").data("scenarioid"),
-							scenarioname: $(this).children("td:nth-child(2)").text()
-						})
-					})
-					suiteInfo.suiteDetails = selectedScenarioData;
-					suiteInfo.testsuitename = $(this).children('.scheduleSuite').find(".scheduleSuiteName").text();
-					suiteInfo.testsuiteid = $(this).children('.scheduleSuite').find(".scheduleSuiteName").data("testsuiteid");
 					var sldate = $(this).children('.scheduleSuite').find(".datePicContainer .fc-datePicker").val();
 					var sltime = $(this).children('.scheduleSuite').find(".timePicContainer .fc-timePicker").val();
 					var sldate_2 = sldate.split("-");
@@ -367,18 +355,45 @@ mySPA.controller('scheduleController',['$scope','$http','$timeout','$location','
 							return false;
 						}
 					}
-					suiteInfo.browserType = browserTypeExe;
-					suiteInfo.reschedule = false;
-					suiteInfo.scheduleid = "";
-					suiteInfo.userInfo = JSON.parse(window.localStorage['_UI'])
-					var scenarioDetails = JSON.parse(window.localStorage["_CT"]).testSuiteDetails;
-					for(var i=0; i<scenarioDetails.length;i++){
-						if(scenarioDetails[i].testsuiteid == suiteInfo.testsuiteid){
-							suiteInfo.cycleid = scenarioDetails[i].cycleid;
+					var chkExistDT = $(".scheduleDataBodyRowChild");
+					for(i=0;i<chkExistDT.length;i++){
+						var cEd = chkExistDT[i].children[0].innerText.split(" ")[0];
+						var cEt = chkExistDT[i].children[0].innerText.split(" ")[1];
+						var cEDd = cEd.split("-");
+						var cETt = cEt.split(":");
+						//if(chkExistDT[i].children[0].innerText == (sldate_2[2]+"-"+sldate_2[1]+"-"+sldate_2[0]+" "+sltime) && chkExistDT[i].children[5].innerText.trim() == "scheduled" && chkExistDT[i].children[1].innerText.trim() == suiteInfo.Ip){
+						if(new Date(cEDd[0], cEDd[1]-1, cEDd[2], cETt[0], cETt[1]).toString() == new Date(sldate_2[2],sldate_2[1]-1,sldate_2[0],sltime_2[0],sltime_2[1]).toString() && chkExistDT[i].children[5].innerText.trim() == "scheduled" && chkExistDT[i].children[1].innerText.trim() == suiteInfo.Ip){
+							doNotSchedule = true;
+							openModelPopup("Schedule Test Suite", "Selected host already scheduled for given time.");
 							break;
 						}
 					}
-					moduleInfo.push(suiteInfo);
+					if(doNotSchedule == false){					
+						$(this).find(".scenarioSchdCon tbody tr").each(function(){
+							selectedScenarioData.push({
+								condition : parseInt($(this).children("td:nth-child(4)").find("select option:selected").val()),
+								dataparam : [$(this).children("td:nth-child(3)").find("input").val()],
+								executestatus : 1,
+								scenarioids : $(this).children("td:nth-child(2)").data("scenarioid"),
+								scenarioname: $(this).children("td:nth-child(2)").text()
+							})
+						})
+						suiteInfo.suiteDetails = selectedScenarioData;
+						suiteInfo.testsuitename = $(this).children('.scheduleSuite').find(".scheduleSuiteName").text();
+						suiteInfo.testsuiteid = $(this).children('.scheduleSuite').find(".scheduleSuiteName").data("testsuiteid");
+						suiteInfo.browserType = browserTypeExe;
+						suiteInfo.reschedule = false;
+						suiteInfo.scheduleid = "";
+						suiteInfo.userInfo = JSON.parse(window.localStorage['_UI'])
+						var scenarioDetails = JSON.parse(window.localStorage["_CT"]).testSuiteDetails;
+						for(var i=0; i<scenarioDetails.length;i++){
+							if(scenarioDetails[i].testsuiteid == suiteInfo.testsuiteid){
+								suiteInfo.cycleid = scenarioDetails[i].cycleid;
+								break;
+							}
+						}
+						moduleInfo.push(suiteInfo);
+					}
 				}
 			})
 			if(doNotSchedule == false){				
