@@ -142,7 +142,7 @@ exports.mindmapService = function(req, res) {
 					idDict[e.id]=(e.id_n)?e.id_n:uuidV4();
 					e.id=idDict[e.id];
 					t=e.task;
-					var taskstatus='inprogress';
+					var taskstatus='assigned';
 					if(e.type=='modules_endtoend'){
 						if(e.oid!=null){			
 							qList.push({"statement":"MATCH (n)-[r:FMTTS{id:'"+e.id+"'}]->(o:TESTSCENARIOS) DETACH DELETE r,o;"});
@@ -326,7 +326,7 @@ exports.mindmapService = function(req, res) {
 					idDict[e.id]=(e.id_n)?e.id_n:uuidV4();
 					e.id=idDict[e.id];
 					t=e.task;
-					var taskstatus='inprogress';
+					var taskstatus='assigned';
 					if(e.type=='modules_endtoend'){
 						if(e.oid!=null){
 							qList.push({"statement":"MATCH (n)-[r:FMTTS{id:'"+e.id+"'}]->(o:TESTSCENARIOS) DETACH DELETE r,o"});
@@ -649,28 +649,89 @@ exports.mindmapService = function(req, res) {
 		}else if(d.task=='reviewTask'){
 			//var prjId=d.prjId;
 			var taskID=d.taskId;
-			query={'statement':"MATCH (n:TASKS) WHERE n.taskID='"+taskID+"' and n.assignedTo='"+d.userId+"' RETURN n.reviewer"};
+			var date=new Date();
+
+			var cur_date=date.getDate()+"/"+(date.getMonth()+1)+"/"+date.getFullYear()+','+date.toLocaleTimeString();
+			var taskHistory={"userid":d.userId,"status":"","modifiedBy":d.user_name,"modifiedOn":cur_date};
+			if (d.status=='inprogress' || d.status=='assigned'|| d.status=='reassigned' || d.status=='reassign'){
+				query={'statement':"MATCH (n:TASKS) WHERE n.taskID='"+taskID+"' and n.assignedTo='"+d.userId+"' RETURN n"};
+			}else if(d.status=='reveiw'){
+				query={'statement':"MATCH (n:TASKS) WHERE n.taskID='"+taskID+"' and n.reviewer='"+d.userId+"' RETURN n"};
+			}
+			// else if(d.status=='reassign'){
+			// 	query={'statement':"MATCH (n:TASKS) WHERE n.taskID='"+taskID+"' and n.assignedTo='"+d.userId+"' RETURN n"};
+			// }
+			
 			var qlist_query=[query];
+			var new_queries='';
+			var task_flag=false;
 			neo4jAPI.executeQueries(qlist_query,function(status,result){
-					//res.setHeader('Content-Type', 'application/json');
-					if(status!=200) res.status(status).send(result);
-					else{
+					//res.setHeader('Content-Type','application/json');
+					if(status!=200) {
+						res.status(status).send(result);
+					}else{
 						try{
 							res_data=JSON.parse(result);
-							if(res_data[0].data.length!= 0){
-								if(res_data[0].data[0].row[0] != null && res_data[0].data[0].row[0] != 'select reviewer'){
-									query={'statement':"MATCH (n:TASKS) WHERE n.taskID='"+taskID+"' and n.assignedTo='"+d.userId+"' set n.task_owner=n.assignedTo,n.assignedTo=n.reviewer,n.status='review' RETURN n"};
-									var qlist_query=[query];
-										neo4jAPI.executeQueries(qlist_query,function(status,result){
-											res.setHeader('Content-Type', 'application/json');
+							if(res_data[0].data.length!= 0 && res_data[0].data[0].row[0] != null){
+								var task=res_data[0].data[0].row[0];
+								var neo_taskHistory=task.taskHistory;
+								if((d.status=='inprogress' || d.status=='assigned' || d.status=='reassigned') && task.reviewer != 'select reviewer'){
+									taskHistory.status='review';
+									if (neo_taskHistory==undefined || neo_taskHistory==''){
+										neo_taskHistory=[taskHistory];
+									}else{
+										neo_taskHistory=JSON.parse(neo_taskHistory)
+										neo_taskHistory.push(taskHistory);
+										
+									}
+									neo_taskHistory=JSON.stringify(neo_taskHistory);
+									
+									query={'statement':"MATCH (n:TASKS) WHERE n.taskID='"+taskID+"' and n.assignedTo='"+d.userId+"' set n.task_owner=n.assignedTo,n.assignedTo=n.reviewer,n.status='review',n.taskHistory='"+neo_taskHistory+"' RETURN n"};
+									new_queries=[query];
+									task_flag=true;
+									
+								}else if(d.status=='review'){
+									taskHistory.status='complete';
+									if (neo_taskHistory==undefined || neo_taskHistory==''){
+										neo_taskHistory=[taskHistory];
+									}else{
+										neo_taskHistory=JSON.parse(neo_taskHistory)
+										neo_taskHistory.push(taskHistory);
+										
+									}
+									neo_taskHistory=JSON.stringify(neo_taskHistory);
+									query={'statement':"MATCH (n:TASKS) WHERE n.taskID='"+taskID+"' and n.reviewer='"+d.userId+"' set n.assignedTo='',n.status='complete',n.taskHistory='"+neo_taskHistory+"' RETURN n"};
+									new_queries=[query];
+									task_flag=true;
+								}else if(d.status=='reassign'){
+									taskHistory.status='reassigned';
+									if (neo_taskHistory==undefined || neo_taskHistory==''){
+										neo_taskHistory=[taskHistory];
+									}else{
+										neo_taskHistory=JSON.parse(neo_taskHistory)
+										neo_taskHistory.push(taskHistory);
+										
+									}
+									neo_taskHistory=JSON.stringify(neo_taskHistory);
+									query={'statement':"MATCH (n:TASKS) WHERE n.taskID='"+taskID+"' and n.reviewer='"+d.userId+"' set n.reviewer=n.assignedTo,n.assignedTo=n.task_owner,n.status='reassigned',n.taskHistory='"+neo_taskHistory+"' RETURN n"};
+									new_queries=[query];
+									task_flag=true;
+								}
+								if(task_flag){
+									neo4jAPI.executeQueries(new_queries,function(status,result){
+											//res.setHeader('Content-Type','application/json');
 											if(status!=200) res.status(status).send(result);
 											else res.status(200).send('success');
+									
 									});
 								}else{
 									res.status(200).send('fail');
 								}
-							}else{
-								res.status(200).send('Tasksubmitted');
+								
+								
+							}
+							else{
+								res.status(200).send('fail');
 							}
 						}catch(ex){
 							console.log(ex);

@@ -277,6 +277,7 @@ if (cluster.isMaster) {
     var webCrawler = require('./server/controllers/webCrawler');
     var chatbot = require('./server/controllers/chatbot');
     var neuronGraphs2D = require('./server/controllers/neuronGraphs2D');
+    var taskbuilder=require('./server/controllers/taskJson');
 
     // Mindmap Routes
     app.post('/home', mindmap.mindmapService);
@@ -337,6 +338,7 @@ if (cluster.isMaster) {
     //Plugin Routes
     app.post('/getProjectIDs_Nineteen68', plugin.getProjectIDs_Nineteen68);
     app.post('/getTaskJson_Nineteen68', plugin.getTaskJson_Nineteen68);
+    app.post('/updateTaskstatus_mindmaps', taskbuilder.updateTaskstatus_mindmaps);
     //Utility plugins
     app.post('/Encrypt_ICE', utility.Encrypt_ICE);
     // Wecoccular Plugin

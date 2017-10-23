@@ -2,6 +2,26 @@ var create_ice = require('../controllers/create_ice');
 var async = require('async');
 var neo4jAPI = require('../controllers/neo4jAPI');
 
+exports.updateTaskstatus_mindmaps = function (obj, cb, data) {
+	try {
+		//query={'statement':"MATCH (n:TASKS) WHERE n.assignedTo='"+obj.userid+"' RETURN n"};
+		/*Neo4j query changed to return both the task node and it's associated module/screen/scenario/testcase node */
+		var qlist_query = [{'statement': "MATCH (n:TASKS{taskID:'"+obj+"'}) set n.status=inprogress"}];
+		neo4jAPI.executeQueries(qlist_query,function(status,result){
+			if(status!=200) {
+				console.log(result);
+			}
+			else {
+				console.log('inprogress');
+				cb(null,'inprogress');
+			}
+		});
+	} catch (error) {
+		console.log(error);
+	}
+};
+
+
 exports.getTaskJson_mindmaps = function (obj, cb, data) {
 	try {
 		//query={'statement':"MATCH (n:TASKS) WHERE n.assignedTo='"+obj.userid+"' RETURN n"};

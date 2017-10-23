@@ -72,13 +72,18 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
         $scope.errorMessage = "";
     }
     //Default Function to reset all input, select
-
-    var getTaskName = JSON.parse(window.localStorage['_CT']).taskName;
-    appType = JSON.parse(window.localStorage['_CT']).appType;
-    screenName = JSON.parse(window.localStorage['_CT']).screenName;
-    testCaseName = JSON.parse(window.localStorage['_CT']).testCaseName;
-    subTaskType = JSON.parse(window.localStorage['_CT']).subTaskType;
-    subTask = JSON.parse(window.localStorage['_CT']).subtask;
+    var current_task=JSON.parse(window.localStorage['_CT']);
+    var getTaskName = current_task.taskName;
+    appType = current_task.appType;
+    screenName = current_task.screenName;
+    testCaseName = current_task.testCaseName;
+    subTaskType = current_task.subTaskType;
+    subTask = current_task.subtask;
+    status = current_task.status;
+	if(status=='review'){
+				$('.submitTaskBtn').text('Approve');
+				$('.reassignTaskBtn').show();
+	}
     $("#page-taskName").empty().append('<span class="taskname">' + getTaskName + '</span>');
     $(".projectInfoWrap").empty()
     //Loading Project Info
@@ -195,17 +200,32 @@ console.log("screenName:", screenName);
     var keywordValArr = [];
     var proceed = false;
 
-    //Submit Task Screen
-    $scope.submitTasksScreen = function() {
-        $("#submitTasksScreen").modal("show")
-    }
-    //Submit Task Screen
+//Submit Task Screen
+	$scope.submitTasksScreen = function(action){
+		$("#submitTasksScreen").modal("show")
+		if(action=='reassign'){
+			$("#submitTasksScreen").find('.modal-body p').text('Are you sure you want to reassign the task ?')
+			$("#submitTasksScreen").find('.modal-footer button')[0].setAttribute('onclick',"submit_task('reassign')")
+		}
+        // else{
+        //     $("#submitTasksScreen").find('.modal-footer button')[0].setAttribute('onclick',"submit_task('"+action+"')")
+        // }
+	}
+	//Submit Task Screen
 
-    //Submit Tast Test Case
-    $scope.submitTasksTestCase = function() {
-        $("#submitTasksTestCase").modal("show")
-    }
-    //Submit task Test Case
+	//Submit Tast Test Case
+	$scope.submitTasksTestCase = function(action){
+		
+		$("#submitTasksTestCase").modal("show")
+		if(action=='reassign'){
+			$("#submitTasksTestCase").find('.modal-body p').text('Are you sure you want to reassign the task ?')
+			$("#submitTasksTestCase").find('.modal-footer button')[0].setAttribute('onclick',"submit_task('reassign')")
+		}
+        // else{
+        //     $("#submitTasksTestCase").find('.modal-footer button')[0].setAttribute('onclick',"submit_task('"+action+"')")
+        // }
+	}
+	//Submit task Test Case
 
     $scope.readTestCase_ICE = function() {
         var taskInfo = JSON.parse(window.localStorage['_CT']);

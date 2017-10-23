@@ -194,6 +194,16 @@ body {
     outline: 0;
 }
 
+.reassignTaskBtn.focus,
+.reassignTaskBtn,
+.reassignTaskBtn:active:focus,
+.reassignTaskBtn:focus,
+.reassignTaskBtn:hover {
+	background:#ff7300
+}
+
+
+
 .submitTaskBtn.focus,
 .submitTaskBtn,
 .submitTaskBtn:active:focus,

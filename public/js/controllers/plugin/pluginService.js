@@ -17,6 +17,13 @@ mySPA.factory('PluginService', ['$http','$q', function ($http, $httpProvider, $q
 	        })
 			.then (function(response)	{return response.data;	},
 			function(response){	return $q.reject(response.data);});	
+    	},
+			updateTaskStatus: function(obj){
+	        return $http.post('/updateTaskStatus_Nineteen68', {
+              obj : obj, 
+	        })
+			.then (function(response)	{return response.data;	},
+			function(response){	return $q.reject(response.data);});	
     	}
   }
 }]);
