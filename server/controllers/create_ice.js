@@ -1814,3 +1814,59 @@ exports.createE2E_Structure_Nineteen68 = function (req, res) {
 		}
 	});
 };
+
+exports.getEmptyProjects_ICE = function (req, res) {
+	var projectdetails = {
+		projectId: [],
+		projectName: [],
+	};
+	var user_id = req.userid;
+	var inputs1 = {
+		"userid": user_id,
+		"query": "getprojids"
+	};
+	args1 = {
+		data: inputs1,
+		headers: {
+			"Content-Type": "application/json"
+		}
+	};
+	async.series({
+		function (callback) {
+			client.post("http://127.0.0.1:1990/create_ice/getProjectIDs_Nineteen68", args1,
+				function (result, response) {
+				if (response.statusCode != 200 || result.rows == "fail") {
+					res(null, result.rows);
+				} else if (result.rows[0] == null || result.rows[0].projectids==null) {
+					res(null, "fail");
+				} else {
+					var res_projectid = result.rows[0].projectids;
+					inputs2 = {
+						"projectids": res_projectid,
+					};
+					args2 = {
+						data: inputs2,
+						headers: {
+							"Content-Type": "application/json"
+						}
+					};
+					client.post("http://127.0.0.1:1990/create_ice/getEmptyProjects_ICE", args2,
+						function (emptyProjectData, response) {
+						if (response.statusCode != 200 || emptyProjectData.rows == "fail") {
+							res(null, emptyProjectData.rows);
+						} else {
+							projectdetails=emptyProjectData.rows;
+							callback();
+						}
+					});
+				}
+			});
+		}
+	}, function (err, results) {
+		try {
+			res(null, projectdetails);
+		} catch (ex) {
+			console.log(ex);
+		}
+	});
+};
