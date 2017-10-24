@@ -340,7 +340,7 @@ mySPA.controller('scheduleController',['$scope','$http','$timeout','$location','
 						doNotSchedule = true;
 						return false;
 					}
-					if((new Date(sldate_2[2],(sldate_2[1]-1),sldate_2[0]).toString() == new Date(dt.getFullYear(),dt.getMonth(),dt.getDate()).toString()) && (parseInt(sltime_2[1]) <= new Date().getMinutes()+5)){
+					if((new Date(sldate_2[2],(sldate_2[1]-1),sldate_2[0]).toString() == new Date(dt.getFullYear(),dt.getMonth(),dt.getDate()).toString()) && (sltime <= (new Date().getHours()+":"+(new Date().getMinutes()+5)))){
 						$(this).children('.scheduleSuite').find(".timePicContainer .fc-timePicker").prop("style","border: 2px solid red;");
 						openModelPopup("Schedule Test Suite", "Schedule time must be 5 mins more than current time.");
 						doNotSchedule = true;
