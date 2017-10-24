@@ -319,7 +319,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 			assignedProj.projectName = $(this).text();
 			assignedProjects.push(assignedProj);
 		});
-		if (assignedProjects.length != 0){
+		//if (assignedProjects.length != 0){
 			//var domainId = $('#selAssignProject option:selected').val();
 			var userDetails = JSON.parse(window.localStorage['_UI']);
 			var userId = $("#selAssignUser option:selected").attr("data-id");
@@ -331,8 +331,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 //			assignProjectsObj.unAssignedProjects = unAssignedProjects;
 			assignProjectsObj.assignedProjects = assignedProjects;;
 			assignProjectsObj.getAssignedProjectsLen = getAssignedProjectsLen;
-
-			console.log(assignProjectsObj);
+			//console.log(assignProjectsObj);
 			adminServices.assignProjects_ICE(assignProjectsObj)
 			.then(function (data) {
 				if(data == "Invalid Session"){
@@ -340,7 +339,10 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 				}
 				if(data == 'success')
 				{
-					openModelPopup("Assign Projects", "Projects assigned to user successfully");
+					if (assignedProjects.length != 0)
+						openModelPopup("Assign Projects", "Projects assigned to user successfully");
+					else
+						openModelPopup("Assign Projects", "Projects unassigned successfully");
 					resetAssignProjectForm();
 				}
 				else{
@@ -348,13 +350,10 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 				}
 
 			}, function (error) { console.log("Error:::::::::::::", error) })
-
-		}
-		else {
-			openModelPopup("Assign Projects", "Please add project/s");
-
-		}
-
+		// }
+		// else {
+		// 	openModelPopup("Assign Projects", "Please add project/s");
+		// }
 	};
 
 	$("#projectTab").on('click',function() {
