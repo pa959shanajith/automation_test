@@ -2331,9 +2331,45 @@ console.log("screenName:", screenName);
             //window.localStorage['disableEditing'] = "true";
             //Pushing custom object in array
             $.each($(".addObj-row"), function() {
+                var typeOfElement;
+                var eleType = $(this).find("select option:selected").val();
+                switch(eleType){
+                    case "button":
+                        typeOfElement = "btn";
+                        break;
+                    case "checkbox":
+                        typeOfElement = "chkbox";
+                        break;
+                    case "select":
+                        typeOfElement = "select";
+                        break;
+                    case "img":
+                        typeOfElement = "img";
+                        break;
+                    case "a":
+                        typeOfElement = "lnk";
+                        break;
+                    case "radiobutton":
+                        typeOfElement = "radiobtn";
+                        break;
+                    case "input":
+                        typeOfElement = "txtbox";
+                        break;
+                    case "list":
+                        typeOfElement = "lst";
+                        break;
+                    case "table":
+                        typeOfElement = "tbl";
+                        break;
+                    case "Element":
+                        typeOfElement = "elmnt";
+                        break;
+                    default:
+                        break;
+                }
                 customObj.push({
-                    custname: $(this).find("input").val(),
-                    tag: $(this).find("select option:selected").val(),
+                    custname: $(this).find("input").val()+"_"+typeOfElement,
+                    tag: eleType,
                     xpath: ''
                 })
             })
