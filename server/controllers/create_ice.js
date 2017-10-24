@@ -1870,3 +1870,32 @@ exports.getEmptyProjects_ICE = function (req, res) {
 		}
 	});
 };
+
+exports.submitTask = function (req, res) {
+	var taskdetails=req.taskdetails;
+	inputs={
+		'status':req.status,
+		'table':taskdetails.labels[0],
+		'details':taskdetails.properties,
+		'username':req.user,
+		'versionnumber':req.versionnumber
+	}
+	args = {
+		data: inputs,
+		headers: {
+			"Content-Type": "application/json"
+		}
+	};
+	client.post("http://127.0.0.1:1990/create_ice/submitTask", args,
+		function (result, response) {
+		try {
+			if (response.statusCode != 200 || result.rows == "fail") {
+				res(null, result.rows);
+			} else {
+				console.log(result);
+			}
+		} catch (ex) {
+			console.log(ex);
+		}
+	});
+};

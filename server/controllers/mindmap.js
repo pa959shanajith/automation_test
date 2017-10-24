@@ -654,9 +654,11 @@ exports.mindmapService = function(req, res) {
 			var cur_date=date.getDate()+"/"+(date.getMonth()+1)+"/"+date.getFullYear()+','+date.toLocaleTimeString();
 			var taskHistory={"userid":d.userId,"status":"","modifiedBy":d.user_name,"modifiedOn":cur_date};
 			if (d.status=='inprogress' || d.status=='assigned'|| d.status=='reassigned' || d.status=='reassign'){
-				query={'statement':"MATCH (n:TASKS) WHERE n.taskID='"+taskID+"' and n.assignedTo='"+d.userId+"' RETURN n"};
-			}else if(d.status=='reveiw'){
-				query={'statement':"MATCH (n:TASKS) WHERE n.taskID='"+taskID+"' and n.reviewer='"+d.userId+"' RETURN n"};
+				//query={'statement':"MATCH (n:TASKS) WHERE n.taskID='"+taskID+"' and n.assignedTo='"+d.userId+"' RETURN n"};
+				query={'statement':"MATCH (n:TASKS) WHERE n.taskID='"+taskID+"' and n.assignedTo='"+d.userId+"' with n as n Match path=(n)<-[r]-(a) RETURN path","resultDataContents":["graph"]};
+			}else if(d.status=='review'){
+				//query={'statement':"MATCH (n:TASKS) WHERE n.taskID='"+taskID+"' and n.reviewer='"+d.userId+"' RETURN n"};
+				query={'statement':"MATCH (n:TASKS) WHERE n.taskID='"+taskID+"' and n.reviewer='"+d.userId+"' with n as n Match path=(n)<-[r]-(a) RETURN path","resultDataContents":["graph"]};
 			}
 			// else if(d.status=='reassign'){
 			// 	query={'statement':"MATCH (n:TASKS) WHERE n.taskID='"+taskID+"' and n.assignedTo='"+d.userId+"' RETURN n"};
@@ -672,8 +674,19 @@ exports.mindmapService = function(req, res) {
 					}else{
 						try{
 							res_data=JSON.parse(result);
-							if(res_data[0].data.length!= 0 && res_data[0].data[0].row[0] != null){
-								var task=res_data[0].data[0].row[0];
+							//if(res_data[0].data.length!= 0 && res_data[0].data[0].row[0] != null){
+							if(res_data[0].data.length!= 0 && res_data[0].data[0]['graph']['nodes'] != null){
+								//var task=res_data[0].data[0].row[0];
+								var task = '';
+								var task_relation='';
+								if(res_data[0].data[0]['graph']['nodes'][0].labels[0]=='TASKS'){
+									task=res_data[0].data[0]['graph']['nodes'][0];
+									task_relation = res_data[0].data[0]['graph']['nodes'][1];
+								}
+								else{
+									task=res_data[0].data[0]['graph']['nodes'][1];
+									task_relation = res_data[0].data[0]['graph']['nodes'][0];
+								}
 								var neo_taskHistory=task.taskHistory;
 								if((d.status=='inprogress' || d.status=='assigned' || d.status=='reassigned') && task.reviewer != 'select reviewer'){
 									taskHistory.status='review';
@@ -718,6 +731,17 @@ exports.mindmapService = function(req, res) {
 									task_flag=true;
 								}
 								if(task_flag){
+									inputs = {
+										'status':taskHistory.status,
+										'taskdetails':task_relation,
+										'user':d.user_name,
+										'versionnumber':d.versionnumber
+									}
+									create_ice.submitTask(inputs,function(err,data){
+										res.setHeader('Content-Type', 'application/json');
+										if(err)
+											res.status(500).send(err)
+									});
 									neo4jAPI.executeQueries(new_queries,function(status,result){
 											//res.setHeader('Content-Type','application/json');
 											if(status!=200) res.status(status).send(result);

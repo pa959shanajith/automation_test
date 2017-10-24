@@ -1458,10 +1458,11 @@ var submit_task=function(action){
 	var taskinfo=JSON.parse(window.localStorage['_CT']);
 	var taskid=taskinfo.subTaskId;
 	var taskstatus=taskinfo.status;
+	var version=taskinfo.versionnumber;
 	if (action!=undefined && action=='reassign'){
 		taskstatus=action;
 	}
-	dataSender({task:'reviewTask',prjId:$(".project-list").val(),taskId:taskid,userId:userid,status:taskstatus,user_name:username},function(err,result){
+	dataSender({task:'reviewTask',prjId:$(".project-list").val(),taskId:taskid,userId:userid,status:taskstatus,user_name:username,versionnumber:version},function(err,result){
 		if(err) console.log(result);
 		else{
 			if (result=='fail'){
