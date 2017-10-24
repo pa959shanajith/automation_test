@@ -1,8 +1,6 @@
 /**
  * Dependencies.
  */
-//var dbConn = require('../../server/config/cassandra');
-//var dbConnICE = require('../../server/config/icetestautomation');
 var bcrypt = require('bcrypt');
 var async = require('async');
 var epurl = "http://127.0.0.1:1990/";

@@ -335,9 +335,10 @@ if (cluster.isMaster) {
     app.post('/getReport_Nineteen68', report.getReport_Nineteen68);
     app.post('/exportToJson_ICE', report.exportToJson_ICE);
     app.post('/openScreenShot', report.openScreenShot);
+
     //Plugin Routes
     app.post('/getProjectIDs_Nineteen68', plugin.getProjectIDs_Nineteen68);
-    app.post('/getTaskJson_Nineteen68', plugin.getTaskJson_Nineteen68);
+    app.post('/getTaskJson_mindmaps', taskbuilder.getTaskJson_mindmaps);
     app.post('/updateTaskstatus_mindmaps', taskbuilder.updateTaskstatus_mindmaps);
     //Utility plugins
     app.post('/Encrypt_ICE', utility.Encrypt_ICE);

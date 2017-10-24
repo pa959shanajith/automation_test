@@ -4,7 +4,6 @@
 var async = require('async');
 var myserver = require('../../server.js');
 var uuid = require('uuid-random');
-//var dbConnICE = require('../../server/config/icetestautomation');
 var epurl = "http://127.0.0.1:1990/";
 var Client = require("node-rest-client").Client;
 var client = new Client();

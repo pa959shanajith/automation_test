@@ -1,7 +1,6 @@
 /**
  * Dependencies.
  */
-// var dbConn = require('../../server/config/icetestautomation');
 var myserver = require('../../server.js');
 var async = require('async');
 var parse = require('xml-parser');

@@ -2,11 +2,8 @@
     "ldap_ip":"142.102.27.242",
     "ldap_port":"389",
     "ldap_domain":"psys.com",
-    "host":"10.41.31.66",
-    "username": "nineteen68",
-    "password": "TA@SLK2017",
     "screenShotPath": "",
-    "n4jhost": "localhost:7474",
-    "n4jusername": "neo4j",
-    "n4jpassword": "local7474"
+    "host": "localhost:7474",
+    "username": "neo4j",
+    "password": "local7474"
 }

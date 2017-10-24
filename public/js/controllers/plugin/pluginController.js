@@ -39,7 +39,7 @@ mySPA.controller('pluginController',['$scope','$window','$http','$location','$ti
 			if(data != "Fail" && data != "Invalid Session")
 			{
 				var obj={'userid':userid,'prjId':data};
-				PluginService.getTaskJson_Nineteen68(obj)
+				PluginService.getTaskJson_mindmaps(obj)
 				.then(function (data) {
 					if(data == "Invalid Session")
 					{

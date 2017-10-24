@@ -1,8 +1,6 @@
 /**
  * Dependencies.
  */
-//var dbConn = require('../../server/config/cassandra');
-//var dbConnICE = require('../../server/config/icetestautomation');
 var bcrypt = require('bcrypt');
 var async = require('async');
 var Client = require("node-rest-client").Client;

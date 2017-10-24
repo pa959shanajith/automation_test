@@ -1,10 +1,9 @@
-var configJson = require('../../server/config/options');
+var config = require('../../server/config/config');
 var Client = require("node-rest-client").Client;
 var client = new Client();
-var neoConfig = configJson.storageConfig;
-var neoURL = "http://" + neoConfig.n4jhost + "/db/data/transaction/commit";
+var neoURL = "http://" + config.host + "/db/data/transaction/commit";
 var requestHeaders = {
-	'Authorization': 'Basic ' + new Buffer(neoConfig.n4jusername + ':' + neoConfig.n4jpassword).toString('base64'),
+	'Authorization': 'Basic ' + new Buffer(config.username + ':' + config.password).toString('base64'),
 	'Accept': 'application/json,text/plain',
 	'Content-Type': 'application/json',
 };
