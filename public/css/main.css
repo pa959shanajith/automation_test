@@ -194,6 +194,16 @@ body {
     outline: 0;
 }
 
+.reassignTaskBtn.focus,
+.reassignTaskBtn,
+.reassignTaskBtn:active:focus,
+.reassignTaskBtn:focus,
+.reassignTaskBtn:hover {
+	background:#ff7300
+}
+
+
+
 .submitTaskBtn.focus,
 .submitTaskBtn,
 .submitTaskBtn:active:focus,
@@ -3712,6 +3722,7 @@ li.select_all .addCustObj{
     position: absolute;
     right: 45px;
     top: 5px;
+    visibility: hidden;
 }
 
 .actionOnHover img{

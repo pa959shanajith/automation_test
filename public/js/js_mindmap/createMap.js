@@ -3,6 +3,7 @@ var activeNode,childNode,uNix,uLix,node,link,dNodes,dLinks,allMMaps,temp,rootInd
 var deletednode=[],unassignTask=[],deletednode_info=[];
 var userInfo =  JSON.parse(window.localStorage['_UI']);
 var userid = userInfo.user_id;
+var username = userInfo.username;
 // node_names_tc keep track of testcase names to decide reusability of testcases
 var node_names_tc=[];
 var saveFlag=false;
@@ -1453,19 +1454,28 @@ var treeIterator = function(c,d,e){
 	return e;
 };
 
-var submit_task=function(e){
+var submit_task=function(action){
 	var taskinfo=JSON.parse(window.localStorage['_CT']);
 	var taskid=taskinfo.subTaskId;
-	//alert(taskinfo.subTaskId);
-	dataSender({task:'reviewTask',prjId:taskinfo.projectId,taskId:taskid,userId:userid},function(err,result){
+	var taskstatus=taskinfo.status;
+	var version=taskinfo.versionnumber;
+	var batchTaskIDs=taskinfo.batchTaskIDs;
+	if (action!=undefined && action=='reassign'){
+		taskstatus=action;
+	}
+	dataSender({task:'reviewTask',prjId:$(".project-list").val(),taskId:taskid,userId:userid,status:taskstatus,user_name:username,versionnumber:version,batchIds:batchTaskIDs},function(err,result){
 		if(err) console.log(result);
 		else{
-			console.log(result);
 			if (result=='fail'){
 				openDialogMindmap("Task Submission Error", "Reviewer is not assigned !")
-			}else if(result=='Tasksubmitted'){
-				openDialogMindmap("Task Submission Error", "Task Already Submitted!")
-			}else{
+			}
+			else if(taskstatus=='reassign'){
+				openDialogMindmap("Task Reassignment Success", "Task Reassigned scucessfully!")
+			}
+			else if(taskstatus=='review'){
+				openDialogMindmap("Task Completion Success", "Task Approved scucessfully!")
+			}
+			else{
 				openDialogMindmap("Task Submission Success", "Task Submitted scucessfully!")
 			}
 		}
@@ -1824,6 +1834,8 @@ function openDialogMindmap(title, body){
 			$("#mindmapGlobalDialog").find('.btn-default').focus();					
 		}, 300);
 	}else if(window.location.pathname == '/designTestCase' || window.location.pathname == '/design' ||window.location.pathname == '/execute'){
+		$("#globalTaskSubmit").find('.modal-title').text(title);
+		$("#globalTaskSubmit").find('.modal-body p').text(body);
 		$("#globalTaskSubmit").modal("show");
 	}
 	

@@ -27,16 +27,22 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 	{
 		window.location.href = "/";
 	}
-	var getTaskName = JSON.parse(window.localStorage['_CT']).taskName;
-	appType = JSON.parse(window.localStorage['_CT']).appType;
+	var current_task=JSON.parse(window.localStorage['_CT']);
+	var getTaskName = current_task.taskName;
+	appType = current_task.appType;
 	//Task Name Commented
 	//$("#page-taskName").empty().append('<span class="taskname">'+getTaskName+'</span>');
 	$(".projectInfoWrap").empty()
-	testSuiteName = JSON.parse(window.localStorage['_CT']).testSuiteName;
+	testSuiteName = current_task.testSuiteName;
 	if(getTaskName.indexOf("Execute Batch") < 0){
 		$(".parentBatchContainer").parent().hide();
 		$(".btnPanel").css("left","0");
 		$("#page-taskName span").text("Suite Execution");
+		var status = current_task.status;
+		if(status=='review'){
+					$('.submitTaskBtn').text('Approve');
+					$('.reassignTaskBtn').show();
+		}
 	}
 	else	$("#page-taskName span").text("Batch Execution");
 	//$timeout(function(){
@@ -56,14 +62,18 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 	// var cycleId = JSON.parse(window.localStorage['_CT']).cycleId;
 	// var testSuiteId = JSON.parse(window.localStorage['_CT']).testSuiteId;
 	// var testSuiteName = JSON.parse(window.localStorage['_CT']).testSuiteName;
-	var assignedTestScenarioId = JSON.parse(window.localStorage['_CT']).assignedTestScenarioIds;
+	var assignedTestScenarioId = current_task.assignedTestScenarioIds;
 	if(window.localStorage['_CT']){
-		var readTestSuite = JSON.parse(window.localStorage['_CT']).testSuiteDetails;
+		var window_ct=JSON.parse(window.localStorage['_CT']);
+		var readTestSuite = window_ct.testSuiteDetails;
+		for(var rti=0;rti<readTestSuite.length;rti++){
+			readTestSuite[rti].versionnumber = parseFloat(window_ct.versionnumber);
+		}
 		console.log("read",readTestSuite);
 	}
 
 	//Global Information
-	//Getting Apptype or Screen Type
+	//Getting Apptype or Screen Typef
 	$scope.getScreenView = appType
 
 	//Onload ServiceCall
@@ -380,7 +390,9 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 			var conditionCheck = [];
 			var executeStatus = [];
 			if(window.localStorage['_CT']){
-				var cycleid = JSON.parse(window.localStorage['_CT']).testSuiteDetails;
+				var window_ct=JSON.parse(window.localStorage['_CT']);
+				var cycleid = window_ct.testSuiteDetails;
+				var versionnumber = parseFloat(window_ct.versionnumber);
 			}
 			//if($(this).is(":checked") == true){
 			//Getting ScenarioIds
@@ -430,6 +442,7 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 			suiteDetails.getparampaths = getParamPaths;
 			suiteDetails.conditioncheck = conditionCheck;
 			suiteDetails.donotexecute = executeStatus;
+			suiteDetails.versionnumber = versionnumber;
 			suiteDetails.testscycleid = JSON.parse(window.localStorage['_CT']).testSuiteDetails[loopingtimes].cycleid;
 			//console.log("suiteDetails",suiteDetails);
 			suiteInfo[testSuiteName] = suiteDetails;
@@ -636,12 +649,21 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 	//ALM Functionality
 
 
-	//Submit Task Function
-	$scope.submitTaskExecution = function(){
+	// //Submit Task Function
+	// $scope.submitTaskExecution = function(){
+	// 	$("#submitTasksExecution").modal("show")
+	// 	$('#submitTasksExecution').find('.btn-default-yes').focus();
+	// }
+	// //Submit Task Function
+
+	$scope.submitTaskExecution = function(action){
 		$("#submitTasksExecution").modal("show")
 		$('#submitTasksExecution').find('.btn-default-yes').focus();
+		if(action=='reassign'){
+			$("#submitTasksExecution").find('.modal-body p').text('Are you sure you want to reassign the task ?')
+			$("#submitTasksExecution").find('.modal-footer button')[0].setAttribute('onclick',"submit_task('reassign')")
+		}
 	}
-	//Submit Task Function
 
 
 	//Conditiion Check Function

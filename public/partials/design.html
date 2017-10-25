@@ -146,7 +146,8 @@
 				</div>
 
 				<!-- Submit Task Button-->
-				<button class="btn btn-md pull-right submitTaskBtn submitTaskBtn-abs" ng-click="submitTasksScreen()"  title="Submit">Submit</button>
+				<button class="btn btn-md pull-right reassignTaskBtn " style="margin-top: 2px;display:None" ng-click="submitTasksScreen('reassign')"  title="Reassign Task">Reassign</button>
+				<button class="btn btn-md pull-right submitTaskBtn submitTaskBtn-abs" ng-click="submitTasksScreen('submit')"  title="Submit">Submit</button>
 				<!-- Submit Task Button-->
 			</div>
 			<!-- Top -->
@@ -193,7 +194,9 @@
 		<!-- Specificly Webservice Screen -->
 
 		<!-- Submit Task Button-->
-		<button ng-class="getScreenView == 'Webservice' ? 'hideContainer' : 'showContainer'" class="btn btn-md pull-right submitTaskBtn" ng-click="submitTasksScreen()"  title="Submit Task">Submit</button>
+		<button class="btn btn-md pull-right reassignTaskBtn " style="float: left !important; margin-left: -46px; display:None" ng-click="submitTasksScreen('reassign')"  title="Reassign Task">Reassign</button>
+		<button ng-class="getScreenView == 'Webservice' ? 'hideContainer' : 'showContainer'" class="btn btn-md pull-right submitTaskBtn" ng-click="submitTasksScreen('submit')"  title="Submit Task">Submit</button>
+		<!--<button ng-class="getScreenView == 'Webservice' ? 'hideContainer' : 'showContainer'" class="btn btn-md pull-right submitTaskBtn" ng-click="submitTasksScreen()"  title="Submit Task">Submit</button>-->
 		<!-- Submit Task Button-->
 
 		<!--Scrape Tree-->

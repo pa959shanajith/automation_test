@@ -1,47 +1,9 @@
-var fs = require('fs');
-var https = require('https');
 var uuidV4 = require('uuid/v4');
-var express = require('express');
-var router = express.Router();
+var neo4jAPI = require('../controllers/neo4jAPI');
 var admin = require('../controllers/admin');
 var create_ice=require('../controllers/create_ice');
-var async = require('async');
-var certificate = fs.readFileSync('server/https/server.crt','utf-8');
 
-/* Send queries to Neo4J/ICE API. */
-var reqToAPI = function(d,u,p,callback) {
-	try{
-		var data = JSON.stringify(d);
-		var result="";
-		var postOptions = {host: u[0], port: u[1], path: p, method: 'POST',ca:certificate,checkServerIdentity: function (host, cert) {
-		return undefined; },headers: {'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(data)}};
-		postOptions.agent= new https.Agent(postOptions);
-		var postRequest = https.request(postOptions,function(resp){
-			resp.setEncoding('utf-8');
-			resp.on('data', function(chunk) {result+=chunk;});
-			resp.on('end', function(chunk) {callback(null,resp.statusCode,result);});
-		});
-		postRequest.on('error',function(e){callback(e.message,400,null);});
-		postRequest.write(data);
-		postRequest.end();
-	}catch(ex){
-		console.log(ex);
-	}
-	
-};
-
-/* GET Home page. */
-router.get('/', function(req, res, next) {
-	if(!req.session.uniqueID) {res.status(200).send('<br><br>Your session has been invalidated. Please <a href=\'/logout\'>Login</a> Again');}
-	else {
-		var e = req.session.uniqueID.attributes;
-		res.status(200).render('home.jade', { title: 'Mindmap', fname: e.fName, lname: e.lName, urole: e.role});
-	}
-});
-
-/* POST Mindmap*/
-router.post('/', function(req, res, next) {
-	//if(!req.session.uniqueID) res.status(401).send('Session Timed Out! Login Again');
+exports.mindmapService = function(req, res) {
 	if(req.cookies['connect.sid'] != undefined)
 	{
 		var sessionCookie = req.cookies['connect.sid'].split(".");
@@ -53,18 +15,14 @@ router.post('/', function(req, res, next) {
 		if(!req.session.id) res.status(401).send('<br><br>Your session has been expired.Please <a href="/">Login</a> Again');
 	else {
 		var d=req.body;
-		//var sessObj=req.session.uniqueID;
-		//var prjId=sessObj.project.id;
-		//var prjId='d4965851-a7f1-4499-87a3-ce53e8bf8e66';
 		var prjId=d.prjId;
 		var nData=[],qList=[],idDict={};
 		var urlData=req.get('host').split(':');
 		if(d.task=='getList'){
 			qList.push({"statement":"MATCH (n:MODULES{projectID:'"+prjId+"'}) RETURN n.moduleID,n.moduleName"});
-			reqToAPI({"data":{"statements":qList}},urlData,'/neo4jAPI',function(err,status,result){
+			neo4jAPI.executeQueries(qList,function(status,result){
 				res.setHeader('Content-Type', 'application/json');
-				if(err) res.status(status).send(err);
-				else if(status!=200) res.status(status).send(result);
+				if(status!=200) res.status(status).send(result);
 				else{
 					var jsonData=JSON.parse(result);
 					jsonData[0].data.forEach(function(e,i){
@@ -87,10 +45,9 @@ router.post('/', function(req, res, next) {
 			qList.push({"statement":"MATCH path=(n:MODULES{projectID:'"+prjId+"'}) WHERE NOT (n)-[:FMTTS]->() RETURN n","resultDataContents":["graph"]});
 			//MATCH (a:MODULES) WHERE NOT (a)-[:FMTTS]->() return a
 
-			reqToAPI({"data":{"statements":qList}},urlData,'/neo4jAPI',function(err,status,result){
-				res.setHeader('Content-Type','application/json');
-				if(err) res.status(status).send(err);
-				else if(status!=200) res.status(status).send(result);
+			neo4jAPI.executeQueries(qList,function(status,result){
+				res.setHeader('Content-Type', 'application/json');
+				if(status!=200) res.status(status).send(result);
 				else{
 					var k=0,rIndex=[],lbl,neoIdDict={},maps=[],tList=[];
 					var attrDict={"modules_endtoend":{"childIndex":"childIndex","projectID":"projectID","moduleName":"name","moduleID":"id_n","moduleID_c":"id_c"},"modules":{"childIndex":"childIndex","projectID":"pid_n","moduleName":"name","moduleID":"id_n","moduleID_c":"id_c"},"scenarios":{"projectID":"projectID","childIndex":"childIndex","moduleID":"pid_n","testScenarioName":"name","testScenarioID":"id_n","testScenarioID_c":"id_c"},"screens":{"childIndex":"childIndex","testScenarioID":"pid_n","screenName":"name","screenID":"id_n","screenID_c":"id_c"},"testcases":{"childIndex":"childIndex","screenID":"pid_n","testCaseName":"name","testCaseID":"id_n","testCaseID_c":"id_c"},"tasks":{"taskID":"id_n","task":"t","batchName":"bn","assignedTo":"at","reviewer":"rw","startDate":"sd","endDate":"ed","release":"re","cycle":"cy","details":"det","nodeID":"pid","parent":"anc"}};
@@ -182,7 +139,7 @@ router.post('/', function(req, res, next) {
 					idDict[e.id]=(e.id_n)?e.id_n:uuidV4();
 					e.id=idDict[e.id];
 					t=e.task;
-					var taskstatus='inprogress';
+					var taskstatus='assigned';
 					if(e.type=='modules_endtoend'){
 						if(e.oid!=null){			
 							qList.push({"statement":"MATCH (n)-[r:FMTTS{id:'"+e.id+"'}]->(o:TESTSCENARIOS) DETACH DELETE r,o;"});
@@ -242,10 +199,9 @@ router.post('/', function(req, res, next) {
 				//qList=qList.concat(rnmList);
 				//var index=(qList.length-rnmList.length)-1;
 				
-				reqToAPI({"data":{"statements":qList}},urlData,'/neo4jAPI',function(err,status,result){
-					res.setHeader('Content-Type','application/json');
-					if(err) res.status(status).send(err);
-					else if(status!=200) res.status(status).send(result);
+				neo4jAPI.executeQueries(qList,function(status,result){
+					res.setHeader('Content-Type', 'application/json');
+					if(status!=200) res.status(status).send(result);
 					else{
 						var k=0,rIndex,lbl,neoIdDict={};
 						idDict={};
@@ -292,12 +248,10 @@ router.post('/', function(req, res, next) {
 								else e.pid_n=null;
 							}
 						});
-						
-					
 						res.status(status).send(nData[rIndex]);
 					}
 				});
-		}	else if(d.data.write==20){
+			}	else if(d.data.write==20){
 				var uidx=0,rIndex;
 				var relId=d.data.relId;
 				var cycId=d.data.cycId;
@@ -329,30 +283,22 @@ router.post('/', function(req, res, next) {
 				qObj.userName=d.data.user_name;
 				//fs.writeFileSync('assets/req_json.json',JSON.stringify(qObj),'utf8');
 				create_ice.createE2E_Structure_Nineteen68(qObj,function(err,data){
-				//res.setHeader('Content-Type', 'application/json');
-				if(err)
-				res.status(500).send(err);
-				else{
-					datatosend=data;
-					
-				}
-				//fs.writeFileSync('assets/req_json_cassandra.txt',JSON.stringify(data),'utf8');
-				//var data = JSON.stringify(data);
-				var module_type='modules_endtoend';
-				var parsing_result=parsing(data,urlData,module_type);
-				//var qList_new=parsing(data,urlData);
-				 
-				reqToAPI({"data":{"statements":parsing_result[0]}},urlData,'/neo4jAPI',function(err,status,result){
-					//res.setHeader('Content-Type','application/json');
-					if(err) res.status(status).send(err);
-					res.status(200).send(parsing_result[1]);
-					
+					//res.setHeader('Content-Type', 'application/json');
+					if(err)
+					res.status(500).send(err);
+					else{
+						datatosend=data;
+					}
+					//fs.writeFileSync('assets/req_json_cassandra.txt',JSON.stringify(data),'utf8');
+					//var data = JSON.stringify(data);
+					var module_type='modules_endtoend';
+					var parsing_result=parsing(data,urlData,module_type);
+					//var qList_new=parsing(data,urlData);
+					neo4jAPI.executeQueries(parsing_result[0],function(status,result){
+						if(status!=200) res.status(status).send(result);
+						else res.status(200).send(parsing_result[1]);
+					});
 				});
-				
-
-
-				});
-
 			}
 		}
 		else if(d.task=='writeMap'){
@@ -377,7 +323,7 @@ router.post('/', function(req, res, next) {
 					idDict[e.id]=(e.id_n)?e.id_n:uuidV4();
 					e.id=idDict[e.id];
 					t=e.task;
-					var taskstatus='inprogress';
+					var taskstatus='assigned';
 					if(e.type=='modules_endtoend'){
 						if(e.oid!=null){
 							qList.push({"statement":"MATCH (n)-[r:FMTTS{id:'"+e.id+"'}]->(o:TESTSCENARIOS) DETACH DELETE r,o"});
@@ -529,10 +475,9 @@ router.post('/', function(req, res, next) {
 				}
 				
 				
-				reqToAPI({"data":{"statements":qList}},urlData,'/neo4jAPI',function(err,status,result){
-					res.setHeader('Content-Type','application/json');
-					if(err) res.status(status).send(err);
-					else if(status!=200) res.status(status).send(result);
+				neo4jAPI.executeQueries(qList,function(status,result){
+					res.setHeader('Content-Type', 'application/json');
+					if(status!=200) res.status(status).send(result);
 					else{
 						var k=0,rIndex,lbl,neoIdDict={};
 						idDict={};
@@ -615,30 +560,24 @@ router.post('/', function(req, res, next) {
 				qObj.userName=d.data.user_name;
 				//fs.writeFileSync('assets/req_json.json',JSON.stringify(qObj),'utf8');
 				create_ice.createStructure_Nineteen68(qObj,function(err,data){
-				//res.setHeader('Content-Type', 'application/json');
-				if(err)
-				res.status(500).send(err);
-				else{
-					datatosend=data;
-					
-				}
-				//fs.writeFileSync('assets/req_json_cassandra.txt',JSON.stringify(data),'utf8');
-				//var data = JSON.stringify(data);
-				var module_type='modules';
-				var parsing_result=parsing(data,urlData,module_type);
-				//var qList_new=parsing(data,urlData);
-				 
-				reqToAPI({"data":{"statements":parsing_result[0]}},urlData,'/neo4jAPI',function(err,status,result){
-					//res.setHeader('Content-Type','application/json');
-					if(err) res.status(status).send(err);
-					res.status(200).send(parsing_result[1]);
-					
+					//res.setHeader('Content-Type', 'application/json');
+					if(err)
+					res.status(500).send(err);
+					else{
+						datatosend=data;
+						
+					}
+					//fs.writeFileSync('assets/req_json_cassandra.txt',JSON.stringify(data),'utf8');
+					//var data = JSON.stringify(data);
+					var module_type='modules';
+					var parsing_result=parsing(data,urlData,module_type);
+					//var qList_new=parsing(data,urlData);
+					neo4jAPI.executeQueries(parsing_result[0],function(status,result){
+						//res.setHeader('Content-Type', 'application/json');
+						if(status!=200) res.status(status).send(result);
+						else res.status(200).send(parsing_result[1]);
+					});
 				});
-				
-
-
-				});
-
 			}
 		}
 		else if(d.task=='populateUsers'){
@@ -707,30 +646,114 @@ router.post('/', function(req, res, next) {
 		}else if(d.task=='reviewTask'){
 			//var prjId=d.prjId;
 			var taskID=d.taskId;
-			query={'statement':"MATCH (n:TASKS) WHERE n.taskID='"+taskID+"' and n.assignedTo='"+d.userId+"' RETURN n.reviewer"};
+			var batchIds=d.batchIds;
+			var date=new Date();
+
+			var cur_date=date.getDate()+"/"+(date.getMonth()+1)+"/"+date.getFullYear()+','+date.toLocaleTimeString();
+			var taskHistory={"userid":d.userId,"status":"","modifiedBy":d.user_name,"modifiedOn":cur_date};
+			if (d.status=='inprogress' || d.status=='assigned'|| d.status=='reassigned' || d.status=='reassign'){
+				//query={'statement':"MATCH (n:TASKS) WHERE n.taskID='"+taskID+"' and n.assignedTo='"+d.userId+"' RETURN n"};
+				query={'statement':"MATCH (n:TASKS) WHERE n.taskID='"+taskID+"' and n.assignedTo='"+d.userId+"' with n as n Match path=(n)<-[r]-(a) RETURN path","resultDataContents":["graph"]};
+			}else if(d.status=='review'){
+				//query={'statement':"MATCH (n:TASKS) WHERE n.taskID='"+taskID+"' and n.reviewer='"+d.userId+"' RETURN n"};
+				query={'statement':"MATCH (n:TASKS) WHERE n.taskID='"+taskID+"' and n.reviewer='"+d.userId+"' with n as n Match path=(n)<-[r]-(a) RETURN path","resultDataContents":["graph"]};
+			}
+			// else if(d.status=='reassign'){
+			// 	query={'statement':"MATCH (n:TASKS) WHERE n.taskID='"+taskID+"' and n.assignedTo='"+d.userId+"' RETURN n"};
+			// }
+			
 			var qlist_query=[query];
-			reqToAPI({"data":{"statements":qlist_query}},urlData,'/neo4jAPI',function(err,status,result){
+			var new_queries='';
+			var task_flag=false;
+			neo4jAPI.executeQueries(qlist_query,function(status,result){
 					//res.setHeader('Content-Type','application/json');
-					if(err) {
-						res.status(status).send(err);
+					if(status!=200) {
+						res.status(status).send(result);
 					}else{
 						try{
 							res_data=JSON.parse(result);
-							if(res_data[0].data.length!= 0){
-								if(res_data[0].data[0].row[0] != null && res_data[0].data[0].row[0] != 'select reviewer'){
-									query={'statement':"MATCH (n:TASKS) WHERE n.taskID='"+taskID+"' and n.assignedTo='"+d.userId+"' set n.task_owner=n.assignedTo,n.assignedTo=n.reviewer,n.status='review' RETURN n"};
-									var qlist_query=[query];
-									reqToAPI({"data":{"statements":qlist_query}},urlData,'/neo4jAPI',function(err,status,result){
+							//if(res_data[0].data.length!= 0 && res_data[0].data[0].row[0] != null){
+							if(res_data[0].data.length!= 0 && res_data[0].data[0]['graph']['nodes'] != null){
+								//var task=res_data[0].data[0].row[0];
+								var task = '';
+								var task_relation='';
+								if(res_data[0].data[0]['graph']['nodes'][0].labels[0]=='TASKS'){
+									task=res_data[0].data[0]['graph']['nodes'][0];
+									task_relation = res_data[0].data[0]['graph']['nodes'][1];
+								}
+								else{
+									task=res_data[0].data[0]['graph']['nodes'][1];
+									task_relation = res_data[0].data[0]['graph']['nodes'][0];
+								}
+								var neo_taskHistory=task.taskHistory;
+								if((d.status=='inprogress' || d.status=='assigned' || d.status=='reassigned') && task.reviewer != 'select reviewer'){
+									taskHistory.status='review';
+									if (neo_taskHistory==undefined || neo_taskHistory==''){
+										neo_taskHistory=[taskHistory];
+									}else{
+										neo_taskHistory=JSON.parse(neo_taskHistory)
+										neo_taskHistory.push(taskHistory);
+										
+									}
+									neo_taskHistory=JSON.stringify(neo_taskHistory);
+									
+									query={'statement':"MATCH (n:TASKS) WHERE n.taskID='"+taskID+"' and n.assignedTo='"+d.userId+"' set n.task_owner=n.assignedTo,n.assignedTo=n.reviewer,n.status='review',n.taskHistory='"+neo_taskHistory+"' RETURN n"};
+									new_queries=[query];
+									task_flag=true;
+									
+								}else if(d.status=='review'){
+									taskHistory.status='complete';
+									if (neo_taskHistory==undefined || neo_taskHistory==''){
+										neo_taskHistory=[taskHistory];
+									}else{
+										neo_taskHistory=JSON.parse(neo_taskHistory)
+										neo_taskHistory.push(taskHistory);
+										
+									}
+									neo_taskHistory=JSON.stringify(neo_taskHistory);
+									query={'statement':"MATCH (n:TASKS) WHERE n.taskID='"+taskID+"' and n.reviewer='"+d.userId+"' set n.assignedTo='',n.status='complete',n.taskHistory='"+neo_taskHistory+"' RETURN n"};
+									new_queries=[query];
+									task_flag=true;
+								}else if(d.status=='reassign'){
+									taskHistory.status='reassigned';
+									if (neo_taskHistory==undefined || neo_taskHistory==''){
+										neo_taskHistory=[taskHistory];
+									}else{
+										neo_taskHistory=JSON.parse(neo_taskHistory)
+										neo_taskHistory.push(taskHistory);
+										
+									}
+									neo_taskHistory=JSON.stringify(neo_taskHistory);
+									query={'statement':"MATCH (n:TASKS) WHERE n.taskID='"+taskID+"' and n.reviewer='"+d.userId+"' set n.reviewer=n.assignedTo,n.assignedTo=n.task_owner,n.status='reassigned',n.taskHistory='"+neo_taskHistory+"' RETURN n"};
+									new_queries=[query];
+									task_flag=true;
+								}
+								if(task_flag){
+									inputs = {
+										'status':taskHistory.status,
+										'taskdetails':task_relation,
+										'user':d.user_name,
+										'versionnumber':d.versionnumber
+									}
+									create_ice.submitTask(inputs,function(err,data){
+										res.setHeader('Content-Type', 'application/json');
+										if(err)
+											res.status(500).send(err)
+									});
+									neo4jAPI.executeQueries(new_queries,function(status,result){
 											//res.setHeader('Content-Type','application/json');
-											if(err) res.status(status).send(err);
-											res.status(200).send('success');
+											if(status!=200) res.status(status).send(result);
+											else res.status(200).send('success');
 									
 									});
 								}else{
 									res.status(200).send('fail');
 								}
-							}else{
-								res.status(200).send('Tasksubmitted');
+								
+								
+							}
+							else{
+								res.status(200).send('fail');
 							}
 						}catch(ex){
 							console.log(ex);
@@ -741,36 +764,32 @@ router.post('/', function(req, res, next) {
 		}else if(d.task=='populateScenarios'){
 			var moduleId=d.moduleId;
 			//var taskID=d.taskId;
-			
 			query={'statement':"MATCH (a{moduleID:'"+moduleId+"'})-[:FMTTS]->(b) RETURN b"};
 			var qlist_query=[query];
 			var scenarioList=[];
-			reqToAPI({"data":{"statements":qlist_query}},urlData,'/neo4jAPI',function(err,status,result){
-					//res.setHeader('Content-Type','application/json');
-					if(err) {
-						res.status(status).send(err);
-					}else{
-						try{
-							res_data=JSON.parse(result);
-							res_data[0].data.forEach(function(row){
-								scenarioList.push(row.row[0])
-							});
-							res.status(200).send(scenarioList);
-						}catch(ex){
-							console.log(ex);
-							res.status(200).send('fail');
-						}
+			neo4jAPI.executeQueries(qlist_query,function(status,result){
+				res.setHeader('Content-Type', 'application/json');
+				if(status!=200) res.status(status).send(result);
+				else{
+					try{
+						res_data=JSON.parse(result);
+						res_data[0].data.forEach(function(row){
+							scenarioList.push(row.row[0])
+						});
+						res.status(200).send(scenarioList);
+					}catch(ex){
+						console.log(ex);
+						res.status(200).send('fail');
 					}
-				});
+				}
+			});
 		}
 	}
 }
 else{
 			res.send("Invalid Session");
 		}
-});
-
-
+};
 
 
 var parsing = function(d,urlData,module_type) {
@@ -857,8 +876,5 @@ updateJson.push(cassandraId_dict);
 return [ qList_new,updateJson];
 };
 
-
-
-module.exports = router;
 
 //MATCH (n)-[r:FMTTS{id:'bad100b6-c223-4888-a8e9-ad26a2de4a61'}]->(o:TESTSCENARIOS) DETACH DELETE r,o
