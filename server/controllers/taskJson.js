@@ -127,6 +127,7 @@ function next_function(resultobj, cb, data) {
 				'reviewer': '',
 				'startDate': '',
 				'expectedEndDate': '',
+				'batchTaskIDs':[],
 				'status': 'assigned'
 			};
 			var testSuiteDetails_obj = {
@@ -185,7 +186,8 @@ function next_function(resultobj, cb, data) {
 					}
 					testSuiteDetails_obj.testsuitename = 'modulename';
 					testSuiteDetails_obj.projectidts = parent[0];
-					testSuiteDetails_obj.assignedTestScenarioIds = 'data.testscenarioIds[0]';
+					testSuiteDetails_obj.assignedTestScenarioIds = '';
+					
 					task_json.screenName = 'screenname';
 					task_json.scenarioName = 'scenarioname';
 					task_json.testCaseName = 'testcasename';
@@ -204,6 +206,8 @@ function next_function(resultobj, cb, data) {
 						} else {
 							parent_index = batch_dict[t.batchName];
 							batch_task = user_task_json[parent_index];
+							batch_task.taskDetails[0].batchTaskIDs.push(t.taskID);
+							testSuiteDetails_obj.subTaskId = t.taskID;
 							batch_task.testSuiteDetails.push(testSuiteDetails_obj);
 							batch_flag = true;
 						}
@@ -219,7 +223,9 @@ function next_function(resultobj, cb, data) {
 					}
 					//task_json.assignedTestScenarioIds=data.assignedTestScenarioIds;
 					if (!batch_flag) {
+						testSuiteDetails_obj.subTaskId = t.taskID;
 						task_json.testSuiteDetails.push(testSuiteDetails_obj);
+						taskDetails.batchTaskIDs.push(t.taskID);
 						task_json.taskDetails.push(taskDetails);
 						user_task_json.push(task_json);
 					}
@@ -237,29 +243,30 @@ function next_function(resultobj, cb, data) {
 								maincallback();
 							}
 							else {
-								try {
+								
 									result1 = JSON.parse(result);
-									testSuiteDetails_obj.testsuitename = result1[0].data[0].row[0];
-									maincallback();
-								} catch (ex) {
-									qlist_query = [query1];
-									neo4jAPI.executeQueries(qlist_query,function(status,result){
+									if(result1[0].data.length >0 && result1[0].data[0].row[0] != undefined){
+										testSuiteDetails_obj.testsuitename = result1[0].data[0].row[0];
+										maincallback();
+									}else{
+										qlist_query = [query1];
+										neo4jAPI.executeQueries(qlist_query,function(status,result){
 										if(status!=200) {
 											console.log(result);
 											maincallback();
 										}
 										else {
-											try {
-												result1 = JSON.parse(result);
+											result1 = JSON.parse(result);
+											if(result1[0].data.length >0 && result1[0].data[0].row[0] != undefined){
 												testSuiteDetails_obj.testsuitename = result1[0].data[0].row[0];
-												maincallback();
-											} catch (ex) {
-												maincallback();
 											}
+											maincallback();
 										}
 									});
-								}
-							}
+									}
+									
+									
+								} 
 						});
 					} else {
 						maincallback();
@@ -273,5 +280,6 @@ function next_function(resultobj, cb, data) {
 		});
 	} catch (ex) {
 		console.log(ex);
+		cb(null, user_task_json);
 	}
 }

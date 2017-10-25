@@ -1459,10 +1459,11 @@ var submit_task=function(action){
 	var taskid=taskinfo.subTaskId;
 	var taskstatus=taskinfo.status;
 	var version=taskinfo.versionnumber;
+	var batchTaskIDs=taskinfo.batchTaskIDs;
 	if (action!=undefined && action=='reassign'){
 		taskstatus=action;
 	}
-	dataSender({task:'reviewTask',prjId:$(".project-list").val(),taskId:taskid,userId:userid,status:taskstatus,user_name:username,versionnumber:version},function(err,result){
+	dataSender({task:'reviewTask',prjId:$(".project-list").val(),taskId:taskid,userId:userid,status:taskstatus,user_name:username,versionnumber:version,batchIds:batchTaskIDs},function(err,result){
 		if(err) console.log(result);
 		else{
 			if (result=='fail'){
