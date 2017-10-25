@@ -9,7 +9,7 @@ var epurl = "http://127.0.0.1:1990/";
 var roles = [];
 var r_ids = [];
 var userRoles = {};
-
+var validator =  require('validator');
 //GetUserRoles
 exports.getUserRoles_Nineteen68 = function (req, res) {
 	try {
@@ -87,6 +87,10 @@ exports.getUsers_Nineteen68 = function (req, res) {
 //Get All Users
 exports.getAllUsers_Nineteen68 = function (req, res) {
 	try {
+		var checkAction = validator.isEmpty(req.body.action);
+		if(checkAction == false)
+		{
+
 		if (req.cookies['connect.sid'] != undefined) {
 			var sessionCookie = req.cookies['connect.sid'].split(".");
 			var sessionToken = sessionCookie[0].split(":");
@@ -126,7 +130,10 @@ exports.getAllUsers_Nineteen68 = function (req, res) {
 		} else {
 			res.send("Invalid Session");
 		}
-	} catch (exception) {
+	}else{
+			res.send("fail");
+	}
+} catch (exception) {
 		console.log(exception);
 		res.send("fail");
 	}
@@ -203,6 +210,61 @@ exports.createUser_Nineteen68 = function (req, res) {
 			var req_email_id = req.body.createUser.email;
 			var salt = bcrypt.genSaltSync(10);
 			var req_hashedPassword = bcrypt.hashSync(req_password, salt);
+
+			validateCreateUser();
+
+				function validateCreateUser()
+			{
+					    check_username = validator.isEmpty(req_username);
+					    check_usernameLen = validator.isLength(req_username,1,50);
+						if(check_username == false && check_usernameLen == true)
+						{
+							valid_username = true;
+						}
+					    check_password = validator.isEmpty(req_password);
+					    check_passwordLen = validator.isLength(req_password,1,12);
+						if(check_password == false && check_passwordLen == true)
+						{
+							valid_password = true;
+						}
+						 check_firstname = validator.isEmpty(req_firstname);
+						 check_firstnameLen = validator.isLength(req_firstname,1,12);
+						 check_firstnamePattern = validator.isAlpha(req_firstname);
+						 if(check_firstname == false && check_firstnameLen == true && check_firstnamePattern == true)
+						 {
+							valid_firstname = true;
+						 }
+						 check_lastname = validator.isEmpty(req_lastname);
+						 check_lastnameLen = validator.isLength(req_lastname,1,12);
+						 check_lastnamePattern = validator.isAlpha(req_lastname);
+						 if(check_lastname == false && check_lastnameLen == true  && check_lastnamePattern == true)
+						 {
+							valid_lastname = true;
+						 }
+					     check_ldapuser = validator.isEmpty(req_ldapuser.toString());
+						 if(check_ldapuser == false)
+						 {
+							 valid_ldapuser = true;
+						 }
+						 check_defaultRole = validator.isUUID(req_defaultRole);
+						 if(check_defaultRole == true)
+						 {
+							 valid_defaultRole = true;
+						 }
+						 check_email_id = validator.isEmail(req_email_id);
+						 check_emailLen = validator.isLength(req_email_id,1,50);
+						 if(check_email_id == true &&  check_emailLen == true)
+						 {
+							 valid_email_id = true;
+						 }
+						 var salt = bcrypt.genSaltSync(10);
+					 	 check_hashedPassword =  validator.isEmpty(bcrypt.hashSync(req_password, salt));
+						 if(check_hashedPassword == false)
+						 {
+							 valid_hashedPassword = true;
+						 }
+			}
+
 			var inputs = {
 				"query": "allusernames"
 			};
@@ -212,6 +274,8 @@ exports.createUser_Nineteen68 = function (req, res) {
 					"Content-Type": "application/json"
 				}
 			};
+				if(valid_username == true && valid_password == true && valid_firstname == true && valid_lastname == true && valid_ldapuser == true && valid_defaultRole == true && valid_email_id == true && valid_hashedPassword == true )
+			{
 			client.post(epurl + "admin/createUser_Nineteen68", args,
 				function (userNameresult, response) {
 				if (response.statusCode != 200 || userNameresult.rows == "fail") {
@@ -267,6 +331,10 @@ exports.createUser_Nineteen68 = function (req, res) {
 					}
 				}
 			});
+		}
+		else{
+			 res.send("fail");
+		}
 		} else {
 			res.send("Invalid Session");
 		}
@@ -304,6 +372,56 @@ exports.updateUser_nineteen68 = function updateUser_nineteen68(req, res) {
 				var salt = bcrypt.genSaltSync(10);
 				var req_hashedPassword = bcrypt.hashSync(local_password, salt);
 			}
+			validateUpdateUser();
+			function validateUpdateUser()
+			{
+				  		check_username = validator.isEmpty(local_username);
+					    check_usernameLen = validator.isLength(local_username,1,50);
+						if(check_username == false && check_usernameLen == true)
+						{
+							valid_username = true;
+						}
+						if (local_password != "")
+						{
+							check_password = validator.isEmpty(local_password);
+							check_passwordLen = validator.isLength(local_password,1,12);
+							if(check_password == false && check_passwordLen == true)
+							{
+								valid_password = true;
+							}
+							else{
+								valid_password = false;
+							}
+						}
+						else{
+							if(local_password == "")
+							{
+								valid_password = true;
+							}
+						  } 
+						 check_firstname = validator.isEmpty(local_firstname);
+						 check_firstnameLen = validator.isLength(local_firstname,1,12);
+						 check_firstnamePattern = validator.isAlpha(local_firstname);
+						 if(check_firstname == false && check_firstnameLen == true && check_firstnamePattern == true)
+						 {
+							valid_firstname = true;
+						 }
+						 check_lastname = validator.isEmpty(local_lastname);
+						 check_lastnameLen = validator.isLength(local_lastname,1,12);
+						 check_lastnamePattern = validator.isAlpha(local_lastname);
+						 if(check_lastname == false && check_lastnameLen == true && check_lastnamePattern == true);
+						 {
+							valid_lastname = true;
+						 }
+						 check_email_id = validator.isEmail(local_email_id);
+						 check_emailLen = validator.isLength(local_email_id,1,50);
+						 if(check_email_id == true && check_emailLen == true)
+						 {
+							 valid_email_id = true;
+						 }
+						
+					
+			}
 			var inputs = {
 				"userid": local_user_Id
 			};
@@ -313,6 +431,8 @@ exports.updateUser_nineteen68 = function updateUser_nineteen68(req, res) {
 					"Content-Type": "application/json"
 				}
 			};
+			if(valid_username == true && valid_password == true && valid_firstname == true && valid_lastname == true && valid_email_id == true )
+			{	
 			client.post(epurl + "admin/getUserData_Nineteen68", args,
 				function (result, response) {
 				try {
@@ -394,7 +514,9 @@ exports.updateUser_nineteen68 = function updateUser_nineteen68(req, res) {
 					console.log(exception);
 					res.send(flag);
 				}
-			});
+			});}else{
+				res.send("fail");
+			}
 		} else {
 			res.send("Invalid Session");
 		}
@@ -406,6 +528,8 @@ exports.updateUser_nineteen68 = function updateUser_nineteen68(req, res) {
 
 //Get Domains
 exports.getDomains_ICE = function getDomains_ICE(req, res) {
+	var checkAction = validator.isEmpty(req.body.action);
+	
 	try {
 		if (req.cookies['connect.sid'] != undefined) {
 			var sessionCookie = req.cookies['connect.sid'].split(".");
@@ -419,6 +543,8 @@ exports.getDomains_ICE = function getDomains_ICE(req, res) {
 					"Content-Type": "application/json"
 				}
 			};
+			if(checkAction == false)
+			{
 			client.post(epurl + "admin/getDomains_ICE", args,
 				function (result, response) {
 				try {
@@ -444,6 +570,10 @@ exports.getDomains_ICE = function getDomains_ICE(req, res) {
 					console.log(exception);
 				}
 			});
+		}
+		else{
+			res.send("fail");
+		}
 			function finalresult() {
 				res.send(responsedata);
 			}
@@ -470,6 +600,35 @@ exports.createProject_ICE = function createProject_ICE(req, res) {
 			var requestedtags = "tags";
 			var projectTypeId = "";
 			var newProjectID = "";
+			validateCreateProject();
+			function validateCreateProject()
+			{
+				  check_domain = validator.isEmpty(createProjectObj.domainId);
+				  check_domain_type = validator.isUUID(createProjectObj.domainId);
+				  if(check_domain == false && check_domain_type == true)
+				  {
+					  valid_domain = true;
+				  }
+				check_project = validator.isEmpty(createProjectObj.projectName);
+				check_projectLen = validator.isLength(createProjectObj.projectName,1,50);
+				if(check_project == false && check_projectLen == true)
+				{
+					valid_projectName = true;
+				}
+				check_appType = validator.isEmpty(createProjectObj.appType);	
+				if(check_appType == false)
+				{
+					valid_appType = true;
+				}    
+				check_projectDetails = validator.isJSON(JSON.stringify(createProjectObj.projectDetails));	
+				check_projectDetailsLen = createProjectObj.projectDetails.length;
+				if(check_projectDetails == true && check_projectDetailsLen > 0)
+				{
+					valid_projectDetails = true;
+				}    
+			}
+			if(valid_domain == true && valid_projectName == true && valid_appType == true && valid_projectDetails == true)
+			{
 			async.series({
 				projecttype: function (callback) {
 					try {
@@ -611,7 +770,7 @@ exports.createProject_ICE = function createProject_ICE(req, res) {
 				} else {
 					//console.log(data);
 				}
-			});
+			});}else{res.send("fail");}
 		} else {
 			res.send("Invalid Session");
 		}
@@ -658,6 +817,31 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 			var requestedtags = "tags";
 			var flag = "";
 			var requestedprojectid = updateProjectDetails.projectId;
+			validateUpdateProject();
+
+			function validateUpdateProject()
+			{
+				check_project = validator.isEmpty(updateProjectDetails.projectName);
+				check_projectId = validator.isUUID(updateProjectDetails.projectId);
+				check_projectLen = validator.isLength(updateProjectDetails.projectName,1,50);
+				if(check_project == false && check_projectLen == true && check_projectId == true)
+				{
+					valid_projectName = true;
+				}
+				check_appType = validator.isEmpty(updateProjectDetails.appType);	
+				if(check_appType == false)
+				{
+					valid_appType = true;
+				} 
+				check_updateProjectDetails = validator.isJSON(JSON.stringify(updateProjectDetails));  
+				if(check_updateProjectDetails == true)
+				{
+					valid_projectDetails = true;
+				} 
+			}
+			if(valid_projectName == true && valid_appType == true && valid_projectDetails == true)
+		{
+			
 			async.series({
 				newProjectDetails: function (newProjectDetailsCallback) {
 					var projectDetails = updateProjectDetails.newProjectDetails;
@@ -1113,7 +1297,7 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 					console.log("success");
 					res.send("success");
 				}
-			});
+			});}else{res.send('fail');}
 		} else {
 			res.send("Invalid Session");
 		}
@@ -1279,6 +1463,9 @@ exports.getNames_ICE = function (req, res) {
  * date 03/04/2017
  */
 exports.getDetails_ICE = function (req, res) {
+	var checkresBody = validator.isJSON(JSON.stringify(req.body));
+	if(checkresBody == true)
+	{
 	try {
 		if (req.cookies['connect.sid'] != undefined) {
 			var sessionCookie = req.cookies['connect.sid'].split(".");
@@ -1534,6 +1721,10 @@ exports.getDetails_ICE = function (req, res) {
 	} catch (exception) {
 		console.log(exception);
 	}
+}
+else{
+	res.send('fail');
+}
 };
 
 //Save Assigned Projects
@@ -1553,6 +1744,27 @@ exports.assignProjects_ICE = function (req, res) {
 				projectIds.push(projectDetails[i].projectId);
 			}
 			var inputs = {};
+				validateAssignProjects();
+				function validateAssignProjects(){
+					check_domainId = validator.isEmpty(assignProjectsDetails.domainId);
+					if(check_domainId == false)
+					{
+						valid_domainId = true;
+					}
+					check_userid  = validator.isUUID(assignProjectsDetails.userId);
+					if(check_userid == true)
+					{
+						valid_userId = true;
+					}
+					check_userInfo = validator.isJSON(JSON.stringify(assignProjectsDetails.userInfo));
+					check_assignProjectDetails = validator.isJSON(JSON.stringify(assignProjectsDetails.userInfo));
+					if(check_userInfo == true && check_assignProjectDetails == true)
+					{
+						valid_objects = true;
+					}
+
+				}
+		
 			if (assignProjectsDetails.getAssignedProjectsLen > 0) {
 				alreadyassigned = true;
 				inputs = {
@@ -1578,6 +1790,8 @@ exports.assignProjects_ICE = function (req, res) {
 					"Content-Type": "application/json"
 				}
 			};
+				if(valid_domainId == true && valid_userId == true && valid_objects == true)
+			{
 			client.post(epurl + "admin/assignProjects_ICE", args,
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
@@ -1586,6 +1800,10 @@ exports.assignProjects_ICE = function (req, res) {
 					res.send("success");
 				}
 			});
+			}
+			else{
+				res.send('fail');
+			}
 		} else {
 			res.send("Invalid Session");
 		}

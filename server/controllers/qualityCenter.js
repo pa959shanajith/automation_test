@@ -13,6 +13,7 @@ var client = new Client();
 var sessionExtend = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes 
 var sessionTime = 30 * 60 * 1000;
 var updateSessionTimeEvery = 20 * 60 * 1000;
+var validator = require('validator');
 
 exports.loginQCServer_ICE = function (req, res) {
 	try{
@@ -28,6 +29,24 @@ exports.loginQCServer_ICE = function (req, res) {
 			console.log("IP:",ip);
 			var name = req.session.username;
 			console.log(Object.keys(myserver.allSocketsMap),"<<all people, asking person:",name);
+            check_qcUrl = validator.isEmpty(req.body.qcURL);
+            if(check_qcUrl == false)
+            {
+                validate_qcUrl = true;
+            }
+            check_qcUsername = validator.isEmpty(req.body.qcUsername);
+            if(check_qcUsername == false)
+            {
+                validate_qcUsername = true;
+            }
+            check_qcPassword = validator.isEmpty(req.body.qcPassword);
+            if(check_qcPassword == false)
+            {
+                 validate_qcPassword = true;
+            }
+        if(validate_qcUrl == true && validate_qcUsername == true &&  validate_qcPassword == true)
+            {
+
 			if('allSocketsMap' in myserver && name in myserver.allSocketsMap){
 				var mySocket = myserver.allSocketsMap[name];
 				var username = req.body.qcUsername;
@@ -54,6 +73,9 @@ exports.loginQCServer_ICE = function (req, res) {
 				console.log(exception);
 			}
 		}
+            }else{
+                res.send('unavailableLocalServer');
+            }
 	}
 	else{
 		res.send("Invalid Session");
@@ -61,7 +83,7 @@ exports.loginQCServer_ICE = function (req, res) {
 }catch(exception){
 		console.log(exception);
 		res.send("unavailableLocalServer");
-	}
+    }
 };
 
 exports.qcProjectDetails_ICE = function (req, res) {

@@ -7,7 +7,7 @@ var epurl = "http://127.0.0.1:1990/";
 var Client = require("node-rest-client").Client;
 var myserver = require('../../server.js');
 var client = new Client();
-
+var validator =  require('validator');
 //Global Variables
 var roles = [];
 var userRoles = {};
@@ -20,6 +20,24 @@ exports.authenticateUser_Nineteen68 = function (req, res) {
         var password = req.body.password;
         var session = req.session;
         var sessId = req.session.id;
+        validateLogin();
+        function validateLogin()
+        {
+                check_username = validator.isEmpty(username);
+                    check_usernameLen = validator.isLength(username,1,50);
+                    if(check_username == false && check_usernameLen == true)
+                    {
+                            valid_username = true;
+                    }
+                    check_password = validator.isEmpty(password);
+                    check_passwordLen = validator.isLength(password,1,12);
+                    if(check_password == false && check_passwordLen == true)
+                    {
+                            valid_password = true;
+                    }
+        }
+         if(valid_username == true && valid_password == true)
+            {
         var maxTime = 0;
         for (var key in req.sessionStore.sessions) {
             var sessionStore = req.sessionStore.sessions[key];
@@ -115,6 +133,7 @@ exports.authenticateUser_Nineteen68 = function (req, res) {
                 });
             }
         });
+    }else{ res.send("fail");}
     } catch (exception) {
         console.log(exception);
         res.send("fail");
@@ -144,6 +163,24 @@ exports.authenticateUser_Nineteen68_CI = function (req, res) {
                 "Content-Type": "application/json"
             }
         };
+         validateLogin();
+            function validateLogin()
+            {
+                  check_username = validator.isEmpty(username);
+                        check_usernameLen = validator.isLength(username,1,50);
+                        if(check_username == false && check_usernameLen == true)
+                        {
+                              valid_username = true;
+                        }
+                        check_password = validator.isEmpty(password);
+                        check_passwordLen = validator.isLength(password,1,12);
+                        if(check_password == false && check_passwordLen == true)
+                        {
+                              valid_password = true;
+                        }
+            }
+        if(valid_username == true && valid_password == true)
+            {
         checkldapuser(req, function (err, data) {
             if (data) {
                 ldapCheck(req, function (err, ldapdata) {
@@ -261,7 +298,7 @@ exports.authenticateUser_Nineteen68_CI = function (req, res) {
                     }
                 });
             }
-        });
+        }); }else{res.send('fail');}
     } catch (exception) {
         console.log(exception);
         res.setHeader('set-cookie', sessId);
