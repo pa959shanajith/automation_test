@@ -1,47 +1,9 @@
-var fs = require('fs');
-var https = require('https');
 var uuidV4 = require('uuid/v4');
-var express = require('express');
-var router = express.Router();
+var neo4jAPI = require('../controllers/neo4jAPI');
 var admin = require('../controllers/admin');
 var create_ice=require('../controllers/create_ice');
-var async = require('async');
-var certificate = fs.readFileSync('server/https/server.crt','utf-8');
 
-/* Send queries to Neo4J/ICE API. */
-var reqToAPI = function(d,u,p,callback) {
-	try{
-		var data = JSON.stringify(d);
-		var result="";
-		var postOptions = {host: u[0], port: u[1], path: p, method: 'POST',ca:certificate,checkServerIdentity: function (host, cert) {
-		return undefined; },headers: {'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(data)}};
-		postOptions.agent= new https.Agent(postOptions);
-		var postRequest = https.request(postOptions,function(resp){
-			resp.setEncoding('utf-8');
-			resp.on('data', function(chunk) {result+=chunk;});
-			resp.on('end', function(chunk) {callback(null,resp.statusCode,result);});
-		});
-		postRequest.on('error',function(e){callback(e.message,400,null);});
-		postRequest.write(data);
-		postRequest.end();
-	}catch(ex){
-		console.log(ex);
-	}
-	
-};
-
-/* GET Home page. */
-router.get('/', function(req, res, next) {
-	if(!req.session.uniqueID) {res.status(200).send('<br><br>Your session has been invalidated. Please <a href=\'/logout\'>Login</a> Again');}
-	else {
-		var e = req.session.uniqueID.attributes;
-		res.status(200).render('home.jade', { title: 'Mindmap', fname: e.fName, lname: e.lName, urole: e.role});
-	}
-});
-
-/* POST Mindmap*/
-router.post('/', function(req, res, next) {
-	//if(!req.session.uniqueID) res.status(401).send('Session Timed Out! Login Again');
+exports.mindmapService = function(req, res) {
 	if(req.cookies['connect.sid'] != undefined)
 	{
 		var sessionCookie = req.cookies['connect.sid'].split(".");
@@ -61,10 +23,9 @@ router.post('/', function(req, res, next) {
 		var urlData=req.get('host').split(':');
 		if(d.task=='getList'){
 			qList.push({"statement":"MATCH (n:MODULES{projectID:'"+prjId+"'}) RETURN n.moduleID,n.moduleName"});
-			reqToAPI({"data":{"statements":qList}},urlData,'/neo4jAPI',function(err,status,result){
+			neo4jAPI.executeQueries(qList,function(status,result){
 				res.setHeader('Content-Type', 'application/json');
-				if(err) res.status(status).send(err);
-				else if(status!=200) res.status(status).send(result);
+				if(status!=200) res.status(status).send(result);
 				else{
 					var jsonData=JSON.parse(result);
 					jsonData[0].data.forEach(function(e,i){
@@ -87,13 +48,12 @@ router.post('/', function(req, res, next) {
 			qList.push({"statement":"MATCH path=(n:MODULES{projectID:'"+prjId+"'}) WHERE NOT (n)-[:FMTTS]->() RETURN n","resultDataContents":["graph"]});
 			//MATCH (a:MODULES) WHERE NOT (a)-[:FMTTS]->() return a
 
-			reqToAPI({"data":{"statements":qList}},urlData,'/neo4jAPI',function(err,status,result){
-				res.setHeader('Content-Type','application/json');
-				if(err) res.status(status).send(err);
-				else if(status!=200) res.status(status).send(result);
+			neo4jAPI.executeQueries(qList,function(status,result){
+				res.setHeader('Content-Type', 'application/json');
+				if(status!=200) res.status(status).send(result);
 				else{
 					var k=0,rIndex=[],lbl,neoIdDict={},maps=[],tList=[];
-					var attrDict={"modules_endtoend":{"childIndex":"childIndex","projectID":"projectID","moduleName":"name","moduleID":"id_n","moduleID_c":"id_c"},"modules":{"childIndex":"childIndex","projectID":"pid_n","moduleName":"name","moduleID":"id_n","moduleID_c":"id_c"},"scenarios":{"projectID":"projectID","childIndex":"childIndex","moduleID":"pid_n","testScenarioName":"name","testScenarioID":"id_n","testScenarioID_c":"id_c"},"screens":{"childIndex":"childIndex","testScenarioID":"pid_n","screenName":"name","screenID":"id_n","screenID_c":"id_c"},"testcases":{"childIndex":"childIndex","screenID":"pid_n","testCaseName":"name","testCaseID":"id_n","testCaseID_c":"id_c"},"tasks":{"taskID":"id_n","task":"t","batchName":"bn","assignedTo":"at","reviewer":"rw","startDate":"sd","endDate":"ed","release":"re","cycle":"cy","details":"det","nodeID":"pid","parent":"anc"}};
+					var attrDict={"modules_endtoend":{"childIndex":"childIndex","projectID":"projectID","moduleName":"name","moduleID":"id_n","moduleID_c":"id_c"},"modules":{"childIndex":"childIndex","projectID":"pid_n","moduleName":"name","moduleID":"id_n","moduleID_c":"id_c"},"scenarios":{"projectID":"projectID","childIndex":"childIndex","moduleID":"pid_n","testScenarioName":"name","testScenarioID":"id_n","testScenarioID_c":"id_c"},"screens":{"childIndex":"childIndex","testScenarioID":"pid_n","screenName":"name","screenID":"id_n","screenID_c":"id_c"},"testcases":{"childIndex":"childIndex","screenID":"pid_n","testCaseName":"name","testCaseID":"id_n","testCaseID_c":"id_c"},"tasks":{"taskID":"id_n","task":"t","batchName":"bn","assignedTo":"at","reviewer":"rw","startDate":"sd","endDate":"ed","re_estimation":"re_estimation","release":"re","cycle":"cy","details":"det","nodeID":"pid","parent":"anc"}};
 					var jsonData=JSON.parse(result);
 					var all_modules=jsonData[0].data;
 					
@@ -114,8 +74,7 @@ router.post('/', function(req, res, next) {
 								}
 								if(lbl=="tasks"){
 									try{
-										
-										nData.push({id:n.id_n,oid:n.id,task:n.t,batchName:n.bn,assignedTo:n.at,reviewer:n.rw,startDate:n.sd,endDate:n.ed,release:n.re,cycle:n.cy,details:n.det,nodeID:n.pid,parent:n.anc.slice(1,-1).split(',')});
+										nData.push({id:n.id_n,oid:n.id,task:n.t,batchName:n.bn,assignedTo:n.at,reviewer:n.rw,startDate:n.sd,endDate:n.ed,re_estimation:n.re_estimation,release:n.re,cycle:n.cy,details:n.det,nodeID:n.pid,parent:n.anc.slice(1,-1).split(',')});
 									}
 									catch (ex){
 										console.log(n.id);
@@ -124,7 +83,6 @@ router.post('/', function(req, res, next) {
 								else{
 									if(lbl=="modules" || lbl=="modules_endtoend") n.childIndex=0;
 									nData.push({projectID:n.projectID,childIndex:n.childIndex,id:n.id,"type":lbl,name:n.name,id_n:n.id_n,pid_n:n.pid_n,id_c:n.id_c,children:[],task:null});
-
 								} 
 								if(lbl=="modules" || lbl=="modules_endtoend") rIndex.push(k);
 								idDict[n.id]=k;neoIdDict[n.id_n]=k;
@@ -133,16 +91,15 @@ router.post('/', function(req, res, next) {
 						});
 						row.graph.relationships.forEach(function(r){
 							try{
-							var srcIndex=idDict[r.startNode.toString()];
-							var tgtIndex=idDict[r.endNode.toString()];
-							if(nData[tgtIndex].children===undefined) nData[srcIndex].task=nData[tgtIndex];
-							else if(nData[srcIndex].children.indexOf(nData[tgtIndex])==-1){
-								nData[srcIndex].children.push(nData[tgtIndex]);
-								if(nData[tgtIndex].childIndex==undefined){
-									nData[tgtIndex].childIndex=nData[srcIndex].children.length;
-								}
-								
-							} 
+								var srcIndex=idDict[r.startNode.toString()];
+								var tgtIndex=idDict[r.endNode.toString()];
+								if(nData[tgtIndex].children===undefined) nData[srcIndex].task=nData[tgtIndex];
+								else if(nData[srcIndex].children.indexOf(nData[tgtIndex])==-1){
+									nData[srcIndex].children.push(nData[tgtIndex]);
+									if(nData[tgtIndex].childIndex==undefined){
+										nData[tgtIndex].childIndex=nData[srcIndex].children.length;
+									}
+								} 
 							}catch (ex){
 								console.log(ex);
 							}
@@ -161,7 +118,6 @@ router.post('/', function(req, res, next) {
 			});
 		}
 		else if(d.task=='endTOend'){
-
 			data=d.data.map;
 			prjId=d.data.prjId;
 			var deletednodes=d.data.abc;
@@ -182,27 +138,24 @@ router.post('/', function(req, res, next) {
 					idDict[e.id]=(e.id_n)?e.id_n:uuidV4();
 					e.id=idDict[e.id];
 					t=e.task;
-					var taskstatus='inprogress';
+					var taskstatus='assigned';
 					if(e.type=='modules_endtoend'){
 						if(e.oid!=null){			
 							qList.push({"statement":"MATCH (n)-[r:FMTTS{id:'"+e.id+"'}]->(o:TESTSCENARIOS) DETACH DELETE r,o;"});
-							
 							if(e.renamed) qList.push({"statement":"MATCH(n:MODULES_ENDTOEND{moduleID:'"+e.id+"'}) SET n.moduleName='"+e.name+"'"+",n.unique_property='["+e.name+','+e.projectID+"]'"});
 						}
 						else qList.push({"statement":"MERGE(n:MODULES_ENDTOEND{projectID:'"+e.projectID+"',moduleName:'"+e.name+"',moduleID:'"+e.id+"',createdBy:'"+user+"',createdOn:'null',moduleID_c:'"+e.id_c+"',unique_property:'["+e.name+','+e.projectID+"]'}) SET n.childIndex='"+e.childIndex+"'"});
 						if(t!=null && e.id_c !=null){
 							t.parent=[prjId].concat(e.id_c);
 							t.id=(t.id!=null)?t.id:uuidV4();
-							
 							if(t.oid!=null){
 								if (t.updatedParent != undefined){
-									qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',nodeID:'"+e.id+"',parent:'["+t.parent+"]'}) SET n.task='"+t.task+"',n.assignedTo='"+t.assignedTo+"',n.reviewer='"+t.reviewer+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.release='"+t.release+"',n.cycle='"+t.cycle+"',n.details='"+t.details+",n.status='"+taskstatus+"',n.parent='["+[prjId].concat(t.updatedParent)+"]'"});
+									qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',nodeID:'"+e.id+"',parent:'["+t.parent+"]'}) SET n.task='"+t.task+"',n.assignedTo='"+t.assignedTo+"',n.reviewer='"+t.reviewer+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.re_estimation='"+t.re_estimation+"',n.release='"+t.release+"',n.cycle='"+t.cycle+"',n.details='"+t.details+",n.status='"+taskstatus+"',n.parent='["+[prjId].concat(t.updatedParent)+"]'"});
 								}else{
-									qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',nodeID:'"+e.id+"',parent:'["+t.parent+"]'}) SET n.task='"+t.task+"',n.status='"+taskstatus+"',n.assignedTo='"+t.assignedTo+"',n.reviewer='"+t.reviewer+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.release='"+t.release+"',n.cycle='"+t.cycle+"',n.details='"+t.details+"'"});
-								}
-								
+									qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',nodeID:'"+e.id+"',parent:'["+t.parent+"]'}) SET n.task='"+t.task+"',n.status='"+taskstatus+"',n.assignedTo='"+t.assignedTo+"',n.reviewer='"+t.reviewer+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.re_estimation='"+t.re_estimation+"',n.release='"+t.release+"',n.cycle='"+t.cycle+"',n.details='"+t.details+"'"});
+								}	
 							} 
-							else qList.push({"statement":"MERGE(n:TASKS{taskID:'"+t.id+"',task:'"+t.task+"',assignedTo:'"+t.assignedTo+"',status:'"+taskstatus+"',reviewer:'"+t.reviewer+"',startDate:'"+t.startDate+"',endDate:'"+t.endDate+"',release:'"+t.release+"',cycle:'"+t.cycle+"',details:'"+t.details+"',nodeID:'"+e.id+"',parent:'["+t.parent+"]'})"});
+							else qList.push({"statement":"MERGE(n:TASKS{taskID:'"+t.id+"',task:'"+t.task+"',assignedTo:'"+t.assignedTo+"',status:'"+taskstatus+"',reviewer:'"+t.reviewer+"',startDate:'"+t.startDate+"',endDate:'"+t.endDate+"',re_estimation:'"+t.re_estimation+"',release:'"+t.release+"',cycle:'"+t.cycle+"',details:'"+t.details+"',nodeID:'"+e.id+"',parent:'["+t.parent+"]'})"});
 						}
 					}
  					else if(e.type=='scenarios'){
@@ -212,21 +165,17 @@ router.post('/', function(req, res, next) {
 						if(t!=null && e.id_c!=null){
 							t.parent=[prjId].concat(e.pid_c,e.id_c);
 							t.id=(t.id!=null)?t.id:uuidV4();
-		
 							if(t.oid!=null){
 								if (t.updatedParent != undefined){
-									qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',nodeID:'"+e.id+"',parent:'["+t.parent+"]'}) SET n.task='"+t.task+"',n.status='"+taskstatus+"',n.assignedTo='"+t.assignedTo+"',n.reviewer='"+t.reviewer+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.release='"+t.release+"',n.cycle='"+t.cycle+"',n.details='"+t.details+"',n.parent='["+[prjId].concat(t.updatedParent)+"]'"});
+									qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',nodeID:'"+e.id+"',parent:'["+t.parent+"]'}) SET n.task='"+t.task+"',n.status='"+taskstatus+"',n.assignedTo='"+t.assignedTo+"',n.reviewer='"+t.reviewer+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.re_estimation='"+t.re_estimation+"',n.release='"+t.release+"',n.cycle='"+t.cycle+"',n.details='"+t.details+"',n.parent='["+[prjId].concat(t.updatedParent)+"]'"});
 								}else{
-									qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',nodeID:'"+e.id+"',parent:'["+t.parent+"]'}) SET n.task='"+t.task+"',n.status='"+taskstatus+"',n.assignedTo='"+t.assignedTo+"',n.reviewer='"+t.reviewer+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.release='"+t.release+"',n.cycle='"+t.cycle+"',n.details='"+t.details+"'"});
+									qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',nodeID:'"+e.id+"',parent:'["+t.parent+"]'}) SET n.task='"+t.task+"',n.status='"+taskstatus+"',n.assignedTo='"+t.assignedTo+"',n.reviewer='"+t.reviewer+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.re_estimation='"+t.re_estimation+"',n.release='"+t.release+"',n.cycle='"+t.cycle+"',n.details='"+t.details+"'"});
 								}
-								
 							} 
-							else qList.push({"statement":"MERGE(n:TASKS{taskID:'"+t.id+"',task:'"+t.task+"',assignedTo:'"+t.assignedTo+"',reviewer:'"+t.reviewer+"',status:'"+taskstatus+"',startDate:'"+t.startDate+"',endDate:'"+t.endDate+"',release:'"+t.release+"',cycle:'"+t.cycle+"',details:'"+t.details+"',nodeID:'"+e.id+"',parent:'["+t.parent+"]'})"});
+							else qList.push({"statement":"MERGE(n:TASKS{taskID:'"+t.id+"',task:'"+t.task+"',assignedTo:'"+t.assignedTo+"',reviewer:'"+t.reviewer+"',status:'"+taskstatus+"',startDate:'"+t.startDate+"',endDate:'"+t.endDate+"',re_estimation:'"+t.re_estimation+"',release:'"+t.release+"',cycle:'"+t.cycle+"',details:'"+t.details+"',nodeID:'"+e.id+"',parent:'["+t.parent+"]'})"});
 						}
 						//qList.push({"statement":"MATCH(n:TESTSCENARIOS{testScenarioID:'"+e.id+"'}) SET n.testScenarioName='"+e.name+"'"+",n.projectID='"+prjId+"'"});
 					}
-					
-					
 				});
 				qList.push({"statement":"MATCH (a:MODULES_ENDTOEND),(b:TESTSCENARIOS) WHERE a.moduleID=b.moduleID MERGE (a)-[r:FMTTS {id:b.moduleID}]-(b)"});
 				// qList.push({"statement":"MATCH (a:TESTSCENARIOS),(b:SCREENS) WHERE a.testScenarioID=b.testScenarioID MERGE (a)-[r:FTSTS {id:b.testScenarioID}]-(b)"});
@@ -242,14 +191,13 @@ router.post('/', function(req, res, next) {
 				//qList=qList.concat(rnmList);
 				//var index=(qList.length-rnmList.length)-1;
 				
-				reqToAPI({"data":{"statements":qList}},urlData,'/neo4jAPI',function(err,status,result){
-					res.setHeader('Content-Type','application/json');
-					if(err) res.status(status).send(err);
-					else if(status!=200) res.status(status).send(result);
+				neo4jAPI.executeQueries(qList,function(status,result){
+					res.setHeader('Content-Type', 'application/json');
+					if(status!=200) res.status(status).send(result);
 					else{
 						var k=0,rIndex,lbl,neoIdDict={};
 						idDict={};
-						var attrDict={"modules_endtoend":{"childIndex":"childIndex","projectID":"projectID","moduleName":"name","moduleID":"id_n","moduleID_c":"id_c"},"modules":{"childIndex":"childIndex","projectID":"pid_n","moduleName":"name","moduleID":"id_n","moduleID_c":"id_c"},"scenarios":{"projectID":"projectID","childIndex":"childIndex","moduleID":"pid_n","testScenarioName":"name","testScenarioID":"id_n","testScenarioID_c":"id_c"},"screens":{"childIndex":"childIndex","testScenarioID":"pid_n","screenName":"name","screenID":"id_n","screenID_c":"id_c"},"testcases":{"childIndex":"childIndex","screenID":"pid_n","testCaseName":"name","testCaseID":"id_n","testCaseID_c":"id_c"},"tasks":{"taskID":"id_n","task":"t","assignedTo":"at","reviewer":"rw","startDate":"sd","endDate":"ed","release":"re","cycle":"cy","details":"det","nodeID":"pid","parent":"anc"}};
+						var attrDict={"modules_endtoend":{"childIndex":"childIndex","projectID":"projectID","moduleName":"name","moduleID":"id_n","moduleID_c":"id_c"},"modules":{"childIndex":"childIndex","projectID":"pid_n","moduleName":"name","moduleID":"id_n","moduleID_c":"id_c"},"scenarios":{"projectID":"projectID","childIndex":"childIndex","moduleID":"pid_n","testScenarioName":"name","testScenarioID":"id_n","testScenarioID_c":"id_c"},"screens":{"childIndex":"childIndex","testScenarioID":"pid_n","screenName":"name","screenID":"id_n","screenID_c":"id_c"},"testcases":{"childIndex":"childIndex","screenID":"pid_n","testCaseName":"name","testCaseID":"id_n","testCaseID_c":"id_c"},"tasks":{"taskID":"id_n","task":"t","assignedTo":"at","reviewer":"rw","startDate":"sd","endDate":"ed","re_estimation":"re_estimation","release":"re","cycle":"cy","details":"det","nodeID":"pid","parent":"anc"}};
 						var jsonData=JSON.parse(result);
 						var new_res=jsonData[jsonData.length-1].data;
 						if(new_res.length==0){
@@ -265,7 +213,7 @@ router.post('/', function(req, res, next) {
 										if(attrDict[lbl][attrs] !== undefined) n[attrDict[lbl][attrs]]=n.properties[attrs];
 										delete n.properties[attrs];
 									}
-									if(lbl=="tasks") nData.push({id:n.id_n,oid:n.id,task:n.t,assignedTo:n.at,reviewer:n.rw,startDate:n.sd,endDate:n.ed,release:n.re,cycle:n.cy,details:n.det,nodeID:n.pid,parent:n.anc.slice(1,-1).split(',')});
+									if(lbl=="tasks") nData.push({id:n.id_n,oid:n.id,task:n.t,assignedTo:n.at,reviewer:n.rw,startDate:n.sd,endDate:n.ed,re_estimation:n.re_estimation,release:n.re,cycle:n.cy,details:n.det,nodeID:n.pid,parent:n.anc.slice(1,-1).split(',')});
 									else{
 										if(lbl=="modules_endtoend") n.childIndex=0;
 										nData.push({projectID:n.projectID,childIndex:n.childIndex,id:n.id,"type":lbl,name:n.name,id_n:n.id_n,pid_n:n.pid_n,id_c:n.id_c,children:[],task:null});
@@ -282,7 +230,6 @@ router.post('/', function(req, res, next) {
 								else if(nData[srcIndex].children.indexOf(nData[tgtIndex])==-1){
 									nData[srcIndex].children.push(nData[tgtIndex]);
 									if(nData[tgtIndex].childIndex==undefined) nData[tgtIndex].childIndex=nData[srcIndex].children.length;
-									
 								} 
 							});
 						});
@@ -292,8 +239,6 @@ router.post('/', function(req, res, next) {
 								else e.pid_n=null;
 							}
 						});
-						
-					
 						res.status(status).send(nData[rIndex]);
 					}
 				});
@@ -301,7 +246,6 @@ router.post('/', function(req, res, next) {
 				var uidx=0,rIndex;
 				var relId=d.data.relId;
 				var cycId=d.data.cycId;
-			
 				var qObj={"projectId":prjId,"releaseId":relId,"cycleId":cycId,"appType":"Web","testsuiteDetails":[]};
 				var nObj=[],tsList=[];
 				data.forEach(function(e,i){
@@ -329,30 +273,22 @@ router.post('/', function(req, res, next) {
 				qObj.userName=d.data.user_name;
 				//fs.writeFileSync('assets/req_json.json',JSON.stringify(qObj),'utf8');
 				create_ice.createE2E_Structure_Nineteen68(qObj,function(err,data){
-				//res.setHeader('Content-Type', 'application/json');
-				if(err)
-				res.status(500).send(err);
-				else{
-					datatosend=data;
-					
-				}
-				//fs.writeFileSync('assets/req_json_cassandra.txt',JSON.stringify(data),'utf8');
-				//var data = JSON.stringify(data);
-				var module_type='modules_endtoend';
-				var parsing_result=parsing(data,urlData,module_type);
-				//var qList_new=parsing(data,urlData);
-				 
-				reqToAPI({"data":{"statements":parsing_result[0]}},urlData,'/neo4jAPI',function(err,status,result){
-					//res.setHeader('Content-Type','application/json');
-					if(err) res.status(status).send(err);
-					res.status(200).send(parsing_result[1]);
-					
+					//res.setHeader('Content-Type', 'application/json');
+					if(err)
+					res.status(500).send(err);
+					else{
+						datatosend=data;
+					}
+					//fs.writeFileSync('assets/req_json_cassandra.txt',JSON.stringify(data),'utf8');
+					//var data = JSON.stringify(data);
+					var module_type='modules_endtoend';
+					var parsing_result=parsing(data,urlData,module_type);
+					//var qList_new=parsing(data,urlData);
+					neo4jAPI.executeQueries(parsing_result[0],function(status,result){
+						if(status!=200) res.status(status).send(result);
+						else res.status(200).send(parsing_result[1]);
+					});
 				});
-				
-
-
-				});
-
 			}
 		}
 		else if(d.task=='writeMap'){
@@ -377,7 +313,7 @@ router.post('/', function(req, res, next) {
 					idDict[e.id]=(e.id_n)?e.id_n:uuidV4();
 					e.id=idDict[e.id];
 					t=e.task;
-					var taskstatus='inprogress';
+					var taskstatus='assigned';
 					if(e.type=='modules_endtoend'){
 						if(e.oid!=null){
 							qList.push({"statement":"MATCH (n)-[r:FMTTS{id:'"+e.id+"'}]->(o:TESTSCENARIOS) DETACH DELETE r,o"});
@@ -390,13 +326,13 @@ router.post('/', function(req, res, next) {
 							
 							if(t.oid!=null){
 								if (t.updatedParent != undefined){
-									qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',nodeID:'"+e.id+"',parent:'["+t.parent+"]'}) SET n.task='"+t.task+"',n.batchName='"+t.batchName+"',n.assignedTo='"+t.assignedTo+"',n.reviewer='"+t.reviewer+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.release='"+t.release+"',n.cycle='"+t.cycle+"',n.details='"+t.details+",n.status='"+taskstatus+"',n.parent='["+[prjId].concat(t.updatedParent)+"]'"});
+									qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',nodeID:'"+e.id+"',parent:'["+t.parent+"]'}) SET n.task='"+t.task+"',n.batchName='"+t.batchName+"',n.assignedTo='"+t.assignedTo+"',n.reviewer='"+t.reviewer+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.re_estimation='"+t.re_estimation+"',n.release='"+t.release+"',n.cycle='"+t.cycle+"',n.details='"+t.details+",n.status='"+taskstatus+"',n.parent='["+[prjId].concat(t.updatedParent)+"]'"});
 								}else{
-									qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',nodeID:'"+e.id+"',parent:'["+t.parent+"]'}) SET n.task='"+t.task+"',n.batchName='"+t.batchName+"',n.status='"+taskstatus+"',n.assignedTo='"+t.assignedTo+"',n.reviewer='"+t.reviewer+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.release='"+t.release+"',n.cycle='"+t.cycle+"',n.details='"+t.details+"'"});
+									qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',nodeID:'"+e.id+"',parent:'["+t.parent+"]'}) SET n.task='"+t.task+"',n.batchName='"+t.batchName+"',n.status='"+taskstatus+"',n.assignedTo='"+t.assignedTo+"',n.reviewer='"+t.reviewer+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.re_estimation='"+t.re_estimation+"',n.release='"+t.release+"',n.cycle='"+t.cycle+"',n.details='"+t.details+"'"});
 								}
 								
 							} 
-							else qList.push({"statement":"MERGE(n:TASKS{taskID:'"+t.id+"',batchName:'"+t.batchName+"',task:'"+t.task+"',assignedTo:'"+t.assignedTo+"',status:'"+taskstatus+"',reviewer:'"+t.reviewer+"',startDate:'"+t.startDate+"',endDate:'"+t.endDate+"',release:'"+t.release+"',cycle:'"+t.cycle+"',details:'"+t.details+"',nodeID:'"+e.id+"',parent:'["+t.parent+"]'})"});
+							else qList.push({"statement":"MERGE(n:TASKS{taskID:'"+t.id+"',batchName:'"+t.batchName+"',task:'"+t.task+"',assignedTo:'"+t.assignedTo+"',status:'"+taskstatus+"',reviewer:'"+t.reviewer+"',startDate:'"+t.startDate+"',endDate:'"+t.endDate+"',re_estimation:'"+t.re_estimation+"',release:'"+t.release+"',cycle:'"+t.cycle+"',details:'"+t.details+"',nodeID:'"+e.id+"',parent:'["+t.parent+"]'})"});
 						}
 					}
 					else if(e.type=='modules'){
@@ -416,13 +352,12 @@ router.post('/', function(req, res, next) {
 							
 							if(t.oid!=null){
 								if (t.updatedParent != undefined){
-									qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',nodeID:'"+e.id+"',parent:'["+t.parent+"]'}) SET n.task='"+t.task+"',n.batchName='"+t.batchName+"',n.assignedTo='"+t.assignedTo+"',n.reviewer='"+t.reviewer+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.release='"+t.release+"',n.cycle='"+t.cycle+"',n.details='"+t.details+",n.status='"+taskstatus+"',n.parent='["+[prjId].concat(t.updatedParent)+"]'"});
+									qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',nodeID:'"+e.id+"',parent:'["+t.parent+"]'}) SET n.task='"+t.task+"',n.batchName='"+t.batchName+"',n.assignedTo='"+t.assignedTo+"',n.reviewer='"+t.reviewer+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.re_estimation='"+t.re_estimation+"',n.release='"+t.release+"',n.cycle='"+t.cycle+"',n.details='"+t.details+",n.status='"+taskstatus+"',n.parent='["+[prjId].concat(t.updatedParent)+"]'"});
 								}else{
-									qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',nodeID:'"+e.id+"',parent:'["+t.parent+"]'}) SET n.task='"+t.task+"',n.batchName='"+t.batchName+"',n.status='"+taskstatus+"',n.assignedTo='"+t.assignedTo+"',n.reviewer='"+t.reviewer+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.release='"+t.release+"',n.cycle='"+t.cycle+"',n.details='"+t.details+"'"});
+									qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',nodeID:'"+e.id+"',parent:'["+t.parent+"]'}) SET n.task='"+t.task+"',n.batchName='"+t.batchName+"',n.status='"+taskstatus+"',n.assignedTo='"+t.assignedTo+"',n.reviewer='"+t.reviewer+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.re_estimation='"+t.re_estimation+"',n.release='"+t.release+"',n.cycle='"+t.cycle+"',n.details='"+t.details+"'"});
 								}
-								
 							} 
-							else qList.push({"statement":"MERGE(n:TASKS{taskID:'"+t.id+"',batchName:'"+t.batchName+"',task:'"+t.task+"',assignedTo:'"+t.assignedTo+"',status:'"+taskstatus+"',reviewer:'"+t.reviewer+"',startDate:'"+t.startDate+"',endDate:'"+t.endDate+"',release:'"+t.release+"',cycle:'"+t.cycle+"',details:'"+t.details+"',nodeID:'"+e.id+"',parent:'["+t.parent+"]'})"});
+							else qList.push({"statement":"MERGE(n:TASKS{taskID:'"+t.id+"',batchName:'"+t.batchName+"',task:'"+t.task+"',assignedTo:'"+t.assignedTo+"',status:'"+taskstatus+"',reviewer:'"+t.reviewer+"',startDate:'"+t.startDate+"',endDate:'"+t.endDate+"',re_estimation:'"+t.re_estimation+"',release:'"+t.release+"',cycle:'"+t.cycle+"',details:'"+t.details+"',nodeID:'"+e.id+"',parent:'["+t.parent+"]'})"});
 						}
 					}
  					else if(e.type=='scenarios'){
@@ -435,13 +370,12 @@ router.post('/', function(req, res, next) {
 		
 							if(t.oid!=null){
 								if (t.updatedParent != undefined){
-									qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',nodeID:'"+e.id+"',parent:'["+t.parent+"]'}) SET n.task='"+t.task+"',n.status='"+taskstatus+"',n.assignedTo='"+t.assignedTo+"',n.reviewer='"+t.reviewer+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.release='"+t.release+"',n.cycle='"+t.cycle+"',n.details='"+t.details+"',n.parent='["+[prjId].concat(t.updatedParent)+"]'"});
+									qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',nodeID:'"+e.id+"',parent:'["+t.parent+"]'}) SET n.task='"+t.task+"',n.status='"+taskstatus+"',n.assignedTo='"+t.assignedTo+"',n.reviewer='"+t.reviewer+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.re_estimation='"+t.re_estimation+"',n.release='"+t.release+"',n.cycle='"+t.cycle+"',n.details='"+t.details+"',n.parent='["+[prjId].concat(t.updatedParent)+"]'"});
 								}else{
-									qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',nodeID:'"+e.id+"',parent:'["+t.parent+"]'}) SET n.task='"+t.task+"',n.status='"+taskstatus+"',n.assignedTo='"+t.assignedTo+"',n.reviewer='"+t.reviewer+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.release='"+t.release+"',n.cycle='"+t.cycle+"',n.details='"+t.details+"'"});
+									qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',nodeID:'"+e.id+"',parent:'["+t.parent+"]'}) SET n.task='"+t.task+"',n.status='"+taskstatus+"',n.assignedTo='"+t.assignedTo+"',n.reviewer='"+t.reviewer+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.re_estimation='"+t.re_estimation+"',n.release='"+t.release+"',n.cycle='"+t.cycle+"',n.details='"+t.details+"'"});
 								}
-								
 							} 
-							else qList.push({"statement":"MERGE(n:TASKS{taskID:'"+t.id+"',task:'"+t.task+"',assignedTo:'"+t.assignedTo+"',reviewer:'"+t.reviewer+"',status:'"+taskstatus+"',startDate:'"+t.startDate+"',endDate:'"+t.endDate+"',release:'"+t.release+"',cycle:'"+t.cycle+"',details:'"+t.details+"',nodeID:'"+e.id+"',parent:'["+t.parent+"]'})"});
+							else qList.push({"statement":"MERGE(n:TASKS{taskID:'"+t.id+"',task:'"+t.task+"',assignedTo:'"+t.assignedTo+"',reviewer:'"+t.reviewer+"',status:'"+taskstatus+"',startDate:'"+t.startDate+"',endDate:'"+t.endDate+"',re_estimation:'"+t.re_estimation+"',release:'"+t.release+"',cycle:'"+t.cycle+"',details:'"+t.details+"',nodeID:'"+e.id+"',parent:'["+t.parent+"]'})"});
 						}
 						//qList.push({"statement":"MATCH(n:TESTSCENARIOS{testScenarioID:'"+e.id+"'}) SET n.testScenarioName='"+e.name+"'"+",n.projectID='"+prjId+"'"});
 					}
@@ -452,19 +386,16 @@ router.post('/', function(req, res, next) {
 						qList.push({"statement":"MERGE(n:SCREENS{projectID:'"+prjId+"',testScenarioID:'"+idDict[e.pid]+"',screenName:'"+e.name+"',screenID:'"+e.id+"',createdBy:'"+user+"',createdOn:'null',uid:'"+uidx+"',screenID_c:'"+e.id_c+"'})SET n.childIndex='"+e.childIndex+"'"});
 						if(t!=null && e.id_c!=null){
 							t.id=(t.id!=null)?t.id:uuidV4();
-		
 							if(t.oid!=null){
 								if (t.updatedParent != undefined){
-									qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',nodeID:'"+e.id+"',parent:'["+t.parent+"]'}) SET n.task='"+t.task+"',n.assignedTo='"+t.assignedTo+"',n.status='"+taskstatus+"',n.reviewer='"+t.reviewer+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.details='"+t.details+"',n.uid='"+uidx+"',n.parent='["+[prjId].concat(t.updatedParent)+"]'"});
+									qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',nodeID:'"+e.id+"',parent:'["+t.parent+"]'}) SET n.task='"+t.task+"',n.assignedTo='"+t.assignedTo+"',n.status='"+taskstatus+"',n.reviewer='"+t.reviewer+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.re_estimation='"+t.re_estimation+"',n.details='"+t.details+"',n.uid='"+uidx+"',n.parent='["+[prjId].concat(t.updatedParent)+"]'"});
 								}else{
-									qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',nodeID:'"+e.id+"',parent:'["+t.parent+"]'}) SET n.task='"+t.task+"',n.assignedTo='"+t.assignedTo+"',n.status='"+taskstatus+"',n.reviewer='"+t.reviewer+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.details='"+t.details+"',n.uid='"+uidx+"'"});
+									qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',nodeID:'"+e.id+"',parent:'["+t.parent+"]'}) SET n.task='"+t.task+"',n.assignedTo='"+t.assignedTo+"',n.status='"+taskstatus+"',n.reviewer='"+t.reviewer+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.re_estimation='"+t.re_estimation+"',n.details='"+t.details+"',n.uid='"+uidx+"'"});
 								}
-								
 							} 
 							else{
-								
 								t.parent=[prjId].concat(t.parent);
-								qList.push({"statement":"MERGE(n:TASKS{taskID:'"+t.id+"',task:'"+t.task+"',assignedTo:'"+t.assignedTo+"',reviewer:'"+t.reviewer+"',status:'"+taskstatus+"',startDate:'"+t.startDate+"',endDate:'"+t.endDate+"',details:'"+t.details+"',nodeID:'"+e.id+"',parent:'["+t.parent+"]',uid:'"+uidx+"'})"});
+								qList.push({"statement":"MERGE(n:TASKS{taskID:'"+t.id+"',task:'"+t.task+"',assignedTo:'"+t.assignedTo+"',reviewer:'"+t.reviewer+"',status:'"+taskstatus+"',startDate:'"+t.startDate+"',endDate:'"+t.endDate+"',re_estimation:'"+t.re_estimation+"',details:'"+t.details+"',nodeID:'"+e.id+"',parent:'["+t.parent+"]',uid:'"+uidx+"'})"});
 							}
 						}
 					}
@@ -474,29 +405,25 @@ router.post('/', function(req, res, next) {
 						if(e.renamed && e.id_n && e.orig_name){
 							rnmList.push({"statement":"MATCH(n:TESTCASES{testCaseName:'"+e.orig_name+"',testScenarioID:'"+lts+"',screenID_c:'"+e.pid_c+"'}) SET n.testCaseName='"+e.name+"'"});
 						}
-						
 						if(e.pid_c!='null' && e.pid_c!=undefined){
 							qList.push({"statement":"MERGE(n:TESTCASES{screenID:'"+idDict[e.pid]+"',testScenarioID:'"+lts+"',testCaseName:'"+e.name+"',testCaseID:'"+e.id+"',createdBy:'"+user+"',createdOn:'null',uid:'"+uidx+"',testCaseID_c:'"+e.id_c+"'}) SET n.screenID_c='"+e.pid_c+"',n.childIndex='"+e.childIndex+"'"});
 						}else{
 							qList.push({"statement":"MERGE(n:TESTCASES{screenID:'"+idDict[e.pid]+"',testScenarioID:'"+lts+"',testCaseName:'"+e.name+"',testCaseID:'"+e.id+"',createdBy:'"+user+"',createdOn:'null',uid:'"+uidx+"',testCaseID_c:'"+e.id_c+"'}) SET n.childIndex='"+e.childIndex+"'"});
 						}
 						
-						
 						if(t!=null  && e.id_c!=null){
 							t.id=(t.id!=null)?t.id:uuidV4();
 							//var parent=[prjId].concat(t.parent);
 							if(t.oid!=null){
 								if (t.updatedParent != undefined){
-									qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',nodeID:'"+e.id+"',parent:'["+t.parent+"]'}) SET n.task='"+t.task+"',n.assignedTo='"+t.assignedTo+"',n.reviewer='"+t.reviewer+"',n.status='"+taskstatus+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.details='"+t.details+"',n.uid='"+uidx+"',n.parent='["+[prjId].concat(t.updatedParent)+"]'"});
+									qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',nodeID:'"+e.id+"',parent:'["+t.parent+"]'}) SET n.task='"+t.task+"',n.assignedTo='"+t.assignedTo+"',n.reviewer='"+t.reviewer+"',n.status='"+taskstatus+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.re_estimation='"+t.re_estimation+"',n.details='"+t.details+"',n.uid='"+uidx+"',n.parent='["+[prjId].concat(t.updatedParent)+"]'"});
 								}else{
-									qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',nodeID:'"+e.id+"',parent:'["+t.parent+"]'}) SET n.task='"+t.task+"',n.assignedTo='"+t.assignedTo+"',n.reviewer='"+t.reviewer+"',n.status='"+taskstatus+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.details='"+t.details+"',n.uid='"+uidx+"'"});
+									qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',nodeID:'"+e.id+"',parent:'["+t.parent+"]'}) SET n.task='"+t.task+"',n.assignedTo='"+t.assignedTo+"',n.reviewer='"+t.reviewer+"',n.status='"+taskstatus+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.re_estimation='"+t.re_estimation+"',n.details='"+t.details+"',n.uid='"+uidx+"'"});
 								}
-								
 							} 
 							else{
-								
 								t.parent=[prjId].concat(t.parent);
-								qList.push({"statement":"MERGE(n:TASKS{taskID:'"+t.id+"',task:'"+t.task+"',assignedTo:'"+t.assignedTo+"',status:'"+taskstatus+"',reviewer:'"+t.reviewer+"',startDate:'"+t.startDate+"',endDate:'"+t.endDate+"',details:'"+t.details+"',nodeID:'"+e.id+"',parent:'["+t.parent+"]',uid:'"+uidx+"'})"});
+								qList.push({"statement":"MERGE(n:TASKS{taskID:'"+t.id+"',task:'"+t.task+"',assignedTo:'"+t.assignedTo+"',status:'"+taskstatus+"',reviewer:'"+t.reviewer+"',startDate:'"+t.startDate+"',endDate:'"+t.endDate+"',re_estimation:'"+t.re_estimation+"',details:'"+t.details+"',nodeID:'"+e.id+"',parent:'["+t.parent+"]',uid:'"+uidx+"'})"});
 							}
 						}
 					}
@@ -525,18 +452,16 @@ router.post('/', function(req, res, next) {
 					qList=qList.concat(rnmList);
 					qList.push({"statement":"MATCH path=(n:MODULES_ENDTOEND{moduleID:'"+data[0].id+"'}) WHERE NOT (n)-[:FMTTS]->() RETURN n","resultDataContents":["graph"]});
 					qList.push({"statement":"MATCH path=(n:MODULES_ENDTOEND{moduleID:'"+data[0].id+"'})-[r*1..]->(t) RETURN path","resultDataContents":["graph"]});
-					
 				}
 				
 				
-				reqToAPI({"data":{"statements":qList}},urlData,'/neo4jAPI',function(err,status,result){
-					res.setHeader('Content-Type','application/json');
-					if(err) res.status(status).send(err);
-					else if(status!=200) res.status(status).send(result);
+				neo4jAPI.executeQueries(qList,function(status,result){
+					res.setHeader('Content-Type', 'application/json');
+					if(status!=200) res.status(status).send(result);
 					else{
 						var k=0,rIndex,lbl,neoIdDict={};
 						idDict={};
-						var attrDict={"modules_endtoend":{"childIndex":"childIndex","projectID":"pid_n","moduleName":"name","moduleID":"id_n","moduleID_c":"id_c"},"modules":{"childIndex":"childIndex","projectID":"pid_n","moduleName":"name","moduleID":"id_n","moduleID_c":"id_c"},"scenarios":{"childIndex":"childIndex","moduleID":"pid_n","testScenarioName":"name","testScenarioID":"id_n","testScenarioID_c":"id_c"},"screens":{"childIndex":"childIndex","testScenarioID":"pid_n","screenName":"name","screenID":"id_n","screenID_c":"id_c"},"testcases":{"childIndex":"childIndex","screenID":"pid_n","testCaseName":"name","testCaseID":"id_n","testCaseID_c":"id_c"},"tasks":{"taskID":"id_n","task":"t","batchName":"bn","assignedTo":"at","reviewer":"rw","startDate":"sd","endDate":"ed","release":"re","cycle":"cy","details":"det","nodeID":"pid","parent":"anc"}};
+						var attrDict={"modules_endtoend":{"childIndex":"childIndex","projectID":"pid_n","moduleName":"name","moduleID":"id_n","moduleID_c":"id_c"},"modules":{"childIndex":"childIndex","projectID":"pid_n","moduleName":"name","moduleID":"id_n","moduleID_c":"id_c"},"scenarios":{"childIndex":"childIndex","moduleID":"pid_n","testScenarioName":"name","testScenarioID":"id_n","testScenarioID_c":"id_c"},"screens":{"childIndex":"childIndex","testScenarioID":"pid_n","screenName":"name","screenID":"id_n","screenID_c":"id_c"},"testcases":{"childIndex":"childIndex","screenID":"pid_n","testCaseName":"name","testCaseID":"id_n","testCaseID_c":"id_c"},"tasks":{"taskID":"id_n","task":"t","batchName":"bn","assignedTo":"at","reviewer":"rw","startDate":"sd","endDate":"ed","re_estimation":"re_estimation","release":"re","cycle":"cy","details":"det","nodeID":"pid","parent":"anc"}};
 						var jsonData=JSON.parse(result);
 						
 						var new_res=jsonData[jsonData.length-1].data;
@@ -552,7 +477,7 @@ router.post('/', function(req, res, next) {
 										if(attrDict[lbl][attrs] !== undefined) n[attrDict[lbl][attrs]]=n.properties[attrs];
 										delete n.properties[attrs];
 									}
-									if(lbl=="tasks") nData.push({id:n.id_n,oid:n.id,task:n.t,batchName:n.bn,assignedTo:n.at,reviewer:n.rw,startDate:n.sd,endDate:n.ed,release:n.re,cycle:n.cy,details:n.det,nodeID:n.pid,parent:n.anc.slice(1,-1).split(',')});
+									if(lbl=="tasks") nData.push({id:n.id_n,oid:n.id,task:n.t,batchName:n.bn,assignedTo:n.at,reviewer:n.rw,startDate:n.sd,endDate:n.ed,re_estimation:n.re_estimation,release:n.re,cycle:n.cy,details:n.det,nodeID:n.pid,parent:n.anc.slice(1,-1).split(',')});
 									else{
 										if(lbl=="modules" || lbl=="modules_endtoend") n.childIndex=0;
 										nData.push({childIndex:n.childIndex,id:n.id,"type":lbl,name:n.name,id_n:n.id_n,pid_n:n.pid_n,id_c:n.id_c,children:[],task:null});
@@ -579,8 +504,6 @@ router.post('/', function(req, res, next) {
 								else e.pid_n=null;
 							}
 						});
-						
-					
 						res.status(status).send(nData[rIndex]);
 					}
 				});
@@ -615,30 +538,24 @@ router.post('/', function(req, res, next) {
 				qObj.userName=d.data.user_name;
 				//fs.writeFileSync('assets/req_json.json',JSON.stringify(qObj),'utf8');
 				create_ice.createStructure_Nineteen68(qObj,function(err,data){
-				//res.setHeader('Content-Type', 'application/json');
-				if(err)
-				res.status(500).send(err);
-				else{
-					datatosend=data;
-					
-				}
-				//fs.writeFileSync('assets/req_json_cassandra.txt',JSON.stringify(data),'utf8');
-				//var data = JSON.stringify(data);
-				var module_type='modules';
-				var parsing_result=parsing(data,urlData,module_type);
-				//var qList_new=parsing(data,urlData);
-				 
-				reqToAPI({"data":{"statements":parsing_result[0]}},urlData,'/neo4jAPI',function(err,status,result){
-					//res.setHeader('Content-Type','application/json');
-					if(err) res.status(status).send(err);
-					res.status(200).send(parsing_result[1]);
-					
+					//res.setHeader('Content-Type', 'application/json');
+					if(err)
+					res.status(500).send(err);
+					else{
+						datatosend=data;
+						
+					}
+					//fs.writeFileSync('assets/req_json_cassandra.txt',JSON.stringify(data),'utf8');
+					//var data = JSON.stringify(data);
+					var module_type='modules';
+					var parsing_result=parsing(data,urlData,module_type);
+					//var qList_new=parsing(data,urlData);
+					neo4jAPI.executeQueries(parsing_result[0],function(status,result){
+						//res.setHeader('Content-Type', 'application/json');
+						if(status!=200) res.status(status).send(result);
+						else res.status(200).send(parsing_result[1]);
+					});
 				});
-				
-
-
-				});
-
 			}
 		}
 		else if(d.task=='populateUsers'){
@@ -707,30 +624,113 @@ router.post('/', function(req, res, next) {
 		}else if(d.task=='reviewTask'){
 			//var prjId=d.prjId;
 			var taskID=d.taskId;
-			query={'statement':"MATCH (n:TASKS) WHERE n.taskID='"+taskID+"' and n.assignedTo='"+d.userId+"' RETURN n.reviewer"};
+			var date=new Date();
+
+			var cur_date=date.getDate()+"/"+(date.getMonth()+1)+"/"+date.getFullYear()+','+date.toLocaleTimeString();
+			var taskHistory={"userid":d.userId,"status":"","modifiedBy":d.user_name,"modifiedOn":cur_date};
+			if (d.status=='inprogress' || d.status=='assigned'|| d.status=='reassigned' || d.status=='reassign'){
+				//query={'statement':"MATCH (n:TASKS) WHERE n.taskID='"+taskID+"' and n.assignedTo='"+d.userId+"' RETURN n"};
+				query={'statement':"MATCH (n:TASKS) WHERE n.taskID='"+taskID+"' and n.assignedTo='"+d.userId+"' with n as n Match path=(n)<-[r]-(a) RETURN path","resultDataContents":["graph"]};
+			}else if(d.status=='review'){
+				//query={'statement':"MATCH (n:TASKS) WHERE n.taskID='"+taskID+"' and n.reviewer='"+d.userId+"' RETURN n"};
+				query={'statement':"MATCH (n:TASKS) WHERE n.taskID='"+taskID+"' and n.reviewer='"+d.userId+"' with n as n Match path=(n)<-[r]-(a) RETURN path","resultDataContents":["graph"]};
+			}
+			// else if(d.status=='reassign'){
+			// 	query={'statement':"MATCH (n:TASKS) WHERE n.taskID='"+taskID+"' and n.assignedTo='"+d.userId+"' RETURN n"};
+			// }
+			
 			var qlist_query=[query];
-			reqToAPI({"data":{"statements":qlist_query}},urlData,'/neo4jAPI',function(err,status,result){
+			var new_queries='';
+			var task_flag=false;
+			neo4jAPI.executeQueries(qlist_query,function(status,result){
 					//res.setHeader('Content-Type','application/json');
-					if(err) {
-						res.status(status).send(err);
+					if(status!=200) {
+						res.status(status).send(result);
 					}else{
 						try{
 							res_data=JSON.parse(result);
-							if(res_data[0].data.length!= 0){
-								if(res_data[0].data[0].row[0] != null && res_data[0].data[0].row[0] != 'select reviewer'){
-									query={'statement':"MATCH (n:TASKS) WHERE n.taskID='"+taskID+"' and n.assignedTo='"+d.userId+"' set n.task_owner=n.assignedTo,n.assignedTo=n.reviewer,n.status='review' RETURN n"};
-									var qlist_query=[query];
-									reqToAPI({"data":{"statements":qlist_query}},urlData,'/neo4jAPI',function(err,status,result){
+							//if(res_data[0].data.length!= 0 && res_data[0].data[0].row[0] != null){
+							if(res_data[0].data.length!= 0 && res_data[0].data[0]['graph']['nodes'] != null){
+								//var task=res_data[0].data[0].row[0];
+								var task = '';
+								var task_relation='';
+								if(res_data[0].data[0]['graph']['nodes'][0].labels[0]=='TASKS'){
+									task=res_data[0].data[0]['graph']['nodes'][0];
+									task_relation = res_data[0].data[0]['graph']['nodes'][1];
+								}
+								else{
+									task=res_data[0].data[0]['graph']['nodes'][1];
+									task_relation = res_data[0].data[0]['graph']['nodes'][0];
+								}
+								var neo_taskHistory=task.taskHistory;
+								if((d.status=='inprogress' || d.status=='assigned' || d.status=='reassigned') && task.reviewer != 'select reviewer'){
+									taskHistory.status='review';
+									if (neo_taskHistory==undefined || neo_taskHistory==''){
+										neo_taskHistory=[taskHistory];
+									}else{
+										neo_taskHistory=JSON.parse(neo_taskHistory)
+										neo_taskHistory.push(taskHistory);
+										
+									}
+									neo_taskHistory=JSON.stringify(neo_taskHistory);
+									
+									query={'statement':"MATCH (n:TASKS) WHERE n.taskID='"+taskID+"' and n.assignedTo='"+d.userId+"' set n.task_owner=n.assignedTo,n.assignedTo=n.reviewer,n.status='review',n.taskHistory='"+neo_taskHistory+"' RETURN n"};
+									new_queries=[query];
+									task_flag=true;
+									
+								}else if(d.status=='review'){
+									taskHistory.status='complete';
+									if (neo_taskHistory==undefined || neo_taskHistory==''){
+										neo_taskHistory=[taskHistory];
+									}else{
+										neo_taskHistory=JSON.parse(neo_taskHistory)
+										neo_taskHistory.push(taskHistory);
+										
+									}
+									neo_taskHistory=JSON.stringify(neo_taskHistory);
+									query={'statement':"MATCH (n:TASKS) WHERE n.taskID='"+taskID+"' and n.reviewer='"+d.userId+"' set n.assignedTo='',n.status='complete',n.taskHistory='"+neo_taskHistory+"' RETURN n"};
+									new_queries=[query];
+									task_flag=true;
+								}else if(d.status=='reassign'){
+									taskHistory.status='reassigned';
+									if (neo_taskHistory==undefined || neo_taskHistory==''){
+										neo_taskHistory=[taskHistory];
+									}else{
+										neo_taskHistory=JSON.parse(neo_taskHistory)
+										neo_taskHistory.push(taskHistory);
+										
+									}
+									neo_taskHistory=JSON.stringify(neo_taskHistory);
+									query={'statement':"MATCH (n:TASKS) WHERE n.taskID='"+taskID+"' and n.reviewer='"+d.userId+"' set n.reviewer=n.assignedTo,n.assignedTo=n.task_owner,n.status='reassigned',n.taskHistory='"+neo_taskHistory+"' RETURN n"};
+									new_queries=[query];
+									task_flag=true;
+								}
+								if(task_flag){
+									inputs = {
+										'status':taskHistory.status,
+										'taskdetails':task_relation,
+										'user':d.user_name,
+										'versionnumber':d.versionnumber
+									}
+									create_ice.submitTask(inputs,function(err,data){
+										res.setHeader('Content-Type', 'application/json');
+										if(err)
+											res.status(500).send(err)
+									});
+									neo4jAPI.executeQueries(new_queries,function(status,result){
 											//res.setHeader('Content-Type','application/json');
-											if(err) res.status(status).send(err);
-											res.status(200).send('success');
+											if(status!=200) res.status(status).send(result);
+											else res.status(200).send('success');
 									
 									});
 								}else{
 									res.status(200).send('fail');
 								}
-							}else{
-								res.status(200).send('Tasksubmitted');
+								
+								
+							}
+							else{
+								res.status(200).send('fail');
 							}
 						}catch(ex){
 							console.log(ex);
@@ -741,42 +741,37 @@ router.post('/', function(req, res, next) {
 		}else if(d.task=='populateScenarios'){
 			var moduleId=d.moduleId;
 			//var taskID=d.taskId;
-			
 			query={'statement':"MATCH (a{moduleID:'"+moduleId+"'})-[:FMTTS]->(b) RETURN b"};
 			var qlist_query=[query];
 			var scenarioList=[];
-			reqToAPI({"data":{"statements":qlist_query}},urlData,'/neo4jAPI',function(err,status,result){
-					//res.setHeader('Content-Type','application/json');
-					if(err) {
-						res.status(status).send(err);
-					}else{
-						try{
-							res_data=JSON.parse(result);
-							res_data[0].data.forEach(function(row){
-								scenarioList.push(row.row[0])
-							});
-							res.status(200).send(scenarioList);
-						}catch(ex){
-							console.log(ex);
-							res.status(200).send('fail');
-						}
+			neo4jAPI.executeQueries(qlist_query,function(status,result){
+				res.setHeader('Content-Type', 'application/json');
+				if(status!=200) res.status(status).send(result);
+				else{
+					try{
+						res_data=JSON.parse(result);
+						res_data[0].data.forEach(function(row){
+							scenarioList.push(row.row[0])
+						});
+						res.status(200).send(scenarioList);
+					}catch(ex){
+						console.log(ex);
+						res.status(200).send('fail');
 					}
-				});
+				}
+			});
 		}
 	}
 }
 else{
 			res.send("Invalid Session");
 		}
-});
-
-
+};
 
 
 var parsing = function(d,urlData,module_type) {
 	var data = d;
 	var qList_new=[];
-
 	var result="";
 	var testsuiteDetails=d.testsuiteDetails;
 	var updateJson=[];
@@ -808,8 +803,6 @@ var parsing = function(d,urlData,module_type) {
 				}
 					
 				cassandraId_dict[testscenarioId_json]=testscenarioId_c_json;
-			
-
 				screenDetails_json.forEach(function(scr,i){
 					var screenId_json=scr.screenId;
 					var screenId_c_json=scr.screenId_c;
@@ -833,20 +826,11 @@ var parsing = function(d,urlData,module_type) {
 							qList_new.push({"statement":"MATCH (a:TESTCASES) WHERE a.testCaseName='"+testcaseName_json+"' and a.screenID_c='"+screenId_c_json+"' SET a.testCaseID_c='"+testcaseId_c_json+"'"});
 						}else{
 							qList_new.push({"statement":"MATCH (a:TESTCASES) WHERE a.testCaseName='"+testcaseName_json+"' and a.screenID_c='"+screenId_c_json+"' SET a.testCaseID_c='"+testcaseId_c_json+"'"});
-						}
-						
+						}						
 						cassandraId_dict[testcaseId_json]=testcaseId_c_json;
-				
-
 					});
-					
 				});
-
-
 			});
-		
-
-
 		});
 	}catch(ex){
 		console.log(ex);
@@ -857,8 +841,5 @@ updateJson.push(cassandraId_dict);
 return [ qList_new,updateJson];
 };
 
-
-
-module.exports = router;
 
 //MATCH (n)-[r:FMTTS{id:'bad100b6-c223-4888-a8e9-ad26a2de4a61'}]->(o:TESTSCENARIOS) DETACH DELETE r,o

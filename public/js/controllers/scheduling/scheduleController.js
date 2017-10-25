@@ -23,13 +23,17 @@ mySPA.controller('scheduleController',['$scope','$http','$timeout','$location','
 	
 	if(window.localStorage['_CT'])
 	{
-		var readTestSuite = JSON.parse(window.localStorage['_CT']).testSuiteDetails;
+		var window_ct=JSON.parse(window.localStorage['_CT']);
+		var readTestSuite = window_ct.testSuiteDetails;
+		for(var rti=0;rti<readTestSuite.length;rti++){
+			readTestSuite[rti].versionnumber = parseFloat(window_ct.versionnumber);
+		}
 		//console.log("read",readTestSuite);
-	   	var getTaskName = JSON.parse(window.localStorage['_CT']).taskName;
-		var	appType = JSON.parse(window.localStorage['_CT']).appType;
+	   	var getTaskName = window_ct.taskName;
+		var	appType = window_ct.appType;
 		//$("#page-taskName").empty().append('<span class="taskname">'+getTaskName+'</span>');
 		$(".projectInfoWrap").empty()
-		//testSuiteName = JSON.parse(window.localStorage['_CT']).testSuiteName;
+		//testSuiteName = window_ct.testSuiteName;
 	}
 	
 	/*$timeout(function(){
@@ -68,11 +72,11 @@ mySPA.controller('scheduleController',['$scope','$http','$timeout','$location','
 					// $(".scheduleSuiteTable").append('<div class="batchSuite"><div class="scheduleSuite"><input type="checkbox" class="selectScheduleSuite"/><span class="scheduleSuiteName" data-testsuiteid="'+eachData[i].testsuiteid+'">'+keys[i]+'</span><span class="ipContainer"><input class="form-control ipformating" type="text" title="Enter IP" placeholder="Enter IP" value=""/></span><span class="datePicContainer"><input class="form-control fc-datePicker" type="text" title="Select Date" placeholder="Select Date" value="" readonly/><img class="datepickerIcon" src="../imgs/ic-datepicker.png" /></span><span class="timePicContainer"><input class="form-control fc-timePicker" type="text" value="" title="Select Time" placeholder="Select Time" readonly disabled/><img class="timepickerIcon" src="../imgs/ic-timepicker.png" /></span></div>'
 					// 		+'<table class="scenarioSchdCon scenarioSch_'+i+'"><thead class="scenarioHeaders"><tr><td></td><td>Scenario Name</td><td>Data Parameterization</td><td>Condition Check</td><td>Project Name</td></tr></thead><tbody class="scenarioBody scenarioTbCon_'+i+'"></tbody></table>');//<input type="checkbox" class="slctAllScenarioSchdule"/>
 
-					$(".scheduleSuiteTable").append('<div class="batchSuite"><div class="scheduleSuite"><input type="checkbox" class="selectScheduleSuite"/><span class="scheduleSuiteName" data-testsuiteid="'+eachData[i].testsuiteid+'">'+keys[i]+'</span><span class="ipContainer"><select class="form-control ipformating"><option selected disabled>Select User</option></select></span><span class="datePicContainer"><input class="form-control fc-datePicker" type="text" title="Select Date" placeholder="Select Date" value="" readonly/><img class="datepickerIcon" src="../imgs/ic-datepicker.png" /></span><span class="timePicContainer"><input class="form-control fc-timePicker" type="text" value="" title="Select Time" placeholder="Select Time" readonly disabled/><img class="timepickerIcon" src="../imgs/ic-timepicker.png" /></span></div>'
+					$(".scheduleSuiteTable").append('<div class="batchSuite"><div class="scheduleSuite"><input type="checkbox" class="selectScheduleSuite"/><span class="scheduleSuiteName" data-testsuiteid="'+eachData[i].testsuiteid+'" data-versionnumber="'+eachData[i].versionnumber+'">'+keys[i]+'</span><span class="ipContainer"><select class="form-control ipformating"><option selected disabled>Select User</option></select></span><span class="datePicContainer"><input class="form-control fc-datePicker" type="text" title="Select Date" placeholder="Select Date" value="" readonly/><img class="datepickerIcon" src="../imgs/ic-datepicker.png" /></span><span class="timePicContainer"><input class="form-control fc-timePicker" type="text" value="" title="Select Time" placeholder="Select Time" readonly disabled/><img class="timepickerIcon" src="../imgs/ic-timepicker.png" /></span></div>'
 							+'<table class="scenarioSchdCon scenarioSch_'+i+'"><thead class="scenarioHeaders"><tr><td>Sl No.</td><td>Scenario Name</td><td>Data Parameterization</td><td>Condition Check</td><td>Project Name</td></tr></thead><tbody class="scenarioBody scenarioTbCon_'+i+'"></tbody></table>');
 							
 
-					// $(".scheduleSuiteTable").append('<div class="batchSuite"><div class="scheduleSuite"><input type="checkbox" class="selectScheduleSuite"/><span class="scheduleSuiteName" data-testsuiteid="'+eachData[i].testsuiteid+'">'+keys[i]+'</span><span class="ipContainer"><select class="form-control ipformating"><option selected disabled>Select User</option></select></span><div class="datePicContainer">   <div id="datetimepicker1" class="input-group date">     <input data-format="dd/MM/yyyy hh:mm:ss" class="datepickerinput" type="text" placeholder="Select Date and Time"></input>     <span class="input-group-addon">       <img class="datepickerIcon" src="../imgs/ic-datepicker.png" />       </i>     </span>   </div> </div></div>'+'<table class="scenarioSchdCon scenarioSch_'+i+'"><thead class="scenarioHeaders"><tr><td></td><td>Scenario Name</td><td>Data Parameterization</td><td>Condition Check</td><td>Project Name</td></tr></thead><tbody class="scenarioBody scenarioTbCon_'+i+'"></tbody></table>');
+					// $(".scheduleSuiteTable").append('<div class="batchSuite"><div class="scheduleSuite"><input type="checkbox" class="selectScheduleSuite"/><span class="scheduleSuiteName" data-testsuiteid="'+eachData[i].testsuiteid+'" data-versionnumber="'+eachData[i].versionnumber+'">'+keys[i]+'</span><span class="ipContainer"><select class="form-control ipformating"><option selected disabled>Select User</option></select></span><div class="datePicContainer">   <div id="datetimepicker1" class="input-group date">     <input data-format="dd/MM/yyyy hh:mm:ss" class="datepickerinput" type="text" placeholder="Select Date and Time"></input>     <span class="input-group-addon">       <img class="datepickerIcon" src="../imgs/ic-datepicker.png" />       </i>     </span>   </div> </div></div>'+'<table class="scenarioSchdCon scenarioSch_'+i+'"><thead class="scenarioHeaders"><tr><td></td><td>Scenario Name</td><td>Data Parameterization</td><td>Condition Check</td><td>Project Name</td></tr></thead><tbody class="scenarioBody scenarioTbCon_'+i+'"></tbody></table>');
 										
 					if(result.connectedUsers != "" && result.connectedUsers.length >0){
 						$(".ipformating").empty();
@@ -326,6 +330,7 @@ mySPA.controller('scheduleController',['$scope','$http','$timeout','$location','
 					var sldate_2 = sldate.split("-");
 					var sltime_2 = sltime.split(":");
 					var dt = new Date();
+					suiteInfo.versionnumber = $(this).children('.scheduleSuite').find(".scheduleSuiteName").data("versionnumber");
 					if($(this).children('.scheduleSuite').find(".ipContainer .ipformating").children("option:selected").val() != "Select User")
 						suiteInfo.Ip = $(this).children('.scheduleSuite').find(".ipContainer .ipformating").children("option:selected").val();
 					else{
@@ -410,7 +415,7 @@ mySPA.controller('scheduleController',['$scope','$http','$timeout','$location','
 					}
 				}
 			}
-			if(doNotSchedule == false){				
+			if(doNotSchedule == false){
 				ScheduleService.testSuitesScheduler_ICE(moduleInfo)
 				.then(function(data){
 					if(data == "success"){

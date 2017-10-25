@@ -9,10 +9,17 @@ mySPA.factory('PluginService', ['$http','$q', function ($http, $httpProvider, $q
 			.then (function(response)	{return response.data;	},
 			function(response){	return $q.reject(response.data);});	
     	},
-       getTaskJson_Nineteen68: function(obj){
-    		var param = "getTaskJson_Nineteen68";
-	        return $http.post('/getTaskJson_Nineteen68', {
+       getTaskJson_mindmaps: function(obj){
+    		var param = "getTaskJson_mindmaps";
+	        return $http.post('/getTaskJson_mindmaps', {
 	        		action: param,
+              obj : obj, 
+	        })
+			.then (function(response)	{return response.data;	},
+			function(response){	return $q.reject(response.data);});	
+    	},
+			updateTaskStatus: function(obj){
+	        return $http.post('/updateTaskstatus_mindmaps', {
               obj : obj, 
 	        })
 			.then (function(response)	{return response.data;	},

@@ -72,13 +72,18 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
         $scope.errorMessage = "";
     }
     //Default Function to reset all input, select
-
-    var getTaskName = JSON.parse(window.localStorage['_CT']).taskName;
-    appType = JSON.parse(window.localStorage['_CT']).appType;
-    screenName = JSON.parse(window.localStorage['_CT']).screenName;
-    testCaseName = JSON.parse(window.localStorage['_CT']).testCaseName;
-    subTaskType = JSON.parse(window.localStorage['_CT']).subTaskType;
-    subTask = JSON.parse(window.localStorage['_CT']).subtask;
+    var current_task=JSON.parse(window.localStorage['_CT']);
+    var getTaskName = current_task.taskName;
+    appType = current_task.appType;
+    screenName = current_task.screenName;
+    testCaseName = current_task.testCaseName;
+    subTaskType = current_task.subTaskType;
+    subTask = current_task.subtask;
+    status = current_task.status;
+	if(status=='review'){
+				$('.submitTaskBtn').text('Approve');
+				$('.reassignTaskBtn').show();
+	}
     $("#page-taskName").empty().append('<span class="taskname">' + getTaskName + '</span>');
     $(".projectInfoWrap").empty()
     //Loading Project Info
@@ -195,28 +200,44 @@ console.log("screenName:", screenName);
     var keywordValArr = [];
     var proceed = false;
 
-    //Submit Task Screen
-    $scope.submitTasksScreen = function() {
-        $("#submitTasksScreen").modal("show")
-    }
-    //Submit Task Screen
+//Submit Task Screen
+	$scope.submitTasksScreen = function(action){
+		$("#submitTasksScreen").modal("show")
+		if(action=='reassign'){
+			$("#submitTasksScreen").find('.modal-body p').text('Are you sure you want to reassign the task ?')
+			$("#submitTasksScreen").find('.modal-footer button')[0].setAttribute('onclick',"submit_task('reassign')")
+		}
+        // else{
+        //     $("#submitTasksScreen").find('.modal-footer button')[0].setAttribute('onclick',"submit_task('"+action+"')")
+        // }
+	}
+	//Submit Task Screen
 
-    //Submit Tast Test Case
-    $scope.submitTasksTestCase = function() {
-        $("#submitTasksTestCase").modal("show")
-    }
-    //Submit task Test Case
+	//Submit Tast Test Case
+	$scope.submitTasksTestCase = function(action){
+		
+		$("#submitTasksTestCase").modal("show")
+		if(action=='reassign'){
+			$("#submitTasksTestCase").find('.modal-body p').text('Are you sure you want to reassign the task ?')
+			$("#submitTasksTestCase").find('.modal-footer button')[0].setAttribute('onclick',"submit_task('reassign')")
+		}
+        // else{
+        //     $("#submitTasksTestCase").find('.modal-footer button')[0].setAttribute('onclick',"submit_task('"+action+"')")
+        // }
+	}
+	//Submit task Test Case
 
     $scope.readTestCase_ICE = function() {
         var taskInfo = JSON.parse(window.localStorage['_CT']);
         var screenId = taskInfo.screenId;
         var testCaseId = taskInfo.testCaseId;
         var testCaseName = taskInfo.testCaseName;
+		var versionnumber = taskInfo.versionnumber;
         appType = taskInfo.appType;
         enabledEdit = "false";
         blockUI("Loading...");
         // service call # 1 - getTestScriptData service call
-        DesignServices.readTestCase_ICE(screenId, testCaseId, testCaseName)
+        DesignServices.readTestCase_ICE(screenId, testCaseId, testCaseName, versionnumber)
             .then(function(data) {
                     if (data == "Invalid Session") {
                         window.location.href = "/";
@@ -403,6 +424,7 @@ console.log("screenName:", screenName);
         var taskInfo = JSON.parse(window.localStorage['_CT']);
         var screenId = taskInfo.screenId;
         var testCaseId = taskInfo.testCaseId;
+		var versionnumber = taskInfo.versionnumber;
         var testCaseName = taskInfo.testCaseName;
         var appType = taskInfo.appType;
         var flag = false;
@@ -432,7 +454,7 @@ console.log("screenName:", screenName);
                             if (flag == false) {
                                 openDialog("App Type Error", "Project application type and Imported JSON application type doesn't match, please check!!")
                             } else {
-                                DesignServices.updateTestCase_ICE(screenId, testCaseId, testCaseName, resultString, userInfo)
+                                DesignServices.updateTestCase_ICE(screenId, testCaseId, testCaseName, resultString, userInfo, versionnumber)
                                     .then(function(data) {
                                         if (data == "Invalid Session") {
                                             window.location.href = "/";
@@ -472,6 +494,7 @@ console.log("screenName:", screenName);
         var screenId = taskInfo.screenId;
         var testCaseId = taskInfo.testCaseId;
         var testCaseName = taskInfo.testCaseName;
+		var versionnumber = taskInfo.versionnumber;
         var appType = taskInfo.appType;
         var flag = false;
         $("#overWriteJson").trigger("click");
@@ -496,7 +519,7 @@ console.log("screenName:", screenName);
                         if (flag == false) {
                             openDialog("App Type Error", "Project application type and Imported JSON application type doesn't match, please check!!")
                         } else {
-                            DesignServices.updateTestCase_ICE(screenId, testCaseId, testCaseName, resultString, userInfo)
+                            DesignServices.updateTestCase_ICE(screenId, testCaseId, testCaseName, resultString, userInfo, versionnumber)
                                 .then(function(data) {
                                     console.log("hello");
                                     if (data == "Invalid Session") {
@@ -532,6 +555,7 @@ console.log("screenName:", screenName);
         var screenId = taskInfo.screenId;
         var testCaseId = taskInfo.testCaseId;
         var testCaseName = taskInfo.testCaseName;
+		var versionnumber = taskInfo.versionnumber;
         var appType = taskInfo.appType;
         var flag = false;
         overWriteJson.addEventListener('change', function(e) {
@@ -555,7 +579,7 @@ console.log("screenName:", screenName);
                         if (flag == false) {
                             openDialog("App Type Error", "Project application type and Imported JSON application type doesn't match, please check!!")
                         } else {
-                            DesignServices.updateTestCase_ICE(screenId, testCaseId, testCaseName, resultString, userInfo)
+                            DesignServices.updateTestCase_ICE(screenId, testCaseId, testCaseName, resultString, userInfo, versionnumber)
                                 .then(function(data) {
                                     if (data == "Invalid Session") {
                                         window.location.href = "/";
@@ -988,6 +1012,7 @@ console.log("screenName:", screenName);
             scrapeObject.screenId = screenId;
             scrapeObject.screenName = screenName;
             scrapeObject.userinfo = userinfo;
+			scrapeObject.versionnumber = tasks.versionnumber;
             DesignServices.updateScreen_ICE(scrapeObject)
                 .then(function(data) {
                     if (data == "Invalid Session") {
@@ -1704,6 +1729,7 @@ console.log("screenName:", screenName);
         scrapeObject.screenName = tasks.screenName;
         scrapeObject.projectId = tasks.projectId;
         scrapeObject.appType = tasks.app
+		scrapeObject.versionnumber = tasks.versionnumber;
         DesignServices.updateScreen_ICE(scrapeObject)
             .then(function(data) {
                 debugger;
@@ -1818,6 +1844,7 @@ console.log("screenName:", screenName);
             scrapeObject.screenName = screenName;
             scrapeObject.deletedList = delList;
             scrapeObject.userinfo = userinfo;
+			scrapeObject.versionnumber = tasks.versionnumber;
             DesignServices.updateScreen_ICE(scrapeObject)
                 .then(function(data) {
                     if (data == "Invalid Session") {
@@ -3037,7 +3064,7 @@ console.log("screenName:", screenName);
         scrapeObject.userinfo = userinfo;
         scrapeObject.param = "updateScrapeData_ICE";
         scrapeObject.appType = tasks.appType;
-
+		scrapeObject.versionnumber = tasks.versionnumber;
         //Update Service to Save Scrape Objects
         DesignServices.updateScreen_ICE(scrapeObject)
             .then(function(data) {
@@ -3145,6 +3172,7 @@ console.log("screenName:", screenName);
                 }*/
                 var testCaseId = taskInfo.testCaseId;
                 var testCaseName = taskInfo.testCaseName;
+                var versionnumber = taskInfo.versionnumber;
                 if ((screenId != undefined) && (screenId != "undefined") && (testCaseId != undefined) && (testCaseId != "undefined")) {
                     //#D5E7FF  DBF5DF
                     var serviceCallFlag = false;
@@ -3225,7 +3253,7 @@ console.log("screenName:", screenName);
                     if (serviceCallFlag == true) {
                         console.log("no service call being made");
                     } else {
-                        DesignServices.updateTestCase_ICE(screenId, testCaseId, testCaseName, mydata, userInfo)
+                        DesignServices.updateTestCase_ICE(screenId, testCaseId, testCaseName, mydata, userInfo, versionnumber)
                             .then(function(data) {
                                     if (data == "Invalid Session") {
                                         window.location.href = "/";
