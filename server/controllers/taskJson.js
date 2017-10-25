@@ -273,5 +273,6 @@ function next_function(resultobj, cb, data) {
 		});
 	} catch (ex) {
 		console.log(ex);
+		cb(null, user_task_json);
 	}
 }

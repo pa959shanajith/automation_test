@@ -15,9 +15,6 @@ exports.mindmapService = function(req, res) {
 		if(!req.session.id) res.status(401).send('<br><br>Your session has been expired.Please <a href="/">Login</a> Again');
 	else {
 		var d=req.body;
-		//var sessObj=req.session.uniqueID;
-		//var prjId=sessObj.project.id;
-		//var prjId='d4965851-a7f1-4499-87a3-ce53e8bf8e66';
 		var prjId=d.prjId;
 		var nData=[],qList=[],idDict={};
 		var urlData=req.get('host').split(':');
