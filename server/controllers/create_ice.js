@@ -25,17 +25,17 @@ function get_moduleName(moduleId, cb, data) {
 	};
 	client.post("http://127.0.0.1:1990/create_ice/getNames_Ninteen68", args,
 		function (modulename, response) {
-		if (response.statusCode != 200 || modulename.rows == "fail") {
-			cb(null, modulename.rows);
-		} else {
-			if (modulename.rows.length != 0) {
-				obj.flag = true;
-				obj.modulename = modulename.rows[0].modulename;
-				obj.testscenarioids = modulename.rows[0].testscenarioids;
+			if (response.statusCode != 200 || modulename.rows == "fail") {
+				cb(null, modulename.rows);
+			} else {
+				if (modulename.rows.length != 0) {
+					obj.flag = true;
+					obj.modulename = modulename.rows[0].modulename;
+					obj.testscenarioids = modulename.rows[0].testscenarioids;
+				}
+				cb(null, obj);
 			}
-			cb(null, obj);
-		}
-	});
+		});
 }
 
 function get_screenName(screenId, cb, data) {
@@ -55,17 +55,17 @@ function get_screenName(screenId, cb, data) {
 	};
 	client.post("http://127.0.0.1:1990/create_ice/getNames_Ninteen68", args,
 		function (screenname, response) {
-		if (response.statusCode != 200 || screenname.rows == "fail") {
-			console.log(screenname.rows);
-			cb(null, screenname.rows);
-		} else {
-			if (screenname.rows.length != 0) {
-				obj2.flag = true;
-				obj2.screenname = screenname.rows[0].screenname;
+			if (response.statusCode != 200 || screenname.rows == "fail") {
+				console.log(screenname.rows);
+				cb(null, screenname.rows);
+			} else {
+				if (screenname.rows.length != 0) {
+					obj2.flag = true;
+					obj2.screenname = screenname.rows[0].screenname;
+				}
+				cb(null, obj2);
 			}
-			cb(null, obj2);
-		}
-	});
+		});
 }
 
 function get_scenarioName(testscenarioId, cb, data) {
@@ -85,17 +85,17 @@ function get_scenarioName(testscenarioId, cb, data) {
 	};
 	client.post("http://127.0.0.1:1990/create_ice/getNames_Ninteen68", args,
 		function (testscenarioname, response) {
-		if (response.statusCode != 200 || testscenarioname.rows == "fail") {
-			console.log(testscenarioname.rows);
-			cb(null, testscenarioname.rows);
-		} else {
-			if (testscenarioname.rows.length != 0) {
-				obj2.flag = true;
-				obj2.testscenarioname = testscenarioname.rows[0].testscenarioname;
+			if (response.statusCode != 200 || testscenarioname.rows == "fail") {
+				console.log(testscenarioname.rows);
+				cb(null, testscenarioname.rows);
+			} else {
+				if (testscenarioname.rows.length != 0) {
+					obj2.flag = true;
+					obj2.testscenarioname = testscenarioname.rows[0].testscenarioname;
+				}
+				cb(null, obj2);
 			}
-			cb(null, obj2);
-		}
-	});
+		});
 }
 
 function get_testcaseName(testcaseId, cb, data) {
@@ -115,17 +115,17 @@ function get_testcaseName(testcaseId, cb, data) {
 	};
 	client.post("http://127.0.0.1:1990/create_ice/getNames_Ninteen68", args,
 		function (testcasename, response) {
-		if (response.statusCode != 200 || testcasename.rows == "fail") {
-			console.log(testcasename.rows);
-			cb(null, testcasename.rows);
-		} else {
-			if (testcasename.rows.length != 0) {
-				obj3.flag = true;
-				obj3.testcasename = testcasename.rows[0].testcasename;
+			if (response.statusCode != 200 || testcasename.rows == "fail") {
+				console.log(testcasename.rows);
+				cb(null, testcasename.rows);
+			} else {
+				if (testcasename.rows.length != 0) {
+					obj3.flag = true;
+					obj3.testcasename = testcasename.rows[0].testcasename;
+				}
+				cb(null, obj3);
 			}
-			cb(null, obj3);
-		}
-	});
+		});
 }
 
 exports.getAllNames = function (parent, cb, data) {
@@ -232,7 +232,7 @@ exports.createStructure_Nineteen68 = function (req, res) {
 				"modulename": testsuiteName,
 				"moduleid": moduleid_c,
 				'modifiedby': username,
-				'modifiedbyrole':username_role,
+				'modifiedbyrole': username_role,
 				"pid": projectid,
 				"versionnumber": versionnumber,
 				"newversionnumber": newversionnumber
@@ -270,9 +270,9 @@ exports.createStructure_Nineteen68 = function (req, res) {
 					'skucodemodule': 'skucodemodule',
 					'tags': 'tags'
 				};
-				if (versionnumber!=newversionnumber) {
-					inputs.subquery='clonenode';
-					inputs.oldversionnumber=versionnumber;
+				if (versionnumber != newversionnumber) {
+					inputs.subquery = 'clonenode';
+					inputs.oldversionnumber = versionnumber;
 				}
 				var args = {
 					data: inputs,
@@ -282,266 +282,266 @@ exports.createStructure_Nineteen68 = function (req, res) {
 				};
 				client.post("http://127.0.0.1:1990/create_ice/insertInSuite_ICE", args,
 					function (result, response) {
-					if (response.statusCode != 200 || result.rows == "fail") {
-						console.log(result.rows);
-					} else {
-						scenario = suitedetails.testscenarioDetails;
-						var scenariosarray = [];
-						var testcaseidlist = [];
-						async.forEachSeries(scenario, function (iterator, callback2) {
-							var scenarioId = uuid();
-							scenariosarray.push(scenarioId);
-							var scenarioName = iterator.testscenarioName;
-							var scenarioid_c = iterator.testscenarioId_c;
-							var scenarioflag = false;
-							var scenarioidTemp = '';
-							var screendetailslist = [];
-							var taskscenario = iterator.task;
-							var scenarioidneo = iterator.testscenarioId;
-							testscenariosid_exists({
-								"testscenarioname": scenarioName,
-								"testscenarioid": scenarioid_c,
-								"pid": projectid,
-								'modifiedby': username,
-								'modifiedbyrole':username_role,
-								"versionnumber": versionnumber,
-								"newversionnumber": newversionnumber
-							}, function (err, scenariodata) {
-								if (err) {
-									console.log(err);
-								} else {
-									scenarioflag = scenariodata.flag;
-									scenarioidTemp = scenariodata.scenarioid;
-								}
-								var scenario_query = '';
-								if (!scenarioflag) {
-									scenario_query = 'notflagscenarios';
-								}
-								else {
-									scenario_query = 'deletescenarios';
-									scenarioId = scenarioidTemp;
-								}
-								var scenariodetailsobj = {
-									"testscenarioId": scenarioidneo,
-									"testscenarioId_c": scenarioId,
-									"screenDetails": screendetailslist,
-									"tasks": taskscenario,
-									"testscenarioName": scenarioName
-								};
-								scenariodetailslist.push(scenariodetailsobj);
-								var inputs = {
-									"query": scenario_query,
-									'projectid': projectid,
-									'testscenarioname': scenarioName,
-									'testscenarioid': scenarioId,
-									'versionnumber': newversionnumber,
-									'createdby': username,
-									'createdthrough': createdthrough,
-									'deleted': false,
-									'skucodetestscenario': 'skucodetestscenario',
-									'tags': 'tags'
-								};
-								if (versionnumber!=newversionnumber) {
-									inputs.subquery='clonenode';
-									inputs.oldversionnumber=versionnumber;
-								}
-								var args = {
-									data: inputs,
-									headers: {
-										"Content-Type": "application/json"
-									}
-								};
-								client.post("http://127.0.0.1:1990/create_ice/insertInScenarios_ICE", args,
-									function (result, response) {
-									if (response.statusCode != 200 || result.rows == "fail") {
-										console.log(result.rows);
+						if (response.statusCode != 200 || result.rows == "fail") {
+							console.log(result.rows);
+						} else {
+							scenario = suitedetails.testscenarioDetails;
+							var scenariosarray = [];
+							var testcaseidlist = [];
+							async.forEachSeries(scenario, function (iterator, callback2) {
+								var scenarioId = uuid();
+								scenariosarray.push(scenarioId);
+								var scenarioName = iterator.testscenarioName;
+								var scenarioid_c = iterator.testscenarioId_c;
+								var scenarioflag = false;
+								var scenarioidTemp = '';
+								var screendetailslist = [];
+								var taskscenario = iterator.task;
+								var scenarioidneo = iterator.testscenarioId;
+								testscenariosid_exists({
+									"testscenarioname": scenarioName,
+									"testscenarioid": scenarioid_c,
+									"pid": projectid,
+									'modifiedby': username,
+									'modifiedbyrole': username_role,
+									"versionnumber": versionnumber,
+									"newversionnumber": newversionnumber
+								}, function (err, scenariodata) {
+									if (err) {
+										console.log(err);
 									} else {
-										scenarioidlist.push(scenarioId);
-										var screen = iterator.screenDetails;
-										async.forEachSeries(screen, function (screenitr, callback3) {
-											var screenId = uuid();
-											var screenDetails = screenitr;
-											var screenName = screenitr.screenName;
-											var screenid_c = screenitr.screenId_c;
-											var screenflag = false;
-											var screenidTemp = '';
-											var testcasedetailslist = [];
-											var screenidneo = screenitr.screenId;
-											var taskscreen = screenitr.task;
-											//console.log('screenName details',screenName);
-											testscreen_exists({
-												"testscreenname": screenName,
-												"testscreenid": screenid_c,
-												"pid": projectid,
-												'modifiedby': username,
-												'modifiedbyrole':username_role,
-												"versionnumber": versionnumber,
-												"newversionnumber": newversionnumber
-											}, function (err, screendata) {
-												if (err) {
-													console.log(err);
-												} else {
-													screenflag = screendata.flag;
-													screenidTemp = screendata.screenid;
-												}
-												var screen_query = '';
-													if (!screenflag) {
-														screen_query = 'notflagscreen';
-													}
-													else {
-														screen_query = 'selectscreen';
-														screenId = screenidTemp;
-													}
-													var screendetailsobj = {
-													"testcaseDetails": testcasedetailslist,
-													"screenName": screenName,
-													"screenId_c": screenId,
-													"screenId": screenidneo,
-													"task": taskscreen
-												};
-												screendetailslist.push(screendetailsobj);
-												var inputs = {
-													"query": screen_query,
-													'projectid': projectid,
-													'screenname': screenName,
-													'screenid': screenId,
-													'versionnumber': newversionnumber,
-													'createdby': username,
-													'createdthrough': createdthrough,
-													'deleted': false,
-													'skucodescreen': 'skucodescreen',
-													'tags': 'tags'
-												};
-												if (versionnumber!=newversionnumber) {
-													inputs.subquery='clonenode';
-													inputs.oldversionnumber=versionnumber;
-												}
-												var args = {
-													data: inputs,
-													headers: {
-														"Content-Type": "application/json"
-													}
-												};
-												client.post("http://127.0.0.1:1990/create_ice/insertInScreen_ICE", args,
-													function (result, response) {
-													if (response.statusCode != 200 || result.rows == "fail") {
-														console.log(result.rows);
-													} else {
-														var testcase = screenDetails.testcaseDetails;
-														async.forEachSeries(testcase, function (testcaseitr, callback4) {
-															var testcaseID = uuid();
-															var testcaseName = testcaseitr.testcaseName;
-															var testcaseid_c = testcaseitr.testcaseId_c;
-															var testcaseflag = false;
-															var testcaseidTemp = '';
-															var testcaseidneo = testcaseitr.testcaseId;
-															var tasktestcase = testcaseitr.task;
-															var screenID_c_neo = testcaseitr.screenID_c;
-															testcase_exists({
-																"screenId": screenId,
-																"testcasename": testcaseName,
-																"testcaseid": testcaseid_c,
-																"pid": projectid,
-																'modifiedby': username,
-																'modifiedbyrole':username_role,
-																"versionnumber": versionnumber,
-																"newversionnumber": newversionnumber
-															}, function (err, testcasedata) {
-																if (err) {
-																	console.log(err);
+										scenarioflag = scenariodata.flag;
+										scenarioidTemp = scenariodata.scenarioid;
+									}
+									var scenario_query = '';
+									if (!scenarioflag) {
+										scenario_query = 'notflagscenarios';
+									}
+									else {
+										scenario_query = 'deletescenarios';
+										scenarioId = scenarioidTemp;
+									}
+									var scenariodetailsobj = {
+										"testscenarioId": scenarioidneo,
+										"testscenarioId_c": scenarioId,
+										"screenDetails": screendetailslist,
+										"tasks": taskscenario,
+										"testscenarioName": scenarioName
+									};
+									scenariodetailslist.push(scenariodetailsobj);
+									var inputs = {
+										"query": scenario_query,
+										'projectid': projectid,
+										'testscenarioname': scenarioName,
+										'testscenarioid': scenarioId,
+										'versionnumber': newversionnumber,
+										'createdby': username,
+										'createdthrough': createdthrough,
+										'deleted': false,
+										'skucodetestscenario': 'skucodetestscenario',
+										'tags': 'tags'
+									};
+									if (versionnumber != newversionnumber) {
+										inputs.subquery = 'clonenode';
+										inputs.oldversionnumber = versionnumber;
+									}
+									var args = {
+										data: inputs,
+										headers: {
+											"Content-Type": "application/json"
+										}
+									};
+									client.post("http://127.0.0.1:1990/create_ice/insertInScenarios_ICE", args,
+										function (result, response) {
+											if (response.statusCode != 200 || result.rows == "fail") {
+												console.log(result.rows);
+											} else {
+												scenarioidlist.push(scenarioId);
+												var screen = iterator.screenDetails;
+												async.forEachSeries(screen, function (screenitr, callback3) {
+													var screenId = uuid();
+													var screenDetails = screenitr;
+													var screenName = screenitr.screenName;
+													var screenid_c = screenitr.screenId_c;
+													var screenflag = false;
+													var screenidTemp = '';
+													var testcasedetailslist = [];
+													var screenidneo = screenitr.screenId;
+													var taskscreen = screenitr.task;
+													//console.log('screenName details',screenName);
+													testscreen_exists({
+														"testscreenname": screenName,
+														"testscreenid": screenid_c,
+														"pid": projectid,
+														'modifiedby': username,
+														'modifiedbyrole': username_role,
+														"versionnumber": versionnumber,
+														"newversionnumber": newversionnumber
+													}, function (err, screendata) {
+														if (err) {
+															console.log(err);
+														} else {
+															screenflag = screendata.flag;
+															screenidTemp = screendata.screenid;
+														}
+														var screen_query = '';
+														if (!screenflag) {
+															screen_query = 'notflagscreen';
+														}
+														else {
+															screen_query = 'selectscreen';
+															screenId = screenidTemp;
+														}
+														var screendetailsobj = {
+															"testcaseDetails": testcasedetailslist,
+															"screenName": screenName,
+															"screenId_c": screenId,
+															"screenId": screenidneo,
+															"task": taskscreen
+														};
+														screendetailslist.push(screendetailsobj);
+														var inputs = {
+															"query": screen_query,
+															'projectid': projectid,
+															'screenname': screenName,
+															'screenid': screenId,
+															'versionnumber': newversionnumber,
+															'createdby': username,
+															'createdthrough': createdthrough,
+															'deleted': false,
+															'skucodescreen': 'skucodescreen',
+															'tags': 'tags'
+														};
+														if (versionnumber != newversionnumber) {
+															inputs.subquery = 'clonenode';
+															inputs.oldversionnumber = versionnumber;
+														}
+														var args = {
+															data: inputs,
+															headers: {
+																"Content-Type": "application/json"
+															}
+														};
+														client.post("http://127.0.0.1:1990/create_ice/insertInScreen_ICE", args,
+															function (result, response) {
+																if (response.statusCode != 200 || result.rows == "fail") {
+																	console.log(result.rows);
 																} else {
-																	testcaseflag = testcasedata.flag;
-																	testcaseidTemp = testcasedata.testcaseid;
-																}
-
-																var testcase_query = '';
-																if (!testcaseflag) {
-																	testcase_query = 'notflagtestcase';
-																}
-																else {
-																	testcase_query = 'selecttestcase';
-																	testcaseID = testcaseidTemp;
-																}
-																var testcasedetailsobj = {
-																	"screenID_c": screenID_c_neo,
-																	"testcaseId": testcaseidneo,
-																	"testcaseId_c": testcaseID,
-																	"testcaseName": testcaseName,
-																	"task": tasktestcase
-																};
-																testcasedetailslist.push(testcasedetailsobj);
-																var inputs = {
-																	"query": testcase_query,
-																	'screenid': screenId,
-																	'testcasename': testcaseName,
-																	'testcaseid': testcaseID,
-																	'versionnumber': newversionnumber,
-																	'createdby': username,
-																	'createdthrough': createdthrough,
-																	'deleted': false,
-																	'skucodetestcase': 'skucodetestcase',
-																	'tags': 'tags'
-																};
-																if (versionnumber!=newversionnumber) {
-																	inputs.subquery='clonenode';
-																	inputs.oldscreenid=screenID_c_neo;
-																	inputs.oldversionnumber=versionnumber;
-																}
-																var args = {
-																	data: inputs,
-																	headers: {
-																		"Content-Type": "application/json"
-																	}
-																};
-																client.post("http://127.0.0.1:1990/create_ice/insertInTestcase_ICE", args,
-																	function (result, response) {
-																	if (response.statusCode != 200 || result.rows == "fail") {
-																		console.log(result.rows);
-																	}
-																	else {
-																		testcaseidlist.push(testcaseID);
-																		var inputs = {
-																			'testcaseid': testcaseID,
+																	var testcase = screenDetails.testcaseDetails;
+																	async.forEachSeries(testcase, function (testcaseitr, callback4) {
+																		var testcaseID = uuid();
+																		var testcaseName = testcaseitr.testcaseName;
+																		var testcaseid_c = testcaseitr.testcaseId_c;
+																		var testcaseflag = false;
+																		var testcaseidTemp = '';
+																		var testcaseidneo = testcaseitr.testcaseId;
+																		var tasktestcase = testcaseitr.task;
+																		var screenID_c_neo = testcaseitr.screenID_c;
+																		testcase_exists({
+																			"screenId": screenId,
+																			"testcasename": testcaseName,
+																			"testcaseid": testcaseid_c,
+																			"pid": projectid,
 																			'modifiedby': username,
 																			'modifiedbyrole': username_role,
-																			'projectid': projectid,
-																			'testscenarioid': scenarioId,
-																			'modifiedflag': scenarioflag,
-																			'testscenarioname': scenarioName,
-																			'versionnumber': newversionnumber
-																		};
-																		var args = {
-																			data: inputs,
-																			headers: {
-																				"Content-Type": "application/json"
+																			"versionnumber": versionnumber,
+																			"newversionnumber": newversionnumber
+																		}, function (err, testcasedata) {
+																			if (err) {
+																				console.log(err);
+																			} else {
+																				testcaseflag = testcasedata.flag;
+																				testcaseidTemp = testcasedata.testcaseid;
 																			}
-																		};
-																		client.post("http://127.0.0.1:1990/create_ice/updateTestScenario_ICE", args,
-																			function (result, response) {
-																			if (response.statusCode != 200 || result.rows == "fail") {
-																				console.log(result.rows);
+
+																			var testcase_query = '';
+																			if (!testcaseflag) {
+																				testcase_query = 'notflagtestcase';
 																			}
 																			else {
-																				console.log("Successfully updated testscenarios");
+																				testcase_query = 'selecttestcase';
+																				testcaseID = testcaseidTemp;
 																			}
+																			var testcasedetailsobj = {
+																				"screenID_c": screenID_c_neo,
+																				"testcaseId": testcaseidneo,
+																				"testcaseId_c": testcaseID,
+																				"testcaseName": testcaseName,
+																				"task": tasktestcase
+																			};
+																			testcasedetailslist.push(testcasedetailsobj);
+																			var inputs = {
+																				"query": testcase_query,
+																				'screenid': screenId,
+																				'testcasename': testcaseName,
+																				'testcaseid': testcaseID,
+																				'versionnumber': newversionnumber,
+																				'createdby': username,
+																				'createdthrough': createdthrough,
+																				'deleted': false,
+																				'skucodetestcase': 'skucodetestcase',
+																				'tags': 'tags'
+																			};
+																			if (versionnumber != newversionnumber) {
+																				inputs.subquery = 'clonenode';
+																				inputs.oldscreenid = screenID_c_neo;
+																				inputs.oldversionnumber = versionnumber;
+																			}
+																			var args = {
+																				data: inputs,
+																				headers: {
+																					"Content-Type": "application/json"
+																				}
+																			};
+																			client.post("http://127.0.0.1:1990/create_ice/insertInTestcase_ICE", args,
+																				function (result, response) {
+																					if (response.statusCode != 200 || result.rows == "fail") {
+																						console.log(result.rows);
+																					}
+																					else {
+																						testcaseidlist.push(testcaseID);
+																						var inputs = {
+																							'testcaseid': testcaseID,
+																							'modifiedby': username,
+																							'modifiedbyrole': username_role,
+																							'projectid': projectid,
+																							'testscenarioid': scenarioId,
+																							'modifiedflag': scenarioflag,
+																							'testscenarioname': scenarioName,
+																							'versionnumber': newversionnumber
+																						};
+																						var args = {
+																							data: inputs,
+																							headers: {
+																								"Content-Type": "application/json"
+																							}
+																						};
+																						client.post("http://127.0.0.1:1990/create_ice/updateTestScenario_ICE", args,
+																							function (result, response) {
+																								if (response.statusCode != 200 || result.rows == "fail") {
+																									console.log(result.rows);
+																								}
+																								else {
+																									console.log("Successfully updated testscenarios");
+																								}
+																							});
+																					}
+																					callback4();
+																				});
 																		});
-																	}
-																	callback4();
-																});
+																	}, callback3);
+																}
 															});
-														}, callback3);
-													}
-												});
-												// callback3();
-											});
-										}, callback2);
-									}
+														// callback3();
+													});
+												}, callback2);
+											}
+										});
+									// callback2();
 								});
-								// callback2();
-							});
-						}, callback);
-					}
-				});
+							}, callback);
+						}
+					});
 				//callback();
 			});
 		},
@@ -553,7 +553,7 @@ exports.createStructure_Nineteen68 = function (req, res) {
 				'modulename': testsuiteName,
 				'modifiedflag': suiteflag,
 				'modifiedby': username,
-				'modifiedbyrole':username_role,
+				'modifiedbyrole': username_role,
 				'versionnumber': newversionnumber
 			};
 			var args = {
@@ -564,31 +564,31 @@ exports.createStructure_Nineteen68 = function (req, res) {
 			};
 			client.post("http://127.0.0.1:1990/create_ice/updateModule_ICE", args,
 				function (result, response) {
-				if (response.statusCode != 200 || result.rows == "fail") {
-					console.log(result.rows);
-				} else {
-					console.log("Successfully updated Modules");
-				}
-				callback();
+					if (response.statusCode != 200 || result.rows == "fail") {
+						console.log(result.rows);
+					} else {
+						console.log("Successfully updated Modules");
+					}
+					callback();
 
-			});
+				});
 		}
 	},
 		function (err, results) {
-		if (err) {
-			console.log(err);
-			res(null, err);
-		} else {
-			var returnJsonmindmap = {
-				"projectId": projectid,
-				"cycleId": cycleId,
-				"releaseId": releaseId,
-				"appType": appType,
-				"testsuiteDetails": suitedetailslist
-			};
-			res(null, returnJsonmindmap);
-		}
-	});
+			if (err) {
+				console.log(err);
+				res(null, err);
+			} else {
+				var returnJsonmindmap = {
+					"projectId": projectid,
+					"cycleId": cycleId,
+					"releaseId": releaseId,
+					"appType": appType,
+					"testsuiteDetails": suitedetailslist
+				};
+				res(null, returnJsonmindmap);
+			}
+		});
 };
 
 function testsuiteid_exists(moduledetails, cb, data) {
@@ -614,20 +614,20 @@ function testsuiteid_exists(moduledetails, cb, data) {
 			};
 			client.post("http://127.0.0.1:1990/create_ice/testsuiteid_exists_ICE", args,
 				function (result, response) {
-				if (response.statusCode != 200 || result.rows == "fail") {
-					console.log(result.rows);
-					cb(null, obj);
-				} else {
-					if (result.rows.length != 0) {
-						obj.flag = true;
-						flagId = true;
-						obj.suiteid = result.rows[0].moduleid;
-						statusflag = true;
-						//cb(null,obj);
+					if (response.statusCode != 200 || result.rows == "fail") {
+						console.log(result.rows);
+						cb(null, obj);
+					} else {
+						if (result.rows.length != 0) {
+							obj.flag = true;
+							flagId = true;
+							obj.suiteid = result.rows[0].moduleid;
+							statusflag = true;
+							//cb(null,obj);
+						}
+						modulecallback();
 					}
-					modulecallback();
-				}
-			});
+				});
 		},
 
 		moduledetails: function (modulecallback) {
@@ -647,19 +647,19 @@ function testsuiteid_exists(moduledetails, cb, data) {
 				};
 				client.post("http://127.0.0.1:1990/create_ice/testsuiteid_exists_ICE", args,
 					function (result, response) {
-					if (response.statusCode != 200 || result.rows == "fail") {
-						console.log(result.rows);
-						cb(null, obj);
-					} else {
-						if (result.rows.length != 0) {
-							obj.flag = true;
-							obj.suiteid = result.rows[0].moduleid;
-							statusflag = true;
-							//cb(null,obj);
+						if (response.statusCode != 200 || result.rows == "fail") {
+							console.log(result.rows);
+							cb(null, obj);
+						} else {
+							if (result.rows.length != 0) {
+								obj.flag = true;
+								obj.suiteid = result.rows[0].moduleid;
+								statusflag = true;
+								//cb(null,obj);
+							}
+							modulecallback();
 						}
-						modulecallback();
-					}
-				});
+					});
 			} else {
 				cb(null, obj);
 			}
@@ -708,18 +708,18 @@ function updatetestsuitename(moduledetails, cb, data) {
 			};
 			client.post("http://127.0.0.1:1990/create_ice/get_node_details_ICE", args,
 				function (result, response) {
-				if (response.statusCode != 200 || result.rows == "fail") {
-					console.log(result.rows);
-				} else {
-					if (result.rows.length != 0) {
-						flagtocheckifexists = true;
-						suitedatatoupdate = result.rows[0];
+					if (response.statusCode != 200 || result.rows == "fail") {
+						console.log(result.rows);
+					} else {
+						if (result.rows.length != 0) {
+							flagtocheckifexists = true;
+							suitedatatoupdate = result.rows[0];
+						}
 					}
-				}
-				callback(null, suitedatatoupdate);
-			});
+					callback(null, suitedatatoupdate);
+				});
 		},
-		delete : function (callback) {
+		delete: function (callback) {
 			if (flagtocheckifexists) {
 				var inputs = {
 					'name': 'delete_module',
@@ -736,14 +736,14 @@ function updatetestsuitename(moduledetails, cb, data) {
 				};
 				client.post("http://127.0.0.1:1990/create_ice/delete_node_ICE", args,
 					function (result, response) {
-					if (response.statusCode != 200 || result.rows == "fail") {
+						if (response.statusCode != 200 || result.rows == "fail") {
 
-						console.log(result.rows);
-					} else {
-						flagtocheckifdeleted = true;
-					}
-					callback();
-				});
+							console.log(result.rows);
+						} else {
+							flagtocheckifdeleted = true;
+						}
+						callback();
+					});
 			} else {
 				callback();
 			}
@@ -758,7 +758,7 @@ function updatetestsuitename(moduledetails, cb, data) {
 					'modifiedby': moduledetails.modifiedby,
 					'modifiedbyrole': moduledetails.modifiedbyrole,
 					'modifiedon': new Date().getTime().toString(),
-					'history':suitedatatoupdate.history,
+					'history': suitedatatoupdate.history,
 					'createdby': suitedatatoupdate.createdby,
 					'createdthrough': suitedatatoupdate.createdthrough,
 					'deleted': suitedatatoupdate.deleted.toString(),
@@ -775,13 +775,13 @@ function updatetestsuitename(moduledetails, cb, data) {
 				};
 				client.post("http://127.0.0.1:1990/create_ice/updateModulename_ICE", args,
 					function (result, response) {
-					if (response.statusCode != 200 || result.rows == "fail") {
-						console.log(result.rows);
-					} else {
-						console.log('Succesfully renamed module name');
-					}
-					callback(null, "success");
-				});
+						if (response.statusCode != 200 || result.rows == "fail") {
+							console.log(result.rows);
+						} else {
+							console.log('Succesfully renamed module name');
+						}
+						callback(null, "success");
+					});
 			} else {
 				callback(null, "fail");
 			}
@@ -815,19 +815,19 @@ function testscenariosid_exists(testscenariodetails, cb, data) {
 			};
 			client.post("http://127.0.0.1:1990/create_ice/testscenariosid_exists_ICE", args,
 				function (result, response) {
-				if (response.statusCode != 200 || result.rows == "fail") {
-					console.log(result.rows);
-					cb(null, obj);
-				} else {
-					if (result.rows.length != 0) {
-						flagId = true;
-						obj.flag = true;
-						obj.scenarioid = result.rows[0].testscenarioid;
-						statusflag = true;
+					if (response.statusCode != 200 || result.rows == "fail") {
+						console.log(result.rows);
+						cb(null, obj);
+					} else {
+						if (result.rows.length != 0) {
+							flagId = true;
+							obj.flag = true;
+							obj.scenarioid = result.rows[0].testscenarioid;
+							statusflag = true;
+						}
+						scenariocallback();
 					}
-					scenariocallback();
-				}
-			});
+				});
 		},
 		scenariodetails: function (scenariocallback) {
 			if (!flagId) {
@@ -846,18 +846,18 @@ function testscenariosid_exists(testscenariodetails, cb, data) {
 				};
 				client.post("http://127.0.0.1:1990/create_ice/testscenariosid_exists_ICE", args,
 					function (result, response) {
-					if (response.statusCode != 200 || result.rows == "fail") {
-						console.log(result.rows);
-						cb(null, obj);
-					} else {
-						if (result.rows.length != 0) {
-							obj.flag = true;
-							obj.scenarioid = result.rows[0].testscenarioid;
-							statusflag = true;
+						if (response.statusCode != 200 || result.rows == "fail") {
+							console.log(result.rows);
+							cb(null, obj);
+						} else {
+							if (result.rows.length != 0) {
+								obj.flag = true;
+								obj.scenarioid = result.rows[0].testscenarioid;
+								statusflag = true;
+							}
+							scenariocallback();
 						}
-						scenariocallback();
-					}
-				});
+					});
 			} else {
 				cb(null, obj);
 			}
@@ -906,18 +906,18 @@ function updatetestscenarioname(testscenariodetails, cb, data) {
 			};
 			client.post("http://127.0.0.1:1990/create_ice/get_node_details_ICE", args,
 				function (result, response) {
-				if (response.statusCode != 200 || result.rows == "fail") {
-					console.log(result.rows);
-				} else {
-					if (result.rows.length != 0) {
-						flagtocheckifexists = true;
-						scenariodatatoupdate = result.rows[0];
+					if (response.statusCode != 200 || result.rows == "fail") {
+						console.log(result.rows);
+					} else {
+						if (result.rows.length != 0) {
+							flagtocheckifexists = true;
+							scenariodatatoupdate = result.rows[0];
+						}
 					}
-				}
-				callback(null, scenariodatatoupdate);
-			});
+					callback(null, scenariodatatoupdate);
+				});
 		},
-		delete : function (callback) {
+		delete: function (callback) {
 			if (flagtocheckifexists) {
 				var inputs = {
 					'name': 'delete_testscenario',
@@ -934,13 +934,13 @@ function updatetestscenarioname(testscenariodetails, cb, data) {
 				};
 				client.post("http://127.0.0.1:1990/create_ice/delete_node_ICE", args,
 					function (result, response) {
-					if (response.statusCode != 200 || result.rows == "fail") {
-						console.log(result.rows);
-					} else {
-						flagtocheckifdeleted = true;
-					}
-					callback();
-				});
+						if (response.statusCode != 200 || result.rows == "fail") {
+							console.log(result.rows);
+						} else {
+							flagtocheckifdeleted = true;
+						}
+						callback();
+					});
 			} else {
 				callback();
 			}
@@ -958,7 +958,7 @@ function updatetestscenarioname(testscenariodetails, cb, data) {
 					'modifiedby': testscenariodetails.modifiedby,
 					'modifiedbyrole': testscenariodetails.modifiedbyrole,
 					'modifiedon': new Date().getTime().toString(),
-					'history':scenariodatatoupdate.history,
+					'history': scenariodatatoupdate.history,
 					'createdon': new Date(scenariodatatoupdate.createdon).getTime().toString(),
 					'createdby': scenariodatatoupdate.createdby,
 					'deleted': scenariodatatoupdate.deleted.toString(),
@@ -974,13 +974,13 @@ function updatetestscenarioname(testscenariodetails, cb, data) {
 				};
 				client.post("http://127.0.0.1:1990/create_ice/updateTestscenarioname_ICE", args,
 					function (result, response) {
-					if (response.statusCode != 200 || result.rows == "fail") {
-						console.log(result.rows);
-					} else {
-						console.log('Succesfully renamed Testscenario name');
-					}
-					callback(null, "success");
-				});
+						if (response.statusCode != 200 || result.rows == "fail") {
+							console.log(result.rows);
+						} else {
+							console.log('Succesfully renamed Testscenario name');
+						}
+						callback(null, "success");
+					});
 			} else {
 				callback(null, "fail");
 			}
@@ -1013,19 +1013,19 @@ function testscreen_exists(testscreendetails, cb, data) {
 			};
 			client.post("http://127.0.0.1:1990/create_ice/testscreenid_exists_ICE", args,
 				function (result, response) {
-				if (response.statusCode != 200 || result.rows == "fail") {
-					console.log(result.rows);
-					cb(null, obj);
-				} else {
-					if (result.rows.length != 0) {
-						flagId = true;
-						obj.flag = true;
-						obj.screenid = result.rows[0].screenid;
-						statusflag = true;
+					if (response.statusCode != 200 || result.rows == "fail") {
+						console.log(result.rows);
+						cb(null, obj);
+					} else {
+						if (result.rows.length != 0) {
+							flagId = true;
+							obj.flag = true;
+							obj.screenid = result.rows[0].screenid;
+							statusflag = true;
+						}
+						screencallback();
 					}
-					screencallback();
-				}
-			});
+				});
 		},
 		screendetails: function (screencallback) {
 			if (!flagId) {
@@ -1044,18 +1044,18 @@ function testscreen_exists(testscreendetails, cb, data) {
 				};
 				client.post("http://127.0.0.1:1990/create_ice/testscreenid_exists_ICE", args,
 					function (result, response) {
-					if (response.statusCode != 200 || result.rows == "fail") {
-						console.log(result.rows);
-						cb(null, obj);
-					} else {
-						if (result.rows.length != 0) {
-							obj.flag = true;
-							obj.screenid = result.rows[0].screenid;
-							statusflag = true;
+						if (response.statusCode != 200 || result.rows == "fail") {
+							console.log(result.rows);
+							cb(null, obj);
+						} else {
+							if (result.rows.length != 0) {
+								obj.flag = true;
+								obj.screenid = result.rows[0].screenid;
+								statusflag = true;
+							}
+							screencallback();
 						}
-						screencallback();
-					}
-				});
+					});
 			} else {
 				cb(null, obj);
 			}
@@ -1103,18 +1103,18 @@ function updatetestscreenname(testscreendetails, cb, data) {
 			};
 			client.post("http://127.0.0.1:1990/create_ice/get_node_details_ICE", args,
 				function (result, response) {
-				if (response.statusCode != 200 || result.rows == "fail") {
-					console.log(result.rows);
-				} else {
-					if (result.rows.length != 0) {
-						flagtocheckifexists = true;
-						screendatatoupdate = result.rows[0];
+					if (response.statusCode != 200 || result.rows == "fail") {
+						console.log(result.rows);
+					} else {
+						if (result.rows.length != 0) {
+							flagtocheckifexists = true;
+							screendatatoupdate = result.rows[0];
+						}
 					}
-				}
-				callback(null, screendatatoupdate);
-			});
+					callback(null, screendatatoupdate);
+				});
 		},
-		delete : function (callback) {
+		delete: function (callback) {
 			if (flagtocheckifexists) {
 				var inputs = {
 					'name': 'delete_screen',
@@ -1131,15 +1131,15 @@ function updatetestscreenname(testscreendetails, cb, data) {
 				};
 				client.post("http://127.0.0.1:1990/create_ice/delete_node_ICE", args,
 					function (result, response) {
-					if (response.statusCode != 200 || result.rows == "fail") {
-						console.log(result.rows);
-					} else {
-						// if(deleted.rows != undefined && deleted.rows.length!=0){
-						flagtocheckifdeleted = true;
-						// }
-					}
-					callback();
-				});
+						if (response.statusCode != 200 || result.rows == "fail") {
+							console.log(result.rows);
+						} else {
+							// if(deleted.rows != undefined && deleted.rows.length!=0){
+							flagtocheckifdeleted = true;
+							// }
+						}
+						callback();
+					});
 			} else {
 				callback();
 			}
@@ -1156,7 +1156,7 @@ function updatetestscreenname(testscreendetails, cb, data) {
 					'modifiedby': testscreendetails.modifiedby,
 					'modifiedbyrole': testscreendetails.modifiedbyrole,
 					'modifiedon': new Date().getTime().toString(),
-					'history':screendatatoupdate.history,
+					'history': screendatatoupdate.history,
 					'createdon': new Date(screendatatoupdate.createdon).getTime().toString(),
 					'createdby': screendatatoupdate.createdby,
 					'createdthrough': screendatatoupdate.createdthrough,
@@ -1174,13 +1174,13 @@ function updatetestscreenname(testscreendetails, cb, data) {
 				};
 				client.post("http://127.0.0.1:1990/create_ice/updateScreenname_ICE", args,
 					function (result, response) {
-					if (response.statusCode != 200 || result.rows == "fail") {
-						console.log(result.rows);
-					} else {
-						console.log('Succesfully renamed Screen name');
-					}
-					callback(null, "success");
-				});
+						if (response.statusCode != 200 || result.rows == "fail") {
+							console.log(result.rows);
+						} else {
+							console.log('Succesfully renamed Screen name');
+						}
+						callback(null, "success");
+					});
 			} else {
 				callback(null, "fail");
 			}
@@ -1213,19 +1213,19 @@ function testcase_exists(testcasedetails, cb, data) {
 			};
 			client.post("http://127.0.0.1:1990/create_ice/testcaseid_exists_ICE", args,
 				function (result, response) {
-				if (response.statusCode != 200 || result.rows == "fail") {
-					console.log(result.rows);
-					cb(null, obj);
-				} else {
-					if (result.rows.length != 0) {
-						obj.flag = true;
-						flagId = true;
-						obj.testcaseid = result.rows[0].testcaseid;
-						statusflag = true;
+					if (response.statusCode != 200 || result.rows == "fail") {
+						console.log(result.rows);
+						cb(null, obj);
+					} else {
+						if (result.rows.length != 0) {
+							obj.flag = true;
+							flagId = true;
+							obj.testcaseid = result.rows[0].testcaseid;
+							statusflag = true;
+						}
+						testcasecallback();
 					}
-					testcasecallback();
-				}
-			});
+				});
 		},
 		testcasedetails: function (testcasecallback) {
 			if (!flagId) {
@@ -1244,18 +1244,18 @@ function testcase_exists(testcasedetails, cb, data) {
 				};
 				client.post("http://127.0.0.1:1990/create_ice/testcaseid_exists_ICE", args,
 					function (result, response) {
-					if (response.statusCode != 200 || result.rows == "fail") {
-						console.log(result.rows);
-						cb(null, obj);
-					} else {
-						if (result.rows.length != 0) {
-							obj.flag = true;
-							obj.testcaseid = result.rows[0].testcaseid;
-							statusflag = true;
+						if (response.statusCode != 200 || result.rows == "fail") {
+							console.log(result.rows);
+							cb(null, obj);
+						} else {
+							if (result.rows.length != 0) {
+								obj.flag = true;
+								obj.testcaseid = result.rows[0].testcaseid;
+								statusflag = true;
+							}
+							testcasecallback();
 						}
-						testcasecallback();
-					}
-				});
+					});
 			} else {
 				cb(null, obj);
 			}
@@ -1303,18 +1303,18 @@ function updatetestcasename(testcasedetails, cb, data) {
 			};
 			client.post("http://127.0.0.1:1990/create_ice/get_node_details_ICE", args,
 				function (result, response) {
-				if (response.statusCode != 200 || result.rows == "fail") {
-					console.log(result.rows);
-				} else {
-					if (result.rows.length != 0) {
-						flagtocheckifexists = true;
-						testcasedatatoupdate = result.rows[0];
+					if (response.statusCode != 200 || result.rows == "fail") {
+						console.log(result.rows);
+					} else {
+						if (result.rows.length != 0) {
+							flagtocheckifexists = true;
+							testcasedatatoupdate = result.rows[0];
+						}
 					}
-				}
-				callback(null, testcasedatatoupdate);
-			});
+					callback(null, testcasedatatoupdate);
+				});
 		},
-		delete : function (callback) {
+		delete: function (callback) {
 			if (flagtocheckifexists) {
 				var inputs = {
 					'name': 'delete_testcase',
@@ -1331,15 +1331,15 @@ function updatetestcasename(testcasedetails, cb, data) {
 				};
 				client.post("http://127.0.0.1:1990/create_ice/delete_node_ICE", args,
 					function (result, response) {
-					if (response.statusCode != 200 || result.rows == "fail") {
-						console.log(result.rows);
-					} else {
-						// if(deleted.rows != undefined && deleted.rows.length!=0){
-						flagtocheckifdeleted = true;
-						// }
-					}
-					callback();
-				});
+						if (response.statusCode != 200 || result.rows == "fail") {
+							console.log(result.rows);
+						} else {
+							// if(deleted.rows != undefined && deleted.rows.length!=0){
+							flagtocheckifdeleted = true;
+							// }
+						}
+						callback();
+					});
 			} else {
 				callback();
 			}
@@ -1356,7 +1356,7 @@ function updatetestcasename(testcasedetails, cb, data) {
 					'modifiedby': testcasedetails.modifiedby,
 					'modifiedbyrole': testcasedetails.modifiedbyrole,
 					'modifiedon': new Date().getTime().toString(),
-					'history':testcasedatatoupdate.history,
+					'history': testcasedatatoupdate.history,
 					'createdon': new Date(testcasedatatoupdate.createdon).getTime().toString(),
 					'createdby': testcasedatatoupdate.createdby,
 					'createdthrough': testcasedatatoupdate.createdthrough,
@@ -1374,13 +1374,13 @@ function updatetestcasename(testcasedetails, cb, data) {
 				};
 				client.post("http://127.0.0.1:1990/create_ice/updateTestcasename_ICE  ", args,
 					function (result, response) {
-					if (response.statusCode != 200 || result.rows == "fail") {
-						console.log(result.rows);
-					} else {
-						console.log('Succesfully renamed Testcase name');
-					}
-					callback(null, "success");
-				});
+						if (response.statusCode != 200 || result.rows == "fail") {
+							console.log(result.rows);
+						} else {
+							console.log('Succesfully renamed Testcase name');
+						}
+						callback(null, "success");
+					});
 			} else {
 				callback(null, "fail");
 			}
@@ -1409,23 +1409,23 @@ exports.getReleaseIDs_Ninteen68 = function (req, res) {
 	};
 	client.post("http://127.0.0.1:1990/create_ice/getReleaseIDs_Ninteen68", args,
 		function (result, response) {
-		try {
-			if (response.statusCode != 200 || result.rows == "fail") {
-				res(null, result.rows);
-			} else {
-				async.forEachSeries(result.rows, function (iterator, callback1) {
-					rname.push(iterator.releasename);
-					r_ids.push(iterator.releaseid);
-					callback1();
-				});
-				rel.rel = rname;
-				rel.r_ids = r_ids;
-				res(null, rel);
+			try {
+				if (response.statusCode != 200 || result.rows == "fail") {
+					res(null, result.rows);
+				} else {
+					async.forEachSeries(result.rows, function (iterator, callback1) {
+						rname.push(iterator.releasename);
+						r_ids.push(iterator.releaseid);
+						callback1();
+					});
+					rel.rel = rname;
+					rel.r_ids = r_ids;
+					res(null, rel);
+				}
+			} catch (ex) {
+				console.log(ex);
 			}
-		} catch (ex) {
-			console.log(ex);
-		}
-	});
+		});
 };
 
 exports.getCycleIDs_Ninteen68 = function (req, res) {
@@ -1447,23 +1447,23 @@ exports.getCycleIDs_Ninteen68 = function (req, res) {
 	};
 	client.post("http://127.0.0.1:1990/create_ice/getCycleIDs_Ninteen68", args,
 		function (result, response) {
-		try {
-			if (response.statusCode != 200 || result.rows == "fail") {
-				res(null, result.rows);
-			} else {
-				async.forEachSeries(result.rows, function (iterator, callback1) {
-					cname.push(iterator.cyclename);
-					c_ids.push(iterator.cycleid);
-					callback1();
-				});
-				cyc.cyc = cname;
-				cyc.c_ids = c_ids;
-				res(null, cyc);
+			try {
+				if (response.statusCode != 200 || result.rows == "fail") {
+					res(null, result.rows);
+				} else {
+					async.forEachSeries(result.rows, function (iterator, callback1) {
+						cname.push(iterator.cyclename);
+						c_ids.push(iterator.cycleid);
+						callback1();
+					});
+					cyc.cyc = cname;
+					cyc.c_ids = c_ids;
+					res(null, cyc);
+				}
+			} catch (ex) {
+				console.log(ex);
 			}
-		} catch (ex) {
-			console.log(ex);
-		}
-	});
+		});
 };
 
 exports.getProjectIDs_Nineteen68 = function (req, res) {
@@ -1487,52 +1487,52 @@ exports.getProjectIDs_Nineteen68 = function (req, res) {
 		}
 	};
 	async.series({
-		function (callback) {
+		function(callback) {
 			client.post("http://127.0.0.1:1990/create_ice/getProjectIDs_Nineteen68", args1,
 				function (result, response) {
-				if (response.statusCode != 200 || result.rows == "fail") {
-					res(null, result.rows);
-				} else {
-					var res_projectid = [];
-					if (result.rows[0] != null || result.rows[0] != undefined) {
-						res_projectid = result.rows[0].projectids;
-					}
-					async.forEachSeries(res_projectid, function (iterator, callback1) {
-						inputs2 = {
-							"projectid": iterator,
-							"query": "getprojectname"
-						};
-						args2 = {
-							data: inputs2,
-							headers: {
-								"Content-Type": "application/json"
-							}
-						};
-						client.post("http://127.0.0.1:1990/create_ice/getProjectIDs_Nineteen68", args2,
-							function (projectnamedata, response) {
-							try {
-								if (response.statusCode != 200 || projectnamedata.rows == "fail") {
-									res(null, projectnamedata.rows);
-								} else {
-									if (projectnamedata.rows[0] != undefined) {
-										project_names.push(projectnamedata.rows[0].projectname);
-										app_types.push(projectnamedata.rows[0].projecttypeid);
-										project_ids.push(iterator);
-									} else {
-										console.log('projectnamedata is Undefined');
-									}
+					if (response.statusCode != 200 || result.rows == "fail") {
+						res(null, result.rows);
+					} else {
+						var res_projectid = [];
+						if (result.rows[0] != null || result.rows[0] != undefined) {
+							res_projectid = result.rows[0].projectids;
+						}
+						async.forEachSeries(res_projectid, function (iterator, callback1) {
+							inputs2 = {
+								"projectid": iterator,
+								"query": "getprojectname"
+							};
+							args2 = {
+								data: inputs2,
+								headers: {
+									"Content-Type": "application/json"
 								}
-								projectdetails.projectId = project_ids;
-								projectdetails.projectName = project_names;
-								projectdetails.appType = app_types;
-								callback1();
-							} catch (ex) {
-								console.log(ex);
-							}
-						});
-					}, callback);
-				}
-			});
+							};
+							client.post("http://127.0.0.1:1990/create_ice/getProjectIDs_Nineteen68", args2,
+								function (projectnamedata, response) {
+									try {
+										if (response.statusCode != 200 || projectnamedata.rows == "fail") {
+											res(null, projectnamedata.rows);
+										} else {
+											if (projectnamedata.rows[0] != undefined) {
+												project_names.push(projectnamedata.rows[0].projectname);
+												app_types.push(projectnamedata.rows[0].projecttypeid);
+												project_ids.push(iterator);
+											} else {
+												console.log('projectnamedata is Undefined');
+											}
+										}
+										projectdetails.projectId = project_ids;
+										projectdetails.projectName = project_names;
+										projectdetails.appType = app_types;
+										callback1();
+									} catch (ex) {
+										console.log(ex);
+									}
+								});
+						}, callback);
+					}
+				});
 		}
 	}, function (err, results) {
 		//console.log(projectdetails);
@@ -1561,20 +1561,20 @@ exports.getProjectType_Nineteen68 = function (req, res) {
 	};
 	client.post("http://127.0.0.1:1990/create_ice/getProjectType_Nineteen68", args,
 		function (result, response) {
-		try {
-			if (response.statusCode != 200 || result.rows == "fail") {
-				res(null, result.rows);
-			} else {
-				if (result.rows.length != 0) {
-					projectDetails.projectType = result.rows[0].projecttypeid;
-					projectDetails.project_id = req;
+			try {
+				if (response.statusCode != 200 || result.rows == "fail") {
+					res(null, result.rows);
+				} else {
+					if (result.rows.length != 0) {
+						projectDetails.projectType = result.rows[0].projecttypeid;
+						projectDetails.project_id = req;
+					}
+					res(null, projectDetails);
 				}
-				res(null, projectDetails);
+			} catch (ex) {
+				console.log(ex);
 			}
-		} catch (ex) {
-			console.log(ex);
-		}
-	});
+		});
 };
 
 exports.createE2E_Structure_Nineteen68 = function (req, res) {
@@ -1607,7 +1607,7 @@ exports.createE2E_Structure_Nineteen68 = function (req, res) {
 				"modulename": testsuiteName,
 				"moduleid": moduleid_c,
 				'modifiedby': username,
-				'modifiedbyrole':username_role,
+				'modifiedbyrole': username_role,
 				"pid": projectid,
 				"versionnumber": versionnumber,
 				"newversionnumber": versionnumber
@@ -1653,58 +1653,58 @@ exports.createE2E_Structure_Nineteen68 = function (req, res) {
 				};
 				client.post("http://127.0.0.1:1990/create_ice/insertInSuite_ICE", args,
 					function (result, response) {
-					if (response.statusCode != 200 || result.rows == "fail") {
-						console.log(result.rows);
-					} else {
-						scenario = suitedetails.testscenarioDetails;
-						var scenariosarray = [];
-						async.forEachSeries(scenario, function (iterator, callback2) {
-							var scenarioId = uuid();
-							scenariosarray.push(scenarioId);
-							var scenarioName = iterator.testscenarioName;
-							var scenarioid_c = iterator.testscenarioId_c;
-							var scenarioflag = false;
-							var scenarioidTemp = '';
-							var screendetailslist = [];
-							var taskscenario = iterator.task;
-							var scenarioidneo = iterator.testscenarioId;
-							var prjID = iterator.projectID;
-							testscenariosid_exists({
-								"testscenarioname": scenarioName,
-								"testscenarioid": scenarioid_c,
-								'modifiedby': username,
-								'modifiedbyrole':username_role,
-								"pid": prjID,
-								"versionnumber": versionnumber,
-								"newversionnumber": versionnumber
-							}, function (err, scenariodata) {
-								if (err) {
-									console.log(err);
-									cb(null, err);
-								} else {
-									scenarioflag = scenariodata.flag;
-									scenarioidTemp = scenariodata.scenarioid;
-								}
-								if (!scenarioflag) {
-									console.log("Scenario does not exists");
-								} else {
-									scenarioId = scenarioidTemp;
-									scenarioidlist.push(scenarioId);
-									var scenariodetailsobj = {
-										"scenario_PrjId": prjID,
-										"testscenarioId": scenarioidneo,
-										"testscenarioId_c": scenarioId,
-										"screenDetails": screendetailslist,
-										"tasks": taskscenario,
-										"testscenarioName": scenarioName
-									};
-									scenariodetailslist.push(scenariodetailsobj);
-								}
-								callback2();
-							});
-						}, callback);
-					}
-				});
+						if (response.statusCode != 200 || result.rows == "fail") {
+							console.log(result.rows);
+						} else {
+							scenario = suitedetails.testscenarioDetails;
+							var scenariosarray = [];
+							async.forEachSeries(scenario, function (iterator, callback2) {
+								var scenarioId = uuid();
+								scenariosarray.push(scenarioId);
+								var scenarioName = iterator.testscenarioName;
+								var scenarioid_c = iterator.testscenarioId_c;
+								var scenarioflag = false;
+								var scenarioidTemp = '';
+								var screendetailslist = [];
+								var taskscenario = iterator.task;
+								var scenarioidneo = iterator.testscenarioId;
+								var prjID = iterator.projectID;
+								testscenariosid_exists({
+									"testscenarioname": scenarioName,
+									"testscenarioid": scenarioid_c,
+									'modifiedby': username,
+									'modifiedbyrole': username_role,
+									"pid": prjID,
+									"versionnumber": versionnumber,
+									"newversionnumber": versionnumber
+								}, function (err, scenariodata) {
+									if (err) {
+										console.log(err);
+										cb(null, err);
+									} else {
+										scenarioflag = scenariodata.flag;
+										scenarioidTemp = scenariodata.scenarioid;
+									}
+									if (!scenarioflag) {
+										console.log("Scenario does not exists");
+									} else {
+										scenarioId = scenarioidTemp;
+										scenarioidlist.push(scenarioId);
+										var scenariodetailsobj = {
+											"scenario_PrjId": prjID,
+											"testscenarioId": scenarioidneo,
+											"testscenarioId_c": scenarioId,
+											"screenDetails": screendetailslist,
+											"tasks": taskscenario,
+											"testscenarioName": scenarioName
+										};
+										scenariodetailslist.push(scenariodetailsobj);
+									}
+									callback2();
+								});
+							}, callback);
+						}
+					});
 			});
 		},
 		updatescenarioids: function (callback) {
@@ -1715,7 +1715,7 @@ exports.createE2E_Structure_Nineteen68 = function (req, res) {
 				'modulename': testsuiteName,
 				'modifiedflag': suiteflag,
 				'modifiedby': username,
-				'modifiedbyrole':username_role,
+				'modifiedbyrole': username_role,
 				'versionnumber': versionnumber
 			};
 			var args = {
@@ -1726,30 +1726,30 @@ exports.createE2E_Structure_Nineteen68 = function (req, res) {
 			};
 			client.post("http://127.0.0.1:1990/create_ice/updateModule_ICE", args,
 				function (result, response) {
-				if (response.statusCode != 200 || result.rows == "fail") {
-					console.log(result.rows);
-				} else {
-					console.log("Successfully updated Modules");
-				}
-				callback();
-			});
+					if (response.statusCode != 200 || result.rows == "fail") {
+						console.log(result.rows);
+					} else {
+						console.log("Successfully updated Modules");
+					}
+					callback();
+				});
 		}
 	},
 		function (err, results) {
-		if (err) {
-			console.log(err);
-			res(null, err);
-		} else {
-			var returnJsonmindmap = {
-				"projectId": projectid,
-				"cycleId": cycleId,
-				"releaseId": releaseId,
-				"appType": appType,
-				"testsuiteDetails": suitedetailslist
-			};
-			res(null, returnJsonmindmap);
-		}
-	});
+			if (err) {
+				console.log(err);
+				res(null, err);
+			} else {
+				var returnJsonmindmap = {
+					"projectId": projectid,
+					"cycleId": cycleId,
+					"releaseId": releaseId,
+					"appType": appType,
+					"testsuiteDetails": suitedetailslist
+				};
+				res(null, returnJsonmindmap);
+			}
+		});
 };
 
 exports.getEmptyProjects_ICE = function (req, res) {
@@ -1769,35 +1769,35 @@ exports.getEmptyProjects_ICE = function (req, res) {
 		}
 	};
 	async.series({
-		function (callback) {
+		function(callback) {
 			client.post("http://127.0.0.1:1990/create_ice/getProjectIDs_Nineteen68", args1,
 				function (result, response) {
-				if (response.statusCode != 200 || result.rows == "fail") {
-					res(null, result.rows);
-				} else if (result.rows[0] == null || result.rows[0].projectids==null) {
-					res(null, "fail");
-				} else {
-					var res_projectid = result.rows[0].projectids;
-					inputs2 = {
-						"projectids": res_projectid,
-					};
-					args2 = {
-						data: inputs2,
-						headers: {
-							"Content-Type": "application/json"
-						}
-					};
-					client.post("http://127.0.0.1:1990/create_ice/getEmptyProjects_ICE", args2,
-						function (emptyProjectData, response) {
-						if (response.statusCode != 200 || emptyProjectData.rows == "fail") {
-							res(null, emptyProjectData.rows);
-						} else {
-							projectdetails=emptyProjectData.rows;
-							callback();
-						}
-					});
-				}
-			});
+					if (response.statusCode != 200 || result.rows == "fail") {
+						res(null, result.rows);
+					} else if (result.rows[0] == null || result.rows[0].projectids == null) {
+						res(null, "fail");
+					} else {
+						var res_projectid = result.rows[0].projectids;
+						inputs2 = {
+							"projectids": res_projectid,
+						};
+						args2 = {
+							data: inputs2,
+							headers: {
+								"Content-Type": "application/json"
+							}
+						};
+						client.post("http://127.0.0.1:1990/create_ice/getEmptyProjects_ICE", args2,
+							function (emptyProjectData, response) {
+								if (response.statusCode != 200 || emptyProjectData.rows == "fail") {
+									res(null, emptyProjectData.rows);
+								} else {
+									projectdetails = emptyProjectData.rows;
+									callback();
+								}
+							});
+					}
+				});
 		}
 	}, function (err, results) {
 		try {
@@ -1825,14 +1825,14 @@ exports.submitTask = function (req, res) {
 	};
 	client.post("http://127.0.0.1:1990/create_ice/submitTask", args,
 		function (result, response) {
-		try {
-			if (response.statusCode != 200 || result.rows == "fail") {
-				res(null, result.rows);
-			} else {
-				console.log(result);
+			try {
+				if (response.statusCode != 200 || result.rows == "fail") {
+					res(null, result.rows);
+				} else {
+					console.log(result);
+				}
+			} catch (ex) {
+				console.log(ex);
 			}
-		} catch (ex) {
-			console.log(ex);
-		}
-	});
+		});
 };
