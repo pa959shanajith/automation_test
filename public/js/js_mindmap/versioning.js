@@ -8,15 +8,15 @@ function replicationHandler() {
   var userInfo = JSON.parse(window.localStorage['_UI']);
   var user_id = userInfo.user_id;
   blockUI('Loading....')
-  dataSender({  user_name: userInfo.username, userRole: user_role,userid:user_id,task: 'projectReplication',versioning: 1}, function (status, result) {
+  dataSender({ user_name: userInfo.username, userRole: user_role, userid: user_id, task: 'projectReplication', versioning: 1 }, function (status, result) {
     if (status) {
       console.log('err');
       unblockUI();
     }
     else {
       result1 = JSON.parse(result);
-      dataSender({ user_name: userInfo.username, userRole: user_role,task:'listOfProjectsNeo4j',versioning: 1 }, function (status, data) {
-        if (status) { console.log('err'); unblockUI();}
+      dataSender({ user_name: userInfo.username, userRole: user_role, task: 'listOfProjectsNeo4j', versioning: 1 }, function (status, data) {
+        if (status) { console.log('err'); unblockUI(); }
         else {
           parse_data = JSON.parse(data);
           //alert(assignedUser);
@@ -26,15 +26,15 @@ function replicationHandler() {
           //   $('#sourceVersions').append($('<option>').attr({ value: listSourceVersions[i].value, class: 'test' }).text(listSourceVersions[i].value));
           // }
           var parsed_project_id = [];
-          for(var i=0;i<parse_data[0].data.length;i++){
+          for (var i = 0; i < parse_data[0].data.length; i++) {
             parsed_project_id.push(parse_data[0].data[i].row[0])
           }
           for (var i = 0; i < result1['projectName'].length; i++) {
-            if(parsed_project_id.indexOf(result1['projectId'][i])!=-1){
-               console.log('Available in Neo4j')
-           }else{
-             $('#destProjects').append($('<option>').attr({ value: result1['projectId'][i], class: 'test' }).text(result1['projectName'][i]));
-           }
+            if (parsed_project_id.indexOf(result1['projectId'][i]) != -1) {
+              console.log('Available in Neo4j')
+            } else {
+              $('#destProjects').append($('<option>').attr({ value: result1['projectId'][i], class: 'test' }).text(result1['projectName'][i]));
+            }
           }
           $('#ProjectReplicationPopUp').modal("show");
           unblockUI();
@@ -61,18 +61,19 @@ function replicate_project()
 
 function replicate_project(from_v, to_v, pid) {
   console.log("inside replicate project");
-  console.log(typeof(from_v))
+  console.log(typeof (from_v))
   console.log(to_v)
   console.log(pid)
   blockUI('Loading....')
   dataSender({ user_name: userInfo.username, userRole: user_role, task: 'createVersion', srcprojectId: $(".project-list").val(), dstprojectId: pid, versioning: 1, vn_from: from_v, vn_to: to_v, action: "project_replicate", write: 10 }, function (err, result) {
-    if (err) { console.log(err); 
-      openDialogMindmap('Mindmap', "Project Replication Failed.") 
+    if (err) {
+      console.log(err);
+      openDialogMindmap('Mindmap', "Project Replication Failed.")
       unblockUI();  //callback(null, err);   unblockUI(); 
-      }
+    }
     else {
-      openDialogMindmap('Mindmap', "Project Replicated Sucessfully.") 
-      unblockUI();  
+      openDialogMindmap('Mindmap', "Project Replicated Sucessfully.")
+      unblockUI();
     }
   });
 
@@ -107,38 +108,38 @@ function addVersioning(versions) {
     class: 'selectVersionLabel'
   }).text('Version: ')
     ).append($('<select>').attr({
-      class: 'version-list', 
-      onchange:'loadModules()'
+      class: 'version-list',
+      onchange: 'loadModules()'
     })).append($('<i>').attr({
-              class:'fa fa-plus-circle fa-lg plus-icon',
-              onclick:"versionInputDialogShow(event)"
-  })).append($('<i>').attr({
-                            class:'fa fa-window-restore fa-lg plus-icon',
-                            onclick:'replicationHandler()'
-                          })
-  ))
+      class: 'fa fa-plus-circle fa-lg plus-icon',
+      onclick: "versionInputDialogShow(event)"
+    })).append($('<i>').attr({
+      class: 'fa fa-window-restore fa-lg plus-icon',
+      onclick: 'replicationHandler()'
+    })
+    ))
   for (i = 0; i < versions.length; i++) {
     $('.version-list').append($('<option>').attr({
       value: versions[i]
     }).text(versions[i]))
   }
 
-  setCookie('mm_pvid',$('.version-list').children()[0].value,15);
-	$('.version-list').val($('.version-list').children()[0].value);
+  setCookie('mm_pvid', $('.version-list').children()[0].value, 15);
+  $('.version-list').val($('.version-list').children()[0].value);
 
-  if(getCookie('mm_pvid') != ''){
+  if (getCookie('mm_pvid') != '') {
     $('.version-list').val(getCookie('mm_pvid'));
   }
   loadMindmapData1(1);
   //loadModules(versions)
 
-  if(window.localStorage['tabMindMap']=="tabAssign"){
-             //remove create new version and replicate button
-                $('.plus-icon').remove();
-                $('.searchModuleimg-assign').addClass('searchModuleimg-assign1')
-                $('.selectProject').addClass('selectProjectAssign') 
+  if (window.localStorage['tabMindMap'] == "tabAssign") {
+    //remove create new version and replicate button
+    $('.plus-icon').remove();
+    $('.searchModuleimg-assign').addClass('searchModuleimg-assign1')
+    $('.selectProject').addClass('selectProjectAssign')
 
-                // $('.searchModuleimg-assign').addClass('searchTabassignsp')        
+    // $('.searchModuleimg-assign').addClass('searchTabassignsp')        
   }
 }
 
@@ -147,46 +148,45 @@ function : loadModules()
 Purpose : Loads modules for the active project Version.
 params : None
 */
-function loadModules(){
-     var active_version= $('.version-list').val();
-      blockUI('Loading...');
-      var svgTileG=d3.select('.ct-tile').append('svg').attr('class','ct-svgTile').attr('height','150px').attr('width','150px').append('g');
-	var svgTileLen = $(".ct-svgTile").length;
-	if(svgTileLen == 0)
-	{
-		$('#ct-mapSvg, #ct-canvas').empty();
-		$('#ct-canvas').append('<div class="ct-tileBox"><div class="ct-tile" title="Create Mindmap"><svg class="ct-svgTile" height="150px" width="150px"><g><circle cx="75" cy="75" r="30"></circle><path d="M75,55L75,95"></path><path d="M55,75L95,75"></path></g></svg></div><span class="ct-text">Create Mindmap</span></div>');
-		
-	}
-      
-    
+function loadModules() {
+  var active_version = $('.version-list').val();
+  blockUI('Loading...');
+  var svgTileG = d3.select('.ct-tile').append('svg').attr('class', 'ct-svgTile').attr('height', '150px').attr('width', '150px').append('g');
+  var svgTileLen = $(".ct-svgTile").length;
+  if (svgTileLen == 0) {
+    $('#ct-mapSvg, #ct-canvas').empty();
+    $('#ct-canvas').append('<div class="ct-tileBox"><div class="ct-tile" title="Create Mindmap"><svg class="ct-svgTile" height="150px" width="150px"><g><circle cx="75" cy="75" r="30"></circle><path d="M75,55L75,95"></path><path d="M55,75L95,75"></path></g></svg></div><span class="ct-text">Create Mindmap</span></div>');
 
-  	dataSender({task:'getModules',tab:window.localStorage['tabMindMap'],prjId:$(".project-list").val(),versioning:1,version:parseFloat(active_version)},function(err,result){
-		if(err){
-			console.log(result);
-			unblockUI();
-		}
-		else{
-			var nodeBox=d3.select('.ct-nodeBox');
-			$(nodeBox[0]).empty();
-			allMMaps=JSON.parse(result);
-			allMMaps.forEach(function(e,i){
-				//var t=e.name.replace(/_/g,' ');
-				var t = $.trim(e.name);
-				var img_src='images_mindmap/node-modules-no.png';
-				if (e.type=='modules_endtoend') img_src='images_mindmap/MM5.png';
-				var node=nodeBox.append('div').attr('class','ct-node fl-left').attr('data-mapid',i).attr('title',t).on('click',loadMap);
-				node.append('img').attr('class','ct-nodeIcon').attr('src',img_src).attr('alt','Module').attr('aria-hidden',true);
-				node.append('span').attr('class','ct-nodeLabel').html(t);
-			});
-		//	if(selectedTab=='tabCreate')
-			populateDynamicInputList();
-			setModuleBoxHeight();
-			unblockUI();
-		}
-	});
+  }
+
+
+
+  dataSender({ task: 'getModules', tab: window.localStorage['tabMindMap'], prjId: $(".project-list").val(), versioning: 1, version: parseFloat(active_version) }, function (err, result) {
+    if (err) {
+      console.log(result);
+      unblockUI();
+    }
+    else {
+      var nodeBox = d3.select('.ct-nodeBox');
+      $(nodeBox[0]).empty();
+      allMMaps = JSON.parse(result);
+      allMMaps.forEach(function (e, i) {
+        //var t=e.name.replace(/_/g,' ');
+        var t = $.trim(e.name);
+        var img_src = 'images_mindmap/node-modules-no.png';
+        if (e.type == 'modules_endtoend') img_src = 'images_mindmap/MM5.png';
+        var node = nodeBox.append('div').attr('class', 'ct-node fl-left').attr('data-mapid', i).attr('title', t).on('click', loadMap);
+        node.append('img').attr('class', 'ct-nodeIcon').attr('src', img_src).attr('alt', 'Module').attr('aria-hidden', true);
+        node.append('span').attr('class', 'ct-nodeLabel').html(t);
+      });
+      //	if(selectedTab=='tabCreate')
+      populateDynamicInputList();
+      setModuleBoxHeight();
+      unblockUI();
+    }
+  });
   //finally set the version in the cookie
-  setCookie('mm_pvid',active_version,15);
+  setCookie('mm_pvid', active_version, 15);
 
 }
 
@@ -196,21 +196,21 @@ function : createNewTab(from_v,to_v)
 Purpose : Creates a New project version in the Neo4j db and creates a new tab for that.
 params : from_v : from the version (Source version), to_v : Version number provided by the user.
 */
-function createNewTab(from_v,to_v){
+function createNewTab(from_v, to_v) {
 
-    
-   if ($('.ct-nodeBox')[0].children !== undefined && $('.ct-nodeBox')[0].children.length == 0) {
+
+  if ($('.ct-nodeBox')[0].children !== undefined && $('.ct-nodeBox')[0].children.length == 0) {
     openDialogMindmap('Error', "Cannot Create Empty Version");
     //versionInputDialogClose()
     return;
   }
   blockUI('Loading...');
   dataSender({ task: 'createVersion', user_name: userInfo.username, userRole: user_role, projectId: $(".project-list").val(), versioning: 1, vn_from: from_v, vn_to: to_v, write: 10 }, function (err, result) {
-    if (err) { console.log(err); unblockUI();openDialogMindmap('Mindmap', "New Version Creation Failed.") }
+    if (err) { console.log(err); unblockUI(); openDialogMindmap('Mindmap', "New Version Creation Failed.") }
     else {
       result1 = JSON.parse(result);
       //alert(assignedUser);
-      }
+    }
     $('.version-list').append($('<option>').attr({
       value: to_v
     }).text(to_v))
@@ -228,7 +228,7 @@ function createNewTab(from_v,to_v){
 
 */
 
-function versionInputDialogClose(){
+function versionInputDialogClose() {
 
   $('#versionNumInputPopUp').modal('toggle');
 }
@@ -240,7 +240,7 @@ function versionInputDialogClose(){
 
 */
 
-function clearInputData(){
+function clearInputData() {
   $('#versionNumberInput').val('');
 }
 
@@ -251,9 +251,9 @@ function clearInputData(){
   param: e : event to get the source version number tab
 */
 function versionInputDialogShow() {
-    var from_v = $('.version-list').val(); 
-    console.log(from_v)
-    $('#createNewVersionButton').attr('onclick', 'createNewVersion(' + from_v + ')');
+  var from_v = $('.version-list').val();
+  console.log(from_v)
+  $('#createNewVersionButton').attr('onclick', 'createNewVersion(' + from_v + ')');
 
   $('#versionNumInputPopUp').modal("show");
   $('#versionNumberInput').val((getMaxVersion() + 0.1).toFixed(1));
@@ -267,9 +267,9 @@ function versionInputDialogShow() {
   Purpose : This function verifies the given verison number is valid to create as a new version
   param : version : version number to verify
 */
-function isValidVersionToCreate(version){
-    
-    return version > getMaxVersion() ;
+function isValidVersionToCreate(version) {
+
+  return version > getMaxVersion();
 
 }
 
@@ -280,21 +280,20 @@ function isValidVersionToCreate(version){
 */
 function getMaxVersion() {
   allTabs = $('.version-list').children();
-  maxVersionTab=0.0;
-  for(var i=0;i<allTabs.length;i++)
-  {
-    if(allTabs[i].value >= maxVersionTab)
-     maxVersionTab = allTabs[i].value 
+  maxVersionTab = 0.0;
+  for (var i = 0; i < allTabs.length; i++) {
+    if (allTabs[i].value >= maxVersionTab)
+      maxVersionTab = allTabs[i].value
   }
   maxVersionNumber = parseFloat(maxVersionTab);
   return maxVersionNumber;
 }
-function getAllVersionsUI(){
-  ret=[];
+function getAllVersionsUI() {
+  ret = [];
   options = $('.version-list').children();
-  for (i=0; i < options.length;i++){
+  for (i = 0; i < options.length; i++) {
     console.log(options[i].value)
-      ret.push(parseFloat(options[i].value));
+    ret.push(parseFloat(options[i].value));
   }
   return ret;
 }
@@ -318,10 +317,10 @@ function createNewVersion(from_v) {
   else {
     //show an error dialog
     //versionInputDialogClose();
-    if(getAllVersionsUI().includes(inputVersion))
+    if (getAllVersionsUI().includes(inputVersion))
       openDialogMindmap('Error', "Version Number already exists");
 
-    else{
+    else {
       openDialogMindmap('Error', "Invalid Version Number");
     }
   }

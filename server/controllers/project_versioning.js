@@ -44,7 +44,7 @@ exports.versioning = function (req, res, next) {
 	if (sessionToken != undefined && req.session.id == sessionToken) {
 		var d = req.body;
 		var prjId = d.projectId;
- 
+
 		var urlData = req.get('host').split(':');
 		if (d.task == 'getVersions') {
 			//prjId=d.projectId;
@@ -423,8 +423,8 @@ exports.versioning = function (req, res, next) {
 			//get the version from version table
 			//create a new version with the existing version data
 			//id's must be new
-			var nData=[];
-            prjId = d.srcprojectId;
+			var nData = [];
+			prjId = d.srcprojectId;
 			tmpprjId = prjId;
 			var user_name = d.user_name;
 			if (d.action == "project_replicate") {
@@ -436,7 +436,7 @@ exports.versioning = function (req, res, next) {
 			vn_from = d.vn_from;
 			vn_to = d.vn_to;
 			userRole = d.userRole;
-            console.log(prjId,vn_from,vn_to);
+			console.log(prjId, vn_from, vn_to);
 			//
 			var qList = [{ "statement": "MATCH path=(n:VERSION{projectID:'" + tmpprjId + "',versionNumber:" + vn_from + "})-[r*1..]->(t) RETURN path", "resultDataContents": ["graph"] }];
 			neo4jAPI.executeQueries(qList, function (status, result) {
@@ -527,8 +527,8 @@ exports.versioning = function (req, res, next) {
 					var createdOn = new Date().toLocaleString();
 					nData.forEach(function (e, i) {
 						t = e.attrs;
-						t.projectID=prjId;
-						
+						t.projectID = prjId;
+
 						if (e.type == 'version') {
 							qList.push({ "statement": "MERGE(n:VERSION{projectID:'" + prjId + "',moduleIDs:" + t.moduleIDs + ",versionNumber:" + vn_to + ",vn:'" + vn_to + "',versionID:'" + uuidV4() + "'}) SET n.createdBy='" + user_name + "',n.createdOn='" + createdOn + "'" });
 						}
@@ -564,7 +564,7 @@ exports.versioning = function (req, res, next) {
 								var incompleteFlow = false;
 								var tsList = [];
 								//Condition to check incomplete flow of Modules, if so do not create structure in cassandra
-								if (nData[rIndex].children.length == 0 || nData[rIndex].attrs.moduleID_c=='null' || nData[rIndex].attrs.moduleID_c=='undefined' ) {
+								if (nData[rIndex].children.length == 0 || nData[rIndex].attrs.moduleID_c == 'null' || nData[rIndex].attrs.moduleID_c == 'undefined') {
 									incompleteFlow = true;
 								} else {
 									nData[rIndex].children.forEach(function (ts, i) {
@@ -582,17 +582,17 @@ exports.versioning = function (req, res, next) {
 													return false;
 												} else {
 													s.children.forEach(function (tc, i) {
-													if(tc.attrs.testCaseID_c!="null" && tc.attrs.testCaseID_c!="undefined")
-														tcList.push({ "screenID_c": tc.attrs.screenID_c, "testcaseId": tc.attrs.testCaseID, "testcaseId_c": null, "testcaseName": tc.attrs.testCaseName, "task": tc.attrs.task });
+														if (tc.attrs.testCaseID_c != "null" && tc.attrs.testCaseID_c != "undefined")
+															tcList.push({ "screenID_c": tc.attrs.screenID_c, "testcaseId": tc.attrs.testCaseID, "testcaseId_c": null, "testcaseName": tc.attrs.testCaseName, "task": tc.attrs.task });
 													});
-													if(s.attrs.screenID_c!="null" && s.attrs.screenID_c!="undefined")
-													 sList.push({ "screenId": s.attrs.screenID, "screenId_c": null, "screenName": s.attrs.screenName, "task": s.attrs.task, "testcaseDetails": tcList });
+													if (s.attrs.screenID_c != "null" && s.attrs.screenID_c != "undefined")
+														sList.push({ "screenId": s.attrs.screenID, "screenId_c": null, "screenName": s.attrs.screenName, "task": s.attrs.task, "testcaseDetails": tcList });
 												}
 
 
 											});
-											if(ts.attrs.testScenarioID_c!="null" && ts.attrs.testScenarioID_c!="undefined")
-											 tsList.push({ "testscenarioId": ts.attrs.testScenarioID, "testscenarioId_c": null, "testscenarioName": ts.attrs.testScenarioName, "tasks": ts.attrs.task, "screenDetails": sList });
+											if (ts.attrs.testScenarioID_c != "null" && ts.attrs.testScenarioID_c != "undefined")
+												tsList.push({ "testscenarioId": ts.attrs.testScenarioID, "testscenarioId_c": null, "testscenarioName": ts.attrs.testScenarioName, "tasks": ts.attrs.task, "screenDetails": sList });
 										}
 									});
 								}
@@ -615,7 +615,7 @@ exports.versioning = function (req, res, next) {
 								} else {
 									maincallback();
 								}
-								
+
 							}, function (maincallback) {
 								res.status(status).send({ status: "Success" });
 							});
@@ -627,25 +627,25 @@ exports.versioning = function (req, res, next) {
 
 		}
 		else if (d.task == 'projectReplication') {
-			var qlist={userid:d.userid}
-			create_ice.getEmptyProjects_ICE(qlist,function(err,result){
+			var qlist = { userid: d.userid }
+			create_ice.getEmptyProjects_ICE(qlist, function (err, result) {
 				if (err) res.status(500).send(result);
-				else{
+				else {
 					res.status(200).send(result)
 				}
 			});
 		}
-		else if(d.task=='listOfProjectsNeo4j'){
-				var qList=[]
-				qList.push({ "statement": "MATCH (n:VERSION) return distinct n.projectID" });
-				neo4jAPI.executeQueries(qList, function (status, result) {
-						res.setHeader('Content-Type', 'application/json');
-						if (status != 200) res.status(status).send(result);
-						else {
-							res.status(status).send(result);
-						}
-				});
-	     }
+		else if (d.task == 'listOfProjectsNeo4j') {
+			var qList = []
+			qList.push({ "statement": "MATCH (n:VERSION) return distinct n.projectID" });
+			neo4jAPI.executeQueries(qList, function (status, result) {
+				res.setHeader('Content-Type', 'application/json');
+				if (status != 200) res.status(status).send(result);
+				else {
+					res.status(status).send(result);
+				}
+			});
+		}
 	}
 
 	else {
