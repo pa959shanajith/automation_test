@@ -6,38 +6,42 @@ Purpose :
 function replicationHandler() {
   console.log('Inside..')
   var userInfo = JSON.parse(window.localStorage['_UI']);
-  var userid = userInfo.user_id;
+  var user_id = userInfo.user_id;
   blockUI('Loading....')
-  dataSender({ task: 'populateProjects', user_id: userid }, function (err, resultx) {
-    if (err) {
-      console.log(result);
+  dataSender({  user_name: userInfo.username, userRole: user_role,userid:user_id,task: 'projectReplication',versioning: 1}, function (status, result) {
+    if (status) {
+      console.log('err');
       unblockUI();
     }
     else {
-      result1x = JSON.parse(resultx);
-      //selectedProject=$(".project-list").val()
-      dataSender({ user_name: userInfo.username, userRole: user_role, projectId: $(".project-list").val(), 'projectdata': result1x['projectId'], versioningEmpty: true }, function (err, result) {
-        if (err) { console.log(err); }
+      result1 = JSON.parse(result);
+      dataSender({ user_name: userInfo.username, userRole: user_role,task:'listOfProjectsNeo4j',versioning: 1 }, function (status, data) {
+        if (status) { console.log('err'); unblockUI();}
         else {
-          result1 = JSON.parse(result);
+          parse_data = JSON.parse(data);
           //alert(assignedUser);
           $('.test').remove()
-          var listSourceVersions = $('.version-list').children();
-          for (var i = 0; i < listSourceVersions.length; i++) {
-            $('#sourceVersions').append($('<option>').attr({ value: listSourceVersions[i].value, class: 'test' }).text(listSourceVersions[i].value));
+          // var listSourceVersions = $('.version-list').children();
+          // for (var i = 0; i < listSourceVersions.length; i++) {
+          //   $('#sourceVersions').append($('<option>').attr({ value: listSourceVersions[i].value, class: 'test' }).text(listSourceVersions[i].value));
+          // }
+          var parsed_project_id = [];
+          for(var i=0;i<parse_data[0].data.length;i++){
+            parsed_project_id.push(parse_data[0].data[i].row[0])
           }
-          console.log(result1)
-          for (var i = 0; i < result1['rows']['projectName'].length; i++) {
-            $('#destProjects').append($('<option>').attr({ value: result1['rows']['projectId'][i], class: 'test' }).text(result1['rows']['projectName'][i]));
+          for (var i = 0; i < result1['projectName'].length; i++) {
+            if(parsed_project_id.indexOf(result1['projectId'][i])!=-1){
+               console.log('Available in Neo4j')
+           }else{
+             $('#destProjects').append($('<option>').attr({ value: result1['projectId'][i], class: 'test' }).text(result1['projectName'][i]));
+           }
           }
           $('#ProjectReplicationPopUp').modal("show");
           unblockUI();
         }
       });
-
     }
   });
-
 
 }
 
@@ -62,13 +66,15 @@ function replicate_project(from_v, to_v, pid) {
   console.log(pid)
   blockUI('Loading....')
   dataSender({ user_name: userInfo.username, userRole: user_role, task: 'createVersion', srcprojectId: $(".project-list").val(), dstprojectId: pid, versioning: 1, vn_from: from_v, vn_to: to_v, action: "project_replicate", write: 10 }, function (err, result) {
-    if (err) { console.log(err); callback(null, err); }
+    if (err) { console.log(err); 
+      openDialogMindmap('Mindmap', "Project Replication Failed.") 
+      unblockUI();  //callback(null, err);   unblockUI(); 
+      }
     else {
-      openDialogMindmap('Mindmap', "New Version created successfully.")
-      
+      openDialogMindmap('Mindmap', "Project Replicated Sucessfully.") 
+      unblockUI();  
     }
   });
-  unblockUI();
 
 }
 
@@ -130,7 +136,9 @@ function addVersioning(versions) {
              //remove create new version and replicate button
                 $('.plus-icon').remove();
                 $('.searchModuleimg-assign').addClass('searchModuleimg-assign1')
-                $('.selectProject').addClass('selectProjectAssign')                
+                $('.selectProject').addClass('selectProjectAssign') 
+
+                // $('.searchModuleimg-assign').addClass('searchTabassignsp')        
   }
 }
 
@@ -192,13 +200,13 @@ function createNewTab(from_v,to_v){
 
     
    if ($('.ct-nodeBox')[0].children !== undefined && $('.ct-nodeBox')[0].children.length == 0) {
-    openDialogMindmap('Error', "Cannot create Empty Version");
+    openDialogMindmap('Error', "Cannot Create Empty Version");
     //versionInputDialogClose()
     return;
   }
   blockUI('Loading...');
   dataSender({ task: 'createVersion', user_name: userInfo.username, userRole: user_role, projectId: $(".project-list").val(), versioning: 1, vn_from: from_v, vn_to: to_v, write: 10 }, function (err, result) {
-    if (err) { console.log(err); callback(null, err); }
+    if (err) { console.log(err); unblockUI();openDialogMindmap('Mindmap', "New Version Creation Failed.") }
     else {
       result1 = JSON.parse(result);
       //alert(assignedUser);
@@ -207,7 +215,7 @@ function createNewTab(from_v,to_v){
       value: to_v
     }).text(to_v))
     unblockUI();
-    openDialogMindmap('Mindmap', "New Version created successfully.");
+    openDialogMindmap('Mindmap', "New Version Created Sucessfully.");
     //versionInputDialogClose()
   });
 
@@ -272,8 +280,13 @@ function isValidVersionToCreate(version){
 */
 function getMaxVersion() {
   allTabs = $('.version-list').children();
-  maxVersionTab = allTabs[allTabs.length - 1];
-  maxVersionNumber = parseFloat(maxVersionTab.value);
+  maxVersionTab=0.0;
+  for(var i=0;i<allTabs.length;i++)
+  {
+    if(allTabs[i].value >= maxVersionTab)
+     maxVersionTab = allTabs[i].value 
+  }
+  maxVersionNumber = parseFloat(maxVersionTab);
   return maxVersionNumber;
 }
 function getAllVersionsUI(){

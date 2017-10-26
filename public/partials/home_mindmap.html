@@ -380,8 +380,28 @@
 			</div>
 		</div>
 	</div>
-<!--  -->
-
+    
+<!-- PorjectVersioingPopUp -->
+<div class="modal fade" id="ProjectReplicationPopUp" role="dialog" data-keyboard="false" data-backdrop="static">
+		<div class="modal-dialog modal-sm">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal">&times;</button>
+					<h4 class="modal-title">Project Replication</h4>
+				</div>
+				<div class="modal-body">
+                  Project
+				  <select id='destProjects'>
+                 </select>	
+				</div>
+				<div class="modal-footer" style="text-align: center">
+					<span id="versioningErrorMsg" style="color: red; float: left; margin-left: 15px; margin-top: 5px;"></span>
+					<img class="qcLoginload" src="imgs/loader.gif" alt="Loading..." style="float: left; display: none;">
+					<button type="button" id = "replicateVersionButton" class="btn btn-default btn-default-modal qcConnsubmit" data-dismiss="modal" onclick="replicationController()" >Replicate</button>
+				</div>
+			</div>
+		</div>
+	</div>
 <!--Footer-->
 <footer footer id="footer" class="footer-global"></footer>
 <!--Footer-->
