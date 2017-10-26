@@ -4,7 +4,6 @@
 //var passwordHash = require('password-hash');
 var uuid = require('uuid-random');
 var async = require('async');
-//var dbConnICE = require('../../server/config/icetestautomation');
 var Client = require("node-rest-client").Client;
 var client = new Client();
 
@@ -201,67 +200,6 @@ exports.getAllNames = function (parent, cb, data) {
 	});
 };
 
-/*function testscreen_exists(testscreenname, cb, data) {
-	var flag = false;
-	var obj = {
-		flag: false,
-		screenid: ''
-	};
-	var inputs = {
-		"screen_name": testscreenname
-	};
-	var args = {
-		data: inputs,
-		headers: {
-			"Content-Type": "application/json"
-		}
-	};
-	client.post("http://127.0.0.1:1990/create_ice/testscreen_exists_ICE", args,
-		function (result, response) {
-		if (response.statusCode != 200 || result.rows == "fail") {
-			console.log(result.rows);
-			cb(null, result.rows);
-		} else {
-			if (result.rows.length != 0) {
-				obj.flag = true;
-				obj.screenid = result.rows[0].screenid;
-			}
-			cb(null, obj);
-		}
-	})
-}
-
-function testcase_exists(testcasename, cb, data) {
-	var flag = false;
-	var obj = {
-		flag: false,
-		testcaseid: ''
-	};
-	var inputs = {
-		"testcase_name": testcasename
-	};
-	var args = {
-		data: inputs,
-		headers: {
-			"Content-Type": "application/json"
-		}
-	};
-	client.post("http://127.0.0.1:1990/create_ice/testcase_exists_ICE", args,
-		function (result, response) {
-		if (response.statusCode != 200 || result.rows == "fail") {
-			console.log(result.rows);
-			cb(null, result.rows);
-		} else {
-			if (result.rows.length != 0) {
-				obj.flag = true;
-				obj.testcaseid = result.rows[0].testcaseid;
-			}
-			cb(null, obj);
-		}
-
-	})
-}*/
-
 //CreateStrcutre
 exports.createStructure_Nineteen68 = function (req, res) {
 	var createdthrough = 'Mindmaps Creation';
@@ -270,9 +208,8 @@ exports.createStructure_Nineteen68 = function (req, res) {
 	var cycleId = RequestedJSON.cycleId;
 	var releaseId = RequestedJSON.releaseId;
 	var appType = RequestedJSON.appType;
-	var username_role = RequestedJSON.userRole;
+	var username_role = 'Nineteen68_Admin';
 	var username = RequestedJSON.userName.toLowerCase();
-	var suite = RequestedJSON.testsuiteDetails.length;
 	var suiteID = uuid();
 	var suitedetails = RequestedJSON.testsuiteDetails[0];
 	var testsuiteName = suitedetails.testsuiteName;
@@ -280,8 +217,8 @@ exports.createStructure_Nineteen68 = function (req, res) {
 	var scenarioidlist = [];
 	var scenario = [];
 	var suitedetailslist = [];
-	var versionnumber = RequestedJSON.from_version;;
-	var newversionnumber =  RequestedJSON.new_version;
+	var versionnumber = RequestedJSON.from_version;
+	var newversionnumber = RequestedJSON.new_version;
 	var suiteflag = false;
 	async.series({
 		projectsUnderDomain: function (callback) {
@@ -306,7 +243,6 @@ exports.createStructure_Nineteen68 = function (req, res) {
 					suiteflag = data.flag;
 					suiteidTemp = data.suiteid;
 				}
-				var insertInSuite = '';
 				if (!suiteflag) {
 					suite_query = 'notflagsuite';
 				}
@@ -334,6 +270,10 @@ exports.createStructure_Nineteen68 = function (req, res) {
 					'skucodemodule': 'skucodemodule',
 					'tags': 'tags'
 				};
+				if (versionnumber!=newversionnumber) {
+					inputs.subquery='clonenode';
+					inputs.oldversionnumber=versionnumber;
+				}
 				var args = {
 					data: inputs,
 					headers: {
@@ -351,8 +291,6 @@ exports.createStructure_Nineteen68 = function (req, res) {
 						async.forEachSeries(scenario, function (iterator, callback2) {
 							var scenarioId = uuid();
 							scenariosarray.push(scenarioId);
-							var modifiedon = new Date().getTime();
-							//var scenariodetails = iterator.testscenarioDetails[scenario];
 							var scenarioName = iterator.testscenarioName;
 							var scenarioid_c = iterator.testscenarioId_c;
 							var scenarioflag = false;
@@ -376,7 +314,6 @@ exports.createStructure_Nineteen68 = function (req, res) {
 									scenarioidTemp = scenariodata.scenarioid;
 								}
 								var scenario_query = '';
-								var insertInScenario = '';
 								if (!scenarioflag) {
 									scenario_query = 'notflagscenarios';
 								}
@@ -404,6 +341,10 @@ exports.createStructure_Nineteen68 = function (req, res) {
 									'skucodetestscenario': 'skucodetestscenario',
 									'tags': 'tags'
 								};
+								if (versionnumber!=newversionnumber) {
+									inputs.subquery='clonenode';
+									inputs.oldversionnumber=versionnumber;
+								}
 								var args = {
 									data: inputs,
 									headers: {
@@ -427,7 +368,6 @@ exports.createStructure_Nineteen68 = function (req, res) {
 											var testcasedetailslist = [];
 											var screenidneo = screenitr.screenId;
 											var taskscreen = screenitr.task;
-											var versionnumber = 0;
 											//console.log('screenName details',screenName);
 											testscreen_exists({
 												"testscreenname": screenName,
@@ -444,7 +384,6 @@ exports.createStructure_Nineteen68 = function (req, res) {
 													screenflag = screendata.flag;
 													screenidTemp = screendata.screenid;
 												}
-												var insertInScreen = '';
 												var screen_query = '';
 													if (!screenflag) {
 														screen_query = 'notflagscreen';
@@ -473,6 +412,10 @@ exports.createStructure_Nineteen68 = function (req, res) {
 													'skucodescreen': 'skucodescreen',
 													'tags': 'tags'
 												};
+												if (versionnumber!=newversionnumber) {
+													inputs.subquery='clonenode';
+													inputs.oldversionnumber=versionnumber;
+												}
 												var args = {
 													data: inputs,
 													headers: {
@@ -485,11 +428,8 @@ exports.createStructure_Nineteen68 = function (req, res) {
 														console.log(result.rows);
 													} else {
 														var testcase = screenDetails.testcaseDetails;
-														var testcasesarray = [];
 														async.forEachSeries(testcase, function (testcaseitr, callback4) {
 															var testcaseID = uuid();
-															// testcasesarray.push(testcaseID);
-															var testcaseDetails = testcaseitr;
 															var testcaseName = testcaseitr.testcaseName;
 															var testcaseid_c = testcaseitr.testcaseId_c;
 															var testcaseflag = false;
@@ -497,7 +437,6 @@ exports.createStructure_Nineteen68 = function (req, res) {
 															var testcaseidneo = testcaseitr.testcaseId;
 															var tasktestcase = testcaseitr.task;
 															var screenID_c_neo = testcaseitr.screenID_c;
-															var versionnumber = 0;
 															testcase_exists({
 																"screenId": screenId,
 																"testcasename": testcaseName,
@@ -543,6 +482,11 @@ exports.createStructure_Nineteen68 = function (req, res) {
 																	'skucodetestcase': 'skucodetestcase',
 																	'tags': 'tags'
 																};
+																if (versionnumber!=newversionnumber) {
+																	inputs.subquery='clonenode';
+																	inputs.oldscreenid=screenID_c_neo;
+																	inputs.oldversionnumber=versionnumber;
+																}
 																var args = {
 																	data: inputs,
 																	headers: {
@@ -556,7 +500,6 @@ exports.createStructure_Nineteen68 = function (req, res) {
 																	}
 																	else {
 																		testcaseidlist.push(testcaseID);
-																		var updateTestscenario = "update testscenarios set testcaseids=testcaseids+[" + testcaseID + "],modifiedby='" + username + "',modifiedon=" + modifiedon + "   where projectid =" + projectid + "and testscenarioid =" + scenarioId + " and testscenarioname = '" + scenarioName + "' and versionnumber=" + versionnumber;
 																		var inputs = {
 																			'testcaseid': testcaseID,
 																			'modifiedby': username,
@@ -1345,7 +1288,6 @@ function testcase_exists(testcasedetails, cb, data) {
 function updatetestcasename(testcasedetails, cb, data) {
 	var testcasedatatoupdate = [];
 	var flagtocheckifexists = false;
-	var flagtocheckifnameexists = false;
 	var flagtocheckifdeleted = false;
 	async.series({
 		select: function (callback) {
@@ -1644,7 +1586,6 @@ exports.createE2E_Structure_Nineteen68 = function (req, res) {
 	var appType = RequestedJSON.appType;
 	var username = RequestedJSON.userName.toLowerCase();
 	var username_role = 'Nineteen68_Admin';
-	var suite = RequestedJSON.testsuiteDetails.length;
 	var suiteID = uuid();
 	var suitedetails = RequestedJSON.testsuiteDetails[0];
 	var testsuiteName = suitedetails.testsuiteName;
@@ -1717,12 +1658,9 @@ exports.createE2E_Structure_Nineteen68 = function (req, res) {
 					} else {
 						scenario = suitedetails.testscenarioDetails;
 						var scenariosarray = [];
-						var testcaseidlist = [];
 						async.forEachSeries(scenario, function (iterator, callback2) {
 							var scenarioId = uuid();
 							scenariosarray.push(scenarioId);
-							var modifiedon = new Date().getTime();
-							//var scenariodetails = iterator.testscenarioDetails[scenario];
 							var scenarioName = iterator.testscenarioName;
 							var scenarioid_c = iterator.testscenarioId_c;
 							var scenarioflag = false;
@@ -1747,7 +1685,6 @@ exports.createE2E_Structure_Nineteen68 = function (req, res) {
 									scenarioflag = scenariodata.flag;
 									scenarioidTemp = scenariodata.scenarioid;
 								}
-								var insertInScenario = '';
 								if (!scenarioflag) {
 									console.log("Scenario does not exists");
 								} else {
@@ -1865,6 +1802,35 @@ exports.getEmptyProjects_ICE = function (req, res) {
 	}, function (err, results) {
 		try {
 			res(null, projectdetails);
+		} catch (ex) {
+			console.log(ex);
+		}
+	});
+};
+
+exports.submitTask = function (req, res) {
+	var taskdetails = req.taskdetails;
+	inputs = {
+		'status': req.status,
+		'table': taskdetails.labels[0],
+		'details': taskdetails.properties,
+		'username': req.user,
+		'versionnumber': req.versionnumber
+	};
+	args = {
+		data: inputs,
+		headers: {
+			"Content-Type": "application/json"
+		}
+	};
+	client.post("http://127.0.0.1:1990/create_ice/submitTask", args,
+		function (result, response) {
+		try {
+			if (response.statusCode != 200 || result.rows == "fail") {
+				res(null, result.rows);
+			} else {
+				console.log(result);
+			}
 		} catch (ex) {
 			console.log(ex);
 		}
