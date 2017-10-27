@@ -41,7 +41,7 @@ function loadMindmapData(param){
 			if (param==1){
 				versioning_enabled=1;
 				dataSender({task:'getVersions',projectId:$(".project-list").val(),versioning:1},function(err,result){
-				if(err){ console.log(err);callback(null,err);}
+				if(err){ console.log(err);openDialogMindmap('Error','Error loading Versions')}
 				else{
 					addVersioning(result);	
 					if(getCookie('mm_pvid') ==''){
@@ -67,7 +67,7 @@ function loadMindmapData(param){
 				}
 				if (param==1){
 					dataSender({task:'getVersions',projectId:$(".project-list").val(),versioning:1},function(err,result){
-					if(err){ console.log(err);callback(null,err);}
+					if(err){ console.log(err);openDialogMindmap('Error','Error loading Versions')}
 					else{
 						addVersioning(result);
 						
