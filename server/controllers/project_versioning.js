@@ -533,7 +533,8 @@ exports.versioning = function (req, res, next) {
 							qList.push({ "statement": "MERGE(n:VERSION{projectID:'" + prjId + "',moduleIDs:" + t.moduleIDs + ",versionNumber:" + vn_to + ",vn:'" + vn_to + "',versionID:'" + uuidV4() + "'}) SET n.createdBy='" + user_name + "',n.createdOn='" + createdOn + "'" });
 						}
 						else if (e.type == 'modules') {
-							var new_property = t.unique_property.slice(0, -1).concat(',' + vn_to + ']')
+							var new_property ="["+t.moduleName + ',' + t.projectID + ',' + vn_to +"]";
+							//var new_property = t.unique_property.slice(0, -1).concat(',' + vn_to + ']')
 							qList.push({ "statement": "MERGE(n:MODULES{projectID:'" + t.projectID + "',moduleName:'" + t.moduleName + "',moduleID:'" + t.moduleID + "',createdBy:'" + t.createdBy + "',createdOn:'" + createdOn + "',moduleID_c:'null',unique_property:'" + new_property + "',childIndex:'" + t.childIndex + "'})" });
 						}
 						else if (e.type == 'testscenarios') {

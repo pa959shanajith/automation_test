@@ -150,7 +150,7 @@ function next_function(resultobj, cb, data) {
 					}
 					testSuiteDetails_obj.testsuitename = 'modulename';
 					testSuiteDetails_obj.projectidts = parent[0];
-					testSuiteDetails_obj.assignedTestScenarioIds = 'data.testscenarioIds[0]';
+					testSuiteDetails_obj.assignedTestScenarioIds = '';
 					task_json.screenName = 'screenname';
 					task_json.scenarioName = 'scenarioname';
 					task_json.testCaseName = 'testcasename';
