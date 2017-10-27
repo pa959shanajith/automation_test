@@ -112,11 +112,11 @@ function addVersioning(versions) {
       onchange: 'loadModules()'
     })).append($('<i>').attr({
       class: 'fa fa-plus-circle fa-lg plus-icon',
-      title:"Create",
+      title:"Create New Version",
       onclick: "versionInputDialogShow(event)"
     })).append($('<i>').attr({
       class: 'fa fa-window-restore fa-lg plus-icon',
-      title:"Replication",
+      title:"Replicate project",
       onclick: 'replicationHandler()'
     })
     ))
