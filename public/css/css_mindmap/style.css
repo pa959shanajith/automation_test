@@ -246,13 +246,13 @@ p,a,img,text,span,.noselect{-webkit-touch-callout:none;-webkit-user-select:none;
 #ct-rSide .ct-expand::after{left: 1px;border-left-color:#333}
 #ct-rSide .ct-expand.ct-rev::after{left:1px;border-left-color:#333;border-right-color:transparent}
 #ct-main, #ct-main-e2e{position:relative;margin:2px;padding:5px;height:calc(100% - 4px);width:calc(100% - 16px);z-index: -1 !important;}
-#ct-moduleBox{position:absolute;padding:0 10px;top:0px;z-index:100;height:182px;width:83%;background-color:#e6e7e9;border:1px solid#e6e7e9;left:133px}
+#ct-moduleBox{position:absolute;padding:0 10px;top:0px;z-index:100;height:122px;width:83%;background-color:#e6e7e9;border:1px solid#e6e7e9;left:133px}
 #ct-moduleBox .ct-expand{height:8px;width:60px;left:calc(50% - 40px);bottom:0;background-color:#fff}
 #ct-moduleBox .ct-expand::after{left:25px;top:1px;border-top-color:#333}
 #ct-moduleBox .ct-expand.ct-rev::after{left:25px;top:-4px;border-top-color:transparent;border-bottom-color:#333}
 #ct-moduleBox.ct-open{height: 260px; /* max-height: 280px; */ overflow: auto;}
 /**Optional for id ct-moduleBox CSS**/
-.ct-moduleBoxOptional{position:absolute;padding:0 10px;top:0px;z-index:100;height:182px;width:83%;background-color:#e6e7e9;border:1px solid#e6e7e9; left: 147px}
+.ct-moduleBoxOptional{position:absolute;padding:0 10px;top:0px;z-index:100;height:122px;width:83%;background-color:#e6e7e9;border:1px solid#e6e7e9; left: 147px}
 .ct-moduleBoxOptional .ct-expand{height:8px;width:60px;left:calc(50% - 30px);bottom:0;background-color:#fff}
 .ct-moduleBoxOptional .ct-expand::after{left:25px;top:1px;border-top-color:#333}
 .ct-moduleBoxOptional .ct-expand.ct-rev::after{left:25px;top:-4px;border-top-color:transparent;border-bottom-color:#333}
@@ -373,17 +373,12 @@ p,a,img,text,span,.noselect{-webkit-touch-callout:none;-webkit-user-select:none;
 /*.selectProject{height: 24px;width: 100%;}*/
 .selectProject
 {
-    margin-left: -41% !important;
+    margin-left: 0% !important;
     position: relative;
 }
-.selectProjectAssign
-{
-    margin-left: -46% !important;
-    position: relative;
-}
-/*.selectProjectPri{    
+.selectProjectPri{    
     left: 0px !important;
-}*/
+}
 .selectProjectLabel{
     position: relative;
     margin: 2px 8px 0 0;
@@ -579,12 +574,11 @@ select
 
 .searchModuleimg-assign, .searchModuleimg-create{
 	position: absolute;
-    margin-left: 55.4%;
+    margin-left: 46.4%;
     top: 3px;
     border-left: 1px solid #ccc;
     padding-left: 3px;
 }
-
 
 /*#ct-moduleBox.ct-open .ct-nodeBox
 {
@@ -608,15 +602,16 @@ select
 }
 .selectVersionLabel{
     position: relative;
-    margin-right:1%;
-    margin-left:-2%;
+    margin-right: 5%;
+    margin-left: -22%;
 }
 .plus-icon{
-    margin-left: 1%;
+    margin-left: 8%;
 }
 .selectVersion{
-   position: relative;
-   margin-left: 3%;
+    position: relative;
+    margin-left: 4%;
+    float: left;
 }
 .searchbox-assign, .searchbox-create{
     float:right;
@@ -624,6 +619,6 @@ select
 #destProjects{
     width:94%;
 }
-.searchModuleimg-assign1{
-    margin-left:50.4%;
+.selectProjectPosition{
+     float:left;
 }

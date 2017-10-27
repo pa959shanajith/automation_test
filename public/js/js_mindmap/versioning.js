@@ -112,9 +112,11 @@ function addVersioning(versions) {
       onchange: 'loadModules()'
     })).append($('<i>').attr({
       class: 'fa fa-plus-circle fa-lg plus-icon',
+      title:"Create",
       onclick: "versionInputDialogShow(event)"
     })).append($('<i>').attr({
       class: 'fa fa-window-restore fa-lg plus-icon',
+      title:"Replication",
       onclick: 'replicationHandler()'
     })
     ))
@@ -132,14 +134,10 @@ function addVersioning(versions) {
   }
   loadMindmapData1(1);
   //loadModules(versions)
-
+  $('.selectProject').addClass('selectProjectPosition')
   if (window.localStorage['tabMindMap'] == "tabAssign") {
-    //remove create new version and replicate button
     $('.plus-icon').remove();
-    $('.searchModuleimg-assign').addClass('searchModuleimg-assign1')
-    $('.selectProject').addClass('selectProjectAssign')
-
-    // $('.searchModuleimg-assign').addClass('searchTabassignsp')        
+    $('.selectVersion').css('margin-left','2%');    
   }
 }
 
