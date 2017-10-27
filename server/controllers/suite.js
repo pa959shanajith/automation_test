@@ -1288,6 +1288,8 @@ function TestSuiteDetails_Module_ICE(req, cb1, data) {
 						donotexecutevalues.push('1');
 						getparampathvalues.push('');
 					}
+				} else {
+					testscenarioids = [];
 				}
 				var inputs = {
 					"cycleid": requiredcycleid,

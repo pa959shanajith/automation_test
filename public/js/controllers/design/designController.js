@@ -610,7 +610,8 @@ console.log("screenName:", screenName);
         var screenId = taskInfo.screenId;
         var testCaseId = taskInfo.testCaseId;
         var testCaseName = taskInfo.testCaseName;
-        DesignServices.readTestCase_ICE(screenId, testCaseId, testCaseName)
+        var versionnumber = taskInfo.versionnumber;
+        DesignServices.readTestCase_ICE(screenId, testCaseId, testCaseName, versionnumber)
             .then(function(response) {
                     if (response == "Invalid Session") {
                         window.location.href = "/";
