@@ -272,7 +272,6 @@ exports.createStructure_Nineteen68 = function (req, res) {
 				};
 				if (versionnumber!=newversionnumber) {
 					inputs.subquery='clonenode';
-					inputs.oldmoduleid=moduleid_c;
 					inputs.oldversionnumber=versionnumber;
 				}
 				var args = {
@@ -344,7 +343,6 @@ exports.createStructure_Nineteen68 = function (req, res) {
 								};
 								if (versionnumber!=newversionnumber) {
 									inputs.subquery='clonenode';
-									inputs.oldscenarioid=scenarioid_c;
 									inputs.oldversionnumber=versionnumber;
 								}
 								var args = {
@@ -417,7 +415,6 @@ exports.createStructure_Nineteen68 = function (req, res) {
 												};
 												if (versionnumber!=newversionnumber) {
 													inputs.subquery='clonenode';
-													inputs.oldscreenid=screenid_c;
 													inputs.oldversionnumber=versionnumber;
 												}
 												var args = {
@@ -489,7 +486,7 @@ exports.createStructure_Nineteen68 = function (req, res) {
 																};
 																if (versionnumber!=newversionnumber) {
 																	inputs.subquery='clonenode';
-																	inputs.oldtestcaseid=testcaseid_c;
+																	inputs.oldscreenid=screenID_c_neo;
 																	inputs.oldversionnumber=versionnumber;
 																}
 																var args = {

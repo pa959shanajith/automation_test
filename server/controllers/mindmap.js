@@ -621,6 +621,7 @@ exports.mindmapService = function(req, res) {
 		}else if(d.task=='reviewTask'){
 			//var prjId=d.prjId;
 			var taskID=d.taskId;
+			var batchIds=d.batchIds;
 			var date=new Date();
 
 			var cur_date=date.getDate()+"/"+(date.getMonth()+1)+"/"+date.getFullYear()+','+date.toLocaleTimeString();
