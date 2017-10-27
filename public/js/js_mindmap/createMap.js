@@ -57,7 +57,7 @@ function loadMindmapData1(){
 	var selectedTab = window.localStorage['tabMindMap'];
 	uNix=0;uLix=0;dNodes=[];dLinks=[];nCount=[0,0,0,0];scrList=[];tcList=[];cSpan=[0,0];cScale=1;mapSaved=!1;
 	//Adding task to scenario
-	taskAssign={"modules_endtoend":{"task":["Execute","Execute Batch"],"attributes":["bn","at","rw","sd","ed","re","cy"]},"modules":{"task":["Execute","Execute Batch"],"attributes":["bn","at","rw","sd","ed","re","cy"]},"scenarios":{"task":["Execute Scenario"],"attributes":["at","rw","sd","ed"]},"screens":{"task":["Scrape","Append","Compare","Add","Map"],"attributes":["at","rw","sd","ed"]},"testcases":{"task":["Update","Design"],"attributes":["at","rw","sd","ed"]}};
+	taskAssign={"modules_endtoend":{"task":["Execute","Execute Batch"],"attributes":["bn","at","rw","sd","ed","re","cy","re_estimation"]},"modules":{"task":["Execute","Execute Batch"],"attributes":["bn","at","rw","sd","ed","re","cy","re_estimation"]},"scenarios":{"task":["Execute Scenario"],"attributes":["at","rw","sd","ed","re_estimation"]},"screens":{"task":["Scrape","Append","Compare","Add","Map"],"attributes":["at","rw","sd","ed","re_estimation"]},"testcases":{"task":["Update","Design"],"attributes":["at","rw","sd","ed","re_estimation"]}};
 	zoom=d3.behavior.zoom().scaleExtent([0.1,3]).on("zoom", zoomed);
 	faRef={"plus":"fa-plus","edit":"fa-pencil-square-o","delete":"fa-trash-o"};	
 		$(document).on('click',".ct-tile", function() {
@@ -373,7 +373,17 @@ var addTask = function(e){
 	var a,b,p=d3.select(activeNode);
 	var pi=parseInt(p.attr('id').split('-')[2]);
 	var nType=p.attr('data-nodetype');
-	var tObj={t:/*d3.select('#ct-assignTask').html()*/$('#ct-assignTask').val(),bn:$('#ct-executeBatch').val(),at:$('#ct-assignedTo').val(),rw:/*(d3.select('#ct-assignRevw')[0][0])?*/$('#ct-assignRevw').val()/*:null*/,sd:$('#startDate').val(),ed:$('#endDate').val(),re:(d3.select('#ct-assignRel')[0][0])?$('#ct-assignRel').val():null,cy:(d3.select('#ct-assignCyc')[0][0])?$('#ct-assignCyc').val():null,det:d3.select('#ct-assignDetails').property('value'),app:$('option:selected', '.project-list').attr('app-type')};
+	var estimationCount = 0;
+	if(dNodes[pi].task != undefined || dNodes[pi].task != null){
+		if(dNodes[pi].task.endDate != "" || dNodes[pi].task.endDate != undefined || dNodes[pi].task.endDate != " "){
+			var nodeDateSplit = dNodes[pi].task.endDate.split("/");
+			var modDateSplit = $('#endDate').val().split("/");
+			if(new Date(nodeDateSplit[2],(nodeDateSplit[1]-1),nodeDateSplit[0]) != new Date(modDateSplit[2], (modDateSplit[1]-1), modDateSplit[0])){
+				estimationCount = parseInt(dNodes[pi].task.re_estimation) + 1;
+			}
+		}
+	}
+	var tObj={t:/*d3.select('#ct-assignTask').html()*/$('#ct-assignTask').val(),bn:$('#ct-executeBatch').val(),at:$('#ct-assignedTo').val(),rw:/*(d3.select('#ct-assignRevw')[0][0])?*/$('#ct-assignRevw').val()/*:null*/,sd:$('#startDate').val(),ed:$('#endDate').val(),re_estimation:estimationCount,re:(d3.select('#ct-assignRel')[0][0])?$('#ct-assignRel').val():null,cy:(d3.select('#ct-assignCyc')[0][0])?$('#ct-assignCyc').val():null,det:d3.select('#ct-assignDetails').property('value'),app:$('option:selected', '.project-list').attr('app-type')};
 	//console.log(tObj);
 	if(dNodes[pi].task){
 		tObj.id=dNodes[pi].task.id;
@@ -401,7 +411,7 @@ var addTask = function(e){
 		if(nType=="modules" || nType=="modules_endtoend"){
 			if(tObj.cy != 'select cycle' && tObj.re != 'select release'){
 				if(dNodes[pi].id_c!="null"){
-					dNodes[pi].task={id:tObj.id,oid:tObj.oid,batchName:tObj.bn,task:tObj.t,assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,release:tObj.re,cycle:tObj.cy,details:tObj.det,parent:(tObj.parent!=null)?tObj.parent:[dNodes[pi].id_c]};
+					dNodes[pi].task={id:tObj.id,oid:tObj.oid,batchName:tObj.bn,task:tObj.t,assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,re_estimation:tObj.re_estimation,release:tObj.re,cycle:tObj.cy,details:tObj.det,parent:(tObj.parent!=null)?tObj.parent:[dNodes[pi].id_c]};
 				}
 				//Logic to add tasks for the scenario
 				if(dNodes[pi].children) dNodes[pi].children.forEach(function(tSc){
@@ -409,7 +419,7 @@ var addTask = function(e){
 							if(dNodes[pi].id_c!='null' && tSc.id_c!='null'){
 								taskflag=true;
 								//Issue- 711 Assign directly to the module and see that scenario gets assign but on click of "Save" scenario gets unassign.
-								tSc.task={id:null,oid:null,task:"Execute Scenario",assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,release:tObj.re,cycle:tObj.cy,details:tObj.det,parent:(tObj.parent!=null)?tObj.parent:[dNodes[pi].id_c,tSc.id_c]};
+								tSc.task={id:null,oid:null,task:"Execute Scenario",assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,re_estimation:tObj.re_estimation,release:tObj.re,cycle:tObj.cy,details:tObj.det,parent:(tObj.parent!=null)?tObj.parent:[dNodes[pi].id_c,tSc.id_c]};
 								d3.select('#ct-node-'+tSc.id).append('image').attr('class','ct-nodeTask').attr('xlink:href','images_mindmap/node-task-assigned.png').attr('x',29).attr('y',-10);
 							}
 							
@@ -425,7 +435,7 @@ var addTask = function(e){
 							if(scr.task===undefined||scr.task==null){
 								if(dNodes[pi].id_c!='null' && tSc.id_c!='null' && scr.id_c!='null'){
 									taskflag=true;
-									scr.task={id:null,oid:null,task:"Scrape",assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,details:tObj.det,parent:[dNodes[pi].id_c,tSc.id_c,scr.id_c]};
+									scr.task={id:null,oid:null,task:"Scrape",assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,re_estimation:tObj.re_estimation,details:tObj.det,parent:[dNodes[pi].id_c,tSc.id_c,scr.id_c]};
 									d3.select('#ct-node-'+scr.id).append('image').attr('class','ct-nodeTask').attr('xlink:href','images_mindmap/node-task-assigned.png').attr('x',29).attr('y',-10);
 								}
 								
@@ -440,7 +450,7 @@ var addTask = function(e){
 								if(tCa.task===undefined||tCa.task==null){
 									if(dNodes[pi].id_c!='null' && tSc.id_c!='null' && scr.id_c!='null' && tCa.id_c != 'null' ){
 										taskflag=true;
-										tCa.task={id:null,oid:null,task:"Design",assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,details:tObj.det,parent:[dNodes[pi].id_c,tSc.id_c,scr.id_c,tCa.id_c]};
+										tCa.task={id:null,oid:null,task:"Design",assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,re_estimation:tObj.re_estimation,details:tObj.det,parent:[dNodes[pi].id_c,tSc.id_c,scr.id_c,tCa.id_c]};
 										d3.select('#ct-node-'+tCa.id).append('image').attr('class','ct-nodeTask').attr('xlink:href','images_mindmap/node-task-assigned.png').attr('x',29).attr('y',-10);
 									}
 								}else{
@@ -469,7 +479,7 @@ var addTask = function(e){
 					
 				
 				if(tscid!='null'){
-					dNodes[pi].task={id:tObj.id,oid:tObj.oid,task:tObj.t,assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,release:parentTask.release,cycle:parentTask.cycle,details:tObj.det,parent:(tObj.parent!=null)?tObj.parent:[modid,dNodes[pi].id_c]};
+					dNodes[pi].task={id:tObj.id,oid:tObj.oid,task:tObj.t,assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,re_estimation:tObj.re_estimation,release:parentTask.release,cycle:parentTask.cycle,details:tObj.det,parent:(tObj.parent!=null)?tObj.parent:[modid,dNodes[pi].id_c]};
 					if(dNodes[pi].parent.type=='modules_endtoend') taskflag=true;
 				}
 
@@ -479,7 +489,7 @@ var addTask = function(e){
 						if(scr.task===undefined||scr.task==null){
 							if(modid!='null' && tscid!='null' && scr.id_c!='null'){
 								taskflag=true;
-								scr.task={id:null,oid:null,task:"Scrape",assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,details:tObj.det,parent:[modid,tscid,scr.id_c]};
+								scr.task={id:null,oid:null,task:"Scrape",assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,re_estimation:tObj.re_estimation,details:tObj.det,parent:[modid,tscid,scr.id_c]};
 								d3.select('#ct-node-'+scr.id).append('image').attr('class','ct-nodeTask').attr('xlink:href','images_mindmap/node-task-assigned.png').attr('x',29).attr('y',-10);
 							}
 							
@@ -494,7 +504,7 @@ var addTask = function(e){
 							if(tCa.task===undefined||tCa.task==null){
 								if(modid!='null' && tscid!='null' && scr.id_c!='null' && tCa.id_c != 'null' ){
 									taskflag=true;
-									tCa.task={id:null,oid:null,task:"Design",assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,details:tObj.det,parent:[modid,tscid,scr.id_c,tCa.id_c]};
+									tCa.task={id:null,oid:null,task:"Design",assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,re_estimation:tObj.re_estimation,details:tObj.det,parent:[modid,tscid,scr.id_c,tCa.id_c]};
 									d3.select('#ct-node-'+tCa.id).append('image').attr('class','ct-nodeTask').attr('xlink:href','images_mindmap/node-task-assigned.png').attr('x',29).attr('y',-10);
 								}
 							}else{
@@ -514,7 +524,7 @@ var addTask = function(e){
 		else if(nType=="screens"){
 			var modid=dNodes[pi].parent.parent.id_c,tscid=dNodes[pi].parent.id_c,scrid=dNodes[pi].id_c;
 			if(dNodes[pi].id_c!='null'){
-				dNodes[pi].task={id:tObj.id,oid:tObj.oid,task:tObj.t,assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,details:tObj.det,parent:(tObj.parent!=null)?tObj.parent:[modid,tscid,scrid]};
+				dNodes[pi].task={id:tObj.id,oid:tObj.oid,task:tObj.t,assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,re_estimation:tObj.re_estimation,details:tObj.det,parent:(tObj.parent!=null)?tObj.parent:[modid,tscid,scrid]};
 			}
 			
 			if(tObj.parent!=[modid,tscid,scrid]){
@@ -526,7 +536,7 @@ var addTask = function(e){
 				if(tCa.task===undefined||tCa.task==null){
 					if (modid !='null' && tscid !='null' && scrid!='null' && tcid!='null'){
 						taskflag=true;
-						tCa.task={id:null,oid:null,task:cTask,assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,details:tObj.det,parent:[modid,tscid,scrid,tcid]};
+						tCa.task={id:null,oid:null,task:cTask,assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,re_estimation:tObj.re_estimation,details:tObj.det,parent:[modid,tscid,scrid,tcid]};
 						d3.select('#ct-node-'+tCa.id).append('image').attr('class','ct-nodeTask').attr('xlink:href','images_mindmap/node-task-assigned.png').attr('x',29).attr('y',-10);
 					}
 				}else{
@@ -541,7 +551,7 @@ var addTask = function(e){
 			var modid=dNodes[pi].parent.parent.parent.id_c,tscid=dNodes[pi].parent.parent.id_c,scrid=dNodes[pi].parent.id_c;var tcid=dNodes[pi].id_c;
 			if (modid !='null' && tscid !='null' && scrid!='null' && tcid!='null'){
 				taskflag=true;
-				dNodes[pi].task={id:tObj.id,oid:tObj.oid,task:tObj.t,assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,details:tObj.det,parent:(tObj.parent!=null)?tObj.parent:[modid,tscid,scrid,tcid]};
+				dNodes[pi].task={id:tObj.id,oid:tObj.oid,task:tObj.t,assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,re_estimation:tObj.re_estimation,details:tObj.det,parent:(tObj.parent!=null)?tObj.parent:[modid,tscid,scrid,tcid]};
 				if(tObj.parent!=[modid,tscid,scrid,tcid]){
 					dNodes[pi].task['updatedParent']=[modid,tscid,scrid,tcid];
 				}

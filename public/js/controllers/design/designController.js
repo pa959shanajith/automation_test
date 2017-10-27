@@ -504,7 +504,7 @@ console.log("screenName:", screenName);
                 var file = overWriteJson.files[0];
                 var textType = /json.*/;
                 var reader = new FileReader();
-                reader.onload = function(e) {
+                reader.onload = function(e) {                    
                     if ((file.name.split('.')[file.name.split('.').length - 1]).toLowerCase() == "json") {
                         var resultString = JSON.parse(reader.result);
                         for (i = 0; i < resultString.length; i++) {
@@ -537,7 +537,6 @@ console.log("screenName:", screenName);
                         openDialog("Import Testcase", "Please Check the file format you have uploaded!")
                     }
                 }
-
                 reader.readAsText(file);
                 counter2 = 1;
                 $("#overWriteJson").val('');
@@ -611,7 +610,8 @@ console.log("screenName:", screenName);
         var screenId = taskInfo.screenId;
         var testCaseId = taskInfo.testCaseId;
         var testCaseName = taskInfo.testCaseName;
-        DesignServices.readTestCase_ICE(screenId, testCaseId, testCaseName)
+        var versionnumber = taskInfo.versionnumber;
+        DesignServices.readTestCase_ICE(screenId, testCaseId, testCaseName, versionnumber)
             .then(function(response) {
                     if (response == "Invalid Session") {
                         window.location.href = "/";
@@ -2359,9 +2359,45 @@ console.log("screenName:", screenName);
             //window.localStorage['disableEditing'] = "true";
             //Pushing custom object in array
             $.each($(".addObj-row"), function() {
+                var typeOfElement;
+                var eleType = $(this).find("select option:selected").val();
+                switch(eleType){
+                    case "button":
+                        typeOfElement = "btn";
+                        break;
+                    case "checkbox":
+                        typeOfElement = "chkbox";
+                        break;
+                    case "select":
+                        typeOfElement = "select";
+                        break;
+                    case "img":
+                        typeOfElement = "img";
+                        break;
+                    case "a":
+                        typeOfElement = "lnk";
+                        break;
+                    case "radiobutton":
+                        typeOfElement = "radiobtn";
+                        break;
+                    case "input":
+                        typeOfElement = "txtbox";
+                        break;
+                    case "list":
+                        typeOfElement = "lst";
+                        break;
+                    case "table":
+                        typeOfElement = "tbl";
+                        break;
+                    case "Element":
+                        typeOfElement = "elmnt";
+                        break;
+                    default:
+                        break;
+                }
                 customObj.push({
-                    custname: $(this).find("input").val(),
-                    tag: $(this).find("select option:selected").val(),
+                    custname: $(this).find("input").val()+"_"+typeOfElement,
+                    tag: eleType,
                     xpath: ''
                 })
             })
@@ -4684,10 +4720,10 @@ function contentTable(newTestScriptDataLS) {
             $grid.jqGrid('setCell', currRowId, 'objectName', objName);
             $grid.jqGrid('setCell', currRowId, 'url', url);
         }
-        /*else{
-            $grid.jqGrid('setCell', currRowId, 'objectName', objName);
-            $grid.jqGrid('setCell', currRowId, 'url', url);
-        }*/
+        // else{
+        //     $grid.jqGrid('setCell', currRowId, 'objectName', objName);
+        //     $grid.jqGrid('setCell', currRowId, 'url', url);
+        // }
         //get Input and Output Syntax for selected Keyword
         $.each(keywordArrayList, function(index, value) {
             keywordArrayKey = index;

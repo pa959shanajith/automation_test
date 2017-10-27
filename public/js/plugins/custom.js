@@ -15,6 +15,38 @@ history.pushState(null, null, document.URL);
 window.addEventListener('popstate', function () {
 	history.pushState(null, null, document.URL);
 });
+function getCookie(cname) {
+	var name = cname + "=";
+	var ca = document.cookie.split(';');
+	for (var i = 0; i < ca.length; i++) {
+		var c = ca[i];
+		while (c.charAt(0) == ' ')
+			c = c.substring(1);
+		if (c.indexOf(name) == 0)
+			return c.substring(name.length, c.length);
+	}
+	return "";
+}
+//   /**
+//    * 'XSRF-TOKEN',
+//    * 'X-XSRF-TOKEN' name changed
+//    * @author - sushma.p
+//    */
+$.extend($.jgrid.defaults, {
+	ajaxRowOptions : {
+		beforeSend : function(jqXHR) {
+			var csrf_token = getCookie("29927e0554f6483cfd4761fa4c8edfd1");
+			jqXHR.setRequestHeader('1753f5bdd248dcf909f106d0a6595dab', csrf_token);
+		}
+	}
+})
+
+$(document).ajaxSend(function(elm, xhr, s){
+    if (s.type == "POST") {
+        s.data += s.data?"&":"";
+        s.data += "_token=" + $('#csrf-token').val();
+    }
+});
 
 //Document Ready Function
 $(document).ready(function() {
@@ -114,12 +146,10 @@ $(document).ready(function() {
 		{
 			if(JSON.parse(window.localStorage['_CT']).appType == "MobileWeb" && navigator.appVersion.indexOf("Win")!=-1){
 				if(parseInt(viewString.mirrorwidth) > 800)
-				{
-
-				}
+				{}
 				else{
-						$("#window-scrape-screenshot").css({"width":""+viewString.mirrorwidth+"px", /*"height": ""+viewString.mirrorheight+"px",*/ "max-height":""+viewString.mirrorheight+"px !important"});        	 
-						$("#window-scrape-screenshot .popupContent").css({"width":""+viewString.mirrorwidth+"px", "height": ""+viewString.mirrorheight+"px"});
+					$("#window-scrape-screenshot").css({"width":""+viewString.mirrorwidth+"px", /*"height": ""+viewString.mirrorheight+"px",*/ "max-height":""+viewString.mirrorheight+"px !important"});        	 
+					$("#window-scrape-screenshot .popupContent").css({"width":""+viewString.mirrorwidth+"px", "height": ""+viewString.mirrorheight+"px"});
 				}
 			}
 			else 

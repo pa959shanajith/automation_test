@@ -1157,7 +1157,7 @@ exports.updateScreen_ICE = function (req, res) {
 																}
 															}
 														});
-														testcasecallback();
+														testcasecallback;
 													} catch (exception) {
 														console.log(exception);
 													}
@@ -1177,7 +1177,7 @@ exports.updateScreen_ICE = function (req, res) {
 							}
 						});
 					}
-					finalcallback();
+					finalcallback;
 				} catch (exception) {
 					console.log(exception);
 				}

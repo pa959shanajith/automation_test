@@ -6,9 +6,10 @@ var myserver = require('../../server.js');
 var epurl = "http://127.0.0.1:1990/";
 var Client = require("node-rest-client").Client;
 var client = new Client();
-var sessionExtend = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes 
+var sessionExtend = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes 
 var sessionTime = 30 * 60 * 1000;
 var updateSessionTimeEvery = 20 * 60 * 1000;
+var validator = require('validator');
 
 exports.loginQCServer_ICE = function (req, res) {
 	try {
@@ -21,8 +22,26 @@ exports.loginQCServer_ICE = function (req, res) {
 			var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 			console.log("IP:", ip);
 			var name = req.session.username;
-			console.log(Object.keys(myserver.allSocketsMap), "<<all people, asking person:", name);
-			if ('allSocketsMap' in myserver && name in myserver.allSocketsMap) {
+			console.log(Object.keys(myserver.allSocketsMap),"<<all people, asking person:",name);
+            check_qcUrl = validator.isEmpty(req.body.qcURL);
+            if(check_qcUrl == false)
+            {
+                validate_qcUrl = true;
+            }
+            check_qcUsername = validator.isEmpty(req.body.qcUsername);
+            if(check_qcUsername == false)
+            {
+                validate_qcUsername = true;
+            }
+            check_qcPassword = validator.isEmpty(req.body.qcPassword);
+            if(check_qcPassword == false)
+            {
+                 validate_qcPassword = true;
+            }
+        if(validate_qcUrl == true && validate_qcUsername == true &&  validate_qcPassword == true)
+            {
+
+			if('allSocketsMap' in myserver && name in myserver.allSocketsMap){
 				var mySocket = myserver.allSocketsMap[name];
 				var username = req.body.qcUsername;
 				var password = req.body.qcPassword;
@@ -55,6 +74,9 @@ exports.loginQCServer_ICE = function (req, res) {
 		} else {
 			res.send("Invalid Session");
 		}
+            }else{
+                res.send('unavailableLocalServer');
+            }
 	} catch (exception) {
 		console.log(exception);
 		res.send("unavailableLocalServer");
@@ -509,3 +531,193 @@ function qcscenariodetails(projectid, cb) {
 		cb(null, qcDetailsList);
 	});
 }
+
+
+exports.manualTestcaseDetails_ICE = function(req,res){
+    
+    getProjectsAndModules(req.body.user_id,function(data){
+        res.send(data);
+    })
+}
+
+function getProjectsAndModules(userid,cb){
+    var projectDetailsList1 = [];
+    var projectidlist = [];
+    var scenarioDetailsList ;
+    async.series({
+        getprojectDetails:function(callback){
+            //var getprojects = "select projectids from icepermissions where userid="+userid;
+            var inputs = {"userid":userid,"query":"getprojectDetails"}
+            var args = {
+                data:inputs,
+                headers:{"Content-Type" : "application/json"}                
+            }
+            client.post(epurl+"qualityCenter/qcProjectDetails_ICE",args,
+                function (projectrows, response) {
+                    if (response.statusCode != 200 || projectrows.rows == "fail") {
+           // dbConnICE.execute(getprojects,function(err,projectrows){
+                //if(err){
+                    //console.log(err);
+                    console.log("Error occured in getProjectsForUser: fail , getProjectsAndModules");
+                }else{
+                    if(projectrows.rows.length!=0){
+                        flagtocheckifexists = true;
+                        projectidlist = projectrows.rows[0].projectids;
+                    }
+                }
+                 callback();
+                //cb(null,testcasedatatoupdate);
+            }); 
+        },
+        moduleDetails:function(callback){
+            async.forEachSeries(projectidlist,function(itr,datacallback){
+                projectandmodule(itr,function(data){
+                    projectDetailsList1.push(data);
+                    datacallback();
+                })
+            },callback);
+        }
+    },function(err,data){
+        cb(projectDetailsList1);
+    })
+};
+
+
+function projectandmodule(projectid,cb,data){
+    var projectDetails = {"project_id":'',"project_name":'',"module_details":[]};
+    var projectname = '';
+    var modulelist = [];
+    async.series({
+        projectname1 : function(callback1){
+            //var projectnamequery = "SELECT projectname FROM projects WHERE projectid="+projectid;
+            var inputs = {"projectid":projectid,"query":"projectname1"}
+            var args = {
+                data:inputs,
+                headers:{"Content-Type" : "application/json"}
+                
+            }
+            client.post(epurl+"qualityCenter/qcProjectDetails_ICE",args,
+                function (projectdata, response) {
+                    if (response.statusCode != 200 || projectdata.rows == "fail") {
+            // dbConnICE.execute(projectnamequery,function(err,projectdata){
+            //         if(err){
+            //             console.log(err);
+                        console.log("Error occured in getProjectsForUser: fail , projectname1");
+                    }else{
+                        if(projectdata.rows.length!=0){
+                            projectname = projectdata.rows[0].projectname;
+                        }
+                    }
+                    callback1();
+            });
+        },
+        /*scenariodata:function(callback1){
+            var modulequery = "SELECT * FROM modules where projectid="+projectid
+                var inputs = {"projectid":projectid,"query":"scenariodata"}
+                var args = {
+                    data:inputs,
+                    headers:{"Content-Type" : "application/json"}
+                    
+                }
+                projectDetails.project_id = projectid;
+                projectDetails.project_name = projectname;
+                // client.post(epurl+"qualityCenter/qcProjectDetails_ICE",args,
+                //     function (modulerows, response) {
+                //     if (response.statusCode != 200 || scenariorows.rows == "fail") {
+                dbConnICE.execute(modulequery,function(err,modulerows){
+                if(err){
+                    console.log(err);
+                        console.log("Error occured in getProjectsForUser: fail , scenariodata");
+                }else{
+                    if(modulerows.rows.length!=0){
+                        flagtocheckifexists = true;
+                        //scenarios_list = JSON.parse(JSON.stringify(modulerows.rows));
+                        getmodulescenario(modulerows.rows,function(moduledata){
+                            modulelist = moduledata;
+                            callback1();
+                        })
+                        
+                    }else{
+                        projectDetails.project_id = projectid;
+                        projectDetails.project_name = projectname;
+                        callback1();
+                    }
+                }
+            });
+        }*/
+    },function(err,data){
+        projectDetails.module_details = modulelist;
+        cb(projectDetails);
+    });
+};
+
+
+/*function getmodulescenario(rows,cb){
+    var modulelist = [];
+    async.forEachSeries(rows,function(itr,callback){
+        var moduleobj = {"module_name":itr.modulename,"module_id":itr.moduleid,"scenario_details":[]};
+        getScenarioDetails(itr.testscenarioids,function(scenariodata){
+            moduleobj.scenario_details = scenariodata;
+            modulelist.push(moduleobj);
+            callback();
+        });
+
+    },function(){
+        cb(modulelist)
+    });
+}
+
+function getScenarioDetails(scenarioids,cb){
+    var scenariolist = [];
+    async.forEachSeries(scenarioids,function(itr,callback){
+        var scenarioquery = "select * from testscenarios where testscenarioid="+itr;
+        var scenarioobj = {"scenario_name":"","scenario_id":"","testcase_details":[]};
+        dbConnICE.execute(scenarioquery,function(err,scenariodata){
+            if(err){
+                console.log(err);
+            }else{
+                if(scenariodata.rows.length >0){
+                    scenarioobj.scenario_name = scenariodata.rows[0].testscenarioname;
+                    scenarioobj.scenario_id = scenariodata.rows[0].testscenarioid;
+                    getTestCaseDetails(scenariodata.rows[0].testcaseids,function(testcasedata){
+                        scenarioobj.testcase_details = testcasedata;
+                        scenariolist.push(scenarioobj);
+                        callback();
+                    });
+
+                }else{
+                    callback();
+                }
+            }
+        });
+        
+    },function(){
+        cb(scenariolist);
+    })
+}
+
+function getTestCaseDetails(testcaseids,cb){
+    var testcaselist = [];
+    async.forEachSeries(testcaseids,function(itr,callback){
+        var testcaseobj = {"testcase_name":"","testcase_id":""};
+        var testcasequery = "select testcasename,testcaseid from testcases where testcaseid="+itr;
+        dbConnICE.execute(testcasequery,function(err,testcasedata){
+            if(err){
+                console.log("Error occured is :",err);
+                callback();
+            }else{
+                if(testcasedata.rows.length >0){
+                    testcaseobj.testcase_name = testcasedata.rows[0].testcasename;
+                    testcaseobj.testcase_id = testcasedata.rows[0].testcaseid;
+                    testcaselist.push(testcaseobj);
+                    callback();
+                }else{
+                    callback()
+                }
+            }
+        });
+
+    },function(){
+        cb(testcaselist);
+    });
+};*/

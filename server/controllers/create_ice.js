@@ -368,8 +368,6 @@ exports.createStructure_Nineteen68 = function (req, res) {
 											var testcasedetailslist = [];
 											var screenidneo = screenitr.screenId;
 											var taskscreen = screenitr.task;
-											var versionnumber = 0;
-											//console.log('screenName details',screenName);
 											testscreen_exists({
 												"testscreenname": screenName,
 												"testscreenid": screenid_c,
@@ -438,7 +436,6 @@ exports.createStructure_Nineteen68 = function (req, res) {
 															var testcaseidneo = testcaseitr.testcaseId;
 															var tasktestcase = testcaseitr.task;
 															var screenID_c_neo = testcaseitr.screenID_c;
-															var versionnumber = 0;
 															testcase_exists({
 																"screenId": screenId,
 																"testcasename": testcaseName,

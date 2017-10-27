@@ -209,6 +209,12 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 						$("#parentExecute").prop("checked", false);
 					}
 				 }
+				 if(dataLen == 2){
+					 $(".executionDataTable tbody").prop("style","max-height: 180px !important;");
+				 }
+				 else if(dataLen > 2){
+					 $(".executionDataTable tbody").prop("style","max-height: 100px !important;");
+				 }
 				 if(dataLen == $(".parentSuiteChk:checked").length){
 					 $(".checkStylebox").prop("checked", true);
 				 }

@@ -7,118 +7,135 @@ var epurl = "http://127.0.0.1:1990/";
 var Client = require("node-rest-client").Client;
 var myserver = require('../../server.js');
 var client = new Client();
-
+var validator = require('validator');
 //Global Variables
 var roles = [];
 var userRoles = {};
 
 //Authenticate User - Nineteen68
 exports.authenticateUser_Nineteen68 = function (req, res) {
-    try {
-        console.log("Inside Authenticate User");
-        var username = req.body.username.toLowerCase();
-        var password = req.body.password;
-        var session = req.session;
-        var sessId = req.session.id;
-        var maxTime = 0;
-        for (var key in req.sessionStore.sessions) {
-            var sessionStore = req.sessionStore.sessions[key];
-            if (sessionStore) {
-                var obj = JSON.parse(sessionStore);
-                if (username == obj.username) {
-                    var dateEx = new Date(obj.cookie.expires);
-                    if (dateEx.getTime() > maxTime) {
-                        maxTime = dateEx.getTime();
-                    }
-                }
-            }
-        }
-        var dateNow = new Date();
-        if (dateNow.getTime() < maxTime) {
-            return res.send("userLogged");
-        }
-        req.session.username = username;
-        req.session.uniqueId = sessId;
-        var flag = 'inValidCredential';
-        var assignedProjects = false;
-        var validUser = false;
-        var inputs = {
-            "username": req.session.username
-        };
-        var args = {
-            data: inputs,
-            headers: {
-                "Content-Type": "application/json"
-            }
-        };
-        checkldapuser(req, function (err, data) {
-            if (data) {
-                ldapCheck(req, function (err, ldapdata) {
-                    if (ldapdata == 'pass') {
-                        flag = 'validCredential';
-                        res.setHeader('Set-Cookie', sessId);
-                        res.send(flag);
-                    } else {
-                        res.send(flag);
-                    }
-                });
-            } else {
-                client.post(epurl + "login/authenticateUser_Nineteen68", args,
-                    function (result, response) {
-                    if (response.statusCode != 200 || result.rows == "fail") {
-                        console.log("Error occured in authenticateUser_Nineteen68 : Fail");
-                        res.send("fail");
-                    } else {
-                        try {
-                            if (result.rows.length == 0) {
-                                res.send(flag);
-                            } else {
-                                for (var i = 0; i < result.rows.length; i++) {
-                                    dbHashedPassword = result.rows[i].password;
-                                }
-                                validUser = bcrypt.compareSync(password, dbHashedPassword); // true
-                                //Check whether projects are assigned for a user
-                                checkAssignedProjects(req, function (err, assignedProjectsData, role) {
-                                    if (role != "Admin" && role != "Business Analyst" && role != "Tech Lead") {
-                                        if (assignedProjectsData > 0) {
-                                            assignedProjects = true;
-                                        }
-                                        if (validUser == true && assignedProjects == true) {
-                                            flag = 'validCredential';
-                                            res.setHeader('Set-Cookie', sessId);
-                                            res.send(flag);
-                                        } else if (validUser == true && assignedProjects == false) {
-                                            flag = 'noProjectsAssigned';
-                                            req.session.destroy();
-                                            res.send(flag);
-                                        } else {
-                                            req.session.destroy();
-                                            res.send(flag);
-                                        }
-                                    } else {
-                                        if (validUser == true) {
-                                            flag = 'validCredential';
-                                            res.setHeader('Set-Cookie', sessId);
-                                            res.send(flag);
-                                        } else {
-                                            req.session.destroy();
-                                            res.send(flag);
-                                        }
-                                    }
-                                });
-                            }
-                        } catch (exception) {
-                            console.log(exception);
-                            res.send("fail");
-                        }
-                    }
-                });
-            }
-        });
-    } catch (exception) {
-        console.log(exception);
-        res.send("fail");
-    }
+	try {
+		console.log("Inside Authenticate User");
+		var username = req.body.username.toLowerCase();
+		var password = req.body.password;
+		var session = req.session;
+		var sessId = req.session.id;
+		validateLogin();
+		function validateLogin() {
+			check_username = validator.isEmpty(username);
+			check_usernameLen = validator.isLength(username, 1, 50);
+			if (check_username == false && check_usernameLen == true) {
+				valid_username = true;
+			}
+			check_password = validator.isEmpty(password);
+			check_passwordLen = validator.isLength(password, 1, 12);
+			if (check_password == false && check_passwordLen == true) {
+				valid_password = true;
+			}
+		}
+		if (valid_username == true && valid_password == true) {
+			var maxTime = 0;
+			for (var key in req.sessionStore.sessions) {
+				var sessionStore = req.sessionStore.sessions[key];
+				if (sessionStore) {
+					var obj = JSON.parse(sessionStore);
+					if (username == obj.username) {
+						var dateEx = new Date(obj.cookie.expires);
+						if (dateEx.getTime() > maxTime) {
+							maxTime = dateEx.getTime();
+						}
+					}
+				}
+			}
+			var dateNow = new Date();
+			if (dateNow.getTime() < maxTime) {
+				return res.send("userLogged");
+			}
+			req.session.username = username;
+			req.session.uniqueId = sessId;
+			var flag = 'inValidCredential';
+			var assignedProjects = false;
+			var validUser = false;
+			var inputs = {
+				"username": req.session.username
+			};
+			var args = {
+				data: inputs,
+				headers: {
+					"Content-Type": "application/json"
+				}
+			};
+			checkldapuser(req, function (err, data) {
+				if (data) {
+					ldapCheck(req, function (err, ldapdata) {
+						if (ldapdata == 'pass') {
+							flag = 'validCredential';
+							res.setHeader('Set-Cookie', sessId);
+							res.send(flag);
+						} else {
+							res.send(flag);
+						}
+					});
+				} else {
+					client.post(epurl + "login/authenticateUser_Nineteen68", args,
+						function (result, response) {
+						if (response.statusCode != 200 || result.rows == "fail") {
+							console.log("Error occured in authenticateUser_Nineteen68 : Fail");
+							res.send("fail");
+						} else {
+							try {
+								if (result.rows.length == 0) {
+									res.send(flag);
+								} else {
+									for (var i = 0; i < result.rows.length; i++) {
+										dbHashedPassword = result.rows[i].password;
+									}
+									validUser = bcrypt.compareSync(password, dbHashedPassword); // true
+									//Check whether projects are assigned for a user
+									checkAssignedProjects(req, function (err, assignedProjectsData, role) {
+										if (role != "Admin" && role != "Business Analyst" && role != "Tech Lead") {
+											if (assignedProjectsData > 0) {
+												assignedProjects = true;
+											}
+											if (validUser == true && assignedProjects == true) {
+												flag = 'validCredential';
+												res.setHeader('Set-Cookie', sessId);
+												res.send(flag);
+											} else if (validUser == true && assignedProjects == false) {
+												flag = 'noProjectsAssigned';
+												req.session.destroy();
+												res.send(flag);
+											} else {
+												req.session.destroy();
+												res.send(flag);
+											}
+										} else {
+											if (validUser == true) {
+												flag = 'validCredential';
+												res.setHeader('Set-Cookie', sessId);
+												res.send(flag);
+											} else {
+												req.session.destroy();
+												res.send(flag);
+											}
+										}
+									});
+								}
+							} catch (exception) {
+								console.log(exception);
+								res.send("fail");
+							}
+						}
+					});
+				}
+			});
+		} else {
+			res.send("fail");
+		}
+	} catch (exception) {
+		console.log(exception);
+		res.send("fail");
+	}
 };
 
 /**
@@ -126,149 +143,168 @@ exports.authenticateUser_Nineteen68 = function (req, res) {
  * @author : vinay
  */
 exports.authenticateUser_Nineteen68_CI = function (req, res) {
-    try {
-        console.log("Inside Authenticate User");
-        var username = req.body.username.toLowerCase();
-        var password = req.body.password;
-        var session = req.session;
-        var sessId = req.session.id;
-        req.session.username = username;
-        req.session.uniqueId = sessId;
-        var flag = 'inValidCredential';
-        var inputs = {
-            "username": req.session.username
-        };
-        var args = {
-            data: inputs,
-            headers: {
-                "Content-Type": "application/json"
-            }
-        };
-        checkldapuser(req, function (err, data) {
-            if (data) {
-                ldapCheck(req, function (err, ldapdata) {
-                    if (ldapdata == 'pass') {
-                        flag = 'validCredential';
-                        status = {
-                            "status": flag,
-                            "session_id": sessId
-                        };
-                        res.setHeader('set-cookie', sessId);
-                        res.writeHead(200, {
-                            'Content-Type': 'text/plain'
-                        });
-                        res.write("status : " + flag + " , session_id : " + sessId);
-                        res.end();
-                    } else {
-                        res.setHeader('set-cookie', sessId);
-                        res.writeHead(401, {
-                            'Content-Type': 'text/plain'
-                        });
-                        res.write("status : " + flag + " , session_id : " + "");
-                        res.end();
-                    }
-                });
-            } else {
-                client.post(epurl + "login/authenticateUser_Nineteen68", args,
-                    function (result, response) {
-                    if (response.statusCode != 200 || result.rows == "fail") {
-                        console.log("Error occured in authenticateUser_Nineteen68 : Fail");
-                        res.setHeader('set-cookie', sessId);
-                        res.writeHead(500, {
-                            'Content-Type': 'text/plain'
-                        });
-                        res.write("status : fail , session_id : ");
-                        res.end();
-                    } else {
-                        try {
-                            if (result.rows.length == 0) {
-                                res.setHeader('set-cookie', sessId);
-                                res.writeHead(401, {
-                                    'Content-Type': 'text/plain'
-                                });
-                                res.write("status : " + flag + " , session_id : " + "");
-                                res.end();
-                            } else {
-                                for (var i = 0; i < result.rows.length; i++) {
-                                    dbHashedPassword = result.rows[i].password;
-                                }
-                                var validUser = bcrypt.compareSync(password, dbHashedPassword); // true
-                                checkAssignedProjects(req, function (err, assignedProjectsData, role) {
-                                    if (role != "Admin" && role != "Business Analyst" && role != "Tech Lead") {
-                                        if (assignedProjectsData > 0) {
-                                            assignedProjects = true;
-                                        }
-                                        if (validUser == true && assignedProjects == true) {
-                                            flag = 'validCredential';
-                                            status = {
-                                                "status": flag,
-                                                "session_id": sessId
-                                            };
-                                            res.setHeader('set-cookie', sessId);
-                                            res.writeHead(200, {
-                                                'Content-Type': 'text/plain'
-                                            });
-                                            res.write("status : " + flag + " , session_id : " + sessId);
-                                            res.end();
-                                        } else if (validUser == true && assignedProjects == false) {
-                                            flag = 'noProjectsAssigned';
-                                            res.writeHead(401, {
-                                                'Content-Type': 'text/plain'
-                                            });
-                                            res.write("status : " + flag + " , session_id : " + "");
-                                            res.end();
-                                        } else {
-                                            res.setHeader('set-cookie', sessId);
-                                            res.writeHead(401, {
-                                                'Content-Type': 'text/plain'
-                                            });
-                                            res.write("status : " + flag + " , session_id : " + "");
-                                            res.end();
-                                        }
-                                    } else {
-                                        if (validUser == true) {
-                                            flag = 'validCredential';
-                                            status = {
-                                                "status": flag,
-                                                "session_id": sessId
-                                            };
-                                            res.setHeader('set-cookie', sessId);
-                                            res.writeHead(200, {
-                                                'Content-Type': 'text/plain'
-                                            });
-                                            res.write("status : " + flag + " , session_id : " + sessId);
-                                            res.end();
-                                        } else {
-                                            res.setHeader('set-cookie', sessId);
-                                            res.writeHead(401, {
-                                                'Content-Type': 'text/plain'
-                                            });
-                                            res.write("status : " + flag + " , session_id : " + "");
-                                            res.end();
-                                        }
-                                    }
-                                });
-                            }
-                        } catch (exception) {
-                            console.log(exception);
-                            res.setHeader('set-cookie', sessId);
-                            res.writeHead(500, {
-                                'Content-Type': 'text/plain'
-                            });
-                            res.write("status : fail , session_id : ");
-                            res.end();
-                        }
-                    }
-                });
-            }
-        });
-    } catch (exception) {
-        console.log(exception);
-        res.setHeader('set-cookie', sessId);
-        res.writeHead(500, {'Content-Type': 'text/plain'});
-        res.write("status : fail , session_id : ");
-        res.end();
-    }
+	try {
+		console.log("Inside Authenticate User");
+		var username = req.body.username.toLowerCase();
+		var password = req.body.password;
+		var session = req.session;
+		var sessId = req.session.id;
+		req.session.username = username;
+		req.session.uniqueId = sessId;
+		var flag = 'inValidCredential';
+		var inputs = {
+			"username": req.session.username
+		};
+		var args = {
+			data: inputs,
+			headers: {
+				"Content-Type": "application/json"
+			}
+		};
+		validateLogin();
+		function validateLogin() {
+			check_username = validator.isEmpty(username);
+			check_usernameLen = validator.isLength(username, 1, 50);
+			if (check_username == false && check_usernameLen == true) {
+				valid_username = true;
+			}
+			check_password = validator.isEmpty(password);
+			check_passwordLen = validator.isLength(password, 1, 12);
+			if (check_password == false && check_passwordLen == true) {
+				valid_password = true;
+			}
+		}
+		if (valid_username == true && valid_password == true) {
+			checkldapuser(req, function (err, data) {
+				if (data) {
+					ldapCheck(req, function (err, ldapdata) {
+						if (ldapdata == 'pass') {
+							flag = 'validCredential';
+							status = {
+								"status": flag,
+								"session_id": sessId
+							};
+							res.setHeader('set-cookie', sessId);
+							res.writeHead(200, {
+								'Content-Type': 'text/plain'
+							});
+							res.write("status : " + flag + " , session_id : " + sessId);
+							res.end();
+						} else {
+							res.setHeader('set-cookie', sessId);
+							res.writeHead(401, {
+								'Content-Type': 'text/plain'
+							});
+							res.write("status : " + flag + " , session_id : " + "");
+							res.end();
+						}
+					});
+				} else {
+					client.post(epurl + "login/authenticateUser_Nineteen68", args,
+						function (result, response) {
+						if (response.statusCode != 200 || result.rows == "fail") {
+							console.log("Error occured in authenticateUser_Nineteen68 : Fail");
+							res.setHeader('set-cookie', sessId);
+							res.writeHead(500, {
+								'Content-Type': 'text/plain'
+							});
+							res.write("status : fail , session_id : ");
+							res.end();
+						} else {
+							try {
+								if (result.rows.length == 0) {
+									res.setHeader('set-cookie', sessId);
+									res.writeHead(401, {
+										'Content-Type': 'text/plain'
+									});
+									res.write("status : " + flag + " , session_id : " + "");
+									res.end();
+								} else {
+									for (var i = 0; i < result.rows.length; i++) {
+										dbHashedPassword = result.rows[i].password;
+									}
+									var validUser = bcrypt.compareSync(password, dbHashedPassword); // true
+									checkAssignedProjects(req, function (err, assignedProjectsData, role) {
+										if (role != "Admin" && role != "Business Analyst" && role != "Tech Lead") {
+											if (assignedProjectsData > 0) {
+												assignedProjects = true;
+											}
+											if (validUser == true && assignedProjects == true) {
+												flag = 'validCredential';
+												status = {
+													"status": flag,
+													"session_id": sessId
+												};
+												res.setHeader('set-cookie', sessId);
+												res.writeHead(200, {
+													'Content-Type': 'text/plain'
+												});
+												res.write("status : " + flag + " , session_id : " + sessId);
+												res.end();
+											} else if (validUser == true && assignedProjects == false) {
+												flag = 'noProjectsAssigned';
+												res.writeHead(401, {
+													'Content-Type': 'text/plain'
+												});
+												res.write("status : " + flag + " , session_id : " + "");
+												res.end();
+											} else {
+												res.setHeader('set-cookie', sessId);
+												res.writeHead(401, {
+													'Content-Type': 'text/plain'
+												});
+												res.write("status : " + flag + " , session_id : " + "");
+												res.end();
+											}
+										} else {
+											if (validUser == true) {
+												flag = 'validCredential';
+												status = {
+													"status": flag,
+													"session_id": sessId
+												};
+												res.setHeader('set-cookie', sessId);
+												res.writeHead(200, {
+													'Content-Type': 'text/plain'
+												});
+												res.write("status : " + flag + " , session_id : " + sessId);
+												res.end();
+											} else {
+												res.setHeader('set-cookie', sessId);
+												res.writeHead(401, {
+													'Content-Type': 'text/plain'
+												});
+												res.write("status : " + flag + " , session_id : " + "");
+												res.end();
+											}
+										}
+									});
+								}
+							} catch (exception) {
+								console.log(exception);
+								res.setHeader('set-cookie', sessId);
+								res.writeHead(500, {
+									'Content-Type': 'text/plain'
+								});
+								res.write("status : fail , session_id : ");
+								res.end();
+							}
+						}
+					});
+				}
+			});
+		} else {
+			res.send('fail');
+		}
+	} catch (exception) {
+		console.log(exception);
+		res.setHeader('set-cookie', sessId);
+		res.writeHead(500, {
+			'Content-Type': 'text/plain'
+		});
+		res.write("status : fail , session_id : ");
+		res.end();
+	}
 };
 
 /**
@@ -276,448 +312,447 @@ exports.authenticateUser_Nineteen68_CI = function (req, res) {
  * @author : vinay
  */
 function checkAssignedProjects(req, callback, data) {
-    var userid = '';
-    var roleid = '';
-    var assignedProjectsLen = '';
-    async.series({
-        getUserId: function (callback) {
-            var inputs = {
-                "username": req.session.username,
-                "query": "getUserId"
-            };
-            var args = {
-                data: inputs,
-                headers: {
-                    "Content-Type": "application/json"
-                }
-            };
-            client.post(epurl + "login/authenticateUser_Nineteen68/projassigned", args,
-                function (result, response) {
-                if (response.statusCode != 200 || result.rows == "fail") {
-                    console.log("Error occured in authenticateUser_Nineteen68 : Fail");
-                    res.send("fail");
-                } else {
-                    userid = result.rows[0].userid;
-                    roleid = result.rows[0].defaultrole;
-                    callback(null, userid, roleid);
-                }
-            });
-        },
-        getUserRole: function (callback) {
-            try {
-                var inputs = {
-                    "roleid": roleid,
-                    "query": "getUserRole"
-                };
-                var args = {
-                    data: inputs,
-                    headers: {
-                        "Content-Type": "application/json"
-                    }
-                };
-                client.post(epurl + "login/authenticateUser_Nineteen68/projassigned", args,
-                    function (rolesResult, response) {
-                    if (response.statusCode != 200 || rolesResult.rows == "fail") {
-                        console.log("Error occured in authenticateUser_Nineteen68 : Fail");
-                        res.send("fail");
-                    } else {
-                        rolename = rolesResult.rows[0].rolename;
-                        callback(null, userid, rolename);
-                    }
-                });
-            } catch (exception) {
-                console.log(exception);
-                res.send('fail');
-            }
-        },
-        getAssignedProjects: function (callback) {
-            try {
-                var inputs = {
-                    "userid": userid,
-                    "query": "getAssignedProjects"
-                };
-                var args = {
-                    data: inputs,
-                    headers: {
-                        "Content-Type": "application/json"
-                    }
-                };
-                client.post(epurl + "login/authenticateUser_Nineteen68/projassigned", args,
-                    function (projectsResult, response) {
-                    if (response.statusCode != 200 || projectsResult.rows == "fail") {
-                        console.log("Error occured in authenticateUser_Nineteen68 : Fail");
-                        res.send("fail");
-                    } else {
-                        if (projectsResult.rows.length > 0) {
-                            assignedProjectsLen = projectsResult.rows[0].projectids.length;
-                            callback(null, assignedProjectsLen, rolename);
-                        } else {
-                            assignedProjectsLen = projectsResult.rows.length;
-                            callback(null, assignedProjectsLen, rolename);
-                        }
-                    }
-                });
-            } catch (exception) {
-                console.log(exception);
-                res.send('fail');
-            }
-        },
-    }, function (err, data) {
-        try {
-            if (err) {
-                res.send("fail");
-            } else {
-                callback(null, assignedProjectsLen, rolename);
-            }
-        } catch (exception) {
-            console.log(exception);
-            res.send('fail');
-        }
-    });
+	var userid = '';
+	var roleid = '';
+	var assignedProjectsLen = '';
+	async.series({
+		getUserId: function (callback) {
+			var inputs = {
+				"username": req.session.username,
+				"query": "getUserId"
+			};
+			var args = {
+				data: inputs,
+				headers: {
+					"Content-Type": "application/json"
+				}
+			};
+			client.post(epurl + "login/authenticateUser_Nineteen68/projassigned", args,
+				function (result, response) {
+				if (response.statusCode != 200 || result.rows == "fail") {
+					console.log("Error occured in authenticateUser_Nineteen68 : Fail");
+					res.send("fail");
+				} else {
+					userid = result.rows[0].userid;
+					roleid = result.rows[0].defaultrole;
+					callback(null, userid, roleid);
+				}
+			});
+		},
+		getUserRole: function (callback) {
+			try {
+				var inputs = {
+					"roleid": roleid,
+					"query": "getUserRole"
+				};
+				var args = {
+					data: inputs,
+					headers: {
+						"Content-Type": "application/json"
+					}
+				};
+				client.post(epurl + "login/authenticateUser_Nineteen68/projassigned", args,
+					function (rolesResult, response) {
+					if (response.statusCode != 200 || rolesResult.rows == "fail") {
+						console.log("Error occured in authenticateUser_Nineteen68 : Fail");
+						res.send("fail");
+					} else {
+						rolename = rolesResult.rows[0].rolename;
+						callback(null, userid, rolename);
+					}
+				});
+			} catch (exception) {
+				console.log(exception);
+				res.send('fail');
+			}
+		},
+		getAssignedProjects: function (callback) {
+			try {
+				var inputs = {
+					"userid": userid,
+					"query": "getAssignedProjects"
+				};
+				var args = {
+					data: inputs,
+					headers: {
+						"Content-Type": "application/json"
+					}
+				};
+				client.post(epurl + "login/authenticateUser_Nineteen68/projassigned", args,
+					function (projectsResult, response) {
+					if (response.statusCode != 200 || projectsResult.rows == "fail") {
+						console.log("Error occured in authenticateUser_Nineteen68 : Fail");
+						res.send("fail");
+					} else {
+						if (projectsResult.rows.length > 0 && projectsResult.rows[0].projectids != null) {
+							assignedProjectsLen = projectsResult.rows[0].projectids.length;
+							callback(null, assignedProjectsLen, rolename);
+						} else {
+							assignedProjectsLen = 0;
+							callback(null, assignedProjectsLen, rolename);
+						}
+					}
+				});
+			} catch (exception) {
+				console.log(exception);
+				res.send('fail');
+			}
+		},
+	}, function (err, data) {
+		try {
+			if (err) {
+				res.send("fail");
+			} else {
+				callback(null, assignedProjectsLen, rolename);
+			}
+		} catch (exception) {
+			console.log(exception);
+			res.send('fail');
+		}
+	});
 }
-
 
 /**
  * @see : function to check whether existing user is ldap user or not
  * @author : shree.p
  */
 function checkldapuser(req, callback, data) {
-    var flag = false;
-    var inputs = {
-        "username": req.session.username
-    };
-    var args = {
-        data: inputs,
-        headers: {
-            "Content-Type": "application/json"
-        }
-    };
-    client.post(epurl + "login/authenticateUser_Nineteen68/ldap", args,
-        function (result, response) {
-        if (response.statusCode != 200 || result.rows == "fail") {
-            console.log("Error occured in authenticateUser_Nineteen68 : Fail");
-            callback(null, flag);
-        } else {
-            try {
-                if (result.rows.length == 0) {
-                    callback(null, flag);
-                } else {
-                    flag = result.rows[0].ldapuser;
-                    if (flag == null || flag == undefined) {
-                        flag = false;
-                    }
-                    callback(null, flag);
-                }
-            } catch (exception) {
-                console.log(exception);
-                callback(null, flag);
-            }
-        }
-    });
+	var flag = false;
+	var inputs = {
+		"username": req.session.username
+	};
+	var args = {
+		data: inputs,
+		headers: {
+			"Content-Type": "application/json"
+		}
+	};
+	client.post(epurl + "login/authenticateUser_Nineteen68/ldap", args,
+		function (result, response) {
+		if (response.statusCode != 200 || result.rows == "fail") {
+			console.log("Error occured in authenticateUser_Nineteen68 : Fail");
+			callback(null, flag);
+		} else {
+			try {
+				if (result.rows.length == 0) {
+					callback(null, flag);
+				} else {
+					flag = result.rows[0].ldapuser;
+					if (flag == null || flag == undefined) {
+						flag = false;
+					}
+					callback(null, flag);
+				}
+			} catch (exception) {
+				console.log(exception);
+				callback(null, flag);
+			}
+		}
+	});
 }
 
 function ldapCheck(req, cb) {
-    var config = require('../../server/config/config');
-    var ldap_ip = '',
-    ldap_port = '',
-    ldap_domain = '';
-    var username = req.body.username.toLowerCase();
-    var password = req.body.password;
-    ldap_ip = config.ldap_ip;
-    ldap_port = config.ldap_port;
-    ldap_domain = config.ldap_domain;
-    var dcarray = [];
-    var dcstringarr = [];
-    try {
-        if (ldap_domain.indexOf(".") !== -1) {
-            dcarray = ldap_domain.split(".");
-        }
-        for (var i = 0; i < dcarray.length; i++) {
-            dcstringarr.push("dc=" + dcarray[i]);
-        }
-    } catch (ex) {
-        console.log("Exception occured : ", ex);
-    }
-    var ActiveDirectory = require('activedirectory');
-    var ad = new ActiveDirectory({
-            url: 'ldap://' + ldap_ip + ':' + ldap_port,
-            baseDN: dcstringarr.toString()
-        });
-    ad.authenticate(username, password, function (err, auth) {
-        if (err) {
-            console.log('ERROR: ' + JSON.stringify(err));
-            //console.log('Authentication failed!');
-            //cb(null,'fail');
-        }
-        if (auth) {
-            console.log("LDAP user");
-            cb(null, 'pass');
-        } else {
-            console.log('Authentication failed!');
-            cb(null, 'fail');
-        }
-    });
+	var config = require('../../server/config/config');
+	var ldap_ip = '',
+	ldap_port = '',
+	ldap_domain = '';
+	var username = req.body.username.toLowerCase();
+	var password = req.body.password;
+	ldap_ip = config.ldap_ip;
+	ldap_port = config.ldap_port;
+	ldap_domain = config.ldap_domain;
+	var dcarray = [];
+	var dcstringarr = [];
+	try {
+		if (ldap_domain.indexOf(".") !== -1) {
+			dcarray = ldap_domain.split(".");
+		}
+		for (var i = 0; i < dcarray.length; i++) {
+			dcstringarr.push("dc=" + dcarray[i]);
+		}
+	} catch (ex) {
+		console.log("Exception occured : ", ex);
+	}
+	var ActiveDirectory = require('activedirectory');
+	var ad = new ActiveDirectory({
+			url: 'ldap://' + ldap_ip + ':' + ldap_port,
+			baseDN: dcstringarr.toString()
+		});
+	ad.authenticate(username, password, function (err, auth) {
+		if (err) {
+			console.log('ERROR: ' + JSON.stringify(err));
+			//console.log('Authentication failed!');
+			//cb(null,'fail');
+		}
+		if (auth) {
+			console.log("LDAP user");
+			cb(null, 'pass');
+		} else {
+			console.log('Authentication failed!');
+			cb(null, 'fail');
+		}
+	});
 }
 
 //Load User Information - Nineteen68
 exports.loadUserInfo_Nineteen68 = function (req, res) {
-    try {
-        if (req.cookies['connect.sid'] != undefined) {
-            var sessionCookie = req.cookies['connect.sid'].split(".");
-            var sessionToken = sessionCookie[0].split(":");
-            sessionToken = sessionToken[1];
-        }
-        if (sessionToken != undefined && req.session.id == sessionToken) {
-            var flag = req.body.flag;
-            var switchedRole = req.body.selRole;
-            userName = req.body.username.toLowerCase();
-            jsonService = {};
-            userpermissiondetails = [];
-            async.series({
-                userInfo: function (callback) {
-                    try {
-                        var inputs = {
-                            "username": userName.toLowerCase(),
-                            "query": "userInfo"
-                        };
-                        var args = {
-                            data: inputs,
-                            headers: {
-                                "Content-Type": "application/json"
-                            }
-                        };
-                        client.post(epurl + "login/loadUserInfo_Nineteen68", args,
-                            function (userResult, response) {
-                            if (response.statusCode != 200 || userResult.rows == "fail") {
-                                var flag = "fail";
-                                console.log("Failed to get user details from users.");
-                                res.send(flag);
-                            } else {
-                                try {
-                                    if (userResult.rows.length > 0) {
-                                        AlljsonServices = [];
-                                        service = userResult.rows[0];
-                                        userId = service.userid;
-                                        jsonService.user_id = userId;
-                                        jsonService.email_id = service.emailid;
-                                        jsonService.additionalrole = service.additionalroles;
-                                        jsonService.firstname = service.firstname;
-                                        jsonService.lastname = service.lastname;
-                                        jsonService.role = service.defaultrole;
-                                        jsonService.username = service.username.toLowerCase();
-                                        req.session.defaultRoleId = jsonService.role;
-                                    } else {
-                                        console.log("No records found.");
-                                        res.send("fail");
-                                    }
-                                } catch (exception) {
-                                    console.log(exception);
-                                    res.send("fail");
-                                }
-                            }
-                            callback();
-                        });
-                    } catch (exception) {
-                        console.log(exception);
-                        res.send("fail");
-                    }
-                },
-                loggedinRole: function (callback) {
-                    var inputs;
-                    if (flag == true) {
-                        inputs = {
-                            "roleid": req.body.selRole,
-                            "query": "loggedinRole"
-                        };
-                    }
-                    if (flag == false || flag == undefined) {
-                        inputs = {
-                            "roleid": req.session.defaultRoleId,
-                            "query": "loggedinRole"
-                        };
-                    }
-                    var args = {
-                        data: inputs,
-                        headers: {
-                            "Content-Type": "application/json"
-                        }
-                    };
-                    client.post(epurl + "login/loadUserInfo_Nineteen68", args,
-                        function (rolesResult, response) {
-                        if (response.statusCode != 200 || rolesResult.rows == "fail") {
-                            console.log("Error occured in getRoleNameByRoleId_Nineteen68 : Fail");
-                            res.send("fail");
-                        } else {
-                            try {
-                                if (rolesResult.rows.length == 0) {
-                                    console.log("No Records Found");
-                                    res.send("fail");
-                                } else {
-                                    try {
-                                        var role = "";
-                                        for (var i = 0; i < rolesResult.rows.length; i++) {
-                                            role = rolesResult.rows[i].rolename;
-                                        }
-                                        req.session.defaultRole = role;
-                                    } catch (exception) {
-                                        console.log(exception);
-                                        res.send("fail");
-                                    }
-                                }
-                                callback();
-                            } catch (exception) {
-                                console.log(exception);
-                                res.send("fail");
-                            }
-                        }
-                    });
-                },
-                //Service call to get the plugins accessible for the user
-                userPlugins: function (callback) {
-                    try {
-                        var inputs;
-                        if (flag == true) {
-                            inputs = {
-                                "roleid": req.body.selRole,
-                                "query": "userPlugins"
-                            };
-                        }
-                        if (flag == false || flag == undefined) {
-                            inputs = {
-                                "roleid": req.session.defaultRoleId,
-                                "query": "userPlugins"
-                            };
-                        }
-                        var args = {
-                            data: inputs,
-                            headers: {
-                                "Content-Type": "application/json"
-                            }
-                        };
-                        client.post(epurl + "login/loadUserInfo_Nineteen68", args,
-                            function (pluginResult, response) {
-                            if (response.statusCode != 200 || pluginResult.rows == "fail") {
-                                console.log("Error occured in loadUserInfo_Nineteen68 : Fail");
-                                res.send("fail");
-                            } else {
-                                try {
-                                    if (pluginResult.rows.length > 0) {
-                                        var objKeys = Object.keys(pluginResult.rows[0]);
-                                        var pluginsArr = [];
-                                        var count = 0;
-                                        for (var k in pluginResult.rows[0]) {
-                                            // if(count < pluginResult.columns.length){
-                                            if (k != 'roleid' && k != 'permissionid') {
-                                                pluginsArr.push({
-                                                    "keyName": k,
-                                                    "keyValue": (pluginResult.rows[0])[k]
-                                                });
-                                            }
-                                            //     count++;
-                                            // }
-                                        }
-                                        //userpermissiondetails.push(pluginResult.rows[0]);
-                                        jsonService.plugindetails = pluginsArr;
-                                    } else {
-                                        console.log("No Records Found");
-                                        res.send("fail");
-                                    }
-                                } catch (exception) {
-                                    console.log(exception);
-                                    res.send("fail");
-                                }
-                            }
-                            callback();
-                        });
-                    } catch (exception) {
-                        console.log(exception);
-                        res.send("fail");
-                    }
-                }
-            }, function (err, data) {
-                if (err) {
-                    res.send("fail");
-                } else {
-                    res.send(jsonService);
-                }
-            });
-        } else {
-            res.send("Invalid Session");
-        }
-    } catch (exception) {
-        console.log(exception);
-        res.send("fail");
-    }
+	try {
+		if (req.cookies['connect.sid'] != undefined) {
+			var sessionCookie = req.cookies['connect.sid'].split(".");
+			var sessionToken = sessionCookie[0].split(":");
+			sessionToken = sessionToken[1];
+		}
+		if (sessionToken != undefined && req.session.id == sessionToken) {
+			var flag = req.body.flag;
+			var switchedRole = req.body.selRole;
+			userName = req.body.username.toLowerCase();
+			jsonService = {};
+			userpermissiondetails = [];
+			async.series({
+				userInfo: function (callback) {
+					try {
+						var inputs = {
+							"username": userName.toLowerCase(),
+							"query": "userInfo"
+						};
+						var args = {
+							data: inputs,
+							headers: {
+								"Content-Type": "application/json"
+							}
+						};
+						client.post(epurl + "login/loadUserInfo_Nineteen68", args,
+							function (userResult, response) {
+							if (response.statusCode != 200 || userResult.rows == "fail") {
+								var flag = "fail";
+								console.log("Failed to get user details from users.");
+								res.send(flag);
+							} else {
+								try {
+									if (userResult.rows.length > 0) {
+										AlljsonServices = [];
+										service = userResult.rows[0];
+										userId = service.userid;
+										jsonService.user_id = userId;
+										jsonService.email_id = service.emailid;
+										jsonService.additionalrole = service.additionalroles;
+										jsonService.firstname = service.firstname;
+										jsonService.lastname = service.lastname;
+										jsonService.role = service.defaultrole;
+										jsonService.username = service.username.toLowerCase();
+										req.session.defaultRoleId = jsonService.role;
+									} else {
+										console.log("No records found.");
+										res.send("fail");
+									}
+								} catch (exception) {
+									console.log(exception);
+									res.send("fail");
+								}
+							}
+							callback();
+						});
+					} catch (exception) {
+						console.log(exception);
+						res.send("fail");
+					}
+				},
+				loggedinRole: function (callback) {
+					var inputs;
+					if (flag == true) {
+						inputs = {
+							"roleid": req.body.selRole,
+							"query": "loggedinRole"
+						};
+					}
+					if (flag == false || flag == undefined) {
+						inputs = {
+							"roleid": req.session.defaultRoleId,
+							"query": "loggedinRole"
+						};
+					}
+					var args = {
+						data: inputs,
+						headers: {
+							"Content-Type": "application/json"
+						}
+					};
+					client.post(epurl + "login/loadUserInfo_Nineteen68", args,
+						function (rolesResult, response) {
+						if (response.statusCode != 200 || rolesResult.rows == "fail") {
+							console.log("Error occured in getRoleNameByRoleId_Nineteen68 : Fail");
+							res.send("fail");
+						} else {
+							try {
+								if (rolesResult.rows.length == 0) {
+									console.log("No Records Found");
+									res.send("fail");
+								} else {
+									try {
+										var role = "";
+										for (var i = 0; i < rolesResult.rows.length; i++) {
+											role = rolesResult.rows[i].rolename;
+										}
+										req.session.defaultRole = role;
+									} catch (exception) {
+										console.log(exception);
+										res.send("fail");
+									}
+								}
+								callback();
+							} catch (exception) {
+								console.log(exception);
+								res.send("fail");
+							}
+						}
+					});
+				},
+				//Service call to get the plugins accessible for the user
+				userPlugins: function (callback) {
+					try {
+						var inputs;
+						if (flag == true) {
+							inputs = {
+								"roleid": req.body.selRole,
+								"query": "userPlugins"
+							};
+						}
+						if (flag == false || flag == undefined) {
+							inputs = {
+								"roleid": req.session.defaultRoleId,
+								"query": "userPlugins"
+							};
+						}
+						var args = {
+							data: inputs,
+							headers: {
+								"Content-Type": "application/json"
+							}
+						};
+						client.post(epurl + "login/loadUserInfo_Nineteen68", args,
+							function (pluginResult, response) {
+							if (response.statusCode != 200 || pluginResult.rows == "fail") {
+								console.log("Error occured in loadUserInfo_Nineteen68 : Fail");
+								res.send("fail");
+							} else {
+								try {
+									if (pluginResult.rows.length > 0) {
+										var objKeys = Object.keys(pluginResult.rows[0]);
+										var pluginsArr = [];
+										var count = 0;
+										for (var k in pluginResult.rows[0]) {
+											// if(count < pluginResult.columns.length){
+											if (k != 'roleid' && k != 'permissionid') {
+												pluginsArr.push({
+													"keyName": k,
+													"keyValue": (pluginResult.rows[0])[k]
+												});
+											}
+											//     count++;
+											// }
+										}
+										//userpermissiondetails.push(pluginResult.rows[0]);
+										jsonService.plugindetails = pluginsArr;
+									} else {
+										console.log("No Records Found");
+										res.send("fail");
+									}
+								} catch (exception) {
+									console.log(exception);
+									res.send("fail");
+								}
+							}
+							callback();
+						});
+					} catch (exception) {
+						console.log(exception);
+						res.send("fail");
+					}
+				}
+			}, function (err, data) {
+				if (err) {
+					res.send("fail");
+				} else {
+					res.send(jsonService);
+				}
+			});
+		} else {
+			res.send("Invalid Session");
+		}
+	} catch (exception) {
+		console.log(exception);
+		res.send("fail");
+	}
 };
 
 //Get UserRoles By RoleId - Nineteen68
 exports.getRoleNameByRoleId_Nineteen68 = function (req, res) {
-    try {
-        if (req.cookies['connect.sid'] != undefined) {
-            var sessionCookie = req.cookies['connect.sid'].split(".");
-            var sessionToken = sessionCookie[0].split(":");
-            sessionToken = sessionToken[1];
-        }
-        if (sessionToken != undefined && req.session.id == sessionToken) {
-            var roleId = [];
-            roleId = req.body.role;
-            var role = [];
-            //var role = roleId[0];
-            var flag = "";
-            async.forEachSeries(roleId, function (roleid, callback) {
-                var inputs = {
-                    "roleid": roleid
-                };
-                var args = {
-                    data: inputs,
-                    headers: {
-                        "Content-Type": "application/json"
-                    }
-                };
-                client.post(epurl + "login/getRoleNameByRoleId_Nineteen68", args,
-                    function (rolesResult, response) {
-                    if (response.statusCode != 200 || rolesResult.rows == "fail") {
-                        console.log("Error occured in getRoleNameByRoleId_Nineteen68 : Fail");
-                        res.send("fail");
-                    } else {
-                        try {
-                            if (rolesResult.rows.length == 0) {
-                                console.log("No Records Found");
-                                res.send("fail");
-                            } else {
-                                try {
-                                    //var role="";
-                                    for (var i = 0; i < rolesResult.rows.length; i++) {
-                                        role.push(rolesResult.rows[i].rolename);
-                                    }
-                                    // res.send(role);
-                                } catch (exception) {
-                                    console.log(exception);
-                                    res.send("fail");
-                                }
-                                callback();
-                            }
-                        } catch (exception) {
-                            console.log(exception);
-                            res.send("fail");
-                        }
-                    }
-                    // callback();
-                });
-            }, function () {
-                if (role == undefined) {
-                    res.send("fail");
-                } else {
-                    res.send(role);
-                }
-            });
-        } else {
-            res.send("Invalid Session");
-        }
-    } catch (exception) {
-        console.log(exception);
-        res.send("fail");
-    }
+	try {
+		if (req.cookies['connect.sid'] != undefined) {
+			var sessionCookie = req.cookies['connect.sid'].split(".");
+			var sessionToken = sessionCookie[0].split(":");
+			sessionToken = sessionToken[1];
+		}
+		if (sessionToken != undefined && req.session.id == sessionToken) {
+			var roleId = [];
+			roleId = req.body.role;
+			var role = [];
+			//var role = roleId[0];
+			var flag = "";
+			async.forEachSeries(roleId, function (roleid, callback) {
+				var inputs = {
+					"roleid": roleid
+				};
+				var args = {
+					data: inputs,
+					headers: {
+						"Content-Type": "application/json"
+					}
+				};
+				client.post(epurl + "login/getRoleNameByRoleId_Nineteen68", args,
+					function (rolesResult, response) {
+					if (response.statusCode != 200 || rolesResult.rows == "fail") {
+						console.log("Error occured in getRoleNameByRoleId_Nineteen68 : Fail");
+						res.send("fail");
+					} else {
+						try {
+							if (rolesResult.rows.length == 0) {
+								console.log("No Records Found");
+								res.send("fail");
+							} else {
+								try {
+									//var role="";
+									for (var i = 0; i < rolesResult.rows.length; i++) {
+										role.push(rolesResult.rows[i].rolename);
+									}
+									// res.send(role);
+								} catch (exception) {
+									console.log(exception);
+									res.send("fail");
+								}
+								callback();
+							}
+						} catch (exception) {
+							console.log(exception);
+							res.send("fail");
+						}
+					}
+					// callback();
+				});
+			}, function () {
+				if (role == undefined) {
+					res.send("fail");
+				} else {
+					res.send(role);
+				}
+			});
+		} else {
+			res.send("Invalid Session");
+		}
+	} catch (exception) {
+		console.log(exception);
+		res.send("fail");
+	}
 };
 
 /**
@@ -725,21 +760,21 @@ exports.getRoleNameByRoleId_Nineteen68 = function (req, res) {
  * @see function to logout in Nineteen68 from jenkins
  */
 exports.logoutUser_Nineteen68_CI = function (req, res) {
-    if (req.sessionStore.sessions != undefined) {
-        session_list = req.sessionStore.sessions;
-        if (Object.keys(session_list).length != 0) {
-            req.sessionStore.clear();
-            res.send('Logout successful');
-        } else {
-            res.send('Session Expired');
-        }
-    }
+	if (req.sessionStore.sessions != undefined) {
+		session_list = req.sessionStore.sessions;
+		if (Object.keys(session_list).length != 0) {
+			req.sessionStore.clear();
+			res.send('Logout successful');
+		} else {
+			res.send('Session Expired');
+		}
+	}
 };
 
 exports.logoutUser_Nineteen68 = function (req, res) {
-    req.cookies['connect.sid'] = '';
-    req.session.destroy();
-    if (req.session == undefined) {
-        res.send('Session Expired');
-    }
+	req.cookies['connect.sid'] = '';
+	req.session.destroy();
+	if (req.session == undefined) {
+		res.send('Session Expired');
+	}
 };
