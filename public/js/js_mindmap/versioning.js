@@ -19,6 +19,7 @@ function replicationHandler() {
         if (status) { console.log('err'); unblockUI(); }
         else {
           parse_data = JSON.parse(data);
+          var flag=0;
           //alert(assignedUser);
           $('.versioningOption').remove()
           // var listSourceVersions = $('.version-list').children();
@@ -27,20 +28,24 @@ function replicationHandler() {
           // }
           var parsed_project_id = [];
           for (var i = 0; i < parse_data[0].data.length; i++) {
-            parsed_project_id.push(parse_data[0].data[i].row[0])
+            parsed_project_id.push(parse_data[0].data[i].row[0])  
           }
-          var flag=0;
-          for (var i = 0; i < result1['projectName'].length; i++) {
-            if (parsed_project_id.indexOf(result1['projectId'][i]) != -1) {
-              console.log('Available in Neo4j')
-            } else {
-              flag=1;
-              $('#destProjects').append($('<option>').attr({ value: result1['projectId'][i], class: 'versioningOption' }).text(result1['projectName'][i]));
-            }
+          if(parsed_project_id.indexOf($('.project-list').val())!=-1){
+              for (var i = 0; i < result1['projectName'].length; i++) {
+                if (parsed_project_id.indexOf(result1['projectId'][i]) != -1) {
+                  console.log('Available in Neo4j')
+                } else {
+                  flag=1;
+                  $('#destProjects').append($('<option>').attr({ value: result1['projectId'][i], class: 'versioningOption' }).text(result1['projectName'][i]));
+                }
+              }
+              $('#ProjectReplicationPopUp').modal("show");
+              if(!flag)
+                $('#replicateVersionButton').addClass('disableButton');
           }
-          $('#ProjectReplicationPopUp').modal("show");
-          if(!flag)
-            $('#replicateVersionButton').addClass('disableButton');
+          else{
+            openDialogMindmap('Mindmap', "Project is Empty.")
+          }
           unblockUI();
         }
       });
