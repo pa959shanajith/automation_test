@@ -72,7 +72,7 @@ function replicate_project(from_v, to_v, pid) {
       unblockUI();  //callback(null, err);   unblockUI(); 
     }
     else {
-      openDialogMindmap('Mindmap', "Project Replicated Sucessfully.")
+      openDialogMindmap('Mindmap', "Project Replicated Successfully.")
       unblockUI();
     }
   });
@@ -213,7 +213,10 @@ function createNewTab(from_v, to_v) {
       value: to_v
     }).text(to_v))
     unblockUI();
-    openDialogMindmap('Mindmap', "New Version Created Sucessfully.");
+    $('.version-list').val(to_v);
+    loadModules();
+    openDialogMindmap('Mindmap', "New Version Created Successfully.");
+
     //versionInputDialogClose()
   });
 
