@@ -206,6 +206,7 @@ exports.createStructure_Nineteen68 = function (req, res) {
 	var createdthrough = 'Mindmaps Creation';
 	var RequestedJSON = req;
 	var projectid = RequestedJSON.projectId;
+	var oldprojectid = RequestedJSON.oldprojectId;
 	var cycleId = RequestedJSON.cycleId;
 	var releaseId = RequestedJSON.releaseId;
 	var appType = RequestedJSON.appType;
@@ -220,6 +221,7 @@ exports.createStructure_Nineteen68 = function (req, res) {
 	var suitedetailslist = [];
 	var versionnumber = 0;
 	var newversionnumber = 0;
+	var cloneflag = RequestedJSON.action;
 	var suiteflag = false;
 	qList=[]; //For neurongraphs
 	async.series({
@@ -272,9 +274,10 @@ exports.createStructure_Nineteen68 = function (req, res) {
 					'skucodemodule': 'skucodemodule',
 					'tags': 'tags'
 				};
-				if (versionnumber!=newversionnumber) {
+				if (cloneflag) {
 					inputs.subquery='clonenode';
 					inputs.oldversionnumber=versionnumber;
+					inputs.oldprojectid=oldprojectid;
 				}
 				var args = {
 					data: inputs,
@@ -343,9 +346,10 @@ exports.createStructure_Nineteen68 = function (req, res) {
 									'skucodetestscenario': 'skucodetestscenario',
 									'tags': 'tags'
 								};
-								if (versionnumber!=newversionnumber) {
+								if (cloneflag) {
 									inputs.subquery='clonenode';
 									inputs.oldversionnumber=versionnumber;
+									inputs.oldprojectid=oldprojectid;
 								}
 								var args = {
 									data: inputs,
@@ -427,9 +431,10 @@ exports.createStructure_Nineteen68 = function (req, res) {
 													'skucodescreen': 'skucodescreen',
 													'tags': 'tags'
 												};
-												if (versionnumber!=newversionnumber) {
+												if (cloneflag) {
 													inputs.subquery='clonenode';
 													inputs.oldversionnumber=versionnumber;
+													inputs.oldprojectid=oldprojectid;
 												}
 												var args = {
 													data: inputs,
@@ -504,7 +509,7 @@ exports.createStructure_Nineteen68 = function (req, res) {
 																	'skucodetestcase': 'skucodetestcase',
 																	'tags': 'tags'
 																};
-																if (versionnumber!=newversionnumber) {
+																if (cloneflag) {
 																	inputs.subquery='clonenode';
 																	inputs.oldscreenid=screenID_c_neo;
 																	inputs.oldversionnumber=versionnumber;
