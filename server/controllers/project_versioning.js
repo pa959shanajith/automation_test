@@ -300,10 +300,10 @@ exports.versioning = function (req, res, next) {
 					}
 				});
 				if (tab != 'end_to_end') {
-					qList.push({ "statement": "MATCH (a:MODULES),(b:TESTSCENARIOS) WHERE '"+moduleID+"'=b.moduleID MERGE (a)-[r:FMTTS {id:b.moduleID}]-(b)" });
+					qList.push({ "statement": "MATCH (a:MODULES),(b:TESTSCENARIOS) WHERE a.moduleID=b.moduleID MERGE (a)-[r:FMTTS {id:b.moduleID}]-(b)" });
 					qList.push({ "statement": "MATCH (a:TESTSCENARIOS),(b:SCREENS) WHERE a.testScenarioID=b.testScenarioID MERGE (a)-[r:FTSTS {id:b.testScenarioID}]-(b)" });
 					qList.push({ "statement": "MATCH (a:SCREENS),(b:TESTCASES) WHERE a.screenID=b.screenID and a.uid=b.uid MERGE (a)-[r:FSTTS {id:b.screenID}]-(b)" });
-					qList.push({ "statement": "MATCH (a:MODULES),(b:TASKS) WHERE '"+moduleID+"'=b.nodeID MERGE (a)-[r:FNTT {id:b.nodeID}]-(b)" });
+					qList.push({ "statement": "MATCH (a:MODULES),(b:TASKS) WHERE a.moduleID=b.nodeID MERGE (a)-[r:FNTT {id:b.nodeID}]-(b)" });
 					qList.push({ "statement": "MATCH (a:TESTSCENARIOS),(b:TASKS) WHERE a.testScenarioID=b.nodeID MERGE (a)-[r:FNTT {id:b.nodeID}]-(b)" });
 					qList.push({ "statement": "MATCH (a:SCREENS),(b:TASKS) WHERE a.screenID=b.nodeID and a.uid=b.uid MERGE (a)-[r:FNTT {id:b.nodeID}]-(b)" });
 					qList.push({ "statement": "MATCH (a:TESTCASES),(b:TASKS) WHERE a.testCaseID=b.nodeID and a.uid=b.uid MERGE (a)-[r:FNTT {id:b.nodeID}]-(b)" });
@@ -561,7 +561,7 @@ exports.versioning = function (req, res, next) {
 						res.setHeader('Content-Type', 'application/json');
 						if (status != 200) res.status(status).send(result);
 						else {
-							var qObj = { "projectId": prjId, "testsuiteDetails": [], userRole: userRole, from_version: parseFloat(vn_from), new_version: vn_to };
+							var qObj = { "projectId": prjId,"oldprojectId":tmpprjId,"action":true, "testsuiteDetails": [], userRole: userRole, from_version: parseFloat(vn_from), new_version: vn_to };
 							qObj.userName = d.user_name;
 
 							async.forEachSeries(rIndexList, function (rIndex, maincallback) {
