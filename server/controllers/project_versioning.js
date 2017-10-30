@@ -70,6 +70,7 @@ exports.versioning = function (req, res, next) {
 							list.push(d.row[0])
 						})
 						//jsonData=JSON.stringify(list);
+						list.sort(function (a, b) { return (a > b) ? 1 : ((b > a) ? -1 : 0); });
 						res.status(status).send(list);
 					}
 					//res.setHeader('Content-Type', 'application/json');
@@ -180,13 +181,14 @@ exports.versioning = function (req, res, next) {
 				removeTask.forEach(function (t, i) {
 					qList.push({ "statement": "MATCH (N) WHERE ID(N)=" + t + " MATCH (N)-[r:FNTT]-(b) DETACH DELETE b" });
 				});
-
+				var moduleID=null;
 				data.forEach(function (e, i) {
 					idDict[e.id] = (e.id_n) ? e.id_n : uuidV4();
 					e.id = idDict[e.id];
 					t = e.task;
 					var taskstatus = 'inprogress';
 					if (e.type == 'modules') {
+						moduleID=e.id;
 						if (e.oid != null) {
 							//Added new queries to allow saving of incomplete structure
 							//qList.push({"statement":"MATCH (n)-[r:FMTTS{id:'"+e.id+"'}]->(o:TESTSCENARIOS)-[s]->(p:SCREENS)-[t]->(q:TESTCASES) DETACH DELETE r,s,t,o,p,q"});
@@ -266,6 +268,7 @@ exports.versioning = function (req, res, next) {
 					else if (e.type == 'testcases') {
 						var screen_data = '';
 						var screenid_c = 'null';
+
 						if (e.renamed && e.id_n && e.orig_name) {
 							rnmList.push({ "statement": "MATCH(n:TESTCASES{testCaseName:'" + e.orig_name + "',testScenarioID:'" + lts + "',screenID_c:'" + e.pid_c + "'}) SET n.testCaseName='" + e.name + "'" });
 						}
@@ -297,10 +300,10 @@ exports.versioning = function (req, res, next) {
 					}
 				});
 				if (tab != 'end_to_end') {
-					qList.push({ "statement": "MATCH (a:MODULES),(b:TESTSCENARIOS) WHERE a.moduleID=b.moduleID MERGE (a)-[r:FMTTS {id:b.moduleID}]-(b)" });
+					qList.push({ "statement": "MATCH (a:MODULES),(b:TESTSCENARIOS) WHERE '"+moduleID+"'=b.moduleID MERGE (a)-[r:FMTTS {id:b.moduleID}]-(b)" });
 					qList.push({ "statement": "MATCH (a:TESTSCENARIOS),(b:SCREENS) WHERE a.testScenarioID=b.testScenarioID MERGE (a)-[r:FTSTS {id:b.testScenarioID}]-(b)" });
 					qList.push({ "statement": "MATCH (a:SCREENS),(b:TESTCASES) WHERE a.screenID=b.screenID and a.uid=b.uid MERGE (a)-[r:FSTTS {id:b.screenID}]-(b)" });
-					qList.push({ "statement": "MATCH (a:MODULES),(b:TASKS) WHERE a.moduleID=b.nodeID MERGE (a)-[r:FNTT {id:b.nodeID}]-(b)" });
+					qList.push({ "statement": "MATCH (a:MODULES),(b:TASKS) WHERE '"+moduleID+"'=b.nodeID MERGE (a)-[r:FNTT {id:b.nodeID}]-(b)" });
 					qList.push({ "statement": "MATCH (a:TESTSCENARIOS),(b:TASKS) WHERE a.testScenarioID=b.nodeID MERGE (a)-[r:FNTT {id:b.nodeID}]-(b)" });
 					qList.push({ "statement": "MATCH (a:SCREENS),(b:TASKS) WHERE a.screenID=b.nodeID and a.uid=b.uid MERGE (a)-[r:FNTT {id:b.nodeID}]-(b)" });
 					qList.push({ "statement": "MATCH (a:TESTCASES),(b:TASKS) WHERE a.testCaseID=b.nodeID and a.uid=b.uid MERGE (a)-[r:FNTT {id:b.nodeID}]-(b)" });
