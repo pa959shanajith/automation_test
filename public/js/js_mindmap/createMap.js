@@ -1563,6 +1563,7 @@ var actionEvent = function(e){
 		s.classed('no-access',!1);
 		if(err){
 			console.log(result);
+			$('#ct-createAction').addClass('disableButton')
 			if(result.indexOf('Schema.ConstraintValidationFailed')>-1){
 				openDialogMindmap('Save error','Module names cannot be duplicate');
 			}

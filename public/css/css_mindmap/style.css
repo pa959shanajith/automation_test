@@ -574,8 +574,9 @@ select
 
 .searchModuleimg-assign, .searchModuleimg-create{
 	position: absolute;
-    margin-left: 46.4%;
+    margin-left: 47.20%;
     top: 3px;
+    background-color: white;
     border-left: 1px solid #ccc;
     padding-left: 3px;
 }

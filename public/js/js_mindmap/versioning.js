@@ -20,7 +20,7 @@ function replicationHandler() {
         else {
           parse_data = JSON.parse(data);
           //alert(assignedUser);
-          $('.test').remove()
+          $('.versioningOption').remove()
           // var listSourceVersions = $('.version-list').children();
           // for (var i = 0; i < listSourceVersions.length; i++) {
           //   $('#sourceVersions').append($('<option>').attr({ value: listSourceVersions[i].value, class: 'test' }).text(listSourceVersions[i].value));
@@ -29,14 +29,18 @@ function replicationHandler() {
           for (var i = 0; i < parse_data[0].data.length; i++) {
             parsed_project_id.push(parse_data[0].data[i].row[0])
           }
+          var flag=0;
           for (var i = 0; i < result1['projectName'].length; i++) {
             if (parsed_project_id.indexOf(result1['projectId'][i]) != -1) {
               console.log('Available in Neo4j')
             } else {
-              $('#destProjects').append($('<option>').attr({ value: result1['projectId'][i], class: 'test' }).text(result1['projectName'][i]));
+              flag=1;
+              $('#destProjects').append($('<option>').attr({ value: result1['projectId'][i], class: 'versioningOption' }).text(result1['projectName'][i]));
             }
           }
           $('#ProjectReplicationPopUp').modal("show");
+          if(!flag)
+            $('#replicateVersionButton').addClass('disableButton');
           unblockUI();
         }
       });
@@ -112,11 +116,11 @@ function addVersioning(versions) {
       onchange: 'loadModules()'
     })).append($('<i>').attr({
       class: 'fa fa-plus-circle fa-lg plus-icon',
-      title:"Create New Version",
+      title: "Create New Version",
       onclick: "versionInputDialogShow(event)"
     })).append($('<i>').attr({
       class: 'fa fa-window-restore fa-lg plus-icon',
-      title:"Replicate project",
+      title: "Replicate project",
       onclick: 'replicationHandler()'
     })
     ))
@@ -137,7 +141,7 @@ function addVersioning(versions) {
   $('.selectProject').addClass('selectProjectPosition')
   if (window.localStorage['tabMindMap'] == "tabAssign") {
     $('.plus-icon').remove();
-    $('.selectVersion').css('margin-left','2%');    
+    $('.selectVersion').css('margin-left', '2%');
   }
 }
 
@@ -268,6 +272,7 @@ function versionInputDialogShow() {
   Purpose : This function verifies the given verison number is valid to create as a new version
   param : version : version number to verify
 */
+
 function isValidVersionToCreate(version) {
 
   return version > getMaxVersion();
@@ -289,6 +294,13 @@ function getMaxVersion() {
   maxVersionNumber = parseFloat(maxVersionTab);
   return maxVersionNumber;
 }
+
+/* 
+  function : getallVersion()
+  Purpose : This function returns the all version number present in the UI
+  param : None
+*/
+
 function getAllVersionsUI() {
   ret = [];
   options = $('.version-list').children();
@@ -306,6 +318,7 @@ Purpose : This function calls isValidVersionToCreate to verify the version numbe
 provided by the user in the dialog box and calls createNewTab to create new version in the database
 param : from_v : source version
 */
+
 function createNewVersion(from_v) {
   console.log(from_v);
   inputVersion = parseFloat($('#versionNumberInput').val());

@@ -641,7 +641,7 @@ exports.versioning = function (req, res, next) {
 		}
 		else if (d.task == 'listOfProjectsNeo4j') {
 			var qList = []
-			qList.push({ "statement": "MATCH (n:VERSION) return distinct n.projectID" });
+			qList.push({ "statement": "MATCH (n:MODULES) return distinct n.projectID" });
 			neo4jAPI.executeQueries(qList, function (status, result) {
 				res.setHeader('Content-Type', 'application/json');
 				if (status != 200) res.status(status).send(result);
