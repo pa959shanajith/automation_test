@@ -24,8 +24,10 @@ exports.getCrawlResults = function(req, res){
                   {
                     validate_url = true;
                   }
-                  check_level = validator.isNumeric(req.body.level);
-                  if(check_level == true)
+				  console.log(typeof(req.body.level));
+                  check_level = validator.isEmpty(req.body.level.toString());
+				  
+                  if(check_level == false)
                   {
                     validate_level = true;
                   }
