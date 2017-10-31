@@ -206,6 +206,7 @@ exports.createStructure_Nineteen68 = function (req, res) {
 	var createdthrough = 'Mindmaps Creation';
 	var RequestedJSON = req;
 	var projectid = RequestedJSON.projectId;
+	var oldprojectid = RequestedJSON.oldprojectId;
 	var cycleId = RequestedJSON.cycleId;
 	var releaseId = RequestedJSON.releaseId;
 	var appType = RequestedJSON.appType;
@@ -220,6 +221,7 @@ exports.createStructure_Nineteen68 = function (req, res) {
 	var suitedetailslist = [];
 	var versionnumber = 0;
 	var newversionnumber = 0;
+	var cloneflag = RequestedJSON.action;
 	var suiteflag = false;
 	qList=[]; //For neurongraphs
 	async.series({
@@ -272,9 +274,10 @@ exports.createStructure_Nineteen68 = function (req, res) {
 					'skucodemodule': 'skucodemodule',
 					'tags': 'tags'
 				};
-				if (versionnumber!=newversionnumber) {
+				if (cloneflag) {
 					inputs.subquery='clonenode';
 					inputs.oldversionnumber=versionnumber;
+					inputs.oldprojectid=oldprojectid;
 				}
 				var args = {
 					data: inputs,
@@ -343,9 +346,10 @@ exports.createStructure_Nineteen68 = function (req, res) {
 									'skucodetestscenario': 'skucodetestscenario',
 									'tags': 'tags'
 								};
-								if (versionnumber!=newversionnumber) {
+								if (cloneflag) {
 									inputs.subquery='clonenode';
 									inputs.oldversionnumber=versionnumber;
+									inputs.oldprojectid=oldprojectid;
 								}
 								var args = {
 									data: inputs,
@@ -427,9 +431,10 @@ exports.createStructure_Nineteen68 = function (req, res) {
 													'skucodescreen': 'skucodescreen',
 													'tags': 'tags'
 												};
-												if (versionnumber!=newversionnumber) {
+												if (cloneflag) {
 													inputs.subquery='clonenode';
 													inputs.oldversionnumber=versionnumber;
+													inputs.oldprojectid=oldprojectid;
 												}
 												var args = {
 													data: inputs,
@@ -504,7 +509,7 @@ exports.createStructure_Nineteen68 = function (req, res) {
 																	'skucodetestcase': 'skucodetestcase',
 																	'tags': 'tags'
 																};
-																if (versionnumber!=newversionnumber) {
+																if (cloneflag) {
 																	inputs.subquery='clonenode';
 																	inputs.oldscreenid=screenID_c_neo;
 																	inputs.oldversionnumber=versionnumber;
@@ -1535,75 +1540,38 @@ exports.getCycleIDs_Ninteen68 = function (req, res) {
 };
 
 exports.getProjectIDs_Nineteen68 = function (req, res) {
-	var project_names = [];
-	var project_ids = [];
-	var app_types = [];
 	var projectdetails = {
 		projectId: [],
 		projectName: [],
 		appType: []
 	};
 	var user_id = req.userid;
-	var inputs1 = {
+	var allflag = req.allflag;
+	if (allflag) allflag = "allflag";
+	else allflag = "emptyflag";
+	var inputs = {
 		"userid": user_id,
-		"query": "getprojids"
+		"query": allflag
 	};
-	args1 = {
-		data: inputs1,
+	args = {
+		data: inputs,
 		headers: {
 			"Content-Type": "application/json"
 		}
 	};
 	async.series({
 		function (callback) {
-			client.post("http://127.0.0.1:1990/create_ice/getProjectIDs_Nineteen68", args1,
+			client.post("http://127.0.0.1:1990/create_ice/getProjectIDs_Nineteen68", args,
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
 					res(null, result.rows);
 				} else {
-					var res_projectid = [];
-					if (result.rows[0] != null || result.rows[0] != undefined) {
-						res_projectid = result.rows[0].projectids;
-					}
-					async.forEachSeries(res_projectid, function (iterator, callback1) {
-						inputs2 = {
-							"projectid": iterator,
-							"query": "getprojectname"
-						};
-						args2 = {
-							data: inputs2,
-							headers: {
-								"Content-Type": "application/json"
-							}
-						};
-						client.post("http://127.0.0.1:1990/create_ice/getProjectIDs_Nineteen68", args2,
-							function (projectnamedata, response) {
-							try {
-								if (response.statusCode != 200 || projectnamedata.rows == "fail") {
-									res(null, projectnamedata.rows);
-								} else {
-									if (projectnamedata.rows[0] != undefined) {
-										project_names.push(projectnamedata.rows[0].projectname);
-										app_types.push(projectnamedata.rows[0].projecttypeid);
-										project_ids.push(iterator);
-									} else {
-										console.log('projectnamedata is Undefined');
-									}
-								}
-								projectdetails.projectId = project_ids;
-								projectdetails.projectName = project_names;
-								projectdetails.appType = app_types;
-								callback1();
-							} catch (ex) {
-								console.log(ex);
-							}
-						});
-					}, callback);
+					projectdetails=result.rows;
+					callback();
 				}
 			});
 		}
 	}, function (err, results) {
-		//console.log(projectdetails);
 		try {
 			res(null, projectdetails);
 		} catch (ex) {
@@ -1816,62 +1784,6 @@ exports.createE2E_Structure_Nineteen68 = function (req, res) {
 				"testsuiteDetails": suitedetailslist
 			};
 			res(null,returnJsonmindmap);
-		}
-	});
-};
-
-exports.getEmptyProjects_ICE = function (req, res) {
-	var projectdetails = {
-		projectId: [],
-		projectName: [],
-	};
-	var user_id = req.userid;
-	var inputs1 = {
-		"userid": user_id,
-		"query": "getprojids"
-	};
-	args1 = {
-		data: inputs1,
-		headers: {
-			"Content-Type": "application/json"
-		}
-	};
-	async.series({
-		function (callback) {
-			client.post("http://127.0.0.1:1990/create_ice/getProjectIDs_Nineteen68", args1,
-				function (result, response) {
-				if (response.statusCode != 200 || result.rows == "fail") {
-					res(null, result.rows);
-				} else if (result.rows[0] == null || result.rows[0].projectids==null) {
-					res(null, "fail");
-				} else {
-					var res_projectid = result.rows[0].projectids;
-					inputs2 = {
-						"projectids": res_projectid,
-					};
-					args2 = {
-						data: inputs2,
-						headers: {
-							"Content-Type": "application/json"
-						}
-					};
-					client.post("http://127.0.0.1:1990/create_ice/getEmptyProjects_ICE", args2,
-						function (emptyProjectData, response) {
-						if (response.statusCode != 200 || emptyProjectData.rows == "fail") {
-							res(null, emptyProjectData.rows);
-						} else {
-							projectdetails=emptyProjectData.rows;
-							callback();
-						}
-					});
-				}
-			});
-		}
-	}, function (err, results) {
-		try {
-			res(null, projectdetails);
-		} catch (ex) {
-			console.log(ex);
 		}
 	});
 };

@@ -569,11 +569,12 @@ exports.mindmapService = function(req, res) {
 			});
 			
 		}else if(d.task=='populateProjects'){
-
 			var datatosend ='';
-			var user_id={userid : ''};
-			user_id.userid = d.user_id;
-			create_ice.getProjectIDs_Nineteen68(user_id,function(err,data){
+			var reqData={
+				"userid": d.user_id,
+				"allflag": true
+			};
+			create_ice.getProjectIDs_Nineteen68(reqData,function(err,data){
 				res.setHeader('Content-Type', 'application/json');
 				if(err)
 				res.status(500).send(err)
