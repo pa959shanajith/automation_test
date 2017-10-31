@@ -3,8 +3,9 @@ mySPA.factory('PluginService', ['$http','$q', function ($http, $httpProvider, $q
         getProjectIDs_Nineteen68: function(userid){
     		var param = "getProjectIDs_Nineteen68";
 	        return $http.post('/getProjectIDs_Nineteen68', {
-	        		action: param,
-              userid : userid, 
+	        	action: param,
+				userid : userid,
+				allflag : true
 	        })
 			.then (function(response)	{return response.data;	},
 			function(response){	return $q.reject(response.data);});	
