@@ -869,7 +869,9 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
     jsonStruct = {0 : 'level', 1 : 'name' , 2 : 'parent' , 3 : 'redirected' , 4 : 'status' , 5  :'title'};
     for(i=0; i<$scope.crawledLinks.length; i++){
         var newRow = document.createElement('tr');
-        
+		
+        if($scope.crawledLinks[i]['type'] == "duplicate")
+          continue;
         //create SNo text node
         var sNo = document.createElement('td');
         sNo.setAttribute('style', 'width: 55px');
