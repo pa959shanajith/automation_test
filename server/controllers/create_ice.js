@@ -452,9 +452,9 @@ exports.createStructure_Nineteen68 = function (req, res) {
 													} else {
                                                         //Execute neo4j query!!
                                                         if(screen_query=='notflagscreen'){
-                                                            qList.push({"statement":"MERGE (n:SCREENS_NG {projectid:'"+projectid+"',screenname:'"+screenName+"',screenid:'"+screenId+"',versionnumber:'1'}) SET n.deleted='false' return n"})
+                                                            qList.push({"statement":"MERGE (n:SCREENS_NG {projectid:'"+projectid+"',screenname:'"+screenName+"',screenid:'"+screenId+"'}) SET n.deleted='false' return n"})
                                                             //relationship
-                                                            qList.push({"statement":"MATCH (a:TESTCASES_NG{screenid:'"+screenId+"'}),(b:SCREENS_NG {projectid:'"+projectid+"',screenname:'"+screenName+"',screenid:'"+screenId+"',versionnumber:'1'}) MERGE (a)-[r:FTCETSCR_NG{id:'"+screenId+"'}]->(b) RETURN a,r,b"})
+                                                            qList.push({"statement":"MATCH (a:TESTCASES_NG{screenid:'"+screenId+"'}),(b:SCREENS_NG {projectid:'"+projectid+"',screenname:'"+screenName+"',screenid:'"+screenId+"'}) MERGE (a)-[r:FTCETSCR_NG{id:'"+screenId+"'}]->(b) RETURN a,r,b"})
                                                             //reqToAPI(qList,urlData);
                                                         }
 														var testcase = screenDetails.testcaseDetails;
@@ -532,7 +532,7 @@ exports.createStructure_Nineteen68 = function (req, res) {
 																		if(testcase_query=='notflagtestcase'){
 																			qList.push({"statement":"MERGE (n:TESTCASES_NG {screenid:'"+screenId+"',testcasename:'"+testcaseName+"',testcaseid:'"+testcaseID+"',versionnumber:'1'}) SET n.deleted='false' return n"});
 																			//Relationship
-																			qList.push({"statement":"MATCH (a:TESTCASES_NG{testcaseid:'"+testcaseID+"'}),(b:SCREENS_NG {screenid:'"+screenId+"',versionnumber:'1'}) MERGE (a)-[r:FTCETSCR_NG{id:'"+screenId+"'}]->(b) RETURN a,r,b"})
+																			qList.push({"statement":"MATCH (a:TESTCASES_NG{testcaseid:'"+testcaseID+"'}),(b:SCREENS_NG {screenid:'"+screenId+"'}) MERGE (a)-[r:FTCETSCR_NG{id:'"+screenId+"'}]->(b) RETURN a,r,b"})
 																			qList.push({"statement":"MATCH (a:TESTSCENARIOS_NG),(b:TESTCASES_NG{testcaseid:'"+testcaseID+"'}) WHERE '"+testcaseID+"' IN a.testcaseids MERGE (a)-[r:FTSCTTCE_NG{id:'"+testcaseID+"'}]->(b)RETURN a,r,b"})
 																		// reqToAPI(qList,urlData);
 																		}
