@@ -6,9 +6,10 @@ var myserver = require('../../server.js');
 var uuid = require('uuid-random');
 var epurl = "http://127.0.0.1:1990/";
 var Client = require("node-rest-client").Client;
+var neo4jAPI = require('../controllers/neo4jAPI');
 var client = new Client();
 var schedule = require('node-schedule');
-var sessionExtend = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes 
+var sessionExtend = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes 
 var sessionTime = 30 * 60 * 1000;
 var updateSessionTimeEvery = 20 * 60 * 1000;
 var scheduleStatus = "";
@@ -20,7 +21,11 @@ var scheduleStatus = "";
  * this reads the scenario information from the testsuites
  * and testsuites table of the icetestautomation keyspace
  */
+
+var qList = [];
+
 exports.readTestSuite_ICE = function (req, res) {
+	qList = [];
 	if (req.cookies['connect.sid'] != undefined) {
 		var sessionCookie = req.cookies['connect.sid'].split(".");
 		var sessionToken = sessionCookie[0].split(":");
@@ -151,6 +156,19 @@ exports.readTestSuite_ICE = function (req, res) {
 					});
 				}
 			});
+		},function(){
+			neo4jAPI.executeQueries(qList,function(status,result){
+				//res.setHeader('Content-Type', 'application/json');
+				if(status!=200){
+					console.log("Status:",status,"\nResponse: ",result);
+					//res.status(status).send(result);
+				}
+				else{
+					console.log('Success');
+					console.log('qList:::',qList);
+					console.log('result:: ',result);
+				}
+			});			
 		});
 	} else {
 		res.send("Invalid Session");
@@ -227,6 +245,7 @@ function Projectnametestcasename_ICE(req, cb, data) {
  * to the testsuites table of icetestautomation keyspace
  */
 exports.updateTestSuite_ICE = function (req, res) {
+    qList = [];	
 	if (req.cookies['connect.sid'] != undefined) {
 		var sessionCookie = req.cookies['connect.sid'].split(".");
 		var sessionToken = sessionCookie[0].split(":");
@@ -300,6 +319,16 @@ exports.updateTestSuite_ICE = function (req, res) {
 						if (response.statusCode != 200 || data.rows == "fail") {
 							console.log(response.statusCode);
 						} else {
+							//Execute neo4j query!!
+							//var qList=[];
+							qList.push({"statement":"MATCH (n:TESTSUITES_NG {cycleid:'"+inputs.cycleid
+									+"',testsuitename:'"+inputs.testsuitename+",'testsuiteid:'"+inputs.testsuiteid
+									+"',versionnumber:["+inputs.versionnumber+"]}) set n.testscenarioids=[], n.donotexecute='null' return n"});
+
+							//Relationships
+							qList.push({"statement":"MATCH (a:TESTSUITES_NG{testsuiteid:'"+inputs.testsuiteid+"',cycleid:'"+inputs.cycleid
+									+"'})-[r]->(b:TESTSCENARIOS_NG) delete r"})
+						
 							flag = "success";
 							deleteSuitecallback(null, flag);
 						}
@@ -334,6 +363,18 @@ exports.updateTestSuite_ICE = function (req, res) {
 							if (response.statusCode != 200 || data.rows == "fail") {
 								console.log(response.statusCode);
 							} else {
+								//Execute neo4j query!!
+								//var qList=[];
+								qList.push({"statement":"MATCH (n:TESTSUITES_NG {cycleid:'"+inputs2.cycleid
+											+"',testsuiteid:'"+inputs2.testsuiteid+"',testsuitename:'"+inputs2.testsuitename
+											+"',versionnumber:["+inputs2.versionnumber+"]}) set n.testscenarioids=n.testscenarioids+["
+											+inputs2.testscenarioids+"], n.donotexecute='"+inputs2.donotexecute+"'"});
+								//Relationship
+								qList.push({"statement":"MATCH (a:TESTSUITES_NG{cycleid:'"+inputs2.cycleid
+									+"',testsuiteid:'"+inputs2.testsuiteid+"',testsuitename:'"+inputs2.testsuitename
+									+"',versionnumber:["+inputs2.versionnumber+"]})),(b:TESTSCENARIOS_NG{testscenarioid:'"+inputs2.testscenarioids+"'}) MERGE (a)-[r:FTSUTTSC_NG{id:'"+inputs2.testscenarioids+"'}]->(b)RETURN a,b,r"})
+
+								//reqToAPI(qList,urlData);								
 								flag = "success";
 								saveSuite(null, flag);
 							}
@@ -501,7 +542,7 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 						req.session.cookie.maxAge = sessionTime;
 					}, updateSessionTimeEvery);
 				mySocket.on('result_executeTestSuite', function (resultData) {
-					//req.session.cookie.expires = new Date(Date.now() + 30 * 60 * 1000); 
+					//req.session.cookie.expires = new Date(Date.now() + 30 * 60 * 1000); 
 					completedSceCount++;
 					clearInterval(updateSessionExpiry);
 					if (resultData != "success" && resultData != "Terminate") {
@@ -1317,9 +1358,25 @@ function TestSuiteDetails_Module_ICE(req, cb1, data) {
 					function (result, response) {
 					if (response.statusCode != 200 || result.rows == "fail") {
 						console.log("Error occured in TestSuiteDetails_Module_ICE : fail, testcasesteps");
+						//Execute neo4j query!!
+						//var qList=[];
+
 						cb1(null, flag);
 					} else {
-						callback(null, flag);
+						for(var te=0;te<inputs.testscenarioids.length;te++){inputs.testscenarioids[te]='"'+inputs.testscenarioids[te]+'"';}
+						qList.push({"statement":"MERGE (n:TESTSUITES_NG {cycleid:'"+inputs.cycleid
+									+"',testsuitename:'"+inputs.testsuitename+"',testsuiteid:'"+inputs.testsuiteid+"',testscenarioids:["
+									+inputs.testscenarioids+"],donotexecute:'["
+									+inputs.donotexecute+"]',versionnumber:["+inputs.versionnumber
+									+"]}) SET n.deleted='"+inputs.deleted+"'"});
+									//Relationships
+									for(i=0; i<inputs.testscenarioids.length;i++){
+										qList.push({"statement":"MATCH (a:TESTSUITES_NG{testsuiteid:'"+inputs.testsuiteid+"',cycleid:'"+inputs.cycleid
+									+"'}),(b:TESTSCENARIOS_NG{testscenarioid:"+inputs.testscenarioids[i]+"}) MERGE (a)-[r:FTSUTTSC_NG{id:"+inputs.testscenarioids[i]+"}]->(b)RETURN r"})
+									}
+									qList.push({"statement":"MATCH (a:CYCLES_NG{cycleid:'"+inputs.cycleid+"'}),(b:TESTSUITES_NG{testsuiteid:'"+inputs.testsuiteid+"',cycleid:'"+inputs.cycleid+"'}) MERGE (a)-[r:FCYCTTSU_NG{id:'"+inputs.testsuiteid+"'}]->(b)RETURN r"})                                                
+						//reqToAPI(qList,urlData);
+						callback(null, flag);						
 					}
 				});
 			} else {
@@ -1430,7 +1487,12 @@ function updatescenariodetailsinsuite(req, cb, data) {
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
 					console.log("Error occured in TestSuiteDetails_Module_ICE : fail, delete");
-				} else {}
+				} else {
+					//Execute neo4j query!!
+					//var qList=[];
+					qList.push({"statement":"MATCH (n:TESTSUITES_NG {cycleid:'"+inputs.cycleid
+					+"',testsuitename:'"+inputs.testsuitename+"',testsuiteid:'"+inputs.testsuiteid+"'}) DETACH DELETE n"});
+				}
 
 				simplecallback();
 			});
@@ -1466,6 +1528,27 @@ function updatescenariodetailsinsuite(req, cb, data) {
 				if (response.statusCode != 200 || result.rows == "fail") {
 					cb(null, "fail");
 				} else {
+					//Execute neo4j query!!
+					//var qList=[];
+					for(var te=0;te<inputs.testscenarioids.length;te++){inputs.testscenarioids[te]='"'+inputs.testscenarioids[te]+'"';}
+					for(var te=0;te<inputs.donotexecute.length;te++){inputs.donotexecute[te]='"'+inputs.donotexecute[te]+'"';}
+					inputs.donotexecute1 = inputs.donotexecute.join(',');
+					inputs.testscenarioids1 = inputs.testscenarioids.join(',');
+					qList.push({"statement":"MERGE (n:TESTSUITES_NG {cycleid:'"+inputs.cycleid
+								+"',testsuitename:'"+inputs.testsuitename+"',testsuiteid:'"+inputs.testsuiteid+"',deleted:'"+inputs.deleted
+								+"',versionnumber:["+inputs.versionnumber+"]}) set n.testscenarioids=["
+								+inputs.testscenarioids1+"], n.donotexecute=["+inputs.donotexecute1+"]"});
+
+					//Relationships
+					qList.push({"statement":"MATCH (a:TESTSUITES_NG{testsuiteid:'"+inputs.testsuiteid+"',cycleid:'"+inputs.cycleid
+									+"'})-[r]->(b:TESTSCENARIOS_NG) delete r"})
+					for(var te=0;te<inputs.testscenarioids.length;te++){
+						qList.push({"statement":"MATCH (a:TESTSUITES_NG{testsuiteid:'"+inputs.testsuiteid+"',cycleid:'"+inputs.cycleid
+									+"'}),(b:TESTSCENARIOS_NG) WHERE b.testscenarioid IN a.testscenarioids MERGE (a)-[r:FTSUTTSC_NG{id:'"+inputs.testscenarioids[te]+"'}]->(b)RETURN r"})                                   
+					}
+					qList.push({"statement":"MATCH (a:CYCLES_NG{cycleid:'"+inputs.cycleid+"'}),(b:TESTSUITES_NG{testsuiteid:'"+inputs.testsuiteid+"',cycleid:'"+inputs.cycleid+"'}) MERGE (a)-[r:FCYCTTSU_NG{id:'"+inputs.testsuiteid+"'}]->(b)RETURN r"})                  
+					//reqToAPI(qList,urlData);
+
 					simplecallback(null, result);
 				}
 			});

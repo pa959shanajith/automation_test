@@ -73,6 +73,8 @@ p,a,img,text,span,.noselect{-webkit-touch-callout:none;-webkit-user-select:none;
     height: 26px;
     padding-left: 5px;
 }
+#searchModule-create, #eteSearchModules, #eteSearchScenarios, #searchModule-assign{padding-right: 28px;}
+#searchModule-create, #searchModule-assign{padding-left: 4px;}
 .endtoend-modules-right-upper label{
 	margin-bottom: 0;
     margin-top: 7px;
@@ -83,12 +85,12 @@ p,a,img,text,span,.noselect{-webkit-touch-callout:none;-webkit-user-select:none;
 }
 .endtoend-modules-right-upper img{
 	float: right;
-    left: 222px;
+    left: 225px;
     margin-top: 1px;
 }
 .searchModuleimg{
 	position: relative;
-    right: 100px;
+    right: 103px;
     top: 3px;
     border-left: 1px solid #ccc;
     padding-left: 3px;
@@ -371,16 +373,16 @@ p,a,img,text,span,.noselect{-webkit-touch-callout:none;-webkit-user-select:none;
 #ct-assignRel{ position: relative; left: 24px; width: 64%;}
 #ct-assignCyc{ position: relative; left: 24px; width: 64%;}
 /*.selectProject{height: 24px;width: 100%;}*/
-.selectProject{
-    float: right;
+.selectProject
+{
+    margin-left: 0% !important;
     position: relative;
-    left: -90px !important;
 }
 .selectProjectPri{    
     left: 0px !important;
 }
 .selectProjectLabel{
-    float: left;
+    position: relative;
     margin: 2px 8px 0 0;
     font-size: 14px;
     font-family: LatoWeb;
@@ -496,10 +498,7 @@ select
     position: relative;
     left: 160px;
 }
-.selectProject
-{
-    margin-right: 0px !important;
-}
+
 .ct-expand-module
 {
     width: 88.5% !important;
@@ -576,14 +575,13 @@ select
 }
 
 .searchModuleimg-assign, .searchModuleimg-create{
-    float:left;
 	position: absolute;
-    margin-left: -30.25%;
+    margin-left: 47.20%;
     top: 3px;
+    background-color: white;
     border-left: 1px solid #ccc;
     padding-left: 3px;
 }
-
 
 /*#ct-moduleBox.ct-open .ct-nodeBox
 {
@@ -598,4 +596,32 @@ select
 @media screen and (max-height: 680px) {
 	.mindmap-left-section{margin-top: 60px !important;}
 	.endtoend-modules-right-lower button{right: 0px !important;}
+}
+/* versioning css */
+
+
+.replicate{
+    margin-left:20px;
+}
+.selectVersionLabel{
+    position: relative;
+    margin-right: 5%;
+    margin-left: -22%;
+}
+.plus-icon{
+    margin-left: 8%;
+}
+.selectVersion{
+    position: relative;
+    margin-left: 4%;
+    float: left;
+}
+.searchbox-assign, .searchbox-create{
+    float:right;
+}
+#destProjects{
+    width:94%;
+}
+.selectProjectPosition{
+     float:left;
 }
