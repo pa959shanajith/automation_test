@@ -191,6 +191,7 @@ mySPA.controller('mindmapController', ['$scope', '$http', '$location', '$timeout
                     url: window.location.origin+'/js/js_mindmap/versioning.js',
                     success: function() {
                         versioningEnabled=true;
+                        
                         load_versions();
                     },  
                     error: function() {
@@ -238,6 +239,8 @@ mySPA.controller('mindmapController', ['$scope', '$http', '$location', '$timeout
             	$('.selectProject').show();
                 $("img.selectedIcon").removeClass("selectedIcon");
 		        $('#createImg').addClass('selectedIcon');
+                if(!versioningEnabled)
+                    $('.selectProject').addClass('selectProjectPosition');
                 if($("#left-nav-section").is(":visible") == true && $("#right-dependencies-section").is(":visible") == false)
                 {
                    $("#ct-moduleBox,.tabAssign").addClass("ct-expand-module");
@@ -247,6 +250,8 @@ mySPA.controller('mindmapController', ['$scope', '$http', '$location', '$timeout
                 $('.selectProject').show();
                 $("img.selectedIcon").removeClass("selectedIcon");
 		        $('#assignImg').addClass('selectedIcon');
+                if(!versioningEnabled)
+                    $('.selectProject').addClass('selectProjectPosition');
                  if($("#left-nav-section").is(":visible") == true && $("#right-dependencies-section").is(":visible") == false)
                 {
                     $("#ct-moduleBox,.tabAssign").addClass("ct-expand-module");
@@ -263,6 +268,7 @@ mySPA.controller('mindmapController', ['$scope', '$http', '$location', '$timeout
                     loadMindmapData_V();
                 }else{
                     loadMindmapData(0);
+                    
                 }
                 // $.ajax({
                 //     type: 'HEAD',
