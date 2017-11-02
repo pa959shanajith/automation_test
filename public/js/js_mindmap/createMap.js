@@ -676,7 +676,8 @@ var nodeClick = function(e){
 	
 	var default_releaseid='';
 	taskAssign[t].attributes.forEach(function(tk){
-		v=u.append('li');
+	    v = tk != 're_estimation'? u.append('li') : v;
+		//v=u.append('li');
 		if(tk=="bn"){	
 			v.append('span').attr('class','ct-assignItem fl-left').html('Batch Name');
 			
