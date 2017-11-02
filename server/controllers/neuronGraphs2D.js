@@ -137,7 +137,7 @@ exports.getGraphData = function(req, res){
 					res.status(status).send(result);
 				}
 				else{
-					var jsonData=JSON.parse(result);
+					var jsonData=result;
 					var pData=parseData(jsonData[0].data);
 					if(pData.nodes.length==0) res.status(status).send({"err":true,"ecode":"DB_NOT_FOUND","msg":"Neuron Graphs DB not found!"});
 					else{

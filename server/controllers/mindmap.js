@@ -812,7 +812,7 @@ var update_cassandraID = function(d,urlData,module_type) {
 					var screenname_json=scr.screenName;
 					//var modulename_json=sc.testsuiteName;
 					var testcaseDetails_json=scr.testcaseDetails;
-					qList_new.push({"statement":"MATCH (a:SCREENS) WHERE a.screenName='"+screenname_json+" and a.projectID='"+data.projectId+"' SET a.screenID_c='"+screenId_c_json+"'"});
+					qList_new.push({"statement":"MATCH (a:SCREENS) WHERE a.screenName='"+screenname_json+"' and a.projectID='"+data.projectId+"' SET a.screenID_c='"+screenId_c_json+"'"});
 					//qList_new.push({"statement":"MATCH (a:SCREENS) WHERE a.screenName='"+screenname_json+"' and a.projectID='"+data.projectId+"' SET a.screenID_c='"+screenId_c_json+"'"});
 					//updateJson.push({screenId_json:screenId_c_json});
 					cassandraId_dict[screenId_json]=screenId_c_json;

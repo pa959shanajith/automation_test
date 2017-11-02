@@ -214,8 +214,8 @@ mySPA.controller('mindmapController', ['$scope', '$http', '$location', '$timeout
             }
         }
         else if($scope.tab=='mindmapEndtoEndModules'){
-            if(!versioningEnabled){
-                $("#ct-main").hide();
+            // if(!versioningEnabled){
+            $("#ct-main").hide();
         	$("img.selectedIcon").removeClass("selectedIcon");
 	        $('#createImg').addClass('selectedIcon');
             if($("#left-nav-section").is(":visible") == true && $("#right-dependencies-section").is(":visible") == false)
@@ -228,9 +228,9 @@ mySPA.controller('mindmapController', ['$scope', '$http', '$location', '$timeout
             if($('.rsSlide').is(':visible'))
                 $("#ct-expand-right").trigger("click");
             loadMindmapData_W();
-            }else{
-                openDialogMindmap('Error',"EndtoEnd flow disabled in Versioning");
-            }
+            // }else{
+            //     openDialogMindmap('Error',"EndtoEnd flow disabled in Versioning");
+            // }
         	
         }
         else{
@@ -293,11 +293,10 @@ mySPA.controller('mindmapController', ['$scope', '$http', '$location', '$timeout
     }
     
     $scope.createMap = function(option){
-    	if(option == "mindmapEndtoEndModules" && versioningEnabled){
-            openDialogMindmap('Error',"EndtoEnd flow disabled in Versioning");
-        } //as of now, do nothing
-        
-        else
+    	// if(option == "mindmapEndtoEndModules" && versioningEnabled){
+        //     openDialogMindmap('Error',"EndtoEnd flow disabled in Versioning");
+        // } //as of now, do nothing
+        // else
     	$scope.tab = option;
     }
 

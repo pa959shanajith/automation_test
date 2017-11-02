@@ -1580,7 +1580,7 @@ var actionEvent = function(e){
 		return !1;
 	}
 	var from_v=to_v=0;
-	if ($('.version-list') !== undefined)
+	if ($('.version-list').length !=0)
 	from_v=to_v=$('.version-list').val();
 	dataSender({task:'writeMap',data:{write:flag,userRole:user_role,vn_from: from_v, vn_to: to_v,tab:cur_module,map:mapData,user_name:username,abc:deletednode,xyz:unassignTask,prjId:$('.project-list').val(),relId:$('#ct-assignRel').val(),cycId:$('#ct-assignCyc').val()},role:user_role,versioning:versioning_enabled},function(err,result){
 		s.classed('no-access',!1);
@@ -1629,7 +1629,7 @@ var actionEvent = function(e){
 				openDialogMindmap("Success", "Data saved successfully");
 			}
 			var vn='';
-			if ($('.version-list')!== undefined)
+			if ($('.version-list').length!=0)
 			from_v=to_v=$('.version-list').val()
 
 			 dataSender({task:'getModules',tab:window.localStorage['tabMindMap'],prjId:$(".project-list").val(),versioning:versioning_enabled,version:parseFloat(from_v)},function(err,result){
