@@ -256,7 +256,7 @@ function next_function(resultobj, cb, data) {
 											maincallback();
 										}
 										else {
-											result1 = JSON.parse(result);
+											result1 = result;
 											if(result1[0].data.length >0 && result1[0].data[0].row[0] != undefined){
 												testSuiteDetails_obj.testsuitename = result1[0].data[0].row[0];
 											}
