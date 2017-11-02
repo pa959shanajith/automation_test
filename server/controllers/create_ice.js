@@ -5,8 +5,9 @@
 var uuid = require('uuid-random');
 var async = require('async');
 var Client = require("node-rest-client").Client;
+var neo4jAPI = require('../controllers/neo4jAPI');
 var client = new Client();
-
+var qList=[]; //For neurongraphs
 function get_moduleName(moduleId, cb, data) {
 	var obj = {
 		flag: false,
@@ -222,6 +223,7 @@ exports.createStructure_Nineteen68 = function (req, res) {
 	var newversionnumber = RequestedJSON.new_version;
 	var cloneflag = RequestedJSON.action;
 	var suiteflag = false;
+	qList=[]; //For neurongraphs
 	async.series({
 		projectsUnderDomain: function (callback) {
 			suiteflag = false;
@@ -360,6 +362,18 @@ exports.createStructure_Nineteen68 = function (req, res) {
 									if (response.statusCode != 200 || result.rows == "fail") {
 										console.log(result.rows);
 									} else {
+										//Execute neo4j query!!
+										if(scenario_query=='notflagscenarios'){
+											//Execute neo4j query!!
+											qList.push({"statement":"MERGE (n:TESTSCENARIOS_NG {projectid:'"+projectid+"',testscenarioname:'"+scenarioName+"',testscenarioid:'"+scenarioId+"',testcaseids:[]}) SET n.deleted='false' return n"})
+											//Add relationship between scenario and testsuite
+											qList.push({"statement":"MATCH (a:TESTSUITES_NG),(b:TESTSCENARIOS_NG{testscenarioid:'"+scenarioId+"'}) WHERE '"+scenarioId+"' IN a.testscenarioids MERGE (a)-[r:FTSUTTSC_NG{id:'"+scenarioId+"'}]->(b)RETURN a,b,r"})
+											
+											qList.push({"statement":"MATCH (a:TESTSCENARIOS_NG{testscenarioid:'"+scenarioId+"'}),(b:TESTCASES_NG) WHERE b.testcaseid IN a.testcaseids MERGE (a)-[r:FTSCTTCE_NG{id:b.testcaseid}]->(b) RETURN a,r,b"})
+										}
+										else if(scenario_query=='deletescenarios')
+											qList.push({"statement":"MATCH (n: TESTSCENARIOS_NG { testscenarioname: '"+scenarioName+"',testscenarioid: '"+scenarioId+"' }) set n.testcaseids=[]"})
+
 										scenarioidlist.push(scenarioId);
 										var screen = iterator.screenDetails;
 										async.forEachSeries(screen, function (screenitr, callback3) {
@@ -431,6 +445,13 @@ exports.createStructure_Nineteen68 = function (req, res) {
 													if (response.statusCode != 200 || result.rows == "fail") {
 														console.log(result.rows);
 													} else {
+                                                        //Execute neo4j query!!
+                                                        if(screen_query=='notflagscreen'){
+                                                            qList.push({"statement":"MERGE (n:SCREENS_NG {projectid:'"+projectid+"',screenname:'"+screenName+"',screenid:'"+screenId+"',versionnumber:'1'}) SET n.deleted='false' return n"})
+                                                            //relationship
+                                                            qList.push({"statement":"MATCH (a:TESTCASES_NG{screenid:'"+screenId+"'}),(b:SCREENS_NG {projectid:'"+projectid+"',screenname:'"+screenName+"',screenid:'"+screenId+"',versionnumber:'1'}) MERGE (a)-[r:FTCETSCR_NG{id:'"+screenId+"'}]->(b) RETURN a,r,b"})
+                                                            //reqToAPI(qList,urlData);
+                                                        }
 														var testcase = screenDetails.testcaseDetails;
 														async.forEachSeries(testcase, function (testcaseitr, callback4) {
 															var testcaseID = uuid();
@@ -503,6 +524,14 @@ exports.createStructure_Nineteen68 = function (req, res) {
 																		console.log(result.rows);
 																	}
 																	else {
+																		if(testcase_query=='notflagtestcase'){
+																			qList.push({"statement":"MERGE (n:TESTCASES_NG {screenid:'"+screenId+"',testcasename:'"+testcaseName+"',testcaseid:'"+testcaseID+"',versionnumber:'1'}) SET n.deleted='false' return n"});
+																			//Relationship
+																			qList.push({"statement":"MATCH (a:TESTCASES_NG{testcaseid:'"+testcaseID+"'}),(b:SCREENS_NG {screenid:'"+screenId+"',versionnumber:'1'}) MERGE (a)-[r:FTCETSCR_NG{id:'"+screenId+"'}]->(b) RETURN a,r,b"})
+																			qList.push({"statement":"MATCH (a:TESTSCENARIOS_NG),(b:TESTCASES_NG{testcaseid:'"+testcaseID+"'}) WHERE '"+testcaseID+"' IN a.testcaseids MERGE (a)-[r:FTSCTTCE_NG{id:'"+testcaseID+"'}]->(b)RETURN a,r,b"})
+																		// reqToAPI(qList,urlData);
+																		}
+																		
 																		testcaseidlist.push(testcaseID);
 																		var inputs = {
 																			'testcaseid': testcaseID,
@@ -527,10 +556,16 @@ exports.createStructure_Nineteen68 = function (req, res) {
 																			}
 																			else {
 																				console.log("Successfully updated testscenarios");
+																				qList.push({"statement":"MATCH (n:TESTSCENARIOS_NG {projectid:'"+projectid+"',testscenarioname:'"+scenarioName+"',testscenarioid:'"+scenarioId+"'}) SET n.testcaseids=n.testcaseids+['"+testcaseID+"'] return n"});
+																				//Add relationship between scenario and testsuite
+																				//qListR.push({"statement":"MATCH (a:TESTSCENARIOS_NG{testscenarioid:'"+scenarioId+"'})-[r]->(b:TESTCASES_NG) delete r"})
+																				qList.push({"statement":"MATCH (a:TESTSUITES_NG),(b:TESTSCENARIOS_NG{testscenarioid:'"+scenarioId+"'}) WHERE '"+scenarioId+"' IN a.testscenarioids MERGE (a)-[r:FTSUTTSC_NG{id:'"+scenarioId+"'}]->(b)RETURN a,r,b"})
+																				qList.push({"statement":"MATCH (a:TESTSCENARIOS_NG{testscenarioid:'"+scenarioId+"'}),(b:TESTCASES_NG{testcaseid:'"+testcaseID+"'}) MERGE (a)-[r:FTSCTTCE_NG{id:'"+testcaseID+"'}]->(b)RETURN a,r,b"})
+																				callback4();
 																			}
 																		});
 																	}
-																	callback4();
+																	
 																});
 															});
 														}, callback3);
@@ -548,6 +583,7 @@ exports.createStructure_Nineteen68 = function (req, res) {
 				});
 				//callback();
 			});
+
 		},
 		updatescenarioids: function (callback) {
 			var inputs = {
@@ -590,7 +626,21 @@ exports.createStructure_Nineteen68 = function (req, res) {
 				"appType": appType,
 				"testsuiteDetails": suitedetailslist
 			};
-			res(null, returnJsonmindmap);
+			neo4jAPI.executeQueries(qList,function(status,result){
+					//res.setHeader('Content-Type','application/json');
+					if(err){
+						console.log(err);
+						//res.status(status).send(err);
+					} else{
+						console.log("Qlist::: ",qList);
+						console.log("Result::: ",result);
+						res(null, returnJsonmindmap);
+						//console.log("user_task_json : ",user_task_json);
+						//return user_task_json;
+					}
+
+			});
+
 		}
 	});
 };
@@ -745,6 +795,7 @@ function updatetestsuitename(moduledetails, cb, data) {
 						console.log(result.rows);
 					} else {
 						flagtocheckifdeleted = true;
+
 					}
 					callback();
 				});
@@ -941,6 +992,8 @@ function updatetestscenarioname(testscenariodetails, cb, data) {
 					if (response.statusCode != 200 || result.rows == "fail") {
 						console.log(result.rows);
 					} else {
+						//Execute neo4j query!!
+						qList.push({"statement":"MATCH (n: TESTSCENARIOS_NG { testscenarioname: '"+inputs.node_name+"',testscenarioid: '"+inputs.id+"' }) detach delete n"});
 						flagtocheckifdeleted = true;
 					}
 					callback();
@@ -981,6 +1034,8 @@ function updatetestscenarioname(testscenariodetails, cb, data) {
 					if (response.statusCode != 200 || result.rows == "fail") {
 						console.log(result.rows);
 					} else {
+	                    //Execute neo4j query!!
+	                    qList.push({"statement":"MATCH(n:TESTSCENARIOS_NG{testScenarioid:'"+inputs.testscenarioid+"'}) SET n.testscenarioname='"+inputs.testscenarioname+"'"+",n.projectid='"+inputs.projectid+"' return n"});
 						console.log('Succesfully renamed Testscenario name');
 					}
 					callback(null, "success");
@@ -1140,6 +1195,9 @@ function updatetestscreenname(testscreendetails, cb, data) {
 					} else {
 						// if(deleted.rows != undefined && deleted.rows.length!=0){
 						flagtocheckifdeleted = true;
+						//Execute neo4j query!!
+						qList.push({"statement":"MATCH (n: SCREENS_NG { screenname: '"+inputs.node_name+"',screenid: '"+inputs.id+"',versionnumber:'"+inputs.version_number+"' }) detach delete n"});
+						
 						// }
 					}
 					callback();
@@ -1182,6 +1240,9 @@ function updatetestscreenname(testscreendetails, cb, data) {
 						console.log(result.rows);
 					} else {
 						console.log('Succesfully renamed Screen name');
+						//Execute neo4j query!!
+						qList.push({"statement":"MATCH(n:SCREENS_NG{screenid:'"+inputs.screenid+"'}) SET n.screenname='"+inputs.screenname+"'"+",n.projectid='"+inputs.projectid+"' return n"});
+
 					}
 					callback(null, "success");
 				});
@@ -1340,6 +1401,9 @@ function updatetestcasename(testcasedetails, cb, data) {
 					} else {
 						// if(deleted.rows != undefined && deleted.rows.length!=0){
 						flagtocheckifdeleted = true;
+                        //Execute neo4j query!!
+                        qList.push({"statement":"MATCH (n: TESTCASES_NG { testCaseName: '"+inputs.node_name+"',testCaseID: '"+inputs.id+"',versionnumber:'"+inputs.version_number+"' }) detach delete n"});
+
 						// }
 					}
 					callback();
@@ -1382,6 +1446,9 @@ function updatetestcasename(testcasedetails, cb, data) {
 						console.log(result.rows);
 					} else {
 						console.log('Succesfully renamed Testcase name');
+						//Execute neo4j query!!
+						qList.push({"statement":"MATCH(n:TESTCASES_NG{testcaseid:'"+inputs.testcaseid+"'}) SET n.testcasename='"+inputs.testcasename+"' return n"});
+
 					}
 					callback(null, "success");
 				});
@@ -1471,75 +1538,38 @@ exports.getCycleIDs_Ninteen68 = function (req, res) {
 };
 
 exports.getProjectIDs_Nineteen68 = function (req, res) {
-	var project_names = [];
-	var project_ids = [];
-	var app_types = [];
 	var projectdetails = {
 		projectId: [],
 		projectName: [],
 		appType: []
 	};
 	var user_id = req.userid;
-	var inputs1 = {
+	var allflag = req.allflag;
+	if (allflag) allflag = "allflag";
+	else allflag = "emptyflag";
+	var inputs = {
 		"userid": user_id,
-		"query": "getprojids"
+		"query": allflag
 	};
-	args1 = {
-		data: inputs1,
+	args = {
+		data: inputs,
 		headers: {
 			"Content-Type": "application/json"
 		}
 	};
 	async.series({
 		function (callback) {
-			client.post("http://127.0.0.1:1990/create_ice/getProjectIDs_Nineteen68", args1,
+			client.post("http://127.0.0.1:1990/create_ice/getProjectIDs_Nineteen68", args,
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
 					res(null, result.rows);
 				} else {
-					var res_projectid = [];
-					if (result.rows[0] != null || result.rows[0] != undefined) {
-						res_projectid = result.rows[0].projectids;
-					}
-					async.forEachSeries(res_projectid, function (iterator, callback1) {
-						inputs2 = {
-							"projectid": iterator,
-							"query": "getprojectname"
-						};
-						args2 = {
-							data: inputs2,
-							headers: {
-								"Content-Type": "application/json"
-							}
-						};
-						client.post("http://127.0.0.1:1990/create_ice/getProjectIDs_Nineteen68", args2,
-							function (projectnamedata, response) {
-							try {
-								if (response.statusCode != 200 || projectnamedata.rows == "fail") {
-									res(null, projectnamedata.rows);
-								} else {
-									if (projectnamedata.rows[0] != undefined) {
-										project_names.push(projectnamedata.rows[0].projectname);
-										app_types.push(projectnamedata.rows[0].projecttypeid);
-										project_ids.push(iterator);
-									} else {
-										console.log('projectnamedata is Undefined');
-									}
-								}
-								projectdetails.projectId = project_ids;
-								projectdetails.projectName = project_names;
-								projectdetails.appType = app_types;
-								callback1();
-							} catch (ex) {
-								console.log(ex);
-							}
-						});
-					}, callback);
+					projectdetails=result.rows;
+					callback();
 				}
 			});
 		}
 	}, function (err, results) {
-		//console.log(projectdetails);
 		try {
 			res(null, projectdetails);
 		} catch (ex) {
@@ -1751,7 +1781,36 @@ exports.createE2E_Structure_Nineteen68 = function (req, res) {
 				"appType": appType,
 				"testsuiteDetails": suitedetailslist
 			};
-			res(null, returnJsonmindmap);
+			res(null,returnJsonmindmap);
+		}
+	});
+};
+
+exports.submitTask = function (req, res) {
+	var taskdetails = req.taskdetails;
+	inputs = {
+		'status': req.status,
+		'table': taskdetails.labels[0],
+		'details': taskdetails.properties,
+		'username': req.user,
+		'versionnumber': req.versionnumber
+	};
+	args = {
+		data: inputs,
+		headers: {
+			"Content-Type": "application/json"
+		}
+	};
+	client.post("http://127.0.0.1:1990/create_ice/submitTask", args,
+		function (result, response) {
+		try {
+			if (response.statusCode != 200 || result.rows == "fail") {
+				res(null, result.rows);
+			} else {
+				console.log(result);
+			}
+		} catch (ex) {
+			console.log(ex);
 		}
 	});
 };

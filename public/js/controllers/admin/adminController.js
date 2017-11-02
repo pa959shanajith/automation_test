@@ -31,132 +31,127 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 		angular.element(document.getElementById("left-nav-section")).scope().getUserRoles();
 	});
 
+	$(document).on('change','#selAssignUser', function(e) {
+		$('#allProjectAP, #assignedProjectAP').empty();	
+		$(".load").show();
+		$("#selAssignUser, #rightall, #rightgo, #leftgo, #leftall, .adminBtn").prop("disabled",true);
+		$("#overlayContainer").prop("style","opacity: 1;")
+		adminServices.getDomains_ICE()
+		.then(function (data) {
+			if(data == "Invalid Session"){
+				window.location.href = "/";
+			} 
+			else {
+				domainId =  data[0].domainId;					
+				$("#selAssignProject").val(data[0].domainName);
+				$('#allProjectAP, #assignedProjectAP').empty();
+				//var domainId = data[0].domainId;
+				//var requestedids = domainId;
+				//var domains = [];
+				var requestedids =[];
+				requestedids.push(domainId);
+				//console.log("Domain", domains);
+				//var requestedids = domains.push(domainId);
+				var idtype=["domaindetails"];
+				var userId = $("#selAssignUser option:selected").attr("data-id");
+				var getAssignProj = {};
+				getAssignProj.domainId = domainId;
+				getAssignProj.userId = userId;
+				var assignedProjectsArr = [];
+				var assignedProjectNames = [];
+				var unassignedProjectIds = [];
+				var unassignedProjectNames = [];
+				var unAssignedProjects = {};
+				//	getAssignedProjectsLen = 0;
 
-
-	 	$(document).on('change','#selAssignUser', function(e) {
-			$('#allProjectAP, #assignedProjectAP').empty();
-		
-			$(".load").show();
-			$("#selAssignUser, #rightall, #rightgo, #leftgo, #leftall, .adminBtn").prop("disabled",true);
-			$("#overlayContainer").prop("style","opacity: 1;")
-			adminServices.getDomains_ICE()
-			.then(function (data) {
-				if(data == "Invalid Session"){
-					window.location.href = "/";
-				} 
-				else {
-					domainId =  data[0].domainId;					
-					$("#selAssignProject").val(data[0].domainName);
-					$('#allProjectAP, #assignedProjectAP').empty();
-					//var domainId = data[0].domainId;
-					//var requestedids = domainId;
-					//var domains = [];
-					var requestedids =[];
-					requestedids.push(domainId);
-					//console.log("Domain", domains);
-					//var requestedids = domains.push(domainId);
-					var idtype=["domaindetails"];
-					var userId = $("#selAssignUser option:selected").attr("data-id");
-
-					var getAssignProj = {};
-					getAssignProj.domainId = domainId;
-					getAssignProj.userId = userId;
-					var assignedProjectsArr = [];
-					var assignedProjectNames = [];
-					var unassignedProjectIds = [];
-					var unassignedProjectNames = [];
-					var unAssignedProjects = {};
-					//	getAssignedProjectsLen = 0;
-	
-					adminServices.getAssignedProjects_ICE(getAssignProj)
-					.then(function (data1) {
-					getAssignedProjectsLen = data1.length;
-						if(data1 == "Invalid Session"){
-							window.location.href = "/";
-						}
-						$('#assignedProjectAP').empty();
-						projectData = [];
-						projectData = data1;
-						if(data1.length > 0)
+				adminServices.getAssignedProjects_ICE(getAssignProj)
+				.then(function (data1) {
+				getAssignedProjectsLen = data1.length;
+					if(data1 == "Invalid Session"){
+						window.location.href = "/";
+					}
+					$('#assignedProjectAP').empty();
+					projectData = [];
+					projectData = data1;
+					if(data1.length > 0)
+					{							
+						for(var i=0;i<data1.length;i++)
 						{
-							 
-							for(var i=0;i<data1.length;i++)
-							{
-								$('#assignedProjectAP').append($("<option value=" +data1[i].projectId+ "></option>").text(data1[i].projectName));
-							}
-							for(var j=0;j<projectData.length;j++)
-							{
-								assignedProjectsArr.push(projectData[j].projectId);
-								assignedProjectNames.push(projectData[j].projectName)
-							}
-
-							adminServices.getDetails_ICE(idtype,requestedids)
-							.then(function (detResponse) {
-								if(detResponse == "Invalid Session"){
-									window.location.href = "/";
-								}
-								$('#allProjectAP').empty();
-								if(detResponse.projectIds.length > 0)
-								{
-									for(var k=0;k<detResponse.projectIds.length;k++){
-										if(!eleContainsInArray(assignedProjectsArr,detResponse.projectIds[k])){
-											unassignedProjectIds.push(detResponse.projectIds[k]);
-										}
-									}
-
-									for(var l=0;l<detResponse.projectNames.length;l++){
-										if(!eleContainsInArray(assignedProjectNames,detResponse.projectNames[l])){
-											unassignedProjectNames.push(detResponse.projectNames[l]);
-										}
-									}
-
-									function eleContainsInArray(arr,element){
-										if(arr != null && arr.length >0){
-											for(var s=0;s<arr.length;s++){
-												if(arr[s] == element)
-													return true;
-											}
-										}
-										return false;
-									}
-									unAssignedProjects.projectIds =  unassignedProjectIds;
-									unAssignedProjects.projectNames =  unassignedProjectNames;
-									for(var m=0;m<unAssignedProjects.projectIds.length;m++)
-									{
-										$('#allProjectAP').append($("<option value=" +unAssignedProjects.projectIds[m]+ "></option>").text(unAssignedProjects.projectNames[m]));
-									}
-									if($("#selAssignUser").find("option:selected").text() == 'Select User')
-									{
-										$("#assignedProjectAP,#allProjectAP").empty();
-									}
-									$(".load").hide();
-									$("#selAssignUser, #rightall, #rightgo, #leftgo, #leftall, .adminBtn").prop("disabled",false);
-								}
-							}, function (error) { console.log("Error:::::::::::::", error) })
+							$('#assignedProjectAP').append($("<option value=" +data1[i].projectId+ "></option>").text(data1[i].projectName));
 						}
-						else{
-							adminServices.getDetails_ICE(idtype,requestedids)
-							.then(function (res) {
-								if(res == "Invalid Session"){
-									window.location.href = "/";
+						for(var j=0;j<projectData.length;j++)
+						{
+							assignedProjectsArr.push(projectData[j].projectId);
+							assignedProjectNames.push(projectData[j].projectName)
+						}
+
+						adminServices.getDetails_ICE(idtype,requestedids)
+						.then(function (detResponse) {
+							if(detResponse == "Invalid Session"){
+								window.location.href = "/";
+							}
+							$('#allProjectAP').empty();
+							if(detResponse.projectIds.length > 0)
+							{
+								for(var k=0;k<detResponse.projectIds.length;k++){
+									if(!eleContainsInArray(assignedProjectsArr,detResponse.projectIds[k])){
+										unassignedProjectIds.push(detResponse.projectIds[k]);
+									}
 								}
-								if(res.projectIds.length > 0)
+
+								for(var l=0;l<detResponse.projectNames.length;l++){
+									if(!eleContainsInArray(assignedProjectNames,detResponse.projectNames[l])){
+										unassignedProjectNames.push(detResponse.projectNames[l]);
+									}
+								}
+
+								function eleContainsInArray(arr,element){
+									if(arr != null && arr.length >0){
+										for(var s=0;s<arr.length;s++){
+											if(arr[s] == element)
+												return true;
+										}
+									}
+									return false;
+								}
+								unAssignedProjects.projectIds =  unassignedProjectIds;
+								unAssignedProjects.projectNames =  unassignedProjectNames;
+								for(var m=0;m<unAssignedProjects.projectIds.length;m++)
+								{
+									$('#allProjectAP').append($("<option value=" +unAssignedProjects.projectIds[m]+ "></option>").text(unAssignedProjects.projectNames[m]));
+								}
+								if($("#selAssignUser").find("option:selected").text() == 'Select User')
 								{
 									$("#assignedProjectAP,#allProjectAP").empty();
-									for(var n=0;n<res.projectIds.length;n++)
-									{
-										$('#allProjectAP').append($("<option value=" +res.projectIds[n]+ "></option>").text(res.projectNames[n]));
-									}
-								}								
+								}
 								$(".load").hide();
 								$("#selAssignUser, #rightall, #rightgo, #leftgo, #leftall, .adminBtn").prop("disabled",false);
-							}, function (error) { console.log("Error:::::::::::::", error) })
-						}
-					},function (error) { console.log("Error:::::::::::::", error) })
-				}
-			});
-			
+							}
+						}, function (error) { console.log("Error:::::::::::::", error) })
+					}
+					else{
+						adminServices.getDetails_ICE(idtype,requestedids)
+						.then(function (res) {
+							if(res == "Invalid Session"){
+								window.location.href = "/";
+							}
+							if(res.projectIds.length > 0)
+							{
+								$("#assignedProjectAP,#allProjectAP").empty();
+								for(var n=0;n<res.projectIds.length;n++)
+								{
+									$('#allProjectAP').append($("<option value=" +res.projectIds[n]+ "></option>").text(res.projectNames[n]));
+								}
+							}								
+							$(".load").hide();
+							$("#selAssignUser, #rightall, #rightgo, #leftgo, #leftall, .adminBtn").prop("disabled",false);
+						}, function (error) { console.log("Error:::::::::::::", error) })
+					}
+				},function (error) { console.log("Error:::::::::::::", error) })
+			}
 		});
+		
+	});
 
 		//	Assign Projects Tab Click
 	$(document).on('click','#assignProjectTab',function(e) {
@@ -198,106 +193,104 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 		//};
 	 });
 
-	 	$(document).on('change','#selAssignProject', function() {
-			
-			$('#allProjectAP, #assignedProjectAP').empty();
-			var domainId = $("#selAssignProject option:selected").val();
-			var requestedids = [domainId];
-			var domains = [];
-			domains.push(domainId);
-			//console.log("Domain", domains);
-			//var requestedids = domains.push(domainId);
-			var idtype=["domaindetails"];
-			var userId = $("#selAssignUser option:selected").attr("data-id");
+	$(document).on('change','#selAssignProject', function() {
+		$('#allProjectAP, #assignedProjectAP').empty();
+		var domainId = $("#selAssignProject option:selected").val();
+		var requestedids = [domainId];
+		var domains = [];
+		domains.push(domainId);
+		//console.log("Domain", domains);
+		//var requestedids = domains.push(domainId);
+		var idtype=["domaindetails"];
+		var userId = $("#selAssignUser option:selected").attr("data-id");
+		var getAssignProj = {};
+		getAssignProj.domainId = domainId;
+		getAssignProj.userId = userId;
+		var assignedProjectsArr = [];
+		var assignedProjectNames = [];
+		var unassignedProjectIds = [];
+		var unassignedProjectNames = [];
+		var unAssignedProjects = {};
+	//	getAssignedProjectsLen = 0;
 
-			var getAssignProj = {};
-			getAssignProj.domainId = domainId;
-			getAssignProj.userId = userId;
-			var assignedProjectsArr = [];
-			var assignedProjectNames = [];
-			var unassignedProjectIds = [];
-			var unassignedProjectNames = [];
-			var unAssignedProjects = {};
-		//	getAssignedProjectsLen = 0;
-	
-			adminServices.getAssignedProjects_ICE(getAssignProj)
-			.then(function (data) {
-				getAssignedProjectsLen = data.length;
-				if(data == "Invalid Session"){
-				window.location.href = "/";
-				}
-				$('#assignedProjectAP').empty();
-				projectData = [];
-				projectData = data;
-				if(data.length > 0)
+		adminServices.getAssignedProjects_ICE(getAssignProj)
+		.then(function (data) {
+			getAssignedProjectsLen = data.length;
+			if(data == "Invalid Session"){
+			window.location.href = "/";
+			}
+			$('#assignedProjectAP').empty();
+			projectData = [];
+			projectData = data;
+			if(data.length > 0)
+			{
+				for(var i=0;i<data.length;i++)
 				{
-					for(var i=0;i<data.length;i++)
+					$('#assignedProjectAP').append($("<option value=" +data[i].projectId+ "></option>").text(data[i].projectName));
+				}
+				for(var j=0;j<projectData.length;j++)
+				{
+					assignedProjectsArr.push(projectData[j].projectId);
+					assignedProjectNames.push(projectData[j].projectName)
+				}
+
+				adminServices.getDetails_ICE(idtype,requestedids)
+				.then(function (response) {
+					if(response == "Invalid Session"){
+						window.location.href = "/";
+						}
+					$('#allProjectAP').empty();
+					if(response.projectIds.length > 0)
 					{
-						$('#assignedProjectAP').append($("<option value=" +data[i].projectId+ "></option>").text(data[i].projectName));
-					}
-					for(var j=0;j<projectData.length;j++)
-					{
-						assignedProjectsArr.push(projectData[j].projectId);
-						assignedProjectNames.push(projectData[j].projectName)
-					}
-
-					adminServices.getDetails_ICE(idtype,requestedids)
-					.then(function (response) {
-						if(response == "Invalid Session"){
-							window.location.href = "/";
-							}
-						$('#allProjectAP').empty();
-						if(response.projectIds.length > 0)
-						{
-							for(var k=0;k<response.projectIds.length;k++){
-								if(!eleContainsInArray(assignedProjectsArr,response.projectIds[k])){
-									unassignedProjectIds.push(response.projectIds[k]);
-								}
-							}
-
-							for(var l=0;l<response.projectNames.length;l++){
-								if(!eleContainsInArray(assignedProjectNames,response.projectNames[l])){
-									unassignedProjectNames.push(response.projectNames[l]);
-								}
-							}
-
-							function eleContainsInArray(arr,element){
-								if(arr != null && arr.length >0){
-									for(var s=0;s<arr.length;s++){
-										if(arr[s] == element)
-											return true;
-									}
-								}
-								return false;
-							}
-							unAssignedProjects.projectIds =  unassignedProjectIds;
-							unAssignedProjects.projectNames =  unassignedProjectNames;
-							for(var m=0;m<unAssignedProjects.projectIds.length;m++)
-							{
-								$('#allProjectAP').append($("<option value=" +unAssignedProjects.projectIds[m]+ "></option>").text(unAssignedProjects.projectNames[m]));
+						for(var k=0;k<response.projectIds.length;k++){
+							if(!eleContainsInArray(assignedProjectsArr,response.projectIds[k])){
+								unassignedProjectIds.push(response.projectIds[k]);
 							}
 						}
-					}, function (error) { console.log("Error:::::::::::::", error) })
-				}
-				else{
-					adminServices.getDetails_ICE(idtype,requestedids)
-					.then(function (resDetails) {
-						if(resDetails == "Invalid Session"){
-							window.location.href = "/";
-							}
-						if(resDetails.projectIds.length > 0)
-						{
-							$("#assignedProjectAP,#allProjectAP").empty();
-							
-							for(var n=0;n<resDetails.projectIds.length;n++)
-							{
-								$('#allProjectAP').append($("<option value=" +resDetails.projectIds[n]+ "></option>").text(resDetails.projectNames[n]));
+
+						for(var l=0;l<response.projectNames.length;l++){
+							if(!eleContainsInArray(assignedProjectNames,response.projectNames[l])){
+								unassignedProjectNames.push(response.projectNames[l]);
 							}
 						}
-					}, function (error) { console.log("Error:::::::::::::", error) })
-				}
-			}, function (error) { console.log("Error:::::::::::::", error) })
-		});
+
+						function eleContainsInArray(arr,element){
+							if(arr != null && arr.length >0){
+								for(var s=0;s<arr.length;s++){
+									if(arr[s] == element)
+										return true;
+								}
+							}
+							return false;
+						}
+						unAssignedProjects.projectIds =  unassignedProjectIds;
+						unAssignedProjects.projectNames =  unassignedProjectNames;
+						for(var m=0;m<unAssignedProjects.projectIds.length;m++)
+						{
+							$('#allProjectAP').append($("<option value=" +unAssignedProjects.projectIds[m]+ "></option>").text(unAssignedProjects.projectNames[m]));
+						}
+					}
+				}, function (error) { console.log("Error:::::::::::::", error) })
+			}
+			else{
+				adminServices.getDetails_ICE(idtype,requestedids)
+				.then(function (resDetails) {
+					if(resDetails == "Invalid Session"){
+						window.location.href = "/";
+						}
+					if(resDetails.projectIds.length > 0)
+					{
+						$("#assignedProjectAP,#allProjectAP").empty();
+						
+						for(var n=0;n<resDetails.projectIds.length;n++)
+						{
+							$('#allProjectAP').append($("<option value=" +resDetails.projectIds[n]+ "></option>").text(resDetails.projectNames[n]));
+						}
+					}
+				}, function (error) { console.log("Error:::::::::::::", error) })
+			}
+		}, function (error) { console.log("Error:::::::::::::", error) })
+	});
 
 //	Assign Projects Button Click
 	$scope.assignProjects = function() {
@@ -320,14 +313,13 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 			unAssignedProjects.push(unassignedProj);
 		});
 
-
 		$("#assignedProjectAP option").each(function() {
 			var assignedProj = {};
 			assignedProj.projectId = $(this).val();
 			assignedProj.projectName = $(this).text();
 			assignedProjects.push(assignedProj);
 		});
-		if (assignedProjects.length != 0){
+		//if (assignedProjects.length != 0){
 			//var domainId = $('#selAssignProject option:selected').val();
 			var userDetails = JSON.parse(window.localStorage['_UI']);
 			var userId = $("#selAssignUser option:selected").attr("data-id");
@@ -339,16 +331,18 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 //			assignProjectsObj.unAssignedProjects = unAssignedProjects;
 			assignProjectsObj.assignedProjects = assignedProjects;;
 			assignProjectsObj.getAssignedProjectsLen = getAssignedProjectsLen;
-
-			console.log(assignProjectsObj);
+			//console.log(assignProjectsObj);
 			adminServices.assignProjects_ICE(assignProjectsObj)
 			.then(function (data) {
-					if(data == "Invalid Session"){
-							window.location.href = "/";
-							}
+				if(data == "Invalid Session"){
+					window.location.href = "/";
+				}
 				if(data == 'success')
 				{
-					openModelPopup("Assign Projects", "Projects assigned to user successfully");
+					if (assignedProjects.length != 0)
+						openModelPopup("Assign Projects", "Projects assigned to user successfully");
+					else
+						openModelPopup("Assign Projects", "Projects unassigned successfully");
 					resetAssignProjectForm();
 				}
 				else{
@@ -356,13 +350,10 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 				}
 
 			}, function (error) { console.log("Error:::::::::::::", error) })
-
-		}
-		else {
-			openModelPopup("Assign Projects", "Please add project/s");
-
-		}
-
+		// }
+		// else {
+		// 	openModelPopup("Assign Projects", "Please add project/s");
+		// }
 	};
 
 	$("#projectTab").on('click',function() {
@@ -379,15 +370,13 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 		adminServices.getDomains_ICE()
 		.then(function (data) {
 			if(data == "Invalid Session"){
-							window.location.href = "/";
-							}
+				window.location.href = "/";
+			}
 			else {
 				$("#selDomain").val(data[0].domainName);
 				domainId = data[0].domainId;
 			}
-
 		}, function (error) { console.log("Error:::::::::::::", error) })
-
 	});
 
 	function toggleCycleClick()
@@ -413,10 +402,9 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 		$(this).children().find('img').addClass('selectedIcon');
 			setTimeout(function() {
 				$("#preferencesTable").find("input[type=checkbox]:not(.switchRole)").each(function() {
-					$(this).attr("disabled","disabled");
-				});
-			}, 50);
-
+				$(this).attr("disabled","disabled");
+			});
+		}, 50);
 	});
 
 
@@ -560,8 +548,8 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 		adminServices.getUserRoles_Nineteen68()
 		.then(function (rolesRes) {
 			if(rolesRes == "Invalid Session"){
-							window.location.href = "/";
-							}
+				window.location.href = "/";
+			}
 			userRoleArrayList = rolesRes.userRoles;
 			userRolesList = rolesRes;
 			var getDropDown;
@@ -716,10 +704,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 
 	//Update Project Action
 	$scope.update_project = function () {
-
 		$("#selDomainEdit,#selProject").removeClass("selectErrorBorder");
-
-
 		if($('#selDomainEdit option:selected').val() == ""){
 			$("#selDomainEdit").addClass("selectErrorBorder");
 		}else if($('#selProject option:selected').val() == ""){
@@ -733,7 +718,6 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 		// }
 		else{
 				flag = false;
-
 				//Update project details json with editedProjectDetails, deletedProjectDetails, newProjectDetails
 				updateProjectObj = {};
 				var userDetails = JSON.parse(window.localStorage['_UI']);
@@ -755,7 +739,6 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 				var proceedFlag = true;
 				var relName="";
 				if(newProjectDetails.length > 0){
-
 					for(i=0;i<newProjectDetails.length;i++){
 						var testFlag = true;
 						if(newProjectDetails[i].cycleDetails.length <= 0){
@@ -876,75 +859,75 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 		});*/
 		$("#releaseTxt").val('');
 		var reg = /^[a-zA-Z0-9\s\.\-\_]+$/
-			$(document).on('click', "#addReleaseName", function(e) {
-				e.preventDefault();
-				if($("#releaseTxt").val() == "")
-				{
-					$("#releaseTxt").addClass('inputErrorBorder');
-					return false;
-				}
-				else if(!reg.test($("#releaseTxt").val()))
-				{
-					$("#releaseTxt").addClass('inputErrorBorder');
-					$("#releaseTxt").val('');
-					return false;
-				}
-				else{
-					$("#releaseTxt").removeClass('inputErrorBorder');
-					$("#releaseList li").each(function() {
-						if($(this).children('span.releaseName').text() == $("#releaseTxt").val())
-						{
-							$(".close:visible").trigger('click');
-							openModelPopup("Add Release", "Release Name already exists");
-							flag = true;
-						}
-					});
-					if(flag == true)
+		$(document).on('click', "#addReleaseName", function(e) {
+			e.preventDefault();
+			if($("#releaseTxt").val() == "")
+			{
+				$("#releaseTxt").addClass('inputErrorBorder');
+				return false;
+			}
+			else if(!reg.test($("#releaseTxt").val()))
+			{
+				$("#releaseTxt").addClass('inputErrorBorder');
+				$("#releaseTxt").val('');
+				return false;
+			}
+			else{
+				$("#releaseTxt").removeClass('inputErrorBorder');
+				$("#releaseList li").each(function() {
+					if($(this).children('span.releaseName').text() == $("#releaseTxt").val())
 					{
-						return false;
+						$(".close:visible").trigger('click');
+						openModelPopup("Add Release", "Release Name already exists");
+						flag = true;
 					}
-					releaseName = $("#releaseTxt").val();
+				});
+				if(flag == true)
+				{
+					return false;
+				}
+				releaseName = $("#releaseTxt").val();
 
-					taskName = $("#page-taskName").children("span").text();
-					$(".close:visible").trigger('click');
-					if(taskName == "Create Project")
-					{
-						$("#releaseList").append("<li id='releaseList_"+count+"'><img src='imgs/ic-release.png' /><span title="+releaseName+" class='releaseName'>"+releaseName+"</span><span class='actionOnHover'><img id=editReleaseName_"+count+" title='Edit Release Name' src='imgs/ic-edit-sm.png' class='editReleaseName'><img id=deleteReleaseName_"+count+" title='Delete Release' src='imgs/ic-delete-sm.png' class='deleteRelease'></span></li>");
-						$("#releaseList li:last").trigger('click');
-						//releaseNamesArr.push(releaseName);
-						var releCycObj = {
-								"releaseName" : '',
-								"cycleNames" : []
-						};
-						releCycObj.releaseName = releaseName;
-						projectDetails.push(releCycObj);
-						toggleCycleClick();
-						count++;
-					}
-					if(taskName == "Update Project")
-					{
-						var createNewRelCyc = {
-								"releaseName": "",
-								"newStatus" : true,
-								"cycleDetails": []
-						}
-						count = $("#releaseList li").length;
-						$("#releaseList").append("<li class='createRelease' id='releaseList_"+count+"'><img src='imgs/ic-release.png' /><span title="+releaseName+" class='releaseName'>"+releaseName+"</span><span class='actionOnHover'><img id=editReleaseName_"+count+" title='Edit Release Name' src='imgs/ic-edit-sm.png' class='editReleaseName'><img id=deleteReleaseName_"+count+" title='Delete Release' src='imgs/ic-delete-sm.png' class='deleteRelease'></span></li>");
-						// releCycObj = {};
-						// releCycObj.releaseName = releaseName;
-						// releCycObj.releaseId = "";
-						// releCycObj.cycleDetails = [];
-						// updateProjectDetails.push(releCycObj);
-						//for update project json
-						createNewRelCyc.releaseName = releaseName;
-						newProjectDetails.push(createNewRelCyc);
-						toggleCycleClick();
-						$("#releaseList li#releaseList_"+count+"").trigger('click');
-						count++;
-					}
-					e.stopImmediatePropagation();
+				taskName = $("#page-taskName").children("span").text();
+				$(".close:visible").trigger('click');
+				if(taskName == "Create Project")
+				{
+					$("#releaseList").append("<li id='releaseList_"+count+"'><img src='imgs/ic-release.png' /><span title="+releaseName+" class='releaseName'>"+releaseName+"</span><span class='actionOnHover'><img id=editReleaseName_"+count+" title='Edit Release Name' src='imgs/ic-edit-sm.png' class='editReleaseName'><img id=deleteReleaseName_"+count+" title='Delete Release' src='imgs/ic-delete-sm.png' class='deleteRelease'></span></li>");
+					$("#releaseList li:last").trigger('click');
+					//releaseNamesArr.push(releaseName);
+					var releCycObj = {
+							"releaseName" : '',
+							"cycleNames" : []
+					};
+					releCycObj.releaseName = releaseName;
+					projectDetails.push(releCycObj);
+					toggleCycleClick();
+					count++;
 				}
-			})
+				if(taskName == "Update Project")
+				{
+					var createNewRelCyc = {
+							"releaseName": "",
+							"newStatus" : true,
+							"cycleDetails": []
+					}
+					count = $("#releaseList li").length;
+					$("#releaseList").append("<li class='createRelease' id='releaseList_"+count+"'><img src='imgs/ic-release.png' /><span title="+releaseName+" class='releaseName'>"+releaseName+"</span><span class='actionOnHover'><img id=editReleaseName_"+count+" title='Edit Release Name' src='imgs/ic-edit-sm.png' class='editReleaseName'><img id=deleteReleaseName_"+count+" title='Delete Release' src='imgs/ic-delete-sm.png' class='deleteRelease'></span></li>");
+					// releCycObj = {};
+					// releCycObj.releaseName = releaseName;
+					// releCycObj.releaseId = "";
+					// releCycObj.cycleDetails = [];
+					// updateProjectDetails.push(releCycObj);
+					//for update project json
+					createNewRelCyc.releaseName = releaseName;
+					newProjectDetails.push(createNewRelCyc);
+					toggleCycleClick();
+					$("#releaseList li#releaseList_"+count+"").trigger('click');
+					count++;
+				}
+				e.stopImmediatePropagation();
+			}
+		})
 	});
 
 	$(document).on('click',"#releaseList li",function() {
@@ -1221,6 +1204,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 		$("#releaseName").addClass("validationKeydown");
 		var existingReleaseName = $(this).parents("li").children(".releaseName").text()
 		$("#releaseName").val(existingReleaseName);
+		var flag = false;
 		editReleaseId = e.target.id;
 		editRelid = e.target.parentElement.previousSibling.dataset.releaseid;
 		if(e.target.id != "releaseName")
@@ -1247,6 +1231,18 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 					}
 					else{
 						$("#releaseName").removeClass('inputErrorBorder');
+						$("#releaseList li").each(function() {
+							if($(this).children('span.releaseName').text() == $("#releaseName").val())
+							{
+								$(".close:visible").trigger('click');
+								openModelPopup("Add Release", "Release Name already exists");
+								flag = true;
+							}
+						});
+						if(flag == true)
+						{
+							return false;
+						}
 						releaseName = $("#releaseName").val();
 						taskName = $("#page-taskName").children("span").text();
 						if(taskName == "Create Project")
@@ -1475,90 +1471,129 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 				{
 					return false;
 				}
-					if($("#cycleName").val() == "")
-					{
-						$("#cycleName").addClass('inputErrorBorder');
-						return false;
+				if($("#cycleName").val() == "")
+				{
+					$("#cycleName").addClass('inputErrorBorder');
+					return false;
+				}
+				else if(!reg.test($("#cycleName").val()))
+				{
+					$("#cycleName").addClass('inputErrorBorder');
+					$("#cycleName").val('');
+					return false;
+				}
+				else{
+					var relID = $("li.active").children('span.releaseName').data("releaseid");
+					for(i=0; i<updateProjectDetails.length; i++){
+						if(relID == updateProjectDetails[i].releaseId){
+							for(j=0; j<updateProjectDetails[i].cycleDetails.length; j++){
+								if($("#cycleName").val().trim() == updateProjectDetails[i].cycleDetails[j].cycleName){
+									$(".close:visible").trigger('click');
+									openModelPopup("Edit Cycle Name", "Cycle Name already exists");
+									return false;
+								}
+							}
+							break;
+						}
 					}
-					else if(!reg.test($("#cycleName").val()))
+					$("#cycleName").removeClass('inputErrorBorder');
+					cycleName = $("#cycleName").val();
+
+					$(".close:visible").trigger('click');
+					taskName = $("#page-taskName").children("span").text();
+					if(taskName == "Create Project")
 					{
-						$("#cycleName").addClass('inputErrorBorder');
-						$("#cycleName").val('');
-						return false;
-					}
-					else{
-						var relID = $("li.active").children('span.releaseName').data("releaseid");
-						for(i=0; i<updateProjectDetails.length; i++){
-							if(relID == updateProjectDetails[i].releaseId){
-								for(j=0; j<updateProjectDetails[i].cycleDetails.length; j++){
-									if($("#cycleName").val().trim() == updateProjectDetails[i].cycleDetails[j].cycleName){
-										$(".close:visible").trigger('click');
-										openModelPopup("Edit Cycle Name", "Cycle Name already exists");
-										return false;
+						$("#"+editCycleId).parent().prev('span').text($("#cycleName").val());
+						$("#"+editCycleId).parent().prev('span')[0].setAttribute("title", $("#cycleName").val());
+						var cycleIndex = '';
+						cycleIndex = $('li.cycleList').index();
+						for(var i=0;i<projectDetails.length;i++)
+						{
+							if(projectDetails[i].releaseName == $("li.active").children('span.releaseName').text())
+							{
+								for(var j=0;j<projectDetails[i].cycleNames.length;j++)
+								{
+									if(j == cycleIndex)
+									{
+										projectDetails[i].cycleNames[j] = $("#cycleName").val();
 									}
 								}
-								break;
 							}
 						}
-						$("#cycleName").removeClass('inputErrorBorder');
-						cycleName = $("#cycleName").val();
-
-						$(".close:visible").trigger('click');
-						taskName = $("#page-taskName").children("span").text();
-						if(taskName == "Create Project")
+					}
+					else if(taskName == "Update Project")
+					{
+						var oldCycText = $("#"+editCycleId).parent().prev('span').text();
+						$("#"+editCycleId).parent().prev('span').text($("#cycleName").val());
+						$("#"+editCycleId).parent().prev('span')[0].setAttribute("title", $("#cycleName").val());
+						var cycleIndex = '';
+						cycleIndex = $('li.cycleList').index();
+						for(var i=0;i<updateProjectDetails.length;i++)
 						{
-							$("#"+editCycleId).parent().prev('span').text($("#cycleName").val());
-							$("#"+editCycleId).parent().prev('span')[0].setAttribute("title", $("#cycleName").val());
-							var cycleIndex = '';
-							cycleIndex = $('li.cycleList').index();
-							for(var i=0;i<projectDetails.length;i++)
+							if(updateProjectDetails[i].releaseName == $("li.active").children('span.releaseName').text())
 							{
-								if(projectDetails[i].releaseName == $("li.active").children('span.releaseName').text())
+								for(var j=0;j<updateProjectDetails[i].cycleDetails.length;j++)
 								{
-									for(var j=0;j<projectDetails[i].cycleNames.length;j++)
+									var objectType = typeof(updateProjectDetails[i].cycleDetails[j]);
+									if(objectType == "object" && j == cycleIndex && (updateProjectDetails[i].releaseName == $("li.active").children('span.releaseName').text()) && (updateProjectDetails[i].cycleDetails[j].cycleId == editCycId))
 									{
-										if(j == cycleIndex)
-										{
-											projectDetails[i].cycleNames[j] = $("#cycleName").val();
+										var editRelCyc = {
+												"releaseId": "",
+												"releaseName": "",
+												"oldreleaseName" :"",
+												"cycleDetails": [],
+												"editStatus": false
 										}
-									}
-								}
-							}
-						}
-						else if(taskName == "Update Project")
-						{
-							var oldCycText = $("#"+editCycleId).parent().prev('span').text();
-							$("#"+editCycleId).parent().prev('span').text($("#cycleName").val());
-							$("#"+editCycleId).parent().prev('span')[0].setAttribute("title", $("#cycleName").val());
-							var cycleIndex = '';
-							cycleIndex = $('li.cycleList').index();
-							for(var i=0;i<updateProjectDetails.length;i++)
-							{
-								if(updateProjectDetails[i].releaseName == $("li.active").children('span.releaseName').text())
-								{
-									for(var j=0;j<updateProjectDetails[i].cycleDetails.length;j++)
-									{
-										var objectType = typeof(updateProjectDetails[i].cycleDetails[j]);
-										if(objectType == "object" && j == cycleIndex && (updateProjectDetails[i].releaseName == $("li.active").children('span.releaseName').text()) && (updateProjectDetails[i].cycleDetails[j].cycleId == editCycId))
-										{
-											var editRelCyc = {
-													"releaseId": "",
-													"releaseName": "",
-													"oldreleaseName" :"",
-													"cycleDetails": [],
-													"editStatus": false
-											}
-											var editCycle = {
-													"oldCycleName": "",
-													"cycleName": "",
-													"cycleId": "",
-													"editStatus":  false
-											}
-											//console.log("objectType", typeof(updateProjectDetails[i].cycleDetails[j]))
-											updateProjectDetails[i].cycleDetails[j].cycleName = $("#cycleName").val();
+										var editCycle = {
+												"oldCycleName": "",
+												"cycleName": "",
+												"cycleId": "",
+												"editStatus":  false
+										}
+										//console.log("objectType", typeof(updateProjectDetails[i].cycleDetails[j]))
+										updateProjectDetails[i].cycleDetails[j].cycleName = $("#cycleName").val();
 
-											//For update project json
-											if(editedProjectDetails.length <= 0){
+										//For update project json
+										if(editedProjectDetails.length <= 0){
+											//building release details
+											editRelCyc.releaseId = relID;//updateProjectDetails[i].releaseId;
+											editRelCyc.releaseName = $("li.active").children('span.releaseName').text();//updateProjectDetails[i].releaseName;
+											//building cycle details with release
+											editCycle.oldCycleName = oldCycText;
+											editCycle.cycleName = $("#cycleName").val();//updateProjectDetails[i].cycleDetails[j].cycleName;
+											editCycle.cycleId = editCycId;//updateProjectDetails[i].cycleDetails[j].cycleId;
+											editCycle.editStatus = true;
+											editRelCyc.cycleDetails.push(editCycle)
+											//pushing all data to an array
+											editedProjectDetails.push(editRelCyc)
+										}
+										else {
+											var chkRelPresent = true;
+											for(m=0; m<editedProjectDetails.length; m++){
+												if(editedProjectDetails[m].releaseId == relID/*updateProjectDetails[i].releaseId*/){
+													var chkcycinrel = true;
+													for(n=0; n<editedProjectDetails[m].cycleDetails.length; n++){
+														if(editedProjectDetails[m].cycleDetails[n].cycleId == editCycId/*updateProjectDetails[i].cycleDetails[j].cycleId*/){
+															editedProjectDetails[m].cycleDetails[n].cycleName = $("#cycleName").val();//updateProjectDetails[i].cycleDetails[j].cycleName;
+															editedProjectDetails[m].cycleDetails[n].oldCycleName = oldCycText;
+															editedProjectDetails[m].cycleDetails[n].editStatus = true;
+															chkcycinrel = false;
+															break;
+														}
+													}
+													if(chkcycinrel == true){
+														//building cycle details with release
+														editCycle.oldCycleName = oldCycText;
+														editCycle.cycleName = $("#cycleName").val();//updateProjectDetails[i].cycleDetails[j].cycleName;
+														editCycle.cycleId = editCycId;//updateProjectDetails[i].cycleDetails[j].cycleId;
+														editCycle.editStatus = true;
+														editedProjectDetails[m].cycleDetails.push(editCycle);
+														break;
+													}
+													chkRelPresent = false;
+												}
+											}
+											if(chkRelPresent == true){
 												//building release details
 												editRelCyc.releaseId = relID;//updateProjectDetails[i].releaseId;
 												editRelCyc.releaseName = $("li.active").children('span.releaseName').text();//updateProjectDetails[i].releaseName;
@@ -1571,61 +1606,22 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 												//pushing all data to an array
 												editedProjectDetails.push(editRelCyc)
 											}
-											else {
-												var chkRelPresent = true;
-												for(m=0; m<editedProjectDetails.length; m++){
-													if(editedProjectDetails[m].releaseId == relID/*updateProjectDetails[i].releaseId*/){
-														var chkcycinrel = true;
-														for(n=0; n<editedProjectDetails[m].cycleDetails.length; n++){
-															if(editedProjectDetails[m].cycleDetails[n].cycleId == editCycId/*updateProjectDetails[i].cycleDetails[j].cycleId*/){
-																editedProjectDetails[m].cycleDetails[n].cycleName = $("#cycleName").val();//updateProjectDetails[i].cycleDetails[j].cycleName;
-																editedProjectDetails[m].cycleDetails[n].oldCycleName = oldCycText;
-																editedProjectDetails[m].cycleDetails[n].editStatus = true;
-																chkcycinrel = false;
-																break;
-															}
-														}
-														if(chkcycinrel == true){
-															//building cycle details with release
-															editCycle.oldCycleName = oldCycText;
-															editCycle.cycleName = $("#cycleName").val();//updateProjectDetails[i].cycleDetails[j].cycleName;
-															editCycle.cycleId = editCycId;//updateProjectDetails[i].cycleDetails[j].cycleId;
-															editCycle.editStatus = true;
-															editedProjectDetails[m].cycleDetails.push(editCycle);
-															break;
-														}
-														chkRelPresent = false;
-													}
-												}
-												if(chkRelPresent == true){
-													//building release details
-													editRelCyc.releaseId = relID;//updateProjectDetails[i].releaseId;
-													editRelCyc.releaseName = $("li.active").children('span.releaseName').text();//updateProjectDetails[i].releaseName;
-													//building cycle details with release
-													editCycle.oldCycleName = oldCycText;
-													editCycle.cycleName = $("#cycleName").val();//updateProjectDetails[i].cycleDetails[j].cycleName;
-													editCycle.cycleId = editCycId;//updateProjectDetails[i].cycleDetails[j].cycleId;
-													editCycle.editStatus = true;
-													editRelCyc.cycleDetails.push(editCycle)
-													//pushing all data to an array
-													editedProjectDetails.push(editRelCyc)
-												}
-											}
-											break;
 										}
-										//For update project json
-										if(objectType == "string" && j == cycleIndex){
-											updateProjectDetails[i].cycleDetails[j] =  $("#cycleName").val();
-										}
+										break;
+									}
+									//For update project json
+									if(objectType == "string" && j == cycleIndex){
+										updateProjectDetails[i].cycleDetails[j] =  $("#cycleName").val();
 									}
 								}
 							}
 						}
-						//$("#"+editCycleId).addClass("editedCycle");
-						//$("#"+editCycleId).siblings(".deleteCycle").addClass("editedCycle");
-						event.stopImmediatePropagation();
-						$("#"+event.target.id).unbind('click');
 					}
+					//$("#"+editCycleId).addClass("editedCycle");
+					//$("#"+editCycleId).siblings(".deleteCycle").addClass("editedCycle");
+					event.stopImmediatePropagation();
+					$("#"+event.target.id).unbind('click');
+				}
 			});
 		}
 	});
@@ -1680,6 +1676,11 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 								{
 									delete newProjectDetails[i].cycleDetails[j];
 									newProjectDetails[i].cycleDetails =  newProjectDetails[i].cycleDetails.filter(function(n){ return n != null });
+									if(newProjectDetails[i].cycleDetails.length <= 0){
+										delete newProjectDetails[i];
+										newProjectDetails =  newProjectDetails.filter(function(n){ return n != null });
+										break;
+									}
 									goahead = true;
 								}
 							}

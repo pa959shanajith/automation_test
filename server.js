@@ -72,6 +72,7 @@ if (cluster.isMaster) {
     var helmet = require('helmet');
     const os = require('os');
     var async = require('async');
+    var lusca = require('lusca');
     //HTTPS Configuration
     var privateKey = fs.readFileSync('server/https/server.key', 'utf-8');
     var certificate = fs.readFileSync('server/https/server.crt', 'utf-8');
@@ -126,6 +127,64 @@ if (cluster.isMaster) {
         }
     }));
     app.use(helmet());
+    var opts = {
+            csrf: {
+                angular: true
+            }
+        }; // options for lusca
+    app.use(lusca.p3p('ABCDEF'));
+    app.use(helmet.referrerPolicy({ policy: 'same-origin' }));
+    var ninetyDaysInSeconds = 7776000
+    app.use(helmet.hpkp({
+    maxAge: ninetyDaysInSeconds,
+    sha256s: ['AbCdEf123=', 'ZyXwVu456=']
+    }))
+     app.use(helmet.noCache());
+    //Role Based User Access to services
+      app.post('*',function(req,res,next) {
+           var roleId = req.session.defaultRoleId;
+           if(req.session.defaultRoleId != undefined)
+           {
+                var updateinp = {roleid:req.session.defaultRoleId,servicename:req.url.replace("/","")}
+                var args = { data:updateinp,headers:{"Content-Type" : "application/json"}}
+                apiclient.post("http://127.0.0.1:1990/"+"utility/userAccess_Nineteen68",args,
+                                function (result, response) {
+                    if(response.statusCode != 200 || result.rows == "fail"){
+                        console.log("Error occured in userAccess_Nineteen68 : Fail");
+                        res.send("Invalid Session");
+                    }else{
+                        if(result.rows == "True"){
+                            return next();
+                        }else{
+                            req.session.destroy(); 
+                            res.status(401).redirect('/');
+                        }
+                    }
+                });
+           }
+           else{
+               return next();
+           }
+    });
+    //CORS
+    app.all('*', function(req, res, next) {
+        res.header('Access-Control-Allow-Origin', '*');
+        res.header('Access-Control-Allow-Methods', 'PUT, GET, POST, DELETE, OPTIONS');
+        res.header('Access-Control-Allow-Headers', 'X-Requested-With');
+        next();
+    });
+    //Content Security Policy Enabled for Images and Fonts.
+    app.use(helmet.contentSecurityPolicy({
+        directives: {
+            imgSrc:["'self'",'data:'],
+            fontSrc: ["'self'"],
+            objectSrc: ["'none'"],
+            mediaSrc: ["'self'"],
+            frameSrc: ["'none'"]
+        }
+        }));
+
+
     //write stream for logs
     //var accessLogStream = fs.createWriteStream(__dirname + '/access.log', {flags: 'a'})
     //setup the logger
@@ -277,6 +336,7 @@ if (cluster.isMaster) {
     var webCrawler = require('./server/controllers/webCrawler');
     var chatbot = require('./server/controllers/chatbot');
     var neuronGraphs2D = require('./server/controllers/neuronGraphs2D');
+    var taskbuilder=require('./server/controllers/taskJson');
 
     // Mindmap Routes
     try{
@@ -340,9 +400,11 @@ if (cluster.isMaster) {
     app.post('/getReport_Nineteen68', report.getReport_Nineteen68);
     app.post('/exportToJson_ICE', report.exportToJson_ICE);
     app.post('/openScreenShot', report.openScreenShot);
+
     //Plugin Routes
     app.post('/getProjectIDs_Nineteen68', plugin.getProjectIDs_Nineteen68);
-    app.post('/getTaskJson_Nineteen68', plugin.getTaskJson_Nineteen68);
+    app.post('/getTaskJson_mindmaps', taskbuilder.getTaskJson_mindmaps);
+    app.post('/updateTaskstatus_mindmaps', taskbuilder.updateTaskstatus_mindmaps);
     //Utility plugins
     app.post('/Encrypt_ICE', utility.Encrypt_ICE);
     // Wecoccular Plugin
@@ -354,7 +416,8 @@ if (cluster.isMaster) {
     //NeuronGraphs Plugin Routes
     app.post('/hierarchy_nGraphs2D', neuronGraphs2D.getHierarchy);
     app.post('/getGraph_nGraphs2D', neuronGraphs2D.getGraphData);
-
+    app.post('/getPackData_nGraphs2D', neuronGraphs2D.getPackData);		
+    app.post('/getReportData_nGraphs2D', neuronGraphs2D.getReportData);
     //QC Plugin
     app.post('/loginQCServer_ICE', qc.loginQCServer_ICE);
     app.post('/qcProjectDetails_ICE', qc.qcProjectDetails_ICE);
@@ -535,7 +598,7 @@ if (cluster.isMaster) {
     console.log(e);
     setTimeout(function(){
       cluster.worker.kill();
-    }, 2);
+    }, 2)
   }
 
 }

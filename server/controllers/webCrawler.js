@@ -3,7 +3,7 @@ var url=require('url');
 var sessionExtend = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes 
 var sessionTime = 30 * 60 * 1000;
 var updateSessionTimeEvery = 20 * 60 * 1000;
-
+var validator = require('validator');
 exports.getCrawlResults = function(req, res){
        try{
            if(req.cookies['connect.sid'] != undefined){
@@ -16,6 +16,29 @@ exports.getCrawlResults = function(req, res){
              var input_url = req.body.url;
              var level = req.body.level;
              var agent = req.body.agent;
+              validateWeboccular();
+             function validateWeboccular ()
+             {
+                  check_url = validator.isURL(req.body.url);
+                  if(check_url == true)
+                  {
+                    validate_url = true;
+                  }
+				  console.log(typeof(req.body.level));
+                  check_level = validator.isEmpty(req.body.level.toString());
+				  
+                  if(check_level == false)
+                  {
+                    validate_level = true;
+                  }
+                  check_agent = validator.isAlpha(req.body.agent);
+                    if(check_agent == true)
+                    {
+                      validate_agent = true;
+                    }
+             }
+        if(validate_url == true && validate_level == true && check_agent == true)
+                  {  
 
            var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
            console.log("IP:",ip);
@@ -55,6 +78,10 @@ exports.getCrawlResults = function(req, res){
                   return res.status(500).json({ success: false, data: err});
                 }
              });
+           }
+           else{
+              res.send('unavailableLocalServer');
+           }
              //
             //  mySocket.on('disconnect', function(){
             //    return res.send("localServerDisconnected")

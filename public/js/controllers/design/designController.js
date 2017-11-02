@@ -72,13 +72,18 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
         $scope.errorMessage = "";
     }
     //Default Function to reset all input, select
-
-    var getTaskName = JSON.parse(window.localStorage['_CT']).taskName;
-    appType = JSON.parse(window.localStorage['_CT']).appType;
-    screenName = JSON.parse(window.localStorage['_CT']).screenName;
-    testCaseName = JSON.parse(window.localStorage['_CT']).testCaseName;
-    subTaskType = JSON.parse(window.localStorage['_CT']).subTaskType;
-    subTask = JSON.parse(window.localStorage['_CT']).subtask;
+    var current_task=JSON.parse(window.localStorage['_CT']);
+    var getTaskName = current_task.taskName;
+    appType = current_task.appType;
+    screenName = current_task.screenName;
+    testCaseName = current_task.testCaseName;
+    subTaskType = current_task.subTaskType;
+    subTask = current_task.subtask;
+    status = current_task.status;
+	if(status=='review'){
+				$('.submitTaskBtn').text('Approve');
+				$('.reassignTaskBtn').show();
+	}
     $("#page-taskName").empty().append('<span class="taskname">' + getTaskName + '</span>');
     $(".projectInfoWrap").empty()
     //Loading Project Info
@@ -195,17 +200,32 @@ console.log("screenName:", screenName);
     var keywordValArr = [];
     var proceed = false;
 
-    //Submit Task Screen
-    $scope.submitTasksScreen = function() {
-        $("#submitTasksScreen").modal("show")
-    }
-    //Submit Task Screen
+//Submit Task Screen
+	$scope.submitTasksScreen = function(action){
+		$("#submitTasksScreen").modal("show")
+		if(action=='reassign'){
+			$("#submitTasksScreen").find('.modal-body p').text('Are you sure you want to reassign the task ?')
+			$("#submitTasksScreen").find('.modal-footer button')[0].setAttribute('onclick',"submit_task('reassign')")
+		}
+        // else{
+        //     $("#submitTasksScreen").find('.modal-footer button')[0].setAttribute('onclick',"submit_task('"+action+"')")
+        // }
+	}
+	//Submit Task Screen
 
-    //Submit Tast Test Case
-    $scope.submitTasksTestCase = function() {
-        $("#submitTasksTestCase").modal("show")
-    }
-    //Submit task Test Case
+	//Submit Tast Test Case
+	$scope.submitTasksTestCase = function(action){
+		
+		$("#submitTasksTestCase").modal("show")
+		if(action=='reassign'){
+			$("#submitTasksTestCase").find('.modal-body p').text('Are you sure you want to reassign the task ?')
+			$("#submitTasksTestCase").find('.modal-footer button')[0].setAttribute('onclick',"submit_task('reassign')")
+		}
+        // else{
+        //     $("#submitTasksTestCase").find('.modal-footer button')[0].setAttribute('onclick',"submit_task('"+action+"')")
+        // }
+	}
+	//Submit task Test Case
 
     $scope.readTestCase_ICE = function() {
         var taskInfo = JSON.parse(window.localStorage['_CT']);
@@ -484,7 +504,7 @@ console.log("screenName:", screenName);
                 var file = overWriteJson.files[0];
                 var textType = /json.*/;
                 var reader = new FileReader();
-                reader.onload = function(e) {
+                reader.onload = function(e) {                    
                     if ((file.name.split('.')[file.name.split('.').length - 1]).toLowerCase() == "json") {
                         var resultString = JSON.parse(reader.result);
                         for (i = 0; i < resultString.length; i++) {
@@ -517,7 +537,6 @@ console.log("screenName:", screenName);
                         openDialog("Import Testcase", "Please Check the file format you have uploaded!")
                     }
                 }
-
                 reader.readAsText(file);
                 counter2 = 1;
                 $("#overWriteJson").val('');
@@ -591,7 +610,7 @@ console.log("screenName:", screenName);
         var screenId = taskInfo.screenId;
         var testCaseId = taskInfo.testCaseId;
         var testCaseName = taskInfo.testCaseName;
-		var versionnumber = taskInfo.versionnumber;
+        var versionnumber = taskInfo.versionnumber;
         DesignServices.readTestCase_ICE(screenId, testCaseId, testCaseName, versionnumber)
             .then(function(response) {
                     if (response == "Invalid Session") {
@@ -2320,7 +2339,7 @@ console.log("screenName:", screenName);
                 {
                       for (var i = 0; i < viewString.view.length; i++) {
                          
-						if ( $.trim($(this).find("input").val()) == $.trim(viewString.view[i].custname)) {
+						if ( $.trim($(this).find("input").val()) == $.trim(viewString.view[i].custname) || $.trim($(this).find("input").val()) == $.trim(viewString.view[i].custname).split("_")[0]) {
 							$("#dialog-addObject").modal("hide");
 							openDialog("Add Object", "Object characterstics are same for " + $(this).find("input").val() + "");
 							return false;
@@ -2340,9 +2359,45 @@ console.log("screenName:", screenName);
             //window.localStorage['disableEditing'] = "true";
             //Pushing custom object in array
             $.each($(".addObj-row"), function() {
+                var typeOfElement;
+                var eleType = $(this).find("select option:selected").val();
+                switch(eleType){
+                    case "button":
+                        typeOfElement = "btn";
+                        break;
+                    case "checkbox":
+                        typeOfElement = "chkbox";
+                        break;
+                    case "select":
+                        typeOfElement = "select";
+                        break;
+                    case "img":
+                        typeOfElement = "img";
+                        break;
+                    case "a":
+                        typeOfElement = "lnk";
+                        break;
+                    case "radiobutton":
+                        typeOfElement = "radiobtn";
+                        break;
+                    case "input":
+                        typeOfElement = "txtbox";
+                        break;
+                    case "list":
+                        typeOfElement = "lst";
+                        break;
+                    case "table":
+                        typeOfElement = "tbl";
+                        break;
+                    case "Element":
+                        typeOfElement = "elmnt";
+                        break;
+                    default:
+                        break;
+                }
                 customObj.push({
-                    custname: $(this).find("input").val(),
-                    tag: $(this).find("select option:selected").val(),
+                    custname: $(this).find("input").val()+"_"+typeOfElement,
+                    tag: eleType,
                     xpath: ''
                 })
             })
@@ -2622,7 +2677,7 @@ console.log("screenName:", screenName);
                 scrapeObject.editedListoldCustName = [];
                 scrapeObject.editedListoldXpath = [];
                 scrapeObject.editedListmodifiedXpaths = [];
-
+                scrapeObject.versionnumber = tasks.versionnumber;
                 //Filtering the Object which has been mapped
                 var valueToMap = $(".valueMerged")
                 $.each(valueToMap, function() {
@@ -4665,10 +4720,10 @@ function contentTable(newTestScriptDataLS) {
             $grid.jqGrid('setCell', currRowId, 'objectName', objName);
             $grid.jqGrid('setCell', currRowId, 'url', url);
         }
-        else{
-            $grid.jqGrid('setCell', currRowId, 'objectName', objName);
-            $grid.jqGrid('setCell', currRowId, 'url', url);
-        }
+        // else{
+        //     $grid.jqGrid('setCell', currRowId, 'objectName', objName);
+        //     $grid.jqGrid('setCell', currRowId, 'url', url);
+        // }
         //get Input and Output Syntax for selected Keyword
         $.each(keywordArrayList, function(index, value) {
             keywordArrayKey = index;

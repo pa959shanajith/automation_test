@@ -95,6 +95,7 @@ mySPA.controller('qcController',['$scope','$window','$http','$location','$timeou
 	}
 
 	$scope.hideMappedFilesTab = function(){
+		$scope.testLabGenerator = false;
 		$(".mappedFiles, .mappedFilesLabel").hide();
 		$("#page-taskName span").text("ALM Integration");
 		$(".qcActionBtn, .leftQcStructure, .rightQcStructure").show();
@@ -420,6 +421,7 @@ mySPA.controller('qcController',['$scope','$window','$http','$location','$timeou
 	//Get all project details for Manual Testcase Generator
 	//Load projects
 	$scope.getDetailsforMTG = function(){
+		$scope.testLabGenerator = false;
 		blockUI("Loading...");
 		qcServices.manualTestcaseDetails_ICE()
 		.then(function(data){
@@ -552,6 +554,8 @@ mySPA.controller('qcController',['$scope','$window','$http','$location','$timeou
 
 	//Generate Manual Testcase details
 	$scope.saveTestlabdetails = function(){
+		$scope.tab = false;
+		$scope.testLabGenerator = true;
 		var tCaseId = $(".selectTestcaseMTG").data("testcaseid");
 		var getMTGColumns = $(".almFieldExcel li");
 		var testcasedetails = {};

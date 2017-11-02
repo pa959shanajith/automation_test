@@ -1,7 +1,6 @@
 /**
  * Dependencies.
  */
-// var dbConn = require('../../server/config/icetestautomation');
 var myserver = require('../../server.js');
 var async = require('async');
 var parse = require('xml-parser');
@@ -1158,7 +1157,7 @@ exports.updateScreen_ICE = function (req, res) {
 																}
 															}
 														});
-														testcasecallback();
+														testcasecallback;
 													} catch (exception) {
 														console.log(exception);
 													}
@@ -1178,7 +1177,7 @@ exports.updateScreen_ICE = function (req, res) {
 							}
 						});
 					}
-					finalcallback();
+					finalcallback;
 				} catch (exception) {
 					console.log(exception);
 				}

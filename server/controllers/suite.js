@@ -4,14 +4,15 @@
 var async = require('async');
 var myserver = require('../../server.js');
 var uuid = require('uuid-random');
-var dbConnICE = require('../../server/config/icetestautomation');
 var epurl = "http://127.0.0.1:1990/";
 var Client = require("node-rest-client").Client;
+var neo4jAPI = require('../controllers/neo4jAPI');
 var client = new Client();
 var schedule = require('node-schedule');
-var sessionExtend = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes 
+var sessionExtend = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes 
 var sessionTime = 30 * 60 * 1000;
 var updateSessionTimeEvery = 20 * 60 * 1000;
+var scheduleStatus = "";
 
 /**
  * @author vishvas.a
@@ -20,7 +21,11 @@ var updateSessionTimeEvery = 20 * 60 * 1000;
  * this reads the scenario information from the testsuites
  * and testsuites table of the icetestautomation keyspace
  */
+
+var qList = [];
+
 exports.readTestSuite_ICE = function (req, res) {
+	qList = [];
 	if (req.cookies['connect.sid'] != undefined) {
 		var sessionCookie = req.cookies['connect.sid'].split(".");
 		var sessionToken = sessionCookie[0].split(":");
@@ -123,6 +128,7 @@ exports.readTestSuite_ICE = function (req, res) {
 											respeachscenario.scenarionames = outscenarionames;
 											respeachscenario.projectnames = outprojectnames;
 											respeachscenario.testsuiteid = eachSuite.testsuiteid;
+											respeachscenario.versionnumber = eachSuite.versionnumber;
 											if (scenarioidindex == outscenarioids.length) {
 												responsedata[eachSuite.testsuitename] = respeachscenario;
 												if (testsuitesindex == requiredreadTestSuite.length) {
@@ -150,6 +156,19 @@ exports.readTestSuite_ICE = function (req, res) {
 					});
 				}
 			});
+		},function(){
+			neo4jAPI.executeQueries(qList,function(status,result){
+				//res.setHeader('Content-Type', 'application/json');
+				if(status!=200){
+					console.log("Status:",status,"\nResponse: ",result);
+					//res.status(status).send(result);
+				}
+				else{
+					console.log('Success');
+					console.log('qList:::',qList);
+					console.log('result:: ',result);
+				}
+			});			
 		});
 	} else {
 		res.send("Invalid Session");
@@ -226,6 +245,7 @@ function Projectnametestcasename_ICE(req, cb, data) {
  * to the testsuites table of icetestautomation keyspace
  */
 exports.updateTestSuite_ICE = function (req, res) {
+    qList = [];	
 	if (req.cookies['connect.sid'] != undefined) {
 		var sessionCookie = req.cookies['connect.sid'].split(".");
 		var sessionToken = sessionCookie[0].split(":");
@@ -251,7 +271,6 @@ exports.updateTestSuite_ICE = function (req, res) {
 				var testscenarioids = eachbatchDetails[eachsuitename].testscenarioids;
 				var testscycleid = eachbatchDetails[eachsuitename].testscycleid;
 				var versionnumber = eachbatchDetails[eachsuitename].versionnumber;
-				console.log(requestedtestsuitename);
 				var index = 0;
 				/*
 				 * Query 1 checking whether the requestedtestsuiteid belongs to the same requestedtestscycleid
@@ -300,6 +319,16 @@ exports.updateTestSuite_ICE = function (req, res) {
 						if (response.statusCode != 200 || data.rows == "fail") {
 							console.log(response.statusCode);
 						} else {
+							//Execute neo4j query!!
+							//var qList=[];
+							qList.push({"statement":"MATCH (n:TESTSUITES_NG {cycleid:'"+inputs.cycleid
+									+"',testsuitename:'"+inputs.testsuitename+",'testsuiteid:'"+inputs.testsuiteid
+									+"',versionnumber:["+inputs.versionnumber+"]}) set n.testscenarioids=[], n.donotexecute='null' return n"});
+
+							//Relationships
+							qList.push({"statement":"MATCH (a:TESTSUITES_NG{testsuiteid:'"+inputs.testsuiteid+"',cycleid:'"+inputs.cycleid
+									+"'})-[r]->(b:TESTSCENARIOS_NG) delete r"})
+						
 							flag = "success";
 							deleteSuitecallback(null, flag);
 						}
@@ -334,6 +363,18 @@ exports.updateTestSuite_ICE = function (req, res) {
 							if (response.statusCode != 200 || data.rows == "fail") {
 								console.log(response.statusCode);
 							} else {
+								//Execute neo4j query!!
+								//var qList=[];
+								qList.push({"statement":"MATCH (n:TESTSUITES_NG {cycleid:'"+inputs2.cycleid
+											+"',testsuiteid:'"+inputs2.testsuiteid+"',testsuitename:'"+inputs2.testsuitename
+											+"',versionnumber:["+inputs2.versionnumber+"]}) set n.testscenarioids=n.testscenarioids+["
+											+inputs2.testscenarioids+"], n.donotexecute='"+inputs2.donotexecute+"'"});
+								//Relationship
+								qList.push({"statement":"MATCH (a:TESTSUITES_NG{cycleid:'"+inputs2.cycleid
+									+"',testsuiteid:'"+inputs2.testsuiteid+"',testsuitename:'"+inputs2.testsuitename
+									+"',versionnumber:["+inputs2.versionnumber+"]})),(b:TESTSCENARIOS_NG{testscenarioid:'"+inputs2.testscenarioids+"'}) MERGE (a)-[r:FTSUTTSC_NG{id:'"+inputs2.testscenarioids+"'}]->(b)RETURN a,b,r"})
+
+								//reqToAPI(qList,urlData);								
 								flag = "success";
 								saveSuite(null, flag);
 							}
@@ -347,6 +388,32 @@ exports.updateTestSuite_ICE = function (req, res) {
 		res.send("Invalid Session");
 	}
 };
+
+//Update execution table on completion of suite execution
+function updateExecutionStatus(testsuiteid, executionid, starttime, suiteStatus) {
+	var inputs = {
+		"testsuiteid": testsuiteid,
+		"executionid": executionid,
+		"starttime": starttime.toString(),
+		"status": suiteStatus,
+		"query": "inserintotexecutionquery"
+	};
+	var args = {
+		data: inputs,
+		headers: {
+			"Content-Type": "application/json"
+		}
+	};
+	client.post(epurl + "suite/ExecuteTestSuite_ICE", args,
+		function (result, response) {
+		if (response.statusCode != 200 || result.rows == "fail") {
+			console.log("Error occured in TestCaseDetails_Suite_ICE : fail , insertIntoExecution");
+			flag = "fail";
+		} else {
+			flag = "success";
+		}
+	});
+}
 
 /**
  * @author shree.p
@@ -401,7 +468,6 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 			var dataparamlist = [];
 			var conditionchecklist = [];
 			var browserTypelist = [];
-			var scenarioindex = 0;
 			testsuiteIds.push(testsuiteid);
 			async.forEachSeries(suiteDetails, function (eachsuiteDetails, eachsuiteDetailscallback) {
 				var executionjson = {
@@ -419,7 +485,6 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 				currentscenarioid = eachsuiteDetails.scenarioids;
 				TestCaseDetails_Suite_ICE(currentscenarioid, userInfo.user_id, function (currentscenarioidError, currentscenarioidResponse) {
 					var scenariotestcaseobj = {};
-					// scenarioindex=scenarioindex + 1;
 					if (currentscenarioidError) {
 						console.log(currentscenarioidError);
 					} else {
@@ -454,7 +519,6 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 					}
 				}
 			});
-
 		});
 
 		function excutionObjectBuilding(testsuitedetailslist) {
@@ -464,9 +528,11 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 		}
 
 		function executionFunction(executionRequest) {
-			console.log(executionRequest);
-			var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 			var name = req.session.username;
+			var scenarioCount = executionRequest.suitedetails[0].scenarioIds.length;
+			var completedSceCount = 0;
+			var statusPass = 0;
+			var suiteStatus;
 			console.log(Object.keys(myserver.allSocketsMap), "<<all people, asking person:", name);
 			if ('allSocketsMap' in myserver && name in myserver.allSocketsMap) {
 				var mySocket = myserver.allSocketsMap[name];
@@ -476,7 +542,8 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 						req.session.cookie.maxAge = sessionTime;
 					}, updateSessionTimeEvery);
 				mySocket.on('result_executeTestSuite', function (resultData) {
-					//req.session.cookie.expires = new Date(Date.now() + 30 * 60 * 1000); 
+					//req.session.cookie.expires = new Date(Date.now() + 30 * 60 * 1000); 
+					completedSceCount++;
 					clearInterval(updateSessionExpiry);
 					if (resultData != "success" && resultData != "Terminate") {
 						try {
@@ -486,58 +553,54 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 							var testsuiteid = resultData.testsuiteId;
 							var req_report = resultData.reportdata;
 							var req_reportStepsArray = reportdata.rows;
-							var req_overAllStatus = reportdata.overallstatus;
-							var req_browser = reportdata.overallstatus[0].browserType;
-							reportdata = JSON.stringify(reportdata).replace(/'/g, "''");
-							reportdata = JSON.parse(reportdata);
-							var reportId = uuid();
-							var inputs = {
-								"reportid": reportId,
-								"executionid": executionid,
-								"testsuiteid": testsuiteid,
-								"testscenarioid": scenarioid,
-								"browser": req_browser,
-								"status": resultData.reportData.overallstatus[0].overallstatus,
-								"report": JSON.stringify(reportdata),
-								"query": "insertreportquery"
-							};
-							var args = {
-								data: inputs,
-								headers: {
-									"Content-Type": "application/json"
+							if (reportdata.overallstatus.length != 0) {
+								var req_overAllStatus = reportdata.overallstatus;
+								var req_browser = reportdata.overallstatus[0].browserType;
+								reportdata = JSON.stringify(reportdata).replace(/'/g, "''");
+								reportdata = JSON.parse(reportdata);
+								var reportId = uuid();
+								if (resultData.reportData.overallstatus[0].overallstatus == "Pass") {
+									statusPass++;
 								}
-							};
-							client.post(epurl + "suite/ExecuteTestSuite_ICE", args,
-								function (result, response) {
-								if (response.statusCode != 200 || result.rows == "fail") {
-									console.log("Error occured in TestCaseDetails_Suite_ICE : fail , insertreportquery");
-									flag = "fail";
-								} else {
-									flag = "success";
-								}
-							});
-							var inputs = {
-								"testsuiteid": testsuiteid,
-								"executionid": executionid,
-								"starttime": starttime.toString(),
-								"status": resultData.reportData.overallstatus[0].overallstatus,
-								"query": "inserintotexecutionquery"
-							};
-							var args = {
-								data: inputs,
-								headers: {
-									"Content-Type": "application/json"
-								}
-							};
-							var dbqueryexecution = client.post(epurl + "suite/ExecuteTestSuite_ICE", args,
+								var inputs = {
+									"reportid": reportId,
+									"executionid": executionid,
+									"testsuiteid": testsuiteid,
+									"testscenarioid": scenarioid,
+									"browser": req_browser,
+									"status": resultData.reportData.overallstatus[0].overallstatus,
+									"report": JSON.stringify(reportdata),
+									"query": "insertreportquery"
+								};
+								var args = {
+									data: inputs,
+									headers: {
+										"Content-Type": "application/json"
+									}
+								};
+								client.post(epurl + "suite/ExecuteTestSuite_ICE", args,
 									function (result, response) {
 									if (response.statusCode != 200 || result.rows == "fail") {
-										console.log("Error occured in TestCaseDetails_Suite_ICE : fail , insertIntoExecution");
+										console.log("Error occured in TestCaseDetails_Suite_ICE : fail , insertreportquery");
 										flag = "fail";
 									} else {
 										flag = "success";
 									}
 								});
+								if (completedSceCount == scenarioCount) {
+									if (statusPass == scenarioCount) {
+										suiteStatus = "Pass";
+									} else {
+										suiteStatus = "Fail";
+									}
+									updateExecutionStatus(testsuiteid, executionid, starttime, suiteStatus);
+								}
+							} else {
+								if (completedSceCount == scenarioCount) {
+									suiteStatus = "Fail";
+									updateExecutionStatus(testsuiteid, executionid, starttime, suiteStatus);
+								}
+							}
 						} catch (ex) {
 							console.log(ex);
 						}
@@ -617,7 +680,6 @@ exports.ExecuteTestSuite_ICE_CI = function (req, res) {
 			var dataparamlist = [];
 			var conditionchecklist = [];
 			var browserTypelist = [];
-			var scenarioindex = 0;
 			testsuiteIds.push(testsuiteid);
 			async.forEachSeries(suiteDetails, function (eachsuiteDetails, eachsuiteDetailscallback) {
 				var executionjson = {
@@ -635,7 +697,6 @@ exports.ExecuteTestSuite_ICE_CI = function (req, res) {
 				currentscenarioid = eachsuiteDetails.scenarioids;
 				TestCaseDetails_Suite_ICE(currentscenarioid, userInfo.user_id, function (currentscenarioidError, currentscenarioidResponse) {
 					var scenariotestcaseobj = {};
-					// scenarioindex=scenarioindex + 1;
 					if (currentscenarioidError) {
 						console.log(currentscenarioidError);
 					} else {
@@ -678,10 +739,11 @@ exports.ExecuteTestSuite_ICE_CI = function (req, res) {
 		}
 
 		function executionFunction(executionRequest) {
-			console.log(executionRequest);
-			var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-			console.log("IP:", ip);
 			var name = req.session.username;
+			var scenarioCount = executionRequest.suitedetails[0].scenarioIds.length;
+			var completedSceCount = 0;
+			var statusPass = 0;
+			var suiteStatus;
 			console.log(Object.keys(myserver.allSocketsMap), "<<all people, asking person:", name);
 			if ('allSocketsMap' in myserver && name in myserver.allSocketsMap) {
 				var mySocket = myserver.allSocketsMap[name];
@@ -692,6 +754,7 @@ exports.ExecuteTestSuite_ICE_CI = function (req, res) {
 					}, updateSessionTimeEvery);
 				mySocket.on('result_executeTestSuite', function (resultData) {
 					//req.session.cookie.expires = sessionExtend;
+					completedSceCount++;
 					clearInterval(updateSessionExpiry);
 					if (resultData != "success" && resultData != "Terminate") {
 						try {
@@ -701,27 +764,32 @@ exports.ExecuteTestSuite_ICE_CI = function (req, res) {
 							var testsuiteid = resultData.testsuiteId;
 							var req_report = resultData.reportdata;
 							var req_reportStepsArray = reportdata.rows;
-							var req_overAllStatus = reportdata.overallstatus;
-							var req_browser = reportdata.overallstatus[0].browserType;
-							reportdata = JSON.stringify(reportdata).replace(/'/g, "''");
-							reportdata = JSON.parse(reportdata);
-							var inputs = {
-								"reportid": reportId,
-								"executionid": executionid,
-								"testsuiteid": testsuiteid,
-								"testscenarioid": scenarioid,
-								"browser": req_browser,
-								"status": resultData.reportData.overallstatus[0].overallstatus,
-								"report": JSON.stringify(reportdata),
-								"query": "insertreportquery"
-							};
-							var args = {
-								data: inputs,
-								headers: {
-									"Content-Type": "application/json"
+							if (reportdata.overallstatus.length != 0) {
+								var req_overAllStatus = reportdata.overallstatus;
+								var req_browser = reportdata.overallstatus[0].browserType;
+								reportdata = JSON.stringify(reportdata).replace(/'/g, "''");
+								reportdata = JSON.parse(reportdata);
+								var reportId = uuid();
+								if (resultData.reportData.overallstatus[0].overallstatus == "Pass") {
+									statusPass++;
 								}
-							};
-							var dbquery = client.post(epurl + "suite/ExecuteTestSuite_ICE", args,
+								var inputs = {
+									"reportid": reportId,
+									"executionid": executionid,
+									"testsuiteid": testsuiteid,
+									"testscenarioid": scenarioid,
+									"browser": req_browser,
+									"status": resultData.reportData.overallstatus[0].overallstatus,
+									"report": JSON.stringify(reportdata),
+									"query": "insertreportquery"
+								};
+								var args = {
+									data: inputs,
+									headers: {
+										"Content-Type": "application/json"
+									}
+								};
+								client.post(epurl + "suite/ExecuteTestSuite_ICE", args,
 									function (result, response) {
 									if (response.statusCode != 200 || result.rows == "fail") {
 										console.log("Error occured in TestCaseDetails_Suite_ICE : fail , insertreportquery");
@@ -730,27 +798,20 @@ exports.ExecuteTestSuite_ICE_CI = function (req, res) {
 										flag = "success";
 									}
 								});
-							var inputs = {
-								"testsuiteid": testsuiteid,
-								"executionid": executionid,
-								"starttime": starttime.toString(),
-								"query": "inserintotexecutionquery"
-							};
-							var args = {
-								data: inputs,
-								headers: {
-									"Content-Type": "application/json"
-								}
-							};
-							var dbqueryexecution = client.post(epurl + "suite/ExecuteTestSuite_ICE", args,
-									function (result, response) {
-									if (response.statusCode != 200 || result.rows == "fail") {
-										console.log("Error occured in TestCaseDetails_Suite_ICE : fail , insertIntoExecution");
-										flag = "fail";
+								if (completedSceCount == scenarioCount) {
+									if (statusPass == scenarioCount) {
+										suiteStatus = "Pass";
 									} else {
-										flag = "success";
+										suiteStatus = "Fail";
 									}
-								});
+									updateExecutionStatus(testsuiteid, executionid, starttime, suiteStatus);
+								}
+							} else {
+								if (completedSceCount == scenarioCount) {
+									suiteStatus = "Fail";
+									updateExecutionStatus(testsuiteid, executionid, starttime, suiteStatus);
+								}
+							}
 						} catch (ex) {
 							console.log(ex);
 						}
@@ -1066,11 +1127,6 @@ exports.getTestcaseDetailsForScenario_ICE = function (req, res) {
 
 //Function to fetch all the testcase,screen and project names for provided scenarioid
 function testcasedetails_testscenarios(req, cb, data) {
-	var testcasedetails = {
-		testcasename: "",
-		screenname: "",
-		projectname: ""
-	};
 	var testcaseids = [];
 	var screenidlist = [];
 	var testcasenamelist = [];
@@ -1273,6 +1329,8 @@ function TestSuiteDetails_Module_ICE(req, cb1, data) {
 						donotexecutevalues.push('1');
 						getparampathvalues.push('');
 					}
+				} else {
+					testscenarioids = [];
 				}
 				var inputs = {
 					"cycleid": requiredcycleid,
@@ -1300,9 +1358,25 @@ function TestSuiteDetails_Module_ICE(req, cb1, data) {
 					function (result, response) {
 					if (response.statusCode != 200 || result.rows == "fail") {
 						console.log("Error occured in TestSuiteDetails_Module_ICE : fail, testcasesteps");
+						//Execute neo4j query!!
+						//var qList=[];
+
 						cb1(null, flag);
 					} else {
-						callback(null, flag);
+						for(var te=0;te<inputs.testscenarioids.length;te++){inputs.testscenarioids[te]='"'+inputs.testscenarioids[te]+'"';}
+						qList.push({"statement":"MERGE (n:TESTSUITES_NG {cycleid:'"+inputs.cycleid
+									+"',testsuitename:'"+inputs.testsuitename+"',testsuiteid:'"+inputs.testsuiteid+"',testscenarioids:["
+									+inputs.testscenarioids+"],donotexecute:'["
+									+inputs.donotexecute+"]',versionnumber:["+inputs.versionnumber
+									+"]}) SET n.deleted='"+inputs.deleted+"'"});
+									//Relationships
+									for(i=0; i<inputs.testscenarioids.length;i++){
+										qList.push({"statement":"MATCH (a:TESTSUITES_NG{testsuiteid:'"+inputs.testsuiteid+"',cycleid:'"+inputs.cycleid
+									+"'}),(b:TESTSCENARIOS_NG{testscenarioid:"+inputs.testscenarioids[i]+"}) MERGE (a)-[r:FTSUTTSC_NG{id:"+inputs.testscenarioids[i]+"}]->(b)RETURN r"})
+									}
+									qList.push({"statement":"MATCH (a:CYCLES_NG{cycleid:'"+inputs.cycleid+"'}),(b:TESTSUITES_NG{testsuiteid:'"+inputs.testsuiteid+"',cycleid:'"+inputs.cycleid+"'}) MERGE (a)-[r:FCYCTTSU_NG{id:'"+inputs.testsuiteid+"'}]->(b)RETURN r"})                                                
+						//reqToAPI(qList,urlData);
+						callback(null, flag);						
 					}
 				});
 			} else {
@@ -1413,7 +1487,12 @@ function updatescenariodetailsinsuite(req, cb, data) {
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
 					console.log("Error occured in TestSuiteDetails_Module_ICE : fail, delete");
-				} else {}
+				} else {
+					//Execute neo4j query!!
+					//var qList=[];
+					qList.push({"statement":"MATCH (n:TESTSUITES_NG {cycleid:'"+inputs.cycleid
+					+"',testsuitename:'"+inputs.testsuitename+"',testsuiteid:'"+inputs.testsuiteid+"'}) DETACH DELETE n"});
+				}
 
 				simplecallback();
 			});
@@ -1449,6 +1528,27 @@ function updatescenariodetailsinsuite(req, cb, data) {
 				if (response.statusCode != 200 || result.rows == "fail") {
 					cb(null, "fail");
 				} else {
+					//Execute neo4j query!!
+					//var qList=[];
+					for(var te=0;te<inputs.testscenarioids.length;te++){inputs.testscenarioids[te]='"'+inputs.testscenarioids[te]+'"';}
+					for(var te=0;te<inputs.donotexecute.length;te++){inputs.donotexecute[te]='"'+inputs.donotexecute[te]+'"';}
+					inputs.donotexecute1 = inputs.donotexecute.join(',');
+					inputs.testscenarioids1 = inputs.testscenarioids.join(',');
+					qList.push({"statement":"MERGE (n:TESTSUITES_NG {cycleid:'"+inputs.cycleid
+								+"',testsuitename:'"+inputs.testsuitename+"',testsuiteid:'"+inputs.testsuiteid+"',deleted:'"+inputs.deleted
+								+"',versionnumber:["+inputs.versionnumber+"]}) set n.testscenarioids=["
+								+inputs.testscenarioids1+"], n.donotexecute=["+inputs.donotexecute1+"]"});
+
+					//Relationships
+					qList.push({"statement":"MATCH (a:TESTSUITES_NG{testsuiteid:'"+inputs.testsuiteid+"',cycleid:'"+inputs.cycleid
+									+"'})-[r]->(b:TESTSCENARIOS_NG) delete r"})
+					for(var te=0;te<inputs.testscenarioids.length;te++){
+						qList.push({"statement":"MATCH (a:TESTSUITES_NG{testsuiteid:'"+inputs.testsuiteid+"',cycleid:'"+inputs.cycleid
+									+"'}),(b:TESTSCENARIOS_NG) WHERE b.testscenarioid IN a.testscenarioids MERGE (a)-[r:FTSUTTSC_NG{id:'"+inputs.testscenarioids[te]+"'}]->(b)RETURN r"})                                   
+					}
+					qList.push({"statement":"MATCH (a:CYCLES_NG{cycleid:'"+inputs.cycleid+"'}),(b:TESTSUITES_NG{testsuiteid:'"+inputs.testsuiteid+"',cycleid:'"+inputs.cycleid+"'}) MERGE (a)-[r:FCYCTTSU_NG{id:'"+inputs.testsuiteid+"'}]->(b)RETURN r"})                  
+					//reqToAPI(qList,urlData);
+
 					simplecallback(null, result);
 				}
 			});
@@ -1468,8 +1568,6 @@ function updatescenariodetailsinsuite(req, cb, data) {
 }
 
 /***********************Scheduling jobs***************************/
-var scheduleStatus = "";
-// var deleteFlag = false;
 exports.testSuitesScheduler_ICE = function (req, res) {
 	if (req.cookies['connect.sid'] != undefined) {
 		var sessionCookie = req.cookies['connect.sid'].split(".");
@@ -1494,18 +1592,10 @@ exports.testSuitesScheduler_ICE = function (req, res) {
 //Schedule Testsuite normal and when server restart
 function scheduleTestSuite(modInfo, req, schedcallback) {
 	var schedulingData = modInfo;
-	var schDate,
-	schTime,
-	cycleId,
-	scheduleId,
-	clientIp,
-	scenarioDetails;
-	var browserList,
-	testSuiteId,
-	testsuitename;
+	var schDate, schTime, cycleId, scheduleId, clientIp, scenarioDetails;
+	var browserList, testSuiteId, testsuitename;
 	var doneFlag = 0;
-	var schedFlag,
-	rescheduleflag;
+	var schedFlag,rescheduleflag;
 	var counter = 0;
 	async.forEachSeries(schedulingData, function (itr, Callback) {
 		schDate = itr.date;
@@ -1520,17 +1610,37 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 		scheduleStatus = "scheduled";
 		testSuiteId = itr.testsuiteid;
 		testSuitename = itr.testsuitename;
-		scenarioDetails = JSON.stringify(itr.suiteDetails);
+		versionnumber = itr.versionnumber;
+		scenarioDetails = itr.suiteDetails;
 		var sessObj;
 		//Normal scheduling
 		if (rescheduleflag != true) {
 			scheduleId = uuid();
 			sessObj = cycleId + ";" + scheduleId + ";" + dateTime.valueOf().toString();
-			var dbquery = "INSERT INTO scheduledexecution (cycleid,scheduledatetime,scheduleid,browserlist,clientipaddress,clientport,scenariodetails,schedulestatus,testsuiteids,testsuitename) VALUES (" + cycleId + "," + dateTime.valueOf().toString() + "," + scheduleId + ",'[" + browserList + "]','" + clientIp + "',9494,'" + scenarioDetails + "','" + scheduleStatus + "',[" + testSuiteId + "], '" + testSuitename + "');";
+			var inputs = {
+				"cycleid": cycleId,
+				"scheduledatetime": dateTime.valueOf().toString(),
+				"scheduleid": scheduleId,
+				"browserlist": browserList,
+				"clientipaddress": clientIp,
+				"clientport": "9494",
+				"scenariodetails": JSON.stringify(scenarioDetails),
+				"schedulestatus": scheduleStatus,
+				"testsuiteids": [testSuiteId],
+				"testsuitename": testSuitename,
+				"query": "insertscheduledata"
+			};
+			var args = {
+				data: inputs,
+				headers: {
+					"Content-Type": "application/json"
+				}
+			};
 			try {
-				dbConnICE.execute(dbquery, function (err, result) {
-					if (err) {
-						console.log(err);
+				client.post(epurl + "suite/ScheduleTestSuite_ICE", args,
+					function (result, response) {
+					if (response.statusCode != 200 || result.rows == "fail") {
+						console.log(response.statusCode);
 						schedFlag = "fail";
 						schedcallback(null, schedFlag);
 					} else {
@@ -1549,8 +1659,6 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 									console.log(data);
 								}
 							});
-							// deleteFlag = true;
-							// deleteScheduledData(deleteFlag, sessObj)
 						}
 					}
 				});
@@ -1563,11 +1671,12 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 			//Rescheduling jobs on server restart
 			scheduleId = itr.scheduleid;
 			sessObj = cycleId + ";" + scheduleId + ";" + dateTime.valueOf().toString();
-			var obj = new Date(schDate[2], (schDate[1] - 1), schDate[0], schTime[0], schTime[1]);
+			var obj = new Date(Date.UTC(schDate[2], (schDate[1] - 1), schDate[0], schTime[0], schTime[1], 0));
 			try {
 				var scheduledjob = schedule.scheduleJob(sessObj, obj, function () {
 						executeScheduling(sessObj, schedulingData, req);
 					});
+				counter++;
 				Callback();
 			} catch (ex) {
 				console.log(ex);
@@ -1577,10 +1686,7 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 						console.log(data);
 					}
 				});
-				// deleteFlag = true;
-				// deleteScheduledData(deleteFlag, sessObj)
 			}
-			// var dbquery = "UPDATE scheduledexecution SET schedulestatus = '" + scheduleStatus + "' WHERE cycleid=" + cycleId + " AND scheduledatetime=" + dateTime.valueOf().toString() + " AND scheduleid=" + scheduleId + ";";
 		}
 	}, function () {
 		// if (deleteFlag != true) doneFlag = 1;
@@ -1600,12 +1706,23 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 
 	//Executing test suites on scheduled time
 	function executeScheduling(sessObj, schedulingData, req) {
-		var dbQuery = "SELECT * from scheduledexecution WHERE cycleid=" + sessObj.split(";")[0] + " AND scheduledatetime=" + sessObj.split(";")[2] + " AND scheduleid=" + sessObj.split(";")[1] + " ALLOW FILTERING;";
-		console.log(dbQuery);
+		var inputs = {
+			"cycleid": sessObj.split(";")[0],
+			"scheduledatetime": sessObj.split(";")[2],
+			"scheduleid": sessObj.split(";")[1],
+			"query": "getscheduledata"
+		};
+		var args = {
+			data: inputs,
+			headers: {
+				"Content-Type": "application/json"
+			}
+		};
 		try {
-			dbConnICE.execute(dbQuery, function (err, result) {
-				if (err) {
-					console.log(err);
+			client.post(epurl + "suite/ScheduleTestSuite_ICE", args,
+				function (result, response) {
+				if (response.statusCode != 200 || result.rows == "fail") {
+					console.log(response.statusCode);
 					scheduleStatus = "Failed 02";
 					updateStatus(sessObj, function (err, data) {
 						if (!err) {
@@ -1641,7 +1758,6 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 								"testsuitename": ""
 							};
 							var currentscenarioid = "";
-
 							scenarioIdList.push(eachsuiteDetails.scenarioids);
 							dataparamlist.push(eachsuiteDetails.dataparam[0]);
 							conditionchecklist.push(eachsuiteDetails.condition);
@@ -1649,7 +1765,6 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 							currentscenarioid = eachsuiteDetails.scenarioids;
 							TestCaseDetails_Suite_ICE(currentscenarioid, schedulingData[0].userInfo.user_id, function (currentscenarioidError, currentscenarioidResponse) {
 								var scenariotestcaseobj = {};
-								// scenarioindex=scenarioindex + 1;
 								if (currentscenarioidError) {
 									console.log(currentscenarioidError);
 								} else {
@@ -1663,18 +1778,11 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 									if (listofscenarioandtestcases.length == suiteDetails.length) {
 										updateData();
 										//batchExecutionDataCallback();
-										scheduleStatus = "Inprogress";
-										updateStatus(sessObj, function (err, data) {
-											if (!err) {
-												console.log(data);
-											}
-										});
 										var a = scheduleFunction(executionRequest);
 										console.log(a);
 									}
 								}
 							});
-
 							function updateData() {
 								executionjson[testsuiteid] = listofscenarioandtestcases;
 								executionjson.scenarioIds = scenarioIdList;
@@ -1689,30 +1797,34 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 								//}
 							}
 						});
-
 						function excutionObjectBuilding(testsuitedetailslist) {
 							executionRequest.executionId = JSON.parse(JSON.stringify(result.rows[0].scheduleid));
 							executionRequest.suitedetails = testsuitedetailslist;
 							executionRequest.testsuiteIds.push(testsuiteid);
 						}
-
 						function scheduleFunction(executionRequest) {
-							console.log(executionRequest);
-							// var ip = ipAdd; //req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-							// console.log(Object.keys(myserver.allSocketsMap), "<<all people, asking person:", ip);
-							// if ('allSocketsMap' in myserver && ip in myserver.allSocketsMap) {
-							//     var mySocket = myserver.allSocketsMap[ip];
 							var name = ipAdd;
+							var scenarioCount_s = executionRequest.suitedetails[0].scenarioIds.length;
+							var completedSceCount_s = 0;
+							var statusPass_s = 0;
+							var suiteStatus_s;
 							console.log(Object.keys(myserver.allSchedulingSocketsMap), "<<all people, asking person:", name);
 							if ('allSchedulingSocketsMap' in myserver && name in myserver.allSchedulingSocketsMap) {
 								var mySocket = myserver.allSchedulingSocketsMap[name];
 								mySocket._events.result_executeTestSuite = [];
 								var starttime = new Date().getTime();
 								mySocket.emit('executeTestSuite', executionRequest);
+								scheduleStatus = "Inprogress";
+								updateStatus(sessObj, function (err, data) {
+									if (!err) {
+										console.log(data);
+									}
+								});
 								var updateSessionExpiry = setInterval(function () {
 										req.session.cookie.maxAge = sessionTime;
 									}, updateSessionTimeEvery);
 								mySocket.on('result_executeTestSuite', function (resultData) {
+									completedSceCount_s++;
 									clearInterval(updateSessionExpiry);
 									if (resultData != "success" && resultData != "Terminate") {
 										try {
@@ -1722,30 +1834,54 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 											var testsuiteid = resultData.testsuiteId;
 											var req_report = resultData.reportdata;
 											var req_reportStepsArray = reportdata.rows;
-											var req_overAllStatus = reportdata.overallstatus;
-											var req_browser = reportdata.overallstatus[0].browserType;
-											reportdata = JSON.stringify(reportdata).replace(/'/g, "''");
-											reportdata = JSON.parse(reportdata);
-											var reportId = uuid();
-
-											var insertReport = "INSERT INTO reports (reportid,executionid,testsuiteid,testscenarioid,executedtime,browser,modifiedon,status,report) VALUES (" + reportId + "," + executionid + "," + testsuiteid + "," + scenarioid + "," + new Date().getTime() + ",'" + req_browser + "'," + new Date().getTime() + ",'" + resultData.reportData.overallstatus[0].overallstatus + "','" + JSON.stringify(reportdata) + "')";
-											var dbquery = dbConnICE.execute(insertReport, function (err, result) {
-													if (err) {
+											if (reportdata.overallstatus.length != 0) {
+												var req_overAllStatus = reportdata.overallstatus;
+												var req_browser = reportdata.overallstatus[0].browserType;
+												reportdata = JSON.stringify(reportdata).replace(/'/g, "''");
+												reportdata = JSON.parse(reportdata);
+												var reportId = uuid();
+												if (resultData.reportData.overallstatus[0].overallstatus == "Pass") {
+													statusPass_s++;
+												}
+												var inputs = {
+													"reportid": reportId,
+													"executionid": executionid,
+													"testsuiteid": testsuiteid,
+													"testscenarioid": scenarioid,
+													"browser": req_browser,
+													"status": resultData.reportData.overallstatus[0].overallstatus,
+													"report": JSON.stringify(reportdata),
+													"query": "insertreportquery"
+												};
+												var args = {
+													data: inputs,
+													headers: {
+														"Content-Type": "application/json"
+													}
+												};
+												client.post(epurl + "suite/ExecuteTestSuite_ICE", args,
+													function (result, response) {
+													if (response.statusCode != 200 || result.rows == "fail") {
+														console.log("Error occured in TestCaseDetails_Suite_ICE : fail , insertreportquery");
 														flag = "fail";
 													} else {
 														flag = "success";
 													}
 												});
-
-											var insertIntoExecution = "INSERT INTO execution (testsuiteid,executionid,starttime,endtime) VALUES (" + testsuiteid + "," + executionid + "," + starttime + "," + new Date().getTime() + ");";
-											var dbqueryexecution = dbConnICE.execute(insertIntoExecution, function (err, resultexecution) {
-													if (err) {
-														flag = "fail";
+												if (completedSceCount_s == scenarioCount_s) {
+													if (statusPass_s == scenarioCount_s) {
+														suiteStatus_s = "Pass";
 													} else {
-														flag = "success";
+														suiteStatus_s = "Fail";
 													}
-												});
-											//console.log("this is the value:",resultData);
+													updateSchedulingStatus(testsuiteid, executionid, starttime, suiteStatus_s);
+												}
+											} else {
+												if (completedSceCount_s == scenarioCount_s) {
+													suiteStatus_s = "Fail";
+													updateExecutionStatus(testsuiteid, executionid, starttime, suiteStatus_s);
+												}
+											}
 										} catch (ex) {
 											console.log(ex);
 										}
@@ -1763,7 +1899,7 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 												}
 											});
 											//res.send(resultData);
-											console.log(resultData);
+											//console.log(resultData);
 										} catch (ex) {
 											console.log(ex);
 										}
@@ -1797,37 +1933,57 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 		}
 	}
 
-	//Delete the scheduled job on failure of execution
-	// function deleteScheduledData(delFlag, sessObj){
-	//     if (delFlag == true) {
-	//         var deleteQuery = "DELETE from scheduledexecution WHERE cycleid=" + sessObj.split(";")[0] + " AND scheduledatetime=" + sessObj.split(";")[2] + " AND scheduleid=" + sessObj.split(";")[1] + ";";
-	//         try {
-	//             dbConnICE.execute(deleteQuery, function(err, result) {
-	//                 if (err) {
-	//                     console.log(err);
-	//                 } else {
-	//                     console.log("Deletion Success");;
-	//                 }
-	//             });
-	//         } catch (ex) {
-	//             console.log(ex);
-	//         }
-	//     }
-	// }
+	//Update execution table on completion of suite execution
+	function updateSchedulingStatus(testsuiteid, executionid, starttime, suiteStatus_s) {
+		var inputs = {
+			"testsuiteid": testsuiteid,
+			"executionid": executionid,
+			"starttime": starttime.toString(),
+			"status": suiteStatus_s,
+			"query": "inserintotexecutionquery"
+		};
+		var args = {
+			data: inputs,
+			headers: {
+				"Content-Type": "application/json"
+			}
+		};
+		client.post(epurl + "suite/ExecuteTestSuite_ICE", args,
+			function (result, response) {
+			if (response.statusCode != 200 || result.rows == "fail") {
+				console.log("Error occured in TestCaseDetails_Suite_ICE : fail , insertIntoExecution");
+				flag = "fail";
+			} else {
+				flag = "success";
+			}
+		});
+	}
 }
 
 //Update status of current scheduled job
 function updateStatus(sessObj, updateStatuscallback) {
 	try {
 		if (scheduleStatus != "") {
-			var statusQuery = "UPDATE scheduledexecution SET schedulestatus = '" + scheduleStatus + "' WHERE cycleid=" + sessObj.split(";")[0] + " AND scheduledatetime=" + sessObj.split(";")[2] + " AND scheduleid=" + sessObj.split(";")[1] + ";";
+			var inputs = {
+				"schedulestatus": scheduleStatus,
+				"cycleid": sessObj.split(";")[0],
+				"scheduledatetime": sessObj.split(";")[2],
+				"scheduleid": sessObj.split(";")[1],
+				"query": "updatescheduledstatus"
+			};
+			var args = {
+				data: inputs,
+				headers: {
+					"Content-Type": "application/json"
+				}
+			};
 			try {
-				dbConnICE.execute(statusQuery, function (err, result) {
-					if (err) {
-						console.log(err);
+				client.post(epurl + "suite/ScheduleTestSuite_ICE", args,
+					function (result, response) {
+					if (response.statusCode != 200 || result.rows == "fail") {
+						console.log(response.statusCode);
 						updateStatuscallback(null, "fail");
 					} else {
-						//console.log("Status updated successfully----", scheduleStatus);
 						updateStatuscallback(null, "success");
 					}
 				});
@@ -1849,8 +2005,7 @@ exports.getScheduledDetails_ICE = function (req, res) {
 		sessionToken = sessionToken[1];
 	}
 	if (sessionToken != undefined && req.session.id == sessionToken) {
-		var dbquery = "SELECT * from scheduledexecution;";
-		getScheduledDetails(dbquery, function (err, getSchedcallback) {
+		getScheduledDetails("getallscheduledata", function (err, getSchedcallback) {
 			if (err) {
 				console.log(err);
 				res.send("fail");
@@ -1878,15 +2033,33 @@ exports.cancelScheduledJob_ICE = function (req, res) {
 	if (sessionToken != undefined && req.session.id == sessionToken) {
 		var cycleid = req.body.suiteDetails.cycleid;
 		var scheduleid = req.body.suiteDetails.scheduleid;
+		var schedStatus = req.body.schedStatus;
 		var scheduledatetime = new Date(req.body.suiteDetails.scheduledatetime).valueOf().toString();
+		var scheduledatetimeINT = parseInt(scheduledatetime);
 		try {
-			var checkQuery = "SELECT schedulestatus FROM scheduledexecution WHERE cycleid=" + cycleid + " and scheduledatetime=" + scheduledatetime + " and scheduleid=" + scheduleid + "";
-			dbConnICE.execute(checkQuery, function (err, result) {
-				if (!err && result.rows.length > 0) {
+			var upDate = new Date(scheduledatetimeINT).getFullYear() + "-" + ("0" + (new Date(scheduledatetimeINT).getMonth() + 1)).slice(-2) + "-" + ("0" + new Date(scheduledatetimeINT).getDate()).slice(-2) + " " + ("0" + new Date(scheduledatetimeINT).getHours()).slice(-2) + ":" + ("0" + new Date(scheduledatetimeINT).getMinutes()).slice(-2) + ":00+0000";
+			var inputs = {
+				"cycleid": cycleid,
+				"scheduledatetime": upDate,
+				"scheduleid": scheduleid,
+				"query": "getscheduledstatus"
+			};
+			var args = {
+				data: inputs,
+				headers: {
+					"Content-Type": "application/json"
+				}
+			};
+			client.post(epurl + "suite/ScheduleTestSuite_ICE", args,
+				function (result, response) {
+				if (response.statusCode != 200 || result.rows == "fail") {
+					console.log(response.statusCode);
+					res.send("fail");
+				} else {
 					var status = result.rows[0].schedulestatus;
 					if (status == "scheduled") {
-						var objectD = cycleid + ";" + scheduleid + ";" + scheduledatetime.valueOf().toString();
-						scheduleStatus = "cancelled";
+						var objectD = cycleid + ";" + scheduleid + ";" + upDate.valueOf().toString();
+						scheduleStatus = schedStatus;
 						updateStatus(objectD, function (err, data) {
 							if (!err) {
 								res.send(data);
@@ -1896,9 +2069,6 @@ exports.cancelScheduledJob_ICE = function (req, res) {
 					} else {
 						res.send("inprogress");
 					}
-				} else {
-					console.log(err);
-					res.send("fail");
 				}
 			});
 		} catch (exception) {
@@ -1913,9 +2083,20 @@ exports.cancelScheduledJob_ICE = function (req, res) {
 //Fetch Scheduled data
 function getScheduledDetails(dbquery, schedDetailscallback) {
 	try {
-		dbConnICE.execute(dbquery, function (err, result) {
-			if (err) {
-				console.log(err);
+		var inputs = {
+			"scheduledetails": dbquery,
+			"query": "getallscheduledetails"
+		};
+		var args = {
+			data: inputs,
+			headers: {
+				"Content-Type": "application/json"
+			}
+		};
+		client.post(epurl + "suite/ScheduleTestSuite_ICE", args,
+			function (result, response) {
+			if (response.statusCode != 200 || result.rows == "fail") {
+				console.log(response.statusCode);
 				schedDetailscallback(null, "fail");
 			} else {
 				schedDetailscallback(null, result.rows);
@@ -1929,10 +2110,9 @@ function getScheduledDetails(dbquery, schedDetailscallback) {
 
 //Re-Scheduling the tasks
 exports.reScheduleTestsuite = function (req, res) {
-	var dbquery = "SELECT * from scheduledexecution where schedulestatus='scheduled' allow filtering;";
 	var getscheduleData = [];
 	try {
-		getScheduledDetails(dbquery, function (err, reSchedcallback) {
+		getScheduledDetails("getallscheduleddetails", function (err, reSchedcallback) {
 			if (err) {
 				console.log(err);
 			} else {
@@ -1945,7 +2125,14 @@ exports.reScheduleTestsuite = function (req, res) {
 						}
 						if (status == "Inprogress") {
 							scheduleStatus = "Failed 01";
-							var objectD = reSchedcallback[i].cycleid.valueOf().toString() + ";" + reSchedcallback[i].scheduleid.valueOf().toString() + ";" + reSchedcallback[i].scheduledatetime.valueOf().toString();
+							var str,dd,dt;
+							var tempDD,tempDT;
+							str = new Date(reSchedcallback[i].scheduledatetime).getFullYear() + "-" + ("0" + (new Date(reSchedcallback[i].scheduledatetime).getMonth() + 1)).slice(-2) + "-" + ("0" + new Date(reSchedcallback[i].scheduledatetime).getDate()).slice(-2) + " " + ("0" + new Date(reSchedcallback[i].scheduledatetime).getUTCHours()).slice(-2) + ":" + ("0" + new Date(reSchedcallback[i].scheduledatetime).getUTCMinutes()).slice(-2);
+							tempDD = str.split(" ")[0];
+							tempDT = str.split(" ")[1];
+							dd = tempDD.split("-");
+							dt = tempDT.split(":");
+							var objectD = reSchedcallback[i].cycleid.valueOf().toString() + ";" + reSchedcallback[i].scheduleid.valueOf().toString() + ";" + new Date(Date.UTC(dd[0], dd[1] - 1, dd[2], dt[0], dt[1])).valueOf().toString();
 							updateStatus(objectD, function (err, data) {
 								if (!err) {
 									console.log(data);
@@ -1959,18 +2146,18 @@ exports.reScheduleTestsuite = function (req, res) {
 						var tempDD,tempDT;
 						var modInformation = [];
 						async.forEachSeries(getscheduleData, function (itrSchData, getscheduleDataCallback) {
-							str = JSON.stringify(itrSchData.scheduledatetime).replace(/[\\[\]\~`!@#$%^&*()+={}|;"',<>?/\s]/g, "");
-							tempDD = (str.split("T")[0]).split("-");
-							tempDT = (str.split("T")[1]).split(":");
-							if (new Date(Date.UTC(tempDD[0], (tempDD[1] - 1), tempDD[2], tempDT[0], tempDT[1])) > new Date(Date.UTC(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), new Date().getHours(), new Date().getMinutes()))) {
-								dd = tempDD[2] + "-" + tempDD[1] + "-" + tempDD[0];
-								dt = tempDT[0] + ":" + tempDT[1];
+							str = new Date(itrSchData.scheduledatetime).getFullYear() + "-" + ("0" + (new Date(itrSchData.scheduledatetime).getMonth() + 1)).slice(-2) + "-" + ("0" + new Date(itrSchData.scheduledatetime).getDate()).slice(-2) + " " + ("0" + new Date(itrSchData.scheduledatetime).getUTCHours()).slice(-2) + ":" + ("0" + new Date(itrSchData.scheduledatetime).getUTCMinutes()).slice(-2);
+							tempDD = str.split(" ")[0];
+							tempDT = str.split(" ")[1];
+							dd = tempDD.split("-");
+							dt = tempDT.split(":");
+							if (new Date(Date.UTC(dd[0], dd[1] - 1, dd[2], dt[0], dt[1])) > new Date(Date.UTC(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), new Date().getHours(), new Date().getMinutes()))) {
 								modInfo.suiteDetails = itrSchData.scenariodetails;
 								modInfo.testsuitename = itrSchData.testsuitename;
 								modInfo.testsuiteid = itrSchData.testsuiteids[0].valueOf().toString();
 								modInfo.Ip = itrSchData.clientipaddress;
-								modInfo.date = dd;
-								modInfo.time = dt;
+								modInfo.date = dd[2] + "-" + dd[1] + "-" + dd[0];
+								modInfo.time = str.split(" ")[1];
 								modInfo.browserType = itrSchData.browserlist;
 								modInfo.cycleid = itrSchData.cycleid.valueOf().toString();
 								modInfo.reschedule = true;
@@ -1985,7 +2172,7 @@ exports.reScheduleTestsuite = function (req, res) {
 								});
 							} else {
 								scheduleStatus = "Failed 01";
-								var objectD = itrSchData.cycleid.valueOf().toString() + ";" + itrSchData.scheduleid.valueOf().toString() + ";" + itrSchData.scheduledatetime.valueOf().toString();
+								var objectD = itrSchData.cycleid.valueOf().toString() + ";" + itrSchData.scheduleid.valueOf().toString() + ";" + new Date(Date.UTC(dd[0], dd[1] - 1, dd[2], dt[0], dt[1])).valueOf().toString();
 								updateStatus(objectD, function (err, data) {
 									if (!err) {
 										console.log(data);
