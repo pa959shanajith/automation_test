@@ -12,7 +12,7 @@
 					<li><span><a class='scrapeOnTxt'>ALM Integration</a></span></li>
 					<li><a id='testPlanTab' ng-click="tab = 'testPlan'; hideMappedFilesTab(); loadDomains();" title="Test Plan" class="selectBrowser">
 						<span><img src='imgs/testplan.png' class='selectedIcon' alt='Test Plan' /></span>Test Plan</a></li>
-					<li><a id='TestLabTab' ng-click="tab = 'testLab'; getDetailsforMTG();" title="Test Lab" style="display: none;" class="selectBrowser">
+					<li><a id='TestLabTab' ng-click="tab = 'testLab'; getDetailsforMTG();" title="Test Lab" class="selectBrowser">
 						<span><img src='imgs/testlab.png' alt='Test Lab' /></span>Test Lab</a></li>
 					<li><a id='reportTab' ng-click="tab = 'reportTab'" title="Report" class="selectBrowser" style="display: none;">
 						<span><img src='' alt='Report' /></span>Report</a></li>
@@ -112,11 +112,35 @@
 						<li><label style="color: red;">Type</label><span><input type="text" value="Manual" disabled></input></span></li>
 					</ul>
 				</div>
-				<button class="saveTestlabdetails" ng-click="saveTestlabdetails()" title="Generate Manual Testcase">Generate</button>
+				<button class="saveTestlabdetails" ng-click="saveTestlabdetails();" title="Generate Manual Testcase">Generate</button>
 			</div>
 			<!--  Form -->
 		</div>
 		<!-- Test Lab -->
+
+		<!-- Test Lab Generator -->
+		<div class="containerWrap" ng-show="testLabGenerator">
+			<div class="testLabGenContainer">
+				<table id="testLabGen">
+					<thead>
+						<tr>
+							<th>Subject</th>
+							<th>Testcase</th>
+							<th>Type</th>
+							<th>Description</th>
+							<th>Step Name</th>
+							<th>Step Description</th>
+							<th>Expected Result</th>
+							<th>Author</th>
+							<th>Creation Date</th>
+							<th>Status</th>
+						</tr>
+					</thead>
+					<tbody></tbody>
+				</table>
+			</div>
+		</div>
+		<!-- Test Lab Generator -->
 
 		<!-- Reports -->
 		<div class="containerWrap" ng-if="tab == 'reportTab'">

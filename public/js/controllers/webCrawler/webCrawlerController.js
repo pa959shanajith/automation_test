@@ -32,10 +32,18 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
   $scope.showWeboccularHome = function(){
     if (!$scope.enableGenerate)
     return;
+    var myNode = document.getElementById("report-canvas");
+    while (myNode.firstChild) {
+        myNode.removeChild(myNode.firstChild);
+    }
+    $('#middle-content-section').removeAttr('class');
 
     $("#result-canvas").hide();
     $scope.hideBaseContent = { message: 'false' };
-    $scope.check = true;
+    if(!$scope.reportGenerated){
+      $scope.check = true;
+    }
+      
   }
 
   $scope.executeGo = function(){
@@ -379,6 +387,9 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
     if ($scope.check) {
       return;
     }
+    //$("#result-canvas").empty();
+    
+    $scope.reportGenerated = false;
     var baseSVG = document.getElementById("base-svg");
     if (baseSVG) {
       document.getElementById("result-canvas").removeChild(document.getElementById("base-svg"));
@@ -822,5 +833,70 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
       root.size = recurse(root);
       return nodes;
     }
+  }
+
+  /* function to show a table report*/
+  $scope.showReport = function(){
+    $scope.hideBaseContent = { message: 'true' };;
+    var myNode = document.getElementById("report-canvas");
+    while (myNode.firstChild) {
+        myNode.removeChild(myNode.firstChild);
+    }
+     //if report alreardy exists
+    //if($scope.reportGenerated)
+    $("#result-canvas").hide();
+    $("#report-canvas").show();
+    $scope.reportGenerated = true;
+    
+    $('#middle-content-section').attr('class',"webCrawler-report");
+    var body = document.getElementById('report-canvas');
+    var reportDiv = document.createElement('div');
+    //reportDiv.setAttribute('class', 'scrollbar-inner');
+
+    var tbl = document.createElement('table');
+    tbl.setAttribute('width','100%');
+    tbl.setAttribute('height','100%');
+    tbl.setAttribute('class', 'webCrawler-report-table');
+   // $('.scrollbar-inner').scrollbar();
+    var tbdy = document.createElement('tbody');
+
+    var headrow = document.createElement('tr');
+    var headData = {0: 'S.No.', 1 : 'Level', 2 : 'URL', 3: 'Parent URL', 4 : 'Redirected', 5:  'Status', 6 : 'Title'};
+    for (var i=0; i<7; i++){
+       var th = document.createElement('th');
+       th.appendChild(document.createTextNode(headData[i]));
+       headrow.appendChild(th)
+    }
+    
+    headrow.childNodes[0].setAttribute('style','width : 55px');
+    headrow.childNodes[1].setAttribute('style','width : 55px');
+    headrow.childNodes[5].setAttribute('style','width : 65px');
+    tbdy.appendChild(headrow);
+    jsonStruct = {0 : 'level', 1 : 'name' , 2 : 'parent' , 3 : 'redirected' , 4 : 'status' , 5  :'title'};
+    for(i=0; i<$scope.crawledLinks.length; i++){
+        var newRow = document.createElement('tr');
+        
+        //create SNo text node
+        var sNo = document.createElement('td');
+        sNo.setAttribute('style', 'width: 55px');
+        sNo.appendChild(document.createTextNode(i+1));
+        newRow.appendChild(sNo);
+
+        //7 is the number of attributes from Level to title
+        for(j=0 ; j<6; j++){
+          var data = document.createElement('td');
+          text = $scope.crawledLinks[i][jsonStruct[j]]
+          
+          if(text == undefined)
+            text = "-";
+          data.appendChild(document.createTextNode(text));
+          newRow.appendChild(data);
+        }
+        tbdy.appendChild(newRow);
+        
+    }
+    tbl.appendChild(tbdy);
+    reportDiv.appendChild(tbl);
+    body.appendChild(reportDiv);
   }
 }]);

@@ -59,12 +59,13 @@ mySPA.factory('DesignServices', ['$http','$q', function ($http, $httpProvider, $
 			})
 		},
 
-		readTestCase_ICE : function(screenId,testCaseId,testCaseName){
+		readTestCase_ICE : function(screenId,testCaseId,testCaseName,versionnumber){
 			return $http.post('/readTestCase_ICE',{
 				param : 'readTestCase_ICE',
 				screenid: screenId,
 				testcaseid: testCaseId,
-				testcasename: testCaseName
+				testcasename: testCaseName,
+				versionnumber: versionnumber
 			})
 			.then(function(response)  { 
 				return response.data
@@ -73,7 +74,7 @@ mySPA.factory('DesignServices', ['$http','$q', function ($http, $httpProvider, $
 			})
 		},
 
-		updateTestCase_ICE : function(screenId,testCaseId,testCaseName,mydata,userInfo){
+		updateTestCase_ICE : function(screenId,testCaseId,testCaseName,mydata,userInfo,versionnumber){
 			var modifiedData = JSON.parse(JSON.stringify(mydata));
 			for(i=0;i<modifiedData.length;i++){
 				if(modifiedData[i].inputVal == undefined){
@@ -96,7 +97,7 @@ mySPA.factory('DesignServices', ['$http','$q', function ($http, $httpProvider, $
 				userinfo: userInfo,
 				skucodetestcase : "skucodetestcase",
 				tags: "tags",
-				versionnumber: "1"
+				versionnumber: versionnumber
 			})
 			.then(function(response)  { 
 				return response.data

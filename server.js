@@ -39,7 +39,7 @@ console.log = function () {
   logFile.write('['+n+']['+a.file+':'+a.number+ ':'+a.column+'] >> '+ util.format.apply(null, arguments) + '\n');
 //  logFile.write('['+n+'] ['+a+']; '+ util.format.apply(null, arguments) + '\n');
   logStdout.write(util.format.apply(null, arguments) + '\n');
-}
+};
 console.error = console.log;
 
 if (cluster.isMaster) {
@@ -65,13 +65,14 @@ if (cluster.isMaster) {
     //var io = require('socket.io')(server);
     var bodyParser = require('body-parser');
     var morgan = require('morgan');
-    var sessions = require('express-session')
+    var sessions = require('express-session');
     var cookieParser = require('cookie-parser');
     // var errorhandler = require('errorhandler');
     var cmd = require('node-cmd');
     var helmet = require('helmet');
     const os = require('os');
     var async = require('async');
+    var lusca = require('lusca');
     //HTTPS Configuration
     var privateKey = fs.readFileSync('server/https/server.key', 'utf-8');
     var certificate = fs.readFileSync('server/https/server.crt', 'utf-8');
@@ -110,7 +111,7 @@ if (cluster.isMaster) {
         limit: '10mb',
         extended: true
     }));
-    //app.use(morgan('combined'))
+    //app.use(morgan('combined'));
 
     app.use(cookieParser());
     app.use(sessions({
@@ -126,6 +127,64 @@ if (cluster.isMaster) {
         }
     }));
     app.use(helmet());
+    var opts = {
+            csrf: {
+                angular: true
+            }
+        }; // options for lusca
+    app.use(lusca.p3p('ABCDEF'));
+    app.use(helmet.referrerPolicy({ policy: 'same-origin' }));
+    var ninetyDaysInSeconds = 7776000
+    app.use(helmet.hpkp({
+    maxAge: ninetyDaysInSeconds,
+    sha256s: ['AbCdEf123=', 'ZyXwVu456=']
+    }))
+     app.use(helmet.noCache());
+    //Role Based User Access to services
+      app.post('*',function(req,res,next) {
+           var roleId = req.session.defaultRoleId;
+           if(req.session.defaultRoleId != undefined)
+           {
+                var updateinp = {roleid:req.session.defaultRoleId,servicename:req.url.replace("/","")}
+                var args = { data:updateinp,headers:{"Content-Type" : "application/json"}}
+                apiclient.post("http://127.0.0.1:1990/"+"utility/userAccess_Nineteen68",args,
+                                function (result, response) {
+                    if(response.statusCode != 200 || result.rows == "fail"){
+                        console.log("Error occured in userAccess_Nineteen68 : Fail");
+                        res.send("Invalid Session");
+                    }else{
+                        if(result.rows == "True"){
+                            return next();
+                        }else{
+                            req.session.destroy(); 
+                            res.status(401).redirect('/');
+                        }
+                    }
+                });
+           }
+           else{
+               return next();
+           }
+    });
+    //CORS
+    app.all('*', function(req, res, next) {
+        res.header('Access-Control-Allow-Origin', '*');
+        res.header('Access-Control-Allow-Methods', 'PUT, GET, POST, DELETE, OPTIONS');
+        res.header('Access-Control-Allow-Headers', 'X-Requested-With');
+        next();
+    });
+    //Content Security Policy Enabled for Images and Fonts.
+    app.use(helmet.contentSecurityPolicy({
+        directives: {
+            imgSrc:["'self'",'data:'],
+            fontSrc: ["'self'"],
+            objectSrc: ["'none'"],
+            mediaSrc: ["'self'"],
+            frameSrc: ["'none'"]
+        }
+        }));
+
+
     //write stream for logs
     //var accessLogStream = fs.createWriteStream(__dirname + '/access.log', {flags: 'a'})
     //setup the logger
@@ -187,7 +246,7 @@ if (cluster.isMaster) {
     });
 
     function sessionCheck(req, res, roles) {
-        console.log("session check ", req.url)
+        console.log("session check ", req.url);
       if (!req.session.defaultRole || roles.indexOf(req.session.defaultRole) >=0)
         {
             req.session.destroy(); res.status(401).send('<br><br>Your session has been expired.Please <a href="/">Login</a> Again');
@@ -238,23 +297,23 @@ if (cluster.isMaster) {
             //console.log('===== Killed jsreport server =====',data);
             cmd.get('node index.js', function(data, err, stderr){
               if (!err) {
-                console.log('the node-cmd:',data)
+                console.log('the node-cmd:',data);
               } else {
-                console.log("Cannot start Jsreport server")
+                console.log("Cannot start Jsreport server");
               }
             });
           }
           else{
             console.log("Cannot kill jsreport report");
           }
-        })
+        });
       }
       else{
         cmd.get('node index.js', function(data, err, stderr){
           if (!err) {
               console.log('JS report server started normally');
           } else {
-            console.log("Cannot start Jsreport server")
+            console.log("Cannot start Jsreport server");
           }
         });
       }
@@ -264,14 +323,13 @@ if (cluster.isMaster) {
     var screenShotPath=uiConfig.storageConfig.screenShotPath;
 
     //Route Directories
-    var neo4jAPI = require('./server/controllers/neo4jAPI');
+    //var neo4jAPI = require('./server/controllers/neo4jAPI');
     var mindmap = require('./server/controllers/mindmap');
     var login = require('./server/controllers/login');
     var admin = require('./server/controllers/admin');
     var design = require('./server/controllers/design');
     var suite = require('./server/controllers/suite');
     var report = require('./server/controllers/report');
-    var header = require('./server/controllers/header');
     var plugin = require('./server/controllers/plugin');
     var utility = require('./server/controllers/utility');
     var qc = require('./server/controllers/qualityCenter');
@@ -279,16 +337,19 @@ if (cluster.isMaster) {
     var chatbot = require('./server/controllers/chatbot');
     var neuronGraphs2D = require('./server/controllers/neuronGraphs2D');
     var dashboard = require('./server/controllers/dashboard');
+    var taskbuilder=require('./server/controllers/taskJson');
 
     // Mindmap Routes
-    app.use('/home', mindmap);
+    app.post('/home', mindmap.mindmapService);
     //Neo4j API Routes
-    app.post('/neo4jAPI', neo4jAPI.executeQueries);
+    //app.post('/neo4jAPI', neo4jAPI.executeQueriesOverRestAPI);
     //Login Routes
     app.post('/authenticateUser_Nineteen68', login.authenticateUser_Nineteen68);
     app.post('/authenticateUser_Nineteen68_CI', login.authenticateUser_Nineteen68_CI);
     app.post('/loadUserInfo_Nineteen68', login.loadUserInfo_Nineteen68);
     app.post('/getRoleNameByRoleId_Nineteen68', login.getRoleNameByRoleId_Nineteen68);
+    app.post('/logoutUser_Nineteen68', login.logoutUser_Nineteen68);
+    app.post('/logoutUser_Nineteen68_CI', login.logoutUser_Nineteen68_CI);
     //Admin Routes
     app.post('/getUserRoles_Nineteen68', admin.getUserRoles_Nineteen68);
     app.post('/createUser_Nineteen68', admin.createUser_Nineteen68);
@@ -334,16 +395,11 @@ if (cluster.isMaster) {
     app.post('/getReport_Nineteen68', report.getReport_Nineteen68);
     app.post('/exportToJson_ICE', report.exportToJson_ICE);
     app.post('/openScreenShot', report.openScreenShot);
-    //Generic Routes
-    app.post('/getProjectDetails_ICE', header.getProjectDetails_ICE);
-    app.post('/getReleaseNameByReleaseId_ICE', header.getReleaseNameByReleaseId_ICE);
-    app.post('/getCycleNameByCycleId_ICE', header.getCycleNameByCycleId_ICE);
-    //Logout Routes
-    app.post('/logoutUser_Nineteen68', header.logoutUser_Nineteen68);
-    app.post('/logoutUser_Nineteen68_CI', header.logoutUser_Nineteen68_CI);
+
     //Plugin Routes
     app.post('/getProjectIDs_Nineteen68', plugin.getProjectIDs_Nineteen68);
-    app.post('/getTaskJson_Nineteen68', plugin.getTaskJson_Nineteen68);
+    app.post('/getTaskJson_mindmaps', taskbuilder.getTaskJson_mindmaps);
+    app.post('/updateTaskstatus_mindmaps', taskbuilder.updateTaskstatus_mindmaps);
     //Utility plugins
     app.post('/Encrypt_ICE', utility.Encrypt_ICE);
     // Wecoccular Plugin

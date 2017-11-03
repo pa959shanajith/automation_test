@@ -7,6 +7,7 @@ var epurl="http://127.0.0.1:1990/";
 var sessionExtend = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes 
 var sessionTime = 30 * 60 * 1000;
 var updateSessionTimeEvery = 20 * 60 * 1000;
+var validator =  require('validator');
 exports.Encrypt_ICE = function getDomains_ICE(req, res) {
 	try {
 		if(req.cookies['connect.sid'] != undefined)
@@ -20,6 +21,23 @@ exports.Encrypt_ICE = function getDomains_ICE(req, res) {
 			var methodSelected = req.body.encryptionType;
 			var encrytData = req.body.encryptionValue;
 			var encryptedValue;
+			validateEncryption();
+			function validateEncryption()
+			{
+				check_encryptionType = validator.isAlpha(methodSelected);
+				if(check_encryptionType == true)
+				{
+					validate_encryptionType = true;
+				}
+				check_encryptData = validator.isEmpty(encrytData);
+				if(check_encryptData == false)
+				{
+					validate_check_encryptData = true;
+				}
+			}
+			if(validate_encryptionType == true && validate_check_encryptData == true)
+					{
+
 			try{
 				// if (methodSelected === 'undefined') {
 				// 	res.send("fail");
@@ -103,9 +121,11 @@ exports.Encrypt_ICE = function getDomains_ICE(req, res) {
 				}else{
 					res.send("fail");
 				}
-			}
+			} 
 			catch(exception){
 				console.log(exception);
+			} }else{
+				res.send("fail");
 			}
 		}
 		else{

@@ -1,29 +1,8 @@
 var myserver = require('../../server.js');
 var fs = require('fs');
-var https = require('https');
-var certificate = fs.readFileSync('server/https/server.crt','utf-8');
+var neo4jAPI = require('../controllers/neo4jAPI');
 var sessionTime = 30 * 60 * 1000;
 var updateSessionTimeEvery = 20 * 60 * 1000;
-
-var reqToAPI = function(d,u,p,callback) {
-	try{
-		var data = JSON.stringify(d);
-		var result="";
-		var postOptions = {host: u[0], port: u[1], path: p, method: 'POST',ca:certificate,checkServerIdentity: function (host, cert) {
-		return undefined; },headers: {'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(data)}};
-		postOptions.agent= new https.Agent(postOptions);
-		var postRequest = https.request(postOptions,function(resp){
-			resp.setEncoding('utf-8');
-			resp.on('data', function(chunk) {result+=chunk;});
-			resp.on('end', function(chunk) {callback(null,resp.statusCode,result);});
-		});
-		postRequest.on('error',function(e){callback(e.message,400,null);});
-		postRequest.write(data);
-		postRequest.end();
-	}catch(ex){
-		console.log(ex);
-	}
-};
 
 var parseData = function(data){
 	var rootIndex=-1;
@@ -104,15 +83,16 @@ exports.getGraphData = function(req, res){
 		}
 		if(sessionToken != undefined && req.session.id == sessionToken){
 			var qList=[]
-			var urlData=req.get('host').split(':');
 			var userid=req.body.uid;
 			//'686d69a5-b519-4b4f-a813-8299235a2e97';'9c017f14-5a1c-4f2f-85a9-52728c86684c';
 			//qList.push({"statement":"MATCH(a:ICEPERMISSIONS_NG{userid:'"+userid+"'})-[r1]->(b:DOMAINS_NG) WITH b as d MATCH path=(d)-[r*1..]->(x) RETURN path","resultDataContents":["graph"]});
 			qList.push({"statement":"MATCH(a:ICEPERMISSIONS_NG{userid:'"+userid+"'})-[r1]->(d:DOMAINS_NG) WITH a.projectids as pids,d as d MATCH (p:PROJECTS_NG) WHERE p.projectid in pids WITH p as p,d as d MATCH path=(d)-[r2]->(p)-[r3*1..]->(x) RETURN path","resultDataContents":["graph"]});
-			reqToAPI({"data":{"statements":qList}},urlData,'/neo4jAPI',function(err,status,result){
+			neo4jAPI.executeQueries(qList,function(status,result){
 				res.setHeader('Content-Type', 'application/json');
-				if(err) res.status(status).send(err);
-				else if(status!=200) res.status(status).send(result);
+				if(status!=200){
+					console.log("Status:",status,"\nResponse: ",result);
+					res.status(status).send(result);
+				}
 				else{
 					var jsonData=JSON.parse(result);
 					var pData=parseData(jsonData[0].data);

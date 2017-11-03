@@ -80,7 +80,9 @@
 							<option>In Progress</option>
 							<option>Terminated</option>
 							<option>Cancelled</option>
-							<option>Failed</option>
+							<option>Failed 00</option>
+							<option>Failed 01</option>
+							<option>Failed 02</option>
 							<option>Show All</option>
 						</select>
 					</div>
@@ -91,7 +93,7 @@
 						<!-- Schedule Table Header -->
 						<div class="scheduleDataHeader">
 							<span style="width: 20%; border-right: 1px solid #fff; cursor: pointer;" title="Click to sort" ng-click="reverse=!reverse;predicate='scheduledatetime'">Date & Time</span>
-							<span style="width: 13%; border-right: 1px solid #fff">IP Address</span>
+							<span style="width: 13%; border-right: 1px solid #fff">Host</span>
 							<span style="width: 20%; border-right: 1px solid #fff">Scenario Name</span>
 							<span style="width: 20%; border-right: 1px solid #fff">Test Suite</span>
 							<span style="width: 15%; border-right: 1px solid #fff">Browsers</span>
@@ -100,25 +102,18 @@
 						<!-- Schedule Table Header -->
 						
 						<!-- Schedule Table Body -->
-						<!--<div id="scheduledDataBody" class="scrollbar-inner scheduledDataBody">
-							<!--<div class="scheduleDataBodyRow">
-								<div style="width: 15%">Date & Time</div>
-								<div style="width: 15%">IP Address</div>
-								<div style="width: 20%">Scenario Name</div>
-								<div style="width: 20%">Project Name</div>
-								<div style="width: 18%">Browser</div>
-								<div style="width: 12%">Completed</div>
-							</div>
-						</div>-->
 						<div id="scheduledDataBody" class="scrollbar-inner scheduledDataBody">
 							<div class='scheduleDataBodyRow' ng-repeat="schdata in scheduledData | orderBy:predicate:reverse">
 								<div ng-repeat="data in schdata.scenariodetails" class="scheduleDataBodyRowChild">
-									<div style='width: 20%'>{{schdata.scheduledatetime.split("T")[0]}} {{schdata.scheduledatetime.split("T")[1].split(".")[0]}}</div>
+									<div style='width: 20%'>{{schdata.scheduledatetime}}</div><!-- {{schdata.scheduledatetime.split("T")[1].split(".")[0]}}-->
 									<div style='width: 13%'>{{schdata.clientipaddress}}</div>
-									<div style='width: 20%'>{{data.scenarioname}}</div>
-									<div style='width: 20%'>{{schdata.testsuitename}}</div>
-									<div style='width: 15%' ng-repeat="brow in schdata.browserlist"><img ng-src={{browImg(brow)}} /></div>
-									<div style='width: 12%' data-cycleid={{schdata.cycleid}} data-scheduleid={{schdata.scheduleid}} data-scheduledatetime={{schdata.scheduledatetime.valueOf().toString()}}>{{schdata.schedulestatus}} <img src='imgs/ic-close.png' ng-if="schdata.schedulestatus == 'scheduled'" class='cancelJob' ng-click='cancelThisJob($event)' title='Cancel Job'/></div>
+									<div style='width: 20%' title={{data.scenarioname}}>{{data.scenarioname}}</div>
+									<div style='width: 20%' title={{schdata.testsuitename}}>{{schdata.testsuitename}}</div>
+									<div style='width: 15%'><img ng-repeat="brow in schdata.browserlist" ng-src={{browImg(brow)}} style="margin-right: 5px;"/></div>
+									<div style='width: 12%' data-cycleid={{schdata.cycleid}} data-scheduleid={{schdata.scheduleid}} data-scheduledatetime={{schdata.scheduledatetime.valueOf().toString()}}>{{schdata.schedulestatus}} <span class="glyphicon glyphicon-remove cancelJob" ng-if="schdata.schedulestatus == 'scheduled'" ng-click='cancelThisJob($event,"cancelled")' title='Cancel Job'></span>
+									<!--<span class="glyphicon glyphicon-stop cancelJob" ng-if="schdata.schedulestatus == 'scheduled'" ng-click='cancelThisJob($event,"Terminate")' title='Terminate Job'></span>-->
+									</div> 
+									<!--<img src='imgs/ic-close.png' ng-if="schdata.schedulestatus == 'scheduled'" class='cancelJob' ng-click='cancelThisJob($event)' title='Cancel Job'/>-->
 								</div>
 							</div>
 						</div>
