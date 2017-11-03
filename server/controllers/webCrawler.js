@@ -17,28 +17,22 @@ exports.getCrawlResults = function(req, res){
              var level = req.body.level;
              var agent = req.body.agent;
               validateWeboccular();
-             function validateWeboccular ()
-             {
+             function validateWeboccular (){
                   check_url = validator.isURL(req.body.url);
-                  if(check_url == true)
-                  {
+                  if(check_url == true){
                     validate_url = true;
                   }
-				  console.log(typeof(req.body.level));
                   check_level = validator.isEmpty(req.body.level.toString());
-				  
-                  if(check_level == false)
-                  {
+                  if(check_level == false){
                     validate_level = true;
                   }
                   check_agent = validator.isAlpha(req.body.agent);
-                    if(check_agent == true)
-                    {
+                    if(check_agent == true){
                       validate_agent = true;
                     }
              }
         if(validate_url == true && validate_level == true && check_agent == true)
-                  {  
+                  {
 
            var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
            console.log("IP:",ip);
@@ -82,10 +76,6 @@ exports.getCrawlResults = function(req, res){
            else{
               res.send('unavailableLocalServer');
            }
-             //
-            //  mySocket.on('disconnect', function(){
-            //    return res.send("localServerDisconnected")
-            //  });
           }else{
             return res.send("Invalid Session");
           }

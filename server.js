@@ -239,7 +239,7 @@ if (cluster.isMaster) {
     });
 
     //Test Lead and Test Manager can access Weboccular Plugin
-    app.get(/^\/(p_Weboccular|neuronGraphs2D|p_ALM)$/, function(req, res){
+    app.get(/^\/(p_Weboccular|neuronGraphs2D|p_ALM|p_Dashboard)$/, function(req, res){
         //Denied roles
         roles=  ["Admin", "Business Analyst", "Tech Lead", "Test Engineer"];
         sessionCheck(req, res, roles);
@@ -252,7 +252,7 @@ if (cluster.isMaster) {
             req.session.destroy(); res.status(401).send('<br><br>Your session has been expired.Please <a href="/">Login</a> Again');
         }else{
             if (req.cookies['connect.sid'] && req.cookies['connect.sid'] != undefined) {
-                
+
                  res.sendFile("index.html", { root: __dirname + "/public/" });
                 } else {
                      req.session.destroy();
@@ -336,8 +336,10 @@ if (cluster.isMaster) {
     var webCrawler = require('./server/controllers/webCrawler');
     var chatbot = require('./server/controllers/chatbot');
     var neuronGraphs2D = require('./server/controllers/neuronGraphs2D');
+    var dashboard = require('./server/controllers/dashboard');
     var taskbuilder=require('./server/controllers/taskJson');
 
+    // Mindmap Routes
     // Mindmap Routes
     try{
         var version = require('./server/controllers/project_versioning');
@@ -345,6 +347,7 @@ if (cluster.isMaster) {
     }catch(Ex){
         console.log('Not found');
     }
+
     app.post('/home', mindmap.mindmapService);
     //Neo4j API Routes
     //app.post('/neo4jAPI', neo4jAPI.executeQueriesOverRestAPI);
@@ -416,14 +419,19 @@ if (cluster.isMaster) {
     //NeuronGraphs Plugin Routes
     app.post('/hierarchy_nGraphs2D', neuronGraphs2D.getHierarchy);
     app.post('/getGraph_nGraphs2D', neuronGraphs2D.getGraphData);
-    app.post('/getPackData_nGraphs2D', neuronGraphs2D.getPackData);		
+    app.post('/getPackData_nGraphs2D', neuronGraphs2D.getPackData);
     app.post('/getReportData_nGraphs2D', neuronGraphs2D.getReportData);
+
     //QC Plugin
     app.post('/loginQCServer_ICE', qc.loginQCServer_ICE);
     app.post('/qcProjectDetails_ICE', qc.qcProjectDetails_ICE);
     app.post('/qcFolderDetails_ICE', qc.qcFolderDetails_ICE);
     app.post('/saveQcDetails_ICE', qc.saveQcDetails_ICE);
     app.post('/viewQcMappedList_ICE', qc.viewQcMappedList_ICE);
+    // Dashboard Routes
+    app.post('/loadDashboard', dashboard.loadDashboard);
+    app.post('/loadDashboardData', dashboard.loadDashboardData);
+    app.post('/loadDashboard_2', dashboard.loadDashboard_2);
     //app.post('/manualTestcaseDetails_ICE', qc.manualTestcaseDetails_ICE);
 
 
@@ -598,7 +606,7 @@ if (cluster.isMaster) {
     console.log(e);
     setTimeout(function(){
       cluster.worker.kill();
-    }, 2)
+    }, 200)
   }
 
 }
