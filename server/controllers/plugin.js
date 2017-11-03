@@ -13,7 +13,6 @@ exports.getProjectIDs_Nineteen68 = function (req, res) {
 				console.log(err);
 				res.send('fail');
 			} else {
-				//console.log('user_task_json',data);
 				res.send(data);
 			}
 		});

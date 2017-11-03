@@ -22,8 +22,8 @@ exports.getCrawlResults = function(req, res){
                   if(check_url == true){
                     validate_url = true;
                   }
-                  check_level = validator.isNumeric(req.body.level);
-                  if(check_level == true){
+                  check_level = validator.isEmpty(req.body.level.toString());
+                  if(check_level == false){
                     validate_level = true;
                   }
                   check_agent = validator.isAlpha(req.body.agent);
@@ -76,10 +76,6 @@ exports.getCrawlResults = function(req, res){
            else{
               res.send('unavailableLocalServer');
            }
-             //
-            //  mySocket.on('disconnect', function(){
-            //    return res.send("localServerDisconnected")
-            //  });
           }else{
             return res.send("Invalid Session");
           }
