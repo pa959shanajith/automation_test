@@ -111,7 +111,7 @@ if (cluster.isMaster) {
         limit: '10mb',
         extended: true
     }));
-    //app.use(morgan('combined'));
+    app.use(morgan('combined'));
 
     app.use(cookieParser());
     app.use(sessions({
@@ -340,12 +340,6 @@ if (cluster.isMaster) {
     var taskbuilder=require('./server/controllers/taskJson');
 
     // Mindmap Routes
-    try{
-        var version = require('./server/controllers/project_versioning');
-        app.post('/version', version.versioning);
-    }catch(Ex){
-        console.log('Not found');
-    }
     app.post('/home', mindmap.mindmapService);
     //Neo4j API Routes
     //app.post('/neo4jAPI', neo4jAPI.executeQueriesOverRestAPI);
@@ -417,8 +411,7 @@ if (cluster.isMaster) {
     //NeuronGraphs Plugin Routes
     app.post('/hierarchy_nGraphs2D', neuronGraphs2D.getHierarchy);
     app.post('/getGraph_nGraphs2D', neuronGraphs2D.getGraphData);
-    app.post('/getPackData_nGraphs2D', neuronGraphs2D.getPackData);		
-    app.post('/getReportData_nGraphs2D', neuronGraphs2D.getReportData);
+
     //QC Plugin
     app.post('/loginQCServer_ICE', qc.loginQCServer_ICE);
     app.post('/qcProjectDetails_ICE', qc.qcProjectDetails_ICE);

@@ -71,7 +71,7 @@ var neo4jAPI = require('../controllers/neo4jAPI');
       if(status!=200){
         res.status(status).send(result);
       }else{
-        var jsonData=JSON.parse(result);
+        var jsonData=result;
         callback(jsonData);
       }
     });
@@ -79,10 +79,10 @@ var neo4jAPI = require('../controllers/neo4jAPI');
   }
 
   function getProjectNames(projectID, allExecutionData, callback){
-    inputs = { "projectid":projectID, "query":"getprojectname"};
+    inputs = { "projectid":projectID, "query":"projecttable"};
     args = {data:inputs, headers:{"Content-Type" : "application/json"}}
 
-    client.post(epurl+'create_ice/getProjectIDs_Nineteen68', args,
+    client.post(epurl+'suite/getTestcaseDetailsForScenario_ICE', args,
     function(projectDetails, response){
       allExecutionData.projectDetails[projectID] = projectDetails.rows[0].projectname;
       callback(allExecutionData);
@@ -134,7 +134,7 @@ var neo4jAPI = require('../controllers/neo4jAPI');
             //console.log("cycleids : ", cycleIds.rows);
             let cycleIdsArr = cycleIds.rows;
             async.each(cycleIdsArr, function(cycleId, doneFetchingTestsuiteId){
-            //  console.log("executing cycle id, ", cycleId );
+             //console.log("executing cycle id, ", cycleId );
               allExecutionData.cycleDetails[cycleId.cycleid] = cycleId.cyclename;
               inputs = {
                 "id":cycleId.cycleid,
@@ -230,12 +230,13 @@ var neo4jAPI = require('../controllers/neo4jAPI');
       if (isSessionActive(req,res)) {
         var user_id = req.body.userid;
         var jsonData;
-        inputs = { "userid":user_id, "query":"getprojids"};
+        inputs = { "userid":user_id, "query":"allflag"};
         args = {data:inputs, headers:{"Content-Type" : "application/json"}}
         client.post(epurl+"create_ice/getProjectIDs_Nineteen68", args,
         function (result, response) {
           try{
-            let projectIds = result.rows[0].projectids;
+          //  console.log(result.rows.projectId);
+            let projectIds = result.rows.projectId;
             var arr = [];
             async.parallel([
               function ( callback ) {
