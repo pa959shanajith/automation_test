@@ -767,12 +767,9 @@ exports.createProject_ICE = function createProject_ICE(req, res) {
 					if (err) {
 						console.log(err);
 					} else {
-                        //console.log(data);
                         neo4jAPI.executeQueries(qList,function(status,result){
-                            //res.setHeader('Content-Type', 'application/json');
                             if(status!=200){
                                 console.log("Status:",status,"\nResponse: ",result);
-                                //res.status(status).send(result);
                             }
                             else{
                                 console.log('Success');
@@ -1873,10 +1870,8 @@ exports.assignProjects_ICE = function (req, res) {
 
                         // MATCH p = (a:DOMAINS_NG{userid:'bced8722-1ce1-41e0-b7d3-d9a9c0bcd800'})-[r1]->(d:DOMAINS_NG) return p
                         neo4jAPI.executeQueries(qList,function(status,result){
-                            //res.setHeader('Content-Type', 'application/json');
                             if(status!=200){
                                 console.log("Status:",status,"\nResponse: ",result);
-                                //res.status(status).send(result);
                             }
                             else{
                                 console.log('Success');

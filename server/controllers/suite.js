@@ -111,6 +111,7 @@ exports.readTestSuite_ICE = function (req, res) {
 								}
 								respeachscenario.dataparam = outdataparam;
 								scenarioidindex = 0;
+								responsedata[eachSuite.testsuitename] = respeachscenario;
 								async.forEachSeries(outscenarioids, function (eachoutscenarioid, outscenarioidcallback) {
 									scenarioidindex = scenarioidindex + 1;
 									/**
@@ -142,8 +143,7 @@ exports.readTestSuite_ICE = function (req, res) {
 															"testSuiteDetails": responsedata
 														};
 														res.send(schedulingDetails);
-													} else
-														res.send(responsedata);
+													}
 												}
 											}
 											outscenarioidcallback();
@@ -158,14 +158,13 @@ exports.readTestSuite_ICE = function (req, res) {
 			});
 		},function(){
 			neo4jAPI.executeQueries(qList,function(status,result){
-				//res.setHeader('Content-Type', 'application/json');
 				if(status!=200){
 					console.log("Status:",status,"\nResponse: ",result);
-					//res.status(status).send(result);
 				}
 				else{
 					console.log('Success');
 				}
+				res.send(responsedata);
 			});
 		});
 	} else {
@@ -1317,6 +1316,9 @@ function TestSuiteDetails_Module_ICE(req, cb1, data) {
 		testcasesteps: function (callback) {
 			var testscenarioids = resultdata.testscenarioids;
 			var versionnumber = resultdata.versionnumber;
+			if (testscenarioids == null) {
+				testscenarioids = [];
+			}
 			if (!flag) {
 				var conditioncheckvalues = [];
 				var donotexecutevalues = [];

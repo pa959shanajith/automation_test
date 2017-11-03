@@ -632,16 +632,10 @@ exports.createStructure_Nineteen68 = function (req, res) {
 				"testsuiteDetails": suitedetailslist
 			};
 			neo4jAPI.executeQueries(qList,function(status,result){
-					//res.setHeader('Content-Type','application/json');
 					if(err){
 						console.log(err);
-						//res.status(status).send(err);
 					} else{
-						console.log("Qlist::: ",qList);
-						console.log("Result::: ",result);
 						res(null, returnJsonmindmap);
-						//console.log("user_task_json : ",user_task_json);
-						//return user_task_json;
 					}
 
 			});
