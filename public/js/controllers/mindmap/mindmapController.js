@@ -12,7 +12,6 @@ mySPA.controller('mindmapController', ['$scope', '$http', '$location', '$timeout
 	{
 		window.location.href = "/";
 	}
-    var versioningEnabled=false;
 	$timeout(function(){
 		$('.scrollbar-inner').scrollbar();
 		$('.scrollbar-macosx').scrollbar();
@@ -185,22 +184,7 @@ mySPA.controller('mindmapController', ['$scope', '$http', '$location', '$timeout
 
     // Changes made for End to end module implementation
     $scope.createMapsCall = function(e){
-            
-           $.ajax({
-                    type: 'HEAD',
-                    url: window.location.origin+'/js/js_mindmap/versioning.js',
-                    success: function() {
-                        versioningEnabled=true;
-                        
-                        load_versions();
-                    },  
-                    error: function() {
-                        load_versions();
-                    }
-                });
-       
-       function load_versions(){
-            if($scope.tab=='tabRequirement'){
+        if($scope.tab=='tabRequirement'){
         	$('.selectProject').hide();
             $("img.selectedIcon").removeClass("selectedIcon");
             $('#reqImg').addClass('selectedIcon');
@@ -215,8 +199,7 @@ mySPA.controller('mindmapController', ['$scope', '$http', '$location', '$timeout
             }
         }
         else if($scope.tab=='mindmapEndtoEndModules'){
-            // if(!versioningEnabled){
-            $("#ct-main").hide();
+        	$("#ct-main").hide();
         	$("img.selectedIcon").removeClass("selectedIcon");
 	        $('#createImg').addClass('selectedIcon');
             if($("#left-nav-section").is(":visible") == true && $("#right-dependencies-section").is(":visible") == false)
@@ -229,18 +212,12 @@ mySPA.controller('mindmapController', ['$scope', '$http', '$location', '$timeout
             if($('.rsSlide').is(':visible'))
                 $("#ct-expand-right").trigger("click");
             loadMindmapData_W();
-            // }else{
-            //     openDialogMindmap('Error',"EndtoEnd flow disabled in Versioning");
-            // }
-        	
         }
         else{
             if ($scope.tab=='tabCreate'){
             	$('.selectProject').show();
                 $("img.selectedIcon").removeClass("selectedIcon");
 		        $('#createImg').addClass('selectedIcon');
-                if(!versioningEnabled)
-                    $('.selectProject').addClass('selectProjectPosition');
                 if($("#left-nav-section").is(":visible") == true && $("#right-dependencies-section").is(":visible") == false)
                 {
                    $("#ct-moduleBox,.tabAssign").addClass("ct-expand-module");
@@ -250,8 +227,6 @@ mySPA.controller('mindmapController', ['$scope', '$http', '$location', '$timeout
                 $('.selectProject').show();
                 $("img.selectedIcon").removeClass("selectedIcon");
 		        $('#assignImg').addClass('selectedIcon');
-                if(!versioningEnabled)
-                    $('.selectProject').addClass('selectProjectPosition');
                  if($("#left-nav-section").is(":visible") == true && $("#right-dependencies-section").is(":visible") == false)
                 {
                     $("#ct-moduleBox,.tabAssign").addClass("ct-expand-module");
@@ -263,29 +238,10 @@ mySPA.controller('mindmapController', ['$scope', '$http', '$location', '$timeout
                 $("#ct-collapse").trigger("click");
             if($('#right-dependencies-section').is(':visible'))
                 $("#ct-expand-right").trigger("click");
-                            //if versioning.js file is present then call addVersioning function else call loadMindmapData()
-                if (versioningEnabled){
-                    loadMindmapData_V();
-                }else{
-                    loadMindmapData(0);
-                    
-                }
-                // $.ajax({
-                //     type: 'HEAD',
-                //     url: window.location.origin+'/js/js_mindmap/versioning.js',
-                //     success: function() {
-                //         loadMindmapData_V();
-                        
-                //     },  
-                //     error: function() {
-                //         loadMindmapData(0);
-                //     }
-                // });
-                
-
+            
+            loadMindmapData();
             $timeout(function(){
-               $('#ct-moduleBox').prop("style","width:100% ; left:0px ;");
-
+                $('#ct-moduleBox').prop("style","width:100% ; left:0px ;");
             },10);
             $timeout(function(){
                 $('#ct-AssignBox').prop("style","width:100% ; left:0px ;");
@@ -295,17 +251,30 @@ mySPA.controller('mindmapController', ['$scope', '$http', '$location', '$timeout
             
         }
         window.localStorage['tabMindMap'] = $scope.tab;
-       }
     }
     
     $scope.createMap = function(option){
-    	// if(option == "mindmapEndtoEndModules" && versioningEnabled){
-        //     openDialogMindmap('Error',"EndtoEnd flow disabled in Versioning");
-        // } //as of now, do nothing
-        // else
     	$scope.tab = option;
     }
 
+    // $(document).on('change', "#selectProjectEtem", function(){
+    // 	if($(this).children("option:selected").val()){
+    // 		var container = $("#etemModuleContainer");
+    // 		container.empty();
+    // 		for(i=0; i<20; i++){
+    // 			container.append("<span class='moduleContainer' data-moduleId=''><img alt='Module icon' class='eteMbox' src='imgs/ic-reportbox.png' title=''><br/><span class='modulename' title=''>Module"+(i+1)+"</span></span>");
+    // 		}
+    // 		initScroller();
+    // 	}
+    // })
+    
+    // $(document).on('click', '.moduleContainer', function(){
+    // 	var container = $("#eteScenarioContainer");
+	// 	container.empty();
+    // 	for(i=0; i<50; i++){
+    // 		container.append("<span class='eteScenrios' data-scenarioId=''>End to End Scenario"+(i+1)+"</span>")
+    // 	}
+    // })
     
     var collapseEteflag = true;
     $(document).on('click', '.collapseEte', function(){

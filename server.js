@@ -5,6 +5,7 @@ var util = require('util');
 var logFile = fs.createWriteStream('logs/node_server.log', { flags: 'a' });
 // Or 'w' to truncate the file every time the process starts.
 var logStdout = process.stdout;
+var notificationMsg = require('./server/notifications/notifyMessages.js');
 
 function _getCallerFile() {
   var count = 0;
@@ -111,7 +112,7 @@ if (cluster.isMaster) {
         limit: '10mb',
         extended: true
     }));
-    app.use(morgan('combined'));
+    //app.use(morgan('combined'));
 
     app.use(cookieParser());
     app.use(sessions({
@@ -482,9 +483,10 @@ if (cluster.isMaster) {
     var socketMap = {};
     var socketMapUI = {};
     var sokcetMapScheduling={};
+    var socketMapNotify = {};
     var isUISocketRequest = false;
 
-    io.on('connection', function(socket) {
+        io.on('connection', function(socket) {
         // console.log("-------------------------------------------------------------------------------------------------------");
         var ip = socket.request.connection.remoteAddress || socket.request.headers['x-forwarded-for'];
         console.log("Normal Mode Enabled for  IP :",ip);
@@ -499,9 +501,19 @@ if (cluster.isMaster) {
             console.log("socket request from UI");
             address=socket.request._query['username'];
             socketMapUI[address] = socket;
-            socket.emit("connectionAck", "Success");
-        //  }
-        }else{
+        }
+        else if(socket.request._query['check'] == "notify" ){
+                 address=socket.request._query['username'];
+                 socketMapNotify[address] = socket;
+
+                 //Broadcast Message
+                 var broadcastTo = ['/admin','/plugin','/design','/designTestCase','/execute','/scheduling','/specificreports','/home','/p_Utility','/p_Reports','p_Weboccular','/neuronGraphs2D','/p_ALM'];
+                 notificationMsg.to = broadcastTo;
+                 notificationMsg.notifyMsg = 'Server Maintenance Scheduled';
+                 var soc = socketMapNotify[address];
+                // soc.emit("notify",notificationMsg);
+        }
+        else{
           isUISocketRequest = false;
           if (!(address in socketMap)) {
               socketMap[address] = socket;
@@ -515,6 +527,7 @@ if (cluster.isMaster) {
         module.exports.allSocketsMap = socketMap;
         module.exports.allSocketsMapUI = socketMapUI;
         module.exports.allSchedulingSocketsMap=sokcetMapScheduling;
+        module.exports.socketMapNotify = socketMapNotify; 
         httpsServer.setTimeout();
 
         // socket.on('message', function(data) {
@@ -608,5 +621,4 @@ if (cluster.isMaster) {
       cluster.worker.kill();
     }, 200)
   }
-
 }

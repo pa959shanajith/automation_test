@@ -11,7 +11,7 @@ var validator = require('validator');
 //Global Variables
 var roles = [];
 var userRoles = {};
-
+ var notificationMsg = require("../notifications/notifyMessages");
 //Authenticate User - Nineteen68
 exports.authenticateUser_Nineteen68 = function (req, res) {
 	try {
@@ -20,6 +20,7 @@ exports.authenticateUser_Nineteen68 = function (req, res) {
 		var password = req.body.password;
 		var session = req.session;
 		var sessId = req.session.id;
+
 		validateLogin();
 		function validateLogin() {
 			check_username = validator.isEmpty(username);
@@ -505,7 +506,7 @@ exports.loadUserInfo_Nineteen68 = function (req, res) {
 		if (sessionToken != undefined && req.session.id == sessionToken) {
 			var flag = req.body.flag;
 			var switchedRole = req.body.selRole;
-			userName = req.body.username.toLowerCase();
+			userName = req.session.username.toLowerCase();
 			jsonService = {};
 			userpermissiondetails = [];
 			async.series({
@@ -695,7 +696,7 @@ exports.getRoleNameByRoleId_Nineteen68 = function (req, res) {
 		}
 		if (sessionToken != undefined && req.session.id == sessionToken) {
 			var roleId = [];
-			roleId = req.body.role;
+			roleId.push(req.session.defaultRoleId);
 			var role = [];
 			//var role = roleId[0];
 			var flag = "";
@@ -778,3 +779,4 @@ exports.logoutUser_Nineteen68 = function (req, res) {
 		res.send('Session Expired');
 	}
 };
+

@@ -10,11 +10,19 @@ var selectedROleID;
 var primaryRole = [];
 primaryRole = JSON.parse(window.localStorage['_UI']).role;
 var primaryRoleName = window.localStorage['_SR'];
-mySPA.controller('headerController', function($scope,$http,$location,headerServices,LoginService,cfpLoadingBar) {
+mySPA.controller('headerController', function($scope,$rootScope,$http,$location,headerServices,LoginService,cfpLoadingBar,socket) {
 	if(window.localStorage['_UI'])
 	{
 		userDetails = JSON.parse(window.localStorage['_UI']);
 	}
+	$scope.notifications = [];
+	if(window.localStorage.notification)
+	{
+		$scope.notifications = JSON.parse(window.localStorage.notification);
+	}
+
+
+		
 	userRole = window.localStorage['_SR'];
 	$("#displayUsername").text(userDetails.firstname + ' ' + userDetails.lastname)
 	$(".heading-center-light").text('Welcome  '+ userDetails.firstname + ' ' + userDetails.lastname +'!');
@@ -35,6 +43,92 @@ mySPA.controller('headerController', function($scope,$http,$location,headerServi
 		}, 300);
 	}
 
+	if($location.$$path == "/plugin")
+		{
+			$("button.notify-btn").addClass('notify-btn-white');
+
+		}
+	$("#notifications-count").hide();
+
+		socket.on('notify', function(value){
+			var dateTime =  new Date().toLocaleString();
+			if(value.to.indexOf($location.$$path) >= 0){
+				$('.top-left').notify({
+					message: {
+						text: value.notifyMsg
+					},
+					animate: {
+						enter: 'animated fadeInRight',
+						exit: 'animated fadeOutRight'
+					}
+				}).show();
+			}
+			
+			if(window.localStorage.notification)
+			{
+				var notificationArr =	window.localStorage.notification;
+				//console.log(JSON.parse(notificationArr));
+				notificationArr = JSON.parse(notificationArr);
+				value.dateTime = dateTime;
+				notificationArr.push(value);
+				notificationArr = JSON.stringify(notificationArr);
+				window.localStorage.notification = notificationArr;
+				$scope.notifications = JSON.parse(window.localStorage.notification);
+				$scope.$apply();
+				
+			}
+			else{
+				var notificationArr = [];
+				value.dateTime = dateTime;
+				notificationArr.push(value);
+				console.log(JSON.stringify(notificationArr));
+				notificationArr = JSON.stringify(notificationArr)
+				window.localStorage.notification = notificationArr;
+				$scope.notifications = JSON.parse(window.localStorage.notification);
+				$scope.$apply();
+			}
+			
+				var notifications = JSON.parse(window.localStorage.notification);
+				var unreadNotifications = notifications.filter(a=>a.isRead==false);
+				var notificationCount = unreadNotifications.length;
+				console.log("notificCount", notificationCount);
+				if(notificationCount < 1 || notificationCount == '' || notificationCount == undefined)
+				{
+					$("#notifications-count").hide();
+				}
+				else{
+					$("#notifications-count").show();
+					$("#notifications-count").text(notificationCount);
+				}
+			 $(document).on("click", "#dropdownMenuButton", function(e){
+
+						if($(".notify-div").is(":visible") == true)
+						{
+							$("#notifications-count").hide();
+							var readMessages = JSON.parse(window.localStorage.notification);
+							console.log("read", readMessages);
+							for(var i=0;i<readMessages.length;i++)
+							{
+								readMessages[i].isRead = true;
+							}
+							window.localStorage.notification = JSON.stringify(readMessages);
+						}
+						
+				 });
+			
+		});
+			 $(document).on("click", "#dropdownMenuButton", function(e){
+				if($(".notifyMsgDiv").length < 1)
+					{
+						$("#notifyBox").removeClass('dropdown-menu');
+					} 
+					else{
+						$("#notifyBox").removeClass('dropdown-menu').addClass('dropdown-menu');
+					}
+			 });
+
+			 
+	
 	$(document).on("click", "#naviPg", function(e){
 		if(userRole == 'Admin')
 		{
