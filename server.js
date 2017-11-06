@@ -112,7 +112,7 @@ if (cluster.isMaster) {
         limit: '10mb',
         extended: true
     }));
-    //app.use(morgan('combined'));
+    app.use(morgan('combined'));
 
     app.use(cookieParser());
     app.use(sessions({
