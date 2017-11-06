@@ -178,7 +178,7 @@ if (cluster.isMaster) {
     app.use(helmet.contentSecurityPolicy({
         directives: {
             imgSrc:["'self'",'data:'],
-            fontSrc: ["'self'"],
+         //   fontSrc: ["'self'"],
             objectSrc: ["'none'"],
             mediaSrc: ["'self'"],
             frameSrc: ["'none'"]
