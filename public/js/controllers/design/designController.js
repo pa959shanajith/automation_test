@@ -72,6 +72,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
         $scope.errorMessage = "";
     }
     //Default Function to reset all input, select
+
     var current_task=JSON.parse(window.localStorage['_CT']);
     var getTaskName = current_task.taskName;
     appType = current_task.appType;
@@ -84,6 +85,7 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
 				$('.submitTaskBtn').text('Approve');
 				$('.reassignTaskBtn').show();
 	}
+
     $("#page-taskName").empty().append('<span class="taskname">' + getTaskName + '</span>');
     $(".projectInfoWrap").empty()
     //Loading Project Info
@@ -210,6 +212,7 @@ console.log("screenName:", screenName);
         // else{
         //     $("#submitTasksScreen").find('.modal-footer button')[0].setAttribute('onclick',"submit_task('"+action+"')")
         // }
+
 	}
 	//Submit Task Screen
 
@@ -224,6 +227,7 @@ console.log("screenName:", screenName);
         // else{
         //     $("#submitTasksTestCase").find('.modal-footer button')[0].setAttribute('onclick',"submit_task('"+action+"')")
         // }
+
 	}
 	//Submit task Test Case
 
@@ -355,7 +359,7 @@ console.log("screenName:", screenName);
         testcaseID.push(taskInfo.testCaseId);
         var browserType = [];
         browserType.push(selectedBrowserType)
-        if (appType == "MobileWeb") browserType = [];
+        if (appType == "MobileWeb" || appType == "Mainframe") browserType = [];
         globalSelectedBrowserType = selectedBrowserType;
         var blockMsg = 'Debug in Progress. Please Wait...';
         if (dependentTestCaseFlag == true) {
@@ -537,6 +541,7 @@ console.log("screenName:", screenName);
                         openDialog("Import Testcase", "Please Check the file format you have uploaded!")
                     }
                 }
+
                 reader.readAsText(file);
                 counter2 = 1;
                 $("#overWriteJson").val('');
@@ -2398,6 +2403,7 @@ console.log("screenName:", screenName);
                 customObj.push({
                     custname: $(this).find("input").val()+"_"+typeOfElement,
                     tag: eleType,
+
                     xpath: ''
                 })
             })
@@ -2678,6 +2684,7 @@ console.log("screenName:", screenName);
                 scrapeObject.editedListoldXpath = [];
                 scrapeObject.editedListmodifiedXpaths = [];
                 scrapeObject.versionnumber = tasks.versionnumber;
+
                 //Filtering the Object which has been mapped
                 var valueToMap = $(".valueMerged")
                 $.each(valueToMap, function() {
@@ -4721,9 +4728,11 @@ function contentTable(newTestScriptDataLS) {
             $grid.jqGrid('setCell', currRowId, 'url', url);
         }
         // else{
+
         //     $grid.jqGrid('setCell', currRowId, 'objectName', objName);
         //     $grid.jqGrid('setCell', currRowId, 'url', url);
         // }
+
         //get Input and Output Syntax for selected Keyword
         $.each(keywordArrayList, function(index, value) {
             keywordArrayKey = index;

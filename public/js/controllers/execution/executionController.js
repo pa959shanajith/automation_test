@@ -594,8 +594,9 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 		console.log("moduleInfo:::" + $scope.moduleInfo)
 		//moduleInfo.push(suiteInfo);
 		//Getting each row data as an object
-		if(appType != "SAP" && browserTypeExe.length == 0)	openDialogExe("Execute Test Suite", "Please select a browser")
+		if((appType != "SAP" && appType != "Mainframe") && browserTypeExe.length == 0)	openDialogExe("Execute Test Suite", "Please select a browser")
 		else if(appType == "SAP" && browserTypeExe.length == 0)	openDialogExe("Execute Test Suite", "Please select SAP Apps option")
+
 		else if($(".exe-ExecuteStatus input:checked").length == 0) openDialogExe("Execute Test Suite", "Please select atleast one scenario(s) to execute")
 		else{
 			//if(appType == "SAP") browserTypeExe = ["1"];
@@ -662,6 +663,7 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 	// }
 	// //Submit Task Function
 
+
 	$scope.submitTaskExecution = function(action){
 		$("#submitTasksExecution").modal("show")
 		$('#submitTasksExecution').find('.btn-default-yes').focus();
@@ -670,6 +672,7 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 			$("#submitTasksExecution").find('.modal-footer button')[0].setAttribute('onclick',"submit_task('reassign')")
 		}
 	}
+
 
 
 	//Conditiion Check Function
