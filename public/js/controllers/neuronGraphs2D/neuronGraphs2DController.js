@@ -32,6 +32,7 @@ mySPA.controller('neuronGraphs2DController', ['$scope', '$http', '$location', '$
 		// 	d.y=undefined;
 		// 	d.z=undefined;
 		// })
+
 		activeNode = undefined;
 		console.log('assign tab')
 		$scope.tab = option;
@@ -42,6 +43,11 @@ mySPA.controller('neuronGraphs2DController', ['$scope', '$http', '$location', '$
 			 //$scope.loadNGraphs();
 		}
 		else if($scope.tab=='actionTab') {
+			if(!globalobj['lockedSuite']){
+				$timeout(function(){$('#viewImg').trigger("click");},1000);
+				openDialog('Error','Please Lock a suite to Execute first!');
+				return;
+			}
 			$('#actionImg').addClass('selectedIcon');
 			buildExecutionGraph();
 			globalobj['jsondata'] = createExecutionJson();			
@@ -486,7 +492,7 @@ function indexOfItem(array, item) {
             return i;   // Found it
         }
     }
-	alert("You shouldn't be here!")
+	openDialog("Error","You shouldn't be here!")
     return -1;   // Not found
 }
 	var getNClosestCords = function(nObj,cords,n,flag){
@@ -759,7 +765,7 @@ function indexOfItem(array, item) {
 			
 			//console.log('nodeclick executed')
 			if (activeNode==this){
-				$('.closePopup').trigger('click');
+				$('.closePopup').trigger("click");
 				clearHighlightNodes();
 			} 
 			else{
@@ -880,12 +886,12 @@ function indexOfItem(array, item) {
 		//console.log('activeNode: ',d3.select(activeNode));
 //		console.log('activeNode: ',d3.select(activeNode).attr('class').indexOf('node-TestSuite')!==-1);
 	if(d3.select(activeNode).attr('class').indexOf('node-TestSuite')!==-1){
-			alert('Suite locked for execution');
+			openDialog('Suite to Execute','Suite locked for execution');
 			console.log('activeNode: ',activeNode)
 			globalobj['lockedSuite'] = activeNode;
 		}
 		else
-			alert('Please select a Suite');
+			openDialog('Error','Please select a Suite');
 	};
 	var buildExecutionGraph = function(){
 		//console.log('Hi');
@@ -933,6 +939,7 @@ function indexOfItem(array, item) {
 	};
 
 	var createExecutionJson = function(){
+	globalobj['jsondata'] = [];
 	var jsondata11 = [{
     	"suiteDetails": [],
     	"testsuitename": "",
@@ -986,10 +993,10 @@ function indexOfItem(array, item) {
 			//$('#executionTerminated').modal('show');
 			//$('#executionTerminated').find('.btn-default').focus();
 		} else if (data == "unavailableLocalServer") {
-			alert("Execute Test Suite, ICE Engine is not available. Please run the batch file and connect to the Server.")
+			openDialog('Error',"Execute Test Suite, ICE Engine is not available. Please run the batch file and connect to the Server.")
 			//$('#executionserverunavailable').modal('show');
 		} else {
-			alert("execution successful")
+			openDialog("Success","execution successful")
 			globalobj['module_id'] = globalobj['jsondata'][0].testsuiteid
 			//console.log("MID before:",globalobj['module_id'])
 
@@ -1002,12 +1009,11 @@ function indexOfItem(array, item) {
 		}
 
 		unblockUI()
-		globalobj['jsondata'] = [];
 		//console.log("MID after:",globalobj['module_id'])
 	},
 		function(error) {
 			unblockUI()
-			openDialogExe("Execute Failed", "Failed to execute.")
+			openDialog("Execute Failed", "Failed to execute.")
 		})
 	}
 
@@ -1157,7 +1163,7 @@ function indexOfItem(array, item) {
 
 
 	$scope.history = function(){
-		alert('Results view is currently disabled!');
+		openDialog('Error','Results view is currently disabled!');
 		/* History when response is changed!!
 	//	console.log("jsondata[0]:::::::", globalobj['jsondata'][0])
 		//console.log("@@@@moduleId:",d3.select(globalobj['lockedSuite']).datum().attributes.testSuiteid)
@@ -1198,4 +1204,14 @@ function indexOfItem(array, item) {
 			})  
 			*/
 	}
+
+	function openDialog(title, body){
+		$("#NeuronGraphGlobalModal").find('.modal-title').text(title);
+		$("#NeuronGraphGlobalModal").find('.modal-body p').text(body).css('color','black');
+		$("#NeuronGraphGlobalModal").modal("show");
+		setTimeout(function(){
+		$("#NeuronGraphGlobalModal").find('.btn-accept').focus();
+		}, 300);
+	}
+	
 }]);
