@@ -37,8 +37,7 @@ exports.getTaskJson_mindmaps = function (req, res) {
 	if (sessionToken != undefined && req.session.id == sessionToken) {
 		try {
 			var obj=req.body.obj;
-			req.session.obj = obj;
-			var qlist_query = [{'statement': "MATCH (a)-[r:FNTT {id:b.nodeID}]-(b) where b.assignedTo='" + 	req.session.obj.userid + "' return a,b"}];
+			var qlist_query = [{'statement': "MATCH (a)-[r:FNTT {id:b.nodeID}]-(b) where b.assignedTo='" + obj.userid + "' return a,b"}];
 			neo4jAPI.executeQueries(qlist_query,function(status,result){
 				if(status!=200) {
 					console.log(result);
