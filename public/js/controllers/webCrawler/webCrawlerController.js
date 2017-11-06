@@ -134,10 +134,7 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
 
     socket.on('endData', function(obj){
       var reverseLinks = obj.sdata.links;
-      console.log("before end data ", $scope.crawledLinks);
       $scope.crawledLinks = $scope.crawledLinks.concat(reverseLinks);
-
-      console.log("after endData",$scope.crawledLinks);
       $scope.otherLinks = obj.notParsedURLs;
       $('#progress-canvas').fadeOut(800, function(){
         $scope.hideBaseContent = { message: 'false' };
@@ -276,26 +273,32 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
     }
     return elem;
   }
-
+  /*
+  * Create an object which will contains all the elements level-wise(level = key of the object)
+  */
   function createLevelObject(arr){
     var modified = {};
-    for(var i = 0 ; i< arr.length; i++){
-      if (arr[i].redirected) {
-        if( arr[i].redirected != "no"  && arr[i].name != arr[i].redirected){
-          var json = {
-            "type" : "redirected",
-            "name" : arr[i].redirected,
-            "parent" : arr[i].name,
-            "level" : arr[i].level,
-            "status" : arr[i].status
-          }
-
-          if (!modified[arr[i].level]) {
-            modified[arr[i].level] = []
-          }
-          modified[arr[i].level].push(json)
+    var arrLength = arr.length;
+    for(var i = 0 ; i< arrLength; i++){
+      /*
+      * If the arr contains redirected link then add it to the modified array with the same level
+      * on which it was redirected.
+      */
+      if(arr[i].redirected && (arr[i].redirected != "no"  && arr[i].name != arr[i].redirected)){
+        var json = {
+          "type" : "redirected",
+          "name" : arr[i].redirected,
+          "parent" : arr[i].name,
+          "level" : arr[i].level,
+          "status" : arr[i].status
         }
+
+        if (!modified[arr[i].level]) {
+          modified[arr[i].level] = []
+        }
+        modified[arr[i].level].push(json)
       }
+
       if (!modified[arr[i].level]) {
         modified[arr[i].level] = []
       }
@@ -365,7 +368,8 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
   }
 
   function addParents(arr, parent){
-    for (var i = 0; i < arr.length; i++) {
+    var arrLength = arr.length;
+    for (var i = 0; i < arrLength; i++) {
       arr[i].parentsAll = [];
       arr[i].parentsAll.push(arr[i].parent);
       arr[i].parentsAll = arr[i].parentsAll.concat(parent);
@@ -375,6 +379,7 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
     }
     return arr;
   }
+
   var positionNode = {"x":0 , "y":0};
   $scope.generateGraph = function(){
     $("#result-canvas").show();
@@ -513,7 +518,8 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
     function startAgain(){
       nodes = flatten(root),
       links = d3.layout.tree().links(nodes);
-      for(var i=0; i<nodes.length; i++){
+      var numberOfNodes = nodes.length;
+      for(var i=0; i< numberOfNodes; i++){
         if(nodes[i].collapse){
           toggle(nodes[i], false);
         }
@@ -533,7 +539,7 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
       nodes = flatten(root),
       links = d3.layout.tree().links(nodes);
 
-      for(i = 0; i < links.length-1; i ++ ){
+      for(i = 0; i < links.length; i ++ ){
         d = links[i];
         var isFound = true;
         if(d.target.type == "duplicate"|| d.target.type == "reverse"){
@@ -633,7 +639,7 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
       var nodeEnter = node.enter().append("g")
       .attr("class", function(d){
         if(d.type == "duplicate" || d.type == "reverse")
-          return  "node hidden";
+        return  "node hidden";
         return  "node";
       })
       .on("click", click)
@@ -750,7 +756,7 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
         positionNode.x =  (-d.x + canvSize[0]/2) ;
         positionNode.y =  (-d.y + canvSize[1]/2) ;
       }
-       return "translate(" + d.x + "," + d.y + ")"; });
+      return "translate(" + d.x + "," + d.y + ")"; });
 
     }
 
@@ -869,7 +875,9 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
     jsonStruct = {0 : 'level', 1 : 'name' , 2 : 'parent' , 3 : 'redirected' , 4 : 'status' , 5  :'title'};
     for(i=0; i<$scope.crawledLinks.length; i++){
         var newRow = document.createElement('tr');
-        
+		
+        if($scope.crawledLinks[i]['type'] == "duplicate")
+          continue;
         //create SNo text node
         var sNo = document.createElement('td');
         sNo.setAttribute('style', 'width: 55px');

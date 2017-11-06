@@ -2,7 +2,9 @@ var activeNode,childNode,uNix,uLix,node,link,dNodes,dLinks,allMMaps,temp,rootInd
 //unassignTask is an array to store whose task to be deleted
 var deletednode=[],unassignTask=[],deletednode_info=[];
 var userInfo =  JSON.parse(window.localStorage['_UI']);
+var user_role=window.localStorage['_SR'];
 var userid = userInfo.user_id;
+var versioning_enabled=0;
 var username = userInfo.username;
 // node_names_tc keep track of testcase names to decide reusability of testcases
 var node_names_tc=[];
@@ -10,7 +12,7 @@ var saveFlag=false;
 //for handling the case when creatednode goes beyond screensize
 var CreateEditFlag=false;
 var isIE = /*@cc_on!@*/false || !!document.documentMode;
-function loadMindmapData(){
+function loadMindmapData(param){
 	blockUI("Loading...");
 	dataSender({task:'populateProjects',user_id:userid},function(err,result){
 		if(err){
@@ -26,14 +28,33 @@ function loadMindmapData(){
 			//selectedProject=$(".project-list").val();
 			$(".project-list").empty();
 			for(i=0; i<result1.projectId.length && result1.projectName.length; i++){
-				$('.project-list').append("<option app-type='"+result1.appType[i]+"' data-id='"+result1.projectName[i]+"' value='"+result1.projectId[i]+"'>"+result1.projectName[i]+"</option>");	
+				$('.project-list').append("<option app-type='"+result1.appType[i]+"' data-id='"+result1.projectName[i]+"' value='"+result1.projectId[i]+"'>"+result1.projectName[i]+"</option>");
+			}
+			if(getCookie('mm_pid') != ''){
+				selectedProject=getCookie('mm_pid');
+			}
+			if (selectedProject == null){
+				setCookie('mm_pid',result1.projectId[0],15);
+				selectedProject=result1.projectId[0];
+			}
+			$(".project-list").val(selectedProject);
+			//$(".project-list option[value='" + selectedProject + "']").attr('selected', 'selected');
+			if (param==1){
+				versioning_enabled=1;
+				dataSender({task:'getVersions',projectId:$(".project-list").val(),versioning:1},function(err,result){
+				if(err){ console.log(err);openDialogMindmap('Error','Error loading Versions')}
+				else{
+					addVersioning(result);
+					if(getCookie('mm_pvid') ==''){
+					setCookie('mm_pvid',$('.version-list').children()[0].value,15);
+					$('.version-list').val($('.version-list').children()[0].value);
+					}
+				}
+			});
+			}else{
+				loadMindmapData1(param);
 			}
 
-			if (selectedProject == null){
-				selectedProject=result1.projectName[0];
-			}
-			$(".project-list option[value='" + selectedProject + "']").attr('selected', 'selected');
-			loadMindmapData1(); 
 			$(".project-list").change(function () {
 			//Mindmap clear search box on selecting different project
 				$('#searchModule-create').val('');
@@ -44,7 +65,19 @@ function loadMindmapData(){
 				{
 					$("img.iconSpaceArrow").removeClass("iconSpaceArrowTop");
 				}
-				loadMindmapData1();
+				if (param==1){
+					dataSender({task:'getVersions',projectId:$(".project-list").val(),versioning:1},function(err,result){
+					if(err){ console.log(err);openDialogMindmap('Error','Error loading Versions')}
+					else{
+						addVersioning(result);
+
+						}
+					});
+				}else{
+					loadMindmapData1(param);
+				}
+				setCookie('mm_pid',selectedProject,15);
+
 			});
 			//Calling the function to restrict the user to give default node names
 			$("#ct-canvas").click(callme);
@@ -52,14 +85,14 @@ function loadMindmapData(){
 		}
 	});
 }
-function loadMindmapData1(){
+function loadMindmapData1(param){
 	blockUI("Loading...");
 	var selectedTab = window.localStorage['tabMindMap'];
 	uNix=0;uLix=0;dNodes=[];dLinks=[];nCount=[0,0,0,0];scrList=[];tcList=[];cSpan=[0,0];cScale=1;mapSaved=!1;
 	//Adding task to scenario
 	taskAssign={"modules_endtoend":{"task":["Execute","Execute Batch"],"attributes":["bn","at","rw","sd","ed","re","cy","re_estimation"]},"modules":{"task":["Execute","Execute Batch"],"attributes":["bn","at","rw","sd","ed","re","cy","re_estimation"]},"scenarios":{"task":["Execute Scenario"],"attributes":["at","rw","sd","ed","re_estimation"]},"screens":{"task":["Scrape","Append","Compare","Add","Map"],"attributes":["at","rw","sd","ed","re_estimation"]},"testcases":{"task":["Update","Design"],"attributes":["at","rw","sd","ed","re_estimation"]}};
 	zoom=d3.behavior.zoom().scaleExtent([0.1,3]).on("zoom", zoomed);
-	faRef={"plus":"fa-plus","edit":"fa-pencil-square-o","delete":"fa-trash-o"};	
+	faRef={"plus":"fa-plus","edit":"fa-pencil-square-o","delete":"fa-trash-o"};
 		$(document).on('click',".ct-tile", function() {
 			createNewMap();
 			});
@@ -88,7 +121,13 @@ function loadMindmapData1(){
 			// svgTileG.append('path').attr('d','M55,75L95,75');
 	}
 	d3.select('#ct-assignBox').classed('no-disp',!0);
-	dataSender({task:'getModules',tab:window.localStorage['tabMindMap'],prjId:$(".project-list").val()},function(err,result){
+	var version_num='';
+
+	if(param==1){
+		version_num=$('.version-list').val();
+	}
+
+	dataSender({task:'getModules',tab:window.localStorage['tabMindMap'],prjId:$(".project-list").val(),versioning:param,version:version_num},function(err,result){
 		if(err){
 			console.log(result);
 			unblockUI();
@@ -156,19 +195,19 @@ var initiate = function(){
 		t.append('rect').attr('x',100).attr('y',0).attr('rx',12).attr('ry',12);
 		t.append('text').attr('x',114).attr('y',18).text('Create');
 	}
-	
-	
+
+
 };
 var zoomed = function(){
 	cSpan=d3.event.translate;
 	cScale=d3.event.scale;
-	
+
 	//Logic to change the layout
 	d3.select("#ct-mindMap").attr("transform","translate("+d3.event.translate+")scale("+d3.event.scale +")");
 };
 var getElementDimm = function(s){return [parseFloat(s.style("width")),parseFloat(s.style("height"))];};
 
-var createNewMap = function(e){ 
+var createNewMap = function(e){
 	initiate();
 	clearSvg();
 	var s=getElementDimm(d3.select("#ct-mapSvg"));
@@ -181,7 +220,7 @@ var createNewMap = function(e){
 	else{
 		node={id:uNix,childIndex:0,name:'Module_0',type:'modules',y:s[1]*0.4,x:s[0]*0.2,children:[],parent:null};
 	}
-	
+
 	dNodes.push(node);nCount[0]++;uNix++;
 	//To fix issue 710-Create a module and see that module name does not display in edit mode
 	v=addNode(dNodes[uNix-1],!1,null);
@@ -203,7 +242,7 @@ var loadMap = function(e){
 		treeBuilder(allMMaps[reqMap]);
 	}
 };
-// to load the map again after switching the layout 
+// to load the map again after switching the layout
 var loadMap2 = function(){
 	var selectedTab = window.localStorage['tabMindMap'];
     if(selectedTab=='mindmapEndtoEndModules'){
@@ -213,9 +252,9 @@ var loadMap2 = function(){
 		treeBuilder_W(tbd);
 	}
 	else{
-		var tbd=dNodes[0];	
+		var tbd=dNodes[0];
 		initiate();
-		clearSvg();	
+		clearSvg();
 		treeBuilder(tbd);
 	}
 };
@@ -231,10 +270,10 @@ var addNode = function(n,m,pi){
 	if(n.type=='testcases'){
 		node_names_tc.push(n.name);
 	}
-	
+
 	var v=d3.select('#ct-mindMap').append('g').attr('id','ct-node-'+n.id).attr('class','ct-node').attr('data-nodetype',n.type).attr('transform',"translate("+(n.x).toString()+","+(n.y).toString()+")");
 	// To fix rendering issue in FF issue #415
-	
+
 	var img_src='images_mindmap/node-'+n.type+'.png';
 	if (n.type=='modules_endtoend') img_src='images_mindmap/MM5.png';
 	if($("#ct-canvas").attr('class')=='tabCreate ng-scope'){
@@ -242,13 +281,13 @@ var addNode = function(n,m,pi){
 	}else{
 		v.append('image').attr('height','40px').attr('width','40px').attr('class','ct-nodeIcon').attr('xlink:href',img_src).on('click',nodeClick);
 	}
-	
+
 	n.display_name=n.name;
 	var ch=15;
 	//Issue 697
 	if(n.type=='testcases') ch=9;
 	if((n.name.length>15 && n.type!='modules' && n.type!='modules_endtoend') || (n.name.length>9 && n.type=='testcases')){
-		
+
 		n.display_name=n.display_name.slice(0,ch)+'...';
 	}
 	v.append('text').attr('class','ct-nodeLabel').text(n.display_name).attr('text-anchor','middle').attr('x',20).attr('title',n.name).attr('y',50);
@@ -260,13 +299,13 @@ var addNode = function(n,m,pi){
 		}else{
 			n.reuse='parent';
 		}
-		
-		//if(v.select('.ct-nodeReuse')[0][0]==null) 
+
+		//if(v.select('.ct-nodeReuse')[0][0]==null)
 		//v.append('image').attr('class','ct-nodeReuse').attr('xlink:href','images_mindmap/NEAREST.png').attr('x',10).attr('y',10);
 	}
-	
-	
-	
+
+
+
 	if(m&&pi){
 		var p=d3.select('#ct-node-'+pi.id);
 		//modified params for layout change
@@ -322,7 +361,7 @@ var removeTask= function(e){
 	d3.select('#ct-assignBox').classed('no-disp',!0);
 }
 var addTask = function(e){
-	
+
 	$("ct-assignTask,#ct-assignedTo,#ct-assignRevw,#ct-assignRel,#ct-assignCyc").removeClass("selectErrorBorder");
 	$("#startDate,#endDate").removeClass("inputErrorBorder");
 	if($("ct-assignTask option:selected").val() == "select user") {
@@ -341,7 +380,7 @@ var addTask = function(e){
 		$("#ct-assignRevw").css('border','').addClass("inputErrorBorderFull");
 		return false;
 	}
-	
+
 	else if($("#startDate").val() == "") {
 		$("#startDate").css('border','').addClass("inputErrorBorderFull");
 		return false;
@@ -350,7 +389,7 @@ var addTask = function(e){
 		$("#endDate").css('border','').addClass("inputErrorBorderFull");
 		return false;
 	}
-	
+
 	else if($("#ct-assignRel option:selected").val() == "select release") {
 		$("#ct-assignRel").css('border','').addClass("inputErrorBorderFull");
 		return false;
@@ -373,6 +412,10 @@ var addTask = function(e){
 	var a,b,p=d3.select(activeNode);
 	var pi=parseInt(p.attr('id').split('-')[2]);
 	var nType=p.attr('data-nodetype');
+	tvn=0;
+	if ($('.version-list') !== undefined)
+	tvn=$('.version-list').val();
+
 	var estimationCount = 0;
 	if(dNodes[pi].task != undefined || dNodes[pi].task != null){
 		if(dNodes[pi].task.endDate != "" || dNodes[pi].task.endDate != undefined || dNodes[pi].task.endDate != " "){
@@ -383,7 +426,7 @@ var addTask = function(e){
 			}
 		}
 	}
-	var tObj={t:/*d3.select('#ct-assignTask').html()*/$('#ct-assignTask').val(),bn:$('#ct-executeBatch').val(),at:$('#ct-assignedTo').val(),rw:/*(d3.select('#ct-assignRevw')[0][0])?*/$('#ct-assignRevw').val()/*:null*/,sd:$('#startDate').val(),ed:$('#endDate').val(),re_estimation:estimationCount,re:(d3.select('#ct-assignRel')[0][0])?$('#ct-assignRel').val():null,cy:(d3.select('#ct-assignCyc')[0][0])?$('#ct-assignCyc').val():null,det:d3.select('#ct-assignDetails').property('value'),app:$('option:selected', '.project-list').attr('app-type')};
+	var tObj={tvn:tvn,t:$('#ct-assignTask').val(),bn:$('#ct-executeBatch').val(),at:$('#ct-assignedTo').val(),rw:/*(d3.select('#ct-assignRevw')[0][0])?*/$('#ct-assignRevw').val()/*:null*/,sd:$('#startDate').val(),ed:$('#endDate').val(),re_estimation:estimationCount,re:(d3.select('#ct-assignRel')[0][0])?$('#ct-assignRel').val():null,cy:(d3.select('#ct-assignCyc')[0][0])?$('#ct-assignCyc').val():null,det:d3.select('#ct-assignDetails').property('value'),app:$('option:selected', '.project-list').attr('app-type')};
 	//console.log(tObj);
 	if(dNodes[pi].task){
 		tObj.id=dNodes[pi].task.id;
@@ -411,7 +454,7 @@ var addTask = function(e){
 		if(nType=="modules" || nType=="modules_endtoend"){
 			if(tObj.cy != 'select cycle' && tObj.re != 'select release'){
 				if(dNodes[pi].id_c!="null"){
-					dNodes[pi].task={id:tObj.id,oid:tObj.oid,batchName:tObj.bn,task:tObj.t,assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,re_estimation:tObj.re_estimation,release:tObj.re,cycle:tObj.cy,details:tObj.det,parent:(tObj.parent!=null)?tObj.parent:[dNodes[pi].id_c]};
+					dNodes[pi].task={taskvn:tObj.tvn,id:tObj.id,oid:tObj.oid,batchName:tObj.bn,task:tObj.t,assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,re_estimation:tObj.re_estimation,release:tObj.re,cycle:tObj.cy,details:tObj.det,parent:(tObj.parent!=null)?tObj.parent:[dNodes[pi].id_c]};
 				}
 				//Logic to add tasks for the scenario
 				if(dNodes[pi].children) dNodes[pi].children.forEach(function(tSc){
@@ -419,10 +462,10 @@ var addTask = function(e){
 							if(dNodes[pi].id_c!='null' && tSc.id_c!='null'){
 								taskflag=true;
 								//Issue- 711 Assign directly to the module and see that scenario gets assign but on click of "Save" scenario gets unassign.
-								tSc.task={id:null,oid:null,task:"Execute Scenario",assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,re_estimation:tObj.re_estimation,release:tObj.re,cycle:tObj.cy,details:tObj.det,parent:(tObj.parent!=null)?tObj.parent:[dNodes[pi].id_c,tSc.id_c]};
+								tSc.task={taskvn:tObj.tvn,id:null,oid:null,task:"Execute Scenario",assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,re_estimation:tObj.re_estimation,release:tObj.re,cycle:tObj.cy,details:tObj.det,parent:(tObj.parent!=null)?tObj.parent:[dNodes[pi].id_c,tSc.id_c]};
 								d3.select('#ct-node-'+tSc.id).append('image').attr('class','ct-nodeTask').attr('xlink:href','images_mindmap/node-task-assigned.png').attr('x',29).attr('y',-10);
 							}
-							
+
 					}else{
 							//If any of the cassandra id in parent list of the task is null then update it
 							if(tSc.task.parent.indexOf(null)==-1 && tSc.task.parent!=[dNodes[pi].id_c,tSc.id_c]){
@@ -430,27 +473,28 @@ var addTask = function(e){
 							}
 
 					}
-					if(tSc.children != undefined){				
+					if(tSc.children != undefined){
 						tSc.children.forEach(function(scr){
 							if(scr.task===undefined||scr.task==null){
 								if(dNodes[pi].id_c!='null' && tSc.id_c!='null' && scr.id_c!='null'){
 									taskflag=true;
-									scr.task={id:null,oid:null,task:"Scrape",assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,re_estimation:tObj.re_estimation,details:tObj.det,parent:[dNodes[pi].id_c,tSc.id_c,scr.id_c]};
+									scr.task={taskvn:tObj.tvn,id:null,oid:null,task:"Scrape",assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,re_estimation:tObj.re_estimation,details:tObj.det,parent:[dNodes[pi].id_c,tSc.id_c,scr.id_c]};
+
 									d3.select('#ct-node-'+scr.id).append('image').attr('class','ct-nodeTask').attr('xlink:href','images_mindmap/node-task-assigned.png').attr('x',29).attr('y',-10);
 								}
-								
+
 							}else{
 								if(scr.task.parent.indexOf(null)==-1 && scr.task.parent!=[dNodes[pi].id_c,tSc.id_c,scr.id_c]){
 									scr.task['updatedParent']=[dNodes[pi].id_c,tSc.id_c,scr.id_c];
 								}
 
 							}
-							
+
 							scr.children.forEach(function(tCa){
 								if(tCa.task===undefined||tCa.task==null){
 									if(dNodes[pi].id_c!='null' && tSc.id_c!='null' && scr.id_c!='null' && tCa.id_c != 'null' ){
 										taskflag=true;
-										tCa.task={id:null,oid:null,task:"Design",assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,re_estimation:tObj.re_estimation,details:tObj.det,parent:[dNodes[pi].id_c,tSc.id_c,scr.id_c,tCa.id_c]};
+										tCa.task={taskvn:tObj.tvn,id:null,oid:null,task:"Design",assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,re_estimation:tObj.re_estimation,details:tObj.det,parent:[dNodes[pi].id_c,tSc.id_c,scr.id_c,tCa.id_c]};
 										d3.select('#ct-node-'+tCa.id).append('image').attr('class','ct-nodeTask').attr('xlink:href','images_mindmap/node-task-assigned.png').attr('x',29).attr('y',-10);
 									}
 								}else{
@@ -476,35 +520,36 @@ var addTask = function(e){
 
 				if(dNodes[pi].parent.task != null){
 					var parentTask=dNodes[pi].parent.task ;
-					
-				
+
+
 				if(tscid!='null'){
-					dNodes[pi].task={id:tObj.id,oid:tObj.oid,task:tObj.t,assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,re_estimation:tObj.re_estimation,release:parentTask.release,cycle:parentTask.cycle,details:tObj.det,parent:(tObj.parent!=null)?tObj.parent:[modid,dNodes[pi].id_c]};
+					dNodes[pi].task={taskvn:tObj.tvn,id:tObj.id,oid:tObj.oid,task:tObj.t,assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,re_estimation:tObj.re_estimation,release:parentTask.release,cycle:parentTask.cycle,details:tObj.det,parent:(tObj.parent!=null)?tObj.parent:[modid,dNodes[pi].id_c]};
+
 					if(dNodes[pi].parent.type=='modules_endtoend') taskflag=true;
 				}
 
-				
+
 				if(dNodes[pi].children) dNodes[pi].children.forEach(function(scr){
 					//tSc.children.forEach(function(scr){
 						if(scr.task===undefined||scr.task==null){
 							if(modid!='null' && tscid!='null' && scr.id_c!='null'){
 								taskflag=true;
-								scr.task={id:null,oid:null,task:"Scrape",assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,re_estimation:tObj.re_estimation,details:tObj.det,parent:[modid,tscid,scr.id_c]};
+								scr.task={taskvn:tObj.tvn,id:null,oid:null,task:"Scrape",assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,re_estimation:tObj.re_estimation,details:tObj.det,parent:[modid,tscid,scr.id_c]};
 								d3.select('#ct-node-'+scr.id).append('image').attr('class','ct-nodeTask').attr('xlink:href','images_mindmap/node-task-assigned.png').attr('x',29).attr('y',-10);
 							}
-							
+
 						}else{
 							if(scr.task.parent!=[modid,tscid,scr.id_c]){
 								scr.task['updatedParent']=[modid,tscid,scr.id_c];
 							}
 
 						}
-						
+
 						scr.children.forEach(function(tCa){
 							if(tCa.task===undefined||tCa.task==null){
 								if(modid!='null' && tscid!='null' && scr.id_c!='null' && tCa.id_c != 'null' ){
 									taskflag=true;
-									tCa.task={id:null,oid:null,task:"Design",assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,re_estimation:tObj.re_estimation,details:tObj.det,parent:[modid,tscid,scr.id_c,tCa.id_c]};
+									tCa.task={taskvn:tObj.tvn,id:null,oid:null,task:"Design",assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,re_estimation:tObj.re_estimation,details:tObj.det,parent:[modid,tscid,scr.id_c,tCa.id_c]};
 									d3.select('#ct-node-'+tCa.id).append('image').attr('class','ct-nodeTask').attr('xlink:href','images_mindmap/node-task-assigned.png').attr('x',29).attr('y',-10);
 								}
 							}else{
@@ -524,9 +569,9 @@ var addTask = function(e){
 		else if(nType=="screens"){
 			var modid=dNodes[pi].parent.parent.id_c,tscid=dNodes[pi].parent.id_c,scrid=dNodes[pi].id_c;
 			if(dNodes[pi].id_c!='null'){
-				dNodes[pi].task={id:tObj.id,oid:tObj.oid,task:tObj.t,assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,re_estimation:tObj.re_estimation,details:tObj.det,parent:(tObj.parent!=null)?tObj.parent:[modid,tscid,scrid]};
+				dNodes[pi].task={taskvn:tObj.tvn,id:tObj.id,oid:tObj.oid,task:tObj.t,assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,re_estimation:tObj.re_estimation,details:tObj.det,parent:(tObj.parent!=null)?tObj.parent:[modid,tscid,scrid]};
 			}
-			
+
 			if(tObj.parent!=[modid,tscid,scrid]){
 				dNodes[pi].task['updatedParent']=[modid,tscid,scrid];
 			}
@@ -536,7 +581,7 @@ var addTask = function(e){
 				if(tCa.task===undefined||tCa.task==null){
 					if (modid !='null' && tscid !='null' && scrid!='null' && tcid!='null'){
 						taskflag=true;
-						tCa.task={id:null,oid:null,task:cTask,assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,re_estimation:tObj.re_estimation,details:tObj.det,parent:[modid,tscid,scrid,tcid]};
+						tCa.task={taskvn:tObj.tvn,id:null,oid:null,task:cTask,assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,re_estimation:tObj.re_estimation,details:tObj.det,parent:[modid,tscid,scrid,tcid]};
 						d3.select('#ct-node-'+tCa.id).append('image').attr('class','ct-nodeTask').attr('xlink:href','images_mindmap/node-task-assigned.png').attr('x',29).attr('y',-10);
 					}
 				}else{
@@ -551,7 +596,7 @@ var addTask = function(e){
 			var modid=dNodes[pi].parent.parent.parent.id_c,tscid=dNodes[pi].parent.parent.id_c,scrid=dNodes[pi].parent.id_c;var tcid=dNodes[pi].id_c;
 			if (modid !='null' && tscid !='null' && scrid!='null' && tcid!='null'){
 				taskflag=true;
-				dNodes[pi].task={id:tObj.id,oid:tObj.oid,task:tObj.t,assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,re_estimation:tObj.re_estimation,details:tObj.det,parent:(tObj.parent!=null)?tObj.parent:[modid,tscid,scrid,tcid]};
+				dNodes[pi].task={taskvn:tObj.tvn,id:tObj.id,oid:tObj.oid,task:tObj.t,assignedTo:tObj.at,reviewer:tObj.rw,startDate:tObj.sd,endDate:tObj.ed,re_estimation:tObj.re_estimation,details:tObj.det,parent:(tObj.parent!=null)?tObj.parent:[modid,tscid,scrid,tcid]};
 				if(tObj.parent!=[modid,tscid,scrid,tcid]){
 					dNodes[pi].task['updatedParent']=[modid,tscid,scrid,tcid];
 				}
@@ -600,8 +645,8 @@ var nodeClick = function(e){
 			return;
 		}
 	}
-	
-	
+
+
 	//if(t=='scenarios') return;
 	var nt=(dNodes[pi].task!==undefined||dNodes[pi].task!=null)?dNodes[pi].task:!1;
 	var tObj={t:(nt)?nt.task:'',bn:(nt)?nt.batchName:'',at:(nt)?nt.assignedTo:'',rw:(nt&&nt.reviewer!=null)?nt.reviewer:'',sd:(nt)?nt.startDate:'',ed:(nt)?nt.endDate:'',re:(nt&&nt.release!=null)?nt.release:'',cy:(nt&&nt.cycle!=null)?nt.cycle:'',det:(nt)?nt.details:''};
@@ -617,7 +662,7 @@ var nodeClick = function(e){
 	if (tObj.t==null || tObj.t==""){
 		tObj.t=taskAssign[t].task[0];
 	}
-	$("#ct-assignTask option[value='" + tObj.t + "']").attr('selected', 'selected'); 
+	$("#ct-assignTask option[value='" + tObj.t + "']").attr('selected', 'selected');
 
 	$("#ct-assignTask").change(function () {
             if($("#ct-assignTask").val()=='Execute Batch'){
@@ -626,27 +671,28 @@ var nodeClick = function(e){
 				$('#ct-executeBatch').attr('disabled','true');
 			}
 	})
-	
-	
+
+
 	var default_releaseid='';
 	taskAssign[t].attributes.forEach(function(tk){
-		v=u.append('li');
-		if(tk=="bn"){	
+	    v = tk != 're_estimation'? u.append('li') : v;
+		//v=u.append('li');
+		if(tk=="bn"){
 			v.append('span').attr('class','ct-assignItem fl-left').html('Batch Name');
-			
+
 			var d = v.append('input').attr('type','text').attr('id','ct-executeBatch');
 			$('#ct-executeBatch').attr('value',tObj.bn);
 			if(tObj.t!='Execute Batch'){
 				$('#ct-executeBatch').attr('disabled','true')
-			} 
-			
-			
+			}
+
+
 		}
-		if(tk=='at'){			
+		if(tk=='at'){
 			var result1 = {};
 			v.append('span').attr('class','ct-assignItem fl-left').html('Assigned to');
 			var d = v.append('select').attr('id','ct-assignedTo');//.attr('class','assignedTo')
-			
+
 			$('#ct-assignedTo').append("<option value='select user' >Select User</option>");
 			//PAssing selected projectid to the service
 			dataSender({task:'populateUsers',projectId:$(".project-list").val()},function(err,result){
@@ -654,15 +700,15 @@ var nodeClick = function(e){
 				else{
 					result1=JSON.parse(result);
 					//alert(assignedUser);
-				
+
 						for(i=0; i<result1.userRoles.length && result1.r_ids.length; i++){
-							$('#ct-assignedTo').append("<option data-id='"+result1.userRoles[i]+"' value='"+result1.r_ids[i]+"'>"+result1.userRoles[i]+"</option>");	
+							$('#ct-assignedTo').append("<option data-id='"+result1.userRoles[i]+"' value='"+result1.r_ids[i]+"'>"+result1.userRoles[i]+"</option>");
 						}
-							$("#ct-assignedTo option[value='" + tObj.at + "']").attr('selected', 'selected');					
+							$("#ct-assignedTo option[value='" + tObj.at + "']").attr('selected', 'selected');
 				}
-				
+
 			});
-		
+
 		}
 		else if(tk=='rw'){
 			var result1 = {};
@@ -676,10 +722,10 @@ var nodeClick = function(e){
 					for(i=0; i<result1.userRoles.length && result1.r_ids.length; i++){
 						$('#ct-assignRevw').append("<option data-id='"+result1.userRoles[i]+"' value='"+result1.r_ids[i]+"'>"+result1.userRoles[i]+"</option>");
 					}
-					$("#ct-assignRevw option[value='" + tObj.rw + "']").attr('selected', 'selected'); 
-					
+					$("#ct-assignRevw option[value='" + tObj.rw + "']").attr('selected', 'selected');
+
 				}
-				
+
 			});
 		 }
 		else if(tk=='sd'){
@@ -707,7 +753,7 @@ var nodeClick = function(e){
 				$("#startDate").attr('disabled','disabled');
 			}
 			$("#startDate").val(tObj.sd);
-							
+
 		}
 		else if(tk=='ed'){
 			v.append('span').attr('class','ct-assignItem fl-left').html('End Date');
@@ -725,6 +771,9 @@ var nodeClick = function(e){
 					$("#endDate").datepicker("show");
 			});
 			f=w.append('ul').attr('class','ct-asValCalBox dropdown-menu');//.on('click',$('.ct-asValBoxIcon.ct-asItemCal.btn.dropdown-toggle').datepicker());
+			// if(tObj.ed.trim() == ""){
+			// 	tObj.count = 0;
+			// }else tObj.count = '';
 			$("#endDate").val(tObj.ed);
 		}
 		else if(tk=='re'){
@@ -735,9 +784,9 @@ var nodeClick = function(e){
 					$('#ct-assignRel').append("<option value='select release' select=selected>"+"Select release"+"</option>");
 					dataSender({task:'populateReleases',projectId:$(".project-list").val()},function(err,result){
 						if(err){ releaseResult=err;console.log(result);callback(null,err);}
-						
+
 						else{
-							
+
 							result1=JSON.parse(result);
 							releaseResult = result1;
 							default_releaseid='';
@@ -755,14 +804,14 @@ var nodeClick = function(e){
 								//672 Mindmap - Cycle selected under execution task is getting reset to default value after save
 								default_releaseid=tObj.re;
 							}
-							$("#ct-assignRel option[value='" + selectedRel + "']").attr('selected', 'selected'); 
+							$("#ct-assignRel option[value='" + selectedRel + "']").attr('selected', 'selected');
 							var result2 = {};
 							v.append('span').attr('class','ct-assignItem fl-left').html('Cycle');
 							var d = v.append('select').attr('id','ct-assignCyc');
 							$('#ct-assignCyc').append("<option value='select cycle' select=selected>"+"Select cycle"+"</option>");
 							//'46974ffa-d02a-49d8-978d-7da3b2304255'
 							dataSender({task:'populateCycles',relId:default_releaseid},function(err,result){
-								if(err){ 
+								if(err){
 									//console.log(err);
 									callback(null,err);
 								}
@@ -776,18 +825,18 @@ var nodeClick = function(e){
 									if(tObj.cy!=""){
 										selectedCyc=tObj.cy;
 									}
-									$("#ct-assignCyc option[value='" + selectedCyc + "']").attr('selected', 'selected'); 
+									$("#ct-assignCyc option[value='" + selectedCyc + "']").attr('selected', 'selected');
 								}
-								
+
 							});
-							
+
 						}
 
 
-						
+
 					});
-					
-					
+
+
 
 		}
 
@@ -813,17 +862,17 @@ var nodeClick = function(e){
 		l[1]=(canvSize[1]-cSize[1])-150;
 
 	c.style('top',l[1]+'px').style('left',l[0]+'px').classed('no-disp',!1);
-	
+
 	//condition to disable unassign task button
 	setTimeout(function(){
 		$('#ct-unassignButton a').addClass("disableButton");
-		
+
 		 if(dNodes[pi].task!=null && dNodes[pi].task!=undefined && dNodes[pi].task.oid!=null){
 			$('#ct-unassignButton a').removeClass("disableButton");
-		}	
+		}
 	},30)
-	
-	
+
+
 };
 
 function loadCycles(){
@@ -832,7 +881,7 @@ function loadCycles(){
 							//'46974ffa-d02a-49d8-978d-7da3b2304255'
 	dataSender({task:'populateCycles',relId:$("#ct-assignRel").val()},function(err,result){
 								console.log('In CYC ',$("#ct-assignRel").val());
-								if(err){ 
+								if(err){
 									callback(null,err);
 								}
 								else{
@@ -840,9 +889,9 @@ function loadCycles(){
 									for(i=0; i<result2.c_ids.length && result2.cyc.length; i++){
 										$('#ct-assignCyc').append("<option data-id='"+result2.cyc[i]+"' value='"+result2.c_ids[i]+"'>"+result2.cyc[i]+"</option>");
 									}
-									$("#ct-assignCyc option[value='" + result2.cyc[0] + "']").attr('selected', 'selected'); 
+									$("#ct-assignCyc option[value='" + result2.cyc[0] + "']").attr('selected', 'selected');
 								}
-								
+
 							});
 }
 
@@ -895,7 +944,7 @@ var getNewPosition=function(node,pi,arr_co){
 				new_one={x:parseInt(dNodes[pi].children[index].x)+80,y:parseInt(dNodes[pi].children[index].y)};
 			else
 				new_one={x:parseInt(dNodes[pi].children[index].x),y:parseInt(dNodes[pi].children[index].y+80)};
-			
+
 			if(JSON.stringify(arr_co).indexOf(JSON.stringify(new_one))>-1){
 				if(layout_vertical){
 				node.x=dNodes[pi].children[index].x+160;
@@ -919,10 +968,10 @@ var getNewPosition=function(node,pi,arr_co){
 				}
 
 			}
-		
-			
+
+
 	}else{
-			
+
 			if(dNodes[pi].parent != null){
 				arr=dNodes[pi].parent.children;
 				index=dNodes[pi].parent.children.length-1;
@@ -968,7 +1017,7 @@ var getNewPosition=function(node,pi,arr_co){
 				node.x=dNodes[pi].x+125;
 				}
 			}
-			
+
 	}
 	return node;
 }
@@ -983,7 +1032,7 @@ var createNode = function(e){
 	var pt=p.attr('data-nodetype');
 	if(pt=='testcases') return;
 	var pi = p.attr('id').split('-')[2];
-	
+
 	if(dNodes[pi]._children == null){
 		if(dNodes[pi].children == undefined) dNodes[pi]['children']=[];
 		var nNext={'modules':['Scenario',1],'scenarios':['Screen',2],'screens':['Testcase',3]};
@@ -995,14 +1044,14 @@ var createNode = function(e){
 		dNodes.forEach(function(d,i){
 			var objj={x:parseInt(d.x),y:parseInt(d.y)};
 			arr_co.push(objj);
-			
+
 		});
 	// switch-layout feature
 		if($('#switch-layout').hasClass('vertical-layout')){
 		node={id:uNix,childIndex:'',path:'',name:nNext[pt][0]+'_'+nCount[nNext[pt][1]],type:(nNext[pt][0]).toLowerCase()+'s',y:h*(0.15*(1.34+nNext[pt][1])+Math.random()*0.1),x:90+30*Math.floor(Math.random()*(Math.floor((w-150)/80))),children:[],parent:dNodes[pi]};
 		}
 		else{
-		node={id:uNix,childIndex:'',path:'',name:nNext[pt][0]+'_'+nCount[nNext[pt][1]],type:(nNext[pt][0]).toLowerCase()+'s',y:h*(0.15*(1.34+nNext[pt][1])+Math.random()*0.1),x:90+30*Math.floor(Math.random()*(Math.floor((w-150)/80))),children:[],parent:dNodes[pi]};		
+		node={id:uNix,childIndex:'',path:'',name:nNext[pt][0]+'_'+nCount[nNext[pt][1]],type:(nNext[pt][0]).toLowerCase()+'s',y:h*(0.15*(1.34+nNext[pt][1])+Math.random()*0.1),x:90+30*Math.floor(Math.random()*(Math.floor((w-150)/80))),children:[],parent:dNodes[pi]};
 		}
 
 		node=getNewPosition(node,pi,arr_co);
@@ -1014,24 +1063,24 @@ var createNode = function(e){
 		var currentNode=addNode(dNodes[uNix],!0,dNodes[pi]);
 		if(currentNode != null){
 			childNode=currentNode;
-			
+
 			link={id:uLix,source:dNodes[pi],target:dNodes[uNix]};
 			dLinks.push(link);
 			addLink(uLix,dNodes[pi],dNodes[uNix]);
 			uNix++;uLix++;
-			
+
 			//By default when a node is created it's name should be in ediatable mode
 			CreateEditFlag=true;
 			editNode(e,currentNode);
 		}
-		
+
 	}else{
 		openDialogMindmap('Error','Expand the node');
 	}
-	
+
 };
 var editNode = function(e,node){
-	
+
 	$('#ct-inpAct').removeClass('errorClass');
 	d3.select('#ct-inpAct').classed('no-disp',!1);
 	e=e||window.event;
@@ -1060,7 +1109,7 @@ var editNode = function(e,node){
 	d3.select('#ct-ctrlBox').classed('no-disp',!0);
 	var name='';
 	//By default when a node is created it's name should be in ediatable mode
-	
+
 	name=dNodes[pi].name;
 	//name=p.text();
 	l=[(parseFloat(l[0])-20)*cScale+cSpan[0],(parseFloat(l[1])+42)*cScale+cSpan[1]];
@@ -1077,13 +1126,13 @@ var editNode = function(e,node){
 			cSpanY=cSpanY-temp;
 		}
 
-		
+
 		d3.select('#ct-mindMap').attr('transform', "translate("+cSpanX+","+cSpanY+")scale("+cScale+")");
 		//cSpan[0]=cSpan[0]-l[0]/2 //after edit mindmap doesn't move to orignal position
 		l=p.attr('transform').slice(10,-1).split(split_char);
 		l=[(parseFloat(l[0])-20)*cScale+cSpanX,(parseFloat(l[1])+42)*cScale+cSpanY];
 	}
-	
+
 	// If created node is beyond screen size on horizontal side
 	if(CreateEditFlag==true && l[0]>cSize[0]){
 		CreateEditFlag=false;
@@ -1162,7 +1211,7 @@ var moveNodeBegin = function(e){
 	//To check whether browser Is IE or not issue #415
 	var isIE = /*@cc_on!@*/false || !!document.documentMode;
 	var p=d3.select(this.parentElement);
-	if (isIE) { 
+	if (isIE) {
 		var p=d3.select(this.parentNode);
 	}
 	var pi=p.attr('id').split('-')[2];
@@ -1185,11 +1234,11 @@ var moveNodeEnd = function(e){
 	var isIE = /*@cc_on!@*/false || !!document.documentMode;
 	var p=d3.select(this.parentElement);
 	var split_char=',';
-	if (isIE) { 
+	if (isIE) {
 		var p=d3.select(this.parentNode);
 		split_char=' ';
 	}
-	
+
 	var pi=p.attr('id').split('-')[2];
 	var l=p.attr('transform').slice(10,-1).split(split_char);
 	//Logic to implement rearranging of nodes
@@ -1208,18 +1257,18 @@ var moveNodeEnd = function(e){
 		if($('#switch-layout').hasClass('vertical-layout')){
 			if(l[0]<a.x){
 				if(counter==-1) counter=(i+1);
-				
+
 				a.childIndex++;
 				curNode.childIndex=counter;
-			}						
+			}
 		}
 		else{
 			if(l[1]<a.y){
 				if(counter==-1) counter=(i+1);
-				
+
 				a.childIndex++;
 				curNode.childIndex=counter;
-			}			
+			}
 		}
 
 		});
@@ -1280,21 +1329,21 @@ var moveNodeEnd = function(e){
 	dNodes[pi].y=parseFloat(l[1]);
 	addLink(temp.t,dLinks[temp.t].source,dLinks[temp.t].target);
 	var v=(dNodes[pi].children)?!1:!0;
-	
+
 	//Issue fixed #374: 'Mindmap - Blank nodes are retained if we delete the connected nodes'
 	temp.s.forEach(function(d){
 		if(deletednode_info.indexOf(dLinks[d].target)==-1){
 			addLink(d,dLinks[d].source,dLinks[d].target);
 			d3.select('#ct-link-'+d).classed('no-disp',v);
 		}
-			
+
 	});
 	p.classed('ct-movable',!1);
 };
 var toggleNode = function(e){
 	var isIE = /*@cc_on!@*/false || !!document.documentMode;
 	var p=d3.select(this.parentElement);
-	if (isIE) { 
+	if (isIE) {
 		var p=d3.select(this.parentNode);
 	}
 	var pi = p.attr('id').split('-')[2];
@@ -1351,7 +1400,7 @@ var inpChange = function(e){
 	if(val=='Screen_0' || val=='Scenario_0' || val=='Testcase_0' ){
 		$('#ct-inpAct').addClass('errorClass');
 		return;
-	} 
+	}
 	if(!validNodeDetails(val,this)) return;
 	//if(!validNodeDetails(this)) return;
 	if(childNode!=null){
@@ -1366,7 +1415,7 @@ var inpChange = function(e){
 	if(dNodes[pi].id_n){
 		dNodes[pi].original_name=pt.attr('title');
 		dNodes[pi].rnm=!0;
-	} 
+	}
 	if(t=='screens' && scrList[inp.attr('data-nodeid')]!==undefined){
 		//The below line leads to duplicate id_n of nodes when the node name is selected from suggestions list (only via mouse click)
 		//dNodes[pi].id_n=scrList[inp.attr('data-nodeid')].id_n;
@@ -1402,16 +1451,16 @@ var inpKeyUp = function(e){
 	var val=d3.select(this).property('value');
 	var iul=d3.select('#ct-inpSugg');
 	if(e.keyCode==13) {
-		inpChange();			
+		inpChange();
 		return;
 	}
 	if(val.indexOf('_')==-1) {
 		iul.classed('no-disp',!0);
 		var isIE = /*@cc_on!@*/false || !!document.documentMode;
-		if (isIE) { 
+		if (isIE) {
 			d3.select(this.parentNode).select('#ct-inpPredict').property('value','');
 		}else d3.select(this.parentElement).select('#ct-inpPredict').property('value','');
-		
+
 		return;
 	}
 	t=p.attr('data-nodetype');
@@ -1501,7 +1550,7 @@ var actionEvent = function(e){
 	if(dNodes[0].type=='modules_endtoend'){
 		cur_module='end_to_end';
 		error=false;
-	} 
+	}
 	// if(error){
 	// 	openDialogMindmap("Error", "Mindmap flow must be complete! Modules -> Scenarios -> Screens -> Testcases")
 	// 	//$('#Mindmap_error').modal('show');
@@ -1512,7 +1561,7 @@ var actionEvent = function(e){
 		d3.select('#ct-inpBox').classed('no-disp',!0);
 		saveFlag=true;
 		$('#ct-createAction').removeClass('disableButton');
-		
+
 	}
 	else if(s.attr('id')=='ct-createAction'){
 		if(error){
@@ -1522,7 +1571,7 @@ var actionEvent = function(e){
 		}
 		flag=20;
 		d3.select('#ct-inpBox').classed('no-disp',!0);
-		
+
 	}
 	if(flag==0) return;
 	if(s.classed('no-access')) return;
@@ -1533,18 +1582,22 @@ var actionEvent = function(e){
 		openDialogMindmap('Error','No projects is assigned to User');
 		return !1;
 	}
-	dataSender({task:'writeMap',data:{write:flag,tab:cur_module,map:mapData,user_name:username,abc:deletednode,xyz:unassignTask,prjId:$('.project-list').val(),relId:$('#ct-assignRel').val(),cycId:$('#ct-assignCyc').val()}},function(err,result){
+	var from_v=to_v=0;
+	if ($('.version-list').length !=0)
+	from_v=to_v=$('.version-list').val();
+	dataSender({task:'writeMap',data:{write:flag,userRole:user_role,vn_from: from_v, vn_to: to_v,tab:cur_module,map:mapData,user_name:username,abc:deletednode,xyz:unassignTask,prjId:$('.project-list').val(),relId:$('#ct-assignRel').val(),cycId:$('#ct-assignCyc').val()},role:user_role,versioning:versioning_enabled},function(err,result){
 		s.classed('no-access',!1);
 		if(err){
 			console.log(result);
+			$('#ct-createAction').addClass('disableButton')
 			if(result.indexOf('Schema.ConstraintValidationFailed')>-1){
 				openDialogMindmap('Save error','Module names cannot be duplicate');
 			}
 			else{
 				openDialogMindmap('Save error','Failed to save data');
 			}
-			
-		} 
+
+		}
 		else{
 			//alert(alertMsg);
 			var res=JSON.parse(result);
@@ -1568,18 +1621,21 @@ var actionEvent = function(e){
 			}
 			setModuleBoxHeight();
 			if(selectedTab=='tabCreate') populateDynamicInputList();
-			
+
 			clearSvg();
 			treeBuilder(allMMaps[mid]);
 			unassignTask=[];
-			
+
 			if(selectedTab=='tabAssign'){
 				openDialogMindmap("Success", "Tasks saved successfully");
 			}else{
 				openDialogMindmap("Success", "Data saved successfully");
 			}
-			
-			 dataSender({task:'getModules',tab:window.localStorage['tabMindMap'],prjId:$(".project-list").val()},function(err,result){
+			var vn='';
+			if ($('.version-list').length!=0)
+			from_v=to_v=$('.version-list').val()
+
+			 dataSender({task:'getModules',tab:window.localStorage['tabMindMap'],prjId:$(".project-list").val(),versioning:versioning_enabled,version:parseFloat(from_v)},function(err,result){
 				 	if(err) console.log(result);
 				 	else{
 						// console.log(result);
@@ -1595,7 +1651,7 @@ var actionEvent = function(e){
 							node.append('img').attr('class','ct-nodeIcon').attr('src',img_src).attr('alt','Module').attr('aria-hidden',true);
 							node.append('span').attr('class','ct-nodeLabel').html(t);
 						});
-						if(selectedTab=='tabCreate') 
+						if(selectedTab=='tabCreate')
 						populateDynamicInputList();
 						setModuleBoxHeight();
 				 	}
@@ -1612,7 +1668,7 @@ if(flag==20){
 			mid=i;
 			return !0;
 		}
-			return !1;
+			//return !1;
 	});
 	//263-'Mindmap- Module: Currently allowing to create 2 modules with same name- Error msg is given on click of Create button
 	if(allMMaps[mid] != undefined){
@@ -1634,7 +1690,7 @@ if(flag==20){
 			else d.id_c=res[d.id_n];
 
 		});
-		
+
 		openDialogMindmap("Success", "Structure created successfully");
 		saveFlag=false;
 		$('#ct-createAction').addClass('disableButton');
@@ -1642,8 +1698,8 @@ if(flag==20){
 		saveFlag=false;
 		openDialogMindmap("Success", "Failed to create structure");
 	}
-	
-	
+
+
 	//$('#Mindmap_create').modal('show');
   }
 
@@ -1686,7 +1742,7 @@ var toggleExpandAssign = function(e){
 	$(e.target).parent().parent().toggleClass('ct-open');
 	$(e.target).toggleClass("iconSpaceArrowTop");
 	e.stopImmediatePropagation();
-	if($("#ct-AssignBox").hasClass("ct-open") == true){		
+	if($("#ct-AssignBox").hasClass("ct-open") == true){
 		$("#ct-canvas").css("top","5px");
 	// 	if($("#left-nav-section").is(":visible") == true && $("#right-dependencies-section").is(":visible") == true)
 	// {
@@ -1741,13 +1797,13 @@ var populateDynamicInputList = function(){
 							}
 						});
 					}
-					
+
 				});
 			}
-			
+
 		});
 	}
-		
+
 	});
 };
 var clearSvg = function(){
@@ -1765,7 +1821,7 @@ var callme=function(){
 	if(childNode != null && (childNode.text()=='Module_0' || childNode.text()=='Screen_0' || childNode.text()=='Scenario_0' || childNode.text()=='Testcase_0')){
 		d3.select('#ct-inpBox').classed('no-disp',!1);
 	}
-	
+
 }
 
 var treeBuilder = function(tree){
@@ -1829,25 +1885,51 @@ var dataSender = function(data,callback){
 	try{xhttp=new XMLHttpRequest();}catch(e){try{xhttp=new ActiveXObject("Msxml2.XMLHTTP");}catch(e){try{xhttp=new ActiveXObject("Microsoft.XMLHTTP");}catch(e){alert("Your Browser is outdated!\nPlease Update!");return false;}}}
 	xhttp.onreadystatechange = function(){4==this.readyState&&(200==this.status?callback(!1,this.responseText):(400==this.status||401==this.status||402==this.status||403==this.status||404==this.status)&&callback(!0,this.responseText));};
 	//xhttp.open("POST",window.location.pathname,!0);
-	xhttp.open("POST",'/home',!0);
+	if(data.versioning==1)
+		xhttp.open("POST",'/version',!0);
+	else
+		xhttp.open("POST",'/home',!0);
 	xhttp.setRequestHeader("Content-Type", "application/json");
 	xhttp.send(JSON.stringify(data));
 };
 
 //Dialog used through out mindmap
 function openDialogMindmap(title, body){
-	if (window.location.pathname == '/home'){
+	if (window.location.pathname == '/home' || window.location.pathname == '/version'){
 		$("#mindmapGlobalDialog").find('.modal-title').text(title);
 		$("#mindmapGlobalDialog").find('.modal-body p').text(body).css('color','black');
 		$("#mindmapGlobalDialog").modal("show");
 		setTimeout(function(){
-			$("#mindmapGlobalDialog").find('.btn-default').focus();					
+			$("#mindmapGlobalDialog").find('.btn-default').focus();
 		}, 300);
 	}else if(window.location.pathname == '/designTestCase' || window.location.pathname == '/design' ||window.location.pathname == '/execute'){
 		$("#globalTaskSubmit").find('.modal-title').text(title);
 		$("#globalTaskSubmit").find('.modal-body p').text(body);
 		$("#globalTaskSubmit").modal("show");
 	}
-	
-	
+
+}
+
+/* function to set a Browser cookie */
+function setCookie(cname, cvalue, exdays) {
+    var d = new Date();
+    d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+    var expires = "expires="+d.toUTCString();
+    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+}
+
+/* function to get a Browser cookie */
+function getCookie(cname) {
+    var name = cname + "=";
+    var ca = document.cookie.split(';');
+    for(var i = 0; i < ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0) == ' ') {
+            c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length);
+        }
+    }
+    return "";
 }

@@ -10,6 +10,8 @@ var roles = [];
 var r_ids = [];
 var userRoles = {};
 var validator =  require('validator');
+var qList = [];
+var neo4jAPI = require('../controllers/neo4jAPI');
 //GetUserRoles
 exports.getUserRoles_Nineteen68 = function (req, res) {
 	try {
@@ -561,6 +563,7 @@ exports.getDomains_ICE = function getDomains_ICE(req, res) {
 };
 
 exports.createProject_ICE = function createProject_ICE(req, res) {
+    qList = [];
 	try {
 		if (req.cookies['connect.sid'] != undefined) {
 			var sessionCookie = req.cookies['connect.sid'].split(".");
@@ -649,8 +652,18 @@ exports.createProject_ICE = function createProject_ICE(req, res) {
 								if (response.statusCode != 200 || insertProjectData.rows == "fail") {
 									console.log(response.statusCode);
 								} else {
-									newProjectID = insertProjectData.rows[0].projectid;
-									callback();
+                                    newProjectID = insertProjectData.rows[0].projectid;
+                                    //Execute neo4j query!!
+                                    //var qList=[];
+                                    qList.push({"statement":"MERGE (n:PROJECTS_NG {projectid:'"+newProjectID
+                                                +"',domainid:'"+inputs.domainid+"',projectname:'"
+                                                +inputs.projectname+"'}) return n"});
+                                    //Relationships
+                                    qList.push({"statement":"MATCH (a:DOMAINS_NG{domainid:'"+inputs.domainid+"'}),(b:PROJECTS_NG {projectid:'"+newProjectID
+                                                +"',domainid:'"+inputs.domainid+"',projectname:'"+inputs.projectname+"'}) MERGE(a)-[r:FDOMTPRJ_NG{id:'"+newProjectID+"'}]->(b) return a,r,b"})
+                                    
+                                    callback();
+                                    
 								}
 							});
 						} catch (exception) {
@@ -689,6 +702,24 @@ exports.createProject_ICE = function createProject_ICE(req, res) {
 											console.log(response.statusCode);
 										} else {
 											newReleaseID = data.rows[0].releaseid;
+                                            //Execute neo4j query!! createrelease
+                                            //var qList=[];
+                                            qList.push({"statement":"MERGE (n:RELEASES_NG {releaseid:'"+newReleaseID
+                                                        +"',projectid:'"+inputs.projectid+"',releasename:'"
+                                                        +inputs.releasename+"',deleted:'"+false+"'}) return n"});
+                                            //Relationships
+                                            qList.push({"statement":"MATCH (a:PROJECTS_NG{projectid:'"+inputs.projectid+"'}),(b:RELEASES_NG {releaseid:'"+newReleaseID
+                                                        +"',projectid:'"+inputs.projectid+"',releasename:'"
+                                                        +inputs.releasename+"',deleted:'"+false+"'}) MERGE(a)-[r:FPRJTREL_NG{id:'"+newReleaseID
+                                                        +"'}]->(b) return a,r,b"})														
+
+                                            //qList.push({"statement":"MATCH (c:RELEASES_NG{releaseid:'"+newReleaseID+"'}) return c"})
+                                            //qList.push({"statement":"MATCH (c:CYCLES_NG{releaseid:'"+newReleaseID+"'}) return c"})
+
+                                            qList.push({"statement":"MATCH (a:RELEASES_NG{releaseid:'"+newReleaseID
+                                                        +"'}),(b:CYCLES_NG {releaseid:'"+newReleaseID
+                                                        +"',deleted:'"+false+"'}) MERGE(a)-[r:FRELTCYC_NG{id:b.cycleid}]->(b) return a,r,b"})														
+                                            //reqToAPI(qList,urlData);
 											async.forEachSeries(cycleNames, function (cycleName, cycleNamescallback) {
 												try {
 													var eachCycleName = cycleName;
@@ -736,7 +767,14 @@ exports.createProject_ICE = function createProject_ICE(req, res) {
 					if (err) {
 						console.log(err);
 					} else {
-						//console.log(data);
+                        neo4jAPI.executeQueries(qList,function(status,result){
+                            if(status!=200){
+                                console.log("Status:",status,"\nResponse: ",result);
+                            }
+                            else{
+                                console.log('Success');
+                            }
+                        });						
 					}
 				});
 			} else {
@@ -760,9 +798,21 @@ function createCycle(args, createCycleCallback) {
 				statusFlag = "Error occured in createCycle of createProject_ICE : Fail";
 				createCycleCallback(statusFlag, null);
 			} else {
+				newCycleID  = result.rows[0].cycleid;
+				//var qList=[];
+				qList.push({"statement":"MERGE (n:CYCLES_NG {releaseid:'"+args.data.releaseid
+                +"',cyclename:'"+args.data.cyclename+"',cycleid:'"
+                +newCycleID+"',deleted:'"+false+"'}) return n"});
+				//Relationships
+				qList.push({"statement":"MATCH (a:RELEASES_NG{releaseid:'"+args.data.releaseid+"'}),(b:CYCLES_NG {releaseid:'"+args.data.releaseid
+                +"',cyclename:'"+args.data.cyclename+"',cycleid:'"
+                +newCycleID+"',deleted:'"+false+"'}) MERGE(a)-[r:FRELTCYC_NG{id:'"
+                +newCycleID+"'}]->(b) return a,r,b"})														
+				
 				//statusFlag = "success";
 				//createCycleCallback(null, statusFlag);
 				createCycleCallback(null, result.rows[0]);
+
 			}
 		} catch (exception) {
 			console.log(exception);
@@ -775,6 +825,7 @@ function createCycle(args, createCycleCallback) {
  * from a particular domain
  */
 exports.updateProject_ICE = function updateProject_ICE(req, res) {
+	qList=[];    
 	try {
 		if (req.cookies['connect.sid'] != undefined) {
 			var sessionCookie = req.cookies['connect.sid'].split(".");
@@ -841,6 +892,25 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 													console.log(response.statusCode);
 												} else {
 													newReleaseID = data.rows[0].releaseid;
+                                                    //Execute neo4j query!! createrelease
+                                                    qList.push({"statement":"MERGE (n:RELEASES_NG {releaseid:'"+newReleaseID
+                                                                +"',projectid:'"+inputs.projectid+"',releasename:'"
+                                                                +inputs.releasename+"',deleted:'"+false+"'}) return n"});
+                                                    //reqToAPI(qList,urlData);
+                                                    //Relationships
+                                                    qList.push({"statement":"MATCH (a:PROJECTS_NG{projectid:'"+inputs.projectid+"'}),(b:RELEASES_NG {releaseid:'"+newReleaseID
+                                                                +"',projectid:'"+inputs.projectid+"',releasename:'"
+                                                                +inputs.releasename+"',deleted:'"+false+"'}) MERGE(a)-[r:FPRJTREL_NG{id:'"+newReleaseID
+                                                                +"'}]->(b) return a,r,b"})														
+
+                                                    //qList.push({"statement":"MATCH (c:RELEASES_NG{releaseid:'"+newReleaseID+"'}) return c"})
+                                                    //qList.push({"statement":"MATCH (c:CYCLES_NG{releaseid:'"+newReleaseID+"'}) return c"})
+
+                                                    qList.push({"statement":"MATCH (a:RELEASES_NG{releaseid:'"+newReleaseID
+                                                                +"'}),(b:CYCLES_NG {releaseid:'"+newReleaseID
+                                                                +"',deleted:'"+false+"'}) MERGE(a)-[r:FRELTCYC_NG{id:b.cycleid}]->(b) return a,r,b"})														
+                                                    // reqToAPI(qList,urlData);
+                                                                                                        
 													async.forEachSeries(cycleDetails, function (eachCycleDetail, cycleNamescallback) {
 														try {
 															var eachCycleName = eachCycleDetail.cycleName;
@@ -955,6 +1025,12 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 													flag = "Error in deleteRelease-updateProject_ICE : Fail";
 													res.send(flag);
 												} else {
+                                                    //Execute neo4j query!! deleterelease
+                                                    //var qList=[];
+                                                    qList.push({"statement":"MATCH (n:RELEASES_NG {projectid:'"+inputs.projectid
+                                                                +"',releaseid:'"+inputs.releaseid+"',releasename:'"
+                                                                +inputs.releasename+"'}) detach delete n"});
+                                                    //reqToAPI(qList,urlData);                                                    
 													var cyclesOfRelease = eachprojectDetail.cycleDetails;
 													async.forEachSeries(cyclesOfRelease, function (eachCycleDetail, eachCycleCallback) {
 														try {
@@ -976,7 +1052,13 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 																	flag = "Error in deleteCycles(true)-updateProject_ICE : Fail";
 																	res.send(flag);
 																} else {
-																	eachCycleCallback();
+                                                                    //Execute neo4j query!! deletecycle
+                                                                    //var qList=[];
+                                                                    qList.push({"statement":"MATCH (n:CYCLES_NG {cycleid:'"+inputs.cycleid
+                                                                                +"',releaseid:'"+inputs.releaseid+"',cyclename:'"
+                                                                                +inputs.cyclename+"'}) detach delete n"});
+                                                                    //reqToAPI(qList,urlData);																
+                                                                    eachCycleCallback();                                                                    
 																}
 															});
 														} catch (exception) {
@@ -1015,7 +1097,13 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 																	flag = "Error in deleteCycles(false)-updateProject_ICE : Fail";
 																	res.send(flag);
 																} else {
-																	eachCycleCallback();
+                                                                    //Execute neo4j query!! deletecycle
+                                                                    //var qList=[];
+                                                                    qList.push({"statement":"MATCH (n:CYCLES_NG {cycleid:'"+inputs.cycleid
+                                                                                +"',releaseid:'"+inputs.releaseid+"',cyclename:'"
+                                                                                +inputs.cyclename+"'}) detach delete n"});
+                                                                    //reqToAPI(qList,urlData);
+                                                                    eachCycleCallback();
 																}
 															});
 														} catch (exception) {
@@ -1259,8 +1347,19 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 						console.log("fail");
 						res.send("fail");
 					} else {
+                        neo4jAPI.executeQueries(qList,function(status,result){
+                            res.setHeader('Content-Type', 'application/json');
+                            if(status!=200){
+                                console.log("Status:",status,"\nResponse: ",result);
+                                
+                            }
+                            else{
+                                console.log('success');
+                                res.send("success");
+                            }
+                        });
 						console.log("success");
-						res.send("success");
+						//res.send("success");
 					}
 				});
 			} else {
@@ -1759,7 +1858,28 @@ exports.assignProjects_ICE = function (req, res) {
 					if (response.statusCode != 200 || result.rows == "fail") {
 						res.send("fail");
 					} else {
-						res.send("success");
+                        inputs.projectids1 = "'"+inputs.projectids.join('\',\'')+"'"
+                        //Execute neo4j query!!
+                        //var qList=[];
+                        qList.push({"statement":"MERGE (n:ICEPERMISSIONS_NG {userid:'"+inputs.userid
+                                    +"',domainid:'"+inputs.domainid+"'}) set n.projectids=["+inputs.projectids1+"] return n"});
+                        //Relationships
+                        qList.push({"statement":"MATCH (a:ICEPERMISSIONS_NG{userid:'"+inputs.userid
+                                    +"',domainid:'"+inputs.domainid+"'}),(b:DOMAINS_NG {domainid:'"
+                                    +inputs.domainid+"'}) MERGE(a)-[r:FICETDOM_NG{id:'"+inputs.domainid+"'}]->(b) return a,r,b"})
+
+                        // MATCH p = (a:DOMAINS_NG{userid:'bced8722-1ce1-41e0-b7d3-d9a9c0bcd800'})-[r1]->(d:DOMAINS_NG) return p
+                        neo4jAPI.executeQueries(qList,function(status,result){
+                            if(status!=200){
+                                console.log("Status:",status,"\nResponse: ",result);
+                            }
+                            else{
+                                console.log('Success');
+                                res.send("success");
+                            }
+                        });	
+
+//						res.send("success");
 					}
 				});
 			} else {

@@ -2339,7 +2339,7 @@ console.log("screenName:", screenName);
                 {
                       for (var i = 0; i < viewString.view.length; i++) {
                          
-						if ( $.trim($(this).find("input").val()) == $.trim(viewString.view[i].custname)) {
+						if ( $.trim($(this).find("input").val()) == $.trim(viewString.view[i].custname) || $.trim($(this).find("input").val()) == $.trim(viewString.view[i].custname).split("_")[0]) {
 							$("#dialog-addObject").modal("hide");
 							openDialog("Add Object", "Object characterstics are same for " + $(this).find("input").val() + "");
 							return false;
@@ -2677,7 +2677,7 @@ console.log("screenName:", screenName);
                 scrapeObject.editedListoldCustName = [];
                 scrapeObject.editedListoldXpath = [];
                 scrapeObject.editedListmodifiedXpaths = [];
-
+                scrapeObject.versionnumber = tasks.versionnumber;
                 //Filtering the Object which has been mapped
                 var valueToMap = $(".valueMerged")
                 $.each(valueToMap, function() {
