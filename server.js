@@ -404,6 +404,7 @@ if (cluster.isMaster) {
     app.post('/getReport_Nineteen68', report.getReport_Nineteen68);
     app.post('/exportToJson_ICE', report.exportToJson_ICE);
     app.post('/openScreenShot', report.openScreenShot);
+    app.post('/connectJira_ICE', report.connectJira_ICE);
 
     //Plugin Routes
     app.post('/getProjectIDs_Nineteen68', plugin.getProjectIDs_Nineteen68);
