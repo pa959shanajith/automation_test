@@ -9,6 +9,8 @@ var async = require('async');
 var certificate = fs.readFileSync('server/https/server.crt', 'utf-8');
 var Client = require("node-rest-client").Client;
 var client = new Client({ connection: { rejectUnauthorized: false } });
+var myserver = require('../../server.js');
+var notificationMsg = require("../notifications/notifyMessages");
 
 // /* Send queries to Neo4J/ICE API. */
 // var reqToAPI = function(d,u,p,callback) {
@@ -160,6 +162,24 @@ exports.versioning = function (req, res) {
 			});
 		}
 		else if (d.task == 'writeMap') {
+			var tasks =[];
+			for (var i=0;i<d.data.map.length;i++)
+			{
+				if(	d.data.map[i].task)
+				{
+					tasks.push(d.data.map[i].task);
+				}
+			}
+			var newtasks = tasks.length;
+			//Assigned Tasks Notification
+			if('socketMapNotify' in myserver && d.data.sendNotify in myserver.socketMapNotify){
+				 var soc = myserver.socketMapNotify[d.data.sendNotify];
+				 var assignedTasksNotification = {};
+				 	assignedTasksNotification.to = '/plugin';
+					assignedTasksNotification.notifyMsg = "New tasks have been assigned!";
+					assignedTasksNotification.isRead = false;
+					soc.emit("notify",assignedTasksNotification);
+			}
 			var nData = [], qList = [], idDict = {};
 			var createdOn = new Date().toLocaleString();
 			data = d.data.map;
