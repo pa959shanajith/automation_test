@@ -79,6 +79,9 @@ exports.readTestSuite_ICE = function (req, res) {
 							};
 							async.forEachSeries(result.rows, function (eachSuiterow, eachSuitecallback) {
 								outscenarioids = eachSuiterow.testscenarioids;
+								if (outscenarioids == null) {
+									outscenarioids = [];
+								}
 								respeachscenario.scenarioids = outscenarioids;
 								if (eachSuiterow.donotexecute == null) {
 									var arrTemp = [];
@@ -142,7 +145,7 @@ exports.readTestSuite_ICE = function (req, res) {
 															"connectedUsers": connectusers,
 															"testSuiteDetails": responsedata
 														};
-														res.send(schedulingDetails);
+														responsedata=schedulingDetails;
 													}
 												}
 											}
@@ -1329,8 +1332,6 @@ function TestSuiteDetails_Module_ICE(req, cb1, data) {
 						donotexecutevalues.push('1');
 						getparampathvalues.push('');
 					}
-				} else {
-					testscenarioids = [];
 				}
 				var inputs = {
 					"cycleid": requiredcycleid,
@@ -1358,9 +1359,6 @@ function TestSuiteDetails_Module_ICE(req, cb1, data) {
 					function (result, response) {
 					if (response.statusCode != 200 || result.rows == "fail") {
 						console.log("Error occured in TestSuiteDetails_Module_ICE : fail, testcasesteps");
-						//Execute neo4j query!!
-						//var qList=[];
-
 						cb1(null, flag);
 					} else {
 						for(var te=0;te<inputs.testscenarioids.length;te++){inputs.testscenarioids[te]='"'+inputs.testscenarioids[te]+'"';}
@@ -1382,7 +1380,6 @@ function TestSuiteDetails_Module_ICE(req, cb1, data) {
 			} else {
 				var jsondata = {
 					"testsuiteid": requiredtestsuiteid,
-					"testscenarioid": testscenarioids,
 					"cycleid": requiredcycleid,
 					"testsuitename": requiredtestsuitename,
 					"versionnumber": versionnumber,
@@ -1438,16 +1435,18 @@ function updatescenariodetailsinsuite(req, cb, data) {
 		},
 		validatedata: function (simplecallback) {
 			var scenarioidstocheck = suiterowdetails.testscenarioids;
-			var verifyscenarioid = req.testscenarioid;
+			var verifyscenarioid = req.testscenarioids;
 			var getparampath = suiterowdetails.getparampaths;
 			var conditioncheck = suiterowdetails.conditioncheck;
 			var donotexecute = suiterowdetails.donotexecute;
+			if (scenarioidstocheck != null) {
+				scenarioidstocheck = JSON.parse(JSON.stringify(scenarioidstocheck));
+			} else {
+				scenarioidstocheck = [];
+			}
 			for (var i = 0; i < verifyscenarioid.length; i++) {
-				var temp = verifyscenarioid[i];
-				var index;
-				if (scenarioidstocheck != null)
-					index = JSON.parse(JSON.stringify(scenarioidstocheck)).indexOf(temp);
-				if (index != null && index != undefined && index != -1) {
+				var index = scenarioidstocheck.indexOf(verifyscenarioid[i]);
+				if (index != -1) {
 					if (getparampath != null) {
 						if (getparampath[index] == '' || getparampath[index] == ' ') {
 							getparampath1.push('\' \'');
