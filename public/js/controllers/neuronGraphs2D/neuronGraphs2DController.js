@@ -6,9 +6,13 @@ mySPA.controller('neuronGraphs2DController', ['$scope', '$http', '$location', '$
 //nodeStatusdata,moduleid,scenarioids,exec_id,failed_tc_list
 	var globalobj = {};
 	var leveldict={'Domain':0,'Project':1,'Release':2,'Cycle':3,'TestSuite':4,'TestScenario':5,'TestCase':6,'Screen':7}
+	var levelrad={0:0,1:1,2:2,3:3,4:4,5:5,6:6,7:7}
+
 	globalobj['failed_tc_list']=[];
-	var nodeClickFlag;
+	var nodeClickFlag,executeFlag;
 	var nodeIdDict={};
+	var memoryarray =[];
+
 	var PI=Math.PI, fCos=Math.cos, fAcos=Math.acos, fSin=Math.sin, fAsin=Math.asin;
 
 	$timeout(function(){
@@ -50,14 +54,14 @@ mySPA.controller('neuronGraphs2DController', ['$scope', '$http', '$location', '$
 			}
 			$('#actionImg').addClass('selectedIcon');
 			buildExecutionGraph();
-			globalobj['jsondata'] = createExecutionJson();			
+			globalobj['jsondata'] = createExecutionJson();
+			executeFlag = false;			
 		}
 	}
 
 	$scope.fullview = function(){
-		$scope.nodes.forEach(function(e){
-			d3.select('#node-'+e.id).classed('no-disp',false)
-		})
+		d3.selectAll('.node-nG').classed('no-disp',false).classed('node-nG-dimmed',false);
+		d3.selectAll('.link-nG').classed('allow-disp',false);
 	}
 
 
@@ -115,6 +119,10 @@ mySPA.controller('neuronGraphs2DController', ['$scope', '$http', '$location', '$
 		$('#ct-canvas').children().remove()
 	};
 
+	$scope.clearLinks = function(){
+		d3.selectAll(".link-nG").classed('allow-disp',false);
+		d3.selectAll(".node-nG").classed('node-nG-dimmed',false);
+	};
 	/*---------------Sidebar Toggle Starts Here---------------*/
 	$(".lsSlide,.rsSlide").show();
 	$("#ct-expand-left").click(function(e){
@@ -311,11 +319,18 @@ mySPA.controller('neuronGraphs2DController', ['$scope', '$http', '$location', '$
 		s2R = 1.2*(s1R+Math.ceil(Math.sqrt(total_R))+1);
 		s3R = 1.2*(s2R+Math.ceil(Math.sqrt(total_C))+1);
 		s4R = 1.2*(s3R+Math.ceil(Math.sqrt((total_TS+total_TSc+total_TC+total_S))));
+		levelrad['Project'] = s1R;
+		levelrad['Release'] = s2R;
+		levelrad['Cycle'] = s3R;
+		levelrad['TestSuite'] = s4R;
+		levelrad['TestScenario'] = s4R;
+		levelrad['TestCase'] = s4R;
+		levelrad['Screen'] = s4R;
 		var P_cords,R_cords,C_cords,TS_cords,TSc_cords,TC_cords,S_cords;
 		P_cords=getN3DCoords(total_P,s1R)
-		R_cords=getN3DCoords(total_R,s2R)		
-		Cy_cords=getN3DCoords(total_C,s3R)		
-		C_cords=getN3DCoords((total_TS+total_TSc+total_TC+total_S),s4R)
+		R_cords=getN3DCoords(Math.ceil(total_R*1.2),s2R)		
+		Cy_cords=getN3DCoords(Math.ceil(total_C*1.4),s3R)		
+		C_cords=getN3DCoords(Math.ceil((total_TS+total_TSc+total_TC+total_S)*1.7),s4R)
 		console.log("C_cords:",C_cords.length,"\t sum:",(total_TS+total_TSc+total_TC+total_S))
 		rObj.x=0;rObj.y=0;rObj.z=0;
 
@@ -583,6 +598,7 @@ function indexOfItem(array, item) {
 	}
 
 	function animate(){
+		TWEEN.update();
 		requestAnimationFrame(animate);
 		controls.update();
 		var time=Date.now()*0.0004;
@@ -732,50 +748,116 @@ function indexOfItem(array, item) {
 		if (disp.toLowerCase()=='none') return false;
 		else return true;
 	};
+	function getDestinationCord(nObj){
+		var cord={x:0,y:0,z:0};
+		cord.x=nObj.x//*(levelrad[1+leveldict[nObj.type]]-levelrad[leveldict[nObj.type]]);
+		cord.y=nObj.y//*(levelrad[1+leveldict[nObj.type]]-levelrad[leveldict[nObj.type]]);
+		cord.z=nObj.z//*(levelrad[1+leveldict[nObj.type]]-levelrad[leveldict[nObj.type]]);
+		var rad = Math.sqrt((cord.x*cord.x)+(cord.y*cord.y)+(cord.z*cord.z));
+		console.log('rad: ',rad);
+		var tf = convertCartesianToSpherical(cord,rad);
+		console.log('tf: ',tf);
+		if(leveldict[nObj.type]<4){
+			var xyz = getGeoCoords(rad+(levelrad[1+leveldict[nObj.type]]-levelrad[leveldict[nObj.type]])+20,tf)
+		}
+		else{
+		var xyz = getGeoCoords(rad+25,tf)}
+		console.log('xyz: ',xyz);
+		cord.x = xyz[0]*50;
+		cord.y = xyz[1]*50;
+		cord.z = xyz[2]*50;
+		console.log('c1');		
+		console.log('cord:: ',cord);
+		return cord;
+	};
+	function convertCartesianToSpherical(cord,radius)
+	{
+		polar = Math.acos(cord.z/radius)
+		azimuthal = Math.atan2(cord.y, cord.x)
+		return [azimuthal,polar];
+	}
+	var getGeoCoords = function(r,tf){
+		coords3d=[r*fCos(tf[0])*fSin(tf[1]),r*fSin(tf[0])*fSin(tf[1]),r*fCos(tf[1])];
+		return coords3d;
+	};
+
 
 	var nodeClick = function(e){
 		if($('#actionImg_full').hasClass('sfhen')){
-			console.log('nodes: ',$scope.nodes);
-			d3.selectAll('.node-nG').classed('node-nG-dimmed',true);
+			nodeClickFlag = true;
+			// console.log('nodes: ',$scope.nodes);
+			if($('.allow-disp').length==0)
+				d3.selectAll('.node-nG').classed('node-nG-dimmed',true);
 			var recusive_traverse = function(nObj,lvl){
 				if(nObj.children){
 					d3.select('#node-'+nObj.id).classed('no-disp',false).classed('node-nG-dimmed',false);
 					nObj.children.forEach(function(ch,chi){
 						//console.log('oohhhhhhhhhhh:::',ch)
 						d3.select('#node-'+ch.id).classed('no-disp',false).classed('node-nG-dimmed',false);
-						//d3.select("#link-1-"+nObj.id+"-"+ch.id).classed('allow-disp',true); 
-						//d3.select("#link-2-"+nObj.id+"-"+ch.id).classed('allow-disp',true);
+						d3.select("#link-1-"+nObj.id+"-"+ch.id).classed('allow-disp',true); 
+						d3.select("#link-2-"+nObj.id+"-"+ch.id).classed('allow-disp',true);
 						recusive_traverse(ch,lvl+1)
 					});
 				}
 			};
 			recusive_traverse(e,0);
 
+			// //Shoot node with relationships
+			// $('[id*="'+e.id+'"]').removeClass('allow-disp');
+			// d3.select('#node-'+e.id).classed('no-disp',true);
 		}
 		else{
+			if($scope.tab=='actionTab' && !executeFlag)
+				return;
 			//if($scope.tab=='actionTab') return;
 			nodeClickFlag = true;
 			console.log('e:',e);
 			//console.log(e.children)
 			//to display children of selected node
 			console.log("camera position: ", camera.position)
-			//camera.position.z=e.z+100;
-			//camera.updateProjectionMatrix();
-			d3.select(e.children[0]).each(function(ch){d3.select(ch).classed('no-disp',false)})
-			
-			//console.log('nodeclick executed')
-			if (activeNode==this){
-				$('.closePopup').trigger("click");
-				clearHighlightNodes();
-			} 
-			else{
-				activeNode=this;
-				var d=d3.select(this).datum();
-				console.log('highlight node:',d);
-				highlightNodes(d);
-				addInfo(d);
-				//$("a[title='Info']").trigger("click");
+			if(e.type!='Domain'){
+				var from = {
+					x: camera.position.x,
+					y: camera.position.y,
+					z: camera.position.z
+				};
+
+				// var to = {
+				// 	x: e.x*120,
+				// 	y: e.y*120,
+				// 	z: e.z*120
+				// };
+				var to = getDestinationCord(e);
+				console.log('From: ',from,' To: ',to);
+				var tween = new TWEEN.Tween(from)
+					.to(to, 700)
+					.easing(TWEEN.Easing.Circular.Out)
+					.onUpdate(function () {
+						//console.log('this:::: ', this)
+					camera.position.set(this._object.x, this._object.y, this._object.z);
+					camera.lookAt(new THREE.Vector3(0, 0, 0));
+				}).onComplete(function () {
+					camera.lookAt(new THREE.Vector3(0, 0, 0));
+				}).start();	
 			}
+				//camera.position.z=e.z+100;
+				//camera.updateProjectionMatrix();
+				//d3.select(e.children[0]).each(function(ch){d3.select(ch).classed('no-disp',false)})
+				
+				//console.log('nodeclick executed')
+				if (activeNode==this){
+					$('.closePopup').trigger('click');
+					clearHighlightNodes();
+				} 
+				else{
+					activeNode=this;
+					var d=d3.select(this).datum();
+					console.log('highlight node:',d);
+					highlightNodes(d);
+					addInfo(d);
+					//$("a[title='Info']").trigger("click");
+				}
+
 		}
 		$('.popupContent-filter-active').addClass('popupContent-default').removeClass('popupContent-filter-active')
 	}
@@ -789,6 +871,7 @@ function indexOfItem(array, item) {
 	};
 
 	var highlightNodes = function(d){
+		memoryarray = [];
 		//console.log('highlight nodes')
 		if(!isDisplayed("#node-"+d.id)){
 			clearHighlightNodes();
@@ -799,15 +882,26 @@ function indexOfItem(array, item) {
 		//d3.select(d.children).ea
 //		console.log('neighbor array: ',neighborArray);
 
-        $('.link-nG.allow-disp').removeClass('allow-disp');
-        $('.node-nG').addClass('node-nG-dimmed');
-        d3.select('#node-'+d.id).classed('node-nG-dimmed',false);
+        //$('.link-nG.allow-disp').removeClass('allow-disp');
+        if($('.allow-disp').length==0){
+			$('.node-nG').addClass('node-nG-dimmed');
+		}
+        
+		d3.select('#node-'+d.id).classed('node-nG-dimmed',false);
 		
-        d.parent.forEach(function(e){d3.select('#node-'+e.id).classed('no-disp',false).classed('node-nG-dimmed',false); 
+        d.parent.forEach(function(e){
+			if(!isDisplayed("#node-"+e.id)){
+				memoryarray.push("#node-"+e.id);
+			}
+		d3.select('#node-'+e.id).classed('no-disp',false).classed('node-nG-dimmed',false);			
 		d3.select("#link-1-"+e.id+"-"+d.id).classed('allow-disp',true); 
 		d3.select("#link-2-"+e.id+"-"+d.id).classed('allow-disp',true);});
 
-        d.children.forEach(function(e){d3.select('#node-'+e.id).classed('no-disp',false).classed('node-nG-dimmed',false); 
+        d.children.forEach(function(e){
+			if(!isDisplayed("#node-"+e.id)){ 
+				memoryarray.push("#node-"+e.id);
+			}
+		d3.select('#node-'+e.id).classed('no-disp',false).classed('node-nG-dimmed',false);	
 		d3.select("#link-1-"+d.id+"-"+e.id).classed('allow-disp',true); 
 		d3.select("#link-2-"+d.id+"-"+e.id).classed('allow-disp',true)});
 	
@@ -823,7 +917,7 @@ function indexOfItem(array, item) {
         d.children.forEach(function(e){
 			if(isDisplayed("#node-"+e.id)){
 				d3.select("#link-1-"+d.id+"-"+e.id).classed('allow-disp',flag); 
-				d3.select("#link-2-"+e.id+"-"+d.id).classed('allow-disp',flag)}
+				d3.select("#link-2-"+d.id+"-"+e.id).classed('allow-disp',flag)}
 		});
 	
 	};
@@ -832,9 +926,16 @@ function indexOfItem(array, item) {
 
 	var clearHighlightNodes = function(){
 		//console.log('clear highlight nodes')
+		
+		memoryarray.forEach(function(element) {
+			console.log("Elemmmm:",element);
+			$(element).addClass('no-disp');
+		});
+		$('[id*="'+activeNode.id.split('-')[1]+'"]').removeClass('allow-disp');
 		activeNode=undefined;
-		$('.link-nG.allow-disp').removeClass('allow-disp');
-		$('.node-nG.node-nG-dimmed').removeClass('node-nG-dimmed');
+		//$('.link-nG.allow-disp').removeClass('allow-disp');
+		if($('.allow-disp').length==0)
+			$('.node-nG.node-nG-dimmed').removeClass('node-nG-dimmed');
 		$('#window-pi p.proj-info-wrap').empty();
 	};
 
@@ -847,21 +948,21 @@ function indexOfItem(array, item) {
 	});
 
 	var nodeHover = function(e){
-		if(activeNode!==undefined || $('#actionImg_full').hasClass('sfhen'))
+		if($('.allow-disp').length>0)
 			$(this).attr('title',e.type+': '+e.name);
 		else{
 		//console.log("nodeHover executed!")
 //		activeNode=this;
 		nodeClickFlag = false;
 		$(this).css('height','90px');
-		$(this).addClass()
+		//$(this).addClass()
 		$(this).attr('title',e.type+': '+e.name);
 
 		var d=d3.select(this).datum();
 
 		//highlightNodes(d);
 		//return;
-		highlightNodes_hover(d,true);
+		highlightNodes_hover(d,false);
 		//addInfo(d);
 		//$("a[title='Info']").trigger("click");
 		}
@@ -872,8 +973,8 @@ function indexOfItem(array, item) {
 //		return;
 		//console.log('flag: ',nodeClickFlag);
 		$('.closePopup').trigger('click');
+		$(this).css('height','64px');
 		if(!nodeClickFlag){
-			$(this).css('height','64px');
 			$(this).attr('title','');
 			var d=d3.select(this).datum();
 			highlightNodes_hover(d,false);
@@ -885,7 +986,7 @@ function indexOfItem(array, item) {
 		//console.log('activeNode: ',activeNode);
 		//console.log('activeNode: ',d3.select(activeNode));
 //		console.log('activeNode: ',d3.select(activeNode).attr('class').indexOf('node-TestSuite')!==-1);
-	if(d3.select(activeNode).attr('class').indexOf('node-TestSuite')!==-1){
+	if(activeNode!=undefined && d3.select(activeNode).attr('class').indexOf('node-TestSuite')!==-1){
 			openDialog('Suite to Execute','Suite locked for execution');
 			console.log('activeNode: ',activeNode)
 			globalobj['lockedSuite'] = activeNode;
@@ -894,6 +995,7 @@ function indexOfItem(array, item) {
 			openDialog('Error','Please select a Suite');
 	};
 	var buildExecutionGraph = function(){
+		d3.selectAll(".link-nG").classed('allow-disp',false);
 		//console.log('Hi');
 		d3.selectAll(".node-nG").classed('no-disp',true).classed('node-nG-dimmed',false);
 		d3.select(globalobj['lockedSuite']).classed('no-disp',false);
@@ -902,7 +1004,7 @@ function indexOfItem(array, item) {
 		//console.log('rootIndex:', d3.select(lockedSuite).data()[0].idx);
 		//console.log('rootIndex:', d3.select(lockedSuite).attr('idx'));
 		d3.select('#actionImg_full').classed('sfhen',false);
-		d3.selectAll(".link-nG").classed('allow-disp',false);
+		//d3.selectAll(".link-nG").classed('allow-disp',false);
 		//$scope.exec_nodes = [];
 		//$scope.exec_nodes=d3.selectAll('.node-nG').filter(function(){return !d3.select(this).classed('no-disp')}).data();
 /*
@@ -984,12 +1086,18 @@ function indexOfItem(array, item) {
 		//console.log('hi');
 		//console.log('jsondata: ', globalobj['jsondata']);
 		globalobj['jsondata'][0].browserType = [String(browserNum)]
+		if($("#ct-expand-left").hasClass('ct-rev'))
+			$("#ct-expand-left").trigger("click");
+		if($("#ct-expand-right").hasClass('ct-rev'))
+			$("#ct-expand-right").trigger("click");
 		blockUI('Executing...')
 		ExecutionService.ExecuteTestSuite_ICE(globalobj['jsondata']).then(function(data) {
+		executeFlag = true;
 		if (data == "Invalid Session") {
 			window.location.href = "/";
 		}
 		if (data == "Terminate") {
+			openDialog("Terminate","execution Terminated")
 			//$('#executionTerminated').modal('show');
 			//$('#executionTerminated').find('.btn-default').focus();
 		} else if (data == "unavailableLocalServer") {
@@ -1009,6 +1117,11 @@ function indexOfItem(array, item) {
 		}
 
 		unblockUI()
+		if(!$("#ct-expand-left").hasClass('ct-rev'))
+			$("#ct-expand-left").trigger("click");
+		if(!$("#ct-expand-right").hasClass('ct-rev'))
+			$("#ct-expand-right").trigger("click");		
+		//globalobj['jsondata'] = [];
 		//console.log("MID after:",globalobj['module_id'])
 	},
 		function(error) {
