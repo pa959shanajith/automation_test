@@ -1578,6 +1578,8 @@ var actionEvent = function(e){
 	s.classed('no-access',!0);
 	var userInfo =  JSON.parse(window.localStorage['_UI']);
 	var username = userInfo.username;
+	var assignedTo = $("#ct-assignedTo option:selected").text();
+
 	if($('.project-list').val()==null){
 		openDialogMindmap('Error','No projects is assigned to User');
 		return !1;

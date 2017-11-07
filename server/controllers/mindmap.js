@@ -2,6 +2,8 @@ var uuidV4 = require('uuid/v4');
 var neo4jAPI = require('../controllers/neo4jAPI');
 var admin = require('../controllers/admin');
 var create_ice=require('../controllers/create_ice');
+var myserver = require('../../server.js');
+var notificationMsg = require("../notifications/notifyMessages");
 
 exports.mindmapService = function(req, res) {
 	if(req.cookies['connect.sid'] != undefined)
@@ -291,6 +293,24 @@ exports.mindmapService = function(req, res) {
 			}
 		}
 		else if(d.task=='writeMap'){
+			var tasks =[];
+			for (var i=0;i<d.data.map.length;i++)
+			{
+				if(	d.data.map[i].task)
+				{
+					tasks.push(d.data.map[i].task);
+				}
+			}
+			var newtasks = tasks.length;
+			//Assigned Tasks Notification
+			if('socketMapNotify' in myserver && d.data.sendNotify in myserver.socketMapNotify){
+				 var soc = myserver.socketMapNotify[d.data.sendNotify];
+				 var assignedTasksNotification = {};
+				 	assignedTasksNotification.to = '/plugin';
+					assignedTasksNotification.notifyMsg = newtasks+" New tasks have been assigned!";
+					assignedTasksNotification.isRead = false;
+					soc.emit("notify",assignedTasksNotification);
+			}
 			data=d.data.map;
 			prjId=d.data.prjId;
 			var tab=d.data.tab;

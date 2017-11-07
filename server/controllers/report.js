@@ -9,6 +9,7 @@ var epurl = "http://127.0.0.1:1990/";
 var sessionExtend = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes 
 var sessionTime = 30 * 60 * 1000;
 var updateSessionTimeEvery = 20 * 60 * 1000;
+var validator =  require('validator');
 
 exports.getMainReport_ICE = function (req, res) {
 	try {
@@ -945,3 +946,120 @@ exports.exportToJson_ICE = function (req, res) {
 		res.send("fail");
 	}
 };
+
+//Connect to Jira
+exports.connectJira_ICE = function (req, res) {
+	try{
+		if (req.cookies['connect.sid'] != undefined) {
+			var sessionCookie = req.cookies['connect.sid'].split(".");
+			var sessionToken = sessionCookie[0].split(":");
+			sessionToken = sessionToken[1];
+		}
+		if (sessionToken != undefined && req.session.id == sessionToken) {
+			if(req.body.action == 'loginToJira'){ //Login to Jira for creating issues
+				var jiraurl = req.body.url;
+				var jirausername = req.body.username;
+				var jirapwd = req.body.password;
+				if(!validateData(jiraurl,"empty") && !validateData(jirausername,"empty") && !validateData(jirapwd,"empty")){
+					//var inputs = [jiraurl,jirausername,jirapwd];
+					var inputs = {
+						"jira_serverlocation": jiraurl,
+						"jira_uname": jirausername,
+						"jira_pwd": jirapwd
+					};
+					try {
+						var name = req.session.username;
+						console.log(Object.keys(myserver.allSocketsMap), "<<all people, asking person:", name);
+						if ('allSocketsMap' in myserver && name in myserver.allSocketsMap) {
+							var mySocket = myserver.allSocketsMap[name];
+							mySocket._events.jiralogin = [];
+							mySocket.emit('jiralogin',req.body.action,inputs);
+							var updateSessionExpiry = setInterval(function () {
+								req.session.cookie.maxAge = sessionTime;
+							}, updateSessionTimeEvery);
+							var count = 0;
+							mySocket.on('auto_populate', function (resultData) {
+								clearInterval(updateSessionExpiry);
+								if (resultData != "Fail") {
+									if(count == 0){res.send(resultData); count++;}
+								} else{
+									if(count == 0){res.send(resultData); count++;}
+								}
+							});
+						} else {
+							console.log("Socket not Available");
+							res.send("unavailableLocalServer");
+						}
+					} catch (exception) {
+						console.log(exception);
+					}
+				}
+				else{
+					res.send("Fail");
+				}
+			}
+			else if (req.body.action == 'createIssueInJira'){ //Create issues in the Jira
+				var createObj = req.body.issue_dict;
+				if(!validateData(createObj.project,"empty") && !validateData(createObj.issuetype,"empty") && !validateData(createObj.summary,"empty") && !validateData(createObj.priority,"empty")){
+					try {
+						var name = req.session.username;
+						console.log(Object.keys(myserver.allSocketsMap), "<<all people, asking person:", name);
+						if ('allSocketsMap' in myserver && name in myserver.allSocketsMap) {
+							var mySocket = myserver.allSocketsMap[name];
+							mySocket._events.jiralogin = [];
+							mySocket.emit('jiralogin',req.body.action,createObj);
+							var updateSessionExpiry = setInterval(function () {
+								req.session.cookie.maxAge = sessionTime;
+							}, updateSessionTimeEvery);
+							mySocket._events.issue_id = [];
+							var count = 0;
+							mySocket.on('issue_id', function (resultData) {
+								clearInterval(updateSessionExpiry);
+								if (resultData != "Fail") {
+									if(count == 0){res.send(resultData); count++;}
+								} else {
+									if(count == 0){res.send(resultData); count++;}
+								}
+							});
+						} else {
+							console.log("Socket not Available");
+							res.send("unavailableLocalServer");
+						}
+					} catch (exception) {
+						console.log(exception);
+					}
+				}
+				else{
+					res.send("Fail");
+				}
+			}
+		} else {
+			res.send("Invalid Session");
+		}
+	}
+	catch (exception) {
+		console.log(exception);
+		res.send("Fail");
+	}
+}
+
+function validateData(content, type){
+	switch(type){
+		case "empty":
+			return validator.isEmpty(content);
+		case "url":
+			return validator.isURL(content);
+		case "num":
+			return validator.isNumeric(content);
+		case "alph":
+			return validator.isAlpha(content);
+		case "len":
+			return validator.isLength(content);
+		case "uuid":
+			return validator.isUUID(content);
+		case "email":
+			return validator.isEmail(content);
+		case "json":
+			return validator.isJSON(content);
+	}
+}

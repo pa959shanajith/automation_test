@@ -80,6 +80,16 @@
 			</div>
 			<!-- Mobile Web -->
 			
+			<!-- Mainframe -->
+			<div id="left-top-section" ng-if="getScreenView == 'Mainframe'" class="ApptypeScreenView">
+				<ul>
+					<li><span><a class='scrapeOnTxt'>Debug On</a></span></li>
+					<li><a href='#'  ng-click="debugTestCase_ICE();" title="Mainframe"><span><img src='imgs/ic-mainframe.png' alt='Mainframe' style="background-color: white; border-radius: 7px;"/></span>Mainframe</a></li>
+					<li class="last"  title="Add Dependent Test Cases"><span style="margin-bottom:-5px"><input id="addDependent" type='checkbox' value=""></span><label class='addDependentTestCase' for="addDependent">Add Dependent Test Cases</label></li>
+				</ul>
+			</div>
+			<!-- Mainframe -->
+			
 			<div class='clear-both'></div>
 			
 			<div id="left-bottom-section">

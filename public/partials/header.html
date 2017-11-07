@@ -4,9 +4,12 @@
         <img width="160" src="imgs/logo.png" style="cursor: pointer;" id='naviPg' />
     </div>
     <!--left Logo-->
-
+<!-- Notify Div -->
+      <div class='notifications top-left'></div>
     <!--Right Navigation-->
+
     <div class="dropdown dropdown-userPart">
+			 
         <div class="col-md-6" id='sRole' ng-click="Switch_Role()">
             <button class="btn dropdown-toggle dropdown-userrole" type="button" data-toggle="dropdown">
                 <span><img class="header-ic" src="imgs/ic-switch-user.png" /></span>
@@ -28,6 +31,26 @@
                 <li><a href="#" ng-click ="$event.preventDefault(); logout();">Logout</a></li>
             </ul>
         </div>
+				<!--<div class="col-sm-2 bell-icon-div"  ng-click="showNotifications()">
+					<span class="count animated ng-binding" id="notifications-count">1</span>
+					<span class='glyphicon glyphicon-bell bell-icon'></span>
+				</div>-->
+
+				<div class="dropdown col-sm-2 bell-icon-div">
+						<button class="btn btn-secondary dropdown-toggle notify-btn" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" >
+								<span class="count animated ng-binding" id="notifications-count" ng-bind=""></span>
+								<span class='glyphicon glyphicon-bell bell-icon'></span>
+						</button>
+						
+						<div id='notifyBox' class="dropdown-menu  dropdown-menu-right notify-div" aria-labelledby="dropdownMenuButton">
+							<div ng-repeat ="item in notifications| orderBy:-'$index':true "  class='dropdown-item notifyMsgDiv'> 
+								<div id="notificationMessage" class='messageNotify'>
+          			 	<span>Recieved on: {{item.dateTime}}</span><br /><span>Message:  {{item.notifyMsg}}</span> 
+        				</div>
+								 <div class="divider"></div>
+							</div>
+						</div>
+</div>
     </div>
     <!--Right Navigation-->
     
@@ -50,6 +73,18 @@
 	  </div>
 	</div>
 	<!-- SwitchRole Modal  -->
+
+	<!---- Notification HTML ---->
+	<!--<div class="" id="notification-dropdown" style="display: none;">
+		          <div class="dropdown-body">
+		                <ul class="notification-menu">
+											<li><span class="highlight ng-binding">Notification 1</span></li>
+											<li class="divider"></li>
+											<li><span class="highlight ng-binding">Notification 1</span></li>
+									</ul>
+							</div>
+	</div>-->
+	<!---- Notification HTML ---->
 	
 	<!-- Popup for Role change -->
 	<div class="modal fade" id="switchedRoleModal" role="dialog" data-keyboard="false" data-backdrop="static">

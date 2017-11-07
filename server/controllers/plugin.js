@@ -8,7 +8,8 @@ exports.getProjectIDs_Nineteen68 = function (req, res) {
 		sessionToken = sessionToken[1];
 	}
 	if (sessionToken != undefined && req.session.id == sessionToken) {
-		create_ice.getProjectIDs_Nineteen68(req.body, function (err, data) {
+			req.session.userObj = req.body;
+		create_ice.getProjectIDs_Nineteen68(req.session.userObj, function (err, data) {
 			if (err) {
 				console.log(err);
 				res.send('fail');
