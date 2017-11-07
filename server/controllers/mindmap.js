@@ -307,7 +307,7 @@ exports.mindmapService = function(req, res) {
 				 var soc = myserver.socketMapNotify[d.data.sendNotify];
 				 var assignedTasksNotification = {};
 				 	assignedTasksNotification.to = '/plugin';
-					assignedTasksNotification.notifyMsg = newtasks+" New tasks have been assigned!";
+					assignedTasksNotification.notifyMsg = " New tasks have been assigned!";
 					assignedTasksNotification.isRead = false;
 					soc.emit("notify",assignedTasksNotification);
 			}

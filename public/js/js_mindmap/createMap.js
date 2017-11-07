@@ -1587,7 +1587,7 @@ var actionEvent = function(e){
 	var from_v=to_v=0;
 	if ($('.version-list').length !=0)
 	from_v=to_v=$('.version-list').val();
-	dataSender({task:'writeMap',data:{write:flag,userRole:user_role,vn_from: from_v, vn_to: to_v,tab:cur_module,map:mapData,user_name:username,abc:deletednode,xyz:unassignTask,prjId:$('.project-list').val(),relId:$('#ct-assignRel').val(),cycId:$('#ct-assignCyc').val()},role:user_role,versioning:versioning_enabled},function(err,result){
+	dataSender({task:'writeMap',data:{sendNotify:assignedTo,write:flag,userRole:user_role,vn_from: from_v, vn_to: to_v,tab:cur_module,map:mapData,user_name:username,abc:deletednode,xyz:unassignTask,prjId:$('.project-list').val(),relId:$('#ct-assignRel').val(),cycId:$('#ct-assignCyc').val()},role:user_role,versioning:versioning_enabled},function(err,result){
 		s.classed('no-access',!1);
 		if(err){
 			console.log(result);
