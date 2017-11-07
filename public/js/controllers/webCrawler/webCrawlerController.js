@@ -8,6 +8,8 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
       }
     });
   }, 10);
+    //Task Listing
+    loadUserTasks()
   window.onbeforeunload = function() {
     return "Data will be lost if you leave the page, are you sure?";
   };

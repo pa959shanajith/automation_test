@@ -10,9 +10,10 @@ var sessionExtend = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes
 var sessionTime = 30 * 60 * 1000;
 var updateSessionTimeEvery = 20 * 60 * 1000;
 var validator = require('validator');
-
+var  logger = require('../../logger');
 exports.loginQCServer_ICE = function (req, res) {
 	try {
+		logger.info("Inside UI service: loginQCServer_ICE");
 		if (req.cookies['connect.sid'] != undefined) {
 			var sessionCookie = req.cookies['connect.sid'].split(".");
 			var sessionToken = sessionCookie[0].split(":");
@@ -20,9 +21,12 @@ exports.loginQCServer_ICE = function (req, res) {
 		}
 		if (sessionToken != undefined && req.session.id == sessionToken) {
 			var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-			console.log("IP:", ip);
+			logger.info("ICE Socket connecting IP: %s" , ip);
+			//console.log("IP:", ip);
 			var name = req.session.username;
-			console.log(Object.keys(myserver.allSocketsMap),"<<all people, asking person:",name);
+			//console.log(Object.keys(myserver.allSocketsMap),"<<all people, asking person:",name);
+			logger.info("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
+			logger.info("ICE Socket requesting Address: " , name);
             check_qcUrl = validator.isEmpty(req.body.qcURL);
             if(check_qcUrl == false)
             {
@@ -64,26 +68,28 @@ exports.loginQCServer_ICE = function (req, res) {
 					res.send(data);
 				});
 			} else {
-				console.log("Socket not Available");
+				logger.info("ICE Socket not Available");
 				try {
 					res.send("unavailableLocalServer");
 				} catch (exception) {
-					console.log(exception);
+					logger.error(exception);
 				}
 			}
 		} else {
+				logger.info("Invalid Session");
 			res.send("Invalid Session");
 		}
             }else{
                 res.send('unavailableLocalServer');
             }
 	} catch (exception) {
-		console.log(exception);
+		logger.error(exception);
 		res.send("unavailableLocalServer");
 	}
 };
 
 exports.qcProjectDetails_ICE = function (req, res) {
+	logger.info("Inside UI service: qcProjectDetails_ICE");
 	var projectDetailList = {
 		"nineteen68_projects": '',
 		"qc_projects": ""
@@ -97,7 +103,8 @@ exports.qcProjectDetails_ICE = function (req, res) {
 		if (sessionToken != undefined && req.session.id == sessionToken) {
 			//var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 			var name = req.session.username;
-			console.log(Object.keys(myserver.allSocketsMap), "<<all people, asking person:", name);
+			logger.info("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
+			logger.info("ICE Socket requesting Address: " , name);
 			if ('allSocketsMap' in myserver && name in myserver.allSocketsMap) {
 				var mySocket = myserver.allSocketsMap[name];
 				// var userid = req.body.qcUsername;
@@ -110,6 +117,7 @@ exports.qcProjectDetails_ICE = function (req, res) {
 					"qcaction": req.body.qcaction
 				};
 				getProjectsForUser(userid, function (projectdata) {
+				
 					// var qcDetails = {"qcUsername":username,"qcPassword":password,"qcURL":url};
 					// var data = "LAUNCH_SAP";
 					mySocket._events.qcresponse = [];
@@ -125,29 +133,32 @@ exports.qcProjectDetails_ICE = function (req, res) {
 							projectDetailList.qc_projects = data.project;
 							res.send(projectDetailList);
 						} catch (ex) {
+							logger.error(ex);
 							res.send("fail");
 						}
 
 					});
 				});
 			} else {
-				console.log("Socket not Available");
+					logger.info("ICE Socket not Available");
 				try {
 					res.send("unavailableLocalServer");
 				} catch (exception) {
-					console.log(exception);
+					logger.error(exception);
 				}
 			}
 		} else {
+				logger.info("Invalid Session");
 			res.send("Invalid Session");
 		}
 	} catch (exception) {
-		console.log(exception);
+		logger.error(exception);
 		res.send("unavailableLocalServer");
 	}
 };
 
 function getProjectsForUser(userid, cb) {
+	logger.info("Inside function getProjectsForUser");
 	var projectDetailsList = [];
 	var projectidlist = [];
 	async.series({
@@ -163,10 +174,11 @@ function getProjectsForUser(userid, cb) {
 					"Content-Type": "application/json"
 				}
 			};
+			logger.info("Calling NDAC Service from getProjectsForUser: qualityCenter/qcProjectDetails_ICE");
 			client.post(epurl + "qualityCenter/qcProjectDetails_ICE", args,
 				function (projectrows, response) {
 				if (response.statusCode != 200 || projectrows.rows == "fail") {
-					console.log("Error occured in getProjectsForUser: fail , getprojectDetails");
+					logger.error("Error occured in qualityCenter/qcProjectDetails_ICE from getprojectDetails Error Code : ERRNDAC");
 				} else {
 					if (projectrows.rows.length != 0) {
 						flagtocheckifexists = true;
@@ -193,6 +205,7 @@ function getProjectsForUser(userid, cb) {
 }
 
 function projectandscenario(projectid, cb) {
+		logger.info("Inside function projectandscenario");
 	var scenarios_list;
 	var projectDetails = {
 		"project_id": '',
@@ -212,10 +225,12 @@ function projectandscenario(projectid, cb) {
 					"Content-Type": "application/json"
 				}
 			};
+				logger.info("Calling NDAC Service : qualityCenter/qcProjectDetails_ICE");
 			client.post(epurl + "qualityCenter/qcProjectDetails_ICE", args,
 				function (projectdata, response) {
 				if (response.statusCode != 200 || projectdata.rows == "fail") {
-					console.log("Error occured in getProjectsForUser: fail , projectname1");
+					
+					logger.error("Error occured in getProjectsForUser from projectname1 Error Code : ERRNDAC");
 				} else {
 					if (projectdata.rows.length != 0) {
 						projectname = projectdata.rows[0].projectname;
@@ -235,10 +250,11 @@ function projectandscenario(projectid, cb) {
 					"Content-Type": "application/json"
 				}
 			};
+				logger.info("Calling NDAC Service :qualityCenter/qcProjectDetails_ICE");
 			client.post(epurl + "qualityCenter/qcProjectDetails_ICE", args,
 				function (scenariorows, response) {
 				if (response.statusCode != 200 || scenariorows.rows == "fail") {
-					console.log("Error occured in getProjectsForUser: fail , scenariodata");
+					logger.error("Error occured in getProjectsForUser from scenariodata Error Code : ERRNDAC");
 				} else {
 					if (scenariorows.rows.length != 0) {
 						flagtocheckifexists = true;
@@ -260,6 +276,7 @@ function projectandscenario(projectid, cb) {
 }
 
 exports.qcFolderDetails_ICE = function (req, res) {
+	logger.info("Inside UI service: qcFolderDetails_ICE");
 	var projectDetailList = {
 		"nineteen68_projects": '',
 		"qc_projects": ""
@@ -272,7 +289,8 @@ exports.qcFolderDetails_ICE = function (req, res) {
 		}
 		if (sessionToken != undefined && req.session.id == sessionToken) {
 			var name = req.session.username;
-			console.log(Object.keys(myserver.allSocketsMap), "<<all people, asking person:", name);
+			logger.info("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
+			logger.info("ICE Socket requesting Address: " , name);
 			if ('allSocketsMap' in myserver && name in myserver.allSocketsMap) {
 				var mySocket = myserver.allSocketsMap[name];
 				// var userid = req.body.qcUsername;
@@ -296,23 +314,25 @@ exports.qcFolderDetails_ICE = function (req, res) {
 				});
 				//})
 			} else {
-				console.log("Socket not Available");
+				logger.info("ICE Socket not Available");
 				try {
 					res.send("unavailableLocalServer");
 				} catch (exception) {
-					console.log(exception);
+					logger.error(exception);
 				}
 			}
 		} else {
+				logger.info("Invalid Session");
 			res.send("Invalid Session");
 		}
 	} catch (exception) {
-		console.log(exception);
+		logger.error(exception);
 		res.send("unavailableLocalServer");
 	}
 };
 
 exports.saveQcDetails_ICE = function (req, res) {
+	logger.info("Inside UI service: saveQcDetails_ICE");
 	var mappedDetails = req.body.mappedDetails;
 	var flag = true;
 	if (mappedDetails.length > 0) {
@@ -345,10 +365,11 @@ exports.saveQcDetails_ICE = function (req, res) {
 				"Content-Type": "application/json"
 			}
 		};
+			logger.info("Calling NDAC Service: qualityCenter/saveQcDetails_ICE");
 		client.post(epurl + "qualityCenter/saveQcDetails_ICE", args,
 			function (qcdetailsows, response) {
 			if (response.statusCode != 200 || qcdetailsows.rows == "fail") {
-				console.log("Error occured in saveQcDetails_ICE: fail");
+					logger.error("Error occured in saveQcDetails_ICE Error Code : ERRNDAC");
 				flag = false;
 			}
 			callback();
@@ -388,10 +409,11 @@ exports.saveQcDetails_ICE = function (req, res) {
 					}*/
 					res.send("success");
 				} else {
+					logger.info("Invalid Session");
 					res.send("Invalid Session");
 				}
 			} catch (exception) {
-				console.log(exception);
+				logger.error(exception);
 				res.send("unavailableLocalServer");
 			}
 		} else {
@@ -401,6 +423,7 @@ exports.saveQcDetails_ICE = function (req, res) {
 };
 
 exports.viewQcMappedList_ICE = function (req, res) {
+	logger.info("Inside UI service: viewQcMappedList_ICE");
 	var qcDetailsList = [];
 	var userid = req.body.user_id;
 	getQcDetailsForUser(userid, function (responsedata) {
@@ -410,6 +433,7 @@ exports.viewQcMappedList_ICE = function (req, res) {
 };
 
 function getQcDetailsForUser(userid, cb) {
+	logger.info("Inside function getQcDetailsForUser");
 	var projectDetailsList = [];
 	var projectidlist = [];
 	var scenarioDetailsList;
@@ -426,10 +450,11 @@ function getQcDetailsForUser(userid, cb) {
 				}
 
 			};
+				logger.info("Calling NDAC Service :qualityCenter/qcProjectDetails_ICE");
 			client.post(epurl + "qualityCenter/qcProjectDetails_ICE", args,
 				function (projectrows, response) {
 				if (response.statusCode != 200 || projectrows.rows == "fail") {
-					console.log("Error occured in getQcDetailsForUser: fail , getprojectDetails");
+				logger.error("Error occured in qualityCenter/qcProjectDetails_ICE from getQcDetailsForUser Error Code : ERRNDAC");
 				} else {
 					if (projectrows.rows.length != 0) {
 						flagtocheckifexists = true;
@@ -441,6 +466,7 @@ function getQcDetailsForUser(userid, cb) {
 			});
 		},
 		scenarioDetails: function (callback1) {
+				logger.info("Inside function scenarioDetails");
 			async.forEachSeries(projectidlist, function (itr, callback2) {
 				qcscenariodetails(itr, function (err, projectDetails) {
 					for (i = 0; i < projectDetails.length; i++) {
@@ -451,13 +477,13 @@ function getQcDetailsForUser(userid, cb) {
 			}, callback1);
 		},
 		data: function (callback1) {
-			console.log(JSON.stringify(projectDetailsList));
 			cb(projectDetailsList);
 		}
 	});
 }
 
 function qcscenariodetails(projectid, cb) {
+		logger.info("Inside function qcscenariodetails");
 	var scenarios_list;
 	var projectDetails = {
 		"project_id": '',
@@ -478,9 +504,11 @@ function qcscenariodetails(projectid, cb) {
 					"Content-Type": "application/json"
 				}
 			};
+				logger.info("Calling NDAC Service from qcscenariodetails: qualityCenter/qcProjectDetails_ICE");
 			client.post(epurl + "qualityCenter/qcProjectDetails_ICE", args,
 				function (scenariorows, response) {
 				if (response.statusCode != 200 || scenariorows.rows == "fail") {
+					logger.error("Error occured in qualityCenter/qcProjectDetails_ICE from qcscenariodetails Error Code : ERRNDAC");
 				} else {
 					if (scenariorows.rows.length != 0) {
 						flagtocheckifexists = true;
@@ -494,6 +522,7 @@ function qcscenariodetails(projectid, cb) {
 			});
 		},
 		qcdetails: function (callback1) {
+			logger.info("Inside function qcdetails");
 			async.forEachSeries(scenarios_list, function (itr, callback2) {
 				var inputs = {
 					"testscenarioid": itr.testscenarioid,
@@ -505,10 +534,11 @@ function qcscenariodetails(projectid, cb) {
 						"Content-Type": "application/json"
 					}
 				};
+					logger.info("Calling NDAC Service from qcdetails: qualityCenter/viewQcMappedList_ICE");
 				client.post(epurl + "qualityCenter/viewQcMappedList_ICE", args,
 					function (qcdetailsows, response) {
 					if (response.statusCode != 200 || qcdetailsows.rows == "fail") {
-						console.log("Error occured in getQcDetailsForUser: fail , getprojectDetails");
+						logger.error("Error occured inqualityCenter/viewQcMappedList_ICE from qcdetails Error Code : ERRNDAC");
 					} else {
 						if (qcdetailsows.rows.length != 0) {
 							flagtocheckifexists = true;
@@ -534,13 +564,14 @@ function qcscenariodetails(projectid, cb) {
 
 
 exports.manualTestcaseDetails_ICE = function(req,res){
-    
+    	logger.info("Inside UI service: manualTestcaseDetails_ICE");
     getProjectsAndModules(req.body.user_id,function(data){
         res.send(data);
     })
 }
 
 function getProjectsAndModules(userid,cb){
+		logger.info("Inside function getProjectsAndModules");
     var projectDetailsList1 = [];
     var projectidlist = [];
     var scenarioDetailsList ;
@@ -552,13 +583,15 @@ function getProjectsAndModules(userid,cb){
                 data:inputs,
                 headers:{"Content-Type" : "application/json"}                
             }
+				logger.info("Calling NDAC Service from getProjectsAndModules: qualityCenter/qcProjectDetails_ICE");
             client.post(epurl+"qualityCenter/qcProjectDetails_ICE",args,
                 function (projectrows, response) {
                     if (response.statusCode != 200 || projectrows.rows == "fail") {
            // dbConnICE.execute(getprojects,function(err,projectrows){
                 //if(err){
                     //console.log(err);
-                    console.log("Error occured in getProjectsForUser: fail , getProjectsAndModules");
+                  					logger.error("Error occured in qualityCenter/qcProjectDetails_ICE from getProjectsAndModules Error Code : ERRNDAC");
+
                 }else{
                     if(projectrows.rows.length!=0){
                         flagtocheckifexists = true;
@@ -570,6 +603,7 @@ function getProjectsAndModules(userid,cb){
             }); 
         },
         moduleDetails:function(callback){
+				logger.info("Inside function moduleDetails");
             async.forEachSeries(projectidlist,function(itr,datacallback){
                 projectandmodule(itr,function(data){
                     projectDetailsList1.push(data);
@@ -584,6 +618,7 @@ function getProjectsAndModules(userid,cb){
 
 
 function projectandmodule(projectid,cb,data){
+		logger.info("Inside function projectandmodule");
     var projectDetails = {"project_id":'',"project_name":'',"module_details":[]};
     var projectname = '';
     var modulelist = [];
@@ -596,13 +631,14 @@ function projectandmodule(projectid,cb,data){
                 headers:{"Content-Type" : "application/json"}
                 
             }
+				logger.info("Calling NDAC Service from projectname1: qualityCenter/qcProjectDetails_ICE");
             client.post(epurl+"qualityCenter/qcProjectDetails_ICE",args,
                 function (projectdata, response) {
                     if (response.statusCode != 200 || projectdata.rows == "fail") {
             // dbConnICE.execute(projectnamequery,function(err,projectdata){
             //         if(err){
             //             console.log(err);
-                        console.log("Error occured in getProjectsForUser: fail , projectname1");
+					logger.error("Error occured in qualityCenter/qcProjectDetails_ICE from projectname1 Error Code : ERRNDAC");
                     }else{
                         if(projectdata.rows.length!=0){
                             projectname = projectdata.rows[0].projectname;

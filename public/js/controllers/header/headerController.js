@@ -43,7 +43,7 @@ mySPA.controller('headerController', function($scope,$rootScope,$http,$location,
 		}, 300);
 	}
 
-	if($location.$$path == "/plugin")
+	if($location.$$path == "/plugin" || $location.$$path == "/p_Weboccular" ||  $location.$$path == "/p_Dashboard")
 		{
 			$("button.notify-btn").addClass('notify-btn-white');
 
