@@ -554,6 +554,13 @@ exports.loadUserInfo_Nineteen68 = function (req, res) {
 		if (sessionToken != undefined && req.session.id == sessionToken) {
 			var flag = req.body.flag;
 			var switchedRole = req.body.selRole;
+			if(switchedRole != undefined && switchedRole != '' )
+			{
+				req.session.switchedRole = true;
+			}
+			else{
+					req.session.switchedRole = false;
+			}
 			userName = req.session.username.toLowerCase();
 			jsonService = {};
 			userpermissiondetails = [];

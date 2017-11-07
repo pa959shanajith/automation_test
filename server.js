@@ -274,19 +274,31 @@ if (cluster.isMaster) {
                                     }
                                     });
 
-			
-      if (!req.session.defaultRole || roles.indexOf(req.session.defaultRole) >=0)
-        {
-            req.session.destroy(); res.status(401).send('<br><br>Your session has been expired.Please <a href="/">Login</a> Again');
-        }else{
-            if (req.cookies['connect.sid'] && req.cookies['connect.sid'] != undefined) {
+	  if(req.session.switchedRole != true)
+      {
+             if (!req.session.defaultRole || roles.indexOf(req.session.defaultRole) >=0)
+                {
+                req.session.destroy(); res.status(401).send('<br><br>Your session has been expired.Please <a href="/">Login</a> Again');
+                }else{
+                    if (req.cookies['connect.sid'] && req.cookies['connect.sid'] != undefined) {
 
-                 res.sendFile("index.html", { root: __dirname + "/public/" });
-                } else {
-                     req.session.destroy();
-                      res.status(401).send('<br><br>Your session has been expired. Please <a href="/">Login</a> Again');
-                    }
-        }
+                        res.sendFile("index.html", { root: __dirname + "/public/" });
+                        } else {
+                            req.session.destroy();
+                            res.status(401).send('<br><br>Your session has been expired. Please <a href="/">Login</a> Again');
+                            }
+                }
+      }	
+      else{
+           if (req.cookies['connect.sid'] && req.cookies['connect.sid'] != undefined) {
+
+                        res.sendFile("index.html", { root: __dirname + "/public/" });
+                        } else {
+                            req.session.destroy();
+                            res.status(401).send('<br><br>Your session has been expired. Please <a href="/">Login</a> Again');
+                            }
+      }
+     
     }
     app.get('/favicon.ico', function(req, res){
         if (req.cookies['connect.sid'] && req.cookies['connect.sid'] != undefined) { res.sendFile("index.html", { root: __dirname + "/public/" });} else {req.session.destroy(); res.status(401).send('<br><br>Your session has been expired. Please <a href="/">Login</a> Again');}
