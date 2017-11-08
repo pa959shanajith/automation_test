@@ -12,18 +12,22 @@ var userRoles = {};
 var validator =  require('validator');
 var qList = [];
 var neo4jAPI = require('../controllers/neo4jAPI');
+var logger = require('../../logger');
 //GetUserRoles
 exports.getUserRoles_Nineteen68 = function (req, res) {
 	try {
+		logger.info("Inside UI service: getUserRoles_Nineteen68");
 		if (req.cookies['connect.sid'] != undefined) {
 			var sessionCookie = req.cookies['connect.sid'].split(".");
 			var sessionToken = sessionCookie[0].split(":");
 			sessionToken = sessionToken[1];
 		}
 		if (sessionToken != undefined && req.session.id == sessionToken) {
+			logger.info("Calling NDAC Service: getUserRoles_Nineteen68");
 			client.post(epurl + "admin/getUserRoles_Nineteen68",
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
+					logger.error("Error occured in getUserRoles_Nineteen68 Error Code : ERRNDAC");
 					res.send("fail");
 				} else {
 					try {
@@ -33,35 +37,39 @@ exports.getUserRoles_Nineteen68 = function (req, res) {
 						}
 						userRoles.userRoles = roles;
 						userRoles.r_ids = r_ids;
+						logger.info("User Roles fetched successfully");
 						res.send(userRoles);
 					} catch (exception) {
-						console.log(exception);
+						logger.error(exception);
 						res.send("fail");
 					}
 				}
 			});
 		} else {
+			logger.info("Invalid Session");
 			res.send("Invalid Session");
 		}
 	} catch (exception) {
-		console.log(exception);
+		logger.error(exception);
 		res.send("fail");
 	}
 };
 
 //GetUsers service has been changed to populate the users who has access to the project
 exports.getUsers_Nineteen68 = function (req, res) {
+	logger.info("Inside UI service: getUsers_Nineteen68");
 	var prjId = req.prjId;
 	var args = {
 		headers: {
 			"Content-Type": "application/json"
 		}
 	};
+	logger.info("Calling NDAC Service: getUsers_Nineteen68");
 	client.post(epurl + "admin/getUserRoles_Nineteen68", args,
 		function (userrolesresult, userrolesresponse) {
 		if (userrolesresponse.statusCode != 200 || userrolesresult.rows == "fail") {
-			console.log("fail");
-			res(null, "fail");
+			logger.error("Error occured in getRoleNameByRoleId_Nineteen68 Error Code : ERRNDAC");
+			res(null, "fail");getUserRoles_Nineteen68
 		} else {
 			inputs = {
 				"userroles": userrolesresult.rows,
@@ -73,12 +81,14 @@ exports.getUsers_Nineteen68 = function (req, res) {
 					"Content-Type": "application/json"
 				}
 			};
+			logger.info("Calling NDAC Service: getUsers_Nineteen68");
 			client.post(epurl + "admin/getUsers_Nineteen68", args,
 				function (getUsers, response) {
 				if (response.statusCode != 200 || getUsers.rows == "fail") {
-					console.log("fail");
+					logger.error("Error occured in getUsers_Nineteen68 Error Code : ERRNDAC");
 					res(null, "fail");
 				} else {
+					logger.info("Users fetched successfully");
 					res(null, getUsers);
 				}
 			});
@@ -89,6 +99,7 @@ exports.getUsers_Nineteen68 = function (req, res) {
 //Get All Users
 exports.getAllUsers_Nineteen68 = function (req, res) {
 	try {
+		logger.info("Inside UI service: getAllUsers_Nineteen68");
 		var checkAction = validator.isEmpty(req.body.action);
 		if(checkAction == false) {
 			if (req.cookies['connect.sid'] != undefined) {
@@ -110,10 +121,11 @@ exports.getAllUsers_Nineteen68 = function (req, res) {
 						"Content-Type": "application/json"
 					}
 				};
+				logger.info("Calling NDAC Service: getAllUsers_Nineteen68");
 				client.post(epurl + "admin/getAllUsers_Nineteen68", args,
 					function (allusersresult, allusersresponse) {
 					if (allusersresponse.statusCode != 200 || allusersresult.rows == "fail") {
-						console.log("fail");
+					logger.error("Error occured in getAllUsers_Nineteen68 Error Code : ERRNDAC");
 						res(null, "fail");
 					} else {
 						for (var i = 0; i < allusersresult.rows.length; i++) {
@@ -124,17 +136,19 @@ exports.getAllUsers_Nineteen68 = function (req, res) {
 						userDetails.userIds = userIds;
 						userDetails.user_names = user_names;
 						userDetails.d_roles = d_role;
+						logger.info("Users fetched successfully");
 						res.send(userDetails);
 					}
 				});
 			} else {
+				logger.info("Invalid Session");
 				res.send("Invalid Session");
 			}
 		} else{
 				res.send("fail");
 		}
 	} catch (exception) {
-		console.log(exception);
+		logger.error(exception);
 		res.send("fail");
 	}
 };
@@ -142,6 +156,7 @@ exports.getAllUsers_Nineteen68 = function (req, res) {
 //Get Users for Edit
 exports.getEditUsersInfo_Nineteen68 = function (req, res) {
 	try {
+		logger.info("Inside UI service: getEditUsersInfo_Nineteen68");
 		if (req.cookies['connect.sid'] != undefined) {
 			var sessionCookie = req.cookies['connect.sid'].split(".");
 			var sessionToken = sessionCookie[0].split(":");
@@ -160,6 +175,7 @@ exports.getEditUsersInfo_Nineteen68 = function (req, res) {
 					"Content-Type": "application/json"
 				}
 			};
+			logger.info("Calling NDAC Service: getUserData_Nineteen68");
 			client.post(epurl + "admin/getUserData_Nineteen68", args,
 				function (result, response) {
 				try {
@@ -175,24 +191,27 @@ exports.getEditUsersInfo_Nineteen68 = function (req, res) {
 							userDetails.lastName = iterator.lastname;
 							userDetails.ldapuser = iterator.ldapuser;
 						});
+						logger.info("User Details fetched successfully");
 						res.send(userDetails);
 					}
 				} catch (exception) {
-					console.log(exception);
+					logger.error(exception);
 					res.send(flag);
 				}
 			});
 		} else {
+			logger.info("Invalid Session");
 			res.send("Invalid Session");
 		}
 	} catch (exception) {
-		console.log(exception);
+		logger.error(exception);
 	}
 };
 
 //CreateUser
 exports.createUser_Nineteen68 = function (req, res) {
 	try {
+		logger.info("Inside UI service: createUser_Nineteen68");
 		if (req.cookies['connect.sid'] != undefined) {
 			var sessionCookie = req.cookies['connect.sid'].split(".");
 			var sessionToken = sessionCookie[0].split(":");
@@ -214,6 +233,7 @@ exports.createUser_Nineteen68 = function (req, res) {
 			validateCreateUser();
 
 			function validateCreateUser() {
+				logger.info("Inside validateCreateUser function");
 				check_username = validator.isEmpty(req_username);
 				check_usernameLen = validator.isLength(req_username, 1, 50);
 				if (check_username == false && check_usernameLen == true) {
@@ -266,10 +286,11 @@ exports.createUser_Nineteen68 = function (req, res) {
 				}
 			};
 			if (valid_username == true && valid_password == true && valid_firstname == true && valid_lastname == true && valid_ldapuser == true && valid_defaultRole == true && valid_email_id == true && valid_hashedPassword == true) {
+				logger.info("Calling NDAC Service: createUser_Nineteen68");
 				client.post(epurl + "admin/createUser_Nineteen68", args,
 					function (userNameresult, response) {
 					if (response.statusCode != 200 || userNameresult.rows == "fail") {
-						console.log("Error occured in createUser_Nineteen68 : Fail");
+						logger.error("Error occured in createUser_Nineteen68 Error Code : ERRNDAC");
 						res.send("fail");
 					} else {
 						try {
@@ -301,22 +322,25 @@ exports.createUser_Nineteen68 = function (req, res) {
 										"Content-Type": "application/json"
 									}
 								};
+								logger.info("Calling NDAC Service: createUser_Nineteen68");
 								client.post(epurl + "admin/createUser_Nineteen68", args,
 									function (result, response) {
 									try {
 										flag = "Success";
+										logger.info("User created successfully");
 										res.send(flag);
 									} catch (exception) {
-										console.log(exception);
+										logger.error(exception);
 										res.send(flag);
 									}
 								});
 							} else {
 								flag = "User Exists";
+								logger.info("User already exists");
 								res.send(flag);
 							}
 						} catch (exception) {
-							console.log(exception);
+							logger.error(exception);
 							res.send(flag);
 						}
 					}
@@ -325,10 +349,11 @@ exports.createUser_Nineteen68 = function (req, res) {
 				res.send("fail");
 			}
 		} else {
+			logger.info("Invalid Session");
 			res.send("Invalid Session");
 		}
 	} catch (exception) {
-		console.log(exception);
+		logger.error(exception);
 		res.send("fail");
 	}
 };
@@ -336,6 +361,7 @@ exports.createUser_Nineteen68 = function (req, res) {
 //Edit User
 exports.updateUser_nineteen68 = function updateUser_nineteen68(req, res) {
 	try {
+		logger.info("Inside UI service: updateUser_nineteen68");
 		if (req.cookies['connect.sid'] != undefined) {
 			var sessionCookie = req.cookies['connect.sid'].split(".");
 			var sessionToken = sessionCookie[0].split(":");
@@ -363,6 +389,7 @@ exports.updateUser_nineteen68 = function updateUser_nineteen68(req, res) {
 			}
 			validateUpdateUser();
 			function validateUpdateUser() {
+				logger.info("Inside validateUpdateUser function");
 				check_username = validator.isEmpty(local_username);
 				check_usernameLen = validator.isLength(local_username, 1, 50);
 				if (check_username == false && check_usernameLen == true) {
@@ -410,11 +437,13 @@ exports.updateUser_nineteen68 = function updateUser_nineteen68(req, res) {
 				}
 			};
 			if (valid_username == true && valid_password == true && valid_firstname == true && valid_lastname == true && valid_email_id == true) {
+				logger.info("Calling NDAC Service: getUserData_Nineteen68");
 				client.post(epurl + "admin/getUserData_Nineteen68", args,
 					function (result, response) {
 					try {
 						if (response.statusCode != 200 || result.rows == "fail") {
 							var flag = "fail";
+							logger.error("Error occured in getUserData_Nineteen68 Error Code : ERRNDAC");
 							res.send(flag);
 						} else {
 							service = result.rows[0];
@@ -471,6 +500,7 @@ exports.updateUser_nineteen68 = function updateUser_nineteen68(req, res) {
 									"Content-Type": "application/json"
 								}
 							};
+							logger.info("Calling NDAC Service: updateUser_Nineteen68");
 							client.post(epurl + "admin/updateUser_Nineteen68", args,
 								function (result, response) {
 								try {
@@ -479,16 +509,17 @@ exports.updateUser_nineteen68 = function updateUser_nineteen68(req, res) {
 										res.send(flag);
 									} else {
 										flag = "success";
+										logger.info("User updated successfully");
 										res.send(flag);
 									}
 								} catch (exception) {
-									console.log(exception);
+									logger.error(exception);
 									res.send(flag);
 								}
 							});
 						}
 					} catch (exception) {
-						console.log(exception);
+						logger.error(exception);
 						res.send(flag);
 					}
 				});
@@ -496,16 +527,18 @@ exports.updateUser_nineteen68 = function updateUser_nineteen68(req, res) {
 				res.send("fail");
 			}
 		} else {
+			logger.info("Invalid Session");
 			res.send("Invalid Session");
 		}
 	} catch (exception) {
-		console.log(exception);
+		logger.error(exception);
 		res.send("fail");
 	}
 };
 
 //Get Domains
 exports.getDomains_ICE = function getDomains_ICE(req, res) {
+	logger.info("Inside UI service: getDomains_ICE");
 	var checkAction = validator.isEmpty(req.body.action);
 
 	try {
@@ -522,10 +555,12 @@ exports.getDomains_ICE = function getDomains_ICE(req, res) {
 				}
 			};
 			if (checkAction == false) {
+					logger.info("Calling NDAC Service: getDomains_ICE");
 				client.post(epurl + "admin/getDomains_ICE", args,
 					function (result, response) {
 					try {
 						if (response.statusCode != 200 || result.rows == "fail") {
+							logger.error("Error occured in getDomains_ICE Error Code : ERRNDAC");
 							res.send("fail");
 						} else {
 							async.forEachSeries(result.rows, function (eachdomain, domainscallback) {
@@ -539,25 +574,27 @@ exports.getDomains_ICE = function getDomains_ICE(req, res) {
 									responsedata.push(reponseobj);
 									domainscallback();
 								} catch (exception) {
-									console.log(exception);
+									logger.error(exception);
 								}
 							}, finalresult);
 						}
 					} catch (exception) {
-						console.log(exception);
+					logger.error(exception);
 					}
 				});
 			} else {
 				res.send("fail");
 			}
 			function finalresult() {
+				logger.info("Domains fetched successfully");
 				res.send(responsedata);
 			}
 		} else {
+			logger.info("Invalid Session");
 			res.send("Invalid Session");
 		}
 	} catch (exception) {
-		console.log(exception);
+		logger.error(exception);
 		res.send("fail");
 	}
 };
@@ -565,6 +602,7 @@ exports.getDomains_ICE = function getDomains_ICE(req, res) {
 exports.createProject_ICE = function createProject_ICE(req, res) {
     qList = [];
 	try {
+		logger.info("Inside UI service: createProject_ICE");
 		if (req.cookies['connect.sid'] != undefined) {
 			var sessionCookie = req.cookies['connect.sid'].split(".");
 			var sessionToken = sessionCookie[0].split(":");
@@ -579,6 +617,7 @@ exports.createProject_ICE = function createProject_ICE(req, res) {
 			var newProjectID = "";
 			validateCreateProject();
 			function validateCreateProject() {
+				logger.info("Inside function validateCreateProject");
 				check_domain = validator.isEmpty(createProjectObj.domainId);
 				check_domain_type = validator.isUUID(createProjectObj.domainId);
 				if (check_domain == false && check_domain_type == true) {
@@ -613,20 +652,23 @@ exports.createProject_ICE = function createProject_ICE(req, res) {
 									"Content-Type": "application/json"
 								}
 							};
+							logger.info("Calling NDAC Service: createProject_ICE");
 							client.post(epurl + "admin/createProject_ICE", args,
 								function (projectTypeData, response) {
 								try {
-									if (response.statusCode != 200 || projectTypeData.rows == "fail") {}
+									if (response.statusCode != 200 || projectTypeData.rows == "fail") {
+										logger.error("Error occured in createProject_ICE Error Code : ERRNDAC");
+									}
 									else {
 										projectTypeId = projectTypeData.rows[0].projecttypeid;
 									}
 									callback();
 								} catch (exception) {
-									console.log(exception);
+									logger.error(exception);
 								}
 							});
 						} catch (exception) {
-							console.log(exception);
+							logger.error(exception);
 						}
 					},
 					createproject: function (callback) {
@@ -647,10 +689,11 @@ exports.createProject_ICE = function createProject_ICE(req, res) {
 								}
 							};
 							newProjectID = "";
+							logger.info("Calling NDAC Service from function createProject: createProject_ICE");
 							client.post(epurl + "admin/createProject_ICE", args,
 								function (insertProjectData, response) {
 								if (response.statusCode != 200 || insertProjectData.rows == "fail") {
-									console.log(response.statusCode);
+									logger.error("Error occured in createProject_ICE from createproject Error Code : ERRNDAC");
 								} else {
                                     newProjectID = insertProjectData.rows[0].projectid;
                                     //Execute neo4j query!!
@@ -667,7 +710,7 @@ exports.createProject_ICE = function createProject_ICE(req, res) {
 								}
 							});
 						} catch (exception) {
-							console.log(exception);
+							logger.error(exception);
 						}
 					},
 					createreleases: function (callback) {
@@ -696,10 +739,11 @@ exports.createProject_ICE = function createProject_ICE(req, res) {
 											"Content-Type": "application/json"
 										}
 									};
+									logger.info("Calling NDAC Service : createProject_ICE");
 									client.post(epurl + "admin/createProject_ICE", args,
 										function (data, response) {
 										if (response.statusCode != 200 || data.rows == "fail") {
-											console.log(response.statusCode);
+											logger.error("Error occured in createProject_ICE Error Code : ERRNDAC");
 										} else {
 											newReleaseID = data.rows[0].releaseid;
                                             //Execute neo4j query!! createrelease
@@ -740,39 +784,43 @@ exports.createProject_ICE = function createProject_ICE(req, res) {
 													createCycle(args, function (error, response) {
 														try {
 															if (error) {
+																logger.error(error);
 																res.send(error);
 															} else {
 																cycleNamescallback();
 															}
 														} catch (exception) {
-															console.log(exception);
+															logger.error(exception);
 														}
 													});
 												} catch (exception) {
-													console.log(exception);
+													logger.error(exception);
 												}
 											}, numberOfReleasescallback);
 										}
 									});
 								} catch (exception) {
-									console.log(exception);
+									logger.error(exception);
 								}
 							}, callback(null, ""));
+							logger.info("Project created successfully");
 							res.send('success');
 						} catch (exception) {
-							console.log(exception);
+							logger.error(exception);
 						}
 					}
 				}, function (err, data) {
 					if (err) {
-						console.log(err);
+						logger.error(exception);
 					} else {
+						logger.info("Calling neo4jAPI execute queries for createProject_ICE");
                         neo4jAPI.executeQueries(qList,function(status,result){
                             if(status!=200){
-                                console.log("Status:",status,"\nResponse: ",result);
+                               logger.info("Error in neo4jAPI execute queries with status for createProject_ICE: %d",status,"\nresponse for createProject_ICE:Response: %s",result);
                             }
                             else{
-                                console.log('Success');
+								logger.info("neo4jAPI execute queries with status for createProject_ICE: %d",status,"\nresponse for createProject_ICE:Response: %s",result);
+                                logger.info('neo4jAPI execute queries for createProject_ICE executed successfully');
                             }
                         });						
 					}
@@ -781,21 +829,25 @@ exports.createProject_ICE = function createProject_ICE(req, res) {
 				res.send("fail");
 			}
 		} else {
+			logger.info("Invalid Session");
 			res.send("Invalid Session");
 		}
 	} catch (exception) {
-		console.log(exception);
+		logger.error(exception);
 	}
 };
 
 function createCycle(args, createCycleCallback) {
+	logger.info("Inside function createCycle");
 	var statusFlag = "";
 	var cycleId="";
+	logger.info("Calling NDAC Service from createCycle:createProject_ICE");
 	client.post(epurl + "admin/createProject_ICE", args,
 		function (result, response) {
 		try {
 			if (response.statusCode != 200 || result.rows == "fail") {
 				statusFlag = "Error occured in createCycle of createProject_ICE : Fail";
+				logger.error("Error occured in createProject_ICE from createCycle Error Code : ERRNDAC");
 				createCycleCallback(statusFlag, null);
 			} else {
 				newCycleID  = result.rows[0].cycleid;
@@ -812,10 +864,10 @@ function createCycle(args, createCycleCallback) {
 				//statusFlag = "success";
 				//createCycleCallback(null, statusFlag);
 				createCycleCallback(null, result.rows[0]);
-
+				logger.info("Cycle created for project successfully");
 			}
 		} catch (exception) {
-			console.log(exception);
+			logger.error(exception);
 		}
 	});
 }
@@ -827,6 +879,7 @@ function createCycle(args, createCycleCallback) {
 exports.updateProject_ICE = function updateProject_ICE(req, res) {
 	qList=[];    
 	try {
+		logger.info("Inside UI Service: updateProject_ICE");
 		if (req.cookies['connect.sid'] != undefined) {
 			var sessionCookie = req.cookies['connect.sid'].split(".");
 			var sessionToken = sessionCookie[0].split(":");
@@ -842,6 +895,7 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 			validateUpdateProject();
 
 			function validateUpdateProject() {
+				logger.info("Inside function validateUpdateProject");
 				check_project = validator.isEmpty(updateProjectDetails.projectName);
 				check_projectId = validator.isUUID(updateProjectDetails.projectId);
 				check_projectLen = validator.isLength(updateProjectDetails.projectName, 1, 50);
@@ -884,12 +938,13 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 												"Content-Type": "application/json"
 											}
 										};
+										logger.info("Calling NDAC Service from newProjectDetails : admin/createProject_ICE");
 										client.post(epurl + "admin/createProject_ICE", args,
 											function (data, response) {
 
 											try {
 												if (response.statusCode != 200 || data.rows == "fail") {
-													console.log(response.statusCode);
+												logger.error("Error occurred in admin/createProject_ICE from newProjectDetails Error Code : ERRNDAC");
 												} else {
 													newReleaseID = data.rows[0].releaseid;
                                                     //Execute neo4j query!! createrelease
@@ -930,26 +985,27 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 															};
 															createCycle(args, function (error, response) {
 																if (error) {
+																	logger.error(error);
 																	res.send(error);
 																} else {
 																	try {
 																		cycleNamescallback();
 																	} catch (exception) {
-																		console.log(exception);
+																		logger.error(exception);
 																	}
 																}
 															});
 														} catch (exception) {
-															console.log(exception);
+															logger.error(exception);
 														}
 													}, eachprojectDetailcallback);
 												}
 											} catch (exception) {
-												console.log(exception);
+											logger.error(exception);
 											}
 										});
 									} catch (exception) {
-										console.log(exception);
+										logger.error(exception);
 									}
 								} else {
 									try {
@@ -977,25 +1033,25 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 												};
 												createCycle(args, function (error, response) {
 													if (error) {
-														res.send(error);
+														logger.error(error);
 													} else {
 														try {
 															cycleNamescallback();
 														} catch (exception) {
-															console.log(exception);
+															logger.error(exception);
 														}
 													}
 												});
 											} catch (exception) {
-												console.log(exception);
+												logger.error(exception);
 											}
 										}, eachprojectDetailcallback);
 									} catch (exception) {
-										console.log(exception);
+										logger.error(exception);
 									}
 								}
 							} catch (exception) {
-								console.log(exception);
+								logger.error(exception);
 							}
 						}, newProjectDetailsCallback);
 					},
@@ -1018,11 +1074,13 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 												"Content-Type": "application/json"
 											}
 										};
+										logger.info("Calling NDAC Service from deletedProjectDetails : admin/updateProject_ICE");
 										client.post(epurl + "admin/updateProject_ICE", args,
 											function (result, response) {
 											try {
 												if (response.statusCode != 200 || result.rows == "fail") {
 													flag = "Error in deleteRelease-updateProject_ICE : Fail";
+													logger.error("Error occurred in admin/updateProject_ICE from deletedProjectDetails Error Code : ERRNDAC");
 													res.send(flag);
 												} else {
                                                     //Execute neo4j query!! deleterelease
@@ -1046,9 +1104,11 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 																	"Content-Type": "application/json"
 																}
 															};
+															logger.info("Calling NDAC Service from deletedProjectDetails inside async : admin/updateProject_ICE");
 															client.post(epurl + "admin/updateProject_ICE", args,
 																function (result, response) {
 																if (response.statusCode != 200 || result.rows == "fail") {
+																	logger.error("Error occurred in admin/updateProject_ICE inside async Error Code : ERRNDAC");
 																	flag = "Error in deleteCycles(true)-updateProject_ICE : Fail";
 																	res.send(flag);
 																} else {
@@ -1062,12 +1122,12 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 																}
 															});
 														} catch (exception) {
-															console.log(exception);
+															logger.error(exception);
 														}
 													}, eachprojectDetailcallback);
 												}
 											} catch (exception) {
-												console.log(exception);
+												logger.error(exception);
 											}
 										});
 									} else if (!deleteStatus) {
@@ -1091,9 +1151,11 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 																	"Content-Type": "application/json"
 																}
 															};
+															logger.info("Calling NDAC Service inside async from !deleteStatus: admin/updateProject_ICE");
 															client.post(epurl + "admin/updateProject_ICE", args,
 																function (result, response) {
 																if (response.statusCode != 200 || result.rows == "fail") {
+																	logger.error("Error occurred in admin/updateProject_ICE inside async from !deleteStatus Error Code : ERRNDAC");
 																	flag = "Error in deleteCycles(false)-updateProject_ICE : Fail";
 																	res.send(flag);
 																} else {
@@ -1107,23 +1169,23 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 																}
 															});
 														} catch (exception) {
-															console.log(exception);
+															logger.error(exception);
 														}
 													}
 												} catch (exception) {
-													console.log(exception);
+													logger.error(exception);
 												}
 											}, eachprojectDetailcallback);
 										} catch (exception) {
-											console.log(exception);
+											logger.error(exception);
 										}
 									}
 								} catch (exception) {
-									console.log(exception);
+									logger.error(exception);
 								}
 							}, deletedProjectDetailsCallback);
 						} catch (exception) {
-							console.log(exception);
+								logger.error(exception);
 						}
 					},
 					editedProjectDetails: function (editedProjectDetailsCallback) {
@@ -1148,10 +1210,12 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 													"Content-Type": "application/json"
 												}
 											};
+											logger.info("Calling NDAC Service from editedProjectDetails : admin/updateProject_ICE");
 											client.post(epurl + "admin/updateProject_ICE", args,
 												function (result, response) {
 												try {
 													if (response.statusCode != 200 || result.rows == "fail") {
+														logger.error("Error occurred in admin/updateProject_ICE from editedProjectDetails Error Code : ERRNDAC");
 														flag = "Error in delete-Release(true)-updateProject_ICE : Fail";
 														res.send(flag);
 													} else {
@@ -1171,9 +1235,11 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 																	"Content-Type": "application/json"
 																}
 															};
+															logger.info("Calling NDAC Service from editedProjectDetails :admin/createProject_ICE");
 															client.post(epurl + "admin/createProject_ICE", args,
 																function (data, response) {
 																if (response.statusCode != 200 || data.rows == "fail") {
+																	logger.error("Error occurred in admin/createProject_ICE from editedProjectDetails Error Code : ERRNDAC");
 																	flag = "Error in update-Release(true)-updateProject_ICE : Fail";
 																	res.send(flag);
 																} else {
@@ -1200,9 +1266,11 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 																								"Content-Type": "application/json"
 																							}
 																						};
+																						logger.info("Calling NDAC Service from editedProjectDetails :admin/updateProject_ICE");
 																						client.post(epurl + "admin/updateProject_ICE", args,
 																							function (result, response) {
 																							if (response.statusCode != 200 || result.rows == "fail") {
+																								logger.error("Error occurred in admin/updateProject_ICE from editedProjectDetails Error Code : ERRNDAC");
 																								flag = "Error in delete-Cycle(true)-updateProject_ICE : Fail";
 																								res.send(flag);
 																							} else {
@@ -1224,41 +1292,42 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 																									};
 																									createCycle(args, function (error, response) {
 																										if (error) {
+																											logger.error(error);
 																											res.send(error);
 																										} else {
 																											eachCycleCallback();
 																										}
 																									});
 																								} catch (exception) {
-																									console.log(exception);
+																									logger.error(exception);
 																								}
 																							}
 																						});
 																					} catch (exception) {
-																						console.log(exception);
+																						logger.error(exception);
 																					}
 																				} else {
 																					eachCycleCallback();
 																				}
 																			} catch (exception) {
-																				console.log(exception);
+																				logger.error(exception);
 																			}
 																		}, eachprojectDetailcallback);
 																	} catch (exception) {
-																		console.log(exception);
+																		logger.error(exception);
 																	}
 																}
 															});
 														} catch (exception) {
-															console.log(exception);
+																logger.error(exception);
 														}
 													}
 												} catch (exception) {
-													console.log(exception);
+													logger.error(exception);
 												}
 											});
 										} catch (exception) {
-											console.log(exception);
+												logger.error(exception);
 										}
 									} else {
 										try {
@@ -1286,9 +1355,11 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 																	"Content-Type": "application/json"
 																}
 															};
+															logger.info("Calling NDAC Service : admin/updateProject_ICE");
 															client.post(epurl + "admin/updateProject_ICE", args,
 																function (result, response) {
 																if (response.statusCode != 200 || result.rows == "fail") {
+																	logger.error("Error occurred in admin/updateProject_ICE Error Code : ERRNDAC");
 																	flag = "Error in delete-Cycle(true)-updateProject_ICE : Fail";
 																	res.send(flag);
 																} else {
@@ -1310,55 +1381,56 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 																		};
 																		createCycle(args, function (error, response) {
 																			if (error) {
+																				logger.error(error);
 																				res.send(error);
 																			} else {
 																				eachCycleCallback();
 																			}
 																		});
 																	} catch (exception) {
-																		console.log(exception);
+																			logger.error(exception);
 																	}
 																}
 															});
 														} catch (exception) {
-															console.log(exception);
+															logger.error(exception);
 														}
 													} else {
 														eachCycleCallback();
 													}
 												} catch (exception) {
-													console.log(exception);
+													logger.error(exception);
 												}
 											}, eachprojectDetailcallback);
 										} catch (exception) {
-											console.log(exception);
+											logger.error(exception);
 										}
 									}
 								} catch (exception) {
-									console.log(exception);
+									logger.error(exception);
 								}
 							}, editedProjectDetailsCallback);
 						} catch (exception) {
-							console.log(exception);
+							logger.error(exception);
 						}
 					}
 				}, function (error, response) {
 					if (error) {
-						console.log("fail");
+						logger.error("Error occured in function newProjectDetails");
 						res.send("fail");
 					} else {
+						logger.info("Calling neo4jAPI execute queries for updateProject_ICE");
                         neo4jAPI.executeQueries(qList,function(status,result){
-                            res.setHeader('Content-Type', 'application/json');
+                           // res.setHeader('Content-Type', 'application/json');
                             if(status!=200){
-                                console.log("Status:",status,"\nResponse: ",result);
-                                
+                              logger.info("Error in neo4jAPI execute queries with status for updateProject_ICE: %d",status,"\n response for updateProject_ICE: %s",result);
                             }
                             else{
-                                console.log('success');
-                                res.send("success");
+                               logger.info('neo4jAPI execute queries for updateProject_ICE executed successfully');
+                               res.send("success");
                             }
                         });
-						console.log("success");
+						 logger.info('neo4jAPI execute queries for updateProject_ICE executed successfully');
 						//res.send("success");
 					}
 				});
@@ -1366,10 +1438,11 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 				res.send('fail');
 			}
 		} else {
+			logger.info("Invalid Session");
 			res.send("Invalid Session");
 		}
 	} catch (exception) {
-		console.log(exception);
+		logger.error(exception);
 	}
 };
 
@@ -1380,6 +1453,7 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
  * date 24.03.2017
  */
 exports.getNames_ICE = function (req, res) {
+	logger.info("Inside UI service: getNames_ICE");
 	try {
 		if (req.cookies['connect.sid'] != undefined) {
 			var sessionCookie = req.cookies['connect.sid'].split(".");
@@ -1407,18 +1481,20 @@ exports.getNames_ICE = function (req, res) {
 							namesfetcher(requestedidslist[eachid], "domainsall", function (error, response) {
 								try {
 									if (response.length <= 0) {
+										logger.info('No projects found')
 										res.send("No Projects");
 									} else {
 										for (var i = 0; i < response.length; i++) {
 											responsedata.projectIds.push(response[i].projectid);
 											responsedata.projectNames.push(response[i].projectname);
 											if (i == response.length - 1) {
+												logger.info('Project details fetched successfully')
 												res.send(responsedata);
 											}
 										}
 									}
 								} catch (exception) {
-									console.log(exception);
+									logger.error(exception);
 								}
 							});
 						} else if (idtypes[eachid] == 'projects') {
@@ -1428,10 +1504,11 @@ exports.getNames_ICE = function (req, res) {
 									responsedata.requestedids.push(response[0].projectid);
 									responsedata.respnames.push(response[0].projectname);
 									if (index == requestedidslist.length) {
+										logger.info('Project details fetched successfully');
 										res.send(responsedata);
 									}
 								} catch (exception) {
-									console.log(exception);
+									logger.error(exception);
 								}
 							});
 						} else if (idtypes[eachid] == 'releases') {
@@ -1442,10 +1519,11 @@ exports.getNames_ICE = function (req, res) {
 									responsedata.requestedids.push(response[0].releaseid);
 									responsedata.respnames.push(response[0].releasename);
 									if (index == requestedidslist.length) {
+										logger.info('Release details fetched successfully');
 										res.send(responsedata);
 									}
 								} catch (exception) {
-									console.log(exception);
+									logger.error(exception);
 								}
 							});
 						} else if (idtypes[eachid] == 'cycles') {
@@ -1456,10 +1534,11 @@ exports.getNames_ICE = function (req, res) {
 									responsedata.requestedids.push(response[0].cycleid);
 									responsedata.respnames.push(response[0].cyclename);
 									if (index == requestedidslist.length) {
+										logger.info('Cycle details fetched successfully');
 										res.send(responsedata);
 									}
 								} catch (exception) {
-									console.log(exception);
+									logger.error(exception);
 								}
 							});
 						} else if (idtypes[eachid] == 'screens') {
@@ -1469,10 +1548,11 @@ exports.getNames_ICE = function (req, res) {
 									responsedata.requestedids.push(response[0].screenid);
 									responsedata.respnames.push(response[0].screenname);
 									if (index == requestedidslist.length) {
+										logger.info('Screen details fetched successfully');
 										res.send(responsedata);
 									}
 								} catch (exception) {
-									console.log(exception);
+									logger.error(exception);
 								}
 							});
 						} else {
@@ -1480,7 +1560,7 @@ exports.getNames_ICE = function (req, res) {
 							break;
 						}
 					} else {
-						console.log("Invalid Input");
+						logger.info("Invalid Input to UI Service getNames_ICE");
 					}
 				}
 			} else {
@@ -1488,6 +1568,7 @@ exports.getNames_ICE = function (req, res) {
 			}
 
 			function namesfetcher(id, query, namesfetchercallback) {
+				logger.info("Inside function namesfetcher");
 				var inputs = {
 					"id": id,
 					"query": query
@@ -1498,26 +1579,29 @@ exports.getNames_ICE = function (req, res) {
 						"Content-Type": "application/json"
 					}
 				};
+				logger.info("Calling NDAC Service from namesfetcher: admin/getNames_ICE");
 				client.post(epurl + "admin/getNames_ICE", args,
 					function (queryStringresult, response) {
 					try {
 						if (response.statusCode != 200 || queryStringresult.rows == "fail") {
 							statusFlag = "Error occured in namesfetcher : Fail";
+							logger.error("Error occured in admin/getNames_ICE from namesfetcher Error Code : ERRNDAC");
 							namesfetchercallback(statusFlag, null);
 						} else {
 							index = index + 1;
 							namesfetchercallback(null, queryStringresult.rows);
 						}
 					} catch (exception) {
-						console.log(exception);
+						logger.error(exception);
 					}
 				});
 			}
 		} else {
+			logger.info("Invalid Session");
 			res.send("Invalid Session");
 		}
 	} catch (exception) {
-		console.log(exception);
+		logger.error(exception);
 	}
 };
 
@@ -1530,6 +1614,7 @@ exports.getNames_ICE = function (req, res) {
  * date 03/04/2017
  */
 exports.getDetails_ICE = function (req, res) {
+	logger.info("Inside UI service: getDetails_ICE");
 	var checkresBody = validator.isJSON(JSON.stringify(req.body));
 	if (checkresBody == true) {
 		try {
@@ -1559,9 +1644,10 @@ exports.getDetails_ICE = function (req, res) {
 									queryExecutor(requestedid, "domaindetails", "subquery", function (error, response) {
 										if (error) {
 											try {
+												logger.error("Error occured in getDetails_ICE_domaindetails");
 												res.send("Error in getDetails_ICE_domaindetails : Fail");
 											} catch (exception) {
-												console.log(exception);
+												logger.error(exception);
 											}
 										} else {
 											try {
@@ -1575,18 +1661,18 @@ exports.getDetails_ICE = function (req, res) {
 															try {
 																res.send(responsedatadomains);
 															} catch (exception) {
-																console.log(exception);
+																logger.error(exception);
 															}
 														}
 													}
 												}
 											} catch (exception) {
-												console.log(exception);
+												logger.error(exception);
 											}
 										}
 									});
 								} catch (exception) {
-									console.log(exception);
+										logger.error(exception);
 								}
 							} else if (idtypes[eachid] == 'projectsdetails') {
 								try {
@@ -1600,9 +1686,10 @@ exports.getDetails_ICE = function (req, res) {
 										function (queryForProjectTypeIderror, queryForProjectTypeIdresponse) {
 										if (queryForProjectTypeIderror) {
 											try {
+												logger.error(queryForProjectTypeIderror);
 												res.send(queryForProjectTypeIderror);
 											} catch (exception) {
-												console.log(exception);
+												logger.error(exception);
 											}
 										} else {
 											try {
@@ -1613,9 +1700,10 @@ exports.getDetails_ICE = function (req, res) {
 														function (queryForProjectTypeerror, queryForProjectTyperesponse) {
 														if (queryForProjectTypeerror) {
 															try {
+																logger.error(queryForProjectTypeerror);
 																res.send(queryForProjectTypeerror);
 															} catch (exception) {
-																console.log(exception);
+																logger.error(exception);
 															}
 														} else {
 															try {
@@ -1625,9 +1713,10 @@ exports.getDetails_ICE = function (req, res) {
 																		function (queryGetReleaseserror, queryGetReleasesresponse) {
 																		if (queryGetReleaseserror) {
 																			try {
+																				logger.error(queryGetReleasesQueryerror);
 																				res.send(queryGetReleasesQueryerror);
 																			} catch (exception) {
-																				console.log(exception);
+																					logger.error(exception);
 																			}
 																		} else {
 																			var releaseindex = 0;
@@ -1640,9 +1729,10 @@ exports.getDetails_ICE = function (req, res) {
 																						try {
 																							if (queryGetCycleserror) {
 																								try {
+																									logger.error(queryGetCycleserror);
 																									res.send(queryGetCycleserror);
 																								} catch (exception) {
-																									console.log(exception);
+																									logger.error(exception);
 																								}
 																							} else {
 																								try {
@@ -1661,7 +1751,7 @@ exports.getDetails_ICE = function (req, res) {
 																											cycleDetails.push(eachCycleObject);
 																											cyclecallback();
 																										} catch (exception) {
-																											console.log(exception);
+																												logger.error(exception);
 																										}
 																									});
 																									eachProjectDetail.releaseName = eachRelease.releasename;
@@ -1671,35 +1761,35 @@ exports.getDetails_ICE = function (req, res) {
 																										finalDataReturn();
 																									}
 																								} catch (exception) {
-																									console.log(exception);
+																										logger.error(exception);
 																								}
 																							}
 																							releasecallback();
 																						} catch (exception) {
-																							console.log(exception);
+																								logger.error(exception);
 																						}
 																					});
 																					responsedata.projectDetails.push(eachProjectDetail);
 																				} catch (exception) {
-																					console.log(exception);
+																						logger.error(exception);
 																				}
 																			});
 																		}
 																	});
 																}
 															} catch (exception) {
-																console.log(exception);
+																logger.error(exception);
 															}
 														}
 													});
 												}
 											} catch (exception) {
-												console.log(exception);
+												logger.error(exception);
 											}
 										}
 									});
 								} catch (exception) {
-									console.log(exception);
+									logger.error(exception);
 								}
 							} else if (idtypes[eachid] == 'cycledetails') {
 								responsedata = {
@@ -1710,9 +1800,10 @@ exports.getDetails_ICE = function (req, res) {
 									function (error, response) {
 									if (error) {
 										try {
+											logger.error("Error occured in getDetails_ICE_cycledetails");
 											res.send("Error in getDetails_ICE_cycledetails : Fail");
 										} catch (exception) {
-											console.log(exception);
+											logger.error(exception);
 										}
 									} else {
 										async.forEachSeries(response, function (eachtestSuiteDetails, testsuiteCallback) {
@@ -1721,7 +1812,7 @@ exports.getDetails_ICE = function (req, res) {
 												responsedata.testsuiteNames.push(eachtestSuiteDetails.testsuitename);
 												testsuiteCallback();
 											} catch (exception) {
-												console.log(exception);
+												logger.error(exception);
 											}
 										});
 										finalDataReturn();
@@ -1732,21 +1823,22 @@ exports.getDetails_ICE = function (req, res) {
 								try {
 									res.send("fail");
 								} catch (exception) {
-									console.log(exception);
+									logger.error(exception);
 								}
 							}
 						}
 					} catch (exception) {
-						console.log(exception);
+						logger.error(exception);
 					}
 				} else {
 					try {
 						res.send("fail");
 					} catch (exception) {
-						console.log(exception);
+						logger.error(exception);
 					}
 				}
 				function queryExecutor(id, query, subquery, queryExecutorcallback) {
+					logger.info('Inside function queryExecutor');
 					var inputs = {
 						"id": id,
 						"query": query,
@@ -1758,18 +1850,20 @@ exports.getDetails_ICE = function (req, res) {
 							"Content-Type": "application/json"
 						}
 					};
+					logger.info("Calling NDAC Service from queryExecutor: admin/getDetails_ICE");
 					client.post(epurl + "admin/getDetails_ICE", args,
 						function (queryStringresult, response) {
 						try {
 							if (response.statusCode != 200 || queryStringresult.rows == "fail") {
 								statusFlag = "Error occured in queryExecutor : Fail";
+								logger.error("Error occured in getDetails_ICE Error Code : ERRNDAC");
 								queryExecutorcallback(statusFlag, null);
 							} else {
 								index = index + 1;
 								queryExecutorcallback(null, queryStringresult.rows);
 							}
 						} catch (exception) {
-							console.log(exception);
+							logger.error(exception);
 						}
 					});
 				}
@@ -1778,14 +1872,15 @@ exports.getDetails_ICE = function (req, res) {
 					try {
 						res.send(responsedata);
 					} catch (exception) {
-						console.log(exception);
+						logger.error(exception);
 					}
 				}
 			} else {
+				logger.info("Invalid Session");
 				res.send("Invalid Session");
 			}
 		} catch (exception) {
-			console.log(exception);
+				logger.error(exception);
 		}
 	} else {
 		res.send('fail');
@@ -1794,6 +1889,7 @@ exports.getDetails_ICE = function (req, res) {
 
 //Save Assigned Projects
 exports.assignProjects_ICE = function (req, res) {
+	logger.info("Inside UI Service: assignProjects_ICE");
 	try {
 		if (req.cookies['connect.sid'] != undefined) {
 			var sessionCookie = req.cookies['connect.sid'].split(".");
@@ -1811,6 +1907,7 @@ exports.assignProjects_ICE = function (req, res) {
 			var inputs = {};
 			validateAssignProjects();
 			function validateAssignProjects() {
+				logger.info("Inside function validateAssignProjects");
 				check_domainId = validator.isEmpty(assignProjectsDetails.domainId);
 				if (check_domainId == false) {
 					valid_domainId = true;
@@ -1853,9 +1950,11 @@ exports.assignProjects_ICE = function (req, res) {
 				}
 			};
 			if (valid_domainId == true && valid_userId == true && valid_objects == true) {
+				logger.info("Calling NDAC Service : admin/assignProjects_ICE");
 				client.post(epurl + "admin/assignProjects_ICE", args,
 					function (result, response) {
 					if (response.statusCode != 200 || result.rows == "fail") {
+						logger.error("Error occurred in admin/assignProjects_ICE Error Code : ERRNDAC");
 						res.send("fail");
 					} else {
                         inputs.projectids1 = "'"+inputs.projectids.join('\',\'')+"'"
@@ -1869,12 +1968,13 @@ exports.assignProjects_ICE = function (req, res) {
                                     +inputs.domainid+"'}) MERGE(a)-[r:FICETDOM_NG{id:'"+inputs.domainid+"'}]->(b) return a,r,b"})
 
                         // MATCH p = (a:DOMAINS_NG{userid:'bced8722-1ce1-41e0-b7d3-d9a9c0bcd800'})-[r1]->(d:DOMAINS_NG) return p
+						logger.info("Calling neo4jAPI execute queries for assignProjects_ICE");
                         neo4jAPI.executeQueries(qList,function(status,result){
                             if(status!=200){
-                                console.log("Status:",status,"\nResponse: ",result);
+                           		logger.info("Error in neo4jAPI execute queries with status for assignProjects_ICE: %d",status,"\n response for assignProjects_ICE:%s",result);
                             }
                             else{
-                                console.log('Success');
+                                logger.info('neo4jAPI execute queries for assignProjects_ICE executed successfully');
                                 res.send("success");
                             }
                         });	
@@ -1886,10 +1986,11 @@ exports.assignProjects_ICE = function (req, res) {
 				res.send('fail');
 			}
 		} else {
+			logger.info("Invalid Session");
 			res.send("Invalid Session");
 		}
 	} catch (exception) {
-		console.log(exception);
+		logger.error(exception);
 		res.send("fail");
 	}
 };
@@ -1897,6 +1998,7 @@ exports.assignProjects_ICE = function (req, res) {
 //get Assigned Projects
 exports.getAssignedProjects_ICE = function (req, res) {
 	try {
+		logger.info("Inside UI service: getAssignedProjects_ICE");
 		if (req.cookies['connect.sid'] != undefined) {
 			var sessionCookie = req.cookies['connect.sid'].split(".");
 			var sessionToken = sessionCookie[0].split(":");
@@ -1917,10 +2019,12 @@ exports.getAssignedProjects_ICE = function (req, res) {
 					"Content-Type": "application/json"
 				}
 			};
+			logger.info("Calling NDAC Service : admin/getAssignedProjects_ICE");
 			client.post(epurl + "admin/getAssignedProjects_ICE", args,
 				function (result, response) {
 				try {
 					if (response.statusCode != 200 || result.rows == "fail") {
+						logger.error("Error occurred in admin/getAssignedProjects_ICE Error Code : ERRNDAC");
 						res.send("fail");
 					} else {
 						for (var i = 0; i < result.rows.length; i++) {
@@ -1938,10 +2042,12 @@ exports.getAssignedProjects_ICE = function (req, res) {
 										"Content-Type": "application/json"
 									}
 								};
+								logger.info("Calling NDAC Service : admin/getAssignedProjects_ICE inside async function");
 								client.post(epurl + "admin/getAssignedProjects_ICE", args,
 									function (result, response) {
 									try {
 										if (response.statusCode != 200 || result.rows == "fail") {
+											ogger.error("Error occurred in admin/getAssignedProjects_ICE inside async function Error Code : ERRNDAC");
 											res.send("fail");
 										} else {
 											if (result.rows.length > 0) {
@@ -1953,30 +2059,32 @@ exports.getAssignedProjects_ICE = function (req, res) {
 											assignProjectCallback();
 										}
 									} catch (exception) {
-										console.log(exception);
+										logger.error(exception);
 										res.send("fail");
 									}
 								});
 							} catch (exception) {
-								console.log(exception);
+								logger.error(exception);
 								res.send("fail");
 							}
 						}, finalfunction);
 
 					}
 					function finalfunction() {
+						logger.info('Assigned projects fetched successfully');
 						res.send(assignedProjObj);
 					}
 				} catch (exception) {
-					console.log(exception);
+					logger.error(exception);
 					res.send("fail");
 				}
 			});
 		} else {
+			logger.info("Invalid Session");
 			res.send("Invalid Session");
 		}
 	} catch (exception) {
-		console.log(exception);
+		logger.error(exception);
 		res.send("fail");
 	}
 };
