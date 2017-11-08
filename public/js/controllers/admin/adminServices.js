@@ -133,6 +133,14 @@ mySPA.factory('adminServices', ['$http', '$q', function ($http, $q) {
             })
             .then(function (response) { return response.data; },
            			 function (response) { return $q.reject(response.data); });
-        }
+        },
+		getAvailablePlugins: function () {
+			var param = "getAvailablePlugins";
+    		return $http.post('/getAvailablePlugins', {
+    			action: param
+    		})
+    		.then(function (response) { return response.data; },
+    				function (response) { return $q.reject(response.data); });
+		}
     };
 }]);

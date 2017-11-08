@@ -360,6 +360,14 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 		resetForm();
 		projectDetails = [];
 		updateProjectDetails = [];
+		var plugins = [];
+		adminServices.getAvailablePlugins()
+		.then(function (plugins_list) {
+			for(var i = 0; i < plugins_list.length; i++){
+				plugins[i] = plugins_list[i]
+			}
+		}, function (error) { console.log("Error:::::::::::::", error) });
+		
 		$("img.selectedIcon").removeClass("selectedIcon");
 		$(this).children().find('img').addClass('selectedIcon');
 		$timeout(function(){
@@ -375,6 +383,22 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 			else {
 				$("#selDomain").val(data[0].domainName);
 				domainId = data[0].domainId;
+				var html = '';
+				var imgname = '';
+				$(".appTypesContainer").empty();
+				for(var i = 0; i < plugins.length; i++){
+					imgname = plugins[i].toLowerCase();
+					if(plugins[i]=="DesktopJava")
+						imgname = 'oracleApps';
+					else if(plugins[i]=="MobileApp")
+						imgname = 'mobileApps';
+					else if(plugins[i]=="SAP")
+						imgname = 'sapApps';
+					else if(plugins[i]=="MobileWeb")
+						imgname = 'mobileWeb';
+					html = '<div class="projectTypes_create" data-app="'+plugins[i]+'" title="'+plugins[i]+'"><img src="imgs/'+imgname+'.png" alt="'+plugins[i]+'" /><label>'+plugins[i]+'</label></div>';
+					$(".appTypesContainer").append(html);
+				}
 			}
 		}, function (error) { console.log("Error:::::::::::::", error) })
 	});
@@ -1829,6 +1853,16 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 		projectDetails = [];
 		updateProjectDetails = [];
 		$scope.tab = "editProject";
+		var plugins = [];
+		adminServices.getAvailablePlugins()
+		.then(function (plugins_list) {
+			console.log(plugins_list);
+			console.log("\n\n");
+			for(var i = 0; i < plugins_list.length; i++){
+				plugins[i] = plugins_list[i]
+			}
+		}, function (error) { console.log("Error:", error) });
+		
 		adminServices.getDomains_ICE()
 		.then(function (data) {
 			if(data == "Invalid Session"){
@@ -1848,6 +1882,22 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 				//console.log("Domain", domains);
 				//var requestedids = domains.push(domainId);
 				var idtype=["domaindetails"];
+				var html = '';
+				var imgname = '';
+				$(".appTypesContainer").empty();
+				for(var i = 0; i < plugins.length; i++){
+					imgname = plugins[i].toLowerCase();
+					if(plugins[i]=="DesktopJava")
+						imgname = 'oracleApps';
+					else if(plugins[i]=="MobileApp")
+						imgname = 'mobileApps';
+					else if(plugins[i]=="SAP")
+						imgname = 'sapApps';
+					else if(plugins[i]=="MobileWeb")
+						imgname = 'mobileWeb';
+					html = '<div class="projectTypes_create" data-app="'+plugins[i]+'" title="'+plugins[i]+'"><img src="imgs/'+imgname+'.png" alt="'+plugins[i]+'" /><label>'+plugins[i]+'</label></div>';
+					$(".appTypesContainer").append(html);
+				}
 				adminServices.getDetails_ICE(idtype,requestedids)
 				.then(function (getDetailsResponse) {
 					if(getDetailsResponse == "Invalid Session"){
