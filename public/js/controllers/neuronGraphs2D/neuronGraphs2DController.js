@@ -11,12 +11,12 @@ mySPA.controller('neuronGraphs2DController', ['$scope', '$http', '$location', '$
 	globalobj['failed_tc_list']=[];
 	var nodeClickFlag,executeFlag;
 	var nodeIdDict={};
-	var memoryarray =[];
+	var memoryarray =[],fadearray=[];
 
 	var PI=Math.PI, fCos=Math.cos, fAcos=Math.acos, fSin=Math.sin, fAsin=Math.asin;
 
 	$timeout(function(){
-		console.log('timeout')
+		//console.log('timeout')
 		$('.scrollbar-inner').scrollbar();
 		$('.scrollbar-macosx').scrollbar();
 		document.getElementById("currentYear").innerHTML = new Date().getFullYear();
@@ -31,14 +31,14 @@ mySPA.controller('neuronGraphs2DController', ['$scope', '$http', '$location', '$
 	$scope.assignTab = function(option){
 
 		// d3.selectAll('.node-nG').each(function(d){
-		// 	console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
+		// 	//console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
 		// 	d.x=undefined;
 		// 	d.y=undefined;
 		// 	d.z=undefined;
 		// })
 
 		activeNode = undefined;
-		console.log('assign tab')
+		//console.log('assign tab')
 		$scope.tab = option;
 		$('.selectedIcon').removeClass('selectedIcon');
 		if($scope.tab=='viewTab'){
@@ -66,7 +66,7 @@ mySPA.controller('neuronGraphs2DController', ['$scope', '$http', '$location', '$
 
 
 	$scope.loadNGraphs = function(e){
-		console.log('loadNgraphs called from tab: ', $scope.tab)
+		//console.log('loadNgraphs called from tab: ', $scope.tab)
 		if($("#ct-expand-left").hasClass('ct-rev'))
 			$("#ct-expand-left").trigger("click");
 		if($("#ct-expand-right").hasClass('ct-rev'))
@@ -83,7 +83,7 @@ mySPA.controller('neuronGraphs2DController', ['$scope', '$http', '$location', '$
 // 				console.error(data.ecode);
 // 				return false;
 // 			}
-// 			console.log("Passssss!!!")
+// 			//console.log("Passssss!!!")
 // 		blockUI('Please wait while graphs are being fetched...');
 // //		setTimeout('playNote('+currentaudio.id+', '+noteTime+')', delay);
 
@@ -98,7 +98,7 @@ mySPA.controller('neuronGraphs2DController', ['$scope', '$http', '$location', '$
 	}
 
 	var addLegends = function(){
-		console.log('add legends')
+		//console.log('add legends')
 		var i=0;
 		//var nodeTypeList=Object.keys(nodeColor);
 		//var canvX=getDimms('#ct-canvas')[0]-50;
@@ -113,7 +113,7 @@ mySPA.controller('neuronGraphs2DController', ['$scope', '$http', '$location', '$
 	}
 
 	$scope.clearData = function(){
-		console.log('clear data')
+		//console.log('clear data')
 		delete $scope.nodes;
 		delete $scope.fetchedData;
 		$('#ct-canvas').children().remove()
@@ -126,7 +126,7 @@ mySPA.controller('neuronGraphs2DController', ['$scope', '$http', '$location', '$
 	/*---------------Sidebar Toggle Starts Here---------------*/
 	$(".lsSlide,.rsSlide").show();
 	$("#ct-expand-left").click(function(e){
-		console.log('leftbar click')
+		//console.log('leftbar click')
 		if($("#ct-expand-left").hasClass("ct-rev")) $(".lsSlide").hide();
 		else $(".lsSlide").show();
 		$("#ct-expand-left").toggleClass("ct-rev");
@@ -134,7 +134,7 @@ mySPA.controller('neuronGraphs2DController', ['$scope', '$http', '$location', '$
 	});
 
 	$("#ct-expand-right").click(function(e){
-		console.log('rightbar click')		
+		//console.log('rightbar click')		
 		if($("#ct-expand-right").hasClass("ct-rev")) $(".rsSlide").hide();
 		else $(".rsSlide").show();
 		$("#ct-expand-right").toggleClass("ct-rev")
@@ -144,7 +144,7 @@ mySPA.controller('neuronGraphs2DController', ['$scope', '$http', '$location', '$
 
 	/*---------------Filter Objects Start Here---------------*/
 	$(document).on("click", ".filterObjects", function(){
-		console.log('filter objects')
+		//console.log('filter objects')
 		enabledFilters=[];
 		$('.popupContent-filter-active').each(function(){
 			enabledFilters.push($(this).data('tag'));
@@ -152,11 +152,11 @@ mySPA.controller('neuronGraphs2DController', ['$scope', '$http', '$location', '$
 		applyFilters(1);
 	});
 
-	$("#selectAllFilters span.selectAllTxt").on("click", function(){applyFilters(0); console.log('apply filter')});
-	$("#selectAllFilters input.checkStyleboxFilter").on("click", function(){applyFilters(0); console.log('apply filter')});
+	$("#selectAllFilters span.selectAllTxt").on("click", function(){applyFilters(0); //console.log('apply filter')});
+	$("#selectAllFilters input.checkStyleboxFilter").on("click", function(){applyFilters(0); //console.log('apply filter')});
 	
 	var applyFilters = function(k){
-		console.log('apply filter')
+		//console.log('apply filter')
 		if (k==0||enabledFilters.length==0){
 			enabledFilters=[];
 			$('.node-nG.no-disp').removeClass('no-disp');
@@ -175,7 +175,7 @@ mySPA.controller('neuronGraphs2DController', ['$scope', '$http', '$location', '$
 	/*---------------Search Node Starts Here---------------*/
 	//$(".slidePopup").click(function(e){
 	$("#slidePopupSearchBox").click(function(e){
-		console.log('slidepopup search box')
+		//console.log('slidepopup search box')
 		visibleNodeNames=[];
 		d3.selectAll('.node-nG').each(function(d){if(!(d3.select(this).classed('no-disp'))) visibleNodeNames.push([d.idx,d.name]);});
 		$('#popupSearchResult').empty();
@@ -183,7 +183,7 @@ mySPA.controller('neuronGraphs2DController', ['$scope', '$http', '$location', '$
 	});
 
 	$(".searchInputNodes").on('keyup',function(e){
-		console.log('search input nodes keyup')
+		//console.log('search input nodes keyup')
 		e=e||window.event;
 		var searchKey=$(this).val().toLowerCase();
 		var searchResults='';
@@ -192,7 +192,7 @@ mySPA.controller('neuronGraphs2DController', ['$scope', '$http', '$location', '$
 	});
 
 	$(document).on("click", ".searchNodeItem", function(e){
-		console.log('searchnodeitem click')
+		//console.log('searchnodeitem click')
 		$("#node-"+$scope.nodes[$(this).data("lindex")].id).trigger("click");
 	});
 	/*---------------Search Node Ends Here---------------*/
@@ -200,7 +200,7 @@ mySPA.controller('neuronGraphs2DController', ['$scope', '$http', '$location', '$
 	/*---------------Data Processing Logic Starts Here---------------*/
 
 	var loadGraphData = function(){
-		console.log('loadgraph data')
+		//console.log('loadgraph data')
 		if(window.localStorage['_UI']){
 			var userInfo =  JSON.parse(window.localStorage['_UI']);
 			var userid = userInfo.user_id;
@@ -214,13 +214,13 @@ mySPA.controller('neuronGraphs2DController', ['$scope', '$http', '$location', '$
 					return false;
 				}
 				$("#ct-canvas").show();
-				//console.log('loadGraphData::::::::::::: ',data)
+				////console.log('loadGraphData::::::::::::: ',data)
 				$scope.fetchedData=data;
 				nodeTypes=data.type;
 				rootIndex=data.root;
 				mapN2DCoords=data.coords2D;
 				$scope.nodes=bindData(data.nodes,data.links);
-				console.log('nodes: ', $scope.nodes);
+				//console.log('nodes: ', $scope.nodes);
 				//blockUI(data.msg);
 				setPositionsSemi3D($scope.nodes,rootIndex);
 				//unblockUI();
@@ -236,7 +236,7 @@ mySPA.controller('neuronGraphs2DController', ['$scope', '$http', '$location', '$
 	}
 
 	var bindData = function(no,lo){
-		console.log('bind data')
+		//console.log('bind data')
 		m=JSON.parse(JSON.stringify(no));
 		m.forEach(function(n,i){
 			n.children=[];
@@ -257,7 +257,7 @@ mySPA.controller('neuronGraphs2DController', ['$scope', '$http', '$location', '$
 	};
 
 	var cleanCyclicData = function(no){
-		console.log('clean cyclic data')
+		//console.log('clean cyclic data')
 		no.forEach(function(n){
 			if (n.children) delete n.children;
 			if (n.parent) delete n.parent;
@@ -305,7 +305,7 @@ mySPA.controller('neuronGraphs2DController', ['$scope', '$http', '$location', '$
 		var rObj,np,pCord,nr,rCord,rc_c,rtfi,rCord_2d,ncy,cyCord,cyc_c,cytfi,cyCord_2d,tmp;
 		var s1R=4,s2R=10,s3R=20,s4R=30;
 		rObj=data[iRoot];
-		console.log('>>>>>>>>>>>rObj: ',rObj);
+		//console.log('>>>>>>>>>>>rObj: ',rObj);
 		var total_P=0,total_R=0,total_C=0,total_TS=0,total_TSc=0,total_TC=0,total_S;
 		total_P=rObj.children.length;
 		total_R=$scope.nodes.filter(function( obj ) {return obj.type == "Release";}).length;
@@ -314,7 +314,7 @@ mySPA.controller('neuronGraphs2DController', ['$scope', '$http', '$location', '$
 		total_TSc=$scope.nodes.filter(function( obj ) {return obj.type == "TestScenario";}).length;
 		total_TC=$scope.nodes.filter(function( obj ) {return obj.type == "TestCase";}).length;
 		total_S=$scope.nodes.filter(function( obj ) {return obj.type == "Screen";}).length;
-		console.log(total_P,total_R,total_C,total_TS,total_TSc,total_TC,total_S)
+		//console.log(total_P,total_R,total_C,total_TS,total_TSc,total_TC,total_S)
 		s1R = 1.2*(Math.ceil(Math.sqrt(total_P))+1);
 		s2R = 1.2*(s1R+Math.ceil(Math.sqrt(total_R))+1);
 		s3R = 1.2*(s2R+Math.ceil(Math.sqrt(total_C))+1);
@@ -331,7 +331,7 @@ mySPA.controller('neuronGraphs2DController', ['$scope', '$http', '$location', '$
 		R_cords=getN3DCoords(Math.ceil(total_R*1.2),s2R)		
 		Cy_cords=getN3DCoords(Math.ceil(total_C*1.4),s3R)		
 		C_cords=getN3DCoords(Math.ceil((total_TS+total_TSc+total_TC+total_S)*1.7),s4R)
-		console.log("C_cords:",C_cords.length,"\t sum:",(total_TS+total_TSc+total_TC+total_S))
+		//console.log("C_cords:",C_cords.length,"\t sum:",(total_TS+total_TSc+total_TC+total_S))
 		rObj.x=0;rObj.y=0;rObj.z=0;
 
 		var totalcount=0,idx_r=0,idx_c=0,idx_ts=0,idx_scn=0,idx_tc=0,idx_scr=0;
@@ -344,13 +344,13 @@ mySPA.controller('neuronGraphs2DController', ['$scope', '$http', '$location', '$
 				prj.z=P_cords[prjix][2];
 				if(prj.children && prj.children.length>0){
 					nr=prj.children.length;
-					console.log("testcases:::",nr)
+					//console.log("testcases:::",nr)
 					rCord=getNClosestCords(prj,R_cords,nr,1)
 					idx_r=0;
 					prj.children.forEach(function(rel,relix){
-						//console.log("Relx",rel.x)
+						////console.log("Relx",rel.x)
 						if(rel.x==undefined){
-							//console.log("Relx Entered",rel.x)
+							////console.log("Relx Entered",rel.x)
 							rel.x=rCord[idx_r][0];
 							rel.y=rCord[idx_r][1];
 							rel.z=rCord[idx_r][2];
@@ -360,20 +360,20 @@ mySPA.controller('neuronGraphs2DController', ['$scope', '$http', '$location', '$
 						// Yahan se continue karna h!!
 						if(rel.children && rel.children.length>0){
 							ncy=rel.children.length;
-							//console.log("no. of cycles:", ncy)
+							////console.log("no. of cycles:", ncy)
 							cyCord=getNClosestCords(rel,Cy_cords,ncy,1);
-							//console.log("c_Cord:", C_cords)
+							////console.log("c_Cord:", C_cords)
 							
 							cyCord.forEach(function(c){
 								var i = indexOfItem(Cy_cords,c);
-								//console.log("index:",i)
+								////console.log("index:",i)
 								 Cy_cords.splice(i,1);
 							})
 							totalcount=totalcount+cyCord.length;
-							//console.log("Count!!!!!",totalcount)
+							////console.log("Count!!!!!",totalcount)
 							
 
-							//console.log("c_Cord after!:", C_cords)
+							////console.log("c_Cord after!:", C_cords)
 							idx_c=0;
 							rel.children.forEach(function(cyc,cycix){
 								if(cyc.x==undefined){
@@ -386,21 +386,21 @@ mySPA.controller('neuronGraphs2DController', ['$scope', '$http', '$location', '$
 								if(cyc.children && cyc.children.length>0){
 									ntsc=cyc.children.length;
 									tscCord=getNClosestCords(cyc,C_cords,ntsc,1);
-									//console.log("n testscn ::",ntsc)
-									//console.log("c_Cord:", C_cords)
+									////console.log("n testscn ::",ntsc)
+									////console.log("c_Cord:", C_cords)
 									
 									tscCord.forEach(function(c){
 									var i = indexOfItem(C_cords,c);
-									//console.log("index:",i)
+									////console.log("index:",i)
 									C_cords.splice(i,1);
 									})
 									totalcount=totalcount+tscCord.length;
-									//console.log("Count!!!!!",totalcount)
-									//console.log("c_Cord after!:", C_cords)
+									////console.log("Count!!!!!",totalcount)
+									////console.log("c_Cord after!:", C_cords)
 
 									idx_ts=0;
 									cyc.children.forEach(function(tsc,tscix){
-										//console.log("scnix:",tscix)
+										////console.log("scnix:",tscix)
 										if(tsc.x==undefined){
 											tsc.x=tscCord[idx_ts][0];
 											tsc.y=tscCord[idx_ts][1];
@@ -410,23 +410,23 @@ mySPA.controller('neuronGraphs2DController', ['$scope', '$http', '$location', '$
 
 										if(tsc.children && tsc.children.length>0){
 											nscn=tsc.children.length;
-											//console.log("no of testscn:",nscn)
+											////console.log("no of testscn:",nscn)
 											scnCord=getNClosestCords(tsc,C_cords,nscn,1);
 											//onsole.log("tscCord ::",scnCord)
-											//console.log("c_Cord before:", C_cords)
+											////console.log("c_Cord before:", C_cords)
 											
 											scnCord.forEach(function(c){
 											var i = indexOfItem(C_cords,c);
-											//console.log("index:",i)
+											////console.log("index:",i)
 											C_cords.splice(i,1);
 											})
 											totalcount=totalcount+scnCord.length;
-											//console.log("Count!!!!!",totalcount)
-											//console.log("c_Cord after:", C_cords)
+											////console.log("Count!!!!!",totalcount)
+											////console.log("c_Cord after:", C_cords)
 										
 										idx_scn=0;
 										tsc.children.forEach(function(scn,scnix){
-											//console.log("scnix:",scnix)
+											////console.log("scnix:",scnix)
 											if(scn.x==undefined){
 												scn.x=scnCord[idx_scn][0];
 												scn.y=scnCord[idx_scn][1];
@@ -436,22 +436,22 @@ mySPA.controller('neuronGraphs2DController', ['$scope', '$http', '$location', '$
 
 											if(scn.children && scn.children.length>0){
 												ntc=scn.children.length;
-												//console.log("n tc",ntc)
-												//console.log("c_Cord:", C_cords)
+												////console.log("n tc",ntc)
+												////console.log("c_Cord:", C_cords)
 												tcCord=getNClosestCords(scn,C_cords,ntc,1);
-												//console.log("tscCord ::",tscCord)
+												////console.log("tscCord ::",tscCord)
 												
 												tcCord.forEach(function(c){
 												var i = indexOfItem(C_cords,c);
-												//console.log("index:",i)
+												////console.log("index:",i)
 												C_cords.splice(i,1);
 												})
-												//console.log("c_Cord after:", C_cords)
+												////console.log("c_Cord after:", C_cords)
 												totalcount=totalcount+tcCord.length;
-												//console.log("Count!!!!!",totalcount)
+												////console.log("Count!!!!!",totalcount)
 												idx_tc=0;
 													scn.children.forEach(function(tc,tcix){
-														//console.log("scnix:",tcix)
+														////console.log("scnix:",tcix)
 														if(tc.x==undefined){
 															tc.x=tcCord[idx_tc][0];
 															tc.y=tcCord[idx_tc][1];
@@ -460,22 +460,22 @@ mySPA.controller('neuronGraphs2DController', ['$scope', '$http', '$location', '$
 														}
 														if(tc.children && tc.children.length>0){
 															nscr=tc.children.length;
-															//console.log("n scr",nscr)
-															//console.log("c_Cord:", C_cords)
+															////console.log("n scr",nscr)
+															////console.log("c_Cord:", C_cords)
 															scrCord=getNClosestCords(tc,C_cords,nscr,1);
-															//console.log("scrCord ::",scrCord)
+															////console.log("scrCord ::",scrCord)
 															
 															scrCord.forEach(function(c){
 															var i = indexOfItem(C_cords,c);
-															//console.log("index:",i)
+															////console.log("index:",i)
 															C_cords.splice(i,1);
 															})
-															//console.log("c_Cord after:", C_cords)
+															////console.log("c_Cord after:", C_cords)
 															totalcount=totalcount+scrCord.length;
-															//console.log("Count!!!!!",totalcount)
+															////console.log("Count!!!!!",totalcount)
 															idx_scr=0;
 															tc.children.forEach(function(scr,scrix){
-																//console.log("scnix:",scrix)
+																////console.log("scnix:",scrix)
 																if(scr.x==undefined){
 																	scr.x=scrCord[idx_scr][0];
 																	scr.y=scrCord[idx_scr][1];
@@ -515,19 +515,19 @@ function indexOfItem(array, item) {
 			if(child.x!=undefined)
 				n=n-1;
 		})
-		//console.log("getNClosestCords!!!")
-		//console.log("Nobj: ",nObj)
-		//console.log("cords: ",cords)
-		//console.log("n: ",n)
+		////console.log("getNClosestCords!!!")
+		////console.log("Nobj: ",nObj)
+		////console.log("cords: ",cords)
+		////console.log("n: ",n)
 		var points = [];
 		for (i = 0; i < cords.length; i++) {
-			//console.log("cords In: ",cords)
+			////console.log("cords In: ",cords)
 			var point = cords[i];
-			//console.log("point[0]: ",point[0]);
+			////console.log("point[0]: ",point[0]);
 			point.len = distanceBetweenPoints([point[0],point[1],point[2]], [nObj.x,nObj.y,nObj.z]);
     		points.push(point);
 		}
-		//console.log("points before!! :",points);
+		////console.log("points before!! :",points);
 		//points.sort(function(a, b) {
     	//		return a.len > b.len;
 		//})
@@ -536,14 +536,14 @@ function indexOfItem(array, item) {
 		else
 			points.sort(function(a,b) {return (a.len < b.len) ? 1 : ((b.len < a.len) ? -1 : 0);} );
 
-		//console.log("points!! :",points);
-		//console.log("points sliced!! :",points.slice(0,n));
+		////console.log("points!! :",points);
+		////console.log("points sliced!! :",points.slice(0,n));
 		return points.slice(0,n);
 	}
 
     var distanceBetweenPoints = function(point1,point2){
-		//console.log('point1:',point1)
-		//console.log('point2:',point2)
+		////console.log('point1:',point1)
+		////console.log('point2:',point2)
 		var a = point1[0] - point2[0]
 		var b = point1[1] - point2[1]
 		var c = point1[2] - point2[2]
@@ -563,7 +563,7 @@ function indexOfItem(array, item) {
 	var baseSprite=document.createElement('img');
 
 	var nginit = function(n,l,level){
-		console.log('ng init')
+		//console.log('ng init')
 		canvDimm=getDimms('#ct-canvas');
 		camera=new THREE.PerspectiveCamera(70,canvDimm[0]/canvDimm[1],1,5000);
 		camera.position.z=1500;
@@ -582,7 +582,7 @@ function indexOfItem(array, item) {
 		window.addEventListener('mousewheel',test,false)
 	};
 	function test(){
-		console.log("scroll event");
+		//console.log("scroll event");
 	}
 
 	function render(){
@@ -651,10 +651,10 @@ function indexOfItem(array, item) {
 	};
 
 	var drawGraph = function(nodes,links,lvl){
-		console.log("drawGraph Executed! ")
-		console.log("Nodess:",nodes)
-		console.log("links:", links)
-		console.log('draw graph')
+		//console.log("drawGraph Executed! ")
+		//console.log("Nodess:",nodes)
+		//console.log("links:", links)
+		//console.log('draw graph')
 		var i,o
 		for(i=0;i<$scope.objects.length;i++){
 			o=$scope.objects[i];
@@ -735,15 +735,15 @@ function indexOfItem(array, item) {
 	};
 
 	var isDisplayed = function(el){
-		console.log('el======:',el);
+		//console.log('el======:',el);
 		if(d3.select(el)[0][0]==null) return false;
-		console.log('is displayed')
+		//console.log('is displayed')
 		var disp=d3.select(el).style('display');
 		if (disp.toLowerCase()=='none') return false;
 		else return true;
 	};
 	var makeDisplayed = function(el){
-		console.log('make displayed')
+		//console.log('make displayed')
 		var disp=d3.select(el).style('display','block');
 		if (disp.toLowerCase()=='none') return false;
 		else return true;
@@ -754,20 +754,20 @@ function indexOfItem(array, item) {
 		cord.y=nObj.y//*(levelrad[1+leveldict[nObj.type]]-levelrad[leveldict[nObj.type]]);
 		cord.z=nObj.z//*(levelrad[1+leveldict[nObj.type]]-levelrad[leveldict[nObj.type]]);
 		var rad = Math.sqrt((cord.x*cord.x)+(cord.y*cord.y)+(cord.z*cord.z));
-		console.log('rad: ',rad);
+		//console.log('rad: ',rad);
 		var tf = convertCartesianToSpherical(cord,rad);
-		console.log('tf: ',tf);
+		//console.log('tf: ',tf);
 		if(leveldict[nObj.type]<4){
 			var xyz = getGeoCoords(rad+(levelrad[1+leveldict[nObj.type]]-levelrad[leveldict[nObj.type]])+20,tf)
 		}
 		else{
 		var xyz = getGeoCoords(rad+25,tf)}
-		console.log('xyz: ',xyz);
+		//console.log('xyz: ',xyz);
 		cord.x = xyz[0]*50;
 		cord.y = xyz[1]*50;
 		cord.z = xyz[2]*50;
-		console.log('c1');		
-		console.log('cord:: ',cord);
+		//console.log('c1');		
+		//console.log('cord:: ',cord);
 		return cord;
 	};
 	function convertCartesianToSpherical(cord,radius)
@@ -785,14 +785,14 @@ function indexOfItem(array, item) {
 	var nodeClick = function(e){
 		if($('#actionImg_full').hasClass('sfhen')){
 			nodeClickFlag = true;
-			// console.log('nodes: ',$scope.nodes);
+			// //console.log('nodes: ',$scope.nodes);
 			if($('.allow-disp').length==0)
 				d3.selectAll('.node-nG').classed('node-nG-dimmed',true);
 			var recusive_traverse = function(nObj,lvl){
 				if(nObj.children){
 					d3.select('#node-'+nObj.id).classed('no-disp',false).classed('node-nG-dimmed',false);
 					nObj.children.forEach(function(ch,chi){
-						//console.log('oohhhhhhhhhhh:::',ch)
+						////console.log('oohhhhhhhhhhh:::',ch)
 						d3.select('#node-'+ch.id).classed('no-disp',false).classed('node-nG-dimmed',false);
 						d3.select("#link-1-"+nObj.id+"-"+ch.id).classed('allow-disp',true); 
 						d3.select("#link-2-"+nObj.id+"-"+ch.id).classed('allow-disp',true);
@@ -811,10 +811,10 @@ function indexOfItem(array, item) {
 				return;
 			//if($scope.tab=='actionTab') return;
 			nodeClickFlag = true;
-			console.log('e:',e);
-			//console.log(e.children)
+			//console.log('e:',e);
+			////console.log(e.children)
 			//to display children of selected node
-			console.log("camera position: ", camera.position)
+			//console.log("camera position: ", camera.position)
 			if(e.type!='Domain'){
 				var from = {
 					x: camera.position.x,
@@ -828,12 +828,12 @@ function indexOfItem(array, item) {
 				// 	z: e.z*120
 				// };
 				var to = getDestinationCord(e);
-				console.log('From: ',from,' To: ',to);
+				//console.log('From: ',from,' To: ',to);
 				var tween = new TWEEN.Tween(from)
 					.to(to, 700)
 					.easing(TWEEN.Easing.Circular.Out)
 					.onUpdate(function () {
-						//console.log('this:::: ', this)
+						////console.log('this:::: ', this)
 					camera.position.set(this._object.x, this._object.y, this._object.z);
 					camera.lookAt(new THREE.Vector3(0, 0, 0));
 				}).onComplete(function () {
@@ -844,7 +844,7 @@ function indexOfItem(array, item) {
 				//camera.updateProjectionMatrix();
 				//d3.select(e.children[0]).each(function(ch){d3.select(ch).classed('no-disp',false)})
 				
-				//console.log('nodeclick executed')
+				////console.log('nodeclick executed')
 				if (activeNode==this){
 					$('.closePopup').trigger('click');
 					clearHighlightNodes();
@@ -852,7 +852,7 @@ function indexOfItem(array, item) {
 				else{
 					activeNode=this;
 					var d=d3.select(this).datum();
-					console.log('highlight node:',d);
+					//console.log('highlight node:',d);
 					highlightNodes(d);
 					addInfo(d);
 					//$("a[title='Info']").trigger("click");
@@ -864,7 +864,7 @@ function indexOfItem(array, item) {
 
 
 	var addInfo = function(d){
-		//console.log('add info')
+		////console.log('add info')
 		attrArr="<strong>Group:</strong> "+d.type;
 		for (attrs in d.attributes){ attrArr+= "<br><strong>"+attrs+":</strong> "+d.attributes[attrs]; }
 		d3.select('#window-pi p.proj-info-wrap').html(attrArr);
@@ -872,26 +872,34 @@ function indexOfItem(array, item) {
 
 	var highlightNodes = function(d){
 		memoryarray = [];
-		//console.log('highlight nodes')
+		fadearray = [];
+		////console.log('highlight nodes')
 		if(!isDisplayed("#node-"+d.id)){
 			clearHighlightNodes();
 			return;
 		}
 //		var neighborArray = [d.id];
-//		console.log('node for neighbor: ',d)
+//		//console.log('node for neighbor: ',d)
 		//d3.select(d.children).ea
-//		console.log('neighbor array: ',neighborArray);
+//		//console.log('neighbor array: ',neighborArray);
 
         //$('.link-nG.allow-disp').removeClass('allow-disp');
         if($('.allow-disp').length==0){
 			$('.node-nG').addClass('node-nG-dimmed');
 		}
         
-		d3.select('#node-'+d.id).classed('node-nG-dimmed',false);
+		if($("#node-"+d.id).hasClass('node-nG-dimmed')){
+			d3.select('#node-'+d.id).classed('node-nG-dimmed',false);
+			fadearray.push("#node-"+d.id);
+		}		
+
 		
         d.parent.forEach(function(e){
 			if(!isDisplayed("#node-"+e.id)){
 				memoryarray.push("#node-"+e.id);
+			}
+			if($("#node-"+e.id).hasClass('node-nG-dimmed')){
+				fadearray.push("#node-"+e.id);
 			}
 		d3.select('#node-'+e.id).classed('no-disp',false).classed('node-nG-dimmed',false);			
 		d3.select("#link-1-"+e.id+"-"+d.id).classed('allow-disp',true); 
@@ -901,6 +909,10 @@ function indexOfItem(array, item) {
 			if(!isDisplayed("#node-"+e.id)){ 
 				memoryarray.push("#node-"+e.id);
 			}
+			if($("#node-"+e.id).hasClass('node-nG-dimmed')){
+				fadearray.push("#node-"+e.id);
+			}		
+				
 		d3.select('#node-'+e.id).classed('no-disp',false).classed('node-nG-dimmed',false);	
 		d3.select("#link-1-"+d.id+"-"+e.id).classed('allow-disp',true); 
 		d3.select("#link-2-"+d.id+"-"+e.id).classed('allow-disp',true)});
@@ -925,13 +937,19 @@ function indexOfItem(array, item) {
 
 
 	var clearHighlightNodes = function(){
-		//console.log('clear highlight nodes')
+		////console.log('clear highlight nodes')
 		
 		memoryarray.forEach(function(element) {
-			console.log("Elemmmm:",element);
+			//console.log("Elemmmm:",element);
 			$(element).addClass('no-disp');
+			$('[id*="'+element.split('-')[1]+'"]').removeClass('allow-disp');
 		});
-		$('[id*="'+activeNode.id.split('-')[1]+'"]').removeClass('allow-disp');
+		fadearray.forEach(function(element) {
+			//console.log("Elemmmm:",element);
+			$(element).addClass('node-nG-dimmed');
+			$('[id*="'+element.split('-')[1]+'"]').removeClass('allow-disp');
+		});		
+		//$('[id*="'+activeNode.id.split('-')[1]+'"]').removeClass('allow-disp');
 		activeNode=undefined;
 		//$('.link-nG.allow-disp').removeClass('allow-disp');
 		if($('.allow-disp').length==0)
@@ -951,7 +969,7 @@ function indexOfItem(array, item) {
 		if($('.allow-disp').length>0)
 			$(this).attr('title',e.type+': '+e.name);
 		else{
-		//console.log("nodeHover executed!")
+		////console.log("nodeHover executed!")
 //		activeNode=this;
 		nodeClickFlag = false;
 		$(this).css('height','90px');
@@ -971,7 +989,7 @@ function indexOfItem(array, item) {
 	var nodeHoverOut = function(e){
 //		clearHighlightNodes();
 //		return;
-		//console.log('flag: ',nodeClickFlag);
+		////console.log('flag: ',nodeClickFlag);
 		$('.closePopup').trigger('click');
 		$(this).css('height','64px');
 		if(!nodeClickFlag){
@@ -983,12 +1001,12 @@ function indexOfItem(array, item) {
 
 	$scope.lockSuite = function(e){
 		//$(".selectBrowser").find("img").removeClass("sb");
-		//console.log('activeNode: ',activeNode);
-		//console.log('activeNode: ',d3.select(activeNode));
-//		console.log('activeNode: ',d3.select(activeNode).attr('class').indexOf('node-TestSuite')!==-1);
+		////console.log('activeNode: ',activeNode);
+		////console.log('activeNode: ',d3.select(activeNode));
+//		//console.log('activeNode: ',d3.select(activeNode).attr('class').indexOf('node-TestSuite')!==-1);
 	if(activeNode!=undefined && d3.select(activeNode).attr('class').indexOf('node-TestSuite')!==-1){
 			openDialog('Suite to Execute','Suite locked for execution');
-			console.log('activeNode: ',activeNode)
+			//console.log('activeNode: ',activeNode)
 			globalobj['lockedSuite'] = activeNode;
 		}
 		else
@@ -996,13 +1014,13 @@ function indexOfItem(array, item) {
 	};
 	var buildExecutionGraph = function(){
 		d3.selectAll(".link-nG").classed('allow-disp',false);
-		//console.log('Hi');
+		////console.log('Hi');
 		d3.selectAll(".node-nG").classed('no-disp',true).classed('node-nG-dimmed',false);
 		d3.select(globalobj['lockedSuite']).classed('no-disp',false);
 		d3.select('#actionImg_full').classed('sfhen',true);
 		$(globalobj['lockedSuite']).trigger('click');
-		//console.log('rootIndex:', d3.select(lockedSuite).data()[0].idx);
-		//console.log('rootIndex:', d3.select(lockedSuite).attr('idx'));
+		////console.log('rootIndex:', d3.select(lockedSuite).data()[0].idx);
+		////console.log('rootIndex:', d3.select(lockedSuite).attr('idx'));
 		d3.select('#actionImg_full').classed('sfhen',false);
 		//d3.selectAll(".link-nG").classed('allow-disp',false);
 		//$scope.exec_nodes = [];
@@ -1010,13 +1028,13 @@ function indexOfItem(array, item) {
 /*
 		//add dependent nodes to scope exec
 		var tc_list=d3.selectAll('.node-TestCase').filter(function(){return !d3.select(this).classed('no-disp')}).data();
-		//console.log('TC LIST>>>>>>:::',tc_list)
+		////console.log('TC LIST>>>>>>:::',tc_list)
 		var add_parent_dependencies = function(nObj,lvl){
-			//console.log('Hi')
-			//console.log("^^^^parent:",nObj)
+			////console.log('Hi')
+			////console.log("^^^^parent:",nObj)
 			if(nObj.parent){
 				nObj.parent.forEach(function(ch,chi){
-					//console.log('>>>>>>:::',ch)
+					////console.log('>>>>>>:::',ch)
 					r=30;
 					tf=[Math.random()*2*PI,Math.random()*2*PI];
 					xyz=getGeoCoords(r,tf)
@@ -1035,8 +1053,8 @@ function indexOfItem(array, item) {
 */
 
 		var lockedSuiteObj=d3.select(globalobj['lockedSuite']).datum();
-		console.log("lockedSuite:",globalobj['lockedSuite'])
-		console.log("Idx:::",d3.select(globalobj['lockedSuite']).data()[0].idx)
+		//console.log("lockedSuite:",globalobj['lockedSuite'])
+		//console.log("Idx:::",d3.select(globalobj['lockedSuite']).data()[0].idx)
 
 	};
 
@@ -1050,14 +1068,14 @@ function indexOfItem(array, item) {
 		"NG":"true"
 		}]
 	var lockedSuiteObj=d3.select(globalobj['lockedSuite']).data();
-	//console.log(">>>>>>>>>>>lockedSuite:",lockedSuiteObj)
+	////console.log(">>>>>>>>>>>lockedSuite:",lockedSuiteObj)
 	
 	//res =$.grep($scope.exec_nodes, function(e){ return e.type == "TestSuite"; });
 	jsondata11[0].testsuitename = lockedSuiteObj[0].name;
 	jsondata11[0].testsuiteid = lockedSuiteObj[0].attributes.testSuiteid;
 	//jsondata[0].suiteDetails[0].scenarioids = [];
 	globalobj['testscenario_ids']=lockedSuiteObj[0].attributes.testScenarioids;
-	//console.log('lockedSuiteObj[0].attributes.testScenarioids',)
+	////console.log('lockedSuiteObj[0].attributes.testScenarioids',)
 	var i = 0;
 
 	for(var k = 0; k < lockedSuiteObj[0].attributes.testScenarioids.length; k++){
@@ -1076,15 +1094,15 @@ function indexOfItem(array, item) {
 		jsondata11[0].suiteDetails.push(part1);
 	}
 	globalobj['jsondata']=jsondata11;
-	//console.log('\n\n------------json data------------\n\n',JSON.stringify(globalobj['jsondata']));
-	console.log('\n\n------------json data 11------------\n\n',JSON.stringify(jsondata11));
+	////console.log('\n\n------------json data------------\n\n',JSON.stringify(globalobj['jsondata']));
+	//console.log('\n\n------------json data 11------------\n\n',JSON.stringify(jsondata11));
 	return jsondata11;
 	}
 
 
 	$scope.execute = function(browserNum){
-		//console.log('hi');
-		//console.log('jsondata: ', globalobj['jsondata']);
+		////console.log('hi');
+		////console.log('jsondata: ', globalobj['jsondata']);
 		globalobj['jsondata'][0].browserType = [String(browserNum)]
 		if($("#ct-expand-left").hasClass('ct-rev'))
 			$("#ct-expand-left").trigger("click");
@@ -1106,14 +1124,14 @@ function indexOfItem(array, item) {
 		} else {
 			openDialog("Success","execution successful")
 			globalobj['module_id'] = globalobj['jsondata'][0].testsuiteid
-			//console.log("MID before:",globalobj['module_id'])
+			////console.log("MID before:",globalobj['module_id'])
 
-			console.log('DATAAAAAAAA::: ',data)
+			//console.log('DATAAAAAAAA::: ',data)
 			for (a in data.TCS){
 						if(data.TCS[a]=='Fail' || data.TCS[a]=='fail')
 							globalobj['failed_tc_list'].push(b)
 			}
-			console.log("%%%%Failed tc list%%%\n",globalobj['failed_tc_list'])			
+			//console.log("%%%%Failed tc list%%%\n",globalobj['failed_tc_list'])			
 		}
 
 		unblockUI()
@@ -1122,7 +1140,7 @@ function indexOfItem(array, item) {
 		if(!$("#ct-expand-right").hasClass('ct-rev'))
 			$("#ct-expand-right").trigger("click");		
 		//globalobj['jsondata'] = [];
-		//console.log("MID after:",globalobj['module_id'])
+		////console.log("MID after:",globalobj['module_id'])
 	},
 		function(error) {
 			unblockUI()
@@ -1141,10 +1159,10 @@ function indexOfItem(array, item) {
 	// 			return false;
 	// 		}
 	// 		else{
-	// 			console.log('data recieved successfully! ::',data);
+	// 			//console.log('data recieved successfully! ::',data);
 	// 			globalobj['nodeStatusdata']=data;
-	// 			//console.log("&&&&Testscenarioids&&&&\n",testscenarioids)
-	// 			//console.log("&&&&data&&&&\n",globalobj['nodeStatusdata'])
+	// 			////console.log("&&&&Testscenarioids&&&&\n",testscenarioids)
+	// 			////console.log("&&&&data&&&&\n",globalobj['nodeStatusdata'])
 	// 			for (a in globalobj['nodeStatusdata']){
 	// 				if(a!='rows' || a!='undefined'){
 	// 					for(b in globalobj['nodeStatusdata'][a]){
@@ -1154,7 +1172,7 @@ function indexOfItem(array, item) {
 	// 				}
 
 	// 			}
-	// 			console.log("%%%%Failed tc list%%%\n",globalobj['failed_tc_list'])
+	// 			//console.log("%%%%Failed tc list%%%\n",globalobj['failed_tc_list'])
 
 
 	// 	//For each failed testcase, add a class to indicate failed!!
@@ -1164,15 +1182,15 @@ function indexOfItem(array, item) {
 	// 				var selected_node = $scope.nodes.filter(function( obj ) {
 	// 									return obj.name == tc_name;
 	// 									});
-	// 				//console.log("++++++selected_node:",selected_node)
+	// 				////console.log("++++++selected_node:",selected_node)
 	// 				d3.select('#node-'+selected_node[0].id).classed('node-nG-dimmed',false)
 	// 			})
 	// 			var up_traverse = function(nObj,lvl){
-	// 				//console.log('Hi')
-	// 				//console.log("^^^^parent:",nObj)
+	// 				////console.log('Hi')
+	// 				////console.log("^^^^parent:",nObj)
 	// 				if(nObj.parent){
 	// 					nObj.parent.forEach(function(ch,chi){
-	// 						//console.log('oohhhhhhhhhhh:::',ch)
+	// 						////console.log('oohhhhhhhhhhh:::',ch)
 	// 						d3.select('#node-'+ch.id).classed('node-nG-dimmed',false);
 	// 						up_traverse(ch,lvl+1)
 	// 					});
@@ -1192,8 +1210,8 @@ function indexOfItem(array, item) {
 	// }
 
 	var getReportData1 = function() {
-	    //console.log("&&&&Testscenarioids&&&&\n",testscenarioids)
-	    //console.log("&&&&data&&&&\n",globalobj['nodeStatusdata'])
+	    ////console.log("&&&&Testscenarioids&&&&\n",testscenarioids)
+	    ////console.log("&&&&data&&&&\n",globalobj['nodeStatusdata'])
 	    //For each failed testcase, add a class to indicate failed!!
 	    clearHighlightNodes();
 	    d3.selectAll('.node-nG').classed('node-nG-dimmed', true)
@@ -1201,15 +1219,15 @@ function indexOfItem(array, item) {
 	        var selected_node = $scope.nodes.filter(function(obj) {
 	            return obj.name == tc_name;
 	        });
-	        //console.log("++++++selected_node:",selected_node)
+	        ////console.log("++++++selected_node:",selected_node)
 	        d3.select('#node-' + selected_node[0].id).classed('node-nG-dimmed', false)
 	    })
 	    var up_traverse = function(nObj, lvl) {
-	        //console.log('Hi')
-	        //console.log("^^^^parent:",nObj)
+	        ////console.log('Hi')
+	        ////console.log("^^^^parent:",nObj)
 	        if (nObj.parent) {
 	            nObj.parent.forEach(function(ch, chi) {
-	                //console.log('oohhhhhhhhhhh:::',ch)
+	                ////console.log('oohhhhhhhhhhh:::',ch)
 	                d3.select('#node-' + ch.id).classed('node-nG-dimmed', false);
 	                up_traverse(ch, lvl + 1)
 	            });
@@ -1232,8 +1250,8 @@ function indexOfItem(array, item) {
 
 
 	// $scope.history = function(){
-	// //			console.log("jsondata[0]:::::::", globalobj['jsondata'][0])
-	// 			console.log("@@@@moduleId:",d3.select(globalobj['lockedSuite']).datum().attributes.testSuiteid)
+	// //			//console.log("jsondata[0]:::::::", globalobj['jsondata'][0])
+	// 			//console.log("@@@@moduleId:",d3.select(globalobj['lockedSuite']).datum().attributes.testSuiteid)
 	// 	reportService.getSuiteDetailsInExecution_ICE(d3.select(globalobj['lockedSuite']).datum().attributes.testSuiteid).then(function(data) {
 	// 			if (data == "Invalid Session") {
 	// 				window.location.href = "/";
@@ -1245,7 +1263,7 @@ function indexOfItem(array, item) {
 	// 						//tableContainer.find('tbody').empty();
 	// 						var startDat, startTym, executionid_tmp;
 	// 						for (i = 0; i < data.length; i++) {
-	// 							//console.log("^^^^^data: ",data[i])
+	// 							////console.log("^^^^^data: ",data[i])
 	// 							executionid_tmp = data[i].execution_id;
 	// 							startDat = (data[i].start_time.split(' ')[0]).split("-")
 	// 							startTym = (data[i].start_time.split(' ')[1]).split(":")
@@ -1253,20 +1271,20 @@ function indexOfItem(array, item) {
 	// 							if (mydate > tempdate) {
 	// 								tempdate = mydate
 	// 								globalobj['executionid'] = executionid_tmp;
-	// 								console.log('modified!');
+	// 								//console.log('modified!');
 	// 								//testscenarioids.push(data[i].testscenarioids)
 	// 							}
 
 	// 						}
-	// 						console.log('latest execution on :::', tempdate, 'execution_id:', globalobj['executionid'])
+	// 						//console.log('latest execution on :::', tempdate, 'execution_id:', globalobj['executionid'])
 	// 						getReportData(d3.select(globalobj['lockedSuite']).datum().attributes.testSuiteid, globalobj['executionid'], globalobj['testscenario_ids']);
-	// 						console.log('getReportData executed')
+	// 						//console.log('getReportData executed')
 	// 					}
 	// 				}
-	// 			} else console.log("Unable to load Test suite details in execution.")
+	// 			} else //console.log("Unable to load Test suite details in execution.")
 	// 		},
 	// 		function(error) {
-	// 			console.log("Error-------" + error);
+	// 			//console.log("Error-------" + error);
 	// 		})
 	// }
 
@@ -1278,8 +1296,8 @@ function indexOfItem(array, item) {
 	$scope.history = function(){
 		openDialog('Error','Results view is currently disabled!');
 		/* History when response is changed!!
-	//	console.log("jsondata[0]:::::::", globalobj['jsondata'][0])
-		//console.log("@@@@moduleId:",d3.select(globalobj['lockedSuite']).datum().attributes.testSuiteid)
+	//	//console.log("jsondata[0]:::::::", globalobj['jsondata'][0])
+		////console.log("@@@@moduleId:",d3.select(globalobj['lockedSuite']).datum().attributes.testSuiteid)
 		reportService.getSuiteDetailsInExecution_ICE(d3.select(globalobj['lockedSuite']).datum().attributes.testSuiteid).then(function(data) {
 				if (data == "Invalid Session") {
 					window.location.href = "/";
@@ -1291,7 +1309,7 @@ function indexOfItem(array, item) {
 							//tableContainer.find('tbody').empty();
 							var startDat, startTym, executionid_tmp;
 							for (i = 0; i < data.length; i++) {
-								//console.log("^^^^^data: ",data[i])
+								////console.log("^^^^^data: ",data[i])
 								executionid_tmp = data[i].execution_id;
 								startDat = (data[i].start_time.split(' ')[0]).split("-")
 								startTym = (data[i].start_time.split(' ')[1]).split(":")
@@ -1299,21 +1317,21 @@ function indexOfItem(array, item) {
 								if (mydate > tempdate) {
 									tempdate = mydate
 									globalobj['executionid'] = executionid_tmp;
-									console.log('modified!');
+									//console.log('modified!');
 									//testscenarioids.push(data[i].testscenarioids)
 								}
 
 							}
-							console.log('latest execution on :::', tempdate, 'execution_id:', globalobj['executionid'])
+							//console.log('latest execution on :::', tempdate, 'execution_id:', globalobj['executionid'])
 							//getReportData(d3.select(globalobj['lockedSuite']).datum().attributes.testSuiteid, globalobj['executionid'], globalobj['testscenario_ids']);
 							getReportData1();
-							console.log('getReportData executed')
+							//console.log('getReportData executed')
 						}
 					}
-				} else console.log("Unable to load Test suite details in execution.")
+				} else //console.log("Unable to load Test suite details in execution.")
 			},
 			function(error) {
-				console.log("Error-------" + error);
+				//console.log("Error-------" + error);
 			})  
 			*/
 	}
