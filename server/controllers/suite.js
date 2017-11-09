@@ -433,7 +433,8 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 		var executionRequest = {
 			"executionId": "",
 			"suitedetails": [],
-			"testsuiteIds": []
+			"testsuiteIds": [],
+			"apptype": ""
 		};
 		var executionId = uuid();
 		var starttime = new Date().getTime();
@@ -463,6 +464,7 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 			var testsuitename = eachbatchExecutionData.testsuitename;
 			var testsuiteid = eachbatchExecutionData.testsuiteid;
 			var browserType = eachbatchExecutionData.browserType;
+			var apptype = eachbatchExecutionData.appType;
 			var listofscenarioandtestcases = [];
 			var scenarioIdList = [];
 			var dataparamlist = [];
@@ -515,16 +517,17 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 					executionjson.testsuitename = testsuitename;
 					testsuitedetailslist.push(executionjson);
 					if (testsuitedetailslist.length == batchExecutionData.length) {
-						excutionObjectBuilding(testsuitedetailslist);
+						excutionObjectBuilding(testsuitedetailslist,apptype);
 					}
 				}
 			});
 		});
 
-		function excutionObjectBuilding(testsuitedetailslist) {
+		function excutionObjectBuilding(testsuitedetailslist,apptype) {
 			executionRequest.executionId = executionId;
 			executionRequest.suitedetails = testsuitedetailslist;
 			executionRequest.testsuiteIds = testsuiteIds;
+			executionRequest.apptype = apptype;
 		}
 
 		function executionFunction(executionRequest) {

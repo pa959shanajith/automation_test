@@ -372,6 +372,7 @@ if (cluster.isMaster) {
     app.post('/getDetails_ICE', admin.getDetails_ICE);
     app.post('/assignProjects_ICE', admin.assignProjects_ICE);
     app.post('/getAssignedProjects_ICE', admin.getAssignedProjects_ICE);
+	app.post('/getAvailablePlugins', admin.getAvailablePlugins);
     //Design Screen Routes
     app.post('/initScraping_ICE', design.initScraping_ICE);
     app.post('/highlightScrapElement_ICE', design.highlightScrapElement_ICE);
@@ -492,6 +493,7 @@ if (cluster.isMaster) {
         var ip = socket.request.connection.remoteAddress || socket.request.headers['x-forwarded-for'];
         console.log("Normal Mode Enabled for  IP :",ip);
         var address=socket.handshake.query['username'];
+		var icesession=socket.handshake.query['icesession'];
         console.log("socket connecting address" , address);
         console.log('Param ',socket.handshake.query['username']);
         //console.log("middleware:", socket.request._query['check']);
@@ -516,15 +518,36 @@ if (cluster.isMaster) {
         }
         else{
           isUISocketRequest = false;
-          if (!(address in socketMap)) {
-              socketMap[address] = socket;
-              socket.send('connected');
-              socket.emit('update_screenshot_path',screenShotPath);
-          }else{
-              socket.send('connectionExists');
-          }
+          var inputs = {
+			"icesession": icesession,
+			"query":'connect'
+		  };
+		  var args = {
+			data: inputs,
+			headers: {
+				"Content-Type": "application/json"
+			}
+		  };
+		  apiclient.post("http://127.0.0.1:1990/server/updateActiveIceSessions", args,
+			function (result, response) {
+				if (response.statusCode != 200) {
+					console.log("Error in connecting ndac")
+				}
+				else{
+					socket.send('checkConnection',result['ice_check']);
+					if(result['node_check']){
+						if (!(address in socketMap)) {
+							socketMap[address] = socket;
+							socket.send('connected');
+							socket.emit('update_screenshot_path',screenShotPath);
+						}
+						else{
+							socket.send('connectionExists');
+						}
+					}
+				}
+		  });
         }
-
         module.exports.allSocketsMap = socketMap;
         module.exports.allSocketsMapUI = socketMapUI;
         module.exports.allSchedulingSocketsMap=sokcetMapScheduling;
@@ -556,11 +579,14 @@ if (cluster.isMaster) {
         socket.on('disconnect', function() {
             var ip = socket.request.connection.remoteAddress || socket.request.headers['x-forwarded-for'];
             console.log("disconnect IP:",ip);
-          if (socket.request._query['check'] == "true" ) {
-            //var address = socket.request.connection.remoteAddress || socket.request.headers['x-forwarded-for'];
-            var address=socket.handshake.query['username'];
-            console.log("\n\n Disconnecting ... from UI socket " , address);
-          }else{
+		if (socket.request._query['check'] == "true" ) {
+			//var address = socket.request.connection.remoteAddress || socket.request.headers['x-forwarded-for'];
+			var address=socket.handshake.query['username'];
+			console.log("\n\n Disconnecting ... from UI socket " , address);
+		} else if(socket.request._query['check'] == "notify" ){
+			var address=socket.handshake.query['username'];
+			//logger.info("Disconnecting from Notification socket:" , address);  
+		} else{
             //var i = socketMap.indexOf(socket);
             var address=socket.handshake.query['username'];
             if (socketMap[address] != undefined) {
@@ -577,6 +603,22 @@ if (cluster.isMaster) {
                 //console.log("------------------------SOCKET DISCONNECTED----------------------------------------");
                 console.log("NO. OF CLIENTS CONNECTED:", Object.keys(sokcetMapScheduling).length,'\nIP\'s connected :',Object.keys(sokcetMapScheduling).join());
             }
+			var inputs = {
+				"username": address,
+				"query":'disconnect'
+			};
+			var args = {
+				data: inputs,
+				headers: {
+					"Content-Type": "application/json"
+				}
+			};
+			apiclient.post("http://127.0.0.1:1990/server/updateActiveIceSessions", args,
+				function (result, response) {
+					if (response.statusCode != 200 || result.rows == "fail") {
+						console.log("Error in NDAC: updateActiveIceSessions");
+					}
+			});
           }
         });
 

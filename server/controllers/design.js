@@ -1572,6 +1572,7 @@ exports.debugTestCase_ICE = function (req, res) {
 						try {
 							var requestedbrowsertypes = req.body.browsertypes;
 							var requestedtestcaseids = req.body.testcaseids;
+							var apptype = req.body.apptype;
 							var responsedata = [];
 							var counter = -1;
 							var browsertypeobject = {
@@ -1605,10 +1606,12 @@ exports.debugTestCase_ICE = function (req, res) {
 												var responseobject = {
 													template: "",
 													testcasename: "",
-													testcase: []
+													testcase: [],
+													apptype: ""
 												};
 												responseobject.testcase = eachTestcaseData.testcasesteps;
 												responseobject.testcasename = eachTestcaseData.testcasename;
+												responseobject.apptype = apptype;
 												responsedata.push(responseobject);
 												responsedata.push(browsertypeobject);
 												var inputs = {

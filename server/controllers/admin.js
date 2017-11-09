@@ -1980,3 +1980,29 @@ exports.getAssignedProjects_ICE = function (req, res) {
 		res.send("fail");
 	}
 };
+
+exports.getAvailablePlugins = function (req, res) {
+	try {
+		var plugins_list = [];
+		if (req.cookies['connect.sid'] != undefined) {
+			var sessionCookie = req.cookies['connect.sid'].split(".");
+			var sessionToken = sessionCookie[0].split(":");
+			sessionToken = sessionToken[1];
+		}
+		if (sessionToken != undefined && req.session.id == sessionToken) {
+			client.post(epurl + "admin/getAvailablePlugins",
+				function (result, response) {
+				if (response.statusCode != 200 || result.rows == "fail") {
+					res.send("fail");
+				} else {
+					res.send(result.rows);
+				}
+			});
+		} else {
+			res.send("Invalid Session");
+		}
+	} catch (exception) {
+		console.log(exception);
+		res.send("fail");
+	}
+};
