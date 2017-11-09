@@ -383,20 +383,19 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 			else {
 				$("#selDomain").val(data[0].domainName);
 				domainId = data[0].domainId;
-				var html = '';
-				var imgname = '';
+				var details = {
+					"web":{"data":"Web","title":"Web","img":"web"},
+					"webservice":{"data":"WebService","title":"Web Service","img":"webservice"},
+					"mainframe":{"data":"Mainframe","title":"Mainframe","img":"mainframe"},
+					"desktop":{"data":"Desktop","title":"Desktop Apps","img":"desktop"},
+					"oebs":{"data":"DesktopJava","title":"Oracle Apps","img":"oracleApps"},
+					"mobileapp":{"data":"MobileApp","title":"Mobile Apps","img":"mobileApps"},
+					"mobileweb":{"data":"MobileWeb","title":"Mobile Web","img":"mobileWeb"},
+					"sap":{"data":"SAP","title":"SAP Apps","img":"sapApps"}
+				};
 				$(".appTypesContainer").empty();
 				for(var i = 0; i < plugins.length; i++){
-					imgname = plugins[i].toLowerCase();
-					if(plugins[i]=="DesktopJava")
-						imgname = 'oracleApps';
-					else if(plugins[i]=="MobileApp")
-						imgname = 'mobileApps';
-					else if(plugins[i]=="SAP")
-						imgname = 'sapApps';
-					else if(plugins[i]=="MobileWeb")
-						imgname = 'mobileWeb';
-					html = '<div class="projectTypes_create" data-app="'+plugins[i]+'" title="'+plugins[i]+'"><img src="imgs/'+imgname+'.png" alt="'+plugins[i]+'" /><label>'+plugins[i]+'</label></div>';
+					html = '<div class="projectTypes_create" data-app="'+details[plugins[i]]['data']+'" title="'+details[plugins[i]]['title']+'"><img src="imgs/'+details[plugins[i]]['img']+'.png" alt="'+details[plugins[i]]['title']+'" /><label>'+details[plugins[i]]['title']+'</label></div>';
 					$(".appTypesContainer").append(html);
 				}
 			}
@@ -1856,8 +1855,6 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 		var plugins = [];
 		adminServices.getAvailablePlugins()
 		.then(function (plugins_list) {
-			console.log(plugins_list);
-			console.log("\n\n");
 			for(var i = 0; i < plugins_list.length; i++){
 				plugins[i] = plugins_list[i]
 			}
@@ -1866,8 +1863,8 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 		adminServices.getDomains_ICE()
 		.then(function (data) {
 			if(data == "Invalid Session"){
-							  window.location.href = "/";
-							}
+			  window.location.href = "/";
+			}
 			else {				
 				domainId = data[0].domainId;
 				$("#selDomainEdit").val(data[0].domainName);
@@ -1882,20 +1879,19 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 				//console.log("Domain", domains);
 				//var requestedids = domains.push(domainId);
 				var idtype=["domaindetails"];
-				var html = '';
-				var imgname = '';
+				var details = {
+					"web":{"data":"Web","title":"Web","img":"web"},
+					"webservice":{"data":"WebService","title":"Web Service","img":"webservice"},
+					"mainframe":{"data":"Mainframe","title":"Mainframe","img":"mainframe"},
+					"desktop":{"data":"Desktop","title":"Desktop Apps","img":"desktop"},
+					"oebs":{"data":"DesktopJava","title":"Oracle Apps","img":"oracleApps"},
+					"mobileapp":{"data":"MobileApp","title":"Mobile Apps","img":"mobileApps"},
+					"mobileweb":{"data":"MobileWeb","title":"Mobile Web","img":"mobileWeb"},
+					"sap":{"data":"SAP","title":"SAP Apps","img":"sapApps"}
+				};
 				$(".appTypesContainer").empty();
 				for(var i = 0; i < plugins.length; i++){
-					imgname = plugins[i].toLowerCase();
-					if(plugins[i]=="DesktopJava")
-						imgname = 'oracleApps';
-					else if(plugins[i]=="MobileApp")
-						imgname = 'mobileApps';
-					else if(plugins[i]=="SAP")
-						imgname = 'sapApps';
-					else if(plugins[i]=="MobileWeb")
-						imgname = 'mobileWeb';
-					html = '<div class="projectTypes_create" data-app="'+plugins[i]+'" title="'+plugins[i]+'"><img src="imgs/'+imgname+'.png" alt="'+plugins[i]+'" /><label>'+plugins[i]+'</label></div>';
+					html = '<div class="projectTypes" data-app="'+details[plugins[i]]['data']+'" title="'+details[plugins[i]]['title']+'"><img src="imgs/'+details[plugins[i]]['img']+'.png" alt="'+details[plugins[i]]['title']+'" /><label>'+details[plugins[i]]['title']+'</label></div>';
 					$(".appTypesContainer").append(html);
 				}
 				adminServices.getDetails_ICE(idtype,requestedids)
