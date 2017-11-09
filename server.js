@@ -10,7 +10,7 @@ var util = require('util');
 var expressWinston = require('express-winston');
 var winston = require('winston');
 var notificationMsg = require('./server/notifications/notifyMessages.js');
-
+var epurl="http://127.0.0.1:1990/";
 var  logger = require('./logger');
 
 if (cluster.isMaster) {
@@ -126,16 +126,14 @@ if (cluster.isMaster) {
            {
                 var updateinp = {roleid:req.session.defaultRoleId,servicename:req.url.replace("/","")}
                 var args = { data:updateinp,headers:{"Content-Type" : "application/json"}}
-                apiclient.post("http://127.0.0.1:1990/"+"utility/userAccess_Nineteen68",args,
-                                function (result, response) {
+                apiclient.post(epurl+"utility/userAccess_Nineteen68",args,
+                                     function (result, response) {
                     if(response.statusCode != 200 || result.rows == "fail"){
                         logger.error("Error occured in userAccess_Nineteen68");
                         res.send("Invalid Session");
                     }else{
                         if(result.rows == "True"){
                        // logger.info("User " + req.session.username + " authenticated");
-				       
-                          
                                  logger.rewriters.push(function(level, msg, meta) {
                                        if(req.session != undefined)
                                             {
@@ -149,9 +147,6 @@ if (cluster.isMaster) {
                                             return meta;
                                     }
                                     });
-                            
-                          
-						
                             return next();
                         }else{
                           
@@ -250,7 +245,7 @@ if (cluster.isMaster) {
     });
 
     function sessionCheck(req, res, roles) {
-        logger.info("Inside sessioncheck for URL : ", req.url);
+        logger.info("Inside sessioncheck for URL : %s", req.url);
        // logger.info("User " + req.session.username + " authenticated");
                 // if(req.session.username != undefined && req.session.userid != undefined)
                 // {
@@ -352,7 +347,7 @@ if (cluster.isMaster) {
             //console.log('===== Killed jsreport server =====',data);
             cmd.get('node index.js', function(data, err, stderr){
               if (!err) {
-                logger.debug('the node-cmd:',data);
+                logger.debug('the node-cmd: %s',data);
               } else {
                 logger.error("Cannot start Jsreport server");
               }
@@ -542,10 +537,10 @@ if (cluster.isMaster) {
     var isUISocketRequest = false;
 
         io.on('connection', function(socket) {
-         logger.info("Inside Socket connection");
+        logger.info("Inside Socket connection");
         // console.log("-------------------------------------------------------------------------------------------------------");
         var ip = socket.request.connection.remoteAddress || socket.request.headers['x-forwarded-for'];
-        logger.info("Normal Mode Enabled for  IP :", ip);
+        logger.info("Normal Mode Enabled for  IP : %s", ip);
         var address=socket.handshake.query['username'];
          logger.info("Socket connecting address" , address);
          logger.info('Param ',socket.handshake.query['username']);
@@ -619,18 +614,18 @@ if (cluster.isMaster) {
               logger.info("Inside Socket UI disconnection");
             //var address = socket.request.connection.remoteAddress || socket.request.headers['x-forwarded-for'];
             var address=socket.handshake.query['username'];
-              logger.info("Disconnecting from UI socket:" , address);
+              logger.info("Disconnecting from UI socket: %s" , address);
           }
         else if(socket.request._query['check'] == "notify" ){
             var address=socket.handshake.query['username'];
-            logger.info("Disconnecting from Notification socket:" , address);  
+            logger.info("Disconnecting from Notification socket: %s" , address);  
         } 
         else{
             //var i = socketMap.indexOf(socket);
             logger.info("Inside ICE Socket disconnection");
             var address=socket.handshake.query['username'];
             if (socketMap[address] != undefined) {
-                 logger.info('Disconnecting from ICE socket :', address);
+                 logger.info('Disconnecting from ICE socket : %s', address);
                 delete socketMap[address];
                 module.exports.allSocketsMap = socketMap;
                 //console.log("------------------------SOCKET DISCONNECTED----------------------------------------");
@@ -638,7 +633,7 @@ if (cluster.isMaster) {
                 logger.info("IP\'s connected : %s", Object.keys(socketMap).join());
             }
             else if (sokcetMapScheduling[address] != undefined) {
-                  logger.info('Disconnecting from Scheduling socket :', address);
+                  logger.info('Disconnecting from Scheduling socket : %s', address);
                 delete sokcetMapScheduling[address];
                 module.exports.allSchedulingSocketsMap = sokcetMapScheduling;
                 //console.log("------------------------SOCKET DISCONNECTED----------------------------------------");
@@ -652,11 +647,11 @@ if (cluster.isMaster) {
                logger.info("Inside Socket reconnect");
              logger.info("Reconnecting for scheduling socket");
            var ip = socket.request.connection.remoteAddress || socket.request.headers['x-forwarded-for'];
-             logger.info("Scheduling Mode Enabled for  IP:", ip);
+             logger.info("Scheduling Mode Enabled for  IP: %s", ip);
            var address=socket.handshake.query['username'];
            console.log(data);
             if (data && socketMap[address] != undefined) {
-                  logger.info('Disconnecting socket connection for Normal Mode(ICE Socket) :', address);
+                  logger.info('Disconnecting socket connection for Normal Mode(ICE Socket) : %s', address);
                 delete socketMap[address];
                 module.exports.allSocketsMap = socketMap;
                    logger.info("NO. OF CLIENTS CONNECTED: %d", Object.keys(socketMap).length);
@@ -667,7 +662,7 @@ if (cluster.isMaster) {
                 logger.info("NO. OF CLIENTS CONNECTED: %d", Object.keys(sokcetMapScheduling).length);
                 logger.info("IP\'s connected :' %s", Object.keys(sokcetMapScheduling).join());
             }else if(!data && sokcetMapScheduling!=undefined){
-                  logger.info('Disconnecting socket connection for Scheduling mode:', address);
+                  logger.info('Disconnecting socket connection for Scheduling mode: %s', address);
                 delete sokcetMapScheduling[address];
                 module.exports.allSchedulingSocketsMap = sokcetMapScheduling;
                   logger.info("NO. OF CLIENTS CONNECTED: %d", Object.keys(sokcetMapScheduling).length);

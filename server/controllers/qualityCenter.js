@@ -26,7 +26,7 @@ exports.loginQCServer_ICE = function (req, res) {
 			var name = req.session.username;
 			//console.log(Object.keys(myserver.allSocketsMap),"<<all people, asking person:",name);
 			logger.info("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
-			logger.info("ICE Socket requesting Address: " , name);
+			logger.info("ICE Socket requesting Address: %s" , name);
             check_qcUrl = validator.isEmpty(req.body.qcURL);
             if(check_qcUrl == false)
             {
@@ -104,7 +104,7 @@ exports.qcProjectDetails_ICE = function (req, res) {
 			//var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 			var name = req.session.username;
 			logger.info("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
-			logger.info("ICE Socket requesting Address: " , name);
+			logger.info("ICE Socket requesting Address: %s" , name);
 			if ('allSocketsMap' in myserver && name in myserver.allSocketsMap) {
 				var mySocket = myserver.allSocketsMap[name];
 				// var userid = req.body.qcUsername;
@@ -290,7 +290,7 @@ exports.qcFolderDetails_ICE = function (req, res) {
 		if (sessionToken != undefined && req.session.id == sessionToken) {
 			var name = req.session.username;
 			logger.info("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
-			logger.info("ICE Socket requesting Address: " , name);
+			logger.info("ICE Socket requesting Address: %s" , name);
 			if ('allSocketsMap' in myserver && name in myserver.allSocketsMap) {
 				var mySocket = myserver.allSocketsMap[name];
 				// var userid = req.body.qcUsername;
