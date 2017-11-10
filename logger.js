@@ -32,7 +32,6 @@ const logger = new (winston.Logger)({
       timestamp: dateFormat,
       datePattern: 'yyyy-MM-dd',
       prepend: true,
-      maxDays : 7,
       level: process.env.ENV === 'DEV' ? 'debug' : 'info',
       handleExceptions: true
     })
