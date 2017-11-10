@@ -2088,7 +2088,7 @@ console.log("screenName:", screenName);
             var d = $("<div></div>", {
                 "class": "hightlight"
             });
-            var getTopValue;
+            var getTopValue, getTopValueios;
 
             var screen_width = document.getElementById('screenshot').height;
             var real_width = document.getElementById('screenshot').naturalHeight;
@@ -2103,7 +2103,8 @@ console.log("screenName:", screenName);
                     d.css('width', (rect.w / 3) + 'px');
                 } else if (navigator.appVersion.indexOf("Mac") != -1) {
                     d.css('left', rect.x + 'px');
-                    d.css('top', rect.y + 'px');
+                    if(rect.y > 450) d.css('top', (rect.y - 12) + 'px');
+                    else d.css('top', rect.y + 'px');
                     d.css('height', rect.h + 'px');
                     d.css('width', rect.w + 'px');
                 }
@@ -2144,9 +2145,11 @@ console.log("screenName:", screenName);
             d.css('background-color', 'yellow');
             d.css('z-index', '3');
             d.css('opacity', '0.7');
-            getTopValue = Math.round(rect.y) * scale_highlight + 'px'
+            getTopValue = Math.round(rect.y) * scale_highlight + 'px';
+            getTopValueios = Math.round(rect.y) * scale_highlight +100+ 'px'
             if (appType == "MobileApp")
-                $(".scroll-wrapper > .scrollbar-screenshot").animate({scrollTop: parseInt(Math.round(rect.y) - 600) + 'px'}, 500);
+                if(navigator.appVersion.indexOf("Mac") != -1) $(".scroll-wrapper > .scrollbar-screenshot").animate({scrollTop: parseInt(getTopValueios)}, 500);
+                else $(".scroll-wrapper > .scrollbar-screenshot").animate({scrollTop: parseInt(Math.round(rect.y) - 600) + 'px'}, 500);
             else
                 $(".scroll-wrapper > .scrollbar-screenshot").animate({scrollTop: parseInt(getTopValue)}, 500);
             //$('.scroll-wrapper > .scrollbar-screenshot').scrollTo(d.offset().top);

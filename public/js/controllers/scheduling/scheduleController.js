@@ -11,6 +11,7 @@ mySPA.controller('scheduleController',['$scope','$http','$timeout','$location','
     var browserTypeExe = [];
     //Task Listing
     loadUserTasks()
+	blockUI("Loading...");
     /*var taskAuth;
 	if(window.localStorage['_CT'] == "")
 	{
@@ -101,6 +102,7 @@ mySPA.controller('scheduleController',['$scope','$http','$timeout','$location','
 				getScheduledDetails();
 			}
 			cfpLoadingBar.complete();
+			unblockUI();
 		}, 
 		function(error) {
 			console.log("Error")
@@ -289,6 +291,7 @@ mySPA.controller('scheduleController',['$scope','$http','$timeout','$location','
 			else if(slctdOption == "Failed 01")	keySlctd = "Failed 01";
 			else if(slctdOption == "Failed 02")	keySlctd = "Failed 02";
 			else if(slctdOption == "Cancelled")	keySlctd = "cancelled";
+			else if(slctdOption == "Scheduled")	keySlctd = "scheduled";
 			var content = $("#scheduledDataBody>.scheduleDataBodyRow .scheduleDataBodyRowChild");
 			$.each(content, function(){
 				if($(this).children("div:nth-child(6)").text().indexOf(keySlctd) >= 0){
@@ -449,6 +452,12 @@ mySPA.controller('scheduleController',['$scope','$http','$timeout','$location','
 			if(data == "success"){
 				openModelPopup("Scheduled Test Suite", "Job is "+status+".");
 				$event.target.parentElement.textContent = status;
+				var tabEle = $(".scheduleDataBodyRowChild");
+				for(var i=0; i<tabEle.length; i++){
+					if(tabEle[i].children[5].dataset.scheduleid == suiteDetailsObj.scheduleid){
+						tabEle[i].children[5].innerText = status;
+					}
+				}
 			}
 			else if(data == "inprogress"){
 				openModelPopup("Scheduled Test Suite", "Job is in progress.. cannot be cancelled.");

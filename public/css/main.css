@@ -2459,12 +2459,17 @@ input[disabled]{
     font-size: 17px;
     font-family: 'LatoWebLight';
 }
+.scenarioHeaders tr{width: 100%;}
 .scenarioHeaders tr td{
 	padding: 0 5px 0 5px;
 	border-right: 1px solid #fff;
 	text-align: center;
 }
-.scenarioHeaders tr td:first-child{text-align: left; padding-left: 8px; padding-top: 2px;}
+.scenarioHeaders tr td:first-child{text-align: left; padding-left: 8px; padding-top: 2px; width: 7%;}
+.scenarioHeaders tr td:nth-child(2){width: 30%;}
+.scenarioHeaders tr td:nth-child(3){width: 22%;}
+.scenarioHeaders tr td:nth-child(4){width: 15%;}
+.scenarioHeaders tr td:nth-child(5){width: 26%;}
 .scenarioBody tr td{
 	padding: 0 5px 0 5px;
 	text-align: center;
