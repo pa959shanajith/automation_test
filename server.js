@@ -421,6 +421,7 @@ if (cluster.isMaster) {
     app.post('/getDetails_ICE', admin.getDetails_ICE);
     app.post('/assignProjects_ICE', admin.assignProjects_ICE);
     app.post('/getAssignedProjects_ICE', admin.getAssignedProjects_ICE);
+	app.post('/getAvailablePlugins', admin.getAvailablePlugins);
     //Design Screen Routes
     app.post('/initScraping_ICE', design.initScraping_ICE);
     app.post('/highlightScrapElement_ICE', design.highlightScrapElement_ICE);
@@ -542,8 +543,10 @@ if (cluster.isMaster) {
         var ip = socket.request.connection.remoteAddress || socket.request.headers['x-forwarded-for'];
         logger.info("Normal Mode Enabled for  IP : %s", ip);
         var address=socket.handshake.query['username'];
-         logger.info("Socket connecting address" , address);
-         logger.info('Param ',socket.handshake.query['username']);
+        
+		var icesession=socket.handshake.query['icesession'];
+         logger.info("Socket connecting address %s" , address);
+         logger.info('Param %s',socket.handshake.query['username']);
         //console.log("middleware:", socket.request._query['check']);
 
         if (socket.request._query['check'] == "true" ) {
@@ -567,18 +570,42 @@ if (cluster.isMaster) {
                 // soc.emit("notify",notificationMsg);
         }
         else{
-          isUISocketRequest = false;
-          if (!(address in socketMap)) {
-             logger.info("Inside ICE Socket Connection");
-              socketMap[address] = socket;
-              socket.send('connected');
-              socket.emit('update_screenshot_path',screenShotPath);
-          }else{
-               logger.info("connectionExists for ICE Socket");
-               socket.send('connectionExists');
-          }
-        }
 
+          isUISocketRequest = false;
+          var inputs = {
+			"icesession": icesession,
+			"query":'connect'
+		  };
+		  var args = {
+			data: inputs,
+			headers: {
+				"Content-Type": "application/json"
+			}
+		  };
+         logger.info("Calling NDAC Service: updateActiveIceSessions");
+		  apiclient.post("http://127.0.0.1:1990/server/updateActiveIceSessions", args,
+			function (result, response) {
+				if (response.statusCode != 200) {
+					logger.error("Error occured in updateActiveIceSessions Error Code: ERRNDAC");
+				}
+				else{
+					socket.send('checkConnection',result['ice_check']);
+					if(result['node_check']){
+						if (!(address in socketMap)) {
+							socketMap[address] = socket;
+							socket.send('connected');
+                            logger.info("NO. OF CLIENTS CONNECTED: %d", Object.keys(socketMap).length);
+                            logger.info("IP\'s connected :' %s", Object.keys(socketMap).join());
+							socket.emit('update_screenshot_path',screenShotPath);
+						}
+						else{
+							socket.send('connectionExists');
+						}
+					}
+				}
+		  });
+          
+        }
         module.exports.allSocketsMap = socketMap;
         module.exports.allSocketsMapUI = socketMapUI;
         module.exports.allSchedulingSocketsMap=sokcetMapScheduling;
@@ -628,7 +655,7 @@ if (cluster.isMaster) {
                  logger.info('Disconnecting from ICE socket : %s', address);
                 delete socketMap[address];
                 module.exports.allSocketsMap = socketMap;
-                //console.log("------------------------SOCKET DISCONNECTED----------------------------------------");
+              
                 logger.info("NO. OF CLIENTS CONNECTED: %d", Object.keys(socketMap).length);
                 logger.info("IP\'s connected : %s", Object.keys(socketMap).join());
             }
@@ -640,6 +667,26 @@ if (cluster.isMaster) {
                   logger.info(": %d", Object.keys(sokcetMapScheduling).length);
                 logger.info("IP\'s connected :' %s", Object.keys(sokcetMapScheduling).join());
             }
+			var inputs = {
+				"username": address,
+				"query":'disconnect'
+			};
+			var args = {
+				data: inputs,
+				headers: {
+					"Content-Type": "application/json"
+				}
+			};
+            logger.info("Calling NDAC Service: updateActiveIceSessions");
+			apiclient.post("http://127.0.0.1:1990/server/updateActiveIceSessions", args,
+				function (result, response) {
+					if (response.statusCode != 200 || result.rows == "fail") {
+						logger.error("Error occured in updateActiveIceSessions Error Code: ERRNDAC");
+					}
+                    else{
+                        logger.info("IP disconnected %s",address);
+                    }
+			});
           }
         });
 
@@ -654,18 +701,18 @@ if (cluster.isMaster) {
                   logger.info('Disconnecting socket connection for Normal Mode(ICE Socket) : %s', address);
                 delete socketMap[address];
                 module.exports.allSocketsMap = socketMap;
-                   logger.info("NO. OF CLIENTS CONNECTED: %d", Object.keys(socketMap).length);
+                   logger.info("NOo. OF CLIENTS CONNECTED: %d", Object.keys(socketMap).length);
                 logger.info("IP\'s connected :' %s", Object.keys(socketMap).join());
                 sokcetMapScheduling[address] = socket;
                 socket.send('reconnected');
                 module.exports.allSchedulingSocketsMap = sokcetMapScheduling;
-                logger.info("NO. OF CLIENTS CONNECTED: %d", Object.keys(sokcetMapScheduling).length);
+                logger.info("NOoo. OF CLIENTS CONNECTED: %d", Object.keys(sokcetMapScheduling).length);
                 logger.info("IP\'s connected :' %s", Object.keys(sokcetMapScheduling).join());
             }else if(!data && sokcetMapScheduling!=undefined){
                   logger.info('Disconnecting socket connection for Scheduling mode: %s', address);
                 delete sokcetMapScheduling[address];
                 module.exports.allSchedulingSocketsMap = sokcetMapScheduling;
-                  logger.info("NO. OF CLIENTS CONNECTED: %d", Object.keys(sokcetMapScheduling).length);
+                  logger.info("NOoo. OF CLIENTS CONNECTED: %d", Object.keys(sokcetMapScheduling).length);
                 logger.info("IP\'s connected :' %s", Object.keys(sokcetMapScheduling).join());
                 socketMap[address] = socket;
                 module.exports.allSocketsMap = socketMap;
@@ -677,8 +724,7 @@ if (cluster.isMaster) {
         socket.on('connect_failed', function() {
               logger.error("Error occurred in connecting socket");
         });
-          logger.info("NO. OF CLIENTS CONNECTED: %d", Object.keys(socketMap).length);
-          logger.info("IP\'s connected :' %s", Object.keys(socketMap).join());
+
 
     });
     //SOCKET CONNECTION USING SOCKET.IO

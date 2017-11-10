@@ -364,7 +364,7 @@ console.log("screenName:", screenName);
         var blockMsg = 'Debug in Progress. Please Wait...';
         if (dependentTestCaseFlag == true) {
             blockUI(blockMsg);
-            DesignServices.debugTestCase_ICE(browserType, checkedTestcases)
+            DesignServices.debugTestCase_ICE(browserType, checkedTestcases, appType)
                 .then(function(data) {
                         if (data == "Invalid Session") {
                             window.location.href = "/";
@@ -392,7 +392,7 @@ console.log("screenName:", screenName);
                     });
         } else {
             blockUI(blockMsg);
-            DesignServices.debugTestCase_ICE(browserType, testcaseID)
+            DesignServices.debugTestCase_ICE(browserType, testcaseID, appType)
                 .then(function(data) {
                         if (data == "Invalid Session") {
                             window.location.href = "/";

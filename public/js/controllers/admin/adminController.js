@@ -360,6 +360,14 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 		resetForm();
 		projectDetails = [];
 		updateProjectDetails = [];
+		var plugins = [];
+		adminServices.getAvailablePlugins()
+		.then(function (plugins_list) {
+			for(var i = 0; i < plugins_list.length; i++){
+				plugins[i] = plugins_list[i]
+			}
+		}, function (error) { console.log("Error:::::::::::::", error) });
+		
 		$("img.selectedIcon").removeClass("selectedIcon");
 		$(this).children().find('img').addClass('selectedIcon');
 		$timeout(function(){
