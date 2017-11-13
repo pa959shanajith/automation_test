@@ -103,40 +103,47 @@ exports.authenticateUser_Nineteen68 = function (req, res) {
 									
 									//Check whether projects are assigned for a user
 									checkAssignedProjects(req, function (err, assignedProjectsData, role) {
+										if(err == 'fail')
+										{
+											res.send('fail');
+										}
+										else{
 											logger.info("Inside function call of checkAssignedProjects");
-										if (role != "Admin" && role != "Business Analyst" && role != "Tech Lead") {
-											if (assignedProjectsData > 0) {
-												assignedProjects = true;
-											}
-											if (validUser == true && assignedProjects == true) {
-												flag = 'validCredential';
-												addUsernameAndIdInLogs(username,flag,req.session.userid);
-												res.setHeader('Set-Cookie', sessId);
-												logger.info("User Authenticated successfully");
-												res.send(flag);
-											} else if (validUser == true && assignedProjects == false) {
-												flag = 'noProjectsAssigned';
-												logger.info("User has not been assigned any projects");
-												req.session.destroy();
-												res.send(flag);
+											if (role != "Admin" && role != "Business Analyst" && role != "Tech Lead") {
+												if (assignedProjectsData > 0) {
+													assignedProjects = true;
+												}
+												if (validUser == true && assignedProjects == true) {
+													flag = 'validCredential';
+													addUsernameAndIdInLogs(username,flag,req.session.userid);
+													res.setHeader('Set-Cookie', sessId);
+													logger.info("User Authenticated successfully");
+													res.send(flag);
+												} else if (validUser == true && assignedProjects == false) {
+													flag = 'noProjectsAssigned';
+													logger.info("User has not been assigned any projects");
+													req.session.destroy();
+													res.send(flag);
+												} else {
+													logger.info("User Authentication failed");
+													req.session.destroy();
+													res.send(flag);
+												}
 											} else {
-												logger.info("User Authentication failed");
-												req.session.destroy();
-												res.send(flag);
-											}
-										} else {
-											if (validUser == true) {
-												flag = 'validCredential';
-												addUsernameAndIdInLogs(username,flag,req.session.userid);
-												res.setHeader('Set-Cookie', sessId);
-												logger.info("User Authenticated successfully");
-												res.send(flag);
-											} else {
-												logger.info("User Authentication failed");
-												req.session.destroy();
-												res.send(flag);
+												if (validUser == true) {
+													flag = 'validCredential';
+													addUsernameAndIdInLogs(username,flag,req.session.userid);
+													res.setHeader('Set-Cookie', sessId);
+													logger.info("User Authenticated successfully");
+													res.send(flag);
+												} else {
+													logger.info("User Authentication failed");
+													req.session.destroy();
+													res.send(flag);
+												}
 											}
 										}
+										
 									});
 								}
 							} catch (exception) {
@@ -355,6 +362,7 @@ function checkAssignedProjects(req, callback, data) {
 	userid = '';
 	var roleid = '';
 	var assignedProjectsLen = '';
+	var flag = 'fail';
 	async.series({
 		getUserId: function (callback) {
 			var inputs = {
@@ -372,7 +380,8 @@ function checkAssignedProjects(req, callback, data) {
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
 					logger.error("Error occured in authenticateUser_Nineteen68 Error Code : ERRNDAC");
-					res.send("fail");
+					callback(flag);
+					//res.send("fail");
 				} else {
 					userid = result.rows[0].userid;
 					req.session.userid = userid;
@@ -398,7 +407,8 @@ function checkAssignedProjects(req, callback, data) {
 					function (rolesResult, response) {
 					if (response.statusCode != 200 || rolesResult.rows == "fail") {
 						logger.error("Error occured in authenticateUser_Nineteen68 Error Code : ERRNDAC");
-						res.send("fail");
+						callback(flag);
+						//res.send("fail");
 					} else {
 						rolename = rolesResult.rows[0].rolename;
 						callback(null, userid, rolename);
@@ -406,7 +416,8 @@ function checkAssignedProjects(req, callback, data) {
 				});
 			} catch (exception) {
 				logger.error(exception);
-				res.send('fail');
+				//res.send("fail");
+				callback(flag);
 			}
 		},
 		getAssignedProjects: function (callback) {
@@ -426,7 +437,8 @@ function checkAssignedProjects(req, callback, data) {
 					function (projectsResult, response) {
 					if (response.statusCode != 200 || projectsResult.rows == "fail") {
 						logger.error("Error occured in authenticateUser_Nineteen68 Error Code : ERRNDAC");
-						res.send("fail");
+						callback(flag);
+						//res.send("fail");
 					} else {
 						if (projectsResult.rows.length > 0 && projectsResult.rows[0].projectids != null) {
 							assignedProjectsLen = projectsResult.rows[0].projectids.length;
@@ -439,20 +451,22 @@ function checkAssignedProjects(req, callback, data) {
 				});
 			} catch (exception) {
 				logger.error(exception);
-				res.send('fail');
+				//res.send('fail');
+				callback(flag);
 			}
 		},
 	}, function (err, data) {
 		try {
 			if (err) {
 				logger.error(err);
-				res.send("fail");
+				callback(flag);
 			} else {
 				callback(null, assignedProjectsLen, rolename);
 			}
 		} catch (exception) {
 			logger.error(exception);
-			res.send('fail');
+			//res.send('fail');
+			callback(flag);
 		}
 	});
 }
