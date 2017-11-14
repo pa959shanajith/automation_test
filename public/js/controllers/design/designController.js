@@ -206,9 +206,15 @@ console.log("screenName:", screenName);
 	$scope.submitTasksScreen = function(action){
 		$("#submitTasksScreen").modal("show")
 		if(action=='reassign'){
+            $("#submitTasksScreen").find('.modal-title').text('Reassign Task');
 			$("#submitTasksScreen").find('.modal-body p').text('Are you sure you want to reassign the task ?')
 			$("#submitTasksScreen").find('.modal-footer button')[0].setAttribute('onclick',"submit_task('reassign')")
-		}
+        }
+        if(action == 'submit'  &&  $(".submitTaskBtn:visible").text() == 'Approve' )
+        {
+            $("#submitTasksScreen").find('.modal-title').text('Approve Task');
+            $("#submitTasksScreen").find('.modal-body p').text('Are you sure you want to approve the task ?')
+        }
         // else{
         //     $("#submitTasksScreen").find('.modal-footer button')[0].setAttribute('onclick',"submit_task('"+action+"')")
         // }
@@ -221,9 +227,15 @@ console.log("screenName:", screenName);
 		
 		$("#submitTasksTestCase").modal("show")
 		if(action=='reassign'){
+            $("#submitTasksTestCase").find('.modal-title').text('Reassign Task');
 			$("#submitTasksTestCase").find('.modal-body p').text('Are you sure you want to reassign the task ?')
 			$("#submitTasksTestCase").find('.modal-footer button')[0].setAttribute('onclick',"submit_task('reassign')")
-		}
+        }
+        if(action == 'submit' &&  $(".submitTaskBtn:visible").text() == 'Approve')
+        {
+            $("#submitTasksTestCase").find('.modal-title').text('Approve Task');
+            $("#submitTasksTestCase").find('.modal-body p').text('Are you sure you want to approve the task ?')
+        }
         // else{
         //     $("#submitTasksTestCase").find('.modal-footer button')[0].setAttribute('onclick',"submit_task('"+action+"')")
         // }

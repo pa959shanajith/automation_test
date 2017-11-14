@@ -5186,3 +5186,11 @@ Weboccular report css
     overflow-x: hidden;
 
 }
+#submitTasksTestCase > .modal-sm,#submitTasksScreen >.modal-sm,#submitTasksExecution > .modal-sm,#globalTaskSubmit > .modal-sm
+{
+    width: 310px !important;
+}
+.reassignTaskBtn
+{
+    margin-right: 5px;
+}
