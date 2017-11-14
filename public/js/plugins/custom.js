@@ -52,6 +52,13 @@ $(document).ajaxSend(function(elm, xhr, s){
 $(document).ready(function() {
 	//prevent special characters(such as <,>,',"",-) for all the Inputs except for password field, testcase grid inputs and edit on scrapedobjects.
 	$(document).on("keydown","input[type='text']:not([type=password]):not(.editObjectName):not(.editable):not(#userName):not(#firstName):not(#lastName):not(.launchPopupInput), textarea:not(.editable):not(.wsdlTextAreaBody)", function(e) {
+		if(e.target.className == 'searchScrapInput' )
+		{
+			if(e.keyCode === 222)
+			{
+				return true;
+			}
+		}
 		if(e.shiftKey && e.keyCode == 189)
 		{
 			return true;

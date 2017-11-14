@@ -669,9 +669,22 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 		$("#submitTasksExecution").modal("show")
 		$('#submitTasksExecution').find('.btn-default-yes').focus();
 		if(action=='reassign'){
+			$("#submitTasksExecution").find('.modal-title').text('Reassign Task');
 			$("#submitTasksExecution").find('.modal-body p').text('Are you sure you want to reassign the task ?')
 			$("#submitTasksExecution").find('.modal-footer button')[0].setAttribute('onclick',"submit_task('reassign')")
 		}
+		else
+        {
+			if($(".submitTaskBtn:visible").text() == 'Approve')
+			{
+				$("#submitTasksExecution").find('.modal-title').text('Approve Task');
+				$("#submitTasksExecution").find('.modal-body p').text('Are you sure you want to approve the task ?')
+			}
+			else{
+				$("#submitTasksExecution").find('.modal-body p').text('Are you sure you want to submit the task ?')
+			}
+			
+        }
 	}
 
 

@@ -104,6 +104,7 @@ exports.authenticateUser_Nineteen68 = function (req, res) {
 									checkAssignedProjects(req, function (err, assignedProjectsData, role) {
 										if(err == 'fail')
 										{
+											logger.error("Error occured in authenticateUser_Nineteen68 Error Code : ERRNDAC");
 											res.send('fail');
 										}
 										else{
