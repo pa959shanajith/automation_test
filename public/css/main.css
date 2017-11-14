@@ -3738,7 +3738,7 @@ li.select_all .addCustObj{
 .actionOnHover img:first-child{
 	margin-right: 10px !important;
 }
-
+.editReleaseName, .editCycleName{visibility: visible;}
 .ldapBtn.focus,
 .ldapBtn,
 .ldapBtn:active:focus,
