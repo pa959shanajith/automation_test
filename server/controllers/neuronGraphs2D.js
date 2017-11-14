@@ -1,4 +1,4 @@
-var myserver = require('../../server.js');
+var myserver = require('../lib/socket.js');
 var fs = require('fs');
 //var https = require('https');
 var neo4jAPI = require('../controllers/neo4jAPI');

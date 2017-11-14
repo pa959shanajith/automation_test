@@ -1,7 +1,7 @@
 /**
  * Dependencies.
  */
-var myserver = require('../../server.js');
+var myserver = require('../lib/socket.js');
 var async = require('async');
 var parse = require('xml-parser');
 var Client = require("node-rest-client").Client;

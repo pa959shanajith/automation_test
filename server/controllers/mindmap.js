@@ -2,7 +2,7 @@ var uuidV4 = require('uuid/v4');
 var neo4jAPI = require('../controllers/neo4jAPI');
 var admin = require('../controllers/admin');
 var create_ice=require('../controllers/create_ice');
-var myserver = require('../../server.js');
+var myserver = require('../lib/socket.js');
 var notificationMsg = require("../notifications/notifyMessages");
 
 exports.mindmapService = function(req, res) {

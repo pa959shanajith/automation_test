@@ -1,4 +1,4 @@
-var myserver = require('../../server.js');
+var myserver = require('../lib/socket.js');
 var url=require('url');
 var sessionExtend = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes 
 var sessionTime = 30 * 60 * 1000;

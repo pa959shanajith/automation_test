@@ -9,7 +9,7 @@ var async = require('async');
 var certificate = fs.readFileSync('server/https/server.crt', 'utf-8');
 var Client = require("node-rest-client").Client;
 var client = new Client({ connection: { rejectUnauthorized: false } });
-var myserver = require('../../server.js');
+var myserver = require('../lib/socket.js');
 var notificationMsg = require("../notifications/notifyMessages");
 
 // /* Send queries to Neo4J/ICE API. */

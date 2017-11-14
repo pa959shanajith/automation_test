@@ -1,5 +1,5 @@
 //node
-var myserver = require('../../server.js');
+var myserver = require('../lib/socket.js');
 // var PythonShell = require('python-shell');
 var Client = require("node-rest-client").Client;
 var client = new Client();

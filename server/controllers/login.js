@@ -5,7 +5,6 @@ var bcrypt = require('bcrypt');
 var async = require('async');
 var epurl = "http://127.0.0.1:1990/";
 var Client = require("node-rest-client").Client;
-var myserver = require('../../server.js');
 var client = new Client();
 var validator = require('validator');
 //Global Variables

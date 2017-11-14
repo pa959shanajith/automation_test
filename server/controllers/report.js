@@ -2,7 +2,7 @@
  * Dependencies.
  */
 var async = require('async');
-var myserver = require('../../server.js');
+var myserver = require('../lib/socket.js');
 var Client = require("node-rest-client").Client;
 var client = new Client();
 var epurl = "http://127.0.0.1:1990/";
