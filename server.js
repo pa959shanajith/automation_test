@@ -12,17 +12,17 @@ var winston = require('winston');
 var epurl = "http://127.0.0.1:1990/";
 var logger = require('./logger');
 
-// if (cluster.isMaster) {
-//     cluster.fork();
-//     cluster.on('disconnect', function(worker) {
-//         console.log('disconnect!');
-//     });
-//     cluster.on('exit', function(worker) {
-//         console.log('Let\'s not have Sentiments... Worker %d is killed.', worker.id);
-//         cluster.fork();
-//     });
+if (cluster.isMaster) {
+    cluster.fork();
+    cluster.on('disconnect', function(worker) {
+        console.log('disconnect!');
+    });
+    cluster.on('exit', function(worker) {
+        console.log('Let\'s not have Sentiments... Worker %d is killed.', worker.id);
+        cluster.fork();
+    });
 
-// } else {
+} else {
 try {
     var express = require('express');
     var app = express();
@@ -508,4 +508,4 @@ try {
         cluster.worker.kill();
     }, 200)
 }
-//}
+}
