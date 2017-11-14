@@ -6,9 +6,11 @@ var uuid = require('uuid-random');
 var async = require('async');
 var Client = require("node-rest-client").Client;
 var neo4jAPI = require('../controllers/neo4jAPI');
+var  logger = require('../../logger');
 var client = new Client();
 var qList=[]; //For neurongraphs
 function get_moduleName(moduleId, cb, data) {
+	logger.info("Inside the function get_moduleName");
 	var obj = {
 		flag: false,
 		modulename: '',
@@ -24,9 +26,11 @@ function get_moduleName(moduleId, cb, data) {
 			"Content-Type": "application/json"
 		}
 	};
+	logger.info("Calling NDAC Service from get_moduleName: create_ice/getNames_Ninteen68");
 	client.post("http://127.0.0.1:1990/create_ice/getNames_Ninteen68", args,
 		function (modulename, response) {
 		if (response.statusCode != 200 || modulename.rows == "fail") {
+			logger.error("Error occured in create_ice/getNames_Ninteen68: get_moduleName, Error Code : ERRNDAC");
 			cb(null, modulename.rows);
 		} else {
 			if (modulename.rows.length != 0) {
@@ -40,6 +44,7 @@ function get_moduleName(moduleId, cb, data) {
 }
 
 function get_screenName(screenId, cb, data) {
+	logger.info("Inside the function get_screenName ");
 	var obj2 = {
 		flag: false,
 		screenname: ''
@@ -54,10 +59,11 @@ function get_screenName(screenId, cb, data) {
 			"Content-Type": "application/json"
 		}
 	};
+	logger.info("Calling NDAC Service from get_screenName: create_ice/getNames_Ninteen68");
 	client.post("http://127.0.0.1:1990/create_ice/getNames_Ninteen68", args,
 		function (screenname, response) {
 		if (response.statusCode != 200 || screenname.rows == "fail") {
-			console.log(screenname.rows);
+			logger.error("Error occured in create_ice/getNames_Ninteen68: get_screenName, Error Code : ERRNDAC");
 			cb(null, screenname.rows);
 		} else {
 			if (screenname.rows.length != 0) {
@@ -70,6 +76,7 @@ function get_screenName(screenId, cb, data) {
 }
 
 function get_scenarioName(testscenarioId, cb, data) {
+	logger.info("Inside the function get_scenarioName ");
 	var obj2 = {
 		flag: false,
 		testscenarioname: ''
@@ -84,10 +91,11 @@ function get_scenarioName(testscenarioId, cb, data) {
 			"Content-Type": "application/json"
 		}
 	};
+	logger.info("Calling NDAC Service from get_scenarioName: create_ice/getNames_Ninteen68");
 	client.post("http://127.0.0.1:1990/create_ice/getNames_Ninteen68", args,
 		function (testscenarioname, response) {
 		if (response.statusCode != 200 || testscenarioname.rows == "fail") {
-			console.log(testscenarioname.rows);
+			logger.error("Error occured in create_ice/getNames_Ninteen68: get_scenarioName, Error Code : ERRNDAC");
 			cb(null, testscenarioname.rows);
 		} else {
 			if (testscenarioname.rows.length != 0) {
@@ -100,6 +108,7 @@ function get_scenarioName(testscenarioId, cb, data) {
 }
 
 function get_testcaseName(testcaseId, cb, data) {
+	logger.info("Inside the function get_testcaseName ");
 	var obj3 = {
 		flag: false,
 		testcasename: ''
@@ -114,10 +123,11 @@ function get_testcaseName(testcaseId, cb, data) {
 			"Content-Type": "application/json"
 		}
 	};
+	logger.info("Calling NDAC Service from get_testcaseName: create_ice/getNames_Ninteen68");
 	client.post("http://127.0.0.1:1990/create_ice/getNames_Ninteen68", args,
 		function (testcasename, response) {
 		if (response.statusCode != 200 || testcasename.rows == "fail") {
-			console.log(testcasename.rows);
+			logger.error("Error occured in create_ice/getNames_Ninteen68: get_testcaseName, Error Code : ERRNDAC");
 			cb(null, testcasename.rows);
 		} else {
 			if (testcasename.rows.length != 0) {
@@ -130,6 +140,7 @@ function get_testcaseName(testcaseId, cb, data) {
 }
 
 exports.getAllNames = function (parent, cb, data) {
+	logger.info("Inside UI service: getAllNames");
 	var parent_length = parent.length;
 	var allNames = {
 		"testsuitename": "",
@@ -140,9 +151,11 @@ exports.getAllNames = function (parent, cb, data) {
 	};
 	async.series({
 		modulename: function (callback) {
+			logger.info("Inside the function modulename : service getAllNames");
+			logger.info("Calling function get_moduleName from the service getAllNames");
 			get_moduleName(parent[1], function (err, data) {
 				if (err) {
-					console.log(err);
+					logger.info("Error occured in the function modulename: service getAllNames: ",err);
 				}
 				else {
 					allNames.modulename = data.modulename;
@@ -152,10 +165,12 @@ exports.getAllNames = function (parent, cb, data) {
 			});
 		},
 		scenarioname: function (callback) {
+			logger.info("Inside the function scenarioname : service getAllNames");
 			if (parent_length == 5 || parent_length == 3) {
+				logger.info("Calling function get_scenarioName from the service getAllNames");
 				get_scenarioName(parent[2], function (err, data2) {
 					if (err) {
-						console.log(err);
+						logger.info("Error occured in the function scenarioname: service getAllNames: ",err);
 					}
 					else {
 						allNames.scenarioname = data2.testscenarioname;
@@ -167,10 +182,12 @@ exports.getAllNames = function (parent, cb, data) {
 			}
 		},
 		screenname: function (callback) {
+			logger.info("Inside the function screenname: service getAllNames");
 			if (parent_length >= 4) {
+				logger.info("Calling function get_screenName from the service getAllNames");
 				get_screenName(parent[3], function (err, data2) {
 					if (err) {
-						console.log(err);
+						logger.info("Error occured in the function screenname: service getAllNames: ",err);
 					}
 					else {
 						allNames.screenname = data2.screenname;
@@ -182,10 +199,12 @@ exports.getAllNames = function (parent, cb, data) {
 			}
 		},
 		testcasename: function (callback) {
+			logger.info("Inside the function testcasename: getAllNames");
 			if (parent_length == 5) {
+				logger.info("Calling function get_testcaseName from the service getAllNames");
 				get_testcaseName(parent[4], function (err, data3) {
 					if (err) {
-						console.log(err);
+						logger.info("Error occured in the function testcasename: service getAllNames: ",err);
 					}
 					else {
 						allNames.testcasename = data3.testcasename;
@@ -203,6 +222,7 @@ exports.getAllNames = function (parent, cb, data) {
 
 //CreateStrcutre
 exports.createStructure_Nineteen68 = function (req, res) {
+	logger.info("Inside UI service: createStructure_Nineteen68");
 	var createdthrough = 'Mindmaps Creation';
 	var RequestedJSON = req;
 	var projectid = RequestedJSON.projectId;
@@ -231,6 +251,7 @@ exports.createStructure_Nineteen68 = function (req, res) {
 	qList=[]; //For neurongraphs
 	async.series({
 		projectsUnderDomain: function (callback) {
+			logger.info("Inside projectsUnderDomain function: createStructure_Nineteen68");
 			suiteflag = false;
 			var suiteidTemp = '';
 			var scenariodetailslist = [];
@@ -247,7 +268,7 @@ exports.createStructure_Nineteen68 = function (req, res) {
 				"newversionnumber": newversionnumber
 			}, function (err, data) {
 				if (err) {
-					console.log(err);
+					logger.info("Error occured in the function projectsUnderDomain: createStructure_Nineteen68: ",err);
 				} else {
 					suiteflag = data.flag;
 					suiteidTemp = data.suiteid;
@@ -290,10 +311,11 @@ exports.createStructure_Nineteen68 = function (req, res) {
 						"Content-Type": "application/json"
 					}
 				};
+				logger.info("Calling NDAC Service from projectsUnderDomain "+suite_query+": create_ice/insertInSuite_ICE");
 				client.post("http://127.0.0.1:1990/create_ice/insertInSuite_ICE", args,
 					function (result, response) {
 					if (response.statusCode != 200 || result.rows == "fail") {
-						console.log(result.rows);
+						logger.error("Error occured in create_ice/insertInSuite_ICE: projectsUnderDomain, Error Code : ERRNDAC");
 					} else {
 						scenario = suitedetails.testscenarioDetails;
 						var scenariosarray = [];
@@ -318,7 +340,7 @@ exports.createStructure_Nineteen68 = function (req, res) {
 								"newversionnumber": newversionnumber
 							}, function (err, scenariodata) {
 								if (err) {
-									console.log(err);
+									logger.info("Error occured in the function projectsUnderDomain: createStructure_Nineteen68: ",err);
 								} else {
 									scenarioflag = scenariodata.flag;
 									scenarioidTemp = scenariodata.scenarioid;
@@ -362,10 +384,11 @@ exports.createStructure_Nineteen68 = function (req, res) {
 										"Content-Type": "application/json"
 									}
 								};
+								logger.info("Calling NDAC Service from projectsUnderDomain "+suite_query+": create_ice/insertInSuite_ICE");
 								client.post("http://127.0.0.1:1990/create_ice/insertInScenarios_ICE", args,
 									function (result, response) {
 									if (response.statusCode != 200 || result.rows == "fail") {
-										console.log(result.rows);
+										logger.error("Error occured in create_ice/insertInSuite_ICE: projectsUnderDomain, Error Code : ERRNDAC");
 									} else {
 										//Execute neo4j query!!
 										if(scenario_query=='notflagscenarios'){
@@ -401,7 +424,7 @@ exports.createStructure_Nineteen68 = function (req, res) {
 												"newversionnumber": newversionnumber
 											}, function (err, screendata) {
 												if (err) {
-													console.log(err);
+													logger.info("Error occured in the function projectsUnderDomain: createStructure_Nineteen68: ",err);
 												} else {
 													screenflag = screendata.flag;
 													screenidTemp = screendata.screenid;
@@ -445,10 +468,11 @@ exports.createStructure_Nineteen68 = function (req, res) {
 														"Content-Type": "application/json"
 													}
 												};
+												logger.info("Calling NDAC Service from createStructure_Nineteen68: create_ice/insertInScreen_ICE");
 												client.post("http://127.0.0.1:1990/create_ice/insertInScreen_ICE", args,
 													function (result, response) {
 													if (response.statusCode != 200 || result.rows == "fail") {
-														console.log(result.rows);
+														logger.info("Error occured in create_ice/insertInScreen_ICE: createStructure_Nineteen68");
 													} else {
                                                         //Execute neo4j query!!
                                                         if(screen_query=='notflagscreen'){
@@ -478,7 +502,7 @@ exports.createStructure_Nineteen68 = function (req, res) {
 																"newversionnumber": newversionnumber
 															}, function (err, testcasedata) {
 																if (err) {
-																	console.log(err);
+																	logger.info("Error occured in the function projectsUnderDomain: createStructure_Nineteen68 service: ",err);
 																} else {
 																	testcaseflag = testcasedata.flag;
 																	testcaseidTemp = testcasedata.testcaseid;
@@ -523,10 +547,11 @@ exports.createStructure_Nineteen68 = function (req, res) {
 																		"Content-Type": "application/json"
 																	}
 																};
+																logger.info("Calling NDAC Service from projectsUnderDomain: create_ice/insertInTestcase_ICE");
 																client.post("http://127.0.0.1:1990/create_ice/insertInTestcase_ICE", args,
 																	function (result, response) {
 																	if (response.statusCode != 200 || result.rows == "fail") {
-																		console.log(result.rows);
+																		logger.info("Error occured in create_ice/insertInTestcase_ICE: createStructure_Nineteen68 service");
 																	}
 																	else {
 																		if(testcase_query=='notflagtestcase'){
@@ -554,13 +579,14 @@ exports.createStructure_Nineteen68 = function (req, res) {
 																				"Content-Type": "application/json"
 																			}
 																		};
+																		logger.info("Calling NDAC Service from projectsUnderDomain: create_ice/updateTestScenario_ICE");
 																		client.post("http://127.0.0.1:1990/create_ice/updateTestScenario_ICE", args,
 																			function (result, response) {
 																			if (response.statusCode != 200 || result.rows == "fail") {
-																				console.log(result.rows);
+																				logger.info("Error occured in create_ice/updateTestScenario_ICE: createStructure_Nineteen68 service");
 																			}
 																			else {
-																				console.log("Successfully updated testscenarios");
+																				logger.info("Successfully updated testscenarios");
 																				qList.push({"statement":"MATCH (n:TESTSCENARIOS_NG {projectid:'"+projectid+"',testscenarioname:'"+scenarioName+"',testscenarioid:'"+scenarioId+"'}) SET n.testcaseids=n.testcaseids+['"+testcaseID+"'] return n"});
 																				//Add relationship between scenario and testsuite
 																				//qListR.push({"statement":"MATCH (a:TESTSCENARIOS_NG{testscenarioid:'"+scenarioId+"'})-[r]->(b:TESTCASES_NG) delete r"})
@@ -591,6 +617,7 @@ exports.createStructure_Nineteen68 = function (req, res) {
 
 		},
 		updatescenarioids: function (callback) {
+			logger.info("Inside the function updatescenarioids ");
 			var inputs = {
 				'testscenarioids': scenarioidlist,
 				'moduleid': suiteID,
@@ -607,12 +634,13 @@ exports.createStructure_Nineteen68 = function (req, res) {
 					"Content-Type": "application/json"
 				}
 			};
+			logger.info("Calling NDAC Service from updatescenarioids: create_ice/updateModule_ICE");
 			client.post("http://127.0.0.1:1990/create_ice/updateModule_ICE", args,
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
-					console.log(result.rows);
+					logger.info("Error occured in create_ice/updateModule_ICE: createStructure_Nineteen68 service");
 				} else {
-					console.log("Successfully updated Modules");
+					logger.info("Successfully updated Modules");
 				}
 				callback();
 
@@ -620,31 +648,33 @@ exports.createStructure_Nineteen68 = function (req, res) {
 		}
 	},
 		function (err, results) {
-		if (err) {
-			console.log(err);
-			res(null, err);
-		} else {
-			var returnJsonmindmap = {
-				"projectId": projectid,
-				"cycleId": cycleId,
-				"releaseId": releaseId,
-				"appType": appType,
-				"testsuiteDetails": suitedetailslist
-			};
-			neo4jAPI.executeQueries(qList,function(status,result){
+			logger.info("Inside final function");
+			if (err) {
+				logger.info("Error occured in final funtion: createStructure_Nineteen68 service: ", err);
+				res(null, err);
+			} else {
+				var returnJsonmindmap = {
+					"projectId": projectid,
+					"cycleId": cycleId,
+					"releaseId": releaseId,
+					"appType": appType,
+					"testsuiteDetails": suitedetailslist
+				};
+				logger.info("Calling funtion neo4jAPI.executeQueries: createStructure_Nineteen68 service");
+				neo4jAPI.executeQueries(qList,function(status,result){
 					if(err){
-						console.log(err);
+						logger.info("Error occured in the function neo4jAPI.executeQueries: createStructure_Nineteen68: ", err);
 					} else{
 						res(null, returnJsonmindmap);
 					}
+				});
 
-			});
-
-		}
-	});
+			}
+		});
 };
 
 function testsuiteid_exists(moduledetails, cb, data) {
+	logger.info("Inside the function testsuiteid_exists ");
 	var flagId = false;
 	var obj = {
 		flag: false,
@@ -653,6 +683,7 @@ function testsuiteid_exists(moduledetails, cb, data) {
 	var statusflag = false;
 	async.series({
 		modulename: function (modulecallback) {
+			logger.info("Inside the function modulename: testsuiteid_exists");
 			var inputs = {
 				'project_id': moduledetails.pid,
 				'module_name': moduledetails.modulename,
@@ -665,10 +696,11 @@ function testsuiteid_exists(moduledetails, cb, data) {
 					"Content-Type": "application/json"
 				}
 			};
+			logger.info("Calling NDAC Service from testsuiteid_exists - modulename: create_ice/testsuiteid_exists_ICE");
 			client.post("http://127.0.0.1:1990/create_ice/testsuiteid_exists_ICE", args,
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
-					console.log(result.rows);
+					logger.error("Error occured in create_ice/testsuiteid_exists_ICE: testsuiteid_exists - modulename, Error Code : ERRNDAC");
 					cb(null, obj);
 				} else {
 					if (result.rows.length != 0) {
@@ -684,6 +716,7 @@ function testsuiteid_exists(moduledetails, cb, data) {
 		},
 
 		moduledetails: function (modulecallback) {
+			logger.info("Inside the function moduledetails: testsuiteid_exists");
 			if (!flagId) {
 				var inputs = {
 					'project_id': moduledetails.pid,
@@ -698,10 +731,11 @@ function testsuiteid_exists(moduledetails, cb, data) {
 						"Content-Type": "application/json"
 					}
 				};
+				logger.info("Calling NDAC Service from testsuiteid_exists - moduledetails: create_ice/testsuiteid_exists_ICE");
 				client.post("http://127.0.0.1:1990/create_ice/testsuiteid_exists_ICE", args,
 					function (result, response) {
 					if (response.statusCode != 200 || result.rows == "fail") {
-						console.log(result.rows);
+						logger.error("Error occured in create_ice/testsuiteid_exists_ICE: testsuiteid_exists - moduledetails, Error Code : ERRNDAC");
 						cb(null, obj);
 					} else {
 						if (result.rows.length != 0) {
@@ -718,10 +752,12 @@ function testsuiteid_exists(moduledetails, cb, data) {
 			}
 		},
 		moduleupdate: function (modulecallback) {
+			logger.info("Inside the function moduleupdate: testsuiteid_exists");
 			if (!statusflag) {
+				logger.info("Calling updatetestsuitename function from moduleupdate: testsuiteid_exists");
 				updatetestsuitename(moduledetails, function (err, data) {
 					if (err) {
-						console.log(err);
+						logger.info("Error in the function moduleupdate: testsuiteid_exists ", err);
 					} else {
 						if (data == "success") {
 							obj.flag = true;
@@ -744,11 +780,13 @@ function testsuiteid_exists(moduledetails, cb, data) {
 }
 
 function updatetestsuitename(moduledetails, cb, data) {
+	logger.info("Inside the function updatetestsuitename ");
 	var suitedatatoupdate = [];
 	var flagtocheckifexists = false;
 	var flagtocheckifdeleted = false;
 	async.series({
 		select: function (callback) {
+			logger.info("Inside the function select: updatetestsuitename");
 			var inputs = {
 				'name': 'module_details',
 				'id': moduledetails.moduleid
@@ -759,10 +797,11 @@ function updatetestsuitename(moduledetails, cb, data) {
 					"Content-Type": "application/json"
 				}
 			};
+			logger.info("Calling NDAC Service from updatetestsuitename - select: create_ice/get_node_details_ICE");
 			client.post("http://127.0.0.1:1990/create_ice/get_node_details_ICE", args,
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
-					console.log(result.rows);
+					logger.error("Error occured in create_ice/get_node_details_ICE: updatetestsuitename Error Code : ERRNDAC");
 				} else {
 					if (result.rows.length != 0) {
 						flagtocheckifexists = true;
@@ -773,6 +812,7 @@ function updatetestsuitename(moduledetails, cb, data) {
 			});
 		},
 		delete : function (callback) {
+			logger.info("Inside the function delete: updatetestsuitename");
 			if (flagtocheckifexists) {
 				var inputs = {
 					'name': 'delete_module',
@@ -787,14 +827,13 @@ function updatetestsuitename(moduledetails, cb, data) {
 						"Content-Type": "application/json"
 					}
 				};
+				logger.info("Calling NDAC Service from updatetestsuitename - delete: create_ice/delete_node_ICE");
 				client.post("http://127.0.0.1:1990/create_ice/delete_node_ICE", args,
 					function (result, response) {
 					if (response.statusCode != 200 || result.rows == "fail") {
-
-						console.log(result.rows);
+						logger.error("Error occured in create_ice/delete_node_ICE: updatetestsuitename Error Code : ERRNDAC");
 					} else {
 						flagtocheckifdeleted = true;
-
 					}
 					callback();
 				});
@@ -803,6 +842,7 @@ function updatetestsuitename(moduledetails, cb, data) {
 			}
 		},
 		update: function (callback) {
+			logger.info("Inside theh function update: updatetestsuitename");
 			if (flagtocheckifexists && flagtocheckifdeleted) {
 				var inputs = {
 					'projectid': suitedatatoupdate.projectid,
@@ -827,12 +867,13 @@ function updatetestsuitename(moduledetails, cb, data) {
 						"Content-Type": "application/json"
 					}
 				};
+				logger.info("Calling NDAC Service from updatetestsuitename - update: create_ice/updateModulename_ICE");
 				client.post("http://127.0.0.1:1990/create_ice/updateModulename_ICE", args,
 					function (result, response) {
 					if (response.statusCode != 200 || result.rows == "fail") {
-						console.log(result.rows);
+						logger.error("Error occured in create_ice/updateModulename_ICE: updatetestsuitename Error Code : ERRNDAC");
 					} else {
-						console.log('Succesfully renamed module name');
+						logger.error('Succesfully renamed module name');
 					}
 					callback(null, "success");
 				});
@@ -847,6 +888,7 @@ function updatetestsuitename(moduledetails, cb, data) {
 }
 
 function testscenariosid_exists(testscenariodetails, cb, data) {
+	logger.info("Inside teh function testscenariosid_exists ");
 	var flagId = false;
 	var obj = {
 		flag: false,
@@ -855,6 +897,7 @@ function testscenariosid_exists(testscenariodetails, cb, data) {
 	var statusflag = false;
 	async.series({
 		scenarioname: function (scenariocallback) {
+			logger.info("Inside the function scenarioname: testscenariosid_exists");
 			var inputs = {
 				'project_id': testscenariodetails.pid,
 				'scenario_name': testscenariodetails.testscenarioname,
@@ -867,10 +910,11 @@ function testscenariosid_exists(testscenariodetails, cb, data) {
 					"Content-Type": "application/json"
 				}
 			};
+			logger.info("Calling NDAC Service from testscenariosid_exists - scenarioname: create_ice/testscenariosid_exists_ICE");
 			client.post("http://127.0.0.1:1990/create_ice/testscenariosid_exists_ICE", args,
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
-					console.log(result.rows);
+					logger.error("Error occured in create_ice/testscenariosid_exists_ICE: testscenariosid_exists Error Code : ERRNDAC");
 					cb(null, obj);
 				} else {
 					if (result.rows.length != 0) {
@@ -884,6 +928,7 @@ function testscenariosid_exists(testscenariodetails, cb, data) {
 			});
 		},
 		scenariodetails: function (scenariocallback) {
+			logger.info("Inside the function scenariodetails: testscenariosid_exists");
 			if (!flagId) {
 				var inputs = {
 					'project_id': testscenariodetails.pid,
@@ -898,10 +943,11 @@ function testscenariosid_exists(testscenariodetails, cb, data) {
 						"Content-Type": "application/json"
 					}
 				};
+				logger.info("Calling NDAC Service from testscenariosid_exists - scenariodetails: create_ice/testscenariosid_exists_ICE");
 				client.post("http://127.0.0.1:1990/create_ice/testscenariosid_exists_ICE", args,
 					function (result, response) {
 					if (response.statusCode != 200 || result.rows == "fail") {
-						console.log(result.rows);
+						logger.error("Error occured in create_ice/testscenariosid_exists_ICE: testscenariosid_exists - scenariodetails Error Code : ERRNDAC");
 						cb(null, obj);
 					} else {
 						if (result.rows.length != 0) {
@@ -917,10 +963,12 @@ function testscenariosid_exists(testscenariodetails, cb, data) {
 			}
 		},
 		scenarioupdate: function (scenariocallback) {
+			logger.info("Inside the function scenarioupdate: testscenariosid_exists");
 			if (!statusflag) {
+				logger.info("Calling function updatetestscenarioname from scenarioupdate function");
 				updatetestscenarioname(testscenariodetails, function (err, data) {
 					if (err) {
-						console.log(err);
+						logger.error("Error occured in the function scenarioupdate: testscenariosid_exists - scenarioupdate: ",err);
 					} else {
 						if (data == "success") {
 							obj.flag = true;
@@ -933,7 +981,6 @@ function testscenariosid_exists(testscenariodetails, cb, data) {
 			} else {
 				scenariocallback(null, obj);
 			}
-
 		}
 	}, function (err, data) {
 		if (!err) {
@@ -943,11 +990,13 @@ function testscenariosid_exists(testscenariodetails, cb, data) {
 }
 
 function updatetestscenarioname(testscenariodetails, cb, data) {
+	logger.info("Inside the function updatetestscenarioname");
 	var scenariodatatoupdate = [];
 	var flagtocheckifexists = false;
 	var flagtocheckifdeleted = false;
 	async.series({
 		select: function (callback) {
+			logger.info("Inside the function select: updatetestscenarioname");
 			var inputs = {
 				'name': 'testscenario_details',
 				'id': testscenariodetails.testscenarioid
@@ -958,10 +1007,11 @@ function updatetestscenarioname(testscenariodetails, cb, data) {
 					"Content-Type": "application/json"
 				}
 			};
+			logger.info("Calling NDAC Service from updatetestscenarioname - select: create_ice/get_node_details_ICE");
 			client.post("http://127.0.0.1:1990/create_ice/get_node_details_ICE", args,
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
-					console.log(result.rows);
+					logger.error("Error occured in create_ice/get_node_details_ICE: updatetestscenarioname - select, Error Code : ERRNDAC");
 				} else {
 					if (result.rows.length != 0) {
 						flagtocheckifexists = true;
@@ -972,6 +1022,7 @@ function updatetestscenarioname(testscenariodetails, cb, data) {
 			});
 		},
 		delete : function (callback) {
+			logger.info("Inside the function delete: updatetestscenarioname");
 			if (flagtocheckifexists) {
 				var inputs = {
 					'name': 'delete_testscenario',
@@ -986,10 +1037,11 @@ function updatetestscenarioname(testscenariodetails, cb, data) {
 						"Content-Type": "application/json"
 					}
 				};
+				logger.info("Calling NDAC Service from updatetestscenarioname - delete: create_ice/delete_node_ICE");
 				client.post("http://127.0.0.1:1990/create_ice/delete_node_ICE", args,
 					function (result, response) {
 					if (response.statusCode != 200 || result.rows == "fail") {
-						console.log(result.rows);
+						logger.error("Error occured in create_ice/delete_node_ICE: updatetestscenarioname - delete, Error Code : ERRNDAC");
 					} else {
 						//Execute neo4j query!!
 						qList.push({"statement":"MATCH (n: TESTSCENARIOS_NG { testscenarioname: '"+inputs.node_name+"',testscenarioid: '"+inputs.id+"' }) detach delete n"});
@@ -1002,6 +1054,7 @@ function updatetestscenarioname(testscenariodetails, cb, data) {
 			}
 		},
 		update: function (callback) {
+			logger.info("Inside the function update: updatetestscenarioname");
 			if (flagtocheckifexists && flagtocheckifdeleted) {
 				if (scenariodatatoupdate.testcaseids == null) {
 					scenariodatatoupdate.testcaseids = '';
@@ -1028,14 +1081,15 @@ function updatetestscenarioname(testscenariodetails, cb, data) {
 						"Content-Type": "application/json"
 					}
 				};
+				logger.info("Calling NDAC Service from updatetestscenarioname - update: create_ice/updateTestscenarioname_ICE");
 				client.post("http://127.0.0.1:1990/create_ice/updateTestscenarioname_ICE", args,
 					function (result, response) {
 					if (response.statusCode != 200 || result.rows == "fail") {
-						console.log(result.rows);
+						logger.error("Error occured in create_ice/updateTestscenarioname_ICE: updatetestscenarioname - update, Error Code : ERRNDAC");
 					} else {
 	                    //Execute neo4j query!!
 	                    qList.push({"statement":"MATCH(n:TESTSCENARIOS_NG{testScenarioid:'"+inputs.testscenarioid+"'}) SET n.testscenarioname='"+inputs.testscenarioname+"'"+",n.projectid='"+inputs.projectid+"' return n"});
-						console.log('Succesfully renamed Testscenario name');
+						logger.error('Succesfully renamed Testscenario name');
 					}
 					callback(null, "success");
 				});
@@ -1049,6 +1103,7 @@ function updatetestscenarioname(testscenariodetails, cb, data) {
 }
 
 function testscreen_exists(testscreendetails, cb, data) {
+	logger.info("Inside the function testscreen_exists");
 	var flagId = false;
 	var obj = {
 		flag: false,
@@ -1057,6 +1112,7 @@ function testscreen_exists(testscreendetails, cb, data) {
 	var statusflag = false;
 	async.series({
 		screenname: function (screencallback) {
+			logger.info("Inside the function screenname: testscreen_exists");
 			var inputs = {
 				'project_id': testscreendetails.pid,
 				'screen_name': testscreendetails.testscreenname,
@@ -1069,10 +1125,11 @@ function testscreen_exists(testscreendetails, cb, data) {
 					"Content-Type": "application/json"
 				}
 			};
+			logger.info("Calling NDAC Service from testscreen_exists - screenname: create_ice/testscreenid_exists_ICE");
 			client.post("http://127.0.0.1:1990/create_ice/testscreenid_exists_ICE", args,
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
-					console.log(result.rows);
+					logger.error("Error occured in create_ice/testscreenid_exists_ICE: testscreen_exists - screenname, Error Code : ERRNDAC");
 					cb(null, obj);
 				} else {
 					if (result.rows.length != 0) {
@@ -1086,6 +1143,7 @@ function testscreen_exists(testscreendetails, cb, data) {
 			});
 		},
 		screendetails: function (screencallback) {
+			logger.info("Inside the function screendetails: testscreen_exists");
 			if (!flagId) {
 				var inputs = {
 					'project_id': testscreendetails.pid,
@@ -1100,10 +1158,11 @@ function testscreen_exists(testscreendetails, cb, data) {
 						"Content-Type": "application/json"
 					}
 				};
+				logger.info("Calling NDAC Service from testscreen_exists - screendetails: create_ice/testscreenid_exists_ICE");
 				client.post("http://127.0.0.1:1990/create_ice/testscreenid_exists_ICE", args,
 					function (result, response) {
 					if (response.statusCode != 200 || result.rows == "fail") {
-						console.log(result.rows);
+						logger.error("Error occured in create_ice/testscreenid_exists_ICE: testscreen_exists - screendetails, Error Code : ERRNDAC");
 						cb(null, obj);
 					} else {
 						if (result.rows.length != 0) {
@@ -1119,10 +1178,12 @@ function testscreen_exists(testscreendetails, cb, data) {
 			}
 		},
 		screenupdate: function (screencallback) {
+			logger.info("Inside the function screenupdate: testscreen_exists");
 			if (!statusflag) {
+				logger.info("Calling function updatetestscreenname from screenupdate of testscreen_exists function");
 				updatetestscreenname(testscreendetails, function (err, data) {
 					if (err) {
-						console.log(err);
+						logger.info("Error occured in the function updatetestscreenname: screenupdate of testscreen_exists function:", err);
 					} else {
 						if (data == "success") {
 							obj.flag = true;
@@ -1144,11 +1205,13 @@ function testscreen_exists(testscreendetails, cb, data) {
 }
 
 function updatetestscreenname(testscreendetails, cb, data) {
+	logger.info("Inside the function updatetestscreenname");
 	var screendatatoupdate = [];
 	var flagtocheckifexists = false;
 	var flagtocheckifdeleted = false;
 	async.series({
 		select: function (callback) {
+			logger.info("Inside the function select: updatetestscreenname");
 			var inputs = {
 				'name': 'screen_details',
 				'id': testscreendetails.testscreenid
@@ -1159,10 +1222,11 @@ function updatetestscreenname(testscreendetails, cb, data) {
 					"Content-Type": "application/json"
 				}
 			};
+			logger.info("Calling NDAC Service from updatetestscreenname - select: create_ice/get_node_details_ICE");
 			client.post("http://127.0.0.1:1990/create_ice/get_node_details_ICE", args,
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
-					console.log(result.rows);
+					logger.info("Error occured in create_ice/get_node_details_ICE: updatetestscreenname, Error Code : ERRNDAC");
 				} else {
 					if (result.rows.length != 0) {
 						flagtocheckifexists = true;
@@ -1173,6 +1237,7 @@ function updatetestscreenname(testscreendetails, cb, data) {
 			});
 		},
 		delete : function (callback) {
+			logger.info("Inside the function delete: updatetestscreenname");
 			if (flagtocheckifexists) {
 				var inputs = {
 					'name': 'delete_screen',
@@ -1187,17 +1252,16 @@ function updatetestscreenname(testscreendetails, cb, data) {
 						"Content-Type": "application/json"
 					}
 				};
+				logger.info("Calling NDAC Service from updatetestscreenname - delete: create_ice/delete_node_ICE");
 				client.post("http://127.0.0.1:1990/create_ice/delete_node_ICE", args,
 					function (result, response) {
 					if (response.statusCode != 200 || result.rows == "fail") {
-						console.log(result.rows);
+						logger.info("Error occured in create_ice/delete_node_ICE: updatetestscreenname, Error Code : ERRNDAC");
 					} else {
 						// if(deleted.rows != undefined && deleted.rows.length!=0){
 						flagtocheckifdeleted = true;
 						//Execute neo4j query!!
 						qList.push({"statement":"MATCH (n: SCREENS_NG { screenname: '"+inputs.node_name+"',screenid: '"+inputs.id+"',versionnumber:'"+inputs.version_number+"' }) detach delete n"});
-						
-						// }
 					}
 					callback();
 				});
@@ -1206,6 +1270,7 @@ function updatetestscreenname(testscreendetails, cb, data) {
 			}
 		},
 		update: function (callback) {
+			logger.info("Inside the function update: updatetestscreenname");
 			if (flagtocheckifexists) {
 				if (screendatatoupdate.screendata == null) {
 					screendatatoupdate.screendata = '';
@@ -1233,15 +1298,15 @@ function updatetestscreenname(testscreendetails, cb, data) {
 						"Content-Type": "application/json"
 					}
 				};
+				logger.info("Calling NDAC Service from updatetestscreenname - update: create_ice/updateScreenname_ICE");
 				client.post("http://127.0.0.1:1990/create_ice/updateScreenname_ICE", args,
 					function (result, response) {
 					if (response.statusCode != 200 || result.rows == "fail") {
-						console.log(result.rows);
+						logger.info("Error occured in create_ice/updateScreenname_ICE: updatetestscreenname, Error Code : ERRNDAC");
 					} else {
-						console.log('Succesfully renamed Screen name');
+						logger.info('Succesfully renamed Screen name');
 						//Execute neo4j query!!
 						qList.push({"statement":"MATCH(n:SCREENS_NG{screenid:'"+inputs.screenid+"'}) SET n.screenname='"+inputs.screenname+"'"+",n.projectid='"+inputs.projectid+"' return n"});
-
 					}
 					callback(null, "success");
 				});
@@ -1255,6 +1320,7 @@ function updatetestscreenname(testscreendetails, cb, data) {
 }
 
 function testcase_exists(testcasedetails, cb, data) {
+	logger.info("Inside the function testcase_exists");
 	var flagId = false;
 	var obj = {
 		flag: false,
@@ -1263,6 +1329,7 @@ function testcase_exists(testcasedetails, cb, data) {
 	var statusflag = false;
 	async.series({
 		testcasename: function (testcasecallback) {
+			logger.info("Inside the function testcasename: testcase_exists");
 			var inputs = {
 				'screen_id': testcasedetails.screenId,
 				'testcase_name': testcasedetails.testcasename,
@@ -1275,10 +1342,11 @@ function testcase_exists(testcasedetails, cb, data) {
 					"Content-Type": "application/json"
 				}
 			};
+			logger.info("Calling NDAC Service from testcase_exists - testcasename: create_ice/testcaseid_exists_ICE");
 			client.post("http://127.0.0.1:1990/create_ice/testcaseid_exists_ICE", args,
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
-					console.log(result.rows);
+					logger.info("Error occured in create_ice/testcaseid_exists_ICE: testcase_exists, Error Code : ERRNDAC");
 					cb(null, obj);
 				} else {
 					if (result.rows.length != 0) {
@@ -1292,6 +1360,7 @@ function testcase_exists(testcasedetails, cb, data) {
 			});
 		},
 		testcasedetails: function (testcasecallback) {
+			logger.info("Inside the function testcasedetails: testcase_exists function");
 			if (!flagId) {
 				var inputs = {
 					'screen_id': testcasedetails.screenId,
@@ -1306,10 +1375,11 @@ function testcase_exists(testcasedetails, cb, data) {
 						"Content-Type": "application/json"
 					}
 				};
+				logger.info("Calling NDAC Service from testcase_exists - testcasedetails: create_ice/testcaseid_exists_ICE");
 				client.post("http://127.0.0.1:1990/create_ice/testcaseid_exists_ICE", args,
 					function (result, response) {
 					if (response.statusCode != 200 || result.rows == "fail") {
-						console.log(result.rows);
+						logger.info("Error occured in create_ice/testcaseid_exists_ICE: testcase_exists - testcasedetails, Error Code : ERRNDAC");
 						cb(null, obj);
 					} else {
 						if (result.rows.length != 0) {
@@ -1325,10 +1395,12 @@ function testcase_exists(testcasedetails, cb, data) {
 			}
 		},
 		testcaseupdate: function (testcasecallback) {
+			logger.info("Inside the function testcaseupdate: testcase_exists");
 			if (!statusflag) {
+				logger.info("Calling updatetestcasename function from testcaseupdate of testcase_exists function");
 				updatetestcasename(testcasedetails, function (err, data) {
 					if (err) {
-						console.log(err);
+						logger.info("Error occured in the function testcaseupdate of testcase_exists function");
 					} else {
 						if (data == "success") {
 							obj.flag = true;
@@ -1350,11 +1422,13 @@ function testcase_exists(testcasedetails, cb, data) {
 }
 
 function updatetestcasename(testcasedetails, cb, data) {
+	logger.info("Inside the function updatetestcasename");
 	var testcasedatatoupdate = [];
 	var flagtocheckifexists = false;
 	var flagtocheckifdeleted = false;
 	async.series({
 		select: function (callback) {
+			logger.info("Inside the function select: updatetestcasename");
 			var inputs = {
 				'name': 'testcase_details',
 				'id': testcasedetails.testcaseid
@@ -1365,10 +1439,11 @@ function updatetestcasename(testcasedetails, cb, data) {
 					"Content-Type": "application/json"
 				}
 			};
+			logger.info("Calling NDAC Service from updatetestcasename - select: create_ice/get_node_details_ICE");
 			client.post("http://127.0.0.1:1990/create_ice/get_node_details_ICE", args,
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
-					console.log(result.rows);
+					logger.info("Error occured in create_ice/get_node_details_ICE: updatetestcasename - select, Error Code : ERRNDAC");
 				} else {
 					if (result.rows.length != 0) {
 						flagtocheckifexists = true;
@@ -1379,6 +1454,7 @@ function updatetestcasename(testcasedetails, cb, data) {
 			});
 		},
 		delete : function (callback) {
+			logger.info("Inside the function delete: updatetestcasename");
 			if (flagtocheckifexists) {
 				var inputs = {
 					'name': 'delete_testcase',
@@ -1393,17 +1469,17 @@ function updatetestcasename(testcasedetails, cb, data) {
 						"Content-Type": "application/json"
 					}
 				};
+				logger.info("Calling NDAC Service from updatetestcasename - delete: create_ice/delete_node_ICE");
 				client.post("http://127.0.0.1:1990/create_ice/delete_node_ICE", args,
 					function (result, response) {
 					if (response.statusCode != 200 || result.rows == "fail") {
-						console.log(result.rows);
+						logger.info("Error occured in create_ice/delete_node_ICE: updatetestcasename - delete, Error Code : ERRNDAC");
 					} else {
 						// if(deleted.rows != undefined && deleted.rows.length!=0){
 						flagtocheckifdeleted = true;
                         //Execute neo4j query!!
                         qList.push({"statement":"MATCH (n: TESTCASES_NG { testCaseName: '"+inputs.node_name+"',testCaseID: '"+inputs.id+"',versionnumber:'"+inputs.version_number+"' }) detach delete n"});
-
-						// }
+					// }
 					}
 					callback();
 				});
@@ -1412,6 +1488,7 @@ function updatetestcasename(testcasedetails, cb, data) {
 			}
 		},
 		update: function (callback) {
+			logger.info("Inside the function update: updatetestcasename");
 			if (flagtocheckifexists && flagtocheckifdeleted) {
 				if (testcasedatatoupdate.testcasesteps == null) {
 					testcasedatatoupdate.testcasesteps = '';
@@ -1439,15 +1516,15 @@ function updatetestcasename(testcasedetails, cb, data) {
 						"Content-Type": "application/json"
 					}
 				};
+				logger.info("Calling NDAC Service from updatetestcasename - update: create_ice/updateTestcasename_ICE");
 				client.post("http://127.0.0.1:1990/create_ice/updateTestcasename_ICE  ", args,
 					function (result, response) {
 					if (response.statusCode != 200 || result.rows == "fail") {
-						console.log(result.rows);
+						logger.info("Error occured in create_ice/updateTestcasename_ICE: updatetestcasename - update, Error Code : ERRNDAC");
 					} else {
-						console.log('Succesfully renamed Testcase name');
+						logger.info('Succesfully renamed Testcase name');
 						//Execute neo4j query!!
 						qList.push({"statement":"MATCH(n:TESTCASES_NG{testcaseid:'"+inputs.testcaseid+"'}) SET n.testcasename='"+inputs.testcasename+"' return n"});
-
 					}
 					callback(null, "success");
 				});
@@ -1461,6 +1538,7 @@ function updatetestcasename(testcasedetails, cb, data) {
 }
 
 exports.getReleaseIDs_Ninteen68 = function (req, res) {
+	logger.info("Inside UI service: getReleaseIDs_Ninteen68");
 	var rname = [];
 	var r_ids = [];
 	var rel = {
@@ -1477,28 +1555,31 @@ exports.getReleaseIDs_Ninteen68 = function (req, res) {
 			"Content-Type": "application/json"
 		}
 	};
+	logger.info("Calling NDAC Service from getReleaseIDs_Ninteen68: create_ice/getReleaseIDs_Ninteen68");
 	client.post("http://127.0.0.1:1990/create_ice/getReleaseIDs_Ninteen68", args,
 		function (result, response) {
-		try {
-			if (response.statusCode != 200 || result.rows == "fail") {
-				res(null, result.rows);
-			} else {
-				async.forEachSeries(result.rows, function (iterator, callback1) {
-					rname.push(iterator.releasename);
-					r_ids.push(iterator.releaseid);
-					callback1();
-				});
-				rel.rel = rname;
-				rel.r_ids = r_ids;
-				res(null, rel);
+			try {
+				if (response.statusCode != 200 || result.rows == "fail") {
+					logger.info("Error occured in create_ice/getReleaseIDs_Ninteen68: getReleaseIDs_Ninteen68, Error Code : ERRNDAC");
+					res(null, result.rows);
+				} else {
+					async.forEachSeries(result.rows, function (iterator, callback1) {
+						rname.push(iterator.releasename);
+						r_ids.push(iterator.releaseid);
+						callback1();
+					});
+					rel.rel = rname;
+					rel.r_ids = r_ids;
+					res(null, rel);
+				}
+			} catch (ex) {
+				logger.info("Exception in the service getReleaseIDs_Ninteen68: ", ex);
 			}
-		} catch (ex) {
-			console.log(ex);
-		}
-	});
+		});
 };
 
 exports.getCycleIDs_Ninteen68 = function (req, res) {
+	logger.info("Inside UI service: getCycleIDs_Ninteen68");
 	var cname = [];
 	var c_ids = [];
 	var cyc = {
@@ -1515,28 +1596,31 @@ exports.getCycleIDs_Ninteen68 = function (req, res) {
 			"Content-Type": "application/json"
 		}
 	};
+	logger.info("Calling NDAC Service from getCycleIDs_Ninteen68: create_ice/getCycleIDs_Ninteen68");
 	client.post("http://127.0.0.1:1990/create_ice/getCycleIDs_Ninteen68", args,
 		function (result, response) {
-		try {
-			if (response.statusCode != 200 || result.rows == "fail") {
-				res(null, result.rows);
-			} else {
-				async.forEachSeries(result.rows, function (iterator, callback1) {
-					cname.push(iterator.cyclename);
-					c_ids.push(iterator.cycleid);
-					callback1();
-				});
-				cyc.cyc = cname;
-				cyc.c_ids = c_ids;
-				res(null, cyc);
+			try {
+				if (response.statusCode != 200 || result.rows == "fail") {
+					logger.info("Error occured in create_ice/getCycleIDs_Ninteen68: getCycleIDs_Ninteen68, Error Code : ERRNDAC");
+					res(null, result.rows);
+				} else {
+					async.forEachSeries(result.rows, function (iterator, callback1) {
+						cname.push(iterator.cyclename);
+						c_ids.push(iterator.cycleid);
+						callback1();
+					});
+					cyc.cyc = cname;
+					cyc.c_ids = c_ids;
+					res(null, cyc);
+				}
+			} catch (ex) {
+				logger.info("Exception in the service getCycleIDs_Ninteen68: ", ex);
 			}
-		} catch (ex) {
-			console.log(ex);
-		}
-	});
+		});
 };
 
 exports.getProjectIDs_Nineteen68 = function (req, res) {
+	logger.info("Inside UI service: getProjectIDs_Nineteen68");
 	var projectdetails = {
 		projectId: [],
 		projectName: [],
@@ -1558,9 +1642,11 @@ exports.getProjectIDs_Nineteen68 = function (req, res) {
 	};
 	async.series({
 		function (callback) {
+			logger.info("Calling NDAC Service from getProjectIDs_Nineteen68: create_ice/getProjectIDs_Nineteen68");
 			client.post("http://127.0.0.1:1990/create_ice/getProjectIDs_Nineteen68", args,
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
+					logger.info("Error occured in create_ice/getProjectIDs_Nineteen68: getProjectIDs_Nineteen68, Error Code : ERRNDAC");
 					res(null, result.rows);
 				} else {
 					projectdetails=result.rows;
@@ -1572,12 +1658,13 @@ exports.getProjectIDs_Nineteen68 = function (req, res) {
 		try {
 			res(null, projectdetails);
 		} catch (ex) {
-			console.log(ex);
+			logger.info("Exception in the service getProjectIDs_Nineteen68: ", ex);
 		}
 	});
 };
 
 exports.getProjectType_Nineteen68 = function (req, res) {
+	logger.info("Inside UI service: getProjectType_Nineteen68");
 	var projectDetails = {
 		projectType: '',
 		project_id: ''
@@ -1592,10 +1679,12 @@ exports.getProjectType_Nineteen68 = function (req, res) {
 			"Content-Type": "application/json"
 		}
 	};
+	logger.info("Calling NDAC Service from getProjectType_Nineteen68: create_ice/getProjectType_Nineteen68");
 	client.post("http://127.0.0.1:1990/create_ice/getProjectType_Nineteen68", args,
 		function (result, response) {
 		try {
 			if (response.statusCode != 200 || result.rows == "fail") {
+				logger.info("Error occured in create_ice/getProjectType_Nineteen68: getProjectType_Nineteen68, Error Code : ERRNDAC");
 				res(null, result.rows);
 			} else {
 				if (result.rows.length != 0) {
@@ -1605,12 +1694,13 @@ exports.getProjectType_Nineteen68 = function (req, res) {
 				res(null, projectDetails);
 			}
 		} catch (ex) {
-			console.log(ex);
+			logger.info("Exception in the service getProjectType_Nineteen68: ", ex);
 		}
 	});
 };
 
 exports.createE2E_Structure_Nineteen68 = function (req, res) {
+	logger.info("Inside UI service: createE2E_Structure_Nineteen68");
 	var createdthrough = 'Mindmaps Creation';
 	var RequestedJSON = req;
 	var projectid = RequestedJSON.projectId;
@@ -1630,6 +1720,7 @@ exports.createE2E_Structure_Nineteen68 = function (req, res) {
 	var suiteflag = false;
 	async.series({
 		projectsUnderDomain: function (callback) {
+			logger.info("Inside the function projectsUnderDomain: createE2E_Structure_Nineteen68");
 			suiteflag = false;
 			var suiteidTemp = '';
 			var scenariodetailslist = [];
@@ -1646,7 +1737,7 @@ exports.createE2E_Structure_Nineteen68 = function (req, res) {
 				"newversionnumber": versionnumber
 			}, function (err, data) {
 				if (err) {
-					console.log(err);
+					logger.info("Error occured in projectsUnderDomain: createE2E_Structure_Nineteen68: ",err);
 				} else {
 					suiteflag = data.flag;
 					suiteidTemp = data.suiteid;
@@ -1684,10 +1775,11 @@ exports.createE2E_Structure_Nineteen68 = function (req, res) {
 						"Content-Type": "application/json"
 					}
 				};
+				logger.info("Calling NDAC Service from projectsUnderDomain: createE2E_Structure_Nineteen68: create_ice/insertInSuite_ICE");
 				client.post("http://127.0.0.1:1990/create_ice/insertInSuite_ICE", args,
 					function (result, response) {
 					if (response.statusCode != 200 || result.rows == "fail") {
-						console.log(result.rows);
+						logger.info("Error occured in create_ice/insertInSuite_ICE: projectsUnderDomain: createE2E_Structure_Nineteen68, Error Code : ERRNDAC");
 					} else {
 						scenario = suitedetails.testscenarioDetails;
 						var scenariosarray = [];
@@ -1712,14 +1804,14 @@ exports.createE2E_Structure_Nineteen68 = function (req, res) {
 								"newversionnumber": versionnumber
 							}, function (err, scenariodata) {
 								if (err) {
-									console.log(err);
+									logger.info("Error occured in projectsUnderDomain: createE2E_Structure_Nineteen68: create_ice/insertInSuite_ICE ",err);
 									cb(null, err);
 								} else {
 									scenarioflag = scenariodata.flag;
 									scenarioidTemp = scenariodata.scenarioid;
 								}
 								if (!scenarioflag) {
-									console.log("Scenario does not exists");
+									logger.info("Scenario does not exists");
 								} else {
 									scenarioId = scenarioidTemp;
 									scenarioidlist.push(scenarioId);
@@ -1741,6 +1833,7 @@ exports.createE2E_Structure_Nineteen68 = function (req, res) {
 			});
 		},
 		updatescenarioids: function (callback) {
+			logger.info("Inside the function updatescenarioids: createE2E_Structure_Nineteen68");
 			var inputs = {
 				'testscenarioids': scenarioidlist,
 				'moduleid': suiteID,
@@ -1757,20 +1850,21 @@ exports.createE2E_Structure_Nineteen68 = function (req, res) {
 					"Content-Type": "application/json"
 				}
 			};
+			logger.info("Calling NDAC Service from updatescenarioids: createE2E_Structure_Nineteen68: create_ice/updateModule_ICE");
 			client.post("http://127.0.0.1:1990/create_ice/updateModule_ICE", args,
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
-					console.log(result.rows);
+					logger.info("Error occured in create_ice/updateModule_ICE: updatescenarioids: createE2E_Structure_Nineteen68, Error Code : ERRNDAC");
 				} else {
-					console.log("Successfully updated Modules");
+					logger.info("Successfully updated Modules");
 				}
 				callback();
 			});
 		}
 	},
-		function (err, results) {
+	function (err, results) {
 		if (err) {
-			console.log(err);
+			logger.info("Error occured in createE2E_Structure_Nineteen68: ",err);
 			res(null, err);
 		} else {
 			var returnJsonmindmap = {
@@ -1787,6 +1881,7 @@ exports.createE2E_Structure_Nineteen68 = function (req, res) {
 
 
 exports.submitTask = function (req, res) {
+	logger.info("Inside UI service: submitTask");
 	var taskdetails = req.taskdetails;
 	inputs = {
 		'status': req.status,
@@ -1801,16 +1896,18 @@ exports.submitTask = function (req, res) {
 			"Content-Type": "application/json"
 		}
 	};
+	logger.info("Calling NDAC Service from submitTask: create_ice/submitTask");
 	client.post("http://127.0.0.1:1990/create_ice/submitTask", args,
 		function (result, response) {
-		try {
-			if (response.statusCode != 200 || result.rows == "fail") {
-				res(null, result.rows);
-			} else {
-				console.log(result);
+			try {
+				if (response.statusCode != 200 || result.rows == "fail") {
+					logger.info("Error occured in create_ice/submitTask: submitTask, Error Code : ERRNDAC");
+					res(null, result.rows);
+				} else {
+					logger.info("Task submitted successfully");
+				}
+			} catch (ex) {
+				logger.info("Exception in the service submitTask: ", ex);
 			}
-		} catch (ex) {
-			console.log(ex);
-		}
-	});
+		});
 };

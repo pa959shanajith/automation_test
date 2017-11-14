@@ -13,6 +13,7 @@ var sessionExtend = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes
 var sessionTime = 30 * 60 * 1000;
 var updateSessionTimeEvery = 20 * 60 * 1000;
 var scheduleStatus = "";
+var  logger = require('../../logger');
 
 /**
  * @author vishvas.a
@@ -25,6 +26,7 @@ var scheduleStatus = "";
 var qList = [];
 
 exports.readTestSuite_ICE = function (req, res) {
+	logger.info("Inside UI service: readTestSuite_ICE");
 	qList = [];
 	if (req.cookies['connect.sid'] != undefined) {
 		var sessionCookie = req.cookies['connect.sid'].split(".");
@@ -45,9 +47,10 @@ exports.readTestSuite_ICE = function (req, res) {
 			var outscenarionames = [];
 			var outprojectnames = [];
 			testsuitesindex = testsuitesindex + 1;
+			logger.info("Calling function TestSuiteDetails_Module_ICE from readTestSuite_ICE");
 			TestSuiteDetails_Module_ICE(eachSuite, function (TestSuiteDetailserror, TestSuiteDetailsCallback) {
 				if (TestSuiteDetailserror) {
-					console.log(TestSuiteDetailserror);
+					logger.info("Error in the function TestSuiteDetails_Module_ICE from readTestSuite_ICE: ",TestSuiteDetailserror);
 				} else {
 					var inputs = {
 						"testsuiteid": eachSuite.testsuiteid,
@@ -62,9 +65,11 @@ exports.readTestSuite_ICE = function (req, res) {
 							"Content-Type": "application/json"
 						}
 					};
+					logger.info("Calling NDAC Service from readTestSuite_ICE: suite/readTestSuite_ICE");
 					client.post(epurl + "suite/readTestSuite_ICE", args,
 						function (result, response) {
 						if (response.statusCode != 200 || result.rows == "fail") {
+							logger.info("Error occured in suite/readTestSuite_ICE from readTestSuite_ICE Error Code : ERRNDAC")
 							var flag = "Error in readTestSuite_ICE : Fail";
 							res.send(flag);
 						} else {
@@ -121,9 +126,10 @@ exports.readTestSuite_ICE = function (req, res) {
 									 *  Projectnametestcasename_ICE is a function to fetch testscenario name and project name
 									 * 	modified shreeram p on 15th mar 2017
 									 * */
+									logger.info("Calling function Projectnametestcasename_ICE from readTestSuite_ICE");
 									Projectnametestcasename_ICE(eachoutscenarioid, function (eachoutscenarioiderr, eachoutscenarioiddata) {
 										if (eachoutscenarioiderr) {
-											console.log(eachoutscenarioiderr);
+											logger.info("Error in the function Projectnametestcasename_ICE from readTestSuite_ICE: ",eachoutscenarioiderr);
 										} else {
 											if (eachoutscenarioiddata != null || eachoutscenarioiddata != undefined) {
 												outscenarionames.push(eachoutscenarioiddata.testcasename);
@@ -140,6 +146,7 @@ exports.readTestSuite_ICE = function (req, res) {
 														var connectusers = [];
 														if (myserver.allSchedulingSocketsMap != undefined) {
 															connectusers = Object.keys(myserver.allSchedulingSocketsMap);
+															logger.info("IP\'s connected : %s", Object.keys(myserver.allSchedulingSocketsMap).join());
 														}
 														var schedulingDetails = {
 															"connectedUsers": connectusers,
@@ -160,17 +167,21 @@ exports.readTestSuite_ICE = function (req, res) {
 				}
 			});
 		},function(){
+			logger.info("Inside final function of the service readTestSuite_ICE");
+			logger.info("Calling function executeQueries from final function of the service readTestSuite_ICE");
 			neo4jAPI.executeQueries(qList,function(status,result){
 				if(status!=200){
-					console.log("Status:",status,"\nResponse: ",result);
+					logger.info("Status:",status,"\nResponse: ",result);
 				}
 				else{
-					console.log('Success');
+					logger.info('Success');
 				}
+				logger.info("Sending Testsuite details from the service readTestSuite_ICE");
 				res.send(responsedata);
 			});
 		});
 	} else {
+		logger.info('Error in the service readTestSuite_ICE: Invalid Session');
 		res.send("Invalid Session");
 	}
 };
@@ -180,6 +191,7 @@ exports.readTestSuite_ICE = function (req, res) {
  * created by shreeram p on 15th mar 2017
  *  */
 function Projectnametestcasename_ICE(req, cb, data) {
+	logger.info("Inside function Projectnametestcasename_ICE of the service readTestSuite_ICE");
 	var projectid = '';
 	var testcaseNproject = {
 		testcasename: "",
@@ -197,10 +209,11 @@ function Projectnametestcasename_ICE(req, cb, data) {
 					"Content-Type": "application/json"
 				}
 			};
+			logger.info("Calling NDAC Service from Projectnametestcasename_ICE - testcasename: suite/readTestSuite_ICE");
 			client.post(epurl + "suite/readTestSuite_ICE", args,
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
-					console.log("Error occured in Projectnametestcasename_ICE : fail");
+					logger.info("Error occured in the function testcasename of Projectnametestcasename_ICE: suite/readTestSuite_ICE - fail");
 				} else {
 					if (result.rows.length != 0) {
 						projectid = result.rows[0].projectid;
@@ -221,10 +234,11 @@ function Projectnametestcasename_ICE(req, cb, data) {
 					"Content-Type": "application/json"
 				}
 			};
+			logger.info("Calling NDAC Service from Projectnametestcasename_ICE - projectname: suite/readTestSuite_ICE");
 			client.post(epurl + "suite/readTestSuite_ICE", args,
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
-					console.log("Error occured in Projectnametestcasename_ICE : fail");
+					logger.info("Error occured in the function projectname of Projectnametestcasename_ICE: suite/readTestSuite_ICE - fail");
 				} else {
 					if (result.rows.length != 0)
 						testcaseNproject.projectname = result.rows[0].projectname;
@@ -245,6 +259,7 @@ function Projectnametestcasename_ICE(req, cb, data) {
  * to the testsuites table of icetestautomation keyspace
  */
 exports.updateTestSuite_ICE = function (req, res) {
+	logger.info("Inside UI service: updateTestSuite_ICE");
     qList = [];
 	if (req.cookies['connect.sid'] != undefined) {
 		var sessionCookie = req.cookies['connect.sid'].split(".");
@@ -284,17 +299,20 @@ exports.updateTestSuite_ICE = function (req, res) {
 					"testsuiteid": requestedtestsuiteid,
 					"versionnumber": versionnumber
 				};
+				logger.info("Calling function deleteSuite (deletetestsuitequery) from updateTestSuite_ICE");
 				deleteSuite(inputs, function (err, response) {
 					if (response == "success") {
+						logger.info("Calling function saveSuite (deletetestsuitequery) from updateTestSuite_ICE");
 						saveSuite(function (err, response) {
 							if (err) {
+								logger.info("Error occured in the function saveSuite (deletetestsuitequery) from updateTestSuite_ICE");
 								flag = "fail";
 								res.send(flag);
 							} else {
 								flag = "success";
 								index = index + 1;
 								if (index == testscenarioids.length) {
-									console.log("delete completed --- calling next Suite");
+									logger.info("Delete completed - calling next Suite. In the function saveSuite (deletetestsuitequery) from updateTestSuite_ICE");
 									suiteindex = suiteindex + 1;
 									if (batchindex == batchDetailslength && suiteindex == totalnumberofsuites) {
 										res.send("success");
@@ -308,16 +326,18 @@ exports.updateTestSuite_ICE = function (req, res) {
 				});
 
 				function deleteSuite(inputs, deleteSuitecallback) {
+					logger.info("Inside deleteSuite function");
 					var args = {
 						data: inputs,
 						headers: {
 							"Content-Type": "application/json"
 						}
 					};
+					logger.info("Calling NDAC Service from the function deleteSuite of updateTestSuite_ICE: suite/updateTestSuite_ICE");
 					client.post(epurl + "suite/updateTestSuite_ICE", args,
 						function (data, response) {
 						if (response.statusCode != 200 || data.rows == "fail") {
-							console.log(response.statusCode);
+							logger.error("Error occured in suite/updateTestSuite_ICE from updateTestSuite_ICE: deleteSuite function - Error Code : ERRNDAC");
 						} else {
 							//Execute neo4j query!!
 							//var qList=[];
@@ -336,6 +356,7 @@ exports.updateTestSuite_ICE = function (req, res) {
 				}
 
 				function saveSuite(saveSuite) {
+					logger.info("Inside saveSuite function");
 					for (var scenarioidindex = 0; scenarioidindex < testscenarioids.length; scenarioidindex++) {
 						var inputs2 = {
 							"query": "updatetestsuitedataquery",
@@ -358,10 +379,11 @@ exports.updateTestSuite_ICE = function (req, res) {
 								"Content-Type": "application/json"
 							}
 						};
+						logger.info("Calling NDAC Service from the function saveSuite of updateTestSuite_ICE: suite/updateTestSuite_ICE");
 						client.post(epurl + "suite/updateTestSuite_ICE", args,
 							function (data, response) {
 							if (response.statusCode != 200 || data.rows == "fail") {
-								console.log(response.statusCode);
+								logger.error("Error occured in suite/updateTestSuite_ICE from updateTestSuite_ICE: saveSuite function - Error Code : ERRNDAC");
 							} else {
 								//Execute neo4j query!!
 								//var qList=[];
@@ -385,12 +407,14 @@ exports.updateTestSuite_ICE = function (req, res) {
 			batchDetailscallback();
 		});
 	} else {
+		logger.info("Error occured in the service updateTestSuite_ICE: Invalid Session");
 		res.send("Invalid Session");
 	}
 };
 
 //Update execution table on completion of suite execution
 function updateExecutionStatus(testsuiteid, executionid, starttime, suiteStatus) {
+	logger.info("Inside updateExecutionStatus function");
 	var inputs = {
 		"testsuiteid": testsuiteid,
 		"executionid": executionid,
@@ -404,12 +428,14 @@ function updateExecutionStatus(testsuiteid, executionid, starttime, suiteStatus)
 			"Content-Type": "application/json"
 		}
 	};
+	logger.info("Calling NDAC Service: suite/ExecuteTestSuite_ICE from updateExecutionStatus function");
 	client.post(epurl + "suite/ExecuteTestSuite_ICE", args,
 		function (result, response) {
 		if (response.statusCode != 200 || result.rows == "fail") {
-			console.log("Error occured in TestCaseDetails_Suite_ICE : fail , insertIntoExecution");
+			logger.error("Error occured in updateExecutionStatus: suite/ExecuteTestSuite_ICE, Error Code : ERRNDAC");
 			flag = "fail";
 		} else {
+			logger.error("Execution status updated successfully from updateExecutionStatus: suite/ExecuteTestSuite_ICE");
 			flag = "success";
 		}
 	});
@@ -420,6 +446,7 @@ function updateExecutionStatus(testsuiteid, executionid, starttime, suiteStatus)
  * @author vishvas.a changes on 21/June/2017 with regard to Batch Execution
  */
 exports.ExecuteTestSuite_ICE = function (req, res) {
+	logger.info("Inside UI service: ExecuteTestSuite_ICE");
 	if (req.cookies['connect.sid'] != undefined) {
 		var sessionCookie = req.cookies['connect.sid'].split(".");
 		var sessionToken = sessionCookie[0].split(":");
@@ -451,12 +478,13 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 				"Content-Type": "application/json"
 			}
 		};
+		logger.info("Calling NDAC Service: utility/dataUpdator_ICE from ExecuteTestSuite_ICE");
 		client.post(epurl + "utility/dataUpdator_ICE", args,
 			function (result, response) {
 			if (response.statusCode != 200 || result.rows == "fail") {
-				console.log("Data Updator Fail");
+				logger.info("Error occured in utility/dataUpdator_ICE service from ExecuteTestSuite_ICE: Data Updator Fail");
 			} else {
-				console.log("Data Updator Success");
+				logger.info("Data Updator Success");
 			}
 		});
 		async.forEachSeries(batchExecutionData, function (eachbatchExecutionData, batchExecutionDataCallback) {
@@ -485,10 +513,11 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 				conditionchecklist.push(eachsuiteDetails.condition);
 				browserTypelist.push(eachsuiteDetails.browserType);
 				currentscenarioid = eachsuiteDetails.scenarioids;
+				logger.info("Calling function TestCaseDetails_Suite_ICE from ExecuteTestSuite_ICE");
 				TestCaseDetails_Suite_ICE(currentscenarioid, userInfo.user_id, function (currentscenarioidError, currentscenarioidResponse) {
 					var scenariotestcaseobj = {};
 					if (currentscenarioidError) {
-						console.log(currentscenarioidError);
+						logger.info("Error occured in the function TestCaseDetails_Suite_ICE: ",currentscenarioidError);
 					} else {
 						if (currentscenarioidResponse != null || currentscenarioidResponse != undefined) {
 							scenariotestcaseobj[currentscenarioid] = currentscenarioidResponse.listoftestcasedata;
@@ -498,16 +527,18 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 							eachsuiteDetailscallback();
 						}
 						if (listofscenarioandtestcases.length == suiteDetails.length) {
+							logger.info("Calling function updateData from TestCaseDetails_Suite_ICE function");
 							updateData();
 							batchExecutionDataCallback();
 							if (testsuitedetailslist.length == batchExecutionData.length) {
+								logger.info("Calling function executionFunction from TestCaseDetails_Suite_ICE function");
 								var a = executionFunction(executionRequest);
-								console.log(a);
 							}
 						}
 					}
 				});
 				function updateData() {
+					logger.info("Inside updateData function");
 					executionjson[testsuiteid] = listofscenarioandtestcases;
 					executionjson.scenarioIds = scenarioIdList;
 					executionjson.browserType = browserType;
@@ -517,6 +548,7 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 					executionjson.testsuitename = testsuitename;
 					testsuitedetailslist.push(executionjson);
 					if (testsuitedetailslist.length == batchExecutionData.length) {
+						logger.info("Calling function excutionObjectBuilding from updateData function");
 						excutionObjectBuilding(testsuitedetailslist,apptype);
 					}
 				}
@@ -524,6 +556,7 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 		});
 
 		function excutionObjectBuilding(testsuitedetailslist,apptype) {
+			logger.info("Inside excutionObjectBuilding function");
 			executionRequest.executionId = executionId;
 			executionRequest.suitedetails = testsuitedetailslist;
 			executionRequest.testsuiteIds = testsuiteIds;
@@ -531,12 +564,14 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 		}
 
 		function executionFunction(executionRequest) {
+			logger.info("Inside executionFunction function");
 			var name = req.session.username;
 			var scenarioCount = executionRequest.suitedetails[0].scenarioIds.length;
 			var completedSceCount = 0;
 			var statusPass = 0;
 			var suiteStatus;
-			console.log(Object.keys(myserver.allSocketsMap), "<<all people, asking person:", name);
+			logger.info("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
+			logger.info("ICE Socket requesting Address: %s" , name);
 			if ('allSocketsMap' in myserver && name in myserver.allSocketsMap) {
 				var mySocket = myserver.allSocketsMap[name];
 				mySocket._events.result_executeTestSuite = [];
@@ -581,12 +616,14 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 										"Content-Type": "application/json"
 									}
 								};
+								logger.info("Calling NDAC Service from executionFunction: suite/ExecuteTestSuite_ICE");
 								client.post(epurl + "suite/ExecuteTestSuite_ICE", args,
 									function (result, response) {
 									if (response.statusCode != 200 || result.rows == "fail") {
-										console.log("Error occured in TestCaseDetails_Suite_ICE : fail , insertreportquery");
+										logger.error("Error occured in suite/ExecuteTestSuite_ICE from executionFunction Error Code : ERRNDAC");
 										flag = "fail";
 									} else {
+										logger.error("Successfully inserted report data");
 										flag = "success";
 									}
 								});
@@ -596,33 +633,37 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 									} else {
 										suiteStatus = "Fail";
 									}
+									logger.info("Calling function updateExecutionStatus from executionFunction");
 									updateExecutionStatus(testsuiteid, executionid, starttime, suiteStatus);
 								}
 							} else {
 								if (completedSceCount == scenarioCount) {
 									suiteStatus = "Fail";
+									logger.info("Calling function updateExecutionStatus from executionFunction");
 									updateExecutionStatus(testsuiteid, executionid, starttime, suiteStatus);
 								}
 							}
 						} catch (ex) {
-							console.log(ex);
+							logger.info("Exception in the function executionFunction: insertreportquery ", ex);
 						}
 					}
 					if (resultData == "success" || resultData == "Terminate") {
 						try {
+							logger.info("Sending execution status from function executionFunction");
 							res.send(resultData);
 						} catch (ex) {
-							console.log(ex);
+							logger.info("Exception While sending execution status from the function executionFunction", ex);
 						}
 					}
 
 				});
 			} else {
-				console.log("Socket not Available");
+				logger.info("Error occured in the function executionFunction: Socket not Available");
 				res.send("unavailableLocalServer");
 			}
 		}
 	} else {
+		logger.info("Error occured in the function executionFunction: Invalid Session");
 		res.send("Invalid Session");
 	}
 };
@@ -632,6 +673,7 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
  * @see function to execute test suites from jenkins
  */
 exports.ExecuteTestSuite_ICE_CI = function (req, res) {
+	logger.info("Inside UI service: ExecuteTestSuite_ICE_CI");
 	if (req.sessionStore.sessions != undefined) {
 		session_list = req.sessionStore.sessions;
 		if (Object.keys(session_list).length != 0) {
@@ -665,12 +707,13 @@ exports.ExecuteTestSuite_ICE_CI = function (req, res) {
 				"Content-Type": "application/json"
 			}
 		};
+		logger.info("Calling NDAC Service from ExecuteTestSuite_ICE_CI: utility/dataUpdator_ICE");
 		client.post(epurl + "utility/dataUpdator_ICE", args,
 			function (result, response) {
 			if (response.statusCode != 200 || result.rows == "fail") {
-				console.log("Data Updator Fail");
+				logger.info("Error occured in utility/dataUpdator_ICE service from ExecuteTestSuite_ICE_CI: Data Updator Fail");
 			} else {
-				console.log("Data Updator Success");
+				logger.info("Data Updator Success");
 			}
 		});
 		async.forEachSeries(batchExecutionData, function (eachbatchExecutionData, batchExecutionDataCallback) {
@@ -698,10 +741,11 @@ exports.ExecuteTestSuite_ICE_CI = function (req, res) {
 				conditionchecklist.push(eachsuiteDetails.condition);
 				browserTypelist.push(eachsuiteDetails.browserType);
 				currentscenarioid = eachsuiteDetails.scenarioids;
+				logger.info("Calling function TestCaseDetails_Suite_ICE from ExecuteTestSuite_ICE_CI");
 				TestCaseDetails_Suite_ICE(currentscenarioid, userInfo.user_id, function (currentscenarioidError, currentscenarioidResponse) {
 					var scenariotestcaseobj = {};
 					if (currentscenarioidError) {
-						console.log(currentscenarioidError);
+						logger.info("Error occured in the function TestCaseDetails_Suite_ICE from ExecuteTestSuite_ICE_CI: ",currentscenarioidError);
 					} else {
 						if (currentscenarioidResponse != null || currentscenarioidResponse != undefined) {
 							scenariotestcaseobj[currentscenarioid] = currentscenarioidResponse;
@@ -709,16 +753,18 @@ exports.ExecuteTestSuite_ICE_CI = function (req, res) {
 							eachsuiteDetailscallback();
 						}
 						if (listofscenarioandtestcases.length == suiteDetails.length) {
+							logger.info("Calling function updateData from TestCaseDetails_Suite_ICE from ExecuteTestSuite_ICE_CI");
 							updateData();
 							batchExecutionDataCallback();
 							if (testsuitedetailslist.length == batchExecutionData.length) {
+								logger.info("Calling function executionFunction from TestCaseDetails_Suite_ICE from ExecuteTestSuite_ICE_CI");
 								var a = executionFunction(executionRequest);
-								console.log(a);
 							}
 						}
 					}
 				});
 				function updateData() {
+					logger.info("Inside updateData function in ExecuteTestSuite_ICE_CI");
 					executionjson[testsuiteid] = listofscenarioandtestcases;
 					executionjson.scenarioIds = scenarioIdList;
 					executionjson.browserType = browserType;
@@ -728,6 +774,7 @@ exports.ExecuteTestSuite_ICE_CI = function (req, res) {
 					executionjson.testsuitename = testsuitename;
 					testsuitedetailslist.push(executionjson);
 					if (testsuitedetailslist.length == batchExecutionData.length) {
+						logger.info("Calling function excutionObjectBuilding from updateData in ExecuteTestSuite_ICE_CI");
 						excutionObjectBuilding(testsuitedetailslist);
 					}
 				}
@@ -736,18 +783,21 @@ exports.ExecuteTestSuite_ICE_CI = function (req, res) {
 		});
 
 		function excutionObjectBuilding(testsuitedetailslist) {
+			logger.info("Inside excutionObjectBuilding function in ExecuteTestSuite_ICE_CI");
 			executionRequest.executionId = executionId;
 			executionRequest.suitedetails = testsuitedetailslist;
 			executionRequest.testsuiteIds = testsuiteIds;
 		}
 
 		function executionFunction(executionRequest) {
+			logger.info("Inside executionFunction function in ExecuteTestSuite_ICE_CI");
 			var name = req.session.username;
 			var scenarioCount = executionRequest.suitedetails[0].scenarioIds.length;
 			var completedSceCount = 0;
 			var statusPass = 0;
 			var suiteStatus;
-			console.log(Object.keys(myserver.allSocketsMap), "<<all people, asking person:", name);
+			logger.info("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
+			logger.info("ICE Socket requesting Address: %s" , name);
 			if ('allSocketsMap' in myserver && name in myserver.allSocketsMap) {
 				var mySocket = myserver.allSocketsMap[name];
 				mySocket._events.result_executeTestSuite = [];
@@ -792,12 +842,14 @@ exports.ExecuteTestSuite_ICE_CI = function (req, res) {
 										"Content-Type": "application/json"
 									}
 								};
+								logger.info("Calling NDAC Service from executionFunction in ExecuteTestSuite_ICE_CI: suite/ExecuteTestSuite_ICE");
 								client.post(epurl + "suite/ExecuteTestSuite_ICE", args,
 									function (result, response) {
 									if (response.statusCode != 200 || result.rows == "fail") {
-										console.log("Error occured in TestCaseDetails_Suite_ICE : fail , insertreportquery");
+										logger.error("Error occured in suite/ExecuteTestSuite_ICE from executionFunction in ExecuteTestSuite_ICE_CI Error Code : ERRNDAC");
 										flag = "fail";
 									} else {
+										logger.error("Successfully inserted report data");
 										flag = "success";
 									}
 								});
@@ -807,38 +859,43 @@ exports.ExecuteTestSuite_ICE_CI = function (req, res) {
 									} else {
 										suiteStatus = "Fail";
 									}
+									logger.info("Calling function updateExecutionStatus from executionFunction in ExecuteTestSuite_ICE_CI");
 									updateExecutionStatus(testsuiteid, executionid, starttime, suiteStatus);
 								}
 							} else {
 								if (completedSceCount == scenarioCount) {
 									suiteStatus = "Fail";
+									logger.info("Calling function updateExecutionStatus from executionFunction in ExecuteTestSuite_ICE_CI");
 									updateExecutionStatus(testsuiteid, executionid, starttime, suiteStatus);
 								}
 							}
 						} catch (ex) {
-							console.log(ex);
+							logger.info("Exception in the function executionFunction in ExecuteTestSuite_ICE_CI: insertreportquery ", ex);
 						}
 					}
 					if (resultData == "success" || resultData == "Terminate") {
 						try {
+							logger.info("Sending execution status from function executionFunction in ExecuteTestSuite_ICE_CI");
 							res.send(resultData);
 						} catch (ex) {
-							console.log(ex);
+							logger.info("Exception While sending execution status from the function executionFunction in ExecuteTestSuite_ICE_CI", ex);
 							res.send("fail");
 						}
 					}
 				});
 			} else {
-				console.log("Socket not Available");
+				logger.info("Error occured in the function executionFunction in ExecuteTestSuite_ICE_CI: Socket not Available");
 				res.send("unavailableLocalServer");
 			}
 		}
 	} else {
+		logger.info("Error occured in the function executionFunction in ExecuteTestSuite_ICE_CI: Invalid Session");
 		res.send("Invalid Session");
 	}
 };
 
 function TestCaseDetails_Suite_ICE(req, userid, cb, data) {
+	logger.info("Inside TestCaseDetails_Suite_ICE function");
 	var requestedtestscenarioid = req;
 	var resultstring = [];
 	var data = [];
@@ -858,10 +915,11 @@ function TestCaseDetails_Suite_ICE(req, userid, cb, data) {
 					"Content-Type": "application/json"
 				}
 			};
+			logger.info("Calling NDAC Service: suite/ExecuteTestSuite_ICE from TestCaseDetails_Suite_ICE - testcaseid");
 			client.post(epurl + "suite/ExecuteTestSuite_ICE", args,
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
-					console.log("Error occured in TestCaseDetails_Suite_ICE : fail , testcaseid");
+					logger.error("Error occured in suite/ExecuteTestSuite_ICE from TestCaseDetails_Suite_ICE - testcaseid, Error Code : ERRNDAC");
 				} else {
 					if (result.rows.length != 0) {
 						data = JSON.parse(JSON.stringify(result.rows[0].testcaseids));
@@ -889,10 +947,11 @@ function TestCaseDetails_Suite_ICE(req, userid, cb, data) {
 						"Content-Type": "application/json"
 					}
 				};
+				logger.info("Calling NDAC Service: suite/ExecuteTestSuite_ICE from TestCaseDetails_Suite_ICE - testcasesteps");
 				client.post(epurl + "suite/ExecuteTestSuite_ICE", args,
 					function (screenidresponse, response) {
 					if (response.statusCode != 200 || screenidresponse.rows == "fail") {
-						console.log("Error occured in TestCaseDetails_Suite_ICE : fail , testcasesteps");
+						logger.error("Error occured in suite/ExecuteTestSuite_ICE from TestCaseDetails_Suite_ICE - testcasesteps, Error Code : ERRNDAC");
 					} else {
 						try {
 							if (screenidresponse.rows.length != 0) {
@@ -906,10 +965,11 @@ function TestCaseDetails_Suite_ICE(req, userid, cb, data) {
 										"Content-Type": "application/json"
 									}
 								};
+								logger.info("Calling NDAC Service: suite/ExecuteTestSuite_ICE from TestCaseDetails_Suite_ICE - getscreendataquery");
 								client.post(epurl + "suite/ExecuteTestSuite_ICE", args,
 									function (screendataresponse, response) {
 									if (response.statusCode != 200 || screendataresponse.rows == "fail") {
-										console.log("Error occured in TestCaseDetails_Suite_ICE : fail , testcasesteps");
+										logger.error("Error occured in suite/ExecuteTestSuite_ICE from TestCaseDetails_Suite_ICE - getscreendataquery, Error Code : ERRNDAC");
 									} else {
 										try {
 											try {
@@ -917,7 +977,6 @@ function TestCaseDetails_Suite_ICE(req, userid, cb, data) {
 											} catch (exception) {
 												screendataresponse = JSON.parse("{}");
 											}
-
 											if (screendataresponse != null && screendataresponse != "") {
 												if ('body' in screendataresponse) {
 													var wsscreentemplate = screendataresponse.body[0];
@@ -931,10 +990,11 @@ function TestCaseDetails_Suite_ICE(req, userid, cb, data) {
 															"Content-Type": "application/json"
 														}
 													};
+													logger.info("Calling NDAC Service: suite/ExecuteTestSuite_ICE from TestCaseDetails_Suite_ICE - testcasestepsquery");
 													client.post(epurl + "suite/ExecuteTestSuite_ICE", args,
 														function (answers, response) {
 														if (response.statusCode != 200 || answers.rows == "fail") {
-															console.log("Error occured in TestCaseDetails_Suite_ICE : fail , testcasesteps");
+															logger.error("Error occured in suite/ExecuteTestSuite_ICE from TestCaseDetails_Suite_ICE - testcasestepsquery, Error Code : ERRNDAC");
 														} else {
 															responsedata.template = wsscreentemplate;
 															if (answers.rows.length != 0) {
@@ -956,10 +1016,11 @@ function TestCaseDetails_Suite_ICE(req, userid, cb, data) {
 															"Content-Type": "application/json"
 														}
 													};
+													logger.info("Calling NDAC Service: suite/ExecuteTestSuite_ICE from TestCaseDetails_Suite_ICE - testcasestepsquery");
 													client.post(epurl + "suite/ExecuteTestSuite_ICE", args,
 														function (answers, response) {
 														if (response.statusCode != 200 || answers.rows == "fail") {
-															console.log("Error occured in TestCaseDetails_Suite_ICE : fail , testcasesteps");
+															logger.error("Error occured in suite/ExecuteTestSuite_ICE from TestCaseDetails_Suite_ICE - testcasestepsquery, Error Code : ERRNDAC");
 														} else {
 															responsedata.template = "";
 															if (answers.rows.length != 0) {
@@ -982,10 +1043,11 @@ function TestCaseDetails_Suite_ICE(req, userid, cb, data) {
 														"Content-Type": "application/json"
 													}
 												};
+												logger.info("Calling NDAC Service: suite/ExecuteTestSuite_ICE from TestCaseDetails_Suite_ICE - testcasestepsquery");
 												client.post(epurl + "suite/ExecuteTestSuite_ICE", args,
 													function (answers, response) {
 													if (response.statusCode != 200 || answers.rows == "fail") {
-														console.log("Error occured in TestCaseDetails_Suite_ICE : fail , testcasesteps");
+														logger.error("Error occured in suite/ExecuteTestSuite_ICE from TestCaseDetails_Suite_ICE - testcasestepsquery, Error Code : ERRNDAC");
 													} else {
 														responsedata.template = "";
 														if (answers.rows.length != 0) {
@@ -1008,10 +1070,11 @@ function TestCaseDetails_Suite_ICE(req, userid, cb, data) {
 													"Content-Type": "application/json"
 												}
 											};
+											logger.info("Calling NDAC Service: suite/ExecuteTestSuite_ICE from TestCaseDetails_Suite_ICE - testcasestepsquery");
 											client.post(epurl + "suite/ExecuteTestSuite_ICE", args,
 												function (answers, response) {
 												if (response.statusCode != 200 || answers.rows == "fail") {
-													console.log("Error occured in TestCaseDetails_Suite_ICE : fail , testcasesteps");
+													logger.error("Error occured in suite/ExecuteTestSuite_ICE from TestCaseDetails_Suite_ICE - testcasestepsquery, Error Code : ERRNDAC");
 												} else {
 													responsedata.template = "";
 													if (answers.rows.length != 0) {
@@ -1037,10 +1100,11 @@ function TestCaseDetails_Suite_ICE(req, userid, cb, data) {
 										"Content-Type": "application/json"
 									}
 								};
+								logger.info("Calling NDAC Service: suite/ExecuteTestSuite_ICE from TestCaseDetails_Suite_ICE - testcasestepsquery");
 								client.post(epurl + "suite/ExecuteTestSuite_ICE", args,
 									function (answers, response) {
 									if (response.statusCode != 200 || answers.rows == "fail") {
-										console.log("Error occured in TestCaseDetails_Suite_ICE : fail , testcasesteps");
+										logger.error("Error occured in suite/ExecuteTestSuite_ICE from TestCaseDetails_Suite_ICE - testcasestepsquery, Error Code : ERRNDAC");
 									} else {
 										responsedata.template = "";
 										if (answers.rows.length != 0) {
@@ -1053,7 +1117,7 @@ function TestCaseDetails_Suite_ICE(req, userid, cb, data) {
 								});
 							}
 						} catch (exception) {
-							console.log("Exception occured in TestCaseDetails_Suite_ICE : ", exception);
+							logger.error("Exception occured in TestCaseDetails_Suite_ICE : ", exception);
 						}
 					}
 				});
@@ -1061,6 +1125,7 @@ function TestCaseDetails_Suite_ICE(req, userid, cb, data) {
 		},
 
 		qcscenariodetails: function (callback) {
+			logger.info("Inside qcscenariodetails function");
 			var inputs = {
 				"testscenarioid": requestedtestscenarioid,
 				"query": "qcdetails"
@@ -1071,10 +1136,11 @@ function TestCaseDetails_Suite_ICE(req, userid, cb, data) {
 					"Content-Type": "application/json"
 				}
 			};
+			logger.info("Calling NDAC Service: qualityCenter/viewQcMappedList_ICE from qcscenariodetails");
 			client.post(epurl + "qualityCenter/viewQcMappedList_ICE", args,
 				function (qcdetailsows, response) {
 				if (response.statusCode != 200 || qcdetailsows.rows == "fail") {
-					console.log("Exception occured in TestCaseDetails_Suite_ICE : fail, qcscenariodetails ");
+					logger.error("Error occured in qualityCenter/viewQcMappedList_ICE from qcscenariodetails Error Code : ERRNDAC");
 				} else {
 
 					if (qcdetailsows.rows.length != 0) {
@@ -1086,14 +1152,17 @@ function TestCaseDetails_Suite_ICE(req, userid, cb, data) {
 			});
 		}
 	},
-		function (err, results) {
+	function (err, results) {
+		logger.info("Inside final function of TestCaseDetails_Suite_ICE");
 		var obj = {
 			"listoftestcasedata": JSON.stringify(listoftestcasedata),
 			"qcdetails": qcdetails
 		};
 		if (err) {
+			logger.info("Error occured in the final function of TestCaseDetails_Suite_ICE");
 			cb(err);
 		} else {
+			logger.info("Sending testcase data and QC details from final function of TestCaseDetails_Suite_ICE");
 			cb(null, obj);
 		}
 	});
@@ -1104,6 +1173,7 @@ function TestCaseDetails_Suite_ICE(req, userid, cb, data) {
  * @author Shreeram
  */
 exports.getTestcaseDetailsForScenario_ICE = function (req, res) {
+	logger.info("Inside Ui service getTestcaseDetailsForScenario_ICE");
 	if (req.cookies['connect.sid'] != undefined) {
 		var sessionCookie = req.cookies['connect.sid'].split(".");
 		var sessionToken = sessionCookie[0].split(":");
@@ -1111,25 +1181,29 @@ exports.getTestcaseDetailsForScenario_ICE = function (req, res) {
 	}
 	if (sessionToken != undefined && req.session.id == sessionToken) {
 		var requiredtestscenarioid = req.body.testScenarioId;
+		logger.info("Calling function testcasedetails_testscenarios from getTestcaseDetailsForScenario_ICE");
 		testcasedetails_testscenarios(requiredtestscenarioid, function (err, data) {
 			if (err) {
+				logger.info("Error occured in the testcasedetails_testscenarios function of getTestcaseDetailsForScenario_ICE");
 				res.send("fail");
 			} else {
 				try {
-					//console.log(data);
+					logger.info("Sending response data from testcasedetails_testscenarios function of getTestcaseDetailsForScenario_ICE");
 					res.send(JSON.stringify(data));
 				} catch (ex) {
-					console.log("Exception occured in getTestcaseDetailsForScenario_ICE : ", ex);
+					logger.info("Exception occured in getTestcaseDetailsForScenario_ICE : ", ex);
 				}
 			}
 		});
 	} else {
+		logger.info("Error occured in the testcasedetails_testscenarios: Invalid Session")
 		res.send("Invalid Session");
 	}
 };
 
 //Function to fetch all the testcase,screen and project names for provided scenarioid
 function testcasedetails_testscenarios(req, cb, data) {
+	logger.info("Inside testcasedetails_testscenarios function");
 	var testcaseids = [];
 	var screenidlist = [];
 	var testcasenamelist = [];
@@ -1148,10 +1222,11 @@ function testcasedetails_testscenarios(req, cb, data) {
 					"Content-Type": "application/json"
 				}
 			};
+			logger.info("Calling NDAC Service from testcasedetails_testscenarios - testscenariotable: suite/getTestcaseDetailsForScenario_ICE");
 			client.post(epurl + "suite/getTestcaseDetailsForScenario_ICE", args,
 				function (testscenarioresult, response) {
 				if (response.statusCode != 200 || testscenarioresult.rows == "fail") {
-					console.log(response.statusCode);
+					logger.error("Error occured in suite/getTestcaseDetailsForScenario_ICE from testcasedetails_testscenarios - testscenariotable, Error Code : ERRNDAC");
 				} else {
 					if (testscenarioresult.rows.length != 0)
 						testcaseids = testscenarioresult.rows[0].testcaseids;
@@ -1172,10 +1247,11 @@ function testcasedetails_testscenarios(req, cb, data) {
 						"Content-Type": "application/json"
 					}
 				};
+				logger.info("Calling NDAC Service from testcasedetails_testscenarios - testcasetable: suite/getTestcaseDetailsForScenario_ICE");
 				client.post(epurl + "suite/getTestcaseDetailsForScenario_ICE", args,
 					function (testcaseresult, response) {
 					if (response.statusCode != 200 || testcaseresult.rows == "fail") {
-						console.log(response.statusCode);
+						logger.error("Error occured in suite/getTestcaseDetailsForScenario_ICE from testcasedetails_testscenarios - testcasetable, Error Code : ERRNDAC");
 					} else {
 						if (testcaseresult.rows.length != 0) {
 							testcasenamelist.push(testcaseresult.rows[0].testcasename);
@@ -1198,10 +1274,11 @@ function testcasedetails_testscenarios(req, cb, data) {
 						"Content-Type": "application/json"
 					}
 				};
+				logger.info("Calling NDAC Service from testcasedetails_testscenarios - screentable: suite/getTestcaseDetailsForScenario_ICE");
 				client.post(epurl + "suite/getTestcaseDetailsForScenario_ICE", args,
 					function (screenresult, response) {
 					if (response.statusCode != 200 || screenresult.rows == "fail") {
-						console.log(response.statusCode);
+						logger.error("Error occured in suite/getTestcaseDetailsForScenario_ICE from testcasedetails_testscenarios - screentable, Error Code : ERRNDAC");
 					} else {
 						if (screenresult.rows.length != 0) {
 							screennamelist.push(screenresult.rows[0].screenname);
@@ -1224,10 +1301,11 @@ function testcasedetails_testscenarios(req, cb, data) {
 						"Content-Type": "application/json"
 					}
 				};
+				logger.info("Calling NDAC Service from testcasedetails_testscenarios - projecttable: suite/getTestcaseDetailsForScenario_ICE");
 				client.post(epurl + "suite/getTestcaseDetailsForScenario_ICE", args,
 					function (projectresult, response) {
 					if (response.statusCode != 200 || projectresult.rows == "fail") {
-						console.log(response.statusCode);
+						logger.error("Error occured in suite/getTestcaseDetailsForScenario_ICE from testcasedetails_testscenarios - projecttable, Error Code : ERRNDAC");
 					} else {
 						if (projectresult.rows.length != 0)
 							projectnamelist.push(projectresult.rows[0].projectname);
@@ -1237,8 +1315,9 @@ function testcasedetails_testscenarios(req, cb, data) {
 			}, callback);
 		}
 	}, function (err, data) {
+		logger.info("Inside final function of testcasedetails_testscenarios");
 		if (err) {
-			console.log(err);
+			logger.error("Error occured in final function of testcasedetails_testscenarios: ", err);
 			cb(err, "fail");
 		} else {
 			var resultdata = {
@@ -1255,12 +1334,14 @@ function testcasedetails_testscenarios(req, cb, data) {
 			resultdata.screenids = screenidlist;
 			resultdata.projectnames = projectnamelist;
 			resultdata.projectids = projectidlist;
+			logger.error("Sending response data from final function of testcasedetails_testscenarios");
 			cb(err, resultdata);
 		}
 	});
 }
 
 function TestSuiteDetails_Module_ICE(req, cb1, data) {
+	logger.info("Inside TestSuiteDetails_Module_ICE function");
 	var requiredcycleid = req.cycleid;
 	var requiredtestsuiteid = req.testsuiteid;
 	var requiredtestsuitename = req.testsuitename;
@@ -1282,10 +1363,11 @@ function TestSuiteDetails_Module_ICE(req, cb1, data) {
 					"Content-Type": "application/json"
 				}
 			};
+			logger.info("Calling NDAC Service from TestSuiteDetails_Module_ICE - testsuitecheck: suite/readTestSuite_ICE");
 			client.post(epurl + "suite/readTestSuite_ICE", args,
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
-					console.log("Error occured in TestSuiteDetails_Module_ICE : fail , testsuitecheck");
+					logger.error("Error occured in suite/readTestSuite_ICE from TestSuiteDetails_Module_ICE - testsuitecheck, Error Code : ERRNDAC");
 				} else {
 					if (result.rows.length != 0) {
 						flag = true;
@@ -1306,10 +1388,11 @@ function TestSuiteDetails_Module_ICE(req, cb1, data) {
 					"Content-Type": "application/json"
 				}
 			};
+			logger.info("Calling NDAC Service from TestSuiteDetails_Module_ICE - selectmodule: suite/readTestSuite_ICE");
 			client.post(epurl + "suite/readTestSuite_ICE", args,
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
-					console.log("Error occured in TestSuiteDetails_Module_ICE : fail, selectmodule");
+					logger.error("Error occured in suite/readTestSuite_ICE from TestSuiteDetails_Module_ICE - selectmodule, Error Code : ERRNDAC");
 				} else {
 					if (result.rows.length != 0) {
 						data = JSON.parse(JSON.stringify(result.rows[0]));
@@ -1358,10 +1441,11 @@ function TestSuiteDetails_Module_ICE(req, cb1, data) {
 						"Content-Type": "application/json"
 					}
 				};
+				logger.info("Calling NDAC Service from TestSuiteDetails_Module_ICE - testcasesteps: suite/readTestSuite_ICE");
 				client.post(epurl + "suite/readTestSuite_ICE", args,
 					function (result, response) {
 					if (response.statusCode != 200 || result.rows == "fail") {
-						console.log("Error occured in TestSuiteDetails_Module_ICE : fail, testcasesteps");
+						logger.error("Error occured in suite/readTestSuite_ICE from TestSuiteDetails_Module_ICE - testcasesteps, Error Code : ERRNDAC");
 						cb1(null, flag);
 					} else {
 						for(var te=0;te<inputs.testscenarioids.length;te++){inputs.testscenarioids[te]='"'+inputs.testscenarioids[te]+'"';}
@@ -1388,9 +1472,10 @@ function TestSuiteDetails_Module_ICE(req, cb1, data) {
 					"versionnumber": versionnumber,
 					"testscenarioids": testscenarioids
 				};
+				logger.info("Calling function updatescenariodetailsinsuite from TestSuiteDetails_Module_ICE - testcasesteps");
 				updatescenariodetailsinsuite(jsondata, function (err, data) {
 					if (err) {
-						console.log(err);
+						logger.info("Error in the function updatescenariodetailsinsuite from TestSuiteDetails_Module_ICE - testcasesteps", err);
 						cb1(null, flag);
 					} else {
 						callback(null, flag);
@@ -1399,7 +1484,9 @@ function TestSuiteDetails_Module_ICE(req, cb1, data) {
 			}
 		}
 	}, function (err, results) {
+		logger.info("Inside final function of TestSuiteDetails_Module_ICE");
 		if (err) {
+			logger.info("Error in the final function of updatescenariodetailsinsuite from TestSuiteDetails_Module_ICE - testcasesteps");
 			cb1(null, flag);
 		} else {
 			cb1(null, flag);
@@ -1408,12 +1495,14 @@ function TestSuiteDetails_Module_ICE(req, cb1, data) {
 }
 
 function updatescenariodetailsinsuite(req, cb, data) {
+	logger.info("Inside updatescenariodetailsinsuite function");
 	var suiterowdetails = {};
 	var getparampath1 = [];
 	var conditioncheck1 = [];
 	var donotexecute1 = [];
 	async.series({
 		fetchdata: function (simplecallback) {
+			logger.info("Inside fetchdata function of updatescenariodetailsinsuite()");
 			var inputs = {
 				"testsuiteid": req.testsuiteid,
 				"cycleid": req.cycleid,
@@ -1425,10 +1514,11 @@ function updatescenariodetailsinsuite(req, cb, data) {
 					"Content-Type": "application/json"
 				}
 			};
+			logger.info("Calling NDAC Service from updatescenariodetailsinsuite - fetchdata: suite/readTestSuite_ICE");
 			client.post(epurl + "suite/readTestSuite_ICE", args,
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
-					console.log("Error occured in TestSuiteDetails_Module_ICE : fail, fetchdata");
+					logger.error("Error occured in suite/readTestSuite_ICE from updatescenariodetailsinsuite - fetchdata, Error Code: ERRNDAC");
 				} else {
 					if (result.rows.length != 0)
 						suiterowdetails = result.rows[0];
@@ -1437,6 +1527,7 @@ function updatescenariodetailsinsuite(req, cb, data) {
 			});
 		},
 		validatedata: function (simplecallback) {
+			logger.info("Inside validatedata function of updatescenariodetailsinsuite()");
 			var scenarioidstocheck = suiterowdetails.testscenarioids;
 			var verifyscenarioid = req.testscenarioids;
 			var getparampath = suiterowdetails.getparampaths;
@@ -1472,6 +1563,7 @@ function updatescenariodetailsinsuite(req, cb, data) {
 			simplecallback();
 		},
 		delete : function (simplecallback) {
+			logger.info("Inside delete function of updatescenariodetailsinsuite()");
 			var inputs = {
 				"testsuiteid": req.testsuiteid,
 				"cycleid": req.cycleid,
@@ -1485,21 +1577,22 @@ function updatescenariodetailsinsuite(req, cb, data) {
 					"Content-Type": "application/json"
 				}
 			};
+			logger.info("Calling NDAC Service from updatescenariodetailsinsuite - delete: suite/readTestSuite_ICE");
 			client.post(epurl + "suite/readTestSuite_ICE", args,
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
-					console.log("Error occured in TestSuiteDetails_Module_ICE : fail, delete");
+					logger.error("Error occured in suite/readTestSuite_ICE from updatescenariodetailsinsuite - delete, Error Code: ERRNDAC");
 				} else {
 					//Execute neo4j query!!
 					//var qList=[];
 					qList.push({"statement":"MATCH (n:TESTSUITES_NG {cycleid:'"+inputs.cycleid
 					+"',testsuitename:'"+inputs.testsuitename+"',testsuiteid:'"+inputs.testsuiteid+"'}) DETACH DELETE n"});
 				}
-
 				simplecallback();
 			});
 		},
 		updatescenarioinnsuite: function (simplecallback) {
+			logger.info("Inside updatescenarioinnsuite function of updatescenariodetailsinsuite()");
 			var inputs = {
 				"cycleid": req.cycleid,
 				"testsuitename": req.testsuitename,
@@ -1525,9 +1618,11 @@ function updatescenariodetailsinsuite(req, cb, data) {
 					"Content-Type": "application/json"
 				}
 			};
+			logger.info("Calling NDAC Service from updatescenariodetailsinsuite - updatescenarioinnsuite: suite/readTestSuite_ICE");
 			client.post(epurl + "suite/readTestSuite_ICE", args,
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
+					logger.error("Error occured in suite/readTestSuite_ICE from updatescenariodetailsinsuite - updatescenarioinnsuite, Error Code: ERRNDAC");
 					cb(null, "fail");
 				} else {
 					//Execute neo4j query!!
@@ -1556,14 +1651,15 @@ function updatescenariodetailsinsuite(req, cb, data) {
 			});
 		}
 	}, function (err, data) {
+		logger.info("Inside final function of updatescenariodetailsinsuite");
 		if (err) {
-			console.log(err);
+			logger.info("Error occured in the final function of updatescenariodetailsinsuite: ", err);
 			cb(null, err);
 		} else {
 			try {
 				cb(null, 'Successsssssss');
 			} catch (ex) {
-				console.log("Exception occured in the updating scenarios", ex);
+				logger.info("Exception occured in the updating scenarios in the final function of updatescenariodetailsinsuite: ", ex);
 			}
 		}
 	});
@@ -1571,6 +1667,7 @@ function updatescenariodetailsinsuite(req, cb, data) {
 
 /***********************Scheduling jobs***************************/
 exports.testSuitesScheduler_ICE = function (req, res) {
+	logger.info("Inside UI service testSuitesScheduler_ICE");
 	if (req.cookies['connect.sid'] != undefined) {
 		var sessionCookie = req.cookies['connect.sid'].split(".");
 		var sessionToken = sessionCookie[0].split(":");
@@ -1578,21 +1675,25 @@ exports.testSuitesScheduler_ICE = function (req, res) {
 	}
 	if (sessionToken != undefined && req.session.id == sessionToken) {
 		var modInfo = req.body.moduleInfo;
+		logger.info("Calling function scheduleTestSuite from testSuitesScheduler_ICE");
 		scheduleTestSuite(modInfo, req, function (err, schedulecallback) {
 			try {
+				logger.info("TestSuite Scheduled successfully");
 				res.send(schedulecallback);
 			} catch (exception) {
-				console.log(exception);
+				logger.info("Exception in the service testSuitesScheduler_ICE: ",exception);
 				res.send("fail");
 			}
 		});
 	} else {
+		logger.info("Error in the service testSuitesScheduler_ICE: Invalid Session");
 		res.send("Invalid Session");
 	}
 };
 
 //Schedule Testsuite normal and when server restart
 function scheduleTestSuite(modInfo, req, schedcallback) {
+	logger.info("Inside scheduleTestSuite function");
 	var schedulingData = modInfo;
 	var schDate, schTime, cycleId, scheduleId, clientIp, scenarioDetails;
 	var browserList, testSuiteId, testsuitename;
@@ -1639,33 +1740,36 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 				}
 			};
 			try {
+				logger.info("Calling NDAC Service from scheduleTestSuite: suite/ScheduleTestSuite_ICE");
 				client.post(epurl + "suite/ScheduleTestSuite_ICE", args,
 					function (result, response) {
 					if (response.statusCode != 200 || result.rows == "fail") {
-						console.log(response.statusCode);
+						logger.error("Error occured in suite/ScheduleTestSuite_ICE from scheduleTestSuite Error Code : ERRNDAC");
 						schedFlag = "fail";
 						schedcallback(null, schedFlag);
 					} else {
 						var obj = new Date(schDate[2], (schDate[1] - 1), schDate[0], schTime[0], schTime[1]);
 						try {
 							var scheduledjob = schedule.scheduleJob(sessObj, obj, function () {
-									executeScheduling(sessObj, schedulingData, req);
-								});
+								logger.info("Calling function executeScheduling from scheduleTestSuite");
+								executeScheduling(sessObj, schedulingData, req);
+							});
 							counter++;
 							Callback();
 						} catch (ex) {
-							console.log(ex);
+							logger.info("Exception in the function executeScheduling from scheduleTestSuite: ", ex);
 							scheduleStatus = "Failed 02";
+							logger.info("Calling function updateStatus from scheduleTestSuite");
 							updateStatus(sessObj, function (err, data) {
 								if (!err) {
-									console.log(data);
+									logger.info("Scheduling status updated successfully", data);
 								}
 							});
 						}
 					}
 				});
 			} catch (exception) {
-				console.log(exception);
+				logger.info("Exception in the function executeScheduling from scheduleTestSuite: Normal scheduling ", exception);
 				schedFlag = "fail";
 				schedcallback(null, schedFlag);
 			}
@@ -1676,21 +1780,23 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 			var obj = new Date(Date.UTC(schDate[2], (schDate[1] - 1), schDate[0], schTime[0], schTime[1], 0));
 			try {
 				var scheduledjob = schedule.scheduleJob(sessObj, obj, function () {
-						executeScheduling(sessObj, schedulingData, req);
-					});
+					logger.info("Calling function executeScheduling from scheduleTestSuite: reshedule");
+					executeScheduling(sessObj, schedulingData, req);
+				});
 				counter++;
 				Callback();
 			} catch (ex) {
-				console.log(ex);
+				logger.info("Exception in the function executeScheduling from scheduleTestSuite: reshedule ", ex);
 				scheduleStatus = "Failed 02";
 				updateStatus(sessObj, function (err, data) {
 					if (!err) {
-						console.log(data);
+						logger.info("Scheduling status updated successfully", data);
 					}
 				});
 			}
 		}
 	}, function () {
+		logger.info("Inside final function of executeScheduling");
 		// if (deleteFlag != true) doneFlag = 1;
 		// if (doneFlag == 1) {
 		if (schedulingData.length == counter) {
@@ -1708,6 +1814,7 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 
 	//Executing test suites on scheduled time
 	function executeScheduling(sessObj, schedulingData, req) {
+		logger.info("Inside executeScheduling function");
 		var inputs = {
 			"cycleid": sessObj.split(";")[0],
 			"scheduledatetime": sessObj.split(";")[2],
@@ -1721,14 +1828,16 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 			}
 		};
 		try {
+			logger.info("Calling NDAC Service from executeScheduling: suite/ScheduleTestSuite_ICE");
 			client.post(epurl + "suite/ScheduleTestSuite_ICE", args,
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
-					console.log(response.statusCode);
+					logger.error("Error occured in suite/ScheduleTestSuite_ICE from executeScheduling Error Code : ERRNDAC");
 					scheduleStatus = "Failed 02";
+					logger.info("Calling function updateStatus from executeScheduling");
 					updateStatus(sessObj, function (err, data) {
 						if (!err) {
-							console.log(data);
+							logger.info("Scheduling status updated successfully", data);
 						}
 					});
 					// deleteFlag = true;
@@ -1765,10 +1874,11 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 							conditionchecklist.push(eachsuiteDetails.condition);
 							browserTypelist = browserType;
 							currentscenarioid = eachsuiteDetails.scenarioids;
+							logger.info("Calling function TestCaseDetails_Suite_ICE from executeScheduling");
 							TestCaseDetails_Suite_ICE(currentscenarioid, schedulingData[0].userInfo.user_id, function (currentscenarioidError, currentscenarioidResponse) {
 								var scenariotestcaseobj = {};
 								if (currentscenarioidError) {
-									console.log(currentscenarioidError);
+									logger.error("Error occured in the function TestCaseDetails_Suite_ICE from executeScheduling Error Code : ERRNDAC", currentscenarioidError);
 								} else {
 									if (currentscenarioidResponse != null || currentscenarioidResponse != undefined) {
 										scenariotestcaseobj[currentscenarioid] = currentscenarioidResponse.listoftestcasedata;
@@ -1778,14 +1888,16 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 										eachsuiteDetailscallback();
 									}
 									if (listofscenarioandtestcases.length == suiteDetails.length) {
+										logger.info("Calling updateData function TestCaseDetails_Suite_ICE from executeScheduling");
 										updateData();
 										//batchExecutionDataCallback();
+										logger.info("Calling scheduleFunction function TestCaseDetails_Suite_ICE from executeScheduling");
 										var a = scheduleFunction(executionRequest);
-										console.log(a);
 									}
 								}
 							});
 							function updateData() {
+								logger.info("Inside updateData function of executeScheduling");
 								executionjson[testsuiteid] = listofscenarioandtestcases;
 								executionjson.scenarioIds = scenarioIdList;
 								executionjson.browserType = browserTypelist;
@@ -1795,36 +1907,41 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 								executionjson.testsuitename = testsuitenm;
 								testsuitedetailslist.push(executionjson);
 								//if (testsuitedetailslist.length == batchExecutionData.length) {
+								logger.info("Calling excutionObjectBuilding function from TestCaseDetails_Suite_ICE");
 								excutionObjectBuilding(testsuitedetailslist);
 								//}
 							}
 						});
 						function excutionObjectBuilding(testsuitedetailslist) {
+							logger.info("Inside excutionObjectBuilding function of executeScheduling");
 							executionRequest.executionId = JSON.parse(JSON.stringify(result.rows[0].scheduleid));
 							executionRequest.suitedetails = testsuitedetailslist;
 							executionRequest.testsuiteIds.push(testsuiteid);
 						}
 						function scheduleFunction(executionRequest) {
+							logger.info("Inside scheduleFunction function of executeScheduling");
 							var name = ipAdd;
 							var scenarioCount_s = executionRequest.suitedetails[0].scenarioIds.length;
 							var completedSceCount_s = 0;
 							var statusPass_s = 0;
 							var suiteStatus_s;
-							console.log(Object.keys(myserver.allSchedulingSocketsMap), "<<all people, asking person:", name);
+							logger.info("IP\'s connected : %s", Object.keys(myserver.allSchedulingSocketsMap).join());
+							logger.info("ICE Socket requesting Address: %s" , name);
 							if ('allSchedulingSocketsMap' in myserver && name in myserver.allSchedulingSocketsMap) {
 								var mySocket = myserver.allSchedulingSocketsMap[name];
 								mySocket._events.result_executeTestSuite = [];
 								var starttime = new Date().getTime();
 								mySocket.emit('executeTestSuite', executionRequest);
 								scheduleStatus = "Inprogress";
+								logger.info("Calling function updateStatus from scheduleFunction");
 								updateStatus(sessObj, function (err, data) {
 									if (!err) {
-										console.log(data);
+										logger.info("Sending response data from scheduleFunction");
 									}
 								});
 								var updateSessionExpiry = setInterval(function () {
-										req.session.cookie.maxAge = sessionTime;
-									}, updateSessionTimeEvery);
+									req.session.cookie.maxAge = sessionTime;
+								}, updateSessionTimeEvery);
 								mySocket.on('result_executeTestSuite', function (resultData) {
 									completedSceCount_s++;
 									clearInterval(updateSessionExpiry);
@@ -1861,10 +1978,11 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 														"Content-Type": "application/json"
 													}
 												};
+												logger.info("Calling NDAC Service from scheduleFunction: suite/ExecuteTestSuite_ICE");
 												client.post(epurl + "suite/ExecuteTestSuite_ICE", args,
 													function (result, response) {
 													if (response.statusCode != 200 || result.rows == "fail") {
-														console.log("Error occured in TestCaseDetails_Suite_ICE : fail , insertreportquery");
+														logger.error("Error occured in suite/ExecuteTestSuite_ICE from scheduleFunction, Error Code : ERRNDAC");
 														flag = "fail";
 													} else {
 														flag = "success";
@@ -1876,16 +1994,18 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 													} else {
 														suiteStatus_s = "Fail";
 													}
+													logger.info("Calling function updateSchedulingStatus from scheduleFunction");
 													updateSchedulingStatus(testsuiteid, executionid, starttime, suiteStatus_s);
 												}
 											} else {
 												if (completedSceCount_s == scenarioCount_s) {
 													suiteStatus_s = "Fail";
+													logger.info("Calling function updateExecutionStatus from scheduleFunction");
 													updateExecutionStatus(testsuiteid, executionid, starttime, suiteStatus_s);
 												}
 											}
 										} catch (ex) {
-											console.log(ex);
+											logger.info("Exception occured in the scheduleFunction: ", ex);
 										}
 									}
 									if (resultData) {
@@ -1895,26 +2015,28 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 											scheduleStatus = resultData.reportData.overallstatus[0].overallstatus;
 										}
 										try {
+											logger.info("Calling function updateStatus from scheduleFunction");
 											updateStatus(sessObj, function (err, data) {
 												if (!err) {
-													console.log(data);
+													logger.info("Sending response data from scheduleFunction");
 												}
 											});
 											//res.send(resultData);
 											//console.log(resultData);
 										} catch (ex) {
-											console.log(ex);
+											logger.info("Exception occured in the updateStatus function of scheduleFunction: ", ex);
 										}
 									}
 								});
 							} else {
-								console.log("Socket not Available");
+								logger.info("Error occured in the function scheduleFunction: Socket not Available");
 								// deleteFlag = true;
 								// deleteScheduledData(deleteFlag, sessObj)
 								scheduleStatus = "Failed 00";
+								logger.info("Calling function updateStatus from scheduleFunction");
 								updateStatus(sessObj, function (err, data) {
 									if (!err) {
-										console.log(data);
+										logger.info("Sending response data from scheduleFunction");
 									}
 								});
 							}
@@ -1923,13 +2045,14 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 				}
 			});
 		} catch (exception) {
-			console.log(exception);
+			logger.info("Exception occured in the executeScheduling function: ", ex);
 			// deleteFlag = true;
 			// deleteScheduledData(deleteFlag, sessObj)
 			scheduleStatus = "Failed 02";
+			logger.info("Calling function updateStatus from executeScheduling");
 			updateStatus(sessObj, function (err, data) {
 				if (!err) {
-					console.log(data);
+					logger.info("Sending response data from executeScheduling");
 				}
 			});
 		}
@@ -1937,6 +2060,7 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 
 	//Update execution table on completion of suite execution
 	function updateSchedulingStatus(testsuiteid, executionid, starttime, suiteStatus_s) {
+		logger.info("Inside updateSchedulingStatus function");
 		var inputs = {
 			"testsuiteid": testsuiteid,
 			"executionid": executionid,
@@ -1950,10 +2074,11 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 				"Content-Type": "application/json"
 			}
 		};
+		logger.info("Calling NDAC Service from updateSchedulingStatus: suite/ExecuteTestSuite_ICE");
 		client.post(epurl + "suite/ExecuteTestSuite_ICE", args,
 			function (result, response) {
 			if (response.statusCode != 200 || result.rows == "fail") {
-				console.log("Error occured in TestCaseDetails_Suite_ICE : fail , insertIntoExecution");
+				logger.error("Error occured in suite/ExecuteTestSuite_ICE from updateSchedulingStatus, Error Code : ERRNDAC");
 				flag = "fail";
 			} else {
 				flag = "success";
@@ -1964,6 +2089,7 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 
 //Update status of current scheduled job
 function updateStatus(sessObj, updateStatuscallback) {
+	logger.info("Inside updateStatus function");
 	try {
 		if (scheduleStatus != "") {
 			var inputs = {
@@ -1980,53 +2106,58 @@ function updateStatus(sessObj, updateStatuscallback) {
 				}
 			};
 			try {
+				logger.info("Calling NDAC Service from updateStatus: suite/ScheduleTestSuite_ICE");
 				client.post(epurl + "suite/ScheduleTestSuite_ICE", args,
 					function (result, response) {
 					if (response.statusCode != 200 || result.rows == "fail") {
-						console.log(response.statusCode);
+						logger.error("Error occured in suite/ScheduleTestSuite_ICE from updateStatus, Error Code : ERRNDAC");
 						updateStatuscallback(null, "fail");
 					} else {
 						updateStatuscallback(null, "success");
 					}
 				});
 			} catch (exception) {
-				console.log(exception);
+				logger.error("Exception occured in suite/ScheduleTestSuite_ICE from updateStatus: ",exception);
 				updateStatuscallback(null, "fail");
 			}
 		}
 	} catch (exception) {
-		console.log(exception);
+		logger.error("Exception occured in updateStatus: ",exception);
 		updateStatuscallback(null, "fail");
 	}
 }
 
 exports.getScheduledDetails_ICE = function (req, res) {
+	logger.info("Inside UI service getScheduledDetails_ICE");
 	if (req.cookies['connect.sid'] != undefined) {
 		var sessionCookie = req.cookies['connect.sid'].split(".");
 		var sessionToken = sessionCookie[0].split(":");
 		sessionToken = sessionToken[1];
 	}
 	if (sessionToken != undefined && req.session.id == sessionToken) {
+		logger.info("Calling function getScheduledDetails from getScheduledDetails_ICE");
 		getScheduledDetails("getallscheduledata", function (err, getSchedcallback) {
 			if (err) {
-				console.log(err);
+				logger.error("Error occured in getScheduledDetails from getScheduledDetails_ICE: ",err);
 				res.send("fail");
 			} else {
 				try {
 					res.send(getSchedcallback);
 				} catch (exception) {
-					console.log(exception);
+					logger.error("Exception occured while sending response getSchedcallback: ",exception);
 					res.send("fail");
 				}
 			}
 		});
 	} else {
+		logger.error("Error occured in getScheduledDetails_ICE: Invalid Session");
 		res.send("Invalid Session");
 	}
 };
 
 //cancel scheduled Jobs
 exports.cancelScheduledJob_ICE = function (req, res) {
+	logger.info("Inside UI service cancelScheduledJob_ICE");
 	if (req.cookies['connect.sid'] != undefined) {
 		var sessionCookie = req.cookies['connect.sid'].split(".");
 		var sessionToken = sessionCookie[0].split(":");
@@ -2052,32 +2183,39 @@ exports.cancelScheduledJob_ICE = function (req, res) {
 					"Content-Type": "application/json"
 				}
 			};
+			logger.info("Calling NDAC Service from cancelScheduledJob_ICE: suite/ScheduleTestSuite_ICE");
 			client.post(epurl + "suite/ScheduleTestSuite_ICE", args,
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
-					console.log(response.statusCode);
+					logger.error("Error occured in suite/ScheduleTestSuite_ICE from cancelScheduledJob_ICE service, Error Code : ERRNDAC");
 					res.send("fail");
 				} else {
 					var status = result.rows[0].schedulestatus;
 					if (status == "scheduled") {
 						var objectD = cycleid + ";" + scheduleid + ";" + upDate.valueOf().toString();
 						scheduleStatus = schedStatus;
+						logger.info("Calling function updateStatus from cancelScheduledJob_ICE service");
 						updateStatus(objectD, function (err, data) {
 							if (!err) {
+								logger.info("Sending response data from cancelScheduledJob_ICE service on success");
 								res.send(data);
-							} else
+							} else{
+								logger.info("Error in the function updateStatus from cancelScheduledJob_ICE service");
 								res.send(data);
+							}
 						});
 					} else {
+						logger.info("Sending response 'inprogress' from cancelScheduledJob_ICE service");
 						res.send("inprogress");
 					}
 				}
 			});
 		} catch (exception) {
-			console.log(exception);
+			logger.error("Exception in the service cancelScheduledJob_ICE: ",exception);
 			res.send("fail");
 		}
 	} else {
+		logger.error("Error in the service cancelScheduledJob_ICE: Invalid Session");
 		res.send("Invalid Session");
 	}
 };
@@ -2085,6 +2223,7 @@ exports.cancelScheduledJob_ICE = function (req, res) {
 //Fetch Scheduled data
 function getScheduledDetails(dbquery, schedDetailscallback) {
 	try {
+		logger.info("Inside getScheduledDetails function");
 		var inputs = {
 			"scheduledetails": dbquery,
 			"query": "getallscheduledetails"
@@ -2095,28 +2234,31 @@ function getScheduledDetails(dbquery, schedDetailscallback) {
 				"Content-Type": "application/json"
 			}
 		};
+		logger.info("Calling NDAC Service from getScheduledDetails: suite/ScheduleTestSuite_ICE");
 		client.post(epurl + "suite/ScheduleTestSuite_ICE", args,
 			function (result, response) {
 			if (response.statusCode != 200 || result.rows == "fail") {
-				console.log(response.statusCode);
+				logger.error("Error occured in suite/ScheduleTestSuite_ICE from getScheduledDetails, Error Code : ERRNDAC");
 				schedDetailscallback(null, "fail");
 			} else {
 				schedDetailscallback(null, result.rows);
 			}
 		});
 	} catch (exception) {
-		console.log(exception);
+		logger.error("Exception in the function getScheduledDetails: ",exception);
 		schedDetailscallback(null, "fail");
 	}
 }
 
 //Re-Scheduling the tasks
 exports.reScheduleTestsuite = function (req, res) {
+	logger.info("Inside UI service reScheduleTestsuite");
 	var getscheduleData = [];
 	try {
+		logger.info("Calling function getScheduledDetails from reScheduleTestsuite service");
 		getScheduledDetails("getallscheduleddetails", function (err, reSchedcallback) {
 			if (err) {
-				console.log(err);
+				logger.error("Error occured in getScheduledDetails from reScheduleTestsuite service: ", err);
 			} else {
 				if (reSchedcallback != "fail") {
 					var status;
@@ -2135,9 +2277,10 @@ exports.reScheduleTestsuite = function (req, res) {
 							dd = tempDD.split("-");
 							dt = tempDT.split(":");
 							var objectD = reSchedcallback[i].cycleid.valueOf().toString() + ";" + reSchedcallback[i].scheduleid.valueOf().toString() + ";" + new Date(Date.UTC(dd[0], dd[1] - 1, dd[2], dt[0], dt[1])).valueOf().toString();
+							logger.info("Calling function updateStatus from reScheduleTestsuite service");
 							updateStatus(objectD, function (err, data) {
 								if (!err) {
-									console.log(data);
+									logger.info("Sending response data from the function updateStatus of reScheduleTestsuite service");
 								}
 							});
 						}
@@ -2165,19 +2308,21 @@ exports.reScheduleTestsuite = function (req, res) {
 								modInfo.reschedule = true;
 								modInfo.scheduleid = itrSchData.scheduleid.valueOf().toString();
 								modInformation.push(modInfo);
+								logger.info("Calling function scheduleTestSuite from reScheduleTestsuite service");
 								scheduleTestSuite(modInformation, req, function (err, schedulecallback) {
 									try {
-										console.log(schedulecallback);
+										logger.info("Status of the function scheduleTestSuite from reScheduleTestsuite service");
 									} catch (exception) {
-										console.log(exception);
+										logger.info("Exception in the function scheduleTestSuite from reScheduleTestsuite service: ", exception);
 									}
 								});
 							} else {
 								scheduleStatus = "Failed 01";
 								var objectD = itrSchData.cycleid.valueOf().toString() + ";" + itrSchData.scheduleid.valueOf().toString() + ";" + new Date(Date.UTC(dd[0], dd[1] - 1, dd[2], dt[0], dt[1])).valueOf().toString();
+								logger.info("Calling function updateStatus from reScheduleTestsuite service");
 								updateStatus(objectD, function (err, data) {
 									if (!err) {
-										console.log(data);
+										logger.info("Sending response data from the function updateStatus of reScheduleTestsuite service");
 									}
 								});
 							}
@@ -2185,11 +2330,11 @@ exports.reScheduleTestsuite = function (req, res) {
 						});
 					}
 				} else {
-					console.log("Jobs are not rescheduled");
+					logger.info("Status from the function reScheduleTestsuite: Jobs are not rescheduled");
 				}
 			}
 		});
 	} catch (ex) {
-		console.log(ex);
+		logger.info("Exception in the function reScheduleTestsuite: ", ex);
 	}
 };
