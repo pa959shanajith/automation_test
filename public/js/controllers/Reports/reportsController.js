@@ -78,8 +78,17 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 						$(".rpProjects").append("<option value='"+data.projectids[i]+"'>"+data.projectnames[i]+"</option>");
 					}
 					var proId;
-					if(localStorage.getItem('fromExecution') == "true"){						
-						proId = JSON.parse(localStorage.getItem("_CT")).projectId;
+					if(localStorage.getItem('fromExecution') == "true"){
+						var testSuites = JSON.parse(localStorage.getItem("_CT")).testSuiteDetails;
+						if(testSuites.length > 0)
+						{
+							for(var i=0; i<testSuites.length; i++){
+								proId = testSuites[i].projectidts;
+							}
+						}
+						else{
+							proId = JSON.parse(localStorage.getItem("_CT")).projectId;
+						}						
 						var options = $(".rpProjects option");
 						for(var i=0; i<options.length; i++){
 							if(options[i].value == proId){
@@ -92,6 +101,8 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 					else{
 						$(".rpProjects").prop('selectedIndex', 1);
 						proId = data.projectids[0];
+						console.log("data",data.projectids[0]);
+						console.log("proId",proId);
 					}
 					getProjectsAndSuites(proId, "reports");					
 				}

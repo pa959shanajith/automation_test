@@ -673,6 +673,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 								return false;
 							}
 							if(proceeed == true){
+								blockUI("Loading...");
 								var userDetails = JSON.parse(window.localStorage['_UI']);
 								createprojectObj.domainId =  domainId;
 								createprojectObj.projectName = $.trim($("#projectName").val());
@@ -694,6 +695,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 										openModelPopup("Create Project", "Failed to create project");
 										resetForm();
 									}
+									unblockUI();
 								}, function (error) { console.log("Error:::::::::::::", error) })
 							}
 						}, function (error) { console.log("Error:::::::::::::", error) })
@@ -701,6 +703,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 				}
 			}
 			else{
+				unblockUI();
 				openModelPopup("Create Project", "Please add atleast one cycle for a release");
 			}
 		}
@@ -740,6 +743,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 		// 	openModelPopup("Update Project", "Please add atleast one cycle for a release");
 		// }
 		else{
+				blockUI("Loading...");
 				flag = false;
 				//Update project details json with editedProjectDetails, deletedProjectDetails, newProjectDetails
 				updateProjectObj = {};
@@ -802,6 +806,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 
 				}
 				if(proceedFlag == false){
+					unblockUI();
 					openModelPopup("Update Project", "Please add atleast one cycle for release: "+relName);
 					return false;
 				}
@@ -834,6 +839,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 							openModelPopup("Update Project", "Failed to update project");
 							resetForm();
 						}
+						unblockUI();
 					}, function (error) { console.log("Error:::::::::::::", error) })
 				}
 
