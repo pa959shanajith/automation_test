@@ -1855,6 +1855,7 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 						var conditionchecklist = [];
 						var browserTypelist = [];
 						var listofscenarioandtestcases = [];
+						var appType;
 						var executionRequest = {
 							"executionId": "",
 							"suitedetails": [],
@@ -1874,6 +1875,7 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 							conditionchecklist.push(eachsuiteDetails.condition);
 							browserTypelist = browserType;
 							currentscenarioid = eachsuiteDetails.scenarioids;
+							appType = eachsuiteDetails.appType;
 							logger.info("Calling function TestCaseDetails_Suite_ICE from executeScheduling");
 							TestCaseDetails_Suite_ICE(currentscenarioid, schedulingData[0].userInfo.user_id, function (currentscenarioidError, currentscenarioidResponse) {
 								var scenariotestcaseobj = {};
@@ -1917,6 +1919,7 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 							executionRequest.executionId = JSON.parse(JSON.stringify(result.rows[0].scheduleid));
 							executionRequest.suitedetails = testsuitedetailslist;
 							executionRequest.testsuiteIds.push(testsuiteid);
+							executionRequest.apptype = appType;
 						}
 						function scheduleFunction(executionRequest) {
 							logger.info("Inside scheduleFunction function of executeScheduling");

@@ -383,7 +383,8 @@ mySPA.controller('scheduleController',['$scope','$http','$timeout','$location','
 								dataparam : [$(this).children("td:nth-child(3)").find("input").val()],
 								executestatus : 1,
 								scenarioids : $(this).children("td:nth-child(2)").data("scenarioid"),
-								scenarioname: $(this).children("td:nth-child(2)").text()
+								scenarioname: $(this).children("td:nth-child(2)").text(),
+								appType: window_ct.appType
 							})
 						})
 						suiteInfo.suiteDetails = selectedScenarioData;
