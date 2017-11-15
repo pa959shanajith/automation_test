@@ -383,7 +383,7 @@ exports.mindmapService = function(req, res) {
 						}
 					}
  					else if(e.type=='scenarios'){
-						if(e.renamed && e.id_n) rnmList.push({"statement":"MATCH(n:TESTSCENARIOS{testScenarioID:'"+e.id+"'}) SET n.testScenarioName='"+e.name+"'"+",n.projectID='"+prjId+"'"});
+						if(e.renamed && e.id_n) rnmList.push({"statement":"MATCH(n:TESTSCENARIOS{testScenarioID:'"+e.id+"',n.projectID:'"+prjId+"'}) SET n.testScenarioName='"+e.name+"'"});
 						qList.push({"statement":"MERGE(n:TESTSCENARIOS{projectID:'"+prjId+"',moduleID:'"+idDict[e.pid]+"',testScenarioName:'"+e.name+"',testScenarioID:'"+e.id+"',createdBy:'"+user+"',createdOn:'null',testScenarioID_c:'"+e.id_c+"'}) SET n.childIndex='"+e.childIndex+"'"});
 						//Supporting task assignmnet for scenarios
 						if(t!=null && e.id_c!=null){
@@ -403,7 +403,7 @@ exports.mindmapService = function(req, res) {
 					}
 					else if(e.type=='screens'){
 						uidx++;lts=idDict[e.pid];
-						if(e.renamed && e.id_n && e.orig_name) rnmList.push({"statement":"MATCH(n:SCREENS{screenName:'"+e.orig_name+"'}) SET n.screenName='"+e.name+"'"+",n.projectID='"+prjId+"'"});
+						if(e.renamed && e.id_n && e.orig_name) rnmList.push({"statement":"MATCH(n:SCREENS{screenName:'"+e.orig_name+"',n.projectID:'"+prjId+"'}) SET n.screenName='"+e.name+"'"});
 						//qList.push({"statement":"MATCH(n:SCREENS{screenID:'"+e.id+"'}) SET n.screenName='"+e.name+"'"+",n.projectID='"+prjId+"'"});
 						qList.push({"statement":"MERGE(n:SCREENS{projectID:'"+prjId+"',testScenarioID:'"+idDict[e.pid]+"',screenName:'"+e.name+"',screenID:'"+e.id+"',createdBy:'"+user+"',createdOn:'null',uid:'"+uidx+"',screenID_c:'"+e.id_c+"'})SET n.childIndex='"+e.childIndex+"'"});
 						if(t!=null && e.id_c!=null){
