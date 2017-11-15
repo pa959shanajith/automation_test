@@ -9,11 +9,12 @@ var uuidV4 = require('uuid/v4');
 var express = require('express');
 var certificate = fs.readFileSync('server/https/server.crt','utf-8');
 var neo4jAPI = require('../controllers/neo4jAPI');
-
+var  logger = require('../../logger');
 /*
 * Checks if the session is active
 */
   function isSessionActive(req, res){
+    logger.info("Inside function isSessionActive");
     if(req.cookies['connect.sid'] != undefined){
       var sessionCookie = req.cookies['connect.sid'].split(".");
       var sessionToken = sessionCookie[0].split(":");
@@ -23,10 +24,12 @@ var neo4jAPI = require('../controllers/neo4jAPI');
   }
 
   exports.loadDashboard = function(req, res){
+    logger.info("Inside UI service: loadDashboard")
     try {
       if(isSessionActive(req, res)){
         var IP = req.headers.host.split(":")[0];
         //req.connection.servername;//localAddress.split(":")[req.connection.localAddress.split(":").length-1];
+        logger.info("Connecting to jsreport client from loadDashboard_2");
         var client = require("jsreport-client")("https://"+IP+":8001/");
         client.render({
           template: {
@@ -39,13 +42,14 @@ var neo4jAPI = require('../controllers/neo4jAPI');
           }
         }, function(err, response){
           if(err) {
-            console.log('Error when trying to render report:', err);
+
+            logger.error('Error while trying to render report');
             res.send("fail");
           }else{
             try{
               response.pipe(res);
             }catch(exception){
-              console.log(exception);
+                logger.error(exception);
               res.send("fail");
             }
           }
@@ -54,12 +58,13 @@ var neo4jAPI = require('../controllers/neo4jAPI');
         res.send("Invalid Session");
       }
     }catch (e) {
-      console.log(exception);
+      logger.error(e);
       res.sed("fail");
     }
   }
 
   function getTasksData(req, res, projIds, callback){
+    logger.info("Inside function getTasksData");
     var qList=[];
     var urlData=req.get('host').split(':');
     projIds.forEach((id)=>{
@@ -79,9 +84,11 @@ var neo4jAPI = require('../controllers/neo4jAPI');
   }
 
   function getProjectNames(projectID, allExecutionData, callback){
+    logger.info("Inside function getProjectNames");
     inputs = { "projectid":projectID, "query":"projecttable"};
     args = {data:inputs, headers:{"Content-Type" : "application/json"}}
-
+	
+	logger.info("Calling NDAC Service from getProjectNames: suite/getTestcaseDetailsForScenario_ICE");
     client.post(epurl+'suite/getTestcaseDetailsForScenario_ICE', args,
     function(projectDetails, response){
       allExecutionData.projectDetails[projectID] = projectDetails.rows[0].projectname;
@@ -91,6 +98,7 @@ var neo4jAPI = require('../controllers/neo4jAPI');
   }
 
   function getExecutionData(req, res, projectIds, callback){
+    logger.info("Inside function getExecutionData");
     var arr = [];
     var allExecutionData = {
       projectDetails: {},
@@ -111,7 +119,8 @@ var neo4jAPI = require('../controllers/neo4jAPI');
         data:inputs,
         headers:{"Content-Type" : "application/json"}
       };
-
+	  
+	  logger.info("Calling NDAC Service from getExecutionData: admin/getDetails_ICE");
       client.post(epurl+"admin/getDetails_ICE", args,
       function(releaseIds, response){
         //console.log("releaseIds : ", releaseIds.rows);
@@ -129,6 +138,8 @@ var neo4jAPI = require('../controllers/neo4jAPI');
             data:inputs,
             headers:{"Content-Type" : "application/json"}
           };
+
+          logger.info("Calling NDAC Service from getExecutionData: admin/getDetails_ICE");
           client.post(epurl+"admin/getDetails_ICE", args,
           function(cycleIds, response){
             //console.log("cycleids : ", cycleIds.rows);
@@ -146,6 +157,7 @@ var neo4jAPI = require('../controllers/neo4jAPI');
                 headers:{"Content-Type" : "application/json"}
               };
 
+              logger.info("Calling NDAC Service from getExecutionData: admin/getDetails_ICE");
               client.post(epurl+"admin/getDetails_ICE", args,
               function(testsuiteIds, response){
                 //console.log("testsuiteIds : ", testsuiteIds.rows);
@@ -162,6 +174,7 @@ var neo4jAPI = require('../controllers/neo4jAPI');
                     headers:{"Content-Type" : "application/json"}
                   };
 
+                  logger.info("Calling NDAC Service from getExecutionData: reports/getSuiteDetailsInExecution_ICE");
                   client.post(epurl+'reports/getSuiteDetailsInExecution_ICE', args,
                   function(executionTime, response){
                     //console.log("executionTime",executionTime.rows);
@@ -225,6 +238,7 @@ var neo4jAPI = require('../controllers/neo4jAPI');
   }
 
   exports.loadDashboardData = function(req, res){
+    logger.info("Inside UI service: loadDashboardData")  
     try {
       var projJson = {}
       if (isSessionActive(req,res)) {
@@ -258,7 +272,7 @@ var neo4jAPI = require('../controllers/neo4jAPI');
               })
             });
           }catch(exception){
-            console.log(exception);
+            logger.error(exception);
             res.send("fail");
           }
         });
@@ -266,16 +280,18 @@ var neo4jAPI = require('../controllers/neo4jAPI');
         res.send("Invalid Session")
       }
     }catch (e) {
-      console.log(e);
+      logger.error(e);
       res.send('fail')
     }
   }
 
   exports.loadDashboard_2 = function(req, res){
+    logger.info("Inside UI service: loadDashboard_2");
     try {
       if(isSessionActive(req, res)){
         var IP = req.headers.host.split(":")[0];
         //req.connection.servername;//localAddress.split(":")[req.connection.localAddress.split(":").length-1];
+        logger.info("Connecting to jsreport client from loadDashboard_2");
         var client = require("jsreport-client")("https://"+IP+":8001/");
         client.render({
           template: {
@@ -290,13 +306,13 @@ var neo4jAPI = require('../controllers/neo4jAPI');
           }
         }, function(err, response){
           if(err) {
-            console.log('Error when trying to render report:', err);
+            logger.error('Error while trying to render report');
             res.send("fail");
           }else{
             try{
               response.pipe(res);
             }catch(exception){
-              console.log(exception);
+              logger.error(exception);
               res.send("fail");
             }
           }
@@ -305,7 +321,7 @@ var neo4jAPI = require('../controllers/neo4jAPI');
         res.send("Invalid Session");
       }
     }catch (e) {
-      console.log(exception);
+      logger.error(e);
       res.sed("fail");
     }
   }
