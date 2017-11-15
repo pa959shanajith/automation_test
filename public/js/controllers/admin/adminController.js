@@ -385,7 +385,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 				domainId = data[0].domainId;
 				var details = {
 					"web":{"data":"Web","title":"Web","img":"web"},
-					"webservice":{"data":"WebService","title":"Web Service","img":"webservice"},
+					"webservice":{"data":"Webservice","title":"Web Service","img":"webservice"},
 					"mainframe":{"data":"Mainframe","title":"Mainframe","img":"mainframe"},
 					"desktop":{"data":"Desktop","title":"Desktop Apps","img":"desktop"},
 					"oebs":{"data":"DesktopJava","title":"Oracle Apps","img":"oracleApps"},
@@ -1887,7 +1887,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 				var idtype=["domaindetails"];
 				var details = {
 					"web":{"data":"Web","title":"Web","img":"web"},
-					"webservice":{"data":"WebService","title":"Web Service","img":"webservice"},
+					"webservice":{"data":"Webservice","title":"Web Service","img":"webservice"},
 					"mainframe":{"data":"Mainframe","title":"Mainframe","img":"mainframe"},
 					"desktop":{"data":"Desktop","title":"Desktop Apps","img":"desktop"},
 					"oebs":{"data":"DesktopJava","title":"Oracle Apps","img":"oracleApps"},
