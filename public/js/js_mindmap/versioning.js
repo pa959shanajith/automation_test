@@ -57,11 +57,12 @@ function replicationHandler() {
                 }
               }
               $('#ProjectReplicationPopUp').modal("show");
+               $('#replicateVersionButton').removeClass('disableButton').removeAttr('disabled','disabled');
               if(!flag)
-                $('#replicateVersionButton').addClass('disableButton');
+                $('#replicateVersionButton').addClass('disableButton').attr('disabled','disabled');
           }
           else{
-            openDialogMindmap('Mindmap', "Empty Project can't be replicate.")
+            openDialogMindmap('Mindmap', "Empty Projects cannot be replicated.")
           }
           unblockUI();
         }
@@ -283,8 +284,16 @@ function versionInputDialogShow() {
   console.log(from_v)
   $('#createNewVersionButton').attr('onclick', 'createNewVersion(' + from_v + ')');
 
-  $('#versionNumInputPopUp').modal("show");
-  $('#versionNumberInput').val((getMaxVersion() + 0.1).toFixed(1));
+  dataSender({task:'getVersions',projectId:$(".project-list").val(),versioning:1},function(err,result){
+				if(err){ console.log(err);openDialogMindmap('Error','Error in creating versions')}
+				else{
+              result=JSON.parse(result);
+              maxVersionNumber=result[result.length-1];
+							 $('#versionNumInputPopUp').modal("show");
+              $('#versionNumberInput').val((parseFloat(maxVersionNumber) + 0.1).toFixed(1));
+				}
+			});
+ 
 
   //operation == "hide" ? $('#versionNumInputPopUp').modal("hide") : $('#versionNumInputPopUp').modal("show");
 
@@ -296,27 +305,27 @@ function versionInputDialogShow() {
   param : version : version number to verify
 */
 
-function isValidVersionToCreate(version) {
+// function isValidVersionToCreate(version) {
 
-  return version > getMaxVersion();
+//   return version > getMaxVersion();
 
-}
+// }
 
 /* 
   function : getMaxVersion()
   Purpose : This function returns the maximum version number present in the UI
   param : None
 */
-function getMaxVersion() {
-  allTabs = $('.version-list').children();
-  maxVersionTab = 0.0;
-  for (var i = 0; i < allTabs.length; i++) {
-    if (allTabs[i].value >= maxVersionTab)
-      maxVersionTab = allTabs[i].value
-  }
-  maxVersionNumber = parseFloat(maxVersionTab);
-  return maxVersionNumber;
-}
+// function getMaxVersion() {
+//   allTabs = $('.version-list').children();
+//   maxVersionTab = 0.0;
+//   for (var i = 0; i < allTabs.length; i++) {
+//     if (allTabs[i].value >= maxVersionTab)
+//       maxVersionTab = allTabs[i].value
+//   }
+//   maxVersionNumber = parseFloat(maxVersionTab);
+//   return maxVersionNumber;
+// }
 
 /* 
   function : getallVersion()
@@ -324,15 +333,15 @@ function getMaxVersion() {
   param : None
 */
 
-function getAllVersionsUI() {
-  ret = [];
-  options = $('.version-list').children();
-  for (i = 0; i < options.length; i++) {
-    console.log(options[i].value)
-    ret.push(parseFloat(options[i].value));
-  }
-  return ret;
-}
+// function getAllVersionsUI() {
+//   ret = [];
+//   options = $('.version-list').children();
+//   for (i = 0; i < options.length; i++) {
+//     console.log(options[i].value)
+//     ret.push(parseFloat(options[i].value));
+//   }
+//   return ret;
+// }
 
 
 /* 
@@ -345,22 +354,39 @@ param : from_v : source version
 function createNewVersion(from_v) {
   console.log(from_v);
   inputVersion = parseFloat($('#versionNumberInput').val());
+    dataSender({task:'getVersions',projectId:$(".project-list").val(),versioning:1},function(err,result){
+				if(err){ console.log(err);openDialogMindmap('Error','Error in creating versions')}
+				else{
+              result=JSON.parse(result);
+              maxVersionNumber=result[result.length-1];
+              if(inputVersion>parseFloat(maxVersionNumber)){
+                createNewTab(from_v, inputVersion);
+              }else{
+                if (result.includes(inputVersion.toString()))
+                  openDialogMindmap('Error', "Version Number already exists");
 
-  if (isValidVersionToCreate(inputVersion)) {
-    //this version number is valid, go ahead   
-    createNewTab(from_v, inputVersion);
+                  else {
+                    openDialogMindmap('Error', "Invalid Version Number");
+                  }
+              }
+				}
+			});
 
-  }
-  else {
-    //show an error dialog
-    //versionInputDialogClose();
-    if (getAllVersionsUI().includes(inputVersion))
-      openDialogMindmap('Error', "Version Number already exists");
+  // if (isValidVersionToCreate(inputVersion)) {
+  //   //this version number is valid, go ahead   
+  //   createNewTab(from_v, inputVersion);
 
-    else {
-      openDialogMindmap('Error', "Invalid Version Number");
-    }
-  }
+  // }
+  // else {
+  //   //show an error dialog
+  //   //versionInputDialogClose();
+  //   if (getAllVersionsUI().includes(inputVersion))
+  //     openDialogMindmap('Error', "Version Number already exists");
+
+  //   else {
+  //     openDialogMindmap('Error', "Invalid Version Number");
+  //   }
+  // }
 }
 
 /* 
