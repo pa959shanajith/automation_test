@@ -4,6 +4,7 @@ var https = require('https');
 var uuidV4 = require('uuid/v4');
 //var router = express.Router();
 var create_ice = require('../controllers/create_ice');
+var  logger = require('../../logger');
 var neo4jAPI = require('../controllers/neo4jAPI');
 var async = require('async');
 var certificate = fs.readFileSync('server/https/server.crt', 'utf-8');
@@ -38,6 +39,7 @@ var notificationMsg = require("../notifications/notifyMessages");
 /* POST Mindmap*/
 exports.versioning = function (req, res) {
 	//if(!req.session.uniqueID) res.status(401).send('Session Timed Out! Login Again');
+	logger.info('Inside the UI Service versioning')
 	if (req.cookies['connect.sid'] != undefined) {
 		var sessionCookie = req.cookies['connect.sid'].split(".");
 		var sessionToken = sessionCookie[0].split(":");
@@ -50,18 +52,27 @@ exports.versioning = function (req, res) {
 		var urlData = req.get('host').split(':');
 		if (d.task == 'getVersions') {
 			//prjId=d.projectId;
+			logger.info('Inside the getVersion task of UI Service versioning ');
 			var qList = [{ "statement": "MATCH (n:VERSION{projectID:'" + prjId + "'}) RETURN n.vn" }];
+			logger.info("Calling Neo4j API Service from versioning: project_versioning/versioning");
 			neo4jAPI.executeQueries(qList, function (status, result) {
 				//res.setHeader('Content-Type', 'application/json');
-				if (status != 200) res.status(status).send(result);
+				if (status != 200) {
+					logger.error("Error occured in project_versioning/versioning: versioning service",status);
+					res.status(status).send(result);
+				}
 				else {
 					var jsonData = result[0].data;
 					if (jsonData.length == 0 || jsonData[0].row[0] == null) {
 						var vn = '0.0';
 						qList = [({ "statement": "MERGE(n:VERSION{projectID:'" + prjId + "',moduleIDs:[],versionNumber:" + vn + ",vn:'" + vn + "',versionId:'" + uuidV4() + "'})" })];
+						logger.info("Calling Neo4j API Service from versioning: project_versioning/versioning");
 						neo4jAPI.executeQueries(qList, function (status, result) {
 							//res.setHeader('Content-Type', 'application/json');
-							if (status != 200) res.status(status).send(result);
+							if (status != 200){
+								logger.error("Error occured in project_versioning/versioning: versioning service",status);
+								res.status(status).send(result);
+							}
 							else {
 								res.status(status).send([vn]);
 							}
@@ -83,14 +94,19 @@ exports.versioning = function (req, res) {
 
 
 		else if (d.task == 'getModules') {
+			logger.info('Inside the getModules task of UI Service versioning ')
 			var nData = [], qList = [], idDict = {};
 			prjId = d.prjId;
 			version = d.version;
 			qList.push({ "statement": " MATCH path=(n:VERSION{projectID:'" + prjId + "',versionNumber:" + version + "})-[r*1..]->(t) RETURN path", "resultDataContents": ["graph"] });
 			qList.push({ "statement": "MATCH path=(n:VERSION{projectID:'" + prjId + "',versionNumber:" + version + "}) WHERE NOT (n)-[:FMTTS]->() RETURN n", "resultDataContents": ["graph"] });
+			logger.info("Calling Neo4j API Service from versioning: project_versioning/versioning");
 			neo4jAPI.executeQueries(qList, function (status, result) {
 				res.setHeader('Content-Type', 'application/json');
-				if (status != 200) res.status(status).send(result);
+				if (status != 200){
+					logger.error("Error occured in project_versioning/versioning: versioning service",status);
+					res.status(status).send(result);
+				}
 				else {
 					var k = 0, rIndex = [], lbl, neoIdDict = {}, maps = [], tList = [];
 					var attrDict = { "modules_endtoend": { "childIndex": "childIndex", "projectID": "projectID", "moduleName": "name", "moduleID": "id_n", "moduleID_c": "id_c" }, "modules": { "childIndex": "childIndex", "projectID": "pid_n", "moduleName": "name", "moduleID": "id_n", "moduleID_c": "id_c" }, "scenarios": { "projectID": "projectID", "childIndex": "childIndex", "moduleID": "pid_n", "testScenarioName": "name", "testScenarioID": "id_n", "testScenarioID_c": "id_c" }, "screens": { "childIndex": "childIndex", "testScenarioID": "pid_n", "screenName": "name", "screenID": "id_n", "screenID_c": "id_c" }, "testcases": { "childIndex": "childIndex", "screenID": "pid_n", "testCaseName": "name", "testCaseID": "id_n", "testCaseID_c": "id_c" }, "tasks": { "taskID": "id_n", "task": "t", "batchName": "bn", "assignedTo": "at", "reviewer": "rw", "startDate": "sd", "endDate": "ed", "re_estimation": "re_estimation", "release": "re", "cycle": "cy", "details": "det", "nodeID": "pid", "parent": "anc", "taskvn": "taskvn" } };
@@ -118,7 +134,7 @@ exports.versioning = function (req, res) {
 										nData.push({ id: n.id_n, oid: n.id, task: n.t, batchName: n.bn, assignedTo: n.at, reviewer: n.rw, startDate: n.sd, endDate: n.ed,re_estimation: n.re_estimation, release: n.re, cycle: n.cy, details: n.det, nodeID: n.pid, parent: n.anc.slice(1, -1).split(','), vn: n.taskvn });
 									}
 									catch (ex) {
-										console.log(n.id);
+										logger.error("Error occured in project_versioning/versioning: versioning service",ex);
 									}
 								}
 								else {
@@ -144,7 +160,7 @@ exports.versioning = function (req, res) {
 
 								}
 							} catch (ex) {
-								console.log(ex);
+								logger.error("Error occured in project_versioning/versioning: versioning service",ex);
 							}
 						});
 					});
@@ -162,6 +178,7 @@ exports.versioning = function (req, res) {
 			});
 		}
 		else if (d.task == 'writeMap') {
+			logger.info('Inside writemap task of the UI Service versioning')
 			var tasks =[];
 			for (var i=0;i<d.data.map.length;i++)
 			{
@@ -333,12 +350,13 @@ exports.versioning = function (req, res) {
 					qList.push({ "statement": "MATCH path=(n:MODULES{moduleID:'" + data[0].id + "'}) WHERE NOT (n)-[:FMTTS]->() RETURN n", "resultDataContents": ["graph"] });
 					qList.push({ "statement": "MATCH path=(n:MODULES{moduleID:'" + data[0].id + "'})-[r*1..]->(t) RETURN path", "resultDataContents": ["graph"] });
 				}
-
-
-
+				logger.info("Calling Neo4j API Service from versioning: project_versioning/versioning");
 				neo4jAPI.executeQueries(qList, function (status, result) {
 					res.setHeader('Content-Type', 'application/json');
-					if (status != 200) res.status(status).send(result);
+					if (status != 200) {
+						logger.error("Error occured in project_versioning/versioning: versioning service",status);
+						res.status(status).send(result);
+					}
 					else {
 						var k = 0, rIndex, lbl, neoIdDict = {};
 						idDict = {};
@@ -386,8 +404,7 @@ exports.versioning = function (req, res) {
 							}
 						});
 
-						console.log(rIndex);
-						console.log(nData[rIndex]);
+						logger.debug('WriteMap data:',nData[rIndex]);
 						res.status(status).send(nData[rIndex]);
 					}
 				});
@@ -420,18 +437,23 @@ exports.versioning = function (req, res) {
 				});
 				qObj.testsuiteDetails = [{ "testsuiteId": nObj[rIndex].id, "testsuiteId_c": nObj[rIndex].id_c, "testsuiteName": nObj[rIndex].name, "task": nObj[rIndex].task, "testscenarioDetails": tsList }];
 				qObj.userName = d.data.user_name;
+				logger.info("Calling createStructure_Nineteen68 node Service from versioning: project_versioning/versioning");
 				create_ice.createStructure_Nineteen68(qObj, function (err, data) {
-					if (err)
+					if (err){
+						logger.error("Error occured in project_versioning/versioning: versioning service",err);
 						res.status(500).send(err);
-					else {
+					}else {
 						datatosend = data;
 
 					}
 					var module_type = 'modules';
 					var parsing_result = parsing(data, module_type, vn_to, 0);
-
+					logger.info("Calling Neo4j API Service from versioning: project_versioning/versioning");
 					neo4jAPI.executeQueries(parsing_result[0], function (status, result) {
-						if (status != 200) res.status(status).send(result);
+						if (status != 200){
+							logger.error("Error occured in project_versioning/versioning: versioning service",status);
+							res.status(status).send(result);
+						}
 						else res.status(200).send(parsing_result[1]);
 
 					});
@@ -444,6 +466,7 @@ exports.versioning = function (req, res) {
 		}
 
 		else if (d.task == 'createVersion') {
+			logger.info('Inside the createVersion task of UI Service versioning ')
 			//get the version from version table
 			//create a new version with the existing version data
 			//id's must be new
@@ -460,13 +483,16 @@ exports.versioning = function (req, res) {
 			vn_from = d.vn_from;
 			vn_to = d.vn_to;
 			userRole = d.userRole;
-			console.log(prjId, vn_from, vn_to);
+			logger.debug("Destination Project id,Source,destination Version",prjId,vn_from, vn_to);
 			//
 			var qList = [{ "statement": "MATCH path=(n:VERSION{projectID:'" + tmpprjId + "',versionNumber:" + vn_from + "})-[r*1..]->(t) RETURN path", "resultDataContents": ["graph"] }];
+			logger.info("Calling Neo4j API Service from versioning: project_versioning/versioning");
 			neo4jAPI.executeQueries(qList, function (status, result) {
 				res.setHeader('Content-Type', 'application/json');
-				if (status != 200) res.status(status).send(result);
-				else {
+				if (status != 200) {
+					logger.error("Error occured in project_versioning/versioning: versioning service",status);
+					res.status(status).send(result);
+				}else {
 					var k = 0, rIndex, lbl, neoIdDict = {};
 					idDict = {};
 					newMap = {};
@@ -474,7 +500,6 @@ exports.versioning = function (req, res) {
 					//var attrDict={"version":{},"modules_endtoend":{"moduleID":"id_n"},"modules":{"moduleID":"id_n"},"testscenarios":{"testScenarioID":"id_n"},"screens":{"screenID":"id_n"},"testcases":{"testCaseID":"id_n"}};
 					var attrDict = { "version": "versionID", "modules_endtoend": "moduleID", "modules": "moduleID", "testscenarios": "testScenarioID", "screens": "screenID", "testcases": "testCaseID" };
 					var jsonData = result;
-					console.log(jsonData.length);
 					var new_res = jsonData[0].data;
 					new_res.forEach(function (row) {
 						row.graph.nodes.forEach(function (n) {
@@ -521,9 +546,8 @@ exports.versioning = function (req, res) {
 						//neoIdDict[n.id_n]=k;
 						if (e.type == 'version') {
 							newModIds = [];
-							console.log("Version moduleids");
 							for (var mix = 0; mix < e.attrs.moduleIDs.length; mix++) {
-								console.log("Version moduleids:  OLD:", e.attrs.moduleIDs[mix], "  new:", newMap[e.attrs.moduleIDs[mix]]);
+								logger.debug("Version moduleids:  OLD:", e.attrs.moduleIDs[mix], "  new:", newMap[e.attrs.moduleIDs[mix]]);
 								if (newMap[e.attrs.moduleIDs[mix]] !== undefined) newModIds.push("\"" + newMap[e.attrs.moduleIDs[mix]] + "\"");
 							}
 							e.attrs.moduleIDs = "[" + newModIds + "]";
@@ -577,11 +601,13 @@ exports.versioning = function (req, res) {
 					qList.push({ "statement": "MATCH (a:TESTSCENARIOS),(b:SCREENS) WHERE a.testScenarioID=b.testScenarioID MERGE (a)-[r:FTSTS {id:b.testScenarioID}]->(b)" });
 					qList.push({ "statement": "MATCH (a:SCREENS),(b:TESTCASES) WHERE a.screenID=b.screenID and a.uid=b.uid MERGE (a)-[r:FSTTS {id:b.screenID}]->(b)" });
 					qList.push({ "statement": "MATCH (a) remove a.uid" });
-
+					logger.info("Calling Neo4j API Service from versioning: project_versioning/versioning");
 					neo4jAPI.executeQueries(qList, function (status, result) {
 						res.setHeader('Content-Type', 'application/json');
-						if (status != 200) res.status(status).send(result);
-						else {
+						if (status != 200) {
+							logger.error("Error occured in project_versioning/versioning: versioning service",status);
+							res.status(status).send(result);
+						}else {
 							var qObj = { "projectId": prjId,"oldprojectId":tmpprjId,"action":true, "testsuiteDetails": [], userRole: userRole, from_version: parseFloat(vn_from), new_version: vn_to };
 							qObj.userName = d.user_name;
 
@@ -624,17 +650,22 @@ exports.versioning = function (req, res) {
 								if (!incompleteFlow) {
 									qObj.testsuiteDetails = [{ "testsuiteId": nData[rIndex].attrs.moduleID, "testsuiteId_c": null, "testsuiteName": nData[rIndex].attrs.moduleName, "task": nData[rIndex].attrs.task, "testscenarioDetails": tsList }];
 									//Passing the details of hierarchical structure of module and its children to NDAC service to create Structure in Cassandra
+									logger.info("Calling createStructure_Nineteen68 node Service from versioning: project_versioning/versioning");
 									create_ice.createStructure_Nineteen68(qObj, function (err, data) {
-										if (err)
+										if (err){
+											logger.error("Error occured in project_versioning/versioning: versioning service",err);
 											res.status(500).send(err);
-										else {
+										}else {
 											datatosend = data;
 										}
 										var module_type = 'modules';
 										var parsing_result = parsing(data, module_type, vn_to, 1);
+										logger.info("Calling Neo4j API Service from versioning: project_versioning/versioning");
 										neo4jAPI.executeQueries(parsing_result[0], function (status, result) {
-											if (status != 200) res.status(status).send(result);
-											maincallback();
+											if (status != 200) {
+											logger.error("Error occured in project_versioning/versioning: versioning service",status);
+											res.status(status).send(result);
+										}maincallback();
 										});
 									})
 								} else {
@@ -652,21 +683,29 @@ exports.versioning = function (req, res) {
 
 		}
 		else if (d.task == 'projectReplication') {
+			logger.info('Inside the projectReplication task of UI Service versioning ')
 			var qlist = { userid: d.userid,'allflag':false }
+			logger.info("Calling getProjectIDs_Nineteen68 node Service from versioning: project_versioning/versioning");
 			create_ice.getProjectIDs_Nineteen68(qlist, function (err, result) {
-				if (err) res.status(500).send(result);
-				else {
+				if (err){
+					logger.error("Error occured in project_versioning/versioning: versioning service",err);
+					res.status(500).send(result);
+				}else {
 					res.status(200).send(result)
 				}
 			});
 		}
 		else if (d.task == 'listOfProjectsNeo4j') {
+			logger.info('Inside the listOfProjectsNeo4j task of UI Service versioning ')
 			var qList = []
 			qList.push({ "statement": "MATCH (n:MODULES) return distinct n.projectID" });
+			logger.info("Calling Neo4j API Service from versioning: project_versioning/versioning");
 			neo4jAPI.executeQueries(qList, function (status, result) {
 				res.setHeader('Content-Type', 'application/json');
-				if (status != 200) res.status(status).send(result);
-				else {
+				if (status != 200){
+					logger.error("Error occured in project_versioning/versioning: versioning service",status);
+					res.status(status).send(result);
+				}else {
 					res.status(status).send(result);
 				}
 			});
@@ -674,6 +713,7 @@ exports.versioning = function (req, res) {
 	}
 
 	else {
+		logger.error("Error occured in project_versioning/versioning: versioning service",': Invalid session');
 		res.send("Invalid Session");
 	}
 };
@@ -682,6 +722,7 @@ exports.versioning = function (req, res) {
 
 
 var parsing = function (d, module_type, vn, flag) {
+	logger.info("Inside the function parsing ");
 	var data = d;
 	var qList_new = [];
 
@@ -736,7 +777,7 @@ var parsing = function (d, module_type, vn, flag) {
 						var testcaseId_c_json = tc.testcaseId_c;
 						var testcaseName_json = tc.testcaseName;
 						var screenId_C_neo = tc.screenID_c;
-						console.log('testcaseId_json', testcaseId_c_json);
+						logger.debug('testcaseId_json', testcaseId_c_json);
 						if (flag == 0) {
 							if (screenId_C_neo == 'null' || screenId_C_neo == undefined) {
 								qList_new.push({ "statement": "MATCH (b:VERSION{versionNumber:" + vn + "})-[r*1..]->(a:TESTCASES{testCaseName:'" + testcaseName_json + "',screenID:'" + screenId_json + "'}) SET a.screenID_c='" + screenId_c_json + "'" });
@@ -764,7 +805,7 @@ var parsing = function (d, module_type, vn, flag) {
 
 		});
 	} catch (ex) {
-		console.log(ex);
+		logger.error("Error occured in parsing function:",ex);
 	}
 
 	updateJson.push(cassandraId_dict);
