@@ -5610,4 +5610,3 @@ function openDialog(title, body) {
         $("#globalModal").find('.btn-default').focus();
     }, 300);
 }
-//XML Beatuifier

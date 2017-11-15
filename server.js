@@ -501,7 +501,6 @@ try {
     });
 
     module.exports = app;
-    //var io = require('./server/lib/socket.js');
 } catch (e) {
     logger.error(e);
     setTimeout(function () {
