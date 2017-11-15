@@ -4,8 +4,11 @@ var sessionExtend = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes 
 var sessionTime = 30 * 60 * 1000;
 var updateSessionTimeEvery = 20 * 60 * 1000;
 var validator = require('validator');
+var logger = require('../../logger');
+
 exports.getCrawlResults = function(req, res){
        try{
+		   logger.info("Inside UI service: getCrawlResults");
            if(req.cookies['connect.sid'] != undefined){
              var sessionCookie = req.cookies['connect.sid'].split(".");
              var sessionToken = sessionCookie[0].split(":");
@@ -18,6 +21,7 @@ exports.getCrawlResults = function(req, res){
              var agent = req.body.agent;
               validateWeboccular();
              function validateWeboccular (){
+				          logger.info("Inside function: validateWeboccular");
                   check_url = validator.isURL(req.body.url);
                   if(check_url == true){
                     validate_url = true;
@@ -35,11 +39,14 @@ exports.getCrawlResults = function(req, res){
                   {
 
            var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-           console.log("IP:",ip);
+           //console.log("IP:",ip);
             var name = req.session.username;
-            console.log(Object.keys(myserver.allSocketsMap),"<<all people, asking person:",name);
+            //console.log(Object.keys(myserver.allSocketsMap),"<<all people, asking person:",name);
+            logger.info("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
+            logger.info("ICE Socket requesting Address: %s" , name);
             var mySocket = myserver.allSocketsMap[name];
              if (!mySocket) {
+               logger.info("ICE socket not available for Address : %s",name);
                return res.send("unavailableLocalServer");
              }
              mySocket.emit("webCrawlerGo", input_url, level, agent);
@@ -52,7 +59,7 @@ exports.getCrawlResults = function(req, res){
                   var mySocketUI =  myserver.allSocketsMapUI[name];
                   mySocketUI.emit("newdata", JSON.parse(value));
                 }catch(exception){
-                    console.log(exception);
+                    logger.error(exception);
                 }
              });
              mySocket.on('result_web_crawler_finished', function (value) {
@@ -68,7 +75,7 @@ exports.getCrawlResults = function(req, res){
                   //res.status(200);
                   return res.status(200).json({ success: true});
                 }catch(exception){
-                  console.log(exception);
+                  logger.error(exception);
                   return res.status(500).json({ success: false, data: err});
                 }
              });
@@ -77,9 +84,10 @@ exports.getCrawlResults = function(req, res){
               res.send('unavailableLocalServer');
            }
           }else{
+            logger.info("Error occured in the service getCrawlResults: Invalid Session");
             return res.send("Invalid Session");
           }
       }catch(exception){
-        console.log(exception);
+        logger.error(exception);
       }
 }
