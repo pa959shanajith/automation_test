@@ -1,7 +1,8 @@
 var async = require('async');
 var neo4jAPI = require('../controllers/neo4jAPI');
-
+var logger = require('../../logger');
 exports.updateTaskstatus_mindmaps = function (req, res) {
+	logger.info("Inside UI service: updateTaskstatus_mindmaps");
 	if (req.cookies['connect.sid'] != undefined) {
 		var sessionCookie = req.cookies['connect.sid'].split(".");
 		var sessionToken = sessionCookie[0].split(":");
@@ -13,14 +14,14 @@ exports.updateTaskstatus_mindmaps = function (req, res) {
 			var qlist_query = [{'statement': "MATCH (n:TASKS{taskID:'"+obj+"'}) set n.status='inprogress'"}];
 			neo4jAPI.executeQueries(qlist_query,function(status,result){
 				if(status!=200) {
-					console.log(result);
+					logger.info(result);
 				}
 				else {
 					res.send('inprogress');
 				}
 			});
 		} catch (error) {
-			console.log(error);
+			logger.error("exception occured in updateTaskstatus_mindmaps",error);
 		}
 	} else {
 		res.send("Invalid Session");
@@ -29,6 +30,7 @@ exports.updateTaskstatus_mindmaps = function (req, res) {
 
 
 exports.getTaskJson_mindmaps = function (req, res) {
+	logger.info("Inside UI service: getTaskJson_mindmaps");
 	if (req.cookies['connect.sid'] != undefined) {
 		var sessionCookie = req.cookies['connect.sid'].split(".");
 		var sessionToken = sessionCookie[0].split(":");
@@ -41,7 +43,7 @@ exports.getTaskJson_mindmaps = function (req, res) {
 			var qlist_query = [{'statement': "MATCH (a)-[r:FNTT {id:b.nodeID}]-(b) where b.assignedTo='" + req.session.obj.userid + "' return a,b"}];
 			neo4jAPI.executeQueries(qlist_query,function(status,result){
 				if(status!=200) {
-					console.log(result);
+					logger.info(result);
 				}
 				else {
 					var resultobj = {
@@ -50,7 +52,7 @@ exports.getTaskJson_mindmaps = function (req, res) {
 					};
 					next_function(resultobj, function (err, data) {
 						if (err) {
-							console.log(err);
+							logger.error('error occured in getTaskJson_mindmaps',err);
 							res.send('fail');
 						} else {
 							res.send(data);
@@ -59,7 +61,7 @@ exports.getTaskJson_mindmaps = function (req, res) {
 				}
 			});
 		} catch (error) {
-			console.log(error);
+			logger.error('exception in getTaskJson_mindmaps',error);
 		}
 	} else {
 		res.send("Invalid Session");
@@ -93,6 +95,7 @@ var projectTypes = {
 };
 
 function next_function(resultobj, cb, data) {
+	logger.info("Inside function: next_function ");
 	var result = resultobj.result;
 	var prjId = resultobj.prjId.projectId;
 	var appTypes = resultobj.prjId.appType;
@@ -240,7 +243,7 @@ function next_function(resultobj, cb, data) {
 						var qlist_query = [query];
 						neo4jAPI.executeQueries(qlist_query,function(status,result){
 							if(status!=200) {
-								console.log(result);
+								logger.info(result);
 								maincallback();
 							}
 							else {
@@ -253,7 +256,7 @@ function next_function(resultobj, cb, data) {
 										qlist_query = [query1];
 										neo4jAPI.executeQueries(qlist_query,function(status,result){
 										if(status!=200) {
-											console.log(result);
+											logger.info(result);
 											maincallback();
 										}
 										else {
@@ -280,7 +283,7 @@ function next_function(resultobj, cb, data) {
 			cb(null, user_task_json);
 		});
 	} catch (ex) {
-		console.log(ex);
+		logger.error('exception in next_function',ex);
 		cb(null, user_task_json);
 	}
 }
