@@ -65,7 +65,8 @@ exports.versioning = function (req, res) {
 					var jsonData = result[0].data;
 					if (jsonData.length == 0 || jsonData[0].row[0] == null) {
 						var vn = '0.0';
-						qList = [({ "statement": "MERGE(n:VERSION{projectID:'" + prjId + "',moduleIDs:[],versionNumber:" + vn + ",vn:'" + vn + "',versionId:'" + uuidV4() + "'})" })];
+						qList = [({ "statement": "MERGE(n:VERSION{projectID:'" + prjId + "',versionNumber:" + vn + ",vn:'" + vn + "'}) set n.moduleIDs=[],n.versionId='" + uuidV4() + "'" })];
+						//qList = [({ "statement": "MERGE(n:VERSION{projectID:'" + prjId + "',moduleIDs:[],versionNumber:" + vn + ",vn:'" + vn + "',versionId:'" + uuidV4() + "'})" })];
 						logger.info("Calling Neo4j API Service from versioning: project_versioning/versioning");
 						neo4jAPI.executeQueries(qList, function (status, result) {
 							//res.setHeader('Content-Type', 'application/json');
@@ -578,7 +579,8 @@ exports.versioning = function (req, res) {
 						t.projectID = prjId;
 
 						if (e.type == 'version') {
-							qList.push({ "statement": "MERGE(n:VERSION{projectID:'" + prjId + "',moduleIDs:" + t.moduleIDs + ",versionNumber:" + vn_to + ",vn:'" + vn_to + "',versionID:'" + uuidV4() + "'}) SET n.createdBy='" + user_name + "',n.createdOn='" + createdOn + "'" });
+							//qList.push({ "statement": "MERGE(n:VERSION{projectID:'" + prjId + "',moduleIDs:" + t.moduleIDs + ",versionNumber:" + vn_to + ",vn:'" + vn_to + "',versionID:'" + uuidV4() + "'}) SET n.createdBy='" + user_name + "',n.createdOn='" + createdOn + "'" });
+							qList.push({ "statement": "MERGE(n:VERSION{projectID:'" + prjId + "',versionNumber:" + vn_to + ",vn:'" + vn_to + "'}) SET n.moduleIDs=" + t.moduleIDs + ",n.versionID='" + uuidV4() + "',n.createdBy='" + user_name + "',n.createdOn='" + createdOn + "'" });
 						}
 						else if (e.type == 'modules') {
 							var new_property ="["+t.moduleName + ',' + t.projectID + ',' + vn_to +"]";
