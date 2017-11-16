@@ -2315,12 +2315,40 @@ console.log("screenName:", screenName);
 
     //Submit Custom Object Functionality
     $scope.submitCustomObject = function() {
+        var err = "false";
+        $('input.inputErrorBorderBottom').removeClass('inputErrorBorderBottom');
         $scope.errorMessage = "";
         $(".addObjTopWrap").find(".error-msg-abs").text("");
         $(".addObj-row").find("input").removeAttr("style");
         var flag = "false";
-        $(".addObj-row").find("input").removeClass('inputErrorBorder')
-        $(".addObj-row").find("select").removeClass('selectErrorBorder')
+        $(".addObj-row").find("input").removeClass('inputErrorBorder');
+        $(".addObj-row").find("select").removeClass('selectErrorBorder');
+        var custObjNames = [];
+        var dupCustObjNames = [];
+        $('input.form-control-custom').each(function() {
+            custObjNames.push( $.trim($(this).val()));
+        });
+        var sorted_custObjNames = custObjNames.slice().sort();
+        for (var i = 0; i < custObjNames.length - 1; i++) {
+            if (sorted_custObjNames[i + 1] == sorted_custObjNames[i]) {
+                dupCustObjNames.push(sorted_custObjNames[i]);
+            }
+        }
+        if(dupCustObjNames.length > 0)
+        {
+            openDialog("Add Object", "Duplicate custom names added");
+            $('input.form-control-custom').each(function() {
+                for(var j=0;j<dupCustObjNames.length;j++)
+                {
+                    if ($.trim($(this).val()) == $.trim(dupCustObjNames[j]))
+                    {
+                        $(this).addClass('inputErrorBorderBottom');
+                    } 
+                }
+                    
+            });
+            return false;
+        }
         $.each($(".addObj-row"), function() {
             if ($(this).find("input").val() == "") {
                 //$scope.errorMessage = "Please enter object name";
@@ -2360,18 +2388,26 @@ console.log("screenName:", screenName);
                       for (var i = 0; i < viewString.view.length; i++) {
                          
 						if ( $.trim($(this).find("input").val()) == $.trim(viewString.view[i].custname) || $.trim($(this).find("input").val()) == $.trim(viewString.view[i].custname).split("_")[0]) {
-							$("#dialog-addObject").modal("hide");
-							openDialog("Add Object", "Object characterstics are same for " + $(this).find("input").val() + "");
-							return false;
+							//$("#dialog-addObject").modal("hide");
+                            openDialog("Add Object", "Object characterstics are same for " + $(this).find("input").val() + "");
+                            $(this).find("input").addClass('inputErrorBorderBottom');
+                            err = "true";
 						}
-				    }
+                    }
                 }
-              
-                //If no field is empty, proceed to service call
-                flag = "true";
-                $scope.errorMessage = "";
-                $(".addObj-row").find("input").removeClass('inputErrorBorder')
-                $(".addObj-row").find("select").removeClass('selectErrorBorder')
+                if(err == "true")
+                {
+                    flag = "false";
+                    return false;
+                }
+                else
+                {
+                    //If no field is empty, proceed to service call
+                    flag = "true";
+                    $scope.errorMessage = "";
+                    $(".addObj-row").find("input").removeClass('inputErrorBorder')
+                    $(".addObj-row").find("select").removeClass('selectErrorBorder')
+                }
             }
         })
         if (flag == "true") {
