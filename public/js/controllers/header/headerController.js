@@ -39,7 +39,7 @@ mySPA.controller('headerController', function($scope,$rootScope,$http,$location,
 		$("#switchRoleModal").find('.modal-body p').text(body);
 		$("#switchRoleModal").modal("show");
 		setTimeout(function(){
-			$("#switchRoleModal").find('.btn-default').focus();			
+			$("#switchRoleModal").find('.btn-default').focus();	
 		}, 300);
 	}
 
@@ -92,19 +92,7 @@ mySPA.controller('headerController', function($scope,$rootScope,$http,$location,
 				$scope.notifications = JSON.parse(window.localStorage.notification);
 				$scope.$apply();
 			}
-			
-				var notifications = JSON.parse(window.localStorage.notification);
-				var unreadNotifications = notifications.filter(a=>a.isRead==false);
-				var notificationCount = unreadNotifications.length;
-				console.log("notificCount", notificationCount);
-				if(notificationCount < 1 || notificationCount == '' || notificationCount == undefined)
-				{
-					$("#notifications-count").hide();
-				}
-				else{
-					$("#notifications-count").show();
-					$("#notifications-count").text(notificationCount);
-				}
+			unreadNotifications();
 			 $(document).on("click", "#dropdownMenuButton", function(e){
 
 						if($(".notify-div").is(":visible") == true)
@@ -122,6 +110,27 @@ mySPA.controller('headerController', function($scope,$rootScope,$http,$location,
 				 });
 			
 		});
+
+function unreadNotifications()
+{
+	var notifications = JSON.parse(window.localStorage.notification);
+	var unreadNotifications = notifications.filter(a=>a.isRead==false);
+	var notificationCount = unreadNotifications.length;
+	console.log("notificCount", notificationCount);
+	if(notificationCount < 1 || notificationCount == '' || notificationCount == undefined)
+	{
+		$("#notifications-count").hide();
+	}
+	else{
+		$("#notifications-count").show();
+		console.log("count",notificationCount );
+		$("#notifications-count").text(notificationCount);
+	}
+}
+		setTimeout(function(){
+			unreadNotifications();
+		}, 2000);
+			
 			 $(document).on("click", "#dropdownMenuButton", function(e){
 				if($(".notifyMsgDiv").length < 1)
 					{
@@ -129,6 +138,17 @@ mySPA.controller('headerController', function($scope,$rootScope,$http,$location,
 					} 
 					else{
 						$("#notifyBox").removeClass('dropdown-menu').addClass('dropdown-menu');
+					}
+					if($(".notify-div").is(":visible") == true)
+					{
+						$("#notifications-count").hide();
+						var readMessages = JSON.parse(window.localStorage.notification);
+						console.log("read", readMessages);
+						for(var i=0;i<readMessages.length;i++)
+						{
+							readMessages[i].isRead = true;
+						}
+						window.localStorage.notification = JSON.stringify(readMessages);
 					}
 			 });
 
