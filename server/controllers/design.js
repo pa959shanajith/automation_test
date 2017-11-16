@@ -160,19 +160,19 @@ exports.initScraping_ICE = function (req, res) {
 					});
 				}
 			} else {
-				logger.info("Error occured in the service initScraping_ICE: Socket not Available");
+				logger.error("Error occured in the service initScraping_ICE: Socket not Available");
 				try {
 					res.send("unavailableLocalServer");
 				} catch (exception) {
-					logger.info("Exception in the service initScraping_ICE: ",exception);
+					logger.error("Exception in the service initScraping_ICE: %s",exception);
 				}
 			}
 		} else {
-			logger.info("Error occured in the service initScraping_ICE: Invalid Session");
+			logger.error("Error occured in the service initScraping_ICE: Invalid Session");
 			res.send("Invalid Session");
 		}
 	} catch (exception) {
-		logger.info("Exception in the service initScraping_ICE: ",exception);
+		logger.error("Exception in the service initScraping_ICE: %s",exception);
 		res.send("unavailableLocalServer");
 	}
 };
@@ -203,14 +203,14 @@ exports.highlightScrapElement_ICE = function (req, res) {
 			mySocket.emit("focus", focusParam, elementURL, appType);
 			//req.session.cookie.expires = sessionExtend;
 			var flag = 'success';
-			logger.error("Successfully highlighted selected object");
+			logger.info("Successfully highlighted selected object");
 			res.send(flag);
 		} else {
-			logger.info("Error occured in the service highlightScrapElement_ICE: Invalid Session");
+			logger.error("Error occured in the service highlightScrapElement_ICE: Invalid Session");
 			res.send("Invalid Session");
 		}
 	} catch (exception) {
-		logger.info("Exception in the service highlightScrapElement_ICE: ",exception);
+		logger.error("Exception in the service highlightScrapElement_ICE: %s",exception);
 	}
 };
 
@@ -239,15 +239,15 @@ exports.getScrapeDataScreenLevel_ICE = function (req, res) {
 					logger.info("Scraped Data sent successfully from getScrapeDataScreenLevel_ICE service");
 					res.send(getScrapeDataQueryresponse);
 				} catch (exception) {
-					logger.info("Exception while sending scraped data from getScrapeDataScreenLevel_ICE service: ",exception);
+					logger.error("Exception while sending scraped data from getScrapeDataScreenLevel_ICE service: %s",exception);
 				}
 			});
 		} else {
-			logger.info("Error occured in the service getScrapeDataScreenLevel_ICE: Invalid Session");
+			logger.error("Error occured in the service getScrapeDataScreenLevel_ICE: Invalid Session");
 			res.send("Invalid Session");
 		}
 	} catch (exception) {
-		logger.info("Exception in the service getScrapeDataScreenLevel_ICE: ",exception);
+		logger.error("Exception in the service getScrapeDataScreenLevel_ICE: %s",exception);
 	}
 };
 
@@ -279,11 +279,11 @@ function fetchScrapedData(inputs, fetchScrapedDatacallback) {
 						fetchScrapedDatacallback(null, responsedata);
 					}
 				} catch (exception) {
-					logger.info("Exception while sending scraped data from the function fetchScrapedData: ",exception);
+					logger.error("Exception while sending scraped data from the function fetchScrapedData: %s",exception);
 				}
 			});
 	} catch (exception) {
-		logger.info("Exception in the function fetchScrapedData: ",exception);
+		logger.error("Exception in the function fetchScrapedData: %s",exception);
 	}
 }
 
@@ -363,7 +363,7 @@ exports.updateScreen_ICE = function (req, res) {
 													logger.info("Calling function parseRequest from the service updateScreen_ICE: updateScrapeData_ICE");
 													parseRequest(baseRequestBody);
 												} catch (exception) {
-													logger.info(exception);
+													logger.error(exception);
 												}
 												for (var populationindex = 0; populationindex < allXpaths.length; populationindex++) {
 													var scrapedObjectsWS = {};
@@ -431,7 +431,7 @@ exports.updateScreen_ICE = function (req, res) {
 								finalFunction(scrapedObjects);
 							}
 						} catch (exception) {
-							logger.info("Exception from the service updateScreen_ICE: updateScrapeData_ICE - WEBSERVICE: ",exception);
+							logger.error("Exception from the service updateScreen_ICE: updateScrapeData_ICE - WEBSERVICE: %s",exception);
 						}
 					} else {
 						inputs = {
@@ -447,7 +447,7 @@ exports.updateScreen_ICE = function (req, res) {
 						finalFunction(scrapedObjects);
 					}
 				} catch (exception) {
-					logger.info("Exception from the service updateScreen_ICE: updateScrapeData_ICE: ",exception);
+					logger.error("Exception from the service updateScreen_ICE: updateScrapeData_ICE: %s",exception);
 				}
 			} else if (param == "editScrapeData_ICE") {
 				try {
@@ -526,7 +526,7 @@ exports.updateScreen_ICE = function (req, res) {
 													try {
 														res.send(statusFlag);
 													} catch (exception) {
-														logger.info("Exception while sending status from the service updateScreen_ICE: editScrapeData_ICE: ",exception);
+														logger.error("Exception while sending status from the service updateScreen_ICE: editScrapeData_ICE: %s",exception);
 													}
 												}
 											} else {
@@ -534,21 +534,21 @@ exports.updateScreen_ICE = function (req, res) {
 												try {
 													res.send(statusFlag);
 												} catch (exception) {
-													logger.info("Exception while sending status from the service updateScreen_ICE - Error occured in updateScreenData: ",exception);
+													logger.error("Exception while sending status from the service updateScreen_ICE - Error occured in updateScreenData: %s",exception);
 												}
 											}
 										} catch (exception) {
-											logger.info("Exception in the function fetchScrapedData from the service updateScreen_ICE - editScrapeData_ICE: ",exception);
+											logger.error("Exception in the function fetchScrapedData from the service updateScreen_ICE - editScrapeData_ICE: %s",exception);
 										}
 									});
 									editcallback();
 								} catch (exception) {
-									logger.info("Exception from the service updateScreen_ICE - editScrapeData_ICE: ",exception);
+									logger.error("Exception from the service updateScreen_ICE - editScrapeData_ICE: %s",exception);
 								}
 							}
 						]);
 				} catch (exception) {
-					logger.info("Exception from the service updateScreen_ICE - editScrapeData_ICE: ",exception);
+					logger.error("Exception from the service updateScreen_ICE - editScrapeData_ICE: %s",exception);
 				}
 			} else if (param == "deleteScrapeData_ICE") {
 				try {
@@ -644,7 +644,7 @@ exports.updateScreen_ICE = function (req, res) {
 													try {
 														res.send(statusFlag);
 													} catch (exception) {
-														logger.info("Exception while sending status flag from the service updateScreen_ICE - deleteScrapeData_ICE: ",exception);
+														logger.error("Exception while sending status flag from the service updateScreen_ICE - deleteScrapeData_ICE: %s",exception);
 													}
 												}
 											} else {
@@ -652,21 +652,21 @@ exports.updateScreen_ICE = function (req, res) {
 												try {
 													res.send(statusFlag);
 												} catch (exception) {
-													logger.info("Exception from the service updateScreen_ICE - deleteScrapeData_ICE: Error occured in updateScreenData ",exception);
+													logger.error("Exception from the service updateScreen_ICE - deleteScrapeData_ICE: Error occured in updateScreenData: %s",exception);
 												}
 											}
 										} catch (exception) {
-											logger.info("Exception in the function fetchScrapedData from the service updateScreen_ICE - deleteScrapeData_ICE: ",exception);
+											logger.error("Exception in the function fetchScrapedData from the service updateScreen_ICE - deleteScrapeData_ICE: %s",exception);
 										}
 									});
 									deletecallback();
 								} catch (exception) {
-									logger.info("Exception from the service updateScreen_ICE - deleteScrapeData_ICE: ",exception);
+									logger.error("Exception from the service updateScreen_ICE - deleteScrapeData_ICE: %s",exception);
 								}
 							}
 						]);
 				} catch (exception) {
-					logger.info("Exception from the service updateScreen_ICE - deleteScrapeData_ICE: ",exception);
+					logger.error("Exception from the service updateScreen_ICE - deleteScrapeData_ICE: %s",exception);
 				}
 			} else if (param == "mapScrapeData_ICE") {
 				/*
@@ -723,7 +723,7 @@ exports.updateScreen_ICE = function (req, res) {
 															}
 															scrapedObjectCallback();
 														} catch (exception) {
-															logger.info("Exception in the function fetchScrapedData from the service updateScreen_ICE - mapScrapeData_ICE: ",exception);
+															logger.error("Exception in the function fetchScrapedData from the service updateScreen_ICE - mapScrapeData_ICE: %s",exception);
 														}
 													}, addedObjectCustNameCallback);
 												});
@@ -762,7 +762,7 @@ exports.updateScreen_ICE = function (req, res) {
 															}
 															scrapedObjectCallback();
 														} catch (exception) {
-															logger.info("Exception in the function fetchScrapedData from the service updateScreen_ICE - mapScrapeData_ICE: ",exception);
+															logger.error("Exception in the function fetchScrapedData from the service updateScreen_ICE - mapScrapeData_ICE: %s",exception);
 														}
 													}, userCustNameCallback);
 												});
@@ -783,7 +783,7 @@ exports.updateScreen_ICE = function (req, res) {
 														}
 														requiredXpathListCallback();
 													} catch (exception) {
-														logger.info("Exception in the function fetchScrapedData from the service updateScreen_ICE - mapScrapeData_ICE: ",exception);
+														logger.error("Exception in the function fetchScrapedData from the service updateScreen_ICE - mapScrapeData_ICE: %s",exception);
 													}
 												});
 												if (tagMatch != "sAmEoBjEcTrEpeAtEd") {
@@ -806,11 +806,11 @@ exports.updateScreen_ICE = function (req, res) {
 																		}
 																		scrapedObjectCallback();
 																	} catch (exception) {
-																		logger.info("Exception in the function fetchScrapedData from the service updateScreen_ICE - mapScrapeData_ICE: ",exception);
+																		logger.error("Exception in the function fetchScrapedData from the service updateScreen_ICE - mapScrapeData_ICE: %s",exception);
 																	}
 																}, requiredXpathListCallback);
 															} catch (exception) {
-																logger.info("Exception in the function fetchScrapedData from the service updateScreen_ICE - mapScrapeData_ICE: ",exception);
+																logger.error("Exception in the function fetchScrapedData from the service updateScreen_ICE - mapScrapeData_ICE: %s",exception);
 															}
 														});
 													} else {
@@ -835,7 +835,7 @@ exports.updateScreen_ICE = function (req, res) {
 																		}
 																	}
 																} catch (exception) {
-																	logger.info("Exception in the function fetchScrapedData from the service updateScreen_ICE - mapScrapeData_ICE: ",exception);
+																	logger.error("Exception in the function fetchScrapedData from the service updateScreen_ICE - mapScrapeData_ICE: %s",exception);
 																}
 																scrapedObjectCallback();
 															}, addedObjectCustNameCallback);
@@ -877,7 +877,7 @@ exports.updateScreen_ICE = function (req, res) {
 											try {
 												res.send(statusFlag);
 											} catch (exception) {
-												logger.info("Exception while sending response from the function fetchScrapedData in the service updateScreen_ICE - mapScrapeData_ICE: Error occured in mapScreenData: ",exception);
+												logger.error("Exception while sending response from the function fetchScrapedData in the service updateScreen_ICE - mapScrapeData_ICE: Error occured in mapScreenData: %s",exception);
 											}
 										}
 									} else {
@@ -885,15 +885,15 @@ exports.updateScreen_ICE = function (req, res) {
 										try {
 											res.send(statusFlag);
 										} catch (exception) {
-											logger.info("Exception while sending response from the function fetchScrapedData in the service updateScreen_ICE - mapScrapeData_ICE: Error occured in updateScreenData : ",exception);
+											logger.error("Exception while sending response from the function fetchScrapedData in the service updateScreen_ICE - mapScrapeData_ICE: Error occured in updateScreenData: %s",exception);
 										}
 									}
 								} catch (exception) {
-									logger.info("Exception in the function fetchScrapedData from the service updateScreen_ICE - mapScrapeData_ICE: ",exception);
+									logger.error("Exception in the function fetchScrapedData from the service updateScreen_ICE - mapScrapeData_ICE: %s",exception);
 								}
 							});
 						} catch (exception) {
-							logger.info("Exception in the function fetchScrapedData from the service updateScreen_ICE - mapScrapeData_ICE: ",exception);
+							logger.error("Exception in the function fetchScrapedData from the service updateScreen_ICE - mapScrapeData_ICE: %s",exception);
 						}
 					}
 				});
@@ -969,7 +969,7 @@ exports.updateScreen_ICE = function (req, res) {
 													try {
 														res.send(statusFlag);
 													} catch (exception) {
-														logger.info("Exception while sending response from the function fetchScrapedData: updateScreen_ICE - updateComparedObjects: No Objects to compare", exception);
+														logger.error("Exception while sending response from the function fetchScrapedData: updateScreen_ICE - updateComparedObjects: No Objects to compare: %s", exception);
 													}
 												}
 											} else {
@@ -977,20 +977,20 @@ exports.updateScreen_ICE = function (req, res) {
 												try {
 													res.send(statusFlag);
 												} catch (exception) {
-													logger.info("Exception while sending response from the function fetchScrapedData: updateScreen_ICE - updateComparedObjects: Error occured in updateScreenData", exception);
+													logger.error("Exception while sending response from the function fetchScrapedData: updateScreen_ICE - updateComparedObjects: Error occured in updateScreenData: %s", exception);
 												}
 											}
 										} catch (exception) {
-											logger.info("Exception in the function fetchScrapedData: service updateScreen_ICE - updateComparedObjects: ", exception);
+											logger.error("Exception in the function fetchScrapedData: service updateScreen_ICE - updateComparedObjects: %s", exception);
 										}
 									}); //End of fetchScrapedData
 								} catch (exception) {
-									logger.info("Exception in the function fetchScrapedData: service updateScreen_ICE - updateComparedObjects: ", exception);
+									logger.error("Exception in the function fetchScrapedData: service updateScreen_ICE - updateComparedObjects: %s", exception);
 								}
 							} //End of Async function callback
 						]); //End of Async series
 				} catch (exception) {
-					logger.info("Exception in the function fetchScrapedData: service updateScreen_ICE - updateComparedObjects: ", exception);
+					logger.error("Exception in the function fetchScrapedData: service updateScreen_ICE - updateComparedObjects: %s", exception);
 				}
 			}
 			function sortNumber(a, b) {
@@ -1017,7 +1017,7 @@ exports.updateScreen_ICE = function (req, res) {
 									try {
 										res.send(statusFlag);
 									} catch (exception) {
-										logger.info("Exception while sending response in design/updateScreen_ICE from the finalFunction: ", exception);
+										logger.error("Exception while sending response in design/updateScreen_ICE from the finalFunction: %s", exception);
 									}
 								} else {
 									if (param != 'updateScrapeData_ICE') {
@@ -1037,7 +1037,7 @@ exports.updateScreen_ICE = function (req, res) {
 														} else if (param == 'updateComparedObjects') {
 															//CHANGE JSON FOR COMPARED OBJECTS -- INVALID JSON FORMAT FROM CORE
 															oldCustnames = updateData.updatedViewString.view[0].changedobject;
-															console.log("oldcustnames", oldCustnames);
+															logger.info("oldcustnames: %s", oldCustnames);
 														} else if (param == 'mapScrapeData_ICE') {
 															// Empty Block
 														} else {
@@ -1059,7 +1059,7 @@ exports.updateScreen_ICE = function (req, res) {
 																try {
 																	res.send(statusFlag);
 																} catch (exception) {
-																	logger.info("Exception while sending response in design/readTestCase_ICE from the finalFunction: ", exception);
+																	logger.error("Exception while sending response in design/readTestCase_ICE from the finalFunction: %s", exception);
 																}
 															} else {
 																try {
@@ -1144,7 +1144,7 @@ exports.updateScreen_ICE = function (req, res) {
 																						updatingtestcasedata = JSON.stringify(updatingtestcasedata);
 																						updatingtestcasedata = updatingtestcasedata.replace(/'+/g, "''");
 																					} catch (exception) {
-																						logger.info("Exception in the finalFunction: ", exception);
+																						logger.error("Exception in the finalFunction: %s", exception);
 																					}
 																				}
 																				if (updatingtestcasedata == "[]") {
@@ -1166,7 +1166,7 @@ exports.updateScreen_ICE = function (req, res) {
 																						try {
 																							res.send(error);
 																						} catch (exception) {
-																							logger.info("Exception in the function uploadTestCaseData from finalFunction: ", exception);
+																							logger.error("Exception in the function uploadTestCaseData from finalFunction: %s", exception);
 																						}
 																					} else {
 																						try {
@@ -1175,12 +1175,12 @@ exports.updateScreen_ICE = function (req, res) {
 																								res.send(response);
 																							}
 																						} catch (exception) {
-																							logger.info("Exception in the function uploadTestCaseData from finalFunction: ", exception);
+																							logger.error("Exception in the function uploadTestCaseData from finalFunction: %s", exception);
 																						}
 																					}
 																				});
 																			} catch (exception) {
-																				logger.info("Exception in the finalFunction: ", exception);
+																				logger.error("Exception in the finalFunction: %s", exception);
 																			}
 																			testcaserendercallback();
 																		});
@@ -1189,17 +1189,17 @@ exports.updateScreen_ICE = function (req, res) {
 																		try {
 																			res.send(statusFlag);
 																		} catch (exception) {
-																			logger.info("Exception while sending response in the finalFunction: ", exception);
+																			logger.error("Exception while sending response in the finalFunction: %s", exception);
 																		}
 																	}
 																} catch (exception) {
-																	logger.info("Exception in the finalFunction: ", exception);
+																	logger.error("Exception in the finalFunction: %s", exception);
 																}
 															}
 														});
 														testcasecallback;
 													} catch (exception) {
-														logger.info("Exception in the finalFunction: ", exception);
+														logger.error("Exception in the finalFunction: %s", exception);
 													}
 												}
 											]);
@@ -1208,26 +1208,26 @@ exports.updateScreen_ICE = function (req, res) {
 										try {
 											res.send(statusFlag);
 										} catch (exception) {
-											logger.info("Exception while sending response in the finalFunction: ", exception);
+											logger.error("Exception while sending response in the finalFunction: %s", exception);
 										}
 									}
 								}
 							} catch (exception) {
-								logger.info("Exception in the finalFunction: ", exception);
+								logger.error("Exception in the finalFunction: %s", exception);
 							}
 						});
 					}
 					finalcallback;
 				} catch (exception) {
-					logger.info("Exception in the finalFunction: ", exception);
+					logger.error("Exception in the finalFunction: %s", exception);
 				}
 			}
 		} else {
-			logger.info("Error occured in the finalFunction: Invalid Session");
+			logger.error("Error occured in the finalFunction: Invalid Session");
 			res.send("Invalid Session");
 		}
 	} catch (exception) {
-		logger.info("Exception in the finalFunction: ", exception);
+		logger.error("Exception in the finalFunction: %s", exception);
 	}
 };
 
@@ -1253,12 +1253,12 @@ function repeatedXpath(viewString, xpath) {
 					}
 				}
 			} catch (exception) {
-				logger.info("Exception in the function repeatedXpath: ", exception);
+				logger.error("Exception in the function repeatedXpath: %s", exception);
 			}
 		}
 		return result;
 	} catch (exception) {
-		logger.info("Exception in the function repeatedXpath: ", exception);
+		logger.error("Exception in the function repeatedXpath: %s", exception);
 	}
 }
 
@@ -1278,7 +1278,7 @@ function buildObject(scrapedObjects, modifiedBy, requestedskucodeScreens, screen
 		};
 		return inputsWS;
 	} catch (exception) {
-		logger.info("Exception in the function buildObject: ", exception);
+		logger.error("Exception in the function buildObject: %s", exception);
 	}
 }
 
@@ -1328,7 +1328,7 @@ function parseRequest(readChild) {
 			}
 		}
 	} catch (exception) {
-		logger.info("Exception in the function parseRequest: ", exception);
+		logger.error("Exception in the function parseRequest: %s", exception);
 	}
 }
 
@@ -1359,7 +1359,7 @@ function uploadTestCaseData(inputs, uploadTestCaseDatacallback) {
 			}
 		});
 	} catch (exception) {
-		logger.info("Exception in the function uploadTestCaseData: ", exception);
+		logger.error("Exception in the function uploadTestCaseData: %s", exception);
 	}
 }
 
@@ -1416,7 +1416,7 @@ exports.readTestCase_ICE = function (req, res) {
 						try {
 							res.send(flag);
 						} catch (exception) {
-							logger.info("Exception while sending response from the service readTestCase_ICE: ", exception);
+							logger.error("Exception while sending response from the service readTestCase_ICE: %s", exception);
 						}
 					} else {
 						try {
@@ -1441,7 +1441,7 @@ exports.readTestCase_ICE = function (req, res) {
 											try {
 												res.send(responsedata);
 											} catch (exception) {
-												logger.info("Exception while sending response data from the service readTestCase_ICE - fetchScrapedData: ", exception);
+												logger.error("Exception while sending response data from the service readTestCase_ICE - fetchScrapedData: %s", exception);
 											}
 										} else {
 											responsedata = {
@@ -1452,7 +1452,7 @@ exports.readTestCase_ICE = function (req, res) {
 											try {
 												res.send(responsedata);
 											} catch (exception) {
-												logger.info("Exception while sending response data from the service readTestCase_ICE - fetchScrapedData: ", exception);
+												logger.error("Exception while sending response data from the service readTestCase_ICE - fetchScrapedData: %s", exception);
 											}
 										}
 									} else if ((scrapedobjects == null || scrapedobjects.trim() == '' || scrapedobjects == undefined) && (testcasesteps != null && testcasesteps != '' || testcasesteps != undefined)) {
@@ -1464,7 +1464,7 @@ exports.readTestCase_ICE = function (req, res) {
 										try {
 											res.send(responsedata);
 										} catch (exception) {
-											logger.info("Exception while sending response data from the service readTestCase_ICE - fetchScrapedData: ", exception);
+											logger.error("Exception while sending response data from the service readTestCase_ICE - fetchScrapedData: %s", exception);
 										}
 									} else {
 										//this case is merely impossible in V2.0 as creation happens in MindMaps
@@ -1476,27 +1476,27 @@ exports.readTestCase_ICE = function (req, res) {
 										try {
 											res.send(responsedata);
 										} catch (exception) {
-											logger.info("Exception while sending response data from the service readTestCase_ICE - fetchScrapedData: ", exception);
+											logger.error("Exception while sending response data from the service readTestCase_ICE - fetchScrapedData: %s", exception);
 										}
 									}
 								} catch (exception) {
-									logger.info("Exception in the service readTestCase_ICE - fetchScrapedData: ", exception);
+									logger.error("Exception in the service readTestCase_ICE - fetchScrapedData: %s", exception);
 								}
 							});
 						} catch (exception) {
-							logger.info("Exception in the service readTestCase_ICE: ", exception);
+							logger.error("Exception in the service readTestCase_ICE: %s", exception);
 						}
 					}
 				} catch (exception) {
-					logger.info("Exception in the service readTestCase_ICE: ", exception);
+					logger.error("Exception in the service readTestCase_ICE: %s", exception);
 				}
 			});
 		} else {
-			logger.info("Error in the service readTestCase_ICE: Invalid Session");
+			logger.error("Error in the service readTestCase_ICE: Invalid Session");
 			res.send("Invalid Session");
 		}
 	} catch (exception) {
-		logger.info("Exception in the service readTestCase_ICE: ", exception);
+		logger.error("Exception in the service readTestCase_ICE: %s", exception);
 	}
 };
 
@@ -1547,7 +1547,7 @@ exports.updateTestCase_ICE = function (req, res) {
 						try {
 							res.send(flag);
 						} catch (exception) {
-							logger.info("Exception in the service updateTestCase_ICE: ", exception);
+							logger.error("Exception in the service updateTestCase_ICE: %s", exception);
 						}
 					} else {
 						for (var i = 0; i < result.rows.length; i++) {
@@ -1576,31 +1576,31 @@ exports.updateTestCase_ICE = function (req, res) {
 									try {
 										res.send(error);
 									} catch (exception) {
-										logger.info("Exception in the service updateTestCase_ICE - uploadTestCaseData: ", exception);
+										logger.error("Exception in the service updateTestCase_ICE - uploadTestCaseData: %s", exception);
 									}
 								} else {
 									try {
 										res.send(response);
 									} catch (exception) {
-										logger.info("Exception in the service updateTestCase_ICE - uploadTestCaseData: ", exception);
+										logger.error("Exception in the service updateTestCase_ICE - uploadTestCaseData: %s", exception);
 									}
 								}
 							});
 						} else {
-							logger.info("Error in the service updateTestCase_ICE: Fail to save testcase");
+							logger.error("Error in the service updateTestCase_ICE: Fail to save testcase");
 							res.send("fail");
 						}
 					}
 				} catch (exception) {
-					logger.info("Exception in the service updateTestCase_ICE: ", exception);
+					logger.error("Exception in the service updateTestCase_ICE: %s", exception);
 				}
 			});
 		} else {
-			logger.info("Error in the service updateTestCase_ICE: Invalid Session");
+			logger.error("Error in the service updateTestCase_ICE: Invalid Session");
 			res.send("Invalid Session");
 		}
 	} catch (exception) {
-		logger.info("Exception in the service updateTestCase_ICE: ", exception);
+		logger.error("Exception in the service updateTestCase_ICE: %s", exception);
 	}
 };
 
@@ -1660,7 +1660,7 @@ exports.debugTestCase_ICE = function (req, res) {
 											try {
 												res.send(flag);
 											} catch (exception) {
-												logger.info("Exception in the service debugTestCase_ICE: ", exception);
+												logger.error("Exception in the service debugTestCase_ICE: %s", exception);
 											}
 										} else {
 											async.forEachSeries(testcasedataresult.rows, function (eachTestcaseData, testcasedataCallback) {
@@ -1704,24 +1704,24 @@ exports.debugTestCase_ICE = function (req, res) {
 																try {
 																	res.send(responsedata);
 																} catch (exception) {
-																	logger.info("Exception in the service debugTestCase_ICE: ", exception);
+																	logger.error("Exception in the service debugTestCase_ICE: %s", exception);
 																}
 															});
 														}
 													} catch (exception) {
-														logger.info("Exception in the service debugTestCase_ICE: ", exception);
+														logger.error("Exception in the service debugTestCase_ICE: %s", exception);
 													}
 												});
 												testcasedataCallback();
 											}, eachTestcaseIDsCallback);
 										}
 									} catch (exception) {
-										logger.info("Exception in the service debugTestCase_ICE: ", exception);
+										logger.error("Exception in the service debugTestCase_ICE: %s", exception);
 									}
 								});
 							});
 						} catch (exception) {
-							logger.info("Exception in the service debugTestCase_ICE: ", exception);
+							logger.error("Exception in the service debugTestCase_ICE: %s", exception);
 						}
 					} else if (action == 'debugTestCaseWS_ICE') {
 						try {
@@ -1740,7 +1740,7 @@ exports.debugTestCase_ICE = function (req, res) {
 										try {
 											res.send(value);
 										} catch (exception) {
-											logger.info("Exception while sending response in the service debugTestCase_ICE - result_debugTestCaseWS: ", exception);
+											logger.error("Exception while sending response in the service debugTestCase_ICE - result_debugTestCaseWS: %s", exception);
 										}
 									} else {
 										var responsedata = {
@@ -1755,7 +1755,7 @@ exports.debugTestCase_ICE = function (req, res) {
 												try {
 													res.send(responsedata);
 												} catch (exception) {
-													logger.info("Exception while sending response data in the service debugTestCase_ICE - result_debugTestCaseWS: ", exception);
+													logger.error("Exception while sending response data in the service debugTestCase_ICE - result_debugTestCaseWS: %s", exception);
 												}
 											} else if (response.length == 1) {
 												responsedata.responseHeader.push(response[0]);
@@ -1763,7 +1763,7 @@ exports.debugTestCase_ICE = function (req, res) {
 												try {
 													res.send(responsedata);
 												} catch (exception) {
-													logger.info("Exception while sending response data in the service debugTestCase_ICE - result_debugTestCaseWS: ", exception);
+													logger.error("Exception while sending response data in the service debugTestCase_ICE - result_debugTestCaseWS: %s", exception);
 												}
 											} else {
 												responsedata.responseHeader.push("");
@@ -1771,7 +1771,7 @@ exports.debugTestCase_ICE = function (req, res) {
 												try {
 													res.send(responsedata);
 												} catch (exception) {
-													logger.info("Exception while sending response data in the service debugTestCase_ICE - result_debugTestCaseWS: ", exception);
+													logger.error("Exception while sending response data in the service debugTestCase_ICE - result_debugTestCaseWS: %s", exception);
 												}
 											}
 										} else {
@@ -1780,16 +1780,16 @@ exports.debugTestCase_ICE = function (req, res) {
 											try {
 												res.send(responsedata);
 											} catch (exception) {
-												logger.info("Exception while sending response data in the service debugTestCase_ICE - result_debugTestCaseWS: ", exception);
+												logger.error("Exception while sending response data in the service debugTestCase_ICE - result_debugTestCaseWS: %s", exception);
 											}
 										}
 									}
 								} catch (exception) {
-									logger.info("Exception in the service debugTestCase_ICE - result_debugTestCaseWS: ", exception);
+									logger.error("Exception in the service debugTestCase_ICE - result_debugTestCaseWS: %s", exception);
 								}
 							});
 						} catch (exception) {
-							logger.info("Exception in the service debugTestCase_ICE - debugTestCaseWS_ICE: ", exception);
+							logger.error("Exception in the service debugTestCase_ICE - debugTestCaseWS_ICE: %s", exception);
 						}
 					} else if (action == 'wsdlListGenerator_ICE') {
 						try {
@@ -1807,7 +1807,7 @@ exports.debugTestCase_ICE = function (req, res) {
 										try {
 											res.send(listGenResponse);
 										} catch (exception) {
-											logger.info("Exception in the service debugTestCase_ICE - result_wsdl_listOfOperation: ", exception);
+											logger.error("Exception in the service debugTestCase_ICE - result_wsdl_listOfOperation: %s", exception);
 										}
 									} else {
 										var responsedata = {
@@ -1823,16 +1823,16 @@ exports.debugTestCase_ICE = function (req, res) {
 											try {
 												res.send("fail");
 											} catch (exception) {
-												logger.info("Exception in the service debugTestCase_ICE - result_wsdl_listOfOperation: ", exception);
+												logger.error("Exception in the service debugTestCase_ICE - result_wsdl_listOfOperation: %s", exception);
 											}
 										}
 									}
 								} catch (exception) {
-									logger.info("Exception in the service debugTestCase_ICE - result_wsdl_listOfOperation: ", exception);
+									logger.error("Exception in the service debugTestCase_ICE - result_wsdl_listOfOperation: %s", exception);
 								}
 							});
 						} catch (exception) {
-							logger.info("Exception in the service debugTestCase_ICE - wsdlListGenerator_ICE: ", exception);
+							logger.error("Exception in the service debugTestCase_ICE - wsdlListGenerator_ICE: %s", exception);
 						}
 					} else if (action == 'wsdlServiceGenerator_ICE') {
 						try {
@@ -1863,7 +1863,7 @@ exports.debugTestCase_ICE = function (req, res) {
 										try {
 											res.send(serviceGenResponse);
 										} catch (exception) {
-											logger.info("Exception in the service debugTestCase_ICE - result_wsdl_ServiceGenerator: ", exception);
+											logger.error("Exception in the service debugTestCase_ICE - result_wsdl_ServiceGenerator: %s", exception);
 										}
 									} else {
 										var responsedata = {
@@ -1896,35 +1896,35 @@ exports.debugTestCase_ICE = function (req, res) {
 										try {
 											res.send(responsedata);
 										} catch (exception) {
-											logger.info("Exception in the service debugTestCase_ICE - result_wsdl_ServiceGenerator: ", exception);
+											logger.error("Exception in the service debugTestCase_ICE - result_wsdl_ServiceGenerator: %s", exception);
 										}
 									}
 								} catch (exception) {
-									logger.info("Exception in the service debugTestCase_ICE - result_wsdl_ServiceGenerator: ", exception);
+									logger.error("Exception in the service debugTestCase_ICE - result_wsdl_ServiceGenerator: %s", exception);
 								}
 							});
 						} catch (exception) {
-							logger.info("Exception in the service debugTestCase_ICE - wsdlServiceGenerator_ICE: ", exception);
+							logger.error("Exception in the service debugTestCase_ICE - wsdlServiceGenerator_ICE: %s", exception);
 						}
 					}
 				} catch (exception) {
-					logger.info("Exception in the service debugTestCase_ICE - wsdlServiceGenerator_ICE: ", exception);
+					logger.error("Exception in the service debugTestCase_ICE - wsdlServiceGenerator_ICE: %s", exception);
 				}
 			} else {
-				logger.info("Error in the service debugTestCase_ICE: Socket not Available");
+				logger.error("Error in the service debugTestCase_ICE: Socket not Available");
 				try {
 					res.send("unavailableLocalServer");
 				} catch (exception) {
-					logger.info("Error in the service debugTestCase_ICE: ", exception);
+					logger.error("Error in the service debugTestCase_ICE: %s", exception);
 				}
 			}
 		} else {
-			logger.info("Error in the service debugTestCase_ICE: Invalid Session");
+			logger.error("Error in the service debugTestCase_ICE: Invalid Session");
 			res.send("Invalid Session");
 		}
 	} catch (exception) {
 		res.send("unavailableLocalServer");
-		logger.info("Exception in the service debugTestCase_ICE:unavailableLocalServer: ", exception);
+		logger.error("Exception in the service debugTestCase_ICE:unavailableLocalServer: %s", exception);
 	}
 };
 
@@ -1960,7 +1960,7 @@ exports.getKeywordDetails_ICE = function getKeywordDetails_ICE(req, res) {
 								logger.error("Error occured in design/getKeywordDetails_ICE from getKeywordDetails_ICE, Error Code : ERRNDAC");
 								res.send("Server data rendering failed: Fail");
 							} catch (exception) {
-								logger.info("Exception in the service getKeywordDetails_ICE: ", exception);
+								logger.error("Exception in the service getKeywordDetails_ICE: %s", exception);
 							}
 						} else {
 							for (var objectindex = 0; objectindex < projectBasedKeywordsresult.rows.length; objectindex++) {
@@ -1972,11 +1972,11 @@ exports.getKeywordDetails_ICE = function getKeywordDetails_ICE(req, res) {
 							try {
 								res.send(individualsyntax);
 							} catch (exception) {
-								logger.info("Exception in the service getKeywordDetails_ICE: ", exception);
+								logger.error("Exception in the service getKeywordDetails_ICE: %s", exception);
 							}
 						}
 					} catch (exception) {
-						logger.info("Exception in the service getKeywordDetails_ICE: ", exception);
+						logger.error("Exception in the service getKeywordDetails_ICE: %s", exception);
 					}
 				});
 		} else {
@@ -1984,7 +1984,7 @@ exports.getKeywordDetails_ICE = function getKeywordDetails_ICE(req, res) {
 			res.send("Invalid Session");
 		}
 	} catch (exception) {
-		logger.info("Exception in the service getKeywordDetails_ICE: ", exception);
+		logger.error("Exception in the service getKeywordDetails_ICE: %s", exception);
 	}
 };
 
@@ -2017,10 +2017,10 @@ exports.getTestcasesByScenarioId_ICE = function getTestcasesByScenarioId_ICE(req
 					if (response.statusCode != 200 || testcasesResult.rows == "fail") {
 						flag = "Error in fetching testcaseIds : Fail";
 						try {
-							logger.info("Error in fetching testcaseIds");
+							logger.error("Error in fetching testcaseIds");
 							res.send(flag);
 						} catch (exception) {
-							logger.info("Exception in the service getTestcasesByScenarioId_ICE - gettestcaseids: ", exception);
+							logger.error("Exception in the service getTestcasesByScenarioId_ICE - gettestcaseids: %s", exception);
 						}
 					} else {
 						var testcaseIds = testcasesResult.rows[0].testcaseids;
@@ -2044,10 +2044,10 @@ exports.getTestcasesByScenarioId_ICE = function getTestcasesByScenarioId_ICE(req
 											if (response.statusCode != 200 || testcaseNamesResult.rows == "fail") {
 												flag = "Error in fetching testcaseNames : Fail";
 												try {
-													logger.info("Error in fetching testcaseNames");
+													logger.error("Error in fetching testcaseNames");
 													res.send(flag);
 												} catch (exception) {
-													logger.info("Exception in the service getTestcasesByScenarioId_ICE - gettestcasedetails: ", exception);
+													logger.error("Exception in the service getTestcasesByScenarioId_ICE - gettestcasedetails: %s", exception);
 												}
 											} else {
 												var testcaseNames = testcaseNamesResult.rows[0];
@@ -2057,16 +2057,16 @@ exports.getTestcasesByScenarioId_ICE = function getTestcasesByScenarioId_ICE(req
 												fetchtestcaseNameCallback();
 											}
 										} catch (exception) {
-											logger.info("Exception in the service getTestcasesByScenarioId_ICE - gettestcasedetails: ", exception);
+											logger.error("Exception in the service getTestcasesByScenarioId_ICE - gettestcasedetails: %s", exception);
 										}
 									});
 								} catch (exception) {
-									logger.info("Exception in the service getTestcasesByScenarioId_ICE: ", exception);
+									logger.error("Exception in the service getTestcasesByScenarioId_ICE: %s", exception);
 								}
 							}, finalfunction);
 					}
 				} catch (exception) {
-					logger.info("Exception in the service getTestcasesByScenarioId_ICE: ", exception);
+					logger.error("Exception in the service getTestcasesByScenarioId_ICE: %s", exception);
 				}
 
 				function finalfunction() {
@@ -2075,15 +2075,15 @@ exports.getTestcasesByScenarioId_ICE = function getTestcasesByScenarioId_ICE(req
 						logger.info("Sending testcase details");
 						res.send(testcasesArr);
 					} catch (exception) {
-						logger.info("Exception in the finalfunction from the service getTestcasesByScenarioId_ICE: ", exception);
+						logger.error("Exception in the finalfunction from the service getTestcasesByScenarioId_ICE: %s", exception);
 					}
 				}
 			});
 		} else {
-			logger.info("Error occured in the service getTestcasesByScenarioId_ICE: Invalid Session");
+			logger.error("Error occured in the service getTestcasesByScenarioId_ICE: Invalid Session");
 			res.send("Invalid Session");
 		}
 	} catch (exception) {
-		logger.info("Exception in the service getTestcasesByScenarioId_ICE: ", exception);
+		logger.error("Exception in the service getTestcasesByScenarioId_ICE: %s", exception);
 	}
 };

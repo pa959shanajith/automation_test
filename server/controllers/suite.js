@@ -50,7 +50,7 @@ exports.readTestSuite_ICE = function (req, res) {
 			logger.info("Calling function TestSuiteDetails_Module_ICE from readTestSuite_ICE");
 			TestSuiteDetails_Module_ICE(eachSuite, function (TestSuiteDetailserror, TestSuiteDetailsCallback) {
 				if (TestSuiteDetailserror) {
-					logger.info("Error in the function TestSuiteDetails_Module_ICE from readTestSuite_ICE: ",TestSuiteDetailserror);
+					logger.error("Error in the function TestSuiteDetails_Module_ICE from readTestSuite_ICE: %s",TestSuiteDetailserror);
 				} else {
 					var inputs = {
 						"testsuiteid": eachSuite.testsuiteid,
@@ -69,7 +69,7 @@ exports.readTestSuite_ICE = function (req, res) {
 					client.post(epurl + "suite/readTestSuite_ICE", args,
 						function (result, response) {
 						if (response.statusCode != 200 || result.rows == "fail") {
-							logger.info("Error occured in suite/readTestSuite_ICE from readTestSuite_ICE Error Code : ERRNDAC")
+							logger.error("Error occured in suite/readTestSuite_ICE from readTestSuite_ICE Error Code : ERRNDAC")
 							var flag = "Error in readTestSuite_ICE : Fail";
 							res.send(flag);
 						} else {
@@ -129,7 +129,7 @@ exports.readTestSuite_ICE = function (req, res) {
 									logger.info("Calling function Projectnametestcasename_ICE from readTestSuite_ICE");
 									Projectnametestcasename_ICE(eachoutscenarioid, function (eachoutscenarioiderr, eachoutscenarioiddata) {
 										if (eachoutscenarioiderr) {
-											logger.info("Error in the function Projectnametestcasename_ICE from readTestSuite_ICE: ",eachoutscenarioiderr);
+											logger.error("Error in the function Projectnametestcasename_ICE from readTestSuite_ICE: %s",eachoutscenarioiderr);
 										} else {
 											if (eachoutscenarioiddata != null || eachoutscenarioiddata != undefined) {
 												outscenarionames.push(eachoutscenarioiddata.testcasename);
@@ -171,7 +171,7 @@ exports.readTestSuite_ICE = function (req, res) {
 			logger.info("Calling function executeQueries from final function of the service readTestSuite_ICE");
 			neo4jAPI.executeQueries(qList,function(status,result){
 				if(status!=200){
-					logger.info("Status:",status,"\nResponse: ",result);
+					logger.error("Status:",status,"\nResponse: ",result);
 				}
 				else{
 					logger.info('Success');
@@ -181,7 +181,7 @@ exports.readTestSuite_ICE = function (req, res) {
 			});
 		});
 	} else {
-		logger.info('Error in the service readTestSuite_ICE: Invalid Session');
+		logger.error('Error in the service readTestSuite_ICE: Invalid Session');
 		res.send("Invalid Session");
 	}
 };
@@ -213,7 +213,7 @@ function Projectnametestcasename_ICE(req, cb, data) {
 			client.post(epurl + "suite/readTestSuite_ICE", args,
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
-					logger.info("Error occured in the function testcasename of Projectnametestcasename_ICE: suite/readTestSuite_ICE - fail");
+					logger.error("Error occured in the function testcasename of Projectnametestcasename_ICE: suite/readTestSuite_ICE - fail");
 				} else {
 					if (result.rows.length != 0) {
 						projectid = result.rows[0].projectid;
@@ -238,7 +238,7 @@ function Projectnametestcasename_ICE(req, cb, data) {
 			client.post(epurl + "suite/readTestSuite_ICE", args,
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
-					logger.info("Error occured in the function projectname of Projectnametestcasename_ICE: suite/readTestSuite_ICE - fail");
+					logger.error("Error occured in the function projectname of Projectnametestcasename_ICE: suite/readTestSuite_ICE - fail");
 				} else {
 					if (result.rows.length != 0)
 						testcaseNproject.projectname = result.rows[0].projectname;
@@ -305,7 +305,7 @@ exports.updateTestSuite_ICE = function (req, res) {
 						logger.info("Calling function saveSuite (deletetestsuitequery) from updateTestSuite_ICE");
 						saveSuite(function (err, response) {
 							if (err) {
-								logger.info("Error occured in the function saveSuite (deletetestsuitequery) from updateTestSuite_ICE");
+								logger.error("Error occured in the function saveSuite (deletetestsuitequery) from updateTestSuite_ICE");
 								flag = "fail";
 								res.send(flag);
 							} else {
@@ -407,7 +407,7 @@ exports.updateTestSuite_ICE = function (req, res) {
 			batchDetailscallback();
 		});
 	} else {
-		logger.info("Error occured in the service updateTestSuite_ICE: Invalid Session");
+		logger.error("Error occured in the service updateTestSuite_ICE: Invalid Session");
 		res.send("Invalid Session");
 	}
 };
@@ -435,7 +435,7 @@ function updateExecutionStatus(testsuiteid, executionid, starttime, suiteStatus)
 			logger.error("Error occured in updateExecutionStatus: suite/ExecuteTestSuite_ICE, Error Code : ERRNDAC");
 			flag = "fail";
 		} else {
-			logger.error("Execution status updated successfully from updateExecutionStatus: suite/ExecuteTestSuite_ICE");
+			logger.info("Execution status updated successfully from updateExecutionStatus: suite/ExecuteTestSuite_ICE");
 			flag = "success";
 		}
 	});
@@ -482,7 +482,7 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 		client.post(epurl + "utility/dataUpdator_ICE", args,
 			function (result, response) {
 			if (response.statusCode != 200 || result.rows == "fail") {
-				logger.info("Error occured in utility/dataUpdator_ICE service from ExecuteTestSuite_ICE: Data Updator Fail");
+				logger.error("Error occured in utility/dataUpdator_ICE service from ExecuteTestSuite_ICE: Data Updator Fail");
 			} else {
 				logger.info("Data Updator Success");
 			}
@@ -517,7 +517,7 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 				TestCaseDetails_Suite_ICE(currentscenarioid, userInfo.user_id, function (currentscenarioidError, currentscenarioidResponse) {
 					var scenariotestcaseobj = {};
 					if (currentscenarioidError) {
-						logger.info("Error occured in the function TestCaseDetails_Suite_ICE: ",currentscenarioidError);
+						logger.error("Error occured in the function TestCaseDetails_Suite_ICE: %s",currentscenarioidError);
 					} else {
 						if (currentscenarioidResponse != null || currentscenarioidResponse != undefined) {
 							scenariotestcaseobj[currentscenarioid] = currentscenarioidResponse.listoftestcasedata;
@@ -623,7 +623,7 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 										logger.error("Error occured in suite/ExecuteTestSuite_ICE from executionFunction Error Code : ERRNDAC");
 										flag = "fail";
 									} else {
-										logger.error("Successfully inserted report data");
+										logger.info("Successfully inserted report data");
 										flag = "success";
 									}
 								});
@@ -644,7 +644,7 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 								}
 							}
 						} catch (ex) {
-							logger.info("Exception in the function executionFunction: insertreportquery ", ex);
+							logger.error("Exception in the function executionFunction: insertreportquery: %s", ex);
 						}
 					}
 					if (resultData == "success" || resultData == "Terminate") {
@@ -652,18 +652,18 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 							logger.info("Sending execution status from function executionFunction");
 							res.send(resultData);
 						} catch (ex) {
-							logger.info("Exception While sending execution status from the function executionFunction", ex);
+							logger.error("Exception While sending execution status from the function executionFunction: %s", ex);
 						}
 					}
 
 				});
 			} else {
-				logger.info("Error occured in the function executionFunction: Socket not Available");
+				logger.error("Error occured in the function executionFunction: Socket not Available");
 				res.send("unavailableLocalServer");
 			}
 		}
 	} else {
-		logger.info("Error occured in the function executionFunction: Invalid Session");
+		logger.error("Error occured in the function executionFunction: Invalid Session");
 		res.send("Invalid Session");
 	}
 };
@@ -711,7 +711,7 @@ exports.ExecuteTestSuite_ICE_CI = function (req, res) {
 		client.post(epurl + "utility/dataUpdator_ICE", args,
 			function (result, response) {
 			if (response.statusCode != 200 || result.rows == "fail") {
-				logger.info("Error occured in utility/dataUpdator_ICE service from ExecuteTestSuite_ICE_CI: Data Updator Fail");
+				logger.error("Error occured in utility/dataUpdator_ICE service from ExecuteTestSuite_ICE_CI: Data Updator Fail");
 			} else {
 				logger.info("Data Updator Success");
 			}
@@ -745,7 +745,7 @@ exports.ExecuteTestSuite_ICE_CI = function (req, res) {
 				TestCaseDetails_Suite_ICE(currentscenarioid, userInfo.user_id, function (currentscenarioidError, currentscenarioidResponse) {
 					var scenariotestcaseobj = {};
 					if (currentscenarioidError) {
-						logger.info("Error occured in the function TestCaseDetails_Suite_ICE from ExecuteTestSuite_ICE_CI: ",currentscenarioidError);
+						logger.error("Error occured in the function TestCaseDetails_Suite_ICE from ExecuteTestSuite_ICE_CI: %s",currentscenarioidError);
 					} else {
 						if (currentscenarioidResponse != null || currentscenarioidResponse != undefined) {
 							scenariotestcaseobj[currentscenarioid] = currentscenarioidResponse;
@@ -849,7 +849,7 @@ exports.ExecuteTestSuite_ICE_CI = function (req, res) {
 										logger.error("Error occured in suite/ExecuteTestSuite_ICE from executionFunction in ExecuteTestSuite_ICE_CI Error Code : ERRNDAC");
 										flag = "fail";
 									} else {
-										logger.error("Successfully inserted report data");
+										logger.info("Successfully inserted report data");
 										flag = "success";
 									}
 								});
@@ -870,7 +870,7 @@ exports.ExecuteTestSuite_ICE_CI = function (req, res) {
 								}
 							}
 						} catch (ex) {
-							logger.info("Exception in the function executionFunction in ExecuteTestSuite_ICE_CI: insertreportquery ", ex);
+							logger.error("Exception in the function executionFunction in ExecuteTestSuite_ICE_CI: insertreportquery: %s", ex);
 						}
 					}
 					if (resultData == "success" || resultData == "Terminate") {
@@ -878,18 +878,18 @@ exports.ExecuteTestSuite_ICE_CI = function (req, res) {
 							logger.info("Sending execution status from function executionFunction in ExecuteTestSuite_ICE_CI");
 							res.send(resultData);
 						} catch (ex) {
-							logger.info("Exception While sending execution status from the function executionFunction in ExecuteTestSuite_ICE_CI", ex);
+							logger.error("Exception While sending execution status from the function executionFunction in ExecuteTestSuite_ICE_CI: %s", ex);
 							res.send("fail");
 						}
 					}
 				});
 			} else {
-				logger.info("Error occured in the function executionFunction in ExecuteTestSuite_ICE_CI: Socket not Available");
+				logger.error("Error occured in the function executionFunction in ExecuteTestSuite_ICE_CI: Socket not Available");
 				res.send("unavailableLocalServer");
 			}
 		}
 	} else {
-		logger.info("Error occured in the function executionFunction in ExecuteTestSuite_ICE_CI: Invalid Session");
+		logger.error("Error occured in the function executionFunction in ExecuteTestSuite_ICE_CI: Invalid Session");
 		res.send("Invalid Session");
 	}
 };
@@ -1117,7 +1117,7 @@ function TestCaseDetails_Suite_ICE(req, userid, cb, data) {
 								});
 							}
 						} catch (exception) {
-							logger.error("Exception occured in TestCaseDetails_Suite_ICE : ", exception);
+							logger.error("Exception occured in TestCaseDetails_Suite_ICE : %s", exception);
 						}
 					}
 				});
@@ -1159,7 +1159,7 @@ function TestCaseDetails_Suite_ICE(req, userid, cb, data) {
 			"qcdetails": qcdetails
 		};
 		if (err) {
-			logger.info("Error occured in the final function of TestCaseDetails_Suite_ICE");
+			logger.error("Error occured in the final function of TestCaseDetails_Suite_ICE");
 			cb(err);
 		} else {
 			logger.info("Sending testcase data and QC details from final function of TestCaseDetails_Suite_ICE");
@@ -1184,19 +1184,19 @@ exports.getTestcaseDetailsForScenario_ICE = function (req, res) {
 		logger.info("Calling function testcasedetails_testscenarios from getTestcaseDetailsForScenario_ICE");
 		testcasedetails_testscenarios(requiredtestscenarioid, function (err, data) {
 			if (err) {
-				logger.info("Error occured in the testcasedetails_testscenarios function of getTestcaseDetailsForScenario_ICE");
+				logger.error("Error occured in the testcasedetails_testscenarios function of getTestcaseDetailsForScenario_ICE");
 				res.send("fail");
 			} else {
 				try {
 					logger.info("Sending response data from testcasedetails_testscenarios function of getTestcaseDetailsForScenario_ICE");
 					res.send(JSON.stringify(data));
 				} catch (ex) {
-					logger.info("Exception occured in getTestcaseDetailsForScenario_ICE : ", ex);
+					logger.error("Exception occured in getTestcaseDetailsForScenario_ICE: %s", ex);
 				}
 			}
 		});
 	} else {
-		logger.info("Error occured in the testcasedetails_testscenarios: Invalid Session")
+		logger.error("Error occured in the testcasedetails_testscenarios: Invalid Session")
 		res.send("Invalid Session");
 	}
 };
@@ -1317,7 +1317,7 @@ function testcasedetails_testscenarios(req, cb, data) {
 	}, function (err, data) {
 		logger.info("Inside final function of testcasedetails_testscenarios");
 		if (err) {
-			logger.error("Error occured in final function of testcasedetails_testscenarios: ", err);
+			logger.error("Error occured in final function of testcasedetails_testscenarios: %s", err);
 			cb(err, "fail");
 		} else {
 			var resultdata = {
@@ -1475,7 +1475,7 @@ function TestSuiteDetails_Module_ICE(req, cb1, data) {
 				logger.info("Calling function updatescenariodetailsinsuite from TestSuiteDetails_Module_ICE - testcasesteps");
 				updatescenariodetailsinsuite(jsondata, function (err, data) {
 					if (err) {
-						logger.info("Error in the function updatescenariodetailsinsuite from TestSuiteDetails_Module_ICE - testcasesteps", err);
+						logger.error("Error in the function updatescenariodetailsinsuite from TestSuiteDetails_Module_ICE - testcasesteps: %s", err);
 						cb1(null, flag);
 					} else {
 						callback(null, flag);
@@ -1486,7 +1486,7 @@ function TestSuiteDetails_Module_ICE(req, cb1, data) {
 	}, function (err, results) {
 		logger.info("Inside final function of TestSuiteDetails_Module_ICE");
 		if (err) {
-			logger.info("Error in the final function of updatescenariodetailsinsuite from TestSuiteDetails_Module_ICE - testcasesteps");
+			logger.error("Error in the final function of updatescenariodetailsinsuite from TestSuiteDetails_Module_ICE - testcasesteps: %s",err);
 			cb1(null, flag);
 		} else {
 			cb1(null, flag);
@@ -1653,13 +1653,13 @@ function updatescenariodetailsinsuite(req, cb, data) {
 	}, function (err, data) {
 		logger.info("Inside final function of updatescenariodetailsinsuite");
 		if (err) {
-			logger.info("Error occured in the final function of updatescenariodetailsinsuite: ", err);
+			logger.error("Error occured in the final function of updatescenariodetailsinsuite: %s", err);
 			cb(null, err);
 		} else {
 			try {
 				cb(null, 'Successsssssss');
 			} catch (ex) {
-				logger.info("Exception occured in the updating scenarios in the final function of updatescenariodetailsinsuite: ", ex);
+				logger.error("Exception occured in the updating scenarios in the final function of updatescenariodetailsinsuite: %s", ex);
 			}
 		}
 	});
@@ -1681,12 +1681,12 @@ exports.testSuitesScheduler_ICE = function (req, res) {
 				logger.info("TestSuite Scheduled successfully");
 				res.send(schedulecallback);
 			} catch (exception) {
-				logger.info("Exception in the service testSuitesScheduler_ICE: ",exception);
+				logger.error("Exception in the service testSuitesScheduler_ICE: %s",exception);
 				res.send("fail");
 			}
 		});
 	} else {
-		logger.info("Error in the service testSuitesScheduler_ICE: Invalid Session");
+		logger.error("Error in the service testSuitesScheduler_ICE: Invalid Session");
 		res.send("Invalid Session");
 	}
 };
@@ -1757,7 +1757,7 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 							counter++;
 							Callback();
 						} catch (ex) {
-							logger.info("Exception in the function executeScheduling from scheduleTestSuite: ", ex);
+							logger.error("Exception in the function executeScheduling from scheduleTestSuite: %s", ex);
 							scheduleStatus = "Failed 02";
 							logger.info("Calling function updateStatus from scheduleTestSuite");
 							updateStatus(sessObj, function (err, data) {
@@ -1769,7 +1769,7 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 					}
 				});
 			} catch (exception) {
-				logger.info("Exception in the function executeScheduling from scheduleTestSuite: Normal scheduling ", exception);
+				logger.error("Exception in the function executeScheduling from scheduleTestSuite: Normal scheduling: %s", exception);
 				schedFlag = "fail";
 				schedcallback(null, schedFlag);
 			}
@@ -1786,7 +1786,7 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 				counter++;
 				Callback();
 			} catch (ex) {
-				logger.info("Exception in the function executeScheduling from scheduleTestSuite: reshedule ", ex);
+				logger.error("Exception in the function executeScheduling from scheduleTestSuite: reshedule: %s", ex);
 				scheduleStatus = "Failed 02";
 				updateStatus(sessObj, function (err, data) {
 					if (!err) {
@@ -1880,7 +1880,7 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 							TestCaseDetails_Suite_ICE(currentscenarioid, schedulingData[0].userInfo.user_id, function (currentscenarioidError, currentscenarioidResponse) {
 								var scenariotestcaseobj = {};
 								if (currentscenarioidError) {
-									logger.error("Error occured in the function TestCaseDetails_Suite_ICE from executeScheduling Error Code : ERRNDAC", currentscenarioidError);
+									logger.error("Error occured in the function TestCaseDetails_Suite_ICE from executeScheduling Error Code - ERRNDAC: %s", currentscenarioidError);
 								} else {
 									if (currentscenarioidResponse != null || currentscenarioidResponse != undefined) {
 										scenariotestcaseobj[currentscenarioid] = currentscenarioidResponse.listoftestcasedata;
@@ -2008,7 +2008,7 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 												}
 											}
 										} catch (ex) {
-											logger.info("Exception occured in the scheduleFunction: ", ex);
+											logger.error("Exception occured in the scheduleFunction: %s", ex);
 										}
 									}
 									if (resultData) {
@@ -2027,12 +2027,12 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 											//res.send(resultData);
 											//console.log(resultData);
 										} catch (ex) {
-											logger.info("Exception occured in the updateStatus function of scheduleFunction: ", ex);
+											logger.error("Exception occured in the updateStatus function of scheduleFunction: %s", ex);
 										}
 									}
 								});
 							} else {
-								logger.info("Error occured in the function scheduleFunction: Socket not Available");
+								logger.error("Error occured in the function scheduleFunction: Socket not Available");
 								// deleteFlag = true;
 								// deleteScheduledData(deleteFlag, sessObj)
 								scheduleStatus = "Failed 00";
@@ -2048,7 +2048,7 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 				}
 			});
 		} catch (exception) {
-			logger.info("Exception occured in the executeScheduling function: ", ex);
+			logger.error("Exception occured in the executeScheduling function: %s", ex);
 			// deleteFlag = true;
 			// deleteScheduledData(deleteFlag, sessObj)
 			scheduleStatus = "Failed 02";
@@ -2120,12 +2120,12 @@ function updateStatus(sessObj, updateStatuscallback) {
 					}
 				});
 			} catch (exception) {
-				logger.error("Exception occured in suite/ScheduleTestSuite_ICE from updateStatus: ",exception);
+				logger.error("Exception occured in suite/ScheduleTestSuite_ICE from updateStatus: %s",exception);
 				updateStatuscallback(null, "fail");
 			}
 		}
 	} catch (exception) {
-		logger.error("Exception occured in updateStatus: ",exception);
+		logger.error("Exception occured in updateStatus: %s",exception);
 		updateStatuscallback(null, "fail");
 	}
 }
@@ -2141,13 +2141,13 @@ exports.getScheduledDetails_ICE = function (req, res) {
 		logger.info("Calling function getScheduledDetails from getScheduledDetails_ICE");
 		getScheduledDetails("getallscheduledata", function (err, getSchedcallback) {
 			if (err) {
-				logger.error("Error occured in getScheduledDetails from getScheduledDetails_ICE: ",err);
+				logger.error("Error occured in getScheduledDetails from getScheduledDetails_ICE: %s",err);
 				res.send("fail");
 			} else {
 				try {
 					res.send(getSchedcallback);
 				} catch (exception) {
-					logger.error("Exception occured while sending response getSchedcallback: ",exception);
+					logger.error("Exception occured while sending response getSchedcallback: %s",exception);
 					res.send("fail");
 				}
 			}
@@ -2203,7 +2203,7 @@ exports.cancelScheduledJob_ICE = function (req, res) {
 								logger.info("Sending response data from cancelScheduledJob_ICE service on success");
 								res.send(data);
 							} else{
-								logger.info("Error in the function updateStatus from cancelScheduledJob_ICE service");
+								logger.error("Error in the function updateStatus from cancelScheduledJob_ICE service");
 								res.send(data);
 							}
 						});
@@ -2214,7 +2214,7 @@ exports.cancelScheduledJob_ICE = function (req, res) {
 				}
 			});
 		} catch (exception) {
-			logger.error("Exception in the service cancelScheduledJob_ICE: ",exception);
+			logger.error("Exception in the service cancelScheduledJob_ICE: %s",exception);
 			res.send("fail");
 		}
 	} else {
@@ -2248,7 +2248,7 @@ function getScheduledDetails(dbquery, schedDetailscallback) {
 			}
 		});
 	} catch (exception) {
-		logger.error("Exception in the function getScheduledDetails: ",exception);
+		logger.error("Exception in the function getScheduledDetails: %s",exception);
 		schedDetailscallback(null, "fail");
 	}
 }
@@ -2261,7 +2261,7 @@ exports.reScheduleTestsuite = function (req, res) {
 		logger.info("Calling function getScheduledDetails from reScheduleTestsuite service");
 		getScheduledDetails("getallscheduleddetails", function (err, reSchedcallback) {
 			if (err) {
-				logger.error("Error occured in getScheduledDetails from reScheduleTestsuite service: ", err);
+				logger.error("Error occured in getScheduledDetails from reScheduleTestsuite service: %s", err);
 			} else {
 				if (reSchedcallback != "fail") {
 					var status;
@@ -2316,7 +2316,7 @@ exports.reScheduleTestsuite = function (req, res) {
 									try {
 										logger.info("Status of the function scheduleTestSuite from reScheduleTestsuite service");
 									} catch (exception) {
-										logger.info("Exception in the function scheduleTestSuite from reScheduleTestsuite service: ", exception);
+										logger.error("Exception in the function scheduleTestSuite from reScheduleTestsuite service: %s", exception);
 									}
 								});
 							} else {
@@ -2338,6 +2338,6 @@ exports.reScheduleTestsuite = function (req, res) {
 			}
 		});
 	} catch (ex) {
-		logger.info("Exception in the function reScheduleTestsuite: ", ex);
+		logger.error("Exception in the function reScheduleTestsuite: %s", ex);
 	}
 };
