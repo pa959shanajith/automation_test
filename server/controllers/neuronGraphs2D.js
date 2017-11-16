@@ -9,7 +9,6 @@ var updateSessionTimeEvery = 20 * 60 * 1000;
 var Client = require("node-rest-client").Client;
 var client = new Client();
 var epurl="http://127.0.0.1:1990/";
-//var urlData=['wslk13fodc6-30r','8443'];
 
 /* Send queries to Neo4J/ICE API. */
 var fs = require('fs');
