@@ -1,7 +1,8 @@
-var myserver = require('../../server.js');
+var myserver = require('../lib/socket.js');
 var fs = require('fs');
 //var https = require('https');
 var neo4jAPI = require('../controllers/neo4jAPI');
+var logger = require('../../logger');
 //var certificate = fs.readFileSync('server/https/server.crt','utf-8');
 var sessionTime = 30 * 60 * 1000;
 var updateSessionTimeEvery = 20 * 60 * 1000;
@@ -41,6 +42,7 @@ var https = require('https');
 
 
 var parseData = function(data){
+	logger.info("Inside function: parseData ");
 	var rootIndex=-1;
 	var nodeTypes={"DOMAINS_NG":"Domain","PROJECTS_NG":"Project","RELEASES_NG":"Release","CYCLES_NG":"Cycle","TESTSUITES_NG":"TestSuite","TESTSCENARIOS_NG":"TestScenario","TESTCASES_NG":"TestCase","SCREENS_NG":"Screen"};
 	var nc=0,lc=0,nodes=[],links=[],nodeIdDict={},linkIdDict={};
@@ -89,6 +91,7 @@ var parseData = function(data){
 };
 
 var get2DCoordsData = function(data,r,dNeed){
+	logger.info("Inside function: get2DCoordsData ");
 	if(r){
 		dNeed={};
 		if(data.children) data.children.forEach(function(p){
@@ -108,6 +111,7 @@ var get2DCoordsData = function(data,r,dNeed){
 };
 
 var cleanData = function(data){
+	logger.info("Inside function: cleanData ");
 	data.forEach(function(e){
 		delete e.children;
 		delete e.parent;
@@ -116,6 +120,7 @@ var cleanData = function(data){
 };
 
 exports.getGraphData = function(req, res){
+	logger.info("Inside UI service: getGraphData");
 	try{
 		if(req.cookies['connect.sid'] != undefined){
 			var sessionCookie = req.cookies['connect.sid'].split(".");
@@ -129,11 +134,11 @@ exports.getGraphData = function(req, res){
 			//'686d69a5-b519-4b4f-a813-8299235a2e97';'9c017f14-5a1c-4f2f-85a9-52728c86684c';
 			//qList.push({"statement":"MATCH(a:ICEPERMISSIONS_NG{userid:'"+userid+"'})-[r1]->(b:DOMAINS_NG) WITH b as d MATCH path=(d)-[r*1..]->(x) RETURN path","resultDataContents":["graph"]});
 			qList.push({"statement":"MATCH(a:ICEPERMISSIONS_NG{userid:'"+userid+"'})-[r1]->(d:DOMAINS_NG) WITH a.projectids as pids,d as d MATCH (p:PROJECTS_NG) WHERE p.projectid in pids WITH p as p,d as d MATCH path=(d)-[r2]->(p)-[r3*1..]->(x) RETURN path","resultDataContents":["graph"]});
-			console.log('qList::::', qList);
+			//console.log('qList::::', qList);
 			neo4jAPI.executeQueries(qList,function(status,result){
 				res.setHeader('Content-Type', 'application/json');
 				if(status!=200){
-					console.log("Status:",status,"\nResponse: ",result);
+					//console.log("Status:",status,"\nResponse: ",result);
 					res.status(status).send(result);
 				}
 				else{
@@ -156,12 +161,13 @@ exports.getGraphData = function(req, res){
 		}
 	}
 	catch(exception){
-		console.log(exception);
+		logger.info("Exception in the service getGraphData: ", exception);
 		res.send({"err":true,"ecode":"FAIL","msg":"Internal Error! Please contact admin"});
 	}
 };
 
 exports.getPackData = function(req, res){
+	logger.info("Inside UI service: getPackData");
 	try{
 		if(req.cookies['connect.sid'] != undefined){
 			var sessionCookie = req.cookies['connect.sid'].split(".");
@@ -178,12 +184,13 @@ exports.getPackData = function(req, res){
 		}
 	}
 	catch(exception){
-		console.log(exception);
+		logger.error("Exception in the service getPackData: ", exception);
 		res.send({"err":true,"ecode":"FAIL","msg":"Internal Error! Please contact admin"});
 	}
 };
 
 exports.getHierarchy = function(req, res){
+	logger.info("Inside UI service: getHierarchy");
 	try{
 		if(req.cookies['connect.sid'] != undefined){
 			var sessionCookie = req.cookies['connect.sid'].split(".");
@@ -206,12 +213,12 @@ exports.getHierarchy = function(req, res){
 						console.log(data);
 						//Logic Goes Here
 					}catch(exception){
-						console.log(exception);
+						logger.info("Exception in the service getHierarchy: ", exception);
 					}
 				});
 			}
 			else {
-				console.log("Socket not Available");
+				logger.error("Error occurred in connecting socket");
 				res.send("unavailableLocalServer");
 			}
 		}
@@ -220,12 +227,13 @@ exports.getHierarchy = function(req, res){
 		}
 	}
 	catch(exception){
-		console.log(exception);
+		logger.info("Exception in the service getHierarchy: ", exception);
 		res.send("fail");
 	}
 };
 
 exports.getReportData = function(req, res){
+	logger.info("Inside UI service: getReportData");
 	try{
 		if(req.cookies['connect.sid'] != undefined){
 			var sessionCookie = req.cookies['connect.sid'].split(".");
@@ -242,11 +250,11 @@ exports.getReportData = function(req, res){
 			// 	+ req_testsuiteId ;
 			// dbConnICE.execute(getExecutionDetails,function(err,executionData){
 			var inputs = {"suiteid" :req_testsuiteId,"executionid":req_executionId,"testscenarioids":req_testScenarioIds}
-			console.log("\n*****inputs******\n",inputs);
+			//console.log("\n*****inputs******\n",inputs);
 			var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
+			logger.info("Calling NDAC Service from getReportData :reports/getReportData");
 			client.post(epurl+"reports/getReportData",args,
 			function (result, response) {
-				console.log('++++res++++:',result)
 				var executionDetailsJSON={};
 				try{
 					// if(err){
@@ -261,7 +269,8 @@ exports.getReportData = function(req, res){
 						//res.send(JSON.stringify(executionDetailsJSON));
 					}
 				catch(exception){
-					console.log(exception);
+					//console.log(exception);
+					logger.error(exception);
 					res.send("fail");
 				}
 			});
@@ -272,7 +281,7 @@ exports.getReportData = function(req, res){
 		}
 	}
 	catch(exception){
-		console.log(exception);
+		logger.error(exception);
 		res.send({"err":true,"ecode":"FAIL","msg":"Internal Error! Please contact admin"});
 	}
 }

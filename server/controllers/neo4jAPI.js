@@ -1,5 +1,6 @@
 var config = require('../../server/config/config');
 var Client = require("node-rest-client").Client;
+var logger = require('../../logger');
 var client = new Client();
 var neoURL = "http://" + config.host + "/db/data/transaction/commit";
 var requestHeaders = {
@@ -9,6 +10,7 @@ var requestHeaders = {
 };
 
 exports.executeQueriesOverRestAPI = function (req, res) {
+	logger.info("Inside UI service: executeQueriesOverRestAPI");
 	var args = {
 		"data": req.body.data,
 		"headers": requestHeaders
@@ -24,6 +26,7 @@ exports.executeQueriesOverRestAPI = function (req, res) {
 };
 
 exports.executeQueries = function (d, cb) {
+	logger.info("Inside UI service: executeQueries");
 	var args = {
 		"data": {"statements": d},
 		"headers": requestHeaders

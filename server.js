@@ -1,74 +1,34 @@
+//load environment variables
+var env = require('node-env-file');
+if (!process.env.ENV)
+    env(__dirname + '/.env');
+
 // Module Dependencies
 var cluster = require('cluster');
 var fs = require('fs');
 var util = require('util');
-var logFile = fs.createWriteStream('logs/node_server.log', { flags: 'a' });
-// Or 'w' to truncate the file every time the process starts.
-var logStdout = process.stdout;
-var notificationMsg = require('./server/notifications/notifyMessages.js');
-
-function _getCallerFile() {
-  var count = 0;
-    try {
-        var err = new Error();
-        var callerfile;
-        var currentfile;
-        var oFunc = Error.prepareStackTrace;
-        Error.prepareStackTrace = function (err, stack) { return stack; };
-        currentfile = err.stack.shift().getFileName();
-        while (err.stack.length) {
-          var a = err.stack.shift();
-          callerfile =a.getFileName();
-          if(currentfile !== callerfile){
-              callerLine = a.getLineNumber();
-              column = a.getColumnNumber();
-              Error.prepareStackTrace = oFunc; return {file : callerfile, number : callerLine, column: column};
-          }else{
-            count++;
-            callerLine = a.getLineNumber();
-            column = a.getColumnNumber();
-            if(count > 1){Error.prepareStackTrace = oFunc; return {file : callerfile, number : callerLine, column: column};}
-          }
-        }
-    } catch (err) {}
-}
-
-console.log = function () {
-  var d = new Date();
-  var n = d.toLocaleString();
-  var a = _getCallerFile();
-  logFile.write('['+n+']['+a.file+':'+a.number+ ':'+a.column+'] >> '+ util.format.apply(null, arguments) + '\n');
-//  logFile.write('['+n+'] ['+a+']; '+ util.format.apply(null, arguments) + '\n');
-  logStdout.write(util.format.apply(null, arguments) + '\n');
-};
-console.error = console.log;
+var expressWinston = require('express-winston');
+var winston = require('winston');
+var epurl = "http://127.0.0.1:1990/";
+var logger = require('./logger');
 
 if (cluster.isMaster) {
-    //    cluster.fork();
     cluster.fork();
     cluster.on('disconnect', function(worker) {
         console.log('disconnect!');
-        // cluster.fork();
     });
     cluster.on('exit', function(worker) {
-
-        // Replace the dead worker,
-        // we're not sentimental
         console.log('Let\'s not have Sentiments... Worker %d is killed.', worker.id);
         cluster.fork();
     });
 
 } else {
-  try {
+try {
     var express = require('express');
     var app = express();
-
-    //var io = require('socket.io')(server);
     var bodyParser = require('body-parser');
-    var morgan = require('morgan');
     var sessions = require('express-session');
     var cookieParser = require('cookie-parser');
-    // var errorhandler = require('errorhandler');
     var cmd = require('node-cmd');
     var helmet = require('helmet');
     const os = require('os');
@@ -101,18 +61,24 @@ if (cluster.isMaster) {
         honorCipherOrder: true
     };
     var httpsServer = require('https').createServer(credentials, app);
-    var io = require('socket.io')(httpsServer);
+    module.exports.httpsServer = httpsServer;
+    var io = require('./server/lib/socket');
 
-    module.exports = app;
-    module.exports.allSocketsMap = {};
     app.use(bodyParser.json({
         limit: '10mb'
     }));
+
     app.use(bodyParser.urlencoded({
         limit: '10mb',
         extended: true
     }));
-    app.use(morgan('combined'));
+
+    app.use(expressWinston.logger({
+        winstonInstance: logger,
+        requestWhitelist: ['url'],
+        colorize: true
+
+    }));
 
     app.use(cookieParser());
     app.use(sessions({
@@ -127,48 +93,64 @@ if (cluster.isMaster) {
             maxAge: (30 * 60 * 1000)
         }
     }));
+
     app.use(helmet());
     var opts = {
-            csrf: {
-                angular: true
-            }
-        }; // options for lusca
+        csrf: {
+            angular: true
+        }
+    }; // options for lusca
     app.use(lusca.p3p('ABCDEF'));
     app.use(helmet.referrerPolicy({ policy: 'same-origin' }));
     var ninetyDaysInSeconds = 7776000
     app.use(helmet.hpkp({
-    maxAge: ninetyDaysInSeconds,
-    sha256s: ['AbCdEf123=', 'ZyXwVu456=']
+        maxAge: ninetyDaysInSeconds,
+        sha256s: ['AbCdEf123=', 'ZyXwVu456=']
     }))
-     app.use(helmet.noCache());
+
+    app.use(helmet.noCache());
+
     //Role Based User Access to services
-      app.post('*',function(req,res,next) {
-           var roleId = req.session.defaultRoleId;
-           if(req.session.defaultRoleId != undefined)
-           {
-                var updateinp = {roleid:req.session.defaultRoleId,servicename:req.url.replace("/","")}
-                var args = { data:updateinp,headers:{"Content-Type" : "application/json"}}
-                apiclient.post("http://127.0.0.1:1990/"+"utility/userAccess_Nineteen68",args,
-                                function (result, response) {
-                    if(response.statusCode != 200 || result.rows == "fail"){
-                        console.log("Error occured in userAccess_Nineteen68 : Fail");
+    app.post('*', function (req, res, next) {
+        var roleId = req.session.defaultRoleId;
+        if (req.session.defaultRoleId != undefined) {
+            var updateinp = { roleid: req.session.defaultRoleId, servicename: req.url.replace("/", "") }
+            var args = { data: updateinp, headers: { "Content-Type": "application/json" } }
+            apiclient.post(epurl + "utility/userAccess_Nineteen68", args,
+                function (result, response) {
+                    if (response.statusCode != 200 || result.rows == "fail") {
+                        logger.error("Error occured in userAccess_Nineteen68");
                         res.send("Invalid Session");
-                    }else{
-                        if(result.rows == "True"){
+                    } else {
+                        if (result.rows == "True") {
+                            // logger.info("User " + req.session.username + " authenticated");
+                            logger.rewriters.push(function (level, msg, meta) {
+                                if (req.session != undefined) {
+                                    meta.username = req.session.username;
+                                    meta.userid = req.session.userid;
+                                    return meta;
+                                }
+                                else {
+                                    meta.username = null;
+                                    meta.userid = null;
+                                    return meta;
+                                }
+                            });
                             return next();
-                        }else{
-                            req.session.destroy(); 
+                        } else {
+
+                            req.session.destroy();
                             res.status(401).redirect('/');
                         }
                     }
                 });
-           }
-           else{
-               return next();
-           }
+        }
+        else {
+            return next();
+        }
     });
     //CORS
-    app.all('*', function(req, res, next) {
+    app.all('*', function (req, res, next) {
         res.header('Access-Control-Allow-Origin', '*');
         res.header('Access-Control-Allow-Methods', 'PUT, GET, POST, DELETE, OPTIONS');
         res.header('Access-Control-Allow-Headers', 'X-Requested-With');
@@ -177,19 +159,14 @@ if (cluster.isMaster) {
     //Content Security Policy Enabled for Images and Fonts.
     app.use(helmet.contentSecurityPolicy({
         directives: {
-            imgSrc:["'self'",'data:'],
-         //   fontSrc: ["'self'"],
+            imgSrc: ["'self'", 'data:'],
+            //   fontSrc: ["'self'"],
             objectSrc: ["'none'"],
             mediaSrc: ["'self'"],
             frameSrc: ["'none'"]
         }
-        }));
+    }));
 
-
-    //write stream for logs
-    //var accessLogStream = fs.createWriteStream(__dirname + '/access.log', {flags: 'a'})
-    //setup the logger
-    //app.use(morgan('combined', {stream: accessLogStream}))
     //serve all asset files from necessary directories
     app.use("/js", express.static(__dirname + "/public/js"));
     app.use("/imgs", express.static(__dirname + "/public/imgs"));
@@ -203,125 +180,175 @@ if (cluster.isMaster) {
     //         root: __dirname + "/public/"
     //     });
     // });
-    app.get('/partials/:name', function(req, res) {
+
+    app.get('/partials/:name', function (req, res) {
         // console.log("/partials-----",req);
         res.sendFile(__dirname + "/public/partials/" + req.params.name); //To render partials
     });
 
-    app.get('/', function(req, res) {
-            res.clearCookie('connect.sid');
-            req.session.destroy();
+    app.get('/',  function (req,  res)  {
 
-            res.sendFile("index.html", {
-                root: __dirname + "/public/"
-            });
+        res.clearCookie('connect.sid');
+        req.session.destroy();
+        logger.rewriters.push(function (level, msg, meta) {
+            meta.username = null;
+            meta.userid = null;
+            return meta;
+        });
+        res.sendFile("index.html", {
+            root: __dirname + "/public/"
+        });
     });
 
-     app.get('/admin', function(req, res) {
-        if(!req.session.defaultRole || req.session.defaultRole != 'Admin'){
-            req.session.destroy(); res.status(401).send('<br><br>Your session has been expired.Please <a href="/">Login</a> Again');
-        }else{
-            if (req.cookies['connect.sid'] && req.cookies['connect.sid'] != undefined) { res.sendFile("index.html", { root: __dirname + "/public/" });} else {req.session.destroy(); res.status(401).send('<br><br>Your session has been expired.Please <a href="/">Login</a>Again');}
+    app.get('/admin',  function (req,  res)  {
+        if (!req.session.defaultRole || req.session.defaultRole != 'Admin') {
+            req.session.destroy();  res.status(401).send('<br><br>Your session has been expired.Please <a href="/">Login</a> Again');
+        } else {
+            if  (req.cookies['connect.sid']  &&  req.cookies['connect.sid']  !=  undefined)  {  res.sendFile("index.html",  {  root:  __dirname  +  "/public/"  }); }  else  { req.session.destroy();  res.status(401).send('<br><br>Your session has been expired.Please <a href="/">Login</a>Again'); }
         }
     });
 
     //Only Test Engineer and Test Lead have access
-    app.get(/^\/(design|designTestCase|execute|scheduling)$/, function(req, res){
+    app.get(/^\/(design|designTestCase|execute|scheduling)$/, function (req, res) {
         //Denied roles
         roles = ["Admin", "Business Analyst", "Tech Lead", "Test Manager"];
         sessionCheck(req, res, roles);
     });
 
     //Test Engineer,Test Lead and Test Manager can access
-    app.get(/^\/(specificreports|home|p_Utility|p_Reports|plugin)$/, function(req, res){
+    app.get(/^\/(specificreports|home|p_Utility|p_Reports|plugin)$/, function (req, res) {
         //Denied roles
         roles = ["Admin", "Business Analyst", "Tech Lead"];
         sessionCheck(req, res, roles);
     });
 
     //Test Lead and Test Manager can access Weboccular Plugin
-    app.get(/^\/(p_Weboccular|neuronGraphs2D|p_ALM|p_Dashboard)$/, function(req, res){
+    app.get(/^\/(p_Weboccular|neuronGraphs2D|p_ALM|p_Dashboard)$/, function (req, res) {
         //Denied roles
-        roles=  ["Admin", "Business Analyst", "Tech Lead", "Test Engineer"];
+        roles = ["Admin", "Business Analyst", "Tech Lead", "Test Engineer"];
         sessionCheck(req, res, roles);
     });
 
     function sessionCheck(req, res, roles) {
-        console.log("session check ", req.url);
-      if (!req.session.defaultRole || roles.indexOf(req.session.defaultRole) >=0)
-        {
-            req.session.destroy(); res.status(401).send('<br><br>Your session has been expired.Please <a href="/">Login</a> Again');
-        }else{
+        logger.info("Inside sessioncheck for URL : %s", req.url);
+        // logger.info("User " + req.session.username + " authenticated");
+        // if(req.session.username != undefined && req.session.userid != undefined)
+        // {
+        //         logger.rewriters.push(function(level, msg, meta) {
+        // 		meta.username =  req.session.username;
+        // 		meta.userid =  req.session.userid;
+        // 		return meta;
+        // 		});
+        // }
+        logger.rewriters.push(function (level, msg, meta) {
+            if (req.session != undefined && req.session.userid != undefined) {
+                meta.username = req.session.username;
+                meta.userid = req.session.userid;
+                return meta;
+            }
+            else {
+                meta.username = null;
+                meta.userid = null;
+                return meta;
+            }
+        });
+
+        if (req.session.switchedRole != true) {
+            if (!req.session.defaultRole || roles.indexOf(req.session.defaultRole) >= 0) {
+                req.session.destroy();  res.status(401).send('<br><br>Your session has been expired.Please <a href="/">Login</a> Again');
+            } else {
+                if (req.cookies['connect.sid'] && req.cookies['connect.sid'] != undefined) {
+
+                    res.sendFile("index.html", { root: __dirname + "/public/" });
+                } else {
+                    req.session.destroy();
+                    res.status(401).send('<br><br>Your session has been expired. Please <a href="/">Login</a> Again');
+                }
+            }
+        }
+        else {
             if (req.cookies['connect.sid'] && req.cookies['connect.sid'] != undefined) {
 
-                 res.sendFile("index.html", { root: __dirname + "/public/" });
-                } else {
-                     req.session.destroy();
-                      res.status(401).send('<br><br>Your session has been expired. Please <a href="/">Login</a> Again');
-                    }
+                res.sendFile("index.html", { root: __dirname + "/public/" });
+            } else {
+                req.session.destroy();
+                res.status(401).send('<br><br>Your session has been expired. Please <a href="/">Login</a> Again');
+            }
         }
+
     }
-    app.get('/favicon.ico', function(req, res){
-        if (req.cookies['connect.sid'] && req.cookies['connect.sid'] != undefined) { res.sendFile("index.html", { root: __dirname + "/public/" });} else {req.session.destroy(); res.status(401).send('<br><br>Your session has been expired. Please <a href="/">Login</a> Again');}
+    app.get('/favicon.ico', function (req, res) {
+        if (req.cookies['connect.sid'] && req.cookies['connect.sid'] != undefined) { res.sendFile("index.html", { root: __dirname + "/public/" }); } else { req.session.destroy(); res.status(401).send('<br><br>Your session has been expired. Please <a href="/">Login</a> Again'); }
     });
 
-    app.get('/css/fonts/Lato/Lato-Regular.ttf', function(req, res){
-        if (req.cookies['connect.sid'] && req.cookies['connect.sid'] != undefined) { res.sendFile("index.html", { root: __dirname + "/public/" });} else {req.session.destroy(); res.status(401).send('<br><br>Your session has been expired. Please <a href="/">Login</a> Again');}
+    app.get('/css/fonts/Lato/Lato-Regular.ttf', function (req, res) {
+        if (req.cookies['connect.sid'] && req.cookies['connect.sid'] != undefined) { res.sendFile("index.html", { root: __dirname + "/public/" }); } else { req.session.destroy(); res.status(401).send('<br><br>Your session has been expired. Please <a href="/">Login</a> Again'); }
     });
 
-    app.post('/designTestCase', function(req, res) {
+    app.post('/designTestCase', function (req, res) {
         // console.log("*--------",req);
         res.sendFile("index.html", {
             root: __dirname + "/public/"
         });
     });
 
+    // express-winston errorLogger makes sense AFTER the router.
+    // app.use(expressWinston.errorLogger({
+    //   transports: [
+    //     new winston.transports.Console({
+    //       json: true,
+    //       colorize: true
+    //     })
+    //   ]
+    // }));
+    //  // Optionally you can include your custom error handler after the logging.
+    // app.use(express.errorLogger({
+    //   dumpExceptions: true,
+    //   showStack: true
+    // }));
 
     var Client = require("node-rest-client").Client;
     var apiclient = new Client();
     //Starting jsreport server
-    if(os.type()=='Windows_NT') {
-        try{
-            var tmp=os.tmpdir();
-            fs.unlinkSync(tmp+'\\jsreport-temp\\extensions\\locations.json');
-            fs.unlinkSync(tmp+'\\jsreport-temp\\licensing\\cache.json');
-        } catch(e){}
+    if (os.type() == 'Windows_NT') {
+        try {
+            var tmp = os.tmpdir();
+            fs.unlinkSync(tmp + '\\jsreport-temp\\extensions\\locations.json');
+            fs.unlinkSync(tmp + '\\jsreport-temp\\licensing\\cache.json');
+        } catch (e) { }
     }
-    cmd.get('netstat -ano | find "LISTENING" | find "8001"', function(data, err, stderr){
-      if(data){
-          //console.log('killing JS report server and restarting');
-        //console.log('===== Process ID of jsreport =====',data);
-        var thisResult = data.split("\r\n")[0].split(" ")[data.split("\r\n")[0].split(" ").length-1];
-        var cmdtoexe = "Taskkill /PID "+thisResult+" /F";
-        cmd.get(cmdtoexe, function(data, err, stderr){
-          if(data){
-            //console.log('===== Killed jsreport server =====',data);
-            cmd.get('node index.js', function(data, err, stderr){
-              if (!err) {
-                console.log('the node-cmd:',data);
-              } else {
-                console.log("Cannot start Jsreport server");
-              }
+    cmd.get('netstat -ano | find "LISTENING" | find "8001"', function (data, err, stderr) {
+        if (data) {
+            //console.log('killing JS report server and restarting');
+            //console.log('===== Process ID of jsreport =====',data);
+            var thisResult = data.split("\r\n")[0].split(" ")[data.split("\r\n")[0].split(" ").length - 1];
+            var cmdtoexe = "Taskkill /PID " + thisResult + " /F";
+            cmd.get(cmdtoexe, function (data, err, stderr) {
+                if (data) {
+                    //console.log('===== Killed jsreport server =====',data);
+                    cmd.get('node index.js', function (data, err, stderr) {
+                        if (!err) {
+                            logger.debug('the node-cmd: %s', data);
+                        } else {
+                            logger.error("Cannot start Jsreport server");
+                        }
+                    });
+                }
+                else {
+                    logger.error("Cannot kill jsreport server");
+                }
             });
-          }
-          else{
-            console.log("Cannot kill jsreport report");
-          }
-        });
-      }
-      else{
-        cmd.get('node index.js', function(data, err, stderr){
-          if (!err) {
-              console.log('JS report server started normally');
-          } else {
-            console.log("Cannot start Jsreport server");
-          }
-        });
-      }
+        }
+        else {
+            cmd.get('node index.js', function (data, err, stderr) {
+                if (!err) {
+                    logger.info('JS report server started normally');
+                } else {
+                    logger.error("Cannot start Jsreport server");
+                }
+            });
+        }
     });
-
-    var uiConfig = require('./server/config/options');
-    var screenShotPath=uiConfig.storageConfig.screenShotPath;
 
     //Route Directories
     //var neo4jAPI = require('./server/controllers/neo4jAPI');
@@ -338,14 +365,13 @@ if (cluster.isMaster) {
     var chatbot = require('./server/controllers/chatbot');
     var neuronGraphs2D = require('./server/controllers/neuronGraphs2D');
     var dashboard = require('./server/controllers/dashboard');
-    var taskbuilder=require('./server/controllers/taskJson');
+    var taskbuilder = require('./server/controllers/taskJson');
 
     // Mindmap Routes
-    // Mindmap Routes
-    try{
+    try {
         var version = require('./server/controllers/project_versioning');
         app.post('/version', version.versioning);
-    }catch(Ex){
+    } catch (Ex) {
         console.log('Not found');
     }
 
@@ -372,7 +398,7 @@ if (cluster.isMaster) {
     app.post('/getDetails_ICE', admin.getDetails_ICE);
     app.post('/assignProjects_ICE', admin.assignProjects_ICE);
     app.post('/getAssignedProjects_ICE', admin.getAssignedProjects_ICE);
-	app.post('/getAvailablePlugins', admin.getAvailablePlugins);
+    app.post('/getAvailablePlugins', admin.getAvailablePlugins);
     //Design Screen Routes
     app.post('/initScraping_ICE', design.initScraping_ICE);
     app.post('/highlightScrapElement_ICE', design.highlightScrapElement_ICE);
@@ -406,7 +432,6 @@ if (cluster.isMaster) {
     app.post('/exportToJson_ICE', report.exportToJson_ICE);
     app.post('/openScreenShot', report.openScreenShot);
     app.post('/connectJira_ICE', report.connectJira_ICE);
-
     //Plugin Routes
     app.post('/getProjectIDs_Nineteen68', plugin.getProjectIDs_Nineteen68);
     app.post('/getTaskJson_mindmaps', taskbuilder.getTaskJson_mindmaps);
@@ -415,7 +440,6 @@ if (cluster.isMaster) {
     app.post('/Encrypt_ICE', utility.Encrypt_ICE);
     // Wecoccular Plugin
     app.post('/crawResults', webCrawler.getCrawlResults);
-
     //Chatbot Routes
     app.post('/getTopMatches_ProfJ', chatbot.getTopMatches_ProfJ);
     app.post('/updateFrequency_ProfJ', chatbot.updateFrequency_ProfJ);
@@ -424,7 +448,6 @@ if (cluster.isMaster) {
     app.post('/getGraph_nGraphs2D', neuronGraphs2D.getGraphData);
     app.post('/getPackData_nGraphs2D', neuronGraphs2D.getPackData);
     app.post('/getReportData_nGraphs2D', neuronGraphs2D.getReportData);
-
     //QC Plugin
     app.post('/loginQCServer_ICE', qc.loginQCServer_ICE);
     app.post('/qcProjectDetails_ICE', qc.qcProjectDetails_ICE);
@@ -437,42 +460,39 @@ if (cluster.isMaster) {
     app.post('/loadDashboard_2', dashboard.loadDashboard_2);
     //app.post('/manualTestcaseDetails_ICE', qc.manualTestcaseDetails_ICE);
 
-
     //-------------SERVER START------------//
-    //server.listen(3000);      //Http Server
     var hostFamilyType = '0.0.0.0';
-    var portNumber=8443;
+    var portNumber = 8443;
     httpsServer.listen(portNumber, hostFamilyType); //Https Server
-    try{
-        var apireq = apiclient.get("http://127.0.0.1:1990/",function(data,response){
-            try{
-                if(response.statusCode != 200){
+    try {
+        var apireq = apiclient.get("http://127.0.0.1:1990/", function (data, response) {
+            try {
+                if (response.statusCode != 200) {
                     httpsServer.close();
-                    console.log("Please run the Service API and Restart the Server");
-                }else{
+                    logger.error("Please run the Service API and Restart the Server");
+                } else {
                     suite.reScheduleTestsuite();
-                    console.log("Nineteen68 Server Ready...");
+                    logger.info("Nineteen68 Server Ready...");
                 }
-            }catch(exception){
+            } catch (exception) {
                 httpsServer.close();
-                console.log("Please run the Service API and Restart the Server");
+                logger.error("Please run the Service API and Restart the Server");
             }
         });
         apireq.on('error', function (err) {
             httpsServer.close();
-            console.log("Please run the Service API and Restart the Server");
+            logger.error("Please run the Service API and Restart the Server");
         });
-    }catch(exception){
+    } catch (exception) {
         httpsServer.close();
-        console.log("Please run the Service API");
+        logger.error("Please run the Service API");
     }
-    // httpsServer.listen(8443); //Https Server
 
     //To prevent can't send header response
-    app.use(function(req, res, next) {
+    app.use(function (req, res, next) {
         var _send = res.send;
         var sent = false;
-        res.send = function(data) {
+        res.send = function (data) {
             if (sent) return;
             _send.bind(res)(data);
             sent = true;
@@ -480,188 +500,11 @@ if (cluster.isMaster) {
         next();
     });
 
-  //SOCKET CONNECTION USING SOCKET.IO
-    var allClients = [];
-    var socketMap = {};
-    var socketMapUI = {};
-    var sokcetMapScheduling={};
-    var socketMapNotify = {};
-    var isUISocketRequest = false;
-
-        io.on('connection', function(socket) {
-        // console.log("-------------------------------------------------------------------------------------------------------");
-        var ip = socket.request.connection.remoteAddress || socket.request.headers['x-forwarded-for'];
-        console.log("Normal Mode Enabled for  IP :",ip);
-        var address=socket.handshake.query['username'];
-		var icesession=socket.handshake.query['icesession'];
-        console.log("socket connecting address" , address);
-        console.log('Param ',socket.handshake.query['username']);
-        //console.log("middleware:", socket.request._query['check']);
-
-        if (socket.request._query['check'] == "true" ) {
-        //  if ( !(address in socketMapUI) ) {
-            isUISocketRequest = true;
-            console.log("socket request from UI");
-            address=socket.request._query['username'];
-            socketMapUI[address] = socket;
-        }
-        else if(socket.request._query['check'] == "notify" ){
-                 address=socket.request._query['username'];
-                 socketMapNotify[address] = socket;
-
-                 //Broadcast Message
-                 var broadcastTo = ['/admin','/plugin','/design','/designTestCase','/execute','/scheduling','/specificreports','/home','/p_Utility','/p_Reports','p_Weboccular','/neuronGraphs2D','/p_ALM'];
-                 notificationMsg.to = broadcastTo;
-                 notificationMsg.notifyMsg = 'Server Maintenance Scheduled';
-                 var soc = socketMapNotify[address];
-                // soc.emit("notify",notificationMsg);
-        }
-        else{
-          isUISocketRequest = false;
-          var inputs = {
-			"icesession": icesession,
-			"query":'connect'
-		  };
-		  var args = {
-			data: inputs,
-			headers: {
-				"Content-Type": "application/json"
-			}
-		  };
-		  apiclient.post("http://127.0.0.1:1990/server/updateActiveIceSessions", args,
-			function (result, response) {
-				if (response.statusCode != 200) {
-					console.log("Error in connecting ndac")
-				}
-				else{
-					socket.send('checkConnection',result['ice_check']);
-					if(result['node_check']){
-						if (!(address in socketMap)) {
-							socketMap[address] = socket;
-							socket.send('connected');
-							socket.emit('update_screenshot_path',screenShotPath);
-						}
-						else{
-							socket.send('connectionExists');
-						}
-					}
-				}
-		  });
-        }
-        module.exports.allSocketsMap = socketMap;
-        module.exports.allSocketsMapUI = socketMapUI;
-        module.exports.allSchedulingSocketsMap=sokcetMapScheduling;
-        module.exports.socketMapNotify = socketMapNotify; 
-        httpsServer.setTimeout();
-
-        // socket.on('message', function(data) {
-        //     console.log("SER", data);
-        // });
-        // if (!isUISocketRequest) {
-        // var socketFlag = false;
-        //   if (allSockets.length > 0) {
-        //       for (var socketIndexes = 0; socketIndexes < allSockets.length; socketIndexes++) {
-        //           if (allSockets[socketIndexes].handshake.query['username'].indexOf(socket.handshake.query['username']) != -1) {
-        //               socketFlag = true;
-        //           }
-        //       }
-        //   } else {
-        //       allSockets.push(socket);
-        //       allClients.push(socket.conn.id);
-        //       socketFlag = true;
-        //   }
-        //   if (socketFlag == false) {
-        //       allSockets.push(socket);
-        //       allClients.push(socket.conn.id)
-        //   }
-        // }
-        //module.exports.abc = allSockets;
-        socket.on('disconnect', function() {
-            var ip = socket.request.connection.remoteAddress || socket.request.headers['x-forwarded-for'];
-            console.log("disconnect IP:",ip);
-		if (socket.request._query['check'] == "true" ) {
-			//var address = socket.request.connection.remoteAddress || socket.request.headers['x-forwarded-for'];
-			var address=socket.handshake.query['username'];
-			console.log("\n\n Disconnecting ... from UI socket " , address);
-		} else if(socket.request._query['check'] == "notify" ){
-			var address=socket.handshake.query['username'];
-			//logger.info("Disconnecting from Notification socket:" , address);  
-		} else{
-            //var i = socketMap.indexOf(socket);
-            var address=socket.handshake.query['username'];
-            if (socketMap[address] != undefined) {
-                console.log('Socket Connection got disconnected for :', address);
-                delete socketMap[address];
-                module.exports.allSocketsMap = socketMap;
-                //console.log("------------------------SOCKET DISCONNECTED----------------------------------------");
-                console.log("NO. OF CLIENTS CONNECTED:", Object.keys(socketMap).length,'\nIP\'s connected :',Object.keys(socketMap).join());
-            }
-            else if (sokcetMapScheduling[address] != undefined) {
-                console.log('Socket Connection got disconnected for :', address);
-                delete sokcetMapScheduling[address];
-                module.exports.allSchedulingSocketsMap = sokcetMapScheduling;
-                //console.log("------------------------SOCKET DISCONNECTED----------------------------------------");
-                console.log("NO. OF CLIENTS CONNECTED:", Object.keys(sokcetMapScheduling).length,'\nIP\'s connected :',Object.keys(sokcetMapScheduling).join());
-            }
-			var inputs = {
-				"username": address,
-				"query":'disconnect'
-			};
-			var args = {
-				data: inputs,
-				headers: {
-					"Content-Type": "application/json"
-				}
-			};
-			apiclient.post("http://127.0.0.1:1990/server/updateActiveIceSessions", args,
-				function (result, response) {
-					if (response.statusCode != 200 || result.rows == "fail") {
-						console.log("Error in NDAC: updateActiveIceSessions");
-					}
-			});
-          }
-        });
-
-        socket.on('reconnect', function(data) {
-           console.log("ReEstablish connection for Scheduling");
-           var ip = socket.request.connection.remoteAddress || socket.request.headers['x-forwarded-for'];
-           console.log("Scheduling Mode Enabled for  IP:",ip);
-           var address=socket.handshake.query['username'];
-           console.log(data);
-            if (data && socketMap[address] != undefined) {
-                console.log('Socket Connection got disconnected for Normal Mode :', address);
-                delete socketMap[address];
-                module.exports.allSocketsMap = socketMap;
-                console.log("NO. OF CLIENTS CONNECTED:", Object.keys(socketMap).length,'\nIP\'s connected :',Object.keys(socketMap).join());
-                sokcetMapScheduling[address] = socket;
-                socket.send('reconnected');
-                module.exports.allSchedulingSocketsMap = sokcetMapScheduling;
-                console.log("NO. OF CLIENTS CONNECTED For Scheduling:", Object.keys(sokcetMapScheduling).length,'\nIP\'s connected :',Object.keys(sokcetMapScheduling).join());
-            }else if(!data && sokcetMapScheduling!=undefined){
-                console.log('Socket Connection got disconnected for Scheduling mode:', address);
-                delete sokcetMapScheduling[address];
-                module.exports.allSchedulingSocketsMap = sokcetMapScheduling;
-                console.log("NO. OF CLIENTS CONNECTED For Scheduling:", Object.keys(sokcetMapScheduling).length,'\nIP\'s connected :',Object.keys(sokcetMapScheduling).join());
-                socketMap[address] = socket;
-                module.exports.allSocketsMap = socketMap;
-                socket.send('connected');
-            }
-
-        });
-
-        socket.on('connect_failed', function() {
-            console.log("Sorry, there seems to be an issue with the connection!");
-        });
-        console.log("NO. OF CLIENTS CONNECTED:", Object.keys(socketMap).length,'\nIP\'s connected :',Object.keys(socketMap).join());
-
-    });
-    //SOCKET CONNECTION USING SOCKET.IO
-
-    // console.log("module.exports.allSocketsMap=-------------------------\n", module.exports.allSocketsMap);
-  } catch (e) {
-    console.log(e);
-    setTimeout(function(){
-      cluster.worker.kill();
+    module.exports = app;
+} catch (e) {
+    logger.error(e);
+    setTimeout(function () {
+        cluster.worker.kill();
     }, 200)
-  }
+}
 }

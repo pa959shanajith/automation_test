@@ -1,4 +1,5 @@
 var fs = require('fs'),
+    logger = require('../../logger'),
 configPath = __dirname + '/config.json'
 var parsed,screenShotPath,scrShot_path_exists;
 try{
@@ -6,12 +7,12 @@ try{
 	screenShotPath=parsed.screenShotPath;
 	scrShot_path_exists=fs.existsSync(screenShotPath);
 } catch(e){
-	console.error('\nPlease provide valid values in config.json file\n');
+	logger.error('Please provide valid values in config.json file');
 	throw e;
 }
 if(!scrShot_path_exists){
 	//throw ("\nScreenshot path \""+screenShotPath+"\" does not exists or server machine doesn't have sufficient permissions\n");
-	console.log("\nScreenshot path \""+screenShotPath+"\" does not exists or server machine doesn't have sufficient permissions\n");
+	logger.warn("Screenshot path \""+screenShotPath+"\" does not exists or server machine doesn't have sufficient permissions");
 }
 
 exports.storageConfig =  parsed;

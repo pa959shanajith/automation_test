@@ -2,10 +2,11 @@ var uuidV4 = require('uuid/v4');
 var neo4jAPI = require('../controllers/neo4jAPI');
 var admin = require('../controllers/admin');
 var create_ice=require('../controllers/create_ice');
-var myserver = require('../../server.js');
+var myserver = require('../lib/socket.js');
 var notificationMsg = require("../notifications/notifyMessages");
-
+var logger = require('../../logger');
 exports.mindmapService = function(req, res) {
+	logger.info("Inside UI service: mindmapService");
 	if(req.cookies['connect.sid'] != undefined)
 	{
 		var sessionCookie = req.cookies['connect.sid'].split(".");
@@ -77,7 +78,8 @@ exports.mindmapService = function(req, res) {
 										nData.push({id:n.id_n,oid:n.id,task:n.t,batchName:n.bn,assignedTo:n.at,reviewer:n.rw,startDate:n.sd,endDate:n.ed,re_estimation:n.re_estimation,release:n.re,cycle:n.cy,details:n.det,nodeID:n.pid,parent:n.anc.slice(1,-1).split(',')});
 									}
 									catch (ex){
-										console.log(n.id);
+					
+										logger.error("exception in mindmapService: ",ex);
 									}
 								}
 								else{
@@ -101,7 +103,8 @@ exports.mindmapService = function(req, res) {
 									}
 								}
 							}catch (ex){
-								console.log(ex);
+
+								logger.error("exception in mindmapService: ",ex);
 							}
 						});
 					});
@@ -307,7 +310,7 @@ exports.mindmapService = function(req, res) {
 				 var soc = myserver.socketMapNotify[d.data.sendNotify];
 				 var assignedTasksNotification = {};
 				 	assignedTasksNotification.to = '/plugin';
-					assignedTasksNotification.notifyMsg = newtasks+" New tasks have been assigned!";
+					assignedTasksNotification.notifyMsg = " New tasks have been assigned!";
 					assignedTasksNotification.isRead = false;
 					soc.emit("notify",assignedTasksNotification);
 			}
@@ -380,7 +383,7 @@ exports.mindmapService = function(req, res) {
 						}
 					}
  					else if(e.type=='scenarios'){
-						if(e.renamed && e.id_n) rnmList.push({"statement":"MATCH(n:TESTSCENARIOS{testScenarioID:'"+e.id+"'}) SET n.testScenarioName='"+e.name+"'"+",n.projectID='"+prjId+"'"});
+						if(e.renamed && e.id_n) rnmList.push({"statement":"MATCH(n:TESTSCENARIOS{testScenarioID:'"+e.id+"',n.projectID:'"+prjId+"'}) SET n.testScenarioName='"+e.name+"'"});
 						qList.push({"statement":"MERGE(n:TESTSCENARIOS{projectID:'"+prjId+"',moduleID:'"+idDict[e.pid]+"',testScenarioName:'"+e.name+"',testScenarioID:'"+e.id+"',createdBy:'"+user+"',createdOn:'null',testScenarioID_c:'"+e.id_c+"'}) SET n.childIndex='"+e.childIndex+"'"});
 						//Supporting task assignmnet for scenarios
 						if(t!=null && e.id_c!=null){
@@ -400,7 +403,7 @@ exports.mindmapService = function(req, res) {
 					}
 					else if(e.type=='screens'){
 						uidx++;lts=idDict[e.pid];
-						if(e.renamed && e.id_n && e.orig_name) rnmList.push({"statement":"MATCH(n:SCREENS{screenName:'"+e.orig_name+"'}) SET n.screenName='"+e.name+"'"+",n.projectID='"+prjId+"'"});
+						if(e.renamed && e.id_n && e.orig_name) rnmList.push({"statement":"MATCH(n:SCREENS{screenName:'"+e.orig_name+"',n.projectID:'"+prjId+"'}) SET n.screenName='"+e.name+"'"});
 						//qList.push({"statement":"MATCH(n:SCREENS{screenID:'"+e.id+"'}) SET n.screenName='"+e.name+"'"+",n.projectID='"+prjId+"'"});
 						qList.push({"statement":"MERGE(n:SCREENS{projectID:'"+prjId+"',testScenarioID:'"+idDict[e.pid]+"',screenName:'"+e.name+"',screenID:'"+e.id+"',createdBy:'"+user+"',createdOn:'null',uid:'"+uidx+"',screenID_c:'"+e.id_c+"'})SET n.childIndex='"+e.childIndex+"'"});
 						if(t!=null && e.id_c!=null){
@@ -755,7 +758,7 @@ exports.mindmapService = function(req, res) {
 								res.status(200).send('fail');
 							}
 						}catch(ex){
-							console.log(ex);
+							logger.error("exception in mindmapService: ",ex);
 							res.status(200).send('fail');
 						}
 					}
@@ -777,7 +780,7 @@ exports.mindmapService = function(req, res) {
 						});
 						res.status(200).send(scenarioList);
 					}catch(ex){
-						console.log(ex);
+						logger.error("exception in mindmapService: ",ex);
 						res.status(200).send('fail');
 					}
 				}
@@ -792,6 +795,7 @@ else{
 
 
 var update_cassandraID = function(d,urlData,module_type) {
+	logger.info("Inside function: update_cassandraID ");
 	var data = d;
 	var qList_new=[];
 	var result="";
@@ -855,7 +859,7 @@ var update_cassandraID = function(d,urlData,module_type) {
 			});
 		});
 	}catch(ex){
-		console.log(ex);
+		logger.error('exception in update_cassandraID',ex);
 	}
 
 updateJson.push(cassandraId_dict);

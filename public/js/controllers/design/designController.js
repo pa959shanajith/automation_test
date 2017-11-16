@@ -206,9 +206,15 @@ console.log("screenName:", screenName);
 	$scope.submitTasksScreen = function(action){
 		$("#submitTasksScreen").modal("show")
 		if(action=='reassign'){
+            $("#submitTasksScreen").find('.modal-title').text('Reassign Task');
 			$("#submitTasksScreen").find('.modal-body p').text('Are you sure you want to reassign the task ?')
 			$("#submitTasksScreen").find('.modal-footer button')[0].setAttribute('onclick',"submit_task('reassign')")
-		}
+        }
+        if(action == 'submit'  &&  $(".submitTaskBtn:visible").text() == 'Approve' )
+        {
+            $("#submitTasksScreen").find('.modal-title').text('Approve Task');
+            $("#submitTasksScreen").find('.modal-body p').text('Are you sure you want to approve the task ?')
+        }
         // else{
         //     $("#submitTasksScreen").find('.modal-footer button')[0].setAttribute('onclick',"submit_task('"+action+"')")
         // }
@@ -221,9 +227,15 @@ console.log("screenName:", screenName);
 		
 		$("#submitTasksTestCase").modal("show")
 		if(action=='reassign'){
+            $("#submitTasksTestCase").find('.modal-title').text('Reassign Task');
 			$("#submitTasksTestCase").find('.modal-body p').text('Are you sure you want to reassign the task ?')
 			$("#submitTasksTestCase").find('.modal-footer button')[0].setAttribute('onclick',"submit_task('reassign')")
-		}
+        }
+        if(action == 'submit' &&  $(".submitTaskBtn:visible").text() == 'Approve')
+        {
+            $("#submitTasksTestCase").find('.modal-title').text('Approve Task');
+            $("#submitTasksTestCase").find('.modal-body p').text('Are you sure you want to approve the task ?')
+        }
         // else{
         //     $("#submitTasksTestCase").find('.modal-footer button')[0].setAttribute('onclick',"submit_task('"+action+"')")
         // }
@@ -2088,7 +2100,7 @@ console.log("screenName:", screenName);
             var d = $("<div></div>", {
                 "class": "hightlight"
             });
-            var getTopValue;
+            var getTopValue, getTopValueios;
 
             var screen_width = document.getElementById('screenshot').height;
             var real_width = document.getElementById('screenshot').naturalHeight;
@@ -2103,7 +2115,8 @@ console.log("screenName:", screenName);
                     d.css('width', (rect.w / 3) + 'px');
                 } else if (navigator.appVersion.indexOf("Mac") != -1) {
                     d.css('left', rect.x + 'px');
-                    d.css('top', rect.y + 'px');
+                    if(rect.y > 450) d.css('top', (rect.y - 12) + 'px');
+                    else d.css('top', rect.y + 'px');
                     d.css('height', rect.h + 'px');
                     d.css('width', rect.w + 'px');
                 }
@@ -2144,9 +2157,11 @@ console.log("screenName:", screenName);
             d.css('background-color', 'yellow');
             d.css('z-index', '3');
             d.css('opacity', '0.7');
-            getTopValue = Math.round(rect.y) * scale_highlight + 'px'
+            getTopValue = Math.round(rect.y) * scale_highlight + 'px';
+            getTopValueios = Math.round(rect.y) * scale_highlight +100+ 'px'
             if (appType == "MobileApp")
-                $(".scroll-wrapper > .scrollbar-screenshot").animate({scrollTop: parseInt(Math.round(rect.y) - 600) + 'px'}, 500);
+                if(navigator.appVersion.indexOf("Mac") != -1) $(".scroll-wrapper > .scrollbar-screenshot").animate({scrollTop: parseInt(getTopValueios)}, 500);
+                else $(".scroll-wrapper > .scrollbar-screenshot").animate({scrollTop: parseInt(Math.round(rect.y) - 600) + 'px'}, 500);
             else
                 $(".scroll-wrapper > .scrollbar-screenshot").animate({scrollTop: parseInt(getTopValue)}, 500);
             //$('.scroll-wrapper > .scrollbar-screenshot').scrollTo(d.offset().top);
@@ -5595,4 +5610,3 @@ function openDialog(title, body) {
         $("#globalModal").find('.btn-default').focus();
     }, 300);
 }
-//XML Beatuifier
