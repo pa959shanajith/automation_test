@@ -778,11 +778,12 @@ exports.getRoleNameByRoleId_Nineteen68 = function (req, res) {
 		}
 		if (sessionToken != undefined && req.session.id == sessionToken) {
 			var roleId = [];
-			roleId.push(req.session.defaultRoleId);
+			req.session.role = [];
+			req.session.role = req.body.role;
 			var role = [];
 			//var role = roleId[0];
 			var flag = "";
-			async.forEachSeries(roleId, function (roleid, callback) {
+			async.forEachSeries(req.session.role, function (roleid, callback) {
 				var inputs = {
 					"roleid": roleid
 				};
