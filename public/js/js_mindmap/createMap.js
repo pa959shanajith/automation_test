@@ -665,6 +665,7 @@ function nodeClick(e){
 				$('#ct-executeBatch').removeAttr("disabled");
 			}else{
 				$('#ct-executeBatch').attr('disabled','true');
+				$('#ct-executeBatch').val('');
 			}
 	})
 

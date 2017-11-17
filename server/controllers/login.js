@@ -35,23 +35,7 @@ exports.authenticateUser_Nineteen68 = function (req, res) {
 			}
 		}
 		if (valid_username == true && valid_password == true) {
-			var maxTime = 0;
-			for (var key in req.sessionStore.sessions) {
-				var sessionStore = req.sessionStore.sessions[key];
-				if (sessionStore) {
-					var obj = JSON.parse(sessionStore);
-					if (username == obj.username) {
-						var dateEx = new Date(obj.cookie.expires);
-						if (dateEx.getTime() > maxTime) {
-							maxTime = dateEx.getTime();
-						}
-					}
-				}
-			}
-			var dateNow = new Date();
-			if (dateNow.getTime() < maxTime) {
-				return res.send("userLogged");
-			}
+			
 			req.session.username = username;
 			req.session.uniqueId = sessId;
 			var flag = 'inValidCredential';
@@ -91,6 +75,7 @@ exports.authenticateUser_Nineteen68 = function (req, res) {
 							logger.error("Error occured in authenticateUser_Nineteen68 Error Code : ERRNDAC");
 							res.send("fail");
 						} else {
+
 							try {
 								if (result.rows.length == 0) {
 									res.send(flag);
@@ -99,6 +84,28 @@ exports.authenticateUser_Nineteen68 = function (req, res) {
 										dbHashedPassword = result.rows[i].password;
 									}
 									validUser = bcrypt.compareSync(password, dbHashedPassword); // true
+
+									//Check for concurrent login
+									if(validUser == true)
+									{
+										var maxTime = 0;
+										for (var key in req.sessionStore.sessions) {
+											var sessionStore = req.sessionStore.sessions[key];
+											if (sessionStore) {
+												var obj = JSON.parse(sessionStore);
+												if (username == obj.username) {
+													var dateEx = new Date(obj.cookie.expires);
+													if (dateEx.getTime() > maxTime) {
+														maxTime = dateEx.getTime();
+													}
+												}
+											}
+										}
+										var dateNow = new Date();
+										if (dateNow.getTime() < maxTime) {
+											return res.send("userLogged");
+										}
+									}
 									
 									//Check whether projects are assigned for a user
 									checkAssignedProjects(req, function (err, assignedProjectsData, role) {
@@ -771,11 +778,12 @@ exports.getRoleNameByRoleId_Nineteen68 = function (req, res) {
 		}
 		if (sessionToken != undefined && req.session.id == sessionToken) {
 			var roleId = [];
-			roleId.push(req.session.defaultRoleId);
+			req.session.role = [];
+			req.session.role = req.body.role;
 			var role = [];
 			//var role = roleId[0];
 			var flag = "";
-			async.forEachSeries(roleId, function (roleid, callback) {
+			async.forEachSeries(req.session.role, function (roleid, callback) {
 				var inputs = {
 					"roleid": roleid
 				};
