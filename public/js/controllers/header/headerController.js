@@ -104,15 +104,18 @@ mySPA.controller('headerController', function ($scope, $rootScope, $http, $locat
 	});
 
 	function unreadNotifications() {
-		var notifications = JSON.parse(window.localStorage.notification);
-		var unreadNotifications = notifications.filter(a => a.isRead == false);
-		var notificationCount = unreadNotifications.length;
-		if (notificationCount < 1 || notificationCount == '' || notificationCount == undefined) {
-			$("#notifications-count").hide();
-		}
-		else {
-			$("#notifications-count").show();
-			$("#notifications-count").text(notificationCount);
+		if(window.localStorage.notification)
+		{
+			var notifications = JSON.parse(window.localStorage.notification);
+			var unreadNotifications = notifications.filter(a => a.isRead == false);
+			var notificationCount = unreadNotifications.length;
+			if (notificationCount < 1 || notificationCount == '' || notificationCount == undefined) {
+				$("#notifications-count").hide();
+			}
+			else {
+				$("#notifications-count").show();
+				$("#notifications-count").text(notificationCount);
+			}
 		}
 	}
 	setTimeout(function () {
