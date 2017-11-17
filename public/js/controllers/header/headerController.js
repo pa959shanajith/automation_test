@@ -116,14 +116,12 @@ function unreadNotifications()
 	var notifications = JSON.parse(window.localStorage.notification);
 	var unreadNotifications = notifications.filter(a=>a.isRead==false);
 	var notificationCount = unreadNotifications.length;
-	console.log("notificCount", notificationCount);
 	if(notificationCount < 1 || notificationCount == '' || notificationCount == undefined)
 	{
 		$("#notifications-count").hide();
 	}
 	else{
 		$("#notifications-count").show();
-		console.log("count",notificationCount );
 		$("#notifications-count").text(notificationCount);
 	}
 }
