@@ -1,6 +1,6 @@
 mySPA.controller('neuronGraphs2DController', ['$scope', '$http', '$location', '$timeout', 'neuronGraphs2DService','ExecutionService','reportService' , 'cfpLoadingBar','$window', function($scope,$http,$location,$timeout,neuronGraphs2DService,ExecutionService,reportService,cfpLoadingBar,$window) {
     $("head").append('<link id="nGraphsCSS" rel="stylesheet" type="text/css" href="css/nGraphs.css" />')
-	if(window.localStorage['navigateScreen'] != "neuronGraphs2D") window.location.href = "/";
+	if(window.localStorage['navigateScreen'] != "neuronGraphs2D") $rootScope.redirectPage();
 	var nodeColor={"Domain":"#355264","Project":"#A24178","Release":"#CD7D40","Cycle":"#A9B800","TestSuite":"#FF9899","TestScenario":"#E3CC4C","TestCase":"#7BD2C9","Screen":"#BDBEC0"};
 	var nodeTypes,rootIndex,mapN2DCoords,enabledFilters,visibleNodeNames;
 //nodeStatusdata,moduleid,scenarioids,exec_id,failed_tc_list
@@ -75,7 +75,7 @@ mySPA.controller('neuronGraphs2DController', ['$scope', '$http', '$location', '$
 		$scope.clearData();
 
 // 		neuronGraphs2DService.BuildRelationships().then(function(data){
-// 			if(data.err && data.ecode=="INVALID_SESSION") window.location.href = "/"; 
+// 			if(data.err && data.ecode=="INVALID_SESSION") $rootScope.redirectPage(); 
 // 			else if(data.err){
 // 				unblockUI();
 // 				blockUI(data.msg);
@@ -205,7 +205,7 @@ mySPA.controller('neuronGraphs2DController', ['$scope', '$http', '$location', '$
 			var userInfo =  JSON.parse(window.localStorage['_UI']);
 			var userid = userInfo.user_id;
 			neuronGraphs2DService.getGraphData(userid).then(function(data){
-				if(data.err && data.ecode=="INVALID_SESSION") window.location.href = "/"; 
+				if(data.err && data.ecode=="INVALID_SESSION") $rootScope.redirectPage(); 
 				else if(data.err){
 					unblockUI();
 					blockUI(data.msg);
@@ -1112,7 +1112,7 @@ function indexOfItem(array, item) {
 		ExecutionService.ExecuteTestSuite_ICE(globalobj['jsondata']).then(function(data) {
 		executeFlag = true;
 		if (data == "Invalid Session") {
-			window.location.href = "/";
+			$rootScope.redirectPage();
 		}
 		if (data == "Terminate") {
 			openDialog("Terminate","execution Terminated")
@@ -1150,7 +1150,7 @@ function indexOfItem(array, item) {
 
 	// var getReportData = function(moduleid,executionid,testscenarioids){
 	// 		neuronGraphs2DService.getReportData(moduleid,executionid,testscenarioids).then(function(data){
-	// 		if(data.err && data.ecode=="INVALID_SESSION") window.location.href = "/"; 
+	// 		if(data.err && data.ecode=="INVALID_SESSION") $rootScope.redirectPage(); 
 	// 		else if(data.err){
 	// 			unblockUI();
 	// 			blockUI(data.msg);
@@ -1254,7 +1254,7 @@ function indexOfItem(array, item) {
 	// 			console.log("@@@@moduleId:",d3.select(globalobj['lockedSuite']).datum().attributes.testSuiteid)
 	// 	reportService.getSuiteDetailsInExecution_ICE(d3.select(globalobj['lockedSuite']).datum().attributes.testSuiteid).then(function(data) {
 	// 			if (data == "Invalid Session") {
-	// 				window.location.href = "/";
+	// 				$rootScope.redirectPage();
 	// 			}
 	// 			if (data != "fail") {
 	// 				if (Object.prototype.toString.call(data) === '[object Array]') {
@@ -1300,7 +1300,7 @@ function indexOfItem(array, item) {
 		//console.log("@@@@moduleId:",d3.select(globalobj['lockedSuite']).datum().attributes.testSuiteid)
 		reportService.getSuiteDetailsInExecution_ICE(d3.select(globalobj['lockedSuite']).datum().attributes.testSuiteid).then(function(data) {
 				if (data == "Invalid Session") {
-					window.location.href = "/";
+					$rootScope.redirectPage();
 				}
 				if (data != "fail") {
 					if (Object.prototype.toString.call(data) === '[object Array]') {

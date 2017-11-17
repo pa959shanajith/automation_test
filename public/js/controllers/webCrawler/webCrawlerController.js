@@ -78,8 +78,10 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
     $scope.addDomainDot();
 
     setTimeout(function(){
-      var w = document.getElementById('domain').offsetWidth/2;
-      document.getElementById('domain').setAttribute("style", " display: block;  position:absolute; bottom: -40px; text-align:center;  left: calc(50% - "+w+"px)");
+      if (document.getElementById('domain')) {
+        var w = document.getElementById('domain').offsetWidth/2;
+        document.getElementById('domain').setAttribute("style", " display: block;  position:absolute; bottom: -40px; text-align:center;  left: calc(50% - "+w+"px)");      
+      }
     },100);
 
     // socket connection ....
@@ -97,8 +99,8 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
           $('#progress-canvas').hide();
           openDialog("Weboccular Screen", "ICE Engine is not available. Please run the batch file and connect to the Server.");
           return false;
-        }else{
-
+        }else if(data == "Invalid Session"){
+          $rootScope.redirectPage();
         }
       }, function(err){
         console.log("Error :", err)

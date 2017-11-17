@@ -1,29 +1,28 @@
-/**
- * 
- */
-var userDetails,userRole,task,switchedRoleId;
-var projectId = []
-var releaseId = [];
-var cycleId = [];
-var screenId = [];
-var selectedROleID;	
-var primaryRole = [];
-primaryRole = JSON.parse(window.localStorage['_UI']).role;
-var primaryRoleName = window.localStorage['_SR'];
-mySPA.controller('headerController', function($scope,$rootScope,$http,$location,headerServices,LoginService,cfpLoadingBar,socket) {
-	if(window.localStorage['_UI'])
-	{
+mySPA.controller('headerController', function($scope, $rootScope, $timeout, $http, $location, headerServices, LoginService, cfpLoadingBar, socket) {
+	var userDetails,userRole,task,switchedRoleId;
+	var projectId = []
+	var releaseId = [];
+	var cycleId = [];
+	var screenId = [];
+	var selectedROleID;
+
+	if(window.localStorage['_UI']){
 		userDetails = JSON.parse(window.localStorage['_UI']);
 	}
 	$scope.notifications = [];
-	if(window.localStorage.notification)
-	{
+	if(window.localStorage.notification){
 		$scope.notifications = JSON.parse(window.localStorage.notification);
 	}
-
-
-		
+	
 	userRole = window.localStorage['_SR'];
+
+	$scope.$on('$locationChangeStart', function(event, next, current){
+		// Prevent the browser default action (Going back):
+		if (localStorage["navigateScreen"] == $location.path()) {
+			event.preventDefault();
+		}
+	});
+
 	$("#displayUsername").text(userDetails.firstname + ' ' + userDetails.lastname)
 	$(".heading-center-light").text('Welcome  '+ userDetails.firstname + ' ' + userDetails.lastname +'!');
 	$(".userRole").text(userRole);
@@ -43,16 +42,14 @@ mySPA.controller('headerController', function($scope,$rootScope,$http,$location,
 		}, 300);
 	}
 
-	if($location.$$path == '/admin')
-	{
+	if($location.$$path == '/admin'){
 		$(".bell-icon-div").hide();
 	}
 
-	if($location.$$path == "/plugin" || $location.$$path == "/p_Weboccular" ||  $location.$$path == "/p_Dashboard")
-		{
-			$("button.notify-btn").addClass('notify-btn-white');
+	if($location.$$path == "/plugin" || $location.$$path == "/p_Weboccular" ||  $location.$$path == "/p_Dashboard"){
+		$("button.notify-btn").addClass('notify-btn-white');
+	}
 
-		}
 	$("#notifications-count").hide();
 
 		socket.on('notify', function(value){
@@ -122,30 +119,29 @@ mySPA.controller('headerController', function($scope,$rootScope,$http,$location,
 				 });
 			
 		});
-			 $(document).on("click", "#dropdownMenuButton", function(e){
-				if($(".notifyMsgDiv").length < 1)
-					{
-						$("#notifyBox").removeClass('dropdown-menu');
-					} 
-					else{
-						$("#notifyBox").removeClass('dropdown-menu').addClass('dropdown-menu');
-					}
-			 });
+		$(document).on("click", "#dropdownMenuButton", function(e){
+		if($(".notifyMsgDiv").length < 1)
+			{
+				$("#notifyBox").removeClass('dropdown-menu');
+			} 
+			else{
+				$("#notifyBox").removeClass('dropdown-menu').addClass('dropdown-menu');
+			}
+		});
 
 			 
 	
 	$(document).on("click", "#naviPg", function(e){
-		if(userRole == 'Admin')
-		{
+		if(userRole == 'Admin'){
 			//window.location.href = '/admin';
-		}
-		else{
+		}else{
 			window.localStorage["_VP"] = true;
 			window.localStorage['navigateScreen'] = "plugin";
 			//window.location.assign('plugin');
-			window.location.href = '/plugin';
+			$timeout(function () {
+				$location.path('/plugin');
+		   	}, 100);
 		}
-
 	});
 
 	var additionalRoleName;
@@ -189,8 +185,8 @@ mySPA.controller('headerController', function($scope,$rootScope,$http,$location,
 			.then(function (response) {
 
 				if(response == "Invalid Session"){
-								window.location.href = "/";
-								}
+					$rootScope.redirectPage();
+				}
 				var roleasarray=[];
 				//roleasarray.push(response.additionalrole);
 				roleasarray = response.additionalrole;
@@ -199,7 +195,7 @@ mySPA.controller('headerController', function($scope,$rootScope,$http,$location,
 									.then(function (data) {
 									
 				  if(response == "Invalid Session"){
-					window.location.href = "/";
+					$rootScope.redirectPage();
 				  }
 				  else if(data.length == 0){
 					  $("#switchRoles").hide();
@@ -304,8 +300,8 @@ mySPA.controller('headerController', function($scope,$rootScope,$http,$location,
 		headerServices.getNames_ICE(projectId,['projects']) 
 		.then(function(data){
 			if(data == "Invalid Session"){
-				  window.location.href = "/";
-				}
+				$rootScope.redirectPage();
+			}
 			$scope.projectDetails = data;
 			task = JSON.parse(window.localStorage['_CT']);
 
@@ -313,16 +309,16 @@ mySPA.controller('headerController', function($scope,$rootScope,$http,$location,
 			screenId.push(task.screenId);
 			headerServices.getNames_ICE(releaseId, ['releases']) 
 			.then(function(data){
-					if(data == "Invalid Session"){
-				  window.location.href = "/";
+				if(data == "Invalid Session"){
+				  $rootScope.redirectPage();
 				}
 				$scope.releaseDetails = data;
 				cycleId.push(task.cycleId);
 				headerServices.getNames_ICE(cycleId, ['cycles'])
 				.then(function(data){
-						if(data == "Invalid Session"){
-				  window.location.href = "/";
-				}
+					if(data == "Invalid Session"){
+				  		$rootScope.redirectPage();
+					}
 					console.log("cycleDetails", data);
 					$scope.cycleDetails = data;
 
@@ -331,25 +327,16 @@ mySPA.controller('headerController', function($scope,$rootScope,$http,$location,
 			headerServices.getNames_ICE(screenId,['screens']) 
 		.then(function(data){
 			if(data == "Invalid Session"){
-				  window.location.href = "/";
-				}
-					console.log("screenId", data);
-					$scope.screenName = data.respnames[0];
+				$rootScope.redirectPage();
+			}
+			console.log("screenId", data);
+			$scope.screenName = data.respnames[0];
 		}, 
 		function(error) {	console.log("Failed to fetch info")});
 		}, function(error) {	console.log("Failed to fetch projectInfo")});
 	}
-	$scope.logout = function() 
-	{
-		var UserName = JSON.parse(window.localStorage['_UI']).username;
-		//Logout User Service to be called
-		headerServices.logoutUser_Nineteen68(UserName) 
-		.then(function(data){
-			if(data == "Session Expired")
-			{
-				window.localStorage.clear();
-				window.location.href = '/';
-			}
-		}, function(error) {	console.log("Failed to Logout")});
+
+	$scope.logout = function(){
+		$rootScope.redirectPage();
 	}
 });

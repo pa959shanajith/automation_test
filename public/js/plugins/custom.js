@@ -13,8 +13,10 @@ setTimeout(function(){
 //To prevent Back Button in browser
 history.pushState(null, null, document.URL);
 window.addEventListener('popstate', function () {
-	history.pushState(null, null, document.URL);
+	var currentURL = document.URL.split("/")[0]+'/'+window.localStorage.navigateScreen;
+	history.pushState(null, null, currentURL);
 });
+
 function getCookie(cname) {
 	var name = cname + "=";
 	var ca = document.cookie.split(';');

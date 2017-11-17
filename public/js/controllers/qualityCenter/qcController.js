@@ -1,4 +1,4 @@
-mySPA.controller('qcController',['$scope','$window','$http','$location','$timeout','qcServices','cfpLoadingBar', function($scope,$window,$http,$location,$timeout,qcServices,cfpLoadingBar) {
+mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$location','$timeout','qcServices','cfpLoadingBar', function($scope, rootScope, $window,$http,$location,$timeout,qcServices,cfpLoadingBar) {
 	$('.scrollbar-inner').scrollbar();
 	var nineteen68_projects_details;
 	$scope.domainData;
@@ -10,9 +10,8 @@ mySPA.controller('qcController',['$scope','$window','$http','$location','$timeou
 		$("#loginToQCpop").modal("show");
 	}, 500)
 	var mappedList = [];
-	if(window.localStorage['navigateScreen'] != "p_ALM")
-	{
-		window.location.href = "/";
+	if(window.localStorage['navigateScreen'] != "p_ALM"){
+		$rootScope.redirectPage();
 	}
 
 	$(".selectBrowser").click(function(){

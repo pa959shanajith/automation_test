@@ -88,10 +88,28 @@ mySPA.config(function($routeProvider, $locationProvider,$provide) {
 			 	templateUrl: 'partials/dashboard.html',
 			 	controller: 'dashboardController'
 			})
+			.when('/:login',
+			{
+				templateUrl: 'partials/login.html',
+				controller: 'loginController'
+			})
 			.otherwise({redirectTo: '/'});
 
-	//$locationProvider.html5Mode(true);      //to remove angular hash(#) in the url
-	$locationProvider.html5Mode({
-		enabled: true,	requireBase: false
+		//$locationProvider.html5Mode(true);      //to remove angular hash(#) in the url
+		$locationProvider.html5Mode({
+			enabled: true,	requireBase: false
+		});
+	}).run(function($rootScope, $location, headerServices){
+		$rootScope.redirectPage = function(){
+			var UserName = JSON.parse(window.localStorage['_UI']).username;
+			headerServices.logoutUser_Nineteen68(UserName)
+			.then(function(data){
+				if(data == "Session Expired"){
+					window.localStorage.clear();
+					$location.path('/login');
+				}
+			}, function(error) {
+				console.log("Failed to Logout");
+			});
+		}
 	});
-});

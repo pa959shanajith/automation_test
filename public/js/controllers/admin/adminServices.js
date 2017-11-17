@@ -1,6 +1,3 @@
-/***
- * Admin Services 
- */
 mySPA.factory('adminServices', ['$http', '$q', function ($http, $q) {
     return {
     	getUserRoles_Nineteen68: function () {

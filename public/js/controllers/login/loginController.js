@@ -1,4 +1,4 @@
-mySPA.controller('loginController', function ($scope, $http, $location, LoginService, cfpLoadingBar) {
+mySPA.controller('loginController', function ($scope, $rootScope, $timeout, $http, $location, LoginService, cfpLoadingBar) {
 	$(".ic-username, .ic-password").parent().removeClass("input-border-error")
 	$scope.loginValidation = "";
 	window.localStorage.clear();
@@ -84,11 +84,11 @@ mySPA.controller('loginController', function ($scope, $http, $location, LoginSer
 
 											if(data == "Admin"){
 												window.localStorage['navigateScreen'] = "admin";
-												window.location.href = "/admin";
+												$location.path( "/admin");
 											}
 											else{
 												window.localStorage['navigateScreen'] = "plugin";
-												window.location.href = "/plugin";
+												$location.path( "/plugin");
 											}
 										}
 										else	console.log("Fail to get role name by role Id.");
