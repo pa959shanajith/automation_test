@@ -1908,7 +1908,7 @@ exports.debugTestCase_ICE = function (req, res) {
 						}
 					}
 				} catch (exception) {
-					logger.info("Exception in the service debugTestCase_ICE - wsdlServiceGenerator_ICE: ", exception);
+					logger.info("Exception in the service debugTestCase_ICE - debugTestCase_ICE: ", exception);
 				}
 			} else {
 				logger.info("Error in the service debugTestCase_ICE: Socket not Available");
