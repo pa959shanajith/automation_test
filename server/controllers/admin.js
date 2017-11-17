@@ -302,7 +302,7 @@ exports.createUser_Nineteen68 = function (req, res) {
 								}
 							}
 							if (req_ldapuser) {
-								req_hashedPassword = null;
+								req_hashedPassword = "null";
 							}
 							if (status === false) {
 								var inputs = {

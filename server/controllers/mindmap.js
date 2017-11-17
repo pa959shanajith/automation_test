@@ -737,11 +737,10 @@ exports.mindmapService = function(req, res) {
 										'user':d.user_name,
 										'versionnumber':d.versionnumber
 									}
-									create_ice.submitTask(inputs,function(err,data){
+									/*create_ice.submitTask(inputs,function(err,data){
 										res.setHeader('Content-Type', 'application/json');
-										if(err)
-											res.status(500).send(err)
-									});
+										if(err)	res.status(500).send(err)
+									});*/
 									neo4jAPI.executeQueries(new_queries,function(status,result){
 											//res.setHeader('Content-Type','application/json');
 											if(status!=200) res.status(status).send(result);

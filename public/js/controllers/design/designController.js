@@ -1137,6 +1137,7 @@ console.log("screenName:", screenName);
                 "remarks": [""]
             })
             initWSJson.testcasename = "",
+            initWSJson.apptype = "Webservice",
             initWSJson.testcase = testCaseWS
             DesignServices.initScrapeWS_ICE(initWSJson)
                 .then(function(data) {
