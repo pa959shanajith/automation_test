@@ -151,8 +151,8 @@ try {
     });
     //CORS
     app.all('*', function (req, res, next) {
-        res.header('Access-Control-Allow-Origin', '*');
-        res.header('Access-Control-Allow-Methods', 'PUT, GET, POST, DELETE, OPTIONS');
+        var origin = req.get('host');
+        res.setHeader('Access-Control-Allow-Origin', origin);
         res.header('Access-Control-Allow-Headers', 'X-Requested-With');
         next();
     });
