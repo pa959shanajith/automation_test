@@ -1,6 +1,3 @@
-/***
- *
- */
 var domainId;
 var DOMAINID, releaseName, cycleName, count=0,delCount=0,editReleaseId='',editCycleId='',deleteReleaseId='',deleteCycleId='',taskName;releaseNamesArr =[];
 var createprojectObj = {}; var projectDetails = [];var flag;var projectExists;var updateProjectDetails = [];
@@ -8,7 +5,7 @@ var editedProjectDetails = [];
 var deletedProjectDetails = [];
 var newProjectDetails = [];
 var unAssignedProjects = []; var assignedProjects = [];var projectData =[];var valid = "";var getAssignedProjectsLen=0;
-mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeout','cfpLoadingBar', function ($scope, $http, adminServices, $timeout, cfpLoadingBar) {
+mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServices','$timeout','cfpLoadingBar', function ($scope, $rootScope, $http, adminServices, $timeout, cfpLoadingBar) {
 	$("body").css("background","#eee");
 	$('.dropdown').on('show.bs.dropdown', function(e){
 		$(this).find('.dropdown-menu').first().stop(true, true).slideDown(300);
@@ -39,9 +36,8 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 		adminServices.getDomains_ICE()
 		.then(function (data) {
 			if(data == "Invalid Session"){
-				window.location.href = "/";
-			} 
-			else {
+				$rootScope.redirectPage();
+			}else {
 				domainId =  data[0].domainId;					
 				$("#selAssignProject").val(data[0].domainName);
 				$('#allProjectAP, #assignedProjectAP').empty();
@@ -68,7 +64,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 				.then(function (data1) {
 				getAssignedProjectsLen = data1.length;
 					if(data1 == "Invalid Session"){
-						window.location.href = "/";
+						$rootScope.redirectPage();
 					}
 					$('#assignedProjectAP').empty();
 					projectData = [];
@@ -88,7 +84,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 						adminServices.getDetails_ICE(idtype,requestedids)
 						.then(function (detResponse) {
 							if(detResponse == "Invalid Session"){
-								window.location.href = "/";
+								$rootScope.redirectPage();
 							}
 							$('#allProjectAP').empty();
 							if(detResponse.projectIds.length > 0)
@@ -133,7 +129,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 						adminServices.getDetails_ICE(idtype,requestedids)
 						.then(function (res) {
 							if(res == "Invalid Session"){
-								window.location.href = "/";
+								$rootScope.redirectPage();
 							}
 							if(res.projectIds.length > 0)
 							{
@@ -164,8 +160,8 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 		adminServices.getAllUsers_Nineteen68()
 		.then(function (userRes) {
 			if(userRes == "Invalid Session"){
-				window.location.href = "/";
-				}
+				$rootScope.redirectPage();
+			}
 			$("#selAssignUser").empty()
 			$("#selAssignUser").append('<option data-id="" value disabled selected>Select User</option>')
 			for(i=0; i<userRes.userIds.length && userRes.user_names.length; i++){
@@ -217,7 +213,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 		.then(function (data) {
 			getAssignedProjectsLen = data.length;
 			if(data == "Invalid Session"){
-			window.location.href = "/";
+				$rootScope.redirectPage();
 			}
 			$('#assignedProjectAP').empty();
 			projectData = [];
@@ -237,8 +233,8 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 				adminServices.getDetails_ICE(idtype,requestedids)
 				.then(function (response) {
 					if(response == "Invalid Session"){
-						window.location.href = "/";
-						}
+						$rootScope.redirectPage();
+					}
 					$('#allProjectAP').empty();
 					if(response.projectIds.length > 0)
 					{
@@ -276,7 +272,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 				adminServices.getDetails_ICE(idtype,requestedids)
 				.then(function (resDetails) {
 					if(resDetails == "Invalid Session"){
-						window.location.href = "/";
+							$rootScope.redirectPage();
 						}
 					if(resDetails.projectIds.length > 0)
 					{
@@ -335,7 +331,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 			adminServices.assignProjects_ICE(assignProjectsObj)
 			.then(function (data) {
 				if(data == "Invalid Session"){
-					window.location.href = "/";
+					$rootScope.redirectPage();
 				}
 				if(data == 'success')
 				{
@@ -378,9 +374,8 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 		adminServices.getDomains_ICE()
 		.then(function (data) {
 			if(data == "Invalid Session"){
-				window.location.href = "/";
-			}
-			else {
+				$rootScope.redirectPage();
+			}else {
 				$("#selDomain").val(data[0].domainName);
 				domainId = data[0].domainId;
 				var details = {
@@ -533,8 +528,8 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 			adminServices.createUser_Nineteen68(createUser)
 			.then(function (data) {
 				if(data == "Invalid Session"){
-							window.location.href = "/";
-							}
+					$rootScope.redirectPage();
+				}
 				if (data == "Success") {
 					openModelPopup("Create User", "User created successfully");
 					resetCreateUser();
@@ -571,7 +566,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 		adminServices.getUserRoles_Nineteen68()
 		.then(function (rolesRes) {
 			if(rolesRes == "Invalid Session"){
-				window.location.href = "/";
+				$rootScope.redirectPage();
 			}
 			userRoleArrayList = rolesRes.userRoles;
 			userRolesList = rolesRes;
@@ -648,8 +643,8 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 						var proceeed = false;
 						adminServices.getNames_ICE(requestedids,idtype)
 						.then(function (response) {
-						if(response == "Invalid Session"){
-							  window.location.href = "/";
+							if(response == "Invalid Session"){
+								$rootScope.redirectPage();
 							}
 							if(response == "No Projects"){
 								proceeed = true;
@@ -683,7 +678,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 								adminServices.createProject_ICE(createprojectObj,userDetails)
 								.then(function (createProjectRes) {
 									if(createProjectRes == "Invalid Session"){
-									  window.location.href = "/";
+										$rootScope.redirectPage();
 									}
 									if(createProjectRes == 'success')
 									{
@@ -820,8 +815,8 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 					adminServices.updateProject_ICE(updateProjectObj, userDetails)
 					.then(function (updateProjectRes) {
 						if(updateProjectRes == "Invalid Session"){
-							  window.location.href = "/";
-							}
+							$rootScope.redirectPage();
+						}
 						clearUpdateProjectObjects();
 						if(updateProjectRes == 'success')
 						{
@@ -1695,8 +1690,8 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 				adminServices.getDetails_ICE(idtype,CycleID)
 				.then(function (response) {
 					if(response == "Invalid Session"){
-							  window.location.href = "/";
-							}
+						$rootScope.redirectPage();
+					}
 
 					for(var i=0;i<newProjectDetails.length;i++){
 						if(newProjectDetails[i].releaseName == $("li.active").children("span.releaseName").text()){
@@ -1827,8 +1822,8 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 		adminServices.getAllUsers_Nineteen68()
 		.then(function (allUsersRes) {
 			if(allUsersRes == "Invalid Session"){
-							  window.location.href = "/";
-							}
+				$rootScope.redirectPage();
+			}
 			$("#userSelect").empty()
 			$("#userSelect").append('<option data-id="" value disabled selected>Select User</option>')
 			for(i=0; i<allUsersRes.userIds.length; i++){
@@ -1869,9 +1864,8 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 		adminServices.getDomains_ICE()
 		.then(function (data) {
 			if(data == "Invalid Session"){
-			  window.location.href = "/";
-			}
-			else {				
+				$rootScope.redirectPage();
+			}else {				
 				domainId = data[0].domainId;
 				$("#selDomainEdit").val(data[0].domainName);
 				
@@ -1903,18 +1897,15 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 				adminServices.getDetails_ICE(idtype,requestedids)
 				.then(function (getDetailsResponse) {
 					if(getDetailsResponse == "Invalid Session"){
-								  window.location.href = "/";
-								}
-					if(getDetailsResponse.projectNames.length > 0)
-					{
+						$rootScope.redirectPage();
+					}
+					if(getDetailsResponse.projectNames.length > 0){
 						$('#selProject').empty();
 						$('#selProject').append($("<option value=''  disabled selected>Please Select Your Project</option>"));
 						for (var i = 0; i < getDetailsResponse.projectNames.length; i++) {
 							$('#selProject').append($("<option value=" + getDetailsResponse.projectIds[i] + "></option>").text(getDetailsResponse.projectNames[i]));
 						}
-
-					}
-					else{
+					}else{
 						$('#selProject').empty();
 						$('#selProject').append($("<option value=''  disabled selected>Please Select Your Project</option>"));
 						for (var i = 0; i < getDetailsResponse.projectNames.length; i++) {
@@ -1969,7 +1960,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 //			adminServices.getDetails_ICE(idtype,requestedids)
 //			.then(function (response) {
 //				if(response == "Invalid Session"){
-//							  window.location.href = "/";
+//							 $rootScope.redirectPage();
 //							}
 //				if(response.projectNames.length > 0)
 //				{
@@ -2019,7 +2010,7 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 			adminServices.getDetails_ICE(idtype,requestedids)
 			.then(function (response) {
 				if(response == "Invalid Session"){
-							  window.location.href = "/";
+					$rootScope.redirectPage();
 							}
 				if(response.projectNames.length > 0)
 				{
@@ -2068,8 +2059,8 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 			adminServices.getDetails_ICE(idtype,requestedids)
 			.then(function (selProjectRes) {
 				if(selProjectRes == "Invalid Session"){
-							  window.location.href = "/";
-							}
+					$rootScope.redirectPage();
+				}
 				//console.log("resposne", response);
 				$("div.projectTypes").addClass("disableProjectType");
 				switch (selProjectRes.appType)
@@ -2151,8 +2142,8 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 		adminServices.getUsersInfo(userId, userName)
 		.then(function (userDataRes) {
 			if(userDataRes == "Invalid Session"){
-							  window.location.href = "/";
-							}
+				$rootScope.redirectPage();
+			}
 			$("#firstName:not(.create)").val(userDataRes.firstName);
 			$("#lastName:not(.create)").val(userDataRes.lastName);
 			$("#email:not(.create)").val(userDataRes.emailId != undefined? userDataRes.emailId : "");
@@ -2178,8 +2169,8 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 			adminServices.getUserRoles_Nineteen68()
 			.then(function (response) {
 				if(response == "Invalid Session"){
-							  window.location.href = "/";
-							}
+					$rootScope.redirectPage();
+				}
 				$("#userRoles").empty().append('<option value disabled>Select User Role</option>')
 				for(i=0; i<response.r_ids.length && response.userRoles.length; i++){
 					if(roleId == response.r_ids[i]){
@@ -2344,8 +2335,8 @@ mySPA.controller('adminController', ['$scope', '$http', 'adminServices','$timeou
 			adminServices.updateUser_nineteen68(updateUserObj,userDetails)
 			.then(function (updateUserRes) {
 				if(updateUserRes == "Invalid Session"){
-							  window.location.href = "/";
-							}
+					$rootScope.redirectPage();
+				}
 				if(updateUserRes == "success"){
 					openModelPopup("Edit User", "User has been edited successfully.");
 					resetUpdateUser();

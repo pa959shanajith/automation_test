@@ -1,5 +1,5 @@
 
-mySPA.controller('mindmapController', ['$scope', '$http', '$location', '$timeout', 'chatbotService','mindmapServices','cfpLoadingBar','$window', function($scope,$http,$location,$timeout,chatbotService,mindmapServices,cfpLoadingBar,$window) {
+mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$location', '$timeout', 'chatbotService','mindmapServices','cfpLoadingBar','$window', function($scope, $rootScope, $http, $location,$timeout,chatbotService,mindmapServices,cfpLoadingBar,$window) {
     $("body").css("background","#eee");
     $("head").append('<link id="mindmapCSS1" rel="stylesheet" type="text/css" href="css/css_mindmap/style.css" /><link id="mindmapCSS2" rel="stylesheet" type="text/css" href="fonts/font-awesome_mindmap/css/font-awesome.min.css" />')
 	
@@ -8,9 +8,8 @@ mySPA.controller('mindmapController', ['$scope', '$http', '$location', '$timeout
 	{
 		taskAuth = false;
 	}*/
-	if(window.localStorage['navigateScreen'] != "home")
-	{
-		window.location.href = "/";
+	if(window.localStorage['navigateScreen'] != "home"){
+		$rootScope.redirectPage();
 	}
     var versioningEnabled=false;
 	$timeout(function(){
@@ -472,27 +471,27 @@ mySPA.controller('mindmapController', ['$scope', '$http', '$location', '$timeout
     }
     // Changes made for End to end module implementation
 //To toggle the view when user clicks on switch layout (Himanshu)
-$scope.toggleview = function(){
-    var selectedTab = window.localStorage['tabMindMap'];
-    if(selectedTab=='mindmapEndtoEndModules')
-        var temp=dNodes_W.length;
-    else
-        var temp=dNodes.length;
-    
-if(temp==0){
-        alert('Please select a module first');
-}
-else if((selectedTab=='mindmapEndtoEndModules' || selectedTab=='tabCreate') && !$('#ct-inpBox').hasClass('no-disp'))
-{
-        alert('Please complete editing first');    
-        d3.select('#ct-inpAct').node().focus();
-}
-else if(selectedTab=='tabAssign' && !$('#ct-assignBox').hasClass('no-disp')){
-        alert('Please complete assign step first');    
-}
-else{
-        $('#switch-layout').toggleClass('vertical-layout');
-        loadMap2();
-}
+    $scope.toggleview = function(){
+        var selectedTab = window.localStorage['tabMindMap'];
+        if(selectedTab=='mindmapEndtoEndModules')
+            var temp=dNodes_W.length;
+        else
+            var temp=dNodes.length;
+        
+        if(temp==0){
+                alert('Please select a module first');
+        }
+        else if((selectedTab=='mindmapEndtoEndModules' || selectedTab=='tabCreate') && !$('#ct-inpBox').hasClass('no-disp'))
+        {
+                alert('Please complete editing first');    
+                d3.select('#ct-inpAct').node().focus();
+        }
+        else if(selectedTab=='tabAssign' && !$('#ct-assignBox').hasClass('no-disp')){
+                alert('Please complete assign step first');    
+        }
+        else{
+                $('#switch-layout').toggleClass('vertical-layout');
+                loadMap2();
+        }
     };
 }]);

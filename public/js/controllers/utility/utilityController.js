@@ -1,4 +1,4 @@
-mySPA.controller('utilityController', ['$scope', '$http', '$location', '$timeout', 'utilityService', 'cfpLoadingBar', '$window', function($scope, $http, $location, $timeout, utilityService, cfpLoadingBar, $window) {
+mySPA.controller('utilityController', ['$scope','$rootScope',  '$http', '$location', '$timeout', 'utilityService', 'cfpLoadingBar', '$window', function($scope, $rootScope, $http, $location, $timeout, utilityService, cfpLoadingBar, $window) {
     $("body").css("background", "#eee");
     $timeout(function() {
         $('.scrollbar-inner').scrollbar();
@@ -15,7 +15,7 @@ mySPA.controller('utilityController', ['$scope', '$http', '$location', '$timeout
     	var taskAuth = false;
     }*/
     if (window.localStorage['navigateScreen'] != "p_Utility") {
-        window.location.href = "/";
+        $rootScope.redirectPage();
     }
 
     cfpLoadingBar.start()
@@ -270,7 +270,7 @@ mySPA.controller('utilityController', ['$scope', '$http', '$location', '$timeout
             utilityService.Encrypt(methodSelected, encryptionVal)
                 .then(function(data) {
                     if (data == "Invalid Session") {
-                        window.location.href = "/";
+                        $rootScope.redirectPage();
                     } else if (data != "fail") {
                         $("#encryptedData").val(data);
                     } else {

@@ -4279,6 +4279,17 @@ select:-webkit-autofill:focus {
 	border: 2px solid #d33c3c !important;
 }
 
+.modal-body .row-modal .form-control-custom.inputErrorBorderBottom, .form-control-custom.inputErrorBorderBottom
+{
+    border: 2px solid #d33c3c !important;
+    border-left: 0 !important;
+    border-right: 0 !important;
+    border-top: 0 !important;
+    border-radius: 0;
+    box-shadow: none;
+    color: #333;
+}
+
 
 
 /**************** SAP reports Icon CSS ***************************/

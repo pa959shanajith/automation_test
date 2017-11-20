@@ -1,14 +1,16 @@
-mySPA.controller('pluginController',['$scope','$window','$http','$location','$timeout','PluginService', function($scope,$window,$http,$location,$timeout,PluginService) {
-	$('.scrollbar-inner').scrollbar()
+mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','$location','$timeout','PluginService', function($scope, $rootScope,$window,$http,$location,$timeout,PluginService) {
+	$('.scrollbar-inner').scrollbar();
+	window.onbeforeunload = null;
 	document.getElementById("currentYear").innerHTML = new Date().getFullYear()
 	var userInfo = JSON.parse(window.localStorage['_UI']);
 	var availablePlugins = userInfo.pluginsInfo;
 	$("#plugin-container").empty().hide();
-	
-	if(window.localStorage['navigateScreen'] != "plugin")
-	{
-		window.location.href = "/";
-	} 
+	$("body").css("background", "#fff");
+	if(window.localStorage['navigateScreen'] != "plugin"){
+		$rootScope.redirectPage();
+		return;
+	}
+
 	for(i=0; i<availablePlugins.length; i++){
 		if(availablePlugins[i].pluginValue != false){
 			$("#plugin-container").append('<div class="col-md-4 plugin-block"><span class="toggleClick" onclick="p_event(this.dataset.name)" data-name="p_'+availablePlugins[i].pluginName.replace(/\s/g,'')+'" id="'+availablePlugins[i].pluginName+'" title="'+availablePlugins[i].pluginName+'">'+availablePlugins[i].pluginName+'</span></div>').fadeIn()
@@ -41,12 +43,9 @@ mySPA.controller('pluginController',['$scope','$window','$http','$location','$ti
 				var obj={'userid':userid,'prjId':data};
 				PluginService.getTaskJson_mindmaps(obj)
 				.then(function (data) {
-					if(data == "Invalid Session")
-					{
-						window.location.href = "/";
-					}
-					else{
-						//console.log(data);
+					if(data == "Invalid Session"){
+						$rootScope.redirectPage();
+					}else{
 						var tasksJson = data;
 						//window.localStorage['_TJ'] = angular.toJson(tasksJson);
 						// 	var tasksJson = [{
@@ -108,7 +107,7 @@ mySPA.controller('pluginController',['$scope','$window','$http','$location','$ti
 				// $("#plugin-container").removeClass("inactiveLink");
 			}	
 			else{
-				window.location.href = "/";
+				$rootScope.redirectPage();
 			}
 		}, function (error) { console.log("Error:::::::::::::", error) })
 	}
@@ -168,7 +167,9 @@ mySPA.controller('pluginController',['$scope','$window','$http','$location','$ti
 		else if(name == "p_NeuronGraphs2D") name = 'neuronGraphs2D';
 		else if(name == "p_NeuronGraphs3D") name = 'neuronGraphs3D';
 		window.localStorage['navigateScreen'] = name;
-		$window.location.assign(name)
+		$timeout(function () {
+			$location.path('/'+ name);
+	   	}, 100);
 	}
 	window.localStorage['_TJ'] = "";
 	window.localStorage['_CT'] = "";

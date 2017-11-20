@@ -31,24 +31,24 @@ exports.getMainReport_ICE = function (req, res) {
 				}
 			}, function (err, response) {
 				if (err) {
-					logger.error('Error occured in getMainReport_ICE when trying to render report:', err);
+					logger.error('Error occured in getMainReport_ICE when trying to render report: %s', err);
 					res.send("fail");
 				} else {
 					try {
-						logger.error('Reports rendered successfully');
+						logger.info('Reports rendered successfully');
 						response.pipe(res);
 					} catch (exception) {
-						logger.error('Exception in getMainReport_ICE when trying to render report:', exception);
+						logger.error('Exception in getMainReport_ICE when trying to render report: %s', exception);
 						res.send("fail");
 					}
 				}
 			});
 		} else {
-			logger.info("Invalid Session");
+			logger.error("Invalid Session");
 			res.send("Invalid Session");
 		}
 	} catch (exception) {
-		logger.error('Exception in getMainReport_ICE when trying to render report:', exception);
+		logger.error('Exception in getMainReport_ICE when trying to render report: %s', exception);
 		res.send("fail");
 	}
 };
@@ -74,7 +74,7 @@ exports.openScreenShot = function (req, res) {
 				//req.session.cookie.expires = sessionExtend
 				clearInterval(updateSessionExpiry);
 				if (resultData != "fail") {
-					logger.error('Screen shot opened successfully');
+					logger.info('Screen shot opened successfully');
 					res.send(resultData);
 				} else{
 					logger.error('Screen shot status: ', resultData);
@@ -82,11 +82,11 @@ exports.openScreenShot = function (req, res) {
 				}
 			});
 		} else {
-			logger.info("ICE Socket not Available");
+			logger.error("ICE Socket not Available");
 			res.send("unavailableLocalServer");
 		}
 	} catch (exception) {
-		logger.info("Exception in openScreenShot when trying to open screenshot:",exception);
+		logger.error("Exception in openScreenShot when trying to open screenshot: %s",exception);
 	}
 };
 
@@ -118,24 +118,24 @@ exports.renderReport_ICE = function (req, res) {
 				}
 			}, function (err, response) {
 				if (err) {
-					logger.info("Error occured in renderReport_ICE when trying to render report:",err);
+					logger.error("Error occured in renderReport_ICE when trying to render report: %s",err);
 					res.send("fail");
 				} else {
 					try {
-						logger.error('Reports rendered successfully');
+						logger.info('Reports rendered successfully');
 						response.pipe(res);
 					} catch (exception) {
-						logger.info("Exception occured in renderReport_ICE when trying to render report:",exception);
+						logger.error("Exception occured in renderReport_ICE when trying to render report: %s",exception);
 						res.send("fail");
 					}
 				}
 			});
 		} else {
-			logger.info("Invalid Session");
+			logger.error("Invalid Session");
 			res.send("Invalid Session");
 		}
 	} catch (exception) {
-		logger.info("Exception occured in renderReport_ICE when trying to render report:",exception);
+		logger.error("Exception occured in renderReport_ICE when trying to render report: %s",exception);
 		res.send("fail");
 	}
 };
@@ -159,19 +159,19 @@ exports.getAllSuites_ICE = function (req, res) {
 				getprojectdetails(userid, function (getprojectdetailserror, getprojectdetailsresponse) {
 					try {
 						if (getprojectdetailserror) {
-							logger.info("Error occured in the function getprojectdetails: getAllSuites_ICE: Projects");
+							logger.error("Error occured in the function getprojectdetails: getAllSuites_ICE: Projects");
 							res.send("fail");
 						} else {
 							logger.info("Sending project details from getprojectdetails function of getAllSuites_ICE:Projects");
 							res.send(getprojectdetailsresponse);
 						}
 					} catch (exception) {
-						logger.info("Exception in the function getprojectdetails: getAllSuites_ICE: Projects ",exception);
+						logger.error("Exception in the function getprojectdetails: getAllSuites_ICE: Projects: %s",exception);
 						res.send("fail");
 					}
 				});
 			} catch (exception) {
-				logger.info("Exception in the service getAllSuites_ICE: Projects ",exception);
+				logger.error("Exception in the service getAllSuites_ICE: Projects: %s",exception);
 				res.send("fail");
 			}
 		} else if (requestedaction == 'reports') {
@@ -181,27 +181,27 @@ exports.getAllSuites_ICE = function (req, res) {
 				getsuitedetails(projectid, function (getsuitedetailserror, getsuitedetailsresponse) {
 					try {
 						if (getsuitedetailserror) {
-							logger.info("Error occured in the function getsuitedetails: getAllSuites_ICE: reports");
+							logger.error("Error occured in the function getsuitedetails: getAllSuites_ICE: reports");
 							res.send("fail");
 						} else {
 							logger.info("Sending Suite details from getsuitedetails: getAllSuites_ICE: reports");
 							res.send(getsuitedetailsresponse);
 						}
 					} catch (exception) {
-						logger.info("Exception in a function getsuitedetails: getAllSuites_ICE: reports ",exception);
+						logger.error("Exception in a function getsuitedetails: getAllSuites_ICE: reports: %s",exception);
 						res.send("fail");
 					}
 				});
 			} catch (exception) {
-				logger.info("Exception in the service getAllSuites_ICE: reports ",exception);
+				logger.error("Exception in the service getAllSuites_ICE: reports: %s",exception);
 				res.send("fail");
 			}
 		} else {
-			logger.info("Invalid input fail");
+			logger.error("Invalid input fail");
 			res.send('Invalid input fail');
 		}
 	} else {
-		logger.info("Invalid Session");
+		logger.error("Invalid Session");
 		res.send("Invalid Session");
 	}
 
@@ -263,24 +263,24 @@ exports.getAllSuites_ICE = function (req, res) {
 												getprojectdetailscallback(null, responsedata);
 											}
 										} catch (exception) {
-											logger.info("Exception in the function getprojectdetails: admin/getNames_ICE",exception);
+											logger.error("Exception in the function getprojectdetails: admin/getNames_ICE: %s",exception);
 											// getprojectdetailscallback("fail",null);
 										}
 									}
 								});
 							} catch (exception) {
-								logger.info("Exception in the function getprojectdetails when calling admin/getNames_ICE",exception);
+								logger.error("Exception in the function getprojectdetails when calling admin/getNames_ICE: %s",exception);
 								// getprojectdetailscallback("fail",null);
 							}
 						});
 					} catch (exception) {
-						logger.info("Exception in the function getprojectdetails when calling admin/getNames_ICE",exception);
+						logger.error("Exception in the function getprojectdetails when calling admin/getNames_ICE: %s",exception);
 						// getprojectdetailscallback("fail",null);
 					}
 				}
 			});
 		} catch (exception) {
-			logger.info("Exception in the function getprojectdetails when calling reports/getAllSuites_ICE",exception);
+			logger.error("Exception in the function getprojectdetails when calling reports/getAllSuites_ICE: %s",exception);
 			// getprojectdetailscallback("fail",null);
 		}
 	}
@@ -373,7 +373,7 @@ exports.getAllSuites_ICE = function (req, res) {
 																		cycleindex += 1;
 																	}
 																} catch (exception) {
-																	logger.info("Exception in the function getsuitedetails while getting suite details from admin/getDetails_ICE",exception);
+																	logger.error("Exception in the function getsuitedetails while getting suite details from admin/getDetails_ICE: %s",exception);
 																	getsuitedetailscallback("fail", null);
 																}
 															}
@@ -388,7 +388,7 @@ exports.getAllSuites_ICE = function (req, res) {
 															}
 														});
 													} catch (exception) {
-														logger.info("Exception in the function getsuitedetails while traversing cycleids: ",exception);
+														logger.error("Exception in the function getsuitedetails while traversing cycleids: %s",exception);
 														// getsuitedetailscallback("fail",null);
 													}
 												});
@@ -397,7 +397,7 @@ exports.getAllSuites_ICE = function (req, res) {
 												releaseindex += 1;
 											}
 										} catch (exception) {
-											logger.info("Exception in the function getsuitedetails while checking no of cycleids: ",exception);
+											logger.error("Exception in the function getsuitedetails while checking no of cycleids: %s",exception);
 											// getsuitedetailscallback("fail",null);
 										}
 									}
@@ -408,17 +408,16 @@ exports.getAllSuites_ICE = function (req, res) {
 							finalfunction();
 						}
 						function finalfunction() {
-							// console.log("This is the response:",responsedata.suitenames.length);
 							getsuitedetailscallback(null, responsedata);
 						}
 					} catch (exception) {
-						logger.info("Exception in the function getsuitedetails while checking no of releaseids: ",exception);
+						logger.error("Exception in the function getsuitedetails while checking no of releaseids: %s",exception);
 						// getsuitedetailscallback("fail",null);
 					}
 				}
 			});
 		} catch (exception) {
-			logger.info("Exception while calling NDAC Service from getsuitedetails: reports/getAllSuites_ICE: releases ",exception);
+			logger.error("Exception while calling NDAC Service from getsuitedetails: reports/getAllSuites_ICE: releases: %s",exception);
 			// getsuitedetailscallback("fail",null);
 		}
 	}
@@ -450,7 +449,7 @@ exports.getSuiteDetailsInExecution_ICE = function (req, res) {
 				function (executionData, response) {
 				try {
 					if (response.statusCode != 200 || executionData.rows == "fail") {
-						logger.info("Error occured in the service getSuiteDetailsInExecution_ICE: reports/getSuiteDetailsInExecution_ICE");
+						logger.error("Error occured in the service getSuiteDetailsInExecution_ICE: reports/getSuiteDetailsInExecution_ICE");
 						res.send("fail");
 					} else {
 						for (var i = 0; i < executionData.rows.length; i++) {
@@ -468,16 +467,16 @@ exports.getSuiteDetailsInExecution_ICE = function (req, res) {
 						res.send(JSON.stringify(executionDetailsJSON));
 					}
 				} catch (exception) {
-					logger.info("Exception in the service getSuiteDetailsInExecution_ICE: reports/getSuiteDetailsInExecution_ICE", exception);
+					logger.error("Exception in the service getSuiteDetailsInExecution_ICE: reports/getSuiteDetailsInExecution_ICE: %s", exception);
 					res.send("fail");
 				}
 			});
 		} else {
-			logger.info("Error in the service getSuiteDetailsInExecution_ICE: Invalid Session")
+			logger.error("Error in the service getSuiteDetailsInExecution_ICE: Invalid Session")
 			res.send("Invalid Session");
 		}
 	} catch (exception) {
-		logger.info("Exception in the service getSuiteDetailsInExecution_ICE: ", exception);
+		logger.error("Exception in the service getSuiteDetailsInExecution_ICE: %s", exception);
 		res.send("fail");
 	}
 };
@@ -510,7 +509,7 @@ exports.reportStatusScenarios_ICE = function (req, res) {
 					client.post(epurl + "reports/reportStatusScenarios_ICE", args,
 						function (result, response) {
 						if (response.statusCode != 200 || result.rows == "fail") {
-							logger.info("Error occured in the service reportStatusScenarios_ICE - executiondetails: reports/reportStatusScenarios_ICE");
+							logger.error("Error occured in the service reportStatusScenarios_ICE - executiondetails: reports/reportStatusScenarios_ICE");
 							var flag = "fail";
 							res.send(flag);
 						} else {
@@ -538,7 +537,7 @@ exports.reportStatusScenarios_ICE = function (req, res) {
 									client.post(epurl + "reports/reportStatusScenarios_ICE", args,
 										function (scenarioNameDetails, response) {
 										if (response.statusCode != 200 || scenarioNameDetails.rows == "fail") {
-											logger.info("Error occured in the service reportStatusScenarios_ICE - scenarioname: reports/reportStatusScenarios_ICE");
+											logger.error("Error occured in the service reportStatusScenarios_ICE - scenarioname: reports/reportStatusScenarios_ICE");
 											var flag = "fail";
 											res.send(flag);
 										} else {
@@ -554,7 +553,7 @@ exports.reportStatusScenarios_ICE = function (req, res) {
 													});
 													callback3();
 												} catch (exception) {
-													logger.info("Exception in the service reportStatusScenarios_ICE - scenarioname: reports/reportStatusScenarios_ICE", exception);
+													logger.error("Exception in the service reportStatusScenarios_ICE - scenarioname: reports/reportStatusScenarios_ICE: %s", exception);
 													res.send("fail");
 												}
 											}, callback2);
@@ -562,7 +561,7 @@ exports.reportStatusScenarios_ICE = function (req, res) {
 									});
 									//reportList.push(report);
 								} catch (exception) {
-									logger.info("Exception in the service reportStatusScenarios_ICE - executiondetails: reports/reportStatusScenarios_ICE", exception);
+									logger.error("Exception in the service reportStatusScenarios_ICE - executiondetails: reports/reportStatusScenarios_ICE: %s", exception);
 									res.send("fail");
 								}
 							}, callback);
@@ -572,7 +571,7 @@ exports.reportStatusScenarios_ICE = function (req, res) {
 			},
 			function (err, results) {
 				if (err) {
-					logger.info("Error occured in the service reportStatusScenarios_ICE: final function", err);
+					logger.error("Error occured in the service reportStatusScenarios_ICE: final function: %s", err);
 					res.send("fail");
 				} else {
 					if (report.length > 0) {
@@ -602,11 +601,11 @@ exports.reportStatusScenarios_ICE = function (req, res) {
 				}
 			});
 		} else {
-			logger.info("Invalid Session: reportStatusScenarios_ICE");
+			logger.error("Invalid Session: reportStatusScenarios_ICE");
 			res.send("Invalid Session");
 		}
 	} catch (exception) {
-		logger.info("Exception in the service reportStatusScenarios_ICE", exception);
+		logger.error("Exception in the service reportStatusScenarios_ICE: %s", exception);
 		res.send("fail");
 	}
 };
@@ -643,7 +642,7 @@ exports.getReport_Nineteen68 = function (req, res) {
 						function (reportResult, response) {
 						if (response.statusCode != 200 || reportResult.rows == "fail") {
 							flag = "fail";
-							logger.info("Error occured in the service getReport_Nineteen68 - projectsUnderDomain: Failed to get report, executed time and scenarioIds from reports");
+							logger.error("Error occured in the service getReport_Nineteen68 - projectsUnderDomain: Failed to get report, executed time and scenarioIds from reports");
 							res.send(flag);
 						} else {
 							var reportres = reportResult.rows.length;
@@ -670,7 +669,7 @@ exports.getReport_Nineteen68 = function (req, res) {
 									client.post(epurl + "reports/getReport_Nineteen68", args,
 										function (scenarioResult, response) {
 										if (response.statusCode != 200 || scenarioResult.rows == "fail") {
-											logger.info("Error occured in the service getReport_Nineteen68 - scenariodetails: Failed to get scenario name and projectId from scenarios.");
+											logger.error("Error occured in the service getReport_Nineteen68 - scenariodetails: Failed to get scenario name and projectId from scenarios.");
 										} else {
 											async.forEachSeries(scenarioResult.rows, function (sceiditr, callback2) {
 												try {
@@ -693,7 +692,7 @@ exports.getReport_Nineteen68 = function (req, res) {
 													client.post(epurl + "reports/getReport_Nineteen68", args,
 														function (suiteResult, response) {
 														if (response.statusCode != 200 || suiteResult.rows == "fail") {
-															logger.info("Error occured in the service getReport_Nineteen68 - cycleid: Failed to get cycle Ids from test suites.");
+															logger.error("Error occured in the service getReport_Nineteen68 - cycleid: Failed to get cycle Ids from test suites.");
 														} else {
 															async.forEachSeries(suiteResult.rows, function (suiteiditr, callback3) {
 																try {
@@ -726,7 +725,7 @@ exports.getReport_Nineteen68 = function (req, res) {
 																	client.post(epurl + "reports/getReport_Nineteen68", args,
 																		function (cycleResult, response) {
 																		if (response.statusCode != 200 || cycleResult.rows == "fail") {
-																			logger.info("Error occured in the service getReport_Nineteen68 - cycledetails: Failed to get cycle name and releaseId from cycles.");
+																			logger.error("Error occured in the service getReport_Nineteen68 - cycledetails: Failed to get cycle name and releaseId from cycles.");
 																		} else {
 																			async.forEachSeries(cycleResult.rows, function (cycleiditr, callback4) {
 																				try {
@@ -749,7 +748,7 @@ exports.getReport_Nineteen68 = function (req, res) {
 																					client.post(epurl + "reports/getReport_Nineteen68", args,
 																						function (releaseResult, response) {
 																						if (response.statusCode != 200 || releaseResult.rows == "fail") {
-																							logger.info("Error occured in the service getReport_Nineteen68 - releasedetails: Failed to get release name and projectsId from releases.");
+																							logger.error("Error occured in the service getReport_Nineteen68 - releasedetails: Failed to get release name and projectsId from releases.");
 																						} else {
 																							async.forEachSeries(releaseResult.rows, function (reliditr, callback5) {
 																								try {
@@ -772,7 +771,7 @@ exports.getReport_Nineteen68 = function (req, res) {
 																									client.post(epurl + "reports/getReport_Nineteen68", args,
 																										function (projectResult, response) {
 																										if (response.statusCode != 200 || projectResult.rows == "fail") {
-																											logger.info("Error occured in the service getReport_Nineteen68 - projectdetails: Failed to get project name and domainId from projects.");
+																											logger.error("Error occured in the service getReport_Nineteen68 - projectdetails: Failed to get project name and domainId from projects.");
 																										} else {
 																											async.forEachSeries(projectResult.rows, function (proiditr, callback6) {
 																												try {
@@ -794,7 +793,7 @@ exports.getReport_Nineteen68 = function (req, res) {
 																													client.post(epurl + "reports/getReport_Nineteen68", args,
 																														function (domainResult, response) {
 																														if (response.statusCode != 200 || domainResult.rows == "fail") {
-																															logger.info("Error occured in the service getReport_Nineteen68 - domaindetails: Failed to get domain name from domains.");
+																															logger.error("Error occured in the service getReport_Nineteen68 - domaindetails: Failed to get domain name from domains.");
 																														} else {
 																															async.forEachSeries(domainResult.rows, function (domainiditr, callback7) {
 																																try {
@@ -803,49 +802,49 @@ exports.getReport_Nineteen68 = function (req, res) {
 																																	//console.log('final reportInfoObj in domain deatails', reportInfoObj);
 																																	callback7();
 																																} catch (exception) {
-																																	logger.info("Exception in the service getReport_Nineteen68 - domaindetails:",exception);
+																																	logger.error("Exception in the service getReport_Nineteen68 - domaindetails: %s",exception);
 																																	res.send("fail");
 																																}
 																															}, callback6);
 																														}
 																													});
 																												} catch (exception) {
-																													logger.info("Exception in the service getReport_Nineteen68 - projectdetails:",exception);
+																													logger.error("Exception in the service getReport_Nineteen68 - projectdetails: %s",exception);
 																													res.send("fail");
 																												}
 																											}, callback5);
 																										}
 																									});
 																								} catch (exception) {
-																									logger.info("Exception in the service getReport_Nineteen68 - releasedetails:",exception);
+																									logger.error("Exception in the service getReport_Nineteen68 - releasedetails: %s",exception);
 																									res.send("fail");
 																								}
 																							}, callback4);
 																						}
 																					});
 																				} catch (exception) {
-																					logger.info("Exception in the service getReport_Nineteen68 - cycledetails:",exception);
+																					logger.error("Exception in the service getReport_Nineteen68 - cycledetails: %s",exception);
 																					res.send("fail");
 																				}
 																			}, callback3);
 																		}
 																	});
 																} catch (exception) {
-																	logger.info("Exception in the service getReport_Nineteen68 - cycleid:",exception);
+																	logger.error("Exception in the service getReport_Nineteen68 - cycleid: %s",exception);
 																	res.send("fail");
 																}
 															}, callback2);
 														}
 													});
 												} catch (exception) {
-													logger.info("Exception in the service getReport_Nineteen68 - scenariodetails:",exception);
+													logger.error("Exception in the service getReport_Nineteen68 - scenariodetails: %s",exception);
 													res.send("fail");
 												}
 											}, callback1);
 										}
 									});
 								} catch (exception) {
-									logger.info("Exception in the service getReport_Nineteen68 - projectsUnderDomain:",exception);
+									logger.error("Exception in the service getReport_Nineteen68 - projectsUnderDomain: %s",exception);
 									res.send("fail");
 								}
 							}, callback);
@@ -855,7 +854,7 @@ exports.getReport_Nineteen68 = function (req, res) {
 			},
 				function (err, results) {
 				if (err) {
-					logger.info("Error occured in the service getReport_Nineteen68: final function:",err);
+					logger.error("Error occured in the service getReport_Nineteen68: final function: %s",err);
 					cb(err);
 					res.send("fail");
 				} else {
@@ -867,11 +866,11 @@ exports.getReport_Nineteen68 = function (req, res) {
 				}
 			});
 		} else {
-			logger.info("Invalid Session, in the service getReport_Nineteen68");
+			logger.error("Invalid Session, in the service getReport_Nineteen68");
 			res.send("Invalid Session");
 		}
 	} catch (exception) {
-		logger.info("Exception occured in the service getReport_Nineteen68: ",exception);
+		logger.error("Exception occured in the service getReport_Nineteen68: %s",exception);
 		res.send("fail");
 	}
 };
@@ -903,7 +902,7 @@ exports.exportToJson_ICE = function (req, res) {
 					client.post(epurl + "reports/exportToJson_ICE", args,
 						function (reportResult, response) {
 						if (response.statusCode != 200 || reportResult.rows == "fail") {
-							logger.info("Error in the service exportToJson_ICE: Failed to get reports.");
+							logger.error("Error in the service exportToJson_ICE: Failed to get reports.");
 							res.send("fail");
 						} else {
 							try {
@@ -926,7 +925,7 @@ exports.exportToJson_ICE = function (req, res) {
 										client.post(epurl + "reports/exportToJson_ICE", args,
 											function (scenarioResult, response) {
 											if (response.statusCode != 200 || scenarioResult.rows == "fail") {
-												logger.info("Error in the service exportToJson_ICE: Failed to get scenario Id from reports.");
+												logger.error("Error in the service exportToJson_ICE: Failed to get scenario Id from reports.");
 											} else {
 												var reportres = scenarioResult.rows.length;
 												async.forEachSeries(scenarioResult.rows, function (sceiditr, callback2) {
@@ -946,7 +945,7 @@ exports.exportToJson_ICE = function (req, res) {
 														client.post(epurl + "reports/exportToJson_ICE", args,
 															function (scenarionameResult, response) {
 															if (response.statusCode != 200 || scenarionameResult.rows == "fail") {
-																logger.info("Error in the service exportToJson_ICE: Failed to get testscenarioname from testscenarios.");
+																logger.error("Error in the service exportToJson_ICE: Failed to get testscenarioname from testscenarios.");
 															} else {
 																var scenameres = scenarionameResult.rows.length;
 																async.forEachSeries(scenarionameResult.rows, function (scenameitr, callback3) {
@@ -955,26 +954,26 @@ exports.exportToJson_ICE = function (req, res) {
 																		reportInfoObj.scenarioname = scenarioname;
 																		callback3();
 																	} catch (exception) {
-																		logger.info("Exception in the service exportToJson_ICE - scenarioname: Failed to get testscenarioname from testscenarios.", exception);
+																		logger.error("Exception in the service exportToJson_ICE - scenarioname: Failed to get testscenarioname from testscenarios: %s", exception);
 																		res.send("fail");
 																	}
 																}, callback2);
 															}
 														});
 													} catch (exception) {
-														logger.info("Exception in the service exportToJson_ICE - scenarioname: Failed to get testscenarioname from testscenarios.", exception);
+														logger.error("Exception in the service exportToJson_ICE - scenarioname: Failed to get testscenarioname from testscenarios: %s", exception);
 														res.send("fail");
 													}
 												}, callback1);
 											}
 										});
 									} catch (exception) {
-										logger.info("Exception in the service exportToJson_ICE - scenarioid: ", exception);
+										logger.error("Exception in the service exportToJson_ICE - scenarioid: %s", exception);
 										res.send("fail");
 									}
 								}, callback);
 							} catch (exception) {
-								logger.info("Exception in the service exportToJson_ICE - scenarioid: ", exception);
+								logger.error("Exception in the service exportToJson_ICE - scenarioid: %s", exception);
 								res.send("fail");
 							}
 						}
@@ -983,20 +982,20 @@ exports.exportToJson_ICE = function (req, res) {
 			},
 				function (err, results) {
 				if (err) {
-					logger.info("Error in the service exportToJson_ICE final function ", err);
+					logger.error("Error in the service exportToJson_ICE final function: %s", err);
 					cb(err);
 					res.send("fail");
 				} else {
-					logger.info("Sending reports information object in the service exportToJson_ICE: final function ", err);
+					logger.info("Sending reports information object in the service exportToJson_ICE: final function ");
 					res.send(reportInfoObj);
 				}
 			});
 		} else {
-			logger.info("Error in the service exportToJson_ICE: Invalid Session ");
+			logger.error("Error in the service exportToJson_ICE: Invalid Session ");
 			res.send("Invalid Session");
 		}
 	} catch (exception) {
-		logger.info("Exception in the service exportToJson_ICE", exception);
+		logger.error("Exception in the service exportToJson_ICE: %s", exception);
 		res.send("fail");
 	}
 };
@@ -1038,7 +1037,7 @@ exports.connectJira_ICE = function (req, res) {
 								clearInterval(updateSessionExpiry);
 								if (resultData != "Fail") {
 									if(count == 0){
-										logger.error('Jira: Login successfully.');
+										logger.info('Jira: Login successfully.');
 										res.send(resultData); 
 										count++;
 									}
@@ -1055,7 +1054,7 @@ exports.connectJira_ICE = function (req, res) {
 							res.send("unavailableLocalServer");
 						}
 					} catch (exception) {
-						logger.error("Exception in the service connectJira_ICE - loginToJira: ", exception);
+						logger.error("Exception in the service connectJira_ICE - loginToJira: %s", exception);
 					}
 				}
 				else{
@@ -1083,7 +1082,7 @@ exports.connectJira_ICE = function (req, res) {
 								clearInterval(updateSessionExpiry);
 								if (resultData != "Fail") {
 									if(count == 0){
-										logger.error('Jira: Issue created successfully.');
+										logger.info('Jira: Issue created successfully.');
 										res.send(resultData);
 										count++;
 									}
@@ -1100,7 +1099,7 @@ exports.connectJira_ICE = function (req, res) {
 							res.send("unavailableLocalServer");
 						}
 					} catch (exception) {
-						logger.error("Exception in the service connectJira_ICE - createIssueInJira: ", exception);
+						logger.error("Exception in the service connectJira_ICE - createIssueInJira: %s", exception);
 					}
 				}
 				else{
@@ -1114,7 +1113,7 @@ exports.connectJira_ICE = function (req, res) {
 		}
 	}
 	catch (exception) {
-		logger.error("Exception in the service connectJira_ICE: ", exception);
+		logger.error("Exception in the service connectJira_ICE: %s", exception);
 		res.send("Fail");
 	}
 }

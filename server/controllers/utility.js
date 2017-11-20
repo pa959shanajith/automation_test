@@ -1,4 +1,3 @@
-//node
 var myserver = require('../../server.js');
 // var PythonShell = require('python-shell');
 var Client = require("node-rest-client").Client;
@@ -27,8 +26,8 @@ exports.Encrypt_ICE = function getDomains_ICE(req, res) {
 			function validateEncryption()
 			{
 				logger.info("Inside function validateEncryption");
-				check_encryptionType = validator.isAlpha(methodSelected);
-				if(check_encryptionType == true)
+				check_encryptionType = validator.isEmpty(methodSelected);
+				if(check_encryptionType == false)
 				{
 					validate_encryptionType = true;
 				}

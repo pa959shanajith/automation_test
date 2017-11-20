@@ -36,11 +36,11 @@ var copiedViewstring = false;
 var getIndexOfDeletedObjects = [];
 var newScrapedData;
 window.localStorage['disableEditing'] = "false";
-mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout', 'DesignServices', 'cfpLoadingBar', '$window', function($scope, $http, $location, $timeout, DesignServices, cfpLoadingBar, $window) {
+mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$location', '$timeout', 'DesignServices', 'cfpLoadingBar', '$window', function($scope, $rootScope, $http, $location, $timeout, DesignServices, cfpLoadingBar, $window) {
     $("body").css("background", "#eee");
     $("#tableActionButtons, .designTableDnd").delay(500).animate({
         opacity: "1"
-    }, 500)
+    }, 500);
     $timeout(function() {
         $('.scrollbar-inner').scrollbar();
         $('.scrollbar-macosx').scrollbar();
@@ -61,7 +61,8 @@ mySPA.controller('designController', ['$scope', '$http', '$location', '$timeout'
         window.localStorage['navigateScrape'] = false;
     }
     if (taskAuth == false) {
-        window.location.href = "/";
+        $rootScope.redirectPage();
+        return;
     }
     //Default Function to reset all input, select
     $scope.resetTextFields = function() {
@@ -256,7 +257,8 @@ console.log("screenName:", screenName);
         DesignServices.readTestCase_ICE(screenId, testCaseId, testCaseName, versionnumber)
             .then(function(data) {
                     if (data == "Invalid Session") {
-                        window.location.href = "/";
+                        $rootScope.redirectPage();
+                        return;
                     }
                     //console.log(data);
                     var appType = taskInfo.appType;
@@ -272,7 +274,7 @@ console.log("screenName:", screenName);
                     DesignServices.getScrapeDataScreenLevel_ICE(screenId)
                         .then(function(data2) {
                                 if (data2 == "Invalid Session") {
-                                    window.location.href = "/";
+                                    $rootScope.redirectPage();
                                 }
                                 if (appType == "Webservice") {
                                     if (data2 != "") dataFormat12 = data2.header[0].split("##").join("\n");
@@ -290,7 +292,7 @@ console.log("screenName:", screenName);
                                 DesignServices.getKeywordDetails_ICE(appType)
                                     .then(function(data3) {
                                             if (data3 == "Invalid Session") {
-                                                window.location.href = "/";
+                                                $rootScope.redirectPage();
                                             }
                                             keywordValArr.length = 0;
                                             keywordListData = angular.toJson(data3);
@@ -379,7 +381,7 @@ console.log("screenName:", screenName);
             DesignServices.debugTestCase_ICE(browserType, checkedTestcases, appType)
                 .then(function(data) {
                         if (data == "Invalid Session") {
-                            window.location.href = "/";
+                            $rootScope.redirectPage();
                         }
                         console.log("debug-----", data);
                         if (data == "unavailableLocalServer") {
@@ -407,7 +409,7 @@ console.log("screenName:", screenName);
             DesignServices.debugTestCase_ICE(browserType, testcaseID, appType)
                 .then(function(data) {
                         if (data == "Invalid Session") {
-                            window.location.href = "/";
+                            $rootScope.redirectPage();
                         }
                         console.log("debug-----", data);
                         if (data == "unavailableLocalServer") {
@@ -473,7 +475,7 @@ console.log("screenName:", screenName);
                                 DesignServices.updateTestCase_ICE(screenId, testCaseId, testCaseName, resultString, userInfo, versionnumber)
                                     .then(function(data) {
                                         if (data == "Invalid Session") {
-                                            window.location.href = "/";
+                                            $rootScope.redirectPage();
                                         }
                                         if (data == "success") {
                                             angular.element(document.getElementById("tableActionButtons")).scope().readTestCase_ICE();
@@ -539,7 +541,7 @@ console.log("screenName:", screenName);
                                 .then(function(data) {
                                     console.log("hello");
                                     if (data == "Invalid Session") {
-                                        window.location.href = "/";
+                                        $rootScope.redirectPage();
                                     }
                                     if (data == "success") {
                                         angular.element(document.getElementById("tableActionButtons")).scope().readTestCase_ICE();
@@ -599,7 +601,7 @@ console.log("screenName:", screenName);
                             DesignServices.updateTestCase_ICE(screenId, testCaseId, testCaseName, resultString, userInfo, versionnumber)
                                 .then(function(data) {
                                     if (data == "Invalid Session") {
-                                        window.location.href = "/";
+                                        $rootScope.redirectPage();
                                     }
                                     if (data == "success") {
                                         angular.element(document.getElementById("tableActionButtons")).scope().readTestCase_ICE();
@@ -631,7 +633,7 @@ console.log("screenName:", screenName);
         DesignServices.readTestCase_ICE(screenId, testCaseId, testCaseName, versionnumber)
             .then(function(response) {
                     if (response == "Invalid Session") {
-                        window.location.href = "/";
+                        $rootScope.redirectPage();
                     }
                     var temp, responseData;
                     if (typeof response === 'object') {
@@ -742,7 +744,7 @@ console.log("screenName:", screenName);
         DesignServices.getScrapeDataScreenLevel_ICE()
             .then(function(data) {
                     if (data == "Invalid Session") {
-                        window.location.href = "/";
+                        $rootScope.redirectPage();
                     }
                     gsElement = [];
                     $(".popupWrap").animate({
@@ -921,7 +923,7 @@ console.log("screenName:", screenName);
         DesignServices.getScrapeDataScreenLevel_ICE()
             .then(function(data) {
                     if (data == "Invalid Session") {
-                        window.location.href = "/";
+                        $rootScope.redirectPage();
                     }
                     if (typeof data === "object") {
                         //Printing the Save data in UI
@@ -1034,7 +1036,7 @@ console.log("screenName:", screenName);
             DesignServices.updateScreen_ICE(scrapeObject)
                 .then(function(data) {
                     if (data == "Invalid Session") {
-                        window.location.href = "/";
+                        $rootScope.redirectPage();
                     }
                     if (data == "success") {
                         openDialog("Save WebService Template", "WebService Template saved successfully.");
@@ -1140,7 +1142,7 @@ console.log("screenName:", screenName);
             DesignServices.initScrapeWS_ICE(initWSJson)
                 .then(function(data) {
                     if (data == "Invalid Session") {
-                        window.location.href = "/";
+                        $rootScope.redirectPage();
                     }
                     if (data == "unavailableLocalServer") {
                         unblockUI();
@@ -1185,7 +1187,7 @@ console.log("screenName:", screenName);
             DesignServices.launchWSDLGo(wsdlUrl)
                 .then(function(data) {
                         if (data == "Invalid Session") {
-                            window.location.href = "/";
+                            $rootScope.redirectPage();
                         }
                         if (data == "fail") {
                             unblockUI();
@@ -1225,7 +1227,7 @@ console.log("screenName:", screenName);
             DesignServices.wsdlAdd(wsdlUrl, wsdlSelectedMethod)
                 .then(function(data) {
                         if (data == "Invalid Session") {
-                            window.location.href = "/";
+                            $rootScope.redirectPage();
                         }
                         if (data == "unavailableLocalServer") {
                             unblockUI();
@@ -1469,7 +1471,7 @@ console.log("screenName:", screenName);
                     console.log("UI", data);
 
                     if (data == "Invalid Session") {
-                        window.location.href = "/";
+                        $rootScope.redirectPage();
                     }
                     //window.localStorage['disableEditing'] = "true";
                     unblockUI();
@@ -1754,7 +1756,7 @@ console.log("screenName:", screenName);
                 debugger;
                 console.log("out", data);
                 if (data == "Invalid Session") {
-                    window.location.href = "/";
+                    $rootScope.redirectPage();
                 }
                 if (data == 'success') {
                     //openDialog("Compared Objects", "Scraped data updated successfully.");
@@ -1867,7 +1869,7 @@ console.log("screenName:", screenName);
             DesignServices.updateScreen_ICE(scrapeObject)
                 .then(function(data) {
                     if (data == "Invalid Session") {
-                        window.location.href = "/";
+                        $rootScope.redirectPage();
                     }
                     if (data == "success") {
                         openDialog("Delete Scrape Objects", "Scraped Objects deleted successfully.")
@@ -2181,7 +2183,7 @@ console.log("screenName:", screenName);
         DesignServices.highlightScrapElement_ICE(xpath, url, appType)
             .then(function(data) {
                 if (data == "Invalid Session") {
-                    window.location.href = "/";
+                    $rootScope.redirectPage();
                 }
                 if (data == "fail") {
                     openDialog("Fail", "Failed to highlight")
@@ -2316,12 +2318,40 @@ console.log("screenName:", screenName);
 
     //Submit Custom Object Functionality
     $scope.submitCustomObject = function() {
+        var err = "false";
+        $('input.inputErrorBorderBottom').removeClass('inputErrorBorderBottom');
         $scope.errorMessage = "";
         $(".addObjTopWrap").find(".error-msg-abs").text("");
         $(".addObj-row").find("input").removeAttr("style");
         var flag = "false";
-        $(".addObj-row").find("input").removeClass('inputErrorBorder')
-        $(".addObj-row").find("select").removeClass('selectErrorBorder')
+        $(".addObj-row").find("input").removeClass('inputErrorBorder');
+        $(".addObj-row").find("select").removeClass('selectErrorBorder');
+        var custObjNames = [];
+        var dupCustObjNames = [];
+        $('input.form-control-custom').each(function() {
+            custObjNames.push( $.trim($(this).val()));
+        });
+        var sorted_custObjNames = custObjNames.slice().sort();
+        for (var i = 0; i < custObjNames.length - 1; i++) {
+            if (sorted_custObjNames[i + 1] == sorted_custObjNames[i]) {
+                dupCustObjNames.push(sorted_custObjNames[i]);
+            }
+        }
+        if(dupCustObjNames.length > 0)
+        {
+            openDialog("Add Object", "Duplicate custom names added");
+            $('input.form-control-custom').each(function() {
+                for(var j=0;j<dupCustObjNames.length;j++)
+                {
+                    if ($.trim($(this).val()) == $.trim(dupCustObjNames[j]))
+                    {
+                        $(this).addClass('inputErrorBorderBottom');
+                    } 
+                }
+                    
+            });
+            return false;
+        }
         $.each($(".addObj-row"), function() {
             if ($(this).find("input").val() == "") {
                 //$scope.errorMessage = "Please enter object name";
@@ -2361,18 +2391,26 @@ console.log("screenName:", screenName);
                       for (var i = 0; i < viewString.view.length; i++) {
                          
 						if ( $.trim($(this).find("input").val()) == $.trim(viewString.view[i].custname) || $.trim($(this).find("input").val()) == $.trim(viewString.view[i].custname).split("_")[0]) {
-							$("#dialog-addObject").modal("hide");
-							openDialog("Add Object", "Object characterstics are same for " + $(this).find("input").val() + "");
-							return false;
+							//$("#dialog-addObject").modal("hide");
+                            openDialog("Add Object", "Object characterstics are same for " + $(this).find("input").val() + "");
+                            $(this).find("input").addClass('inputErrorBorderBottom');
+                            err = "true";
 						}
-				    }
+                    }
                 }
-              
-                //If no field is empty, proceed to service call
-                flag = "true";
-                $scope.errorMessage = "";
-                $(".addObj-row").find("input").removeClass('inputErrorBorder')
-                $(".addObj-row").find("select").removeClass('selectErrorBorder')
+                if(err == "true")
+                {
+                    flag = "false";
+                    return false;
+                }
+                else
+                {
+                    //If no field is empty, proceed to service call
+                    flag = "true";
+                    $scope.errorMessage = "";
+                    $(".addObj-row").find("input").removeClass('inputErrorBorder')
+                    $(".addObj-row").find("select").removeClass('selectErrorBorder')
+                }
             }
         })
         if (flag == "true") {
@@ -2721,7 +2759,7 @@ console.log("screenName:", screenName);
                 DesignServices.mapScrapeData_ICE(scrapeObject)
                     .then(function(data) {
                             if (data == "Invalid Session") {
-                                window.location.href = "/";
+                                $rootScope.redirectPage();
                             }
                             $("#dialog-mapObject").modal("hide");
                             if (data == "success") openDialog("Map Object", "Objects has been mapped successfully."); //$("#mapObjSuccess").modal("show");
@@ -3093,7 +3131,7 @@ console.log("screenName:", screenName);
         DesignServices.updateScreen_ICE(scrapeObject)
             .then(function(data) {
                 if (data == "Invalid Session") {
-                    window.location.href = "/";
+                    $rootScope.redirectPage();
                 }
                 if (data == "success") {
 					eaCheckbox = false;
@@ -3280,7 +3318,7 @@ console.log("screenName:", screenName);
                         DesignServices.updateTestCase_ICE(screenId, testCaseId, testCaseName, mydata, userInfo, versionnumber)
                             .then(function(data) {
                                     if (data == "Invalid Session") {
-                                        window.location.href = "/";
+                                        $rootScope.redirectPage();
                                     }
                                     if (data == "success") {
                                         /*if(window.localStorage['UITSCrtd'] == "true") window.localStorage['UITSCrtd'] = "false"
@@ -3447,7 +3485,7 @@ console.log("screenName:", screenName);
             DesignServices.getTestcasesByScenarioId_ICE(testScenarioId)
                 .then(function(data) {
                     if (data == "Invalid Session") {
-                        window.location.href = "/";
+                        $rootScope.redirectPage();
                     }
                     $("#dependentTestCasesContent").empty();
                     //data = data.sort();

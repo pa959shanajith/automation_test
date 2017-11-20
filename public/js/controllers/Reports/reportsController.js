@@ -1,5 +1,5 @@
 
-mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout','$window', 'reportService','cfpLoadingBar','$sce', function($scope,$http,$location,$timeout,$window,reportService, cfpLoadingBar, $sce) {
+mySPA.controller('reportsController', ['$scope','$rootScope', '$http', '$location', '$timeout','$window', 'reportService','cfpLoadingBar','$sce', function($scope, $rootScope, $http,$location,$timeout,$window,reportService, cfpLoadingBar, $sce) {
 	$("body").css("background","#eee");
 	$("head").append('<link id="mindmapCSS2" rel="stylesheet" type="text/css" href="fonts/font-awesome_mindmap/css/font-awesome.min.css" />')
 	var getUserInfo = JSON.parse(window.localStorage['_UI']);
@@ -20,9 +20,8 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 	{
 		taskAuth = false;
 	}*/
-	if(window.localStorage['navigateScreen'] != "p_Reports")
-	{
-		window.location.href = "/";
+	if(window.localStorage['navigateScreen'] != "p_Reports"){
+		$rootScope.redirectPage();
 	}
 	//Loading Project Info
 	//var getProjInfo = JSON.parse(window.localStorage['_T'])
@@ -36,7 +35,7 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 		reportService.getMainReport_ICE()
 		.then(function(data1) {
 			if(data1 == "Invalid Session"){
-				window.location.href = "/";
+				$rootScope.redirectPage();
 			}
 			if(data1 != "fail"){
 				$("#reportSection").append(data1);
@@ -68,7 +67,7 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 		reportService.getAllSuites_ICE(ID, type)
 		.then(function(data) {
 			if(data == "Invalid Session"){
-				window.location.href = "/";
+				$rootScope.redirectPage();
 			}
 			if(type == "projects"){
 				if(data != "fail" && data.projectids.length != 0){
@@ -179,7 +178,7 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 		reportService.getSuiteDetailsInExecution_ICE(testsuiteId)
 		.then(function(data) {
 			if(data == "Invalid Session"){
-				window.location.href = "/";
+				$rootScope.redirectPage();
 			}
 			if(data != "fail"){
 				var tableContainer = $('#testSuitesTimeTable');
@@ -336,7 +335,7 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 		.then(function(data) {
 			console.log("data",data);
 			if(data == "Invalid Session"){
-				window.location.href = "/";
+				$rootScope.redirectPage();
 			}
 			if(data != "fail"){
 				var scenarioContainer = $('#scenarioReportsTable');
@@ -487,7 +486,7 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 		reportService.getReport_Nineteen68(reportID, testsuiteId,testsuitename)
 		.then(function(data) {
 			if(data == "Invalid Session"){
-				window.location.href = "/";
+				$rootScope.redirectPage();
 			}
 			if(data != "fail"){
 				if(data.length > 0){
@@ -549,7 +548,7 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 					//Service call to get Html reports
 					reportService.renderReport_ICE(finalReports, reportType).then(
 					function(data1) {
-						if(data1 == "Invalid Session") window.location.href = "/";
+						if(data1 == "Invalid Session") $rootScope.redirectPage();
 						else if(data1 == "fail") console.log("Failed to render reports.");
 						else{
 							openWindow = 0;
@@ -578,7 +577,7 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 						//Service call to get Pdf reports
 						reportService.renderReport_ICE(finalReports, reportType).then(
 						function(data1){
-							if(data1 == "Invalid Session") window.location.href = "/";
+							if(data1 == "Invalid Session") $rootScope.redirectPage();
 							else if(data1 == "fail") console.log("Failed to render reports.");
 							else{
 								openWindow = 0;
@@ -623,7 +622,7 @@ mySPA.controller('reportsController', ['$scope', '$http', '$location', '$timeout
 		reportService.exportToJson_ICE(repId)
 		.then(function(response) {
 			if(response == "Invalid Session"){
-				window.location.href = "/";
+				$rootScope.redirectPage();
 			}
 			if(response != "fail"){
 				if (typeof response === 'object') {

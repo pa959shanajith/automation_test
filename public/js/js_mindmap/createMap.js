@@ -1,11 +1,7 @@
 var activeNode,childNode,uNix,uLix,node,link,dNodes,dLinks,allMMaps,temp,rootIndex,faRef,nCount,scrList,tcList,mapSaved,zoom,cSpan,cScale,taskAssign,releaseResult,selectedProject;
 //unassignTask is an array to store whose task to be deleted
 var deletednode=[],unassignTask=[],deletednode_info=[];
-var userInfo =  JSON.parse(window.localStorage['_UI']);
-var user_role=window.localStorage['_SR'];
-var userid = userInfo.user_id;
 var versioning_enabled=0;
-var username = userInfo.username;
 // node_names_tc keep track of testcase names to decide reusability of testcases
 var node_names_tc=[];
 var saveFlag=false;
@@ -14,7 +10,7 @@ var CreateEditFlag=false;
 var isIE = /*@cc_on!@*/false || !!document.documentMode;
 function loadMindmapData(param){
 	blockUI("Loading...");
-	dataSender({task:'populateProjects',user_id:userid},function(err,result){
+	dataSender({task:'populateProjects',user_id:JSON.parse(window.localStorage['_UI']).user_id},function(err,result){
 		if(err){
 			console.log(result);
 			unblockUI();
@@ -156,7 +152,7 @@ window.onresize=function() {
 	var w=window.innerWidth-28,h=window.innerHeight-123;
 	var mapSvg=d3.select('#ct-mapSvg').style('width',w+'px').style('height',h+'px');
 };
-var initiate = function(){
+function initiate(){
 	var t,u;
 	var selectedTab = window.localStorage['tabMindMap'];
 	d3.select('.ct-tileBox').remove();
@@ -198,16 +194,16 @@ var initiate = function(){
 
 
 };
-var zoomed = function(){
+function zoomed(){
 	cSpan=d3.event.translate;
 	cScale=d3.event.scale;
 
 	//Logic to change the layout
 	d3.select("#ct-mindMap").attr("transform","translate("+d3.event.translate+")scale("+d3.event.scale +")");
 };
-var getElementDimm = function(s){return [parseFloat(s.style("width")),parseFloat(s.style("height"))];};
+function getElementDimm(s){return [parseFloat(s.style("width")),parseFloat(s.style("height"))];};
 
-var createNewMap = function(e){
+function createNewMap(e){
 	initiate();
 	clearSvg();
 	var s=getElementDimm(d3.select("#ct-mapSvg"));
@@ -228,7 +224,7 @@ var createNewMap = function(e){
 	editNode(e);
 };
 
-var loadMap = function(e){
+function loadMap(e){
 
 	if(!d3.select('#ct-mindMap')[0][0] || confirm('Unsaved work will be lost if you continue.\nContinue?')){
 		saveFlag=false;
@@ -243,7 +239,7 @@ var loadMap = function(e){
 	}
 };
 // to load the map again after switching the layout
-var loadMap2 = function(){
+function loadMap2(){
 	var selectedTab = window.localStorage['tabMindMap'];
     if(selectedTab=='mindmapEndtoEndModules'){
 		var tbd=dNodes_W[0];
@@ -259,13 +255,15 @@ var loadMap2 = function(){
 	}
 };
 
-var genPathData = function(s,t){
+function genPathData(s,t){
 	/*if(s[1]<t[1]) return ('M'+s[0]+','+s[1]+' H'+(((s[0]+t[0])/2)-10)+' Q'+((s[0]+t[0])/2)+','+s[1]+' '+((s[0]+t[0])/2)+','+(s[1]+10)+'  V'+(t[1]-10)+' Q'+((s[0]+t[0])/2)+','+t[1]+' '+(((s[0]+t[0])/2)+10)+','+t[1]+' H'+t[0]);
 	else return ('M'+s[0]+','+s[1]+' H'+(((s[0]+t[0])/2)-10)+' Q'+((s[0]+t[0])/2)+','+s[1]+' '+((s[0]+t[0])/2)+','+(s[1]-10)+'  V'+(t[1]+10)+' Q'+((s[0]+t[0])/2)+','+t[1]+' '+(((s[0]+t[0])/2)+10)+','+t[1]+' H'+t[0]);*/
 	return ('M'+s[0]+','+s[1]+'C'+(s[0]+t[0])/2+','+s[1]+' '+(s[0]+t[0])/2+','+t[1]+' '+t[0]+','+t[1]);
 };
-var addNode = function(n,m,pi){
 
+var node_names_tc=[];
+
+function addNode(n,m,pi){
 	var selectedTab = window.localStorage['tabMindMap'];
 	if(n.type=='testcases'){
 		node_names_tc.push(n.name);
@@ -293,7 +291,7 @@ var addNode = function(n,m,pi){
 	v.append('text').attr('class','ct-nodeLabel').text(n.display_name).attr('text-anchor','middle').attr('x',20).attr('title',n.name).attr('y',50);
 	v.append('title').text(n.name);
 	//Condition to add the properties of reuse to the node (Currently only for testcases)
-	if(node_names_tc.length>0 && node_names_tc.indexOf(n.name)>-1){
+	if(node_names_tc && node_names_tc.length >0 && node_names_tc.indexOf(n.name)>-1){
 		if(node_names_tc.indexOf(n.name)==node_names_tc.lastIndexOf(n.name)){
 			n.reuse='reuse';
 		}else{
@@ -303,8 +301,6 @@ var addNode = function(n,m,pi){
 		//if(v.select('.ct-nodeReuse')[0][0]==null)
 		//v.append('image').attr('class','ct-nodeReuse').attr('xlink:href','images_mindmap/NEAREST.png').attr('x',10).attr('y',10);
 	}
-
-
 
 	if(m&&pi){
 		var p=d3.select('#ct-node-'+pi.id);
@@ -329,11 +325,11 @@ var addNode = function(n,m,pi){
 				else
 					v.append('circle').attr('class','ct-'+n.type+' ct-cLeft ct-nodeBubble').attr('cx',-3).attr('cy',20).attr('r',4).on('mousedown',moveNodeBegin).on('mouseup',moveNodeEnd);
 			}
-
 	}
 	return v;
 };
-var addLink = function(r,p,c){
+
+function addLink(r,p,c){
 //Modified parameters for layout change
 
 	// switch-layout feature
@@ -349,7 +345,7 @@ var addLink = function(r,p,c){
 	var l=d3.select('#ct-mindMap').insert('path','g').attr('id','ct-link-'+r).attr('class','ct-link').attr('d',d);
 };
 //To Unassign the task of a particular node
-var removeTask= function(e){
+function removeTask(e){
 	if ($("#ct-unassignButton a").attr('class')=='disableButton') return;
 	var p=d3.select(activeNode);
 	p.select('.ct-nodeTask').classed('no-disp',!0);
@@ -360,7 +356,7 @@ var removeTask= function(e){
 	}
 	d3.select('#ct-assignBox').classed('no-disp',!0);
 }
-var addTask = function(e){
+function addTask(e){
 
 	$("ct-assignTask,#ct-assignedTo,#ct-assignRevw,#ct-assignRel,#ct-assignCyc").removeClass("selectErrorBorder");
 	$("#startDate,#endDate").removeClass("inputErrorBorder");
@@ -621,7 +617,7 @@ var addTask = function(e){
 	}
 };
 
-var nodeClick = function(e){
+function nodeClick(e){
 	e=e||window.event;
 	e.cancelbubble=!0;
 	if(e.stopPropagation) e.stopPropagation();
@@ -669,6 +665,7 @@ var nodeClick = function(e){
 				$('#ct-executeBatch').removeAttr("disabled");
 			}else{
 				$('#ct-executeBatch').attr('disabled','true');
+				$('#ct-executeBatch').val('');
 			}
 	})
 
@@ -895,7 +892,7 @@ function loadCycles(){
 							});
 }
 
-var nodeCtrlClick = function(e){
+function nodeCtrlClick(e){
 	d3.select('#ct-inpBox').classed('no-disp',!0);
 	e=e||window.event;
 	e.cancelbubble=!0;
@@ -935,7 +932,7 @@ var nodeCtrlClick = function(e){
 	}
 };
 
-var getNewPosition=function(node,pi,arr_co){
+function getNewPosition(node,pi,arr_co){
 	// Switch_layout functionality
 	var layout_vertical=$('#switch-layout').hasClass('vertical-layout');
 	if(dNodes[pi].children.length >0){
@@ -1022,7 +1019,7 @@ var getNewPosition=function(node,pi,arr_co){
 	return node;
 }
 
-var createNode = function(e){
+function createNode(e){
 	//If module is in edit mode, then return do not add any node
 	if(d3.select('#ct-inpBox').attr('class')=="") return;
 
@@ -1079,7 +1076,7 @@ var createNode = function(e){
 	}
 
 };
-var editNode = function(e,node){
+function editNode(e,node){
 
 	$('#ct-inpAct').removeClass('errorClass');
 	d3.select('#ct-inpAct').classed('no-disp',!1);
@@ -1152,7 +1149,7 @@ var editNode = function(e,node){
 	d3.select('#ct-inpSugg').classed('no-disp',!0);
 };
 
-var deleteNode = function(e){
+function deleteNode(e){
 	//If module is in edit mode, then return do not add any node
 	if(d3.select('#ct-inpBox').attr('class')=="") return;
 	d3.select('#ct-ctrlBox').classed('no-disp',!0);
@@ -1180,7 +1177,7 @@ var deleteNode = function(e){
 	});
 	if(p.children.length==0) d3.select('#ct-node-'+p.id).select('.ct-cRight').remove();
 };
-var recurseDelChild = function(d){
+function recurseDelChild(d){
 	if(d.children) d.children.forEach(function(e){recurseDelChild(e);});
 	d.parent=null;
 	d.children=null;
@@ -1197,12 +1194,12 @@ var recurseDelChild = function(d){
 		}
 	}
 };
-var moveNode = function(e){
+function moveNode(e){
 	e=e||window.event;
 	//#886 Unable to rearrange nodes in e2e
 	d3.select('.ct-movable').attr('transform', "translate("+parseFloat((e.pageX-14-cSpan[0])/cScale+2)+","+parseFloat((e.pageY-188-cSpan[1])/cScale-20)+")");
 };
-var moveNodeBegin = function(e){
+function moveNodeBegin(e){
 	e=e||window.event;
 	e.cancelbubble=!0;
 	//Issue #763 is fixed,Mindmap - If node is moved in edit mode ,then Textbox is not been moved with the Node.
@@ -1229,7 +1226,7 @@ var moveNodeBegin = function(e){
 	p.classed('ct-movable',!0);
 	d3.select('#ct-mapSvg').on('mousemove.nodemove',moveNode);
 };
-var moveNodeEnd = function(e){
+function moveNodeEnd(e){
 	d3.select('#ct-mapSvg').on('mousemove.nodemove',null);
 	var isIE = /*@cc_on!@*/false || !!document.documentMode;
 	var p=d3.select(this.parentElement);
@@ -1244,7 +1241,7 @@ var moveNodeEnd = function(e){
 	//Logic to implement rearranging of nodes
 	var curNode=dNodes[pi];
 	//logic changed to the change in layout
-	var changeOrderRight = function(curNode,ci,totalChildren){
+	function changeOrderRight(curNode,ci,totalChildren){
 		var counter=-1;
 		var flag=false;
 		totalChildren.forEach(function(a,i){
@@ -1273,7 +1270,7 @@ var moveNodeEnd = function(e){
 
 		});
 	};
-	var changeOrderLeft = function(curNode,ci,totalChildren){
+	function changeOrderLeft(curNode,ci,totalChildren){
 		var counter=0;
 		var flag=false;
 		totalChildren.forEach(function(a,ci){
@@ -1340,7 +1337,7 @@ var moveNodeEnd = function(e){
 	});
 	p.classed('ct-movable',!1);
 };
-var toggleNode = function(e){
+function toggleNode(e){
 	var isIE = /*@cc_on!@*/false || !!document.documentMode;
 	var p=d3.select(this.parentElement);
 	if (isIE) {
@@ -1360,7 +1357,7 @@ var toggleNode = function(e){
 		recurseTogChild(dNodes[pi],!1);
 	}
 };
-var recurseTogChild = function(d,v){
+function recurseTogChild(d,v){
 	if(d.children) d.children.forEach(function(e){
 		recurseTogChild(e,v);
 		d3.select('#ct-node-'+e.id).classed('no-disp',v);
@@ -1380,7 +1377,7 @@ var recurseTogChild = function(d,v){
 		}
 	});
 };
-var validNodeDetails = function(value,p){
+function validNodeDetails(value,p){
 	var nName,flag=!0;
 	nName=value;
 	//var specials=/[*|\":<>[\]{}`\\()'!;@&$~#%^-]/;
@@ -1393,7 +1390,7 @@ var validNodeDetails = function(value,p){
 };
 
 
-var inpChange = function(e){
+function inpChange(e){
 	console.log('inpchange executed')
 	var inp=d3.select('#ct-inpAct');
 	var val=inp.property('value');
@@ -1437,7 +1434,7 @@ var inpChange = function(e){
 	}
 	zoom.event(d3.select('#ct-mapSvg'));
 };
-var inpKeyUp = function(e){
+function inpKeyUp(e){
 	e=e||window.event;
 	temp=[];
 	var t,list;
@@ -1505,7 +1502,7 @@ var inpKeyUp = function(e){
 		else d3.select(this.parentElement).select('#ct-inpPredict').property('value','');
 	}
 };
-var treeIterator = function(c,d,e){
+function treeIterator(c,d,e){
 	c.push({id:d.id,childIndex:d.childIndex,id_c:(d.id_c)?d.id_c:null,id_n:(d.id_n)?d.id_n:null,oid:(d.oid)?d.oid:null,name:d.name,type:d.type,pid:(d.parent)?d.parent.id:null,pid_c:(d.parent)?d.parent.id_c:null,task:(d.task)?d.task:null,renamed:(d.rnm)?d.rnm:!1,orig_name:(d.original_name)?d.original_name:null});
 	if(d.children&&d.children.length>0) d.children.forEach(function(t){e=treeIterator(c,t,e);});
 	else if(d._children&&d._children.length>0) d._children.forEach(function(t){e=treeIterator(c,t,e);});
@@ -1513,7 +1510,7 @@ var treeIterator = function(c,d,e){
 	return e;
 };
 
-var submit_task=function(action){
+function submit_task(action){
 	var taskinfo=JSON.parse(window.localStorage['_CT']);
 	var taskid=taskinfo.subTaskId;
 	var taskstatus=taskinfo.status;
@@ -1522,7 +1519,7 @@ var submit_task=function(action){
 	if (action!=undefined && action=='reassign'){
 		taskstatus=action;
 	}
-	dataSender({task:'reviewTask',prjId:$(".project-list").val(),taskId:taskid,userId:userid,status:taskstatus,user_name:username,versionnumber:version,batchIds:batchTaskIDs},function(err,result){
+	dataSender({task:'reviewTask',prjId:$(".project-list").val(),taskId:taskid,userId:JSON.parse(window.localStorage['_UI']).user_id,status:taskstatus,user_name:JSON.parse(window.localStorage['_UI']).username,versionnumber:version,batchIds:batchTaskIDs},function(err,result){
 		if(err) console.log(result);
 		else{
 			if (result=='fail'){
@@ -1541,7 +1538,7 @@ var submit_task=function(action){
 	});
 }
 
-var actionEvent = function(e){
+function actionEvent(e){
 	var selectedTab = window.localStorage['tabMindMap'];
 	var s=d3.select(this);
 	var cur_module=null;
@@ -1587,7 +1584,7 @@ var actionEvent = function(e){
 	var from_v=to_v=0;
 	if ($('.version-list').length !=0)
 	from_v=to_v=$('.version-list').val();
-	dataSender({task:'writeMap',data:{sendNotify:assignedTo,write:flag,userRole:user_role,vn_from: from_v, vn_to: to_v,tab:cur_module,map:mapData,user_name:username,abc:deletednode,xyz:unassignTask,prjId:$('.project-list').val(),relId:$('#ct-assignRel').val(),cycId:$('#ct-assignCyc').val()},role:user_role,versioning:versioning_enabled},function(err,result){
+	dataSender({task:'writeMap',data:{sendNotify:assignedTo,write:flag,userRole:window.localStorage['_SR'],vn_from: from_v, vn_to: to_v,tab:cur_module,map:mapData,user_name:username,abc:deletednode,xyz:unassignTask,prjId:$('.project-list').val(),relId:$('#ct-assignRel').val(),cycId:$('#ct-assignCyc').val()},role:window.localStorage['_SR'],versioning:versioning_enabled},function(err,result){
 		s.classed('no-access',!1);
 		if(err){
 			console.log(result);
@@ -1708,7 +1705,7 @@ if(flag==20){
 		}
 	});
 };
-var toggleExpand = function(e){
+function toggleExpand(e){
 	var s=d3.select($(e.target).parent());
 	var p=d3.select($(e.target).parent().parent());
     $(e.target).parent().toggleClass('ct-rev');
@@ -1733,7 +1730,7 @@ var toggleExpand = function(e){
 		$(".ct-nodeBox").css({"overflow":"", "width":""})
 	}
 };
-var toggleExpandAssign = function(e){
+function toggleExpandAssign(e){
 	// var s=d3.select($("#"+e.target.id));
 	// var p=d3.select($("#"+e.target.id).parent());
 	// $("#"+e.target.id).toggleClass('ct-rev');
@@ -1762,12 +1759,12 @@ var toggleExpandAssign = function(e){
 		$(".ct-nodeBox").css({"overflow":"", "width":""})
 	}
 };
-var clickHideElements = function(e){
+function clickHideElements(e){
 	d3.select('#ct-inpBox').classed('no-disp',!0);
 	d3.select('#ct-ctrlBox').classed('no-disp',!0);
 	d3.select('#ct-assignBox').classed('no-disp',!0);
 };
-var setModuleBoxHeight = function(){
+function setModuleBoxHeight(){
 	//var lm=d3.select('#ct-moduleBox').classed('ct-open',!0);
 	var lm=d3.select('.ct-moduleBoxOptional').classed('ct-open',!0);
 	var h1=lm.style('height');
@@ -1775,7 +1772,7 @@ var setModuleBoxHeight = function(){
 	if(h1==lm.style('height')) lm.select('.ct-expand').classed('no-disp',!0);
 	else lm.select('.ct-expand').classed('no-disp',!1);
 };
-var populateDynamicInputList = function(){
+function populateDynamicInputList(){
 	scrList=[];tcList=[];scenarioList=[];
 	var scrDict={},tcDict={},scenarioDict={};
 	allMMaps.forEach(function(m){
@@ -1808,7 +1805,7 @@ var populateDynamicInputList = function(){
 
 	});
 };
-var clearSvg = function(){
+function clearSvg(){
 	d3.select('#ct-mindMap').remove();
 	d3.select('#ct-ctrlBox').classed('no-disp',!0);
 	d3.select('#ct-assignBox').classed('no-disp',!0);
@@ -1819,18 +1816,18 @@ var clearSvg = function(){
 };
 
 //FUnction is tagged to every click on 'cnavas' element to validate the names of nodes when created
-var callme=function(){
+function callme(){
 	if(childNode != null && (childNode.text()=='Module_0' || childNode.text()=='Screen_0' || childNode.text()=='Scenario_0' || childNode.text()=='Testcase_0')){
 		d3.select('#ct-inpBox').classed('no-disp',!1);
 	}
 
 }
 
-var treeBuilder = function(tree){
+function treeBuilder(tree){
 	node_names_tc=[];
 	var pidx=0,levelCount=[1],cSize=getElementDimm(d3.select("#ct-mapSvg"));
 	var typeNum={'modules':0,'modules_endtoend':0,'scenarios':1,'screens':2,'testcases':3};
-	var childCounter = function(l,s){
+	function childCounter(l,s){
 		if(levelCount.length<=l) levelCount.push(0);
 		if(s.children) {
 			levelCount[l]+=s.children.length;
@@ -1882,7 +1879,7 @@ else
 };
 
 
-var dataSender = function(data,callback){
+function dataSender(data,callback){
 	var xhttp;
 	try{xhttp=new XMLHttpRequest();}catch(e){try{xhttp=new ActiveXObject("Msxml2.XMLHTTP");}catch(e){try{xhttp=new ActiveXObject("Microsoft.XMLHTTP");}catch(e){alert("Your Browser is outdated!\nPlease Update!");return false;}}}
 	xhttp.onreadystatechange = function(){4==this.readyState&&(200==this.status?callback(!1,this.responseText):(400==this.status||401==this.status||402==this.status||403==this.status||404==this.status)&&callback(!0,this.responseText));};

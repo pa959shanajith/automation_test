@@ -1,5 +1,5 @@
 var appType;var releaseName;var cycleName;var testSuiteName;
-mySPA.controller('executionController',['$scope','$http','$timeout','$location','ExecutionService','cfpLoadingBar', function ($scope, $http, $timeout, $location, ExecutionService, cfpLoadingBar) {
+mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeout','$location','ExecutionService','cfpLoadingBar', function ($scope, $rootScope, $http, $timeout, $location, ExecutionService, cfpLoadingBar) {
 	cfpLoadingBar.start();
 	var getEachScenario = [] //Contains Each RowData of Scenarios
 	var userinfo = {} //Contains Userinfo
@@ -25,7 +25,7 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 	}*/
 	if(window.localStorage['navigateScreen'] != "TestSuite")
 	{
-		window.location.href = "/";
+		$rootScope.redirectPage();
 	}
 	var current_task=JSON.parse(window.localStorage['_CT']);
 	var getTaskName = current_task.taskName;
@@ -87,7 +87,7 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 		ExecutionService.readTestSuite_ICE(readTestSuite, "execute")
 		.then(function(data) {
 			if(data == "Invalid Session"){
-					window.location.href = "/";
+					$rootScope.redirectPage();
 			 }
 			if(data == ""){
 				// $('.checkStylebox').attr("disabled", true); 
@@ -361,7 +361,7 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 		ExecutionService.loadLocationDetails(scenarioName, scenarioId)
 		.then(function(data) {
 			if(data == "Invalid Session"){
-					window.location.href = "/";
+					$rootScope.redirectPage();
 			 }
 			for(i=0; i<data.projectnames.length && data.testcasenames.length && data.screennames.length; i++){
 				//document.getElementById("scenarioDetailsContent").innerHTML += '<div class="sDInnerContentsWrap"><div class="sDInnerContents">'+data.testcasenames[i]+'</div><div class="sDInnerContents">'+data.screennames[i]+'</div><div class="sDInnerContents">'+data.projectnames[i]+'</div></div>'
@@ -467,7 +467,7 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 		.then(function(data) {
 			unblockUI();
 			if(data == "Invalid Session"){
-				window.location.href = "/";
+				$rootScope.redirectPage();
 			}
 			if(data != "fail"){
 				openDialogExe("Save Test Suite", "Test suite saved successfully.")
@@ -605,7 +605,7 @@ mySPA.controller('executionController',['$scope','$http','$timeout','$location',
 			ExecutionService.ExecuteTestSuite_ICE($scope.moduleInfo)
 			.then(function(data){
 				if(data == "Invalid Session"){
-					window.location.href = "/";
+					$rootScope.redirectPage();
 				}
 				if(data == "Terminate"){
 					$('#executionTerminated').modal('show');

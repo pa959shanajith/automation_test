@@ -1,5 +1,5 @@
 var releaseName,cycleName,testSuiteName;
-mySPA.controller('scheduleController',['$scope','$http','$timeout','$location','ScheduleService','cfpLoadingBar','$compile', function ($scope, $http, $timeout, $location, ScheduleService, cfpLoadingBar, $compile) {
+mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout','$location','ScheduleService','cfpLoadingBar','$compile', function ($scope, $rootScope, $http, $timeout, $location, ScheduleService, cfpLoadingBar, $compile) {
 	cfpLoadingBar.start();
 	$("body").css("background","#eee");
 	$("head").append('<link rel="stylesheet" type="text/css" href="fonts/font-awesome_mindmap/css/font-awesome.min.css" />')
@@ -17,13 +17,11 @@ mySPA.controller('scheduleController',['$scope','$http','$timeout','$location','
 	{
 		taskAuth = false;
 	}*/
-	if(window.localStorage['navigateScreen'] != "scheduling")
-	{
-		window.location.href = "/";
+	if(window.localStorage['navigateScreen'] != "scheduling"){
+		$rootScope.redirectPage();
 	}
 	
-	if(window.localStorage['_CT'])
-	{
+	if(window.localStorage['_CT']){
 		var window_ct=JSON.parse(window.localStorage['_CT']);
 		var readTestSuite = window_ct.testSuiteDetails;
 		for(var rti=0;rti<readTestSuite.length;rti++){
@@ -59,9 +57,8 @@ mySPA.controller('scheduleController',['$scope','$http','$timeout','$location','
 		ScheduleService.readTestSuite_ICE(readTestSuite, "schedule")
 		.then(function(result) {
 			if(result == "Invalid Session"){
-				window.location.href = "/";
-			}
-			else if(result.testSuiteDetails){
+				$rootScope.redirectPage();
+			}else if(result.testSuiteDetails){
 				var data = result.testSuiteDetails;
 				//Populating Data in Scheduling Table
 				var dataLen = Object.keys(data).length;

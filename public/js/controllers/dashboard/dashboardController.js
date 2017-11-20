@@ -1,4 +1,4 @@
-mySPA.controller('dashboardController', ['$scope', '$http', '$location', '$timeout', 'dashboardService', 'cfpLoadingBar', '$window', function($scope, $http, $location, $timeout, dashboardService, cfpLoadingBar, $window) {
+mySPA.controller('dashboardController', ['$scope', '$rootScope', '$http', '$timeout', 'dashboardService', 'cfpLoadingBar', '$window', function($scope, $rootScope, $http, $timeout, dashboardService, cfpLoadingBar, $window) {
   $scope.levels = ["Test Suites", "Cycles", "Releases","Projects"];
   $scope.selectedLevel = "Releases";
   $scope.selectedProject = {
@@ -81,7 +81,7 @@ mySPA.controller('dashboardController', ['$scope', '$http', '$location', '$timeo
     .then(function(data){
       //console.log(data);
       if(data == "Invalid Session"){
-        window.location.href = "/";
+        $rootScope.redirectPage();
       }
       if (data != 'fail') {
         $("#first_graph").append(data);
@@ -99,7 +99,7 @@ mySPA.controller('dashboardController', ['$scope', '$http', '$location', '$timeo
     .then(function(data){
       console.log(data);
       if(data == "Invalid Session"){
-        window.location.href = "/";
+        $rootScope.redirectPage();
       }
       if (data != 'fail') {
 

@@ -151,8 +151,8 @@ try {
     });
     //CORS
     app.all('*', function (req, res, next) {
-        res.header('Access-Control-Allow-Origin', '*');
-        res.header('Access-Control-Allow-Methods', 'PUT, GET, POST, DELETE, OPTIONS');
+        var origin = req.get('host');
+        res.setHeader('Access-Control-Allow-Origin', origin);
         res.header('Access-Control-Allow-Headers', 'X-Requested-With');
         next();
     });
@@ -168,11 +168,13 @@ try {
     }));
 
     //serve all asset files from necessary directories
+    app.use('/partials',express.static(__dirname + "/public/partials"));
     app.use("/js", express.static(__dirname + "/public/js"));
     app.use("/imgs", express.static(__dirname + "/public/imgs"));
     app.use("/images_mindmap", express.static(__dirname + "/public/images_mindmap"));
     app.use("/css", express.static(__dirname + "/public/css"));
     app.use("/fonts", express.static(__dirname + "/public/fonts"));
+
     // app.get("/", function(req, res) {
     //     // console.log("/--------",req);
     //     res.clearCookie('connect.sid');
@@ -181,13 +183,7 @@ try {
     //     });
     // });
 
-    app.get('/partials/:name', function (req, res) {
-        // console.log("/partials-----",req);
-        res.sendFile(__dirname + "/public/partials/" + req.params.name); //To render partials
-    });
-
     app.get('/',  function (req,  res)  {
-
         res.clearCookie('connect.sid');
         req.session.destroy();
         logger.rewriters.push(function (level, msg, meta) {
@@ -195,9 +191,13 @@ try {
             meta.userid = null;
             return meta;
         });
-        res.sendFile("index.html", {
-            root: __dirname + "/public/"
-        });
+        res.sendFile("index.html", {root: __dirname + "/public/"});
+    });
+
+    app.get('/login', function(req, res) {
+        res.clearCookie('connect.sid');
+        req.session.destroy();
+        res.sendFile("index.html", {root: __dirname + "/public/"});
     });
 
     app.get('/admin',  function (req,  res)  {
@@ -309,46 +309,6 @@ try {
 
     var Client = require("node-rest-client").Client;
     var apiclient = new Client();
-    //Starting jsreport server
-    if (os.type() == 'Windows_NT') {
-        try {
-            var tmp = os.tmpdir();
-            fs.unlinkSync(tmp + '\\jsreport-temp\\extensions\\locations.json');
-            fs.unlinkSync(tmp + '\\jsreport-temp\\licensing\\cache.json');
-        } catch (e) { }
-    }
-    cmd.get('netstat -ano | find "LISTENING" | find "8001"', function (data, err, stderr) {
-        if (data) {
-            //console.log('killing JS report server and restarting');
-            //console.log('===== Process ID of jsreport =====',data);
-            var thisResult = data.split("\r\n")[0].split(" ")[data.split("\r\n")[0].split(" ").length - 1];
-            var cmdtoexe = "Taskkill /PID " + thisResult + " /F";
-            cmd.get(cmdtoexe, function (data, err, stderr) {
-                if (data) {
-                    //console.log('===== Killed jsreport server =====',data);
-                    cmd.get('node index.js', function (data, err, stderr) {
-                        if (!err) {
-                            logger.debug('the node-cmd: %s', data);
-                        } else {
-                            logger.error("Cannot start Jsreport server");
-                        }
-                    });
-                }
-                else {
-                    logger.error("Cannot kill jsreport server");
-                }
-            });
-        }
-        else {
-            cmd.get('node index.js', function (data, err, stderr) {
-                if (!err) {
-                    logger.info('JS report server started normally');
-                } else {
-                    logger.error("Cannot start Jsreport server");
-                }
-            });
-        }
-    });
 
     //Route Directories
     //var neo4jAPI = require('./server/controllers/neo4jAPI');
@@ -488,6 +448,9 @@ try {
         logger.error("Please run the Service API");
     }
 
+    // Start JS REPORT Server
+    require('./server/lib/jsReportServer')();
+        
     //To prevent can't send header response
     app.use(function (req, res, next) {
         var _send = res.send;
