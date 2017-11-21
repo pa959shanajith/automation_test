@@ -69,7 +69,7 @@ exports.readTestSuite_ICE = function (req, res) {
 					client.post(epurl + "suite/readTestSuite_ICE", args,
 						function (result, response) {
 						if (response.statusCode != 200 || result.rows == "fail") {
-							logger.error("Error occured in suite/readTestSuite_ICE from readTestSuite_ICE Error Code : ERRNDAC")
+							logger.error("Error occured in suite/readTestSuite_ICE from readTestSuite_ICE Error Code : ERRNDAC");
 							var flag = "Error in readTestSuite_ICE : Fail";
 							res.send(flag);
 						} else {
@@ -347,7 +347,7 @@ exports.updateTestSuite_ICE = function (req, res) {
 
 							//Relationships
 							qList.push({"statement":"MATCH (a:TESTSUITES_NG{testsuiteid:'"+inputs.testsuiteid+"',cycleid:'"+inputs.cycleid
-									+"'})-[r]->(b:TESTSCENARIOS_NG) delete r"})
+									+"'})-[r]->(b:TESTSCENARIOS_NG) delete r"});
 
 							flag = "success";
 							deleteSuitecallback(null, flag);
@@ -394,7 +394,7 @@ exports.updateTestSuite_ICE = function (req, res) {
 								//Relationship
 								qList.push({"statement":"MATCH (a:TESTSUITES_NG{cycleid:'"+inputs2.cycleid
 									+"',testsuiteid:'"+inputs2.testsuiteid+"',testsuitename:'"+inputs2.testsuitename
-									+"',versionnumber:["+inputs2.versionnumber+"]})),(b:TESTSCENARIOS_NG{testscenarioid:'"+inputs2.testscenarioids+"'}) MERGE (a)-[r:FTSUTTSC_NG{id:'"+inputs2.testscenarioids+"'}]->(b)RETURN a,b,r"})
+									+"',versionnumber:["+inputs2.versionnumber+"]})),(b:TESTSCENARIOS_NG{testscenarioid:'"+inputs2.testscenarioids+"'}) MERGE (a)-[r:FTSUTTSC_NG{id:'"+inputs2.testscenarioids+"'}]->(b)RETURN a,b,r"});
 
 								//reqToAPI(qList,urlData);
 								flag = "success";
@@ -579,6 +579,10 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 				var updateSessionExpiry = setInterval(function () {
 						req.session.cookie.maxAge = sessionTime;
 					}, updateSessionTimeEvery);
+				mySocket.on("unavailableLocalServer", function () {
+					logger.error("Error occured in ExecuteTestSuite_ICE: Socket Disconnected");
+					res.send("unavailableLocalServer");
+				});
 				mySocket.on('result_executeTestSuite', function (resultData) {
 					//req.session.cookie.expires = new Date(Date.now() + 30 * 60 * 1000);
 					completedSceCount++;
@@ -805,6 +809,10 @@ exports.ExecuteTestSuite_ICE_CI = function (req, res) {
 				var updateSessionExpiry = setInterval(function () {
 						req.session.cookie.maxAge = sessionTime;
 					}, updateSessionTimeEvery);
+				mySocket.on("unavailableLocalServer", function () {
+					logger.error("Error occured in ExecuteTestSuite_ICE_CI: Socket Disconnected");
+					res.send("unavailableLocalServer");
+				});
 				mySocket.on('result_executeTestSuite', function (resultData) {
 					//req.session.cookie.expires = sessionExtend;
 					completedSceCount++;
@@ -1196,7 +1204,7 @@ exports.getTestcaseDetailsForScenario_ICE = function (req, res) {
 			}
 		});
 	} else {
-		logger.error("Error occured in the testcasedetails_testscenarios: Invalid Session")
+		logger.error("Error occured in the testcasedetails_testscenarios: Invalid Session");
 		res.send("Invalid Session");
 	}
 };
@@ -1457,9 +1465,9 @@ function TestSuiteDetails_Module_ICE(req, cb1, data) {
 									//Relationships
 									for(i=0; i<inputs.testscenarioids.length;i++){
 										qList.push({"statement":"MATCH (a:TESTSUITES_NG{testsuiteid:'"+inputs.testsuiteid+"',cycleid:'"+inputs.cycleid
-									+"'}),(b:TESTSCENARIOS_NG{testscenarioid:"+inputs.testscenarioids[i]+"}) MERGE (a)-[r:FTSUTTSC_NG{id:"+inputs.testscenarioids[i]+"}]->(b)RETURN r"})
+									+"'}),(b:TESTSCENARIOS_NG{testscenarioid:"+inputs.testscenarioids[i]+"}) MERGE (a)-[r:FTSUTTSC_NG{id:"+inputs.testscenarioids[i]+"}]->(b)RETURN r"});
 									}
-									qList.push({"statement":"MATCH (a:CYCLES_NG{cycleid:'"+inputs.cycleid+"'}),(b:TESTSUITES_NG{testsuiteid:'"+inputs.testsuiteid+"',cycleid:'"+inputs.cycleid+"'}) MERGE (a)-[r:FCYCTTSU_NG{id:'"+inputs.testsuiteid+"'}]->(b)RETURN r"})
+									qList.push({"statement":"MATCH (a:CYCLES_NG{cycleid:'"+inputs.cycleid+"'}),(b:TESTSUITES_NG{testsuiteid:'"+inputs.testsuiteid+"',cycleid:'"+inputs.cycleid+"'}) MERGE (a)-[r:FCYCTTSU_NG{id:'"+inputs.testsuiteid+"'}]->(b)RETURN r"});
 						//reqToAPI(qList,urlData);
 						callback(null, flag);
 					}
@@ -1637,12 +1645,12 @@ function updatescenariodetailsinsuite(req, cb, data) {
 
 					//Relationships
 					qList.push({"statement":"MATCH (a:TESTSUITES_NG{testsuiteid:'"+inputs.testsuiteid+"',cycleid:'"+inputs.cycleid
-									+"'})-[r]->(b:TESTSCENARIOS_NG) delete r"})
+									+"'})-[r]->(b:TESTSCENARIOS_NG) delete r"});
 					for(var te=0;te<inputs.testscenarioids.length;te++){
 						qList.push({"statement":"MATCH (a:TESTSUITES_NG{testsuiteid:'"+inputs.testsuiteid+"',cycleid:'"+inputs.cycleid
-									+"'}),(b:TESTSCENARIOS_NG) WHERE b.testscenarioid IN a.testscenarioids MERGE (a)-[r:FTSUTTSC_NG{id:'"+inputs.testscenarioids[te]+"'}]->(b)RETURN r"})
+									+"'}),(b:TESTSCENARIOS_NG) WHERE b.testscenarioid IN a.testscenarioids MERGE (a)-[r:FTSUTTSC_NG{id:'"+inputs.testscenarioids[te]+"'}]->(b)RETURN r"});
 					}
-					qList.push({"statement":"MATCH (a:CYCLES_NG{cycleid:'"+inputs.cycleid+"'}),(b:TESTSUITES_NG{testsuiteid:'"+inputs.testsuiteid+"',cycleid:'"+inputs.cycleid+"'}) MERGE (a)-[r:FCYCTTSU_NG{id:'"+inputs.testsuiteid+"'}]->(b)RETURN r"})
+					qList.push({"statement":"MATCH (a:CYCLES_NG{cycleid:'"+inputs.cycleid+"'}),(b:TESTSUITES_NG{testsuiteid:'"+inputs.testsuiteid+"',cycleid:'"+inputs.cycleid+"'}) MERGE (a)-[r:FCYCTTSU_NG{id:'"+inputs.testsuiteid+"'}]->(b)RETURN r"});
 					//reqToAPI(qList,urlData);
 
 					simplecallback(null, result);
