@@ -330,8 +330,9 @@ mySPA.controller('reportsController', ['$scope','$rootScope', '$http', '$locatio
 		$(this).addClass('scenariostatusreportselect');
 		$(this).siblings().removeClass('scenariostatusreportselect');
 		executionId = $(this).attr('data-executionid');
+		var testsuiteid = $(".reportboxselected").attr('data-suiteid');
 		$('.formatpdfbrwsrexport').remove();
-		reportService.reportStatusScenarios_ICE(executionId)
+		reportService.reportStatusScenarios_ICE(executionId, testsuiteid)
 		.then(function(data) {
 			console.log("data",data);
 			if(data == "Invalid Session"){
