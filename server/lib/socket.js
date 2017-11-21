@@ -51,7 +51,6 @@ io.on('connection', function (socket) {
     // soc.emit("notify",notificationMsg);
   }
   else {
-
     isUISocketRequest = false;
     var inputs = {
       "icesession": icesession,
@@ -76,11 +75,8 @@ io.on('connection', function (socket) {
               socketMap[address] = socket;
               socket.send('connected');
               logger.info("NO. OF CLIENTS CONNECTED: %d", Object.keys(socketMap).length);
-              logger.info("IP\'s connected :' %s", Object.keys(socketMap).join());
+              logger.info("IP\'s connected : %s", Object.keys(socketMap).join());
               socket.emit('update_screenshot_path', screenShotPath);
-            }
-            else {
-              socket.send('connectionExists');
             }
           }
         }
@@ -129,9 +125,11 @@ io.on('connection', function (socket) {
       logger.info("Disconnecting from Notification socket: %s", address);
     }
     else {
+	  var connect_flag = false;
       logger.info("Inside ICE Socket disconnection");
       var address = socket.handshake.query['username'];
       if (socketMap[address] != undefined) {
+        connect_flag = true;
         logger.info('Disconnecting from ICE socket : %s', address);
         delete socketMap[address];
         module.exports.allSocketsMap = socketMap;
@@ -139,33 +137,36 @@ io.on('connection', function (socket) {
         logger.info("IP\'s connected : %s", Object.keys(socketMap).join());
       }
       else if (sokcetMapScheduling[address] != undefined) {
+        connect_flag = true;
         logger.info('Disconnecting from Scheduling socket : %s', address);
         delete sokcetMapScheduling[address];
         module.exports.allSchedulingSocketsMap = sokcetMapScheduling;
         logger.info(": %d", Object.keys(sokcetMapScheduling).length);
-        logger.info("IP\'s connected :' %s", Object.keys(sokcetMapScheduling).join());
+        logger.info("IP\'s connected : %s", Object.keys(sokcetMapScheduling).join());
       }
-      var inputs = {
-        "username": address,
-        "query": 'disconnect'
-      };
-      var args = {
-        data: inputs,
-        headers: {
-          "Content-Type": "application/json"
-        }
-      };
-      logger.info("Calling NDAC Service: updateActiveIceSessions");
-      apiclient.post("http://127.0.0.1:1990/server/updateActiveIceSessions", args,
-        function (result, response) {
-          if (response.statusCode != 200 || result.rows == "fail") {
-            logger.error("Error occured in updateActiveIceSessions Error Code: ERRNDAC");
-          }
-          else {
-            logger.info("IP disconnected %s", address);
-          }
-        });
-    }
+	  if (connect_flag){
+		  var inputs = {
+			"username": address,
+			"query": 'disconnect'
+		  };
+		  var args = {
+			data: inputs,
+			headers: {
+			  "Content-Type": "application/json"
+			}
+		  };
+		  logger.info("Calling NDAC Service: updateActiveIceSessions");
+		  apiclient.post("http://127.0.0.1:1990/server/updateActiveIceSessions", args,
+			function (result, response) {
+			  if (response.statusCode != 200 || result.rows == "fail") {
+				logger.error("Error occured in updateActiveIceSessions Error Code: ERRNDAC");
+			  }
+			  else {
+				logger.info("IP disconnected %s", address);
+			  }
+			});
+	  }
+	}
   });
 
   socket.on('reconnect', function (data) {
@@ -178,22 +179,22 @@ io.on('connection', function (socket) {
       logger.info('Disconnecting socket connection for Normal Mode(ICE Socket) : %s', address);
       delete socketMap[address];
       module.exports.allSocketsMap = socketMap;
-      logger.info("NOo. OF CLIENTS CONNECTED: %d", Object.keys(socketMap).length);
+      logger.info("No. OF CLIENTS CONNECTED: %d", Object.keys(socketMap).length);
       logger.info("IP\'s connected :' %s", Object.keys(socketMap).join());
       sokcetMapScheduling[address] = socket;
-      socket.send('reconnected');
+      socket.send('schedulingEnabled');
       module.exports.allSchedulingSocketsMap = sokcetMapScheduling;
-      logger.info("NOoo. OF CLIENTS CONNECTED: %d", Object.keys(sokcetMapScheduling).length);
+      logger.info("No. OF CLIENTS CONNECTED: %d", Object.keys(sokcetMapScheduling).length);
       logger.info("IP\'s connected :' %s", Object.keys(sokcetMapScheduling).join());
     } else if (!data && sokcetMapScheduling != undefined) {
       logger.info('Disconnecting socket connection for Scheduling mode: %s', address);
       delete sokcetMapScheduling[address];
       module.exports.allSchedulingSocketsMap = sokcetMapScheduling;
-      logger.info("NOoo. OF CLIENTS CONNECTED: %d", Object.keys(sokcetMapScheduling).length);
+      logger.info("No. OF CLIENTS CONNECTED: %d", Object.keys(sokcetMapScheduling).length);
       logger.info("IP\'s connected :' %s", Object.keys(sokcetMapScheduling).join());
       socketMap[address] = socket;
       module.exports.allSocketsMap = socketMap;
-      socket.send('connected');
+      socket.send('schedulingDisabled');
     }
 
   });

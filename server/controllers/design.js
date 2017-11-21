@@ -932,10 +932,10 @@ exports.updateScreen_ICE = function (req, res) {
 													for (var j = 0; j < viewString.length; j++) {
 														var updatedXpath = updatedViewString[i].xpath.replace(/\s/g, ' ').replace('&nbsp;', ' ');
 														updatedXpath = updatedViewString[i].xpath.split(";");
-														updatedXpath = updatedXpath[0];
+														updatedXpath = updatedXpath[1];
 														var fetchedXpath = viewString[j].xpath.replace(/\s/g, ' ').replace('&nbsp;', ' ');
 														fetchedXpath = viewString[j].xpath.split(";");
-														fetchedXpath = fetchedXpath[0];
+														fetchedXpath = fetchedXpath[1];
 														if (updatedXpath == fetchedXpath) {
 															updatedIndex.push(j);
 															viewString[j] = updatedViewString[i];
