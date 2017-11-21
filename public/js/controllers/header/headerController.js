@@ -51,19 +51,25 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 	}
 	$("#notifications-count").hide();
 
+	
 	socket.on('notify', function (value) {
-		var dateTime = new Date().toLocaleString();
-		if (value.to.indexOf($location.$$path) >= 0) {
-			$('.top-left').notify({
-				message: {
-					text: value.notifyMsg
-				},
-				animate: {
-					enter: 'animated fadeInRight',
-					exit: 'animated fadeOutRight'
-				}
-			}).show();
-		}
+			if(value.count == 0)
+			{
+				var dateTime = new Date().toLocaleString();
+				if (value.to.indexOf($location.$$path) >= 0) {
+					$('.top-left').notify({
+						message: {
+							text: value.notifyMsg
+						},
+						animate: {
+							enter: 'animated fadeInRight',
+							exit: 'animated fadeOutRight'
+						}
+					}).show();
+			}
+			
+			value.count = value.count + 1;
+		
 
 		if (window.localStorage.notification) {
 			var notificationArr = window.localStorage.notification;
@@ -93,7 +99,6 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 			if ($(".notify-div").is(":visible") == true) {
 				$("#notifications-count").hide();
 				var readMessages = JSON.parse(window.localStorage.notification);
-				console.log("read", readMessages);
 				for (var i = 0; i < readMessages.length; i++) {
 					readMessages[i].isRead = true;
 				}
@@ -101,7 +106,7 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 			}
 
 		});
-
+		}
 	});
 
 	function unreadNotifications() {

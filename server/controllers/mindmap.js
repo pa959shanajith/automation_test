@@ -308,10 +308,12 @@ exports.mindmapService = function(req, res) {
 			//Assigned Tasks Notification
 			if('socketMapNotify' in myserver && d.data.sendNotify in myserver.socketMapNotify){
 				 var soc = myserver.socketMapNotify[d.data.sendNotify];
+				 var count = 0;
 				 var assignedTasksNotification = {};
 				 	assignedTasksNotification.to = '/plugin';
-					assignedTasksNotification.notifyMsg = " New tasks have been assigned!";
+					assignedTasksNotification.notifyMsg = "New tasks have been assigned by "+ d.data.user_name+"";
 					assignedTasksNotification.isRead = false;
+					assignedTasksNotification.count = count;
 					soc.emit("notify",assignedTasksNotification);
 			}
 			data=d.data.map;
