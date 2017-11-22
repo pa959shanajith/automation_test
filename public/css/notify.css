@@ -95,3 +95,12 @@ div.dropdown-item
     word-wrap: break-word;
     white-space: normal !important;
 }
+.messageNotifier
+{
+    color: #333;
+    font-weight: bold;
+}
+#messageDate, #messageNote
+{
+    font-family: Latowebmedium;
+}

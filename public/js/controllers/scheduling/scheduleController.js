@@ -118,7 +118,7 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 					result[k].scenariodetails = JSON.parse(result[k].scenariodetails);
 					result[k].scheduledatetime = new Date(result[k].scheduledatetime).getFullYear()+"-"
 					+("0" + (new Date(result[k].scheduledatetime).getMonth()+1)).slice(-2)+"-"
-					+("0" + new Date(result[k].scheduledatetime).getDate()).slice(-2)+" "
+					+("0" + new Date(result[k].scheduledatetime).getUTCDate()).slice(-2)+" "
 					+("0" + new Date(result[k].scheduledatetime).getUTCHours()).slice(-2)+":"
 					+("0" + new Date(result[k].scheduledatetime).getUTCMinutes()).slice(-2)
 				}
@@ -345,7 +345,13 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 						doNotSchedule = true;
 						return false;
 					}
-					if((new Date(sldate_2[2],(sldate_2[1]-1),sldate_2[0]).toString() == new Date(dt.getFullYear(),dt.getMonth(),dt.getDate()).toString()) && (sltime <= (new Date().getHours()+":"+(new Date().getMinutes()+5)))){
+					if(new Date(sldate_2[2],(sldate_2[1]-1),sldate_2[0],sltime_2[0],sltime_2[1]) < new Date()){
+						$(this).children('.scheduleSuite').find(".timePicContainer .fc-timePicker").prop("style","border: 2px solid red;");
+						openModelPopup("Schedule Test Suite", "Schedule time must be 5 mins more than current time.");
+						doNotSchedule = true;
+						return false;
+					}
+					else if((new Date(sldate_2[2],(sldate_2[1]-1),sldate_2[0],sltime_2[0],sltime_2[1]) > new Date()) && (parseInt(sltime_2[0]) == new Date().getHours()) && (parseInt(sltime_2[1]) <= new Date().getMinutes()+5)){
 						$(this).children('.scheduleSuite').find(".timePicContainer .fc-timePicker").prop("style","border: 2px solid red;");
 						openModelPopup("Schedule Test Suite", "Schedule time must be 5 mins more than current time.");
 						doNotSchedule = true;

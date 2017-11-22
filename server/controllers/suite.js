@@ -1712,9 +1712,10 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 		schDate = schDate.split("-");
 		schTime = itr.time;
 		schTime = schTime.split(":");
-		var dateTime = new Date(Date.UTC(schDate[2], (schDate[1] - 1), schDate[0], schTime[0], schTime[1], 0));
-		cycleId = itr.cycleid;
 		rescheduleflag = itr.reschedule;
+		//var dateTime = rescheduleflag != true ? new Date(Date.UTC(schDate[2], (schDate[1] - 1), schDate[0], schTime[0], schTime[1], 0)) : new Date(schDate[2], (schDate[1] - 1), schDate[0], schTime[0], schTime[1], 0);
+		var dateTime = new Date(Date.UTC(schDate[2], (schDate[1] - 1), schDate[0], schTime[0], schTime[1], 0));
+		cycleId = itr.cycleid;		
 		browserList = itr.browserType;
 		clientIp = itr.Ip;
 		scheduleStatus = "scheduled";
@@ -1733,7 +1734,7 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 				"scheduleid": scheduleId,
 				"browserlist": browserList,
 				"clientipaddress": clientIp,
-				"clientport": "9494",
+				"userid": schedulingData[0].userInfo.user_id,
 				"scenariodetails": JSON.stringify(scenarioDetails),
 				"schedulestatus": scheduleStatus,
 				"testsuiteids": [testSuiteId],
@@ -1784,7 +1785,7 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 			//Rescheduling jobs on server restart
 			scheduleId = itr.scheduleid;
 			sessObj = cycleId + ";" + scheduleId + ";" + dateTime.valueOf().toString();
-			var obj = new Date(Date.UTC(schDate[2], (schDate[1] - 1), schDate[0], schTime[0], schTime[1], 0));
+			var obj = new Date(schDate[2], (schDate[1] - 1), schDate[0], schTime[0], schTime[1], 0); //new Date(schDate[2], (schDate[1] - 1), schDate[0], schTime[0], schTime[1], 0);
 			try {
 				var scheduledjob = schedule.scheduleJob(sessObj, obj, function () {
 					logger.info("Calling function executeScheduling from scheduleTestSuite: reshedule");
@@ -1884,7 +1885,8 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 							currentscenarioid = eachsuiteDetails.scenarioids;
 							appType = eachsuiteDetails.appType;
 							logger.info("Calling function TestCaseDetails_Suite_ICE from executeScheduling");
-							TestCaseDetails_Suite_ICE(currentscenarioid, schedulingData[0].userInfo.user_id, function (currentscenarioidError, currentscenarioidResponse) {
+							var uid = rescheduleflag != true ? schedulingData[0].userInfo.user_id : schedulingData[0].userid;
+							TestCaseDetails_Suite_ICE(currentscenarioid, uid, function (currentscenarioidError, currentscenarioidResponse) {
 								var scenariotestcaseobj = {};
 								if (currentscenarioidError) {
 									logger.error("Error occured in the function TestCaseDetails_Suite_ICE from executeScheduling Error Code - ERRNDAC: %s", currentscenarioidError);
@@ -1942,11 +1944,15 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 								mySocket._events.result_executeTestSuite = [];
 								var starttime = new Date().getTime();
 								mySocket.emit('executeTestSuite', executionRequest);
-								scheduleStatus = "Inprogress";
-								logger.info("Calling function updateStatus from scheduleFunction");
-								updateStatus(sessObj, function (err, data) {
-									if (!err) {
-										logger.info("Sending response data from scheduleFunction");
+								mySocket.on('return_status_executeTestSuite', function (response) {
+									if(response == "success"){
+										scheduleStatus = "Inprogress";
+										logger.info("Calling function updateStatus from scheduleFunction");
+										updateStatus(sessObj, function (err, data) {
+											if (!err) {
+												logger.info("Sending response data from scheduleFunction");
+											}
+										});
 									}
 								});
 								var updateSessionExpiry = setInterval(function () {
@@ -2301,12 +2307,12 @@ exports.reScheduleTestsuite = function (req, res) {
 						var tempDD,tempDT;
 						var modInformation = [];
 						async.forEachSeries(getscheduleData, function (itrSchData, getscheduleDataCallback) {
-							str = new Date(itrSchData.scheduledatetime).getFullYear() + "-" + ("0" + (new Date(itrSchData.scheduledatetime).getMonth() + 1)).slice(-2) + "-" + ("0" + new Date(itrSchData.scheduledatetime).getDate()).slice(-2) + " " + ("0" + new Date(itrSchData.scheduledatetime).getUTCHours()).slice(-2) + ":" + ("0" + new Date(itrSchData.scheduledatetime).getUTCMinutes()).slice(-2);
+							str = new Date(itrSchData.scheduledatetime).getFullYear() + "-" + ("0" + (new Date(itrSchData.scheduledatetime).getMonth() + 1)).slice(-2) + "-" + ("0" + new Date(itrSchData.scheduledatetime).getUTCDate()).slice(-2) + " " + ("0" + new Date(itrSchData.scheduledatetime).getUTCHours()).slice(-2) + ":" + ("0" + new Date(itrSchData.scheduledatetime).getUTCMinutes()).slice(-2);
 							tempDD = str.split(" ")[0];
 							tempDT = str.split(" ")[1];
 							dd = tempDD.split("-");
 							dt = tempDT.split(":");
-							if (new Date(Date.UTC(dd[0], dd[1] - 1, dd[2], dt[0], dt[1])) > new Date(Date.UTC(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), new Date().getHours(), new Date().getMinutes()))) {
+							if (new Date(dd[0], dd[1] - 1, dd[2], dt[0], dt[1]) > new Date()) {
 								modInfo.suiteDetails = itrSchData.scenariodetails;
 								modInfo.testsuitename = itrSchData.testsuitename;
 								modInfo.testsuiteid = itrSchData.testsuiteids[0].valueOf().toString();
@@ -2317,6 +2323,8 @@ exports.reScheduleTestsuite = function (req, res) {
 								modInfo.cycleid = itrSchData.cycleid.valueOf().toString();
 								modInfo.reschedule = true;
 								modInfo.scheduleid = itrSchData.scheduleid.valueOf().toString();
+								modInfo.versionnumber = 1;
+								modInfo.userid = itrSchData.userid;
 								modInformation.push(modInfo);
 								logger.info("Calling function scheduleTestSuite from reScheduleTestsuite service");
 								scheduleTestSuite(modInformation, req, function (err, schedulecallback) {

@@ -308,10 +308,12 @@ exports.mindmapService = function(req, res) {
 			//Assigned Tasks Notification
 			if('socketMapNotify' in myserver && d.data.sendNotify in myserver.socketMapNotify){
 				 var soc = myserver.socketMapNotify[d.data.sendNotify];
+				 var count = 0;
 				 var assignedTasksNotification = {};
 				 	assignedTasksNotification.to = '/plugin';
-					assignedTasksNotification.notifyMsg = " New tasks have been assigned!";
+					assignedTasksNotification.notifyMsg = "New tasks have been assigned by "+ d.data.user_name+"";
 					assignedTasksNotification.isRead = false;
+					assignedTasksNotification.count = count;
 					soc.emit("notify",assignedTasksNotification);
 			}
 			data=d.data.map;
@@ -383,7 +385,7 @@ exports.mindmapService = function(req, res) {
 						}
 					}
  					else if(e.type=='scenarios'){
-						if(e.renamed && e.id_n) rnmList.push({"statement":"MATCH(n:TESTSCENARIOS{testScenarioID:'"+e.id+"',n.projectID:'"+prjId+"'}) SET n.testScenarioName='"+e.name+"'"});
+						if(e.renamed && e.id_n) rnmList.push({"statement":"MATCH(n:TESTSCENARIOS{testScenarioID:'"+e.id+"',projectID:'"+prjId+"'}) SET n.testScenarioName='"+e.name+"'"});
 						qList.push({"statement":"MERGE(n:TESTSCENARIOS{projectID:'"+prjId+"',moduleID:'"+idDict[e.pid]+"',testScenarioName:'"+e.name+"',testScenarioID:'"+e.id+"',createdBy:'"+user+"',createdOn:'null',testScenarioID_c:'"+e.id_c+"'}) SET n.childIndex='"+e.childIndex+"'"});
 						//Supporting task assignmnet for scenarios
 						if(t!=null && e.id_c!=null){
@@ -403,7 +405,7 @@ exports.mindmapService = function(req, res) {
 					}
 					else if(e.type=='screens'){
 						uidx++;lts=idDict[e.pid];
-						if(e.renamed && e.id_n && e.orig_name) rnmList.push({"statement":"MATCH(n:SCREENS{screenName:'"+e.orig_name+"',n.projectID:'"+prjId+"'}) SET n.screenName='"+e.name+"'"});
+						if(e.renamed && e.id_n && e.orig_name) rnmList.push({"statement":"MATCH(n:SCREENS{screenName:'"+e.orig_name+"',projectID:'"+prjId+"'}) SET n.screenName='"+e.name+"'"});
 						//qList.push({"statement":"MATCH(n:SCREENS{screenID:'"+e.id+"'}) SET n.screenName='"+e.name+"'"+",n.projectID='"+prjId+"'"});
 						qList.push({"statement":"MERGE(n:SCREENS{projectID:'"+prjId+"',testScenarioID:'"+idDict[e.pid]+"',screenName:'"+e.name+"',screenID:'"+e.id+"',createdBy:'"+user+"',createdOn:'null',uid:'"+uidx+"',screenID_c:'"+e.id_c+"'})SET n.childIndex='"+e.childIndex+"'"});
 						if(t!=null && e.id_c!=null){
