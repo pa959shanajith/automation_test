@@ -122,6 +122,10 @@ try {
                         logger.error("Error occured in userAccess_Nineteen68");
                         res.send("Invalid Session");
                     } else {
+                        if(req.url == '/home' && req.session.defaultRole == 'Test Engineer')
+                        {
+                            result.rows = "True"
+                        }
                         if (result.rows == "True") {
                             // logger.info("User " + req.session.username + " authenticated");
                             logger.rewriters.push(function (level, msg, meta) {
