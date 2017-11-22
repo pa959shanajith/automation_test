@@ -180,25 +180,17 @@ exports.versioning = function (req, res) {
 		}
 		else if (d.task == 'writeMap') {
 			logger.info('Inside writemap task of the UI Service versioning')
-			var tasks =[];
-			for (var i=0;i<d.data.map.length;i++)
-			{
-				if(	d.data.map[i].task)
-				{
-					tasks.push(d.data.map[i].task);
-				}
-			}
-			var newtasks = tasks.length;
 			//Assigned Tasks Notification
 			if('socketMapNotify' in myserver && d.data.sendNotify in myserver.socketMapNotify){
 				 var soc = myserver.socketMapNotify[d.data.sendNotify];
+				 var count = 0;
 				 var assignedTasksNotification = {};
 				 	assignedTasksNotification.to = '/plugin';
-					assignedTasksNotification.notifyMsg = "New tasks have been assigned!";
+					assignedTasksNotification.notifyMsg = "New tasks have been assigned by "+ d.data.user_name+"";
 					assignedTasksNotification.isRead = false;
+					assignedTasksNotification.count = count;
 					soc.emit("notify",assignedTasksNotification);
 			}
-
 			var nData = [], qList = [], idDict = {};
 			var createdOn = new Date().toLocaleString();
 			data = d.data.map;

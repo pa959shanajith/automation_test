@@ -491,13 +491,15 @@ exports.reportStatusScenarios_ICE = function (req, res) {
 		}
 		if (sessionToken != undefined && req.session.id == sessionToken) {
 			var req_executionId = req.body.executionId;
+			var req_testsuiteId = req.body.testsuiteId;
 			var reportList = [];
 			var report = [];
 			async.series({
 				executiondetails: function (callback) {
 					var inputs = {
 						"query": "executiondetails",
-						"executionid": req_executionId
+						"executionid": req_executionId,
+						"testsuiteid": req_testsuiteId
 					};
 					var args = {
 						data: inputs,

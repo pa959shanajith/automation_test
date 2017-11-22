@@ -70,10 +70,11 @@ mySPA.factory('reportService', ['$http','$q', function ($http, $httpProvider, $q
 		},
 		
 		//Get Testsuites start end details
-		reportStatusScenarios_ICE : function(executionid){
+		reportStatusScenarios_ICE : function(executionid, testsuiteid){
 			return $http.post('/reportStatusScenarios_ICE',{
 				param : 'reportStatusScenarios_ICE',
-				executionId : executionid
+				executionId : executionid,
+				testsuiteId : testsuiteid
 			})
 			.then(function(response)  {
 				return response.data
