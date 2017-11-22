@@ -15,10 +15,10 @@ var logger = require('./logger');
 if (cluster.isMaster) {
     cluster.fork();
     cluster.on('disconnect', function(worker) {
-        console.log('disconnect!');
+        logger.info('disconnect!');
     });
     cluster.on('exit', function(worker) {
-        console.log('Let\'s not have Sentiments... Worker %d is killed.', worker.id);
+        logger.info('Let\'s not have Sentiments... Worker %d is killed. %s', worker.id);
         cluster.fork();
     });
 
@@ -336,7 +336,7 @@ try {
         var version = require('./server/controllers/project_versioning');
         app.post('/version', version.versioning);
     } catch (Ex) {
-        console.log('Not found');
+        logger.error('Versioning route path not found');
     }
 
     app.post('/home', mindmap.mindmapService);

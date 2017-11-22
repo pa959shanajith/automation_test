@@ -8,7 +8,7 @@ function replicationHandler() {
   var userInfo = JSON.parse(window.localStorage['_UI']);
   var user_id = userInfo.user_id;
   blockUI('Loading....')
-  dataSender({ user_name: userInfo.username, userRole: user_role, userid: user_id, task: 'projectReplication', versioning: 1 }, function (status, result) {
+  dataSender({ user_name: userInfo.username, userRole: window.localStorage['_SR'], userid: user_id, task: 'projectReplication', versioning: 1 }, function (status, result) {
     if (status) {
       console.log('err');
       unblockUI();
@@ -17,7 +17,7 @@ function replicationHandler() {
       result1 = JSON.parse(result);
       var project_type=$('.project-list').find(':selected').attr('app-type')
       //alert('project');
-      dataSender({ user_name: userInfo.username, userRole: user_role, task: 'listOfProjectsNeo4j', versioning: 1 }, function (status, data) {
+      dataSender({ user_name: userInfo.username, userRole: window.localStorage['_SR'], task: 'listOfProjectsNeo4j', versioning: 1 }, function (status, data) {
         if (status) { console.log('err'); unblockUI(); }
         else {
           parse_data = JSON.parse(data);
@@ -91,8 +91,10 @@ function replicate_project(from_v, to_v, pid) {
   console.log(typeof (from_v))
   console.log(to_v)
   console.log(pid)
-  blockUI('Loading....')
-  dataSender({ user_name: userInfo.username, userRole: user_role, task: 'createVersion', srcprojectId: $(".project-list").val(), dstprojectId: pid, versioning: 1, vn_from: from_v, vn_to: to_v, action: "project_replicate", write: 10 }, function (err, result) {
+  blockUI('Loading....');
+  var userInfo = JSON.parse(window.localStorage['_UI']);
+  var user_id = userInfo.user_id;
+  dataSender({ user_name: userInfo.username, userRole: window.localStorage['_SR'], task: 'createVersion', srcprojectId: $(".project-list").val(), dstprojectId: pid, versioning: 1, vn_from: from_v, vn_to: to_v, action: "project_replicate", write: 10 }, function (err, result) {
     if (err) {
       console.log(err);
       openDialogMindmap('Mindmap', "Project Replication Failed.")
@@ -224,14 +226,15 @@ params : from_v : from the version (Source version), to_v : Version number provi
 */
 function createNewTab(from_v, to_v) {
 
-
+  var userInfo = JSON.parse(window.localStorage['_UI']);
+  var user_id = userInfo.user_id;
   if ($('.ct-nodeBox')[0].children !== undefined && $('.ct-nodeBox')[0].children.length == 0) {
     openDialogMindmap('Error', "Cannot Create Empty Version");
     //versionInputDialogClose()
     return;
   }
   blockUI('Loading...');
-  dataSender({ task: 'createVersion', user_name: userInfo.username, userRole: user_role, projectId: $(".project-list").val(), versioning: 1, vn_from: from_v, vn_to: to_v, write: 10 }, function (err, result) {
+  dataSender({ task: 'createVersion', user_name: userInfo.username, userRole: window.localStorage['_SR'], projectId: $(".project-list").val(), versioning: 1, vn_from: from_v, vn_to: to_v, write: 10 }, function (err, result) {
     if (err) { console.log(err); unblockUI(); openDialogMindmap('Mindmap', "New Version Creation Failed.") }
     else {
       result1 = JSON.parse(result);
