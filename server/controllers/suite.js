@@ -566,8 +566,9 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 		function executionFunction(executionRequest) {
 			logger.info("Inside executionFunction function");
 			var name = req.session.username;
-			var scenarioCount = executionRequest.suitedetails[0].scenarioIds.length;
+			//var scenarioCount = executionRequest.suitedetails[0].scenarioIds.length;
 			var completedSceCount = 0;
+			var testsuitecount=0;
 			var statusPass = 0;
 			var suiteStatus;
 			logger.info("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
@@ -581,9 +582,11 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 					}, updateSessionTimeEvery);
 				mySocket.on('result_executeTestSuite', function (resultData) {
 					//req.session.cookie.expires = new Date(Date.now() + 30 * 60 * 1000);
-					completedSceCount++;
+					//completedSceCount++;
 					clearInterval(updateSessionExpiry);
 					if (resultData != "success" && resultData != "Terminate") {
+						completedSceCount++;
+						scenarioCount = executionRequest.suitedetails[testsuitecount].scenarioIds.length;
 						try {
 							var scenarioid = resultData.scenarioId;
 							var executionid = resultData.executionId;
@@ -633,11 +636,20 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 									} else {
 										suiteStatus = "Fail";
 									}
+									completedSceCount = 0;
+									testsuitecount++;
+									
+									
 									logger.info("Calling function updateExecutionStatus from executionFunction");
 									updateExecutionStatus(testsuiteid, executionid, starttime, suiteStatus);
 								}
 							} else {
+								completedSceCount++;
+								scenarioCount = executionRequest.suitedetails[testsuitecount].scenarioIds.length;
 								if (completedSceCount == scenarioCount) {
+									completedSceCount = 0;
+									testsuitecount++;
+									
 									suiteStatus = "Fail";
 									logger.info("Calling function updateExecutionStatus from executionFunction");
 									updateExecutionStatus(testsuiteid, executionid, starttime, suiteStatus);
