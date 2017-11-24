@@ -156,6 +156,8 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 		e.preventDefault();
 		//alert('click');
 	//	$scope.tabAssignProject = function() {
+		$scope.ldapBtn=true;
+		$scope.citokenBtn=true;
 		resetAssignProjectForm();
 		$("img.selectedIcon").removeClass("selectedIcon");
 		$(this).children().find('img').addClass('selectedIcon');
@@ -359,6 +361,8 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 		projectDetails = [];
 		updateProjectDetails = [];
 		var plugins = [];
+		$scope.ldapBtn=true;
+		$scope.citokenBtn=true;
 		adminServices.getAvailablePlugins()
 		.then(function (plugins_list) {
 			for(var i = 0; i < plugins_list.length; i++){
@@ -418,6 +422,8 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 	}
 
 	$("#preferencesTab").on('click',function() {
+		$scope.ldapBtn=true;
+		$scope.citokenBtn=true;
 		$("img.selectedIcon").removeClass("selectedIcon");
 		$(this).children().find('img').addClass('selectedIcon');
 			setTimeout(function() {
