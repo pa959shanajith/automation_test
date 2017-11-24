@@ -2047,7 +2047,7 @@ exports.getAssignedProjects_ICE = function (req, res) {
 									function (result, response) {
 									try {
 										if (response.statusCode != 200 || result.rows == "fail") {
-											ogger.error("Error occurred in admin/getAssignedProjects_ICE inside async function Error Code : ERRNDAC");
+											logger.error("Error occurred in admin/getAssignedProjects_ICE inside async function Error Code : ERRNDAC");
 											res.send("fail");
 										} else {
 											if (result.rows.length > 0) {

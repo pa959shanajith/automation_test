@@ -30,7 +30,7 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
   $scope.crawledLinks = [];
   $scope.enableGenerate = false;
   $scope.selectedAgent = "chrome";
-
+  $scope.url = "http://";
   $scope.showWeboccularHome = function(){
     if (!$scope.enableGenerate)
     return;
