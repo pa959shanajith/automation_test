@@ -119,8 +119,9 @@ exports.readTestSuite_ICE = function (req, res) {
 									outdataparam = eachSuiterow.getparampaths;
 								}
 								respeachscenario.dataparam = outdataparam;
+								respeachscenario.testsuitename = eachSuite.testsuitename;
 								scenarioidindex = 0;
-								responsedata[eachSuite.testsuitename] = respeachscenario;
+								responsedata[eachSuite.testsuiteid] = respeachscenario;
 								async.forEachSeries(outscenarioids, function (eachoutscenarioid, outscenarioidcallback) {
 									scenarioidindex = scenarioidindex + 1;
 									/**
@@ -141,7 +142,7 @@ exports.readTestSuite_ICE = function (req, res) {
 											respeachscenario.testsuiteid = eachSuite.testsuiteid;
 											respeachscenario.versionnumber = eachSuite.versionnumber;
 											if (scenarioidindex == outscenarioids.length) {
-												responsedata[eachSuite.testsuitename] = respeachscenario;
+												responsedata[eachSuite.testsuiteid] = respeachscenario;
 												if (testsuitesindex == requiredreadTestSuite.length) {
 													if (fromFlg == "scheduling") {
 														var connectusers = [];

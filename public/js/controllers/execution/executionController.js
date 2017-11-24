@@ -100,19 +100,16 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 			    $('#excSaveBtn').attr("disabled", false);
 				$(".executionTableDnd").empty()
 				cfpLoadingBar.complete();
-				 var dataLen = Object.keys(data).length;
-				 for(var m =0;m<dataLen;m++)
-				 {
+				var dataLen = Object.keys(data).length;
+				var keys = Object.keys(data);
+				var eachData = Object.keys(data).map(function(itm) { return data[itm]; });
+				for(var m =0;m<dataLen;m++) {
 					getEachScenario = []; // Empty scenarios for each module
 					//create header for table
 					$("#executionDataTable_"+m+" tbody tr").remove();
-					var keys = Object.keys(data);
-					var eachData = Object.keys(data).map(function(itm) { return data[itm]; });
-					eachData = eachData[m];
-					rowData = eachData;
+					rowData = eachData[m];
 					$("div.executionTableDnd").attr('id','batch_'+m);
-					console.log(keys[m]);
-					$("#batch_"+m+"").append("<div class='suiteNameTxt' id='page-taskName_"+m+"'><span class='taskname'><input id='parentSuite_"+m+"' class='parentSuiteChk' type='checkbox' name='' />"+keys[m]+"</span></div><div id='exeData_"+m+"' class='exeDataTable testSuiteBatch'><table id='executionDataTable_"+m+"' class='executionDataTable' cellspacing='0' cellpadding='0'><thead><tr><th style='width: 4%' id='contextmenu'></th><th style='width: 3%; padding: 5px 0px'><i class='fa fa-ban' title='Do Not Execute' aria-hidden='true' style='font-size: 14px;'></i><input id='parentExecute_"+m+"' class='d-execute' type='checkbox' /></th>	<th style='width: 28%; text-align:left; border-right: 1px solid #fff;'>Scenario Name</th><th style='width: 24%; border-right: 1px solid #fff'>Data Parameterization</th>	<th style='width: 18%; border-right: 1px solid #fff'>Condition</th><th style='width: 23%;'>Project Name</th></tr><input type='hidden' value='"+rowData.testsuiteid+"'/></thead><tbody class='scrollbar-inner testScenarioScroll'></tbody></table></div>");//<th style='width: 8%; text-align: center;'>ALM</th>
+					$("#batch_"+m+"").append("<div class='suiteNameTxt' id='page-taskName_"+m+"'><span class='taskname'><input id='parentSuite_"+m+"' class='parentSuiteChk' type='checkbox' name='' />"+rowData.testsuitename+"</span></div><div id='exeData_"+m+"' class='exeDataTable testSuiteBatch'><table id='executionDataTable_"+m+"' class='executionDataTable' cellspacing='0' cellpadding='0'><thead><tr><th style='width: 4%' id='contextmenu'></th><th style='width: 3%; padding: 5px 0px'><i class='fa fa-ban' title='Do Not Execute' aria-hidden='true' style='font-size: 14px;'></i><input id='parentExecute_"+m+"' class='d-execute' type='checkbox' /></th>	<th style='width: 28%; text-align:left; border-right: 1px solid #fff;'>Scenario Name</th><th style='width: 24%; border-right: 1px solid #fff'>Data Parameterization</th>	<th style='width: 18%; border-right: 1px solid #fff'>Condition</th><th style='width: 23%;'>Project Name</th></tr><input type='hidden' value='"+rowData.testsuiteid+"'/></thead><tbody class='scrollbar-inner testScenarioScroll'></tbody></table></div>");//<th style='width: 8%; text-align: center;'>ALM</th>
 					//<img class='expandTable' src='imgs/icon-minus.png'>
 
 				    var row = $("#executionDataTable_"+m+"").find('tbody');
