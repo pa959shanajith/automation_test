@@ -1,6 +1,6 @@
 /*
 function replicationHandler()
-Purpose : 
+Purpose : displaying pop up for replication of project
 */
 
 function replicationHandler() {
@@ -8,7 +8,7 @@ function replicationHandler() {
   var userInfo = JSON.parse(window.localStorage['_UI']);
   var user_id = userInfo.user_id;
   blockUI('Loading....')
-  dataSender({ user_name: userInfo.username, userRole: window.localStorage['_SR'], userid: user_id, task: 'projectReplication', versioning: 1 }, function (status, result) {
+  dataSender({ user_name: userInfo.username, userRole: window.localStorage['_SR'], userid: user_id, task: 'getProjectIDs_Nineteen68', versioning: 1 }, function (status, result) {
     if (status) {
       console.log('err');
       unblockUI();
@@ -16,21 +16,15 @@ function replicationHandler() {
     else {
       result1 = JSON.parse(result);
       var project_type=$('.project-list').find(':selected').attr('app-type')
-      //alert('project');
-      dataSender({ user_name: userInfo.username, userRole: window.localStorage['_SR'], task: 'listOfProjectsNeo4j', versioning: 1 }, function (status, data) {
+      dataSender({ user_name: userInfo.username, userRole: window.localStorage['_SR'],userid: user_id,task: 'listOfProjectsNeo4j', versioning: 1 }, function (status, data) {
         if (status) { console.log('err'); unblockUI(); }
         else {
           parse_data = JSON.parse(data);
           var flag=0;
-          //alert(assignedUser);
           $('.versioningOption').remove()
-          // var listSourceVersions = $('.version-list').children();
-          // for (var i = 0; i < listSourceVersions.length; i++) {
-          //   $('#sourceVersions').append($('<option>').attr({ value: listSourceVersions[i].value, class: 'test' }).text(listSourceVersions[i].value));
-          // }
           var parsed_project_id = [];
           for (var i = 0; i < parse_data[0].data.length; i++) {
-            parsed_project_id.push(parse_data[0].data[i].row[0])  
+            parsed_project_id.push(parse_data[0].data[i].row[0])
           }
 
           var new_projectsList = {
@@ -45,7 +39,7 @@ function replicationHandler() {
               new_projectsList.projectName.push(result1['projectName'][i]);
               new_projectsList.appType.push(result1['appType'][i]);
             }
-              
+
           }
           if(parsed_project_id.indexOf($('.project-list').val())!=-1){
               for (var i = 0; i < new_projectsList['projectName'].length; i++) {
@@ -74,7 +68,7 @@ function replicationHandler() {
 
 /*
   function replicationController()
-  Purpose :
+  Purpose : Invoking replication project
 */
 
 function replicationController() {
@@ -84,21 +78,19 @@ function replicationController() {
 
 /*
 function replicate_project()
+Purpose:Invoking the node service for replication of project
 */
 
 function replicate_project(from_v, to_v, pid) {
-  console.log("inside replicate project");
-  console.log(typeof (from_v))
-  console.log(to_v)
-  console.log(pid)
-  blockUI('Loading....');
   var userInfo = JSON.parse(window.localStorage['_UI']);
   var user_id = userInfo.user_id;
+  console.log("inside replicate project");
+  blockUI('Loading....')
   dataSender({ user_name: userInfo.username, userRole: window.localStorage['_SR'], task: 'createVersion', srcprojectId: $(".project-list").val(), dstprojectId: pid, versioning: 1, vn_from: from_v, vn_to: to_v, action: "project_replicate", write: 10 }, function (err, result) {
     if (err) {
       console.log(err);
       openDialogMindmap('Mindmap', "Project Replication Failed.")
-      unblockUI();  //callback(null, err);   unblockUI(); 
+      unblockUI();
     }
     else {
       openDialogMindmap('Mindmap', "Project Replicated Successfully.")
@@ -116,7 +108,6 @@ Purpose : loading mindmap data for default version.
 
 function loadMindmapData_V() {
   loadMindmapData(1);
-
 }
 
 /*
@@ -131,7 +122,6 @@ function addVersioning(versions) {
   console.log(versions);
   $('.replicate').remove()
   $('.selectVersion').remove();
-  //   $(".ct-project-tab").append('<div class="container"></div>');
   $('.ct-project-tab').append($('<span>').attr({
     class: 'selectVersion'
   }).append($('<label>').attr({
@@ -149,19 +139,22 @@ function addVersioning(versions) {
       title: "Replicate project",
       onclick: 'replicationHandler()'
     })
-    ))
+    ).append($('<i>').attr({
+      class: 'glyphicon glyphicon-export plus-icon',
+      title: "Export Version",
+      onclick: 'exportData()'
+    })));
   for (i = 0; i < versions.length; i++) {
     $('.version-list').append($('<option>').attr({
       value: versions[i]
     }).text(versions[i]))
   }
-
-  setCookie('mm_pvid', $('.version-list').children()[0].value, 15);
+  //setCookie('mm_pvid', $('.version-list').children()[0].value, 15);
   $('.version-list').val($('.version-list').children()[0].value);
 
-  if (getCookie('mm_pvid') != '') {
-    $('.version-list').val(getCookie('mm_pvid'));
-  }
+  // if (getCookie('mm_pvid') != '') {
+  //   $('.version-list').val(getCookie('mm_pvid'));
+  // }
   loadMindmapData1(1);
   //loadModules(versions)
   $('.selectProject').addClass('selectProjectPosition')
@@ -176,6 +169,7 @@ function : loadModules()
 Purpose : Loads modules for the active project Version.
 params : None
 */
+
 function loadModules() {
   var active_version = $('.version-list').val();
   blockUI('Loading...');
@@ -186,9 +180,6 @@ function loadModules() {
     $('#ct-canvas').append('<div class="ct-tileBox"><div class="ct-tile" title="Create Mindmap"><svg class="ct-svgTile" height="150px" width="150px"><g><circle cx="75" cy="75" r="30"></circle><path d="M75,55L75,95"></path><path d="M55,75L95,75"></path></g></svg></div><span class="ct-text">Create Mindmap</span></div>');
 
   }
-
-
-
   dataSender({ task: 'getModules', tab: window.localStorage['tabMindMap'], prjId: $(".project-list").val(), versioning: 1, version: parseFloat(active_version) }, function (err, result) {
     if (err) {
       console.log(result);
@@ -199,7 +190,6 @@ function loadModules() {
       $(nodeBox[0]).empty();
       allMMaps = JSON.parse(result);
       allMMaps.forEach(function (e, i) {
-        //var t=e.name.replace(/_/g,' ');
         var t = $.trim(e.name);
         var img_src = 'images_mindmap/node-modules-no.png';
         if (e.type == 'modules_endtoend') img_src = 'images_mindmap/MM5.png';
@@ -207,14 +197,12 @@ function loadModules() {
         node.append('img').attr('class', 'ct-nodeIcon').attr('src', img_src).attr('alt', 'Module').attr('aria-hidden', true);
         node.append('span').attr('class', 'ct-nodeLabel').html(t);
       });
-      //	if(selectedTab=='tabCreate')
       populateDynamicInputList();
       setModuleBoxHeight();
       unblockUI();
     }
   });
-  //finally set the version in the cookie
-  setCookie('mm_pvid', active_version, 15);
+  // setCookie('mm_pvid', active_version, 15);
 
 }
 
@@ -230,7 +218,6 @@ function createNewTab(from_v, to_v) {
   var user_id = userInfo.user_id;
   if ($('.ct-nodeBox')[0].children !== undefined && $('.ct-nodeBox')[0].children.length == 0) {
     openDialogMindmap('Error', "Cannot Create Empty Version");
-    //versionInputDialogClose()
     return;
   }
   blockUI('Loading...');
@@ -238,17 +225,14 @@ function createNewTab(from_v, to_v) {
     if (err) { console.log(err); unblockUI(); openDialogMindmap('Mindmap', "New Version Creation Failed.") }
     else {
       result1 = JSON.parse(result);
-      //alert(assignedUser);
+       $('.version-list').val(to_v);
+       unblockUI();
     }
-    $('.version-list').append($('<option>').attr({
-      value: to_v
-    }).text(to_v))
-    unblockUI();
-    $('.version-list').val(to_v);
+    // $('.version-list').append($('<option>').attr({
+    //   value: to_v
+    // }).text(to_v))
     loadModules();
     openDialogMindmap('Mindmap', "New Version Created Successfully.");
-
-    //versionInputDialogClose()
   });
 
 }
@@ -296,60 +280,12 @@ function versionInputDialogShow() {
               $('#versionNumberInput').val((parseFloat(maxVersionNumber) + 0.1).toFixed(1));
 				}
 			});
- 
-
-  //operation == "hide" ? $('#versionNumInputPopUp').modal("hide") : $('#versionNumInputPopUp').modal("show");
 
 }
 
-/* 
-  function : isValidVersionToCreate(version)
-  Purpose : This function verifies the given verison number is valid to create as a new version
-  param : version : version number to verify
-*/
-
-// function isValidVersionToCreate(version) {
-
-//   return version > getMaxVersion();
-
-// }
-
-/* 
-  function : getMaxVersion()
-  Purpose : This function returns the maximum version number present in the UI
-  param : None
-*/
-// function getMaxVersion() {
-//   allTabs = $('.version-list').children();
-//   maxVersionTab = 0.0;
-//   for (var i = 0; i < allTabs.length; i++) {
-//     if (allTabs[i].value >= maxVersionTab)
-//       maxVersionTab = allTabs[i].value
-//   }
-//   maxVersionNumber = parseFloat(maxVersionTab);
-//   return maxVersionNumber;
-// }
-
-/* 
-  function : getallVersion()
-  Purpose : This function returns the all version number present in the UI
-  param : None
-*/
-
-// function getAllVersionsUI() {
-//   ret = [];
-//   options = $('.version-list').children();
-//   for (i = 0; i < options.length; i++) {
-//     console.log(options[i].value)
-//     ret.push(parseFloat(options[i].value));
-//   }
-//   return ret;
-// }
-
-
-/* 
+/*
 function : createNewVersion(from_v)
-Purpose : This function calls isValidVersionToCreate to verify the version number 
+Purpose : This function calls isValidVersionToCreate to verify the version number
 provided by the user in the dialog box and calls createNewTab to create new version in the database
 param : from_v : source version
 */
@@ -374,25 +310,9 @@ function createNewVersion(from_v) {
               }
 				}
 			});
-
-  // if (isValidVersionToCreate(inputVersion)) {
-  //   //this version number is valid, go ahead   
-  //   createNewTab(from_v, inputVersion);
-
-  // }
-  // else {
-  //   //show an error dialog
-  //   //versionInputDialogClose();
-  //   if (getAllVersionsUI().includes(inputVersion))
-  //     openDialogMindmap('Error', "Version Number already exists");
-
-  //   else {
-  //     openDialogMindmap('Error', "Invalid Version Number");
-  //   }
-  // }
 }
 
-/* 
+/*
 function : validateFloatKeyPress(el, evt)
 Purpose : This function restricts user to add only float number and to keep float as one decimal point.
 param : el, evt
@@ -417,7 +337,7 @@ function validateFloatKeyPress(el, evt) {
   return true;
 }
 
-/* 
+/*
 function : getSelectionStart(o)
 Purpose : Helper function for validateFloatKeyPress
 param : o
@@ -429,4 +349,113 @@ function getSelectionStart(o) {
     if (r.text == '') return o.value.length
     return o.value.lastIndexOf(r.text)
   } else return o.selectionStart
+}
+
+
+/*
+function : exportData()
+Purpose : Exporting data in json file
+param :
+*/
+
+function exportData() {
+  data_not_exported=[]
+  data = {"moduleInfo": []};
+  execution_data={"execution_data": [{"browserType": ["1"],"moduleInfo": [{"projectId": "","cycleId": "","moduleId": "",
+				"moduleName": "","releaseId":"", "versionNumber":"","suiteDetails": [{"scenarios_id": "","scenarios_name": ""}]}],
+        "userInfo": {"token_id": "","username": "","ice_username":""}}]};
+  blockUI('Loading UI');
+  var userInfo = JSON.parse(window.localStorage['_UI']);
+  var user_id = userInfo.user_id;
+  dataSender({user_name: userInfo.username, userRole: window.localStorage['_SR'], userid: user_id, task: 'getModules', tab: window.localStorage['tabMindMap'], prjId: $(".project-list").val(), versioning: 1, version: $('.version-list').val() }, function (err, result) {
+    if (err) {
+      console.log(result);
+      unblockUI();
+    }
+    else {
+      result_details = JSON.parse(result);
+      flag=0;
+      for (var i = 0; i < result_details.length; i++) {
+        var module_info = { "appType":"","projectId": $(".project-list").val(),"cycleId":"","moduleId": "", "moduleName": "","releaseId":"",
+        "versionNumber":"","suiteDetails": []};
+        if (result_details[i].id_c != 'null' && result_details[i].id_c != '') {
+          module_info.moduleId = result_details[i].id_c;
+          module_info.moduleName = result_details[i].name;
+          flag=1;
+          for (var j = 0; j < result_details[i].children.length; j++) {
+            var s_data = { 'scenarios_id': '', 'scenarios_name': '' };
+            if (result_details[i].children[j].id_c != 'null' && result_details[i].children[j].id_c != '') {
+              s_data.scenarios_id = result_details[i].children[j].id_c;
+              s_data.scenarios_name = result_details[i].children[j].name;
+              module_info.suiteDetails.push(s_data);
+            }
+            else {
+              console.log('Not exported : ', result_details[i].children[j].name);
+            }
+          }
+          data.moduleInfo.push(module_info);
+        }
+        else {
+          data_not_exported.push(result_details[i].name);
+          console.log('Not exported : ', result_details[i].name);
+        }
+      }
+      if(flag){
+      dataSender({user_name: userInfo.username, userRole: window.localStorage['_SR'], userid: user_id, task: 'getProjectType_Nineteen68',projectid:$(".project-list").val(), versioning: 1 }, function (err, project_data) {
+      if (err) {
+        console.log('err');
+        unblockUI();
+      }
+      else {
+      parsed_project_data = JSON.parse(project_data);
+      ci_details = { projectid: $(".project-list").val() }
+      dataSender({ user_name: userInfo.username, userRole: window.localStorage['_SR'], userid: user_id, ci_data: ci_details, task: 'getCRId', versioning: 1 }, function (status, cycle_data) {
+        if (status) { console.log('Error in exporting'); unblockUI(); openDialogMindmap('Error', "Error in export"); }
+        else {
+          ci_parsed_details = JSON.parse(cycle_data);
+          for (var i = 0; i <  data.moduleInfo.length; i++) {
+            data.moduleInfo[i].cycleId = ci_parsed_details.row.cycleid;
+            data.moduleInfo[i].releaseId=ci_parsed_details.row.releaseid;
+            data.moduleInfo[i].versionNumber=$('.version-list').val();
+            data.moduleInfo[i].appType =  parsed_project_data.project_typename;
+          }
+          var responseData = JSON.stringify(data);
+          jsonDownload('moduleinfo.json',responseData);
+          var response_execution_data = JSON.stringify(execution_data);
+          jsonDownload('execution_data.json',response_execution_data);
+          unblockUI();
+          if(data_not_exported.length!=0)
+          openDialogMindmap('Mindmap', "Data Exported Successfully. Module Not Exported:"+data_not_exported);
+          else
+          openDialogMindmap('Mindmap', "Data Exported Successfully");
+        }
+       });
+       }
+     });
+    }
+    else{
+      unblockUI();
+      openDialogMindmap('Mindmap', "Module is not created in ICE");
+    }
+  }
+  });
+}
+
+/*
+function : jsonDownload()
+Purpose : download json file
+*/
+
+function jsonDownload(filename,responseData){
+  var blob = new Blob([responseData], {
+                type: 'text/json'
+              }),
+                e = document.createEvent('MouseEvents'),
+                a = document.createElement('a');
+              a.download = filename;
+              a.href = window.URL.createObjectURL(blob);
+              a.dataset.downloadurl = ['text/json', a.download, a.href].join(':');
+              e.initMouseEvent('click', true, true, window,
+                0, 0, 0, 0, 0, false, false, false, false, 0, null);
+              a.dispatchEvent(e);
 }

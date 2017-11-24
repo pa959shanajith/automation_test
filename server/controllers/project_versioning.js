@@ -2,6 +2,7 @@ var fs = require('fs');
 var http = require('http');
 var https = require('https');
 var uuidV4 = require('uuid/v4');
+var suite = require('../controllers/suite');
 //var router = express.Router();
 var create_ice = require('../controllers/create_ice');
 var  logger = require('../../logger');
@@ -668,6 +669,12 @@ exports.versioning = function (req, res) {
 								}
 
 							}, function (maincallback) {
+								if(d.action !='project_replicate' && 'socketMapNotify' in myserver){
+									for (soc in myserver.socketMapNotify ){
+										myserver.socketMapNotify[soc]._events.versionUpdate = [];
+										myserver.socketMapNotify[soc].emit("versionUpdate",vn_to);
+										}
+							   	}
 								res.status(status).send({ status: "Success" });
 							});
 
@@ -677,8 +684,8 @@ exports.versioning = function (req, res) {
 			});
 
 		}
-		else if (d.task == 'projectReplication') {
-			logger.info('Inside the projectReplication task of UI Service versioning ')
+		else if (d.task == 'getProjectIDs_Nineteen68') {
+			logger.info('Inside the getProjectIDs_Nineteen68 task of UI Service versioning ')
 			var qlist = { userid: d.userid,'allflag':false }
 			logger.info("Calling getProjectIDs_Nineteen68 node Service from versioning: project_versioning/versioning");
 			create_ice.getProjectIDs_Nineteen68(qlist, function (err, result) {
@@ -702,6 +709,27 @@ exports.versioning = function (req, res) {
 					res.status(status).send(result);
 				}else {
 					res.status(status).send(result);
+				}
+			});
+		}
+		else if (d.task == 'getCRId') {
+			data_to_send = { "projectid": req.body.ci_data.projectid};
+			suite.getCRId(data_to_send, function (status, result) {
+				res.setHeader('Content-Type', 'application/json');
+				if (status != 200) res.status(status).send(result);
+				else {
+					res.status(status).send(result);
+				}
+			});
+		}
+		else if(d.task == 'getProjectType_Nineteen68'){
+			var data_to_send = d.projectid;
+			create_ice.getProjectType_Nineteen68(data_to_send,function(err,result){
+				if(err){
+					res.status(500).send(result);
+				}
+				else{
+					res.status(200).send(result);
 				}
 			});
 		}

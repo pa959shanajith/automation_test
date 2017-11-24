@@ -26,13 +26,14 @@ function loadMindmapData(param){
 			for(i=0; i<result1.projectId.length && result1.projectName.length; i++){
 				$('.project-list').append("<option app-type='"+result1.appType[i]+"' data-id='"+result1.projectName[i]+"' value='"+result1.projectId[i]+"'>"+result1.projectName[i]+"</option>");
 			}
-			if(getCookie('mm_pid') != ''){
-				selectedProject=getCookie('mm_pid');
-			}
-			if (selectedProject == null){
-				setCookie('mm_pid',result1.projectId[0],15);
-				selectedProject=result1.projectId[0];
-			}
+			selectedProject=result1.projectId[0];
+			// if(getCookie('mm_pid') != ''){
+			// 	selectedProject=getCookie('mm_pid');
+			// }
+			// if (selectedProject == null){
+			// 	setCookie('mm_pid',result1.projectId[0],15);
+			// 	selectedProject=result1.projectId[0];
+			// }
 			$(".project-list").val(selectedProject);
 			//$(".project-list option[value='" + selectedProject + "']").attr('selected', 'selected');
 			if (param==1){
@@ -41,10 +42,10 @@ function loadMindmapData(param){
 				if(err){ console.log(err);openDialogMindmap('Error','Error loading Versions')}
 				else{
 					addVersioning(result);
-					if(getCookie('mm_pvid') ==''){
-					setCookie('mm_pvid',$('.version-list').children()[0].value,15);
-					$('.version-list').val($('.version-list').children()[0].value);
-					}
+					// if(getCookie('mm_pvid') ==''){
+					// setCookie('mm_pvid',$('.version-list').children()[0].value,15);
+					// $('.version-list').val($('.version-list').children()[0].value);
+					// }
 				}
 			});
 			}else{

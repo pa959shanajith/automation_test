@@ -374,6 +374,7 @@ try {
     app.post('/debugTestCase_ICE', design.debugTestCase_ICE);
     app.post('/getKeywordDetails_ICE', design.getKeywordDetails_ICE);
     app.post('/getTestcasesByScenarioId_ICE', design.getTestcasesByScenarioId_ICE);
+    app.post('/generateCItoken', admin.generateCItoken);
     //Execute Screen Routes
     app.post('/readTestSuite_ICE', suite.readTestSuite_ICE);
     app.post('/updateTestSuite_ICE', suite.updateTestSuite_ICE);
@@ -382,6 +383,11 @@ try {
     app.post('/getTestcaseDetailsForScenario_ICE', suite.getTestcaseDetailsForScenario_ICE);
     app.post('/ExecuteTestSuite_ICE_CI', suite.ExecuteTestSuite_ICE_CI);
     //app.post('/readTestScenarios_ICE', suite.readTestScenarios_ICE);
+
+    //SVN execution routes
+    app.post('/ExecuteTestSuite_ICE_SVN',suite.ExecuteTestSuite_ICE_SVN);
+    app.post('/getListofScheduledSocketMap',suite.getListofScheduledSocketMap);
+
     //Scheduling Screen Routes
     app.post('/testSuitesScheduler_ICE', suite.testSuitesScheduler_ICE);
     app.post('/getScheduledDetails_ICE', suite.getScheduledDetails_ICE);

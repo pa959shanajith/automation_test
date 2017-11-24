@@ -138,6 +138,14 @@ mySPA.factory('adminServices', ['$http', '$q', function ($http, $q) {
     		})
     		.then(function (response) { return response.data; },
     				function (response) { return $q.reject(response.data); });
-		}
+		},  generateCItoken: function (createUser) {
+            var param = "generateCItoken";
+            return $http.post('/generateCItoken', {
+				param: param,
+				createUser:createUser
+            })
+            .then(function (response) { return response.data; },
+           	function (response) { return $q.reject(response.data); });
+        }
     };
 }]);

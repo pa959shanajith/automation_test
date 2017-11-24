@@ -2,6 +2,7 @@
  * Dependencies.
  */
 var bcrypt = require('bcrypt');
+var uuid = require('uuid-random');
 var async = require('async');
 var Client = require("node-rest-client").Client;
 var client = new Client();
@@ -223,15 +224,20 @@ exports.createUser_Nineteen68 = function (req, res) {
 			var req_username = req.body.createUser.username.toLowerCase();
 			var req_password = req.body.createUser.password;
 			var req_firstname = req.body.createUser.firstName;
+			var req_ciuser = req.body.createUser.ciuser;
 			var req_lastname = req.body.createUser.lastName;
 			var req_ldapuser = req.body.createUser.ldapUser;
 			var req_defaultRole = req.body.createUser.role;
 			var req_email_id = req.body.createUser.email;
+			var req_token = req.body.createUser.ci_token;
 			var salt = bcrypt.genSaltSync(10);
 			var req_hashedPassword = bcrypt.hashSync(req_password, salt);
-
-			validateCreateUser();
-
+			var req_hashedtoken = bcrypt.hashSync(req_token, salt);
+			var ci_user=true;
+			if (!req_ciuser){
+				ci_user=false;
+				validateCreateUser();
+			}
 			function validateCreateUser() {
 				logger.info("Inside validateCreateUser function");
 				check_username = validator.isEmpty(req_username);
@@ -285,7 +291,7 @@ exports.createUser_Nineteen68 = function (req, res) {
 					"Content-Type": "application/json"
 				}
 			};
-			if (valid_username == true && valid_password == true && valid_firstname == true && valid_lastname == true && valid_ldapuser == true && valid_defaultRole == true && valid_email_id == true && valid_hashedPassword == true) {
+			if (ci_user== true ||(valid_username == true && valid_password == true && valid_firstname == true && valid_lastname == true && valid_ldapuser == true && valid_defaultRole == true && valid_email_id == true && valid_hashedPassword == true)) {
 				logger.info("Calling NDAC Service: createUser_Nineteen68");
 				client.post(epurl + "admin/createUser_Nineteen68", args,
 					function (userNameresult, response) {
@@ -294,28 +300,42 @@ exports.createUser_Nineteen68 = function (req, res) {
 						res.send("fail");
 					} else {
 						try {
-							for (var i = 0; i < userNameresult.rows.length; i++) {
-								dbResult = userNameresult.rows[i];
-								if (req_username.toLowerCase() === dbResult.username.toLowerCase()) {
-									status = true;
-									break;
+							if(!ci_user){
+								for (var i = 0; i < userNameresult.rows.length; i++) {
+									dbResult = userNameresult.rows[i];
+									if (req_username.toLowerCase() === dbResult.username.toLowerCase()) {
+										status = true;
+										break;
+									}
 								}
 							}
 							if (req_ldapuser) {
 								req_hashedPassword = "null";
 							}
 							if (status === false) {
-								var inputs = {
-									"query": "createuser",
+								if(!ci_user){
+									var inputs = {
+										"query": "createuser",
+										"createdby": req_username,
+										"defaultrole": req_defaultRole,
+										"emailid": req_email_id,
+										"firstname": req_firstname,
+										"lastname": req_lastname,
+										"ldapuser": req_ldapuser,
+										"password": req_hashedPassword,
+										"username": req_username,
+										"ciuser":false
+									};
+								}
+								else{
+									var inputs = {
+									"query": "createciuser",
 									"createdby": req_username,
-									"defaultrole": req_defaultRole,
-									"emailid": req_email_id,
-									"firstname": req_firstname,
-									"lastname": req_lastname,
-									"ldapuser": req_ldapuser,
-									"password": req_hashedPassword,
-									"username": req_username
-								};
+									"password": req_hashedtoken,
+									"username": req_username,
+									"ciuser":true
+									};
+								}
 								var args = {
 									data: inputs,
 									headers: {
@@ -326,7 +346,8 @@ exports.createUser_Nineteen68 = function (req, res) {
 								client.post(epurl + "admin/createUser_Nineteen68", args,
 									function (result, response) {
 									try {
-										flag = "Success";
+										if(result.rows != "fail") flag = "Success";
+										else flag = "fail";
 										logger.info("User created successfully");
 										res.send(flag);
 									} catch (exception) {
@@ -704,9 +725,9 @@ exports.createProject_ICE = function createProject_ICE(req, res) {
                                     //Relationships
                                     qList.push({"statement":"MATCH (a:DOMAINS_NG{domainid:'"+inputs.domainid+"'}),(b:PROJECTS_NG {projectid:'"+newProjectID
                                                 +"',domainid:'"+inputs.domainid+"',projectname:'"+inputs.projectname+"'}) MERGE(a)-[r:FDOMTPRJ_NG{id:'"+newProjectID+"'}]->(b) return a,r,b"})
-                                    
+
                                     callback();
-                                    
+
 								}
 							});
 						} catch (exception) {
@@ -755,14 +776,14 @@ exports.createProject_ICE = function createProject_ICE(req, res) {
                                             qList.push({"statement":"MATCH (a:PROJECTS_NG{projectid:'"+inputs.projectid+"'}),(b:RELEASES_NG {releaseid:'"+newReleaseID
                                                         +"',projectid:'"+inputs.projectid+"',releasename:'"
                                                         +inputs.releasename+"',deleted:'"+false+"'}) MERGE(a)-[r:FPRJTREL_NG{id:'"+newReleaseID
-                                                        +"'}]->(b) return a,r,b"})														
+                                                        +"'}]->(b) return a,r,b"})
 
                                             //qList.push({"statement":"MATCH (c:RELEASES_NG{releaseid:'"+newReleaseID+"'}) return c"})
                                             //qList.push({"statement":"MATCH (c:CYCLES_NG{releaseid:'"+newReleaseID+"'}) return c"})
 
                                             qList.push({"statement":"MATCH (a:RELEASES_NG{releaseid:'"+newReleaseID
                                                         +"'}),(b:CYCLES_NG {releaseid:'"+newReleaseID
-                                                        +"',deleted:'"+false+"'}) MERGE(a)-[r:FRELTCYC_NG{id:b.cycleid}]->(b) return a,r,b"})														
+                                                        +"',deleted:'"+false+"'}) MERGE(a)-[r:FRELTCYC_NG{id:b.cycleid}]->(b) return a,r,b"})
                                             //reqToAPI(qList,urlData);
 											async.forEachSeries(cycleNames, function (cycleName, cycleNamescallback) {
 												try {
@@ -822,7 +843,7 @@ exports.createProject_ICE = function createProject_ICE(req, res) {
 								logger.info("neo4jAPI execute queries with status for createProject_ICE: %d",status,"\nresponse for createProject_ICE:Response: %s",result);
                                 logger.info('neo4jAPI execute queries for createProject_ICE executed successfully');
                             }
-                        });						
+                        });
 					}
 				});
 			} else {
@@ -859,8 +880,8 @@ function createCycle(args, createCycleCallback) {
 				qList.push({"statement":"MATCH (a:RELEASES_NG{releaseid:'"+args.data.releaseid+"'}),(b:CYCLES_NG {releaseid:'"+args.data.releaseid
                 +"',cyclename:'"+args.data.cyclename+"',cycleid:'"
                 +newCycleID+"',deleted:'"+false+"'}) MERGE(a)-[r:FRELTCYC_NG{id:'"
-                +newCycleID+"'}]->(b) return a,r,b"})														
-				
+                +newCycleID+"'}]->(b) return a,r,b"})
+
 				//statusFlag = "success";
 				//createCycleCallback(null, statusFlag);
 				createCycleCallback(null, result.rows[0]);
@@ -877,7 +898,7 @@ function createCycle(args, createCycleCallback) {
  * from a particular domain
  */
 exports.updateProject_ICE = function updateProject_ICE(req, res) {
-	qList=[];    
+	qList=[];
 	try {
 		logger.info("Inside UI Service: updateProject_ICE");
 		if (req.cookies['connect.sid'] != undefined) {
@@ -956,16 +977,16 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
                                                     qList.push({"statement":"MATCH (a:PROJECTS_NG{projectid:'"+inputs.projectid+"'}),(b:RELEASES_NG {releaseid:'"+newReleaseID
                                                                 +"',projectid:'"+inputs.projectid+"',releasename:'"
                                                                 +inputs.releasename+"',deleted:'"+false+"'}) MERGE(a)-[r:FPRJTREL_NG{id:'"+newReleaseID
-                                                                +"'}]->(b) return a,r,b"})														
+                                                                +"'}]->(b) return a,r,b"})
 
                                                     //qList.push({"statement":"MATCH (c:RELEASES_NG{releaseid:'"+newReleaseID+"'}) return c"})
                                                     //qList.push({"statement":"MATCH (c:CYCLES_NG{releaseid:'"+newReleaseID+"'}) return c"})
 
                                                     qList.push({"statement":"MATCH (a:RELEASES_NG{releaseid:'"+newReleaseID
                                                                 +"'}),(b:CYCLES_NG {releaseid:'"+newReleaseID
-                                                                +"',deleted:'"+false+"'}) MERGE(a)-[r:FRELTCYC_NG{id:b.cycleid}]->(b) return a,r,b"})														
+                                                                +"',deleted:'"+false+"'}) MERGE(a)-[r:FRELTCYC_NG{id:b.cycleid}]->(b) return a,r,b"})
                                                     // reqToAPI(qList,urlData);
-                                                                                                        
+
 													async.forEachSeries(cycleDetails, function (eachCycleDetail, cycleNamescallback) {
 														try {
 															var eachCycleName = eachCycleDetail.cycleName;
@@ -1088,7 +1109,7 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
                                                     qList.push({"statement":"MATCH (n:RELEASES_NG {projectid:'"+inputs.projectid
                                                                 +"',releaseid:'"+inputs.releaseid+"',releasename:'"
                                                                 +inputs.releasename+"'}) detach delete n"});
-                                                    //reqToAPI(qList,urlData);                                                    
+                                                    //reqToAPI(qList,urlData);
 													var cyclesOfRelease = eachprojectDetail.cycleDetails;
 													async.forEachSeries(cyclesOfRelease, function (eachCycleDetail, eachCycleCallback) {
 														try {
@@ -1117,8 +1138,8 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
                                                                     qList.push({"statement":"MATCH (n:CYCLES_NG {cycleid:'"+inputs.cycleid
                                                                                 +"',releaseid:'"+inputs.releaseid+"',cyclename:'"
                                                                                 +inputs.cyclename+"'}) detach delete n"});
-                                                                    //reqToAPI(qList,urlData);																
-                                                                    eachCycleCallback();                                                                    
+                                                                    //reqToAPI(qList,urlData);
+                                                                    eachCycleCallback();
 																}
 															});
 														} catch (exception) {
@@ -1977,7 +1998,7 @@ exports.assignProjects_ICE = function (req, res) {
                                 logger.info('neo4jAPI execute queries for assignProjects_ICE executed successfully');
                                 res.send("success");
                             }
-                        });	
+                        });
 
 //						res.send("success");
 					}
@@ -2047,7 +2068,7 @@ exports.getAssignedProjects_ICE = function (req, res) {
 									function (result, response) {
 									try {
 										if (response.statusCode != 200 || result.rows == "fail") {
-											ogger.error("Error occurred in admin/getAssignedProjects_ICE inside async function Error Code : ERRNDAC");
+											logger.error("Error occurred in admin/getAssignedProjects_ICE inside async function Error Code : ERRNDAC");
 											res.send("fail");
 										} else {
 											if (result.rows.length > 0) {
@@ -2111,6 +2132,26 @@ exports.getAvailablePlugins = function (req, res) {
 		}
 	} catch (exception) {
 		console.log(exception);
+		res.send("fail");
+	}
+};
+
+exports.generateCItoken = function (req, res) {
+	logger.info("Inside UI service: generateCItoken");
+	try {
+		if (req.cookies['connect.sid'] != undefined) {
+			var sessionCookie = req.cookies['connect.sid'].split(".");
+			var sessionToken = sessionCookie[0].split(":");
+			sessionToken = sessionToken[1];
+		}
+		if (sessionToken != undefined && req.session.id == sessionToken) {
+			var user_info={user_name:'ci_user',token:uuid()}
+			res.send(user_info);
+		} else {
+			res.send("Invalid Session");
+		}
+	} catch (exception) {
+		logger.error("Error occurred in admin/generateCItoken:",exception);
 		res.send("fail");
 	}
 };
