@@ -72,13 +72,14 @@ try {
         limit: '10mb',
         extended: true
     }));
-
+    if(process.env.EXPRESSLOGS == 'ON')
     app.use(expressWinston.logger({
         winstonInstance: logger,
-        requestWhitelist: ['url'],
+        requestWhitelist: ['url','ip'],
         colorize: true
 
     }));
+    else logger.info("Express logs are disabled");
 
     app.use(cookieParser());
     app.use(sessions({
