@@ -142,7 +142,7 @@ function addVersioning(versions) {
     ).append($('<i>').attr({
       class: 'glyphicon glyphicon-export plus-icon',
       title: "Export Version",
-      onclick: 'exportData()'
+      onclick: 'exportData(1)'
     })));
   for (i = 0; i < versions.length; i++) {
     $('.version-list').append($('<option>').attr({
@@ -349,113 +349,4 @@ function getSelectionStart(o) {
     if (r.text == '') return o.value.length
     return o.value.lastIndexOf(r.text)
   } else return o.selectionStart
-}
-
-
-/*
-function : exportData()
-Purpose : Exporting data in json file
-param :
-*/
-
-function exportData() {
-  data_not_exported=[]
-  data = {"moduleInfo": []};
-  execution_data={"execution_data": [{"browserType": ["1"],"moduleInfo": [{"projectId": "","cycleId": "","moduleId": "",
-				"moduleName": "","releaseId":"", "versionNumber":"","suiteDetails": [{"scenarios_id": "","scenarios_name": ""}]}],
-        "userInfo": {"token_id": "","username": "","ice_username":""}}]};
-  blockUI('Loading UI');
-  var userInfo = JSON.parse(window.localStorage['_UI']);
-  var user_id = userInfo.user_id;
-  dataSender({user_name: userInfo.username, userRole: window.localStorage['_SR'], userid: user_id, task: 'getModules', tab: window.localStorage['tabMindMap'], prjId: $(".project-list").val(), versioning: 1, version: $('.version-list').val() }, function (err, result) {
-    if (err) {
-      console.log(result);
-      unblockUI();
-    }
-    else {
-      result_details = JSON.parse(result);
-      flag=0;
-      for (var i = 0; i < result_details.length; i++) {
-        var module_info = { "appType":"","projectId": $(".project-list").val(),"cycleId":"","moduleId": "", "moduleName": "","releaseId":"",
-        "versionNumber":"","suiteDetails": []};
-        if (result_details[i].id_c != 'null' && result_details[i].id_c != '') {
-          module_info.moduleId = result_details[i].id_c;
-          module_info.moduleName = result_details[i].name;
-          flag=1;
-          for (var j = 0; j < result_details[i].children.length; j++) {
-            var s_data = { 'scenarios_id': '', 'scenarios_name': '' };
-            if (result_details[i].children[j].id_c != 'null' && result_details[i].children[j].id_c != '') {
-              s_data.scenarios_id = result_details[i].children[j].id_c;
-              s_data.scenarios_name = result_details[i].children[j].name;
-              module_info.suiteDetails.push(s_data);
-            }
-            else {
-              console.log('Not exported : ', result_details[i].children[j].name);
-            }
-          }
-          data.moduleInfo.push(module_info);
-        }
-        else {
-          data_not_exported.push(result_details[i].name);
-          console.log('Not exported : ', result_details[i].name);
-        }
-      }
-      if(flag){
-      dataSender({user_name: userInfo.username, userRole: window.localStorage['_SR'], userid: user_id, task: 'getProjectType_Nineteen68',projectid:$(".project-list").val(), versioning: 1 }, function (err, project_data) {
-      if (err) {
-        console.log('err');
-        unblockUI();
-      }
-      else {
-      parsed_project_data = JSON.parse(project_data);
-      ci_details = { projectid: $(".project-list").val() }
-      dataSender({ user_name: userInfo.username, userRole: window.localStorage['_SR'], userid: user_id, ci_data: ci_details, task: 'getCRId', versioning: 1 }, function (status, cycle_data) {
-        if (status) { console.log('Error in exporting'); unblockUI(); openDialogMindmap('Error', "Error in export"); }
-        else {
-          ci_parsed_details = JSON.parse(cycle_data);
-          for (var i = 0; i <  data.moduleInfo.length; i++) {
-            data.moduleInfo[i].cycleId = ci_parsed_details.row.cycleid;
-            data.moduleInfo[i].releaseId=ci_parsed_details.row.releaseid;
-            data.moduleInfo[i].versionNumber=$('.version-list').val();
-            data.moduleInfo[i].appType =  parsed_project_data.project_typename;
-          }
-          var responseData = JSON.stringify(data);
-          jsonDownload('moduleinfo.json',responseData);
-          var response_execution_data = JSON.stringify(execution_data);
-          jsonDownload('execution_data.json',response_execution_data);
-          unblockUI();
-          if(data_not_exported.length!=0)
-          openDialogMindmap('Mindmap', "Data Exported Successfully. Module Not Exported:"+data_not_exported);
-          else
-          openDialogMindmap('Mindmap', "Data Exported Successfully");
-        }
-       });
-       }
-     });
-    }
-    else{
-      unblockUI();
-      openDialogMindmap('Mindmap', "Module is not created in ICE");
-    }
-  }
-  });
-}
-
-/*
-function : jsonDownload()
-Purpose : download json file
-*/
-
-function jsonDownload(filename,responseData){
-  var blob = new Blob([responseData], {
-                type: 'text/json'
-              }),
-                e = document.createEvent('MouseEvents'),
-                a = document.createElement('a');
-              a.download = filename;
-              a.href = window.URL.createObjectURL(blob);
-              a.dataset.downloadurl = ['text/json', a.download, a.href].join(':');
-              e.initMouseEvent('click', true, true, window,
-                0, 0, 0, 0, 0, false, false, false, false, 0, null);
-              a.dispatchEvent(e);
 }

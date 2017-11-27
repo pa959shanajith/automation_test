@@ -195,6 +195,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     type: 'HEAD',
                     url: window.location.origin+'/js/js_mindmap/versioning.js',
                     success: function() {
+
                         versioningEnabled=true;
                         
                         load_versions();
@@ -251,6 +252,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                    $("#ct-moduleBox,.tabAssign").addClass("ct-expand-module");
                 }
                 $("#ct-main").css("display","block");
+                if(!versioningEnabled){
+                    addExport(versioningEnabled);
+                }
             }else if($scope.tab=='tabAssign'){
                 $('.selectProject').show();
                 $("img.selectedIcon").removeClass("selectedIcon");

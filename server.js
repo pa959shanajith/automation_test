@@ -188,7 +188,7 @@ try {
     //     });
     // });
 
-    app.get('/',  function (req,  res)  {
+    app.get('/',  function (req,  res)  {
         res.clearCookie('connect.sid');
         req.session.destroy();
         logger.rewriters.push(function (level, msg, meta) {
@@ -199,17 +199,17 @@ try {
         res.sendFile("index.html", {root: __dirname + "/public/"});
     });
 
-    app.get('/login', function(req, res) {
+    app.get('/login', function(req, res) {
         res.clearCookie('connect.sid');
         req.session.destroy();
         res.sendFile("index.html", {root: __dirname + "/public/"});
     });
 
-    app.get('/admin',  function (req,  res)  {
+    app.get('/admin',  function (req,  res)  {
         if (!req.session.defaultRole || req.session.defaultRole != 'Admin') {
-            req.session.destroy();  res.status(401).send('<br><br>Your session has been expired.Please <a href="/">Login</a> Again');
+            req.session.destroy();  res.status(401).send('<br><br>Your session has been expired.Please <a href="/">Login</a> Again');
         } else {
-            if  (req.cookies['connect.sid']  &&  req.cookies['connect.sid']  !=  undefined)  {  res.sendFile("index.html",  {  root:  __dirname  +  "/public/"  }); }  else  { req.session.destroy();  res.status(401).send('<br><br>Your session has been expired.Please <a href="/">Login</a>Again'); }
+            if  (req.cookies['connect.sid']  &&  req.cookies['connect.sid']  !=  undefined)  {  res.sendFile("index.html",  {  root:  __dirname  +  "/public/"  }); }  else  { req.session.destroy();  res.status(401).send('<br><br>Your session has been expired.Please <a href="/">Login</a>Again'); }
         }
     });
 
@@ -260,7 +260,7 @@ try {
 
         if (req.session.switchedRole != true) {
             if (!req.session.defaultRole || roles.indexOf(req.session.defaultRole) >= 0) {
-                req.session.destroy();  res.status(401).send('<br><br>Your session has been expired.Please <a href="/">Login</a> Again');
+                req.session.destroy();  res.status(401).send('<br><br>Your session has been expired.Please <a href="/">Login</a> Again');
             } else {
                 if (req.cookies['connect.sid'] && req.cookies['connect.sid'] != undefined) {
 
@@ -387,7 +387,7 @@ try {
 
     //SVN execution routes
     app.post('/ExecuteTestSuite_ICE_SVN',suite.ExecuteTestSuite_ICE_SVN);
-    app.post('/getListofScheduledSocketMap',suite.getListofScheduledSocketMap);
+    // app.post('/getListofScheduledSocketMap',suite.getListofScheduledSocketMap);
 
     //Scheduling Screen Routes
     app.post('/testSuitesScheduler_ICE', suite.testSuitesScheduler_ICE);

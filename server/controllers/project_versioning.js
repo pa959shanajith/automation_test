@@ -713,7 +713,7 @@ exports.versioning = function (req, res) {
 			});
 		}
 		else if (d.task == 'getCRId') {
-			data_to_send = { "projectid": req.body.ci_data.projectid};
+			data_to_send = { "projectid": d.ci_data.projectid};
 			suite.getCRId(data_to_send, function (status, result) {
 				res.setHeader('Content-Type', 'application/json');
 				if (status != 200) res.status(status).send(result);

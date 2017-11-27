@@ -625,3 +625,6 @@ select
 .selectProjectPosition{
      float:left;
 }
+.export-icon{
+    padding-left: 7px;
+}
