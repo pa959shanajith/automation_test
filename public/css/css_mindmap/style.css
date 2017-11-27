@@ -606,14 +606,14 @@ select
 .selectVersionLabel{
     position: relative;
     margin-right: 5%;
-    margin-left: -22%;
+    margin-left: -30%;
 }
 .plus-icon{
     margin-left: 8%;
 }
 .selectVersion{
     position: relative;
-    margin-left: 4%;
+    margin-left: 5%;
     float: left;
 }
 .searchbox-assign, .searchbox-create{
@@ -624,4 +624,7 @@ select
 }
 .selectProjectPosition{
      float:left;
+}
+.export-icon{
+    padding-left: 7px;
 }

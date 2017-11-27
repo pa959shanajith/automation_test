@@ -88,7 +88,7 @@
                                     var b64Response = window.btoa(unescape(encodeURIComponent(data)));
                                     var imageUrl = 'data:image/PNG;base64,'+ data;
                                     var WindowObject = window.open();
-                                    var strHtml = "<html>\n<head>\n </head><body><div style='padding: 10px;'>\n<img style='width: 100%; height: calc(100% - 40px); border: 1px solid #ccc;' src='" + imageUrl + "'/>\n</div>\n</body>\n</html>";
+                                    var strHtml = "<html>\n<head>\n</head>\n<body style='margin: 2px' >\n<img style='border: 1px solid #ccc' src='" + imageUrl + "'/>\n</body>\n</html>";
                                     WindowObject.document.writeln(strHtml);
                                 }
                             }

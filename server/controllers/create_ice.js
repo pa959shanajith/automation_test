@@ -1686,6 +1686,7 @@ exports.getProjectType_Nineteen68 = function (req, res) {
 				if (result.rows.length != 0) {
 					projectDetails.projectType = result.rows[0].projecttypeid;
 					projectDetails.project_id = req;
+					projectDetails.project_typename = result.projecttype[0].projecttypename;
 				}
 				res(null, projectDetails);
 			}

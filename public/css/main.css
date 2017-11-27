@@ -3431,7 +3431,17 @@ li.select_all .addCustObj{
 .actionOnHover img:first-child{
 	margin-right: 10px !important;
 }
-
+.citokenBtn{
+	position: absolute;
+    z-index: 1;
+    right: 82px;
+    margin: 0;
+    padding: 0px 20px;
+    background: #5e636b !important;
+}
+.citokenBtnActive{
+    background: #643693 !important;
+}
 .ldapBtn {
 	position: absolute;
     z-index: 1;

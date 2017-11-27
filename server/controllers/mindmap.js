@@ -1,6 +1,7 @@
 var uuidV4 = require('uuid/v4');
 var neo4jAPI = require('../controllers/neo4jAPI');
 var admin = require('../controllers/admin');
+var suite = require('../controllers/suite');
 var create_ice=require('../controllers/create_ice');
 var myserver = require('../lib/socket.js');
 var notificationMsg = require("../notifications/notifyMessages");
@@ -35,8 +36,6 @@ exports.mindmapService = function(req, res) {
 				}
 			});
 		}
-
-
 		else if(d.task=='getModules'){
 			prjId=d.prjId;
 			if(d.tab=='tabAssign' || d.tab=='endToend'){
@@ -784,6 +783,27 @@ exports.mindmapService = function(req, res) {
 						logger.error("exception in mindmapService: ",ex);
 						res.status(200).send('fail');
 					}
+				}
+			});
+		}
+		else if (d.task == 'getCRId') {
+			data_to_send = { "projectid": d.ci_data.projectid};
+			suite.getCRId(data_to_send, function (status, result) {
+				res.setHeader('Content-Type', 'application/json');
+				if (status != 200) res.status(status).send(result);
+				else {
+					res.status(status).send(result);
+				}
+			});
+		}
+		else if(d.task == 'getProjectType_Nineteen68'){
+			var data_to_send = d.projectid;
+			create_ice.getProjectType_Nineteen68(data_to_send,function(err,result){
+				if(err){
+					res.status(500).send(result);
+				}
+				else{
+					res.status(200).send(result);
 				}
 			});
 		}
