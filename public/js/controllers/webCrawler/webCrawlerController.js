@@ -1,4 +1,4 @@
-mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$timeout', 'webCrawlerServices','cfpLoadingBar','$window', function($scope,$http,$location,$timeout,webCrawlerServices,cfpLoadingBar,$window) {
+mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$timeout', 'webCrawlerServices','cfpLoadingBar','$window', 'socket', function($scope,$http,$location,$timeout,webCrawlerServices,cfpLoadingBar,$window,socket) {
 
   $timeout(function () {
     // Without JQuery
@@ -21,6 +21,11 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
       $("#WebCrawlerGlobalModal").find('.btn-accept').focus();
     }, 300);
   }
+
+  socket.on('ICEnotAvailable', function () {
+    unblockUI();
+		openDialog("Weboccular Screen", "ICE Engine is not available. Please run the batch file and connect to the Server.");
+	});
 
   var start = false;  // Flag to start the removal of dots from the dom
   var currentDot = 0; // used to store the count of dots displayed in progess canvas

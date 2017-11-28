@@ -160,8 +160,11 @@ exports.initScraping_ICE = function (req, res) {
 					});
 				}
 				mySocket.on("unavailableLocalServer", function () {
-					logger.error("Error occured in the service initScraping_ICE: Socket Disconnected");
-					res.send("unavailableLocalServer");
+					logger.error("Error occured in initScraping_ICE: Socket Disconnected");
+					if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
+						var soc = myserver.socketMapNotify[name];
+						soc.emit("ICEnotAvailable");
+					}
 				});
 			} else {
 				logger.error("Error occured in the service initScraping_ICE: Socket not Available");
@@ -1915,8 +1918,11 @@ exports.debugTestCase_ICE = function (req, res) {
 					logger.error("Exception in the service debugTestCase_ICE - wsdlServiceGenerator_ICE: %s", exception);
 				}
 				mySocket.on("unavailableLocalServer", function () {
-					logger.error("Error occured in the service debugTestCase_ICE: Socket Disconnected");
-					res.send("unavailableLocalServer");
+					logger.error("Error occured in debugTestCase_ICE: Socket Disconnected");
+					if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
+						var soc = myserver.socketMapNotify[name];
+						soc.emit("ICEnotAvailable");
+					}
 				});
 			} else {
 				logger.error("Error in the service debugTestCase_ICE: Socket not Available");

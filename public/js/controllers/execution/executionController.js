@@ -1,5 +1,5 @@
 var appType;var releaseName;var cycleName;var testSuiteName;
-mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeout','$location','ExecutionService','cfpLoadingBar', function ($scope, $rootScope, $http, $timeout, $location, ExecutionService, cfpLoadingBar) {
+mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeout','$location','ExecutionService','cfpLoadingBar', 'socket', function ($scope, $rootScope, $http, $timeout, $location, ExecutionService, cfpLoadingBar,socket) {
 	cfpLoadingBar.start();
 	var getEachScenario = [] //Contains Each RowData of Scenarios
 	var userinfo = {} //Contains Userinfo
@@ -18,6 +18,11 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 
 	//Task Listing
 	loadUserTasks()
+
+	socket.on('ICEnotAvailable', function () {
+		$('.modal-backdrop').remove();
+		openDialogExe("Execute Test Suite", "ICE Engine is not available. Please run the batch file and connect to the Server.");
+	});
 	/*var taskAuth;
 	if(window.localStorage['_CT'] == "")
 	{

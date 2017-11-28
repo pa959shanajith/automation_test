@@ -744,7 +744,10 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 					}, updateSessionTimeEvery);
 				mySocket.on("unavailableLocalServer", function () {
 					logger.error("Error occured in ExecuteTestSuite_ICE: Socket Disconnected");
-					res.send("unavailableLocalServer");
+					if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
+						var soc = myserver.socketMapNotify[name];
+						soc.emit("ICEnotAvailable");
+					}
 				});
 				mySocket.on('result_executeTestSuite', function (resultData) {
 					//req.session.cookie.expires = new Date(Date.now() + 30 * 60 * 1000);
@@ -1174,7 +1177,10 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 										// 	}, updateSessionTimeEvery);
 										mySocket.on("unavailableLocalServer", function () {
 											logger.error("Error occured in ExecuteTestSuite_ICE_SVN: Socket Disconnected");
-											res.send("unavailableLocalServer");
+											if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
+												var soc = myserver.socketMapNotify[name];
+												soc.emit("ICEnotAvailable");
+											}
 										});
 										mySocket.on('result_executeTestSuite', function (resultData) {
 											//req.session.cookie.expires = new Date(Date.now() + 30 * 60 * 1000);
@@ -1423,7 +1429,10 @@ exports.ExecuteTestSuite_ICE_CI = function (req, res) {
 					}, updateSessionTimeEvery);
 				mySocket.on("unavailableLocalServer", function () {
 					logger.error("Error occured in ExecuteTestSuite_ICE_CI: Socket Disconnected");
-					res.send("unavailableLocalServer");
+					if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
+						var soc = myserver.socketMapNotify[name];
+						soc.emit("ICEnotAvailable");
+					}
 				});
 				mySocket.on('result_executeTestSuite', function (resultData) {
 					//req.session.cookie.expires = sessionExtend;

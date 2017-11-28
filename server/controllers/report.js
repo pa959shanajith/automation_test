@@ -82,8 +82,11 @@ exports.openScreenShot = function (req, res) {
 				}
 			});
 			mySocket.on("unavailableLocalServer", function () {
-				logger.error("Error occured in the service openScreenShot: Socket Disconnected");
-				res.send("unavailableLocalServer");
+				logger.error("Error occured in openScreenShot: Socket Disconnected");
+				if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
+					var soc = myserver.socketMapNotify[name];
+					soc.emit("ICEnotAvailable");
+				}
 			});
 		} else {
 			logger.error("ICE Socket not Available");
@@ -1056,8 +1059,11 @@ exports.connectJira_ICE = function (req, res) {
 								}
 							});
 							mySocket.on("unavailableLocalServer", function () {
-								logger.error("Error occured in the service connectJira_ICE - loginToJira: Socket Disconnected");
-								res.send("unavailableLocalServer");
+								logger.error("Error occured in connectJira_ICE - loginToJira: Socket Disconnected");
+								if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
+									var soc = myserver.socketMapNotify[name];
+									soc.emit("ICEnotAvailable");
+								}
 							});
 						} else {
 							logger.error("Error occured in the service connectJira_ICE - loginToJira: Socket not Available");
@@ -1105,8 +1111,11 @@ exports.connectJira_ICE = function (req, res) {
 								}
 							});
 							mySocket.on("unavailableLocalServer", function () {
-								logger.error("Error occured in the service connectJira_ICE - createIssueInJira: Socket Disconnected");
-								res.send("unavailableLocalServer");
+								logger.error("Error occured in connectJira_ICE - createIssueInJira: Socket Disconnected");
+								if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
+									var soc = myserver.socketMapNotify[name];
+									soc.emit("ICEnotAvailable");
+								}
 							});
 						} else {
 							logger.error("Error occured in the service connectJira_ICE - createIssueInJira: Socket not Available");

@@ -66,8 +66,11 @@ exports.loginQCServer_ICE = function (req, res) {
 						res.send(data);
 					});
 					mySocket.on("unavailableLocalServer", function () {
-						logger.error("Error occured in the service loginQCServer_ICE: Socket Disconnected");
-						res.send("unavailableLocalServer");
+						logger.error("Error occured in loginQCServer_ICE: Socket Disconnected");
+						if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
+							var soc = myserver.socketMapNotify[name];
+							soc.emit("ICEnotAvailable");
+						}
 					});
 				} else {
 					logger.info("ICE Socket not Available");
@@ -139,8 +142,11 @@ exports.qcProjectDetails_ICE = function (req, res) {
 						}
 					});
 					mySocket.on("unavailableLocalServer", function () {
-						logger.error("Error occured in the service qcProjectDetails_ICE: Socket Disconnected");
-						res.send("unavailableLocalServer");
+						logger.error("Error occured in qcProjectDetails_ICE: Socket Disconnected");
+						if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
+							var soc = myserver.socketMapNotify[name];
+							soc.emit("ICEnotAvailable");
+						}
 					});
 				});
 			} else {
@@ -317,8 +323,11 @@ exports.qcFolderDetails_ICE = function (req, res) {
 					res.send(data);
 				});
 				mySocket.on("unavailableLocalServer", function () {
-					logger.error("Error occured in the service qcFolderDetails_ICE: Socket Disconnected");
-					res.send("unavailableLocalServer");
+					logger.error("Error occured in qcFolderDetails_ICE: Socket Disconnected");
+					if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
+						var soc = myserver.socketMapNotify[name];
+						soc.emit("ICEnotAvailable");
+					}
 				});
 				//})
 			} else {

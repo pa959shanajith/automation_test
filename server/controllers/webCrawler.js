@@ -60,8 +60,11 @@ exports.getCrawlResults = function (req, res) {
 						}
 					});
 					mySocket.on("unavailableLocalServer", function () {
-						logger.error("Error occured in the service getCrawlResults: Socket Disconnected");
-						res.send("unavailableLocalServer");
+						logger.error("Error occured in getCrawlResults: Socket Disconnected");
+						if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
+							var soc = myserver.socketMapNotify[name];
+							soc.emit("ICEnotAvailable");
+						}
 					});
 				} else {
 					logger.info("ICE socket not available for Address : %s", name);

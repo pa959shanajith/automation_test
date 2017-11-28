@@ -435,7 +435,7 @@ try {
     var portNumber = 8443;
     httpsServer.listen(portNumber, hostFamilyType); //Https Server
     try {
-        var apireq = apiclient.get("http://127.0.0.1:1990/", function (data, response) {
+        var apireq = apiclient.post("http://127.0.0.1:1990/server", function (data, response) {
             try {
                 if (response.statusCode != 200) {
                     httpsServer.close();
