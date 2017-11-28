@@ -804,8 +804,9 @@ exports.ExecuteTestSuite_ICE_CI = function (req, res) {
 		function executionFunction(executionRequest) {
 			logger.info("Inside executionFunction function in ExecuteTestSuite_ICE_CI");
 			var name = req.session.username;
-			var scenarioCount = executionRequest.suitedetails[0].scenarioIds.length;
+			//var scenarioCount = executionRequest.suitedetails[0].scenarioIds.length;
 			var completedSceCount = 0;
+			var testsuitecount=0;
 			var statusPass = 0;
 			var suiteStatus;
 			logger.info("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
@@ -819,9 +820,11 @@ exports.ExecuteTestSuite_ICE_CI = function (req, res) {
 					}, updateSessionTimeEvery);
 				mySocket.on('result_executeTestSuite', function (resultData) {
 					//req.session.cookie.expires = sessionExtend;
-					completedSceCount++;
+					//completedSceCount++;
 					clearInterval(updateSessionExpiry);
 					if (resultData != "success" && resultData != "Terminate") {
+						completedSceCount++;
+						scenarioCount = executionRequest.suitedetails[testsuitecount].scenarioIds.length;
 						try {
 							var scenarioid = resultData.scenarioId;
 							var executionid = resultData.executionId;
@@ -871,12 +874,16 @@ exports.ExecuteTestSuite_ICE_CI = function (req, res) {
 									} else {
 										suiteStatus = "Fail";
 									}
+									completedSceCount = 0;
+									testsuitecount++;
 									logger.info("Calling function updateExecutionStatus from executionFunction in ExecuteTestSuite_ICE_CI");
 									updateExecutionStatus(testsuiteid, executionid, starttime, suiteStatus);
 								}
 							} else {
 								if (completedSceCount == scenarioCount) {
 									suiteStatus = "Fail";
+									completedSceCount = 0;
+									testsuitecount++;
 									logger.info("Calling function updateExecutionStatus from executionFunction in ExecuteTestSuite_ICE_CI");
 									updateExecutionStatus(testsuiteid, executionid, starttime, suiteStatus);
 								}
@@ -1685,17 +1692,44 @@ exports.testSuitesScheduler_ICE = function (req, res) {
 		sessionToken = sessionToken[1];
 	}
 	if (sessionToken != undefined && req.session.id == sessionToken) {
-		var modInfo = req.body.moduleInfo;
-		logger.info("Calling function scheduleTestSuite from testSuitesScheduler_ICE");
-		scheduleTestSuite(modInfo, req, function (err, schedulecallback) {
-			try {
-				logger.info("TestSuite Scheduled successfully");
-				res.send(schedulecallback);
-			} catch (exception) {
-				logger.error("Exception in the service testSuitesScheduler_ICE: %s",exception);
-				res.send("fail");
-			}
-		});
+		if(req.body.chkType == "schedule"){			
+			var modInfo = req.body.moduleInfo;
+			logger.info("Calling function scheduleTestSuite from testSuitesScheduler_ICE");
+			scheduleTestSuite(modInfo, req, function (err, schedulecallback) {
+				try {
+					logger.info("TestSuite Scheduled successfully");
+					res.send(schedulecallback);
+				} catch (exception) {
+					logger.error("Exception in the service testSuitesScheduler_ICE: %s",exception);
+					res.send("fail");
+				}
+			});
+		}
+		else{
+			var data = req.body.moduleInfo;
+			var inputs = {
+				"scheduledatetime": data.curDate,
+				"clientipaddress": data.clientipaddress,
+				"scheduledetails": "checkscheduleddetails",
+				"query": "getallscheduledetails"
+			};
+			var args = {
+				data: inputs,
+				headers: {
+					"Content-Type": "application/json"
+				}
+			};
+			logger.info("Calling NDAC Service from testSuitesScheduler_ICE: suite/ScheduleTestSuite_ICE");
+			client.post(epurl + "suite/ScheduleTestSuite_ICE", args,
+				function (result, response) {
+					if (response.statusCode != 200 || result.rows == "fail") {
+						logger.error("Error occured in suite/ScheduleTestSuite_ICE from testSuitesScheduler_ICE service, Error Code : ERRNDAC");
+						res.send("fail");
+					} else {
+						res.send(result.rows);
+					}
+			});
+		}
 	} else {
 		logger.error("Error in the service testSuitesScheduler_ICE: Invalid Session");
 		res.send("Invalid Session");
@@ -1937,8 +1971,9 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 						function scheduleFunction(executionRequest) {
 							logger.info("Inside scheduleFunction function of executeScheduling");
 							var name = ipAdd;
-							var scenarioCount_s = executionRequest.suitedetails[0].scenarioIds.length;
+							//var scenarioCount_s = executionRequest.suitedetails[0].scenarioIds.length;
 							var completedSceCount_s = 0;
+							var testsuitecount_s = 0;
 							var statusPass_s = 0;
 							var suiteStatus_s;
 							logger.info("IP\'s connected : %s", Object.keys(myserver.allSchedulingSocketsMap).join());
@@ -1963,9 +1998,11 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 									req.session.cookie.maxAge = sessionTime;
 								}, updateSessionTimeEvery);
 								mySocket.on('result_executeTestSuite', function (resultData) {
-									completedSceCount_s++;
+									//completedSceCount_s++;
 									clearInterval(updateSessionExpiry);
 									if (resultData != "success" && resultData != "Terminate") {
+										completedSceCount_s++;
+										scenarioCount_s = executionRequest.suitedetails[testsuitecount_s].scenarioIds.length;
 										try {
 											var scenarioid = resultData.scenarioId;
 											var executionid = resultData.executionId;
@@ -2014,12 +2051,16 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 													} else {
 														suiteStatus_s = "Fail";
 													}
+													completedSceCount_s = 0;
+													testsuitecount_s++;
 													logger.info("Calling function updateSchedulingStatus from scheduleFunction");
 													updateSchedulingStatus(testsuiteid, executionid, starttime, suiteStatus_s);
 												}
 											} else {
 												if (completedSceCount_s == scenarioCount_s) {
 													suiteStatus_s = "Fail";
+													completedSceCount_s = 0;
+													testsuitecount_s++;
 													logger.info("Calling function updateExecutionStatus from scheduleFunction");
 													updateExecutionStatus(testsuiteid, executionid, starttime, suiteStatus_s);
 												}

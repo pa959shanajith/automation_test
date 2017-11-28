@@ -202,6 +202,7 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 		$(this).siblings(".fc-datePicker").focus()
 	})
 	.on('click', ".timepickerIcon", function(){
+		//$(".bootstrap-timepicker-hour, .bootstrap-timepicker-minute").val("");
 		$(this).siblings(".fc-timePicker").focus()
 	})
 	//Datepicker Function
@@ -408,7 +409,7 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 					}
 				}
 			})
-			if(doNotSchedule == false){				
+			if(doNotSchedule == false){		
 				for(var i=0; i<moduleInfo.length; i++){
 					for(var j=0; j<moduleInfo.length; j++){
 						if(moduleInfo[i].Ip == moduleInfo[j].Ip && i!=j){
@@ -421,29 +422,67 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 						}
 					}
 				}
+				if(doNotSchedule == false){
+					var counter=0;
+					for(var i=0; i<moduleInfo.length; i++){
+						var dat = moduleInfo[i].date.split("-");
+						var details = {
+							"clientipaddress": moduleInfo[i].Ip,
+							"curDate": dat[2]+"-"+dat[1]+"-"+dat[0]+" "+moduleInfo[i].time+":00+0000",
+						}
+						//var curDate = new Date(Date.UTC(sldate_2[2],sldate_2[1]-1,sldate_2[0],sltime_2[0],sltime_2[1],0));
+						var chktype = "checkexist"
+						ScheduleService.testSuitesScheduler_ICE(chktype,details)
+						.then(function(data){
+							counter++;
+							if(data == "fail"){
+								doNotSchedule = true;
+							}
+							else if(data.length > 0){
+								doNotSchedule = true;
+								openModelPopup("Schedule Test Suite", "Selected host already scheduled for given time.");
+							}
+							else if(data.length == 0){
+								if(moduleInfo.length == counter){
+									proceedScheduling();
+								}
+							}
+						},
+						function(error){
+							console.log(error);
+						})
+					}									
+				}
 			}
-			if(doNotSchedule == false){
-				ScheduleService.testSuitesScheduler_ICE(moduleInfo)
-				.then(function(data){
-					if(data == "success"){
-						openModelPopup("Schedule Test Suite", "Successfully scheduled.");
-						$(".selectScheduleSuite").prop("checked", false);
-						$(".ipformating, .fc-datePicker, .fc-timePicker").prop("style","border: none;").val("");
-						getScheduledDetails();
-					}
-					else if(data == "few"){
-						openModelPopup("Schedule Test Suite", "Few suites are failed to schedule");
-						$(".selectScheduleSuite").prop("checked", false);
-						$(".ipformating, .fc-datePicker, .fc-timePicker").prop("style","border: none;").val("");
-					}
-					else{
-						openModelPopup("Schedule Test Suite", "Failed to schedule Testsuite.");
-						$(".ipformating, .fc-datePicker, .fc-timePicker").prop("style","border: none;")
-					}
-				},
-				function(error){
-					console.log(error);
-				})
+			function proceedScheduling(){
+				if(doNotSchedule == false){
+					var chktype = "schedule"
+					ScheduleService.testSuitesScheduler_ICE(chktype,moduleInfo)
+					.then(function(data){
+						if(data == "success"){
+							openModelPopup("Schedule Test Suite", "Successfully scheduled.");
+							$(".selectScheduleSuite").prop("checked", false);
+							$(".ipformating, .fc-datePicker, .fc-timePicker").prop("style","border: none;").val("");
+							getScheduledDetails();
+						}
+						else if(data == "few"){
+							openModelPopup("Schedule Test Suite", "Few suites are failed to schedule");
+							$(".selectScheduleSuite").prop("checked", false);
+							$(".ipformating, .fc-datePicker, .fc-timePicker").prop("style","border: none;").val("");
+						}
+						else{
+							openModelPopup("Schedule Test Suite", "Failed to schedule Testsuite.");
+							$(".ipformating, .fc-datePicker, .fc-timePicker").prop("style","border: none;")
+						}
+						$(".fc-timePicker").focus()
+					},
+					function(error){
+						console.log(error);
+					})
+					$("#scheduledDataBody>.scheduleDataBodyRow .scheduleDataBodyRowChild").show();
+					$("#scheduledSuitesFilterData").prop('selectedIndex', 0);
+					changeBackground();
+				}
 			}
 		}		
 	}

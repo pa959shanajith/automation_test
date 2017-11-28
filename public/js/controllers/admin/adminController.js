@@ -949,6 +949,8 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 					$("#releaseList li#releaseList_"+count+"").trigger('click');
 					count++;
 				}
+				if($("#releaseList li").length >= 11)
+					$('.scrollbar-inner').scrollbar();
 				e.stopImmediatePropagation();
 			}
 		})
@@ -1112,6 +1114,8 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 					toggleCycleClick();
 					delCount++;
 				}
+				if($("#cycleList li:visible").length >= 11)
+					$('.scrollbar-inner').scrollbar();
 				e.stopImmediatePropagation();
 			}
 		})
