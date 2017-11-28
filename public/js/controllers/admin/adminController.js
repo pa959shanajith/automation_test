@@ -546,7 +546,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 			adminServices.createUser_Nineteen68(createUser)
 			.then(function (data) {
 				if(data == "Invalid Session"){
-					window.location.href = "/";
+					$rootScope.redirectPage();
 				}
 				if (data == "Success") {
 					openModelPopup("Create User", "User created successfully");
@@ -605,7 +605,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 				adminServices.generateCItoken()
 				.then(function (data) {
 					if(data == "Invalid Session"){
-						window.location.href = "/";
+						$rootScope.redirectPage();
 					}
 					else{
 						$("#userName").val(data.user_name);
@@ -2246,7 +2246,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 					}
 				}
 //Secondary
-  // populating Secondary roles list
+  // populating Secondary roles list 
 	              var getDropDown;
 				  getDropDown = $('#additionalRoles');
 				  getDropDown.empty();
@@ -2266,12 +2266,12 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 							}
 						})
 				  }
-	// END of populating Secondary roles list
-
+	// END of populating Secondary roles list 
+			
 			document.getElementById("userRoles").disabled=true;
-				/*Secondary*/
+				/*Secondary*/			
 		    // $(document).on('click',".rolesChecklabel", function(){
-
+			   
 			// 	if(($(this).siblings('input').prop('checked')) == true){
 			// 		$(this).siblings('input').prop('checked',false);
 			// 	}
@@ -2283,7 +2283,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 			// $(document).mouseup(function(e) {
 			// 	var roleSel = $("#additionalRole_options");
 			// 	var roleOpt = $("#additionalRoles");
-
+				
 			// 	if ((!roleSel.is(e.target) && roleSel.has(e.target).length === 0) && (!roleOpt.is(e.target) && roleOpt.has(e.target).length === 0))
 			// 	{
 			// 		$('#additionalRoles').hide();
@@ -2299,7 +2299,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 //populating secondary role drop down
 			$(document).on('click', "#additionalRole_options", function() {
 			      // .is( ":hidden" )
-				  // if ($('#additionalRoles').is(':visible'))
+				  // if ($('#additionalRoles').is(':visible'))							  
 					if ($('#additionalRoles').is(':hidden')){
 						$('#additionalRoles').show();
 					}
@@ -2309,9 +2309,9 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 					}
 	        });
 
-/*Secondary*/
+/*Secondary*/			
 		    $(document).on('click',".rolesChecklabel", function(){
-
+			   
 				if(($(this).siblings('input').prop('checked')) == true){
 					$(this).siblings('input').prop('checked',false);
 				}
@@ -2323,7 +2323,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 			$(document).mouseup(function(e) {
 				var roleSel = $("#additionalRole_options");
 				var roleOpt = $("#additionalRoles");
-
+				
 				if ((!roleSel.is(e.target) && roleSel.has(e.target).length === 0) && (!roleOpt.is(e.target) && roleOpt.has(e.target).length === 0))
 				{
 					$('#additionalRoles').hide();
@@ -2370,7 +2370,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 				openModelPopup("Error", "Password and Confirm Password did not match");
 				$("#confirmPassword").addClass("inputErrorBorder");
 			}
-
+	
 		else if ($("#email").val() == "") {
 			$("#email").addClass("inputErrorBorder");
 		}
@@ -2435,13 +2435,14 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 	};
 
 	//AppTypeSelect Functionality
-	$(document).on("click", ".projectTypes, .projectTypes_create", function(){
+	$(document).on("click", ".projectTypes, .projectTypes_create", function(event){
 		var taskName = $("#page-taskName").children("span").text();
 		if(taskName == "Create Project"){
 			$(this).toggleClass("projectTypeSelected");
 			$(this).siblings().removeClass("projectTypeSelected")
 		}
 		else return false;
+		event.stopImmediatePropagation();
 	});
 	$(document).on("keypress","#email", function(key) {
 		if(key.charCode >= 189 || key.charCode == 64 || key.charCode == 46) return true;
