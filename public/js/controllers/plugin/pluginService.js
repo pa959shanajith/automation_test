@@ -30,9 +30,9 @@ mySPA.factory('PluginService', ['$http','$q', function ($http, $httpProvider, $q
 }]);
 mySPA.factory('socket', ['$rootScope', function($rootScope) {
    //	var socket = io.connect();
-    if(window.localStorage['_UI'])
- 	var userName=JSON.parse(window.localStorage['_UI']).username;
-    var param={check:'notify',username:userName};
+		if(window.localStorage['_UI'])
+ 		var userName= Encrypt.encode(JSON.parse(window.localStorage['_UI']).username);
+		var param={check:'notify',username:userName};
     $rootScope.socket = io('', { forceNew: true, reconnect: true, query: param});
   return {
     on: function(eventName, callback){

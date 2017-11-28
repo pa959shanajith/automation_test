@@ -36,7 +36,7 @@ var copiedViewstring = false;
 var getIndexOfDeletedObjects = [];
 var newScrapedData;
 window.localStorage['disableEditing'] = "false";
-mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$location', '$timeout', 'DesignServices', 'cfpLoadingBar', '$window', function($scope, $rootScope, $http, $location, $timeout, DesignServices, cfpLoadingBar, $window) {
+mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$location', '$timeout', 'DesignServices', 'cfpLoadingBar', '$window', 'socket', function($scope, $rootScope, $http, $location, $timeout, DesignServices, cfpLoadingBar, $window, socket) {
     $("body").css("background", "#eee");
     $("#tableActionButtons, .designTableDnd").delay(500).animate({
         opacity: "1"
@@ -73,7 +73,10 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
         $scope.errorMessage = "";
     }
     //Default Function to reset all input, select
-
+    socket.on('ICEnotAvailable', function () {
+        unblockUI();
+		openDialog("Debug Testcase", "ICE Engine is not available. Please run the batch file and connect to the Server.");
+	});
     var current_task=JSON.parse(window.localStorage['_CT']);
     var getTaskName = current_task.taskName;
     appType = current_task.appType;

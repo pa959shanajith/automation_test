@@ -1,4 +1,4 @@
-mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$location','$timeout','qcServices','cfpLoadingBar', function($scope, rootScope, $window,$http,$location,$timeout,qcServices,cfpLoadingBar) {
+mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$location','$timeout','qcServices','cfpLoadingBar', 'socket', function($scope, rootScope, $window,$http,$location,$timeout,qcServices,cfpLoadingBar,socket) {
 	$('.scrollbar-inner').scrollbar();
 	var nineteen68_projects_details;
 	$scope.domainData;
@@ -32,6 +32,12 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 			}, 500)
 		}
 	}
+
+	socket.on('ICEnotAvailable', function () {
+		unblockUI();
+		openModelPopup("ALM Connection", "unavailableLocalServer")
+	});
+
 	//login to QC
 	$scope.loginQCServer = function(){
 		$(".qcLoginload").show();
