@@ -11,11 +11,15 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 		return;
 	}
 
+	$rootScope.plugins = [];
 	for(i=0; i<availablePlugins.length; i++){
 		if(availablePlugins[i].pluginValue != false){
-			$("#plugin-container").append('<div class="col-md-4 plugin-block"><span class="toggleClick" onclick="p_event(this.dataset.name)" data-name="p_'+availablePlugins[i].pluginName.replace(/\s/g,'')+'" id="'+availablePlugins[i].pluginName+'" title="'+availablePlugins[i].pluginName+'">'+availablePlugins[i].pluginName+'</span></div>').fadeIn()
+			var dataName = Encrypt.encode("p_"+availablePlugins[i].pluginName);
+			$rootScope.plugins.push("p_"+availablePlugins[i].pluginName);
+			$("#plugin-container").append('<div class="col-md-4 plugin-block"><span class="toggleClick pluginBox" data-name="p_'+availablePlugins[i].pluginName.replace(/\s/g,'')+'" id="'+availablePlugins[i].pluginName+'" title="'+availablePlugins[i].pluginName+'">'+availablePlugins[i].pluginName+'</span><input class="plugins" type="hidden" id="'+availablePlugins[i].pluginName+"_"+dataName+'"  title="'+availablePlugins[i].pluginName+"_"+dataName+'"></div>').fadeIn();
 		}        
 	}
+	
 	//Integration with Mindmaps
 	$(".plugin-block span").each(function() {
 		if($(this).text() == "RAID")
@@ -269,9 +273,28 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 }]);
 
 //Plugin click event - Creating Scope to define the function and returning back to controller
-function p_event(name){    
-	angular.element(document.getElementsByClassName("plugin-block")).scope().pluginFunction(name)
-}
+	$(document).on("click", ".pluginBox ", function(e){
+		var name = $(this).attr('data-name');
+		var pluginDetails = [];
+		var selectedPlugin ='';
+		var selectedPluginTxt = '';
+		var encodedVal =  Encrypt.encode(name);
+		var pluginVal = $(this).next('input[type=hidden]').attr('title').split("_")[1];
+		var pluginPath = "p_"+ $(this).next('input[type=hidden]').attr('title').split("_")[0];
+	// 	var pluginTxt = angular.element(document.body).scope().$root.plugins;
+		$(".plugins").each(function() {
+			var id = $(this).attr('title').split("_")[1];
+			path = pluginPath;
+			if(id == encodedVal)
+			{
+				angular.element(document.getElementsByClassName("plugin-block")).scope().pluginFunction(path);
+				return;
+			}
+	  });
+	});
+
+// function p_event(name){ 	
+// }
 
 function taskRedirection(testsuitedetails,scenarioflag,assignedtestscenarioids,subtask,subtaskid,screenid,screenname,projectid,taskname,testcaseid,testcasename,apptype,scenarioid,versionnumber,status,batchTaskIDs){
 	angular.element(document.getElementsByClassName("assignedTask")).scope().taskRedirection(testsuitedetails,scenarioflag,assignedtestscenarioids,subtask,subtaskid,screenid,screenname,projectid,taskname,testcaseid,testcasename,apptype,scenarioid,versionnumber,status,batchTaskIDs)
