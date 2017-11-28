@@ -1,44 +1,9 @@
-var myserver = require('../lib/socket.js');
 var fs = require('fs');
-//var https = require('https');
 var neo4jAPI = require('../controllers/neo4jAPI');
 var logger = require('../../logger');
-//var certificate = fs.readFileSync('server/https/server.crt','utf-8');
-var sessionTime = 30 * 60 * 1000;
-var updateSessionTimeEvery = 20 * 60 * 1000;
 var Client = require("node-rest-client").Client;
 var client = new Client();
 var epurl="http://127.0.0.1:1990/";
-
-/* Send queries to Neo4J/ICE API. */
-var fs = require('fs');
-var certificate = fs.readFileSync('server/https/server.crt','utf-8');
-var https = require('https');
-
-
-// var reqToAPI = function(d,u,p,callback) {
-// 	try{
-// 		var data = JSON.stringify(d);
-// 		console.log('datA:',data);
-// 		var result="";
-// 		var postOptions = {host: u[0], port: u[1], path: p, method: 'POST',ca:certificate,checkServerIdentity: function (host, cert) {
-// 		return undefined; },headers: {'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(data)}};
-// 		postOptions.agent= new https.Agent(postOptions);
-// 		var postRequest = https.request(postOptions,function(resp){
-// 			resp.setEncoding('utf-8');
-// 			resp.on('data', function(chunk) {result+=chunk;});
-// 			resp.on('end', function(chunk) {callback(null,resp.statusCode,result);});
-// 		});
-// 		postRequest.on('error',function(e){callback(e.message,400,null);});
-// 		postRequest.write(data);
-// 		postRequest.end();
-// 	}catch(ex){
-// 		console.log(ex);
-// 	}
-// };
-
-
-
 
 var parseData = function(data){
 	logger.info("Inside function: parseData ");
@@ -103,7 +68,7 @@ var get2DCoordsData = function(data,r,dNeed){
 		});
 	}
 	var dMap = JSON.parse(fs.readFileSync('./assets/nGraphs_2dcoords_300.json'));
-	for(k in dNeed){
+	for(var k in dNeed){
 		dNeed[k]=dMap[k.toString()];
 	}
 	return dNeed;
@@ -115,7 +80,7 @@ var cleanData = function(data){
 		delete e.children;
 		delete e.parent;
 	});
-	return data
+	return data;
 };
 
 exports.getGraphData = function(req, res){
@@ -127,7 +92,7 @@ exports.getGraphData = function(req, res){
 			sessionToken = sessionToken[1];
 		}
 		if(sessionToken != undefined && req.session.id == sessionToken){
-			var qList=[]
+			var qList=[];
 			//var urlData=req.get('host').split(':');
 			var userid=req.body.uid;
 			//'686d69a5-b519-4b4f-a813-8299235a2e97';'9c017f14-5a1c-4f2f-85a9-52728c86684c';
@@ -147,8 +112,8 @@ exports.getGraphData = function(req, res){
 					else{
 						var coords=get2DCoordsData(pData.nodes[pData.root]);
 						var cData=cleanData(pData.nodes);
-						pData['coords2D']=coords;
-						pData['err']=false;
+						pData.coords2D=coords;
+						pData.err=false;
 						res.status(status).send(pData);
 					}
 				}
@@ -188,49 +153,6 @@ exports.getPackData = function(req, res){
 	}
 };
 
-exports.getHierarchy = function(req, res){
-	logger.info("Inside UI service: getHierarchy");
-	try{
-		if(req.cookies['connect.sid'] != undefined){
-			var sessionCookie = req.cookies['connect.sid'].split(".");
-			var sessionToken = sessionCookie[0].split(":");
-			sessionToken = sessionToken[1];
-		}
-		if(sessionToken != undefined && req.session.id == sessionToken){
-			var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-			console.log(Object.keys(myserver.allSocketsMap), "<<all people, asking person:", ip);
-			if ('allSocketsMap' in myserver && ip in myserver.allSocketsMap) {
-				var mySocket = myserver.allSocketsMap[ip];
-				var jsonData=req.nGraphsData
-				mySocket.emit("clusters_nGraph", jsonData);
-				var updateSessionExpiry = setInterval(function () {
-					req.session.cookie.maxAge = sessionTime;
-				},updateSessionTimeEvery);
-				mySocket.on('result_clusters_nGraph', function (data) {
-					clearInterval(updateSessionExpiry);
-					try{
-						console.log(data);
-						//Logic Goes Here
-					}catch(exception){
-						logger.info("Exception in the service getHierarchy: ", exception);
-					}
-				});
-			}
-			else {
-				logger.error("Error occurred in connecting socket");
-				res.send("unavailableLocalServer");
-			}
-		}
-		else{
-			res.send("Invalid Session");
-		}
-	}
-	catch(exception){
-		logger.info("Exception in the service getHierarchy: ", exception);
-		res.send("fail");
-	}
-};
-
 exports.getReportData = function(req, res){
 	logger.info("Inside UI service: getReportData");
 	try{
@@ -248,9 +170,9 @@ exports.getReportData = function(req, res){
 			// var getExecutionDetails="SELECT executionid,starttime,endtime FROM execution WHERE testsuiteid="
 			// 	+ req_testsuiteId ;
 			// dbConnICE.execute(getExecutionDetails,function(err,executionData){
-			var inputs = {"suiteid" :req_testsuiteId,"executionid":req_executionId,"testscenarioids":req_testScenarioIds}
+			var inputs = {"suiteid" :req_testsuiteId,"executionid":req_executionId,"testscenarioids":req_testScenarioIds};
 			//console.log("\n*****inputs******\n",inputs);
-			var args = {data:inputs,headers:{"Content-Type" : "application/json"}}
+			var args = {data:inputs,headers:{"Content-Type" : "application/json"}};
 			logger.info("Calling NDAC Service from getReportData :reports/getReportData");
 			client.post(epurl+"reports/getReportData",args,
 			function (result, response) {
@@ -283,7 +205,7 @@ exports.getReportData = function(req, res){
 		logger.error(exception);
 		res.send({"err":true,"ecode":"FAIL","msg":"Internal Error! Please contact admin"});
 	}
-}
+};
 
 // exports.BuildRelationships = function(req, res){
 // 	try{

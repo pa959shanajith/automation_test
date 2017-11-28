@@ -10,6 +10,8 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 	$('.dropdown').on('show.bs.dropdown', function(e){
 		$(this).find('.dropdown-menu').first().stop(true, true).slideDown(300);
 	});
+	$scope.ldapBtn=true;
+	$scope.citokenBtn=true;
 	$('.dropdown').on('hide.bs.dropdown', function(e){
 		$(this).find('.dropdown-menu').first().stop(true, true).slideUp(300);
 	});
@@ -29,7 +31,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 	});
 
 	$(document).on('change','#selAssignUser', function(e) {
-		$('#allProjectAP, #assignedProjectAP').empty();	
+		$('#allProjectAP, #assignedProjectAP').empty();
 		$(".load").show();
 		$("#selAssignUser, #rightall, #rightgo, #leftgo, #leftall, .adminBtn").prop("disabled",true);
 		$("#overlayContainer").prop("style","opacity: 1;")
@@ -38,7 +40,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 			if(data == "Invalid Session"){
 				$rootScope.redirectPage();
 			}else {
-				domainId =  data[0].domainId;					
+				domainId =  data[0].domainId;
 				$("#selAssignProject").val(data[0].domainName);
 				$('#allProjectAP, #assignedProjectAP').empty();
 				//var domainId = data[0].domainId;
@@ -70,7 +72,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 					projectData = [];
 					projectData = data1;
 					if(data1.length > 0)
-					{							
+					{
 						for(var i=0;i<data1.length;i++)
 						{
 							$('#assignedProjectAP').append($("<option value=" +data1[i].projectId+ "></option>").text(data1[i].projectName));
@@ -138,7 +140,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 								{
 									$('#allProjectAP').append($("<option value=" +res.projectIds[n]+ "></option>").text(res.projectNames[n]));
 								}
-							}								
+							}
 							$(".load").hide();
 							$("#selAssignUser, #rightall, #rightgo, #leftgo, #leftall, .adminBtn").prop("disabled",false);
 						}, function (error) { console.log("Error:::::::::::::", error) })
@@ -146,7 +148,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 				},function (error) { console.log("Error:::::::::::::", error) })
 			}
 		});
-		
+
 	});
 
 		//	Assign Projects Tab Click
@@ -154,6 +156,8 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 		e.preventDefault();
 		//alert('click');
 	//	$scope.tabAssignProject = function() {
+		$scope.ldapBtn=true;
+		$scope.citokenBtn=true;
 		resetAssignProjectForm();
 		$("img.selectedIcon").removeClass("selectedIcon");
 		$(this).children().find('img').addClass('selectedIcon');
@@ -277,7 +281,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 					if(resDetails.projectIds.length > 0)
 					{
 						$("#assignedProjectAP,#allProjectAP").empty();
-						
+
 						for(var n=0;n<resDetails.projectIds.length;n++)
 						{
 							$('#allProjectAP').append($("<option value=" +resDetails.projectIds[n]+ "></option>").text(resDetails.projectNames[n]));
@@ -357,13 +361,15 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 		projectDetails = [];
 		updateProjectDetails = [];
 		var plugins = [];
+		$scope.ldapBtn=true;
+		$scope.citokenBtn=true;
 		adminServices.getAvailablePlugins()
 		.then(function (plugins_list) {
 			for(var i = 0; i < plugins_list.length; i++){
 				plugins[i] = plugins_list[i]
 			}
 		}, function (error) { console.log("Error:::::::::::::", error) });
-		
+
 		$("img.selectedIcon").removeClass("selectedIcon");
 		$(this).children().find('img').addClass('selectedIcon');
 		$timeout(function(){
@@ -416,6 +422,8 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 	}
 
 	$("#preferencesTab").on('click',function() {
+		$scope.ldapBtn=true;
+		$scope.citokenBtn=true;
 		$("img.selectedIcon").removeClass("selectedIcon");
 		$(this).children().find('img').addClass('selectedIcon');
 			setTimeout(function() {
@@ -475,44 +483,52 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 		var reg = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 		//var regexPassword = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[^\w\s]).{8,16}$/;
 		var regexPassword = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~]).{8,16}$/;
-		if ($("#userName").val() == "") {
-			$("#userName").addClass("inputErrorBorder");
+		if(!$scope.citoken){
+			if ($("#userName").val() == "") {
+				$("#userName").addClass("inputErrorBorder");
+			}
+			else if ($("#firstName").val() == "") {
+				$("#firstName").addClass("inputErrorBorder");
+			} else if ($("#lastName").val() == "") {
+				$("#lastName").addClass("inputErrorBorder");
+			}
+			else if ($("#password").val() == "" && $("#password").is(":visible")) {
+				$("#password").addClass("inputErrorBorder");
+			}
+			else if (regexPassword.test($("#password").val()) == false && $("#password").is(":visible")) {
+				openModelPopup("Error", "Password must contain atleast 1 special character, 1 numeric, 1 uppercase and lowercase, length should be minimum 8 characters and maximum 12 characters..");
+				$("#password").addClass("inputErrorBorder");
+			}
+			else if ($("#confirmPassword").val() == "" && $("#confirmPassword").is(":visible")) {
+				$("#confirmPassword").addClass("inputErrorBorder");
+			}
+			else if (regexPassword.test($("#confirmPassword").val()) == false && $("#confirmPassword").is(":visible")) {
+				openModelPopup("Error","Password must contain atleast 1 special character, 1 numeric, 1 uppercase and lowercase, length should be minimum 8 characters and maximum 12 characters..");
+				$("#confirmPassword").addClass("inputErrorBorder");
+			}
+			else if($("#password").val() != $("#confirmPassword").val() && $("#password").is(":visible") && $("#confirmPassword").is(":visible")){
+				openModelPopup("Error", "Password and Confirm Password did not match");
+				$("#confirmPassword").addClass("inputErrorBorder");
+			}
+			else if ($("#email").val() == "") {
+				$("#email").addClass("inputErrorBorder");
+			}
+			else if (reg.test($("#email").val()) == false) {
+				openModelPopup("Error", "Email address is not valid");
+				$("#email").addClass("inputErrorBorder");
+				// $scope.emailRequired = 'Email address is not valid';
+			}
+			else if($('#userRoles option:selected').val() == "") {
+				$("#userRoles").css('border','').addClass("selectErrorBorder");
+			}
+			else {
+				createUserfn();
+			}
 		}
-		else if ($("#firstName").val() == "") {
-			$("#firstName").addClass("inputErrorBorder");
-		} else if ($("#lastName").val() == "") {
-			$("#lastName").addClass("inputErrorBorder");
+		else{
+			createUserfn();
 		}
-		else if ($("#password").val() == "" && $("#password").is(":visible")) {
-			$("#password").addClass("inputErrorBorder");
-		}
-		else if (regexPassword.test($("#password").val()) == false && $("#password").is(":visible")) {
-			openModelPopup("Error", "Password must contain atleast 1 special character, 1 numeric, 1 uppercase and lowercase, length should be minimum 8 characters and maximum 12 characters..");
-			$("#password").addClass("inputErrorBorder");
-		}
-		else if ($("#confirmPassword").val() == "" && $("#confirmPassword").is(":visible")) {
-			$("#confirmPassword").addClass("inputErrorBorder");
-		}
-		else if (regexPassword.test($("#confirmPassword").val()) == false && $("#confirmPassword").is(":visible")) {
-			openModelPopup("Error","Password must contain atleast 1 special character, 1 numeric, 1 uppercase and lowercase, length should be minimum 8 characters and maximum 12 characters..");
-			$("#confirmPassword").addClass("inputErrorBorder");
-		}
-		else if($("#password").val() != $("#confirmPassword").val() && $("#password").is(":visible") && $("#confirmPassword").is(":visible")){
-			openModelPopup("Error", "Password and Confirm Password did not match");
-			$("#confirmPassword").addClass("inputErrorBorder");
-		}
-		else if ($("#email").val() == "") {
-			$("#email").addClass("inputErrorBorder");
-		}
-		else if (reg.test($("#email").val()) == false) {
-			openModelPopup("Error", "Email address is not valid");
-			$("#email").addClass("inputErrorBorder");
-			// $scope.emailRequired = 'Email address is not valid';
-		}
-		else if($('#userRoles option:selected').val() == "") {
-			$("#userRoles").css('border','').addClass("selectErrorBorder");
-		}
-		else {
+		function createUserfn(){
 			//role = $('#userRoles option:selected').text();
 			var createUser = {};
 			createUser.role = $('#userRoles option:selected').val();
@@ -524,11 +540,13 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 			createUser.lastName =  $.trim($("#lastName").val());
 			createUser.email =  $("#email").val();
 			createUser.ldapUser = $(".ldapBtn").hasClass("ldapBtnActive")? true : false;
-
+			createUser.ci_token =  $("#citoken").val();
+			if($scope.citoken) createUser.ciuser = true;
+			else createUser.ciuser = false;
 			adminServices.createUser_Nineteen68(createUser)
 			.then(function (data) {
 				if(data == "Invalid Session"){
-					$rootScope.redirectPage();
+					window.location.href = "/";
 				}
 				if (data == "Success") {
 					openModelPopup("Create User", "User created successfully");
@@ -556,8 +574,51 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 			$("#password").parent().show();
 			$("#confirmPassword").parent().show();
 		}
-	})
+		if($scope.ldapBtn && $scope.citokenBtn){
+			$scope.ldapBtn=true;
+			$scope.citokenBtn=false;
+			$scope.$apply();
+		}else{
+			$scope.ldapBtn=true;
+			$scope.citokenBtn=true;
+			$scope.$apply();
+		}
+	});
 
+	//Generate CI Token
+	$scope.ciToken = function($event){
+		$(event.target).toggleClass("citokenBtnActive")
+		if($(event.target).hasClass('active')){
+			$("#firstName, #lastName, #email, #password, #confirmPassword").parent().show();
+			$("#userRoles").parent().parent().show();
+			$("#citoken").parent().hide();
+			$("#userName").prop('readonly', false);
+			$("#userName").val('');
+			$(event.target).removeClass('active');
+			$scope.ldapBtn=true;
+			$scope.citokenBtn=true;
+			$scope.citoken='';
+		}else{
+			$(event.target).addClass('active');
+			$scope.ldapBtn=false;
+			$scope.citokenBtn=true;
+				adminServices.generateCItoken()
+				.then(function (data) {
+					if(data == "Invalid Session"){
+						window.location.href = "/";
+					}
+					else{
+						$("#userName").val(data.user_name);
+						$scope.citoken = data.token;
+						$("#firstName, #lastName, #email, #password, #confirmPassword").parent().hide();
+						$("#userRoles").parent().parent().hide();
+						$("#citoken").parent().show();
+						$("#userName").prop('readonly', true);
+					}
+				}, function (error) { console.log("Error:::::::::::::", error) })
+		}
+
+	}
 	//Get User Roles in the select container
 
 	var userRolesList;
@@ -863,11 +924,11 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 	}
 	function resetAssignProjectForm()
 	{
-		
+
 		$("#selAssignUser, #selAssignProject").prop('selectedIndex', 0);
 		$("#allProjectAP,#assignedProjectAP,#selAssignProject").empty();
 		$("#selAssignProject").append('<option data-id="" value disabled selected>Please Select your domain</option>')
-	
+
 	}
 
 	//Add Release Name Functionality
@@ -1864,15 +1925,15 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 				plugins[i] = plugins_list[i]
 			}
 		}, function (error) { console.log("Error:", error) });
-		
+
 		adminServices.getDomains_ICE()
 		.then(function (data) {
 			if(data == "Invalid Session"){
 				$rootScope.redirectPage();
-			}else {				
+			}else {
 				domainId = data[0].domainId;
 				$("#selDomainEdit").val(data[0].domainName);
-				
+
 				//to populate the projects:
 				// var requestedids = [domainId];
 				var domains = [domainId];
@@ -1933,7 +1994,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 
 				}, function (error) { console.log("Error:::::::::::::", error) })
 				clearUpdateProjectObjects();
-				
+
 			}
 
 			//sorting the dropdown values in alphabetical order
@@ -2185,7 +2246,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 					}
 				}
 //Secondary
-  // populating Secondary roles list 
+  // populating Secondary roles list
 	              var getDropDown;
 				  getDropDown = $('#additionalRoles');
 				  getDropDown.empty();
@@ -2193,9 +2254,9 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 				  for(i=0; i<userRolesList.r_ids.length; i++){
 					  if(($('#userRoles option:selected').val() != userRolesList.r_ids[i]) && (userRolesList.r_ids[i] != "b5e9cb4a-5299-4806-b7d7-544c30593a6e")){
 						  getDropDown.append("<li class='RolesCheck'><span class='rolesSpan'><input class='addcheckBox' type='checkbox' value="+ userRolesList.r_ids[i] +"><label class='rolesChecklabel'>"+userRolesList.userRoles[i]+"</label></span></li>");
-					  } 
+					  }
 				  }
-				  
+
 				  if(addRole != null){
 						$.each($(document).find(".addcheckBox"), function(){
 							for(j=0;j<addRole.length;j++){
@@ -2205,12 +2266,12 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 							}
 						})
 				  }
-	// END of populating Secondary roles list 
-			
+	// END of populating Secondary roles list
+
 			document.getElementById("userRoles").disabled=true;
-				/*Secondary*/			
+				/*Secondary*/
 		    // $(document).on('click',".rolesChecklabel", function(){
-			   
+
 			// 	if(($(this).siblings('input').prop('checked')) == true){
 			// 		$(this).siblings('input').prop('checked',false);
 			// 	}
@@ -2222,7 +2283,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 			// $(document).mouseup(function(e) {
 			// 	var roleSel = $("#additionalRole_options");
 			// 	var roleOpt = $("#additionalRoles");
-				
+
 			// 	if ((!roleSel.is(e.target) && roleSel.has(e.target).length === 0) && (!roleOpt.is(e.target) && roleOpt.has(e.target).length === 0))
 			// 	{
 			// 		$('#additionalRoles').hide();
@@ -2238,19 +2299,19 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 //populating secondary role drop down
 			$(document).on('click', "#additionalRole_options", function() {
 			      // .is( ":hidden" )
-				  // if ($('#additionalRoles').is(':visible'))							  
+				  // if ($('#additionalRoles').is(':visible'))
 					if ($('#additionalRoles').is(':hidden')){
 						$('#additionalRoles').show();
 					}
-					
+
 					else{
 						$('#additionalRoles').hide();
 					}
 	        });
 
-/*Secondary*/			
+/*Secondary*/
 		    $(document).on('click',".rolesChecklabel", function(){
-			   
+
 				if(($(this).siblings('input').prop('checked')) == true){
 					$(this).siblings('input').prop('checked',false);
 				}
@@ -2262,7 +2323,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 			$(document).mouseup(function(e) {
 				var roleSel = $("#additionalRole_options");
 				var roleOpt = $("#additionalRoles");
-				
+
 				if ((!roleSel.is(e.target) && roleSel.has(e.target).length === 0) && (!roleOpt.is(e.target) && roleOpt.has(e.target).length === 0))
 				{
 					$('#additionalRoles').hide();
@@ -2309,7 +2370,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 				openModelPopup("Error", "Password and Confirm Password did not match");
 				$("#confirmPassword").addClass("inputErrorBorder");
 			}
-	
+
 		else if ($("#email").val() == "") {
 			$("#email").addClass("inputErrorBorder");
 		}
@@ -2433,22 +2494,22 @@ $(document).on("keydown", ".validationKeydown", function(e) {
 		preventSpecialCharOnBlur(id,val);
 	});
 //Special characters prevented for username except (-_.) on copy paste
-$(document).on('cut copy paste','#userName', function(e){ 
+$(document).on('cut copy paste','#userName', function(e){
 			var element = this;
 			setTimeout(function () {
-				var userEnteredText = $(element).val();  
+				var userEnteredText = $(element).val();
 				//userEnteredText = userEnteredText.replace(/\s/g,"");
 					userEnteredText = userEnteredText.replace (/[\\[\]\~`!@#$%^&*()+={}|;:"',<>?/\s]/g ,"");
 				$(element).val(userEnteredText);
-			}, 5); 	
+			}, 5);
  });
 
 //All Special characters prevented for firstname & lastname on copy paste
-$(document).on('cut copy paste','.preventSpecialChar', function(e){ 
-			
+$(document).on('cut copy paste','.preventSpecialChar', function(e){
+
 			var element = this;
 			setTimeout(function () {
-				var userEnteredText = $(element).val();  
+				var userEnteredText = $(element).val();
 				if(e.target.id == 'projectName' || e.target.id == 'releaseTxt' || e.target.id == 'cycleTxt')
 				{
 					userEnteredText = userEnteredText.replace (/[-\\[\]\~`!@#$%^&*()+={}|;:"',.<>?/\s]/g ,"");
@@ -2458,7 +2519,7 @@ $(document).on('cut copy paste','.preventSpecialChar', function(e){
 				}
 				//userEnteredText = userEnteredText.replace (/[[\]\~`!@#$%^&*()-_+={}|;:"',.<>?/\s]_/g ,"");
 				$(element).val(userEnteredText);
-			}, 5); 
+			}, 5);
  });
 
 

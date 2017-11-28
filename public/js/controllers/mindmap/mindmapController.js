@@ -1,5 +1,5 @@
 
-mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$location', '$timeout', 'chatbotService','mindmapServices','cfpLoadingBar','$window', function($scope, $rootScope, $http, $location,$timeout,chatbotService,mindmapServices,cfpLoadingBar,$window) {
+mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$location', '$timeout', 'chatbotService','mindmapServices','cfpLoadingBar','$window','socket', function($scope, $rootScope, $http, $location,$timeout,chatbotService,mindmapServices,cfpLoadingBar,$window,socket) {
     $("body").css("background","#eee");
     $("head").append('<link id="mindmapCSS1" rel="stylesheet" type="text/css" href="css/css_mindmap/style.css" /><link id="mindmapCSS2" rel="stylesheet" type="text/css" href="fonts/font-awesome_mindmap/css/font-awesome.min.css" />')
 	
@@ -30,6 +30,12 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     blockUI(blockMsg);
     loadUserTasks()
     unblockUI();
+    /*creating version in ui*/
+    socket.on('versionUpdate', function(to_v){
+        $('.version-list').append($('<option>').attr({
+             value: to_v
+            }).text(to_v))
+    });
 		/*Sidebar-toggle*/
     $scope.tab = "tabRequirement";
     $(".left-sec-mindmap,.rsSlide").show();
@@ -189,6 +195,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     type: 'HEAD',
                     url: window.location.origin+'/js/js_mindmap/versioning.js',
                     success: function() {
+
                         versioningEnabled=true;
                         
                         load_versions();
@@ -245,6 +252,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                    $("#ct-moduleBox,.tabAssign").addClass("ct-expand-module");
                 }
                 $("#ct-main").css("display","block");
+                if(!versioningEnabled){
+                    addExport(versioningEnabled);
+                }
             }else if($scope.tab=='tabAssign'){
                 $('.selectProject').show();
                 $("img.selectedIcon").removeClass("selectedIcon");

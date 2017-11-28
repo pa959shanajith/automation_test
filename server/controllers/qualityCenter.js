@@ -42,46 +42,48 @@ exports.loginQCServer_ICE = function (req, res) {
             {
                  validate_qcPassword = true;
             }
-        if(validate_qcUrl == true && validate_qcUsername == true &&  validate_qcPassword == true)
-            {
-
-			if('allSocketsMap' in myserver && name in myserver.allSocketsMap){
-				var mySocket = myserver.allSocketsMap[name];
-				var username = req.body.qcUsername;
-				var password = req.body.qcPassword;
-				var url = req.body.qcURL;
-				var qcaction = req.body.qcaction;
-				var qcDetails = {
-					"qcUsername": username,
-					"qcPassword": password,
-					"qcURL": url,
-					"qcaction": qcaction
-				};
-				mySocket._events.qcresponse = [];
-				mySocket.emit("qclogin", qcDetails);
-				var updateSessionExpiry = setInterval(function () {
-						req.session.cookie.maxAge = sessionTime;
-					}, updateSessionTimeEvery);
-				mySocket.on('qcresponse', function (data) {
-					//req.session.cookie.expires = sessionExtend;
-					clearInterval(updateSessionExpiry);
-					res.send(data);
-				});
-			} else {
-				logger.info("ICE Socket not Available");
-				try {
-					res.send("unavailableLocalServer");
-				} catch (exception) {
-					logger.error(exception);
+			if(validate_qcUrl == true && validate_qcUsername == true &&  validate_qcPassword == true) {
+				if('allSocketsMap' in myserver && name in myserver.allSocketsMap){
+					var mySocket = myserver.allSocketsMap[name];
+					var username = req.body.qcUsername;
+					var password = req.body.qcPassword;
+					var url = req.body.qcURL;
+					var qcaction = req.body.qcaction;
+					var qcDetails = {
+						"qcUsername": username,
+						"qcPassword": password,
+						"qcURL": url,
+						"qcaction": qcaction
+					};
+					mySocket._events.qcresponse = [];
+					mySocket.emit("qclogin", qcDetails);
+					var updateSessionExpiry = setInterval(function () {
+							req.session.cookie.maxAge = sessionTime;
+						}, updateSessionTimeEvery);
+					mySocket.on('qcresponse', function (data) {
+						//req.session.cookie.expires = sessionExtend;
+						clearInterval(updateSessionExpiry);
+						res.send(data);
+					});
+					mySocket.on("unavailableLocalServer", function () {
+						logger.error("Error occured in the service loginQCServer_ICE: Socket Disconnected");
+						res.send("unavailableLocalServer");
+					});
+				} else {
+					logger.info("ICE Socket not Available");
+					try {
+						res.send("unavailableLocalServer");
+					} catch (exception) {
+						logger.error(exception);
+					}
 				}
+			} else {
+				logger.info("Invalid Session");
+				res.send("Invalid Session");
 			}
 		} else {
-				logger.info("Invalid Session");
-			res.send("Invalid Session");
+			res.send('unavailableLocalServer');
 		}
-            }else{
-                res.send('unavailableLocalServer');
-            }
 	} catch (exception) {
 		logger.error(exception);
 		res.send("unavailableLocalServer");
@@ -117,7 +119,6 @@ exports.qcProjectDetails_ICE = function (req, res) {
 					"qcaction": req.body.qcaction
 				};
 				getProjectsForUser(userid, function (projectdata) {
-				
 					// var qcDetails = {"qcUsername":username,"qcPassword":password,"qcURL":url};
 					// var data = "LAUNCH_SAP";
 					mySocket._events.qcresponse = [];
@@ -136,11 +137,14 @@ exports.qcProjectDetails_ICE = function (req, res) {
 							logger.error(ex);
 							res.send("fail");
 						}
-
+					});
+					mySocket.on("unavailableLocalServer", function () {
+						logger.error("Error occured in the service qcProjectDetails_ICE: Socket Disconnected");
+						res.send("unavailableLocalServer");
 					});
 				});
 			} else {
-					logger.info("ICE Socket not Available");
+				logger.info("ICE Socket not Available");
 				try {
 					res.send("unavailableLocalServer");
 				} catch (exception) {
@@ -311,6 +315,10 @@ exports.qcFolderDetails_ICE = function (req, res) {
 					//req.session.cookie.expires = sessionExtend;
 					clearInterval(updateSessionExpiry);
 					res.send(data);
+				});
+				mySocket.on("unavailableLocalServer", function () {
+					logger.error("Error occured in the service qcFolderDetails_ICE: Socket Disconnected");
+					res.send("unavailableLocalServer");
 				});
 				//})
 			} else {

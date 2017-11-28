@@ -188,7 +188,7 @@ try {
     //     });
     // });
 
-    app.get('/',  function (req,  res)  {
+    app.get('/',  function (req,  res)  {
         res.clearCookie('connect.sid');
         req.session.destroy();
         logger.rewriters.push(function (level, msg, meta) {
@@ -199,17 +199,17 @@ try {
         res.sendFile("index.html", {root: __dirname + "/public/"});
     });
 
-    app.get('/login', function(req, res) {
+    app.get('/login', function(req, res) {
         res.clearCookie('connect.sid');
         req.session.destroy();
         res.sendFile("index.html", {root: __dirname + "/public/"});
     });
 
-    app.get('/admin',  function (req,  res)  {
+    app.get('/admin',  function (req,  res)  {
         if (!req.session.defaultRole || req.session.defaultRole != 'Admin') {
-            req.session.destroy();  res.status(401).send('<br><br>Your session has been expired.Please <a href="/">Login</a> Again');
+            req.session.destroy();  res.status(401).send('<br><br>Your session has been expired.Please <a href="/">Login</a> Again');
         } else {
-            if  (req.cookies['connect.sid']  &&  req.cookies['connect.sid']  !=  undefined)  {  res.sendFile("index.html",  {  root:  __dirname  +  "/public/"  }); }  else  { req.session.destroy();  res.status(401).send('<br><br>Your session has been expired.Please <a href="/">Login</a>Again'); }
+            if  (req.cookies['connect.sid']  &&  req.cookies['connect.sid']  !=  undefined)  {  res.sendFile("index.html",  {  root:  __dirname  +  "/public/"  }); }  else  { req.session.destroy();  res.status(401).send('<br><br>Your session has been expired.Please <a href="/">Login</a>Again'); }
         }
     });
 
@@ -260,7 +260,7 @@ try {
 
         if (req.session.switchedRole != true) {
             if (!req.session.defaultRole || roles.indexOf(req.session.defaultRole) >= 0) {
-                req.session.destroy();  res.status(401).send('<br><br>Your session has been expired.Please <a href="/">Login</a> Again');
+                req.session.destroy();  res.status(401).send('<br><br>Your session has been expired.Please <a href="/">Login</a> Again');
             } else {
                 if (req.cookies['connect.sid'] && req.cookies['connect.sid'] != undefined) {
 
@@ -375,6 +375,7 @@ try {
     app.post('/debugTestCase_ICE', design.debugTestCase_ICE);
     app.post('/getKeywordDetails_ICE', design.getKeywordDetails_ICE);
     app.post('/getTestcasesByScenarioId_ICE', design.getTestcasesByScenarioId_ICE);
+    app.post('/generateCItoken', admin.generateCItoken);
     //Execute Screen Routes
     app.post('/readTestSuite_ICE', suite.readTestSuite_ICE);
     app.post('/updateTestSuite_ICE', suite.updateTestSuite_ICE);
@@ -383,6 +384,11 @@ try {
     app.post('/getTestcaseDetailsForScenario_ICE', suite.getTestcaseDetailsForScenario_ICE);
     app.post('/ExecuteTestSuite_ICE_CI', suite.ExecuteTestSuite_ICE_CI);
     //app.post('/readTestScenarios_ICE', suite.readTestScenarios_ICE);
+
+    //SVN execution routes
+    app.post('/ExecuteTestSuite_ICE_SVN',suite.ExecuteTestSuite_ICE_SVN);
+    // app.post('/getListofScheduledSocketMap',suite.getListofScheduledSocketMap);
+
     //Scheduling Screen Routes
     app.post('/testSuitesScheduler_ICE', suite.testSuitesScheduler_ICE);
     app.post('/getScheduledDetails_ICE', suite.getScheduledDetails_ICE);
@@ -409,7 +415,6 @@ try {
     app.post('/getTopMatches_ProfJ', chatbot.getTopMatches_ProfJ);
     app.post('/updateFrequency_ProfJ', chatbot.updateFrequency_ProfJ);
     //NeuronGraphs Plugin Routes
-    app.post('/hierarchy_nGraphs2D', neuronGraphs2D.getHierarchy);
     app.post('/getGraph_nGraphs2D', neuronGraphs2D.getGraphData);
     app.post('/getPackData_nGraphs2D', neuronGraphs2D.getPackData);
     app.post('/getReportData_nGraphs2D', neuronGraphs2D.getReportData);

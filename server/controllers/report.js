@@ -81,6 +81,10 @@ exports.openScreenShot = function (req, res) {
 					res.send(resultData);
 				}
 			});
+			mySocket.on("unavailableLocalServer", function () {
+				logger.error("Error occured in the service openScreenShot: Socket Disconnected");
+				res.send("unavailableLocalServer");
+			});
 		} else {
 			logger.error("ICE Socket not Available");
 			res.send("unavailableLocalServer");
@@ -1051,6 +1055,10 @@ exports.connectJira_ICE = function (req, res) {
 									}
 								}
 							});
+							mySocket.on("unavailableLocalServer", function () {
+								logger.error("Error occured in the service connectJira_ICE - loginToJira: Socket Disconnected");
+								res.send("unavailableLocalServer");
+							});
 						} else {
 							logger.error("Error occured in the service connectJira_ICE - loginToJira: Socket not Available");
 							res.send("unavailableLocalServer");
@@ -1095,6 +1103,10 @@ exports.connectJira_ICE = function (req, res) {
 										count++;
 									}
 								}
+							});
+							mySocket.on("unavailableLocalServer", function () {
+								logger.error("Error occured in the service connectJira_ICE - createIssueInJira: Socket Disconnected");
+								res.send("unavailableLocalServer");
 							});
 						} else {
 							logger.error("Error occured in the service connectJira_ICE - createIssueInJira: Socket not Available");
