@@ -2019,6 +2019,9 @@ function exportData(versioning_status) {
 			if(vs_n){
             data.moduleInfo[i].versionNumber=vnumber;
 			}
+			else{
+				data.moduleInfo[i].versionNumber="0.0";
+			}
             data.moduleInfo[i].appType =  parsed_project_data.project_typename;
           }
           var responseData = JSON.stringify(data);
@@ -2027,7 +2030,7 @@ function exportData(versioning_status) {
           jsonDownload('execution_data.json',response_execution_data);
           unblockUI();
           if(data_not_exported.length!=0)
-          openDialogMindmap('Mindmap', "Data Exported Successfully. Note:Only Created Module Exported.");  
+          openDialogMindmap('Mindmap', "Data Exported Successfully. Note:Only Created Modules are exported.");  
           else
           openDialogMindmap('Mindmap', "Data Exported Successfully.");
         }
