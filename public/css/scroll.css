@@ -290,7 +290,8 @@
 	height: 100% !important;
 }
 .pluginTask > .scroll-element.scroll-y .scroll-bar{
-       background: #321e4f
+       background: #321e4f;
+       height: 10px !important;
 }
 .pluginTask > .scroll-element .scroll-element_track{
        background: rgb(211, 211, 211)

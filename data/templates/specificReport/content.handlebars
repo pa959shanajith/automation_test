@@ -113,10 +113,10 @@
                     $('#overlay').css('display', 'block');
                 })
 
-                $(document).on('click', '.disconnectJira', function(){
+                /*$(document).on('click', '.disconnectJira', function(){
                     $(".logintojira").show();
                     $(".disconnectJira, .Llogdefect, #inputSlno, .go_defectlog").hide();
-                })                
+                })*/                
                 
                 //Login to Jira
                 $(document).on('click', '.loginJiraCredentials', function(){
@@ -153,7 +153,7 @@
                                 else if(data == "Invalid Session"){
                                     $(".error-msg").text("Invalid Session. Login again");
                                 }
-                                else{
+                                else if(data === [object Object]){
                                     localStorage.setItem("jiraLoginDetails", JSON.stringify(data));
                                     clearData();
                                     $(".error-msg").text('');
@@ -364,7 +364,7 @@
             .reportsDetails th:nth-child(3){width: 48%;} .rDstepDes{width: 47.5% !important; text-align: left; word-break: break-word;}
             .reportsDetails th:nth-child(4){width: 10%;} .rDstatus{width: 10.1% !important;}
             .reportsDetails th:nth-child(5){width: 10%;} .rDellaps{width: 10.1% !important;}
-            .reportsDetails th:nth-child(6), .rDcomments{width: 12%; word-break: break-word; word-break: break-all;}
+            .reportsDetails th:nth-child(6), .rDcomments{width: 12%; word-break: break-word;}
             .maintabCont{float: left; width: 100%; border: 1px solid #dcdcdc; height: 50%;}
             .tabCont{display: table-cell; border-bottom: 1px solid #ececec; border-right: 1px solid #ececec;}
             .reportsDetail{line-height: 2; text-align: center; height: calc(100% - 35px); overflow: auto;font-size: 14px;}
