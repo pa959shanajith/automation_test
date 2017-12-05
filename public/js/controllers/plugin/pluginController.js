@@ -14,9 +14,11 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 	$rootScope.plugins = [];
 	for(i=0; i<availablePlugins.length; i++){
 		if(availablePlugins[i].pluginValue != false){
-			var dataName = Encrypt.encode("p_"+availablePlugins[i].pluginName);
-			$rootScope.plugins.push("p_"+availablePlugins[i].pluginName);
-			$("#plugin-container").append('<div class="col-md-4 plugin-block"><span class="toggleClick pluginBox" data-name="p_'+availablePlugins[i].pluginName.replace(/\s/g,'')+'" id="'+availablePlugins[i].pluginName+'" title="'+availablePlugins[i].pluginName+'">'+availablePlugins[i].pluginName+'</span><input class="plugins" type="hidden" id="'+availablePlugins[i].pluginName+"_"+dataName+'"  title="'+availablePlugins[i].pluginName+"_"+dataName+'"></div>').fadeIn();
+			var pluginName = availablePlugins[i].pluginName;
+			var pluginTxt = availablePlugins[i].pluginName.replace(/\s/g,''); 
+			var dataName = Encrypt.encode("p_"+pluginTxt);
+			$rootScope.plugins.push("p_"+pluginName);
+			$("#plugin-container").append('<div class="col-md-4 plugin-block"><span class="toggleClick pluginBox" data-name="p_'+availablePlugins[i].pluginName.replace(/\s/g,'')+'" id="'+availablePlugins[i].pluginName+'" title="'+availablePlugins[i].pluginName+'">'+availablePlugins[i].pluginName+'</span><input class="plugins" type="hidden" id="'+availablePlugins[i].pluginName+"_"+dataName+'"  title="'+pluginTxt+"_"+dataName+'"></div>').fadeIn();
 		}        
 	}
 	
