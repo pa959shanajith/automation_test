@@ -459,8 +459,23 @@ try {
     }
 
     // Start JS REPORT Server
-    require('./server/lib/jsReportServer')();
-        
+    //require('./server/lib/jsReportServer')();
+    var reportingApp = express();
+    app.use('/reporting', reportingApp);
+    var jsreport = require('jsreport')({
+        express: { app :reportingApp, server: httpsServer },
+        appPath: "/reporting",
+        wkhtmltopdf:{allowLocalFilesAccess:true}
+    });
+
+    jsreport.init(function () {
+        // running
+    }).catch(function (e) {
+        // error during startup
+        console.error(e.stack)
+        process.exit(1)
+    });
+              
     //To prevent can't send header response
     app.use(function (req, res, next) {
         var _send = res.send;

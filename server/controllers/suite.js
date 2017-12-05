@@ -14,7 +14,8 @@ var sessionExtend = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes
 var sessionTime = 30 * 60 * 1000;
 var updateSessionTimeEvery = 20 * 60 * 1000;
 var scheduleStatus = "";
-var  logger = require('../../logger');
+var logger = require('../../logger');
+var redisServer = require('../lib/redisSocketHandler');
 
 /**
  * @author vishvas.a
@@ -735,7 +736,6 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 			var testsuitecount=0;
 			var statusPass = 0;
 			var suiteStatus;
-			logger.info("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
 			logger.info("ICE Socket requesting Address: %s" , name);
 			redisServer.redisPub1.pubsub('numsub','ICE1_' + req.session.username,function(err,redisres){
 				if (redisres[1]==1) {
@@ -1192,7 +1192,6 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 									var completedSceCount = 0;
 									var statusPass = 0;
 									var suiteStatus;
-									logger.info(Object.keys(myserver.allSocketsMap), "<<all people, asking person:", name);
 									redisServer.redisPub1.pubsub('numsub','ICE1_' + req.session.username,function(err,redisres){
 										if (redisres[1]==1) {
 											/* Commented for LB
@@ -1463,7 +1462,6 @@ exports.ExecuteTestSuite_ICE_CI = function (req, res) {
 			var testsuitecount=0;
 			var statusPass = 0;
 			var suiteStatus;
-			logger.info("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
 			logger.info("ICE Socket requesting Address: %s" , name);
 			redisServer.redisPub1.pubsub('numsub','ICE1_' + req.session.username,function(err,redisres){
 				if (redisres[1]==1) {
@@ -2659,7 +2657,6 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 							var testsuitecount_s = 0;
 							var statusPass_s = 0;
 							var suiteStatus_s;
-							logger.info("IP\'s connected : %s", Object.keys(myserver.allSchedulingSocketsMap).join());
 							logger.info("ICE Socket requesting Address: %s" , name);
 							redisServer.redisPub1.pubsub('numsub','ICE1_' + req.session.username,function(err,redisres){
 								if (redisres[1]==1) {

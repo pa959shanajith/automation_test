@@ -23,7 +23,7 @@ exports.getMainReport_ICE = function (req, res) {
 		}
 		if (sessionToken != undefined && req.session.id == sessionToken) {
 			var IP = req.headers.host.split(":")[0]; //req.connection.servername;//localAddress.split(":")[req.connection.localAddress.split(":").length-1];
-			var client = require("jsreport-client")("https://" + IP + ":8001/");
+			var client = require("jsreport-client")("https://"+IP+"/reporting/");
 			client.render({
 				template: {
 					shortid: "HJP1pqMcg",
@@ -146,7 +146,7 @@ exports.renderReport_ICE = function (req, res) {
 			if (reportType != "html")
 				shortId = "H1Orcdvhg";
 			var IP = req.headers.host.split(":")[0]; //req.connection.servername;//localAddress.split(":")[req.connection.localAddress.split(":").length-1];
-			var client = require("jsreport-client")("https://" + IP + ":8001/");
+			var client = require("jsreport-client")("https://"+IP+"/reporting/");
 			client.render({
 				template: {
 					shortid: shortId,
