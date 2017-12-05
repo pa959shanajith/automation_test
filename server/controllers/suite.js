@@ -1,7 +1,6 @@
 /**
  * Dependencies.
  */
-/*jshint -W041 */ /*jshint -W047 */ /* jshint funcscope:true */ /* jshint shadow:true */ /* jshint eqnull:true */
 var async = require('async');
 var myserver = require('../lib/socket.js');
 var uuid = require('uuid-random');
