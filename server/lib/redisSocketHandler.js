@@ -19,7 +19,7 @@ sub1.on("message", function (channel, message) {
 		mySocket = sockets.allSocketsMap[data.username];
 	if (!mySocket) {
 		logger.info("This server dosen't have the requested %s ICE socket", data.username);
-		/*dataToNode = JSON.stringify("username": data.username, "onAction": "fail", "value": "unavailableLocalServer"});
+		/*dataToNode = JSON.stringify({"username": data.username, "onAction": "fail", "value": "unavailableLocalServer"});
 		pub2.publish('ICE2_' + data.username ,dataToNode);*/
 	} else {
 		switch (data.emitAction) {
@@ -32,12 +32,12 @@ sub1.on("message", function (channel, message) {
 				});
 
 				mySocket.on('result_web_crawler', function (value) {
-					dataToNode =  {"username" : data.username,"onAction" : "result_web_crawler","value":JSON.parse(value)});
+					dataToNode = JSON.stringify({"username" : data.username,"onAction" : "result_web_crawler","value":JSON.parse(value)});
 					pub2.publish('ICE2_' + data.username, dataToNode);
 				});
 
 				mySocket.on('result_web_crawler_finished', function (value) {
-					dataToNode =  {"type" : "res","username" : data.username,"onAction" : "result_web_crawler_finished","value":JSON.parse(value)});
+					dataToNode = JSON.stringify({"type" : "res","username" : data.username,"onAction" : "result_web_crawler_finished","value":JSON.parse(value)});
 					pub2.publish('ICE2_' + data.username, dataToNode);
 				});
 				break;
@@ -51,7 +51,7 @@ sub1.on("message", function (channel, message) {
 				});
 
 				mySocket.on('scrape', function (value) {
-					dataToNode =  {"username" : data.username,"onAction" : "scrape","value":value});
+					dataToNode = JSON.stringify({"username" : data.username,"onAction" : "scrape","value":value});
 					pub2.publish('ICE2_' + data.username, dataToNode);
 				});
 				break;
@@ -65,7 +65,7 @@ sub1.on("message", function (channel, message) {
 				});
 
 				mySocket.on('scrape', function (value) {
-					dataToNode =  {"username" : data.username,"onAction" : "scrape","value":value});
+					dataToNode = JSON.stringify({"username" : data.username,"onAction" : "scrape","value":value});
 					pub2.publish('ICE2_' + data.username, dataToNode);
 				});
 				break;
@@ -79,7 +79,7 @@ sub1.on("message", function (channel, message) {
 				});
 
 				mySocket.on('scrape', function (value) {
-					dataToNode =  {"username" : data.username,"onAction" : "scrape","value":value});
+					dataToNode = JSON.stringify({"username" : data.username,"onAction" : "scrape","value":value});
 					pub2.publish('ICE2_' + data.username, dataToNode);
 				});
 				break;
@@ -93,7 +93,7 @@ sub1.on("message", function (channel, message) {
 				});
 
 				mySocket.on('scrape', function (value) {
-					dataToNode =  {"username" : data.username,"onAction" : "scrape","value":value});
+					dataToNode = JSON.stringify({"username" : data.username,"onAction" : "scrape","value":value});
 					pub2.publish('ICE2_' + data.username, dataToNode);
 				});
 				break;
@@ -107,7 +107,7 @@ sub1.on("message", function (channel, message) {
 				});
 
 				mySocket.on('scrape', function (value) {
-					dataToNode =  {"username" : data.username,"onAction" : "scrape","value":value});
+					dataToNode = JSON.stringify({"username" : data.username,"onAction" : "scrape","value":value});
 					pub2.publish('ICE2_' + data.username, dataToNode);
 				});
 				break;
@@ -121,7 +121,7 @@ sub1.on("message", function (channel, message) {
 				});
 
 				mySocket.on('scrape', function (value) {
-					dataToNode =  {"username" : data.username,"onAction" : "scrape","value":value});
+					dataToNode = JSON.stringify({"username" : data.username,"onAction" : "scrape","value":value});
 					pub2.publish('ICE2_' + data.username, dataToNode);
 				});
 				break;
@@ -141,12 +141,12 @@ sub1.on("message", function (channel, message) {
 				});
 
 				mySocket.on('result_debugTestCase', function (value) {
-					dataToNode = JSON.stringify("username": data.username, "onAction": "result_debugTestCase", "value": value});
+					dataToNode = JSON.stringify({"username": data.username, "onAction": "result_debugTestCase", "value": value});
 					pub2.publish('ICE2_' + data.username, dataToNode);
 				});
 
 				mySocket.on('result_debugTestCaseWS', function (value) {
-					dataToNode = JSON.stringify("username": data.username, "onAction": "result_debugTestCaseWS", "value": value});
+					dataToNode = JSON.stringify({"username": data.username, "onAction": "result_debugTestCaseWS", "value": value});
 					pub2.publish('ICE2_' + data.username, dataToNode);
 				});
 				break;
@@ -160,7 +160,7 @@ sub1.on("message", function (channel, message) {
 				});
 
 				mySocket.on('result_wsdl_listOfOperation', function (value) {
-					dataToNode = JSON.stringify("username": data.username, "onAction": "result_wsdl_listOfOperation", "value": value});
+					dataToNode = JSON.stringify({"username": data.username, "onAction": "result_wsdl_listOfOperation", "value": value});
 					pub2.publish('ICE2_' + data.username, dataToNode);
 				});
 				break;
@@ -174,7 +174,7 @@ sub1.on("message", function (channel, message) {
 				});
 
 				mySocket.on('result_wsdl_ServiceGenerator', function (value) {
-					dataToNode = JSON.stringify("username": data.username, "onAction": "result_wsdl_ServiceGenerator", "value": value});
+					dataToNode = JSON.stringify({"username": data.username, "onAction": "result_wsdl_ServiceGenerator", "value": value});
 					pub2.publish('ICE2_' + data.username, dataToNode);
 				});
 				break;
@@ -188,7 +188,7 @@ sub1.on("message", function (channel, message) {
 				});
 
 				mySocket.on('render_screenshot', function (value) {
-					dataToNode = JSON.stringify("username": data.username, "onAction": "render_screenshot", "value": value});
+					dataToNode = JSON.stringify({"username": data.username, "onAction": "render_screenshot", "value": value});
 					pub2.publish('ICE2_' + data.username, dataToNode);
 				});
 				break;
@@ -204,12 +204,12 @@ sub1.on("message", function (channel, message) {
 				});
 
 				mySocket.on('auto_populate', function (value) {
-					dataToNode = JSON.stringify("username": data.username, "onAction": "auto_populate", "value": value});
+					dataToNode = JSON.stringify({"username": data.username, "onAction": "auto_populate", "value": value});
 					pub2.publish('ICE2_' + data.username, dataToNode);
 				});
 
 				mySocket.on('issue_id', function (value) {
-					dataToNode = JSON.stringify("username": data.username, "onAction": "issue_id", "value": value});
+					dataToNode = JSON.stringify({"username": data.username, "onAction": "issue_id", "value": value});
 					pub2.publish('ICE2_' + data.username, dataToNode);
 				});
 				break;
@@ -225,12 +225,12 @@ sub1.on("message", function (channel, message) {
 				});
 
 				mySocket.on('result_executeTestSuite', function (value) {
-					dataToNode = JSON.stringify("username": data.username, "onAction": "result_executeTestSuite", "value": value});
+					dataToNode = JSON.stringify({"username": data.username, "onAction": "result_executeTestSuite", "value": value});
 					pub2.publish('ICE2_' + data.username, dataToNode);
 				});
 
 				mySocket.on('return_status_executeTestSuite', function (value) {
-					dataToNode = JSON.stringify("username": data.username, "onAction": "return_status_executeTestSuite", "value": value});
+					dataToNode = JSON.stringify({"username": data.username, "onAction": "return_status_executeTestSuite", "value": value});
 					pub2.publish('ICE2_' + data.username, dataToNode);
 				});
 				break;
@@ -245,13 +245,13 @@ sub1.on("message", function (channel, message) {
 				});
 
 				mySocket.on('qcresponse', function (value) {
-					dataToNode = JSON.stringify("username": data.username, "onAction": "qcresponse", "value": value});
+					dataToNode = JSON.stringify({"username": data.username, "onAction": "qcresponse", "value": value});
 					pub2.publish('ICE2_' + data.username, dataToNode);
 				});
 				break;
 
 			default:
-				dataToNode = JSON.stringify("username": data.username, "onAction": "fail", "value": "fail"});
+				dataToNode = JSON.stringify({"username": data.username, "onAction": "fail", "value": "fail"});
 				pub2.publish('ICE2_' + data.username, dataToNode);
 				break;
 		}
