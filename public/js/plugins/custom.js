@@ -197,22 +197,25 @@ $(document).ready(function() {
 		{
 			var subTaskID = JSON.parse(window.localStorage['_CT']).subTaskId;
 		}
-		var selectedTask = $("#window-task").find("#accordion").find(".assignedTaskInner");
-		$.each(selectedTask, function(){
-			if($(this)[0].dataset.subtaskid == subTaskID){
-				$(this).parents(".panel-default").addClass("disableActions");
-				$(this)[0].setAttribute("onclick","");
-				$(this).css("cursor","default");
-			}
-		})
-		setTimeout(function(){
-			$(".assignedTaskInner").each(function(){
+		if(window.location.pathname != "/scheduling"){
+			var selectedTask = $("#window-task").find("#accordion").find(".assignedTaskInner");
+			$.each(selectedTask, function(){
 				if($(this)[0].dataset.subtaskid == subTaskID){
-					$(this).trigger("click");
+					$(this).parents(".panel-default").addClass("disableActions");
+					$(this)[0].setAttribute("onclick","");
+					$(this).css("cursor","default");
 					return false;
 				}
-			})    		
-		}, 200)
+			})
+			setTimeout(function(){
+				$(".assignedTaskInner").each(function(){
+					if($(this)[0].dataset.subtaskid == subTaskID){
+						$(this).trigger("click");
+						return false;
+					}
+				})    		
+			}, 200)
+		}
 		if(window.localStorage['_CT'])
 		{
 			if(JSON.parse(window.localStorage['_CT']).appType == "MobileWeb" && navigator.appVersion.indexOf("Win")!=-1){
