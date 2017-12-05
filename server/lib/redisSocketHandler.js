@@ -112,20 +112,25 @@ sub1.on("message", function (channel, message) {
 					dataToNode = JSON.stringify(dataToNode);
 					pub2.publish('ICE2_' + data.username, dataToNode);
 				});
-
+				break;
+			case 'wsdl_listOfOperation':
+				mySocket._events.result_wsdl_listOfOperation = [];
+				mySocket.emit('wsdl_listOfOperation', data.wsdlurl);
 				mySocket.on('result_wsdl_listOfOperation', function (value) {
 					dataToNode = {"username": data.username, "onAction": "result_wsdl_listOfOperation", "value": value};
 					dataToNode = JSON.stringify(dataToNode);
 					pub2.publish('ICE2_' + data.username, dataToNode);
 				});
-
+				break;
+			case 'wsdlServiceGenerator_ICE':
+				mySocket._events.result_wsdl_ServiceGenerator = [];
+				mySocket.emit('wsdlServiceGenerator_ICE', data.serviceGenRequest);
 				mySocket.on('result_wsdl_ServiceGenerator', function (value) {
 					dataToNode = {"username": data.username, "onAction": "result_wsdl_ServiceGenerator", "value": value};
 					dataToNode = JSON.stringify(dataToNode);
 					pub2.publish('ICE2_' + data.username, dataToNode);
 				});
 				break;
-
 			case 'render_screenshot':
 				mySocket._events.render_screenshot = [];
 				mySocket.emit('render_screenshot', data.path);
