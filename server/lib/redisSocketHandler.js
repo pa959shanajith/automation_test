@@ -161,9 +161,17 @@ sub1.on("message", function (channel, message) {
 
 			case 'executeTestSuite':
 				mySocket._events.result_executeTestSuite = [];
+				mySocket._events.return_status_executeTestSuite = [];
 				mySocket.emit('executeTestSuite', data.executionRequest);
+
 				mySocket.on('result_executeTestSuite', function (value) {
 					dataToNode = {"username": data.username, "onAction": "result_executeTestSuite", "value": value};
+					dataToNode = JSON.stringify(dataToNode);
+					pub2.publish('ICE2_' + data.username, dataToNode);
+				});
+
+				mySocket.on('return_status_executeTestSuite', function (value) {
+					dataToNode = {"username": data.username, "onAction": "return_status_executeTestSuite", "value": value};
 					dataToNode = JSON.stringify(dataToNode);
 					pub2.publish('ICE2_' + data.username, dataToNode);
 				});

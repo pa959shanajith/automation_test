@@ -1,6 +1,7 @@
 /**
  * Dependencies.
  */
+/*jshint -W041 */ /*jshint -W047 */ /* jshint funcscope:true */ /* jshint shadow:true */ /* jshint eqnull:true */
 var async = require('async');
 var myserver = require('../lib/socket.js');
 var uuid = require('uuid-random');
@@ -232,7 +233,7 @@ function readTestSuite_ICE_SVN(req,callback) {
 					client.post(epurl + "suite/readTestSuite_ICE", args,
 						function (result, response) {
 							if (response.statusCode != 200 || result.rows == "fail") {
-								logger.error("Error occured in suite/readTestSuite_ICE_SVN from readTestSuite_ICE Error Code : ERRNDAC")
+								logger.error("Error occured in suite/readTestSuite_ICE_SVN from readTestSuite_ICE Error Code : ERRNDAC");
 								var flag = "Error in readTestSuite_ICE : Fail";
 								callback(false);
 								//res(400, flag);
@@ -345,7 +346,7 @@ function readTestSuite_ICE_SVN(req,callback) {
 		logger.error('Error in the service readTestSuite_ICE: Invalid Session');
 		callback(false);
 	}
-};
+}
 
 
 
@@ -616,6 +617,8 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 		sessionToken = sessionToken[1];
 	}
 	if (sessionToken != undefined && req.session.id == sessionToken) {
+		redisServer.redisSub2.removeAllListeners('message');
+		redisServer.redisSub2.subscribe('ICE2_' + req.session.username,1);
 		var batchExecutionData = req.body.moduleInfo;
 		var userInfo = req.body.userInfo;
 		var testsuitedetailslist = [];
@@ -735,109 +738,130 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 			var suiteStatus;
 			logger.info("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
 			logger.info("ICE Socket requesting Address: %s" , name);
-			if ('allSocketsMap' in myserver && name in myserver.allSocketsMap) {
-				var mySocket = myserver.allSocketsMap[name];
-				mySocket._events.result_executeTestSuite = [];
-				mySocket.emit('executeTestSuite', executionRequest);
-				var updateSessionExpiry = setInterval(function () {
-						req.session.cookie.maxAge = sessionTime;
-					}, updateSessionTimeEvery);
-				mySocket.on("unavailableLocalServer", function () {
-					logger.error("Error occured in ExecuteTestSuite_ICE: Socket Disconnected");
-					if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
-						var soc = myserver.socketMapNotify[name];
-						soc.emit("ICEnotAvailable");
-					}
-				});
-				mySocket.on('result_executeTestSuite', function (resultData) {
+			redisServer.redisPub1.pubsub('numsub','ICE1_' + req.session.username,function(err,redisres){
+				if (redisres[1]==1) {
+					/*commented for LB
+					if ('allSocketsMap' in myserver && name in myserver.allSocketsMap) {
+					var mySocket = myserver.allSocketsMap[name];
+					mySocket._events.result_executeTestSuite = [];
+					mySocket.emit('executeTestSuite', executionRequest);*/
+					logger.info("Sending socket request for executeTestSuite to redis");
+					dataToIce = {"emitAction" : "executeTestSuite","username" : req.session.username, "executionRequest": executionRequest};
+					redisServer.redisPub1.publish('ICE1_' + req.session.username,JSON.stringify(dataToIce));
+					var updateSessionExpiry = setInterval(function () {
+							req.session.cookie.maxAge = sessionTime;
+						}, updateSessionTimeEvery);
+					/*commented for LB
+					mySocket.on("unavailableLocalServer", function () {
+						logger.error("Error occured in ExecuteTestSuite_ICE: Socket Disconnected");
+						if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
+							var soc = myserver.socketMapNotify[name];
+							soc.emit("ICEnotAvailable");
+						}
+					});
+					mySocket.on('result_executeTestSuite', function (resultData) {
 					//req.session.cookie.expires = new Date(Date.now() + 30 * 60 * 1000);
-					clearInterval(updateSessionExpiry);
-					if (resultData != "success" && resultData != "Terminate") {
-						completedSceCount++;
-						scenarioCount = executionRequest.suitedetails[testsuitecount].scenarioIds.length;
-						try {
-							var scenarioid = resultData.scenarioId;
-							var executionid = resultData.executionId;
-							var reportdata = resultData.reportData;
-							var testsuiteid = resultData.testsuiteId;
-							var req_report = resultData.reportdata;
-							var req_reportStepsArray = reportdata.rows;
-							if (reportdata.overallstatus.length != 0) {
-								var req_overAllStatus = reportdata.overallstatus;
-								var req_browser = reportdata.overallstatus[0].browserType;
-								reportdata = JSON.stringify(reportdata).replace(/'/g, "''");
-								reportdata = JSON.parse(reportdata);
-								var reportId = uuid();
-								if (resultData.reportData.overallstatus[0].overallstatus == "Pass") {
-									statusPass++;
-								}
-								var inputs = {
-									"reportid": reportId,
-									"executionid": executionid,
-									"testsuiteid": testsuiteid,
-									"testscenarioid": scenarioid,
-									"browser": req_browser,
-									"status": resultData.reportData.overallstatus[0].overallstatus,
-									"report": JSON.stringify(reportdata),
-									"query": "insertreportquery"
-								};
-								var args = {
-									data: inputs,
-									headers: {
-										"Content-Type": "application/json"
-									}
-								};
-								logger.info("Calling NDAC Service from executionFunction: suite/ExecuteTestSuite_ICE");
-								client.post(epurl + "suite/ExecuteTestSuite_ICE", args,
-									function (result, response) {
-									if (response.statusCode != 200 || result.rows == "fail") {
-										logger.error("Error occured in suite/ExecuteTestSuite_ICE from executionFunction Error Code : ERRNDAC");
-										flag = "fail";
-									} else {
-										logger.info("Successfully inserted report data");
-										flag = "success";
-									}
-								});
-								if (completedSceCount == scenarioCount) {
-									if (statusPass == scenarioCount) {
-										suiteStatus = "Pass";
-									} else {
-										suiteStatus = "Fail";
-									}
-									completedSceCount = 0;
-									testsuitecount++;
-									logger.info("Calling function updateExecutionStatus from executionFunction");
-									updateExecutionStatus(testsuiteid, executionid, starttime, suiteStatus);
+					*/
+					redisServer.redisSub2.on("message",function (channel,message) {
+						data = JSON.parse(message);
+						if(req.session.username == data.username){
+							if (data.onAction == "unavailableLocalServer") {
+								logger.error("Error occured in ExecuteTestSuite_ICE: Socket Disconnected");
+								if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
+									var soc = myserver.socketMapNotify[name];
+									soc.emit("ICEnotAvailable");
 								}
 							} else {
-								completedSceCount++;
-								scenarioCount = executionRequest.suitedetails[testsuitecount].scenarioIds.length;
-								if (completedSceCount == scenarioCount) {
-									completedSceCount = 0;
-									testsuitecount++;
-									suiteStatus = "Fail";
-									logger.info("Calling function updateExecutionStatus from executionFunction");
-									updateExecutionStatus(testsuiteid, executionid, starttime, suiteStatus);
+								var resultData = data.value;
+								clearInterval(updateSessionExpiry);
+								if (resultData != "success" && resultData != "Terminate") {
+									completedSceCount++;
+									scenarioCount = executionRequest.suitedetails[testsuitecount].scenarioIds.length;
+									try {
+										var scenarioid = resultData.scenarioId;
+										var executionid = resultData.executionId;
+										var reportdata = resultData.reportData;
+										var testsuiteid = resultData.testsuiteId;
+										var req_report = resultData.reportdata;
+										var req_reportStepsArray = reportdata.rows;
+										if (reportdata.overallstatus.length != 0) {
+											var req_overAllStatus = reportdata.overallstatus;
+											var req_browser = reportdata.overallstatus[0].browserType;
+											reportdata = JSON.stringify(reportdata).replace(/'/g, "''");
+											reportdata = JSON.parse(reportdata);
+											var reportId = uuid();
+											if (resultData.reportData.overallstatus[0].overallstatus == "Pass") {
+												statusPass++;
+											}
+											var inputs = {
+												"reportid": reportId,
+												"executionid": executionid,
+												"testsuiteid": testsuiteid,
+												"testscenarioid": scenarioid,
+												"browser": req_browser,
+												"status": resultData.reportData.overallstatus[0].overallstatus,
+												"report": JSON.stringify(reportdata),
+												"query": "insertreportquery"
+											};
+											var args = {
+												data: inputs,
+												headers: {
+													"Content-Type": "application/json"
+												}
+											};
+											logger.info("Calling NDAC Service from executionFunction: suite/ExecuteTestSuite_ICE");
+											client.post(epurl + "suite/ExecuteTestSuite_ICE", args,
+												function (result, response) {
+												if (response.statusCode != 200 || result.rows == "fail") {
+													logger.error("Error occured in suite/ExecuteTestSuite_ICE from executionFunction Error Code : ERRNDAC");
+													flag = "fail";
+												} else {
+													logger.info("Successfully inserted report data");
+													flag = "success";
+												}
+											});
+											if (completedSceCount == scenarioCount) {
+												if (statusPass == scenarioCount) {
+													suiteStatus = "Pass";
+												} else {
+													suiteStatus = "Fail";
+												}
+												completedSceCount = 0;
+												testsuitecount++;
+												logger.info("Calling function updateExecutionStatus from executionFunction");
+												updateExecutionStatus(testsuiteid, executionid, starttime, suiteStatus);
+											}
+										} else {
+											completedSceCount++;
+											scenarioCount = executionRequest.suitedetails[testsuitecount].scenarioIds.length;
+											if (completedSceCount == scenarioCount) {
+												completedSceCount = 0;
+												testsuitecount++;
+												suiteStatus = "Fail";
+												logger.info("Calling function updateExecutionStatus from executionFunction");
+												updateExecutionStatus(testsuiteid, executionid, starttime, suiteStatus);
+											}
+										}
+									} catch (ex) {
+										logger.error("Exception in the function executionFunction: insertreportquery: %s", ex);
+									}
+								}
+								if (resultData == "success" || resultData == "Terminate") {
+									try {
+										logger.info("Sending execution status from function executionFunction");
+										res.send(resultData);
+									} catch (ex) {
+										logger.error("Exception While sending execution status from the function executionFunction: %s", ex);
+									}
 								}
 							}
-						} catch (ex) {
-							logger.error("Exception in the function executionFunction: insertreportquery: %s", ex);
 						}
-					}
-					if (resultData == "success" || resultData == "Terminate") {
-						try {
-							logger.info("Sending execution status from function executionFunction");
-							res.send(resultData);
-						} catch (ex) {
-							logger.error("Exception While sending execution status from the function executionFunction: %s", ex);
-						}
-					}
-
-				});
-			} else {
-				logger.error("Error occured in the function executionFunction: Socket not Available");
-				res.send("unavailableLocalServer");
-			}
+					});
+				} else {
+					logger.error("Error occured in the function executionFunction: Socket not Available");
+					res.send("unavailableLocalServer");
+				}
+			});
 		}
 	} else {
 		logger.error("Error occured in the function executionFunction: Invalid Session");
@@ -869,7 +893,7 @@ exports.getListofScheduledSocketMap = function (req, res) {
 			for (var i = 0; i < result.rows.length; i++) {
 				validUser = bcrypt.compareSync(req.body.token_id, result.rows[i].password);
 				if (validUser) {
-					break
+					break;
 				}
 			}
 			if(validUser){
@@ -931,6 +955,8 @@ exports.getCRId = function (req, res) {
 
 exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 	logger.info("Inside UI service: ExecuteTestSuite_ICE_SVN");
+	redisServer.redisSub2.removeAllListeners('message');
+	redisServer.redisSub2.subscribe('ICE2_' + req.session.username,1);
 	var final_data = {};
 	var sc_map = {};
 	var module_data = {};
@@ -1168,108 +1194,126 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 									var statusPass = 0;
 									var suiteStatus;
 									logger.info(Object.keys(myserver.allSocketsMap), "<<all people, asking person:", name);
-									if ('allSocketsMap' in myserver && name in myserver.allSocketsMap) {
-										var mySocket = myserver.allSocketsMap[name];
-										mySocket._events.result_executeTestSuite = [];
-										mySocket.emit('executeTestSuite', executionRequest);
-										// var updateSessionExpiry = setInterval(function () {
-										// 		req.session.cookie.maxAge = sessionTime;
-										// 	}, updateSessionTimeEvery);
-										mySocket.on("unavailableLocalServer", function () {
-											logger.error("Error occured in ExecuteTestSuite_ICE_SVN: Socket Disconnected");
-											if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
-												var soc = myserver.socketMapNotify[name];
-												soc.emit("ICEnotAvailable");
-											}
-										});
-										mySocket.on('result_executeTestSuite', function (resultData) {
-											//req.session.cookie.expires = new Date(Date.now() + 30 * 60 * 1000);
-											completedSceCount++;
-											// clearInterval(updateSessionExpiry);
-											if (resultData != "success" && resultData != "Terminate") {
-												try {
-													var scenarioid = resultData.scenarioId;
-													var executionid = resultData.executionId;
-													var reportdata = resultData.reportData;
-													var testsuiteid = resultData.testsuiteId;
-													var req_report = resultData.reportdata;
-													var req_reportStepsArray = reportdata.rows;
-													if (reportdata.overallstatus.length != 0) {
-														var req_overAllStatus = reportdata.overallstatus;
-														var req_browser = reportdata.overallstatus[0].browserType;
-														reportdata = JSON.stringify(reportdata).replace(/'/g, "''");
-														reportdata = JSON.parse(reportdata);
-														if (scenarioid in sc_map)
-															reportdata.overallstatus[0]["secnarios_name"] = sc_map[scenarioid];
-														reportdata.overallstatus[0]["secnarios_id"] = scenarioid;
-														for (var k = 0; k < final_data[username].moduleInfo.length; k++) {
-															if (final_data[username].moduleInfo[k].moduleId == testsuiteid)
-																final_data[username].moduleInfo[k].suiteDetails.push(reportdata.overallstatus[0]);
-														}
-														var reportId = uuid();
-														if (resultData.reportData.overallstatus[0].overallstatus == "Pass") {
-															statusPass++;
-														}
-														var inputs = {
-															"reportid": reportId,
-															"executionid": executionid,
-															"testsuiteid": testsuiteid,
-															"testscenarioid": scenarioid,
-															"browser": req_browser,
-															"status": resultData.reportData.overallstatus[0].overallstatus,
-															"report": JSON.stringify(reportdata),
-															"query": "insertreportquery"
-														};
-														var args = {
-															data: inputs,
-															headers: {
-																"Content-Type": "application/json"
-															}
-														};
-														logger.info("Calling NDAC Service from ExecuteTestSuite_ICE_SVN:suite/ExecuteTestSuite_ICE");
-														client.post(epurl + "suite/ExecuteTestSuite_ICE", args,
-															function (result, response) {
-																if (response.statusCode != 200 || result.rows == "fail") {
-																	logger.error("Error occured in ExecuteTestSuite_ICE_SVN service from suite/ExecuteTestSuite_ICE Error Code : ERRNDAC");
-																	flag = "fail";
-																} else {
-																	flag = "success";
-																}
-															});
-														if (completedSceCount == scenarioCount) {
-															if (statusPass == scenarioCount) {
-																suiteStatus = "Pass";
-															} else {
-																suiteStatus = "Fail";
-															}
-															updateExecutionStatus(testsuiteid, executionid, starttime, suiteStatus);
+									redisServer.redisPub1.pubsub('numsub','ICE1_' + req.session.username,function(err,redisres){
+										if (redisres[1]==1) {
+											/* Commented for LB
+											if ('allSocketsMap' in myserver && name in myserver.allSocketsMap) {
+											var mySocket = myserver.allSocketsMap[name];
+											mySocket._events.result_executeTestSuite = [];
+											mySocket.emit('executeTestSuite', executionRequest); */
+											// var updateSessionExpiry = setInterval(function () {
+											// 		req.session.cookie.maxAge = sessionTime;
+											// 	}, updateSessionTimeEvery);
+											/* Commented for LB
+											mySocket.on("unavailableLocalServer", function () {
+												logger.error("Error occured in ExecuteTestSuite_ICE_SVN: Socket Disconnected");
+												if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
+													var soc = myserver.socketMapNotify[name];
+													soc.emit("ICEnotAvailable");
+												}
+											});
+											mySocket.on('result_executeTestSuite', function (resultData) {
+												//req.session.cookie.expires = new Date(Date.now() + 30 * 60 * 1000);
+											*/
+											redisServer.redisSub2.on("message",function (channel,message) {
+												data = JSON.parse(message);
+												if(req.session.username == data.username){
+													if (data.onAction == "unavailableLocalServer") {
+														logger.error("Error occured in ExecuteTestSuite_ICE_SVN: Socket Disconnected");
+														if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
+															var soc = myserver.socketMapNotify[name];
+															soc.emit("ICEnotAvailable");
 														}
 													} else {
-														if (completedSceCount == scenarioCount) {
-															suiteStatus = "Fail";
-															updateExecutionStatus(testsuiteid, executionid, starttime, suiteStatus);
+														var resultData = data.value;
+														completedSceCount++;
+														// clearInterval(updateSessionExpiry);
+														if (resultData != "success" && resultData != "Terminate") {
+															try {
+																var scenarioid = resultData.scenarioId;
+																var executionid = resultData.executionId;
+																var reportdata = resultData.reportData;
+																var testsuiteid = resultData.testsuiteId;
+																var req_report = resultData.reportdata;
+																var req_reportStepsArray = reportdata.rows;
+																if (reportdata.overallstatus.length != 0) {
+																	var req_overAllStatus = reportdata.overallstatus;
+																	var req_browser = reportdata.overallstatus[0].browserType;
+																	reportdata = JSON.stringify(reportdata).replace(/'/g, "''");
+																	reportdata = JSON.parse(reportdata);
+																	if (scenarioid in sc_map)
+																		reportdata.overallstatus[0]["secnarios_name"] = sc_map[scenarioid];
+																	reportdata.overallstatus[0]["secnarios_id"] = scenarioid;
+																	for (var k = 0; k < final_data[username].moduleInfo.length; k++) {
+																		if (final_data[username].moduleInfo[k].moduleId == testsuiteid)
+																			final_data[username].moduleInfo[k].suiteDetails.push(reportdata.overallstatus[0]);
+																	}
+																	var reportId = uuid();
+																	if (resultData.reportData.overallstatus[0].overallstatus == "Pass") {
+																		statusPass++;
+																	}
+																	var inputs = {
+																		"reportid": reportId,
+																		"executionid": executionid,
+																		"testsuiteid": testsuiteid,
+																		"testscenarioid": scenarioid,
+																		"browser": req_browser,
+																		"status": resultData.reportData.overallstatus[0].overallstatus,
+																		"report": JSON.stringify(reportdata),
+																		"query": "insertreportquery"
+																	};
+																	var args = {
+																		data: inputs,
+																		headers: {
+																			"Content-Type": "application/json"
+																		}
+																	};
+																	logger.info("Calling NDAC Service from ExecuteTestSuite_ICE_SVN:suite/ExecuteTestSuite_ICE");
+																	client.post(epurl + "suite/ExecuteTestSuite_ICE", args,
+																		function (result, response) {
+																			if (response.statusCode != 200 || result.rows == "fail") {
+																				logger.error("Error occured in ExecuteTestSuite_ICE_SVN service from suite/ExecuteTestSuite_ICE Error Code : ERRNDAC");
+																				flag = "fail";
+																			} else {
+																				flag = "success";
+																			}
+																		});
+																	if (completedSceCount == scenarioCount) {
+																		if (statusPass == scenarioCount) {
+																			suiteStatus = "Pass";
+																		} else {
+																			suiteStatus = "Fail";
+																		}
+																		updateExecutionStatus(testsuiteid, executionid, starttime, suiteStatus);
+																	}
+																} else {
+																	if (completedSceCount == scenarioCount) {
+																		suiteStatus = "Fail";
+																		updateExecutionStatus(testsuiteid, executionid, starttime, suiteStatus);
+																	}
+																}
+															} catch (ex) {
+																logger.error("Error occured in ExecuteTestSuite_ICE_SVN service:",ex);
+															}
+														}
+														if (resultData == "success" || resultData == "Terminate") {
+															try {
+																result_to_send.execution_status.push(final_data[username]);
+																cb();
+															} catch (ex) {
+																//	cb();
+																logger.error("Error occured in ExecuteTestSuite_ICE_SVN service:",ex);
+															}
+
 														}
 													}
-												} catch (ex) {
-													logger.error("Error occured in ExecuteTestSuite_ICE_SVN service:",ex);
 												}
-											}
-											if (resultData == "success" || resultData == "Terminate") {
-												try {
-													result_to_send.execution_status.push(final_data[username]);
-													cb();
-												} catch (ex) {
-													//	cb();
-													logger.error("Error occured in ExecuteTestSuite_ICE_SVN service:",ex);
-												}
-
-											}
-
-										});
-									} else {
-										logger.error("Error occured in ExecuteTestSuite_ICE_SVN service: Socket not Available");
-										res.send("unavailableLocalServer");
-									}
+											});
+										} else {
+											logger.error("Error occured in ExecuteTestSuite_ICE_SVN service: Socket not Available");
+											res.send("unavailableLocalServer");
+										}
+									});
 								}
 							}
 						});
@@ -1304,6 +1348,8 @@ exports.ExecuteTestSuite_ICE_CI = function (req, res) {
 		}
 	}
 	if (sessionToken != undefined && req.body.session_id == sessionToken) {
+		redisServer.redisSub2.removeAllListeners('message');
+		redisServer.redisSub2.subscribe('ICE2_' + req.session.username,1);
 		var batchExecutionData = req.body.moduleInfo;
 		var userInfo = req.body.userInfo;
 		var testsuitedetailslist = [];
@@ -1420,108 +1466,130 @@ exports.ExecuteTestSuite_ICE_CI = function (req, res) {
 			var suiteStatus;
 			logger.info("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
 			logger.info("ICE Socket requesting Address: %s" , name);
-			if ('allSocketsMap' in myserver && name in myserver.allSocketsMap) {
-				var mySocket = myserver.allSocketsMap[name];
-				mySocket._events.result_executeTestSuite = [];
-				mySocket.emit('executeTestSuite', executionRequest);
-				var updateSessionExpiry = setInterval(function () {
-						req.session.cookie.maxAge = sessionTime;
-					}, updateSessionTimeEvery);
-				mySocket.on("unavailableLocalServer", function () {
-					logger.error("Error occured in ExecuteTestSuite_ICE_CI: Socket Disconnected");
-					if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
-						var soc = myserver.socketMapNotify[name];
-						soc.emit("ICEnotAvailable");
-					}
-				});
-				mySocket.on('result_executeTestSuite', function (resultData) {
-					//req.session.cookie.expires = sessionExtend;
-					//completedSceCount++;
-					clearInterval(updateSessionExpiry);
-					if (resultData != "success" && resultData != "Terminate") {
-						completedSceCount++;
-						scenarioCount = executionRequest.suitedetails[testsuitecount].scenarioIds.length;
-						try {
-							var scenarioid = resultData.scenarioId;
-							var executionid = resultData.executionId;
-							var reportdata = resultData.reportData;
-							var testsuiteid = resultData.testsuiteId;
-							var req_report = resultData.reportdata;
-							var req_reportStepsArray = reportdata.rows;
-							if (reportdata.overallstatus.length != 0) {
-								var req_overAllStatus = reportdata.overallstatus;
-								var req_browser = reportdata.overallstatus[0].browserType;
-								reportdata = JSON.stringify(reportdata).replace(/'/g, "''");
-								reportdata = JSON.parse(reportdata);
-								var reportId = uuid();
-								if (resultData.reportData.overallstatus[0].overallstatus == "Pass") {
-									statusPass++;
-								}
-								var inputs = {
-									"reportid": reportId,
-									"executionid": executionid,
-									"testsuiteid": testsuiteid,
-									"testscenarioid": scenarioid,
-									"browser": req_browser,
-									"status": resultData.reportData.overallstatus[0].overallstatus,
-									"report": JSON.stringify(reportdata),
-									"query": "insertreportquery"
-								};
-								var args = {
-									data: inputs,
-									headers: {
-										"Content-Type": "application/json"
-									}
-								};
-								logger.info("Calling NDAC Service from executionFunction in ExecuteTestSuite_ICE_CI: suite/ExecuteTestSuite_ICE");
-								client.post(epurl + "suite/ExecuteTestSuite_ICE", args,
-									function (result, response) {
-									if (response.statusCode != 200 || result.rows == "fail") {
-										logger.error("Error occured in suite/ExecuteTestSuite_ICE from executionFunction in ExecuteTestSuite_ICE_CI Error Code : ERRNDAC");
-										flag = "fail";
-									} else {
-										logger.info("Successfully inserted report data");
-										flag = "success";
-									}
-								});
-								if (completedSceCount == scenarioCount) {
-									if (statusPass == scenarioCount) {
-										suiteStatus = "Pass";
-									} else {
-										suiteStatus = "Fail";
-									}
-									completedSceCount = 0;
-									testsuitecount++;
-									logger.info("Calling function updateExecutionStatus from executionFunction in ExecuteTestSuite_ICE_CI");
-									updateExecutionStatus(testsuiteid, executionid, starttime, suiteStatus);
+			redisServer.redisPub1.pubsub('numsub','ICE1_' + req.session.username,function(err,redisres){
+				if (redisres[1]==1) {
+					/*commented for LB
+					if ('allSocketsMap' in myserver && name in myserver.allSocketsMap) {
+					var mySocket = myserver.allSocketsMap[name];
+					mySocket._events.result_executeTestSuite = [];
+					mySocket.emit('executeTestSuite', executionRequest); */
+					logger.info("Sending socket request for executeTestSuite to redis");
+					dataToIce = {"emitAction" : "executeTestSuite","username" : req.session.username, "executionRequest": executionRequest};
+					redisServer.redisPub1.publish('ICE1_' + req.session.username,JSON.stringify(dataToIce));
+					var updateSessionExpiry = setInterval(function () {
+							req.session.cookie.maxAge = sessionTime;
+						}, updateSessionTimeEvery);
+					/*commented for LB
+					mySocket.on("unavailableLocalServer", function () {
+						logger.error("Error occured in ExecuteTestSuite_ICE_CI: Socket Disconnected");
+						if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
+							var soc = myserver.socketMapNotify[name];
+							soc.emit("ICEnotAvailable");
+						}
+					});
+					mySocket.on('result_executeTestSuite', function (resultData) {
+						//req.session.cookie.expires = sessionExtend;
+						//completedSceCount++;
+					*/
+					redisServer.redisSub2.on("message",function (channel,message) {
+						data = JSON.parse(message);
+						if(req.session.username == data.username){
+							if (data.onAction == "unavailableLocalServer") {
+								logger.error("Error occured in ExecuteTestSuite_ICE_CI: Socket Disconnected");
+								if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
+									var soc = myserver.socketMapNotify[name];
+									soc.emit("ICEnotAvailable");
 								}
 							} else {
-								if (completedSceCount == scenarioCount) {
-									suiteStatus = "Fail";
-									completedSceCount = 0;
-									testsuitecount++;
-									logger.info("Calling function updateExecutionStatus from executionFunction in ExecuteTestSuite_ICE_CI");
-									updateExecutionStatus(testsuiteid, executionid, starttime, suiteStatus);
+								var resultData = data.value;
+								clearInterval(updateSessionExpiry);
+								if (resultData != "success" && resultData != "Terminate") {
+									completedSceCount++;
+									scenarioCount = executionRequest.suitedetails[testsuitecount].scenarioIds.length;
+									try {
+										var scenarioid = resultData.scenarioId;
+										var executionid = resultData.executionId;
+										var reportdata = resultData.reportData;
+										var testsuiteid = resultData.testsuiteId;
+										var req_report = resultData.reportdata;
+										var req_reportStepsArray = reportdata.rows;
+										if (reportdata.overallstatus.length != 0) {
+											var req_overAllStatus = reportdata.overallstatus;
+											var req_browser = reportdata.overallstatus[0].browserType;
+											reportdata = JSON.stringify(reportdata).replace(/'/g, "''");
+											reportdata = JSON.parse(reportdata);
+											var reportId = uuid();
+											if (resultData.reportData.overallstatus[0].overallstatus == "Pass") {
+												statusPass++;
+											}
+											var inputs = {
+												"reportid": reportId,
+												"executionid": executionid,
+												"testsuiteid": testsuiteid,
+												"testscenarioid": scenarioid,
+												"browser": req_browser,
+												"status": resultData.reportData.overallstatus[0].overallstatus,
+												"report": JSON.stringify(reportdata),
+												"query": "insertreportquery"
+											};
+											var args = {
+												data: inputs,
+												headers: {
+													"Content-Type": "application/json"
+												}
+											};
+											logger.info("Calling NDAC Service from executionFunction in ExecuteTestSuite_ICE_CI: suite/ExecuteTestSuite_ICE");
+											client.post(epurl + "suite/ExecuteTestSuite_ICE", args,
+												function (result, response) {
+												if (response.statusCode != 200 || result.rows == "fail") {
+													logger.error("Error occured in suite/ExecuteTestSuite_ICE from executionFunction in ExecuteTestSuite_ICE_CI Error Code : ERRNDAC");
+													flag = "fail";
+												} else {
+													logger.info("Successfully inserted report data");
+													flag = "success";
+												}
+											});
+											if (completedSceCount == scenarioCount) {
+												if (statusPass == scenarioCount) {
+													suiteStatus = "Pass";
+												} else {
+													suiteStatus = "Fail";
+												}
+												completedSceCount = 0;
+												testsuitecount++;
+												logger.info("Calling function updateExecutionStatus from executionFunction in ExecuteTestSuite_ICE_CI");
+												updateExecutionStatus(testsuiteid, executionid, starttime, suiteStatus);
+											}
+										} else {
+											if (completedSceCount == scenarioCount) {
+												suiteStatus = "Fail";
+												completedSceCount = 0;
+												testsuitecount++;
+												logger.info("Calling function updateExecutionStatus from executionFunction in ExecuteTestSuite_ICE_CI");
+												updateExecutionStatus(testsuiteid, executionid, starttime, suiteStatus);
+											}
+										}
+									} catch (ex) {
+										logger.error("Exception in the function executionFunction in ExecuteTestSuite_ICE_CI: insertreportquery: %s", ex);
+									}
+								}
+								if (resultData == "success" || resultData == "Terminate") {
+									try {
+										logger.info("Sending execution status from function executionFunction in ExecuteTestSuite_ICE_CI");
+										res.send(resultData);
+									} catch (ex) {
+										logger.error("Exception While sending execution status from the function executionFunction in ExecuteTestSuite_ICE_CI: %s", ex);
+										res.send("fail");
+									}
 								}
 							}
-						} catch (ex) {
-							logger.error("Exception in the function executionFunction in ExecuteTestSuite_ICE_CI: insertreportquery: %s", ex);
 						}
-					}
-					if (resultData == "success" || resultData == "Terminate") {
-						try {
-							logger.info("Sending execution status from function executionFunction in ExecuteTestSuite_ICE_CI");
-							res.send(resultData);
-						} catch (ex) {
-							logger.error("Exception While sending execution status from the function executionFunction in ExecuteTestSuite_ICE_CI: %s", ex);
-							res.send("fail");
-						}
-					}
-				});
-			} else {
-				logger.error("Error occured in the function executionFunction in ExecuteTestSuite_ICE_CI: Socket not Available");
-				res.send("unavailableLocalServer");
-			}
+					});
+				} else {
+					logger.error("Error occured in the function executionFunction in ExecuteTestSuite_ICE_CI: Socket not Available");
+					res.send("unavailableLocalServer");
+				}
+			});
 		}
 	} else {
 		logger.error("Error occured in the function executionFunction in ExecuteTestSuite_ICE_CI: Invalid Session");
@@ -2594,129 +2662,153 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 							var suiteStatus_s;
 							logger.info("IP\'s connected : %s", Object.keys(myserver.allSchedulingSocketsMap).join());
 							logger.info("ICE Socket requesting Address: %s" , name);
-							if ('allSchedulingSocketsMap' in myserver && name in myserver.allSchedulingSocketsMap) {
-								var mySocket = myserver.allSchedulingSocketsMap[name];
-								mySocket._events.result_executeTestSuite = [];
-								var starttime = new Date().getTime();
-								mySocket.emit('executeTestSuite', executionRequest);
-								mySocket.on('return_status_executeTestSuite', function (response) {
-									if(response == "success"){
-										scheduleStatus = "Inprogress";
-										logger.info("Calling function updateStatus from scheduleFunction");
-										updateStatus(sessObj, function (err, data) {
-											if (!err) {
-												logger.info("Sending response data from scheduleFunction");
-											}
-										});
-									}
-								});
-								var updateSessionExpiry = setInterval(function () {
-									req.session.cookie.maxAge = sessionTime;
-								}, updateSessionTimeEvery);
-								mySocket.on('result_executeTestSuite', function (resultData) {
-									//completedSceCount_s++;
-									clearInterval(updateSessionExpiry);
-									if (resultData != "success" && resultData != "Terminate") {
-										completedSceCount_s++;
-										scenarioCount_s = executionRequest.suitedetails[testsuitecount_s].scenarioIds.length;
-										try {
-											var scenarioid = resultData.scenarioId;
-											var executionid = resultData.executionId;
-											var reportdata = resultData.reportData;
-											var testsuiteid = resultData.testsuiteId;
-											var req_report = resultData.reportdata;
-											var req_reportStepsArray = reportdata.rows;
-											if (reportdata.overallstatus.length != 0) {
-												var req_overAllStatus = reportdata.overallstatus;
-												var req_browser = reportdata.overallstatus[0].browserType;
-												reportdata = JSON.stringify(reportdata).replace(/'/g, "''");
-												reportdata = JSON.parse(reportdata);
-												var reportId = uuid();
-												if (resultData.reportData.overallstatus[0].overallstatus == "Pass") {
-													statusPass_s++;
-												}
-												var inputs = {
-													"reportid": reportId,
-													"executionid": executionid,
-													"testsuiteid": testsuiteid,
-													"testscenarioid": scenarioid,
-													"browser": req_browser,
-													"status": resultData.reportData.overallstatus[0].overallstatus,
-													"report": JSON.stringify(reportdata),
-													"query": "insertreportquery"
-												};
-												var args = {
-													data: inputs,
-													headers: {
-														"Content-Type": "application/json"
-													}
-												};
-												logger.info("Calling NDAC Service from scheduleFunction: suite/ExecuteTestSuite_ICE");
-												client.post(epurl + "suite/ExecuteTestSuite_ICE", args,
-													function (result, response) {
-													if (response.statusCode != 200 || result.rows == "fail") {
-														logger.error("Error occured in suite/ExecuteTestSuite_ICE from scheduleFunction, Error Code : ERRNDAC");
-														flag = "fail";
-													} else {
-														flag = "success";
-													}
-												});
-												if (completedSceCount_s == scenarioCount_s) {
-													if (statusPass_s == scenarioCount_s) {
-														suiteStatus_s = "Pass";
-													} else {
-														suiteStatus_s = "Fail";
-													}
-													completedSceCount_s = 0;
-													testsuitecount_s++;
-													logger.info("Calling function updateSchedulingStatus from scheduleFunction");
-													updateSchedulingStatus(testsuiteid, executionid, starttime, suiteStatus_s);
-												}
-											} else {
-												if (completedSceCount_s == scenarioCount_s) {
-													suiteStatus_s = "Fail";
-													completedSceCount_s = 0;
-													testsuitecount_s++;
-													logger.info("Calling function updateExecutionStatus from scheduleFunction");
-													updateExecutionStatus(testsuiteid, executionid, starttime, suiteStatus_s);
-												}
-											}
-										} catch (ex) {
-											logger.error("Exception occured in the scheduleFunction: %s", ex);
-										}
-									}
-									if (resultData) {
-										if (typeof(resultData) == "string") {
-											scheduleStatus = resultData;
-										} else if (typeof(resultData) == "object") {
-											scheduleStatus = resultData.reportData.overallstatus[0].overallstatus;
-										}
-										try {
+							redisServer.redisPub1.pubsub('numsub','ICE1_' + req.session.username,function(err,redisres){
+								if (redisres[1]==1) {
+									/* Commented for LB
+									if ('allSchedulingSocketsMap' in myserver && name in myserver.allSchedulingSocketsMap) {
+									var mySocket = myserver.allSchedulingSocketsMap[name];
+									mySocket._events.result_executeTestSuite = [];
+									mySocket.emit('executeTestSuite', executionRequest); */
+									var starttime = new Date().getTime();
+									var updateSessionExpiry = setInterval(function () {
+										req.session.cookie.maxAge = sessionTime;
+									}, updateSessionTimeEvery);
+									/* Commented for LB
+									mySocket.on('return_status_executeTestSuite', function (response) {
+										if(response == "success"){
+											scheduleStatus = "Inprogress";
 											logger.info("Calling function updateStatus from scheduleFunction");
 											updateStatus(sessObj, function (err, data) {
 												if (!err) {
 													logger.info("Sending response data from scheduleFunction");
 												}
 											});
-											//res.send(resultData);
-											//console.log(resultData);
-										} catch (ex) {
-											logger.error("Exception occured in the updateStatus function of scheduleFunction: %s", ex);
 										}
-									}
-								});
-							} else {
-								logger.error("Error occured in the function scheduleFunction: Socket not Available");
-								// deleteFlag = true;
-								// deleteScheduledData(deleteFlag, sessObj)
-								scheduleStatus = "Failed 00";
-								logger.info("Calling function updateStatus from scheduleFunction");
-								updateStatus(sessObj, function (err, data) {
-									if (!err) {
-										logger.info("Sending response data from scheduleFunction");
-									}
-								});
-							}
+									});
+									mySocket.on('result_executeTestSuite', function (resultData) {
+										//completedSceCount_s++;
+									*/
+									redisServer.redisSub2.on("message",function (channel,message) {
+										data = JSON.parse(message);
+										if(req.session.username == data.username){
+											if (data.onAction == "return_status_executeTestSuite") {
+												var response = data.value;
+												if(response == "success"){
+													scheduleStatus = "Inprogress";
+													logger.info("Calling function updateStatus from scheduleFunction");
+													updateStatus(sessObj, function (err, data) {
+														if (!err) {
+															logger.info("Sending response data from scheduleFunction");
+														}
+													});
+												}
+											} else {
+												var resultData = data.value;
+												clearInterval(updateSessionExpiry);
+												if (resultData != "success" && resultData != "Terminate") {
+													completedSceCount_s++;
+													scenarioCount_s = executionRequest.suitedetails[testsuitecount_s].scenarioIds.length;
+													try {
+														var scenarioid = resultData.scenarioId;
+														var executionid = resultData.executionId;
+														var reportdata = resultData.reportData;
+														var testsuiteid = resultData.testsuiteId;
+														var req_report = resultData.reportdata;
+														var req_reportStepsArray = reportdata.rows;
+														if (reportdata.overallstatus.length != 0) {
+															var req_overAllStatus = reportdata.overallstatus;
+															var req_browser = reportdata.overallstatus[0].browserType;
+															reportdata = JSON.stringify(reportdata).replace(/'/g, "''");
+															reportdata = JSON.parse(reportdata);
+															var reportId = uuid();
+															if (resultData.reportData.overallstatus[0].overallstatus == "Pass") {
+																statusPass_s++;
+															}
+															var inputs = {
+																"reportid": reportId,
+																"executionid": executionid,
+																"testsuiteid": testsuiteid,
+																"testscenarioid": scenarioid,
+																"browser": req_browser,
+																"status": resultData.reportData.overallstatus[0].overallstatus,
+																"report": JSON.stringify(reportdata),
+																"query": "insertreportquery"
+															};
+															var args = {
+																data: inputs,
+																headers: {
+																	"Content-Type": "application/json"
+																}
+															};
+															logger.info("Calling NDAC Service from scheduleFunction: suite/ExecuteTestSuite_ICE");
+															client.post(epurl + "suite/ExecuteTestSuite_ICE", args,
+																function (result, response) {
+																if (response.statusCode != 200 || result.rows == "fail") {
+																	logger.error("Error occured in suite/ExecuteTestSuite_ICE from scheduleFunction, Error Code : ERRNDAC");
+																	flag = "fail";
+																} else {
+																	flag = "success";
+																}
+															});
+															if (completedSceCount_s == scenarioCount_s) {
+																if (statusPass_s == scenarioCount_s) {
+																	suiteStatus_s = "Pass";
+																} else {
+																	suiteStatus_s = "Fail";
+																}
+																completedSceCount_s = 0;
+																testsuitecount_s++;
+																logger.info("Calling function updateSchedulingStatus from scheduleFunction");
+																updateSchedulingStatus(testsuiteid, executionid, starttime, suiteStatus_s);
+															}
+														} else {
+															if (completedSceCount_s == scenarioCount_s) {
+																suiteStatus_s = "Fail";
+																completedSceCount_s = 0;
+																testsuitecount_s++;
+																logger.info("Calling function updateExecutionStatus from scheduleFunction");
+																updateExecutionStatus(testsuiteid, executionid, starttime, suiteStatus_s);
+															}
+														}
+													} catch (ex) {
+														logger.error("Exception occured in the scheduleFunction: %s", ex);
+													}
+												}
+												if (resultData) {
+													if (typeof(resultData) == "string") {
+														scheduleStatus = resultData;
+													} else if (typeof(resultData) == "object") {
+														scheduleStatus = resultData.reportData.overallstatus[0].overallstatus;
+													}
+													try {
+														logger.info("Calling function updateStatus from scheduleFunction");
+														updateStatus(sessObj, function (err, data) {
+															if (!err) {
+																logger.info("Sending response data from scheduleFunction");
+															}
+														});
+														//res.send(resultData);
+														//console.log(resultData);
+													} catch (ex) {
+														logger.error("Exception occured in the updateStatus function of scheduleFunction: %s", ex);
+													}
+												}
+											}
+										}
+									});
+								} else {
+									logger.error("Error occured in the function scheduleFunction: Socket not Available");
+									// deleteFlag = true;
+									// deleteScheduledData(deleteFlag, sessObj)
+									scheduleStatus = "Failed 00";
+									logger.info("Calling function updateStatus from scheduleFunction");
+									updateStatus(sessObj, function (err, data) {
+										if (!err) {
+											logger.info("Sending response data from scheduleFunction");
+										}
+									});
+								}
+							});
 						}
 					} //only jobs with scheduled status executes
 				}
