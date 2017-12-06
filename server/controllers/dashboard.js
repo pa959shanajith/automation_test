@@ -10,6 +10,7 @@ var express = require('express');
 var certificate = fs.readFileSync('server/https/server.crt','utf-8');
 var neo4jAPI = require('../controllers/neo4jAPI');
 var  logger = require('../../logger');
+var reportAddr;
 /*
 * Checks if the session is active
 */
@@ -30,7 +31,10 @@ var  logger = require('../../logger');
         var IP = req.headers.host.split(":")[0];
         //req.connection.servername;//localAddress.split(":")[req.connection.localAddress.split(":").length-1];
         logger.info("Connecting to jsreport client from loadDashboard_2");
-        var client = require("jsreport-client")("https://"+IP+":8001/");
+		var host = req.headers.host.split(":"); //req.connection.servername;//localAddress.split(":")[req.connection.localAddress.split(":").length-1];
+		if (host.length>1) reportAddr="https://" + host[0] + ":" + host[1] + "/reportServer/"
+		else reportAddr = "https://" + host[0] + "/reportServer/";
+		var client = require("jsreport-client")(reportAddr);
         client.render({
           template: {
             shortid: "ByCt0KGo-",
@@ -289,10 +293,13 @@ var  logger = require('../../logger');
     logger.info("Inside UI service: loadDashboard_2");
     try {
       if(isSessionActive(req, res)){
-        var IP = req.headers.host.split(":")[0];
-        //req.connection.servername;//localAddress.split(":")[req.connection.localAddress.split(":").length-1];
+												
+																											   
         logger.info("Connecting to jsreport client from loadDashboard_2");
-        var client = require("jsreport-client")("https://"+IP+":8001/");
+		var host = req.headers.host.split(":"); //req.connection.servername;//localAddress.split(":")[req.connection.localAddress.split(":").length-1];
+		if (host.length>1) reportAddr="https://" + host[0] + ":" + host[1] + "/reportServer/"
+		else reportAddr = "https://" + host[0] + "/reportServer/";
+		var client = require("jsreport-client")(reportAddr);
         client.render({
           template: {
             shortid: "rk00qKOn-",
