@@ -5,15 +5,15 @@ var redisConfig = globalConfig.redis.split(':');
 redisConfig = {	"host": redisConfig[0],	"port": parseInt(redisConfig[1]) };
 var sub1 = redis.createClient(redisConfig);
 var pub1 = redis.createClient(redisConfig);
-var sub2 = redis.createClient(redisConfig);
+var sub2 = {};
 var pub2 = redis.createClient(redisConfig);
-var mySocket, dataToNode;
 
 sub1.on("message", function (channel, message) {
 	logger.debug("channel is %s", channel);
-	data = JSON.parse(message);
+	var data = JSON.parse(message);
 	var socketchannel = channel.split('_')[1];
 	var sockets = require('./socket.js');
+	var mySocket, dataToNode;
 	if (socketchannel === "scheduling")
 		mySocket = sockets.allSchedulingSocketsMap[data.username];
 	else
@@ -122,6 +122,7 @@ sub1.on("message", function (channel, message) {
 				});
 
 				mySocket.on('scrape', function (value) {
+					logger.debug("data.username is %s \n\n",data.username);
 					dataToNode = JSON.stringify({"username" : data.username,"onAction" : "scrape","value":value});
 					pub2.publish('ICE2_' + data.username, dataToNode);
 				});
@@ -263,3 +264,4 @@ module.exports.redisSub1 = sub1;
 module.exports.redisPub1 = pub1;
 module.exports.redisSub2 = sub2;
 module.exports.redisPub2 = pub2;
+module.exports.redisConfig = redisConfig;

@@ -31,19 +31,20 @@ var redisServer = require('../lib/redisSocketHandler');
 exports.initScraping_ICE = function (req, res) {
 	logger.info("Inside UI service: initScraping_ICE");
 	try {
-		redisServer.redisSub2.removeAllListeners('message');
-		redisServer.redisSub2.subscribe('ICE2_' + req.session.username ,1);	
 		if (req.cookies['connect.sid'] != undefined) {
 			var sessionCookie = req.cookies['connect.sid'].split(".");
 			var sessionToken = sessionCookie[0].split(":");
 			sessionToken = sessionToken[1];
 		}
 		if (sessionToken != undefined && req.session.id == sessionToken) {
-			var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-			logger.info("ICE Socket connecting IP: %s" , ip);			
 			var name = req.session.username;
+			redisServer.redisSub2[name].removeAllListeners('message');
+			redisServer.redisSub2[name].subscribe('ICE2_' + req.session.username ,1);	
+			var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+			logger.info("ICE Socket connecting IP: %s" , ip);
 			logger.info("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
 			logger.info("ICE Socket requesting Address: %s" , name);
+			logger.warn("ICE Socket requesting Address: %s" , name);
 			//if ('allSocketsMap' in myserver && name in myserver.allSocketsMap) {
 			//check on redis whether the ice socket is connected to any of the servers
 			redisServer.redisPub1.pubsub('numsub','ICE1_normal_' + req.session.username,function(err,redisres){
@@ -74,7 +75,7 @@ exports.initScraping_ICE = function (req, res) {
 						res.send(data);
 					});
 					*/
-					redisServer.redisSub2.on("message",function (channel,message) {
+					redisServer.redisSub2[name].on("message",function (channel,message) {
 						data = JSON.parse(message);
 						name = data.username;
 						//LB: make sure to send recieved data to corresponding user
@@ -116,7 +117,7 @@ exports.initScraping_ICE = function (req, res) {
 						res.send(data);
 					});
 					*/
-					redisServer.redisSub2.on("message",function (channel,message) {
+					redisServer.redisSub2[name].on("message",function (channel,message) {
 						data = JSON.parse(message);
 						name = data.username;
 						//LB: make sure to send recieved data to corresponding user
@@ -161,7 +162,7 @@ exports.initScraping_ICE = function (req, res) {
 						res.send(data);
 					});
 					*/
-					redisServer.redisSub2.on("message",function (channel,message) {
+					redisServer.redisSub2[name].on("message",function (channel,message) {
 						data = JSON.parse(message);
 						name = data.username;
 						//LB: make sure to send recieved data to corresponding user
@@ -208,7 +209,7 @@ exports.initScraping_ICE = function (req, res) {
 						res.send(data);
 					});
 					*/
-					redisServer.redisSub2.on("message",function (channel,message) {
+					redisServer.redisSub2[name].on("message",function (channel,message) {
 						data = JSON.parse(message);
 						name = data.username;
 						//LB: make sure to send recieved data to corresponding user
@@ -251,7 +252,7 @@ exports.initScraping_ICE = function (req, res) {
 						res.send(data);
 					});
 					*/
-					redisServer.redisSub2.on("message",function (channel,message) {
+					redisServer.redisSub2[name].on("message",function (channel,message) {
 						data = JSON.parse(message);
 						name = data.username;
 						//LB: make sure to send recieved data to corresponding user
@@ -315,11 +316,11 @@ exports.initScraping_ICE = function (req, res) {
 						res.send(data);
 					});
 					*/
-					redisServer.redisSub2.on("message",function (channel,message) {
+					redisServer.redisSub2[name].on("message",function (channel,message) {
 						data = JSON.parse(message);
-						name = data.username;
+						logger.error("Channel is %s in scraping for user %s",channel,req.session.username);
 						//LB: make sure to send recieved data to corresponding user
-						if(req.session.username == name){
+						if(req.session.username == data.username){
 							if (data.onAction == "unavailableLocalServer") {
 								logger.error("Error occured in initScraping_ICE: Socket Disconnected");
 								if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
@@ -378,14 +379,14 @@ exports.highlightScrapElement_ICE = function (req, res) {
 			sessionToken = sessionToken[1];
 		}
 		if (sessionToken != undefined && req.session.id == sessionToken) {
-			redisServer.redisSub2.removeAllListeners('message');
-			redisServer.redisSub2.subscribe('ICE2_' + req.session.username ,1);
+			var name = req.session.username;
+			redisServer.redisSub2[name].removeAllListeners('message');
+			redisServer.redisSub2[name].subscribe('ICE2_' + req.session.username ,1);
 			var focusParam = req.body.elementXpath;
 			var elementURL = req.body.elementUrl;
 			var appType = req.body.appType;
 			var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 			logger.info("ICE Socket connecting IP: %s" , ip);
-			var name = req.session.username;
 			logger.info("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
 			logger.info("ICE Socket requesting Address: %s" , name);
 			/*commented for LB
@@ -1813,9 +1814,11 @@ exports.debugTestCase_ICE = function (req, res) {
 			sessionToken = sessionToken[1];
 		}
 		if (sessionToken != undefined && req.session.id == sessionToken) {
+			var name = req.session.username;
+			redisServer.redisSub2[name].removeAllListeners('message');
+			redisServer.redisSub2[name].subscribe('ICE2_' + req.session.username ,1);
 			var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 			logger.info("ICE Socket connecting IP: %s" , ip);
-			var name = req.session.username;
 			logger.info("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
 			logger.info("ICE Socket requesting Address: %s" , name);
 			/*commented for LB
@@ -1916,7 +1919,7 @@ exports.debugTestCase_ICE = function (req, res) {
 																}
 															});
 															*/
-															redisServer.redisSub2.on("message",function (channel,message) {
+															redisServer.redisSub2[name].on("message",function (channel,message) {
 																data = JSON.parse(message);
 																name = data.username;
 																//LB: make sure to send recieved data to corresponding user
@@ -1968,7 +1971,7 @@ exports.debugTestCase_ICE = function (req, res) {
 									req.session.cookie.maxAge = sessionTime;
 								}, updateSessionTimeEvery);
 							/*mySocket.on('result_debugTestCaseWS', function (value) {*/
-								redisServer.redisSub2.on("message",function (channel,message) {
+								redisServer.redisSub2[name].on("message",function (channel,message) {
 									data = JSON.parse(message);
 									name = data.username;
 									//LB: make sure to send recieved data to corresponding user
@@ -2055,7 +2058,7 @@ exports.debugTestCase_ICE = function (req, res) {
 									req.session.cookie.maxAge = sessionTime;
 								}, updateSessionTimeEvery);
 							/*mySocket.on('result_wsdl_listOfOperation', function (listGenResponse) {*/
-								redisServer.redisSub2.on("message",function (channel,message) {
+								redisServer.redisSub2[name].on("message",function (channel,message) {
 									data = JSON.parse(message);
 									name = data.username;
 									//LB: make sure to send recieved data to corresponding user
@@ -2132,7 +2135,7 @@ exports.debugTestCase_ICE = function (req, res) {
 									req.session.cookie.maxAge = sessionTime;
 								}, updateSessionTimeEvery);
 							/*mySocket.on('result_wsdl_ServiceGenerator', function (serviceGenResponse) {*/
-								redisServer.redisSub2.on("message",function (channel,message) {
+								redisServer.redisSub2[name].on("message",function (channel,message) {
 									data = JSON.parse(message);
 									name = data.username;
 									//LB: make sure to send recieved data to corresponding user

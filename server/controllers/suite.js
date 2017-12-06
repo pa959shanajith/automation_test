@@ -631,8 +631,9 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 		sessionToken = sessionToken[1];
 	}
 	if (sessionToken != undefined && req.session.id == sessionToken) {
-		redisServer.redisSub2.removeAllListeners('message');
-		redisServer.redisSub2.subscribe('ICE2_' + req.session.username,1);
+		var name = req.session.username;
+		redisServer.redisSub2[name].removeAllListeners('message');
+		redisServer.redisSub2[name].subscribe('ICE2_' + req.session.username,1);
 		var batchExecutionData = req.body.moduleInfo;
 		var userInfo = req.body.userInfo;
 		var testsuitedetailslist = [];
@@ -745,7 +746,6 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 
 		function executionFunction(executionRequest) {
 			logger.info("Inside executionFunction function");
-			var name = req.session.username;
 			var completedSceCount = 0;
 			var testsuitecount=0;
 			var statusPass = 0;
@@ -775,7 +775,7 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 					mySocket.on('result_executeTestSuite', function (resultData) {
 					//req.session.cookie.expires = new Date(Date.now() + 30 * 60 * 1000);
 					*/
-					redisServer.redisSub2.on("message",function (channel,message) {
+					redisServer.redisSub2[name].on("message",function (channel,message) {
 						data = JSON.parse(message);
 						if(req.session.username == data.username){
 							if (data.onAction == "unavailableLocalServer") {
@@ -976,8 +976,8 @@ exports.getCRId = function (req, res) {
 
 exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 	logger.info("Inside UI service: ExecuteTestSuite_ICE_SVN");
-	redisServer.redisSub2.removeAllListeners('message');
-	redisServer.redisSub2.subscribe('ICE2_' + req.session.username,1);
+	redisServer.redisSub2[name].removeAllListeners('message');
+	redisServer.redisSub2[name].subscribe('ICE2_' + req.session.username,1);
 	var final_data = {};
 	var sc_map = {};
 	var module_data = {};
@@ -1235,7 +1235,7 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 											mySocket.on('result_executeTestSuite', function (resultData) {
 												//req.session.cookie.expires = new Date(Date.now() + 30 * 60 * 1000);
 											*/
-											redisServer.redisSub2.on("message",function (channel,message) {
+											redisServer.redisSub2[name].on("message",function (channel,message) {
 												data = JSON.parse(message);
 												if(req.session.username == data.username){
 													if (data.onAction == "unavailableLocalServer") {
@@ -1368,8 +1368,9 @@ exports.ExecuteTestSuite_ICE_CI = function (req, res) {
 		}
 	}
 	if (sessionToken != undefined && req.body.session_id == sessionToken) {
-		redisServer.redisSub2.removeAllListeners('message');
-		redisServer.redisSub2.subscribe('ICE2_' + req.session.username,1);
+		var name = req.session.username;
+		redisServer.redisSub2[name].removeAllListeners('message');
+		redisServer.redisSub2[name].subscribe('ICE2_' + req.session.username,1);
 		var batchExecutionData = req.body.moduleInfo;
 		var userInfo = req.body.userInfo;
 		var testsuitedetailslist = [];
@@ -1478,7 +1479,6 @@ exports.ExecuteTestSuite_ICE_CI = function (req, res) {
 
 		function executionFunction(executionRequest) {
 			logger.info("Inside executionFunction function in ExecuteTestSuite_ICE_CI");
-			var name = req.session.username;
 			//var scenarioCount = executionRequest.suitedetails[0].scenarioIds.length;
 			var completedSceCount = 0;
 			var testsuitecount=0;
@@ -1510,7 +1510,7 @@ exports.ExecuteTestSuite_ICE_CI = function (req, res) {
 						//req.session.cookie.expires = sessionExtend;
 						//completedSceCount++;
 					*/
-					redisServer.redisSub2.on("message",function (channel,message) {
+					redisServer.redisSub2[name].on("message",function (channel,message) {
 						data = JSON.parse(message);
 						if(req.session.username == data.username){
 							if (data.onAction == "unavailableLocalServer") {
@@ -2709,7 +2709,7 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 									mySocket.on('result_executeTestSuite', function (resultData) {
 										//completedSceCount_s++;
 									*/
-									redisServer.redisSub2.on("message",function (channel,message) {
+									redisServer.redisSub2[name].on("message",function (channel,message) {
 										data = JSON.parse(message);
 										if(req.session.username == data.username){
 											if (data.onAction == "return_status_executeTestSuite") {

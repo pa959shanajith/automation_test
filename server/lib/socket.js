@@ -1,4 +1,5 @@
 var logger = require('../../logger');
+var redis = require("redis");
 var redisServer = require('./redisSocketHandler');
 //SOCKET CONNECTION USING SOCKET.IO
 var allClients = [];
@@ -77,6 +78,7 @@ io.on('connection', function (socket) {
 						logger.info("IP\'s connected : %s", Object.keys(socketMap).join());
 						socket.emit('update_screenshot_path', screenShotPath);
 						redisServer.redisSub1.subscribe('ICE1_normal_' + address, 1);
+						redisServer.redisSub2[address]=redis.createClient(redisServer.redisConfig);
 					}
 				}
 			}

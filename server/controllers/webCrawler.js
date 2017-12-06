@@ -5,14 +5,15 @@ var logger = require('../../logger');
 exports.getCrawlResults = function (req, res) {
 	try {
 		logger.info("Inside UI service: getCrawlResults");
-		redisServer.redisSub2.removeAllListeners('message');
-		redisServer.redisSub2.subscribe('ICE2_' + req.session.username,1);
 		if (req.cookies['connect.sid'] != undefined) {
 			var sessionCookie = req.cookies['connect.sid'].split(".");
 			var sessionToken = sessionCookie[0].split(":");
 			sessionToken = sessionToken[1];
 		}
 		if (sessionToken != undefined && req.session.id == sessionToken) {
+			var name = req.session.username;
+			redisServer.redisSub2[name].removeAllListeners('message');
+			redisServer.redisSub2[name].subscribe('ICE2_' + req.session.username,1);
 			var input_url = req.body.url;
 			var level = req.body.level;
 			var agent = req.body.agent;
@@ -35,7 +36,6 @@ exports.getCrawlResults = function (req, res) {
 			if (validate_url == true && validate_level == true && check_agent == true) {
 				//var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 				//logger.info("IP:",ip);
-				var name = req.session.username;
 				logger.info("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
 				logger.info("ICE Socket requesting Address: %s", name);
 				//if ('allSocketsMap' in myserver && name in myserver.allSocketsMap) {
@@ -64,7 +64,7 @@ exports.getCrawlResults = function (req, res) {
 							}
 						});
 						*/
-						redisServer.redisSub2.on("message",function (channel,message) {
+						redisServer.redisSub2[name].on("message",function (channel,message) {
 
 						// req.session.cookie.expires = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes 
 						

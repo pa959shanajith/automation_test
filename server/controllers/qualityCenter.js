@@ -22,12 +22,12 @@ exports.loginQCServer_ICE = function (req, res) {
 			sessionToken = sessionToken[1];
 		}
 		if (sessionToken != undefined && req.session.id == sessionToken) {
-			redisServer.redisSub2.removeAllListeners('message');
-			redisServer.redisSub2.subscribe('ICE2_' + req.session.username,1);
+			var name = req.session.username;
+			redisServer.redisSub2[name].removeAllListeners('message');
+			redisServer.redisSub2[name].subscribe('ICE2_' + req.session.username,1);
 			var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 			logger.info("ICE Socket connecting IP: %s" , ip);
 			//console.log("IP:", ip);
-			var name = req.session.username;
 			//console.log(Object.keys(myserver.allSocketsMap),"<<all people, asking person:",name);
 			logger.info("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
 			logger.info("ICE Socket requesting Address: %s" , name);
@@ -83,7 +83,7 @@ exports.loginQCServer_ICE = function (req, res) {
 								soc.emit("ICEnotAvailable");
 							}
 						}); */
-						redisServer.redisSub2.on("message",function (channel,message) {
+						redisServer.redisSub2[name].on("message",function (channel,message) {
 							data = JSON.parse(message);
 							if(req.session.username == data.username){
 								if (data.onAction == "unavailableLocalServer") {
@@ -135,10 +135,10 @@ exports.qcProjectDetails_ICE = function (req, res) {
 			sessionToken = sessionToken[1];
 		}
 		if (sessionToken != undefined && req.session.id == sessionToken) {
-			redisServer.redisSub2.removeAllListeners('message');
-			redisServer.redisSub2.subscribe('ICE2_' + req.session.username,1);
-			//var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 			var name = req.session.username;
+			redisServer.redisSub2[name].removeAllListeners('message');
+			redisServer.redisSub2[name].subscribe('ICE2_' + req.session.username,1);
+			//var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 			logger.info("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
 			logger.info("ICE Socket requesting Address: %s" , name);
 			redisServer.redisPub1.pubsub('numsub','ICE1_normal_' + req.session.username,function(err,redisres){
@@ -183,7 +183,7 @@ exports.qcProjectDetails_ICE = function (req, res) {
 								soc.emit("ICEnotAvailable");
 							}
 						}); */
-						redisServer.redisSub2.on("message",function (channel,message) {
+						redisServer.redisSub2[name].on("message",function (channel,message) {
 							data = JSON.parse(message);
 							if(req.session.username == data.username){
 								if (data.onAction == "unavailableLocalServer") {
@@ -358,9 +358,9 @@ exports.qcFolderDetails_ICE = function (req, res) {
 			sessionToken = sessionToken[1];
 		}
 		if (sessionToken != undefined && req.session.id == sessionToken) {
-			redisServer.redisSub2.removeAllListeners('message');
-			redisServer.redisSub2.subscribe('ICE2_' + req.session.username,1);
 			var name = req.session.username;
+			redisServer.redisSub2[name].removeAllListeners('message');
+			redisServer.redisSub2[name].subscribe('ICE2_' + req.session.username,1);
 			logger.info("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
 			logger.info("ICE Socket requesting Address: %s" , name);
 			redisServer.redisPub1.pubsub('numsub','ICE1_normal_' + req.session.username,function(err,redisres){
@@ -389,7 +389,7 @@ exports.qcFolderDetails_ICE = function (req, res) {
 							soc.emit("ICEnotAvailable");
 						}
 					}); */
-					redisServer.redisSub2.on("message",function (channel,message) {
+					redisServer.redisSub2[name].on("message",function (channel,message) {
 						data = JSON.parse(message);
 						if(req.session.username == data.username){
 							if (data.onAction == "unavailableLocalServer") {

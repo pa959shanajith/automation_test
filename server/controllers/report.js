@@ -57,8 +57,8 @@ exports.getMainReport_ICE = function (req, res) {
 //to open screen shot
 exports.openScreenShot = function (req, res) {
 	logger.info("Inside UI service: openScreenShot");
-	redisServer.redisSub2.removeAllListeners('message');
-	redisServer.redisSub2.subscribe('ICE2_' + req.session.username,1);
+	redisServer.redisSub2[name].removeAllListeners('message');
+	redisServer.redisSub2[name].subscribe('ICE2_' + req.session.username,1);
 	try {
 		var path = req.body.absPath;
 		var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
@@ -99,7 +99,7 @@ exports.openScreenShot = function (req, res) {
 						soc.emit("ICEnotAvailable");
 					}
 				});*/
-				redisServer.redisSub2.on("message",function (channel,message) {
+				redisServer.redisSub2[name].on("message",function (channel,message) {
 					data = JSON.parse(message);
 					if(req.session.username == data.username){
 						if (data.onAction == "unavailableLocalServer") {
@@ -1053,8 +1053,9 @@ exports.connectJira_ICE = function (req, res) {
 			sessionToken = sessionToken[1];
 		}
 		if (sessionToken != undefined && req.session.id == sessionToken) {
-			redisServer.redisSub2.removeAllListeners('message');
-			redisServer.redisSub2.subscribe('ICE2_' + req.session.username,1);
+			var name = req.session.username;
+			redisServer.redisSub2[name].removeAllListeners('message');
+			redisServer.redisSub2[name].subscribe('ICE2_' + req.session.username,1);
 			if(req.body.action == 'loginToJira'){ //Login to Jira for creating issues
 				var jiraurl = req.body.url;
 				var jirausername = req.body.username;
@@ -1067,7 +1068,6 @@ exports.connectJira_ICE = function (req, res) {
 						"jira_pwd": jirapwd
 					};
 					try {
-						var name = req.session.username;
 						logger.info("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
 						logger.info("ICE Socket requesting Address: %s" , name);
 						redisServer.redisPub1.pubsub('numsub','ICE1_normal_' + req.session.username,function(err,redisres){
@@ -1108,7 +1108,7 @@ exports.connectJira_ICE = function (req, res) {
 										soc.emit("ICEnotAvailable");
 									}
 								});*/
-								redisServer.redisSub2.on("message",function (channel,message) {
+								redisServer.redisSub2[name].on("message",function (channel,message) {
 									data = JSON.parse(message);
 									if(req.session.username == data.username){
 										if (data.onAction == "unavailableLocalServer") {
@@ -1196,7 +1196,7 @@ exports.connectJira_ICE = function (req, res) {
 										soc.emit("ICEnotAvailable");
 									}
 								});*/
-								redisServer.redisSub2.on("message",function (channel,message) {
+								redisServer.redisSub2[name].on("message",function (channel,message) {
 									data = JSON.parse(message);
 									if(req.session.username == data.username){
 										if (data.onAction == "unavailableLocalServer") {
