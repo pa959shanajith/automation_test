@@ -1,6 +1,7 @@
 var myserver = require('../lib/socket.js');
 var validator = require('validator');
 var logger = require('../../logger');
+var redisServer = require('../lib/redisSocketHandler');
 
 exports.getCrawlResults = function (req, res) {
 	try {
@@ -13,7 +14,7 @@ exports.getCrawlResults = function (req, res) {
 		if (sessionToken != undefined && req.session.id == sessionToken) {
 			var name = req.session.username;
 			redisServer.redisSub2[name].removeAllListeners('message');
-			redisServer.redisSub2[name].subscribe('ICE2_' + req.session.username,1);
+			redisServer.redisSub2[name].subscribe('ICE2_' + req.session.username ,1);	
 			var input_url = req.body.url;
 			var level = req.body.level;
 			var agent = req.body.agent;
@@ -38,104 +39,64 @@ exports.getCrawlResults = function (req, res) {
 				//logger.info("IP:",ip);
 				logger.info("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
 				logger.info("ICE Socket requesting Address: %s", name);
-				//if ('allSocketsMap' in myserver && name in myserver.allSocketsMap) {
-				//check on redis whether the ice socket is connected to any of the servers
 				redisServer.redisPub1.pubsub('numsub','ICE1_normal_' + req.session.username,function(err,redisres){
 					if (redisres[1]==1) {
-						/*commented for LB
+						/* Commented for LB
+						if ('allSocketsMap' in myserver && name in myserver.allSocketsMap) {
+						var mySocket = myserver.allSocketsMap[name];
 						mySocket.emit("webCrawlerGo", input_url, level, agent);
-						*/
-						//  var updateSessionExpiry = setInterval(function () {
-						//    req.session.cookie.maxAge = sessionTime;
-						//  },updateSessionTimeEvery);
-						logger.info("Sending socket request for webCrawlerGo to redis");
-						dataToIce = {"emitAction" : "webCrawlerGo","username" : req.session.username,
-									"input_url":input_url, "level" : level, "agent" :agent};
-						redisServer.redisPub1.publish('ICE1_normal_' + req.session.username,JSON.stringify(dataToIce));
-
-						/*commented for LB
-						mySocket.on('result_web_crawler', function (value) {
-						// req.session.cookie.expires = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes 
-						try{
-							var mySocketUI =  myserver.allSocketsMapUI[name];
-							mySocketUI.emit("newdata", JSON.parse(value));
-							}catch(exception){
-								logger.error(exception);
-							}
-						});
-						*/
-						redisServer.redisSub2[name].on("message",function (channel,message) {
-
-						// req.session.cookie.expires = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes 
-						
-						data = JSON.parse(message);
-						if (data.onAction == "unavailableLocalServer") {
-							logger.error("Error occured in initScraping_ICE: Socket Disconnected");
+						mySocket.on("unavailableLocalServer", function () {
+							logger.error("Error occured in getCrawlResults: Socket Disconnected");
 							if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
 								var soc = myserver.socketMapNotify[name];
 								soc.emit("ICEnotAvailable");
 							}
-						}
-						else if(data.onAction == "result_web_crawler"){
-							try{
-								var mySocketUI =  myserver.allSocketsMapUI[data.username];
-								mySocketUI.emit("newdata", data.value);
-							}catch(exception){
+						});
+						mySocket.on('result_web_crawler', function (value) {
+							try {
+								var mySocketUI = myserver.allSocketsMapUI[name];
+								mySocketUI.emit("newdata", JSON.parse(value));
+							} catch (exception) {
 								logger.error(exception);
 							}
-						} else if(data.onAction == 'result_web_crawler_finished'){
-							req.session.cookie.expires = sessionExtend;
-							//  clearInterval(updateSessionExpiry);
-								data  = JSON.parse(message);
-								name = data.username;
-								value = data.value;
-							try{
-								//console.log(value);
-								var mySocketUI =  myserver.allSocketsMapUI[name];
-								mySocketUI.emit("endData", value);
-								mySocket._events.result_web_crawler = [];
-								mySocket._events.result_web_crawler_finished = [];
-								//res.status(200);
-								return res.status(200).json({ success: true});
-								}catch(exception){
-								logger.error(exception);
-								return res.status(500).json({ success: false, data: err});
-								}
-						}
-						
 						});
-						/*commented for LB
 						mySocket.on('result_web_crawler_finished', function (value) {
-						// req.session.cookie.expires = sessionExtend;
-						//  clearInterval(updateSessionExpiry);
-
-						try{
-							//console.log(value);
-							var mySocketUI =  myserver.allSocketsMapUI[name];
-							mySocketUI.emit("endData", JSON.parse(value));
-							mySocket._events.result_web_crawler = [];
-							mySocket._events.result_web_crawler_finished = [];
-							//res.status(200);
-							return res.status(200).json({ success: true});
-							}catch(exception){
-							logger.error(exception);
-							return res.status(500).json({ success: false, data: err});
-							}
-						});
-						
-								mySocket.on("unavailableLocalServer", function () {
+						*/
+						redisServer.redisSub2[name].on("message",function (channel,message) {
+							data = JSON.parse(message);
+							if(req.session.username == data.username){
+								if (data.onAction == "unavailableLocalServer") {
 									logger.error("Error occured in getCrawlResults: Socket Disconnected");
 									if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
 										var soc = myserver.socketMapNotify[name];
 										soc.emit("ICEnotAvailable");
 									}
-								});
-								*/
-							} else {
-								logger.info("ICE socket not available for Address : %s", name);
-								res.send("unavailableLocalServer");
+								} else if (data.onAction == "result_web_crawler") {
+									try {
+										var mySocketUI = myserver.allSocketsMapUI[name];
+										mySocketUI.emit("newdata", JSON.parse(value));
+									} catch (exception) {
+										logger.error(exception);
+									}
+								} else if (data.onAction == "result_web_crawler_finished") {
+									try {
+										var mySocketUI = myserver.allSocketsMapUI[name];
+										mySocketUI.emit("endData", JSON.parse(value));
+										mySocket._events.result_web_crawler = [];
+										mySocket._events.result_web_crawler_finished = [];
+										res.status(200).json({success: true});
+									} catch (exception) {
+										logger.error(exception);
+										res.status(500).json({success: false, data: exception});
+									}
+								}
 							}
 						});
+					} else {
+						logger.info("ICE socket not available for Address : %s", name);
+						res.send("unavailableLocalServer");
+					}
+				});
 			} else {
 				res.send('unavailableLocalServer');
 			}
