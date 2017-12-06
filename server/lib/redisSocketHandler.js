@@ -25,7 +25,6 @@ sub1.on("message", function (channel, message) {
 	} else {
 		switch (data.emitAction) {
 			case 'webCrawlerGo':
-				mySocket._events.webCrawlerGo = [];
 				mySocket._events.result_web_crawler = [];
 				mySocket._events.result_web_crawler_finished = [];
 				mySocket.emit("webCrawlerGo", data.input_url, data.level, data.agent);

@@ -61,10 +61,25 @@ exports.getCrawlResults = function (req, res) {
 							}
 						});
 						mySocket.on('result_web_crawler_finished', function (value) {
+							try {
+								var mySocketUI = myserver.allSocketsMapUI[name];
+								mySocketUI.emit("endData", value);
+								mySocket._events.result_web_crawler = [];
+								mySocket._events.result_web_crawler_finished = [];
+								res.status(200).json({success: true});
+							} catch (exception) {
+								logger.error(exception);
+								res.status(500).json({success: false, data: exception});
+							}
+						});
 						*/
+						logger.info("Sending socket request for webCrawlerGo to redis");
+						dataToIce = {"emitAction" : "webCrawlerGo","username" : req.session.username, "input_url":input_url, "level" : level, "agent" :agent};
+						redisServer.redisPub1.publish('ICE1_normal_' + req.session.username,JSON.stringify(dataToIce));
 						redisServer.redisSub2[name].on("message",function (channel,message) {
 							data = JSON.parse(message);
 							if(req.session.username == data.username){
+								var value = data.value;
 								if (data.onAction == "unavailableLocalServer") {
 									logger.error("Error occured in getCrawlResults: Socket Disconnected");
 									if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
@@ -74,16 +89,14 @@ exports.getCrawlResults = function (req, res) {
 								} else if (data.onAction == "result_web_crawler") {
 									try {
 										var mySocketUI = myserver.allSocketsMapUI[name];
-										mySocketUI.emit("newdata", JSON.parse(value));
+										mySocketUI.emit("newdata", value);
 									} catch (exception) {
 										logger.error(exception);
 									}
 								} else if (data.onAction == "result_web_crawler_finished") {
 									try {
 										var mySocketUI = myserver.allSocketsMapUI[name];
-										mySocketUI.emit("endData", JSON.parse(value));
-										mySocket._events.result_web_crawler = [];
-										mySocket._events.result_web_crawler_finished = [];
+										mySocketUI.emit("endData", value);
 										res.status(200).json({success: true});
 									} catch (exception) {
 										logger.error(exception);
