@@ -40,7 +40,7 @@ exports.getCrawlResults = function (req, res) {
 				logger.info("ICE Socket requesting Address: %s", name);
 				//if ('allSocketsMap' in myserver && name in myserver.allSocketsMap) {
 				//check on redis whether the ice socket is connected to any of the servers
-				redisServer.redisPub1.pubsub('numsub','ICE1_' + req.session.username,function(err,redisres){
+				redisServer.redisPub1.pubsub('numsub','ICE1_normal_' + req.session.username,function(err,redisres){
 					if (redisres[1]==1) {
 						/*commented for LB
 						mySocket.emit("webCrawlerGo", input_url, level, agent);
@@ -51,7 +51,7 @@ exports.getCrawlResults = function (req, res) {
 						logger.info("Sending socket request for webCrawlerGo to redis");
 						dataToIce = {"emitAction" : "webCrawlerGo","username" : req.session.username,
 									"input_url":input_url, "level" : level, "agent" :agent};
-						redisServer.redisPub1.publish('ICE1_' + req.session.username,JSON.stringify(dataToIce));
+						redisServer.redisPub1.publish('ICE1_normal_' + req.session.username,JSON.stringify(dataToIce));
 
 						/*commented for LB
 						mySocket.on('result_web_crawler', function (value) {

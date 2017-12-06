@@ -46,7 +46,7 @@ exports.initScraping_ICE = function (req, res) {
 			logger.info("ICE Socket requesting Address: %s" , name);
 			//if ('allSocketsMap' in myserver && name in myserver.allSocketsMap) {
 			//check on redis whether the ice socket is connected to any of the servers
-			redisServer.redisPub1.pubsub('numsub','ICE1_' + req.session.username,function(err,redisres){
+			redisServer.redisPub1.pubsub('numsub','ICE1_normal_' + req.session.username,function(err,redisres){
 				if (redisres[1]==1) {
 				//var mySocket = myserver.allSocketsMap[name];
 				var reqScrapJson = {};
@@ -62,7 +62,7 @@ exports.initScraping_ICE = function (req, res) {
 					logger.info("Sending socket request for LAUNCH_DESKTOP to redis");
 					dataToIce = {"emitAction" : "LAUNCH_DESKTOP","username" : req.session.username,
 								 "applicationPath":applicationPath};
-					redisServer.redisPub1.publish('ICE1_' + req.session.username,JSON.stringify(dataToIce));
+					redisServer.redisPub1.publish('ICE1_normal_' + req.session.username,JSON.stringify(dataToIce));
 					var updateSessionExpiry = setInterval(function () {
 							req.session.cookie.maxAge = sessionTime;
 						}, updateSessionTimeEvery);
@@ -104,7 +104,7 @@ exports.initScraping_ICE = function (req, res) {
 					logger.info("Sending socket request for LAUNCH_SAP to redis");
 					dataToIce = {"emitAction" : "LAUNCH_SAP","username" : req.session.username,
 								 "applicationPath":applicationPath};
-					redisServer.redisPub1.publish('ICE1_' + req.session.username,JSON.stringify(dataToIce));
+					redisServer.redisPub1.publish('ICE1_normal_' + req.session.username,JSON.stringify(dataToIce));
 					var updateSessionExpiry = setInterval(function () {
 							req.session.cookie.maxAge = sessionTime;
 						}, updateSessionTimeEvery);
@@ -149,7 +149,7 @@ exports.initScraping_ICE = function (req, res) {
 					logger.info("Sending socket request for LAUNCH_OEBS to redis");
 					dataToIce = {"emitAction" : "LAUNCH_OEBS","username" : req.session.username,
 								 "applicationPath":applicationPath};
-					redisServer.redisPub1.publish('ICE1_' + req.session.username,JSON.stringify(dataToIce));
+					redisServer.redisPub1.publish('ICE1_normal_' + req.session.username,JSON.stringify(dataToIce));
 					var updateSessionExpiry = setInterval(function () {
 							req.session.cookie.maxAge = sessionTime;
 						}, updateSessionTimeEvery);
@@ -196,7 +196,7 @@ exports.initScraping_ICE = function (req, res) {
 					dataToIce = {"emitAction" : "LAUNCH_MOBILE","username" : req.session.username,
 								 "apkPath":apkPath,"serial":serial,"mobileDeviceName":mobileDeviceName,
 								 "mobileIosVersion":mobileIosVersion,"mobileUDID":mobileUDID};
-					redisServer.redisPub1.publish('ICE1_' + req.session.username,JSON.stringify(dataToIce));
+					redisServer.redisPub1.publish('ICE1_normal_' + req.session.username,JSON.stringify(dataToIce));
 					var updateSessionExpiry = setInterval(function () {
 							req.session.cookie.maxAge = sessionTime;
 						}, updateSessionTimeEvery);
@@ -239,7 +239,7 @@ exports.initScraping_ICE = function (req, res) {
 					logger.info("Sending socket request for LAUNCH_MOBILE_WEB to redis");
 					dataToIce = {"emitAction" : "LAUNCH_MOBILE_WEB","username" : req.session.username,
 								 "mobileSerial":mobileSerial,"androidVersion":androidVersion};
-					redisServer.redisPub1.publish('ICE1_' + req.session.username,JSON.stringify(dataToIce));
+					redisServer.redisPub1.publish('ICE1_normal_' + req.session.username,JSON.stringify(dataToIce));
 					var updateSessionExpiry = setInterval(function () {
 							req.session.cookie.maxAge = sessionTime;
 						}, updateSessionTimeEvery);
@@ -303,7 +303,7 @@ exports.initScraping_ICE = function (req, res) {
 					*/
 					logger.info("Sending socket request for webscrape to redis");
 					dataToIce = {"emitAction" : "webscrape","username" : req.session.username, "data":data};
-					redisServer.redisPub1.publish('ICE1_' + req.session.username,JSON.stringify(dataToIce));
+					redisServer.redisPub1.publish('ICE1_normal_' + req.session.username,JSON.stringify(dataToIce));
 					var updateSessionExpiry = setInterval(function () {
 							req.session.cookie.maxAge = sessionTime;
 						}, updateSessionTimeEvery);
@@ -396,7 +396,7 @@ exports.highlightScrapElement_ICE = function (req, res) {
 			logger.info("Sending socket request for focus to redis");
 			dataToIce = {"emitAction" : "focus","username" : req.session.username,
 						 "focusParam":focusParam,"elementURL":elementURL,"appType":appType};
-			redisServer.redisPub1.publish('ICE1_' + req.session.username,JSON.stringify(dataToIce));
+			redisServer.redisPub1.publish('ICE1_normal_' + req.session.username,JSON.stringify(dataToIce));
 			var flag = 'success';
 			logger.info("Successfully highlighted selected object");
 			res.send(flag);
@@ -1822,7 +1822,7 @@ exports.debugTestCase_ICE = function (req, res) {
 			if ('allSocketsMap' in myserver && name in myserver.allSocketsMap) {
 			*/
 			//LB: check on redis whether the ice socket is connected to any of the servers
-			redisServer.redisPub1.pubsub('numsub','ICE1_' + req.session.username,function(err,redisres){
+			redisServer.redisPub1.pubsub('numsub','ICE1_normal_' + req.session.username,function(err,redisres){
 				if (redisres[1]==1) {
 				/*commented for LB
 				//var mySocket = myserver.allSocketsMap[name];
@@ -1902,7 +1902,7 @@ exports.debugTestCase_ICE = function (req, res) {
 															*/
 															logger.info("Sending socket request for debugTestCase to redis");
 															dataToIce = {"emitAction" : "debugTestCase","username" : req.session.username, "responsedata":responsedata};
-															redisServer.redisPub1.publish('ICE1_' + req.session.username,JSON.stringify(dataToIce));
+															redisServer.redisPub1.publish('ICE1_normal_' + req.session.username,JSON.stringify(dataToIce));
 															var updateSessionExpiry = setInterval(function () {
 																	req.session.cookie.maxAge = sessionTime;
 																}, updateSessionTimeEvery);
@@ -1963,7 +1963,7 @@ exports.debugTestCase_ICE = function (req, res) {
 							*/
 							logger.info("Sending socket request for debugTestCaseWS_ICE to redis");
 							dataToIce = {"emitAction" : "debugTestCase","username" : req.session.username, "responsedata":testcaseWS};
-							redisServer.redisPub1.publish('ICE1_' + req.session.username,JSON.stringify(dataToIce));
+							redisServer.redisPub1.publish('ICE1_normal_' + req.session.username,JSON.stringify(dataToIce));
 							var updateSessionExpiry = setInterval(function () {
 									req.session.cookie.maxAge = sessionTime;
 								}, updateSessionTimeEvery);
@@ -2050,7 +2050,7 @@ exports.debugTestCase_ICE = function (req, res) {
 							*/
 							logger.info("Sending socket request for debugTestCase to redis");
 							dataToIce = {"emitAction" : "wsdl_listOfOperation","username" : req.session.username, "wsdlurl":wsdlurl};
-							redisServer.redisPub1.publish('ICE1_' + req.session.username,JSON.stringify(dataToIce));	
+							redisServer.redisPub1.publish('ICE1_normal_' + req.session.username,JSON.stringify(dataToIce));	
 							var updateSessionExpiry = setInterval(function () {
 									req.session.cookie.maxAge = sessionTime;
 								}, updateSessionTimeEvery);
@@ -2127,7 +2127,7 @@ exports.debugTestCase_ICE = function (req, res) {
 							*/
 							logger.info("Sending socket request for debugTestCase to redis");
 							dataToIce = {"emitAction" : "wsdl_ServiceGenerator","username" : req.session.username, "serviceGenRequest":serviceGenRequest};
-							redisServer.redisPub1.publish('ICE1_' + req.session.username,JSON.stringify(dataToIce));
+							redisServer.redisPub1.publish('ICE1_normal_' + req.session.username,JSON.stringify(dataToIce));
 							var updateSessionExpiry = setInterval(function () {
 									req.session.cookie.maxAge = sessionTime;
 								}, updateSessionTimeEvery);

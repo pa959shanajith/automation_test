@@ -147,15 +147,22 @@ exports.readTestSuite_ICE = function (req, res) {
 												if (testsuitesindex == requiredreadTestSuite.length) {
 													if (fromFlg == "scheduling") {
 														var connectusers = [];
+														/* Commented for LB
 														if (myserver.allSchedulingSocketsMap != undefined) {
 															connectusers = Object.keys(myserver.allSchedulingSocketsMap);
 															logger.info("IP\'s connected : %s", Object.keys(myserver.allSchedulingSocketsMap).join());
-														}
-														var schedulingDetails = {
-															"connectedUsers": connectusers,
-															"testSuiteDetails": responsedata
-														};
-														responsedata=schedulingDetails;
+														} */
+														redisServer.redisPub1.pubsub('channels','ICE1_scheduling_*',function(err,redisres){
+															redisres.forEach(function(e){
+																connectusers.push(e.split('_')[2]);
+															});
+															logger.info("IP\'s connected : %s", connectusers.join());
+															var schedulingDetails = {
+																"connectedUsers": connectusers,
+																"testSuiteDetails": responsedata
+															};
+															responsedata=schedulingDetails;
+														});
 													}
 												}
 											}
@@ -305,16 +312,23 @@ function readTestSuite_ICE_SVN(req,callback) {
 													if (testsuitesindex == requiredreadTestSuite.length) {
 														if (fromFlg == "scheduling") {
 															var connectusers = [];
+															/* Commented for LB
 															if (myserver.allSchedulingSocketsMap != undefined) {
 																connectusers = Object.keys(myserver.allSchedulingSocketsMap);
 																logger.info("IP\'s connected : %s", Object.keys(myserver.allSchedulingSocketsMap).join());
-															}
-															var schedulingDetails = {
-																"connectedUsers": connectusers,
-																"testSuiteDetails": responsedata
-															};
-															//res(200, schedulingDetails);
-															callback(true);
+															} */
+															redisServer.redisPub1.pubsub('channels','ICE1_scheduling_*',function(err,redisres){
+																redisres.forEach(function(e){
+																	connectusers.push(e.split('_')[2]);
+																});
+																logger.info("IP\'s connected : %s", connectusers.join());
+																var schedulingDetails = {
+																	"connectedUsers": connectusers,
+																	"testSuiteDetails": responsedata
+																};
+																//res(200, schedulingDetails);
+																callback(true);
+															});
 														} else
 															callback(true)
 													}
@@ -737,7 +751,7 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 			var statusPass = 0;
 			var suiteStatus;
 			logger.info("ICE Socket requesting Address: %s" , name);
-			redisServer.redisPub1.pubsub('numsub','ICE1_' + req.session.username,function(err,redisres){
+			redisServer.redisPub1.pubsub('numsub','ICE1_normal_' + req.session.username,function(err,redisres){
 				if (redisres[1]==1) {
 					/*commented for LB
 					if ('allSocketsMap' in myserver && name in myserver.allSocketsMap) {
@@ -746,7 +760,7 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 					mySocket.emit('executeTestSuite', executionRequest);*/
 					logger.info("Sending socket request for executeTestSuite to redis");
 					dataToIce = {"emitAction" : "executeTestSuite","username" : req.session.username, "executionRequest": executionRequest};
-					redisServer.redisPub1.publish('ICE1_' + req.session.username,JSON.stringify(dataToIce));
+					redisServer.redisPub1.publish('ICE1_normal_' + req.session.username,JSON.stringify(dataToIce));
 					var updateSessionExpiry = setInterval(function () {
 							req.session.cookie.maxAge = sessionTime;
 						}, updateSessionTimeEvery);
@@ -897,7 +911,15 @@ exports.getListofScheduledSocketMap = function (req, res) {
 			}
 			if(validUser){
 				logger.info("Inside UI service: getListofScheduledSocketMap authentication pass");
-				res.send({ "status": "success", "username": Object.keys(myserver.allSchedulingSocketsMap),"validation": "Passed"});
+				// Commented for LB
+				// res.send({ "status": "success", "username": Object.keys(myserver.allSchedulingSocketsMap),"validation": "Passed"});
+				var connectusers = [];
+				redisServer.redisPub1.pubsub('channels','ICE1_scheduling_*',function(err,redisres){
+					redisres.forEach(function(e){
+						connectusers.push(e.split('_')[2]);
+					});
+					res.send({ "status": "success", "username": connectusers,"validation": "Passed"});
+				});
 			}else{
 				logger.info("Inside UI service: getListofScheduledSocketMap authentication failed");
 				res.send({ "status": "fail", "username": "", "validation": "failed" });
@@ -1192,7 +1214,7 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 									var completedSceCount = 0;
 									var statusPass = 0;
 									var suiteStatus;
-									redisServer.redisPub1.pubsub('numsub','ICE1_' + req.session.username,function(err,redisres){
+									redisServer.redisPub1.pubsub('numsub','ICE1_normal_' + req.session.username,function(err,redisres){
 										if (redisres[1]==1) {
 											/* Commented for LB
 											if ('allSocketsMap' in myserver && name in myserver.allSocketsMap) {
@@ -1463,7 +1485,7 @@ exports.ExecuteTestSuite_ICE_CI = function (req, res) {
 			var statusPass = 0;
 			var suiteStatus;
 			logger.info("ICE Socket requesting Address: %s" , name);
-			redisServer.redisPub1.pubsub('numsub','ICE1_' + req.session.username,function(err,redisres){
+			redisServer.redisPub1.pubsub('numsub','ICE1_normal_' + req.session.username,function(err,redisres){
 				if (redisres[1]==1) {
 					/*commented for LB
 					if ('allSocketsMap' in myserver && name in myserver.allSocketsMap) {
@@ -1472,7 +1494,7 @@ exports.ExecuteTestSuite_ICE_CI = function (req, res) {
 					mySocket.emit('executeTestSuite', executionRequest); */
 					logger.info("Sending socket request for executeTestSuite to redis");
 					dataToIce = {"emitAction" : "executeTestSuite","username" : req.session.username, "executionRequest": executionRequest};
-					redisServer.redisPub1.publish('ICE1_' + req.session.username,JSON.stringify(dataToIce));
+					redisServer.redisPub1.publish('ICE1_normal_' + req.session.username,JSON.stringify(dataToIce));
 					var updateSessionExpiry = setInterval(function () {
 							req.session.cookie.maxAge = sessionTime;
 						}, updateSessionTimeEvery);
@@ -2658,13 +2680,16 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 							var statusPass_s = 0;
 							var suiteStatus_s;
 							logger.info("ICE Socket requesting Address: %s" , name);
-							redisServer.redisPub1.pubsub('numsub','ICE1_' + req.session.username,function(err,redisres){
+							redisServer.redisPub1.pubsub('numsub','ICE1_scheduling_' + req.session.username,function(err,redisres){
 								if (redisres[1]==1) {
 									/* Commented for LB
 									if ('allSchedulingSocketsMap' in myserver && name in myserver.allSchedulingSocketsMap) {
 									var mySocket = myserver.allSchedulingSocketsMap[name];
 									mySocket._events.result_executeTestSuite = [];
 									mySocket.emit('executeTestSuite', executionRequest); */
+									logger.info("Sending socket request for executeTestSuite to redis");
+									dataToIce = {"emitAction" : "executeTestSuite","username" : req.session.username, "executionRequest": executionRequest};
+									redisServer.redisPub1.publish('ICE1_scheduling_' + req.session.username,JSON.stringify(dataToIce));
 									var starttime = new Date().getTime();
 									var updateSessionExpiry = setInterval(function () {
 										req.session.cookie.maxAge = sessionTime;

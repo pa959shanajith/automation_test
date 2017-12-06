@@ -66,7 +66,7 @@ exports.openScreenShot = function (req, res) {
 		var name = req.session.username;
 		logger.info("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
 		logger.info("ICE Socket requesting Address: %s" , name);
-		redisServer.redisPub1.pubsub('numsub','ICE1_' + req.session.username,function(err,redisres){
+		redisServer.redisPub1.pubsub('numsub','ICE1_normal_' + req.session.username,function(err,redisres){
 			if (redisres[1]==1) {
 				/* Commented for LB
 				if ('allSocketsMap' in myserver && name in myserver.allSocketsMap) {
@@ -76,7 +76,7 @@ exports.openScreenShot = function (req, res) {
 				*/
 				logger.info("Sending socket request for render_screenshot to redis");
 				dataToIce = {"emitAction" : "render_screenshot","username" : req.session.username, "path":path};
-				redisServer.redisPub1.publish('ICE1_' + req.session.username,JSON.stringify(dataToIce));
+				redisServer.redisPub1.publish('ICE1_normal_' + req.session.username,JSON.stringify(dataToIce));
 				var updateSessionExpiry = setInterval(function () {
 						req.session.cookie.maxAge = sessionTime;
 					}, updateSessionTimeEvery);
@@ -1070,7 +1070,7 @@ exports.connectJira_ICE = function (req, res) {
 						var name = req.session.username;
 						logger.info("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
 						logger.info("ICE Socket requesting Address: %s" , name);
-						redisServer.redisPub1.pubsub('numsub','ICE1_' + req.session.username,function(err,redisres){
+						redisServer.redisPub1.pubsub('numsub','ICE1_normal_' + req.session.username,function(err,redisres){
 							if (redisres[1]==1) {
 								/* Commented for LB
 								if ('allSocketsMap' in myserver && name in myserver.allSocketsMap) {
@@ -1079,7 +1079,7 @@ exports.connectJira_ICE = function (req, res) {
 								mySocket.emit('jiralogin',req.body.action,inputs);*/
 								logger.info("Sending socket request for jira_login to redis");
 								dataToIce = {"emitAction": "jira_login", "username": req.session.username, "action": req.body.action, "inputs": inputs};
-								redisServer.redisPub1.publish('ICE1_' + req.session.username,JSON.stringify(dataToIce));
+								redisServer.redisPub1.publish('ICE1_normal_' + req.session.username,JSON.stringify(dataToIce));
 								var updateSessionExpiry = setInterval(function () {
 									req.session.cookie.maxAge = sessionTime;
 								}, updateSessionTimeEvery);
@@ -1157,7 +1157,7 @@ exports.connectJira_ICE = function (req, res) {
 						var name = req.session.username;
 						logger.info("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
 						logger.info("ICE Socket requesting Address: %s" , name);
-						redisServer.redisPub1.pubsub('numsub','ICE1_' + req.session.username,function(err,redisres){
+						redisServer.redisPub1.pubsub('numsub','ICE1_normal_' + req.session.username,function(err,redisres){
 							if (redisres[1]==1) {
 								/* Commented for LB
 								if ('allSocketsMap' in myserver && name in myserver.allSocketsMap) {
@@ -1167,7 +1167,7 @@ exports.connectJira_ICE = function (req, res) {
 								mySocket.emit('jiralogin',req.body.action,createObj);*/
 								logger.info("Sending socket request for jira_login to redis");
 								dataToIce = {"emitAction": "jira_login", "username": req.session.username, "action": req.body.action, "inputs": createObj};
-								redisServer.redisPub1.publish('ICE1_' + req.session.username,JSON.stringify(dataToIce));
+								redisServer.redisPub1.publish('ICE1_normal_' + req.session.username,JSON.stringify(dataToIce));
 								var updateSessionExpiry = setInterval(function () {
 									req.session.cookie.maxAge = sessionTime;
 								}, updateSessionTimeEvery);

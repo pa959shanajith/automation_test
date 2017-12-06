@@ -12,8 +12,9 @@ var mySocket, dataToNode;
 sub1.on("message", function (channel, message) {
 	logger.debug("channel is %s", channel);
 	data = JSON.parse(message);
+	var socketchannel = channel.split('_')[1];
 	var sockets = require('./socket.js');
-	if (data.mapobj === "scheduling")
+	if (socketchannel === "scheduling")
 		mySocket = sockets.allSchedulingSocketsMap[data.username];
 	else
 		mySocket = sockets.allSocketsMap[data.username];

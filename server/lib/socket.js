@@ -76,7 +76,7 @@ io.on('connection', function (socket) {
 						logger.info("NO. OF CLIENTS CONNECTED: %d", Object.keys(socketMap).length);
 						logger.info("IP\'s connected : %s", Object.keys(socketMap).join());
 						socket.emit('update_screenshot_path', screenShotPath);
-						redisServer.redisSub1.subscribe('ICE1_' + address, 1);
+						redisServer.redisSub1.subscribe('ICE1_normal_' + address, 1);
 					}
 				}
 			}
@@ -103,12 +103,12 @@ io.on('connection', function (socket) {
 			logger.info("Disconnecting from Notification socket: %s", address);
 		} else {
 			var connect_flag = false;
-			redisServer.redisSub1.unsubscribe('ICE1_' + address);
 			logger.info("Inside ICE Socket disconnection");
 			var address = socket.handshake.query['username'];
 			if (socketMap[address] != undefined) {
 				connect_flag = true;
 				logger.info('Disconnecting from ICE socket : %s', address);
+				redisServer.redisSub1.unsubscribe('ICE1_normal_' + address,1);
 				delete socketMap[address];
 				module.exports.allSocketsMap = socketMap;
 				logger.info("NO. OF CLIENTS CONNECTED: %d", Object.keys(socketMap).length);
@@ -116,6 +116,7 @@ io.on('connection', function (socket) {
 			} else if (sokcetMapScheduling[address] != undefined) {
 				connect_flag = true;
 				logger.info('Disconnecting from Scheduling socket : %s', address);
+				redisServer.redisSub1.unsubscribe('ICE1_scheduling_' + address,1);
 				delete sokcetMapScheduling[address];
 				module.exports.allSchedulingSocketsMap = sokcetMapScheduling;
 				logger.info(": %d", Object.keys(sokcetMapScheduling).length);
@@ -152,6 +153,8 @@ io.on('connection', function (socket) {
 		logger.info("Scheduling Mode Enabled for  IP: %s", ip);
 		var address = socket.handshake.query['username'];
 		if (data && socketMap[address] != undefined) {
+			redisServer.redisSub1.unsubscribe('ICE1_normal_' + address,1);
+			redisServer.redisSub1.subscribe('ICE1_scheduling_' + address,1);
 			logger.info('Disconnecting socket connection for Normal Mode(ICE Socket) : %s', address);
 			delete socketMap[address];
 			module.exports.allSocketsMap = socketMap;
@@ -163,6 +166,8 @@ io.on('connection', function (socket) {
 			logger.info("No. OF CLIENTS CONNECTED: %d", Object.keys(sokcetMapScheduling).length);
 			logger.info("IP\'s connected :' %s", Object.keys(sokcetMapScheduling).join());
 		} else if (!data && sokcetMapScheduling != undefined) {
+			redisServer.redisSub1.unsubscribe('ICE1_scheduling_' + address,1);
+			redisServer.redisSub1.subscribe('ICE1_normal_' + address,1);
 			logger.info('Disconnecting socket connection for Scheduling mode: %s', address);
 			delete sokcetMapScheduling[address];
 			module.exports.allSchedulingSocketsMap = sokcetMapScheduling;
