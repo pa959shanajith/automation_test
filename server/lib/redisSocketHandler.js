@@ -5,7 +5,7 @@ var redisConfig = globalConfig.redis.split(':');
 redisConfig = {	"host": redisConfig[0],	"port": parseInt(redisConfig[1]) };
 var sub1 = redis.createClient(redisConfig);
 var pub1 = redis.createClient(redisConfig);
-var sub2 = {};
+var sub2 = redis.createClient(redisConfig);
 var pub2 = redis.createClient(redisConfig);
 
 sub1.on("message", function (channel, message) {
@@ -266,4 +266,3 @@ module.exports.redisSub1 = sub1;
 module.exports.redisPub1 = pub1;
 module.exports.redisSub2 = sub2;
 module.exports.redisPub2 = pub2;
-module.exports.redisConfig = redisConfig;

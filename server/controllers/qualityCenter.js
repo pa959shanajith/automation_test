@@ -23,8 +23,8 @@ exports.loginQCServer_ICE = function (req, res) {
 		}
 		if (sessionToken != undefined && req.session.id == sessionToken) {
 			var name = req.session.username;
-			redisServer.redisSub2[name].removeAllListeners('message');
-			redisServer.redisSub2[name].subscribe('ICE2_' + req.session.username,1);
+			//redisServer.redisSub2.removeAllListeners('message');
+			redisServer.redisSub2.subscribe('ICE2_' + name,1);
 			var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 			logger.info("ICE Socket connecting IP: %s" , ip);
 			//console.log("IP:", ip);
@@ -32,22 +32,19 @@ exports.loginQCServer_ICE = function (req, res) {
 			logger.info("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
 			logger.info("ICE Socket requesting Address: %s" , name);
             check_qcUrl = validator.isEmpty(req.body.qcURL);
-            if(check_qcUrl == false)
-            {
+            if(check_qcUrl == false) {
                 validate_qcUrl = true;
             }
             check_qcUsername = validator.isEmpty(req.body.qcUsername);
-            if(check_qcUsername == false)
-            {
+            if(check_qcUsername == false) {
                 validate_qcUsername = true;
             }
             check_qcPassword = validator.isEmpty(req.body.qcPassword);
-            if(check_qcPassword == false)
-            {
+            if(check_qcPassword == false) {
                  validate_qcPassword = true;
             }
 			if(validate_qcUrl == true && validate_qcUsername == true &&  validate_qcPassword == true) {
-				redisServer.redisPub1.pubsub('numsub','ICE1_normal_' + req.session.username,function(err,redisres){
+				redisServer.redisPub1.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
 					// if('allSocketsMap' in myserver && name in myserver.allSocketsMap){
 					if (redisres[1]==1) {
 						var username = req.body.qcUsername;
@@ -65,8 +62,8 @@ exports.loginQCServer_ICE = function (req, res) {
 						mySocket._events.qcresponse = [];
 						mySocket.emit("qclogin", qcDetails); */
 						logger.info("Sending socket request for qclogin to redis");
-						dataToIce = {"emitAction" : "qclogin","username" : req.session.username, "responsedata":qcDetails};
-						redisServer.redisPub1.publish('ICE1_normal_' + req.session.username,JSON.stringify(dataToIce));
+						dataToIce = {"emitAction" : "qclogin","username" : name, "responsedata":qcDetails};
+						redisServer.redisPub1.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
 						var updateSessionExpiry = setInterval(function () {
 								req.session.cookie.maxAge = sessionTime;
 							}, updateSessionTimeEvery);
@@ -83,23 +80,25 @@ exports.loginQCServer_ICE = function (req, res) {
 								soc.emit("ICEnotAvailable");
 							}
 						}); */
-						redisServer.redisSub2[name].on("message",function (channel,message) {
+						function qclogin_listener(channel,message) {
 							data = JSON.parse(message);
-							if(req.session.username == data.username){
+							if(name == data.username){
+								redisServer.redisSub2.removeListener('message',qclogin_listener);
 								if (data.onAction == "unavailableLocalServer") {
 									logger.error("Error occured in loginQCServer_ICE: Socket Disconnected");
 									if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
 										var soc = myserver.socketMapNotify[name];
 										soc.emit("ICEnotAvailable");
 									}
-								} else {
+								} else if (data.onAction == "qcresponse") {
 									data = data.value;
 									//req.session.cookie.expires = sessionExtend;
 									clearInterval(updateSessionExpiry);
 									res.send(data);
 								}
 							}
-						});
+						};
+						redisServer.redisSub2.on("message",qclogin_listener);
 					} else {
 						logger.info("ICE Socket not Available");
 						try {
@@ -136,12 +135,12 @@ exports.qcProjectDetails_ICE = function (req, res) {
 		}
 		if (sessionToken != undefined && req.session.id == sessionToken) {
 			var name = req.session.username;
-			redisServer.redisSub2[name].removeAllListeners('message');
-			redisServer.redisSub2[name].subscribe('ICE2_' + req.session.username,1);
+			//redisServer.redisSub2.removeAllListeners('message');
+			redisServer.redisSub2.subscribe('ICE2_' + name,1);
 			//var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 			logger.info("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
 			logger.info("ICE Socket requesting Address: %s" , name);
-			redisServer.redisPub1.pubsub('numsub','ICE1_normal_' + req.session.username,function(err,redisres){
+			redisServer.redisPub1.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
 				/* Commented for LB
 				if ('allSocketsMap' in myserver && name in myserver.allSocketsMap) {
 					var mySocket = myserver.allSocketsMap[name]; */
@@ -158,8 +157,8 @@ exports.qcProjectDetails_ICE = function (req, res) {
 						mySocket._events.qcresponse = [];
 						mySocket.emit("qclogin", qcDetails); */
 						logger.info("Sending socket request for qclogin to redis");
-						dataToIce = {"emitAction" : "qclogin","username" : req.session.username, "responsedata":qcDetails};
-						redisServer.redisPub1.publish('ICE1_normal_' + req.session.username,JSON.stringify(dataToIce));
+						dataToIce = {"emitAction" : "qclogin","username" : name, "responsedata":qcDetails};
+						redisServer.redisPub1.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
 						var updateSessionExpiry = setInterval(function () {
 								req.session.cookie.maxAge = sessionTime;
 							}, updateSessionTimeEvery);
@@ -183,16 +182,17 @@ exports.qcProjectDetails_ICE = function (req, res) {
 								soc.emit("ICEnotAvailable");
 							}
 						}); */
-						redisServer.redisSub2[name].on("message",function (channel,message) {
+						function qclogin_listener(channel,message) {
 							data = JSON.parse(message);
-							if(req.session.username == data.username){
+							if(name == data.username){
+								redisServer.redisSub2.removeListener('message',qclogin_listener);
 								if (data.onAction == "unavailableLocalServer") {
 									logger.error("Error occured in qcProjectDetails_ICE: Socket Disconnected");
 									if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
 										var soc = myserver.socketMapNotify[name];
 										soc.emit("ICEnotAvailable");
 									}
-								} else {
+								} else if (data.onAction == "qcresponse") {
 									data = data.value;
 									//req.session.cookie.expires = sessionExtend;
 									clearInterval(updateSessionExpiry);
@@ -206,7 +206,8 @@ exports.qcProjectDetails_ICE = function (req, res) {
 									}
 								}
 							}
-						});
+						};
+						redisServer.redisSub2.on("message",qclogin_listener);
 					});
 				} else {
 					logger.info("ICE Socket not Available");
@@ -359,11 +360,11 @@ exports.qcFolderDetails_ICE = function (req, res) {
 		}
 		if (sessionToken != undefined && req.session.id == sessionToken) {
 			var name = req.session.username;
-			redisServer.redisSub2[name].removeAllListeners('message');
-			redisServer.redisSub2[name].subscribe('ICE2_' + req.session.username,1);
+			//redisServer.redisSub2.removeAllListeners('message');
+			redisServer.redisSub2.subscribe('ICE2_' + name,1);
 			logger.info("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
 			logger.info("ICE Socket requesting Address: %s" , name);
-			redisServer.redisPub1.pubsub('numsub','ICE1_normal_' + req.session.username,function(err,redisres){
+			redisServer.redisPub1.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
 				if (redisres[1]==1) {
 					/* Commented for LB
 					if ('allSocketsMap' in myserver && name in myserver.allSocketsMap) {
@@ -371,8 +372,8 @@ exports.qcFolderDetails_ICE = function (req, res) {
 					mySocket._events.qcresponse = [];
 					mySocket.emit("qclogin", req.body); */
 					logger.info("Sending socket request for qclogin to redis");
-					dataToIce = {"emitAction" : "qclogin","username" : req.session.username, "responsedata":qcDetails};
-					redisServer.redisPub1.publish('ICE1_normal_' + req.session.username,JSON.stringify(dataToIce));
+					dataToIce = {"emitAction" : "qclogin","username" : name, "responsedata":qcDetails};
+					redisServer.redisPub1.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
 					var updateSessionExpiry = setInterval(function () {
 							req.session.cookie.maxAge = sessionTime;
 						}, updateSessionTimeEvery);
@@ -389,23 +390,25 @@ exports.qcFolderDetails_ICE = function (req, res) {
 							soc.emit("ICEnotAvailable");
 						}
 					}); */
-					redisServer.redisSub2[name].on("message",function (channel,message) {
+					function qclogin_listener(channel,message) {
 						data = JSON.parse(message);
-						if(req.session.username == data.username){
+						if(name == data.username){
+							redisServer.redisSub2.removeListener('message',qclogin_listener);
 							if (data.onAction == "unavailableLocalServer") {
 								logger.error("Error occured in qcFolderDetails_ICE: Socket Disconnected");
 								if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
 									var soc = myserver.socketMapNotify[name];
 									soc.emit("ICEnotAvailable");
 								}
-							} else {
+							} else if (data.onAction == "qcresponse") {
 								data = data.value;
 								//req.session.cookie.expires = sessionExtend;
 								clearInterval(updateSessionExpiry);
 								res.send(data);
 							}
 						}
-					});
+					};
+					redisServer.redisSub2.on("message",qclogin_listener);
 				} else {
 					logger.info("ICE Socket not Available");
 					try {
@@ -416,7 +419,7 @@ exports.qcFolderDetails_ICE = function (req, res) {
 				}
 			});
 		} else {
-				logger.info("Invalid Session");
+			logger.info("Invalid Session");
 			res.send("Invalid Session");
 		}
 	} catch (exception) {

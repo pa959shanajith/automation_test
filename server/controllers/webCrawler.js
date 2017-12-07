@@ -13,8 +13,7 @@ exports.getCrawlResults = function (req, res) {
 		}
 		if (sessionToken != undefined && req.session.id == sessionToken) {
 			var name = req.session.username;
-			redisServer.redisSub2[name].removeAllListeners('message');
-			redisServer.redisSub2[name].subscribe('ICE2_' + req.session.username ,1);	
+			redisServer.redisSub2.subscribe('ICE2_' + name ,1);	
 			var input_url = req.body.url;
 			var level = req.body.level;
 			var agent = req.body.agent;
@@ -39,7 +38,7 @@ exports.getCrawlResults = function (req, res) {
 				//logger.info("IP:",ip);
 				logger.info("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
 				logger.info("ICE Socket requesting Address: %s", name);
-				redisServer.redisPub1.pubsub('numsub','ICE1_normal_' + req.session.username,function(err,redisres){
+				redisServer.redisPub1.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
 					if (redisres[1]==1) {
 						/* Commented for LB
 						if ('allSocketsMap' in myserver && name in myserver.allSocketsMap) {
@@ -74,13 +73,14 @@ exports.getCrawlResults = function (req, res) {
 						});
 						*/
 						logger.info("Sending socket request for webCrawlerGo to redis");
-						dataToIce = {"emitAction" : "webCrawlerGo","username" : req.session.username, "input_url":input_url, "level" : level, "agent" :agent};
-						redisServer.redisPub1.publish('ICE1_normal_' + req.session.username,JSON.stringify(dataToIce));
-						redisServer.redisSub2[name].on("message",function (channel,message) {
+						dataToIce = {"emitAction" : "webCrawlerGo","username" : name, "input_url":input_url, "level" : level, "agent" :agent};
+						redisServer.redisPub1.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
+						function webCrawlerGo_listener(channel,message) {
 							data = JSON.parse(message);
-							if(req.session.username == data.username){
+							if(name == data.username){
 								var value = data.value;
 								if (data.onAction == "unavailableLocalServer") {
+									redisServer.redisSub2.removeListener('message',webCrawlerGo_listener);	
 									logger.error("Error occured in getCrawlResults: Socket Disconnected");
 									if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
 										var soc = myserver.socketMapNotify[name];
@@ -94,6 +94,7 @@ exports.getCrawlResults = function (req, res) {
 										logger.error(exception);
 									}
 								} else if (data.onAction == "result_web_crawler_finished") {
+									redisServer.redisSub2.removeListener('message',webCrawlerGo_listener);	
 									try {
 										var mySocketUI = myserver.allSocketsMapUI[name];
 										mySocketUI.emit("endData", value);
@@ -104,13 +105,15 @@ exports.getCrawlResults = function (req, res) {
 									}
 								}
 							}
-						});
+						};
+						redisServer.redisSub2.on("message",webCrawlerGo_listener);
 					} else {
 						logger.info("ICE socket not available for Address : %s", name);
 						res.send("unavailableLocalServer");
 					}
 				});
-			} else {
+			} 
+			else {
 				res.send('unavailableLocalServer');
 			}
 		} else {
