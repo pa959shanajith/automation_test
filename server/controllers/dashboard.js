@@ -1,7 +1,7 @@
 // @author : Mukul Saini
 var Client = require("node-rest-client").Client;
 var client = new Client();
-var epurl="http://127.0.0.1:1990/";
+var epurl = "http://"+process.env.NDAC_IP+":"+process.env.NDAC_PORT+"/";
 var async = require('async');
 var fs = require('fs');
 var https = require('https');
@@ -27,10 +27,11 @@ var  logger = require('../../logger');
     logger.info("Inside UI service: loadDashboard")
     try {
       if(isSessionActive(req, res)){
-        var IP = req.headers.host.split(":")[0];
-        //req.connection.servername;//localAddress.split(":")[req.connection.localAddress.split(":").length-1];
-        logger.info("Connecting to jsreport client from loadDashboard_2");
-        var client = require("jsreport-client")("https://"+IP+":8001/");
+        logger.info("Connecting to jsreport client from loadDashboard");
+		var host = req.headers.host.split(":"); //req.connection.servername;//localAddress.split(":")[req.connection.localAddress.split(":").length-1];
+		if (host.length>1) reportAddr="https://" + host[0] + ":" + host[1] + "/reportServer/";
+		else reportAddr = "https://" + host[0] + "/reportServer/";
+		var client = require("jsreport-client")(reportAddr);
         client.render({
           template: {
             shortid: "ByCt0KGo-",
@@ -289,10 +290,11 @@ var  logger = require('../../logger');
     logger.info("Inside UI service: loadDashboard_2");
     try {
       if(isSessionActive(req, res)){
-        var IP = req.headers.host.split(":")[0];
-        //req.connection.servername;//localAddress.split(":")[req.connection.localAddress.split(":").length-1];
         logger.info("Connecting to jsreport client from loadDashboard_2");
-        var client = require("jsreport-client")("https://"+IP+":8001/");
+		var host = req.headers.host.split(":"); //req.connection.servername;//localAddress.split(":")[req.connection.localAddress.split(":").length-1];
+		if (host.length>1) reportAddr="https://" + host[0] + ":" + host[1] + "/reportServer/";
+		else reportAddr = "https://" + host[0] + "/reportServer/";
+		var client = require("jsreport-client")(reportAddr);
         client.render({
           template: {
             shortid: "rk00qKOn-",

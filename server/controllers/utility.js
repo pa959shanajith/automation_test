@@ -1,8 +1,8 @@
-var myserver = require('../../server.js');
+var myserver = require('../../server');
 // var PythonShell = require('python-shell');
 var Client = require("node-rest-client").Client;
 var client = new Client();
-var epurl="http://127.0.0.1:1990/";
+var epurl = "http://"+process.env.NDAC_IP+":"+process.env.NDAC_PORT+"/";
 var sessionExtend = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes 
 var sessionTime = 30 * 60 * 1000;
 var updateSessionTimeEvery = 20 * 60 * 1000;

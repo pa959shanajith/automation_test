@@ -1,4 +1,4 @@
-var myserver = require('../lib/socket.js');
+var myserver = require('../lib/socket');
 var validator = require('validator');
 var logger = require('../../logger');
 var redisServer = require('../lib/redisSocketHandler');

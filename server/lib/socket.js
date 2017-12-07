@@ -7,11 +7,11 @@ var sokcetMapScheduling = {};
 var socketMapNotify = {};
 var isUISocketRequest = false;
 
-var myserver = require('./../../server.js');
+var myserver = require('./../../server');
 var httpsServer = myserver.httpsServer;
 var io = require('socket.io')(httpsServer);
-var notificationMsg = require('./../notifications/notifyMessages.js');
-
+var notificationMsg = require('./../notifications/notifyMessages');
+var epurl = "http://"+process.env.NDAC_IP+":"+process.env.NDAC_PORT+"/";
 var Client = require("node-rest-client").Client;
 var apiclient = new Client();
 
@@ -52,7 +52,7 @@ io.on('connection', function (socket) {
 			}
 		};
 		logger.info("Calling NDAC Service: updateActiveIceSessions");
-		apiclient.post("http://127.0.0.1:1990/server/updateActiveIceSessions", args,
+		apiclient.post(epurl+"server/updateActiveIceSessions", args,
 		function (result, response) {
 			if (response.statusCode != 200) {
 				logger.error("Error occured in updateActiveIceSessions Error Code: ERRNDAC");
@@ -121,7 +121,7 @@ io.on('connection', function (socket) {
 					}
 				};
 				logger.info("Calling NDAC Service: updateActiveIceSessions");
-				apiclient.post("http://127.0.0.1:1990/server/updateActiveIceSessions", args,
+				apiclient.post(epurl+"server/updateActiveIceSessions", args,
 					function (result, response) {
 					if (response.statusCode != 200 || result.rows == "fail") {
 						logger.error("Error occured in updateActiveIceSessions Error Code: ERRNDAC");

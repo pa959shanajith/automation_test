@@ -5,8 +5,7 @@ var async = require('async');
 var myserver = require('../lib/socket');
 var Client = require("node-rest-client").Client;
 var client = new Client();
-var epurl = "http://127.0.0.1:1990/";
-var sessionExtend = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes 
+var epurl = "http://"+process.env.NDAC_IP+":"+process.env.NDAC_PORT+"/";
 var sessionTime = 30 * 60 * 1000;
 var updateSessionTimeEvery = 20 * 60 * 1000;
 var validator =  require('validator');
@@ -23,7 +22,7 @@ exports.getMainReport_ICE = function (req, res) {
 			sessionToken = sessionToken[1];
 		}
 		if (sessionToken != undefined && req.session.id == sessionToken) {
-			var host = req.headers.host.split(":"); //req.connection.servername;//localAddress.split(":")[req.connection.localAddress.split(":").length-1];
+			var host = req.headers.host.split(":");
 			if (host.length>1) reportAddr="https://" + host[0] + ":" + host[1] + "/reportServer/";
 			else reportAddr = "https://" + host[0] + "/reportServer/";
 			var client = require("jsreport-client")(reportAddr);
@@ -124,7 +123,7 @@ exports.renderReport_ICE = function (req, res) {
 			var shortId = "rkE973-5l";
 			if (reportType != "html")
 				shortId = "H1Orcdvhg";
-			var host = req.headers.host.split(":"); //req.connection.servername;//localAddress.split(":")[req.connection.localAddress.split(":").length-1];
+			var host = req.headers.host.split(":");
 			if (host.length>1) reportAddr="https://" + host[0] + ":" + host[1] + "/reportServer/";
 			else reportAddr = "https://" + host[0] + "/reportServer/";
 			var client = require("jsreport-client")(reportAddr);

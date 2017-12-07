@@ -5,10 +5,12 @@
 var uuid = require('uuid-random');
 var async = require('async');
 var Client = require("node-rest-client").Client;
-var neo4jAPI = require('../controllers/neo4jAPI');
-var  logger = require('../../logger');
 var client = new Client();
+var neo4jAPI = require('../controllers/neo4jAPI');
+var logger = require('../../logger');
+var epurl = "http://"+process.env.NDAC_IP+":"+process.env.NDAC_PORT+"/";
 var qList=[]; //For neurongraphs
+
 function get_moduleName(moduleId, cb, data) {
 	logger.info("Inside the function get_moduleName");
 	var obj = {
@@ -27,7 +29,7 @@ function get_moduleName(moduleId, cb, data) {
 		}
 	};
 	logger.info("Calling NDAC Service from get_moduleName: create_ice/getNames_Ninteen68");
-	client.post("http://127.0.0.1:1990/create_ice/getNames_Ninteen68", args,
+	client.post(epurl+"create_ice/getNames_Ninteen68", args,
 		function (modulename, response) {
 		if (response.statusCode != 200 || modulename.rows == "fail") {
 			logger.error("Error occured in create_ice/getNames_Ninteen68: get_moduleName, Error Code : ERRNDAC");
@@ -60,7 +62,7 @@ function get_screenName(screenId, cb, data) {
 		}
 	};
 	logger.info("Calling NDAC Service from get_screenName: create_ice/getNames_Ninteen68");
-	client.post("http://127.0.0.1:1990/create_ice/getNames_Ninteen68", args,
+	client.post(epurl+"create_ice/getNames_Ninteen68", args,
 		function (screenname, response) {
 		if (response.statusCode != 200 || screenname.rows == "fail") {
 			logger.error("Error occured in create_ice/getNames_Ninteen68: get_screenName, Error Code : ERRNDAC");
@@ -92,7 +94,7 @@ function get_scenarioName(testscenarioId, cb, data) {
 		}
 	};
 	logger.info("Calling NDAC Service from get_scenarioName: create_ice/getNames_Ninteen68");
-	client.post("http://127.0.0.1:1990/create_ice/getNames_Ninteen68", args,
+	client.post(epurl+"create_ice/getNames_Ninteen68", args,
 		function (testscenarioname, response) {
 		if (response.statusCode != 200 || testscenarioname.rows == "fail") {
 			logger.error("Error occured in create_ice/getNames_Ninteen68: get_scenarioName, Error Code : ERRNDAC");
@@ -124,7 +126,7 @@ function get_testcaseName(testcaseId, cb, data) {
 		}
 	};
 	logger.info("Calling NDAC Service from get_testcaseName: create_ice/getNames_Ninteen68");
-	client.post("http://127.0.0.1:1990/create_ice/getNames_Ninteen68", args,
+	client.post(epurl+"create_ice/getNames_Ninteen68", args,
 		function (testcasename, response) {
 		if (response.statusCode != 200 || testcasename.rows == "fail") {
 			logger.error("Error occured in create_ice/getNames_Ninteen68: get_testcaseName, Error Code : ERRNDAC");
@@ -312,7 +314,7 @@ exports.createStructure_Nineteen68 = function (req, res) {
 					}
 				};
 				logger.info("Calling NDAC Service from projectsUnderDomain "+suite_query+": create_ice/insertInSuite_ICE");
-				client.post("http://127.0.0.1:1990/create_ice/insertInSuite_ICE", args,
+				client.post(epurl+"create_ice/insertInSuite_ICE", args,
 					function (result, response) {
 					if (response.statusCode != 200 || result.rows == "fail") {
 						logger.error("Error occured in create_ice/insertInSuite_ICE: projectsUnderDomain, Error Code : ERRNDAC");
@@ -385,7 +387,7 @@ exports.createStructure_Nineteen68 = function (req, res) {
 									}
 								};
 								logger.info("Calling NDAC Service from projectsUnderDomain "+suite_query+": create_ice/insertInSuite_ICE");
-								client.post("http://127.0.0.1:1990/create_ice/insertInScenarios_ICE", args,
+								client.post(epurl+"create_ice/insertInScenarios_ICE", args,
 									function (result, response) {
 									if (response.statusCode != 200 || result.rows == "fail") {
 										logger.error("Error occured in create_ice/insertInSuite_ICE: projectsUnderDomain, Error Code : ERRNDAC");
@@ -393,14 +395,14 @@ exports.createStructure_Nineteen68 = function (req, res) {
 										//Execute neo4j query!!
 										if(scenario_query=='notflagscenarios'){
 											//Execute neo4j query!!
-											qList.push({"statement":"MERGE (n:TESTSCENARIOS_NG {projectid:'"+projectid+"',testscenarioname:'"+scenarioName+"',testscenarioid:'"+scenarioId+"',testcaseids:[]}) SET n.deleted='false' return n"})
+											qList.push({"statement":"MERGE (n:TESTSCENARIOS_NG {projectid:'"+projectid+"',testscenarioname:'"+scenarioName+"',testscenarioid:'"+scenarioId+"',testcaseids:[]}) SET n.deleted='false' return n"});
 											//Add relationship between scenario and testsuite
-											qList.push({"statement":"MATCH (a:TESTSUITES_NG),(b:TESTSCENARIOS_NG{testscenarioid:'"+scenarioId+"'}) WHERE '"+scenarioId+"' IN a.testscenarioids MERGE (a)-[r:FTSUTTSC_NG{id:'"+scenarioId+"'}]->(b)RETURN a,b,r"})
+											qList.push({"statement":"MATCH (a:TESTSUITES_NG),(b:TESTSCENARIOS_NG{testscenarioid:'"+scenarioId+"'}) WHERE '"+scenarioId+"' IN a.testscenarioids MERGE (a)-[r:FTSUTTSC_NG{id:'"+scenarioId+"'}]->(b)RETURN a,b,r"});
 											
-											qList.push({"statement":"MATCH (a:TESTSCENARIOS_NG{testscenarioid:'"+scenarioId+"'}),(b:TESTCASES_NG) WHERE b.testcaseid IN a.testcaseids MERGE (a)-[r:FTSCTTCE_NG{id:b.testcaseid}]->(b) RETURN a,r,b"})
+											qList.push({"statement":"MATCH (a:TESTSCENARIOS_NG{testscenarioid:'"+scenarioId+"'}),(b:TESTCASES_NG) WHERE b.testcaseid IN a.testcaseids MERGE (a)-[r:FTSCTTCE_NG{id:b.testcaseid}]->(b) RETURN a,r,b"});
 										}
 										else if(scenario_query=='deletescenarios')
-											qList.push({"statement":"MATCH (n: TESTSCENARIOS_NG { testscenarioname: '"+scenarioName+"',testscenarioid: '"+scenarioId+"' }) set n.testcaseids=[]"})
+											qList.push({"statement":"MATCH (n: TESTSCENARIOS_NG { testscenarioname: '"+scenarioName+"',testscenarioid: '"+scenarioId+"' }) set n.testcaseids=[]"});
 
 										scenarioidlist.push(scenarioId);
 										var screen = iterator.screenDetails;
@@ -469,16 +471,16 @@ exports.createStructure_Nineteen68 = function (req, res) {
 													}
 												};
 												logger.info("Calling NDAC Service from createStructure_Nineteen68: create_ice/insertInScreen_ICE");
-												client.post("http://127.0.0.1:1990/create_ice/insertInScreen_ICE", args,
+												client.post(epurl+"create_ice/insertInScreen_ICE", args,
 													function (result, response) {
 													if (response.statusCode != 200 || result.rows == "fail") {
 														logger.error("Error occured in create_ice/insertInScreen_ICE: createStructure_Nineteen68");
 													} else {
                                                         //Execute neo4j query!!
                                                         if(screen_query=='notflagscreen'){
-                                                            qList.push({"statement":"MERGE (n:SCREENS_NG {projectid:'"+projectid+"',screenname:'"+screenName+"',screenid:'"+screenId+"'}) SET n.deleted='false' return n"})
+                                                            qList.push({"statement":"MERGE (n:SCREENS_NG {projectid:'"+projectid+"',screenname:'"+screenName+"',screenid:'"+screenId+"'}) SET n.deleted='false' return n"});
                                                             //relationship
-                                                            qList.push({"statement":"MATCH (a:TESTCASES_NG{screenid:'"+screenId+"'}),(b:SCREENS_NG {projectid:'"+projectid+"',screenname:'"+screenName+"',screenid:'"+screenId+"'}) MERGE (a)-[r:FTCETSCR_NG{id:'"+screenId+"'}]->(b) RETURN a,r,b"})
+                                                            qList.push({"statement":"MATCH (a:TESTCASES_NG{screenid:'"+screenId+"'}),(b:SCREENS_NG {projectid:'"+projectid+"',screenname:'"+screenName+"',screenid:'"+screenId+"'}) MERGE (a)-[r:FTCETSCR_NG{id:'"+screenId+"'}]->(b) RETURN a,r,b"});
                                                             //reqToAPI(qList,urlData);
                                                         }
 														var testcase = screenDetails.testcaseDetails;
@@ -548,7 +550,7 @@ exports.createStructure_Nineteen68 = function (req, res) {
 																	}
 																};
 																logger.info("Calling NDAC Service from projectsUnderDomain: create_ice/insertInTestcase_ICE");
-																client.post("http://127.0.0.1:1990/create_ice/insertInTestcase_ICE", args,
+																client.post(epurl+"create_ice/insertInTestcase_ICE", args,
 																	function (result, response) {
 																	if (response.statusCode != 200 || result.rows == "fail") {
 																		logger.error("Error occured in create_ice/insertInTestcase_ICE: createStructure_Nineteen68 service");
@@ -557,8 +559,8 @@ exports.createStructure_Nineteen68 = function (req, res) {
 																		if(testcase_query=='notflagtestcase'){
 																			qList.push({"statement":"MERGE (n:TESTCASES_NG {screenid:'"+screenId+"',testcasename:'"+testcaseName+"',testcaseid:'"+testcaseID+"',versionnumber:'1'}) SET n.deleted='false' return n"});
 																			//Relationship
-																			qList.push({"statement":"MATCH (a:TESTCASES_NG{testcaseid:'"+testcaseID+"'}),(b:SCREENS_NG {screenid:'"+screenId+"'}) MERGE (a)-[r:FTCETSCR_NG{id:'"+screenId+"'}]->(b) RETURN a,r,b"})
-																			qList.push({"statement":"MATCH (a:TESTSCENARIOS_NG),(b:TESTCASES_NG{testcaseid:'"+testcaseID+"'}) WHERE '"+testcaseID+"' IN a.testcaseids MERGE (a)-[r:FTSCTTCE_NG{id:'"+testcaseID+"'}]->(b)RETURN a,r,b"})
+																			qList.push({"statement":"MATCH (a:TESTCASES_NG{testcaseid:'"+testcaseID+"'}),(b:SCREENS_NG {screenid:'"+screenId+"'}) MERGE (a)-[r:FTCETSCR_NG{id:'"+screenId+"'}]->(b) RETURN a,r,b"});
+																			qList.push({"statement":"MATCH (a:TESTSCENARIOS_NG),(b:TESTCASES_NG{testcaseid:'"+testcaseID+"'}) WHERE '"+testcaseID+"' IN a.testcaseids MERGE (a)-[r:FTSCTTCE_NG{id:'"+testcaseID+"'}]->(b)RETURN a,r,b"});
 																		// reqToAPI(qList,urlData);
 																		}
 																		
@@ -580,7 +582,7 @@ exports.createStructure_Nineteen68 = function (req, res) {
 																			}
 																		};
 																		logger.info("Calling NDAC Service from projectsUnderDomain: create_ice/updateTestScenario_ICE");
-																		client.post("http://127.0.0.1:1990/create_ice/updateTestScenario_ICE", args,
+																		client.post(epurl+"create_ice/updateTestScenario_ICE", args,
 																			function (result, response) {
 																			if (response.statusCode != 200 || result.rows == "fail") {
 																				logger.error("Error occured in create_ice/updateTestScenario_ICE: createStructure_Nineteen68 service");
@@ -590,8 +592,8 @@ exports.createStructure_Nineteen68 = function (req, res) {
 																				qList.push({"statement":"MATCH (n:TESTSCENARIOS_NG {projectid:'"+projectid+"',testscenarioname:'"+scenarioName+"',testscenarioid:'"+scenarioId+"'}) SET n.testcaseids=n.testcaseids+['"+testcaseID+"'] return n"});
 																				//Add relationship between scenario and testsuite
 																				//qListR.push({"statement":"MATCH (a:TESTSCENARIOS_NG{testscenarioid:'"+scenarioId+"'})-[r]->(b:TESTCASES_NG) delete r"})
-																				qList.push({"statement":"MATCH (a:TESTSUITES_NG),(b:TESTSCENARIOS_NG{testscenarioid:'"+scenarioId+"'}) WHERE '"+scenarioId+"' IN a.testscenarioids MERGE (a)-[r:FTSUTTSC_NG{id:'"+scenarioId+"'}]->(b)RETURN a,r,b"})
-																				qList.push({"statement":"MATCH (a:TESTSCENARIOS_NG{testscenarioid:'"+scenarioId+"'}),(b:TESTCASES_NG{testcaseid:'"+testcaseID+"'}) MERGE (a)-[r:FTSCTTCE_NG{id:'"+testcaseID+"'}]->(b)RETURN a,r,b"})
+																				qList.push({"statement":"MATCH (a:TESTSUITES_NG),(b:TESTSCENARIOS_NG{testscenarioid:'"+scenarioId+"'}) WHERE '"+scenarioId+"' IN a.testscenarioids MERGE (a)-[r:FTSUTTSC_NG{id:'"+scenarioId+"'}]->(b)RETURN a,r,b"});
+																				qList.push({"statement":"MATCH (a:TESTSCENARIOS_NG{testscenarioid:'"+scenarioId+"'}),(b:TESTCASES_NG{testcaseid:'"+testcaseID+"'}) MERGE (a)-[r:FTSCTTCE_NG{id:'"+testcaseID+"'}]->(b)RETURN a,r,b"});
 																				callback4();
 																			}
 																		});
@@ -635,7 +637,7 @@ exports.createStructure_Nineteen68 = function (req, res) {
 				}
 			};
 			logger.info("Calling NDAC Service from updatescenarioids: create_ice/updateModule_ICE");
-			client.post("http://127.0.0.1:1990/create_ice/updateModule_ICE", args,
+			client.post(epurl+"create_ice/updateModule_ICE", args,
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
 					logger.info("Error occured in create_ice/updateModule_ICE: createStructure_Nineteen68 service");
@@ -697,7 +699,7 @@ function testsuiteid_exists(moduledetails, cb, data) {
 				}
 			};
 			logger.info("Calling NDAC Service from testsuiteid_exists - modulename: create_ice/testsuiteid_exists_ICE");
-			client.post("http://127.0.0.1:1990/create_ice/testsuiteid_exists_ICE", args,
+			client.post(epurl+"create_ice/testsuiteid_exists_ICE", args,
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
 					logger.error("Error occured in create_ice/testsuiteid_exists_ICE: testsuiteid_exists - modulename, Error Code : ERRNDAC");
@@ -732,7 +734,7 @@ function testsuiteid_exists(moduledetails, cb, data) {
 					}
 				};
 				logger.info("Calling NDAC Service from testsuiteid_exists - moduledetails: create_ice/testsuiteid_exists_ICE");
-				client.post("http://127.0.0.1:1990/create_ice/testsuiteid_exists_ICE", args,
+				client.post(epurl+"create_ice/testsuiteid_exists_ICE", args,
 					function (result, response) {
 					if (response.statusCode != 200 || result.rows == "fail") {
 						logger.error("Error occured in create_ice/testsuiteid_exists_ICE: testsuiteid_exists - moduledetails, Error Code : ERRNDAC");
@@ -798,7 +800,7 @@ function updatetestsuitename(moduledetails, cb, data) {
 				}
 			};
 			logger.info("Calling NDAC Service from updatetestsuitename - select: create_ice/get_node_details_ICE");
-			client.post("http://127.0.0.1:1990/create_ice/get_node_details_ICE", args,
+			client.post(epurl+"create_ice/get_node_details_ICE", args,
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
 					logger.error("Error occured in create_ice/get_node_details_ICE: updatetestsuitename Error Code : ERRNDAC");
@@ -828,7 +830,7 @@ function updatetestsuitename(moduledetails, cb, data) {
 					}
 				};
 				logger.info("Calling NDAC Service from updatetestsuitename - delete: create_ice/delete_node_ICE");
-				client.post("http://127.0.0.1:1990/create_ice/delete_node_ICE", args,
+				client.post(epurl+"create_ice/delete_node_ICE", args,
 					function (result, response) {
 					if (response.statusCode != 200 || result.rows == "fail") {
 						logger.error("Error occured in create_ice/delete_node_ICE: updatetestsuitename Error Code : ERRNDAC");
@@ -867,7 +869,7 @@ function updatetestsuitename(moduledetails, cb, data) {
 					}
 				};
 				logger.info("Calling NDAC Service from updatetestsuitename - update: create_ice/updateModulename_ICE");
-				client.post("http://127.0.0.1:1990/create_ice/updateModulename_ICE", args,
+				client.post(epurl+"create_ice/updateModulename_ICE", args,
 					function (result, response) {
 					if (response.statusCode != 200 || result.rows == "fail") {
 						logger.error("Error occured in create_ice/updateModulename_ICE: updatetestsuitename Error Code : ERRNDAC");
@@ -910,7 +912,7 @@ function testscenariosid_exists(testscenariodetails, cb, data) {
 				}
 			};
 			logger.info("Calling NDAC Service from testscenariosid_exists - scenarioname: create_ice/testscenariosid_exists_ICE");
-			client.post("http://127.0.0.1:1990/create_ice/testscenariosid_exists_ICE", args,
+			client.post(epurl+"create_ice/testscenariosid_exists_ICE", args,
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
 					logger.error("Error occured in create_ice/testscenariosid_exists_ICE: testscenariosid_exists Error Code : ERRNDAC");
@@ -943,7 +945,7 @@ function testscenariosid_exists(testscenariodetails, cb, data) {
 					}
 				};
 				logger.info("Calling NDAC Service from testscenariosid_exists - scenariodetails: create_ice/testscenariosid_exists_ICE");
-				client.post("http://127.0.0.1:1990/create_ice/testscenariosid_exists_ICE", args,
+				client.post(epurl+"create_ice/testscenariosid_exists_ICE", args,
 					function (result, response) {
 					if (response.statusCode != 200 || result.rows == "fail") {
 						logger.error("Error occured in create_ice/testscenariosid_exists_ICE: testscenariosid_exists - scenariodetails Error Code : ERRNDAC");
@@ -1007,7 +1009,7 @@ function updatetestscenarioname(testscenariodetails, cb, data) {
 				}
 			};
 			logger.info("Calling NDAC Service from updatetestscenarioname - select: create_ice/get_node_details_ICE");
-			client.post("http://127.0.0.1:1990/create_ice/get_node_details_ICE", args,
+			client.post(epurl+"create_ice/get_node_details_ICE", args,
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
 					logger.error("Error occured in create_ice/get_node_details_ICE: updatetestscenarioname - select, Error Code : ERRNDAC");
@@ -1037,7 +1039,7 @@ function updatetestscenarioname(testscenariodetails, cb, data) {
 					}
 				};
 				logger.info("Calling NDAC Service from updatetestscenarioname - delete: create_ice/delete_node_ICE");
-				client.post("http://127.0.0.1:1990/create_ice/delete_node_ICE", args,
+				client.post(epurl+"create_ice/delete_node_ICE", args,
 					function (result, response) {
 					if (response.statusCode != 200 || result.rows == "fail") {
 						logger.error("Error occured in create_ice/delete_node_ICE: updatetestscenarioname - delete, Error Code : ERRNDAC");
@@ -1080,7 +1082,7 @@ function updatetestscenarioname(testscenariodetails, cb, data) {
 					}
 				};
 				logger.info("Calling NDAC Service from updatetestscenarioname - update: create_ice/updateTestscenarioname_ICE");
-				client.post("http://127.0.0.1:1990/create_ice/updateTestscenarioname_ICE", args,
+				client.post(epurl+"create_ice/updateTestscenarioname_ICE", args,
 					function (result, response) {
 					if (response.statusCode != 200 || result.rows == "fail") {
 						logger.error("Error occured in create_ice/updateTestscenarioname_ICE: updatetestscenarioname - update, Error Code : ERRNDAC");
@@ -1124,7 +1126,7 @@ function testscreen_exists(testscreendetails, cb, data) {
 				}
 			};
 			logger.info("Calling NDAC Service from testscreen_exists - screenname: create_ice/testscreenid_exists_ICE");
-			client.post("http://127.0.0.1:1990/create_ice/testscreenid_exists_ICE", args,
+			client.post(epurl+"create_ice/testscreenid_exists_ICE", args,
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
 					logger.error("Error occured in create_ice/testscreenid_exists_ICE: testscreen_exists - screenname, Error Code : ERRNDAC");
@@ -1157,7 +1159,7 @@ function testscreen_exists(testscreendetails, cb, data) {
 					}
 				};
 				logger.info("Calling NDAC Service from testscreen_exists - screendetails: create_ice/testscreenid_exists_ICE");
-				client.post("http://127.0.0.1:1990/create_ice/testscreenid_exists_ICE", args,
+				client.post(epurl+"create_ice/testscreenid_exists_ICE", args,
 					function (result, response) {
 					if (response.statusCode != 200 || result.rows == "fail") {
 						logger.error("Error occured in create_ice/testscreenid_exists_ICE: testscreen_exists - screendetails, Error Code : ERRNDAC");
@@ -1221,7 +1223,7 @@ function updatetestscreenname(testscreendetails, cb, data) {
 				}
 			};
 			logger.info("Calling NDAC Service from updatetestscreenname - select: create_ice/get_node_details_ICE");
-			client.post("http://127.0.0.1:1990/create_ice/get_node_details_ICE", args,
+			client.post(epurl+"create_ice/get_node_details_ICE", args,
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
 					logger.error("Error occured in create_ice/get_node_details_ICE: updatetestscreenname, Error Code : ERRNDAC");
@@ -1251,7 +1253,7 @@ function updatetestscreenname(testscreendetails, cb, data) {
 					}
 				};
 				logger.info("Calling NDAC Service from updatetestscreenname - delete: create_ice/delete_node_ICE");
-				client.post("http://127.0.0.1:1990/create_ice/delete_node_ICE", args,
+				client.post(epurl+"create_ice/delete_node_ICE", args,
 					function (result, response) {
 					if (response.statusCode != 200 || result.rows == "fail") {
 						logger.error("Error occured in create_ice/delete_node_ICE: updatetestscreenname, Error Code : ERRNDAC");
@@ -1296,7 +1298,7 @@ function updatetestscreenname(testscreendetails, cb, data) {
 					}
 				};
 				logger.info("Calling NDAC Service from updatetestscreenname - update: create_ice/updateScreenname_ICE");
-				client.post("http://127.0.0.1:1990/create_ice/updateScreenname_ICE", args,
+				client.post(epurl+"create_ice/updateScreenname_ICE", args,
 					function (result, response) {
 					if (response.statusCode != 200 || result.rows == "fail") {
 						logger.error("Error occured in create_ice/updateScreenname_ICE: updatetestscreenname, Error Code : ERRNDAC");
@@ -1340,7 +1342,7 @@ function testcase_exists(testcasedetails, cb, data) {
 				}
 			};
 			logger.info("Calling NDAC Service from testcase_exists - testcasename: create_ice/testcaseid_exists_ICE");
-			client.post("http://127.0.0.1:1990/create_ice/testcaseid_exists_ICE", args,
+			client.post(epurl+"create_ice/testcaseid_exists_ICE", args,
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
 					logger.error("Error occured in create_ice/testcaseid_exists_ICE: testcase_exists, Error Code : ERRNDAC");
@@ -1373,7 +1375,7 @@ function testcase_exists(testcasedetails, cb, data) {
 					}
 				};
 				logger.info("Calling NDAC Service from testcase_exists - testcasedetails: create_ice/testcaseid_exists_ICE");
-				client.post("http://127.0.0.1:1990/create_ice/testcaseid_exists_ICE", args,
+				client.post(epurl+"create_ice/testcaseid_exists_ICE", args,
 					function (result, response) {
 					if (response.statusCode != 200 || result.rows == "fail") {
 						logger.error("Error occured in create_ice/testcaseid_exists_ICE: testcase_exists - testcasedetails, Error Code : ERRNDAC");
@@ -1437,7 +1439,7 @@ function updatetestcasename(testcasedetails, cb, data) {
 				}
 			};
 			logger.info("Calling NDAC Service from updatetestcasename - select: create_ice/get_node_details_ICE");
-			client.post("http://127.0.0.1:1990/create_ice/get_node_details_ICE", args,
+			client.post(epurl+"create_ice/get_node_details_ICE", args,
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
 					logger.error("Error occured in create_ice/get_node_details_ICE: updatetestcasename - select, Error Code : ERRNDAC");
@@ -1467,7 +1469,7 @@ function updatetestcasename(testcasedetails, cb, data) {
 					}
 				};
 				logger.info("Calling NDAC Service from updatetestcasename - delete: create_ice/delete_node_ICE");
-				client.post("http://127.0.0.1:1990/create_ice/delete_node_ICE", args,
+				client.post(epurl+"create_ice/delete_node_ICE", args,
 					function (result, response) {
 					if (response.statusCode != 200 || result.rows == "fail") {
 						logger.error("Error occured in create_ice/delete_node_ICE: updatetestcasename - delete, Error Code : ERRNDAC");
@@ -1513,7 +1515,7 @@ function updatetestcasename(testcasedetails, cb, data) {
 					}
 				};
 				logger.info("Calling NDAC Service from updatetestcasename - update: create_ice/updateTestcasename_ICE");
-				client.post("http://127.0.0.1:1990/create_ice/updateTestcasename_ICE  ", args,
+				client.post(epurl+"create_ice/updateTestcasename_ICE  ", args,
 					function (result, response) {
 					if (response.statusCode != 200 || result.rows == "fail") {
 						logger.error("Error occured in create_ice/updateTestcasename_ICE: updatetestcasename - update, Error Code : ERRNDAC");
@@ -1552,7 +1554,7 @@ exports.getReleaseIDs_Ninteen68 = function (req, res) {
 		}
 	};
 	logger.info("Calling NDAC Service from getReleaseIDs_Ninteen68: create_ice/getReleaseIDs_Ninteen68");
-	client.post("http://127.0.0.1:1990/create_ice/getReleaseIDs_Ninteen68", args,
+	client.post(epurl+"create_ice/getReleaseIDs_Ninteen68", args,
 		function (result, response) {
 			try {
 				if (response.statusCode != 200 || result.rows == "fail") {
@@ -1593,7 +1595,7 @@ exports.getCycleIDs_Ninteen68 = function (req, res) {
 		}
 	};
 	logger.info("Calling NDAC Service from getCycleIDs_Ninteen68: create_ice/getCycleIDs_Ninteen68");
-	client.post("http://127.0.0.1:1990/create_ice/getCycleIDs_Ninteen68", args,
+	client.post(epurl+"create_ice/getCycleIDs_Ninteen68", args,
 		function (result, response) {
 			try {
 				if (response.statusCode != 200 || result.rows == "fail") {
@@ -1639,7 +1641,7 @@ exports.getProjectIDs_Nineteen68 = function (req, res) {
 	async.series({
 		function (callback) {
 			logger.info("Calling NDAC Service from getProjectIDs_Nineteen68: create_ice/getProjectIDs_Nineteen68");
-			client.post("http://127.0.0.1:1990/create_ice/getProjectIDs_Nineteen68", args,
+			client.post(epurl+"create_ice/getProjectIDs_Nineteen68", args,
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
 					logger.error("Error occured in create_ice/getProjectIDs_Nineteen68: getProjectIDs_Nineteen68, Error Code : ERRNDAC");
@@ -1676,7 +1678,7 @@ exports.getProjectType_Nineteen68 = function (req, res) {
 		}
 	};
 	logger.info("Calling NDAC Service from getProjectType_Nineteen68: create_ice/getProjectType_Nineteen68");
-	client.post("http://127.0.0.1:1990/create_ice/getProjectType_Nineteen68", args,
+	client.post(epurl+"create_ice/getProjectType_Nineteen68", args,
 		function (result, response) {
 		try {
 			if (response.statusCode != 200 || result.rows == "fail") {
@@ -1773,7 +1775,7 @@ exports.createE2E_Structure_Nineteen68 = function (req, res) {
 					}
 				};
 				logger.info("Calling NDAC Service from projectsUnderDomain: createE2E_Structure_Nineteen68: create_ice/insertInSuite_ICE");
-				client.post("http://127.0.0.1:1990/create_ice/insertInSuite_ICE", args,
+				client.post(epurl+"create_ice/insertInSuite_ICE", args,
 					function (result, response) {
 					if (response.statusCode != 200 || result.rows == "fail") {
 						logger.error("Error occured in create_ice/insertInSuite_ICE: projectsUnderDomain: createE2E_Structure_Nineteen68, Error Code : ERRNDAC");
@@ -1848,7 +1850,7 @@ exports.createE2E_Structure_Nineteen68 = function (req, res) {
 				}
 			};
 			logger.info("Calling NDAC Service from updatescenarioids: createE2E_Structure_Nineteen68: create_ice/updateModule_ICE");
-			client.post("http://127.0.0.1:1990/create_ice/updateModule_ICE", args,
+			client.post(epurl+"create_ice/updateModule_ICE", args,
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
 					logger.error("Error occured in create_ice/updateModule_ICE: updatescenarioids: createE2E_Structure_Nineteen68, Error Code : ERRNDAC");
@@ -1894,7 +1896,7 @@ exports.submitTask = function (req, res) {
 		}
 	};
 	logger.info("Calling NDAC Service from submitTask: create_ice/submitTask");
-	client.post("http://127.0.0.1:1990/create_ice/submitTask", args,
+	client.post(epurl+"create_ice/submitTask", args,
 		function (result, response) {
 			try {
 				if (response.statusCode != 200 || result.rows == "fail") {

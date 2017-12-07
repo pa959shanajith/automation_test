@@ -2,10 +2,10 @@
  * Dependencies.
  */
 var async = require('async');
-var myserver = require('../lib/socket.js');
+var myserver = require('../lib/socket');
 var uuid = require('uuid-random');
 var bcrypt = require('bcrypt');
-var epurl = "http://127.0.0.1:1990/";
+var epurl = "http://"+process.env.NDAC_IP+":"+process.env.NDAC_PORT+"/";
 var Client = require("node-rest-client").Client;
 var neo4jAPI = require('../controllers/neo4jAPI');
 var client = new Client();

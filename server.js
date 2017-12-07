@@ -9,7 +9,7 @@ var fs = require('fs');
 var util = require('util');
 var expressWinston = require('express-winston');
 var winston = require('winston');
-var epurl = "http://127.0.0.1:1990/";
+var epurl = "http://"+process.env.NDAC_IP+":"+process.env.NDAC_PORT+"/";
 var logger = require('./logger');
 
 if (cluster.isMaster) {
@@ -31,7 +31,6 @@ try {
     var cookieParser = require('cookie-parser');
     var cmd = require('node-cmd');
     var helmet = require('helmet');
-    const os = require('os');
     var async = require('async');
     var lusca = require('lusca');
     //HTTPS Configuration

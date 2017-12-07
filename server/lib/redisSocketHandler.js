@@ -1,8 +1,6 @@
 var redis = require("redis");
-var globalConfig = require('../config/options').storageConfig;
 var logger = require('../../logger');
-var redisConfig = globalConfig.redis.split(':');
-redisConfig = {"host": redisConfig[0],	"port": parseInt(redisConfig[1])};
+var redisConfig = {"host": process.env.REDIS_IP, "port": parseInt(process.env.REDIS_PORT)};
 var sub1 = redis.createClient(redisConfig);
 var pub1 = redis.createClient(redisConfig);
 var sub2 = redis.createClient(redisConfig);
@@ -12,7 +10,7 @@ sub1.on("message", function (channel, message) {
 	logger.debug("In redisSocketHandler: Channel is %s", channel);
 	var data = JSON.parse(message);
 	var socketchannel = channel.split('_')[1];
-	var sockets = require('./socket.js');
+	var sockets = require('./socket');
 	var mySocket, dataToNode;
 	if (socketchannel === "scheduling")
 		mySocket = sockets.allSchedulingSocketsMap[data.username];

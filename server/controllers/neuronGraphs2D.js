@@ -3,7 +3,7 @@ var neo4jAPI = require('../controllers/neo4jAPI');
 var logger = require('../../logger');
 var Client = require("node-rest-client").Client;
 var client = new Client();
-var epurl="http://127.0.0.1:1990/";
+var epurl = "http://"+process.env.NDAC_IP+":"+process.env.NDAC_PORT+"/";
 
 var parseData = function(data){
 	logger.info("Inside function: parseData ");

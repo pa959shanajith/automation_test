@@ -2,8 +2,8 @@
  * Dependencies.
  */
 var async = require('async');
-var myserver = require('../lib/socket.js');
-var epurl = "http://127.0.0.1:1990/";
+var myserver = require('../lib/socket');
+var epurl = "http://"+process.env.NDAC_IP+":"+process.env.NDAC_PORT+"/";
 var Client = require("node-rest-client").Client;
 var client = new Client();
 var sessionExtend = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes 
