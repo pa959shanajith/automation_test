@@ -38,8 +38,7 @@ exports.initScraping_ICE = function (req, res) {
 		}
 		if (sessionToken != undefined && req.session.id == sessionToken) {
 			var name = req.session.username;
-			redisServer.redisSub2[name].removeAllListeners('message');
-			redisServer.redisSub2[name].subscribe('ICE2_' + req.session.username ,1);	
+			redisServer.redisSub2.subscribe('ICE2_' + req.session.username ,1);	
 			var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 			logger.info("ICE Socket connecting IP: %s" , ip);
 			logger.info("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
@@ -75,12 +74,13 @@ exports.initScraping_ICE = function (req, res) {
 						res.send(data);
 					});
 					*/
-					redisServer.redisSub2[name].on("message",function (channel,message) {
+					function LAUNCH_DESKTOP_listener(channel,message) {
 						data = JSON.parse(message);
 						name = data.username;
 						//LB: make sure to send recieved data to corresponding user
 						if(req.session.username == name){
 							value = data.value;
+							redisServer.redisSub2.removeListener('message',LAUNCH_DESKTOP_listener);
 							if (data.onAction == "unavailableLocalServer") {
 								logger.error("Error occured in initScraping_ICE: Socket Disconnected");
 								if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
@@ -94,7 +94,8 @@ exports.initScraping_ICE = function (req, res) {
 							res.send(value);
 						}
 						}
-					});
+					}
+					redisServer.redisSub2.on("message",LAUNCH_DESKTOP_listener);
 				} else if (req.body.screenViewObject.appType == "SAP") {
 					var applicationPath = req.body.screenViewObject.applicationPath;
 					var data = "LAUNCH_SAP";
@@ -117,12 +118,13 @@ exports.initScraping_ICE = function (req, res) {
 						res.send(data);
 					});
 					*/
-					redisServer.redisSub2[name].on("message",function (channel,message) {
+					function LAUNCH_SAP_listener(channel,message) {
 						data = JSON.parse(message);
 						name = data.username;
 						//LB: make sure to send recieved data to corresponding user
 						if(req.session.username == name){
 						value = data.value;
+						redisServer.redisSub2.removeListener('message',LAUNCH_SAP_listener);
 						if (data.onAction == "unavailableLocalServer") {
 							logger.error("Error occured in initScraping_ICE: Socket Disconnected");
 							if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
@@ -136,7 +138,8 @@ exports.initScraping_ICE = function (req, res) {
 						res.send(value);
 						}
 						}
-					});
+					}
+					redisServer.redisSub2.on("message",LAUNCH_SAP_listener);
 				} else if (req.body.screenViewObject.appType == "DesktopJava") {
 					var applicationPath = req.body.screenViewObject.applicationPath;
 					var data = "LAUNCH_OEBS";
@@ -162,12 +165,13 @@ exports.initScraping_ICE = function (req, res) {
 						res.send(data);
 					});
 					*/
-					redisServer.redisSub2[name].on("message",function (channel,message) {
+					function LAUNCH_OEBS_listener(channel,message) {
 						data = JSON.parse(message);
 						name = data.username;
 						//LB: make sure to send recieved data to corresponding user
 						if(req.session.username == name){
 						value = data.value;
+						redisServer.redisSub2.removeListener('message',LAUNCH_OEBS_listener);
 						if (data.onAction == "unavailableLocalServer") {
 							logger.error("Error occured in initScraping_ICE: Socket Disconnected");
 							if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
@@ -181,7 +185,8 @@ exports.initScraping_ICE = function (req, res) {
 						res.send(value);
 						}
 						}
-					});
+					}
+					redisServer.redisSub2.on("message",LAUNCH_OEBS_listener);
 				} else if (req.body.screenViewObject.appType == "MobileApp") {
 					var apkPath = req.body.screenViewObject.apkPath;
 					var serial = req.body.screenViewObject.mobileSerial;
@@ -209,12 +214,13 @@ exports.initScraping_ICE = function (req, res) {
 						res.send(data);
 					});
 					*/
-					redisServer.redisSub2[name].on("message",function (channel,message) {
+					function LAUNCH_MOBILE_listener(channel,message) {
 						data = JSON.parse(message);
 						name = data.username;
 						//LB: make sure to send recieved data to corresponding user
 						if(req.session.username == name){
 						value = data.value;
+						redisServer.redisSub2.removeListener('message',LAUNCH_MOBILE_listener);
 						if (data.onAction == "unavailableLocalServer") {
 							logger.error("Error occured in initScraping_ICE: Socket Disconnected");
 							if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
@@ -225,10 +231,12 @@ exports.initScraping_ICE = function (req, res) {
 						//req.session.cookie.expires = sessionExtend;
 						clearInterval(updateSessionExpiry);
 						logger.info("Sending MOBILE scraped objects from initScraping_ICE");
+						
 						res.send(value);
 						}
 						}
-					});
+					}
+					redisServer.redisSub2.on("message",LAUNCH_MOBILE_listener);
 				} else if (req.body.screenViewObject.appType == "MobileWeb") {
 					var mobileSerial = req.body.screenViewObject.mobileSerial;
 					var androidVersion = req.body.screenViewObject.androidVersion;
@@ -252,11 +260,12 @@ exports.initScraping_ICE = function (req, res) {
 						res.send(data);
 					});
 					*/
-					redisServer.redisSub2[name].on("message",function (channel,message) {
+					function LAUNCH_MOBILE_WEB_listener(channel,message) {
 						data = JSON.parse(message);
 						name = data.username;
 						//LB: make sure to send recieved data to corresponding user
 						if(req.session.username == name){
+							redisServer.redisSub2.removeListener('message',LAUNCH_MOBILE_WEB_listener);
 							if (data.onAction == "unavailableLocalServer") {
 								logger.error("Error occured in initScraping_ICE: Socket Disconnected");
 								if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
@@ -264,14 +273,15 @@ exports.initScraping_ICE = function (req, res) {
 									soc.emit("ICEnotAvailable");
 								}
 							} else {
-						value = data.value;
-						//req.session.cookie.expires = sessionExtend;
-						clearInterval(updateSessionExpiry);
-						logger.info("Sending MOBILE_WEB scraped objects from initScraping_ICE");
-						res.send(value);
+								value = data.value;
+								//req.session.cookie.expires = sessionExtend;
+								clearInterval(updateSessionExpiry);
+								logger.info("Sending MOBILE_WEB scraped objects from initScraping_ICE");
+								res.send(value);
+							}
 						}
-						}
-					});
+					}
+					redisServer.redisSub2.on("message",LAUNCH_MOBILE_WEB_listener);
 				} else {
 					var data = {};
 					var browserType = req.body.screenViewObject.browserType;
@@ -316,11 +326,12 @@ exports.initScraping_ICE = function (req, res) {
 						res.send(data);
 					});
 					*/
-					redisServer.redisSub2[name].on("message",function (channel,message) {
+					function webscrape_listener(channel,message) {
 						data = JSON.parse(message);
 						logger.error("Channel is %s in scraping for user %s",channel,req.session.username);
 						//LB: make sure to send recieved data to corresponding user
 						if(req.session.username == data.username){
+							redisServer.redisSub2.removeListener('message',webscrape_listener);
 							if (data.onAction == "unavailableLocalServer") {
 								logger.error("Error occured in initScraping_ICE: Socket Disconnected");
 								if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
@@ -328,14 +339,15 @@ exports.initScraping_ICE = function (req, res) {
 									soc.emit("ICEnotAvailable");
 								}
 							} else {
-						value = data.value;
-						//req.session.cookie.expires = sessionExtend;
-						clearInterval(updateSessionExpiry);
-						logger.info("Sending WEB scraped objects from initScraping_ICE");
-						res.send(value);
+								value = data.value;
+								//req.session.cookie.expires = sessionExtend;
+								clearInterval(updateSessionExpiry);
+								logger.info("Sending WEB scraped objects from initScraping_ICE");
+								res.send(value);
+								}
 						}
-						}
-					});
+					}
+					redisServer.redisSub2.on("message",webscrape_listener);
 				}
 				/* commented for LB
 				mySocket.on("unavailableLocalServer", function () {
@@ -380,8 +392,7 @@ exports.highlightScrapElement_ICE = function (req, res) {
 		}
 		if (sessionToken != undefined && req.session.id == sessionToken) {
 			var name = req.session.username;
-			redisServer.redisSub2[name].removeAllListeners('message');
-			redisServer.redisSub2[name].subscribe('ICE2_' + req.session.username ,1);
+			redisServer.redisSub2.subscribe('ICE2_' + req.session.username ,1);
 			var focusParam = req.body.elementXpath;
 			var elementURL = req.body.elementUrl;
 			var appType = req.body.appType;
@@ -1815,8 +1826,7 @@ exports.debugTestCase_ICE = function (req, res) {
 		}
 		if (sessionToken != undefined && req.session.id == sessionToken) {
 			var name = req.session.username;
-			redisServer.redisSub2[name].removeAllListeners('message');
-			redisServer.redisSub2[name].subscribe('ICE2_' + req.session.username ,1);
+			redisServer.redisSub2.subscribe('ICE2_' + req.session.username ,1);
 			var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 			logger.info("ICE Socket connecting IP: %s" , ip);
 			logger.info("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
@@ -1919,18 +1929,19 @@ exports.debugTestCase_ICE = function (req, res) {
 																}
 															});
 															*/
-															redisServer.redisSub2[name].on("message",function (channel,message) {
+															function result_debugTestCase_listener(channel,message) {
 																data = JSON.parse(message);
 																name = data.username;
 																//LB: make sure to send recieved data to corresponding user
 																if(req.session.username == name){
+																	redisServer.redisSub2.removeListener('message',result_debugTestCase_listener);
 																	if (data.onAction == "unavailableLocalServer") {
 																		logger.error("Error occured in debugTestCase_ICE: Socket Disconnected");
 																		if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
 																			var soc = myserver.socketMapNotify[name];
 																			soc.emit("ICEnotAvailable");
 																		}
-																	} else {
+																	} else if (data.onAction == "result_debugTestCase") {
 																	clearInterval(updateSessionExpiry);
 																	try {
 																		res.send(data.value);
@@ -1939,7 +1950,8 @@ exports.debugTestCase_ICE = function (req, res) {
 																	}
 																}
 																}
-															});
+															}
+															redisServer.redisSub2.on("message",debugTestCase_listener);
 														}
 													} catch (exception) {
 														logger.error("Exception in the service debugTestCase_ICE: %s", exception);
@@ -1970,12 +1982,12 @@ exports.debugTestCase_ICE = function (req, res) {
 							var updateSessionExpiry = setInterval(function () {
 									req.session.cookie.maxAge = sessionTime;
 								}, updateSessionTimeEvery);
-							/*mySocket.on('result_debugTestCaseWS', function (value) {*/
-								redisServer.redisSub2[name].on("message",function (channel,message) {
+								function result_debugTestCaseWS_listener(channel,message) {
 									data = JSON.parse(message);
 									name = data.username;
 									//LB: make sure to send recieved data to corresponding user
 									if(req.session.username == name){
+										redisServer.redisSub2.removeListener('message',result_debugTestCaseWS_listener);
 										if (data.onAction == "unavailableLocalServer") {
 											logger.error("Error occured in debugTestCase_ICE: Socket Disconnected");
 											if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
@@ -2040,7 +2052,9 @@ exports.debugTestCase_ICE = function (req, res) {
 									}
 								}
 									}
-								});
+								}
+							/*mySocket.on('result_debugTestCaseWS', function (value) {*/
+								redisServer.redisSub2.on("message",result_debugTestCaseWS_listener);
 						} catch (exception) {
 							logger.error("Exception in the service debugTestCase_ICE - debugTestCaseWS_ICE: %s", exception);
 						}
@@ -2057,19 +2071,19 @@ exports.debugTestCase_ICE = function (req, res) {
 							var updateSessionExpiry = setInterval(function () {
 									req.session.cookie.maxAge = sessionTime;
 								}, updateSessionTimeEvery);
-							/*mySocket.on('result_wsdl_listOfOperation', function (listGenResponse) {*/
-								redisServer.redisSub2[name].on("message",function (channel,message) {
+								function result_wsdl_listOfOperation_listener(channel,message) {
 									data = JSON.parse(message);
 									name = data.username;
 									//LB: make sure to send recieved data to corresponding user
 									if(req.session.username == name){
+										redisServer.redisSub2.removeListener('message',result_wsdl_listOfOperation_listener);
 										if (data.onAction == "unavailableLocalServer") {
 											logger.error("Error occured in debugTestCase_ICE: Socket Disconnected");
 											if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
 												var soc = myserver.socketMapNotify[name];
 												soc.emit("ICEnotAvailable");
 											}
-										} else {
+										} else if (data.onAction == "result_wsdl_listOfOperation") {
 									//req.session.cookie.expires = sessionExtend;
 									clearInterval(updateSessionExpiry);
 									var listGenResponse=data.value;
@@ -2103,7 +2117,9 @@ exports.debugTestCase_ICE = function (req, res) {
 									}
 								}
 									}
-								});
+								}
+							/*mySocket.on('result_wsdl_listOfOperation', function (listGenResponse) {*/
+								redisServer.redisSub2.on("message",result_wsdl_listOfOperation_listener);
 							
 						} catch (exception) {
 							logger.error("Exception in the service debugTestCase_ICE - wsdlListGenerator_ICE: %s", exception);
@@ -2134,19 +2150,19 @@ exports.debugTestCase_ICE = function (req, res) {
 							var updateSessionExpiry = setInterval(function () {
 									req.session.cookie.maxAge = sessionTime;
 								}, updateSessionTimeEvery);
-							/*mySocket.on('result_wsdl_ServiceGenerator', function (serviceGenResponse) {*/
-								redisServer.redisSub2[name].on("message",function (channel,message) {
+								function result_wsdl_ServiceGenerator_listener(channel,message) {
 									data = JSON.parse(message);
 									name = data.username;
 									//LB: make sure to send recieved data to corresponding user
 									if(req.session.username == name){
+										redisServer.redisSub2.removeListener('message',result_wsdl_ServiceGenerator_listener);
 										if (data.onAction == "unavailableLocalServer") {
 											logger.error("Error occured in debugTestCase_ICE: Socket Disconnected");
 											if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
 												var soc = myserver.socketMapNotify[name];
 												soc.emit("ICEnotAvailable");
 											}
-										} else{
+										} else if (data.onAction == "result_wsdl_ServiceGenerator") {
 									//req.session.cookie.expires = sessionExtend;
 									clearInterval(updateSessionExpiry);
 									try {
@@ -2195,7 +2211,9 @@ exports.debugTestCase_ICE = function (req, res) {
 									}
 									}
 								}
-								});
+								}
+							/*mySocket.on('result_wsdl_ServiceGenerator', function (serviceGenResponse) {*/
+								redisServer.redisSub2.on("message",result_wsdl_ServiceGenerator_listener);
 								
 						} catch (exception) {
 							logger.error("Exception in the service debugTestCase_ICE - wsdlServiceGenerator_ICE: %s", exception);
