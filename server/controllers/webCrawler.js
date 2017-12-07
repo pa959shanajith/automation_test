@@ -34,44 +34,10 @@ exports.getCrawlResults = function (req, res) {
 				}
 			}
 			if (validate_url == true && validate_level == true && check_agent == true) {
-				//var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-				//logger.info("IP:",ip);
-				logger.info("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
+				logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
 				logger.info("ICE Socket requesting Address: %s", name);
 				redisServer.redisPub1.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
 					if (redisres[1]==1) {
-						/* Commented for LB
-						if ('allSocketsMap' in myserver && name in myserver.allSocketsMap) {
-						var mySocket = myserver.allSocketsMap[name];
-						mySocket.emit("webCrawlerGo", input_url, level, agent);
-						mySocket.on("unavailableLocalServer", function () {
-							logger.error("Error occured in getCrawlResults: Socket Disconnected");
-							if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
-								var soc = myserver.socketMapNotify[name];
-								soc.emit("ICEnotAvailable");
-							}
-						});
-						mySocket.on('result_web_crawler', function (value) {
-							try {
-								var mySocketUI = myserver.allSocketsMapUI[name];
-								mySocketUI.emit("newdata", JSON.parse(value));
-							} catch (exception) {
-								logger.error(exception);
-							}
-						});
-						mySocket.on('result_web_crawler_finished', function (value) {
-							try {
-								var mySocketUI = myserver.allSocketsMapUI[name];
-								mySocketUI.emit("endData", value);
-								mySocket._events.result_web_crawler = [];
-								mySocket._events.result_web_crawler_finished = [];
-								res.status(200).json({success: true});
-							} catch (exception) {
-								logger.error(exception);
-								res.status(500).json({success: false, data: exception});
-							}
-						});
-						*/
 						logger.info("Sending socket request for webCrawlerGo to redis");
 						dataToIce = {"emitAction" : "webCrawlerGo","username" : name, "input_url":input_url, "level" : level, "agent" :agent};
 						redisServer.redisPub1.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));

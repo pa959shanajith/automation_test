@@ -38,47 +38,29 @@ exports.initScraping_ICE = function (req, res) {
 		}
 		if (sessionToken != undefined && req.session.id == sessionToken) {
 			var name = req.session.username;
-			redisServer.redisSub2.subscribe('ICE2_' + req.session.username ,1);	
+			redisServer.redisSub2.subscribe('ICE2_' + name ,1);	
 			var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-			logger.info("ICE Socket connecting IP: %s" , ip);
-			logger.info("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
+			logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
 			logger.info("ICE Socket requesting Address: %s" , name);
-			logger.warn("ICE Socket requesting Address: %s" , name);
-			//if ('allSocketsMap' in myserver && name in myserver.allSocketsMap) {
 			//check on redis whether the ice socket is connected to any of the servers
-			redisServer.redisPub1.pubsub('numsub','ICE1_normal_' + req.session.username,function(err,redisres){
+			redisServer.redisPub1.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
 				if (redisres[1]==1) {
-				//var mySocket = myserver.allSocketsMap[name];
 				var reqScrapJson = {};
 				reqScrapJson.action = "SCRAPE";
 				if (req.body.screenViewObject.appType == "Desktop") {
 					var applicationPath = req.body.screenViewObject.applicationPath;
 					var data = "LAUNCH_DESKTOP";
-					
-					/*commented for LB
-					mySocket._events.scrape = [];
-					mySocket.emit("LAUNCH_DESKTOP", applicationPath);
-					*/
 					logger.info("Sending socket request for LAUNCH_DESKTOP to redis");
-					dataToIce = {"emitAction" : "LAUNCH_DESKTOP","username" : req.session.username,
+					dataToIce = {"emitAction" : "LAUNCH_DESKTOP","username" : name,
 								 "applicationPath":applicationPath};
-					redisServer.redisPub1.publish('ICE1_normal_' + req.session.username,JSON.stringify(dataToIce));
+					redisServer.redisPub1.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
 					var updateSessionExpiry = setInterval(function () {
 							req.session.cookie.maxAge = sessionTime;
 						}, updateSessionTimeEvery);
-					/*commented for LB
-					mySocket.on('scrape', function (data) {
-						//	req.session.cookie.expires = sessionExtend;
-						clearInterval(updateSessionExpiry);
-						logger.info("Sending desktop scraped objects from initScraping_ICE");
-						res.send(data);
-					});
-					*/
 					function LAUNCH_DESKTOP_listener(channel,message) {
 						data = JSON.parse(message);
-						name = data.username;
 						//LB: make sure to send recieved data to corresponding user
-						if(req.session.username == name){
+						if(name == data.username){
 							value = data.value;
 							redisServer.redisSub2.removeListener('message',LAUNCH_DESKTOP_listener);
 							if (data.onAction == "unavailableLocalServer") {
@@ -88,7 +70,6 @@ exports.initScraping_ICE = function (req, res) {
 									soc.emit("ICEnotAvailable");
 								}
 							} else {
-							//req.session.cookie.expires = sessionExtend;
 							clearInterval(updateSessionExpiry);
 							logger.info("Sending desktop scraped objects from initScraping_ICE");
 							res.send(value);
@@ -99,30 +80,17 @@ exports.initScraping_ICE = function (req, res) {
 				} else if (req.body.screenViewObject.appType == "SAP") {
 					var applicationPath = req.body.screenViewObject.applicationPath;
 					var data = "LAUNCH_SAP";
-					/*commented for LB
-					mySocket._events.scrape = [];
-					mySocket.emit("LAUNCH_SAP", applicationPath);
-					*/
 					logger.info("Sending socket request for LAUNCH_SAP to redis");
-					dataToIce = {"emitAction" : "LAUNCH_SAP","username" : req.session.username,
+					dataToIce = {"emitAction" : "LAUNCH_SAP","username" : name,
 								 "applicationPath":applicationPath};
-					redisServer.redisPub1.publish('ICE1_normal_' + req.session.username,JSON.stringify(dataToIce));
+					redisServer.redisPub1.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
 					var updateSessionExpiry = setInterval(function () {
 							req.session.cookie.maxAge = sessionTime;
 						}, updateSessionTimeEvery);
-					/*commented for LB
-					mySocket.on('scrape', function (data) {
-						//req.session.cookie.expires = sessionExtend;
-						clearInterval(updateSessionExpiry);
-						logger.info("Sending SAP scraped objects from initScraping_ICE");
-						res.send(data);
-					});
-					*/
 					function LAUNCH_SAP_listener(channel,message) {
 						data = JSON.parse(message);
-						name = data.username;
 						//LB: make sure to send recieved data to corresponding user
-						if(req.session.username == name){
+						if(name == data.username){
 						value = data.value;
 						redisServer.redisSub2.removeListener('message',LAUNCH_SAP_listener);
 						if (data.onAction == "unavailableLocalServer") {
@@ -132,7 +100,6 @@ exports.initScraping_ICE = function (req, res) {
 								soc.emit("ICEnotAvailable");
 							}
 						} else {
-						//req.session.cookie.expires = sessionExtend;
 						clearInterval(updateSessionExpiry);
 						logger.info("Sending SAP scraped objects from initScraping_ICE");
 						res.send(value);
@@ -143,33 +110,17 @@ exports.initScraping_ICE = function (req, res) {
 				} else if (req.body.screenViewObject.appType == "DesktopJava") {
 					var applicationPath = req.body.screenViewObject.applicationPath;
 					var data = "LAUNCH_OEBS";
-					/*commented for LB
-					mySocket._events.scrape = [];
-					// mySocket.send(data);
-					*/
-					/*commented for LB
-					mySocket.emit("LAUNCH_OEBS", applicationPath);
-					*/
 					logger.info("Sending socket request for LAUNCH_OEBS to redis");
-					dataToIce = {"emitAction" : "LAUNCH_OEBS","username" : req.session.username,
+					dataToIce = {"emitAction" : "LAUNCH_OEBS","username" :name,
 								 "applicationPath":applicationPath};
-					redisServer.redisPub1.publish('ICE1_normal_' + req.session.username,JSON.stringify(dataToIce));
+					redisServer.redisPub1.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
 					var updateSessionExpiry = setInterval(function () {
 							req.session.cookie.maxAge = sessionTime;
 						}, updateSessionTimeEvery);
-					/*commented for LB
-					mySocket.on('scrape', function (data) {
-						//req.session.cookie.expires = sessionExtend;
-						clearInterval(updateSessionExpiry);
-						logger.info("Sending OEBS scraped objects from initScraping_ICE");
-						res.send(data);
-					});
-					*/
 					function LAUNCH_OEBS_listener(channel,message) {
 						data = JSON.parse(message);
-						name = data.username;
 						//LB: make sure to send recieved data to corresponding user
-						if(req.session.username == name){
+						if(name == data.username){
 						value = data.value;
 						redisServer.redisSub2.removeListener('message',LAUNCH_OEBS_listener);
 						if (data.onAction == "unavailableLocalServer") {
@@ -179,7 +130,6 @@ exports.initScraping_ICE = function (req, res) {
 								soc.emit("ICEnotAvailable");
 							}
 						} else {
-						//req.session.cookie.expires = sessionExtend;
 						clearInterval(updateSessionExpiry);
 						logger.info("Sending OEBS scraped objects from initScraping_ICE");
 						res.send(value);
@@ -194,31 +144,18 @@ exports.initScraping_ICE = function (req, res) {
 					var mobileIosVersion = req.body.screenViewObject.mobileIosVersion;
 					var mobileUDID = req.body.screenViewObject.mobileUDID;
 					var data = "LAUNCH_MOBILE";
-					/*commented for LB
-					mySocket._events.scrape = [];
-					mySocket.emit("LAUNCH_MOBILE", apkPath, serial, mobileDeviceName, mobileIosVersion, mobileUDID);
-					*/
 					logger.info("Sending socket request for LAUNCH_MOBILE to redis");
-					dataToIce = {"emitAction" : "LAUNCH_MOBILE","username" : req.session.username,
+					dataToIce = {"emitAction" : "LAUNCH_MOBILE","username" : name,
 								 "apkPath":apkPath,"serial":serial,"mobileDeviceName":mobileDeviceName,
 								 "mobileIosVersion":mobileIosVersion,"mobileUDID":mobileUDID};
-					redisServer.redisPub1.publish('ICE1_normal_' + req.session.username,JSON.stringify(dataToIce));
+					redisServer.redisPub1.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
 					var updateSessionExpiry = setInterval(function () {
 							req.session.cookie.maxAge = sessionTime;
 						}, updateSessionTimeEvery);
-					/*commented for LB
-					mySocket.on('scrape', function (data) {
-						//req.session.cookie.expires = sessionExtend;
-						clearInterval(updateSessionExpiry);
-						logger.info("Sending MOBILE scraped objects from initScraping_ICE");
-						res.send(data);
-					});
-					*/
 					function LAUNCH_MOBILE_listener(channel,message) {
 						data = JSON.parse(message);
-						name = data.username;
 						//LB: make sure to send recieved data to corresponding user
-						if(req.session.username == name){
+						if(name == data.username){
 						value = data.value;
 						redisServer.redisSub2.removeListener('message',LAUNCH_MOBILE_listener);
 						if (data.onAction == "unavailableLocalServer") {
@@ -228,7 +165,6 @@ exports.initScraping_ICE = function (req, res) {
 								soc.emit("ICEnotAvailable");
 							}
 						} else {
-						//req.session.cookie.expires = sessionExtend;
 						clearInterval(updateSessionExpiry);
 						logger.info("Sending MOBILE scraped objects from initScraping_ICE");
 						
@@ -241,30 +177,17 @@ exports.initScraping_ICE = function (req, res) {
 					var mobileSerial = req.body.screenViewObject.mobileSerial;
 					var androidVersion = req.body.screenViewObject.androidVersion;
 					var data = "LAUNCH_MOBILE_WEB";
-					/*commented for LB
-					mySocket._events.scrape = [];
-					mySocket.emit("LAUNCH_MOBILE_WEB", mobileSerial, androidVersion);
-					*/
 					logger.info("Sending socket request for LAUNCH_MOBILE_WEB to redis");
-					dataToIce = {"emitAction" : "LAUNCH_MOBILE_WEB","username" : req.session.username,
+					dataToIce = {"emitAction" : "LAUNCH_MOBILE_WEB","username" : name,
 								 "mobileSerial":mobileSerial,"androidVersion":androidVersion};
-					redisServer.redisPub1.publish('ICE1_normal_' + req.session.username,JSON.stringify(dataToIce));
+					redisServer.redisPub1.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
 					var updateSessionExpiry = setInterval(function () {
 							req.session.cookie.maxAge = sessionTime;
 						}, updateSessionTimeEvery);
-					/*commented for LB
-					mySocket.on('scrape', function (data) {
-						//req.session.cookie.expires = sessionExtend;
-						clearInterval(updateSessionExpiry);
-						logger.info("Sending MOBILE_WEB scraped objects from initScraping_ICE");
-						res.send(data);
-					});
-					*/
 					function LAUNCH_MOBILE_WEB_listener(channel,message) {
 						data = JSON.parse(message);
-						name = data.username;
 						//LB: make sure to send recieved data to corresponding user
-						if(req.session.username == name){
+						if(name == data.username){
 							redisServer.redisSub2.removeListener('message',LAUNCH_MOBILE_WEB_listener);
 							if (data.onAction == "unavailableLocalServer") {
 								logger.error("Error occured in initScraping_ICE: Socket Disconnected");
@@ -274,7 +197,6 @@ exports.initScraping_ICE = function (req, res) {
 								}
 							} else {
 								value = data.value;
-								//req.session.cookie.expires = sessionExtend;
 								clearInterval(updateSessionExpiry);
 								logger.info("Sending MOBILE_WEB scraped objects from initScraping_ICE");
 								res.send(value);
@@ -299,38 +221,22 @@ exports.initScraping_ICE = function (req, res) {
 						data.action = "scrape";
 						if (browserType == "chrome") {
 							data.task = "OPEN BROWSER CH";
-							//var data = "OPEN BROWSER CH";
 						} else if (browserType == "ie") {
 							data.task = "OPEN BROWSER IE";
-							//var data =  "OPEN BROWSER IE";
 						} else if (browserType == "mozilla") {
 							data.task = "OPEN BROWSER FX";
-							//var data =   "OPEN BROWSER FX";
 						}
 					}
-					/*commented for LB
-					mySocket._events.scrape = [];
-					mySocket.emit("webscrape", data);
-					*/
 					logger.info("Sending socket request for webscrape to redis");
-					dataToIce = {"emitAction" : "webscrape","username" : req.session.username, "data":data};
-					redisServer.redisPub1.publish('ICE1_normal_' + req.session.username,JSON.stringify(dataToIce));
+					dataToIce = {"emitAction" : "webscrape","username" : name, "data":data};
+					redisServer.redisPub1.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
 					var updateSessionExpiry = setInterval(function () {
 							req.session.cookie.maxAge = sessionTime;
 						}, updateSessionTimeEvery);
-					/*commented for LB
-					mySocket.on('scrape', function (data) {
-						//req.session.cookie.expires = sessionExtend;
-						clearInterval(updateSessionExpiry);
-						logger.info("Sending WEB scraped objects from initScraping_ICE");
-						res.send(data);
-					});
-					*/
 					function webscrape_listener(channel,message) {
 						data = JSON.parse(message);
-						logger.error("Channel is %s in scraping for user %s",channel,req.session.username);
 						//LB: make sure to send recieved data to corresponding user
-						if(req.session.username == data.username){
+						if(name == data.username){
 							redisServer.redisSub2.removeListener('message',webscrape_listener);
 							if (data.onAction == "unavailableLocalServer") {
 								logger.error("Error occured in initScraping_ICE: Socket Disconnected");
@@ -340,7 +246,6 @@ exports.initScraping_ICE = function (req, res) {
 								}
 							} else {
 								value = data.value;
-								//req.session.cookie.expires = sessionExtend;
 								clearInterval(updateSessionExpiry);
 								logger.info("Sending WEB scraped objects from initScraping_ICE");
 								res.send(value);
@@ -349,15 +254,6 @@ exports.initScraping_ICE = function (req, res) {
 					}
 					redisServer.redisSub2.on("message",webscrape_listener);
 				}
-				/* commented for LB
-				mySocket.on("unavailableLocalServer", function () {
-					logger.error("Error occured in initScraping_ICE: Socket Disconnected");
-					if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
-						var soc = myserver.socketMapNotify[name];
-						soc.emit("ICEnotAvailable");
-					}
-				});
-				*/
 			} else {
 				logger.error("Error occured in the service initScraping_ICE: Socket not Available");
 				try {
@@ -392,23 +288,17 @@ exports.highlightScrapElement_ICE = function (req, res) {
 		}
 		if (sessionToken != undefined && req.session.id == sessionToken) {
 			var name = req.session.username;
-			redisServer.redisSub2.subscribe('ICE2_' + req.session.username ,1);
+			redisServer.redisSub2.subscribe('ICE2_' + name ,1);
 			var focusParam = req.body.elementXpath;
 			var elementURL = req.body.elementUrl;
 			var appType = req.body.appType;
 			var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-			logger.info("ICE Socket connecting IP: %s" , ip);
-			logger.info("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
+			logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
 			logger.info("ICE Socket requesting Address: %s" , name);
-			/*commented for LB
-			var mySocket = myserver.allSocketsMap[name];
-			mySocket.emit("focus", focusParam, elementURL, appType);
-			*/
-			//req.session.cookie.expires = sessionExtend;
 			logger.info("Sending socket request for focus to redis");
-			dataToIce = {"emitAction" : "focus","username" : req.session.username,
+			dataToIce = {"emitAction" : "focus","username" : name,
 						 "focusParam":focusParam,"elementURL":elementURL,"appType":appType};
-			redisServer.redisPub1.publish('ICE1_normal_' + req.session.username,JSON.stringify(dataToIce));
+			redisServer.redisPub1.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
 			var flag = 'success';
 			logger.info("Successfully highlighted selected object");
 			res.send(flag);
@@ -1826,20 +1716,13 @@ exports.debugTestCase_ICE = function (req, res) {
 		}
 		if (sessionToken != undefined && req.session.id == sessionToken) {
 			var name = req.session.username;
-			redisServer.redisSub2.subscribe('ICE2_' + req.session.username ,1);
+			redisServer.redisSub2.subscribe('ICE2_' + name ,1);
 			var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-			logger.info("ICE Socket connecting IP: %s" , ip);
-			logger.info("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
+			logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
 			logger.info("ICE Socket requesting Address: %s" , name);
-			/*commented for LB
-			if ('allSocketsMap' in myserver && name in myserver.allSocketsMap) {
-			*/
 			//LB: check on redis whether the ice socket is connected to any of the servers
-			redisServer.redisPub1.pubsub('numsub','ICE1_normal_' + req.session.username,function(err,redisres){
+			redisServer.redisPub1.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
 				if (redisres[1]==1) {
-				/*commented for LB
-				//var mySocket = myserver.allSocketsMap[name];
-				*/
 				try {
 					var action = req.body.param;
 					if (action == 'debugTestCase_ICE') {
@@ -1909,31 +1792,16 @@ exports.debugTestCase_ICE = function (req, res) {
 														// responsedata.push(responseobject);
 														// responsedata.push(browsertypeobject);
 														if (counter == requestedtestcaseids.length - 1) {
-															/*commented for LB
-															mySocket._events.result_debugTestCase = [];
-															mySocket.emit('debugTestCase', responsedata);
-															*/
 															logger.info("Sending socket request for debugTestCase to redis");
-															dataToIce = {"emitAction" : "debugTestCase","username" : req.session.username, "responsedata":responsedata};
-															redisServer.redisPub1.publish('ICE1_normal_' + req.session.username,JSON.stringify(dataToIce));
+															dataToIce = {"emitAction" : "debugTestCase","username" : name, "responsedata":responsedata};
+															redisServer.redisPub1.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
 															var updateSessionExpiry = setInterval(function () {
 																	req.session.cookie.maxAge = sessionTime;
 																}, updateSessionTimeEvery);
-															/*commented for LB	
-															mySocket.on('result_debugTestCase', function (responsedata) {
-																clearInterval(updateSessionExpiry);
-																try {
-																	res.send(responsedata);
-																} catch (exception) {
-																	logger.error("Exception in the service debugTestCase_ICE: %s", exception);
-																}
-															});
-															*/
 															function result_debugTestCase_listener(channel,message) {
 																data = JSON.parse(message);
-																name = data.username;
 																//LB: make sure to send recieved data to corresponding user
-																if(req.session.username == name){
+																if(name == data.username){
 																	redisServer.redisSub2.removeListener('message',result_debugTestCase_listener);
 																	if (data.onAction == "unavailableLocalServer") {
 																		logger.error("Error occured in debugTestCase_ICE: Socket Disconnected");
@@ -1951,7 +1819,7 @@ exports.debugTestCase_ICE = function (req, res) {
 																}
 																}
 															}
-															redisServer.redisSub2.on("message",debugTestCase_listener);
+															redisServer.redisSub2.on("message",result_debugTestCase_listener);
 														}
 													} catch (exception) {
 														logger.error("Exception in the service debugTestCase_ICE: %s", exception);
@@ -1972,21 +1840,16 @@ exports.debugTestCase_ICE = function (req, res) {
 						try {
 							var testcaseWS = [];
 							testcaseWS.push(req.body.testCaseWS);
-							/*commented for LB
-							mySocket._events.result_debugTestCaseWS = [];
-							mySocket.emit('debugTestCase', testcaseWS);
-							*/
 							logger.info("Sending socket request for debugTestCaseWS_ICE to redis");
-							dataToIce = {"emitAction" : "debugTestCase","username" : req.session.username, "responsedata":testcaseWS};
-							redisServer.redisPub1.publish('ICE1_normal_' + req.session.username,JSON.stringify(dataToIce));
+							dataToIce = {"emitAction" : "debugTestCase","username" : name, "responsedata":testcaseWS};
+							redisServer.redisPub1.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
 							var updateSessionExpiry = setInterval(function () {
 									req.session.cookie.maxAge = sessionTime;
 								}, updateSessionTimeEvery);
 								function result_debugTestCaseWS_listener(channel,message) {
 									data = JSON.parse(message);
-									name = data.username;
 									//LB: make sure to send recieved data to corresponding user
-									if(req.session.username == name){
+									if(data.username == name){
 										redisServer.redisSub2.removeListener('message',result_debugTestCaseWS_listener);
 										if (data.onAction == "unavailableLocalServer") {
 											logger.error("Error occured in debugTestCase_ICE: Socket Disconnected");
@@ -1995,7 +1858,6 @@ exports.debugTestCase_ICE = function (req, res) {
 												soc.emit("ICEnotAvailable");
 											}
 										} else {
-									//req.session.cookie.expires = sessionExtend;
 									clearInterval(updateSessionExpiry);
 									var value = data.value;
 									try {
@@ -2053,7 +1915,6 @@ exports.debugTestCase_ICE = function (req, res) {
 								}
 									}
 								}
-							/*mySocket.on('result_debugTestCaseWS', function (value) {*/
 								redisServer.redisSub2.on("message",result_debugTestCaseWS_listener);
 						} catch (exception) {
 							logger.error("Exception in the service debugTestCase_ICE - debugTestCaseWS_ICE: %s", exception);
@@ -2061,21 +1922,16 @@ exports.debugTestCase_ICE = function (req, res) {
 					} else if (action == 'wsdlListGenerator_ICE') {
 						try {
 							var wsdlurl = req.body.wsdlurl;
-							/*commented for LB
-							mySocket._events.result_wsdl_listOfOperation = [];
-							mySocket.emit('wsdl_listOfOperation', wsdlurl);
-							*/
 							logger.info("Sending socket request for debugTestCase to redis");
-							dataToIce = {"emitAction" : "wsdl_listOfOperation","username" : req.session.username, "wsdlurl":wsdlurl};
-							redisServer.redisPub1.publish('ICE1_normal_' + req.session.username,JSON.stringify(dataToIce));	
+							dataToIce = {"emitAction" : "wsdl_listOfOperation","username" : name, "wsdlurl":wsdlurl};
+							redisServer.redisPub1.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));	
 							var updateSessionExpiry = setInterval(function () {
 									req.session.cookie.maxAge = sessionTime;
 								}, updateSessionTimeEvery);
 								function result_wsdl_listOfOperation_listener(channel,message) {
 									data = JSON.parse(message);
-									name = data.username;
 									//LB: make sure to send recieved data to corresponding user
-									if(req.session.username == name){
+									if(data.username == name){
 										redisServer.redisSub2.removeListener('message',result_wsdl_listOfOperation_listener);
 										if (data.onAction == "unavailableLocalServer") {
 											logger.error("Error occured in debugTestCase_ICE: Socket Disconnected");
@@ -2084,7 +1940,6 @@ exports.debugTestCase_ICE = function (req, res) {
 												soc.emit("ICEnotAvailable");
 											}
 										} else if (data.onAction == "result_wsdl_listOfOperation") {
-									//req.session.cookie.expires = sessionExtend;
 									clearInterval(updateSessionExpiry);
 									var listGenResponse=data.value;
 									try {
@@ -2118,7 +1973,6 @@ exports.debugTestCase_ICE = function (req, res) {
 								}
 									}
 								}
-							/*mySocket.on('result_wsdl_listOfOperation', function (listGenResponse) {*/
 								redisServer.redisSub2.on("message",result_wsdl_listOfOperation_listener);
 							
 						} catch (exception) {
@@ -2140,21 +1994,16 @@ exports.debugTestCase_ICE = function (req, res) {
 								operations: operations,
 								soapVersion: soapVersion
 							};
-							/*commented for LB
-							mySocket._events.result_wsdl_ServiceGenerator = [];
-							mySocket.emit('wsdl_ServiceGenerator', serviceGenRequest);
-							*/
 							logger.info("Sending socket request for debugTestCase to redis");
-							dataToIce = {"emitAction" : "wsdl_ServiceGenerator","username" : req.session.username, "serviceGenRequest":serviceGenRequest};
-							redisServer.redisPub1.publish('ICE1_normal_' + req.session.username,JSON.stringify(dataToIce));
+							dataToIce = {"emitAction" : "wsdl_ServiceGenerator","username" : name, "serviceGenRequest":serviceGenRequest};
+							redisServer.redisPub1.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
 							var updateSessionExpiry = setInterval(function () {
 									req.session.cookie.maxAge = sessionTime;
 								}, updateSessionTimeEvery);
 								function result_wsdl_ServiceGenerator_listener(channel,message) {
 									data = JSON.parse(message);
-									name = data.username;
 									//LB: make sure to send recieved data to corresponding user
-									if(req.session.username == name){
+									if(data.username == name){
 										redisServer.redisSub2.removeListener('message',result_wsdl_ServiceGenerator_listener);
 										if (data.onAction == "unavailableLocalServer") {
 											logger.error("Error occured in debugTestCase_ICE: Socket Disconnected");
@@ -2163,7 +2012,6 @@ exports.debugTestCase_ICE = function (req, res) {
 												soc.emit("ICEnotAvailable");
 											}
 										} else if (data.onAction == "result_wsdl_ServiceGenerator") {
-									//req.session.cookie.expires = sessionExtend;
 									clearInterval(updateSessionExpiry);
 									try {
 										if (serviceGenResponse.toUpperCase() === 'TERMINATE') {
