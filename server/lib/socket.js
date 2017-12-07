@@ -1,7 +1,6 @@
 var logger = require('../../logger');
 var redisServer = require('./redisSocketHandler');
 //SOCKET CONNECTION USING SOCKET.IO
-var allClients = [];
 var socketMap = {};
 var socketMapUI = {};
 var sokcetMapScheduling = {};
@@ -21,36 +20,26 @@ var screenShotPath = uiConfig.storageConfig.screenShotPath;
 
 io.on('connection', function (socket) {
 	logger.info("Inside Socket connection");
-	// console.log("-------------------------------------------------------------------------------------------------------");
-	var ip = socket.request.connection.remoteAddress || socket.request.headers['x-forwarded-for'];
-	logger.info("Normal Mode Enabled for  IP : %s", ip);
-	var address = socket.handshake.query['username'];
-
-	var icesession = socket.handshake.query['icesession'];
+	var address = socket.handshake.query.username;
+	var icesession = socket.handshake.query.icesession;
 	logger.info("Socket connecting address %s", address);
-	logger.info('Param %s', socket.handshake.query['username']);
-	//console.log("middleware:", socket.request._query['check']);
-
-	if (socket.request._query['check'] == "true") {
-		logger.info("Inside UI Socket Connection");
-		//  if ( !(address in socketMapUI) ) {
+	if (socket.request._query.check == "true") {
+		logger.info("Socket request from UI");
 		isUISocketRequest = true;
-		logger.info("socket request from UI");
-		address = socket.request._query['username'];
+		address = socket.request._query.username;
 		socketMapUI[address] = socket;
 		socket.emit("connectionAck", "Success");
-	} else if (socket.request._query['check'] == "notify") {
-
-		address = Base64.decode(socket.request._query['username']);
+	} else if (socket.request._query.check == "notify") {
+		address = Base64.decode(socket.request._query.username);
 		socketMapNotify[address] = socket;
-
 		//Broadcast Message
 		var broadcastTo = ['/admin', '/plugin', '/design', '/designTestCase', '/execute', '/scheduling', '/specificreports', '/home', '/p_Utility', '/p_Reports', 'p_Weboccular', '/neuronGraphs2D', '/p_ALM'];
 		notificationMsg.to = broadcastTo;
 		notificationMsg.notifyMsg = 'Server Maintenance Scheduled';
-		var soc = socketMapNotify[address];
+		// var soc = socketMapNotify[address];
 		// soc.emit("notify",notificationMsg);
 	} else {
+		logger.info("Socket request from ICE");
 		isUISocketRequest = false;
 		var inputs = {
 			"icesession": icesession,
@@ -68,13 +57,13 @@ io.on('connection', function (socket) {
 			if (response.statusCode != 200) {
 				logger.error("Error occured in updateActiveIceSessions Error Code: ERRNDAC");
 			} else {
-				socket.send('checkConnection', result['ice_check']);
-				if (result['node_check']) {
+				socket.send('checkConnection', result.ice_check);
+				if (result.node_check) {
 					if (!(address in socketMap)) {
 						socketMap[address] = socket;
 						socket.send('connected');
-						logger.info("NO. OF CLIENTS CONNECTED: %d", Object.keys(socketMap).length);
-						logger.info("IP\'s connected : %s", Object.keys(socketMap).join());
+						logger.debug("%s is connected", address);
+						logger.debug("No. of clients connected for Normal mode: %d", Object.keys(socketMap).length);
 						socket.emit('update_screenshot_path', screenShotPath);
 						redisServer.redisSub1.subscribe('ICE1_normal_' + address, 1);
 					}
@@ -91,36 +80,34 @@ io.on('connection', function (socket) {
 
 	socket.on('disconnect', function () {
 		logger.info("Inside Socket disconnect");
-		var ip = socket.request.connection.remoteAddress || socket.request.headers['x-forwarded-for'];
-		if (socket.request._query['check'] == "true") {
-			logger.info("Inside Socket UI disconnection");
-			//var address = socket.request.connection.remoteAddress || socket.request.headers['x-forwarded-for'];
-			var address = socket.handshake.query['username'];
+		// var ip = socket.request.connection.remoteAddress || socket.request.headers['x-forwarded-for'];
+		if (socket.request._query.check == "true") {
+			address = socket.handshake.query.username;
 			logger.info("Disconnecting from UI socket: %s", address);
-		} else if (socket.request._query['check'] == "notify") {
-			//var address = socket.handshake.query['username'];
-			var address = Base64.decode(socket.request._query['username']);
+		} else if (socket.request._query.check == "notify") {
+			// address = socket.handshake.query.username;
+			address = Base64.decode(socket.request._query.username);
 			logger.info("Disconnecting from Notification socket: %s", address);
 		} else {
 			var connect_flag = false;
 			logger.info("Inside ICE Socket disconnection");
-			var address = socket.handshake.query['username'];
+			var address = socket.handshake.query.username;
 			if (socketMap[address] != undefined) {
 				connect_flag = true;
 				logger.info('Disconnecting from ICE socket : %s', address);
 				redisServer.redisSub1.unsubscribe('ICE1_normal_' + address,1);
 				delete socketMap[address];
 				module.exports.allSocketsMap = socketMap;
-				logger.info("NO. OF CLIENTS CONNECTED: %d", Object.keys(socketMap).length);
-				logger.info("IP\'s connected : %s", Object.keys(socketMap).join());
+				logger.debug("No. of clients connected for Normal mode: %d", Object.keys(socketMap).length);
+				logger.debug("Clients connected for Normal mode : %s", Object.keys(socketMap).join());
 			} else if (sokcetMapScheduling[address] != undefined) {
 				connect_flag = true;
 				logger.info('Disconnecting from Scheduling socket : %s', address);
 				redisServer.redisSub1.unsubscribe('ICE1_scheduling_' + address,1);
 				delete sokcetMapScheduling[address];
 				module.exports.allSchedulingSocketsMap = sokcetMapScheduling;
-				logger.info(": %d", Object.keys(sokcetMapScheduling).length);
-				logger.info("IP\'s connected : %s", Object.keys(sokcetMapScheduling).join());
+				logger.debug("No. of clients connected for Scheduling mode: %d", Object.keys(sokcetMapScheduling).length);
+				logger.debug("Clients connected for Scheduling mode : %s", Object.keys(sokcetMapScheduling).join());
 			}
 			if (connect_flag) {
 				var inputs = {
@@ -139,7 +126,7 @@ io.on('connection', function (socket) {
 					if (response.statusCode != 200 || result.rows == "fail") {
 						logger.error("Error occured in updateActiveIceSessions Error Code: ERRNDAC");
 					} else {
-						logger.info("IP disconnected %s", address);
+						logger.info("%s is disconnected", address);
 					}
 				});
 			}
@@ -147,35 +134,34 @@ io.on('connection', function (socket) {
 	});
 
 	socket.on('reconnect', function (data) {
-		logger.info("Inside Socket reconnect");
-		logger.info("Reconnecting for scheduling socket");
-		var ip = socket.request.connection.remoteAddress || socket.request.headers['x-forwarded-for'];
-		logger.info("Scheduling Mode Enabled for  IP: %s", ip);
-		var address = socket.handshake.query['username'];
+		logger.info("Inside Socket reconnect: Reconnecting for scheduling socket");
+		var address = socket.handshake.query.username;
 		if (data && socketMap[address] != undefined) {
 			redisServer.redisSub1.unsubscribe('ICE1_normal_' + address,1);
 			redisServer.redisSub1.subscribe('ICE1_scheduling_' + address,1);
-			logger.info('Disconnecting socket connection for Normal Mode(ICE Socket) : %s', address);
+			logger.info('Disconnecting socket connection for Normal Mode: %s', address);
 			delete socketMap[address];
 			module.exports.allSocketsMap = socketMap;
-			logger.info("No. OF CLIENTS CONNECTED: %d", Object.keys(socketMap).length);
-			logger.info("IP\'s connected :' %s", Object.keys(socketMap).join());
+			logger.debug("No. of clients connected for Normal mode: %d", Object.keys(socketMap).length);
+			logger.debug("Clients connected for Normal mode : %s", Object.keys(socketMap).join());
 			sokcetMapScheduling[address] = socket;
-			socket.send('schedulingEnabled');
 			module.exports.allSchedulingSocketsMap = sokcetMapScheduling;
-			logger.info("No. OF CLIENTS CONNECTED: %d", Object.keys(sokcetMapScheduling).length);
-			logger.info("IP\'s connected :' %s", Object.keys(sokcetMapScheduling).join());
+			socket.send('schedulingEnabled');
+			logger.debug("No. of clients connected for Scheduling mode: %d", Object.keys(sokcetMapScheduling).length);
+			logger.debug("Clients connected for Scheduling mode : %s", Object.keys(sokcetMapScheduling).join());
 		} else if (!data && sokcetMapScheduling != undefined) {
 			redisServer.redisSub1.unsubscribe('ICE1_scheduling_' + address,1);
 			redisServer.redisSub1.subscribe('ICE1_normal_' + address,1);
 			logger.info('Disconnecting socket connection for Scheduling mode: %s', address);
 			delete sokcetMapScheduling[address];
 			module.exports.allSchedulingSocketsMap = sokcetMapScheduling;
-			logger.info("No. OF CLIENTS CONNECTED: %d", Object.keys(sokcetMapScheduling).length);
-			logger.info("IP\'s connected :' %s", Object.keys(sokcetMapScheduling).join());
+			logger.debug("No. of clients connected for Scheduling mode: %d", Object.keys(sokcetMapScheduling).length);
+			logger.debug("Clients connected for Scheduling mode : %s", Object.keys(sokcetMapScheduling).join());
 			socketMap[address] = socket;
 			module.exports.allSocketsMap = socketMap;
 			socket.send('schedulingDisabled');
+			logger.debug("No. of clients connected for Normal mode: %d", Object.keys(socketMap).length);
+			logger.debug("Clients connected for Normal mode : %s", Object.keys(socketMap).join());
 		}
 	});
 
@@ -216,7 +202,7 @@ var Base64 = {
 	_utf8_decode: function (utftext) {
 		var string = "";
 		var i = 0;
-		var c = c1 = c2 = 0;
+		var c = 0, c2 = 0;
 		while (i < utftext.length) {
 			c = utftext.charCodeAt(i);
 			if (c < 128) {
@@ -235,6 +221,6 @@ var Base64 = {
 		}
 		return string;
 	}
-}
+};
 
 module.exports = io;

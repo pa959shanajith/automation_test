@@ -24,7 +24,7 @@ exports.getMainReport_ICE = function (req, res) {
 		}
 		if (sessionToken != undefined && req.session.id == sessionToken) {
 			var host = req.headers.host.split(":"); //req.connection.servername;//localAddress.split(":")[req.connection.localAddress.split(":").length-1];
-			if (host.length>1) reportAddr="https://" + host[0] + ":" + host[1] + "/reportServer/"
+			if (host.length>1) reportAddr="https://" + host[0] + ":" + host[1] + "/reportServer/";
 			else reportAddr = "https://" + host[0] + "/reportServer/";
 			var client = require("jsreport-client")(reportAddr);
 			client.render({
@@ -63,45 +63,19 @@ exports.openScreenShot = function (req, res) {
 	try {
 		var path = req.body.absPath;
 		var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-		logger.info("ICE Socket connecting IP: %s" , ip);
+		logger.debug("ICE Socket connecting IP: %s" , ip);
 		var name = req.session.username;
-		logger.info("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
-		logger.info("ICE Socket requesting Address: %s" , name);
-		//redisServer.redisSub2.removeAllListeners('message');
+		logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
+		logger.debug("ICE Socket requesting Address: %s" , name);
 		redisServer.redisSub2.subscribe('ICE2_' + name,1);
 		redisServer.redisPub1.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
 			if (redisres[1]==1) {
-				/* Commented for LB
-				if ('allSocketsMap' in myserver && name in myserver.allSocketsMap) {
-				var mySocket = myserver.allSocketsMap[name];
-				mySocket._events.render_screenshot = [];
-				mySocket.emit('render_screenshot', path);
-				*/
 				logger.info("Sending socket request for render_screenshot to redis");
 				dataToIce = {"emitAction" : "render_screenshot","username" : name, "path":path};
 				redisServer.redisPub1.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
 				var updateSessionExpiry = setInterval(function () {
 						req.session.cookie.maxAge = sessionTime;
 					}, updateSessionTimeEvery);
-				/* Commented for LB
-				mySocket.on('render_screenshot', function (resultData) {
-					//req.session.cookie.expires = sessionExtend
-					clearInterval(updateSessionExpiry);
-					if (resultData != "fail") {
-						logger.info('Screen shot opened successfully');
-						res.send(resultData);
-					} else{
-						logger.error('Screen shot status: ', resultData);
-						res.send(resultData);
-					}
-				});
-				mySocket.on("unavailableLocalServer", function () {
-					logger.error("Error occured in openScreenShot: Socket Disconnected");
-					if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
-						var soc = myserver.socketMapNotify[name];
-						soc.emit("ICEnotAvailable");
-					}
-				});*/
 				function render_screenshot_listener(channel,message) {
 					data = JSON.parse(message);
 					if(name == data.username){
@@ -124,7 +98,7 @@ exports.openScreenShot = function (req, res) {
 							}
 						}
 					}
-				};
+				}
 				redisServer.redisSub2.on("message",render_screenshot_listener);
 			} else {
 				logger.error("ICE Socket not Available");
@@ -151,7 +125,7 @@ exports.renderReport_ICE = function (req, res) {
 			if (reportType != "html")
 				shortId = "H1Orcdvhg";
 			var host = req.headers.host.split(":"); //req.connection.servername;//localAddress.split(":")[req.connection.localAddress.split(":").length-1];
-			if (host.length>1) reportAddr="https://" + host[0] + ":" + host[1] + "/reportServer/"
+			if (host.length>1) reportAddr="https://" + host[0] + ":" + host[1] + "/reportServer/";
 			else reportAddr = "https://" + host[0] + "/reportServer/";
 			var client = require("jsreport-client")(reportAddr);
 			client.render({
@@ -520,7 +494,7 @@ exports.getSuiteDetailsInExecution_ICE = function (req, res) {
 				}
 			});
 		} else {
-			logger.error("Error in the service getSuiteDetailsInExecution_ICE: Invalid Session")
+			logger.error("Error in the service getSuiteDetailsInExecution_ICE: Invalid Session");
 			res.send("Invalid Session");
 		}
 	} catch (exception) {
@@ -1061,7 +1035,6 @@ exports.connectJira_ICE = function (req, res) {
 		}
 		if (sessionToken != undefined && req.session.id == sessionToken) {
 			var name = req.session.username;
-			//redisServer.redisSub2.removeAllListeners('message');
 			redisServer.redisSub2.subscribe('ICE2_' + name,1);
 			if(req.body.action == 'loginToJira'){ //Login to Jira for creating issues
 				var jiraurl = req.body.url;
@@ -1075,15 +1048,10 @@ exports.connectJira_ICE = function (req, res) {
 						"jira_pwd": jirapwd
 					};
 					try {
-						logger.info("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
-						logger.info("ICE Socket requesting Address: %s" , name);
+						logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
+						logger.debug("ICE Socket requesting Address: %s" , name);
 						redisServer.redisPub1.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
 							if (redisres[1]==1) {
-								/* Commented for LB
-								if ('allSocketsMap' in myserver && name in myserver.allSocketsMap) {
-								var mySocket = myserver.allSocketsMap[name];
-								mySocket._events.jiralogin = [];
-								mySocket.emit('jiralogin',req.body.action,inputs);*/
 								logger.info("Sending socket request for jira_login to redis");
 								dataToIce = {"emitAction": "jira_login", "username": name, "action": req.body.action, "inputs": inputs};
 								redisServer.redisPub1.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
@@ -1091,30 +1059,6 @@ exports.connectJira_ICE = function (req, res) {
 									req.session.cookie.maxAge = sessionTime;
 								}, updateSessionTimeEvery);
 								var count = 0;
-								/* Commented for LB
-								mySocket.on('auto_populate', function (resultData) {
-									clearInterval(updateSessionExpiry);
-									if (resultData != "Fail") {
-										if(count == 0){
-											logger.info('Jira: Login successfully.');
-											res.send(resultData); 
-											count++;
-										}
-									} else{
-										if(count == 0){
-											logger.error('Jira: Login Failed.');
-											res.send(resultData); 
-											count++;
-										}
-									}
-								});
-								mySocket.on("unavailableLocalServer", function () {
-									logger.error("Error occured in connectJira_ICE - loginToJira: Socket Disconnected");
-									if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
-										var soc = myserver.socketMapNotify[name];
-										soc.emit("ICEnotAvailable");
-									}
-								});*/
 								function jira_login_1_listener(channel,message) {
 									data = JSON.parse(message);
 									if(name == data.username){
@@ -1143,7 +1087,7 @@ exports.connectJira_ICE = function (req, res) {
 											}
 										}
 									}
-								};
+								}
 								redisServer.redisSub2.on("message",jira_login_1_listener);
 							} else {
 								logger.error("Error occured in the service connectJira_ICE - loginToJira: Socket not Available");
@@ -1163,16 +1107,10 @@ exports.connectJira_ICE = function (req, res) {
 				var createObj = req.body.issue_dict;
 				if(!validateData(createObj.project,"empty") && !validateData(createObj.issuetype,"empty") && !validateData(createObj.summary,"empty") && !validateData(createObj.priority,"empty")){
 					try {
-						logger.info("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
-						logger.info("ICE Socket requesting Address: %s" , name);
+						logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
+						logger.debug("ICE Socket requesting Address: %s" , name);
 						redisServer.redisPub1.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
 							if (redisres[1]==1) {
-								/* Commented for LB
-								if ('allSocketsMap' in myserver && name in myserver.allSocketsMap) {
-								var mySocket = myserver.allSocketsMap[name];
-								mySocket._events.jiralogin = [];
-								mySocket._events.issue_id = [];
-								mySocket.emit('jiralogin',req.body.action,createObj);*/
 								logger.info("Sending socket request for jira_login to redis");
 								dataToIce = {"emitAction": "jira_login", "username": name, "action": req.body.action, "inputs": createObj};
 								redisServer.redisPub1.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
@@ -1180,30 +1118,6 @@ exports.connectJira_ICE = function (req, res) {
 									req.session.cookie.maxAge = sessionTime;
 								}, updateSessionTimeEvery);
 								var count = 0;
-								/* Commented for LB
-								mySocket.on('issue_id', function (resultData) {
-									clearInterval(updateSessionExpiry);
-									if (resultData != "Fail") {
-										if(count == 0){
-											logger.info('Jira: Issue created successfully.');
-											res.send(resultData);
-											count++;
-										}
-									} else {
-										if(count == 0){
-											logger.error('Jira: Failed to create issue.');
-											res.send(resultData);
-											count++;
-										}
-									}
-								});
-								mySocket.on("unavailableLocalServer", function () {
-									logger.error("Error occured in connectJira_ICE - createIssueInJira: Socket Disconnected");
-									if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
-										var soc = myserver.socketMapNotify[name];
-										soc.emit("ICEnotAvailable");
-									}
-								});*/
 								function jira_login_2_listener(channel,message) {
 									data = JSON.parse(message);
 									if(name == data.username){
@@ -1232,7 +1146,7 @@ exports.connectJira_ICE = function (req, res) {
 											}
 										}
 									}
-								};
+								}
 								redisServer.redisSub2.on("message",jira_login_2_listener);
 							} else {
 								logger.error("Error occured in the service connectJira_ICE - createIssueInJira: Socket not Available");

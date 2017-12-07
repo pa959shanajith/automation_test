@@ -147,16 +147,11 @@ exports.readTestSuite_ICE = function (req, res) {
 												if (testsuitesindex == requiredreadTestSuite.length) {
 													if (fromFlg == "scheduling") {
 														var connectusers = [];
-														/* Commented for LB
-														if (myserver.allSchedulingSocketsMap != undefined) {
-															connectusers = Object.keys(myserver.allSchedulingSocketsMap);
-															logger.info("IP\'s connected : %s", Object.keys(myserver.allSchedulingSocketsMap).join());
-														} */
 														redisServer.redisPub1.pubsub('channels','ICE1_scheduling_*',function(err,redisres){
 															redisres.forEach(function(e){
 																connectusers.push(e.split('_')[2]);
 															});
-															logger.info("IP\'s connected : %s", connectusers.join());
+															logger.debug("IP\'s connected : %s", connectusers.join());
 															var schedulingDetails = {
 																"connectedUsers": connectusers,
 																"testSuiteDetails": responsedata
@@ -312,16 +307,11 @@ function readTestSuite_ICE_SVN(req,callback) {
 													if (testsuitesindex == requiredreadTestSuite.length) {
 														if (fromFlg == "scheduling") {
 															var connectusers = [];
-															/* Commented for LB
-															if (myserver.allSchedulingSocketsMap != undefined) {
-																connectusers = Object.keys(myserver.allSchedulingSocketsMap);
-																logger.info("IP\'s connected : %s", Object.keys(myserver.allSchedulingSocketsMap).join());
-															} */
 															redisServer.redisPub1.pubsub('channels','ICE1_scheduling_*',function(err,redisres){
 																redisres.forEach(function(e){
 																	connectusers.push(e.split('_')[2]);
 																});
-																logger.info("IP\'s connected : %s", connectusers.join());
+																logger.debug("IP\'s connected : %s", connectusers.join());
 																var schedulingDetails = {
 																	"connectedUsers": connectusers,
 																	"testSuiteDetails": responsedata
@@ -330,7 +320,7 @@ function readTestSuite_ICE_SVN(req,callback) {
 																callback(true);
 															});
 														} else
-															callback(true)
+															callback(true);
 													}
 												}
 												outscenarioidcallback();
@@ -632,7 +622,6 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 	}
 	if (sessionToken != undefined && req.session.id == sessionToken) {
 		var name = req.session.username;
-		//redisServer.redisSub2.removeAllListeners('message');
 		redisServer.redisSub2.subscribe('ICE2_' + name,1);
 		var batchExecutionData = req.body.moduleInfo;
 		var userInfo = req.body.userInfo;
@@ -750,31 +739,15 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 			var testsuitecount=0;
 			var statusPass = 0;
 			var suiteStatus;
-			logger.info("ICE Socket requesting Address: %s" , name);
+			logger.debug("ICE Socket requesting Address: %s" , name);
 			redisServer.redisPub1.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
 				if (redisres[1]==1) {
-					/*commented for LB
-					if ('allSocketsMap' in myserver && name in myserver.allSocketsMap) {
-					var mySocket = myserver.allSocketsMap[name];
-					mySocket._events.result_executeTestSuite = [];
-					mySocket.emit('executeTestSuite', executionRequest);*/
 					logger.info("Sending socket request for executeTestSuite to redis");
 					dataToIce = {"emitAction" : "executeTestSuite","username" : name, "executionRequest": executionRequest};
 					redisServer.redisPub1.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
 					var updateSessionExpiry = setInterval(function () {
 							req.session.cookie.maxAge = sessionTime;
 						}, updateSessionTimeEvery);
-					/*commented for LB
-					mySocket.on("unavailableLocalServer", function () {
-						logger.error("Error occured in ExecuteTestSuite_ICE: Socket Disconnected");
-						if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
-							var soc = myserver.socketMapNotify[name];
-							soc.emit("ICEnotAvailable");
-						}
-					});
-					mySocket.on('result_executeTestSuite', function (resultData) {
-					//req.session.cookie.expires = new Date(Date.now() + 30 * 60 * 1000);
-					*/
 					function executeTestSuite_listener(channel,message) {
 						data = JSON.parse(message);
 						if(name == data.username){
@@ -871,7 +844,7 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 								}
 							}
 						}
-					};
+					}
 					redisServer.redisSub2.on("message",executeTestSuite_listener);
 				} else {
 					logger.error("Error occured in the function executionFunction: Socket not Available");
@@ -1038,7 +1011,7 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 						"testsuiteid": userdata_iterator.moduleInfo[i].moduleId,
 						"testsuitename": userdata_iterator.moduleInfo[i].moduleName,
 						"appType": userdata_iterator.moduleInfo[i].appType
-					}
+					};
 					module_data[userdata_iterator.userInfo.ice_username].push(module_info_data);
 
 				}
@@ -1060,7 +1033,7 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 							}
 							else {
 								var module_index = userdata_iterator.moduleInfo.indexOf(moduleinfo_iterator);
-								var moduleResult = { "moduleName": "", "moduleId": "", "suiteDetails": [] }
+								var moduleResult = { "moduleName": "", "moduleId": "", "suiteDetails": [] };
 								var readTestSuite = {
 									"assignedTestScenarioIds": "",
 									"cycleid": moduleinfo_iterator.cycleId,
@@ -1211,7 +1184,6 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 								function executionFunction(executionRequest, username) {
 									// var name = req.session.username;
 									var name = username;
-									//redisServer.redisSub2.removeAllListeners('message');
 									redisServer.redisSub2.subscribe('ICE2_' + name,1);
 									var scenarioCount = executionRequest.suitedetails[0].scenarioIds.length;
 									var completedSceCount = 0;
@@ -1219,28 +1191,12 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 									var suiteStatus;
 									redisServer.redisPub1.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
 										if (redisres[1]==1) {
-											/* Commented for LB
-											if ('allSocketsMap' in myserver && name in myserver.allSocketsMap) {
-											var mySocket = myserver.allSocketsMap[name];
-											mySocket._events.result_executeTestSuite = [];
-											mySocket.emit('executeTestSuite', executionRequest); */
 											logger.info("Sending socket request for executeTestSuite to redis");
 											dataToIce = {"emitAction" : "executeTestSuite","username" : name, "executionRequest": executionRequest};
 											redisServer.redisPub1.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
 											// var updateSessionExpiry = setInterval(function () {
 											// 		req.session.cookie.maxAge = sessionTime;
 											// 	}, updateSessionTimeEvery);
-											/* Commented for LB
-											mySocket.on("unavailableLocalServer", function () {
-												logger.error("Error occured in ExecuteTestSuite_ICE_SVN: Socket Disconnected");
-												if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
-													var soc = myserver.socketMapNotify[name];
-													soc.emit("ICEnotAvailable");
-												}
-											});
-											mySocket.on('result_executeTestSuite', function (resultData) {
-												//req.session.cookie.expires = new Date(Date.now() + 30 * 60 * 1000);
-											*/
 											function executeTestSuite_listener(channel,message) {
 												data = JSON.parse(message);
 												if(name == data.username){
@@ -1336,7 +1292,7 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 														}
 													}
 												}
-											};
+											}
 											redisServer.redisSub2.on("message",executeTestSuite_listener);
 										} else {
 											logger.error("Error occured in ExecuteTestSuite_ICE_SVN service: Socket not Available");
@@ -1378,7 +1334,6 @@ exports.ExecuteTestSuite_ICE_CI = function (req, res) {
 	}
 	if (sessionToken != undefined && req.body.session_id == sessionToken) {
 		var name = req.session.username;
-		//redisServer.redisSub2.removeAllListeners('message');
 		redisServer.redisSub2.subscribe('ICE2_' + name,1);
 		var batchExecutionData = req.body.moduleInfo;
 		var userInfo = req.body.userInfo;
@@ -1496,29 +1451,12 @@ exports.ExecuteTestSuite_ICE_CI = function (req, res) {
 			logger.info("ICE Socket requesting Address: %s" , name);
 			redisServer.redisPub1.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
 				if (redisres[1]==1) {
-					/*commented for LB
-					if ('allSocketsMap' in myserver && name in myserver.allSocketsMap) {
-					var mySocket = myserver.allSocketsMap[name];
-					mySocket._events.result_executeTestSuite = [];
-					mySocket.emit('executeTestSuite', executionRequest); */
 					logger.info("Sending socket request for executeTestSuite to redis");
 					dataToIce = {"emitAction" : "executeTestSuite","username" : name, "executionRequest": executionRequest};
 					redisServer.redisPub1.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
 					var updateSessionExpiry = setInterval(function () {
 							req.session.cookie.maxAge = sessionTime;
 						}, updateSessionTimeEvery);
-					/*commented for LB
-					mySocket.on("unavailableLocalServer", function () {
-						logger.error("Error occured in ExecuteTestSuite_ICE_CI: Socket Disconnected");
-						if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
-							var soc = myserver.socketMapNotify[name];
-							soc.emit("ICEnotAvailable");
-						}
-					});
-					mySocket.on('result_executeTestSuite', function (resultData) {
-						//req.session.cookie.expires = sessionExtend;
-						//completedSceCount++;
-					*/
 					function executeTestSuite_listener(channel,message) {
 						data = JSON.parse(message);
 						if(name == data.username){
@@ -1614,7 +1552,7 @@ exports.ExecuteTestSuite_ICE_CI = function (req, res) {
 								}
 							}
 						}
-					};
+					}
 					redisServer.redisSub2.on("message",executeTestSuite_listener);
 				} else {
 					logger.error("Error occured in the function executionFunction in ExecuteTestSuite_ICE_CI: Socket not Available");
@@ -2686,21 +2624,15 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 						function scheduleFunction(executionRequest) {
 							logger.info("Inside scheduleFunction function of executeScheduling");
 							var name = ipAdd;
-							//redisServer.redisSub2.removeAllListeners('message');
 							redisServer.redisSub2.subscribe('ICE2_' + name ,1);	
 							//var scenarioCount_s = executionRequest.suitedetails[0].scenarioIds.length;
 							var completedSceCount_s = 0;
 							var testsuitecount_s = 0;
 							var statusPass_s = 0;
 							var suiteStatus_s;
-							logger.info("ICE Socket requesting Address: %s" , name);
+							logger.debug("ICE Socket requesting Address: %s" , name);
 							redisServer.redisPub1.pubsub('numsub','ICE1_scheduling_' + name,function(err,redisres){
 								if (redisres[1]==1) {
-									/* Commented for LB
-									if ('allSchedulingSocketsMap' in myserver && name in myserver.allSchedulingSocketsMap) {
-									var mySocket = myserver.allSchedulingSocketsMap[name];
-									mySocket._events.result_executeTestSuite = [];
-									mySocket.emit('executeTestSuite', executionRequest); */
 									logger.info("Sending socket request for executeTestSuite to redis");
 									dataToIce = {"emitAction" : "executeTestSuite","username" : name, "executionRequest": executionRequest};
 									redisServer.redisPub1.publish('ICE1_scheduling_' + name,JSON.stringify(dataToIce));
@@ -2708,21 +2640,6 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 									var updateSessionExpiry = setInterval(function () {
 										req.session.cookie.maxAge = sessionTime;
 									}, updateSessionTimeEvery);
-									/* Commented for LB
-									mySocket.on('return_status_executeTestSuite', function (response) {
-										if(response == "success"){
-											scheduleStatus = "Inprogress";
-											logger.info("Calling function updateStatus from scheduleFunction");
-											updateStatus(sessObj, function (err, data) {
-												if (!err) {
-													logger.info("Sending response data from scheduleFunction");
-												}
-											});
-										}
-									});
-									mySocket.on('result_executeTestSuite', function (resultData) {
-										//completedSceCount_s++;
-									*/
 									function executeTestSuite_listener(channel,message) {
 										data = JSON.parse(message);
 										if(name == data.username){
@@ -2831,7 +2748,7 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 												}
 											}
 										}
-									};
+									}
 									redisServer.redisSub2.on("message",executeTestSuite_listener);
 								} else {
 									logger.error("Error occured in the function scheduleFunction: Socket not Available");
