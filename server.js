@@ -463,7 +463,8 @@ try {
     var jsreport = require('jsreport')({
         express: { app :reportingApp, server: httpsServer },
         appPath: "/reportServer",
-        wkhtmltopdf:{allowLocalFilesAccess:true}
+        wkhtmltopdf:{allowLocalFilesAccess:true},
+		logger: {"console":{"transport":"console","level":"error"}}
     });
 
     jsreport.init(function () {
