@@ -1929,8 +1929,10 @@ console.log("screenName:", screenName);
             if ($(".parentObjContainer").find(".checkStylebox").is(":checked")) {
                 viewString.view = [];
                 viewString.mirror = "";
-                newScrapedList.view = [];
-                newScrapedList.mirror = "";
+                if(newScrapedList != undefined){
+                    newScrapedList.view = [];
+                    newScrapedList.mirror = "";
+                }
                 $("#scraplist").empty();
                 $("#deleteObjects").prop("disabled", true);
                 $(".checkStylebox").prop("checked", false);
@@ -2342,7 +2344,7 @@ console.log("screenName:", screenName);
         }
         if(dupCustObjNames.length > 0)
         {
-            openDialog("Add Object", "Duplicate custom names added");
+            openDialog("Add Object", "Duplicate custom names");
             $('input.form-control-custom').each(function() {
                 for(var j=0;j<dupCustObjNames.length;j++)
                 {

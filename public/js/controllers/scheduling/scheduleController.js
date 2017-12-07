@@ -175,8 +175,12 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 			if($(this).val().length > 0){
 				$(this).parent().siblings('span').find('.fc-timePicker').prop('disabled',false).css('background-color','white');
 			}
+			$(this).parent().siblings('.timePicContainer').find('.fc-timePicker').timepicker({
+				minTime: new Date().getHours() + ':' + (parseInt(new Date().getMinutes()+5)),
+				minuteStep: 1,
+				showMeridian: false
+			})
 		})
-		
 	})
 	$(document).on('focus', '#datetimepicker1', function(){
 		$(this).datetimepicker({

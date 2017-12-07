@@ -2405,7 +2405,12 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 				if(updateUserRes == "success"){
 					openModelPopup("Edit User", "User has been edited successfully.");
 					resetUpdateUser();
-
+					if(userDetails.user_id == updateUserObj.userId){
+						$("#displayUsername").text(updateUserObj.firstName+" "+updateUserObj.lastName);
+						userDetails.firstname = updateUserObj.firstName;
+						userDetails.lastname = updateUserObj.lastName;
+						window.localStorage['_UI'] = JSON.stringify(userDetails);
+					}
 					$timeout(function(){
 
 						$("#userTab").trigger("click");
