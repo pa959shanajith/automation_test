@@ -11,6 +11,7 @@ var sessionTime = 30 * 60 * 1000;
 var updateSessionTimeEvery = 20 * 60 * 1000;
 var validator =  require('validator');
 var  logger = require('../../logger');
+var reportAddr;
 
 exports.getMainReport_ICE = function (req, res) {
 	logger.info("Inside UI service: getMainReport_ICE");
@@ -21,8 +22,10 @@ exports.getMainReport_ICE = function (req, res) {
 			sessionToken = sessionToken[1];
 		}
 		if (sessionToken != undefined && req.session.id == sessionToken) {
-			var IP = req.headers.host.split(":")[0]; //req.connection.servername;//localAddress.split(":")[req.connection.localAddress.split(":").length-1];
-			var client = require("jsreport-client")("https://" + IP + ":8001/");
+			var host = req.headers.host.split(":"); //req.connection.servername;//localAddress.split(":")[req.connection.localAddress.split(":").length-1];
+			if (host.length>1) reportAddr="https://" + host[0] + ":" + host[1] + "/reportServer/"
+			else reportAddr = "https://" + host[0] + "/reportServer/";
+			var client = require("jsreport-client")(reportAddr);
 			client.render({
 				template: {
 					shortid: "HJP1pqMcg",
@@ -111,8 +114,10 @@ exports.renderReport_ICE = function (req, res) {
 			var shortId = "rkE973-5l";
 			if (reportType != "html")
 				shortId = "H1Orcdvhg";
-			var IP = req.headers.host.split(":")[0]; //req.connection.servername;//localAddress.split(":")[req.connection.localAddress.split(":").length-1];
-			var client = require("jsreport-client")("https://" + IP + ":8001/");
+			var host = req.headers.host.split(":"); //req.connection.servername;//localAddress.split(":")[req.connection.localAddress.split(":").length-1];
+			if (host.length>1) reportAddr="https://" + host[0] + ":" + host[1] + "/reportServer/"
+			else reportAddr = "https://" + host[0] + "/reportServer/";
+			var client = require("jsreport-client")(reportAddr);
 			client.render({
 				template: {
 					shortid: shortId,

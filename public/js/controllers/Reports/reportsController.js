@@ -1,4 +1,3 @@
-
 mySPA.controller('reportsController', ['$scope','$rootScope', '$http', '$location', '$timeout','$window', 'reportService','cfpLoadingBar','$sce', function($scope, $rootScope, $http,$location,$timeout,$window,reportService, cfpLoadingBar, $sce) {
 	$("body").css("background","#eee");
 	$("head").append('<link id="mindmapCSS2" rel="stylesheet" type="text/css" href="fonts/font-awesome_mindmap/css/font-awesome.min.css" />')
@@ -614,6 +613,7 @@ mySPA.controller('reportsController', ['$scope','$rootScope', '$http', '$locatio
 		function(error) {
 			console.log("Error-------"+error);
 		});
+		e.stopImmediatePropagation();
 	});
 
 
