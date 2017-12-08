@@ -1,6 +1,6 @@
 var redis = require("redis");
 var logger = require('../../logger');
-var redisConfig = {"host": process.env.REDIS_IP, "port": parseInt(process.env.REDIS_PORT)};
+var redisConfig = {"host": process.env.REDIS_IP, "port": parseInt(process.env.REDIS_PORT),"password" : process.env.REDIS_AUTH};
 var sub1 = redis.createClient(redisConfig);
 var pub1 = redis.createClient(redisConfig);
 var sub2 = redis.createClient(redisConfig);

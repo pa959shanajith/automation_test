@@ -11,7 +11,6 @@ var expressWinston = require('express-winston');
 var winston = require('winston');
 var epurl = "http://"+process.env.NDAC_IP+":"+process.env.NDAC_PORT+"/";
 var logger = require('./logger');
-
 if (cluster.isMaster) {
     cluster.fork();
     cluster.on('disconnect', function(worker) {
@@ -29,10 +28,14 @@ try {
     var bodyParser = require('body-parser');
     var sessions = require('express-session');
     var cookieParser = require('cookie-parser');
-    var cmd = require('node-cmd');
     var helmet = require('helmet');
     var async = require('async');
     var lusca = require('lusca');
+    var redis = require("redis");
+    var redisStore = require('connect-redis')(sessions);
+    var redisConfig = {"host": process.env.REDIS_IP, "port": parseInt(process.env.REDIS_PORT),"password" : process.env.REDIS_AUTH};
+    var redisSessionClient = redis.createClient(redisConfig);
+    
     //HTTPS Configuration
     var privateKey = fs.readFileSync('server/https/server.key', 'utf-8');
     var certificate = fs.readFileSync('server/https/server.crt', 'utf-8');
@@ -83,6 +86,7 @@ try {
     app.use(cookieParser());
     app.use(sessions({
         secret: '$^%EDE%^tfd65e7ufyCYDR^%IU',
+        store: new redisStore({ host: process.env.REDIS_IP, port: process.env.REDIS_PORT, client: redisSessionClient}),
         path: '/',
         httpOnly: true,
         secure: true,
@@ -336,7 +340,7 @@ try {
         var version = require('./server/controllers/project_versioning');
         app.post('/version', version.versioning);
     } catch (Ex) {
-        logger.error('Versioning route path not found');
+        logger.warn('Versioning route path not found');
     }
 
     app.post('/home', mindmap.mindmapService);
