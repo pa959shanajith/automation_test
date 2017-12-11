@@ -14,10 +14,10 @@ var logger = require('./logger');
 if (cluster.isMaster) {
     cluster.fork();
     cluster.on('disconnect', function(worker) {
-        logger.info('disconnect!');
+        logger.error('Node server has encountered some problems, Disconnecting!');
     });
     cluster.on('exit', function(worker) {
-        logger.info('Let\'s not have Sentiments... Worker %d is killed. %s', worker.id);
+        logger.error('Worker %d is killed!', worker.id);
         cluster.fork();
     });
 
@@ -77,7 +77,7 @@ try {
     if(process.env.EXPRESSLOGS == 'ON')
     app.use(expressWinston.logger({
         winstonInstance: logger,
-        requestWhitelist: ['url','ip'],
+        requestWhitelist: ['url'],
         colorize: true
 
     }));
@@ -136,6 +136,7 @@ try {
                                 if (req.session != undefined) {
                                     meta.username = req.session.username;
                                     meta.userid = req.session.userid;
+                                    meta.userip = req.headers['client-ip'] != undefined ?  req.headers['client-ip']: req.ip;
                                     return meta;
                                 }
                                 else {
@@ -197,6 +198,7 @@ try {
         logger.rewriters.push(function (level, msg, meta) {
             meta.username = null;
             meta.userid = null;
+            meta.userip = req.headers['client-ip'] != undefined ?  req.headers['client-ip']: req.ip;
             return meta;
         });
         res.sendFile("index.html", {root: __dirname + "/public/"});
@@ -252,6 +254,7 @@ try {
             if (req.session != undefined && req.session.userid != undefined) {
                 meta.username = req.session.username;
                 meta.userid = req.session.userid;
+                meta.userip = req.headers['client-ip'] != undefined ?  req.headers['client-ip']: req.ip;
                 return meta;
             }
             else {
