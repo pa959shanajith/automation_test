@@ -946,7 +946,6 @@ $(document).on('click', '.createNew-ete', function(e){
  	    $('#eteSearchScenarios').val("");
 
     	var container = $("#eteScenarioContainer");
-		container.empty();
     	
 		var id=d3.select(this).attr('data-mapid');
 		var moduleid=allMaps_info[id].id_n;
@@ -956,6 +955,7 @@ $(document).on('click', '.createNew-ete', function(e){
 		dataSender({task:'populateScenarios',moduleId:moduleid},function(err,result){
 			if(err) console.log(result);
 			else{
+			    container.empty();
 				//d3.select('.addScenarios-ete').classed('disableButton',!0);
 				result=JSON.parse(result);
 				if(result!=''){
