@@ -40,6 +40,7 @@ function loadMindmapData(param) {
             // 	selectedProject=result1.projectId[0];
             // }
             $(".project-list").val(selectedProject);
+			selectedProject = undefined;
             //$(".project-list option[value='" + selectedProject + "']").attr('selected', 'selected');
             if (param == 1) {
                 versioning_enabled = 1;
@@ -89,7 +90,7 @@ function loadMindmapData(param) {
                 } else {
                     loadMindmapData1(param);
                 }
-                setCookie('mm_pid', selectedProject, 15);
+                //setCookie('mm_pid', selectedProject, 15);
 
             });
             //Calling the function to restrict the user to give default node names
