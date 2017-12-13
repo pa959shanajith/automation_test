@@ -37,8 +37,12 @@ try {
     var redisSessionClient = redis.createClient(redisConfig);
     
     //HTTPS Configuration
-    var privateKey = fs.readFileSync('server/https/server.key', 'utf-8');
-    var certificate = fs.readFileSync('server/https/server.crt', 'utf-8');
+	var certPath = "server/https/";
+	if (process.env.LB_ENABLED == "True") {
+		certPath += "domain_certs/";
+	}
+    var privateKey = fs.readFileSync(certPath+'server.key', 'utf-8');
+    var certificate = fs.readFileSync(certPath+'server.crt', 'utf-8');
     var credentials = {
         key: privateKey,
         cert: certificate,
