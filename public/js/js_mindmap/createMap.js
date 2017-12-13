@@ -23,10 +23,11 @@ function loadMindmapData(param){
 			result1=JSON.parse(result);
 			//selectedProject=$(".project-list").val();
 			$(".project-list").empty();
-			for(i=0; i<result1.projectId.length && result1.projectName.length; i++){
+			for(i=0; i<(result1.projectId.length && result1.projectName.length); i++){
 				$('.project-list').append("<option app-type='"+result1.appType[i]+"' data-id='"+result1.projectName[i]+"' value='"+result1.projectId[i]+"'>"+result1.projectName[i]+"</option>");
 			}
-			selectedProject=result1.projectId[0];
+			if(!selectedProject)
+				selectedProject=result1.projectId[0];
 			// if(getCookie('mm_pid') != ''){
 			// 	selectedProject=getCookie('mm_pid');
 			// }
