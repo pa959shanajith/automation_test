@@ -445,7 +445,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         var query = $scope.query;
         console.log(query.length);
         if(query.length == 0 ){
-             alert("Please enter a query!");
+            openDialogMindmap('Error',"Please enter a query!");
         }
         else{
         $scope.visible = 0;
@@ -489,15 +489,15 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             var temp=dNodes.length;
         
         if(temp==0){
-                alert('Please select a module first');
+                openDialogMindmap('Error',"Please select a module first");
         }
         else if((selectedTab=='mindmapEndtoEndModules' || selectedTab=='tabCreate') && !$('#ct-inpBox').hasClass('no-disp'))
         {
-                alert('Please complete editing first');    
+                openDialogMindmap('Error',"Please complete editing first");   
                 d3.select('#ct-inpAct').node().focus();
         }
         else if(selectedTab=='tabAssign' && !$('#ct-assignBox').hasClass('no-disp')){
-                alert('Please complete assign step first');    
+                openDialogMindmap('Error','Please complete assign step first');    
         }
         else{
                 $('#switch-layout').toggleClass('vertical-layout');
