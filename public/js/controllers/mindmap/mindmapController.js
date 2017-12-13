@@ -504,4 +504,11 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 loadMap2();
         }
     };
+
+    $scope.createNewMap = function(){
+        if(confirm('Unsaved work will be lost if you continue.\nContinue?')){
+            $('.nodeBoxSelected').removeClass('nodeBoxSelected');
+            createNewMap();
+        }
+    }
 }]);

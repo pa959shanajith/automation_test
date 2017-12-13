@@ -1083,8 +1083,10 @@ function editNode(e,node){
 	$('#ct-inpAct').removeClass('errorClass');
 	d3.select('#ct-inpAct').classed('no-disp',!1);
 	e=e||window.event;
-	e.cancelbubble=!0;
-	if(e.stopPropagation) e.stopPropagation();
+	if(e){
+		e.cancelbubble=!0;
+		if(e.stopPropagation) e.stopPropagation();
+	}
 	//logic to create the node in editable mode
 	if(node==0){
 		childNode=null;
