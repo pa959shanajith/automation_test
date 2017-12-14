@@ -253,6 +253,15 @@ sub1.on("message", function (channel, message) {
 	}
 });
 
+function redisErrorHandler(err) {
+	process.env.EXIT_FLAG = true;
+}
+
+sub1.on("error",redisErrorHandler);
+pub1.on("error",redisErrorHandler);
+sub2.on("error",redisErrorHandler);
+pub2.on("error",redisErrorHandler);
+
 module.exports.redisSub1 = sub1;
 module.exports.redisPub1 = pub1;
 module.exports.redisSub2 = sub2;

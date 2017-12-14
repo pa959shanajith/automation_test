@@ -2,6 +2,7 @@
 var env = require('node-env-file');
 if (!process.env.ENV)
     env(__dirname + '/.env');
+process.env.EXIT_FLAG = false;
 
 // Module Dependencies
 var cluster = require('cluster');
@@ -12,13 +13,15 @@ var winston = require('winston');
 var epurl = "http://"+process.env.NDAC_IP+":"+process.env.NDAC_PORT+"/";
 var logger = require('./logger');
 if (cluster.isMaster) {
-    cluster.fork();
+	cluster.fork();
     cluster.on('disconnect', function(worker) {
         logger.error('Node server has encountered some problems, Disconnecting!');
     });
     cluster.on('exit', function(worker) {
-        logger.error('Worker %d is killed!', worker.id);
-        cluster.fork();
+		if (!process.env.EXIT_FLAG) {
+			logger.error('Worker %d is killed!', worker.id);
+			cluster.fork();
+		}
     });
 
 } else {
@@ -34,8 +37,13 @@ try {
     var redis = require("redis");
     var redisStore = require('connect-redis')(sessions);
     var redisConfig = {"host": process.env.REDIS_IP, "port": parseInt(process.env.REDIS_PORT),"password" : process.env.REDIS_AUTH};
-    var redisSessionClient = redis.createClient(redisConfig);
-    
+	var redisSessionClient = redis.createClient(redisConfig);
+	redisSessionClient.on("error", function (err) {
+        logger.error("Please run the Redis DB");
+		process.env.EXIT_FLAG = true;
+		cluster.worker.kill();
+	});
+
     //HTTPS Configuration
 	var certPath = "server/https/";
 	if (process.env.LB_ENABLED == "True") {
