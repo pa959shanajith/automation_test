@@ -11,7 +11,6 @@ var updateSessionTimeEvery = 20 * 60 * 1000;
 var validator =  require('validator');
 var logger = require('../../logger');
 var redisServer = require('../lib/redisSocketHandler');
-var reportAddr;
 
 exports.getMainReport_ICE = function (req, res) {
 	logger.info("Inside UI service: getMainReport_ICE");
@@ -22,10 +21,8 @@ exports.getMainReport_ICE = function (req, res) {
 			sessionToken = sessionToken[1];
 		}
 		if (sessionToken != undefined && req.session.id == sessionToken) {
-			var host = req.headers.host.split(":");
-			if (host.length>1) reportAddr="https://" + host[0] + ":" + host[1] + "/reportServer/";
-			else reportAddr = "https://" + host[0] + "/reportServer/";
-			var client = require("jsreport-client")(reportAddr);
+			var host = req.headers.host;
+			var client = require("jsreport-client")("https://" + host + "/reportServer/");
 			client.render({
 				template: {
 					shortid: "HJP1pqMcg",
@@ -123,10 +120,8 @@ exports.renderReport_ICE = function (req, res) {
 			var shortId = "rkE973-5l";
 			if (reportType != "html")
 				shortId = "H1Orcdvhg";
-			var host = req.headers.host.split(":");
-			if (host.length>1) reportAddr="https://" + host[0] + ":" + host[1] + "/reportServer/";
-			else reportAddr = "https://" + host[0] + "/reportServer/";
-			var client = require("jsreport-client")(reportAddr);
+			var host = req.headers.host;
+			var client = require("jsreport-client")("https://" + host + "/reportServer/");
 			client.render({
 				template: {
 					shortid: shortId,

@@ -762,9 +762,11 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 								var resultData = data.value;
 								clearInterval(updateSessionExpiry);
 								if (resultData != "success" && resultData != "Terminate") {
-									completedSceCount++;
-									scenarioCount = executionRequest.suitedetails[testsuitecount].scenarioIds.length;
+									// completedSceCount++;
+									// scenarioCount = executionRequest.suitedetails[testsuitecount].scenarioIds.length;
 									try {
+										completedSceCount++;
+										scenarioCount = executionRequest.suitedetails[testsuitecount].scenarioIds.length * executionRequest.suitedetails[testsuitecount].browserType.length;
 										var scenarioid = resultData.scenarioId;
 										var executionid = resultData.executionId;
 										var reportdata = resultData.reportData;

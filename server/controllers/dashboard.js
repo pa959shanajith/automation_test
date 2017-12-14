@@ -28,10 +28,8 @@ var  logger = require('../../logger');
     try {
       if(isSessionActive(req, res)){
         logger.info("Connecting to jsreport client from loadDashboard");
-		var host = req.headers.host.split(":"); //req.connection.servername;//localAddress.split(":")[req.connection.localAddress.split(":").length-1];
-		if (host.length>1) reportAddr="https://" + host[0] + ":" + host[1] + "/reportServer/";
-		else reportAddr = "https://" + host[0] + "/reportServer/";
-		var client = require("jsreport-client")(reportAddr);
+		var host = req.headers.host;
+		var client = require("jsreport-client")("https://" + host + "/reportServer/");
         client.render({
           template: {
             shortid: "ByCt0KGo-",
@@ -291,10 +289,8 @@ var  logger = require('../../logger');
     try {
       if(isSessionActive(req, res)){
         logger.info("Connecting to jsreport client from loadDashboard_2");
-		var host = req.headers.host.split(":"); //req.connection.servername;//localAddress.split(":")[req.connection.localAddress.split(":").length-1];
-		if (host.length>1) reportAddr="https://" + host[0] + ":" + host[1] + "/reportServer/";
-		else reportAddr = "https://" + host[0] + "/reportServer/";
-		var client = require("jsreport-client")(reportAddr);
+		var host = req.headers.host;
+		var client = require("jsreport-client")("https://" + host + "/reportServer/");
         client.render({
           template: {
             shortid: "rk00qKOn-",

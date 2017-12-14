@@ -91,7 +91,6 @@ try {
         winstonInstance: logger,
         requestWhitelist: ['url'],
         colorize: true
-
     }));
     else logger.info("Express logs are disabled");
 
@@ -477,7 +476,6 @@ try {
     }
 
     // Start JS REPORT Server
-    //require('./server/lib/jsReportServer')();
     var reportingApp = express();
     app.use('/reportServer', reportingApp);
     var jsreport = require('jsreport')({
