@@ -2,6 +2,7 @@
 var env = require('node-env-file');
 if (!process.env.ENV)
     env(__dirname + '/.env');
+process.env.EXIT_FLAG = false;
 
 // Module Dependencies
 var cluster = require('cluster');
@@ -9,17 +10,18 @@ var fs = require('fs');
 var util = require('util');
 var expressWinston = require('express-winston');
 var winston = require('winston');
-var epurl = "http://127.0.0.1:1990/";
+var epurl = "http://"+process.env.NDAC_IP+":"+process.env.NDAC_PORT+"/";
 var logger = require('./logger');
-
 if (cluster.isMaster) {
-    cluster.fork();
+	cluster.fork();
     cluster.on('disconnect', function(worker) {
-        logger.info('disconnect!');
+        logger.error('Node server has encountered some problems, Disconnecting!');
     });
     cluster.on('exit', function(worker) {
-        logger.info('Let\'s not have Sentiments... Worker %d is killed. %s', worker.id);
-        cluster.fork();
+		if (!process.env.EXIT_FLAG) {
+			logger.error('Worker %d is killed!', worker.id);
+			cluster.fork();
+		}
     });
 
 } else {
@@ -29,14 +31,26 @@ try {
     var bodyParser = require('body-parser');
     var sessions = require('express-session');
     var cookieParser = require('cookie-parser');
-    var cmd = require('node-cmd');
     var helmet = require('helmet');
-    const os = require('os');
     var async = require('async');
     var lusca = require('lusca');
+    var redis = require("redis");
+    var redisStore = require('connect-redis')(sessions);
+    var redisConfig = {"host": process.env.REDIS_IP, "port": parseInt(process.env.REDIS_PORT),"password" : process.env.REDIS_AUTH};
+	var redisSessionClient = redis.createClient(redisConfig);
+	redisSessionClient.on("error", function (err) {
+        logger.error("Please run the Redis DB");
+		process.env.EXIT_FLAG = true;
+		cluster.worker.kill();
+	});
+
     //HTTPS Configuration
-    var privateKey = fs.readFileSync('server/https/server.key', 'utf-8');
-    var certificate = fs.readFileSync('server/https/server.crt', 'utf-8');
+	var certPath = "server/https/";
+	if (process.env.LB_ENABLED == "True") {
+		certPath += "domain_certs/";
+	}
+    var privateKey = fs.readFileSync(certPath+'server.key', 'utf-8');
+    var certificate = fs.readFileSync(certPath+'server.crt', 'utf-8');
     var credentials = {
         key: privateKey,
         cert: certificate,
@@ -75,7 +89,7 @@ try {
     if(process.env.EXPRESSLOGS == 'ON')
     app.use(expressWinston.logger({
         winstonInstance: logger,
-        requestWhitelist: ['url','ip'],
+        requestWhitelist: ['url'],
         colorize: true
     }));
     else logger.info("Express logs are disabled");
@@ -83,6 +97,7 @@ try {
     app.use(cookieParser());
     app.use(sessions({
         secret: '$^%EDE%^tfd65e7ufyCYDR^%IU',
+        store: new redisStore({ host: process.env.REDIS_IP, port: process.env.REDIS_PORT, client: redisSessionClient}),
         path: '/',
         httpOnly: true,
         secure: true,
@@ -132,6 +147,7 @@ try {
                                 if (req.session != undefined) {
                                     meta.username = req.session.username;
                                     meta.userid = req.session.userid;
+                                    meta.userip = req.headers['client-ip'] != undefined ?  req.headers['client-ip']: req.ip;
                                     return meta;
                                 }
                                 else {
@@ -193,6 +209,7 @@ try {
         logger.rewriters.push(function (level, msg, meta) {
             meta.username = null;
             meta.userid = null;
+            meta.userip = req.headers['client-ip'] != undefined ?  req.headers['client-ip']: req.ip;
             return meta;
         });
         res.sendFile("index.html", {root: __dirname + "/public/"});
@@ -248,6 +265,7 @@ try {
             if (req.session != undefined && req.session.userid != undefined) {
                 meta.username = req.session.username;
                 meta.userid = req.session.userid;
+                meta.userip = req.headers['client-ip'] != undefined ?  req.headers['client-ip']: req.ip;
                 return meta;
             }
             else {
@@ -336,7 +354,7 @@ try {
         var version = require('./server/controllers/project_versioning');
         app.post('/version', version.versioning);
     } catch (Ex) {
-        logger.error('Versioning route path not found');
+        logger.warn('Versioning route path not found');
     }
 
     app.post('/home', mindmap.mindmapService);
@@ -474,7 +492,7 @@ try {
         console.error(e.stack)
         process.exit(1)
     });
-        
+
     //To prevent can't send header response
     app.use(function (req, res, next) {
         var _send = res.send;

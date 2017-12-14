@@ -14,6 +14,7 @@ const logger = new (winston.Logger)({
             (level, msg, meta) => {
                 meta.username = null;
                 meta.userid = null;
+                meta.userip = null;
                 return meta;
             }
         ],

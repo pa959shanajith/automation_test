@@ -1,8 +1,7 @@
-//node
-var myserver = require('../../server.js');
 // var PythonShell = require('python-shell');
 var Client = require("node-rest-client").Client;
 var client = new Client();
+var epurl = "http://"+process.env.NDAC_IP+":"+process.env.NDAC_PORT+"/";
 
 exports.getTopMatches_ProfJ = function getTopMatches(req, res) {
 	try {
@@ -21,7 +20,7 @@ exports.getTopMatches_ProfJ = function getTopMatches(req, res) {
                         headers:{'Content-Type': 'plain/text'}
                     };
 						// PythonShell.run("AES_encryption.py", options, function (err, results) {
-                    client.post("http://127.0.0.1:1990/chatbot/getTopMatches_ProfJ",args,
+                    client.post(epurl+"chatbot/getTopMatches_ProfJ",args,
                         function (results, response) {
                         // if (err){
                             if(response.statusCode != 200){
@@ -73,7 +72,7 @@ exports.updateFrequency_ProfJ = function(req, res) {
                     };
 						// PythonShell.run("AES_encryption.py", options, function (err, results) {
 					console.log("Hi I am inside update freq service")
-                    client.post("http://127.0.0.1:1990/chatbot/updateFrequency_ProfJ",args,
+                    client.post(epurl+"chatbot/updateFrequency_ProfJ",args,
                         function (results, response) {
                         // if (err){
                             if(response.statusCode != 200){
