@@ -195,15 +195,28 @@ function next_function(resultobj, cb, data) {
 					task_json.screenName = 'screenname';
 					task_json.scenarioName = 'scenarioname';
 					task_json.testCaseName = 'testcasename';
+					//Check if versioning exists
+					function versioningCheck()
+					{
+						try {
+							var versioning = require('../controllers/project_versioning.js');
+							versioningEnabled = ' version_'+ task_json.versionnumber+ ' : ';
+						}
+						catch(err) {
+							versioningEnabled = ' ';
+						}
+						return versioningEnabled;
+					}
+
 					if (t.task == 'Design' || t.task == 'Update') {
-						taskDetails.taskName = t.task + ' version_'+ task_json.versionnumber+ ':' + m.testCaseName;
+						taskDetails.taskName = t.task + versioningCheck() + m.testCaseName;
 						task_json.testCaseName = m.testCaseName;
 					} else if (t.task == 'Execute') {
-						taskDetails.taskName = t.task + ' version_'+ task_json.versionnumber+ ':' + m.moduleName;
+						taskDetails.taskName = t.task + versioningCheck()  + m.moduleName;
 						testSuiteDetails_obj.testsuitename = m.moduleName;
 					} else if (t.task == 'Execute Batch') {
 						task_json.projectId = "";
-						taskDetails.taskName = t.task + ' version_'+ task_json.versionnumber+ ':' + t.batchName;
+						taskDetails.taskName = t.task + versioningCheck() + t.batchName;
 						testSuiteDetails_obj.testsuitename = m.moduleName;
 						if (batch_dict[t.batchName] == undefined) {
 							batch_dict[t.batchName] = user_task_json.length;
@@ -218,11 +231,11 @@ function next_function(resultobj, cb, data) {
 					} else if (t.task == 'Execute Scenario') {
 						task_json.scenarioFlag = 'True';
 						task_json.assignedTestScenarioIds = [task_json.scenarioId];
-						taskDetails.taskName = t.task + ' version_'+ task_json.versionnumber+ ':' + m.testScenarioName;
+						taskDetails.taskName = t.task + versioningCheck() + m.testScenarioName;
 						task_json.scenarioName = m.testScenarioName;
 						//testSuiteDetails_obj.assignedTestScenarioIds=[task_json.scenarioId];
 					} else {
-						taskDetails.taskName = t.task + ' version_'+ task_json.versionnumber+ ':' + m.screenName;
+						taskDetails.taskName = t.task + versioningCheck() + m.screenName;
 						task_json.screenName = m.screenName;
 					}
 					//task_json.assignedTestScenarioIds=data.assignedTestScenarioIds;
