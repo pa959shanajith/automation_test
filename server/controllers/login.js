@@ -7,18 +7,16 @@ var epurl = "http://"+process.env.NDAC_IP+":"+process.env.NDAC_PORT+"/";
 var Client = require("node-rest-client").Client;
 var client = new Client();
 var validator = require('validator');
-//Global Variables
-var roles = [];
-var userRoles = {};
-var  logger = require('../../logger');
- var notificationMsg = require("../notifications/notifyMessages");
+var myserver = require('../lib/socket');
+var logger = require('../../logger');
+var notificationMsg = require("../notifications/notifyMessages");
+
 //Authenticate User - Nineteen68
 exports.authenticateUser_Nineteen68 = function (req, res) {
 	try {
 		logger.info("Inside UI service: authenticateUser_Nineteen68");
 		var username = req.body.username.toLowerCase();
 		var password = req.body.password;
-		var session = req.session;
 		var sessId = req.session.id;
 
 		validateLogin();
@@ -35,7 +33,6 @@ exports.authenticateUser_Nineteen68 = function (req, res) {
 			}
 		}
 		if (valid_username == true && valid_password == true) {
-			
 			req.session.username = username;
 			req.session.uniqueId = sessId;
 			var flag = 'inValidCredential';
@@ -75,7 +72,6 @@ exports.authenticateUser_Nineteen68 = function (req, res) {
 							logger.error("Error occured in authenticateUser_Nineteen68 Error Code : ERRNDAC");
 							res.send("fail");
 						} else {
-
 							try {
 								if (result.rows.length == 0) {
 									res.send(flag);
@@ -85,36 +81,12 @@ exports.authenticateUser_Nineteen68 = function (req, res) {
 									}
 									validUser = bcrypt.compareSync(password, dbHashedPassword); // true
 
-									//Check for concurrent login
-									if(validUser == true)
-									{
-										var maxTime = 0;
-										for (var key in req.sessionStore.sessions) {
-											var sessionStore = req.sessionStore.sessions[key];
-											if (sessionStore) {
-												var obj = JSON.parse(sessionStore);
-												if (username == obj.username) {
-													var dateEx = new Date(obj.cookie.expires);
-													if (dateEx.getTime() > maxTime) {
-														maxTime = dateEx.getTime();
-													}
-												}
-											}
-										}
-										var dateNow = new Date();
-										if (dateNow.getTime() < maxTime) {
-											return res.send("userLogged");
-										}
-									}
-									
-									//Check whether projects are assigned for a user
-									checkAssignedProjects(req, function (err, assignedProjectsData, role) {
-										if(err == 'fail')
-										{
+									// Callback function for Check whether projects are assigned for a user
+									function checkAssignedProjects_callback(err, assignedProjectsData, role) {
+										if(err == 'fail') {
 											logger.error("Error occured in authenticateUser_Nineteen68 Error Code : ERRNDAC");
 											res.send('fail');
-										}
-										else{
+										} else {
 											logger.info("Inside function call of checkAssignedProjects");
 											if (role != "Admin" && role != "Business Analyst" && role != "Tech Lead") {
 												if (assignedProjectsData > 0) {
@@ -150,7 +122,42 @@ exports.authenticateUser_Nineteen68 = function (req, res) {
 												}
 											}
 										}
-										
+									}
+
+									// Implementation for Concurrent login
+									myserver.defRedisCli.keys('*', function (allKeyserr, allKeys) {
+										if (allKeyserr) {
+											logger.error("Error while checking for session");
+											return res.send('fail');
+										} else {
+											var userLogged = false;
+											async.forEachSeries(allKeys, function(ki,ki_cb){
+												if (userLogged === true) {
+													ki_cb();
+												} else {
+													myserver.defRedisCli.get(ki, function (keyerr, keyVal) {
+														if (keyerr) {
+															logger.error("Error while checking for session");
+														} else {
+															var obj = JSON.parse(keyVal);
+															if (username == obj.username) {
+																userLogged=true;
+															}
+														}
+														ki_cb();
+													});
+												}
+											}, function(){
+												if (userLogged == 'fail') {
+													return res.send('fail');
+												} else if (userLogged==true) {
+													return res.send("userLogged");
+												} else if (userLogged==false) {
+													//Check whether projects are assigned for a user
+													checkAssignedProjects(req, checkAssignedProjects_callback);
+												}
+											});
+										}
 									});
 								}
 							} catch (exception) {
@@ -168,18 +175,19 @@ exports.authenticateUser_Nineteen68 = function (req, res) {
 		logger.error(exception);
 		res.send("fail");
 	}
-
 };
+
 function addUsernameAndIdInLogs(username,flag,userid){
-			if(flag == "validCredential"){
-				//logger.info("User " + username + " authenticated");
-				logger.rewriters.push(function(level, msg, meta) {
-						meta.username = username;
-						meta.userid = userid;
-						return meta;
-						});
-			}
+	if(flag == "validCredential"){
+		//logger.info("User " + username + " authenticated");
+		logger.rewriters.push(function(level, msg, meta) {
+			meta.username = username;
+			meta.userid = userid;
+			return meta;
+		});
+	}
 }
+
 /**
  * @see : function to authenticate users from jenkins
  * @author : vinay
@@ -189,7 +197,6 @@ exports.authenticateUser_Nineteen68_CI = function (req, res) {
 		logger.info("Inside UI service: authenticateUser_Nineteen68_CI");
 		var username = req.body.username.toLowerCase();
 		var password = req.body.password;
-		var session = req.session;
 		var sessId = req.session.id;
 		req.session.username = username;
 		req.session.uniqueId = sessId;
@@ -717,9 +724,8 @@ exports.loadUserInfo_Nineteen68 = function (req, res) {
 							} else {
 								try {
 									if (pluginResult.rows.length > 0) {
-										var objKeys = Object.keys(pluginResult.rows[0]);
 										var pluginsArr = [];
-										var count = 0;
+										// var count = 0;
 										for (var k in pluginResult.rows[0]) {
 											// if(count < pluginResult.columns.length){
 											if (k != 'roleid' && k != 'permissionid') {
@@ -782,7 +788,6 @@ exports.getRoleNameByRoleId_Nineteen68 = function (req, res) {
 			req.session.role = req.body.role;
 			var role = [];
 			//var role = roleId[0];
-			var flag = "";
 			async.forEachSeries(req.session.role, function (roleid, callback) {
 				var inputs = {
 					"roleid": roleid

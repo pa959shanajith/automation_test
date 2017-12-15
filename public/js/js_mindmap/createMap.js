@@ -10,7 +10,7 @@ var saveFlag = false;
 //for handling the case when creatednode goes beyond screensize
 var CreateEditFlag = false;
 var isIE = /*@cc_on!@*/ false || !!document.documentMode;
-
+var IncompleteFlowFlag = false;
 function loadMindmapData(param) {
     blockUI("Loading...");
     dataSender({
@@ -330,6 +330,13 @@ function loadMap(e) {
         clearSvg();
         var reqMap = d3.select(this).attr('data-mapid');
         treeBuilder(allMMaps[reqMap]);
+        //Himanshu
+        IncompleteFlowFlag = false;
+        error = treeIterator(undefined, dNodes[0], false);
+        if(error){
+            openDialogMindmap("Warning", 'Incomplete flow!');
+            IncompleteFlowFlag = true;
+        }
     }
 };
 // to load the map again after switching the layout
@@ -844,6 +851,10 @@ function addTask(e) {
 };
 
 function nodeClick(e) {
+    if(IncompleteFlowFlag){
+        openDialogMindmap('Error', 'Incomplete Flow!');
+        return;
+    }
     e = e || window.event;
     e.cancelbubble = !0;
     if (e.stopPropagation) e.stopPropagation();
@@ -1797,20 +1808,22 @@ function inpKeyUp(e) {
 };
 
 function treeIterator(c, d, e) {
-    c.push({
-        id: d.id,
-        childIndex: d.childIndex,
-        id_c: (d.id_c) ? d.id_c : null,
-        id_n: (d.id_n) ? d.id_n : null,
-        oid: (d.oid) ? d.oid : null,
-        name: d.name,
-        type: d.type,
-        pid: (d.parent) ? d.parent.id : null,
-        pid_c: (d.parent) ? d.parent.id_c : null,
-        task: (d.task) ? d.task : null,
-        renamed: (d.rnm) ? d.rnm : !1,
-        orig_name: (d.original_name) ? d.original_name : null
-    });
+    if(c != undefined){
+        c.push({
+            id: d.id,
+            childIndex: d.childIndex,
+            id_c: (d.id_c) ? d.id_c : null,
+            id_n: (d.id_n) ? d.id_n : null,
+            oid: (d.oid) ? d.oid : null,
+            name: d.name,
+            type: d.type,
+            pid: (d.parent) ? d.parent.id : null,
+            pid_c: (d.parent) ? d.parent.id_c : null,
+            task: (d.task) ? d.task : null,
+            renamed: (d.rnm) ? d.rnm : !1,
+            orig_name: (d.original_name) ? d.original_name : null
+        });
+    }
     if (d.children && d.children.length > 0) d.children.forEach(function(t) {
         e = treeIterator(c, t, e);
     });

@@ -254,7 +254,7 @@ sub1.on("message", function (channel, message) {
 });
 
 function redisErrorHandler(err) {
-	process.env.EXIT_FLAG = true;
+	/* Error Handler function */
 }
 
 sub1.on("error",redisErrorHandler);

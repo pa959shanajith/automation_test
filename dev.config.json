@@ -1,8 +1,4 @@
 {
-    "certificate": {
-        "key": "server/https/server.key",    
-        "cert": "server/https/server.crt"
-    },
     "authentication" : {
         "cookieSession": {
             "secret": "<your strong secret>"
@@ -14,8 +10,6 @@
         "enabled": false
     },
     "connectionString": { "name": "fs" },
-    "httpPort": 3001,
-    "httpsPort": 8001,
     "blobStorage": "fileSystem",
     "phantom": {
         "strategy": "dedicated-process",
@@ -29,5 +23,11 @@
     "scripts": {
         "allowedModules": [],
         "timeout": 60000
-    }
+    },
+	"logger": {
+		"console": {
+			"transport": "console",
+			"level": "error"
+		}
+	}
 }

@@ -14,6 +14,10 @@ var notificationMsg = require('./../notifications/notifyMessages');
 var epurl = "http://"+process.env.NDAC_IP+":"+process.env.NDAC_PORT+"/";
 var Client = require("node-rest-client").Client;
 var apiclient = new Client();
+var redis = require("redis");
+var redisConfig = {"host": process.env.REDIS_IP, "port": parseInt(process.env.REDIS_PORT),"password" : process.env.REDIS_AUTH};
+var defRedisCli = redis.createClient(redisConfig);
+defRedisCli.on("error", function (err) { /* Error Handler function */ });
 
 var uiConfig = require('./../config/options');
 var screenShotPath = uiConfig.storageConfig.screenShotPath;
@@ -224,3 +228,4 @@ var Base64 = {
 };
 
 module.exports = io;
+module.exports.defRedisCli = defRedisCli;

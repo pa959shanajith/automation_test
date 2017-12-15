@@ -2,7 +2,6 @@
 var env = require('node-env-file');
 if (!process.env.ENV)
     env(__dirname + '/.env');
-process.env.EXIT_FLAG = false;
 
 // Module Dependencies
 var cluster = require('cluster');
@@ -18,7 +17,7 @@ if (cluster.isMaster) {
         logger.error('Node server has encountered some problems, Disconnecting!');
     });
     cluster.on('exit', function(worker) {
-		if (!process.env.EXIT_FLAG) {
+		if (worker.exitedAfterDisconnect != true) {
 			logger.error('Worker %d is killed!', worker.id);
 			cluster.fork();
 		}
@@ -40,8 +39,7 @@ try {
 	var redisSessionClient = redis.createClient(redisConfig);
 	redisSessionClient.on("error", function (err) {
         logger.error("Please run the Redis DB");
-		process.env.EXIT_FLAG = true;
-		cluster.worker.kill();
+		cluster.worker.disconnect().kill();
 	});
 
     //HTTPS Configuration
@@ -452,7 +450,7 @@ try {
     var portNumber = 8443;
     httpsServer.listen(portNumber, hostFamilyType); //Https Server
     try {
-        var apireq = apiclient.post("http://127.0.0.1:1990/server", function (data, response) {
+        var apireq = apiclient.post(epurl+"server", function (data, response) {
             try {
                 if (response.statusCode != 200) {
                     httpsServer.close();
@@ -480,9 +478,7 @@ try {
     app.use('/reportServer', reportingApp);
     var jsreport = require('jsreport')({
         express: { app :reportingApp, server: httpsServer },
-        appPath: "/reportServer",
-        wkhtmltopdf:{allowLocalFilesAccess:true},
-		logger: {"console":{"transport":"console","level":"error"}}
+        appPath: "/reportServer"
     });
 
     jsreport.init(function () {
