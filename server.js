@@ -77,11 +77,11 @@ try {
     var io = require('./server/lib/socket');
 
     app.use(bodyParser.json({
-        limit: '10mb'
+        limit: '50mb'
     }));
 
     app.use(bodyParser.urlencoded({
-        limit: '10mb',
+        limit: '50mb',
         extended: true
     }));
     if(process.env.EXPRESSLOGS == 'ON')
