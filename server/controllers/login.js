@@ -7,7 +7,7 @@ var epurl = "http://"+process.env.NDAC_IP+":"+process.env.NDAC_PORT+"/";
 var Client = require("node-rest-client").Client;
 var client = new Client();
 var validator = require('validator');
-var myserver = require('../lib/socket');
+var myserver = require('../../server');
 var logger = require('../../logger');
 var notificationMsg = require("../notifications/notifyMessages");
 
@@ -33,13 +33,11 @@ exports.authenticateUser_Nineteen68 = function (req, res) {
 			}
 		}
 		if (valid_username == true && valid_password == true) {
-			req.session.username = username;
-			req.session.uniqueId = sessId;
 			var flag = 'inValidCredential';
 			var assignedProjects = false;
 			var validUser = false;
 			var inputs = {
-				"username": req.session.username
+				"username": username
 			};
 			var args = {
 				data: inputs,
@@ -47,15 +45,18 @@ exports.authenticateUser_Nineteen68 = function (req, res) {
 					"Content-Type": "application/json"
 				}
 			};
-			checkldapuser(req, function (err, data) {
+			checkldapuser(req, username, function (err, data) {
 				logger.info("Inside call function of checkldapuser");
 				if (data) {
 					ldapCheck(req, function (err, ldapdata) {
-					logger.info("Inside call function of ldapCheck");
-					logger.info("LDAP User");
+						logger.info("Inside call function of ldapCheck");
+						logger.info("LDAP User");
 						if (ldapdata == 'pass') {
 							flag = 'validCredential';
-							addUsernameAndIdInLogs(username,flag,req.session.userid);
+							addUsernameAndIdInLogs(username,flag,data);
+							req.session.username = username;
+							req.session.uniqueId = sessId;
+							req.session.userid = data;
 							res.setHeader('Set-Cookie', sessId);
 							logger.info("User Authenticated successfully");
 							res.send(flag);
@@ -76,9 +77,8 @@ exports.authenticateUser_Nineteen68 = function (req, res) {
 								if (result.rows.length == 0) {
 									res.send(flag);
 								} else {
-									for (var i = 0; i < result.rows.length; i++) {
-										dbHashedPassword = result.rows[i].password;
-									}
+									var dbHashedPassword = result.rows[0].password;
+									var userid = result.rows[0].userid;
 									validUser = bcrypt.compareSync(password, dbHashedPassword); // true
 
 									// Callback function for Check whether projects are assigned for a user
@@ -94,7 +94,10 @@ exports.authenticateUser_Nineteen68 = function (req, res) {
 												}
 												if (validUser == true && assignedProjects == true) {
 													flag = 'validCredential';
-													addUsernameAndIdInLogs(username,flag,req.session.userid);
+													addUsernameAndIdInLogs(username,flag,userid);
+													req.session.username = username;
+													req.session.uniqueId = sessId;
+													req.session.userid = userid;
 													res.setHeader('Set-Cookie', sessId);
 													logger.info("User Authenticated successfully");
 													res.send(flag);
@@ -111,7 +114,10 @@ exports.authenticateUser_Nineteen68 = function (req, res) {
 											} else {
 												if (validUser == true) {
 													flag = 'validCredential';
-													addUsernameAndIdInLogs(username,flag,req.session.userid);
+													addUsernameAndIdInLogs(username,flag,userid);
+													req.session.username = username;
+													req.session.uniqueId = sessId;
+													req.session.userid = userid;
 													res.setHeader('Set-Cookie', sessId);
 													logger.info("User Authenticated successfully");
 													res.send(flag);
@@ -125,40 +131,43 @@ exports.authenticateUser_Nineteen68 = function (req, res) {
 									}
 
 									// Implementation for Concurrent login
-									myserver.defRedisCli.keys('*', function (allKeyserr, allKeys) {
-										if (allKeyserr) {
-											logger.error("Error while checking for session");
-											return res.send('fail');
-										} else {
-											var userLogged = false;
-											async.forEachSeries(allKeys, function(ki,ki_cb){
-												if (userLogged === true) {
-													ki_cb();
-												} else {
-													myserver.defRedisCli.get(ki, function (keyerr, keyVal) {
-														if (keyerr) {
-															logger.error("Error while checking for session");
-														} else {
-															var obj = JSON.parse(keyVal);
-															if (username == obj.username) {
+									if (validUser == true) {
+										myserver.redisSessionStore.client.keys('*', function (allKeyserr, allKeys) {
+											if (allKeyserr) {
+												logger.info("User Authentication failed");
+												return res.send('fail');
+											} else if (allKeys.length == 0) {
+												//Check whether projects are assigned for a user
+												checkAssignedProjects(req, username, checkAssignedProjects_callback);
+											} else {
+												myserver.redisSessionStore.all(function (keyerr, allKeysVal) {
+													if (keyerr) {
+														logger.info("User Authentication failed");
+														return res.send('fail');
+													} else {
+														var userLogged = false;
+														for (var ki = 0; ki < allKeysVal.length; ki++) {
+															if (username == allKeysVal[ki].username) {
 																userLogged=true;
 															}
 														}
-														ki_cb();
-													});
-												}
-											}, function(){
-												if (userLogged == 'fail') {
-													return res.send('fail');
-												} else if (userLogged==true) {
-													return res.send("userLogged");
-												} else if (userLogged==false) {
-													//Check whether projects are assigned for a user
-													checkAssignedProjects(req, checkAssignedProjects_callback);
-												}
-											});
-										}
-									});
+														if (userLogged==true) {
+															logger.info("User already logged in");
+															req.session.destroy();
+															return res.send("userLogged");
+														} else if (userLogged==false) {
+															//Check whether projects are assigned for a user
+															checkAssignedProjects(req, username, checkAssignedProjects_callback);
+														}
+													}
+												});
+											}
+										});
+									} else {
+										logger.info("User Authentication failed");
+										req.session.destroy();
+										return res.send(flag);
+									}
 								}
 							} catch (exception) {
 								logger.error(exception);
@@ -198,11 +207,9 @@ exports.authenticateUser_Nineteen68_CI = function (req, res) {
 		var username = req.body.username.toLowerCase();
 		var password = req.body.password;
 		var sessId = req.session.id;
-		req.session.username = username;
-		req.session.uniqueId = sessId;
 		var flag = 'inValidCredential';
 		var inputs = {
-			"username": req.session.username
+			"username": username
 		};
 		var args = {
 			data: inputs,
@@ -224,17 +231,16 @@ exports.authenticateUser_Nineteen68_CI = function (req, res) {
 			}
 		}
 		if (valid_username == true && valid_password == true) {
-			checkldapuser(req, function (err, data) {
+			checkldapuser(req, username, function (err, data) {
 					logger.info("Inside call function of checkldapuser");
 				if (data) {
 					ldapCheck(req, function (err, ldapdata) {
 						logger.info("Inside call function of ldapCheck");
 						if (ldapdata == 'pass') {
 							flag = 'validCredential';
-							status = {
-								"status": flag,
-								"session_id": sessId
-							};
+							req.session.username = username;
+							req.session.uniqueId = sessId;
+							req.session.userid = userid;
 							res.setHeader('set-cookie', sessId);
 							res.writeHead(200, {
 								'Content-Type': 'text/plain'
@@ -274,11 +280,10 @@ exports.authenticateUser_Nineteen68_CI = function (req, res) {
 									res.write("status : " + flag + " , session_id : " + "");
 									res.end();
 								} else {
-									for (var i = 0; i < result.rows.length; i++) {
-										dbHashedPassword = result.rows[i].password;
-									}
+									var dbHashedPassword = result.rows[0].password;
+									var userid = result.rows[0].userid;
 									var validUser = bcrypt.compareSync(password, dbHashedPassword); // true
-									checkAssignedProjects(req, function (err, assignedProjectsData, role) {
+									checkAssignedProjects(req, username, function (err, assignedProjectsData, role) {
 										logger.info("Inside function call of checkAssignedProjects");
 										if (role != "Admin" && role != "Business Analyst" && role != "Tech Lead") {
 											if (assignedProjectsData > 0) {
@@ -286,10 +291,9 @@ exports.authenticateUser_Nineteen68_CI = function (req, res) {
 											}
 											if (validUser == true && assignedProjects == true) {
 												flag = 'validCredential';
-												status = {
-													"status": flag,
-													"session_id": sessId
-												};
+												req.session.username = username;
+												req.session.uniqueId = sessId;
+												req.session.userid = userid;
 												res.setHeader('set-cookie', sessId);
 												res.writeHead(200, {
 													'Content-Type': 'text/plain'
@@ -317,10 +321,9 @@ exports.authenticateUser_Nineteen68_CI = function (req, res) {
 										} else {
 											if (validUser == true) {
 												flag = 'validCredential';
-												status = {
-													"status": flag,
-													"session_id": sessId
-												};
+												req.session.username = username;
+												req.session.uniqueId = sessId;
+												req.session.userid = userid;
 												res.setHeader('set-cookie', sessId);
 												res.writeHead(200, {
 													'Content-Type': 'text/plain'
@@ -371,7 +374,7 @@ exports.authenticateUser_Nineteen68_CI = function (req, res) {
  * @see : function to check whether projects are assigned for user
  * @author : vinay
  */
-function checkAssignedProjects(req, callback, data) {
+function checkAssignedProjects(req, username, callback, data) {
 	logger.info("Inside checkAssignedProjects function");
 	userid = '';
 	var roleid = '';
@@ -380,7 +383,7 @@ function checkAssignedProjects(req, callback, data) {
 	async.series({
 		getUserId: function (callback) {
 			var inputs = {
-				"username": req.session.username,
+				"username": username,
 				"query": "getUserId"
 			};
 			var args = {
@@ -393,12 +396,11 @@ function checkAssignedProjects(req, callback, data) {
 			client.post(epurl + "login/authenticateUser_Nineteen68/projassigned", args,
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
-					logger.error("Error occured in authenticateUser_Nineteen68 Error Code : ERRNDAC");
+					logger.error("Error occured in authenticateUser_Nineteen68/projassigned Error Code : ERRNDAC");
 					callback(flag);
 					//res.send("fail");
 				} else {
 					userid = result.rows[0].userid;
-					req.session.userid = userid;
 					roleid = result.rows[0].defaultrole;
 					callback(null, userid, roleid);
 				}
@@ -422,7 +424,6 @@ function checkAssignedProjects(req, callback, data) {
 					if (response.statusCode != 200 || rolesResult.rows == "fail") {
 						logger.error("Error occured in authenticateUser_Nineteen68 Error Code : ERRNDAC");
 						callback(flag);
-						//res.send("fail");
 					} else {
 						rolename = rolesResult.rows[0].rolename;
 						callback(null, userid, rolename);
@@ -430,7 +431,6 @@ function checkAssignedProjects(req, callback, data) {
 				});
 			} catch (exception) {
 				logger.error(exception);
-				//res.send("fail");
 				callback(flag);
 			}
 		},
@@ -452,7 +452,6 @@ function checkAssignedProjects(req, callback, data) {
 					if (response.statusCode != 200 || projectsResult.rows == "fail") {
 						logger.error("Error occured in authenticateUser_Nineteen68 Error Code : ERRNDAC");
 						callback(flag);
-						//res.send("fail");
 					} else {
 						if (projectsResult.rows.length > 0 && projectsResult.rows[0].projectids != null) {
 							assignedProjectsLen = projectsResult.rows[0].projectids.length;
@@ -465,7 +464,6 @@ function checkAssignedProjects(req, callback, data) {
 				});
 			} catch (exception) {
 				logger.error(exception);
-				//res.send('fail');
 				callback(flag);
 			}
 		},
@@ -479,7 +477,6 @@ function checkAssignedProjects(req, callback, data) {
 			}
 		} catch (exception) {
 			logger.error(exception);
-			//res.send('fail');
 			callback(flag);
 		}
 	});
@@ -489,11 +486,11 @@ function checkAssignedProjects(req, callback, data) {
  * @see : function to check whether existing user is ldap user or not
  * @author : shree.p
  */
-function checkldapuser(req, callback, data) {
-		logger.info("Inside function checkldapuser");
+function checkldapuser(req, username, callback, data) {
+	logger.info("Inside function checkldapuser");
 	var flag = false;
 	var inputs = {
-		"username": req.session.username
+		"username": username
 	};
 	var args = {
 		data: inputs,
@@ -505,16 +502,15 @@ function checkldapuser(req, callback, data) {
 	client.post(epurl + "login/authenticateUser_Nineteen68/ldap", args,
 		function (result, response) {
 		if (response.statusCode != 200 || result.rows == "fail") {
-			logger.error("Error occured in authenticateUser_Nineteen68 Error Code : ERRNDAC");
+			logger.error("Error occured in authenticateUser_Nineteen68_ldap Error Code : ERRNDAC");
 			callback(null, flag);
 		} else {
 			try {
 				if (result.rows.length == 0) {
 					callback(null, flag);
 				} else {
-					flag = result.rows[0].ldapuser;
-					if (flag == null || flag == undefined) {
-						flag = false;
+					if (result.rows[0].ldapuser == true) {
+						flag = result.rows[0].userid;
 					}
 					callback(null, flag);
 				}
@@ -587,7 +583,7 @@ exports.loadUserInfo_Nineteen68 = function (req, res) {
 				req.session.switchedRole = true;
 			}
 			else{
-					req.session.switchedRole = false;
+				req.session.switchedRole = false;
 			}
 			userName = req.session.username.toLowerCase();
 			jsonService = {};
