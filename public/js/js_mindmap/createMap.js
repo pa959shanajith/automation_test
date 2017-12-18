@@ -332,9 +332,10 @@ function loadMap(e) {
         treeBuilder(allMMaps[reqMap]);
         //Himanshu
         IncompleteFlowFlag = false;
-        error = treeIterator(undefined, dNodes[0], false);
-        if(error){
-            openDialogMindmap("Warning", 'Incomplete flow!');
+        var errTemp = false;
+        if(dNodes[0].type != 'modules_endtoend')
+            errTemp = treeIterator(undefined, dNodes[0], false);
+        if(errTemp){
             IncompleteFlowFlag = true;
         }
     }

@@ -6,21 +6,20 @@ if (!process.env.ENV)
 // Module Dependencies
 var cluster = require('cluster');
 var fs = require('fs');
-var util = require('util');
 var expressWinston = require('express-winston');
 var winston = require('winston');
 var epurl = "http://"+process.env.NDAC_IP+":"+process.env.NDAC_PORT+"/";
 var logger = require('./logger');
 if (cluster.isMaster) {
-	cluster.fork();
+    cluster.fork();
     cluster.on('disconnect', function(worker) {
         logger.error('Node server has encountered some problems, Disconnecting!');
     });
     cluster.on('exit', function(worker) {
-		if (worker.exitedAfterDisconnect != true) {
-			logger.error('Worker %d is killed!', worker.id);
-			cluster.fork();
-		}
+        if (worker.exitedAfterDisconnect != true) {
+            logger.error('Worker %d is killed!', worker.id);
+            cluster.fork();
+        }
     });
 
 } else {
@@ -31,22 +30,22 @@ try {
     var sessions = require('express-session');
     var cookieParser = require('cookie-parser');
     var helmet = require('helmet');
-    var async = require('async');
     var lusca = require('lusca');
     var redis = require("redis");
     var redisStore = require('connect-redis')(sessions);
     var redisConfig = {"host": process.env.REDIS_IP, "port": parseInt(process.env.REDIS_PORT),"password" : process.env.REDIS_AUTH};
-	var redisSessionClient = redis.createClient(redisConfig);
-	redisSessionClient.on("error", function (err) {
+    var redisSessionClient = redis.createClient(redisConfig);
+    redisSessionClient.on("error", function (err) {
         logger.error("Please run the Redis DB");
-		cluster.worker.disconnect().kill();
-	});
+        cluster.worker.disconnect().kill();
+    });
+    var redisSessionStore = new redisStore({ host: process.env.REDIS_IP, port: process.env.REDIS_PORT, client: redisSessionClient});
 
     //HTTPS Configuration
-	var certPath = "server/https/";
-	if (process.env.LB_ENABLED == "True") {
-		certPath += "domain_certs/";
-	}
+    var certPath = "server/https/";
+    if (process.env.LB_ENABLED == "True") {
+        certPath += "domain_certs/";
+    }
     var privateKey = fs.readFileSync(certPath+'server.key', 'utf-8');
     var certificate = fs.readFileSync(certPath+'server.crt', 'utf-8');
     var credentials = {
@@ -73,15 +72,17 @@ try {
         honorCipherOrder: true
     };
     var httpsServer = require('https').createServer(credentials, app);
+    module.exports = app;
+    module.exports.redisSessionStore = redisSessionStore;
     module.exports.httpsServer = httpsServer;
     var io = require('./server/lib/socket');
 
     app.use(bodyParser.json({
-        limit: '10mb'
+        limit: '50mb'
     }));
 
     app.use(bodyParser.urlencoded({
-        limit: '10mb',
+        limit: '50mb',
         extended: true
     }));
     if(process.env.EXPRESSLOGS == 'ON')
@@ -95,31 +96,26 @@ try {
     app.use(cookieParser());
     app.use(sessions({
         secret: '$^%EDE%^tfd65e7ufyCYDR^%IU',
-        store: new redisStore({ host: process.env.REDIS_IP, port: process.env.REDIS_PORT, client: redisSessionClient}),
-        path: '/',
-        httpOnly: true,
-        secure: true,
+        store: redisSessionStore,
         rolling: true,
-        resave: true,
+        resave: false,
         saveUninitialized: false,  //Should always be false for cookie to clear
         cookie: {
+            path: '/',
+            httpOnly: true,
+            secure: true,
             maxAge: (30 * 60 * 1000)
         }
     }));
 
     app.use(helmet());
-    var opts = {
-        csrf: {
-            angular: true
-        }
-    }; // options for lusca
     app.use(lusca.p3p('ABCDEF'));
     app.use(helmet.referrerPolicy({ policy: 'same-origin' }));
-    var ninetyDaysInSeconds = 7776000
+    var ninetyDaysInSeconds = 7776000;
     app.use(helmet.hpkp({
         maxAge: ninetyDaysInSeconds,
         sha256s: ['AbCdEf123=', 'ZyXwVu456=']
-    }))
+    }));
 
     app.use(helmet.noCache());
 
@@ -127,8 +123,8 @@ try {
     app.post('*', function (req, res, next) {
         var roleId = req.session.defaultRoleId;
         if (req.session.defaultRoleId != undefined) {
-            var updateinp = { roleid: req.session.defaultRoleId, servicename: req.url.replace("/", "") }
-            var args = { data: updateinp, headers: { "Content-Type": "application/json" } }
+            var updateinp = { roleid: req.session.defaultRoleId, servicename: req.url.replace("/", "") };
+            var args = { data: updateinp, headers: { "Content-Type": "application/json" } };
             apiclient.post(epurl + "utility/userAccess_Nineteen68", args,
                 function (result, response) {
                     if (response.statusCode != 200 || result.rows == "fail") {
@@ -137,7 +133,7 @@ try {
                     } else {
                         if(req.url == '/home' && req.session.defaultRole == 'Test Engineer')
                         {
-                            result.rows = "True"
+                            result.rows = "True";
                         }
                         if (result.rows == "True") {
                             // logger.info("User " + req.session.username + " authenticated");
@@ -254,10 +250,10 @@ try {
         // if(req.session.username != undefined && req.session.userid != undefined)
         // {
         //         logger.rewriters.push(function(level, msg, meta) {
-        // 		meta.username =  req.session.username;
-        // 		meta.userid =  req.session.userid;
-        // 		return meta;
-        // 		});
+        //         meta.username =  req.session.username;
+        //         meta.userid =  req.session.userid;
+        //         return meta;
+        //         });
         // }
         logger.rewriters.push(function (level, msg, meta) {
             if (req.session != undefined && req.session.userid != undefined) {
@@ -485,8 +481,8 @@ try {
         // running
     }).catch(function (e) {
         // error during startup
-        console.error(e.stack)
-        process.exit(1)
+        logger.error(e.stack);
+        process.exit(1);
     });
 
     //To prevent can't send header response
@@ -500,12 +496,10 @@ try {
         };
         next();
     });
-
-    module.exports = app;
 } catch (e) {
     logger.error(e);
     setTimeout(function () {
         cluster.worker.kill();
-    }, 200)
+    }, 200);
 }
 }
