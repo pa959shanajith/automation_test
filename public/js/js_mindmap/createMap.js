@@ -6,6 +6,12 @@ var deletednode = [],
 var versioning_enabled = 0;
 // node_names_tc keep track of testcase names to decide reusability of testcases
 var node_names_tc = [];
+var sections = {
+    'modules': 112,
+    'scenarios': 237,
+    'screens': 363,
+    'testcases': 488
+}; // Now mindmap levels will be devided into sections
 var saveFlag = false;
 //for handling the case when creatednode goes beyond screensize
 var CreateEditFlag = false;
@@ -163,7 +169,7 @@ function loadMindmapData1(param) {
     var svgTileLen = $(".ct-svgTile").length;
     if (svgTileLen == 0) {
         $('#ct-mapSvg, #ct-canvas').empty();
-        $('#ct-canvas').append('<div class="ct-tileBox"><div class="ct-tile" title="Create Mindmap"><svg class="ct-svgTile" height="150px" width="150px"><g><circle cx="75" cy="75" r="30"></circle><path d="M75,55L75,95"></path><path d="M55,75L95,75"></path></g></svg></div><span class="ct-text">Create Mindmap</span></div>');
+        $('#ct-canvas').append('<div id="minimap"></div><div class="ct-tileBox"><div class="ct-tile" title="Create Mindmap"><svg class="ct-svgTile" height="150px" width="150px"><g><circle cx="75" cy="75" r="30"></circle><path d="M75,55L75,95"></path><path d="M55,75L95,75"></path></g></svg></div><span class="ct-text">Create Mindmap</span></div>');
         // svgTileG.append('circle').attr('cx',75).attr('cy',75).attr('r',30);
         // svgTileG.append('path').attr('d','M75,55L75,95');
         // svgTileG.append('path').attr('d','M55,75L95,75');
@@ -291,7 +297,7 @@ function createNewMap(e) {
             childIndex: 0,
             name: 'Module_0',
             type: 'modules',
-            y: s[0] * 0.2,
+            y: s[0] * 0.1(0.9),
             x: s[1] * 0.4,
             children: [],
             parent: null
@@ -303,7 +309,7 @@ function createNewMap(e) {
             name: 'Module_0',
             type: 'modules',
             y: s[1] * 0.4,
-            x: s[0] * 0.2,
+            x: s[0] * 0.1 * 0.9,
             children: [],
             parent: null
         };
@@ -1194,90 +1200,62 @@ function nodeCtrlClick(e) {
 
 function getNewPosition(node, pi, arr_co) {
     // Switch_layout functionality
+    // **NOTE**
+    //dNodes[pi].children are arranged in increasing
+    // order of x/y disance depending on layout
     var layout_vertical = $('#switch-layout').hasClass('vertical-layout');
-    if (dNodes[pi].children.length > 0) {
+    if (dNodes[pi].children.length > 0) { // new node has siblings
         index = dNodes[pi].children.length - 1;
         if (layout_vertical)
             new_one = {
                 x: parseInt(dNodes[pi].children[index].x) + 80,
-                y: parseInt(dNodes[pi].children[index].y)
-            };
+                y: sections[node.type]
+            }; // Go beside last sibling node
         else
             new_one = {
-                x: parseInt(dNodes[pi].children[index].x),
+                x: sections[node.type],
                 y: parseInt(dNodes[pi].children[index].y + 80)
             };
+        node = getNonOverlappingPosition(node, arr_co, new_one);
 
-        if (JSON.stringify(arr_co).indexOf(JSON.stringify(new_one)) > -1) {
-            if (layout_vertical) {
-                node.x = dNodes[pi].children[index].x + 160;
-                node.y = dNodes[pi].children[index].y;
-            } else {
-                node.y = dNodes[pi].children[index].y + 160;
-                node.x = dNodes[pi].children[index].x;
-            }
+    } else { //first kid of any node
 
-        } else {
-            //layout_change
-            if (layout_vertical) {
-                node.x = dNodes[pi].children[index].x + 80;
-                node.y = dNodes[pi].children[index].y;
-
-            } else {
-                node.y = dNodes[pi].children[index].y + 80;
-                node.x = dNodes[pi].children[index].x;
-            }
-
-        }
-
-
-    } else {
-
-        if (dNodes[pi].parent != null) {
+        if (dNodes[pi].parent != null) { //if kid of scenario/testcase/screen
             arr = dNodes[pi].parent.children;
-            index = dNodes[pi].parent.children.length - 1;
+            index = dNodes[pi].parent.children.length - 1; //number of parents siblings - 1
             //new_one={x:parseInt(arr[index].x),y:parseInt(arr[index].y)+125};
 
             if (layout_vertical) {
                 new_one = {
                     x: parseInt(dNodes[pi].x),
-                    y: parseInt(dNodes[pi].y) + 125
-                };
+                    y: parseInt(sections[node.type])
+                }; // go directly below parent
             } else {
                 new_one = {
-                    x: parseInt(dNodes[pi].x) + 125,
+                    x: parseInt(sections[node.type]),
                     y: parseInt(dNodes[pi].y)
-                };
+                }; // go directly below parent
             }
-
-            if (JSON.stringify(arr_co).indexOf(JSON.stringify(new_one)) > -1) {
-                //layout_change
-                if (layout_vertical) {
-                    node.x = arr[index].x + 80;
-                    node.y = arr[index].y + 125;
-                } else {
-                    node.y = arr[index].y + 80;
-                    node.x = arr[index].x + 125;
-                }
-
-            } else {
-                //layout_Change
-                if (layout_vertical) {
-                    node.x = dNodes[pi].x;
-                    node.y = dNodes[pi].y + 125;
-                } else {
-                    node.y = dNodes[pi].y;
-                    node.x = dNodes[pi].x + 125;
-                }
-            }
-        } else {
+            node = getNonOverlappingPosition(node, arr_co, new_one);
+            // if(JSON.stringify(arr_co).indexOf(JSON.stringify(new_one))>-1){		// if position already occupied
+            // 	//layout_change
+            // 	if(layout_vertical){
+            // 	node.x=arr[index].x+80;					// shift and go below parent
+            // 	node.y=parseInt(sections[node.type]);
+            // 	}
+            // 	else{
+            // 	node.y=arr[index].y+80;
+            // 	node.x=parseInt(sections[node.type]);
+            // 	}
+            // }
+        } else { //Module's kid
             //layout_change
             if (layout_vertical) {
-                node.x = dNodes[pi].x;
-                node.y = dNodes[pi].y + 125;
+                node.x = parseInt(dNodes[pi].x);
+                node.y = parseInt(sections[node.type]);
             } else {
-                node.y = dNodes[pi].y;
-                node.x = dNodes[pi].x + 125;
+                node.y = parseInt(dNodes[pi].y);
+                node.x = parseInt(sections[node.type]);
             }
         }
 
@@ -1285,7 +1263,37 @@ function getNewPosition(node, pi, arr_co) {
     return node;
 }
 
+function getNonOverlappingPosition(node, arr_co, new_one) {
+    var layout_vertical = $('#switch-layout').hasClass('vertical-layout');
+    var dist = 0;
+    dist = closestCord(arr_co, new_one);
+    while (dist < 60) {
+        if (layout_vertical) {
+            new_one.x = new_one.x + 80;
+        } else {
+            new_one.y = new_one.y + 80;
+        }
+        dist = closestCord(arr_co, new_one);
+    }
+    node.x = new_one.x;
+    node.y = new_one.y;
+    return node;
+}
+
+function closestCord(arr_co, new_one) {
+    var dmin = 1000;
+    for (var i = 0; i < arr_co.length; i++) {
+        var a = new_one.x - arr_co[i].x;
+        var b = new_one.y - arr_co[i].y;
+        var c = Math.sqrt(a * a + b * b);
+        if (c < dmin)
+            dmin = c;
+    }
+    return dmin;
+}
+
 function createNode(e) {
+
     //If module is in edit mode, then return do not add any node
     if (d3.select('#ct-inpBox').attr('class') == "") return;
 
@@ -1317,12 +1325,17 @@ function createNode(e) {
 
         });
         // switch-layout feature
+        if (e) {
+            var tempName = e.name;
+        } else {
+            var tempName = nNext[pt][0] + '_' + nCount[nNext[pt][1]];
+        }
         if ($('#switch-layout').hasClass('vertical-layout')) {
             node = {
                 id: uNix,
                 childIndex: '',
                 path: '',
-                name: nNext[pt][0] + '_' + nCount[nNext[pt][1]],
+                name: tempName,
                 type: (nNext[pt][0]).toLowerCase() + 's',
                 y: h * (0.15 * (1.34 + nNext[pt][1]) + Math.random() * 0.1),
                 x: 90 + 30 * Math.floor(Math.random() * (Math.floor((w - 150) / 80))),
@@ -1334,7 +1347,7 @@ function createNode(e) {
                 id: uNix,
                 childIndex: '',
                 path: '',
-                name: nNext[pt][0] + '_' + nCount[nNext[pt][1]],
+                name: tempName,
                 type: (nNext[pt][0]).toLowerCase() + 's',
                 y: h * (0.15 * (1.34 + nNext[pt][1]) + Math.random() * 0.1),
                 x: 90 + 30 * Math.floor(Math.random() * (Math.floor((w - 150) / 80))),
@@ -1343,7 +1356,7 @@ function createNode(e) {
             };
         }
 
-        node = getNewPosition(node, pi, arr_co);
+        node = getNewPosition(node, pi, arr_co); //pi: active node ID
         var curNode = node;
         dNodes.push(node);
         nCount[nNext[pt][1]]++;
@@ -1366,7 +1379,9 @@ function createNode(e) {
 
             //By default when a node is created it's name should be in ediatable mode
             CreateEditFlag = true;
-            editNode(e, currentNode);
+            if (e);
+            else
+                editNode(e, currentNode);
         }
 
     } else {
@@ -2262,10 +2277,12 @@ function treeBuilder(tree) {
         // switch-layout feature
         if ($('#switch-layout').hasClass('vertical-layout')) {
             d.y = cSize[0] * 0.1 * (0.9 + typeNum[d.type]);
+            sections[d.type] = d.y;
         } else {
             d.y = d.x;
             //Logic to change the layout and to reduce the length of the links
             d.x = cSize[0] * 0.1 * (0.9 + typeNum[d.type]);
+            sections[d.type] = d.x;
         }
 
 
