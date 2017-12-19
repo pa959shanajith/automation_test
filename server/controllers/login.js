@@ -40,7 +40,7 @@ exports.authenticateUser_Nineteen68 = function (req, res) {
 		if (valid_username == true && valid_password == true) {
 			var flag = 'inValidCredential';
 			var assignedProjects = false;
-			var validUser = false;
+			var userLogged = false;
 			var inputs = {
 				"username": username
 			};
@@ -50,21 +50,27 @@ exports.authenticateUser_Nineteen68 = function (req, res) {
 					"Content-Type": "application/json"
 				}
 			};
-			checkldapuser(req, username, function (err, data) {
+
+			function checkldapuser_callback(err, data) {
 				logger.info("Inside call function of checkldapuser");
 				if (data) {
 					ldapCheck(req, function (err, ldapdata) {
 						logger.info("Inside call function of ldapCheck");
 						logger.info("LDAP User");
 						if (ldapdata == 'pass') {
-							flag = 'validCredential';
-							addUsernameAndIdInLogs(username,flag,data);
-							req.session.username = username;
-							req.session.uniqueId = sessId;
-							req.session.userid = data;
-							res.setHeader('Set-Cookie', sessId);
-							logger.info("User Authenticated successfully");
-							res.send(flag);
+							if (userLogged == true) {
+								flag = "userLogged";
+								logger.info("User already logged in");
+								req.session.destroy();
+							} else {
+								flag = 'validCredential';
+								addUsernameAndIdInLogs(username,flag,data);
+								req.session.username = username;
+								req.session.uniqueId = sessId;
+								req.session.userid = data;
+								logger.info("User Authenticated successfully");
+							}
+							return res.send(flag);
 						} else {
 							logger.info("User Authentication failed");
 							res.send(flag);
@@ -84,98 +90,93 @@ exports.authenticateUser_Nineteen68 = function (req, res) {
 								} else {
 									var dbHashedPassword = result.rows[0].password;
 									var userid = result.rows[0].userid;
-									validUser = bcrypt.compareSync(password, dbHashedPassword); // true
+									var validUser = bcrypt.compareSync(password, dbHashedPassword); // true
 
-									// Callback function for Check whether projects are assigned for a user
-									function checkAssignedProjects_callback(err, assignedProjectsData, role) {
-										if(err == 'fail') {
-											logger.error("Error occured in authenticateUser_Nineteen68 Error Code : ERRNDAC");
-											res.send('fail');
-										} else {
-											logger.info("Inside function call of checkAssignedProjects");
-											if (role != "Admin" && role != "Business Analyst" && role != "Tech Lead") {
-												if (assignedProjectsData > 0) {
-													assignedProjects = true;
-												}
-												if (validUser == true && assignedProjects == true) {
-													flag = 'validCredential';
-													addUsernameAndIdInLogs(username,flag,userid);
-													req.session.username = username;
-													req.session.uniqueId = sessId;
-													req.session.userid = userid;
-													logger.info("User Authenticated successfully");
-													res.send(flag);
-												} else if (validUser == true && assignedProjects == false) {
-													flag = 'noProjectsAssigned';
-													logger.info("User has not been assigned any projects");
-													req.session.destroy();
-													res.send(flag);
-												} else {
-													logger.info("User Authentication failed");
-													req.session.destroy();
-													res.send(flag);
-												}
+									if (validUser == true && userLogged == true) {
+										flag = "userLogged";
+										logger.info("User already logged in");
+										req.session.destroy();
+										res.send(flag);
+									} else {
+										//Check whether projects are assigned for a user
+										checkAssignedProjects(req, username,
+											function checkAssignedProjects_callback(err, assignedProjectsData, role) {
+											if(err == 'fail') {
+												logger.error("Error occured in authenticateUser_Nineteen68 Error Code : ERRNDAC");
+												res.send('fail');
 											} else {
-												if (validUser == true) {
-													flag = 'validCredential';
-													addUsernameAndIdInLogs(username,flag,userid);
-													req.session.username = username;
-													req.session.uniqueId = sessId;
-													req.session.userid = userid;
-													logger.info("User Authenticated successfully");
-													res.send(flag);
-												} else {
-													logger.info("User Authentication failed");
-													req.session.destroy();
-													res.send(flag);
-												}
-											}
-										}
-									}
-
-									// Implementation for Concurrent login
-									if (validUser == true) {
-										myserver.redisSessionStore.ids(function (allKeyserr, allKeys) {
-											if (allKeyserr) {
-												logger.info("User Authentication failed");
-												return res.send('fail');
-											} else if (allKeys.length == 0) {
-												//Check whether projects are assigned for a user
-												checkAssignedProjects(req, username, checkAssignedProjects_callback);
-											} else {
-												myserver.redisSessionStore.all(function (keyerr, allKeysVal) {
-													if (keyerr) {
-														logger.info("User Authentication failed");
-														return res.send('fail');
-													} else {
-														var userLogged = false;
-														for (var ki = 0; ki < allKeysVal.length; ki++) {
-															if (username == allKeysVal[ki].username) {
-																userLogged=true;
-															}
-														}
-														if (userLogged==true) {
-															logger.info("User already logged in");
-															req.session.destroy();
-															return res.send("userLogged");
-														} else if (userLogged==false) {
-															//Check whether projects are assigned for a user
-															checkAssignedProjects(req, username, checkAssignedProjects_callback);
-														}
+												logger.info("Inside function call of checkAssignedProjects");
+												if (role != "Admin" && role != "Business Analyst" && role != "Tech Lead") {
+													if (assignedProjectsData > 0) {
+														assignedProjects = true;
 													}
-												});
+													if (validUser == true && assignedProjects == true) {
+														flag = 'validCredential';
+														addUsernameAndIdInLogs(username,flag,userid);
+														req.session.username = username;
+														req.session.uniqueId = sessId;
+														req.session.userid = userid;
+														logger.info("User Authenticated successfully");
+														res.send(flag);
+													} else if (validUser == true && assignedProjects == false) {
+														flag = 'noProjectsAssigned';
+														logger.info("User has not been assigned any projects");
+														req.session.destroy();
+														res.send(flag);
+													} else {
+														logger.info("User Authentication failed");
+														req.session.destroy();
+														res.send(flag);
+													}
+												} else {
+													if (validUser == true) {
+														flag = 'validCredential';
+														addUsernameAndIdInLogs(username,flag,userid);
+														req.session.username = username;
+														req.session.uniqueId = sessId;
+														req.session.userid = userid;
+														logger.info("User Authenticated successfully");
+														res.send(flag);
+													} else {
+														logger.info("User Authentication failed");
+														req.session.destroy();
+														res.send(flag);
+													}
+												}
 											}
 										});
-									} else {
-										logger.info("User Authentication failed");
-										req.session.destroy();
-										return res.send(flag);
 									}
 								}
 							} catch (exception) {
 								logger.error(exception);
 								res.send("fail");
 							}
+						}
+					});
+				}
+			}
+
+			// Implementation for Concurrent login
+			myserver.redisSessionStore.ids(function (allKeyserr, allKeys) {
+				if (allKeyserr) {
+					logger.info("User Authentication failed");
+					return res.send('fail');
+				} else if (allKeys.length == 0) {
+					// Callback function for Check whether user is ldapuser
+					checkldapuser(req, username, checkldapuser_callback);
+				} else {
+					myserver.redisSessionStore.all(function (keyerr, allKeysVal) {
+						if (keyerr) {
+							logger.info("User Authentication failed");
+							return res.send('fail');
+						} else {
+							for (var ki = 0; ki < allKeysVal.length; ki++) {
+								if (username == allKeysVal[ki].username) {
+									userLogged=true;
+									break;
+								}
+							}
+							checkldapuser(req, username, checkldapuser_callback);
 						}
 					});
 				}
