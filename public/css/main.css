@@ -5,6 +5,7 @@
 body,
 html {
     height: 100%;
+    width: 100%;
     -webkit-user-select: text !important;
   	-moz-user-select: text !important;
   	-ms-user-select: text !important;
