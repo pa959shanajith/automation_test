@@ -11,6 +11,11 @@ var myserver = require('../../server');
 var logger = require('../../logger');
 var notificationMsg = require("../notifications/notifyMessages");
 
+function isSessionActive(req){
+	var sessionToken = req.session.uniqueId;
+    return sessionToken != undefined && req.session.id == sessionToken;
+}
+
 //Authenticate User - Nineteen68
 exports.authenticateUser_Nineteen68 = function (req, res) {
 	try {
@@ -98,7 +103,6 @@ exports.authenticateUser_Nineteen68 = function (req, res) {
 													req.session.username = username;
 													req.session.uniqueId = sessId;
 													req.session.userid = userid;
-													res.setHeader('Set-Cookie', sessId);
 													logger.info("User Authenticated successfully");
 													res.send(flag);
 												} else if (validUser == true && assignedProjects == false) {
@@ -118,7 +122,6 @@ exports.authenticateUser_Nineteen68 = function (req, res) {
 													req.session.username = username;
 													req.session.uniqueId = sessId;
 													req.session.userid = userid;
-													res.setHeader('Set-Cookie', sessId);
 													logger.info("User Authenticated successfully");
 													res.send(flag);
 												} else {
@@ -132,7 +135,7 @@ exports.authenticateUser_Nineteen68 = function (req, res) {
 
 									// Implementation for Concurrent login
 									if (validUser == true) {
-										myserver.redisSessionStore.client.keys('*', function (allKeyserr, allKeys) {
+										myserver.redisSessionStore.ids(function (allKeyserr, allKeys) {
 											if (allKeyserr) {
 												logger.info("User Authentication failed");
 												return res.send('fail');
@@ -570,12 +573,7 @@ function ldapCheck(req, cb) {
 exports.loadUserInfo_Nineteen68 = function (req, res) {
 	try {
 		logger.info("Inside UI Service: loadUserInfo_Nineteen68");
-		if (req.cookies['connect.sid'] != undefined) {
-			var sessionCookie = req.cookies['connect.sid'].split(".");
-			var sessionToken = sessionCookie[0].split(":");
-			sessionToken = sessionToken[1];
-		}
-		if (sessionToken != undefined && req.session.id == sessionToken) {
+		if (isSessionActive(req)) {
 			var flag = req.body.flag;
 			var switchedRole = req.body.selRole;
 			if(switchedRole != undefined && switchedRole != '' )
@@ -773,12 +771,7 @@ exports.loadUserInfo_Nineteen68 = function (req, res) {
 exports.getRoleNameByRoleId_Nineteen68 = function (req, res) {
 	try {
 		logger.info("Inside UI service: getRoleNameByRoleId_Nineteen68");
-		if (req.cookies['connect.sid'] != undefined) {
-			var sessionCookie = req.cookies['connect.sid'].split(".");
-			var sessionToken = sessionCookie[0].split(":");
-			sessionToken = sessionToken[1];
-		}
-		if (sessionToken != undefined && req.session.id == sessionToken) {
+		if (isSessionActive(req)) {
 			var roleId = [];
 			req.session.role = [];
 			req.session.role = req.body.role;
@@ -864,7 +857,7 @@ exports.logoutUser_Nineteen68_CI = function (req, res) {
 
 exports.logoutUser_Nineteen68 = function (req, res) {
 	logger.info("Inside UI Service: logoutUser_Nineteen68");
-	req.cookies['connect.sid'] = '';
+	res.clearCookie('connect.sid');
 	logger.info("user logged out successfully %s",req.session.username);
 	req.session.destroy();
 	if (req.session == undefined) {
@@ -872,4 +865,3 @@ exports.logoutUser_Nineteen68 = function (req, res) {
 		res.send('Session Expired');
 	}
 };
-

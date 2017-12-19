@@ -1,4 +1,4 @@
-var uuidV4 = require('uuid/v4');
+var uuidV4 = require('uuid-random');
 var neo4jAPI = require('../controllers/neo4jAPI');
 var admin = require('../controllers/admin');
 var suite = require('../controllers/suite');
@@ -6,18 +6,15 @@ var create_ice=require('../controllers/create_ice');
 var myserver = require('../lib/socket.js');
 var notificationMsg = require("../notifications/notifyMessages");
 var logger = require('../../logger');
+
+function isSessionActive(req){
+	var sessionToken = req.session.uniqueId;
+    return sessionToken != undefined && req.session.id == sessionToken;
+}
+
 exports.mindmapService = function(req, res) {
 	logger.info("Inside UI service: mindmapService");
-	if(req.cookies['connect.sid'] != undefined)
-	{
-		var sessionCookie = req.cookies['connect.sid'].split(".");
-		var sessionToken = sessionCookie[0].split(":");
-		sessionToken = sessionToken[1];
-	}
-	if(sessionToken != undefined && req.session.id == sessionToken)
-	{
-		if(!req.session.id) res.status(401).send('<br><br>Your session has been expired.Please <a href="/">Login</a> Again');
-	else {
+	if (isSessionActive(req)) {
 		var d=req.body;
 		var prjId=d.prjId;
 		var nData=[],qList=[],idDict={};
@@ -808,10 +805,9 @@ exports.mindmapService = function(req, res) {
 			});
 		}
 	}
-}
-else{
-			res.send("Invalid Session");
-		}
+	else{
+		res.send("Invalid Session");
+	}
 };
 
 

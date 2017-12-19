@@ -1,52 +1,21 @@
-var fs = require('fs');
-var http = require('http');
-var https = require('https');
-var uuidV4 = require('uuid/v4');
+var uuidV4 = require('uuid-random');
 var suite = require('../controllers/suite');
-//var router = express.Router();
 var create_ice = require('../controllers/create_ice');
-var  logger = require('../../logger');
+var logger = require('../../logger');
 var neo4jAPI = require('../controllers/neo4jAPI');
 var async = require('async');
-var certificate = fs.readFileSync('server/https/server.crt', 'utf-8');
-var Client = require("node-rest-client").Client;
-var client = new Client({ connection: { rejectUnauthorized: false } });
 var myserver = require('../lib/socket.js');
 var notificationMsg = require("../notifications/notifyMessages");
 
-// /* Send queries to Neo4J/ICE API. */
-// var reqToAPI = function(d,u,p,callback) {
-// 	try{
-// 		var neoUrl="https://"+u[0]+":"+u[1]+p;
-// 		var args={
-// 			"data":d,
-//             "headers": {
-// 				'Accept': 'application/json',
-// 				'Content-Type': 'application/json',
-// 			}
-// 		};
-// 		client.post(neoUrl,args,function(resData,response){
-// 			if (response.statusCode != 200) callback("fail",400,null);
-// 			else callback(null,response.statusCode,resData);
-// 		});
-// 	}catch(ex){
-// 		console.log(ex);
-// 	}
-
-// };
-
-
+function isSessionActive(req){
+	var sessionToken = req.session.uniqueId;
+    return sessionToken != undefined && req.session.id == sessionToken;
+}
 
 /* POST Mindmap*/
 exports.versioning = function (req, res) {
-	//if(!req.session.uniqueID) res.status(401).send('Session Timed Out! Login Again');
 	logger.info('Inside the UI Service versioning')
-	if (req.cookies['connect.sid'] != undefined) {
-		var sessionCookie = req.cookies['connect.sid'].split(".");
-		var sessionToken = sessionCookie[0].split(":");
-		sessionToken = sessionToken[1];
-	}
-	if (sessionToken != undefined && req.session.id == sessionToken) {
+	if (isSessionActive(req)) {
 		var d = req.body;
 		var prjId = d.projectId;
 
@@ -734,15 +703,11 @@ exports.versioning = function (req, res) {
 			});
 		}
 	}
-
 	else {
 		logger.error("Error occured in project_versioning/versioning: versioning service",': Invalid session');
 		res.send("Invalid Session");
 	}
 };
-
-
-
 
 var parsing = function (d, module_type, vn, flag) {
 	logger.info("Inside the function parsing ");

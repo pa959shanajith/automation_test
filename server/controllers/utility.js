@@ -8,17 +8,16 @@ var sessionTime = 30 * 60 * 1000;
 var updateSessionTimeEvery = 20 * 60 * 1000;
 var validator =  require('validator');
 var logger = require('../../logger');
+
+function isSessionActive(req){
+	var sessionToken = req.session.uniqueId;
+    return sessionToken != undefined && req.session.id == sessionToken;
+}
+
 exports.Encrypt_ICE = function getDomains_ICE(req, res) {
 	try {
 		logger.info("Inside UI service: Encrypt_ICE");
-		if(req.cookies['connect.sid'] != undefined)
-		{
-			var sessionCookie = req.cookies['connect.sid'].split(".");
-			var sessionToken = sessionCookie[0].split(":");
-			sessionToken = sessionToken[1];
-		}
-		if(sessionToken != undefined && req.session.id == sessionToken)
-		{
+		if (isSessionActive(req)) {
 			var methodSelected = req.body.encryptionType;
 			var encrytData = req.body.encryptionValue;
 			var encryptedValue;
@@ -142,14 +141,7 @@ exports.Encrypt_ICE = function getDomains_ICE(req, res) {
 };
 
 // exports.pairwise_ICE = function(req, res) {
-// 		if(req.cookies['connect.sid'] != undefined)
-// 		{
-// 			var sessionCookie = req.cookies['connect.sid'].split(".");
-// 			var sessionToken = sessionCookie[0].split(":");
-// 			sessionToken = sessionToken[1];
-// 		}
-// 		if(sessionToken != undefined && req.session.id == sessionToken)
-// 		{
+//  	if (isSessionActive(req)) {
 // 			var abc = {}
 // 			abc.key = req.body.dataObj;
 // 			var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;

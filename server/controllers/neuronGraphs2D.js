@@ -5,6 +5,11 @@ var Client = require("node-rest-client").Client;
 var client = new Client();
 var epurl = "http://"+process.env.NDAC_IP+":"+process.env.NDAC_PORT+"/";
 
+function isSessionActive(req){
+	var sessionToken = req.session.uniqueId;
+    return sessionToken != undefined && req.session.id == sessionToken;
+}
+
 var parseData = function(data){
 	logger.info("Inside function: parseData ");
 	var rootIndex=-1;
@@ -86,12 +91,7 @@ var cleanData = function(data){
 exports.getGraphData = function(req, res){
 	logger.info("Inside UI service: getGraphData");
 	try{
-		if(req.cookies['connect.sid'] != undefined){
-			var sessionCookie = req.cookies['connect.sid'].split(".");
-			var sessionToken = sessionCookie[0].split(":");
-			sessionToken = sessionToken[1];
-		}
-		if(sessionToken != undefined && req.session.id == sessionToken){
+		if (isSessionActive(req)) {
 			var qList=[];
 			//var urlData=req.get('host').split(':');
 			var userid=req.body.uid;
@@ -133,12 +133,7 @@ exports.getGraphData = function(req, res){
 exports.getPackData = function(req, res){
 	logger.info("Inside UI service: getPackData");
 	try{
-		if(req.cookies['connect.sid'] != undefined){
-			var sessionCookie = req.cookies['connect.sid'].split(".");
-			var sessionToken = sessionCookie[0].split(":");
-			sessionToken = sessionToken[1];
-		}
-		if(sessionToken != undefined && req.session.id == sessionToken){
+		if (isSessionActive(req)) {
 			var dNeed=req.body.data;
 			var coords=get2DCoordsData(!1,!1,dNeed);
 			res.status(200).send({"err":false,"coords_data":coords});
@@ -156,14 +151,8 @@ exports.getPackData = function(req, res){
 exports.getReportData = function(req, res){
 	logger.info("Inside UI service: getReportData");
 	try{
-		if(req.cookies['connect.sid'] != undefined){
-			var sessionCookie = req.cookies['connect.sid'].split(".");
-			var sessionToken = sessionCookie[0].split(":");
-			sessionToken = sessionToken[1];
-		}
-		if(sessionToken != undefined && req.session.id == sessionToken){
+		if (isSessionActive(req)) {
 			//my story
-			
 			var req_testsuiteId=req.body.moduleid;
 			var req_executionId=req.body.executionid;
 			var req_testScenarioIds=req.body.testscenarioids;
@@ -209,12 +198,7 @@ exports.getReportData = function(req, res){
 
 // exports.BuildRelationships = function(req, res){
 // 	try{
-// 		if(req.cookies['connect.sid'] != undefined){
-// 			var sessionCookie = req.cookies['connect.sid'].split(".");
-// 			var sessionToken = sessionCookie[0].split(":");
-// 			sessionToken = sessionToken[1];
-// 		}
-// 		if(sessionToken != undefined && req.session.id == sessionToken){
+//  	if (isSessionActive(req)) {
 // 			//my story
 // 			var qList = [];
 // 			qList.push({"statement":"MATCH (a:TESTSUITES_NG),(b:TESTSCENARIOS_NG) WHERE b.testscenarioid IN a.testscenarioids MERGE (a)-[r:FTSUTTSC_NG{id:b.testscenarioid}]->(b)"});

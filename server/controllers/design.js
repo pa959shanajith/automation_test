@@ -8,12 +8,6 @@ var Client = require("node-rest-client").Client;
 var client = new Client();
 var epurl = "http://"+process.env.NDAC_IP+":"+process.env.NDAC_PORT+"/";
 var logger = require('../../logger');
-/**
- * @author vinay.niranjan
- * @modified author vinay.niranjan
- * the service is used to init scraping & fetch scrape objects
- */
-
 //base RequestElement
 var baseRequestBody = {};
 //xpath for view
@@ -28,15 +22,21 @@ var sessionTime = 30 * 60 * 1000;
 var updateSessionTimeEvery = 20 * 60 * 1000;
 var redisServer = require('../lib/redisSocketHandler');
 
+function isSessionActive(req){
+	var sessionToken = req.session.uniqueId;
+    return sessionToken != undefined && req.session.id == sessionToken;
+}
+
+
+/**
+ * @author vinay.niranjan
+ * @modified author vinay.niranjan
+ * the service is used to init scraping & fetch scrape objects
+ */
 exports.initScraping_ICE = function (req, res) {
 	logger.info("Inside UI service: initScraping_ICE");
 	try {
-		if (req.cookies['connect.sid'] != undefined) {
-			var sessionCookie = req.cookies['connect.sid'].split(".");
-			var sessionToken = sessionCookie[0].split(":");
-			sessionToken = sessionToken[1];
-		}
-		if (sessionToken != undefined && req.session.id == sessionToken) {
+		if (isSessionActive(req)) {
 			var name = req.session.username;
 			redisServer.redisSub2.subscribe('ICE2_' + name ,1);	
 			var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
@@ -278,12 +278,7 @@ exports.initScraping_ICE = function (req, res) {
 exports.highlightScrapElement_ICE = function (req, res) {
 	try {
 		logger.info("Inside UI service: highlightScrapElement_ICE");
-		if (req.cookies['connect.sid'] != undefined) {
-			var sessionCookie = req.cookies['connect.sid'].split(".");
-			var sessionToken = sessionCookie[0].split(":");
-			sessionToken = sessionToken[1];
-		}
-		if (sessionToken != undefined && req.session.id == sessionToken) {
+		if (isSessionActive(req)) {
 			var name = req.session.username;
 			redisServer.redisSub2.subscribe('ICE2_' + name ,1);
 			var focusParam = req.body.elementXpath;
@@ -316,12 +311,7 @@ exports.highlightScrapElement_ICE = function (req, res) {
 exports.getScrapeDataScreenLevel_ICE = function (req, res) {
 	try {
 		logger.info("Inside UI service: getScrapeDataScreenLevel_ICE");
-		if (req.cookies['connect.sid'] != undefined) {
-			var sessionCookie = req.cookies['connect.sid'].split(".");
-			var sessionToken = sessionCookie[0].split(":");
-			sessionToken = sessionToken[1];
-		}
-		if (sessionToken != undefined && req.session.id == sessionToken) {
+		if (isSessionActive(req)) {
 			var inputs = {
 				"screenid": req.body.screenId,
 				"projectid": req.body.projectId,
@@ -390,12 +380,7 @@ function fetchScrapedData(inputs, fetchScrapedDatacallback) {
 exports.updateScreen_ICE = function (req, res) {
 	try {
 		logger.info("Inside UI service: updateScreen_ICE");
-		if (req.cookies['connect.sid'] != undefined) {
-			var sessionCookie = req.cookies['connect.sid'].split(".");
-			var sessionToken = sessionCookie[0].split(":");
-			sessionToken = sessionToken[1];
-		}
-		if (sessionToken != undefined && req.session.id == sessionToken) {
+		if (isSessionActive(req)) {
 			var updateData = req.body.scrapeObject;
 			var projectID = updateData.projectId;
 			var screenID = updateData.screenId;
@@ -1465,12 +1450,7 @@ function uploadTestCaseData(inputs, uploadTestCaseDatacallback) {
 exports.readTestCase_ICE = function (req, res) {
 	try {
 		logger.info("Inside UI service: readTestCase_ICE");
-		if (req.cookies['connect.sid'] != undefined) {
-			var sessionCookie = req.cookies['connect.sid'].split(".");
-			var sessionToken = sessionCookie[0].split(":");
-			sessionToken = sessionToken[1];
-		}
-		if (sessionToken != undefined && req.session.id == sessionToken) {
+		if (isSessionActive(req)) {
 			//base output elements
 			var testcasesteps = "";
 			var testcasename = "";
@@ -1602,12 +1582,7 @@ exports.readTestCase_ICE = function (req, res) {
 exports.updateTestCase_ICE = function (req, res) {
 	try {
 		logger.info("Inside UI service: updateTestCase_ICE");
-		if (req.cookies['connect.sid'] != undefined) {
-			var sessionCookie = req.cookies['connect.sid'].split(".");
-			var sessionToken = sessionCookie[0].split(":");
-			sessionToken = sessionToken[1];
-		}
-		if (sessionToken != undefined && req.session.id == sessionToken) {
+		if (isSessionActive(req)) {
 			var hasrow = false;
 			//base request elements
 			var requestedscreenid = req.body.screenid;
@@ -1706,12 +1681,7 @@ exports.updateTestCase_ICE = function (req, res) {
 exports.debugTestCase_ICE = function (req, res) {
 	try {
 		logger.info("Inside UI service: debugTestCase_ICE");
-		if (req.cookies['connect.sid'] != undefined) {
-			var sessionCookie = req.cookies['connect.sid'].split(".");
-			var sessionToken = sessionCookie[0].split(":");
-			sessionToken = sessionToken[1];
-		}
-		if (sessionToken != undefined && req.session.id == sessionToken) {
+		if (isSessionActive(req)) {
 			var name = req.session.username;
 			redisServer.redisSub2.subscribe('ICE2_' + name ,1);
 			var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
@@ -2092,12 +2062,7 @@ exports.debugTestCase_ICE = function (req, res) {
 exports.getKeywordDetails_ICE = function getKeywordDetails_ICE(req, res) {
 	try {
 		logger.info("Inside UI service: getKeywordDetails_ICE");
-		if (req.cookies['connect.sid'] != undefined) {
-			var sessionCookie = req.cookies['connect.sid'].split(".");
-			var sessionToken = sessionCookie[0].split(":");
-			sessionToken = sessionToken[1];
-		}
-		if (sessionToken != undefined && req.session.id == sessionToken) {
+		if (isSessionActive(req)) {
 			var requestedprojecttypename = req.body.projecttypename;
 			// Query 1 fetching the objecttype,keywords basked on projecttypename
 			var individualsyntax = {};
@@ -2148,12 +2113,7 @@ exports.getKeywordDetails_ICE = function getKeywordDetails_ICE(req, res) {
 exports.getTestcasesByScenarioId_ICE = function getTestcasesByScenarioId_ICE(req, res) {
 	try {
 		logger.info("Inside UI service: getTestcasesByScenarioId_ICE");
-		if (req.cookies['connect.sid'] != undefined) {
-			var sessionCookie = req.cookies['connect.sid'].split(".");
-			var sessionToken = sessionCookie[0].split(":");
-			sessionToken = sessionToken[1];
-		}
-		if (sessionToken != undefined && req.session.id == sessionToken) {
+		if (isSessionActive(req)) {
 			var testcasesArr = [];
 			var testScenarioId = req.body.testScenarioId;
 			var inputs = {

@@ -16,6 +16,12 @@ var updateSessionTimeEvery = 20 * 60 * 1000;
 var scheduleStatus = "";
 var logger = require('../../logger');
 var redisServer = require('../lib/redisSocketHandler');
+var qList = [];
+
+function isSessionActive(req){
+	var sessionToken = req.session.uniqueId;
+    return sessionToken != undefined && req.session.id == sessionToken;
+}
 
 /**
  * @author vishvas.a
@@ -24,18 +30,10 @@ var redisServer = require('../lib/redisSocketHandler');
  * this reads the scenario information from the testsuites
  * and testsuites table of the icetestautomation keyspace
  */
-
-var qList = [];
-
 exports.readTestSuite_ICE = function (req, res) {
 	logger.info("Inside UI service: readTestSuite_ICE");
 	qList = [];
-	if (req.cookies['connect.sid'] != undefined) {
-		var sessionCookie = req.cookies['connect.sid'].split(".");
-		var sessionToken = sessionCookie[0].split(":");
-		sessionToken = sessionToken[1];
-	}
-	if (sessionToken != undefined && req.session.id == sessionToken) {
+	if (isSessionActive(req)) {
 		var requiredreadTestSuite = req.body.readTestSuite;
 		var fromFlg = req.body.fromFlag;
 		var responsedata = {};
@@ -429,12 +427,7 @@ function Projectnametestcasename_ICE(req, cb, data) {
 exports.updateTestSuite_ICE = function (req, res) {
 	logger.info("Inside UI service: updateTestSuite_ICE");
     qList = [];
-	if (req.cookies['connect.sid'] != undefined) {
-		var sessionCookie = req.cookies['connect.sid'].split(".");
-		var sessionToken = sessionCookie[0].split(":");
-		sessionToken = sessionToken[1];
-	}
-	if (sessionToken != undefined && req.session.id == sessionToken) {
+	if (isSessionActive(req)) {
 		var userinfo = req.body.batchDetails.userinfo;
 		var batchDetails = req.body.batchDetails.suiteDetails;
 		var batchDetailslength = batchDetails.length;
@@ -615,12 +608,7 @@ function updateExecutionStatus(testsuiteid, executionid, starttime, suiteStatus)
  */
 exports.ExecuteTestSuite_ICE = function (req, res) {
 	logger.info("Inside UI service: ExecuteTestSuite_ICE");
-	if (req.cookies['connect.sid'] != undefined) {
-		var sessionCookie = req.cookies['connect.sid'].split(".");
-		var sessionToken = sessionCookie[0].split(":");
-		sessionToken = sessionToken[1];
-	}
-	if (sessionToken != undefined && req.session.id == sessionToken) {
+	if (isSessionActive(req)) {
 		var name = req.session.username;
 		redisServer.redisSub2.subscribe('ICE2_' + name,1);
 		var batchExecutionData = req.body.moduleInfo;
@@ -1848,12 +1836,7 @@ function TestCaseDetails_Suite_ICE(req, userid, cb, data) {
  */
 exports.getTestcaseDetailsForScenario_ICE = function (req, res) {
 	logger.info("Inside Ui service getTestcaseDetailsForScenario_ICE");
-	if (req.cookies['connect.sid'] != undefined) {
-		var sessionCookie = req.cookies['connect.sid'].split(".");
-		var sessionToken = sessionCookie[0].split(":");
-		sessionToken = sessionToken[1];
-	}
-	if (sessionToken != undefined && req.session.id == sessionToken) {
+	if (isSessionActive(req)) {
 		var requiredtestscenarioid = req.body.testScenarioId;
 		logger.info("Calling function testcasedetails_testscenarios from getTestcaseDetailsForScenario_ICE");
 		testcasedetails_testscenarios(requiredtestscenarioid, function (err, data) {
@@ -2341,12 +2324,7 @@ function updatescenariodetailsinsuite(req, cb, data) {
 /***********************Scheduling jobs***************************/
 exports.testSuitesScheduler_ICE = function (req, res) {
 	logger.info("Inside UI service testSuitesScheduler_ICE");
-	if (req.cookies['connect.sid'] != undefined) {
-		var sessionCookie = req.cookies['connect.sid'].split(".");
-		var sessionToken = sessionCookie[0].split(":");
-		sessionToken = sessionToken[1];
-	}
-	if (sessionToken != undefined && req.session.id == sessionToken) {
+	if (isSessionActive(req)) {
 		if(req.body.chkType == "schedule"){			
 			var modInfo = req.body.moduleInfo;
 			logger.info("Calling function scheduleTestSuite from testSuitesScheduler_ICE");
@@ -2854,12 +2832,7 @@ function updateStatus(sessObj, updateStatuscallback) {
 
 exports.getScheduledDetails_ICE = function (req, res) {
 	logger.info("Inside UI service getScheduledDetails_ICE");
-	if (req.cookies['connect.sid'] != undefined) {
-		var sessionCookie = req.cookies['connect.sid'].split(".");
-		var sessionToken = sessionCookie[0].split(":");
-		sessionToken = sessionToken[1];
-	}
-	if (sessionToken != undefined && req.session.id == sessionToken) {
+	if (isSessionActive(req)) {
 		logger.info("Calling function getScheduledDetails from getScheduledDetails_ICE");
 		getScheduledDetails("getallscheduledata", function (err, getSchedcallback) {
 			if (err) {
@@ -2883,12 +2856,7 @@ exports.getScheduledDetails_ICE = function (req, res) {
 //cancel scheduled Jobs
 exports.cancelScheduledJob_ICE = function (req, res) {
 	logger.info("Inside UI service cancelScheduledJob_ICE");
-	if (req.cookies['connect.sid'] != undefined) {
-		var sessionCookie = req.cookies['connect.sid'].split(".");
-		var sessionToken = sessionCookie[0].split(":");
-		sessionToken = sessionToken[1];
-	}
-	if (sessionToken != undefined && req.session.id == sessionToken) {
+	if (isSessionActive(req)) {
 		var cycleid = req.body.suiteDetails.cycleid;
 		var scheduleid = req.body.suiteDetails.scheduleid;
 		var schedStatus = req.body.schedStatus;
