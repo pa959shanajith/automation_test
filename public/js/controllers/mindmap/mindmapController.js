@@ -511,4 +511,34 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             createNewMap();
         }
     }
+
+    $scope.fullScreen = function(){
+		var elt = document.getElementById('viewArea');
+        console.log("Requesting fullscreen for", elt);
+        if ((window.fullScreen) ||(window.innerWidth == screen.width && (screen.height - window.innerHeight) <= 1)) {
+            if (document.cancelFullScreen) {
+                document.cancelFullScreen();
+            } else if (document.mozCancelFullScreen) {
+                document.mozCancelFullScreen();
+            } else if (document.webkitCancelFullScreen) {
+                document.webkitCancelFullScreen();
+            }
+            $timeout(function(){
+                $('.thumb-ic-highlight').removeClass('thumb-ic-highlight');
+            },100);
+        } else {
+            if (elt.requestFullscreen) {
+                elt.requestFullscreen();
+            } else if (elt.msRequestFullscreen) {
+                elt.msRequestFullscreen();
+            } else if (elt.mozRequestFullScreen) {
+                elt.mozRequestFullScreen();
+            } else if (elt.webkitRequestFullscreen) {
+                elt.webkitRequestFullscreen();
+            } else {
+                console.error("Fullscreen not available");
+            }
+        }
+    }
+
 }]);

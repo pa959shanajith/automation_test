@@ -25,11 +25,14 @@ mySPA.factory('ScheduleService', ['$http','$q', function ($http, $httpProvider, 
 			.then(function(response){	return response.data},
 			function(response){return $q.reject(response.data)})
 		},
-		cancelScheduledJob_ICE : function(suiteDetailsObj, status){
+		cancelScheduledJob_ICE : function(suiteDetailsObj, status,host,schedUserid){
 			return $http.post('/cancelScheduledJob_ICE',{
 				param : 'cancelScheduledJob_ICE',
 				suiteDetails: suiteDetailsObj,
-				schedStatus: status
+				schedStatus: status,
+				host: host,
+				schedUserid: schedUserid,
+				userInfo: JSON.parse(window.localStorage['_UI']).user_id
 			})
 			.then(function(response){	return response.data},
 			function(response){return $q.reject(response.data)})

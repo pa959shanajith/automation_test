@@ -1,5 +1,5 @@
 var releaseName,cycleName,testSuiteName;
-mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout','$location','ScheduleService','cfpLoadingBar','$compile', function ($scope, $rootScope, $http, $timeout, $location, ScheduleService, cfpLoadingBar, $compile) {
+mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout','$location','ScheduleService','cfpLoadingBar','$compile','$interval', function ($scope, $rootScope, $http, $timeout, $location, ScheduleService, cfpLoadingBar, $compile, $interval) {
 	cfpLoadingBar.start();
 	$("body").css("background","#eee");
 	$("head").append('<link rel="stylesheet" type="text/css" href="fonts/font-awesome_mindmap/css/font-awesome.min.css" />')
@@ -47,11 +47,14 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 				$(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">Project :</span><span class="content">'+projectDetails.respnames[0]+'</span></p><p class="proj-info-wrap"><span class="content-label">Release :</span><span class="content">'+releaseName+'</span></p><p class="proj-info-wrap"><span class="content-label">Cycle :</span><span class="content">'+cycleName+'</span></p>')
 			}
 	}, 2000)*/
-    
+    var sortFlag = false;
 	//Onload ServiceCall
 	$timeout(function(){
 		angular.element(document.getElementById("left-nav-section")).scope().readTestSuite_ICE();
 	}, 1000)
+
+	//update scheduled table every 20 seconds
+	$interval(getScheduledDetails, 20000);
 	
 	$scope.readTestSuite_ICE = function(){
 		ScheduleService.readTestSuite_ICE(readTestSuite, "schedule")
@@ -82,15 +85,17 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 					}
 					for(j=0;j<eachData[i].scenarioids.length;j++){
 						if(eachData[i].condition[j] == 0)
-							$(document).find(".scenarioTbCon_"+i+"").append('<tr><td><span>'+count+'</span></td><td data-scenarioid="'+eachData[i].scenarioids[j]+'">'+eachData[i].scenarionames[j]+'</td><td style="padding: 2px 0 2px 0;"><input type="text" value="'+eachData[i].dataparam[j]+'" disabled/></td><td><select disabled><option value="1">True</option><option value="0" selected>False</option></select></td><td>'+eachData[i].projectnames[j]+'</td></tr>');//<input type="checkbox" class="scenarioCheck"/>
+							$(document).find(".scenarioTbCon_"+i+"").append('<tr><td><span>'+count+'</span><input type="checkbox" class="selectToSched" disabled/></td><td data-scenarioid="'+eachData[i].scenarioids[j]+'">'+eachData[i].scenarionames[j]+'</td><td style="padding: 2px 0 2px 0;"><input type="text" value="'+eachData[i].dataparam[j]+'" disabled/></td><td><select disabled><option value="1">True</option><option value="0" selected>False</option></select></td><td>'+eachData[i].projectnames[j]+'</td></tr>');//<input type="checkbox" class="scenarioCheck"/>
 						else
-							$(document).find(".scenarioTbCon_"+i+"").append('<tr><td><span>'+count+'</span></td><td data-scenarioid="'+eachData[i].scenarioids[j]+'">'+eachData[i].scenarionames[j]+'</td><td style="padding: 2px 0 2px 0;"><input type="text" value="'+eachData[i].dataparam[j]+'" disabled/></td><td><select disabled><option value="1" selected>True</option><option value="0">False</option></select></td><td>'+eachData[i].projectnames[j]+'</td></tr>');//<input type="checkbox" class="scenarioCheck"/>
+							$(document).find(".scenarioTbCon_"+i+"").append('<tr><td><span>'+count+'</span><input type="checkbox" class="selectToSched" disabled/></td><td data-scenarioid="'+eachData[i].scenarioids[j]+'">'+eachData[i].scenarionames[j]+'</td><td style="padding: 2px 0 2px 0;"><input type="text" value="'+eachData[i].dataparam[j]+'" disabled/></td><td><select disabled><option value="1" selected>True</option><option value="0">False</option></select></td><td>'+eachData[i].projectnames[j]+'</td></tr>');//<input type="checkbox" class="scenarioCheck"/>
 						count++;
 					}		
 							//+'<div id="scheduleDataBody" class="scrollbar-inner scheduleDataBody"><label>'+(i+1)+'</label><input type="checkbox"/><label>scenario</label><span><input type="text" class="dataParamValue"/></span><span><select><option value="false" selected>False</option><option>True</option></select></span><label>project</label></div></div>')
 				}				
 				$('.scrollbar-inner').scrollbar();
+				sortFlag = true;
 				getScheduledDetails();
+				sortFlag = false;
 			}
 			cfpLoadingBar.complete();
 			unblockUI();
@@ -99,7 +104,15 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 			console.log("Error")
 		});
 	}
-    
+	
+	$(document).on("change", ".selectScheduleSuite", function(){
+		if($(this).is(":checked")){
+			$(this).parent().siblings(".scenarioSchdCon").find(".selectToSched").attr("disabled",false);
+		}
+		else
+			$(this).parent().siblings(".scenarioSchdCon").find(".selectToSched").attr("disabled",true).prop("checked", false);
+	})
+
 	//Function to get scheduled details
 	function getScheduledDetails(){
 		ScheduleService.getScheduledDetails_ICE()
@@ -140,8 +153,9 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 				// 	}
 				// }						
 				$timeout(function(){
-					$(".scheduleDataHeader span:first-child").trigger("click");
+					sortFlag == true? $(".scheduleDataHeader span:first-child").trigger("click") : 
 					changeBackground();
+					$("#scheduledSuitesFilterData").prop('selectedIndex', 0);
 				},100)
 			}
 		},
@@ -380,14 +394,16 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 					}
 					if(doNotSchedule == false){					
 						$(this).find(".scenarioSchdCon tbody tr").each(function(){
-							selectedScenarioData.push({
-								condition : parseInt($(this).children("td:nth-child(4)").find("select option:selected").val()),
-								dataparam : [$(this).children("td:nth-child(3)").find("input").val()],
-								executestatus : 1,
-								scenarioids : $(this).children("td:nth-child(2)").data("scenarioid"),
-								scenarioname: $(this).children("td:nth-child(2)").text(),
-								appType: window_ct.appType
-							})
+							if($(this).find(".selectToSched").is(":checked")){
+								selectedScenarioData.push({
+									condition : parseInt($(this).children("td:nth-child(4)").find("select option:selected").val()),
+									dataparam : [$(this).children("td:nth-child(3)").find("input").val()],
+									executestatus : 1,
+									scenarioids : $(this).children("td:nth-child(2)").data("scenarioid"),
+									scenarioname: $(this).children("td:nth-child(2)").text(),
+									appType: window_ct.appType
+								})
+							}
 						})
 						suiteInfo.suiteDetails = selectedScenarioData;
 						suiteInfo.testsuitename = $(this).children('.scheduleSuite').find(".scheduleSuiteName").text();
@@ -459,7 +475,8 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 					.then(function(data){
 						if(data == "success"){
 							openModelPopup("Schedule Test Suite", "Successfully scheduled.");
-							$(".selectScheduleSuite").prop("checked", false);
+							$(".selectScheduleSuite, .selectToSched").prop("checked", false);
+							$(".selectBrowserSc").find(".sb").removeClass("sb");
 							$(".ipformating, .fc-datePicker, .fc-timePicker").prop("style","border: none;").val("");
 							getScheduledDetails();
 						}
@@ -488,7 +505,9 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 	//Cancel scheduled jobs
 	$scope.cancelThisJob = function($event,status){
 		var suiteDetailsObj = $event.currentTarget.parentElement.dataset;
-		ScheduleService.cancelScheduledJob_ICE(suiteDetailsObj,status)
+		var host = $event.currentTarget.parentElement.parentElement.children[1].innerText;
+		var schedUserid = $event.currentTarget.parentElement.parentElement.children[1].dataset.userid;
+		ScheduleService.cancelScheduledJob_ICE(suiteDetailsObj,status,host,schedUserid)
 		.then(function(data){
 			if(data == "success"){
 				openModelPopup("Scheduled Test Suite", "Job is "+status+".");
@@ -499,9 +518,13 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 						tabEle[i].children[5].innerText = status;
 					}
 				}
+				getScheduledDetails();
 			}
 			else if(data == "inprogress"){
 				openModelPopup("Scheduled Test Suite", "Job is in progress.. cannot be cancelled.");
+			}
+			else if(data == "not authorised"){
+				openModelPopup("Scheduled Test Suite", "You are not authorized to cancel this job.");
 			}
 			else{
 				openModelPopup("Scheduled Test Suite", "Failed to cancel Job");

@@ -18,6 +18,30 @@ var apiclient = new Client();
 var uiConfig = require('./../config/options');
 var screenShotPath = uiConfig.storageConfig.screenShotPath;
 
+//Check for valid user
+function checkValidUserToConnect(address, callback){
+	var inputs = {
+		"username": address
+	};
+	var args = {
+		data: inputs,
+		headers: {
+			"Content-Type": "application/json"
+		}
+	};
+	logger.info("Calling NDAC Service: authenticateUser_Nineteen68");
+	apiclient.post(epurl + "login/authenticateUser_Nineteen68", args,
+	function (result, response) {
+		if (response.statusCode != 200 || result.rows == "fail") {
+			logger.error("Error occured in authenticateUser_Nineteen68 to valid user Error Code : ERRNDAC");
+			callback(null, "fail");
+		} else {
+			callback(null, result);
+		}
+	});
+}
+
+
 io.on('connection', function (socket) {
 	logger.info("Inside Socket connection");
 	var address = socket.handshake.query.username;
@@ -59,14 +83,21 @@ io.on('connection', function (socket) {
 			} else {
 				socket.send('checkConnection', result.ice_check);
 				if (result.node_check) {
-					if (!(address in socketMap)) {
-						socketMap[address] = socket;
-						socket.send('connected');
-						logger.debug("%s is connected", address);
-						logger.debug("No. of clients connected for Normal mode: %d", Object.keys(socketMap).length);
-						socket.emit('update_screenshot_path', screenShotPath);
-						redisServer.redisSub1.subscribe('ICE1_normal_' + address, 1);
-					}
+					checkValidUserToConnect(address, function(err, result){
+						if (result != undefined && result != "fail" && result.rows.length != 0){
+							if (!(address in socketMap)) {
+								socketMap[address] = socket;
+								socket.send('connected');
+								logger.debug("%s is connected", address);
+								logger.debug("No. of clients connected for Normal mode: %d", Object.keys(socketMap).length);
+								socket.emit('update_screenshot_path', screenShotPath);
+								redisServer.redisSub1.subscribe('ICE1_normal_' + address, 1);
+							}						
+						}
+						else{
+							logger.debug("%s is not valid user to connect", address);
+						}
+					});															
 				}
 			}
 		});

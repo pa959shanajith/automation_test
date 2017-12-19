@@ -3,25 +3,16 @@ var Client = require("node-rest-client").Client;
 var client = new Client();
 var epurl = "http://"+process.env.NDAC_IP+":"+process.env.NDAC_PORT+"/";
 var async = require('async');
-var fs = require('fs');
-var https = require('https');
-var uuidV4 = require('uuid/v4');
-var express = require('express');
-var certificate = fs.readFileSync('server/https/server.crt','utf-8');
 var neo4jAPI = require('../controllers/neo4jAPI');
 var  logger = require('../../logger');
 /*
 * Checks if the session is active
 */
-  function isSessionActive(req, res){
+function isSessionActive(req, res){
     logger.info("Inside function isSessionActive");
-    if(req.cookies['connect.sid'] != undefined){
-      var sessionCookie = req.cookies['connect.sid'].split(".");
-      var sessionToken = sessionCookie[0].split(":");
-      sessionToken = sessionToken[1];
-    }
+	var sessionToken = req.session.uniqueId;
     return sessionToken != undefined && req.session.id == sessionToken;
-  }
+}
 
   exports.loadDashboard = function(req, res){
     logger.info("Inside UI service: loadDashboard")

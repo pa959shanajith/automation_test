@@ -3,16 +3,14 @@ var Client = require("node-rest-client").Client;
 var client = new Client();
 var epurl = "http://"+process.env.NDAC_IP+":"+process.env.NDAC_PORT+"/";
 
+function isSessionActive(req){
+	var sessionToken = req.session.uniqueId;
+    return sessionToken != undefined && req.session.id == sessionToken;
+}
+
 exports.getTopMatches_ProfJ = function getTopMatches(req, res) {
 	try {
-		if(req.cookies['connect.sid'] != undefined)
-		{
-			var sessionCookie = req.cookies['connect.sid'].split(".");
-			var sessionToken = sessionCookie[0].split(":");
-			sessionToken = sessionToken[1];
-		}
-		if(sessionToken != undefined && req.session.id == sessionToken)
-		{
+		if (isSessionActive(req)) {
 			var query= req.body.userQuery;
 			try{
                     var args = {
@@ -56,14 +54,7 @@ exports.getTopMatches_ProfJ = function getTopMatches(req, res) {
 
 exports.updateFrequency_ProfJ = function(req, res) {
 	try {
-		if(req.cookies['connect.sid'] != undefined)
-		{
-			var sessionCookie = req.cookies['connect.sid'].split(".");
-			var sessionToken = sessionCookie[0].split(":");
-			sessionToken = sessionToken[1];
-		}
-		if(sessionToken != undefined && req.session.id == sessionToken)
-		{
+		if (isSessionActive(req)) {
 			var qid= req.body.qid;
 			try{
                     var args = {

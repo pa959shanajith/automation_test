@@ -28,7 +28,6 @@ try {
     var app = express();
     var bodyParser = require('body-parser');
     var sessions = require('express-session');
-    var cookieParser = require('cookie-parser');
     var helmet = require('helmet');
     var lusca = require('lusca');
     var redis = require("redis");
@@ -38,6 +37,9 @@ try {
     redisSessionClient.on("error", function (err) {
         logger.error("Please run the Redis DB");
         cluster.worker.disconnect().kill();
+    });
+    redisSessionClient.on("connect", function (err) {
+        logger.debug("Redis DB connected");
     });
     var redisSessionStore = new redisStore({ host: process.env.REDIS_IP, port: process.env.REDIS_PORT, client: redisSessionClient});
 
@@ -93,19 +95,18 @@ try {
     }));
     else logger.info("Express logs are disabled");
 
-    app.use(cookieParser());
     app.use(sessions({
-        secret: '$^%EDE%^tfd65e7ufyCYDR^%IU',
-        store: redisSessionStore,
-        rolling: true,
-        resave: false,
-        saveUninitialized: false,  //Should always be false for cookie to clear
         cookie: {
             path: '/',
             httpOnly: true,
             secure: true,
             maxAge: (30 * 60 * 1000)
-        }
+        },
+        resave: false,
+        rolling: true,
+        saveUninitialized: false,  //Should always be false for cookie to clear
+        secret: '$^%EDE%^tfd65e7ufyCYDR^%IU',
+        store: redisSessionStore
     }));
 
     app.use(helmet());
@@ -152,7 +153,6 @@ try {
                             });
                             return next();
                         } else {
-
                             req.session.destroy();
                             res.status(401).redirect('/');
                         }
@@ -189,14 +189,6 @@ try {
     app.use("/css", express.static(__dirname + "/public/css"));
     app.use("/fonts", express.static(__dirname + "/public/fonts"));
 
-    // app.get("/", function(req, res) {
-    //     // console.log("/--------",req);
-    //     res.clearCookie('connect.sid');
-    //     res.sendFile("index.html", {
-    //         root: __dirname + "/public/"
-    //     });
-    // });
-
     app.get('/',  function (req,  res)  {
         res.clearCookie('connect.sid');
         req.session.destroy();
@@ -217,9 +209,9 @@ try {
 
     app.get('/admin',  function (req,  res)  {
         if (!req.session.defaultRole || req.session.defaultRole != 'Admin') {
-            req.session.destroy();  res.status(401).send('<br><br>Your session has been expired.Please <a href="/">Login</a> Again');
+            req.session.destroy();  res.status(401).redirect('/');
         } else {
-            if  (req.cookies['connect.sid']  &&  req.cookies['connect.sid']  !=  undefined)  {  res.sendFile("index.html",  {  root:  __dirname  +  "/public/"  }); }  else  { req.session.destroy();  res.status(401).send('<br><br>Your session has been expired.Please <a href="/">Login</a>Again'); }
+            if (req.session.uniqueId != undefined) { res.sendFile("index.html",  {  root:  __dirname  +  "/public/"  }); }  else  { req.session.destroy();  res.status(401).redirect('/login'); }
         }
     });
 
@@ -271,34 +263,32 @@ try {
 
         if (req.session.switchedRole != true) {
             if (!req.session.defaultRole || roles.indexOf(req.session.defaultRole) >= 0) {
-                req.session.destroy();  res.status(401).send('<br><br>Your session has been expired.Please <a href="/">Login</a> Again');
+                req.session.destroy();  res.status(401).redirect('/');
             } else {
-                if (req.cookies['connect.sid'] && req.cookies['connect.sid'] != undefined) {
-
+                if (req.session.uniqueId != undefined) {
                     res.sendFile("index.html", { root: __dirname + "/public/" });
                 } else {
                     req.session.destroy();
-                    res.status(401).send('<br><br>Your session has been expired. Please <a href="/">Login</a> Again');
+                    res.status(401).redirect('/login');
                 }
             }
         }
         else {
-            if (req.cookies['connect.sid'] && req.cookies['connect.sid'] != undefined) {
-
+            if (req.session.uniqueId != undefined) {
                 res.sendFile("index.html", { root: __dirname + "/public/" });
             } else {
                 req.session.destroy();
-                res.status(401).send('<br><br>Your session has been expired. Please <a href="/">Login</a> Again');
+                res.status(401).redirect('/login');
             }
         }
-
     }
+
     app.get('/favicon.ico', function (req, res) {
-        if (req.cookies['connect.sid'] && req.cookies['connect.sid'] != undefined) { res.sendFile("index.html", { root: __dirname + "/public/" }); } else { req.session.destroy(); res.status(401).send('<br><br>Your session has been expired. Please <a href="/">Login</a> Again'); }
+        if (req.session.uniqueId != undefined) { res.sendFile("index.html", { root: __dirname + "/public/" }); } else { req.session.destroy(); res.status(401).redirect('/login'); }
     });
 
     app.get('/css/fonts/Lato/Lato-Regular.ttf', function (req, res) {
-        if (req.cookies['connect.sid'] && req.cookies['connect.sid'] != undefined) { res.sendFile("index.html", { root: __dirname + "/public/" }); } else { req.session.destroy(); res.status(401).send('<br><br>Your session has been expired. Please <a href="/">Login</a> Again'); }
+        if (req.session.uniqueId != undefined) { res.sendFile("index.html", { root: __dirname + "/public/" }); } else { req.session.destroy(); res.status(401).redirect('/login'); }
     });
 
     app.post('/designTestCase', function (req, res) {
