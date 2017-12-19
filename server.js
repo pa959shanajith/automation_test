@@ -13,7 +13,7 @@ var logger = require('./logger');
 if (cluster.isMaster) {
     cluster.fork();
     cluster.on('disconnect', function(worker) {
-        logger.error('Node server has encountered some problems, Disconnecting!');
+        logger.error('Nineteen68 server has encountered some problems, Disconnecting!');
     });
     cluster.on('exit', function(worker) {
         if (worker.exitedAfterDisconnect != true) {
@@ -453,7 +453,7 @@ try {
                     logger.error("Please run the Service API and Restart the Server");
                 } else {
                     suite.reScheduleTestsuite();
-                    logger.info("Nineteen68 Server Ready...");
+                    console.info("Nineteen68 Server Ready...");
                 }
             } catch (exception) {
                 httpsServer.close();
