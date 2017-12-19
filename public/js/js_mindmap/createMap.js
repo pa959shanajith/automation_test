@@ -1740,19 +1740,17 @@ function inpChange(e) {
         //The below line leads to duplicate id_n of nodes when the node name is selected from suggestions list (only via mouse click)
         //dNodes[pi].id_n=scrList[inp.attr('data-nodeid')].id_n;
         dNodes[pi].name = scrList[inp.attr('data-nodeid')].name;
-        pt.text(dNodes[pi].name);
-        d3.select('#ct-inpBox').classed('no-disp', !0);
     } else if (t == 'testcases' && tcList[inp.attr('data-nodeid')] !== undefined) {
         //The below line leads to duplicate id_n of nodes when the node name is selected from suggestions list (only via mouse click)
         //dNodes[pi].id_n=tcList[inp.attr('data-nodeid')].id_n;
         dNodes[pi].name = tcList[inp.attr('data-nodeid')].name;
-        pt.text(dNodes[pi].name);
-        d3.select('#ct-inpBox').classed('no-disp', !0);
     } else {
         dNodes[pi].name = val;
-        pt.text(dNodes[pi].name);
-        d3.select('#ct-inpBox').classed('no-disp', !0);
     }
+    d3.select('#ct-inpBox').classed('no-disp', !0);
+    var tmp = dNodes[pi].name;
+    if (tmp.length > 15) var tmp = tmp.slice(0, 15) + "...";
+    pt.text(tmp);
     zoom.event(d3.select('#ct-mapSvg'));
 };
 
@@ -2234,7 +2232,9 @@ function callme() {
     if (childNode != null && (childNode.text() == 'Module_0' || childNode.text() == 'Screen_0' || childNode.text() == 'Scenario_0' || childNode.text() == 'Testcase_0')) {
         d3.select('#ct-inpBox').classed('no-disp', !1);
     }
-
+    if(!$('#ct-inpBox').hasClass('no-disp')){
+        inpChange();
+    }
 }
 
 function treeBuilder(tree) {
@@ -2261,7 +2261,7 @@ function treeBuilder(tree) {
     };
     childCounter(1, tree);
     var newHeight = d3.max(levelCount) * 90;
-    var d3Tree = d3.layout.tree().size([newHeight, cSize[0]]);
+    var d3Tree = d3.layout.tree().size([newHeight*1.5, cSize[0]]);
     // if(tree.oid===undefined) d3Tree.sort(function(a,b){return a.childIndex-b.childIndex;});
     // else d3Tree.sort(function(a,b){return a.childIndex-b.childIndex;});
     if (tree.childIndex === undefined) d3Tree.sort(function(a, b) {
