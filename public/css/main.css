@@ -2488,7 +2488,7 @@ input[disabled]{
     border-radius: 4px;
 }
 .scenarioBody tr td:first-child{text-align: left;}
-.scenarioBody tr td:first-child span{margin-right: 10px; margin-left: 4px;}
+.scenarioBody tr td:first-child span{margin-right: 10px; margin-left: 4px; position: relative; bottom: 5px;}
 .scenarioBody tr td:first-child input{position: relative;top: 2px;}
 
 .selectBrowser, .selectBrowserSc{

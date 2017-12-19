@@ -2860,53 +2860,62 @@ exports.cancelScheduledJob_ICE = function (req, res) {
 		var cycleid = req.body.suiteDetails.cycleid;
 		var scheduleid = req.body.suiteDetails.scheduleid;
 		var schedStatus = req.body.schedStatus;
-		var scheduledatetime = new Date(req.body.suiteDetails.scheduledatetime).valueOf().toString();
-		var scheduledatetimeINT = parseInt(scheduledatetime);
-		try {
-			var upDate = new Date(scheduledatetimeINT).getFullYear() + "-" + ("0" + (new Date(scheduledatetimeINT).getMonth() + 1)).slice(-2) + "-" + ("0" + new Date(scheduledatetimeINT).getDate()).slice(-2) + " " + ("0" + new Date(scheduledatetimeINT).getHours()).slice(-2) + ":" + ("0" + new Date(scheduledatetimeINT).getMinutes()).slice(-2) + ":00+0000";
-			var inputs = {
-				"cycleid": cycleid,
-				"scheduledatetime": upDate,
-				"scheduleid": scheduleid,
-				"query": "getscheduledstatus"
-			};
-			var args = {
-				data: inputs,
-				headers: {
-					"Content-Type": "application/json"
-				}
-			};
-			logger.info("Calling NDAC Service from cancelScheduledJob_ICE: suite/ScheduleTestSuite_ICE");
-			client.post(epurl + "suite/ScheduleTestSuite_ICE", args,
-				function (result, response) {
-				if (response.statusCode != 200 || result.rows == "fail") {
-					logger.error("Error occured in suite/ScheduleTestSuite_ICE from cancelScheduledJob_ICE service, Error Code : ERRNDAC");
-					res.send("fail");
-				} else {
-					var status = result.rows[0].schedulestatus;
-					if (status == "scheduled") {
-						var objectD = cycleid + ";" + scheduleid + ";" + upDate.valueOf().toString();
-						scheduleStatus = schedStatus;
-						logger.info("Calling function updateStatus from cancelScheduledJob_ICE service");
-						updateStatus(objectD, function (err, data) {
-							if (!err) {
-								logger.info("Sending response data from cancelScheduledJob_ICE service on success");
-								res.send(data);
-							} else{
-								logger.error("Error in the function updateStatus from cancelScheduledJob_ICE service");
-								res.send(data);
-							}
-						});
-					} else {
-						logger.info("Sending response 'inprogress' from cancelScheduledJob_ICE service");
-						res.send("inprogress");
+		var schedHost = req.body.host;
+		var schedUserid = req.body.schedUserid;
+		var userid = req.body.userInfo;
+		if(userid == schedUserid || schedHost == req.session.username){
+			var scheduledatetime = new Date(req.body.suiteDetails.scheduledatetime).valueOf().toString();
+			var scheduledatetimeINT = parseInt(scheduledatetime);
+			try {
+				var upDate = new Date(scheduledatetimeINT).getFullYear() + "-" + ("0" + (new Date(scheduledatetimeINT).getMonth() + 1)).slice(-2) + "-" + ("0" + new Date(scheduledatetimeINT).getDate()).slice(-2) + " " + ("0" + new Date(scheduledatetimeINT).getHours()).slice(-2) + ":" + ("0" + new Date(scheduledatetimeINT).getMinutes()).slice(-2) + ":00+0000";
+				var inputs = {
+					"cycleid": cycleid,
+					"scheduledatetime": upDate,
+					"scheduleid": scheduleid,
+					"query": "getscheduledstatus"
+				};
+				var args = {
+					data: inputs,
+					headers: {
+						"Content-Type": "application/json"
 					}
-				}
-			});
-		} catch (exception) {
-			logger.error("Exception in the service cancelScheduledJob_ICE: %s",exception);
-			res.send("fail");
+				};
+				logger.info("Calling NDAC Service from cancelScheduledJob_ICE: suite/ScheduleTestSuite_ICE");
+				client.post(epurl + "suite/ScheduleTestSuite_ICE", args,
+					function (result, response) {
+					if (response.statusCode != 200 || result.rows == "fail") {
+						logger.error("Error occured in suite/ScheduleTestSuite_ICE from cancelScheduledJob_ICE service, Error Code : ERRNDAC");
+						res.send("fail");
+					} else {
+						var status = result.rows[0].schedulestatus;
+						if (status == "scheduled") {
+							var objectD = cycleid + ";" + scheduleid + ";" + upDate.valueOf().toString();
+							scheduleStatus = schedStatus;
+							logger.info("Calling function updateStatus from cancelScheduledJob_ICE service");
+							updateStatus(objectD, function (err, data) {
+								if (!err) {
+									logger.info("Sending response data from cancelScheduledJob_ICE service on success");
+									res.send(data);
+								} else{
+									logger.error("Error in the function updateStatus from cancelScheduledJob_ICE service");
+									res.send(data);
+								}
+							});
+						} else {
+							logger.info("Sending response 'inprogress' from cancelScheduledJob_ICE service");
+							res.send("inprogress");
+						}
+					}
+				});
+			} catch (exception) {
+				logger.error("Exception in the service cancelScheduledJob_ICE: %s",exception);
+				res.send("fail");
+			}
 		}
+		else{
+			logger.info("Sending response 'not authorised' from cancelScheduledJob_ICE service");
+			res.send("not authorised");
+		}		
 	} else {
 		logger.error("Error in the service cancelScheduledJob_ICE: Invalid Session");
 		res.send("Invalid Session");
