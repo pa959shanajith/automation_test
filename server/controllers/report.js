@@ -472,7 +472,10 @@ exports.getSuiteDetailsInExecution_ICE = function (req, res) {
 							startTime = new Date(executionData.rows[i].starttime);
 							endTime = new Date(executionData.rows[i].endtime);
 							starttime = startTime.getDate() + "-" + (startTime.getMonth() + 1) + "-" + startTime.getFullYear() + " " + startTime.getHours() + ":" + startTime.getMinutes();
-							endtime = endTime.getDate() + "-" + (endTime.getMonth() + 1) + "-" + endTime.getFullYear() + " " + (endTime.getUTCHours()) + ":" + (+endTime.getUTCMinutes());
+							//FIx for #1232 - ICE_Reports : Incorrect end date is displayed for one of the Regression Scenario
+							//Fetching Universal date and time since the end time is genearted from NDAC
+							//-Sushma G.P
+							endtime = endTime.getUTCDate() + "-" + (endTime.getUTCMonth() + 1) + "-" + endTime.getUTCFullYear() + " " + (endTime.getUTCHours()) + ":" + (+endTime.getUTCMinutes());
 							executionDetailsJSON.push({
 								execution_id: executionData.rows[i].executionid,
 								start_time: starttime,
@@ -535,7 +538,10 @@ exports.reportStatusScenarios_ICE = function (req, res) {
 								try {
 									var executedtimeTemp = new Date(iterator.executedtime);
 									if (executedtimeTemp != null) {
-										executedtimeTemp = executedtimeTemp.getDate() + "-" + (executedtimeTemp.getMonth() + 1) + "-" + executedtimeTemp.getFullYear() + " " + (executedtimeTemp.getUTCHours()) + ":" + (executedtimeTemp.getUTCMinutes()) + ":" + executedtimeTemp.getSeconds();
+									//#1232 - ICE_Reports : Incorrect end date is displayed for one of the Regression Scenario
+									//Fetching Universal date and time since the end time is genearted from NDAC
+									//-Sushma G.P
+										executedtimeTemp = executedtimeTemp.getUTCDate() + "-" + (executedtimeTemp.getUTCMonth() + 1) + "-" + executedtimeTemp.getUTCFullYear() + " " + (executedtimeTemp.getUTCHours()) + ":" + (executedtimeTemp.getUTCMinutes()) + ":" + executedtimeTemp.getSeconds();
 									}
 									var browserTemp = iterator.browser;
 									var statusTemp = iterator.status;
