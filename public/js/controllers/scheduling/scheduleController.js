@@ -119,8 +119,8 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 		if(getRowCount == selectedCount){
 			$(this).parents(".scenarioSchdCon").siblings(".scheduleSuite").find(".selectScheduleSuite").prop("checked", true);
 		}
-		else
-		$(this).parents(".scenarioSchdCon").siblings(".scheduleSuite").find(".selectScheduleSuite").prop("checked", false);
+		// else
+		// $(this).parents(".scenarioSchdCon").siblings(".scheduleSuite").find(".selectScheduleSuite").prop("checked", false);
 	});
 
 	//Function to get scheduled details
@@ -342,6 +342,7 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 		var doNotSchedule = false;
 		if(appType != "SAP" && browserTypeExe.length == 0)	openModelPopup("Schedule Test Suite", "Please select a browser");
 		else if($(".selectScheduleSuite:checked").length == 0) openModelPopup("Schedule Test Suite", "Please select atleast one Suite(s) to schedule");
+		else if($('.selectToSched:checked').length == 0) openModelPopup("Schedule Test Suite", "Please select atleast one scenario to schedule");
 		else{
 			if(appType == "SAP") browserTypeExe = ["1"];
 			$.each($(".batchSuite"), function(){
