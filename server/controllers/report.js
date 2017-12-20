@@ -12,15 +12,15 @@ var validator =  require('validator');
 var logger = require('../../logger');
 var redisServer = require('../lib/redisSocketHandler');
 
+function isSessionActive(req){
+	var sessionToken = req.session.uniqueId;
+    return sessionToken != undefined && req.session.id == sessionToken;
+}
+
 exports.getMainReport_ICE = function (req, res) {
 	logger.info("Inside UI service: getMainReport_ICE");
 	try {
-		if (req.cookies['connect.sid'] != undefined) {
-			var sessionCookie = req.cookies['connect.sid'].split(".");
-			var sessionToken = sessionCookie[0].split(":");
-			sessionToken = sessionToken[1];
-		}
-		if (sessionToken != undefined && req.session.id == sessionToken) {
+		if (isSessionActive(req)) {
 			var host = req.headers.host;
 			var client = require("jsreport-client")("https://" + host + "/reportServer/");
 			client.render({
@@ -109,12 +109,7 @@ exports.openScreenShot = function (req, res) {
 exports.renderReport_ICE = function (req, res) {
 	logger.info("Inside UI service: renderReport_ICE");
 	try {
-		if (req.cookies['connect.sid'] != undefined) {
-			var sessionCookie = req.cookies['connect.sid'].split(".");
-			var sessionToken = sessionCookie[0].split(":");
-			sessionToken = sessionToken[1];
-		}
-		if (sessionToken != undefined && req.session.id == sessionToken) {
+		if (isSessionActive(req)) {
 			var finalReports = req.body.finalreports;
 			var reportType = req.body.reporttype;
 			var shortId = "rkE973-5l";
@@ -158,12 +153,7 @@ exports.renderReport_ICE = function (req, res) {
 
 exports.getAllSuites_ICE = function (req, res) {
 	logger.info("Inside UI service: getAllSuites_ICE");
-	if (req.cookies['connect.sid'] != undefined) {
-		var sessionCookie = req.cookies['connect.sid'].split(".");
-		var sessionToken = sessionCookie[0].split(":");
-		sessionToken = sessionToken[1];
-	}
-	if (sessionToken != undefined && req.session.id == sessionToken) {
+	if (isSessionActive(req)) {
 		//the code below is commented as per the new requirement
 		//ALM #460 - Reports - HTML report takes very long time to open/ hangs when report size is 5MB above
 		// author - vishvas.a modified date:27-Sep-2017
@@ -442,12 +432,7 @@ exports.getAllSuites_ICE = function (req, res) {
 exports.getSuiteDetailsInExecution_ICE = function (req, res) {
 	logger.info("Inside UI service: getSuiteDetailsInExecution_ICE");
 	try {
-		if (req.cookies['connect.sid'] != undefined) {
-			var sessionCookie = req.cookies['connect.sid'].split(".");
-			var sessionToken = sessionCookie[0].split(":");
-			sessionToken = sessionToken[1];
-		}
-		if (sessionToken != undefined && req.session.id == sessionToken) {
+		if (isSessionActive(req)) {
 			var req_testsuiteId = req.body.testsuiteid;
 			var startTime, endTime, starttime, endtime;
 			var executionDetailsJSON = [];
@@ -472,7 +457,10 @@ exports.getSuiteDetailsInExecution_ICE = function (req, res) {
 							startTime = new Date(executionData.rows[i].starttime);
 							endTime = new Date(executionData.rows[i].endtime);
 							starttime = startTime.getDate() + "-" + (startTime.getMonth() + 1) + "-" + startTime.getFullYear() + " " + startTime.getHours() + ":" + startTime.getMinutes();
-							endtime = endTime.getDate() + "-" + (endTime.getMonth() + 1) + "-" + endTime.getFullYear() + " " + (endTime.getUTCHours()) + ":" + (+endTime.getUTCMinutes());
+							//FIx for #1232 - ICE_Reports : Incorrect end date is displayed for one of the Regression Scenario
+							//Fetching Universal date and time since the end time is genearted from NDAC
+							//-Sushma G.P
+							endtime = endTime.getUTCDate() + "-" + (endTime.getUTCMonth() + 1) + "-" + endTime.getUTCFullYear() + " " + (endTime.getUTCHours()) + ":" + (+endTime.getUTCMinutes());
 							executionDetailsJSON.push({
 								execution_id: executionData.rows[i].executionid,
 								start_time: starttime,
@@ -500,12 +488,7 @@ exports.getSuiteDetailsInExecution_ICE = function (req, res) {
 exports.reportStatusScenarios_ICE = function (req, res) {
 	logger.info("Inside UI service: reportStatusScenarios_ICE");
 	try {
-		if (req.cookies['connect.sid'] != undefined) {
-			var sessionCookie = req.cookies['connect.sid'].split(".");
-			var sessionToken = sessionCookie[0].split(":");
-			sessionToken = sessionToken[1];
-		}
-		if (sessionToken != undefined && req.session.id == sessionToken) {
+		if (isSessionActive(req)) {
 			var req_executionId = req.body.executionId;
 			var req_testsuiteId = req.body.testsuiteId;
 			var reportList = [];
@@ -535,7 +518,10 @@ exports.reportStatusScenarios_ICE = function (req, res) {
 								try {
 									var executedtimeTemp = new Date(iterator.executedtime);
 									if (executedtimeTemp != null) {
-										executedtimeTemp = executedtimeTemp.getDate() + "-" + (executedtimeTemp.getMonth() + 1) + "-" + executedtimeTemp.getFullYear() + " " + (executedtimeTemp.getUTCHours()) + ":" + (executedtimeTemp.getUTCMinutes()) + ":" + executedtimeTemp.getSeconds();
+									//#1232 - ICE_Reports : Incorrect end date is displayed for one of the Regression Scenario
+									//Fetching Universal date and time since the end time is genearted from NDAC
+									//-Sushma G.P
+										executedtimeTemp = executedtimeTemp.getUTCDate() + "-" + (executedtimeTemp.getUTCMonth() + 1) + "-" + executedtimeTemp.getUTCFullYear() + " " + (executedtimeTemp.getUTCHours()) + ":" + (executedtimeTemp.getUTCMinutes()) + ":" + executedtimeTemp.getSeconds();
 									}
 									var browserTemp = iterator.browser;
 									var statusTemp = iterator.status;
@@ -631,12 +617,7 @@ exports.reportStatusScenarios_ICE = function (req, res) {
 exports.getReport_Nineteen68 = function (req, res) {
 	logger.info("Inside UI service: getReport_Nineteen68");
 	try {
-		if (req.cookies['connect.sid'] != undefined) {
-			var sessionCookie = req.cookies['connect.sid'].split(".");
-			var sessionToken = sessionCookie[0].split(":");
-			sessionToken = sessionToken[1];
-		}
-		if (sessionToken != undefined && req.session.id == sessionToken) {
+		if (isSessionActive(req)) {
 			var reportId = req.body.reportId;
 			var testsuiteId = req.body.testsuiteId;
 			var testsuitename = req.body.testsuitename;
@@ -896,12 +877,7 @@ exports.getReport_Nineteen68 = function (req, res) {
 exports.exportToJson_ICE = function (req, res) {
 	logger.info("Inside UI service: exportToJson_ICE");
 	try {
-		if (req.cookies['connect.sid'] != undefined) {
-			var sessionCookie = req.cookies['connect.sid'].split(".");
-			var sessionToken = sessionCookie[0].split(":");
-			sessionToken = sessionToken[1];
-		}
-		if (sessionToken != undefined && req.session.id == sessionToken) {
+		if (isSessionActive(req)) {
 			var reportId = req.body.reportId;
 			var reportInfoObj = {};
 			async.series({
@@ -1022,12 +998,7 @@ exports.exportToJson_ICE = function (req, res) {
 exports.connectJira_ICE = function (req, res) {
 	logger.info("Inside UI service: connectJira_ICE");
 	try{
-		if (req.cookies['connect.sid'] != undefined) {
-			var sessionCookie = req.cookies['connect.sid'].split(".");
-			var sessionToken = sessionCookie[0].split(":");
-			sessionToken = sessionToken[1];
-		}
-		if (sessionToken != undefined && req.session.id == sessionToken) {
+		if (isSessionActive(req)) {
 			var name = req.session.username;
 			redisServer.redisSub2.subscribe('ICE2_' + name,1);
 			if(req.body.action == 'loginToJira'){ //Login to Jira for creating issues

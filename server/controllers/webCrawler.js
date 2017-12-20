@@ -3,15 +3,15 @@ var validator = require('validator');
 var logger = require('../../logger');
 var redisServer = require('../lib/redisSocketHandler');
 
+function isSessionActive(req){
+	var sessionToken = req.session.uniqueId;
+    return sessionToken != undefined && req.session.id == sessionToken;
+}
+
 exports.getCrawlResults = function (req, res) {
 	try {
 		logger.info("Inside UI service: getCrawlResults");
-		if (req.cookies['connect.sid'] != undefined) {
-			var sessionCookie = req.cookies['connect.sid'].split(".");
-			var sessionToken = sessionCookie[0].split(":");
-			sessionToken = sessionToken[1];
-		}
-		if (sessionToken != undefined && req.session.id == sessionToken) {
+		if (isSessionActive(req)) {
 			var name = req.session.username;
 			redisServer.redisSub2.subscribe('ICE2_' + name ,1);	
 			var input_url = req.body.url;

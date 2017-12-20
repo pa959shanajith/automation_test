@@ -1,14 +1,15 @@
 var async = require('async');
 var neo4jAPI = require('../controllers/neo4jAPI');
 var logger = require('../../logger');
+
+function isSessionActive(req){
+	var sessionToken = req.session.uniqueId;
+    return sessionToken != undefined && req.session.id == sessionToken;
+}
+
 exports.updateTaskstatus_mindmaps = function (req, res) {
 	logger.info("Inside UI service: updateTaskstatus_mindmaps");
-	if (req.cookies['connect.sid'] != undefined) {
-		var sessionCookie = req.cookies['connect.sid'].split(".");
-		var sessionToken = sessionCookie[0].split(":");
-		sessionToken = sessionToken[1];
-	}
-	if (sessionToken != undefined && req.session.id == sessionToken) {
+	if (isSessionActive(req)) {
 		try {
 			var obj=req.body.obj;
 			var qlist_query = [{'statement': "MATCH (n:TASKS{taskID:'"+obj+"'}) set n.status='inprogress'"}];
@@ -31,12 +32,7 @@ exports.updateTaskstatus_mindmaps = function (req, res) {
 
 exports.getTaskJson_mindmaps = function (req, res) {
 	logger.info("Inside UI service: getTaskJson_mindmaps");
-	if (req.cookies['connect.sid'] != undefined) {
-		var sessionCookie = req.cookies['connect.sid'].split(".");
-		var sessionToken = sessionCookie[0].split(":");
-		sessionToken = sessionToken[1];
-	}
-	if (sessionToken != undefined && req.session.id == sessionToken) {
+	if (isSessionActive(req)) {
 		try {
 			var obj=req.body.obj;
 			req.session.obj = obj;

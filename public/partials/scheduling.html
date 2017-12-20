@@ -107,7 +107,7 @@
 							<div class='scheduleDataBodyRow' ng-repeat="schdata in scheduledData | orderBy:predicate:reverse">
 								<div ng-repeat="data in schdata.scenariodetails" class="scheduleDataBodyRowChild">
 									<div style='width: 20%'>{{schdata.scheduledatetime}}</div><!-- {{schdata.scheduledatetime.split("T")[1].split(".")[0]}}-->
-									<div style='width: 13%'>{{schdata.clientipaddress}}</div>
+									<div style='width: 13%' data-userid={{schdata.userid}}>{{schdata.clientipaddress}}</div>
 									<div style='width: 20%' title={{data.scenarioname}}>{{data.scenarioname}}</div>
 									<div style='width: 20%' title={{schdata.testsuitename}}>{{schdata.testsuitename}}</div>
 									<div style='width: 15%'><img ng-repeat="brow in schdata.browserlist" ng-src={{browImg(brow)}} style="margin-right: 5px;"/></div>

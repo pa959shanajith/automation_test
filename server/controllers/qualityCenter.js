@@ -13,15 +13,15 @@ var validator = require('validator');
 var  logger = require('../../logger');
 var redisServer = require('../lib/redisSocketHandler');
 
+function isSessionActive(req){
+	var sessionToken = req.session.uniqueId;
+    return sessionToken != undefined && req.session.id == sessionToken;
+}
+
 exports.loginQCServer_ICE = function (req, res) {
 	try {
 		logger.info("Inside UI service: loginQCServer_ICE");
-		if (req.cookies['connect.sid'] != undefined) {
-			var sessionCookie = req.cookies['connect.sid'].split(".");
-			var sessionToken = sessionCookie[0].split(":");
-			sessionToken = sessionToken[1];
-		}
-		if (sessionToken != undefined && req.session.id == sessionToken) {
+		if (isSessionActive(req)) {
 			var name = req.session.username;
 			redisServer.redisSub2.subscribe('ICE2_' + name,1);
 			var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
@@ -105,12 +105,7 @@ exports.qcProjectDetails_ICE = function (req, res) {
 		"qc_projects": ""
 	};
 	try {
-		if (req.cookies['connect.sid'] != undefined) {
-			var sessionCookie = req.cookies['connect.sid'].split(".");
-			var sessionToken = sessionCookie[0].split(":");
-			sessionToken = sessionToken[1];
-		}
-		if (sessionToken != undefined && req.session.id == sessionToken) {
+		if (isSessionActive(req)) {
 			var name = req.session.username;
 			redisServer.redisSub2.subscribe('ICE2_' + name,1);
 			logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
@@ -301,12 +296,7 @@ exports.qcFolderDetails_ICE = function (req, res) {
 		"qc_projects": ""
 	};
 	try {
-		if (req.cookies['connect.sid'] != undefined) {
-			var sessionCookie = req.cookies['connect.sid'].split(".");
-			var sessionToken = sessionCookie[0].split(":");
-			sessionToken = sessionToken[1];
-		}
-		if (sessionToken != undefined && req.session.id == sessionToken) {
+		if (isSessionActive(req)) {
 			var name = req.session.username;
 			redisServer.redisSub2.subscribe('ICE2_' + name,1);
 			logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
@@ -402,12 +392,7 @@ exports.saveQcDetails_ICE = function (req, res) {
 	}, function () {
 		if (flag) {
 			try {
-				if (req.cookies['connect.sid'] != undefined) {
-					var sessionCookie = req.cookies['connect.sid'].split(".");
-					var sessionToken = sessionCookie[0].split(":");
-					sessionToken = sessionToken[1];
-				}
-				if (sessionToken != undefined && req.session.id == sessionToken) {
+				if (isSessionActive(req)) {
 					/*var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 					console.log(Object.keys(myserver.allSocketsMap), "<<all people, asking person:", ip);
 					var mySocket = myserver.allSocketsMap[ip];

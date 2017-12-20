@@ -16,6 +16,12 @@ var updateSessionTimeEvery = 20 * 60 * 1000;
 var scheduleStatus = "";
 var logger = require('../../logger');
 var redisServer = require('../lib/redisSocketHandler');
+var qList = [];
+
+function isSessionActive(req){
+	var sessionToken = req.session.uniqueId;
+    return sessionToken != undefined && req.session.id == sessionToken;
+}
 
 /**
  * @author vishvas.a
@@ -24,18 +30,10 @@ var redisServer = require('../lib/redisSocketHandler');
  * this reads the scenario information from the testsuites
  * and testsuites table of the icetestautomation keyspace
  */
-
-var qList = [];
-
 exports.readTestSuite_ICE = function (req, res) {
 	logger.info("Inside UI service: readTestSuite_ICE");
 	qList = [];
-	if (req.cookies['connect.sid'] != undefined) {
-		var sessionCookie = req.cookies['connect.sid'].split(".");
-		var sessionToken = sessionCookie[0].split(":");
-		sessionToken = sessionToken[1];
-	}
-	if (sessionToken != undefined && req.session.id == sessionToken) {
+	if (isSessionActive(req)) {
 		var requiredreadTestSuite = req.body.readTestSuite;
 		var fromFlg = req.body.fromFlag;
 		var responsedata = {};
@@ -429,12 +427,7 @@ function Projectnametestcasename_ICE(req, cb, data) {
 exports.updateTestSuite_ICE = function (req, res) {
 	logger.info("Inside UI service: updateTestSuite_ICE");
     qList = [];
-	if (req.cookies['connect.sid'] != undefined) {
-		var sessionCookie = req.cookies['connect.sid'].split(".");
-		var sessionToken = sessionCookie[0].split(":");
-		sessionToken = sessionToken[1];
-	}
-	if (sessionToken != undefined && req.session.id == sessionToken) {
+	if (isSessionActive(req)) {
 		var userinfo = req.body.batchDetails.userinfo;
 		var batchDetails = req.body.batchDetails.suiteDetails;
 		var batchDetailslength = batchDetails.length;
@@ -615,12 +608,7 @@ function updateExecutionStatus(testsuiteid, executionid, starttime, suiteStatus)
  */
 exports.ExecuteTestSuite_ICE = function (req, res) {
 	logger.info("Inside UI service: ExecuteTestSuite_ICE");
-	if (req.cookies['connect.sid'] != undefined) {
-		var sessionCookie = req.cookies['connect.sid'].split(".");
-		var sessionToken = sessionCookie[0].split(":");
-		sessionToken = sessionToken[1];
-	}
-	if (sessionToken != undefined && req.session.id == sessionToken) {
+	if (isSessionActive(req)) {
 		var name = req.session.username;
 		redisServer.redisSub2.subscribe('ICE2_' + name,1);
 		var batchExecutionData = req.body.moduleInfo;
@@ -1848,12 +1836,7 @@ function TestCaseDetails_Suite_ICE(req, userid, cb, data) {
  */
 exports.getTestcaseDetailsForScenario_ICE = function (req, res) {
 	logger.info("Inside Ui service getTestcaseDetailsForScenario_ICE");
-	if (req.cookies['connect.sid'] != undefined) {
-		var sessionCookie = req.cookies['connect.sid'].split(".");
-		var sessionToken = sessionCookie[0].split(":");
-		sessionToken = sessionToken[1];
-	}
-	if (sessionToken != undefined && req.session.id == sessionToken) {
+	if (isSessionActive(req)) {
 		var requiredtestscenarioid = req.body.testScenarioId;
 		logger.info("Calling function testcasedetails_testscenarios from getTestcaseDetailsForScenario_ICE");
 		testcasedetails_testscenarios(requiredtestscenarioid, function (err, data) {
@@ -2341,12 +2324,7 @@ function updatescenariodetailsinsuite(req, cb, data) {
 /***********************Scheduling jobs***************************/
 exports.testSuitesScheduler_ICE = function (req, res) {
 	logger.info("Inside UI service testSuitesScheduler_ICE");
-	if (req.cookies['connect.sid'] != undefined) {
-		var sessionCookie = req.cookies['connect.sid'].split(".");
-		var sessionToken = sessionCookie[0].split(":");
-		sessionToken = sessionToken[1];
-	}
-	if (sessionToken != undefined && req.session.id == sessionToken) {
+	if (isSessionActive(req)) {
 		if(req.body.chkType == "schedule"){			
 			var modInfo = req.body.moduleInfo;
 			logger.info("Calling function scheduleTestSuite from testSuitesScheduler_ICE");
@@ -2854,12 +2832,7 @@ function updateStatus(sessObj, updateStatuscallback) {
 
 exports.getScheduledDetails_ICE = function (req, res) {
 	logger.info("Inside UI service getScheduledDetails_ICE");
-	if (req.cookies['connect.sid'] != undefined) {
-		var sessionCookie = req.cookies['connect.sid'].split(".");
-		var sessionToken = sessionCookie[0].split(":");
-		sessionToken = sessionToken[1];
-	}
-	if (sessionToken != undefined && req.session.id == sessionToken) {
+	if (isSessionActive(req)) {
 		logger.info("Calling function getScheduledDetails from getScheduledDetails_ICE");
 		getScheduledDetails("getallscheduledata", function (err, getSchedcallback) {
 			if (err) {
@@ -2883,62 +2856,66 @@ exports.getScheduledDetails_ICE = function (req, res) {
 //cancel scheduled Jobs
 exports.cancelScheduledJob_ICE = function (req, res) {
 	logger.info("Inside UI service cancelScheduledJob_ICE");
-	if (req.cookies['connect.sid'] != undefined) {
-		var sessionCookie = req.cookies['connect.sid'].split(".");
-		var sessionToken = sessionCookie[0].split(":");
-		sessionToken = sessionToken[1];
-	}
-	if (sessionToken != undefined && req.session.id == sessionToken) {
+	if (isSessionActive(req)) {
 		var cycleid = req.body.suiteDetails.cycleid;
 		var scheduleid = req.body.suiteDetails.scheduleid;
 		var schedStatus = req.body.schedStatus;
-		var scheduledatetime = new Date(req.body.suiteDetails.scheduledatetime).valueOf().toString();
-		var scheduledatetimeINT = parseInt(scheduledatetime);
-		try {
-			var upDate = new Date(scheduledatetimeINT).getFullYear() + "-" + ("0" + (new Date(scheduledatetimeINT).getMonth() + 1)).slice(-2) + "-" + ("0" + new Date(scheduledatetimeINT).getDate()).slice(-2) + " " + ("0" + new Date(scheduledatetimeINT).getHours()).slice(-2) + ":" + ("0" + new Date(scheduledatetimeINT).getMinutes()).slice(-2) + ":00+0000";
-			var inputs = {
-				"cycleid": cycleid,
-				"scheduledatetime": upDate,
-				"scheduleid": scheduleid,
-				"query": "getscheduledstatus"
-			};
-			var args = {
-				data: inputs,
-				headers: {
-					"Content-Type": "application/json"
-				}
-			};
-			logger.info("Calling NDAC Service from cancelScheduledJob_ICE: suite/ScheduleTestSuite_ICE");
-			client.post(epurl + "suite/ScheduleTestSuite_ICE", args,
-				function (result, response) {
-				if (response.statusCode != 200 || result.rows == "fail") {
-					logger.error("Error occured in suite/ScheduleTestSuite_ICE from cancelScheduledJob_ICE service, Error Code : ERRNDAC");
-					res.send("fail");
-				} else {
-					var status = result.rows[0].schedulestatus;
-					if (status == "scheduled") {
-						var objectD = cycleid + ";" + scheduleid + ";" + upDate.valueOf().toString();
-						scheduleStatus = schedStatus;
-						logger.info("Calling function updateStatus from cancelScheduledJob_ICE service");
-						updateStatus(objectD, function (err, data) {
-							if (!err) {
-								logger.info("Sending response data from cancelScheduledJob_ICE service on success");
-								res.send(data);
-							} else{
-								logger.error("Error in the function updateStatus from cancelScheduledJob_ICE service");
-								res.send(data);
-							}
-						});
-					} else {
-						logger.info("Sending response 'inprogress' from cancelScheduledJob_ICE service");
-						res.send("inprogress");
+		var schedHost = req.body.host;
+		var schedUserid = req.body.schedUserid;
+		var userid = req.body.userInfo;
+		if(userid == schedUserid || schedHost == req.session.username){
+			var scheduledatetime = new Date(req.body.suiteDetails.scheduledatetime).valueOf().toString();
+			var scheduledatetimeINT = parseInt(scheduledatetime);
+			try {
+				var upDate = new Date(scheduledatetimeINT).getFullYear() + "-" + ("0" + (new Date(scheduledatetimeINT).getMonth() + 1)).slice(-2) + "-" + ("0" + new Date(scheduledatetimeINT).getDate()).slice(-2) + " " + ("0" + new Date(scheduledatetimeINT).getHours()).slice(-2) + ":" + ("0" + new Date(scheduledatetimeINT).getMinutes()).slice(-2) + ":00+0000";
+				var inputs = {
+					"cycleid": cycleid,
+					"scheduledatetime": upDate,
+					"scheduleid": scheduleid,
+					"query": "getscheduledstatus"
+				};
+				var args = {
+					data: inputs,
+					headers: {
+						"Content-Type": "application/json"
 					}
-				}
-			});
-		} catch (exception) {
-			logger.error("Exception in the service cancelScheduledJob_ICE: %s",exception);
-			res.send("fail");
+				};
+				logger.info("Calling NDAC Service from cancelScheduledJob_ICE: suite/ScheduleTestSuite_ICE");
+				client.post(epurl + "suite/ScheduleTestSuite_ICE", args,
+					function (result, response) {
+					if (response.statusCode != 200 || result.rows == "fail") {
+						logger.error("Error occured in suite/ScheduleTestSuite_ICE from cancelScheduledJob_ICE service, Error Code : ERRNDAC");
+						res.send("fail");
+					} else {
+						var status = result.rows[0].schedulestatus;
+						if (status == "scheduled") {
+							var objectD = cycleid + ";" + scheduleid + ";" + upDate.valueOf().toString();
+							scheduleStatus = schedStatus;
+							logger.info("Calling function updateStatus from cancelScheduledJob_ICE service");
+							updateStatus(objectD, function (err, data) {
+								if (!err) {
+									logger.info("Sending response data from cancelScheduledJob_ICE service on success");
+									res.send(data);
+								} else{
+									logger.error("Error in the function updateStatus from cancelScheduledJob_ICE service");
+									res.send(data);
+								}
+							});
+						} else {
+							logger.info("Sending response 'inprogress' from cancelScheduledJob_ICE service");
+							res.send("inprogress");
+						}
+					}
+				});
+			} catch (exception) {
+				logger.error("Exception in the service cancelScheduledJob_ICE: %s",exception);
+				res.send("fail");
+			}
 		}
+		else{
+			logger.info("Sending response 'not authorised' from cancelScheduledJob_ICE service");
+			res.send("not authorised");
+		}		
 	} else {
 		logger.error("Error in the service cancelScheduledJob_ICE: Invalid Session");
 		res.send("Invalid Session");

@@ -8,7 +8,28 @@ const logDir = 'logs';
 if (!fs.existsSync(logDir)) {
   fs.mkdirSync(logDir);
 }
+var LOG_LEVEL_CONSOLE = 'error';
+var LOG_LEVEL_FILE = 'info';
 
+//DEV environment
+if(process.env.ENV == 'DEV'){
+  LOG_LEVEL_CONSOLE = 'debug';
+  LOG_LEVEL_FILE = 'debug';
+} 
+//TEST environment
+else if(process.env.ENV == 'TEST'){
+  LOG_LEVEL_CONSOLE = 'warn';
+  LOG_LEVEL_FILE = 'debug';
+}
+//PROD environment
+else if(process.env.ENV == 'PROD'){
+  LOG_LEVEL_CONSOLE = 'error';
+  LOG_LEVEL_FILE = 'info';
+}
+else{
+  console.warn("ENV variable is not set in .env file, starting with default TEST environment");
+  //process.env.ENV = 'TEST'
+}
 const logger = new (winston.Logger)({
   rewriters: [
             (level, msg, meta) => {
@@ -24,7 +45,7 @@ const logger = new (winston.Logger)({
     new (winston.transports.Console)({
       timestamp: dateFormat,
       colorize: true,
-      level: process.env.ENV === 'DEV' ? 'debug' : 'info',
+      level:LOG_LEVEL_CONSOLE,
       handleExceptions: true,
      
     }),
@@ -33,7 +54,7 @@ const logger = new (winston.Logger)({
       timestamp: dateFormat,
       datePattern: 'yyyy-MM-dd',
       prepend: true,
-      level: process.env.ENV === 'DEV' ? 'debug' : 'info',
+      level: LOG_LEVEL_FILE,
       handleExceptions: true
     })
   ],

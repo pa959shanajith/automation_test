@@ -14,16 +14,17 @@ var validator =  require('validator');
 var qList = [];
 var neo4jAPI = require('../controllers/neo4jAPI');
 var logger = require('../../logger');
+
+function isSessionActive(req){
+	var sessionToken = req.session.uniqueId;
+    return sessionToken != undefined && req.session.id == sessionToken;
+}
+
 //GetUserRoles
 exports.getUserRoles_Nineteen68 = function (req, res) {
 	try {
 		logger.info("Inside UI service: getUserRoles_Nineteen68");
-		if (req.cookies['connect.sid'] != undefined) {
-			var sessionCookie = req.cookies['connect.sid'].split(".");
-			var sessionToken = sessionCookie[0].split(":");
-			sessionToken = sessionToken[1];
-		}
-		if (sessionToken != undefined && req.session.id == sessionToken) {
+		if (isSessionActive(req)) {
 			logger.info("Calling NDAC Service: getUserRoles_Nineteen68");
 			client.post(epurl + "admin/getUserRoles_Nineteen68",
 				function (result, response) {
@@ -103,12 +104,7 @@ exports.getAllUsers_Nineteen68 = function (req, res) {
 		logger.info("Inside UI service: getAllUsers_Nineteen68");
 		var checkAction = validator.isEmpty(req.body.action);
 		if(checkAction == false) {
-			if (req.cookies['connect.sid'] != undefined) {
-				var sessionCookie = req.cookies['connect.sid'].split(".");
-				var sessionToken = sessionCookie[0].split(":");
-				sessionToken = sessionToken[1];
-			}
-			if (sessionToken != undefined && req.session.id == sessionToken) {
+			if (isSessionActive(req)) {
 				var user_names = [];
 				var userIds = [];
 				var d_role = [];
@@ -158,12 +154,7 @@ exports.getAllUsers_Nineteen68 = function (req, res) {
 exports.getEditUsersInfo_Nineteen68 = function (req, res) {
 	try {
 		logger.info("Inside UI service: getEditUsersInfo_Nineteen68");
-		if (req.cookies['connect.sid'] != undefined) {
-			var sessionCookie = req.cookies['connect.sid'].split(".");
-			var sessionToken = sessionCookie[0].split(":");
-			sessionToken = sessionToken[1];
-		}
-		if (sessionToken != undefined && req.session.id == sessionToken) {
+		if (isSessionActive(req)) {
 			var requestedUserName = req.body.userName;
 			var requestedUserId = req.body.userId;
 			var userDetails = {};
@@ -213,12 +204,7 @@ exports.getEditUsersInfo_Nineteen68 = function (req, res) {
 exports.createUser_Nineteen68 = function (req, res) {
 	try {
 		logger.info("Inside UI service: createUser_Nineteen68");
-		if (req.cookies['connect.sid'] != undefined) {
-			var sessionCookie = req.cookies['connect.sid'].split(".");
-			var sessionToken = sessionCookie[0].split(":");
-			sessionToken = sessionToken[1];
-		}
-		if (sessionToken != undefined && req.session.id == sessionToken) {
+		if (isSessionActive(req)) {
 			var flag = "fail";
 			var status = false;
 			var req_username = req.body.createUser.username.toLowerCase();
@@ -383,12 +369,7 @@ exports.createUser_Nineteen68 = function (req, res) {
 exports.updateUser_nineteen68 = function updateUser_nineteen68(req, res) {
 	try {
 		logger.info("Inside UI service: updateUser_nineteen68");
-		if (req.cookies['connect.sid'] != undefined) {
-			var sessionCookie = req.cookies['connect.sid'].split(".");
-			var sessionToken = sessionCookie[0].split(":");
-			sessionToken = sessionToken[1];
-		}
-		if (sessionToken != undefined && req.session.id == sessionToken) {
+		if (isSessionActive(req)) {
 			var flag = "fail";
 			var status = false;
 			var userdetails = req.body.userinfo;
@@ -561,14 +542,8 @@ exports.updateUser_nineteen68 = function updateUser_nineteen68(req, res) {
 exports.getDomains_ICE = function getDomains_ICE(req, res) {
 	logger.info("Inside UI service: getDomains_ICE");
 	var checkAction = validator.isEmpty(req.body.action);
-
 	try {
-		if (req.cookies['connect.sid'] != undefined) {
-			var sessionCookie = req.cookies['connect.sid'].split(".");
-			var sessionToken = sessionCookie[0].split(":");
-			sessionToken = sessionToken[1];
-		}
-		if (sessionToken != undefined && req.session.id == sessionToken) {
+		if (isSessionActive(req)) {
 			var responsedata = [];
 			var args = {
 				headers: {
@@ -624,12 +599,7 @@ exports.createProject_ICE = function createProject_ICE(req, res) {
     qList = [];
 	try {
 		logger.info("Inside UI service: createProject_ICE");
-		if (req.cookies['connect.sid'] != undefined) {
-			var sessionCookie = req.cookies['connect.sid'].split(".");
-			var sessionToken = sessionCookie[0].split(":");
-			sessionToken = sessionToken[1];
-		}
-		if (sessionToken != undefined && req.session.id == sessionToken) {
+		if (isSessionActive(req)) {
 			var createProjectObj = req.body.createProjectObj;
 			var userinfo = req.body.userDetails;
 			var requestedskucode = "skucodetestcase";
@@ -901,12 +871,7 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 	qList=[];
 	try {
 		logger.info("Inside UI Service: updateProject_ICE");
-		if (req.cookies['connect.sid'] != undefined) {
-			var sessionCookie = req.cookies['connect.sid'].split(".");
-			var sessionToken = sessionCookie[0].split(":");
-			sessionToken = sessionToken[1];
-		}
-		if (sessionToken != undefined && req.session.id == sessionToken) {
+		if (isSessionActive(req)) {
 			var updateProjectDetails = req.body.updateProjectObj;
 			var userinfo = req.body.userDetails;
 			var requestedskucode = "skucode";
@@ -1476,12 +1441,7 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 exports.getNames_ICE = function (req, res) {
 	logger.info("Inside UI service: getNames_ICE");
 	try {
-		if (req.cookies['connect.sid'] != undefined) {
-			var sessionCookie = req.cookies['connect.sid'].split(".");
-			var sessionToken = sessionCookie[0].split(":");
-			sessionToken = sessionToken[1];
-		}
-		if (sessionToken != undefined && req.session.id == sessionToken) {
+		if (isSessionActive(req)) {
 			var requestedidslist = req.body.requestedids;
 			var idtypes = req.body.idtype;
 			var index = 0;
@@ -1639,12 +1599,7 @@ exports.getDetails_ICE = function (req, res) {
 	var checkresBody = validator.isJSON(JSON.stringify(req.body));
 	if (checkresBody == true) {
 		try {
-			if (req.cookies['connect.sid'] != undefined) {
-				var sessionCookie = req.cookies['connect.sid'].split(".");
-				var sessionToken = sessionCookie[0].split(":");
-				sessionToken = sessionToken[1];
-			}
-			if (sessionToken != undefined && req.session.id == sessionToken) {
+			if (isSessionActive(req)) {
 				var requestedidslist = req.body.requestedids;
 				var idtypes = req.body.idtype;
 				var responsedata = {};
@@ -1912,12 +1867,7 @@ exports.getDetails_ICE = function (req, res) {
 exports.assignProjects_ICE = function (req, res) {
 	logger.info("Inside UI Service: assignProjects_ICE");
 	try {
-		if (req.cookies['connect.sid'] != undefined) {
-			var sessionCookie = req.cookies['connect.sid'].split(".");
-			var sessionToken = sessionCookie[0].split(":");
-			sessionToken = sessionToken[1];
-		}
-		if (sessionToken != undefined && req.session.id == sessionToken) {
+		if (isSessionActive(req)) {
 			var assignProjectsDetails = req.body.assignProjectsObj;
 			var projectDetails = assignProjectsDetails.assignedProjects;
 			var projectIds = [];
@@ -2020,12 +1970,7 @@ exports.assignProjects_ICE = function (req, res) {
 exports.getAssignedProjects_ICE = function (req, res) {
 	try {
 		logger.info("Inside UI service: getAssignedProjects_ICE");
-		if (req.cookies['connect.sid'] != undefined) {
-			var sessionCookie = req.cookies['connect.sid'].split(".");
-			var sessionToken = sessionCookie[0].split(":");
-			sessionToken = sessionToken[1];
-		}
-		if (sessionToken != undefined && req.session.id == sessionToken) {
+		if (isSessionActive(req)) {
 			var requestDetails = req.body.getAssignProj;
 			var assignedProjectIds = [];
 			var assignedProjObj = [];
@@ -2113,12 +2058,7 @@ exports.getAssignedProjects_ICE = function (req, res) {
 exports.getAvailablePlugins = function (req, res) {
 	try {
 		var plugins_list = [];
-		if (req.cookies['connect.sid'] != undefined) {
-			var sessionCookie = req.cookies['connect.sid'].split(".");
-			var sessionToken = sessionCookie[0].split(":");
-			sessionToken = sessionToken[1];
-		}
-		if (sessionToken != undefined && req.session.id == sessionToken) {
+		if (isSessionActive(req)) {
 			client.post(epurl + "admin/getAvailablePlugins",
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
@@ -2139,12 +2079,7 @@ exports.getAvailablePlugins = function (req, res) {
 exports.generateCItoken = function (req, res) {
 	logger.info("Inside UI service: generateCItoken");
 	try {
-		if (req.cookies['connect.sid'] != undefined) {
-			var sessionCookie = req.cookies['connect.sid'].split(".");
-			var sessionToken = sessionCookie[0].split(":");
-			sessionToken = sessionToken[1];
-		}
-		if (sessionToken != undefined && req.session.id == sessionToken) {
+		if (isSessionActive(req)) {
 			var user_info={user_name:'ci_user',token:uuid()}
 			res.send(user_info);
 		} else {
