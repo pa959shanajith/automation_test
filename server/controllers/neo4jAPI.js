@@ -9,22 +9,6 @@ var requestHeaders = {
 	'Content-Type': 'application/json',
 };
 
-exports.executeQueriesOverRestAPI = function (req, res) {
-	logger.info("Inside UI service: executeQueriesOverRestAPI");
-	var args = {
-		"data": req.body.data,
-		"headers": requestHeaders
-	};
-	client.post(neoURL, args, function (result, resp) {
-		if (resp.statusCode != 200) res.status(400).send("fail");
-		else if (result.errors.length !== 0) res.status(400).send(result.errors);
-		else {
-			res.setHeader('Content-Type', 'application/json');
-			res.status(200).send(JSON.stringify(result.results));
-		}
-	});
-};
-
 exports.executeQueries = function (d, cb) {
 	logger.info("Inside UI service: executeQueries");
 	var args = {

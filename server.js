@@ -16,7 +16,7 @@ if (cluster.isMaster) {
         logger.error('Nineteen68 server has encountered some problems, Disconnecting!');
     });
     cluster.on('exit', function(worker) {
-        if (worker.exitedAfterDisconnect != true) {
+        if (worker.exitedAfterDisconnect !== true) {
             logger.error('Worker %d is killed!', worker.id);
             cluster.fork();
         }
@@ -218,35 +218,26 @@ try {
     //Only Test Engineer and Test Lead have access
     app.get(/^\/(design|designTestCase|execute|scheduling)$/, function (req, res) {
         //Denied roles
-        roles = ["Admin", "Business Analyst", "Tech Lead", "Test Manager"];
+        var roles = ["Admin", "Business Analyst", "Tech Lead", "Test Manager"];
         sessionCheck(req, res, roles);
     });
 
     //Test Engineer,Test Lead and Test Manager can access
     app.get(/^\/(specificreports|home|p_Utility|p_Reports|plugin)$/, function (req, res) {
         //Denied roles
-        roles = ["Admin", "Business Analyst", "Tech Lead"];
+        var roles = ["Admin", "Business Analyst", "Tech Lead"];
         sessionCheck(req, res, roles);
     });
 
     //Test Lead and Test Manager can access Weboccular Plugin
     app.get(/^\/(p_Weboccular|neuronGraphs2D|p_ALM|p_Dashboard)$/, function (req, res) {
         //Denied roles
-        roles = ["Admin", "Business Analyst", "Tech Lead", "Test Engineer"];
+        var roles = ["Admin", "Business Analyst", "Tech Lead", "Test Engineer"];
         sessionCheck(req, res, roles);
     });
 
     function sessionCheck(req, res, roles) {
         logger.info("Inside sessioncheck for URL : %s", req.url);
-        // logger.info("User " + req.session.username + " authenticated");
-        // if(req.session.username != undefined && req.session.userid != undefined)
-        // {
-        //         logger.rewriters.push(function(level, msg, meta) {
-        //         meta.username =  req.session.username;
-        //         meta.userid =  req.session.userid;
-        //         return meta;
-        //         });
-        // }
         logger.rewriters.push(function (level, msg, meta) {
             if (req.session != undefined && req.session.userid != undefined) {
                 meta.username = req.session.username;
@@ -261,7 +252,7 @@ try {
             }
         });
 
-        if (req.session.switchedRole != true) {
+        if (req.session.switchedRole !== true) {
             if (!req.session.defaultRole || roles.indexOf(req.session.defaultRole) >= 0) {
                 req.session.destroy();  res.status(401).redirect('/');
             } else {
@@ -292,7 +283,6 @@ try {
     });
 
     app.post('/designTestCase', function (req, res) {
-        // console.log("*--------",req);
         res.sendFile("index.html", {
             root: __dirname + "/public/"
         });
@@ -317,7 +307,6 @@ try {
     var apiclient = new Client();
 
     //Route Directories
-    //var neo4jAPI = require('./server/controllers/neo4jAPI');
     var mindmap = require('./server/controllers/mindmap');
     var login = require('./server/controllers/login');
     var admin = require('./server/controllers/admin');
@@ -338,12 +327,10 @@ try {
         var version = require('./server/controllers/project_versioning');
         app.post('/version', version.versioning);
     } catch (Ex) {
-        logger.warn('Versioning route path not found');
+        logger.warn('Versioning is disabled');
     }
 
     app.post('/home', mindmap.mindmapService);
-    //Neo4j API Routes
-    //app.post('/neo4jAPI', neo4jAPI.executeQueriesOverRestAPI);
     //Login Routes
     app.post('/authenticateUser_Nineteen68', login.authenticateUser_Nineteen68);
     app.post('/authenticateUser_Nineteen68_CI', login.authenticateUser_Nineteen68_CI);
