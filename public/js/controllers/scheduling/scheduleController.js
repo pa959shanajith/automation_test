@@ -114,13 +114,13 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 	})
 
 	$(document).on("change", '.selectToSched', function(){
-		var getRowCount = $(this).parents(".scenarioBody").children("tr").length;
+		// var getRowCount = $(this).parents(".scenarioBody").children("tr").length;
 		var selectedCount = $(this).parents(".scenarioBody").children("tr").find(".selectToSched:checked").length
-		if(getRowCount == selectedCount){
+		// if(getRowCount == selectedCount){
 			$(this).parents(".scenarioSchdCon").siblings(".scheduleSuite").find(".selectScheduleSuite").prop("checked", true);
-		}
-		// else
-		// $(this).parents(".scenarioSchdCon").siblings(".scheduleSuite").find(".selectScheduleSuite").prop("checked", false);
+		//}
+		if(selectedCount == 0)
+			$(this).parents(".scenarioSchdCon").siblings(".scheduleSuite").find(".selectScheduleSuite").prop("checked", false);
 	});
 
 	//Function to get scheduled details
