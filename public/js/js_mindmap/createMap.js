@@ -1164,7 +1164,7 @@ function loadCycles() {
 function nodeCtrlClick(e) {
     //In case of paste
 	var activeNode_temp;
-	if($('#pasteImg1').hasClass('paste-map')){
+	if($('#pasteImg1').hasClass('active-map')){
 		if(isIE) activeNode=this.parentNode;
 		else activeNode=this.parentElement;	
 		activeNode_temp = activeNode;	
@@ -2697,7 +2697,8 @@ function copyMap(){
 		openDialogMindmap('Success','Data Copied successfully');
 		$('.ct-node').removeClass('node-selected');
 		$('.ct-link').removeClass('link-selected');	
-		$('#rect-copy').remove();
+        $('#rect-copy').remove();
+        $('#copyImg1').removeClass('active-map');
 	}
 
 }

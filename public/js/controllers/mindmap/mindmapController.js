@@ -546,12 +546,18 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     }
     $scope.startCopy = function() {
         // $('#copyImg1').toggleClass('copyEnable');
-        if($('#rect-copy').length==0)
+        if($('#rect-copy').length==0){
+            $('#copyImg1').addClass('active-map');      
             draww();
+        }
+        else{
+            $('#rect-copy').remove();
+            $('#copyImg1').removeClass('active-map');
+        }
     }
 
     $scope.pasteMap = function(){
-        $('#pasteImg1').toggleClass('paste-map');
+        $('#pasteImg1').toggleClass('active-map');
         var mod = false;
         //select a node to paste all red just available green module/scenario
         dNodes_c.forEach(function(e,i){

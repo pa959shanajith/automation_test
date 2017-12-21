@@ -655,3 +655,7 @@ select
 .link-selected{
     stroke: blue;
 }
+
+.active-map {
+    color: #983fd3;
+}
