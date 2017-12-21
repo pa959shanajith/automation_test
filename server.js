@@ -23,6 +23,7 @@ if (cluster.isMaster) {
     });
 
 } else {
+    
 try {
     var express = require('express');
     var app = express();
