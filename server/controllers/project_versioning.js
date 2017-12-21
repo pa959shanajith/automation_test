@@ -224,6 +224,11 @@ exports.versioning = function (req, res) {
 					else if (e.type == 'scenarios') {
 						if (e.renamed && e.id_n) rnmList.push({ "statement": "MATCH(n:TESTSCENARIOS{testScenarioID:'" + e.id + "'}) SET n.testScenarioName='" + e.name + "'" + ",n.projectID='" + prjId + "'" });
 						qList.push({ "statement": "MERGE(n:TESTSCENARIOS{projectID:'" + prjId + "',moduleID:'" + idDict[e.pid] + "',testScenarioName:'" + e.name + "',testScenarioID:'" + e.id + "',createdBy:'" + user + "',createdOn:'" + createdOn + "',testScenarioID_c:'" + e.id_c + "'}) SET n.childIndex='" + e.childIndex + "'" });
+						//Relating scenario with moduleId
+						//Yashi
+						if(tab!='end_to_end'){
+							qList.push({"statement":"MATCH (a:MODULES{moduleID:'"+idDict[e.pid]+"'}),(b:TESTSCENARIOS{moduleID:'"+idDict[e.pid]+"'}) MERGE (a)-[r:FMTTS {id:'"+idDict[e.pid]+"'}]-(b)"});
+						}
 						//Supporting task assignmnet for scenarios
 						if (t != null && e.id_c != null) {
 							t.parent = [prjId].concat(e.pid_c, e.id_c);
@@ -238,6 +243,7 @@ exports.versioning = function (req, res) {
 
 							}
 							else qList.push({ "statement": "MERGE(n:TASKS{taskID:'" + t.id + "',task:'" + t.task + "',assignedTo:'" + t.assignedTo + "',reviewer:'" + t.reviewer + "',status:'" + taskstatus + "',startDate:'" + t.startDate + "',endDate:'" + t.endDate + "',re_estimation:'" + t.re_estimation + "',release:'" + t.release + "',cycle:'" + t.cycle + "',details:'" + t.details + "',nodeID:'" + e.id + "',parent:'[" + t.parent + "]',taskvn:" + parseFloat(vn_from) + "})" });
+								qList.push({"statement":"MATCH (a:TESTSCENARIOS{testScenarioID:'"+e.id+"'}),(b:TASKS{nodeID:'"+e.id+"'}) MERGE (a)-[r:FNTT {id:'"+e.id+"'}]-(b)"});
 						}
 						//qList.push({"statement":"MATCH(n:TESTSCENARIOS{testScenarioID:'"+e.id+"'}) SET n.testScenarioName='"+e.name+"'"+",n.projectID='"+prjId+"'"});
 					}
@@ -249,6 +255,9 @@ exports.versioning = function (req, res) {
 						}
 						//qList.push({"statement":"MATCH(n:SCREENS{screenID:'"+e.id+"'}) SET n.screenName='"+e.name+"'"+",n.projectID='"+prjId+"'"});
 						qList.push({ "statement": "MERGE(n:SCREENS{projectID:'" + prjId + "',testScenarioID:'" + idDict[e.pid] + "',screenName:'" + e.name + "',screenID:'" + e.id + "',createdBy:'" + user + "',createdOn:'" + createdOn + "',uid:'" + uidx + "',screenID_c:'" + e.id_c + "'})SET n.childIndex='" + e.childIndex + "',n.vn=" + parseFloat(vn_from) });
+						//Relating scenario with screens
+						//Yashi
+							qList.push({"statement":"MATCH (a:TESTSCENARIOS{testScenarioID:'"+idDict[e.pid]+"'}),(b:SCREENS{testScenarioID:'"+idDict[e.pid]+"'}) MERGE (a)-[r:FTSTS {id:'"+idDict[e.pid]+"'}]-(b)"});	
 						if (t != null && e.id_c != null) {
 							t.id = (t.id != null) ? t.id : uuidV4();
 
@@ -258,7 +267,7 @@ exports.versioning = function (req, res) {
 								} else {
 									qList.push({ "statement": "MATCH(n:TASKS{taskID:'" + t.id + "',nodeID:'" + e.id + "',parent:'[" + t.parent + "]',taskvn:" + parseFloat(vn_from) + "}) SET n.task='" + t.task + "',n.assignedTo='" + t.assignedTo + "',n.status='" + taskstatus + "',n.reviewer='" + t.reviewer + "',n.startDate='" + t.startDate + "',n.endDate='" + t.endDate + "',n.re_estimation='" + t.re_estimation + "',n.details='" + t.details + "',n.uid='" + uidx + "'" });
 								}
-
+								qList.push({"statement":"MATCH (a:SCREENS{screenID:'"+e.id+"'}),(b:TASKS{nodeID:'"+e.id+"'}) MERGE (a)-[r:FNTT {id:'"+e.id+"'}]-(b)"});
 							}
 							else {
 
@@ -281,7 +290,9 @@ exports.versioning = function (req, res) {
 							qList.push({ "statement": "MERGE(n:TESTCASES{screenID:'" + idDict[e.pid] + "',testScenarioID:'" + lts + "',testCaseName:'" + e.name + "',testCaseID:'" + e.id + "',createdBy:'" + user + "',createdOn:'" + createdOn + "',uid:'" + uidx + "',testCaseID_c:'" + e.id_c + "'}) SET n.childIndex='" + e.childIndex + "'" });
 						}
 
-
+						//Relating testcases with screens
+						//Yashi
+							qList.push({"statement":"MATCH (a:SCREENS{screenID:'"+idDict[e.pid]+"'}),(b:TESTCASES{screenID:'"+idDict[e.pid]+"'}) MERGE (a)-[r:FSTTS {id:'"+idDict[e.pid]+"'}]-(b)"});		
 						if (t != null && e.id_c != null) {
 							t.id = (t.id != null) ? t.id : uuidV4();
 							//var parent=[prjId].concat(t.parent);
@@ -291,7 +302,7 @@ exports.versioning = function (req, res) {
 								} else {
 									qList.push({ "statement": "MATCH(n:TASKS{taskID:'" + t.id + "',nodeID:'" + e.id + "',parent:'[" + t.parent + "]',taskvn:" + parseFloat(vn_from) + "}) SET n.task='" + t.task + "',n.assignedTo='" + t.assignedTo + "',n.reviewer='" + t.reviewer + "',n.status='" + taskstatus + "',n.startDate='" + t.startDate + "',n.endDate='" + t.endDate + "',n.re_estimation='" + t.re_estimation + "',n.details='" + t.details + "',n.uid='" + uidx + "'" });
 								}
-
+								qList.push({"statement":"MATCH (a:TESTCASES{testCaseID:'"+e.id+"'}),(b:TASKS{nodeID:'"+e.id+"'}) MERGE (a)-[r:FNTT {id:'"+e.id+"'}]-(b)"})
 							}
 							else {
 
@@ -302,11 +313,11 @@ exports.versioning = function (req, res) {
 					}
 				});
 				if (tab != 'end_to_end') {
-					qList.push({ "statement": "MATCH (a:MODULES),(b:TESTSCENARIOS) WHERE a.moduleID=b.moduleID MERGE (a)-[r:FMTTS {id:b.moduleID}]-(b)" });
+					//qList.push({ "statement": "MATCH (a:MODULES),(b:TESTSCENARIOS) WHERE a.moduleID=b.moduleID MERGE (a)-[r:FMTTS {id:b.moduleID}]-(b)" });
 					qList.push({ "statement": "MATCH (a:TESTSCENARIOS),(b:SCREENS) WHERE a.testScenarioID=b.testScenarioID MERGE (a)-[r:FTSTS {id:b.testScenarioID}]-(b)" });
 					qList.push({ "statement": "MATCH (a:SCREENS),(b:TESTCASES) WHERE a.screenID=b.screenID and a.uid=b.uid MERGE (a)-[r:FSTTS {id:b.screenID}]-(b)" });
 					//qList.push({ "statement": "MATCH (a:MODULES),(b:TASKS) WHERE a.moduleID=b.nodeID MERGE (a)-[r:FNTT {id:b.nodeID}]-(b)" });
-					qList.push({ "statement": "MATCH (a:TESTSCENARIOS),(b:TASKS) WHERE a.testScenarioID=b.nodeID MERGE (a)-[r:FNTT {id:b.nodeID}]-(b)" });
+					//qList.push({ "statement": "MATCH (a:TESTSCENARIOS),(b:TASKS) WHERE a.testScenarioID=b.nodeID MERGE (a)-[r:FNTT {id:b.nodeID}]-(b)" });
 					qList.push({ "statement": "MATCH (a:SCREENS),(b:TASKS) WHERE a.screenID=b.nodeID and a.uid=b.uid MERGE (a)-[r:FNTT {id:b.nodeID}]-(b)" });
 					qList.push({ "statement": "MATCH (a:TESTCASES),(b:TASKS) WHERE a.testCaseID=b.nodeID and a.uid=b.uid MERGE (a)-[r:FNTT {id:b.nodeID}]-(b)" });
 					qList.push({ "statement": "MATCH (a) remove a.uid" });
