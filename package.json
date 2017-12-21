@@ -10,6 +10,7 @@
   "author": "Dimension Labs",
   "license": "ISC",
   "dependencies": {
+    "activedirectory": "^0.7.2",
     "async": "^2.6.0",
     "bcrypt": "^1.0.3",
     "body-parser": "^1.18.2",

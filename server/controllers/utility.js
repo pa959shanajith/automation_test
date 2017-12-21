@@ -1,3 +1,4 @@
+var crypto = require('crypto');
 var myserver = require('../../server');
 // var PythonShell = require('python-shell');
 var Client = require("node-rest-client").Client;
@@ -100,10 +101,8 @@ exports.Encrypt_ICE = function getDomains_ICE(req, res) {
 					}
 				}else if(methodSelected == "MD5"){
 					try{
-						var crypto = require('crypto');
 						encryptedValue = crypto.createHash('md5').update(encrytData).digest("hex");
-					}
-					catch(exception){
+					} catch(exception){
 						logger.error(exception);
 						res.send("fail");
 					}
@@ -111,11 +110,9 @@ exports.Encrypt_ICE = function getDomains_ICE(req, res) {
 					res.send(encryptedValue);
 				}else if(methodSelected == "Base64"){
 					try{
-
 						var buffer = new Buffer(encrytData);
 						var encryptedValue = buffer.toString('base64');
-					}
-					catch(exception){
+					} catch(exception){
 					    logger.error(exception);
 						res.send("fail");
 					}

@@ -1,15 +1,17 @@
 /**
  * Dependencies.
  */
-var bcrypt = require('bcrypt');
 var async = require('async');
+var bcrypt = require('bcrypt');
+var validator = require('validator');
+var activeDirectory = require('activedirectory');
 var epurl = "http://"+process.env.NDAC_IP+":"+process.env.NDAC_PORT+"/";
 var Client = require("node-rest-client").Client;
 var client = new Client();
-var validator = require('validator');
 var myserver = require('../../server');
 var logger = require('../../logger');
 var notificationMsg = require("../notifications/notifyMessages");
+var config = require('../../server/config/config');
 
 function isSessionActive(req){
 	var sessionToken = req.session.uniqueId;
@@ -37,7 +39,7 @@ exports.authenticateUser_Nineteen68 = function (req, res) {
 			if (check_password == false && check_passwordLen == true) {
 				valid_password = true;
 			}
-		};
+		}
 		if (valid_username == true && valid_password == true) {
 			var flag = 'inValidCredential';
 			var assignedProjects = false;
@@ -155,7 +157,7 @@ exports.authenticateUser_Nineteen68 = function (req, res) {
 						}
 					});
 				}
-			};
+			}
 
 			// Implementation for Concurrent login
 			myserver.redisSessionStore.ids(function (allKeyserr, allKeys) {
@@ -235,7 +237,7 @@ exports.authenticateUser_Nineteen68_CI = function (req, res) {
 			if (check_password == false && check_passwordLen == true) {
 				valid_password = true;
 			}
-		};
+		}
 		if (valid_username == true && valid_password == true) {
 			checkldapuser(req, username, function (err, data) {
 					logger.info("Inside call function of checkldapuser");
@@ -531,7 +533,6 @@ function checkldapuser(req, username, callback, data) {
 
 function ldapCheck(req, cb) {
 	logger.info("Inside ldapCheck function");
-	var config = require('../../server/config/config');
 	var ldap_ip = '',
 	ldap_port = '',
 	ldap_domain = '';
@@ -552,8 +553,7 @@ function ldapCheck(req, cb) {
 	} catch (ex) {
 		logger.error(ex);
 	}
-	var ActiveDirectory = require('activedirectory');
-	var ad = new ActiveDirectory({
+	var ad = new activeDirectory({
 			url: 'ldap://' + ldap_ip + ':' + ldap_port,
 			baseDN: dcstringarr.toString()
 		});
