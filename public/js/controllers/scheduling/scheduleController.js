@@ -1,4 +1,5 @@
 var releaseName,cycleName,testSuiteName;
+var triggeredSeconds = 0;
 mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout','$location','ScheduleService','cfpLoadingBar','$compile','$interval', function ($scope, $rootScope, $http, $timeout, $location, ScheduleService, cfpLoadingBar, $compile, $interval) {
 	cfpLoadingBar.start();
 	$("body").css("background","#eee");
@@ -54,7 +55,7 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 	}, 1000)
 
 	//update scheduled table every 20 seconds
-	$interval(getScheduledDetails, 20000);
+	$interval(getScheduledDetailsInterval, 20000);
 	
 	$scope.readTestSuite_ICE = function(){
 		ScheduleService.readTestSuite_ICE(readTestSuite, "schedule")
@@ -123,6 +124,12 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 			$(this).parents(".scenarioSchdCon").siblings(".scheduleSuite").find(".selectScheduleSuite").prop("checked", false);
 	});
 
+	//Function to get scheduled details on interval
+	function getScheduledDetailsInterval(){
+		if(Math.round(new Date() / 1000) - triggeredSeconds >= 20){
+			getScheduledDetails();
+		}
+	}
 	//Function to get scheduled details
 	function getScheduledDetails(){
 		ScheduleService.getScheduledDetails_ICE()
@@ -166,12 +173,13 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 					sortFlag == true? $(".scheduleDataHeader span:first-child").trigger("click") : 
 					changeBackground();
 					$("#scheduledSuitesFilterData").prop('selectedIndex', 0);
+					triggeredSeconds = Math.round(new Date() / 1000);
 				},100)
 			}
 		},
 		function(error) {
 			console.log(error)
-		});
+		});		
 	}
 
 	$scope.browImg = function(brow){
