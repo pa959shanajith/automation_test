@@ -1,4 +1,4 @@
-var activeNode, childNode, uNix, uLix, node, link, dNodes, dLinks, allMMaps, temp, rootIndex, faRef, nCount, scrList, tcList, mapSaved, zoom, cSpan, cScale, taskAssign, releaseResult, selectedProject;
+var activeNode,childNode,uNix,uLix,node,link,dNodes,dLinks,dNodes_c,dLinks_c,allMMaps,temp,rootIndex,faRef,nCount,scrList,tcList,mapSaved,zoom,cSpan,cScale,taskAssign,releaseResult,selectedProject;
 //unassignTask is an array to store whose task to be deleted
 var deletednode = [],
     unassignTask = [],
@@ -1162,6 +1162,64 @@ function loadCycles() {
 }
 
 function nodeCtrlClick(e) {
+    //In case of paste
+	var activeNode_temp;
+	if($('#pasteImg1').hasClass('active-map')){
+		if(isIE) activeNode=this.parentNode;
+		else activeNode=this.parentElement;	
+		activeNode_temp = activeNode;	
+		if(d3.select(activeNode).attr('data-nodetype')==$($('.node-selected')[0]).attr('data-nodetype')){
+			if($($('.node-selected')[0]).attr('data-nodetype')=='scenarios'){
+				//paste to scenarios
+				//call createnode for each node
+				dNodes_c.forEach(function(e,i){
+					activeNode = activeNode_temp;
+					if(e.type == 'screens'){
+						createNode({name:e.name});
+						activeNode = childNode[0][0];
+						dLinks_c.forEach(function(f,j){
+							if(f.source.name == e.name){
+								createNode({name:f.target.name});
+							}
+						})
+					} 
+
+				});			
+			}
+			else if($($('.node-selected')[0]).attr('data-nodetype')=='modules'){
+				var activenode_scr;
+				//paste to module
+				//call createnode for each node
+				dNodes_c.forEach(function(e,i){
+					if(e.type == 'scenarios'){
+						activeNode = '#ct-node-0';						
+						createNode({name:e.name});
+						activeNode = childNode[0][0];
+						activenode_scr = activeNode;
+						dLinks_c.forEach(function(f,j){
+							if(f.source.name == e.name && f.target.type=='screens'){
+								activeNode = activenode_scr;
+								createNode({name:f.target.name});
+								activeNode = childNode[0][0];
+								dLinks_c.forEach(function(g,k){
+									if(g.source.name == f.target.name && g.source.type=='screens'){
+										createNode({name:g.target.name});										
+									}
+								});
+							}
+						})
+					} 
+
+				});			
+			}			
+			openDialogMindmap('Success','Pasted successfully');
+		} 
+		else{
+			openDialogMindmap('Error','Please select a Scenario to paste to..');
+		}
+		return;
+	}	
+    
     d3.select('#ct-inpBox').classed('no-disp', !0);
     e = e || window.event;
     e.cancelbubble = !0;
@@ -2561,4 +2619,86 @@ function jsonDownload(filename, responseData) {
     e.initMouseEvent('click', true, true, window,
         0, 0, 0, 0, 0, false, false, false, false, 0, null);
     a.dispatchEvent(e);
+}
+
+function draww(){
+	clearSvg();
+	treeBuilder(allMMaps[$('.nodeBoxSelected').attr('data-mapid')]);
+	//Disable every other action	
+	$('#ct-canvas').append("<div id='rect-copy'><div>").on('resize',resize1).on('drag',resize1);
+	$( "#rect-copy" ).resizable();
+	$( "#rect-copy" ).draggable();
+}
+
+function resize1(){
+		dNodes_c = [];
+		dLinks_c = [];
+		$('.ct-node').removeClass('node-selected node-error');
+		$('.ct-link').removeClass('link-selected');
+		console.log('Resize');
+		var xvp = d3.select("#ct-mindMap").attr("transform").split(/[()]/)[1].split(',')[0];
+		var yvp = d3.select("#ct-mindMap").attr("transform").split(/[()]/)[1].split(',')[1];
+		var scale = (d3.select("#ct-mindMap").attr("transform").split(/[()]/)[3]);
+
+		dNodes.forEach( function(e,i) {
+			var lt = [parseFloat(xvp)+parseFloat(e.x)*parseFloat(scale),parseFloat(yvp)+parseFloat(e.y)*parseFloat(scale)];
+			console.log('l,t :',lt);
+			if(e.type!='modules'){
+				if(lt[0]>$('#rect-copy').position().left && lt[0]<($('#rect-copy').position().left+$('#rect-copy').width()) && lt[1]>$('#rect-copy').position().top && lt[1]<($('#rect-copy').position().top+$('#rect-copy').height())){
+					$('#ct-node-'+i).addClass('node-selected');
+					if(e.type=='testcases' && (dNodes_c.indexOf(dNodes[e.parent.id])==-1)){
+						$('#ct-node-'+e.parent.id).addClass('node-selected');
+						dNodes_c.push(dNodes[e.parent.id]);
+					}
+					dNodes_c.push(e);				
+				}
+			}
+		}); 
+		dLinks.forEach(function(e,i){
+			if($('#ct-node-'+e.source.id).hasClass('node-selected')&&$('#ct-node-'+e.target.id).hasClass('node-selected')){
+				$('#ct-link-'+e.id).addClass('link-selected');
+				dLinks_c.push(e);
+			}
+		})	       
+};
+
+function copyMap(){
+	var dangling_screen_check_flag = false,dangling_screen,dangling_screen_flag = false,ds_list=[];
+	//validate
+	//if topmost is scenario and screen without parent -> fail
+	dNodes_c.forEach(function(e,i){
+		if(e.type=='scenarios')
+			dangling_screen_check_flag = true;  // then check for dangling screen
+	})
+	if(dangling_screen_check_flag){
+		dNodes_c.forEach(function(e,i){
+			if(e.type == 'screens'){
+	 			dangling_screen = true;				
+				dLinks_c.forEach(function(f,i){
+					if(e.id == f.target.id)
+						dangling_screen = false;
+				})
+			}
+			if(dangling_screen){
+
+				dangling_screen_flag =true;
+				ds_list.push(e);
+			}
+		})
+	}
+
+	if(dangling_screen_flag){
+		openDialogMindmap('Error','dangling screen!!! validation failed!');
+		ds_list.forEach(function(e,i){
+			$('#ct-node-'+e.id).addClass('node-error');
+		});		
+	}
+	else{
+		openDialogMindmap('Success','Data Copied successfully');
+		$('.ct-node').removeClass('node-selected');
+		$('.ct-link').removeClass('link-selected');	
+        $('#rect-copy').remove();
+        $('#copyImg1').removeClass('active-map');
+	}
+
 }

@@ -71,9 +71,9 @@ exports.getUsers_Nineteen68 = function (req, res) {
 		function (userrolesresult, userrolesresponse) {
 		if (userrolesresponse.statusCode != 200 || userrolesresult.rows == "fail") {
 			logger.error("Error occured in getRoleNameByRoleId_Nineteen68 Error Code : ERRNDAC");
-			res(null, "fail");getUserRoles_Nineteen68
+			res(null, "fail");
 		} else {
-			inputs = {
+			var inputs = {
 				"userroles": userrolesresult.rows,
 				"projectid": prjId
 			};
@@ -155,7 +155,6 @@ exports.getEditUsersInfo_Nineteen68 = function (req, res) {
 	try {
 		logger.info("Inside UI service: getEditUsersInfo_Nineteen68");
 		if (isSessionActive(req)) {
-			var requestedUserName = req.body.userName;
 			var requestedUserId = req.body.userId;
 			var userDetails = {};
 			var inputs = {
@@ -188,7 +187,7 @@ exports.getEditUsersInfo_Nineteen68 = function (req, res) {
 					}
 				} catch (exception) {
 					logger.error(exception);
-					res.send(flag);
+					res.send(null,"fail");
 				}
 			});
 		} else {
@@ -224,45 +223,46 @@ exports.createUser_Nineteen68 = function (req, res) {
 				ci_user=false;
 				validateCreateUser();
 			}
+			var valid_username, valid_password, valid_firstname, valid_lastname, valid_ldapuser, valid_defaultRole, valid_email_id, valid_hashedPassword;
 			function validateCreateUser() {
 				logger.info("Inside validateCreateUser function");
-				check_username = validator.isEmpty(req_username);
-				check_usernameLen = validator.isLength(req_username, 1, 50);
+				var check_username = validator.isEmpty(req_username);
+				var check_usernameLen = validator.isLength(req_username, 1, 50);
 				if (check_username == false && check_usernameLen == true) {
 					valid_username = true;
 				}
-				check_password = validator.isEmpty(req_password);
-				check_passwordLen = validator.isLength(req_password, 1, 12);
+				var check_password = validator.isEmpty(req_password);
+				var check_passwordLen = validator.isLength(req_password, 1, 12);
 				if (check_password == false && check_passwordLen == true) {
 					valid_password = true;
 				}
-				check_firstname = validator.isEmpty(req_firstname);
-				check_firstnameLen = validator.isLength(req_firstname, 1, 12);
-				check_firstnamePattern = validator.isAlpha(req_firstname);
+				var check_firstname = validator.isEmpty(req_firstname);
+				var check_firstnameLen = validator.isLength(req_firstname, 1, 12);
+				var check_firstnamePattern = validator.isAlpha(req_firstname);
 				if (check_firstname == false && check_firstnameLen == true && check_firstnamePattern == true) {
 					valid_firstname = true;
 				}
-				check_lastname = validator.isEmpty(req_lastname);
-				check_lastnameLen = validator.isLength(req_lastname, 1, 12);
-				check_lastnamePattern = validator.isAlpha(req_lastname);
+				var check_lastname = validator.isEmpty(req_lastname);
+				var check_lastnameLen = validator.isLength(req_lastname, 1, 12);
+				var check_lastnamePattern = validator.isAlpha(req_lastname);
 				if (check_lastname == false && check_lastnameLen == true && check_lastnamePattern == true) {
 					valid_lastname = true;
 				}
-				check_ldapuser = validator.isEmpty(req_ldapuser.toString());
+				var check_ldapuser = validator.isEmpty(req_ldapuser.toString());
 				if (check_ldapuser == false) {
 					valid_ldapuser = true;
 				}
-				check_defaultRole = validator.isUUID(req_defaultRole);
+				var check_defaultRole = validator.isUUID(req_defaultRole);
 				if (check_defaultRole == true) {
 					valid_defaultRole = true;
 				}
-				check_email_id = validator.isEmail(req_email_id);
-				check_emailLen = validator.isLength(req_email_id, 1, 50);
+				var check_email_id = validator.isEmail(req_email_id);
+				var check_emailLen = validator.isLength(req_email_id, 1, 50);
 				if (check_email_id == true && check_emailLen == true) {
 					valid_email_id = true;
 				}
 				var salt = bcrypt.genSaltSync(10);
-				check_hashedPassword = validator.isEmpty(bcrypt.hashSync(req_password, salt));
+				var check_hashedPassword = validator.isEmpty(bcrypt.hashSync(req_password, salt));
 				if (check_hashedPassword == false) {
 					valid_hashedPassword = true;
 				}
@@ -288,7 +288,7 @@ exports.createUser_Nineteen68 = function (req, res) {
 						try {
 							if(!ci_user){
 								for (var i = 0; i < userNameresult.rows.length; i++) {
-									dbResult = userNameresult.rows[i];
+									var dbResult = userNameresult.rows[i];
 									if (req_username.toLowerCase() === dbResult.username.toLowerCase()) {
 										status = true;
 										break;
@@ -300,7 +300,7 @@ exports.createUser_Nineteen68 = function (req, res) {
 							}
 							if (status === false) {
 								if(!ci_user){
-									var inputs = {
+									inputs = {
 										"query": "createuser",
 										"createdby": req_username,
 										"defaultrole": req_defaultRole,
@@ -314,7 +314,7 @@ exports.createUser_Nineteen68 = function (req, res) {
 									};
 								}
 								else{
-									var inputs = {
+									inputs = {
 									"query": "createciuser",
 									"createdby": req_username,
 									"password": req_hashedtoken,
@@ -371,7 +371,6 @@ exports.updateUser_nineteen68 = function updateUser_nineteen68(req, res) {
 		logger.info("Inside UI service: updateUser_nineteen68");
 		if (isSessionActive(req)) {
 			var flag = "fail";
-			var status = false;
 			var userdetails = req.body.userinfo;
 			var userObj = req.body.updateUserObj;
 			var local_username = userObj.userName.toLowerCase();
@@ -385,21 +384,18 @@ exports.updateUser_nineteen68 = function updateUser_nineteen68(req, res) {
 			var local_email_id = userObj.email;
 			var local_user_Id = userObj.userId;
 			var db_password = '';
-			if (local_password != "") {
-				var salt = bcrypt.genSaltSync(10);
-				var req_hashedPassword = bcrypt.hashSync(local_password, salt);
-			}
 			validateUpdateUser();
+			var valid_username, valid_password, valid_firstname, valid_lastname, valid_email_id;
 			function validateUpdateUser() {
 				logger.info("Inside validateUpdateUser function");
-				check_username = validator.isEmpty(local_username);
-				check_usernameLen = validator.isLength(local_username, 1, 50);
+				var check_username = validator.isEmpty(local_username);
+				var check_usernameLen = validator.isLength(local_username, 1, 50);
 				if (check_username == false && check_usernameLen == true) {
 					valid_username = true;
 				}
 				if (local_password != "") {
-					check_password = validator.isEmpty(local_password);
-					check_passwordLen = validator.isLength(local_password, 1, 12);
+					var check_password = validator.isEmpty(local_password);
+					var check_passwordLen = validator.isLength(local_password, 1, 12);
 					if (check_password == false && check_passwordLen == true) {
 						valid_password = true;
 					} else {
@@ -410,20 +406,20 @@ exports.updateUser_nineteen68 = function updateUser_nineteen68(req, res) {
 						valid_password = true;
 					}
 				}
-				check_firstname = validator.isEmpty(local_firstname);
-				check_firstnameLen = validator.isLength(local_firstname, 1, 12);
-				check_firstnamePattern = validator.isAlpha(local_firstname);
+				var check_firstname = validator.isEmpty(local_firstname);
+				var check_firstnameLen = validator.isLength(local_firstname, 1, 12);
+				var check_firstnamePattern = validator.isAlpha(local_firstname);
 				if (check_firstname == false && check_firstnameLen == true && check_firstnamePattern == true) {
 					valid_firstname = true;
 				}
-				check_lastname = validator.isEmpty(local_lastname);
-				check_lastnameLen = validator.isLength(local_lastname, 1, 12);
-				check_lastnamePattern = validator.isAlpha(local_lastname);
+				var check_lastname = validator.isEmpty(local_lastname);
+				var check_lastnameLen = validator.isLength(local_lastname, 1, 12);
+				var check_lastnamePattern = validator.isAlpha(local_lastname);
 				if (check_lastname == false && check_lastnameLen == true && check_lastnamePattern == true);{
 					valid_lastname = true;
 				}
-				check_email_id = validator.isEmail(local_email_id);
-				check_emailLen = validator.isLength(local_email_id, 1, 50);
+				var check_email_id = validator.isEmail(local_email_id);
+				var check_emailLen = validator.isLength(local_email_id, 1, 50);
 				if (check_email_id == true && check_emailLen == true) {
 					valid_email_id = true;
 				}
@@ -443,12 +439,13 @@ exports.updateUser_nineteen68 = function updateUser_nineteen68(req, res) {
 				client.post(epurl + "admin/getUserData_Nineteen68", args,
 					function (result, response) {
 					try {
+						var flag = "fail";
 						if (response.statusCode != 200 || result.rows == "fail") {
-							var flag = "fail";
 							logger.error("Error occured in getUserData_Nineteen68 Error Code : ERRNDAC");
 							res.send(flag);
 						} else {
-							service = result.rows[0];
+							var req_hashedPassword;
+							var service = result.rows[0];
 							if (local_username == undefined || local_username == 'undefined' || local_username == '') {
 								local_username = service.username.toLowerCase();
 							}
@@ -456,7 +453,7 @@ exports.updateUser_nineteen68 = function updateUser_nineteen68(req, res) {
 								db_password = "existing";
 							} else {
 								var salt = bcrypt.genSaltSync(10);
-								var req_hashedPassword = bcrypt.hashSync(local_password, salt);
+								req_hashedPassword = bcrypt.hashSync(local_password, salt);
 							}
 							if (local_firstname == undefined || local_firstname == 'undefined' || local_firstname == '') {
 								local_firstname = service.firstname;
@@ -477,7 +474,7 @@ exports.updateUser_nineteen68 = function updateUser_nineteen68(req, res) {
 							if (result.rows[0].ldapuser != null || result.rows[0].ldapuser != undefined) {
 								if (result.rows[0].ldapuser) {
 									db_password = null;
-									req_hashedPassword = null;
+									req_hashedPassword = "not required";
 								}
 							}
 							var inputs = {
@@ -507,7 +504,7 @@ exports.updateUser_nineteen68 = function updateUser_nineteen68(req, res) {
 								function (result, response) {
 								try {
 									if (response.statusCode != 200 || result.rows == "fail") {
-										var flag = "fail";
+										flag = "fail";
 										res.send(flag);
 									} else {
 										flag = "success";
@@ -607,24 +604,25 @@ exports.createProject_ICE = function createProject_ICE(req, res) {
 			var projectTypeId = "";
 			var newProjectID = "";
 			validateCreateProject();
+			var valid_domain, valid_projectName, valid_appType, valid_projectDetails;
 			function validateCreateProject() {
 				logger.info("Inside function validateCreateProject");
-				check_domain = validator.isEmpty(createProjectObj.domainId);
-				check_domain_type = validator.isUUID(createProjectObj.domainId);
+				var check_domain = validator.isEmpty(createProjectObj.domainId);
+				var check_domain_type = validator.isUUID(createProjectObj.domainId);
 				if (check_domain == false && check_domain_type == true) {
 					valid_domain = true;
 				}
-				check_project = validator.isEmpty(createProjectObj.projectName);
-				check_projectLen = validator.isLength(createProjectObj.projectName, 1, 50);
+				var check_project = validator.isEmpty(createProjectObj.projectName);
+				var check_projectLen = validator.isLength(createProjectObj.projectName, 1, 50);
 				if (check_project == false && check_projectLen == true) {
 					valid_projectName = true;
 				}
-				check_appType = validator.isEmpty(createProjectObj.appType);
+				var check_appType = validator.isEmpty(createProjectObj.appType);
 				if (check_appType == false) {
 					valid_appType = true;
 				}
-				check_projectDetails = validator.isJSON(JSON.stringify(createProjectObj.projectDetails));
-				check_projectDetailsLen = createProjectObj.projectDetails.length;
+				var check_projectDetails = validator.isJSON(JSON.stringify(createProjectObj.projectDetails));
+				var check_projectDetailsLen = createProjectObj.projectDetails.length;
 				if (check_projectDetails == true && check_projectDetailsLen > 0) {
 					valid_projectDetails = true;
 				}
@@ -689,13 +687,12 @@ exports.createProject_ICE = function createProject_ICE(req, res) {
                                     newProjectID = insertProjectData.rows[0].projectid;
                                     //Execute neo4j query!!
                                     //var qList=[];
-                                    qList.push({"statement":"MERGE (n:PROJECTS_NG {projectid:'"+newProjectID
-                                                +"',domainid:'"+inputs.domainid+"',projectname:'"
-                                                +inputs.projectname+"'}) return n"});
+                                    qList.push({"statement":"MERGE (n:PROJECTS_NG {projectid:'"+newProjectID+
+                                                "',domainid:'"+inputs.domainid+"',projectname:'"+
+                                                inputs.projectname+"'}) return n"});
                                     //Relationships
-                                    qList.push({"statement":"MATCH (a:DOMAINS_NG{domainid:'"+inputs.domainid+"'}),(b:PROJECTS_NG {projectid:'"+newProjectID
-                                                +"',domainid:'"+inputs.domainid+"',projectname:'"+inputs.projectname+"'}) MERGE(a)-[r:FDOMTPRJ_NG{id:'"+newProjectID+"'}]->(b) return a,r,b"})
-
+                                    qList.push({"statement":"MATCH (a:DOMAINS_NG{domainid:'"+inputs.domainid+"'}),(b:PROJECTS_NG {projectid:'"+newProjectID+
+                                                "',domainid:'"+inputs.domainid+"',projectname:'"+inputs.projectname+"'}) MERGE(a)-[r:FDOMTPRJ_NG{id:'"+newProjectID+"'}]->(b) return a,r,b"});
                                     callback();
 
 								}
@@ -707,14 +704,11 @@ exports.createProject_ICE = function createProject_ICE(req, res) {
 					createreleases: function (callback) {
 						try {
 							var numberOfReleases = createProjectObj.projectDetails;
-							var releasesLength = numberOfReleases.length;
 							async.forEachSeries(numberOfReleases, function (eachrelease, numberOfReleasescallback) {
 								try {
 									var releaseDetails = eachrelease;
 									var releaseName = releaseDetails.releaseName;
 									var cycleNames = releaseDetails.cycleNames;
-									var cyclesLength = cycleNames.length;
-									var cycleindex = 0;
 									var newReleaseID = "";
 									var inputs = {
 										"query": "createrelease",
@@ -739,21 +733,21 @@ exports.createProject_ICE = function createProject_ICE(req, res) {
 											newReleaseID = data.rows[0].releaseid;
                                             //Execute neo4j query!! createrelease
                                             //var qList=[];
-                                            qList.push({"statement":"MERGE (n:RELEASES_NG {releaseid:'"+newReleaseID
-                                                        +"',projectid:'"+inputs.projectid+"',releasename:'"
-                                                        +inputs.releasename+"',deleted:'"+false+"'}) return n"});
+                                            qList.push({"statement":"MERGE (n:RELEASES_NG {releaseid:'"+newReleaseID+
+                                                        "',projectid:'"+inputs.projectid+"',releasename:'"+
+                                                        inputs.releasename+"',deleted:'"+false+"'}) return n"});
                                             //Relationships
-                                            qList.push({"statement":"MATCH (a:PROJECTS_NG{projectid:'"+inputs.projectid+"'}),(b:RELEASES_NG {releaseid:'"+newReleaseID
-                                                        +"',projectid:'"+inputs.projectid+"',releasename:'"
-                                                        +inputs.releasename+"',deleted:'"+false+"'}) MERGE(a)-[r:FPRJTREL_NG{id:'"+newReleaseID
-                                                        +"'}]->(b) return a,r,b"})
+                                            qList.push({"statement":"MATCH (a:PROJECTS_NG{projectid:'"+inputs.projectid+"'}),(b:RELEASES_NG {releaseid:'"+newReleaseID+
+                                                        "',projectid:'"+inputs.projectid+"',releasename:'"+
+                                                        inputs.releasename+"',deleted:'"+false+"'}) MERGE(a)-[r:FPRJTREL_NG{id:'"+newReleaseID+
+                                                        "'}]->(b) return a,r,b"});
 
                                             //qList.push({"statement":"MATCH (c:RELEASES_NG{releaseid:'"+newReleaseID+"'}) return c"})
                                             //qList.push({"statement":"MATCH (c:CYCLES_NG{releaseid:'"+newReleaseID+"'}) return c"})
 
-                                            qList.push({"statement":"MATCH (a:RELEASES_NG{releaseid:'"+newReleaseID
-                                                        +"'}),(b:CYCLES_NG {releaseid:'"+newReleaseID
-                                                        +"',deleted:'"+false+"'}) MERGE(a)-[r:FRELTCYC_NG{id:b.cycleid}]->(b) return a,r,b"})
+                                            qList.push({"statement":"MATCH (a:RELEASES_NG{releaseid:'"+newReleaseID+
+                                                        "'}),(b:CYCLES_NG {releaseid:'"+newReleaseID+
+                                                        "',deleted:'"+false+"'}) MERGE(a)-[r:FRELTCYC_NG{id:b.cycleid}]->(b) return a,r,b"});
                                             //reqToAPI(qList,urlData);
 											async.forEachSeries(cycleNames, function (cycleName, cycleNamescallback) {
 												try {
@@ -802,7 +796,7 @@ exports.createProject_ICE = function createProject_ICE(req, res) {
 					}
 				}, function (err, data) {
 					if (err) {
-						logger.error(exception);
+						logger.error(err);
 					} else {
 						logger.info("Calling neo4jAPI execute queries for createProject_ICE");
                         neo4jAPI.executeQueries(qList,function(status,result){
@@ -831,7 +825,6 @@ exports.createProject_ICE = function createProject_ICE(req, res) {
 function createCycle(args, createCycleCallback) {
 	logger.info("Inside function createCycle");
 	var statusFlag = "";
-	var cycleId="";
 	logger.info("Calling NDAC Service from createCycle:createProject_ICE");
 	client.post(epurl + "admin/createProject_ICE", args,
 		function (result, response) {
@@ -841,16 +834,16 @@ function createCycle(args, createCycleCallback) {
 				logger.error("Error occured in createProject_ICE from createCycle Error Code : ERRNDAC");
 				createCycleCallback(statusFlag, null);
 			} else {
-				newCycleID  = result.rows[0].cycleid;
+				var newCycleID  = result.rows[0].cycleid;
 				//var qList=[];
-				qList.push({"statement":"MERGE (n:CYCLES_NG {releaseid:'"+args.data.releaseid
-                +"',cyclename:'"+args.data.cyclename+"',cycleid:'"
-                +newCycleID+"',deleted:'"+false+"'}) return n"});
+				qList.push({"statement":"MERGE (n:CYCLES_NG {releaseid:'"+args.data.releaseid+
+                "',cyclename:'"+args.data.cyclename+"',cycleid:'"+
+                newCycleID+"',deleted:'"+false+"'}) return n"});
 				//Relationships
-				qList.push({"statement":"MATCH (a:RELEASES_NG{releaseid:'"+args.data.releaseid+"'}),(b:CYCLES_NG {releaseid:'"+args.data.releaseid
-                +"',cyclename:'"+args.data.cyclename+"',cycleid:'"
-                +newCycleID+"',deleted:'"+false+"'}) MERGE(a)-[r:FRELTCYC_NG{id:'"
-                +newCycleID+"'}]->(b) return a,r,b"})
+				qList.push({"statement":"MATCH (a:RELEASES_NG{releaseid:'"+args.data.releaseid+"'}),(b:CYCLES_NG {releaseid:'"+args.data.releaseid+
+                "',cyclename:'"+args.data.cyclename+"',cycleid:'"+
+                newCycleID+"',deleted:'"+false+"'}) MERGE(a)-[r:FRELTCYC_NG{id:'"+
+                newCycleID+"'}]->(b) return a,r,b"});
 
 				//statusFlag = "success";
 				//createCycleCallback(null, statusFlag);
@@ -874,25 +867,23 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 		if (isSessionActive(req)) {
 			var updateProjectDetails = req.body.updateProjectObj;
 			var userinfo = req.body.userDetails;
-			var requestedskucode = "skucode";
-			var requestedtags = "tags";
 			var flag = "";
 			var requestedprojectid = updateProjectDetails.projectId;
 			validateUpdateProject();
-
+			var valid_projectName,valid_appType, valid_projectDetails;
 			function validateUpdateProject() {
 				logger.info("Inside function validateUpdateProject");
-				check_project = validator.isEmpty(updateProjectDetails.projectName);
-				check_projectId = validator.isUUID(updateProjectDetails.projectId);
-				check_projectLen = validator.isLength(updateProjectDetails.projectName, 1, 50);
+				var check_project = validator.isEmpty(updateProjectDetails.projectName);
+				var check_projectId = validator.isUUID(updateProjectDetails.projectId);
+				var check_projectLen = validator.isLength(updateProjectDetails.projectName, 1, 50);
 				if (check_project == false && check_projectLen == true && check_projectId == true) {
 					valid_projectName = true;
 				}
-				check_appType = validator.isEmpty(updateProjectDetails.appType);
+				var check_appType = validator.isEmpty(updateProjectDetails.appType);
 				if (check_appType == false) {
 					valid_appType = true;
 				}
-				check_updateProjectDetails = validator.isJSON(JSON.stringify(updateProjectDetails));
+				var check_updateProjectDetails = validator.isJSON(JSON.stringify(updateProjectDetails));
 				if (check_updateProjectDetails == true) {
 					valid_projectDetails = true;
 				}
@@ -904,11 +895,11 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 						async.forEachSeries(projectDetails, function (eachprojectDetail, eachprojectDetailcallback) {
 							try {
 								var releaseCreateStatus = eachprojectDetail.newStatus;
+								var releaseDetails = eachprojectDetail;
+								var cycleDetails = releaseDetails.cycleDetails;
 								if (releaseCreateStatus) {
 									try {
-										var releaseDetails = eachprojectDetail;
 										var releaseName = releaseDetails.releaseName;
-										var cycleDetails = releaseDetails.cycleDetails;
 										var newReleaseID = "";
 										var inputs = {
 											"query": "createrelease",
@@ -934,22 +925,22 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 												} else {
 													newReleaseID = data.rows[0].releaseid;
                                                     //Execute neo4j query!! createrelease
-                                                    qList.push({"statement":"MERGE (n:RELEASES_NG {releaseid:'"+newReleaseID
-                                                                +"',projectid:'"+inputs.projectid+"',releasename:'"
-                                                                +inputs.releasename+"',deleted:'"+false+"'}) return n"});
+                                                    qList.push({"statement":"MERGE (n:RELEASES_NG {releaseid:'"+newReleaseID+
+                                                                "',projectid:'"+inputs.projectid+"',releasename:'"+
+                                                                inputs.releasename+"',deleted:'"+false+"'}) return n"});
                                                     //reqToAPI(qList,urlData);
                                                     //Relationships
-                                                    qList.push({"statement":"MATCH (a:PROJECTS_NG{projectid:'"+inputs.projectid+"'}),(b:RELEASES_NG {releaseid:'"+newReleaseID
-                                                                +"',projectid:'"+inputs.projectid+"',releasename:'"
-                                                                +inputs.releasename+"',deleted:'"+false+"'}) MERGE(a)-[r:FPRJTREL_NG{id:'"+newReleaseID
-                                                                +"'}]->(b) return a,r,b"})
+                                                    qList.push({"statement":"MATCH (a:PROJECTS_NG{projectid:'"+inputs.projectid+"'}),(b:RELEASES_NG {releaseid:'"+newReleaseID+
+                                                                "',projectid:'"+inputs.projectid+"',releasename:'"+
+                                                                inputs.releasename+"',deleted:'"+false+"'}) MERGE(a)-[r:FPRJTREL_NG{id:'"+newReleaseID+
+                                                                "'}]->(b) return a,r,b"});
 
                                                     //qList.push({"statement":"MATCH (c:RELEASES_NG{releaseid:'"+newReleaseID+"'}) return c"})
                                                     //qList.push({"statement":"MATCH (c:CYCLES_NG{releaseid:'"+newReleaseID+"'}) return c"})
 
-                                                    qList.push({"statement":"MATCH (a:RELEASES_NG{releaseid:'"+newReleaseID
-                                                                +"'}),(b:CYCLES_NG {releaseid:'"+newReleaseID
-                                                                +"',deleted:'"+false+"'}) MERGE(a)-[r:FRELTCYC_NG{id:b.cycleid}]->(b) return a,r,b"})
+                                                    qList.push({"statement":"MATCH (a:RELEASES_NG{releaseid:'"+newReleaseID+
+                                                                "'}),(b:CYCLES_NG {releaseid:'"+newReleaseID+
+                                                                "',deleted:'"+false+"'}) MERGE(a)-[r:FRELTCYC_NG{id:b.cycleid}]->(b) return a,r,b"});
                                                     // reqToAPI(qList,urlData);
 
 													async.forEachSeries(cycleDetails, function (eachCycleDetail, cycleNamescallback) {
@@ -997,9 +988,7 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 									try {
 										//this piece of code runs when only cycles needs to be created
 										//in a specified release
-										var releaseDetails = eachprojectDetail;
 										var releaseId = releaseDetails.releaseId;
-										var cycleDetails = releaseDetails.cycleDetails;
 										async.forEachSeries(cycleDetails, function (eachCycleDetail, cycleNamescallback) {
 											try {
 												var eachCycleName = eachCycleDetail.cycleName;
@@ -1071,9 +1060,9 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 												} else {
                                                     //Execute neo4j query!! deleterelease
                                                     //var qList=[];
-                                                    qList.push({"statement":"MATCH (n:RELEASES_NG {projectid:'"+inputs.projectid
-                                                                +"',releaseid:'"+inputs.releaseid+"',releasename:'"
-                                                                +inputs.releasename+"'}) detach delete n"});
+                                                    qList.push({"statement":"MATCH (n:RELEASES_NG {projectid:'"+inputs.projectid+
+                                                                "',releaseid:'"+inputs.releaseid+"',releasename:'"+
+                                                                inputs.releasename+"'}) detach delete n"});
                                                     //reqToAPI(qList,urlData);
 													var cyclesOfRelease = eachprojectDetail.cycleDetails;
 													async.forEachSeries(cyclesOfRelease, function (eachCycleDetail, eachCycleCallback) {
@@ -1100,9 +1089,9 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 																} else {
                                                                     //Execute neo4j query!! deletecycle
                                                                     //var qList=[];
-                                                                    qList.push({"statement":"MATCH (n:CYCLES_NG {cycleid:'"+inputs.cycleid
-                                                                                +"',releaseid:'"+inputs.releaseid+"',cyclename:'"
-                                                                                +inputs.cyclename+"'}) detach delete n"});
+                                                                    qList.push({"statement":"MATCH (n:CYCLES_NG {cycleid:'"+inputs.cycleid+
+                                                                                "',releaseid:'"+inputs.releaseid+"',cyclename:'"+
+                                                                                inputs.cyclename+"'}) detach delete n"});
                                                                     //reqToAPI(qList,urlData);
                                                                     eachCycleCallback();
 																}
@@ -1124,7 +1113,6 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 													var deleteStatusCycles = eachCycleDetail.deleteStatus;
 													if (deleteStatusCycles) {
 														try {
-															var cyclesOfRelease = eachCycleDetail.cycleDetails;
 															var inputs = {
 																"query": "deletecycle",
 																"cyclename": eachCycleDetail.cycleName,
@@ -1147,9 +1135,9 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 																} else {
                                                                     //Execute neo4j query!! deletecycle
                                                                     //var qList=[];
-                                                                    qList.push({"statement":"MATCH (n:CYCLES_NG {cycleid:'"+inputs.cycleid
-                                                                                +"',releaseid:'"+inputs.releaseid+"',cyclename:'"
-                                                                                +inputs.cyclename+"'}) detach delete n"});
+                                                                    qList.push({"statement":"MATCH (n:CYCLES_NG {cycleid:'"+inputs.cycleid+
+                                                                                "',releaseid:'"+inputs.releaseid+"',cyclename:'"+
+                                                                                inputs.cyclename+"'}) detach delete n"});
                                                                     //reqToAPI(qList,urlData);
                                                                     eachCycleCallback();
 																}
@@ -1180,10 +1168,10 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 							async.forEachSeries(projectDetails, function (eachprojectDetail, eachprojectDetailcallback) {
 								try {
 									var editedStatus = eachprojectDetail.editStatus;
+									var newReleaseName = eachprojectDetail.releaseName;
+									var releaseId = eachprojectDetail.releaseId;
 									if (editedStatus) {
 										try {
-											var newReleaseName = eachprojectDetail.releaseName;
-											var releaseId = eachprojectDetail.releaseId;
 											var inputs = {
 												"query": "deleterelease",
 												"releasename": eachprojectDetail.oldreleaseName,
@@ -1317,8 +1305,6 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 										}
 									} else {
 										try {
-											var newReleaseName = eachprojectDetail.releaseName;
-											var releaseId = eachprojectDetail.releaseId;
 											var cycleDetails = eachprojectDetail.cycleDetails;
 											var newCycleName = "";
 											var cycleId = "";
@@ -1455,21 +1441,21 @@ exports.getNames_ICE = function (req, res) {
 					if (requestedidslist[eachid] != null && requestedidslist[eachid] != undefined && requestedidslist[eachid].trim() != '') {
 						//in this block all projects under the domain is the response.
 						if (idtypes[eachid] == 'domainsall') {
-							var responsedata = {
+							responsedata = {
 								projectIds: [],
 								projectNames: []
 							};
 							namesfetcher(requestedidslist[eachid], "domainsall", function (error, response) {
 								try {
 									if (response.length <= 0) {
-										logger.info('No projects found')
+										logger.info('No projects found');
 										res.send("No Projects");
 									} else {
 										for (var i = 0; i < response.length; i++) {
 											responsedata.projectIds.push(response[i].projectid);
 											responsedata.projectNames.push(response[i].projectname);
 											if (i == response.length - 1) {
-												logger.info('Project details fetched successfully')
+												logger.info('Project details fetched successfully');
 												res.send(responsedata);
 											}
 										}
@@ -1565,7 +1551,7 @@ exports.getNames_ICE = function (req, res) {
 					function (queryStringresult, response) {
 					try {
 						if (response.statusCode != 200 || queryStringresult.rows == "fail") {
-							statusFlag = "Error occured in namesfetcher : Fail";
+							var statusFlag = "Error occured in namesfetcher : Fail";
 							logger.error("Error occured in admin/getNames_ICE from namesfetcher Error Code : ERRNDAC");
 							namesfetchercallback(statusFlag, null);
 						} else {
@@ -1689,8 +1675,8 @@ exports.getDetails_ICE = function (req, res) {
 																		function (queryGetReleaseserror, queryGetReleasesresponse) {
 																		if (queryGetReleaseserror) {
 																			try {
-																				logger.error(queryGetReleasesQueryerror);
-																				res.send(queryGetReleasesQueryerror);
+																				logger.error(queryGetReleaseserror);
+																				res.send(queryGetReleaseserror);
 																			} catch (exception) {
 																					logger.error(exception);
 																			}
@@ -1831,7 +1817,7 @@ exports.getDetails_ICE = function (req, res) {
 						function (queryStringresult, response) {
 						try {
 							if (response.statusCode != 200 || queryStringresult.rows == "fail") {
-								statusFlag = "Error occured in queryExecutor : Fail";
+								var statusFlag = "Error occured in queryExecutor : Fail";
 								logger.error("Error occured in getDetails_ICE Error Code : ERRNDAC");
 								queryExecutorcallback(statusFlag, null);
 							} else {
@@ -1877,18 +1863,19 @@ exports.assignProjects_ICE = function (req, res) {
 			}
 			var inputs = {};
 			validateAssignProjects();
+			var valid_domainId, valid_objects, valid_userId;
 			function validateAssignProjects() {
 				logger.info("Inside function validateAssignProjects");
-				check_domainId = validator.isEmpty(assignProjectsDetails.domainId);
+				var check_domainId = validator.isEmpty(assignProjectsDetails.domainId);
 				if (check_domainId == false) {
 					valid_domainId = true;
 				}
-				check_userid = validator.isUUID(assignProjectsDetails.userId);
+				var check_userid = validator.isUUID(assignProjectsDetails.userId);
 				if (check_userid == true) {
 					valid_userId = true;
 				}
-				check_userInfo = validator.isJSON(JSON.stringify(assignProjectsDetails.userInfo));
-				check_assignProjectDetails = validator.isJSON(JSON.stringify(assignProjectsDetails.userInfo));
+				var check_userInfo = validator.isJSON(JSON.stringify(assignProjectsDetails.userInfo));
+				var check_assignProjectDetails = validator.isJSON(JSON.stringify(assignProjectsDetails.userInfo));
 				if (check_userInfo == true && check_assignProjectDetails == true) {
 					valid_objects = true;
 				}
@@ -1928,15 +1915,15 @@ exports.assignProjects_ICE = function (req, res) {
 						logger.error("Error occurred in admin/assignProjects_ICE Error Code : ERRNDAC");
 						res.send("fail");
 					} else {
-                        inputs.projectids1 = "'"+inputs.projectids.join('\',\'')+"'"
+                        inputs.projectids1 = "'"+inputs.projectids.join('\',\'')+"'";
                         //Execute neo4j query!!
                         //var qList=[];
-                        qList.push({"statement":"MERGE (n:ICEPERMISSIONS_NG {userid:'"+inputs.userid
-                                    +"',domainid:'"+inputs.domainid+"'}) set n.projectids=["+inputs.projectids1+"] return n"});
+                        qList.push({"statement":"MERGE (n:ICEPERMISSIONS_NG {userid:'"+inputs.userid+
+                                    "',domainid:'"+inputs.domainid+"'}) set n.projectids=["+inputs.projectids1+"] return n"});
                         //Relationships
-                        qList.push({"statement":"MATCH (a:ICEPERMISSIONS_NG{userid:'"+inputs.userid
-                                    +"',domainid:'"+inputs.domainid+"'}),(b:DOMAINS_NG {domainid:'"
-                                    +inputs.domainid+"'}) MERGE(a)-[r:FICETDOM_NG{id:'"+inputs.domainid+"'}]->(b) return a,r,b"})
+                        qList.push({"statement":"MATCH (a:ICEPERMISSIONS_NG{userid:'"+inputs.userid+
+                                    "',domainid:'"+inputs.domainid+"'}),(b:DOMAINS_NG {domainid:'"+
+                                    inputs.domainid+"'}) MERGE(a)-[r:FICETDOM_NG{id:'"+inputs.domainid+"'}]->(b) return a,r,b"});
 
                         // MATCH p = (a:DOMAINS_NG{userid:'bced8722-1ce1-41e0-b7d3-d9a9c0bcd800'})-[r1]->(d:DOMAINS_NG) return p
 						logger.info("Calling neo4jAPI execute queries for assignProjects_ICE");
@@ -2057,7 +2044,6 @@ exports.getAssignedProjects_ICE = function (req, res) {
 
 exports.getAvailablePlugins = function (req, res) {
 	try {
-		var plugins_list = [];
 		if (isSessionActive(req)) {
 			client.post(epurl + "admin/getAvailablePlugins",
 				function (result, response) {
@@ -2080,7 +2066,7 @@ exports.generateCItoken = function (req, res) {
 	logger.info("Inside UI service: generateCItoken");
 	try {
 		if (isSessionActive(req)) {
-			var user_info={user_name:'ci_user',token:uuid()}
+			var user_info={user_name:'ci_user',token:uuid()};
 			res.send(user_info);
 		} else {
 			res.send("Invalid Session");

@@ -1,4 +1,5 @@
 var releaseName,cycleName,testSuiteName;
+var triggeredSeconds = 0;
 mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout','$location','ScheduleService','cfpLoadingBar','$compile','$interval', function ($scope, $rootScope, $http, $timeout, $location, ScheduleService, cfpLoadingBar, $compile, $interval) {
 	cfpLoadingBar.start();
 	$("body").css("background","#eee");
@@ -54,7 +55,7 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 	}, 1000)
 
 	//update scheduled table every 20 seconds
-	$interval(getScheduledDetails, 20000);
+	$interval(getScheduledDetailsInterval, 20000);
 	
 	$scope.readTestSuite_ICE = function(){
 		ScheduleService.readTestSuite_ICE(readTestSuite, "schedule")
@@ -107,12 +108,28 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 	
 	$(document).on("change", ".selectScheduleSuite", function(){
 		if($(this).is(":checked")){
-			$(this).parent().siblings(".scenarioSchdCon").find(".selectToSched").attr("disabled",false);
+			$(this).parent().siblings(".scenarioSchdCon").find(".selectToSched").attr("disabled",false).prop("checked", true);
 		}
 		else
 			$(this).parent().siblings(".scenarioSchdCon").find(".selectToSched").attr("disabled",true).prop("checked", false);
 	})
 
+	$(document).on("change", '.selectToSched', function(){
+		// var getRowCount = $(this).parents(".scenarioBody").children("tr").length;
+		var selectedCount = $(this).parents(".scenarioBody").children("tr").find(".selectToSched:checked").length
+		// if(getRowCount == selectedCount){
+			$(this).parents(".scenarioSchdCon").siblings(".scheduleSuite").find(".selectScheduleSuite").prop("checked", true);
+		//}
+		if(selectedCount == 0)
+			$(this).parents(".scenarioSchdCon").siblings(".scheduleSuite").find(".selectScheduleSuite").prop("checked", false);
+	});
+
+	//Function to get scheduled details on interval
+	function getScheduledDetailsInterval(){
+		if(Math.round(new Date() / 1000) - triggeredSeconds >= 20){
+			getScheduledDetails();
+		}
+	}
 	//Function to get scheduled details
 	function getScheduledDetails(){
 		ScheduleService.getScheduledDetails_ICE()
@@ -156,12 +173,13 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 					sortFlag == true? $(".scheduleDataHeader span:first-child").trigger("click") : 
 					changeBackground();
 					$("#scheduledSuitesFilterData").prop('selectedIndex', 0);
+					triggeredSeconds = Math.round(new Date() / 1000);
 				},100)
 			}
 		},
 		function(error) {
 			console.log(error)
-		});
+		});		
 	}
 
 	$scope.browImg = function(brow){
@@ -332,6 +350,7 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 		var doNotSchedule = false;
 		if(appType != "SAP" && browserTypeExe.length == 0)	openModelPopup("Schedule Test Suite", "Please select a browser");
 		else if($(".selectScheduleSuite:checked").length == 0) openModelPopup("Schedule Test Suite", "Please select atleast one Suite(s) to schedule");
+		else if($('.selectToSched:checked').length == 0) openModelPopup("Schedule Test Suite", "Please select atleast one scenario to schedule");
 		else{
 			if(appType == "SAP") browserTypeExe = ["1"];
 			$.each($(".batchSuite"), function(){

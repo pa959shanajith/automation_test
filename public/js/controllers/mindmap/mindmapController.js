@@ -541,4 +541,38 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         }
     }
 
+    $scope.copyMindMap = function() {
+        copyMap();
+    }
+    $scope.startCopy = function() {
+        // $('#copyImg1').toggleClass('copyEnable');
+        if($('#rect-copy').length==0){
+            $('#copyImg1').addClass('active-map');      
+            draww();
+        }
+        else{
+            $('#rect-copy').remove();
+            $('#copyImg1').removeClass('active-map');
+        }
+    }
+
+    $scope.pasteMap = function(){
+        $('#pasteImg1').toggleClass('active-map');
+        var mod = false;
+        //select a node to paste all red just available green module/scenario
+        dNodes_c.forEach(function(e,i){
+            if(e.type=='scenarios')
+                mod = true;  // then check for dangling screen
+        })
+        if(mod){
+            //add to module
+            $('[data-nodetype=modules]').addClass('node-selected');            
+        }
+        else{
+            //highlight scenarios
+            $('[data-nodetype=scenarios]').addClass('node-selected');
+        }
+    }
+
+
 }]);

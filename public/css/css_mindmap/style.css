@@ -628,3 +628,34 @@ select
 .export-icon{
     padding-left: 7px;
 }
+#copy-paste{
+    display: inline-block;
+    white-space: nowrap;
+    padding-right: 7px;
+    padding-left: 7px;
+}
+ #rect-copy {
+    width: 150px;
+    height: 150px;
+    padding: 0.5em;
+    position: absolute;
+    top: 150px;
+    left: 200px;
+    border: 1px solid blue;     
+}
+
+.node-selected{
+    outline: 1px dashed blue;
+}
+
+.node-error{
+    outline: 2px dashed red;
+}
+
+.link-selected{
+    stroke: blue;
+}
+
+.active-map {
+    color: #983fd3;
+}

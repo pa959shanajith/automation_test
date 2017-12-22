@@ -1,15 +1,17 @@
 /**
  * Dependencies.
  */
-var bcrypt = require('bcrypt');
 var async = require('async');
+var bcrypt = require('bcrypt');
+var validator = require('validator');
+var activeDirectory = require('activedirectory');
 var epurl = "http://"+process.env.NDAC_IP+":"+process.env.NDAC_PORT+"/";
 var Client = require("node-rest-client").Client;
 var client = new Client();
-var validator = require('validator');
 var myserver = require('../../server');
 var logger = require('../../logger');
 var notificationMsg = require("../notifications/notifyMessages");
+var config = require('../../server/config/config');
 
 function isSessionActive(req){
 	var sessionToken = req.session.uniqueId;
@@ -24,15 +26,16 @@ exports.authenticateUser_Nineteen68 = function (req, res) {
 		var password = req.body.password;
 		var sessId = req.session.id;
 
+		var valid_username, valid_password;
 		validateLogin();
 		function validateLogin() {
-			check_username = validator.isEmpty(username);
-			check_usernameLen = validator.isLength(username, 1, 50);
+			var check_username = validator.isEmpty(username);
+			var check_usernameLen = validator.isLength(username, 1, 50);
 			if (check_username == false && check_usernameLen == true) {
 				valid_username = true;
 			}
-			check_password = validator.isEmpty(password);
-			check_passwordLen = validator.isLength(password, 1, 12);
+			var check_password = validator.isEmpty(password);
+			var check_passwordLen = validator.isLength(password, 1, 12);
 			if (check_password == false && check_passwordLen == true) {
 				valid_password = true;
 			}
@@ -99,7 +102,7 @@ exports.authenticateUser_Nineteen68 = function (req, res) {
 										res.send(flag);
 									} else {
 										//Check whether projects are assigned for a user
-										checkAssignedProjects(req, username,
+										checkAssignedProjects(username,
 											function checkAssignedProjects_callback(err, assignedProjectsData, role) {
 											if(err == 'fail') {
 												logger.error("Error occured in authenticateUser_Nineteen68 Error Code : ERRNDAC");
@@ -221,15 +224,16 @@ exports.authenticateUser_Nineteen68_CI = function (req, res) {
 				"Content-Type": "application/json"
 			}
 		};
+		var userid, assignedProjects, valid_username, valid_password;
 		validateLogin();
 		function validateLogin() {
-			check_username = validator.isEmpty(username);
-			check_usernameLen = validator.isLength(username, 1, 50);
+			var check_username = validator.isEmpty(username);
+			var check_usernameLen = validator.isLength(username, 1, 50);
 			if (check_username == false && check_usernameLen == true) {
 				valid_username = true;
 			}
-			check_password = validator.isEmpty(password);
-			check_passwordLen = validator.isLength(password, 1, 12);
+			var check_password = validator.isEmpty(password);
+			var check_passwordLen = validator.isLength(password, 1, 12);
 			if (check_password == false && check_passwordLen == true) {
 				valid_password = true;
 			}
@@ -287,7 +291,7 @@ exports.authenticateUser_Nineteen68_CI = function (req, res) {
 									var dbHashedPassword = result.rows[0].password;
 									var userid = result.rows[0].userid;
 									var validUser = bcrypt.compareSync(password, dbHashedPassword); // true
-									checkAssignedProjects(req, username, function (err, assignedProjectsData, role) {
+									checkAssignedProjects(username, function (err, assignedProjectsData, role) {
 										logger.info("Inside function call of checkAssignedProjects");
 										if (role != "Admin" && role != "Business Analyst" && role != "Tech Lead") {
 											if (assignedProjectsData > 0) {
@@ -378,10 +382,11 @@ exports.authenticateUser_Nineteen68_CI = function (req, res) {
  * @see : function to check whether projects are assigned for user
  * @author : vinay
  */
-function checkAssignedProjects(req, username, callback, data) {
+function checkAssignedProjects(username, callback, data) {
 	logger.info("Inside checkAssignedProjects function");
-	userid = '';
+	var userid = '';
 	var roleid = '';
+	var rolename;
 	var assignedProjectsLen = '';
 	var flag = 'fail';
 	async.series({
@@ -528,7 +533,6 @@ function checkldapuser(req, username, callback, data) {
 
 function ldapCheck(req, cb) {
 	logger.info("Inside ldapCheck function");
-	var config = require('../../server/config/config');
 	var ldap_ip = '',
 	ldap_port = '',
 	ldap_domain = '';
@@ -549,8 +553,7 @@ function ldapCheck(req, cb) {
 	} catch (ex) {
 		logger.error(ex);
 	}
-	var ActiveDirectory = require('activedirectory');
-	var ad = new ActiveDirectory({
+	var ad = new activeDirectory({
 			url: 'ldap://' + ldap_ip + ':' + ldap_port,
 			baseDN: dcstringarr.toString()
 		});
@@ -577,16 +580,13 @@ exports.loadUserInfo_Nineteen68 = function (req, res) {
 		if (isSessionActive(req)) {
 			var flag = req.body.flag;
 			var switchedRole = req.body.selRole;
-			if(switchedRole != undefined && switchedRole != '' )
-			{
+			if(switchedRole != undefined && switchedRole != '' ) {
 				req.session.switchedRole = true;
-			}
-			else{
+			} else{
 				req.session.switchedRole = false;
 			}
-			userName = req.session.username.toLowerCase();
-			jsonService = {};
-			userpermissiondetails = [];
+			var userName = req.session.username.toLowerCase();
+			var jsonService = {};
 			async.series({
 				userInfo: function (callback) {
 					try {
@@ -610,10 +610,8 @@ exports.loadUserInfo_Nineteen68 = function (req, res) {
 							} else {
 								try {
 									if (userResult.rows.length > 0) {
-										AlljsonServices = [];
-										service = userResult.rows[0];
-										userId = service.userid;
-										jsonService.user_id = userId;
+										var service = userResult.rows[0];
+										jsonService.user_id = service.userid;
 										jsonService.email_id = service.emailid;
 										jsonService.additionalrole = service.additionalroles;
 										jsonService.firstname = service.firstname;
@@ -720,19 +718,14 @@ exports.loadUserInfo_Nineteen68 = function (req, res) {
 								try {
 									if (pluginResult.rows.length > 0) {
 										var pluginsArr = [];
-										// var count = 0;
 										for (var k in pluginResult.rows[0]) {
-											// if(count < pluginResult.columns.length){
 											if (k != 'roleid' && k != 'permissionid') {
 												pluginsArr.push({
 													"keyName": k,
 													"keyValue": (pluginResult.rows[0])[k]
 												});
 											}
-											//     count++;
-											// }
 										}
-										//userpermissiondetails.push(pluginResult.rows[0]);
 										jsonService.plugindetails = pluginsArr;
 									} else {
 										logger.info("User plugins not found");
@@ -844,7 +837,7 @@ exports.getRoleNameByRoleId_Nineteen68 = function (req, res) {
 exports.logoutUser_Nineteen68_CI = function (req, res) {
 	logger.info("Inside UI Service: logoutUser_Nineteen68_CI");
 	if (req.sessionStore.sessions != undefined) {
-		session_list = req.sessionStore.sessions;
+		var session_list = req.sessionStore.sessions;
 		if (Object.keys(session_list).length != 0) {
 			logger.info("user logged out successfully");
 			req.sessionStore.clear();
