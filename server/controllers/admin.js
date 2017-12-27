@@ -42,7 +42,7 @@ exports.getUserRoles_Nineteen68 = function (req, res) {
 						logger.info("User Roles fetched successfully");
 						res.send(userRoles);
 					} catch (exception) {
-						logger.error(exception);
+						logger.error(exception.message);
 						res.send("fail");
 					}
 				}
@@ -52,7 +52,7 @@ exports.getUserRoles_Nineteen68 = function (req, res) {
 			res.send("Invalid Session");
 		}
 	} catch (exception) {
-		logger.error(exception);
+		logger.error(exception.message);
 		res.send("fail");
 	}
 };
@@ -145,7 +145,7 @@ exports.getAllUsers_Nineteen68 = function (req, res) {
 				res.send("fail");
 		}
 	} catch (exception) {
-		logger.error(exception);
+		logger.error(exception.message);
 		res.send("fail");
 	}
 };
@@ -186,7 +186,7 @@ exports.getEditUsersInfo_Nineteen68 = function (req, res) {
 						res.send(userDetails);
 					}
 				} catch (exception) {
-					logger.error(exception);
+					logger.error(exception.message);
 					res.send(null,"fail");
 				}
 			});
@@ -195,7 +195,7 @@ exports.getEditUsersInfo_Nineteen68 = function (req, res) {
 			res.send("Invalid Session");
 		}
 	} catch (exception) {
-		logger.error(exception);
+		logger.error(exception.message);
 	}
 };
 
@@ -337,7 +337,7 @@ exports.createUser_Nineteen68 = function (req, res) {
 										logger.info("User created successfully");
 										res.send(flag);
 									} catch (exception) {
-										logger.error(exception);
+										logger.error(exception.message);
 										res.send(flag);
 									}
 								});
@@ -347,7 +347,7 @@ exports.createUser_Nineteen68 = function (req, res) {
 								res.send(flag);
 							}
 						} catch (exception) {
-							logger.error(exception);
+							logger.error(exception.message);
 							res.send(flag);
 						}
 					}
@@ -360,7 +360,7 @@ exports.createUser_Nineteen68 = function (req, res) {
 			res.send("Invalid Session");
 		}
 	} catch (exception) {
-		logger.error(exception);
+		logger.error(exception.message);
 		res.send("fail");
 	}
 };
@@ -512,13 +512,13 @@ exports.updateUser_nineteen68 = function updateUser_nineteen68(req, res) {
 										res.send(flag);
 									}
 								} catch (exception) {
-									logger.error(exception);
+									logger.error(exception.message);
 									res.send(flag);
 								}
 							});
 						}
 					} catch (exception) {
-						logger.error(exception);
+						logger.error(exception.message);
 						res.send(flag);
 					}
 				});
@@ -530,7 +530,7 @@ exports.updateUser_nineteen68 = function updateUser_nineteen68(req, res) {
 			res.send("Invalid Session");
 		}
 	} catch (exception) {
-		logger.error(exception);
+		logger.error(exception.message);
 		res.send("fail");
 	}
 };
@@ -567,12 +567,12 @@ exports.getDomains_ICE = function getDomains_ICE(req, res) {
 									responsedata.push(reponseobj);
 									domainscallback();
 								} catch (exception) {
-									logger.error(exception);
+									logger.error(exception.message);
 								}
 							}, finalresult);
 						}
 					} catch (exception) {
-					logger.error(exception);
+					logger.error(exception.message);
 					}
 				});
 			} else {
@@ -587,7 +587,7 @@ exports.getDomains_ICE = function getDomains_ICE(req, res) {
 			res.send("Invalid Session");
 		}
 	} catch (exception) {
-		logger.error(exception);
+		logger.error(exception.message);
 		res.send("fail");
 	}
 };
@@ -653,11 +653,11 @@ exports.createProject_ICE = function createProject_ICE(req, res) {
 									}
 									callback();
 								} catch (exception) {
-									logger.error(exception);
+									logger.error(exception.message);
 								}
 							});
 						} catch (exception) {
-							logger.error(exception);
+							logger.error(exception.message);
 						}
 					},
 					createproject: function (callback) {
@@ -698,7 +698,7 @@ exports.createProject_ICE = function createProject_ICE(req, res) {
 								}
 							});
 						} catch (exception) {
-							logger.error(exception);
+							logger.error(exception.message);
 						}
 					},
 					createreleases: function (callback) {
@@ -775,23 +775,23 @@ exports.createProject_ICE = function createProject_ICE(req, res) {
 																cycleNamescallback();
 															}
 														} catch (exception) {
-															logger.error(exception);
+															logger.error(exception.message);
 														}
 													});
 												} catch (exception) {
-													logger.error(exception);
+													logger.error(exception.message);
 												}
 											}, numberOfReleasescallback);
 										}
 									});
 								} catch (exception) {
-									logger.error(exception);
+									logger.error(exception.message);
 								}
 							}, callback(null, ""));
 							logger.info("Project created successfully");
 							res.send('success');
 						} catch (exception) {
-							logger.error(exception);
+							logger.error(exception.message);
 						}
 					}
 				}, function (err, data) {
@@ -818,7 +818,7 @@ exports.createProject_ICE = function createProject_ICE(req, res) {
 			res.send("Invalid Session");
 		}
 	} catch (exception) {
-		logger.error(exception);
+		logger.error(exception.message);
 	}
 };
 
@@ -851,7 +851,7 @@ function createCycle(args, createCycleCallback) {
 				logger.info("Cycle created for project successfully");
 			}
 		} catch (exception) {
-			logger.error(exception);
+			logger.error(exception.message);
 		}
 	});
 }
@@ -968,21 +968,21 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 																	try {
 																		cycleNamescallback();
 																	} catch (exception) {
-																		logger.error(exception);
+																		logger.error(exception.message);
 																	}
 																}
 															});
 														} catch (exception) {
-															logger.error(exception);
+															logger.error(exception.message);
 														}
 													}, eachprojectDetailcallback);
 												}
 											} catch (exception) {
-											logger.error(exception);
+											logger.error(exception.message);
 											}
 										});
 									} catch (exception) {
-										logger.error(exception);
+										logger.error(exception.message);
 									}
 								} else {
 									try {
@@ -1013,20 +1013,20 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 														try {
 															cycleNamescallback();
 														} catch (exception) {
-															logger.error(exception);
+															logger.error(exception.message);
 														}
 													}
 												});
 											} catch (exception) {
-												logger.error(exception);
+												logger.error(exception.message);
 											}
 										}, eachprojectDetailcallback);
 									} catch (exception) {
-										logger.error(exception);
+										logger.error(exception.message);
 									}
 								}
 							} catch (exception) {
-								logger.error(exception);
+								logger.error(exception.message);
 							}
 						}, newProjectDetailsCallback);
 					},
@@ -1097,12 +1097,12 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 																}
 															});
 														} catch (exception) {
-															logger.error(exception);
+															logger.error(exception.message);
 														}
 													}, eachprojectDetailcallback);
 												}
 											} catch (exception) {
-												logger.error(exception);
+												logger.error(exception.message);
 											}
 										});
 									} else if (!deleteStatus) {
@@ -1143,23 +1143,23 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 																}
 															});
 														} catch (exception) {
-															logger.error(exception);
+															logger.error(exception.message);
 														}
 													}
 												} catch (exception) {
-													logger.error(exception);
+													logger.error(exception.message);
 												}
 											}, eachprojectDetailcallback);
 										} catch (exception) {
-											logger.error(exception);
+											logger.error(exception.message);
 										}
 									}
 								} catch (exception) {
-									logger.error(exception);
+									logger.error(exception.message);
 								}
 							}, deletedProjectDetailsCallback);
 						} catch (exception) {
-								logger.error(exception);
+								logger.error(exception.message);
 						}
 					},
 					editedProjectDetails: function (editedProjectDetailsCallback) {
@@ -1273,35 +1273,35 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 																										}
 																									});
 																								} catch (exception) {
-																									logger.error(exception);
+																									logger.error(exception.message);
 																								}
 																							}
 																						});
 																					} catch (exception) {
-																						logger.error(exception);
+																						logger.error(exception.message);
 																					}
 																				} else {
 																					eachCycleCallback();
 																				}
 																			} catch (exception) {
-																				logger.error(exception);
+																				logger.error(exception.message);
 																			}
 																		}, eachprojectDetailcallback);
 																	} catch (exception) {
-																		logger.error(exception);
+																		logger.error(exception.message);
 																	}
 																}
 															});
 														} catch (exception) {
-																logger.error(exception);
+																logger.error(exception.message);
 														}
 													}
 												} catch (exception) {
-													logger.error(exception);
+													logger.error(exception.message);
 												}
 											});
 										} catch (exception) {
-												logger.error(exception);
+												logger.error(exception.message);
 										}
 									} else {
 										try {
@@ -1360,30 +1360,30 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 																			}
 																		});
 																	} catch (exception) {
-																			logger.error(exception);
+																			logger.error(exception.message);
 																	}
 																}
 															});
 														} catch (exception) {
-															logger.error(exception);
+															logger.error(exception.message);
 														}
 													} else {
 														eachCycleCallback();
 													}
 												} catch (exception) {
-													logger.error(exception);
+													logger.error(exception.message);
 												}
 											}, eachprojectDetailcallback);
 										} catch (exception) {
-											logger.error(exception);
+											logger.error(exception.message);
 										}
 									}
 								} catch (exception) {
-									logger.error(exception);
+									logger.error(exception.message);
 								}
 							}, editedProjectDetailsCallback);
 						} catch (exception) {
-							logger.error(exception);
+							logger.error(exception.message);
 						}
 					}
 				}, function (error, response) {
@@ -1414,7 +1414,7 @@ exports.updateProject_ICE = function updateProject_ICE(req, res) {
 			res.send("Invalid Session");
 		}
 	} catch (exception) {
-		logger.error(exception);
+		logger.error(exception.message);
 	}
 };
 
@@ -1461,7 +1461,7 @@ exports.getNames_ICE = function (req, res) {
 										}
 									}
 								} catch (exception) {
-									logger.error(exception);
+									logger.error(exception.message);
 								}
 							});
 						} else if (idtypes[eachid] == 'projects') {
@@ -1475,7 +1475,7 @@ exports.getNames_ICE = function (req, res) {
 										res.send(responsedata);
 									}
 								} catch (exception) {
-									logger.error(exception);
+									logger.error(exception.message);
 								}
 							});
 						} else if (idtypes[eachid] == 'releases') {
@@ -1490,7 +1490,7 @@ exports.getNames_ICE = function (req, res) {
 										res.send(responsedata);
 									}
 								} catch (exception) {
-									logger.error(exception);
+									logger.error(exception.message);
 								}
 							});
 						} else if (idtypes[eachid] == 'cycles') {
@@ -1505,7 +1505,7 @@ exports.getNames_ICE = function (req, res) {
 										res.send(responsedata);
 									}
 								} catch (exception) {
-									logger.error(exception);
+									logger.error(exception.message);
 								}
 							});
 						} else if (idtypes[eachid] == 'screens') {
@@ -1519,7 +1519,7 @@ exports.getNames_ICE = function (req, res) {
 										res.send(responsedata);
 									}
 								} catch (exception) {
-									logger.error(exception);
+									logger.error(exception.message);
 								}
 							});
 						} else {
@@ -1559,7 +1559,7 @@ exports.getNames_ICE = function (req, res) {
 							namesfetchercallback(null, queryStringresult.rows);
 						}
 					} catch (exception) {
-						logger.error(exception);
+						logger.error(exception.message);
 					}
 				});
 			}
@@ -1568,7 +1568,7 @@ exports.getNames_ICE = function (req, res) {
 			res.send("Invalid Session");
 		}
 	} catch (exception) {
-		logger.error(exception);
+		logger.error(exception.message);
 	}
 };
 
@@ -1609,7 +1609,7 @@ exports.getDetails_ICE = function (req, res) {
 												logger.error("Error occured in getDetails_ICE_domaindetails");
 												res.send("Error in getDetails_ICE_domaindetails : Fail");
 											} catch (exception) {
-												logger.error(exception);
+												logger.error(exception.message);
 											}
 										} else {
 											try {
@@ -1623,18 +1623,18 @@ exports.getDetails_ICE = function (req, res) {
 															try {
 																res.send(responsedatadomains);
 															} catch (exception) {
-																logger.error(exception);
+																logger.error(exception.message);
 															}
 														}
 													}
 												}
 											} catch (exception) {
-												logger.error(exception);
+												logger.error(exception.message);
 											}
 										}
 									});
 								} catch (exception) {
-										logger.error(exception);
+										logger.error(exception.message);
 								}
 							} else if (idtypes[eachid] == 'projectsdetails') {
 								try {
@@ -1651,7 +1651,7 @@ exports.getDetails_ICE = function (req, res) {
 												logger.error(queryForProjectTypeIderror);
 												res.send(queryForProjectTypeIderror);
 											} catch (exception) {
-												logger.error(exception);
+												logger.error(exception.message);
 											}
 										} else {
 											try {
@@ -1665,7 +1665,7 @@ exports.getDetails_ICE = function (req, res) {
 																logger.error(queryForProjectTypeerror);
 																res.send(queryForProjectTypeerror);
 															} catch (exception) {
-																logger.error(exception);
+																logger.error(exception.message);
 															}
 														} else {
 															try {
@@ -1678,7 +1678,7 @@ exports.getDetails_ICE = function (req, res) {
 																				logger.error(queryGetReleaseserror);
 																				res.send(queryGetReleaseserror);
 																			} catch (exception) {
-																					logger.error(exception);
+																					logger.error(exception.message);
 																			}
 																		} else {
 																			var releaseindex = 0;
@@ -1694,7 +1694,7 @@ exports.getDetails_ICE = function (req, res) {
 																									logger.error(queryGetCycleserror);
 																									res.send(queryGetCycleserror);
 																								} catch (exception) {
-																									logger.error(exception);
+																									logger.error(exception.message);
 																								}
 																							} else {
 																								try {
@@ -1713,7 +1713,7 @@ exports.getDetails_ICE = function (req, res) {
 																											cycleDetails.push(eachCycleObject);
 																											cyclecallback();
 																										} catch (exception) {
-																												logger.error(exception);
+																												logger.error(exception.message);
 																										}
 																									});
 																									eachProjectDetail.releaseName = eachRelease.releasename;
@@ -1723,35 +1723,35 @@ exports.getDetails_ICE = function (req, res) {
 																										finalDataReturn();
 																									}
 																								} catch (exception) {
-																										logger.error(exception);
+																										logger.error(exception.message);
 																								}
 																							}
 																							releasecallback();
 																						} catch (exception) {
-																								logger.error(exception);
+																								logger.error(exception.message);
 																						}
 																					});
 																					responsedata.projectDetails.push(eachProjectDetail);
 																				} catch (exception) {
-																						logger.error(exception);
+																						logger.error(exception.message);
 																				}
 																			});
 																		}
 																	});
 																}
 															} catch (exception) {
-																logger.error(exception);
+																logger.error(exception.message);
 															}
 														}
 													});
 												}
 											} catch (exception) {
-												logger.error(exception);
+												logger.error(exception.message);
 											}
 										}
 									});
 								} catch (exception) {
-									logger.error(exception);
+									logger.error(exception.message);
 								}
 							} else if (idtypes[eachid] == 'cycledetails') {
 								responsedata = {
@@ -1765,7 +1765,7 @@ exports.getDetails_ICE = function (req, res) {
 											logger.error("Error occured in getDetails_ICE_cycledetails");
 											res.send("Error in getDetails_ICE_cycledetails : Fail");
 										} catch (exception) {
-											logger.error(exception);
+											logger.error(exception.message);
 										}
 									} else {
 										async.forEachSeries(response, function (eachtestSuiteDetails, testsuiteCallback) {
@@ -1774,7 +1774,7 @@ exports.getDetails_ICE = function (req, res) {
 												responsedata.testsuiteNames.push(eachtestSuiteDetails.testsuitename);
 												testsuiteCallback();
 											} catch (exception) {
-												logger.error(exception);
+												logger.error(exception.message);
 											}
 										});
 										finalDataReturn();
@@ -1785,18 +1785,18 @@ exports.getDetails_ICE = function (req, res) {
 								try {
 									res.send("fail");
 								} catch (exception) {
-									logger.error(exception);
+									logger.error(exception.message);
 								}
 							}
 						}
 					} catch (exception) {
-						logger.error(exception);
+						logger.error(exception.message);
 					}
 				} else {
 					try {
 						res.send("fail");
 					} catch (exception) {
-						logger.error(exception);
+						logger.error(exception.message);
 					}
 				}
 				function queryExecutor(id, query, subquery, queryExecutorcallback) {
@@ -1825,7 +1825,7 @@ exports.getDetails_ICE = function (req, res) {
 								queryExecutorcallback(null, queryStringresult.rows);
 							}
 						} catch (exception) {
-							logger.error(exception);
+							logger.error(exception.message);
 						}
 					});
 				}
@@ -1834,7 +1834,7 @@ exports.getDetails_ICE = function (req, res) {
 					try {
 						res.send(responsedata);
 					} catch (exception) {
-						logger.error(exception);
+						logger.error(exception.message);
 					}
 				}
 			} else {
@@ -1842,7 +1842,7 @@ exports.getDetails_ICE = function (req, res) {
 				res.send("Invalid Session");
 			}
 		} catch (exception) {
-				logger.error(exception);
+				logger.error(exception.message);
 		}
 	} else {
 		res.send('fail');
@@ -1948,7 +1948,7 @@ exports.assignProjects_ICE = function (req, res) {
 			res.send("Invalid Session");
 		}
 	} catch (exception) {
-		logger.error(exception);
+		logger.error(exception.message);
 		res.send("fail");
 	}
 };
@@ -2012,12 +2012,12 @@ exports.getAssignedProjects_ICE = function (req, res) {
 											assignProjectCallback();
 										}
 									} catch (exception) {
-										logger.error(exception);
+										logger.error(exception.message);
 										res.send("fail");
 									}
 								});
 							} catch (exception) {
-								logger.error(exception);
+								logger.error(exception.message);
 								res.send("fail");
 							}
 						}, finalfunction);
@@ -2028,7 +2028,7 @@ exports.getAssignedProjects_ICE = function (req, res) {
 						res.send(assignedProjObj);
 					}
 				} catch (exception) {
-					logger.error(exception);
+					logger.error(exception.message);
 					res.send("fail");
 				}
 			});
@@ -2037,7 +2037,7 @@ exports.getAssignedProjects_ICE = function (req, res) {
 			res.send("Invalid Session");
 		}
 	} catch (exception) {
-		logger.error(exception);
+		logger.error(exception.message);
 		res.send("fail");
 	}
 };

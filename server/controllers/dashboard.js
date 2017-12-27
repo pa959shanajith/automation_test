@@ -41,7 +41,7 @@ function isSessionActive(req, res){
             try{
               response.pipe(res);
             }catch(exception){
-                logger.error(exception);
+                logger.error(exception.message);
               res.send("fail");
             }
           }
@@ -264,7 +264,7 @@ function isSessionActive(req, res){
               })
             });
           }catch(exception){
-            logger.error(exception);
+            logger.error(exception.message);
             res.send("fail");
           }
         });
@@ -303,7 +303,7 @@ function isSessionActive(req, res){
             try{
               response.pipe(res);
             }catch(exception){
-              logger.error(exception);
+              logger.error(exception.message);
               res.send("fail");
             }
           }

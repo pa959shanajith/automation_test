@@ -151,7 +151,7 @@ exports.authenticateUser_Nineteen68 = function (req, res) {
 									}
 								}
 							} catch (exception) {
-								logger.error(exception);
+								logger.error(exception.message);
 								res.send("fail");
 							}
 						}
@@ -188,7 +188,7 @@ exports.authenticateUser_Nineteen68 = function (req, res) {
 			res.send("fail");
 		}
 	} catch (exception) {
-		logger.error(exception);
+		logger.error(exception.message);
 		res.send("fail");
 	}
 };
@@ -352,7 +352,7 @@ exports.authenticateUser_Nineteen68_CI = function (req, res) {
 									});
 								}
 							} catch (exception) {
-								logger.error(exception);
+								logger.error(exception.message);
 								res.setHeader('set-cookie', sessId);
 								res.writeHead(500, {
 									'Content-Type': 'text/plain'
@@ -368,7 +368,7 @@ exports.authenticateUser_Nineteen68_CI = function (req, res) {
 			res.send('fail');
 		}
 	} catch (exception) {
-		logger.error(exception);
+		logger.error(exception.message);
 		res.setHeader('set-cookie', sessId);
 		res.writeHead(500, {
 			'Content-Type': 'text/plain'
@@ -439,7 +439,7 @@ function checkAssignedProjects(username, callback, data) {
 					}
 				});
 			} catch (exception) {
-				logger.error(exception);
+				logger.error(exception.message);
 				callback(flag);
 			}
 		},
@@ -472,7 +472,7 @@ function checkAssignedProjects(username, callback, data) {
 					}
 				});
 			} catch (exception) {
-				logger.error(exception);
+				logger.error(exception.message);
 				callback(flag);
 			}
 		},
@@ -485,7 +485,7 @@ function checkAssignedProjects(username, callback, data) {
 				callback(null, assignedProjectsLen, rolename);
 			}
 		} catch (exception) {
-			logger.error(exception);
+			logger.error(exception.message);
 			callback(flag);
 		}
 	});
@@ -524,7 +524,7 @@ function checkldapuser(req, username, callback, data) {
 					callback(null, flag);
 				}
 			} catch (exception) {
-				logger.error(exception);
+				logger.error(exception.message);
 				callback(null, flag);
 			}
 		}
@@ -624,14 +624,14 @@ exports.loadUserInfo_Nineteen68 = function (req, res) {
 										res.send("fail");
 									}
 								} catch (exception) {
-									logger.error(exception);
+									logger.error(exception.message);
 									res.send("fail");
 								}
 							}
 							callback();
 						});
 					} catch (exception) {
-						logger.error(exception);
+						logger.error(exception.message);
 						res.send("fail");
 					}
 				},
@@ -674,13 +674,13 @@ exports.loadUserInfo_Nineteen68 = function (req, res) {
 										}
 										req.session.defaultRole = role;
 									} catch (exception) {
-										logger.error(exception);
+										logger.error(exception.message);
 										res.send("fail");
 									}
 								}
 								callback();
 							} catch (exception) {
-								logger.error(exception);
+								logger.error(exception.message);
 								res.send("fail");
 							}
 						}
@@ -732,14 +732,14 @@ exports.loadUserInfo_Nineteen68 = function (req, res) {
 										res.send("fail");
 									}
 								} catch (exception) {
-									logger.error(exception);
+									logger.error(exception.message);
 									res.send("fail");
 								}
 							}
 							callback();
 						});
 					} catch (exception) {
-						logger.error(exception);
+						logger.error(exception.message);
 						res.send("fail");
 					}
 				}
@@ -756,7 +756,7 @@ exports.loadUserInfo_Nineteen68 = function (req, res) {
 			res.send("Invalid Session");
 		}
 	} catch (exception) {
-		logger.error(exception);
+		logger.error(exception.message);
 		res.send("fail");
 	}
 };
@@ -801,13 +801,13 @@ exports.getRoleNameByRoleId_Nineteen68 = function (req, res) {
 									}
 									// res.send(role);
 								} catch (exception) {
-									logger.error(exception);
+									logger.error(exception.message);
 									res.send("fail");
 								}
 								callback();
 							}
 						} catch (exception) {
-							logger.error(exception);
+							logger.error(exception.message);
 							res.send("fail");
 						}
 					}
@@ -825,7 +825,7 @@ exports.getRoleNameByRoleId_Nineteen68 = function (req, res) {
 			res.send("Invalid Session");
 		}
 	} catch (exception) {
-		logger.error(exception);
+		logger.error(exception.message);
 		res.send("fail");
 	}
 };

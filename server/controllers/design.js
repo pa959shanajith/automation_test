@@ -442,7 +442,7 @@ exports.updateScreen_ICE = function (req, res) {
 													logger.info("Calling function parseRequest from the service updateScreen_ICE: updateScrapeData_ICE");
 													parseRequest(baseRequestBody);
 												} catch (exception) {
-													logger.error(exception);
+													logger.error(exception.message);
 												}
 												for (var populationindex = 0; populationindex < allXpaths.length; populationindex++) {
 													var scrapedObjectsWS = {};

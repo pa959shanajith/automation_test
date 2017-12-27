@@ -96,14 +96,14 @@ exports.Encrypt_ICE = function getDomains_ICE(req, res) {
 						});
 
 					}catch(exception){
-						logger.error(exception);
+						logger.error(exception.message);
 						res.send("fail");
 					}
 				}else if(methodSelected == "MD5"){
 					try{
 						encryptedValue = crypto.createHash('md5').update(encrytData).digest("hex");
 					} catch(exception){
-						logger.error(exception);
+						logger.error(exception.message);
 						res.send("fail");
 					}
 						logger.info("Data encrypted successfully");
@@ -113,7 +113,7 @@ exports.Encrypt_ICE = function getDomains_ICE(req, res) {
 						var buffer = new Buffer(encrytData);
 						var encryptedValue = buffer.toString('base64');
 					} catch(exception){
-					    logger.error(exception);
+					    logger.error(exception.message);
 						res.send("fail");
 					}
 					logger.info("Data encrypted successfully");
@@ -123,7 +123,7 @@ exports.Encrypt_ICE = function getDomains_ICE(req, res) {
 				}
 			} 
 			catch(exception){
-				logger.error(exception);
+				logger.error(exception.message);
 			} }else{
 				res.send("fail");
 			}
@@ -132,7 +132,7 @@ exports.Encrypt_ICE = function getDomains_ICE(req, res) {
 			res.send("Invalid Session");
 		}
 	}catch (exception) {
-		logger.error(exception);
+		logger.error(exception.message);
 		res.send("fail");
 	}
 };

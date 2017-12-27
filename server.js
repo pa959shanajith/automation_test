@@ -22,7 +22,8 @@ if (cluster.isMaster) {
         }
     });
 
-} else {
+} 
+else {
     
 try {
     var express = require('express');
@@ -54,6 +55,7 @@ try {
     var credentials = {
         key: privateKey,
         cert: certificate,
+        secureOptions: require('constants').SSL_OP_NO_TLSv1 | require('constants').SSL_OP_NO_SSLv3,
         ciphers: [
             "ECDHE-RSA-AES256-SHA384",
             "DHE-RSA-AES256-SHA384",
@@ -118,7 +120,6 @@ try {
         maxAge: ninetyDaysInSeconds,
         sha256s: ['AbCdEf123=', 'ZyXwVu456=']
     }));
-
     app.use(helmet.noCache());
 
     //Role Based User Access to services
@@ -192,6 +193,8 @@ try {
 
     app.get('/',  function (req,  res)  {
         res.clearCookie('connect.sid');
+        res.clearCookie('io');
+        res.clearCookie('mm_pid');
         req.session.destroy();
         logger.rewriters.push(function (level, msg, meta) {
             meta.username = null;
@@ -474,6 +477,9 @@ try {
         };
         next();
     });
+app.use(function(err, req, res, next) {
+    res.send(err.message);
+});
 } catch (e) {
     logger.error(e);
     setTimeout(function () {

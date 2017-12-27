@@ -180,7 +180,7 @@ exports.getReportData = function(req, res){
 					}
 				catch(exception){
 					//console.log(exception);
-					logger.error(exception);
+					logger.error(exception.message);
 					res.send("fail");
 				}
 			});
@@ -191,7 +191,7 @@ exports.getReportData = function(req, res){
 		}
 	}
 	catch(exception){
-		logger.error(exception);
+		logger.error(exception.message);
 		res.send({"err":true,"ecode":"FAIL","msg":"Internal Error! Please contact admin"});
 	}
 };
