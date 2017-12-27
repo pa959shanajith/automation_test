@@ -73,7 +73,10 @@ function loadMindmapData(param) {
             $(".project-list").change(function() {
                 //Mindmap clear search box on selecting different project
                 dNodes_c = [] //Copied data should be cleared
-                dLinks_c = [] // on change of project list
+                dLinks_c = [] // on change of projet list
+                $('.fa.fa-pencil-square-o.fa-lg.plus-icon').removeClass('active-map');
+                $('#rect-copy').remove();
+                $('.fa.fa-clipboard.fa-lg.plus-icon').removeClass('active-map');
                 $('#searchModule-create').val('');
                 $('#searchModule-assign').val('');
                 selectedProject = $(".project-list").val();
