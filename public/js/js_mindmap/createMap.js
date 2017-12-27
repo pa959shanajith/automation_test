@@ -327,6 +327,8 @@ function createNewMap(e) {
 function loadMap(e) {
 
     if (!d3.select('#ct-mindMap')[0][0] || confirm('Unsaved work will be lost if you continue.\nContinue?')) {
+        $('.fa.fa-pencil-square-o.fa-lg.plus-icon.active-map').trigger('click') //Remove copy rectangle
+        $('.fa.fa-clipboard.fa-lg.plus-icon.active-map').trigger('click') //Disable paste
         saveFlag = false;
         $('#ct-createAction').addClass('disableButton');
         $("div.nodeBoxSelected").removeClass("nodeBoxSelected");
@@ -1114,13 +1116,19 @@ function nodeClick(e) {
     var canvSize = getElementDimm(d3.select("#ct-mapSvg"));
     var split_char = ',';
     if (isIE) split_char = ' ';
+    //Set position of assign box
     var l = p.attr('transform').slice(10, -1).split(split_char);
     l = [(parseFloat(l[0]) + 50) * cScale + cSpan[0], (parseFloat(l[1]) - 20) * cScale + cSpan[1]];
     if (canvSize[0] - l[0] < cSize[0]) l[0] = l[0] - cSize[0] - 60 * cScale;
     if (canvSize[1] - l[1] < cSize[1]) l[1] = canvSize[1] - cSize[1] - 10 * cScale;
     c.style('top', l[1] + 'px').style('left', l[0] + 'px').classed('no-disp', !1);
 
-
+    if(canvSize[1]-25 < cSize[1]){
+        c.style('height',canvSize[1]-25+'px').style('top','0px').style('overflow','scroll');
+    }
+    else{
+        c.style('height','auto');        
+    }
     if (l[1] < 0)
         l[1] = 0;
     else if (l[1] > canvSize[1] - cSize[1])
@@ -1179,7 +1187,7 @@ function nodeCtrlClick(e) {
 						createNode({name:e.name});
 						activeNode = childNode[0][0];
 						dLinks_c.forEach(function(f,j){
-							if(f.source.name == e.name){
+							if(f.source.id_n == e.id_n){
 								createNode({name:f.target.name});
 							}
 						})
@@ -1198,12 +1206,12 @@ function nodeCtrlClick(e) {
 						activeNode = childNode[0][0];
 						activenode_scr = activeNode;
 						dLinks_c.forEach(function(f,j){
-							if(f.source.name == e.name && f.target.type=='screens'){
+							if(f.source.id_n == e.id_n && f.target.type=='screens'){
 								activeNode = activenode_scr;
 								createNode({name:f.target.name});
 								activeNode = childNode[0][0];
 								dLinks_c.forEach(function(g,k){
-									if(g.source.name == f.target.name && g.source.type=='screens'){
+									if(g.source.id_n == f.target.id_n && g.source.type=='screens'){
 										createNode({name:g.target.name});										
 									}
 								});
@@ -2685,8 +2693,9 @@ function jsonDownload(filename, responseData) {
 }
 
 function draww(){
+    var mmap = dNodes[0];
 	clearSvg();
-	treeBuilder(allMMaps[$('.nodeBoxSelected').attr('data-mapid')]);
+	treeBuilder(mmap);
 	//Disable every other action	
 	$('#ct-canvas').append("<div id='rect-copy'><div>").on('resize',resize1).on('drag',resize1);
 	$( "#rect-copy" ).resizable();

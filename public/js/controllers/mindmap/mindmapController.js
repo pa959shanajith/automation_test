@@ -546,6 +546,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         else{
             $('#rect-copy').remove();
             $('#copyImg1').removeClass('active-map');
+            $('.node-selected').removeClass('node-selected');
+            $('.link-selected').removeClass('link-selected');
         }
     }
 
@@ -564,6 +566,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         else{
             //highlight scenarios
             $('[data-nodetype=scenarios]').addClass('node-selected');
+        }
+        if(!$('#pasteImg1').hasClass('active-map')){
+            $('.node-selected').removeClass('node-selected');
         }
     }
 
