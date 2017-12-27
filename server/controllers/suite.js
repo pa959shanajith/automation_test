@@ -2709,9 +2709,10 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 												else if (resultData) {
 													if (typeof(resultData) == "string") {
 														redisServer.redisSub2.removeListener("message",executeTestSuite_listener);
-														scheduleStatus = resultData;
+														scheduleStatus = resultData == "success" ? "Completed" : resultData;
 													} else if (typeof(resultData) == "object") {
-														scheduleStatus = resultData.reportData.overallstatus[0].overallstatus;
+														var stat = resultData.reportData.overallstatus[0].overallstatus;
+														scheduleStatus = stat == "success" ? "Completed" : stat;
 													}
 													try {
 														logger.info("Calling function updateStatus from scheduleFunction");
