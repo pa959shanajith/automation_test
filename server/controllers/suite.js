@@ -2638,9 +2638,11 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 												var resultData = data.value;
 												clearInterval(updateSessionExpiry);
 												if (resultData != "success" && resultData != "Terminate") {
-													completedSceCount_s++;
-													scenarioCount_s = executionRequest.suitedetails[testsuitecount_s].scenarioIds.length;
+													//completedSceCount_s++;
+													//scenarioCount_s = executionRequest.suitedetails[testsuitecount_s].scenarioIds.length;
 													try {
+														completedSceCount_s++;
+														scenarioCount_s = executionRequest.suitedetails[testsuitecount_s].scenarioIds.length  * executionRequest.suitedetails[testsuitecount_s].browserType.length;
 														var scenarioid = resultData.scenarioId;
 														var executionid = resultData.executionId;
 														var reportdata = resultData.reportData;
@@ -2694,6 +2696,8 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 																updateSchedulingStatus(testsuiteid, executionid, starttime, suiteStatus_s);
 															}
 														} else {
+															completedSceCount_s++;
+															scenarioCount_s = executionRequest.suitedetails[testsuitecount_s].scenarioIds.length;
 															if (completedSceCount_s == scenarioCount_s) {
 																suiteStatus_s = "Fail";
 																completedSceCount_s = 0;
@@ -2706,7 +2710,7 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 														logger.error("Exception occured in the scheduleFunction: %s", ex);
 													}
 												}
-												else if (resultData) {
+												if (resultData) {
 													if (typeof(resultData) == "string") {
 														redisServer.redisSub2.removeListener("message",executeTestSuite_listener);
 														scheduleStatus = resultData == "success" ? "Completed" : resultData;
