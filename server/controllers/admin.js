@@ -233,7 +233,7 @@ exports.createUser_Nineteen68 = function (req, res) {
 				}
 				var check_password = validator.isEmpty(req_password);
 				var check_passwordLen = validator.isLength(req_password, 1, 12);
-				if (check_password == false && check_passwordLen == true) {
+				if ((check_password == false && check_passwordLen == true) || req_ldapuser == true) {
 					valid_password = true;
 				}
 				var check_firstname = validator.isEmpty(req_firstname);
@@ -401,10 +401,8 @@ exports.updateUser_nineteen68 = function updateUser_nineteen68(req, res) {
 					} else {
 						valid_password = false;
 					}
-				} else {
-					if (local_password == "") {
-						valid_password = true;
-					}
+				} else if (local_password == "") {
+					valid_password = true;
 				}
 				var check_firstname = validator.isEmpty(local_firstname);
 				var check_firstnameLen = validator.isLength(local_firstname, 1, 12);

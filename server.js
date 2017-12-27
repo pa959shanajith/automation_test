@@ -455,7 +455,8 @@ try {
     app.use('/reportServer', reportingApp);
     var jsreport = require('jsreport')({
         express: { app :reportingApp, server: httpsServer },
-        appPath: "/reportServer"
+        appPath: "/reportServer",
+		logger: { "console": { "transport": "console", "level": "error" } }
     });
 
     jsreport.init(function () {
