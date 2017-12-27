@@ -8,6 +8,10 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
       }
     });
   }, 10);
+  if(window.localStorage['navigateScreen'] != "p_Weboccular")
+	{
+		window.location.href = "/";
+	}
     //Task Listing
     loadUserTasks()
   window.onbeforeunload = function() {

@@ -312,7 +312,7 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 		}
 		else{
 			var keySlctd;
-			if(slctdOption == "Completed")	keySlctd = "success";
+			if(slctdOption == "Completed")	keySlctd = "Completed";
 			else if(slctdOption == "In Progress")	keySlctd = "Inprogress";
 			else if(slctdOption == "Terminated")	keySlctd = "Terminate";
 			else if(slctdOption == "Failed 00")	keySlctd = "Failed 00";

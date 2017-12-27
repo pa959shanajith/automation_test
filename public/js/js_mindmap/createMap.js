@@ -72,6 +72,11 @@ function loadMindmapData(param) {
 
             $(".project-list").change(function() {
                 //Mindmap clear search box on selecting different project
+                dNodes_c = [] //Copied data should be cleared
+                dLinks_c = [] // on change of projet list
+                $('.fa.fa-pencil-square-o.fa-lg.plus-icon').removeClass('active-map');
+                $('#rect-copy').remove();
+                $('.fa.fa-clipboard.fa-lg.plus-icon').removeClass('active-map');
                 $('#searchModule-create').val('');
                 $('#searchModule-assign').val('');
                 selectedProject = $(".project-list").val();
@@ -327,6 +332,8 @@ function createNewMap(e) {
 function loadMap(e) {
 
     if (!d3.select('#ct-mindMap')[0][0] || confirm('Unsaved work will be lost if you continue.\nContinue?')) {
+        $('.fa.fa-pencil-square-o.fa-lg.plus-icon.active-map').trigger('click') //Remove copy rectangle
+        $('.fa.fa-clipboard.fa-lg.plus-icon.active-map').trigger('click') //Disable paste
         saveFlag = false;
         $('#ct-createAction').addClass('disableButton');
         $("div.nodeBoxSelected").removeClass("nodeBoxSelected");
@@ -380,6 +387,7 @@ function addNode(n, m, pi) {
     // To fix rendering issue in FF issue #415
 
     var img_src = 'images_mindmap/node-' + n.type + '.png';
+    if(n.reuse && (n.type == 'testcases' || n.type=='screens')) img_src = 'images_mindmap/'+n.type+'-reuse.png';
     if (n.type == 'modules_endtoend') img_src = 'images_mindmap/MM5.png';
     if ($("#ct-canvas").attr('class') == 'tabCreate ng-scope') {
         v.append('image').attr('height', '40px').attr('width', '40px').attr('class', 'ct-nodeIcon').attr('xlink:href', img_src).on('click', nodeCtrlClick);
@@ -398,16 +406,16 @@ function addNode(n, m, pi) {
     v.append('text').attr('class', 'ct-nodeLabel').text(n.display_name).attr('text-anchor', 'middle').attr('x', 20).attr('title', n.name).attr('y', 50);
     v.append('title').text(n.name);
     //Condition to add the properties of reuse to the node (Currently only for testcases)
-    if (node_names_tc && node_names_tc.length > 0 && node_names_tc.indexOf(n.name) > -1) {
-        if (node_names_tc.indexOf(n.name) == node_names_tc.lastIndexOf(n.name)) {
-            n.reuse = 'reuse';
-        } else {
-            n.reuse = 'parent';
-        }
+    // if (node_names_tc && node_names_tc.length > 0 && node_names_tc.indexOf(n.name) > -1) {
+    //     if (node_names_tc.indexOf(n.name) == node_names_tc.lastIndexOf(n.name)) {
+    //         n.reuse = 'reuse';
+    //     } else {
+    //         n.reuse = 'parent';
+    //     }
 
-        //if(v.select('.ct-nodeReuse')[0][0]==null)
-        //v.append('image').attr('class','ct-nodeReuse').attr('xlink:href','images_mindmap/NEAREST.png').attr('x',10).attr('y',10);
-    }
+    //     //if(v.select('.ct-nodeReuse')[0][0]==null)
+    //     //v.append('image').attr('class','ct-nodeReuse').attr('xlink:href','images_mindmap/NEAREST.png').attr('x',10).attr('y',10);
+    // }
 
     if (m && pi) {
         var p = d3.select('#ct-node-' + pi.id);
@@ -1113,13 +1121,19 @@ function nodeClick(e) {
     var canvSize = getElementDimm(d3.select("#ct-mapSvg"));
     var split_char = ',';
     if (isIE) split_char = ' ';
+    //Set position of assign box
     var l = p.attr('transform').slice(10, -1).split(split_char);
     l = [(parseFloat(l[0]) + 50) * cScale + cSpan[0], (parseFloat(l[1]) - 20) * cScale + cSpan[1]];
     if (canvSize[0] - l[0] < cSize[0]) l[0] = l[0] - cSize[0] - 60 * cScale;
     if (canvSize[1] - l[1] < cSize[1]) l[1] = canvSize[1] - cSize[1] - 10 * cScale;
     c.style('top', l[1] + 'px').style('left', l[0] + 'px').classed('no-disp', !1);
 
-
+    if(canvSize[1]-25 < cSize[1]){
+        c.style('height',canvSize[1]-25+'px').style('top','0px').style('overflow','scroll');
+    }
+    else{
+        c.style('height','auto');        
+    }
     if (l[1] < 0)
         l[1] = 0;
     else if (l[1] > canvSize[1] - cSize[1])
@@ -1178,7 +1192,7 @@ function nodeCtrlClick(e) {
 						createNode({name:e.name});
 						activeNode = childNode[0][0];
 						dLinks_c.forEach(function(f,j){
-							if(f.source.name == e.name){
+							if(f.source.id_n == e.id_n){
 								createNode({name:f.target.name});
 							}
 						})
@@ -1197,12 +1211,12 @@ function nodeCtrlClick(e) {
 						activeNode = childNode[0][0];
 						activenode_scr = activeNode;
 						dLinks_c.forEach(function(f,j){
-							if(f.source.name == e.name && f.target.type=='screens'){
+							if(f.source.id_n == e.id_n && f.target.type=='screens'){
 								activeNode = activenode_scr;
 								createNode({name:f.target.name});
 								activeNode = childNode[0][0];
 								dLinks_c.forEach(function(g,k){
-									if(g.source.name == f.target.name && g.source.type=='screens'){
+									if(g.source.id_n == f.target.id_n && g.source.type=='screens'){
 										createNode({name:g.target.name});										
 									}
 								});
@@ -2330,40 +2344,102 @@ function treeBuilder(tree) {
     });
     dNodes = d3Tree.nodes(tree);
     //dLinks=d3Tree.links(dNodes);
-    dNodes.forEach(function(d) {
+
+/* 
+ *  Logic for adding reuse property 
+ */
+    function parseDataReuse(){
+        var dataReuse = {'screen':[],'testcase':[],'projectid':''};
+        dNodes.forEach(function(e,i){
+            if((e.type in ['modules','scenarios'])) return;
+            dNodes[i].reuse = false;
+            dNodes.forEach(function(f,j){
+                if((e.type=='screens' && e.type == f.type && e.name == f.name && i!=j)||(e.type=='testcases' && e.type == f.type && e.name == f.name && e.parent.name == f.parent.name && i!=j)){
+                    dNodes[i].reuse = true;
+                    // console.log(e.type,' ',e.name,' reused')
+                } })
+
+            if((e.reuse== true)) return;
+            if(e.type == 'testcases'){
+                dataReuse['testcase'].push({'testcasename':e.name,'screenname':e.parent.name,'idx':i});
+            }
+            else if(e.type == 'screens' && e.type == 'screens'){
+                dataReuse['screen'].push({'screenname':e.name,'idx':i});
+            }            
+            
+        })
+        // dNodes.forEach(function(e,i){
+        //     if((e.reuse== true) || (e.type in ['modules','scenarios'])) return;
+        //     if(e.type == 'testcases'){
+        //         dataReuse['testcase'].push({'testcasename':e.name,'screenname':e.parent.name,'idx':i});
+        //     }
+        //     else if(e.type == 'screens' && e.type == 'screens'){
+        //         dataReuse['screen'].push({'screenname':e.name,'idx':i});
+        //     }
+        // })            
+        dataReuse['projectid'] = $(".project-list").val();
+        return dataReuse;
+    }
+    var reusedata = parseDataReuse();
+
+    // Now call the service and assign reuse property to all other nodes
+    var userInfo = JSON.parse(window.localStorage['_UI']);
+    var user_id = userInfo.user_id;
+    dataSender({
+        user_name: userInfo.username,
+        userRole: window.localStorage['_SR'],
+        userid: user_id,
+        task: 'checkReuse',
+        parsedata: reusedata
+    }, function(error,result) {
+        if(error)
+            console.log("error in datasender: checkReuse service")
+        // Now In dNodes update reuse parameter 
+        result = JSON.parse(result);
+        result['screen'].forEach(function(e,i){
+            dNodes[e.idx].reuse = e.reuse;
+        })
+        result['testcase'].forEach(function(e,i){
+            dNodes[e.idx].reuse = e.reuse;
+        })
+        dNodes.forEach(function(d) {
+
+            // switch-layout feature
+            if ($('#switch-layout').hasClass('vertical-layout')) {
+                d.y = cSize[0] * 0.1 * (0.9 + typeNum[d.type]);
+                sections[d.type] = d.y;
+            } else {
+                d.y = d.x;
+                //Logic to change the layout and to reduce the length of the links
+                d.x = cSize[0] * 0.1 * (0.9 + typeNum[d.type]);
+                sections[d.type] = d.x;
+            }
+
+
+
+            if (d.oid === undefined) d.oid = d.id;
+            d.id = uNix++;
+            addNode(d, !0, d.parent);
+            if (d.task != null) d3.select('#ct-node-' + d.id).append('image').attr('class', 'ct-nodeTask').attr('width', '21px').attr('height', '21px').attr('xlink:href', 'images_mindmap/node-task-assigned.png').attr('x', 29).attr('y', -10);
+        });
+        dLinks = d3Tree.links(dNodes);
+        dLinks.forEach(function(d) {
+            d.id = uLix++;
+            addLink(d.id, d.source, d.target);
+        });
+        //zoom.translate([0,(cSize[1]/2)-dNodes[0].y]);
 
         // switch-layout feature
-        if ($('#switch-layout').hasClass('vertical-layout')) {
-            d.y = cSize[0] * 0.1 * (0.9 + typeNum[d.type]);
-            sections[d.type] = d.y;
-        } else {
-            d.y = d.x;
-            //Logic to change the layout and to reduce the length of the links
-            d.x = cSize[0] * 0.1 * (0.9 + typeNum[d.type]);
-            sections[d.type] = d.x;
-        }
-
-
-
-        if (d.oid === undefined) d.oid = d.id;
-        d.id = uNix++;
-        addNode(d, !0, d.parent);
-        if (d.task != null) d3.select('#ct-node-' + d.id).append('image').attr('class', 'ct-nodeTask').attr('width', '21px').attr('height', '21px').attr('xlink:href', 'images_mindmap/node-task-assigned.png').attr('x', 29).attr('y', -10);
+        if ($('#switch-layout').hasClass('vertical-layout'))
+            zoom.translate([(cSize[0] / 2) - dNodes[0].x, (cSize[1] / 5) - dNodes[0].y]);
+        else
+            zoom.translate([(cSize[0] / 3) - dNodes[0].x, (cSize[1] / 2) - dNodes[0].y]);
+        //zoom.translate([(cSize[0]/2),(cSize[1]/2)]);
+        zoom.event(d3.select('#ct-mapSvg'));
+     
     });
-    dLinks = d3Tree.links(dNodes);
-    dLinks.forEach(function(d) {
-        d.id = uLix++;
-        addLink(d.id, d.source, d.target);
-    });
-    //zoom.translate([0,(cSize[1]/2)-dNodes[0].y]);
 
-    // switch-layout feature
-    if ($('#switch-layout').hasClass('vertical-layout'))
-        zoom.translate([(cSize[0] / 2) - dNodes[0].x, (cSize[1] / 5) - dNodes[0].y]);
-    else
-        zoom.translate([(cSize[0] / 3) - dNodes[0].x, (cSize[1] / 2) - dNodes[0].y]);
-    //zoom.translate([(cSize[0]/2),(cSize[1]/2)]);
-    zoom.event(d3.select('#ct-mapSvg'));
+
 };
 
 
@@ -2622,8 +2698,9 @@ function jsonDownload(filename, responseData) {
 }
 
 function draww(){
+    var mmap = dNodes[0];
 	clearSvg();
-	treeBuilder(allMMaps[$('.nodeBoxSelected').attr('data-mapid')]);
+	treeBuilder(mmap);
 	//Disable every other action	
 	$('#ct-canvas').append("<div id='rect-copy'><div>").on('resize',resize1).on('drag',resize1);
 	$( "#rect-copy" ).resizable();
@@ -2635,14 +2712,14 @@ function resize1(){
 		dLinks_c = [];
 		$('.ct-node').removeClass('node-selected node-error');
 		$('.ct-link').removeClass('link-selected');
-		console.log('Resize');
+		// console.log('Resize');
 		var xvp = d3.select("#ct-mindMap").attr("transform").split(/[()]/)[1].split(',')[0];
 		var yvp = d3.select("#ct-mindMap").attr("transform").split(/[()]/)[1].split(',')[1];
 		var scale = (d3.select("#ct-mindMap").attr("transform").split(/[()]/)[3]);
 
 		dNodes.forEach( function(e,i) {
 			var lt = [parseFloat(xvp)+parseFloat(e.x)*parseFloat(scale),parseFloat(yvp)+parseFloat(e.y)*parseFloat(scale)];
-			console.log('l,t :',lt);
+			// console.log('l,t :',lt);
 			if(e.type!='modules'){
 				if(lt[0]>$('#rect-copy').position().left && lt[0]<($('#rect-copy').position().left+$('#rect-copy').width()) && lt[1]>$('#rect-copy').position().top && lt[1]<($('#rect-copy').position().top+$('#rect-copy').height())){
 					$('#ct-node-'+i).addClass('node-selected');

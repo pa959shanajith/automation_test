@@ -35,7 +35,10 @@ mySPA.controller('dashboardController', ['$scope', '$rootScope', '$http', '$time
     });
   }
 
-
+  if(window.localStorage['navigateScreen'] != "p_Dashboard")
+	{
+		window.location.href = "/";
+	}
   $scope.showButtons = false;
   $scope.scheduledAdherence = "red";
   $scope.showButtonsSection = function(){

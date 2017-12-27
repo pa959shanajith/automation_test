@@ -5,11 +5,11 @@ var socketMap = {};
 var socketMapUI = {};
 var sokcetMapScheduling = {};
 var socketMapNotify = {};
-var isUISocketRequest = false;
 
 var myserver = require('./../../server');
 var httpsServer = myserver.httpsServer;
-var io = require('socket.io')(httpsServer);
+// var io = require('socket.io')(httpsServer);
+var io = require('socket.io').listen(httpsServer,{ cookie: false });
 var notificationMsg = require('./../notifications/notifyMessages');
 var epurl = "http://"+process.env.NDAC_IP+":"+process.env.NDAC_PORT+"/";
 var Client = require("node-rest-client").Client;
@@ -18,44 +18,22 @@ var apiclient = new Client();
 var uiConfig = require('./../config/options');
 var screenShotPath = uiConfig.storageConfig.screenShotPath;
 
-//Check for valid user
-function checkValidUserToConnect(address, callback){
-	var inputs = {
-		"username": address
-	};
-	var args = {
-		data: inputs,
-		headers: {
-			"Content-Type": "application/json"
-		}
-	};
-	logger.info("Calling NDAC Service: authenticateUser_Nineteen68");
-	apiclient.post(epurl + "login/authenticateUser_Nineteen68", args,
-	function (result, response) {
-		if (response.statusCode != 200 || result.rows == "fail") {
-			logger.error("Error occured in authenticateUser_Nineteen68 to valid user Error Code : ERRNDAC");
-			callback(null, "fail");
-		} else {
-			callback(null, result);
-		}
-	});
-}
-
-
 io.on('connection', function (socket) {
 	logger.info("Inside Socket connection");
 	var address = socket.handshake.query.username;
-	var icesession = socket.handshake.query.icesession;
 	logger.info("Socket connecting address %s", address);
 	if (socket.request._query.check == "true") {
 		logger.info("Socket request from UI");
-		isUISocketRequest = true;
 		address = socket.request._query.username;
 		socketMapUI[address] = socket;
 		socket.emit("connectionAck", "Success");
 	} else if (socket.request._query.check == "notify") {
-		address = Base64.decode(socket.request._query.username);
-		socketMapNotify[address] = socket;
+		 //address = Base64.decode(socket.request._query.username);
+		 //socketMapNotify[address] = socket;
+		socket.on('key',function(data) {
+			address = Base64.decode(data);
+			socketMapNotify[address] = socket;
+		  });
 		//Broadcast Message
 		var broadcastTo = ['/admin', '/plugin', '/design', '/designTestCase', '/execute', '/scheduling', '/specificreports', '/home', '/p_Utility', '/p_Reports', 'p_Weboccular', '/neuronGraphs2D', '/p_ALM'];
 		notificationMsg.to = broadcastTo;
@@ -64,7 +42,8 @@ io.on('connection', function (socket) {
 		// soc.emit("notify",notificationMsg);
 	} else {
 		logger.info("Socket request from ICE");
-		isUISocketRequest = false;
+		address = socket.handshake.query.username;
+		var icesession = socket.handshake.query.icesession;
 		var inputs = {
 			"icesession": icesession,
 			"query": 'connect'
@@ -79,29 +58,26 @@ io.on('connection', function (socket) {
 		apiclient.post(epurl+"server/updateActiveIceSessions", args,
 		function (result, response) {
 			if (response.statusCode != 200) {
-				logger.error("Error occured in updateActiveIceSessions Error Code: ERRNDAC");
+				logger.error("Error occurred in updateActiveIceSessions Error Code: ERRNDAC");
 			} else {
 				socket.send('checkConnection', result.ice_check);
-				if (result.node_check) {
-					checkValidUserToConnect(address, function(err, result){
-						if (result != undefined && result != "fail" && result.rows.length != 0){
-							if (!(address in socketMap)) {
-								socketMap[address] = socket;
-								socket.send('connected');
-								logger.debug("%s is connected", address);
-								logger.debug("No. of clients connected for Normal mode: %d", Object.keys(socketMap).length);
-								socket.emit('update_screenshot_path', screenShotPath);
-								redisServer.redisSub1.subscribe('ICE1_normal_' + address, 1);
-							}						
-						}
-						else{
-							logger.debug("%s is not valid user to connect", address);
-						}
-					});															
+				if (result.node_check === "allow") {
+					if (!(address in socketMap)) {
+						socketMap[address] = socket;
+						socket.send('connected');
+						logger.debug("%s is connected", address);
+						logger.debug("No. of clients connected for Normal mode: %d", Object.keys(socketMap).length);
+						socket.emit('update_screenshot_path', screenShotPath);
+						redisServer.redisSub1.subscribe('ICE1_normal_' + address, 1);
+					}
+				} else {
+					if (result.node_check === "userNotValid") {
+						logger.error("%s is not authorized to connect", address);
+					}
+					socket.disconnect(false);
 				}
 			}
 		});
-
 	}
 	module.exports.allSocketsMap = socketMap;
 	module.exports.allSocketsMapUI = socketMapUI;
@@ -111,9 +87,10 @@ io.on('connection', function (socket) {
 
 	socket.on('disconnect', function () {
 		logger.info("Inside Socket disconnect");
+		var address;
 		// var ip = socket.request.connection.remoteAddress || socket.request.headers['x-forwarded-for'];
 		if (socket.request._query.check == "true") {
-			address = socket.handshake.query.username;
+			address = socket.request._query.username;
 			logger.info("Disconnecting from UI socket: %s", address);
 		} else if (socket.request._query.check == "notify") {
 			// address = socket.handshake.query.username;
@@ -122,7 +99,7 @@ io.on('connection', function (socket) {
 		} else {
 			var connect_flag = false;
 			logger.info("Inside ICE Socket disconnection");
-			var address = socket.handshake.query.username;
+			address = socket.handshake.query.username;
 			if (socketMap[address] != undefined) {
 				connect_flag = true;
 				logger.info('Disconnecting from ICE socket : %s', address);
@@ -155,7 +132,7 @@ io.on('connection', function (socket) {
 				apiclient.post(epurl+"server/updateActiveIceSessions", args,
 					function (result, response) {
 					if (response.statusCode != 200 || result.rows == "fail") {
-						logger.error("Error occured in updateActiveIceSessions Error Code: ERRNDAC");
+						logger.error("Error occurred in updateActiveIceSessions Error Code: ERRNDAC");
 					} else {
 						logger.info("%s is disconnected", address);
 					}
@@ -164,8 +141,8 @@ io.on('connection', function (socket) {
 		}
 	});
 
-	socket.on('reconnect', function (data) {
-		logger.info("Inside Socket reconnect: Reconnecting for scheduling socket");
+	socket.on('toggle_schedule', function (data) {
+		logger.info("Inside Socket toggle_schedule: Reconnecting for scheduling socket");
 		var address = socket.handshake.query.username;
 		if (data && socketMap[address] != undefined) {
 			redisServer.redisSub1.unsubscribe('ICE1_normal_' + address,1);
@@ -205,35 +182,37 @@ io.on('connection', function (socket) {
 var Base64 = {
 	_keyStr: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",
 	decode: function (input) {
-		var output = "";
-		var chr1,chr2,chr3;
-		var enc1,enc2,enc3,enc4;
-		var i = 0;
-		input = input.replace(/[^A-Za-z0-9\+\/\=]/g, "");
-		while (i < input.length) {
-			enc1 = this._keyStr.indexOf(input.charAt(i++));
-			enc2 = this._keyStr.indexOf(input.charAt(i++));
-			enc3 = this._keyStr.indexOf(input.charAt(i++));
-			enc4 = this._keyStr.indexOf(input.charAt(i++));
-			chr1 = (enc1 << 2) | (enc2 >> 4);
-			chr2 = ((enc2 & 15) << 4) | (enc3 >> 2);
-			chr3 = ((enc3 & 3) << 6) | enc4;
-			output = output + String.fromCharCode(chr1);
-			if (enc3 != 64) {
-				output = output + String.fromCharCode(chr2);
+		if(input != undefined) {
+			var output = "";
+			var chr1,chr2,chr3;
+			var enc1,enc2,enc3,enc4;
+			var i = 0;
+			input = input.replace(/[^A-Za-z0-9\+\/\=]/g, "");
+			while (i < input.length) {
+				enc1 = this._keyStr.indexOf(input.charAt(i++));
+				enc2 = this._keyStr.indexOf(input.charAt(i++));
+				enc3 = this._keyStr.indexOf(input.charAt(i++));
+				enc4 = this._keyStr.indexOf(input.charAt(i++));
+				chr1 = (enc1 << 2) | (enc2 >> 4);
+				chr2 = ((enc2 & 15) << 4) | (enc3 >> 2);
+				chr3 = ((enc3 & 3) << 6) | enc4;
+				output = output + String.fromCharCode(chr1);
+				if (enc3 != 64) {
+					output = output + String.fromCharCode(chr2);
+				}
+				if (enc4 != 64) {
+					output = output + String.fromCharCode(chr3);
+				}
 			}
-			if (enc4 != 64) {
-				output = output + String.fromCharCode(chr3);
-			}
+			output = Base64._utf8_decode(output);
+			return output;
 		}
-		output = Base64._utf8_decode(output);
-		return output;
 	},
 
 	_utf8_decode: function (utftext) {
 		var string = "";
 		var i = 0;
-		var c = 0, c2 = 0;
+		var c, c2, c3;
 		while (i < utftext.length) {
 			c = utftext.charCodeAt(i);
 			if (c < 128) {

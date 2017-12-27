@@ -149,7 +149,7 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 
 
 	$(document).on("click", "#naviPg", function (e) {
-		if (userRole != 'Admin') {
+		if (window.localStorage['_SR'] != 'Admin') {
 			window.localStorage["_VP"] = true;
 			window.localStorage['navigateScreen'] = "plugin";
 			//window.location.assign('plugin');

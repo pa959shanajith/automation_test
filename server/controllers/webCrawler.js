@@ -57,7 +57,7 @@ exports.getCrawlResults = function (req, res) {
 										var mySocketUI = myserver.allSocketsMapUI[name];
 										mySocketUI.emit("newdata", value);
 									} catch (exception) {
-										logger.error(exception);
+										logger.error(exception.message);
 									}
 								} else if (data.onAction == "result_web_crawler_finished") {
 									redisServer.redisSub2.removeListener('message',webCrawlerGo_listener);	
@@ -66,7 +66,7 @@ exports.getCrawlResults = function (req, res) {
 										mySocketUI.emit("endData", value);
 										res.status(200).json({success: true});
 									} catch (exception) {
-										logger.error(exception);
+										logger.error(exception.message);
 										res.status(500).json({success: false, data: exception});
 									}
 								}
@@ -87,6 +87,6 @@ exports.getCrawlResults = function (req, res) {
 			res.send("Invalid Session");
 		}
 	} catch (exception) {
-		logger.error(exception);
+		logger.error(exception.message);
 	}
 };

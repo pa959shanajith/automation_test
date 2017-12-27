@@ -23,11 +23,5 @@
     "scripts": {
         "allowedModules": [],
         "timeout": 60000
-    },
-	"logger": {
-		"console": {
-			"transport": "console",
-			"level": "error"
-		}
-	}
+    }
 }

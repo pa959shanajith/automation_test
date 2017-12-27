@@ -78,7 +78,7 @@ window.addEventListener('popstate', function () {
 	var currentURL = document.URL.split("/")[0]+'/'+window.localStorage.navigateScreen;
 	history.pushState(null, null, currentURL);
 });
-
+document.cookie = '';
 function getCookie(cname) {
 	var name = cname + "=";
 	var ca = document.cookie.split(';');

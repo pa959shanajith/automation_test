@@ -81,7 +81,7 @@ exports.loginQCServer_ICE = function (req, res) {
 						try {
 							res.send("unavailableLocalServer");
 						} catch (exception) {
-							logger.error(exception);
+							logger.error(exception.message);
 						}
 					}
 				});
@@ -93,7 +93,7 @@ exports.loginQCServer_ICE = function (req, res) {
 			res.send('unavailableLocalServer');
 		}
 	} catch (exception) {
-		logger.error(exception);
+		logger.error(exception.message);
 		res.send("unavailableLocalServer");
 	}
 };
@@ -157,7 +157,7 @@ exports.qcProjectDetails_ICE = function (req, res) {
 					try {
 						res.send("unavailableLocalServer");
 					} catch (exception) {
-						logger.error(exception);
+						logger.error(exception.message);
 					}
 				}
 			});
@@ -166,7 +166,7 @@ exports.qcProjectDetails_ICE = function (req, res) {
 			res.send("Invalid Session");
 		}
 	} catch (exception) {
-		logger.error(exception);
+		logger.error(exception.message);
 		res.send("unavailableLocalServer");
 	}
 };
@@ -332,7 +332,7 @@ exports.qcFolderDetails_ICE = function (req, res) {
 					try {
 						res.send("unavailableLocalServer");
 					} catch (exception) {
-						logger.error(exception);
+						logger.error(exception.message);
 					}
 				}
 			});
@@ -341,7 +341,7 @@ exports.qcFolderDetails_ICE = function (req, res) {
 			res.send("Invalid Session");
 		}
 	} catch (exception) {
-		logger.error(exception);
+		logger.error(exception.message);
 		res.send("unavailableLocalServer");
 	}
 };
@@ -423,7 +423,7 @@ exports.saveQcDetails_ICE = function (req, res) {
 					res.send("Invalid Session");
 				}
 			} catch (exception) {
-				logger.error(exception);
+				logger.error(exception.message);
 				res.send("unavailableLocalServer");
 			}
 		} else {
