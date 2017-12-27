@@ -380,6 +380,7 @@ function addNode(n, m, pi) {
     // To fix rendering issue in FF issue #415
 
     var img_src = 'images_mindmap/node-' + n.type + '.png';
+    if(n.reuse && (n.type == 'testcases' || n.type=='screens')) img_src = 'images_mindmap/'+n.type+'-reuse.png';
     if (n.type == 'modules_endtoend') img_src = 'images_mindmap/MM5.png';
     if ($("#ct-canvas").attr('class') == 'tabCreate ng-scope') {
         v.append('image').attr('height', '40px').attr('width', '40px').attr('class', 'ct-nodeIcon').attr('xlink:href', img_src).on('click', nodeCtrlClick);
@@ -398,16 +399,16 @@ function addNode(n, m, pi) {
     v.append('text').attr('class', 'ct-nodeLabel').text(n.display_name).attr('text-anchor', 'middle').attr('x', 20).attr('title', n.name).attr('y', 50);
     v.append('title').text(n.name);
     //Condition to add the properties of reuse to the node (Currently only for testcases)
-    if (node_names_tc && node_names_tc.length > 0 && node_names_tc.indexOf(n.name) > -1) {
-        if (node_names_tc.indexOf(n.name) == node_names_tc.lastIndexOf(n.name)) {
-            n.reuse = 'reuse';
-        } else {
-            n.reuse = 'parent';
-        }
+    // if (node_names_tc && node_names_tc.length > 0 && node_names_tc.indexOf(n.name) > -1) {
+    //     if (node_names_tc.indexOf(n.name) == node_names_tc.lastIndexOf(n.name)) {
+    //         n.reuse = 'reuse';
+    //     } else {
+    //         n.reuse = 'parent';
+    //     }
 
-        //if(v.select('.ct-nodeReuse')[0][0]==null)
-        //v.append('image').attr('class','ct-nodeReuse').attr('xlink:href','images_mindmap/NEAREST.png').attr('x',10).attr('y',10);
-    }
+    //     //if(v.select('.ct-nodeReuse')[0][0]==null)
+    //     //v.append('image').attr('class','ct-nodeReuse').attr('xlink:href','images_mindmap/NEAREST.png').attr('x',10).attr('y',10);
+    // }
 
     if (m && pi) {
         var p = d3.select('#ct-node-' + pi.id);
@@ -2330,6 +2331,64 @@ function treeBuilder(tree) {
     });
     dNodes = d3Tree.nodes(tree);
     //dLinks=d3Tree.links(dNodes);
+
+/* 
+ *  Logic for adding reuse property 
+ */
+    function parseDataReuse(){
+        var dataReuse = {'screen':[],'testcase':[],'projectid':''};
+        dNodes.forEach(function(e,i){
+            if((e.type in ['modules','scenarios'])) return;
+            dNodes[i].reuse = false;
+            dNodes.forEach(function(f,j){
+                if((e.type=='screens' && e.type == f.type && e.name == f.name && i!=j)||(e.type=='testcases' && e.type == f.type && e.name == f.name && e.parent.name == f.parent.name && i!=j)){
+                    dNodes[i].reuse = true;
+                    // console.log(e.type,' ',e.name,' reused')
+                } })
+
+            if((e.reuse== true)) return;
+            if(e.type == 'testcases'){
+                dataReuse['testcase'].push({'testcasename':e.name,'screenname':e.parent.name,'idx':i});
+            }
+            else if(e.type == 'screens' && e.type == 'screens'){
+                dataReuse['screen'].push({'screenname':e.name,'idx':i});
+            }            
+            
+        })
+        // dNodes.forEach(function(e,i){
+        //     if((e.reuse== true) || (e.type in ['modules','scenarios'])) return;
+        //     if(e.type == 'testcases'){
+        //         dataReuse['testcase'].push({'testcasename':e.name,'screenname':e.parent.name,'idx':i});
+        //     }
+        //     else if(e.type == 'screens' && e.type == 'screens'){
+        //         dataReuse['screen'].push({'screenname':e.name,'idx':i});
+        //     }
+        // })            
+        dataReuse['projectid'] = $(".project-list").val();
+        return dataReuse;
+    }
+    var reusedata = parseDataReuse();
+    console.log("reused data: ",reusedata);
+
+    // Now call the service and assign reuse property to all other nodes
+    var userInfo = JSON.parse(window.localStorage['_UI']);
+    var user_id = userInfo.user_id;
+    dataSender({
+        user_name: userInfo.username,
+        userRole: window.localStorage['_SR'],
+        userid: user_id,
+        task: 'checkReuse',
+        parsedata: reusedata
+    }, function(error,result) {
+        console.log("result: ",result);
+        // Now In dNodes update reuse parameter 
+        result = JSON.parse(result);
+        result['screen'].forEach(function(e,i){
+            dNodes[e.idx].reuse = e.reuse;
+        })
+        result['testcase'].forEach(function(e,i){
+            dNodes[e.idx].reuse = e.reuse;
+        })
     dNodes.forEach(function(d) {
 
         // switch-layout feature
@@ -2364,6 +2423,10 @@ function treeBuilder(tree) {
         zoom.translate([(cSize[0] / 3) - dNodes[0].x, (cSize[1] / 2) - dNodes[0].y]);
     //zoom.translate([(cSize[0]/2),(cSize[1]/2)]);
     zoom.event(d3.select('#ct-mapSvg'));
+     
+    });
+
+
 };
 
 

@@ -828,12 +828,53 @@ exports.mindmapService = function(req, res) {
 				}
 			});
 		}
+		else if(d.task == 'checkReuse'){
+			var qData = d.parsedata;
+			var qListReuse = getQueries(qData);
+			neo4jAPI.executeQueries(qListReuse,function(status,result){
+				res.setHeader('Content-Type', 'application/json');
+				if(status!=200) {
+					console.log("error: ",result);		
+					res.status(status).send(result);			
+				}
+				else{
+					console.log("result: ",result);
+					var i = 0;
+					while(i<qData['screen'].length){
+						if(result[i].data[0].row[0]>0)
+							qData['screen'][i].reuse = true;
+						else
+							qData['screen'][i].reuse = false;						
+						i = i+1;
+					}
+					var j = 0;
+					while((i+j)<qData['testcase'].length){
+						if(result[i+j].data[0].row[0]>0)
+							qData['testcase'][j].reuse = true;
+						else
+							qData['testcase'][j].reuse = false;						
+						j = j+1;
+					}
+					res.status(status).send(qData);
+				} 
+			});
+		}		
 	}
 	else{
 		res.send("Invalid Session");
 	}
 };
 
+function getQueries(qdata){
+	var qList_reuse= [];
+	qdata['screen'].forEach(function(e,i){
+		qList_reuse.push({'statement':'Match (n:SCREENS{screenName : "'+e.screenname+'",projectID :"'+qdata['projectid']+'"}) return count(n)'});
+	})
+	qdata['testcase'].forEach(function(e,i){
+		qList_reuse.push({'statement':'Match (n:TESTCASES{testCaseName : "'+e.testcasename+'",screenName : "'+e.screenname+'",projectID :"'+qdata['projectid']+'"}) return count(n)'});
+	})
+	return qList_reuse;
+}
 
 var update_cassandraID = function(d,urlData,module_type) {
 	logger.info("Inside function: update_cassandraID ");
