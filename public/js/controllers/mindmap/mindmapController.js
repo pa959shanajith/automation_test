@@ -388,7 +388,6 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 		$.each($('.eteScenrios'), function(){
 			if($(this).hasClass('selectScenariobg')){
                 classflag=true;
-                console.log(classflag);
                 d3.select('.addScenarios-ete').classed('disableButton',!1);
         }})
         
@@ -399,7 +398,6 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 		input = document.getElementById("searchModule-assign");
     filter_elem = input.value.toUpperCase();
 		elems = $('#ct-AssignBox .ct-node');
-        console.log(elems)
 		for (i = 0; i < elems.length; i++) {
 				if (elems[i].textContent.toUpperCase().indexOf(filter_elem) > -1) {
 						elems[i].style.display = "";
@@ -414,7 +412,6 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 		input = document.getElementById("searchModule-create");
     filter_elem = input.value.toUpperCase();
 		elems = $('#ct-moduleBox .ct-node');
-        console.log(elems)
 		for (i = 0; i < elems.length; i++) {
 				if (elems[i].textContent.toUpperCase().indexOf(filter_elem) > -1) {
 						elems[i].style.display = "";
@@ -443,18 +440,14 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     $scope.conversation = []
      $scope.querySend = function (){
         var query = $scope.query;
-        console.log(query.length);
         if(query.length == 0 ){
             openDialogMindmap('Error',"Please enter a query!");
         }
         else{
         $scope.visible = 0;
         $scope.conversation.push({'text' : query,'pos': "assistFrom-me",'type': 0});
-        //console.log(query);
         $scope.query = "";
         chatbotService.getTopMatches(query).then(function(data){ 
-       // console.log("Reporting from controller.. i have this object:");
-        //console.log(data);
         $scope.topMatches = data;
         $scope.conversation.push({'text' : $scope.topMatches,'pos': "assistFrom-them",'type':0});
         //console.log($scope.conversation)

@@ -834,11 +834,10 @@ exports.mindmapService = function(req, res) {
 			neo4jAPI.executeQueries(qListReuse,function(status,result){
 				res.setHeader('Content-Type', 'application/json');
 				if(status!=200) {
-					console.log("error: ",result);		
+					logger.error('Error in checkReuse mindmap service');		
 					res.status(status).send(result);			
 				}
 				else{
-					console.log("result: ",result);
 					var i = 0;
 					while(i<qData['screen'].length){
 						if(result[i].data[0].row[0]>0)

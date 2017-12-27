@@ -2368,7 +2368,6 @@ function treeBuilder(tree) {
         return dataReuse;
     }
     var reusedata = parseDataReuse();
-    console.log("reused data: ",reusedata);
 
     // Now call the service and assign reuse property to all other nodes
     var userInfo = JSON.parse(window.localStorage['_UI']);
@@ -2380,7 +2379,8 @@ function treeBuilder(tree) {
         task: 'checkReuse',
         parsedata: reusedata
     }, function(error,result) {
-        console.log("result: ",result);
+        if(error)
+            console.log("error in datasender: checkReuse service")
         // Now In dNodes update reuse parameter 
         result = JSON.parse(result);
         result['screen'].forEach(function(e,i){
@@ -2389,40 +2389,40 @@ function treeBuilder(tree) {
         result['testcase'].forEach(function(e,i){
             dNodes[e.idx].reuse = e.reuse;
         })
-    dNodes.forEach(function(d) {
+        dNodes.forEach(function(d) {
+
+            // switch-layout feature
+            if ($('#switch-layout').hasClass('vertical-layout')) {
+                d.y = cSize[0] * 0.1 * (0.9 + typeNum[d.type]);
+                sections[d.type] = d.y;
+            } else {
+                d.y = d.x;
+                //Logic to change the layout and to reduce the length of the links
+                d.x = cSize[0] * 0.1 * (0.9 + typeNum[d.type]);
+                sections[d.type] = d.x;
+            }
+
+
+
+            if (d.oid === undefined) d.oid = d.id;
+            d.id = uNix++;
+            addNode(d, !0, d.parent);
+            if (d.task != null) d3.select('#ct-node-' + d.id).append('image').attr('class', 'ct-nodeTask').attr('width', '21px').attr('height', '21px').attr('xlink:href', 'images_mindmap/node-task-assigned.png').attr('x', 29).attr('y', -10);
+        });
+        dLinks = d3Tree.links(dNodes);
+        dLinks.forEach(function(d) {
+            d.id = uLix++;
+            addLink(d.id, d.source, d.target);
+        });
+        //zoom.translate([0,(cSize[1]/2)-dNodes[0].y]);
 
         // switch-layout feature
-        if ($('#switch-layout').hasClass('vertical-layout')) {
-            d.y = cSize[0] * 0.1 * (0.9 + typeNum[d.type]);
-            sections[d.type] = d.y;
-        } else {
-            d.y = d.x;
-            //Logic to change the layout and to reduce the length of the links
-            d.x = cSize[0] * 0.1 * (0.9 + typeNum[d.type]);
-            sections[d.type] = d.x;
-        }
-
-
-
-        if (d.oid === undefined) d.oid = d.id;
-        d.id = uNix++;
-        addNode(d, !0, d.parent);
-        if (d.task != null) d3.select('#ct-node-' + d.id).append('image').attr('class', 'ct-nodeTask').attr('width', '21px').attr('height', '21px').attr('xlink:href', 'images_mindmap/node-task-assigned.png').attr('x', 29).attr('y', -10);
-    });
-    dLinks = d3Tree.links(dNodes);
-    dLinks.forEach(function(d) {
-        d.id = uLix++;
-        addLink(d.id, d.source, d.target);
-    });
-    //zoom.translate([0,(cSize[1]/2)-dNodes[0].y]);
-
-    // switch-layout feature
-    if ($('#switch-layout').hasClass('vertical-layout'))
-        zoom.translate([(cSize[0] / 2) - dNodes[0].x, (cSize[1] / 5) - dNodes[0].y]);
-    else
-        zoom.translate([(cSize[0] / 3) - dNodes[0].x, (cSize[1] / 2) - dNodes[0].y]);
-    //zoom.translate([(cSize[0]/2),(cSize[1]/2)]);
-    zoom.event(d3.select('#ct-mapSvg'));
+        if ($('#switch-layout').hasClass('vertical-layout'))
+            zoom.translate([(cSize[0] / 2) - dNodes[0].x, (cSize[1] / 5) - dNodes[0].y]);
+        else
+            zoom.translate([(cSize[0] / 3) - dNodes[0].x, (cSize[1] / 2) - dNodes[0].y]);
+        //zoom.translate([(cSize[0]/2),(cSize[1]/2)]);
+        zoom.event(d3.select('#ct-mapSvg'));
      
     });
 
@@ -2698,14 +2698,14 @@ function resize1(){
 		dLinks_c = [];
 		$('.ct-node').removeClass('node-selected node-error');
 		$('.ct-link').removeClass('link-selected');
-		console.log('Resize');
+		// console.log('Resize');
 		var xvp = d3.select("#ct-mindMap").attr("transform").split(/[()]/)[1].split(',')[0];
 		var yvp = d3.select("#ct-mindMap").attr("transform").split(/[()]/)[1].split(',')[1];
 		var scale = (d3.select("#ct-mindMap").attr("transform").split(/[()]/)[3]);
 
 		dNodes.forEach( function(e,i) {
 			var lt = [parseFloat(xvp)+parseFloat(e.x)*parseFloat(scale),parseFloat(yvp)+parseFloat(e.y)*parseFloat(scale)];
-			console.log('l,t :',lt);
+			// console.log('l,t :',lt);
 			if(e.type!='modules'){
 				if(lt[0]>$('#rect-copy').position().left && lt[0]<($('#rect-copy').position().left+$('#rect-copy').width()) && lt[1]>$('#rect-copy').position().top && lt[1]<($('#rect-copy').position().top+$('#rect-copy').height())){
 					$('#ct-node-'+i).addClass('node-selected');
