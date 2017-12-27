@@ -535,6 +535,10 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     }
 
     $scope.copyMindMap = function() {
+        if(dNodes_c.length==0){
+            openDialogMindmap('Warning','Nothing is copied');
+            return;
+        }        
         copyMap();
     }
     $scope.startCopy = function() {
@@ -550,8 +554,15 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             $('.link-selected').removeClass('link-selected');
         }
     }
-
     $scope.pasteMap = function(){
+        if($('.fa.fa-pencil-square-o.fa-lg.plus-icon').hasClass('active-map')){
+            openDialogMindmap('Error','Please complete copy step first');
+            return;            
+        }
+        if(dNodes_c.length==0){
+            openDialogMindmap('Error','Nothing to paste');
+            return;
+        }
         $('#pasteImg1').toggleClass('active-map');
         var mod = false;
         //select a node to paste all red just available green module/scenario
