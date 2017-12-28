@@ -161,7 +161,7 @@ exports.versioning = function (req, res) {
 					assignedTasksNotification.count = count;
 					soc.emit("notify",assignedTasksNotification);
 			}
-			var nData = [], qList = [], idDict = {};
+			var nData = [], qList = [], idDict = {},nameDict={};
 			var createdOn = new Date().toLocaleString();
 			data = d.data.map;
 			prjId = d.data.prjId;
@@ -185,6 +185,7 @@ exports.versioning = function (req, res) {
 				var moduleID=null;
 				data.forEach(function (e, i) {
 					idDict[e.id] = (e.id_n) ? e.id_n : uuidV4();
+					nameDict[e.id] = e.name;
 					e.id = idDict[e.id];
 					t = e.task;
 					var taskstatus = 'inprogress';
@@ -285,9 +286,9 @@ exports.versioning = function (req, res) {
 						}
 
 						if (e.pid_c != 'null' && e.pid_c != undefined) {
-							qList.push({ "statement": "MERGE(n:TESTCASES{screenID:'" + idDict[e.pid] + "',testScenarioID:'" + lts + "',testCaseName:'" + e.name + "',testCaseID:'" + e.id + "',createdBy:'" + user + "',createdOn:'" + createdOn + "',uid:'" + uidx + "',testCaseID_c:'" + e.id_c + "'}) SET n.screenID_c='" + e.pid_c + "',n.childIndex='" + e.childIndex + "'" });
+							qList.push({ "statement": "MERGE(n:TESTCASES{screenID:'" + idDict[e.pid] + "',screenName:'"+nameDict[e.pid] +"',projectID:'" + prjId + "',testScenarioID:'" + lts + "',testCaseName:'" + e.name + "',testCaseID:'" + e.id + "',createdBy:'" + user + "',createdOn:'" + createdOn + "',uid:'" + uidx + "',testCaseID_c:'" + e.id_c + "'}) SET n.screenID_c='" + e.pid_c + "',n.childIndex='" + e.childIndex + "'" });
 						} else {
-							qList.push({ "statement": "MERGE(n:TESTCASES{screenID:'" + idDict[e.pid] + "',testScenarioID:'" + lts + "',testCaseName:'" + e.name + "',testCaseID:'" + e.id + "',createdBy:'" + user + "',createdOn:'" + createdOn + "',uid:'" + uidx + "',testCaseID_c:'" + e.id_c + "'}) SET n.childIndex='" + e.childIndex + "'" });
+							qList.push({ "statement": "MERGE(n:TESTCASES{screenID:'" + idDict[e.pid] + "',screenName:'"+nameDict[e.pid] +"',projectID:'" + prjId + "',testScenarioID:'" + lts + "',testCaseName:'" + e.name + "',testCaseID:'" + e.id + "',createdBy:'" + user + "',createdOn:'" + createdOn + "',uid:'" + uidx + "',testCaseID_c:'" + e.id_c + "'}) SET n.childIndex='" + e.childIndex + "'" });
 						}
 
 						//Relating testcases with screens
