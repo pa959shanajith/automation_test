@@ -78,7 +78,7 @@ mySPA.config(function($routeProvider, $locationProvider,$provide) {
 			 	templateUrl: 'partials/qualityCenter.html',
 			 	controller: 'qcController'
 			})
-			.when('/neuronGraphs2D',
+			.when('/neuronGraphs',
 			{
 			 	templateUrl: 'partials/neuronGraphs2D.html',
 			 	controller: 'neuronGraphs2DController'

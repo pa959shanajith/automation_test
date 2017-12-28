@@ -257,7 +257,7 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 				if (data != "fail") {
 					//To be removed - Has to come from database
 					var availablePlugins = [];
-					var key = ["ALM", "Auto Gen Path", "Dashboard", "Dead Code Identifier", "ICE", "Mindmap", "Neuron Graphs 2D", "Neuron Graphs 3D", "Oxbow Code Identifier", "Reports", "Weboccular"];
+					var key = ["ALM", "Auto Gen Path", "Dashboard", "Dead Code Identifier", "ICE", "Mindmap", "Neuron Graphs", "Neuron Graphs 3D", "Oxbow Code Identifier", "Reports", "Weboccular"];
 					for (i = 0; i < data.plugindetails.length; i++) {
 						availablePlugins.push({
 							"pluginName": key[i],

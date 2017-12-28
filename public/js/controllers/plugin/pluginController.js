@@ -170,7 +170,7 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 			//window.localStorage["_VM"] = true;
 			name = 'home'
 		}
-		else if(name == "p_NeuronGraphs2D") name = 'neuronGraphs2D';
+		else if(name == "p_NeuronGraphs") name = 'neuronGraphs';
 		else if(name == "p_NeuronGraphs3D") name = 'neuronGraphs3D';
 		window.localStorage['navigateScreen'] = name;
 		$timeout(function () {
