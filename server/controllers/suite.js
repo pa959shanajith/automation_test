@@ -2613,7 +2613,7 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 							logger.debug("ICE Socket requesting Address: %s" , name);
 							redisServer.redisPub1.pubsub('numsub','ICE1_scheduling_' + name,function(err,redisres){
 								if (redisres[1]==1) {
-									logger.info("Sending socket request for executeTestSuite to redis");
+									logger.info("Sending socket request for executeTestSuite:scheduling to redis");
 									dataToIce = {"emitAction" : "executeTestSuite","username" : name, "executionRequest": executionRequest};
 									redisServer.redisPub1.publish('ICE1_scheduling_' + name,JSON.stringify(dataToIce));
 									var starttime = new Date().getTime();
@@ -2710,14 +2710,15 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 														logger.error("Exception occured in the scheduleFunction: %s", ex);
 													}
 												}
-												if (resultData) {
+												else if (resultData) {
 													if (typeof(resultData) == "string") {
 														redisServer.redisSub2.removeListener("message",executeTestSuite_listener);
 														scheduleStatus = resultData == "success" ? "Completed" : resultData;
-													} else if (typeof(resultData) == "object") {
-														var stat = resultData.reportData.overallstatus[0].overallstatus;
-														scheduleStatus = stat == "success" ? "Completed" : stat;
-													}
+													} 
+													// else if (typeof(resultData) == "object") {
+													// 	var stat = resultData.reportData.overallstatus[0].overallstatus;
+													// 	scheduleStatus = stat == "success" ? "Completed" : stat;
+													// }
 													try {
 														logger.info("Calling function updateStatus from scheduleFunction");
 														updateStatus(sessObj, function (err, data) {
