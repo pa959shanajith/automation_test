@@ -3,7 +3,7 @@
  */
 var async = require('async');
 var myserver = require('../lib/socket');
-var jsreportClient = require("jsreport-client");
+var jsrclient = require("jsreport-client")("https://127.0.0.1:"+process.env.serverPort+"/reportServer/");
 var Client = require("node-rest-client").Client;
 var client = new Client();
 var epurl = "http://"+process.env.NDAC_IP+":"+process.env.NDAC_PORT+"/";
@@ -22,8 +22,6 @@ exports.getMainReport_ICE = function (req, res) {
 	logger.info("Inside UI service: getMainReport_ICE");
 	try {
 		if (isSessionActive(req)) {
-			var host = req.headers.host;
-			var jsrclient = jsreportClient("https://" + host + "/reportServer/");
 			jsrclient.render({
 				template: {
 					shortid: "HJP1pqMcg",
@@ -116,8 +114,6 @@ exports.renderReport_ICE = function (req, res) {
 			var shortId = "rkE973-5l";
 			if (reportType != "html")
 				shortId = "H1Orcdvhg";
-			var host = req.headers.host;
-			var jsrclient = jsreportClient("https://" + host + "/reportServer/");
 			jsrclient.render({
 				template: {
 					shortid: shortId,
@@ -642,7 +638,7 @@ exports.getReport_Nineteen68 = function (req, res) {
 						function (reportResult, response) {
 						if (response.statusCode != 200 || reportResult.rows == "fail") {
 							flag = "fail";
-							logger.error("Error occured in the service getReport_Nineteen68 - projectsUnderDomain: Failed to get report, executed time and scenarioIds from reports");
+							logger.error("Error occured in the service getReport_Nineteen68 - projectsUnderDomain: Failed to get report, executed time and scenarioIds from reports. Error Code : ERRNDAC");
 							res.send(flag);
 						} else {
 							var reportres = reportResult.rows.length;

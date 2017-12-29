@@ -186,10 +186,8 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 
 
 	$scope.Switch_Role = function () {
-
 		//var userId = JSON.parse(window.localStorage['_UI']).user_id;
 		var username = JSON.parse(window.localStorage['_UI']).username.toLowerCase();
-		//var username = JSON.parse(window.localStorage['_UI']).username;
 		var userRolesList;
 		var selRole;
 		if (JSON.parse(window.localStorage['_UI']).additionalrole.length == 0) {
@@ -198,17 +196,14 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 		}
 		LoginService.loadUserInfo_Nineteen68(username, selRole, false)
 			.then(function (response) {
-
 				if(response == "Invalid Session"){
 					$rootScope.redirectPage();
 				}
 				var roleasarray=[];
 				//roleasarray.push(response.additionalrole);
 				roleasarray = response.additionalrole;
-				console.log(roleasarray);
 				LoginService.getRoleNameByRoleId_Nineteen68(roleasarray)
 					.then(function (data) {
-
 						if (response == "Invalid Session") {
 							$rootScope.redirectPage();
 						}
@@ -247,11 +242,8 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 	}
 
 	$scope.switchRole_Yes = function () {
-		var currentRole = window.localStorage['_SR'];
 		var username = JSON.parse(window.localStorage['_UI']).username.toLowerCase();
-		//var username = JSON.parse(window.localStorage['_UI']).username;
 		var selRole = selectedROleID;
-
 		LoginService.loadUserInfo_Nineteen68(username, selRole, true)
 			.then(function (data) {
 				if (data != "fail") {
@@ -268,10 +260,6 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 						"pluginName": "Utility",
 						"pluginValue": "true"
 					})
-					// availablePlugins.push({
-					// 				"pluginName" : "Weboccular",
-					// 				"pluginValue" : "true"
-					// })
 					data.pluginsInfo = availablePlugins;
 					//window.localStorage['LoginSuccess'] = "True";
 					window.localStorage['_SR'] = additionalRoleName;

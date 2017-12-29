@@ -34,9 +34,9 @@ exports.getTaskJson_mindmaps = function (req, res) {
 	logger.info("Inside UI service: getTaskJson_mindmaps");
 	if (isSessionActive(req)) {
 		try {
-			var obj=req.body.obj;
-			req.session.obj = obj;
-			var qlist_query = [{'statement': "MATCH (a)-[r:FNTT {id:b.nodeID}]-(b) where b.assignedTo='" + req.session.obj.userid + "' return a,b"}];
+			var userid = req.session.userid;
+			var prjId=req.body.obj;
+			var qlist_query = [{'statement': "MATCH (a)-[r:FNTT {id:b.nodeID}]-(b) where b.assignedTo='" + userid + "' return a,b"}];
 			neo4jAPI.executeQueries(qlist_query,function(status,result){
 				if(status!=200) {
 					logger.info(result);
@@ -44,7 +44,7 @@ exports.getTaskJson_mindmaps = function (req, res) {
 				else {
 					var resultobj = {
 						"result": result,
-						"prjId": obj.prjId
+						"prjId": prjId
 					};
 					next_function(resultobj, function (err, data) {
 						if (err) {

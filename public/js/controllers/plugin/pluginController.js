@@ -19,7 +19,7 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 			var dataName = Encrypt.encode("p_"+pluginTxt);
 			$rootScope.plugins.push("p_"+pluginName);
 			$("#plugin-container").append('<div class="col-md-4 plugin-block"><span class="toggleClick pluginBox" data-name="p_'+availablePlugins[i].pluginName.replace(/\s/g,'')+'" id="'+availablePlugins[i].pluginName+'" title="'+availablePlugins[i].pluginName+'">'+availablePlugins[i].pluginName+'</span><input class="plugins" type="hidden" id="'+availablePlugins[i].pluginName+"_"+dataName+'"  title="'+pluginTxt+"_"+dataName+'"></div>').fadeIn();
-		}        
+		}
 	}
 	
 	//Integration with Mindmaps
@@ -36,17 +36,14 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 	{
 		var userInfo =  JSON.parse(window.localStorage['_UI']);
 		var userRole = window.localStorage['_SR'];
-		if(userRole == "Test Manager")
-		{
+		if(userRole == "Test Manager") {
 			$(".task-content").hide();
 		}
 		var userid = userInfo.user_id;
-		PluginService.getProjectIDs_Nineteen68(userid)
+		PluginService.getProjectIDs_Nineteen68()
 		.then(function (data) {
-		
-			if(data != "Fail" && data != "Invalid Session")
-			{
-				var obj={'userid':userid,'prjId':data};
+			if(data != "Fail" && data != "Invalid Session") {
+				var obj=data;
 				PluginService.getTaskJson_mindmaps(obj)
 				.then(function (data) {
 					if(data == "Invalid Session"){

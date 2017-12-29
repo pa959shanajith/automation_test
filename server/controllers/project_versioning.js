@@ -378,8 +378,6 @@ exports.versioning = function (req, res) {
 								else e.pid_n = null;
 							}
 						});
-
-						logger.debug('WriteMap data:',nData[rIndex]);
 						res.status(status).send(nData[rIndex]);
 					}
 				});
@@ -776,7 +774,6 @@ var parsing = function (d, module_type, vn, flag) {
 						var testcaseId_c_json = tc.testcaseId_c;
 						var testcaseName_json = tc.testcaseName;
 						var screenId_C_neo = tc.screenID_c;
-						logger.debug('testcaseId_json', testcaseId_c_json);
 						if (flag == 0) {
 							if (screenId_C_neo == 'null' || screenId_C_neo == undefined) {
 								qList_new.push({ "statement": "MATCH (b:VERSION{versionNumber:" + vn + "})-[r*1..]->(a:TESTCASES{testCaseName:'" + testcaseName_json + "',screenID:'" + screenId_json + "'}) SET a.screenID_c='" + screenId_c_json + "'" });
