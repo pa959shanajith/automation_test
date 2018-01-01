@@ -901,8 +901,8 @@ exports.getListofScheduledSocketMap = function (req, res) {
 
 exports.getCRId = function (req, res) {
 	logger.info("Inside UI service: getCRId");
-	final_data = { 'row': { 'cycleid': '', 'releaseid': '' } };
-	args = {
+	var final_data = { 'row': { 'cycleid': '', 'releaseid': '' } };
+	var args = {
 		data: { projectid: req.projectid }, headers: {
 			"Content-Type": "application/json"
 		}
@@ -914,25 +914,32 @@ exports.getCRId = function (req, res) {
 				logger.error("Error occured in getCRId service from create_ice/getReleaseIDs_Ninteen68 Error Code : ERRNDAC");
 				res(400, result);
 			} else {
-				if (result.rows.length != 0)
+				if (result.rows.length === 0) {
+					res(400, final_data);
+				} else {
 					final_data.row.releaseid = result.rows[0].releaseid;
-				args = {
-					data: { releaseid: final_data.row.releaseid }, headers: {
-						"Content-Type": "application/json"
-					}
-				};
-				client.post(epurl + "create_ice/getCycleIDs_Ninteen68", args, function (result1, response1) {
-					if (response1.statusCode != 200 || result1.status == "fail") {
-						logger.error("Error occured in getCRId service from create_ice/getCycleIDs_Ninteen68 Error Code : ERRNDAC");
-						res(400, result1);
-					} else {
-						if (result1.rows.length != 0)
-							final_data.row.cycleid = result1.rows[0].cycleid;
-						res(200, final_data);
-					}
-				});
+					args = {
+						data: { releaseid: final_data.row.releaseid },
+						headers: {
+							"Content-Type": "application/json"
+						}
+					};
+					client.post(epurl + "create_ice/getCycleIDs_Ninteen68", args, function (result1, response1) {
+						if (response1.statusCode != 200 || result1.status == "fail") {
+							logger.error("Error occured in getCRId service from create_ice/getCycleIDs_Ninteen68 Error Code : ERRNDAC");
+							res(400, result1);
+						} else {
+							if (result1.rows.length === 0) {
+								res(400, final_data);
+							} else {
+								final_data.row.cycleid = result1.rows[0].cycleid;
+								res(200, final_data);
+							}
+						}
+					});
+				}
 			}
-		});
+	});
 };
 
 /*
@@ -1991,7 +1998,7 @@ function testcasedetails_testscenarios(req, cb, data) {
 			resultdata.screenids = screenidlist;
 			resultdata.projectnames = projectnamelist;
 			resultdata.projectids = projectidlist;
-			logger.error("Sending response data from final function of testcasedetails_testscenarios");
+			logger.info("Sending response data from final function of testcasedetails_testscenarios");
 			cb(err, resultdata);
 		}
 	});
@@ -2613,7 +2620,7 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 							logger.debug("ICE Socket requesting Address: %s" , name);
 							redisServer.redisPub1.pubsub('numsub','ICE1_scheduling_' + name,function(err,redisres){
 								if (redisres[1]==1) {
-									logger.info("Sending socket request for executeTestSuite to redis");
+									logger.info("Sending socket request for executeTestSuite:scheduling to redis");
 									dataToIce = {"emitAction" : "executeTestSuite","username" : name, "executionRequest": executionRequest};
 									redisServer.redisPub1.publish('ICE1_scheduling_' + name,JSON.stringify(dataToIce));
 									var starttime = new Date().getTime();
@@ -2710,14 +2717,15 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 														logger.error("Exception occured in the scheduleFunction: %s", ex);
 													}
 												}
-												if (resultData) {
+												else if (resultData) {
 													if (typeof(resultData) == "string") {
 														redisServer.redisSub2.removeListener("message",executeTestSuite_listener);
 														scheduleStatus = resultData == "success" ? "Completed" : resultData;
-													} else if (typeof(resultData) == "object") {
-														var stat = resultData.reportData.overallstatus[0].overallstatus;
-														scheduleStatus = stat == "success" ? "Completed" : stat;
-													}
+													} 
+													// else if (typeof(resultData) == "object") {
+													// 	var stat = resultData.reportData.overallstatus[0].overallstatus;
+													// 	scheduleStatus = stat == "success" ? "Completed" : stat;
+													// }
 													try {
 														logger.info("Calling function updateStatus from scheduleFunction");
 														updateStatus(sessObj, function (err, data) {

@@ -719,7 +719,7 @@ function testsuiteid_exists(moduledetails, cb, data) {
 
 		moduledetails: function (modulecallback) {
 			logger.info("Inside the function moduledetails: testsuiteid_exists");
-			if (!flagId) {
+			if (!flagId && moduledetails.moduleid != "null") {
 				var inputs = {
 					'project_id': moduledetails.pid,
 					'module_name': moduledetails.modulename,
@@ -930,7 +930,7 @@ function testscenariosid_exists(testscenariodetails, cb, data) {
 		},
 		scenariodetails: function (scenariocallback) {
 			logger.info("Inside the function scenariodetails: testscenariosid_exists");
-			if (!flagId) {
+			if (!flagId && testscenariodetails.testscenarioid != "null") {
 				var inputs = {
 					'project_id': testscenariodetails.pid,
 					'scenario_name': testscenariodetails.testscenarioname,
@@ -1144,7 +1144,7 @@ function testscreen_exists(testscreendetails, cb, data) {
 		},
 		screendetails: function (screencallback) {
 			logger.info("Inside the function screendetails: testscreen_exists");
-			if (!flagId) {
+			if (!flagId && testscreendetails.testscreenid != "null") {
 				var inputs = {
 					'project_id': testscreendetails.pid,
 					'screen_name': testscreendetails.testscreenname,
@@ -1360,7 +1360,7 @@ function testcase_exists(testcasedetails, cb, data) {
 		},
 		testcasedetails: function (testcasecallback) {
 			logger.info("Inside the function testcasedetails: testcase_exists function");
-			if (!flagId) {
+			if (!flagId && testcasedetails.testcaseid != "null") {
 				var inputs = {
 					'screen_id': testcasedetails.screenId,
 					'testcase_name': testcasedetails.testcasename,

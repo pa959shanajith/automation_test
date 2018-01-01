@@ -38,12 +38,12 @@ try {
     var redisSessionClient = redis.createClient(redisConfig);
     redisSessionClient.on("error", function (err) {
         logger.error("Please run the Redis DB");
-        cluster.worker.disconnect().kill();
+        //cluster.worker.disconnect().kill();
     });
     redisSessionClient.on("connect", function (err) {
         logger.debug("Redis DB connected");
     });
-    var redisSessionStore = new redisStore({ host: process.env.REDIS_IP, port: process.env.REDIS_PORT, client: redisSessionClient});
+    var redisSessionStore = new redisStore({client: redisSessionClient});
 
     //HTTPS Configuration
     var certPath = "server/https/";
@@ -77,6 +77,7 @@ try {
         honorCipherOrder: true
     };
     var httpsServer = require('https').createServer(credentials, app);
+	process.env.serverPort = 8443;
     module.exports = app;
     module.exports.redisSessionStore = redisSessionStore;
     module.exports.httpsServer = httpsServer;
@@ -112,6 +113,14 @@ try {
         store: redisSessionStore
     }));
 
+    app.use('*',function(req,res,next){
+		if (req.session === undefined) {
+			res.status(500).send("<html><body><p>[ECODE 600] Intenal Server Error Occured!</p></body></html>");
+		} else {
+			return next();
+		}
+	});
+
     app.use(helmet());
     app.use(lusca.p3p('ABCDEF'));
     app.use(helmet.referrerPolicy({ policy: 'same-origin' }));
@@ -121,7 +130,7 @@ try {
         sha256s: ['AbCdEf123=', 'ZyXwVu456=']
     }));
     app.use(helmet.noCache());
-
+	
     //Role Based User Access to services
     app.post('*', function (req, res, next) {
         var roleId = req.session.defaultRoleId;
@@ -179,7 +188,7 @@ try {
             //   fontSrc: ["'self'"],
             objectSrc: ["'none'"],
             mediaSrc: ["'self'"],
-            frameSrc: ["'none'"]
+            frameSrc: ["data:"]
         }
     }));
 
@@ -424,7 +433,7 @@ try {
 
     //-------------SERVER START------------//
     var hostFamilyType = '0.0.0.0';
-    var portNumber = 8443;
+    var portNumber = process.env.serverPort;
     httpsServer.listen(portNumber, hostFamilyType); //Https Server
     try {
         var apireq = apiclient.post(epurl+"server", function (data, response) {
@@ -450,7 +459,7 @@ try {
         logger.error("Please run the Service API");
     }
 
-    // Start JS REPORT Server
+    //-------------JS REPORT SERVER BEGINS------------//
     var reportingApp = express();
     app.use('/reportServer', reportingApp);
     var jsreport = require('jsreport')({
@@ -466,6 +475,7 @@ try {
         logger.error(e.stack);
         process.exit(1);
     });
+    //-------------JS REPORT SERVER ENDS------------//
 
     //To prevent can't send header response
     app.use(function (req, res, next) {
@@ -478,9 +488,15 @@ try {
         };
         next();
     });
-app.use(function(err, req, res, next) {
-    res.send(err.message);
-});
+
+	app.get('*', function(req, res){
+		res.status(404).send("<html><body><p>The page could not be found or you don't have permission to view it.</p></body></html>");
+	});
+
+	app.use(function(err, req, res, next) {
+		logger.error(err.message);
+		res.status(500).send("<html><body><p>[ECODE 601] Intenal Server Error Occured!</p></body></html>");
+	});
 } catch (e) {
     logger.error(e);
     setTimeout(function () {

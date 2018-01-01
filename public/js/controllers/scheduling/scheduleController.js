@@ -516,6 +516,7 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 					$("#scheduledDataBody>.scheduleDataBodyRow .scheduleDataBodyRowChild").show();
 					$("#scheduledSuitesFilterData").prop('selectedIndex', 0);
 					changeBackground();
+					browserTypeExe = [];
 				}
 			}
 		}		

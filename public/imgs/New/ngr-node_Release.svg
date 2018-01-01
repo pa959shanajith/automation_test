@@ -1,0 +1,17 @@
+<svg width="60" height="60" xmlns="http://www.w3.org/2000/svg">
+ <!-- Created with Method Draw - http://github.com/duopixel/Method-Draw/ -->
+
+ <g>
+  <title>background</title>
+  <rect fill="none" id="canvas_background" height="17.0035" width="17.0035" y="-1" x="-1"/>
+ </g>
+ <g>
+  <title>Layer 1</title>
+  <rect fill="#1f77b4" stroke-width="0.1" x="9.291913" y="9.243422" width="43.64702" height="41.998123" id="svg_2" stroke="#ffffff"/>
+  <path fill="#1f77b4" stroke-width="0.1" d="m9.061805,17.84916l0,-8.535415l-8.729402,8.535415l8.729402,0z" id="svg_3" stroke="#ffffff"/>
+  <path fill="#1f77b4" stroke-width="0.1" d="m44.238911,51.373461l0,8.535416l8.535417,-8.535416l-8.535417,0z" id="svg_4" stroke="#ffffff"/>
+  <rect fill="#1f77b4" stroke-width="0.1" x="0.07755" y="17.875831" width="44.034983" height="41.998123" id="svg_1" stroke="#ffffff"/>
+  <text fill="#ffffff" stroke-width="0" x="11.053594" y="48.668843" id="svg_7" font-size="24" font-family="Helvetica, Arial, sans-serif" text-anchor="start" xml:space="preserve" transform="matrix(1.3109872382424692,0,0,1.1509205494498929,-3.8161124667716573,-7.393549963013754) " stroke="#000000">R</text>
+  <line fill="none" stroke="#ffffff" stroke-width="0.1" fill-opacity="null" x1="52.647949" y1="9.340416" x2="44.209527" y2="17.778838" id="svg_13" stroke-linejoin="null" stroke-linecap="null"/>
+ </g>
+</svg>

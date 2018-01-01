@@ -591,7 +591,7 @@ exports.loadUserInfo_Nineteen68 = function (req, res) {
 				userInfo: function (callback) {
 					try {
 						var inputs = {
-							"username": userName.toLowerCase(),
+							"username": userName,
 							"query": "userInfo"
 						};
 						var args = {
@@ -636,18 +636,13 @@ exports.loadUserInfo_Nineteen68 = function (req, res) {
 					}
 				},
 				loggedinRole: function (callback) {
-					var inputs;
+					var inputs = {
+						"query": "loggedinRole"
+					};
 					if (flag == true) {
-						inputs = {
-							"roleid": req.body.selRole,
-							"query": "loggedinRole"
-						};
-					}
-					if (flag == false || flag == undefined) {
-						inputs = {
-							"roleid": req.session.defaultRoleId,
-							"query": "loggedinRole"
-						};
+						inputs.roleid = switchedRole;
+					} else if (flag == false || flag == undefined) {
+						inputs.roleid = req.session.defaultRoleId;
 					}
 					var args = {
 						data: inputs,
@@ -692,7 +687,7 @@ exports.loadUserInfo_Nineteen68 = function (req, res) {
 						var inputs;
 						if (flag == true) {
 							inputs = {
-								"roleid": req.body.selRole,
+								"roleid": switchedRole,
 								"query": "userPlugins"
 							};
 						}
