@@ -38,7 +38,7 @@ try {
     var redisSessionClient = redis.createClient(redisConfig);
     redisSessionClient.on("error", function (err) {
         logger.error("Please run the Redis DB");
-        cluster.worker.disconnect().kill();
+        //cluster.worker.disconnect().kill();
     });
     redisSessionClient.on("connect", function (err) {
         logger.debug("Redis DB connected");
@@ -113,6 +113,14 @@ try {
         store: redisSessionStore
     }));
 
+    app.use('*',function(req,res,next){
+		if (req.session === undefined) {
+			res.status(500).send("<html><body><p>[ECODE 600] Intenal Server Error Occured!</p></body></html>");
+		} else {
+			return next();
+		}
+	});
+
     app.use(helmet());
     app.use(lusca.p3p('ABCDEF'));
     app.use(helmet.referrerPolicy({ policy: 'same-origin' }));
@@ -122,7 +130,7 @@ try {
         sha256s: ['AbCdEf123=', 'ZyXwVu456=']
     }));
     app.use(helmet.noCache());
-
+	
     //Role Based User Access to services
     app.post('*', function (req, res, next) {
         var roleId = req.session.defaultRoleId;
@@ -480,9 +488,15 @@ try {
         };
         next();
     });
-app.use(function(err, req, res, next) {
-    res.send(err.message);
-});
+
+	app.get('*', function(req, res){
+		res.status(404).send("<html><body><p>The page could not be found or you don't have permission to view it.</p></body></html>");
+	});
+
+	app.use(function(err, req, res, next) {
+		logger.error(err.message);
+		res.status(500).send("<html><body><p>[ECODE 601] Intenal Server Error Occured!</p></body></html>");
+	});
 } catch (e) {
     logger.error(e);
     setTimeout(function () {
