@@ -387,7 +387,8 @@ function addNode(n, m, pi) {
     // To fix rendering issue in FF issue #415
 
     var img_src = 'images_mindmap/node-' + n.type + '.png';
-    if(n.reuse && (n.type == 'testcases' || n.type=='screens')) img_src = 'images_mindmap/'+n.type+'-reuse.png';
+    //Hot fix for >>> Mindmap: Screen node icon is changed . It's a temporary fix for not to show reuse icons, it'll be reverted once the backend logic is fixed.
+    //if(n.reuse && (n.type == 'testcases' || n.type=='screens')) img_src = 'images_mindmap/'+n.type+'-reuse.png';
     if (n.type == 'modules_endtoend') img_src = 'images_mindmap/MM5.png';
     if ($("#ct-canvas").attr('class') == 'tabCreate ng-scope') {
         v.append('image').attr('height', '40px').attr('width', '40px').attr('class', 'ct-nodeIcon').attr('xlink:href', img_src).on('click', nodeCtrlClick);
