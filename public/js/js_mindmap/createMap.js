@@ -72,8 +72,8 @@ function loadMindmapData(param) {
 
             $(".project-list").change(function() {
                 //Mindmap clear search box on selecting different project
-                dNodes_c = [] //Copied data should be cleared
-                dLinks_c = [] // on change of projet list
+                dNodes_c = []; //Copied data should be cleared
+                dLinks_c = []; // on change of project list
                 $('.fa.fa-pencil-square-o.fa-lg.plus-icon').removeClass('active-map');
                 $('#rect-copy').remove();
                 $('.fa.fa-clipboard.fa-lg.plus-icon').removeClass('active-map');
@@ -302,7 +302,7 @@ function createNewMap(e) {
             childIndex: 0,
             name: 'Module_0',
             type: 'modules',
-            y: s[0] * 0.1(0.9),
+            y: s[0] * 0.1*(0.9),
             x: s[1] * 0.4,
             children: [],
             parent: null
@@ -391,7 +391,9 @@ function addNode(n, m, pi) {
     //if(n.reuse && (n.type == 'testcases' || n.type=='screens')) img_src = 'images_mindmap/'+n.type+'-reuse.png';
     if (n.type == 'modules_endtoend') img_src = 'images_mindmap/MM5.png';
     if ($("#ct-canvas").attr('class') == 'tabCreate ng-scope') {
-        v.append('image').attr('height', '40px').attr('width', '40px').attr('class', 'ct-nodeIcon').attr('xlink:href', img_src).on('click', nodeCtrlClick);
+        //v.append('image').attr('height', '40px').attr('width', '40px').attr('class', 'ct-nodeIcon').attr('xlink:href', img_src).on('click', nodeCtrlClick);
+        var v_c=v.append('image').attr('height', '40px').attr('width', '40px').attr('class', 'ct-nodeIcon').attr('xlink:href', img_src);
+        $(v_c.node()).on('click', nodeCtrlClick);
     } else {
         v.append('image').attr('height', '40px').attr('width', '40px').attr('class', 'ct-nodeIcon').attr('xlink:href', img_src).on('click', nodeClick);
     }
@@ -872,8 +874,10 @@ function nodeClick(e) {
         return;
     }
     e = e || window.event;
-    e.cancelbubble = !0;
-    if (e.stopPropagation) e.stopPropagation();
+    if(e){
+        e.cancelbubble = !0;
+        if (e.stopPropagation) e.stopPropagation();
+    }
     if (isIE) activeNode = this.parentNode;
     else activeNode = this.parentElement;
     var u, v, w, f, c = d3.select('#ct-assignBox');
@@ -1177,11 +1181,17 @@ function loadCycles() {
 }
 
 function nodeCtrlClick(e) {
+    d3.select('#ct-inpBox').classed('no-disp', !0);
+    e = e || window.event;
+    if(e){
+        e.cancelbubble = !0;
+        if (e.stopPropagation) e.stopPropagation();
+    }
+    if (isIE) activeNode = this.parentNode;
+    else activeNode = this.parentElement;    
     //In case of paste
 	var activeNode_temp;
 	if($('#pasteImg1').hasClass('active-map')){
-		if(isIE) activeNode=this.parentNode;
-		else activeNode=this.parentElement;	
 		activeNode_temp = activeNode;	
 		if(d3.select(activeNode).attr('data-nodetype')==$($('.node-selected')[0]).attr('data-nodetype')){
 			if($($('.node-selected')[0]).attr('data-nodetype')=='scenarios'){
@@ -1235,12 +1245,7 @@ function nodeCtrlClick(e) {
 		return;
 	}	
     
-    d3.select('#ct-inpBox').classed('no-disp', !0);
-    e = e || window.event;
-    e.cancelbubble = !0;
-    if (e.stopPropagation) e.stopPropagation();
-    if (isIE) activeNode = this.parentNode;
-    else activeNode = this.parentElement;
+
     var p = d3.select(activeNode);
     var t = p.attr('data-nodetype');
     var split_char = ',';

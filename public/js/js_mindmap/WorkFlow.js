@@ -2,8 +2,6 @@ var uNix_W,uLix_W,node,link,dNodes_W,dLinks_W,allMMaps_W,temp_W,faRef,mapSaved,z
 var cur_module,allMaps_info,activeNode_W,childNode_W;
 //unassignTask is an array to store whose task to be deleted
 var deletednode_W=[],unassignTask=[];
-var userInfo =  JSON.parse(window.localStorage['_UI']);
-var userid = userInfo.user_id;
 // node_names_tc keep track of testcase names to decide reusability of testcases
 var node_names_tc=[];
 var saveFlag=false;
@@ -13,7 +11,8 @@ var isIE = /*@cc_on!@*/false || !!document.documentMode;
 		$('.scrollbar-macosx').scrollbar();
     }
 function loadMindmapData_W(){
-	
+	var userInfo =  JSON.parse(window.localStorage['_UI']);
+	var userid = userInfo.user_id;
 	dataSender({task:'populateProjects',user_id:userid},function(err,result){
 		if(err) console.log(result);
 		else{
@@ -22,9 +21,9 @@ function loadMindmapData_W(){
                    $("#ct-moduleBox,.tabAssign").addClass("ct-expand-module");
                 }
 			result1=JSON.parse(result);
-			var selectedProject=$(".selectProjectEtem").val();
+			// var selectedProject=$(".selectProjectEtem").val();
 			$("#selectProjectEtem").empty();
-			for(i=0; i<result1.projectId.length && result1.projectName.length; i++){
+			for(i=0; i<(result1.projectId.length && result1.projectName.length); i++){
 				$('#selectProjectEtem').append("<option app-type='"+result1.appType[i]+"' data-id='"+result1.projectName[i]+"' value='"+result1.projectId[i]+"'>"+result1.projectName[i]+"</option>");	
 			}
 
@@ -34,6 +33,7 @@ function loadMindmapData_W(){
 			$("#selectProjectEtem option[value='" + selectedProject + "']").attr('selected', 'selected');
 			loadMindmapData1_W(); 
 			$("#selectProjectEtem").change(function () {
+				selectedProject = $(".project-list").val();
             //alert($(".project-list").val());
 				$('#eteSearchModules').val('')
 				if($("img.iconSpaceArrow").hasClass("iconSpaceArrowTop"))
@@ -141,7 +141,7 @@ function initiate_W(){
 	//u.append('div').attr('id','ct-unassignButton').append('a').html('Unassign').on('click',removeTask);
 	// var mapSvgDiv = canvas.append('div').attr("class","ct-mapSvgContainer");
 	// var mapSvg=mapSvgDiv.append('svg').attr('id','ct-mapSvg').call(zoom).on('click.hideElements',clickHideElements);
-	var mapSvg=canvas.append('svg').attr('id','ct-mapSvg').call(zoom_W).on('click.hideElements',clickHideElements);
+	var mapSvg=canvas.append('svg').attr('id','ct-mapSvg').call(zoom_W).on('click.hideElements',clickHideElements_W);
 	var dataAdder=[{c:'#5c5ce5',t:'Modules'},{c:'#4299e2',t:'Scenarios'},{c:'#19baae',t:'Screens'},{c:'#efa022',t:'Test Cases'}];
 	u=canvas.append('svg').attr('id','ct-legendBox').append('g').attr('transform','translate(10,10)');
 	dataAdder.forEach(function(e,i) {
@@ -1022,7 +1022,7 @@ function toggleExpandAssign(e){
 		$(".ct-nodeBox").css({"overflow":"", "width":""})
 	}
 };
-function clickHideElements(e){
+function clickHideElements_W(e){
 	d3.select('#ct-inpBox').classed('no-disp',!0);
 	d3.select('#ct-ctrlBox').classed('no-disp',!0);
 	d3.select('#ct-assignBox').classed('no-disp',!0);
