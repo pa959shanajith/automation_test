@@ -1811,6 +1811,7 @@ console.log("screenName:", screenName);
     });
     //To delete Scrape Objects
     $scope.del_Objects = function() {
+        
         $("#deleteObjectsModal").modal("hide");
         if (deleteScrapeDataservice) {
             var userinfo = JSON.parse(window.localStorage['_UI']);
@@ -1898,7 +1899,7 @@ console.log("screenName:", screenName);
                         openDialog("Delete Scrape Objects", "Scraped Objects deleted successfully.")
                         deleteFlag = true;
                         $(".checkStylebox").prop("checked", false);
-                        $("#deleteObjects").prop("disabled", true);
+                        $("#deleteObjects,#saveObjects").prop("disabled", true);
                         angular.element(document.getElementById("left-nav-section")).scope().getScrapeData();
                     } else {
                         openDialog("Delete Scrape Objects", "Scraped Objects fail to delete.")
@@ -1954,7 +1955,7 @@ console.log("screenName:", screenName);
                     newScrapedList.mirror = "";
                 }
                 $("#scraplist").empty();
-                $("#deleteObjects").prop("disabled", true);
+                $("#deleteObjects,#saveObjects").prop("disabled", true);
                 $(".checkStylebox").prop("checked", false);
             } else if (!$("input[type=checkbox].checkall").is(":checked")) {
                 openDialog("Delete Scrape data", "Please select objects to delete.")
@@ -2006,6 +2007,10 @@ console.log("screenName:", screenName);
                 $("#deleteObjects").prop("disabled", true);
             }
         }
+        if($(".ellipsis").length == 0)
+        {
+           $(".checkStylebox").prop('disabled', true);
+        }
     }
 
     function isInArray(value, array) {
@@ -2030,6 +2035,7 @@ console.log("screenName:", screenName);
         var count = 0;
         var numberOfElems = 0;
         var value = $(this).val();
+        
         $(".select_all").each(function() {
             if ($(this).find("span.ellipsis").text().toLowerCase().indexOf(value.toLowerCase()) > -1) {
                 numberOfElems++;
@@ -2042,10 +2048,17 @@ console.log("screenName:", screenName);
                 $(this).hide();
             }
         });
+
         if (numberOfElems == 0) {
-            $("#deleteObjects,.checkStylebox").prop("disabled", "disabled");
-        } else {
+            $("#deleteObjects,.checkStylebox").prop("disabled", true);
+         } 
+        else {
             $("#deleteObjects,.checkStylebox").prop("disabled", false);
+        }
+        var checkedLen = $(".ellipsis:checked").length;
+        if(checkedLen == 0)
+        {
+            $("#deleteObjects").prop("disabled", true);
         }
         if (numberOfElems == 0 && count == 0) {
             $('.checkStylebox').prop("checked", false);
