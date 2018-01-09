@@ -23,7 +23,7 @@ exports.loginQCServer_ICE = function (req, res) {
 		logger.info("Inside UI service: loginQCServer_ICE");
 		if (isSessionActive(req)) {
 			var name = req.session.username;
-			redisServer.redisSub2.subscribe('ICE2_' + name,1);
+			redisServer.redisSub2.subscribe('ICE2_' + name);
 			var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 			logger.debug("ICE Socket connecting IP: %s" , ip);
 			logger.debug("ICE Socket requesting Address: %s" , name);
@@ -107,7 +107,7 @@ exports.qcProjectDetails_ICE = function (req, res) {
 	try {
 		if (isSessionActive(req)) {
 			var name = req.session.username;
-			redisServer.redisSub2.subscribe('ICE2_' + name,1);
+			redisServer.redisSub2.subscribe('ICE2_' + name);
 			logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
 			logger.debug("ICE Socket requesting Address: %s" , name);
 			redisServer.redisPub1.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
@@ -298,7 +298,7 @@ exports.qcFolderDetails_ICE = function (req, res) {
 	try {
 		if (isSessionActive(req)) {
 			var name = req.session.username;
-			redisServer.redisSub2.subscribe('ICE2_' + name,1);
+			redisServer.redisSub2.subscribe('ICE2_' + name);
 			logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
 			logger.debug("ICE Socket requesting Address: %s" , name);
 			redisServer.redisPub1.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){

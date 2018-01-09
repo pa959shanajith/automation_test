@@ -62,7 +62,7 @@ exports.openScreenShot = function (req, res) {
 		var name = req.session.username;
 		logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
 		logger.debug("ICE Socket requesting Address: %s" , name);
-		redisServer.redisSub2.subscribe('ICE2_' + name,1);
+		redisServer.redisSub2.subscribe('ICE2_' + name);
 		redisServer.redisPub1.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
 			if (redisres[1]==1) {
 				logger.info("Sending socket request for render_screenshot to redis");
@@ -997,7 +997,7 @@ exports.connectJira_ICE = function (req, res) {
 	try{
 		if (isSessionActive(req)) {
 			var name = req.session.username;
-			redisServer.redisSub2.subscribe('ICE2_' + name,1);
+			redisServer.redisSub2.subscribe('ICE2_' + name);
 			if(req.body.action == 'loginToJira'){ //Login to Jira for creating issues
 				var jiraurl = req.body.url;
 				var jirausername = req.body.username;

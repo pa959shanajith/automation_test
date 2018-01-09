@@ -21,10 +21,8 @@ if (cluster.isMaster) {
             cluster.fork();
         }
     });
-
-} 
-else {
-    
+} else
+{
 try {
     var express = require('express');
     var app = express();

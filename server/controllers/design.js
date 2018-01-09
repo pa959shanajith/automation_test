@@ -38,7 +38,7 @@ exports.initScraping_ICE = function (req, res) {
 	try {
 		if (isSessionActive(req)) {
 			var name = req.session.username;
-			redisServer.redisSub2.subscribe('ICE2_' + name ,1);	
+			redisServer.redisSub2.subscribe('ICE2_' + name);	
 			var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 			logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
 			logger.info("ICE Socket requesting Address: %s" , name);
@@ -280,7 +280,7 @@ exports.highlightScrapElement_ICE = function (req, res) {
 		logger.info("Inside UI service: highlightScrapElement_ICE");
 		if (isSessionActive(req)) {
 			var name = req.session.username;
-			redisServer.redisSub2.subscribe('ICE2_' + name ,1);
+			redisServer.redisSub2.subscribe('ICE2_' + name);
 			var focusParam = req.body.elementXpath;
 			var elementURL = req.body.elementUrl;
 			var appType = req.body.appType;
@@ -1683,7 +1683,7 @@ exports.debugTestCase_ICE = function (req, res) {
 		logger.info("Inside UI service: debugTestCase_ICE");
 		if (isSessionActive(req)) {
 			var name = req.session.username;
-			redisServer.redisSub2.subscribe('ICE2_' + name ,1);
+			redisServer.redisSub2.subscribe('ICE2_' + name);
 			var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 			logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
 			logger.info("ICE Socket requesting Address: %s" , name);
