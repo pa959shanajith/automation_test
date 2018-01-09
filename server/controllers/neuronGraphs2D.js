@@ -32,9 +32,6 @@ var parseData = function(data){
 					}
 					delete n.properties[attrs];
 				}
-				//nodes.push({"id":n.id,"idx":nc,"type":nodeTypes[n.labels[0]],"name":n.properties.Name,"parent":[],"children":[]});
-				//console.log(nodeTypes[n.labels[0]],'\n')
-				//console.log('@@@@@@@@@@@n@@@@@@@@@@@@@:',JSON.stringify(n))
 				nodes.push({"id":n.id,"idx":nc,"type":nodeTypes[n.labels[0]],"name":n.properties.Name,"attributes": n.properties,"parent":[],"children":[]});
 				nodeIdDict[n.id]=nc;
 				nc++;
@@ -57,26 +54,6 @@ var parseData = function(data){
 		});
 	});
 	return {nodes:nodes,links:links,type:nodeTypes,root:rootIndex};
-};
-
-var get2DCoordsData = function(data,r,dNeed){
-	logger.info("Inside function: get2DCoordsData ");
-	if(r){
-		dNeed={};
-		if(data.children) data.children.forEach(function(p){
-			if(p.children){
-				dNeed[p.children.length]=1;
-				p.children.forEach(function(r){
-					if(r.children) dNeed[r.children.length]=1;
-				});
-			}
-		});
-	}
-	var dMap = JSON.parse(fs.readFileSync('./assets/nGraphs_2dcoords_300.json'));
-	for(var k in dNeed){
-		dNeed[k]=dMap[k.toString()];
-	}
-	return dNeed;
 };
 
 var cleanData = function(data){
@@ -103,22 +80,19 @@ exports.getGraphData = function(req, res){
 				res.setHeader('Content-Type', 'application/json');
 				if(status!=200){
 					//console.log("Status:",status,"\nResponse: ",result);
-					res.status(status).send(result);
+					res.status(status).send("Error connecting to neo4j!");
 				}
 				else{
 					var jsonData=result;
 					var pData=parseData(jsonData[0].data);
 					if(pData.nodes.length==0) res.status(status).send({"err":true,"ecode":"DB_NOT_FOUND","msg":"Neuron Graphs DB not found!"});
 					else{
-						var coords=get2DCoordsData(pData.nodes[pData.root]);
 						var cData=cleanData(pData.nodes);
-						pData.coords2D=coords;
 						pData.err=false;
 						res.status(status).send(pData);
 					}
 				}
 			});
-			
 		}
 		else{
 			res.send({"err":true,"ecode":"INVALID_SESSION","msg":"Your session has been expired. Please login again"});
@@ -129,98 +103,3 @@ exports.getGraphData = function(req, res){
 		res.send({"err":true,"ecode":"FAIL","msg":"Internal Error! Please contact admin"});
 	}
 };
-
-exports.getPackData = function(req, res){
-	logger.info("Inside UI service: getPackData");
-	try{
-		if (isSessionActive(req)) {
-			var dNeed=req.body.data;
-			var coords=get2DCoordsData(!1,!1,dNeed);
-			res.status(200).send({"err":false,"coords_data":coords});
-		}
-		else{
-			res.send({"err":true,"ecode":"INVALID_SESSION","msg":"Your session has been expired. Please login again"});
-		}
-	}
-	catch(exception){
-		logger.error("Exception in the service getPackData: ", exception);
-		res.send({"err":true,"ecode":"FAIL","msg":"Internal Error! Please contact admin"});
-	}
-};
-
-exports.getReportData = function(req, res){
-	logger.info("Inside UI service: getReportData");
-	try{
-		if (isSessionActive(req)) {
-			//my story
-			var req_testsuiteId=req.body.moduleid;
-			var req_executionId=req.body.executionid;
-			var req_testScenarioIds=req.body.testscenarioids;
-			// var getExecutionDetails="SELECT executionid,starttime,endtime FROM execution WHERE testsuiteid="
-			// 	+ req_testsuiteId ;
-			// dbConnICE.execute(getExecutionDetails,function(err,executionData){
-			var inputs = {"suiteid" :req_testsuiteId,"executionid":req_executionId,"testscenarioids":req_testScenarioIds};
-			//console.log("\n*****inputs******\n",inputs);
-			var args = {data:inputs,headers:{"Content-Type" : "application/json"}};
-			logger.info("Calling NDAC Service from getReportData :reports/getReportData");
-			client.post(epurl+"reports/getReportData",args,
-			function (result, response) {
-				var executionDetailsJSON={};
-				try{
-					// if(err){
-					if(response.statusCode != 200 || result.rows == "fail"){
-						//console.log(err);
-						res.send("fail");
-					}else{
-							//Correct response
-							res.send(result);
-						}
-						//console.log('executionDetailsJSON ',JSON.stringify(executionDetailsJSON));
-						//res.send(JSON.stringify(executionDetailsJSON));
-					}
-				catch(exception){
-					//console.log(exception);
-					logger.error(exception.message);
-					res.send("fail");
-				}
-			});
-
-		}
-		else{
-			res.send({"err":true,"ecode":"INVALID_SESSION","msg":"Your session has been expired. Please login again"});
-		}
-	}
-	catch(exception){
-		logger.error(exception.message);
-		res.send({"err":true,"ecode":"FAIL","msg":"Internal Error! Please contact admin"});
-	}
-};
-
-// exports.BuildRelationships = function(req, res){
-// 	try{
-//  	if (isSessionActive(req)) {
-// 			//my story
-// 			var qList = [];
-// 			qList.push({"statement":"MATCH (a:TESTSUITES_NG),(b:TESTSCENARIOS_NG) WHERE b.testscenarioid IN a.testscenarioids MERGE (a)-[r:FTSUTTSC_NG{id:b.testscenarioid}]->(b)"});
-// 			console.log('hi1');
-// 			qList.push({"statement":"MATCH (a:TESTCASES_NG),(b:SCREENS_NG) WHERE a.screenid=b.screenid MERGE (a)-[r:FTCETSCR_NG{id:b.screenid}]->(b)"})
-// 			console.log('hi2');
-// 			qList.push({"statement":"MATCH (a:TESTSCENARIOS_NG),(b:TESTCASES_NG) WHERE b.testcaseid IN a.testcaseids MERGE (a)-[r:FTSCTTCE_NG{id:b.testcaseid}]->(b)"})
-// 			console.log('hi3');
-// 			reqToAPI1(qList,urlData);
-// 			setTimeout(function() {
-// 				res.send("BuildRelationships executed successfully");	
-// 				console.log("==================After Response======================")
-// 			}, 20000);
-			
-
-// 		}
-// 		else{
-// 			res.send({"err":true,"ecode":"INVALID_SESSION","msg":"Your session has been expired. Please login again"});
-// 		}
-// 	}
-// 	catch(exception){
-// 		console.log(exception);
-// 		res.send({"err":true,"ecode":"FAIL","msg":"Internal Error! Please contact admin"});
-// 	}
-// }

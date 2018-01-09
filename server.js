@@ -417,8 +417,6 @@ try {
     app.post('/updateFrequency_ProfJ', chatbot.updateFrequency_ProfJ);
     //NeuronGraphs Plugin Routes
     app.post('/getGraph_nGraphs2D', neuronGraphs2D.getGraphData);
-    app.post('/getPackData_nGraphs2D', neuronGraphs2D.getPackData);
-    app.post('/getReportData_nGraphs2D', neuronGraphs2D.getReportData);
     //QC Plugin
     app.post('/loginQCServer_ICE', qc.loginQCServer_ICE);
     app.post('/qcProjectDetails_ICE', qc.qcProjectDetails_ICE);
