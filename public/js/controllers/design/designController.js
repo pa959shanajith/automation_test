@@ -48,6 +48,14 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
         if (navigator.appVersion.indexOf("Mac") != -1) {
             $(".safariBrowser").show();
         }
+        if($("#compareChangedObjectsBox").is(":visible") == true)
+        {
+           $("#viewscrapedObjects").show();
+        }
+        else{
+            $("#viewscrapedObjects").hide();
+        }
+
     }, 500)
 
     //Task Listing
@@ -1502,7 +1510,7 @@ console.log("screenName:", screenName);
                     if (data.action == "compare") {
                         updatedViewString = data;
                         $("#changedOrdList li,#compareUnchangedObjectsBox li ,#compareNotFoundObjectsBox li").empty();
-                        $("#viewscrapedObjects").hide();
+                      //  $("#viewscrapedObjects").hide();
                         //Hide Scrape Objects
                         $("#scrapTree,.fsScroll").hide();
                         if (data.view[0].changedobject.length > 0) {
@@ -1737,6 +1745,18 @@ console.log("screenName:", screenName);
                             deleteScrapeDataservice = false;
                         } else $("#saveObjects").addClass('hide');
                     }
+                    if($("#compareChangedObjectsBox").is(":visible") == true)
+                    {
+                        $("#viewscrapedObjects").show();
+                    }
+                    else{
+                        $("#viewscrapedObjects").hide();
+                    }
+
+                    $(document).on('click','#viewscrapedObjects',function() {
+                            window.location.href = '/design';
+                    });
+
                 }, function(error) {
                     console.log("Fail to Load design_ICE")
                 });

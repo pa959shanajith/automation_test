@@ -1064,7 +1064,7 @@ input[disabled]{
 {
     float: left;
     width: 80%;
-    margin-top: 2%;
+    /* margin-top: 2%; */
 }
 .compareObjHeading
 {
