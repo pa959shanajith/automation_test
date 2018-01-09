@@ -48,15 +48,16 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
         if (navigator.appVersion.indexOf("Mac") != -1) {
             $(".safariBrowser").show();
         }
-        if($("#compareChangedObjectsBox").is(":visible") == true)
-        {
-           $("#viewscrapedObjects").show();
-        }
-        else{
-            $("#viewscrapedObjects").hide();
-        }
 
     }, 500)
+
+    if($("#compareChangedObjectsBox").is(":visible") == true)
+    {
+       $("#viewscrapedObjects").show();
+    }
+    else{
+        $("#viewscrapedObjects").hide();
+    }
 
     //Task Listing
     loadUserTasks()
