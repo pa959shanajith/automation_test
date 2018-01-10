@@ -50,12 +50,14 @@
 
 			</div>
 
-			<div class="scrollbar-inner crawl-result" >
-				<h4 ng-if="arr.length > 0">Subdomains </h4>
-				<p ng-repeat= "a in arr track by $index">{{a}} </p>
-				<br>
-				<h4 ng-if="otherLinks.length > 0">Other Links</h4>
-				<p ng-repeat= "a in otherLinks track by $index">{{a.name}} </p>
+			<div class="scrollbar-inner" >
+				<div class="crawl-result" >
+					<h4 ng-if="arr.length > 0">Subdomains </h4>
+					<p ng-repeat= "a in arr track by $index">{{a}} </p>
+					<br>
+					<h4 ng-if="otherLinks.length > 0">Other Links</h4>
+					<p ng-repeat= "a in otherLinks track by $index">{{a.name}} </p>
+				</div>
 			</div>
 		</div>
 
@@ -83,7 +85,7 @@
           		</div>
         	</a>
 			<!--Popup-->
-			<div tabindex="0" id="window-task" class="popupWrap">
+			<div tabindex="0" id="window-task" class="popupWrap" style="z-index: 99999 !important;">
 				<h4 class="h4-custom closePopup">My task(s)<img class="closePopup pull-right" src="imgs/ic-arrow.png" /></h4>
 				<div class="input-group">
 						<span class="input-group-addon inputMyTask" id="basic-addon1"><img src="imgs/ic-search-icon.png"></span>
@@ -102,7 +104,7 @@
 		<!--Images Blocks-->
 
 		<!--Images Blocks-->
-		<div class="thumbnail thumbnail-custom">
+		<div class="thumbnail thumbnail-custom" ng-show="showInfo">
         	<a class="slidePopup"  title="Info">
           		<img class="thumb-ic" src="imgs/ic-info.png" alt="Project Info">
           		<div class="caption">
@@ -112,7 +114,25 @@
 			<!--Popup-->
 			<div tabindex="0" id="window-pi" class="popupWrap">
 				<h4 class="h4-custom closePopup">Information <img class="closePopup pull-right" src="imgs/ic-arrow.png" /></h4>
-				<div class="popupContent projectInfoWrap"></div>
+				<div class="popupContent projectInfoWrap">
+					<p>
+						<b>Name : </b>
+						<a href ="{{clickedNode.name}}" title="{{clickedNode.name}}" target='_blank' ng-bind="clickedNode.name"></a>
+					</p>
+					<p ng-show= "clickedNode.parent != 'None'">
+						<b>Parent : </b>
+						
+						<a  href ="{{clickedNode.parent != 'None' ? clickedNode.parent : ''}}" title="{{clickedNode.parent}}" target='_blank' ng-bind="clickedNode.parent"></a>						
+					</p>
+					<p>
+						<b>Level : </b>
+						<span ng-bind="clickedNode.level"></span>						
+					</p>
+					<p>
+						<b>Status : </b>
+						<span ng-bind="clickedNode.status"></span>						
+					</p>
+				</div>
 			</div>
 			<!--Popup-->
       	</div>

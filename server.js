@@ -327,7 +327,7 @@ try {
     var plugin = require('./server/controllers/plugin');
     var utility = require('./server/controllers/utility');
     var qc = require('./server/controllers/qualityCenter');
-    var webCrawler = require('./server/controllers/webCrawler');
+    var webocular = require('./server/controllers/webocular');
     var chatbot = require('./server/controllers/chatbot');
     var neuronGraphs2D = require('./server/controllers/neuronGraphs2D');
     var dashboard = require('./server/controllers/dashboard');
@@ -409,7 +409,7 @@ try {
     //Utility plugins
     app.post('/Encrypt_ICE', utility.Encrypt_ICE);
     // Wecoccular Plugin
-    app.post('/crawResults', webCrawler.getCrawlResults);
+    app.post('/crawResults', webocular.getCrawlResults);
     //Chatbot Routes
     app.post('/getTopMatches_ProfJ', chatbot.getTopMatches_ProfJ);
     app.post('/updateFrequency_ProfJ', chatbot.updateFrequency_ProfJ);

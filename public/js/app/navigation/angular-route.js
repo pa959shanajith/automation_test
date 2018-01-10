@@ -70,8 +70,8 @@ mySPA.config(function($routeProvider, $locationProvider,$provide) {
 			 	controller: 'mindmapController'
 			})
 			.when('/p_Weboccular',{
-				templateUrl: 'partials/webCrawler.html',
-				controller: 'webCrawlerController'
+				templateUrl: 'partials/webocular.html',
+				controller: 'webocularController'
 			})
 			.when('/p_ALM',
 			{
