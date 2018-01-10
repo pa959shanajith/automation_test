@@ -48,10 +48,7 @@ exports.getCrawlResults = function (req, res) {
 								if (data.onAction == "unavailableLocalServer") {
 									redisServer.redisSub2.removeListener('message',webCrawlerGo_listener);	
 									logger.error("Error occured in getCrawlResults: Socket Disconnected");
-									if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
-										var soc = myserver.socketMapNotify[name];
-										soc.emit("ICEnotAvailable");
-									}
+									res.send("unavailableLocalServer");
 								} else if (data.onAction == "result_web_crawler") {
 									try {
 										var mySocketUI = myserver.allSocketsMapUI[name];
@@ -78,8 +75,7 @@ exports.getCrawlResults = function (req, res) {
 						res.send("unavailableLocalServer");
 					}
 				});
-			} 
-			else {
+			} else {
 				res.send('unavailableLocalServer');
 			}
 		} else {

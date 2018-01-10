@@ -108,6 +108,7 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
     socket.on('connectionAck', function(value){
       webocularServices.getResults($scope.url, $scope.level, $scope.selectedAgent).then(function(data){
         console.log("Data from service", data);
+
         if (data == "unavailableLocalServer") {
           $scope.hideBaseContent = { message: 'false' };
           // Display the progress canvas after clearing all dots.
@@ -116,6 +117,12 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
           return false;
         }else if(data == "Invalid Session"){
           $rootScope.redirectPage();
+        }else if( data == "localServerInterrupted"){
+          $scope.hideBaseContent = { message: 'false' };
+          // Display the progress canvas after clearing all dots.
+          $('#progress-canvas').hide();
+          openDialog("Weboccular Screen", "ICE Engine is not available. Please run the batch file and connect to the Server.");
+          return false;
         }
       }, function(err){
         console.log("Error :", err)
@@ -456,7 +463,7 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
       level : 0,
       status : root.status
     }
-    
+
     var width = window.innerWidth,
     height = window.innerHeight,
     nodes,
