@@ -1,5 +1,11 @@
-mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$timeout', 'webCrawlerServices','cfpLoadingBar','$window', 'socket', function($scope,$http,$location,$timeout,webCrawlerServices,cfpLoadingBar,$window,socket) {
-
+mySPA.controller('webCrawlerController', ['$scope', '$http', '$rootScope', '$location', '$timeout', 'webCrawlerServices','cfpLoadingBar','$window', 'socket', function($scope,$http, $rootScope, $location,$timeout,webCrawlerServices,cfpLoadingBar,$window,socket) {
+  $timeout(function() {
+    $('.scrollbar-inner').scrollbar();
+    $('.scrollbar-macosx').scrollbar();
+    document.getElementById("currentYear").innerHTML = new Date().getFullYear()
+    cfpLoadingBar.complete()
+    $("#utilityEncrytpion").trigger("click");
+  }, 500)
   $timeout(function () {
     // Without JQuery
     var slider = new Slider('#level-slider', {
@@ -8,12 +14,11 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
       }
     });
   }, 10);
-  if(window.localStorage['navigateScreen'] != "p_Weboccular")
-	{
+  if(window.localStorage['navigateScreen'] != "p_Weboccular"){
 		window.location.href = "/";
 	}
     //Task Listing
-    loadUserTasks()
+  loadUserTasks()
   window.onbeforeunload = function() {
     return "Data will be lost if you leave the page, are you sure?";
   };
@@ -50,6 +55,7 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
     $('#middle-content-section').removeAttr('class');
 
     $("#result-canvas").hide();
+    $scope.showInfo = false;
     $scope.hideBaseContent = { message: 'false' };
     if(!$scope.reportGenerated){
       $scope.check = true;
@@ -132,7 +138,6 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
     });
 
     socket.on('newdata', function(obj){
-      //console.log(obj);
       var name = obj.name;
       var parent = obj.parent;
 
@@ -156,7 +161,6 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
 
       $scope.enableGenerate = true;
       $scope.check= false;
-      //  $scope.arr = obj.subdomains;
       $scope.$apply();
 
       socket.disconnect('', { query: "check=true" })
@@ -227,7 +231,6 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
   var removeIndex = 2; // 0 and 1 index is for slider and domain dot. We don't have to remove that
   var maxDots =  dotsPosition.length-1;
   $scope.addDot = function(obj){
-    //console.log("in add dot", currentDot);
     if(currentDot >= 40){
       currentDot = 0;
       start = true;
@@ -299,7 +302,7 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
       */
       if(arr[i].redirected && (arr[i].redirected != "no"  && arr[i].name != arr[i].redirected)){
         var json = {
-          "type" : "redirected",
+          "type" : arr[i].type== "subdomain" ? "redirectedSubdomain" : "redirected",
           "name" : arr[i].redirected,
           "parent" : arr[i].name,
           "level" : arr[i].level,
@@ -336,7 +339,7 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
         }
 
         var thisNode = levelObjects[k];
-        if(obj[i][k].type == "redirected"){
+        if(obj[i][k].type == "redirected" || obj[i][k].type == "redirectedSubdomain" ){
           for(var j = 0; j <= (obj[i].length)-1; j++){
             if (thisNode.parent == obj[i][j].name) {
               if (obj[i][j].children) {
@@ -344,6 +347,11 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
               }else{
                 obj[i][j].children =  [];
                 obj[i][j].children.push(thisNode);
+              }
+              if(thisNode.status != 200){
+                obj[i][j].containsDeadLink = true;
+              }else if(thisNode.containsDeadLink){
+                obj[i][j].containsDeadLink = true;
               }
               break;
             }
@@ -370,6 +378,11 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
               obj[i-1][j].children =  [];
               obj[i-1][j].children.push(thisNode);
             }
+            if(thisNode.status != 200){
+              obj[i-1][j].containsDeadLink = true;
+            }else if(thisNode.containsDeadLink){
+              obj[i-1][j].containsDeadLink = true;
+            }
             a = false;
             break;
           }
@@ -379,7 +392,7 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
     }
     return obj[0];
   }
-
+  var deadLinks = [];
   function addParents(arr, parent){
     var arrLength = arr.length;
     for (var i = 0; i < arrLength; i++) {
@@ -396,11 +409,11 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
   var positionNode = {"x":0 , "y":0};
   $scope.generateGraph = function(){
     $("#result-canvas").show();
+    $scope.showInfo = true;
     $scope.hideBaseContent = { message: 'true' };;
     if ($scope.check) {
       return;
     }
-    //$("#result-canvas").empty();
     
     $scope.reportGenerated = false;
     var baseSVG = document.getElementById("base-svg");
@@ -432,6 +445,7 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
 
     var root = parseRelations(createLevelObject($scope.crawledLinks));
     console.log(root);
+
     var init = []
     root = addParents(root, init);
     for (var i = 0; i < root.length; i++) {
@@ -440,7 +454,12 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
         break;
       }
     }
-
+    $scope.clickedNode = {
+      name : root.name, 
+      parent : "",
+      level : 0,
+      status : root.status
+    }
     var width = window.innerWidth,
     height = window.innerHeight,
     nodes,
@@ -552,7 +571,7 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
       nodes = flatten(root),
       links = d3.layout.tree().links(nodes);
 
-      for(i = 0; i < links.length; i ++ ){
+      for(i = 0; i < links.length-1; i ++ ){
         d = links[i];
         var isFound = true;
         if(d.target.type == "duplicate"|| d.target.type == "reverse"){
@@ -592,11 +611,11 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
     function addStylesToNode(d) {
       // for root node
       if(d.parent == "None/")
-      return "imgs/wc-p-sq.png"
+        return "imgs/wc-p-sq.png"
       if(d.redirected != undefined && d.redirected != "no")
-      return "imgs/circle-outline-256.png"
+        return "imgs/circle-outline-256.png"
       if (d.status!=200) {
-        if(d.type == "subdomain"){
+        if(d.type == "subdomain" || d.type == "redirectedSubdomain"){
           return "imgs/wc-red-sq.png"
         }else if(d.type == "reverse"){
           return "imgs/ic-cycle.png"
@@ -606,23 +625,30 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
 
       if(d.isTerminal == true){
         if (d.status != 200) {
-          if(d.type == "subdomain"){
+          if(d.type == "subdomain" || d.type == "redirectedSubdomain"){
             return "imgs/wc-red-sq.png"
           }else if(d.type == "reverse"){
             return "imgs/ic-cycle.png"
           }
           return "imgs/circle-128.png"
         }else{
-          if(d.type == "subdomain"){
+          if(d.type == "subdomain" || d.type == "redirectedSubdomain"){
             return "imgs/wc-sq.png"
           }
           return "imgs/wc-cr.png"; // terminal node
         }
       }else if(d.nodeOpen == false){
+        if(d.containsDeadLink)
+          return "imgs/wc-p-ContainsDeadlink.png";
         return "imgs/wc-p-cr.png"; // collapsed node
       }else if (!d.children && !d._children) {
+        if( d.type == "redirectedSubdomain"){
+          return "imgs/wc-sq.png"
+        }
         return "imgs/wc-cr.png"
       }else{
+        if(d.containsDeadLink)
+          return "imgs/wc-m-ContainsDeadlink.png";
         return "imgs/wc-m-cr.png";
       }
     }
@@ -748,7 +774,6 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
     }
 
     document.getElementById("result-canvas").addEventListener("dblclick", () => {
-      console.log("reset the zoom ");
       zoomReset = true;
       svgMain.call(d3.behavior.zoom().scale(1).translate([positionNode.x,positionNode.y]).scaleExtent([0.5, 7.5]).on("zoom", rescale)).on("dblclick.zoom", null);
       svg.attr("transform",
@@ -770,7 +795,6 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
         positionNode.y =  (-d.y + canvSize[1]/2) ;
       }
       return "translate(" + d.x + "," + d.y + ")"; });
-
     }
 
     function color(d) {
@@ -806,7 +830,14 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$location', '$time
 
     // Toggle children on click.
     function click(d){
-      console.log(activeD)
+      $scope.clickedNode = {
+        name :  d.name,
+        parent : d.parent,
+        level : d.level,
+        status : d.status
+      }
+  
+      $scope.$apply();
       // if (d3.event.defaultPrevented) return; // ignore drag
       if (activeD.length > 0 && d.name != activeD[activeD.length-1].name ) {
         var i = activeD.length-1;

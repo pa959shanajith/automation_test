@@ -1,7 +1,7 @@
 <div ng-controller='headerController' class="container-fluid container-fluid-spacing">
     <!--left Logo-->
     <div class="logoPart">
-        <img width="160" src="imgs/logo.png" style="cursor: pointer;" id='naviPg' />
+        <img width="160" src="imgs/logo.png" style="cursor: pointer;" id='naviPg' ng-click="naviPg()" />
     </div>
     <!--left Logo-->
 <!-- Notify Div -->
@@ -16,7 +16,7 @@
                 <span class='userInfo'>Switch Role</span>
             </button>
             <ul class="dropdown-menu" id="switchRoles">
-                <!--<li class="switchRole_confirm"><a href="#" data-toggle="modal" data-target="#switchRoleModal">Test Engineer</a></li>-->
+                <!--<li class="switchRole_confirm" ng-click="switchedRoleConfirm()"><a href="#" data-toggle="modal" data-target="#switchRoleModal">Test Engineer</a></li>-->
                 <!--<li><a href="#" data-toggle="modal" data-target="#switchRoleModal">Test Lead</a></li>-->
             </ul>
         </div>
@@ -37,7 +37,7 @@
 				</div>-->
 
 				<div class="dropdown col-sm-2 bell-icon-div">
-						<button class="btn btn-secondary dropdown-toggle notify-btn" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" >
+						<button class="btn btn-secondary dropdown-toggle notify-btn" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" ng-click="dropdownMenuButton()" aria-expanded="false" >
 								<span class="count animated ng-binding" id="notifications-count" ng-bind=""></span>
 								<span class='glyphicon glyphicon-bell bell-icon'></span>
 						</button>

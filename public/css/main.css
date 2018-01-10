@@ -4698,10 +4698,10 @@ select:-webkit-autofill:focus {
 .crawl-result{
     margin-top: 30px;
     border: 1px solid black;
-    height: 350px;
+    max-height: 350px;
     overflow: auto;
-    border-radius: 10px;
-    padding: 30px;
+    border-radius: 4px;
+    padding: 15px
 }
 
 .dot {
@@ -4717,9 +4717,9 @@ select:-webkit-autofill:focus {
 }
 
 #progress-canvas{
+  z-index:0;
   top:40px;
   position: relative;
-  /*border:1px solid;*/
   max-height: 600px;
   height : 80%;
 }
@@ -4735,6 +4735,16 @@ select:-webkit-autofill:focus {
     animation-name: example;
     animation-duration: 4s;
     animation-iteration-count:infinite;
+}
+.projectInfoWrap p{
+    max-width: 350px;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow:ellipsis;
+}
+.projectInfoWrap a{
+    color :white;
 }
 
 /* Safari 4.0 - 8.0 */

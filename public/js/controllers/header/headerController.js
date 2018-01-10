@@ -53,27 +53,24 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 
 	
 	socket.on('notify', function (value) {
-			if(value.count == 0)
-			{
-				var dateTime = new Date().toLocaleString();
-				if (value.to.indexOf($location.$$path) >= 0) {
-					$('.top-left').notify({
-						message: {
-							text: value.notifyMsg
-						},
-						animate: {
-							enter: 'animated fadeInRight',
-							exit: 'animated fadeOutRight'
-						}
-					}).show();
-			}
+		if(value.count == 0){
+			var dateTime = new Date().toLocaleString();
+			if (value.to.indexOf($location.$$path) >= 0) {
+				$('.top-left').notify({
+					message: {
+						text: value.notifyMsg
+					},
+					animate: {
+						enter: 'animated fadeInRight',
+						exit: 'animated fadeOutRight'
+					}
+				}).show();
+		}
 			
-			value.count = value.count + 1;
-		
-
+		value.count = value.count + 1;
+	
 		if (window.localStorage.notification) {
 			var notificationArr = window.localStorage.notification;
-			//console.log(JSON.parse(notificationArr));
 			notificationArr = JSON.parse(notificationArr);
 			value.dateTime = dateTime;
 			notificationArr.push(value);
@@ -81,103 +78,73 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 			window.localStorage.notification = notificationArr;
 			$scope.notifications = JSON.parse(window.localStorage.notification);
 			$scope.$apply();
-
-		}
-		else {
+		}else {
 			var notificationArr = [];
 			value.dateTime = dateTime;
 			notificationArr.push(value);
-			console.log(JSON.stringify(notificationArr));
 			notificationArr = JSON.stringify(notificationArr)
 			window.localStorage.notification = notificationArr;
 			$scope.notifications = JSON.parse(window.localStorage.notification);
 			$scope.$apply();
 		}
 		unreadNotifications();
-		$(document).on("click", "#dropdownMenuButton", function (e) {
 
-			if ($(".notify-div").is(":visible") == true) {
-				$("#notifications-count").hide();
-				var readMessages = JSON.parse(window.localStorage.notification);
-				for (var i = 0; i < readMessages.length; i++) {
-					readMessages[i].isRead = true;
-				}
-				window.localStorage.notification = JSON.stringify(readMessages);
-			}
-
-		});
 		}
 	});
 
 	function unreadNotifications() {
-		if(window.localStorage.notification)
-		{
+		if(window.localStorage.notification){
 			var notifications = JSON.parse(window.localStorage.notification);
 			var unreadNotifications = notifications.filter(a => a.isRead == false);
 			var notificationCount = unreadNotifications.length;
 			if (notificationCount < 1 || notificationCount == '' || notificationCount == undefined) {
 				$("#notifications-count").hide();
-			}
-			else {
+			}else {
 				$("#notifications-count").show();
 				$("#notifications-count").text(notificationCount);
 			}
 		}
 	}
+
 	setTimeout(function () {
 		unreadNotifications();
 	}, 500);
 
-	$(document).on("click", "#dropdownMenuButton", function (e) {
-		if ($(".notifyMsgDiv").length < 1) {
+	$scope.dropdownMenuButton = function(){
+		if (!window.localStorage.notification) {
 			$("#notifyBox").removeClass('dropdown-menu');
+			return;
 		}
-		else {
-			$("#notifyBox").removeClass('dropdown-menu').addClass('dropdown-menu');
+
+		$("#notifyBox").removeClass('dropdown-menu').addClass('dropdown-menu');
+		$("#notifications-count").hide();
+		var readMessages = JSON.parse(window.localStorage.notification);
+		for (var i = 0; i < readMessages.length; i++) {
+			readMessages[i].isRead = true;
 		}
-		if ($(".notify-div").is(":visible") == true) {
-			$("#notifications-count").hide();
-			var readMessages = JSON.parse(window.localStorage.notification);
-			console.log("read", readMessages);
-			for (var i = 0; i < readMessages.length; i++) {
-				readMessages[i].isRead = true;
-			}
-			window.localStorage.notification = JSON.stringify(readMessages);
-		}
-	});
+		window.localStorage.notification = JSON.stringify(readMessages);
+	}
 
-
-
-	$(document).on("click", "#naviPg", function (e) {
+	$scope.naviPg = function(){
 		if (window.localStorage['_SR'] != 'Admin') {
 			window.localStorage["_VP"] = true;
 			window.localStorage['navigateScreen'] = "plugin";
-			//window.location.assign('plugin');
 			$timeout(function () {
 				$location.path('/plugin');
 		   	}, 100);
 		}
-	});
+	}
 
 	var additionalRoleName;
 	var userId = JSON.parse(window.localStorage['_UI']).user_id;
 
-	$(document).on('click', ".switchRole_confirm", function () {
-		//primaryRoleName = window.localStorage['_SR'];
+	$scope.switchedRoleConfirm = function(){
 		additionalRoleName = $(this).text();
 		selectedROleID = $(this).valueOf("outerHTML").data("id");
-		console.log($(this).text());
 		openModelPopup("Switch Role", "Are you sure you want to switch role to: " + additionalRoleName);
+	}
 
-		//$("#switchRoleModal").modal("show");
-	})
-
-	//$(document).on('click', ".switchRole_confirm",
 	$scope.switchedRole = function () {
-		//additionalRoleName = $(this).text(); 
-		//selectedROleID = $(this).valueOf("outerHTML").data("id");
-		//console.log($(this).text());
-		//openModelPopup("Switch Role", "Your role is changed to "+additionalRoleName);
 		changedRole = $('#changedRole');
 		changedRole.append($("<p>Your role is changed to " + additionalRoleName + "</p>"))
 		$("#switchRoleModal").modal("hide");
@@ -320,7 +287,6 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 					if(data == "Invalid Session"){
 				  		$rootScope.redirectPage();
 					}
-					console.log("cycleDetails", data);
 					$scope.cycleDetails = data;
 
 				}, function(error) {	console.log("Failed to get cycle name")});
@@ -330,7 +296,6 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 			if(data == "Invalid Session"){
 				$rootScope.redirectPage();
 			}
-			console.log("screenId", data);
 			$scope.screenName = data.respnames[0];
 		}, 
 		function(error) {	console.log("Failed to fetch info")});
