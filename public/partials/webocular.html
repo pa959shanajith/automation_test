@@ -119,9 +119,10 @@
 						<b>Name : </b>
 						<a href ="{{clickedNode.name}}" title="{{clickedNode.name}}" target='_blank' ng-bind="clickedNode.name"></a>
 					</p>
-					<p>
+					<p ng-show= "clickedNode.parent != 'None'">
 						<b>Parent : </b>
-						<a href ="{{clickedNode.parent}}" title="{{clickedNode.parent}}" target='_blank' ng-bind="clickedNode.parent"></a>						
+						
+						<a  href ="{{clickedNode.parent != 'None' ? clickedNode.parent : ''}}" title="{{clickedNode.parent}}" target='_blank' ng-bind="clickedNode.parent"></a>						
 					</p>
 					<p>
 						<b>Level : </b>

@@ -1,4 +1,4 @@
-mySPA.controller('webCrawlerController', ['$scope', '$http', '$rootScope', '$location', '$timeout', 'webCrawlerServices','cfpLoadingBar','$window', 'socket', function($scope,$http, $rootScope, $location,$timeout,webCrawlerServices,cfpLoadingBar,$window,socket) {
+mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$location', '$timeout', 'webocularServices','cfpLoadingBar','$window', 'socket', function($scope,$http, $rootScope, $location,$timeout,webocularServices,cfpLoadingBar,$window,socket) {
   $timeout(function() {
     $('.scrollbar-inner').scrollbar();
     $('.scrollbar-macosx').scrollbar();
@@ -106,7 +106,7 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$rootScope', '$loc
 
     // fired when the connection acknowledgment is received from the server
     socket.on('connectionAck', function(value){
-      webCrawlerServices.getResults($scope.url, $scope.level, $scope.selectedAgent).then(function(data){
+      webocularServices.getResults($scope.url, $scope.level, $scope.selectedAgent).then(function(data){
         console.log("Data from service", data);
         if (data == "unavailableLocalServer") {
           $scope.hideBaseContent = { message: 'false' };
@@ -324,7 +324,6 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$rootScope', '$loc
   }
 
   function parseRelations(obj){
-    console.log(obj);
     for(var i = $scope.level; i>=0; i--){
       var levelObjects;
       if (obj[i]) {
@@ -365,7 +364,6 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$rootScope', '$loc
         }else if(obj[i][k].type == "duplicate"){
           obj[i][k].isTerminal = true;
         }
-        var a = true;
 
         if (i == 0) {
           break;
@@ -383,11 +381,9 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$rootScope', '$loc
             }else if(thisNode.containsDeadLink){
               obj[i-1][j].containsDeadLink = true;
             }
-            a = false;
             break;
           }
         }
-        console.log(a);
       }
     }
     return obj[0];
@@ -456,10 +452,11 @@ mySPA.controller('webCrawlerController', ['$scope', '$http', '$rootScope', '$loc
     }
     $scope.clickedNode = {
       name : root.name, 
-      parent : "",
+      parent : root.parent,
       level : 0,
       status : root.status
     }
+    
     var width = window.innerWidth,
     height = window.innerHeight,
     nodes,
