@@ -723,7 +723,7 @@ var inpKeyUp_W = function(e){
 function treeIterator_W(c,d,e){
 	c.push({projectID:d.projectID,id:d.id,childIndex:d.childIndex,id_c:(d.id_c)?d.id_c:null,id_n:(d.id_n)?d.id_n:null,oid:(d.oid)?d.oid:null,name:d.name,type:d.type,pid:(d.parent)?d.parent.id:null,pid_c:(d.parent)?d.parent.id_c:null,task:(d.task)?d.task:null,renamed:(d.rnm)?d.rnm:!1,orig_name:(d.original_name)?d.original_name:null});
 	if(d.children&&d.children.length>0) d.children.forEach(function(t){e=treeIterator_W(c,t,e);});
-	//else if(d._children&&d._children.length>0) d._children.forEach(function(t){e=treeIterator(c,t,e);});
+	else if(d._children&&d._children.length>0) d._children.forEach(function(t){e=treeIterator(c,t,e);});
 	//else if(d.type!='testcases') return !0;
 	return e;
 };
@@ -745,7 +745,7 @@ function actionEvent_W(e){
 	else if(s.attr('id')=='ct-createAction_W'){
 		flag=20;
 		if(error){
-			openDialogMindmap("Error", "Mindmap flow must be complete! Modules -> Scenarios -> Screens -> Testcases")
+			openDialogMindmap("Error", "Mindmap flow must be complete! Modules -> Scenarios -> Screens -> Testcases");
 			//$('#Mindmap_error').modal('show');
 			return;
 		}
