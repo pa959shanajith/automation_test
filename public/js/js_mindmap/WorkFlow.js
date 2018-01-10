@@ -513,65 +513,65 @@ function moveNodeEnd_W(e){
 	//Logic to implement rearranging of nodes
 	var curNode=dNodes_W[pi];
 	//logic change dto the change in layout
-	function changeOrderRight(curNode,ci,p){
-		var counter=-1;
-		var flag=false;
-		dNodes_W[pi].parent.children.forEach(function(a,i){
-			if(ci<=(i+1)){
-				return false;
-			}
-			//layout change
-		// switch-layout feature
-		if($('#switch-layout').hasClass('vertical-layout')){
-			if(l[0]<a.x){
-				if(counter==-1) counter=(i+1);
-				a.childIndex++;
-				curNode.childIndex=counter;
-			}			
-		}
-		else{
-			if(l[1]<a.y){
-				if(counter==-1) counter=(i+1);
-				a.childIndex++;
-				curNode.childIndex=counter;
-			}
-		}
-		});
-	};
-	function changeOrderLeft(curNode,ci,p){
-		var counter=0;
-		var flag=false;
-		dNodes_W[pi].parent.children.forEach(function(a,ci){
-			//layout change
-			if(l[1]>a.y){
-				counter=(ci+1);
-				a.childIndex--;
-				curNode.childIndex=counter;
-			}
-		});
-	};
-	var currentChildIndex=curNode.childIndex;
-	var totalChildren=curNode.parent.children;
-	// switch-layout feature
-	if($('#switch-layout').hasClass('vertical-layout')){
-		if(l[1]<curNode.y){
-			//alert('moved up');
-			changeOrderRight(curNode,currentChildIndex,totalChildren);	
-		}else{
-			//alert('moved down');
-			changeOrderLeft(curNode,currentChildIndex,totalChildren);
-		}
-	}
+	// function changeOrderRight(curNode,ci,p){
+	// 	var counter=-1;
+	// 	var flag=false;
+	// 	dNodes_W[pi].parent.children.forEach(function(a,i){
+	// 		if(ci<=(i+1)){
+	// 			return false;
+	// 		}
+	// 		//layout change
+	// 	// switch-layout feature
+	// 	if($('#switch-layout').hasClass('vertical-layout')){
+	// 		if(l[0]<a.x){
+	// 			if(counter==-1) counter=(i+1);
+	// 			a.childIndex++;
+	// 			curNode.childIndex=counter;
+	// 		}			
+	// 	}
+	// 	else{
+	// 		if(l[1]<a.y){
+	// 			if(counter==-1) counter=(i+1);
+	// 			a.childIndex++;
+	// 			curNode.childIndex=counter;
+	// 		}
+	// 	}
+	// 	});
+	// };
+	// function changeOrderLeft(curNode,ci,p){
+	// 	var counter=0;
+	// 	var flag=false;
+	// 	dNodes_W[pi].parent.children.forEach(function(a,ci){
+	// 		//layout change
+	// 		if(l[1]>a.y){
+	// 			counter=(ci+1);
+	// 			a.childIndex--;
+	// 			curNode.childIndex=counter;
+	// 		}
+	// 	});
+	// };
+	// var currentChildIndex=curNode.childIndex;
+	// var totalChildren=curNode.parent.children;
+	// // switch-layout feature
+	// if($('#switch-layout').hasClass('vertical-layout')){
+	// 	if(l[1]<curNode.y){
+	// 		//alert('moved up');
+	// 		changeOrderRight(curNode,currentChildIndex,totalChildren);	
+	// 	}else{
+	// 		//alert('moved down');
+	// 		changeOrderLeft(curNode,currentChildIndex,totalChildren);
+	// 	}
+	// }
 	
-	else {
-	if(l[1]<curNode.y){
-		//alert('moved up');
-		changeOrderRight(curNode,currentChildIndex,totalChildren);
-	}else{
-		//alert('moved down');
-		changeOrderLeft(curNode,currentChildIndex,totalChildren);
-	}
-	}
+	// else {
+	// if(l[1]<curNode.y){
+	// 	//alert('moved up');
+	// 	changeOrderRight(curNode,currentChildIndex,totalChildren);
+	// }else{
+	// 	//alert('moved down');
+	// 	changeOrderLeft(curNode,currentChildIndex,totalChildren);
+	// }
+	// }
 	dNodes_W[pi].x=parseFloat(l[0]);
 	dNodes_W[pi].y=parseFloat(l[1]);
 	addLink_W(temp_W.t,dLinks_W[temp_W.t].source,dLinks_W[temp_W.t].target);
@@ -733,6 +733,32 @@ function treeIterator_W(c,d,e){
 function actionEvent_W(e){
 	var s=d3.select(this);
 	var error=!1,mapData=[],flag=0,alertMsg;
+	var temp_data=[];
+	dNodes_W.forEach(function(e,i){
+        if(i==0) return;
+        temp_data[i] = {idx:i,x:e.x,y:e.y,type:e.type};
+    });
+
+    var layout_vertical = $('#switch-layout').hasClass('vertical-layout');
+    if(layout_vertical){
+
+        temp_data.sort(function(a, b) {
+            return a.x - b.x;
+        }); 
+    }
+    else{
+            
+        temp_data.sort(function(a, b) {
+            return a.y - b.y;
+        });         
+    }
+
+    
+    var counter = {'scenarios':1};
+    temp_data.forEach(function(e,i){
+    	dNodes_W[e.idx].childIndex = counter[e.type];
+         counter[e.type] = counter[e.type]+1;
+     })
 	error=treeIterator_W(mapData,dNodes_W[0],error);
 	
 	if(s.attr('id')=='ct-saveAction_W'){
