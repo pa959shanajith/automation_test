@@ -416,7 +416,7 @@ mySPA.controller('scheduleController',['$scope', '$rootScope', '$http','$timeout
 							if($(this).find(".selectToSched").is(":checked")){
 								selectedScenarioData.push({
 									condition : parseInt($(this).children("td:nth-child(4)").find("select option:selected").val()),
-									dataparam : [$(this).children("td:nth-child(3)").find("input").val()],
+									dataparam : [$(this).children("td:nth-child(3)").find("input").val().trim()],
 									executestatus : 1,
 									scenarioids : $(this).children("td:nth-child(2)").data("scenarioid"),
 									scenarioname: $(this).children("td:nth-child(2)").text(),
