@@ -28,14 +28,14 @@ function loadMindmapData_W(){
 			}
 
 			if (selectedProject == null){
-				selectedProject=result1.projectName[0];
+				selectedProject=result1.projectId[0];
 			}
 			$("#selectProjectEtem option[value='" + selectedProject + "']").attr('selected', 'selected');
 			loadMindmapData1_W(); 
 			$("#selectProjectEtem").change(function () {
-				selectedProject = $(".project-list").val();
+				selectedProject = $("#selectProjectEtem").val();
             //alert($(".project-list").val());
-				$('#eteSearchModules').val('')
+				$('#eteSearchModules').val('');
 				if($("img.iconSpaceArrow").hasClass("iconSpaceArrowTop"))
 				{
 					$("img.iconSpaceArrow").removeClass("iconSpaceArrowTop");
