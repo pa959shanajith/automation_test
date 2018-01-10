@@ -1641,86 +1641,86 @@ function moveNodeEnd(e) {
     var pi = p.attr('id').split('-')[2];
     var l = p.attr('transform').slice(10, -1).split(split_char);
     //Logic to implement rearranging of nodes
-    var curNode = dNodes[pi];
-    //logic changed to the change in layout
-    function changeOrderRight(curNode, ci, totalChildren) {
-        var counter = -1;
-        var flag = false;
-        totalChildren.forEach(function(a, i) {
-            if (ci <= (i + 1)) {
-                return false;
-            }
-            //			Layout_change
-            //			if(l[0]<a.x){
-            // switch-layout feature
-            if ($('#switch-layout').hasClass('vertical-layout')) {
-                if (l[0] < a.x) {
-                    if (counter == -1) counter = (i + 1);
-
-                    a.childIndex++;
-                    curNode.childIndex = counter;
-                }
-            } else {
-                if (l[1] < a.y) {
-                    if (counter == -1) counter = (i + 1);
-
-                    a.childIndex++;
-                    curNode.childIndex = counter;
-                }
-            }
-
-        });
-    };
-
-    function changeOrderLeft(curNode, ci, totalChildren) {
-        var counter = 0;
-        var flag = false;
-        totalChildren.forEach(function(a, ci) {
-            //			Layout_change
-            //			if(l[0]>a.x){
-            // switch-layout feature
-            if ($('#switch-layout').hasClass('vertical-layout')) {
-                if (l[0] > a.x) {
-                    counter = (ci + 1);
-                    a.childIndex--;
-                    curNode.childIndex = counter;
-                }
-            } else {
-                if (l[1] > a.y) {
-                    counter = (ci + 1);
-                    a.childIndex--;
-                    curNode.childIndex = counter;
-                }
-            }
-        });
-    };
-    var currentChildIndex = curNode.childIndex;
-    var totalChildren = curNode.parent.children;
-    if (currentChildIndex != totalChildren.indexOf(curNode) + 1) {
-        currentChildIndex = totalChildren.indexOf(curNode) + 1
-
-    }
+//    var curNode = dNodes[pi];
+//    //logic changed to the change in layout
+//    function changeOrderRight(curNode, ci, totalChildren) {
+//        var counter = -1;
+//        var flag = false;
+//        totalChildren.forEach(function(a, i) {
+//            if (ci <= (i + 1)) {
+//                return false;
+//            }
+//            //			Layout_change
+//            //			if(l[0]<a.x){
+//            // switch-layout feature
+//            if ($('#switch-layout').hasClass('vertical-layout')) {
+//                if (l[0] < a.x) {
+//                    if (counter == -1) counter = (i + 1);
+//
+//                    a.childIndex++;
+//                    curNode.childIndex = counter;
+//                }
+//            } else {
+//                if (l[1] < a.y) {
+//                    if (counter == -1) counter = (i + 1);
+//
+//                    a.childIndex++;
+//                    curNode.childIndex = counter;
+//                }
+//            }
+//
+//        });
+//    };
+//
+//    function changeOrderLeft(curNode, ci, totalChildren) {
+//        var counter = 0;
+//        var flag = false;
+//        totalChildren.forEach(function(a, ci) {
+//            //			Layout_change
+//            //			if(l[0]>a.x){
+//            // switch-layout feature
+//            if ($('#switch-layout').hasClass('vertical-layout')) {
+//                if (l[0] > a.x) {
+//                    counter = (ci + 1);
+//                    a.childIndex--;
+//                    curNode.childIndex = counter;
+//                }
+//            } else {
+//                if (l[1] > a.y) {
+//                    counter = (ci + 1);
+//                    a.childIndex--;
+//                    curNode.childIndex = counter;
+//                }
+//            }
+//        });
+//    };
+//    var currentChildIndex = curNode.childIndex;
+//    var totalChildren = curNode.parent.children;
+//    if (currentChildIndex != totalChildren.indexOf(curNode) + 1) {
+//        currentChildIndex = totalChildren.indexOf(curNode) + 1
+//
+//    }
     //layout change
     //	if(l[0]<curNode.x){
     // switch-layout feature
-    if ($('#switch-layout').hasClass('vertical-layout')) {
-        if (l[0] < curNode.x) {
-            //alert('moved up');
-            changeOrderRight(curNode, currentChildIndex, totalChildren);
-        } else {
-            //alert('moved down');
-            changeOrderLeft(curNode, currentChildIndex, totalChildren);
-        }
-    } else {
-        if (l[1] < curNode.y) {
-            //alert('moved up');
-            changeOrderRight(curNode, currentChildIndex, totalChildren);
-        } else {
-            //alert('moved down');
-            changeOrderLeft(curNode, currentChildIndex, totalChildren);
-        }
-
-    }
+//    if ($('#switch-layout').hasClass('vertical-layout')) {
+//        if (l[0] < curNode.x) {
+//            //alert('moved up');
+//            changeOrderRight(curNode, currentChildIndex, totalChildren);
+//        } else {
+//            //alert('moved down');
+//            changeOrderLeft(curNode, currentChildIndex, totalChildren);
+//        }
+//    } else {
+//        if (l[1] < curNode.y) {
+//            //alert('moved up');
+//            changeOrderRight(curNode, currentChildIndex, totalChildren);
+//        } else {
+//            //alert('moved down');
+//            changeOrderLeft(curNode, currentChildIndex, totalChildren);
+//        }
+//
+//    }
     dNodes[pi].x = parseFloat(l[0]);
     dNodes[pi].y = parseFloat(l[1]);
     addLink(temp.t, dLinks[temp.t].source, dLinks[temp.t].target);
@@ -1968,6 +1968,32 @@ function actionEvent(e) {
         mapData = [],
         flag = 0,
         alertMsg;
+    var temp_data=[];
+    dNodes.forEach(function(e,i){
+        if(i==0) return;
+        temp_data[i] = {idx:i,x:e.x,y:e.y,type:e.type};
+    });
+
+    var layout_vertical = $('#switch-layout').hasClass('vertical-layout');
+    if(layout_vertical){
+
+        temp_data.sort(function(a, b) {
+            return a.x - b.x;
+        }); 
+    }
+    else{
+            
+        temp_data.sort(function(a, b) {
+            return a.y - b.y;
+        });         
+    }
+
+    
+    var counter = {'scenarios':1,'screens':1,'testcases':1};
+    temp_data.forEach(function(e,i){
+         dNodes[e.idx].childIndex = counter[e.type];
+         counter[e.type] = counter[e.type]+1;
+     })
     error = treeIterator(mapData, dNodes[0], error);
     if (dNodes[0].type == 'modules_endtoend') {
         cur_module = 'end_to_end';
