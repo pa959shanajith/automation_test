@@ -610,7 +610,7 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 	logger.info("Inside UI service: ExecuteTestSuite_ICE");
 	if (isSessionActive(req)) {
 		var name = req.session.username;
-		redisServer.redisSub2.subscribe('ICE2_' + name,1);
+		redisServer.redisSub2.subscribe('ICE2_' + name);
 		var batchExecutionData = req.body.moduleInfo;
 		var userInfo = req.body.userInfo;
 		var testsuitedetailslist = [];
@@ -1181,7 +1181,7 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 								function executionFunction(executionRequest, username) {
 									// var name = req.session.username;
 									var name = username;
-									redisServer.redisSub2.subscribe('ICE2_' + name,1);
+									redisServer.redisSub2.subscribe('ICE2_' + name);
 									var scenarioCount = executionRequest.suitedetails[0].scenarioIds.length;
 									var completedSceCount = 0;
 									var statusPass = 0;
@@ -1331,7 +1331,7 @@ exports.ExecuteTestSuite_ICE_CI = function (req, res) {
 	}
 	if (sessionToken != undefined && req.body.session_id == sessionToken) {
 		var name = req.session.username;
-		redisServer.redisSub2.subscribe('ICE2_' + name,1);
+		redisServer.redisSub2.subscribe('ICE2_' + name);
 		var batchExecutionData = req.body.moduleInfo;
 		var userInfo = req.body.userInfo;
 		var testsuitedetailslist = [];
@@ -2611,7 +2611,7 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 						function scheduleFunction(executionRequest) {
 							logger.info("Inside scheduleFunction function of executeScheduling");
 							var name = ipAdd;
-							redisServer.redisSub2.subscribe('ICE2_' + name ,1);	
+							redisServer.redisSub2.subscribe('ICE2_' + name);	
 							//var scenarioCount_s = executionRequest.suitedetails[0].scenarioIds.length;
 							var completedSceCount_s = 0;
 							var testsuitecount_s = 0;

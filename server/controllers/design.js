@@ -38,7 +38,7 @@ exports.initScraping_ICE = function (req, res) {
 	try {
 		if (isSessionActive(req)) {
 			var name = req.session.username;
-			redisServer.redisSub2.subscribe('ICE2_' + name ,1);	
+			redisServer.redisSub2.subscribe('ICE2_' + name);	
 			var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 			logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
 			logger.info("ICE Socket requesting Address: %s" , name);
@@ -280,7 +280,7 @@ exports.highlightScrapElement_ICE = function (req, res) {
 		logger.info("Inside UI service: highlightScrapElement_ICE");
 		if (isSessionActive(req)) {
 			var name = req.session.username;
-			redisServer.redisSub2.subscribe('ICE2_' + name ,1);
+			redisServer.redisSub2.subscribe('ICE2_' + name);
 			var focusParam = req.body.elementXpath;
 			var elementURL = req.body.elementUrl;
 			var appType = req.body.appType;
@@ -1683,7 +1683,7 @@ exports.debugTestCase_ICE = function (req, res) {
 		logger.info("Inside UI service: debugTestCase_ICE");
 		if (isSessionActive(req)) {
 			var name = req.session.username;
-			redisServer.redisSub2.subscribe('ICE2_' + name ,1);
+			redisServer.redisSub2.subscribe('ICE2_' + name);
 			var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 			logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
 			logger.info("ICE Socket requesting Address: %s" , name);
@@ -1981,9 +1981,9 @@ exports.debugTestCase_ICE = function (req, res) {
 										} else if (data.onAction == "result_wsdl_ServiceGenerator") {
 											clearInterval(updateSessionExpiry);
 											try {
-												if (serviceGenResponse.toUpperCase() === 'TERMINATE') {
+												if (data.value.toUpperCase() === 'TERMINATE') {
 													try {
-														res.send(serviceGenResponse);
+														res.send(data.value);
 													} catch (exception) {
 														logger.error("Exception in the service debugTestCase_ICE - result_wsdl_ServiceGenerator: %s", exception);
 													}
@@ -1999,8 +1999,8 @@ exports.debugTestCase_ICE = function (req, res) {
 													};
 													responsedata.endPointURL.push(wsdlurl.split('?')[0]);
 													responsedata.operations.push(operations);
-													if (serviceGenResponse != "fail" && serviceGenResponse != undefined && serviceGenResponse != "") {
-														response = serviceGenResponse.split('rEsPONseBOdY:');
+													if (data.value != "fail" && data.value != undefined && data.value != "") {
+														response = data.value.split('rEsPONseBOdY:');
 														if (response.length == 2) {
 															responsedata.header.push(response[0]);
 															responsedata.body.push(response[1]);

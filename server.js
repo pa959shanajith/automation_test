@@ -21,10 +21,8 @@ if (cluster.isMaster) {
             cluster.fork();
         }
     });
-
-} 
-else {
-    
+} else
+{
 try {
     var express = require('express');
     var app = express();
@@ -329,7 +327,7 @@ try {
     var plugin = require('./server/controllers/plugin');
     var utility = require('./server/controllers/utility');
     var qc = require('./server/controllers/qualityCenter');
-    var webCrawler = require('./server/controllers/webCrawler');
+    var webocular = require('./server/controllers/webocular');
     var chatbot = require('./server/controllers/chatbot');
     var neuronGraphs2D = require('./server/controllers/neuronGraphs2D');
     var dashboard = require('./server/controllers/dashboard');
@@ -411,14 +409,12 @@ try {
     //Utility plugins
     app.post('/Encrypt_ICE', utility.Encrypt_ICE);
     // Wecoccular Plugin
-    app.post('/crawResults', webCrawler.getCrawlResults);
+    app.post('/crawResults', webocular.getCrawlResults);
     //Chatbot Routes
     app.post('/getTopMatches_ProfJ', chatbot.getTopMatches_ProfJ);
     app.post('/updateFrequency_ProfJ', chatbot.updateFrequency_ProfJ);
     //NeuronGraphs Plugin Routes
     app.post('/getGraph_nGraphs2D', neuronGraphs2D.getGraphData);
-    app.post('/getPackData_nGraphs2D', neuronGraphs2D.getPackData);
-    app.post('/getReportData_nGraphs2D', neuronGraphs2D.getReportData);
     //QC Plugin
     app.post('/loginQCServer_ICE', qc.loginQCServer_ICE);
     app.post('/qcProjectDetails_ICE', qc.qcProjectDetails_ICE);

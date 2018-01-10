@@ -37,7 +37,7 @@ mySPA.controller('neuronGraphs2DController', ['$scope', '$http', '$location', '$
     };
 
     //global variables
-    var nodeTypes, rootIndex, mapN2DCoords, enabledFilters, visibleNodeNames;
+    var nodeTypes, rootIndex, enabledFilters, visibleNodeNames;
     var globalobj = {};
     var leveldict = {
         'Domain': 0,
@@ -48,8 +48,8 @@ mySPA.controller('neuronGraphs2DController', ['$scope', '$http', '$location', '$
         'TestScenario': 5,
         'TestCase': 6,
         'Screen': 7
-    }
-    var levelrad = {0: 0,1: 0,2: 0,3: 0,4: 0,5: 0,6: 0,7: 0} //radius of each level
+    };
+    var levelrad = {0: 0,1: 0,2: 0,3: 0,4: 0,5: 0,6: 0,7: 0}; //radius of each level
     var togglelinksflag = false,
         togglelinkslist = [],
         viewPageName;
@@ -470,7 +470,6 @@ mySPA.controller('neuronGraphs2DController', ['$scope', '$http', '$location', '$
                 $scope.fetchedData = data;
                 nodeTypes = data.type;
                 rootIndex = data.root;
-                mapN2DCoords = data.coords2D;
                 $scope.nodes = bindData(data.nodes, data.links);
 
                 // That is when using 3D
@@ -937,11 +936,9 @@ mySPA.controller('neuronGraphs2DController', ['$scope', '$http', '$location', '$
 
             // the first one is the object we'll be moving around
             selectedObject = intersects[0].object;
-            console.log("selected object: ", selectedObject);
             listobj = scene.getAllObjectByProperty('label', 'TestCase');
             // and calculate the offset
             // var intersects = raycaster.intersectObject(plane);
-            console.log('Testcaese: ', listobj);
             // offset.copy(intersects[0].point).sub(plane.position);
             nodeClick_NG(selectedObject, event.ctrlKey);
         }

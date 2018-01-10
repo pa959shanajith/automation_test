@@ -446,9 +446,9 @@ exports.mindmapService = function(req, res) {
 							rnmList.push({"statement":"MATCH(n:TESTCASES{testCaseName:'"+e.orig_name+"',testScenarioID:'"+lts+"',screenID_c:'"+e.pid_c+"'}) SET n.testCaseName='"+e.name+"'"});
 						}
 						if(e.pid_c!='null' && e.pid_c!=undefined){
-							qList.push({"statement":"MERGE(n:TESTCASES{screenID:'"+idDict[e.pid]+"',testScenarioID:'"+lts+"',testCaseName:'"+e.name+"',testCaseID:'"+e.id+"',createdBy:'"+user+"',createdOn:'null',uid:'"+uidx+"',testCaseID_c:'"+e.id_c+"'}) SET n.screenID_c='"+e.pid_c+"',n.childIndex='"+e.childIndex+"'"});
+							qList.push({"statement":"MERGE(n:TESTCASES{screenID:'"+idDict[e.pid]+"',screenName:'"+nameDict[e.pid] +"',projectID:'" + prjId + "',testScenarioID:'"+lts+"',testCaseName:'"+e.name+"',testCaseID:'"+e.id+"',createdBy:'"+user+"',createdOn:'null',uid:'"+uidx+"',testCaseID_c:'"+e.id_c+"'}) SET n.screenID_c='"+e.pid_c+"',n.childIndex='"+e.childIndex+"'"});
 						}else{
-							qList.push({"statement":"MERGE(n:TESTCASES{screenID:'"+idDict[e.pid]+"',testScenarioID:'"+lts+"',testCaseName:'"+e.name+"',testCaseID:'"+e.id+"',createdBy:'"+user+"',createdOn:'null',uid:'"+uidx+"',testCaseID_c:'"+e.id_c+"'}) SET n.childIndex='"+e.childIndex+"'"});
+							qList.push({"statement":"MERGE(n:TESTCASES{screenID:'"+idDict[e.pid]+"',screenName:'"+nameDict[e.pid] +"',projectID:'" + prjId + "',testScenarioID:'"+lts+"',testCaseName:'"+e.name+"',testCaseID:'"+e.id+"',createdBy:'"+user+"',createdOn:'null',uid:'"+uidx+"',testCaseID_c:'"+e.id_c+"'}) SET n.childIndex='"+e.childIndex+"'"});
 						}
 
 						//Relating testcases with screens
@@ -840,15 +840,15 @@ exports.mindmapService = function(req, res) {
 				else{
 					var i = 0;
 					while(i<qData['screen'].length){
-						if(result[i].data[0].row[0]>0)
+						if(result[i].data[0].row[0]>1)
 							qData['screen'][i].reuse = true;
 						else
 							qData['screen'][i].reuse = false;						
 						i = i+1;
 					}
 					var j = 0;
-					while((i+j)<qData['testcase'].length){
-						if(result[i+j].data[0].row[0]>0)
+					while(j<qData['testcase'].length){
+						if(result[i+j].data[0].row[0]>1)
 							qData['testcase'][j].reuse = true;
 						else
 							qData['testcase'][j].reuse = false;						

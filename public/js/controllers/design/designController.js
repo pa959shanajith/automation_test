@@ -48,7 +48,16 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
         if (navigator.appVersion.indexOf("Mac") != -1) {
             $(".safariBrowser").show();
         }
+
     }, 500)
+
+    if($("#compareChangedObjectsBox").is(":visible") == true)
+    {
+       $("#viewscrapedObjects").show();
+    }
+    else{
+        $("#viewscrapedObjects").hide();
+    }
 
     //Task Listing
     loadUserTasks()
@@ -1485,8 +1494,17 @@ console.log("screenName:", screenName);
                     }
                     if (data == "unavailableLocalServer") {
                         unblockUI();
-                        eaCheckbox = false;
-                        $("#enableAppend").prop('checked',false);
+                         eaCheckbox = false;
+                         var scrapedObjectsLen = $("span.ellipsis").length;
+                         if(scrapedObjectsLen > 0)
+                         {
+                            $(".enableActions").removeClass("enableActions").addClass("disableActions");
+                         }
+                         else{
+                            $(".disableActions").removeClass("disableActions").addClass("enableActions");
+                         }
+                        
+                         $("#enableAppend").prop('checked',false);
                         openDialog("Scrape Screen", "ICE Engine is not available. Please run the batch file and connect to the Server.");
                         return false
                     }
@@ -1502,7 +1520,7 @@ console.log("screenName:", screenName);
                     if (data.action == "compare") {
                         updatedViewString = data;
                         $("#changedOrdList li,#compareUnchangedObjectsBox li ,#compareNotFoundObjectsBox li").empty();
-                        $("#viewscrapedObjects").hide();
+                      //  $("#viewscrapedObjects").hide();
                         //Hide Scrape Objects
                         $("#scrapTree,.fsScroll").hide();
                         if (data.view[0].changedobject.length > 0) {
@@ -1737,6 +1755,18 @@ console.log("screenName:", screenName);
                             deleteScrapeDataservice = false;
                         } else $("#saveObjects").addClass('hide');
                     }
+                    if($("#compareChangedObjectsBox").is(":visible") == true)
+                    {
+                        $("#viewscrapedObjects").show();
+                    }
+                    else{
+                        $("#viewscrapedObjects").hide();
+                    }
+
+                    $(document).on('click','#viewscrapedObjects',function() {
+                            window.location.href = '/design';
+                    });
+
                 }, function(error) {
                     console.log("Fail to Load design_ICE")
                 });
@@ -1791,6 +1821,7 @@ console.log("screenName:", screenName);
     });
     //To delete Scrape Objects
     $scope.del_Objects = function() {
+        
         $("#deleteObjectsModal").modal("hide");
         if (deleteScrapeDataservice) {
             var userinfo = JSON.parse(window.localStorage['_UI']);
@@ -1878,7 +1909,7 @@ console.log("screenName:", screenName);
                         openDialog("Delete Scrape Objects", "Scraped Objects deleted successfully.")
                         deleteFlag = true;
                         $(".checkStylebox").prop("checked", false);
-                        $("#deleteObjects").prop("disabled", true);
+                        $("#deleteObjects,#saveObjects").prop("disabled", true);
                         angular.element(document.getElementById("left-nav-section")).scope().getScrapeData();
                     } else {
                         openDialog("Delete Scrape Objects", "Scraped Objects fail to delete.")
@@ -1934,7 +1965,7 @@ console.log("screenName:", screenName);
                     newScrapedList.mirror = "";
                 }
                 $("#scraplist").empty();
-                $("#deleteObjects").prop("disabled", true);
+                $("#deleteObjects,#saveObjects").prop("disabled", true);
                 $(".checkStylebox").prop("checked", false);
             } else if (!$("input[type=checkbox].checkall").is(":checked")) {
                 openDialog("Delete Scrape data", "Please select objects to delete.")
@@ -1986,6 +2017,10 @@ console.log("screenName:", screenName);
                 $("#deleteObjects").prop("disabled", true);
             }
         }
+        if($(".ellipsis").length == 0)
+        {
+           $(".checkStylebox").prop('disabled', true);
+        }
     }
 
     function isInArray(value, array) {
@@ -2010,6 +2045,7 @@ console.log("screenName:", screenName);
         var count = 0;
         var numberOfElems = 0;
         var value = $(this).val();
+        
         $(".select_all").each(function() {
             if ($(this).find("span.ellipsis").text().toLowerCase().indexOf(value.toLowerCase()) > -1) {
                 numberOfElems++;
@@ -2022,10 +2058,17 @@ console.log("screenName:", screenName);
                 $(this).hide();
             }
         });
+
         if (numberOfElems == 0) {
-            $("#deleteObjects,.checkStylebox").prop("disabled", "disabled");
-        } else {
+            $("#deleteObjects,.checkStylebox").prop("disabled", true);
+         } 
+        else {
             $("#deleteObjects,.checkStylebox").prop("disabled", false);
+        }
+        var checkedLen = $(".ellipsis:checked").length;
+        if(checkedLen == 0)
+        {
+            $("#deleteObjects").prop("disabled", true);
         }
         if (numberOfElems == 0 && count == 0) {
             $('.checkStylebox').prop("checked", false);

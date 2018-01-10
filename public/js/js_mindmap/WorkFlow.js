@@ -2,8 +2,6 @@ var uNix_W,uLix_W,node,link,dNodes_W,dLinks_W,allMMaps_W,temp_W,faRef,mapSaved,z
 var cur_module,allMaps_info,activeNode_W,childNode_W;
 //unassignTask is an array to store whose task to be deleted
 var deletednode_W=[],unassignTask=[];
-var userInfo =  JSON.parse(window.localStorage['_UI']);
-var userid = userInfo.user_id;
 // node_names_tc keep track of testcase names to decide reusability of testcases
 var node_names_tc=[];
 var saveFlag=false;
@@ -13,7 +11,8 @@ var isIE = /*@cc_on!@*/false || !!document.documentMode;
 		$('.scrollbar-macosx').scrollbar();
     }
 function loadMindmapData_W(){
-	
+	var userInfo =  JSON.parse(window.localStorage['_UI']);
+	var userid = userInfo.user_id;
 	dataSender({task:'populateProjects',user_id:userid},function(err,result){
 		if(err) console.log(result);
 		else{
@@ -22,20 +21,21 @@ function loadMindmapData_W(){
                    $("#ct-moduleBox,.tabAssign").addClass("ct-expand-module");
                 }
 			result1=JSON.parse(result);
-			var selectedProject=$(".selectProjectEtem").val();
+			// var selectedProject=$(".selectProjectEtem").val();
 			$("#selectProjectEtem").empty();
-			for(i=0; i<result1.projectId.length && result1.projectName.length; i++){
+			for(i=0; i<(result1.projectId.length && result1.projectName.length); i++){
 				$('#selectProjectEtem').append("<option app-type='"+result1.appType[i]+"' data-id='"+result1.projectName[i]+"' value='"+result1.projectId[i]+"'>"+result1.projectName[i]+"</option>");	
 			}
 
 			if (selectedProject == null){
-				selectedProject=result1.projectName[0];
+				selectedProject=result1.projectId[0];
 			}
 			$("#selectProjectEtem option[value='" + selectedProject + "']").attr('selected', 'selected');
 			loadMindmapData1_W(); 
 			$("#selectProjectEtem").change(function () {
+				selectedProject = $("#selectProjectEtem").val();
             //alert($(".project-list").val());
-				$('#eteSearchModules').val('')
+				$('#eteSearchModules').val('');
 				if($("img.iconSpaceArrow").hasClass("iconSpaceArrowTop"))
 				{
 					$("img.iconSpaceArrow").removeClass("iconSpaceArrowTop");
@@ -141,7 +141,7 @@ function initiate_W(){
 	//u.append('div').attr('id','ct-unassignButton').append('a').html('Unassign').on('click',removeTask);
 	// var mapSvgDiv = canvas.append('div').attr("class","ct-mapSvgContainer");
 	// var mapSvg=mapSvgDiv.append('svg').attr('id','ct-mapSvg').call(zoom).on('click.hideElements',clickHideElements);
-	var mapSvg=canvas.append('svg').attr('id','ct-mapSvg').call(zoom_W).on('click.hideElements',clickHideElements);
+	var mapSvg=canvas.append('svg').attr('id','ct-mapSvg').call(zoom_W).on('click.hideElements',clickHideElements_W);
 	var dataAdder=[{c:'#5c5ce5',t:'Modules'},{c:'#4299e2',t:'Scenarios'},{c:'#19baae',t:'Screens'},{c:'#efa022',t:'Test Cases'}];
 	u=canvas.append('svg').attr('id','ct-legendBox').append('g').attr('transform','translate(10,10)');
 	dataAdder.forEach(function(e,i) {
@@ -513,65 +513,65 @@ function moveNodeEnd_W(e){
 	//Logic to implement rearranging of nodes
 	var curNode=dNodes_W[pi];
 	//logic change dto the change in layout
-	function changeOrderRight(curNode,ci,p){
-		var counter=-1;
-		var flag=false;
-		dNodes_W[pi].parent.children.forEach(function(a,i){
-			if(ci<=(i+1)){
-				return false;
-			}
-			//layout change
-		// switch-layout feature
-		if($('#switch-layout').hasClass('vertical-layout')){
-			if(l[0]<a.x){
-				if(counter==-1) counter=(i+1);
-				a.childIndex++;
-				curNode.childIndex=counter;
-			}			
-		}
-		else{
-			if(l[1]<a.y){
-				if(counter==-1) counter=(i+1);
-				a.childIndex++;
-				curNode.childIndex=counter;
-			}
-		}
-		});
-	};
-	function changeOrderLeft(curNode,ci,p){
-		var counter=0;
-		var flag=false;
-		dNodes_W[pi].parent.children.forEach(function(a,ci){
-			//layout change
-			if(l[1]>a.y){
-				counter=(ci+1);
-				a.childIndex--;
-				curNode.childIndex=counter;
-			}
-		});
-	};
-	var currentChildIndex=curNode.childIndex;
-	var totalChildren=curNode.parent.children;
-	// switch-layout feature
-	if($('#switch-layout').hasClass('vertical-layout')){
-		if(l[1]<curNode.y){
-			//alert('moved up');
-			changeOrderRight(curNode,currentChildIndex,totalChildren);	
-		}else{
-			//alert('moved down');
-			changeOrderLeft(curNode,currentChildIndex,totalChildren);
-		}
-	}
+	// function changeOrderRight(curNode,ci,p){
+	// 	var counter=-1;
+	// 	var flag=false;
+	// 	dNodes_W[pi].parent.children.forEach(function(a,i){
+	// 		if(ci<=(i+1)){
+	// 			return false;
+	// 		}
+	// 		//layout change
+	// 	// switch-layout feature
+	// 	if($('#switch-layout').hasClass('vertical-layout')){
+	// 		if(l[0]<a.x){
+	// 			if(counter==-1) counter=(i+1);
+	// 			a.childIndex++;
+	// 			curNode.childIndex=counter;
+	// 		}			
+	// 	}
+	// 	else{
+	// 		if(l[1]<a.y){
+	// 			if(counter==-1) counter=(i+1);
+	// 			a.childIndex++;
+	// 			curNode.childIndex=counter;
+	// 		}
+	// 	}
+	// 	});
+	// };
+	// function changeOrderLeft(curNode,ci,p){
+	// 	var counter=0;
+	// 	var flag=false;
+	// 	dNodes_W[pi].parent.children.forEach(function(a,ci){
+	// 		//layout change
+	// 		if(l[1]>a.y){
+	// 			counter=(ci+1);
+	// 			a.childIndex--;
+	// 			curNode.childIndex=counter;
+	// 		}
+	// 	});
+	// };
+	// var currentChildIndex=curNode.childIndex;
+	// var totalChildren=curNode.parent.children;
+	// // switch-layout feature
+	// if($('#switch-layout').hasClass('vertical-layout')){
+	// 	if(l[1]<curNode.y){
+	// 		//alert('moved up');
+	// 		changeOrderRight(curNode,currentChildIndex,totalChildren);	
+	// 	}else{
+	// 		//alert('moved down');
+	// 		changeOrderLeft(curNode,currentChildIndex,totalChildren);
+	// 	}
+	// }
 	
-	else {
-	if(l[1]<curNode.y){
-		//alert('moved up');
-		changeOrderRight(curNode,currentChildIndex,totalChildren);
-	}else{
-		//alert('moved down');
-		changeOrderLeft(curNode,currentChildIndex,totalChildren);
-	}
-	}
+	// else {
+	// if(l[1]<curNode.y){
+	// 	//alert('moved up');
+	// 	changeOrderRight(curNode,currentChildIndex,totalChildren);
+	// }else{
+	// 	//alert('moved down');
+	// 	changeOrderLeft(curNode,currentChildIndex,totalChildren);
+	// }
+	// }
 	dNodes_W[pi].x=parseFloat(l[0]);
 	dNodes_W[pi].y=parseFloat(l[1]);
 	addLink_W(temp_W.t,dLinks_W[temp_W.t].source,dLinks_W[temp_W.t].target);
@@ -723,7 +723,7 @@ var inpKeyUp_W = function(e){
 function treeIterator_W(c,d,e){
 	c.push({projectID:d.projectID,id:d.id,childIndex:d.childIndex,id_c:(d.id_c)?d.id_c:null,id_n:(d.id_n)?d.id_n:null,oid:(d.oid)?d.oid:null,name:d.name,type:d.type,pid:(d.parent)?d.parent.id:null,pid_c:(d.parent)?d.parent.id_c:null,task:(d.task)?d.task:null,renamed:(d.rnm)?d.rnm:!1,orig_name:(d.original_name)?d.original_name:null});
 	if(d.children&&d.children.length>0) d.children.forEach(function(t){e=treeIterator_W(c,t,e);});
-	//else if(d._children&&d._children.length>0) d._children.forEach(function(t){e=treeIterator(c,t,e);});
+	else if(d._children&&d._children.length>0) d._children.forEach(function(t){e=treeIterator(c,t,e);});
 	//else if(d.type!='testcases') return !0;
 	return e;
 };
@@ -733,6 +733,32 @@ function treeIterator_W(c,d,e){
 function actionEvent_W(e){
 	var s=d3.select(this);
 	var error=!1,mapData=[],flag=0,alertMsg;
+	var temp_data=[];
+	dNodes_W.forEach(function(e,i){
+        if(i==0) return;
+        temp_data[i] = {idx:i,x:e.x,y:e.y,type:e.type};
+    });
+
+    var layout_vertical = $('#switch-layout').hasClass('vertical-layout');
+    if(layout_vertical){
+
+        temp_data.sort(function(a, b) {
+            return a.x - b.x;
+        }); 
+    }
+    else{
+            
+        temp_data.sort(function(a, b) {
+            return a.y - b.y;
+        });         
+    }
+
+    
+    var counter = {'scenarios':1};
+    temp_data.forEach(function(e,i){
+    	dNodes_W[e.idx].childIndex = counter[e.type];
+         counter[e.type] = counter[e.type]+1;
+     })
 	error=treeIterator_W(mapData,dNodes_W[0],error);
 	
 	if(s.attr('id')=='ct-saveAction_W'){
@@ -745,7 +771,7 @@ function actionEvent_W(e){
 	else if(s.attr('id')=='ct-createAction_W'){
 		flag=20;
 		if(error){
-			openDialogMindmap("Error", "Mindmap flow must be complete! Modules -> Scenarios -> Screens -> Testcases")
+			openDialogMindmap("Error", "Mindmap flow must be complete! Modules -> Scenarios -> Screens -> Testcases");
 			//$('#Mindmap_error').modal('show');
 			return;
 		}
@@ -1022,7 +1048,7 @@ function toggleExpandAssign(e){
 		$(".ct-nodeBox").css({"overflow":"", "width":""})
 	}
 };
-function clickHideElements(e){
+function clickHideElements_W(e){
 	d3.select('#ct-inpBox').classed('no-disp',!0);
 	d3.select('#ct-ctrlBox').classed('no-disp',!0);
 	d3.select('#ct-assignBox').classed('no-disp',!0);

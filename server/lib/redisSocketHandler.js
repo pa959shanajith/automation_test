@@ -20,6 +20,7 @@ sub1.on("message", function (channel, message) {
 	case 'webCrawlerGo':
 		mySocket._events.result_web_crawler = [];
 		mySocket._events.result_web_crawler_finished = [];
+		mySocket._events.unavailableLocalServer = [];
 		mySocket.emit("webCrawlerGo", data.input_url, data.level, data.agent);
 
 		mySocket.on('unavailableLocalServer', function (value) {
@@ -39,6 +40,7 @@ sub1.on("message", function (channel, message) {
 		break;
 	case 'LAUNCH_DESKTOP':
 		mySocket._events.scrape = [];
+		mySocket._events.unavailableLocalServer = [];
 		mySocket.emit("LAUNCH_DESKTOP", data.applicationPath);
 
 		mySocket.on('unavailableLocalServer', function (value) {
@@ -53,6 +55,7 @@ sub1.on("message", function (channel, message) {
 		break;
 	case 'LAUNCH_SAP':
 		mySocket._events.scrape = [];
+		mySocket._events.unavailableLocalServer = [];
 		mySocket.emit("LAUNCH_SAP", data.applicationPath);
 
 		mySocket.on('unavailableLocalServer', function (value) {
@@ -67,6 +70,7 @@ sub1.on("message", function (channel, message) {
 		break;
 	case 'LAUNCH_OEBS':
 		mySocket._events.scrape = [];
+		mySocket._events.unavailableLocalServer = [];
 		mySocket.emit("LAUNCH_OEBS", data.applicationPath);
 
 		mySocket.on('unavailableLocalServer', function (value) {
@@ -81,6 +85,7 @@ sub1.on("message", function (channel, message) {
 		break;
 	case 'LAUNCH_MOBILE':
 		mySocket._events.scrape = [];
+		mySocket._events.unavailableLocalServer = [];
 		mySocket.emit("LAUNCH_MOBILE", data.apkPath, data.serial, data.mobileDeviceName, data.mobileIosVersion, data.mobileUDID);
 
 		mySocket.on('unavailableLocalServer', function (value) {
@@ -95,6 +100,7 @@ sub1.on("message", function (channel, message) {
 		break;
 	case 'LAUNCH_MOBILE_WEB':
 		mySocket._events.scrape = [];
+		mySocket._events.unavailableLocalServer = [];
 		mySocket.emit("LAUNCH_MOBILE_WEB", data.mobileSerial, data.androidVersion);
 
 		mySocket.on('unavailableLocalServer', function (value) {
@@ -109,6 +115,7 @@ sub1.on("message", function (channel, message) {
 		break;
 	case 'webscrape':
 		mySocket._events.scrape = [];
+		mySocket._events.unavailableLocalServer = [];
 		mySocket.emit("webscrape", data.data);
 
 		mySocket.on('unavailableLocalServer', function (value) {
@@ -129,6 +136,7 @@ sub1.on("message", function (channel, message) {
 		mySocket._events.result_debugTestCaseWS = [];
 		mySocket._events.result_wsdl_listOfOperation = [];
 		mySocket._events.result_wsdl_ServiceGenerator = [];
+		mySocket._events.unavailableLocalServer = [];
 		mySocket.emit("debugTestCase", data.responsedata);
 
 		mySocket.on('unavailableLocalServer', function (value) {
@@ -148,6 +156,7 @@ sub1.on("message", function (channel, message) {
 		break;
 	case 'wsdl_listOfOperation':
 		mySocket._events.result_wsdl_listOfOperation = [];
+		mySocket._events.unavailableLocalServer = [];
 		mySocket.emit('wsdl_listOfOperation', data.wsdlurl);
 
 		mySocket.on('unavailableLocalServer', function (value) {
@@ -160,9 +169,10 @@ sub1.on("message", function (channel, message) {
 			pub2.publish('ICE2_' + data.username, dataToNode);
 		});
 		break;
-	case 'wsdlServiceGenerator_ICE':
+	case 'wsdl_ServiceGenerator':
 		mySocket._events.result_wsdl_ServiceGenerator = [];
-		mySocket.emit('wsdlServiceGenerator_ICE', data.serviceGenRequest);
+		mySocket._events.unavailableLocalServer = [];
+		mySocket.emit('wsdl_ServiceGenerator', data.serviceGenRequest);
 
 		mySocket.on('unavailableLocalServer', function (value) {
 			dataToNode = JSON.stringify({"username": data.username, "onAction": "unavailableLocalServer", "value": value});
@@ -176,6 +186,7 @@ sub1.on("message", function (channel, message) {
 		break;
 	case 'render_screenshot':
 		mySocket._events.render_screenshot = [];
+		mySocket._events.unavailableLocalServer = [];
 		mySocket.emit('render_screenshot', data.path);
 
 		mySocket.on('unavailableLocalServer', function (value) {
@@ -192,6 +203,7 @@ sub1.on("message", function (channel, message) {
 	case 'jiralogin':
 		mySocket._events.jiralogin = [];
 		mySocket._events.issue_id = [];
+		mySocket._events.unavailableLocalServer = [];
 		mySocket.emit('jiralogin', data.action, data.inputs);
 
 		mySocket.on('unavailableLocalServer', function (value) {
@@ -213,6 +225,7 @@ sub1.on("message", function (channel, message) {
 	case 'executeTestSuite':
 		mySocket._events.result_executeTestSuite = [];
 		mySocket._events.return_status_executeTestSuite = [];
+		mySocket._events.unavailableLocalServer = [];
 		mySocket.emit('executeTestSuite', data.executionRequest);
 
 		mySocket.on('unavailableLocalServer', function (value) {
@@ -233,6 +246,7 @@ sub1.on("message", function (channel, message) {
 
 	case 'qclogin':
 		mySocket._events.qcresponse = [];
+		mySocket._events.unavailableLocalServer = [];
 		mySocket.emit('qclogin', data.responsedata);
 
 		mySocket.on('unavailableLocalServer', function (value) {

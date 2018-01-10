@@ -1,4 +1,4 @@
-mySPA.factory('webCrawlerServices', ['$http','$q', function ($http, $httpProvider, $q)   {
+mySPA.factory('webocularServices', ['$http','$q', function ($http, $httpProvider, $q)   {
 	return{
 		getResults : function(url, level, agent){
 			console.log("Data in service", url, level, agent);
