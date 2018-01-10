@@ -169,10 +169,10 @@ sub1.on("message", function (channel, message) {
 			pub2.publish('ICE2_' + data.username, dataToNode);
 		});
 		break;
-	case 'wsdlServiceGenerator_ICE':
+	case 'wsdl_ServiceGenerator':
 		mySocket._events.result_wsdl_ServiceGenerator = [];
 		mySocket._events.unavailableLocalServer = [];
-		mySocket.emit('wsdlServiceGenerator_ICE', data.serviceGenRequest);
+		mySocket.emit('wsdl_ServiceGenerator', data.serviceGenRequest);
 
 		mySocket.on('unavailableLocalServer', function (value) {
 			dataToNode = JSON.stringify({"username": data.username, "onAction": "unavailableLocalServer", "value": value});

@@ -1981,9 +1981,9 @@ exports.debugTestCase_ICE = function (req, res) {
 										} else if (data.onAction == "result_wsdl_ServiceGenerator") {
 											clearInterval(updateSessionExpiry);
 											try {
-												if (serviceGenResponse.toUpperCase() === 'TERMINATE') {
+												if (data.value.toUpperCase() === 'TERMINATE') {
 													try {
-														res.send(serviceGenResponse);
+														res.send(data.value);
 													} catch (exception) {
 														logger.error("Exception in the service debugTestCase_ICE - result_wsdl_ServiceGenerator: %s", exception);
 													}
@@ -1999,8 +1999,8 @@ exports.debugTestCase_ICE = function (req, res) {
 													};
 													responsedata.endPointURL.push(wsdlurl.split('?')[0]);
 													responsedata.operations.push(operations);
-													if (serviceGenResponse != "fail" && serviceGenResponse != undefined && serviceGenResponse != "") {
-														response = serviceGenResponse.split('rEsPONseBOdY:');
+													if (data.value != "fail" && data.value != undefined && data.value != "") {
+														response = data.value.split('rEsPONseBOdY:');
 														if (response.length == 2) {
 															responsedata.header.push(response[0]);
 															responsedata.body.push(response[1]);
