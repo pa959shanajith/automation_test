@@ -1494,8 +1494,17 @@ console.log("screenName:", screenName);
                     }
                     if (data == "unavailableLocalServer") {
                         unblockUI();
-                        eaCheckbox = false;
-                        $("#enableAppend").prop('checked',false);
+                         eaCheckbox = false;
+                         var scrapedObjectsLen = $("span.ellipsis").length;
+                         if(scrapedObjectsLen > 0)
+                         {
+                            $(".enableActions").removeClass("enableActions").addClass("disableActions");
+                         }
+                         else{
+                            $(".disableActions").removeClass("disableActions").addClass("enableActions");
+                         }
+                        
+                         $("#enableAppend").prop('checked',false);
                         openDialog("Scrape Screen", "ICE Engine is not available. Please run the batch file and connect to the Server.");
                         return false
                     }
