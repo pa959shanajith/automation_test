@@ -411,7 +411,11 @@ console.log("screenName:", screenName);
                         } else if (data == "browserUnavailable") {
                             unblockUI();
                             openDialog("Debug Testcase", "Browser is not available")
+                        } else if (data == "scheduleModeOn") {
+                            unblockUI();
+                            openDialog("Debug Testcase", "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.")
                         }
+
                     },
                     function(error) {
                         console.log("Error while traversing while executing debugTestcase method!! \r\n " + (error.data));
@@ -439,6 +443,9 @@ console.log("screenName:", screenName);
                         } else if (data == "browserUnavailable") {
                             unblockUI();
                             openDialog("Debug Testcase", "Browser is not available")
+                        } else if (data == "scheduleModeOn") {
+                            unblockUI();
+                            openDialog("Debug Testcase", "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.")
                         }
                     },
                     function(error) {
@@ -1161,6 +1168,11 @@ console.log("screenName:", screenName);
                         openDialog("Web Service Screen", "ICE Engine is not available. Please run the batch file and connect to the Server.");
                         return false
                     }
+                    if (data == "scheduleModeOn") {
+                        unblockUI();
+                        openDialog("Web Service Screen", "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.")
+                        return false
+                    }
                     unblockUI();
                     if (typeof data == "object") {
                         openDialog("Data Retrieve", "Web Service response received successfully");
@@ -1211,6 +1223,11 @@ console.log("screenName:", screenName);
                             openDialog("WSDL-Scrape Screen", "ICE Engine is not available. Please run the batch file and connect to the Server.");
                             return false
                         }
+                        if (data == "scheduleModeOn") {
+                            unblockUI();
+                            openDialog("WSDL-Scrape Screen", "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.")
+                            return false
+                        }
                         console.log(data)
                         $("#wsldSelect").empty().append('<option value selected disabled>Select Operation</option>')
                         for (i = 0; i < data.listofoperations.length; i++) {
@@ -1244,6 +1261,11 @@ console.log("screenName:", screenName);
                         if (data == "unavailableLocalServer") {
                             unblockUI();
                             openDialog("WSDL Add-Scrape Screen", "ICE Engine is not available. Please run the batch file and connect to the Server.");
+                            return false
+                        }
+                        if (data == "scheduleModeOn") {
+                            unblockUI();
+                            openDialog("WSDL Add-Scrape Screen", "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.")
                             return false
                         }
                         if (typeof data === "object") {
@@ -1492,6 +1514,22 @@ console.log("screenName:", screenName);
                         openDialog("Scrape Screen", "Scraped data exceeds max. Limit.");
                         return false
                     }
+                    if(data == 'scheduleModeOn')
+                    {
+                        unblockUI();
+                        eaCheckbox = false;
+                        var scrapedObjectsLen = $("span.ellipsis").length;
+                        if(scrapedObjectsLen > 0)
+                        {
+                           $(".enableActions").removeClass("enableActions").addClass("disableActions");
+                        }
+                        else{
+                           $(".disableActions").removeClass("disableActions").addClass("enableActions");
+                        }
+                        $("#enableAppend").prop('checked',false);
+                        openDialog("Scrape Screen", "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.");
+                        return false
+                    }
                     if (data == "unavailableLocalServer") {
                         unblockUI();
                          eaCheckbox = false;
@@ -1507,6 +1545,10 @@ console.log("screenName:", screenName);
                          $("#enableAppend").prop('checked',false);
                         openDialog("Scrape Screen", "ICE Engine is not available. Please run the batch file and connect to the Server.");
                         return false
+                    }
+                    if (data == "scheduleModeOn") {
+                        unblockUI();
+                        openDialog("Debug Testcase", "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.")
                     }
                     if (data == "fail") {
                         openDialog("Scrape", "Failed to scrape.")
