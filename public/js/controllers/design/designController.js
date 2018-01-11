@@ -1352,9 +1352,11 @@ console.log("screenName:", screenName);
                     $("#launchDesktopApps").modal("hide");
                     if(compareFlag == true){
                         blockUI(blockMsg2);
+                        e.stopImmediatePropagation();
                     }
                     else{
                         blockUI(blockMsg);
+                        e.stopImmediatePropagation();
                     }
                 }
             }
@@ -1372,9 +1374,11 @@ console.log("screenName:", screenName);
                     //blockUI(blockMsg);
                     if(compareFlag == true){
                         blockUI(blockMsg2);
+                        e.stopImmediatePropagation();
                     }
                     else{
                         blockUI(blockMsg);
+                        e.stopImmediatePropagation();
                     }
                 }
             }
@@ -1400,9 +1404,11 @@ console.log("screenName:", screenName);
                         // blockUI(blockMsg);
                         if(compareFlag == true){
                         blockUI(blockMsg2);
+                        e.stopImmediatePropagation();
                     }
                     else{
                         blockUI(blockMsg);
+                        e.stopImmediatePropagation();
                     }
                     }
                 } else if ($("#mobilityAPKPath").val().toLowerCase().indexOf(".ipa") >= 0 || $("#mobilityAPKPath").val().toLowerCase().indexOf(".app") >= 0) {
@@ -1429,9 +1435,11 @@ console.log("screenName:", screenName);
                         // blockUI(blockMsg);
                         if(compareFlag == true){
                         blockUI(blockMsg2);
+                        e.stopImmediatePropagation();
                         }
                         else{
                             blockUI(blockMsg);
+                            e.stopImmediatePropagation();
                         }
                     }
                 }
@@ -1455,9 +1463,11 @@ console.log("screenName:", screenName);
                     // blockUI(blockMsg);
                     if(compareFlag == true){
                         blockUI(blockMsg2);
+                        e.stopImmediatePropagation();
                     }
                     else{
                         blockUI(blockMsg);
+                        e.stopImmediatePropagation();
                     }
                 }
             }
@@ -1476,9 +1486,11 @@ console.log("screenName:", screenName);
                     // blockUI(blockMsg);
                     if(compareFlag == true){
                         blockUI(blockMsg2);
+                        e.stopImmediatePropagation();
                     }
                     else{
                         blockUI(blockMsg);
+                        e.stopImmediatePropagation();
                     }
                 }
             }
@@ -1494,9 +1506,11 @@ console.log("screenName:", screenName);
                 // blockUI(blockMsg);
                 if(compareFlag == true){
                         blockUI(blockMsg2);
+                        e.stopImmediatePropagation();
                     }
                     else{
                         blockUI(blockMsg);
+                        e.stopImmediatePropagation();
                     }
             }
             //For Web
