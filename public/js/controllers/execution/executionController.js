@@ -617,6 +617,10 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 					openDialogExe("Execute Test Suite", "ICE Engine is not available. Please run the batch file and connect to the Server.")
 					//$('#executionserverunavailable').modal('show');
 				}
+				else if(data == "scheduleModeOn")
+				{
+					openDialogExe("Execute Test Suite", "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.");
+				}
 				else{
 					$('#executionCompleted').modal('show');
 					setTimeout(function(){

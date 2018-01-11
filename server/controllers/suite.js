@@ -838,7 +838,14 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 					redisServer.redisSub2.on("message",executeTestSuite_listener);
 				} else {
 					logger.error("Error occured in the function executionFunction: Socket not Available");
-					res.send("unavailableLocalServer");
+					//res.send("unavailableLocalServer");
+					if(Object.keys(myserver.allSchedulingSocketsMap).length > 0)
+					{
+						res.send("scheduleModeOn");
+					}
+					else{
+						res.send("unavailableLocalServer");
+					}
 				}
 			});
 		}
@@ -1293,7 +1300,14 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 											redisServer.redisSub2.on("message",executeTestSuite_listener);
 										} else {
 											logger.error("Error occured in ExecuteTestSuite_ICE_SVN service: Socket not Available");
-											res.send("unavailableLocalServer");
+											//res.send("unavailableLocalServer");
+											if(Object.keys(myserver.allSchedulingSocketsMap).length > 0)
+											{
+												res.send("scheduleModeOn");
+											}
+											else{
+												res.send("unavailableLocalServer");
+											}
 										}
 									});
 								}
@@ -1553,7 +1567,14 @@ exports.ExecuteTestSuite_ICE_CI = function (req, res) {
 					redisServer.redisSub2.on("message",executeTestSuite_listener);
 				} else {
 					logger.error("Error occured in the function executionFunction in ExecuteTestSuite_ICE_CI: Socket not Available");
-					res.send("unavailableLocalServer");
+					//res.send("unavailableLocalServer");
+					if(Object.keys(myserver.allSchedulingSocketsMap).length > 0)
+					{
+						res.send("scheduleModeOn");
+					}
+					else{
+						res.send("unavailableLocalServer");
+					}
 				}
 			});
 		}
