@@ -298,6 +298,7 @@ exports.mindmapService = function(req, res) {
 		}
 		else if(d.task=='writeMap'){
 			var tasks =[];
+			var nameDict = {};
 			for (var i=0;i<d.data.map.length;i++)
 			{
 				if(	d.data.map[i].task)
@@ -338,6 +339,7 @@ exports.mindmapService = function(req, res) {
 					idDict[e.id]=(e.id_n)?e.id_n:uuidV4();
 					e.id=idDict[e.id];
 					t=e.task;
+					nameDict[e.id] = e.name;
 					var taskstatus='assigned';
 					if(e.type=='modules_endtoend'){
 						if(e.oid!=null){
