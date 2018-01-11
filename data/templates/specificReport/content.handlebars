@@ -80,6 +80,10 @@
                                 if(data == "unavailableLocalServer"){
                                     alert("Local Server unavailable");
                                 }
+                                else if(data == 'scheduleModeOn')
+                                {
+                                     alert("Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.");
+                                }
                                 else if(data == "fail"){
                                     alert("Failed to open image");
                                 }
@@ -152,6 +156,10 @@
                                 }
                                 else if(data == "Invalid Session"){
                                     $(".error-msg").text("Invalid Session. Login again");
+                                }
+                                  else if(data == 'scheduleModeOn')
+                                {
+                                     $(".error-msg").text("Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.");
                                 }
                                 else if(data === [object Object]){
                                     localStorage.setItem("jiraLoginDetails", JSON.stringify(data));
@@ -290,6 +298,12 @@
                                     $(".createIssueWindow").hide();
                                     $(".statusWindow").show();
                                     $("#showStatus").text("Local Server unavailable.");
+                                }
+                                else if(data == 'scheduleModeOn')
+                                {
+                                    $(".createIssueWindow").hide();
+                                    $(".statusWindow").show();
+                                    $("#showStatus").text("Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.");
                                 }
                                 else if(data == "Invalid Session"){
                                     $(".createIssueWindow").hide();
