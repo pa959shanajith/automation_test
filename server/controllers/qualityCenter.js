@@ -79,7 +79,14 @@ exports.loginQCServer_ICE = function (req, res) {
 					} else {
 						logger.info("ICE Socket not Available");
 						try {
-							res.send("unavailableLocalServer");
+							//res.send("unavailableLocalServer");
+							if(Object.keys(myserver.allSchedulingSocketsMap).length > 0)
+							{
+								res.send("scheduleModeOn");
+							}
+							else{
+								res.send("unavailableLocalServer");
+							}
 						} catch (exception) {
 							logger.error(exception.message);
 						}
@@ -90,11 +97,25 @@ exports.loginQCServer_ICE = function (req, res) {
 				res.send("Invalid Session");
 			}
 		} else {
-			res.send('unavailableLocalServer');
+			//res.send('unavailableLocalServer');
+			if(Object.keys(myserver.allSchedulingSocketsMap).length > 0)
+			{
+				res.send("scheduleModeOn");
+			}
+			else{
+				res.send("unavailableLocalServer");
+			}
 		}
 	} catch (exception) {
 		logger.error(exception.message);
-		res.send("unavailableLocalServer");
+		//res.send("unavailableLocalServer");
+		if(Object.keys(myserver.allSchedulingSocketsMap).length > 0)
+		{
+			res.send("scheduleModeOn");
+		}
+		else{
+			res.send("unavailableLocalServer");
+		}
 	}
 };
 
@@ -155,7 +176,14 @@ exports.qcProjectDetails_ICE = function (req, res) {
 				} else {
 					logger.info("ICE Socket not Available");
 					try {
-						res.send("unavailableLocalServer");
+						//res.send("unavailableLocalServer");
+						if(Object.keys(myserver.allSchedulingSocketsMap).length > 0)
+						{
+							res.send("scheduleModeOn");
+						}
+						else{
+							res.send("unavailableLocalServer");
+						}
 					} catch (exception) {
 						logger.error(exception.message);
 					}
@@ -167,7 +195,14 @@ exports.qcProjectDetails_ICE = function (req, res) {
 		}
 	} catch (exception) {
 		logger.error(exception.message);
-		res.send("unavailableLocalServer");
+		//res.send("unavailableLocalServer");
+		if(Object.keys(myserver.allSchedulingSocketsMap).length > 0)
+		{
+			res.send("scheduleModeOn");
+		}
+		else{
+			res.send("unavailableLocalServer");
+		}
 	}
 };
 
@@ -330,7 +365,14 @@ exports.qcFolderDetails_ICE = function (req, res) {
 				} else {
 					logger.info("ICE Socket not Available");
 					try {
-						res.send("unavailableLocalServer");
+						//res.send("unavailableLocalServer");
+						if(Object.keys(myserver.allSchedulingSocketsMap).length > 0)
+						{
+							res.send("scheduleModeOn");
+						}
+						else{
+							res.send("unavailableLocalServer");
+						}
 					} catch (exception) {
 						logger.error(exception.message);
 					}
@@ -342,7 +384,14 @@ exports.qcFolderDetails_ICE = function (req, res) {
 		}
 	} catch (exception) {
 		logger.error(exception.message);
-		res.send("unavailableLocalServer");
+		//res.send("unavailableLocalServer");
+		if(Object.keys(myserver.allSchedulingSocketsMap).length > 0)
+		{
+			res.send("scheduleModeOn");
+		}
+		else{
+			res.send("unavailableLocalServer");
+		}
 	}
 };
 
@@ -424,7 +473,14 @@ exports.saveQcDetails_ICE = function (req, res) {
 				}
 			} catch (exception) {
 				logger.error(exception.message);
-				res.send("unavailableLocalServer");
+				//res.send("unavailableLocalServer");
+				if(Object.keys(myserver.allSchedulingSocketsMap).length > 0)
+				{
+					res.send("scheduleModeOn");
+				}
+				else{
+					res.send("unavailableLocalServer");
+				}
 			}
 		} else {
 			res.send("fail");

@@ -254,7 +254,14 @@ exports.initScraping_ICE = function (req, res) {
 				} else {
 					logger.error("Error occured in the service initScraping_ICE: Socket not Available");
 					try {
-						res.send("unavailableLocalServer");
+						//res.send("unavailableLocalServer");
+						if(Object.keys(myserver.allSchedulingSocketsMap).length > 0)
+						{
+							res.send("scheduleModeOn");
+						}
+						else{
+							res.send("unavailableLocalServer");
+						}
 					} catch (exception) {
 						logger.error("Exception in the service initScraping_ICE: %s",exception);
 					}
@@ -266,7 +273,14 @@ exports.initScraping_ICE = function (req, res) {
 		}
 	} catch (exception) {
 		logger.error("Exception in the service initScraping_ICE: %s",exception);
-		res.send("unavailableLocalServer");
+		//res.send("unavailableLocalServer");
+		if(Object.keys(myserver.allSchedulingSocketsMap).length > 0)
+		{
+			res.send("scheduleModeOn");
+		}
+		else{
+			res.send("unavailableLocalServer");
+		}
 	}
 };
 
@@ -2038,7 +2052,14 @@ exports.debugTestCase_ICE = function (req, res) {
 				} else {
 					logger.error("Error in the service debugTestCase_ICE: Socket not Available");
 					try {
-						res.send("unavailableLocalServer");
+						//res.send("unavailableLocalServer");
+						if(Object.keys(myserver.allSchedulingSocketsMap).length > 0)
+						{
+							res.send("scheduleModeOn");
+						}
+						else{
+							res.send("unavailableLocalServer");
+						}
 					} catch (exception) {
 						logger.error("Error in the service debugTestCase_ICE: %s", exception);
 					}
@@ -2049,7 +2070,13 @@ exports.debugTestCase_ICE = function (req, res) {
 			res.send("Invalid Session");
 		}
 	} catch (exception) {
-		res.send("unavailableLocalServer");
+		if(Object.keys(myserver.allSchedulingSocketsMap).length > 0)
+		{
+			res.send("scheduleModeOn");
+		}
+		else{
+			res.send("unavailableLocalServer");
+		}
 		logger.error("Exception in the service debugTestCase_ICE:unavailableLocalServer: %s", exception);
 	}
 };

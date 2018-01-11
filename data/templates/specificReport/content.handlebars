@@ -80,6 +80,10 @@
                                 if(data == "unavailableLocalServer"){
                                     alert("Local Server unavailable");
                                 }
+                                else if(data == 'scheduleModeOn')
+                                {
+                                     alert("Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.");
+                                }
                                 else if(data == "fail"){
                                     alert("Failed to open image");
                                 }
@@ -119,6 +123,11 @@
                 })*/                
                 
                 //Login to Jira
+                $(document).on('click','.resetJiraCredentials',function(){
+                    $("#jiraURL").val('');
+                    $("#jiraUserName").val('');
+                    $("#jiraPassword").val('');
+                });
                 $(document).on('click', '.loginJiraCredentials', function(){
                     $("#jiraURL, #jiraUserName, #jiraPassword").css('border-color','#bbb');
                     url = $("#jiraURL").val().trim();
@@ -153,7 +162,12 @@
                                 else if(data == "Invalid Session"){
                                     $(".error-msg").text("Invalid Session. Login again");
                                 }
-                                else if(data === [object Object]){
+                                  else if(data == 'scheduleModeOn')
+                                {
+                                     $(".error-msg").text("Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.");
+                                }
+                                else {
+                                   //if(data === [object Object])
                                     localStorage.setItem("jiraLoginDetails", JSON.stringify(data));
                                     clearData();
                                     $(".error-msg").text('');
@@ -216,7 +230,7 @@
                         $("#"+selector).append("<option value="+dataArray[i].id+">"+dataArray[i].name+"</option>");
                     }
                 }
-
+                /*
                 function ele(id){return document.getElementById(id);}
                 ele("jAttachment").addEventListener("change", updateFilePath, false);
                 function updateFilePath(){
@@ -225,7 +239,7 @@
                     $("#scrnShotPath").val($("#jAttachment").val());
                     console.log("jAttachment----"+$("#jAttachment").val());
                     console.log("scrnShotPath----"+$("#scrnShotPath").val());
-                }
+                }*/
                 //function to close popup window
                 $(document).on('click', '.closeWindow', function(){
                      $(".jiraWindow, .createIssueWindow, .statusWindow").hide();
@@ -248,7 +262,7 @@
                     var description = $("#jDescription").val();
                     var priority = $("#jPriority option:selected").text();
                     var label = $("#jLabel").val().split(" ");
-                    var attachment = $("#jAttachment").val();
+                    var attachment = $("#scrnShotPath").val();
                     if(!projectid) $("#jProjects").css('border-color','red');
                     else if(!issuetype || issuetype == "Select Issue") $("#jIssuetype").css('border-color','red');
                     else if(!summary) $("#jSummary").css('border-color','red');
@@ -290,6 +304,12 @@
                                     $(".createIssueWindow").hide();
                                     $(".statusWindow").show();
                                     $("#showStatus").text("Local Server unavailable.");
+                                }
+                                else if(data == 'scheduleModeOn')
+                                {
+                                    $(".createIssueWindow").hide();
+                                    $(".statusWindow").show();
+                                    $("#showStatus").text("Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.");
                                 }
                                 else if(data == "Invalid Session"){
                                     $(".createIssueWindow").hide();
@@ -546,11 +566,11 @@
                 margin-right: 12px;
             }
             .statusWindow .popupheader label{float: left; margin: 6px 0 0 20px;}
-            #jSummary, #jDescription, #jlabel, #jAttachment{
+            #jSummary, #jDescription, #jlabel{
                 width: 500px;
                 text-align: left;
             }
-            #jAttachment{width: 95px;}
+            /*#jAttachment{width: 95px;}*/
             .createIssueWindow #scrnShotPath{
                 width: 406px;
             }
@@ -778,7 +798,7 @@
                     <p><label>Description</label><textarea class="jirapopupinput" id="jDescription"></textarea></p>
                     <p><label>Priority<span class="mandatory">*</span></label><select class="jirapopupinput" id="jPriority"><option value="" selected disabled>Select Priority</option></select></p>
                     <p><label>Label</label><textarea class="jirapopupinput" id="jLabel"></textarea></p>
-                    <p><label>Attachment</label><input type="file" class="jirapopupinput" id="jAttachment" /><input type="text" id="scrnShotPath" class="jirapopupinput" disabled/></p>
+                    <p><label>Attachment Path</label><input type="text" id="scrnShotPath" class="jirapopupinput"/></p>
                     <p><span class="error-msg"></span><button type="button" class="cancelIssues">Cancel</button><button type="button" class="createIssues">Create</button></p>
                 </div>
 

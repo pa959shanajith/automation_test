@@ -70,6 +70,10 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 				if(data == "unavailableLocalServer"){
 					$("#qcErrorMsg").text("Unavailable LocalServer");
 				}
+				else if(data == "scheduleModeOn")
+				{
+					$("#qcErrorMsg").text("Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.");
+				}
 				else if(data == "Invalid Session"){
 					$("#qcErrorMsg").text("Invalid Session");
 				}
@@ -116,6 +120,10 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 				nineteen68_projects_details = data.nineteen68_projects;
 				if(data == "unavailableLocalServer"){
 					openModelPopup("ALM Connection", "unavailableLocalServer")
+				}	
+				else if(data == "scheduleModeOn")
+				{
+					openModelPopup("ALM Connection", "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.")
 				}
 				else if(data == "Invalid Session"){
 					openModelPopup("ALM Connection", "Invalid Session")
@@ -361,6 +369,9 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 			.then(function(data){
 				if(data == "unavailableLocalServer"){
 					openModelPopup("Save Mapped Testcase", "unavailableLocalServer");
+				}
+				else if(data == "scheduleModeOn"){
+					openModelPopup("Save Mapped Testcase", "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.");
 				}
 				else if(data == "fail"){
 					openModelPopup("Save Mapped Testcase", "failed to save");

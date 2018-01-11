@@ -97,7 +97,14 @@ exports.openScreenShot = function (req, res) {
 				redisServer.redisSub2.on("message",render_screenshot_listener);
 			} else {
 				logger.error("ICE Socket not Available");
-				res.send("unavailableLocalServer");
+				//res.send("unavailableLocalServer");
+				if(Object.keys(myserver.allSchedulingSocketsMap).length > 0)
+				{
+					res.send("scheduleModeOn");
+				}
+				else{
+					res.send("unavailableLocalServer");
+				}
 			}
 		});
 	} catch (exception) {
@@ -1015,7 +1022,7 @@ exports.connectJira_ICE = function (req, res) {
 						redisServer.redisPub1.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
 							if (redisres[1]==1) {
 								logger.info("Sending socket request for jira_login to redis");
-								dataToIce = {"emitAction": "jira_login", "username": name, "action": req.body.action, "inputs": inputs};
+								dataToIce = {"emitAction": "jiralogin", "username": name, "action": req.body.action, "inputs": inputs};
 								redisServer.redisPub1.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
 								var updateSessionExpiry = setInterval(function () {
 									req.session.cookie.maxAge = sessionTime;
@@ -1053,7 +1060,14 @@ exports.connectJira_ICE = function (req, res) {
 								redisServer.redisSub2.on("message",jira_login_1_listener);
 							} else {
 								logger.error("Error occured in the service connectJira_ICE - loginToJira: Socket not Available");
-								res.send("unavailableLocalServer");
+								//res.send("unavailableLocalServer");
+								if(Object.keys(myserver.allSchedulingSocketsMap).length > 0)
+								{
+									res.send("scheduleModeOn");
+								}
+								else{
+									res.send("unavailableLocalServer");
+								}
 							}
 						});
 					} catch (exception) {
@@ -1074,7 +1088,7 @@ exports.connectJira_ICE = function (req, res) {
 						redisServer.redisPub1.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
 							if (redisres[1]==1) {
 								logger.info("Sending socket request for jira_login to redis");
-								dataToIce = {"emitAction": "jira_login", "username": name, "action": req.body.action, "inputs": createObj};
+								dataToIce = {"emitAction": "jiralogin", "username": name, "action": req.body.action, "inputs": createObj};
 								redisServer.redisPub1.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
 								var updateSessionExpiry = setInterval(function () {
 									req.session.cookie.maxAge = sessionTime;
@@ -1112,7 +1126,14 @@ exports.connectJira_ICE = function (req, res) {
 								redisServer.redisSub2.on("message",jira_login_2_listener);
 							} else {
 								logger.error("Error occured in the service connectJira_ICE - createIssueInJira: Socket not Available");
-								res.send("unavailableLocalServer");
+								//res.send("unavailableLocalServer");
+								if(Object.keys(myserver.allSchedulingSocketsMap).length > 0)
+								{
+									res.send("scheduleModeOn");
+								}
+								else{
+									res.send("unavailableLocalServer");
+								}
 							}
 						});
 					} catch (exception) {
