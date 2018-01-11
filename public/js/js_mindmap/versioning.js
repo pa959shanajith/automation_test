@@ -119,7 +119,6 @@ params : versions : list of all versions of the selected project
 function addVersioning(versions) {
   versions = JSON.parse(versions);
   console.log("versioning enabled");
-  console.log(versions);
   $('.replicate').remove()
   $('.selectVersion').remove();
   $('.ct-project-tab').append($('<span>').attr({
@@ -157,6 +156,7 @@ function addVersioning(versions) {
   // }
   loadMindmapData1(1);
   //loadModules(versions)
+  $('.version-list').attr({title:$('.version-list').val()});
   $('.selectProject').addClass('selectProjectPosition')
   if (window.localStorage['tabMindMap'] == "tabAssign") {
     $('.plus-icon').remove();
@@ -172,6 +172,7 @@ params : None
 
 function loadModules() {
   var active_version = $('.version-list').val();
+  $('.version-list').attr({title:active_version});
   blockUI('Loading...');
   var svgTileG = d3.select('.ct-tile').append('svg').attr('class', 'ct-svgTile').attr('height', '150px').attr('width', '150px').append('g');
   var svgTileLen = $(".ct-svgTile").length;

@@ -661,3 +661,6 @@ select
 .active-map {
     color: #983fd3;
 }
+.version-list{
+    max-width: 50px;
+}
