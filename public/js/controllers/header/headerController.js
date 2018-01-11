@@ -138,11 +138,15 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 	var additionalRoleName;
 	var userId = JSON.parse(window.localStorage['_UI']).user_id;
 
-	$scope.switchedRoleConfirm = function(){
+	$(document).on('click', ".switchRole_confirm", function () {
+		//primaryRoleName = window.localStorage['_SR'];
 		additionalRoleName = $(this).text();
 		selectedROleID = $(this).valueOf("outerHTML").data("id");
+		console.log($(this).text());
 		openModelPopup("Switch Role", "Are you sure you want to switch role to: " + additionalRoleName);
-	}
+
+		//$("#switchRoleModal").modal("show");
+	})
 
 	$scope.switchedRole = function () {
 		changedRole = $('#changedRole');
