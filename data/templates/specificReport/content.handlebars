@@ -123,6 +123,11 @@
                 })*/                
                 
                 //Login to Jira
+                $(document).on('click','.resetJiraCredentials',function(){
+                    $("#jiraURL").val('');
+                    $("#jiraUserName").val('');
+                    $("#jiraPassword").val('');
+                });
                 $(document).on('click', '.loginJiraCredentials', function(){
                     $("#jiraURL, #jiraUserName, #jiraPassword").css('border-color','#bbb');
                     url = $("#jiraURL").val().trim();
