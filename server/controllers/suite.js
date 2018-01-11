@@ -872,7 +872,7 @@ exports.getListofScheduledSocketMap = function (req, res) {
 	client.post(epurl + "login/authenticateUser_Nineteen68", args, function (result, response) {
 		if (response.statusCode != 200 || result.rows == "fail") {
 			logger.error("Error occured in getListofScheduledSocketMap service from login/authenticateUser_Nineteen68 Error Code : ERRNDAC");
-			res.send({ "status": "fail", "username": "", "validation": "failed" });
+			res.send({ "status": "fail", "username": "", "tokenValidation": "failed" });
 		}
 		else {
 			validUser = false;
@@ -891,11 +891,11 @@ exports.getListofScheduledSocketMap = function (req, res) {
 					redisres.forEach(function(e){
 						connectusers.push(e.split('_')[2]);
 					});
-					res.send({ "status": "success", "username": connectusers,"validation": "Passed"});
+					res.send({ "status": "success", "username": connectusers,"tokenValidation": "Passed"});
 				});
 			}else{
 				logger.info("Inside UI service: getListofScheduledSocketMap authentication failed");
-				res.send({ "status": "fail", "username": "", "validation": "failed" });
+				res.send({ "status": "fail", "username": "", "tokenValidation": "failed" });
 			}
 		}
 	});
@@ -963,7 +963,7 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 	var testsuite_creation_data = {};
 	var result_to_send = { "execution_status": [] };
 	async.eachSeries(req.body.execution_data, function (uservalidation_iterator, cb_validation) {
-		result_status = { "userName": "", "ice_userName": "", "moduleInfo": [], "validation": "failed" };
+		result_status = { "userName": "", "ice_userName": "", "moduleInfo": [], "tokenValidation": "failed" };
 		result_status.userName = uservalidation_iterator.userInfo.username;
 		result_status.ice_userName = uservalidation_iterator.userInfo.ice_username;
 		args_validation = {
@@ -988,7 +988,7 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 				}
 				if (validUser) {
 					valid_userdata.push(uservalidation_iterator);
-					result_status.validation = "passed";
+					result_status.tokenValidation = "passed";
 					final_data[uservalidation_iterator.userInfo.ice_username] = result_status;
 				}
 				else {
