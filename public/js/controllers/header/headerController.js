@@ -111,6 +111,15 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 	}, 500);
 
 	$scope.dropdownMenuButton = function(){
+		var notificationCount = $("#notifications-count").text();
+		$("span.indexCount").each(function() {
+				var text = $(this).text();
+				$(this).attr('class','notify_'+text);
+		});
+		for(var i=0;i<notificationCount;i++)
+		{
+			$(".notify_"+i).parent().children('.txtNotify').addClass('highlightNotification');
+		}
 		if (!window.localStorage.notification) {
 			$("#notifyBox").removeClass('dropdown-menu');
 			return;
