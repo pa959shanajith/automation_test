@@ -48,7 +48,14 @@ exports.getCrawlResults = function (req, res) {
 								if (data.onAction == "unavailableLocalServer") {
 									redisServer.redisSub2.removeListener('message',webCrawlerGo_listener);	
 									logger.error("Error occured in getCrawlResults: Socket Disconnected");
-									res.send("unavailableLocalServer");
+									//res.send("unavailableLocalServer");
+									if(Object.keys(myserver.allSchedulingSocketsMap).length > 0)
+									{
+										res.send("scheduleModeOn");
+									}
+									else{
+										res.send("unavailableLocalServer");
+									}
 								} else if (data.onAction == "result_web_crawler") {
 									try {
 										var mySocketUI = myserver.allSocketsMapUI[name];
@@ -72,11 +79,25 @@ exports.getCrawlResults = function (req, res) {
 						redisServer.redisSub2.on("message",webCrawlerGo_listener);
 					} else {
 						logger.info("ICE socket not available for Address : %s", name);
-						res.send("unavailableLocalServer");
+						//res.send("unavailableLocalServer");
+						if(Object.keys(myserver.allSchedulingSocketsMap).length > 0)
+						{
+							res.send("scheduleModeOn");
+						}
+						else{
+							res.send("unavailableLocalServer");
+						}
 					}
 				});
 			} else {
-				res.send('unavailableLocalServer');
+				//res.send('unavailableLocalServer');
+				if(Object.keys(myserver.allSchedulingSocketsMap).length > 0)
+				{
+					res.send("scheduleModeOn");
+				}
+				else{
+					res.send("unavailableLocalServer");
+				}
 			}
 		} else {
 			logger.info("Error occured in the service getCrawlResults: Invalid Session");

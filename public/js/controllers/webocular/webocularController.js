@@ -124,6 +124,13 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
           openDialog("Weboccular Screen", "ICE Engine is not available. Please run the batch file and connect to the Server.");
           return false;
         }
+        else if(data == "scheduleModeOn")
+        {
+          $scope.hideBaseContent = { message: 'false' };
+          $('#progress-canvas').hide();
+          openDialog("Weboccular Screen", "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.");
+          return false;
+        }
       }, function(err){
         console.log("Error :", err)
       });
