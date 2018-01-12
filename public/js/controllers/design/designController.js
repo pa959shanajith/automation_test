@@ -863,6 +863,7 @@ console.log("screenName:", screenName);
 
     //Disabling Filter
     $("a[title='Filter']").mouseover(function() {
+      
         if (viewString == "") {
             $(this).children("img").addClass("thumb-ic-disabled").removeClass("thumb-ic");
             $(this).parent().css("cursor", "no-drop");
@@ -872,6 +873,10 @@ console.log("screenName:", screenName);
         } else {
             $(this).children("img").addClass("thumb-ic").removeClass("thumb-ic-disabled");
             $(this).parent().css("cursor", "pointer");
+        }
+        if($("#viewscrapedObjects").is(":visible") == true)
+        {
+            $(this).parent().addClass('disableFilter');
         }
     })
 
@@ -1811,9 +1816,11 @@ console.log("screenName:", screenName);
                             deleteScrapeDataservice = false;
                         } else $("#saveObjects").addClass('hide');
                     }
-                    if($("#compareChangedObjectsBox").is(":visible") == true)
+                    if($("#compareChangedObjectsBox").is(":visible") == true || $("#compareNotFoundObjectsBox").is(":visible") == true || $("#compareUnchangedObjectsBox").is(":visible") == true)
                     {
                         $("#viewscrapedObjects").show();
+                        $("#left-top-section,#left-bottom-section").css('pointer-events','none');
+                      //  $("a[title='Filter']").parent().removeAttr( 'style' ).css("cursor", "no-drop");
                     }
                     else{
                         $("#viewscrapedObjects").hide();

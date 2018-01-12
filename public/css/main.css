@@ -1064,7 +1064,7 @@ input[disabled]{
 {
     float: left;
     width: 80%;
-    /* margin-top: 2%; */
+    margin-top: 2%; 
 }
 .compareObjHeading
 {
@@ -5223,4 +5223,9 @@ Weboccular report css
 .reassignTaskBtn
 {
     margin-right: 5px;
+}
+.disableFilter
+{
+    cursor: no-drop !important;
+    pointer-events: none;
 }
