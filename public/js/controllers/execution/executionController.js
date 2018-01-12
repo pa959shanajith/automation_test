@@ -89,8 +89,10 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 	$scope.readTestSuite_ICE = function(){
         $('.checkStylebox').attr("disabled", true); 
 		$('#excSaveBtn').attr("disabled", true);
+		blockUI("Loading in Progress. Please Wait");
 		ExecutionService.readTestSuite_ICE(readTestSuite, "execute")
 		.then(function(data) {
+			unblockUI();
 			if(data == "Invalid Session"){
 					$rootScope.redirectPage();
 			 }
