@@ -25,16 +25,17 @@ mySPA.controller('neuronGraphs2DController', ['$scope', '$http', '$location', '$
     };
     //var nodeColor1={"Domain":"#AEC7E8","Project":"#FF7F0E","Release":"#1F77B4","Cycle":"#FFBB78","TestSuite":"#2CA02C","TestScenario":"#98DF8A","TestCase":"#D62728","Screen":"#FF9896"};
     // colors for 2D
-    var legendKids1 = {
-        "Domain": "#AEC7E8",
-        "Project": "#FF7F0E",
-        "Release": "#1F77B4",
-        "Cycle": "#FFBB78",
-        "Test Suite": "#2CA02C",
-        "Test Scenario": "#98DF8A",
-        "Test Case": "#D62728",
-        "Screen": "#FF9896"
-    };
+    // var legendKids1 = {
+    //     "Domain": "#1F77B4",
+    //     "Project": "#AEC7E8",
+    //     "Release": "#FF7F0E",
+    //     "Cycle": "#FFBB78",
+    //     "Test Suite": "#2CA02C",
+    //     "Test Scenario": "#98DF8A",
+    //     "Test Case": "#D62728",
+    //     "Screen": "#FF9896"
+    // };
+    var legendKids1 = legendKids;
 
     //global variables
     var nodeTypes, rootIndex, enabledFilters, visibleNodeNames;
@@ -460,9 +461,9 @@ mySPA.controller('neuronGraphs2DController', ['$scope', '$http', '$location', '$
                 else if (data.err) {
                     unblockUI();
                     blockUI(data.msg);
-                    $timeout(function() {
-                        unblockUI();
-                    }, 3000);
+                    // $timeout(function() {
+                    //     unblockUI();
+                    // }, 3000);
                     console.error(data.ecode);
                     return false;
                 }
@@ -994,7 +995,7 @@ mySPA.controller('neuronGraphs2DController', ['$scope', '$http', '$location', '$
      * use: adds nodes to scene with merged geometry 
      */		
     function mergeCube(mergeInto, i) {
-        var cubeGeometry = new THREE.SphereGeometry(1, 10, 10);
+        var cubeGeometry = new THREE.SphereGeometry(1, 30, 30);
         var translation = new THREE.Matrix4().makeTranslation($scope.nodes[i].x, $scope.nodes[i].y, $scope.nodes[i].z);
         cubeGeometry.applyMatrix(translation);
 
@@ -1008,12 +1009,17 @@ mySPA.controller('neuronGraphs2DController', ['$scope', '$http', '$location', '$
 
         //console.log("color: ",nodeColor[$scope.nodes[i].type]);
         //        var cubeMaterial = new THREE.MeshLambertMaterial({color:nodeColor[$scope.nodes[i].type]});
-        // var cubeGeometry = addGeometry(i);
-        // var cubeMaterial = addMaterial(i);
-        var cubeGeometry = new THREE.SphereGeometry(1, 5, 5);
-        var cubeMaterial = new THREE.MeshLambertMaterial({
-            color: nodeColor[$scope.nodes[i].type]
-        });
+        var sphereList = ['TestCase', 'Screen', 'TestSuite', 'TestScenario', 'Cycle','Release'];
+        if (sphereList.indexOf($scope.nodes[i].type) != -1){
+            var cubeGeometry = addGeometry(i);
+            var cubeMaterial = addMaterial(i);
+        }
+        else{
+            var cubeGeometry = new THREE.SphereGeometry(1, 35, 35);
+            var cubeMaterial = new THREE.MeshLambertMaterial({
+                color: nodeColor[$scope.nodes[i].type]
+            });
+        }
         var cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
         cube.position.set($scope.nodes[i].x, $scope.nodes[i].y, $scope.nodes[i].z);
         cube.name = $scope.nodes[i].name;
@@ -1032,7 +1038,7 @@ mySPA.controller('neuronGraphs2DController', ['$scope', '$http', '$location', '$
     function addGeometry(i) {
         var sphereList = ['TestCase', 'Screen', 'TestSuite', 'TestScenario', 'Cycle'];
         if (sphereList.indexOf($scope.nodes[i].type) != -1)
-            var cubeGeometry = new THREE.SphereGeometry(1, 5, 5);
+            var cubeGeometry = new THREE.SphereGeometry(1, 15, 15);
         else
             var cubeGeometry = new THREE.BoxGeometry(2, 2, 2);
         return cubeGeometry;
@@ -1092,10 +1098,10 @@ mySPA.controller('neuronGraphs2DController', ['$scope', '$http', '$location', '$
                     map: map_t
                 }),
                 new THREE.MeshLambertMaterial({
-                    map: THREE.ImageUtils.loadTexture(url[5])
+                    map: map_t
                 }),
                 new THREE.MeshLambertMaterial({
-                    map: map_t
+                    map: THREE.ImageUtils.loadTexture(url[5])
                 })
             ];
         }
@@ -1141,7 +1147,7 @@ mySPA.controller('neuronGraphs2DController', ['$scope', '$http', '$location', '$
         var tube = new THREE.TubeGeometry(curveQuad, 1, 0.15, 3, false);
         var mesh = new THREE.Mesh(tube, new THREE.MeshLambertMaterial({
             color: '#aaaaaa',
-            opacity: 0.7,
+            opacity: 0.9,
             transparent: true
         }));
         mesh.name = 'link';
@@ -1356,14 +1362,14 @@ mySPA.controller('neuronGraphs2DController', ['$scope', '$http', '$location', '$
     function nodeHover(nObj) {
         scene.getAllObjectByProperty('start', nObj.idx).forEach(function(e) {
             e.material.color = {
-                r: 1,
+                r: 0.3,
                 g: 0.3,
                 b: 0.3
             };
         });
         scene.getAllObjectByProperty('end', nObj.idx).forEach(function(e) {
             e.material.color = {
-                r: 1,
+                r: 0.3,
                 g: 0.3,
                 b: 0.3
             };
@@ -1656,18 +1662,27 @@ mySPA.controller('neuronGraphs2DController', ['$scope', '$http', '$location', '$
             })
             .call(drag);
 
-        node.append("circle")
-            .attr("r", function(d) {
-                //return 12;
-                return d.weight + 12;
-            })
-            .style("fill", function(d) {
-                return color(1 / d.rating);
-            }).append("svg:title")
-            .text(function(d) {
-                return d.type + ' : ' + d.name;
-            });
-
+        // node.append("circle")
+        //     .attr("r", function(d) {
+        //         //return 12;
+        //         return d.weight + 12;
+        //     })
+        //     .style("fill", function(d) {
+        //         return color(1 / d.rating);
+        //     }).append("svg:title")
+        //     .text(function(d) {
+        //         return d.type + ' : ' + d.name;
+        //     });
+        node.append("svg:image")
+        .attr("xlink:href",  function(d) {console.log("Helloo",d); return "imgs/ngr-node_"+d.type+".svg";}) //d.img : url of image
+        .attr("x", function(d) { return -25;})
+        .attr("y", function(d) { return -25;})
+        .attr("height", function(d){if(d.type=='Domain') return 80; else return 50;})
+        .attr("width", function(d){if(d.type=='Domain') return 80; else return 50;})
+        .append("svg:title")
+        .text(function(d) {
+            return d.type + ' : ' + d.name;
+        });
 		/* ------------------Adding objects to document completed------------------------- */
 
 		/* ------------------Event listeners for 2d graph------------------------- */		

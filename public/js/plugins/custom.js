@@ -347,7 +347,7 @@ function loadUserTasks(){
 	if(window.location.pathname != "/home"){
 		$("#mindmapCSS1, #mindmapCSS2").remove()
 	}
-	else if(window.location.pathname != "/neuronGraphs2D"){
+	else if(window.location.pathname != "/neuronGraphs"){
 		$("#nGraphsCSS").remove()
 	}
 	var tasksJson = JSON.parse(window.localStorage['_TJ'])

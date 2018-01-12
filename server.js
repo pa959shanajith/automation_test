@@ -241,7 +241,7 @@ try {
     });
 
     //Test Lead and Test Manager can access Weboccular Plugin
-    app.get(/^\/(p_Weboccular|neuronGraphs2D|p_ALM|p_Dashboard)$/, function (req, res) {
+    app.get(/^\/(p_Weboccular|neuronGraphs|p_ALM|p_Dashboard)$/, function (req, res) {
         //Denied roles
         var roles = ["Admin", "Business Analyst", "Tech Lead", "Test Engineer"];
         sessionCheck(req, res, roles);
