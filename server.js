@@ -341,7 +341,20 @@ try {
         logger.warn('Versioning is disabled');
     }
 
-    app.post('/home', mindmap.mindmapService);
+    //app.post('/home', mindmap.mindmapService);
+    app.post('/populateProjects', mindmap.populateProjects);
+    app.post('/populateUsers', mindmap.populateUsers);
+    app.post('/checkReuse', mindmap.checkReuse);
+    app.post('/getCRId', mindmap.getCRId);
+    app.post('/getProjectTypeMM_Nineteen68', mindmap.getProjectTypeMM_Nineteen68);
+    app.post('/populateScenarios', mindmap.populateScenarios);
+    app.post('/populateReleases', mindmap.populateReleases);
+    app.post('/populateCycles', mindmap.populateCycles);
+    app.post('/getModules', mindmap.getModules);
+    app.post('/reviewTask', mindmap.reviewTask);
+    app.post('/saveData', mindmap.saveData);
+    app.post('/saveEndtoEndData', mindmap.saveEndtoEndData);
+
     //Login Routes
     app.post('/authenticateUser_Nineteen68', login.authenticateUser_Nineteen68);
     app.post('/authenticateUser_Nineteen68_CI', login.authenticateUser_Nineteen68_CI);
@@ -499,4 +512,4 @@ try {
         cluster.worker.kill();
     }, 200);
 }
-}
+//}
