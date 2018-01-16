@@ -3003,8 +3003,6 @@ function actionEvent(e) {
 
 
                 //$('#Mindmap_create').modal('show');
-            }
-
     //     }
     // });
 };
