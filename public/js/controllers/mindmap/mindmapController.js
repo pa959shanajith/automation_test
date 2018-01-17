@@ -1,12 +1,6 @@
 mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$location', '$timeout', 'chatbotService','mindmapServices','cfpLoadingBar','$window','socket', function($scope, $rootScope, $http, $location,$timeout,chatbotService,mindmapServices,cfpLoadingBar,$window,socket) {
     $("body").css("background","#eee");
     $("head").append('<link id="mindmapCSS1" rel="stylesheet" type="text/css" href="css/css_mindmap/style.css" /><link id="mindmapCSS2" rel="stylesheet" type="text/css" href="fonts/font-awesome_mindmap/css/font-awesome.min.css" />')
-	
-    /*var taskAuth;
-	if(window.localStorage["_VM"] == "false")
-	{
-		taskAuth = false;
-	}*/
 	if(window.localStorage['navigateScreen'] != "home"){
 		$rootScope.redirectPage();
 	}
@@ -15,19 +9,11 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 		$('.scrollbar-inner').scrollbar();
 		$('.scrollbar-macosx').scrollbar();
 		document.getElementById("currentYear").innerHTML = new Date().getFullYear()
-        if($("#left-nav-section").is(":visible") == true)
-            {
-               $("span.taskname").addClass('taskTitle');
-            }
-        else{
-             $("span.taskname").removeClass('taskTitle');
-             $("div.content-div").removeClass("content-div-req");
-        }
-        
+        adjustMidPanel();
 	}, 500)
     var blockMsg = 'Please Wait...';
     blockUI(blockMsg);
-    loadUserTasks()
+    loadUserTasks();
     unblockUI();
     /*creating version in ui*/
     socket.on('versionUpdate', function(to_v){
@@ -35,23 +21,47 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
              value: to_v
             }).text(to_v))
     });
-		/*Sidebar-toggle*/
+	
+    /*Sidebar-toggle*/
     $scope.tab = "tabRequirement";
-    $(".left-sec-mindmap,.rsSlide").show();
-    $('.selectProject').hide();
+    $(".lsSlide,.rsSlide").show();
+    $('#ct-main').addClass('leftBarOpen rightBarOpen');
+    $('.selectProject').show();
     // $("#ct-moduleBox").hide();
     //$("#ct-moduleBox,.ct-tilebox").hide();
-    $(".ct-show-left").click(function(e) {
-        e.preventDefault();
-        $(".left-sec-mindmap").hide();
-        //$("#wrapper").toggleClass("active");
+    $("#ct-expand-left").click(function(e) {
+        console.log('leftbar click')
+        if ($("#ct-expand-left").hasClass("ct-rev")) $(".lsSlide").animate({width:0},200,function(){
+            $(".lsSlide").hide();
+        })
+        else
+            $(".lsSlide").show().animate({width:166},200);
+        $("#ct-expand-left").toggleClass("ct-rev");
+        $("#ct-main").toggleClass("leftBarOpen");
+        adjustMidPanel();
     });
-   
-    $("#ct-expand").click(function(e) {
-         $("#ct-moduleBox,.tabAssign").removeClass("ct-expand-module");
-           $(".left-sec-mindmap").show();
-           if($(".left-sec-mindmap").is(":visible") == true && $('#right-dependencies-section').is(':visible') == false){
-                $("#ct-moduleBox,.tabAssign").removeClass("leftBarClose leftBarOpen bar-collapse rightBarClose rightBarOpen rightOpenLeftClose bar-expand").addClass("leftBarOpen");
+
+    $("#ct-expand-right").click(function(e) {
+        console.log('rightbar click')
+        if ($("#ct-expand-right").hasClass("ct-rev")) $(".rsSlide").animate({width:0},200,function(){
+            $(".rsSlide").hide();
+        })
+        else $(".rsSlide").show().animate({width:90},200);
+        $("#ct-expand-right").toggleClass("ct-rev");
+        $("#ct-main").toggleClass("rightBarOpen");
+        adjustMidPanel();
+    });
+
+    function adjustMidPanel(){
+        if($('.leftBarOpen.rightBarOpen').length>0){
+                $(".ct-tileBox").css({'left':'50%'})
+                //endtoend
+                $(".endtoend-modulesContainer").prop("style","width:calc(100% - 256px) !important; left:166px !important;");
+                $(".searchModuleimg").prop("style","right:86px !important;");
+                $(".endtoend-modules-right-upper img").prop("style","left:180px !important;");
+                $(".eteLabel").prop("style","left:366px !important; width:140px !important; bottom:23px !important;");
+       }
+        else if($('.leftBarOpen').length>0){
                 // $("#ct-moduleBox,.tabAssign").css({'left':'147px !important','width':'100%'})
                 $(".ct-tileBox").css({'left':'52% !important'});
                 //endtoend
@@ -59,137 +69,87 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 $(".searchModuleimg").prop("style","right:91px !important;");
                 $(".endtoend-modules-right-upper img").prop("style","left:195px !important;");
                 $(".eteLabel").prop("style","left:392px !important; width:140px !important; bottom:23px !important;");
-           }
-           else if($(".left-sec-mindmap").is(":visible") == true && $('#right-dependencies-section').is(':visible') == true){
-                $(".ct-tileBox").css({'left':'50%'})
-                $("#ct-moduleBox,.tabAssign").removeClass("leftBarClose rightBarClose rightBarOpen bar-collapse leftOpenRightClose rightOpenLeftClose bar-expand").addClass("bar-expand");
-                //endtoend
-                $(".endtoend-modulesContainer").prop("style","width:calc(100% - 256px) !important; left:166px !important;");
-                $(".searchModuleimg").prop("style","right:86px !important;");
-                $(".endtoend-modules-right-upper img").prop("style","left:180px !important;");
-                $(".eteLabel").prop("style","left:366px !important; width:140px !important; bottom:23px !important;");
-           }
-           $("span.taskname").addClass('taskTitle');
-           $("div.content-div").removeClass("content-div-both-collapse");
-           $("div.content-div").addClass("content-div-req");
-            
-    });
-    $("#ct-collapse").click(function(e) {
-         $("#ct-moduleBox,.tabAssign").removeClass("ct-expand-module");
-           $(".left-sec-mindmap").hide();
-            $("#ct-expand").addClass('collapsed');
-            if($('#right-dependencies-section').is(':visible')){
-                $("#ct-moduleBox,.tabAssign").removeClass("leftBarOpen rightBarClose rightBarOpen bar-collapse leftOpenRightClose rightOpenLeftClose bar-expand").addClass("leftBarClose");
-                $(".ct-tileBox").css({'left':'50%'})
-            }
-            else{
-                $("#ct-expand").removeClass('collapsed');
-                $(".ct-tileBox").css({'left':'52% !important'})
-            }
-            $("span.taskname").removeClass('taskTitle');
-            $("div.content-div").removeClass("content-div-req ");
-            if(($("#left-nav-section").is(":visible") == false &&  $("#right-dependencies-section").is(":visible") == false))
-            {
-                    $("div.content-div").addClass("content-div-both-collapse");
-                    $("#ct-moduleBox,.tabAssign").removeClass("leftBarOpen leftBarClose rightBarClose rightBarOpen bar-expand leftOpenRightClose rightOpenLeftClose").addClass("bar-collapse");
-                    //endtoend
-                    $(".endtoend-modulesContainer").prop("style","width:calc(100% - 10px) !important;");
-                    $(".searchModuleimg").prop("style","right:100px !important;");
-                    $(".endtoend-modules-right-upper img").prop("style","left:222px !important;");
-                    $(".eteLabel").prop("style","left:0 !important; width:140px !important; bottom:18px !important;");
-            }            
-            else if(($("#left-nav-section").is(":visible") == false &&  $("#right-dependencies-section").is(":visible") == true))
-            {
-                $("#ct-moduleBox,.tabAssign").removeClass("leftBarOpen leftBarClose rightBarClose rightBarOpen bar-collapse leftOpenRightClose bar-expand").addClass("rightBarOpen");
+        }
+        else if($('.rightBarOpen').length>0){
                 //endtoend
                 $(".endtoend-modulesContainer").prop("style","width:calc(100% - 96px) !important;");
                 $(".searchModuleimg").prop("style","right:95px !important;");
                 $(".endtoend-modules-right-upper img").prop("style","left:210px !important;");
                 $(".eteLabel").prop("style","left:420px !important; width:140px !important; bottom:18px !important;");
-                $("div.content-div").removeClass("content-div-both-collapse");
-            }
-            
-    });
-    $("#ct-expand-right").click(function(e) {
-         $("#ct-moduleBox,.tabAssign").removeClass("ct-expand-module");
-    	var flg = false;
-         e.preventDefault()
-         $(".rsSlide").toggle(5, function(){
-             $(this).siblings("#ct-expand-right").toggleClass("ct-collapse-right");
-             $("#ct-expand-right").removeClass('expand');
-             if($(".left-sec-mindmap").is(':visible') && $('#right-dependencies-section').is(':visible')){
-                 $("#ct-moduleBox,.tabAssign").removeClass("leftBarOpen leftBarClose rightBarOpen bar-collapse bar-expand leftOpenRightClose rightOpenLeftClose").addClass("bar-expand");
-            	 flg = true;
-                 $("div.content-div").addClass("content-div-req");
-                 $("div.content-div").removeClass("content-div-right-expand");
-                 $(".project-list").removeClass("selectProject");
-                $timeout(function(){
-                    $("select.selectProject").removeClass("selectProjectPri");
-                },300)
+        }
+        else{
                 //endtoend
-                $(".endtoend-modulesContainer").prop("style","width:calc(100% - 256px) !important; left:166px !important;");
-                $(".searchModuleimg").prop("style","right:86px !important;");
-                $(".endtoend-modules-right-upper img").prop("style","left:180px !important;");
-                $(".eteLabel").prop("style","left:366px !important; width:140px !important; bottom:23px !important;");
-             }
-             else{                 
-                $("#ct-expand-right").addClass('expand');
-                $("div.content-div").removeClass("content-div-req");
-                $("div.content-div").addClass("content-div-right-expand");
-                $(".project-list").addClass("selectProject");
-                if(($("#left-nav-section").is(":visible") == true &&  $("#right-dependencies-section").is(":visible") == false)){
+                $(".endtoend-modulesContainer").prop("style","width:calc(100% - 10px) !important;");
+                $(".searchModuleimg").prop("style","right:100px !important;");
+                $(".endtoend-modules-right-upper img").prop("style","left:222px !important;");
+                $(".eteLabel").prop("style","left:0 !important; width:140px !important; bottom:18px !important;");
 
-					$("#ct-moduleBox,.tabAssign").removeClass("leftBarOpen leftBarClose rightBarOpen bar-collapse bar-expand leftOpenRightClose rightOpenLeftClose").addClass("leftBarOpen");
+        }
+    }
 
-				//endtoend
-                    $(".endtoend-modulesContainer").prop("style","width:calc(100% - 172px) !important; left:166px !important;");
-                    $(".searchModuleimg").prop("style","right:91px !important;");
-                    $(".endtoend-modules-right-upper img").prop("style","left:195px !important;");
-                    $(".eteLabel").prop("style","left:390px !important; width:140px !important; bottom:23px !important;");
-                }
-                else if(($("#left-nav-section").is(":visible") == false &&  $("#right-dependencies-section").is(":visible") == true)){
-					$("#ct-moduleBox,.tabAssign").removeClass("leftBarOpen leftBarClose rightBarOpen bar-collapse bar-expand leftOpenRightClose rightOpenLeftClose").addClass("rightBarOpen");
+    //Some properties may be useful for versioning
+    // $("#ct-expand-r").click(function(e) {
+    // 	var flg = false;
+    //      e.preventDefault()
+    //      $(".rsSlide").toggle(5, function(){
+    //          if($(".left-sec-mindmap").is(':visible') && $('#right-dependencies-section').is(':visible')){
+    //         	 flg = true;
+    //             $timeout(function(){
+    //                 $("select.selectProject").removeClass("selectProjectPri");
+    //             },300)
+    //             //endtoend
+    //             $(".endtoend-modulesContainer").prop("style","width:calc(100% - 256px) !important; left:166px !important;");
+    //             $(".searchModuleimg").prop("style","right:86px !important;");
+    //             $(".endtoend-modules-right-upper img").prop("style","left:180px !important;");
+    //             $(".eteLabel").prop("style","left:366px !important; width:140px !important; bottom:23px !important;");
+    //          }
+    //          else{                 
+    //             $("#ct-expand-right").addClass('expand');
+    //             $(".project-list").addClass("selectProject");
+    //             if(($("#left-nav-section").is(":visible") == true &&  $("#right-dependencies-section").is(":visible") == false)){
+	// 				$("#ct-moduleBox,.tabAssign").removeClass("leftBarOpen leftBarClose rightBarOpen bar-collapse bar-expand leftOpenRightClose rightOpenLeftClose").addClass("leftBarOpen");
+	// 			//endtoend
+    //                 $(".endtoend-modulesContainer").prop("style","width:calc(100% - 172px) !important; left:166px !important;");
+    //                 $(".searchModuleimg").prop("style","right:91px !important;");
+    //                 $(".endtoend-modules-right-upper img").prop("style","left:195px !important;");
+    //                 $(".eteLabel").prop("style","left:390px !important; width:140px !important; bottom:23px !important;");
+    //             }
+    //             else if(($("#left-nav-section").is(":visible") == false &&  $("#right-dependencies-section").is(":visible") == true)){
+	// 				$("#ct-moduleBox,.tabAssign").removeClass("leftBarOpen leftBarClose rightBarOpen bar-collapse bar-expand leftOpenRightClose rightOpenLeftClose").addClass("rightBarOpen");
 
-				//endtoend
-                    $(".endtoend-modulesContainer").prop("style","width:calc(100% - 96px) !important;");
-                    $(".searchModuleimg").prop("style","right:95px !important;");
-                    $(".endtoend-modules-right-upper img").prop("style","left:208px !important;");
-                    $(".eteLabel").prop("style","left:417px !important; width:140px !important; bottom:23px !important;");
-
-                    $("div.content-div").removeClass("content-div-right-expand");
-                    $(".project-list").removeClass("selectProject");
-                }
-                else if(($("#left-nav-section").is(":visible") == false && $("#right-dependencies-section").is(":visible") == false)){
-					$("#ct-moduleBox,.tabAssign").removeClass("leftBarOpen leftBarClose rightBarOpen bar-collapse bar-expand leftOpenRightClose rightOpenLeftClose").addClass("bar-collapse");
-                    //endtoend
-                    $(".endtoend-modulesContainer").prop("style","width:calc(100% - 12px) !important;");
-                    $(".searchModuleimg").prop("style","right:102px !important;");
-                    $(".endtoend-modules-right-upper img").prop("style","left:225px !important;");
-                    $(".eteLabel").prop("style","left:0px !important; width:140px !important; bottom:18px !important;");
-
-                    $("div.content-div").removeClass("content-div-right-expand");
-                    $(".project-list").removeClass("selectProject");
-                }
-                $timeout(function(){
-                    $("select.selectProject").addClass("selectProjectPri");
-                },300)
-             }
-             if(flg) $("#ct-moduleBox,.tabAssign").removeClass("leftBarOpen leftBarClose rightBarClose rightBarOpen bar-collapse leftOpenRightClose rightOpenLeftClose").addClass("bar-expand");
-               if(($("#left-nav-section").is(":visible") == false &&  $("#right-dependencies-section").is(":visible") == false))
-                {
-                   $("div.content-div").addClass("content-div-both-collapse");
-                     $("#ct-moduleBox,.tabAssign").removeClass("leftBarOpen leftBarClose rightBarClose rightBarOpen bar-expand leftOpenRightClose rightOpenLeftClose").addClass("bar-collapse");
-                }
-                else{
-                      $("div.content-div").removeClass("content-div-both-collapse");
-                }
-         });
+	// 			//endtoend
+    //                 $(".endtoend-modulesContainer").prop("style","width:calc(100% - 96px) !important;");
+    //                 $(".searchModuleimg").prop("style","right:95px !important;");
+    //                 $(".endtoend-modules-right-upper img").prop("style","left:208px !important;");
+    //                 $(".eteLabel").prop("style","left:417px !important; width:140px !important; bottom:23px !important;");
+    //                 $(".project-list").removeClass("selectProject");
+    //             }
+    //             else if(($("#left-nav-section").is(":visible") == false && $("#right-dependencies-section").is(":visible") == false)){
+	// 				$("#ct-moduleBox,.tabAssign").removeClass("leftBarOpen leftBarClose rightBarOpen bar-collapse bar-expand leftOpenRightClose rightOpenLeftClose").addClass("bar-collapse");
+    //                 //endtoend
+    //                 $(".endtoend-modulesContainer").prop("style","width:calc(100% - 12px) !important;");
+    //                 $(".searchModuleimg").prop("style","right:102px !important;");
+    //                 $(".endtoend-modules-right-upper img").prop("style","left:225px !important;");
+    //                 $(".eteLabel").prop("style","left:0px !important; width:140px !important; bottom:18px !important;");
+    //                 $(".project-list").removeClass("selectProject");
+    //             }
+    //             $timeout(function(){
+    //                 $("select.selectProject").addClass("selectProjectPri");
+    //             },300)
+    //          }
+    //          if(flg) $("#ct-moduleBox,.tabAssign").removeClass("leftBarOpen leftBarClose rightBarClose rightBarOpen bar-collapse leftOpenRightClose rightOpenLeftClose").addClass("bar-expand");
+    //            if(($("#left-nav-section").is(":visible") == false &&  $("#right-dependencies-section").is(":visible") == false))
+    //             {
+    //                  $("#ct-moduleBox,.tabAssign").removeClass("leftBarOpen leftBarClose rightBarClose rightBarOpen bar-expand leftOpenRightClose rightOpenLeftClose").addClass("bar-collapse");
+    //             }
+    //             else{
+    //             }
+    //      });
      
-    });
+    // });
 
     // Changes made for End to end module implementation
     $scope.createMapsCall = function(e){
-            
            $.ajax({
                     type: 'HEAD',
                     url: window.location.origin+'/js/js_mindmap/versioning.js',
@@ -197,15 +157,22 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
                         versioningEnabled=true;
                         
-                        load_versions();
+                        load_tab();
                     },  
                     error: function() {
-                        load_versions();
+                        load_tab();
                     }
                 });
+                
+    function collapseSidebars(){
+        if($('#left-nav-section').is(':visible'))
+            $("#ct-expand-left").trigger("click");
+        if($('#right-dependencies-section').is(':visible'))
+            $("#ct-expand-right").trigger("click");
+    }
        
-       function load_versions(){
-            if($scope.tab=='tabRequirement'){
+    function load_tab(){
+        if($scope.tab=='tabRequirement'){
         	$('.selectProject').hide();
             $("img.selectedIcon").removeClass("selectedIcon");
             $('#reqImg').addClass('selectedIcon');
@@ -214,29 +181,14 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             $('.selectProject').hide();
         	$("img.selectedIcon").removeClass("selectedIcon");
 	        $('#createImg').addClass('selectedIcon');
-            if($("#left-nav-section").is(":visible") == true && $("#right-dependencies-section").is(":visible") == false)
-            {
-               $("#ct-moduleBox,.tabAssign").addClass("ct-expand-module");
-            }
         }
         else if($scope.tab=='mindmapEndtoEndModules'){
             // if(!versioningEnabled){
             $("#ct-main").hide();
         	$("img.selectedIcon").removeClass("selectedIcon");
 	        $('#createImg').addClass('selectedIcon');
-            if($("#left-nav-section").is(":visible") == true && $("#right-dependencies-section").is(":visible") == false)
-            {
-               $("#ct-moduleBox,.tabAssign").addClass("ct-expand-module");
-            }
-           
-            if($('.scrollbar-macosx').is(':visible'))
-                $("#ct-collapse").trigger("click");
-            if($('.rsSlide').is(':visible'))
-                $("#ct-expand-right").trigger("click");
+            collapseSidebars();
             loadMindmapData_W();
-            // }else{
-            //     openDialogMindmap('Error',"EndtoEnd flow disabled in Versioning");
-            // }
         	
         }
         else{
@@ -246,10 +198,6 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 		        $('#createImg').addClass('selectedIcon');
                 if(!versioningEnabled)
                     $('.selectProject').addClass('selectProjectPosition');
-                if($("#left-nav-section").is(":visible") == true && $("#right-dependencies-section").is(":visible") == false)
-                {
-                   $("#ct-moduleBox,.tabAssign").addClass("ct-expand-module");
-                }
                 $("#ct-main").css("display","block");
                 if(!versioningEnabled){
                     addExport(versioningEnabled);
@@ -260,48 +208,34 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 		        $('#assignImg').addClass('selectedIcon');
                 if(!versioningEnabled)
                     $('.selectProject').addClass('selectProjectPosition');
-                 if($("#left-nav-section").is(":visible") == true && $("#right-dependencies-section").is(":visible") == false)
-                {
-                    $("#ct-moduleBox,.tabAssign").addClass("ct-expand-module");
-                }
                 $("#ct-main").css("display","block");
             }
-            
-            if($('.scrollbar-macosx').is(':visible'))
-                $("#ct-collapse").trigger("click");
-            if($('#right-dependencies-section').is(':visible'))
-                $("#ct-expand-right").trigger("click");
-                            //if versioning.js file is present then call addVersioning function else call loadMindmapData()
+
+            collapseSidebars();
+            //if versioning.js file is present then call addVersioning function else call loadMindmapData()
                 if (versioningEnabled){
                     loadMindmapData_V();
                 }else{
                     loadMindmapData(0);
-                    
                 }
                
-
             $timeout(function(){
                $('#ct-moduleBox').prop("style","width:100% ; left:0px ;");
-
             },10);
             $timeout(function(){
                 $('#ct-AssignBox').prop("style","width:100% ; left:0px ;");
             },10);
-            
-          
-            
         }
         window.localStorage['tabMindMap'] = $scope.tab;
        }
     }
-    
+
     $scope.createMap = function(option){
     	$scope.tab = option;
     }
-
     
     var collapseEteflag = true;
-    $(document).on('click', '.collapseEte', function(){
+    $('.collapseEte').click(function(){
     	if(collapseEteflag){
     		if(screen.height < 1024){
     			$(".endtoend-modulesContainer").prop("style","height: 48% !important;");
@@ -331,20 +265,19 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     })
     
     //Search Modules
-    $(document).on('keyup', '#eteSearchModules', function() {
+    $('#eteSearchModules').keyup(function() {
 		filter(this, 'etemModuleContainer'); 
 	});
     
     //Search Scenarios
-    $(document).on('keyup', '#eteSearchScenarios', function() {
+    $('#eteSearchScenarios').keyup(function() {
 		filter(this, 'eteScenarioContainer'); 
 	});
     
 	function filter(element, id) {
 		var value = $(element).val();
 		var container;
-		if(id == "etemModuleContainer")	container = $("#etemModuleContainer span.modulename");
-		else container = $("#eteScenarioContainer span.eteScenrios");
+        container = $("#"+id+" span.eteScenrios");
 		$(container).each(function () {
 			if ($(this).text().toLowerCase().indexOf(value.toLowerCase()) > -1) {
 				id == "etemModuleContainer"? $(this).parent().show() : $(this).show()
@@ -355,8 +288,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 	}
 
 // #817 To select multiple scenarios in e2e (Himanshu)
-	$(document).on('click', '.eteScenrios', function(){
-// #894: Add button should be enabled only if some scenario is selected
+	$('.eteScenrios').click(function(){
 		$(this).toggleClass('selectScenariobg');
         var classflag=false;
         d3.select('.addScenarios-ete').classed('disableButton',!0);
@@ -365,13 +297,12 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 classflag=true;
                 d3.select('.addScenarios-ete').classed('disableButton',!1);
         }})
-        
 	})
 
 // Search for modules in assign tab of end to end flow (Himanshu)
- 	$(document).on('keyup', '#searchModule-assign', function(){
+ 	$('#searchModule-assign').keyup(function(){
 		input = document.getElementById("searchModule-assign");
-    filter_elem = input.value.toUpperCase();
+        filter_elem = input.value.toUpperCase();
 		elems = $('#ct-AssignBox .ct-node');
 		for (i = 0; i < elems.length; i++) {
 				if (elems[i].textContent.toUpperCase().indexOf(filter_elem) > -1) {
@@ -383,9 +314,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 	});
 
 	// Search for modules in create tab (Himanshu)
- 	$(document).on('keyup', '#searchModule-create', function(){
+ 	$('#searchModule-create').keyup(function(){
 		input = document.getElementById("searchModule-create");
-    filter_elem = input.value.toUpperCase();
+        filter_elem = input.value.toUpperCase();
 		elems = $('#ct-moduleBox .ct-node');
 		for (i = 0; i < elems.length; i++) {
 				if (elems[i].textContent.toUpperCase().indexOf(filter_elem) > -1) {
@@ -402,7 +333,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 		$('.scrollbar-macosx').scrollbar();
     }
      // Prof J Assist (Yashi)
-    $scope.conversation = []
+    $scope.conversation = [];
      $scope.querySend = function (){
         var query = $scope.query;
         if(query.length == 0 ){
@@ -419,7 +350,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         });
         } 
     }
-  $scope.displayAnswer = function (index){
+    $scope.displayAnswer = function (index){
         $scope.conversation.push({'text' : $scope.topMatches[index][2],'pos':  "assistFrom-them",'type':1});
         $scope.answer = $scope.topMatches[index][2];
         
@@ -438,7 +369,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             objDiv.scrollTop = objDiv.scrollHeight;
     }
     // Changes made for End to end module implementation
-//To toggle the view when user clicks on switch layout (Himanshu)
+    //To toggle the view when user clicks on switch layout (Himanshu)
     $scope.toggleview = function(){
         var selectedTab = window.localStorage['tabMindMap'];
         if(selectedTab=='mindmapEndtoEndModules')
@@ -547,7 +478,10 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             $('.node-selected').removeClass('node-selected');
         }
     }
-    var activeNode,childNode,uNix,uLix,node,link,dNodes,dLinks,dNodes_c,dLinks_c,allMMaps,temp,rootIndex,faRef,nCount,scrList,tcList,mapSaved,zoom,cSpan,cScale,taskAssign,releaseResult,selectedProject;
+
+//------------------Createmap.js---------------------//
+
+var activeNode,childNode,uNix,uLix,node,link,dNodes,dLinks,dNodes_c,dLinks_c,allMMaps,temp,rootIndex,faRef,nCount,scrList,tcList,mapSaved,zoom,cSpan,cScale,taskAssign,releaseResult,selectedProject;
 //unassignTask is an array to store whose task to be deleted
 var deletednode = [],
     unassignTask = [],
@@ -560,12 +494,13 @@ var sections = {
     'scenarios': 237,
     'screens': 363,
     'testcases': 488
-}; // Now mindmap levels will be devided into sections
+}; // from now mindmap levels will be divided into sections
 var saveFlag = false;
 //for handling the case when creatednode goes beyond screensize
 var CreateEditFlag = false;
 var isIE = /*@cc_on!@*/ false || !!document.documentMode;
 var IncompleteFlowFlag = false;
+
 function loadMindmapData(param) {
     blockUI("Loading...");
         mindmapServices.populateProjects()
@@ -616,7 +551,6 @@ function loadMindmapData(param) {
                                 $('#searchModule-create').val('');
                                 $('#searchModule-assign').val('');
                                 selectedProject = $(".project-list").val();
-                            
                                 if ($("img.iconSpaceArrow").hasClass("iconSpaceArrowTop")) {
                                     $("img.iconSpaceArrow").removeClass("iconSpaceArrowTop");
                                 }
@@ -637,17 +571,12 @@ function loadMindmapData(param) {
                                 } else {
                                     loadMindmapData1(param);
                                 }
-                                
-
                             });
                             //Calling the function to restrict the user to give default node names
                             $("#ct-canvas").click(callme);
                             unblockUI();
-        
-								
 							}
-							
-						}, function (error) { console.log("Error:::::::::::::", error);unblockUI(); })
+						}, function (error) { console.log("Error:", error);unblockUI(); })
     // dataSender({
     //     task: 'populateProjects',
     //     user_id: JSON.parse(window.localStorage['_UI']).user_id
@@ -782,31 +711,39 @@ function loadMindmapData1(param) {
         "edit": "fa-pencil-square-o",
         "delete": "fa-trash-o"
     };
-    $(document).on('click', ".ct-tile", function() {
-        createNewMap();
+
+    $('#ctExpandCreate').click(function(e) {
+            toggleExpand(e,'module');
     });
 
-    $(document).on('click', "#ctExpandCreate", function(e) {
-        if ($(".ct-node:visible").length > 6) {
-            toggleExpand(e);
-        }
+    $("#ctExpandAssign").click(function(e) {
+            toggleExpandAssign(e,'Assign');
     });
-    $(document).on('click', "#ctExpandAssign", function(e) {
-        if ($(".ct-node:visible").length > 6) {
-            toggleExpandAssign(e);
-        }
-    });
+
     d3.select('#ct-main').on('contextmenu', function(e) {
         d3.event.preventDefault();
     });
+
     var svgTileG = d3.select('.ct-tile').append('svg').attr('class', 'ct-svgTile').attr('height', '150px').attr('width', '150px').append('g');
     var svgTileLen = $(".ct-svgTile").length;
     if (svgTileLen == 0) {
         $('#ct-mapSvg, #ct-canvas').empty();
-        $('#ct-canvas').append('<div id="minimap"></div><div class="ct-tileBox"><div class="ct-tile" title="Create Mindmap"><svg class="ct-svgTile" height="150px" width="150px"><g><circle cx="75" cy="75" r="30"></circle><path d="M75,55L75,95"></path><path d="M55,75L95,75"></path></g></svg></div><span class="ct-text">Create Mindmap</span></div>');
-        // svgTileG.append('circle').attr('cx',75).attr('cy',75).attr('r',30);
-        // svgTileG.append('path').attr('d','M75,55L75,95');
-        // svgTileG.append('path').attr('d','M55,75L95,75');
+        $('#ct-canvas').append(`<div id="minimap"></div>
+                                <div class="ct-tileBox">
+                                    <div class="ct-tile" title="Create Mindmap">
+                                        <svg class="ct-svgTile" height="150px" width="150px">
+                                            <g>
+                                                <circle cx="75" cy="75" r="30"></circle>
+                                                <path d="M75,55L75,95"></path>
+                                                <path d="M55,75L95,75"></path>
+                                            </g>
+                                        </svg>
+                                    </div>
+                                <span class="ct-text">Create Mindmap</span>
+                                </div>`);
+        $(".ct-tile").click(function() {
+        createNewMap();
+    });
     }
     d3.select('#ct-assignBox').classed('no-disp', !0);
     var version_num = '';
@@ -814,28 +751,27 @@ function loadMindmapData1(param) {
     if (param == 1) {
         version_num = $('.version-list').val();
     }
-
         mindmapServices.getModules(window.localStorage['tabMindMap'],$(".project-list").val(),param,parseFloat(version_num))
-						.then(function (res) {
-                             var nodeBox = d3.select('.ct-nodeBox');
-                            $(nodeBox[0]).empty();
-                            //allMMaps = JSON.parse(result);
-                            allMMaps = res;
-                            allMMaps.forEach(function(e, i) {
-                                //var t=e.name.replace(/_/g,' ');
-                                var t = $.trim(e.name);
-                                var img_src = 'images_mindmap/node-modules-no.png';
-                                if (e.type == 'modules_endtoend') img_src = 'images_mindmap/MM5.png';
-                                var node = nodeBox.append('div').attr('class', 'ct-node fl-left').attr('data-mapid', i).attr('title', t).on('click', loadMap);
-                                node.append('img').attr('class', 'ct-nodeIcon').attr('src', img_src).attr('alt', 'Module').attr('aria-hidden', true);
-                                node.append('span').attr('class', 'ct-nodeLabel').html(t);
-                            });
-                            if (selectedTab == 'tabCreate')
-                                populateDynamicInputList();
-                            setModuleBoxHeight();
-                            unblockUI();
+        .then(function (res) {
+                var nodeBox = d3.select('.ct-nodeBox');
+            $(nodeBox[0]).empty();
+            //allMMaps = JSON.parse(result);
+            allMMaps = res;
+            allMMaps.forEach(function(e, i) {
+                //var t=e.name.replace(/_/g,' ');
+                var t = $.trim(e.name);
+                var img_src = 'images_mindmap/node-modules-no.png';
+                if (e.type == 'modules_endtoend') img_src = 'images_mindmap/MM5.png';
+                var node = nodeBox.append('div').attr('class', 'ct-node fl-left').attr('data-mapid', i).attr('title', t).on('click', loadMap);
+                node.append('img').attr('class', 'ct-nodeIcon').attr('src', img_src).attr('alt', 'Module').attr('aria-hidden', true);
+                node.append('span').attr('class', 'ct-nodeLabel').html(t);
+            });
+            if (selectedTab == 'tabCreate')
+                populateDynamicInputList();
+            setModuleBoxHeight();
+            unblockUI();
 
-                        }, function (error) { console.log("Error:::::::::::::", error);unblockUI();})
+        }, function (error) { console.log("Error:::::::::::::", error);unblockUI();})
 
     // dataSender({
     //     task: 'getModules',
@@ -924,14 +860,11 @@ function initiate() {
         t.append('rect').attr('x', 100).attr('y', 0).attr('rx', 12).attr('ry', 12);
         t.append('text').attr('x', 114).attr('y', 18).text('Create');
     }
-
-
 };
 
 function zoomed() {
     cSpan = d3.event.translate;
     cScale = d3.event.scale;
-
     //Logic to change the layout
     d3.select("#ct-mindMap").attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
 };
@@ -947,29 +880,21 @@ function createNewMap(e) {
 
     //X and y changed to implement layout change
     // switch-layout feature
+    node = {
+        id: uNix,
+        childIndex: 0,
+        name: 'Module_0',
+        type: 'modules',
+        y: s[1] * 0.4,
+        x: s[0] * 0.1 * 0.9,
+        children: [],
+        parent: null
+    };    
+
     if ($('#switch-layout').hasClass('vertical-layout')) {
-        node = {
-            id: uNix,
-            childIndex: 0,
-            name: 'Module_0',
-            type: 'modules',
-            y: s[0] * 0.1*(0.9),
-            x: s[1] * 0.4,
-            children: [],
-            parent: null
-        };
-    } else {
-        node = {
-            id: uNix,
-            childIndex: 0,
-            name: 'Module_0',
-            type: 'modules',
-            y: s[1] * 0.4,
-            x: s[0] * 0.1 * 0.9,
-            children: [],
-            parent: null
-        };
-    }
+        node.y = s[0] * 0.1*(0.9);
+        node.x = s[1] * 0.4;
+    };
 
     dNodes.push(node);
     nCount[0]++;
@@ -981,7 +906,6 @@ function createNewMap(e) {
 };
 
 function loadMap(e) {
-
     if (!d3.select('#ct-mindMap')[0][0] || confirm('Unsaved work will be lost if you continue.\nContinue?')) {
         $('.fa.fa-pencil-square-o.fa-lg.plus-icon.active-map').trigger('click') //Remove copy rectangle
         $('.fa.fa-clipboard.fa-lg.plus-icon.active-map').trigger('click') //Disable paste
@@ -989,12 +913,11 @@ function loadMap(e) {
         $('#ct-createAction').addClass('disableButton');
         $("div.nodeBoxSelected").removeClass("nodeBoxSelected");
         $(this).addClass("nodeBoxSelected");
+        d3.select('#ct-inpBox').classed('no-disp', true);
         initiate();
-        d3.select('#ct-inpBox').classed('no-disp', !0);
         clearSvg();
         var reqMap = d3.select(this).attr('data-mapid');
         treeBuilder(allMMaps[reqMap]);
-        //Himanshu
         IncompleteFlowFlag = false;
         var errTemp = false;
         if(dNodes[0].type != 'modules_endtoend')
@@ -1004,6 +927,7 @@ function loadMap(e) {
         }
     }
 };
+
 // to load the map again after switching the layout
 function loadMap2() {
     var selectedTab = window.localStorage['tabMindMap'];
@@ -1021,8 +945,6 @@ function loadMap2() {
 };
 
 function genPathData(s, t) {
-    /*if(s[1]<t[1]) return ('M'+s[0]+','+s[1]+' H'+(((s[0]+t[0])/2)-10)+' Q'+((s[0]+t[0])/2)+','+s[1]+' '+((s[0]+t[0])/2)+','+(s[1]+10)+'  V'+(t[1]-10)+' Q'+((s[0]+t[0])/2)+','+t[1]+' '+(((s[0]+t[0])/2)+10)+','+t[1]+' H'+t[0]);
-    else return ('M'+s[0]+','+s[1]+' H'+(((s[0]+t[0])/2)-10)+' Q'+((s[0]+t[0])/2)+','+s[1]+' '+((s[0]+t[0])/2)+','+(s[1]-10)+'  V'+(t[1]+10)+' Q'+((s[0]+t[0])/2)+','+t[1]+' '+(((s[0]+t[0])/2)+10)+','+t[1]+' H'+t[0]);*/
     return ('M' + s[0] + ',' + s[1] + 'C' + (s[0] + t[0]) / 2 + ',' + s[1] + ' ' + (s[0] + t[0]) / 2 + ',' + t[1] + ' ' + t[0] + ',' + t[1]);
 };
 
@@ -1042,7 +964,6 @@ function addNode(n, m, pi) {
     //if(n.reuse && (n.type == 'testcases' || n.type=='screens')) img_src = 'images_mindmap/'+n.type+'-reuse.png';
     if (n.type == 'modules_endtoend') img_src = 'images_mindmap/MM5.png';
     if ($("#ct-canvas").attr('class') == 'tabCreate ng-scope') {
-        //v.append('image').attr('height', '40px').attr('width', '40px').attr('class', 'ct-nodeIcon').attr('xlink:href', img_src).on('click', nodeCtrlClick);
         var v_c=v.append('image').attr('height', '40px').attr('width', '40px').attr('class', 'ct-nodeIcon').attr('xlink:href', img_src);
         $(v_c.node()).on('click', nodeCtrlClick);
     } else {
@@ -1060,7 +981,6 @@ function addNode(n, m, pi) {
     v.append('text').attr('class', 'ct-nodeLabel').text(n.display_name).attr('text-anchor', 'middle').attr('x', 20).attr('title', n.name).attr('y', 50);
     v.append('title').text(n.name);
     
-
     if (m && pi) {
         var p = d3.select('#ct-node-' + pi.id);
         //modified params for layout change
@@ -1115,7 +1035,6 @@ function removeTask(e) {
 }
 
 function addTask(e) {
-
     $("ct-assignTask,#ct-assignedTo,#ct-assignRevw,#ct-assignRel,#ct-assignCyc").removeClass("selectErrorBorder");
     $("#startDate,#endDate").removeClass("inputErrorBorder");
     if ($("ct-assignTask option:selected").val() == "select user") {
@@ -2304,7 +2223,7 @@ function recurseDelChild(d) {
 function moveNode(e) {
     e = e || window.event;
     //#886 Unable to rearrange nodes in e2e
-    d3.select('.ct-movable').attr('transform', "translate(" + parseFloat((e.pageX - 14 - cSpan[0]) / cScale + 2) + "," + parseFloat((e.pageY - 188 - cSpan[1]) / cScale - 20) + ")");
+    d3.select('.ct-movable').attr('transform', "translate(" + parseFloat((e.pageX - $('#ct-mapSvg').offset().left - cSpan[0]) / cScale + 2) + "," + parseFloat((e.pageY - 188 - cSpan[1]) / cScale - 20) + ")");
 };
 
 function moveNodeBegin(e) {
@@ -2349,87 +2268,6 @@ function moveNodeEnd(e) {
 
     var pi = p.attr('id').split('-')[2];
     var l = p.attr('transform').slice(10, -1).split(split_char);
-    //Logic to implement rearranging of nodes
-//    var curNode = dNodes[pi];
-//    //logic changed to the change in layout
-//    function changeOrderRight(curNode, ci, totalChildren) {
-//        var counter = -1;
-//        var flag = false;
-//        totalChildren.forEach(function(a, i) {
-//            if (ci <= (i + 1)) {
-//                return false;
-//            }
-//            //			Layout_change
-//            //			if(l[0]<a.x){
-//            // switch-layout feature
-//            if ($('#switch-layout').hasClass('vertical-layout')) {
-//                if (l[0] < a.x) {
-//                    if (counter == -1) counter = (i + 1);
-//
-//                    a.childIndex++;
-//                    curNode.childIndex = counter;
-//                }
-//            } else {
-//                if (l[1] < a.y) {
-//                    if (counter == -1) counter = (i + 1);
-//
-//                    a.childIndex++;
-//                    curNode.childIndex = counter;
-//                }
-//            }
-//
-//        });
-//    };
-//
-//    function changeOrderLeft(curNode, ci, totalChildren) {
-//        var counter = 0;
-//        var flag = false;
-//        totalChildren.forEach(function(a, ci) {
-//            //			Layout_change
-//            //			if(l[0]>a.x){
-//            // switch-layout feature
-//            if ($('#switch-layout').hasClass('vertical-layout')) {
-//                if (l[0] > a.x) {
-//                    counter = (ci + 1);
-//                    a.childIndex--;
-//                    curNode.childIndex = counter;
-//                }
-//            } else {
-//                if (l[1] > a.y) {
-//                    counter = (ci + 1);
-//                    a.childIndex--;
-//                    curNode.childIndex = counter;
-//                }
-//            }
-//        });
-//    };
-//    var currentChildIndex = curNode.childIndex;
-//    var totalChildren = curNode.parent.children;
-//    if (currentChildIndex != totalChildren.indexOf(curNode) + 1) {
-//        currentChildIndex = totalChildren.indexOf(curNode) + 1
-//
-//    }
-    //layout change
-    //	if(l[0]<curNode.x){
-    // switch-layout feature
-//    if ($('#switch-layout').hasClass('vertical-layout')) {
-//        if (l[0] < curNode.x) {
-//            //alert('moved up');
-//            changeOrderRight(curNode, currentChildIndex, totalChildren);
-//        } else {
-//            //alert('moved down');
-//            changeOrderLeft(curNode, currentChildIndex, totalChildren);
-//        }
-//    } else {
-//        if (l[1] < curNode.y) {
-//            //alert('moved up');
-//            changeOrderRight(curNode, currentChildIndex, totalChildren);
-//        } else {
-//            //alert('moved down');
-//            changeOrderLeft(curNode, currentChildIndex, totalChildren);
-//        }
-//
-//    }
     dNodes[pi].x = parseFloat(l[0]);
     dNodes[pi].y = parseFloat(l[1]);
     addLink(temp.t, dLinks[temp.t].source, dLinks[temp.t].target);
@@ -3014,21 +2852,19 @@ function actionEvent(e) {
     //             }
 
 
-    //             //$('#Mindmap_create').modal('show');
-    //         }
-
+                //$('#Mindmap_create').modal('show');
     //     }
     // });
 };
 
-function toggleExpand(e) {
+function toggleExpand(e,tab) {
     var s = d3.select($(e.target).parent());
     var p = d3.select($(e.target).parent().parent());
     $(e.target).parent().toggleClass('ct-rev');
     $(e.target).parent().parent().toggleClass('ct-open');
     $(e.target).toggleClass("iconSpaceArrowTop");
     e.stopImmediatePropagation();
-    if ($("#ct-moduleBox").hasClass("ct-open") == true) {
+    if ($("#ct-"+tab+"Box").hasClass("ct-open") == true) {
         $("#ct-canvas").css("top", "5px");
         // if($("#left-nav-section").is(":visible") == true && $("#right-dependencies-section").is(":visible") == true)
         // 	{
@@ -3042,45 +2878,7 @@ function toggleExpand(e) {
         $(".iconSpaceArrow").attr("src", "imgs/ic-collapseup.png");
     } else {
         $(".iconSpaceArrow").attr("src", "imgs/ic-collapse.png");
-        $("#ct-moduleBox").css({
-            "position": "",
-            "top": ""
-        });
-        $("#ct-canvas").css("top", "");
-        $(".ct-nodeBox .ct-node").css("width", "");
-        $(".ct-nodeBox").css({
-            "overflow": "",
-            "width": ""
-        })
-    }
-};
-
-function toggleExpandAssign(e) {
-    // var s=d3.select($("#"+e.target.id));
-    // var p=d3.select($("#"+e.target.id).parent());
-    // $("#"+e.target.id).toggleClass('ct-rev');
-    // $("#"+e.target.id).parent().toggleClass('ct-open');
-    var s = d3.select($(e.target).parent());
-    var p = d3.select($(e.target).parent().parent());
-    $(e.target).parent().toggleClass('ct-rev');
-    $(e.target).parent().parent().toggleClass('ct-open');
-    $(e.target).toggleClass("iconSpaceArrowTop");
-    e.stopImmediatePropagation();
-    if ($("#ct-AssignBox").hasClass("ct-open") == true) {
-        $("#ct-canvas").css("top", "5px");
-        // 	if($("#left-nav-section").is(":visible") == true && $("#right-dependencies-section").is(":visible") == true)
-        // {
-        // 		//$("#ct-AssignBox").css({"position":"relative","top":"25px"});
-        // }
-        $(".ct-nodeBox .ct-node").css("width", "139px");
-        $(".ct-nodeBox").css({
-            "overflow": "auto",
-            "width": "98%"
-        })
-        $(".iconSpaceArrow").attr("src", "imgs/ic-collapseup.png");
-    } else {
-        $(".iconSpaceArrow").attr("src", "imgs/ic-collapse.png");
-        $("#ct-AssignBox").css({
+        $("#ct-"+tab+"Box").css({
             "position": "",
             "top": ""
         });
@@ -3175,6 +2973,7 @@ function clearSvg() {
 
 //FUnction is tagged to every click on 'cnavas' element to validate the names of nodes when created
 function callme() {
+    if($('.ct-tileBox').length>0) return;
     if (childNode != null && (childNode.text() == 'Module_0' || childNode.text() == 'Screen_0' || childNode.text() == 'Scenario_0' || childNode.text() == 'Testcase_0')) {
         d3.select('#ct-inpBox').classed('no-disp', !1);
     }
@@ -3219,9 +3018,9 @@ function treeBuilder(tree) {
     dNodes = d3Tree.nodes(tree);
     //dLinks=d3Tree.links(dNodes);
 
-/* 
- *  Logic for adding reuse property 
- */
+    /* 
+    *  Logic for adding reuse property 
+    */
     function parseDataReuse(){
         var dataReuse = {'screen':[],'testcase':[],'projectid':''};
         dNodes.forEach(function(e,i){
@@ -3260,7 +3059,6 @@ function treeBuilder(tree) {
             dNodes[e.idx].reuse = e.reuse;
         })
         dNodes.forEach(function(d) {
-
             // switch-layout feature
             if ($('#switch-layout').hasClass('vertical-layout')) {
                 d.y = cSize[0] * 0.1 * (0.9 + typeNum[d.type]);
@@ -3271,9 +3069,6 @@ function treeBuilder(tree) {
                 d.x = cSize[0] * 0.1 * (0.9 + typeNum[d.type]);
                 sections[d.type] = d.x;
             }
-
-
-
             if (d.oid === undefined) d.oid = d.id;
             d.id = uNix++;
             addNode(d, !0, d.parent);
@@ -3284,7 +3079,6 @@ function treeBuilder(tree) {
             d.id = uLix++;
             addLink(d.id, d.source, d.target);
         });
-       
         // switch-layout feature
         if ($('#switch-layout').hasClass('vertical-layout'))
             zoom.translate([(cSize[0] / 2) - dNodes[0].x, (cSize[1] / 5) - dNodes[0].y]);
@@ -3293,90 +3087,7 @@ function treeBuilder(tree) {
         //zoom.translate([(cSize[0]/2),(cSize[1]/2)]);
         zoom.event(d3.select('#ct-mapSvg'));
     },function(error){console.log("error in datasender: checkReuse service")})
-    // dataSender({
-    //     user_name: userInfo.username,
-    //     userRole: window.localStorage['_SR'],
-    //     userid: user_id,
-    //     task: 'checkReuse',
-    //     parsedata: reusedata
-    // }, function(error,result) {
-    //     if(error)
-    //         console.log("error in datasender: checkReuse service")
-    //     // Now In dNodes update reuse parameter 
-    //     result = JSON.parse(result);
-    //     result['screen'].forEach(function(e,i){
-    //         dNodes[e.idx].reuse = e.reuse;
-    //     })
-    //     result['testcase'].forEach(function(e,i){
-    //         dNodes[e.idx].reuse = e.reuse;
-    //     })
-    //     dNodes.forEach(function(d) {
-
-    //         // switch-layout feature
-    //         if ($('#switch-layout').hasClass('vertical-layout')) {
-    //             d.y = cSize[0] * 0.1 * (0.9 + typeNum[d.type]);
-    //             sections[d.type] = d.y;
-    //         } else {
-    //             d.y = d.x;
-    //             //Logic to change the layout and to reduce the length of the links
-    //             d.x = cSize[0] * 0.1 * (0.9 + typeNum[d.type]);
-    //             sections[d.type] = d.x;
-    //         }
-
-
-
-    //         if (d.oid === undefined) d.oid = d.id;
-    //         d.id = uNix++;
-    //         addNode(d, !0, d.parent);
-    //         if (d.task != null) d3.select('#ct-node-' + d.id).append('image').attr('class', 'ct-nodeTask').attr('width', '21px').attr('height', '21px').attr('xlink:href', 'images_mindmap/node-task-assigned.png').attr('x', 29).attr('y', -10);
-    //     });
-    //     dLinks = d3Tree.links(dNodes);
-    //     dLinks.forEach(function(d) {
-    //         d.id = uLix++;
-    //         addLink(d.id, d.source, d.target);
-    //     });
-       
-    //     // switch-layout feature
-    //     if ($('#switch-layout').hasClass('vertical-layout'))
-    //         zoom.translate([(cSize[0] / 2) - dNodes[0].x, (cSize[1] / 5) - dNodes[0].y]);
-    //     else
-    //         zoom.translate([(cSize[0] / 3) - dNodes[0].x, (cSize[1] / 2) - dNodes[0].y]);
-    //     //zoom.translate([(cSize[0]/2),(cSize[1]/2)]);
-    //     zoom.event(d3.select('#ct-mapSvg'));
-     
-    // });
-
-
 };
-
-
-// function dataSender(data, callback) {
-//     var xhttp;
-//     try {
-//         xhttp = new XMLHttpRequest();
-//     } catch (e) {
-//         try {
-//             xhttp = new ActiveXObject("Msxml2.XMLHTTP");
-//         } catch (e) {
-//             try {
-//                 xhttp = new ActiveXObject("Microsoft.XMLHTTP");
-//             } catch (e) {
-//                 alert("Your Browser is outdated!\nPlease Update!");
-//                 return false;
-//             }
-//         }
-//     }
-//     xhttp.onreadystatechange = function() {
-//         4 == this.readyState && (200 == this.status ? callback(!1, this.responseText) : (400 == this.status || 401 == this.status || 402 == this.status || 403 == this.status || 404 == this.status) && callback(!0, this.responseText));
-//     };
-//     //xhttp.open("POST",window.location.pathname,!0);
-//     if (data.versioning == 1)
-//         xhttp.open("POST", '/version', !0);
-//     else
-//         xhttp.open("POST", '/home', !0);
-//     xhttp.setRequestHeader("Content-Type", "application/json");
-//     xhttp.send(JSON.stringify(data));
-// };
 
 //Dialog used through out mindmap
 function openDialogMindmap(title, body) {
@@ -3686,7 +3397,6 @@ function copyMap(){
 	}
 
 }
-
 
 //------------------------------------------------Workflow.js----------------------------------------
 var uNix_W,uLix_W,node,link,dNodes_W,dLinks_W,allMMaps_W,temp_W,faRef,mapSaved,zoom_W,cSpan_W,cScale_W,taskAssign;
@@ -4854,7 +4564,4 @@ function treeBuilder_W(tree){
 	}
 	zoom_W.event(d3.select('#ct-mapSvg'));
 };
-
-
-
 }]);

@@ -690,8 +690,8 @@ exports.saveData=function(req,res){
 			}
 			else if(flag==20){
 				var uidx=0,rIndex;
-				var relId=inputs.relId;
-				var cycId=inputs.cycId;
+				var relId=d.data.relId;
+				var cycId=d.data.cycId;
 
 				var qObj={"projectId":prjId,"releaseId":relId,"cycleId":cycId,"appType":"Web","testsuiteDetails":[]};
 				var nObj=[],tsList=[];
@@ -715,10 +715,10 @@ exports.saveData=function(req,res){
 					tsList.push({"testscenarioId":ts.id,"testscenarioId_c":ts.id_c,"testscenarioName":ts.name,"tasks":ts.task,"screenDetails":sList});
 				});
 				qObj.testsuiteDetails=[{"testsuiteId":nObj[rIndex].id,"testsuiteId_c":nObj[rIndex].id_c,"testsuiteName":nObj[rIndex].name,"task":nObj[rIndex].task,"testscenarioDetails":tsList}];
-				qObj.userName=user;
-
+				qObj.userName=d.data.user_name;
+				//fs.writeFileSync('assets/req_json.json',JSON.stringify(qObj),'utf8');
 				create_ice.createStructure_Nineteen68(qObj,function(err,data){
-
+					//res.setHeader('Content-Type', 'application/json');
 					if(err)
 					res.status(500).send(err);
 					else{
@@ -746,14 +746,14 @@ exports.saveEndtoEndData=function(req,res){
 	if (isSessionActive(req)) {
 			var nData=[],qList=[],idDict={};
 			var urlData=req.get('host').split(':');
-			var inputs=req.body; 
+			var inputs=req.body.data; 
 			var data=inputs.map;
 			var prjId=inputs.prjId;
-			var deletednodes=inputs.deletednode;
-			var user=req.session.username;
+			var deletednodes=inputs.abc;
+			var user=inputs.user_name;
 			var flag=inputs.write;
 			//TO support task deletion
-			var removeTask=inputs.unassignTask;
+			var removeTask=inputs.xyz;
 			if(flag==10){
 				var uidx=0,t,lts,rnmList=[];
 				deletednodes.forEach(function(t,i){
@@ -821,13 +821,7 @@ exports.saveEndtoEndData=function(req,res){
 
 				neo4jAPI.executeQueries(qList,function(status,result){
 					res.setHeader('Content-Type', 'application/json');
-					if(status!=200){
-						var error_msg='Fail';
-						if(result.indexOf('Schema.ConstraintValidationFailed')>-1){
-							error_msg='DuplicateModules';
-						}
-						res.status(status).send(error_msg);
-					} 
+					if(status!=200) res.status(status).send(result);
 					else{
 						var k=0,rIndex,lbl,neoIdDict={};
 						idDict={};
@@ -879,9 +873,9 @@ exports.saveEndtoEndData=function(req,res){
 				});
 		}	else if(flag==20){
 				var uidx=0,rIndex;
-				var vn_from=inputs.vn_from;
-				var vn_to=inputs.vn_from;
-				var userRole=inputs.userRole;
+				var vn_from=d.data.vn_from;
+				var vn_to=d.data.vn_from;
+				var userRole=d.data.userRole;
 
 				//var qObj={"projectId":prjId,"releaseId":relId,"cycleId":cycId,"appType":"Web","testsuiteDetails":[]};
 				var qObj={"projectId":prjId,"testsuiteDetails":[],userRole:userRole,from_version:parseFloat(vn_from),new_version:vn_to};
@@ -905,23 +899,20 @@ exports.saveEndtoEndData=function(req,res){
 					tsList.push({"projectID":ts.projectID,"testscenarioId":ts.id,"testscenarioId_c":ts.id_c,"testscenarioName":ts.name,"tasks":ts.task,"screenDetails":sList});
 				});
 				qObj.testsuiteDetails=[{"projectID":nObj[rIndex].projectID,"testsuiteId":nObj[rIndex].id,"testsuiteId_c":nObj[rIndex].id_c,"testsuiteName":nObj[rIndex].name,"task":nObj[rIndex].task,"testscenarioDetails":tsList}];
-				qObj.userName=user;
-				
+				qObj.userName=d.data.user_name;
+				//fs.writeFileSync('assets/req_json.json',JSON.stringify(qObj),'utf8');
 				create_ice.createE2E_Structure_Nineteen68(qObj,function(err,data){
-					
-					if(err){
-						logger.error(err);
-						res.status(500).send('Fail');
-					}
-
-					
+					//res.setHeader('Content-Type', 'application/json');
+					if(err)
+					res.status(500).send(err);
 					else{
 						datatosend=data;
 					}
-					
+					//fs.writeFileSync('assets/req_json_cassandra.txt',JSON.stringify(data),'utf8');
+					//var data = JSON.stringify(data);
 					var module_type='modules_endtoend';
 					var parsing_result=update_cassandraID(data,urlData,module_type);
-					
+					//var qList_new=parsing(data,urlData);
 					neo4jAPI.executeQueries(parsing_result[0],function(status,result){
 						if(status!=200) res.status(status).send(result);
 						else res.status(200).send(parsing_result[1]);

@@ -2,7 +2,7 @@
 <div id="ct-page">
    <!-- Left Section -->
    <div class="ct-side fl-left" id="ct-lSide">
-      <div id="left-nav-section" style='z-index:9999;' class='left-sec-mindmap'>
+      <div id="left-nav-section" style='z-index:9999;' class='left-sec-mindmap lsSlide'>
          <div class="scroll-wrapper scrollbar-macosx" style="position: relative;">
             <div class="scrollbar-macosx scroll-content" style="height: auto; margin-bottom: 0px; margin-right: 0px; max-height: 410px;">
                <div class="clear-both"></div>
@@ -33,11 +33,8 @@
                </div>
             </div>
          </div>
-         <div id='ct-collapse' class="ct-expand">
       </div>
-      </div>
-      <div id='ct-expand' class="ct-expand">
-      </div>
+      <div id='ct-expand-left' class="ct-expand ct-rev"></div>
    </div>
    <!-- Left Section -->
    <!-- Mid Section -->
@@ -83,14 +80,13 @@
    <div id="ct-main" class="fl-left">
       <div id="ct-projectList">
          <div class="ct-project"></div>
-         <div class="ct-expand"></div>
       </div>
-      <div ng-if="tab == 'tabRequirement'" id="page-taskName" class="showContainer" style="width:0px !important"><span class="taskname taskTitle">Requirement</span></div>
+      <div ng-if="tab == 'tabRequirement'" id="page-taskName" class="showContainer" style="width:0px !important"><span class="taskname">Requirement</span></div>
       <div ng-if="tab == 'tabRequirement'" class='clear-both'></div>
-      <div ng-if="tab == 'tabRequirement'" class="content-div content-div-req"></div>
-      <div ng-if="tab == 'tabRequirement'" class="content-div content-div-req"></div>
-      <div ng-if="tab == 'tabRequirement'" class="content-div content-div-req"></div>
-      <div ng-if="tab == 'tabRequirement'" class="content-div content-div-req"></div>
+      <div ng-if="tab == 'tabRequirement'" class="content-div"></div>
+      <div ng-if="tab == 'tabRequirement'" class="content-div"></div>
+      <div ng-if="tab == 'tabRequirement'" class="content-div"></div>
+      <div ng-if="tab == 'tabRequirement'" class="content-div"></div>
 
 
       <div ng-if="tab == 'tabCreate'" id="ct-moduleBox" class="ct-moduleBoxOptional tabCreate">      
@@ -314,7 +310,7 @@
       <!--Images Blocks-->
    </div>
    
-      <div id='ct-expand-right' class="ct-expand"></div>
+      <div id='ct-expand-right' class="ct-expand ct-rev"></div>
    </div>
    <!-- Right Section -->  
 </div>
