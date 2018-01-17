@@ -103,8 +103,8 @@ mySPA.factory('mindmapServices', ['$http','$q', function ($http, $httpProvider, 
     	},
 		saveEndtoEndData: function (assignedTo,writeFlag,userRole,from_v,to_v,cur_module,mapData,deletednode,unassignTask,prjId,relId,cycId){
 					
-    		var param = "saveData";
-    		return $http.post('/saveData', {
+    		var param = "saveEndtoEndData";
+    		return $http.post('/saveEndtoEndData', {
     			action: param,
 				sendNotify:assignedTo,
 				write:writeFlag,
@@ -124,8 +124,8 @@ mySPA.factory('mindmapServices', ['$http','$q', function ($http, $httpProvider, 
     	},
 		reviewTask: function (assignedTo,writeFlag,userRole,from_v,to_v,cur_module,mapData,deletednode,unassignTask,prjId,relId,cycId){
 					
-    		var param = "saveData";
-    		return $http.post('/saveData', {
+    		var param = "reviewTask";
+    		return $http.post('/reviewTask', {
     			action: param,
 				sendNotify:assignedTo,
 				write:writeFlag,
