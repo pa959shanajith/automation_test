@@ -839,7 +839,6 @@ exports.saveEndtoEndData=function(req,res){
 							new_res=jsonData[jsonData.length-2].data
 						}
 						new_res.forEach(function(row){
-						//jsonData[jsonData.length-1].data.forEach(function(row){
 							row.graph.nodes.forEach(function(n){
 								if (idDict[n.id] === undefined) {
 									lbl=n.labels[0].toLowerCase();
@@ -882,8 +881,6 @@ exports.saveEndtoEndData=function(req,res){
 				var vn_from=inputs.vn_from;
 				var vn_to=inputs.vn_from;
 				var userRole=inputs.userRole;
-
-				//var qObj={"projectId":prjId,"releaseId":relId,"cycleId":cycId,"appType":"Web","testsuiteDetails":[]};
 				var qObj={"projectId":prjId,"testsuiteDetails":[],userRole:userRole,from_version:parseFloat(vn_from),new_version:vn_to};
 				var nObj=[],tsList=[];
 				data.forEach(function(e,i){

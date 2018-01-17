@@ -577,96 +577,6 @@ function loadMindmapData(param) {
                             unblockUI();
 							}
 						}, function (error) { console.log("Error:", error);unblockUI(); })
-    // dataSender({
-    //     task: 'populateProjects',
-    //     user_id: JSON.parse(window.localStorage['_UI']).user_id
-    // }, function(err, result) {
-    //     if (err) {
-    //         console.log(result);
-    //         unblockUI();
-    //     } else {
-    //         if ($("#left-nav-section").is(":visible") == true && $("#right-dependencies-section").is(":visible") == false) {
-    //             $("#ct-moduleBox,.tabAssign").addClass("ct-expand-module");
-    //         }
-    //         result1 = JSON.parse(result);
-    //         //selectedProject=$(".project-list").val();
-    //         $(".project-list").empty();
-    //         for (i = 0; i < (result1.projectId.length && result1.projectName.length); i++) {
-    //             $('.project-list').append("<option app-type='" + result1.appType[i] + "' data-id='" + result1.projectName[i] + "' value='" + result1.projectId[i] + "'>" + result1.projectName[i] + "</option>");
-    //         }
-    //         if (!selectedProject)
-    //             selectedProject = result1.projectId[0];
-    //         // if(getCookie('mm_pid') != ''){
-    //         // 	selectedProject=getCookie('mm_pid');
-    //         // }
-    //         // if (selectedProject == null){
-    //         // 	setCookie('mm_pid',result1.projectId[0],15);
-    //         // 	selectedProject=result1.projectId[0];
-    //         // }
-    //         $(".project-list").val(selectedProject);
-	// 		selectedProject = undefined;
-    //         //$(".project-list option[value='" + selectedProject + "']").attr('selected', 'selected');
-    //         if (param == 1) {
-    //             versioning_enabled = 1;
-    //             dataSender({
-    //                 task: 'getVersions',
-    //                 projectId: $(".project-list").val(),
-    //                 versioning: 1
-    //             }, function(err, result) {
-    //                 if (err) {
-    //                     console.log(err);
-    //                     openDialogMindmap('Error', 'Error loading Versions')
-    //                 } else {
-    //                     addVersioning(result);
-    //                     // if(getCookie('mm_pvid') ==''){
-    //                     // setCookie('mm_pvid',$('.version-list').children()[0].value,15);
-    //                     // $('.version-list').val($('.version-list').children()[0].value);
-    //                     // }
-    //                 }
-    //             });
-    //         } else {
-    //             loadMindmapData1(param);
-    //         }
-
-    //         $(".project-list").change(function() {
-    //             //Mindmap clear search box on selecting different project
-    //             dNodes_c = []; //Copied data should be cleared
-    //             dLinks_c = []; // on change of project list
-    //             $('.fa.fa-pencil-square-o.fa-lg.plus-icon').removeClass('active-map');
-    //             $('#rect-copy').remove();
-    //             $('.fa.fa-clipboard.fa-lg.plus-icon').removeClass('active-map');
-    //             $('#searchModule-create').val('');
-    //             $('#searchModule-assign').val('');
-    //             selectedProject = $(".project-list").val();
-    //             //alert($(".project-list").val());
-    //             if ($("img.iconSpaceArrow").hasClass("iconSpaceArrowTop")) {
-    //                 $("img.iconSpaceArrow").removeClass("iconSpaceArrowTop");
-    //             }
-    //             if (param == 1) {
-    //                 dataSender({
-    //                     task: 'getVersions',
-    //                     projectId: $(".project-list").val(),
-    //                     versioning: 1
-    //                 }, function(err, result) {
-    //                     if (err) {
-    //                         console.log(err);
-    //                         openDialogMindmap('Error', 'Error loading Versions')
-    //                     } else {
-    //                         addVersioning(result);
-
-    //                     }
-    //                 });
-    //             } else {
-    //                 loadMindmapData1(param);
-    //             }
-    //             //setCookie('mm_pid', selectedProject, 15);
-
-    //         });
-    //         //Calling the function to restrict the user to give default node names
-    //         $("#ct-canvas").click(callme);
-    //         unblockUI();
-    //     }
-    // });
 }
 
 function loadMindmapData1(param) {
@@ -773,35 +683,6 @@ function loadMindmapData1(param) {
 
         }, function (error) { console.log("Error:::::::::::::", error);unblockUI();})
 
-    // dataSender({
-    //     task: 'getModules',
-    //     tab: window.localStorage['tabMindMap'],
-    //     prjId: $(".project-list").val(),
-    //     versioning: param,
-    //     version: version_num
-    // }, function(err, result) {
-    //     if (err) {
-    //         console.log(result);
-    //         unblockUI();
-    //     } else {
-    //         var nodeBox = d3.select('.ct-nodeBox');
-    //         $(nodeBox[0]).empty();
-    //         allMMaps = JSON.parse(result);
-    //         allMMaps.forEach(function(e, i) {
-    //             //var t=e.name.replace(/_/g,' ');
-    //             var t = $.trim(e.name);
-    //             var img_src = 'images_mindmap/node-modules-no.png';
-    //             if (e.type == 'modules_endtoend') img_src = 'images_mindmap/MM5.png';
-    //             var node = nodeBox.append('div').attr('class', 'ct-node fl-left').attr('data-mapid', i).attr('title', t).on('click', loadMap);
-    //             node.append('img').attr('class', 'ct-nodeIcon').attr('src', img_src).attr('alt', 'Module').attr('aria-hidden', true);
-    //             node.append('span').attr('class', 'ct-nodeLabel').html(t);
-    //         });
-    //         if (selectedTab == 'tabCreate')
-    //             populateDynamicInputList();
-    //         setModuleBoxHeight();
-    //         unblockUI();
-    //     }
-    // });
 }
 window.onresize = function() {
     var w = window.innerWidth - 28,
@@ -1528,27 +1409,6 @@ function nodeClick(e) {
 
             }, function (error) { console.log("Error:::::::::::::", error);unblockUI();})
 
-
-           
-            // dataSender({
-            //     task: 'populateUsers',
-            //     projectId: $(".project-list").val()
-            // }, function(err, result) {
-            //     if (err) {
-            //         console.log(result);
-            //         callback(null, err);
-            //     } else {
-            //         result1 = JSON.parse(result);
-            //         //alert(assignedUser);
-
-            //         for (i = 0; i < result1.userRoles.length && result1.r_ids.length; i++) {
-            //             $('#ct-assignedTo').append("<option data-id='" + result1.userRoles[i] + "' value='" + result1.r_ids[i] + "'>" + result1.userRoles[i] + "</option>");
-            //         }
-            //         $("#ct-assignedTo option[value='" + tObj.at + "']").attr('selected', 'selected');
-            //     }
-
-            // });
-
         } else if (tk == 'rw') {
             var result1 = {};
             v.append('span').attr('class', 'ct-assignItem fl-left').html('Reviewer');
@@ -1562,23 +1422,7 @@ function nodeClick(e) {
                     $("#ct-assignRevw option[value='" + tObj.at + "']").attr('selected', 'selected');
 
             }, function (error) { console.log("Error:::::::::::::", error);unblockUI();})
-            // dataSender({
-            //     task: 'populateUsers',
-            //     projectId: $(".project-list").val()
-            // }, function(err, result) {
-            //     if (err) {
-            //         console.log(result);
-            //         callback(null, err);
-            //     } else {
-            //         result1 = JSON.parse(result);
-            //         for (i = 0; i < result1.userRoles.length && result1.r_ids.length; i++) {
-            //             $('#ct-assignRevw').append("<option data-id='" + result1.userRoles[i] + "' value='" + result1.r_ids[i] + "'>" + result1.userRoles[i] + "</option>");
-            //         }
-            //         $("#ct-assignRevw option[value='" + tObj.rw + "']").attr('selected', 'selected');
-
-            //     }
-
-            // });
+          
         } else if (tk == 'sd') {
             v.append('span').attr('class', 'ct-assignItem fl-left').html('Start Date');
             w = v.append('div').attr('class', 'ct-assignItem btn-group dropdown fl-right dateBoxSd');
@@ -1670,67 +1514,7 @@ function nodeClick(e) {
             },function(error){
                 console.log("Error in populating Releases");
             })
-            // dataSender({
-            //     task: 'populateReleases',
-            //     projectId: $(".project-list").val()
-            // }, function(err, result) {
-            //     if (err) {
-            //         releaseResult = err;
-            //         console.log(result);
-            //         callback(null, err);
-            //     } else {
-
-            //         result1 = JSON.parse(result);
-            //         releaseResult = result1;
-            //         default_releaseid = '';
-            //         for (i = 0; i < result1.r_ids.length && result1.rel.length; i++) {
-            //             $('#ct-assignRel').append("<option data-id='" + result1.rel[i] + "' value='" + result1.r_ids[i] + "'>" + result1.rel[i] + "</option>");
-            //         }
-            //         $('#ct-assignRel').change(function() {
-            //             default_releaseid = $('#ct-assignRel').val();
-            //             loadCycles();
-            //         });
-            //         //var selectedRel=result1.r_ids[0];
-            //         var selectedRel = 'select release';
-            //         if (tObj.re != "") {
-            //             selectedRel = tObj.re;
-            //             //672 Mindmap - Cycle selected under execution task is getting reset to default value after save
-            //             default_releaseid = tObj.re;
-            //         }
-            //         $("#ct-assignRel option[value='" + selectedRel + "']").attr('selected', 'selected');
-            //         var result2 = {};
-            //         v.append('span').attr('class', 'ct-assignItem fl-left').html('Cycle');
-            //         var d = v.append('select').attr('id', 'ct-assignCyc');
-            //         $('#ct-assignCyc').append("<option value='select cycle' select=selected>" + "Select cycle" + "</option>");
-            //         //'46974ffa-d02a-49d8-978d-7da3b2304255'
-            //         dataSender({
-            //             task: 'populateCycles',
-            //             relId: default_releaseid
-            //         }, function(err, result) {
-            //             if (err) {
-            //                 //console.log(err);
-            //                 callback(null, err);
-            //             } else {
-            //                 result2 = JSON.parse(result);
-            //                 for (i = 0; i < result2.c_ids.length && result2.cyc.length; i++) {
-            //                     $('#ct-assignCyc').append("<option data-id='" + result2.cyc[i] + "' value='" + result2.c_ids[i] + "'>" + result2.cyc[i] + "</option>");
-            //                 }
-            //                 //var selectedCyc=result2.c_ids[0];
-            //                 var selectedCyc = 'select cycle';
-            //                 if (tObj.cy != "") {
-            //                     selectedCyc = tObj.cy;
-            //                 }
-            //                 $("#ct-assignCyc option[value='" + selectedCyc + "']").attr('selected', 'selected');
-            //             }
-
-            //         });
-
-            //     }
-
-
-
-            // });
-
+          
 
 
         }
@@ -1790,22 +1574,7 @@ function loadCycles() {
         console.log("Error in populating Cycles");
         //callback(null, err);
     })
-    // dataSender({
-    //     task: 'populateCycles',
-    //     relId: $("#ct-assignRel").val()
-    // }, function(err, result) {
-    //     console.log('In CYC ', $("#ct-assignRel").val());
-    //     if (err) {
-    //         callback(null, err);
-    //     } else {
-    //         result2 = JSON.parse(result);
-    //         for (i = 0; i < result2.c_ids.length && result2.cyc.length; i++) {
-    //             $('#ct-assignCyc').append("<option data-id='" + result2.cyc[i] + "' value='" + result2.c_ids[i] + "'>" + result2.cyc[i] + "</option>");
-    //         }
-    //         $("#ct-assignCyc option[value='" + result2.cyc[0] + "']").attr('selected', 'selected');
-    //     }
-
-    // });
+ 
 }
 
 function nodeCtrlClick(e) {
@@ -1943,17 +1712,7 @@ function getNewPosition(node, pi, arr_co) {
                 }; // go directly below parent
             }
             node = getNonOverlappingPosition(node, arr_co, new_one);
-            // if(JSON.stringify(arr_co).indexOf(JSON.stringify(new_one))>-1){		// if position already occupied
-            // 	//layout_change
-            // 	if(layout_vertical){
-            // 	node.x=arr[index].x+80;					// shift and go below parent
-            // 	node.y=parseInt(sections[node.type]);
-            // 	}
-            // 	else{
-            // 	node.y=arr[index].y+80;
-            // 	node.x=parseInt(sections[node.type]);
-            // 	}
-            // }
+           
         } else { //Module's kid
             //layout_change
             if (layout_vertical) {
@@ -2632,34 +2391,7 @@ function actionEvent(e) {
                 },function(error){
                     console.log(error);
                 })
-                // dataSender({
-                //     task: 'getModules',
-                //     tab: window.localStorage['tabMindMap'],
-                //     prjId: $(".project-list").val(),
-                //     versioning: versioning_enabled,
-                //     version: parseFloat(from_v)
-                // }, function(err, result) {
-                //     if (err) console.log(result);
-                //     else {
-                //         // console.log(result);
-                //         var nodeBox = d3.select('.ct-nodeBox');
-                //         $(nodeBox[0]).empty();
-                //         allMMaps = JSON.parse(result);
-                //         allMMaps.forEach(function(e, i) {
-                //             //var t=e.name.replace(/_/g,' ');
-                //             var img_src = 'images_mindmap/node-modules-no.png';
-                //             if (e.type == 'modules_endtoend') img_src = 'images_mindmap/MM5.png';
-                //             var t = $.trim(e.name);
-                //             var node = nodeBox.append('div').attr('class', 'ct-node fl-left').attr('data-mapid', i).attr('title', t).on('click', loadMap);
-                //             node.append('img').attr('class', 'ct-nodeIcon').attr('src', img_src).attr('alt', 'Module').attr('aria-hidden', true);
-                //             node.append('span').attr('class', 'ct-nodeLabel').html(t);
-                //         });
-                //         if (selectedTab == 'tabCreate')
-                //             populateDynamicInputList();
-                //         setModuleBoxHeight();
-                //     }
-                // });
-                //$('#Mindmap_save').modal('show');
+             
             }
             if (flag == 20) {
                 if (!saveFlag) return;
@@ -2714,147 +2446,7 @@ function actionEvent(e) {
                 openDialogMindmap('Save error', 'Failed to save data');
             }
         })
-    // dataSender({
-    //     task: 'writeMap',
-    //     data: {
-    //         sendNotify: assignedTo,
-    //         write: flag,
-    //         userRole: window.localStorage['_SR'],
-    //         vn_from: from_v,
-    //         vn_to: to_v,
-    //         tab: cur_module,
-    //         map: mapData,
-    //         user_name: username,
-    //         abc: deletednode,
-    //         xyz: unassignTask,
-    //         prjId: $('.project-list').val(),
-    //         relId: $('#ct-assignRel').val(),
-    //         cycId: $('#ct-assignCyc').val()
-    //     },
-    //     role: window.localStorage['_SR'],
-    //     versioning: versioning_enabled
-    // }, function(err, result) {
-    //     s.classed('no-access', !1);
-    //     if (err) {
-    //         console.log(result);
-    //         $('#ct-createAction').addClass('disableButton')
-    //         if (result.indexOf('Schema.ConstraintValidationFailed') > -1) {
-    //             openDialogMindmap('Save error', 'Module names cannot be duplicate');
-    //         } else {
-    //             openDialogMindmap('Save error', 'Failed to save data');
-    //         }
-
-    //     } else {
-    //         //alert(alertMsg);
-    //         var res = JSON.parse(result);
-    //         if (flag == 10) {
-
-    //             mapSaved = !0;
-    //             var mid, sts = allMMaps.some(function(m, i) {
-    //                 if (m.id_n == res.id_n) {
-    //                     mid = i;
-    //                     allMMaps[i] = res;
-    //                     return !0;
-    //                 }
-    //                 return !1;
-    //             });
-    //             if (!sts) {
-    //                 mid = allMMaps.length;
-    //                 allMMaps.push(res);
-    //                 var node = d3.select('.ct-nodeBox').append('div').attr('class', 'ct-node fl-left').attr('data-mapid', mid).attr('title', res.name).on('click', loadMap);
-    //                 node.append('img').attr('class', 'ct-nodeIcon').attr('src', 'images_mindmap/node-modules-no.png').attr('alt', 'Module').attr('aria-hidden', true);
-    //                 node.append('span').attr('class', 'ct-nodeLabel').html(res.name.replace(/_/g, ' '));
-    //             }
-    //             setModuleBoxHeight();
-    //             if (selectedTab == 'tabCreate') populateDynamicInputList();
-
-    //             clearSvg();
-    //             treeBuilder(allMMaps[mid]);
-    //             unassignTask = [];
-
-    //             if (selectedTab == 'tabAssign') {
-    //                 openDialogMindmap("Success", "Tasks saved successfully");
-    //             } else {
-    //                 openDialogMindmap("Success", "Data saved successfully");
-    //             }
-    //             var vn = '';
-    //             if ($('.version-list').length != 0)
-    //                 from_v = to_v = $('.version-list').val()
-
-    //             dataSender({
-    //                 task: 'getModules',
-    //                 tab: window.localStorage['tabMindMap'],
-    //                 prjId: $(".project-list").val(),
-    //                 versioning: versioning_enabled,
-    //                 version: parseFloat(from_v)
-    //             }, function(err, result) {
-    //                 if (err) console.log(result);
-    //                 else {
-    //                     // console.log(result);
-    //                     var nodeBox = d3.select('.ct-nodeBox');
-    //                     $(nodeBox[0]).empty();
-    //                     allMMaps = JSON.parse(result);
-    //                     allMMaps.forEach(function(e, i) {
-    //                         //var t=e.name.replace(/_/g,' ');
-    //                         var img_src = 'images_mindmap/node-modules-no.png';
-    //                         if (e.type == 'modules_endtoend') img_src = 'images_mindmap/MM5.png';
-    //                         var t = $.trim(e.name);
-    //                         var node = nodeBox.append('div').attr('class', 'ct-node fl-left').attr('data-mapid', i).attr('title', t).on('click', loadMap);
-    //                         node.append('img').attr('class', 'ct-nodeIcon').attr('src', img_src).attr('alt', 'Module').attr('aria-hidden', true);
-    //                         node.append('span').attr('class', 'ct-nodeLabel').html(t);
-    //                     });
-    //                     if (selectedTab == 'tabCreate')
-    //                         populateDynamicInputList();
-    //                     setModuleBoxHeight();
-    //                 }
-    //             });
-    //             //$('#Mindmap_save').modal('show');
-    //         }
-    //         if (flag == 20) {
-    //             if (!saveFlag) return;
-    //             var res = JSON.parse(result);
-    //             res = res[0];
-    //             var mid, resMap = Object.keys(res);
-    //             allMMaps.some(function(m, i) {
-    //                 if (m.id_n == resMap[0]) {
-    //                     mid = i;
-    //                     return !0;
-    //                 }
-    //                 //return !1;
-    //             });
-    //             //263-'Mindmap- Module: Currently allowing to create 2 modules with same name- Error msg is given on click of Create button
-    //             if (allMMaps[mid] != undefined) {
-    //                 allMMaps[mid].id_c = res[resMap[0]];
-    //                 allMMaps[mid].children.forEach(function(tsc) {
-    //                     tsc.id_c = res[tsc.id_n];
-    //                     tsc.children.forEach(function(scr) {
-    //                         scr.id_c = res[scr.id_n];
-    //                         scr.children.forEach(function(tc) {
-    //                             if (res[tc.id_n] != 'null') {
-    //                                 tc.id_c = res[tc.id_n];
-    //                             }
-    //                         });
-    //                     });
-    //                 });
-    //                 //To update cassandra_ids (id_c) of nodes in dNodes variable
-    //                 dNodes.forEach(function(d) {
-    //                     if (d.type == 'modules') d.id_c = res[resMap[0]];
-    //                     else d.id_c = res[d.id_n];
-
-    //                 });
-
-    //                 openDialogMindmap("Success", "Structure created successfully");
-    //                 saveFlag = false;
-    //                 $('#ct-createAction').addClass('disableButton');
-    //             } else {
-    //                 saveFlag = false;
-    //                 openDialogMindmap("Success", "Failed to create structure");
-    //             }
-
-
-                //$('#Mindmap_create').modal('show');
-    //     }
-    // });
+    
 };
 
 function toggleExpand(e,tab) {
@@ -4129,8 +3721,10 @@ function actionEvent_W(e){
 		s.classed('no-access',!1);
 		return;
 	}          
-    var from_v=to_v=cur_module='';                     
-    mindmapServices.saveEndtoEndData(username,flag,window.localStorage['_SR'],from_v,to_v,cur_module,mapData,deletednode_W,unassignTask,selectedProject,$('#ct-assignRel').val(),$('#ct-assignCyc').val()).then(function(result){
+    var from_v=to_v='';      
+    console.log("::::MAPDATA::::: ",mapData);
+              
+    mindmapServices.saveEndtoEndData(username,flag,window.localStorage['_SR'],from_v,to_v,'endToend',mapData,deletednode_W,unassignTask,selectedProject,$('#ct-assignRel').val(),$('#ct-assignCyc').val()).then(function(result){
         var res=result;
         if(flag==10){
 
@@ -4159,8 +3753,9 @@ function actionEvent_W(e){
 			// fix for 1046:  "Create" does not work when we add scenarios from different projects
 			saveFlag=true;
 			$('#ct-createAction_W').removeClass('disableButton').removeClass('no-access');
-            mindmapServices.getModules(window.localStorage['tabMindMap'],$("#selectProjectEtem").val(),param,parseFloat(version_num))
-			.then(function (res) {
+            //alert(window.localStorage['tabMindMap']);
+            mindmapServices.getModules('endToend',$("#selectProjectEtem").val(),versioning_enabled,'')
+			.then(function (result) {
                 var nodeBox=d3.select('#etemModuleContainer');
 						$(nodeBox[0]).empty();
 						allMMaps_W=allMaps_info=result;
@@ -4200,19 +3795,21 @@ function actionEvent_W(e){
                     return !1;
             });
             //263-'Mindmap- Module: Currently allowing to create 2 modules with same name- Error msg is given on click of Create button
+            console.log(allMMaps_W);
+            console.log(mid);
             if(allMMaps_W[mid] != undefined){
                 allMMaps_W[mid].id_c=res[resMap[0]];
                 allMMaps_W[mid].children.forEach(function(tsc){
                         tsc.id_c=res[tsc.id_n];
                         //Himanshu please check the cause for scenario children is undefined here
-                        /* tsc.children.forEach(function(scr){
+                        tsc.children.forEach(function(scr){
                              scr.id_c=res[scr.id_n];
                              scr.children.forEach(function(tc){
                                  if (res[tc.id_n]!='null'){
                                      tc.id_c=res[tc.id_n];
                                  }
                              });
-                         });*/
+                         });
                 });
                 //To update cassandra_ids (id_c) of nodes in dNodes_W variable
                 dNodes_W.forEach(function(d){
@@ -4241,125 +3838,6 @@ function actionEvent_W(e){
 		}
     })
 
-	// dataSender({task:'endTOend',data:{write:flag,map:mapData,user_name:username,abc:deletednode_W,xyz:unassignTask,prjId:selectedProject,relId:$('#ct-assignRel').val(),cycId:$('#ct-assignCyc').val()}},function(err,result){
-	// 	s.classed('no-access',!1);
-	// 	if(err){
-	// 		if(result.indexOf('Schema.ConstraintValidationFailed')>-1){
-	// 			openDialogMindmap('Save error','Module names cannot be duplicate');
-	// 		}
-	// 		else{
-	// 			openDialogMindmap('Save error','Failed to save data');
-	// 		}
-			
-	// 	} 
-	// 	else{
-			
-	// 		var res=JSON.parse(result);
-	// 		if(flag==10){
-
-	// 		 mapSaved=!0;
-	// 		var mid,sts=allMaps_info.some(function(m,i){
-	// 			if(m.id_n==res.id_n) {
-	// 				mid=i;
-	// 				allMaps_info[i]=res;
-	// 				return !0;
-	// 			}
-	// 			return !1;
-	// 		});
-	// 		if(!sts){
-	// 			mid=allMaps_info.length;
-	// 			allMaps_info.push(res);
-	// 			var node=d3.select('#etemModuleContainer').append('span').attr('class','moduleContainer').attr('data-mapid',mid).attr('title',res.name).on('click',loadScenarios);
-	// 			node.append('img').attr('class','ct-nodeIcon eteMbox').attr('src','imgs/ic-reportbox.png').attr('alt','Module').attr('aria-hidden',true);
-	// 			node.append('span').attr('class','ct-nodeLabel modulename').html(res.name.replace(/_/g,' '));
-	// 		}
-	// 		setModuleBoxHeight_W();
-	// 		clearSvg_W();
-	// 		treeBuilder_W(allMaps_info[mid]);
-	// 		unassignTask=[];
-	// 		//var selectedTab = window.localStorage['tabMindMap']
-	// 		openDialogMindmap("Success", "Data saved successfully");
-	// 		// fix for 1046:  "Create" does not work when we add scenarios from different projects
-	// 		saveFlag=true;
-	// 		$('#ct-createAction_W').removeClass('disableButton').removeClass('no-access');	
-			
-	// 		 dataSender({task:'getModules',tab:'endToend',prjId:$("#selectProjectEtem").val()},function(err,result){
-	// 			 	if(err) console.log(result);
-	// 			 	else{
-						 
-	// 					// console.log(result);
-	// 					var nodeBox=d3.select('#etemModuleContainer');
-	// 					$(nodeBox[0]).empty();
-	// 					allMMaps_W=allMaps_info=JSON.parse(result);
-	// 					//<span class='moduleContainer' data-moduleId=''><img alt='Module icon' class='eteMbox' src='imgs/ic-reportbox.png' title=''><br/><span class='modulename' title=''>Module"+(i+1)+"</span></span>
-	// 					allMMaps_W.forEach(function(e,i){
-	// 						//var t=e.name.replace(/_/g,' ');
-	// 						var src_image='imgs/ic-reportbox.png'
-	// 						var class_name='eteMbox';
-	// 						var onclick_func='';
-	// 						if (e.type=='modules_endtoend'){
-	// 							class_name='eteMboxETE';
-	// 							onclick_func=loadScenarios;
-	// 							src_image='images_mindmap/endToEnd.png';
-	// 						} 
-	// 						var t = $.trim(e.name);
-	// 						var node=nodeBox.append('span').attr('class','moduleContainer').attr('data-mapid',i).attr('title',t).on('click',onclick_func);
-	// 						node.append('img').attr('class','ct-nodeIcon '+class_name).attr('src',src_image).attr('alt','Module').attr('aria-hidden',true);
-	// 						node.append('span').attr('class','ct-nodeLabel modulename').html(t);
-	// 					});
-	// 					initScroller();
-	// 					setModuleBoxHeight_W();
-	// 			 	}
-	// 			});
-	// 		//$('#Mindmap_save').modal('show');
-	// 	}
-    //     if(flag==20){
-    //         if(!saveFlag) return;
-    //         var res=JSON.parse(result);
-    //         res=res[0];
-    //         var mid,resMap=Object.keys(res);
-    //         allMMaps_W.some(function(m,i){
-    //             if(m.id_n==resMap[0]) {
-    //                 mid=i;
-    //                 return !0;
-    //             }
-    //                 return !1;
-    //         });
-    //         //263-'Mindmap- Module: Currently allowing to create 2 modules with same name- Error msg is given on click of Create button
-    //         if(allMMaps_W[mid] != undefined){
-    //             allMMaps_W[mid].id_c=res[resMap[0]];
-    //             allMMaps_W[mid].children.forEach(function(tsc){
-    //                     tsc.id_c=res[tsc.id_n];
-    //                     tsc.children.forEach(function(scr){
-    //                         scr.id_c=res[scr.id_n];
-    //                         scr.children.forEach(function(tc){
-    //                             if (res[tc.id_n]!='null'){
-    //                                 tc.id_c=res[tc.id_n];
-    //                             }
-    //                         });
-    //                 });
-    //             });
-    //             //To update cassandra_ids (id_c) of nodes in dNodes_W variable
-    //             dNodes_W.forEach(function(d){
-    //                 if (d.type=='modules') d.id_c=res[resMap[0]];
-    //                 else d.id_c=res[d.id_n];
-
-    //             });
-                
-    //             openDialogMindmap("Success", "Structure created successfully");
-    //             saveFlag=false;
-    //             $('#ct-createAction_W').addClass('disableButton');
-    //         }else{
-    //             saveFlag=false;
-    //             openDialogMindmap("Success", "Failed to create structure");
-    //         }
-            
-            
-    //         //$('#Mindmap_create').modal('show');
-    //     }
-
-	// 	}
-	// });
 };
 
 
@@ -4415,18 +3893,7 @@ $(document).on('click', '.createNew-ete', function(e){
         },function(error){
             console.log(error);
         })
-	// 	dataSender({task:'populateScenarios',moduleId:moduleid},function(err,result){
-	// 		if(err) console.log(result);
-	// 		else{
-	// 		    container.empty();
-				
-	// 			result=JSON.parse(result);
-				
-	// 			result.forEach(function(row){
-	// 				container.append("<span class='eteScenrios' data-scenarioId='"+row.testScenarioID_c+"' title='"+row.testScenarioName+"'>"+row.testScenarioName+"</span>")
-	// 			});				
-	// 		}
-	// });
+	
 })
 function toggleExpand(e){
 	var s=d3.select($(e.target).parent());
