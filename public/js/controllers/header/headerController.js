@@ -12,7 +12,7 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 	$scope.notifications = [];
 	if(window.localStorage.notification){
 		$scope.notifications = JSON.parse(window.localStorage.notification);
-		$scope.$apply();
+		//$scope.$apply();
 	}
 	
 	userRole = window.localStorage['_SR'];
