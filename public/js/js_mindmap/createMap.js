@@ -19,7 +19,6 @@ var isIE = /*@cc_on!@*/ false || !!document.documentMode;
 var IncompleteFlowFlag = false;
 var taskidArr = [];
 var assignedObj = {};
-var unassignedObj = {};
 function loadMindmapData(param) {
     blockUI("Loading...");
     dataSender({
@@ -870,7 +869,7 @@ function addTask(e) {
     if (errorRelCyc) {
         openDialogMindmap("Task Assignment Error", "Please select Release/Cycle")
     }
-      console.log(dNodes[pi]);
+      
       for(var i=0;i<taskidArr.length;i++)  
       {
           if(taskidArr[i].id == dNodes[pi].task.id)
@@ -878,39 +877,21 @@ function addTask(e) {
               if(dNodes[pi].task.task == "Execute" || dNodes[pi].task.task == "Execute Batch" )
                {
                     assignedObj[dNodes[pi].task.task] =$("#ct-assignedTo option:selected").text();
-                    if(dNodes[pi].oid.indexOf(unassignTask) >= 0)
-                    {
-                        unassignedObj[dNodes[pi].oid] = 'unassigned';
-                    }
                }
                else if(dNodes[pi].task.task == "Execute Scenario")
                {
                     assignedObj[dNodes[pi].task.task] = $("#ct-assignedTo option:selected").text();
-                    if(dNodes[pi].oid.indexOf(unassignTask) >= 0)
-                    {
-                        unassignedObj[dNodes[pi].oid] = 'unassigned';
-                    }
                }
                else if(dNodes[pi].task.task == "Scrape" || dNodes[pi].task.task == "Append" || dNodes[pi].task.task == "Compare" || dNodes[pi].task.task == "Add" || dNodes[pi].task.task == "Map")
                {
                     assignedObj[dNodes[pi].task.task] = $("#ct-assignedTo option:selected").text();
-                    if(dNodes[pi].oid.indexOf(unassignTask) >= 0)
-                    {
-                        unassignedObj[dNodes[pi].oid] = 'unassigned';
-                    }
                }
                else if(dNodes[pi].task.task == "Design" || dNodes[pi].task.task == "Update")
                {
                     assignedObj[dNodes[pi].task.task] = $("#ct-assignedTo option:selected").text();
-                    if(dNodes[pi].oid.indexOf(unassignTask) >= 0)
-                    {
-                        unassignedObj[dNodes[pi].oid] = 'unassigned';
-                    }
                }
           }
       }
-      console.log('assignedObj',assignedObj);
-      console.log('assignedObj',unassignedObj);
 };
 
 function nodeClick(e) {
@@ -2073,7 +2054,6 @@ function actionEvent(e) {
     var userInfo = JSON.parse(window.localStorage['_UI']);
     var username = userInfo.username;
     var assignedTo = assignedObj;
-    var unassignedTasks = unassignedObj;
    // var assignedTo = $("#ct-assignedTo option:selected").text();
     if ($('.project-list').val() == null) {
         openDialogMindmap('Error', 'No projects is assigned to User');
@@ -2086,7 +2066,6 @@ function actionEvent(e) {
         task: 'writeMap',
         data: {
             sendNotify: assignedTo,
-            unassignedTasks: unassignedObj,
             write: flag,
             userRole: window.localStorage['_SR'],
             vn_from: from_v,
