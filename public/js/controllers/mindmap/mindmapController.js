@@ -1,4 +1,38 @@
 mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$location', '$timeout', 'chatbotService','mindmapServices','cfpLoadingBar','$window','socket', function($scope, $rootScope, $http, $location,$timeout,chatbotService,mindmapServices,cfpLoadingBar,$window,socket) {
+
+//------------------Global Variables---------------------------//
+//Createmap//
+var activeNode,childNode,uNix,uLix,node,link,dNodes,dLinks,dNodes_c,dLinks_c,allMMaps,temp,rootIndex,faRef,nCount,scrList,tcList,mapSaved,zoom,cSpan,cScale,taskAssign,releaseResult,selectedProject;
+//unassignTask is an array to store whose task to be deleted
+var deletednode = [],
+    unassignTask = [],
+    deletednode_info = [];
+var versioning_enabled = 0;
+// node_names_tc keep track of testcase names to decide reusability of testcases
+var node_names_tc = [];
+var sections = {
+    'modules': 112,
+    'scenarios': 237,
+    'screens': 363,
+    'testcases': 488
+}; // from now mindmap levels will be divided into sections
+var saveFlag = false;
+//for handling the case when creatednode goes beyond screensize
+var CreateEditFlag = false;
+var isIE = /*@cc_on!@*/ false || !!document.documentMode;
+var IncompleteFlowFlag = false;
+//Createmap//
+
+//Workflow//
+var uNix_W,uLix_W,node,link,dNodes_W,dLinks_W,allMMaps_W,temp_W,faRef,mapSaved,zoom_W,cSpan_W,cScale_W,taskAssign;
+var cur_module,allMaps_info,activeNode_W,childNode_W;
+//unassignTask is an array to store whose task to be deleted
+var deletednode_W=[],unassignTask=[];
+//node_names_tc keep track of testcase names to decide reusability of testcases
+var node_names_tc=[];
+var saveFlag_W=false;
+//Workflow//
+//-------------------End of Global Variables-----------------------//
     $("body").css("background","#eee");
     $("head").append('<link id="mindmapCSS1" rel="stylesheet" type="text/css" href="css/css_mindmap/style.css" /><link id="mindmapCSS2" rel="stylesheet" type="text/css" href="fonts/font-awesome_mindmap/css/font-awesome.min.css" />')
 	if(window.localStorage['navigateScreen'] != "home"){
@@ -156,7 +190,6 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     success: function() {
 
                         versioningEnabled=true;
-                        
                         load_tab();
                     },  
                     error: function() {
@@ -172,21 +205,22 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     }
        
     function load_tab(){
+        function selectOpt(tab){
+            $("img.selectedIcon").removeClass("selectedIcon");
+            $('#'+tab).addClass('selectedIcon');
+        }
         if($scope.tab=='tabRequirement'){
         	$('.selectProject').hide();
-            $("img.selectedIcon").removeClass("selectedIcon");
-            $('#reqImg').addClass('selectedIcon');
+            selectOpt('reqImg');
         }
         else if($scope.tab=='mindmapCreateOption'){
             $('.selectProject').hide();
-        	$("img.selectedIcon").removeClass("selectedIcon");
-	        $('#createImg').addClass('selectedIcon');
+        	selectOpt('createImg');
         }
         else if($scope.tab=='mindmapEndtoEndModules'){
             // if(!versioningEnabled){
             $("#ct-main").hide();
-        	$("img.selectedIcon").removeClass("selectedIcon");
-	        $('#createImg').addClass('selectedIcon');
+        	selectOpt('createImg');
             collapseSidebars();
             loadMindmapData_W();
         	
@@ -194,21 +228,19 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         else{
             if ($scope.tab=='tabCreate'){
             	$('.selectProject').show();
-                $("img.selectedIcon").removeClass("selectedIcon");
-		        $('#createImg').addClass('selectedIcon');
+                selectOpt('createImg');
                 if(!versioningEnabled)
                     $('.selectProject').addClass('selectProjectPosition');
-                $("#ct-main").css("display","block");
+                $("#ct-main").show();
                 if(!versioningEnabled){
                     addExport(versioningEnabled);
                 }
             }else if($scope.tab=='tabAssign'){
                 $('.selectProject').show();
-                $("img.selectedIcon").removeClass("selectedIcon");
-		        $('#assignImg').addClass('selectedIcon');
+                selectOpt('assignImg');
                 if(!versioningEnabled)
                     $('.selectProject').addClass('selectProjectPosition');
-                $("#ct-main").css("display","block");
+                $("#ct-main").show();
             }
 
             collapseSidebars();
@@ -233,7 +265,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     $scope.createMap = function(option){
     	$scope.tab = option;
     }
-    
+
     var collapseEteflag = true;
     $('.collapseEte').click(function(){
     	if(collapseEteflag){
@@ -480,26 +512,6 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     }
 
 //------------------Createmap.js---------------------//
-
-var activeNode,childNode,uNix,uLix,node,link,dNodes,dLinks,dNodes_c,dLinks_c,allMMaps,temp,rootIndex,faRef,nCount,scrList,tcList,mapSaved,zoom,cSpan,cScale,taskAssign,releaseResult,selectedProject;
-//unassignTask is an array to store whose task to be deleted
-var deletednode = [],
-    unassignTask = [],
-    deletednode_info = [];
-var versioning_enabled = 0;
-// node_names_tc keep track of testcase names to decide reusability of testcases
-var node_names_tc = [];
-var sections = {
-    'modules': 112,
-    'scenarios': 237,
-    'screens': 363,
-    'testcases': 488
-}; // from now mindmap levels will be divided into sections
-var saveFlag = false;
-//for handling the case when creatednode goes beyond screensize
-var CreateEditFlag = false;
-var isIE = /*@cc_on!@*/ false || !!document.documentMode;
-var IncompleteFlowFlag = false;
 
 function loadMindmapData(param) {
     blockUI("Loading...");
@@ -1437,10 +1449,10 @@ function nodeClick(e) {
                 autoclose: true,
                 startDate: new Date()
             });
-            $(document).on('blur', '#startDate', function() {
+            $('#startDate').blur(function() {
                 $('#startDate').val($(this).val());
             });
-            $(document).on('click', '#dateIconStartDate', function() {
+            $('#dateIconStartDate').click(function() {
                 $("#startDate").datepicker("show");
             });
             f = w.append('ul').attr('class', 'ct-asValCalBox dropdown-menu'); //.on('click',$('.ct-asValBoxIcon.ct-asItemCal.btn.dropdown-toggle').datepicker());
@@ -1461,13 +1473,10 @@ function nodeClick(e) {
                 autoclose: true,
                 startDate: new Date()
             });
-            $(document).on('click', '#dateIconEndDate', function() {
+            $('#dateIconEndDate').click(function() {
                 $("#endDate").datepicker("show");
             });
             f = w.append('ul').attr('class', 'ct-asValCalBox dropdown-menu'); //.on('click',$('.ct-asValBoxIcon.ct-asItemCal.btn.dropdown-toggle').datepicker());
-            // if(tObj.ed.trim() == ""){
-            // 	tObj.count = 0;
-            // }else tObj.count = '';
             $("#endDate").val(tObj.ed);
         } else if (tk == 're') {
             var result1 = {};
@@ -1982,7 +1991,7 @@ function recurseDelChild(d) {
 function moveNode(e) {
     e = e || window.event;
     //#886 Unable to rearrange nodes in e2e
-    d3.select('.ct-movable').attr('transform', "translate(" + parseFloat((e.pageX - $('#ct-mapSvg').offset().left - cSpan[0]) / cScale + 2) + "," + parseFloat((e.pageY - 188 - cSpan[1]) / cScale - 20) + ")");
+    d3.select('.ct-movable').attr('transform', "translate(" + parseFloat((e.pageX - $('#ct-mapSvg').offset().left - cSpan[0]) / cScale + 2) + "," + parseFloat((e.pageY - $('#ct-mapSvg').offset().top - cSpan[1]) / cScale - 20) + ")");
 };
 
 function moveNodeBegin(e) {
@@ -2991,18 +3000,8 @@ function copyMap(){
 }
 
 //------------------------------------------------Workflow.js----------------------------------------
-var uNix_W,uLix_W,node,link,dNodes_W,dLinks_W,allMMaps_W,temp_W,faRef,mapSaved,zoom_W,cSpan_W,cScale_W,taskAssign;
-var cur_module,allMaps_info,activeNode_W,childNode_W;
-//unassignTask is an array to store whose task to be deleted
-var deletednode_W=[],unassignTask=[];
-//node_names_tc keep track of testcase names to decide reusability of testcases
-var node_names_tc=[];
-var saveFlag=false;
+
 var isIE = /*@cc_on!@*/false || !!document.documentMode;
- function initScroller(){
-    	$('.scrollbar-inner').scrollbar();
-		$('.scrollbar-macosx').scrollbar();
-    }
 function loadMindmapData_W(){
 	var userInfo =  JSON.parse(window.localStorage['_UI']);
 	var userid = userInfo.user_id;
@@ -3053,23 +3052,18 @@ function loadMindmapData1_W(){
 	$('#ct-saveAction_W').removeClass('no-access');
 	//uNix=0;uLix=0;dNodes=[];dLinks=[];nCount=[0,0,0,0];scrList=[];tcList=[];cSpan_W=[0,0];cScale_W=1;mapSaved=!1;
 	taskAssign={"modules_endtoend":{"task":["Execute"],"attributes":["at","rw","sd","ed","re","cy"]},"scenarios":{"task":["Execute Scenario"],"attributes":["at","rw","sd","ed"]},"screens":{"task":["Scrape","Append","Compare","Add","Map"],"attributes":["at","rw","sd","ed"]},"testcases":{"task":["Update","Design"],"attributes":["at","rw","sd","ed"]}};
-	zoom_W=d3.behavior.zoom().scaleExtent([0.1,3]).on("zoom", zoomed_W);
+	zoom_W=d3.behavior.zoom().scaleExtent([0.1,3]).on("zoom", zoomed);
 	faRef={"plus":"fa-plus","edit":"fa-pencil-square-o","delete":"fa-trash-o"};
-	
-		// $(document).on('click',".ct-tile_W", function() {
-		// 	createNewMap_W();
-		// 	});
-
-				 $(document).on('click',"#ctExpandCreate", function(e) {
+				 $("#ctExpandCreate").click(function(e) {
 					if($(".ct-node:visible").length > 6)
 					{
-						toggleExpand(e);
+						toggleExpand(e,'module');
 					}
 				 	});
-				$(document).on('click',"#ctExpandAssign", function(e) {
+				$("#ctExpandAssign").click(function(e) {
 					if($(".ct-node:visible").length > 6)
 					{
-						toggleExpandAssign(e);
+						toggleExpand(e,'Assign');
 					}
 				 	});
 	d3.select('#ct-main').on('contextmenu',function(e){d3.event.preventDefault();});
@@ -3106,10 +3100,7 @@ function loadMindmapData1_W(){
     })
 	
 }
-window.onresize=function() {
-	var w=window.innerWidth-28,h=window.innerHeight-123;
-	var mapSvg=d3.select('#ct-mapSvg').style('width',w+'px').style('height',h+'px');
-};
+
 function initiate_W(){
 	var t,u;
 	var selectedTab = window.localStorage['tabMindMap'];
@@ -3126,7 +3117,7 @@ function initiate_W(){
 	u.append('p').attr('class','ct-ctrl fa '+faRef.edit).on('click',editNode_W).append('span').attr('class','ct-tooltiptext').html('');
 	u.append('p').attr('class','ct-ctrl fa '+faRef.delete).on('click',deleteNode_W).append('span').attr('class','ct-tooltiptext').html('');
 	
-	var mapSvg=canvas.append('svg').attr('id','ct-mapSvg').call(zoom_W).on('click.hideElements',clickHideElements_W);
+	var mapSvg=canvas.append('svg').attr('id','ct-mapSvg').call(zoom_W).on('click.hideElements',clickHideElements);
 	var dataAdder=[{c:'#5c5ce5',t:'Modules'},{c:'#4299e2',t:'Scenarios'},{c:'#19baae',t:'Screens'},{c:'#efa022',t:'Test Cases'}];
 	u=canvas.append('svg').attr('id','ct-legendBox').append('g').attr('transform','translate(10,10)');
 	dataAdder.forEach(function(e,i) {
@@ -3148,13 +3139,7 @@ function initiate_W(){
 	
 	
 };
-function zoomed_W(){
-	cSpan_W=d3.event.translate;
-	cScale_W=d3.event.scale;
-	
-	//Logic to change the layout
-	d3.select("#ct-mindMap").attr("transform","translate("+d3.event.translate+")scale("+d3.event.scale +")");
-};
+
 function getElementDimm(s){return [parseFloat(s.style("width")),parseFloat(s.style("height"))];};
 function createNewMap_W(e){ 
 	initiate_W();
@@ -3179,7 +3164,7 @@ function loadScenarios(e){
 	
 	if(!d3.select('#ct-mindMap')[0][0] || confirm('Unsaved work will be lost if you continue.\nContinue?')){
 		d3.select('.addScenarios-ete').classed('disableButton',!0);
-		saveFlag=false;
+		saveFlag_W=false;
 		$('#ct-createAction_W').addClass('disableButton');
 		$("span.nodeBoxSelected").removeClass("nodeBoxSelected");
 		$(this).addClass("nodeBoxSelected");
@@ -3190,10 +3175,6 @@ function loadScenarios(e){
 		var reqMap=d3.select(this).attr('data-mapid');
 		treeBuilder_W(allMaps_info[reqMap]);
 	}
-};
-function genPathData_W(s,t){
-	
-	return ('M'+s[0]+','+s[1]+'C'+(s[0]+t[0])/2+','+s[1]+' '+(s[0]+t[0])/2+','+t[1]+' '+t[0]+','+t[1]);
 };
 function addNode_W(n,m,pi){
 	
@@ -3224,9 +3205,6 @@ function addNode_W(n,m,pi){
 		
 		
 	}
-	
-	
-	
 	if(m&&pi){
 		var p=d3.select('#ct-node-'+pi.id);
 			// switch-layout feature
@@ -3244,21 +3222,7 @@ function addNode_W(n,m,pi){
 	}
 	return v;
 };
-function addLink_W(r,p,c){
-	//Modified parameters to change the layout
 
-	// switch-layout feature
-	if($('#switch-layout').hasClass('vertical-layout')){
-		var s=[p.x+20,p.y+55];
-		var t=[c.x+20,c.y-3];
-	}
-	else{
-		var s=[p.x+43,p.y+20];
-		var t=[c.x-3,c.y+20];
-	}
-	var d=genPathData_W(s,t);
-	var l=d3.select('#ct-mindMap').insert('path','g').attr('id','ct-link-'+r).attr('class','ct-link').attr('d',d);
-};
 //To Unassign the task of a particular node
 
 
@@ -3316,7 +3280,7 @@ function createScenario_Node(text,scenario_prjId){
 			//console.log(currentNode);
 			link={id:uLix_W,source:dNodes_W[pi],target:dNodes_W[uNix_W]};
 			dLinks_W.push(link);
-			addLink_W(uLix_W,dNodes_W[pi],dNodes_W[uNix_W]);
+			addLink(uLix_W,dNodes_W[pi],dNodes_W[uNix_W]);
 			uNix_W++;uLix_W++;
 			
 		}
@@ -3408,7 +3372,7 @@ function deleteNode_W(e){
 	if(t=='modules_endtoend') return;
 	var sid = s.attr('id').split('-')[2];
 	var p=dNodes_W[sid].parent;
-	recurseDelChild_W(dNodes_W[sid]);
+	recurseDelChild(dNodes_W[sid]);
 	for(j=dLinks_W.length-1;j>=0;j--){
 		if(dLinks_W[j].target.id==sid){
 			d3.select('#ct-link-'+dLinks_W[j].id).remove();
@@ -3426,22 +3390,7 @@ function deleteNode_W(e){
 	});
 	if(p.children.length==0) d3.select('#ct-node-'+p.id).select('.ct-cRight').remove();
 };
-function recurseDelChild_W(d){
-	if(d.children) d.children.forEach(function(e){recurseDelChild_W(e);});
-	d.parent=null;
-	d.children=null;
-	d.task=null;
-	d3.select('#ct-node-'+d.id).remove();
-	if(d.oid != undefined){
-		deletednode_W.push(d.oid)
-	}
-	for(j=dLinks_W.length-1;j>=0;j--){
-		if(dLinks_W[j].source.id==d.id){
-			d3.select('#ct-link-'+dLinks_W[j].id).remove();
-			dLinks_W[j].deleted=!0;
-		}
-	}
-};
+
 function moveNode_W(e){
 	e=e||window.event;
 	//#886 Unable to rearrange nodes in e2e
@@ -3489,10 +3438,10 @@ function moveNodeEnd_W(e){
 	
 	dNodes_W[pi].x=parseFloat(l[0]);
 	dNodes_W[pi].y=parseFloat(l[1]);
-	addLink_W(temp_W.t,dLinks_W[temp_W.t].source,dLinks_W[temp_W.t].target);
+	addLink(temp_W.t,dLinks_W[temp_W.t].source,dLinks_W[temp_W.t].target);
 	var v=(dNodes_W[pi].children)?!1:!0;
 	temp_W.s.forEach(function(d){
-		addLink_W(d,dLinks_W[d].source,dLinks_W[d].target);
+		addLink(d,dLinks_W[d].source,dLinks_W[d].target);
 		d3.select('#ct-link-'+d).classed('no-disp',v);
 	});
 	p.classed('ct-movable',!1);
@@ -3635,6 +3584,7 @@ var inpKeyUp_W = function(e){
 		else d3.select(this.parentElement).select('#ct-inpPredict').property('value','');
 	}
 };
+
 function treeIterator_W(c,d,e){
 	c.push({projectID:d.projectID,id:d.id,childIndex:d.childIndex,id_c:(d.id_c)?d.id_c:null,id_n:(d.id_n)?d.id_n:null,oid:(d.oid)?d.oid:null,name:d.name,type:d.type,pid:(d.parent)?d.parent.id:null,pid_c:(d.parent)?d.parent.id_c:null,task:(d.task)?d.task:null,renamed:(d.rnm)?d.rnm:!1,orig_name:(d.original_name)?d.original_name:null});
 	if(d.children&&d.children.length>0) d.children.forEach(function(t){e=treeIterator_W(c,t,e);});
@@ -3642,8 +3592,6 @@ function treeIterator_W(c,d,e){
 	//else if(d.type!='testcases') return !0;
 	return e;
 };
-
-
 
 function actionEvent_W(e){
 	var s=d3.select(this);
@@ -3710,7 +3658,6 @@ function actionEvent_W(e){
 			return;
 		} 
 	});
-
 	
 	if(selectedProject!=cur_project){
 		openDialogMindmap('Error',"Module belongs to project: '"+$("#selectProjectEtem option[value='"+selectedProject+"']").text()+"' Please go back to the same project and Save");
@@ -3751,7 +3698,7 @@ function actionEvent_W(e){
 			//var selectedTab = window.localStorage['tabMindMap']
 			openDialogMindmap("Success", "Data saved successfully");
 			// fix for 1046:  "Create" does not work when we add scenarios from different projects
-			saveFlag=true;
+			saveFlag_W=true;
 			$('#ct-createAction_W').removeClass('disableButton').removeClass('no-access');
             //alert(window.localStorage['tabMindMap']);
             mindmapServices.getModules('endToend',$("#selectProjectEtem").val(),versioning_enabled,'')
@@ -3779,12 +3726,10 @@ function actionEvent_W(e){
 						setModuleBoxHeight_W();
             },function(error){
                 console.log(error);
-            })
-			
-			
+            })		
 		}
         if(flag==20){
-            if(!saveFlag) return;
+            if(!saveFlag_W) return;
             var res=result[0];
             var mid,resMap=Object.keys(res);
             allMMaps_W.some(function(m,i){
@@ -3819,14 +3764,12 @@ function actionEvent_W(e){
                 });
                 
                 openDialogMindmap("Success", "Structure created successfully");
-                saveFlag=false;
+                saveFlag_W=false;
                 $('#ct-createAction_W').addClass('disableButton');
             }else{
-                saveFlag=false;
+                saveFlag_W=false;
                 openDialogMindmap("Success", "Failed to create structure");
             }
-            
-            
             //$('#Mindmap_create').modal('show');
         }
     },function(error){
@@ -3840,10 +3783,7 @@ function actionEvent_W(e){
 
 };
 
-
-
-
- $(document).on('click', '.addScenarios-ete', function(e){	
+ $('.addScenarios-ete').click(function(e){	
 //// #817 To select multiple scenarios in e2e (Himanshu)
 	 $('.selectScenariobg').each(function(i,obj){
 		var text=$(obj).text();
@@ -3855,11 +3795,11 @@ function actionEvent_W(e){
  		});
 })
 
-$(document).on('click', '.createNew-ete', function(e){
+$('.createNew-ete').click(function(e){
 		createNewMap_W();
 })
 
- $(document).on('click', '.moduleContainer', function(e){
+ $('.moduleContainer').click(function(e){
 		 if($($(this).children()[0]).hasClass('eteMbox')){
 		 	var som='Module Name: '+$(this)[0].title;
 			if(som.length>31)
@@ -3895,62 +3835,7 @@ $(document).on('click', '.createNew-ete', function(e){
         })
 	
 })
-function toggleExpand(e){
-	var s=d3.select($(e.target).parent());
-	var p=d3.select($(e.target).parent().parent());
-    $(e.target).parent().toggleClass('ct-rev');
-	$(e.target).parent().parent().toggleClass('ct-open');
-	$(e.target).toggleClass("iconSpaceArrowTop");
-	e.stopImmediatePropagation();
-		if($("#ct-moduleBox").hasClass("ct-open") == true){
- 	$("#ct-canvas").css("top","5px");
-	// if($("#left-nav-section").is(":visible") == true && $("#right-dependencies-section").is(":visible") == true)
-	// 	{
-	// 	$("#ct-AssignBox").css({"position":"relative","top":"25px"});
-	// 	}
-		$(".ct-nodeBox .ct-node").css("width","139px");
-		$(".ct-nodeBox").css({"overflow":"auto", "width":"99%"})
-		$(".iconSpaceArrow").attr("src","imgs/ic-collapseup.png");
-	}
-	else{
-		$(".iconSpaceArrow").attr("src","imgs/ic-collapse.png");
-		$("#ct-moduleBox").css({"position":"","top":""});
-	$("#ct-canvas").css("top","");
-		$(".ct-nodeBox .ct-node").css("width","");
-		$(".ct-nodeBox").css({"overflow":"", "width":""})
-	}
-};
-function toggleExpandAssign(e){
-	
-	var s=d3.select($(e.target).parent());
-	var p=d3.select($(e.target).parent().parent());
-    $(e.target).parent().toggleClass('ct-rev');
-	$(e.target).parent().parent().toggleClass('ct-open');
-	$(e.target).toggleClass("iconSpaceArrowTop");
-	e.stopImmediatePropagation();
-	if($("#ct-AssignBox").hasClass("ct-open") == true){		
-		$("#ct-canvas").css("top","5px");
-	// 	if($("#left-nav-section").is(":visible") == true && $("#right-dependencies-section").is(":visible") == true)
-	// {
-	// 		//$("#ct-AssignBox").css({"position":"relative","top":"25px"});
-	// }
-		$(".ct-nodeBox .ct-node").css("width","139px");
-	$(".ct-nodeBox").css({"overflow":"auto", "width":"98%"})
-		$(".iconSpaceArrow").attr("src","imgs/ic-collapseup.png");
-	}
-	else{
-		$(".iconSpaceArrow").attr("src","imgs/ic-collapse.png");
-		$("#ct-AssignBox").css({"position":"","top":""});
-		$("#ct-canvas").css("top","");
-		$(".ct-nodeBox .ct-node").css("width","");
-		$(".ct-nodeBox").css({"overflow":"", "width":""})
-	}
-};
-function clickHideElements_W(e){
-	d3.select('#ct-inpBox').classed('no-disp',!0);
-	d3.select('#ct-ctrlBox').classed('no-disp',!0);
-	d3.select('#ct-assignBox').classed('no-disp',!0);
-};
+
 function setModuleBoxHeight_W(){
 	//var lm=d3.select('#ct-moduleBox').classed('ct-open',!0);
 	var lm=d3.select('#etemModuleContainer').classed('ct-open',!0);
@@ -4008,9 +3893,6 @@ function treeBuilder_W(tree){
 		//Logic to change the layout and to reduce the length of the links
 		d.x=cSize[0]*0.1*(0.9+typeNum[d.type]);
 	}
-
-
-
 		if(d.oid===undefined)d.oid=d.id;
 		d.id=uNix_W++;
 		addNode_W(d,!0,d.parent);
@@ -4019,7 +3901,7 @@ function treeBuilder_W(tree){
 	dLinks_W=d3Tree.links(dNodes_W);
 	dLinks_W.forEach(function(d){
 		d.id=uLix_W++;
-		addLink_W(d.id,d.source,d.target);
+		addLink(d.id,d.source,d.target);
 	});
 	//zoom.translate([0,(cSize[1]/2)-dNodes_W[0].y]);
 	// switch-layout feature
