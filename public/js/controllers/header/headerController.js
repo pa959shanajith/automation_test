@@ -12,7 +12,6 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 	$scope.notifications = [];
 	if(window.localStorage.notification){
 		$scope.notifications = JSON.parse(window.localStorage.notification);
-		//$scope.$apply();
 	}
 	
 	userRole = window.localStorage['_SR'];
@@ -69,7 +68,6 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 		}
 			
 		value.count = value.count + 1;
-	
 		if (window.localStorage.notification) {
 			var notificationArr = window.localStorage.notification;
 			notificationArr = JSON.parse(notificationArr);
@@ -112,15 +110,9 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 	}, 500);
 
 	$scope.dropdownMenuButton = function(){
-		
-		var notificationCount = $("#notifications-count").text();
-		$("span.indexCount").each(function() {
-				var text = $(this).text();
-				$(this).attr('class','notify_'+text);
-		});
-		for(var i=0;i<notificationCount;i++)
+		if(window.localStorage.notification)
 		{
-			$(".notify_"+i).parent().children('.txtNotify').addClass('highlightNotification');
+			$scope.notifications = JSON.parse(window.localStorage.notification);
 		}
 		if (!window.localStorage.notification) {
 			$("#notifyBox").removeClass('dropdown-menu');
@@ -134,6 +126,22 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 			readMessages[i].isRead = true;
 		}
 		window.localStorage.notification = JSON.stringify(readMessages);
+		setTimeout(function() {
+			if($(".dropdown-menu").is(":visible") == true)
+			{
+				var notificationCount = parseInt($("#notifications-count").text());
+				$("span.indexCount").each(function() {
+						var text = parseInt($(this).text());
+						$(this).attr('class','notify_'+text);
+				});
+				for(var i=0;i<notificationCount;i++)
+				{
+					$(".notify_"+i).parent().children('.txtNotify').addClass('highlightNotification');
+				}
+			}
+		}, 10);
+		
+	
 	}
 
 	$scope.naviPg = function(){
