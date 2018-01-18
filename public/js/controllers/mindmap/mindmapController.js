@@ -331,7 +331,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             $('.fa.fa-pencil-square-o.fa-lg.plus-icon.active-map').trigger('click') //Remove copy rectangle
             $('.fa.fa-clipboard.fa-lg.plus-icon.active-map').trigger('click') //Disable paste
             saveFlag = false;
-            $('#ct-createAction').addClass('disableButton');
+            //$('#ct-createAction').addClass('disableButton');
+            SaveCreateED('#ct-createAction',1,0);
             $("div.nodeBoxSelected").removeClass("nodeBoxSelected");
             $(this).addClass("nodeBoxSelected");
             d3.select('#ct-inpBox').classed('no-disp', true);
@@ -1311,14 +1312,13 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
         //If module is in edit mode, then return do not add any node
         if (d3.select('#ct-inpBox').attr('class') == "") return;
-
         d3.select('#ct-inpBox').classed('no-disp', !0);
         d3.select('#ct-ctrlBox').classed('no-disp', !0);
         var p = d3.select(activeNode);
         var pt = p.attr('data-nodetype');
         if (pt == 'testcases') return;
         var pi = p.attr('id').split('-')[2];
-
+        SaveCreateED('#ct-createAction',1,0);
         if (dNodes[pi]._children == null) {
             if (dNodes[pi].children == undefined) dNodes[pi]['children'] = [];
             var nNext = {
@@ -1868,7 +1868,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             flag = 10;
             d3.select('#ct-inpBox').classed('no-disp', !0);
             saveFlag = true;
-            $('#ct-createAction').removeClass('disableButton');
+            //$('#ct-createAction').removeClass('disableButton');
+            SaveCreateED('#ct-createAction',0,0);
 
         } else if (s.attr('id') == 'ct-createAction') {
             if (error) {
@@ -1882,7 +1883,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         }
         if (flag == 0) return;
         if (s.classed('no-access')) return;
-        s.classed('no-access', !0);
+        //s.classed('no-access', !0);
         var userInfo = JSON.parse(window.localStorage['_UI']);
         var username = userInfo.username;
         var assignedTo = $("#ct-assignedTo option:selected").text();
@@ -1987,7 +1988,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
                     openDialogMindmap("Success", "Structure created successfully");
                     saveFlag = false;
-                    $('#ct-createAction').addClass('disableButton');
+                    //$('#ct-createAction').addClass('disableButton');
+                    SaveCreateED('#ct-createAction',1,0);
                 } else {
                     saveFlag = false;
                     openDialogMindmap("Success", "Failed to create structure");
@@ -1998,7 +2000,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             }
         }, function(error) {
             console.log(error);
-            $('#ct-createAction').addClass('disableButton')
+            //$('#ct-createAction').addClass('disableButton')
+            SaveCreateED('#ct-createAction',1,0);
             if (result.indexOf('Schema.ConstraintValidationFailed') > -1) {
                 openDialogMindmap('Save error', 'Module names cannot be duplicate');
             } else {
@@ -2612,7 +2615,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         $('#eteScenarioContainer').empty();
         d3.select('.addScenarios-ete').classed('disableButton', !0);
         //$('#ct-saveAction_W').removeClass('no-access');
-        SaveCreateED('#ct-saveAction',0,0);
+        SaveCreateED('#ct-saveAction_W',0,0);
         //uNix=0;uLix=0;dNodes=[];dLinks=[];nCount=[0,0,0,0];scrList=[];tcList=[];cSpan_W=[0,0];cScale_W=1;mapSaved=!1;
         taskAssign = {
             "modules_endtoend": {
@@ -2786,7 +2789,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         if (!d3.select('#ct-mindMap')[0][0] || confirm('Unsaved work will be lost if you continue.\nContinue?')) {
             d3.select('.addScenarios-ete').classed('disableButton', !0);
             saveFlag_W = false;
-            $('#ct-createAction_W').addClass('disableButton');
+            //$('#ct-createAction_W').addClass('disableButton');
+            SaveCreateED('#ct-createAction_W',1,0);
             $("span.nodeBoxSelected").removeClass("nodeBoxSelected");
             $(this).addClass("nodeBoxSelected");
             cur_module = $(this);
@@ -2935,9 +2939,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         var p = d3.select(activeNode_W);
         var t = p.attr('data-nodetype');
         var split_char = ',';
-        if (isIE) split_char = ' ';
+        if (isIE) split_char = ' ';        
         var l = p.attr('transform').slice(10, -1).split(split_char);
-        l = [(parseFloat(l[0]) + 40) * cScale_W + cSpan_W[0], (parseFloat(l[1]) + 40) * cScale_W + cSpan_W[1]];
+        l = [(parseFloat(l[0]) + 40) * cScale + cSpan[0], (parseFloat(l[1]) + 40) * cScale + cSpan[1]];
         var c = d3.select('#ct-ctrlBox').style('top', l[1] + 'px').style('left', l[0] + 'px').classed('no-disp', !1);
         c.select('p.' + faRef.plus).classed('ct-ctrl-inactive', !1);
         c.select('p.' + faRef.edit).classed('ct-ctrl-inactive', !1);
@@ -2989,7 +2993,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
         name = dNodes_W[pi].name;
         //name=p.text();
-        l = [(parseFloat(l[0]) - 20) * cScale_W + cSpan_W[0], (parseFloat(l[1]) + 42) * cScale_W + cSpan_W[1]];
+        l = [(parseFloat(l[0]) - 20) * cScale + cSpan[0], (parseFloat(l[1]) + 42) * cScale + cSpan[1]];
         d3.select('#ct-inpBox').style('top', l[1] + 'px').style('left', l[0] + 'px').classed('no-disp', !1);
         d3.select('#ct-inpPredict').property('value', '');
         d3.select('#ct-inpAct').attr('data-nodeid', null).property('value', name).node().focus();
@@ -3028,7 +3032,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     function moveNode_W(e) {
         e = e || window.event;
         //#886 Unable to rearrange nodes in e2e
-        d3.select('.ct-movable').attr('transform', "translate(" + parseFloat((e.pageX - 14 - cSpan_W[0]) / cScale_W + 2) + "," + parseFloat((e.pageY - 210 - cSpan_W[1]) / cScale_W - 20) + ")");
+        d3.select('.ct-movable').attr('transform', "translate(" + parseFloat((e.pageX - $('#ct-mapSvg').offset().left - cSpan[0]) / cScale + 2) + "," + parseFloat((e.pageY - $('#ct-mapSvg').offset().top - cSpan[1]) / cScale - 20) + ")");
     };
 
     function moveNodeBegin_W(e) {
@@ -3305,7 +3309,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         }
         if (flag == 0) return;
         if (s.classed('no-access')) return;
-        s.classed('no-access', !0);
+        //s.classed('no-access', !0);
         var userInfo = JSON.parse(window.localStorage['_UI']);
         var username = userInfo.username;
         if ($('#selectProjectEtem').val() == null) {
@@ -3362,7 +3366,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 openDialogMindmap("Success", "Data saved successfully");
                 // fix for 1046:  "Create" does not work when we add scenarios from different projects
                 saveFlag_W = true;
-                $('#ct-createAction_W').removeClass('disableButton').removeClass('no-access');
+                //$('#ct-createAction_W').removeClass('disableButton').removeClass('no-access');
+                SaveCreateED('#ct-createAction_W',0,0);
                 //alert(window.localStorage['tabMindMap']);
                 mindmapServices.getModules('endToend', $("#selectProjectEtem").val(), versioning_enabled, '')
                     .then(function(result) {
@@ -3428,7 +3433,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
                     openDialogMindmap("Success", "Structure created successfully");
                     saveFlag_W = false;
-                    $('#ct-createAction_W').addClass('disableButton');
+                    //$('#ct-createAction_W').addClass('disableButton');
+                    SaveCreateED('#ct-createAction_W',1,0);
                 } else {
                     saveFlag_W = false;
                     openDialogMindmap("Success", "Failed to create structure");
@@ -3446,6 +3452,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     };
 
     $('.addScenarios-ete').click(function(e) {
+        SaveCreateED('#ct-createAction_W',1,0);
         //// #817 To select multiple scenarios in e2e (Himanshu)
         $('.selectScenariobg').each(function(i, obj) {
             var text = $(obj).text();
