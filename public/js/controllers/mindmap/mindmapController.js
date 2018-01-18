@@ -24,29 +24,33 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     //Createmap//
 
     //Workflow//
-    var uNix_W, uLix_W, node, link, dNodes_W, dLinks_W, allMMaps_W, temp_W, faRef, mapSaved, zoom_W, cSpan_W, cScale_W, taskAssign;
+    var uNix_W, uLix_W, dNodes_W, dLinks_W, allMMaps_W, temp_W, zoom_W, cSpan_W, cScale_W;
     var cur_module, allMaps_info, activeNode_W, childNode_W;
     //unassignTask is an array to store whose task to be deleted
-    var deletednode_W = [],
-        unassignTask = [];
+    var deletednode_W = [];
     //node_names_tc keep track of testcase names to decide reusability of testcases
-    var node_names_tc = [];
     var saveFlag_W = false;
     //Workflow//
     //-------------------End of Global Variables-----------------------//
 
+        faRef = {
+            "plus": "fa-plus",
+            "edit": "fa-pencil-square-o",
+            "delete": "fa-trash-o"
+        };
+
+
+
     //------------------Createmap.js---------------------//
+
     function loadMindmapData(param) {
+        //param 0: normal , 1: normal with versioning, 2: end to end
         blockUI("Loading...");
-        mindmapServices.populateProjects()
-            .then(function(res) {
+        mindmapServices.populateProjects().then(function(res) {
                 if (res == "Invalid Session") {
                     $rootScope.redirectPage();
                 }
                 if (res.projectId.length > 0) {
-                    if ($("#left-nav-section").is(":visible") == true && $("#right-dependencies-section").is(":visible") == false) {
-                        $("#ct-moduleBox,.tabAssign").addClass("ct-expand-module");
-                    }
                     $(".project-list").empty();
                     for (i = 0; i < (res.projectId.length && res.projectName.length); i++) {
                         $('.project-list').append("<option app-type='" + res.appType[i] + "' data-id='" + res.projectName[i] + "' value='" + res.projectId[i] + "'>" + res.projectName[i] + "</option>");
@@ -72,11 +76,27 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
                             }
                         });
-                    } else {
+                    } else if(param == 0) {
                         loadMindmapData1(param);
+                    }
+                    else if(param == 2){
+                        $('#eteSearchModules').val('');
+                        if ($("img.iconSpaceArrow").hasClass("iconSpaceArrowTop")) {
+                            $("img.iconSpaceArrow").removeClass("iconSpaceArrowTop");
+                        }
+                        loadMindmapData1_W();                        
                     }
 
                     $(".project-list").change(function() {
+                        if(param == 2 ){
+                            selectedProject = $("#selectProjectEtem").val();
+                            //alert($(".project-list").val());
+                            $('#eteSearchModules').val('');
+                            if ($("img.iconSpaceArrow").hasClass("iconSpaceArrowTop")) {
+                                $("img.iconSpaceArrow").removeClass("iconSpaceArrowTop");
+                            }
+                            loadMindmapData1_W();
+                        }
                         //Mindmap clear search box on selecting different project
                         dNodes_c = [] //Copied data should be cleared
                         dLinks_c = [] // on change of projet list
@@ -154,12 +174,6 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             }
         };
         zoom = d3.behavior.zoom().scaleExtent([0.1, 3]).on("zoom", zoomed);
-        faRef = {
-            "plus": "fa-plus",
-            "edit": "fa-pencil-square-o",
-            "delete": "fa-trash-o"
-        };
-
         $('#ctExpandCreate').click(function(e) {
             toggleExpand(e, 'module');
         });
@@ -2052,8 +2066,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     };
 
     function setModuleBoxHeight() {
-        //var lm=d3.select('#ct-moduleBox').classed('ct-open',!0);
         var lm = d3.select('.ct-moduleBoxOptional').classed('ct-open', !0);
+        if($scope.tab == 'tabCreate')
+            var lm=d3.select('#ct-moduleBox').classed('ct-open',!0);
         var h1 = lm.style('height');
         lm.classed('ct-open', !1);
         if (h1 == lm.style('height')) lm.select('.ct-expand').classed('no-disp', !0);
@@ -2570,45 +2585,45 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
     var isIE = /*@cc_on!@*/ false || !!document.documentMode;
 
-    function loadMindmapData_W() {
-        var userInfo = JSON.parse(window.localStorage['_UI']);
-        var userid = userInfo.user_id;
-        mindmapServices.populateProjects().then(function(res) {
-            if ($("#left-nav-section").is(":visible") == true && $("#right-dependencies-section").is(":visible") == false) {
-                $("#ct-moduleBox,.tabAssign").addClass("ct-expand-module");
-            }
-            if ($("#left-nav-section").is(":visible") == true && $("#right-dependencies-section").is(":visible") == false) {
-                $("#ct-moduleBox,.tabAssign").addClass("ct-expand-module");
-            }
+    // function loadMindmapData_W() {
+    //     var userInfo = JSON.parse(window.localStorage['_UI']);
+    //     var userid = userInfo.user_id;
+    //     mindmapServices.populateProjects().then(function(res) {
+    //         if ($("#left-nav-section").is(":visible") == true && $("#right-dependencies-section").is(":visible") == false) {
+    //             $("#ct-moduleBox,.tabAssign").addClass("ct-expand-module");
+    //         }
+    //         if ($("#left-nav-section").is(":visible") == true && $("#right-dependencies-section").is(":visible") == false) {
+    //             $("#ct-moduleBox,.tabAssign").addClass("ct-expand-module");
+    //         }
 
-            // var selectedProject=$(".selectProjectEtem").val();
-            $("#selectProjectEtem").empty();
-            for (i = 0; i < (res.projectId.length && res.projectName.length); i++) {
-                $('#selectProjectEtem').append("<option app-type='" + res.appType[i] + "' data-id='" + res.projectName[i] + "' value='" + res.projectId[i] + "'>" + res.projectName[i] + "</option>");
-            }
+    //         // var selectedProject=$(".selectProjectEtem").val();
+    //         $("#selectProjectEtem").empty();
+    //         for (i = 0; i < (res.projectId.length && res.projectName.length); i++) {
+    //             $('#selectProjectEtem').append("<option app-type='" + res.appType[i] + "' data-id='" + res.projectName[i] + "' value='" + res.projectId[i] + "'>" + res.projectName[i] + "</option>");
+    //         }
 
-            if (selectedProject == null) {
-                selectedProject = res.projectId[0];
-            }
-            $("#selectProjectEtem option[value='" + selectedProject + "']").attr('selected', 'selected');
-            loadMindmapData1_W();
-            $("#selectProjectEtem").change(function() {
-                selectedProject = $("#selectProjectEtem").val();
-                //alert($(".project-list").val());
-                $('#eteSearchModules').val('');
-                if ($("img.iconSpaceArrow").hasClass("iconSpaceArrowTop")) {
-                    $("img.iconSpaceArrow").removeClass("iconSpaceArrowTop");
-                }
-                loadMindmapData1_W();
-            });
-            //Calling the function to restrict the user to give default node names
-            $("#ct-canvas").click(callme);
-        }, function(error) {
-            console.log(error);
-        });
+    //         if (selectedProject == null) {
+    //             selectedProject = res.projectId[0];
+    //         }
+    //         $("#selectProjectEtem option[value='" + selectedProject + "']").attr('selected', 'selected');
+    //         loadMindmapData1_W();
+    //         $("#selectProjectEtem").change(function() {
+    //             selectedProject = $("#selectProjectEtem").val();
+    //             //alert($(".project-list").val());
+    //             $('#eteSearchModules').val('');
+    //             if ($("img.iconSpaceArrow").hasClass("iconSpaceArrowTop")) {
+    //                 $("img.iconSpaceArrow").removeClass("iconSpaceArrowTop");
+    //             }
+    //             loadMindmapData1_W();
+    //         });
+    //         //Calling the function to restrict the user to give default node names
+    //         $("#ct-canvas").click(callme);
+    //     }, function(error) {
+    //         console.log(error);
+    //     });
 
 
-    }
+    // }
 
     function loadMindmapData1_W() {
         blockUI("Loading...");
@@ -2636,11 +2651,6 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             }
         };
         zoom_W = d3.behavior.zoom().scaleExtent([0.1, 3]).on("zoom", zoomed);
-        faRef = {
-            "plus": "fa-plus",
-            "edit": "fa-pencil-square-o",
-            "delete": "fa-trash-o"
-        };
         $("#ctExpandCreate").click(function(e) {
             if ($(".ct-node:visible").length > 6) {
                 toggleExpand(e, 'module');
@@ -2678,6 +2688,56 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 node.append('img').attr('class', 'ct-nodeIcon ' + class_name).attr('src', src_image).attr('alt', 'Module').attr('aria-hidden', true);
                 node.append('span').attr('class', 'ct-nodeLabel modulename').html(t);
             });
+
+
+            $('.moduleContainer').click(function(e) {
+                if ($($(this).children()[0]).hasClass('eteMbox')) {
+                    var som = 'Module Name: ' + $(this)[0].title;
+                    if (som.length > 31)
+                        $('.endtoend-modules-right-upper label').text(som.substring(0, 30) + '...');
+                    else
+                        $('.endtoend-modules-right-upper label').text(som);
+                    $('.endtoend-modules-right-upper label').attr('title', som.substring(13))
+                } else {
+                    $('.endtoend-modules-right-upper label').attr('title', '')
+                    $('.endtoend-modules-right-upper label').text('Scenarios');
+                }
+
+                // #894: Add button disabled by default
+                $('.addScenarios-ete').addClass('disableButton');
+                //#821 UI issues in e2e
+                $('#eteSearchScenarios').val("");
+
+                var container = $("#eteScenarioContainer");
+
+                var id = d3.select(this).attr('data-mapid');
+                var moduleid = allMaps_info[id].id_n;
+                if (allMaps_info[id].type == "modules_endtoend") {
+                    return;
+                }
+                mindmapServices.populateScenarios(moduleid).then(function(result) {
+                    container.empty();
+                    result.forEach(function(row) {
+                        container.append("<span class='eteScenrios' data-scenarioId='" + row.testScenarioID_c + "' title='" + row.testScenarioName + "'>" + row.testScenarioName + "</span>")
+                    });
+                    // #817 To select multiple scenarios in e2e (Himanshu)
+                    $('.eteScenrios').click(function() {
+                        $(this).toggleClass('selectScenariobg');
+                        var classflag = false;
+                        d3.select('.addScenarios-ete').classed('disableButton', !0);
+                        $.each($('.eteScenrios'), function() {
+                            if ($(this).hasClass('selectScenariobg')) {
+                                classflag = true;
+                                d3.select('.addScenarios-ete').classed('disableButton', !1);
+                            }
+                        })
+                    })                    
+                }, function(error) {
+                    console.log(error);
+                })
+
+            })
+
             initScroller();
             setModuleBoxHeight_W();
             unblockUI();
@@ -3451,7 +3511,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
     };
 
-    $('.addScenarios-ete').click(function(e) {
+    $scope.addScenariosete = function(e) {
         SaveCreateED('#ct-createAction_W',1,0);
         //// #817 To select multiple scenarios in e2e (Himanshu)
         $('.selectScenariobg').each(function(i, obj) {
@@ -3462,47 +3522,12 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 openDialogMindmap('Error', 'Scenario is not created');
             }
         });
-    })
+    };
 
     $('.createNew-ete').click(function(e) {
         createNewMap_W();
     })
 
-    $('.moduleContainer').click(function(e) {
-        if ($($(this).children()[0]).hasClass('eteMbox')) {
-            var som = 'Module Name: ' + $(this)[0].title;
-            if (som.length > 31)
-                $('.endtoend-modules-right-upper label').text(som.substring(0, 30) + '...');
-            else
-                $('.endtoend-modules-right-upper label').text(som);
-            $('.endtoend-modules-right-upper label').attr('title', som.substring(13))
-        } else {
-            $('.endtoend-modules-right-upper label').attr('title', '')
-            $('.endtoend-modules-right-upper label').text('Scenarios');
-        }
-
-        // #894: Add button disabled by default
-        $('.addScenarios-ete').addClass('disableButton');
-        //#821 UI issues in e2e
-        $('#eteSearchScenarios').val("");
-
-        var container = $("#eteScenarioContainer");
-
-        var id = d3.select(this).attr('data-mapid');
-        var moduleid = allMaps_info[id].id_n;
-        if (allMaps_info[id].type == "modules_endtoend") {
-            return;
-        }
-        mindmapServices.populateScenarios(moduleid).then(function(result) {
-            container.empty();
-            result.forEach(function(row) {
-                container.append("<span class='eteScenrios' data-scenarioId='" + row.testScenarioID_c + "' title='" + row.testScenarioName + "'>" + row.testScenarioName + "</span>")
-            });
-        }, function(error) {
-            console.log(error);
-        })
-
-    })
 
     function setModuleBoxHeight_W() {
         //var lm=d3.select('#ct-moduleBox').classed('ct-open',!0);
@@ -3798,7 +3823,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 $("#ct-main").hide();
                 selectOpt('createImg');
                 collapseSidebars();
-                loadMindmapData_W();
+                //loadMindmapData_W();
+                loadMindmapData(2);
 
             } else {
                 if ($scope.tab == 'tabCreate') {
@@ -3891,38 +3917,20 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         });
     }
 
-    // #817 To select multiple scenarios in e2e (Himanshu)
-    $('.eteScenrios').click(function() {
-        $(this).toggleClass('selectScenariobg');
-        var classflag = false;
-        d3.select('.addScenarios-ete').classed('disableButton', !0);
-        $.each($('.eteScenrios'), function() {
-            if ($(this).hasClass('selectScenariobg')) {
-                classflag = true;
-                d3.select('.addScenarios-ete').classed('disableButton', !1);
-            }
-        })
-    })
-
-    // Search for modules in assign tab of end to end flow (Himanshu)
-    $('#searchModule-assign').keyup(function() {
-        input = document.getElementById("searchModule-assign");
-        filter_elem = input.value.toUpperCase();
-        elems = $('#ct-AssignBox .ct-node');
-        for (i = 0; i < elems.length; i++) {
-            if (elems[i].textContent.toUpperCase().indexOf(filter_elem) > -1) {
-                elems[i].style.display = "";
-            } else {
-                elems[i].style.display = "none";
-            }
-        }
-    });
-
     // Search for modules in create tab (Himanshu)
-    $('#searchModule-create').keyup(function() {
-        input = document.getElementById("searchModule-create");
+    $scope.searchModule = function(tab) {
+        input = document.getElementById(tab);
         filter_elem = input.value.toUpperCase();
-        elems = $('#ct-moduleBox .ct-node');
+        if(tab == 'eteSearchModules')
+            elems = $('.moduleContainer');
+        else if(tab == 'eteSearchScenarios')
+            elems = $('.eteScenrios');
+        else if( tab == 'searchModule-create')
+            elems = $('#ct-moduleBox .ct-node');
+        else if(tab == 'searchModule-assign')
+            elems = $('.ct-nodeBox .ct-node');
+            
+            
         for (i = 0; i < elems.length; i++) {
             if (elems[i].textContent.toUpperCase().indexOf(filter_elem) > -1) {
                 elems[i].style.display = "";
@@ -3930,7 +3938,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 elems[i].style.display = "none";
             }
         }
-    });
+    };
 
 
     function initScroller() {

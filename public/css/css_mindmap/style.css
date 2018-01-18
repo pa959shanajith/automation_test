@@ -241,7 +241,7 @@ p,a,img,text,span,.noselect{-webkit-touch-callout:none;-webkit-user-select:none;
 #ct-moduleBox {left:25px;top:-4px;border-top-color:transparent;border-bottom-color:#333}*/
 #ct-moduleBox.ct-open{height: 260px; /* max-height: 280px; */ overflow: auto;}
 /**Optional for id ct-moduleBox CSS**/
-.ct-moduleBoxOptional{position:absolute;padding:0 10px;top:0px;z-index:100;height:122px;width:83%;background-color:#e6e7e9;border:1px solid#e6e7e9; left: 147px}
+.ct-moduleBoxOptional{position:absolute;padding:0 10px;top:0px;z-index:100;height:34px;width:83%;background-color:#e6e7e9;border:1px solid#e6e7e9; left: 147px}
 .ct-moduleBoxOptional.ct-open{height: 260px; /* max-height: 280px; */ overflow: auto;}
 
 /*For Side bars*/
@@ -267,7 +267,7 @@ p,a,img,text,span,.noselect{-webkit-touch-callout:none;-webkit-user-select:none;
 
 
 /**Optional for id ct-moduleBox CSS**/
-#ct-canvas, #ct-canvasforAssign{position:absolute;margin-top:116px;height:calc(100% - 118px);overflow:hidden;border:1px solid transparent; z-index: -99 !important; width: calc(100% - 10px);}
+#ct-canvas, #ct-canvasforAssign{position:absolute;margin-top:34px;height:calc(100% - 34px);overflow:hidden;border:1px solid transparent; z-index: -99 !important; width: calc(100% - 10px);}
 .ct-canvas-Container{margin-top:139px!important; height:calc(100% - 140px)!important;}
 /*.ct-tileBox{position: relative; display: block; top: 53%; left: 65%; transform: translateX(-50%) translateY(-50%); width: 150px;}*/
 .ct-tileBox
