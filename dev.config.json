@@ -20,6 +20,11 @@
         "timeout": 10000,
         "allowedModules": []
     },
+    "logger": {
+        "console": {
+            "level": "error"
+        }
+    },
     "scripts": {
         "allowedModules": [],
         "timeout": 60000

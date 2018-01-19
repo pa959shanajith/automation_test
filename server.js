@@ -44,12 +44,9 @@ try {
     var redisSessionStore = new redisStore({client: redisSessionClient});
 
     //HTTPS Configuration
-    var certPath = "server/https/";
-    if (process.env.LB_ENABLED == "True") {
-        certPath += "domain_certs/";
-    }
-    var privateKey = fs.readFileSync(certPath+'server.key', 'utf-8');
-    var certificate = fs.readFileSync(certPath+'server.crt', 'utf-8');
+    var uiConfig = require('./server/config/options');
+    var certificate = uiConfig.storageConfig.certificate.cert;
+    var privateKey = uiConfig.storageConfig.certificate.key;
     var credentials = {
         key: privateKey,
         cert: certificate,
@@ -460,8 +457,7 @@ try {
     app.use('/reportServer', reportingApp);
     var jsreport = require('jsreport')({
         express: { app :reportingApp, server: httpsServer },
-        appPath: "/reportServer",
-		logger: { "console": { "transport": "console", "level": "error" } }
+        appPath: "/reportServer"
     });
 
     jsreport.init(function () {
