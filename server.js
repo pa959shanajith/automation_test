@@ -234,7 +234,7 @@ try {
     });
 
     //Test Engineer,Test Lead and Test Manager can access
-    app.get(/^\/(specificreports|home|p_Utility|p_Reports|plugin)$/, function (req, res) {
+    app.get(/^\/(specificreports|mindmap|p_Utility|p_Reports|plugin)$/, function (req, res) {
         //Denied roles
         var roles = ["Admin", "Business Analyst", "Tech Lead"];
         sessionCheck(req, res, roles);
