@@ -45,7 +45,7 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 		$(".bell-icon-div").hide();
 	}
 
-	if ($location.$$path == "/plugin" || $location.$$path == "/p_Weboccular" || $location.$$path == "/p_Dashboard") {
+	if ($location.$$path == "/plugin" || $location.$$path == "/p_Webocular" || $location.$$path == "/p_Dashboard") {
 		$("button.notify-btn").addClass('notify-btn-white');
 
 	}
@@ -68,7 +68,6 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 		}
 			
 		value.count = value.count + 1;
-	
 		if (window.localStorage.notification) {
 			var notificationArr = window.localStorage.notification;
 			notificationArr = JSON.parse(notificationArr);
@@ -111,14 +110,9 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 	}, 500);
 
 	$scope.dropdownMenuButton = function(){
-		var notificationCount = $("#notifications-count").text();
-		$("span.indexCount").each(function() {
-				var text = $(this).text();
-				$(this).attr('class','notify_'+text);
-		});
-		for(var i=0;i<notificationCount;i++)
+		if(window.localStorage.notification)
 		{
-			$(".notify_"+i).parent().children('.txtNotify').addClass('highlightNotification');
+			$scope.notifications = JSON.parse(window.localStorage.notification);
 		}
 		if (!window.localStorage.notification) {
 			$("#notifyBox").removeClass('dropdown-menu');
@@ -132,6 +126,22 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 			readMessages[i].isRead = true;
 		}
 		window.localStorage.notification = JSON.stringify(readMessages);
+		setTimeout(function() {
+			if($(".dropdown-menu").is(":visible") == true)
+			{
+				var notificationCount = parseInt($("#notifications-count").text());
+				$("span.indexCount").each(function() {
+						var text = parseInt($(this).text());
+						$(this).attr('class','notify_'+text);
+				});
+				for(var i=0;i<notificationCount;i++)
+				{
+					$(".notify_"+i).parent().children('.txtNotify').addClass('highlightNotification');
+				}
+			}
+		}, 10);
+		
+	
 	}
 
 	$scope.naviPg = function(){
@@ -229,7 +239,7 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 				if (data != "fail") {
 					//To be removed - Has to come from database
 					var availablePlugins = [];
-					var key = ["ALM", "Auto Gen Path", "Dashboard", "Dead Code Identifier", "ICE", "Mindmap", "Neuron Graphs", "Neuron Graphs 3D", "Oxbow Code Identifier", "Reports", "Weboccular"];
+					var key = ["ALM", "Auto Gen Path", "Dashboard", "Dead Code Identifier", "ICE", "Mindmap", "Neuron Graphs", "Neuron Graphs 3D", "Oxbow Code Identifier", "Reports", "Webocular"];
 					for (i = 0; i < data.plugindetails.length; i++) {
 						availablePlugins.push({
 							"pluginName": key[i],

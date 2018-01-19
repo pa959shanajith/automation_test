@@ -50,9 +50,9 @@ p,a,img,text,span,.noselect{-webkit-touch-callout:none;-webkit-user-select:none;
 
 .node-active{stroke: #555; stroke-width: 4px;}
 
-.link {stroke: #000; stroke-opacity: 0.7;}
+line.link {stroke: #444!important;; stroke-opacity: 0.7!important;}
 
-.link-active {stroke-opacity: 1;stroke-width: 8px!important;}
+line.link-active {stroke-opacity: 1!important;stroke-width: 3px!important;}
 
 .overlay { fill: none; pointer-events: all;}
 

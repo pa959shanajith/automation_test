@@ -14,7 +14,7 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
       }
     });
   }, 10);
-  if(window.localStorage['navigateScreen'] != "p_Weboccular"){
+  if(window.localStorage['navigateScreen'] != "p_Webocular"){
 		window.location.href = "/";
 	}
     //Task Listing
@@ -23,17 +23,17 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
     return "Data will be lost if you leave the page, are you sure?";
   };
   function openDialog(title, body){
-    $("#WebCrawlerGlobalModal").find('.modal-title').text(title);
-    $("#WebCrawlerGlobalModal").find('.modal-body p').text(body).css('color','black');
-    $("#WebCrawlerGlobalModal").modal("show");
+    $("#WebocularGlobalModal").find('.modal-title').text(title);
+    $("#WebocularGlobalModal").find('.modal-body p').text(body).css('color','black');
+    $("#WebocularGlobalModal").modal("show");
     setTimeout(function(){
-      $("#WebCrawlerGlobalModal").find('.btn-accept').focus();
+      $("#WebocularGlobalModal").find('.btn-accept').focus();
     }, 300);
   }
 
   socket.on('ICEnotAvailable', function () {
     unblockUI();
-		openDialog("Weboccular Screen", "ICE Engine is not available. Please run the batch file and connect to the Server.");
+		openDialog("Webocular Screen", "ICE Engine is not available. Please run the batch file and connect to the Server.");
 	});
 
   var start = false;  // Flag to start the removal of dots from the dom
@@ -45,7 +45,7 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
   $scope.enableGenerate = false;
   $scope.selectedAgent = "chrome";
   $scope.url = "http://";
-  $scope.showWeboccularHome = function(){
+  $scope.showWebocularHome = function(){
     if (!$scope.enableGenerate)
     return;
     var myNode = document.getElementById("report-canvas");
@@ -113,7 +113,7 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
           $scope.hideBaseContent = { message: 'false' };
           // Display the progress canvas after clearing all dots.
           $('#progress-canvas').hide();
-          openDialog("Weboccular Screen", "ICE Engine is not available. Please run the batch file and connect to the Server.");
+          openDialog("Webocular Screen", "ICE Engine is not available. Please run the batch file and connect to the Server.");
           return false;
         }else if(data == "Invalid Session"){
           $rootScope.redirectPage();
@@ -121,14 +121,14 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
           $scope.hideBaseContent = { message: 'false' };
           // Display the progress canvas after clearing all dots.
           $('#progress-canvas').hide();
-          openDialog("Weboccular Screen", "ICE Engine is not available. Please run the batch file and connect to the Server.");
+          openDialog("Webocular Screen", "ICE Engine is not available. Please run the batch file and connect to the Server.");
           return false;
         }
         else if(data == "scheduleModeOn")
         {
           $scope.hideBaseContent = { message: 'false' };
           $('#progress-canvas').hide();
-          openDialog("Weboccular Screen", "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.");
+          openDialog("Webocular Screen", "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.");
           return false;
         }
       }, function(err){

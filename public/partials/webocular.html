@@ -25,13 +25,13 @@
 	<div id="middle-content-section">
 		<!--Task Name-->
 			<div id="page-taskName">
-				<span style="cursor:pointer" ng-click="showWeboccularHome()">Webocular</span>
+				<span style="cursor:pointer" ng-click="showWebocularHome()">Webocular</span>
 			</div>
 			<!--Task Name-->
 			<!-- Generate DIV -->
 		<div ng-hide="hideBaseContent.message == 'true'">
 			<div class="url-div">
-				<form name="weboccular_form">
+				<form name="webocular_form">
 				<span><b>URL </b> </span>
 				<input name="urlInput" type="url" ng-model="url" class="urlInput" placeholder="Enter URL" required>
 					<!--<span>Screen Capture</span>
@@ -44,8 +44,8 @@
 			<div>
 				<span><b>Levels</b></span>
 				<input  id="level-slider" ng-model="level" data-slider-id='ex1Slider' type="text" data-slider-min="0" data-slider-max="20" data-slider-step="1" data-slider-value="4"/>
-				<button ng-if="!weboccular_form.urlInput.$valid" disabled class="btn btn-sm btn-crawl theme" ng-click="executeGo()">Go</button>
-				<button ng-if="weboccular_form.urlInput.$valid" class="btn btn-sm btn-crawl theme" ng-click="executeGo()">Go</button>
+				<button ng-if="!webocular_form.urlInput.$valid" disabled class="btn btn-sm btn-crawl theme" ng-click="executeGo()">Go</button>
+				<button ng-if="webocular_form.urlInput.$valid" class="btn btn-sm btn-crawl theme" ng-click="executeGo()">Go</button>
 				<button ng-if="enableGenerate"  class="btn btn-md pull-right pairwise-GenBtn" ng-click="showReport()" title="Show Report">View Report</button>
 
 			</div>
@@ -139,48 +139,7 @@
 		<!--Images Blocks-->
 
 		<!--Images Blocks-->
-		<div class="thumbnail thumbnail-custom thumbnail-custom-wiki">
-        	<a class="slide_popup slide_assist" href="#"  title="Assist">
-          		<img class="thumb-ic" src="imgs/ic-assist.png" alt="Assist">
-          		<div class="caption">
-            		<p>Assist</p>
-          		</div>
-        	</a>
-        	<!--Popup-->
-			<div id="assistWindow" class="assistWrap">
-				<h4 class="h4-custom h4-custom-assist">
-					<span class="assist-left pull-left"> <img
-						src="imgs/ic-message.png" />Assist
-					</span> <span class="assist-right pull-right"> <img
-						src="imgs/ic-up.png" class="animateAssistUp" style="margin-right: 10px" /> <img
-						src="imgs/ic-close.png" class="animateAssistClose" />
-					</span>
-				</h4>
-				<div class="assistContent">
-					<!-- Chat Container -->
-					<div class="chatContainer scrollbar-inner scrollbar-chatArea chatArea">
-						<ul class="chatList">
-							<li>Choose from the available browser icons from the action bar</li>
-							<li>Enter the URL of the AUT (Application under test)</li>
-							<li>Click on one of the options available in the Scrape Options
-								window</li>
-							<li>Identify the required objects</li>
-							<li>Rename the objects as per the naming convention</li>
-							<li>Click on the save button in the work area</li>
-							<li>Click on submit to complete task.</li>
-						</ul>
-					</div>
-
-					<div class="chatContainer">
-						<textarea rows="3" cols="" class="chatTextArea form-control"
-							placeholder="Ask Prof.J"></textarea>
-						<button class="btn btn-md pull-right">Send</button>
-					</div>
-					<!-- Chat Container -->
-				</div>
-			</div>
-			<!--Popup-->
-      	</div>
+		<chatbot chatbot></chatbot>
 		<!--Images Blocks-->
 	</div>
 	<!--Right Panel-->
@@ -193,7 +152,7 @@
 
 
 <!-- Global Popup -->
-<div class="modal fade" id="WebCrawlerGlobalModal" role="dialog" data-keyboard="false" data-backdrop="static">
+<div class="modal fade" id="WebocularGlobalModal" role="dialog" data-keyboard="false" data-backdrop="static">
 	<div class="modal-dialog modal-sm">
 		<div class="modal-content">
 			<div class="modal-header">
