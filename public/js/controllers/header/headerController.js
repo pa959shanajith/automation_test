@@ -45,7 +45,7 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 		$(".bell-icon-div").hide();
 	}
 
-	if ($location.$$path == "/plugin" || $location.$$path == "/p_Weboccular" || $location.$$path == "/p_Dashboard") {
+	if ($location.$$path == "/plugin" || $location.$$path == "/p_Webocular" || $location.$$path == "/p_Dashboard") {
 		$("button.notify-btn").addClass('notify-btn-white');
 
 	}
@@ -239,7 +239,7 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 				if (data != "fail") {
 					//To be removed - Has to come from database
 					var availablePlugins = [];
-					var key = ["ALM", "Auto Gen Path", "Dashboard", "Dead Code Identifier", "ICE", "Mindmap", "Neuron Graphs", "Neuron Graphs 3D", "Oxbow Code Identifier", "Reports", "Weboccular"];
+					var key = ["ALM", "Auto Gen Path", "Dashboard", "Dead Code Identifier", "ICE", "Mindmap", "Neuron Graphs", "Neuron Graphs 3D", "Oxbow Code Identifier", "Reports", "Webocular"];
 					for (i = 0; i < data.plugindetails.length; i++) {
 						availablePlugins.push({
 							"pluginName": key[i],

@@ -25,13 +25,13 @@
 	<div id="middle-content-section">
 		<!--Task Name-->
 			<div id="page-taskName">
-				<span style="cursor:pointer" ng-click="showWeboccularHome()">Webocular</span>
+				<span style="cursor:pointer" ng-click="showWebocularHome()">Webocular</span>
 			</div>
 			<!--Task Name-->
 			<!-- Generate DIV -->
 		<div ng-hide="hideBaseContent.message == 'true'">
 			<div class="url-div">
-				<form name="weboccular_form">
+				<form name="webocular_form">
 				<span><b>URL </b> </span>
 				<input name="urlInput" type="url" ng-model="url" class="urlInput" placeholder="Enter URL" required>
 					<!--<span>Screen Capture</span>
@@ -44,8 +44,8 @@
 			<div>
 				<span><b>Levels</b></span>
 				<input  id="level-slider" ng-model="level" data-slider-id='ex1Slider' type="text" data-slider-min="0" data-slider-max="20" data-slider-step="1" data-slider-value="4"/>
-				<button ng-if="!weboccular_form.urlInput.$valid" disabled class="btn btn-sm btn-crawl theme" ng-click="executeGo()">Go</button>
-				<button ng-if="weboccular_form.urlInput.$valid" class="btn btn-sm btn-crawl theme" ng-click="executeGo()">Go</button>
+				<button ng-if="!webocular_form.urlInput.$valid" disabled class="btn btn-sm btn-crawl theme" ng-click="executeGo()">Go</button>
+				<button ng-if="webocular_form.urlInput.$valid" class="btn btn-sm btn-crawl theme" ng-click="executeGo()">Go</button>
 				<button ng-if="enableGenerate"  class="btn btn-md pull-right pairwise-GenBtn" ng-click="showReport()" title="Show Report">View Report</button>
 
 			</div>
@@ -193,7 +193,7 @@
 
 
 <!-- Global Popup -->
-<div class="modal fade" id="WebCrawlerGlobalModal" role="dialog" data-keyboard="false" data-backdrop="static">
+<div class="modal fade" id="WebocularGlobalModal" role="dialog" data-keyboard="false" data-backdrop="static">
 	<div class="modal-dialog modal-sm">
 		<div class="modal-content">
 			<div class="modal-header">

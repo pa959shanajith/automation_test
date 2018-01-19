@@ -69,7 +69,7 @@ mySPA.config(function($routeProvider, $locationProvider,$provide) {
 			 	templateUrl: 'partials/home_mindmap.html',
 			 	controller: 'mindmapController'
 			})
-			.when('/p_Weboccular',{
+			.when('/p_Webocular',{
 				templateUrl: 'partials/webocular.html',
 				controller: 'webocularController'
 			})
