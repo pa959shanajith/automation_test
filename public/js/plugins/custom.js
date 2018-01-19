@@ -344,7 +344,7 @@ $(document).ready(function() {
 
 //Innerpages Tasks Implementation
 function loadUserTasks(){
-	if(window.location.pathname != "/home"){
+	if(window.location.pathname != '/mindmap'){
 		$("#mindmapCSS1, #mindmapCSS2").remove()
 	}
 	else if(window.location.pathname != "/neuronGraphs2D"){

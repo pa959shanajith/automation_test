@@ -165,7 +165,7 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 		window.localStorage["_VP"] = true;
 		if(name == "p_Mindmap"){
 			//window.localStorage["_VM"] = true;
-			name = 'home'
+			name = 'mindmap'
 		}
 		else if(name == "p_NeuronGraphs") name = 'neuronGraphs';
 		else if(name == "p_NeuronGraphs3D") name = 'neuronGraphs3D';

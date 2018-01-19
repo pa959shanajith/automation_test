@@ -2276,7 +2276,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
     //Dialog used through out mindmap
     function openDialogMindmap(title, body) {
-        if (window.location.pathname == '/home' || window.location.pathname == '/version') {
+        if (window.location.pathname == '/mindmap' || window.location.pathname == '/version') {
             $("#mindmapGlobalDialog").find('.modal-title').text(title);
             $("#mindmapGlobalDialog").find('.modal-body p').text(body).css('color', 'black');
             $("#mindmapGlobalDialog").modal("show");

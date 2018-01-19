@@ -141,7 +141,7 @@ try {
                         logger.error("Error occured in userAccess_Nineteen68");
                         res.send("Invalid Session");
                     } else {
-                        if(req.url == '/home' && req.session.defaultRole == 'Test Engineer')
+                        if(req.url == '/mindmap' && req.session.defaultRole == 'Test Engineer')
                         {
                             result.rows = "True";
                         }
