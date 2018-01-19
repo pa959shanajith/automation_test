@@ -28,10 +28,10 @@ exports.getTopMatches_ProfJ = function getTopMatches(req, res) {
                                 // results is an array consisting of messages collected during execution 
                                 // console.log('results: %j', results);
                                 // choices = results[2];
-								console.log("Hi i am server of profj");
+								//console.log("Hi i am server of profj");
                                 if(results.rows != "fail"){
                                     choices = results.rows;
-                                    console.log(choices);
+                                    //console.log(choices);
                                     res.send(choices);
                                 }else{
                                     res.send("fail");
@@ -62,7 +62,7 @@ exports.updateFrequency_ProfJ = function(req, res) {
                         headers:{'Content-Type': 'plain/text'}
                     };
 						// PythonShell.run("AES_encryption.py", options, function (err, results) {
-					console.log("Hi I am inside update freq service")
+					//console.log("Hi I am inside update freq service")
                     client.post(epurl+"chatbot/updateFrequency_ProfJ",args,
                         function (results, response) {
                         // if (err){
@@ -73,10 +73,10 @@ exports.updateFrequency_ProfJ = function(req, res) {
                                 // results is an array consisting of messages collected during execution 
                                 // console.log('results: %j', results);
                                 // choices = results[2];
-								console.log("Hi i am server of profj");
+								//console.log("Hi i am server of profj");
                                 if(results.rows != "fail"){
                                     choices = results.rows;
-                                    console.log(choices);
+                                   // console.log(choices);
                                     res.send(choices);
                                 }else{
                                     res.send("fail");

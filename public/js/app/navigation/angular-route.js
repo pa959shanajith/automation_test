@@ -12,6 +12,9 @@ mySPA.config(function($routeProvider, $locationProvider,$provide) {
 			{
 				templateUrl: 'partials/header.html'
 			})
+			.when('/chatbot', {
+				templateUrl: 'partials/chatbot.html'
+			})
 			.when('/footer',
 			{
 				templateUrl: 'partials/footer.html',

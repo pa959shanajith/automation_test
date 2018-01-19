@@ -2105,6 +2105,8 @@ input[disabled]{
 	/*float: right;*/
     margin-top: 5px;
     display: -webkit-inline-box;
+    font-family: 'LatoWeb';
+    font-size: 15px;
 
 
 	/*&:before {
@@ -2138,6 +2140,8 @@ input[disabled]{
 	background:#E5E5EA;
 	border-radius:25px;
 	color: black;
+    font-family: 'LatoWeb';
+    font-size: 15px;
   /*float: left;*/
 
     display: -webkit-inline-box;
