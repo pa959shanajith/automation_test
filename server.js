@@ -138,7 +138,7 @@ try {
                         logger.error("Error occured in userAccess_Nineteen68");
                         res.send("Invalid Session");
                     } else {
-                        if(req.url == '/home' && req.session.defaultRole == 'Test Engineer')
+                        if(req.url == '/mindmap' && req.session.defaultRole == 'Test Engineer')
                         {
                             result.rows = "True";
                         }
@@ -231,7 +231,7 @@ try {
     });
 
     //Test Engineer,Test Lead and Test Manager can access
-    app.get(/^\/(specificreports|home|p_Utility|p_Reports|plugin)$/, function (req, res) {
+    app.get(/^\/(specificreports|mindmap|p_Utility|p_Reports|plugin)$/, function (req, res) {
         //Denied roles
         var roles = ["Admin", "Business Analyst", "Tech Lead"];
         sessionCheck(req, res, roles);
@@ -338,7 +338,20 @@ try {
         logger.warn('Versioning is disabled');
     }
 
-    app.post('/home', mindmap.mindmapService);
+    //app.post('/home', mindmap.mindmapService);
+    app.post('/populateProjects', mindmap.populateProjects);
+    app.post('/populateUsers', mindmap.populateUsers);
+    app.post('/checkReuse', mindmap.checkReuse);
+    app.post('/getCRId', mindmap.getCRId);
+    app.post('/getProjectTypeMM_Nineteen68', mindmap.getProjectTypeMM_Nineteen68);
+    app.post('/populateScenarios', mindmap.populateScenarios);
+    app.post('/populateReleases', mindmap.populateReleases);
+    app.post('/populateCycles', mindmap.populateCycles);
+    app.post('/getModules', mindmap.getModules);
+    app.post('/reviewTask', mindmap.reviewTask);
+    app.post('/saveData', mindmap.saveData);
+    app.post('/saveEndtoEndData', mindmap.saveEndtoEndData);
+
     //Login Routes
     app.post('/authenticateUser_Nineteen68', login.authenticateUser_Nineteen68);
     app.post('/authenticateUser_Nineteen68_CI', login.authenticateUser_Nineteen68_CI);

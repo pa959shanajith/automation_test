@@ -67,7 +67,7 @@ mySPA.config(function($routeProvider, $locationProvider,$provide) {
 			.when('/specificreports',{
 				controller:	'reportsController'
 			})
-			.when('/home',
+			.when('/mindmap',
 			{
 			 	templateUrl: 'partials/home_mindmap.html',
 			 	controller: 'mindmapController'

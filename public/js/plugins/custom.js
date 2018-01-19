@@ -344,7 +344,7 @@ $(document).ready(function() {
 
 //Innerpages Tasks Implementation
 function loadUserTasks(){
-	if(window.location.pathname != "/home"){
+	if(window.location.pathname != '/mindmap'){
 		$("#mindmapCSS1, #mindmapCSS2").remove()
 	}
 	else if(window.location.pathname != "/neuronGraphs"){
@@ -454,3 +454,18 @@ $(document).on('keypress', '.singleInvitedComma', function(e){
 		return true;
 	}
 })
+
+function getCookie(cname) {
+    var name = cname + "=";
+    var ca = document.cookie.split(';');
+    for (var i = 0; i < ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0) == ' ') {
+            c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length);
+        }
+    }
+    return "";
+}
