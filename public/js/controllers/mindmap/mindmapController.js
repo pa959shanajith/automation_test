@@ -3642,7 +3642,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     //--------------------Controller logic-------------------------//
     $("body").css("background", "#eee");
     $("head").append('<link id="mindmapCSS1" rel="stylesheet" type="text/css" href="css/css_mindmap/style.css" /><link id="mindmapCSS2" rel="stylesheet" type="text/css" href="fonts/font-awesome_mindmap/css/font-awesome.min.css" />')
-    if (window.localStorage['navigateScreen'] != "home") {
+    if (window.localStorage['navigateScreen'] != "mindmap") {
         $rootScope.redirectPage();
     }
     var versioningEnabled = false;
