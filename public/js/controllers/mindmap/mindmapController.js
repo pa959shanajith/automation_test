@@ -961,7 +961,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                             $('#ct-assignedTo').append("<option data-id='" + res.userRoles[i] + "' value='" + res.r_ids[i] + "'>" + res.userRoles[i] + "</option>");
                         }
                         $("#ct-assignedTo option[value='" + tObj.at + "']").attr('selected', 'selected');
-
+                        c.classed('no-disp', !1);
                     }, function(error) {
                         console.log("Error:::::::::::::", error);
                         unblockUI();
@@ -1069,6 +1069,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     }, function(error) {
                         console.log("Error in populating Cycles");
                     })
+                    //display assign box after populating data
                 }, function(error) {
                     console.log("Error in populating Releases");
                 })
@@ -1091,7 +1092,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         l = [(parseFloat(l[0]) + 50) * cScale + cSpan[0], (parseFloat(l[1]) - 20) * cScale + cSpan[1]];
         if (canvSize[0] - l[0] < cSize[0]) l[0] = l[0] - cSize[0] - 60 * cScale;
         if (canvSize[1] - l[1] < cSize[1]) l[1] = canvSize[1] - cSize[1] - 10 * cScale;
-        c.style('top', l[1] + 'px').style('left', l[0] + 'px').classed('no-disp', !1);
+        c.style('top', l[1] + 'px').style('left', l[0] + 'px');
 
         if (canvSize[1] - 25 < cSize[1]) {
             c.style('height', canvSize[1] - 25 + 'px').style('top', '0px').style('overflow', 'scroll');
@@ -1102,8 +1103,6 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             l[1] = 0;
         else if (l[1] > canvSize[1] - cSize[1])
             l[1] = (canvSize[1] - cSize[1]) - 150;
-
-        c.style('top', l[1] + 'px').style('left', l[0] + 'px').classed('no-disp', !1);
 
         //condition to disable unassign task button
         setTimeout(function() {
@@ -1879,6 +1878,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         }
 
         if (s.attr('id') == 'ct-saveAction') {
+            blockUI('Saving Flow! Please wait...');
             flag = 10;
             d3.select('#ct-inpBox').classed('no-disp', !0);
             saveFlag = true;
@@ -1892,6 +1892,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 return;
             }
             flag = 20;
+            blockUI('Creating Structure! Please wait...');
             d3.select('#ct-inpBox').classed('no-disp', !0);
 
         }
@@ -1912,6 +1913,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
         mindmapServices.saveData(assignedTo, flag, window.localStorage['_SR'], from_v, to_v, cur_module, mapData, deletednode, unassignTask,
             $('.project-list').val(), $('#ct-assignRel').val(), $('#ct-assignCyc').val(), versioning_enabled).then(function(result) {
+            unblockUI();
             if (flag == 10) {
                 var res = result;
                 mapSaved = !0;
@@ -2013,6 +2015,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 //$('#Mindmap_create').modal('show');
             }
         }, function(error) {
+            unblockUI();
             console.log(error);
             //$('#ct-createAction').addClass('disableButton')
             SaveCreateED('#ct-createAction',1,0);
@@ -2689,8 +2692,11 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 node.append('span').attr('class', 'ct-nodeLabel modulename').html(t);
             });
 
-
             $('.moduleContainer').click(function(e) {
+                if($('#ct-mindMap').length==0){ // if no map is loaded 
+                    openDialogMindmap('Error','First, Please select an end to end module or create a new one!');
+                    return;
+                }
                 if ($($(this).children()[0]).hasClass('eteMbox')) {
                     var som = 'Module Name: ' + $(this)[0].title;
                     if (som.length > 31)
@@ -2845,7 +2851,6 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     };
 
     function loadScenarios(e) {
-
         if (!d3.select('#ct-mindMap')[0][0] || confirm('Unsaved work will be lost if you continue.\nContinue?')) {
             d3.select('.addScenarios-ete').classed('disableButton', !0);
             saveFlag_W = false;
@@ -3353,6 +3358,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         error = treeIterator_W(mapData, dNodes_W[0], error);
 
         if (s.attr('id') == 'ct-saveAction_W') {
+            blockUI('Saving flow! Please wait...');
             flag = 10;
             d3.select('#ct-inpBox').classed('no-disp', !0);
 
@@ -3364,6 +3370,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 //$('#Mindmap_error').modal('show');
                 return;
             }
+            blockUI('Creating structure! Please wait...');
             d3.select('#ct-inpBox').classed('no-disp', !0);
 
         }
@@ -3373,6 +3380,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         var userInfo = JSON.parse(window.localStorage['_UI']);
         var username = userInfo.username;
         if ($('#selectProjectEtem').val() == null) {
+            unblockUI();
             openDialogMindmap('Error', 'No projects is assigned to User');
             return !1;
         }
@@ -3387,10 +3395,12 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         });
 
         if (selectedProject != cur_project) {
+            unblockUI();
             openDialogMindmap('Error', "Module belongs to project: '" + $("#selectProjectEtem option[value='" + selectedProject + "']").text() + "' Please go back to the same project and Save");
             return;
         }
         if (mapData.length <= 1 && flag == 20) {
+            unblockUI();
             openDialogMindmap('Error', 'Incomplete flow! Moudles->Scenarios flow should be present');
             s.classed('no-access', !1);
             return;
@@ -3399,6 +3409,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         console.log("::::MAPDATA::::: ", mapData);
 
         mindmapServices.saveEndtoEndData(username, flag, window.localStorage['_SR'], from_v, to_v, 'endToend', mapData, deletednode_W, unassignTask, selectedProject, $('#ct-assignRel').val(), $('#ct-assignCyc').val()).then(function(result) {
+            unblockUI();
             var res = result;
             if (flag == 10) {
 
@@ -3423,6 +3434,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 treeBuilder_W(allMaps_info[mid]);
                 unassignTask = [];
                 //var selectedTab = window.localStorage['tabMindMap']
+                unblockUI();
                 openDialogMindmap("Success", "Data saved successfully");
                 // fix for 1046:  "Create" does not work when we add scenarios from different projects
                 saveFlag_W = true;
@@ -3490,7 +3502,6 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                         else d.id_c = res[d.id_n];
 
                     });
-
                     openDialogMindmap("Success", "Structure created successfully");
                     saveFlag_W = false;
                     //$('#ct-createAction_W').addClass('disableButton');
@@ -3502,6 +3513,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 //$('#Mindmap_create').modal('show');
             }
         }, function(error) {
+            unblockUI();
             if (error == 'DuplicateModules') {
                 openDialogMindmap('Save error', 'Module names cannot be duplicate');
             } else {
@@ -3524,9 +3536,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         });
     };
 
-    $('.createNew-ete').click(function(e) {
+    $scope.createNewMap_W = function(e) {
         createNewMap_W();
-    })
+    };
 
 
     function setModuleBoxHeight_W() {
@@ -4015,7 +4027,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     };
 
     $scope.createNewMap = function() {
-        if (confirm('Unsaved work will be lost if you continue.\nContinue?')) {
+        if ($('.ct-svgTile').length == 0 && confirm('Unsaved work will be lost if you continue.\nContinue?')) {
             $('.nodeBoxSelected').removeClass('nodeBoxSelected');
             createNewMap();
         }

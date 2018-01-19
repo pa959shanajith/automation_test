@@ -62,11 +62,11 @@
                 <div class="endtoend-modules-right endtoend-module-upperSection">
                     <div class="endtoend-modules-right-upper">
                         <label class="makeElementFloatleft">Scenarios</label>
-                        <input type="text" class="makeElementFloatleft" id="eteSearchScenarios"/><img alt="Search Icon" class="searchModuleimg" src="imgs/ic-search-icon.png"   ng-keyup = "searchModule('eteSearchScenarios')">
+                        <input type="text" class="makeElementFloatleft" id="eteSearchScenarios" placeholder="search scenarios"  ng-keyup = "searchModule('eteSearchScenarios')"/><img alt="Search Icon" class="searchModuleimg" src="imgs/ic-search-icon.png" >
                     </div>
                     <div class="endtoend-modules-right-lower makeElementFloatleft">
                         <div class="scrollbar-inner endtoend-modules-rightfirst-lower makeElementFloatleft" id="eteScenarioContainer"></div>
-                        <button class="createNew-ete">CreateNew</button>
+                        <button class="createNew-ete" ng-click="createNewMap_W()">CreateNew</button>
                         <button class="addScenarios-ete" ng-click ="addScenariosete()" >Add</button>
                     </div>
                 </div>
