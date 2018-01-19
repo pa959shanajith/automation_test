@@ -455,7 +455,7 @@ exports.saveData=function(req,res){
 			var removeTask=inputs.unassignTask;
 			var sendNotify=inputs.sendNotify;
 
-			for(var i=0;i<Object.values(sendNotify).length;i++) {
+			/*for(var i=0;i<Object.values(sendNotify).length;i++) {
 				var taskAssignment = 'assigned';
 				var taskName = data[i].name;
 				var soc = myserver.socketMapNotify[Object.values(sendNotify)[i]];
@@ -473,7 +473,7 @@ exports.saveData=function(req,res){
 				assignedTasksNotification.isRead = false;
 				assignedTasksNotification.count = count;
 				soc.emit("notify",assignedTasksNotification);
-			}
+			}*/
 			
 			//TO support task deletion
 			
