@@ -1,5 +1,5 @@
 var appType;var releaseName;var cycleName;var testSuiteName;
-mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeout','$location','ExecutionService','cfpLoadingBar', 'socket', function ($scope, $rootScope, $http, $timeout, $location, ExecutionService, cfpLoadingBar,socket) {
+mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeout','$location','ExecutionService','mindmapServices','cfpLoadingBar', 'socket', function ($scope, $rootScope, $http, $timeout, $location, ExecutionService, mindmapServices,cfpLoadingBar,socket) {
 	cfpLoadingBar.start();
 	var getEachScenario = [] //Contains Each RowData of Scenarios
 	var userinfo = {} //Contains Userinfo
@@ -672,6 +672,30 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 	// }
 	// //Submit Task Function
 
+	 $scope.submit_task=function(action) {
+        var taskinfo = JSON.parse(window.localStorage['_CT']);
+        var taskid = taskinfo.subTaskId;
+        var taskstatus = taskinfo.status;
+        var version = taskinfo.versionnumber;
+        var batchTaskIDs = taskinfo.batchTaskIDs;
+		var projectId=taskinfo.projectId;
+        if (action != undefined && action == 'reassign') {
+            taskstatus = action;
+        }
+        mindmapServices.reviewTask(projectId,taskid,taskstatus,version,batchTaskIDs).then(function(result){
+        		if (result == 'fail') {
+                    openDialogExe("Task Submission Error", "Reviewer is not assigned !",true)
+                } else if (taskstatus == 'reassign') {
+                    openDialogExe("Task Reassignment Success", "Task Reassigned scucessfully!",true)
+                } else if (taskstatus == 'review') {
+                    openDialogExe("Task Completion Success", "Task Approved scucessfully!",true)
+                } else {
+                    openDialogExe("Task Submission Success", "Task Submitted scucessfully!",true)
+                }
+        },function(error){
+            console.log(error);
+        })
+    }
 
 	$scope.submitTaskExecution = function(action){
 		$("#submitTasksExecution").modal("show")
@@ -679,7 +703,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 		if(action=='reassign'){
 			$("#submitTasksExecution").find('.modal-title').text('Reassign Task');
 			$("#submitTasksExecution").find('.modal-body p').text('Are you sure you want to reassign the task ?')
-			$("#submitTasksExecution").find('.modal-footer button')[0].setAttribute('onclick',"submit_task('reassign')")
+			$("#submitTasksExecution").find('.modal-footer button')[0].setAttribute('ng-click',"submit_task('reassign')")
 		}
 		else
         {
@@ -729,17 +753,27 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 	//Select Browser Function
 
 	$("#tableActionButtons, .executionTableDnd").delay(500).animate({opacity:"1"}, 500)
+
+	 
 }]);
 
 function loadLocationDetails(scenarioName, scenarioId){
 	angular.element(document.getElementById("left-nav-section")).scope().loadLocationDetails(scenarioName, scenarioId);
 }
 
-function openDialogExe(title, body){
-	$("#executeGlobalModal").find('.modal-title').text(title);
-    $("#executeGlobalModal").find('.modal-body p').text(body).css('color','black');
-	$("#executeGlobalModal").modal("show");
-	setTimeout(function(){
-		$("#executeGlobalModal").find('.btn-accept').focus();
-	}, 300);
+function openDialogExe(title, body,submitflag){
+	if(submitflag==undefined){
+		$("#executeGlobalModal").find('.modal-title').text(title);
+		$("#executeGlobalModal").find('.modal-body p').text(body).css('color','black');
+		$("#executeGlobalModal").modal("show");
+		setTimeout(function(){
+			$("#executeGlobalModal").find('.btn-accept').focus();
+		}, 300);
+	}
+	else{
+		 $("#globalTaskSubmit").find('.modal-title').text(title);
+            $("#globalTaskSubmit").find('.modal-body p').text(body);
+            $("#globalTaskSubmit").modal("show");
+	}
 }
+

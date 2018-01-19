@@ -2019,7 +2019,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             console.log(error);
             //$('#ct-createAction').addClass('disableButton')
             SaveCreateED('#ct-createAction',1,0);
-            if (result.indexOf('Schema.ConstraintValidationFailed') > -1) {
+            if (error.indexOf('Schema.ConstraintValidationFailed') > -1) {
                 openDialogMindmap('Save error', 'Module names cannot be duplicate');
             } else {
                 openDialogMindmap('Save error', 'Failed to save data');

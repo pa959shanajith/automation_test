@@ -36,7 +36,7 @@ var copiedViewstring = false;
 var getIndexOfDeletedObjects = [];
 var newScrapedData;
 window.localStorage['disableEditing'] = "false";
-mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$location', '$timeout', 'DesignServices', 'cfpLoadingBar', '$window', 'socket', function($scope, $rootScope, $http, $location, $timeout, DesignServices, cfpLoadingBar, $window, socket) {
+mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$location', '$timeout', 'DesignServices', 'mindmapServices','cfpLoadingBar', '$window', 'socket', function($scope, $rootScope, $http, $location, $timeout, DesignServices, mindmapServices,cfpLoadingBar, $window, socket) {
     $("body").css("background", "#eee");
     $("#tableActionButtons, .designTableDnd").delay(500).animate({
         opacity: "1"
@@ -221,7 +221,7 @@ console.log("screenName:", screenName);
 		if(action=='reassign'){
             $("#submitTasksScreen").find('.modal-title').text('Reassign Task');
 			$("#submitTasksScreen").find('.modal-body p').text('Are you sure you want to reassign the task ?')
-			$("#submitTasksScreen").find('.modal-footer button')[0].setAttribute('onclick',"submit_task('reassign')")
+			$("#submitTasksScreen").find('.modal-footer button')[0].setAttribute('ng-click',"submit_task('reassign')")
         }
         if(action == 'submit'  &&  $(".submitTaskBtn:visible").text() == 'Approve' )
         {
@@ -242,7 +242,7 @@ console.log("screenName:", screenName);
 		if(action=='reassign'){
             $("#submitTasksTestCase").find('.modal-title').text('Reassign Task');
 			$("#submitTasksTestCase").find('.modal-body p').text('Are you sure you want to reassign the task ?')
-			$("#submitTasksTestCase").find('.modal-footer button')[0].setAttribute('onclick',"submit_task('reassign')")
+			$("#submitTasksTestCase").find('.modal-footer button')[0].setAttribute('ng-click',"submit_task('reassign')")
         }
         if(action == 'submit' &&  $(".submitTaskBtn:visible").text() == 'Approve')
         {
@@ -3657,6 +3657,32 @@ console.log("screenName:", screenName);
                 }, function(error) {});
         }
     });
+
+
+      $scope.submit_task=function(action) {
+        var taskinfo = JSON.parse(window.localStorage['_CT']);
+        var taskid = taskinfo.subTaskId;
+        var taskstatus = taskinfo.status;
+        var version = taskinfo.versionnumber;
+        var batchTaskIDs = taskinfo.batchTaskIDs;
+        var projectId=taskinfo.projectId;
+        if (action != undefined && action == 'reassign') {
+            taskstatus = action;
+        }
+        mindmapServices.reviewTask(projectId,taskid,taskstatus,version,batchTaskIDs).then(function(result){
+        if (result == 'fail') {
+                    openDialog("Task Submission Error", "Reviewer is not assigned !",true)
+                } else if (taskstatus == 'reassign') {
+                    openDialog("Task Reassignment Success", "Task Reassigned scucessfully!",true)
+                } else if (taskstatus == 'review') {
+                    openDialog("Task Completion Success", "Task Approved scucessfully!",true)
+                } else {
+                    openDialog("Task Submission Success", "Task Submitted scucessfully!",true)
+                }
+        },function(error){
+            console.log(error);
+        })
+    }
     //Filter Scrape Objects
 }]);
 
@@ -5754,11 +5780,19 @@ function formatXml(xml) {
     return formatted;
 }
 
-function openDialog(title, body) {
-    $("#globalModal").find('.modal-title').text(title);
-    $("#globalModal").find('.modal-body p').text(body).css('color', 'black');
-    $("#globalModal").modal("show");
-    setTimeout(function() {
-        $("#globalModal").find('.btn-default').focus();
-    }, 300);
+function openDialog(title, body,submitflag) {
+    if(submitflag==undefined){
+         $("#globalModal").find('.modal-title').text(title);
+        $("#globalModal").find('.modal-body p').text(body).css('color', 'black');
+        $("#globalModal").modal("show");
+        setTimeout(function() {
+            $("#globalModal").find('.btn-default').focus();
+        }, 300);
+    }else{
+        $("#globalTaskSubmit").find('.modal-title').text(title);
+            $("#globalTaskSubmit").find('.modal-body p').text(body);
+            $("#globalTaskSubmit").modal("show");
+    }
+   
 }
+
