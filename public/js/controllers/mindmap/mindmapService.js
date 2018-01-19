@@ -122,23 +122,17 @@ mySPA.factory('mindmapServices', ['$http','$q', function ($http, $httpProvider, 
     		.then(function (response) { return response.data; },
     				function (response) { return $q.reject(response.data); });
     	},
-		reviewTask: function (assignedTo,writeFlag,userRole,from_v,to_v,cur_module,mapData,deletednode,unassignTask,prjId,relId,cycId){
+		reviewTask: function (projectId,taskId,taskstatus,version,batchTaskIDs){
 					
     		var param = "reviewTask";
     		return $http.post('/reviewTask', {
     			action: param,
-				sendNotify:assignedTo,
-				write:writeFlag,
-				userRole:userRole,
-				vn_from: from_v,
-				vn_to: to_v,
-				tab: cur_module,
-				map: mapData,
-				deletednode: deletednode,
-				unassignTask: unassignTask,
-				prjId: prjId,
-				relId: relId,
-				cycId: cycId
+				prjId:projectId,
+				taskId:taskId,
+				status:taskstatus,
+				versionnumber:version,
+				batchIds:batchTaskIDs
+				
     		})
     		.then(function (response) { return response.data; },
     				function (response) { return $q.reject(response.data); });
