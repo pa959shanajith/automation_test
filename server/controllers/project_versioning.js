@@ -151,16 +151,32 @@ exports.versioning = function (req, res) {
 		else if (d.task == 'writeMap') {
 			logger.info('Inside writemap task of the UI Service versioning')
 			//Assigned Tasks Notification
-			if('socketMapNotify' in myserver && d.data.sendNotify in myserver.socketMapNotify){
-				 var soc = myserver.socketMapNotify[d.data.sendNotify];
-				 var count = 0;
-				 var assignedTasksNotification = {};
-				 	assignedTasksNotification.to = '/plugin';
-					assignedTasksNotification.notifyMsg = "New tasks have been assigned by "+ d.data.user_name+"";
+			//if('socketMapNotify' in myserver && d.data.sendNotify in myserver.socketMapNotify){
+				for(var i=0;i<Object.values(d.data.sendNotify).length;i++)
+				{
+					var taskAssignment = 'assigned';
+					var taskName = d.data.map[i].name;
+					var soc = myserver.socketMapNotify[Object.values(d.data.sendNotify)[i]];
+					var count = 0;
+					var assignedTasksNotification = {};
+					assignedTasksNotification.to = '/plugin';
+					if(d.data.xyz.indexOf(d.data.map[i].oid) >= 0)
+					{
+						taskAssignment = "unassigned";
+					}
+					if(taskAssignment == "unassigned")
+					{
+						assignedTasksNotification.notifyMsg = "Task '"+taskName+"' have been unassigned by "+ d.data.user_name+"";
+					}
+					else{
+						assignedTasksNotification.notifyMsg = "New task '"+taskName+"' have been assigned by "+ d.data.user_name+"";
+					}
+				
 					assignedTasksNotification.isRead = false;
 					assignedTasksNotification.count = count;
 					soc.emit("notify",assignedTasksNotification);
-			}
+				}
+			//}
 			var nData = [], qList = [], idDict = {},nameDict={};
 			var createdOn = new Date().toLocaleString();
 			data = d.data.map;

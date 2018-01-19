@@ -3,7 +3,7 @@ var Client = require("node-rest-client").Client;
 var client = new Client();
 var epurl = "http://"+process.env.NDAC_IP+":"+process.env.NDAC_PORT+"/";
 var async = require('async');
-var jsrclient = require("jsreport-client")("https://127.0.0.1:"+process.env.serverPort+"/reportServer/");
+var jsreportClient = require("jsreport-client");
 var neo4jAPI = require('../controllers/neo4jAPI');
 var logger = require('../../logger');
 
@@ -21,6 +21,7 @@ function isSessionActive(req, res){
     try {
       if(isSessionActive(req, res)){
         logger.info("Connecting to jsreport client from loadDashboard");
+        var jsrclient = jsreportClient("https://" + req.headers.host + "/reportServer/");
         jsrclient.render({
           template: {
             shortid: "ByCt0KGo-",
@@ -280,6 +281,7 @@ function isSessionActive(req, res){
     try {
       if(isSessionActive(req, res)){
         logger.info("Connecting to jsreport client from loadDashboard_2");
+        var jsrclient = jsreportClient("https://" + req.headers.host + "/reportServer/");
         jsrclient.render({
           template: {
             shortid: "rk00qKOn-",

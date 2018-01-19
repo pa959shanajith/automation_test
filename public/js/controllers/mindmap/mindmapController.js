@@ -21,6 +21,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     var CreateEditFlag = false;
     var isIE = /*@cc_on!@*/ false || !!document.documentMode;
     var IncompleteFlowFlag = false;
+	var taskidArr = [], assignedObj = {};
     //Createmap//
 
     //Workflow//
@@ -862,6 +863,19 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         if (errorRelCyc) {
             openDialogMindmap("Task Assignment Error", "Please select Release/Cycle")
         }
+		for (var i = 0; i < taskidArr.length; i++) {
+			if (taskidArr[i].id == dNodes[pi].task.id) {
+				if (dNodes[pi].task.task == "Execute" || dNodes[pi].task.task == "Execute Batch") {
+					assignedObj[dNodes[pi].task.task] = $("#ct-assignedTo option:selected").text();
+				} else if (dNodes[pi].task.task == "Execute Scenario") {
+					assignedObj[dNodes[pi].task.task] = $("#ct-assignedTo option:selected").text();
+				} else if (dNodes[pi].task.task == "Scrape" || dNodes[pi].task.task == "Append" || dNodes[pi].task.task == "Compare" || dNodes[pi].task.task == "Add" || dNodes[pi].task.task == "Map") {
+					assignedObj[dNodes[pi].task.task] = $("#ct-assignedTo option:selected").text();
+				} else if (dNodes[pi].task.task == "Design" || dNodes[pi].task.task == "Update") {
+					assignedObj[dNodes[pi].task.task] = $("#ct-assignedTo option:selected").text();
+				}
+			}
+		}
     };
 
     function nodeClick(e) {
@@ -1107,13 +1121,13 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         //condition to disable unassign task button
         setTimeout(function() {
             $('#ct-unassignButton a').addClass("disableButton");
-
             if (dNodes[pi].task != null && dNodes[pi].task != undefined && dNodes[pi].task.oid != null) {
                 $('#ct-unassignButton a').removeClass("disableButton");
             }
-        }, 30)
-
-
+        }, 30);
+		var nodeClik = {};
+		nodeClik.id = dNodes[pi].task.id;
+		taskidArr.push(nodeClik);
     };
 
     function loadCycles() {
@@ -1901,7 +1915,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         //s.classed('no-access', !0);
         var userInfo = JSON.parse(window.localStorage['_UI']);
         var username = userInfo.username;
-        var assignedTo = $("#ct-assignedTo option:selected").text();
+        var assignedTo = assignedObj;
 
         if ($('.project-list').val() == null) {
             openDialogMindmap('Error', 'No projects is assigned to User');
@@ -2019,7 +2033,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             console.log(error);
             //$('#ct-createAction').addClass('disableButton')
             SaveCreateED('#ct-createAction',1,0);
-            if (result.indexOf('Schema.ConstraintValidationFailed') > -1) {
+            if (error.indexOf('Schema.ConstraintValidationFailed') > -1) {
                 openDialogMindmap('Save error', 'Module names cannot be duplicate');
             } else {
                 openDialogMindmap('Save error', 'Failed to save data');
@@ -3956,53 +3970,6 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     function initScroller() {
         $('.scrollbar-inner').scrollbar();
         $('.scrollbar-macosx').scrollbar();
-    }
-    // Prof J Assist (Yashi)
-    $scope.conversation = [];
-    $scope.querySend = function() {
-        var query = $scope.query;
-        if (query.length == 0) {
-            openDialogMindmap('Error', "Please enter a query!");
-        } else {
-            $scope.visible = 0;
-            $scope.conversation.push({
-                'text': query,
-                'pos': "assistFrom-me",
-                'type': 0
-            });
-            $scope.query = "";
-            chatbotService.getTopMatches(query).then(function(data) {
-                $scope.topMatches = data;
-                $scope.conversation.push({
-                    'text': $scope.topMatches,
-                    'pos': "assistFrom-them",
-                    'type': 0
-                });
-                //console.log($scope.conversation)
-            });
-        }
-    }
-    $scope.displayAnswer = function(index) {
-        $scope.conversation.push({
-            'text': $scope.topMatches[index][2],
-            'pos': "assistFrom-them",
-            'type': 1
-        });
-        $scope.answer = $scope.topMatches[index][2];
-
-        var qid = $scope.topMatches[index][0];
-        //console.log($scope.topMatches[index][2]);
-        chatbotService.updateFrequency(qid).then(function(data) {
-            //console.log("Reporting from controller.. after updating question frequency:");
-            //console.log(data);
-        });
-    }
-
-    $scope.myFunct = function(keyEvent) {
-        if (keyEvent.which === 13)
-            $scope.querySend();
-        var objDiv = document.getElementById("hello");
-        objDiv.scrollTop = objDiv.scrollHeight;
     }
     // Changes made for End to end module implementation
     //To toggle the view when user clicks on switch layout (Himanshu)

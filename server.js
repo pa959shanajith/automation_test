@@ -44,12 +44,9 @@ try {
     var redisSessionStore = new redisStore({client: redisSessionClient});
 
     //HTTPS Configuration
-    var certPath = "server/https/";
-    if (process.env.LB_ENABLED == "True") {
-        certPath += "domain_certs/";
-    }
-    var privateKey = fs.readFileSync(certPath+'server.key', 'utf-8');
-    var certificate = fs.readFileSync(certPath+'server.crt', 'utf-8');
+    var uiConfig = require('./server/config/options');
+    var certificate = uiConfig.storageConfig.certificate.cert;
+    var privateKey = uiConfig.storageConfig.certificate.key;
     var credentials = {
         key: privateKey,
         cert: certificate,
@@ -240,8 +237,8 @@ try {
         sessionCheck(req, res, roles);
     });
 
-    //Test Lead and Test Manager can access Weboccular Plugin
-    app.get(/^\/(p_Weboccular|neuronGraphs2D|p_ALM|p_Dashboard)$/, function (req, res) {
+    //Test Lead and Test Manager can access Webocular Plugin
+    app.get(/^\/(p_Webocular|neuronGraphs|p_ALM|p_Dashboard)$/, function (req, res) {
         //Denied roles
         var roles = ["Admin", "Business Analyst", "Tech Lead", "Test Engineer"];
         sessionCheck(req, res, roles);
@@ -473,8 +470,7 @@ try {
     app.use('/reportServer', reportingApp);
     var jsreport = require('jsreport')({
         express: { app :reportingApp, server: httpsServer },
-        appPath: "/reportServer",
-		logger: { "console": { "transport": "console", "level": "error" } }
+        appPath: "/reportServer"
     });
 
     jsreport.init(function () {

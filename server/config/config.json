@@ -1,4 +1,8 @@
 {
+    "certificate": {
+    	"key": "./server/https/server.key",
+    	"cert": "./server/https/server.crt"
+    },
     "ldap_ip":"142.102.27.242",
     "ldap_port":"389",
     "ldap_domain":"psys.com",

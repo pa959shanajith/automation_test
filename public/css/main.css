@@ -2105,6 +2105,8 @@ input[disabled]{
 	/*float: right;*/
     margin-top: 5px;
     display: -webkit-inline-box;
+    font-family: 'LatoWeb';
+    font-size: 15px;
 
 
 	/*&:before {
@@ -2138,6 +2140,8 @@ input[disabled]{
 	background:#E5E5EA;
 	border-radius:25px;
 	color: black;
+    font-family: 'LatoWeb';
+    font-size: 15px;
   /*float: left;*/
 
     display: -webkit-inline-box;
@@ -5136,7 +5140,7 @@ a { text-decoration: none; color: #EC5C93; }
 }
 
 /*
-Weboccular report css
+Webocular report css
 */
 .webCrawler-report-table {
   margin: 1em 0;

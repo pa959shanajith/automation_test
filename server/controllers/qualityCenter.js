@@ -158,7 +158,7 @@ exports.qcProjectDetails_ICE = function (req, res) {
 										soc.emit("ICEnotAvailable");
 									}
 								} else if (data.onAction == "qcresponse") {
-									data = data.value;
+									data = JSON.parse(data.value);
 									clearInterval(updateSessionExpiry);
 									try {
 										projectDetailList.nineteen68_projects = projectdata;
@@ -333,6 +333,7 @@ exports.qcFolderDetails_ICE = function (req, res) {
 	try {
 		if (isSessionActive(req)) {
 			var name = req.session.username;
+			var qcDetails = req.body;
 			redisServer.redisSub2.subscribe('ICE2_' + name);
 			logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
 			logger.debug("ICE Socket requesting Address: %s" , name);

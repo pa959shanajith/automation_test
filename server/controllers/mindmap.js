@@ -320,25 +320,30 @@ exports.getModules=function(req,res){
 exports.reviewTask=function(req,res){
 	logger.info("Inside UI service: reviewTask");
 	if (isSessionActive(req)) {
-		var taskID=d.taskId;
-			var batchIds=d.batchIds;
+			var inputs=req.body;
+			var taskID=inputs.taskId;
+			var batchIds=inputs.batchIds;
+			var userId=req.session.userid;
+			var username=req.session.username;
 			var date=new Date();
+			var status=inputs.status;
+			var versionnumber=inputs.versionnumber;
 
 			var cur_date=date.getDate()+"/"+(date.getMonth()+1)+"/"+date.getFullYear()+','+date.toLocaleTimeString();
-			var taskHistory={"userid":d.userId,"status":"","modifiedBy":d.user_name,"modifiedOn":cur_date};
-			if (d.status=='inprogress' || d.status=='assigned'|| d.status=='reassigned' || d.status=='reassign'){
-				query={'statement':"MATCH (n:TASKS) WHERE n.taskID='"+taskID+"' and n.assignedTo='"+d.userId+"' with n as n Match path=(n)<-[r]-(a) RETURN path","resultDataContents":["graph"]};
-			}else if(d.status=='review'){
-				query={'statement':"MATCH (n:TASKS) WHERE n.taskID='"+taskID+"' and n.reviewer='"+d.userId+"' with n as n Match path=(n)<-[r]-(a) RETURN path","resultDataContents":["graph"]};
+			var taskHistory={"userid":userId,"status":"","modifiedBy":username,"modifiedOn":cur_date};
+			if (status=='inprogress' || status=='assigned'|| status=='reassigned' || status=='reassign'){
+				query={'statement':"MATCH (n:TASKS) WHERE n.taskID='"+taskID+"' and n.assignedTo='"+userId+"' with n as n Match path=(n)<-[r]-(a) RETURN path","resultDataContents":["graph"]};
+			}else if(status=='review'){
+				query={'statement':"MATCH (n:TASKS) WHERE n.taskID='"+taskID+"' and n.reviewer='"+userId+"' with n as n Match path=(n)<-[r]-(a) RETURN path","resultDataContents":["graph"]};
 			}
 			
 
 			var qlist_query=[query];
 			var new_queries=[];
 			var task_flag=false;
-			neo4jAPI.executeQueries(qlist_query,function(status,result){
-					if(status!=200) {
-						res.status(status).send(result);
+			neo4jAPI.executeQueries(qlist_query,function(status_code,result){
+					if(status_code!=200) {
+						res.status(status_code).send(result);
 					}else{
 						try{
 							res_data=result;
@@ -356,7 +361,7 @@ exports.reviewTask=function(req,res){
 									task_relation = res_data[0].data[0]['graph']['nodes'][0];
 								}
 								var neo_taskHistory=task.taskHistory;
-								if((d.status=='inprogress' || d.status=='assigned' || d.status=='reassigned') && task.reviewer != 'select reviewer'){
+								if((status=='inprogress' || status=='assigned' || status=='reassigned') && task.reviewer != 'select reviewer'){
 									taskHistory.status='review';
 									if (neo_taskHistory==undefined || neo_taskHistory==''){
 										neo_taskHistory=[taskHistory];
@@ -367,11 +372,11 @@ exports.reviewTask=function(req,res){
 									}
 									neo_taskHistory=JSON.stringify(neo_taskHistory);
 
-									query={'statement':"MATCH (n:TASKS) WHERE n.taskID='"+taskID+"' and n.assignedTo='"+d.userId+"' set n.task_owner=n.assignedTo,n.assignedTo=n.reviewer,n.status='review',n.taskHistory='"+neo_taskHistory+"' RETURN n"};
+									query={'statement':"MATCH (n:TASKS) WHERE n.taskID='"+taskID+"' and n.assignedTo='"+userId+"' set n.task_owner=n.assignedTo,n.assignedTo=n.reviewer,n.status='review',n.taskHistory='"+neo_taskHistory+"' RETURN n"};
 									new_queries.push(query);
 									task_flag=true;
 
-								}else if(d.status=='review'){
+								}else if(status=='review'){
 									taskHistory.status='complete';
 									if (neo_taskHistory==undefined || neo_taskHistory==''){
 										neo_taskHistory=[taskHistory];
@@ -381,10 +386,10 @@ exports.reviewTask=function(req,res){
 
 									}
 									neo_taskHistory=JSON.stringify(neo_taskHistory);
-									query={'statement':"MATCH (m)-[r]-(n:TASKS) WHERE n.taskID='"+taskID+"' and n.reviewer='"+d.userId+"' set n.assignedTo='',n.status='complete',n.taskHistory='"+neo_taskHistory+"' DELETE r RETURN n"};
+									query={'statement':"MATCH (m)-[r]-(n:TASKS) WHERE n.taskID='"+taskID+"' and n.reviewer='"+userId+"' set n.assignedTo='',n.status='complete',n.taskHistory='"+neo_taskHistory+"' DELETE r RETURN n"};
 									new_queries.push(query);
 									task_flag=true;
-								}else if(d.status=='reassign'){
+								}else if(status=='reassign'){
 									taskHistory.status='reassigned';
 									if (neo_taskHistory==undefined || neo_taskHistory==''){
 										neo_taskHistory=[taskHistory];
@@ -394,7 +399,7 @@ exports.reviewTask=function(req,res){
 
 									}
 									neo_taskHistory=JSON.stringify(neo_taskHistory);
-									query={'statement':"MATCH (n:TASKS) WHERE n.taskID='"+taskID+"' and n.reviewer='"+d.userId+"' set n.reviewer=n.assignedTo,n.assignedTo=n.task_owner,n.status='reassigned',n.taskHistory='"+neo_taskHistory+"' RETURN n"};
+									query={'statement':"MATCH (n:TASKS) WHERE n.taskID='"+taskID+"' and n.reviewer='"+userId+"' set n.reviewer=n.assignedTo,n.assignedTo=n.task_owner,n.status='reassigned',n.taskHistory='"+neo_taskHistory+"' RETURN n"};
 									new_queries.push(query);
 									task_flag=true;
 								}
@@ -402,8 +407,8 @@ exports.reviewTask=function(req,res){
 									inputs = {
 										'status':taskHistory.status,
 										'taskdetails':task_relation,
-										'user':d.user_name,
-										'versionnumber':d.versionnumber
+										'user':username,
+										'versionnumber':versionnumber
 									}
 									
 									neo4jAPI.executeQueries(new_queries,function(status,result){
@@ -449,24 +454,25 @@ exports.saveData=function(req,res){
 			var flag=inputs.write;
 			var removeTask=inputs.unassignTask;
 			var sendNotify=inputs.sendNotify;
-			for (var i=0;i<data.length;i++)
-			{
-				if(	data[i].task)
-				{
-					tasks.push(data[i].task);
+
+			for(var i=0;i<Object.values(sendNotify).length;i++) {
+				var taskAssignment = 'assigned';
+				var taskName = data[i].name;
+				var soc = myserver.socketMapNotify[Object.values(sendNotify)[i]];
+				var count = 0;
+				var assignedTasksNotification = {};
+				assignedTasksNotification.to = '/plugin';
+				if(removeTask.indexOf(data[i].oid) >= 0) {
+					taskAssignment = "unassigned";
 				}
-			}
-			var newtasks = tasks.length;
-			//Assigned Tasks Notification
-			if('socketMapNotify' in myserver && sendNotify in myserver.socketMapNotify){
-				 var soc = myserver.socketMapNotify[sendNotify];
-				 var count = 0;
-				 var assignedTasksNotification = {};
-				 	assignedTasksNotification.to = '/plugin';
-					assignedTasksNotification.notifyMsg = "New tasks have been assigned by "+ user+"";
-					assignedTasksNotification.isRead = false;
-					assignedTasksNotification.count = count;
-					soc.emit("notify",assignedTasksNotification);
+				if(taskAssignment == "unassigned") {
+					assignedTasksNotification.notifyMsg = "Task '"+taskName+"' have been unassigned by "+ user+"";
+				} else{
+					assignedTasksNotification.notifyMsg = "New task '"+taskName+"' have been assigned by "+ user+"";
+				}
+				assignedTasksNotification.isRead = false;
+				assignedTasksNotification.count = count;
+				soc.emit("notify",assignedTasksNotification);
 			}
 			
 			//TO support task deletion

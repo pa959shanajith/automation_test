@@ -89,10 +89,10 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 	$scope.readTestSuite_ICE = function(){
         $('.checkStylebox').attr("disabled", true); 
 		$('#excSaveBtn').attr("disabled", true);
-		blockUI("Loading in Progress. Please Wait");
+		//blockUI("Loading in Progress. Please Wait");
 		ExecutionService.readTestSuite_ICE(readTestSuite, "execute")
 		.then(function(data) {
-			unblockUI();
+			//unblockUI();
 			if(data == "Invalid Session"){
 					$rootScope.redirectPage();
 			 }
@@ -552,6 +552,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 							suiteInfo.testsuitename = $(this).parents('span.taskname').text();
 							suiteInfo.testsuiteid = $(this).parents('.suiteNameTxt').next().find('thead').children('input[type=hidden]').val();
 							suiteInfo.browserType = browserTypeExe;
+							suiteInfo.appType = appType;
 							//console.log("suiteInfo:::" + suiteInfo)
 							$scope.moduleInfo.push(suiteInfo);
 						}
