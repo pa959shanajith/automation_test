@@ -552,6 +552,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 							suiteInfo.testsuitename = $(this).parents('span.taskname').text();
 							suiteInfo.testsuiteid = $(this).parents('.suiteNameTxt').next().find('thead').children('input[type=hidden]').val();
 							suiteInfo.browserType = browserTypeExe;
+							suiteInfo.appType = appType;
 							//console.log("suiteInfo:::" + suiteInfo)
 							$scope.moduleInfo.push(suiteInfo);
 						}
