@@ -35,7 +35,7 @@ io.on('connection', function (socket) {
 			socketMapNotify[address] = socket;
 		  });
 		//Broadcast Message
-		var broadcastTo = ['/admin', '/plugin', '/design', '/designTestCase', '/execute', '/scheduling', '/specificreports', '/home', '/p_Utility', '/p_Reports', 'p_Weboccular', '/neuronGraphs', '/p_ALM'];
+		var broadcastTo = ['/admin', '/plugin', '/design', '/designTestCase', '/execute', '/scheduling', '/specificreports', '/home', '/p_Utility', '/p_Reports', 'p_Webocular', '/neuronGraphs', '/p_ALM'];
 		notificationMsg.to = broadcastTo;
 		notificationMsg.notifyMsg = 'Server Maintenance Scheduled';
 		// var soc = socketMapNotify[address];

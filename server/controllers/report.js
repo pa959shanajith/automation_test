@@ -3,7 +3,7 @@
  */
 var async = require('async');
 var myserver = require('../lib/socket');
-var jsrclient = require("jsreport-client")("https://127.0.0.1:"+process.env.serverPort+"/reportServer/");
+var jsreportClient = require("jsreport-client");
 var Client = require("node-rest-client").Client;
 var client = new Client();
 var epurl = "http://"+process.env.NDAC_IP+":"+process.env.NDAC_PORT+"/";
@@ -22,6 +22,7 @@ exports.getMainReport_ICE = function (req, res) {
 	logger.info("Inside UI service: getMainReport_ICE");
 	try {
 		if (isSessionActive(req)) {
+			var jsrclient = jsreportClient("https://" + req.headers.host + "/reportServer/");
 			jsrclient.render({
 				template: {
 					shortid: "HJP1pqMcg",
@@ -121,6 +122,7 @@ exports.renderReport_ICE = function (req, res) {
 			var shortId = "rkE973-5l";
 			if (reportType != "html")
 				shortId = "H1Orcdvhg";
+			var jsrclient = jsreportClient("https://" + req.headers.host + "/reportServer/");
 			jsrclient.render({
 				template: {
 					shortid: shortId,

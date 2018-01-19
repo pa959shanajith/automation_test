@@ -17,9 +17,9 @@ exports.getCrawlResults = function (req, res) {
 			var input_url = req.body.url;
 			var level = req.body.level;
 			var agent = req.body.agent;
-			validateWeboccular();
-			function validateWeboccular() {
-				logger.info("Inside function: validateWeboccular");
+			validateWebocular();
+			function validateWebocular() {
+				logger.info("Inside function: validateWebocular");
 				check_url = validator.isURL(req.body.url);
 				if (check_url == true) {
 					validate_url = true;

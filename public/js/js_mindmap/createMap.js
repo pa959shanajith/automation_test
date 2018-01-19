@@ -17,6 +17,8 @@ var saveFlag = false;
 var CreateEditFlag = false;
 var isIE = /*@cc_on!@*/ false || !!document.documentMode;
 var IncompleteFlowFlag = false;
+var taskidArr = [];
+var assignedObj = {};
 function loadMindmapData(param) {
     blockUI("Loading...");
     dataSender({
@@ -471,10 +473,11 @@ function removeTask(e) {
         unassignTask.push(dNodes[pi].oid)
     }
     d3.select('#ct-assignBox').classed('no-disp', !0);
+
 }
 
 function addTask(e) {
-
+  
     $("ct-assignTask,#ct-assignedTo,#ct-assignRevw,#ct-assignRel,#ct-assignCyc").removeClass("selectErrorBorder");
     $("#startDate,#endDate").removeClass("inputErrorBorder");
     if ($("ct-assignTask option:selected").val() == "select user") {
@@ -866,6 +869,29 @@ function addTask(e) {
     if (errorRelCyc) {
         openDialogMindmap("Task Assignment Error", "Please select Release/Cycle")
     }
+      
+      for(var i=0;i<taskidArr.length;i++)  
+      {
+          if(taskidArr[i].id == dNodes[pi].task.id)
+          {
+              if(dNodes[pi].task.task == "Execute" || dNodes[pi].task.task == "Execute Batch" )
+               {
+                    assignedObj[dNodes[pi].task.task] =$("#ct-assignedTo option:selected").text();
+               }
+               else if(dNodes[pi].task.task == "Execute Scenario")
+               {
+                    assignedObj[dNodes[pi].task.task] = $("#ct-assignedTo option:selected").text();
+               }
+               else if(dNodes[pi].task.task == "Scrape" || dNodes[pi].task.task == "Append" || dNodes[pi].task.task == "Compare" || dNodes[pi].task.task == "Add" || dNodes[pi].task.task == "Map")
+               {
+                    assignedObj[dNodes[pi].task.task] = $("#ct-assignedTo option:selected").text();
+               }
+               else if(dNodes[pi].task.task == "Design" || dNodes[pi].task.task == "Update")
+               {
+                    assignedObj[dNodes[pi].task.task] = $("#ct-assignedTo option:selected").text();
+               }
+          }
+      }
 };
 
 function nodeClick(e) {
@@ -1154,8 +1180,10 @@ function nodeClick(e) {
             $('#ct-unassignButton a').removeClass("disableButton");
         }
     }, 30)
-
-
+    
+     var nodeClik = {};
+     nodeClik.id = dNodes[pi].task.id;
+     taskidArr.push(nodeClik);
 };
 
 function loadCycles() {
@@ -2025,8 +2053,8 @@ function actionEvent(e) {
     s.classed('no-access', !0);
     var userInfo = JSON.parse(window.localStorage['_UI']);
     var username = userInfo.username;
-    var assignedTo = $("#ct-assignedTo option:selected").text();
-
+    var assignedTo = assignedObj;
+   // var assignedTo = $("#ct-assignedTo option:selected").text();
     if ($('.project-list').val() == null) {
         openDialogMindmap('Error', 'No projects is assigned to User');
         return !1;

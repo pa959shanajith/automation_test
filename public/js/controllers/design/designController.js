@@ -1521,60 +1521,45 @@ console.log("screenName:", screenName);
             //For Web
             DesignServices.initScraping_ICE(screenViewObject)
                 .then(function(data) {
-                    console.log("UI", data);
-
+                    //console.log("UI", data);
+                    unblockUI();
+                    //window.localStorage['disableEditing'] = "true";
                     if (data == "Invalid Session") {
                         $rootScope.redirectPage();
-                    }
-                    //window.localStorage['disableEditing'] = "true";
-                    unblockUI();
-                    if (data == "Response Body exceeds max. Limit.") {
-                        unblockUI();
+                    } else if (data == "Response Body exceeds max. Limit.") {
                         openDialog("Scrape Screen", "Scraped data exceeds max. Limit.");
                         return false
-                    }
-                    if(data == 'scheduleModeOn')
-                    {
-                        unblockUI();
+                    } else if(data == 'scheduleModeOn') {
                         eaCheckbox = false;
                         var scrapedObjectsLen = $("span.ellipsis").length;
-                        if(scrapedObjectsLen > 0)
-                        {
+                        if(scrapedObjectsLen > 0) {
                            $(".enableActions").removeClass("enableActions").addClass("disableActions");
-                        }
-                        else{
+                        } else {
                            $(".disableActions").removeClass("disableActions").addClass("enableActions");
                         }
                         $("#enableAppend").prop('checked',false);
                         openDialog("Scrape Screen", "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.");
                         return false
-                    }
-                    if (data == "unavailableLocalServer") {
-                        unblockUI();
-                         eaCheckbox = false;
-                         var scrapedObjectsLen = $("span.ellipsis").length;
-                         if(scrapedObjectsLen > 0)
-                         {
-                            $(".enableActions").removeClass("enableActions").addClass("disableActions");
-                         }
-                         else{
+                    } else if (data == "unavailableLocalServer") {
+                        eaCheckbox = false;
+                        var scrapedObjectsLen = $("span.ellipsis").length;
+                        if(scrapedObjectsLen > 0) {
+							$(".enableActions").removeClass("enableActions").addClass("disableActions");
+                        } else {
                             $(".disableActions").removeClass("disableActions").addClass("enableActions");
-                         }
-                        
-                         $("#enableAppend").prop('checked',false);
+                        }
+                        $("#enableAppend").prop('checked',false);
                         openDialog("Scrape Screen", "ICE Engine is not available. Please run the batch file and connect to the Server.");
                         return false
-                    }
-                    if (data == "scheduleModeOn") {
-                        unblockUI();
-                        openDialog("Debug Testcase", "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.")
-                    }
-                    if (data == "fail") {
+                    } else if (data == "fail") {
                         openDialog("Scrape", "Failed to scrape.")
                         //$("#scrapeFailModal").modal("show");
                         return false
-                    }
-                    if (data == "wrongWindowName") {
+					} else if (data == "Terminate") {
+						unblockUI();
+						openDialog("Scrape Screen", "Scrape Terminated")
+                        return false
+                    } else if (data == "wrongWindowName") {
                         openDialog("Scrape", "Wrong window name.")
                     }
                     //COMPARE & UPDATE SCRAPE OPERATION
