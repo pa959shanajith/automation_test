@@ -702,12 +702,13 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 		$("#submitTasksExecution").modal("show")
 		$('#submitTasksExecution').find('.btn-default-yes').focus();
 		if(action=='reassign'){
+			$scope.stask = 'reassign';
 			$("#submitTasksExecution").find('.modal-title').text('Reassign Task');
-			$("#submitTasksExecution").find('.modal-body p').text('Are you sure you want to reassign the task ?')
-			$("#submitTasksExecution").find('.modal-footer button')[0].setAttribute('ng-click',"submit_task('reassign')")
+			$("#submitTasksExecution").find('.modal-body p').text('Are you sure you want to reassign the task ?');
+			//$("#submitTasksExecution").find('.modal-footer button')[0].setAttribute('ng-click',"submit_task('reassign')")
 		}
 		else
-        {
+        {	$scope.stask = 'approve';
 			if($(".submitTaskBtn:visible").text() == 'Approve')
 			{
 				$("#submitTasksExecution").find('.modal-title').text('Approve Task');
