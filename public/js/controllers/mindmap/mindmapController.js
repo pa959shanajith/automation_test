@@ -31,16 +31,15 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     var deletednode_W = [];
     //node_names_tc keep track of testcase names to decide reusability of testcases
     var saveFlag_W = false;
+    var collapseEteflag = true;
     //Workflow//
     //-------------------End of Global Variables-----------------------//
 
-        faRef = {
+    var faRef = {
             "plus": "fa-plus",
             "edit": "fa-pencil-square-o",
             "delete": "fa-trash-o"
         };
-
-
 
     //------------------Createmap.js---------------------//
 
@@ -3797,8 +3796,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         $scope.tab = option;
     }
 
-    var collapseEteflag = true;
-    $('.collapseEte').click(function() {
+    
+    $scope.collapseETE = function() {
         if (collapseEteflag) {
             if (screen.height < 1024) {
                 $(".endtoend-modulesContainer").prop("style", "height: 48% !important;");
@@ -3822,7 +3821,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             $(this).attr("src", "imgs/ic-collapse.png");
             collapseEteflag = true;
         }
-    })
+    }
 
     //Search Modules
     $('#eteSearchModules').keyup(function() {
