@@ -3943,6 +3943,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     }
     $scope.startCopy = function() {
         // $('#copyImg1').toggleClass('copyEnable');
+        if($('#pasteImg1.active-map').length>0) $scope.pasteMap(); //Disable paste
         if ($('#rect-copy').length == 0) {
             $('#copyImg1').addClass('active-map');
             draww();
@@ -3954,6 +3955,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         }
     }
     $scope.pasteMap = function() {
+        console.error('bwahahaha');
         if ($('.fa.fa-pencil-square-o.fa-lg.plus-icon').hasClass('active-map')) {
             openDialogMindmap('Error', 'Please complete copy step first');
             return;
