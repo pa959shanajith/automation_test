@@ -1,4 +1,4 @@
-mySPA.factory('chatbotService', ['$http','$q', function ($http, $httpProvider, $q)   {
+mySPA.factory('chatbotService', ['$http','$q', function ($http,$q)   {
 	return{
 		getTopMatches: function(query){
 			return $http.post('/getTopMatches_ProfJ',{

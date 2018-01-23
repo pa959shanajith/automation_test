@@ -1,4 +1,4 @@
-mySPA.factory('ScheduleService', ['$http','$q', function ($http, $httpProvider, $q)   {
+mySPA.factory('ScheduleService', ['$http','$q', function ($http,$q)   {
   return{
 	  readTestSuite_ICE : function(readTestSuite){
 			return $http.post('/readTestSuite_ICE',{

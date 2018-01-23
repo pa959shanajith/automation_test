@@ -1,4 +1,4 @@
-mySPA.factory('DesignServices', ['$http','$q', function ($http, $httpProvider, $q)   {
+mySPA.factory('DesignServices', ['$http','$q', function ($http,$q)   {
 	return{
 		initScraping_ICE : function(screenViewObject){
 			return $http.post('/initScraping_ICE',{

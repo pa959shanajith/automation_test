@@ -641,9 +641,20 @@ exports.saveData=function(req,res){
 
 
 				neo4jAPI.executeQueries(qList,function(status,result){
-					res.setHeader('Content-Type', 'application/json');
-					if(status!=200) res.status(status).send(result);
+					
+					if(status!=200){
+						//res.setHeader('Content-Type', 'text');
+						logger.error(result[0]);
+						result=JSON.stringify(result)
+						if(result.indexOf('Schema.ConstraintValidationFailed')>-1){
+							result='DuplicateModules';
+						}else{
+							result='fail';
+						}
+						res.status(status).send(result);
+					} 
 					else{
+						res.setHeader('Content-Type', 'application/json');
 						var k=0,rIndex,lbl,neoIdDict={};
 						idDict={};
 
