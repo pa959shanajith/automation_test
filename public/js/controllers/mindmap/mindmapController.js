@@ -1026,7 +1026,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
             } else if (tk == 'ed') {
                 v.append('span').attr('class', 'ct-assignItem fl-left').html('End Date');
-                $(".fl-right").append("<img src='images_mindmap/ic-datepicker.png' />").attr('alt', 'calIcon');
+                //$(".fl-right").append("<img src='images_mindmap/ic-datepicker.png' />").attr('alt', 'calIcon');
                 w = v.append('div').attr('class', 'ct-assignItem btn-group dropdown fl-right dateBoxEd');
                 w.append('input').attr('class', 'datepicker').attr('id', 'endDate');
                 $(".dateBoxEd").append("<img id='dateIconEndDate' class='dateIcon' src='images_mindmap/ic-datepicker.png' />").attr('alt', 'calIcon');
