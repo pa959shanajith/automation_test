@@ -136,6 +136,15 @@ mySPA.factory('mindmapServices', ['$http','$q', function ($http,$q)   {
     		})
     		.then(function (response) { return response.data; },
     				function (response) { return $q.reject(response.data); });
-    	}
+    	},
+		getCRId:function (projectId){
+			var param = "getCRId";
+    		return $http.post('/getCRId', {
+				projectid:projectId
+				
+    		})
+    		.then(function (response) { return response.data; },
+    				function (response) { return $q.reject(response.data); });
+		}
 	}
 }]);

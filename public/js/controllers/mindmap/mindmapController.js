@@ -1809,39 +1809,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         return e;
     };
 
-    function submit_task(action) {
-        var taskinfo = JSON.parse(window.localStorage['_CT']);
-        var taskid = taskinfo.subTaskId;
-        var taskstatus = taskinfo.status;
-        var version = taskinfo.versionnumber;
-        var batchTaskIDs = taskinfo.batchTaskIDs;
-        if (action != undefined && action == 'reassign') {
-            taskstatus = action;
-        }
-        dataSender({
-            task: 'reviewTask',
-            prjId: $(".project-list").val(),
-            taskId: taskid,
-            userId: JSON.parse(window.localStorage['_UI']).user_id,
-            status: taskstatus,
-            user_name: JSON.parse(window.localStorage['_UI']).username,
-            versionnumber: version,
-            batchIds: batchTaskIDs
-        }, function(err, result) {
-            if (err) console.log(result);
-            else {
-                if (result == 'fail') {
-                    openDialogMindmap("Task Submission Error", "Reviewer is not assigned !")
-                } else if (taskstatus == 'reassign') {
-                    openDialogMindmap("Task Reassignment Success", "Task Reassigned scucessfully!")
-                } else if (taskstatus == 'review') {
-                    openDialogMindmap("Task Completion Success", "Task Approved scucessfully!")
-                } else {
-                    openDialogMindmap("Task Submission Success", "Task Submitted scucessfully!")
-                }
-            }
-        });
-    }
+   
 
     function actionEvent(e) {
         var selectedTab = window.localStorage['tabMindMap'];
@@ -2033,7 +2001,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             console.log(error);
             //$('#ct-createAction').addClass('disableButton')
             SaveCreateED('#ct-createAction',1,0);
-            if (error.indexOf('Schema.ConstraintValidationFailed') > -1) {
+            if (error=='DuplicateModules') {
                 openDialogMindmap('Save error', 'Module names cannot be duplicate');
             } else {
                 openDialogMindmap('Save error', 'Failed to save data');
@@ -2284,7 +2252,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             //zoom.translate([(cSize[0]/2),(cSize[1]/2)]);
             zoom.event(d3.select('#ct-mapSvg'));
         }, function(error) {
-            console.log("error in datasender: checkReuse service")
+            console.log("Error: checkReuse service")
         })
     };
 
@@ -2329,15 +2297,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         return "";
     }
 
-    function addExport(versioning_status) {
-
-        console.log($('.selectProject'));
-        $('.selectProject').append($('<i>').attr({
-            class: 'glyphicon glyphicon-export export-icon',
-            title: "Export Version",
-            onclick: 'exportData(' + versioning_status + ')'
-        }));
-    }
+   
 
     /*
     function : exportData()
@@ -2346,11 +2306,11 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     */
 
     function exportData(versioning_status) {
-        data_not_exported = []
+        var data_not_exported = [];
         var vs_n = 0;
-        var vnumber = "0.0";
+        var version_num = "0.0";
         if ($('.version-list').val() != undefined) {
-            vnumber = $('.version-list').val();
+            version_num = $('.version-list').val();
         }
         if (versioning_status) {
             vs_n = 1;
@@ -2383,21 +2343,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         blockUI('Loading UI');
         var userInfo = JSON.parse(window.localStorage['_UI']);
         var user_id = userInfo.user_id;
-        dataSender({
-            user_name: userInfo.username,
-            userRole: window.localStorage['_SR'],
-            userid: user_id,
-            task: 'getModules',
-            tab: window.localStorage['tabMindMap'],
-            prjId: $(".project-list").val(),
-            versioning: vs_n,
-            version: vnumber
-        }, function(err, result) {
-            if (err) {
-                console.log(result);
-                unblockUI();
-            } else {
-                result_details = JSON.parse(result);
+        mindmapServices.getModules(window.localStorage['tabMindMap'], $(".project-list").val(), versioning_enabled, parseFloat(version_num)).then(
+            function(result){
+                result_details = result;
                 flag = 0;
                 for (var i = 0; i < result_details.length; i++) {
                     var module_info = {
@@ -2434,36 +2382,12 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     }
                 }
                 if (flag) {
-                    dataSender({
-                        user_name: userInfo.username,
-                        userRole: window.localStorage['_SR'],
-                        userid: user_id,
-                        task: 'getProjectType_Nineteen68',
-                        projectid: $(".project-list").val(),
-                        versioning: vs_n
-                    }, function(err, project_data) {
-                        if (err) {
-                            console.log('err');
-                            unblockUI();
-                        } else {
-                            parsed_project_data = JSON.parse(project_data);
-                            // ci_details = {
-                            //     projectid: $(".project-list").val()
-                            // }
-                            dataSender({
-                                user_name: userInfo.username,
-                                userRole: window.localStorage['_SR'],
-                                userid: user_id,
-                                projectid: $(".project-list").val(),
-                                task: 'getCRId',
-                                versioning: vs_n
-                            }, function(status, cycle_data) {
-                                if (status) {
-                                    console.log('Error in exporting');
-                                    unblockUI();
-                                    openDialogMindmap('Error', "Error in export");
-                                } else {
-                                    ci_parsed_details = JSON.parse(cycle_data);
+                    mindmapServices.getProjectTypeMM_Nineteen68($(".project-list").val()).then(
+                        function(project_type){
+                             parsed_project_data = project_type;
+                             mindmapServices.getCRId($(".project-list").val()).then(
+                                 function(rel_cycle_data){
+                                       ci_parsed_details =rel_cycle_data;
                                     for (var i = 0; i < data.moduleInfo.length; i++) {
                                         data.moduleInfo[i].cycleId = ci_parsed_details.row.cycleid;
                                         data.moduleInfo[i].releaseId = ci_parsed_details.row.releaseid;
@@ -2483,16 +2407,35 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                                         openDialogMindmap('Mindmap', "Data Exported Successfully. Note:Only Created Modules are exported.");
                                     else
                                         openDialogMindmap('Mindmap', "Data Exported Successfully.");
-                                }
-                            });
+                                 },function(err){
+                                    console.log('Error in exporting');
+                                    unblockUI();
+                                    openDialogMindmap('Error', "Error in export");
+                                 }
+                             )
+                        },function(err){
+                            console.log(err);
+                            unblockUI();
                         }
-                    });
+                    )
+                   
                 } else {
                     unblockUI();
                     openDialogMindmap('Mindmap', "Module is not created in ICE");
                 }
+            },function(err){
+                console.log(err);
+                unblockUI();
             }
-        });
+        );
+    }
+
+
+     function addExport(versioning_status) {
+        $('.selectProject').append($('<i>').attr({
+            class: 'glyphicon glyphicon-export export-icon',
+            title: "Export Version"
+        })).click(function(e){ exportData(versioning_status); });
     }
 
     /*
@@ -2601,46 +2544,6 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     //------------------------------------------------Workflow.js----------------------------------------
 
     var isIE = /*@cc_on!@*/ false || !!document.documentMode;
-
-    // function loadMindmapData_W() {
-    //     var userInfo = JSON.parse(window.localStorage['_UI']);
-    //     var userid = userInfo.user_id;
-    //     mindmapServices.populateProjects().then(function(res) {
-    //         if ($("#left-nav-section").is(":visible") == true && $("#right-dependencies-section").is(":visible") == false) {
-    //             $("#ct-moduleBox,.tabAssign").addClass("ct-expand-module");
-    //         }
-    //         if ($("#left-nav-section").is(":visible") == true && $("#right-dependencies-section").is(":visible") == false) {
-    //             $("#ct-moduleBox,.tabAssign").addClass("ct-expand-module");
-    //         }
-
-    //         // var selectedProject=$(".selectProjectEtem").val();
-    //         $("#selectProjectEtem").empty();
-    //         for (i = 0; i < (res.projectId.length && res.projectName.length); i++) {
-    //             $('#selectProjectEtem').append("<option app-type='" + res.appType[i] + "' data-id='" + res.projectName[i] + "' value='" + res.projectId[i] + "'>" + res.projectName[i] + "</option>");
-    //         }
-
-    //         if (selectedProject == null) {
-    //             selectedProject = res.projectId[0];
-    //         }
-    //         $("#selectProjectEtem option[value='" + selectedProject + "']").attr('selected', 'selected');
-    //         loadMindmapData1_W();
-    //         $("#selectProjectEtem").change(function() {
-    //             selectedProject = $("#selectProjectEtem").val();
-    //             //alert($(".project-list").val());
-    //             $('#eteSearchModules').val('');
-    //             if ($("img.iconSpaceArrow").hasClass("iconSpaceArrowTop")) {
-    //                 $("img.iconSpaceArrow").removeClass("iconSpaceArrowTop");
-    //             }
-    //             loadMindmapData1_W();
-    //         });
-    //         //Calling the function to restrict the user to give default node names
-    //         $("#ct-canvas").click(callme);
-    //     }, function(error) {
-    //         console.log(error);
-    //     });
-
-
-    // }
 
     function loadMindmapData1_W() {
         blockUI("Loading...");
@@ -3994,7 +3897,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     };
 
     $scope.createNewMap = function() {
-        if ($('.ct-svgTile').length == 0 && confirm('Unsaved work will be lost if you continue.\nContinue?')) {
+        if ($('.ct-svgTile').length != 0 ||($('.ct-svgTile').length == 0 && confirm('Unsaved work will be lost if you continue.\nContinue?'))) {
             $('.nodeBoxSelected').removeClass('nodeBoxSelected');
             createNewMap();
         }
