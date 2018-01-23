@@ -1812,6 +1812,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
    
 
     function actionEvent(e) {
+        if($(this).hasClass('disableButton') || $(this).hasClass('no-access')) return;
         var selectedTab = window.localStorage['tabMindMap'];
         var s = d3.select(this);
         var cur_module = null;
@@ -3235,6 +3236,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     };
 
     function actionEvent_W(e) {
+        if($(this).hasClass('disableButton') || $(this).hasClass('no-access')) return;
         var s = d3.select(this);
         var error = !1,
             mapData = [],
