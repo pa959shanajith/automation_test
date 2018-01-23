@@ -3515,6 +3515,13 @@ console.log("screenName:", screenName);
             {
               $(".checkStylebox").prop("checked", false);
             }
+            if($("#scraplist li").children('a').find('input[type=checkbox]:visible').length == 0)
+            {
+                $(".checkStylebox").attr("disabled",true);
+            }
+            else{
+                $(".checkStylebox").attr("disabled",false);
+            }
             unblockUI();
         }, 500);
     })
