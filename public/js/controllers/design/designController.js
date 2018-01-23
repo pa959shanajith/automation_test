@@ -3465,6 +3465,7 @@ console.log("screenName:", screenName);
     //Filter Scrape Objects
     $(document).on("click", ".checkStyleboxFilter", function() {
         cfpLoadingBar.start();
+        blockUI("Filtering in progress. Please Wait...")
         $("html").css({
             'cursor': 'wait'
         });
@@ -3474,10 +3475,12 @@ console.log("screenName:", screenName);
         })
         $timeout(function() {
             filter()
+            unblockUI();
         }, 500);
     })
     $(document).on("click", ".selectAllTxt", function() {
         cfpLoadingBar.start();
+        blockUI("Filtering in progress. Please Wait...")
         $("html").css({
             'cursor': 'wait'
         });
@@ -3487,6 +3490,7 @@ console.log("screenName:", screenName);
         })
         $timeout(function() {
             filter()
+            unblockUI();
         }, 500);
     })
     $(document).on("click", ".filterObjects", function() {
