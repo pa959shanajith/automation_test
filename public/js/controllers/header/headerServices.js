@@ -1,4 +1,4 @@
-mySPA.factory('headerServices', ['$http','$q', function ($http, $httpProvider, $q){
+mySPA.factory('headerServices', ['$http','$q', function ($http,$q){
     return{
 		logoutUser_Nineteen68 : function(UserName){	
 			return $http.post('/logoutUser_Nineteen68',{

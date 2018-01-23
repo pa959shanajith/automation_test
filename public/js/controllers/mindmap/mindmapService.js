@@ -1,4 +1,4 @@
-mySPA.factory('mindmapServices', ['$http','$q', function ($http, $httpProvider, $q)   {
+mySPA.factory('mindmapServices', ['$http','$q', function ($http,$q)   {
 	return{
 		populateProjects: function () {
     		var param = "populateProjects";

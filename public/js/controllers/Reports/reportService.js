@@ -1,4 +1,4 @@
-mySPA.factory('reportService', ['$http','$q', function ($http, $httpProvider, $q)   {
+mySPA.factory('reportService', ['$http','$q', function ($http,$q)   {
 	return{
 		renderReport_ICE : function(finalReports, reportType){
 			if(reportType == "html"){

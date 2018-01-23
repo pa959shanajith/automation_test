@@ -1,4 +1,4 @@
-mySPA.factory('LoginService', ['$http','$q', function ($http, $httpProvider, $q)   {
+mySPA.factory('LoginService', ['$http','$q', function ($http,$q)   {
   return{
     //Checking User Validation
     authenticateUser_Nineteen68 : function(username, password){

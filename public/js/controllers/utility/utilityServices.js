@@ -1,4 +1,4 @@
-mySPA.factory('utilityService', ['$http','$q', function ($http, $httpProvider, $q)   {
+mySPA.factory('utilityService', ['$http','$q', function ($http,$q)   {
 	return{
 		Encrypt : function(methodSelected, encryptionVal){
 			return $http.post('/Encrypt_ICE',{
