@@ -1879,9 +1879,9 @@ console.log("screenName:", screenName);
             var deletedCustNames = [];
             var deletedCustPath = [];
 
-            var checkCondLen = $("#scraplist li").children('a').find('input[type=checkbox].checkall:checked').length;
+            var checkCondLen = $("#scraplist li").children('a').find('input[type=checkbox].checkall:checked:visible').length;
             if (checkCondLen > 0) {
-                $('input[type=checkbox].checkall:checked').each(function() {
+                $('input[type=checkbox].checkall:checked:visible').each(function() {
                     var id = $(this).parent().attr('id').split("_");
                     id = id[1];
                     deletedCustNames.push(viewString.view[id].custname);
@@ -2113,7 +2113,8 @@ console.log("screenName:", screenName);
         else {
             $("#deleteObjects,.checkStylebox").prop("disabled", false);
         }
-        var checkedLen = $(".ellipsis:checked").length;
+      //  var checkedLen = $(".ellipsis:checked").length;
+        var checkedLen = $("#scraplist li").children('a').find('input[type=checkbox].checkall:checked:visible').length;
         if(checkedLen == 0)
         {
             $("#deleteObjects").prop("disabled", true);
@@ -2122,7 +2123,14 @@ console.log("screenName:", screenName);
             $('.checkStylebox').prop("checked", false);
         }
         if (numberOfElems != 0 && count == 0) {
-            $('.checkStylebox').prop("checked", true);
+            if($("#scraplist li").children('a').find('input[type=checkbox].checkall:checked:visible').length > 0)
+            {
+                $('.checkStylebox').prop("checked", true);
+            }
+            else{
+                $('.checkStylebox').prop("checked", false);
+            }
+           
         } else {
             $('.checkStylebox').prop("checked", false);
         }
@@ -3483,6 +3491,8 @@ console.log("screenName:", screenName);
     })
     $(document).on("click", ".filterObjects", function() {
         cfpLoadingBar.start();
+        blockUI('Filtering in progress. Please Wait...');
+        $(".checkStylebox").prop("checked", false);
         $("html").css({
             'cursor': 'wait'
         });
@@ -3496,6 +3506,12 @@ console.log("screenName:", screenName);
             if (($("#scraplist li").find('input[name="selectAllListItems"]:checked').length == $("#scraplist li").find('input[name="selectAllListItems"]:visible').length) && $("#scraplist li").find('input[name="selectAllListItems"]:visible').length != 0) {
                 $(".checkStylebox").prop("checked", true);
             } else $(".checkStylebox").prop("checked", false);
+            $(".checkStylebox,.checkall").prop("checked", false);
+            if($("#scraplist li").children('a').find('input[type=checkbox].checkall:checked:visible').length == 0)
+            {
+              $(".checkStylebox").prop("checked", false);
+            }
+            unblockUI();
         }, 500);
     })
 
