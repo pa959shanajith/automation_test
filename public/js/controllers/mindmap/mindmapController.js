@@ -2435,7 +2435,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         $('.selectProject').append($('<i>').attr({
             class: 'glyphicon glyphicon-export export-icon',
             title: "Export Version"
-        })).click(function(e){ exportData(versioning_status); });
+        }).click(function(e){ exportData(versioning_status); }));
     }
 
     /*
