@@ -1000,7 +1000,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
             } else if (tk == 'sd') {
                 v.append('span').attr('class', 'ct-assignItem fl-left').html('Start Date');
-                w = v.append('div').attr('class', 'ct-assignItem btn-group dropdown fl-right dateBoxSd');
+                w = v.append('div').attr('class', 'ct-assignItem btn-group dropdown fl-right-assign dateBoxSd');
                 // w.append('input').attr('class','ct-asValBox btn dropdown-toggle').attr('data-toggle','dropdown').append('a').attr('id','ct-assignStart').html(tObj.sd);
                 // w.append('button').attr('class','ct-asValBoxIcon ct-asItemCal btn dropdown-toggle').attr('data-toggle','dropdown').append('img').attr('src','images_mindmap/ic-datepicker.png').attr('alt','calIcon');
                 w.append('input').attr('class', 'datepicker').attr('id', 'startDate');
@@ -1026,8 +1026,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
             } else if (tk == 'ed') {
                 v.append('span').attr('class', 'ct-assignItem fl-left').html('End Date');
-                //$(".fl-right").append("<img src='images_mindmap/ic-datepicker.png' />").attr('alt', 'calIcon');
-                w = v.append('div').attr('class', 'ct-assignItem btn-group dropdown fl-right dateBoxEd');
+                $(".fl-right-assign").append("<img src='images_mindmap/ic-datepicker.png' />").attr('alt', 'calIcon');
+                w = v.append('div').attr('class', 'ct-assignItem btn-group dropdown fl-right-assign dateBoxEd');
                 w.append('input').attr('class', 'datepicker').attr('id', 'endDate');
                 $(".dateBoxEd").append("<img id='dateIconEndDate' class='dateIcon' src='images_mindmap/ic-datepicker.png' />").attr('alt', 'calIcon');
                 $('#endDate').datepicker({
