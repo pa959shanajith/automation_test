@@ -2055,7 +2055,7 @@ exports.getAvailablePlugins = function (req, res) {
 			res.send("Invalid Session");
 		}
 	} catch (exception) {
-		console.log(exception);
+		logger.error(exception);
 		res.send("fail");
 	}
 };
