@@ -397,8 +397,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         // To fix rendering issue in FF issue #415
 
         var img_src = 'images_mindmap/node-' + n.type + '.png';
-        //Hot fix for >>> Mindmap: Screen node icon is changed . It's a temporary fix for not to show reuse icons, it'll be reverted once the backend logic is fixed.
-        //if(n.reuse && (n.type == 'testcases' || n.type=='screens')) img_src = 'images_mindmap/'+n.type+'-reuse.png';
+        if(n.reuse && (n.type == 'testcases' || n.type=='screens')) img_src = 'images_mindmap/'+n.type+'-reuse.png';
         if (n.type == 'modules_endtoend') img_src = 'images_mindmap/MM5.png';
         if ($("#ct-canvas").attr('class') == 'tabCreate ng-scope') {
             var v_c = v.append('image').attr('height', '40px').attr('width', '40px').attr('class', 'ct-nodeIcon').attr('xlink:href', img_src);
@@ -2598,7 +2597,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 //var t=e.name.replace(/_/g,' ');
                 var src_image = 'imgs/ic-reportbox.png'
                 var class_name = 'eteMbox';
-                var onclick_func = '';
+                var onclick_func = displayScenarios;
                 if (e.type == 'modules_endtoend') {
                     class_name = 'eteMboxETE';
                     onclick_func = loadScenarios;
@@ -2609,58 +2608,6 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 node.append('img').attr('class', 'ct-nodeIcon ' + class_name).attr('src', src_image).attr('alt', 'Module').attr('aria-hidden', true);
                 node.append('span').attr('class', 'ct-nodeLabel modulename').html(t);
             });
-
-            $('.moduleContainer').click(function(e) {
-                if($('#ct-mindMap').length==0){ // if no map is loaded 
-                    openDialogMindmap('Error','First, Please select an end to end module or create a new one!');
-                    return;
-                }
-                if ($($(this).children()[0]).hasClass('eteMbox')) {
-                    var som = 'Module Name: ' + $(this)[0].title;
-                    if (som.length > 31)
-                        $('.endtoend-modules-right-upper label').text(som.substring(0, 30) + '...');
-                    else
-                        $('.endtoend-modules-right-upper label').text(som);
-                    $('.endtoend-modules-right-upper label').attr('title', som.substring(13))
-                } else {
-                    $('.endtoend-modules-right-upper label').attr('title', '')
-                    $('.endtoend-modules-right-upper label').text('Scenarios');
-                }
-
-                // #894: Add button disabled by default
-                $('.addScenarios-ete').addClass('disableButton');
-                //#821 UI issues in e2e
-                $('#eteSearchScenarios').val("");
-
-                var container = $("#eteScenarioContainer");
-
-                var id = d3.select(this).attr('data-mapid');
-                var moduleid = allMaps_info[id].id_n;
-                if (allMaps_info[id].type == "modules_endtoend") {
-                    return;
-                }
-                mindmapServices.populateScenarios(moduleid).then(function(result) {
-                    container.empty();
-                    result.forEach(function(row) {
-                        container.append("<span class='eteScenrios' data-scenarioId='" + row.testScenarioID_c + "' title='" + row.testScenarioName + "'>" + row.testScenarioName + "</span>")
-                    });
-                    // #817 To select multiple scenarios in e2e (Himanshu)
-                    $('.eteScenrios').click(function() {
-                        $(this).toggleClass('selectScenariobg');
-                        var classflag = false;
-                        d3.select('.addScenarios-ete').classed('disableButton', !0);
-                        $.each($('.eteScenrios'), function() {
-                            if ($(this).hasClass('selectScenariobg')) {
-                                classflag = true;
-                                d3.select('.addScenarios-ete').classed('disableButton', !1);
-                            }
-                        })
-                    })                    
-                }, function(error) {
-                    console.log(error);
-                })
-
-            })
 
             initScroller();
             setModuleBoxHeight_W();
@@ -2784,6 +2731,58 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             treeBuilder_W(allMaps_info[reqMap]);
         }
     };
+
+    function displayScenarios(e) {
+        if($('#ct-mindMap').length==0){ // if no map is loaded 
+            openDialogMindmap('Error','First, Please select an end to end module or create a new one!');
+            return;
+        }
+        if ($($(this).children()[0]).hasClass('eteMbox')) {
+            var som = 'Module Name: ' + $(this)[0].title;
+            if (som.length > 31)
+                $('.endtoend-modules-right-upper label').text(som.substring(0, 30) + '...');
+            else
+                $('.endtoend-modules-right-upper label').text(som);
+            $('.endtoend-modules-right-upper label').attr('title', som.substring(13))
+        } else {
+            $('.endtoend-modules-right-upper label').attr('title', '')
+            $('.endtoend-modules-right-upper label').text('Scenarios');
+        }
+
+        // #894: Add button disabled by default
+        $('.addScenarios-ete').addClass('disableButton');
+        //#821 UI issues in e2e
+        $('#eteSearchScenarios').val("");
+
+        var container = $("#eteScenarioContainer");
+
+        var id = d3.select(this).attr('data-mapid');
+        var moduleid = allMaps_info[id].id_n;
+        if (allMaps_info[id].type == "modules_endtoend") {
+            return;
+        }
+        mindmapServices.populateScenarios(moduleid).then(function(result) {
+            container.empty();
+            result.forEach(function(row) {
+                container.append("<span class='eteScenrios' data-scenarioId='" + row.testScenarioID_c + "' title='" + row.testScenarioName + "'>" + row.testScenarioName + "</span>")
+            });
+            // #817 To select multiple scenarios in e2e (Himanshu)
+            $('.eteScenrios').click(function() {
+                $(this).toggleClass('selectScenariobg');
+                var classflag = false;
+                d3.select('.addScenarios-ete').classed('disableButton', !0);
+                $.each($('.eteScenrios'), function() {
+                    if ($(this).hasClass('selectScenariobg')) {
+                        classflag = true;
+                        d3.select('.addScenarios-ete').classed('disableButton', !1);
+                    }
+                })
+            })                    
+        }, function(error) {
+            console.log(error);
+        })
+
+    }
 
     function addNode_W(n, m, pi) {
 
@@ -3285,7 +3284,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         } else if (s.attr('id') == 'ct-createAction_W') {
             flag = 20;
             if (error) {
-                openDialogMindmap("Error", "Mindmap flow must be complete! Modules -> Scenarios -> Screens -> Testcases");
+                openDialogMindmap("Error", "Mindmap flow must be complete! End to End Module -> Scenarios");
                 //$('#Mindmap_error').modal('show');
                 return;
             }
@@ -3370,7 +3369,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                             //var t=e.name.replace(/_/g,' ');
                             var src_image = 'imgs/ic-reportbox.png'
                             var class_name = 'eteMbox';
-                            var onclick_func = '';
+                            var onclick_func = displayScenarios;
                             if (e.type == 'modules_endtoend') {
                                 class_name = 'eteMboxETE';
                                 onclick_func = loadScenarios;
