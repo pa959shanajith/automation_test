@@ -37,6 +37,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
     var faRef = {
             "plus": "fa-plus",
+            "plus1": "fa-hand-peace-o",
             "edit": "fa-pencil-square-o",
             "delete": "fa-trash-o"
         };
@@ -258,6 +259,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         u.append('ul').attr('id', 'ct-inpSugg').classed('no-disp', !0);
         u = canvas.append('div').attr('id', 'ct-ctrlBox').classed('no-disp', !0);
         u.append('p').attr('class', 'ct-ctrl fa ' + faRef.plus).on('click', createNode).append('span').attr('class', 'ct-tooltiptext').html('');
+        u.append('p').attr('class', 'ct-ctrl fa ' + faRef.plus1).on('click', createMultipleNode).append('span').attr('class', 'ct-tooltiptext').html('');
         u.append('p').attr('class', 'ct-ctrl fa ' + faRef.edit).on('click', editNode).append('span').attr('class', 'ct-tooltiptext').html('');
         u.append('p').attr('class', 'ct-ctrl fa ' + faRef.delete).on('click', deleteNode).append('span').attr('class', 'ct-tooltiptext').html('');
         u = canvas.append('div').attr('id', 'ct-assignBox').classed('no-disp', !0);
@@ -397,8 +399,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         // To fix rendering issue in FF issue #415
 
         var img_src = 'images_mindmap/node-' + n.type + '.png';
-        //Hot fix for >>> Mindmap: Screen node icon is changed . It's a temporary fix for not to show reuse icons, it'll be reverted once the backend logic is fixed.
-        //if(n.reuse && (n.type == 'testcases' || n.type=='screens')) img_src = 'images_mindmap/'+n.type+'-reuse.png';
+        if(n.reuse && (n.type == 'testcases' || n.type=='screens')) img_src = 'images_mindmap/'+n.type+'-reuse.png';
         if (n.type == 'modules_endtoend') img_src = 'images_mindmap/MM5.png';
         if ($("#ct-canvas").attr('class') == 'tabCreate ng-scope') {
             var v_c = v.append('image').attr('height', '40px').attr('width', '40px').attr('class', 'ct-nodeIcon').attr('xlink:href', img_src);
@@ -1000,7 +1001,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
             } else if (tk == 'sd') {
                 v.append('span').attr('class', 'ct-assignItem fl-left').html('Start Date');
-                w = v.append('div').attr('class', 'ct-assignItem btn-group dropdown fl-right dateBoxSd');
+                w = v.append('div').attr('class', 'ct-assignItem btn-group dropdown fl-right-assign dateBoxSd');
                 // w.append('input').attr('class','ct-asValBox btn dropdown-toggle').attr('data-toggle','dropdown').append('a').attr('id','ct-assignStart').html(tObj.sd);
                 // w.append('button').attr('class','ct-asValBoxIcon ct-asItemCal btn dropdown-toggle').attr('data-toggle','dropdown').append('img').attr('src','images_mindmap/ic-datepicker.png').attr('alt','calIcon');
                 w.append('input').attr('class', 'datepicker').attr('id', 'startDate');
@@ -1026,8 +1027,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
             } else if (tk == 'ed') {
                 v.append('span').attr('class', 'ct-assignItem fl-left').html('End Date');
-                //$(".fl-right").append("<img src='images_mindmap/ic-datepicker.png' />").attr('alt', 'calIcon');
-                w = v.append('div').attr('class', 'ct-assignItem btn-group dropdown fl-right dateBoxEd');
+                $(".fl-right-assign").append("<img src='images_mindmap/ic-datepicker.png' />").attr('alt', 'calIcon');
+                w = v.append('div').attr('class', 'ct-assignItem btn-group dropdown fl-right-assign dateBoxEd');
                 w.append('input').attr('class', 'datepicker').attr('id', 'endDate');
                 $(".dateBoxEd").append("<img id='dateIconEndDate' class='dateIcon' src='images_mindmap/ic-datepicker.png' />").attr('alt', 'calIcon');
                 $('#endDate').datepicker({
@@ -1232,16 +1233,19 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         c.select('p.' + faRef.delete).classed('ct-ctrl-inactive', !1);
         if (t == 'modules') {
             c.select('p.' + faRef.plus + ' .ct-tooltiptext').html('Create Scenarios');
+            c.select('p.' + faRef.plus1 + ' .ct-tooltiptext').html('Create Multiple Scenarios');
             c.select('p.' + faRef.edit + ' .ct-tooltiptext').html('Edit Module');
             //513-'Mindmap: When we delete an existing Module and create another module in the same work space  then a new Module instance is being appended .
             c.select('p.' + faRef.delete).classed('ct-ctrl-inactive', !0);
             //c.select('p.'+faRef.delete+' .ct-tooltiptext').html('Delete Module');
         } else if (t == 'scenarios') {
             c.select('p.' + faRef.plus + ' .ct-tooltiptext').html('Create Screens');
+            c.select('p.' + faRef.plus1 + ' .ct-tooltiptext').html('Create Multiple Screens');
             c.select('p.' + faRef.edit + ' .ct-tooltiptext').html('Edit Scenario');
             c.select('p.' + faRef.delete + ' .ct-tooltiptext').html('Delete Scenario');
         } else if (t == 'screens') {
             c.select('p.' + faRef.plus + ' .ct-tooltiptext').html('Create Testcases');
+            c.select('p.' + faRef.plus1 + ' .ct-tooltiptext').html('Create Multiple Testcases');
             c.select('p.' + faRef.edit + ' .ct-tooltiptext').html('Edit Screen');
             c.select('p.' + faRef.delete + ' .ct-tooltiptext').html('Delete Screen');
         } else if (t == 'testcases') {
@@ -1431,6 +1435,49 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         }
 
     };
+
+    //------Create Multiple Child Node-------//
+    function createMultipleNode(){
+        $("#addObjContainer").empty();
+        $scope.errorMessage = "";
+        $("#dialog-addObject").modal("show");
+        $timeout(function(){$('.modal-backdrop.in').remove();},1000);
+
+    }
+
+    $scope.addMoreNode = function() {
+          $("#addObjContainer").append(`<div class="row row-modal addObj-row">
+                                        <div class="form-group"><input type="text" class="form-control form-control-custom" placeholder="Enter node name"></div>
+                                        <img class="deleteAddObjRow" src="imgs/ic-delete.png" />
+                                        </div>`);
+    };
+
+    $scope.clearNodes = function() {
+        $("input").val('');
+        $("select").prop('selectedIndex', 0);
+        $(".addObj-row").find("input").removeClass('inputErrorBorder')
+        $(".addObj-row").find("select").removeClass('selectErrorBorder')
+        $scope.errorMessage = "";
+    }
+
+
+    $(document).on("click", ".deleteAddObjRow", function() {
+        $(this).parent(".addObj-row").remove();
+    });
+
+    $scope.createNodes = function(){
+        var nodeNames = [];
+        $('input.form-control-custom').each(function() {
+            nodeNames.push( $.trim($(this).val()));
+        });
+        console.log("NodeNames:",nodeNames);
+        nodeNames.forEach(function(node,i){
+            createNode({name: node[i]});
+        });
+        $("#dialog-addObject").modal("hide");
+    }
+
+    //------End of Create Multiple Child Node-------//
 
     function editNode(e, node) {
 
@@ -2598,7 +2645,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 //var t=e.name.replace(/_/g,' ');
                 var src_image = 'imgs/ic-reportbox.png'
                 var class_name = 'eteMbox';
-                var onclick_func = '';
+                var onclick_func = displayScenarios;
                 if (e.type == 'modules_endtoend') {
                     class_name = 'eteMboxETE';
                     onclick_func = loadScenarios;
@@ -2609,58 +2656,6 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 node.append('img').attr('class', 'ct-nodeIcon ' + class_name).attr('src', src_image).attr('alt', 'Module').attr('aria-hidden', true);
                 node.append('span').attr('class', 'ct-nodeLabel modulename').html(t);
             });
-
-            $('.moduleContainer').click(function(e) {
-                if($('#ct-mindMap').length==0){ // if no map is loaded 
-                    openDialogMindmap('Error','First, Please select an end to end module or create a new one!');
-                    return;
-                }
-                if ($($(this).children()[0]).hasClass('eteMbox')) {
-                    var som = 'Module Name: ' + $(this)[0].title;
-                    if (som.length > 31)
-                        $('.endtoend-modules-right-upper label').text(som.substring(0, 30) + '...');
-                    else
-                        $('.endtoend-modules-right-upper label').text(som);
-                    $('.endtoend-modules-right-upper label').attr('title', som.substring(13))
-                } else {
-                    $('.endtoend-modules-right-upper label').attr('title', '')
-                    $('.endtoend-modules-right-upper label').text('Scenarios');
-                }
-
-                // #894: Add button disabled by default
-                $('.addScenarios-ete').addClass('disableButton');
-                //#821 UI issues in e2e
-                $('#eteSearchScenarios').val("");
-
-                var container = $("#eteScenarioContainer");
-
-                var id = d3.select(this).attr('data-mapid');
-                var moduleid = allMaps_info[id].id_n;
-                if (allMaps_info[id].type == "modules_endtoend") {
-                    return;
-                }
-                mindmapServices.populateScenarios(moduleid).then(function(result) {
-                    container.empty();
-                    result.forEach(function(row) {
-                        container.append("<span class='eteScenrios' data-scenarioId='" + row.testScenarioID_c + "' title='" + row.testScenarioName + "'>" + row.testScenarioName + "</span>")
-                    });
-                    // #817 To select multiple scenarios in e2e (Himanshu)
-                    $('.eteScenrios').click(function() {
-                        $(this).toggleClass('selectScenariobg');
-                        var classflag = false;
-                        d3.select('.addScenarios-ete').classed('disableButton', !0);
-                        $.each($('.eteScenrios'), function() {
-                            if ($(this).hasClass('selectScenariobg')) {
-                                classflag = true;
-                                d3.select('.addScenarios-ete').classed('disableButton', !1);
-                            }
-                        })
-                    })                    
-                }, function(error) {
-                    console.log(error);
-                })
-
-            })
 
             initScroller();
             setModuleBoxHeight_W();
@@ -2784,6 +2779,58 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             treeBuilder_W(allMaps_info[reqMap]);
         }
     };
+
+    function displayScenarios(e) {
+        if($('#ct-mindMap').length==0){ // if no map is loaded 
+            openDialogMindmap('Error','First, Please select an end to end module or create a new one!');
+            return;
+        }
+        if ($($(this).children()[0]).hasClass('eteMbox')) {
+            var som = 'Module Name: ' + $(this)[0].title;
+            if (som.length > 31)
+                $('.endtoend-modules-right-upper label').text(som.substring(0, 30) + '...');
+            else
+                $('.endtoend-modules-right-upper label').text(som);
+            $('.endtoend-modules-right-upper label').attr('title', som.substring(13))
+        } else {
+            $('.endtoend-modules-right-upper label').attr('title', '')
+            $('.endtoend-modules-right-upper label').text('Scenarios');
+        }
+
+        // #894: Add button disabled by default
+        $('.addScenarios-ete').addClass('disableButton');
+        //#821 UI issues in e2e
+        $('#eteSearchScenarios').val("");
+
+        var container = $("#eteScenarioContainer");
+
+        var id = d3.select(this).attr('data-mapid');
+        var moduleid = allMaps_info[id].id_n;
+        if (allMaps_info[id].type == "modules_endtoend") {
+            return;
+        }
+        mindmapServices.populateScenarios(moduleid).then(function(result) {
+            container.empty();
+            result.forEach(function(row) {
+                container.append("<span class='eteScenrios' data-scenarioId='" + row.testScenarioID_c + "' title='" + row.testScenarioName + "'>" + row.testScenarioName + "</span>")
+            });
+            // #817 To select multiple scenarios in e2e (Himanshu)
+            $('.eteScenrios').click(function() {
+                $(this).toggleClass('selectScenariobg');
+                var classflag = false;
+                d3.select('.addScenarios-ete').classed('disableButton', !0);
+                $.each($('.eteScenrios'), function() {
+                    if ($(this).hasClass('selectScenariobg')) {
+                        classflag = true;
+                        d3.select('.addScenarios-ete').classed('disableButton', !1);
+                    }
+                })
+            })                    
+        }, function(error) {
+            console.log(error);
+        })
+
+    }
 
     function addNode_W(n, m, pi) {
 
@@ -3285,7 +3332,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         } else if (s.attr('id') == 'ct-createAction_W') {
             flag = 20;
             if (error) {
-                openDialogMindmap("Error", "Mindmap flow must be complete! Modules -> Scenarios -> Screens -> Testcases");
+                openDialogMindmap("Error", "Mindmap flow must be complete! End to End Module -> Scenarios");
                 //$('#Mindmap_error').modal('show');
                 return;
             }
@@ -3370,7 +3417,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                             //var t=e.name.replace(/_/g,' ');
                             var src_image = 'imgs/ic-reportbox.png'
                             var class_name = 'eteMbox';
-                            var onclick_func = '';
+                            var onclick_func = displayScenarios;
                             if (e.type == 'modules_endtoend') {
                                 class_name = 'eteMboxETE';
                                 onclick_func = loadScenarios;
@@ -3983,9 +4030,6 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         }
     }
     //--------------------Controller logic Ends-------------------------//
-    angular.element(function () {
-        console.log('page loading completed');
-    });
 
     function SaveCreateED(element,disable,noAccess){
         d3.select(element).classed('no-access',noAccess);
