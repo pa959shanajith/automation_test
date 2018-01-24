@@ -219,7 +219,6 @@ exports.checkReuse=function(req,res){
 		logger.error("Invalid Session");
 		res.send("Invalid Session");
 	}
-
 }
 
 exports.getModules=function(req,res){
@@ -454,26 +453,29 @@ exports.saveData=function(req,res){
 			var flag=inputs.write;
 			var removeTask=inputs.unassignTask;
 			var sendNotify=inputs.sendNotify;
-
-			/*for(var i=0;i<Object.values(sendNotify).length;i++) {
-				var taskAssignment = 'assigned';
-				var taskName = data[i].name;
-				var soc = myserver.socketMapNotify[Object.values(sendNotify)[i]];
-				var count = 0;
-				var assignedTasksNotification = {};
-				assignedTasksNotification.to = '/plugin';
-				if(removeTask.indexOf(data[i].oid) >= 0) {
-					taskAssignment = "unassigned";
+			//Assigned Tasks Notification
+			var assignedToValues = Object.keys(sendNotify).map(function(key){return sendNotify[key]});
+			for(var i=0;i<assignedToValues.length;i++) {
+				if (Object.keys(myserver.socketMapNotify).indexOf(assignedToValues[i]) > -1) {
+					var taskAssignment = 'assigned';
+					var taskName = data[i].name;
+					var soc = myserver.socketMapNotify[assignedToValues[i]];
+					var count = 0;
+					var assignedTasksNotification = {};
+					assignedTasksNotification.to = '/plugin';
+					if(removeTask.indexOf(data[i].oid) >= 0) {
+						taskAssignment = "unassigned";
+					}
+					if(taskAssignment == "unassigned") {
+						assignedTasksNotification.notifyMsg = "Task '"+taskName+"' have been unassigned by "+ user+"";
+					} else{
+						assignedTasksNotification.notifyMsg = "New task '"+taskName+"' have been assigned by "+ user+"";
+					}
+					assignedTasksNotification.isRead = false;
+					assignedTasksNotification.count = count;
+					soc.emit("notify",assignedTasksNotification);
 				}
-				if(taskAssignment == "unassigned") {
-					assignedTasksNotification.notifyMsg = "Task '"+taskName+"' have been unassigned by "+ user+"";
-				} else{
-					assignedTasksNotification.notifyMsg = "New task '"+taskName+"' have been assigned by "+ user+"";
-				}
-				assignedTasksNotification.isRead = false;
-				assignedTasksNotification.count = count;
-				soc.emit("notify",assignedTasksNotification);
-			}*/
+			}
 			
 			//TO support task deletion
 			
@@ -571,7 +573,12 @@ exports.saveData=function(req,res){
 					}
 					else if(e.type=='screens'){
 						uidx++;lts=idDict[e.pid];
-						if(e.renamed && e.id_n && e.orig_name) rnmList.push({"statement":"MATCH(n:SCREENS{screenName:'"+e.orig_name+"',projectID:'"+prjId+"'}) SET n.screenName='"+e.name+"'"});
+						if(e.renamed && e.id_n && e.orig_name) 
+						{	
+							rnmList.push({"statement":"MATCH(n:SCREENS{screenName:'"+e.orig_name+"',projectID:'"+prjId+"'}) SET n.screenName='"+e.name+"'"});
+							// Beacuse of reuse feature adding testcasename to screen table so if screen is renamed change should reflect in testcase table
+							rnmList.push({"statement":"MATCH(n:TESTCASES{screenName:'"+e.orig_name+"',projectID:'"+prjId+"'}) SET n.screenName='"+e.name+"'"});
+						}
 						qList.push({"statement":"MERGE(n:SCREENS{projectID:'"+prjId+"',testScenarioID:'"+idDict[e.pid]+"',screenName:'"+e.name+"',screenID:'"+e.id+"',createdBy:'"+user+"',createdOn:'null',uid:'"+uidx+"',screenID_c:'"+e.id_c+"'})SET n.childIndex='"+e.childIndex+"'"});
 						//Relating scenario with screens
 						//Yashi
@@ -599,9 +606,9 @@ exports.saveData=function(req,res){
 							rnmList.push({"statement":"MATCH(n:TESTCASES{testCaseName:'"+e.orig_name+"',testScenarioID:'"+lts+"',screenID_c:'"+e.pid_c+"'}) SET n.testCaseName='"+e.name+"'"});
 						}
 						if(e.pid_c!='null' && e.pid_c!=undefined){
-							qList.push({"statement":"MERGE(n:TESTCASES{screenID:'"+idDict[e.pid]+"',screenName:'"+nameDict[e.pid] +"',projectID:'" + prjId + "',testScenarioID:'"+lts+"',testCaseName:'"+e.name+"',testCaseID:'"+e.id+"',createdBy:'"+user+"',createdOn:'null',uid:'"+uidx+"',testCaseID_c:'"+e.id_c+"'}) SET n.screenID_c='"+e.pid_c+"',n.childIndex='"+e.childIndex+"'"});
+							qList.push({"statement":"MERGE(n:TESTCASES{screenID:'"+idDict[e.pid]+"',screenName:'"+nameDict[idDict[e.pid]] +"',projectID:'" + prjId + "',testScenarioID:'"+lts+"',testCaseName:'"+e.name+"',testCaseID:'"+e.id+"',createdBy:'"+user+"',createdOn:'null',uid:'"+uidx+"',testCaseID_c:'"+e.id_c+"'}) SET n.screenID_c='"+e.pid_c+"',n.childIndex='"+e.childIndex+"'"});
 						}else{
-							qList.push({"statement":"MERGE(n:TESTCASES{screenID:'"+idDict[e.pid]+"',screenName:'"+nameDict[e.pid] +"',projectID:'" + prjId + "',testScenarioID:'"+lts+"',testCaseName:'"+e.name+"',testCaseID:'"+e.id+"',createdBy:'"+user+"',createdOn:'null',uid:'"+uidx+"',testCaseID_c:'"+e.id_c+"'}) SET n.childIndex='"+e.childIndex+"'"});
+							qList.push({"statement":"MERGE(n:TESTCASES{screenID:'"+idDict[e.pid]+"',screenName:'"+nameDict[idDict[e.pid]] +"',projectID:'" + prjId + "',testScenarioID:'"+lts+"',testCaseName:'"+e.name+"',testCaseID:'"+e.id+"',createdBy:'"+user+"',createdOn:'null',uid:'"+uidx+"',testCaseID_c:'"+e.id_c+"'}) SET n.childIndex='"+e.childIndex+"'"});
 						}
 
 						//Relating testcases with screens

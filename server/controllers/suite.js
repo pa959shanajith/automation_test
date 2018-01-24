@@ -10,7 +10,6 @@ var Client = require("node-rest-client").Client;
 var neo4jAPI = require('../controllers/neo4jAPI');
 var client = new Client();
 var schedule = require('node-schedule');
-var sessionExtend = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes
 var sessionTime = 30 * 60 * 1000;
 var updateSessionTimeEvery = 20 * 60 * 1000;
 var scheduleStatus = "";
@@ -740,6 +739,7 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 						data = JSON.parse(message);
 						if(name == data.username){
 							if (data.onAction == "unavailableLocalServer") {
+								clearInterval(updateSessionExpiry);
 								redisServer.redisSub2.removeListener("message",executeTestSuite_listener);
 								logger.error("Error occured in ExecuteTestSuite_ICE: Socket Disconnected");
 								if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
@@ -748,7 +748,6 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 								}
 							} else if (data.onAction == "result_executeTestSuite") {
 								var resultData = data.value;
-								clearInterval(updateSessionExpiry);
 								if (resultData != "success" && resultData != "Terminate") {
 									// completedSceCount++;
 									// scenarioCount = executionRequest.suitedetails[testsuitecount].scenarioIds.length;
@@ -824,6 +823,7 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 									}
 								}
 								if (resultData == "success" || resultData == "Terminate") {
+									clearInterval(updateSessionExpiry);
 									redisServer.redisSub2.removeListener("message",executeTestSuite_listener);
 									try {
 										logger.info("Sending execution status from function executionFunction");
@@ -1205,6 +1205,7 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 												data = JSON.parse(message);
 												if(name == data.username){
 													if (data.onAction == "unavailableLocalServer") {
+														// clearInterval(updateSessionExpiry);
 														redisServer.redisSub2.removeListener("message",executeTestSuite_listener);
 														logger.error("Error occured in ExecuteTestSuite_ICE_SVN: Socket Disconnected");
 														if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
@@ -1214,7 +1215,6 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 													} else if (data.onAction == "result_executeTestSuite") {
 														var resultData = data.value;
 														completedSceCount++;
-														// clearInterval(updateSessionExpiry);
 														if (resultData != "success" && resultData != "Terminate") {
 															try {
 																var scenarioid = resultData.scenarioId;
@@ -1284,6 +1284,7 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 															}
 														}
 														if (resultData == "success" || resultData == "Terminate") {
+															// clearInterval(updateSessionExpiry);
 															redisServer.redisSub2.removeListener("message",executeTestSuite_listener);
 															try {
 																result_to_send.execution_status.push(final_data[username]);
@@ -1472,6 +1473,7 @@ exports.ExecuteTestSuite_ICE_CI = function (req, res) {
 						data = JSON.parse(message);
 						if(name == data.username){
 							if (data.onAction == "unavailableLocalServer") {
+								clearInterval(updateSessionExpiry);
 								redisServer.redisSub2.removeListener("message",executeTestSuite_listener);
 								logger.error("Error occured in ExecuteTestSuite_ICE_CI: Socket Disconnected");
 								if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
@@ -1480,7 +1482,6 @@ exports.ExecuteTestSuite_ICE_CI = function (req, res) {
 								}
 							} else if (data.onAction == "result_executeTestSuite") {
 								var resultData = data.value;
-								clearInterval(updateSessionExpiry);
 								if (resultData != "success" && resultData != "Terminate") {
 									completedSceCount++;
 									scenarioCount = executionRequest.suitedetails[testsuitecount].scenarioIds.length;
@@ -1552,6 +1553,7 @@ exports.ExecuteTestSuite_ICE_CI = function (req, res) {
 									}
 								}
 								if (resultData == "success" || resultData == "Terminate") {
+									clearInterval(updateSessionExpiry);
 									redisServer.redisSub2.removeListener("message",executeTestSuite_listener);
 									try {
 										logger.info("Sending execution status from function executionFunction in ExecuteTestSuite_ICE_CI");
@@ -2664,7 +2666,6 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 												}
 											} else if (data.onAction == "result_executeTestSuite") {
 												var resultData = data.value;
-												clearInterval(updateSessionExpiry);
 												if (resultData != "success" && resultData != "Terminate") {
 													//completedSceCount_s++;
 													//scenarioCount_s = executionRequest.suitedetails[testsuitecount_s].scenarioIds.length;
@@ -2740,6 +2741,7 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 												}
 												else if (resultData) {
 													if (typeof(resultData) == "string") {
+														clearInterval(updateSessionExpiry);
 														redisServer.redisSub2.removeListener("message",executeTestSuite_listener);
 														scheduleStatus = resultData == "success" ? "Completed" : resultData;
 													} 

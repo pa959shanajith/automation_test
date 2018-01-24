@@ -190,7 +190,7 @@ p,a,img,text,span,.noselect{-webkit-touch-callout:none;-webkit-user-select:none;
 .selectScenariobg{background-color: #4299e2; color: #fff;}
 #etemModuleContainer{margin: 0;}
 .fl-left{float:left!important}
-.fl-right{float:right!important}
+.fl-right,.fl-right-assign{float:right!important}
 .bg-blank{background:transparent!important}
 .no-disp{display:none!important}
 .no-access{cursor:not-allowed!important}

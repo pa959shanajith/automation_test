@@ -791,7 +791,10 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
       "translate(" + [positionNode.x,positionNode.y] + ")"
       + " scale(" + 1 + ")");
     });
-
+  
+    function getElementDimm(s) {
+      return [parseFloat(s.style("width")), parseFloat(s.style("height"))];
+  };
 
     function tick() {
       link.attr("x1", function(d) { return d.source.x+12.5 ; })
