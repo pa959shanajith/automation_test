@@ -61,6 +61,7 @@ exports.loginQCServer_ICE = function (req, res) {
 						function qclogin_listener(channel,message) {
 							data = JSON.parse(message);
 							if(name == data.username){
+								clearInterval(updateSessionExpiry);
 								redisServer.redisSub2.removeListener('message',qclogin_listener);
 								if (data.onAction == "unavailableLocalServer") {
 									logger.error("Error occured in loginQCServer_ICE: Socket Disconnected");
@@ -70,7 +71,6 @@ exports.loginQCServer_ICE = function (req, res) {
 									}
 								} else if (data.onAction == "qcresponse") {
 									data = data.value;
-									clearInterval(updateSessionExpiry);
 									res.send(data);
 								}
 							}
@@ -140,7 +140,6 @@ exports.qcProjectDetails_ICE = function (req, res) {
 					};
 					getProjectsForUser(userid, function (projectdata) {
 						// var qcDetails = {"qcUsername":username,"qcPassword":password,"qcURL":url};
-						// var data = "LAUNCH_SAP";
 						logger.info("Sending socket request for qclogin to redis");
 						dataToIce = {"emitAction" : "qclogin","username" : name, "responsedata":qcDetails};
 						redisServer.redisPub1.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
@@ -150,6 +149,7 @@ exports.qcProjectDetails_ICE = function (req, res) {
 						function qclogin_listener(channel,message) {
 							data = JSON.parse(message);
 							if(name == data.username){
+								clearInterval(updateSessionExpiry);
 								redisServer.redisSub2.removeListener('message',qclogin_listener);
 								if (data.onAction == "unavailableLocalServer") {
 									logger.error("Error occured in qcProjectDetails_ICE: Socket Disconnected");
@@ -158,15 +158,18 @@ exports.qcProjectDetails_ICE = function (req, res) {
 										soc.emit("ICEnotAvailable");
 									}
 								} else if (data.onAction == "qcresponse") {
-									data = JSON.parse(data.value);
-									clearInterval(updateSessionExpiry);
-									try {
-										projectDetailList.nineteen68_projects = projectdata;
-										projectDetailList.qc_projects = data.project;
-										res.send(projectDetailList);
-									} catch (ex) {
-										logger.error(ex);
+									if (data.value.toLowerCase() == "fail")
 										res.send("fail");
+									else {
+										data = JSON.parse(data.value);
+										try {
+											projectDetailList.nineteen68_projects = projectdata;
+											projectDetailList.qc_projects = data.project;
+											res.send(projectDetailList);
+										} catch (ex) {
+											logger.error(ex);
+											res.send("fail");
+										}
 									}
 								}
 							}
@@ -247,7 +250,6 @@ function getProjectsForUser(userid, cb) {
 			}, callback1);
 		},
 		data: function (callback1) {
-			console.log(JSON.stringify(projectDetailsList));
 			cb(projectDetailsList);
 		}
 	});
@@ -348,6 +350,7 @@ exports.qcFolderDetails_ICE = function (req, res) {
 					function qclogin_listener(channel,message) {
 						data = JSON.parse(message);
 						if(name == data.username){
+							clearInterval(updateSessionExpiry);
 							redisServer.redisSub2.removeListener('message',qclogin_listener);
 							if (data.onAction == "unavailableLocalServer") {
 								logger.error("Error occured in qcFolderDetails_ICE: Socket Disconnected");
@@ -357,7 +360,6 @@ exports.qcFolderDetails_ICE = function (req, res) {
 								}
 							} else if (data.onAction == "qcresponse") {
 								data = data.value;
-								clearInterval(updateSessionExpiry);
 								res.send(data);
 							}
 						}
