@@ -37,6 +37,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
     var faRef = {
             "plus": "fa-plus",
+            "plus1": "fa-hand-peace-o",
             "edit": "fa-pencil-square-o",
             "delete": "fa-trash-o"
         };
@@ -258,6 +259,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         u.append('ul').attr('id', 'ct-inpSugg').classed('no-disp', !0);
         u = canvas.append('div').attr('id', 'ct-ctrlBox').classed('no-disp', !0);
         u.append('p').attr('class', 'ct-ctrl fa ' + faRef.plus).on('click', createNode).append('span').attr('class', 'ct-tooltiptext').html('');
+        u.append('p').attr('class', 'ct-ctrl fa ' + faRef.plus1).on('click', createMultipleNode).append('span').attr('class', 'ct-tooltiptext').html('');
         u.append('p').attr('class', 'ct-ctrl fa ' + faRef.edit).on('click', editNode).append('span').attr('class', 'ct-tooltiptext').html('');
         u.append('p').attr('class', 'ct-ctrl fa ' + faRef.delete).on('click', deleteNode).append('span').attr('class', 'ct-tooltiptext').html('');
         u = canvas.append('div').attr('id', 'ct-assignBox').classed('no-disp', !0);
@@ -1231,16 +1233,19 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         c.select('p.' + faRef.delete).classed('ct-ctrl-inactive', !1);
         if (t == 'modules') {
             c.select('p.' + faRef.plus + ' .ct-tooltiptext').html('Create Scenarios');
+            c.select('p.' + faRef.plus1 + ' .ct-tooltiptext').html('Create Multiple Scenarios');
             c.select('p.' + faRef.edit + ' .ct-tooltiptext').html('Edit Module');
             //513-'Mindmap: When we delete an existing Module and create another module in the same work space  then a new Module instance is being appended .
             c.select('p.' + faRef.delete).classed('ct-ctrl-inactive', !0);
             //c.select('p.'+faRef.delete+' .ct-tooltiptext').html('Delete Module');
         } else if (t == 'scenarios') {
             c.select('p.' + faRef.plus + ' .ct-tooltiptext').html('Create Screens');
+            c.select('p.' + faRef.plus1 + ' .ct-tooltiptext').html('Create Multiple Screens');
             c.select('p.' + faRef.edit + ' .ct-tooltiptext').html('Edit Scenario');
             c.select('p.' + faRef.delete + ' .ct-tooltiptext').html('Delete Scenario');
         } else if (t == 'screens') {
             c.select('p.' + faRef.plus + ' .ct-tooltiptext').html('Create Testcases');
+            c.select('p.' + faRef.plus1 + ' .ct-tooltiptext').html('Create Multiple Testcases');
             c.select('p.' + faRef.edit + ' .ct-tooltiptext').html('Edit Screen');
             c.select('p.' + faRef.delete + ' .ct-tooltiptext').html('Delete Screen');
         } else if (t == 'testcases') {
@@ -1430,6 +1435,49 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         }
 
     };
+
+    //------Create Multiple Child Node-------//
+    function createMultipleNode(){
+        $("#addObjContainer").empty();
+        $scope.errorMessage = "";
+        $("#dialog-addObject").modal("show");
+        $timeout(function(){$('.modal-backdrop.in').remove();},1000);
+
+    }
+
+    $scope.addMoreNode = function() {
+          $("#addObjContainer").append(`<div class="row row-modal addObj-row">
+                                        <div class="form-group"><input type="text" class="form-control form-control-custom" placeholder="Enter node name"></div>
+                                        <img class="deleteAddObjRow" src="imgs/ic-delete.png" />
+                                        </div>`);
+    };
+
+    $scope.clearNodes = function() {
+        $("input").val('');
+        $("select").prop('selectedIndex', 0);
+        $(".addObj-row").find("input").removeClass('inputErrorBorder')
+        $(".addObj-row").find("select").removeClass('selectErrorBorder')
+        $scope.errorMessage = "";
+    }
+
+
+    $(document).on("click", ".deleteAddObjRow", function() {
+        $(this).parent(".addObj-row").remove();
+    });
+
+    $scope.createNodes = function(){
+        var nodeNames = [];
+        $('input.form-control-custom').each(function() {
+            nodeNames.push( $.trim($(this).val()));
+        });
+        console.log("NodeNames:",nodeNames);
+        nodeNames.forEach(function(node,i){
+            createNode({name: node[i]});
+        });
+        $("#dialog-addObject").modal("hide");
+    }
+
+    //------End of Create Multiple Child Node-------//
 
     function editNode(e, node) {
 
@@ -3982,9 +4030,6 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         }
     }
     //--------------------Controller logic Ends-------------------------//
-    angular.element(function () {
-        console.log('page loading completed');
-    });
 
     function SaveCreateED(element,disable,noAccess){
         d3.select(element).classed('no-access',noAccess);
