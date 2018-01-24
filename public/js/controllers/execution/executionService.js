@@ -1,4 +1,4 @@
-mySPA.factory('ExecutionService', ['$http','$q', function ($http, $httpProvider, $q)   {
+mySPA.factory('ExecutionService', ['$http','$q', function ($http,$q)   {
 	return{
 		readTestSuite_ICE : function(readTestSuite){
 			return $http.post('/readTestSuite_ICE',{

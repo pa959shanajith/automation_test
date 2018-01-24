@@ -1,4 +1,4 @@
-mySPA.factory('qcServices', ['$http','$q', function ($http, $httpProvider, $q)   {
+mySPA.factory('qcServices', ['$http','$q', function ($http,$q)   {
   return{
         loginQCServer_ICE: function(qcURL,qcUserName,qcPassword){
     			var param = "loginQCServer_ICE";

@@ -1,4 +1,4 @@
-mySPA.factory('mindmapServices', ['$http','$q', function ($http, $httpProvider, $q)   {
+mySPA.factory('mindmapServices', ['$http','$q', function ($http,$q)   {
 	return{
 		populateProjects: function () {
     		var param = "populateProjects";
@@ -136,6 +136,15 @@ mySPA.factory('mindmapServices', ['$http','$q', function ($http, $httpProvider, 
     		})
     		.then(function (response) { return response.data; },
     				function (response) { return $q.reject(response.data); });
-    	}
+    	},
+		getCRId:function (projectId){
+			var param = "getCRId";
+    		return $http.post('/getCRId', {
+				projectid:projectId
+				
+    		})
+    		.then(function (response) { return response.data; },
+    				function (response) { return $q.reject(response.data); });
+		}
 	}
 }]);

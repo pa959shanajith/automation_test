@@ -1,4 +1,4 @@
-mySPA.factory('dashboardService', ['$http','$q', function ($http, $httpProvider, $q)   {
+mySPA.factory('dashboardService', ['$http','$q', function ($http,$q)   {
   return{
     loadDashboard: function(query){
       return $http.post('/loadDashboard', {
