@@ -1439,17 +1439,21 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         $("#addObjContainer").empty();
         $scope.errorMessage = "";
         $("#dialog-addObject").modal("show");
+        //Add two nodes 
+        $scope.addMoreNode();
+        $scope.addMoreNode();
         $timeout(function(){$('.modal-backdrop.in').remove();},1000);
 
     }
 
     $scope.addMoreNode = function() {
         if($('.row.row-modal.addObj-row').length<10){
+            var idxAddNode = 1+$('.row.row-modal.addObj-row').length;
             $("#addObjContainer").append(`<div class="row row-modal addObj-row">
                                                 <form class="form-horizontal" role="form">
-                                                        <div class="col-sm-2"><label for="addNode-`+1+$('.row.row-modal.addObj-row').length+`">`+$('.row.row-modal.addObj-row').length+`</label></div>
+                                                        <div class="col-sm-2 addNode-label"><label>`+idxAddNode+`</label></div>
                                                         <div class="col-sm-6">
-                                                        <input type="text" id = 'addNode-`+1+$('.row.row-modal.addObj-row').length+`' class="form-control form-control-custom" placeholder="Enter node name">
+                                                        <input type="text" class="form-control form-control-custom" placeholder="Enter node name" maxlength="40">
                                                         </div>
                                                         <div class="col-sm-2 deleteAddObjRow"><img src="imgs/ic-delete.png" /></div>
                                                 </form>
@@ -1470,7 +1474,12 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
 
     $(document).on("click", ".deleteAddObjRow", function() {
-        $(this).parent(".addObj-row").remove();
+        $(this).parent().parent().remove();
+        var tmpidx = 1;
+        $('.addNode-label').each(function(){
+            $(this).text(tmpidx);
+            tmpidx=tmpidx+1;
+        });
     });
 
     $scope.createNodes = function(){
