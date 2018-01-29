@@ -453,26 +453,29 @@ exports.saveData=function(req,res){
 			var flag=inputs.write;
 			var removeTask=inputs.unassignTask;
 			var sendNotify=inputs.sendNotify;
-
-			/*for(var i=0;i<Object.values(sendNotify).length;i++) {
-				var taskAssignment = 'assigned';
-				var taskName = data[i].name;
-				var soc = myserver.socketMapNotify[Object.values(sendNotify)[i]];
-				var count = 0;
-				var assignedTasksNotification = {};
-				assignedTasksNotification.to = '/plugin';
-				if(removeTask.indexOf(data[i].oid) >= 0) {
-					taskAssignment = "unassigned";
+			//Assigned Tasks Notification
+			var assignedToValues = Object.keys(sendNotify).map(function(key){return sendNotify[key]});
+			for(var i=0;i<assignedToValues.length;i++) {
+				if (Object.keys(myserver.socketMapNotify).indexOf(assignedToValues[i]) > -1) {
+					var taskAssignment = 'assigned';
+					var taskName = data[i].name;
+					var soc = myserver.socketMapNotify[assignedToValues[i]];
+					var count = 0;
+					var assignedTasksNotification = {};
+					assignedTasksNotification.to = '/plugin';
+					if(removeTask.indexOf(data[i].oid) >= 0) {
+						taskAssignment = "unassigned";
+					}
+					if(taskAssignment == "unassigned") {
+						assignedTasksNotification.notifyMsg = "Task '"+taskName+"' have been unassigned by "+ user+"";
+					} else{
+						assignedTasksNotification.notifyMsg = "New task '"+taskName+"' have been assigned by "+ user+"";
+					}
+					assignedTasksNotification.isRead = false;
+					assignedTasksNotification.count = count;
+					soc.emit("notify",assignedTasksNotification);
 				}
-				if(taskAssignment == "unassigned") {
-					assignedTasksNotification.notifyMsg = "Task '"+taskName+"' have been unassigned by "+ user+"";
-				} else{
-					assignedTasksNotification.notifyMsg = "New task '"+taskName+"' have been assigned by "+ user+"";
-				}
-				assignedTasksNotification.isRead = false;
-				assignedTasksNotification.count = count;
-				soc.emit("notify",assignedTasksNotification);
-			}*/
+			}
 			
 			//TO support task deletion
 			
