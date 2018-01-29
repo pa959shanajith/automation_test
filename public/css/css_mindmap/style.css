@@ -619,3 +619,6 @@ select
 .version-list{
     max-width: 50px;
 }
+.errBorder{
+   box-shadow: 5px 0px 0px 0px red !important;
+}

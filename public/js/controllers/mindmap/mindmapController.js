@@ -960,8 +960,6 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 if (tObj.t != 'Execute Batch') {
                     $('#ct-executeBatch').attr('disabled', 'true')
                 }
-
-
             }
             if (tk == 'at') {
                 var result1 = {};
@@ -1446,10 +1444,20 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     }
 
     $scope.addMoreNode = function() {
-          $("#addObjContainer").append(`<div class="row row-modal addObj-row">
-                                        <div class="form-group"><input type="text" class="form-control form-control-custom" placeholder="Enter node name"></div>
-                                        <img class="deleteAddObjRow" src="imgs/ic-delete.png" />
-                                        </div>`);
+        if($('.row.row-modal.addObj-row').length<10){
+            $("#addObjContainer").append(`<div class="row row-modal addObj-row">
+                                                <form class="form-horizontal" role="form">
+                                                        <div class="col-sm-2"><label for="addNode-`+1+$('.row.row-modal.addObj-row').length+`">`+$('.row.row-modal.addObj-row').length+`</label></div>
+                                                        <div class="col-sm-6">
+                                                        <input type="text" id = 'addNode-`+1+$('.row.row-modal.addObj-row').length+`' class="form-control form-control-custom" placeholder="Enter node name">
+                                                        </div>
+                                                        <div class="col-sm-2 deleteAddObjRow"><img src="imgs/ic-delete.png" /></div>
+                                                </form>
+                                            </div>`);                                                                            
+        }
+        else{
+            openDialogMindmap('Error','At a time only 10 nodes can be added');
+        }
     };
 
     $scope.clearNodes = function() {
@@ -1467,14 +1475,20 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
     $scope.createNodes = function(){
         var nodeNames = [];
+        $('.errBorder').removeClass('errBorder');
         $('input.form-control-custom').each(function() {
             nodeNames.push( $.trim($(this).val()));
+            if(!validNodeDetails($.trim($(this).val()))){
+                $(this).addClass('errBorder');
+            }
         });
-        console.log("NodeNames:",nodeNames);
-        nodeNames.forEach(function(node,i){
-            createNode({name:node});
-        });
-        $("#dialog-addObject").modal("hide");
+        if($('.errBorder').length==0){
+            console.log("NodeNames:",nodeNames);
+            nodeNames.forEach(function(node,i){
+                createNode({name:node});
+            });
+            $("#dialog-addObject").modal("hide");
+        }
     }
 
     //------End of Create Multiple Child Node-------//
@@ -1712,7 +1726,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         var nName, flag = !0;
         nName = value;
         //var specials=/[*|\":<>[\]{}`\\()'!;@&$~#%^-]/;
-        var regex = /^[a-zA-Z0-9_]*$/;;
+        var regex = /^[a-zA-Z0-9_]*$/;
         if (nName.length == 0 || nName.length > 40 || nName.indexOf('_') < 0 || !(regex.test(nName))) {
             $('#ct-inpAct').addClass('errorClass');
             flag = !1;
