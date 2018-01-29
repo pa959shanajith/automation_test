@@ -1472,7 +1472,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         });
         console.log("NodeNames:",nodeNames);
         nodeNames.forEach(function(node,i){
-            createNode({name: node[i]});
+            createNode({name:node});
         });
         $("#dialog-addObject").modal("hide");
     }
