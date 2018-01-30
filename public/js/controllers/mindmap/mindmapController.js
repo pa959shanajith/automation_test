@@ -3688,7 +3688,7 @@ function replicationHandler() {
   Purpose : Invoking replication project
 */
 
-function replicationController() {
+$scope.replicationController=function replicationController() {
 
   replicate_project($('.version-list').val(), '0.0', $('#destProjects').val())
 }
@@ -3707,6 +3707,7 @@ function replicate_project(from_v, to_v, pid) {
       function(res){
         $('.version-list').val(to_v);
        unblockUI();
+       openDialogMindmap('Mindmap', "Project Replicated Successfully.")
       },function(err){
           console.log(err); 
           unblockUI(); 
