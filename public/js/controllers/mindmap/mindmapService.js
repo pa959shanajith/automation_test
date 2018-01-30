@@ -67,39 +67,44 @@ mySPA.factory('mindmapServices', ['$http','$q', function ($http,$q)   {
     		.then(function (response) { return response.data; },
     				function (response) { return $q.reject(response.data); });
     	},
-		getModules: function (usertab,prjId,versioning_enabled,version){
+		getModules: function (versioning_enabled,usertab,prjId,version){
 					
-    		var param = "getModules";
-    		return $http.post('/getModules', {
-    			action: param,
+    		var param = "/getModules";
+			if (versioning_enabled==1){
+				param = "/getModulesVersioning";
+			}
+    		return $http.post(param, {
 				tab:usertab,
                 prjId: prjId,
-                versioning: versioning_enabled,
                 version:version
     		})
     		.then(function (response) { return response.data; },
     				function (response) { return $q.reject(response.data); });
     	},
-		saveData: function (assignedTo,writeFlag,userRole,from_v,to_v,cur_module,mapData,deletednode,unassignTask,prjId,relId,cycId){
-					
-    		var param = "saveData";
-    		return $http.post('/saveData', {
-    			action: param,
-				sendNotify:assignedTo,
-				write:writeFlag,
-				userRole:userRole,
-				vn_from: from_v,
-				vn_to: to_v,
-				tab: cur_module,
-				map: mapData,
-				deletednode: deletednode,
-				unassignTask: unassignTask,
-				prjId: prjId,
-				relId: relId,
-				cycId: cycId
-    		})
-    		.then(function (response) { return response.data; },
-    				function (response) { return $q.reject(response.data); });
+		saveData: function (versioning_enabled,assignedTo,writeFlag,userRole,from_v,to_v,cur_module,mapData,deletednode,unassignTask,prjId,relId,cycId){
+			var param = "/saveData";
+			if (versioning_enabled==1){
+				param = "/saveDataVersioning";
+			}
+			return $http.post(param, {
+					action: param,
+					sendNotify:assignedTo,
+					write:writeFlag,
+					userRole:userRole,
+					vn_from: from_v,
+					vn_to: to_v,
+					tab: cur_module,
+					map: mapData,
+					deletednode: deletednode,
+					unassignTask: unassignTask,
+					prjId: prjId,
+					relId: relId,
+					cycId: cycId
+			})
+			.then(function (response) { return response.data; },
+					function (response) { return $q.reject(response.data); });
+
+    		
     	},
 		saveEndtoEndData: function (assignedTo,writeFlag,userRole,from_v,to_v,cur_module,mapData,deletednode,unassignTask,prjId,relId,cycId){
 					
@@ -145,6 +150,36 @@ mySPA.factory('mindmapServices', ['$http','$q', function ($http,$q)   {
     		})
     		.then(function (response) { return response.data; },
     				function (response) { return $q.reject(response.data); });
-		}
+		},
+		getVersions:function (projectId){
+			var param = "getVersions";
+    		return $http.post('/getVersions', {
+				projectId:projectId
+				
+    		})
+    		.then(function (response) { return response.data; },
+    				function (response) { return $q.reject(response.data); });
+		},
+		getProjectsNeo: function (){
+    		return $http.post('/getProjectsNeo', {
+    		})
+    		.then(function (response) { return response.data; },
+    				function (response) { return $q.reject(response.data); });
+    	},
+		createVersion: function (param,userRole,srcprojectId,dstprojectId,vn_from,vn_to,write) {
+    		return $http.post('/createVersion', {
+    			action: param,
+				userRole:userRole,
+				srcprojectId:srcprojectId,
+				dstprojectId:dstprojectId,
+				vn_from:vn_from,
+				vn_to:vn_to,
+				write:write
+
+    		})
+    		.then(function (response) { return response.data; },
+    				function (response) { return $q.reject(response.data); });
+    	},
+
 	}
 }]);
