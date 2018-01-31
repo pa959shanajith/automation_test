@@ -4362,6 +4362,8 @@ function getSelectionStart(o) {
             $('[data-nodetype=scenarios]').addClass('node-selected');
         }
         if (!$('#pasteImg1').hasClass('active-map')) {
+            dNodes_c = [];
+            dLinks_c = [];
             $('.node-selected').removeClass('node-selected');
         }
     }
