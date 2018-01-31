@@ -1177,7 +1177,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                             });
                             activeNode = childNode[0][0];
                             dLinks_c.forEach(function(f, j) {
-                                if (f.source.id_n == e.id_n) {
+                                if (f.source.id == e.id) {
                                     createNode({
                                         name: f.target.name
                                     });
@@ -1199,14 +1199,14 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                             activeNode = childNode[0][0];
                             activenode_scr = activeNode;
                             dLinks_c.forEach(function(f, j) {
-                                if (f.source.id_n == e.id_n && f.target.type == 'screens') {
+                                if (f.source.id == e.id && f.target.type == 'screens') {
                                     activeNode = activenode_scr;
                                     createNode({
                                         name: f.target.name
                                     });
                                     activeNode = childNode[0][0];
                                     dLinks_c.forEach(function(g, k) {
-                                        if (g.source.id_n == f.target.id_n && g.source.type == 'screens') {
+                                        if (g.source.id == f.target.id && g.source.type == 'screens') {
                                             createNode({
                                                 name: g.target.name
                                             });
@@ -4102,67 +4102,6 @@ function getSelectionStart(o) {
 
         }
     }
-
-    //Some properties may be useful for versioning
-    // $("#ct-expand-r").click(function(e) {
-    // 	var flg = false;
-    //      e.preventDefault()
-    //      $(".rsSlide").toggle(5, function(){
-    //          if($(".left-sec-mindmap").is(':visible') && $('#right-dependencies-section').is(':visible')){
-    //         	 flg = true;
-    //             $timeout(function(){
-    //                 $("select.selectProject").removeClass("selectProjectPri");
-    //             },300)
-    //             //endtoend
-    //             $(".endtoend-modulesContainer").prop("style","width:calc(100% - 256px) !important; left:166px !important;");
-    //             $(".searchModuleimg").prop("style","right:86px !important;");
-    //             $(".endtoend-modules-right-upper img").prop("style","left:180px !important;");
-    //             $(".eteLabel").prop("style","left:366px !important; width:140px !important; bottom:23px !important;");
-    //          }
-    //          else{                 
-    //             $("#ct-expand-right").addClass('expand');
-    //             $(".project-list").addClass("selectProject");
-    //             if(($("#left-nav-section").is(":visible") == true &&  $("#right-dependencies-section").is(":visible") == false)){
-    // 				$("#ct-moduleBox,.tabAssign").removeClass("leftBarOpen leftBarClose rightBarOpen bar-collapse bar-expand leftOpenRightClose rightOpenLeftClose").addClass("leftBarOpen");
-    // 			//endtoend
-    //                 $(".endtoend-modulesContainer").prop("style","width:calc(100% - 172px) !important; left:166px !important;");
-    //                 $(".searchModuleimg").prop("style","right:91px !important;");
-    //                 $(".endtoend-modules-right-upper img").prop("style","left:195px !important;");
-    //                 $(".eteLabel").prop("style","left:390px !important; width:140px !important; bottom:23px !important;");
-    //             }
-    //             else if(($("#left-nav-section").is(":visible") == false &&  $("#right-dependencies-section").is(":visible") == true)){
-    // 				$("#ct-moduleBox,.tabAssign").removeClass("leftBarOpen leftBarClose rightBarOpen bar-collapse bar-expand leftOpenRightClose rightOpenLeftClose").addClass("rightBarOpen");
-
-    // 			//endtoend
-    //                 $(".endtoend-modulesContainer").prop("style","width:calc(100% - 96px) !important;");
-    //                 $(".searchModuleimg").prop("style","right:95px !important;");
-    //                 $(".endtoend-modules-right-upper img").prop("style","left:208px !important;");
-    //                 $(".eteLabel").prop("style","left:417px !important; width:140px !important; bottom:23px !important;");
-    //                 $(".project-list").removeClass("selectProject");
-    //             }
-    //             else if(($("#left-nav-section").is(":visible") == false && $("#right-dependencies-section").is(":visible") == false)){
-    // 				$("#ct-moduleBox,.tabAssign").removeClass("leftBarOpen leftBarClose rightBarOpen bar-collapse bar-expand leftOpenRightClose rightOpenLeftClose").addClass("bar-collapse");
-    //                 //endtoend
-    //                 $(".endtoend-modulesContainer").prop("style","width:calc(100% - 12px) !important;");
-    //                 $(".searchModuleimg").prop("style","right:102px !important;");
-    //                 $(".endtoend-modules-right-upper img").prop("style","left:225px !important;");
-    //                 $(".eteLabel").prop("style","left:0px !important; width:140px !important; bottom:18px !important;");
-    //                 $(".project-list").removeClass("selectProject");
-    //             }
-    //             $timeout(function(){
-    //                 $("select.selectProject").addClass("selectProjectPri");
-    //             },300)
-    //          }
-    //          if(flg) $("#ct-moduleBox,.tabAssign").removeClass("leftBarOpen leftBarClose rightBarClose rightBarOpen bar-collapse leftOpenRightClose rightOpenLeftClose").addClass("bar-expand");
-    //            if(($("#left-nav-section").is(":visible") == false &&  $("#right-dependencies-section").is(":visible") == false))
-    //             {
-    //                  $("#ct-moduleBox,.tabAssign").removeClass("leftBarOpen leftBarClose rightBarClose rightBarOpen bar-expand leftOpenRightClose rightOpenLeftClose").addClass("bar-collapse");
-    //             }
-    //             else{
-    //             }
-    //      });
-
-    // });
 
     // Changes made for End to end module implementation
     $scope.createMapsCall = function(e) {
