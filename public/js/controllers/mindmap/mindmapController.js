@@ -914,6 +914,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             cy: (nt && nt.cycle != null) ? nt.cycle : '',
             det: (nt) ? nt.details : ''
         };
+        c.classed('no-disp', !1);
         d3.select('#ct-assignDetails').property('value', tObj.det);
         d3.select('#ct-assignTable').select('ul').remove();
         u = d3.select('#ct-assignTable').append('ul');
@@ -964,7 +965,6 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                             $('#ct-assignedTo').append("<option data-id='" + res.userRoles[i] + "' value='" + res.r_ids[i] + "'>" + res.userRoles[i] + "</option>");
                         }
                         $("#ct-assignedTo option[value='" + tObj.at + "']").attr('selected', 'selected');
-                        c.classed('no-disp', !1);
                     }, function(error) {
                         console.log("Error:::::::::::::", error);
                         unblockUI();
