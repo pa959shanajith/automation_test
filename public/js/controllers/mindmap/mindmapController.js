@@ -64,19 +64,14 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
                     if (param == 1) {
                         versioning_enabled = 1;
-                        dataSender({
-                            task: 'getVersions',
-                            projectId: $(".project-list").val(),
-                            versioning: 1
-                        }, function(err, result) {
-                            if (err) {
-                                console.log(err);
+                        mindmapServices.getVersions($(".project-list").val()).then(
+                            function(res){
+                                addVersioning(res);
+                            },function(err){
+                                 console.log(err);
                                 openDialogMindmap('Error', 'Error loading Versions')
-                            } else {
-                                addVersioning(result);
-
-                            }
-                        });
+                            })
+                       
                     } else if(param == 0) {
                         loadMindmapData1(param);
                     }
@@ -112,19 +107,14 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                             $("img.iconSpaceArrow").removeClass("iconSpaceArrowTop");
                         }
                         if (param == 1) {
-                            dataSender({
-                                task: 'getVersions',
-                                projectId: $(".project-list").val(),
-                                versioning: 1
-                            }, function(err, result) {
-                                if (err) {
-                                    console.log(err);
-                                    openDialogMindmap('Error', 'Error loading Versions')
-                                } else {
-                                    addVersioning(result);
-
-                                }
-                            });
+                            mindmapServices.getVersions($(".project-list").val()).then(
+                            function(res){
+                                addVersioning(res);
+                            },function(err){
+                                 console.log(err);
+                                openDialogMindmap('Error', 'Error loading Versions')
+                            })
+                           
                         } else {
                             loadMindmapData1(param);
                         }
@@ -215,7 +205,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         if (param == 1) {
             version_num = $('.version-list').val();
         }
-        mindmapServices.getModules(window.localStorage['tabMindMap'], $(".project-list").val(), param, parseFloat(version_num))
+        mindmapServices.getModules(versioning_enabled,window.localStorage['tabMindMap'], $(".project-list").val(),  parseFloat(version_num))
             .then(function(res) {
                 var nodeBox = d3.select('.ct-nodeBox');
                 $(nodeBox[0]).empty();
@@ -474,11 +464,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
     function addTask(e) {
         $("ct-assignTask,#ct-assignedTo,#ct-assignRevw,#ct-assignRel,#ct-assignCyc").removeClass("selectErrorBorder");
-        $("#startDate,#endDate").removeClass("inputErrorBorder");
-        if ($("ct-assignTask option:selected").val() == "select user") {
-            $("#ct-assignedTo").css('border', '').addClass("inputErrorBorderFull");
-            return false;
-        } else if ($("#ct-assignTask option:selected").val() == "Execute Batch" && $("#ct-executeBatch").val() == "") {
+        $("#startDate,#endDate").removeClass("inputErrorBorder"); 
+        if ($("#ct-assignTask option:selected").val() == "Execute Batch" && $("#ct-executeBatch").val() == "") {
             $("#ct-executeBatch").css('border', '').addClass("inputErrorBorderFull");
             return false;
         } else if ($("#ct-assignedTo option:selected").val() == "select user") {
@@ -499,12 +486,16 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         } else if ($("#ct-assignCyc option:selected").val() == "select cycle") {
             $("#ct-assignCyc").css('border', '').addClass("inputErrorBorderFull");
             return false;
+        } else if ($("#ct-assignDetails").val().trim() == "") {
+            $("#ct-assignDetails").css('border', '').addClass("inputErrorBorderFull");
+            return false;
         }
+        
         var ed = $("#endDate").val().split('/');
         var sd = $("#startDate").val().split('/');
         start_date = new Date(sd[2] + '-' + sd[1] + '-' + sd[0]);
         end_date = new Date(ed[2] + '-' + ed[1] + '-' + ed[0]);
-
+        var apptype=$('.project-list option:selected').attr('app-type');
 
         if (end_date < start_date) {
             $("#endDate").css('border', '').addClass("inputErrorBorderFull");
@@ -623,21 +614,23 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                                 if (scr.task === undefined || scr.task == null) {
                                     if (dNodes[pi].id_c != 'null' && tSc.id_c != 'null' && scr.id_c != 'null') {
                                         taskflag = true;
-                                        scr.task = {
-                                            taskvn: tObj.tvn,
-                                            id: null,
-                                            oid: null,
-                                            task: "Scrape",
-                                            assignedTo: tObj.at,
-                                            reviewer: tObj.rw,
-                                            startDate: tObj.sd,
-                                            endDate: tObj.ed,
-                                            re_estimation: tObj.re_estimation,
-                                            details: tObj.det,
-                                            parent: [dNodes[pi].id_c, tSc.id_c, scr.id_c]
-                                        };
+                                        if(apptype!="258afbfd-088c-445f-b270-5014e61ba4e2"){
+                                            scr.task = {
+                                                taskvn: tObj.tvn,
+                                                id: null,
+                                                oid: null,
+                                                task: "Scrape",
+                                                assignedTo: tObj.at,
+                                                reviewer: tObj.rw,
+                                                startDate: tObj.sd,
+                                                endDate: tObj.ed,
+                                                re_estimation: tObj.re_estimation,
+                                                details: tObj.det,
+                                                parent: [dNodes[pi].id_c, tSc.id_c, scr.id_c]
+                                            };
 
-                                        d3.select('#ct-node-' + scr.id).append('image').attr('class', 'ct-nodeTask').attr('xlink:href', 'images_mindmap/node-task-assigned.png').attr('x', 29).attr('y', -10);
+                                            d3.select('#ct-node-' + scr.id).append('image').attr('class', 'ct-nodeTask').attr('xlink:href', 'images_mindmap/node-task-assigned.png').attr('x', 29).attr('y', -10);
+                                        }
                                     }
 
                                 } else {
@@ -718,20 +711,22 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                         if (scr.task === undefined || scr.task == null) {
                             if (modid != 'null' && tscid != 'null' && scr.id_c != 'null') {
                                 taskflag = true;
-                                scr.task = {
-                                    taskvn: tObj.tvn,
-                                    id: null,
-                                    oid: null,
-                                    task: "Scrape",
-                                    assignedTo: tObj.at,
-                                    reviewer: tObj.rw,
-                                    startDate: tObj.sd,
-                                    endDate: tObj.ed,
-                                    re_estimation: tObj.re_estimation,
-                                    details: tObj.det,
-                                    parent: [modid, tscid, scr.id_c]
-                                };
-                                d3.select('#ct-node-' + scr.id).append('image').attr('class', 'ct-nodeTask').attr('xlink:href', 'images_mindmap/node-task-assigned.png').attr('x', 29).attr('y', -10);
+                                if(apptype!="258afbfd-088c-445f-b270-5014e61ba4e2"){
+                                    scr.task = {
+                                        taskvn: tObj.tvn,
+                                        id: null,
+                                        oid: null,
+                                        task: "Scrape",
+                                        assignedTo: tObj.at,
+                                        reviewer: tObj.rw,
+                                        startDate: tObj.sd,
+                                        endDate: tObj.ed,
+                                        re_estimation: tObj.re_estimation,
+                                        details: tObj.det,
+                                        parent: [modid, tscid, scr.id_c]
+                                    };
+                                    d3.select('#ct-node-' + scr.id).append('image').attr('class', 'ct-nodeTask').attr('xlink:href', 'images_mindmap/node-task-assigned.png').attr('x', 29).attr('y', -10);
+                                }
                             }
 
                         } else {
@@ -884,6 +879,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             openDialogMindmap('Error', 'Incomplete Flow!');
             return;
         }
+        
         e = e || window.event;
         if (e) {
             e.cancelbubble = !0;
@@ -896,8 +892,12 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         var pi = parseInt(p.attr('id').split('-')[2]);
         var t = p.attr('data-nodetype');
         var flag = true;
+        var apptype=$('.project-list option:selected').attr('app-type')
         if (t == 'scenarios' && dNodes[pi].parent.type == 'modules_endtoend') {
             flag = false;
+        }else if(t == 'screens' && apptype=="258afbfd-088c-445f-b270-5014e61ba4e2"){
+            openDialogMindmap('Error', 'Task disabled for Mainframe screen');
+            return;
         }
         if (flag) {
             if (t != 'testcases' && (dNodes[pi]._children != null)) {
@@ -924,7 +924,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             cy: (nt && nt.cycle != null) ? nt.cycle : '',
             det: (nt) ? nt.details : ''
         };
-        d3.select('#ct-assignDetails').property('value', tObj.det);
+        c.classed('no-disp', !1);
+        //d3.select('#ct-assignDetails').property('value', tObj.det);
         d3.select('#ct-assignTable').select('ul').remove();
         u = d3.select('#ct-assignTable').append('ul');
         v = u.append('li');
@@ -936,7 +937,13 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         if (tObj.t == null || tObj.t == "") {
             tObj.t = taskAssign[t].task[0];
         }
+      
         $("#ct-assignTask option[value='" + tObj.t + "']").attr('selected', 'selected');
+
+        if(tObj.det===null || tObj.det.trim() == ""){
+            tObj.det=tObj.t+" "+dNodes[pi].type+" "+dNodes[pi].name
+        }
+        d3.select('#ct-assignDetails').property('value', tObj.det);
 
         $("#ct-assignTask").change(function() {
             if ($("#ct-assignTask").val() == 'Execute Batch') {
@@ -960,8 +967,6 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 if (tObj.t != 'Execute Batch') {
                     $('#ct-executeBatch').attr('disabled', 'true')
                 }
-
-
             }
             if (tk == 'at') {
                 var result1 = {};
@@ -976,7 +981,6 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                             $('#ct-assignedTo').append("<option data-id='" + res.userRoles[i] + "' value='" + res.r_ids[i] + "'>" + res.userRoles[i] + "</option>");
                         }
                         $("#ct-assignedTo option[value='" + tObj.at + "']").attr('selected', 'selected');
-                        c.classed('no-disp', !1);
                     }, function(error) {
                         console.log("Error:::::::::::::", error);
                         unblockUI();
@@ -992,7 +996,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                         for (i = 0; i < res.userRoles.length && res.r_ids.length; i++) {
                             $('#ct-assignRevw').append("<option data-id='" + res.userRoles[i] + "' value='" + res.r_ids[i] + "'>" + res.userRoles[i] + "</option>");
                         }
-                        $("#ct-assignRevw option[value='" + tObj.at + "']").attr('selected', 'selected');
+                        $("#ct-assignRevw option[value='" + tObj.rw + "']").attr('selected', 'selected');
 
                     }, function(error) {
                         console.log("Error:::::::::::::", error);
@@ -1173,7 +1177,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                             });
                             activeNode = childNode[0][0];
                             dLinks_c.forEach(function(f, j) {
-                                if (f.source.id_n == e.id_n) {
+                                if (f.source.id == e.id) {
                                     createNode({
                                         name: f.target.name
                                     });
@@ -1195,14 +1199,14 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                             activeNode = childNode[0][0];
                             activenode_scr = activeNode;
                             dLinks_c.forEach(function(f, j) {
-                                if (f.source.id_n == e.id_n && f.target.type == 'screens') {
+                                if (f.source.id == e.id && f.target.type == 'screens') {
                                     activeNode = activenode_scr;
                                     createNode({
                                         name: f.target.name
                                     });
                                     activeNode = childNode[0][0];
                                     dLinks_c.forEach(function(g, k) {
-                                        if (g.source.id_n == f.target.id_n && g.source.type == 'screens') {
+                                        if (g.source.id == f.target.id && g.source.type == 'screens') {
                                             createNode({
                                                 name: g.target.name
                                             });
@@ -1441,15 +1445,29 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         $("#addObjContainer").empty();
         $scope.errorMessage = "";
         $("#dialog-addObject").modal("show");
+        //Add two nodes 
+        $scope.addMoreNode();
+        $scope.addMoreNode();
         $timeout(function(){$('.modal-backdrop.in').remove();},1000);
 
     }
 
     $scope.addMoreNode = function() {
-          $("#addObjContainer").append(`<div class="row row-modal addObj-row">
-                                        <div class="form-group"><input type="text" class="form-control form-control-custom" placeholder="Enter node name"></div>
-                                        <img class="deleteAddObjRow" src="imgs/ic-delete.png" />
-                                        </div>`);
+        if($('.row.row-modal.addObj-row').length<10){
+            var idxAddNode = 1+$('.row.row-modal.addObj-row').length;
+            $("#addObjContainer").append(`<div class="row row-modal addObj-row">
+                                                <form class="form-horizontal" role="form">
+                                                        <div class="col-sm-2 addNode-label"><label>`+idxAddNode+`</label></div>
+                                                        <div class="col-sm-6">
+                                                        <input type="text" class="form-control form-control-custom" placeholder="Enter node name" maxlength="40">
+                                                        </div>
+                                                        <div class="col-sm-2 deleteAddObjRow"><img src="imgs/ic-delete.png" /></div>
+                                                </form>
+                                            </div>`);                                                                            
+        }
+        else{
+            openDialogMindmap('Error','At a time only 10 nodes can be added');
+        }
     };
 
     $scope.clearNodes = function() {
@@ -1462,19 +1480,30 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
 
     $(document).on("click", ".deleteAddObjRow", function() {
-        $(this).parent(".addObj-row").remove();
+        $(this).parent().parent().remove();
+        var tmpidx = 1;
+        $('.addNode-label').each(function(){
+            $(this).text(tmpidx);
+            tmpidx=tmpidx+1;
+        });
     });
 
     $scope.createNodes = function(){
         var nodeNames = [];
+        $('.errBorder').removeClass('errBorder');
         $('input.form-control-custom').each(function() {
             nodeNames.push( $.trim($(this).val()));
+            if(!validNodeDetails($.trim($(this).val()))){
+                $(this).addClass('errBorder');
+            }
         });
-        console.log("NodeNames:",nodeNames);
-        nodeNames.forEach(function(node,i){
-            createNode({name: node[i]});
-        });
-        $("#dialog-addObject").modal("hide");
+        if($('.errBorder').length==0){
+            console.log("NodeNames:",nodeNames);
+            nodeNames.forEach(function(node,i){
+                createNode({name:node});
+            });
+            $("#dialog-addObject").modal("hide");
+        }
     }
 
     //------End of Create Multiple Child Node-------//
@@ -1711,7 +1740,6 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     function validNodeDetails(value, p) {
         var nName, flag = !0;
         nName = value;
-        //var specials=/[*|\":<>[\]{}`\\()'!;@&$~#%^-]/;
         var regex = /^[a-zA-Z0-9_]*$/;;
         if (nName.length == 0 || nName.length > 40 || nName.indexOf('_') < 0 || !(regex.test(nName))) {
             $('#ct-inpAct').addClass('errorClass');
@@ -1941,8 +1969,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         if ($('.version-list').length != 0)
             from_v = to_v = $('.version-list').val();
 
-        mindmapServices.saveData(assignedTo, flag, window.localStorage['_SR'], from_v, to_v, cur_module, mapData, deletednode, unassignTask,
-            $('.project-list').val(), $('#ct-assignRel').val(), $('#ct-assignCyc').val(), versioning_enabled).then(function(result) {
+        mindmapServices.saveData(versioning_enabled,assignedTo, flag, window.localStorage['_SR'], from_v, to_v, cur_module, mapData, deletednode, unassignTask,
+            $('.project-list').val(), $('#ct-assignRel').val(), $('#ct-assignCyc').val()).then(function(result) {
             unblockUI();
             if (flag == 10) {
                 var res = result;
@@ -1978,7 +2006,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 var vn = '';
                 if ($('.version-list').length != 0)
                     from_v = to_v = $('.version-list').val()
-                mindmapServices.getModules(window.localStorage['tabMindMap'], $(".project-list").val(), versioning_enabled, parseFloat(from_v)).then(function(result) {
+                mindmapServices.getModules(versioning_enabled,window.localStorage['tabMindMap'], $(".project-list").val(), parseFloat(from_v)).then(function(result) {
                     var nodeBox = d3.select('.ct-nodeBox');
                     $(nodeBox[0]).empty();
                     allMMaps = result;
@@ -2391,7 +2419,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         blockUI('Loading UI');
         var userInfo = JSON.parse(window.localStorage['_UI']);
         var user_id = userInfo.user_id;
-        mindmapServices.getModules(window.localStorage['tabMindMap'], $(".project-list").val(), versioning_enabled, parseFloat(version_num)).then(
+        mindmapServices.getModules(versioning_enabled,window.localStorage['tabMindMap'], $(".project-list").val(),parseFloat(version_num)).then(
             function(result){
                 result_details = result;
                 flag = 0;
@@ -2440,7 +2468,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                                         data.moduleInfo[i].cycleId = ci_parsed_details.row.cycleid;
                                         data.moduleInfo[i].releaseId = ci_parsed_details.row.releaseid;
                                         if (vs_n) {
-                                            data.moduleInfo[i].versionNumber = vnumber;
+                                            data.moduleInfo[i].versionNumber = version_num;
                                         } else {
                                             data.moduleInfo[i].versionNumber = "0.0";
                                         }
@@ -2636,7 +2664,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         var svgTileLen = $(".ct-svgTile").length;
 
         d3.select('#ct-assignBox').classed('no-disp', !0);
-        mindmapServices.getModules('endToend', $("#selectProjectEtem").val()).then(function(result) {
+        mindmapServices.getModules(versioning_enabled,'endToend', $("#selectProjectEtem").val()).then(function(result) {
             var nodeBox = d3.select('#etemModuleContainer');
             $(nodeBox[0]).empty();
             allMMaps_W = allMaps_info = result;
@@ -3372,7 +3400,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             return;
         }
         var from_v = to_v = '';
-        console.log("::::MAPDATA::::: ", mapData);
+        
 
         mindmapServices.saveEndtoEndData(username, flag, window.localStorage['_SR'], from_v, to_v, 'endToend', mapData, deletednode_W, unassignTask, selectedProject, $('#ct-assignRel').val(), $('#ct-assignCyc').val()).then(function(result) {
             unblockUI();
@@ -3407,7 +3435,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 //$('#ct-createAction_W').removeClass('disableButton').removeClass('no-access');
                 SaveCreateED('#ct-createAction_W',0,0);
                 //alert(window.localStorage['tabMindMap']);
-                mindmapServices.getModules('endToend', $("#selectProjectEtem").val(), versioning_enabled, '')
+                mindmapServices.getModules(versioning_enabled,'endToend', $("#selectProjectEtem").val(),'')
                     .then(function(result) {
                         var nodeBox = d3.select('#etemModuleContainer');
                         $(nodeBox[0]).empty();
@@ -3604,7 +3632,379 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         zoom_W.event(d3.select('#ct-mapSvg'));
     };
     //-------------------End of workflow.js---------------------------//
+    //-------------------Start of Versioning.js-----------------------//
+    /*
+function replicationHandler()
+Purpose : displaying pop up for replication of project
+*/
 
+function replicationHandler() {
+  console.log('Inside..')
+  var userInfo = JSON.parse(window.localStorage['_UI']);
+  var user_id = userInfo.user_id;
+  blockUI('Loading....')
+  mindmapServices.populateProjects().then(function(result) {
+      var project_type=$('.project-list').find(':selected').attr('app-type')
+      mindmapServices.getProjectsNeo().then(function(res){
+          var parse_data = res;
+          var flag=0;
+          $('.versioningOption').remove()
+          var parsed_project_id = [];
+          for (var i = 0; i < parse_data[0].data.length; i++) {
+            parsed_project_id.push(parse_data[0].data[i].row[0])
+          }
+
+          var new_projectsList = {
+            projectId: [],
+            projectName: [],
+            appType: []
+	        };
+          for(var i=0;i<result['projectName'].length;i++)
+          {
+            if(project_type==result['appType'][i]){
+              new_projectsList.projectId.push(result['projectId'][i]);
+              new_projectsList.projectName.push(result['projectName'][i]);
+              new_projectsList.appType.push(result['appType'][i]);
+            }
+
+          }
+          if(parsed_project_id.indexOf($('.project-list').val())!=-1){
+              for (var i = 0; i < new_projectsList['projectName'].length; i++) {
+                if (parsed_project_id.indexOf(new_projectsList['projectId'][i]) != -1) {
+                  console.log('Available in Neo4j')
+                } else {
+                  flag=1;
+                  $('#destProjects').append($('<option>').attr({ value: new_projectsList['projectId'][i], class: 'versioningOption' }).text(new_projectsList['projectName'][i]));
+                }
+              }
+              $('#ProjectReplicationPopUp').modal("show");
+               $('#replicateVersionButton').removeClass('disableButton').removeAttr('disabled','disabled');
+              if(!flag)
+                $('#replicateVersionButton').addClass('disableButton').attr('disabled','disabled');
+          }
+          else{
+            openDialogMindmap('Mindmap', "Empty Projects cannot be replicated.")
+          }
+          unblockUI();
+
+      },function(err){
+          console.log('Error in fetching projects list'); 
+          unblockUI();
+      })
+  },function(err){
+        console.log('Error in fetching projects list'); 
+        unblockUI();
+  })
+
+
+}
+
+/*
+  function replicationController()
+  Purpose : Invoking replication project
+*/
+
+$scope.replicationController=function replicationController() {
+
+  replicate_project($('.version-list').val(), '0.0', $('#destProjects').val())
+}
+
+/*
+function replicate_project()
+Purpose:Invoking the node service for replication of project
+*/
+
+function replicate_project(from_v, to_v, pid) {
+  var userInfo = JSON.parse(window.localStorage['_UI']);
+  var user_id = userInfo.user_id;
+  console.log("inside replicate project");
+  blockUI('Loading....')
+    mindmapServices.createVersion('project_replicate',window.localStorage['_SR'], $(".project-list").val(),pid, from_v,  to_v,10 ).then(
+      function(res){
+        $('.version-list').val(to_v);
+       unblockUI();
+       openDialogMindmap('Mindmap', "Project Replicated Successfully.")
+      },function(err){
+          console.log(err); 
+          unblockUI(); 
+          openDialogMindmap('Mindmap', "Project Replication Failed.")
+      }
+  )
+
+
+}
+
+
+/*
+function : loadMindmapData()
+Purpose : loading mindmap data for default version.
+*/
+
+function loadMindmapData_V() {
+  loadMindmapData(1);
+}
+
+/*
+function : addVersioning(vn)
+Purpose : Adding versioning UI in the mindmap UI.
+params : versions : list of all versions of the selected project
+*/
+
+function addVersioning(versions) {
+//   versions = JSON.parse(versions);
+  console.log("versioning enabled");
+  $('.replicate').remove()
+  $('.selectVersion').remove();
+  $('.ct-project-tab').append($('<span>').attr({
+    class: 'selectVersion'
+  }).append($('<label>').attr({
+    class: 'selectVersionLabel'
+  }).text('Version: ')
+    ).append($('<select>').attr({
+      class: 'version-list'
+    })).append($('<i>').attr({
+      class: 'fa fa-plus-circle fa-lg plus-icon',
+      title: "Create New Version",
+      //onclick: "versionInputDialogShow(event)"
+    })).append($('<i>').attr({
+      class: 'fa fa-window-restore fa-lg plus-icon',
+      title: "Replicate project",
+      //onclick: 'replicationHandler()'
+    })
+    ).append($('<i>').attr({
+      class: 'glyphicon glyphicon-export plus-icon',
+      title: "Export Version",
+      //onclick: 'exportData(1)'
+    })));
+  for (i = 0; i < versions.length; i++) {
+    $('.version-list').append($('<option>').attr({
+      value: versions[i]
+    }).text(versions[i]))
+  }
+
+  $('.version-list').change(function(){
+      loadModules();
+  });
+   $('.fa.fa-plus-circle.fa-lg.plus-icon').click(function(e){
+      versionInputDialogShow(e);
+  });
+
+   $('.fa.fa-window-restore.fa-lg.plus-icon').click(function(){
+       
+      replicationHandler();
+  });
+
+   $('.glyphicon.glyphicon-export.plus-icon').click(function(){
+      exportData(versioning_enabled);
+  });
+
+  //setCookie('mm_pvid', $('.version-list').children()[0].value, 15);
+  $('.version-list').val($('.version-list').children()[0].value);
+
+  // if (getCookie('mm_pvid') != '') {
+  //   $('.version-list').val(getCookie('mm_pvid'));
+  // }
+  loadMindmapData1(1);
+  //loadModules(versions)
+  $('.version-list').attr({title:$('.version-list').val()});
+  $('.selectProject').addClass('selectProjectPosition')
+  if (window.localStorage['tabMindMap'] == "tabAssign") {
+    $('.plus-icon').remove();
+    $('.selectVersion').css('margin-left', '2%');
+  }
+}
+
+/*
+function : loadModules()
+Purpose : Loads modules for the active project Version.
+params : None
+*/
+
+function loadModules() {
+  var active_version = $('.version-list').val();
+  $('.version-list').attr({title:active_version});
+  blockUI('Loading...');
+  var svgTileG = d3.select('.ct-tile').append('svg').attr('class', 'ct-svgTile').attr('height', '150px').attr('width', '150px').append('g');
+  var svgTileLen = $(".ct-svgTile").length;
+  if (svgTileLen == 0) {
+    $('#ct-mapSvg, #ct-canvas').empty();
+    $('#ct-canvas').append('<div class="ct-tileBox"><div class="ct-tile" title="Create Mindmap"><svg class="ct-svgTile" height="150px" width="150px"><g><circle cx="75" cy="75" r="30"></circle><path d="M75,55L75,95"></path><path d="M55,75L95,75"></path></g></svg></div><span class="ct-text">Create Mindmap</span></div>');
+
+  }
+  mindmapServices.getModules(versioning_enabled,window.localStorage['tabMindMap'],$(".project-list").val(),parseFloat(active_version)).then(
+      function(res){
+            var nodeBox = d3.select('.ct-nodeBox');
+            $(nodeBox[0]).empty();
+            allMMaps = res;
+            allMMaps.forEach(function (e, i) {
+                var t = $.trim(e.name);
+                var img_src = 'images_mindmap/node-modules-no.png';
+                if (e.type == 'modules_endtoend') img_src = 'images_mindmap/MM5.png';
+                var node = nodeBox.append('div').attr('class', 'ct-node fl-left').attr('data-mapid', i).attr('title', t).on('click', loadMap);
+                node.append('img').attr('class', 'ct-nodeIcon').attr('src', img_src).attr('alt', 'Module').attr('aria-hidden', true);
+                node.append('span').attr('class', 'ct-nodeLabel').html(t);
+            });
+            populateDynamicInputList();
+            setModuleBoxHeight();
+            unblockUI();
+      },function(err){
+           console.log(err);
+            unblockUI();
+      }
+  )
+
+
+}
+
+
+/*
+function : createNewTab(from_v,to_v)
+Purpose : Creates a New project version in the Neo4j db and creates a new tab for that.
+params : from_v : from the version (Source version), to_v : Version number provided by the user.
+*/
+function createNewTab(from_v, to_v) {
+
+  var userInfo = JSON.parse(window.localStorage['_UI']);
+  var user_id = userInfo.user_id;
+  if ($('.ct-nodeBox')[0].children !== undefined && $('.ct-nodeBox')[0].children.length == 0) {
+    openDialogMindmap('Error', "Cannot Create Empty Version");
+    return;
+  }
+  blockUI('Loading...');
+  mindmapServices.createVersion('',window.localStorage['_SR'],  $(".project-list").val(),'', from_v, to_v, 10 ).then(
+      function(res){
+        $('.version-list').val(to_v);
+       unblockUI();
+       loadModules();
+        openDialogMindmap('Mindmap', "New Version Created Successfully.");
+      },function(err){
+          console.log(err); 
+          unblockUI(); 
+          openDialogMindmap('Mindmap', "New Version Creation Failed.")
+      }
+
+  )
+
+}
+
+/*
+
+  function : versionInputDialogClose()
+  Purpose : Closes the dialog box for version Number input.
+
+*/
+
+function versionInputDialogClose() {
+
+  $('#versionNumInputPopUp').modal('toggle');
+}
+
+/*
+
+  function : clearInputData()
+  Purpose : Clears the data in  dialog box for version Number input.
+
+*/
+
+function clearInputData() {
+  $('#versionNumberInput').val('');
+}
+
+/*
+
+  function : versionInputDialogShow(e)
+  Purpose : Shows the dialog to add version number.
+  param: e : event to get the source version number tab
+*/
+function versionInputDialogShow() {
+  var from_v = $('.version-list').val();
+  console.log(from_v)
+  $('#createNewVersionButton').click(function(e){
+      createNewVersion(from_v)
+  })
+  mindmapServices.getVersions($(".project-list").val()).then(
+    function(res){
+      maxVersionNumber=res[res.length-1];
+	  $('#versionNumInputPopUp').modal("show");
+        $('#versionNumberInput').val((parseFloat(maxVersionNumber) + 0.1).toFixed(1));
+    },function(err){
+        console.log(err);
+        openDialogMindmap('Error','Error in creating versions')
+    })
+
+
+
+}
+
+/*
+function : createNewVersion(from_v)
+Purpose : This function calls isValidVersionToCreate to verify the version number
+provided by the user in the dialog box and calls createNewTab to create new version in the database
+param : from_v : source version
+*/
+
+function createNewVersion(from_v) {
+  console.log(from_v);
+  inputVersion = parseFloat($('#versionNumberInput').val());
+  mindmapServices.getVersions($(".project-list").val()).then(
+    function(result){
+        maxVersionNumber=result[result.length-1];
+        if(inputVersion>parseFloat(maxVersionNumber)){
+            createNewTab(from_v, inputVersion);
+        }else{
+            if (result.includes(inputVersion.toString()))
+                openDialogMindmap('Error', "Version Number already exists");
+
+            else {
+                openDialogMindmap('Error', "Invalid Version Number");
+            }
+        }
+    },function(err){
+        console.log(err);
+        openDialogMindmap('Error','Error in creating versions')
+    })
+  
+}
+
+/*
+function : validateFloatKeyPress(el, evt)
+Purpose : This function restricts user to add only float number and to keep float as one decimal point.
+param : el, evt
+*/
+
+function validateFloatKeyPress(el, evt) {
+  var charCode = (evt.which) ? evt.which : event.keyCode;
+  var number = el.value.split('.');
+  if (charCode != 46 && charCode > 31 && (charCode < 48 || charCode > 57)) {
+    return false;
+  }
+  //just one dot
+  if (number.length > 1 && charCode == 46) {
+    return false;
+  }
+  //get the carat position
+  var caratPos = getSelectionStart(el);
+  var dotPos = el.value.indexOf(".");
+  if (caratPos > dotPos && dotPos > -1 && (number[1].length > 0)) {
+    return false;
+  }
+  return true;
+}
+
+/*
+function : getSelectionStart(o)
+Purpose : Helper function for validateFloatKeyPress
+param : o
+*/
+function getSelectionStart(o) {
+  if (o.createTextRange) {
+    var r = document.selection.createRange().duplicate()
+    r.moveEnd('character', o.value.length)
+    if (r.text == '') return o.value.length
+    return o.value.lastIndexOf(r.text)
+  } else return o.selectionStart
+}
+    //--------------------End of Versioning.js---------------------//
     //--------------------Controller logic-------------------------//
     $("body").css("background", "#eee");
     $("head").append('<link id="mindmapCSS1" rel="stylesheet" type="text/css" href="css/css_mindmap/style.css" /><link id="mindmapCSS2" rel="stylesheet" type="text/css" href="fonts/font-awesome_mindmap/css/font-awesome.min.css" />')
@@ -3703,80 +4103,16 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         }
     }
 
-    //Some properties may be useful for versioning
-    // $("#ct-expand-r").click(function(e) {
-    // 	var flg = false;
-    //      e.preventDefault()
-    //      $(".rsSlide").toggle(5, function(){
-    //          if($(".left-sec-mindmap").is(':visible') && $('#right-dependencies-section').is(':visible')){
-    //         	 flg = true;
-    //             $timeout(function(){
-    //                 $("select.selectProject").removeClass("selectProjectPri");
-    //             },300)
-    //             //endtoend
-    //             $(".endtoend-modulesContainer").prop("style","width:calc(100% - 256px) !important; left:166px !important;");
-    //             $(".searchModuleimg").prop("style","right:86px !important;");
-    //             $(".endtoend-modules-right-upper img").prop("style","left:180px !important;");
-    //             $(".eteLabel").prop("style","left:366px !important; width:140px !important; bottom:23px !important;");
-    //          }
-    //          else{                 
-    //             $("#ct-expand-right").addClass('expand');
-    //             $(".project-list").addClass("selectProject");
-    //             if(($("#left-nav-section").is(":visible") == true &&  $("#right-dependencies-section").is(":visible") == false)){
-    // 				$("#ct-moduleBox,.tabAssign").removeClass("leftBarOpen leftBarClose rightBarOpen bar-collapse bar-expand leftOpenRightClose rightOpenLeftClose").addClass("leftBarOpen");
-    // 			//endtoend
-    //                 $(".endtoend-modulesContainer").prop("style","width:calc(100% - 172px) !important; left:166px !important;");
-    //                 $(".searchModuleimg").prop("style","right:91px !important;");
-    //                 $(".endtoend-modules-right-upper img").prop("style","left:195px !important;");
-    //                 $(".eteLabel").prop("style","left:390px !important; width:140px !important; bottom:23px !important;");
-    //             }
-    //             else if(($("#left-nav-section").is(":visible") == false &&  $("#right-dependencies-section").is(":visible") == true)){
-    // 				$("#ct-moduleBox,.tabAssign").removeClass("leftBarOpen leftBarClose rightBarOpen bar-collapse bar-expand leftOpenRightClose rightOpenLeftClose").addClass("rightBarOpen");
-
-    // 			//endtoend
-    //                 $(".endtoend-modulesContainer").prop("style","width:calc(100% - 96px) !important;");
-    //                 $(".searchModuleimg").prop("style","right:95px !important;");
-    //                 $(".endtoend-modules-right-upper img").prop("style","left:208px !important;");
-    //                 $(".eteLabel").prop("style","left:417px !important; width:140px !important; bottom:23px !important;");
-    //                 $(".project-list").removeClass("selectProject");
-    //             }
-    //             else if(($("#left-nav-section").is(":visible") == false && $("#right-dependencies-section").is(":visible") == false)){
-    // 				$("#ct-moduleBox,.tabAssign").removeClass("leftBarOpen leftBarClose rightBarOpen bar-collapse bar-expand leftOpenRightClose rightOpenLeftClose").addClass("bar-collapse");
-    //                 //endtoend
-    //                 $(".endtoend-modulesContainer").prop("style","width:calc(100% - 12px) !important;");
-    //                 $(".searchModuleimg").prop("style","right:102px !important;");
-    //                 $(".endtoend-modules-right-upper img").prop("style","left:225px !important;");
-    //                 $(".eteLabel").prop("style","left:0px !important; width:140px !important; bottom:18px !important;");
-    //                 $(".project-list").removeClass("selectProject");
-    //             }
-    //             $timeout(function(){
-    //                 $("select.selectProject").addClass("selectProjectPri");
-    //             },300)
-    //          }
-    //          if(flg) $("#ct-moduleBox,.tabAssign").removeClass("leftBarOpen leftBarClose rightBarClose rightBarOpen bar-collapse leftOpenRightClose rightOpenLeftClose").addClass("bar-expand");
-    //            if(($("#left-nav-section").is(":visible") == false &&  $("#right-dependencies-section").is(":visible") == false))
-    //             {
-    //                  $("#ct-moduleBox,.tabAssign").removeClass("leftBarOpen leftBarClose rightBarClose rightBarOpen bar-expand leftOpenRightClose rightOpenLeftClose").addClass("bar-collapse");
-    //             }
-    //             else{
-    //             }
-    //      });
-
-    // });
-
     // Changes made for End to end module implementation
     $scope.createMapsCall = function(e) {
-        $.ajax({
-            type: 'HEAD',
-            url: window.location.origin + '/js/js_mindmap/versioning111.js',
-            success: function() {
-                versioningEnabled = true;
-                load_tab();
-            },
-            error: function() {
-                load_tab();
-            }
-        });
+        mindmapServices.getProjectsNeo().then(function(res){
+            versioningEnabled = true;
+            load_tab();
+
+        },function(err){
+            load_tab();
+
+        })
 
         function collapseSidebars() {
             if ($('#left-nav-section').is(':visible'))
@@ -4026,6 +4362,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             $('[data-nodetype=scenarios]').addClass('node-selected');
         }
         if (!$('#pasteImg1').hasClass('active-map')) {
+            dNodes_c = [];
+            dLinks_c = [];
             $('.node-selected').removeClass('node-selected');
         }
     }

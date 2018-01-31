@@ -12,21 +12,15 @@ function isSessionActive(req){
     return sessionToken != undefined && req.session.id == sessionToken;
 }
 
-/* POST Mindmap*/
-exports.versioning = function (req, res) {
-	logger.info('Inside the UI Service versioning')
+exports.getVersions=function(req,res){
+	logger.info("Inside UI service: getVersions");
 	if (isSessionActive(req)) {
-		var d = req.body;
-		var prjId = d.projectId;
-
+		var prjId = req.body.projectId;
 		var urlData = req.get('host').split(':');
-		if (d.task == 'getVersions') {
-			//prjId=d.projectId;
-			logger.info('Inside the getVersion task of UI Service versioning ');
-			var qList = [{ "statement": "MATCH (n:VERSION{projectID:'" + prjId + "'}) RETURN n.vn" }];
-			logger.info("Calling Neo4j API Service from versioning: project_versioning/versioning");
-			neo4jAPI.executeQueries(qList, function (status, result) {
-				//res.setHeader('Content-Type', 'application/json');
+		logger.info('Inside the getVersion task of UI Service versioning ');
+		var qList = [{ "statement": "MATCH (n:VERSION{projectID:'" + prjId + "'}) RETURN n.vn" }];
+		logger.info("Calling Neo4j API Service from versioning: project_versioning/versioning");
+				neo4jAPI.executeQueries(qList, function (status, result) {
 				if (status != 200) {
 					logger.error("Error occured in project_versioning/versioning: versioning service",status);
 					res.status(status).send(result);
@@ -39,7 +33,6 @@ exports.versioning = function (req, res) {
 						//qList = [({ "statement": "MERGE(n:VERSION{projectID:'" + prjId + "',moduleIDs:[],versionNumber:" + vn + ",vn:'" + vn + "',versionId:'" + uuidV4() + "'})" })];
 						logger.info("Calling Neo4j API Service from versioning: project_versioning/versioning");
 						neo4jAPI.executeQueries(qList, function (status, result) {
-							//res.setHeader('Content-Type', 'application/json');
 							if (status != 200){
 								logger.error("Error occured in project_versioning/versioning: versioning service",status);
 								res.status(status).send(result);
@@ -53,22 +46,27 @@ exports.versioning = function (req, res) {
 						jsonData.forEach(function (d) {
 							list.push(d.row[0])
 						})
-						//jsonData=JSON.stringify(list);
 						list.sort(function (a, b) { return (a > b) ? 1 : ((b > a) ? -1 : 0); });
 						res.status(status).send(list);
 					}
-					//res.setHeader('Content-Type', 'application/json');
 
 				}
 			});
-		}
+	}
+	else{
+		logger.error("Invalid Session");
+		res.send("Invalid Session");
+	}
 
+}
 
-		else if (d.task == 'getModules') {
+exports.getModulesVersioning=function(req,res){
+	logger.info("Inside UI service: getModulesVersioning");
+	if (isSessionActive(req)) {
 			logger.info('Inside the getModules task of UI Service versioning ')
 			var nData = [], qList = [], idDict = {};
-			prjId = d.prjId;
-			version = d.version;
+			var prjId = req.body.prjId;
+			var version = req.body.version;
 			qList.push({ "statement": " MATCH path=(n:VERSION{projectID:'" + prjId + "',versionNumber:" + version + "})-[r*1..]->(t) RETURN path", "resultDataContents": ["graph"] });
 			qList.push({ "statement": "MATCH path=(n:VERSION{projectID:'" + prjId + "',versionNumber:" + version + "}) WHERE NOT (n)-[:FMTTS]->() RETURN n", "resultDataContents": ["graph"] });
 			logger.info("Calling Neo4j API Service from versioning: project_versioning/versioning");
@@ -84,12 +82,9 @@ exports.versioning = function (req, res) {
 					var jsonData = result;
 					var all_modules = jsonData[0].data;
 
-					// if (d.tab=='tabAssign' || d.tab=='endToend'){
-					// 	all_modules=jsonData[0].data.concat(jsonData[1].data).concat(jsonData[2].data).concat(jsonData[3].data);
-
-					// }else{
+					
 					all_modules = jsonData[0].data.concat(jsonData[1].data);
-					//}
+					
 					all_modules.forEach(function (row) {
 						row.graph.nodes.forEach(function (n) {
 							if (idDict[n.id] === undefined) {
@@ -147,49 +142,322 @@ exports.versioning = function (req, res) {
 					res.status(status).send(maps);
 				}
 			});
-		}
-		else if (d.task == 'writeMap') {
-			logger.info('Inside writemap task of the UI Service versioning')
+
+	}
+	else{
+		logger.error("Invalid Session");
+		res.send("Invalid Session");
+	}
+
+}
+
+exports.createVersion=function(req,res){
+	logger.info("Inside UI service: createVersion");
+	if (isSessionActive(req)) {
+			var nData = [];
+			var inputs=req.body;
+			var prjId = inputs.srcprojectId;
+			var tmpprjId = prjId;
+			var user_name = req.session.username;
+			var action=inputs.action
+			var destination_project=inputs.dstprojectId;
+			var vn_from = inputs.vn_from;
+			var vn_to = inputs.vn_to;
+			var userRole = inputs.userRole;
+			if (action == "project_replicate") {
+				prjId = destination_project
+			}
+			//  else {
+			// 	prjId = inputs.projectId;
+			// 	tmpprjId = prjId;
+			// }
+			
+			logger.debug("Destination Project id,Source,destination Version",prjId,vn_from, vn_to);
+			//
+			var qList = [{ "statement": "MATCH path=(n:VERSION{projectID:'" + tmpprjId + "',versionNumber:" + vn_from + "})-[r*1..]->(t) RETURN path", "resultDataContents": ["graph"] }];
+			logger.info("Calling Neo4j API Service from versioning: project_versioning/versioning");
+			neo4jAPI.executeQueries(qList, function (status, result) {
+				res.setHeader('Content-Type', 'application/json');
+				if (status != 200) {
+					logger.error("Error occured in project_versioning/versioning: versioning service",status);
+					res.status(status).send(result);
+				}else {
+					var k = 0, rIndex, lbl, neoIdDict = {};
+					idDict = {};
+					newMap = {};
+					rIndexMap = {}, rIndexList = [];
+					//var attrDict={"version":{},"modules_endtoend":{"moduleID":"id_n"},"modules":{"moduleID":"id_n"},"testscenarios":{"testScenarioID":"id_n"},"screens":{"screenID":"id_n"},"testcases":{"testCaseID":"id_n"}};
+					var attrDict = { "version": "versionID", "modules_endtoend": "moduleID", "modules": "moduleID", "testscenarios": "testScenarioID", "screens": "screenID", "testcases": "testCaseID" };
+					var jsonData = result;
+					var new_res = jsonData[0].data;
+					new_res.forEach(function (row) {
+						row.graph.nodes.forEach(function (n) {
+							if (idDict[n.id] === undefined) {
+								lbl = n.labels[0].toLowerCase();
+								if (lbl != "tasks" && lbl != "modules_endtoend") {
+
+									if (lbl == "modules") n.childIndex = 0;
+									// nData.push({id:n.id,type:lbl,name:n.name,attrs:n.properties,children:[]});
+									nData.push({ type: lbl, attrs: n.properties, children: [] });
+									idDict[n.id] = k;
+									var newId = uuidV4();
+									if (lbl == "version") rIndex = k;
+									if (newMap[n.properties[attrDict[lbl]]] === undefined) {
+										newMap[n.properties[attrDict[lbl]]] = newId;
+										if (lbl == 'modules') {
+											rIndexMap[newId] = k; rIndexList.push(k);
+										}
+									}
+
+									k++;
+								}
+							}
+						});
+
+						row.graph.relationships.forEach(function (r) {
+							var srcIndex = idDict[r.startNode.toString()];
+							var tgtIndex = idDict[r.endNode.toString()];
+							if (tgtIndex != undefined) {
+								if (nData[tgtIndex].children === undefined) nData[srcIndex].task = nData[tgtIndex];
+								else if (nData[srcIndex].children.indexOf(nData[tgtIndex]) == -1) {
+									nData[srcIndex].children.push(nData[tgtIndex]);
+									if (nData[tgtIndex].childIndex == undefined) nData[tgtIndex].childIndex = nData[srcIndex].children.length;
+
+								}
+							}
+
+						});
+					});
+
+					//  SORT THE nDATA on Basis of heirchy
+
+					nData.forEach(function (e) {
+						//neoIdDict[n.id_n]=k;
+						if (e.type == 'version') {
+							newModIds = [];
+							for (var mix = 0; mix < e.attrs.moduleIDs.length; mix++) {
+								logger.debug("Version moduleids:  OLD:", e.attrs.moduleIDs[mix], "  new:", newMap[e.attrs.moduleIDs[mix]]);
+								if (newMap[e.attrs.moduleIDs[mix]] !== undefined) newModIds.push("\"" + newMap[e.attrs.moduleIDs[mix]] + "\"");
+							}
+							e.attrs.moduleIDs = "[" + newModIds + "]";
+							//console.log("Version moduleids", e.attrs.moduleIDs);
+						} else if (e.type == "modules") {
+							e.attrs.moduleID = newMap[e.attrs.moduleID];
+							//console.log("module id: ",e.attrs.moduleID, "moduleame : ",e.name)
+						} else if (e.type == 'testscenarios') {
+							e.attrs.moduleID = newMap[e.attrs.moduleID];
+							e.attrs.testScenarioID = newMap[e.attrs.testScenarioID];
+							//console.log("scenario id: ",e.attrs.testScenarioID, "scenarioname  : ",e.name)
+						} else if (e.type == 'screens') {
+							e.attrs.screenID = newMap[e.attrs.screenID];
+							e.attrs.testScenarioID = newMap[e.attrs.testScenarioID];
+							//console.log("screen id: ",e.attrs.screenID, "screenname  : ",e.name)
+						} else if (e.type == 'testcases') {
+							e.attrs.screenID = newMap[e.attrs.screenID];
+							e.attrs.testCaseID = newMap[e.attrs.testCaseID];
+							//console.log("testCase id: ",e.attrs.testCaseID, "testCase name  : ",e.name)
+						}
+					});
+
+
+					var uidx = 0, t, lts, qList = [];
+					var createdOn = new Date().toLocaleString();
+					nData.forEach(function (e, i) {
+						t = e.attrs;
+						t.projectID = prjId;
+
+						if (e.type == 'version') {
+							//qList.push({ "statement": "MERGE(n:VERSION{projectID:'" + prjId + "',moduleIDs:" + t.moduleIDs + ",versionNumber:" + vn_to + ",vn:'" + vn_to + "',versionID:'" + uuidV4() + "'}) SET n.createdBy='" + user_name + "',n.createdOn='" + createdOn + "'" });
+							qList.push({ "statement": "MERGE(n:VERSION{projectID:'" + prjId + "',versionNumber:" + vn_to + ",vn:'" + vn_to + "'}) SET n.moduleIDs=" + t.moduleIDs + ",n.versionID='" + uuidV4() + "',n.createdBy='" + user_name + "',n.createdOn='" + createdOn + "'" });
+						}
+						else if (e.type == 'modules') {
+							var new_property ="["+t.moduleName + ',' + t.projectID + ',' + vn_to +"]";
+							//var new_property = t.unique_property.slice(0, -1).concat(',' + vn_to + ']')
+							qList.push({ "statement": "MERGE(n:MODULES{projectID:'" + t.projectID + "',moduleName:'" + t.moduleName + "',moduleID:'" + t.moduleID + "',createdBy:'" + t.createdBy + "',createdOn:'" + createdOn + "',moduleID_c:'null',unique_property:'" + new_property + "',childIndex:'" + t.childIndex + "'})" });
+						}
+						else if (e.type == 'testscenarios') {
+							qList.push({ "statement": "MERGE(n:TESTSCENARIOS{projectID:'" + t.projectID + "',moduleID:'" + t.moduleID + "',testScenarioName:'" + t.testScenarioName + "',testScenarioID:'" + t.testScenarioID + "',createdBy:'" + t.createdBy + "',createdOn:'" + createdOn + "',testScenarioID_c:'null', childIndex:'" + t.childIndex + "'})" });
+						}
+						else if (e.type == 'screens') {
+							uidx++; lts = t.testScenarioID;
+							qList.push({ "statement": "MERGE(n:SCREENS{projectID:'" + t.projectID + "',testScenarioID:'" + t.testScenarioID + "',screenName:'" + t.screenName + "',screenID:'" + t.screenID + "',createdBy:'" + t.createdBy + "',createdOn:'" + createdOn + "',uid:'" + uidx + "',screenID_c:'null',childIndex:'" + t.childIndex + "'})" });
+						}
+						else if (e.type == 'testcases') {
+							qList.push({ "statement": "MERGE(n:TESTCASES{screenID:'" + t.screenID + "',testScenarioID:'" + lts + "',testCaseName:'" + t.testCaseName + "',testCaseID:'" + t.testCaseID + "',createdBy:'" + t.createdBy + "',createdOn:'" + createdOn + "',uid:'" + uidx + "',testCaseID_c:'null',screenID_c:'null',childIndex:'" + t.childIndex + "'})" });
+						}
+					});
+					qList.push({ "statement": "MATCH (a:VERSION),(b:MODULES) WHERE b.moduleID IN a.moduleIDs MERGE (a)-[r:FVTM {id:b.moduleID}]->(b)" });
+					qList.push({ "statement": "MATCH (a:MODULES),(b:TESTSCENARIOS) WHERE a.moduleID=b.moduleID MERGE (a)-[r:FMTTS {id:b.moduleID}]->(b)" });
+					qList.push({ "statement": "MATCH (a:TESTSCENARIOS),(b:SCREENS) WHERE a.testScenarioID=b.testScenarioID MERGE (a)-[r:FTSTS {id:b.testScenarioID}]->(b)" });
+					qList.push({ "statement": "MATCH (a:SCREENS),(b:TESTCASES) WHERE a.screenID=b.screenID and a.uid=b.uid MERGE (a)-[r:FSTTS {id:b.screenID}]->(b)" });
+					qList.push({ "statement": "MATCH (a) remove a.uid" });
+					logger.info("Calling Neo4j API Service from versioning: project_versioning/versioning");
+					neo4jAPI.executeQueries(qList, function (status, result) {
+						res.setHeader('Content-Type', 'application/json');
+						if (status != 200) {
+							logger.error("Error occured in project_versioning/versioning: versioning service",status);
+							res.status(status).send(result);
+						}else {
+							var qObj = { "projectId": prjId,"oldprojectId":tmpprjId,"action":true, "testsuiteDetails": [], userRole: userRole, from_version: parseFloat(vn_from), new_version: vn_to };
+							qObj.userName = user_name;
+
+							async.forEachSeries(rIndexList, function (rIndex, maincallback) {
+								var incompleteFlow = false;
+								var tsList = [];
+								//Condition to check incomplete flow of Modules, if so do not create structure in cassandra
+								if (nData[rIndex].children.length == 0 || nData[rIndex].attrs.moduleID_c == 'null' || nData[rIndex].attrs.moduleID_c == 'undefined') {
+									incompleteFlow = true;
+								} else {
+									nData[rIndex].children.forEach(function (ts, i) {
+										var sList = [];
+										//Condition to check incomplete flow of Scenarios, if so do not create structure in cassandra
+										if (ts.children.length == 0) {
+											incompleteFlow = true;
+											return false;
+										} else {
+											ts.children.forEach(function (s, i) {
+												var tcList = [];
+												//Condition to check incomplete flow of Screens, if so do not create structure in cassandra
+												if (s.children.length == 0) {
+													incompleteFlow = true;
+													return false;
+												} else {
+													s.children.forEach(function (tc, i) {
+														if (tc.attrs.testCaseID_c != "null" && tc.attrs.testCaseID_c != "undefined")
+															tcList.push({ "screenID_c": tc.attrs.screenID_c, "testcaseId": tc.attrs.testCaseID, "testcaseId_c": null, "testcaseName": tc.attrs.testCaseName, "task": tc.attrs.task });
+													});
+													if (s.attrs.screenID_c != "null" && s.attrs.screenID_c != "undefined")
+														sList.push({ "screenId": s.attrs.screenID, "screenId_c": null, "screenName": s.attrs.screenName, "task": s.attrs.task, "testcaseDetails": tcList });
+												}
+
+
+											});
+											if (ts.attrs.testScenarioID_c != "null" && ts.attrs.testScenarioID_c != "undefined")
+												tsList.push({ "testscenarioId": ts.attrs.testScenarioID, "testscenarioId_c": null, "testscenarioName": ts.attrs.testScenarioName, "tasks": ts.attrs.task, "screenDetails": sList });
+										}
+									});
+								}
+								if (!incompleteFlow) {
+									qObj.testsuiteDetails = [{ "testsuiteId": nData[rIndex].attrs.moduleID, "testsuiteId_c": null, "testsuiteName": nData[rIndex].attrs.moduleName, "task": nData[rIndex].attrs.task, "testscenarioDetails": tsList }];
+									//Passing the details of hierarchical structure of module and its children to NDAC service to create Structure in Cassandra
+									logger.info("Calling createStructure_Nineteen68 node Service from versioning: project_versioning/versioning");
+									create_ice.createStructure_Nineteen68(qObj, function (err, data) {
+										if (err){
+											logger.error("Error occured in project_versioning/versioning: versioning service",err);
+											res.status(500).send(err);
+										}else {
+											datatosend = data;
+										}
+										var module_type = 'modules';
+										var parsing_result = parsing(data, module_type, vn_to, 1);
+										logger.info("Calling Neo4j API Service from versioning: project_versioning/versioning");
+										neo4jAPI.executeQueries(parsing_result[0], function (status, result) {
+											if (status != 200) {
+											logger.error("Error occured in project_versioning/versioning: versioning service",status);
+											res.status(status).send(result);
+										}maincallback();
+										});
+									})
+								} else {
+									maincallback();
+								}
+
+							}, function (maincallback) {
+								if(action !='project_replicate' && 'socketMapNotify' in myserver){
+									for (soc in myserver.socketMapNotify ){
+										myserver.socketMapNotify[soc]._events.versionUpdate = [];
+										myserver.socketMapNotify[soc].emit("versionUpdate",vn_to);
+										}
+							   	}
+								res.status(status).send({ status: "Success" });
+							});
+
+						}
+					});
+				}
+			});
+
+	}
+	else{
+		logger.error("Invalid Session");
+		res.send("Invalid Session");
+	}
+
+}
+exports.getProjectsNeo=function(req,res){
+	logger.info("Inside UI service: getProjectsNeo");
+	if (isSessionActive(req)) {
+		var qList = [];
+		qList.push({ "statement": "MATCH (n:MODULES) return distinct n.projectID" });
+		logger.info("Calling Neo4j API Service from versioning: project_versioning/versioning");
+		neo4jAPI.executeQueries(qList, function (status, result) {
+			res.setHeader('Content-Type', 'application/json');
+			if (status != 200){
+				logger.error("Error occured in project_versioning/versioning: versioning service",result);
+				res.status(status).send('Fail');
+			}else {
+				res.status(status).send(result);
+			}
+		});
+		
+	}
+	else{
+		logger.error("Invalid Session");
+		res.send("Invalid Session");
+	}
+
+}
+
+exports.saveDataVersioning=function(req,res){
+	logger.info("Inside UI service: saveDataVersioning");
+	if (isSessionActive(req)) {
+		logger.info('Inside the UI Service saveDataVersioning')
+			var tasks =[];
+			var nameDict = {};
+			var nData=[],qList=[],idDict={};
+			var urlData=req.get('host').split(':');
+			var inputs=req.body; 
+			var data=inputs.map;
+			var tab=inputs.tab;
+			var prjId=inputs.prjId;
+			var deletednodes=inputs.deletednode;
+			var vn_from=inputs.vn_from;
+			var vn_to=inputs.vn_from;
+			var user=req.session.username;
+			var flag=inputs.write;
+			var removeTask=inputs.unassignTask;
+			var sendNotify=inputs.sendNotify;
+			var userRole=inputs.userRole;
+			var createdOn = new Date().toLocaleString();
 			//Assigned Tasks Notification
 			//if('socketMapNotify' in myserver && d.data.sendNotify in myserver.socketMapNotify){
-				for(var i=0;i<Object.values(d.data.sendNotify).length;i++)
-				{
+			//Assigned Tasks Notification
+			var assignedToValues = Object.keys(sendNotify).map(function(key){return sendNotify[key]});
+			for(var i=0;i<assignedToValues.length;i++) {
+				if (Object.keys(myserver.socketMapNotify).indexOf(assignedToValues[i]) > -1) {
 					var taskAssignment = 'assigned';
-					var taskName = d.data.map[i].name;
-					var soc = myserver.socketMapNotify[Object.values(d.data.sendNotify)[i]];
+					var taskName = data[i].name;
+					var soc = myserver.socketMapNotify[assignedToValues[i]];
 					var count = 0;
 					var assignedTasksNotification = {};
 					assignedTasksNotification.to = '/plugin';
-					if(d.data.xyz.indexOf(d.data.map[i].oid) >= 0)
-					{
+					if(removeTask.indexOf(data[i].oid) >= 0) {
 						taskAssignment = "unassigned";
 					}
-					if(taskAssignment == "unassigned")
-					{
-						assignedTasksNotification.notifyMsg = "Task '"+taskName+"' have been unassigned by "+ d.data.user_name+"";
+					if(taskAssignment == "unassigned") {
+						assignedTasksNotification.notifyMsg = "Task '"+taskName+"' have been unassigned by "+ user+"";
+					} else{
+						assignedTasksNotification.notifyMsg = "New task '"+taskName+"' have been assigned by "+ user+"";
 					}
-					else{
-						assignedTasksNotification.notifyMsg = "New task '"+taskName+"' have been assigned by "+ d.data.user_name+"";
-					}
-				
 					assignedTasksNotification.isRead = false;
 					assignedTasksNotification.count = count;
 					soc.emit("notify",assignedTasksNotification);
 				}
-			//}
-			var nData = [], qList = [], idDict = {},nameDict={};
-			var createdOn = new Date().toLocaleString();
-			data = d.data.map;
-			prjId = d.data.prjId;
-			var vn_from = d.data.vn_from;
-			var vn_to = d.data.vn_from;
-			var tab = d.data.tab;
-			var deletednodes = d.data.abc;
-			var user = d.data.user_name;
-			var userRole = d.data.userRole;
-			//TO support task deletion
-			var removeTask = d.data.xyz;
-			if (d.data.write == 10) {
+			}
+		
+			
+		
+			if (flag == 10) {
 				var uidx = 0, t, lts, rnmList = [];
 				deletednodes.forEach(function (t, i) {
 					qList.push({ "statement": "MATCH (N) WHERE ID(N)=" + t + " MATCH (N)-[r:FNTT]-(b) DETACH DELETE b" });
@@ -399,7 +667,7 @@ exports.versioning = function (req, res) {
 					}
 				});
 			}
-			else if (d.data.write == 20) {
+			else if (flag == 20) {
 				var uidx = 0, rIndex;
 
 
@@ -426,7 +694,7 @@ exports.versioning = function (req, res) {
 					tsList.push({ "testscenarioId": ts.id, "testscenarioId_c": ts.id_c, "testscenarioName": ts.name, "tasks": ts.task, "screenDetails": sList });
 				});
 				qObj.testsuiteDetails = [{ "testsuiteId": nObj[rIndex].id, "testsuiteId_c": nObj[rIndex].id_c, "testsuiteName": nObj[rIndex].name, "task": nObj[rIndex].task, "testscenarioDetails": tsList }];
-				qObj.userName = d.data.user_name;
+				qObj.userName = user;
 				logger.info("Calling createStructure_Nineteen68 node Service from versioning: project_versioning/versioning");
 				create_ice.createStructure_Nineteen68(qObj, function (err, data) {
 					if (err){
@@ -453,287 +721,14 @@ exports.versioning = function (req, res) {
 				});
 
 			}
-		}
-
-		else if (d.task == 'createVersion') {
-			logger.info('Inside the createVersion task of UI Service versioning ')
-			//get the version from version table
-			//create a new version with the existing version data
-			//id's must be new
-			var nData = [];
-			prjId = d.srcprojectId;
-			tmpprjId = prjId;
-			var user_name = d.user_name;
-			if (d.action == "project_replicate") {
-				prjId = d.dstprojectId;
-			} else {
-				prjId = d.projectId;
-				tmpprjId = prjId;
-			}
-			vn_from = d.vn_from;
-			vn_to = d.vn_to;
-			userRole = d.userRole;
-			logger.debug("Destination Project id,Source,destination Version",prjId,vn_from, vn_to);
-			//
-			var qList = [{ "statement": "MATCH path=(n:VERSION{projectID:'" + tmpprjId + "',versionNumber:" + vn_from + "})-[r*1..]->(t) RETURN path", "resultDataContents": ["graph"] }];
-			logger.info("Calling Neo4j API Service from versioning: project_versioning/versioning");
-			neo4jAPI.executeQueries(qList, function (status, result) {
-				res.setHeader('Content-Type', 'application/json');
-				if (status != 200) {
-					logger.error("Error occured in project_versioning/versioning: versioning service",status);
-					res.status(status).send(result);
-				}else {
-					var k = 0, rIndex, lbl, neoIdDict = {};
-					idDict = {};
-					newMap = {};
-					rIndexMap = {}, rIndexList = [];
-					//var attrDict={"version":{},"modules_endtoend":{"moduleID":"id_n"},"modules":{"moduleID":"id_n"},"testscenarios":{"testScenarioID":"id_n"},"screens":{"screenID":"id_n"},"testcases":{"testCaseID":"id_n"}};
-					var attrDict = { "version": "versionID", "modules_endtoend": "moduleID", "modules": "moduleID", "testscenarios": "testScenarioID", "screens": "screenID", "testcases": "testCaseID" };
-					var jsonData = result;
-					var new_res = jsonData[0].data;
-					new_res.forEach(function (row) {
-						row.graph.nodes.forEach(function (n) {
-							if (idDict[n.id] === undefined) {
-								lbl = n.labels[0].toLowerCase();
-								if (lbl != "tasks" && lbl != "modules_endtoend") {
-
-									if (lbl == "modules") n.childIndex = 0;
-									// nData.push({id:n.id,type:lbl,name:n.name,attrs:n.properties,children:[]});
-									nData.push({ type: lbl, attrs: n.properties, children: [] });
-									idDict[n.id] = k;
-									var newId = uuidV4();
-									if (lbl == "version") rIndex = k;
-									if (newMap[n.properties[attrDict[lbl]]] === undefined) {
-										newMap[n.properties[attrDict[lbl]]] = newId;
-										if (lbl == 'modules') {
-											rIndexMap[newId] = k; rIndexList.push(k);
-										}
-									}
-
-									k++;
-								}
-							}
-						});
-
-						row.graph.relationships.forEach(function (r) {
-							var srcIndex = idDict[r.startNode.toString()];
-							var tgtIndex = idDict[r.endNode.toString()];
-							if (tgtIndex != undefined) {
-								if (nData[tgtIndex].children === undefined) nData[srcIndex].task = nData[tgtIndex];
-								else if (nData[srcIndex].children.indexOf(nData[tgtIndex]) == -1) {
-									nData[srcIndex].children.push(nData[tgtIndex]);
-									if (nData[tgtIndex].childIndex == undefined) nData[tgtIndex].childIndex = nData[srcIndex].children.length;
-
-								}
-							}
-
-						});
-					});
-
-					//  SORT THE nDATA on Basis of heirchy
-
-					nData.forEach(function (e) {
-						//neoIdDict[n.id_n]=k;
-						if (e.type == 'version') {
-							newModIds = [];
-							for (var mix = 0; mix < e.attrs.moduleIDs.length; mix++) {
-								logger.debug("Version moduleids:  OLD:", e.attrs.moduleIDs[mix], "  new:", newMap[e.attrs.moduleIDs[mix]]);
-								if (newMap[e.attrs.moduleIDs[mix]] !== undefined) newModIds.push("\"" + newMap[e.attrs.moduleIDs[mix]] + "\"");
-							}
-							e.attrs.moduleIDs = "[" + newModIds + "]";
-							//console.log("Version moduleids", e.attrs.moduleIDs);
-						} else if (e.type == "modules") {
-							e.attrs.moduleID = newMap[e.attrs.moduleID];
-							//console.log("module id: ",e.attrs.moduleID, "moduleame : ",e.name)
-						} else if (e.type == 'testscenarios') {
-							e.attrs.moduleID = newMap[e.attrs.moduleID];
-							e.attrs.testScenarioID = newMap[e.attrs.testScenarioID];
-							//console.log("scenario id: ",e.attrs.testScenarioID, "scenarioname  : ",e.name)
-						} else if (e.type == 'screens') {
-							e.attrs.screenID = newMap[e.attrs.screenID];
-							e.attrs.testScenarioID = newMap[e.attrs.testScenarioID];
-							//console.log("screen id: ",e.attrs.screenID, "screenname  : ",e.name)
-						} else if (e.type == 'testcases') {
-							e.attrs.screenID = newMap[e.attrs.screenID];
-							e.attrs.testCaseID = newMap[e.attrs.testCaseID];
-							//console.log("testCase id: ",e.attrs.testCaseID, "testCase name  : ",e.name)
-						}
-					});
-
-
-					var uidx = 0, t, lts, qList = [];
-					var createdOn = new Date().toLocaleString();
-					nData.forEach(function (e, i) {
-						t = e.attrs;
-						t.projectID = prjId;
-
-						if (e.type == 'version') {
-							//qList.push({ "statement": "MERGE(n:VERSION{projectID:'" + prjId + "',moduleIDs:" + t.moduleIDs + ",versionNumber:" + vn_to + ",vn:'" + vn_to + "',versionID:'" + uuidV4() + "'}) SET n.createdBy='" + user_name + "',n.createdOn='" + createdOn + "'" });
-							qList.push({ "statement": "MERGE(n:VERSION{projectID:'" + prjId + "',versionNumber:" + vn_to + ",vn:'" + vn_to + "'}) SET n.moduleIDs=" + t.moduleIDs + ",n.versionID='" + uuidV4() + "',n.createdBy='" + user_name + "',n.createdOn='" + createdOn + "'" });
-						}
-						else if (e.type == 'modules') {
-							var new_property ="["+t.moduleName + ',' + t.projectID + ',' + vn_to +"]";
-							//var new_property = t.unique_property.slice(0, -1).concat(',' + vn_to + ']')
-							qList.push({ "statement": "MERGE(n:MODULES{projectID:'" + t.projectID + "',moduleName:'" + t.moduleName + "',moduleID:'" + t.moduleID + "',createdBy:'" + t.createdBy + "',createdOn:'" + createdOn + "',moduleID_c:'null',unique_property:'" + new_property + "',childIndex:'" + t.childIndex + "'})" });
-						}
-						else if (e.type == 'testscenarios') {
-							qList.push({ "statement": "MERGE(n:TESTSCENARIOS{projectID:'" + t.projectID + "',moduleID:'" + t.moduleID + "',testScenarioName:'" + t.testScenarioName + "',testScenarioID:'" + t.testScenarioID + "',createdBy:'" + t.createdBy + "',createdOn:'" + createdOn + "',testScenarioID_c:'null', childIndex:'" + t.childIndex + "'})" });
-						}
-						else if (e.type == 'screens') {
-							uidx++; lts = t.testScenarioID;
-							qList.push({ "statement": "MERGE(n:SCREENS{projectID:'" + t.projectID + "',testScenarioID:'" + t.testScenarioID + "',screenName:'" + t.screenName + "',screenID:'" + t.screenID + "',createdBy:'" + t.createdBy + "',createdOn:'" + createdOn + "',uid:'" + uidx + "',screenID_c:'null',childIndex:'" + t.childIndex + "'})" });
-						}
-						else if (e.type == 'testcases') {
-							qList.push({ "statement": "MERGE(n:TESTCASES{screenID:'" + t.screenID + "',testScenarioID:'" + lts + "',testCaseName:'" + t.testCaseName + "',testCaseID:'" + t.testCaseID + "',createdBy:'" + t.createdBy + "',createdOn:'" + createdOn + "',uid:'" + uidx + "',testCaseID_c:'null',screenID_c:'null',childIndex:'" + t.childIndex + "'})" });
-						}
-					});
-					qList.push({ "statement": "MATCH (a:VERSION),(b:MODULES) WHERE b.moduleID IN a.moduleIDs MERGE (a)-[r:FVTM {id:b.moduleID}]->(b)" });
-					qList.push({ "statement": "MATCH (a:MODULES),(b:TESTSCENARIOS) WHERE a.moduleID=b.moduleID MERGE (a)-[r:FMTTS {id:b.moduleID}]->(b)" });
-					qList.push({ "statement": "MATCH (a:TESTSCENARIOS),(b:SCREENS) WHERE a.testScenarioID=b.testScenarioID MERGE (a)-[r:FTSTS {id:b.testScenarioID}]->(b)" });
-					qList.push({ "statement": "MATCH (a:SCREENS),(b:TESTCASES) WHERE a.screenID=b.screenID and a.uid=b.uid MERGE (a)-[r:FSTTS {id:b.screenID}]->(b)" });
-					qList.push({ "statement": "MATCH (a) remove a.uid" });
-					logger.info("Calling Neo4j API Service from versioning: project_versioning/versioning");
-					neo4jAPI.executeQueries(qList, function (status, result) {
-						res.setHeader('Content-Type', 'application/json');
-						if (status != 200) {
-							logger.error("Error occured in project_versioning/versioning: versioning service",status);
-							res.status(status).send(result);
-						}else {
-							var qObj = { "projectId": prjId,"oldprojectId":tmpprjId,"action":true, "testsuiteDetails": [], userRole: userRole, from_version: parseFloat(vn_from), new_version: vn_to };
-							qObj.userName = d.user_name;
-
-							async.forEachSeries(rIndexList, function (rIndex, maincallback) {
-								var incompleteFlow = false;
-								var tsList = [];
-								//Condition to check incomplete flow of Modules, if so do not create structure in cassandra
-								if (nData[rIndex].children.length == 0 || nData[rIndex].attrs.moduleID_c == 'null' || nData[rIndex].attrs.moduleID_c == 'undefined') {
-									incompleteFlow = true;
-								} else {
-									nData[rIndex].children.forEach(function (ts, i) {
-										var sList = [];
-										//Condition to check incomplete flow of Scenarios, if so do not create structure in cassandra
-										if (ts.children.length == 0) {
-											incompleteFlow = true;
-											return false;
-										} else {
-											ts.children.forEach(function (s, i) {
-												var tcList = [];
-												//Condition to check incomplete flow of Screens, if so do not create structure in cassandra
-												if (s.children.length == 0) {
-													incompleteFlow = true;
-													return false;
-												} else {
-													s.children.forEach(function (tc, i) {
-														if (tc.attrs.testCaseID_c != "null" && tc.attrs.testCaseID_c != "undefined")
-															tcList.push({ "screenID_c": tc.attrs.screenID_c, "testcaseId": tc.attrs.testCaseID, "testcaseId_c": null, "testcaseName": tc.attrs.testCaseName, "task": tc.attrs.task });
-													});
-													if (s.attrs.screenID_c != "null" && s.attrs.screenID_c != "undefined")
-														sList.push({ "screenId": s.attrs.screenID, "screenId_c": null, "screenName": s.attrs.screenName, "task": s.attrs.task, "testcaseDetails": tcList });
-												}
-
-
-											});
-											if (ts.attrs.testScenarioID_c != "null" && ts.attrs.testScenarioID_c != "undefined")
-												tsList.push({ "testscenarioId": ts.attrs.testScenarioID, "testscenarioId_c": null, "testscenarioName": ts.attrs.testScenarioName, "tasks": ts.attrs.task, "screenDetails": sList });
-										}
-									});
-								}
-								if (!incompleteFlow) {
-									qObj.testsuiteDetails = [{ "testsuiteId": nData[rIndex].attrs.moduleID, "testsuiteId_c": null, "testsuiteName": nData[rIndex].attrs.moduleName, "task": nData[rIndex].attrs.task, "testscenarioDetails": tsList }];
-									//Passing the details of hierarchical structure of module and its children to NDAC service to create Structure in Cassandra
-									logger.info("Calling createStructure_Nineteen68 node Service from versioning: project_versioning/versioning");
-									create_ice.createStructure_Nineteen68(qObj, function (err, data) {
-										if (err){
-											logger.error("Error occured in project_versioning/versioning: versioning service",err);
-											res.status(500).send(err);
-										}else {
-											datatosend = data;
-										}
-										var module_type = 'modules';
-										var parsing_result = parsing(data, module_type, vn_to, 1);
-										logger.info("Calling Neo4j API Service from versioning: project_versioning/versioning");
-										neo4jAPI.executeQueries(parsing_result[0], function (status, result) {
-											if (status != 200) {
-											logger.error("Error occured in project_versioning/versioning: versioning service",status);
-											res.status(status).send(result);
-										}maincallback();
-										});
-									})
-								} else {
-									maincallback();
-								}
-
-							}, function (maincallback) {
-								if(d.action !='project_replicate' && 'socketMapNotify' in myserver){
-									for (soc in myserver.socketMapNotify ){
-										myserver.socketMapNotify[soc]._events.versionUpdate = [];
-										myserver.socketMapNotify[soc].emit("versionUpdate",vn_to);
-										}
-							   	}
-								res.status(status).send({ status: "Success" });
-							});
-
-						}
-					});
-				}
-			});
-
-		}
-		else if (d.task == 'getProjectIDs_Nineteen68') {
-			logger.info('Inside the getProjectIDs_Nineteen68 task of UI Service versioning ')
-			var qlist = { userid: d.userid,'allflag':false }
-			logger.info("Calling getProjectIDs_Nineteen68 node Service from versioning: project_versioning/versioning");
-			create_ice.getProjectIDs_Nineteen68(qlist, function (err, result) {
-				if (err){
-					logger.error("Error occured in project_versioning/versioning: versioning service",err);
-					res.status(500).send(result);
-				}else {
-					res.status(200).send(result)
-				}
-			});
-		}
-		else if (d.task == 'listOfProjectsNeo4j') {
-			logger.info('Inside the listOfProjectsNeo4j task of UI Service versioning ')
-			var qList = []
-			qList.push({ "statement": "MATCH (n:MODULES) return distinct n.projectID" });
-			logger.info("Calling Neo4j API Service from versioning: project_versioning/versioning");
-			neo4jAPI.executeQueries(qList, function (status, result) {
-				res.setHeader('Content-Type', 'application/json');
-				if (status != 200){
-					logger.error("Error occured in project_versioning/versioning: versioning service",status);
-					res.status(status).send(result);
-				}else {
-					res.status(status).send(result);
-				}
-			});
-		}
-		else if (d.task == 'getCRId') {
-			data_to_send = { "projectid": d.ci_data.projectid};
-			suite.getCRId(data_to_send, function (status, result) {
-				res.setHeader('Content-Type', 'application/json');
-				if (status != 200) res.status(status).send(result);
-				else {
-					res.status(status).send(result);
-				}
-			});
-		}
-		else if(d.task == 'getProjectType_Nineteen68'){
-			var data_to_send = d.projectid;
-			create_ice.getProjectType_Nineteen68(data_to_send,function(err,result){
-				if(err){
-					res.status(500).send(result);
-				}
-				else{
-					res.status(200).send(result);
-				}
-			});
-		}
 	}
-	else {
-		logger.error("Error occured in project_versioning/versioning: versioning service",': Invalid session');
+	else{
+		logger.error("Invalid Session");
 		res.send("Invalid Session");
 	}
-};
+
+}
+
 
 var parsing = function (d, module_type, vn, flag) {
 	logger.info("Inside the function parsing ");
