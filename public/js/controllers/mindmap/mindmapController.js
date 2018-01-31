@@ -464,11 +464,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
     function addTask(e) {
         $("ct-assignTask,#ct-assignedTo,#ct-assignRevw,#ct-assignRel,#ct-assignCyc").removeClass("selectErrorBorder");
-        $("#startDate,#endDate").removeClass("inputErrorBorder");
-        if ($("ct-assignTask option:selected").val() == "select user") {
-            $("#ct-assignedTo").css('border', '').addClass("inputErrorBorderFull");
-            return false;
-        } else if ($("#ct-assignTask option:selected").val() == "Execute Batch" && $("#ct-executeBatch").val() == "") {
+        $("#startDate,#endDate").removeClass("inputErrorBorder"); 
+        if ($("#ct-assignTask option:selected").val() == "Execute Batch" && $("#ct-executeBatch").val() == "") {
             $("#ct-executeBatch").css('border', '').addClass("inputErrorBorderFull");
             return false;
         } else if ($("#ct-assignedTo option:selected").val() == "select user") {
@@ -489,12 +486,16 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         } else if ($("#ct-assignCyc option:selected").val() == "select cycle") {
             $("#ct-assignCyc").css('border', '').addClass("inputErrorBorderFull");
             return false;
+        } else if ($("#ct-assignDetails").val().trim() == "") {
+            $("#ct-assignDetails").css('border', '').addClass("inputErrorBorderFull");
+            return false;
         }
+        
         var ed = $("#endDate").val().split('/');
         var sd = $("#startDate").val().split('/');
         start_date = new Date(sd[2] + '-' + sd[1] + '-' + sd[0]);
         end_date = new Date(ed[2] + '-' + ed[1] + '-' + ed[0]);
-
+        var apptype=$('.project-list option:selected').attr('app-type');
 
         if (end_date < start_date) {
             $("#endDate").css('border', '').addClass("inputErrorBorderFull");
@@ -613,21 +614,23 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                                 if (scr.task === undefined || scr.task == null) {
                                     if (dNodes[pi].id_c != 'null' && tSc.id_c != 'null' && scr.id_c != 'null') {
                                         taskflag = true;
-                                        scr.task = {
-                                            taskvn: tObj.tvn,
-                                            id: null,
-                                            oid: null,
-                                            task: "Scrape",
-                                            assignedTo: tObj.at,
-                                            reviewer: tObj.rw,
-                                            startDate: tObj.sd,
-                                            endDate: tObj.ed,
-                                            re_estimation: tObj.re_estimation,
-                                            details: tObj.det,
-                                            parent: [dNodes[pi].id_c, tSc.id_c, scr.id_c]
-                                        };
+                                        if(apptype!="258afbfd-088c-445f-b270-5014e61ba4e2"){
+                                            scr.task = {
+                                                taskvn: tObj.tvn,
+                                                id: null,
+                                                oid: null,
+                                                task: "Scrape",
+                                                assignedTo: tObj.at,
+                                                reviewer: tObj.rw,
+                                                startDate: tObj.sd,
+                                                endDate: tObj.ed,
+                                                re_estimation: tObj.re_estimation,
+                                                details: tObj.det,
+                                                parent: [dNodes[pi].id_c, tSc.id_c, scr.id_c]
+                                            };
 
-                                        d3.select('#ct-node-' + scr.id).append('image').attr('class', 'ct-nodeTask').attr('xlink:href', 'images_mindmap/node-task-assigned.png').attr('x', 29).attr('y', -10);
+                                            d3.select('#ct-node-' + scr.id).append('image').attr('class', 'ct-nodeTask').attr('xlink:href', 'images_mindmap/node-task-assigned.png').attr('x', 29).attr('y', -10);
+                                        }
                                     }
 
                                 } else {
@@ -708,20 +711,22 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                         if (scr.task === undefined || scr.task == null) {
                             if (modid != 'null' && tscid != 'null' && scr.id_c != 'null') {
                                 taskflag = true;
-                                scr.task = {
-                                    taskvn: tObj.tvn,
-                                    id: null,
-                                    oid: null,
-                                    task: "Scrape",
-                                    assignedTo: tObj.at,
-                                    reviewer: tObj.rw,
-                                    startDate: tObj.sd,
-                                    endDate: tObj.ed,
-                                    re_estimation: tObj.re_estimation,
-                                    details: tObj.det,
-                                    parent: [modid, tscid, scr.id_c]
-                                };
-                                d3.select('#ct-node-' + scr.id).append('image').attr('class', 'ct-nodeTask').attr('xlink:href', 'images_mindmap/node-task-assigned.png').attr('x', 29).attr('y', -10);
+                                if(apptype!="258afbfd-088c-445f-b270-5014e61ba4e2"){
+                                    scr.task = {
+                                        taskvn: tObj.tvn,
+                                        id: null,
+                                        oid: null,
+                                        task: "Scrape",
+                                        assignedTo: tObj.at,
+                                        reviewer: tObj.rw,
+                                        startDate: tObj.sd,
+                                        endDate: tObj.ed,
+                                        re_estimation: tObj.re_estimation,
+                                        details: tObj.det,
+                                        parent: [modid, tscid, scr.id_c]
+                                    };
+                                    d3.select('#ct-node-' + scr.id).append('image').attr('class', 'ct-nodeTask').attr('xlink:href', 'images_mindmap/node-task-assigned.png').attr('x', 29).attr('y', -10);
+                                }
                             }
 
                         } else {
@@ -874,6 +879,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             openDialogMindmap('Error', 'Incomplete Flow!');
             return;
         }
+        
         e = e || window.event;
         if (e) {
             e.cancelbubble = !0;
@@ -886,8 +892,12 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         var pi = parseInt(p.attr('id').split('-')[2]);
         var t = p.attr('data-nodetype');
         var flag = true;
+        var apptype=$('.project-list option:selected').attr('app-type')
         if (t == 'scenarios' && dNodes[pi].parent.type == 'modules_endtoend') {
             flag = false;
+        }else if(t == 'screens' && apptype=="258afbfd-088c-445f-b270-5014e61ba4e2"){
+            openDialogMindmap('Error', 'Task disabled for Mainframe screen');
+            return;
         }
         if (flag) {
             if (t != 'testcases' && (dNodes[pi]._children != null)) {
@@ -915,7 +925,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             det: (nt) ? nt.details : ''
         };
         c.classed('no-disp', !1);
-        d3.select('#ct-assignDetails').property('value', tObj.det);
+        //d3.select('#ct-assignDetails').property('value', tObj.det);
         d3.select('#ct-assignTable').select('ul').remove();
         u = d3.select('#ct-assignTable').append('ul');
         v = u.append('li');
@@ -927,7 +937,13 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         if (tObj.t == null || tObj.t == "") {
             tObj.t = taskAssign[t].task[0];
         }
+      
         $("#ct-assignTask option[value='" + tObj.t + "']").attr('selected', 'selected');
+
+        if(tObj.det===null || tObj.det.trim() == ""){
+            tObj.det=tObj.t+" "+dNodes[pi].type+" "+dNodes[pi].name
+        }
+        d3.select('#ct-assignDetails').property('value', tObj.det);
 
         $("#ct-assignTask").change(function() {
             if ($("#ct-assignTask").val() == 'Execute Batch') {

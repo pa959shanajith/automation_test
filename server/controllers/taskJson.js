@@ -90,6 +90,8 @@ var projectTypes = {
 	'1fd77879-4dbb-416a-a46d-126d27fee2c7': 'SAP'
 };
 
+var screen_tasks=['scrape','append','Compare','Add','Map'];
+
 function next_function(resultobj, cb, data) {
 	logger.info("Inside function: next_function ");
 	var result = resultobj.result;
@@ -171,117 +173,123 @@ function next_function(resultobj, cb, data) {
 				//Checking if the user is assigned to that project before showing the task to the user
 				if (prjId != undefined && prjId.length > 0 && prjId.indexOf(parent[0]) > -1) {
 					var index = prjId.indexOf(parent[0]);
-					task_json.appType = projectTypes[appTypes[index]];
-					testSuiteDetails_obj.testsuiteid = parent[1];
-					if (parent_length >= 3) {
-						task_json.scenarioId = parent[2];
-					}
-					if (parent_length >= 4) {
-						task_json.screenId = parent[3];
+					var apptype=projectTypes[appTypes[index]];
+					if(!(screen_tasks.indexOf(t.task)>-1 && apptype=='Mainframe')){
+						task_json.appType = apptype;
+						
+						testSuiteDetails_obj.testsuiteid = parent[1];
+						if (parent_length >= 3) {
+							task_json.scenarioId = parent[2];
+						}
+						if (parent_length >= 4) {
+							task_json.screenId = parent[3];
 
-					}
-					if (parent_length == 5) {
-						task_json.testCaseId = parent[4];
-						//task_json.scenarioId=parent[2];
-					}
-					testSuiteDetails_obj.testsuitename = 'modulename';
-					testSuiteDetails_obj.projectidts = parent[0];
-					testSuiteDetails_obj.assignedTestScenarioIds = '';
-					
-					task_json.screenName = 'screenname';
-					task_json.scenarioName = 'scenarioname';
-					task_json.testCaseName = 'testcasename';
-					//Check if versioning exists
-					function versioningCheck()
-					{
-						try {
-							var versioning = require('../controllers/project_versioning.js');
-							versioningEnabled = ' version_'+ task_json.versionnumber+ ' : ';
 						}
-						catch(err) {
-							versioningEnabled = ' ';
+						if (parent_length == 5) {
+							task_json.testCaseId = parent[4];
+							//task_json.scenarioId=parent[2];
 						}
-						return versioningEnabled;
-					}
-
-					if (t.task == 'Design' || t.task == 'Update') {
-						taskDetails.taskName = t.task + versioningCheck() + m.testCaseName;
-						task_json.testCaseName = m.testCaseName;
-					} else if (t.task == 'Execute') {
-						taskDetails.taskName = t.task + versioningCheck()  + m.moduleName;
-						testSuiteDetails_obj.testsuitename = m.moduleName;
-					} else if (t.task == 'Execute Batch') {
-						task_json.projectId = "";
-						taskDetails.taskName = t.task + versioningCheck() + t.batchName;
-						testSuiteDetails_obj.testsuitename = m.moduleName;
-						if (batch_dict[t.batchName] == undefined) {
-							batch_dict[t.batchName] = user_task_json.length;
-						} else {
-							parent_index = batch_dict[t.batchName];
-							batch_task = user_task_json[parent_index];
-							batch_task.taskDetails[0].batchTaskIDs.push(t.taskID);
-							testSuiteDetails_obj.subTaskId = t.taskID;
-							batch_task.testSuiteDetails.push(testSuiteDetails_obj);
-							batch_flag = true;
-						}
-					} else if (t.task == 'Execute Scenario') {
-						task_json.scenarioFlag = 'True';
-						task_json.assignedTestScenarioIds = [task_json.scenarioId];
-						taskDetails.taskName = t.task + versioningCheck() + m.testScenarioName;
-						task_json.scenarioName = m.testScenarioName;
-						//testSuiteDetails_obj.assignedTestScenarioIds=[task_json.scenarioId];
-					} else {
-						taskDetails.taskName = t.task + versioningCheck() + m.screenName;
-						task_json.screenName = m.screenName;
-					}
-					//task_json.assignedTestScenarioIds=data.assignedTestScenarioIds;
-					if (!batch_flag) {
-						testSuiteDetails_obj.subTaskId = t.taskID;
-						task_json.testSuiteDetails.push(testSuiteDetails_obj);
-						taskDetails.batchTaskIDs.push(t.taskID);
-						task_json.taskDetails.push(taskDetails);
-						user_task_json.push(task_json);
-					}
-					if (t.task == 'Execute Scenario') {
-						query = {
-							'statement': "MATCH (n:MODULES{moduleID:'" + m.moduleID + "'}) RETURN n.moduleName"
-						};
-						query1 = {
-							'statement': "MATCH (n:MODULES_ENDTOEND{moduleID:'" + m.moduleID + "'}) RETURN n.moduleName"
-						};
-						var qlist_query = [query];
-						neo4jAPI.executeQueries(qlist_query,function(status,result){
-							if(status!=200) {
-								logger.info(result);
-								maincallback();
+						testSuiteDetails_obj.testsuitename = 'modulename';
+						testSuiteDetails_obj.projectidts = parent[0];
+						testSuiteDetails_obj.assignedTestScenarioIds = '';
+						
+						task_json.screenName = 'screenname';
+						task_json.scenarioName = 'scenarioname';
+						task_json.testCaseName = 'testcasename';
+						//Check if versioning exists
+						function versioningCheck()
+						{
+							try {
+								var versioning = require('../controllers/project_versioning.js');
+								versioningEnabled = ' version_'+ task_json.versionnumber+ ' : ';
 							}
-							else {
-								
-									result1 = result;
-									if(result1[0].data.length >0 && result1[0].data[0].row[0] != undefined){
-										testSuiteDetails_obj.testsuitename = result1[0].data[0].row[0];
-										maincallback();
-									}else{
-										qlist_query = [query1];
-										neo4jAPI.executeQueries(qlist_query,function(status,result){
-										if(status!=200) {
-											logger.info(result);
+							catch(err) {
+								versioningEnabled = ' ';
+							}
+							return versioningEnabled;
+						}
+
+						if (t.task == 'Design' || t.task == 'Update') {
+							taskDetails.taskName = t.task + versioningCheck() + m.testCaseName;
+							task_json.testCaseName = m.testCaseName;
+						} else if (t.task == 'Execute') {
+							taskDetails.taskName = t.task + versioningCheck()  + m.moduleName;
+							testSuiteDetails_obj.testsuitename = m.moduleName;
+						} else if (t.task == 'Execute Batch') {
+							task_json.projectId = "";
+							taskDetails.taskName = t.task + versioningCheck() + t.batchName;
+							testSuiteDetails_obj.testsuitename = m.moduleName;
+							if (batch_dict[t.batchName] == undefined) {
+								batch_dict[t.batchName] = user_task_json.length;
+							} else {
+								parent_index = batch_dict[t.batchName];
+								batch_task = user_task_json[parent_index];
+								batch_task.taskDetails[0].batchTaskIDs.push(t.taskID);
+								testSuiteDetails_obj.subTaskId = t.taskID;
+								batch_task.testSuiteDetails.push(testSuiteDetails_obj);
+								batch_flag = true;
+							}
+						} else if (t.task == 'Execute Scenario') {
+							task_json.scenarioFlag = 'True';
+							task_json.assignedTestScenarioIds = [task_json.scenarioId];
+							taskDetails.taskName = t.task + versioningCheck() + m.testScenarioName;
+							task_json.scenarioName = m.testScenarioName;
+							//testSuiteDetails_obj.assignedTestScenarioIds=[task_json.scenarioId];
+						} else {
+							taskDetails.taskName = t.task + versioningCheck() + m.screenName;
+							task_json.screenName = m.screenName;
+						}
+						//task_json.assignedTestScenarioIds=data.assignedTestScenarioIds;
+						if (!batch_flag) {
+							testSuiteDetails_obj.subTaskId = t.taskID;
+							task_json.testSuiteDetails.push(testSuiteDetails_obj);
+							taskDetails.batchTaskIDs.push(t.taskID);
+							task_json.taskDetails.push(taskDetails);
+							user_task_json.push(task_json);
+						}
+						if (t.task == 'Execute Scenario') {
+							query = {
+								'statement': "MATCH (n:MODULES{moduleID:'" + m.moduleID + "'}) RETURN n.moduleName"
+							};
+							query1 = {
+								'statement': "MATCH (n:MODULES_ENDTOEND{moduleID:'" + m.moduleID + "'}) RETURN n.moduleName"
+							};
+							var qlist_query = [query];
+							neo4jAPI.executeQueries(qlist_query,function(status,result){
+								if(status!=200) {
+									logger.info(result);
+									maincallback();
+								}
+								else {
+									
+										result1 = result;
+										if(result1[0].data.length >0 && result1[0].data[0].row[0] != undefined){
+											testSuiteDetails_obj.testsuitename = result1[0].data[0].row[0];
 											maincallback();
-										}
-										else {
-											result1 = result;
-											if(result1[0].data.length >0 && result1[0].data[0].row[0] != undefined){
-												testSuiteDetails_obj.testsuitename = result1[0].data[0].row[0];
+										}else{
+											qlist_query = [query1];
+											neo4jAPI.executeQueries(qlist_query,function(status,result){
+											if(status!=200) {
+												logger.info(result);
+												maincallback();
 											}
-											maincallback();
+											else {
+												result1 = result;
+												if(result1[0].data.length >0 && result1[0].data[0].row[0] != undefined){
+													testSuiteDetails_obj.testsuitename = result1[0].data[0].row[0];
+												}
+												maincallback();
+											}
+										});
 										}
-									});
-									}
-									
-									
-								} 
-						});
-					} else {
+										
+										
+									} 
+							});
+						} else {
+							maincallback();
+						}
+					}else{
 						maincallback();
 					}
 				} else {
