@@ -1990,7 +1990,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 var vn = '';
                 if ($('.version-list').length != 0)
                     from_v = to_v = $('.version-list').val()
-                mindmapServices.getModules(window.localStorage['tabMindMap'], $(".project-list").val(), versioning_enabled, parseFloat(from_v)).then(function(result) {
+                mindmapServices.getModules(versioning_enabled,window.localStorage['tabMindMap'], $(".project-list").val(), parseFloat(from_v)).then(function(result) {
                     var nodeBox = d3.select('.ct-nodeBox');
                     $(nodeBox[0]).empty();
                     allMMaps = result;
