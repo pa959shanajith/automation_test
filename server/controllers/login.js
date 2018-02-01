@@ -185,7 +185,7 @@ exports.authenticateUser_Nineteen68 = function (req, res) {
 				}
 			});
 		} else {
-			res.send("fail");
+			res.send("invalid_userame_password");
 		}
 	} catch (exception) {
 		logger.error(exception.message);
