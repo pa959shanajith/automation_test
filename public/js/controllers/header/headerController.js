@@ -169,6 +169,7 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 
 	$scope.switchedRole = function () {
 		changedRole = $('#changedRole');
+		changedRole.children().remove(); 
 		changedRole.append($("<p>Your role is changed to " + additionalRoleName + "</p>"))
 		$("#switchRoleModal").modal("hide");
 		$("#switchedRoleModal").modal("show");
