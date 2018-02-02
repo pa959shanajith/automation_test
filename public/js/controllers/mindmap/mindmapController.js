@@ -1001,7 +1001,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     }, function(error) {
                         console.log("Error:::::::::::::", error);
                         unblockUI();
-                    })
+                    })   
 
             } else if (tk == 'sd') {
                 v.append('span').attr('class', 'ct-assignItem fl-left').html('Start Date');
@@ -2282,8 +2282,11 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 }
 
             })
-
             dataReuse['projectid'] = $(".project-list").val();
+            if(versioningEnabled){
+                // Add version number
+                dataReuse['versionNumber'] = $('.version-list').val();
+            }
             return dataReuse;
         }
         var reusedata = parseDataReuse();
@@ -2398,6 +2401,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             "execution_data": [{
                 "browserType": ["1"],
                 "moduleInfo": [{
+                    "appType":"",
                     "projectId": "",
                     "cycleId": "",
                     "moduleId": "",

@@ -1708,12 +1708,23 @@ exports.saveEndtoEndData=function(req,res){
 
 function getQueries(qdata){
 	var qList_reuse= [];
-	qdata['screen'].forEach(function(e,i){
-		qList_reuse.push({'statement':'Match (n:SCREENS{screenName : "'+e.screenname+'",projectID :"'+qdata['projectid']+'"}) return count(n)'});
-	})
-	qdata['testcase'].forEach(function(e,i){
-		qList_reuse.push({'statement':'Match (n:TESTCASES{testCaseName : "'+e.testcasename+'",screenName : "'+e.screenname+'",projectID :"'+qdata['projectid']+'"}) return count(n)'});
-	})
+	if(qdata.versionNumber!=undefined){
+		//Reuse in case of versioning
+		qdata['screen'].forEach(function(e,i){
+			qList_reuse.push({'statement':'Match (n:SCREENS{screenName : "'+e.screenname+'",projectID :"'+qdata['projectid']+'"})<-[r:FTSTS]-(ts:TESTSCENARIOS)<-[s:FMTTS]-(m:MODULES)<-[t:FVTM]-(v:VERSION{versionNumber:'+qdata['versionNumber']+'}) return count(n)'});
+		})
+		qdata['testcase'].forEach(function(e,i){
+			qList_reuse.push({'statement':'Match (n:TESTCASES{testCaseName : "'+e.testcasename+'",projectID :"'+qdata['projectid']+'"})<-[a:FSTTS]-(scr:SCREENS{screenName:"'+e.screenname+'"})<-[r:FTSTS]-(ts:TESTSCENARIOS)<-[s:FMTTS]-(m:MODULES)<-[t:FVTM]-(v:VERSION{versionNumber:'+qdata['versionNumber']+'}) return count(n)'});
+		})		
+	}
+	else{
+		qdata['screen'].forEach(function(e,i){
+			qList_reuse.push({'statement':'Match (n:SCREENS{screenName : "'+e.screenname+'",projectID :"'+qdata['projectid']+'"}) return count(n)'});
+		})
+		qdata['testcase'].forEach(function(e,i){
+			qList_reuse.push({'statement':'Match (n:TESTCASES{testCaseName : "'+e.testcasename+'",projectID :"'+qdata['projectid']+'"})<-[a:FSTTS]-(scr:SCREENS{screenName:"'+e.screenname+'"}) return count(n)'});
+		})
+	}
 	return qList_reuse;
 }
 
