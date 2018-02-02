@@ -58,6 +58,45 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     }
                     if (!selectedProject)
                         selectedProject = res.projectId[0];
+ //////////////////////////////////////////////                       
+                    mindmapServices.populateReleases(selectedProject).then(function(result) {
+                        //releaseResult = result;
+                        default_releaseid = '';
+                        $('.release-list').empty();
+                        for (i = 0; i < result.r_ids.length && result.rel.length; i++) {
+                            $('.release-list').append("<option data-id='" + result.rel[i] + "' value='" + result.r_ids[i] + "'>" + result.rel[i] + "</option>");
+                        }
+                        default_releaseid = $('.release-list').val();
+                        $('.release-list').change(function() {
+                            mindmapServices.populateCycles($('.release-list').val()).then(function(result_cycles) {
+                                var result2 = result_cycles;
+                                $('.cycle-list').empty();
+                                for (i = 0; i < result2.c_ids.length && result2.cyc.length; i++) {
+                                    $('.cycle-list').append("<option data-id='" + result2.cyc[i] + "' value='" + result2.c_ids[i] + "'>" + result2.cyc[i] + "</option>");
+                                }
+                            }, function(error) {
+                                console.log("Error in populating Cycles");
+                            })                                
+                        });
+                        mindmapServices.populateCycles(default_releaseid).then(function(result_cycles) {
+                            var result2 = result_cycles;
+                            $('.cycle-list').empty();
+                            for (i = 0; i < result2.c_ids.length && result2.cyc.length; i++) {
+                                $('.cycle-list').append("<option data-id='" + result2.cyc[i] + "' value='" + result2.c_ids[i] + "'>" + result2.cyc[i] + "</option>");
+                            }
+                            //var selectedCyc=result2.c_ids[0];
+                            var selectedCyc = 'select cycle';
+                            if (tObj.cy != "") {
+                                selectedCyc = tObj.cy;
+                            }
+                        }, function(error) {
+                            console.log("Error in populating Cycles");
+                        })
+                        //display assign box after populating data
+                    }, function(error) {
+                        console.log("Error in populating Releases");
+                    })
+///////////////////////////////////////////////////////////
 
                     $(".project-list").val(selectedProject);
                     selectedProject = undefined;
@@ -103,6 +142,48 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                         $('#searchModule-create').val('');
                         $('#searchModule-assign').val('');
                         selectedProject = $(".project-list").val();
+
+///////////////////////////////////////////////////////
+                        mindmapServices.populateReleases(selectedProject).then(function(result) {
+                            //releaseResult = result;
+                            default_releaseid = '';
+                            $('.release-list').empty();
+                            for (i = 0; i < result.r_ids.length && result.rel.length; i++) {
+                                $('.release-list').append("<option data-id='" + result.rel[i] + "' value='" + result.r_ids[i] + "'>" + result.rel[i] + "</option>");
+                            }
+                            default_releaseid = $('.release-list').val();
+                            $('.release-list').change(function() {
+                                mindmapServices.populateCycles($('.release-list').val()).then(function(result_cycles) {
+                                    var result2 = result_cycles;
+                                    $('.cycle-list').empty();
+                                    for (i = 0; i < result2.c_ids.length && result2.cyc.length; i++) {
+                                        $('.cycle-list').append("<option data-id='" + result2.cyc[i] + "' value='" + result2.c_ids[i] + "'>" + result2.cyc[i] + "</option>");
+                                    }
+                                }, function(error) {
+                                    console.log("Error in populating Cycles");
+                                })                                
+                            });
+                            mindmapServices.populateCycles(default_releaseid).then(function(result_cycles) {
+                                var result2 = result_cycles;
+                                $('.cycle-list').empty();
+                                for (i = 0; i < result2.c_ids.length && result2.cyc.length; i++) {
+                                    $('.cycle-list').append("<option data-id='" + result2.cyc[i] + "' value='" + result2.c_ids[i] + "'>" + result2.cyc[i] + "</option>");
+                                }
+                                //var selectedCyc=result2.c_ids[0];
+                                var selectedCyc = 'select cycle';
+                                if (tObj.cy != "") {
+                                    selectedCyc = tObj.cy;
+                                }
+                            }, function(error) {
+                                console.log("Error in populating Cycles");
+                            })
+                            //display assign box after populating data
+                        }, function(error) {
+                            console.log("Error in populating Releases");
+                        })
+//////////////////////////////////////////////////////
+
+
                         if ($("img.iconSpaceArrow").hasClass("iconSpaceArrowTop")) {
                             $("img.iconSpaceArrow").removeClass("iconSpaceArrowTop");
                         }
