@@ -31,7 +31,7 @@ mySPA.controller('loginController', function ($scope, $rootScope, $timeout, $htt
 			var password = $scope.password;
 			LoginService.authenticateUser_Nineteen68(username, password)
 			.then(function (data) {
-				if(data != "fail" && data != "noProjectsAssigned"){
+				if(data != "fail" && data != "noProjectsAssigned"  && data!= "invalid_userame_password"){
 					if (data == 'inValidCredential') {
 						$(".ic-username").children().attr("src", "imgs/ic-username-error.png");
 						$(".ic-password").children().attr("src", "imgs/ic-password-error.png");
@@ -109,9 +109,16 @@ mySPA.controller('loginController', function ($scope, $rootScope, $timeout, $htt
 						$scope.loginValidation = "To Login, user must be allocated to a Domain and Project. Please contact Admin.";
 						cfpLoadingBar.complete();
 				}
+				else if(data == 'invalid_username_password')
+				{
+					$scope.loginValidation = "Invalid username or password";
+					console.log("Invalid username or password");
+					cfpLoadingBar.complete();
+				}
 				else{
 					$scope.loginValidation = "Failed to Login.";
 					console.log("Fail to Login.")
+					cfpLoadingBar.complete();
 				}
 			}, function (error) { console.log("Failed to Authenticate User") });
 		}

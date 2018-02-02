@@ -35,6 +35,7 @@ var saveFlag = '';
 var copiedViewstring = false;
 var getIndexOfDeletedObjects = [];
 var newScrapedData;
+var saveScrapeDataFlag = false;
 window.localStorage['disableEditing'] = "false";
 mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$location', '$timeout', 'DesignServices', 'mindmapServices','cfpLoadingBar', '$window', 'socket', function($scope, $rootScope, $http, $location, $timeout, DesignServices, mindmapServices,cfpLoadingBar, $window, socket) {
     $("body").css("background", "#eee");
@@ -1525,6 +1526,7 @@ console.log("screenName:", screenName);
             DesignServices.initScraping_ICE(screenViewObject)
                 .then(function(data) {
                     //console.log("UI", data);
+                 
                     unblockUI();
                     //window.localStorage['disableEditing'] = "true";
                     if (data == "Invalid Session") {
@@ -1567,6 +1569,7 @@ console.log("screenName:", screenName);
                     }
                     //COMPARE & UPDATE SCRAPE OPERATION
                     if (data.action == "compare") {
+                       
                         updatedViewString = data;
                         $("#changedOrdList li,#compareUnchangedObjectsBox li ,#compareNotFoundObjectsBox li").empty();
                       //  $("#viewscrapedObjects").hide();
@@ -1680,6 +1683,7 @@ console.log("screenName:", screenName);
                             $("#compareNotFoundObjectsBox").hide();
                         }
                     } else {
+                        saveScrapeDataFlag = false;
                         if (data.view.length > 0) {
                             $("#finalScrap").show();
                         }
@@ -2008,22 +2012,43 @@ console.log("screenName:", screenName);
                     }
                 }
             }
-            if ($(".parentObjContainer").find(".checkStylebox").is(":checked")) {
+            if ($(".parentObjContainer").find(".checkStylebox").is(":checked") && saveScrapeDataFlag == true) {
                 viewString.view = [];
                 viewString.mirror = "";
                 if(newScrapedList != undefined){
                     newScrapedList.view = [];
                     newScrapedList.mirror = "";
                 }
-                $("#scraplist").empty();
-                $("#deleteObjects,#saveObjects").prop("disabled", true);
-                $(".checkStylebox").prop("checked", false);
+                var totalElements = $(".ellipsis").length;
+                var selectedElements = $(".ellipsis:visible").length;
+                if(totalElements == selectedElements)
+                {
+                    $("#scraplist").empty();
+                }
+                else{
+                    $("#scraplist").children("li:visible").empty();
+                }
+                var currentElements = $(".ellipsis:visible").length;
+                if(currentElements > 0)
+                {
+                    $("#deleteObjects,#saveObjects").prop("disabled", false);
+                    $(".checkStylebox").prop("checked", false);
+                }
+                else{
+                    $("#deleteObjects,.checkStylebox").prop("disabled", true);
+                    $(".checkStylebox").prop("checked", false);
+                  
+                }
+           
+                // $("#scraplist").empty();
+                // $("#deleteObjects,#saveObjects").prop("disabled", true);
+                // $(".checkStylebox").prop("checked", false);
             } else if (!$("input[type=checkbox].checkall").is(":checked")) {
                 openDialog("Delete Scrape data", "Please select objects to delete.")
             } else {
                 if (eaCheckbox){
                     var dontChkViewString = 0;
-                    $.each($("input[type=checkbox].checkall:checked"), function() {
+                    $.each($("input[type=checkbox].checkall:checked"), function() {  
                         for (var i = 0; i < newScrapedList.view.length; i++) {
                             if ($(this).parents("li").data("xpath") == newScrapedList.view[i].xpath && ($(this).parent('.objectNames').siblings(".ellipsis").text().trim().replace('/\s/g', ' ')).replace('\n', ' ') == newScrapedList.view[i].custname.trim()) {
                                 //newScrapedList.view.splice(newScrapedList.view.indexOf(newScrapedList.view[i]), 1);
@@ -2036,7 +2061,7 @@ console.log("screenName:", screenName);
                             }
                         }
                     })
-                    if($("input[type=checkbox].checkall:checked").length != dontChkViewString){
+                    if($("input[type=checkbox].checkall:checked").length != dontChkViewString){ 
                         $.each($("input[type=checkbox].checkall:checked"), function() {
                             for (var i = 0; i < viewString.view.length; i++) {
                                 if ($(this).parents("li").data("xpath") == viewString.view[i].xpath && ($(this).parent('.objectNames').siblings(".ellipsis").text().trim().replace('/\s/g', ' ')).replace('\n', ' ') == viewString.view[i].custname.trim()) {
@@ -2064,6 +2089,17 @@ console.log("screenName:", screenName);
                             }
                         }
                     })
+                    var currentElements = $(".ellipsis:visible").length;
+                    if(currentElements > 0)
+                    {
+                        $("#deleteObjects,#saveObjects").prop("disabled", false);
+                        $(".checkStylebox").prop("checked", false);
+                    }
+                    else{
+                        $("#deleteObjects,.checkStylebox").prop("disabled", true);
+                        $(".checkStylebox").prop("checked", false);
+                        $(".popupContent-filter-active").trigger('click');
+                    }
                 }
                 $("#deleteObjects").prop("disabled", true);
             }
@@ -3250,6 +3286,7 @@ console.log("screenName:", screenName);
                     copiedViewstring = false;
                     //enableScreenShotHighlight = true;
                     localStorage.removeItem("_modified");
+                    saveScrapeDataFlag = true;
                     openDialog("Save Scraped data", "Scraped data saved successfully.")
                     angular.element(document.getElementById("left-nav-section")).scope().getScrapeData();
                     $("#saveObjects").attr('disabled', true);
