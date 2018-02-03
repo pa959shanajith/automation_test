@@ -1196,7 +1196,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         function checkAndUpdate(nObj,parentlist) {
             parentlist.unshift(nObj.id_c);
             if (nObj.id_c==null) return [false,[]];
-            if (nObj.type=='modules'){
+            if (nObj.type=='modules' || nObj.type=='modules_endtoend'){
                 return [true,parentlist];
             } 
             if (nObj.parent) {
