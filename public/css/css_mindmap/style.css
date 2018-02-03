@@ -581,7 +581,7 @@ select
      float:left;
 }
 .export-icon{
-    padding-left: 7px;
+    left: 10px;
 }
 #copy-paste{
     display: inline-block;
