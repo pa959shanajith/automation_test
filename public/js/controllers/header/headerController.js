@@ -145,7 +145,7 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 	}
 
 	$scope.naviPg = function(){
-		if (window.localStorage['_SR'] != 'Admin') {
+		if (localStorage.getItem("navigateEnable") == "true") {
 			window.localStorage["_VP"] = true;
 			window.localStorage['navigateScreen'] = "plugin";
 			$timeout(function () {

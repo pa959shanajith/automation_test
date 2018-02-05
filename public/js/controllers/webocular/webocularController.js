@@ -64,7 +64,7 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
   }
 
   $scope.executeGo = function(){
-    //console.log($scope.url, $scope.level, $scope.selectedAgent);
+	localStorage.setItem("navigateEnable", false);
     $scope.enableGenerate = false;
     $scope.crawledLinks = [];
     $scope.arr = [];
@@ -172,7 +172,7 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
         $scope.hideBaseContent = { message: 'false' };
         $scope.$apply();
       });
-
+      localStorage.setItem("navigateEnable", true);
       $scope.enableGenerate = true;
       $scope.check= false;
       $scope.$apply();
@@ -424,7 +424,8 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
     if ($scope.check) {
       return;
     }
-    
+	
+    blockUI("Graph is being generated, Please Wait...");
     $scope.reportGenerated = false;
     var baseSVG = document.getElementById("base-svg");
     if (baseSVG) {
@@ -552,11 +553,7 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
     var link = svg.selectAll(".link"),
     node = svg.selectAll(".node");
 
-    start();
-
-    function start(){
-      restart();
-    }
+    setTimeout(restart, 50);
 
     function startAgain(){
       nodes = flatten(root),
@@ -567,7 +564,7 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
           toggle(nodes[i], false);
         }
       }
-      restart();
+      setTimeout(restart, 50);
     }
 
     function addJson(source, target, reverse) {
@@ -616,7 +613,7 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
           }
         }
       }
-      update();
+      setTimeout(update,50);
     }
 
     function addStylesToNode(d) {
@@ -706,11 +703,24 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
       node.select("image")
       .attr("xlink:href", addStylesToNode)
 
-      if(count11 == 0){
+	  if(count11 == 0){
         count11++;
-        startAgain();
+        setTimeout(startAgain, 50);
+      }else{
+        // Given a timeout of 2 seconds to prevent the blinking effect of screen.
+        setTimeout(function(){
+          unblockUI();
+        },2000);
       }
+	  
     }
+    document.getElementById("result-canvas").addEventListener("dblclick", () => {
+      zoomReset = true;
+      svgMain.call(d3.behavior.zoom().scale(1).translate([positionNode.x,positionNode.y]).scaleExtent([0.5, 7.5]).on("zoom", rescale)).on("dblclick.zoom", null);
+      svg.attr("transform",
+      "translate(" + [positionNode.x,positionNode.y] + ")"
+      + " scale(" + 1 + ")");
+    });
 
     function highlightNeighbors(d,i) {
       var nodeNeighbors = findNeighbors(d,i);
@@ -783,48 +793,28 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
       d3.selectAll("line").style("opacity", 1);
       //restart();
     }
-
-    document.getElementById("result-canvas").addEventListener("dblclick", () => {
-      zoomReset = true;
-      svgMain.call(d3.behavior.zoom().scale(1).translate([positionNode.x,positionNode.y]).scaleExtent([0.5, 7.5]).on("zoom", rescale)).on("dblclick.zoom", null);
-      svg.attr("transform",
-      "translate(" + [positionNode.x,positionNode.y] + ")"
-      + " scale(" + 1 + ")");
-    });
   
     function getElementDimm(s) {
       return [parseFloat(s.style("width")), parseFloat(s.style("height"))];
-  };
+	};
 
     function tick() {
-      link.attr("x1", function(d) { return d.source.x+12.5 ; })
+      link.transition().ease('linear').duration(150)
+      .attr("x1", function(d) { return d.source.x+12.5 ; })
       .attr("y1", function(d) { return d.source.y+12.5 ; })
       .attr("x2", function(d) { return d.target.x+12.5; })
       .attr("y2", function(d) { return d.target.y+12.5; });
 
-      node.attr("transform", function(d) { if(d.parent == "None"){
-        var canvSize=getElementDimm(d3.select("#base-svg"));
-        var x = canvSize[1] - 40 ;
-        positionNode.x =  (-d.x + canvSize[0]/2) ;
-        positionNode.y =  (-d.y + canvSize[1]/2) ;
-      }
-      return "translate(" + d.x + "," + d.y + ")"; });
-    }
-
-    function color(d) {
-      if(d.isTerminal == true){
-        return "#9999ff"; // terminal node
-      }else if(d._children){
-        return "#4050ff"; // collapsed node
-      }else{
-        if(d.color==1){
-          return "rgb(64, 179, 255)"; // central node
-        }else if(d.color==2){
-          return "#0088ff"; // first tier node
-        }else{
-          return "#66aadd" // second tier node
+      node.transition().ease('linear').duration(150)
+      .attr("transform", function(d) {
+        if(d.parent == "None"){
+          var canvSize=getElementDimm(d3.select("#base-svg"));
+          var x = canvSize[1] - 40 ;
+          positionNode.x =  (-d.x + canvSize[0]/2) ;
+          positionNode.y =  (-d.y + canvSize[1]/2) ;
         }
-      }
+        return "translate(" + d.x + "," + d.y + ")";
+      });
     }
 
     function toggle(d, check) {

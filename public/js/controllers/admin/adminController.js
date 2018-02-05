@@ -7,6 +7,9 @@ var newProjectDetails = [];
 var unAssignedProjects = []; var assignedProjects = [];var projectData =[];var valid = "";var getAssignedProjectsLen=0;
 mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServices','$timeout','cfpLoadingBar', function ($scope, $rootScope, $http, adminServices, $timeout, cfpLoadingBar) {
 	$("body").css("background","#eee");
+	
+	localStorage.setItem("navigateEnable", false);
+
 	$('.dropdown').on('show.bs.dropdown', function(e){
 		$(this).find('.dropdown-menu').first().stop(true, true).slideDown(300);
 	});

@@ -11,10 +11,10 @@
 			<div id="left-top-section" class="left-top-section-utility">
 				<ul>
 					<li><span><a class='scrapeOnTxt'>Crawl On</a></span></li>
-					<li><a id='ie_img1' ng-click="selectedAgent = 'ie'" href="#" title="Internet Explorer"><span><img id='ie_img' class="highlightImg" ng-class="{'selectedIcon': selectedAgent === 'ie'}" src="imgs/ic-ie.png" alt="Internet Explorer"></span>Internet Explorer</a></li>
-					<li><a id='gc_img1' ng-click="selectedAgent = 'chrome'" href="#" title="Google Chrome"><span><img id='gc_img' class="highlightImg" ng-class="{'selectedIcon': selectedAgent === 'chrome'}" src="imgs/ic-chrome.png" alt="Google Chrome"></span>Google Chrome</a></li>
-					<li><a id='mf_img1' ng-click="selectedAgent = 'firefox'" href="#" title="Mozilla Firefox"><span><img id='mf_img' class="highlightImg " ng-class="{'selectedIcon': selectedAgent === 'firefox'}" src="imgs/ic-mozilla.png" alt="Mozilla Firefox"></span>Mozilla Firefox</a></li>
-					<li><a id='sf_img1' ng-click="selectedAgent = 'safari'" href="#" title="Safari"><span><img id='sf_img' class="highlightImg " ng-class="{'selectedIcon': selectedAgent === 'safari'}" src="imgs/ic-safari.png" alt="Safari"></span>Safari</a></li>
+					<li><a id='ie_img1' ng-click="hideBaseContent.message=='false' ? selectedAgent = 'ie' : selectedAgent=selectedAgent" href="#" title="Internet Explorer"><span><img id='ie_img' class="highlightImg" ng-class="{'selectedIcon': selectedAgent === 'ie'}" src="imgs/ic-ie.png" alt="Internet Explorer"></span>Internet Explorer</a></li>
+					<li><a id='gc_img1' ng-click="hideBaseContent.message=='false' ? selectedAgent = 'chrome' : selectedAgent=selectedAgent" href="#" title="Google Chrome"><span><img id='gc_img' class="highlightImg" ng-class="{'selectedIcon': selectedAgent === 'chrome'}" src="imgs/ic-chrome.png" alt="Google Chrome"></span>Google Chrome</a></li>
+					<li><a id='mf_img1' ng-click="hideBaseContent.message=='false' ? selectedAgent = 'firefox' : selectedAgent=selectedAgent" href="#" title="Mozilla Firefox"><span><img id='mf_img' class="highlightImg " ng-class="{'selectedIcon': selectedAgent === 'firefox'}" src="imgs/ic-mozilla.png" alt="Mozilla Firefox"></span>Mozilla Firefox</a></li>
+					<li><a id='sf_img1' ng-click="hideBaseContent.message=='false' ? selectedAgent = 'safari' : selectedAgent=selectedAgent" href="#" title="Safari"><span><img id='sf_img' class="highlightImg " ng-class="{'selectedIcon': selectedAgent === 'safari'}" src="imgs/ic-safari.png" alt="Safari"></span>Safari</a></li>
 				</ul>
 			</div>
 		</div>

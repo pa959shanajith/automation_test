@@ -2,6 +2,8 @@ var myserver = require('../lib/socket');
 var validator = require('validator');
 var logger = require('../../logger');
 var redisServer = require('../lib/redisSocketHandler');
+var sessionTime = 30 * 60 * 1000;
+var updateSessionTimeEvery = 20 * 60 * 1000;
 
 function isSessionActive(req){
 	var sessionToken = req.session.uniqueId;
@@ -41,6 +43,9 @@ exports.getCrawlResults = function (req, res) {
 						logger.info("Sending socket request for webCrawlerGo to redis");
 						dataToIce = {"emitAction" : "webCrawlerGo","username" : name, "input_url":input_url, "level" : level, "agent" :agent};
 						redisServer.redisPub1.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
+						var updateSessionExpiry = setInterval(function () {
+							req.session.cookie.maxAge = sessionTime;
+						}, updateSessionTimeEvery);
 						function webCrawlerGo_listener(channel,message) {
 							data = JSON.parse(message);
 							if(name == data.username){
@@ -66,6 +71,7 @@ exports.getCrawlResults = function (req, res) {
 								} else if (data.onAction == "result_web_crawler_finished") {
 									redisServer.redisSub2.removeListener('message',webCrawlerGo_listener);	
 									try {
+										clearInterval(updateSessionExpiry);
 										var mySocketUI = myserver.allSocketsMapUI[name];
 										mySocketUI.emit("endData", value);
 										res.status(200).json({success: true});
