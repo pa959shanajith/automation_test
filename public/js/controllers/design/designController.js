@@ -144,7 +144,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 
     }, 3000)
 
-console.log("screenName:", screenName);
+//console.log("screenName:", screenName);
     if (window.localStorage['_TJ']) {
         allTasks = JSON.parse(window.localStorage['_TJ']);
         if(allTasks.length > 0)
@@ -2080,16 +2080,32 @@ console.log("screenName:", screenName);
                     $.each($("input[type=checkbox].checkall:checked"), function() {
                         for (var i = 0; i < viewString.view.length; i++) {
                             if ($(this).parents("li").data("xpath") == viewString.view[i].xpath && ($(this).parent('.objectNames').siblings(".ellipsis").text().trim().replace('/\s/g', ' ')).replace('\n', ' ') == viewString.view[i].custname.trim()) {
+                              // console.log(viewString.view[i]);
+                               $(this).parents("li.select_all").remove();
                                 //viewString.view.splice(viewString.view.indexOf(viewString.view[i]), 1);
-                                if(!(isInArray(viewString.view.indexOf(viewString.view[i]), getIndexOfDeletedObjects))){
-                                    getIndexOfDeletedObjects.push(viewString.view.indexOf(viewString.view[i]))
-                                    $(this).parents("li.select_all").remove();
-                                    break;
-                                }
+                                // if(!(isInArray(viewString.view.indexOf(viewString.view[i]), getIndexOfDeletedObjects))){
+                                //     getIndexOfDeletedObjects.push(viewString.view.indexOf(viewString.view[i]))
+                                //     $(this).parents("li.select_all").remove();
+                                //     break;
+                                // }
                             }
                         }
+
                     })
+                    var totalElements = $(".ellipsis").length;
+                    var selectedElements = $("input[type=checkbox].checkall:checked:visible").length;
+                    if(totalElements == selectedElements)
+                    {
+                        $("#scraplist").empty();
+                        viewString.view = [];
+                        viewString.mirror = "";
+                        if(newScrapedList != undefined){
+                            newScrapedList.view = [];
+                            newScrapedList.mirror = "";
+                        }
+                    }
                     var currentElements = $(".ellipsis:visible").length;
+                    var filterActiveLen = $(".popupContent-filter-active").length;
                     if(currentElements > 0)
                     {
                         $("#deleteObjects,#saveObjects").prop("disabled", false);
@@ -2100,6 +2116,11 @@ console.log("screenName:", screenName);
                         $(".checkStylebox").prop("checked", false);
                         $(".popupContent-filter-active").trigger('click');
                     }
+                    if(saveScrapeDataFlag == false && currentElements == 0 && filterActiveLen == 0)
+                    {
+                        $("#saveObjects").prop("disabled", true);
+                    }
+                        
                 }
                 $("#deleteObjects").prop("disabled", true);
             }
