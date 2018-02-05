@@ -56,47 +56,54 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     for (i = 0; i < (res.projectId.length && res.projectName.length); i++) {
                         $('.project-list').append("<option app-type='" + res.appType[i] + "' data-id='" + res.projectName[i] + "' value='" + res.projectId[i] + "'>" + res.projectName[i] + "</option>");
                     }
+                    var default_releaseid = '';
                     if (!selectedProject)
-                        selectedProject = res.projectId[0];
- //////////////////////////////////////////////                       
-                    mindmapServices.populateReleases(selectedProject).then(function(result) {
-                        //releaseResult = result;
-                        default_releaseid = '';
-                        $('.release-list').empty();
-                        for (i = 0; i < result.r_ids.length && result.rel.length; i++) {
-                            $('.release-list').append("<option data-id='" + result.rel[i] + "' value='" + result.r_ids[i] + "'>" + result.rel[i] + "</option>");
-                        }
-                        default_releaseid = $('.release-list').val();
-                        $('.release-list').change(function() {
-                            mindmapServices.populateCycles($('.release-list').val()).then(function(result_cycles) {
+                        selectedProject = res.projectId[0];  
+                    if($scope.tab=='tabAssign'){
+                        mindmapServices.populateReleases(selectedProject).then(function(result) {
+                            //releaseResult = result;
+                            
+                            $('.release-list').empty();
+                            for (i = 0; i < result.r_ids.length && result.rel.length; i++) {
+                                $('.release-list').append("<option data-id='" + result.rel[i] + "' value='" + result.r_ids[i] + "'>" + result.rel[i] + "</option>");
+                            }
+                            default_releaseid = $('.release-list').val();
+                            $('.cycle-list').change(function() {
+                                loadMindmapData1(param);
+                            });
+                            $('.release-list').change(function() {
+                                mindmapServices.populateCycles($('.release-list').val()).then(function(result_cycles) {
+                                    var result2 = result_cycles;
+                                    $('.cycle-list').empty();
+                                    for (i = 0; i < result2.c_ids.length && result2.cyc.length; i++) {
+                                        $('.cycle-list').append("<option data-id='" + result2.cyc[i] + "' value='" + result2.c_ids[i] + "'>" + result2.cyc[i] + "</option>");
+                                    }
+                                    loadMindmapData1(param);
+                                }, function(error) {
+                                    console.log("Error in populating Cycles");
+                                })                                
+                            });
+                            mindmapServices.populateCycles(default_releaseid).then(function(result_cycles) {
                                 var result2 = result_cycles;
                                 $('.cycle-list').empty();
                                 for (i = 0; i < result2.c_ids.length && result2.cyc.length; i++) {
                                     $('.cycle-list').append("<option data-id='" + result2.cyc[i] + "' value='" + result2.c_ids[i] + "'>" + result2.cyc[i] + "</option>");
                                 }
+                                loadMindmapData1(param);
+                                //var selectedCyc=result2.c_ids[0];
+                                var selectedCyc = 'select cycle';
+                                // if (tObj.cy != "") {
+                                //     selectedCyc = tObj.cy;
+                                // }
+
                             }, function(error) {
                                 console.log("Error in populating Cycles");
-                            })                                
-                        });
-                        mindmapServices.populateCycles(default_releaseid).then(function(result_cycles) {
-                            var result2 = result_cycles;
-                            $('.cycle-list').empty();
-                            for (i = 0; i < result2.c_ids.length && result2.cyc.length; i++) {
-                                $('.cycle-list').append("<option data-id='" + result2.cyc[i] + "' value='" + result2.c_ids[i] + "'>" + result2.cyc[i] + "</option>");
-                            }
-                            //var selectedCyc=result2.c_ids[0];
-                            var selectedCyc = 'select cycle';
-                            if (tObj.cy != "") {
-                                selectedCyc = tObj.cy;
-                            }
+                            })
+                            //display assign box after populating data
                         }, function(error) {
-                            console.log("Error in populating Cycles");
+                            console.log("Error in populating Releases");
                         })
-                        //display assign box after populating data
-                    }, function(error) {
-                        console.log("Error in populating Releases");
-                    })
-///////////////////////////////////////////////////////////
+                    }
 
                     $(".project-list").val(selectedProject);
                     selectedProject = undefined;
@@ -111,7 +118,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                                 openDialogMindmap('Error', 'Error loading Versions')
                             })
                        
-                    } else if(param == 0) {
+                    } 
+                    else if(param == 0 && $scope.tab=='tabCreate') {
                         loadMindmapData1(param);
                     }
                     else if(param == 2){
@@ -144,6 +152,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                         selectedProject = $(".project-list").val();
 
 ///////////////////////////////////////////////////////
+                    if($scope.tab=='tabAssign'){
                         mindmapServices.populateReleases(selectedProject).then(function(result) {
                             //releaseResult = result;
                             default_releaseid = '';
@@ -159,6 +168,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                                     for (i = 0; i < result2.c_ids.length && result2.cyc.length; i++) {
                                         $('.cycle-list').append("<option data-id='" + result2.cyc[i] + "' value='" + result2.c_ids[i] + "'>" + result2.cyc[i] + "</option>");
                                     }
+                                    loadMindmapData1(param);
                                 }, function(error) {
                                     console.log("Error in populating Cycles");
                                 })                                
@@ -169,11 +179,13 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                                 for (i = 0; i < result2.c_ids.length && result2.cyc.length; i++) {
                                     $('.cycle-list').append("<option data-id='" + result2.cyc[i] + "' value='" + result2.c_ids[i] + "'>" + result2.cyc[i] + "</option>");
                                 }
+                                loadMindmapData1(param);
+                                
                                 //var selectedCyc=result2.c_ids[0];
-                                var selectedCyc = 'select cycle';
-                                if (tObj.cy != "") {
-                                    selectedCyc = tObj.cy;
-                                }
+                                //var selectedCyc = 'select cycle';
+                                // if (tObj.cy != "") {
+                                //     selectedCyc = tObj.cy;
+                                // }
                             }, function(error) {
                                 console.log("Error in populating Cycles");
                             })
@@ -181,6 +193,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                         }, function(error) {
                             console.log("Error in populating Releases");
                         })
+                    }
 //////////////////////////////////////////////////////
 
 
@@ -196,7 +209,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                                 openDialogMindmap('Error', 'Error loading Versions')
                             })
                            
-                        } else {
+                        } else if($scope.tab=='tabCreate'){
                             loadMindmapData1(param);
                         }
                     });
@@ -286,7 +299,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         if (param == 1) {
             version_num = $('.version-list').val();
         }
-        mindmapServices.getModules(versioning_enabled,window.localStorage['tabMindMap'], $(".project-list").val(),  parseFloat(version_num))
+        mindmapServices.getModules(versioning_enabled,window.localStorage['tabMindMap'], $(".project-list").val(),  parseFloat(version_num),$('.release-list').val(),$('.cycle-list').val())
             .then(function(res) {
                 var nodeBox = d3.select('.ct-nodeBox');
                 $(nodeBox[0]).empty();
@@ -2266,7 +2279,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             from_v = to_v = $('.version-list').val();
 
         mindmapServices.saveData(versioning_enabled,assignedTo, flag, window.localStorage['_SR'], from_v, to_v, cur_module, mapData, deletednode, unassignTask,
-            $('.project-list').val(), $('#ct-assignRel').val(), $('#ct-assignCyc').val()).then(function(result) {
+            $('.project-list').val(), $('.release-list').val(), $('.cycle-list').val()).then(function(result) {
             unblockUI();
             if (flag == 10) {
                 var res = result;
