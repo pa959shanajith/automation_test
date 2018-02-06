@@ -2315,7 +2315,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 var vn = '';
                 if ($('.version-list').length != 0)
                     from_v = to_v = $('.version-list').val()
-                mindmapServices.getModules(versioning_enabled,window.localStorage['tabMindMap'], $(".project-list").val(), parseFloat(from_v)).then(function(result) {
+                mindmapServices.getModules(versioning_enabled,window.localStorage['tabMindMap'], $(".project-list").val(), parseFloat(from_v),$('.release-list').val(),$('.cycle-list').val()).then(function(result) {
                     var nodeBox = d3.select('.ct-nodeBox');
                     $(nodeBox[0]).empty();
                     allMMaps = result;
@@ -2735,7 +2735,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         blockUI('Loading UI');
         var userInfo = JSON.parse(window.localStorage['_UI']);
         var user_id = userInfo.user_id;
-        mindmapServices.getModules(versioning_enabled,window.localStorage['tabMindMap'], $(".project-list").val(),parseFloat(version_num)).then(
+        mindmapServices.getModules(versioning_enabled,window.localStorage['tabMindMap'], $(".project-list").val(),parseFloat(version_num),$('.release-list').val(),$('.cycle-list').val()).then(
             function(result){
                 result_details = result;
                 flag = 0;
@@ -2980,7 +2980,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         var svgTileLen = $(".ct-svgTile").length;
 
         d3.select('#ct-assignBox').classed('no-disp', !0);
-        mindmapServices.getModules(versioning_enabled,'endToend', $("#selectProjectEtem").val()).then(function(result) {
+        mindmapServices.getModules(versioning_enabled,'endToend', $("#selectProjectEtem").val(),$('.release-list').val(),$('.cycle-list').val()).then(function(result) {
             var nodeBox = d3.select('#etemModuleContainer');
             $(nodeBox[0]).empty();
             allMMaps_W = allMaps_info = result;
@@ -3751,7 +3751,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 //$('#ct-createAction_W').removeClass('disableButton').removeClass('no-access');
                 SaveCreateED('#ct-createAction_W',0,0);
                 //alert(window.localStorage['tabMindMap']);
-                mindmapServices.getModules(versioning_enabled,'endToend', $("#selectProjectEtem").val(),'')
+                mindmapServices.getModules(versioning_enabled,'endToend', $("#selectProjectEtem").val(),'',$('.release-list').val(),$('.cycle-list').val())
                     .then(function(result) {
                         var nodeBox = d3.select('#etemModuleContainer');
                         $(nodeBox[0]).empty();
@@ -4147,7 +4147,7 @@ function loadModules() {
     $('#ct-canvas').append('<div class="ct-tileBox"><div class="ct-tile" title="Create Mindmap"><svg class="ct-svgTile" height="150px" width="150px"><g><circle cx="75" cy="75" r="30"></circle><path d="M75,55L75,95"></path><path d="M55,75L95,75"></path></g></svg></div><span class="ct-text">Create Mindmap</span></div>');
 
   }
-  mindmapServices.getModules(versioning_enabled,window.localStorage['tabMindMap'],$(".project-list").val(),parseFloat(active_version)).then(
+  mindmapServices.getModules(versioning_enabled,window.localStorage['tabMindMap'],$(".project-list").val(),parseFloat(active_version),$('.release-list').val(),$('.cycle-list').val()).then(
       function(res){
             var nodeBox = d3.select('.ct-nodeBox');
             $(nodeBox[0]).empty();
