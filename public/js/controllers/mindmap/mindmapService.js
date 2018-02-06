@@ -67,7 +67,7 @@ mySPA.factory('mindmapServices', ['$http','$q', function ($http,$q)   {
     		.then(function (response) { return response.data; },
     				function (response) { return $q.reject(response.data); });
     	},
-		getModules: function (versioning_enabled,usertab,prjId,version){
+		getModules: function (versioning_enabled,usertab,prjId,version,relId,cycId){
 					
     		var param = "/getModules";
 			if (versioning_enabled==1){
@@ -76,7 +76,9 @@ mySPA.factory('mindmapServices', ['$http','$q', function ($http,$q)   {
     		return $http.post(param, {
 				tab:usertab,
                 prjId: prjId,
-                version:version
+                version:version,
+				relId: relId,
+				cycId: cycId
     		})
     		.then(function (response) { return response.data; },
     				function (response) { return $q.reject(response.data); });
