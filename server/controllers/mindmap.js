@@ -491,7 +491,10 @@ exports.saveData=function(req,res){
 			if(flag==10){
 				var uidx=0,t,lts,rnmList=[];
 				deletednodes.forEach(function(t,i){
-					qList.push({"statement":"MATCH (N) WHERE ID(N)="+t+" MATCH (N)-[r:FNTT]-(b) DETACH DELETE b"});
+					// Delete task if single connection
+					qList.push({"statement":"MATCH (N) WHERE ID(N)="+t+" MATCH (N)-[r:FNTT]->(b) with b as b MATCH(b)<-[s:FNTT]-(M) WITH count(M) as rel_cnt,b as b  WHERE rel_cnt=1 DETACH DELETE b"});
+					// Else delete just connection					
+					qList.push({"statement":"MATCH (N) WHERE ID(N)="+t+" MATCH (N)-[r:FNTT]-(b) DELETE r"});
 				});
 				//TO support task deletion
 				removeTask.forEach(function(t,i){
@@ -596,16 +599,18 @@ exports.saveData=function(req,res){
 							t.id=(t.id!=null)?t.id:uuidV4();
 							if(t.oid!=null){
 								if (t.updatedParent != undefined){
-									qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',nodeID:'"+e.id+"',parent:'["+t.parent+"]'}) SET n.task='"+t.task+"',n.assignedTo='"+t.assignedTo+"',n.status='"+taskstatus+"',n.reviewer='"+t.reviewer+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.re_estimation='"+t.re_estimation+"',n.details='"+t.details+"',n.uid='"+uidx+"',n.parent='["+[prjId].concat(t.updatedParent)+"]'"});
+									qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',parent:'["+t.parent+"]'}) SET n.task='"+t.task+"',n.assignedTo='"+t.assignedTo+"',n.status='"+taskstatus+"',n.reviewer='"+t.reviewer+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.release='"+t.release+"',n.cycle='"+t.cycle+"',n.re_estimation='"+t.re_estimation+"',n.details='"+t.details+"',n.uid='"+uidx+"',n.parent='["+[prjId].concat(t.updatedParent)+"]'"});
 								}else{
-									qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',nodeID:'"+e.id+"',parent:'["+t.parent+"]'}) SET n.task='"+t.task+"',n.assignedTo='"+t.assignedTo+"',n.status='"+taskstatus+"',n.reviewer='"+t.reviewer+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.re_estimation='"+t.re_estimation+"',n.details='"+t.details+"',n.uid='"+uidx+"'"});
+									qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',parent:'["+t.parent+"]'}) SET n.task='"+t.task+"',n.assignedTo='"+t.assignedTo+"',n.status='"+taskstatus+"',n.reviewer='"+t.reviewer+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.release='"+t.release+"',n.cycle='"+t.cycle+"',n.re_estimation='"+t.re_estimation+"',n.details='"+t.details+"',n.uid='"+uidx+"'"});
 								}
 							}
 							else{
+								// If reused 
 								t.parent=[prjId].concat(t.parent);
-								qList.push({"statement":"MERGE(n:TASKS{taskID:'"+t.id+"',task:'"+t.task+"',assignedTo:'"+t.assignedTo+"',reviewer:'"+t.reviewer+"',status:'"+taskstatus+"',startDate:'"+t.startDate+"',endDate:'"+t.endDate+"',re_estimation:'"+t.re_estimation+"',details:'"+t.details+"',nodeID:'"+e.id+"',parent:'["+t.parent+"]',uid:'"+uidx+"'})"});
-							}
-							qList.push({"statement":"MATCH (a:SCREENS{screenID:'"+e.id+"'}),(b:TASKS{nodeID:'"+e.id+"'}) MERGE (a)-[r:FNTT {id:'"+e.id+"'}]-(b)"});		 
+								qList.push({"statement":"MERGE(n:TASKS{taskID:'"+t.id+"',task:'"+t.task+"',assignedTo:'"+t.assignedTo+"',reviewer:'"+t.reviewer+"',status:'"+taskstatus+"',startDate:'"+t.startDate+"',endDate:'"+t.endDate+"',release:'"+t.release+"',cycle:'"+t.cycle+"',re_estimation:'"+t.re_estimation+"',details:'"+t.details+"',parent:'["+t.parent+"]',uid:'"+uidx+"'})"});
+
+								qList.push({"statement":"MATCH (a:SCREENS{screenID_c:'"+e.id_c+"'}),(b:TASKS{taskID:'"+t.id+"'}) MERGE (a)-[r:FNTT {id:'"+e.id+"'}]-(b)"});
+							}		 
 						}
 					}
 					else if(e.type=='testcases'){
@@ -628,16 +633,18 @@ exports.saveData=function(req,res){
 							//var parent=[prjId].concat(t.parent);
 							if(t.oid!=null){
 								if (t.updatedParent != undefined){
-									qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',nodeID:'"+e.id+"',parent:'["+t.parent+"]'}) SET n.task='"+t.task+"',n.assignedTo='"+t.assignedTo+"',n.reviewer='"+t.reviewer+"',n.status='"+taskstatus+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.re_estimation='"+t.re_estimation+"',n.details='"+t.details+"',n.uid='"+uidx+"',n.parent='["+[prjId].concat(t.updatedParent)+"]'"});
+									qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',parent:'["+t.parent+"]'}) SET n.task='"+t.task+"',n.assignedTo='"+t.assignedTo+"',n.reviewer='"+t.reviewer+"',n.status='"+taskstatus+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.release='"+t.release+"',n.cycle='"+t.cycle+"',n.re_estimation='"+t.re_estimation+"',n.details='"+t.details+"',n.uid='"+uidx+"',n.parent='["+[prjId].concat(t.updatedParent)+"]'"});
 								}else{
-									qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',nodeID:'"+e.id+"',parent:'["+t.parent+"]'}) SET n.task='"+t.task+"',n.assignedTo='"+t.assignedTo+"',n.reviewer='"+t.reviewer+"',n.status='"+taskstatus+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.re_estimation='"+t.re_estimation+"',n.details='"+t.details+"',n.uid='"+uidx+"'"});
+									qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',parent:'["+t.parent+"]'}) SET n.task='"+t.task+"',n.assignedTo='"+t.assignedTo+"',n.reviewer='"+t.reviewer+"',n.status='"+taskstatus+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.release='"+t.release+"',n.cycle='"+t.cycle+"',n.re_estimation='"+t.re_estimation+"',n.details='"+t.details+"',n.uid='"+uidx+"'"});
 								}
 							}
 							else{
 								t.parent=[prjId].concat(t.parent);
-								qList.push({"statement":"MERGE(n:TASKS{taskID:'"+t.id+"',task:'"+t.task+"',assignedTo:'"+t.assignedTo+"',status:'"+taskstatus+"',reviewer:'"+t.reviewer+"',startDate:'"+t.startDate+"',endDate:'"+t.endDate+"',re_estimation:'"+t.re_estimation+"',details:'"+t.details+"',nodeID:'"+e.id+"',parent:'["+t.parent+"]',uid:'"+uidx+"'})"});
+								qList.push({"statement":"MERGE(n:TASKS{taskID:'"+t.id+"',task:'"+t.task+"',assignedTo:'"+t.assignedTo+"',status:'"+taskstatus+"',reviewer:'"+t.reviewer+"',startDate:'"+t.startDate+"',endDate:'"+t.endDate+"',release:'"+t.release+"',cycle:'"+t.cycle+"',re_estimation:'"+t.re_estimation+"',details:'"+t.details+"',parent:'["+t.parent+"]',uid:'"+uidx+"'})"});
+								//In case of reuse
+								qList.push({"statement":"MATCH (a:TESTCASES{testCaseID_c:'"+e.id_c+"'}),(b:TASKS{taskID:'"+t.id+"'}) MERGE (a)-[r:FNTT {id:'"+e.id+"'}]-(b)"});
 							}
-							qList.push({"statement":"MATCH (a:TESTCASES{testCaseID:'"+e.id+"'}),(b:TASKS{nodeID:'"+e.id+"'}) MERGE (a)-[r:FNTT {id:'"+e.id+"'}]-(b)"})	   
+								   
 						}
 					}
 				});
@@ -797,6 +804,7 @@ exports.saveEndtoEndData=function(req,res){
 				removeTask.forEach(function(t,i){
 					qList.push({"statement":"MATCH (N) WHERE ID(N)="+t+" MATCH (N)-[r:FNTT]-(b) DETACH DELETE b"});
 				});
+
 
 				data.forEach(function(e,i){
 					idDict[e.id]=(e.id_n)?e.id_n:uuidV4();
@@ -1031,6 +1039,8 @@ var update_cassandraID = function(d,urlData,module_type) {
 					//var modulename_json=sc.testsuiteName;
 					var testcaseDetails_json=scr.testcaseDetails;
 					qList_new.push({"statement":"MATCH (a:SCREENS) WHERE a.screenName='"+screenname_json+"' and a.projectID='"+data.projectId+"' SET a.screenID_c='"+screenId_c_json+"'"});
+					//Screen Task update in case of reuse
+					qList_new.push({"statement":"MATCH p=(a:SCREENS{screenID_c:'"+screenId_c_json+"'})-[r]-(b:TASKS),(q:SCREENS{screenID_c:'"+screenId_c_json+"'}) MERGE (q)-[s:FNTT{id:q.screenID}]-(b)"});
 					//qList_new.push({"statement":"MATCH (a:SCREENS) WHERE a.screenName='"+screenname_json+"' and a.projectID='"+data.projectId+"' SET a.screenID_c='"+screenId_c_json+"'"});
 					//updateJson.push({screenId_json:screenId_c_json});
 					cassandraId_dict[screenId_json]=screenId_c_json;
@@ -1048,6 +1058,9 @@ var update_cassandraID = function(d,urlData,module_type) {
 						}else{
 							qList_new.push({"statement":"MATCH (a:TESTCASES) WHERE a.testCaseName='"+testcaseName_json+"' and a.screenID_c='"+screenId_c_json+"' SET a.testCaseID_c='"+testcaseId_c_json+"'"});
 						}
+						//TestCase Task update in case of reuse
+						qList_new.push({"statement":"MATCH (a:SCREENS{screenID_c:'"+screenId_c_json+"'})-[r]-(b:TESTCASES{testCaseID_c:'"+testcaseId_c_json+"'})-[s]-(c:TASKS) ,(d:TESTCASES{testCaseID_c:'"+testcaseId_c_json+"'}) MERGE (d)-[t:FNTT{id:d.testCaseID}]-(c)"});
+
 						cassandraId_dict[testcaseId_json]=testcaseId_c_json;
 					});
 				});
