@@ -3959,7 +3959,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             if (d.oid === undefined) d.oid = d.id;
             d.id = uNix_W++;
             addNode_W(d, !0, d.parent);
-            if (d.task != null) d3.select('#ct-node-' + d.id).append('image').attr('class', 'ct-nodeTask').attr('xlink:href', 'images_mindmap/node-task-assigned.png').attr('x', 29).attr('y', -10);
+            if($scope.tab!='mindmapEndtoEndModules'){
+                if (d.task != null) d3.select('#ct-node-' + d.id).append('image').attr('class', 'ct-nodeTask').attr('xlink:href', 'images_mindmap/node-task-assigned.png').attr('x', 29).attr('y', -10);
+            }
         });
         dLinks_W = d3Tree.links(dNodes_W);
         dLinks_W.forEach(function(d) {
