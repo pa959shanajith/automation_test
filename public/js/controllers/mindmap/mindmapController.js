@@ -240,19 +240,19 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         taskAssign = {
             "modules_endtoend": {
                 "task": ["Execute", "Execute Batch"],
-                "attributes": ["bn", "at", "rw", "sd", "ed", "re_estimation"]
+                "attributes": ["bn", "at", "rw", "sd", "ed", "re_estimation","pg"]
             },
             "modules": {
                 "task": ["Execute", "Execute Batch"],
-                "attributes": ["bn", "at", "rw", "sd", "ed", "re_estimation"]
+                "attributes": ["bn", "at", "rw", "sd", "ed", "re_estimation","pg"]
             },
             "scenarios": {
                 "task": ["Execute Scenario"],
-                "attributes": ["at", "rw", "sd", "ed", "re_estimation"]
+                "attributes": ["at", "rw", "sd", "ed", "re_estimation","pg"]
             },
             "screens": {
                 "task": ["Scrape", "Append", "Compare", "Add", "Map"],
-                "attributes": ["at", "rw", "sd", "ed", "re_estimation"]
+                "attributes": ["at", "rw", "sd", "ed", "re_estimation","pg"]
             },
             "testcases": {
                 "task": ["Update", "Design"],
@@ -1131,7 +1131,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     addTask_11(dNodes[pi].id,tObj,0);
                 }
                 //Logic to add tasks for the scenario
-                if (dNodes[pi].children) dNodes[pi].children.forEach(function(tSc) {
+                if (dNodes[pi].children && $('.pg-checkbox')[0].checked) dNodes[pi].children.forEach(function(tSc) {
                     addTask_11(tSc.id,tObj,1);
                     if (tSc.children != undefined) {
                         tSc.children.forEach(function(scr) {
@@ -1145,7 +1145,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 });
             }
             //Logic to add tasks for the scenario
-            else if (nType == "scenarios") {
+            else if (nType == "scenarios" && $('.pg-checkbox')[0].checked) {
                 var modid = dNodes[pi].parent.id_c,
                     tscid = dNodes[pi].id_c;
 
@@ -1163,7 +1163,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     openDialogMindmap("Error", 'Assign task to the module');
                     return;
                 }
-            } else if (nType == "screens") {
+            } else if (nType == "screens" && $('.pg-checkbox')[0].checked) {
                 addTask_11(pi,tObj,7);
                 if (dNodes[pi].children) dNodes[pi].children.forEach(function(tCa) {
                     var cTask = (tObj.t == "Scrape" || tObj.t == "Append" || tObj.t == "Compare") ? "Design" : "Debug";
@@ -1237,7 +1237,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
         function checkAndUpdate(nObj,parentlist) {
             parentlist.unshift(nObj.id_c);
-            if (nObj.id_c==null) return [false,[]];
+            if (nObj.id_c=="null") return [false,[]];
             if (nObj.type=='modules' || nObj.type=='modules_endtoend'){
                 return [true,parentlist];
             } 
@@ -1433,7 +1433,16 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 });
                 f = w.append('ul').attr('class', 'ct-asValCalBox dropdown-menu'); //.on('click',$('.ct-asValBoxIcon.ct-asItemCal.btn.dropdown-toggle').datepicker());
                 $("#endDate").val(tObj.ed);
+
             }
+            else if (tk == "pg") {
+                if(dNodes[pi].children){
+                    v.append('span').append('input').attr('type', 'checkbox').attr('class', 'pg-checkbox');
+                    v.append('span').html(' Propagate');
+                }
+                else
+                    $(v[0][0]).remove();
+            }            
         });
         //var cSize=getElementDimm(c);
         // Removed assgin box overflow (Himanshu)
