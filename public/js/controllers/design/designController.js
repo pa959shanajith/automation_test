@@ -355,7 +355,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                                                         testcaseArray.push(testcase[i]);
                                                     }
                                                 }
-                                                console.log("readTestCase:::", testcaseArray)
+                                              //  console.log("readTestCase:::", testcaseArray)
 
                                                 readTestCaseData = JSON.stringify(testcaseArray)
                                                 $("#jqGrid_addNewTestScript").jqGrid('clearGridData');
@@ -399,7 +399,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                         if (data == "Invalid Session") {
                             $rootScope.redirectPage();
                         }
-                        console.log("debug-----", data);
+                        //console.log("debug-----", data);
                         if (data == "unavailableLocalServer") {
                             unblockUI();
                             openDialog("Debug Testcase", "ICE Engine is not available. Please run the batch file and connect to the Server.")
@@ -431,7 +431,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                         if (data == "Invalid Session") {
                             $rootScope.redirectPage();
                         }
-                        console.log("debug-----", data);
+                        //console.log("debug-----", data);
                         if (data == "unavailableLocalServer") {
                             unblockUI();
                             openDialog("Debug Testcase", "ICE Engine is not available. Please run the batch file and connect to the Server.")
@@ -562,7 +562,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                         } else {
                             DesignServices.updateTestCase_ICE(screenId, testCaseId, testCaseName, resultString, userInfo, versionnumber)
                                 .then(function(data) {
-                                    console.log("hello");
+                                   // console.log("hello");
                                     if (data == "Invalid Session") {
                                         $rootScope.redirectPage();
                                     }
@@ -1237,7 +1237,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                             openDialog("WSDL-Scrape Screen", "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.")
                             return false
                         }
-                        console.log(data)
+                      //  console.log(data)
                         $("#wsldSelect").empty().append('<option value selected disabled>Select Operation</option>')
                         for (i = 0; i < data.listofoperations.length; i++) {
                             $("#wsldSelect").append('<option value="' + data.listofoperations[i] + '">' + data.listofoperations[i] + '</option>')
@@ -1646,7 +1646,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                         } else {
                             $("#compareUnchangedObjectsBox").hide();
                         }
-                        console.log("nf", data.view[2].notfoundobject);
+                       // console.log("nf", data.view[2].notfoundobject);
                         if (data.view[2].notfoundobject.length > 0) {
                             $("#compareNotFoundObjectsBox").show();
                             // //Objects not found
@@ -1700,7 +1700,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                         $("#finalScrap").append("<div id='scrapTree' class='scrapTree'><ul><li><span class='parentObjContainer'><input title='Select all' type='checkbox' class='checkStylebox'/><span class='parentObject'><a id='aScrapper'>Select all </a><button id='saveObjects' class='btn btn-xs btn-xs-custom objBtn' style='margin-left: 10px'>Save</button><button data-toggle='modal' id='deleteObjects' data-target='#deleteObjectsModal' class='btn btn-xs btn-xs-custom objBtn' style='margin-right: 0' disabled>Delete</button></span><span class='searchScrapEle'><img src='imgs/ic-search-icon.png'></input></span><span><input type='text' class='searchScrapInput'></span></span><ul id='scraplist' class='scraplistStyle'></ul></li></ul></div>");
                         var innerUL = $("#finalScrap").children('#scrapTree').children('ul').children().children('#scraplist');
 
-                        console.log("data", viewString);
+                       // console.log("data", viewString);
                         //If enable append is active
                         if (eaCheckbox) {
                             //Getting the Existing Scrape Data
@@ -1842,7 +1842,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
         DesignServices.updateScreen_ICE(scrapeObject)
             .then(function(data) {
                 debugger;
-                console.log("out", data);
+                //console.log("out", data);
                 if (data == "Invalid Session") {
                     $rootScope.redirectPage();
                 }
@@ -2208,7 +2208,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                 obj: $("#scrapTree").find(".focus-highlight").closest("li")
             }
         }
-        console.log(data)
+        //console.log(data)
         var rect, type, ref, name, id, value, label, visible, l10n, source;
         if (appType == "MobileWeb" ) {
             if(parseInt(viewString.mirrorwidth) > 500)
@@ -2372,7 +2372,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                 obj: $("#" + uid).find(".focus-highlight").closest("li")
             }
         }
-        console.log(data)
+       // console.log(data)
         var rect, type, ref, name, id, value, label, visible, l10n, source;
         rect = {
             x: data.rslt.obj.data("left"),
@@ -2998,8 +2998,8 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 
     //Save Scrape Objects
     $(document).on('click', "#saveObjects", function(e) {
-        console.log("reused", reusedScreenNames);
-        console.log("reusedT", reusedScreenTestcaseNames);
+        //console.log("reused", reusedScreenNames);
+        //console.log("reusedT", reusedScreenTestcaseNames);
         if (reusedScreenNames == true || reusedScreenTestcaseNames == true) {
             $("#reUsedObjectsModal").find('.modal-title').text("Save Scraped data");
             $("#reUsedObjectsModal").find('.modal-body p').text("Screen is been reused. Are you sure you want to save objects?").css('color', 'black');
@@ -3269,7 +3269,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
             }
             newScrapedList.view =  newScrapedList.view.filter(function(n){ return n != null });
             getScrapeData = JSON.stringify(newScrapedList);
-            console.log(newScrapedList.view)
+            //console.log(newScrapedList.view)
         }
         else{
             for(var i=0; i<getIndexOfDeletedObjects.length;i++){
@@ -3278,7 +3278,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
             }
             viewString.view =  viewString.view.filter(function(n){ return n != null });
             getScrapeData = JSON.stringify(viewString);
-            console.log(viewString.view)
+            //console.log(viewString.view)
         }
         var screenId = tasks.screenId;
         var screenName = tasks.screenName;
@@ -3445,7 +3445,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                                             mydata[i].inputVal = mydata[i].inputVal.replace(/[\n\r]/g, '##');
                                         } else mydata[i].inputVal[0] = mydata[i].inputVal[0].replace(/[\n\r]/g, '##');
                                     }
-                                    console.log("updateTestCase:::", mydata)
+                                    //console.log("updateTestCase:::", mydata)
                                 }
                                 if (mydata[i].url == undefined) {
                                     mydata[i].url = "";
@@ -4154,8 +4154,15 @@ function contentTable(newTestScriptDataLS) {
             if (selectedKeywordList == keywordArrayKey) {
                 $.each(keywordArrayValue, function(k, v) {
                     if (selectedKeyword == k) {
-                        inputSyntax = JSON.parse(v).inputVal;
-                        outputSyntax = JSON.parse(v).outputVal;
+                        if(v != "")
+                        {
+                            inputSyntax = JSON.parse(v).inputVal;
+                            outputSyntax = JSON.parse(v).outputVal;
+                        }
+                        else{
+                            inputSyntax = v;
+                            outputSyntax = v;
+                        }
                         grid.find("td[aria-describedby = jqGrid_inputVal]:visible").find('input').attr("placeholder", inputSyntax).attr("title", inputSyntax);
                         grid.find("td[aria-describedby = jqGrid_outputVal]:visible").find('input').attr("placeholder", outputSyntax).attr("title", outputSyntax);
                     }
@@ -5048,7 +5055,7 @@ $(document).on('click', '#btnDeleteStepYes', function() {
         selectedRowIds.push($(this).attr("id"));
     })
     var gridArrayData = $("#jqGrid").jqGrid('getRowData');
-    console.log("array data test ***** " + JSON.stringify(gridArrayData));
+   // console.log("array data test ***** " + JSON.stringify(gridArrayData));
     for (var i = 0; i < selectedRowIds.length; i++) {
         $("#jqGrid").delRowData(selectedRowIds[i]);
     }
