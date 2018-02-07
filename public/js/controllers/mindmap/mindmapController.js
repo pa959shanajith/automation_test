@@ -21,7 +21,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     var CreateEditFlag = false;
     var isIE = /*@cc_on!@*/ false || !!document.documentMode;
     var IncompleteFlowFlag = false;
-	var taskidArr = [], assignedObj = {};
+	var taskidArr = [], assignedObj = {},reuseDict = {};
     //Createmap//
 
     //Workflow//
@@ -449,7 +449,25 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 IncompleteFlowFlag = true;
             }
         }
+        reuseDict = getReuseDetails();
+        //console.log('Reusedict:', reuseDict);
     };
+
+    function getReuseDetails(){
+        var dictTmp = {};
+        dNodes.forEach(function(e,i){
+            dictTmp[i] = [];
+            if(e.reuse){
+                dNodes.forEach(function(f,j){
+                    if(e.type==f.type && e.type=='screens' && e.name==f.name && i!=j)
+                        dictTmp[i].push(j); 
+                    else if(e.type==f.type && e.type=='testcases' && e.name==f.name && i!=j && e.parent.name== f.parent.name)
+                        dictTmp[i].push(j);
+                })
+            }
+        })
+        return dictTmp;
+    }
 
     // to load the map again after switching the layout
     function loadMap2() {
@@ -1203,6 +1221,17 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     }                    
                 }
 
+                function replicateTask(pi){
+                    //replicate task to reused node
+                    if(reuseDict[pi].length>0){
+                        reuseDict[pi].forEach(function(e,i){
+                            dNodes[e].task = dNodes[pi].task;
+                            d3.select('#ct-node-' + e).append('image').attr('class', 'ct-nodeTask').attr('xlink:href', 'images_mindmap/node-task-assigned.png').attr('x', 29).attr('y', -10);                    
+                        });
+                    }
+                }
+
+                replicateTask(pi);
             }
         }
 
@@ -1216,7 +1245,6 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 return checkAndUpdate(nObj.parent,parentlist);
             }        
         }
-
         if (!(dateFlag || reviewerFlag)) {
             openDialogMindmap("Date Error", "Please select User/Reviewer and Date ")
         } else if (dateFlag == false) {
@@ -2625,7 +2653,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 if (d.oid === undefined) d.oid = d.id;
                 d.id = uNix++;
                 addNode(d, !0, d.parent);
-                if (d.task != null){
+                if (d.task != null && $scope.tab!='tabCreate'){
     //                if(d.task.release==$('.release-list').val() && d.task.cycle==$('.cycle-list').val())
                         d3.select('#ct-node-' + d.id).append('image').attr('class', 'ct-nodeTask').attr('width', '21px').attr('height', '21px').attr('xlink:href', 'images_mindmap/node-task-assigned.png').attr('x', 29).attr('y', -10);
                 } 
