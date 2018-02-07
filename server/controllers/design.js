@@ -44,7 +44,7 @@ exports.initScraping_ICE = function (req, res) {
 			logger.info("ICE Socket requesting Address: %s" , name);
 			//check on redis whether the ice socket is connected to any of the servers
 			redisServer.redisPub1.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
-				if (redisres[1]==1) {
+				if (redisres[1]>0) {
 					var reqScrapJson = {};
 					reqScrapJson.action = "SCRAPE";
 					if (req.body.screenViewObject.appType == "Desktop") {
@@ -1703,7 +1703,7 @@ exports.debugTestCase_ICE = function (req, res) {
 			logger.info("ICE Socket requesting Address: %s" , name);
 			//LB: check on redis whether the ice socket is connected to any of the servers
 			redisServer.redisPub1.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
-				if (redisres[1]==1) {
+				if (redisres[1]>0) {
 					try {
 						var action = req.body.param;
 						if (action == 'debugTestCase_ICE') {

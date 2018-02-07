@@ -728,7 +728,7 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 			var suiteStatus;
 			logger.debug("ICE Socket requesting Address: %s" , name);
 			redisServer.redisPub1.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
-				if (redisres[1]==1) {
+				if (redisres[1]>0) {
 					logger.info("Sending socket request for executeTestSuite to redis");
 					dataToIce = {"emitAction" : "executeTestSuite","username" : name, "executionRequest": executionRequest};
 					redisServer.redisPub1.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
@@ -1194,7 +1194,7 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 									var statusPass = 0;
 									var suiteStatus;
 									redisServer.redisPub1.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
-										if (redisres[1]==1) {
+										if (redisres[1]>0) {
 											logger.info("Sending socket request for executeTestSuite to redis");
 											dataToIce = {"emitAction" : "executeTestSuite","username" : name, "executionRequest": executionRequest};
 											redisServer.redisPub1.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
@@ -1462,7 +1462,7 @@ exports.ExecuteTestSuite_ICE_CI = function (req, res) {
 			var suiteStatus;
 			logger.info("ICE Socket requesting Address: %s" , name);
 			redisServer.redisPub1.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
-				if (redisres[1]==1) {
+				if (redisres[1]>0) {
 					logger.info("Sending socket request for executeTestSuite to redis");
 					dataToIce = {"emitAction" : "executeTestSuite","username" : name, "executionRequest": executionRequest};
 					redisServer.redisPub1.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
@@ -2642,7 +2642,7 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 							var suiteStatus_s;
 							logger.debug("ICE Socket requesting Address: %s" , name);
 							redisServer.redisPub1.pubsub('numsub','ICE1_scheduling_' + name,function(err,redisres){
-								if (redisres[1]==1) {
+								if (redisres[1]>0) {
 									logger.info("Sending socket request for executeTestSuite:scheduling to redis");
 									dataToIce = {"emitAction" : "executeTestSuite","username" : name, "executionRequest": executionRequest};
 									redisServer.redisPub1.publish('ICE1_scheduling_' + name,JSON.stringify(dataToIce));

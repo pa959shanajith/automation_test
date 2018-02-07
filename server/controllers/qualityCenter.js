@@ -41,7 +41,7 @@ exports.loginQCServer_ICE = function (req, res) {
             }
 			if(validate_qcUrl == true && validate_qcUsername == true &&  validate_qcPassword == true) {
 				redisServer.redisPub1.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
-					if (redisres[1]==1) {
+					if (redisres[1]>0) {
 						var username = req.body.qcUsername;
 						var password = req.body.qcPassword;
 						var url = req.body.qcURL;
@@ -132,7 +132,7 @@ exports.qcProjectDetails_ICE = function (req, res) {
 			logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
 			logger.debug("ICE Socket requesting Address: %s" , name);
 			redisServer.redisPub1.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
-				if (redisres[1]==1) {
+				if (redisres[1]>0) {
 					var userid = req.body.user_id;
 					var qcDetails = {
 						"domain": req.body.domain,
@@ -340,7 +340,7 @@ exports.qcFolderDetails_ICE = function (req, res) {
 			logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
 			logger.debug("ICE Socket requesting Address: %s" , name);
 			redisServer.redisPub1.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
-				if (redisres[1]==1) {
+				if (redisres[1]>0) {
 					logger.info("Sending socket request for qclogin to redis");
 					dataToIce = {"emitAction" : "qclogin","username" : name, "responsedata":qcDetails};
 					redisServer.redisPub1.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));

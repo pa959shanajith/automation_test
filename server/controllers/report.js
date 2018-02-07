@@ -65,7 +65,7 @@ exports.openScreenShot = function (req, res) {
 		logger.debug("ICE Socket requesting Address: %s" , name);
 		redisServer.redisSub2.subscribe('ICE2_' + name);
 		redisServer.redisPub1.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
-			if (redisres[1]==1) {
+			if (redisres[1]>0) {
 				logger.info("Sending socket request for render_screenshot to redis");
 				dataToIce = {"emitAction" : "render_screenshot","username" : name, "path":path};
 				redisServer.redisPub1.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
@@ -1022,7 +1022,7 @@ exports.connectJira_ICE = function (req, res) {
 						logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
 						logger.debug("ICE Socket requesting Address: %s" , name);
 						redisServer.redisPub1.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
-							if (redisres[1]==1) {
+							if (redisres[1]>0) {
 								logger.info("Sending socket request for jira_login to redis");
 								dataToIce = {"emitAction": "jiralogin", "username": name, "action": req.body.action, "inputs": inputs};
 								redisServer.redisPub1.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
@@ -1088,7 +1088,7 @@ exports.connectJira_ICE = function (req, res) {
 						logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
 						logger.debug("ICE Socket requesting Address: %s" , name);
 						redisServer.redisPub1.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
-							if (redisres[1]==1) {
+							if (redisres[1]>0) {
 								logger.info("Sending socket request for jira_login to redis");
 								dataToIce = {"emitAction": "jiralogin", "username": name, "action": req.body.action, "inputs": createObj};
 								redisServer.redisPub1.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));

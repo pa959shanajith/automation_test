@@ -39,7 +39,7 @@ exports.getCrawlResults = function (req, res) {
 				logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
 				logger.info("ICE Socket requesting Address: %s", name);
 				redisServer.redisPub1.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
-					if (redisres[1]==1) {
+					if (redisres[1]>0) {
 						logger.info("Sending socket request for webCrawlerGo to redis");
 						dataToIce = {"emitAction" : "webCrawlerGo","username" : name, "input_url":input_url, "level" : level, "agent" :agent};
 						redisServer.redisPub1.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
