@@ -1818,7 +1818,6 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
     $scope.clearNodes = function() {
         $("input").val('');
-        $("select").prop('selectedIndex', 0);
         $(".addObj-row").find("input").removeClass('inputErrorBorder')
         $(".addObj-row").find("select").removeClass('selectErrorBorder')
         $scope.errorMessage = "";
