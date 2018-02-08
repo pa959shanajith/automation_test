@@ -478,6 +478,11 @@ exports.saveDataVersioning=function(req,res){
 					nameDict[e.id] = e.name;
 					e.id = idDict[e.id];
 					t = e.task;
+					if(e.taskexists && e.task){
+						t.id=e.taskexists.id;
+						t.oid=e.taskexists.oid;
+						t.parent=e.taskexists.parent;
+					}					
 					var taskstatus = 'inprogress';
 					if (e.type == 'modules') {
 						moduleID=e.id;
@@ -626,7 +631,7 @@ exports.saveDataVersioning=function(req,res){
 					else {
 						var k = 0, rIndex, lbl, neoIdDict = {};
 						idDict = {};
-						var attrDict = { "modules": { "childIndex": "childIndex", "projectID": "pid_n", "moduleName": "name", "moduleID": "id_n", "moduleID_c": "id_c" }, "scenarios": { "childIndex": "childIndex", "moduleID": "pid_n", "testScenarioName": "name", "testScenarioID": "id_n", "testScenarioID_c": "id_c" }, "screens": { "childIndex": "childIndex", "testScenarioID": "pid_n", "screenName": "name", "screenID": "id_n", "screenID_c": "id_c" }, "testcases": { "childIndex": "childIndex", "screenID": "pid_n", "testCaseName": "name", "testCaseID": "id_n", "testCaseID_c": "id_c" }, "tasks": { "taskID": "id_n", "task": "t", "batchName": "bn", "assignedTo": "at", "reviewer": "rw", "startDate": "sd", "endDate": "ed", "re_estimation":"re_estimation", "release": "re", "cycle": "cy", "details": "det", "nodeID": "pid", "parent": "anc", "taskvn": "taskvn" } };
+						var attrDict = { "modules": { "childIndex": "childIndex", "projectID": "pid_n", "moduleName": "name", "moduleID": "id_n", "moduleID_c": "id_c" }, "scenarios": { "childIndex": "childIndex", "moduleID": "pid_n", "testScenarioName": "name", "testScenarioID": "id_n", "testScenarioID_c": "id_c" }, "screens": { "childIndex": "childIndex", "testScenarioID": "pid_n", "screenName": "name", "screenID": "id_n", "screenID_c": "id_c","taskexists":"taskexists" }, "testcases": { "childIndex": "childIndex", "screenID": "pid_n", "testCaseName": "name", "testCaseID": "id_n", "testCaseID_c": "id_c" ,"taskexists":"taskexists"}, "tasks": { "taskID": "id_n", "task": "t", "batchName": "bn", "assignedTo": "at", "reviewer": "rw", "startDate": "sd", "endDate": "ed", "re_estimation":"re_estimation", "release": "re", "cycle": "cy", "details": "det", "nodeID": "pid", "parent": "anc", "taskvn": "taskvn" } };
 						var jsonData = (result);
 
 						var new_res = jsonData[jsonData.length - 1].data;
@@ -655,11 +660,19 @@ exports.saveDataVersioning=function(req,res){
 							row.graph.relationships.forEach(function (r) {
 								var srcIndex = idDict[r.startNode.toString()];
 								var tgtIndex = idDict[r.endNode.toString()];
-								if (nData[tgtIndex].children === undefined) nData[srcIndex].task = nData[tgtIndex];
-								else if (nData[srcIndex].children.indexOf(nData[tgtIndex]) == -1) {
+								if(nData[tgtIndex].children===undefined){
+									if((tab=='tabAssign'&& nData[tgtIndex].release==relId && nData[tgtIndex].cycle==cycId)||tab=='tabCreate'||tab=='endToend'){
+										nData[srcIndex].task=nData[tgtIndex];
+									}else if(nData[srcIndex].type=='testcases' || nData[srcIndex].type=='screens'){
+										nData[srcIndex].taskexists=nData[tgtIndex];
+									}
+										
+								} 
+								else if(nData[srcIndex].children.indexOf(nData[tgtIndex])==-1){
 									nData[srcIndex].children.push(nData[tgtIndex]);
-									if (nData[tgtIndex].childIndex == undefined) nData[tgtIndex].childIndex = nData[srcIndex].children.length;
-
+									if(nData[tgtIndex].childIndex==undefined){
+										nData[tgtIndex].childIndex=nData[srcIndex].children.length;
+									}
 								}
 							});
 						});
