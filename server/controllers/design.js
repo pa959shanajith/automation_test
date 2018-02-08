@@ -26,10 +26,11 @@ var utils = require('../lib/utils');
  * the service is used to init scraping & fetch scrape objects
  */
 exports.initScraping_ICE = function (req, res) {
+	var name;
 	logger.info("Inside UI service: initScraping_ICE");
 	try {
 		if (utils.isSessionActive(req.session)) {
-			var name = req.session.username;
+			name = req.session.username;
 			redisServer.redisSub2.subscribe('ICE2_' + name);	
 			var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 			logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
@@ -234,14 +235,12 @@ exports.initScraping_ICE = function (req, res) {
 				} else {
 					logger.error("Error occured in the service initScraping_ICE: Socket not Available");
 					try {
-						//res.send("unavailableLocalServer");
-						if(Object.keys(myserver.allSchedulingSocketsMap).length > 0)
-						{
-							res.send("scheduleModeOn");
-						}
-						else{
-							res.send("unavailableLocalServer");
-						}
+						utils.getChannelNum('ICE1_scheduling_' + name, function(found){
+							var flag="";
+							if (found) flag = "scheduleModeOn";
+							else flag = "unavailableLocalServer";
+							res.send(flag);
+						});
 					} catch (exception) {
 						logger.error("Exception in the service initScraping_ICE: %s",exception);
 					}
@@ -253,14 +252,12 @@ exports.initScraping_ICE = function (req, res) {
 		}
 	} catch (exception) {
 		logger.error("Exception in the service initScraping_ICE: %s",exception);
-		//res.send("unavailableLocalServer");
-		if(Object.keys(myserver.allSchedulingSocketsMap).length > 0)
-		{
-			res.send("scheduleModeOn");
-		}
-		else{
-			res.send("unavailableLocalServer");
-		}
+		utils.getChannelNum('ICE1_scheduling_' + name, function(found){
+			var flag="";
+			if (found) flag = "scheduleModeOn";
+			else flag = "unavailableLocalServer";
+			res.send(flag);
+		});
 	}
 };
 
@@ -1673,10 +1670,11 @@ exports.updateTestCase_ICE = function (req, res) {
  * debugTestCase_ICE service is used to debug the testcase
  */
 exports.debugTestCase_ICE = function (req, res) {
+	var name;
 	try {
 		logger.info("Inside UI service: debugTestCase_ICE");
 		if (utils.isSessionActive(req.session)) {
-			var name = req.session.username;
+			name = req.session.username;
 			redisServer.redisSub2.subscribe('ICE2_' + name);
 			var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 			logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
@@ -2024,14 +2022,12 @@ exports.debugTestCase_ICE = function (req, res) {
 				} else {
 					logger.error("Error in the service debugTestCase_ICE: Socket not Available");
 					try {
-						//res.send("unavailableLocalServer");
-						if(Object.keys(myserver.allSchedulingSocketsMap).length > 0)
-						{
-							res.send("scheduleModeOn");
-						}
-						else{
-							res.send("unavailableLocalServer");
-						}
+						utils.getChannelNum('ICE1_scheduling_' + name, function(found){
+							var flag="";
+							if (found) flag = "scheduleModeOn";
+							else flag = "unavailableLocalServer";
+							res.send(flag);
+						});
 					} catch (exception) {
 						logger.error("Error in the service debugTestCase_ICE: %s", exception);
 					}
@@ -2042,13 +2038,12 @@ exports.debugTestCase_ICE = function (req, res) {
 			res.send("Invalid Session");
 		}
 	} catch (exception) {
-		if(Object.keys(myserver.allSchedulingSocketsMap).length > 0)
-		{
-			res.send("scheduleModeOn");
-		}
-		else{
-			res.send("unavailableLocalServer");
-		}
+		utils.getChannelNum('ICE1_scheduling_' + name, function(found){
+			var flag="";
+			if (found) flag = "scheduleModeOn";
+			else flag = "unavailableLocalServer";
+			res.send(flag);
+		});
 		logger.error("Exception in the service debugTestCase_ICE:unavailableLocalServer: %s", exception);
 	}
 };

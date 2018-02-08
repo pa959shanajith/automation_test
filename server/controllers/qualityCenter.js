@@ -13,10 +13,11 @@ var redisServer = require('../lib/redisSocketHandler');
 var utils = require('../lib/utils');
 
 exports.loginQCServer_ICE = function (req, res) {
+	var name;
 	try {
 		logger.info("Inside UI service: loginQCServer_ICE");
 		if (utils.isSessionActive(req.session)) {
-			var name = req.session.username;
+			name = req.session.username;
 			redisServer.redisSub2.subscribe('ICE2_' + name);
 			var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 			logger.debug("ICE Socket connecting IP: %s" , ip);
@@ -69,19 +70,15 @@ exports.loginQCServer_ICE = function (req, res) {
 						}
 						redisServer.redisSub2.on("message",qclogin_listener);
 					} else {
-						logger.info("ICE Socket not Available");
-						try {
-							//res.send("unavailableLocalServer");
-							if(Object.keys(myserver.allSchedulingSocketsMap).length > 0)
-							{
-								res.send("scheduleModeOn");
+						utils.getChannelNum('ICE1_scheduling_' + name, function(found){
+							var flag="";
+							if (found) flag = "scheduleModeOn";
+							else {
+								flag = "unavailableLocalServer";
+								logger.info("ICE Socket not Available");
 							}
-							else{
-								res.send("unavailableLocalServer");
-							}
-						} catch (exception) {
-							logger.error(exception.message);
-						}
+							res.send(flag);
+						});
 					}
 				});
 			} else {
@@ -89,25 +86,21 @@ exports.loginQCServer_ICE = function (req, res) {
 				res.send("Invalid Session");
 			}
 		} else {
-			//res.send('unavailableLocalServer');
-			if(Object.keys(myserver.allSchedulingSocketsMap).length > 0)
-			{
-				res.send("scheduleModeOn");
-			}
-			else{
-				res.send("unavailableLocalServer");
-			}
+			utils.getChannelNum('ICE1_scheduling_' + name, function(found){
+				var flag="";
+				if (found) flag = "scheduleModeOn";
+				else flag = "unavailableLocalServer";
+				res.send(flag);
+			});
 		}
 	} catch (exception) {
 		logger.error(exception.message);
-		//res.send("unavailableLocalServer");
-		if(Object.keys(myserver.allSchedulingSocketsMap).length > 0)
-		{
-			res.send("scheduleModeOn");
-		}
-		else{
-			res.send("unavailableLocalServer");
-		}
+		utils.getChannelNum('ICE1_scheduling_' + name, function(found){
+			var flag="";
+			if (found) flag = "scheduleModeOn";
+			else flag = "unavailableLocalServer";
+			res.send(flag);
+		});
 	}
 };
 
@@ -117,9 +110,10 @@ exports.qcProjectDetails_ICE = function (req, res) {
 		"nineteen68_projects": '',
 		"qc_projects": ""
 	};
+	var name;
 	try {
 		if (utils.isSessionActive(req.session)) {
-			var name = req.session.username;
+			name = req.session.username;
 			redisServer.redisSub2.subscribe('ICE2_' + name);
 			logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
 			logger.debug("ICE Socket requesting Address: %s" , name);
@@ -167,19 +161,15 @@ exports.qcProjectDetails_ICE = function (req, res) {
 						redisServer.redisSub2.on("message",qclogin_listener);
 					});
 				} else {
-					logger.info("ICE Socket not Available");
-					try {
-						//res.send("unavailableLocalServer");
-						if(Object.keys(myserver.allSchedulingSocketsMap).length > 0)
-						{
-							res.send("scheduleModeOn");
+					utils.getChannelNum('ICE1_scheduling_' + name, function(found){
+						var flag="";
+						if (found) flag = "scheduleModeOn";
+						else {
+							flag = "unavailableLocalServer";
+							logger.info("ICE Socket not Available");
 						}
-						else{
-							res.send("unavailableLocalServer");
-						}
-					} catch (exception) {
-						logger.error(exception.message);
-					}
+						res.send(flag);
+					});
 				}
 			});
 		} else {
@@ -188,14 +178,12 @@ exports.qcProjectDetails_ICE = function (req, res) {
 		}
 	} catch (exception) {
 		logger.error(exception.message);
-		//res.send("unavailableLocalServer");
-		if(Object.keys(myserver.allSchedulingSocketsMap).length > 0)
-		{
-			res.send("scheduleModeOn");
-		}
-		else{
-			res.send("unavailableLocalServer");
-		}
+		utils.getChannelNum('ICE1_scheduling_' + name, function(found){
+			var flag="";
+			if (found) flag = "scheduleModeOn";
+			else flag = "unavailableLocalServer";
+			res.send(flag);
+		});
 	}
 };
 
@@ -322,10 +310,11 @@ exports.qcFolderDetails_ICE = function (req, res) {
 		"nineteen68_projects": '',
 		"qc_projects": ""
 	};
+	var name;
 	try {
 		if (utils.isSessionActive(req.session)) {
-			var name = req.session.username;
 			var qcDetails = req.body;
+			name = req.session.username;
 			redisServer.redisSub2.subscribe('ICE2_' + name);
 			logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
 			logger.debug("ICE Socket requesting Address: %s" , name);
@@ -354,16 +343,16 @@ exports.qcFolderDetails_ICE = function (req, res) {
 					}
 					redisServer.redisSub2.on("message",qclogin_listener);
 				} else {
-					logger.info("ICE Socket not Available");
 					try {
-						//res.send("unavailableLocalServer");
-						if(Object.keys(myserver.allSchedulingSocketsMap).length > 0)
-						{
-							res.send("scheduleModeOn");
-						}
-						else{
-							res.send("unavailableLocalServer");
-						}
+						utils.getChannelNum('ICE1_scheduling_' + name, function(found){
+							var flag="";
+							if (found) flag = "scheduleModeOn";
+							else {
+								flag = "unavailableLocalServer";
+								logger.info("ICE Socket not Available");
+							}
+							res.send(flag);
+						});
 					} catch (exception) {
 						logger.error(exception.message);
 					}
@@ -375,14 +364,12 @@ exports.qcFolderDetails_ICE = function (req, res) {
 		}
 	} catch (exception) {
 		logger.error(exception.message);
-		//res.send("unavailableLocalServer");
-		if(Object.keys(myserver.allSchedulingSocketsMap).length > 0)
-		{
-			res.send("scheduleModeOn");
-		}
-		else{
-			res.send("unavailableLocalServer");
-		}
+		utils.getChannelNum('ICE1_scheduling_' + name, function(found){
+			var flag="";
+			if (found) flag = "scheduleModeOn";
+			else flag = "unavailableLocalServer";
+			res.send(flag);
+		});
 	}
 };
 
@@ -462,14 +449,12 @@ exports.saveQcDetails_ICE = function (req, res) {
 				}
 			} catch (exception) {
 				logger.error(exception.message);
-				//res.send("unavailableLocalServer");
-				if(Object.keys(myserver.allSchedulingSocketsMap).length > 0)
-				{
-					res.send("scheduleModeOn");
-				}
-				else{
-					res.send("unavailableLocalServer");
-				}
+				utils.getChannelNum('ICE1_scheduling_' + name, function(found){
+					var flag="";
+					if (found) flag = "scheduleModeOn";
+					else flag = "unavailableLocalServer";
+					res.send(flag);
+				});
 			}
 		} else {
 			res.send("fail");

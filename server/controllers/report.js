@@ -89,15 +89,15 @@ exports.openScreenShot = function (req, res) {
 				}
 				redisServer.redisSub2.on("message",render_screenshot_listener);
 			} else {
-				logger.error("ICE Socket not Available");
-				//res.send("unavailableLocalServer");
-				if(Object.keys(myserver.allSchedulingSocketsMap).length > 0)
-				{
-					res.send("scheduleModeOn");
-				}
-				else{
-					res.send("unavailableLocalServer");
-				}
+				utils.getChannelNum('ICE1_scheduling_' + name, function(found){
+					var flag="";
+					if (found) flag = "scheduleModeOn";
+					else {
+						flag = "unavailableLocalServer";
+						logger.error("ICE Socket not Available");
+					}
+					res.send(flag);
+				});
 			}
 		});
 	} catch (exception) {
@@ -1051,15 +1051,15 @@ exports.connectJira_ICE = function (req, res) {
 								}
 								redisServer.redisSub2.on("message",jira_login_1_listener);
 							} else {
-								logger.error("Error occured in the service connectJira_ICE - loginToJira: Socket not Available");
-								//res.send("unavailableLocalServer");
-								if(Object.keys(myserver.allSchedulingSocketsMap).length > 0)
-								{
-									res.send("scheduleModeOn");
-								}
-								else{
-									res.send("unavailableLocalServer");
-								}
+								utils.getChannelNum('ICE1_scheduling_' + name, function(found){
+									var flag="";
+									if (found) flag = "scheduleModeOn";
+									else {
+										flag = "unavailableLocalServer";
+										logger.error("Error occured in the service connectJira_ICE - loginToJira: Socket not Available");
+									}
+									res.send(flag);
+								});
 							}
 						});
 					} catch (exception) {
@@ -1115,15 +1115,15 @@ exports.connectJira_ICE = function (req, res) {
 								}
 								redisServer.redisSub2.on("message",jira_login_2_listener);
 							} else {
-								logger.error("Error occured in the service connectJira_ICE - createIssueInJira: Socket not Available");
-								//res.send("unavailableLocalServer");
-								if(Object.keys(myserver.allSchedulingSocketsMap).length > 0)
-								{
-									res.send("scheduleModeOn");
-								}
-								else{
-									res.send("unavailableLocalServer");
-								}
+								utils.getChannelNum('ICE1_scheduling_' + name, function(found){
+									var flag="";
+									if (found) flag = "scheduleModeOn";
+									else {
+										flag = "unavailableLocalServer";
+										logger.error("Error occured in the service connectJira_ICE - createIssueInJira: Socket not Available");
+									}
+									res.send(flag);
+								});
 							}
 						});
 					} catch (exception) {

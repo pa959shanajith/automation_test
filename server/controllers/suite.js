@@ -137,11 +137,7 @@ exports.readTestSuite_ICE = function (req, res) {
 												responsedata[eachSuite.testsuiteid] = respeachscenario;
 												if (testsuitesindex == requiredreadTestSuite.length) {
 													if (fromFlg == "scheduling") {
-														var connectusers = [];
-														redisServer.redisPub1.pubsub('channels','ICE1_scheduling_*',function(err,redisres){
-															redisres.forEach(function(e){
-																connectusers.push(e.split('_')[2]);
-															});
+														utils.scheduleSocketList(function(connectusers){
 															logger.debug("IP\'s connected : %s", connectusers.join());
 															var schedulingDetails = {
 																"connectedUsers": connectusers,
@@ -297,17 +293,12 @@ function readTestSuite_ICE_SVN(req,callback) {
 													responsedata[eachSuite.testsuitename] = respeachscenario;
 													if (testsuitesindex == requiredreadTestSuite.length) {
 														if (fromFlg == "scheduling") {
-															var connectusers = [];
-															redisServer.redisPub1.pubsub('channels','ICE1_scheduling_*',function(err,redisres){
-																redisres.forEach(function(e){
-																	connectusers.push(e.split('_')[2]);
-																});
+															utils.scheduleSocketList(function(connectusers){
 																logger.debug("IP\'s connected : %s", connectusers.join());
 																var schedulingDetails = {
 																	"connectedUsers": connectusers,
 																	"testSuiteDetails": responsedata
 																};
-																//res(200, schedulingDetails);
 																callback(true);
 															});
 														} else
@@ -829,15 +820,15 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 					}
 					redisServer.redisSub2.on("message",executeTestSuite_listener);
 				} else {
-					logger.error("Error occured in the function executionFunction: Socket not Available");
-					//res.send("unavailableLocalServer");
-					if(Object.keys(myserver.allSchedulingSocketsMap).length > 0)
-					{
-						res.send("scheduleModeOn");
-					}
-					else{
-						res.send("unavailableLocalServer");
-					}
+					utils.getChannelNum('ICE1_scheduling_' + name, function(found){
+						var flag="";
+						if (found) flag = "scheduleModeOn";
+						else {
+							flag = "unavailableLocalServer";
+							logger.error("Error occured in the function executionFunction: Socket not Available");
+						}
+						res.send(flag);
+					});
 				}
 			});
 		}
@@ -876,13 +867,7 @@ exports.getListofScheduledSocketMap = function (req, res) {
 			}
 			if(validUser){
 				logger.info("Inside UI service: getListofScheduledSocketMap authentication pass");
-				// Commented for LB
-				// res.send({ "status": "success", "username": Object.keys(myserver.allSchedulingSocketsMap),"validation": "Passed"});
-				var connectusers = [];
-				redisServer.redisPub1.pubsub('channels','ICE1_scheduling_*',function(err,redisres){
-					redisres.forEach(function(e){
-						connectusers.push(e.split('_')[2]);
-					});
+				utils.scheduleSocketList(function(connectusers){
 					res.send({ "status": "success", "username": connectusers,"tokenValidation": "Passed"});
 				});
 			}else{
@@ -1290,15 +1275,15 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 											}
 											redisServer.redisSub2.on("message",executeTestSuite_listener);
 										} else {
-											logger.error("Error occured in ExecuteTestSuite_ICE_SVN service: Socket not Available");
-											//res.send("unavailableLocalServer");
-											if(Object.keys(myserver.allSchedulingSocketsMap).length > 0)
-											{
-												res.send("scheduleModeOn");
-											}
-											else{
-												res.send("unavailableLocalServer");
-											}
+											utils.getChannelNum('ICE1_scheduling_' + name, function(found){
+												var flag="";
+												if (found) flag = "scheduleModeOn";
+												else {
+													flag = "unavailableLocalServer";
+													logger.error("Error occured in ExecuteTestSuite_ICE_SVN service: Socket not Available");
+												}
+												res.send(flag);
+											});
 										}
 									});
 								}
@@ -1556,15 +1541,15 @@ exports.ExecuteTestSuite_ICE_CI = function (req, res) {
 					}
 					redisServer.redisSub2.on("message",executeTestSuite_listener);
 				} else {
-					logger.error("Error occured in the function executionFunction in ExecuteTestSuite_ICE_CI: Socket not Available");
-					//res.send("unavailableLocalServer");
-					if(Object.keys(myserver.allSchedulingSocketsMap).length > 0)
-					{
-						res.send("scheduleModeOn");
-					}
-					else{
-						res.send("unavailableLocalServer");
-					}
+					utils.getChannelNum('ICE1_scheduling_' + name, function(found){
+						var flag="";
+						if (found) flag = "scheduleModeOn";
+						else {
+							flag = "unavailableLocalServer";
+							logger.error("Error occured in the function executionFunction in ExecuteTestSuite_ICE_CI: Socket not Available");
+						}
+						res.send(flag);
+					});
 				}
 			});
 		}
