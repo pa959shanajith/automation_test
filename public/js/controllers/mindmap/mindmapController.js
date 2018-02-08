@@ -1802,7 +1802,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         if($('.row.row-modal.addObj-row').length<10){
             var idxAddNode = 1+$('.row.row-modal.addObj-row').length;
             $("#addObjContainer").append(`<div class="row row-modal addObj-row">
-                                                <form class="form-horizontal" role="form">
+                                                <form class="form-horizontal" role="form" onSubmit="return false;">
                                                         <div class="col-sm-2 addNode-label"><label>`+idxAddNode+`</label></div>
                                                         <div class="col-sm-6">
                                                         <input type="text" class="form-control form-control-custom" placeholder="Enter node name" maxlength="40">
