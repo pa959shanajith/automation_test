@@ -1581,6 +1581,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         var c = d3.select('#ct-ctrlBox').style('top', l[1] + 'px').style('left', l[0] + 'px').classed('no-disp', !1);
         c.select('p.' + faRef.plus).classed('ct-ctrl-inactive', !1);
         c.select('p.' + faRef.delete).classed('ct-ctrl-inactive', !1);
+        c.select('p.' + faRef.plus1).classed('ct-ctrl-inactive', !1);
         if (t == 'modules') {
             c.select('p.' + faRef.plus + ' .ct-tooltiptext').html('Create Scenarios');
             c.select('p.' + faRef.plus1 + ' .ct-tooltiptext').html('Create Multiple Scenarios');
@@ -1600,6 +1601,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             c.select('p.' + faRef.delete + ' .ct-tooltiptext').html('Delete Screen');
         } else if (t == 'testcases') {
             c.select('p.' + faRef.plus).classed('ct-ctrl-inactive', !0);
+            c.select('p.' + faRef.plus1).classed('ct-ctrl-inactive', !0);
             c.select('p.' + faRef.edit + ' .ct-tooltiptext').html('Edit Testcase');
             c.select('p.' + faRef.delete + ' .ct-tooltiptext').html('Delete Testcase');
         }
