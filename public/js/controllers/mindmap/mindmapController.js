@@ -1145,7 +1145,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 });
             }
             //Logic to add tasks for the scenario
-            else if (nType == "scenarios" && $('.pg-checkbox')[0].checked) {
+            else if (nType == "scenarios") {
                 var modid = dNodes[pi].parent.id_c,
                     tscid = dNodes[pi].id_c;
 
@@ -1153,7 +1153,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     if (tscid != 'null') {
                         addTask_11(dNodes[pi].id,tObj,4);
                     }
-                    if (dNodes[pi].children) dNodes[pi].children.forEach(function(scr) {
+                    if (dNodes[pi].children && $('.pg-checkbox')[0].checked) dNodes[pi].children.forEach(function(scr) {
                         addTask_11(scr.id,tObj,5);
                         scr.children.forEach(function(tCa) {
                             addTask_11(tCa.id,tObj,6);
@@ -1163,9 +1163,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     openDialogMindmap("Error", 'Assign task to the module');
                     return;
                 }
-            } else if (nType == "screens" && $('.pg-checkbox')[0].checked) {
+            } else if (nType == "screens") {
                 addTask_11(pi,tObj,7);
-                if (dNodes[pi].children) dNodes[pi].children.forEach(function(tCa) {
+                if (dNodes[pi].children && $('.pg-checkbox')[0].checked) dNodes[pi].children.forEach(function(tCa) {
                     var cTask = (tObj.t == "Scrape" || tObj.t == "Append" || tObj.t == "Compare") ? "Design" : "Debug";
                     addTask_11(tCa.id,tObj,8,cTask);
                 });
