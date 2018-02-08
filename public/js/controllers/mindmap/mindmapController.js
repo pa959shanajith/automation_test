@@ -2218,7 +2218,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 pid_c: (d.parent) ? d.parent.id_c : null,
                 task: (d.task) ? d.task : null,
                 renamed: (d.rnm) ? d.rnm : !1,
-                orig_name: (d.original_name) ? d.original_name : null
+                orig_name: (d.original_name) ? d.original_name : null,
+                taskexists:(d.taskexists)?d.taskexists :null
             });
         }
         if (d.children && d.children.length > 0) d.children.forEach(function(t) {

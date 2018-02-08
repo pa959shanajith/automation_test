@@ -240,7 +240,7 @@ exports.getModules=function(req,res){
 				if(status!=200) res.status(status).send(result);
 				else{
 					var k=0,rIndex=[],lbl,neoIdDict={},maps=[],tList=[];
-					var attrDict={"modules_endtoend":{"childIndex":"childIndex","projectID":"projectID","moduleName":"name","moduleID":"id_n","moduleID_c":"id_c"},"modules":{"childIndex":"childIndex","projectID":"pid_n","moduleName":"name","moduleID":"id_n","moduleID_c":"id_c"},"scenarios":{"projectID":"projectID","childIndex":"childIndex","moduleID":"pid_n","testScenarioName":"name","testScenarioID":"id_n","testScenarioID_c":"id_c"},"screens":{"childIndex":"childIndex","testScenarioID":"pid_n","screenName":"name","screenID":"id_n","screenID_c":"id_c"},"testcases":{"childIndex":"childIndex","screenID":"pid_n","testCaseName":"name","testCaseID":"id_n","testCaseID_c":"id_c"},"tasks":{"taskID":"id_n","task":"t","batchName":"bn","assignedTo":"at","reviewer":"rw","startDate":"sd","endDate":"ed","re_estimation":"re_estimation","release":"re","cycle":"cy","details":"det","nodeID":"pid","parent":"anc"}};
+					var attrDict={"modules_endtoend":{"childIndex":"childIndex","projectID":"projectID","moduleName":"name","moduleID":"id_n","moduleID_c":"id_c"},"modules":{"childIndex":"childIndex","projectID":"pid_n","moduleName":"name","moduleID":"id_n","moduleID_c":"id_c"},"scenarios":{"projectID":"projectID","childIndex":"childIndex","moduleID":"pid_n","testScenarioName":"name","testScenarioID":"id_n","testScenarioID_c":"id_c"},"screens":{"childIndex":"childIndex","testScenarioID":"pid_n","screenName":"name","screenID":"id_n","screenID_c":"id_c","taskexists":"taskexists"},"testcases":{"childIndex":"childIndex","screenID":"pid_n","testCaseName":"name","testCaseID":"id_n","testCaseID_c":"id_c","taskexists":"taskexists"},"tasks":{"taskID":"id_n","task":"t","batchName":"bn","assignedTo":"at","reviewer":"rw","startDate":"sd","endDate":"ed","re_estimation":"re_estimation","release":"re","cycle":"cy","details":"det","nodeID":"pid","parent":"anc"}};
 					var jsonData=result;
 
 					var all_modules=jsonData[0].data;
@@ -284,8 +284,12 @@ exports.getModules=function(req,res){
 								var tgtIndex=idDict[r.endNode.toString()];
 								//if(nData[tgtIndex].children===undefined) nData[srcIndex].task=nData[tgtIndex];
 								if(nData[tgtIndex].children===undefined){
-									if((tab=='tabAssign'&& nData[tgtIndex].release==relId && nData[tgtIndex].cycle==cycId)||tab=='tabCreate'||tab=='endToend')
+									if((tab=='tabAssign'&& nData[tgtIndex].release==relId && nData[tgtIndex].cycle==cycId)||tab=='tabCreate'||tab=='endToend'){
 										nData[srcIndex].task=nData[tgtIndex];
+									}else if(nData[srcIndex].type=='testcases' || nData[srcIndex].type=='screens'){
+										nData[srcIndex].taskexists=nData[tgtIndex];
+									}
+										
 								} 
 								else if(nData[srcIndex].children.indexOf(nData[tgtIndex])==-1){
 									nData[srcIndex].children.push(nData[tgtIndex]);
@@ -500,6 +504,13 @@ exports.saveData=function(req,res){
 					idDict[e.id]=(e.id_n)?e.id_n:uuidV4();
 					e.id=idDict[e.id];
 					t=e.task;
+					if(e.taskexists && e.task){
+						t.id=e.taskexists.id;
+						t.oid=e.taskexists.oid;
+						t.parent=e.taskexists.parent;
+						
+						
+					}
 					nameDict[e.id] = e.name;
 					var taskstatus='assigned';
 					if(e.type=='modules_endtoend'){
@@ -539,7 +550,7 @@ exports.saveData=function(req,res){
 							t.parent=[prjId].concat(e.id_c);
 							t.id=(t.id!=null)?t.id:uuidV4();
 
-							if(t.oid!=null){
+							if(t.oid!=null || t.taskexists){
 								if (t.updatedParent != undefined){
 									qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',nodeID:'"+e.id+"',parent:'["+t.parent+"]',release:'"+relId+"',cycle:'"+cycId+"'}) SET n.task='"+t.task+"',n.batchName='"+t.batchName+"',n.assignedTo='"+t.assignedTo+"',n.reviewer='"+t.reviewer+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.re_estimation='"+t.re_estimation+"',n.details='"+t.details+"',n.status='"+taskstatus+"',n.parent='["+[prjId].concat(t.updatedParent)+"]'"});
 								}else{
