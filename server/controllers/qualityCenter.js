@@ -7,21 +7,15 @@ var epurl = "http://"+process.env.NDAC_IP+":"+process.env.NDAC_PORT+"/";
 var Client = require("node-rest-client").Client;
 var client = new Client();
 var sessionExtend = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes 
-var sessionTime = 30 * 60 * 1000;
-var updateSessionTimeEvery = 20 * 60 * 1000;
 var validator = require('validator');
-var  logger = require('../../logger');
+var logger = require('../../logger');
 var redisServer = require('../lib/redisSocketHandler');
-
-function isSessionActive(req){
-	var sessionToken = req.session.uniqueId;
-    return sessionToken != undefined && req.session.id == sessionToken;
-}
+var utils = require('../lib/utils');
 
 exports.loginQCServer_ICE = function (req, res) {
 	try {
 		logger.info("Inside UI service: loginQCServer_ICE");
-		if (isSessionActive(req)) {
+		if (utils.isSessionActive(req.session)) {
 			var name = req.session.username;
 			redisServer.redisSub2.subscribe('ICE2_' + name);
 			var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
@@ -55,9 +49,7 @@ exports.loginQCServer_ICE = function (req, res) {
 						logger.info("Sending socket request for qclogin to redis");
 						dataToIce = {"emitAction" : "qclogin","username" : name, "responsedata":qcDetails};
 						redisServer.redisPub1.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
-						var updateSessionExpiry = setInterval(function () {
-								req.session.cookie.maxAge = sessionTime;
-							}, updateSessionTimeEvery);
+						var updateSessionExpiry = utils.resetSession(req.session);
 						function qclogin_listener(channel,message) {
 							data = JSON.parse(message);
 							if(name == data.username){
@@ -126,7 +118,7 @@ exports.qcProjectDetails_ICE = function (req, res) {
 		"qc_projects": ""
 	};
 	try {
-		if (isSessionActive(req)) {
+		if (utils.isSessionActive(req.session)) {
 			var name = req.session.username;
 			redisServer.redisSub2.subscribe('ICE2_' + name);
 			logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
@@ -143,9 +135,7 @@ exports.qcProjectDetails_ICE = function (req, res) {
 						logger.info("Sending socket request for qclogin to redis");
 						dataToIce = {"emitAction" : "qclogin","username" : name, "responsedata":qcDetails};
 						redisServer.redisPub1.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
-						var updateSessionExpiry = setInterval(function () {
-								req.session.cookie.maxAge = sessionTime;
-							}, updateSessionTimeEvery);
+						var updateSessionExpiry = utils.resetSession(req.session);
 						function qclogin_listener(channel,message) {
 							data = JSON.parse(message);
 							if(name == data.username){
@@ -333,7 +323,7 @@ exports.qcFolderDetails_ICE = function (req, res) {
 		"qc_projects": ""
 	};
 	try {
-		if (isSessionActive(req)) {
+		if (utils.isSessionActive(req.session)) {
 			var name = req.session.username;
 			var qcDetails = req.body;
 			redisServer.redisSub2.subscribe('ICE2_' + name);
@@ -344,9 +334,7 @@ exports.qcFolderDetails_ICE = function (req, res) {
 					logger.info("Sending socket request for qclogin to redis");
 					dataToIce = {"emitAction" : "qclogin","username" : name, "responsedata":qcDetails};
 					redisServer.redisPub1.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
-					var updateSessionExpiry = setInterval(function () {
-							req.session.cookie.maxAge = sessionTime;
-						}, updateSessionTimeEvery);
+					var updateSessionExpiry = utils.resetSession(req.session);
 					function qclogin_listener(channel,message) {
 						data = JSON.parse(message);
 						if(name == data.username){
@@ -444,7 +432,7 @@ exports.saveQcDetails_ICE = function (req, res) {
 	}, function () {
 		if (flag) {
 			try {
-				if (isSessionActive(req)) {
+				if (utils.isSessionActive(req.session)) {
 					/*var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 					console.log(Object.keys(myserver.allSocketsMap), "<<all people, asking person:", ip);
 					var mySocket = myserver.allSocketsMap[ip];
@@ -454,9 +442,7 @@ exports.saveQcDetails_ICE = function (req, res) {
 							"qcaction": "qcquit"
 						};
 						mySocket.emit("qclogin", qcDetails);
-						var updateSessionExpiry = setInterval(function () {
-								req.session.cookie.maxAge = sessionTime;
-							}, updateSessionTimeEvery);
+						var updateSessionExpiry = utils.resetSession(req.session);
 						mySocket.on('qcresponse', function (data) {
 							clearInterval(updateSessionExpiry);
 							res.send("success");

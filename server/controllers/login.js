@@ -12,11 +12,7 @@ var myserver = require('../../server');
 var logger = require('../../logger');
 var notificationMsg = require("../notifications/notifyMessages");
 var config = require('../../server/config/config');
-
-function isSessionActive(req){
-	var sessionToken = req.session.uniqueId;
-    return sessionToken != undefined && req.session.id == sessionToken;
-}
+var utils = require('../lib/utils');
 
 //Authenticate User - Nineteen68
 exports.authenticateUser_Nineteen68 = function (req, res) {
@@ -577,7 +573,7 @@ function ldapCheck(req, cb) {
 exports.loadUserInfo_Nineteen68 = function (req, res) {
 	try {
 		logger.info("Inside UI Service: loadUserInfo_Nineteen68");
-		if (isSessionActive(req)) {
+		if (utils.isSessionActive(req.session)) {
 			var flag = req.body.flag;
 			var switchedRole = req.body.selRole;
 			if(switchedRole != undefined && switchedRole != '' ) {
@@ -760,7 +756,7 @@ exports.loadUserInfo_Nineteen68 = function (req, res) {
 exports.getRoleNameByRoleId_Nineteen68 = function (req, res) {
 	try {
 		logger.info("Inside UI service: getRoleNameByRoleId_Nineteen68");
-		if (isSessionActive(req)) {
+		if (utils.isSessionActive(req.session)) {
 			var roleId = [];
 			req.session.role = [];
 			req.session.role = req.body.role;

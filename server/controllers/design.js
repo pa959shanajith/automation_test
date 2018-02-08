@@ -17,16 +17,8 @@ var allCustnames = [];
 var objectLevel = 1;
 var xpath = "";
 var inputsWS = {};
-//var sessionExtend = new Date(Date.now() + ); // 30 minutes 
-var sessionTime = 30 * 60 * 1000;
-var updateSessionTimeEvery = 20 * 60 * 1000;
 var redisServer = require('../lib/redisSocketHandler');
-
-function isSessionActive(req){
-	var sessionToken = req.session.uniqueId;
-    return sessionToken != undefined && req.session.id == sessionToken;
-}
-
+var utils = require('../lib/utils');
 
 /**
  * @author vinay.niranjan
@@ -36,7 +28,7 @@ function isSessionActive(req){
 exports.initScraping_ICE = function (req, res) {
 	logger.info("Inside UI service: initScraping_ICE");
 	try {
-		if (isSessionActive(req)) {
+		if (utils.isSessionActive(req.session)) {
 			var name = req.session.username;
 			redisServer.redisSub2.subscribe('ICE2_' + name);	
 			var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
@@ -53,9 +45,7 @@ exports.initScraping_ICE = function (req, res) {
 						logger.info("Sending socket request for LAUNCH_DESKTOP to redis");
 						dataToIce = {"emitAction" : "LAUNCH_DESKTOP","username" : name, "applicationPath":applicationPath};
 						redisServer.redisPub1.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
-						var updateSessionExpiry = setInterval(function () {
-								req.session.cookie.maxAge = sessionTime;
-							}, updateSessionTimeEvery);
+						var updateSessionExpiry = utils.resetSession(req.session);
 						function LAUNCH_DESKTOP_listener(channel, message) {
 							data = JSON.parse(message);
 							//LB: make sure to send recieved data to corresponding user
@@ -82,9 +72,7 @@ exports.initScraping_ICE = function (req, res) {
 						logger.info("Sending socket request for LAUNCH_SAP to redis");
 						dataToIce = {"emitAction" : "LAUNCH_SAP","username" : name, "applicationPath":applicationPath};
 						redisServer.redisPub1.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
-						var updateSessionExpiry = setInterval(function () {
-								req.session.cookie.maxAge = sessionTime;
-							}, updateSessionTimeEvery);
+						var updateSessionExpiry = utils.resetSession(req.session);
 						function LAUNCH_SAP_listener(channel, message) {
 							data = JSON.parse(message);
 							//LB: make sure to send recieved data to corresponding user
@@ -112,9 +100,7 @@ exports.initScraping_ICE = function (req, res) {
 						dataToIce = {"emitAction" : "LAUNCH_OEBS","username" :name,
 									 "applicationPath":applicationPath};
 						redisServer.redisPub1.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
-						var updateSessionExpiry = setInterval(function () {
-								req.session.cookie.maxAge = sessionTime;
-							}, updateSessionTimeEvery);
+						var updateSessionExpiry = utils.resetSession(req.session);
 						function LAUNCH_OEBS_listener(channel, message) {
 							data = JSON.parse(message);
 							//LB: make sure to send recieved data to corresponding user
@@ -147,9 +133,7 @@ exports.initScraping_ICE = function (req, res) {
 									 "apkPath":apkPath,"serial":serial,"mobileDeviceName":mobileDeviceName,
 									 "mobileIosVersion":mobileIosVersion,"mobileUDID":mobileUDID};
 						redisServer.redisPub1.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
-						var updateSessionExpiry = setInterval(function () {
-								req.session.cookie.maxAge = sessionTime;
-							}, updateSessionTimeEvery);
+						var updateSessionExpiry = utils.resetSession(req.session);
 						function LAUNCH_MOBILE_listener(channel, message) {
 							data = JSON.parse(message);
 							//LB: make sure to send recieved data to corresponding user
@@ -178,9 +162,7 @@ exports.initScraping_ICE = function (req, res) {
 						dataToIce = {"emitAction" : "LAUNCH_MOBILE_WEB","username" : name,
 									 "mobileSerial":mobileSerial,"androidVersion":androidVersion};
 						redisServer.redisPub1.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
-						var updateSessionExpiry = setInterval(function () {
-								req.session.cookie.maxAge = sessionTime;
-							}, updateSessionTimeEvery);
+						var updateSessionExpiry = utils.resetSession(req.session);
 						function LAUNCH_MOBILE_WEB_listener(channel, message) {
 							data = JSON.parse(message);
 							//LB: make sure to send recieved data to corresponding user
@@ -227,9 +209,7 @@ exports.initScraping_ICE = function (req, res) {
 						logger.info("Sending socket request for webscrape to redis");
 						dataToIce = {"emitAction" : "webscrape","username" : name, "data":data};
 						redisServer.redisPub1.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
-						var updateSessionExpiry = setInterval(function () {
-								req.session.cookie.maxAge = sessionTime;
-							}, updateSessionTimeEvery);
+						var updateSessionExpiry = utils.resetSession(req.session);
 						function webscrape_listener(channel, message) {
 							data = JSON.parse(message);
 							//LB: make sure to send recieved data to corresponding user
@@ -292,7 +272,7 @@ exports.initScraping_ICE = function (req, res) {
 exports.highlightScrapElement_ICE = function (req, res) {
 	try {
 		logger.info("Inside UI service: highlightScrapElement_ICE");
-		if (isSessionActive(req)) {
+		if (utils.isSessionActive(req.session)) {
 			var name = req.session.username;
 			redisServer.redisSub2.subscribe('ICE2_' + name);
 			var focusParam = req.body.elementXpath;
@@ -325,7 +305,7 @@ exports.highlightScrapElement_ICE = function (req, res) {
 exports.getScrapeDataScreenLevel_ICE = function (req, res) {
 	try {
 		logger.info("Inside UI service: getScrapeDataScreenLevel_ICE");
-		if (isSessionActive(req)) {
+		if (utils.isSessionActive(req.session)) {
 			var inputs = {
 				"screenid": req.body.screenId,
 				"projectid": req.body.projectId,
@@ -394,7 +374,7 @@ function fetchScrapedData(inputs, fetchScrapedDatacallback) {
 exports.updateScreen_ICE = function (req, res) {
 	try {
 		logger.info("Inside UI service: updateScreen_ICE");
-		if (isSessionActive(req)) {
+		if (utils.isSessionActive(req.session)) {
 			var updateData = req.body.scrapeObject;
 			var projectID = updateData.projectId;
 			var screenID = updateData.screenId;
@@ -1464,7 +1444,7 @@ function uploadTestCaseData(inputs, uploadTestCaseDatacallback) {
 exports.readTestCase_ICE = function (req, res) {
 	try {
 		logger.info("Inside UI service: readTestCase_ICE");
-		if (isSessionActive(req)) {
+		if (utils.isSessionActive(req.session)) {
 			//base output elements
 			var testcasesteps = "";
 			var testcasename = "";
@@ -1596,7 +1576,7 @@ exports.readTestCase_ICE = function (req, res) {
 exports.updateTestCase_ICE = function (req, res) {
 	try {
 		logger.info("Inside UI service: updateTestCase_ICE");
-		if (isSessionActive(req)) {
+		if (utils.isSessionActive(req.session)) {
 			var hasrow = false;
 			//base request elements
 			var requestedscreenid = req.body.screenid;
@@ -1695,7 +1675,7 @@ exports.updateTestCase_ICE = function (req, res) {
 exports.debugTestCase_ICE = function (req, res) {
 	try {
 		logger.info("Inside UI service: debugTestCase_ICE");
-		if (isSessionActive(req)) {
+		if (utils.isSessionActive(req.session)) {
 			var name = req.session.username;
 			redisServer.redisSub2.subscribe('ICE2_' + name);
 			var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
@@ -1776,9 +1756,7 @@ exports.debugTestCase_ICE = function (req, res) {
 																logger.info("Sending socket request for debugTestCase to redis");
 																dataToIce = {"emitAction" : "debugTestCase","username" : name, "responsedata":responsedata};
 																redisServer.redisPub1.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
-																var updateSessionExpiry = setInterval(function () {
-																		req.session.cookie.maxAge = sessionTime;
-																	}, updateSessionTimeEvery);
+																var updateSessionExpiry = utils.resetSession(req.session);
 																function result_debugTestCase_listener(channel, message) {
 																	data = JSON.parse(message);
 																	//LB: make sure to send recieved data to corresponding user
@@ -1824,9 +1802,7 @@ exports.debugTestCase_ICE = function (req, res) {
 								logger.info("Sending socket request for debugTestCaseWS_ICE to redis");
 								dataToIce = {"emitAction" : "debugTestCase","username" : name, "responsedata":testcaseWS};
 								redisServer.redisPub1.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
-								var updateSessionExpiry = setInterval(function () {
-										req.session.cookie.maxAge = sessionTime;
-									}, updateSessionTimeEvery);
+								var updateSessionExpiry = utils.resetSession(req.session);
 									function result_debugTestCaseWS_listener(channel, message) {
 										data = JSON.parse(message);
 										//LB: make sure to send recieved data to corresponding user
@@ -1906,9 +1882,7 @@ exports.debugTestCase_ICE = function (req, res) {
 								logger.info("Sending socket request for debugTestCase to redis");
 								dataToIce = {"emitAction" : "wsdl_listOfOperation","username" : name, "wsdlurl":wsdlurl};
 								redisServer.redisPub1.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));	
-								var updateSessionExpiry = setInterval(function () {
-										req.session.cookie.maxAge = sessionTime;
-									}, updateSessionTimeEvery);
+								var updateSessionExpiry = utils.resetSession(req.session);
 									function result_wsdl_listOfOperation_listener(channel, message) {
 										data = JSON.parse(message);
 										//LB: make sure to send recieved data to corresponding user
@@ -1978,9 +1952,7 @@ exports.debugTestCase_ICE = function (req, res) {
 								logger.info("Sending socket request for debugTestCase to redis");
 								dataToIce = {"emitAction" : "wsdl_ServiceGenerator","username" : name, "serviceGenRequest":serviceGenRequest};
 								redisServer.redisPub1.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
-								var updateSessionExpiry = setInterval(function () {
-										req.session.cookie.maxAge = sessionTime;
-									}, updateSessionTimeEvery);
+								var updateSessionExpiry = utils.resetSession(req.session);
 								function result_wsdl_ServiceGenerator_listener(channel, message) {
 									data = JSON.parse(message);
 									//LB: make sure to send recieved data to corresponding user
@@ -2089,7 +2061,7 @@ exports.debugTestCase_ICE = function (req, res) {
 exports.getKeywordDetails_ICE = function getKeywordDetails_ICE(req, res) {
 	try {
 		logger.info("Inside UI service: getKeywordDetails_ICE");
-		if (isSessionActive(req)) {
+		if (utils.isSessionActive(req.session)) {
 			var requestedprojecttypename = req.body.projecttypename;
 			// Query 1 fetching the objecttype,keywords basked on projecttypename
 			var individualsyntax = {};
@@ -2140,7 +2112,7 @@ exports.getKeywordDetails_ICE = function getKeywordDetails_ICE(req, res) {
 exports.getTestcasesByScenarioId_ICE = function getTestcasesByScenarioId_ICE(req, res) {
 	try {
 		logger.info("Inside UI service: getTestcasesByScenarioId_ICE");
-		if (isSessionActive(req)) {
+		if (utils.isSessionActive(req.session)) {
 			var testcasesArr = [];
 			var testScenarioId = req.body.testScenarioId;
 			var inputs = {

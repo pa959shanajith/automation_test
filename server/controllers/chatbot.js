@@ -2,15 +2,11 @@
 var Client = require("node-rest-client").Client;
 var client = new Client();
 var epurl = "http://"+process.env.NDAC_IP+":"+process.env.NDAC_PORT+"/";
-
-function isSessionActive(req){
-	var sessionToken = req.session.uniqueId;
-    return sessionToken != undefined && req.session.id == sessionToken;
-}
+var utils = require('../lib/utils');
 
 exports.getTopMatches_ProfJ = function getTopMatches(req, res) {
 	try {
-		if (isSessionActive(req)) {
+		if (utils.isSessionActive(req.session)) {
 			var query= req.body.userQuery;
 			try{
                     var args = {
@@ -54,7 +50,7 @@ exports.getTopMatches_ProfJ = function getTopMatches(req, res) {
 
 exports.updateFrequency_ProfJ = function(req, res) {
 	try {
-		if (isSessionActive(req)) {
+		if (utils.isSessionActive(req.session)) {
 			var qid= req.body.qid;
 			try{
                     var args = {

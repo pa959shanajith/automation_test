@@ -6,16 +6,11 @@ var create_ice=require('../controllers/create_ice');
 var myserver = require('../lib/socket.js');
 var notificationMsg = require("../notifications/notifyMessages");
 var logger = require('../../logger');
-
-function isSessionActive(req){
-	var sessionToken = req.session.uniqueId;
-    return sessionToken != undefined && req.session.id == sessionToken;
-}
-
+var utils = require('../lib/utils');
 
 exports.populateProjects=function(req,res){
 	logger.info("Inside UI service: populateProjects");
-	if (isSessionActive(req)) {
+	if (utils.isSessionActive(req.session)) {
 		//var d=req.body;
 		var datatosend ='';
 			var reqData={
@@ -41,7 +36,7 @@ exports.populateProjects=function(req,res){
 }
 exports.populateScenarios=function(req,res){
 	logger.info("Inside UI service: populateScenarios");
-	if (isSessionActive(req)) {
+	if (utils.isSessionActive(req.session)) {
 		var moduleId=req.body.moduleId;
 			//var taskID=d.taskId;
 			query={'statement':"MATCH (a{moduleID:'"+moduleId+"'})-[:FMTTS]->(b) RETURN b"};
@@ -73,7 +68,7 @@ exports.populateScenarios=function(req,res){
 
 exports.getProjectTypeMM_Nineteen68=function(req,res){
 	logger.info("Inside UI service: getProjectTypeMM_Nineteen68");
-	if (isSessionActive(req)) {
+	if (utils.isSessionActive(req.session)) {
 			var inputs = req.body.projectId;
 			create_ice.getProjectType_Nineteen68(inputs,function(err,result){
 				if(err){
@@ -94,7 +89,7 @@ exports.getProjectTypeMM_Nineteen68=function(req,res){
 
 exports.populateUsers=function(req,res){
 	logger.info("Inside UI service: populateUsers");
-	if (isSessionActive(req)) {
+	if (utils.isSessionActive(req.session)) {
 		var d=req.body;
 		var datatosend ='';
 			admin.getUsers_Nineteen68({prjId:d.projectId},function(err,data){
@@ -117,7 +112,7 @@ exports.populateUsers=function(req,res){
 
 exports.populateReleases=function(req,res){
 	logger.info("Inside UI service: populateReleases");
-	if (isSessionActive(req)) {
+	if (utils.isSessionActive(req.session)) {
 			var datatosend ='';
 			var d=req.body;
 			var project_id={projectId: d.projectId};
@@ -141,7 +136,7 @@ exports.populateReleases=function(req,res){
 
 exports.populateCycles=function(req,res){
 	logger.info("Inside UI service: populateCycles");
-	if (isSessionActive(req)) {
+	if (utils.isSessionActive(req.session)) {
 		var datatosend ='';
 			var rel_id={relId : req.body.releaseId};
 			create_ice.getCycleIDs_Ninteen68(rel_id,function(err,data){
@@ -165,7 +160,7 @@ exports.populateCycles=function(req,res){
 
 exports.getCRId=function(req,res){
 	logger.info("Inside UI service: getCRId");
-	if (isSessionActive(req)) {
+	if (utils.isSessionActive(req.session)) {
 		var inputs = { "projectid": req.body.projectid};
 		suite.getCRId(inputs, function (status, result) {
 				res.setHeader('Content-Type', 'application/json');
@@ -184,7 +179,7 @@ exports.getCRId=function(req,res){
 
 exports.checkReuse=function(req,res){
 	logger.info("Inside UI service: checkReuse");
-	if (isSessionActive(req)) {
+	if (utils.isSessionActive(req.session)) {
 			var d=req.body;
 			var qData = d.parsedata;
 			var qListReuse = getQueries(qData);
@@ -223,7 +218,7 @@ exports.checkReuse=function(req,res){
 
 exports.getModules=function(req,res){
 	logger.info("Inside UI service: getModules");
-	if (isSessionActive(req)) {
+	if (utils.isSessionActive(req.session)) {
 		var nData=[],qList=[],idDict={};
 		var urlData=req.get('host').split(':');
 		var d=req.body;
@@ -325,7 +320,7 @@ exports.getModules=function(req,res){
 
 exports.reviewTask=function(req,res){
 	logger.info("Inside UI service: reviewTask");
-	if (isSessionActive(req)) {
+	if (utils.isSessionActive(req.session)) {
 			var inputs=req.body;
 			var taskID=inputs.taskId;
 			var batchIds=inputs.batchIds;
@@ -446,7 +441,7 @@ exports.reviewTask=function(req,res){
 
 exports.saveData=function(req,res){
 	logger.info("Inside UI service: saveData");
-	if (isSessionActive(req)) {
+	if (utils.isSessionActive(req.session)) {
 			var tasks =[];
 			var nameDict = {};
 			var nData=[],qList=[],idDict={};
@@ -782,7 +777,7 @@ exports.saveData=function(req,res){
 
 exports.saveEndtoEndData=function(req,res){
 	logger.info("Inside UI service: saveEndtoEndData");
-	if (isSessionActive(req)) {
+	if (utils.isSessionActive(req.session)) {
 			var nData=[],qList=[],idDict={};
 			var urlData=req.get('host').split(':');
 			var inputs=req.body; 

@@ -6,15 +6,11 @@ var neo4jAPI = require('../controllers/neo4jAPI');
 var async = require('async');
 var myserver = require('../lib/socket.js');
 var notificationMsg = require("../notifications/notifyMessages");
-
-function isSessionActive(req){
-	var sessionToken = req.session.uniqueId;
-    return sessionToken != undefined && req.session.id == sessionToken;
-}
+var utils = require('../lib/utils');
 
 exports.getVersions=function(req,res){
 	logger.info("Inside UI service: getVersions");
-	if (isSessionActive(req)) {
+	if (utils.isSessionActive(req.session)) {
 		var prjId = req.body.projectId;
 		var urlData = req.get('host').split(':');
 		logger.info('Inside the getVersion task of UI Service versioning ');
@@ -62,7 +58,7 @@ exports.getVersions=function(req,res){
 
 exports.getModulesVersioning=function(req,res){
 	logger.info("Inside UI service: getModulesVersioning");
-	if (isSessionActive(req)) {
+	if (utils.isSessionActive(req.session)) {
 			logger.info('Inside the getModules task of UI Service versioning ')
 			var nData = [], qList = [], idDict = {};
 			var inputs=req.body;
@@ -161,7 +157,7 @@ exports.getModulesVersioning=function(req,res){
 
 exports.createVersion=function(req,res){
 	logger.info("Inside UI service: createVersion");
-	if (isSessionActive(req)) {
+	if (utils.isSessionActive(req.session)) {
 			var nData = [];
 			var inputs=req.body;
 			var prjId = inputs.srcprojectId;
@@ -394,7 +390,7 @@ exports.createVersion=function(req,res){
 }
 exports.getProjectsNeo=function(req,res){
 	logger.info("Inside UI service: getProjectsNeo");
-	if (isSessionActive(req)) {
+	if (utils.isSessionActive(req.session)) {
 		var qList = [];
 		qList.push({ "statement": "MATCH (n:MODULES) return distinct n.projectID" });
 		logger.info("Calling Neo4j API Service from versioning: project_versioning/versioning");
@@ -418,7 +414,7 @@ exports.getProjectsNeo=function(req,res){
 
 exports.saveDataVersioning=function(req,res){
 	logger.info("Inside UI service: saveDataVersioning");
-	if (isSessionActive(req)) {
+	if (utils.isSessionActive(req.session)) {
 		logger.info('Inside the UI Service saveDataVersioning')
 			var tasks =[];
 			var nameDict = {};

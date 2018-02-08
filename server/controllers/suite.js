@@ -10,17 +10,11 @@ var Client = require("node-rest-client").Client;
 var neo4jAPI = require('../controllers/neo4jAPI');
 var client = new Client();
 var schedule = require('node-schedule');
-var sessionTime = 30 * 60 * 1000;
-var updateSessionTimeEvery = 20 * 60 * 1000;
 var scheduleStatus = "";
 var logger = require('../../logger');
 var redisServer = require('../lib/redisSocketHandler');
+var utils = require('../lib/utils');
 var qList = [];
-
-function isSessionActive(req){
-	var sessionToken = req.session.uniqueId;
-    return sessionToken != undefined && req.session.id == sessionToken;
-}
 
 /**
  * @author vishvas.a
@@ -32,7 +26,7 @@ function isSessionActive(req){
 exports.readTestSuite_ICE = function (req, res) {
 	logger.info("Inside UI service: readTestSuite_ICE");
 	qList = [];
-	if (isSessionActive(req)) {
+	if (utils.isSessionActive(req.session)) {
 		var requiredreadTestSuite = req.body.readTestSuite;
 		var fromFlg = req.body.fromFlag;
 		var responsedata = {};
@@ -426,7 +420,7 @@ function Projectnametestcasename_ICE(req, cb, data) {
 exports.updateTestSuite_ICE = function (req, res) {
 	logger.info("Inside UI service: updateTestSuite_ICE");
     qList = [];
-	if (isSessionActive(req)) {
+	if (utils.isSessionActive(req.session)) {
 		var userinfo = req.body.batchDetails.userinfo;
 		var batchDetails = req.body.batchDetails.suiteDetails;
 		var batchDetailslength = batchDetails.length;
@@ -607,7 +601,7 @@ function updateExecutionStatus(testsuiteid, executionid, starttime, suiteStatus)
  */
 exports.ExecuteTestSuite_ICE = function (req, res) {
 	logger.info("Inside UI service: ExecuteTestSuite_ICE");
-	if (isSessionActive(req)) {
+	if (utils.isSessionActive(req.session)) {
 		var name = req.session.username;
 		redisServer.redisSub2.subscribe('ICE2_' + name);
 		var batchExecutionData = req.body.moduleInfo;
@@ -732,9 +726,7 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 					logger.info("Sending socket request for executeTestSuite to redis");
 					dataToIce = {"emitAction" : "executeTestSuite","username" : name, "executionRequest": executionRequest};
 					redisServer.redisPub1.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
-					var updateSessionExpiry = setInterval(function () {
-							req.session.cookie.maxAge = sessionTime;
-						}, updateSessionTimeEvery);
+					var updateSessionExpiry = utils.resetSession(req.session);
 					function executeTestSuite_listener(channel,message) {
 						data = JSON.parse(message);
 						if(name == data.username){
@@ -1198,9 +1190,7 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 											logger.info("Sending socket request for executeTestSuite to redis");
 											dataToIce = {"emitAction" : "executeTestSuite","username" : name, "executionRequest": executionRequest};
 											redisServer.redisPub1.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
-											// var updateSessionExpiry = setInterval(function () {
-											// 		req.session.cookie.maxAge = sessionTime;
-											// 	}, updateSessionTimeEvery);
+											// var updateSessionExpiry = utils.resetSession(req.session);
 											function executeTestSuite_listener(channel,message) {
 												data = JSON.parse(message);
 												if(name == data.username){
@@ -1466,9 +1456,7 @@ exports.ExecuteTestSuite_ICE_CI = function (req, res) {
 					logger.info("Sending socket request for executeTestSuite to redis");
 					dataToIce = {"emitAction" : "executeTestSuite","username" : name, "executionRequest": executionRequest};
 					redisServer.redisPub1.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
-					var updateSessionExpiry = setInterval(function () {
-							req.session.cookie.maxAge = sessionTime;
-						}, updateSessionTimeEvery);
+					var updateSessionExpiry = utils.resetSession(req.session);
 					function executeTestSuite_listener(channel,message) {
 						data = JSON.parse(message);
 						if(name == data.username){
@@ -1866,7 +1854,7 @@ function TestCaseDetails_Suite_ICE(req, userid, cb, data) {
  */
 exports.getTestcaseDetailsForScenario_ICE = function (req, res) {
 	logger.info("Inside Ui service getTestcaseDetailsForScenario_ICE");
-	if (isSessionActive(req)) {
+	if (utils.isSessionActive(req.session)) {
 		var requiredtestscenarioid = req.body.testScenarioId;
 		logger.info("Calling function testcasedetails_testscenarios from getTestcaseDetailsForScenario_ICE");
 		testcasedetails_testscenarios(requiredtestscenarioid, function (err, data) {
@@ -2354,7 +2342,7 @@ function updatescenariodetailsinsuite(req, cb, data) {
 /***********************Scheduling jobs***************************/
 exports.testSuitesScheduler_ICE = function (req, res) {
 	logger.info("Inside UI service testSuitesScheduler_ICE");
-	if (isSessionActive(req)) {
+	if (utils.isSessionActive(req.session)) {
 		if(req.body.chkType == "schedule"){			
 			var modInfo = req.body.moduleInfo;
 			logger.info("Calling function scheduleTestSuite from testSuitesScheduler_ICE");
@@ -2647,9 +2635,7 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 									dataToIce = {"emitAction" : "executeTestSuite","username" : name, "executionRequest": executionRequest};
 									redisServer.redisPub1.publish('ICE1_scheduling_' + name,JSON.stringify(dataToIce));
 									var starttime = new Date().getTime();
-									var updateSessionExpiry = setInterval(function () {
-										req.session.cookie.maxAge = sessionTime;
-									}, updateSessionTimeEvery);
+									var updateSessionExpiry = utils.resetSession(req.session);
 									function executeTestSuite_listener(channel,message) {
 										data = JSON.parse(message);
 										if(name == data.username){
@@ -2868,7 +2854,7 @@ function updateStatus(sessObj, updateStatuscallback) {
 
 exports.getScheduledDetails_ICE = function (req, res) {
 	logger.info("Inside UI service getScheduledDetails_ICE");
-	if (isSessionActive(req)) {
+	if (utils.isSessionActive(req.session)) {
 		logger.info("Calling function getScheduledDetails from getScheduledDetails_ICE");
 		getScheduledDetails("getallscheduledata", function (err, getSchedcallback) {
 			if (err) {
@@ -2892,7 +2878,7 @@ exports.getScheduledDetails_ICE = function (req, res) {
 //cancel scheduled Jobs
 exports.cancelScheduledJob_ICE = function (req, res) {
 	logger.info("Inside UI service cancelScheduledJob_ICE");
-	if (isSessionActive(req)) {
+	if (utils.isSessionActive(req.session)) {
 		var cycleid = req.body.suiteDetails.cycleid;
 		var scheduleid = req.body.suiteDetails.scheduleid;
 		var schedStatus = req.body.schedStatus;

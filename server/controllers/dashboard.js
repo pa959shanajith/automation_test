@@ -6,20 +6,12 @@ var async = require('async');
 var jsreportClient = require("jsreport-client");
 var neo4jAPI = require('../controllers/neo4jAPI');
 var logger = require('../../logger');
-
-/*
-* Checks if the session is active
-*/
-function isSessionActive(req, res){
-    logger.info("Inside function isSessionActive");
-	var sessionToken = req.session.uniqueId;
-    return sessionToken != undefined && req.session.id == sessionToken;
-}
+var utils = require('../lib/utils');
 
   exports.loadDashboard = function(req, res){
     logger.info("Inside UI service: loadDashboard")
     try {
-      if(isSessionActive(req, res)){
+      if(utils.isSessionActive(req.session)){
         logger.info("Connecting to jsreport client from loadDashboard");
         var jsrclient = jsreportClient("https://" + req.headers.host + "/reportServer/");
         jsrclient.render({
@@ -232,7 +224,7 @@ function isSessionActive(req, res){
     logger.info("Inside UI service: loadDashboardData")  
     try {
       var projJson = {}
-      if (isSessionActive(req,res)) {
+      if (utils.isSessionActive(req.session)) {
         var user_id = req.body.userid;
         var jsonData;
         inputs = { "userid":user_id, "query":"allflag"};
@@ -279,7 +271,7 @@ function isSessionActive(req, res){
   exports.loadDashboard_2 = function(req, res){
     logger.info("Inside UI service: loadDashboard_2");
     try {
-      if(isSessionActive(req, res)){
+      if(utils.isSessionActive(req.session)){
         logger.info("Connecting to jsreport client from loadDashboard_2");
         var jsrclient = jsreportClient("https://" + req.headers.host + "/reportServer/");
         jsrclient.render({

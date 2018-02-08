@@ -5,20 +5,14 @@ var Client = require("node-rest-client").Client;
 var client = new Client();
 var epurl = "http://"+process.env.NDAC_IP+":"+process.env.NDAC_PORT+"/";
 var sessionExtend = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes 
-var sessionTime = 30 * 60 * 1000;
-var updateSessionTimeEvery = 20 * 60 * 1000;
 var validator =  require('validator');
 var logger = require('../../logger');
-
-function isSessionActive(req){
-	var sessionToken = req.session.uniqueId;
-    return sessionToken != undefined && req.session.id == sessionToken;
-}
+var utils = require('../lib/utils');
 
 exports.Encrypt_ICE = function getDomains_ICE(req, res) {
 	try {
 		logger.info("Inside UI service: Encrypt_ICE");
-		if (isSessionActive(req)) {
+		if (utils.isSessionActive(req.session)) {
 			var methodSelected = req.body.encryptionType;
 			var encrytData = req.body.encryptionValue;
 			var encryptedValue;
@@ -138,7 +132,7 @@ exports.Encrypt_ICE = function getDomains_ICE(req, res) {
 };
 
 // exports.pairwise_ICE = function(req, res) {
-//  	if (isSessionActive(req)) {
+//  	if (utils.isSessionActive(req.session)) {
 // 			var abc = {}
 // 			abc.key = req.body.dataObj;
 // 			var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
@@ -150,9 +144,7 @@ exports.Encrypt_ICE = function getDomains_ICE(req, res) {
 // 				mySocket._events.pairwise = [];
 // 			//mySocket.send(dataObj);
 // 				mySocket.emit("pairwise", abc );//Sending
-// 				var updateSessionExpiry = setInterval(function () {
-// 					req.session.cookie.maxAge = sessionTime;
-// 				},updateSessionTimeEvery);
+// 				var updateSessionExpiry =utils.resetSession(req.session);
 // 				//Receiving
 // 				mySocket.on('result_pairs', function (data) {
 // 					//req.session.cookie.expires = sessionExtend;
