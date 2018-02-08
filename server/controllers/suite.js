@@ -10,17 +10,11 @@ var Client = require("node-rest-client").Client;
 var neo4jAPI = require('../controllers/neo4jAPI');
 var client = new Client();
 var schedule = require('node-schedule');
-var sessionTime = 30 * 60 * 1000;
-var updateSessionTimeEvery = 20 * 60 * 1000;
 var scheduleStatus = "";
 var logger = require('../../logger');
 var redisServer = require('../lib/redisSocketHandler');
+var utils = require('../lib/utils');
 var qList = [];
-
-function isSessionActive(req){
-	var sessionToken = req.session.uniqueId;
-    return sessionToken != undefined && req.session.id == sessionToken;
-}
 
 /**
  * @author vishvas.a
@@ -32,7 +26,7 @@ function isSessionActive(req){
 exports.readTestSuite_ICE = function (req, res) {
 	logger.info("Inside UI service: readTestSuite_ICE");
 	qList = [];
-	if (isSessionActive(req)) {
+	if (utils.isSessionActive(req.session)) {
 		var requiredreadTestSuite = req.body.readTestSuite;
 		var fromFlg = req.body.fromFlag;
 		var responsedata = {};
@@ -143,11 +137,7 @@ exports.readTestSuite_ICE = function (req, res) {
 												responsedata[eachSuite.testsuiteid] = respeachscenario;
 												if (testsuitesindex == requiredreadTestSuite.length) {
 													if (fromFlg == "scheduling") {
-														var connectusers = [];
-														redisServer.redisPub1.pubsub('channels','ICE1_scheduling_*',function(err,redisres){
-															redisres.forEach(function(e){
-																connectusers.push(e.split('_')[2]);
-															});
+														utils.scheduleSocketList(function(connectusers){
 															logger.debug("IP\'s connected : %s", connectusers.join());
 															var schedulingDetails = {
 																"connectedUsers": connectusers,
@@ -303,17 +293,12 @@ function readTestSuite_ICE_SVN(req,callback) {
 													responsedata[eachSuite.testsuitename] = respeachscenario;
 													if (testsuitesindex == requiredreadTestSuite.length) {
 														if (fromFlg == "scheduling") {
-															var connectusers = [];
-															redisServer.redisPub1.pubsub('channels','ICE1_scheduling_*',function(err,redisres){
-																redisres.forEach(function(e){
-																	connectusers.push(e.split('_')[2]);
-																});
+															utils.scheduleSocketList(function(connectusers){
 																logger.debug("IP\'s connected : %s", connectusers.join());
 																var schedulingDetails = {
 																	"connectedUsers": connectusers,
 																	"testSuiteDetails": responsedata
 																};
-																//res(200, schedulingDetails);
 																callback(true);
 															});
 														} else
@@ -426,7 +411,7 @@ function Projectnametestcasename_ICE(req, cb, data) {
 exports.updateTestSuite_ICE = function (req, res) {
 	logger.info("Inside UI service: updateTestSuite_ICE");
     qList = [];
-	if (isSessionActive(req)) {
+	if (utils.isSessionActive(req.session)) {
 		var userinfo = req.body.batchDetails.userinfo;
 		var batchDetails = req.body.batchDetails.suiteDetails;
 		var batchDetailslength = batchDetails.length;
@@ -607,7 +592,7 @@ function updateExecutionStatus(testsuiteid, executionid, starttime, suiteStatus)
  */
 exports.ExecuteTestSuite_ICE = function (req, res) {
 	logger.info("Inside UI service: ExecuteTestSuite_ICE");
-	if (isSessionActive(req)) {
+	if (utils.isSessionActive(req.session)) {
 		var name = req.session.username;
 		redisServer.redisSub2.subscribe('ICE2_' + name);
 		var batchExecutionData = req.body.moduleInfo;
@@ -728,13 +713,11 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 			var suiteStatus;
 			logger.debug("ICE Socket requesting Address: %s" , name);
 			redisServer.redisPub1.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
-				if (redisres[1]==1) {
+				if (redisres[1]>0) {
 					logger.info("Sending socket request for executeTestSuite to redis");
 					dataToIce = {"emitAction" : "executeTestSuite","username" : name, "executionRequest": executionRequest};
 					redisServer.redisPub1.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
-					var updateSessionExpiry = setInterval(function () {
-							req.session.cookie.maxAge = sessionTime;
-						}, updateSessionTimeEvery);
+					var updateSessionExpiry = utils.resetSession(req.session);
 					function executeTestSuite_listener(channel,message) {
 						data = JSON.parse(message);
 						if(name == data.username){
@@ -837,15 +820,15 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 					}
 					redisServer.redisSub2.on("message",executeTestSuite_listener);
 				} else {
-					logger.error("Error occured in the function executionFunction: Socket not Available");
-					//res.send("unavailableLocalServer");
-					if(Object.keys(myserver.allSchedulingSocketsMap).length > 0)
-					{
-						res.send("scheduleModeOn");
-					}
-					else{
-						res.send("unavailableLocalServer");
-					}
+					utils.getChannelNum('ICE1_scheduling_' + name, function(found){
+						var flag="";
+						if (found) flag = "scheduleModeOn";
+						else {
+							flag = "unavailableLocalServer";
+							logger.error("Error occured in the function executionFunction: Socket not Available");
+						}
+						res.send(flag);
+					});
 				}
 			});
 		}
@@ -884,13 +867,7 @@ exports.getListofScheduledSocketMap = function (req, res) {
 			}
 			if(validUser){
 				logger.info("Inside UI service: getListofScheduledSocketMap authentication pass");
-				// Commented for LB
-				// res.send({ "status": "success", "username": Object.keys(myserver.allSchedulingSocketsMap),"validation": "Passed"});
-				var connectusers = [];
-				redisServer.redisPub1.pubsub('channels','ICE1_scheduling_*',function(err,redisres){
-					redisres.forEach(function(e){
-						connectusers.push(e.split('_')[2]);
-					});
+				utils.scheduleSocketList(function(connectusers){
 					res.send({ "status": "success", "username": connectusers,"tokenValidation": "Passed"});
 				});
 			}else{
@@ -1194,13 +1171,11 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 									var statusPass = 0;
 									var suiteStatus;
 									redisServer.redisPub1.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
-										if (redisres[1]==1) {
+										if (redisres[1]>0) {
 											logger.info("Sending socket request for executeTestSuite to redis");
 											dataToIce = {"emitAction" : "executeTestSuite","username" : name, "executionRequest": executionRequest};
 											redisServer.redisPub1.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
-											// var updateSessionExpiry = setInterval(function () {
-											// 		req.session.cookie.maxAge = sessionTime;
-											// 	}, updateSessionTimeEvery);
+											// var updateSessionExpiry = utils.resetSession(req.session);
 											function executeTestSuite_listener(channel,message) {
 												data = JSON.parse(message);
 												if(name == data.username){
@@ -1300,15 +1275,15 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 											}
 											redisServer.redisSub2.on("message",executeTestSuite_listener);
 										} else {
-											logger.error("Error occured in ExecuteTestSuite_ICE_SVN service: Socket not Available");
-											//res.send("unavailableLocalServer");
-											if(Object.keys(myserver.allSchedulingSocketsMap).length > 0)
-											{
-												res.send("scheduleModeOn");
-											}
-											else{
-												res.send("unavailableLocalServer");
-											}
+											utils.getChannelNum('ICE1_scheduling_' + name, function(found){
+												var flag="";
+												if (found) flag = "scheduleModeOn";
+												else {
+													flag = "unavailableLocalServer";
+													logger.error("Error occured in ExecuteTestSuite_ICE_SVN service: Socket not Available");
+												}
+												res.send(flag);
+											});
 										}
 									});
 								}
@@ -1462,13 +1437,11 @@ exports.ExecuteTestSuite_ICE_CI = function (req, res) {
 			var suiteStatus;
 			logger.info("ICE Socket requesting Address: %s" , name);
 			redisServer.redisPub1.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
-				if (redisres[1]==1) {
+				if (redisres[1]>0) {
 					logger.info("Sending socket request for executeTestSuite to redis");
 					dataToIce = {"emitAction" : "executeTestSuite","username" : name, "executionRequest": executionRequest};
 					redisServer.redisPub1.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
-					var updateSessionExpiry = setInterval(function () {
-							req.session.cookie.maxAge = sessionTime;
-						}, updateSessionTimeEvery);
+					var updateSessionExpiry = utils.resetSession(req.session);
 					function executeTestSuite_listener(channel,message) {
 						data = JSON.parse(message);
 						if(name == data.username){
@@ -1568,15 +1541,15 @@ exports.ExecuteTestSuite_ICE_CI = function (req, res) {
 					}
 					redisServer.redisSub2.on("message",executeTestSuite_listener);
 				} else {
-					logger.error("Error occured in the function executionFunction in ExecuteTestSuite_ICE_CI: Socket not Available");
-					//res.send("unavailableLocalServer");
-					if(Object.keys(myserver.allSchedulingSocketsMap).length > 0)
-					{
-						res.send("scheduleModeOn");
-					}
-					else{
-						res.send("unavailableLocalServer");
-					}
+					utils.getChannelNum('ICE1_scheduling_' + name, function(found){
+						var flag="";
+						if (found) flag = "scheduleModeOn";
+						else {
+							flag = "unavailableLocalServer";
+							logger.error("Error occured in the function executionFunction in ExecuteTestSuite_ICE_CI: Socket not Available");
+						}
+						res.send(flag);
+					});
 				}
 			});
 		}
@@ -1866,7 +1839,7 @@ function TestCaseDetails_Suite_ICE(req, userid, cb, data) {
  */
 exports.getTestcaseDetailsForScenario_ICE = function (req, res) {
 	logger.info("Inside Ui service getTestcaseDetailsForScenario_ICE");
-	if (isSessionActive(req)) {
+	if (utils.isSessionActive(req.session)) {
 		var requiredtestscenarioid = req.body.testScenarioId;
 		logger.info("Calling function testcasedetails_testscenarios from getTestcaseDetailsForScenario_ICE");
 		testcasedetails_testscenarios(requiredtestscenarioid, function (err, data) {
@@ -2354,7 +2327,7 @@ function updatescenariodetailsinsuite(req, cb, data) {
 /***********************Scheduling jobs***************************/
 exports.testSuitesScheduler_ICE = function (req, res) {
 	logger.info("Inside UI service testSuitesScheduler_ICE");
-	if (isSessionActive(req)) {
+	if (utils.isSessionActive(req.session)) {
 		if(req.body.chkType == "schedule"){			
 			var modInfo = req.body.moduleInfo;
 			logger.info("Calling function scheduleTestSuite from testSuitesScheduler_ICE");
@@ -2642,14 +2615,12 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 							var suiteStatus_s;
 							logger.debug("ICE Socket requesting Address: %s" , name);
 							redisServer.redisPub1.pubsub('numsub','ICE1_scheduling_' + name,function(err,redisres){
-								if (redisres[1]==1) {
+								if (redisres[1]>0) {
 									logger.info("Sending socket request for executeTestSuite:scheduling to redis");
 									dataToIce = {"emitAction" : "executeTestSuite","username" : name, "executionRequest": executionRequest};
 									redisServer.redisPub1.publish('ICE1_scheduling_' + name,JSON.stringify(dataToIce));
 									var starttime = new Date().getTime();
-									var updateSessionExpiry = setInterval(function () {
-										req.session.cookie.maxAge = sessionTime;
-									}, updateSessionTimeEvery);
+									var updateSessionExpiry = utils.resetSession(req.session);
 									function executeTestSuite_listener(channel,message) {
 										data = JSON.parse(message);
 										if(name == data.username){
@@ -2868,7 +2839,7 @@ function updateStatus(sessObj, updateStatuscallback) {
 
 exports.getScheduledDetails_ICE = function (req, res) {
 	logger.info("Inside UI service getScheduledDetails_ICE");
-	if (isSessionActive(req)) {
+	if (utils.isSessionActive(req.session)) {
 		logger.info("Calling function getScheduledDetails from getScheduledDetails_ICE");
 		getScheduledDetails("getallscheduledata", function (err, getSchedcallback) {
 			if (err) {
@@ -2892,7 +2863,7 @@ exports.getScheduledDetails_ICE = function (req, res) {
 //cancel scheduled Jobs
 exports.cancelScheduledJob_ICE = function (req, res) {
 	logger.info("Inside UI service cancelScheduledJob_ICE");
-	if (isSessionActive(req)) {
+	if (utils.isSessionActive(req.session)) {
 		var cycleid = req.body.suiteDetails.cycleid;
 		var scheduleid = req.body.suiteDetails.scheduleid;
 		var schedStatus = req.body.schedStatus;

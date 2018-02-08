@@ -5,11 +5,6 @@ var Client = require("node-rest-client").Client;
 var client = new Client();
 var epurl = "http://"+process.env.NDAC_IP+":"+process.env.NDAC_PORT+"/";
 
-function isSessionActive(req){
-	var sessionToken = req.session.uniqueId;
-    return sessionToken != undefined && req.session.id == sessionToken;
-}
-
 var parseData = function(data){
 	logger.info("Inside function: parseData ");
 	var rootIndex=-1;
@@ -68,7 +63,7 @@ var cleanData = function(data){
 exports.getGraphData = function(req, res){
 	logger.info("Inside UI service: getGraphData");
 	try{
-		if (isSessionActive(req)) {
+		if (utils.isSessionActive(req.session)) {
 			var qList=[];
 			//var urlData=req.get('host').split(':');
 			var userid=req.body.uid;

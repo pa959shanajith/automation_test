@@ -6,15 +6,11 @@ var neo4jAPI = require('../controllers/neo4jAPI');
 var async = require('async');
 var myserver = require('../lib/socket.js');
 var notificationMsg = require("../notifications/notifyMessages");
-
-function isSessionActive(req){
-	var sessionToken = req.session.uniqueId;
-    return sessionToken != undefined && req.session.id == sessionToken;
-}
+var utils = require('../lib/utils');
 
 exports.getVersions=function(req,res){
 	logger.info("Inside UI service: getVersions");
-	if (isSessionActive(req)) {
+	if (utils.isSessionActive(req.session)) {
 		var prjId = req.body.projectId;
 		var urlData = req.get('host').split(':');
 		logger.info('Inside the getVersion task of UI Service versioning ');
@@ -62,11 +58,15 @@ exports.getVersions=function(req,res){
 
 exports.getModulesVersioning=function(req,res){
 	logger.info("Inside UI service: getModulesVersioning");
-	if (isSessionActive(req)) {
+	if (utils.isSessionActive(req.session)) {
 			logger.info('Inside the getModules task of UI Service versioning ')
 			var nData = [], qList = [], idDict = {};
-			var prjId = req.body.prjId;
-			var version = req.body.version;
+			var inputs=req.body;
+			var prjId = inputs.prjId;
+			var version = inputs.version;
+			var relId=inputs.relId;
+			var cycId=inputs.cycId;
+			var tab=inputs.tab;
 			qList.push({ "statement": " MATCH path=(n:VERSION{projectID:'" + prjId + "',versionNumber:" + version + "})-[r*1..]->(t) RETURN path", "resultDataContents": ["graph"] });
 			qList.push({ "statement": "MATCH path=(n:VERSION{projectID:'" + prjId + "',versionNumber:" + version + "}) WHERE NOT (n)-[:FMTTS]->() RETURN n", "resultDataContents": ["graph"] });
 			logger.info("Calling Neo4j API Service from versioning: project_versioning/versioning");
@@ -77,7 +77,7 @@ exports.getModulesVersioning=function(req,res){
 					res.status(status).send(result);
 				}
 				else {
-					var k = 0, rIndex = [], lbl, neoIdDict = {}, maps = [], tList = [];
+					var k = 0, rIndex = [], lbl, neoIdDict = {}, maps = [];
 					var attrDict = { "modules_endtoend": { "childIndex": "childIndex", "projectID": "projectID", "moduleName": "name", "moduleID": "id_n", "moduleID_c": "id_c" }, "modules": { "childIndex": "childIndex", "projectID": "pid_n", "moduleName": "name", "moduleID": "id_n", "moduleID_c": "id_c" }, "scenarios": { "projectID": "projectID", "childIndex": "childIndex", "moduleID": "pid_n", "testScenarioName": "name", "testScenarioID": "id_n", "testScenarioID_c": "id_c" }, "screens": { "childIndex": "childIndex", "testScenarioID": "pid_n", "screenName": "name", "screenID": "id_n", "screenID_c": "id_c" }, "testcases": { "childIndex": "childIndex", "screenID": "pid_n", "testCaseName": "name", "testCaseID": "id_n", "testCaseID_c": "id_c" }, "tasks": { "taskID": "id_n", "task": "t", "batchName": "bn", "assignedTo": "at", "reviewer": "rw", "startDate": "sd", "endDate": "ed", "re_estimation": "re_estimation", "release": "re", "cycle": "cy", "details": "det", "nodeID": "pid", "parent": "anc", "taskvn": "taskvn" } };
 					var jsonData = result;
 					var all_modules = jsonData[0].data;
@@ -117,7 +117,11 @@ exports.getModulesVersioning=function(req,res){
 							try {
 								var srcIndex = idDict[r.startNode.toString()];
 								var tgtIndex = idDict[r.endNode.toString()];
-								if (nData[tgtIndex].children === undefined) nData[srcIndex].task = nData[tgtIndex];
+								if(nData[tgtIndex].children===undefined ) {
+									if (tab=='tabAssign' && nData[tgtIndex].release==relId && nData[tgtIndex].cycle==cycId)
+										nData[srcIndex].task=nData[tgtIndex];
+								}
+								//if (nData[tgtIndex].children === undefined) nData[srcIndex].task = nData[tgtIndex];
 								else if (nData[srcIndex].children.indexOf(nData[tgtIndex]) == -1) {
 									nData[srcIndex].children.push(nData[tgtIndex]);
 									if (nData[tgtIndex].childIndex == undefined) {
@@ -130,7 +134,7 @@ exports.getModulesVersioning=function(req,res){
 							}
 						});
 					});
-					tList.forEach(function (t) { nData[neoIdDict[t.nodeID]].task = t; });
+					
 					nData.forEach(function (e) {
 						if (e.pid_n) {
 							if (neoIdDict[e.pid_n] !== undefined) e.pid_n = nData[neoIdDict[e.pid_n]].id;
@@ -153,7 +157,7 @@ exports.getModulesVersioning=function(req,res){
 
 exports.createVersion=function(req,res){
 	logger.info("Inside UI service: createVersion");
-	if (isSessionActive(req)) {
+	if (utils.isSessionActive(req.session)) {
 			var nData = [];
 			var inputs=req.body;
 			var prjId = inputs.srcprojectId;
@@ -386,7 +390,7 @@ exports.createVersion=function(req,res){
 }
 exports.getProjectsNeo=function(req,res){
 	logger.info("Inside UI service: getProjectsNeo");
-	if (isSessionActive(req)) {
+	if (utils.isSessionActive(req.session)) {
 		var qList = [];
 		qList.push({ "statement": "MATCH (n:MODULES) return distinct n.projectID" });
 		logger.info("Calling Neo4j API Service from versioning: project_versioning/versioning");
@@ -410,7 +414,7 @@ exports.getProjectsNeo=function(req,res){
 
 exports.saveDataVersioning=function(req,res){
 	logger.info("Inside UI service: saveDataVersioning");
-	if (isSessionActive(req)) {
+	if (utils.isSessionActive(req.session)) {
 		logger.info('Inside the UI Service saveDataVersioning')
 			var tasks =[];
 			var nameDict = {};
@@ -423,6 +427,8 @@ exports.saveDataVersioning=function(req,res){
 			var deletednodes=inputs.deletednode;
 			var vn_from=inputs.vn_from;
 			var vn_to=inputs.vn_from;
+			var relId=inputs.relId;
+			var cycId=inputs.cycId;
 			var user=req.session.username;
 			var flag=inputs.write;
 			var removeTask=inputs.unassignTask;
@@ -472,6 +478,11 @@ exports.saveDataVersioning=function(req,res){
 					nameDict[e.id] = e.name;
 					e.id = idDict[e.id];
 					t = e.task;
+					if(e.taskexists && e.task){
+						t.id=e.taskexists.id;
+						t.oid=e.taskexists.oid;
+						t.parent=e.taskexists.parent;
+					}					
 					var taskstatus = 'inprogress';
 					if (e.type == 'modules') {
 						moduleID=e.id;
@@ -496,13 +507,13 @@ exports.saveDataVersioning=function(req,res){
 
 							if (t.oid != null) {
 								if (t.updatedParent != undefined) {
-									qList.push({ "statement": "MATCH(n:TASKS{taskID:'" + t.id + "',nodeID:'" + e.id + "',parent:'[" + t.parent + "]',taskvn:" + parseFloat(vn_from) + "}) SET n.task='" + t.task + "',n.batchName='" + t.batchName + "',n.assignedTo='" + t.assignedTo + "',n.reviewer='" + t.reviewer + "',n.startDate='" + t.startDate + "',n.endDate='" + t.endDate + "',n.re_estimation='" + t.re_estimation + "',n.release='" + t.release + "',n.cycle='" + t.cycle + "',n.details='" + t.details + ",n.status='" + taskstatus + "',n.parent='[" + [prjId].concat(t.updatedParent) + "]'" });
+									qList.push({ "statement": "MATCH(n:TASKS{taskID:'" + t.id + "',nodeID:'" + e.id + "',parent:'[" + t.parent + "]',taskvn:" + parseFloat(vn_from) + "}) SET n.task='" + t.task + "',n.batchName='" + t.batchName + "',n.assignedTo='" + t.assignedTo + "',n.reviewer='" + t.reviewer + "',n.startDate='" + t.startDate + "',n.endDate='" + t.endDate + "',n.re_estimation='" + t.re_estimation + "',n.release='" + relId + "',n.cycle='" + cycId + "',n.details='" + t.details + ",n.status='" + taskstatus + "',n.parent='[" + [prjId].concat(t.updatedParent) + "]'" });
 								} else {
-									qList.push({ "statement": "MATCH(n:TASKS{taskID:'" + t.id + "',nodeID:'" + e.id + "',parent:'[" + t.parent + "]',taskvn:" + parseFloat(vn_from) + "}) SET n.task='" + t.task + "',n.batchName='" + t.batchName + "',n.status='" + taskstatus + "',n.assignedTo='" + t.assignedTo + "',n.reviewer='" + t.reviewer + "',n.startDate='" + t.startDate + "',n.endDate='" + t.endDate + "',n.re_estimation='" + t.re_estimation + "',n.release='" + t.release + "',n.cycle='" + t.cycle + "',n.details='" + t.details + "'" });
+									qList.push({ "statement": "MATCH(n:TASKS{taskID:'" + t.id + "',nodeID:'" + e.id + "',parent:'[" + t.parent + "]',taskvn:" + parseFloat(vn_from) + "}) SET n.task='" + t.task + "',n.batchName='" + t.batchName + "',n.status='" + taskstatus + "',n.assignedTo='" + t.assignedTo + "',n.reviewer='" + t.reviewer + "',n.startDate='" + t.startDate + "',n.endDate='" + t.endDate + "',n.re_estimation='" + t.re_estimation + "',n.release='" + relId + "',n.cycle='" + cycId + "',n.details='" + t.details + "'" });
 								}
 
 							}
-							else qList.push({ "statement": "MERGE(n:TASKS{taskID:'" + t.id + "',batchName:'" + t.batchName + "',task:'" + t.task + "',assignedTo:'" + t.assignedTo + "',status:'" + taskstatus + "',reviewer:'" + t.reviewer + "',startDate:'" + t.startDate + "',endDate:'" + t.endDate + "',re_estimation:'" + t.re_estimation + "',release:'" + t.release + "',cycle:'" + t.cycle + "',details:'" + t.details + "',nodeID:'" + e.id + "',parent:'[" + t.parent + "]',taskvn:" + parseFloat(vn_from) + "})" });
+							else qList.push({ "statement": "MERGE(n:TASKS{taskID:'" + t.id + "',batchName:'" + t.batchName + "',task:'" + t.task + "',assignedTo:'" + t.assignedTo + "',status:'" + taskstatus + "',reviewer:'" + t.reviewer + "',startDate:'" + t.startDate + "',endDate:'" + t.endDate + "',re_estimation:'" + t.re_estimation + "',release:'" + relId + "',cycle:'" + cycId + "',details:'" + t.details + "',nodeID:'" + e.id + "',parent:'[" + t.parent + "]',taskvn:" + parseFloat(vn_from) + "})" });
 							qList.push({ "statement": "MATCH (a:MODULES{moduleID:'"+e.id+"'}),(b:TASKS) WHERE a.moduleID=b.nodeID MERGE (a)-[r:FNTT {id:b.nodeID}]-(b)" });
 						}
 					}
@@ -521,13 +532,13 @@ exports.saveDataVersioning=function(req,res){
 
 							if (t.oid != null) {
 								if (t.updatedParent != undefined) {
-									qList.push({ "statement": "MATCH(n:TASKS{taskID:'" + t.id + "',nodeID:'" + e.id + "',parent:'[" + t.parent + "]',taskvn:" + parseFloat(vn_from) + "}) SET n.task='" + t.task + "',n.status='" + taskstatus + "',n.assignedTo='" + t.assignedTo + "',n.reviewer='" + t.reviewer + "',n.startDate='" + t.startDate + "',n.endDate='" + t.endDate + "',n.re_estimation='" + t.re_estimation + "',n.release='" + t.release + "',n.cycle='" + t.cycle + "',n.details='" + t.details + "',n.parent='[" + [prjId].concat(t.updatedParent) + "]'" });
+									qList.push({ "statement": "MATCH(n:TASKS{taskID:'" + t.id + "',nodeID:'" + e.id + "',parent:'[" + t.parent + "]',taskvn:" + parseFloat(vn_from) + "}) SET n.task='" + t.task + "',n.status='" + taskstatus + "',n.assignedTo='" + t.assignedTo + "',n.reviewer='" + t.reviewer + "',n.startDate='" + t.startDate + "',n.endDate='" + t.endDate + "',n.re_estimation='" + t.re_estimation + "',n.release='" + relId + "',n.cycle='" + cycId + "',n.details='" + t.details + "',n.parent='[" + [prjId].concat(t.updatedParent) + "]'" });
 								} else {
-									qList.push({ "statement": "MATCH(n:TASKS{taskID:'" + t.id + "',nodeID:'" + e.id + "',parent:'[" + t.parent + "]',taskvn:" + parseFloat(vn_from) + "}) SET n.task='" + t.task + "',n.status='" + taskstatus + "',n.assignedTo='" + t.assignedTo + "',n.reviewer='" + t.reviewer + "',n.startDate='" + t.startDate + "',n.endDate='" + t.endDate + "',n.re_estimation='" + t.re_estimation + "',n.release='" + t.release + "',n.cycle='" + t.cycle + "',n.details='" + t.details + "'" });
+									qList.push({ "statement": "MATCH(n:TASKS{taskID:'" + t.id + "',nodeID:'" + e.id + "',parent:'[" + t.parent + "]',taskvn:" + parseFloat(vn_from) + "}) SET n.task='" + t.task + "',n.status='" + taskstatus + "',n.assignedTo='" + t.assignedTo + "',n.reviewer='" + t.reviewer + "',n.startDate='" + t.startDate + "',n.endDate='" + t.endDate + "',n.re_estimation='" + t.re_estimation + "',n.release='" + relId + "',n.cycle='" + cycId + "',n.details='" + t.details + "'" });
 								}
 
 							}
-							else qList.push({ "statement": "MERGE(n:TASKS{taskID:'" + t.id + "',task:'" + t.task + "',assignedTo:'" + t.assignedTo + "',reviewer:'" + t.reviewer + "',status:'" + taskstatus + "',startDate:'" + t.startDate + "',endDate:'" + t.endDate + "',re_estimation:'" + t.re_estimation + "',release:'" + t.release + "',cycle:'" + t.cycle + "',details:'" + t.details + "',nodeID:'" + e.id + "',parent:'[" + t.parent + "]',taskvn:" + parseFloat(vn_from) + "})" });
+							else qList.push({ "statement": "MERGE(n:TASKS{taskID:'" + t.id + "',task:'" + t.task + "',assignedTo:'" + t.assignedTo + "',reviewer:'" + t.reviewer + "',status:'" + taskstatus + "',startDate:'" + t.startDate + "',endDate:'" + t.endDate + "',re_estimation:'" + t.re_estimation + "',release:'" + relId + "',cycle:'" + cycId + "',details:'" + t.details + "',nodeID:'" + e.id + "',parent:'[" + t.parent + "]',taskvn:" + parseFloat(vn_from) + "})" });
 								qList.push({"statement":"MATCH (a:TESTSCENARIOS{testScenarioID:'"+e.id+"'}),(b:TASKS{nodeID:'"+e.id+"'}) MERGE (a)-[r:FNTT {id:'"+e.id+"'}]-(b)"});
 						}
 						//qList.push({"statement":"MATCH(n:TESTSCENARIOS{testScenarioID:'"+e.id+"'}) SET n.testScenarioName='"+e.name+"'"+",n.projectID='"+prjId+"'"});
@@ -548,16 +559,16 @@ exports.saveDataVersioning=function(req,res){
 
 							if (t.oid != null) {
 								if (t.updatedParent != undefined) {
-									qList.push({ "statement": "MATCH(n:TASKS{taskID:'" + t.id + "',nodeID:'" + e.id + "',parent:'[" + t.parent + "]',taskvn:" + parseFloat(vn_from) + "}) SET n.task='" + t.task + "',n.assignedTo='" + t.assignedTo + "',n.status='" + taskstatus + "',n.reviewer='" + t.reviewer + "',n.startDate='" + t.startDate + "',n.endDate='" + t.endDate + "',n.re_estimation='" + t.re_estimation + "',n.details='" + t.details + "',n.uid='" + uidx + "',n.parent='[" + [prjId].concat(t.updatedParent) + "]'" });
+									qList.push({ "statement": "MATCH(n:TASKS{taskID:'" + t.id + "',nodeID:'" + e.id + "',parent:'[" + t.parent + "]',taskvn:" + parseFloat(vn_from) + "}) SET n.task='" + t.task + "',n.assignedTo='" + t.assignedTo + "',n.status='" + taskstatus + "',n.reviewer='" + t.reviewer + "',n.startDate='" + t.startDate + "',n.endDate='" + t.endDate + "',n.release='" + relId + "',n.cycle='" + cycId + "',n.re_estimation='" + t.re_estimation + "',n.details='" + t.details + "',n.uid='" + uidx + "',n.parent='[" + [prjId].concat(t.updatedParent) + "]'" });
 								} else {
-									qList.push({ "statement": "MATCH(n:TASKS{taskID:'" + t.id + "',nodeID:'" + e.id + "',parent:'[" + t.parent + "]',taskvn:" + parseFloat(vn_from) + "}) SET n.task='" + t.task + "',n.assignedTo='" + t.assignedTo + "',n.status='" + taskstatus + "',n.reviewer='" + t.reviewer + "',n.startDate='" + t.startDate + "',n.endDate='" + t.endDate + "',n.re_estimation='" + t.re_estimation + "',n.details='" + t.details + "',n.uid='" + uidx + "'" });
+									qList.push({ "statement": "MATCH(n:TASKS{taskID:'" + t.id + "',nodeID:'" + e.id + "',parent:'[" + t.parent + "]',taskvn:" + parseFloat(vn_from) + "}) SET n.task='" + t.task + "',n.assignedTo='" + t.assignedTo + "',n.status='" + taskstatus + "',n.reviewer='" + t.reviewer + "',n.startDate='" + t.startDate + "',n.endDate='" + t.endDate + "',n.release='" + relId + "',n.cycle='" + cycId + "',n.re_estimation='" + t.re_estimation + "',n.details='" + t.details + "',n.uid='" + uidx + "'" });
 								}
 								qList.push({"statement":"MATCH (a:SCREENS{screenID:'"+e.id+"'}),(b:TASKS{nodeID:'"+e.id+"'}) MERGE (a)-[r:FNTT {id:'"+e.id+"'}]-(b)"});
 							}
 							else {
 
 								t.parent = [prjId].concat(t.parent);
-								qList.push({ "statement": "MERGE(n:TASKS{taskID:'" + t.id + "',task:'" + t.task + "',assignedTo:'" + t.assignedTo + "',reviewer:'" + t.reviewer + "',status:'" + taskstatus + "',startDate:'" + t.startDate + "',endDate:'" + t.endDate + "',re_estimation:'" + t.re_estimation + "',details:'" + t.details + "',nodeID:'" + e.id + "',parent:'[" + t.parent + "]',uid:'" + uidx + "',taskvn:" + parseFloat(vn_from) + "})" });
+								qList.push({ "statement": "MERGE(n:TASKS{taskID:'" + t.id + "',task:'" + t.task + "',assignedTo:'" + t.assignedTo + "',reviewer:'" + t.reviewer + "',status:'" + taskstatus + "',startDate:'" + t.startDate + "',endDate:'" + t.endDate + "',re_estimation:'" + t.re_estimation + "',details:'" + t.details + "',nodeID:'" + e.id + "',parent:'[" + t.parent + "]',release:'" + relId + "',cycle:'" + cycId + "',uid:'" + uidx + "',taskvn:" + parseFloat(vn_from) + "})" });
 							}
 						}
 					}
@@ -583,16 +594,16 @@ exports.saveDataVersioning=function(req,res){
 							//var parent=[prjId].concat(t.parent);
 							if (t.oid != null) {
 								if (t.updatedParent != undefined) {
-									qList.push({ "statement": "MATCH(n:TASKS{taskID:'" + t.id + "',nodeID:'" + e.id + "',parent:'[" + t.parent + "]',taskvn:" + parseFloat(vn_from) + "}) SET n.task='" + t.task + "',n.assignedTo='" + t.assignedTo + "',n.reviewer='" + t.reviewer + "',n.status='" + taskstatus + "',n.startDate='" + t.startDate + "',n.endDate='" + t.endDate + "',n.re_estimation='" + t.re_estimation + "',n.details='" + t.details + "',n.uid='" + uidx + "',n.parent='[" + [prjId].concat(t.updatedParent) + "]'" });
+									qList.push({ "statement": "MATCH(n:TASKS{taskID:'" + t.id + "',nodeID:'" + e.id + "',parent:'[" + t.parent + "]',taskvn:" + parseFloat(vn_from) + "}) SET n.task='" + t.task + "',n.assignedTo='" + t.assignedTo + "',n.reviewer='" + t.reviewer + "',n.status='" + taskstatus + "',n.startDate='" + t.startDate + "',n.endDate='" + t.endDate + "',n.release='" + relId + "',n.cycle='" + cycId + "',n.re_estimation='" + t.re_estimation + "',n.details='" + t.details + "',n.uid='" + uidx + "',n.parent='[" + [prjId].concat(t.updatedParent) + "]'" });
 								} else {
-									qList.push({ "statement": "MATCH(n:TASKS{taskID:'" + t.id + "',nodeID:'" + e.id + "',parent:'[" + t.parent + "]',taskvn:" + parseFloat(vn_from) + "}) SET n.task='" + t.task + "',n.assignedTo='" + t.assignedTo + "',n.reviewer='" + t.reviewer + "',n.status='" + taskstatus + "',n.startDate='" + t.startDate + "',n.endDate='" + t.endDate + "',n.re_estimation='" + t.re_estimation + "',n.details='" + t.details + "',n.uid='" + uidx + "'" });
+									qList.push({ "statement": "MATCH(n:TASKS{taskID:'" + t.id + "',nodeID:'" + e.id + "',parent:'[" + t.parent + "]',taskvn:" + parseFloat(vn_from) + "}) SET n.task='" + t.task + "',n.assignedTo='" + t.assignedTo + "',n.reviewer='" + t.reviewer + "',n.status='" + taskstatus + "',n.startDate='" + t.startDate + "',n.endDate='" + t.endDate + "',n.release='" + relId + "',n.cycle='" + cycId + "',n.re_estimation='" + t.re_estimation + "',n.details='" + t.details + "',n.uid='" + uidx + "'" });
 								}
 								qList.push({"statement":"MATCH (a:TESTCASES{testCaseID:'"+e.id+"'}),(b:TASKS{nodeID:'"+e.id+"'}) MERGE (a)-[r:FNTT {id:'"+e.id+"'}]-(b)"})
 							}
 							else {
 
 								t.parent = [prjId].concat(t.parent);
-								qList.push({ "statement": "MERGE(n:TASKS{taskID:'" + t.id + "',task:'" + t.task + "',assignedTo:'" + t.assignedTo + "',status:'" + taskstatus + "',reviewer:'" + t.reviewer + "',startDate:'" + t.startDate + "',endDate:'" + t.endDate + "',re_estimation:'" + t.re_estimation + "',details:'" + t.details + "',nodeID:'" + e.id + "',parent:'[" + t.parent + "]',uid:'" + uidx + "',taskvn:" + parseFloat(vn_from) + "})" });
+								qList.push({ "statement": "MERGE(n:TASKS{taskID:'" + t.id + "',task:'" + t.task + "',assignedTo:'" + t.assignedTo + "',status:'" + taskstatus + "',reviewer:'" + t.reviewer + "',startDate:'" + t.startDate + "',endDate:'" + t.endDate + "',re_estimation:'" + t.re_estimation + "',details:'" + t.details + "',release:'" + relId + "',cycle:'" + cycId + "',nodeID:'" + e.id + "',parent:'[" + t.parent + "]',uid:'" + uidx + "',taskvn:" + parseFloat(vn_from) + "})" });
 							}
 						}
 					}
@@ -620,7 +631,7 @@ exports.saveDataVersioning=function(req,res){
 					else {
 						var k = 0, rIndex, lbl, neoIdDict = {};
 						idDict = {};
-						var attrDict = { "modules": { "childIndex": "childIndex", "projectID": "pid_n", "moduleName": "name", "moduleID": "id_n", "moduleID_c": "id_c" }, "scenarios": { "childIndex": "childIndex", "moduleID": "pid_n", "testScenarioName": "name", "testScenarioID": "id_n", "testScenarioID_c": "id_c" }, "screens": { "childIndex": "childIndex", "testScenarioID": "pid_n", "screenName": "name", "screenID": "id_n", "screenID_c": "id_c" }, "testcases": { "childIndex": "childIndex", "screenID": "pid_n", "testCaseName": "name", "testCaseID": "id_n", "testCaseID_c": "id_c" }, "tasks": { "taskID": "id_n", "task": "t", "batchName": "bn", "assignedTo": "at", "reviewer": "rw", "startDate": "sd", "endDate": "ed", "re_estimation":"re_estimation", "release": "re", "cycle": "cy", "details": "det", "nodeID": "pid", "parent": "anc", "taskvn": "taskvn" } };
+						var attrDict = { "modules": { "childIndex": "childIndex", "projectID": "pid_n", "moduleName": "name", "moduleID": "id_n", "moduleID_c": "id_c" }, "scenarios": { "childIndex": "childIndex", "moduleID": "pid_n", "testScenarioName": "name", "testScenarioID": "id_n", "testScenarioID_c": "id_c" }, "screens": { "childIndex": "childIndex", "testScenarioID": "pid_n", "screenName": "name", "screenID": "id_n", "screenID_c": "id_c","taskexists":"taskexists" }, "testcases": { "childIndex": "childIndex", "screenID": "pid_n", "testCaseName": "name", "testCaseID": "id_n", "testCaseID_c": "id_c" ,"taskexists":"taskexists"}, "tasks": { "taskID": "id_n", "task": "t", "batchName": "bn", "assignedTo": "at", "reviewer": "rw", "startDate": "sd", "endDate": "ed", "re_estimation":"re_estimation", "release": "re", "cycle": "cy", "details": "det", "nodeID": "pid", "parent": "anc", "taskvn": "taskvn" } };
 						var jsonData = (result);
 
 						var new_res = jsonData[jsonData.length - 1].data;
@@ -649,11 +660,19 @@ exports.saveDataVersioning=function(req,res){
 							row.graph.relationships.forEach(function (r) {
 								var srcIndex = idDict[r.startNode.toString()];
 								var tgtIndex = idDict[r.endNode.toString()];
-								if (nData[tgtIndex].children === undefined) nData[srcIndex].task = nData[tgtIndex];
-								else if (nData[srcIndex].children.indexOf(nData[tgtIndex]) == -1) {
+								if(nData[tgtIndex].children===undefined){
+									if((tab=='tabAssign'&& nData[tgtIndex].release==relId && nData[tgtIndex].cycle==cycId)||tab=='tabCreate'||tab=='endToend'){
+										nData[srcIndex].task=nData[tgtIndex];
+									}else if(nData[srcIndex].type=='testcases' || nData[srcIndex].type=='screens'){
+										nData[srcIndex].taskexists=nData[tgtIndex];
+									}
+										
+								} 
+								else if(nData[srcIndex].children.indexOf(nData[tgtIndex])==-1){
 									nData[srcIndex].children.push(nData[tgtIndex]);
-									if (nData[tgtIndex].childIndex == undefined) nData[tgtIndex].childIndex = nData[srcIndex].children.length;
-
+									if(nData[tgtIndex].childIndex==undefined){
+										nData[tgtIndex].childIndex=nData[srcIndex].children.length;
+									}
 								}
 							});
 						});

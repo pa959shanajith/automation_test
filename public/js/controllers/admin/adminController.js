@@ -7,6 +7,9 @@ var newProjectDetails = [];
 var unAssignedProjects = []; var assignedProjects = [];var projectData =[];var valid = "";var getAssignedProjectsLen=0;
 mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServices','$timeout','cfpLoadingBar', function ($scope, $rootScope, $http, adminServices, $timeout, cfpLoadingBar) {
 	$("body").css("background","#eee");
+	
+	localStorage.setItem("navigateEnable", false);
+
 	$('.dropdown').on('show.bs.dropdown', function(e){
 		$(this).find('.dropdown-menu').first().stop(true, true).slideDown(300);
 	});
@@ -483,6 +486,23 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 		var reg = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 		//var regexPassword = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[^\w\s]).{8,16}$/;
 		var regexPassword = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~]).{8,16}$/;
+		var regCheck = /^[a-zA-Z0-9\_]+$/
+		var regCheckUsername = /^[a-zA-Z0-9\_\.]+$/
+
+		if(regCheckUsername.test($("#userName").val()) == false){
+			openModelPopup("Error", "Username cannot contain special characters other than _ and .");			
+			$("#userName").addClass("inputErrorBorder");
+			return;
+		}else if(regCheck.test($("#firstName").val()) == false){
+			openModelPopup("Error", "First name cannot contain special characters other than _");
+			$("#firstName").addClass("inputErrorBorder");
+			return;
+		}else if(regCheck.test($("#lastName").val()) == false){
+			openModelPopup("Error", "Last name cannot contain special characters other than _");
+			$("#lastName").addClass("inputErrorBorder");
+			return;
+		}
+
 		if(!$scope.citoken){
 			if ($("#userName").val() == "") {
 				$("#userName").addClass("inputErrorBorder");
@@ -520,12 +540,10 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 			}
 			else if($('#userRoles option:selected').val() == "") {
 				$("#userRoles").css('border','').addClass("selectErrorBorder");
-			}
-			else {
+			}else {
 				createUserfn();
 			}
-		}
-		else{
+		}else{
 			createUserfn();
 		}
 		function createUserfn(){
@@ -2477,7 +2495,7 @@ $(document).on("keydown", ".validationKeydown", function(e) {
 		}
 		if(e.target.id == 'firstName' || e.target.id == 'lastName')
 		{
-			if(e.keyCode == 192 ){
+			if(e.keyCode == 32 || e.keyCode == 192 ){
 				return false;
 			}
 		}
@@ -2534,10 +2552,8 @@ $(document).on('cut copy paste','.preventSpecialChar', function(e){
 		var reg = /^[a-zA-Z0-9\_]+$/
 		if(reg.test(val)){
 			return true;
-		}
-		else if(val == ''){
-		}
-		else{
+		}else if(val == ''){
+		}else{
 			openModelPopup("Incorrect Inputs", "Cannot contain special characters other than _");
 			$("#"+id).val('');
 			return false;

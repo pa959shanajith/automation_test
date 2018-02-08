@@ -20,7 +20,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 	loadUserTasks()
 
 	socket.on('ICEnotAvailable', function () {
-		$('.modal-backdrop').remove();
+		unblockUI();
 		openDialogExe("Execute Test Suite", "ICE Engine is not available. Please run the batch file and connect to the Server.");
 	});
 	/*var taskAuth;

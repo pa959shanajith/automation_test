@@ -1,15 +1,11 @@
 var async = require('async');
 var neo4jAPI = require('../controllers/neo4jAPI');
 var logger = require('../../logger');
-
-function isSessionActive(req){
-	var sessionToken = req.session.uniqueId;
-    return sessionToken != undefined && req.session.id == sessionToken;
-}
+var utils = require('../lib/utils');
 
 exports.updateTaskstatus_mindmaps = function (req, res) {
 	logger.info("Inside UI service: updateTaskstatus_mindmaps");
-	if (isSessionActive(req)) {
+	if (utils.isSessionActive(req.session)) {
 		try {
 			var obj=req.body.obj;
 			var qlist_query = [{'statement': "MATCH (n:TASKS{taskID:'"+obj+"'}) set n.status='inprogress'"}];
@@ -32,7 +28,7 @@ exports.updateTaskstatus_mindmaps = function (req, res) {
 
 exports.getTaskJson_mindmaps = function (req, res) {
 	logger.info("Inside UI service: getTaskJson_mindmaps");
-	if (isSessionActive(req)) {
+	if (utils.isSessionActive(req.session)) {
 		try {
 			var userid = req.session.userid;
 			var prjId=req.body.obj;

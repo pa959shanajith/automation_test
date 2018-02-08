@@ -55,7 +55,7 @@ mySPA.controller('reportsController', ['$scope','$rootScope', '$http', '$locatio
 			$('.progress-bar-success, .progress-bar-danger, .progress-bar-warning, .progress-bar-norun').css('width','0%');
 			$('.passPercent, .failPercent, .terminatePercent, .incompletePercent').text('');
 			if($(".dynamicTestsuiteContainer").is(":Visible")){
-				$('.iconSpace').trigger('click');
+				$('.iconSpace-reports').trigger('click');
 			}
 			getProjectsAndSuites(projectId, "reports");
 		}
@@ -223,7 +223,7 @@ mySPA.controller('reportsController', ['$scope','$rootScope', '$http', '$locatio
 			console.log("Error-------"+error);
 		})
 		if($('.dynamicTestsuiteContainer').is(':Visible')){
-			$('.iconSpace').trigger('click');
+			$('.iconSpace-reports').trigger('click');
 		}
 	})
 
@@ -413,7 +413,7 @@ mySPA.controller('reportsController', ['$scope','$rootScope', '$http', '$locatio
 		$('.formatpdfbrwsrexport').remove();
 	})
 
-	$(document).on('click','.iconSpace', function(){
+	function onIconSpaceClick(){
 		$elem = $(this);
 		if(open == 0){
 			//getting the next element
@@ -423,7 +423,7 @@ mySPA.controller('reportsController', ['$scope','$rootScope', '$http', '$locatio
 				$(".scroll-content").parent(".upper-collapsible-section").find(".suitedropdownicon").remove();
 			}
 			$(".scroll-content").parent(".upper-collapsible-section").append($elem.parent());
-			$(".suitedropdownicon").children(".iconSpace").attr("src","imgs/ic-collapseup.png")
+			$(".suitedropdownicon").children(".iconSpace-reports").attr("src","imgs/ic-collapseup.png")
 			$content.slideDown(200, function () {
 				//execute this after slideToggle is done
 				//change text of header based on visibility of content div
@@ -442,7 +442,7 @@ mySPA.controller('reportsController', ['$scope','$rootScope', '$http', '$locatio
 					$(".scroll-content").parent(".upper-collapsible-section").find($elem.parent()).remove();
 				}
 				$(".upper-section-testsuites").append($elem.parent());
-				$(".suitedropdownicon").children(".iconSpace").attr("src","imgs/ic-collapse.png")
+				$(".suitedropdownicon").children(".iconSpace-reports").attr("src","imgs/ic-collapse.png")
 			});
 
 			$('.searchScrapEle').css('display', 'none');
@@ -450,7 +450,12 @@ mySPA.controller('reportsController', ['$scope','$rootScope', '$http', '$locatio
 			showSearchBox = true;
 			open = 0;
 		}
-	})
+	}
+
+	$(document).off('click.as', '.iconSpace-reports');
+	$(document).on({
+		'click.as': onIconSpaceClick         
+	}, '.iconSpace-reports');
 
 	$(document).on('click', '.openreportstatus', function(e){
 		var reportID = $(this).attr('data-reportid');

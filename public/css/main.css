@@ -3946,13 +3946,14 @@ background: none;
     -moz-transform: translateX(-50%);
     -webkit-transform: translateX(-50%);
 }
-.iconSpace{
+.iconSpace, .iconSpace-reports{
     width: 65px;
     display: inline-block;
     height: 10px;
     vertical-align: bottom;
     cursor: pointer;
 }
+
 .addscrolltotestsuite{overflow-y: scroll;}
 .middle-section-testsuites, .bottom-section-testsuites{
 	position: relative;

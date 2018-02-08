@@ -1,15 +1,11 @@
 var create_ice = require('../controllers/create_ice');
 var logger = require('../../logger');
-
-function isSessionActive(req){
-	var sessionToken = req.session.uniqueId;
-    return sessionToken !== undefined && req.session.id == sessionToken;
-}
+var utils = require('../lib/utils');
 
 //getProjectIds
 exports.getProjectIDs_Nineteen68 = function (req, res) {
 	logger.info("Inside UI service: getProjectIDs_Nineteen68");
-	if (isSessionActive(req)) {
+	if (utils.isSessionActive(req.session)) {
 		logger.info("Calling UI Service getProjectIDs_Nineteen68 from create_ice");
 		var obj = req.body;
 		obj.userid = req.session.userid;

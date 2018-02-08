@@ -127,6 +127,16 @@
                     <label class="selectProjectLabel">Project:</label>
                         <select class="project-list"></select>
                 </span>
+
+                <span class="selectRelease selectProjectPosition"> 
+                    <label class="selectReleaseLabel">Release:</label>
+                        <select class="release-list"></select>
+                </span>
+                
+                <span class="selectCycle selectProjectPosition"> 
+                    <label class="selectCycleLabel">Cycle:</label>
+                        <select class="cycle-list"></select>
+                </span>
           </div> 
          <div class="ct-nodeBox">              
          </div>
@@ -348,7 +358,7 @@
 				<div class="modal-footer" style="text-align: center">
 					<span id="versioningErrorMsg" style="color: red; float: left; margin-left: 15px; margin-top: 5px;"></span>
 					<img class="qcLoginload" src="imgs/loader.gif" alt="Loading..." style="float: left; display: none;">
-                    <button type="button" id = "clearInputDataButton" class="btn btn-default btn-default-modal qcConnsubmit" onclick="clearInputData()">Clear</button>
+                    <button type="button" id = "clearInputDataButton" class="btn btn-default btn-default-modal qcConnsubmit" ng-click="clearInputData()">Clear</button>
 					<button type="button" id = "createNewVersionButton" class="btn btn-default btn-default-modal qcConnsubmit" data-dismiss="modal">Create</button>
 				</div>
 			</div>

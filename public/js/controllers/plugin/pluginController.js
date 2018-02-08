@@ -1,6 +1,7 @@
 mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','$location','$timeout','PluginService', function($scope, $rootScope,$window,$http,$location,$timeout,PluginService) {
 	$('.scrollbar-inner').scrollbar();
 	window.onbeforeunload = null;
+	localStorage.setItem("navigateEnable", true);
 	document.getElementById("currentYear").innerHTML = new Date().getFullYear()
 	var userInfo = JSON.parse(window.localStorage['_UI']);
 	var availablePlugins = userInfo.pluginsInfo;
