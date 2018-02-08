@@ -4260,7 +4260,7 @@ function versionInputDialogClose() {
 
 */
 
-function clearInputData() {
+$scope.clearInputData = function() {
   $('#versionNumberInput').val('');
 }
 
