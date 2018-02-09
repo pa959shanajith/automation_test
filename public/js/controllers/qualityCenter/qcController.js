@@ -35,7 +35,7 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 
 	socket.on('ICEnotAvailable', function () {
 		unblockUI();
-		openModelPopup("ALM Connection", "unavailableLocalServer")
+		openModelPopup("ALM Connection", "ICE Engine is not available, Please run the batch file and connect to the Server.")
 	});
 
 	//login to QC
@@ -68,7 +68,7 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 				$(".qcLoginload").hide();
 				$("#qcName,#qcUserName,#qcPwd,.qcConnsubmit").prop("disabled",false);
 				if(data == "unavailableLocalServer"){
-					$("#qcErrorMsg").text("Unavailable LocalServer");
+					$("#qcErrorMsg").text("ICE Engine is not available,Please run the batch file and connect to the Server.");
 				}
 				else if(data == "scheduleModeOn")
 				{
@@ -115,11 +115,12 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 		$(document.body).css({'cursor' : 'wait'});
 		$(".qcSelectDomain, .qcSelectProject").prop("disabled", true);
 		var getDomain = $(this).children("option:selected").val();
+		blockUI('Loading....');
 		qcServices.qcProjectDetails_ICE(getDomain)
 			.then(function(data){
 				nineteen68_projects_details = data.nineteen68_projects;
 				if(data == "unavailableLocalServer"){
-					openModelPopup("ALM Connection", "unavailableLocalServer")
+					openModelPopup("ALM Connection", "ICE Engine is not available, Please run the batch file and connect to the Server.")
 				}	
 				else if(data == "scheduleModeOn")
 				{
@@ -142,8 +143,10 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 					$(document.body).css({'cursor' : 'default'});
 				}
 				$(".qcSelectDomain, .qcSelectProject").prop("disabled", false);
+				unblockUI();
 			},
-			function(error) {	console.log("Error in qcController.js file loginQCServer method! \r\n "+(error.data));
+			function(error) {	unblockUI(); 
+				console.log("Error in qcController.js file loginQCServer method! \r\n "+(error.data));
 			});
 	})
 
@@ -262,6 +265,7 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 					datapath = getParent.data("testsetpath");
 				}
 				var getObject = getParent;
+				blockUI('Loading....');
 				qcServices.qcFolderDetails_ICE(dataAction,getProjectName,getDomainName,datapath,testCasename)
 					.then(function(data){
 						if(data){
@@ -290,8 +294,9 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 						}
 						$(".qcExpand").removeClass("stopPointerEvent");
 						$(document.body).css({'cursor' : 'default'});	
+						unblockUI();
 					},
-					function(error) {	console.log("Error in qcController.js file loginQCServer method! \r\n "+(error.data));
+					function(error) {	unblockUI(); console.log("Error in qcController.js file loginQCServer method! \r\n "+(error.data));
 					});
 					if(getParent.hasClass("Tfolnode"))	$(this).prop("src","imgs/ic-qcCollapse.png");
 				}
@@ -368,7 +373,7 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 			qcServices.saveQcDetails_ICE(mappedList)
 			.then(function(data){
 				if(data == "unavailableLocalServer"){
-					openModelPopup("Save Mapped Testcase", "unavailableLocalServer");
+					openModelPopup("Save Mapped Testcase", "ICE Engine is not available, Please run the batch file and connect to the Server.");
 				}
 				else if(data == "scheduleModeOn"){
 					openModelPopup("Save Mapped Testcase", "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.");

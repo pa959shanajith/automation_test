@@ -1033,7 +1033,7 @@ exports.connectJira_ICE = function (req, res) {
 										} else if (data.onAction == "auto_populate") {
 											var resultData = data.value;
 											clearInterval(updateSessionExpiry);
-											if (resultData != "Fail") {
+											if (resultData != "Fail" && resultData!="Invalid Url" && resultData!="Invalid Credentials") {
 												if(count == 0){
 													logger.info('Jira: Login successfully.');
 													res.send(resultData); 

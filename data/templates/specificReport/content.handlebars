@@ -78,7 +78,7 @@
                             },
                             success: function(data){
                                 if(data == "unavailableLocalServer"){
-                                    alert("Local Server unavailable");
+                                    alert("ICE Engine is not available. Please run the batch file and connect to the Server.");
                                 }
                                 else if(data == 'scheduleModeOn')
                                 {
@@ -156,8 +156,14 @@
                                 if(data == "Fail"){
                                     $(".error-msg").text("Failed to login");
                                 }
+                                else if(data == 'Invalid Url'){
+                                    $(".error-msg").text("Invalid Url");
+                                }
+                                else if(data == "Invalid Credentials"){
+                                     $(".error-msg").text("Invalid Credentials");
+                                }
                                 else if(data == "unavailableLocalServer"){
-                                    $(".error-msg").text("Local Server unavailable.");
+                                    $(".error-msg").text("ICE Engine is not available. Please run the batch file and connect to the Server.");
                                 }
                                 else if(data == "Invalid Session"){
                                     $(".error-msg").text("Invalid Session. Login again");
@@ -244,6 +250,7 @@
                 $(document).on('click', '.closeWindow', function(){
                      $(".jiraWindow, .createIssueWindow, .statusWindow").hide();
                      $('#overlay').css('display', 'none');
+                     $(".error-msg").text('');
                 })
 
                 $(document).on('click', '.cancelIssues', function(){
@@ -303,7 +310,7 @@
                                 else if(data == "unavailableLocalServer"){
                                     $(".createIssueWindow").hide();
                                     $(".statusWindow").show();
-                                    $("#showStatus").text("Local Server unavailable.");
+                                    $("#showStatus").text("ICE Engine is not available. Please run the batch file and connect to the Server.");
                                 }
                                 else if(data == 'scheduleModeOn')
                                 {
@@ -317,11 +324,12 @@
                                     $("#showStatus").text("Invalid Session. Login again");
                                 }
                                 else{
-                                    getRows[parseInt($("#inputSlno").val())].children[6].innerText = data;
+                                    getRows[parseInt($("#inputSlno").val())-1].children[6].innerText = data;
                                     $(".createIssueWindow").hide();
                                     $(".statusWindow").show();
                                     $("#showStatus").text("Issue bearing ID " + data + " created successfully.");
                                 }
+                                $('#inputSlno').val('');
                             }
                         });
                     }
