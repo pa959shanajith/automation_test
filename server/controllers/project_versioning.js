@@ -113,24 +113,27 @@ exports.getModulesVersioning=function(req,res){
 								k++;
 							}
 						});
-						row.graph.relationships.forEach(function (r) {
-							try {
-								var srcIndex = idDict[r.startNode.toString()];
-								var tgtIndex = idDict[r.endNode.toString()];
-								if(nData[tgtIndex].children===undefined ) {
-									if (tab=='tabAssign' && nData[tgtIndex].release==relId && nData[tgtIndex].cycle==cycId)
+						row.graph.relationships.forEach(function(r){
+							try{
+								var srcIndex=idDict[r.startNode.toString()];
+								var tgtIndex=idDict[r.endNode.toString()];
+								//if(nData[tgtIndex].children===undefined) nData[srcIndex].task=nData[tgtIndex];
+								if(nData[tgtIndex].children===undefined){
+									if((tab=='tabAssign'&& nData[tgtIndex].release==relId && nData[tgtIndex].cycle==cycId)||tab=='tabCreate'||tab=='endToend'){
 										nData[srcIndex].task=nData[tgtIndex];
-								}
-								//if (nData[tgtIndex].children === undefined) nData[srcIndex].task = nData[tgtIndex];
-								else if (nData[srcIndex].children.indexOf(nData[tgtIndex]) == -1) {
-									nData[srcIndex].children.push(nData[tgtIndex]);
-									if (nData[tgtIndex].childIndex == undefined) {
-										nData[tgtIndex].childIndex = nData[srcIndex].children.length;
+									}else if(nData[srcIndex].type=='testcases' || nData[srcIndex].type=='screens'){
+										nData[srcIndex].taskexists=nData[tgtIndex];
 									}
-
+										
+								} 
+								else if(nData[srcIndex].children.indexOf(nData[tgtIndex])==-1){
+									nData[srcIndex].children.push(nData[tgtIndex]);
+									if(nData[tgtIndex].childIndex==undefined){
+										nData[tgtIndex].childIndex=nData[srcIndex].children.length;
+									}
 								}
-							} catch (ex) {
-								logger.error("Error occured in project_versioning/versioning: versioning service",ex);
+							}catch (ex){
+								logger.error("exception in mindmapService: ",ex);
 							}
 						});
 					});
@@ -466,11 +469,14 @@ exports.saveDataVersioning=function(req,res){
 			if (flag == 10) {
 				var uidx = 0, t, lts, rnmList = [];
 				deletednodes.forEach(function (t, i) {
-					qList.push({ "statement": "MATCH (N) WHERE ID(N)=" + t + " MATCH (N)-[r:FNTT]-(b) DETACH DELETE b" });
+					// Delete task if single connection
+					qList.push({"statement":"MATCH (N) WHERE ID(N)="+t+" MATCH (N)-[r:FNTT]->(b) with b as b MATCH(b)<-[s:FNTT]-(M) WITH count(M) as rel_cnt,b as b  WHERE rel_cnt=1 DETACH DELETE b"});
+					// Else delete just connection					
+					qList.push({"statement":"MATCH (N) WHERE ID(N)="+t+" MATCH (N)-[r:FNTT]-(b) DELETE r"});
 				});
 				//TO support task deletion
 				removeTask.forEach(function (t, i) {
-					qList.push({ "statement": "MATCH (N) WHERE ID(N)=" + t + " MATCH (N)-[r:FNTT]-(b) DETACH DELETE b" });
+					qList.push({"statement":"MATCH (N) WHERE ID(N)="+t+" MATCH (N)-[r:FNTT]-(b) DETACH DELETE b"});
 				});
 				var moduleID=null;
 				data.forEach(function (e, i) {
@@ -570,6 +576,7 @@ exports.saveDataVersioning=function(req,res){
 								t.parent = [prjId].concat(t.parent);
 								qList.push({ "statement": "MERGE(n:TASKS{taskID:'" + t.id + "',task:'" + t.task + "',assignedTo:'" + t.assignedTo + "',reviewer:'" + t.reviewer + "',status:'" + taskstatus + "',startDate:'" + t.startDate + "',endDate:'" + t.endDate + "',re_estimation:'" + t.re_estimation + "',details:'" + t.details + "',nodeID:'" + e.id + "',parent:'[" + t.parent + "]',release:'" + relId + "',cycle:'" + cycId + "',uid:'" + uidx + "',taskvn:" + parseFloat(vn_from) + "})" });
 							}
+							qList.push({"statement":"MATCH (a:SCREENS{screenID_c:'"+e.id_c+"'}),(b:TASKS{taskID:'"+t.id+"'}) MERGE (a)-[r:FNTT {id:'"+e.id+"'}]-(b)"});
 						}
 					}
 					else if (e.type == 'testcases') {
@@ -605,6 +612,7 @@ exports.saveDataVersioning=function(req,res){
 								t.parent = [prjId].concat(t.parent);
 								qList.push({ "statement": "MERGE(n:TASKS{taskID:'" + t.id + "',task:'" + t.task + "',assignedTo:'" + t.assignedTo + "',status:'" + taskstatus + "',reviewer:'" + t.reviewer + "',startDate:'" + t.startDate + "',endDate:'" + t.endDate + "',re_estimation:'" + t.re_estimation + "',details:'" + t.details + "',release:'" + relId + "',cycle:'" + cycId + "',nodeID:'" + e.id + "',parent:'[" + t.parent + "]',uid:'" + uidx + "',taskvn:" + parseFloat(vn_from) + "})" });
 							}
+							qList.push({"statement":"MATCH (a:TESTCASES{testCaseID_c:'"+e.id_c+"'}),(b:TASKS{taskID:'"+t.id+"'}) MERGE (a)-[r:FNTT {id:'"+e.id+"'}]-(b)"});	
 						}
 					}
 				});
@@ -657,22 +665,14 @@ exports.saveDataVersioning=function(req,res){
 									k++;
 								}
 							});
-							row.graph.relationships.forEach(function (r) {
-								var srcIndex = idDict[r.startNode.toString()];
-								var tgtIndex = idDict[r.endNode.toString()];
-								if(nData[tgtIndex].children===undefined){
-									if((tab=='tabAssign'&& nData[tgtIndex].release==relId && nData[tgtIndex].cycle==cycId)||tab=='tabCreate'||tab=='endToend'){
-										nData[srcIndex].task=nData[tgtIndex];
-									}else if(nData[srcIndex].type=='testcases' || nData[srcIndex].type=='screens'){
-										nData[srcIndex].taskexists=nData[tgtIndex];
-									}
-										
-								} 
+							row.graph.relationships.forEach(function(r){
+								var srcIndex=idDict[r.startNode.toString()];
+								var tgtIndex=idDict[r.endNode.toString()];
+								if(nData[tgtIndex].children===undefined) nData[srcIndex].task=nData[tgtIndex];
 								else if(nData[srcIndex].children.indexOf(nData[tgtIndex])==-1){
 									nData[srcIndex].children.push(nData[tgtIndex]);
-									if(nData[tgtIndex].childIndex==undefined){
-										nData[tgtIndex].childIndex=nData[srcIndex].children.length;
-									}
+									if(nData[tgtIndex].childIndex==undefined) nData[tgtIndex].childIndex=nData[srcIndex].children.length;
+
 								}
 							});
 						});

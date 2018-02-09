@@ -16,7 +16,8 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
   }, 10);
   if(window.localStorage['navigateScreen'] != "p_Webocular"){
 		window.location.href = "/";
-	}
+  }
+  localStorage.setItem("navigateEnable", true);
     //Task Listing
   loadUserTasks()
   window.onbeforeunload = function() {
@@ -64,7 +65,7 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
   }
 
   $scope.executeGo = function(){
-	localStorage.setItem("navigateEnable", false);
+  	localStorage.setItem("navigateEnable", false);
     $scope.enableGenerate = false;
     $scope.crawledLinks = [];
     $scope.arr = [];

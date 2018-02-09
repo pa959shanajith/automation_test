@@ -394,7 +394,8 @@ p,a,img,text,span,.noselect{-webkit-touch-callout:none;-webkit-user-select:none;
     font-size: 14px;
     font-family: LatoWeb;
 }
-.project-list{width: 200px;position: relative;}
+.project-list,.release-list,.cycle-list{width: 160px;position: relative;}
+.selectRelease,.selectCycle{margin-left: 10px;};
 /*FOR MINDMAP ENDS HERE*/
 
 .content-div
