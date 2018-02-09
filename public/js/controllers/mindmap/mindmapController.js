@@ -20,7 +20,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     //for handling the case when creatednode goes beyond screensize
     var CreateEditFlag = false;
     var isIE = /*@cc_on!@*/ false || !!document.documentMode;
-    var IncompleteFlowFlag = false;
+    var IncompleteFlowFlag = false,progressFlag=false;
 	var taskidArr = [], assignedObj = {},reuseDict = {};
     //Createmap//
 
@@ -428,6 +428,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     };
 
     function loadMap(e) {
+        if(progressFlag) return;
+        progressFlag = true;
         if (!d3.select('#ct-mindMap')[0][0] || confirm('Unsaved work will be lost if you continue.\nContinue?')) {
             $('.fa.fa-pencil-square-o.fa-lg.plus-icon.active-map').trigger('click') //Remove copy rectangle
             $('.fa.fa-clipboard.fa-lg.plus-icon.active-map').trigger('click') //Disable paste
@@ -2681,7 +2683,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 zoom.translate([(cSize[0] / 3) - dNodes[0].x, (cSize[1] / 2) - dNodes[0].y]);
             //zoom.translate([(cSize[0]/2),(cSize[1]/2)]);
             zoom.event(d3.select('#ct-mapSvg'));
+            progressFlag = false;
         }, function(error) {
+            progressFlag = false;
             console.log("Error: checkReuse service")
         })
     };
