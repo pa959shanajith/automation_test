@@ -4082,7 +4082,7 @@ function replicate_project(from_v, to_v, pid) {
   blockUI('Loading....')
     mindmapServices.createVersion('project_replicate',window.localStorage['_SR'], $(".project-list").val(),pid, from_v,  to_v,10 ).then(
       function(res){
-        $('.version-list').val(to_v);
+        //$('.version-list').val(to_v);
        unblockUI();
        openDialogMindmap('Mindmap', "Project Replicated Successfully.")
       },function(err){
