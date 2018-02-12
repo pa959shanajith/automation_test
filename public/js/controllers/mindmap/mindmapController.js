@@ -1877,7 +1877,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         if (isIE) split_char = ' ';
         var l = p.attr('transform').slice(10, -1).split(split_char);
         d3.select('#ct-ctrlBox').classed('no-disp', !0);
-        if (p.select('.ct-nodeTask')[0][0] != null) {
+        if (dNodes[activeNode.id.split('-')[2]].task) {
             var msg = 'Unassign the task to rename';
             if (t == 'screens') {
                 msg = 'Unassign the task to rename. And unassign the corresponding testcases tasks';
