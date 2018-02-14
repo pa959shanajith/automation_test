@@ -31,7 +31,7 @@ mySPA.controller('loginController', function ($scope, $rootScope, $timeout, $htt
 			var password = $scope.password;
 			LoginService.authenticateUser_Nineteen68(username, password)
 			.then(function (data) {
-				if(data != "fail" && data != "noProjectsAssigned"  && data!= "invalid_userame_password"){
+				if(data != "fail" && data != "noProjectsAssigned"  && data!= "invalid_username_password"){
 					if (data == 'inValidCredential') {
 						$(".ic-username").children().attr("src", "imgs/ic-username-error.png");
 						$(".ic-password").children().attr("src", "imgs/ic-password-error.png");

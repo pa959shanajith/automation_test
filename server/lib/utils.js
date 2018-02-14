@@ -31,8 +31,6 @@ module.exports.scheduleSocketList = function(cb) {
 module.exports.resetSession = function(session) {
 	var intr = parseInt(process.env.SESSION_INTERVAL);
 	var updateSessionExpiry = setInterval(function () {
-			console.log(session);
-			console.log("bwahaha");
 			myserver.redisSessionStore.touch(session.id, session);
 		}, intr);
 	return updateSessionExpiry;

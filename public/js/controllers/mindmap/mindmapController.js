@@ -20,7 +20,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     //for handling the case when creatednode goes beyond screensize
     var CreateEditFlag = false;
     var isIE = /*@cc_on!@*/ false || !!document.documentMode;
-    var IncompleteFlowFlag = false;
+    var IncompleteFlowFlag = false,progressFlag=false;
 	var taskidArr = [], assignedObj = {},reuseDict = {};
     //Createmap//
 
@@ -428,6 +428,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     };
 
     function loadMap(e) {
+        if(progressFlag) return;
+        progressFlag = true;
         if (!d3.select('#ct-mindMap')[0][0] || confirm('Unsaved work will be lost if you continue.\nContinue?')) {
             $('.fa.fa-pencil-square-o.fa-lg.plus-icon.active-map').trigger('click') //Remove copy rectangle
             $('.fa.fa-clipboard.fa-lg.plus-icon.active-map').trigger('click') //Disable paste
@@ -1791,6 +1793,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     //------Create Multiple Child Node-------//
     function createMultipleNode(){
         $("#addObjContainer").empty();
+        if (d3.select('.fa-hand-peace-o').classed('ct-ctrl-inactive')) return;
         $scope.errorMessage = "";
         $("#dialog-addObject").modal("show");
         //Add two nodes 
@@ -1875,7 +1878,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         if (isIE) split_char = ' ';
         var l = p.attr('transform').slice(10, -1).split(split_char);
         d3.select('#ct-ctrlBox').classed('no-disp', !0);
-        if (p.select('.ct-nodeTask')[0][0] != null) {
+        if (dNodes[activeNode.id.split('-')[2]].task) {
             var msg = 'Unassign the task to rename';
             if (t == 'screens') {
                 msg = 'Unassign the task to rename. And unassign the corresponding testcases tasks';
@@ -2681,7 +2684,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 zoom.translate([(cSize[0] / 3) - dNodes[0].x, (cSize[1] / 2) - dNodes[0].y]);
             //zoom.translate([(cSize[0]/2),(cSize[1]/2)]);
             zoom.event(d3.select('#ct-mapSvg'));
+            progressFlag = false;
         }, function(error) {
+            progressFlag = false;
             console.log("Error: checkReuse service")
         })
     };
@@ -4078,7 +4083,7 @@ function replicate_project(from_v, to_v, pid) {
   blockUI('Loading....')
     mindmapServices.createVersion('project_replicate',window.localStorage['_SR'], $(".project-list").val(),pid, from_v,  to_v,10 ).then(
       function(res){
-        $('.version-list').val(to_v);
+        //$('.version-list').val(to_v);
        unblockUI();
        openDialogMindmap('Mindmap', "Project Replicated Successfully.")
       },function(err){
