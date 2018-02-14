@@ -1793,6 +1793,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     //------Create Multiple Child Node-------//
     function createMultipleNode(){
         $("#addObjContainer").empty();
+        if (d3.select('.fa-hand-peace-o').classed('ct-ctrl-inactive')) return;
         $scope.errorMessage = "";
         $("#dialog-addObject").modal("show");
         //Add two nodes 
