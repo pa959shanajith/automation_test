@@ -2355,51 +2355,48 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 		$("#firstName, #lastName, #password, #confirmPassword, #email").removeClass("inputErrorBorder");
 		var reg = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 		var regexPassword = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~]).{8,16}$/;
+		
+		var regCheck = /^[a-zA-Z0-9\_]+$/
+		var regCheckUsername = /^[a-zA-Z0-9\_\.]+$/
+
+		if(regCheckUsername.test($("#userName").val()) == false){
+			openModelPopup("Error", "Username cannot contain special characters other than _ and .");			
+			$("#userName").addClass("inputErrorBorder");
+			return;
+		}else if(regCheck.test($("#firstName").val()) == false){
+			openModelPopup("Error", "First name cannot contain special characters other than _");
+			$("#firstName").addClass("inputErrorBorder");
+			return;
+		}else if(regCheck.test($("#lastName").val()) == false){
+			openModelPopup("Error", "Last name cannot contain special characters other than _");
+			$("#lastName").addClass("inputErrorBorder");
+			return;
+		}
+		
 		if($("#userSelect option:selected").val() == "") {
 			$("#userSelect").css('border','').addClass("selectErrorBorder");
-		}
-		else if ($("#firstName").val() == "") {
+		}else if ($("#firstName").val() == "") {
 			$("#firstName").addClass("inputErrorBorder");
-		}
-		else if ($("#lastName").val() == "") {
+		}else if ($("#lastName").val() == "") {
 			$("#lastName").addClass("inputErrorBorder");
-		}
-		/*else if ($("#password").val() == "") {
-			$("#password").addClass("inputErrorBorder");
-		}*/
-        /*else if ($("#confirmPassword").val() == "") {
+		}else if (($("#password").val() != "") && ($("#confirmPassword").val() == "")) {
 			$("#confirmPassword").addClass("inputErrorBorder");
-		}*/
-		else if (($("#password").val() != "") && ($("#confirmPassword").val() == "")) {
-			$("#confirmPassword").addClass("inputErrorBorder");
-		}
-		else if (($("#confirmPassword").val() != "") && ($("#password").val() == "")) {
+		}else if (($("#confirmPassword").val() != "") && ($("#password").val() == "")) {
 			$("#password").addClass("inputErrorBorder");
-		}
-			else if ($("#password").val().length > 0 && regexPassword.test($("#password").val()) == false) {
-				openModelPopup("Error", "Password must contain atleast 1 special character, 1 numeric, 1 uppercase and lowercase, length should be minimum 8 characters and maximum 12 characters..");
-				$("#password").addClass("inputErrorBorder");
-			}
-			else if ($("#confirmPassword").val().length > 0 && regexPassword.test($("#confirmPassword").val()) == false ) {
-				openModelPopup("Error","Password must contain atleast 1 special character, 1 numeric, 1 uppercase and lowercase, length should be minimum 8 characters and maximum 12 characters..");
-				$("#confirmPassword").addClass("inputErrorBorder");
-			}
-			else if($("#password").val() != $("#confirmPassword").val() && ($("#password").val().length > 0 && $("#confirmPassword").val().length > 0)){
-				openModelPopup("Error", "Password and Confirm Password did not match");
-				$("#confirmPassword").addClass("inputErrorBorder");
-			}
-	
-		else if ($("#email").val() == "") {
+		}else if ($("#password").val().length > 0 && regexPassword.test($("#password").val()) == false) {
+			openModelPopup("Error", "Password must contain atleast 1 special character, 1 numeric, 1 uppercase and lowercase, length should be minimum 8 characters and maximum 12 characters..");
+			$("#password").addClass("inputErrorBorder");
+		}else if($("#password").val() != $("#confirmPassword").val() && ($("#password").val().length > 0 && $("#confirmPassword").val().length > 0)){
+			openModelPopup("Error", "Password and Confirm Password did not match");
+			$("#confirmPassword").addClass("inputErrorBorder");
+		}else if ($("#email").val() == "") {
 			$("#email").addClass("inputErrorBorder");
-		}
-		else if (reg.test($("#email").val()) == false) {
+		}else if (reg.test($("#email").val()) == false) {
 			openModelPopup("Error", "Email address is not valid");
 			$("#email").addClass("inputErrorBorder");
-		}
-		else if($("#userRoles option:selected").val() == "") {
+		}else if($("#userRoles option:selected").val() == "") {
 			$("#userRoles").css('border','').addClass("selectErrorBorder");
-		}
-		else{
+		}else{
 			var updateUserObj = {};
             var allVals = [];
 			$('#additionalRoles :checked').each(function() {
@@ -2586,7 +2583,7 @@ $(document).on('cut copy paste','.preventSpecialChar', function(e){
 		deletedProjectDetails = [];
 		editedProjectDetails = [];
 	}
-	//Special character validation
+
 	function moveItems(origin, dest) {
 		$(origin).find(':selected').appendTo(dest);
 	}
