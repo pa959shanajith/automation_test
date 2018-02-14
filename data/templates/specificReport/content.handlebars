@@ -7,6 +7,13 @@
         <script type="text/javascript" src="{#asset jquery.min.js @encoding=link}"></script>
         <script>
             var url,userName,pwd;
+            function blockUI(content){
+                    $("body").append("<div id='overlayContainer'><div class='contentOverlay'>"+content+"</div></div>");
+                    $("#overlayContainer").fadeIn(300);
+                }
+            function unblockUI(){
+                $("#overlayContainer").fadeOut(300).remove()
+            }
 			setTimeout(function(){
 				if($('.reportsDetail .reportdetailsrow').length < 12){
 					$('.rDstep').css('width','10.1%');
@@ -141,6 +148,7 @@
                         var hostName = window.location.host;
                         var posturl = 'https://'+hostName+'/connectJira_ICE';
                         console.log("---"+posturl);
+                        blockUI('Loading....');
                         $.ajax({
                             type: 'POST',
                             url: posturl,
@@ -181,6 +189,7 @@
                                     $('#overlay').css('display', 'none');
                                     $(".Llogdefect, #inputSlno, .go_defectlog").show();
                                 }
+                                unblockUI();
                             }
                         });
                     }
@@ -296,6 +305,7 @@
                         }
                         var hostName = window.location.host;
                         var posturl = 'https://'+hostName+'/connectJira_ICE';
+                        blockUI('Loading....');
                         $.ajax({
                             type: 'POST',
                             url: posturl,
@@ -330,6 +340,7 @@
                                     $("#showStatus").text("Issue bearing ID " + data + " created successfully.");
                                 }
                                 $('#inputSlno').val('');
+                                unblockUI();
                             }
                         });
                     }
@@ -339,7 +350,6 @@
                 function clearData(){
                     $("#jiraURL, #jiraUserName, #jiraPassword").val("");
                 }
-
 			}, 400);
 		</script>
         <style>
@@ -479,8 +489,8 @@
                 border-radius: 6px;
             }
             .jiraWindow{
-                width: 450px;
-                height: 220px;
+                width: 497px;
+                height: 240px;
                 left: 31%;
             }            
             .jiraWindow .popupheader label{position: relative; top: 7px; left: 10px;}
@@ -671,6 +681,37 @@
                 .rightSummaryFunc{margin-top: 20px !important;}
                 .midContainer{margin: 0 0 7px 0 !important;}            
             }
+            #overlayContainer{
+                    position: fixed;
+                    background-color: rgba(0, 0, 0, 0.85);
+                    -moz-background-color: rgba(0, 0, 0, 0.85);
+                    -webkit-background-color: rgba(0, 0, 0, 0.85);
+                    width: 100%;
+                    height: 100%;
+                    top: 0;
+                    left: 0;
+                    cursor: wait;
+                    z-index: 10001;
+                    display: none
+                }
+
+        .contentOverlay{
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translateX(-50%) translateY(-50%);
+            -moz-transform: translateX(-50%) translateY(-50%);
+            -webkit-transform: translateX(-50%) translateY(-50%);
+            background: #fff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            -moz-border-radius: 5px;
+            -webkit-border-radius: 5px;
+            cursor: auto;
+            color:#461F6E;
+            font-family: LatoWebBold;
+        }
+
         </style>
     </head>
     <body>
