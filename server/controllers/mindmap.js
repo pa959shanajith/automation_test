@@ -206,6 +206,17 @@ exports.checkReuse=function(req,res){
 							qData['testcase'][j].reuse = false;						
 						j = j+1;
 					}
+					var k = 0;
+					if(qData['scenarios']){
+						while(k<qData['scenarios'].length){
+							if(result[k].data.length>0 && (result[k].data[0].row[0]>1 || (result[k].data[0].row[0]==1 && qData['modules']!=result[k].data[0].row[1])))
+								qData['scenarios'][k].reuse = true;
+							else
+								qData['scenarios'][k].reuse = false;						
+							k = k+1;
+						}
+					}
+					
 					res.status(status).send(qData);
 				} 
 			});
@@ -982,20 +993,34 @@ function getQueries(qdata){
 	var qList_reuse= [];
 	if(qdata.versionNumber!=undefined){
 		//Reuse in case of versioning
-		qdata['screen'].forEach(function(e,i){
-			qList_reuse.push({'statement':'Match (n:SCREENS{screenName : "'+e.screenname+'",projectID :"'+qdata['projectid']+'"})<-[r:FTSTS]-(ts:TESTSCENARIOS)<-[s:FMTTS]-(m:MODULES)<-[t:FVTM]-(v:VERSION{versionNumber:'+qdata['versionNumber']+'}) return count(n)'});
-		})
-		qdata['testcase'].forEach(function(e,i){
-			qList_reuse.push({'statement':'Match (n:TESTCASES{testCaseName : "'+e.testcasename+'",projectID :"'+qdata['projectid']+'"})<-[a:FSTTS]-(scr:SCREENS{screenName:"'+e.screenname+'"})<-[r:FTSTS]-(ts:TESTSCENARIOS)<-[s:FMTTS]-(m:MODULES)<-[t:FVTM]-(v:VERSION{versionNumber:'+qdata['versionNumber']+'}) return count(n)'});
-		})		
+		if (qdata.scenarios!=undefined){
+			qdata['scenarios'].forEach(function(e,i){
+				qList_reuse.push({'statement':'Match (n:TESTSCENARIOS{testScenarioName : "'+e.scenarioname+'",projectID :"'+qdata['projectid']+'"})<-[s:FMTTS]-(m:MODULES)<-[t:FVTM]-(v:VERSION{versionNumber:'+qdata['versionNumber']+'}) return count(n),m.moduleName'});
+			})
+		}else{
+			qdata['screen'].forEach(function(e,i){
+				qList_reuse.push({'statement':'Match (n:SCREENS{screenName : "'+e.screenname+'",projectID :"'+qdata['projectid']+'"})<-[r:FTSTS]-(ts:TESTSCENARIOS)<-[s:FMTTS]-(m:MODULES)<-[t:FVTM]-(v:VERSION{versionNumber:'+qdata['versionNumber']+'}) return count(n)'});
+			})
+			qdata['testcase'].forEach(function(e,i){
+				qList_reuse.push({'statement':'Match (n:TESTCASES{testCaseName : "'+e.testcasename+'",projectID :"'+qdata['projectid']+'"})<-[a:FSTTS]-(scr:SCREENS{screenName:"'+e.screenname+'"})<-[r:FTSTS]-(ts:TESTSCENARIOS)<-[s:FMTTS]-(m:MODULES)<-[t:FVTM]-(v:VERSION{versionNumber:'+qdata['versionNumber']+'}) return count(n)'});
+			})
+		}
+				
 	}
 	else{
-		qdata['screen'].forEach(function(e,i){
-			qList_reuse.push({'statement':'Match (n:SCREENS{screenName : "'+e.screenname+'",projectID :"'+qdata['projectid']+'"}) return count(n)'});
-		})
-		qdata['testcase'].forEach(function(e,i){
-			qList_reuse.push({'statement':'Match (n:TESTCASES{testCaseName : "'+e.testcasename+'",projectID :"'+qdata['projectid']+'"})<-[a:FSTTS]-(scr:SCREENS{screenName:"'+e.screenname+'"}) return count(n)'});
-		})
+		if (qdata.scenarios!=undefined){
+			qdata['scenarios'].forEach(function(e,i){
+				qList_reuse.push({'statement':'Match (n:TESTSCENARIOS{testScenarioName : "'+e.scenarioname+'",projectID :"'+qdata['projectid']+'"}) return count(n),m.moduleName'});
+			})
+		}else{
+			qdata['screen'].forEach(function(e,i){
+				qList_reuse.push({'statement':'Match (n:SCREENS{screenName : "'+e.screenname+'",projectID :"'+qdata['projectid']+'"}) return count(n)'});
+			})
+			qdata['testcase'].forEach(function(e,i){
+				qList_reuse.push({'statement':'Match (n:TESTCASES{testCaseName : "'+e.testcasename+'",projectID :"'+qdata['projectid']+'"})<-[a:FSTTS]-(scr:SCREENS{screenName:"'+e.screenname+'"}) return count(n)'});
+			})
+		}
+		
 	}
 	return qList_reuse;
 }

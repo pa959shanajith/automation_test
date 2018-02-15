@@ -1724,7 +1724,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         if (isIE) split_char = ' ';
         var l = p.attr('transform').slice(10, -1).split(split_char);
         d3.select('#ct-ctrlBox').classed('no-disp', !0);
-        if (dNodes[activeNode.id.split('-')[2]].task) {
+        if (node==0 && dNodes[activeNode.id.split('-')[2]].task) {
             var msg = 'Unassign the task to rename';
             if (t == 'screens') {
                 msg = 'Unassign the task to rename. And unassign the corresponding testcases tasks';
@@ -2126,160 +2126,187 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             dNodes[e.idx].childIndex = counter[e.type];
             counter[e.type] = counter[e.type] + 1;
         })
-        error = treeIterator(mapData, dNodes[0], error);
-        if (dNodes[0].type == 'modules_endtoend') {
-            cur_module = 'end_to_end';
-            error = false;
+        var restrict_scenario_reuse = parseDataReuse(true);
+        if(restrict_scenario_reuse['reuseScenarios'].length>0){
+           openDialogMindmap('Error',"Scenarios cannot be reused : '"+restrict_scenario_reuse['reuseScenarios'].join()+"'");
+            return;
         }
+        mindmapServices.checkReuse(restrict_scenario_reuse).then(function(result_reuse) {
+            var reuse=[];
+            
+            result_reuse['scenarios'].forEach(function(e, i) {
+                
+                if(e.reuse && deletednode_info.indexOf(dNodes[e.idx])<0){
+                    reuse.push(e.scenarioname);
+                  
+                }
 
-        if (s.attr('id') == 'ct-saveAction') {
-            blockUI('Saving Flow! Please wait...');
-            flag = 10;
-            d3.select('#ct-inpBox').classed('no-disp', !0);
-            saveFlag = true;
-            //$('#ct-createAction').removeClass('disableButton');
-            SaveCreateED('#ct-createAction',0,0);
-
-        } else if (s.attr('id') == 'ct-createAction') {
-            if (error) {
-                openDialogMindmap("Error", "Mindmap flow must be complete! Modules -> Scenarios -> Screens -> Testcases")
-                //$('#Mindmap_error').modal('show');
+            })
+            if(reuse.length>0){
+                console.log(deletednode_info);
+                openDialogMindmap('Error',"Scenarios used in another Module : '"+reuse.join()+"'");
                 return;
             }
-            flag = 20;
-            blockUI('Creating Structure! Please wait...');
-            d3.select('#ct-inpBox').classed('no-disp', !0);
+           
+            error = treeIterator(mapData, dNodes[0], error);
+            if (dNodes[0].type == 'modules_endtoend') {
+                cur_module = 'end_to_end';
+                error = false;
+            }
 
-        }
-        if (flag == 0) return;
-        if (s.classed('no-access')) return;
-        //s.classed('no-access', !0);
-        var userInfo = JSON.parse(window.localStorage['_UI']);
-        var username = userInfo.username;
-        var assignedTo = assignedObj;
+            if (s.attr('id') == 'ct-saveAction') {
+                blockUI('Saving Flow! Please wait...');
+                flag = 10;
+                d3.select('#ct-inpBox').classed('no-disp', !0);
+                saveFlag = true;
+                //$('#ct-createAction').removeClass('disableButton');
+                SaveCreateED('#ct-createAction',0,0);
 
-        if ($('.project-list').val() == null) {
-            openDialogMindmap('Error', 'No projects is assigned to User');
-            return !1;
-        }
-        var from_v = to_v = 0;
-        if ($('.version-list').length != 0)
-            from_v = to_v = $('.version-list').val();
-
-        mindmapServices.saveData(versioning_enabled,assignedTo, flag, window.localStorage['_SR'], from_v, to_v, cur_module, mapData, deletednode, unassignTask,
-            $('.project-list').val(), $('.release-list').val(), $('.cycle-list').val()).then(function(result) {
-            unblockUI();
-            if (flag == 10) {
-                var res = result;
-                mapSaved = !0;
-                var mid, sts = allMMaps.some(function(m, i) {
-                    if (m.id_n == res.id_n) {
-                        mid = i;
-                        allMMaps[i] = res;
-                        return !0;
-                    }
-                    return !1;
-                });
-                if (!sts) {
-                    mid = allMMaps.length;
-                    allMMaps.push(res);
-                    var node = d3.select('.ct-nodeBox').append('div').attr('class', 'ct-node fl-left').attr('data-mapid', mid).attr('title', res.name).on('click', loadMap);
-                    node.append('img').attr('class', 'ct-nodeIcon').attr('src', 'images_mindmap/node-modules-no.png').attr('alt', 'Module').attr('aria-hidden', true);
-                    node.append('span').attr('class', 'ct-nodeLabel').html(res.name.replace(/_/g, ' '));
+            } else if (s.attr('id') == 'ct-createAction') {
+                if (error) {
+                    openDialogMindmap("Error", "Mindmap flow must be complete! Modules -> Scenarios -> Screens -> Testcases")
+                    //$('#Mindmap_error').modal('show');
+                    return;
                 }
-                setModuleBoxHeight();
-                if (selectedTab == 'tabCreate') populateDynamicInputList();
-
-                clearSvg();
-                treeBuilder(allMMaps[mid]);
-                unassignTask = [];
-
-                if (selectedTab == 'tabAssign') {
-                    openDialogMindmap("Success", "Tasks saved successfully");
-                } else {
-                    openDialogMindmap("Success", "Data saved successfully");
-                    SaveCreateED('#ct-saveAction',0,0);
-                }
-                var vn = '';
-                if ($('.version-list').length != 0)
-                    from_v = to_v = $('.version-list').val()
-                mindmapServices.getModules(versioning_enabled,window.localStorage['tabMindMap'], $(".project-list").val(), parseFloat(from_v),$('.release-list').val(),$('.cycle-list').val()).then(function(result) {
-                    var nodeBox = d3.select('.ct-nodeBox');
-                    $(nodeBox[0]).empty();
-                    allMMaps = result;
-                    allMMaps.forEach(function(e, i) {
-                        //var t=e.name.replace(/_/g,' ');
-                        var img_src = 'images_mindmap/node-modules-no.png';
-                        if (e.type == 'modules_endtoend') img_src = 'images_mindmap/MM5.png';
-                        var t = $.trim(e.name);
-                        var node = nodeBox.append('div').attr('class', 'ct-node fl-left').attr('data-mapid', i).attr('title', t).on('click', loadMap);
-                        node.append('img').attr('class', 'ct-nodeIcon').attr('src', img_src).attr('alt', 'Module').attr('aria-hidden', true);
-                        node.append('span').attr('class', 'ct-nodeLabel').html(t);
-                    });
-                    if (selectedTab == 'tabCreate')
-                        populateDynamicInputList();
-                    setModuleBoxHeight();
-                }, function(error) {
-                    console.log(error);
-                })
+                flag = 20;
+                blockUI('Creating Structure! Please wait...');
+                d3.select('#ct-inpBox').classed('no-disp', !0);
 
             }
-            if (flag == 20) {
-                if (!saveFlag) return;
-                var res = result[0];
-                //res = res[0];
-                var mid, resMap = Object.keys(res);
-                allMMaps.some(function(m, i) {
-                    if (m.id_n == resMap[0]) {
-                        mid = i;
-                        return !0;
+            if (flag == 0) return;
+            if (s.classed('no-access')) return;
+            //s.classed('no-access', !0);
+            var userInfo = JSON.parse(window.localStorage['_UI']);
+            var username = userInfo.username;
+            var assignedTo = assignedObj;
+
+            if ($('.project-list').val() == null) {
+                openDialogMindmap('Error', 'No projects is assigned to User');
+                return !1;
+            }
+            var from_v = to_v = 0;
+            if ($('.version-list').length != 0)
+                from_v = to_v = $('.version-list').val();
+
+            mindmapServices.saveData(versioning_enabled,assignedTo, flag, window.localStorage['_SR'], from_v, to_v, cur_module, mapData, deletednode, unassignTask,
+                $('.project-list').val(), $('.release-list').val(), $('.cycle-list').val()).then(function(result) {
+                unblockUI();
+                if (flag == 10) {
+                    var res = result;
+                    mapSaved = !0;
+                    var mid, sts = allMMaps.some(function(m, i) {
+                        if (m.id_n == res.id_n) {
+                            mid = i;
+                            allMMaps[i] = res;
+                            return !0;
+                        }
+                        return !1;
+                    });
+                    if (!sts) {
+                        mid = allMMaps.length;
+                        allMMaps.push(res);
+                        var node = d3.select('.ct-nodeBox').append('div').attr('class', 'ct-node fl-left').attr('data-mapid', mid).attr('title', res.name).on('click', loadMap);
+                        node.append('img').attr('class', 'ct-nodeIcon').attr('src', 'images_mindmap/node-modules-no.png').attr('alt', 'Module').attr('aria-hidden', true);
+                        node.append('span').attr('class', 'ct-nodeLabel').html(res.name.replace(/_/g, ' '));
                     }
-                    //return !1;
-                });
-                //263-'Mindmap- Module: Currently allowing to create 2 modules with same name- Error msg is given on click of Create button
-                if (allMMaps[mid] != undefined) {
-                    allMMaps[mid].id_c = res[resMap[0]];
-                    allMMaps[mid].children.forEach(function(tsc) {
-                        tsc.id_c = res[tsc.id_n];
-                        tsc.children.forEach(function(scr) {
-                            scr.id_c = res[scr.id_n];
-                            scr.children.forEach(function(tc) {
-                                if (res[tc.id_n] != 'null') {
-                                    tc.id_c = res[tc.id_n];
-                                }
+                    setModuleBoxHeight();
+                    if (selectedTab == 'tabCreate') populateDynamicInputList();
+
+                    clearSvg();
+                    treeBuilder(allMMaps[mid]);
+                    unassignTask = [];
+
+                    if (selectedTab == 'tabAssign') {
+                        openDialogMindmap("Success", "Tasks saved successfully");
+                    } else {
+                        openDialogMindmap("Success", "Data saved successfully");
+                        SaveCreateED('#ct-saveAction',0,0);
+                    }
+                    var vn = '';
+                    if ($('.version-list').length != 0)
+                        from_v = to_v = $('.version-list').val()
+                    mindmapServices.getModules(versioning_enabled,window.localStorage['tabMindMap'], $(".project-list").val(), parseFloat(from_v),$('.release-list').val(),$('.cycle-list').val()).then(function(result) {
+                        var nodeBox = d3.select('.ct-nodeBox');
+                        $(nodeBox[0]).empty();
+                        allMMaps = result;
+                        allMMaps.forEach(function(e, i) {
+                            //var t=e.name.replace(/_/g,' ');
+                            var img_src = 'images_mindmap/node-modules-no.png';
+                            if (e.type == 'modules_endtoend') img_src = 'images_mindmap/MM5.png';
+                            var t = $.trim(e.name);
+                            var node = nodeBox.append('div').attr('class', 'ct-node fl-left').attr('data-mapid', i).attr('title', t).on('click', loadMap);
+                            node.append('img').attr('class', 'ct-nodeIcon').attr('src', img_src).attr('alt', 'Module').attr('aria-hidden', true);
+                            node.append('span').attr('class', 'ct-nodeLabel').html(t);
+                        });
+                        if (selectedTab == 'tabCreate')
+                            populateDynamicInputList();
+                        setModuleBoxHeight();
+                    }, function(error) {
+                        console.log(error);
+                    })
+
+                }
+                if (flag == 20) {
+                    if (!saveFlag) return;
+                    var res = result[0];
+                    //res = res[0];
+                    var mid, resMap = Object.keys(res);
+                    allMMaps.some(function(m, i) {
+                        if (m.id_n == resMap[0]) {
+                            mid = i;
+                            return !0;
+                        }
+                        //return !1;
+                    });
+                    //263-'Mindmap- Module: Currently allowing to create 2 modules with same name- Error msg is given on click of Create button
+                    if (allMMaps[mid] != undefined) {
+                        allMMaps[mid].id_c = res[resMap[0]];
+                        allMMaps[mid].children.forEach(function(tsc) {
+                            tsc.id_c = res[tsc.id_n];
+                            tsc.children.forEach(function(scr) {
+                                scr.id_c = res[scr.id_n];
+                                scr.children.forEach(function(tc) {
+                                    if (res[tc.id_n] != 'null') {
+                                        tc.id_c = res[tc.id_n];
+                                    }
+                                });
                             });
                         });
-                    });
-                    //To update cassandra_ids (id_c) of nodes in dNodes variable
-                    dNodes.forEach(function(d) {
-                        if (d.type == 'modules') d.id_c = res[resMap[0]];
-                        else d.id_c = res[d.id_n];
+                        //To update cassandra_ids (id_c) of nodes in dNodes variable
+                        dNodes.forEach(function(d) {
+                            if (d.type == 'modules') d.id_c = res[resMap[0]];
+                            else d.id_c = res[d.id_n];
 
-                    });
+                        });
 
-                    openDialogMindmap("Success", "Structure created successfully");
-                    saveFlag = false;
-                    //$('#ct-createAction').addClass('disableButton');
-                    SaveCreateED('#ct-createAction',1,0);
-                } else {
-                    saveFlag = false;
-                    openDialogMindmap("Success", "Failed to create structure");
+                        openDialogMindmap("Success", "Structure created successfully");
+                        saveFlag = false;
+                        //$('#ct-createAction').addClass('disableButton');
+                        SaveCreateED('#ct-createAction',1,0);
+                    } else {
+                        saveFlag = false;
+                        openDialogMindmap("Success", "Failed to create structure");
+                    }
+
+
+                    //$('#Mindmap_create').modal('show');
                 }
-
-
-                //$('#Mindmap_create').modal('show');
-            }
+            }, function(error) {
+                unblockUI();
+                console.log(error);
+                //$('#ct-createAction').addClass('disableButton')
+                SaveCreateED('#ct-createAction',1,0);
+                if (error=='DuplicateModules') {
+                    openDialogMindmap('Save error', 'Module names cannot be duplicate');
+                } else {
+                    openDialogMindmap('Save error', 'Failed to save data');
+                }
+            })
         }, function(error) {
-            unblockUI();
-            console.log(error);
-            //$('#ct-createAction').addClass('disableButton')
-            SaveCreateED('#ct-createAction',1,0);
-            if (error=='DuplicateModules') {
-                openDialogMindmap('Save error', 'Module names cannot be duplicate');
-            } else {
-                openDialogMindmap('Save error', 'Failed to save data');
-            }
+            progressFlag = false;
+            console.log("Error: checkReuse service")
         })
+
 
     };
 
@@ -2409,6 +2436,78 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         }
     }
 
+            /* 
+         *  Logic for adding reuse property 
+         */
+        function parseDataReuse(scenarios) {
+            var dataReuse = {
+                'screen': [],
+                'testcase': [],
+                'projectid': '',
+                'modules':''
+                
+            };
+            if (scenarios){
+                dataReuse['scenarios']=[];
+                dataReuse['reuseScenarios']=[];
+            }
+            dNodes.forEach(function(e, i) {
+                if (e.type=='modules'){
+                    dataReuse['modules']=e.name;
+                    return;
+                } 
+               
+                dNodes[i].reuse = false;
+                if(scenarios){
+                    dNodes.forEach(function(f, j) {
+                        if ((e.type == 'scenarios' && e.type == f.type && e.name == f.name && i != j && deletednode_info.indexOf(e)<0 && deletednode_info.indexOf(f)<0)) {
+                            dNodes[i].reuse = true;
+                            if (dataReuse['reuseScenarios'].indexOf(e.name)<0)
+                            dataReuse['reuseScenarios'].push(e.name);
+                            // console.log(e.type,' ',e.name,' reused')
+                        }
+                    })
+                }else{
+                     dNodes.forEach(function(f, j) {
+                        if ((e.type == 'screens' && e.type == f.type && e.name == f.name && i != j) || (e.type == 'testcases' && e.type == f.type && e.name == f.name && e.parent.name == f.parent.name && i != j)) {
+                            dNodes[i].reuse = true;
+                            // console.log(e.type,' ',e.name,' reused')
+                        }
+                    })
+                }
+               
+
+                if ((e.reuse == true)) return;
+                if(!scenarios){
+                    if (e.type == 'testcases') {
+                        dataReuse['testcase'].push({
+                            'testcasename': e.name,
+                            'screenname': e.parent.name,
+                            'idx': i
+                        });
+                    } else if (e.type == 'screens') {
+                        dataReuse['screen'].push({
+                            'screenname': e.name,
+                            'idx': i
+                        });
+                    }
+                }
+                if (e.type == 'scenarios' && scenarios) {
+                    dataReuse['scenarios'].push({
+                        'scenarioname': e.name,
+                        'idx': i
+                    });
+                }
+
+            })
+            dataReuse['projectid'] = $(".project-list").val();
+            if(versioningEnabled){
+                // Add version number
+                dataReuse['versionNumber'] = $('.version-list').val();
+            }
+            return dataReuse;
+        }
+    
     function treeBuilder(tree) {
         node_names_tc = [];
         var pidx = 0,
@@ -2444,48 +2543,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         });
         dNodes = d3Tree.nodes(tree);
         //dLinks=d3Tree.links(dNodes);
-        /* 
-         *  Logic for adding reuse property 
-         */
-        function parseDataReuse() {
-            var dataReuse = {
-                'screen': [],
-                'testcase': [],
-                'projectid': ''
-            };
-            dNodes.forEach(function(e, i) {
-                if ((e.type in ['modules', 'scenarios'])) return;
-                dNodes[i].reuse = false;
-                dNodes.forEach(function(f, j) {
-                    if ((e.type == 'screens' && e.type == f.type && e.name == f.name && i != j) || (e.type == 'testcases' && e.type == f.type && e.name == f.name && e.parent.name == f.parent.name && i != j)) {
-                        dNodes[i].reuse = true;
-                        // console.log(e.type,' ',e.name,' reused')
-                    }
-                })
 
-                if ((e.reuse == true)) return;
-                if (e.type == 'testcases') {
-                    dataReuse['testcase'].push({
-                        'testcasename': e.name,
-                        'screenname': e.parent.name,
-                        'idx': i
-                    });
-                } else if (e.type == 'screens' && e.type == 'screens') {
-                    dataReuse['screen'].push({
-                        'screenname': e.name,
-                        'idx': i
-                    });
-                }
 
-            })
-            dataReuse['projectid'] = $(".project-list").val();
-            if(versioningEnabled){
-                // Add version number
-                dataReuse['versionNumber'] = $('.version-list').val();
-            }
-            return dataReuse;
-        }
-        var reusedata = parseDataReuse();
+        var reusedata = parseDataReuse(false);
 
         // Now call the service and assign reuse property to all other nodes
         var userInfo = JSON.parse(window.localStorage['_UI']);
