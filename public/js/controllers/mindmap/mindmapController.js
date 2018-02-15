@@ -4117,6 +4117,12 @@ $scope.clearInputData = function() {
   $('#versionNumberInput').val('');
 }
 
+
+$('#createNewVersionButton').click(function(e){
+    var from_v = $('.version-list').val();
+    console.log(from_v);
+    createNewVersion(from_v);
+})
 /*
 
   function : versionInputDialogShow(e)
@@ -4124,11 +4130,6 @@ $scope.clearInputData = function() {
   param: e : event to get the source version number tab
 */
 function versionInputDialogShow() {
-  var from_v = $('.version-list').val();
-  console.log(from_v)
-  $('#createNewVersionButton').click(function(e){
-      createNewVersion(from_v)
-  })
   mindmapServices.getVersions($(".project-list").val()).then(
     function(res){
       maxVersionNumber=res[res.length-1];
