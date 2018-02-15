@@ -86,7 +86,7 @@ var projectTypes = {
 	'1fd77879-4dbb-416a-a46d-126d27fee2c7': 'SAP'
 };
 
-var screen_tasks=['scrape','append','Compare','Add','Map'];
+var screen_tasks=['scrape','append','compare','add','map'];
 
 function next_function(resultobj, cb, data) {
 	logger.info("Inside function: next_function ");
@@ -170,7 +170,7 @@ function next_function(resultobj, cb, data) {
 				if (prjId != undefined && prjId.length > 0 && prjId.indexOf(parent[0]) > -1) {
 					var index = prjId.indexOf(parent[0]);
 					var apptype=projectTypes[appTypes[index]];
-					if(!(screen_tasks.indexOf(t.task)>-1 && apptype=='Mainframe')){
+					if(!(screen_tasks.indexOf(t.task.toLowerCase())>-1 && apptype=='Mainframe')){
 						task_json.appType = apptype;
 						
 						testSuiteDetails_obj.testsuiteid = parent[1];
