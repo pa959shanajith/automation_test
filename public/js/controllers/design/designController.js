@@ -779,7 +779,9 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                     });
                     $(".filterObjects").removeClass("popupContent-filter-active").addClass("popupContent-default");
                     $(".thumb-ic").removeClass("thumb-ic-highlight");
+                
                     if (data != null && data != "getScrapeData Fail." && data != "" && data != " ") {
+                        
                         viewString = data;
 
                         newScrapedList = viewString
@@ -856,6 +858,10 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                         } else {
                             $("li.compareObjects").hide();
                         }
+                    }
+                    if($(".ellipsis:visible").length == 0)
+                    {
+                       $(".checkStylebox").prop("disabled",true);
                     }
                     unblockUI();
                 },
@@ -1874,10 +1880,77 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
             $("#deleteObjectsModal").find('.modal-body p').text("Are you sure you want to delete objects?").css('color', 'black');
         }
     });
+
+    //Delete Scraped Objects
+    function deleteScrapedObjects()
+    {
+        var totalElements = $(".ellipsis").length;
+        var selectedElements = $("input[type=checkbox].checkall:checked:visible").length;
+       // var currentElements = $(".ellipsis:visible").length
+        var filterActiveLen = $(".popupContent-filter-active").length;
+        //Delete All Elements
+        if(totalElements == selectedElements)
+        {
+            $("#scraplist").empty();
+            var currentElements = $(".ellipsis:visible").length;
+            $("a.disableActions").removeClass("disableActions");
+            getIndexOfDeletedObjects = []
+            viewString = {};
+            if(newScrapedList != undefined){
+                newScrapedList.view = [];
+                newScrapedList.mirror = "";
+            }
+            if(currentElements > 0)
+            {
+                $("#deleteObjects,#saveObjects").prop("disabled", false);
+                $(".checkStylebox").prop("checked", false);
+            }
+            else{
+                $("#deleteObjects,.checkStylebox").prop("disabled", true);
+                $(".checkStylebox").prop("checked", false);
+                $(".popupContent-filter-active").trigger('click');
+                $("#saveObjects").prop("disabled", false);
+            }
+      }
+      else{
+            //Delete Selected Elements
+          $.each($("input[type=checkbox].checkall:checked"), function() {
+             $(this).parents("li.select_all").remove();
+             var json ={
+                "xpath": $(this).closest("li").attr('data-xpath'),
+                "url": $(this).closest("li").attr('data-xpath'),
+                "top":  $(this).closest("li").attr('data-top'),
+                "hiddentag":  $(this).closest("li").attr('data-hiddentag'),
+                "height":  $(this).closest("li").attr('data-height'),
+                "custname":  $(this).parent().next("span.ellipsis").text(),
+                "width":  $(this).closest("li").attr('data-width'),
+                "tag":  $(this).closest("li").attr('data-tag'),
+                "left":  $(this).closest("li").attr('data-left'),
+                "tempId":  parseInt($(this).closest("li").attr('val'))
+            };
+            getIndexOfDeletedObjects.push(json);
+          })
+           var currentElements = $(".ellipsis:visible").length;
+          if(currentElements > 0)
+          {
+              $("#saveObjects").prop("disabled", false);
+              $(".checkStylebox").prop("checked", false);
+              $("#deleteObjects").prop("disabled", true);
+          }
+          else{
+              $("#deleteObjects,.checkStylebox").prop("disabled", true);
+              $(".checkStylebox").prop("checked", false);
+              $(".popupContent-filter-active").trigger('click');
+              $("#saveObjects").prop("disabled", false);
+          }
+      }
+     
+    }
+
     //To delete Scrape Objects
     $scope.del_Objects = function() {
-        
         $("#deleteObjectsModal").modal("hide");
+       
         if (deleteScrapeDataservice) {
             var userinfo = JSON.parse(window.localStorage['_UI']);
             //var tasks = JSON.parse(window.localStorage['_TJ']);
@@ -1885,6 +1958,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
             var delList = {};
             var deletedCustNames = [];
             var deletedCustPath = [];
+            var deletedIndex = [];
 
             var checkCondLen = $("#scraplist li").children('a').find('input[type=checkbox].checkall:checked:visible').length;
             if (checkCondLen > 0) {
@@ -1893,10 +1967,13 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                     id = id[1];
                     deletedCustNames.push(viewString.view[id].custname);
                     deletedCustPath.push(viewString.view[id].xpath);
+                    deletedIndex.push(id);
+                    //deletedIndex.push()
                     // console.log(viewString.view[id])
                 });
                 delList.deletedCustName = deletedCustNames;
                 delList.deletedXpath = deletedCustPath;
+                delList.deletedIndex = deletedIndex;
                 //console.log(deletedCustNames);
             }
 
@@ -1938,42 +2015,10 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                     }
                 }
             }
-            //updating renamed objects ends
-
-            //console.log("Delete", viewString);
-            var screenId = tasks.screenId;
-            var screenName = tasks.screenName;
-            var projectId = tasks.projectId;
-            scrapeObject = {};
-            scrapeObject.param = 'deleteScrapeData_ICE';
-            scrapeObject.getScrapeData = viewString;
-            scrapeObject.getScrapeData.mirrorheight = viewString.mirrorheight;
-            scrapeObject.getScrapeData.mirrorwidth = viewString.mirrorwidth;
-            scrapeObject.projectId = projectId;
-            scrapeObject.screenId = screenId;
-            scrapeObject.screenName = screenName;
-            scrapeObject.deletedList = delList;
-            scrapeObject.userinfo = userinfo;
-			scrapeObject.versionnumber = tasks.versionnumber;
-            DesignServices.updateScreen_ICE(scrapeObject)
-                .then(function(data) {
-                    if (data == "Invalid Session") {
-                        $rootScope.redirectPage();
-                    }
-                    if (data == "success") {
-                        openDialog("Delete Scrape Objects", "Scraped Objects deleted successfully.")
-                        deleteFlag = true;
-                        $(".checkStylebox").prop("checked", false);
-                        $("#deleteObjects,#saveObjects").prop("disabled", true);
-                        angular.element(document.getElementById("left-nav-section")).scope().getScrapeData();
-                    } else {
-                        openDialog("Delete Scrape Objects", "Scraped Objects fail to delete.")
-                        deleteFlag = false;
-                    }
-                    //Service to be integrated as it has dependency of ($scope.newTestScriptDataLS)
-                }, function(error) {
-
-                });
+              //Delete all objects ------------------------------------------
+              
+              deleteScrapedObjects();
+              $("#saveObjects").trigger('click');
         } else {
             var tempModifiednames;
             if(window.localStorage['_modified']){
@@ -1997,7 +2042,6 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                             if(newScrapedList.view[mdName[1]])
                                 newScrapedList.view[mdName[1]].custname = mdName[0];
                             tempModifiednames[i] = mdName[0];
-                            //tempModifiednames = tempModifiednames.filter(function(n) {return n != null});
                             window.localStorage['_modified'] = JSON.stringify(tempModifiednames)
                         }
                     }
@@ -2006,7 +2050,6 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                             if(viewString.view[mdName[1]])                           
                                 viewString.view[mdName[1]].custname = mdName[0];
                             tempModifiednames[i] = mdName[0];
-                            //tempModifiednames = tempModifiednames.filter(function(n) {return n != null});
                             window.localStorage['_modified'] = JSON.stringify(tempModifiednames)
                         }
                     }
@@ -2039,10 +2082,6 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                     $(".checkStylebox").prop("checked", false);
                   
                 }
-           
-                // $("#scraplist").empty();
-                // $("#deleteObjects,#saveObjects").prop("disabled", true);
-                // $(".checkStylebox").prop("checked", false);
             } else if (!$("input[type=checkbox].checkall").is(":checked")) {
                 openDialog("Delete Scrape data", "Please select objects to delete.")
             } else {
@@ -2051,7 +2090,6 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                     $.each($("input[type=checkbox].checkall:checked"), function() {  
                         for (var i = 0; i < newScrapedList.view.length; i++) {
                             if ($(this).parents("li").data("xpath") == newScrapedList.view[i].xpath && ($(this).parent('.objectNames').siblings(".ellipsis").text().trim().replace('/\s/g', ' ')).replace('\n', ' ') == newScrapedList.view[i].custname.trim()) {
-                                //newScrapedList.view.splice(newScrapedList.view.indexOf(newScrapedList.view[i]), 1);
                                 if(!(isInArray(newScrapedList.view.indexOf(newScrapedList.view[i]), getIndexOfDeletedObjects))){
                                     getIndexOfDeletedObjects.push(newScrapedList.view.indexOf(newScrapedList.view[i]))
                                     $(this).parents("li.select_all").remove();
@@ -2065,7 +2103,6 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                         $.each($("input[type=checkbox].checkall:checked"), function() {
                             for (var i = 0; i < viewString.view.length; i++) {
                                 if ($(this).parents("li").data("xpath") == viewString.view[i].xpath && ($(this).parent('.objectNames').siblings(".ellipsis").text().trim().replace('/\s/g', ' ')).replace('\n', ' ') == viewString.view[i].custname.trim()) {
-                                    //viewString.view.splice(viewString.view.indexOf(viewString.view[i]), 1);
                                     if(!(isInArray(viewString.view.indexOf(viewString.view[i]), getIndexOfDeletedObjects))){
                                         getIndexOfDeletedObjects.push(viewString.view.indexOf(viewString.view[i]))
                                         $(this).parents("li.select_all").remove();
@@ -2077,50 +2114,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                     }
                 }
                 else{
-                    $.each($("input[type=checkbox].checkall:checked"), function() {
-                        for (var i = 0; i < viewString.view.length; i++) {
-                            if ($(this).parents("li").data("xpath") == viewString.view[i].xpath && ($(this).parent('.objectNames').siblings(".ellipsis").text().trim().replace('/\s/g', ' ')).replace('\n', ' ') == viewString.view[i].custname.trim()) {
-                              // console.log(viewString.view[i]);
-                               $(this).parents("li.select_all").remove();
-                                //viewString.view.splice(viewString.view.indexOf(viewString.view[i]), 1);
-                                // if(!(isInArray(viewString.view.indexOf(viewString.view[i]), getIndexOfDeletedObjects))){
-                                //     getIndexOfDeletedObjects.push(viewString.view.indexOf(viewString.view[i]))
-                                //     $(this).parents("li.select_all").remove();
-                                //     break;
-                                // }
-                            }
-                        }
-
-                    })
-                    var totalElements = $(".ellipsis").length;
-                    var selectedElements = $("input[type=checkbox].checkall:checked:visible").length;
-                    if(totalElements == selectedElements)
-                    {
-                        $("#scraplist").empty();
-                        viewString.view = [];
-                        viewString.mirror = "";
-                        if(newScrapedList != undefined){
-                            newScrapedList.view = [];
-                            newScrapedList.mirror = "";
-                        }
-                    }
-                    var currentElements = $(".ellipsis:visible").length;
-                    var filterActiveLen = $(".popupContent-filter-active").length;
-                    if(currentElements > 0)
-                    {
-                        $("#deleteObjects,#saveObjects").prop("disabled", false);
-                        $(".checkStylebox").prop("checked", false);
-                    }
-                    else{
-                        $("#deleteObjects,.checkStylebox").prop("disabled", true);
-                        $(".checkStylebox").prop("checked", false);
-                        $(".popupContent-filter-active").trigger('click');
-                    }
-                    if(saveScrapeDataFlag == false && currentElements == 0 && filterActiveLen == 0)
-                    {
-                        $("#saveObjects").prop("disabled", true);
-                    }
-                        
+                        deleteScrapedObjects();  
                 }
                 $("#deleteObjects").prop("disabled", true);
             }
@@ -2942,59 +2936,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
             }
         }
     }
-    /****Submit Map Object Functionality****/
-    //Map Object Drag and Drop Functionality
-    // function validateDuplicateObjects(e)
-    // {
-    // 	var xpath;
-    // 		var duplicateCustnames = [];
-    // 		var duplicateXpathElements = {};
-    // 		var duplicateCustnamesElements = {}
-    // 		alert(e.target.id);
-    // 		if($(".ellipsis").length > 0){
-    // 			$.each($("span.ellipsis"), function(){
-    // 				var count = 0;
-    // 				if($(this).parent().parent().attr("data-xpath") != ""){
-    // 					xpath = $(this).parent().parent().attr("data-xpath");
-    // 					console.log("spath",xpath);
-    // 					xpath = xpath.split(";")[2];
-    // 					console.log("sp",xpath);
-    // 					if (!duplicateXpathElements.hasOwnProperty(xpath)){
-    // 						duplicateXpathElements[xpath] = $(this).text();
-    // 					}else{
-    // 						console.log("a",$(this).text());
-    // 						duplicateCustnames.push($(this).text());
-    // 						count = 1;
-    // 					}
 
-    // 					if (count == 0 && !duplicateCustnamesElements.hasOwnProperty($(this).text())){
-    // 						duplicateCustnamesElements[$(this).text()] = xpath;
-    // 					}else if(count == 0 && duplicateCustnamesElements.hasOwnProperty($(this).text())){
-    // 						console.log("b",$(this).text());
-    // 						duplicateCustnames.push($(this).text());
-    // 					}
-    // 				}else {
-    // 					xpath= "";
-    // 					if (!duplicateCustnamesElements.hasOwnProperty($(this).text())){
-    // 						duplicateCustnamesElements[$(this).text()] = xpath;
-    // 					}else{
-    // 						console.log("c",$(this).text());
-    // 						duplicateCustnames.push($(this).text());
-    // 					}
-    // 				}
-    // 	   });
-
-    // 			if(duplicateCustnames.length > 0){
-    // 				openDialog("Save Scrape data", "");
-    // 				$("#globalModal").find('.modal-body p').text("Object characterstics are same for:").css("color","#000").append("<ul class='custList'></ul>");
-
-    // 				for(var j=0;j<duplicateCustnames.length;j++){
-    // 					$("#globalModal").find('.modal-body p ul').append("<li>"+duplicateCustnames[j]+"</li>");
-    // 				}
-    // 				return false;
-    // 			}
-    // 		}
-    // }
 
     //Save Scrape Objects
     $(document).on('click', "#saveObjects", function(e) {
@@ -3021,19 +2963,15 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
         return false;
     };
 
+  
     function saveScrapedObjects() {
         if (noSave = "false") {
             var xpath;
             var duplicateCustnames = [];
             var duplicateXpathElements = {};
             var duplicateCustnamesElements = {};
-            var sameCustnames = [];
-            var dupCustnames = [];
-			// if(window.localStorage['_modified'])
-			// {
-			// 	var modifiednames = JSON.parse(window.localStorage['_modified']);
-			// }
-			// console.log("Modified strings------",modifiednames);
+            var isDuplicateCustNames = false;
+            var isDuplicateXpath = false;
             //validateDuplicateObjects
             if ($("#scraplist .ellipsis").length > 0) {
                 $.each($("#scraplist span.ellipsis"), function() {
@@ -3048,17 +2986,21 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 						else{
 							xpath = xpath;
 						}
-                        sameCustnames.push($(this).text());
                         if (!duplicateXpathElements.hasOwnProperty(xpath)) {
                             duplicateXpathElements[xpath] = $(this).text();
                         } else {
+                            $(this).css('color','red');
                             duplicateCustnames.push($(this).text());
+                            isDuplicateXpath = true;    
                             count = 1;
                         }
                         if (count == 0 && !duplicateCustnamesElements.hasOwnProperty($(this).text())) {
                             duplicateCustnamesElements[$(this).text()] = xpath;
-                        } else if (count == 0 && duplicateCustnamesElements.hasOwnProperty($(this).text())) {
-                            duplicateCustnames.push($(this).text());
+                        } else if ( duplicateCustnamesElements.hasOwnProperty($(this).text())) {
+                            if(count == 0)
+                                duplicateCustnames.push($(this).text());
+                            isDuplicateCustNames = true;
+                            $(this).css('color','red');
                         }
                     } else {
                         xpath = "";
@@ -3066,31 +3008,20 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                             duplicateCustnamesElements[$(this).text()] = xpath;
                         } else {
                             duplicateCustnames.push($(this).text());
+                            isDuplicateCustNames= true;
+                            $(this).css('color','red');
                         }
                     }
-                    var sorted_custnames = sameCustnames.slice().sort();
-                    for (var i = 0; i < sorted_custnames.length - 1; i++) {
-                        if (sorted_custnames[i + 1] == sorted_custnames[i]) {
-                            dupCustnames.push(sorted_custnames[i]);
-                        }
-                    }
-					for(var p=0; p < duplicateCustnames.length;p++)
-					{
-						if(duplicateCustnames[p] == $(this).text())
-						{
-							$(this).css('color','red');
-						}
-					}
+
                 });
-                if (duplicateCustnames.length > 0 && dupCustnames.length > 0) {
+                 if(isDuplicateCustNames) {
                     openDialog("Save Scrape data", "");
                     $("#globalModal").find('.modal-body p').html("<span><strong>Please rename/delete duplicate scraped objects</strong></span><br /><br /><strong>Object characterstics are same for:</strong>").css("color", "#000").append("<ul class='custList'></ul>");
                     for (var j = 0; j < duplicateCustnames.length; j++) {
                         $("#globalModal").find('.modal-body p ul').append("<li>" + duplicateCustnames[j] + "</li>");
                     }
                     return false;
-                }
-                if (duplicateCustnames.length > 0 && dupCustnames.length == 0) {
+                }else if(isDuplicateXpath){
                     $("#saveConfirmObjects").modal('show');
                     $("#saveConfirmObjects").find('.modal-body p').html("<strong>Are you sure you want to save objects ?  <br /><br/ >Object characterstics are still same for:").css("color", "#000").append("<ul class='custList'></ul>");
                     for (var j = 0; j < duplicateCustnames.length; j++) {
@@ -3098,6 +3029,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                     }
                     return false;
                 }
+
             }
             renameScrapedObjects();
         }
@@ -3155,108 +3087,6 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                 }
 			}
 		}
-				// for (var i=0;i<viewString.view.length;i++){
-				// 	if(viewString.view[i].tempId == parseInt(modifiednames[i].split("^^")[1])){
-				// 		viewString.view[i].custname = modifiednames[i].split("^^")[0];
-				// 	}
-				// }
-    //     $.each($("#scraplist li").find("span.ellipsis:not(.customObject)"), function() {
-    //         if ($(this).parent().parent().attr("data-xpath") != "") {
-    //             modifiedCustXpath.push($(this).parent().parent().attr("data-xpath") + "@@@" + $(this).text());
-    //         }
-    //     });
-    //     $.each($("#scraplist li").find("span.addCustObj"), function() {
-    //         modifiedCustObj.push($(this).parent().parent().attr("val") + "@@@" + $(this).text());
-    //     });
-    //     $.each($("#scraplist li").find("span.customObject"), function() {
-    //         modifiedCustObj.push($(this).parent().parent().attr("val") + "@@@" + $(this).text());
-    //     });
-
-    //     //Push/Append objects to viewstring after enable append action
-    //     if (eaCheckbox) {
-    //         for (var j = 0; j < viewString.view.length; j++) {
-    //             newScrapedList.view.push(viewString.view[j]);
-    //         }
-    //         var result = newScrapedList.view.filter(function(obj, index) {
-    //             return obj.xpath != '';
-    //         });
-    //         var custObjEdit = newScrapedList.view.filter(function(obj, index) {
-    //             return obj.xpath == '';
-    //         });
-    //         for (var k = 0; k < result.length; k++) {
-    //             viewStringXpath = result[k].xpath;
-    //             if (viewStringXpath != "") {
-	// 				if(appType == 'Web' || appType == 'MobileWeb'){
-	// 					viewStringXpath = viewStringXpath.split(";")[2];
-	// 				}
-	// 				else{
-	// 					viewStringXpath = viewStringXpath;
-	// 				}
-    //                 modifiedCustname = modifiedCustXpath[k].split("@@@")[1];
-	// 				if(appType == 'Web' || appType == 'MobileWeb'){
-	// 					modifiedXpath = modifiedCustXpath[k].split(";")[2];
-	// 				}
-	// 				else{
-	// 					modifiedXpath = modifiedCustXpath[k].split("@@@")[0];
-	// 				}                
-    //                 if (viewStringXpath == modifiedXpath) {
-    //                     result[k].custname = modifiedCustname;
-    //                 }
-    //             }
-    //         }
-    //         for (var i = 0; i < custObjEdit.length; i++) {
-    //             viewStringXpath = custObjEdit[i].xpath;
-    //             if (viewStringXpath == "") {
-    //                 modifiedCustObjName = modifiedCustObj[i].split("@@@")[1];
-    //                 tempId = modifiedCustObj[i].split('@@@')[0];
-    //                 if (custObjEdit[i].tempId == tempId) {
-    //                     custObjEdit[i].custname = modifiedCustObjName;
-    //                 }
-    //             }
-    //         }
-    //         newScrapedList.mirror = viewString.mirror;
-    //         newScrapedList.scrapetype = viewString.scrapetype;
-    //     } else {
-    //         var result = viewString.view.filter(function(obj, index) {
-    //             return obj.xpath != '';
-    //         });
-    //         var custObjEdit = viewString.view.filter(function(obj, index) {
-    //             return obj.xpath == '';
-    //         });
-    //         if (viewString.view.length > 0) {
-    //             for (var k = 0; k < result.length; k++) {
-    //                 viewStringXpath = result[k].xpath;
-    //                 if (viewStringXpath != "") {
-    //                 	if(appType == 'Web' || appType == 'MobileWeb'){
-	// 						 viewStringXpath = viewStringXpath.split(";")[2];
-	// 					}
-	// 					else{
-	// 						viewStringXpath = viewStringXpath;
-	// 					}						
-    //                     modifiedCustname = modifiedCustXpath[k].split("@@@")[1];
-    //               	if(appType == 'Web' || appType == 'MobileWeb'){
-	// 					modifiedXpath = modifiedCustXpath[k].split(";")[2];
-	// 				}
-	// 				else{
-	// 					modifiedXpath = modifiedCustXpath[k].split("@@@")[0];
-	// 				}
-    //                 if (viewStringXpath == modifiedXpath) {
-    //                     result[k].custname = modifiedCustname;
-    //                 }
-    //             }
-    //         }
-    //         for (var i = 0; i < custObjEdit.length; i++) {
-    //             viewStringXpath = custObjEdit[i].xpath;
-    //             if (viewStringXpath == "") {
-    //                 modifiedCustObjName = modifiedCustObj[i].split("@@@")[1];
-    //                 tempId = modifiedCustObj[i].split('@@@')[0];
-    //                 if (custObjEdit[i].tempId == tempId) {
-    //                     custObjEdit[i].custname = modifiedCustObjName;
-    //                 }
-    //             }
-    //         }
-    //     }
-    // }
         //End of Filter Duplicate Values in ViewString based on custname
         window.localStorage['disableEditing'] = "false";
         //var tasks = JSON.parse(window.localStorage['_TJ']);
@@ -3272,11 +3102,14 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
             //console.log(newScrapedList.view)
         }
         else{
-            for(var i=0; i<getIndexOfDeletedObjects.length;i++){
-                delete viewString.view[getIndexOfDeletedObjects[i]];
-                //viewString.view.splice(getIndexOfDeletedObjects[i], 1);
+            if(getIndexOfDeletedObjects.length > 0)
+            {
+                for(var i=0; i<getIndexOfDeletedObjects.length;i++){
+                    delete viewString.view[getIndexOfDeletedObjects[i].tempId];
+                    //viewString.view.splice(getIndexOfDeletedObjects[i], 1);
+                }
+                viewString.view =  viewString.view.filter(function(n){ return n != null });
             }
-            viewString.view =  viewString.view.filter(function(n){ return n != null });
             getScrapeData = JSON.stringify(viewString);
             //console.log(viewString.view)
         }
@@ -3309,6 +3142,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                     localStorage.removeItem("_modified");
                     saveScrapeDataFlag = true;
                     openDialog("Save Scraped data", "Scraped data saved successfully.")
+                    $("a.enableActions").addClass("disableActions").removeClass("enableActions");
                     angular.element(document.getElementById("left-nav-section")).scope().getScrapeData();
                     $("#saveObjects").attr('disabled', true);
                     deleteScrapeDataservice = true;
@@ -3349,7 +3183,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
             $(this).removeClass('checked');
         }
         var checkedLength = $("input.checked").length;
-        var totalLength = $("#scraplist li").find('input[name="selectAllListItems"]').length;
+        var totalLength = $("#scraplist li:visible").length;
         if (totalLength == checkedLength) {
             $('.checkStylebox').prop("checked", true);
         } else {
@@ -3587,67 +3421,67 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
         }, 500);
     })
 
-    function filter() {
+    function filter() { 
         if (gsElement.length > 0) {
             for (i = 0; i < gsElement.length; i++) {
-                $.each($("#scraplist li"), function() {
-                    if (gsElement[i] == $(this).data("tag") || ($(this).data("tag").toLowerCase().indexOf(gsElement[i].toLowerCase()) >= 0 && gsElement[i] != "a" && $(this).data("tag").toLowerCase() != "radio button" && $(this).data("tag").toLowerCase() != "radiobutton" && $(this).data("tag").toLowerCase().indexOf("listview") < 0 && $(this).data("tag").toLowerCase().indexOf("tablecell") < 0) ||
-                        (gsElement[i] == "input" && ($(this).data("tag").indexOf("edit") >= 0 || $(this).data("tag").indexOf("Edit Box") >= 0 || $(this).data("tag").indexOf("text") >= 0 || $(this).data("tag").indexOf("EditText") >= 0 || $(this).data("tag").indexOf("TextField") >= 0)) ||
-                        (gsElement[i] == "select" && $(this).data("tag").indexOf("combo box") >= 0) ||
-                        (gsElement[i] == "a" && ($(this).data("tag").indexOf("hyperlink") >= 0 /* || $(this).data("tag").indexOf("Static") >= 0*/ )) ||
-                        (gsElement[i] == "checkbox" && $(this).data("tag").indexOf("check box") >= 0) ||
-                        (gsElement[i] == "radiobutton" && $(this).data("tag").indexOf("radio button") >= 0)
-                        /*|| (gsElement[i] == "others" && $(this).data("tag").indexOf("scroll bar") >= 0)
-                        || (gsElement[i] == "others" && $(this).data("tag").indexOf("internal frame") >= 0)
-                        || (gsElement[i] == "others" && $(this).data("tag").indexOf("tab") >= 0)
-                        || (gsElement[i] == "others" && $(this).data("tag").indexOf("XCUIElementTypeTable") >= 0)
-                        || (gsElement[i] == "others" && $(this).data("tag").indexOf("SeekBar") >= 0)
-                        || (gsElement[i] == "others" && $(this).data("tag").indexOf("RangeSeekBar") >= 0)
-                        || (gsElement[i] == "others" && $(this).data("tag").indexOf("NumberPicker") >= 0)
-                        || (gsElement[i] == "others" && $(this).data("tag").indexOf("DatePicker") >= 0)
-                        || (gsElement[i] == "others" && $(this).data("tag").indexOf("TimePicker") >= 0)
-                        || (gsElement[i] == "others" && $(this).data("tag").indexOf("Spinner") >= 0)
-                        || (gsElement[i] == "others" && $(this).data("tag").indexOf("XCUIElementTypeSlider") >= 0)
-                        || (gsElement[i] == "others" && $(this).data("tag").indexOf("XCUIElementTypePickerWheel") >= 0)
-                        || (gsElement[i] == "others" && $(this).data("tag").indexOf("XCUIElementTypeTextField") >= 0)
-                        || (gsElement[i] == "others" && $(this).data("tag").indexOf("XCUIElementTypeSearchField") >= 0)*/
-                    ) {
-                        $(this).show();
-                    }
-                })
-                $.each($("#scraplist li"), function() {
-                    if (gsElement[i] == "others") {
-                        $.each($("#scraplist li"), function() {
-                            if ($(this).data("tag") != "button" &&
-                                $(this).data("tag") != "checkbox" &&
-                                $(this).data("tag") != "select" &&
-                                $(this).data("tag") != "img" &&
-                                $(this).data("tag") != "a" &&
-                                $(this).data("tag") != "radiobutton" &&
-                                $(this).data("tag") != "input" &&
-                                $(this).data("tag") != "list" &&
-                                $(this).data("tag") != "link" &&
-                                $(this).data("tag") != "scroll bar" &&
-                                $(this).data("tag") != "internal frame" &&
-                                $(this).data("tag") != "table" &&
-                                //$(this).data("tag") != "tab" &&
-                                $(this).data("tag").toLowerCase().indexOf("button") == -1 &&
-                                $(this).data("tag").toLowerCase().indexOf("edit") == -1 &&
-                                $(this).data("tag").toLowerCase().indexOf("edit box") == -1 &&
-                                $(this).data("tag").toLowerCase().indexOf("text") == -1 &&
-                                $(this).data("tag").toLowerCase().indexOf("edittext") == -1 &&
-                                $(this).data("tag").toLowerCase().indexOf("combo box") == -1 &&
-                                $(this).data("tag").toLowerCase().indexOf("hyperlink") == -1 &&
-                                $(this).data("tag").toLowerCase().indexOf("check box") == -1 &&
-                                $(this).data("tag").toLowerCase().indexOf("checkbox") == -1 &&
-                                $(this).data("tag").toLowerCase().indexOf("image") == -1 &&
-                                ($(this).data("tag").toLowerCase().indexOf("table") == -1 || $(this).data("tag").toLowerCase() == "tablecell") &&
-                                $(this).data("tag").toLowerCase().indexOf("radio button") == -1) {
-                                $(this).show();
-                            }
-                        })
-                    }
-                })
+                if (gsElement[i] == "others") {
+                    $.each($("#scraplist li"), function() {
+                        if ($(this).data("tag") != "button" &&
+                            $(this).data("tag") != "checkbox" &&
+                            $(this).data("tag") != "select" &&
+                            $(this).data("tag") != "img" &&
+                            $(this).data("tag") != "a" &&
+                            $(this).data("tag") != "radiobutton" &&
+                            $(this).data("tag") != "input" &&
+                            $(this).data("tag") != "list" &&
+                            $(this).data("tag") != "link" &&
+                            $(this).data("tag") != "scroll bar" &&
+                            $(this).data("tag") != "internal frame" &&
+                            $(this).data("tag") != "table" &&
+                            //$(this).data("tag") != "tab" &&
+                            $(this).data("tag").toLowerCase().indexOf("button") == -1 &&
+                            $(this).data("tag").toLowerCase().indexOf("edit") == -1 &&
+                            $(this).data("tag").toLowerCase().indexOf("edit box") == -1 &&
+                            $(this).data("tag").toLowerCase().indexOf("text") == -1 &&
+                            $(this).data("tag").toLowerCase().indexOf("edittext") == -1 &&
+                            $(this).data("tag").toLowerCase().indexOf("combo box") == -1 &&
+                            $(this).data("tag").toLowerCase().indexOf("hyperlink") == -1 &&
+                            $(this).data("tag").toLowerCase().indexOf("check box") == -1 &&
+                            $(this).data("tag").toLowerCase().indexOf("checkbox") == -1 &&
+                            $(this).data("tag").toLowerCase().indexOf("image") == -1 &&
+                            ($(this).data("tag").toLowerCase().indexOf("table") == -1 || $(this).data("tag").toLowerCase() == "tablecell") &&
+                            $(this).data("tag").toLowerCase().indexOf("radio button") == -1) {
+                            $(this).show();
+                        }
+                    })
+                }
+                else{
+                    $.each($("#scraplist li"), function() {
+                        if (gsElement[i] == $(this).data("tag") || ($(this).data("tag").toLowerCase().indexOf(gsElement[i].toLowerCase()) >= 0 && gsElement[i] != "a" && $(this).data("tag").toLowerCase() != "radio button" && $(this).data("tag").toLowerCase() != "radiobutton" && $(this).data("tag").toLowerCase().indexOf("listview") < 0 && $(this).data("tag").toLowerCase().indexOf("tablecell") < 0) ||
+                            (gsElement[i] == "input" && ($(this).data("tag").indexOf("edit") >= 0 || $(this).data("tag").indexOf("Edit Box") >= 0 || $(this).data("tag").indexOf("text") >= 0 || $(this).data("tag").indexOf("EditText") >= 0 || $(this).data("tag").indexOf("TextField") >= 0)) ||
+                            (gsElement[i] == "select" && $(this).data("tag").indexOf("combo box") >= 0) ||
+                            (gsElement[i] == "a" && ($(this).data("tag").indexOf("hyperlink") >= 0 /* || $(this).data("tag").indexOf("Static") >= 0*/ )) ||
+                            (gsElement[i] == "checkbox" && $(this).data("tag").indexOf("check box") >= 0) ||
+                            (gsElement[i] == "radiobutton" && $(this).data("tag").indexOf("radio button") >= 0)
+                            /*|| (gsElement[i] == "others" && $(this).data("tag").indexOf("scroll bar") >= 0)
+                            || (gsElement[i] == "others" && $(this).data("tag").indexOf("internal frame") >= 0)
+                            || (gsElement[i] == "others" && $(this).data("tag").indexOf("tab") >= 0)
+                            || (gsElement[i] == "others" && $(this).data("tag").indexOf("XCUIElementTypeTable") >= 0)
+                            || (gsElement[i] == "others" && $(this).data("tag").indexOf("SeekBar") >= 0)
+                            || (gsElement[i] == "others" && $(this).data("tag").indexOf("RangeSeekBar") >= 0)
+                            || (gsElement[i] == "others" && $(this).data("tag").indexOf("NumberPicker") >= 0)
+                            || (gsElement[i] == "others" && $(this).data("tag").indexOf("DatePicker") >= 0)
+                            || (gsElement[i] == "others" && $(this).data("tag").indexOf("TimePicker") >= 0)
+                            || (gsElement[i] == "others" && $(this).data("tag").indexOf("Spinner") >= 0)
+                            || (gsElement[i] == "others" && $(this).data("tag").indexOf("XCUIElementTypeSlider") >= 0)
+                            || (gsElement[i] == "others" && $(this).data("tag").indexOf("XCUIElementTypePickerWheel") >= 0)
+                            || (gsElement[i] == "others" && $(this).data("tag").indexOf("XCUIElementTypeTextField") >= 0)
+                            || (gsElement[i] == "others" && $(this).data("tag").indexOf("XCUIElementTypeSearchField") >= 0)*/
+                        ) {
+                            $(this).show();
+                        }
+                    })
+                }
             }
         } else {
             $("#scraplist li").show()
