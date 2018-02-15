@@ -531,12 +531,13 @@ select
 }
 
 .searchModuleimg-assign, .searchModuleimg-create{
-	position: absolute;
-    margin-left: 47.20%;
+    position: absolute;
+    /* margin-left: 36.5%; */
     top: 3px;
     background-color: white;
-    border-left: 1px solid #ccc;
+    /* border-left: 1px solid #ccc; */
     padding-left: 3px;
+    right: 13px;
 }
 
 /*#ct-moduleBox.ct-open .ct-nodeBox

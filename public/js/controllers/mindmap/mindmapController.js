@@ -375,11 +375,11 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         });
         u = canvas.append('svg').attr('id', 'ct-actionBox').append('g');
         t = u.append('g').attr('id', 'ct-saveAction').attr('class', 'ct-actionButton').on('click', actionEvent);
-        t.append('rect').attr('x', 0).attr('y', 0).attr('rx', 12).attr('ry', 12);
+        t.append('rect').attr('x', 0).attr('y', 0).attr('rx', 12).attr('ry', 12).attr("width", "80px").attr("height", "50px");
         t.append('text').attr('x', 23).attr('y', 18).text('Save');
         if (selectedTab == "tabCreate") {
             t = u.append('g').attr('id', 'ct-createAction').attr('class', 'ct-actionButton disableButton').on('click', actionEvent);
-            t.append('rect').attr('x', 100).attr('y', 0).attr('rx', 12).attr('ry', 12);
+            t.append('rect').attr('x', 100).attr('y', 0).attr('rx', 12).attr('ry', 12).attr("width", "80px").attr("height", "50px");
             t.append('text').attr('x', 114).attr('y', 18).text('Create');
         }
     };
@@ -509,7 +509,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             var v_c = v.append('image').attr('height', '40px').attr('width', '40px').attr('class', 'ct-nodeIcon').attr('xlink:href', img_src);
             $(v_c.node()).on('click', nodeCtrlClick);
         } else {
-            v.append('image').attr('height', '40px').attr('width', '40px').attr('class', 'ct-nodeIcon').attr('xlink:href', img_src).on('click', nodeClick);
+            v.append('image').attr('height', '40px').attr('width', '40px').attr('class', 'ct-nodeIcon').attr('xlink:href', img_src);;
+            $(v.node()).on('click', nodeClick);
         }
 
         n.display_name = n.name;
@@ -1275,7 +1276,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             if (e.stopPropagation) e.stopPropagation();
         }
         if (isIE) activeNode = this.parentNode;
-        else activeNode = this.parentElement;
+     //   else activeNode = this.parentElement;
+        else activeNode = this;
         var u, v, w, f, c = d3.select('#ct-assignBox');
         var p = d3.select(activeNode);
         var pi = parseInt(p.attr('id').split('-')[2]);
@@ -3094,11 +3096,11 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         u = canvas.append('svg').attr('id', 'ct-actionBox_W').append('g');
         t = u.append('g').attr('id', 'ct-saveAction_W').attr('class', 'ct-actionButton_W').on('click', actionEvent_W);
         // 886: Unable to rearrange nodes in e2e
-        t.append('rect').attr('x', 0).attr('y', 0).attr('rx', 12).attr('ry', 12);
+        t.append('rect').attr('x', 0).attr('y', 0).attr('rx', 12).attr('ry', 12).attr("width", "80px").attr("height", "50px");
         t.append('text').attr('x', 23).attr('y', 18).text('Save');
         if (selectedTab == "tabCreate" || 'mindmapEndtoEndModules') {
             t = u.append('g').attr('id', 'ct-createAction_W').attr('class', 'ct-actionButton_W disableButton').on('click', actionEvent_W);
-            t.append('rect').attr('x', 100).attr('y', 0).attr('rx', 12).attr('ry', 12);
+            t.append('rect').attr('x', 100).attr('y', 0).attr('rx', 12).attr('ry', 12).attr("width", "80px").attr("height", "50px");;
             t.append('text').attr('x', 114).attr('y', 18).text('Create');
 
         }
