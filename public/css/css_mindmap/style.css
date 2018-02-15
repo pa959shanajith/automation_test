@@ -379,6 +379,13 @@ p,a,img,text,span,.noselect{-webkit-touch-callout:none;-webkit-user-select:none;
 #ct-assignRevw{ position: relative; left: 24px; width: 64%;}
 #ct-assignRel{ position: relative; left: 24px; width: 64%;}
 #ct-assignCyc{ position: relative; left: 24px; width: 64%;}
+#ct-cxval{ position: relative; left: 24px; width: 58%;font-weight:bold};
+#ct-compbox{color:#643693;margin-left:10px};
+.ct-cxcontainer{
+    width: 100%;
+	overflow: scroll;
+    position: absolute;
+}
 /*.selectProject{height: 24px;width: 100%;}*/
 .selectProject
 {
