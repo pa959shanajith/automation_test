@@ -33,6 +33,84 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     var saveFlag_W = false;
     var collapseEteflag = true;
     //Workflow//
+
+// Complexity
+        var cx_weightage = {   //scale , weightage
+            'Application Type':3,
+            'Domain knowledge factor':1,
+            'Requirement Complexity':2,
+            'Test Data Requirement/complexity':3,
+            'Test Management Tool being used':1, 
+
+            'Multi-lingual support':5,
+            '# of Objects':5,
+
+            'Analytical & Logical Reasoning':1,
+            'Team Capability':1,
+            '# of steps':1,
+            '# of Verification Points':2,
+            'Multi-browser support':1,
+            'Re-usability/Re-#':2,
+            'Database Check points':1                                 
+        }
+
+        var cx_scale = {
+            //apptype
+            'DW ETL (H)':	5,
+            'Desktop (H)':	5,
+            'Oracle (H)':	5,
+            'SAP (H)':	5,
+            'Mainframe Application (H)':	5,
+            'Mobile Application - IOS (H)':	5,
+            'Mobile Web - IOS (H)':	5,
+            'Webservices - REST (M)':	3,
+            'Mobile Web - Android (M)':	3,
+            'Database Application (M)':	3,
+            'Web Application (L)':	1,
+            'Webservices - SOAP (L)':	1,
+            'Mobile Application - Android (L)':	1,
+            //Domain knowledge
+            'Limited':	5,
+            'Fair':	3,
+            'Good':	1,
+            'H':	5,
+            'M':	3,
+            'L':	1,
+            //Test Management Tool
+            'Yes': 5,
+            'No': 3,
+            //Multi-lingual support Multi-browser support
+            '1':	1,
+            '2 to 3':	3,
+            '>3'	:    5,
+            //# of objects
+            '<11':	1,
+            '11-25':	3,
+            '>25':	5,
+            //Analytical & Logical Reasoning + Team Capability
+            'Very Low':	5,
+            'Low':	4,
+            'Nominal':	3,
+            'High':	2,
+            'Very High':	1,
+            //# of Steps
+            '< 15':	1,
+            '15-30':	3,
+            '>30':	5, 
+            //# of Verification Points Database Check points
+            '< 2':	1,
+            '3-8':	3,
+            '>8':	5,
+            //Re-usability/Re-#
+            'Reused':	1,
+            'Rehashed':	3,
+            'NA':	5
+        };
+        var cscore = 0;
+        var clist;
+
+
+
     //-------------------End of Global Variables-----------------------//
 
     var faRef = {
@@ -248,15 +326,15 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             },
             "scenarios": {
                 "task": ["Execute Scenario"],
-                "attributes": ["at", "rw", "sd", "ed", "re_estimation","pg"]
+                "attributes": ["at", "rw", "sd", "ed", "re_estimation","pg","cx"]
             },
             "screens": {
                 "task": ["Scrape", "Append", "Compare", "Add", "Map"],
-                "attributes": ["at", "rw", "sd", "ed", "re_estimation","pg"]
+                "attributes": ["at", "rw", "sd", "ed", "re_estimation","pg","cx"]
             },
             "testcases": {
                 "task": ["Update", "Design"],
-                "attributes": ["at", "rw", "sd", "ed", "re_estimation"]
+                "attributes": ["at", "rw", "sd", "ed", "re_estimation","cx"]
             }
         };
         zoom = d3.behavior.zoom().scaleExtent([0.1, 3]).on("zoom", zoomed);
@@ -577,417 +655,6 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         d3.select('#ct-assignBox').classed('no-disp', !0);
     }
 
-    // function addTask(e) {
-    //     $("ct-assignTask,#ct-assignedTo,#ct-assignRevw,#ct-assignRel,#ct-assignCyc").removeClass("selectErrorBorder");
-    //     $("#startDate,#endDate").removeClass("inputErrorBorder"); 
-    //     if ($("#ct-assignTask option:selected").val() == "Execute Batch" && $("#ct-executeBatch").val() == "") {
-    //         $("#ct-executeBatch").css('border', '').addClass("inputErrorBorderFull");
-    //         return false;
-    //     } else if ($("#ct-assignedTo option:selected").val() == "select user") {
-    //         $("#ct-assignedTo").css('border', '').addClass("inputErrorBorderFull");
-    //         return false;
-    //     } else if ($("#ct-assignRevw option:selected").val() == "select reviewer") {
-    //         $("#ct-assignRevw").css('border', '').addClass("inputErrorBorderFull");
-    //         return false;
-    //     } else if ($("#startDate").val() == "") {
-    //         $("#startDate").css('border', '').addClass("inputErrorBorderFull");
-    //         return false;
-    //     } else if ($("#endDate").val() == "") {
-    //         $("#endDate").css('border', '').addClass("inputErrorBorderFull");
-    //         return false;
-    //     } else if ($("#ct-assignRel option:selected").val() == "select release") {
-    //         $("#ct-assignRel").css('border', '').addClass("inputErrorBorderFull");
-    //         return false;
-    //     } else if ($("#ct-assignCyc option:selected").val() == "select cycle") {
-    //         $("#ct-assignCyc").css('border', '').addClass("inputErrorBorderFull");
-    //         return false;
-    //     } else if ($("#ct-assignDetails").val().trim() == "") {
-    //         $("#ct-assignDetails").css('border', '').addClass("inputErrorBorderFull");
-    //         return false;
-    //     }
-        
-    //     var ed = $("#endDate").val().split('/');
-    //     var sd = $("#startDate").val().split('/');
-    //     start_date = new Date(sd[2] + '-' + sd[1] + '-' + sd[0]);
-    //     end_date = new Date(ed[2] + '-' + ed[1] + '-' + ed[0]);
-    //     var apptype=$('.project-list option:selected').attr('app-type');
-
-    //     if (end_date < start_date) {
-    //         $("#endDate").css('border', '').addClass("inputErrorBorderFull");
-    //         return false;
-    //     }
-    //     d3.select('#ct-assignBox').classed('no-disp', !0);
-    //     var a, b, p = d3.select(activeNode);
-    //     var pi = parseInt(p.attr('id').split('-')[2]);
-    //     var nType = p.attr('data-nodetype');
-    //     tvn = 0;
-    //     if ($('.version-list') !== undefined)
-    //         tvn = $('.version-list').val();
-
-    //     var estimationCount = 0;
-    //     if (dNodes[pi].task != undefined || dNodes[pi].task != null) {
-    //         if (dNodes[pi].task.endDate != "" || dNodes[pi].task.endDate != undefined || dNodes[pi].task.endDate != " ") {
-    //             var nodeDateSplit = dNodes[pi].task.endDate.split("/");
-    //             var modDateSplit = $('#endDate').val().split("/");
-    //             if (new Date(nodeDateSplit[2], (nodeDateSplit[1] - 1), nodeDateSplit[0]) != new Date(modDateSplit[2], (modDateSplit[1] - 1), modDateSplit[0])) {
-    //                 estimationCount = parseInt(dNodes[pi].task.re_estimation) + 1;
-    //             }
-    //         }
-    //     }
-    //     var tObj = {
-    //         tvn: tvn,
-    //         t: $('#ct-assignTask').val(),
-    //         bn: $('#ct-executeBatch').val(),
-    //         at: $('#ct-assignedTo').val(),
-    //         rw: /*(d3.select('#ct-assignRevw')[0][0])?*/ $('#ct-assignRevw').val() /*:null*/ ,
-    //         sd: $('#startDate').val(),
-    //         ed: $('#endDate').val(),
-    //         re_estimation: estimationCount,
-    //         re: (d3.select('#ct-assignRel')[0][0]) ? $('#ct-assignRel').val() : null,
-    //         cy: (d3.select('#ct-assignCyc')[0][0]) ? $('#ct-assignCyc').val() : null,
-    //         det: d3.select('#ct-assignDetails').property('value'),
-    //         app: $('option:selected', '.project-list').attr('app-type')
-    //     };
-    //     //console.log(tObj);
-    //     if (dNodes[pi].task) {
-    //         tObj.id = dNodes[pi].task.id;
-    //         tObj.oid = dNodes[pi].task.oid;
-    //         tObj.parent = dNodes[pi].task.parent;
-    //     } else {
-    //         tObj.id = null;
-    //         tObj.oid = null;
-    //         tObj.parent = null;
-    //     }
-    //     var taskflag = false;
-    //     var errorRelCyc = false;
-    //     var dateFlag = true;
-    //     var reviewerFlag = true;
-    //     if ($('#startDate').val() == null || $('#endDate').val() == null || $('#startDate').val() == '' || $('#endDate').val() == '') {
-    //         dateFlag = false;
-    //     }
-    //     if (tObj.rw == 'select reviewer' || tObj.at == 'select user') {
-    //         reviewerFlag = false;
-    //     }
-    //     if (dateFlag && reviewerFlag) {
-    //         Object.keys(tObj).forEach(function(k) {
-    //             if (tObj[k] === undefined) tObj[k] = null;
-    //         });
-    //         //if(p.select('.ct-nodeTask')[0][0]==null) p.append('image').attr('class','ct-nodeTask').attr('xlink:href','images_mindmap/node-task-assigned.png').attr('x',29).attr('y',-10);
-    //         if (nType == "modules" || nType == "modules_endtoend") {
-    //             if (tObj.cy != 'select cycle' && tObj.re != 'select release') {
-    //                 if (dNodes[pi].id_c != "null") {
-    //                     dNodes[pi].task = {
-    //                         taskvn: tObj.tvn,
-    //                         id: tObj.id,
-    //                         oid: tObj.oid,
-    //                         batchName: tObj.bn,
-    //                         task: tObj.t,
-    //                         assignedTo: tObj.at,
-    //                         reviewer: tObj.rw,
-    //                         startDate: tObj.sd,
-    //                         endDate: tObj.ed,
-    //                         re_estimation: tObj.re_estimation,
-    //                         release: tObj.re,
-    //                         cycle: tObj.cy,
-    //                         details: tObj.det,
-    //                         parent: (tObj.parent != null) ? tObj.parent : [dNodes[pi].id_c]
-    //                     };
-    //                 }
-    //                 //Logic to add tasks for the scenario
-    //                 if (dNodes[pi].children) dNodes[pi].children.forEach(function(tSc) {
-    //                     if (tSc.task === undefined || tSc.task == null) {
-    //                         if (dNodes[pi].id_c != 'null' && tSc.id_c != 'null') {
-    //                             taskflag = true;
-    //                             //Issue- 711 Assign directly to the module and see that scenario gets assign but on click of "Save" scenario gets unassign.
-    //                             tSc.task = {
-    //                                 taskvn: tObj.tvn,
-    //                                 id: null,
-    //                                 oid: null,
-    //                                 task: "Execute Scenario",
-    //                                 assignedTo: tObj.at,
-    //                                 reviewer: tObj.rw,
-    //                                 startDate: tObj.sd,
-    //                                 endDate: tObj.ed,
-    //                                 re_estimation: tObj.re_estimation,
-    //                                 release: tObj.re,
-    //                                 cycle: tObj.cy,
-    //                                 details: tObj.det,
-    //                                 parent: (tObj.parent != null) ? tObj.parent : [dNodes[pi].id_c, tSc.id_c]
-    //                             };
-    //                             d3.select('#ct-node-' + tSc.id).append('image').attr('class', 'ct-nodeTask').attr('xlink:href', 'images_mindmap/node-task-assigned.png').attr('x', 29).attr('y', -10);
-    //                         }
-
-    //                     } else {
-    //                         //If any of the cassandra id in parent list of the task is null then update it
-    //                         if (tSc.task.parent.indexOf(null) == -1 && tSc.task.parent != [dNodes[pi].id_c, tSc.id_c]) {
-    //                             tSc.task['updatedParent'] = [dNodes[pi].id_c, tSc.id_c];
-    //                         }
-
-    //                     }
-    //                     if (tSc.children != undefined) {
-    //                         tSc.children.forEach(function(scr) {
-    //                             if (scr.task === undefined || scr.task == null) {
-    //                                 if (dNodes[pi].id_c != 'null' && tSc.id_c != 'null' && scr.id_c != 'null') {
-    //                                     taskflag = true;
-    //                                     if(apptype!="258afbfd-088c-445f-b270-5014e61ba4e2"){
-    //                                         scr.task = {
-    //                                             taskvn: tObj.tvn,
-    //                                             id: null,
-    //                                             oid: null,
-    //                                             task: "Scrape",
-    //                                             assignedTo: tObj.at,
-    //                                             reviewer: tObj.rw,
-    //                                             startDate: tObj.sd,
-    //                                             endDate: tObj.ed,
-    //                                             re_estimation: tObj.re_estimation,
-    //                                             details: tObj.det,
-    //                                             parent: [dNodes[pi].id_c, tSc.id_c, scr.id_c]
-    //                                         };
-
-    //                                         d3.select('#ct-node-' + scr.id).append('image').attr('class', 'ct-nodeTask').attr('xlink:href', 'images_mindmap/node-task-assigned.png').attr('x', 29).attr('y', -10);
-    //                                     }
-    //                                 }
-
-    //                             } else {
-    //                                 if (scr.task.parent.indexOf(null) == -1 && scr.task.parent != [dNodes[pi].id_c, tSc.id_c, scr.id_c]) {
-    //                                     scr.task['updatedParent'] = [dNodes[pi].id_c, tSc.id_c, scr.id_c];
-    //                                 }
-
-    //                             }
-
-    //                             scr.children.forEach(function(tCa) {
-    //                                 if (tCa.task === undefined || tCa.task == null) {
-    //                                     if (dNodes[pi].id_c != 'null' && tSc.id_c != 'null' && scr.id_c != 'null' && tCa.id_c != 'null') {
-    //                                         taskflag = true;
-    //                                         tCa.task = {
-    //                                             taskvn: tObj.tvn,
-    //                                             id: null,
-    //                                             oid: null,
-    //                                             task: "Design",
-    //                                             assignedTo: tObj.at,
-    //                                             reviewer: tObj.rw,
-    //                                             startDate: tObj.sd,
-    //                                             endDate: tObj.ed,
-    //                                             re_estimation: tObj.re_estimation,
-    //                                             details: tObj.det,
-    //                                             parent: [dNodes[pi].id_c, tSc.id_c, scr.id_c, tCa.id_c]
-    //                                         };
-    //                                         d3.select('#ct-node-' + tCa.id).append('image').attr('class', 'ct-nodeTask').attr('xlink:href', 'images_mindmap/node-task-assigned.png').attr('x', 29).attr('y', -10);
-    //                                     }
-    //                                 } else {
-    //                                     if (tCa.task.parent != [dNodes[pi].id_c, tSc.id_c, scr.id_c, tCa.id_c]) {
-    //                                         tCa.task['updatedParent'] = [dNodes[pi].id_c, tSc.id_c, scr.id_c, tCa.id_c];
-    //                                     }
-    //                                     taskflag = true;
-    //                                 }
-    //                             });
-    //                         });
-    //                         //Removed a condition to fix assign issue in end to end flow
-    //                     }
-
-    //                 });
-    //             } else {
-    //                 taskflag = '';
-    //                 errorRelCyc = true;
-    //             }
-    //         }
-    //         //Logic to add tasks for the scenario
-    //         else if (nType == "scenarios") {
-    //             var modid = dNodes[pi].parent.id_c,
-    //                 tscid = dNodes[pi].id_c;
-
-    //             if (dNodes[pi].parent.task != null) {
-    //                 var parentTask = dNodes[pi].parent.task;
-
-
-    //                 if (tscid != 'null') {
-    //                     dNodes[pi].task = {
-    //                         taskvn: tObj.tvn,
-    //                         id: tObj.id,
-    //                         oid: tObj.oid,
-    //                         task: tObj.t,
-    //                         assignedTo: tObj.at,
-    //                         reviewer: tObj.rw,
-    //                         startDate: tObj.sd,
-    //                         endDate: tObj.ed,
-    //                         re_estimation: tObj.re_estimation,
-    //                         release: parentTask.release,
-    //                         cycle: parentTask.cycle,
-    //                         details: tObj.det,
-    //                         parent: (tObj.parent != null) ? tObj.parent : [modid, dNodes[pi].id_c]
-    //                     };
-
-    //                     if (dNodes[pi].parent.type == 'modules_endtoend') taskflag = true;
-    //                 }
-
-
-    //                 if (dNodes[pi].children) dNodes[pi].children.forEach(function(scr) {
-    //                     //tSc.children.forEach(function(scr){
-    //                     if (scr.task === undefined || scr.task == null) {
-    //                         if (modid != 'null' && tscid != 'null' && scr.id_c != 'null') {
-    //                             taskflag = true;
-    //                             if(apptype!="258afbfd-088c-445f-b270-5014e61ba4e2"){
-    //                                 scr.task = {
-    //                                     taskvn: tObj.tvn,
-    //                                     id: null,
-    //                                     oid: null,
-    //                                     task: "Scrape",
-    //                                     assignedTo: tObj.at,
-    //                                     reviewer: tObj.rw,
-    //                                     startDate: tObj.sd,
-    //                                     endDate: tObj.ed,
-    //                                     re_estimation: tObj.re_estimation,
-    //                                     details: tObj.det,
-    //                                     parent: [modid, tscid, scr.id_c]
-    //                                 };
-    //                                 d3.select('#ct-node-' + scr.id).append('image').attr('class', 'ct-nodeTask').attr('xlink:href', 'images_mindmap/node-task-assigned.png').attr('x', 29).attr('y', -10);
-    //                             }
-    //                         }
-
-    //                     } else {
-    //                         if (scr.task.parent != [modid, tscid, scr.id_c]) {
-    //                             scr.task['updatedParent'] = [modid, tscid, scr.id_c];
-    //                         }
-
-    //                     }
-
-    //                     scr.children.forEach(function(tCa) {
-    //                         if (tCa.task === undefined || tCa.task == null) {
-    //                             if (modid != 'null' && tscid != 'null' && scr.id_c != 'null' && tCa.id_c != 'null') {
-    //                                 taskflag = true;
-    //                                 tCa.task = {
-    //                                     taskvn: tObj.tvn,
-    //                                     id: null,
-    //                                     oid: null,
-    //                                     task: "Design",
-    //                                     assignedTo: tObj.at,
-    //                                     reviewer: tObj.rw,
-    //                                     startDate: tObj.sd,
-    //                                     endDate: tObj.ed,
-    //                                     re_estimation: tObj.re_estimation,
-    //                                     details: tObj.det,
-    //                                     parent: [modid, tscid, scr.id_c, tCa.id_c]
-    //                                 };
-    //                                 d3.select('#ct-node-' + tCa.id).append('image').attr('class', 'ct-nodeTask').attr('xlink:href', 'images_mindmap/node-task-assigned.png').attr('x', 29).attr('y', -10);
-    //                             }
-    //                         } else {
-    //                             if (tCa.task.parent != [modid, tscid, scr.id_c, tCa.id_c]) {
-    //                                 tCa.task['updatedParent'] = [modid, tscid, scr.id_c, tCa.id_c];
-    //                             }
-    //                             taskflag = true;
-    //                         }
-    //                     });
-    //                     //});
-    //                 });
-    //             } else {
-    //                 openDialogMindmap("Error", 'Assign task to the module')
-    //                 return;
-    //             }
-    //         } else if (nType == "screens") {
-    //             var modid = dNodes[pi].parent.parent.id_c,
-    //                 tscid = dNodes[pi].parent.id_c,
-    //                 scrid = dNodes[pi].id_c;
-    //             if (dNodes[pi].id_c != 'null') {
-    //                 dNodes[pi].task = {
-    //                     taskvn: tObj.tvn,
-    //                     id: tObj.id,
-    //                     oid: tObj.oid,
-    //                     task: tObj.t,
-    //                     assignedTo: tObj.at,
-    //                     reviewer: tObj.rw,
-    //                     startDate: tObj.sd,
-    //                     endDate: tObj.ed,
-    //                     re_estimation: tObj.re_estimation,
-    //                     details: tObj.det,
-    //                     parent: (tObj.parent != null) ? tObj.parent : [modid, tscid, scrid]
-    //                 };
-    //             }
-
-    //             if (tObj.parent != [modid, tscid, scrid]) {
-    //                 dNodes[pi].task['updatedParent'] = [modid, tscid, scrid];
-    //             }
-    //             if (dNodes[pi].children) dNodes[pi].children.forEach(function(tCa) {
-    //                 var cTask = (tObj.t == "Scrape" || tObj.t == "Append" || tObj.t == "Compare") ? "Design" : "Debug";
-    //                 var tcid = tCa.id_c;
-    //                 if (tCa.task === undefined || tCa.task == null) {
-    //                     if (modid != 'null' && tscid != 'null' && scrid != 'null' && tcid != 'null') {
-    //                         taskflag = true;
-    //                         tCa.task = {
-    //                             taskvn: tObj.tvn,
-    //                             id: null,
-    //                             oid: null,
-    //                             task: cTask,
-    //                             assignedTo: tObj.at,
-    //                             reviewer: tObj.rw,
-    //                             startDate: tObj.sd,
-    //                             endDate: tObj.ed,
-    //                             re_estimation: tObj.re_estimation,
-    //                             details: tObj.det,
-    //                             parent: [modid, tscid, scrid, tcid]
-    //                         };
-    //                         d3.select('#ct-node-' + tCa.id).append('image').attr('class', 'ct-nodeTask').attr('xlink:href', 'images_mindmap/node-task-assigned.png').attr('x', 29).attr('y', -10);
-    //                     }
-    //                 } else {
-    //                     if (tCa.task.parent != [modid, tscid, scrid, tcid]) {
-    //                         tCa.task['updatedParent'] = [modid, tscid, scrid, tcid];
-    //                     }
-    //                     taskflag = true;
-    //                 }
-    //             });
-    //         } else if (nType == "testcases") {
-    //             var modid = dNodes[pi].parent.parent.parent.id_c,
-    //                 tscid = dNodes[pi].parent.parent.id_c,
-    //                 scrid = dNodes[pi].parent.id_c;
-    //             var tcid = dNodes[pi].id_c;
-    //             if (modid != 'null' && tscid != 'null' && scrid != 'null' && tcid != 'null') {
-    //                 taskflag = true;
-    //                 dNodes[pi].task = {
-    //                     taskvn: tObj.tvn,
-    //                     id: tObj.id,
-    //                     oid: tObj.oid,
-    //                     task: tObj.t,
-    //                     assignedTo: tObj.at,
-    //                     reviewer: tObj.rw,
-    //                     startDate: tObj.sd,
-    //                     endDate: tObj.ed,
-    //                     re_estimation: tObj.re_estimation,
-    //                     details: tObj.det,
-    //                     parent: (tObj.parent != null) ? tObj.parent : [modid, tscid, scrid, tcid]
-    //                 };
-    //                 if (tObj.parent != [modid, tscid, scrid, tcid]) {
-    //                     dNodes[pi].task['updatedParent'] = [modid, tscid, scrid, tcid];
-    //                 }
-    //             }
-    //         }
-    //     }
-    //     if (!(dateFlag || reviewerFlag)) {
-    //         openDialogMindmap("Date Error", "Please select User/Reviewer and Date ")
-    //     } else if (dateFlag == false) {
-    //         openDialogMindmap("Date Error", "Please select Date")
-    //     } else if (reviewerFlag == false) {
-    //         openDialogMindmap("Task Assignment Error", "Please select Reviewer/Assigned User")
-    //     } else if (taskflag) {
-    //         if (p.select('.ct-nodeTask')[0][0] == null) p.append('image').attr('class', 'ct-nodeTask').attr('xlink:href', 'images_mindmap/node-task-assigned.png').attr('x', 29).attr('y', -10);
-    //     } else if (taskflag == false) {
-    //         openDialogMindmap("Task Assignment Error", "Please create the structure before assigning task")
-    //     }
-    //     if (errorRelCyc) {
-    //         openDialogMindmap("Task Assignment Error", "Please select Release/Cycle")
-    //     }
-	// 	for (var i = 0; i < taskidArr.length; i++) {
-	// 		if (taskidArr[i].id == dNodes[pi].task.id) {
-	// 			if (dNodes[pi].task.task == "Execute" || dNodes[pi].task.task == "Execute Batch") {
-	// 				assignedObj[dNodes[pi].task.task] = $("#ct-assignedTo option:selected").text();
-	// 			} else if (dNodes[pi].task.task == "Execute Scenario") {
-	// 				assignedObj[dNodes[pi].task.task] = $("#ct-assignedTo option:selected").text();
-	// 			} else if (dNodes[pi].task.task == "Scrape" || dNodes[pi].task.task == "Append" || dNodes[pi].task.task == "Compare" || dNodes[pi].task.task == "Add" || dNodes[pi].task.task == "Map") {
-	// 				assignedObj[dNodes[pi].task.task] = $("#ct-assignedTo option:selected").text();
-	// 			} else if (dNodes[pi].task.task == "Design" || dNodes[pi].task.task == "Update") {
-	// 				assignedObj[dNodes[pi].task.task] = $("#ct-assignedTo option:selected").text();
-	// 			}
-	// 		}
-	// 	}
-    // };
     function assignBoxValidator(){
         $("ct-assignTask,#ct-assignedTo,#ct-assignRevw").removeClass("selectErrorBorder");
         $("#startDate,#endDate").removeClass("inputErrorBorder");
@@ -1080,7 +747,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 release: $('.release-list').val(),
                 cycle: $('.cycle-list').val(),
                 details: tObj.det,
-                parent: data.parent
+                parent: data.parent,
+                cx: clist!=undefined ? clist.toString(): undefined
             };        
         if(data.id==0) return t; else delete t.batchName;
         if(data.id==1){
@@ -1117,6 +785,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         var errorRelCyc = false;
         var dateFlag = true;
         var reviewerFlag = true;
+        var apptype=$('.project-list option:selected').attr('app-type');
         if ($('#startDate').val() == null || $('#endDate').val() == null || $('#startDate').val() == '' || $('#endDate').val() == '') {
             dateFlag = false;
         }
@@ -1136,14 +805,13 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 //Logic to add tasks for the scenario
                 if (dNodes[pi].children && $('.pg-checkbox')[0].checked) dNodes[pi].children.forEach(function(tSc) {
                     addTask_11(tSc.id,tObj,1);
-                    if (tSc.children != undefined) {
+                    if (tSc.children != undefined ) {
                         tSc.children.forEach(function(scr) {
-                            addTask_11(scr.id,tObj,2);
+                            if(apptype!="258afbfd-088c-445f-b270-5014e61ba4e2") addTask_11(scr.id,tObj,2);
                             scr.children.forEach(function(tCa) {
                                 addTask_11(tCa.id,tObj,3);
                             });
                         });
-                        //Removed a condition to fix assign issue in end to end flow
                     }
                 });
             }
@@ -1157,7 +825,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                         addTask_11(dNodes[pi].id,tObj,4);
                     }
                     if (dNodes[pi].children && $('.pg-checkbox')[0].checked) dNodes[pi].children.forEach(function(scr) {
-                        addTask_11(scr.id,tObj,5);
+                        if(apptype!="258afbfd-088c-445f-b270-5014e61ba4e2") addTask_11(scr.id,tObj,5);
                         scr.children.forEach(function(tCa) {
                             addTask_11(tCa.id,tObj,6);
                         });
@@ -1313,8 +981,10 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             ed: (nt) ? nt.endDate : '',
             re: (nt && nt.release != null) ? nt.release : '',
             cy: (nt && nt.cycle != null) ? nt.cycle : '',
-            det: (nt) ? nt.details : ''
+            det: (nt) ? nt.details : '',
+            cx: (nt) ? nt.cx : undefined
         };
+        
         c.classed('no-disp', !1);
         //d3.select('#ct-assignDetails').property('value', tObj.det);
         d3.select('#ct-assignTable').select('ul').remove();
@@ -1446,8 +1116,40 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 }
                 else
                     $(v[0][0]).remove();
-            }            
+            }           
+            else if(tk == "cx"){
+                if(dNodes[pi].parent){
+                    v.append('span').attr('class', 'ct-assignItem fl-left').html('Complexity');
+                    v.append('span').attr('id', 'ct-cxval').attr('nType',t).attr('idx',pi).text('Unset');
+                    v.append('span').attr('id','ct-compbox');
+                    $("#ct-compbox").append(`<i class="fa fa-list" aria-hidden="true"></i>`);   
+                    $("#ct-compbox").css('color','#643693').css('margin-left','30px'); 
+                    var HTMLcontent = getHTMLdropdown(t);
+                    clist = tObj.cx;
+                    if(!(clist=="undefined"||clist==undefined)) clist = clist.split(",");
+                    $('#addObjContainer111').empty().append(HTMLcontent);
+                    populateComplexityValues(pi);
+                    $('#ct-compbox').click(function(){
+                        showComplexityBox(t);
+                    });     
+                    if(!(clist=="undefined"||clist==undefined)){
+                        $('#ct-cxval').text(getComplexityLevel(t,parseInt(clist[0])));
+                        $('#complexity-val').text('Complexity: '+getComplexityLevel(t,parseInt(clist[0])));
+                    }
+                    
+                }
+                else
+                    $(v[0][0]).remove();
+            } 
         });
+
+        function populateComplexityValues(pi){
+            if(clist=="undefined"||clist==undefined) return;
+            $.each($(".addObj-row"), function(i) {
+                $(this).find("select").val(clist[i+1]);
+            });
+       }
+
         //var cSize=getElementDimm(c);
         // Removed assgin box overflow (Himanshu)
         var cSize = [268, 386];
@@ -1480,11 +1182,155 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 $('#ct-unassignButton a').removeClass("disableButton");
             }
         }, 30);
-		var nodeClik = {};
-		nodeClik.id = dNodes[pi].task.id;
-		taskidArr.push(nodeClik);
+        if(dNodes[pi].task.id){
+            var nodeClik = {};
+            nodeClik.id = dNodes[pi].task.id;
+            taskidArr.push(nodeClik);
+        }
     };
 
+    function showComplexityBox(nType){
+        //Calculate complexity and then show
+        $.each($(".addObj-row"), function(e) {
+            console.log($(this).find('.form-group-1').text());
+            console.log($(this).find("select option:selected").val());
+        });
+        $('#dialog-compBox').modal("show");
+        $('.form-control.form-control-custom').change(function(){
+            cscore=0;
+            $.each($(".addObj-row"), function(e){
+                var cs=0,cw=0;
+                cw = cx_weightage[$(this).find('.form-group-1').text().trim()]!=undefined?cx_weightage[$(this).find('.form-group-1').text().trim()]:0;
+                cs = cx_scale[$(this).find("select option:selected").val().trim()]!=undefined?cx_scale[$(this).find("select option:selected").val().trim()]:0;
+                cscore = cscore+(cs*cw);
+            });
+            console.log("score:",cscore);
+            $('#complexity-val').text('Complexity: '+getComplexityLevel(nType,cscore));
+        });
+        //$('.modal-backdrop.in').remove();
+    }
+
+    $scope.submitComplexity = function(){
+        var pi = $('#ct-cxval').attr('idx');
+        var err = false;
+        if(cscore!=0) clist = [cscore];
+        $(".addObj-row").find("select").removeClass('selectErrorBorder');
+
+        $.each($(".addObj-row"), function() {
+            if ($(this).find("select option:selected").val() == "Select Option") {
+                $(this).find("select").attr("style", "border-bottom: 4px solid #d33c3c !important;").focus(); //.addClass('selectErrorBorder')
+                err = "true";
+            } 
+            else{
+                clist.push($(this).find("select option:selected").val().trim());
+            }
+        })
+        if(!err){
+            $('#dialog-compBox').modal("hide");
+            $('#ct-cxval').text(getComplexityLevel($('#ct-cxval').attr('nType'),cscore));
+        }
+    }
+
+    function getComplexityLevel(nType,csc){
+        if(nType=='scenarios'){
+            if(csc<=20){
+                return 'Low';
+            }
+            else if(csc<=30){
+                return 'Medium';
+            }
+            else{
+                return 'High';
+            }
+        }
+        if(nType=='screens'){
+            if(csc<=20){
+                return 'Low';
+            }
+            else if(csc<=30){
+                return 'Medium';
+            }
+            else{
+                return 'High';
+            }
+        }
+        if(nType=='testcases'){
+            if(csc<=20){
+                return 'Low';
+            }
+            else if(csc<=35){
+                return 'Medium';
+            }
+            else{
+                return 'High';
+            }
+        }        
+        else return undefined;        
+    }
+
+    function getHTMLdropdown(nType){
+        var tableHTML = ''; 
+        var cTableDataS = {
+            'Application Type':['DW ETL (H)','Desktop (H)','Oracle (H)','SAP (H)','Mainframe Application (H)','Mobile Application - IOS (H)','Mobile Web - IOS (H)','Webservices - REST (M)','Mobile Web - Android (M)','Database Application (M)','Web Application (L)','Webservices - SOAP (L)','Mobile Application - Android (L)'],
+            'Domain knowledge factor':['Limited','Fair','Good'],
+            'Requirement Complexity':['H','M','L'],
+            'Test Data Requirement/complexity':['H','M','L'],
+            'Test Management Tool being used':['Yes','No']
+        };
+        var cTableDataSr = {
+            'Multi-lingual support':['1','2 to 3','>3'],
+            '# of Objects':['<11','11-25','>25']
+        };
+
+        var cTableDataT = {
+            'Analytical & Logical Reasoning':['Very Low','Low','Nominal','High','Very High'],
+            'Team Capability':['Very Low','Low','Nominal','High','Very High'],
+            '# of steps':['<15','15-30','>30'],
+            '# of Verification Points':['<3','3-8','>8'],
+            'Multi-browser support':['<1','2-3','>3'],
+            'Re-usability/Re-#':['NA','Reused','Rehashed'],
+            'Database Check points':['2','3-8','>8']
+        };
+
+
+        function selectHead(key){
+            return      `<div class="row row-modal addObj-row">
+                            <div class="form-group form-group-1">`+key+` </div>
+                                <div class="form-group form-group-2">
+                                    <select class="form-control form-control-custom">`;
+        } 
+        var selectFoot = `</select></div></div>`;
+
+        function buildSelect(optionList){
+            var olist = '<option selected disabled>Select Option</option>';
+            optionList.forEach(function(e){
+                olist = olist+'<option value="'+e+'">'+e+'</option>';
+            });
+            return olist;
+
+        }
+     
+        if(nType=='scenarios'){
+            Object.keys(cTableDataS).forEach(function(key) {
+                 var optlist = buildSelect(cTableDataS[key]);
+                 tableHTML = tableHTML + selectHead(key) + optlist + selectFoot;
+            });
+        }
+        else if(nType=='screens'){
+            Object.keys(cTableDataSr).forEach(function(key) {
+                 var optlist = buildSelect(cTableDataSr[key]);
+                 tableHTML = tableHTML + selectHead(key) + optlist + selectFoot;
+            });
+        }
+        else if(nType=='testcases'){
+            Object.keys(cTableDataT).forEach(function(key) {
+                 var optlist = buildSelect(cTableDataT[key]);
+                 tableHTML = tableHTML + selectHead(key) + optlist + selectFoot;
+            });
+        }
+        return tableHTML;
+    }
+    
     function loadCycles() {
         $('#ct-assignCyc').empty();
         $('#ct-assignCyc').append("<option value='select cycle' select=selected>" + "Select cycle" + "</option>");
@@ -2600,7 +2446,6 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         });
         dNodes = d3Tree.nodes(tree);
         //dLinks=d3Tree.links(dNodes);
-
         /* 
          *  Logic for adding reuse property 
          */
@@ -2997,15 +2842,15 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             },
             "scenarios": {
                 "task": ["Execute Scenario"],
-                "attributes": ["at", "rw", "sd", "ed"]
+                "attributes": ["at", "rw", "sd", "ed","cx"]
             },
             "screens": {
                 "task": ["Scrape", "Append", "Compare", "Add", "Map"],
-                "attributes": ["at", "rw", "sd", "ed"]
+                "attributes": ["at", "rw", "sd", "ed","cx"]
             },
             "testcases": {
                 "task": ["Update", "Design"],
-                "attributes": ["at", "rw", "sd", "ed"]
+                "attributes": ["at", "rw", "sd", "ed","cx"]
             }
         };
         zoom_W = d3.behavior.zoom().scaleExtent([0.1, 3]).on("zoom", zoomed);
@@ -4274,6 +4119,12 @@ $scope.clearInputData = function() {
   $('#versionNumberInput').val('');
 }
 
+
+$('#createNewVersionButton').click(function(e){
+    var from_v = $('.version-list').val();
+    console.log(from_v);
+    createNewVersion(from_v);
+})
 /*
 
   function : versionInputDialogShow(e)
@@ -4281,11 +4132,6 @@ $scope.clearInputData = function() {
   param: e : event to get the source version number tab
 */
 function versionInputDialogShow() {
-  var from_v = $('.version-list').val();
-  console.log(from_v)
-  $('#createNewVersionButton').click(function(e){
-      createNewVersion(from_v)
-  })
   mindmapServices.getVersions($(".project-list").val()).then(
     function(res){
       maxVersionNumber=res[res.length-1];
