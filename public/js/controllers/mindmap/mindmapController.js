@@ -1791,7 +1791,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         if (t == 'modules') return;
         var sid = s.attr('id').split('-')[2];
         var p = dNodes[sid].parent;
-        recurseDelChild(dNodes[sid]);
+        recurseDelChild(dNodes[sid],$scope.tab);
         for (j = dLinks.length - 1; j >= 0; j--) {
             if (dLinks[j].target.id == sid) {
                 d3.select('#ct-link-' + dLinks[j].id).remove();
@@ -1810,9 +1810,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         if (p.children.length == 0) d3.select('#ct-node-' + p.id).select('.ct-cRight').remove();
     };
 
-    function recurseDelChild(d) {
+    function recurseDelChild(d,tab) {
         if (d.children) d.children.forEach(function(e) {
-            recurseDelChild(e);
+            recurseDelChild(e,tab);
         });
         d.parent = null;
         d.children = null;
@@ -1822,12 +1822,17 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         if (d.oid != undefined) {
             deletednode.push(d.oid)
         }
-        for (j = dLinks.length - 1; j >= 0; j--) {
-            if (dLinks[j].source.id == d.id) {
-                d3.select('#ct-link-' + dLinks[j].id).remove();
-                dLinks[j].deleted = !0;
+        var temp=dLinks;
+        if(tab=='mindmapEndtoEndModules'){
+            temp=dLinks_W;
+        }
+        for (j = temp.length - 1; j >= 0; j--) {
+            if (temp[j].source.id == d.id) {
+                d3.select('#ct-link-' + temp[j].id).remove();
+                temp[j].deleted = !0;
             }
         }
+        
     };
 
     function moveNode(e) {
@@ -2128,27 +2133,32 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             dNodes[e.idx].childIndex = counter[e.type];
             counter[e.type] = counter[e.type] + 1;
         })
-        var restrict_scenario_reuse = parseDataReuse(true);
-        if(restrict_scenario_reuse['reuseScenarios'].length>0){
-           openDialogMindmap('Error',"Scenarios cannot be reused : '"+restrict_scenario_reuse['reuseScenarios'].join()+"'");
-            return;
-        }
-        mindmapServices.checkReuse(restrict_scenario_reuse).then(function(result_reuse) {
-            var reuse=[];
-            
-            result_reuse['scenarios'].forEach(function(e, i) {
-                
-                if(e.reuse && deletednode_info.indexOf(dNodes[e.idx])<0){
-                    reuse.push(e.scenarioname);
-                  
-                }
-
-            })
-            if(reuse.length>0){
-                console.log(deletednode_info);
-                openDialogMindmap('Error',"Scenarios used in another Module : '"+reuse.join()+"'");
+        var restrict_scenario_reuse = parseDataReuse(true)
+        if (selectedTab!='tabAssign'){
+            if(restrict_scenario_reuse['reuseScenarios'].length>0 ){
+            openDialogMindmap('Error',"Scenarios cannot be reused : '"+restrict_scenario_reuse['reuseScenarios'].join()+"'");
                 return;
             }
+        }
+       
+        mindmapServices.checkReuse(restrict_scenario_reuse).then(function(result_reuse) {
+            var reuse=[];
+             if (selectedTab!='tabAssign'){
+                 result_reuse['scenarios'].forEach(function(e, i) {
+                
+                    if(e.reuse && deletednode_info.indexOf(dNodes[e.idx])<0){
+                        reuse.push(e.scenarioname);
+                    
+                    }
+
+                })
+                if(reuse.length>0){
+                    console.log(deletednode_info);
+                    openDialogMindmap('Error',"Scenarios used in another Module : '"+reuse.join()+"'");
+                    return;
+                }
+             }
+            
            
             error = treeIterator(mapData, dNodes[0], error);
             if (dNodes[0].type == 'modules_endtoend') {
@@ -3335,7 +3345,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         if (t == 'modules_endtoend') return;
         var sid = s.attr('id').split('-')[2];
         var p = dNodes_W[sid].parent;
-        recurseDelChild(dNodes_W[sid]);
+        recurseDelChild(dNodes_W[sid],$scope.tab);
         for (j = dLinks_W.length - 1; j >= 0; j--) {
             if (dLinks_W[j].target.id == sid) {
                 d3.select('#ct-link-' + dLinks_W[j].id).remove();
@@ -3662,7 +3672,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         }
         if (mapData.length <= 1 && flag == 20) {
             unblockUI();
-            openDialogMindmap('Error', 'Incomplete flow! Moudles->Scenarios flow should be present');
+            openDialogMindmap('Error', 'Incomplete flow! Modules->Scenarios flow should be present');
             s.classed('no-access', !1);
             return;
         }

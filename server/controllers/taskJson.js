@@ -32,7 +32,7 @@ exports.getTaskJson_mindmaps = function (req, res) {
 		try {
 			var userid = req.session.userid;
 			var prjId=req.body.obj;
-			var qlist_query = [{'statement': "MATCH (a)-[r:FNTT]-(b{assignedTo:'" + userid + "'}) return a,b"}];
+			var qlist_query = [{'statement': "MATCH (b{assignedTo:'" + userid + "'})<-[r:FNTT]-(a) with a as a,b as b, b.taskID as id,  collect(b) as nodes where size(nodes)=1 return a,b"}];
 			neo4jAPI.executeQueries(qlist_query,function(status,result){
 				if(status!=200) {
 					logger.info(result);

@@ -524,7 +524,7 @@ exports.saveDataVersioning=function(req,res){
 						}
 					}
 					else if (e.type == 'scenarios') {
-						if (e.renamed && e.id_n) rnmList.push({ "statement": "MATCH(n:TESTSCENARIOS{testScenarioID:'" + e.id + "'}) SET n.testScenarioName='" + e.name + "'" + ",n.projectID='" + prjId + "'" });
+						if(e.renamed && e.id_n &&  e.orig_name) rnmList.push({"statement":"MATCH(n:TESTSCENARIOS{testScenarioName:'"+e.orig_name+"',projectID:'"+prjId+"'})<-[r:FMTTS]-(m)<-[v:FVTM]-(version:VERSION{versionNumber:"+parseFloat(vn_from)+"}) SET n.testScenarioName='"+e.name+"'"});
 						qList.push({ "statement": "MERGE(n:TESTSCENARIOS{projectID:'" + prjId + "',moduleID:'" + idDict[e.pid] + "',testScenarioName:'" + e.name + "',testScenarioID:'" + e.id + "',createdBy:'" + user + "',createdOn:'" + createdOn + "',testScenarioID_c:'" + e.id_c + "'}) SET n.childIndex='" + e.childIndex + "'" });
 						//Relating scenario with moduleId
 						//Yashi
