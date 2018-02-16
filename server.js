@@ -50,7 +50,9 @@ try {
     var credentials = {
         key: privateKey,
         cert: certificate,
-        secureOptions: require('constants').SSL_OP_NO_TLSv1 | require('constants').SSL_OP_NO_SSLv3,
+       // secureOptions: require('constants').SSL_OP_NO_SSLv2 | require('constants').SSL_OP_NO_SSLv3 | require('constants').SSL_OP_NO_TLSv1 | require('constants').SSL_OP_NO_TLSv1_1,
+        secureOptions: require('constants').SSL_OP_NO_SSLv2 | require('constants').SSL_OP_NO_SSLv3,
+        secureProtocol: 'SSLv23_method',
         ciphers: [
             "ECDHE-RSA-AES256-SHA384",
             "DHE-RSA-AES256-SHA384",
