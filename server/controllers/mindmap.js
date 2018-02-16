@@ -878,15 +878,17 @@ exports.saveEndtoEndData=function(req,res){
 				
 
 				neo4jAPI.executeQueries(qList,function(status,result){
-					res.setHeader('Content-Type', 'application/json');
+					
 					if(status!=200){
 						var error_msg='Fail';
+						result=JSON.stringify(result)
 						if(result.indexOf('Schema.ConstraintValidationFailed')>-1){
 							error_msg='DuplicateModules';
 						}
 						res.status(status).send(error_msg);
 					} 
 					else{
+						res.setHeader('Content-Type', 'application/json');
 						var k=0,rIndex,lbl,neoIdDict={};
 						idDict={};
 						var attrDict={"modules_endtoend":{"childIndex":"childIndex","projectID":"projectID","moduleName":"name","moduleID":"id_n","moduleID_c":"id_c"},"modules":{"childIndex":"childIndex","projectID":"pid_n","moduleName":"name","moduleID":"id_n","moduleID_c":"id_c"},"scenarios":{"projectID":"projectID","childIndex":"childIndex","moduleID":"pid_n","testScenarioName":"name","testScenarioID":"id_n","testScenarioID_c":"id_c"},"screens":{"childIndex":"childIndex","testScenarioID":"pid_n","screenName":"name","screenID":"id_n","screenID_c":"id_c"},"testcases":{"childIndex":"childIndex","screenID":"pid_n","testCaseName":"name","testCaseID":"id_n","testCaseID_c":"id_c"},"tasks":{"taskID":"id_n","task":"t","assignedTo":"at","reviewer":"rw","startDate":"sd","endDate":"ed","re_estimation":"re_estimation","release":"re","cycle":"cy","details":"det","nodeID":"pid","parent":"anc"}};
