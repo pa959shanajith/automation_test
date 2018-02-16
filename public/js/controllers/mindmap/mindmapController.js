@@ -583,7 +583,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         var img_src = 'images_mindmap/node-' + n.type + '.png';
         if(n.reuse && (n.type == 'testcases' || n.type=='screens')) img_src = 'images_mindmap/'+n.type+'-reuse.png';
         if (n.type == 'modules_endtoend') img_src = 'images_mindmap/MM5.png';
-        var nodeOpacity = n.id_c!="null"? 1:0.5;
+        
+        var nodeOpacity = !(n.id_c=="null" ||n.id_c==null || n.id_c==undefined)? 1:0.5;
         if ($("#ct-canvas").attr('class') == 'tabCreate ng-scope') {
             var v_c = v.append('image').attr('height', '40px').attr('width', '40px').attr('class', 'ct-nodeIcon').attr('xlink:href', img_src).attr('style','opacity:'+nodeOpacity+';');
             $(v_c.node()).on('click', nodeCtrlClick);
@@ -1787,6 +1788,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         if (d3.select('#ct-inpBox').attr('class') == "") return;
         d3.select('#ct-ctrlBox').classed('no-disp', !0);
         var s = d3.select(activeNode);
+        SaveCreateED('#ct-createAction',1,0);
         //513-'Mindmap: When we delete an existing Module and create another module in the same work space  then a new Module instance is being appended .
         var t = s.attr('data-nodetype');
         if (t == 'modules') return;
@@ -1987,10 +1989,14 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         } else {
             dNodes[pi].name = val;
         }
+        if (dNodes[pi].original_name != val){
+            d3.select('#ct-node-'+pi+'>image').attr('style','opacity:0.6')
+        }
         d3.select('#ct-inpBox').classed('no-disp', !0);
         var tmp = dNodes[pi].name;
         if (tmp.length > 15) var tmp = tmp.slice(0, 15) + "...";
         pt.text(tmp);
+        
         zoom.event(d3.select('#ct-mapSvg'));
     };
 
@@ -2289,6 +2295,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                         dNodes.forEach(function(d) {
                             if (d.type == 'modules') d.id_c = res[resMap[0]];
                             else d.id_c = res[d.id_n];
+                            if (!(d.id_c==null || d.id_c=='null' || d.id_c==undefined)){
+                                d3.select('#ct-node-'+d.id+'>image').attr('style','opacity:1;');
+                            }
 
                         });
 
@@ -3149,7 +3158,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         n.display_name = n.name;
         var img_src = 'images_mindmap/node-scenarios.png';
         if (n.type == 'modules_endtoend') img_src = 'images_mindmap/MM5.png';
-        var nodeOpacity = n.id_c!="null"? 1:0.5;
+        var nodeOpacity = !(n.id_c=="null" ||n.id_c==null || n.id_c==undefined)? 1:0.5;
         v.append('image').attr('height', '40px').attr('width', '40px').attr('class', 'ct-nodeIcon').attr('xlink:href', img_src).on('click', nodeCtrlClick_W).attr('style','opacity:'+nodeOpacity+';');
         var ch = 15;
         if (n.name.length > 15 && n.type != 'modules_endtoend') {
@@ -3773,6 +3782,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     dNodes_W.forEach(function(d) {
                         if (d.type == 'modules') d.id_c = res[resMap[0]];
                         else d.id_c = res[d.id_n];
+                        if (!(d.id_c==null || d.id_c=='null' || d.id_c==undefined)){
+                                d3.select('#ct-node-'+d.id+'>image').attr('style','opacity:1;');
+                        }
 
                     });
                     openDialogMindmap("Success", "Structure created successfully");
