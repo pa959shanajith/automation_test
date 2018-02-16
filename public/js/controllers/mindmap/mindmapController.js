@@ -583,11 +583,12 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         var img_src = 'images_mindmap/node-' + n.type + '.png';
         if(n.reuse && (n.type == 'testcases' || n.type=='screens')) img_src = 'images_mindmap/'+n.type+'-reuse.png';
         if (n.type == 'modules_endtoend') img_src = 'images_mindmap/MM5.png';
+        var nodeOpacity = n.id_c!="null"? 1:0.5;
         if ($("#ct-canvas").attr('class') == 'tabCreate ng-scope') {
-            var v_c = v.append('image').attr('height', '40px').attr('width', '40px').attr('class', 'ct-nodeIcon').attr('xlink:href', img_src);
+            var v_c = v.append('image').attr('height', '40px').attr('width', '40px').attr('class', 'ct-nodeIcon').attr('xlink:href', img_src).attr('style','opacity:'+nodeOpacity+';');
             $(v_c.node()).on('click', nodeCtrlClick);
         } else {
-            v.append('image').attr('height', '40px').attr('width', '40px').attr('class', 'ct-nodeIcon').attr('xlink:href', img_src);;
+            v.append('image').attr('height', '40px').attr('width', '40px').attr('class', 'ct-nodeIcon').attr('xlink:href', img_src).attr('style','opacity:'+nodeOpacity+';');
             $(v.node()).on('click', nodeClick);
         }
 
@@ -3148,7 +3149,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         n.display_name = n.name;
         var img_src = 'images_mindmap/node-scenarios.png';
         if (n.type == 'modules_endtoend') img_src = 'images_mindmap/MM5.png';
-        v.append('image').attr('height', '40px').attr('width', '40px').attr('class', 'ct-nodeIcon').attr('xlink:href', img_src).on('click', nodeCtrlClick_W);
+        var nodeOpacity = n.id_c!="null"? 1:0.5;
+        v.append('image').attr('height', '40px').attr('width', '40px').attr('class', 'ct-nodeIcon').attr('xlink:href', img_src).on('click', nodeCtrlClick_W).attr('style','opacity:'+nodeOpacity+';');
         var ch = 15;
         if (n.name.length > 15 && n.type != 'modules_endtoend') {
             if (n.type == 'testcases') ch = 9;
