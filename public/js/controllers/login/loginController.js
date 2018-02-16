@@ -111,7 +111,7 @@ mySPA.controller('loginController', function ($scope, $rootScope, $timeout, $htt
 				}
 				else if(data == 'invalid_username_password')
 				{
-					$scope.loginValidation = "Invalid username or password";
+					$scope.loginValidation = "The username or password you entered isn't correct. Please try again.";
 					console.log("Invalid username or password");
 					cfpLoadingBar.complete();
 				}

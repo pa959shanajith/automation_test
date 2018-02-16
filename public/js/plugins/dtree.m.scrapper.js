@@ -15,6 +15,15 @@ var listId;
 
     $.fn.scrapTree = function(options) {
         //console.log("options: "+ (this).selector);
+        var viewStringCustnames = [];
+       if(Object.keys(viewString).length > 0)
+       {
+        for(var k=0;k<viewString.view.length;k++)
+        {
+            viewStringCustnames.push(viewString.view[k].custname);
+        }
+       }
+        
         var defaults = {
             closeSameLevel: true,
             useCookie: true,
@@ -133,6 +142,7 @@ var listId;
                                         if (e.which == 13) {
                                             $("#saveObjects").attr('disabled', false);
                                             var regEx = /<|>/g;
+                                       
                                             /*window.localStorage['checkEditWorking'] = "true";
                                             $(".optionalActionButtions").children("#editFunction").prop("disabled", false).show().css({'cursor':'pointer'});
                                             //$(this).parent().append($(span).html($(this).val()));
@@ -146,6 +156,26 @@ var listId;
                                                     span.removeClass('content-hide');
                                                     $(this).remove();
                                                 } else {
+                                                    // console.log("VCN",modStringCustnames);
+                                                    var modVal = $(this).val();
+                                                    if(window.localStorage['_modified'])
+                                                    {
+                                                        modifiednames = JSON.parse(window.localStorage['_modified']);
+                                                        console.log(modifiednames);
+                                                    }
+                                                  
+                                                    // if ($.inArray(modVal, viewStringCustnames)!='-1' || ($.inArray(modVal, modStringCustnames)!='-1')) {
+                                                    //         $("#hiddenTagBox").find('.modal-title').text("Edit Objects");
+                                                    //         $("#hiddenTagBox").find('.modal-body p').text("Object characterstics are same for '"+modVal+"' ").css('color', 'black');
+                                                    //         $('#hiddenTagBox').modal('show');
+                                                    //         return false;
+                                                    //     }  
+                                                    if ($.inArray(modVal, viewStringCustnames)!='-1') {
+                                                        $("#hiddenTagBox").find('.modal-title').text("Edit Objects");
+                                                        $("#hiddenTagBox").find('.modal-body p').text("Object characterstics are same for '"+modVal+"' ").css('color', 'black');
+                                                        $('#hiddenTagBox').modal('show');
+                                                        return false;
+                                                    }                   
                                                     var flagEdit = true;
                                                     window.localStorage['checkEditWorking'] = "true";
                                                     if(window.localStorage['_modified']){                                                        
@@ -176,6 +206,7 @@ var listId;
                                                         }
                                                         if (flg == true) {
                                                             modifiedCustNames.push($(this)[0].value + "^^" + $(this)[0].id.split("_")[1]);
+                                                           // modStringCustnames.push($(this)[0].value);
                                                         }
                                                         //xpathListofCustNames.push(viewString.view[id].xpath);
                                                         //oldCustName.push(viewString.view[id].custname);
@@ -183,8 +214,8 @@ var listId;
                                                         //editedList.xpathListofCustNames = xpathListofCustNames;
                                                         //editedList.oldCustName = oldCustName;   			        	        				
                                                     } else {
-
                                                         modifiedCustNames.push($(this)[0].value + "^^" + $(this)[0].id.split("_")[1]);
+                                                       // modStringCustnames.push($(this)[0].value);
                                                     }
                                                     span.text($(this).val()).removeClass('content-hide');
                                                     window.localStorage['_modified'] = JSON.stringify(modifiedCustNames);
