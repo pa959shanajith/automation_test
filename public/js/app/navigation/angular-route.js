@@ -91,6 +91,11 @@ mySPA.config(function($routeProvider, $locationProvider,$provide) {
 			 	templateUrl: 'partials/dashboard.html',
 			 	controller: 'dashboardController'
 			})
+			.when('/p_AutomatedPathGenerator',
+			{
+			 	templateUrl: 'partials/flowGraph.html',
+			 	controller: 'flowGraphController'
+			})
 			.when('/:login',
 			{
 				templateUrl: 'partials/login.html',

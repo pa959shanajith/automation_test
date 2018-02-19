@@ -240,7 +240,7 @@ try {
     });
 
     //Test Lead and Test Manager can access Webocular Plugin
-    app.get(/^\/(p_Webocular|neuronGraphs|p_ALM|p_Dashboard)$/, function (req, res) {
+    app.get(/^\/(p_Webocular|neuronGraphs|p_ALM|p_Dashboard|p_AutomatedPathGenerator)$/, function (req, res) {
         //Denied roles
         var roles = ["Admin", "Business Analyst", "Tech Lead", "Test Engineer"];
         sessionCheck(req, res, roles);
@@ -331,6 +331,7 @@ try {
     var neuronGraphs2D = require('./server/controllers/neuronGraphs2D');
     var dashboard = require('./server/controllers/dashboard');
     var taskbuilder = require('./server/controllers/taskJson');
+	var flowGraph = require('./server/controllers/flowGraph');
 
     // Mindmap Routes
     try {
@@ -444,6 +445,8 @@ try {
     app.post('/loadDashboardData', dashboard.loadDashboardData);
     app.post('/loadDashboard_2', dashboard.loadDashboard_2);
     //app.post('/manualTestcaseDetails_ICE', qc.manualTestcaseDetails_ICE);
+	// Automated Path Generator Routes
+	app.post('/flowGraphResults', flowGraph.flowGraphResults);
 
     //-------------SERVER START------------//
     var hostFamilyType = '0.0.0.0';

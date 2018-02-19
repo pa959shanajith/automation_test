@@ -1,0 +1,191 @@
+<!--Header-->
+<header header></header>
+<!--Header-->
+
+<!--Content Area-->
+<section class="container-fluid container-fluid-inner">
+
+	<!--Left Panel-->
+	<div id="left-nav-section">
+		<div class="scrollbar-macosx">
+			<div id="left-top-section" class="left-top-section-utility">
+				<ul>
+					<!--<li><a id='ie_img1' ng-click="selectedAgent = 'ie'" href="#" title="Internet Explorer"><span><img id='ie_img' class="highlightImg" ng-class="{'selectedIcon': selectedAgent === 'ie'}" src="imgs/ic-ie.png" alt="Internet Explorer"></span>Internet Explorer</a></li>
+					<li><a id='gc_img1' ng-click="selectedAgent = 'chrome'" href="#" title="Google Chrome"><span><img id='gc_img' class="highlightImg" ng-class="{'selectedIcon': selectedAgent === 'chrome'}" src="imgs/ic-chrome.png" alt="Google Chrome"></span>Google Chrome</a></li>
+					<li><a id='mf_img1' ng-click="selectedAgent = 'firefox'" href="#" title="Mozilla Firefox"><span><img id='mf_img' class="highlightImg " ng-class="{'selectedIcon': selectedAgent === 'firefox'}" src="imgs/ic-mozilla.png" alt="Mozilla Firefox"></span>Mozilla Firefox</a></li>
+					<li><a id='sf_img1' ng-click="selectedAgent = 'safari'" href="#" title="Safari"><span><img id='sf_img' class="highlightImg " ng-class="{'selectedIcon': selectedAgent === 'safari'}" src="imgs/ic-safari.png" alt="Safari"></span>Safari</a></li>-->
+				</ul>
+			</div>
+		</div>
+	</div> 
+	<!--Left Panel-->
+
+	<!--Middle Panel-->
+	<div id="middle-content-section">
+		<!--Task Name-->
+			<div id="page-taskName">
+				<!--<span style="cursor:pointer" ng-click="showWeboccularHome()">Flowgraph</Flowgraph></span>-->
+				<span style="cursor:pointer">Flowgraph</Flowgraph></span>
+			</div>
+			<!--Task Name-->
+			<!-- Generate DIV -->
+		<div ng-hide="hideBaseContent.message == 'true'">
+
+			<div class="url-div">
+			<form name="flowgraph_form">
+				<span><b> Version:</b></span>
+				<select class='urlInput version'  id="version" required>
+						<option value="" disabled>Select</option>
+						<option value = "1">Java 1.3</option>
+						<option value = "2">Java 1.4</option>
+						<option value = "3">Java 1.5</option>
+						<option value = "4">Java 1.6</option>
+						<option value = "5">Java 1.7</option>
+						<option value = "6" selected>Java 1.8</option>
+				</select>
+			</form>
+			</div>
+
+			<div class="url-div">
+				<form name="flowgraph_form">
+					<span><b>Path:</b></span>
+					<input name="pathInput" type="text" ng-model="text" class="pathInput" id="path" placeholder="Enter Path of Folder/Zip/File" required> 
+					<button ng-if="flowgraph_form.pathInput.$invalid" disabled class="btn btn-md pull-right pairwise-GenBtn" ng-click="executeGenerate()">Generate</button>
+					<button ng-if="flowgraph_form.pathInput.$valid" class="btn btn-md pull-right pairwise-GenBtn" ng-click="executeGenerate()">Generate</button>
+				</form>
+			</div>
+			
+			<div class="scrollbar-inner crawl-result" >
+				<br>
+			</div>
+		</div>
+		
+		<div ng-hide="hideBaseContent.message == 'false'" id="progress-canvas">
+			<div id="slider-container">
+				<div id="crawler-slider"></div>
+				<div style="clear:both"></div>
+			</div>
+		</div>
+		<div class="overlay"></div>
+		<div  id="result-canvas"></div>
+		<div id="report-canvas"></div>
+	</div>
+	<!--Middle Panel-->
+
+	<!--Right Panel-->
+	<div id="right-dependencies-section">
+
+		<!--Images Blocks-->
+		<div class="thumbnail thumbnail-custom">
+        	<a class="slidePopup"  title="Tasks">
+          		<img class="thumb-ic" src="imgs/ic-task.png" alt="Tasks">
+          		<div class="caption">
+            		<p>Tasks</p>
+          		</div>
+        	</a>
+			<!--Popup-->
+			<div tabindex="0" id="window-task" class="popupWrap">
+				<h4 class="h4-custom closePopup">My task(s)<img class="closePopup pull-right" src="imgs/ic-arrow.png" /></h4>
+				<div class="input-group">
+						<span class="input-group-addon inputMyTask" id="basic-addon1"><img src="imgs/ic-search-icon.png"></span>
+						<input type="text" class="form-control searchInputMyTask" placeholder="Search My task(s)" aria-describedby="basic-addon1">
+				</div>
+				<div class="popupContent popupTasks">
+					<div class="scrollbar-inner scrollbar-innerpages">
+						<!--Tasks-->
+						<div class="panel-group task-content-inner" id="accordion"></div>
+						<!--Tasks-->
+					</div>
+				</div>
+			</div>
+			<!--Popup-->
+      	</div>
+		<!--Images Blocks-->
+
+		<!--Images Blocks-->
+		<div class="thumbnail thumbnail-custom">
+        	<a class="slidePopup"  title="Info">
+          		<img class="thumb-ic" src="imgs/ic-info.png" alt="Project Info">
+          		<div class="caption">
+            		<p>Info</p>
+          		</div>
+        	</a>
+			<!--Popup-->
+			<div tabindex="0" id="window-pi" class="popupWrap">
+				<h4 class="h4-custom closePopup">Information <img class="closePopup pull-right" src="imgs/ic-arrow.png" /></h4>
+				<div class="popupContent projectInfoWrap"></div>
+			</div>
+			<!--Popup-->
+      	</div>
+		<!--Images Blocks-->
+
+		<!--Images Blocks-->
+		<div class="thumbnail thumbnail-custom thumbnail-custom-wiki">
+        	<a class="slide_popup slide_assist" href="#"  title="Assist">
+          		<img class="thumb-ic" src="imgs/ic-assist.png" alt="Assist">
+          		<div class="caption">
+            		<p>Assist</p>
+          		</div>
+        	</a>
+        	<!--Popup-->
+			<div id="assistWindow" class="assistWrap">
+				<h4 class="h4-custom h4-custom-assist">
+					<span class="assist-left pull-left"> <img
+						src="imgs/ic-message.png" />Assist
+					</span> <span class="assist-right pull-right"> <img
+						src="imgs/ic-up.png" class="animateAssistUp" style="margin-right: 10px" /> <img
+						src="imgs/ic-close.png" class="animateAssistClose" />
+					</span>
+				</h4>
+				<div class="assistContent">
+					<!-- Chat Container -->
+					<div class="chatContainer scrollbar-inner scrollbar-chatArea chatArea">
+						<ul class="chatList">
+							<li>Choose from the available browser icons from the action bar</li>
+							<li>Enter the URL of the AUT (Application under test)</li>
+							<li>Click on one of the options available in the Scrape Options
+								window</li>
+							<li>Identify the required objects</li>
+							<li>Rename the objects as per the naming convention</li>
+							<li>Click on the save button in the work area</li>
+							<li>Click on submit to complete task.</li>
+						</ul>
+					</div>
+
+					<div class="chatContainer">
+						<textarea rows="3" cols="" class="chatTextArea form-control"
+							placeholder="Ask Prof.J"></textarea>
+						<button class="btn btn-md pull-right">Send</button>
+					</div>
+					<!-- Chat Container -->
+				</div>
+			</div>
+			<!--Popup-->
+      	</div>
+		<!--Images Blocks-->
+	</div>
+	<!--Right Panel-->
+</section>
+<!--Content Area-->
+
+<!--Footer-->
+<footer footer id="footer" class="footer-global"></footer>
+<!--Footer-->
+	<!-- Global Modal  -->
+       <div class="modal fade" id="globalModal" role="dialog" data-keyboard="false" data-backdrop="static">
+         <div class="modal-dialog modal-sm">
+           <div class="modal-content">
+             <div class="modal-header">
+               <button type="button" class="close" data-dismiss="modal">&times;</button>
+               <h4 class="modal-title"></h4>
+             </div>
+             <div class="modal-body">
+               <p></p>
+             </div>
+             <div class="modal-footer">
+               <button type="button" class="btn btn-default" data-dismiss="modal">Ok</button>
+             </div>
+           </div>
+         </div>
+       </div>
+       <!-- Global Modal  -->

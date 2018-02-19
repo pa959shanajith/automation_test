@@ -259,7 +259,28 @@ sub1.on("message", function (channel, message) {
 			pub2.publish('ICE2_' + data.username, dataToNode);
 		});
 		break;
+	
+	case 'generateFlowGraph':
+		mySocket._events.flowgraph_result = [];
+		mySocket._events.result_flow_graph_finished = [];
+		mySocket.emit("generateFlowGraph", data.version, data.path);
 
+		mySocket.on('unavailableLocalServer', function (value) {
+			dataToNode = JSON.stringify({"username": data.username, "onAction": "unavailableLocalServer", "value": value});
+			pub2.publish('ICE2_' + data.username, dataToNode);
+		});
+
+		mySocket.on('flowgraph_result', function (value) {
+			dataToNode = JSON.stringify({"username" : data.username,"onAction" : "flowgraph_result","value":JSON.parse(value)});
+			pub2.publish('ICE2_' + data.username, dataToNode);
+		});
+
+		mySocket.on('result_flow_graph_finished', function (value) {
+			dataToNode = JSON.stringify({"type" : "res","username" : data.username,"onAction" : "result_flow_graph_finished","value":JSON.parse(value)});
+			pub2.publish('ICE2_' + data.username, dataToNode);
+		});
+		break;
+		
 	default:
 		dataToNode = JSON.stringify({"username": data.username, "onAction": "fail", "value": "fail"});
 		pub2.publish('ICE2_' + data.username, dataToNode);
