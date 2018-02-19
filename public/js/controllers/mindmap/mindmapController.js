@@ -822,20 +822,17 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 var modid = dNodes[pi].parent.id_c,
                     tscid = dNodes[pi].id_c;
 
-                if (dNodes[pi].parent.task != null) {
-                    if (tscid != 'null') {
-                        addTask_11(dNodes[pi].id,tObj,4);
-                    }
+                if (tscid != 'null') {
+                    addTask_11(dNodes[pi].id,tObj,4);
                     if (dNodes[pi].children && $('.pg-checkbox')[0].checked) dNodes[pi].children.forEach(function(scr) {
                         if(apptype!="258afbfd-088c-445f-b270-5014e61ba4e2") addTask_11(scr.id,tObj,5);
                         scr.children.forEach(function(tCa) {
                             addTask_11(tCa.id,tObj,6);
                         });
-                    });
-                } else {
-                    openDialogMindmap("Error", 'Assign task to the module');
-                    return;
+                    });                    
                 }
+
+
             } else if (nType == "screens") {
                 addTask_11(pi,tObj,7);
                 if (dNodes[pi].children && $('.pg-checkbox')[0].checked) dNodes[pi].children.forEach(function(tCa) {
@@ -1184,7 +1181,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 $('#ct-unassignButton a').removeClass("disableButton");
             }
         }, 30);
-        if(dNodes[pi].task.id){
+        if(dNodes[pi].task && dNodes[pi].task.id){
             var nodeClik = {};
             nodeClik.id = dNodes[pi].task.id;
             taskidArr.push(nodeClik);
@@ -1956,7 +1953,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
 
     function inpChange(e) {
-        console.log('inpchange executed')
+        reuseDict = getReuseDetails();
+        console.log('inpchange executed');
         var inp = d3.select('#ct-inpAct');
         var val = inp.property('value');
         if (val == 'Screen_0' || val == 'Scenario_0' || val == 'Testcase_0') {
@@ -1998,6 +1996,18 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         pt.text(tmp);
         
         zoom.event(d3.select('#ct-mapSvg'));
+        function replicateName(pi){
+            //replicate task to reused node
+            if(reuseDict[pi].length>0){
+                reuseDict[pi].forEach(function(e,i){
+                    dNodes[e].name = dNodes[pi].name;
+                    dNodes[e].original_name = dNodes[pi].original_name;
+                    dNodes[e].rnm = dNodes[pi].rnm;
+                    $('#ct-node-'+e+' > text').text(tmp);
+                });
+            }
+        }
+        replicateName(pi);
     };
 
     function inpKeyUp(e) {
@@ -2082,8 +2092,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 task: (d.task) ? d.task : null,
                 renamed: (d.rnm) ? d.rnm : !1,
                 orig_name: (d.original_name) ? d.original_name : null,
-                taskexists:(d.taskexists)?d.taskexists :null
+                taskexists:(d.taskexists)?d.taskexists :null,
             });
+            if(d.type=='testcases') c[c.length-1].scr_name = d.parent.name; 
         }
         if (d.children && d.children.length > 0) d.children.forEach(function(t) {
             e = treeIterator(c, t, e);
@@ -2140,7 +2151,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             dNodes[e.idx].childIndex = counter[e.type];
             counter[e.type] = counter[e.type] + 1;
         })
-        var restrict_scenario_reuse = parseDataReuse(true)
+        var restrict_scenario_reuse = parseDataReuse(true);
         if (selectedTab!='tabAssign'){
             if(restrict_scenario_reuse['reuseScenarios'].length>0 ){
             openDialogMindmap('Error',"Scenarios cannot be reused : '"+restrict_scenario_reuse['reuseScenarios'].join()+"'");
