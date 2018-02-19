@@ -143,12 +143,12 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
     });
 
     // fired on socket connection timeout
-    socket.on('connect_timeout', (timeout) => {
+    socket.on('connect_timeout', function(timeout) {
       console.log("timeout" , timeout);
     });
 
     // fired on socket error
-    socket.on('error', (error) => {
+    socket.on('error', function(error) {
       console.log("error", error);
     });
 
@@ -715,7 +715,7 @@ mySPA.controller('webocularController', ['$scope', '$http', '$rootScope', '$loca
       }
 	  
     }
-    document.getElementById("result-canvas").addEventListener("dblclick", () => {
+    document.getElementById("result-canvas").addEventListener("dblclick", function(){
       zoomReset = true;
       svgMain.call(d3.behavior.zoom().scale(1).translate([positionNode.x,positionNode.y]).scaleExtent([0.5, 7.5]).on("zoom", rescale)).on("dblclick.zoom", null);
       svg.attr("transform",

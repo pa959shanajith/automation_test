@@ -354,19 +354,19 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         var svgTileLen = $(".ct-svgTile").length;
         if (svgTileLen == 0) {
             $('#ct-mapSvg, #ct-canvas').empty();
-            $('#ct-canvas').append(`<div id="minimap"></div>
-                                <div class="ct-tileBox">
-                                    <div class="ct-tile" title="Create Mindmap">
-                                        <svg class="ct-svgTile" height="150px" width="150px">
-                                            <g>
-                                                <circle cx="75" cy="75" r="30"></circle>
-                                                <path d="M75,55L75,95"></path>
-                                                <path d="M55,75L95,75"></path>
-                                            </g>
-                                        </svg>
-                                    </div>
-                                <span class="ct-text">Create Mindmap</span>
-                                </div>`);
+            $('#ct-canvas').append('<div id="minimap"></div>\
+                                <div class="ct-tileBox">\
+                                    <div class="ct-tile" title="Create Mindmap">\
+                                        <svg class="ct-svgTile" height="150px" width="150px">\
+                                            <g>\
+                                                <circle cx="75" cy="75" r="30"></circle>\
+                                                <path d="M75,55L75,95"></path>\
+                                                <path d="M55,75L95,75"></path>\
+                                            </g>\
+                                        </svg>\
+                                    </div>\
+                                <span class="ct-text">Create Mindmap</span>\
+                                </div>');
             $(".ct-tile").click(function() {
                 createNewMap();
             });
@@ -614,7 +614,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 if (selectedTab == 'tabAssign')
                     v.append('circle').attr('class', 'ct-' + n.type + ' ct-cLeft ct-nodeBubble').attr('cx', -3).attr('cy', 20).attr('r', 4);
                 else
-                    v.append('circle').attr('class', 'ct-' + n.type + ' ct-cLeft ct-nodeBubble').attr('cx', -3).attr('cy', 20).attr('r', 4).on('mousedown', moveNodeBegin).on('mouseup', moveNodeEnd);
+                    v.append('circle').attr('class', 'ct-' + n.type + ' ct-cLeft ct-nodeBubble').attr('cx', -3).attr('cy', 20).attr('r', 4)
+                    $(v.node()).on('mousedown', moveNodeBegin);
+                    $(v.node()).on('mouseup', moveNodeEnd);
             } else {
                 if (!p.select('circle.ct-cRight')[0][0]) {
                     p.append('circle').attr('class', 'ct-' + pi.type + ' ct-cRight ct-nodeBubble').attr('cx', 43).attr('cy', 20).attr('r', 4).on('click', toggleNode);
@@ -622,8 +624,10 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 if (selectedTab == 'tabAssign')
                     v.append('circle').attr('class', 'ct-' + n.type + ' ct-cLeft ct-nodeBubble').attr('cx', -3).attr('cy', 20).attr('r', 4);
                 else
-                    v.append('circle').attr('class', 'ct-' + n.type + ' ct-cLeft ct-nodeBubble').attr('cx', -3).attr('cy', 20).attr('r', 4).on('mousedown', moveNodeBegin).on('mouseup', moveNodeEnd);
-            }
+                    v.append('circle').attr('class', 'ct-' + n.type + ' ct-cLeft ct-nodeBubble').attr('cx', -3).attr('cy', 20).attr('r', 4);
+                    $(v.node()).on('mousedown', moveNodeBegin);
+                    $(v.node()).on('mouseup', moveNodeEnd);
+                }
         }
         return v;
     };
@@ -1122,7 +1126,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     v.append('span').attr('class', 'ct-assignItem fl-left').html('Complexity');
                     v.append('span').attr('id', 'ct-cxval').attr('nType',t).attr('idx',pi).text('Unset');
                     v.append('span').attr('id','ct-compbox');
-                    $("#ct-compbox").append(`<i class="fa fa-list" aria-hidden="true"></i>`);   
+                    $("#ct-compbox").append('<i class="fa fa-list" aria-hidden="true"></i>');   
                     $("#ct-compbox").css('color','#643693').css('margin-left','30px'); 
                     var HTMLcontent = getHTMLdropdown(t);
                     clist = tObj.cx;
@@ -1294,12 +1298,12 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
 
         function selectHead(key){
-            return      `<div class="row row-modal addObj-row">
-                            <div class="form-group form-group-1">`+key+` </div>
-                                <div class="form-group form-group-2">
-                                    <select class="form-control form-control-custom">`;
+            return      '<div class="row row-modal addObj-row">\
+                            <div class="form-group form-group-1">'+key+' </div>\
+                                <div class="form-group form-group-2">\
+                                    <select class="form-control form-control-custom">';
         } 
-        var selectFoot = `</select></div></div>`;
+        var selectFoot = '</select></div></div>';
 
         function buildSelect(optionList){
             var olist = '<option selected disabled>Select Option</option>';
@@ -1654,15 +1658,15 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     $scope.addMoreNode = function() {
         if($('.row.row-modal.addObj-row').length<10){
             var idxAddNode = 1+$('.row.row-modal.addObj-row').length;
-            $("#addObjContainer").append(`<div class="row row-modal addObj-row">
-                                                <form class="form-horizontal" role="form" onSubmit="return false;">
-                                                        <div class="col-sm-2 addNode-label"><label>`+idxAddNode+`</label></div>
-                                                        <div class="col-sm-6">
-                                                        <input type="text" class="form-control form-control-custom" placeholder="Enter node name" maxlength="40">
-                                                        </div>
-                                                        <div class="col-sm-2 deleteAddObjRow"><img src="imgs/ic-delete.png" /></div>
-                                                </form>
-                                            </div>`);                                                                            
+            $("#addObjContainer").append('<div class="row row-modal addObj-row">\
+                                                <form class="form-horizontal" role="form" onSubmit="return false;">\
+                                                        <div class="col-sm-2 addNode-label"><label>'+idxAddNode+'</label></div>\
+                                                        <div class="col-sm-6">\
+                                                        <input type="text" class="form-control form-control-custom" placeholder="Enter node name" maxlength="40">\
+                                                        </div>\
+                                                        <div class="col-sm-2 deleteAddObjRow"><img src="imgs/ic-delete.png" /></div>\
+                                                </form>\
+                                            </div>');                                                                            
         }
         else{
             openDialogMindmap('Error','At a time only 10 nodes can be added');
@@ -1844,9 +1848,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         if (e.stopPropagation) e.stopPropagation();
         //To check whether browser Is IE or not issue #415
         var isIE = /*@cc_on!@*/ false || !!document.documentMode;
-        var p = d3.select(this.parentElement);
+        var p = d3.select(this);
         if (isIE) {
-            var p = d3.select(this.parentNode);
+            var p = d3.select(this);
         }
         var pi = p.attr('id').split('-')[2];
         temp = {
@@ -1863,16 +1867,17 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             }
         });
         p.classed('ct-movable', !0);
-        d3.select('#ct-mapSvg').on('mousemove.nodemove', moveNode);
+        //d3.select('#ct-mapSvg')
+        $(d3.select('#ct-mapSvg').node()).on('mousemove.nodemove', moveNode);
     };
 
     function moveNodeEnd(e) {
         d3.select('#ct-mapSvg').on('mousemove.nodemove', null);
         var isIE = /*@cc_on!@*/ false || !!document.documentMode;
-        var p = d3.select(this.parentElement);
+        var p = d3.select(this);
         var split_char = ',';
         if (isIE) {
-            var p = d3.select(this.parentNode);
+            var p = d3.select(this);
             split_char = ' ';
         }
 
