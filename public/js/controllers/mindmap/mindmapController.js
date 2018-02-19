@@ -893,12 +893,17 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
                 function replicateTask(pi){
                     //replicate task to reused node
+                    //extend creates new copy of object instead of taking reference
+                    var tempTask = jQuery.extend(true, {}, dNodes[pi].task);
                     if(reuseDict[pi].length>0){
                         reuseDict[pi].forEach(function(e,i){
-                            dNodes[e].task = dNodes[pi].task;
+                            
+                            dNodes[e].task = tempTask;
+                            dNodes[e].task.copied = true;
                             d3.select('#ct-node-' + e).append('image').attr('class', 'ct-nodeTask').attr('xlink:href', 'images_mindmap/node-task-assigned.png').attr('x', 29).attr('y', -10);                    
                         });
                     }
+                    dNodes[pi].task.copied = false;
                 }
 
                 replicateTask(pi);

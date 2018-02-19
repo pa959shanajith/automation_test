@@ -637,7 +637,7 @@ exports.saveData=function(req,res){
 									qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',parent:'["+t.parent+"]'}) SET n.task='"+t.task+"',n.assignedTo='"+t.assignedTo+"',n.status='"+taskstatus+"',n.reviewer='"+t.reviewer+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.release='"+t.release+"',n.cycle='"+t.cycle+"',n.re_estimation='"+t.re_estimation+"',n.details='"+t.details+"',n.uid='"+uidx+"',n.cx='"+t.cx+"'"});
 								}
 							}
-							else{
+							else if(!t.copied){
 								// If reused 
 								t.parent=[prjId].concat(t.parent);
 								qList.push({"statement":"MERGE(n:TASKS{taskID:'"+t.id+"',task:'"+t.task+"',assignedTo:'"+t.assignedTo+"',reviewer:'"+t.reviewer+"',status:'"+taskstatus+"',startDate:'"+t.startDate+"',endDate:'"+t.endDate+"',release:'"+t.release+"',cycle:'"+t.cycle+"',re_estimation:'"+t.re_estimation+"',details:'"+t.details+"',parent:'["+t.parent+"]',uid:'"+uidx+"',cx:'"+t.cx+"'})"});
@@ -670,7 +670,7 @@ exports.saveData=function(req,res){
 									qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',parent:'["+t.parent+"]'}) SET n.task='"+t.task+"',n.assignedTo='"+t.assignedTo+"',n.reviewer='"+t.reviewer+"',n.status='"+taskstatus+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.release='"+t.release+"',n.cycle='"+t.cycle+"',n.re_estimation='"+t.re_estimation+"',n.details='"+t.details+"',n.uid='"+uidx+"',n.cx='"+t.cx+"'"});
 								}
 							}
-							else{
+							else if(!t.copied){
 								t.parent=[prjId].concat(t.parent);
 								qList.push({"statement":"MERGE(n:TASKS{taskID:'"+t.id+"',task:'"+t.task+"',assignedTo:'"+t.assignedTo+"',status:'"+taskstatus+"',reviewer:'"+t.reviewer+"',startDate:'"+t.startDate+"',endDate:'"+t.endDate+"',release:'"+t.release+"',cycle:'"+t.cycle+"',re_estimation:'"+t.re_estimation+"',details:'"+t.details+"',parent:'["+t.parent+"]',uid:'"+uidx+"',cx:'"+t.cx+"'})"});
 							}

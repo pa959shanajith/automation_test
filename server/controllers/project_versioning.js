@@ -588,8 +588,7 @@ exports.saveDataVersioning=function(req,res){
 								}
 								qList.push({"statement":"MATCH (a:SCREENS{screenID:'"+e.id+"'}),(b:TASKS{taskID:'" + t.id + "'}) MERGE (a)-[r:FNTT {id:'"+e.id+"'}]-(b)"});
 							}
-							else {
-
+							else if(!t.copied) {
 								t.parent = [prjId].concat(t.parent);
 								qList.push({ "statement": "MERGE(n:TASKS{taskID:'" + t.id + "',task:'" + t.task + "',assignedTo:'" + t.assignedTo + "',reviewer:'" + t.reviewer + "',status:'" + taskstatus + "',startDate:'" + t.startDate + "',endDate:'" + t.endDate + "',re_estimation:'" + t.re_estimation + "',details:'" + t.details + "',parent:'[" + t.parent + "]',release:'" + relId + "',cycle:'" + cycId + "',uid:'" + uidx + "',taskvn:" + parseFloat(vn_from) + ",cx:'"+t.cx+"'})" });
 							}
@@ -624,8 +623,7 @@ exports.saveDataVersioning=function(req,res){
 								}
 								qList.push({"statement":"MATCH (a:TESTCASES{testCaseID:'"+e.id+"'}),(b:TASKS{taskID:'" + t.id + "'}) MERGE (a)-[r:FNTT {id:'"+e.id+"'}]-(b)"})
 							}
-							else {
-
+							else if(!t.copied) {
 								t.parent = [prjId].concat(t.parent);
 								qList.push({ "statement": "MERGE(n:TASKS{taskID:'" + t.id + "',task:'" + t.task + "',assignedTo:'" + t.assignedTo + "',status:'" + taskstatus + "',reviewer:'" + t.reviewer + "',startDate:'" + t.startDate + "',endDate:'" + t.endDate + "',re_estimation:'" + t.re_estimation + "',details:'" + t.details + "',release:'" + relId + "',cycle:'" + cycId + "',parent:'[" + t.parent + "]',uid:'" + uidx + "',taskvn:" + parseFloat(vn_from) + ",cx:'"+t.cx+"'})" });
 							}
