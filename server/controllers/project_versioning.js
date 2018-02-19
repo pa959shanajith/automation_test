@@ -415,6 +415,23 @@ exports.getProjectsNeo=function(req,res){
 
 }
 
+function getRenameQueries(map,prjId,vn_from,createdOn){
+	var rnmQList = [];
+	map.forEach(function(e,i){
+		if(e.renamed){
+			if(e.type=='scenarios'){
+				rnmQList.push({"statement":"MATCH(n:TESTSCENARIOS{testScenarioName:'"+e.orig_name+"',projectID:'"+prjId+"'})<-[r:FMTTS]-(m)<-[v:FVTM]-(version:VERSION{versionNumber:"+parseFloat(vn_from)+"}) SET n.testScenarioName='"+e.name+"'"});
+			}
+			if(e.type=='screens'){
+				rnmQList.push({ "statement": "MATCH(n:SCREENS{screenName:'" + e.orig_name + "',projectID:'" + prjId + "',vn:" + parseFloat(vn_from) + "}) SET n.screenName='" + e.name + "'" });
+			}
+			if(e.type=='testcases'){
+				rnmQList.push({'statement':'Match (n:TESTCASES{testCaseName : "'+e.orig_name+'",projectID :"'+prjId+'"})<-[a:FSTTS]-(scr:SCREENS{screenName:"'+e.screenname+'"})<-[r:FTSTS]-(ts:TESTSCENARIOS)<-[s:FMTTS]-(m:MODULES)<-[t:FVTM]-(v:VERSION{versionNumber:'+parseFloat(vn_from)+'}) SET n.testCaseName= "'+e.name+'"'});
+			}
+		}
+	});
+	return rnmQList;
+}
 exports.saveDataVersioning=function(req,res){
 	logger.info("Inside UI service: saveDataVersioning");
 	if (utils.isSessionActive(req.session)) {
@@ -467,7 +484,7 @@ exports.saveDataVersioning=function(req,res){
 			
 		
 			if (flag == 10) {
-				var uidx = 0, t, lts, rnmList = [];
+				var uidx = 0, t, lts;
 				deletednodes.forEach(function (t, i) {
 					// Delete task if single connection
 					qList.push({"statement":"MATCH (N) WHERE ID(N)="+t+" MATCH (N)-[r:FNTT]->(b) with b as b MATCH(b)<-[s:FNTT]-(M) WITH count(M) as rel_cnt,b as b  WHERE rel_cnt=1 DETACH DELETE b"});
@@ -513,18 +530,18 @@ exports.saveDataVersioning=function(req,res){
 
 							if (t.oid != null) {
 								if (t.updatedParent != undefined) {
-									qList.push({ "statement": "MATCH(n:TASKS{taskID:'" + t.id + "',nodeID:'" + e.id + "',parent:'[" + t.parent + "]',taskvn:" + parseFloat(vn_from) + "}) SET n.task='" + t.task + "',n.batchName='" + t.batchName + "',n.assignedTo='" + t.assignedTo + "',n.reviewer='" + t.reviewer + "',n.startDate='" + t.startDate + "',n.endDate='" + t.endDate + "',n.re_estimation='" + t.re_estimation + "',n.release='" + relId + "',n.cycle='" + cycId + "',n.details='" + t.details + "',n.status='" + taskstatus + "',n.parent='[" + [prjId].concat(t.updatedParent) + "]'" });
+									qList.push({ "statement": "MATCH(n:TASKS{taskID:'" + t.id + "',parent:'[" + t.parent + "]',taskvn:" + parseFloat(vn_from) + "}) SET n.task='" + t.task + "',n.batchName='" + t.batchName + "',n.assignedTo='" + t.assignedTo + "',n.reviewer='" + t.reviewer + "',n.startDate='" + t.startDate + "',n.endDate='" + t.endDate + "',n.re_estimation='" + t.re_estimation + "',n.release='" + relId + "',n.cycle='" + cycId + "',n.details='" + t.details + "',n.status='" + taskstatus + "',n.parent='[" + [prjId].concat(t.updatedParent) + "]'" });
 								} else {
-									qList.push({ "statement": "MATCH(n:TASKS{taskID:'" + t.id + "',nodeID:'" + e.id + "',parent:'[" + t.parent + "]',taskvn:" + parseFloat(vn_from) + "}) SET n.task='" + t.task + "',n.batchName='" + t.batchName + "',n.status='" + taskstatus + "',n.assignedTo='" + t.assignedTo + "',n.reviewer='" + t.reviewer + "',n.startDate='" + t.startDate + "',n.endDate='" + t.endDate + "',n.re_estimation='" + t.re_estimation + "',n.release='" + relId + "',n.cycle='" + cycId + "',n.details='" + t.details + "'" });
+									qList.push({ "statement": "MATCH(n:TASKS{taskID:'" + t.id + "',parent:'[" + t.parent + "]',taskvn:" + parseFloat(vn_from) + "}) SET n.task='" + t.task + "',n.batchName='" + t.batchName + "',n.status='" + taskstatus + "',n.assignedTo='" + t.assignedTo + "',n.reviewer='" + t.reviewer + "',n.startDate='" + t.startDate + "',n.endDate='" + t.endDate + "',n.re_estimation='" + t.re_estimation + "',n.release='" + relId + "',n.cycle='" + cycId + "',n.details='" + t.details + "'" });
 								}
 
 							}
-							else qList.push({ "statement": "MERGE(n:TASKS{taskID:'" + t.id + "',batchName:'" + t.batchName + "',task:'" + t.task + "',assignedTo:'" + t.assignedTo + "',status:'" + taskstatus + "',reviewer:'" + t.reviewer + "',startDate:'" + t.startDate + "',endDate:'" + t.endDate + "',re_estimation:'" + t.re_estimation + "',release:'" + relId + "',cycle:'" + cycId + "',details:'" + t.details + "',nodeID:'" + e.id + "',parent:'[" + t.parent + "]',taskvn:" + parseFloat(vn_from) + "})" });
-							qList.push({ "statement": "MATCH (a:MODULES{moduleID:'"+e.id+"'}),(b:TASKS) WHERE a.moduleID=b.nodeID MERGE (a)-[r:FNTT {id:b.nodeID}]-(b)" });
+							else qList.push({ "statement": "MERGE(n:TASKS{taskID:'" + t.id + "',batchName:'" + t.batchName + "',task:'" + t.task + "',assignedTo:'" + t.assignedTo + "',status:'" + taskstatus + "',reviewer:'" + t.reviewer + "',startDate:'" + t.startDate + "',endDate:'" + t.endDate + "',re_estimation:'" + t.re_estimation + "',release:'" + relId + "',cycle:'" + cycId + "',details:'" + t.details + "',parent:'[" + t.parent + "]',taskvn:" + parseFloat(vn_from) + "})" });
+							qList.push({ "statement": "MATCH (a:MODULES{moduleID:'"+e.id+"'}),(b:TASKS{taskID:'" + t.id + "'})  MERGE (a)-[r:FNTT {id:'"+e.id+"'}]-(b)" });
 						}
 					}
 					else if (e.type == 'scenarios') {
-						if (e.renamed && e.id_n) rnmList.push({ "statement": "MATCH(n:TESTSCENARIOS{testScenarioID:'" + e.id + "'}) SET n.testScenarioName='" + e.name + "'" + ",n.projectID='" + prjId + "'" });
+						//if(e.renamed && e.id_n &&  e.orig_name) rnmList.push({"statement":"MATCH(n:TESTSCENARIOS{testScenarioName:'"+e.orig_name+"',projectID:'"+prjId+"'})<-[r:FMTTS]-(m)<-[v:FVTM]-(version:VERSION{versionNumber:"+parseFloat(vn_from)+"}) SET n.testScenarioName='"+e.name+"'"});
 						qList.push({ "statement": "MERGE(n:TESTSCENARIOS{projectID:'" + prjId + "',moduleID:'" + idDict[e.pid] + "',testScenarioName:'" + e.name + "',testScenarioID:'" + e.id + "',createdBy:'" + user + "',createdOn:'" + createdOn + "',testScenarioID_c:'" + e.id_c + "'}) SET n.childIndex='" + e.childIndex + "'" });
 						//Relating scenario with moduleId
 						//Yashi
@@ -538,23 +555,23 @@ exports.saveDataVersioning=function(req,res){
 
 							if (t.oid != null) {
 								if (t.updatedParent != undefined) {
-									qList.push({ "statement": "MATCH(n:TASKS{taskID:'" + t.id + "',nodeID:'" + e.id + "',parent:'[" + t.parent + "]',taskvn:" + parseFloat(vn_from) + "}) SET n.task='" + t.task + "',n.status='" + taskstatus + "',n.assignedTo='" + t.assignedTo + "',n.reviewer='" + t.reviewer + "',n.startDate='" + t.startDate + "',n.endDate='" + t.endDate + "',n.re_estimation='" + t.re_estimation + "',n.release='" + relId + "',n.cycle='" + cycId + "',n.details='" + t.details + "',n.parent='[" + [prjId].concat(t.updatedParent) + "]',n.cx='"+t.cx+"'" });
+									qList.push({ "statement": "MATCH(n:TASKS{taskID:'" + t.id + "',parent:'[" + t.parent + "]',taskvn:" + parseFloat(vn_from) + "}) SET n.task='" + t.task + "',n.status='" + taskstatus + "',n.assignedTo='" + t.assignedTo + "',n.reviewer='" + t.reviewer + "',n.startDate='" + t.startDate + "',n.endDate='" + t.endDate + "',n.re_estimation='" + t.re_estimation + "',n.release='" + relId + "',n.cycle='" + cycId + "',n.details='" + t.details + "',n.parent='[" + [prjId].concat(t.updatedParent) + "]',n.cx='"+t.cx+"'" });
 								} else {
-									qList.push({ "statement": "MATCH(n:TASKS{taskID:'" + t.id + "',nodeID:'" + e.id + "',parent:'[" + t.parent + "]',taskvn:" + parseFloat(vn_from) + "}) SET n.task='" + t.task + "',n.status='" + taskstatus + "',n.assignedTo='" + t.assignedTo + "',n.reviewer='" + t.reviewer + "',n.startDate='" + t.startDate + "',n.endDate='" + t.endDate + "',n.re_estimation='" + t.re_estimation + "',n.release='" + relId + "',n.cycle='" + cycId + "',n.details='" + t.details + "',n.cx='"+t.cx+"'" });
+									qList.push({ "statement": "MATCH(n:TASKS{taskID:'" + t.id + "',parent:'[" + t.parent + "]',taskvn:" + parseFloat(vn_from) + "}) SET n.task='" + t.task + "',n.status='" + taskstatus + "',n.assignedTo='" + t.assignedTo + "',n.reviewer='" + t.reviewer + "',n.startDate='" + t.startDate + "',n.endDate='" + t.endDate + "',n.re_estimation='" + t.re_estimation + "',n.release='" + relId + "',n.cycle='" + cycId + "',n.details='" + t.details + "',n.cx='"+t.cx+"'" });
 								}
 
 							}
-							else qList.push({ "statement": "MERGE(n:TASKS{taskID:'" + t.id + "',task:'" + t.task + "',assignedTo:'" + t.assignedTo + "',reviewer:'" + t.reviewer + "',status:'" + taskstatus + "',startDate:'" + t.startDate + "',endDate:'" + t.endDate + "',re_estimation:'" + t.re_estimation + "',release:'" + relId + "',cycle:'" + cycId + "',details:'" + t.details + "',nodeID:'" + e.id + "',parent:'[" + t.parent + "]',taskvn:" + parseFloat(vn_from) + ",cx:'"+t.cx+"'})" });
-								qList.push({"statement":"MATCH (a:TESTSCENARIOS{testScenarioID:'"+e.id+"'}),(b:TASKS{nodeID:'"+e.id+"'}) MERGE (a)-[r:FNTT {id:'"+e.id+"'}]-(b)"});
+							else qList.push({ "statement": "MERGE(n:TASKS{taskID:'" + t.id + "',task:'" + t.task + "',assignedTo:'" + t.assignedTo + "',reviewer:'" + t.reviewer + "',status:'" + taskstatus + "',startDate:'" + t.startDate + "',endDate:'" + t.endDate + "',re_estimation:'" + t.re_estimation + "',release:'" + relId + "',cycle:'" + cycId + "',details:'" + t.details + "',parent:'[" + t.parent + "]',taskvn:" + parseFloat(vn_from) + ",cx:'"+t.cx+"'})" });
+								qList.push({"statement":"MATCH (a:TESTSCENARIOS{testScenarioID:'"+e.id+"'}),(b:TASKS{taskID:'" + t.id + "'}) MERGE (a)-[r:FNTT {id:'"+e.id+"'}]-(b)"});
 						}
 						//qList.push({"statement":"MATCH(n:TESTSCENARIOS{testScenarioID:'"+e.id+"'}) SET n.testScenarioName='"+e.name+"'"+",n.projectID='"+prjId+"'"});
 					}
 					else if (e.type == 'screens') {
 						uidx++; lts = idDict[e.pid];
-						if (e.renamed && e.id_n && e.orig_name) {
-							//rnmList.push({"statement":"MATCH(n:SCREENS{screenName:'"+e.orig_name+"'}) SET n.projectID='"+prjId+"',n.vn="+parseFloat(vn_from)});
-							rnmList.push({ "statement": "MATCH(n:SCREENS{screenName:'" + e.orig_name + "',projectID:'" + prjId + "',vn:" + parseFloat(vn_from) + "}) SET n.screenName='" + e.name + "'" });
-						}
+						// if (e.renamed && e.id_n && e.orig_name) {
+						// 	//rnmList.push({"statement":"MATCH(n:SCREENS{screenName:'"+e.orig_name+"'}) SET n.projectID='"+prjId+"',n.vn="+parseFloat(vn_from)});
+						// 	rnmList.push({ "statement": "MATCH(n:SCREENS{screenName:'" + e.orig_name + "',projectID:'" + prjId + "',vn:" + parseFloat(vn_from) + "}) SET n.screenName='" + e.name + "'" });
+						// }
 						//qList.push({"statement":"MATCH(n:SCREENS{screenID:'"+e.id+"'}) SET n.screenName='"+e.name+"'"+",n.projectID='"+prjId+"'"});
 						qList.push({ "statement": "MERGE(n:SCREENS{projectID:'" + prjId + "',testScenarioID:'" + idDict[e.pid] + "',screenName:'" + e.name + "',screenID:'" + e.id + "',createdBy:'" + user + "',createdOn:'" + createdOn + "',uid:'" + uidx + "',screenID_c:'" + e.id_c + "'})SET n.childIndex='" + e.childIndex + "',n.vn=" + parseFloat(vn_from) });
 						//Relating scenario with screens
@@ -565,27 +582,26 @@ exports.saveDataVersioning=function(req,res){
 
 							if (t.oid != null) {
 								if (t.updatedParent != undefined) {
-									qList.push({ "statement": "MATCH(n:TASKS{taskID:'" + t.id + "',nodeID:'" + e.id + "',parent:'[" + t.parent + "]',taskvn:" + parseFloat(vn_from) + "}) SET n.task='" + t.task + "',n.assignedTo='" + t.assignedTo + "',n.status='" + taskstatus + "',n.reviewer='" + t.reviewer + "',n.startDate='" + t.startDate + "',n.endDate='" + t.endDate + "',n.release='" + relId + "',n.cycle='" + cycId + "',n.re_estimation='" + t.re_estimation + "',n.details='" + t.details + "',n.uid='" + uidx + "',n.parent='[" + [prjId].concat(t.updatedParent) + "]',n.cx='"+t.cx+"'" });
+									qList.push({ "statement": "MATCH(n:TASKS{taskID:'" + t.id + "',parent:'[" + t.parent + "]',taskvn:" + parseFloat(vn_from) + "}) SET n.task='" + t.task + "',n.assignedTo='" + t.assignedTo + "',n.status='" + taskstatus + "',n.reviewer='" + t.reviewer + "',n.startDate='" + t.startDate + "',n.endDate='" + t.endDate + "',n.release='" + relId + "',n.cycle='" + cycId + "',n.re_estimation='" + t.re_estimation + "',n.details='" + t.details + "',n.uid='" + uidx + "',n.parent='[" + [prjId].concat(t.updatedParent) + "]',n.cx='"+t.cx+"'" });
 								} else {
-									qList.push({ "statement": "MATCH(n:TASKS{taskID:'" + t.id + "',nodeID:'" + e.id + "',parent:'[" + t.parent + "]',taskvn:" + parseFloat(vn_from) + "}) SET n.task='" + t.task + "',n.assignedTo='" + t.assignedTo + "',n.status='" + taskstatus + "',n.reviewer='" + t.reviewer + "',n.startDate='" + t.startDate + "',n.endDate='" + t.endDate + "',n.release='" + relId + "',n.cycle='" + cycId + "',n.re_estimation='" + t.re_estimation + "',n.details='" + t.details + "',n.uid='" + uidx + "',n.cx='"+t.cx+"'" });
+									qList.push({ "statement": "MATCH(n:TASKS{taskID:'" + t.id + "',parent:'[" + t.parent + "]',taskvn:" + parseFloat(vn_from) + "}) SET n.task='" + t.task + "',n.assignedTo='" + t.assignedTo + "',n.status='" + taskstatus + "',n.reviewer='" + t.reviewer + "',n.startDate='" + t.startDate + "',n.endDate='" + t.endDate + "',n.release='" + relId + "',n.cycle='" + cycId + "',n.re_estimation='" + t.re_estimation + "',n.details='" + t.details + "',n.uid='" + uidx + "',n.cx='"+t.cx+"'" });
 								}
-								qList.push({"statement":"MATCH (a:SCREENS{screenID:'"+e.id+"'}),(b:TASKS{nodeID:'"+e.id+"'}) MERGE (a)-[r:FNTT {id:'"+e.id+"'}]-(b)"});
+								qList.push({"statement":"MATCH (a:SCREENS{screenID:'"+e.id+"'}),(b:TASKS{taskID:'" + t.id + "'}) MERGE (a)-[r:FNTT {id:'"+e.id+"'}]-(b)"});
 							}
-							else {
-
+							else if(!t.copied) {
 								t.parent = [prjId].concat(t.parent);
-								qList.push({ "statement": "MERGE(n:TASKS{taskID:'" + t.id + "',task:'" + t.task + "',assignedTo:'" + t.assignedTo + "',reviewer:'" + t.reviewer + "',status:'" + taskstatus + "',startDate:'" + t.startDate + "',endDate:'" + t.endDate + "',re_estimation:'" + t.re_estimation + "',details:'" + t.details + "',nodeID:'" + e.id + "',parent:'[" + t.parent + "]',release:'" + relId + "',cycle:'" + cycId + "',uid:'" + uidx + "',taskvn:" + parseFloat(vn_from) + ",cx:'"+t.cx+"'})" });
+								qList.push({ "statement": "MERGE(n:TASKS{taskID:'" + t.id + "',task:'" + t.task + "',assignedTo:'" + t.assignedTo + "',reviewer:'" + t.reviewer + "',status:'" + taskstatus + "',startDate:'" + t.startDate + "',endDate:'" + t.endDate + "',re_estimation:'" + t.re_estimation + "',details:'" + t.details + "',parent:'[" + t.parent + "]',release:'" + relId + "',cycle:'" + cycId + "',uid:'" + uidx + "',taskvn:" + parseFloat(vn_from) + ",cx:'"+t.cx+"'})" });
 							}
-							qList.push({"statement":"MATCH (a:SCREENS{screenID_c:'"+e.id_c+"'}),(b:TASKS{taskID:'"+t.id+"'}) MERGE (a)-[r:FNTT {id:'"+e.id+"'}]-(b)"});
+							qList.push({"statement":"MATCH (a:SCREENS{screenID_c:'"+e.id_c+"'}),(b:TASKS{taskID:'" + t.id + "'}) MERGE (a)-[r:FNTT {id:'"+e.id+"'}]-(b)"});
 						}
 					}
 					else if (e.type == 'testcases') {
 						var screen_data = '';
 						var screenid_c = 'null';
 
-						if (e.renamed && e.id_n && e.orig_name) {
-							rnmList.push({ "statement": "MATCH(n:TESTCASES{testCaseName:'" + e.orig_name + "',testScenarioID:'" + lts + "',screenID_c:'" + e.pid_c + "'}) SET n.testCaseName='" + e.name + "'" });
-						}
+						// if (e.renamed && e.id_n && e.orig_name) {
+						// 	rnmList.push({ "statement": "MATCH(n:TESTCASES{testCaseName:'" + e.orig_name + "',testScenarioID:'" + lts + "',screenID_c:'" + e.pid_c + "'}) SET n.testCaseName='" + e.name + "'" });
+						// }
 
 						if (e.pid_c != 'null' && e.pid_c != undefined) {
 							qList.push({ "statement": "MERGE(n:TESTCASES{screenID:'" + idDict[e.pid] + "',screenName:'"+nameDict[e.pid] +"',projectID:'" + prjId + "',testScenarioID:'" + lts + "',testCaseName:'" + e.name + "',testCaseID:'" + e.id + "',createdBy:'" + user + "',createdOn:'" + createdOn + "',uid:'" + uidx + "',testCaseID_c:'" + e.id_c + "'}) SET n.screenID_c='" + e.pid_c + "',n.childIndex='" + e.childIndex + "'" });
@@ -601,21 +617,21 @@ exports.saveDataVersioning=function(req,res){
 							//var parent=[prjId].concat(t.parent);
 							if (t.oid != null) {
 								if (t.updatedParent != undefined) {
-									qList.push({ "statement": "MATCH(n:TASKS{taskID:'" + t.id + "',nodeID:'" + e.id + "',parent:'[" + t.parent + "]',taskvn:" + parseFloat(vn_from) + "}) SET n.task='" + t.task + "',n.assignedTo='" + t.assignedTo + "',n.reviewer='" + t.reviewer + "',n.status='" + taskstatus + "',n.startDate='" + t.startDate + "',n.endDate='" + t.endDate + "',n.release='" + relId + "',n.cycle='" + cycId + "',n.re_estimation='" + t.re_estimation + "',n.details='" + t.details + "',n.uid='" + uidx + "',n.parent='[" + [prjId].concat(t.updatedParent) + "]',n.cx='"+t.cx+"'" });
+									qList.push({ "statement": "MATCH(n:TASKS{taskID:'" + t.id + "',parent:'[" + t.parent + "]',taskvn:" + parseFloat(vn_from) + "}) SET n.task='" + t.task + "',n.assignedTo='" + t.assignedTo + "',n.reviewer='" + t.reviewer + "',n.status='" + taskstatus + "',n.startDate='" + t.startDate + "',n.endDate='" + t.endDate + "',n.release='" + relId + "',n.cycle='" + cycId + "',n.re_estimation='" + t.re_estimation + "',n.details='" + t.details + "',n.uid='" + uidx + "',n.parent='[" + [prjId].concat(t.updatedParent) + "]',n.cx='"+t.cx+"'" });
 								} else {
-									qList.push({ "statement": "MATCH(n:TASKS{taskID:'" + t.id + "',nodeID:'" + e.id + "',parent:'[" + t.parent + "]',taskvn:" + parseFloat(vn_from) + "}) SET n.task='" + t.task + "',n.assignedTo='" + t.assignedTo + "',n.reviewer='" + t.reviewer + "',n.status='" + taskstatus + "',n.startDate='" + t.startDate + "',n.endDate='" + t.endDate + "',n.release='" + relId + "',n.cycle='" + cycId + "',n.re_estimation='" + t.re_estimation + "',n.details='" + t.details + "',n.uid='" + uidx + "',n.cx='"+t.cx+"'" });
+									qList.push({ "statement": "MATCH(n:TASKS{taskID:'" + t.id + "',parent:'[" + t.parent + "]',taskvn:" + parseFloat(vn_from) + "}) SET n.task='" + t.task + "',n.assignedTo='" + t.assignedTo + "',n.reviewer='" + t.reviewer + "',n.status='" + taskstatus + "',n.startDate='" + t.startDate + "',n.endDate='" + t.endDate + "',n.release='" + relId + "',n.cycle='" + cycId + "',n.re_estimation='" + t.re_estimation + "',n.details='" + t.details + "',n.uid='" + uidx + "',n.cx='"+t.cx+"'" });
 								}
-								qList.push({"statement":"MATCH (a:TESTCASES{testCaseID:'"+e.id+"'}),(b:TASKS{nodeID:'"+e.id+"'}) MERGE (a)-[r:FNTT {id:'"+e.id+"'}]-(b)"})
+								qList.push({"statement":"MATCH (a:TESTCASES{testCaseID:'"+e.id+"'}),(b:TASKS{taskID:'" + t.id + "'}) MERGE (a)-[r:FNTT {id:'"+e.id+"'}]-(b)"})
 							}
-							else {
-
+							else if(!t.copied) {
 								t.parent = [prjId].concat(t.parent);
-								qList.push({ "statement": "MERGE(n:TASKS{taskID:'" + t.id + "',task:'" + t.task + "',assignedTo:'" + t.assignedTo + "',status:'" + taskstatus + "',reviewer:'" + t.reviewer + "',startDate:'" + t.startDate + "',endDate:'" + t.endDate + "',re_estimation:'" + t.re_estimation + "',details:'" + t.details + "',release:'" + relId + "',cycle:'" + cycId + "',nodeID:'" + e.id + "',parent:'[" + t.parent + "]',uid:'" + uidx + "',taskvn:" + parseFloat(vn_from) + ",cx:'"+t.cx+"'})" });
+								qList.push({ "statement": "MERGE(n:TASKS{taskID:'" + t.id + "',task:'" + t.task + "',assignedTo:'" + t.assignedTo + "',status:'" + taskstatus + "',reviewer:'" + t.reviewer + "',startDate:'" + t.startDate + "',endDate:'" + t.endDate + "',re_estimation:'" + t.re_estimation + "',details:'" + t.details + "',release:'" + relId + "',cycle:'" + cycId + "',parent:'[" + t.parent + "]',uid:'" + uidx + "',taskvn:" + parseFloat(vn_from) + ",cx:'"+t.cx+"'})" });
 							}
 							qList.push({"statement":"MATCH (a:TESTCASES{testCaseID_c:'"+e.id_c+"'}),(b:TASKS{taskID:'"+t.id+"'}) MERGE (a)-[r:FNTT {id:'"+e.id+"'}]-(b)"});	
 						}
 					}
 				});
+				var rnmList = getRenameQueries(data,prjId,vn_from,createdOn);
 				if (tab != 'end_to_end') {
 					//qList.push({ "statement": "MATCH (a:MODULES),(b:TESTSCENARIOS) WHERE a.moduleID=b.moduleID MERGE (a)-[r:FMTTS {id:b.moduleID}]-(b)" });
 					qList.push({ "statement": "MATCH (a:TESTSCENARIOS),(b:SCREENS) WHERE a.testScenarioID=b.testScenarioID MERGE (a)-[r:FTSTS {id:b.testScenarioID}]-(b)" });
@@ -791,6 +807,8 @@ var parsing = function (d, module_type, vn, flag) {
 					var testcaseDetails_json = scr.testcaseDetails;
 					//console.log(screenId_json,screenId_c_json);
 					qList_new.push({ "statement": "MATCH (b:VERSION{versionNumber:" + vn + "})-[r*1..]->(a:SCREENS{screenName:'" + screenname_json + "',projectID:'" + data.projectId + "'}) SET a.screenID_c='" + screenId_c_json + "'" });
+					//Screen Task update in case of reuse
+					qList_new.push({"statement":"MATCH p=(a:SCREENS{screenID_c:'"+screenId_c_json+"'})-[r]-(b:TASKS),(q:SCREENS{screenID_c:'"+screenId_c_json+"'}) MERGE (q)-[s:FNTT{id:q.screenID}]-(b)"});
 
 					//updateJson.push({screenId_json:screenId_c_json});
 					cassandraId_dict[screenId_json] = screenId_c_json;
@@ -813,7 +831,8 @@ var parsing = function (d, module_type, vn, flag) {
 							qList_new.push({ "statement": "MATCH (b:VERSION{versionNumber:" + vn + "})-[r*1..]->(a:TESTCASES{testCaseName:'" + testcaseName_json + "',screenID:'" + screenId_json + "'}) SET a.screenID_c='" + screenId_c_json + "'" });
 							qList_new.push({ "statement": "MATCH (b:VERSION{versionNumber:" + vn + "})-[r*1..]->(a:TESTCASES{testCaseName:'" + testcaseName_json + "',screenID_c:'" + screenId_c_json + "'}) SET a.testCaseID_c='" + testcaseId_c_json + "'" });
 						}
-
+						//TestCase Task update in case of reuse
+						qList_new.push({"statement":"MATCH (a:SCREENS{screenID_c:'"+screenId_c_json+"'})-[r]-(b:TESTCASES{testCaseID_c:'"+testcaseId_c_json+"'})-[s]-(c:TASKS) ,(d:TESTCASES{testCaseID_c:'"+testcaseId_c_json+"'}) MERGE (d)-[t:FNTT{id:d.testCaseID}]-(c)"});
 						cassandraId_dict[testcaseId_json] = testcaseId_c_json;
 
 
