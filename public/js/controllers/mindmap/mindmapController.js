@@ -2152,6 +2152,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     function treeIterator(c, d, e) {
         if (c != undefined) {
             c.push({
+                projectID:d.projectID,
                 id: d.id,
                 childIndex: d.childIndex,
                 id_c: (d.id_c) ? d.id_c : null,
@@ -2678,7 +2679,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 d.id = uNix++;
                 addNode(d, !0, d.parent);
                 if (d.task != null && $scope.tab!='tabCreate'){
-    //                if(d.task.release==$('.release-list').val() && d.task.cycle==$('.cycle-list').val())
+                   if(d.task.release==$('.release-list').val() && d.task.cycle==$('.cycle-list').val())
                         d3.select('#ct-node-' + d.id).append('image').attr('class', 'ct-nodeTask').attr('width', '21px').attr('height', '21px').attr('xlink:href', 'images_mindmap/node-task-assigned.png').attr('x', 29).attr('y', -10);
                 } 
             });

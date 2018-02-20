@@ -590,19 +590,26 @@ exports.saveData=function(req,res){
 						}		 
 					}
  					else if(e.type=='scenarios'){
-						// if(e.renamed && e.id_n &&  e.orig_name){
-						// 	rnmList.push({"statement":"MATCH(n:TESTSCENARIOS{testScenarioName:'"+e.orig_name+"',projectID:'"+prjId+"'})<-[r:FMTTS]-(m) SET n.testScenarioName='"+e.name+"'"});
-						// } 
-						qList.push({"statement":"MERGE(n:TESTSCENARIOS{projectID:'"+prjId+"',moduleID:'"+idDict[e.pid]+"',testScenarioName:'"+e.name+"',testScenarioID:'"+e.id+"',createdBy:'"+user+"',createdOn:'null',testScenarioID_c:'"+e.id_c+"'}) SET n.childIndex='"+e.childIndex+"'"});
-						//Relating scenario with moduleId
-						//Yashi
-						if(tab!='end_to_end'){
-							qList.push({"statement":"MATCH (a:MODULES{moduleID:'"+idDict[e.pid]+"'}),(b:TESTSCENARIOS{moduleID:'"+idDict[e.pid]+"'}) MERGE (a)-[r:FMTTS {id:'"+idDict[e.pid]+"'}]-(b)"});
-						}
-						else{
+						if (tab=='end_to_end'){
+							qList.push({"statement":"MERGE(n:TESTSCENARIOS{projectID:'"+e.projectID+"',moduleID:'"+idDict[e.pid]+"',testScenarioName:'"+e.name+"',testScenarioID:'"+e.id+"',createdBy:'"+user+"',createdOn:'null',testScenarioID_c:'"+e.id_c+"'}) SET n.childIndex='"+e.childIndex+"'"});
+							//Relating scenario with moduleId //Yashi
 							qList.push({"statement":"MATCH (a:MODULES_ENDTOEND{moduleID:'"+idDict[e.pid]+"'}),(b:TESTSCENARIOS{moduleID:'"+idDict[e.pid]+"'}) MERGE (a)-[r:FMTTS {id:'"+idDict[e.pid]+"'}]-(b)"});
-						}			   
-						//Supporting task assignmnet for scenarios
+						}else{
+							qList.push({"statement":"MERGE(n:TESTSCENARIOS{projectID:'"+prjId+"',moduleID:'"+idDict[e.pid]+"',testScenarioName:'"+e.name+"',testScenarioID:'"+e.id+"',createdBy:'"+user+"',createdOn:'null',testScenarioID_c:'"+e.id_c+"'}) SET n.childIndex='"+e.childIndex+"'"});
+							//Relating scenario with moduleId //Yashi
+							qList.push({"statement":"MATCH (a:MODULES{moduleID:'"+idDict[e.pid]+"'}),(b:TESTSCENARIOS{moduleID:'"+idDict[e.pid]+"'}) MERGE (a)-[r:FMTTS {id:'"+idDict[e.pid]+"'}]-(b)"});
+							
+						}
+						
+						
+						// //Yashi
+						// if(tab!='end_to_end'){
+						// 	qList.push({"statement":"MATCH (a:MODULES{moduleID:'"+idDict[e.pid]+"'}),(b:TESTSCENARIOS{moduleID:'"+idDict[e.pid]+"'}) MERGE (a)-[r:FMTTS {id:'"+idDict[e.pid]+"'}]-(b)"});
+						// }
+						// else{
+						// 	qList.push({"statement":"MATCH (a:MODULES_ENDTOEND{moduleID:'"+idDict[e.pid]+"'}),(b:TESTSCENARIOS{moduleID:'"+idDict[e.pid]+"'}) MERGE (a)-[r:FMTTS {id:'"+idDict[e.pid]+"'}]-(b)"});
+						// }			   
+						//Supporting task assignment for scenarios
 						if(t!=null && e.id_c!=null){
 							t.parent=[prjId].concat(e.pid_c,e.id_c);
 							t.id=(t.id!=null)?t.id:uuidV4();
@@ -635,9 +642,9 @@ exports.saveData=function(req,res){
 							t.id=(t.id!=null)?t.id:uuidV4();
 							if(t.oid!=null){
 								if (t.updatedParent != undefined){
-									qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',parent:'["+t.parent+"]'}) SET n.task='"+t.task+"',n.assignedTo='"+t.assignedTo+"',n.status='"+taskstatus+"',n.reviewer='"+t.reviewer+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.release='"+t.release+"',n.cycle='"+t.cycle+"',n.re_estimation='"+t.re_estimation+"',n.details='"+t.details+"',n.uid='"+uidx+"',n.parent='["+[prjId].concat(t.updatedParent)+"]',n.cx='"+t.cx+"'"});
+									qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',parent:'["+t.parent+"]'}) SET n.task='"+t.task+"',n.assignedTo='"+t.assignedTo+"',n.status='"+taskstatus+"',n.reviewer='"+t.reviewer+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.re_estimation='"+t.re_estimation+"',n.details='"+t.details+"',n.uid='"+uidx+"',n.parent='["+[prjId].concat(t.updatedParent)+"]',n.cx='"+t.cx+"'"});
 								}else{
-									qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',parent:'["+t.parent+"]'}) SET n.task='"+t.task+"',n.assignedTo='"+t.assignedTo+"',n.status='"+taskstatus+"',n.reviewer='"+t.reviewer+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.release='"+t.release+"',n.cycle='"+t.cycle+"',n.re_estimation='"+t.re_estimation+"',n.details='"+t.details+"',n.uid='"+uidx+"',n.cx='"+t.cx+"'"});
+									qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',parent:'["+t.parent+"]'}) SET n.task='"+t.task+"',n.assignedTo='"+t.assignedTo+"',n.status='"+taskstatus+"',n.reviewer='"+t.reviewer+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.re_estimation='"+t.re_estimation+"',n.details='"+t.details+"',n.uid='"+uidx+"',n.cx='"+t.cx+"'"});
 								}
 							}
 							else if(!t.copied){
@@ -668,9 +675,9 @@ exports.saveData=function(req,res){
 							//var parent=[prjId].concat(t.parent);
 							if(t.oid!=null){
 								if (t.updatedParent != undefined){
-									qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',parent:'["+t.parent+"]'}) SET n.task='"+t.task+"',n.assignedTo='"+t.assignedTo+"',n.reviewer='"+t.reviewer+"',n.status='"+taskstatus+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.release='"+t.release+"',n.cycle='"+t.cycle+"',n.re_estimation='"+t.re_estimation+"',n.details='"+t.details+"',n.uid='"+uidx+"',n.parent='["+[prjId].concat(t.updatedParent)+"]',n.cx='"+t.cx+"'"});
+									qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',parent:'["+t.parent+"]'}) SET n.task='"+t.task+"',n.assignedTo='"+t.assignedTo+"',n.reviewer='"+t.reviewer+"',n.status='"+taskstatus+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.re_estimation='"+t.re_estimation+"',n.details='"+t.details+"',n.uid='"+uidx+"',n.parent='["+[prjId].concat(t.updatedParent)+"]',n.cx='"+t.cx+"'"});
 								}else{
-									qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',parent:'["+t.parent+"]'}) SET n.task='"+t.task+"',n.assignedTo='"+t.assignedTo+"',n.reviewer='"+t.reviewer+"',n.status='"+taskstatus+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.release='"+t.release+"',n.cycle='"+t.cycle+"',n.re_estimation='"+t.re_estimation+"',n.details='"+t.details+"',n.uid='"+uidx+"',n.cx='"+t.cx+"'"});
+									qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',parent:'["+t.parent+"]'}) SET n.task='"+t.task+"',n.assignedTo='"+t.assignedTo+"',n.reviewer='"+t.reviewer+"',n.status='"+taskstatus+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.re_estimation='"+t.re_estimation+"',n.details='"+t.details+"',n.uid='"+uidx+"',n.cx='"+t.cx+"'"});
 								}
 							}
 							else if(!t.copied){
