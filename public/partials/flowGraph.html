@@ -25,7 +25,7 @@
 		<!--Task Name-->
 			<div id="page-taskName">
 				<!--<span style="cursor:pointer" ng-click="showWeboccularHome()">Flowgraph</Flowgraph></span>-->
-				<span style="cursor:pointer">Flowgraph</Flowgraph></span>
+				<span style="cursor:pointer" ng-click="showFlowGraphHome()">Automated Path Generator</Flowgraph></span>
 			</div>
 			<!--Task Name-->
 			<!-- Generate DIV -->
@@ -43,19 +43,25 @@
 						<option value = "5">Java 1.7</option>
 						<option value = "6" selected>Java 1.8</option>
 				</select>
+				<br>
+				<br>
+				<span><b>Path:</b></span>
+				<input name="pathInput" type="text" ng-model="text" class="pathInput" id="path" placeholder="Enter Path of Folder/Zip/File" required> 
+				<button ng-if="flowgraph_form.pathInput.$invalid" disabled class="btn btn-md pull-right pairwise-GenBtn" ng-click="executeGenerate()">Generate</button>
+				<button ng-if="flowgraph_form.pathInput.$valid" class="btn btn-md pull-right pairwise-GenBtn" ng-click="executeGenerate()">Generate</button>
 			</form>
 			</div>
 
-			<div class="url-div">
+			<!-- <div class="url-div">
 				<form name="flowgraph_form">
 					<span><b>Path:</b></span>
 					<input name="pathInput" type="text" ng-model="text" class="pathInput" id="path" placeholder="Enter Path of Folder/Zip/File" required> 
 					<button ng-if="flowgraph_form.pathInput.$invalid" disabled class="btn btn-md pull-right pairwise-GenBtn" ng-click="executeGenerate()">Generate</button>
 					<button ng-if="flowgraph_form.pathInput.$valid" class="btn btn-md pull-right pairwise-GenBtn" ng-click="executeGenerate()">Generate</button>
 				</form>
-			</div>
+			</div> -->
 			
-			<div class="scrollbar-inner crawl-result" >
+			<div class="crawl-result" >
 				<br>
 			</div>
 		</div>

@@ -1,5 +1,27 @@
 mySPA.controller('flowGraphController', ['$scope', '$http', '$location', '$timeout', 'flowGraphServices','cfpLoadingBar','$window', function($scope,$http,$location,$timeout,flowGraphServices,cfpLoadingBar,$window) {
-
+	 //Task Listing
+	 $timeout(function() {
+		$('.scrollbar-inner').scrollbar();
+		$('.scrollbar-macosx').scrollbar();
+		document.getElementById("currentYear").innerHTML = new Date().getFullYear()
+		cfpLoadingBar.complete()
+		$("#utilityEncrytpion").trigger("click");
+	  }, 500)
+	  
+	 loadUserTasks()
+	 $scope.showFlowGraphHome = function(){
+		if (!$scope.enableGenerate)
+		return;
+		var myNode = document.getElementById("report-canvas");
+		while (myNode.firstChild) {
+			myNode.removeChild(myNode.firstChild);
+		}
+		$('#middle-content-section').removeAttr('class');
+	
+		$("#result-canvas").hide();
+		$scope.showInfo = false;
+		$scope.hideBaseContent = { message: 'false' };		  
+	  }
 	$scope.executeGenerate = function(){
 		currentDot = 0;
 		for( var k = 1 ; k <  $('#progress-canvas').children().length; ){
@@ -120,24 +142,50 @@ mySPA.controller('flowGraphController', ['$scope', '$http', '$location', '$timeo
 		function onDotMouseOut(e){
 		  e.target.nextSibling.style.visibility = "hidden";
 		}*/
+		categoriesDict = {"public" : "+", "private" : "-", "default" : "~", "protected" : "#"};
 		var x = dotsPosition[currentDot].x;
 		var y = dotsPosition[currentDot].y;
 		currentDot++;
 		var parentElem = document.createElement("div");
 		var elem = document.createElement("div");
-		elem.setAttribute("class", "class_square");
+
+		//could be public, private, protected or default
+		var accessModifier = obj.accessModifier;	
+		var borderType = obj.abstract ? "abstract" : "normal";
+		//var accessModifier = "protected";
+		//var borderType = "normal";
+		elem.setAttribute("class", "apgSquare_" + borderType);
 
 		parentElem.setAttribute("style", "left:"+x+"; top:"+y+"; position:absolute;");
-		var text = document.createElement("p");
-		text.setAttribute("class", "className");
-		var t = document.createTextNode(obj.name);
-		text.appendChild(t);
+		elem.textContent = categoriesDict[accessModifier];
+
+		var text = document.createElement("table");
+		var trow = document.createElement("tr");
+		var td = document.createElement('td');
+		td.appendChild(document.createTextNode(obj.name));
+		trow.appendChild(td);
+		text.appendChild(trow);
+
+		trow = document.createElement("tr");
+		td = document.createElement('td');
+		td.appendChild(document.createTextNode(obj.classVariables.length));
+		trow.appendChild(td);
+		text.appendChild(trow);
+
+		trow = document.createElement("tr");
+		td = document.createElement('td');
+		td.appendChild(document.createTextNode(Object.keys(obj.methods).length));
+		trow.appendChild(td);
+		text.appendChild(trow);
+
+		text.setAttribute("class", "apg_square_hover");
 		parentElem.appendChild(elem);
 		parentElem.appendChild(text);
 		document.getElementById("progress-canvas").appendChild(parentElem);
 		text.style.visibility = "hidden";
 		text.style.left = "-"+(text.offsetWidth/2)+"px";
 		text.style.position="absolute";
+		text.setAttribute('border',"1px");
 		elem.addEventListener("mouseover", onDotMouseOver, false);
 		elem.addEventListener("mouseout", onDotMouseOut, false);
 		function onDotMouseOver(e){

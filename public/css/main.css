@@ -4831,7 +4831,7 @@ select:-webkit-autofill:focus {
   border-radius : 10px;
 }
 
-.dotText, .className{
+.dotText{
   z-index: 9999999;
   max-width: 350px;
   font-weight: 600;
@@ -5235,13 +5235,131 @@ Webocular report css
     pointer-events: none;
 }
 
+
+.apgSquare_abstract{
+    display: inline-block;
+    position: relative;
+    width : 32px;
+    height: 32px;
+    border-radius : 4px;
+    cursor:pointer;
+    border: 2px solid #591e1ea8;
+    background: #41d1e1 ;
+    text-align: center;
+    vertical-align: middle;
+    line-height: 32px;
+    font-weight: bold;
+    font-size: medium;
+    color: white;
+
+}
+.apgSquare_normal{
+    display: inline-block;
+    position: relative;
+    width : 32px;
+    height: 32px;
+    border-radius : 4px;
+    cursor:pointer;
+    background: #41d1e1 ;
+    text-align: center;
+    vertical-align: middle;
+    line-height: 32px;
+    font-weight: bold;
+    font-size: medium;
+    color: white;
+
+}
+
 .class_square {
-      display: inline-block;
-      position: relative;
-      width : 32px;
-      height: 32px;
-      border-radius : 4px;
-      cursor:pointer;
-	  border: 1px solid;
-	  background: #41d1e1;
+    display: inline-block;
+    position: relative;
+    width : 32px;
+    height: 32px;
+    border-radius : 4px;
+    cursor:pointer;
+    border: 1px solid;
+    background: #41d1e1;
+}
+
+.public_abstract{
+    display: inline-block;
+    position: relative;
+    width : 32px;
+    height: 32px;
+    border-radius : 4px;
+    cursor:pointer;
+    border: 2px solid #591e1ea8;
+    background: #41d1e1 ;
+
+}
+
+.public_normal{
+    display: inline-block;
+    position: relative;
+    width : 32px;
+    height: 32px;
+    border-radius : 4px;
+    cursor:pointer;
+    background: #41d1e1 ;
+
+}
+.protected_abstract{
+    display: inline-block;
+    position: relative;
+    width : 32px;
+    height: 32px;
+    border-radius : 4px;
+    cursor:pointer;
+    border: 2px solid #591e1ea8;
+    background: #e95d12 ;
+
+}
+
+.protected_normal{
+    display: inline-block;
+    position: relative;
+    width : 32px;
+    height: 32px;
+    border-radius : 4px;
+    cursor:pointer;
+    background: #e95d12 ;
+
+}
+.default_abstract{
+    display: inline-block;
+    position: relative;
+    width : 32px;
+    height: 32px;
+    border-radius : 4px;
+    cursor:pointer;
+    border: 2px solid #591e1ea8;
+    background: #2af055 ;
+
+}
+
+.default_normal{
+    display: inline-block;
+    position: relative;
+    width : 32px;
+    height: 32px;
+    border-radius : 4px;
+    cursor:pointer;
+    background: #2af055 ;
+
+}
+.apg_square_hover{
+    margin-top: 5px;
+    z-index: 9999999;
+    max-width: 350px;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow:ellipsis;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.url-div span {
+    display : inline-block;
+    width : 50px;
 }
