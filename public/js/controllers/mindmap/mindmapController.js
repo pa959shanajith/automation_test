@@ -507,8 +507,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
     function loadMap(e) {
         if(progressFlag) return;
-        progressFlag = true;
         if (!d3.select('#ct-mindMap')[0][0] || confirm('Unsaved work will be lost if you continue.\nContinue?')) {
+            progressFlag = true;
             $('.fa.fa-pencil-square-o.fa-lg.plus-icon.active-map').trigger('click') //Remove copy rectangle
             $('.fa.fa-clipboard.fa-lg.plus-icon.active-map').trigger('click') //Disable paste
             saveFlag = false;
