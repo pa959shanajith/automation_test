@@ -660,6 +660,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         var pi = parseInt(p.attr('id').split('-')[2]);
         var nType = p.attr('data-nodetype');
         if (dNodes[pi].oid != undefined && dNodes[pi].task != null) {
+            dNodes[pi].task.tstatus = 'unassigned';
             unassignTask.push(dNodes[pi].oid)
         }
         d3.select('#ct-assignBox').classed('no-disp', !0);
@@ -759,7 +760,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 details: tObj.det,
                 parent: data.parent,
                 cx: clist!=undefined ? clist.toString(): undefined
-            };        
+            };       
         if(data.id==0) return t; else delete t.batchName;
         if(data.id==1){
             t.task= "Execute Scenario";
@@ -855,7 +856,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         function addTask_11(pi,tObj,qid,cTask){
             var validate = checkAndUpdate(dNodes[pi],[]);
             var taskUndef = (dNodes[pi].task === undefined || dNodes[pi].task == null);
-            var origTask = ([0,4,7,9].indexOf(qid) != -1); // Orignal tasks not cascaded           
+            var origTask = ([0,4,7,9].indexOf(qid) != -1); // Orignal tasks not cascaded  
+            var taskStatus;         
             if(validate[0]){
                 taskflag = true;
                 if(taskUndef){
@@ -863,7 +865,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     tObj.oid = null;
                     d3.select('#ct-node-' + pi).append('image').attr('class', 'ct-nodeTask').attr('xlink:href', 'images_mindmap/node-task-assigned.png').attr('x', 29).attr('y', -10);                    
                 }
-
+                // If task already exists then set it to true
+                if(dNodes[pi].task) taskStatus = 'updated';
+                else taskStatus = 'created';
                 if(qid == 9)
                     dNodes[pi].task = updateTaskObject(tObj,{id:9,parent:(tObj.parent != null) ? tObj.parent : validate[1]});
                 else if(qid == 7)
@@ -898,6 +902,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                         dNodes[pi].task['updatedParent'] = validate[1];
                     }                    
                 }
+
+                dNodes[pi].task.tstatus = taskStatus;
 
                 function replicateTask(pi){
                     //replicate task to reused node
@@ -941,7 +947,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         }
         if (errorRelCyc) {
             openDialogMindmap("Task Assignment Error", "Please select Release/Cycle")
-        }
+        }   
     };
 
     function nodeClick(e) {
