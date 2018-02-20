@@ -4115,6 +4115,48 @@ function contentTable(newTestScriptDataLS) {
             $grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
         }
         //ends here
+		//Object
+		else if (selectedText == "@Object") {
+            objName = "@Object";
+            url = "";
+            var sc;
+            var res = '';
+            if (appTypeLocal == 'Web') {
+                sc = Object.keys(keywordArrayList.object);
+                selectedKeywordList = "object";
+                var newTSDataLS = angular.element(document.getElementById('jqGrid')).scope().newTestScriptDataLS;
+                if (newTSDataLS) {
+                    if (newTSDataLS != "undefined") {
+                        //var testScriptTableData = JSON.parse(newTSDataLS);
+                        for (j = 0; j < newTSDataLS.length; j++) {
+                            if (newTSDataLS[j].custname != '@Browser' && newTSDataLS[j].custname != '@Oebs' && newTSDataLS[j].custname != '@Window' && newTSDataLS[j].custname != '@Generic' && newTSDataLS[j].custname != '@Custom') {
+                                if (newTSDataLS[j].url != "") {
+                                    url = newTSDataLS[j].url;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            } else {
+                sc = Object.keys(keywordArrayList.object);
+                selectedKeywordList = "object";
+            }
+            for (var i = 0; i < sc.length; i++) {
+                if (selectedKeyword == sc[i]) {
+                    res += '<option role="option" value="' + sc[i] + '" selected>' + sc[i] + '</option>';
+                } else
+                    res += '<option role="option" value="' + sc[i] + '">' + sc[i] + '</option>';
+            }
+            var row = $(e.target).closest('tr.jqgrow');
+            var rowId = row.attr('id');
+            $("select#" + rowId + "_keywordVal", row[0]).html(res);
+            selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
+            $grid.jqGrid('setCell', rowId, 'objectName', objName);
+            $grid.jqGrid('setCell', rowId, 'url', url);
+            $grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
+        }
+        //ends here
         else if (selectedText == "WebService List") {
             objName = " ";
             url = " ";
