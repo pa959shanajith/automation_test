@@ -2531,7 +2531,7 @@ $(document).on('cut copy paste','.preventSpecialChar', function(e){
 			var element = this;
 			setTimeout(function () {
 				var userEnteredText = $(element).val();
-				if(e.target.id == 'projectName' || e.target.id == 'releaseTxt' || e.target.id == 'cycleTxt')
+				if(e.target.id == 'projectName' || e.target.id == 'releaseTxt' || e.target.id == 'cycleTxt' || e.target.id == 'releaseName' ||  e.target.id == 'cycleName')
 				{
 					userEnteredText = userEnteredText.replace (/[-\\[\]\~`!@#$%^&*()+={}|;:"',.<>?/\s]/g ,"");
 				}
