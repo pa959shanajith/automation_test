@@ -30,6 +30,7 @@ try {
     var sessions = require('express-session');
     var helmet = require('helmet');
     var lusca = require('lusca');
+	var consts = require('constants');
     var redis = require("redis");
     var redisStore = require('connect-redis')(sessions);
     var redisConfig = {"host": process.env.REDIS_IP, "port": parseInt(process.env.REDIS_PORT),"password" : process.env.REDIS_AUTH};
@@ -50,8 +51,8 @@ try {
     var credentials = {
         key: privateKey,
         cert: certificate,
-       // secureOptions: require('constants').SSL_OP_NO_SSLv2 | require('constants').SSL_OP_NO_SSLv3 | require('constants').SSL_OP_NO_TLSv1 | require('constants').SSL_OP_NO_TLSv1_1,
-        secureOptions: require('constants').SSL_OP_NO_SSLv2 | require('constants').SSL_OP_NO_SSLv3,
+       // secureOptions: consts.SSL_OP_NO_SSLv2 | consts.SSL_OP_NO_SSLv3 | consts.SSL_OP_NO_TLSv1 | consts.SSL_OP_NO_TLSv1_1,
+        secureOptions: consts.SSL_OP_NO_SSLv2 | consts.SSL_OP_NO_SSLv3,
         secureProtocol: 'SSLv23_method',
         ciphers: [
             "ECDHE-RSA-AES256-SHA384",
@@ -96,12 +97,13 @@ try {
     }));
     else logger.info("Express logs are disabled");
 
+    process.env.SESSION_AGE = 30 * 60 * 1000;
     app.use(sessions({
         cookie: {
             path: '/',
             httpOnly: true,
             secure: true,
-            maxAge: (30 * 60 * 1000)
+            maxAge: parseInt(process.env.SESSION_AGE)
         },
         resave: false,
         rolling: true,

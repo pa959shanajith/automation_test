@@ -302,7 +302,10 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                                 $scope.newTestScriptDataLS = data2.view;
                                 getScrapeDataforCustomObj = data2.view;
                                 $("#window-scrape-screenshotTs .popupContent").empty()
-                                $("#window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrapeTS"><img id="screenshotTS" src="data:image/PNG;base64,' + data2.mirror + '" /></div>')
+                                if (data2.mirror == undefined)
+                                    $("#window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrapeTS">No Screenshot Available</div>')
+                                else
+                                    $("#window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrapeTS"><img id="screenshotTS" src="data:image/PNG;base64,' + data2.mirror + '" /></div>')
 
                                 // service call # 3 -objectType service call
                                 DesignServices.getKeywordDetails_ICE(appType)

@@ -1,6 +1,10 @@
 var myserver = require('../../server');
 var redisServer = require('../lib/redisSocketHandler');
 
+module.exports.allSess = function (cb){
+	myserver.redisSessionStore.all(cb);
+};
+
 module.exports.getChannelNum = function(channel,cb) {
 	redisServer.redisPub1.pubsub('numsub', channel,function(err,redisres){
 		if (redisres[1]>0) cb(true);
@@ -31,7 +35,7 @@ module.exports.scheduleSocketList = function(cb) {
 module.exports.resetSession = function(session) {
 	var intr = parseInt(process.env.SESSION_INTERVAL);
 	var updateSessionExpiry = setInterval(function () {
-			myserver.redisSessionStore.touch(session.id, session);
+			session.maxAge = process.env.SESSION_AGE;
 		}, intr);
 	return updateSessionExpiry;
 };
