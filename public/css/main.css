@@ -5363,3 +5363,17 @@ Webocular report css
     display : inline-block;
     width : 50px;
 }
+
+.apg-cd-link {
+    stroke: #000;
+    stroke-width: 1.5px;
+  }
+  .apg-cd-node {
+    cursor: move;
+    fill: #ccc;
+    stroke: #000;
+    stroke-width: 0.5px;
+  }
+  .apg-cd-node.fixed {
+    fill: #f00;
+  }

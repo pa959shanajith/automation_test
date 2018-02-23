@@ -9,20 +9,23 @@ mySPA.controller('flowGraphController', ['$scope', '$http', '$location', '$timeo
 	  }, 500)
 	  
 	 loadUserTasks()
+
+	 $scope.enableGenerate = false;
 	 $scope.showFlowGraphHome = function(){
 		if (!$scope.enableGenerate)
 		return;
-		var myNode = document.getElementById("report-canvas");
+		var myNode = document.getElementById("apg-cd-canvas");
 		while (myNode.firstChild) {
 			myNode.removeChild(myNode.firstChild);
 		}
 		$('#middle-content-section').removeAttr('class');
 	
-		$("#result-canvas").hide();
+		$("#apg-cd-canvas").hide();
 		$scope.showInfo = false;
 		$scope.hideBaseContent = { message: 'false' };		  
 	  }
 	$scope.executeGenerate = function(){
+		$scope.enableGenerate = false;
 		currentDot = 0;
 		for( var k = 1 ; k <  $('#progress-canvas').children().length; ){
 			var child = document.getElementById('progress-canvas').children[k];
@@ -61,9 +64,16 @@ mySPA.controller('flowGraphController', ['$scope', '$http', '$location', '$timeo
 		
 		socket.on('endData', function(obj){
 			if(obj.result == "success"){
+				console.log(obj);
 				//$scope.createGraph(obj);
-				var slider = document.getElementById("slider-container");
-				slider.remove();
+				$('#progress-canvas').fadeOut(800, function(){
+					$scope.hideBaseContent = { message: 'true' };
+					$scope.$apply();
+				});
+				$scope.generateClassDiagram(obj);
+				// var slider = document.getElementById("slider-container");
+				// slider.remove();
+				$scope.enableGenerate = true;
 				/*document.getElementById('path').value = '';
 				openDialog("Flowgraph Generator", "Flowgraph generated succesfully.");*/
 			}else if(obj.result == "fail"){
@@ -74,6 +84,7 @@ mySPA.controller('flowGraphController', ['$scope', '$http', '$location', '$timeo
 				document.getElementById('path').value = '';
 				openDialog("Flowgraph Generator", "Failed to generate flowgraph.");
 			}
+			
 		});
 	}
 	
@@ -197,13 +208,390 @@ mySPA.controller('flowGraphController', ['$scope', '$http', '$location', '$timeo
 		}
 	}
 
-	function openDialog(title, body) {
-		$("#globalModal").find('.modal-title').text(title);
-		$("#globalModal").find('.modal-body p').text(body).css('color', 'black');
-		$("#globalModal").modal("show");
-		setTimeout(function() {
-			$("#globalModal").find('.btn-default').focus();
-		}, 300);
+	$scope.prepareJSON = function(obj) {
+		obj = obj.classes;
+		var class_map = {};
+		var size = -1;
+		var graph_json = {
+			"nodes": [],
+			"links": []
+		};
+		for (var i = 0; i < obj.length; i++) {
+			size++;
+			class_map[obj[i].name] = size;
+		}
+		for (var i = 0; i < obj.length; i++) {
+			graph_json["nodes"].push({
+				"classname": obj[i].name,
+				"methods": obj[i].methods,
+				"attributes": obj[i].classVariables,
+				"id": i,
+				"abstract": obj[i].abstract,
+				"interface": obj[i].interface
+			});
+		}
+		for (var i=0; i<obj.length; i++){
+
+			if (obj[i].extends != null) {
+				if (class_map.hasOwnProperty(obj[i].extends)) {
+					var link = {
+						"source": class_map[obj[i].name],
+						"target": class_map[obj[i].extends],
+						"type": "extends"
+					};
+					graph_json["links"].push(link);
+				} else {
+					graph_json["nodes"].push({
+						"classname": obj[i].extends,
+						"methods": [],
+						"attributes": [],
+						"id": size + 1
+					});
+					class_map[obj[i].extends] = size + 1;
+					var link = {
+						"source": class_map[obj[i].name],
+						"target": size + 1,
+						"type": "extends"
+					};
+					graph_json["links"].push(link);
+					size++;
+				}
+			}
+			if (obj[i].implements != null) {
+				if ((obj[i].implements).indexOf(",") != -1) {
+					implement_list = (obj[i].implements).split(",");
+					for (var j = 0; j < implement_list.length; j++) {
+						if (class_map.hasOwnProperty(implement_list[j])) {
+							var link = {
+								"source": class_map[obj[i].name],
+								"target": class_map[implement_list[j]],
+								"type": "implements"
+							};
+							graph_json["links"].push(link);
+						} else {
+							graph_json["nodes"].push({
+								"classname": implement_list[j],
+								"methods": [],
+								"attributes": [],
+								"id": size + 1
+							});
+							class_map[implement_list[j]] = size + 1;
+							var link = {
+								"source": class_map[obj[i].name],
+								"target": size + 1,
+								"type": "implements"
+							};
+							graph_json["links"].push(link);
+							size++;
+						}
+					}
+				} else {
+					if (class_map.hasOwnProperty(obj[i].implements)) {
+						var link = {
+							"source": class_map[obj[i].name],
+							"target": class_map[obj[i].implements],
+							"type": "implements"
+						};
+						graph_json["links"].push(link);
+					} else {
+						graph_json["nodes"].push({
+							"classname": obj[i].implements,
+							"methods": [],
+							"attributes": [],
+							"id": size + 1
+						});
+						class_map[obj[i].implements] = size + 1;
+						var link = {
+							"source": class_map[obj[i].name],
+							"target": size + 1,
+							"type": "implements"
+						};
+						graph_json["links"].push(link);
+						size++;
+					}
+				}
+			}
+		}
+		
+		return graph_json;
+	}
+
+
+$scope.generateClassDiagram = function(obj){
+	
+	$("#apg-cd-canvas").show();
+	var width = window.innerWidth,
+    height = window.innerHeight;
+	
+var force = d3.layout.force()
+    .size([width, height])
+    .charge(-1120)
+    .linkDistance(function(d){
+		return (d.source.id*60)+60
+	})
+    .on("tick", tick);
+var drag = force.drag()
+    .on("dragstart", dragstart);
+			  
+var zoom = d3.behavior.zoom()
+	.scaleExtent([0.5, 10])
+	.on("zoom", zoomed);
+var svg = d3.select('#apg-cd-canvas').append('svg')
+    .attr("width", width)
+    .attr("height", height)
+	.call(zoom).on("dblclick.zoom", null);;;
+	
+var rectSVG = svg.append("rect")
+	.attr("width", width)
+	.attr("height", height)
+	.style("fill", "none")
+	.style("pointer-events", "all");	
+
+var container = svg.append("g");
+d3.classDiagram.addMarkers(container.append('defs'));
+var color = d3.scale.category20();
+
+var link = container.selectAll(".apg-cd-link"),
+    node = container.selectAll(".apg-cd-node");
+var graph =	$scope.prepareJSON(obj);
+console.log(graph);
+
+force
+  .nodes(graph.nodes)
+  .links(graph.links)
+  .on("tick", tick)
+  .start();
+  
+path = link.data(graph.links)
+	.enter().insert("path","g")
+	.attr("class", "apg-cd-link");
+
+					
+node = node
+	.data(graph.nodes)
+	.enter()
+	.append("g")
+	.attr("class", "apg-cd-node")
+	.on("dblclick", dblclick)
+	.call(drag);
+
+node.append('rect')
+	.attr({
+		'width': 200,
+		'fill': 'white',
+		'stroke': 'cyan',
+		'stroke-width': 1
+	});
+
+
+function zoomed() {
+	container.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+}			
+var classNameG = node.append('g')
+	.attr('class', 'classname');
+	
+var classNameRects = classNameG.append('rect')
+  .attr({
+	'width': function(d) { return 130 },
+	'fill': 'white',
+	'stroke': 'silver',
+	'stroke-width': 0.5
+  });
+  
+  
+var classNameTexts = classNameG.append('text')
+  .attr('font-size', 12)
+  classNameTexts.call(d3.multilineText()
+	.verticalAlign('top')
+	.paddingTop(4)
+	.paddingBottom(4)
+	.text(function(d) {
+		return d.classname;
+		})
+  );
+
+ adjustHeight(classNameRects[0], classNameTexts[0], 4, 4);
+ var attributesG = node.append('g')
+      .attr({
+        'class': 'attributes',
+        'transform': function(d) {
+          var classNameG = d3.select(this).node().previousSibling,
+              height = classNameG.getBBox().height;
+          return 'translate(0,' + height + ')';
+        }
+      });
+    var attributesRects = attributesG.append('rect')
+      .attr({
+        'width': function(d) { return 130 },
+        'fill': 'white',
+        'stroke': 'silver',
+        'stroke-width': 0.5
+      });
+    var attributesTexts = attributesG.append('text')
+      .attr('font-size', 12)
+      .call(d3.multilineText()
+        .text(function(d) { return d.attributes; })
+        .verticalAlign('top')
+        .horizontalAlign('left')
+        .paddingTop(4)
+        .paddingLeft(4)
+      );
+    adjustHeight(attributesRects[0], attributesTexts[0], 4, 4);
+
+    var methodsG = node.append('g')
+      .attr({
+        'class': 'methods',
+        'transform': function(d) {
+          var attributesG = d3.select(this).node().previousSibling,
+              classNameText = attributesG.previousSibling,
+              classNameBBox = classNameText.getBBox(),
+              attributesBBox = attributesG.getBBox();
+          return 'translate(0,' + (classNameBBox.height + attributesBBox.height) + ')';
+        }
+      });
+    var methodsRects = methodsG.append('rect')
+      .attr({
+        'width': function(d) { return 130 },
+        'fill': 'white',
+        'stroke': 'silver',
+        'stroke-width': 0.5
+      });
+    var methodsTexts = methodsG.append('text')
+      .attr('font-size', 12)
+      .call(d3.multilineText()
+        .text(function(d) { return d.methods; })
+        .verticalAlign('top')
+        .horizontalAlign('left')
+        .paddingTop(4)
+        .paddingLeft(4)
+      );
+    adjustHeight(methodsRects[0], methodsTexts[0], 4, 4);
+	
+	container.selectAll('text').attr('font-family', 'Noto Sans Japanese');
+	
+	node.forEach(function(d){
+
+		d.forEach(function(e,i){
+			var maxWidth = 0;
+			for(i = 1 ;  i< e.children.length; i ++){	
+				maxWidth = Math.max(e.children[i].getBBox().width, maxWidth);
+			}
+			
+			for(i = 1 ;  i< e.children.length; i ++){	
+				d3.select(e.children[i].children[0]).attr('width', maxWidth+8);
+			}
+			d3.select(e.children[0]).attr('width', maxWidth+8);
+			dn=d3.select(e).datum();
+			dn.props=e.getBBox();
+			d3.select(e).datum(dn);
+		});
+	});
+
+function adjustHeight(rects, texts, paddingTop, paddingBottom) {
+  var i,
+	  n = rects.length,
+	  rect,
+	  text,
+	  height;
+	  
+  for (i = 0; i < n; i++) {
+	rect = rects[i];
+	text = texts[i];
+	height = text.getBBox().height + paddingTop + paddingBottom;
+	d3.select(rect).attr('height', height);
+  }
+}
+var createline = d3.svg.line()
+		  .x(function(d) {return d.x;})
+		  .y(function(d) {return d.y;})
+		  
+function tick() {
+		path.attr({
+          'class': 'connector',
+          'stroke': 'black',
+          'stroke-width': 1,
+          'fill': 'none'
+        }).attr("d", function(d){
+			sourceX = d.source.x+(d.source.props.width/2);
+			sourceY = d.source.y+ (d.source.props.height/2);
+			targetCords = {
+					x1 : d.target.x,
+					y1 : d.target.y, 
+					x2 : d.target.x+(d.target.props.width),
+					y2 : d.target.y, 
+					x3 : d.target.x,
+					y3 : d.target.y+(d.target.props.height), 
+					x4 : d.target.x+(d.target.props.width),
+					y4 : d.target.y+(d.target.props.height),
+					x5: d.target.x+(d.target.props.width)/2,
+					y5: d.target.y,
+					x6: d.target.x,
+					y6: d.target.y+(d.target.props.height)/2,
+					x7: d.target.x+(d.target.props.width)/2,
+					y7: d.target.y+(d.target.props.height),
+					x8: d.target.x+(d.target.props.width),
+					y8: d.target.y+(d.target.props.height)/2,
+				}
+				
+				miniCords = calcMinDistance(sourceX,sourceY,targetCords);
+			
+			function calcMinDistance(x1,y1,targetPoitns){
+				var values = Object.values(targetPoitns);
+				var len = values.length/2;
+				var mini = 9007199254740992;
+				var miniX = 0;
+				var miniY = 0;
+
+				for(i=0;i<len;i++){
+					var dist = Math.sqrt(
+							Math.pow((x1 - values[2*i]),2)+
+							Math.pow((y1 - values[2*i + 1]),2)
+						);
+						
+					if(dist < mini){
+						miniX = values[2*i];
+						miniY = values[2*i + 1];
+						mini = dist;
+					}
+				}
+
+				return {x : miniX, y : miniY};
+			}
+			return createline([
+				{x:sourceX,y:sourceY},
+				{x:miniCords.x  ,y: miniCords.y}
+			]);
+		})
+		  var zoom = d3.behavior.zoom()
+            .scaleExtent([1, 10])
+            .on("zoom", zoomed);
+        path.attr('marker-end', 'url(#' + "filledTraiangle" + ')');
+
+        node
+            .attr("transform", function (d) {
+				
+				return "translate(" + Number(d.x) + ", " + Number(d.y) + ")";
+			});
+
+}
+function dblclick(d) {
+  d3.select(this).classed("fixed", d.fixed = false);
+}
+function dragstart(d) {
+d3.event.sourceEvent.stopPropagation();
+  d3.select(this).classed("fixed", d.fixed = true);
+}
+			function openDialog(title, body) {
+			$("#globalModal").find('.modal-title').text(title);
+			$("#globalModal").find('.modal-body p').text(body).css('color', 'black');
+			$("#globalModal").modal("show");
+			setTimeout(function() {
+				$("#globalModal").find('.btn-default').focus();
+			}, 300);
+		}
 	}
 	
 }]);
+
+
+
