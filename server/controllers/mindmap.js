@@ -481,6 +481,7 @@ exports.saveData=function(req,res){
 			var inputs=req.body; 
 			var data=inputs.map;
 			var tab=inputs.tab;
+			var selectedTab=inputs.selectedTab;
 			var prjId=inputs.prjId;
 			var deletednodes=inputs.deletednode;
 			var user=req.session.username;
@@ -525,17 +526,22 @@ exports.saveData=function(req,res){
 				});
 				//TO support task deletion
 				removeTask.forEach(function(t,i){
-					qList.push({"statement":"MATCH (N) WHERE ID(N)="+t+" MATCH (N)-[r:FNTT]-(b) DETACH DELETE b"});
+					//Issue 1685 Release and cycle Id filters are given for task to delete the task only from that release and cycle attached to that node
+					qList.push({"statement":"MATCH (N) WHERE ID(N)="+t+" MATCH (N)-[r:FNTT]-(b:TASKS{release:'"+relId+"',cycle:'"+cycId+"'}) DETACH DELETE b"});
 				});
 
 				data.forEach(function(e,i){
 					idDict[e.id]=(e.id_n)?e.id_n:uuidV4();
 					e.id=idDict[e.id];
 					t=e.task;
-					if(e.taskexists && e.task){
+					
+					if(e.taskexists && e.task && (e.type=='screens' || e.type=='testcases')){
 						t.id=e.taskexists.id;
 						t.oid=e.taskexists.oid;
 						t.parent=e.taskexists.parent;
+						//To fix issue 1685, not to update the task details unless the details comes from original release and cycle
+						t.release=e.taskexists.release;
+						t.cycle=e.taskexists.cycle;
 						
 						
 					}
@@ -552,10 +558,11 @@ exports.saveData=function(req,res){
 							t.id=(t.id!=null)?t.id:uuidV4();
 
 							if(t.oid!=null){
+							//Part of Issue 1685, before relID and cycId from create tab was undefined
 								if (t.updatedParent != undefined){
-									qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',parent:'["+t.parent+"]',release:'"+relId+"',cycle:'"+cycId+"'}) SET n.task='"+t.task+"',n.batchName='"+t.batchName+"',n.assignedTo='"+t.assignedTo+"',n.reviewer='"+t.reviewer+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.re_estimation='"+t.re_estimation+"',n.details='"+t.details+"',n.status='"+taskstatus+"',n.parent='["+[prjId].concat(t.updatedParent)+"]'"});
+									qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',parent:'["+t.parent+"]',release:'"+t.release+"',cycle:'"+t.cycle+"'}) SET n.task='"+t.task+"',n.batchName='"+t.batchName+"',n.assignedTo='"+t.assignedTo+"',n.reviewer='"+t.reviewer+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.re_estimation='"+t.re_estimation+"',n.details='"+t.details+"',n.status='"+taskstatus+"',n.parent='["+[prjId].concat(t.updatedParent)+"]'"});
 								}else{
-									qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',parent:'["+t.parent+"]',release:'"+relId+"',cycle:'"+cycId+"'}) SET n.task='"+t.task+"',n.batchName='"+t.batchName+"',n.status='"+taskstatus+"',n.assignedTo='"+t.assignedTo+"',n.reviewer='"+t.reviewer+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.re_estimation='"+t.re_estimation+"',n.details='"+t.details+"'"});
+									qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',parent:'["+t.parent+"]',release:'"+t.release+"',cycle:'"+t.cycle+"'}) SET n.task='"+t.task+"',n.batchName='"+t.batchName+"',n.status='"+taskstatus+"',n.assignedTo='"+t.assignedTo+"',n.reviewer='"+t.reviewer+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.re_estimation='"+t.re_estimation+"',n.details='"+t.details+"'"});
 								}
 
 							}
@@ -578,11 +585,12 @@ exports.saveData=function(req,res){
 							t.parent=[prjId].concat(e.id_c);
 							t.id=(t.id!=null)?t.id:uuidV4();
 
-							if(t.oid!=null || t.taskexists){
+							if(t.oid!=null){
+							//Part of Issue 1685, before relID and cycId from create tab was undefined
 								if (t.updatedParent != undefined){
-									qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',parent:'["+t.parent+"]',release:'"+relId+"',cycle:'"+cycId+"'}) SET n.task='"+t.task+"',n.batchName='"+t.batchName+"',n.assignedTo='"+t.assignedTo+"',n.reviewer='"+t.reviewer+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.re_estimation='"+t.re_estimation+"',n.details='"+t.details+"',n.status='"+taskstatus+"',n.parent='["+[prjId].concat(t.updatedParent)+"]'"});
+									qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',parent:'["+t.parent+"]',release:'"+t.release+"',cycle:'"+t.cycle+"'}) SET n.task='"+t.task+"',n.batchName='"+t.batchName+"',n.assignedTo='"+t.assignedTo+"',n.reviewer='"+t.reviewer+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.re_estimation='"+t.re_estimation+"',n.details='"+t.details+"',n.status='"+taskstatus+"',n.parent='["+[prjId].concat(t.updatedParent)+"]'"});
 								}else{
-									qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',parent:'["+t.parent+"]',release:'"+relId+"',cycle:'"+cycId+"'}) SET n.task='"+t.task+"',n.batchName='"+t.batchName+"',n.status='"+taskstatus+"',n.assignedTo='"+t.assignedTo+"',n.reviewer='"+t.reviewer+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.re_estimation='"+t.re_estimation+"',n.details='"+t.details+"'"});
+									qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',parent:'["+t.parent+"]',release:'"+t.release+"',cycle:'"+t.cycle+"'}) SET n.task='"+t.task+"',n.batchName='"+t.batchName+"',n.status='"+taskstatus+"',n.assignedTo='"+t.assignedTo+"',n.reviewer='"+t.reviewer+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.re_estimation='"+t.re_estimation+"',n.details='"+t.details+"'"});
 								}
 							}
 							else qList.push({"statement":"MERGE(n:TASKS{taskID:'"+t.id+"',batchName:'"+t.batchName+"',task:'"+t.task+"',assignedTo:'"+t.assignedTo+"',status:'"+taskstatus+"',reviewer:'"+t.reviewer+"',startDate:'"+t.startDate+"',endDate:'"+t.endDate+"',re_estimation:'"+t.re_estimation+"',release:'"+relId+"',cycle:'"+cycId+"',details:'"+t.details+"',parent:'["+t.parent+"]'})"});
@@ -590,50 +598,47 @@ exports.saveData=function(req,res){
 						}		 
 					}
  					else if(e.type=='scenarios'){
+ 					//Part of Issue 1685, take projectid from the scenarios in case of end to end modules
+						var temp_prjID=prjId;
+						
 						if (tab=='end_to_end'){
-							qList.push({"statement":"MERGE(n:TESTSCENARIOS{projectID:'"+e.projectID+"',moduleID:'"+idDict[e.pid]+"',testScenarioName:'"+e.name+"',testScenarioID:'"+e.id+"',createdBy:'"+user+"',createdOn:'null',testScenarioID_c:'"+e.id_c+"'}) SET n.childIndex='"+e.childIndex+"'"});
-							//Relating scenario with moduleId //Yashi
-							qList.push({"statement":"MATCH (a:MODULES_ENDTOEND{moduleID:'"+idDict[e.pid]+"'}),(b:TESTSCENARIOS{moduleID:'"+idDict[e.pid]+"'}) MERGE (a)-[r:FMTTS {id:'"+idDict[e.pid]+"'}]-(b)"});
-						}else{
-							qList.push({"statement":"MERGE(n:TESTSCENARIOS{projectID:'"+prjId+"',moduleID:'"+idDict[e.pid]+"',testScenarioName:'"+e.name+"',testScenarioID:'"+e.id+"',createdBy:'"+user+"',createdOn:'null',testScenarioID_c:'"+e.id_c+"'}) SET n.childIndex='"+e.childIndex+"'"});
-							//Relating scenario with moduleId //Yashi
-							qList.push({"statement":"MATCH (a:MODULES{moduleID:'"+idDict[e.pid]+"'}),(b:TESTSCENARIOS{moduleID:'"+idDict[e.pid]+"'}) MERGE (a)-[r:FMTTS {id:'"+idDict[e.pid]+"'}]-(b)"});
-							
+							temp_prjID=e.projectID;
 						}
+						qList.push({"statement":"MERGE(n:TESTSCENARIOS{projectID:'"+temp_prjID+"',moduleID:'"+idDict[e.pid]+"',testScenarioName:'"+e.name+"',testScenarioID:'"+e.id+"',createdBy:'"+user+"',createdOn:'null',testScenarioID_c:'"+e.id_c+"'}) SET n.childIndex='"+e.childIndex+"'"});						
 						
-						
-						// //Yashi
-						// if(tab!='end_to_end'){
-						// 	qList.push({"statement":"MATCH (a:MODULES{moduleID:'"+idDict[e.pid]+"'}),(b:TESTSCENARIOS{moduleID:'"+idDict[e.pid]+"'}) MERGE (a)-[r:FMTTS {id:'"+idDict[e.pid]+"'}]-(b)"});
-						// }
-						// else{
-						// 	qList.push({"statement":"MATCH (a:MODULES_ENDTOEND{moduleID:'"+idDict[e.pid]+"'}),(b:TESTSCENARIOS{moduleID:'"+idDict[e.pid]+"'}) MERGE (a)-[r:FMTTS {id:'"+idDict[e.pid]+"'}]-(b)"});
-						// }			   
+						// Yashi
+						//Relating scenario with moduleId
+						if(tab!='end_to_end'){
+							qList.push({"statement":"MATCH (a:MODULES{moduleID:'"+idDict[e.pid]+"'}),(b:TESTSCENARIOS{moduleID:'"+idDict[e.pid]+"'}) MERGE (a)-[r:FMTTS {id:'"+idDict[e.pid]+"'}]-(b)"});
+						}
+						else{
+							qList.push({"statement":"MATCH (a:MODULES_ENDTOEND{moduleID:'"+idDict[e.pid]+"'}),(b:TESTSCENARIOS{moduleID:'"+idDict[e.pid]+"'}) MERGE (a)-[r:FMTTS {id:'"+idDict[e.pid]+"'}]-(b)"});
+						}			   
 						//Supporting task assignment for scenarios
 						if(t!=null && e.id_c!=null){
-							t.parent=[prjId].concat(e.pid_c,e.id_c);
+							t.parent=[temp_prjID].concat(e.pid_c,e.id_c);
 							t.id=(t.id!=null)?t.id:uuidV4();
 							if(t.oid!=null){
 								if (t.updatedParent != undefined){
-									qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',parent:'["+t.parent+"]',release:'"+relId+"',cycle:'"+cycId+"'}) SET n.task='"+t.task+"',n.status='"+taskstatus+"',n.assignedTo='"+t.assignedTo+"',n.reviewer='"+t.reviewer+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.re_estimation='"+t.re_estimation+"',n.details='"+t.details+"',n.parent='["+[prjId].concat(t.updatedParent)+"]',n.cx='"+t.cx+"'"});
+									qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',parent:'["+t.parent+"]',release:'"+t.release+"',cycle:'"+t.cycle+"'}) SET n.task='"+t.task+"',n.status='"+taskstatus+"',n.assignedTo='"+t.assignedTo+"',n.reviewer='"+t.reviewer+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.re_estimation='"+t.re_estimation+"',n.details='"+t.details+"',n.parent='["+[temp_prjID].concat(t.updatedParent)+"]',n.cx='"+t.cx+"'"});
 								}else{
-									qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',parent:'["+t.parent+"]',release:'"+relId+"',cycle:'"+cycId+"'}) SET n.task='"+t.task+"',n.status='"+taskstatus+"',n.assignedTo='"+t.assignedTo+"',n.reviewer='"+t.reviewer+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.re_estimation='"+t.re_estimation+"',n.details='"+t.details+"',n.cx='"+t.cx+"'"});
+									qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',parent:'["+t.parent+"]',release:'"+t.release+"',cycle:'"+t.cycle+"'}) SET n.task='"+t.task+"',n.status='"+taskstatus+"',n.assignedTo='"+t.assignedTo+"',n.reviewer='"+t.reviewer+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.re_estimation='"+t.re_estimation+"',n.details='"+t.details+"',n.cx='"+t.cx+"'"});
 								}
 							}
 							else qList.push({"statement":"MERGE(n:TASKS{taskID:'"+t.id+"',task:'"+t.task+"',assignedTo:'"+t.assignedTo+"',reviewer:'"+t.reviewer+"',status:'"+taskstatus+"',startDate:'"+t.startDate+"',endDate:'"+t.endDate+"',re_estimation:'"+t.re_estimation+"',release:'"+relId+"',cycle:'"+cycId+"',details:'"+t.details+"',parent:'["+t.parent+"]',cx:'"+t.cx+"'})"});
-							qList.push({"statement":"MATCH (a:TESTSCENARIOS{projectID:'"+prjId+"',testScenarioName:'"+e.name+"'}),(b:TASKS{taskID:'"+t.id+"'}) MERGE (a)-[r:FNTT {id:a.testScenarioID}]-(b)"});
+							qList.push({"statement":"MATCH (a:TESTSCENARIOS{projectID:'"+temp_prjID+"',testScenarioName:'"+e.name+"'}),(b:TASKS{taskID:'"+t.id+"'}) MERGE (a)-[r:FNTT {id:a.testScenarioID}]-(b)"});
 						}
-						else if(e.id_n==null){ // In case added first time to end to end then connect to all task if exist
-							qList.push({"statement":"MATCH (a:TASKS)<-[r]-(b:TESTSCENARIOS{projectID:'"+prjId+"',testScenarioName:'"+e.name+"'}),(c:TESTSCENARIOS{projectID:'"+e.projectID+"',testScenarioName:'"+e.name+"'}) MERGE (c)-[rel:FNTT {id:c.testScenarioID}]-(a)"});							
-						}						
+						if(e.projectID){
+
+						}
+						//else if(e.id_n==null){ // In case added first time to end to end then connect to all task if exist
+							qList.push({"statement":"MATCH (c:TESTSCENARIOS{projectID:'"+temp_prjID+"',testScenarioName:'"+e.name+"'}) ,(a:TASKS) where not c.testScenarioID_c='null' and a.parent=~('.*'+c.testScenarioID_c+']') MERGE (c)-[rel:FNTT {id:c.testScenarioID}]-(a)"});							
+						//}						
 						//qList.push({"statement":"MATCH(n:TESTSCENARIOS{testScenarioID:'"+e.id+"'}) SET n.testScenarioName='"+e.name+"'"+",n.projectID='"+prjId+"'"});
 					}
 					else if(e.type=='screens'){
 						uidx++;lts=idDict[e.pid];
-						// if(e.renamed && e.id_n && e.orig_name) 
-						// {	
-						// 	rnmList.push({"statement":"MATCH(n:SCREENS{screenName:'"+e.orig_name+"',projectID:'"+prjId+"'}) SET n.screenName='"+e.name+"'"});
-						// }
+						
 						qList.push({"statement":"MERGE(n:SCREENS{projectID:'"+prjId+"',testScenarioID:'"+idDict[e.pid]+"',screenName:'"+e.name+"',screenID:'"+e.id+"',createdBy:'"+user+"',createdOn:'null',uid:'"+uidx+"',screenID_c:'"+e.id_c+"'})SET n.childIndex='"+e.childIndex+"'"});
 						//Relating scenario with screens
 						//Yashi
@@ -641,11 +646,15 @@ exports.saveData=function(req,res){
 						if(t!=null && e.id_c!=null){
 							t.id=(t.id!=null)?t.id:uuidV4();
 							if(t.oid!=null){
-								if (t.updatedParent != undefined){
-									qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',parent:'["+t.parent+"]'}) SET n.task='"+t.task+"',n.assignedTo='"+t.assignedTo+"',n.status='"+taskstatus+"',n.reviewer='"+t.reviewer+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.re_estimation='"+t.re_estimation+"',n.details='"+t.details+"',n.uid='"+uidx+"',n.parent='["+[prjId].concat(t.updatedParent)+"]',n.cx='"+t.cx+"'"});
-								}else{
-									qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',parent:'["+t.parent+"]'}) SET n.task='"+t.task+"',n.assignedTo='"+t.assignedTo+"',n.status='"+taskstatus+"',n.reviewer='"+t.reviewer+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.re_estimation='"+t.re_estimation+"',n.details='"+t.details+"',n.uid='"+uidx+"',n.cx='"+t.cx+"'"});
+							//Part of Issue 1685
+								if(relId==t.release && cycId==t.cycle){
+									if (t.updatedParent != undefined){
+										qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',parent:'["+t.parent+"]'}) SET n.task='"+t.task+"',n.assignedTo='"+t.assignedTo+"',n.status='"+taskstatus+"',n.reviewer='"+t.reviewer+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.re_estimation='"+t.re_estimation+"',n.details='"+t.details+"',n.uid='"+uidx+"',n.parent='["+[prjId].concat(t.updatedParent)+"]',n.cx='"+t.cx+"'"});
+									}else{
+										qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',parent:'["+t.parent+"]'}) SET n.task='"+t.task+"',n.assignedTo='"+t.assignedTo+"',n.status='"+taskstatus+"',n.reviewer='"+t.reviewer+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.re_estimation='"+t.re_estimation+"',n.details='"+t.details+"',n.uid='"+uidx+"',n.cx='"+t.cx+"'"});
+									}
 								}
+								
 							}
 							else if(!t.copied){
 								// If reused 
@@ -658,9 +667,7 @@ exports.saveData=function(req,res){
 					else if(e.type=='testcases'){
 						var screen_data='';
 						var screenid_c='null';
-						// if(e.renamed && e.id_n && e.orig_name){
-						// 	rnmList.push({"statement":"MATCH(n:TESTCASES{testCaseName:'"+e.orig_name+"',testScenarioID:'"+lts+"',screenID_c:'"+e.pid_c+"'}) SET n.testCaseName='"+e.name+"'"});
-						// }
+						
 						if(e.pid_c!='null' && e.pid_c!=undefined){
 							qList.push({"statement":"MERGE(n:TESTCASES{screenID:'"+idDict[e.pid]+"',screenName:'"+nameDict[idDict[e.pid]] +"',projectID:'" + prjId + "',testScenarioID:'"+lts+"',testCaseName:'"+e.name+"',testCaseID:'"+e.id+"',createdBy:'"+user+"',createdOn:'null',uid:'"+uidx+"',testCaseID_c:'"+e.id_c+"'}) SET n.screenID_c='"+e.pid_c+"',n.childIndex='"+e.childIndex+"'"});
 						}else{
@@ -674,11 +681,15 @@ exports.saveData=function(req,res){
 							t.id=(t.id!=null)?t.id:uuidV4();
 							//var parent=[prjId].concat(t.parent);
 							if(t.oid!=null){
-								if (t.updatedParent != undefined){
-									qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',parent:'["+t.parent+"]'}) SET n.task='"+t.task+"',n.assignedTo='"+t.assignedTo+"',n.reviewer='"+t.reviewer+"',n.status='"+taskstatus+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.re_estimation='"+t.re_estimation+"',n.details='"+t.details+"',n.uid='"+uidx+"',n.parent='["+[prjId].concat(t.updatedParent)+"]',n.cx='"+t.cx+"'"});
-								}else{
-									qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',parent:'["+t.parent+"]'}) SET n.task='"+t.task+"',n.assignedTo='"+t.assignedTo+"',n.reviewer='"+t.reviewer+"',n.status='"+taskstatus+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.re_estimation='"+t.re_estimation+"',n.details='"+t.details+"',n.uid='"+uidx+"',n.cx='"+t.cx+"'"});
+							//Part of Issue 1685
+								if(relId==t.release && cycId==t.cycle){
+									if (t.updatedParent != undefined){
+										qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',parent:'["+t.parent+"]'}) SET n.task='"+t.task+"',n.assignedTo='"+t.assignedTo+"',n.reviewer='"+t.reviewer+"',n.status='"+taskstatus+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.re_estimation='"+t.re_estimation+"',n.details='"+t.details+"',n.uid='"+uidx+"',n.parent='["+[prjId].concat(t.updatedParent)+"]',n.cx='"+t.cx+"'"});
+									}else{
+										qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',parent:'["+t.parent+"]'}) SET n.task='"+t.task+"',n.assignedTo='"+t.assignedTo+"',n.reviewer='"+t.reviewer+"',n.status='"+taskstatus+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.re_estimation='"+t.re_estimation+"',n.details='"+t.details+"',n.uid='"+uidx+"',n.cx='"+t.cx+"'"});
+									}
 								}
+								
 							}
 							else if(!t.copied){
 								t.parent=[prjId].concat(t.parent);
@@ -753,7 +764,16 @@ exports.saveData=function(req,res){
 							row.graph.relationships.forEach(function(r){
 								var srcIndex=idDict[r.startNode.toString()];
 								var tgtIndex=idDict[r.endNode.toString()];
-								if(nData[tgtIndex].children===undefined) nData[srcIndex].task=nData[tgtIndex];
+								//if(nData[tgtIndex].children===undefined) nData[srcIndex].task=nData[tgtIndex];
+								//Part of Issue 1685, after saving of data proper task should be written since multiple tasks are conencte dto single node
+								if(nData[tgtIndex].children===undefined){
+									if((selectedTab=='tabAssign'&& nData[tgtIndex].release==relId && nData[tgtIndex].cycle==cycId)||tab=='tabCreate'||tab=='endToend'){
+										nData[srcIndex].task=nData[tgtIndex];
+									}else if(nData[srcIndex].type=='testcases' || nData[srcIndex].type=='screens'){
+										nData[srcIndex].taskexists=nData[tgtIndex];
+									}
+										
+								}
 								else if(nData[srcIndex].children.indexOf(nData[tgtIndex])==-1){
 									nData[srcIndex].children.push(nData[tgtIndex]);
 									if(nData[tgtIndex].childIndex==undefined) nData[tgtIndex].childIndex=nData[srcIndex].children.length;
@@ -869,9 +889,9 @@ exports.saveEndtoEndData=function(req,res){
 							t.id=(t.id!=null)?t.id:uuidV4();
 							if(t.oid!=null){
 								if (t.updatedParent != undefined){
-									qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',parent:'["+t.parent+"]',release:'"+relId+"',cycle:'"+cycId+"'}) SET n.task='"+t.task+"',n.assignedTo='"+t.assignedTo+"',n.reviewer='"+t.reviewer+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.re_estimation='"+t.re_estimation+"',n.details='"+t.details+",n.status='"+taskstatus+"',n.parent='["+[prjId].concat(t.updatedParent)+"]'"});
+									qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',parent:'["+t.parent+"]',release:'"+t.release+"',cycle:'"+t.cycle+"'}) SET n.task='"+t.task+"',n.assignedTo='"+t.assignedTo+"',n.reviewer='"+t.reviewer+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.re_estimation='"+t.re_estimation+"',n.details='"+t.details+",n.status='"+taskstatus+"',n.parent='["+[prjId].concat(t.updatedParent)+"]'"});
 								}else{
-									qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',parent:'["+t.parent+"]',release:'"+relId+"',cycle:'"+cycId+"'}) SET n.task='"+t.task+"',n.status='"+taskstatus+"',n.assignedTo='"+t.assignedTo+"',n.reviewer='"+t.reviewer+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.re_estimation='"+t.re_estimation+"',n.details='"+t.details+"'"});
+									qList.push({"statement":"MATCH(n:TASKS{taskID:'"+t.id+"',parent:'["+t.parent+"]',release:'"+t.release+"',cycle:'"+t.cycle+"'}) SET n.task='"+t.task+"',n.status='"+taskstatus+"',n.assignedTo='"+t.assignedTo+"',n.reviewer='"+t.reviewer+"',n.startDate='"+t.startDate+"',n.endDate='"+t.endDate+"',n.re_estimation='"+t.re_estimation+"',n.details='"+t.details+"'"});
 								}
 							}
 							else qList.push({"statement":"MERGE(n:TASKS{taskID:'"+t.id+"',task:'"+t.task+"',assignedTo:'"+t.assignedTo+"',status:'"+taskstatus+"',reviewer:'"+t.reviewer+"',startDate:'"+t.startDate+"',endDate:'"+t.endDate+"',re_estimation:'"+t.re_estimation+"',release:'"+relId+"',cycle:'"+cycId+"',details:'"+t.details+"',parent:'["+t.parent+"]'})"});
@@ -896,7 +916,7 @@ exports.saveEndtoEndData=function(req,res){
 								}
 							}
 							else qList.push({"statement":"MERGE(n:TASKS{taskID:'"+t.id+"',task:'"+t.task+"',assignedTo:'"+t.assignedTo+"',reviewer:'"+t.reviewer+"',status:'"+taskstatus+"',startDate:'"+t.startDate+"',endDate:'"+t.endDate+"',re_estimation:'"+t.re_estimation+"',release:'"+relId+"',cycle:'"+cycId+"',details:'"+t.details+"',parent:'["+t.parent+"]'})"});
-							qList.push({"statement":"MATCH (a:TESTSCENARIOS{projectID:'"+prjId+"',testScenarioName:'"+e.name+"'}),(b:TASKS{taskID:'"+t.id+"'}) MERGE (a)-[r:FNTT {id:a.testScenarioID}]-(b)"});
+							qList.push({"statement":"MATCH (a:TESTSCENARIOS{projectID:'"+e.projectID+"',testScenarioName:'"+e.name+"'}),(b:TASKS{taskID:'"+t.id+"'}) MERGE (a)-[r:FNTT {id:a.testScenarioID}]-(b)"});
 						}
 						else if(e.id_n==null){ // In case added first time to end to end then connect to all task if exist
 							qList.push({"statement":"MATCH (a:TASKS)<-[r]-(b:TESTSCENARIOS{projectID:'"+prjId+"',testScenarioName:'"+e.name+"'}),(c:TESTSCENARIOS{projectID:'"+e.projectID+"',testScenarioName:'"+e.name+"'}) MERGE (c)-[rel:FNTT {id:c.testScenarioID}]-(a)"});							

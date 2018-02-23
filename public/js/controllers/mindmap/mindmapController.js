@@ -661,7 +661,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         var nType = p.attr('data-nodetype');
         if (dNodes[pi].oid != undefined && dNodes[pi].task != null) {
             dNodes[pi].task.tstatus = 'unassigned';
-            unassignTask.push(dNodes[pi].oid)
+            unassignTask.push(dNodes[pi].oid);
         }
         d3.select('#ct-assignBox').classed('no-disp', !0);
     }
@@ -914,7 +914,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                             
                             dNodes[e].task = tempTask;
                             dNodes[e].task.copied = true;
-                            d3.select('#ct-node-' + e).append('image').attr('class', 'ct-nodeTask').attr('xlink:href', 'images_mindmap/node-task-assigned.png').attr('x', 29).attr('y', -10);                    
+                            d3.select('#ct-node-' + e).append('image').attr('class', 'ct-nodeTask').attr('xlink:href', 'images_mindmap/node-task-assigned.png').attr('style','opacity:0.6').attr('x', 29).attr('y', -10);                    
                         });
                     }
                     dNodes[pi].task.copied = false;
@@ -2244,7 +2244,6 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
                 })
                 if(reuse.length>0){
-                    console.log(deletednode_info);
                     openDialogMindmap('Error',"Scenarios used in another Module : '"+reuse.join()+"'");
                     return;
                 }
@@ -2255,6 +2254,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             if (dNodes[0].type == 'modules_endtoend') {
                 cur_module = 'end_to_end';
                 error = false;
+            }else{
+            	//Part of Issue 1685
+                cur_module=$scope.tab;
             }
 
             if (s.attr('id') == 'ct-saveAction') {
@@ -2292,7 +2294,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 from_v = to_v = $('.version-list').val();
 
             mindmapServices.saveData(versioning_enabled,assignedTo, flag, window.localStorage['_SR'], from_v, to_v, cur_module, mapData, deletednode, unassignTask,
-                $('.project-list').val(), $('.release-list').val(), $('.cycle-list').val()).then(function(result) {
+                $('.project-list').val(), $('.release-list').val(), $('.cycle-list').val(),selectedTab).then(function(result) {
                 unblockUI();
                 if (flag == 10) {
                     var res = result;
@@ -2679,9 +2681,14 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 d.id = uNix++;
                 addNode(d, !0, d.parent);
                 if (d.task != null && $scope.tab!='tabCreate'){
-                   if(d.task.release==$('.release-list').val() && d.task.cycle==$('.cycle-list').val())
+                   if(d.task.release==$('.release-list').val() && d.task.cycle==$('.cycle-list').val()){
                         d3.select('#ct-node-' + d.id).append('image').attr('class', 'ct-nodeTask').attr('width', '21px').attr('height', '21px').attr('xlink:href', 'images_mindmap/node-task-assigned.png').attr('x', 29).attr('y', -10);
-                } 
+                   }
+                }
+                //Enhancement : Part of Issue 1685 showing the task assigned icon little transperent to indicate that task originally do not belongs to this release and cycle but task exists in some other release and cycle
+                else if(d.taskexists && $scope.tab!='tabCreate'){
+                    d3.select('#ct-node-' + d.id).append('image').attr('class', 'ct-nodeTask').attr('width', '21px').attr('height', '21px').attr('xlink:href', 'images_mindmap/node-task-assigned.png').attr('style','opacity:0.6').attr('x', 29).attr('y', -10);
+                }
             });
             dLinks = d3Tree.links(dNodes);
             dLinks.forEach(function(d) {
