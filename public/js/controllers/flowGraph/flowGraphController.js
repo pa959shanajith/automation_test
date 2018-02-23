@@ -1,4 +1,4 @@
-mySPA.controller('flowGraphController', ['$scope', '$http', '$location', '$timeout', 'flowGraphServices','cfpLoadingBar','$window', function($scope,$http,$location,$timeout,flowGraphServices,cfpLoadingBar,$window) {
+mySPA.controller('flowGraphController', ['$scope', '$http', '$location', '$timeout', 'flowGraphServices','cfpLoadingBar','$window', 'socket', function($scope,$http,$location,$timeout,flowGraphServices,cfpLoadingBar,$window,socket) {
 	 //Task Listing
 	 $timeout(function() {
 		$('.scrollbar-inner').scrollbar();
@@ -6,9 +6,9 @@ mySPA.controller('flowGraphController', ['$scope', '$http', '$location', '$timeo
 		document.getElementById("currentYear").innerHTML = new Date().getFullYear()
 		cfpLoadingBar.complete()
 		$("#utilityEncrytpion").trigger("click");
-	  }, 500)
+	  }, 500);
 	  
-	 loadUserTasks()
+	 loadUserTasks(); 
 
 	 $scope.enableGenerate = false;
 	 $scope.showFlowGraphHome = function(){
@@ -21,9 +21,22 @@ mySPA.controller('flowGraphController', ['$scope', '$http', '$location', '$timeo
 		$('#middle-content-section').removeAttr('class');
 	
 		$("#apg-cd-canvas").hide();
+		document.getElementById('path').value = '';
 		$scope.showInfo = false;
 		$scope.hideBaseContent = { message: 'false' };		  
 	  }
+	  
+	  socket.on('ICEnotAvailable', function () {
+		var slider = document.getElementById("slider-container");
+		slider.remove();
+		$('#progress-canvas').fadeOut(800, function(){
+			$scope.hideBaseContent = { message: 'false' };
+			$scope.$apply();
+		});
+		document.getElementById('path').value = '';
+		openDialog("APG", "ICE Engine is not available. Please run the batch file and connect to the Server.");
+	});
+	  
 	$scope.executeGenerate = function(){
 		$scope.enableGenerate = false;
 		currentDot = 0;
@@ -47,7 +60,7 @@ mySPA.controller('flowGraphController', ['$scope', '$http', '$location', '$timeo
 				$scope.hideBaseContent = { message: 'false' };
 				$('#progress-canvas').hide();
 				document.getElementById('path').value = '';
-				openDialog("Flowgraph Generator", "ICE Engine is not available. Please run the batch file and connect to the Server.");
+				openDialog("APG", "ICE Engine is not available. Please run the batch file and connect to the Server.");
 				return false;
 			}else if(data == "Invalid Session"){
 				document.getElementById('path').value = '';
@@ -64,25 +77,19 @@ mySPA.controller('flowGraphController', ['$scope', '$http', '$location', '$timeo
 		
 		socket.on('endData', function(obj){
 			if(obj.result == "success"){
-				console.log(obj);
-				//$scope.createGraph(obj);
 				$('#progress-canvas').fadeOut(800, function(){
 					$scope.hideBaseContent = { message: 'true' };
 					$scope.$apply();
 				});
 				$scope.generateClassDiagram(obj);
-				// var slider = document.getElementById("slider-container");
-				// slider.remove();
 				$scope.enableGenerate = true;
-				/*document.getElementById('path').value = '';
-				openDialog("Flowgraph Generator", "Flowgraph generated succesfully.");*/
 			}else if(obj.result == "fail"){
 				$('#progress-canvas').fadeOut(800, function(){
 					$scope.hideBaseContent = { message: 'false' };
 					$scope.$apply();
 				});
 				document.getElementById('path').value = '';
-				openDialog("Flowgraph Generator", "Failed to generate flowgraph.");
+				openDialog("APG", "Failed to generate graph.");
 			}
 			
 		});
@@ -132,27 +139,6 @@ mySPA.controller('flowGraphController', ['$scope', '$http', '$location', '$timeo
   ]
 	
 	$scope.addClass = function(obj){
-		/*var x = dotsPosition[currentDot].x;
-		var y = dotsPosition[currentDot].y;
-		currentDot++;
-		var parentElem = document.createElement("div");
-		parentElem.setAttribute("style", "left:"+x+"; top:"+y+"; position:absolute;");
-		var icon = document.createElement("span");
-		icon.setAttribute("id","toggle_"+currentDot);
-		icon.setAttribute("class", "toggle-box");
-		var t = document.createTextNode(obj.name);
-		icon.appendChild(t);
-		parentElem.appendChild(icon);
-		document.getElementById("progress-canvas").appendChild(parentElem);
-		icon.addEventListener("mouseover", onDotMouseOver, false);
-		icon.addEventListener("mouseout", onDotMouseOut, false);
-		function onDotMouseOver(e){
-		  e.target.nextSibling.style.visibility = "";
-		}
-
-		function onDotMouseOut(e){
-		  e.target.nextSibling.style.visibility = "hidden";
-		}*/
 		categoriesDict = {"public" : "+", "private" : "-", "default" : "~", "protected" : "#"};
 		var x = dotsPosition[currentDot].x;
 		var y = dotsPosition[currentDot].y;
@@ -209,6 +195,7 @@ mySPA.controller('flowGraphController', ['$scope', '$http', '$location', '$timeo
 	}
 
 	$scope.prepareJSON = function(obj) {
+		links = obj.links;
 		obj = obj.classes;
 		var class_map = {};
 		var size = -1;
@@ -223,7 +210,7 @@ mySPA.controller('flowGraphController', ['$scope', '$http', '$location', '$timeo
 		for (var i = 0; i < obj.length; i++) {
 			graph_json["nodes"].push({
 				"classname": obj[i].name,
-				"methods": obj[i].methods,
+				"methods": obj[i].classMethods,
 				"attributes": obj[i].classVariables,
 				"id": i,
 				"abstract": obj[i].abstract,
@@ -313,6 +300,17 @@ mySPA.controller('flowGraphController', ['$scope', '$http', '$location', '$timeo
 			}
 		}
 		
+		if(links.length != 0){
+			for (var i=0; i < links.length; i++){
+				var link = {
+					"source": class_map[links[i].source],
+					"target": class_map[links[i].target],
+					"type": "association"
+				};
+				graph_json["links"].push(link);
+			}
+		}
+		console.log(graph_json);
 		return graph_json;
 	}
 
@@ -354,7 +352,7 @@ var color = d3.scale.category20();
 var link = container.selectAll(".apg-cd-link"),
     node = container.selectAll(".apg-cd-node");
 var graph =	$scope.prepareJSON(obj);
-console.log(graph);
+
 
 force
   .nodes(graph.nodes)
@@ -565,7 +563,24 @@ function tick() {
 		  var zoom = d3.behavior.zoom()
             .scaleExtent([1, 10])
             .on("zoom", zoomed);
-        path.attr('marker-end', 'url(#' + "filledTraiangle" + ')');
+         path.attr('marker-end', function(d){
+			var arrowType = 'url(#' + "triangle" + ')';
+			if(d.type == 'extends'){
+				arrowType =  'url(#' + "triangle" + ')';
+			}else if( d.type == 'implements'){
+				arrowType =  'url(#' + "triangle" + ')';
+				
+			}else if(d.type == "association"){
+				arrowType =  'url(#' + "arrowhead" + ')';
+			} 
+			return arrowType;
+		}).attr('stroke-dasharray', function(d){
+			var arrowType = 0;
+			if(d.type == 'implements'){
+				arrowType = 4;
+			}
+			return arrowType;
+		});
 
         node
             .attr("transform", function (d) {
