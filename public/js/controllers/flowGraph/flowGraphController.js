@@ -12,6 +12,7 @@ mySPA.controller('flowGraphController', ['$scope', '$http', '$location', '$timeo
 
 	 $scope.enableGenerate = false;
 	 $scope.showFlowGraphHome = function(){
+		$('#complexity-canvas').hide();
 		if (!$scope.enableGenerate)
 		return;
 		var myNode = document.getElementById("apg-cd-canvas");
@@ -214,7 +215,8 @@ mySPA.controller('flowGraphController', ['$scope', '$http', '$location', '$timeo
 				"attributes": obj[i].classVariables,
 				"id": i,
 				"abstract": obj[i].abstract,
-				"interface": obj[i].interface
+				"interface": obj[i].interface,
+				"Complexity":obj[i].complexity
 			});
 		}
 		for (var i=0; i<obj.length; i++){
@@ -232,7 +234,8 @@ mySPA.controller('flowGraphController', ['$scope', '$http', '$location', '$timeo
 						"classname": obj[i].extends,
 						"methods": [],
 						"attributes": [],
-						"id": size + 1
+						"id": size + 1,
+						"complexity":"undefined"
 					});
 					class_map[obj[i].extends] = size + 1;
 					var link = {
@@ -260,7 +263,8 @@ mySPA.controller('flowGraphController', ['$scope', '$http', '$location', '$timeo
 								"classname": implement_list[j],
 								"methods": [],
 								"attributes": [],
-								"id": size + 1
+								"id": size + 1,
+								"complexity":"undefined"
 							});
 							class_map[implement_list[j]] = size + 1;
 							var link = {
@@ -371,6 +375,8 @@ node = node
 	.append("g")
 	.attr("class", "apg-cd-node")
 	.on("dblclick", dblclick)
+	.on("mouseover", nodeOver)
+	.on("mouseout",nodeOut)
 	.call(drag);
 
 node.append('rect')
@@ -465,6 +471,24 @@ var classNameTexts = classNameG.append('text')
       );
     adjustHeight(methodsRects[0], methodsTexts[0], 4, 4);
 	
+	var image = node.append('image')
+	.attr({'href': 'imgs/apg-info.png',
+		'width': '20px',
+		'style': 'transform: translateX(-21px)',
+		'class': 'apg-info-icon',
+	});
+
+	image.on('click', function(d){
+		$('#apg-cd-canvas').hide();
+		$('#complexity-canvas').show();
+		$scope.ccname=d.classname;
+		$scope.cmethod=d.methods.length;
+		$scope.cc =d.Complexity;
+		$scope.$apply();
+		//$scope.hmc=20;
+	});
+	image.append('title').text('Show Complexity');
+	
 	container.selectAll('text').attr('font-family', 'Noto Sans Japanese');
 	
 	node.forEach(function(d){
@@ -477,6 +501,7 @@ var classNameTexts = classNameG.append('text')
 			
 			for(i = 1 ;  i< e.children.length; i ++){	
 				d3.select(e.children[i].children[0]).attr('width', maxWidth+8);
+				d3.select(e.lastChild).attr('style', 'transform: translateX('+Number(maxWidth+8)+'px)')
 			}
 			d3.select(e.children[0]).attr('width', maxWidth+8);
 			dn=d3.select(e).datum();
@@ -592,19 +617,26 @@ function tick() {
 function dblclick(d) {
   d3.select(this).classed("fixed", d.fixed = false);
 }
+function nodeOver(d){
+	$(".apg-info-icon").removeClass("apg-active");
+	this.lastChild.classList.add("apg-active");
+}
+function nodeOut(){
+	$(".apg-info-icon").removeClass("apg-active");
+}
 function dragstart(d) {
 d3.event.sourceEvent.stopPropagation();
   d3.select(this).classed("fixed", d.fixed = true);
 }
-			function openDialog(title, body) {
-			$("#globalModal").find('.modal-title').text(title);
-			$("#globalModal").find('.modal-body p').text(body).css('color', 'black');
-			$("#globalModal").modal("show");
-			setTimeout(function() {
-				$("#globalModal").find('.btn-default').focus();
-			}, 300);
-		}
+	function openDialog(title, body) {
+		$("#globalModal").find('.modal-title').text(title);
+		$("#globalModal").find('.modal-body p').text(body).css('color', 'black');
+		$("#globalModal").modal("show");
+		setTimeout(function() {
+			$("#globalModal").find('.btn-default').focus();
+		}, 300);
 	}
+}
 	
 }]);
 

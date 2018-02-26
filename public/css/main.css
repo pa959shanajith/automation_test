@@ -5372,8 +5372,20 @@ Webocular report css
     cursor: move;
     fill: #ccc;
     stroke: #000;
-    stroke-width: 0.5px;
+    stroke-width: 0.3px;
   }
   .apg-cd-node.fixed {
     fill: #f00;
   }
+
+.apg-info-icon {
+    display : none;
+}
+
+.apg-active {
+    display : block !important;
+}
+
+#complexity-canvas{
+display:none
+} 
