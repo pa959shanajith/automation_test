@@ -4,7 +4,7 @@ Webserver Component of Nineteen68 V2.0.
 
 ## Configuration
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
+These instructions will help setting up the project and running on a local machine for development and testing purposes.
 
 ### Prerequisites
 
@@ -26,14 +26,14 @@ These instructions will get you a copy of the project up and running on your loc
 
                     E.g. for local setup: "127.0.0.1:7474"
 
-* Do not modify `username` and `password` field.
+* Do not modify `username` and `password` fields.
 * Update `screenShot_PathName`: Value should be, shared location in the server where the screenshots are stored. For local setup, provide a folder where screenshots should be saved.
 
 					default: Shared location corresponding to windows systems
 					mac: Shared location corresponding to mac systems
 * Open the `.env` file present in the source folder.
 * Update the value of `ENV` variable to `DEV` / `TEST` / `PROD` accrodingly.
-* Update the `NDAC_IP` and `REDIS_IP` variables with the `IPs` on which NDAC/redis is running.
+* Update the `NDAC_IP` and `REDIS_IP` variables with the `IPs` on which NDAC and redis are running.
 * Run the following command to start the server: ```npm start```
         
 
