@@ -82,7 +82,13 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 				}
 				else if(data == "invalidurl"){
 					$("#qcErrorMsg").text("Invalid URL");
-				}			
+				}	
+				else if(data == "Error:Failed in running Qc"){
+					$("#qcErrorMsg").text("Unable to run Qc");
+				}
+				else if(data=="Error:Qc Operations"){
+					$("#qcErrorMsg").text("Failed during execution");
+				}
 				else if(data){
 					$(".qcSelectDomain").empty();
 					$(".qcSelectDomain").append("<option selected disabled>Select Domain</option>")
@@ -316,10 +322,13 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 		$(this).find(".qcSyncronise, .qcUndoSyncronise").show();
 	})
 	$(document).on('click','.testScenariolink', function(){
+		
+		$('.selectedToMap').prop("style","background-color:none;border-radius:0px;");
+		$(this).siblings().removeClass("selectedToMap");
+	//	$(this).siblings().prop("style","background-color:none;border-radius:0px;");
 		$(this).addClass("selectedToMap");
 		$(this).prop("style","background-color:#E1CAFF;border-radius:5px;");
-		$(this).siblings().removeClass("selectedToMap");
-		$(this).siblings().prop("style","background-color:none;border-radius:0px;");
+		
 	})
 
 	//Undo Mapping
@@ -408,12 +417,15 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 			})
 			if(data.length > 0){
 				$(".qcActionBtn, .leftQcStructure, .rightQcStructure").hide();
-				$("#page-taskName span").text("Mapped Files");
+				$("#page-taskName span").text("Mapped Files");	
+				$('.mappedFiles').off();
 				$(".mappedFiles").empty().show();
+				$('.mappedFiles').removeClass('scroll-wrapper');
 				$(".mappedFilesLabel").show();
 				for(var i=0;i<data.length;i++){
 					$(".mappedFiles").append('<div class="linkedTestset"><label data-qcdomain="'+data[i].qcdomain+'" data-qcfolderpath="'+data[i].qcfolderpath+'" data-qcproject="'+data[i].qcproject+'" data-qctestset="'+data[i].qctestset+'">'+data[i].qctestcase+'</label><span class="linkedLine"></span><label data-scenarioid="'+data[i].testscenarioid+'">'+data[i].testscenarioname+'</label></div>')
-				}				
+				}	
+
 				$('.scrollbar-inner').scrollbar();
 			}
 			else{

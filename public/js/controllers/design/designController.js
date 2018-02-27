@@ -130,6 +130,8 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 
     $timeout(function() {
         projectDetails = angular.element(document.getElementById("left-nav-section")).scope().projectDetails;
+        releaseName = angular.element(document.getElementById("left-nav-section")).scope().releaseDetails;
+        cycleName = angular.element(document.getElementById("left-nav-section")).scope().cycleDetails;
         var getTaskName = JSON.parse(window.localStorage['_CT']).taskName;
         appType = JSON.parse(window.localStorage['_CT']).appType;
         screenName = angular.element(document.getElementById("left-nav-section")).scope().screenName;
@@ -137,9 +139,9 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
         subTaskType = JSON.parse(window.localStorage['_CT']).subTaskType;
         subTask = JSON.parse(window.localStorage['_CT']).subTask;
         if (subTaskType == "Scrape" || subTask == "Scrape") {
-            $(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">Project :</span><span class="content">' + projectDetails.respnames[0] + '</span></p><p class="proj-info-wrap"><span class="content-label">Screen :</span><span class="content">' + screenName + '</span></p>')
+            $(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">Project :</span><span class="content">' + projectDetails.respnames[0] + '</span></p><p class="proj-info-wrap"><span class="content-label">Screen :</span><span class="content">' + screenName + '</span></p><p class="proj-info-wrap"><span class="content-label">Release :</span><span class="content">' + releaseName + '</span></p><p class="proj-info-wrap"><span class="content-label">Cycle :</span><span class="content">' + cycleName + '</span></p>')
         } else {
-            $(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">Project: </span><span class="content">' + projectDetails.respnames[0] + '</span></p><p class="proj-info-wrap"><span class="content-label">Screen: </span><span class="content">' + screenName + '</span></p><p class="proj-info-wrap"><span class="content-label">TestCase: </span><span class="content">' + testCaseName + '</span></p>')
+            $(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">Project: </span><span class="content">' + projectDetails.respnames[0] + '</span></p><p class="proj-info-wrap"><span class="content-label">Screen: </span><span class="content">' + screenName + '</span></p><p class="proj-info-wrap"><span class="content-label">TestCase: </span><span class="content">' + testCaseName + '</span></p><p class="proj-info-wrap"><span class="content-label">Release :</span><span class="content">' + releaseName + '</span></p><p class="proj-info-wrap"><span class="content-label">Cycle :</span><span class="content">' + cycleName + '</span></p>')
         }
 
     }, 3000)
@@ -302,7 +304,10 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                                 $scope.newTestScriptDataLS = data2.view;
                                 getScrapeDataforCustomObj = data2.view;
                                 $("#window-scrape-screenshotTs .popupContent").empty()
-                                $("#window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrapeTS"><img id="screenshotTS" src="data:image/PNG;base64,' + data2.mirror + '" /></div>')
+                                if (data2.mirror == undefined)
+                                    $("#window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrapeTS">No Screenshot Available</div>')
+                                else
+                                    $("#window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrapeTS"><img id="screenshotTS" src="data:image/PNG;base64,' + data2.mirror + '" /></div>')
 
                                 // service call # 3 -objectType service call
                                 DesignServices.getKeywordDetails_ICE(appType)
@@ -386,76 +391,47 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
     $scope.debugTestCase_ICE = function(selectedBrowserType) {
         var taskInfo = JSON.parse(window.localStorage['_CT']);
         var testcaseID = [];
-        testcaseID.push(taskInfo.testCaseId);
         var browserType = [];
         browserType.push(selectedBrowserType)
         if (appType == "MobileWeb" || appType == "Mainframe") browserType = [];
         globalSelectedBrowserType = selectedBrowserType;
-        var blockMsg = 'Debug in Progress. Please Wait...';
+        
         if (dependentTestCaseFlag == true) {
-            blockUI(blockMsg);
-            DesignServices.debugTestCase_ICE(browserType, checkedTestcases, appType)
-                .then(function(data) {
-                        if (data == "Invalid Session") {
-                            $rootScope.redirectPage();
-                        }
-                        //console.log("debug-----", data);
-                        if (data == "unavailableLocalServer") {
-                            unblockUI();
-                            openDialog("Debug Testcase", "ICE Engine is not available. Please run the batch file and connect to the Server.")
-                        } else if (data == "success") {
-                            unblockUI();
-                            openDialog("Debug Testcase", "Debug completed successfully.")
-                        } else if (data == "fail") {
-                            unblockUI();
-                            openDialog("Debug Testcase", "Failed to debug.")
-                        } else if (data == "Terminate") {
-                            unblockUI();
-                            openDialog("Debug Testcase", "Debug Terminated")
-                        } else if (data == "browserUnavailable") {
-                            unblockUI();
-                            openDialog("Debug Testcase", "Browser is not available")
-                        } else if (data == "scheduleModeOn") {
-                            unblockUI();
-                            openDialog("Debug Testcase", "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.")
-                        }
-
-                    },
-                    function(error) {
-                        console.log("Error while traversing while executing debugTestcase method!! \r\n " + (error.data));
-                    });
+            testcaseID = checkedTestcases;
         } else {
-            blockUI(blockMsg);
-            DesignServices.debugTestCase_ICE(browserType, testcaseID, appType)
-                .then(function(data) {
-                        if (data == "Invalid Session") {
-                            $rootScope.redirectPage();
-                        }
-                        //console.log("debug-----", data);
-                        if (data == "unavailableLocalServer") {
-                            unblockUI();
-                            openDialog("Debug Testcase", "ICE Engine is not available. Please run the batch file and connect to the Server.")
-                        } else if (data == "success") {
-                            unblockUI();
-                            openDialog("Debug Testcase", "Debug completed successfully.")
-                        } else if (data == "fail") {
-                            unblockUI();
-                            openDialog("Debug Testcase", "Failed to debug.")
-                        } else if (data == "Terminate") {
-                            unblockUI();
-                            openDialog("Debug Testcase", "Debug Terminated")
-                        } else if (data == "browserUnavailable") {
-                            unblockUI();
-                            openDialog("Debug Testcase", "Browser is not available")
-                        } else if (data == "scheduleModeOn") {
-                            unblockUI();
-                            openDialog("Debug Testcase", "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.")
-                        }
-                    },
-                    function(error) {
-                        console.log("Error while traversing while executing debugTestcase method!! \r\n " + (error.data));
-                    });
+            testcaseID.push(taskInfo.testCaseId);
         }
+
+        var blockMsg = 'Debug in Progress. Please Wait...';
+        blockUI(blockMsg);
+        DesignServices.debugTestCase_ICE(browserType, testcaseID, appType)
+        .then(function(data) {
+            if (data == "Invalid Session") {
+                $rootScope.redirectPage();
+            }
+            if (data == "unavailableLocalServer") {
+                unblockUI();
+                openDialog("Debug Testcase", "ICE Engine is not available. Please run the batch file and connect to the Server.")
+            } else if (data == "success") {
+                unblockUI();
+                openDialog("Debug Testcase", "Debug completed successfully.")
+            } else if (data == "fail") {
+                unblockUI();
+                openDialog("Debug Testcase", "Failed to debug.")
+            } else if (data == "Terminate") {
+                unblockUI();
+                openDialog("Debug Testcase", "Debug Terminated")
+            } else if (data == "browserUnavailable") {
+                unblockUI();
+                openDialog("Debug Testcase", "Browser is not available")
+            } else if (data == "scheduleModeOn") {
+                unblockUI();
+                openDialog("Debug Testcase", "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.")
+            }
+
+        },function(error) {
+            console.log("Error while traversing while executing debugTestcase method!! \r\n " + (error.data));
+        });
     }; // browser invocation ends
 
     //Import Test case
@@ -1472,7 +1448,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                 } else {
                     $(document).find("#mobilityWebSerialNo, #mobilityAndroidVersion").removeClass("inputErrorBorder")
                     screenViewObject.appType = $scope.getScreenView,
-                        screenViewObject.mobileSerial = $(document).find("#mobilityWebSerialNo").val();
+                    screenViewObject.mobileSerial = $(document).find("#mobilityWebSerialNo").val();
                     screenViewObject.androidVersion = $(document).find("#mobilityAndroidVersion").val();
                     $("#launchMobilityWeb").modal("hide");
                     // blockUI(blockMsg);
@@ -4144,6 +4120,48 @@ function contentTable(newTestScriptDataLS) {
             $grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
         }
         //ends here
+		//Object
+		else if (selectedText == "@Object") {
+            objName = "@Object";
+            url = "";
+            var sc;
+            var res = '';
+            if (appTypeLocal == 'Web') {
+                sc = Object.keys(keywordArrayList.object);
+                selectedKeywordList = "object";
+                var newTSDataLS = angular.element(document.getElementById('jqGrid')).scope().newTestScriptDataLS;
+                if (newTSDataLS) {
+                    if (newTSDataLS != "undefined") {
+                        //var testScriptTableData = JSON.parse(newTSDataLS);
+                        for (j = 0; j < newTSDataLS.length; j++) {
+                            if (newTSDataLS[j].custname != '@Browser' && newTSDataLS[j].custname != '@Oebs' && newTSDataLS[j].custname != '@Window' && newTSDataLS[j].custname != '@Generic' && newTSDataLS[j].custname != '@Custom') {
+                                if (newTSDataLS[j].url != "") {
+                                    url = newTSDataLS[j].url;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            } else {
+                sc = Object.keys(keywordArrayList.object);
+                selectedKeywordList = "object";
+            }
+            for (var i = 0; i < sc.length; i++) {
+                if (selectedKeyword == sc[i]) {
+                    res += '<option role="option" value="' + sc[i] + '" selected>' + sc[i] + '</option>';
+                } else
+                    res += '<option role="option" value="' + sc[i] + '">' + sc[i] + '</option>';
+            }
+            var row = $(e.target).closest('tr.jqgrow');
+            var rowId = row.attr('id');
+            $("select#" + rowId + "_keywordVal", row[0]).html(res);
+            selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
+            $grid.jqGrid('setCell', rowId, 'objectName', objName);
+            $grid.jqGrid('setCell', rowId, 'url', url);
+            $grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
+        }
+        //ends here
         else if (selectedText == "WebService List") {
             objName = " ";
             url = " ";
@@ -5560,46 +5578,23 @@ function getTags(data) {
     var obnames = [];
     var appTypeLocal = JSON.parse(window.localStorage['_CT']).appType;
     if (appTypeLocal == "Web") {
-        obnames.push("@Generic");
-        obnames.push("@Excel");
-        obnames.push("@Custom");
-        obnames.push("@Browser");
-        obnames.push("@BrowserPopUp");
+        obnames = ["@Generic","@Excel","@Custom","@Browser","@BrowserPopUp"];
     } else if (appTypeLocal == "Webservice") {
-        obnames.push("@Generic");
-        obnames.push("@Excel");
-        obnames.push("WebService List");
+        obnames = ["@Generic","@Excel","WebService List"];
     } else if (appTypeLocal == "Mainframe") {
-        obnames.push("@Generic");
-        obnames.push("@Excel");
-        obnames.push("Mainframe List");
+        obnames = ["@Generic","@Excel","Mainframe List"];
     } else if (appTypeLocal == "Desktop") {
-        obnames.push("@Generic");
-        obnames.push("@Excel");
-        obnames.push("@Window");
-        obnames.push("@Custom");
-        obnames.push("@Email");
+        obnames = ["@Generic","@Excel","@Window","@Custom","@Email"];
     } else if (appTypeLocal == "DesktopJava") {
-        obnames.push("@Generic");
-        obnames.push("@Excel");
-        obnames.push("@Oebs");
-        obnames.push("@Custom");
+        obnames = ["@Generic","@Excel","@Oebs","@Custom"];
     } else if (appTypeLocal == "MobileApp") {
-        obnames.push("@Generic");
-        obnames.push("@Mobile");
-        obnames.push("@Action");
+        obnames = ["@Generic","@Mobile","@Action"];
     } else if (appTypeLocal == "MobileWeb") {
-        obnames.push("@Generic");
-        obnames.push("@Browser");
-        obnames.push("@BrowserPopUp");
-        obnames.push("@Action");
+        obnames = ["@Generic","@Browser","@BrowserPopUp","@Action"];
     } else if (appTypeLocal == "MobileApp") {
-        obnames.push("@Generic");
-        obnames.push("@MobileiOS");
+        obnames = ["@Generic", "@MobileiOS"]
     } else if (appTypeLocal == "SAP") {
-        obnames.push("@Generic");
-        obnames.push("@Sap");
-        obnames.push("@Custom");
+        obnames = ["@Generic", "@Sap", "@Custom"]
     }
     for (var i = 0; i < data.length; i++) {
         obnames.push(data[i].custname);

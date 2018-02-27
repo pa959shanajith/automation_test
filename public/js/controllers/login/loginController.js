@@ -59,18 +59,13 @@ mySPA.controller('loginController', function ($scope, $rootScope, $timeout, $htt
 								if(data != "fail"){
 									//To be removed - Has to come from database
 									var availablePlugins = [];
-									var key = ["ALM","Auto Gen Path", "Dashboard", "Dead Code Identifier", "ICE" ,"Mindmap" ,"Neuron Graphs", "Neuron Graphs 3D", "Oxbow Code Identifier", "Reports", "Webocular"];
+									var key = ["ALM", "Auto Gen Path", "Dashboard", "Dead Code Identifier", "Mindmap", "Neuron Graphs", "Neuron Graphs 3D", "Oxbow Code Identifier", "Reports", "Utility", "Webocular"];
 									for(i=0; i<data.plugindetails.length; i++){
 										availablePlugins.push({
 											"pluginName" : key[i],
 											"pluginValue" : data.plugindetails[i].keyValue
 										})
 									}
-									availablePlugins.push({
-										"pluginName" : "Utility",
-										"pluginValue" : "true"
-									})
-									
 									data.pluginsInfo = availablePlugins;
 									window.localStorage['LoginSuccess'] = "True";
 									window.localStorage['_UI'] = JSON.stringify(data);

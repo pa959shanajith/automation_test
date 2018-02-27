@@ -4242,7 +4242,7 @@ select:-webkit-autofill:focus {
 .reportsDetails th:nth-child(5), .rDellaps{width: 12%;}
 .reportsDetails th:nth-child(6), .rDcomments{width: 13%;}
 .maintabCont{float: left; width: 100%; border: 1px solid #dcdcdc;}
-.tabCont{display: table-cell; border-bottom: 1px solid #ececec;}
+.tabCont{display: table-cell; border-bottom: 1px solid #ececec;word-wrap:break-word}
 .reportsDetail{line-height: 2; text-align: center; height:425px; overflow: auto;}
 .rDstepDes{text-align: left;}
 .openreportstatuss{text-decoration: none; cursor: text;}

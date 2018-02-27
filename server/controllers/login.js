@@ -8,7 +8,6 @@ var activeDirectory = require('activedirectory');
 var epurl = "http://"+process.env.NDAC_IP+":"+process.env.NDAC_PORT+"/";
 var Client = require("node-rest-client").Client;
 var client = new Client();
-var myserver = require('../../server');
 var logger = require('../../logger');
 var notificationMsg = require("../notifications/notifyMessages");
 var config = require('../../server/config/config');
@@ -156,28 +155,18 @@ exports.authenticateUser_Nineteen68 = function (req, res) {
 			}
 
 			// Implementation for Concurrent login
-			myserver.redisSessionStore.ids(function (allKeyserr, allKeys) {
-				if (allKeyserr) {
+			utils.allSess(function (err, allKeys) {
+				if (err) {
 					logger.info("User Authentication failed");
 					return res.send('fail');
-				} else if (allKeys.length == 0) {
-					// Callback function for Check whether user is ldapuser
-					checkldapuser(req, username, checkldapuser_callback);
 				} else {
-					myserver.redisSessionStore.all(function (keyerr, allKeysVal) {
-						if (keyerr) {
-							logger.info("User Authentication failed");
-							return res.send('fail');
-						} else {
-							for (var ki = 0; ki < allKeysVal.length; ki++) {
-								if (username == allKeysVal[ki].username) {
-									userLogged=true;
-									break;
-								}
-							}
-							checkldapuser(req, username, checkldapuser_callback);
+					for (var ki = 0; ki < allKeys.length; ki++) {
+						if (username == allKeys[ki].username) {
+							userLogged=true;
+							break;
 						}
-					});
+					}
+					checkldapuser(req, username, checkldapuser_callback);
 				}
 			});
 		} else {

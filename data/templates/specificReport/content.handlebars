@@ -42,7 +42,7 @@
                             getRows[i].children[1].innerHTML += '<i class="fa fa-caret-down unexpand" aria-hidden="true" style="position: relative; left: -58px;"></i>';
                         } 
                         else if (getRows[i].children[1].innerText.trim() == "") {
-                            getRows[i].children[1].innerHTML += '<i class="fa fa-caret-down unexpand" aria-hidden="true" style="position: relative; left: -54px;"></i>';
+                            //#499 //getRows[i].children[1].innerHTML += '<i class="fa fa-caret-down unexpand" aria-hidden="true" style="position: relative; left: -54px;"></i>';
                         }
                         else {
                             getRows[i].children[1].innerHTML += '<i class="fa fa-caret-down unexpand" aria-hidden="true" style="position: relative; left: -97px;"></i>';
@@ -195,10 +195,21 @@
                     }
                 })
                 //Login to Jira
-
+                $("#jIssuetype").change(function() {
+                    var on_change_data=$('option:selected', this).text();
+                    if(on_change_data=='Sub-task'){
+                        $('.createIssueWindow p:nth-child(11)').height(68+"px");
+                        $('#parentIssue').show();
+                    }
+                    else{
+                        $('.createIssueWindow p:nth-child(11)').height(117+"px");
+                         $('#parentIssue').hide();
+                    }
+                });
                 //Open create issue popup and get details of mentioned row
                 $(document).on('click', '.opendescpopup', function(){
                     var slno = parseInt($("#inputSlno").val())
+                    $('#parentIssue').hide();
                     if(slno > getRows.length){
                         $('#overlay').css('display', 'block');
                         $(".statusWindow").show();
@@ -242,6 +253,7 @@
                 function fillSelector(dataArray, selector){
                     $("#"+selector).find("option").not(":first").remove();
                     for(var i=0; i<dataArray.length;i++){
+                        if(dataArray[i].name!='Epic')
                         $("#"+selector).append("<option value="+dataArray[i].id+">"+dataArray[i].name+"</option>");
                     }
                 }
@@ -279,6 +291,7 @@
                     var priority = $("#jPriority option:selected").text();
                     var label = $("#jLabel").val().split(" ");
                     var attachment = $("#scrnShotPath").val();
+                    var pissue=$("#jpIssueid").val();
                     if(!projectid) $("#jProjects").css('border-color','red');
                     else if(!issuetype || issuetype == "Select Issue") $("#jIssuetype").css('border-color','red');
                     else if(!summary) $("#jSummary").css('border-color','red');
@@ -299,9 +312,13 @@
                                 'attachment': attachment,
                                 'url': url,
                                 'username': userName,
-                                'password': pwd
+                                'password': pwd,
+                                'parentissue':''
                             },
                             "action": "createIssueInJira"
+                        }
+                        if(issuetype=='Sub-task'){
+                            issue_dict.issue_dict.parentissue=pissue;
                         }
                         var hostName = window.location.host;
                         var posturl = 'https://'+hostName+'/connectJira_ICE';
@@ -340,6 +357,7 @@
                                     $("#showStatus").text("Issue bearing ID " + data + " created successfully.");
                                 }
                                 $('#inputSlno').val('');
+                                $("#jpIssueid").val('');
                                 unblockUI();
                             }
                         });
@@ -399,12 +417,12 @@
             .reportsDetails tr{height: 32px;}
             .reportsDetails th:nth-child(1){width: 4%;} .rDid{width: 4.3% !important;}
             .reportsDetails th:nth-child(2){width: 10%;} .rDstep{width: 10.1% !important;}
-            .reportsDetails th:nth-child(3){width: 48%;} .rDstepDes{width: 47.5% !important; text-align: left; word-break: break-word;}
+            .reportsDetails th:nth-child(3){width: 37%;} .rDstepDes{width: 36.5% !important; text-align: left; word-break: break-word;}
             .reportsDetails th:nth-child(4){width: 10%;} .rDstatus{width: 10.1% !important;}
             .reportsDetails th:nth-child(5){width: 10%;} .rDellaps{width: 10.1% !important;}
-            .reportsDetails th:nth-child(6), .rDcomments{width: 12%; word-break: break-word;}
+            .reportsDetails th:nth-child(6), .rDcomments{width: 20%; word-break: break-word;}
             .maintabCont{float: left; width: 100%; border: 1px solid #dcdcdc; height: 50%;}
-            .tabCont{display: table-cell; border-bottom: 1px solid #ececec; border-right: 1px solid #ececec;}
+            .tabCont{display: table-cell; border-bottom: 1px solid #ececec; border-right: 1px solid #ececec;word-wrap:break-word}
             .reportsDetail{line-height: 2; text-align: center; height: calc(100% - 35px); overflow: auto;font-size: 14px;}
             .openscreenshot{cursor: pointer;}
             .openscreenshot:hover{text-decoration: underline;}
@@ -508,7 +526,7 @@
             .statusWindow{height: 130px;}
             .createIssueWindow{
                 width: 700px;
-                height: 575px;
+                height: 630px;
                 top: 15%;
                 left: 22%;
             }
@@ -516,7 +534,7 @@
                 width: calc(100% - 43px);
                 float: left;
                 padding: 0 0 0 42px;
-                margin-top: 0;
+                margin-top: 6px;
                 margin-bottom: 6px;
             }
             .createIssueWindow p:nth-child(2){margin-top: 12px;}
@@ -525,15 +543,15 @@
                 padding-bottom: 6px;
                 border-bottom: 1px solid #ddd;
             }
-            .createIssueWindow p:nth-child(4){margin-top: 16px;}
-            .createIssueWindow p:nth-child(9){
+            .createIssueWindow p:nth-child(4){margin-top: 6px;}
+            .createIssueWindow p:nth-child(11){
                 background: linear-gradient(to bottom, #FFFFFF 0%, #E6E6E6 50%);
                 border-radius: 5px;
                 border-top: 1px solid #ccc;
-                height: 56px;
+                height: 117px;
                 margin-bottom: 0;
                 position: relative;
-                bottom: calc(100% - 599px);
+                bottom: calc(100% - 620px);
             }
             .createIssueWindow p label{
                 width: 112px;
@@ -815,7 +833,8 @@
                         <div class="rDstepDes tabCont" style="padding-left: 10px; font-weight:{{getStyle StepDescription}}">{{StepDescription}}</div>
                         <div class="rDstatus tabCont openscreenshot"  style="color:{{getColor status}}" data-screenshot="{{screenshot_path}}">{{status}}</div>
                         <div class="rDellaps tabCont">{{EllapsedTime}}</div>
-                        <div class="rDcomments tabCont" style="padding-left: 10px;">{{Comments}}</div>
+                        {{!-- <div class="rDcomments tabCont" style="padding-left: 10px;">{{Comments}}</div> --}}
+                        <div  class="rDcomments tabCont" style="padding-left: 10px;">{{Remark}}</div>
                         <div class="rjira tabCont"><span class="opendescpopup" title="Create Issue"></span></div>
                     </div>
                     {{/each}}
@@ -843,6 +862,7 @@
                     </div>
                     <p><label>Projects<span class="mandatory">*</span></label><select class="jirapopupinput" id="jProjects"><option value="" selected disabled>Select Projects</option></select></p>
                     <p><label>Issue Type<span class="mandatory">*</span></label><select class="jirapopupinput" id="jIssuetype"><option value="" selected disabled>Select Issue</option></select></p>
+                    <p id='parentIssue'><label>Parent Issue Id<span class="mandatory">*</span></label><input type="text" class="jirapopupinput" id="jpIssueid" /></p>
                     <p><label>Summary<span class="mandatory">*</span></label><input type="text" class="jirapopupinput" id="jSummary" maxlength="255" title="Maximum 255 characters accepted."/></p>
                     <p><label>Description</label><textarea class="jirapopupinput" id="jDescription"></textarea></p>
                     <p><label>Priority<span class="mandatory">*</span></label><select class="jirapopupinput" id="jPriority"><option value="" selected disabled>Select Priority</option></select></p>

@@ -110,12 +110,13 @@
     .reportsDetails tr{height: 50px;} 
     .reportsDetails th:nth-child(1){width: 5%;} .rDid{width: 5.25%;}
     .reportsDetails th:nth-child(2){width: 10%;} .rDstep{width: 10.25%;}
-    .reportsDetails th:nth-child(3){width: 50%;} .rDstepDes{width: 49.8%;}
+    .reportsDetails th:nth-child(3){width: 27%;} .rDstepDes{width: 36.5%;}
     .reportsDetails th:nth-child(4){width: 10%;} .rDstatus{width: 10.1%;}
     .reportsDetails th:nth-child(5){width: 12%;} .rDellaps{width: 12.1%;}
-    .reportsDetails th:nth-child(6), .rDcomments{width: 13%; word-break: break-word;}
+    .reportsDetails th:nth-child(6), .rDcomments{width: 25%; word-break: break-word; text-align:left}
+    .reportsDetails th:nth-child(6){ text-align: center}
     .maintabCont{float: left; width: 100%; border: 1px solid #dcdcdc; height: 49%;}
-    .tabCont{display: table-cell; border-bottom: 1px solid #ececec; border-right: 1px solid #ececec;}
+    .tabCont{display: table-cell; border-bottom: 1px solid #ececec; border-right: 1px solid #ececec;word-wrap:break-word}
     .reportsDetail{line-height: 2; text-align: center; height: calc(100% - 35px); overflow: auto;font-size: 14px;}
     .reportsDetail tr { page-break-inside: avoid; }
     .rDstepDes{text-align: left; word-break: break-word;}
@@ -227,7 +228,8 @@
                     <td class="rDstepDes tabCont" style="padding-left: 10px;">{{StepDescription}}</td>
                     <td class="rDstatus tabCont" style="padding-left: 10px; color: {{getColor status}}"><a style="color:inherit;text-decoration:none" href="{{validateImageID screenshot_path slno}}">{{status}}</a></td>
                     <td class="rDellaps tabCont">{{EllapsedTime}}</td>
-                    <td class="rDcomments tabCont" style="padding-left: 10px;">{{Comments}}</td>
+                    <td class="rDcomments tabCont" style="padding-left: 10px;">{{Remark}}</td>
+                    {{!-- <td class="rDcomments tabCont" style="padding-left: 10px;">{{Comments}}</td> --}}
                 </tr>
                 {{/each}}
             </tbody>

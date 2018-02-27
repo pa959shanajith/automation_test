@@ -30,9 +30,10 @@ exports.getTaskJson_mindmaps = function (req, res) {
 	logger.info("Inside UI service: getTaskJson_mindmaps");
 	if (utils.isSessionActive(req.session)) {
 		try {
+			//MATCH (b{assignedTo:'60f6ad0b-ce14-4cad-8345-b09c0739f3e2'})<-[r:FNTT]-(a) with b,collect (a) as set return set,b
 			var userid = req.session.userid;
 			var prjId=req.body.obj;
-			var qlist_query = [{'statement': "MATCH (b{assignedTo:'" + userid + "'})<-[r:FNTT]-(a) with a as a,b as b, b.taskID as id,  collect(b) as nodes where size(nodes)=1 return a,b"}];
+			var qlist_query = [{'statement': "MATCH (b{assignedTo:'" + userid + "'})<-[r:FNTT]-(a) with b,collect (a) as set return set,b"}];
 			neo4jAPI.executeQueries(qlist_query,function(status,result){
 				if(status!=200) {
 					logger.info(result);
@@ -113,7 +114,10 @@ function next_function(resultobj, cb, data) {
 				'assignedTestScenarioIds': [],
 				'taskDetails': [],
 				'testSuiteDetails': [],
-				'scenarioFlag': 'False'
+				'scenarioFlag': 'False',
+				'releaseid':'',
+				'cycleid':''
+
 			};
 			taskDetails = {
 				'taskName': '',
@@ -139,13 +143,16 @@ function next_function(resultobj, cb, data) {
 			};
 			/*t refers to task node, and m refers to its respective node */
 			var t = a.row[1];
-			var m = a.row[0];
+			var m = a.row[0][0];
 			var abc = tasktypes[t.task];
 			var batch_flag = false;
 			//To support the task assignmnet in scenario
 			if (t.task == 'Execute' || t.task == 'Execute Scenario' || t.task == 'Execute Batch') {
 				testSuiteDetails_obj.releaseid = t.release;
 				testSuiteDetails_obj.cycleid = t.cycle;
+			}else{
+				task_json.releaseid=t.release;
+				task_json.cycleid=t.cycle;
 			}
 			if (t.taskvn !== undefined) {
 				task_json.versionnumber = t.taskvn;

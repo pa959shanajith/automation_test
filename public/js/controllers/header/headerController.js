@@ -94,7 +94,9 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 	function unreadNotifications() {
 		if(window.localStorage.notification){
 			var notifications = JSON.parse(window.localStorage.notification);
-			var unreadNotifications = notifications.filter(a => a.isRead == false);
+			var unreadNotifications = notifications.filter(function(a){
+				a.isRead == false;
+			});
 			var notificationCount = unreadNotifications.length;
 			if (notificationCount < 1 || notificationCount == '' || notificationCount == undefined) {
 				$("#notifications-count").hide();
@@ -240,17 +242,13 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 				if (data != "fail") {
 					//To be removed - Has to come from database
 					var availablePlugins = [];
-					var key = ["ALM", "Auto Gen Path", "Dashboard", "Dead Code Identifier", "ICE", "Mindmap", "Neuron Graphs", "Neuron Graphs 3D", "Oxbow Code Identifier", "Reports", "Webocular"];
+					var key = ["ALM", "Auto Gen Path", "Dashboard", "Dead Code Identifier", "Mindmap", "Neuron Graphs", "Neuron Graphs 3D", "Oxbow Code Identifier", "Reports", "Utility", "Webocular"];
 					for (i = 0; i < data.plugindetails.length; i++) {
 						availablePlugins.push({
 							"pluginName": key[i],
 							"pluginValue": data.plugindetails[i].keyValue
 						})
 					}
-					availablePlugins.push({
-						"pluginName": "Utility",
-						"pluginValue": "true"
-					})
 					data.pluginsInfo = availablePlugins;
 					//window.localStorage['LoginSuccess'] = "True";
 					window.localStorage['_SR'] = additionalRoleName;
@@ -297,21 +295,21 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 			$scope.projectDetails = data;
 			task = JSON.parse(window.localStorage['_CT']);
 
-			releaseId.push(task.releaseId);
+			releaseId.push(task.releaseid);
 			screenId.push(task.screenId);
 			headerServices.getNames_ICE(releaseId, ['releases']) 
 			.then(function(data){
 				if(data == "Invalid Session"){
 				  $rootScope.redirectPage();
 				}
-				$scope.releaseDetails = data;
-				cycleId.push(task.cycleId);
+				$scope.releaseDetails = data.respnames[0];
+				cycleId.push(task.cycleid);
 				headerServices.getNames_ICE(cycleId, ['cycles'])
 				.then(function(data){
 					if(data == "Invalid Session"){
 				  		$rootScope.redirectPage();
 					}
-					$scope.cycleDetails = data;
+					$scope.cycleDetails = data.respnames[0];
 
 				}, function(error) {	console.log("Failed to get cycle name")});
 			}, function(error) {	console.log("Failed to get release name")});
