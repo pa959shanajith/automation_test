@@ -8,15 +8,16 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Prerequisites
 
-* Run `Cassandra` DB
-* Run `Redis` DB
-* Run `Mindmaps` DB(Neo4j)
-* Run `NDAC` API
+* Clone and Run [Cassandra](https://10.41.31.131/nineteen68v2.0/db) DB
+* Clone and Run [Redis](ssh://slklocal@10.41.31.52:/home/slklocal/Nineteen68BnR/PortablePython.git
+) DB
+* Clone and Run [Mindmaps](https://10.41.31.131/nineteen68v2.0/Mindmap_DB) DB(Neo4j)
+* Clone and Run [NDAC](https://10.41.31.131/nineteen68v2.0/ndac) API
 
 ### Setup
 
 * Clone this repository
-* Get a copy of node modules, node.exe and npm.cmd files from `UINodeModules.git` repository and place it inside the source folder.
+* Clone [UINodeModules.git](ssh://slklocal@10.41.31.52:/home/slklocal/Nineteen68BnR/UINodeModules.git) repository and place `node modules folder`, `node.exe` and `npm.cmd` files inside the source(`ui`) folder.
 * Open the `config.json` file in `config` folder within `server` folder.
 * Update `ldap_Ip` to ldap system ip 
 * Update `ldap_port` to `389`
@@ -38,10 +39,10 @@ These instructions will get you a copy of the project up and running on your loc
         
 
 ## Built with
-* **Node JS** :  Web Server
-* **Express JS** : Web framework
-* **Angular JS** : UI component framework
-* **Bootstrap** : UI design library
+* [Node JS](https://nodejs.org/) :  Web Server
+* [Express JS](https://expressjs.com/) : Web framework
+* [Angular JS](https://angularjs.org/) : UI component framework
+* [Bootstrap](https://getbootstrap.com/) : UI design library
 * **Specific Plugins**: d3.v3.min.js, dtree.m.scrapper.js, jquery.blockUI.js, jquery.jqGrid.min.js, jquery.mask.js, loading-bar.js, scroll.js
 
 ## Lincese
