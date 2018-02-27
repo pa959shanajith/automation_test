@@ -114,7 +114,7 @@ try {
 
     app.use('*',function(req,res,next){
 		if (req.session === undefined) {
-			res.status(500).send("<html><body><p>[ECODE 600] Intenal Server Error Occured!</p></body></html>");
+			res.status(500).send("<html><body><p>[ECODE 600] Internal Server Error Occured!</p></body></html>");
 		} else {
 			return next();
 		}
