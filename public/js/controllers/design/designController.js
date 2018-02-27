@@ -130,6 +130,8 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 
     $timeout(function() {
         projectDetails = angular.element(document.getElementById("left-nav-section")).scope().projectDetails;
+        releaseName = angular.element(document.getElementById("left-nav-section")).scope().releaseDetails;
+        cycleName = angular.element(document.getElementById("left-nav-section")).scope().cycleDetails;
         var getTaskName = JSON.parse(window.localStorage['_CT']).taskName;
         appType = JSON.parse(window.localStorage['_CT']).appType;
         screenName = angular.element(document.getElementById("left-nav-section")).scope().screenName;
@@ -137,9 +139,9 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
         subTaskType = JSON.parse(window.localStorage['_CT']).subTaskType;
         subTask = JSON.parse(window.localStorage['_CT']).subTask;
         if (subTaskType == "Scrape" || subTask == "Scrape") {
-            $(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">Project :</span><span class="content">' + projectDetails.respnames[0] + '</span></p><p class="proj-info-wrap"><span class="content-label">Screen :</span><span class="content">' + screenName + '</span></p>')
+            $(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">Project :</span><span class="content">' + projectDetails.respnames[0] + '</span></p><p class="proj-info-wrap"><span class="content-label">Screen :</span><span class="content">' + screenName + '</span></p><p class="proj-info-wrap"><span class="content-label">Release :</span><span class="content">' + releaseName + '</span></p><p class="proj-info-wrap"><span class="content-label">Cycle :</span><span class="content">' + cycleName + '</span></p>')
         } else {
-            $(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">Project: </span><span class="content">' + projectDetails.respnames[0] + '</span></p><p class="proj-info-wrap"><span class="content-label">Screen: </span><span class="content">' + screenName + '</span></p><p class="proj-info-wrap"><span class="content-label">TestCase: </span><span class="content">' + testCaseName + '</span></p>')
+            $(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">Project: </span><span class="content">' + projectDetails.respnames[0] + '</span></p><p class="proj-info-wrap"><span class="content-label">Screen: </span><span class="content">' + screenName + '</span></p><p class="proj-info-wrap"><span class="content-label">TestCase: </span><span class="content">' + testCaseName + '</span></p><p class="proj-info-wrap"><span class="content-label">Release :</span><span class="content">' + releaseName + '</span></p><p class="proj-info-wrap"><span class="content-label">Cycle :</span><span class="content">' + cycleName + '</span></p>')
         }
 
     }, 3000)

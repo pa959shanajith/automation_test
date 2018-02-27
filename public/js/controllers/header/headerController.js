@@ -299,21 +299,21 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 			$scope.projectDetails = data;
 			task = JSON.parse(window.localStorage['_CT']);
 
-			releaseId.push(task.releaseId);
+			releaseId.push(task.releaseid);
 			screenId.push(task.screenId);
 			headerServices.getNames_ICE(releaseId, ['releases']) 
 			.then(function(data){
 				if(data == "Invalid Session"){
 				  $rootScope.redirectPage();
 				}
-				$scope.releaseDetails = data;
-				cycleId.push(task.cycleId);
+				$scope.releaseDetails = data.respnames[0];
+				cycleId.push(task.cycleid);
 				headerServices.getNames_ICE(cycleId, ['cycles'])
 				.then(function(data){
 					if(data == "Invalid Session"){
 				  		$rootScope.redirectPage();
 					}
-					$scope.cycleDetails = data;
+					$scope.cycleDetails = data.respnames[0];
 
 				}, function(error) {	console.log("Failed to get cycle name")});
 			}, function(error) {	console.log("Failed to get release name")});
