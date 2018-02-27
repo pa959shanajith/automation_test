@@ -9,8 +9,7 @@ These instructions will get you a copy of the project up and running on your loc
 ### Prerequisites
 
 * Clone and Run [Cassandra](https://10.41.31.131/nineteen68v2.0/db) DB
-* Clone and Run [Redis](ssh://slklocal@10.41.31.52:/home/slklocal/Nineteen68BnR/PortablePython.git
-) DB
+* Clone and Run [Redis](ssh://slklocal@10.41.31.52:/home/slklocal/Nineteen68BnR/redis.git) DB
 * Clone and Run [Mindmaps](https://10.41.31.131/nineteen68v2.0/Mindmap_DB) DB(Neo4j)
 * Clone and Run [NDAC](https://10.41.31.131/nineteen68v2.0/ndac) API
 
@@ -45,6 +44,6 @@ These instructions will get you a copy of the project up and running on your loc
 * [Bootstrap](https://getbootstrap.com/) : UI design library
 * **Specific Plugins**: d3.v3.min.js, dtree.m.scrapper.js, jquery.blockUI.js, jquery.jqGrid.min.js, jquery.mask.js, loading-bar.js, scroll.js
 
-## Lincese
+## License
 
 Copyright © 2018 SLK Software Services Pvt. Ltd. All Rights Reserved.
