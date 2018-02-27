@@ -1,21 +1,49 @@
-Plugins used in Nineteen68 for UI development
--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-Screens				            Plugins				        Purpose										                                    Description													                                                        Files
--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-Design Screen(Screen Level)	    jquery tree menu		    To display scraped objects in a tree structure		                            The scraped object with check box are populated in the tree like structure including edit functionality.	        dtree.m.scrapper.js
+# Nineteen68 Version 2.0 UI
 
-ICE Screens			            jQuery blockUI plugin	    To prevent user from performing action					                        Main screen will be blocked when popup is displayed and while process is going on like(Debug/Scraping).
-														    Preventing user to perform action on the main screen.								                                                                                                                jquery.blockUI.js
+Webserver Component of Nineteen68 V2.0.
 
-Design Testcase Screen		    jQuery Grid			        To create tabular structure for testcases which also includes		            jqGrid is used for representing and manipulating tabular data on the web.
-								                            inbuilt functions like inline edit, delete etc.					                like loading data dynamically through Ajax callbacks.								                                jquery.jqGrid.min.js
+## Configuration
 
-Scheduling Screen		        jquery masking			    To format the data in the input field like for Date & Time, IP Address etc.	    A jQuery Plugin to make masks on form fields and html elements.It allows a user to easily enter fixed 
-																		                                                                    width input where you would like them to enter the data in a certain format (dates,phone numbers, etc).		        jquery.mask.js
+These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
 
-ICE Screens			            angular-loading-bar		    To display the loading bar after the URL field of the tool in all screens 	    Display the progress of service call in the form of loading bar.Where the loader is displayed during 
-																		                                                                    the service call and will be hidden after successful completion of service call.				                    loading-bar.js
+### Prerequisites
 
-ICE Screens			            jQuery CSS Customizable		To customize the scroll bar as per requirement					                jQuery Custom Scrollbar is a plugin that lets customizable scrollbars instead of browser's default scrollbars.	    scroll.js
-				                                            Scrollbar
+* Run `Cassandra` DB
+* Run `Redis` DB
+* Run `Mindmaps` DB(Neo4j)
+* Run `NDAC` API
 
+### Setup
+
+* Clone this repository
+* Get a copy of node modules, node.exe and npm.cmd files from `UINodeModules.git` repository and place it inside the source folder.
+* Open the `config.json` file in `config` folder within `server` folder.
+* Update `ldap_Ip` to ldap system ip 
+* Update `ldap_port` to `389`
+* Update `ldap_domain` to `psys.com`
+* Fetch the `ip` of the system in which the `Mindmaps` db is setup
+* Update the `host` in the following format : `<<IP of Mindmaps DB>>:7474`
+
+                    E.g. for local setup: "127.0.0.1:7474"
+
+* Do not modify `username` and `password` field.
+* Update `screenShot_PathName`: Value should be, shared location in the server where the screenshots are stored. For local setup, provide a folder where screenshots should be saved.
+
+					default: Shared location corresponding to windows systems
+					mac: Shared location corresponding to mac systems
+* Open the `.env` file present in the source folder.
+* Update the value of `ENV` variable to `DEV` / `TEST` / `PROD` accrodingly.
+* Update the `NDAC_IP` and `REDIS_IP` variables with the `IPs` on which NDAC/redis is running.
+* Run the following command to start the server: ```npm start```
+        
+
+## Built with
+* **Node JS** :  Web Server
+* **Express JS** : Web framework
+* **Angular JS** : UI component framework
+* **Bootstrap** : UI design library
+* **Specific Plugins**: d3.v3.min.js, dtree.m.scrapper.js, jquery.blockUI.js, jquery.jqGrid.min.js, jquery.mask.js, loading-bar.js, scroll.js
+
+## Lincese
+
+Copyright © 2018 SLK Software Services Pvt. Ltd. All Rights Reserved.
