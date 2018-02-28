@@ -83,14 +83,14 @@ window.addEventListener('popstate', function () {
 //    * 'X-XSRF-TOKEN' name changed
 //    * @author - sushma.p
 //    */
-$.extend($.jgrid.defaults, {
-	ajaxRowOptions : {
-		beforeSend : function(jqXHR) {
-			var csrf_token = getCookie("29927e0554f6483cfd4761fa4c8edfd1");
-			jqXHR.setRequestHeader('1753f5bdd248dcf909f106d0a6595dab', csrf_token);
-		}
-	}
-})
+// $.extend($.jgrid.defaults, {
+// 	ajaxRowOptions : {
+// 		beforeSend : function(jqXHR) {
+// 			var csrf_token = getCookie("29927e0554f6483cfd4761fa4c8edfd1");
+// 			jqXHR.setRequestHeader('1753f5bdd248dcf909f106d0a6595dab', csrf_token);
+// 		}
+// 	}
+// })
 
 $(document).ajaxSend(function(elm, xhr, s){
     if (s.type == "POST") {
