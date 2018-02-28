@@ -465,7 +465,7 @@ function getRenameQueries(map,prjId){
 				rnmQList.push({"statement":"MATCH(n:SCREENS{screenName:'"+e.orig_name+"',projectID:'"+prjId+"'}) SET n.screenName='"+e.name+"'"});
 			}
 			if(e.type=='testcases'){
-				rnmQList.push({'statement':'Match (n:TESTCASES{testCaseName : "'+e.orig_name+'",projectID :"'+qdata['projectid']+'"})<-[a:FSTTS]-(scr:SCREENS{screenName:"'+e.screenname+'"})  SET n.testCaseName="'+e.name+'"'});
+				rnmQList.push({'statement':'Match (n:TESTCASES{testCaseName : "'+e.orig_name+'",projectID :"'+prjId+'"})<-[a:FSTTS]-(scr:SCREENS{screenName:"'+e.screenname+'"})  SET n.testCaseName="'+e.name+'"'});
 			}
 		}
 	});

@@ -1,6 +1,3 @@
-/**
- * 
- */
 mySPA.directive('footer', function () {
     return {
         restrict: 'A',
