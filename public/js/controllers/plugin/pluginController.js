@@ -18,13 +18,8 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 			var pluginName = availablePlugins[i].pluginName;
 			var pluginTxt = availablePlugins[i].pluginName.replace(/\s/g,''); 
 			var dataName = Encrypt.encode("p_"+pluginTxt);
-			var PUpdatedName='NULL';
 			$rootScope.plugins.push("p_"+pluginName);
-			if(availablePlugins[i].pluginName=='ALM')
-				PUpdatedName='Quality Center';
-			else
-				PUpdatedName=availablePlugins[i].pluginName;
-			$("#plugin-container").append('<div class="col-md-4 plugin-block"><span class="toggleClick pluginBox" data-name="p_'+availablePlugins[i].pluginName.replace(/\s/g,'')+'" id="'+availablePlugins[i].pluginName+'" title="'+availablePlugins[i].pluginName+'">'+PUpdatedName+'</span><input class="plugins" type="hidden" id="'+availablePlugins[i].pluginName+"_"+dataName+'"  title="'+pluginTxt+"_"+dataName+'"></div>').fadeIn();
+			$("#plugin-container").append('<div class="col-md-4 plugin-block"><span class="toggleClick pluginBox" data-name="p_'+availablePlugins[i].pluginName.replace(/\s/g,'')+'" id="'+availablePlugins[i].pluginName+'" title="'+availablePlugins[i].pluginName+'">'+pluginName+'</span><input class="plugins" type="hidden" id="'+availablePlugins[i].pluginName+"_"+dataName+'"  title="'+pluginTxt+"_"+dataName+'"></div>').fadeIn();
 		}
 	}
 	
