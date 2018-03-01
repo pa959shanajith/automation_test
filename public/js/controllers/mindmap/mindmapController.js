@@ -653,17 +653,28 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         var l = d3.select('#ct-mindMap').insert('path', 'g').attr('id', 'ct-link-' + r).attr('class', 'ct-link').attr('d', d);
     };
     //To Unassign the task of a particular node
-    function removeTask(e) {
-        if ($("#ct-unassignButton a").attr('class') == 'disableButton') return;
-        var p = d3.select(activeNode);
-        p.select('.ct-nodeTask').classed('no-disp', !0);
-        var pi = parseInt(p.attr('id').split('-')[2]);
-        var nType = p.attr('data-nodetype');
+    function removeTask(e,tidx) {
+        if(tidx == 0 || tidx == undefined){
+            if ($("#ct-unassignButton a").attr('class') == 'disableButton') return;
+            var p = d3.select(activeNode);
+            p.select('.ct-nodeTask').classed('no-disp', !0);
+            var pi = parseInt(p.attr('id').split('-')[2]);
+            var nType = p.attr('data-nodetype');    
+        }
+        else    pi = tidx;
+
         if (dNodes[pi].oid != undefined && dNodes[pi].task != null) {
-            dNodes[pi].task.tstatus = 'unassigned';
+            dNodes[pi].task.tstatus = 'unassigned'; //tstatus and assignedtoname are solely for notification
             unassignTask.push(dNodes[pi].oid);
         }
         d3.select('#ct-assignBox').classed('no-disp', !0);
+        if(dNodes[pi].children && $('.pg-checkbox')[0].checked){
+            dNodes[pi].children.forEach(function(e,i){
+                var p = d3.select('#ct-node-'+e.id);
+                p.select('.ct-nodeTask').classed('no-disp', !0);                
+                removeTask('something',e.id);
+            });
+        }
     }
 
     function assignBoxValidator(){
@@ -751,6 +762,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 batchName: tObj.bn,
                 task: tObj.t,
                 assignedTo: tObj.at,
+                assignedToName: $('[value="'+tObj.at+'"]').attr('data-id'),
                 reviewer: tObj.rw,
                 startDate: tObj.sd,
                 endDate: tObj.ed,
@@ -2566,7 +2578,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     }else{
                         dataReuse['modules']=e.name;
                     }
-                    
+                
                     return;
                 }
                  
