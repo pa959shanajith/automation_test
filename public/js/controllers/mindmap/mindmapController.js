@@ -2560,7 +2560,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 dataReuse['reuseScenarios']=[];
             }
             dNodes.forEach(function(e, i) {
-                 if (e.type=='modules'){
+                if (e.type=='modules'){
                     if(e.original_name){
                         dataReuse['modules']=e.original_name;
                     }else{
@@ -2568,6 +2568,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     }
                     
                     return;
+                }
                  
                
                 dNodes[i].reuse = false;
