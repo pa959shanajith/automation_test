@@ -62,6 +62,11 @@ mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
             resolve: {
                 deps: ['$ocLazyLoad', function ($ocLazyLoad) {
                     return $ocLazyLoad.load([
+						'js/factories/socketFactory.js',
+						'js/controllers/chatbot/chatbotController.js',
+						'js/controllers/chatbot/chatbotService.js',
+						'js/controllers/login/loginService.js',						
+						'js/controllers/header/headerController.js',
 						'js/controllers/admin/adminController.js',
 						'js/controllers/admin/adminService.js'
                     ]);
@@ -75,7 +80,6 @@ mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
             resolve: {
                 deps: ['$ocLazyLoad', function ($ocLazyLoad) {
                     return $ocLazyLoad.load([
-						'css/dtree.m.scrapper.css',
 						'js/factories/socketFactory.js',
 						'js/plugins/jquery.jqGrid.min.js',
 						'js/i18n/grid.locale-en.js',
@@ -100,7 +104,6 @@ mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
             resolve: {
                 deps: ['$ocLazyLoad', function ($ocLazyLoad) {
                     return $ocLazyLoad.load([
-						'css/dtree.m.scrapper.css',
 						'js/factories/socketFactory.js',
 						'js/plugins/jquery.jqGrid.min.js',
 						'js/i18n/grid.locale-en.js',

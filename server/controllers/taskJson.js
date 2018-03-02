@@ -130,7 +130,8 @@ function next_function(resultobj, cb, data) {
 				'startDate': '',
 				'expectedEndDate': '',
 				'batchTaskIDs':[],
-				'status': 'assigned'
+				'status': 'assigned',
+				'reuse':'False'
 			};
 			var testSuiteDetails_obj = {
 				"releaseid": "",
@@ -143,7 +144,9 @@ function next_function(resultobj, cb, data) {
 			};
 			/*t refers to task node, and m refers to its respective node */
 			var t = a.row[1];
+			var reuseflag='False';
 			var m = a.row[0][0];
+			if(a.row[0].length>1) reuseflag='True';
 			var abc = tasktypes[t.task];
 			var batch_flag = false;
 			//To support the task assignmnet in scenario
@@ -214,6 +217,7 @@ function next_function(resultobj, cb, data) {
 
 						if (t.task == 'Design' || t.task == 'Update') {
 							taskDetails.taskName = t.task + versioningCheck() + m.testCaseName;
+							taskDetails.reuse=reuseflag;
 							task_json.testCaseName = m.testCaseName;
 						} else if (t.task == 'Execute') {
 							taskDetails.taskName = t.task + versioningCheck()  + m.moduleName;
@@ -241,6 +245,7 @@ function next_function(resultobj, cb, data) {
 						} else {
 							taskDetails.taskName = t.task + versioningCheck() + m.screenName;
 							task_json.screenName = m.screenName;
+							taskDetails.reuse=reuseflag;
 						}
 						//task_json.assignedTestScenarioIds=data.assignedTestScenarioIds;
 						if (!batch_flag) {
