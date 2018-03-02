@@ -2239,7 +2239,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         var restrict_scenario_reuse = parseDataReuse(true);
         if (selectedTab!='tabAssign'){
             if(restrict_scenario_reuse['reuseScenarios'].length>0 ){
-            openDialogMindmap('Error',"Scenarios cannot be reused : '"+restrict_scenario_reuse['reuseScenarios'].join()+"'");
+            openDialogMindmap('Error',"Scenario names cannot be reused, please rename the following: "+restrict_scenario_reuse['reuseScenarios'].join());
                 return;
             }
         }
