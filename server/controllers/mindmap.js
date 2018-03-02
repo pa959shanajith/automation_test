@@ -534,14 +534,20 @@ exports.saveData=function(req,res){
 					idDict[e.id]=(e.id_n)?e.id_n:uuidV4();
 					e.id=idDict[e.id];
 					t=e.task;
-					
-					if(e.taskexists && e.task && (e.type=='screens' || e.type=='testcases')){
-						t.id=e.taskexists.id;
-						t.oid=e.taskexists.oid;
-						t.parent=e.taskexists.parent;
-						//To fix issue 1685, not to update the task details unless the details comes from original release and cycle
-						t.release=e.taskexists.release;
-						t.cycle=e.taskexists.cycle;
+					//Even on saving of data in assign tab where x rel and y cyc is chosen, where tasks for screen and testcases are originally assigned in a x rel and z cyc
+					//relation between the node and tasks were getting detached.
+					if((e.taskexists || e.task) && (e.type=='screens' || e.type=='testcases')){
+						if(e.task==null){
+							t=e.taskexists;
+						}else{
+							t.id=e.taskexists.id;
+							t.oid=e.taskexists.oid;
+							t.parent=e.taskexists.parent;
+							//To fix issue 1685, not to update the task details unless the details comes from original release and cycle
+							t.release=e.taskexists.release;
+							t.cycle=e.taskexists.cycle;
+						}
+						
 						
 						
 					}
