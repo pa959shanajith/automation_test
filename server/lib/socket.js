@@ -71,6 +71,7 @@ io.on('connection', function (socket) {
 						redisServer.redisSub1.unsubscribe('ICE1_normal_' + address);
 						redisServer.redisSub1.unsubscribe('ICE1_scheduling_' + address);
 						redisServer.redisSub1.subscribe('ICE1_normal_' + address);
+						redisServer.initListeners(socket);
 					}
 				} else {
 					if (result.node_check === "userNotValid") {

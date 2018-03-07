@@ -34,8 +34,9 @@ module.exports.scheduleSocketList = function(cb) {
 
 module.exports.resetSession = function(session) {
 	var intr = parseInt(process.env.SESSION_INTERVAL);
+	var sessAge = parseInt(process.env.SESSION_AGE);
 	var updateSessionExpiry = setInterval(function () {
-			session.maxAge = process.env.SESSION_AGE;
+			session.maxAge = sessAge;
 		}, intr);
 	return updateSessionExpiry;
 };
