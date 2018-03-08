@@ -493,8 +493,10 @@ mySPA.controller('reportsController', ['$scope','$rootScope', '$http', '$locatio
 			if(data == "Invalid Session"){
 				$rootScope.redirectPage();
 			}
+
 			if(data != "fail"){
 				if(data.length > 0){
+					
 					finalReports.overallstatus[0].domainName = data[0].domainname
 					finalReports.overallstatus[0].projectName = data[0].projectname
 					finalReports.overallstatus[0].releaseName =	data[0].releasename
@@ -515,6 +517,8 @@ mySPA.controller('reportsController', ['$scope','$rootScope', '$http', '$locatio
 						finalReports.overallstatus[0].overAllStatus = obj2.overallstatus[j].overallstatus;
 						elapTym = (obj2.overallstatus[j].EllapsedTime.split(".")[0]).split(":");
 						finalReports.overallstatus[0].EllapsedTime = "~" + ("0" + elapTym[0]).slice(-2) +":"+ ("0" + elapTym[1]).slice(-2) +":"+ ("0" + elapTym[2]).slice(-2)
+						
+						// finalReports.overallstatus[0].expectedResult = obj2.overallstatus[j];
 					}
 					for(k=0; k<obj2.rows.length; k++){
 						finalReports.rows.push(obj2.rows[k]);
@@ -544,10 +548,35 @@ mySPA.controller('reportsController', ['$scope','$rootScope', '$http', '$locatio
 							scrShot.idx.push(k);
 							scrShot.paths.push(finalReports.rows[k].screenshot_path);
 						}
+						if('testcase_details' in finalReports.rows[k])
+						{
+							if(typeof(finalReports.rows[k].testcase_details) == "string")
+							{
+								finalReports.rows[k].testcase_details = JSON.parse(finalReports.rows[k].testcase_details);
+							}
+							else if(typeof(finalReports.rows[k].testcase_details) == "object")
+							{
+								finalReports.rows[k].testcase_details = finalReports.rows[k].testcase_details;
+							}
+							else{
+								finalReports.rows[k].testcase_details = finalReports.rows[k].testcase_details;
+							}
+							
+							console.log("ttttttttttt",finalReports.rows[k])
+						}
 					}
 					finalReports.overallstatus[0].pass = (parseFloat((pass/total)*100).toFixed(2)) > 0? parseFloat((pass/total)*100).toFixed(2) : parseInt(0);
 					finalReports.overallstatus[0].fail = (parseFloat((fail/total)*100).toFixed(2)) > 0? parseFloat((fail/total)*100).toFixed(2) : parseInt(0);
 					finalReports.overallstatus[0].terminate = (parseFloat((terminated/total)*100).toFixed(2)) > 0? parseFloat((terminated/total)*100).toFixed(2) : parseInt(0);
+					// if(obj2.rows[k].testcase_details != "")
+					// {
+					// 	obj2.rows[k].testcase_details = JSON.parse(obj2.rows[k].testcase_details);
+					// }
+					// else{
+					// 	obj2.rows[k].testcase_details = "";
+					// }
+				
+					
 				}
 				if(reportType=="html"){
 					//Service call to get Html reports

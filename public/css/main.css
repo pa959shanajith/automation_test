@@ -2322,9 +2322,15 @@ input[disabled]{
 	width:100%;
 	position: relative;
 }
+
+/* .designDataTable tbody
+{
+    display:none;
+} */
+
 .executionDataTable thead, .scheduleDataHeader, .designDataTable thead {
     position: fixed;
-    width: calc(100% - 308px);
+     width: calc(100% - 308px);
     margin: -0.1em;
     z-index: 1;
     /*background: #5e636b;*/
@@ -2688,12 +2694,14 @@ input[disabled]{
 .designDataTable thead tr th:nth-child(1), .designDataTable tbody tr td:nth-child(1){width: 5% !important;}
 .designDataTable thead tr th:nth-child(2), .designDataTable tbody tr td:nth-child(2){width: 3% !important;}
 .designDataTable tbody tr td:nth-child(3),.designDataTable tbody tr td:nth-child(4), .designDataTable thead tr th:nth-child(3), .designDataTable thead tr th:nth-child(4){width: 0;}
-.designDataTable thead tr th:nth-child(5), .designDataTable tbody tr td:nth-child(5){width: 22% !important; text-align: left;}
-.designDataTable thead tr th:nth-child(6), .designDataTable tbody tr td:nth-child(6){width: 20% !important;}
+.designDataTable thead tr th:nth-child(5), .designDataTable tbody tr td:nth-child(5){width: 18% !important; text-align: left;}
+.designDataTable thead tr th:nth-child(6), .designDataTable tbody tr td:nth-child(6){width: 18% !important;}
 .designDataTable thead tr th:nth-child(7), .designDataTable tbody tr td:nth-child(7){width: 20% !important;}
 .designDataTable thead tr th:nth-child(8), .designDataTable tbody tr td:nth-child(8){width: 20% !important;}
-.designDataTable thead tr th:nth-child(9), .designDataTable tbody tr td:nth-child(9){width: 10% !important;}
-.designDataTable thead tr th:nth-child(5), .designDataTable thead tr th:nth-child(6), .designDataTable thead tr th:nth-child(7), .designDataTable thead tr th:nth-child(8){border-right: 1px solid #fff;}
+.designDataTable thead tr th:nth-child(9), .designDataTable tbody tr td:nth-child(9){width: 8% !important;}
+.designDataTable thead tr th:nth-child(13), .designDataTable tbody tr td:nth-child(13){width: 8% !important;}
+
+.designDataTable thead tr th:nth-child(5), .designDataTable thead tr th:nth-child(6), .designDataTable thead tr th:nth-child(7), .designDataTable thead tr th:nth-child(8),.designDataTable thead tr th:nth-child(9){border-right: 1px solid #fff;}
 .designDataTable tbody tr td:nth-child(1),.designDataTable tbody tr td:nth-child(2),.designDataTable tbody tr td:nth-child(5),.designDataTable tbody tr td:nth-child(6),.designDataTable tbody tr td:nth-child(7),.designDataTable tbody tr td:nth-child(8){text-align: left;}
 .designDataTable tbody tr td:nth-child(6),.designDataTable tbody tr td:nth-child(7),.designDataTable tbody tr td:nth-child(8){padding-left: 3px; padding-right: 5px; word-break: break-all;}
 .designDataTable tbody tr td:nth-child(5){padding-right: 5px; padding-left: 5px; word-wrap: break-word; word-break: break-all;}
@@ -5233,4 +5241,24 @@ Webocular report css
 {
     cursor: no-drop !important;
     pointer-events: none;
+}
+.form-control-width
+{
+    width: 90% !important;
+}
+.form-custom
+{
+    margin-bottom: 5%;
+}
+.checkContainerBox
+{
+    float: left;
+    width: 100%;
+    padding-bottom: 3%;
+}
+
+.checkContainerBox .checkbox-inline input[type='checkbox']{
+    width: 18px;
+    height: 16px;
+    float: left;
 }
