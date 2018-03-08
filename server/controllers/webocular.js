@@ -9,7 +9,7 @@ exports.getCrawlResults = function (req, res) {
 		logger.info("Inside UI service: getCrawlResults");
 		if (utils.isSessionActive(req.session)) {
 			var name = req.session.username;
-			redisServer.redisSub2.subscribe('ICE2_' + name ,1);	
+			redisServer.redisSubServer.subscribe('ICE2_' + name ,1);	
 			var input_url = req.body.url;
 			var level = req.body.level;
 			var agent = req.body.agent;
@@ -32,18 +32,18 @@ exports.getCrawlResults = function (req, res) {
 			if (validate_url == true && validate_level == true && check_agent == true) {
 				logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
 				logger.info("ICE Socket requesting Address: %s", name);
-				redisServer.redisPub1.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
+				redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
 					if (redisres[1]>0) {
 						logger.info("Sending socket request for webCrawlerGo to redis");
 						dataToIce = {"emitAction" : "webCrawlerGo","username" : name, "input_url":input_url, "level" : level, "agent" :agent};
-						redisServer.redisPub1.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
+						redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
 						var updateSessionExpiry = utils.resetSession(req.session);
 						function webCrawlerGo_listener(channel,message) {
 							data = JSON.parse(message);
 							if(name == data.username){
 								var value = data.value;
 								if (data.onAction == "unavailableLocalServer") {
-									redisServer.redisSub2.removeListener('message',webCrawlerGo_listener);	
+									redisServer.redisSubServer.removeListener('message',webCrawlerGo_listener);	
 									logger.error("Error occured in getCrawlResults: Socket Disconnected");
 									res.send("unavailableLocalServer");
 								} else if (data.onAction == "result_web_crawler") {
@@ -54,7 +54,7 @@ exports.getCrawlResults = function (req, res) {
 										logger.error(exception.message);
 									}
 								} else if (data.onAction == "result_web_crawler_finished") {
-									redisServer.redisSub2.removeListener('message',webCrawlerGo_listener);	
+									redisServer.redisSubServer.removeListener('message',webCrawlerGo_listener);	
 									try {
 										clearInterval(updateSessionExpiry);
 										var mySocketUI = myserver.allSocketsMapUI[name];
@@ -67,7 +67,7 @@ exports.getCrawlResults = function (req, res) {
 								}
 							}
 						};
-						redisServer.redisSub2.on("message",webCrawlerGo_listener);
+						redisServer.redisSubServer.on("message",webCrawlerGo_listener);
 					} else {
 						utils.getChannelNum('ICE1_scheduling_' + name, function(found){
 							var flag="";

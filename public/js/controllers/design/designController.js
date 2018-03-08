@@ -332,7 +332,9 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                                                     "_id_": "",
                                                     "appType": appTypeLocal1,
                                                     "remarksStatus": "",
-                                                    "remarks": ""
+                                                    "remarks": "",
+                                                    "addTestCaseDetails":"",
+                                                    "addTestCaseDetailsInfo":""
                                                 }];
                                                 readTestCaseData = JSON.stringify(datalist);
                                                 $("#jqGrid").jqGrid('GridUnload');
@@ -1131,7 +1133,9 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                         "outputVal": "",
                         "url": "",
                         "custname": "",
-                        "remarks": [""]
+                        "remarks": [""],
+                        "addTestCaseDetails":"",
+                        "addTestCaseDetailsInfo":""
                     })
                 }
             }
@@ -1144,7 +1148,9 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                 "outputVal": "",
                 "url": "",
                 "custname": "",
-                "remarks": [""]
+                "remarks": [""],
+                "addTestCaseDetails":"",
+                "addTestCaseDetailsInfo":""
             })
             initWSJson.testcasename = "",
             initWSJson.apptype = "Webservice",
@@ -3293,6 +3299,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                         	}
                         }*/
                     }
+                
                     if (serviceCallFlag == true) {
                         console.log("no service call being made");
                     } else {
@@ -3545,6 +3552,54 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
         }
     });
 
+    
+
+    $(document).on('click', '.detailsIcon', function(e) {
+        modalId = '';
+        modalId = e.target.id;
+        modalId = parseInt(modalId.split("_")[1]);
+        if(e.target.className.includes('inActiveDetails')){
+            openModalFormDialog('Add Test Step Details','');
+            $(".stepDetailsContainer").empty()
+            $(".stepDetailsContainer").append("<div class='formGroup form-inline form-custom'><input autocomplete='off' id='testDetails_"+modalId+"' maxlength='50' type='text' class='form-control form-control-custom form-control-width' placeholder='Enter Test Description'></div><div id='pass_"+modalId+"' class='passFormFields'><div class='formGroup form-inline form-custom'><input autocomplete='off' id='expectedResult_"+modalId+"'  maxlength='50' type='text' class='form-control form-control-custom form-control-width' placeholder='Enter Expected Result for Pass Status'></div><div class='formGroup form-inline form-custom'><input autocomplete='off' id='actualResult_"+modalId+"' type='text'  maxlength='50' class='form-control form-control-custom form-control-width' placeholder='Enter Actual Result for Pass Status'></div></div><div id ='fail_"+modalId+"' class='failFormFields'><div class='formGroup form-inline form-custom'><input autocomplete='off' id='expectedResult_"+modalId+"'  maxlength='50' type='text' class='form-control form-control-custom form-control-width' placeholder='Enter Expected Result for Fail Status'></div><div class='formGroup form-inline form-custom'><input autocomplete='off' id='actualResult_"+modalId+"' type='text'  maxlength='50' class='form-control form-control-custom form-control-width' placeholder='Enter Actual Result for Fail Status'></div></div")
+            
+        }
+        else{
+            var taskInfo = JSON.parse(window.localStorage['_CT']);
+            var screenId = taskInfo.screenId;
+            var testCaseId = taskInfo.testCaseId;
+            var testCaseName = taskInfo.testCaseName;
+            var versionnumber = taskInfo.versionnumber;
+            DesignServices.readTestCase_ICE(screenId, testCaseId, testCaseName, versionnumber)
+            .then(function(response) {
+                    if (response == "Invalid Session") {
+                        $rootScope.redirectPage();
+                    }
+                   console.log("Responseeee",response);
+                    var testcaseSteps  = JSON.parse(response.testcase);
+                    if(typeof(testcaseSteps[modalId -1].addTestCaseDetailsInfo) == "object")
+                    {
+                        var details = testcaseSteps[modalId -1].addTestCaseDetailsInfo;
+                    }
+                    else{
+                        var details = JSON.parse(testcaseSteps[modalId -1].addTestCaseDetailsInfo);
+                    }
+                   
+                    openModalFormDialog('Add Test Step Details','');
+                     $(".stepDetailsContainer").empty()
+                     $(".stepDetailsContainer").append("<div class='formGroup form-inline form-custom'><input autocomplete='off' id='testDetails_"+modalId+"' maxlength='50' type='text' class='form-control form-control-custom form-control-width' placeholder='Enter Test Description'></div><div id='pass_"+modalId+"' class='passFormFields'><div class='formGroup form-inline form-custom'><input autocomplete='off' id='expectedResult_"+modalId+"'  maxlength='50' type='text' class='form-control form-control-custom form-control-width' placeholder='Enter Expected Result for Pass Status'></div><div class='formGroup form-inline form-custom'><input autocomplete='off' id='actualResult_"+modalId+"' type='text'  maxlength='50' class='form-control form-control-custom form-control-width' placeholder='Enter Actual Result for Pass Status'></div></div><div id ='fail_"+modalId+"' class='failFormFields'><div class='formGroup form-inline form-custom'><input autocomplete='off' id='expectedResult_"+modalId+"'  maxlength='50' type='text' class='form-control form-control-custom form-control-width' placeholder='Enter Expected Result for Fail Status'></div><div class='formGroup form-inline form-custom'><input autocomplete='off' id='actualResult_"+modalId+"' type='text'  maxlength='50' class='form-control form-control-custom form-control-width' placeholder='Enter Actual Result for Fail Status'></div></div")
+                     $("#testDetails_"+modalId+"").val(details.testcaseDetails);
+                     $("#pass_"+modalId+"").find("#expectedResult_"+modalId+"").val(details.expectedResult_pass);
+                     $("#pass_"+modalId+"").find("#actualResult_"+modalId+"").val(details.actualResult_pass);
+                     $("#fail_"+modalId+"").find("#expectedResult_"+modalId+"").val(details.expectedResult_fail);
+                     $("#fail_"+modalId+"").find("#actualResult_"+modalId+"").val(details.actualResult_fail);
+                },
+                function(error) {});
+        }
+      
+        e.stopImmediatePropagation();
+    });
+
 
       $scope.submit_task=function(action) {
         var taskinfo = JSON.parse(window.localStorage['_CT']);
@@ -3627,7 +3682,9 @@ function contentTable(newTestScriptDataLS) {
                 {label: 'Remarks', name: 'remarksStatus', editable: false, resizable: false, sortable: false},
                 {label: 'Remarks', name: 'remarks', editable: false, resizable: false, sortable: false, hidden: true},
                 {label: 'URL', name: 'url', editable: false, resizable: false, hidden: true},
-                {label: 'appType', name: 'appType', editable: false, resizable: false, hidden: true}
+                {label: 'appType', name: 'appType', editable: false, resizable: false, hidden: true},
+                {label: 'Details', name: 'addTestCaseDetails', editable: false, resizable: false, sortable: false},
+                {label: 'Details', name: 'addTestCaseDetailsInfo', editable: false, resizable: false, sortable: false,hidden: true}
             ],
             loadonce: false,
             viewrecords: false,
@@ -3651,9 +3708,13 @@ function contentTable(newTestScriptDataLS) {
             toppager: true,
             autoencode: true,
             scrollrows: true,
-            loadComplete: function() {
+            loadComplete: function(data) {
+                loadedGridData = JSON.parse(JSON.stringify(data));
                 $("#jqGrid tr[id^='jqg']").remove();
-                $("#jqGrid tr").each(function() {
+                var v=1;
+
+                $("#jqGrid tr:visible").each(function() {
+
                     if ($(this).find("td:nth-child(10)").text().trim().length <= 0) {
                         $(this).find("td:nth-child(9)").text('');
                         $(this).find("td:nth-child(9)").append('<img src="imgs/ic-remarks-inactive.png" class="remarksIcon"/>');
@@ -3661,6 +3722,86 @@ function contentTable(newTestScriptDataLS) {
                         $(this).find("td:nth-child(9)").text('');
                         $(this).find("td:nth-child(9)").append('<img src="imgs/ic-remarks-active.png" class="remarksIcon"/>');
                     }
+                   
+                    var rowId = parseInt($(this).children("td[aria-describedby='jqGrid_stepNo']").text());
+                    if('rows' in data)
+                    {
+                        if(typeof (data.rows[rowId -1].addTestCaseDetailsInfo) == 'object')
+                        {
+                            $('#jqGrid').jqGrid('setCell', rowId, 'addTestCaseDetailsInfo', angular.toJson(data.rows[rowId -1].addTestCaseDetailsInfo));
+                            $('#jqGrid').jqGrid('setCell', rowId, 'addTestCaseDetails', angular.toJson(data.rows[rowId -1].addTestCaseDetails));
+                        }
+                        else{
+                            $('#jqGrid').jqGrid('setCell', rowId, 'addTestCaseDetailsInfo', data.rows[rowId -1].addTestCaseDetailsInfo);
+                            $('#jqGrid').jqGrid('setCell', rowId, 'addTestCaseDetails', data.rows[rowId -1].addTestCaseDetails);
+                        }
+                        var str = typeof(data.rows[rowId -1].addTestCaseDetailsInfo);
+                        
+                    }
+                    else{
+                        
+                        if(typeof (data[rowId -1].addTestCaseDetailsInfo) == 'object')
+                        {
+                            $('#jqGrid').jqGrid('setCell', rowId, 'addTestCaseDetailsInfo', angular.toJson(data[rowId -1].addTestCaseDetailsInfo));
+                            $('#jqGrid').jqGrid('setCell', rowId, 'addTestCaseDetails', angular.toJson(data[rowId -1].addTestCaseDetails));
+                        }
+                        else{
+                            $('#jqGrid').jqGrid('setCell', rowId, 'addTestCaseDetailsInfo', data[rowId -1].addTestCaseDetailsInfo);
+                            $('#jqGrid').jqGrid('setCell', rowId, 'addTestCaseDetails', data[rowId -1].addTestCaseDetails);
+                        }
+                        var str = typeof(data[rowId -1].addTestCaseDetailsInfo);
+                    }
+
+                    
+               
+                    var getRowData = $('#jqGrid').jqGrid ('getRowData', rowId);
+                    
+                    if(str == "string" && 'rows' in data)
+                    {
+                        if(data.rows[rowId -1].addTestCaseDetailsInfo.length > 0)
+                        {
+                            $(this).find("td:nth-child(13)").text('');
+                            $(this).find("td:nth-child(13)").append('<img alt="activeDetails" title="" id="details_'+v+'" src="imgs/ic-details-active.png" class="detailsIcon activeDetails"/>');
+                        }
+                        else if(data.rows[rowId -1].addTestCaseDetails.length == 0){
+                            $(this).find("td:nth-child(13)").text('');
+                            $(this).find("td:nth-child(13)").append('<img alt="inActiveDetails"  title="" id="details_'+v+'" src="imgs/ic-details-inactive.png" class="detailsIcon inActiveDetails"/>');
+                        }
+                        else{
+                            $(this).find("td:nth-child(13)").text('');
+                            $(this).find("td:nth-child(13)").append('<img  alt="inActiveDetails" title="" id="details_'+v+'" src="imgs/ic-details-inactive.png" class="detailsIcon inActiveDetails"/>');
+                        }
+                    }
+                    else if(str == "string")
+                    {
+                        if(data[rowId -1].addTestCaseDetailsInfo.length > 0)
+                        {
+                            $(this).find("td:nth-child(13)").text('');
+                            $(this).find("td:nth-child(13)").append('<img  alt="activeDetails"  title="" id="details_'+v+'" src="imgs/ic-details-active.png" class="detailsIcon activeDetails"/>');
+                        }
+                        else if(data[rowId -1].addTestCaseDetails.length == 0){
+                            $(this).find("td:nth-child(13)").text('');
+                            $(this).find("td:nth-child(13)").append('<img alt="inActiveDetails" title="" id="details_'+v+'" src="imgs/ic-details-inactive.png" class="detailsIcon inActiveDetails"/>');
+                        }
+                        else{
+                            $(this).find("td:nth-child(13)").text('');
+                            $(this).find("td:nth-child(13)").append('<img alt="inActiveDetails"  title="" id="details_'+v+'" src="imgs/ic-details-inactive.png" class="detailsIcon inActiveDetails"/>');
+                        }
+                    }
+
+                    if(str != "string")
+                    {
+                        if( str != "" && str != "undefined" && str !=undefined )
+                        {
+                            $(this).find("td:nth-child(13)").text('');
+                            $(this).find("td:nth-child(13)").append('<img  alt="activeDetails" title="" id="details_'+v+'" src="imgs/ic-details-active.png" class="detailsIcon activeDetails"/>');
+                        }
+                        else{
+                            $(this).find("td:nth-child(13)").text('');
+                            $(this).find("td:nth-child(13)").append('<img  alt="inActiveDetails" title="" id="details_'+v+'" src="imgs/ic-details-inactive.png" class="detailsIcon inActiveDetails"/>');
+                        }
+                    }
+                    v++;
                 })
                 //$("#cb_jqGrid").on('click', function() {
                 /*var cboxParent =  $(this).is(":checked");
@@ -3818,6 +3959,12 @@ function contentTable(newTestScriptDataLS) {
     $("#jqGrid").jqGrid("setColProp", "appType", {
         editable: false
     });
+    $("#jqGrid").jqGrid("setColProp", "addTestCaseDetails", {
+        editable: false
+    });
+    $("#jqGrid").jqGrid("setColProp", "addTestCaseDetailsInfo", {
+        editable: false
+    });
     $("#jqGrid").resetSelection();
 
     $(document).on('click', '.remarksIcon', function() {
@@ -3867,6 +4014,74 @@ function contentTable(newTestScriptDataLS) {
             }
         }
     })
+
+        //Save teststep details
+        $(document).on('click', '#saveTestStepDetails', function(e) {
+            var $grid =  $('#jqGrid');
+            getTestStepDetailsRowData = $grid.jqGrid ('getRowData', modalId);
+            getTestStepDetailsRowData.addTestCaseDetailsInfo = {};
+            var testDetails = $.trim($('#testDetails_'+modalId+'').val());
+            var expectedResult_pass = $.trim($('#pass_'+modalId+'').find('#expectedResult_'+modalId+'').val());
+            var actualResult_pass =  $.trim($('#pass_'+modalId+'').find('#actualResult_'+modalId+'').val());
+            var expectedResult_fail = $.trim($('#fail_'+modalId+'').find('#expectedResult_'+modalId+'').val());
+            var actualResult_fail =  $.trim($('#fail_'+modalId+'').find('#actualResult_'+modalId+'').val());
+    
+           if(testDetails == '' && expectedResult_pass == '' && actualResult_pass == ''  && expectedResult_fail == '' && actualResult_fail == '')
+           {
+                $('#globalModalForm').modal('hide');
+                openDialog('Add Test Step Details','Please enter atleast one field to save test step details');
+           }
+           else{
+
+            if(testDetails == '' && expectedResult_pass == '' && actualResult_pass == ''  && expectedResult_fail == '' && actualResult_fail == '')
+            {
+                getTestStepDetailsRowData.addTestCaseDetailsInfo ={};
+                getTestStepDetailsRowData.addTestCaseDetails ='';
+            }
+
+                 getTestStepDetailsRowData.addTestCaseDetailsInfo = {
+                    "testcaseDetails": testDetails,
+                    "expectedResult_pass": expectedResult_pass,
+                    "actualResult_pass": actualResult_pass,
+                    "expectedResult_fail": expectedResult_fail,
+                    "actualResult_fail": actualResult_fail,
+                };
+              
+                $grid.jqGrid('setCell', modalId, 'addTestCaseDetailsInfo',JSON.stringify(getTestStepDetailsRowData.addTestCaseDetailsInfo));
+                var gridData =  $grid.jqGrid('getGridParam','data');
+                console.log("sdsd", gridData);
+                for(let i=0;i<gridData.length;i++)
+                {
+                    if(gridData[i].stepNo === getTestStepDetailsRowData.stepNo)
+                    {
+                        gridData[i] = getTestStepDetailsRowData;
+                    }
+                    // if('addTestCaseDetailsInfo' in  gridData[i])
+                    // {
+                    //     if(gridData[i].addTestCaseDetailsInfo != "undefined")
+                    //     {
+                    //         $("tr#"+modalId).find("td:nth-child(13)").text('');
+                    //         $("tr#"+modalId).find("td:nth-child(13)").append('<img id="details_'+modalId+'" src="imgs/ic-details-active.png" class="detailsIcon activeDetails"/>');
+                    //     }
+                    //     else{
+                    //         $("tr#"+modalId).find("td:nth-child(13)").text('');
+                    //         $("tr#"+modalId).find("td:nth-child(13)").append('<img id="details_'+modalId+'" src="imgs/ic-details-inactive.png" class="detailsIcon inActiveDetails"/>');
+                    //     }
+                    // }
+                    // else{
+                    //     $("tr#"+modalId).find("td:nth-child(13)").text('');
+                    //     $("tr#"+modalId).find("td:nth-child(13)").append('<img id="details_'+modalId+'" src="imgs/ic-details-inactive.png" class="detailsIcon inActiveDetails"/>');
+                    // }
+                }
+             
+                $(".close:visible").trigger('click'); 
+           }  
+        });
+
+    //Reset test step details
+    $(document).on('click', '#resetTestStepDetails', function(e) {
+        $('input:visible').val('');
+    });
 
     function hideOtherFuncOnEdit() {
         $("#jqGrid").each(function() {
@@ -4955,7 +5170,9 @@ function addTestScriptRow() {
             "appType": "Generic",
             "remarksStatus": "",
             "remarks": "",
-            "_id_": ""
+            "_id_": "",
+            "addTestCaseDetails": "",
+            "addTestCaseDetailsInfo": ""
         };
 
         $("#jqGrid tr").each(function() {
@@ -4983,6 +5200,8 @@ function addTestScriptRow() {
                         gridArrayData[i].stepNo = i + 1;
                     }
                 }
+                var allRowsInGrid = $('#jqGrid').jqGrid('getGridParam','data');
+                console.log("dd",allRowsInGrid);
             } else {
                 gridArrayData.splice(arrayLength, 0, emptyRowData);
                 gridArrayData[arrayLength].stepNo = parseInt(gridArrayData[arrayLength - 1].stepNo) + 1;
@@ -5044,6 +5263,12 @@ function rearrangeTestScriptRow() {
     $("#jqGrid").jqGrid("setColProp", "remarksIcon", {
         editable: false
     });
+    $("#jqGrid").jqGrid("setColProp", "addTestCaseDetails", {
+        editable: false
+    });
+    $("#jqGrid").jqGrid("setColProp", "addTestCaseDetailsInfo", {
+        editable: false
+    });
     $("#jqGrid").resetSelection();
     $("#jqGrid").find(">tbody").sortable("enable");
     enabledEdit = "false";
@@ -5088,6 +5313,12 @@ function editTestCaseRow() {
         });
         $("#jqGrid").jqGrid("setColProp", "appType", {
             editable: true
+        });
+        $("#jqGrid").jqGrid("setColProp", "addTestCaseDetails", {
+            editable: false
+        });
+        $("#jqGrid").jqGrid("setColProp", "addTestCaseDetailsInfo", {
+            editable: false
         });
         $("#jqGrid").resetSelection();
         $("#jqGrid").trigger("reloadGrid");
@@ -5142,6 +5373,8 @@ function copyTestStep() {
                 getRowJsonCopy = [];
                 return false
             } else {
+                var rowId =  parseInt($(this).children("td:nth-child(1)").text());
+                var getRowData = $('#jqGrid').jqGrid ('getRowData', rowId);
                 getRowJsonCopy.push({
                     "objectName": $(this).children("td:nth-child(4)").text().trim(),
                     "custname": $(this).children("td:nth-child(5)").text(),
@@ -5152,7 +5385,9 @@ function copyTestStep() {
                     "remarksIcon": $(this).children("td:nth-child(9)").text(),
                     "remarks": $(this).children("td:nth-child(10)").text(),
                     "url": $(this).children("td:nth-child(11)").text().trim(),
-                    "appType": $(this).children("td:nth-child(12)").text()
+                    "appType": $(this).children("td:nth-child(12)").text(),
+                    "addTestCaseDetails": $(this).children("td:nth-child(13)").children('img')[0].outerHTML,
+                    "addTestCaseDetailsInfo": getRowData.addTestCaseDetailsInfo
                 });
             }
         });
@@ -5187,6 +5422,12 @@ function copyTestStep() {
             editable: false
         });
         $("#jqGrid").jqGrid("setColProp", "remarksIcon", {
+            editable: false
+        });
+        $("#jqGrid").jqGrid("setColProp", "addTestCaseDetails", {
+            editable: false
+        });
+        $("#jqGrid").jqGrid("setColProp", "addTestCaseDetailsInfo", {
             editable: false
         });
         $("#jqGrid").resetSelection();
@@ -5709,5 +5950,16 @@ function openDialog(title, body,submitflag) {
             $("#globalTaskSubmit").modal("show");
     }
    
+}
+
+function openModalFormDialog(title, body)
+{
+            $("#globalModalForm").find('.modal-title').text(title);
+            $("#globalModalForm").next('.modal-sm').removeClass('modal-');
+            $("#globalModalForm").find('.modal-body p').text(body).css('color', 'black');
+            $("#globalModalForm").modal("show");
+            setTimeout(function() {
+                $("#globalModalForm").find('.btn-default').focus();
+            }, 300);
 }
 

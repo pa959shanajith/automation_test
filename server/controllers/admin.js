@@ -167,7 +167,7 @@ exports.getEditUsersInfo_Nineteen68 = function (req, res) {
 				function (result, response) {
 				try {
 					if (response.statusCode != 200 || result.rows == "fail") {
-						res.send(null,"fail");
+						res.send("fail");
 					} else {
 						result.rows.forEach(function (iterator) {
 							userDetails.userName = iterator.username.toLowerCase();
@@ -183,7 +183,7 @@ exports.getEditUsersInfo_Nineteen68 = function (req, res) {
 					}
 				} catch (exception) {
 					logger.error(exception.message);
-					res.send(null,"fail");
+					res.send("fail");
 				}
 			});
 		} else {

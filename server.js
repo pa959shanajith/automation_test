@@ -98,6 +98,7 @@ try {
     else logger.info("Express logs are disabled");
 
     process.env.SESSION_AGE = 30 * 60 * 1000;
+	process.env.SESSION_INTERVAL = 1200000
     app.use(sessions({
         cookie: {
             path: '/',

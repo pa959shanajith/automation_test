@@ -1150,7 +1150,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             else if(tk == "cx"){
                 if(dNodes[pi].parent){
                     v.append('span').attr('class', 'ct-assignItem fl-left').html('Complexity');
-                    v.append('span').attr('id', 'ct-cxval').attr('nType',t).attr('idx',pi).text('Unset');
+                    v.append('span').attr('id', 'ct-cxval').attr('nType',t).attr('idx',pi).text('Unassigned');
                     v.append('span').attr('id','ct-compbox');
                     $("#ct-compbox").append(`<i class="fa fa-list" aria-hidden="true"></i>`);   
                     $("#ct-compbox").css('color','#643693').css('margin-left','30px'); 
@@ -2239,7 +2239,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         var restrict_scenario_reuse = parseDataReuse(true);
         if (selectedTab!='tabAssign'){
             if(restrict_scenario_reuse['reuseScenarios'].length>0 ){
-            openDialogMindmap('Error',"Scenarios cannot be reused : '"+restrict_scenario_reuse['reuseScenarios'].join()+"'");
+            openDialogMindmap('Error',"Scenario names cannot be reused, please rename the following: "+restrict_scenario_reuse['reuseScenarios'].join());
                 return;
             }
         }
@@ -4781,4 +4781,7 @@ function getSelectionStart(o) {
         d3.select(element).classed('no-access',noAccess);
         d3.select(element).classed('disableButton',disable);
     }
+    setTimeout(function() {		
+		$('#createImg').trigger("click");		
+	}, 500);    
 }]);

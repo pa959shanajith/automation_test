@@ -251,7 +251,7 @@ exports.getModules=function(req,res){
 				if(status!=200) res.status(status).send(result);
 				else{
 					var k=0,rIndex=[],lbl,neoIdDict={},maps=[],tList=[];
-					var attrDict={"modules_endtoend":{"childIndex":"childIndex","projectID":"projectID","moduleName":"name","moduleID":"id_n","moduleID_c":"id_c"},"modules":{"childIndex":"childIndex","projectID":"pid_n","moduleName":"name","moduleID":"id_n","moduleID_c":"id_c"},"scenarios":{"projectID":"projectID","childIndex":"childIndex","moduleID":"pid_n","testScenarioName":"name","testScenarioID":"id_n","testScenarioID_c":"id_c"},"screens":{"childIndex":"childIndex","testScenarioID":"pid_n","screenName":"name","screenID":"id_n","screenID_c":"id_c","taskexists":"taskexists"},"testcases":{"childIndex":"childIndex","screenID":"pid_n","testCaseName":"name","testCaseID":"id_n","testCaseID_c":"id_c","taskexists":"taskexists"},"tasks":{"taskID":"id_n","task":"t","batchName":"bn","assignedTo":"at","reviewer":"rw","startDate":"sd","endDate":"ed","re_estimation":"re_estimation","release":"re","cycle":"cy","details":"det","nodeID":"pid","parent":"anc","cx":"cx"}};
+					var attrDict={"modules_endtoend":{"childIndex":"childIndex","projectID":"projectID","moduleName":"name","moduleID":"id_n","moduleID_c":"id_c"},"modules":{"childIndex":"childIndex","projectID":"projectID","moduleName":"name","moduleID":"id_n","moduleID_c":"id_c"},"scenarios":{"projectID":"projectID","childIndex":"childIndex","moduleID":"pid_n","testScenarioName":"name","testScenarioID":"id_n","testScenarioID_c":"id_c"},"screens":{"projectID":"projectID","childIndex":"childIndex","testScenarioID":"pid_n","screenName":"name","screenID":"id_n","screenID_c":"id_c","taskexists":"taskexists"},"testcases":{"projectID":"projectID","childIndex":"childIndex","screenID":"pid_n","testCaseName":"name","testCaseID":"id_n","testCaseID_c":"id_c","taskexists":"taskexists"},"tasks":{"taskID":"id_n","task":"t","batchName":"bn","assignedTo":"at","reviewer":"rw","startDate":"sd","endDate":"ed","re_estimation":"re_estimation","release":"re","cycle":"cy","details":"det","nodeID":"pid","parent":"anc","cx":"cx"}};
 					var jsonData=result;
 
 					var all_modules=jsonData[0].data;
@@ -534,16 +534,20 @@ exports.saveData=function(req,res){
 					idDict[e.id]=(e.id_n)?e.id_n:uuidV4();
 					e.id=idDict[e.id];
 					t=e.task;
-					
-					if(e.taskexists && e.task && (e.type=='screens' || e.type=='testcases')){
-						t.id=e.taskexists.id;
-						t.oid=e.taskexists.oid;
-						t.parent=e.taskexists.parent;
-						//To fix issue 1685, not to update the task details unless the details comes from original release and cycle
-						t.release=e.taskexists.release;
-						t.cycle=e.taskexists.cycle;
+					//Even on saving of data in assign tab where x rel and y cyc is chosen, where tasks for screen and testcases are originally assigned in a x rel and z cyc
+					//relation between the node and tasks were getting detached.
+					if((e.taskexists || e.task) && (e.type=='screens' || e.type=='testcases')){
+						if(e.task==null){
+							t=e.taskexists;
+						}else if(e.taskexists){
 						
-						
+							t.id=e.taskexists.id;
+							t.oid=e.taskexists.oid;
+							t.parent=e.taskexists.parent;
+							//To fix issue 1685, not to update the task details unless the details comes from original release and cycle
+							t.release=e.taskexists.release;
+							t.cycle=e.taskexists.cycle;
+						}
 					}
 					nameDict[e.id] = e.name;
 					var taskstatus='assigned';
@@ -628,9 +632,6 @@ exports.saveData=function(req,res){
 							else qList.push({"statement":"MERGE(n:TASKS{taskID:'"+t.id+"',task:'"+t.task+"',assignedTo:'"+t.assignedTo+"',reviewer:'"+t.reviewer+"',status:'"+taskstatus+"',startDate:'"+t.startDate+"',endDate:'"+t.endDate+"',re_estimation:'"+t.re_estimation+"',release:'"+relId+"',cycle:'"+cycId+"',details:'"+t.details+"',parent:'["+t.parent+"]',cx:'"+t.cx+"'})"});
 							qList.push({"statement":"MATCH (a:TESTSCENARIOS{projectID:'"+temp_prjID+"',testScenarioName:'"+e.name+"'}),(b:TASKS{taskID:'"+t.id+"'}) MERGE (a)-[r:FNTT {id:a.testScenarioID}]-(b)"});
 						}
-						if(e.projectID){
-
-						}
 						//else if(e.id_n==null){ // In case added first time to end to end then connect to all task if exist
 							qList.push({"statement":"MATCH (c:TESTSCENARIOS{projectID:'"+temp_prjID+"',testScenarioName:'"+e.name+"'}) ,(a:TASKS) where not c.testScenarioID_c='null' and a.parent=~('.*'+c.testScenarioID_c+']') MERGE (c)-[rel:FNTT {id:c.testScenarioID}]-(a)"});							
 						//}						
@@ -661,7 +662,7 @@ exports.saveData=function(req,res){
 								t.parent=[prjId].concat(t.parent);
 								qList.push({"statement":"MERGE(n:TASKS{taskID:'"+t.id+"',task:'"+t.task+"',assignedTo:'"+t.assignedTo+"',reviewer:'"+t.reviewer+"',status:'"+taskstatus+"',startDate:'"+t.startDate+"',endDate:'"+t.endDate+"',release:'"+t.release+"',cycle:'"+t.cycle+"',re_estimation:'"+t.re_estimation+"',details:'"+t.details+"',parent:'["+t.parent+"]',uid:'"+uidx+"',cx:'"+t.cx+"'})"});
 							}		 
-								qList.push({"statement":"MATCH (a:SCREENS{screenID_c:'"+e.id_c+"'}),(b:TASKS{taskID:'"+t.id+"'}) MERGE (a)-[r:FNTT {id:'"+e.id+"'}]-(b)"});
+								qList.push({"statement":"MATCH (a:SCREENS{screenID_c:'"+e.id_c+"'}),(b:TASKS{taskID:'"+t.id+"'}) MERGE (a)-[r:FNTT {id:a.screenID}]-(b)"});
 						}
 					}
 					else if(e.type=='testcases'){
@@ -696,7 +697,7 @@ exports.saveData=function(req,res){
 								qList.push({"statement":"MERGE(n:TASKS{taskID:'"+t.id+"',task:'"+t.task+"',assignedTo:'"+t.assignedTo+"',status:'"+taskstatus+"',reviewer:'"+t.reviewer+"',startDate:'"+t.startDate+"',endDate:'"+t.endDate+"',release:'"+t.release+"',cycle:'"+t.cycle+"',re_estimation:'"+t.re_estimation+"',details:'"+t.details+"',parent:'["+t.parent+"]',uid:'"+uidx+"',cx:'"+t.cx+"'})"});
 							}
 								//In case of reuse
-								qList.push({"statement":"MATCH (a:TESTCASES{testCaseID_c:'"+e.id_c+"'}),(b:TASKS{taskID:'"+t.id+"'}) MERGE (a)-[r:FNTT {id:'"+e.id+"'}]-(b)"});								   
+								qList.push({"statement":"MATCH (a:TESTCASES{testCaseID_c:'"+e.id_c+"'}),(b:TASKS{taskID:'"+t.id+"'}) MERGE (a)-[r:FNTT {id:a.testCaseID}]-(b)"});								   
 						}
 					}
 				});
@@ -918,9 +919,10 @@ exports.saveEndtoEndData=function(req,res){
 							else qList.push({"statement":"MERGE(n:TASKS{taskID:'"+t.id+"',task:'"+t.task+"',assignedTo:'"+t.assignedTo+"',reviewer:'"+t.reviewer+"',status:'"+taskstatus+"',startDate:'"+t.startDate+"',endDate:'"+t.endDate+"',re_estimation:'"+t.re_estimation+"',release:'"+relId+"',cycle:'"+cycId+"',details:'"+t.details+"',parent:'["+t.parent+"]'})"});
 							qList.push({"statement":"MATCH (a:TESTSCENARIOS{projectID:'"+e.projectID+"',testScenarioName:'"+e.name+"'}),(b:TASKS{taskID:'"+t.id+"'}) MERGE (a)-[r:FNTT {id:a.testScenarioID}]-(b)"});
 						}
-						else if(e.id_n==null){ // In case added first time to end to end then connect to all task if exist
-							qList.push({"statement":"MATCH (a:TASKS)<-[r]-(b:TESTSCENARIOS{projectID:'"+prjId+"',testScenarioName:'"+e.name+"'}),(c:TESTSCENARIOS{projectID:'"+e.projectID+"',testScenarioName:'"+e.name+"'}) MERGE (c)-[rel:FNTT {id:c.testScenarioID}]-(a)"});							
-						}
+						qList.push({"statement":"MATCH (c:TESTSCENARIOS{projectID:'"+prjId+"',testScenarioName:'"+e.name+"'}) ,(a:TASKS) where not c.testScenarioID_c='null' and a.parent=~('.*'+c.testScenarioID_c+']') MERGE (c)-[rel:FNTT {id:c.testScenarioID}]-(a)"});
+						// else if(e.id_n==null){ // In case added first time to end to end then connect to all task if exist
+						// 	qList.push({"statement":"MATCH (a:TASKS)<-[r]-(b:TESTSCENARIOS{projectID:'"+prjId+"',testScenarioName:'"+e.name+"'}),(c:TESTSCENARIOS{projectID:'"+e.projectID+"',testScenarioName:'"+e.name+"'}) MERGE (c)-[rel:FNTT {id:c.testScenarioID}]-(a)"});							
+						// }
 					}
 				});
 				

@@ -594,7 +594,7 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 	logger.info("Inside UI service: ExecuteTestSuite_ICE");
 	if (utils.isSessionActive(req.session)) {
 		var name = req.session.username;
-		redisServer.redisSub2.subscribe('ICE2_' + name);
+		redisServer.redisSubServer.subscribe('ICE2_' + name);
 		var batchExecutionData = req.body.moduleInfo;
 		var userInfo = req.body.userInfo;
 		var testsuitedetailslist = [];
@@ -712,18 +712,18 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 			var statusPass = 0;
 			var suiteStatus;
 			logger.debug("ICE Socket requesting Address: %s" , name);
-			redisServer.redisPub1.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
+			redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
 				if (redisres[1]>0) {
 					logger.info("Sending socket request for executeTestSuite to redis");
 					dataToIce = {"emitAction" : "executeTestSuite","username" : name, "executionRequest": executionRequest};
-					redisServer.redisPub1.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
+					redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
 					var updateSessionExpiry = utils.resetSession(req.session);
 					function executeTestSuite_listener(channel,message) {
 						data = JSON.parse(message);
 						if(name == data.username){
 							if (data.onAction == "unavailableLocalServer") {
 								clearInterval(updateSessionExpiry);
-								redisServer.redisSub2.removeListener("message",executeTestSuite_listener);
+								redisServer.redisSubServer.removeListener("message",executeTestSuite_listener);
 								logger.error("Error occured in ExecuteTestSuite_ICE: Socket Disconnected");
 								if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
 									var soc = myserver.socketMapNotify[name];
@@ -807,7 +807,7 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 								}
 								if (resultData == "success" || resultData == "Terminate") {
 									clearInterval(updateSessionExpiry);
-									redisServer.redisSub2.removeListener("message",executeTestSuite_listener);
+									redisServer.redisSubServer.removeListener("message",executeTestSuite_listener);
 									try {
 										logger.info("Sending execution status from function executionFunction");
 										res.send(resultData);
@@ -818,7 +818,7 @@ exports.ExecuteTestSuite_ICE = function (req, res) {
 							}
 						}
 					}
-					redisServer.redisSub2.on("message",executeTestSuite_listener);
+					redisServer.redisSubServer.on("message",executeTestSuite_listener);
 				} else {
 					utils.getChannelNum('ICE1_scheduling_' + name, function(found){
 						var flag="";
@@ -1165,23 +1165,23 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 								function executionFunction(executionRequest, username) {
 									// var name = req.session.username;
 									var name = username;
-									redisServer.redisSub2.subscribe('ICE2_' + name);
+									redisServer.redisSubServer.subscribe('ICE2_' + name);
 									var scenarioCount = executionRequest.suitedetails[0].scenarioIds.length;
 									var completedSceCount = 0;
 									var statusPass = 0;
 									var suiteStatus;
-									redisServer.redisPub1.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
+									redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
 										if (redisres[1]>0) {
 											logger.info("Sending socket request for executeTestSuite to redis");
 											dataToIce = {"emitAction" : "executeTestSuite","username" : name, "executionRequest": executionRequest};
-											redisServer.redisPub1.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
+											redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
 											// var updateSessionExpiry = utils.resetSession(req.session);
 											function executeTestSuite_listener(channel,message) {
 												data = JSON.parse(message);
 												if(name == data.username){
 													if (data.onAction == "unavailableLocalServer") {
 														// clearInterval(updateSessionExpiry);
-														redisServer.redisSub2.removeListener("message",executeTestSuite_listener);
+														redisServer.redisSubServer.removeListener("message",executeTestSuite_listener);
 														logger.error("Error occured in ExecuteTestSuite_ICE_SVN: Socket Disconnected");
 														if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
 															var soc = myserver.socketMapNotify[name];
@@ -1260,7 +1260,7 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 														}
 														if (resultData == "success" || resultData == "Terminate") {
 															// clearInterval(updateSessionExpiry);
-															redisServer.redisSub2.removeListener("message",executeTestSuite_listener);
+															redisServer.redisSubServer.removeListener("message",executeTestSuite_listener);
 															try {
 																result_to_send.execution_status.push(final_data[username]);
 																cb();
@@ -1273,7 +1273,7 @@ exports.ExecuteTestSuite_ICE_SVN = function (req, res) {
 													}
 												}
 											}
-											redisServer.redisSub2.on("message",executeTestSuite_listener);
+											redisServer.redisSubServer.on("message",executeTestSuite_listener);
 										} else {
 											utils.getChannelNum('ICE1_scheduling_' + name, function(found){
 												var flag="";
@@ -1321,7 +1321,7 @@ exports.ExecuteTestSuite_ICE_CI = function (req, res) {
 	}
 	if (sessionToken != undefined && req.body.session_id == sessionToken) {
 		var name = req.session.username;
-		redisServer.redisSub2.subscribe('ICE2_' + name);
+		redisServer.redisSubServer.subscribe('ICE2_' + name);
 		var batchExecutionData = req.body.moduleInfo;
 		var userInfo = req.body.userInfo;
 		var testsuitedetailslist = [];
@@ -1436,18 +1436,18 @@ exports.ExecuteTestSuite_ICE_CI = function (req, res) {
 			var statusPass = 0;
 			var suiteStatus;
 			logger.info("ICE Socket requesting Address: %s" , name);
-			redisServer.redisPub1.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
+			redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
 				if (redisres[1]>0) {
 					logger.info("Sending socket request for executeTestSuite to redis");
 					dataToIce = {"emitAction" : "executeTestSuite","username" : name, "executionRequest": executionRequest};
-					redisServer.redisPub1.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
+					redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
 					var updateSessionExpiry = utils.resetSession(req.session);
 					function executeTestSuite_listener(channel,message) {
 						data = JSON.parse(message);
 						if(name == data.username){
 							if (data.onAction == "unavailableLocalServer") {
 								clearInterval(updateSessionExpiry);
-								redisServer.redisSub2.removeListener("message",executeTestSuite_listener);
+								redisServer.redisSubServer.removeListener("message",executeTestSuite_listener);
 								logger.error("Error occured in ExecuteTestSuite_ICE_CI: Socket Disconnected");
 								if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
 									var soc = myserver.socketMapNotify[name];
@@ -1527,7 +1527,7 @@ exports.ExecuteTestSuite_ICE_CI = function (req, res) {
 								}
 								if (resultData == "success" || resultData == "Terminate") {
 									clearInterval(updateSessionExpiry);
-									redisServer.redisSub2.removeListener("message",executeTestSuite_listener);
+									redisServer.redisSubServer.removeListener("message",executeTestSuite_listener);
 									try {
 										logger.info("Sending execution status from function executionFunction in ExecuteTestSuite_ICE_CI");
 										res.send(resultData);
@@ -1539,7 +1539,7 @@ exports.ExecuteTestSuite_ICE_CI = function (req, res) {
 							}
 						}
 					}
-					redisServer.redisSub2.on("message",executeTestSuite_listener);
+					redisServer.redisSubServer.on("message",executeTestSuite_listener);
 				} else {
 					utils.getChannelNum('ICE1_scheduling_' + name, function(found){
 						var flag="";
@@ -2607,18 +2607,18 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 						function scheduleFunction(executionRequest) {
 							logger.info("Inside scheduleFunction function of executeScheduling");
 							var name = ipAdd;
-							redisServer.redisSub2.subscribe('ICE2_' + name);	
+							redisServer.redisSubServer.subscribe('ICE2_' + name);	
 							//var scenarioCount_s = executionRequest.suitedetails[0].scenarioIds.length;
 							var completedSceCount_s = 0;
 							var testsuitecount_s = 0;
 							var statusPass_s = 0;
 							var suiteStatus_s;
 							logger.debug("ICE Socket requesting Address: %s" , name);
-							redisServer.redisPub1.pubsub('numsub','ICE1_scheduling_' + name,function(err,redisres){
+							redisServer.redisPubICE.pubsub('numsub','ICE1_scheduling_' + name,function(err,redisres){
 								if (redisres[1]>0) {
 									logger.info("Sending socket request for executeTestSuite:scheduling to redis");
 									dataToIce = {"emitAction" : "executeTestSuite","username" : name, "executionRequest": executionRequest};
-									redisServer.redisPub1.publish('ICE1_scheduling_' + name,JSON.stringify(dataToIce));
+									redisServer.redisPubICE.publish('ICE1_scheduling_' + name,JSON.stringify(dataToIce));
 									var starttime = new Date().getTime();
 									var updateSessionExpiry = utils.resetSession(req.session);
 									function executeTestSuite_listener(channel,message) {
@@ -2713,7 +2713,7 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 												else if (resultData) {
 													if (typeof(resultData) == "string") {
 														clearInterval(updateSessionExpiry);
-														redisServer.redisSub2.removeListener("message",executeTestSuite_listener);
+														redisServer.redisSubServer.removeListener("message",executeTestSuite_listener);
 														scheduleStatus = resultData == "success" ? "Completed" : resultData;
 													} 
 													// else if (typeof(resultData) == "object") {
@@ -2736,7 +2736,7 @@ function scheduleTestSuite(modInfo, req, schedcallback) {
 											}
 										}
 									}
-									redisServer.redisSub2.on("message",executeTestSuite_listener);
+									redisServer.redisSubServer.on("message",executeTestSuite_listener);
 								} else {
 									logger.error("Error occured in the function scheduleFunction: Socket not Available");
 									// deleteFlag = true;
