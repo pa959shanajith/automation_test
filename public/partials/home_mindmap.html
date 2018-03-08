@@ -8,7 +8,7 @@
                <div class="clear-both"></div>
                <div id="left-top-section" class="mindmap-left-section" style="top: 150px !important;">
                   <ul>
-                     <li><a id='reqImg1' ng-click="tab = 'tabRequirement'; createMapsCall()" href="#" title="Requirement"><span><img id='reqImg' class="highlightImg selectedIcon" src="images_mindmap/requirement.png" alt="Requirement"></span>Requirement</a></li>
+                     <li><a id='reqImg1' ng-click="tab = 'tabRequirement'; createMapsCall()" class = 'no-disp' href="#" title="Requirement"><span><img id='reqImg' class="highlightImg selectedIcon" src="images_mindmap/requirement.png" alt="Requirement"></span>Requirement</a></li>
                      <li>
                         <a id='createImg1' ng-click="tab = 'mindmapCreateOption'; createMapsCall()" href="#" title="Create"><span ><img id='createImg' class="highlightImg highlightImg1" src="images_mindmap/create.png" alt="Create"></span>Create</a>
                         <!--<span  class="ct-expand ct-show-left">
@@ -81,7 +81,7 @@
       <div id="ct-projectList">
          <div class="ct-project"></div>
       </div>
-      <div ng-if="tab == 'tabRequirement'" id="page-taskName" class="showContainer" style="width:0px !important"><span class="taskname">Requirement</span></div>
+      <!--<div ng-if="tab == 'tabRequirement'" id="page-taskName" class="showContainer" style="width:0px !important"><span class="taskname">Requirement</span></div>-->
       <div ng-if="tab == 'tabRequirement'" class='clear-both'></div>
       <div ng-if="tab == 'tabRequirement'" class="content-div"></div>
       <div ng-if="tab == 'tabRequirement'" class="content-div"></div>
@@ -238,8 +238,8 @@
       <!--Images Blocks-->
       <div ng-if="tab == 'tabCreate' || tab == 'tabAssign' || tab=='mindmapEndtoEndModules'" class="thumbnail thumbnail-custom">
       <!--<div class="thumbnail thumbnail-custom">-->
-         <a class="slidePopup" ng-click ="toggleview()" id="switch-layout" class="vertical-layout" title="SwitchLayout">
-            <img class="thumb-ic" src="imgs/ic-preferences.png" alt="SwitchLayout">
+         <a class="slidePopup" ng-click ="toggleview()" id="switch-layout" class="vertical-layout" title="SwitchLayout" >
+            <img class="thumb-ic" src="imgs/switch.png" alt="SwitchLayout" style="height: 70px;">
             <div class="caption">
                <p>Switch Layout</p>
             </div>
@@ -249,7 +249,7 @@
       <div ng-if="tab == 'tabCreate' || tab == 'tabAssign' || tab=='mindmapEndtoEndModules'" class="thumbnail thumbnail-custom">
       <!--<div class="thumbnail thumbnail-custom">-->
          <a class="slidePopup" ng-click ="fullScreen()" id="fullscr" title="full screen">
-            <img class="thumb-ic" src="imgs/ic-preferences.png" alt="full screen">
+            <img class="thumb-ic" src="imgs/fscr.png" alt="full screen" style="height: 70px;">
             <div class="caption">
                <p>Full Screen</p>
             </div>
@@ -357,7 +357,7 @@
             <!--Modal Content-->
         </div>
         <div class="modal-footer">
-            <div id="complexity-val" class="" style="display: inline-block;float: left;">Complexity: Unset</div>
+            <div id="complexity-val" class="" style="display: inline-block;float: left;">Complexity: Unassigned</div>
             <button ng-click="submitComplexity()" type="button" id="submitComplexity" class="btn btn-default">Ok</button>
         </div>
         </div>
