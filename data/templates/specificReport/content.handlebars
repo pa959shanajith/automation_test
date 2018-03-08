@@ -351,7 +351,7 @@
                                     $("#showStatus").text("Invalid Session. Login again");
                                 }
                                 else{
-                                    getRows[parseInt($("#inputSlno").val())-1].children[6].innerText = data;
+                                    getRows[parseInt($("#inputSlno").val())-1].children[7].innerText = data;
                                     $(".createIssueWindow").hide();
                                     $(".statusWindow").show();
                                     $("#showStatus").text("Issue bearing ID " + data + " created successfully.");
