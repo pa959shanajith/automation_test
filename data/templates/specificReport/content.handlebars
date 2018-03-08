@@ -30,7 +30,7 @@
                     	getRows[i].children[3].classList.remove("openscreenshot");
                     }
                     if(name.indexOf("Testscriptname") >= 0 || name.indexOf("TestCase Name") >= 0){
-                        getRows[i].children[6].children[0].remove();
+                        getRows[i].children[7].children[0].remove();
                     }
                     for(j=i; j<getRows.length; j++){
                         if(parseInt(getRows[j].getAttribute('data-parentid')).length == NaN)    getParentId = parseInt(getRows[j].getAttribute('data-parentid').split(",")[1]);
