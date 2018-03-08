@@ -6,7 +6,7 @@ module.exports.allSess = function (cb){
 };
 
 module.exports.getChannelNum = function(channel,cb) {
-	redisServer.redisPub1.pubsub('numsub', channel,function(err,redisres){
+	redisServer.redisPubICE.pubsub('numsub', channel,function(err,redisres){
 		if (redisres[1]>0) cb(true);
 		else cb(false);
 	});
@@ -14,7 +14,7 @@ module.exports.getChannelNum = function(channel,cb) {
 
 module.exports.socketList = function(cb) {
 	var connectusers=[];
-	redisServer.redisPub1.pubsub('channels','ICE1_normal_*',function(err,redisres){
+	redisServer.redisPubICE.pubsub('channels','ICE1_normal_*',function(err,redisres){
 		redisres.forEach(function(e){
 			connectusers.push(e.split('_')[2]);
 		});
@@ -24,7 +24,7 @@ module.exports.socketList = function(cb) {
 
 module.exports.scheduleSocketList = function(cb) {
 	var connectusers=[];
-	redisServer.redisPub1.pubsub('channels','ICE1_scheduling_*',function(err,redisres){
+	redisServer.redisPubICE.pubsub('channels','ICE1_scheduling_*',function(err,redisres){
 		redisres.forEach(function(e){
 			connectusers.push(e.split('_')[2]);
 		});
