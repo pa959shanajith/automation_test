@@ -99,8 +99,6 @@ mySPA.controller('reportsController', ['$scope','$rootScope', '$http', '$locatio
 					else{
 						$(".rpProjects").prop('selectedIndex', 1);
 						proId = data.projectids[0];
-						console.log("data",data.projectids[0]);
-						console.log("proId",proId);
 					}
 					getProjectsAndSuites(proId, "reports");					
 				}
@@ -333,7 +331,6 @@ mySPA.controller('reportsController', ['$scope','$rootScope', '$http', '$locatio
 		$('.formatpdfbrwsrexport').remove();
 		reportService.reportStatusScenarios_ICE(executionId, testsuiteid)
 		.then(function(data) {
-			console.log("data",data);
 			if(data == "Invalid Session"){
 				$rootScope.redirectPage();
 			}
