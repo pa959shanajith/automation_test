@@ -5,10 +5,11 @@
   "start": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node --max_old_space_size=4096 --optimize_for_size server.js"
+    "start": "node --max_old_space_size=4096 --optimize_for_size server.js",
+    "service" : "node server_winservice.js"
   },
   "author": "Dimension Labs",
-  "license": "ISC",
+  "license": "Copyright (c) SLK Software Services Pvt. Ltd.",
   "dependencies": {
     "activedirectory": "^0.7.2",
     "async": "^2.6.0",
@@ -40,6 +41,7 @@
     "validator": "^9.2.0",
     "winston": "^2.4.0",
     "winston-daily-rotate-file": "^1.7.2",
-    "xml-parser": "^1.2.1"
+    "xml-parser": "^1.2.1",
+    "node-windows": "^0.1.14"
   }
 }
