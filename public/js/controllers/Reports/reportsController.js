@@ -496,7 +496,6 @@ mySPA.controller('reportsController', ['$scope','$rootScope', '$http', '$locatio
 
 			if(data != "fail"){
 				if(data.length > 0){
-					
 					finalReports.overallstatus[0].domainName = data[0].domainname
 					finalReports.overallstatus[0].projectName = data[0].projectname
 					finalReports.overallstatus[0].releaseName =	data[0].releasename
@@ -561,22 +560,11 @@ mySPA.controller('reportsController', ['$scope','$rootScope', '$http', '$locatio
 							else{
 								finalReports.rows[k].testcase_details = finalReports.rows[k].testcase_details;
 							}
-							
-							console.log("ttttttttttt",finalReports.rows[k])
 						}
 					}
 					finalReports.overallstatus[0].pass = (parseFloat((pass/total)*100).toFixed(2)) > 0? parseFloat((pass/total)*100).toFixed(2) : parseInt(0);
 					finalReports.overallstatus[0].fail = (parseFloat((fail/total)*100).toFixed(2)) > 0? parseFloat((fail/total)*100).toFixed(2) : parseInt(0);
 					finalReports.overallstatus[0].terminate = (parseFloat((terminated/total)*100).toFixed(2)) > 0? parseFloat((terminated/total)*100).toFixed(2) : parseInt(0);
-					// if(obj2.rows[k].testcase_details != "")
-					// {
-					// 	obj2.rows[k].testcase_details = JSON.parse(obj2.rows[k].testcase_details);
-					// }
-					// else{
-					// 	obj2.rows[k].testcase_details = "";
-					// }
-				
-					
 				}
 				if(reportType=="html"){
 					//Service call to get Html reports
