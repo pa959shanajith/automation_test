@@ -2194,6 +2194,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
    
 
     function actionEvent(e) {
+        var selectedNodeTitle = $('.nodeBoxSelected').attr('title');
         if($(this).hasClass('disableButton') || $(this).hasClass('no-access')) return;
         var selectedTab = window.localStorage['tabMindMap'];
         var s = d3.select(this);
@@ -2355,6 +2356,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                             node.append('img').attr('class', 'ct-nodeIcon').attr('src', img_src).attr('alt', 'Module').attr('aria-hidden', true);
                             node.append('span').attr('class', 'ct-nodeLabel').html(t);
                         });
+                        $('div[title='+selectedNodeTitle+']').addClass('nodeBoxSelected');
                         if (selectedTab == 'tabCreate')
                             populateDynamicInputList();
                         setModuleBoxHeight();
@@ -2426,8 +2428,6 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             progressFlag = false;
             console.log("Error: checkReuse service")
         })
-
-
     };
 
     function toggleExpand(e, tab) {
@@ -3714,6 +3714,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
     function actionEvent_W(e) {
         if($(this).hasClass('disableButton') || $(this).hasClass('no-access')) return;
+        var selectedNodeTitle = $('.nodeBoxSelected').attr('title');
         var s = d3.select(this);
         var error = !1,
             mapData = [],
@@ -3858,6 +3859,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                             node.append('img').attr('class', 'ct-nodeIcon ' + class_name).attr('src', src_image).attr('alt', 'Module').attr('aria-hidden', true);
                             node.append('span').attr('class', 'ct-nodeLabel modulename').html(t);
                         });
+                        $('span[title='+selectedNodeTitle+']').addClass('nodeBoxSelected');
                         initScroller();
                         setModuleBoxHeight_W();
                     }, function(error) {

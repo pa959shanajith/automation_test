@@ -55,7 +55,7 @@
                             <option value="project2">Project2</option>
                         </select>
                         <input type="text" class="makeElementFloatleft" id="eteSearchModules"  ng-keyup = "searchModule('eteSearchModules')" placeholder="Search modules" /><img alt="Search Icon" class="searchModuleimg" src="imgs/ic-search-icon.png" >
-                        <span class="eteLabel makeElementFloatleft">End to End Modules</span>
+                        <span class="eteLabel makeElementFloatleft no-disp">End to End Modules</span>
                     </div>
                     <div class="scrollbar-inner endtoend-modules-left-lower makeElementFloatleft" style="overflow-y:hidden !important" id="etemModuleContainer"></div>
                 </div>
@@ -239,7 +239,7 @@
       <div ng-if="tab == 'tabCreate' || tab == 'tabAssign' || tab=='mindmapEndtoEndModules'" class="thumbnail thumbnail-custom">
       <!--<div class="thumbnail thumbnail-custom">-->
          <a class="slidePopup" ng-click ="toggleview()" id="switch-layout" class="vertical-layout" title="SwitchLayout" >
-            <img class="thumb-ic" src="imgs/switch.png" alt="SwitchLayout" style="height: 70px;">
+            <img class="thumb-ic" src="imgs/switch.png" alt="SwitchLayout" style="height: 55px;">
             <div class="caption">
                <p>Switch Layout</p>
             </div>
@@ -249,7 +249,7 @@
       <div ng-if="tab == 'tabCreate' || tab == 'tabAssign' || tab=='mindmapEndtoEndModules'" class="thumbnail thumbnail-custom">
       <!--<div class="thumbnail thumbnail-custom">-->
          <a class="slidePopup" ng-click ="fullScreen()" id="fullscr" title="full screen">
-            <img class="thumb-ic" src="imgs/fscr.png" alt="full screen" style="height: 70px;">
+            <img class="thumb-ic" src="imgs/fscr.png" alt="full screen" style="height: 55px;">
             <div class="caption">
                <p>Full Screen</p>
             </div>
