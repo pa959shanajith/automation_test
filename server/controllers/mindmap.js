@@ -196,6 +196,7 @@ exports.checkReuse=function(req,res){
 							qData['screen'][i].reuse = true;
 						else
 							qData['screen'][i].reuse = false;						
+						qData['screen'][i].count = result[i].data[0].row[0];
 						i = i+1;
 					}
 					var j = 0;

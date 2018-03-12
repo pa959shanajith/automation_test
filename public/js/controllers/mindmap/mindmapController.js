@@ -2075,7 +2075,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             $('#renamingConfirmationPopup').attr('node',pi);  
             mindmapServices.checkReuse(dataReuse).then(function(result) {
                 result['screen'].forEach(function(e, i) { 
-                    if(e.reuse){
+                    if(e.count>0){
                         $('#renamingConfirmationPopup').modal("show");
                     }
                 })
