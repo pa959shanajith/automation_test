@@ -4699,7 +4699,7 @@ function getSelectionStart(o) {
     }
 
     $scope.fullScreen = function() {
-        var elt = document.getElementById('viewArea');
+        var elt = document.querySelector("body");
         console.log("Requesting fullscreen for", elt);
         if ((window.fullScreen) || (window.innerWidth == screen.width && (screen.height - window.innerHeight) <= 1)) {
             if (document.cancelFullScreen) {
