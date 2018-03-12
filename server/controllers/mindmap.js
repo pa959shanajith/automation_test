@@ -631,12 +631,20 @@ exports.saveData=function(req,res){
 								}
 							}
 							else qList.push({"statement":"MERGE(n:TASKS{taskID:'"+t.id+"',task:'"+t.task+"',assignedTo:'"+t.assignedTo+"',reviewer:'"+t.reviewer+"',status:'"+taskstatus+"',startDate:'"+t.startDate+"',endDate:'"+t.endDate+"',re_estimation:'"+t.re_estimation+"',release:'"+relId+"',cycle:'"+cycId+"',details:'"+t.details+"',parent:'["+t.parent+"]',cx:'"+t.cx+"'})"});
-							qList.push({"statement":"MATCH (a:TESTSCENARIOS{projectID:'"+temp_prjID+"',testScenarioName:'"+e.name+"'}),(b:TASKS{taskID:'"+t.id+"'}) MERGE (a)-[r:FNTT {id:a.testScenarioID}]-(b)"});
+							qList.push({"statement":"MATCH (a:TESTSCENARIOS{projectID:'"+temp_prjID+"',testScenarioName:'"+e.name+"',testScenarioID:'"+e.id+"'}),(b:TASKS{taskID:'"+t.id+"'}) MERGE (a)-[r:FNTT {id:a.testScenarioID}]-(b)"});
 						}
 						//else if(e.id_n==null){ // In case added first time to end to end then connect to all task if exist
-							qList.push({"statement":"MATCH (c:TESTSCENARIOS{projectID:'"+temp_prjID+"',testScenarioName:'"+e.name+"'}) ,(a:TASKS) where not c.testScenarioID_c='null' and a.parent=~('.*'+c.testScenarioID_c+']') MERGE (c)-[rel:FNTT {id:c.testScenarioID}]-(a)"});							
+													
 						//}						
 						//qList.push({"statement":"MATCH(n:TESTSCENARIOS{testScenarioID:'"+e.id+"'}) SET n.testScenarioName='"+e.name+"'"+",n.projectID='"+prjId+"'"});
+
+						if(tab!='end_to_end'){
+							qList.push({"statement":"MATCH (m:MODULES)-[mt]-(c:TESTSCENARIOS{projectID:'"+temp_prjID+"',testScenarioName:'"+e.name+"',testScenarioID:'"+e.id+"'}) ,(a:TASKS) where not c.testScenarioID_c='null' and a.parent=~('.*'+m.moduleID_c+','+c.testScenarioID_c+']') MERGE (c)-[rel:FNTT {id:c.testScenarioID}]-(a)"});	
+						}
+						else{
+							qList.push({"statement":"MATCH (m:MODULES_ENDTOEND)-[mt]-(c:TESTSCENARIOS{projectID:'"+temp_prjID+"',testScenarioName:'"+e.name+"',testScenarioID:'"+e.id+"'}) ,(a:TASKS) where not c.testScenarioID_c='null' and a.parent=~('.*'+m.moduleID_c+','+c.testScenarioID_c+']') MERGE (c)-[rel:FNTT {id:c.testScenarioID}]-(a)"});
+						}
+
 					}
 					else if(e.type=='screens'){
 						uidx++;lts=idDict[e.pid];
