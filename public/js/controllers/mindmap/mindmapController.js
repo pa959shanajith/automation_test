@@ -142,6 +142,10 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                             //releaseResult = result;
                             
                             $('.release-list').empty();
+                            $('.release-list').append("<option data-id='Select' value='Select' disabled selected>Select</option>");
+                            $('.cycle-list').empty();
+                            $('.cycle-list').append("<option data-id='Select' value='Select' disabled selected>Select</option>");
+
                             for (i = 0; i < result.r_ids.length && result.rel.length; i++) {
                                 $('.release-list').append("<option data-id='" + result.rel[i] + "' value='" + result.r_ids[i] + "'>" + result.rel[i] + "</option>");
                             }
@@ -150,33 +154,35 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                                 loadMindmapData1(param);
                             });
                             $('.release-list').change(function() {
+                                unloadMindmapData();
                                 mindmapServices.populateCycles($('.release-list').val()).then(function(result_cycles) {
                                     var result2 = result_cycles;
                                     $('.cycle-list').empty();
+                                    $('.cycle-list').append("<option data-id='Select' value='Select' disabled selected>Select</option>");
                                     for (i = 0; i < result2.c_ids.length && result2.cyc.length; i++) {
                                         $('.cycle-list').append("<option data-id='" + result2.cyc[i] + "' value='" + result2.c_ids[i] + "'>" + result2.cyc[i] + "</option>");
                                     }
-                                    loadMindmapData1(param);
+                                    //loadMindmapData1(param);
                                 }, function(error) {
                                     console.log("Error in populating Cycles");
                                 })                                
                             });
-                            mindmapServices.populateCycles(default_releaseid).then(function(result_cycles) {
-                                var result2 = result_cycles;
-                                $('.cycle-list').empty();
-                                for (i = 0; i < result2.c_ids.length && result2.cyc.length; i++) {
-                                    $('.cycle-list').append("<option data-id='" + result2.cyc[i] + "' value='" + result2.c_ids[i] + "'>" + result2.cyc[i] + "</option>");
-                                }
-                                loadMindmapData1(param);
-                                //var selectedCyc=result2.c_ids[0];
-                                var selectedCyc = 'select cycle';
-                                // if (tObj.cy != "") {
-                                //     selectedCyc = tObj.cy;
-                                // }
+                            // mindmapServices.populateCycles(default_releaseid).then(function(result_cycles) {
+                            //     var result2 = result_cycles;
+                            //     $('.cycle-list').empty();
+                            //     for (i = 0; i < result2.c_ids.length && result2.cyc.length; i++) {
+                            //         $('.cycle-list').append("<option data-id='" + result2.cyc[i] + "' value='" + result2.c_ids[i] + "'>" + result2.cyc[i] + "</option>");
+                            //     }
+                            //     loadMindmapData1(param);
+                            //     //var selectedCyc=result2.c_ids[0];
+                            //     var selectedCyc = 'select cycle';
+                            //     // if (tObj.cy != "") {
+                            //     //     selectedCyc = tObj.cy;
+                            //     // }
 
-                            }, function(error) {
-                                console.log("Error in populating Cycles");
-                            })
+                            // }, function(error) {
+                            //     console.log("Error in populating Cycles");
+                            // })
                             //display assign box after populating data
                         }, function(error) {
                             console.log("Error in populating Releases");
@@ -229,44 +235,50 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                         $('#searchModule-assign').val('');
                         selectedProject = $(".project-list").val();
 
-///////////////////////////////////////////////////////
                     if($scope.tab=='tabAssign'){
+                        unloadMindmapData();
                         mindmapServices.populateReleases(selectedProject).then(function(result) {
                             //releaseResult = result;
                             default_releaseid = '';
                             $('.release-list').empty();
+                            $('.release-list').append("<option data-id='Select' value='Select' disabled selected>Select</option>");
+                            $('.cycle-list').empty();
+                            $('.cycle-list').append("<option data-id='Select' value='Select' disabled selected>Select</option>");
+
                             for (i = 0; i < result.r_ids.length && result.rel.length; i++) {
                                 $('.release-list').append("<option data-id='" + result.rel[i] + "' value='" + result.r_ids[i] + "'>" + result.rel[i] + "</option>");
                             }
                             default_releaseid = $('.release-list').val();
                             $('.release-list').change(function() {
+                                unloadMindmapData();
                                 mindmapServices.populateCycles($('.release-list').val()).then(function(result_cycles) {
                                     var result2 = result_cycles;
                                     $('.cycle-list').empty();
+                                    $('.cycle-list').append("<option data-id='Select' value='Select' disabled selected>Select</option>");
                                     for (i = 0; i < result2.c_ids.length && result2.cyc.length; i++) {
                                         $('.cycle-list').append("<option data-id='" + result2.cyc[i] + "' value='" + result2.c_ids[i] + "'>" + result2.cyc[i] + "</option>");
                                     }
-                                    loadMindmapData1(param);
+                                    //loadMindmapData1(param);
                                 }, function(error) {
                                     console.log("Error in populating Cycles");
                                 })                                
                             });
-                            mindmapServices.populateCycles(default_releaseid).then(function(result_cycles) {
-                                var result2 = result_cycles;
-                                $('.cycle-list').empty();
-                                for (i = 0; i < result2.c_ids.length && result2.cyc.length; i++) {
-                                    $('.cycle-list').append("<option data-id='" + result2.cyc[i] + "' value='" + result2.c_ids[i] + "'>" + result2.cyc[i] + "</option>");
-                                }
-                                loadMindmapData1(param);
+                            // mindmapServices.populateCycles(default_releaseid).then(function(result_cycles) {
+                            //     var result2 = result_cycles;
+                            //     $('.cycle-list').empty();
+                            //     for (i = 0; i < result2.c_ids.length && result2.cyc.length; i++) {
+                            //         $('.cycle-list').append("<option data-id='" + result2.cyc[i] + "' value='" + result2.c_ids[i] + "'>" + result2.cyc[i] + "</option>");
+                            //     }
+                            //     loadMindmapData1(param);
                                 
-                                //var selectedCyc=result2.c_ids[0];
-                                //var selectedCyc = 'select cycle';
-                                // if (tObj.cy != "") {
-                                //     selectedCyc = tObj.cy;
-                                // }
-                            }, function(error) {
-                                console.log("Error in populating Cycles");
-                            })
+                            //     //var selectedCyc=result2.c_ids[0];
+                            //     //var selectedCyc = 'select cycle';
+                            //     // if (tObj.cy != "") {
+                            //     //     selectedCyc = tObj.cy;
+                            //     // }
+                            // }, function(error) {
+                            //     console.log("Error in populating Cycles");
+                            // })
                             //display assign box after populating data
                         }, function(error) {
                             console.log("Error in populating Releases");
@@ -402,6 +414,14 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 unblockUI();
             })
     }
+
+    function unloadMindmapData(){
+        $('#ct-mindMap').hide();
+        $('#ct-actionBox').remove();
+        var nodeBox = d3.select('.ct-nodeBox');
+        $(nodeBox[0]).empty();
+    }
+
     window.onresize = function() {
         var w = window.innerWidth - 28,
             h = window.innerHeight - 123;
@@ -415,6 +435,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         if (d3.select('#ct-mindMap')[0][0] != null) return;
         if (selectedTab == "tabAssign") var canvas = d3.select('#ct-canvasforAssign');
         else var canvas = d3.select('#ct-canvas');
+        canvas.empty();
         u = canvas.append('div').attr('id', 'ct-inpBox').classed('no-disp', !0);
         u.append('input').attr('id', 'ct-inpPredict').attr('class', 'ct-inp');
         u.append('input').attr('id', 'ct-inpAct').attr('maxlength', '40').attr('class', 'ct-inp').on('change', inpChange).on('keyup', inpKeyUp);
