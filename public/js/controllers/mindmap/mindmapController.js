@@ -910,7 +910,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     dNodes[pi].task = updateTaskObject(tObj,{id:8,parent:validate[1],ctask:cTask});
                 }
                 else if(qid==5 && taskUndef){
-                    dNodes[pi].task = updateTaskObject(tObj,{id:5,parent:(tObj.parent != null) ? tObj.parent : validate[1]});
+                    dNodes[pi].task = updateTaskObject(tObj,{id:5,parent:validate[1]});
                 }
                 else if(qid==6 && taskUndef){
                     dNodes[pi].task = updateTaskObject(tObj,{id:6,parent:validate[1]});                    
@@ -925,7 +925,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     dNodes[pi].task = updateTaskObject(tObj,{id:2,parent:validate[1]});
                 }
                 else if(qid==1 && taskUndef){
-                    dNodes[pi].task = updateTaskObject(tObj,{id:1,parent:(tObj.parent != null) ? tObj.parent : validate[1]});                    
+                    dNodes[pi].task = updateTaskObject(tObj,{id:1,parent:validate[1]});                    
                 }
                 else if(qid==0){
                     dNodes[pi].task = updateTaskObject(tObj,{id:0,parent:(tObj.parent != null) ? tObj.parent : validate[1]});
@@ -948,6 +948,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                             
                             dNodes[e].task = tempTask;
                             dNodes[e].task.copied = true;
+                            dNodes[e].task.copiedidx = pi;
                             d3.select('#ct-node-' + e).append('image').attr('class', 'ct-nodeTask').attr('xlink:href', 'images_mindmap/node-task-assigned.png').attr('style','opacity:0.6').attr('x', 29).attr('y', -10);                    
                         });
                     }
