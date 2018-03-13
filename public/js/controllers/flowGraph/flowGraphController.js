@@ -235,7 +235,7 @@ mySPA.controller('flowGraphController', ['$scope', '$http', '$location', '$timeo
 						"methods": [],
 						"attributes": [],
 						"id": size + 1,
-						"complexity":"undefined"
+						"Complexity":"undefined"
 					});
 					class_map[obj[i].extends] = size + 1;
 					var link = {
@@ -264,7 +264,7 @@ mySPA.controller('flowGraphController', ['$scope', '$http', '$location', '$timeo
 								"methods": [],
 								"attributes": [],
 								"id": size + 1,
-								"complexity":"undefined"
+								"Complexity":"undefined"
 							});
 							class_map[implement_list[j]] = size + 1;
 							var link = {
@@ -289,7 +289,8 @@ mySPA.controller('flowGraphController', ['$scope', '$http', '$location', '$timeo
 							"classname": obj[i].implements,
 							"methods": [],
 							"attributes": [],
-							"id": size + 1
+							"id": size + 1,
+							"Complexity":"undefined"
 						});
 						class_map[obj[i].implements] = size + 1;
 						var link = {
@@ -479,12 +480,22 @@ var classNameTexts = classNameG.append('text')
 	});
 
 	image.on('click', function(d){
-		$('#apg-cd-canvas').hide();
-		$('#complexity-canvas').show();
-		$scope.ccname=d.classname;
-		$scope.cmethod=d.methods.length;
-		$scope.cc =d.Complexity;
-		$scope.$apply();
+		if(d.Complexity=="undefined"){
+			openDialog('APG', "Complexity can't determine.")
+		}
+		else{
+				$('#apg-cd-canvas').hide();
+				$('#complexity-canvas').show();
+				$scope.ccname=d.classname;
+				$scope.cmethod=d.methods.length;
+				$scope.cc =d.Complexity.class;
+				var methods_data=d.Complexity.methods;
+				var method_names=Object.keys(methods_data);
+				for(var i=0;i<method_names.length;i++){
+					$("#tblMethodLevel tbody").append("<tr><td><div>"+method_names[i]+"</div></td><td><div>"+methods_data[method_names[i]]+"</div></td><td><div></div></td></tr>");
+				}
+				$scope.$apply();
+			}
 		//$scope.hmc=20;
 	});
 	image.append('title').text('Show Complexity');

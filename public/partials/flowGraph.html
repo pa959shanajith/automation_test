@@ -72,9 +72,24 @@
 		<div class="overlay"></div>
 		<div  id="apg-cd-canvas"></div>
 		<div id="complexity-canvas">
+			<h4 class="heading-bold">Class Level Complexity Info: </h4>
 			<p>Class Name: {{ccname}} </p> 
+			<p>Class Complexity : {{cc}}</p>
 			<p>No. of Method :{{cmethod}}</p> 
-			<p>Class Cylomatic Complexity : {{cc}}</p>
+			<h4 class="heading-bold">Method Level Complexity Info: </h4>
+			<div class='divMethodContainer'>
+				<table id='tblMethodLevel'>
+					<thead>
+						<tr>
+						<th>Method Name</th>
+						<th>Method Complexity</th>
+						<th>Minimum No. of Testcases</th>
+						</tr>
+					</thead>
+					<tbody>
+						</tbody>
+				</table>
+			</div>
 		</div>
 		<div id="report-canvas"></div>
 	</div>

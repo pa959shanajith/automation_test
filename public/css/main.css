@@ -5389,3 +5389,66 @@ Webocular report css
 #complexity-canvas{
 display:none
 } 
+
+.divMethodContainer
+{
+    float:left;
+    width: 75%;
+    max-height: 500px;
+    overflow: auto;
+}
+#tblMethodLevel th
+{
+    font-family: 'LatoWebBold';
+    text-align: left;
+    border-right: 1px solid #fff;
+}
+#tblMethodLevel th,#tblMethodLevel td
+{
+    padding: 1px 0px;
+    text-align: center;
+    width: 25%;
+    white-space: nowrap;
+}
+#tblMethodLevel td div
+{
+    white-space: normal;
+    word-break: break-all;
+    display: block;
+    font-family: 'LatoWeb';
+    padding: 1%;
+}
+.heading-bold
+{
+    font-family: LatoWebBold;
+}
+
+#tblMethodLevel > thead {
+width: calc(100% - 308px);
+margin: -0.1em;
+z-index: 1;
+background: #5e626b;
+color: #fff;
+font-size: 17px;
+font-family: 'LatoWebLight';
+border-radius: 6px;
+-moz-border-radius: 6px;
+-webkit-border-radius: 6px;
+}
+#tblMethodLevel tbody tr:nth-child(odd), #tblMethodLevel tbody tr:nth-child(odd)
+{
+    background: #e8e6fe;
+}
+#tblMethodLevel tbody tr:nth-child(even)
+{
+    background: #fff;
+}
+#tblMethodLevel tbody tr
+{
+    width: 75%;
+    font-size: 14px;
+    line-height: 1.42857143;
+    padding-top: 5px !important;
+    padding-bottom: 5px !important;
+}
+
