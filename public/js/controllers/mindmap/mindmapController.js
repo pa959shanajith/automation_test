@@ -985,7 +985,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         }   
     };
 
-    function nodeClick(e) {
+    function nodeClick(e) {                
         if (IncompleteFlowFlag) {
             openDialogMindmap('Error', 'Incomplete Flow!');
             return;
@@ -1693,6 +1693,20 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
     //------Create Multiple Child Node-------//
     function createMultipleNode(){
+        switch(d3.select(activeNode).attr('data-nodetype')) {
+            case 'modules_endtoend':
+                $scope.addedntype = 'Scenario_';
+                break;
+            case 'modules':
+                $scope.addedntype = 'Scenario_';
+                break;
+            case 'scenarios':
+                $scope.addedntype = 'Screen_';
+                break;
+            case 'screens':
+                $scope.addedntype = 'Testcase_';
+                break;
+        }        
         $("#addObjContainer").empty();
         if (d3.select('.fa-hand-peace-o').classed('ct-ctrl-inactive')) return;
         $scope.errorMessage = "";
@@ -1711,7 +1725,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                                                 <form class="form-horizontal" role="form" onSubmit="return false;">
                                                         <div class="col-sm-2 addNode-label"><label>`+idxAddNode+`</label></div>
                                                         <div class="col-sm-6">
-                                                        <input type="text" class="form-control form-control-custom" placeholder="Enter node name" maxlength="40">
+                                                        <input type="text" class="form-control form-control-custom" placeholder="Enter node name" maxlength="40" value='`+$scope.addedntype+idxAddNode+`'>
                                                         </div>
                                                         <div class="col-sm-2 deleteAddObjRow"><img src="imgs/ic-delete.png" /></div>
                                                 </form>
