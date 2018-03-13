@@ -491,6 +491,7 @@ exports.saveData=function(req,res){
 			var sendNotify=inputs.sendNotify;
 			var relId=inputs.relId;
 			var cycId=inputs.cycId;
+			var idxDict=[];
 			//Assigned Tasks Notification
 			var assignedToValues = Object.keys(sendNotify).map(function(key){return sendNotify[key]});
 			for(var i=0;i<assignedToValues.length;i++) {
@@ -530,6 +531,10 @@ exports.saveData=function(req,res){
 					//Issue 1685 Release and cycle Id filters are given for task to delete the task only from that release and cycle attached to that node
 					qList.push({"statement":"MATCH (N) WHERE ID(N)="+t+" MATCH (N)-[r:FNTT]-(b:TASKS{release:'"+relId+"',cycle:'"+cycId+"'}) DETACH DELETE b"});
 				});
+
+				data.forEach(function(e,i){
+					idxDict[e.id]=i; 
+				})
 
 				data.forEach(function(e,i){
 					idDict[e.id]=(e.id_n)?e.id_n:uuidV4();
@@ -672,7 +677,7 @@ exports.saveData=function(req,res){
 								qList.push({"statement":"MERGE(n:TASKS{taskID:'"+t.id+"',task:'"+t.task+"',assignedTo:'"+t.assignedTo+"',reviewer:'"+t.reviewer+"',status:'"+taskstatus+"',startDate:'"+t.startDate+"',endDate:'"+t.endDate+"',release:'"+t.release+"',cycle:'"+t.cycle+"',re_estimation:'"+t.re_estimation+"',details:'"+t.details+"',parent:'["+t.parent+"]',uid:'"+uidx+"',cx:'"+t.cx+"'})"});
 							}		 
 							else if(t.copied){
-								qList.push({"statement":"MATCH (a:SCREENS{screenID_c:'"+e.id_c+"'}),(b:TASKS{taskID:'"+data[t.copiedidx].task.id+"'}) MERGE (a)-[r:FNTT {id:a.screenID}]-(b)"});								
+								qList.push({"statement":"MATCH (a:SCREENS{screenID_c:'"+e.id_c+"'}),(b:TASKS{taskID:'"+data[idxDict[t.copiedidx]].task.id+"'}) MERGE (a)-[r:FNTT {id:a.screenID}]-(b)"});								
 							}
 							qList.push({"statement":"MATCH (a:SCREENS{screenID_c:'"+e.id_c+"'}),(b:TASKS{taskID:'"+t.id+"'}) MERGE (a)-[r:FNTT {id:a.screenID}]-(b)"});
 						}
@@ -709,7 +714,7 @@ exports.saveData=function(req,res){
 								qList.push({"statement":"MERGE(n:TASKS{taskID:'"+t.id+"',task:'"+t.task+"',assignedTo:'"+t.assignedTo+"',status:'"+taskstatus+"',reviewer:'"+t.reviewer+"',startDate:'"+t.startDate+"',endDate:'"+t.endDate+"',release:'"+t.release+"',cycle:'"+t.cycle+"',re_estimation:'"+t.re_estimation+"',details:'"+t.details+"',parent:'["+t.parent+"]',uid:'"+uidx+"',cx:'"+t.cx+"'})"});
 							}
 							else if(t.copied){
-								qList.push({"statement":"MATCH (a:TESTCASES{testCaseID_c:'"+e.id_c+"'}),(b:TASKS{taskID:'"+data[t.copiedidx].task.id+"'}) MERGE (a)-[r:FNTT {id:a.testCaseID}]-(b)"});								   
+								qList.push({"statement":"MATCH (a:TESTCASES{testCaseID_c:'"+e.id_c+"'}),(b:TASKS{taskID:'"+data[idxDict[t.copiedidx]].task.id+"'}) MERGE (a)-[r:FNTT {id:a.testCaseID}]-(b)"});								   
 							}
 								//In case of reuse
 							qList.push({"statement":"MATCH (a:TESTCASES{testCaseID_c:'"+e.id_c+"'}),(b:TASKS{taskID:'"+t.id+"'}) MERGE (a)-[r:FNTT {id:a.testCaseID}]-(b)"});								   
