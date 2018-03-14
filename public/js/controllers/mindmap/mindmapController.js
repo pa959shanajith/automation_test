@@ -4867,6 +4867,7 @@ function getSelectionStart(o) {
 		var $minimap = this;
 		var minimapWidth = $minimap.width();
 		var minimapHeight = $minimap.height();
+        $('.minimap-viewport').remove();
 		var $viewport = $( "<div></div>" ).addClass( "minimap-viewport" );
 		$minimap.append( $viewport );
 		$viewport.append('<div id="vpresize" class="vpresize"></div>');
