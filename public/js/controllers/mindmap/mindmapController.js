@@ -527,33 +527,41 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     };
 
     function loadMap(e) {
-        if(progressFlag) return;
-        if (!d3.select('#ct-mindMap')[0][0] || confirm('Unsaved work will be lost if you continue.\nContinue?')) {
-            progressFlag = true;
-            $('.fa.fa-pencil-square-o.fa-lg.plus-icon.active-map').trigger('click') //Remove copy rectangle
-            $('.fa.fa-clipboard.fa-lg.plus-icon.active-map').trigger('click') //Disable paste
-            saveFlag = false;
-            //$('#ct-createAction').addClass('disableButton');
-            SaveCreateED('#ct-createAction',1,0);
-            $("div.nodeBoxSelected").removeClass("nodeBoxSelected");
-            $(this).addClass("nodeBoxSelected");
-            d3.select('#ct-inpBox').classed('no-disp', true);
-            initiate();
-            clearSvg();
-            var reqMap = d3.select(this).attr('data-mapid');
-            treeBuilder(allMMaps[reqMap]);
-            IncompleteFlowFlag = false;
-            var errTemp = false;
-            if (dNodes[0].type != 'modules_endtoend')
-                errTemp = treeIterator(undefined, dNodes[0], false);
-            if (errTemp) {
-                IncompleteFlowFlag = true;
-            }
-            $("#minimap").minimap( $('#ct-mapSvg') );
+        $scope.functionTBE = 'loadMapPopupConfirmed';
+        $('#createNewConfirmationPopup').attr('mapid',d3.select(this).attr('data-mapid'));
+        if ($('#ct-mindMap').length != 0){
+            $('#createNewConfirmationPopup').modal('show');
         }
-        reuseDict = getReuseDetails();
-        //console.log('Reusedict:', reuseDict);
+        else
+            loadMapPopupConfirmed();
     };
+
+    function loadMapPopupConfirmed(){
+        if(progressFlag) return;
+        progressFlag = true;
+        $('.fa.fa-pencil-square-o.fa-lg.plus-icon.active-map').trigger('click') //Remove copy rectangle
+        $('.fa.fa-clipboard.fa-lg.plus-icon.active-map').trigger('click') //Disable paste
+        saveFlag = false;
+        //$('#ct-createAction').addClass('disableButton');
+        SaveCreateED('#ct-createAction',1,0);
+        $("div.nodeBoxSelected").removeClass("nodeBoxSelected");
+        $('[data-mapid='+$('#createNewConfirmationPopup').attr('mapid')+']').addClass("nodeBoxSelected");
+        d3.select('#ct-inpBox').classed('no-disp', true);
+        initiate();
+        clearSvg();
+        var reqMap = $('#createNewConfirmationPopup').attr('mapid');
+        treeBuilder(allMMaps[reqMap]);
+        IncompleteFlowFlag = false;
+        var errTemp = false;
+        if (dNodes[0].type != 'modules_endtoend')
+            errTemp = treeIterator(undefined, dNodes[0], false);
+        if (errTemp) {
+            IncompleteFlowFlag = true;
+        }
+        $("#minimap").minimap( $('#ct-mapSvg') );
+        reuseDict = getReuseDetails();
+        //console.log('Reusedict:', reuseDict);        
+    }
 
     function getReuseDetails(){
         var dictTmp = {};
@@ -3225,21 +3233,29 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     };
 
     function loadScenarios(e) {
-        if (!d3.select('#ct-mindMap')[0][0] || confirm('Unsaved work will be lost if you continue.\nContinue?')) {
-            d3.select('.addScenarios-ete').classed('disableButton', !0);
-            saveFlag_W = false;
-            //$('#ct-createAction_W').addClass('disableButton');
-            SaveCreateED('#ct-createAction_W',1,0);
-            $("span.nodeBoxSelected").removeClass("nodeBoxSelected");
-            $(this).addClass("nodeBoxSelected");
-            cur_module = $(this);
-            initiate_W();
-            d3.select('#ct-inpBox').classed('no-disp', !0);
-            clearSvg_W();
-            var reqMap = d3.select(this).attr('data-mapid');
-            treeBuilder_W(allMaps_info[reqMap]);
+        $scope.functionTBE = 'loadScenariosPopupConfirmed';
+        $('#createNewConfirmationPopup').attr('mapid',d3.select(this).attr('data-mapid'));
+        if ($('#ct-mindMap').length != 0){
+            $('#createNewConfirmationPopup').modal('show');
         }
+        else
+            loadScenariosPopupConfirmed();
     };
+
+    function loadScenariosPopupConfirmed(){
+        d3.select('.addScenarios-ete').classed('disableButton', !0);
+        saveFlag_W = false;
+        //$('#ct-createAction_W').addClass('disableButton');
+        SaveCreateED('#ct-createAction_W',1,0);
+        $("span.nodeBoxSelected").removeClass("nodeBoxSelected");
+        $('[data-mapid='+$('#createNewConfirmationPopup').attr('mapid')+']').addClass("nodeBoxSelected");
+        cur_module = $('[data-mapid='+$('#createNewConfirmationPopup').attr('mapid')+']');
+        initiate_W();
+        d3.select('#ct-inpBox').classed('no-disp', !0);
+        clearSvg_W();
+        var reqMap = $('#createNewConfirmationPopup').attr('mapid');
+        treeBuilder_W(allMaps_info[reqMap]);        
+    }
 
     function displayScenarios(e) {
         if($('#ct-mindMap').length==0){ // if no map is loaded 
@@ -4728,11 +4744,28 @@ function getSelectionStart(o) {
         }
     };
 
+    $scope.createNewMapModal = function(){
+        $scope.functionTBE = 'createNewMap';
+        $scope.$apply();
+    if ($('#ct-mindMap').length != 0)
+        $('#createNewConfirmationPopup').modal('show');
+    else
+        $scope.createNewMap();    
+    }
+
+    $scope.callFunction = function(){
+        $('#createNewConfirmationPopup').modal('hide');
+        if($scope.functionTBE == 'createNewMap')
+            $scope.createNewMap();
+        if($scope.functionTBE == 'loadMapPopupConfirmed')
+            loadMapPopupConfirmed();
+        if($scope.functionTBE == 'loadScenariosPopupConfirmed')
+            loadScenariosPopupConfirmed();
+    }
+
     $scope.createNewMap = function() {
-        if ($('.ct-svgTile').length != 0 ||($('.ct-svgTile').length == 0 && confirm('Unsaved work will be lost if you continue.\nContinue?'))) {
-            $('.nodeBoxSelected').removeClass('nodeBoxSelected');
-            createNewMap();
-        }
+        $('.nodeBoxSelected').removeClass('nodeBoxSelected');
+        createNewMap();
     }
 
     $scope.fullScreen = function() {

@@ -92,7 +92,7 @@
       <div ng-if="tab == 'tabCreate'" id="ct-moduleBox" class="ct-moduleBoxOptional tabCreate">      
 
 		<div class="ct-project-tab">
-            <button ng-if="tab=='tabCreate'" style="position: absolute;padding: 0px 13px;top: 1px;right: 209px;" class="btn btn-md pull-right pairwise-GenBtn" ng-click="createNewMap()" title="Create New Mindmap">Create New</button>
+            <button ng-if="tab=='tabCreate'" style="position: absolute;padding: 0px 13px;top: 1px;right: 209px;" class="btn btn-md pull-right pairwise-GenBtn" ng-click="createNewMapModal()" title="Create New Mindmap">Create New</button>
                 <span ng-if="tab == 'tabCreate'" id='SearchCreate-ete'>
                     <span class="search-create"><img alt="Search Icon" class="searchModuleimg-create" src="imgs/ic-search-icon.png"></span>
                     <input type="text" id="searchModule-create" class="searchbox-create" placeholder="Search Modules" ng-keyup = "searchModule('searchModule-create')">
@@ -441,5 +441,27 @@
 </div>
 
 <!--Footer-->
+<footer footer id="footer" class="footer-global"></footer>
+
+
+<!-- MIndmaps createnewmap confirmation dialog-->
+<div class="modal fade" id="createNewConfirmationPopup" role="dialog" data-keyboard="false" data-backdrop="static">
+	<div class="modal-dialog modal-sm">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">&times;</button>
+				<h4 class="modal-title">Confirmation</h4>
+			</div>
+			<div class="modal-body">
+				<p>Unsaved work will be lost if you continue. Do you want to continue?</p>
+                
+			</div>
+			<div class="modal-footer">
+                <button type="button" class="btn btn-default" ng-click="callFunction(functionTBE)" data-dismiss="modal">Yes</button>
+				<button type="button" class="btn btn-default" id="undoChanges" data-dismiss="modal">No</button>
+			</div>
+		</div>
+	</div>
+</div>
 <footer footer id="footer" class="footer-global"></footer>
 <!--Footer-->
