@@ -1426,3 +1426,38 @@
  .errBorder{
      box-shadow: 5px 0px 0px 0px red !important;
 }
+
+#minimap{
+    position: fixed; 
+    width: 175px; 
+    height: 175px; 
+    top: 216px; 
+    right: 20px; 
+    background-color: #EEE; 
+    border: 1px solid #AAA; 
+    opacity: 0.9; 
+    z-index: 1; 
+    overflow: hidden;
+}
+
+.minimap-node {
+    position: absolute;
+    background-color: rgb(96, 122, 134);
+}
+.minimap-viewport {
+    position: relative;
+    box-sizing: border-box;
+    background-color: rgba(79, 111, 126, 0.4);
+    z-index: 1;
+    cursor: move;
+}
+#vpresize{
+    width: 6px;
+    height: 6px;
+    background: blue;
+    right: 0px;
+    bottom: 0px;
+    /* top: 10px; */
+    position: absolute;
+    cursor: nw-resize;
+}

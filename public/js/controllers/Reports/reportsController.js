@@ -546,7 +546,7 @@ mySPA.controller('reportsController', ['$scope','$rootScope', '$http', '$locatio
 						}
 						if('testcase_details' in finalReports.rows[k])
 						{
-							if(typeof(finalReports.rows[k].testcase_details) == "string")
+							if(typeof(finalReports.rows[k].testcase_details) == "string" && finalReports.rows[k].testcase_details != "" && finalReports.rows[k].testcase_details != "undefined")
 							{
 								finalReports.rows[k].testcase_details = JSON.parse(finalReports.rows[k].testcase_details);
 							}
