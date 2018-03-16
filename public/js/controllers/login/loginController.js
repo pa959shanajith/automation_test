@@ -97,25 +97,23 @@ mySPA.controller('loginController', function ($scope, $rootScope, $timeout, $htt
 						     cfpLoadingBar.complete();
 				         }
 					}
-				}
-
-				else if(data == 'noProjectsAssigned')
-				{
-						$scope.loginValidation = "To Login, user must be allocated to a Domain and Project. Please contact Admin.";
-						cfpLoadingBar.complete();
-				}
-				else if(data == 'invalid_username_password')
-				{
+				} else if(data == 'noProjectsAssigned') {
+					$scope.loginValidation = "To Login, user must be allocated to a Domain and Project. Please contact Admin.";
+					cfpLoadingBar.complete();
+				} else if(data == 'invalid_username_password') {
 					$scope.loginValidation = "The username or password you entered isn't correct. Please try again.";
 					console.log("Invalid username or password");
 					cfpLoadingBar.complete();
-				}
-				else{
+				} else {
 					$scope.loginValidation = "Failed to Login.";
 					console.log("Fail to Login.")
 					cfpLoadingBar.complete();
 				}
-			}, function (error) { console.log("Failed to Authenticate User") });
+			}, function (error) {
+				console.log("Failed to Authenticate User.")
+				$scope.loginValidation = "Failed to Authenticate User.";
+				cfpLoadingBar.complete();
+			});
 		}
 	}
 });
