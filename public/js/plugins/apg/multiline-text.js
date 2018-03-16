@@ -59,7 +59,7 @@ d3.multilineText = function() {
     case 'center':
       return w / 2;
     case 'left':
-      return paddingLeft;
+      return 8;
     case 'right':
       return w - paddingRight;
     }

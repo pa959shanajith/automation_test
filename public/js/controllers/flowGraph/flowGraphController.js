@@ -22,8 +22,10 @@ mySPA.controller('flowGraphController', ['$scope', '$http', '$location', '$timeo
 		$('#middle-content-section').removeAttr('class');
 	
 		$("#apg-cd-canvas").hide();
+		$("#apg-dfd-canvas").hide();
 		document.getElementById('path').value = '';
 		$scope.showInfo = false;
+		$scope.obj = {};
 		$scope.hideBaseContent = { message: 'false' };		  
 	  }
 	  
@@ -39,6 +41,7 @@ mySPA.controller('flowGraphController', ['$scope', '$http', '$location', '$timeo
 	});
 	  
 	$scope.executeGenerate = function(){
+		$scope.obj = {};
 		$scope.enableGenerate = false;
 		currentDot = 0;
 		for( var k = 1 ; k <  $('#progress-canvas').children().length; ){
@@ -84,6 +87,7 @@ mySPA.controller('flowGraphController', ['$scope', '$http', '$location', '$timeo
 				});
 				$scope.generateClassDiagram(obj);
 				$scope.enableGenerate = true;
+				//$scope.generateDataFlowDiagram(obj);
 			}else if(obj.result == "fail"){
 				$('#progress-canvas').fadeOut(800, function(){
 					$scope.hideBaseContent = { message: 'false' };
@@ -140,6 +144,9 @@ mySPA.controller('flowGraphController', ['$scope', '$http', '$location', '$timeo
   ]
 	
 	$scope.addClass = function(obj){
+		if(currentDot >= 40){
+		  currentDot = 0;
+		}
 		categoriesDict = {"public" : "+", "private" : "-", "default" : "~", "protected" : "#"};
 		var x = dotsPosition[currentDot].x;
 		var y = dotsPosition[currentDot].y;
@@ -172,7 +179,7 @@ mySPA.controller('flowGraphController', ['$scope', '$http', '$location', '$timeo
 
 		trow = document.createElement("tr");
 		td = document.createElement('td');
-		td.appendChild(document.createTextNode(Object.keys(obj.methods).length));
+		td.appendChild(document.createTextNode(Object.keys(obj.classMethods).length));
 		trow.appendChild(td);
 		text.appendChild(trow);
 
@@ -209,13 +216,18 @@ mySPA.controller('flowGraphController', ['$scope', '$http', '$location', '$timeo
 			class_map[obj[i].name] = size;
 		}
 		for (var i = 0; i < obj.length; i++) {
+			var classname = obj[i].name;
+			if(obj[i].abstract == true){
+				classname = "<<Abstract>>\n" + obj[i].name;
+			}
+			else if (obj[i].interface == true){
+				classname = "<<Interface>>\n" + obj[i].name;
+			}
 			graph_json["nodes"].push({
-				"classname": obj[i].name,
+				"classname": classname,
 				"methods": obj[i].classMethods,
 				"attributes": obj[i].classVariables,
 				"id": i,
-				"abstract": obj[i].abstract,
-				"interface": obj[i].interface,
 				"Complexity":obj[i].complexity
 			});
 		}
@@ -235,7 +247,7 @@ mySPA.controller('flowGraphController', ['$scope', '$http', '$location', '$timeo
 						"methods": [],
 						"attributes": [],
 						"id": size + 1,
-						"Complexity":"undefined"
+						"complexity":"undefined"
 					});
 					class_map[obj[i].extends] = size + 1;
 					var link = {
@@ -264,7 +276,7 @@ mySPA.controller('flowGraphController', ['$scope', '$http', '$location', '$timeo
 								"methods": [],
 								"attributes": [],
 								"id": size + 1,
-								"Complexity":"undefined"
+								"complexity":"undefined"
 							});
 							class_map[implement_list[j]] = size + 1;
 							var link = {
@@ -289,8 +301,7 @@ mySPA.controller('flowGraphController', ['$scope', '$http', '$location', '$timeo
 							"classname": obj[i].implements,
 							"methods": [],
 							"attributes": [],
-							"id": size + 1,
-							"Complexity":"undefined"
+							"id": size + 1
 						});
 						class_map[obj[i].implements] = size + 1;
 						var link = {
@@ -320,325 +331,287 @@ mySPA.controller('flowGraphController', ['$scope', '$http', '$location', '$timeo
 	}
 
 
-$scope.generateClassDiagram = function(obj){
-	
-	$("#apg-cd-canvas").show();
-	var width = window.innerWidth,
-    height = window.innerHeight;
-	
-var force = d3.layout.force()
-    .size([width, height])
-    .charge(-1120)
-    .linkDistance(function(d){
-		return (d.source.id*60)+60
-	})
-    .on("tick", tick);
-var drag = force.drag()
-    .on("dragstart", dragstart);
-			  
-var zoom = d3.behavior.zoom()
-	.scaleExtent([0.5, 10])
-	.on("zoom", zoomed);
-var svg = d3.select('#apg-cd-canvas').append('svg')
-    .attr("width", width)
-    .attr("height", height)
-	.call(zoom).on("dblclick.zoom", null);;;
-	
-var rectSVG = svg.append("rect")
-	.attr("width", width)
-	.attr("height", height)
-	.style("fill", "none")
-	.style("pointer-events", "all");	
+	$scope.generateClassDiagram = function(obj){
+		
+		$("#apg-cd-canvas").show();
+		let width = $("#middle-content-section").width();
+		let height = $("#middle-content-section").height();
+		let center = [width / 2, height / 2];
 
-var container = svg.append("g");
-d3.classDiagram.addMarkers(container.append('defs'));
-var color = d3.scale.category20();
+		var svg = d3.select('#apg-cd-canvas').append('svg')
+				.attr("width", width)
+				.attr("height", height);
 
-var link = container.selectAll(".apg-cd-link"),
-    node = container.selectAll(".apg-cd-node");
-var graph =	$scope.prepareJSON(obj);
+		var inner = svg.append('g').attr("id", "data-flow-g");	
 
+		var zoom = d3.behavior.zoom()
+				.translate([0, 0])
+				.scale(1)
+				.size([900, 800])
+				.scaleExtent([0.2, 8])
+				.on('zoom', zoomed);
 
-force
-  .nodes(graph.nodes)
-  .links(graph.links)
-  .on("tick", tick)
-  .start();
-  
-path = link.data(graph.links)
-	.enter().insert("path","g")
-	.attr("class", "apg-cd-link");
-
-					
-node = node
-	.data(graph.nodes)
-	.enter()
-	.append("g")
-	.attr("class", "apg-cd-node")
-	.on("dblclick", dblclick)
-	.on("mouseover", nodeOver)
-	.on("mouseout",nodeOut)
-	.call(drag);
-
-node.append('rect')
-	.attr({
-		'width': 200,
-		'fill': 'white',
-		'stroke': 'cyan',
-		'stroke-width': 1
-	});
-
-
-function zoomed() {
-	container.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
-}			
-var classNameG = node.append('g')
-	.attr('class', 'classname');
-	
-var classNameRects = classNameG.append('rect')
-  .attr({
-	'width': function(d) { return 130 },
-	'fill': 'white',
-	'stroke': 'silver',
-	'stroke-width': 0.5
-  });
-  
-  
-var classNameTexts = classNameG.append('text')
-  .attr('font-size', 12)
-  classNameTexts.call(d3.multilineText()
-	.verticalAlign('top')
-	.paddingTop(4)
-	.paddingBottom(4)
-	.text(function(d) {
-		return d.classname;
-		})
-  );
-
- adjustHeight(classNameRects[0], classNameTexts[0], 4, 4);
- var attributesG = node.append('g')
-      .attr({
-        'class': 'attributes',
-        'transform': function(d) {
-          var classNameG = d3.select(this).node().previousSibling,
-              height = classNameG.getBBox().height;
-          return 'translate(0,' + height + ')';
-        }
-      });
-    var attributesRects = attributesG.append('rect')
-      .attr({
-        'width': function(d) { return 130 },
-        'fill': 'white',
-        'stroke': 'silver',
-        'stroke-width': 0.5
-      });
-    var attributesTexts = attributesG.append('text')
-      .attr('font-size', 12)
-      .call(d3.multilineText()
-        .text(function(d) { return d.attributes; })
-        .verticalAlign('top')
-        .horizontalAlign('left')
-        .paddingTop(4)
-        .paddingLeft(4)
-      );
-    adjustHeight(attributesRects[0], attributesTexts[0], 4, 4);
-
-    var methodsG = node.append('g')
-      .attr({
-        'class': 'methods',
-        'transform': function(d) {
-          var attributesG = d3.select(this).node().previousSibling,
-              classNameText = attributesG.previousSibling,
-              classNameBBox = classNameText.getBBox(),
-              attributesBBox = attributesG.getBBox();
-          return 'translate(0,' + (classNameBBox.height + attributesBBox.height) + ')';
-        }
-      });
-    var methodsRects = methodsG.append('rect')
-      .attr({
-        'width': function(d) { return 130 },
-        'fill': 'white',
-        'stroke': 'silver',
-        'stroke-width': 0.5
-      });
-    var methodsTexts = methodsG.append('text')
-      .attr('font-size', 12)
-      .call(d3.multilineText()
-        .text(function(d) { return d.methods; })
-        .verticalAlign('top')
-        .horizontalAlign('left')
-        .paddingTop(4)
-        .paddingLeft(4)
-      );
-    adjustHeight(methodsRects[0], methodsTexts[0], 4, 4);
-	
-	var image = node.append('image')
-	.attr({'href': 'imgs/apg-info.png',
-		'width': '20px',
-		'style': 'transform: translateX(-21px)',
-		'class': 'apg-info-icon',
-	});
-
-	image.on('click', function(d){
-		if(d.Complexity=="undefined"){
-			openDialog('APG', "Complexity can't determine.")
+		svg.call(zoom) 
+			.call(zoom.event);
+			
+		function zoomed() {
+			inner.attr('transform', 'translate(' + zoom.translate() + ')scale(' + zoom.scale() + ')');
 		}
-		else{
-				$('#apg-cd-canvas').hide();
-				$('#complexity-canvas').show();
-				$scope.ccname=d.classname;
-				$scope.cmethod=d.methods.length;
-				$scope.cc =d.Complexity.class;
-				var methods_data=d.Complexity.methods;
-				var method_names=Object.keys(methods_data);
-				for(var i=0;i<method_names.length;i++){
-					$("#tblMethodLevel tbody").append("<tr><td><div>"+method_names[i]+"</div></td><td><div>"+methods_data[method_names[i]]+"</div></td><td><div></div></td></tr>");
-				}
-				$scope.$apply();
-			}
-		//$scope.hmc=20;
-	});
-	image.append('title').text('Show Complexity');
-	
-	container.selectAll('text').attr('font-family', 'Noto Sans Japanese');
-	
-	node.forEach(function(d){
 
-		d.forEach(function(e,i){
-			var maxWidth = 0;
-			for(i = 1 ;  i< e.children.length; i ++){	
-				maxWidth = Math.max(e.children[i].getBBox().width, maxWidth);
-			}
-			
-			for(i = 1 ;  i< e.children.length; i ++){	
-				d3.select(e.children[i].children[0]).attr('width', maxWidth+8);
-				d3.select(e.lastChild).attr('style', 'transform: translateX('+Number(maxWidth+8)+'px)')
-			}
-			d3.select(e.children[0]).attr('width', maxWidth+8);
-			dn=d3.select(e).datum();
-			dn.props=e.getBBox();
-			d3.select(e).datum(dn);
+		var nodeDrag = d3.behavior.drag()
+						.on("dragstart", dragstart)
+						.on("drag", dragmove);
+
+		var edgeDrag = d3.behavior.drag()
+			.on("dragstart", dragstart)
+			.on('drag', function (d) {
+			translateEdge(g.edge(d.v, d.w), d3.event.dx, d3.event.dy);
+			$('#' + g.edge(d.v, d.w).customId).attr('d', calcPoints(d));
 		});
-	});
-
-function adjustHeight(rects, texts, paddingTop, paddingBottom) {
-  var i,
-	  n = rects.length,
-	  rect,
-	  text,
-	  height;
-	  
-  for (i = 0; i < n; i++) {
-	rect = rects[i];
-	text = texts[i];
-	height = text.getBBox().height + paddingTop + paddingBottom;
-	d3.select(rect).attr('height', height);
-  }
-}
-var createline = d3.svg.line()
-		  .x(function(d) {return d.x;})
-		  .y(function(d) {return d.y;})
-		  
-function tick() {
-		path.attr({
-          'class': 'connector',
-          'stroke': 'black',
-          'stroke-width': 1,
-          'fill': 'none'
-        }).attr("d", function(d){
-			sourceX = d.source.x+(d.source.props.width/2);
-			sourceY = d.source.y+ (d.source.props.height/2);
-			targetCords = {
-					x1 : d.target.x,
-					y1 : d.target.y, 
-					x2 : d.target.x+(d.target.props.width),
-					y2 : d.target.y, 
-					x3 : d.target.x,
-					y3 : d.target.y+(d.target.props.height), 
-					x4 : d.target.x+(d.target.props.width),
-					y4 : d.target.y+(d.target.props.height),
-					x5: d.target.x+(d.target.props.width)/2,
-					y5: d.target.y,
-					x6: d.target.x,
-					y6: d.target.y+(d.target.props.height)/2,
-					x7: d.target.x+(d.target.props.width)/2,
-					y7: d.target.y+(d.target.props.height),
-					x8: d.target.x+(d.target.props.width),
-					y8: d.target.y+(d.target.props.height)/2,
-				}
-				
-				miniCords = calcMinDistance(sourceX,sourceY,targetCords);
-			
-			function calcMinDistance(x1,y1,targetPoitns){
-				var values = Object.values(targetPoitns);
-				var len = values.length/2;
-				var mini = 9007199254740992;
-				var miniX = 0;
-				var miniY = 0;
-
-				for(i=0;i<len;i++){
-					var dist = Math.sqrt(
-							Math.pow((x1 - values[2*i]),2)+
-							Math.pow((y1 - values[2*i + 1]),2)
-						);
-						
-					if(dist < mini){
-						miniX = values[2*i];
-						miniY = values[2*i + 1];
-						mini = dist;
-					}
-				}
-
-				return {x : miniX, y : miniY};
-			}
-			return createline([
-				{x:sourceX,y:sourceY},
-				{x:miniCords.x  ,y: miniCords.y}
-			]);
-		})
-		  var zoom = d3.behavior.zoom()
-            .scaleExtent([1, 10])
-            .on("zoom", zoomed);
-         path.attr('marker-end', function(d){
-			var arrowType = 'url(#' + "triangle" + ')';
-			if(d.type == 'extends'){
-				arrowType =  'url(#' + "triangle" + ')';
-			}else if( d.type == 'implements'){
-				arrowType =  'url(#' + "triangle" + ')';
-				
-			}else if(d.type == "association"){
-				arrowType =  'url(#' + "arrowhead" + ')';
-			} 
-			return arrowType;
-		}).attr('stroke-dasharray', function(d){
-			var arrowType = 0;
-			if(d.type == 'implements'){
-				arrowType = 4;
-			}
-			return arrowType;
-		});
-
-        node
-            .attr("transform", function (d) {
-				
-				return "translate(" + Number(d.x) + ", " + Number(d.y) + ")";
+		
+		// Create a new directed graph
+		var g = new dagreD3.graphlib.Graph().setGraph({});
+		
+		var preparedJSON = $scope.prepareJSON(obj);	
+		var nodes = preparedJSON.nodes;
+		var links = preparedJSON.links;
+		$scope.obj = obj;
+		nodes.forEach(function(node){
+			g.setNode(node.id, {
+				label : node.classname,
+				attributes : node.attributes,
+				method: node.methods	
 			});
+		});
 
-}
-function dblclick(d) {
-  d3.select(this).classed("fixed", d.fixed = false);
-}
-function nodeOver(d){
-	$(".apg-info-icon").removeClass("apg-active");
-	this.lastChild.classList.add("apg-active");
-}
-function nodeOut(){
-	$(".apg-info-icon").removeClass("apg-active");
-}
-function dragstart(d) {
-d3.event.sourceEvent.stopPropagation();
-  d3.select(this).classed("fixed", d.fixed = true);
-}
+		
+		// Set up the edges
+		links.forEach(function(link){
+			if(link.type == 'extends')
+				g.setEdge(link.source, link.target, { arrowhead: "simpleArrow" });
+			else if(link.type == 'implements')
+				g.setEdge(link.source, link.target, {arrowhead: "simpleArrow",style: "stroke-dasharray: 5, 5;"});
+			else
+				g.setEdge(link.source, link.target, {style: "" });
+		});
+		
+		console.log(g.edges());
+		console.log(g.nodes());
+		//makes the lines smooth
+		g.edges().forEach(function (e) {
+			var edge = g.edge(e.v, e.w);
+			edge.lineInterpolate = 'basis';
+		});
+
+		function dragstart(d) {
+			d3.event.sourceEvent.stopPropagation();
+		}
+
+		
+		function dragmove(d) {
+			var node = d3.select(this),
+				selectedNode = g.node(d);
+			var prevX = selectedNode.x,
+				prevY = selectedNode.y;
+
+			selectedNode.x += d3.event.dx;
+			selectedNode.y += d3.event.dy;
+			node.attr('transform', 'translate(' + selectedNode.x + ',' + selectedNode.y + ')');
+
+			var dx = selectedNode.x - prevX,
+				dy = selectedNode.y - prevY;
+
+			g.edges().forEach(function (e) {
+				if (e.v == d || e.w == d) {
+					edge = g.edge(e.v, e.w);
+					translateEdge(g.edge(e.v, e.w), dx, dy);
+					$('#' + edge.customId).attr('d', calcPoints(e));
+					label = $('#label_' + edge.customId);
+					var xforms = label.attr('transform');
+					if (xforms != "") {
+						var parts  = /translate\(\s*([^\s,)]+)[ ,]?([^\s,)]+)?/.exec(xforms);
+						var X = parseInt(parts[1])+dx, Y = parseInt(parts[2])+dy;
+						if (isNaN(Y)) {
+							Y = dy;
+						}
+						label.attr('transform','translate('+X+','+Y+')');
+					}            
+				}
+			})
+		}
+
+		function translateEdge(e, dx, dy) {
+			e.points.forEach(function (p) {
+				p.x = p.x + dx;
+				p.y = p.y + dy;
+			});
+		}
+		//taken from dagre-d3 source code (not the exact same)
+		function calcPoints(e) {
+			var edge = g.edge(e.v, e.w),
+				tail = g.node(e.v),
+				head = g.node(e.w);
+			var points = edge.points.slice(1, edge.points.length - 1);
+			var afterslice = edge.points.slice(1, edge.points.length - 1)
+			points.unshift(intersectRect(tail, points[0]));
+			points.push(intersectRect(head, points[points.length - 1]));
+			return d3.svg.line()
+				.x(function (d) {
+				return d.x;
+			})
+				.y(function (d) {
+				return d.y;
+			})
+				.interpolate("basis")
+			(points);
+		}
+
+		//taken from dagre-d3 source code (not the exact same)
+		function intersectRect(node, point) {
+			var x = node.x;
+			var y = node.y;
+			var dx = point.x - x;
+			var dy = point.y - y;
+			var w = $("#" + node.customId).attr('width') / 2;
+			var h = $("#" + node.customId).attr('height') / 2;
+			var sx = 0,
+				sy = 0;
+			if (Math.abs(dy) * w > Math.abs(dx) * h) {
+				// Intersection is top or bottom of rect.
+				if (dy < 0) {
+					h = -h;
+				}
+				sx = dy === 0 ? 0 : h * dx / dy;
+				sy = h;
+			} else {
+				// Intersection is left or right of rect.
+				if (dx < 0) {
+					w = -w;
+				}
+				sx = w;
+				sy = dx === 0 ? 0 : w * dy / dx;
+			}
+			return {
+				x: x + sx,
+				y: y + sy
+			};
+		}
+
+		var render = new dagreD3.render('class');
+		
+		render.arrows().sakshi = function normal(parent, id, edge, type) {
+			var marker = parent.append("marker")
+			.attr("id", id)
+			.attr("viewBox", "0 0 10 10")
+			.attr("refX", 9)
+			.attr("refY", 5)
+			.attr("markerUnits", "strokeWidth")
+			.attr("markerWidth", 8)
+			.attr("markerHeight", 6)
+			.attr("orient", "auto");
+
+			var path = marker.append("path")
+			.attr("d", "M 0 0 L 10 5 L 0 10 z")
+			.style("stroke-width", 1)
+			.style("stroke-dasharray", "1,0")
+			.style("fill", "#fff")
+			.style("stroke", "#333");
+			dagreD3.util.applyStyle(path, edge[type + "Style"]);
+		};
+		
+		render.arrows().simpleArrow = function normal(parent, id, edge, type) {
+			var marker = parent.append("marker")
+			.attr("id", id)
+			.attr("viewBox", "0 0 10 10")
+			.attr("refX", 10)
+			.attr("refY", 5)
+			.attr("markerUnits", "strokeWidth")
+			.attr("markerWidth", 10)
+			.attr("markerHeight", 10)
+			.attr("orient", "auto");
+
+			var path = marker.append("path")
+			.attr("d", "M10 5 0 10 0 8.7 6.8 5.5 0 5.5 0 4.5 6.8 4.5 0 1.3 0 0Z")
+			.style("stroke-width", 1)
+			//.style("stroke-dasharray", "1,0")
+			.style("fill", "black")
+			.style("stroke", "none");
+			dagreD3.util.applyStyle(path, edge[type + "Style"]);
+		};
+		
+		
+
+		// Run the renderer. This is what draws the final graph.
+		render(inner, g);
+		$('.methods').click(function(e){
+			console.log(d3.select(e.target).datum());
+		})
+		// Center the graph
+		var initialScale = 0.75;
+		var _height = svg.attr('height') - g.graph().height;
+		var _width = svg.attr('width') - g.graph().width;
+		//console.log(height / _height);
+		svg.selectAll("g.node rect")
+			.attr("id", function (d) {
+			return "node" + d;
+		});
+
+		nodeGroup = svg.selectAll("g.nodeGroup")
+		nodeGroup.on("mouseover", nodeOver)
+				 .on("mouseout",nodeOut)
+		nodeGroup.append('image')
+			.attr('href', 'imgs/apg-info.png')
+			.attr('width', '20px')
+			.attr('style', 'transform: translateX(-21px)')
+			.attr('class', 'apg-info-icon')
+			.on('click', function(){
+				
+			})
+		nodeGroup.append('image')
+			.attr('href', 'imgs/apg-check-icon.png')
+			.attr('width', '20px')
+			.attr('style', 'transform: translateX(-41px)')
+			.attr('class', 'apg-info-icon')
+			.on('click', $scope.generateDataFlowDiagram)
+			
+		svg.selectAll("g.edgePath path")
+			.attr("id", function (e) {
+			return e.v + "-" + e.w;
+		});
+		svg.selectAll("g.edgeLabel g")
+			.attr("id", function (e) {
+			return 'label_'+e.v + "-" + e.w;
+		});
+
+		g.nodes().forEach(function (v) {
+			var node = g.node(v);
+			node.customId = "node" + v;
+		})
+		g.edges().forEach(function (e) {
+			var edge = g.edge(e.v, e.w);
+			edge.customId = e.v + "-" + e.w
+		});
+		
+		//zoom.translate([(svg.attr('width') - g.graph().width * initialScale) / 2, 10]).scale(1).event(svg);
+		var coord= $('.nodes').children()[0].getAttribute("transform").split("(")[1].split(")")[0].split(",");
+		zoom.translate([ Number(-coord[0]+width/2),  Number(-coord[1]+height/2)]).scale(1).event(svg);
+		
+		nodeDrag.call(svg.selectAll("g.node"));
+		edgeDrag.call(svg.selectAll("g.edgePath"));
+		
+		function nodeOver(d){
+			//d3.event.sourceEvent.stopPropagation();
+			//$(".apg-info-icon").removeClass("apg-active");
+			this.lastChild.classList.add("apg-active");
+			this.lastChild.previousSibling.classList.add("apg-active");
+		}
+		function nodeOut(d){
+			//d3.event.sourceEvent.stopPropagation();
+			$(".apg-info-icon").removeClass("apg-active");
+		}
+
+	}
+	
 	function openDialog(title, body) {
 		$("#globalModal").find('.modal-title').text(title);
 		$("#globalModal").find('.modal-body p').text(body).css('color', 'black');
@@ -647,9 +620,383 @@ d3.event.sourceEvent.stopPropagation();
 			$("#globalModal").find('.btn-default').focus();
 		}, 300);
 	}
-}
+	
+	$scope.generateDataFlowDiagram = function(i){
+		console.log(i);
+		var obj = $scope.obj;
+		var links = obj.links;
+		var nodes = [];
+		var edges = [];
+		var selected_class = obj.classes[i].name;
+		
+		var data_flow_classes = new Set([]);
+		data_flow_classes.add(selected_class);
+		for (var i=0; i < links.length; i++){
+			if(links[i].source == selected_class){
+				selected_class = links[i].target;
+				data_flow_classes.add(links[i].target);
+				i = -1;
+			}
+		}
+		console.log(data_flow_classes);
+		for (var i=0; i<obj.data_flow.length; i++){
+			if(data_flow_classes.has((obj.data_flow[i].class).split('(')[0])){
+				if((obj.data_flow[i].text).startsWith("Class:")){
+					obj.data_flow[i].parent = null;
+				}
+				if(obj.data_flow[i].text == 'Start' || obj.data_flow[i].text == 'End'){
+					obj.data_flow[i].shape = "ellipse";
+				}
+				else if (obj.data_flow[i].shape == 'Diamond' || obj.data_flow[i].shape == 'SwitchDiamond'){
+					obj.data_flow[i].shape = "diamond";
+				}
+				else{
+					obj.data_flow[i].shape = "rect";
+				}
+				nodes.push(obj.data_flow[i]);
+			}
+		}
+		console.log(nodes);
+		var width = $("#middle-content-section").width();
+		var height = $("#middle-content-section").height();
+		$("#apg-cd-canvas").hide();
+		$("#apg-dfd-canvas").show();
+		
+		var svg = d3.select('#apg-dfd-canvas').append('svg')
+					.attr("width", width)
+					.attr("height", height);
+		inner = svg.append('g').attr("id", "data-flow-g");	
+		var zoom = d3.behavior.zoom()
+			  .translate([0, 0])
+			  .scale(1)
+			  .size([900, 800])
+			  .scaleExtent([0.2, 8])
+			  .on('zoom', zoomed);
+		svg.call(zoom) 
+		  .call(zoom.event);
+		function zoomed() {
+		  inner.attr('transform', 'translate(' + zoom.translate() + ')scale(' + zoom.scale() + ')');
+		}
+		var nodeDrag = d3.behavior.drag()
+						.on("dragstart", dragstart)
+						.on("drag", dragmove);
+
+		var edgeDrag = d3.behavior.drag()
+			.on("dragstart", dragstart)
+			.on('drag', function (d) {
+			translateEdge(g.edge(d.v, d.w), d3.event.dx, d3.event.dy);
+			$('#' + g.edge(d.v, d.w).customId).attr('d', calcPoints(d));
+		});
+		var g = new dagreD3.graphlib.Graph().setGraph({});
+		
+		nodes.forEach(function (node) {
+		  g.setNode(node.modified_id, {
+			label: node.text,
+			shape: node.shape
+		  });
+		});
+		console.log(g.nodes());
+		for (var i=0; i<nodes.length; i++){
+			if(nodes[i].child != null){
+				for (var j=0; j<nodes[i].child.length; j++){
+					if(data_flow_classes.has((obj.data_flow[nodes[i].child[j]].class).split('(')[0])){
+						g.setEdge(nodes[i].modified_id, nodes[i].child[j], {
+						});
+					}
+				}
+			}
+		}
+		console.log(g.edges());
+		g.nodes().forEach(function (v) {
+			var node = g.node(v);
+			node.rx = node.ry = 5;
+		});
+		g.edges().forEach(function (e) {
+			var edge = g.edge(e.v, e.w);
+			edge.lineInterpolate = 'basis';
+		});
+
+		function dragstart(d) {
+			d3.event.sourceEvent.stopPropagation();
+		}
+
+		
+		function dragmove(d) {
+			var node = d3.select(this),
+				selectedNode = g.node(d);
+			var prevX = selectedNode.x,
+				prevY = selectedNode.y;
+
+			selectedNode.x += d3.event.dx;
+			selectedNode.y += d3.event.dy;
+			node.attr('transform', 'translate(' + selectedNode.x + ',' + selectedNode.y + ')');
+
+			var dx = selectedNode.x - prevX,
+				dy = selectedNode.y - prevY;
+
+			g.edges().forEach(function (e) {
+				if (e.v == d || e.w == d) {
+					edge = g.edge(e.v, e.w);
+					translateEdge(g.edge(e.v, e.w), dx, dy);
+					$('#' + edge.customId).attr('d', calcPoints(e));
+					label = $('#label_' + edge.customId);
+					var xforms = label.attr('transform');
+					if (xforms != "") {
+						var parts  = /translate\(\s*([^\s,)]+)[ ,]?([^\s,)]+)?/.exec(xforms);
+						var X = parseInt(parts[1])+dx, Y = parseInt(parts[2])+dy;
+						if (isNaN(Y)) {
+							Y = dy;
+						}
+						label.attr('transform','translate('+X+','+Y+')');
+					}            
+				}
+			})
+		}
+
+		function translateEdge(e, dx, dy) {
+			e.points.forEach(function (p) {
+				p.x = p.x + dx;
+				p.y = p.y + dy;
+			});
+		}
+		//taken from dagre-d3 source code (not the exact same)
+		function calcPoints(e) {
+			var edge = g.edge(e.v, e.w),
+				tail = g.node(e.v),
+				head = g.node(e.w);
+			var points = edge.points.slice(1, edge.points.length - 1);
+			var afterslice = edge.points.slice(1, edge.points.length - 1)
+			points.unshift(intersectRect(tail, points[0]));
+			points.push(intersectRect(head, points[points.length - 1]));
+			return d3.svg.line()
+				.x(function (d) {
+				return d.x;
+			})
+				.y(function (d) {
+				return d.y;
+			})
+				.interpolate("basis")
+			(points);
+		}
+
+		//taken from dagre-d3 source code (not the exact same)
+		function intersectRect(node, point) {
+			var x = node.x;
+			var y = node.y;
+			var dx = point.x - x;
+			var dy = point.y - y;
+			var w, h;
+			if(node.shape == "ellipse"){
+				var rx = $("#" + node.customId).attr('rx');
+				var ry = $("#" + node.customId).attr('ry');
+				  var cx = node.x;
+				  var cy = node.y;
+
+				  var px = cx - point.x;
+				  var py = cy - point.y;
+
+				  var det = Math.sqrt(rx * rx * py * py + ry * ry * px * px);
+
+				  var dx = Math.abs(rx * ry * px / det);
+				  if (point.x < cx) {
+					dx = -dx;
+				  }
+				  var dy = Math.abs(rx * ry * py / det);
+				  if (point.y < cy) {
+					dy = -dy;
+				  }
+
+				  return {x: cx + dx, y: cy + dy};
+			}
+			else if(node.shape == "diamond"){
+				  var x1 = node.x;
+				  var y1 = node.y;
+		
+				  var intersections = [];
+					var coords = $("#" + node.customId).attr('points').split(" ");
+				w = Math.abs(coords[1].split(",")[0] - coords[3].split(",")[0])/2;
+				h = Math.abs(coords[0].split(",")[1] - coords[2].split(",")[1])/2;
+					polyPoints = [
+						{ x:  0, y: -h  },
+						{ x: -w, y:  0 },
+						{ x:  0, y:  h },
+						{ x:  w, y:  0 }
+					  ]
+					  
+					  
+				  var minX = Number.POSITIVE_INFINITY,
+					  minY = Number.POSITIVE_INFINITY;
+				  polyPoints.forEach(function(entry) {
+					minX = Math.min(minX, entry.x);
+					minY = Math.min(minY, entry.y);
+				  });
+	
+				  
+				  var left = x1 - w  - minX;
+				  var top =  y1 - h  - minY;
+
+				  for (var i = 0; i < polyPoints.length; i++) {
+					var p1 = polyPoints[i];
+					var p2 = polyPoints[i < polyPoints.length - 1 ? i + 1 : 0];
+					var intersect = intersectLine(node, point,
+					  {x: left + p1.x, y: top + p1.y}, {x: left + p2.x, y: top + p2.y});
+					if (intersect) {
+					  intersections.push(intersect);
+					}
+				  }
+				  function intersectLine(p1, p2, q1, q2) {
+					  // Algorithm from J. Avro, (ed.) Graphics Gems, No 2, Morgan Kaufmann, 1994,
+					  // p7 and p473.
+
+					  var a1, a2, b1, b2, c1, c2;
+					  var r1, r2 , r3, r4;
+					  var denom, offset, num;
+					  var x, y;
+
+					  // Compute a1, b1, c1, where line joining points 1 and 2 is F(x,y) = a1 x +
+					  // b1 y + c1 = 0.
+					  a1 = p2.y - p1.y;
+					  b1 = p1.x - p2.x;
+					  c1 = (p2.x * p1.y) - (p1.x * p2.y);
+
+					  // Compute r3 and r4.
+					  r3 = ((a1 * q1.x) + (b1 * q1.y) + c1);
+					  r4 = ((a1 * q2.x) + (b1 * q2.y) + c1);
+
+					  // Check signs of r3 and r4. If both point 3 and point 4 lie on
+					  // same side of line 1, the line segments do not intersect.
+					  if ((r3 !== 0) && (r4 !== 0) && sameSign(r3, r4)) {
+						return /*DONT_INTERSECT*/;
+					  }
+
+					  // Compute a2, b2, c2 where line joining points 3 and 4 is G(x,y) = a2 x + b2 y + c2 = 0
+					  a2 = q2.y - q1.y;
+					  b2 = q1.x - q2.x;
+					  c2 = (q2.x * q1.y) - (q1.x * q2.y);
+
+					  // Compute r1 and r2
+					  r1 = (a2 * p1.x) + (b2 * p1.y) + c2;
+					  r2 = (a2 * p2.x) + (b2 * p2.y) + c2;
+
+					  // Check signs of r1 and r2. If both point 1 and point 2 lie
+					  // on same side of second line segment, the line segments do
+					  // not intersect.
+					  if ((r1 !== 0) && (r2 !== 0) && (sameSign(r1, r2))) {
+						return /*DONT_INTERSECT*/;
+					  }
+
+					  // Line segments intersect: compute intersection point.
+					  denom = (a1 * b2) - (a2 * b1);
+					  if (denom === 0) {
+						return /*COLLINEAR*/;
+					  }
+
+					  offset = Math.abs(denom / 2);
+
+					  // The denom/2 is to get rounding instead of truncating. It
+					  // is added or subtracted to the numerator, depending upon the
+					  // sign of the numerator.
+					  num = (b1 * c2) - (b2 * c1);
+					  x = (num < 0) ? ((num - offset) / denom) : ((num + offset) / denom);
+
+					  num = (a2 * c1) - (a1 * c2);
+					  y = (num < 0) ? ((num - offset) / denom) : ((num + offset) / denom);
+
+					  return { x: x, y: y };
+					}
+
+					function sameSign(r1, r2) {
+					  return r1 * r2 > 0;
+					}
+
+				  if (!intersections.length) {
+					console.log("NO INTERSECTION FOUND, RETURN NODE CENTER", node);
+					return node;
+				  }
+
+				  if (intersections.length > 1) {
+					// More intersections, find the one nearest to edge end point
+					intersections.sort(function(p, q) {
+					  var pdx = p.x - point.x,
+						  pdy = p.y - point.y,
+						  distp = Math.sqrt(pdx * pdx + pdy * pdy),
+
+						  qdx = q.x - point.x,
+						  qdy = q.y - point.y,
+						  distq = Math.sqrt(qdx * qdx + qdy * qdy);
+
+					  return (distp < distq) ? -1 : (distp === distq ? 0 : 1);
+					});
+				  }
+				  return intersections[0];
+			}
+			else{
+				w = $("#" + node.customId).attr('width') / 2;
+				h = $("#" + node.customId).attr('height') / 2;
+			}
+			
+			var sx = 0,
+				sy = 0;
+			if (Math.abs(dy) * w > Math.abs(dx) * h) {
+				// Intersection is top or bottom of rect.
+				if (dy < 0) {
+					h = -h;
+				}
+				sx = dy === 0 ? 0 : h * dx / dy;
+				sy = h;
+			} else {
+				// Intersection is left or right of rect.
+				if (dx < 0) {
+					w = -w;
+				}
+				sx = w;
+				sy = dx === 0 ? 0 : w * dy / dx;
+			}
+			return {
+				x: parseFloat(x) + parseFloat(sx),
+				y: parseFloat(y) + parseFloat(sy)
+			};
+		}
+		var render = new dagreD3.render();
+		render(inner, g);
+		var initialScale = 0.75;
+		var _height = svg.attr('height') - g.graph().height;
+		var _width = svg.attr('width') - g.graph().width;
+		//console.log(height / _height);
+		svg.selectAll("g.node rect")
+			.attr("id", function (d) {
+			return "node" + d;
+		});
+		svg.selectAll("g.node ellipse")
+			.attr("id", function (d) {
+			return "node" + d;
+		});
+		svg.selectAll("g.node polygon")
+			.attr("id", function (d) {
+			return "node" + d;
+		});
+		svg.selectAll("g.edgePath path")
+			.attr("id", function (e) {
+			return e.v + "-" + e.w;
+		});
+		svg.selectAll("g.edgeLabel g")
+			.attr("id", function (e) {
+			return 'label_'+e.v + "-" + e.w;
+		});
+
+		g.nodes().forEach(function (v) {
+			var node = g.node(v);
+			node.customId = "node" + v;
+		})
+		g.edges().forEach(function (e) {
+			var edge = g.edge(e.v, e.w);
+			edge.customId = e.v + "-" + e.w
+		});
+		var coord= $('.nodes').children()[0].getAttribute("transform").split("(")[1].split(")")[0].split(",");
+		zoom.translate([ Number(-coord[0]+width/2),  Number(-coord[1]+height/2)]).scale(1).event(svg);
+		
+		nodeDrag.call(svg.selectAll("g.node"));
+		edgeDrag.call(svg.selectAll("g.edgePath"));
+	}
 	
 }]);
-
-
-

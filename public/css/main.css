@@ -5452,3 +5452,15 @@ border-radius: 6px;
     padding-bottom: 5px !important;
 }
 
+.node rect,
+.node ellipse,
+.node polygon {
+  stroke: #333;
+  fill: #fff;
+  stroke-width: 1.5px;
+}
+
+.edgePath path {
+  stroke: #333;
+  stroke-width: 1.5px;
+}
