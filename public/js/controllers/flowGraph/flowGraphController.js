@@ -388,11 +388,11 @@ mySPA.controller('flowGraphController', ['$scope', '$http', '$location', '$timeo
 		// Set up the edges
 		links.forEach(function(link){
 			if(link.type == 'extends')
-				g.setEdge(link.source, link.target, { arrowhead: "simpleArrow" });
+				g.setEdge(link.source, link.target, { arrowhead: "hollowPoints" });
 			else if(link.type == 'implements')
-				g.setEdge(link.source, link.target, {arrowhead: "simpleArrow",style: "stroke-dasharray: 5, 5;"});
+				g.setEdge(link.source, link.target, {arrowhead: "hollowPoints",style: "stroke-dasharray: 5, 5;"});
 			else
-				g.setEdge(link.source, link.target, {style: "" });
+				g.setEdge(link.source, link.target, {arrowhead: "simpleArrow" });
 		});
 		
 		console.log(g.edges());
@@ -499,7 +499,7 @@ mySPA.controller('flowGraphController', ['$scope', '$http', '$location', '$timeo
 
 		var render = new dagreD3.render('class');
 		
-		render.arrows().sakshi = function normal(parent, id, edge, type) {
+		render.arrows().hollowPoints = function normal(parent, id, edge, type) {
 			var marker = parent.append("marker")
 			.attr("id", id)
 			.attr("viewBox", "0 0 10 10")
@@ -564,8 +564,24 @@ mySPA.controller('flowGraphController', ['$scope', '$http', '$location', '$timeo
 			.attr('width', '20px')
 			.attr('style', 'transform: translateX(-21px)')
 			.attr('class', 'apg-info-icon')
-			.on('click', function(){
-				
+			.on('click', function(d){
+				d = $scope.obj.classes[d];
+				if(d.complexity=="undefined"){
+					openDialog('APG', "Complexity can't determine.")
+				}
+				else{
+					$('#apg-cd-canvas').hide();
+					$('#complexity-canvas').show();
+					$scope.ccname=d.name;
+					$scope.cmethod=d.classMethods.length;
+					$scope.cc =d.complexity.class;
+					var methods_data=d.complexity.methods;
+					var method_names=Object.keys(methods_data);
+					for(var i=0;i<method_names.length;i++){
+						$("#tblMethodLevel tbody").append("<tr><td><div>"+method_names[i]+"</div></td><td><div>"+methods_data[method_names[i]]+"</div></td><td><div></div></td></tr>");
+					}
+					$scope.$apply();
+					}
 			})
 		nodeGroup.append('image')
 			.attr('href', 'imgs/apg-check-icon.png')
