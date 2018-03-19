@@ -402,6 +402,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     if (e.type == 'modules_endtoend') img_src = 'images_mindmap/MM5.png';
                     var node = nodeBox.append('div').attr('class', 'ct-node fl-left').attr('data-mapid', i).attr('title', t).on('click', loadMap);
                     node.append('img').attr('class', 'ct-nodeIcon').attr('src', img_src).attr('alt', 'Module').attr('aria-hidden', true);
+                    if(t.length>20) t = t.substring(0, 20)+'...';
                     node.append('span').attr('class', 'ct-nodeLabel').html(t);
                 });
                 if (selectedTab == 'tabCreate')
@@ -438,7 +439,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         canvas.empty();
         u = canvas.append('div').attr('id', 'ct-inpBox').classed('no-disp', !0);
         u.append('input').attr('id', 'ct-inpPredict').attr('class', 'ct-inp');
-        u.append('input').attr('id', 'ct-inpAct').attr('maxlength', '40').attr('class', 'ct-inp').on('change', inpChange).on('keyup', inpKeyUp);
+        u.append('input').attr('id', 'ct-inpAct').attr('maxlength', '255').attr('class', 'ct-inp').on('change', inpChange).on('keyup', inpKeyUp);
         u.append('ul').attr('id', 'ct-inpSugg').classed('no-disp', !0);
         u = canvas.append('div').attr('id', 'ct-ctrlBox').classed('no-disp', !0);
         u.append('p').attr('class', 'ct-ctrl fa ' + faRef.plus).on('click', createNode).append('span').attr('class', 'ct-tooltiptext').html('');
@@ -494,7 +495,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         return [parseFloat(s.style("width")), parseFloat(s.style("height"))];
     };
 
-    function createNewMap(e) {
+    function createNewMap(moduleName) {
         initiate();
         clearSvg();
         var s = getElementDimm(d3.select("#ct-mapSvg"));
@@ -511,6 +512,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             children: [],
             parent: null
         };
+        if(moduleName)  node.name = moduleName;
 
         if ($('#switch-layout').hasClass('vertical-layout')) {
             node.y = s[0] * 0.1 * (0.9);
@@ -523,7 +525,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         //To fix issue 710-Create a module and see that module name does not display in edit mode
         v = addNode(dNodes[uNix - 1], !1, null);
         childNode = v;
-        editNode(e);
+        if(!moduleName) editNode();
     };
 
     function loadMap(e) {
@@ -627,7 +629,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         var ch = 15;
         //Issue 697
         if (n.type == 'testcases') ch = 9;
-        if ((n.name.length > 15 && n.type != 'modules' && n.type != 'modules_endtoend') || (n.name.length > 9 && n.type == 'testcases')) {
+        if ((n.name.length > 15) || (n.name.length > 9 && n.type == 'testcases')) {
 
             n.display_name = n.display_name.slice(0, ch) + '...';
         }
@@ -1690,7 +1692,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 CreateEditFlag = true;
                 if (e);
                 else
-                    editNode(e, currentNode);
+                    editNode(currentNode);
             }
 
         } else {
@@ -1733,7 +1735,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                                                 <form class="form-horizontal" role="form" onSubmit="return false;">
                                                         <div class="col-sm-2 addNode-label"><label>`+idxAddNode+`</label></div>
                                                         <div class="col-sm-6">
-                                                        <input type="text" class="form-control form-control-custom" placeholder="Enter node name" maxlength="40" value='`+$scope.addedntype+idxAddNode+`'>
+                                                        <input type="text" class="form-control form-control-custom" placeholder="Enter node name" maxlength="255" value='`+$scope.addedntype+idxAddNode+`'>
                                                         </div>
                                                         <div class="col-sm-2 deleteAddObjRow"><img src="imgs/ic-delete.png" /></div>
                                                 </form>
@@ -1781,15 +1783,15 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
     //------End of Create Multiple Child Node-------//
 
-    function editNode(e, node) {
+    function editNode(node) {
 
         $('#ct-inpAct').removeClass('errorClass');
         d3.select('#ct-inpAct').classed('no-disp', !1);
-        e = e || window.event;
-        if (e) {
-            e.cancelbubble = !0;
-            if (e.stopPropagation) e.stopPropagation();
-        }
+        // e = e || window.event;
+        // if (e) {
+        //     e.cancelbubble = !0;
+        //     if (e.stopPropagation) e.stopPropagation();
+        // }
         //logic to create the node in editable mode
         if (node == 0) {
             childNode = null;
@@ -2045,7 +2047,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         var nName, flag = !0;
         nName = value;
         var regex = /^[a-zA-Z0-9_]*$/;;
-        if (nName.length == 0 || nName.length > 40 || nName.indexOf('_') < 0 || !(regex.test(nName))) {
+        if (nName.length == 0 || nName.length > 255 || nName.indexOf('_') < 0 || !(regex.test(nName))) {
             $('#ct-inpAct').addClass('errorClass');
             flag = !1;
         }
@@ -2399,6 +2401,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                             var t = $.trim(e.name);
                             var node = nodeBox.append('div').attr('class', 'ct-node fl-left').attr('data-mapid', i).attr('title', t).on('click', loadMap);
                             node.append('img').attr('class', 'ct-nodeIcon').attr('src', img_src).attr('alt', 'Module').attr('aria-hidden', true);
+                            if(t.length>20) t = t.substring(0, 20)+'...';
                             node.append('span').attr('class', 'ct-nodeLabel').html(t);
                         });
                         $('div[title='+selectedNodeTitle+']').addClass('nodeBoxSelected');
@@ -3123,6 +3126,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 var t = $.trim(e.name);
                 var node = nodeBox.append('span').attr('class', 'moduleContainer').attr('data-mapid', i).attr('title', t).on('click', onclick_func);
                 node.append('img').attr('class', 'ct-nodeIcon ' + class_name).attr('src', src_image).attr('alt', 'Module').attr('aria-hidden', true);
+                if(t.length>20) t = t.substring(0, 20)+'...';
                 node.append('span').attr('class', 'ct-nodeLabel modulename').html(t);
             });
 
@@ -3145,7 +3149,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         else var canvas = d3.select('#ct-canvas');
         u = canvas.append('div').attr('id', 'ct-inpBox').classed('no-disp', !0);
         u.append('input').attr('id', 'ct-inpPredict').attr('class', 'ct-inp');
-        u.append('input').attr('id', 'ct-inpAct').attr('maxlength', '40').attr('class', 'ct-inp').on('change', inpChange_W).on('keyup', inpKeyUp_W);
+        u.append('input').attr('id', 'ct-inpAct').attr('maxlength', '255').attr('class', 'ct-inp').on('change', inpChange_W).on('keyup', inpKeyUp_W);
         u.append('ul').attr('id', 'ct-inpSugg').classed('no-disp', !0);
         u = canvas.append('div').attr('id', 'ct-ctrlBox').classed('no-disp', !0);
         u.append('p').attr('class', 'ct-ctrl fa ' + faRef.plus).on('click', '').append('span').attr('class', 'ct-tooltiptext').html('');
@@ -3910,6 +3914,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                             var t = $.trim(e.name);
                             var node = nodeBox.append('span').attr('class', 'moduleContainer').attr('data-mapid', i).attr('title', t).on('click', onclick_func);
                             node.append('img').attr('class', 'ct-nodeIcon ' + class_name).attr('src', src_image).attr('alt', 'Module').attr('aria-hidden', true);
+                            if(t.length>20) t = t.substring(0, 20)+'...';
                             node.append('span').attr('class', 'ct-nodeLabel modulename').html(t);
                         });
                         $('span[title='+selectedNodeTitle+']').addClass('nodeBoxSelected');
@@ -4304,6 +4309,7 @@ function loadModules() {
                 if (e.type == 'modules_endtoend') img_src = 'images_mindmap/MM5.png';
                 var node = nodeBox.append('div').attr('class', 'ct-node fl-left').attr('data-mapid', i).attr('title', t).on('click', loadMap);
                 node.append('img').attr('class', 'ct-nodeIcon').attr('src', img_src).attr('alt', 'Module').attr('aria-hidden', true);
+                if(t.length>20) t = t.substring(0, 20)+'...';
                 node.append('span').attr('class', 'ct-nodeLabel').html(t);
             });
             populateDynamicInputList();
@@ -4744,13 +4750,12 @@ function getSelectionStart(o) {
         }
     };
 
-    $scope.createNewMapModal = function(){
+    $scope.createNewMapModal = function(moduleName){
         $scope.functionTBE = 'createNewMap';
-        $scope.$apply();
     if ($('#ct-mindMap').length != 0)
         $('#createNewConfirmationPopup').modal('show');
     else
-        $scope.createNewMap();    
+        $scope.createNewMap(moduleName);    
     }
 
     $scope.callFunction = function(){
@@ -4763,9 +4768,9 @@ function getSelectionStart(o) {
             loadScenariosPopupConfirmed();
     }
 
-    $scope.createNewMap = function() {
+    $scope.createNewMap = function(moduleName) {
         $('.nodeBoxSelected').removeClass('nodeBoxSelected');
-        createNewMap();
+        createNewMap(moduleName);
     }
 
     $scope.fullScreen = function() {
@@ -4857,270 +4862,349 @@ function getSelectionStart(o) {
 		$('#createImg').trigger("click");		
 	}, 500);    
 
+    $('.project-list-popup').change(function(e,i){
+        $('.project-list').val($('.project-list-popup').val());
+    });
 
-(function( $ ) {
-	$.fn.minimap = function( $mapSource ) {
-		var x, y, l, t, w, h;
-		var color = {'modules':'#5500aa','scenarios':'#0000ff','testcases':'#aaaa00','screens':'#00ff00'};
-		var width_v,height_v,xmin_v,ymin_v;
-		var $window = $( window );
-		var $minimap = this;
-		var minimapWidth = $minimap.width();
-		var minimapHeight = $minimap.height();
-        $('.minimap-viewport').remove();
-		var $viewport = $( "<div></div>" ).addClass( "minimap-viewport" );
-		$minimap.append( $viewport );
-		$viewport.append('<div id="vpresize" class="vpresize"></div>');
-		synchronize();
-		$window.on( "resize", synchronize );
-		$mapSource.on( "mousemove", synchronize );
-		$(document).bind('mousewheel', function(){redraw()});
-		$mapSource.on( "click", init );
-		$minimap.on( "mousedown touchstart", down );
-		var scale;
-		function down( e ) {
-			console.log("down event");
-			console.log("e:",e,"this: ",$($(e)[0].target).hasClass('vpresize'));
-			var moveEvent, upEvent;
-			var pos = $minimap.position();
-			console.log("l,t,w,h: ",l,t,w,h);
-			x = ( pos.left + l + w / 2 );  //center x of viewport (absolute)
-			y = ( pos.top + t + h / 2 );	//center y of viewport (absolute)
-			if($($(e)[0].target).hasClass('vpresize'))
-				movevp( e );				
-			else
-				move( e );
 
-			if ( e.type === "touchstart" ) {
-				moveEvent = "touchmove.minimapDown";
-				upEvent = "touchend";
-			} else {
-				moveEvent = "mousemove.minimapDown";
-				upEvent = "mouseup";
-			}
+    $scope.createFromJson = function(){
+        var typeo,typen;
+        $scope.dataJSON.forEach(function(e,i){
+            if(i==0){
+                $scope.createNewMapModal($scope.dataJSON[0].name);
+                activeNode = '#ct-node-0';
+                typeo = 1;
+            }  
+            else{
+                typen = $scope.dataJSON[i].type;
+                if(typen>typeo){
+                    activeNode = '#ct-node-'+(dNodes.length-1);
+                    
+                }
+                else if(typen<typeo){
+                    var lvl = typeo-typen;
+                    if(lvl==1){
+                        activeNode = '#ct-node-'+dNodes[dNodes.length-1].parent.parent.id;
+                    }
+                    if(lvl==2){
+                        activeNode = '#ct-node-'+dNodes[dNodes.length-1].parent.parent.parent.id;
+                    }  
+                }                  
+                createNode({name:$scope.dataJSON[i].name});
+                typeo = typen;
+            }   
+        });
+            
+    };
 
-			if($($(e)[0].target).hasClass('vpresize')){
-				$window.on( moveEvent, movevp );
-				$window.one( upEvent, up );			
-			}
+    (function( $ ) {
+        $.fn.minimap = function( $mapSource ) {
+            var x, y, l, t, w, h;
+            var color = {'modules':'#5500aa','scenarios':'#0000ff','testcases':'#aaaa00','screens':'#00ff00'};
+            var width_v,height_v,xmin_v,ymin_v;
+            var $window = $( window );
+            var $minimap = this;
+            var minimapWidth = $minimap.width();
+            var minimapHeight = $minimap.height();
+            $('.minimap-viewport').remove();
+            var $viewport = $( "<div></div>" ).addClass( "minimap-viewport" );
+            $minimap.append( $viewport );
+            $viewport.append('<div id="vpresize" class="vpresize"></div>');
+            synchronize();
+            $window.on( "resize", synchronize );
+            $mapSource.on( "mousemove", synchronize );
+            $(document).bind('mousewheel', function(){redraw()});
+            $mapSource.on( "click", init );
+            $minimap.on( "mousedown touchstart", down );
+            var scale;
+            function down( e ) {
+                console.log("down event");
+                console.log("e:",e,"this: ",$($(e)[0].target).hasClass('vpresize'));
+                var moveEvent, upEvent;
+                var pos = $minimap.position();
+                console.log("l,t,w,h: ",l,t,w,h);
+                x = ( pos.left + l + w / 2 );  //center x of viewport (absolute)
+                y = ( pos.top + t + h / 2 );	//center y of viewport (absolute)
+                if($($(e)[0].target).hasClass('vpresize'))
+                    movevp( e );				
+                else
+                    move( e );
 
-			else{
-				$window.on( moveEvent, move );
-				$window.one( upEvent, up );					
-			}		
-		}
+                if ( e.type === "touchstart" ) {
+                    moveEvent = "touchmove.minimapDown";
+                    upEvent = "touchend";
+                } else {
+                    moveEvent = "mousemove.minimapDown";
+                    upEvent = "mouseup";
+                }
 
-		function move( e ) {
-			e.preventDefault();
+                if($($(e)[0].target).hasClass('vpresize')){
+                    $window.on( moveEvent, movevp );
+                    $window.one( upEvent, up );			
+                }
 
-			if ( e.type.match( /touch/ ) ) {
-				if ( e.touches.length > 1 ) {
-					return;
-				}
-				var event = e.touches[ 0 ];
-			} else {
-				var event = e;
-			}
-			//console.log("event.clientX, event.clientY: ",event.clientX,event.clientY);
-			var dx = event.clientX - x;
-			var dy = event.clientY - y;
-			//console.log("dx,dy: ",dx,dy);
-			if ( l + dx < 0 ) {
-				dx = -l;
-			}
-			if ( t + dy < 0 ) {
-				dy = -t;
-			}
-			if ( l + w + dx > minimapWidth ) {
-				dx = minimapWidth - l - w;
-			}
-			if ( t + h + dy > minimapHeight ) {
-				dy = minimapHeight - t - h;
-			}
+                else{
+                    $window.on( moveEvent, move );
+                    $window.one( upEvent, up );					
+                }		
+            }
 
-			x += dx;
-			y += dy;
+            function move( e ) {
+                e.preventDefault();
 
-			l += dx;
-			t += dy;
+                if ( e.type.match( /touch/ ) ) {
+                    if ( e.touches.length > 1 ) {
+                        return;
+                    }
+                    var event = e.touches[ 0 ];
+                } else {
+                    var event = e;
+                }
+                //console.log("event.clientX, event.clientY: ",event.clientX,event.clientY);
+                var dx = event.clientX - x;
+                var dy = event.clientY - y;
+                //console.log("dx,dy: ",dx,dy);
+                if ( l + dx < 0 ) {
+                    dx = -l;
+                }
+                if ( t + dy < 0 ) {
+                    dy = -t;
+                }
+                if ( l + w + dx > minimapWidth ) {
+                    dx = minimapWidth - l - w;
+                }
+                if ( t + h + dy > minimapHeight ) {
+                    dy = minimapHeight - t - h;
+                }
 
-			redraw();
-			updateMindMap();
-		}
-		function movevp( e ) {
-			e.preventDefault();
+                x += dx;
+                y += dy;
 
-			if ( e.type.match( /touch/ ) ) {
-				if ( e.touches.length > 1 ) {
-					return;
-				}
-				var event = e.touches[ 0 ];
-			} else {
-				var event = e;
-			}
-			//console.log("event.clientX, event.clientY: ",event.clientX,event.clientY);
-			var xvp = $minimap.position().left+l+w-3;
-			var yvp = $minimap.position().top+t+h-3;
-			//console.log("xvp,yvp: ",);
-			var dx = event.clientX - xvp;
-			var dy = event.clientY - yvp;
-			//console.log("dx,dy: ",dx,dy);
-			// if ( l + dx < 0 ) {
-			// 	dx = -l;
-			// }
-			// if ( t + dy < 0 ) {
-			// 	dy = -t;
-			// }
-			// if ( l + w + dx > minimapWidth ) {
-			// 	dx = minimapWidth - l - w;
-			// }
-			// if ( t + h + dy > minimapHeight ) {
-			// 	dy = minimapHeight - t - h;
-			// }
-			dy = dx*h/w;
-			w += dx;
-			h += dy;
+                l += dx;
+                t += dy;
 
-			redraw();
-			updateMindMap_vp(dx,dy);
-		}
-		function up() {
-			$window.off( ".minimapDown" );
-		}
+                redraw();
+                updateMindMap();
+            }
+            function movevp( e ) {
+                e.preventDefault();
 
-		function synchronize() {
-			console.log("this: ",this);
-			console.log('sync');
-			scale = d3.select("#ct-mindMap").attr("transform").split(/[()]/)[3];
-			//console.log("height_v: ",height_v,"width_v: ",width_v);
-			w = $('#ct-mapSvg').width()*$('#minimap').width()/$('#ct-mindMap').width();
-			h = $('#ct-mapSvg').height()*$('#minimap').height()/$('#ct-mindMap').height();
+                if ( e.type.match( /touch/ ) ) {
+                    if ( e.touches.length > 1 ) {
+                        return;
+                    }
+                    var event = e.touches[ 0 ];
+                } else {
+                    var event = e;
+                }
+                //console.log("event.clientX, event.clientY: ",event.clientX,event.clientY);
+                var xvp = $minimap.position().left+l+w-3;
+                var yvp = $minimap.position().top+t+h-3;
+                //console.log("xvp,yvp: ",);
+                var dx = event.clientX - xvp;
+                var dy = event.clientY - yvp;
+                //console.log("dx,dy: ",dx,dy);
+                // if ( l + dx < 0 ) {
+                // 	dx = -l;
+                // }
+                // if ( t + dy < 0 ) {
+                // 	dy = -t;
+                // }
+                // if ( l + w + dx > minimapWidth ) {
+                // 	dx = minimapWidth - l - w;
+                // }
+                // if ( t + h + dy > minimapHeight ) {
+                // 	dy = minimapHeight - t - h;
+                // }
+                dy = dx*h/w;
+                w += dx;
+                h += dy;
 
-			x = d3.select("#ct-mindMap").attr("transform").split(/[()]/)[1].split(',')[0];
-			y = d3.select("#ct-mindMap").attr("transform").split(/[()]/)[1].split(',')[1];
-				var xmin=1000,ymin=1000,xmax=0,ymax=0;
-				dNodes.forEach( function(e,i){
-					if(xmin>e.x) xmin=e.x;
-					else if(xmax<e.x) xmax=e.x;
-					if(ymin>e.y) ymin=e.y;
-					else if(ymax<e.y) ymax=e.y;	
-				})
-			l = (-xmin_v*scale-x)*$('#minimap').width()/$('#ct-mindMap').width();
-			t = (-ymin_v*scale-y)*$('#minimap').height()/$('#ct-mindMap').height();			
-			//set the mini viewport dimesions
-			redraw();
-		}
+                redraw();
+                updateMindMap_vp(dx,dy);
+            }
+            function up() {
+                $window.off( ".minimapDown" );
+            }
 
-		function updateMindMap(){
-			scale = d3.select("#ct-mindMap").attr("transform").split(/[()]/)[3];
-			//console.log("current transform: ",d3.select("#ct-mindMap").attr("transform"));
-			x_l = -xmin_v*scale-l*$('#ct-mindMap').width()/$('#minimap').width();
-			y_l = -ymin_v*scale-t*$('#ct-mindMap').height()/$('#minimap').height();
-			d3.select('#ct-mindMap').attr('transform','translate('+x_l+','+y_l+')scale('+scale+')');
-			//console.log("updated transform: ",d3.select("#ct-mindMap").attr("transform"));
+            function synchronize() {
+                console.log("this: ",this);
+                console.log('sync');
+                scale = d3.select("#ct-mindMap").attr("transform").split(/[()]/)[3];
+                //console.log("height_v: ",height_v,"width_v: ",width_v);
+                w = $('#ct-mapSvg').width()*$('#minimap').width()/$('#ct-mindMap').width();
+                h = $('#ct-mapSvg').height()*$('#minimap').height()/$('#ct-mindMap').height();
 
-		}
+                x = d3.select("#ct-mindMap").attr("transform").split(/[()]/)[1].split(',')[0];
+                y = d3.select("#ct-mindMap").attr("transform").split(/[()]/)[1].split(',')[1];
+                    var xmin=1000,ymin=1000,xmax=0,ymax=0;
+                    dNodes.forEach( function(e,i){
+                        if(xmin>e.x) xmin=e.x;
+                        else if(xmax<e.x) xmax=e.x;
+                        if(ymin>e.y) ymin=e.y;
+                        else if(ymax<e.y) ymax=e.y;	
+                    })
+                l = (-xmin_v*scale-x)*$('#minimap').width()/$('#ct-mindMap').width();
+                t = (-ymin_v*scale-y)*$('#minimap').height()/$('#ct-mindMap').height();			
+                //set the mini viewport dimesions
+                redraw();
+            }
 
-		function updateMindMap_vp(dx,dy){
-			//h,w,l,t => transform(x,y)scale(z)
-			var xvp = d3.select("#ct-mindMap").attr("transform").split(/[()]/)[1].split(',')[0];
-			var yvp = d3.select("#ct-mindMap").attr("transform").split(/[()]/)[1].split(',')[1];
-			scale = (d3.select("#ct-mindMap").attr("transform").split(/[()]/)[3]);
-			console.log("DX/W: ",dx/w);
-			var temp = Math.round((dx/w) * 10000) / 10000;
-			console.log("temp: ",temp);
-			var delta = (1-temp);
-			scale = scale*delta;
-			console.log("scale: ",scale);
-			d3.select('#ct-mindMap').attr('transform','translate('+xvp*delta+','+yvp*delta+')scale('+scale+')');
-			//console.log("updated transform: ",d3.select("#ct-mindMap").attr("transform"));
+            function updateMindMap(){
+                scale = d3.select("#ct-mindMap").attr("transform").split(/[()]/)[3];
+                //console.log("current transform: ",d3.select("#ct-mindMap").attr("transform"));
+                x_l = -xmin_v*scale-l*$('#ct-mindMap').width()/$('#minimap').width();
+                y_l = -ymin_v*scale-t*$('#ct-mindMap').height()/$('#minimap').height();
+                d3.select('#ct-mindMap').attr('transform','translate('+x_l+','+y_l+')scale('+scale+')');
+                //console.log("updated transform: ",d3.select("#ct-mindMap").attr("transform"));
 
-		}		
+            }
 
-		function redraw() {
-		scale = d3.select("#ct-mindMap").attr("transform").split(/[()]/)[3];
-		console.log("Scaling");
-			// var width_t = w>$('#minimap').width()?$('#minimap').width():w;
-			// var height_t = h>$('#minimap').height()?$('#minimap').height():h;
-			// var left_t = w>$('#minimap').width()?$('#minimap').width():l;
-			// var top_t = h>$('#minimap').height()?$('#minimap').height():t;
-			// if(l<0) {w=$('#minimap').width()+l; l=0;};
-			// if ((l+w)>$('#minimap').width()) w=$('#minimap').width()-l;
-			// if(t<0) {h=$('#minimap').height()+t; t=0;};
-			// if ((h+t)>$('#minimap').height()) w=$('#minimap').height()-t;
-			$viewport.css( {
-				width : w,
-				height : h,				
-				left : l,
-				top : t,
-			} );
-		}
+            function updateMindMap_vp(dx,dy){
+                //h,w,l,t => transform(x,y)scale(z)
+                var xvp = d3.select("#ct-mindMap").attr("transform").split(/[()]/)[1].split(',')[0];
+                var yvp = d3.select("#ct-mindMap").attr("transform").split(/[()]/)[1].split(',')[1];
+                scale = (d3.select("#ct-mindMap").attr("transform").split(/[()]/)[3]);
+                console.log("DX/W: ",dx/w);
+                var temp = Math.round((dx/w) * 10000) / 10000;
+                console.log("temp: ",temp);
+                var delta = (1-temp);
+                scale = scale*delta;
+                console.log("scale: ",scale);
+                d3.select('#ct-mindMap').attr('transform','translate('+xvp*delta+','+yvp*delta+')scale('+scale+')');
+                //console.log("updated transform: ",d3.select("#ct-mindMap").attr("transform"));
 
-		function init() {	
-		console.log('Init');
-			x = d3.select("#ct-mindMap").attr("transform").split(/[()]/)[1].split(',')[0];
-			y = d3.select("#ct-mindMap").attr("transform").split(/[()]/)[1].split(',')[1];
-			$minimap=$('#minimap');
-			$minimap.find( ".minimap-node" ).remove();
-			var xmin=1000,ymin=1000,xmax=0,ymax=0;
-			var width,height;
-			dNodes.forEach( function(e,i){
-				if(xmin>e.x) xmin=e.x;
-				else if(xmax<e.x) xmax=e.x;
-				if(ymin>e.y) ymin=e.y;
-				else if(ymax<e.y) ymax=e.y;	
-			})
-			xmin_v=xmin;
-			ymin_v=ymin;
-			//console.log("xmin: ",xmin,"xmax: ",xmax);
-			//console.log("ymin: ",ymin,"ymax: ",ymax);
-			width_v = width = $("#ct-mindMap").width();
-			height_v = height = $("#ct-mindMap").height();
-			//console.log("width: ",width,"height: ",height);
-			hw=Math.max(width,height);
-			$('.line').remove();
-			dLinks.forEach(function(e,i){
-				var sx,sy,dx,dy;
-				var ratioX = $minimap.width() / (width);
-				var ratioY = $minimap.height() / (height);				
-				sx = (e.source.x -xmin)*scale * ratioX;
-				dx = (e.target.x -xmin)*scale * ratioX;
-				sy = (e.source.y -ymin)*scale * ratioY;
-				dy = (e.target.y -ymin)*scale * ratioY;
-				$('#minimap').line(sx+4, sy+4, dx+4, dy+4);
-			})		
+            }		
 
-			dNodes.forEach( function(e,i) {
-				var $child = $('#ct-node-'+i);
-				var mini = $( "<div></div>" ).addClass( "minimap-node" );
-				$minimap.append( mini );
-				var ratioX = $minimap.width() / (width);
-				var ratioY = $minimap.height() / (height);
-				//console.log("ratioX: ",ratioX,"ratioY: ",ratioY,"scale:",scale);
-				var wM = 8;
-				var hM = 8;
-				var xM = (e.x -xmin)*scale * ratioX;
-				var yM = (e.y -ymin)*scale * ratioY;
-				//console.log("xm: ",xM,"ym: ",yM);
-				mini.css( {
-					width : wM,
-					height :  hM ,
-					left :  xM ,
-					top :  yM,
-					background : color[e.type]
-				} );
-			} );
-	
-			}
-			
+            function redraw() {
+            scale = d3.select("#ct-mindMap").attr("transform").split(/[()]/)[3];
+            console.log("Scaling");
+                // var width_t = w>$('#minimap').width()?$('#minimap').width():w;
+                // var height_t = h>$('#minimap').height()?$('#minimap').height():h;
+                // var left_t = w>$('#minimap').width()?$('#minimap').width():l;
+                // var top_t = h>$('#minimap').height()?$('#minimap').height():t;
+                // if(l<0) {w=$('#minimap').width()+l; l=0;};
+                // if ((l+w)>$('#minimap').width()) w=$('#minimap').width()-l;
+                // if(t<0) {h=$('#minimap').height()+t; t=0;};
+                // if ((h+t)>$('#minimap').height()) w=$('#minimap').height()-t;
+                $viewport.css( {
+                    width : w,
+                    height : h,				
+                    left : l,
+                    top : t,
+                } );
+            }
 
-		return this;
-	}
-})( jQuery );
+            function init() {	
+            console.log('Init');
+                x = d3.select("#ct-mindMap").attr("transform").split(/[()]/)[1].split(',')[0];
+                y = d3.select("#ct-mindMap").attr("transform").split(/[()]/)[1].split(',')[1];
+                $minimap=$('#minimap');
+                $minimap.find( ".minimap-node" ).remove();
+                var xmin=1000,ymin=1000,xmax=0,ymax=0;
+                var width,height;
+                dNodes.forEach( function(e,i){
+                    if(xmin>e.x) xmin=e.x;
+                    else if(xmax<e.x) xmax=e.x;
+                    if(ymin>e.y) ymin=e.y;
+                    else if(ymax<e.y) ymax=e.y;	
+                })
+                xmin_v=xmin;
+                ymin_v=ymin;
+                //console.log("xmin: ",xmin,"xmax: ",xmax);
+                //console.log("ymin: ",ymin,"ymax: ",ymax);
+                width_v = width = $("#ct-mindMap").width();
+                height_v = height = $("#ct-mindMap").height();
+                //console.log("width: ",width,"height: ",height);
+                hw=Math.max(width,height);
+                $('.line').remove();
+                dLinks.forEach(function(e,i){
+                    var sx,sy,dx,dy;
+                    var ratioX = $minimap.width() / (width);
+                    var ratioY = $minimap.height() / (height);				
+                    sx = (e.source.x -xmin)*scale * ratioX;
+                    dx = (e.target.x -xmin)*scale * ratioX;
+                    sy = (e.source.y -ymin)*scale * ratioY;
+                    dy = (e.target.y -ymin)*scale * ratioY;
+                    $('#minimap').line(sx+4, sy+4, dx+4, dy+4);
+                })		
+
+                dNodes.forEach( function(e,i) {
+                    var $child = $('#ct-node-'+i);
+                    var mini = $( "<div></div>" ).addClass( "minimap-node" );
+                    $minimap.append( mini );
+                    var ratioX = $minimap.width() / (width);
+                    var ratioY = $minimap.height() / (height);
+                    //console.log("ratioX: ",ratioX,"ratioY: ",ratioY,"scale:",scale);
+                    var wM = 8;
+                    var hM = 8;
+                    var xM = (e.x -xmin)*scale * ratioX;
+                    var yM = (e.y -ymin)*scale * ratioY;
+                    //console.log("xm: ",xM,"ym: ",yM);
+                    mini.css( {
+                        width : wM,
+                        height :  hM ,
+                        left :  xM ,
+                        top :  yM,
+                        background : color[e.type]
+                    } );
+                } );
+        
+                }
+                
+
+            return this;
+        }
+    })( jQuery );
 //$( "#minimap" ).minimap( $('#ct-mapSvg') );
 
     $scope.toggleMinimap = function(){
         $("#minimap").toggle();
     }
 
+    $scope.showContent = function($fileContent){
+        var validate = true;
+        $scope.content = $fileContent;
+        mindmapServices.excelToMindmap($scope.content).then(function(result) {
+            $scope.dataJSON = result;
+            $scope.dataJSON.forEach(function(e,i){
+                if(!validNodeDetails(e.name)) validate = false;
+            });
+            if(!validate){
+                openDialogMindmap('Error','Validation of excel failed');
+                return;
+            }
+            // Create Mindmap Flow
+            $scope.createMap('tabCreate'); 
+            $scope.tab = 'tabCreate'; 
+            $scope.createMapsCall();
+            $('#ProjectInput').modal('show');
+        }, function(error) {
+            console.log(error);
+        })        
+    };
+
 }]);
+
+mySPA.directive('onReadFile', function ($parse) {
+	return {
+		restrict: 'A',
+		scope: false,
+		link: function(scope, element, attrs) {
+            var fn = $parse(attrs.onReadFile);
+            
+			element.on('change', function(onChangeEvent) {
+				var reader = new FileReader();
+                
+				reader.onload = function(onLoadEvent) {
+                    console.log(onLoadEvent.target.result);
+					scope.$apply(function() {
+						fn(scope, {$fileContent:onLoadEvent.target.result});
+					});
+				};
+
+				reader.readAsBinaryString((onChangeEvent.srcElement || onChangeEvent.target).files[0]);
+			});
+		}
+	};
+});

@@ -42,7 +42,13 @@
    		<div class="createOptionContainer">
    			<div ng-click="createMap('tabCreate'); tab = 'tabCreate'; createMapsCall()" title="Create New"><img alt="Create New" class="" src="images_mindmap/ic-create-newMindmap.png"><label>Create New</label></div>
    			<div ng-click="createMap('mindmapEndtoEndModules'); tab = 'mindmapEndtoEndModules'; createMapsCall()" title="End to End flow"><img alt="End to End flow" class="" src="images_mindmap/ic-endtoendFlow.png"><label>End to End Flow</label></div>
-   			<div title="Import from Excel"><img alt="Import from Excel" class="" src="images_mindmap/ic-importfromexcel-mindmap.png"><label>Import from Excel</label></div>
+   			<div title="Import from Excel">
+                <label for="file-input">
+                    <img alt="Import from Excel" class="" src="images_mindmap/ic-importfromexcel-mindmap.png">
+                </label>
+                <label>Import from Excel</label>
+                <input id="file-input" on-read-file="showContent($fileContent)" type="file" name="xlsfile" accept=".xls,.xlsx" required="" autofocus="" style="display:none"/>
+            </div>
    		</div>
    </div>   
    <div id="ct-main-e2e" class="fl-left" ng-if="tab == 'mindmapEndtoEndModules'">
@@ -453,11 +459,34 @@
                 
 			</div>
 			<div class="modal-footer">
-                <button type="button" class="btn btn-default" ng-click="callFunction(functionTBE)" data-dismiss="modal">Yes</button>
+                <button type="button" class="btn btn-default" ng-click="callFunction()" data-dismiss="modal">Yes</button>
 				<button type="button" class="btn btn-default" id="undoChanges" data-dismiss="modal">No</button>
 			</div>
 		</div>
 	</div>
 </div>
+
+<!-- MIndmaps createnewmap confirmation dialog-->
+<div class="modal fade" id="ProjectInput" role="dialog" data-keyboard="false" data-backdrop="static">
+	<div class="modal-dialog modal-sm">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">&times;</button>
+				<h4 class="modal-title">Select a Project</h4>
+			</div>
+			<div class="modal-body">
+                    <select class="project-list project-list-popup">
+                        <option value="" disabled selected>Please Select Project</option>
+                        <option value="project1">Project1</option>
+                        <option value="project2">Project2</option>
+                    </select>
+			</div>
+			<div class="modal-footer">
+                <button type="button" class="btn btn-default" ng-click="createFromJson()" data-dismiss="modal">Create Flow</button>
+			</div>
+		</div>
+	</div>
+</div>
+
 <footer footer id="footer" class="footer-global"></footer>
 <!--Footer-->

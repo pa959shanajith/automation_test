@@ -362,6 +362,7 @@ try {
     app.post('/reviewTask', mindmap.reviewTask);
     app.post('/saveData', mindmap.saveData);
     app.post('/saveEndtoEndData', mindmap.saveEndtoEndData);
+    app.post('/excelToMindmap',mindmap.excelToMindmap);
 
     //Login Routes
     app.post('/authenticateUser_Nineteen68', login.authenticateUser_Nineteen68);
