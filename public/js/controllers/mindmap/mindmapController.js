@@ -525,7 +525,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         //To fix issue 710-Create a module and see that module name does not display in edit mode
         v = addNode(dNodes[uNix - 1], !1, null);
         childNode = v;
-        if(!moduleName) editNode();
+        if(!moduleName) editNode(node);
     };
 
     function loadMap(e) {
@@ -1793,7 +1793,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         //     if (e.stopPropagation) e.stopPropagation();
         // }
         //logic to create the node in editable mode
-        if (node == 0) {
+        if (node == 0 || node == undefined) {
             childNode = null;
             var p = d3.select(activeNode);
         } else var p = childNode;
@@ -4852,6 +4852,9 @@ function getSelectionStart(o) {
             $('.node-selected').removeClass('node-selected');
         }
     }
+    $scope.parsefile = function(){
+        console.log("Hi! parsed file.");
+    };
     //--------------------Controller logic Ends-------------------------//
 
     function SaveCreateED(element,disable,noAccess){
