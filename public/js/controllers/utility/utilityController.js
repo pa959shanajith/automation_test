@@ -10,14 +10,10 @@ mySPA.controller('utilityController', ['$scope','$rootScope',  '$http', '$locati
     //$scope.getScreenView = "utility-Encrytpion";
     $("#utilityEncrytpion img").addClass("select-utility");
     loadUserTasks()
-    /*if(window.localStorage['_VP'] == "false")
-    {
-    	var taskAuth = false;
-    }*/
+
     if (window.localStorage['navigateScreen'] != "p_Utility") {
         $rootScope.redirectPage();
     }
-
     cfpLoadingBar.start()
 
     $scope.encrypt_optimize = function(tabValue) {

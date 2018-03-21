@@ -52,7 +52,7 @@ exports.authenticateUser_Nineteen68 = function (req, res) {
 			function checkldapuser_callback(err, data) {
 				logger.info("Inside call function of checkldapuser");
 				if (data) {
-					ldapCheck(req, function (err, ldapdata) {
+					ldapCheck(username, password, function (err, ldapdata) {
 						logger.info("Inside call function of ldapCheck");
 						logger.info("LDAP User");
 						if (ldapdata == 'pass') {
@@ -227,7 +227,7 @@ exports.authenticateUser_Nineteen68_CI = function (req, res) {
 			checkldapuser(req, username, function (err, data) {
 					logger.info("Inside call function of checkldapuser");
 				if (data) {
-					ldapCheck(req, function (err, ldapdata) {
+					ldapCheck(username, password, function (err, ldapdata) {
 						logger.info("Inside call function of ldapCheck");
 						if (ldapdata == 'pass') {
 							flag = 'validCredential';
@@ -516,13 +516,11 @@ function checkldapuser(req, username, callback, data) {
 	});
 }
 
-function ldapCheck(req, cb) {
+function ldapCheck(username, password, cb) {
 	logger.info("Inside ldapCheck function");
 	var ldap_ip = '',
 	ldap_port = '',
 	ldap_domain = '';
-	var username = req.body.username.toLowerCase();
-	var password = req.body.password;
 	ldap_ip = config.ldap_ip;
 	ldap_port = config.ldap_port;
 	ldap_domain = config.ldap_domain;
@@ -563,14 +561,8 @@ exports.loadUserInfo_Nineteen68 = function (req, res) {
 	try {
 		logger.info("Inside UI Service: loadUserInfo_Nineteen68");
 		if (utils.isSessionActive(req.session)) {
-			var flag = req.body.flag;
-			var switchedRole = req.body.selRole;
-			if(switchedRole != undefined && switchedRole != '' ) {
-				req.session.switchedRole = true;
-			} else{
-				req.session.switchedRole = false;
-			}
-			var userName = req.session.username.toLowerCase();
+			var selectedRole = req.body.selRole;
+			var userName = req.session.username;
 			var jsonService = {};
 			async.series({
 				userInfo: function (callback) {
@@ -603,7 +595,9 @@ exports.loadUserInfo_Nineteen68 = function (req, res) {
 										jsonService.lastname = service.lastname;
 										jsonService.role = service.defaultrole;
 										jsonService.username = service.username.toLowerCase();
+										selectedRole = selectedRole||jsonService.role;
 										req.session.defaultRoleId = jsonService.role;
+										req.session.activeRole = selectedRole;
 									} else {
 										logger.info("User info not found");
 										res.send("fail");
@@ -622,41 +616,29 @@ exports.loadUserInfo_Nineteen68 = function (req, res) {
 				},
 				loggedinRole: function (callback) {
 					var inputs = {
-						"query": "loggedinRole"
+						"roleid": [selectedRole]
 					};
-					if (flag == true) {
-						inputs.roleid = switchedRole;
-					} else if (flag == false || flag == undefined) {
-						inputs.roleid = req.session.defaultRoleId;
-					}
 					var args = {
 						data: inputs,
 						headers: {
 							"Content-Type": "application/json"
 						}
 					};
-					logger.info("Calling NDAC Service from loggedinRole: loadUserInfo_Nineteen68");
-					client.post(epurl + "login/loadUserInfo_Nineteen68", args,
+					logger.info("Calling NDAC Service from loggedinRole: getRoleNameByRoleId_Nineteen68");
+					client.post(epurl + "login/getRoleNameByRoleId_Nineteen68", args,
 						function (rolesResult, response) {
 						if (response.statusCode != 200 || rolesResult.rows == "fail") {
-							logger.error("Error occured in loadUserInfo_Nineteen68 Error Code : ERRNDAC");
+							logger.error("Error occurred in loadUserInfo_Nineteen68 Error Code : ERRNDAC");
 							res.send("fail");
 						} else {
 							try {
-								if (rolesResult.rows.length == 0) {
-									logger.info("user role not found");
+								var rolename = rolesResult.rows[selectedRole];
+								if (!rolename) {
+									logger.error("User role not found");
 									res.send("fail");
 								} else {
-									try {
-										var role = "";
-										for (var i = 0; i < rolesResult.rows.length; i++) {
-											role = rolesResult.rows[i].rolename;
-										}
-										req.session.defaultRole = role;
-									} catch (exception) {
-										logger.error(exception.message);
-										res.send("fail");
-									}
+									if (selectedRole == req.session.defaultRoleId) req.session.defaultRole = rolename;
+									jsonService.rolename = req.session.defaultRole;
 								}
 								callback();
 							} catch (exception) {
@@ -669,19 +651,10 @@ exports.loadUserInfo_Nineteen68 = function (req, res) {
 				//Service call to get the plugins accessible for the user
 				userPlugins: function (callback) {
 					try {
-						var inputs;
-						if (flag == true) {
-							inputs = {
-								"roleid": switchedRole,
-								"query": "userPlugins"
-							};
-						}
-						if (flag == false || flag == undefined) {
-							inputs = {
-								"roleid": req.session.defaultRoleId,
-								"query": "userPlugins"
-							};
-						}
+						var inputs = {
+							"roleid": selectedRole,
+							"query": "userPlugins"
+						};
 						var args = {
 							data: inputs,
 							headers: {
@@ -696,20 +669,21 @@ exports.loadUserInfo_Nineteen68 = function (req, res) {
 								res.send("fail");
 							} else {
 								try {
-									if (pluginResult.rows.length > 0) {
-										var pluginsArr = [];
-										for (var k in pluginResult.rows[0]) {
-											if (k != 'roleid' && k != 'permissionid') {
-												pluginsArr.push({
-													"keyName": k,
-													"keyValue": (pluginResult.rows[0])[k]
-												});
-											}
-										}
-										jsonService.plugindetails = pluginsArr;
-									} else {
+									if (pluginResult.rows.length == 0) {
 										logger.info("User plugins not found");
 										res.send("fail");
+									} else {
+										var pluginsArr = [];
+										//"alm,apg,dashboard,deadcode,mindmap,neurongraphs,oxbowcode,reports,weboccular,utility"
+										var key = ["ALM", "Auto Gen Path", "Dashboard", "Dead Code Identifier", "Mindmap", "Neuron Graphs", "Oxbow Code Identifier", "Reports", "Utility", "Webocular"];
+										var vals = Object.values(pluginResult.rows[0]);
+										for(i=0; i < key.length; i++){
+											pluginsArr.push({
+												"pluginName" : key[i],
+												"pluginValue" : vals[i]
+											});
+										}
+										jsonService.pluginsInfo = pluginsArr;
 									}
 								} catch (exception) {
 									logger.error(exception.message);
@@ -746,58 +720,24 @@ exports.getRoleNameByRoleId_Nineteen68 = function (req, res) {
 	try {
 		logger.info("Inside UI service: getRoleNameByRoleId_Nineteen68");
 		if (utils.isSessionActive(req.session)) {
-			var roleId = [];
-			req.session.role = [];
-			req.session.role = req.body.role;
-			var role = [];
-			//var role = roleId[0];
-			async.forEachSeries(req.session.role, function (roleid, callback) {
-				var inputs = {
-					"roleid": roleid
-				};
-				var args = {
-					data: inputs,
-					headers: {
-						"Content-Type": "application/json"
-					}
-				};
-
-				logger.info("Calling NDAC Service: getRoleNameByRoleId_Nineteen68");
-				client.post(epurl + "login/getRoleNameByRoleId_Nineteen68", args,
-					function (rolesResult, response) {
-					if (response.statusCode != 200 || rolesResult.rows == "fail") {
-						logger.error("Error occured in getRoleNameByRoleId_Nineteen68 Error Code : ERRNDAC");
-						res.send("fail");
-					} else {
-						try {
-							if (rolesResult.rows.length == 0) {
-								logger.info("User role not found");
-								res.send("fail");
-							} else {
-								try {
-									//var role="";
-									for (var i = 0; i < rolesResult.rows.length; i++) {
-										role.push(rolesResult.rows[i].rolename);
-									}
-									// res.send(role);
-								} catch (exception) {
-									logger.error(exception.message);
-									res.send("fail");
-								}
-								callback();
-							}
-						} catch (exception) {
-							logger.error(exception.message);
-							res.send("fail");
-						}
-					}
-					// callback();
-				});
-			}, function () {
-				if (role == undefined) {
+			var roleList = req.body.role;
+			var inputs = {
+				"roleid": roleList
+			};
+			var args = {
+				data: inputs,
+				headers: {
+					"Content-Type": "application/json"
+				}
+			};
+			logger.info("Calling NDAC Service: getRoleNameByRoleId_Nineteen68");
+			client.post(epurl + "login/getRoleNameByRoleId_Nineteen68", args,
+				function (rolesResult, response) {
+				if (response.statusCode != 200 || rolesResult.rows == "fail") {
+					logger.error("Error occured in getRoleNameByRoleId_Nineteen68 Error Code : ERRNDAC");
 					res.send("fail");
 				} else {
-					res.send(role);
+					res.send(rolesResult.rows);
 				}
 			});
 		} else {
@@ -832,7 +772,7 @@ exports.logoutUser_Nineteen68_CI = function (req, res) {
 exports.logoutUser_Nineteen68 = function (req, res) {
 	logger.info("Inside UI Service: logoutUser_Nineteen68");
 	res.clearCookie('connect.sid');
-	logger.info("user logged out successfully %s",req.session.username);
+	logger.info("%s logged out successfully", req.session.username);
 	req.session.destroy();
 	if (req.session == undefined) {
 		logger.info("Session Expired");

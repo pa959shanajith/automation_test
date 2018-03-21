@@ -1,10 +1,10 @@
 mySPA.controller('headerController', function($scope, $rootScope, $timeout, $http, $location, headerServices, LoginService, cfpLoadingBar, socket) {
-	var userDetails,userRole,task,switchedRoleId;
-	var projectId = []
+	var userDetails,username,userRole,task;
+	var selectedRoleID, selectedRoleName, redirectPath;
+	var projectId = [];
 	var releaseId = [];
 	var cycleId = [];
 	var screenId = [];
-	var selectedROleID;
 
 	if(window.localStorage['_UI']){
 		userDetails = JSON.parse(window.localStorage['_UI']);
@@ -15,6 +15,7 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 	}
 	
 	userRole = window.localStorage['_SR'];
+	username = userDetails.username.toLowerCase();
 
 	$scope.$on('$locationChangeStart', function(event, next, current){
 		// Prevent the browser default action (Going back):
@@ -32,12 +33,13 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 	}
 
 	//Global model popup
-	function openModelPopup(title, body) {
-		$("#switchRoleModal").find('.modal-title').text(title);
-		$("#switchRoleModal").find('.modal-body p').text(body);
-		$("#switchRoleModal").modal("show");
+	function openModelPopup(modalId, title, body) {
+		var modalBox = $("#"+modalId);
+		modalBox.find('.modal-title').text(title);
+		modalBox.find('.modal-body p').text(body);
+		modalBox.modal("show");
 		setTimeout(function () {
-			$("#switchRoleModal").find('.btn-default').focus();
+			modalBox.find('.btn-default').focus();
 		}, 300);
 	}
 
@@ -148,142 +150,79 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 
 	$scope.naviPg = function(){
 		if (localStorage.getItem("navigateEnable") == "true") {
-			window.localStorage["_VP"] = true;
 			window.localStorage['navigateScreen'] = "plugin";
 			$timeout(function () {
 				$location.path('/plugin');
 		   	}, 100);
 		}
-	}
+	};
 
-	var additionalRoleName;
-	var userId = JSON.parse(window.localStorage['_UI']).user_id;
+	if(window.localStorage['_SRS']=="success"){
+		delete window.localStorage['_SRS'];
+		setTimeout(function () {
+			openModelPopup("switchRoleStatus", "Switch Role", "Your role is changed to " + window.localStorage['_SR']);
+		}, 500);
+	}
 
 	$(document).on('click', ".switchRole_confirm", function () {
-		//primaryRoleName = window.localStorage['_SR'];
-		additionalRoleName = $(this).text();
-		selectedROleID = $(this).valueOf("outerHTML").data("id");
-		console.log($(this).text());
-		openModelPopup("Switch Role", "Are you sure you want to switch role to: " + additionalRoleName);
+		selectedRoleName = $(this).text();
+		selectedRoleID = $(this).valueOf("outerHTML").data("id");
+		openModelPopup("switchRoleModal", "Switch Role", "Are you sure you want to switch role to: " + selectedRoleName);
+	});
 
-		//$("#switchRoleModal").modal("show");
-	})
+	$scope.switchRole = function () {
+		userDetails = JSON.parse(window.localStorage['_UI']);
+		var roleasarray = userDetails.additionalrole;
+		if (roleasarray.length == 0) {
+			$("#switchRoles").hide();
+			openModelPopup("switchRoleStatus", "Switch Role", "There are no roles to switch");
+		} else {
+			LoginService.getRoleNameByRoleId_Nineteen68(roleasarray)
+			.then(function (data) {
+				if (data == "Invalid Session") {
+					$rootScope.redirectPage();
+				} else {
+					var rolesList = $('#switchRoles');
+					rolesList.empty();
+					var selectedRole = window.localStorage['_SR'];
+					data[userDetails.role] = userDetails.rolename;
+					for (var rid in data) {
+						if (data[rid] != selectedRole) {
+							rolesList.append($("<li class='switchRole_confirm' data-id=" + rid + " ><a href='#' data-toggle='modal' data-target='#switchRoleModal'>" + data[rid] + "</a></li>"));
+						}
+					}
+				}
+			});
+		}
+	};
 
 	$scope.switchedRole = function () {
-		changedRole = $('#changedRole');
-		changedRole.children().remove(); 
-		changedRole.append($("<p>Your role is changed to " + additionalRoleName + "</p>"))
 		$("#switchRoleModal").modal("hide");
-		$("#switchedRoleModal").modal("show");
-	}
-
-
-	$scope.Switch_Role = function () {
-		//var userId = JSON.parse(window.localStorage['_UI']).user_id;
-		var username = JSON.parse(window.localStorage['_UI']).username.toLowerCase();
-		var userRolesList;
-		var selRole;
-		if (JSON.parse(window.localStorage['_UI']).additionalrole.length == 0) {
-			$("#switchRoles").hide();
-			$('#sRole ul').hide();
-		}
-		LoginService.loadUserInfo_Nineteen68(username, selRole, false)
-			.then(function (response) {
-				if(response == "Invalid Session"){
-					$rootScope.redirectPage();
+		blockUI("Switching to " + selectedRoleName);
+		LoginService.loadUserInfo_Nineteen68(selectedRoleID)
+		.then(function (data) {
+			unblockUI();
+			if (data != "fail") {
+				window.localStorage['_SR'] = selectedRoleName;
+				window.localStorage['_UI'] = JSON.stringify(data);
+				window.localStorage['_SRS'] = "success";
+				if (selectedRoleName == "Admin") {
+					window.localStorage['navigateScreen'] = "admin";
+					window.location.href = "/admin";
+				} else {
+					window.localStorage['navigateScreen'] = "plugin";
+					window.location.href = "/plugin";
 				}
-				var roleasarray=[];
-				//roleasarray.push(response.additionalrole);
-				roleasarray = response.additionalrole;
-				LoginService.getRoleNameByRoleId_Nineteen68(roleasarray)
-					.then(function (data) {
-						if (response == "Invalid Session") {
-							$rootScope.redirectPage();
-						}
-						else if (data.length == 0) {
-							$("#switchRoles").hide();
-							$('#sRole ul').hide();
-							$("#noRoles").modal("show");
-						}
-						else {
-							//alert("success"); $(this).valueOf("outerHTML").data("id")
-							getAdditionalRoles = $('#switchRoles');
-							getAdditionalRoles.empty();
-							var pR = window.localStorage['_pR'].split(";")
-							var sr = window.localStorage['_SR'];
-							var ar = window.localStorage['_aR'];
-							if (pR[0] != sr) {
-								for (var i = 0; i < data.length; i++) {
-									if (($('#switchRole').val() != response) && (data[i] != sr) && (response.additionalrole[i] != ar)) {
-
-										getAdditionalRoles.append($("<li class='switchRole_confirm' data-id=" + response.additionalrole[i] + " ><a href='#' data-toggle='modal' id=" + response.additionalrole[i] + " data-target='#switchRoleModal'>" + data[i] + "</a></li>"));
-									}
-								}
-								getAdditionalRoles.append($("<li class='switchRole_confirm' data-id=" + pR[1] + " ><a href='#' data-toggle='modal' id=" + pR[1] + " data-target='#switchRoleModal'>" + pR[0] + "</a></li>"));
-							}
-							else {
-								for (var i = 0; i < data.length; i++) {
-									getAdditionalRoles.append($("<li class='switchRole_confirm' data-id=" + response.additionalrole[i] + " ><a href='#' data-toggle='modal' id=" + response.additionalrole[i] + " data-target='#switchRoleModal'>" + data[i] + "</a></li>"));
-								}
-							}
-						}
-					});
-				window.localStorage['_R'] = response.r_ids;
-
-			}, function (error) { console.log("Error:::::::::::::", error) })
-
-	}
-
-	$scope.switchRole_Yes = function () {
-		var username = JSON.parse(window.localStorage['_UI']).username.toLowerCase();
-		var selRole = selectedROleID;
-		LoginService.loadUserInfo_Nineteen68(username, selRole, true)
-			.then(function (data) {
-				if (data != "fail") {
-					//To be removed - Has to come from database
-					var availablePlugins = [];
-					var key = ["ALM", "Auto Gen Path", "Dashboard", "Dead Code Identifier", "Mindmap", "Neuron Graphs", "Oxbow Code Identifier", "Reports", "Utility", "Webocular"];
-					for (i = 0; i < data.plugindetails.length; i++) {
-						availablePlugins.push({
-							"pluginName": key[i],
-							"pluginValue": data.plugindetails[i].keyValue
-						})
-					}
-					data.pluginsInfo = availablePlugins;
-					//window.localStorage['LoginSuccess'] = "True";
-					window.localStorage['_SR'] = additionalRoleName;
-					window.localStorage['_UI'] = JSON.stringify(data);
-					window.localStorage['_aR'] = selectedROleID;
-					var roleasarray = [];
-					roleasarray.push(selectedROleID);
-					LoginService.getRoleNameByRoleId_Nineteen68(roleasarray)
-						.then(function (data1) {
-							if (data1 != "fail") {
-								window.localStorage['_SR'] = data1;
-								if (data1 == "Admin") {
-									window.localStorage['navigateScreen'] = "admin";
-									window.location.href = "/admin";
-								}
-								else {
-									window.localStorage['navigateScreen'] = "plugin";
-									window.location.href = "/plugin";
-								}
-							}
-							else console.log("Fail to get role name by role Id.");
-						},
-						function (error) {
-							console.log("Fail to Load UserInfo")
-						});
-					//window.location.href = "/plugin";	
-				}
-				else
-					console.log("Failed to Load UserInfo.");
-			},
-			function (error) {
-				console.log("Fail to Load UserInfo")
-			});
-
-	}
+			} else {
+				console.log("Fail to Switch User");
+				openModelPopup("switchRoleStatus", "Switch Role", "Fail to Switch User");
+			}
+		}, function (error) {
+			unblockUI();
+			console.log("Fail to Switch User");
+			openModelPopup("switchRoleStatus", "Switch Role", "Fail to Switch User");
+		});
+	};
 
 	if (window.localStorage['_CT']) {
 		projectId.push(JSON.parse(window.localStorage['_CT']).projectId);
@@ -326,5 +265,5 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 
 	$scope.logout = function(){
 		$rootScope.redirectPage();
-	}
+	};
 });

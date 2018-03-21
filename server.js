@@ -135,11 +135,11 @@ try {
 
     //Role Based User Access to services
     app.post('*', function (req, res, next) {
-        var roleId = req.session.defaultRoleId;
-        var updateinp = { roleid: roleId, servicename: req.url.replace("/", "") };
+        var roleId = req.session.activeRole;
+        var updateinp = { roleid: roleId||"ignore", servicename: req.url.replace("/", "") };
         var args = { data: updateinp, headers: { "Content-Type": "application/json" } };
         var apireq = apiclient.post(epurl + "utility/userAccess_Nineteen68", args, function (result, response) {
-            if (roleId != undefined) {
+            if (req.session && roleId) {
                 if (response.statusCode != 200 || result.rows == "fail") {
                     logger.error("Error occured in userAccess_Nineteen68");
                     res.send("Invalid Session");
@@ -151,7 +151,7 @@ try {
                 } else {
                     if (result.rows == "True") {
                         logger.rewriters.push(function (level, msg, meta) {
-                            if (req.session.uniqueId != undefined) {
+                            if (req.session && req.session.uniqueId) {
                                 meta.username = req.session.username;
                                 meta.userid = req.session.userid;
                                 meta.userip = req.headers['client-ip'] != undefined ?  req.headers['client-ip']: req.ip;

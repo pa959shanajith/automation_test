@@ -66,7 +66,7 @@ exports.getUsers_Nineteen68 = function (req, res) {
 	client.post(epurl + "admin/getUserRoles_Nineteen68", args,
 		function (userrolesresult, userrolesresponse) {
 		if (userrolesresponse.statusCode != 200 || userrolesresult.rows == "fail") {
-			logger.error("Error occured in getRoleNameByRoleId_Nineteen68 Error Code : ERRNDAC");
+			logger.error("Error occured in getUsers_Nineteen68 Error Code : ERRNDAC");
 			res(null, "fail");
 		} else {
 			var inputs = {
