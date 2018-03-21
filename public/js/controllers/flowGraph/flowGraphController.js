@@ -6,6 +6,7 @@ mySPA.controller('flowGraphController', ['$scope', '$http', '$location', '$timeo
 		document.getElementById("currentYear").innerHTML = new Date().getFullYear()
 		cfpLoadingBar.complete()
 		$("#utilityEncrytpion").trigger("click");
+	
 	  }, 500);
 	  
 	 loadUserTasks(); 
@@ -228,7 +229,7 @@ mySPA.controller('flowGraphController', ['$scope', '$http', '$location', '$timeo
 				"methods": obj[i].classMethods,
 				"attributes": obj[i].classVariables,
 				"id": i,
-				"Complexity":obj[i].complexity
+				"complexity":obj[i].complexity
 			});
 		}
 		for (var i=0; i<obj.length; i++){
@@ -301,7 +302,8 @@ mySPA.controller('flowGraphController', ['$scope', '$http', '$location', '$timeo
 							"classname": obj[i].implements,
 							"methods": [],
 							"attributes": [],
-							"id": size + 1
+							"id": size + 1,
+							"complexity":"undefined"
 						});
 						class_map[obj[i].implements] = size + 1;
 						var link = {
@@ -329,8 +331,7 @@ mySPA.controller('flowGraphController', ['$scope', '$http', '$location', '$timeo
 		console.log(graph_json);
 		return graph_json;
 	}
-
-
+	
 	$scope.generateClassDiagram = function(obj){
 		
 		$("#apg-cd-canvas").show();
@@ -566,23 +567,30 @@ mySPA.controller('flowGraphController', ['$scope', '$http', '$location', '$timeo
 			.attr('class', 'apg-info-icon')
 			.on('click', function(d){
 				d = $scope.obj.classes[d];
-				if(d.complexity=="undefined"){
-					openDialog('APG', "Complexity can't determine.")
+				if(d== undefined || d.complexity== "Undefined"){
+					openDialog('APG', "Complexity can't determine.");
 				}
 				else{
 					$('#apg-cd-canvas').hide();
 					$('#complexity-canvas').show();
 					$scope.ccname=d.name;
-					$scope.cmethod=d.classMethods.length;
 					$scope.cc =d.complexity.class;
 					var methods_data=d.complexity.methods;
 					var method_names=Object.keys(methods_data);
+					$scope.cmethod=method_names.length;
+					$("#tblMethodLevel tbody").empty();
 					for(var i=0;i<method_names.length;i++){
-						$("#tblMethodLevel tbody").append("<tr><td><div>"+method_names[i]+"</div></td><td><div>"+methods_data[method_names[i]]+"</div></td><td><div></div></td></tr>");
+						$("#tblMethodLevel tbody").append("<tr class='highlightRow'><td><div>"+method_names[i]+"</div></td><td><div>"+methods_data[method_names[i]]['complexity']+"</div></td><td><div></div></td></tr>");
 					}
 					$scope.$apply();
-					}
+					$("tr:visible").on('click',function() {
+						$("tr.hightlight_Complexity_row").removeClass("hightlight_Complexity_row");
+						$(this).addClass('hightlight_Complexity_row');
+					});
+				}
 			})
+		
+
 		nodeGroup.append('image')
 			.attr('href', 'imgs/apg-check-icon.png')
 			.attr('width', '20px')
@@ -627,7 +635,7 @@ mySPA.controller('flowGraphController', ['$scope', '$http', '$location', '$timeo
 		}
 
 	}
-	
+
 	function openDialog(title, body) {
 		$("#globalModal").find('.modal-title').text(title);
 		$("#globalModal").find('.modal-body p').text(body).css('color', 'black');
@@ -636,7 +644,9 @@ mySPA.controller('flowGraphController', ['$scope', '$http', '$location', '$timeo
 			$("#globalModal").find('.btn-default').focus();
 		}, 300);
 	}
+
 	
+
 	$scope.generateDataFlowDiagram = function(i){
 		console.log(i);
 		var obj = $scope.obj;
