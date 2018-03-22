@@ -552,7 +552,18 @@ mySPA.controller('reportsController', ['$scope','$rootScope', '$http', '$locatio
 							else{
 								finalReports.rows[k].testcase_details = finalReports.rows[k].testcase_details;
 							}
+
+							if( finalReports.rows[k].testcase_details == "")
+							{
+								finalReports.rows[k].testcase_details = {
+									"actualResult_pass": "",
+									"actualResult_fail": "",
+									"testcaseDetails":""
+								}
+							}
 						}
+					
+						
 					}
 					finalReports.overallstatus[0].pass = (parseFloat((pass/total)*100).toFixed(2)) > 0? parseFloat((pass/total)*100).toFixed(2) : parseInt(0);
 					finalReports.overallstatus[0].fail = (parseFloat((fail/total)*100).toFixed(2)) > 0? parseFloat((fail/total)*100).toFixed(2) : parseInt(0);
