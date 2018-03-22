@@ -966,6 +966,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 }
 
                 replicateTask(pi);
+                if(!origTask) dNodes[pi].task.cx = undefined;
             }
         }
 
