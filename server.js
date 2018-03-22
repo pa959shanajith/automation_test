@@ -339,14 +339,13 @@ try {
 
     // Mindmap Routes
     try {
+    	throw "Disable Versioning";
         var version = require('./server/controllers/project_versioning');
         app.post('/getVersions', version.getVersions);
         app.post('/getModulesVersioning', version.getModulesVersioning);
         app.post('/saveDataVersioning', version.saveDataVersioning);
         app.post('/createVersion', version.createVersion);
         app.post('/getProjectsNeo', version.getProjectsNeo);
-        
-        
     } catch (Ex) {
         logger.warn('Versioning is disabled');
     }

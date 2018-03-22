@@ -366,7 +366,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         var svgTileLen = $(".ct-svgTile").length;
         if (svgTileLen == 0) {
             $('#ct-mapSvg, #ct-canvas').empty();
-            $('#ct-canvas').append(`<div id="minimap-wrapper"><div id="minimap-header"><img class="move-ic-img" src="imgs/move_img.svg" alt="move" style="height: 15px;"></div><div id="minimap"></div></div>
+            $('#ct-canvas').append(`<div id="minimap-wrapper" style="display: none;"><div id="minimap-header"><img class="move-ic-img" src="imgs/move_img.svg" alt="move" style="height: 15px;"></div><div id="minimap"></div></div>
                                 <div class="ct-tileBox">
                                     <div class="ct-tile" title="Create Mindmap">
                                         <svg class="ct-svgTile" height="150px" width="150px">
