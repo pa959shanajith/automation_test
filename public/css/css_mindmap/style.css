@@ -1427,16 +1427,43 @@
      box-shadow: 5px 0px 0px 0px red !important;
 }
 
+#minimap-wrapper{
+    width: 225px;
+    height: 245px;
+    position: fixed;
+    top: 196px;
+    left: calc(100% - 250px);
+}
+#minimap-header{
+    margin-left: 196px;
+    position: fixed;
+    border-radius: 8px 8px 0px 0px;
+    width: 23px;
+    height: 20px;
+    background: #633690;
+    cursor: all-scroll;
+}/*
 #minimap{
-    position: fixed; 
-    width: 175px; 
-    height: 175px; 
-    top: 216px; 
-    right: 20px; 
+    top:10px;
+    width: 100%; 
+    height: 225px; 
     background-color: #EEE; 
     border: 1px solid #AAA; 
     opacity: 0.9; 
     z-index: 1; 
+    overflow: hidden;
+}*/
+
+#minimap{
+    border-radius: 5px;
+    position: fixed;
+    width: 225px;
+    height: 225px;
+    margin-top: 20px;
+    background-color: #EEE;
+    border: 1px solid #633690;
+    opacity: 0.9;
+    z-index: 1;
     overflow: hidden;
 }
 

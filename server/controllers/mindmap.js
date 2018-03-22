@@ -1200,7 +1200,6 @@ var update_cassandraID = function(d,urlData,module_type) {
 exports.excelToMindmap = function(req,res){
 	console.log(req.body.type);
 	var wb = xlsx.read(req.body.data, {type:'binary'});
-	console.log("Entered Here 1");
 	try{
 		var myCSV=xlsToCSV(wb);
 	}
@@ -1210,25 +1209,29 @@ exports.excelToMindmap = function(req,res){
 	var numSheets=myCSV.length/2;
 	var qObj=[];
 	var err;
-	console.log("My CSV object: ",myCSV);
 	for(var k=0;k<numSheets;k++){
 		var cSheet=myCSV[k*2+1];
 		var cSheetRow=cSheet.split('\n');
 		var scoIdx=-1,scrIdx=-1,sctIdx=-1;
 		var uniqueIndex=0;
 		cSheetRow[0].split(',').forEach(function(e,i) {
+			if(/module/i.test(e))modIdx=i;
 			if(/scenario/i.test(e))scoIdx=i;
 			if(/screen/i.test(e))scrIdx=i;
 			if(/script/i.test(e))sctIdx=i;
 		});
-		if(scoIdx==-1||scrIdx==-1||sctIdx==-1||cSheetRow.length<2){
-			err='FATAL Error!! Import a non empty excel file with Scenario, Screen, Script columns.';
+		if(modIdx==-1||scoIdx==-1||scrIdx==-1||sctIdx==-1||cSheetRow.length<2){
+			err='FATAL Error!! Import a non empty excel file with Module, Scenario, Screen, Script columns.';
 			break;
 		}
 		var e,lastSco=-1,lastScr=-1,nodeDict={},scrDict={};
 		for(var i=1;i<cSheetRow.length;i++){
 			var row=cSheetRow[i].split(',');
 			if(row.length<3) continue;
+			if(row[modIdx]!==''){
+				e={id:uuidV4(),name:row[modIdx],type:0};
+				qObj.push(e);
+			}
 			if(row[scoIdx]!==''){
 				lastSco=uniqueIndex;lastScr=-1;scrDict={};
 				e={id:uuidV4(),name:row[scoIdx],type:1};
@@ -1257,7 +1260,6 @@ exports.excelToMindmap = function(req,res){
 		}
 	}
 	var tSt,qList=[];
-	console.log("Excel contents: ",qObj);
 	res.status(200).send(qObj);
 }
 

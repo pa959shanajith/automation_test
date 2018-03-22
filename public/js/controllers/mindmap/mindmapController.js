@@ -366,7 +366,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         var svgTileLen = $(".ct-svgTile").length;
         if (svgTileLen == 0) {
             $('#ct-mapSvg, #ct-canvas').empty();
-            $('#ct-canvas').append(`<div id="minimap"></div>
+            $('#ct-canvas').append(`<div id="minimap-wrapper"><div id="minimap-header"><img class="move-ic-img" src="imgs/move_img.svg" alt="move" style="height: 15px;"></div><div id="minimap"></div></div>
                                 <div class="ct-tileBox">
                                     <div class="ct-tile" title="Create Mindmap">
                                         <svg class="ct-svgTile" height="150px" width="150px">
@@ -4903,7 +4903,7 @@ function getSelectionStart(o) {
     (function( $ ) {
         $.fn.minimap = function( $mapSource ) {
             var x, y, l, t, w, h;
-            var color = {'modules':'#5500aa','scenarios':'#0000ff','testcases':'#aaaa00','screens':'#00ff00'};
+            var color = {'modules':'#5c5ce4','scenarios':'#4299e1','testcases':'#eba22a','screens':'#18b9ad'};
             var width_v,height_v,xmin_v,ymin_v;
             var $window = $( window );
             var $minimap = this;
@@ -4919,6 +4919,10 @@ function getSelectionStart(o) {
             $(document).bind('mousewheel', function(){redraw()});
             $mapSource.on( "click", init );
             $minimap.on( "mousedown touchstart", down );
+            $( "#minimap-header" ).draggable({ containment: "#ct-mapSvg",drag:function(){
+                $('#minimap-wrapper').css("left",$('#minimap-header').css('left')).css("top",String($('#minimap-header').offset().top)+"px");
+            }});
+
             var scale;
             function down( e ) {
                 console.log("down event");
@@ -5031,8 +5035,6 @@ function getSelectionStart(o) {
             }
 
             function synchronize() {
-                console.log("this: ",this);
-                console.log('sync');
                 scale = d3.select("#ct-mindMap").attr("transform").split(/[()]/)[3];
                 //console.log("height_v: ",height_v,"width_v: ",width_v);
                 w = $('#ct-mapSvg').width()*$('#minimap').width()/$('#ct-mindMap').width();
@@ -5081,7 +5083,6 @@ function getSelectionStart(o) {
 
             function redraw() {
             scale = d3.select("#ct-mindMap").attr("transform").split(/[()]/)[3];
-            console.log("Scaling");
                 // var width_t = w>$('#minimap').width()?$('#minimap').width():w;
                 // var height_t = h>$('#minimap').height()?$('#minimap').height():h;
                 // var left_t = w>$('#minimap').width()?$('#minimap').width():l;
@@ -5157,12 +5158,12 @@ function getSelectionStart(o) {
                 
 
             return this;
-        }
+        }        
     })( jQuery );
 //$( "#minimap" ).minimap( $('#ct-mapSvg') );
 
     $scope.toggleMinimap = function(){
-        $("#minimap").toggle();
+        $("#minimap-wrapper").toggle();
     }
 
     $scope.showContent = function($fileContent){
