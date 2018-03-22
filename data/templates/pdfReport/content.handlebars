@@ -236,18 +236,52 @@
                     <td class="rDellaps tabCont">{{EllapsedTime}}</td>
                     <td class="rDcomments tabCont" style="padding-left: 10px;">{{Comments}}</td>
                     <td class="rDremarks tabCont" style="padding-left: 10px;">{{Remark}}</td>
-                    {{#ifEquals status "Pass"}}
-                        <td class="rDExpectedRes tabCont" style="padding-left: 10px;">{{testcase_details.expectedResult_pass}}</td>
-                        <td class="rDActualRes tabCont" style="padding-left: 10px;">{{testcase_details.actualResult_pass}}</td>
-                    {{/ifEquals}}
-                       {{#ifEquals status "Fail"}}
-                        <td class="rDExpectedRes tabCont" style="padding-left: 10px;">{{testcase_details.expectedResult_fail}}</td>
-                        <td class="rDActualRes tabCont" style="padding-left: 10px;">{{testcase_details.actualResult_fail}}</td>
-                    {{/ifEquals}}
-                    {{#ifEquals status ""}}
-                        <td class="rDExpectedRes tabCont"></td>
-                        <td class="rDActualRes tabCont"></td>
+                    
+                     {{#ifEquals testcase_details.testcaseDetails undefined}}
+                      <td class="rDExpectedRes tabCont"></td>
                      {{/ifEquals}}
+                    {{#ifEquals testcase_details.testcaseDetails ""}}
+                        <td class="rDExpectedRes tabCont" style="padding-left: 10px;">{{StepDescription}}</td>
+                    {{/ifEquals}}
+                    {{#ifnotEquals testcase_details.testcaseDetails ""}}
+                       {{#ifnotEquals testcase_details undefined}}
+                        <td class="rDExpectedRes tabCont" style="padding-left: 10px;">{{testcase_details.testcaseDetails}}</td>
+                       {{/ifnotEquals}}
+                    {{/ifnotEquals}} 
+
+
+                     {{#ifEquals status undefined}}
+                      <td class="rDActualRes tabCont"></td>
+                     {{/ifEquals}}
+
+                    {{#ifEquals status "Pass"}}
+                        {{#ifEquals testcase_details.actualResult_pass ""}}
+                          <td class="rDActualRes tabCont" style="padding-left: 10px;">{{status}}</td>
+                        {{/ifEquals}}
+                        {{#ifnotEquals testcase_details.actualResult_pass ""}}
+                           <td class="rDActualRes tabCont" style="padding-left: 10px;">{{testcase_details.actualResult_pass}}</td>
+                        {{/ifnotEquals}}
+                    {{/ifEquals}}
+
+                    {{#ifEquals status "Fail"}}
+                        {{#ifEquals testcase_details.actualResult_fail ""}}
+                            <td class="rDActualRes tabCont" style="padding-left: 10px;">{{status}}</td>
+                        {{/ifEquals}}
+                        {{#ifnotEquals testcase_details.actualResult_fail ""}}
+                           <td class="rDActualRes tabCont" style="padding-left: 10px;">{{testcase_details.actualResult_fail}}</td>
+                        {{/ifnotEquals}}
+                    {{/ifEquals}}
+
+                    {{!-- {{#ifEquals status "Terminate"}}
+                        {{#ifEquals testcase_details.actualResult_fail ""}}
+                            <td class="rDActualRes tabCont" style="padding-left: 10px;">{{status}}</td>
+                        {{/ifEquals}}
+                        {{#ifnotEquals testcase_details.actualResult_fail ""}}
+                           <td class="rDActualRes tabCont" style="padding-left: 10px;">{{testcase_details.actualResult_fail}}</td>
+                        {{/ifnotEquals}}
+                    {{/ifEquals}} --}}
+
+                    
                     
 
                      {{!-- <td class="rDExpectedRes tabCont" style="padding-left: 10px;">{{testcase_details.expectedResult_fail}}</td>

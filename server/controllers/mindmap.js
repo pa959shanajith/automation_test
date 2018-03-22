@@ -7,6 +7,21 @@ var myserver = require('../lib/socket.js');
 var notificationMsg = require("../notifications/notifyMessages");
 var logger = require('../../logger');
 var utils = require('../lib/utils');
+var xlsx = require('xlsx');
+
+/* Convert excel file to CSV Object. */
+var xlsToCSV = function(workbook) {
+	var result = [];
+	workbook.SheetNames.forEach(function(sheetName) {
+		var csv = xlsx.utils.sheet_to_csv(workbook.Sheets[sheetName]);
+		if (csv.length > 0) {
+			result.push(sheetName);
+			result.push(csv);
+		}
+	});
+	//return result.join("\n");
+	return result;
+};
 
 exports.populateProjects=function(req,res){
 	logger.info("Inside UI service: populateProjects");
@@ -1177,10 +1192,75 @@ var update_cassandraID = function(d,urlData,module_type) {
 		logger.error('exception in update_cassandraID',ex);
 	}
 
-updateJson.push(cassandraId_dict);
+	updateJson.push(cassandraId_dict);
 
-return [ qList_new,updateJson];
+	return [ qList_new,updateJson];
 };
 
+exports.excelToMindmap = function(req,res){
+	console.log(req.body.type);
+	var wb = xlsx.read(req.body.data, {type:'binary'});
+	try{
+		var myCSV=xlsToCSV(wb);
+	}
+	catch(exc){
+		console.log(exc);
+	}
+	var numSheets=myCSV.length/2;
+	var qObj=[];
+	var err;
+	for(var k=0;k<numSheets;k++){
+		var cSheet=myCSV[k*2+1];
+		var cSheetRow=cSheet.split('\n');
+		var scoIdx=-1,scrIdx=-1,sctIdx=-1;
+		var uniqueIndex=0;
+		cSheetRow[0].split(',').forEach(function(e,i) {
+			if(/module/i.test(e))modIdx=i;
+			if(/scenario/i.test(e))scoIdx=i;
+			if(/screen/i.test(e))scrIdx=i;
+			if(/script/i.test(e))sctIdx=i;
+		});
+		if(modIdx==-1||scoIdx==-1||scrIdx==-1||sctIdx==-1||cSheetRow.length<2){
+			err='FATAL Error!! Import a non empty excel file with Module, Scenario, Screen, Script columns.';
+			break;
+		}
+		var e,lastSco=-1,lastScr=-1,nodeDict={},scrDict={};
+		for(var i=1;i<cSheetRow.length;i++){
+			var row=cSheetRow[i].split(',');
+			if(row.length<3) continue;
+			if(row[modIdx]!==''){
+				e={id:uuidV4(),name:row[modIdx],type:0};
+				qObj.push(e);
+			}
+			if(row[scoIdx]!==''){
+				lastSco=uniqueIndex;lastScr=-1;scrDict={};
+				e={id:uuidV4(),name:row[scoIdx],type:1};
+				qObj.push(e);
+				nodeDict[e.id]=uniqueIndex;
+				uniqueIndex++;
+			}
+			if(row[scrIdx]!=='' && lastSco!=-1){
+				var tName=row[scrIdx];
+				var lScr=qObj[lastScr];
+				if(lScr===undefined||(lScr&&lScr.name!==tName)) {
+					if(scrDict[tName]===undefined) scrDict[tName]=uuidV4();
+					lastScr=uniqueIndex;
+					e={id:scrDict[tName],name:tName,type:2,uidx:lastScr};
+					qObj.push(e);
+					nodeDict[e.id]=uniqueIndex;
+					uniqueIndex++;
+				}
+			}
+			if(row[sctIdx]!=='' && lastScr!=-1){
+				e={id:uuidV4(),name:row[sctIdx],type:3,uidx:lastScr};
+				qObj.push(e);
+				nodeDict[e.id]=uniqueIndex;
+				uniqueIndex++;
+			}
+		}
+	}
+	var tSt,qList=[];
+	res.status(200).send(qObj);
+}
 
 //MATCH (n)-[r:FMTTS{id:'bad100b6-c223-4888-a8e9-ad26a2de4a61'}]->(o:TESTSCENARIOS) DETACH DELETE r,o

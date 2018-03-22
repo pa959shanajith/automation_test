@@ -30,8 +30,10 @@ try {
     var sessions = require('express-session');
     var helmet = require('helmet');
     var lusca = require('lusca');
-	var consts = require('constants');
+    var consts = require('constants');
     var redis = require("redis");
+    var Client = require("node-rest-client").Client;
+    var apiclient = new Client();
     var redisStore = require('connect-redis')(sessions);
     var redisConfig = {"host": process.env.REDIS_IP, "port": parseInt(process.env.REDIS_PORT),"password" : process.env.REDIS_AUTH};
     var redisSessionClient = redis.createClient(redisConfig);
@@ -51,7 +53,7 @@ try {
     var credentials = {
         key: privateKey,
         cert: certificate,
-       // secureOptions: consts.SSL_OP_NO_SSLv2 | consts.SSL_OP_NO_SSLv3 | consts.SSL_OP_NO_TLSv1 | consts.SSL_OP_NO_TLSv1_1,
+        // secureOptions: consts.SSL_OP_NO_SSLv2 | consts.SSL_OP_NO_SSLv3 | consts.SSL_OP_NO_TLSv1 | consts.SSL_OP_NO_TLSv1_1,
         secureOptions: consts.SSL_OP_NO_SSLv2 | consts.SSL_OP_NO_SSLv3,
         secureProtocol: 'SSLv23_method',
         ciphers: [
@@ -75,7 +77,7 @@ try {
         honorCipherOrder: true
     };
     var httpsServer = require('https').createServer(credentials, app);
-	process.env.serverPort = 8443;
+    process.env.serverPort = 8443;
     module.exports = app;
     module.exports.redisSessionStore = redisSessionStore;
     module.exports.httpsServer = httpsServer;
@@ -98,7 +100,7 @@ try {
     else logger.info("Express logs are disabled");
 
     process.env.SESSION_AGE = 30 * 60 * 1000;
-	process.env.SESSION_INTERVAL = 1200000
+    process.env.SESSION_INTERVAL = 20 * 60 * 1000;
     app.use(sessions({
         cookie: {
             path: '/',
@@ -114,12 +116,12 @@ try {
     }));
 
     app.use('*',function(req,res,next){
-		if (req.session === undefined) {
-			res.status(500).send("<html><body><p>[ECODE 600] Internal Server Error Occured!</p></body></html>");
-		} else {
-			return next();
-		}
-	});
+        if (req.session === undefined) {
+            res.status(500).send("<html><body><p>[ECODE 600] Internal Server Error Occured!</p></body></html>");
+        } else {
+            return next();
+        }
+    });
 
     app.use(helmet());
     app.use(lusca.p3p('ABCDEF'));
@@ -130,49 +132,52 @@ try {
         sha256s: ['AbCdEf123=', 'ZyXwVu456=']
     }));
     app.use(helmet.noCache());
-	
+
     //Role Based User Access to services
     app.post('*', function (req, res, next) {
-        var roleId = req.session.defaultRoleId;
-        if (req.session.defaultRoleId != undefined) {
-            var updateinp = { roleid: req.session.defaultRoleId, servicename: req.url.replace("/", "") };
-            var args = { data: updateinp, headers: { "Content-Type": "application/json" } };
-            apiclient.post(epurl + "utility/userAccess_Nineteen68", args,
-                function (result, response) {
-                    if (response.statusCode != 200 || result.rows == "fail") {
-                        logger.error("Error occured in userAccess_Nineteen68");
-                        res.send("Invalid Session");
+        var roleId = req.session.activeRole;
+        var updateinp = { roleid: roleId||"ignore", servicename: req.url.replace("/", "") };
+        var args = { data: updateinp, headers: { "Content-Type": "application/json" } };
+        var apireq = apiclient.post(epurl + "utility/userAccess_Nineteen68", args, function (result, response) {
+            if (req.session && roleId) {
+                if (response.statusCode != 200 || result.rows == "fail") {
+                    logger.error("Error occured in userAccess_Nineteen68");
+                    res.send("Invalid Session");
+                } else if (result.rows == "off") {
+                    res.status(500).send("fail");
+                    httpsServer.close();
+                    logger.error("License Expired!!");
+                    logger.error("Please run the Service API and Restart the Server");
+                } else {
+                    if (result.rows == "True") {
+                        logger.rewriters.push(function (level, msg, meta) {
+                            if (req.session && req.session.uniqueId) {
+                                meta.username = req.session.username;
+                                meta.userid = req.session.userid;
+                                meta.userip = req.headers['client-ip'] != undefined ?  req.headers['client-ip']: req.ip;
+                                return meta;
+                            }
+                            else {
+                                meta.username = null;
+                                meta.userid = null;
+                                return meta;
+                            }
+                        });
+                        return next();
                     } else {
-                        if(req.url == '/mindmap' && req.session.defaultRole == 'Test Engineer')
-                        {
-                            result.rows = "True";
-                        }
-                        if (result.rows == "True") {
-                            // logger.info("User " + req.session.username + " authenticated");
-                            logger.rewriters.push(function (level, msg, meta) {
-                                if (req.session != undefined) {
-                                    meta.username = req.session.username;
-                                    meta.userid = req.session.userid;
-                                    meta.userip = req.headers['client-ip'] != undefined ?  req.headers['client-ip']: req.ip;
-                                    return meta;
-                                }
-                                else {
-                                    meta.username = null;
-                                    meta.userid = null;
-                                    return meta;
-                                }
-                            });
-                            return next();
-                        } else {
-                            req.session.destroy();
-                            res.status(401).redirect('/');
-                        }
+                        req.session.destroy();
+                        res.status(401).redirect('/');
                     }
-                });
-        }
-        else {
-            return next();
-        }
+                }
+            } else {
+                return next();
+            }
+        });
+        apireq.on('error', function (err) {
+            res.status(500).send("fail");
+            httpsServer.close();
+            logger.error("Please run the Service API and Restart the Server");
+        });
     });
     //CORS
     app.all('*', function (req, res, next) {
@@ -316,9 +321,6 @@ try {
     //   showStack: true
     // }));
 
-    var Client = require("node-rest-client").Client;
-    var apiclient = new Client();
-
     //Route Directories
     var mindmap = require('./server/controllers/mindmap');
     var login = require('./server/controllers/login');
@@ -337,14 +339,13 @@ try {
 
     // Mindmap Routes
     try {
+    	throw "Disable Versioning";
         var version = require('./server/controllers/project_versioning');
         app.post('/getVersions', version.getVersions);
         app.post('/getModulesVersioning', version.getModulesVersioning);
         app.post('/saveDataVersioning', version.saveDataVersioning);
         app.post('/createVersion', version.createVersion);
         app.post('/getProjectsNeo', version.getProjectsNeo);
-        
-        
     } catch (Ex) {
         logger.warn('Versioning is disabled');
     }
@@ -362,6 +363,7 @@ try {
     app.post('/reviewTask', mindmap.reviewTask);
     app.post('/saveData', mindmap.saveData);
     app.post('/saveEndtoEndData', mindmap.saveEndtoEndData);
+    app.post('/excelToMindmap',mindmap.excelToMindmap);
 
     //Login Routes
     app.post('/authenticateUser_Nineteen68', login.authenticateUser_Nineteen68);
@@ -505,14 +507,14 @@ try {
         next();
     });
 
-	app.get('*', function(req, res){
-		res.status(404).send("<html><body><p>The page could not be found or you don't have permission to view it.</p></body></html>");
-	});
+    app.get('*', function(req, res){
+        res.status(404).send("<html><body><p>The page could not be found or you don't have permission to view it.</p></body></html>");
+    });
 
-	app.use(function(err, req, res, next) {
-		logger.error(err.message);
-		res.status(500).send("<html><body><p>[ECODE 601] Intenal Server Error Occured!</p></body></html>");
-	});
+    app.use(function(err, req, res, next) {
+        logger.error(err.message);
+        res.status(500).send("<html><body><p>[ECODE 601] Intenal Server Error Occured!</p></body></html>");
+    });
 } catch (e) {
     logger.error(e);
     setTimeout(function () {

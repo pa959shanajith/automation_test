@@ -183,6 +183,12 @@ mySPA.factory('mindmapServices', ['$http','$q', function ($http,$q)   {
     		.then(function (response) { return response.data; },
     				function (response) { return $q.reject(response.data); });
     	},
-
+		excelToMindmap: function(data){
+    		return $http.post('/excelToMindmap', {
+    			data: data
+    		})
+    		.then(function (response) { return response.data; },
+    				function (response) { return $q.reject(response.data); });
+		},
 	}
 }]);

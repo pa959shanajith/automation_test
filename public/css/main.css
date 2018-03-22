@@ -15,10 +15,6 @@ html {
     scroll-snap-destination: 0 0;
 }
 
-#viewArea{
-    background: #eeeeee;
-}
-
 #snaptarget {
         scroll-snap-coordinate: 0 -8px;
     }

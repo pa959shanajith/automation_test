@@ -430,7 +430,6 @@ function unblockUI(){
 //Function to Block UI
 
 function p_redirect(name){
-	window.localStorage["_VP"] = true;
 	window.localStorage['navigateScreen'] = name;
 	if(name == 'p_Reports'){
 		localStorage.setItem('fromExecution','true');

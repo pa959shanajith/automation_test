@@ -3299,7 +3299,6 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                         	}
                         }*/
                     }
-                
                     if (serviceCallFlag == true) {
                         console.log("no service call being made");
                     } else {
@@ -3561,7 +3560,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
         if(e.target.className.includes('inActiveDetails')){
             openModalFormDialog('Add Test Step Details','');
             $(".stepDetailsContainer").empty()
-            $(".stepDetailsContainer").append("<div class='formGroup form-inline form-custom'><input autocomplete='off' id='testDetails_"+modalId+"' maxlength='50' type='text' class='form-control form-control-custom form-control-width' placeholder='Enter Test Description'></div><div id='pass_"+modalId+"' class='passFormFields'><div class='formGroup form-inline form-custom'><input autocomplete='off' id='expectedResult_"+modalId+"'  maxlength='50' type='text' class='form-control form-control-custom form-control-width' placeholder='Enter Expected Result for Pass Status'></div><div class='formGroup form-inline form-custom'><input autocomplete='off' id='actualResult_"+modalId+"' type='text'  maxlength='50' class='form-control form-control-custom form-control-width' placeholder='Enter Actual Result for Pass Status'></div></div><div id ='fail_"+modalId+"' class='failFormFields'><div class='formGroup form-inline form-custom'><input autocomplete='off' id='expectedResult_"+modalId+"'  maxlength='50' type='text' class='form-control form-control-custom form-control-width' placeholder='Enter Expected Result for Fail Status'></div><div class='formGroup form-inline form-custom'><input autocomplete='off' id='actualResult_"+modalId+"' type='text'  maxlength='50' class='form-control form-control-custom form-control-width' placeholder='Enter Actual Result for Fail Status'></div></div")
+            $(".stepDetailsContainer").append("<div class='formGroup form-inline form-custom'><input autocomplete='off' id='testDetails_" + modalId + "' maxlength='50' type='text' class='form-control form-control-custom form-control-width' placeholder='Enter Expected Result'></div><div id='pass_" + modalId + "' class='passFormFields'><div class='formGroup form-inline form-custom'><input autocomplete='off' id='actualResult_" + modalId + "' type='text'  maxlength='50' class='form-control form-control-custom form-control-width' placeholder='Enter Actual Result for Pass Status'></div></div><div id ='fail_" + modalId + "' class='failFormFields'><div class='formGroup form-inline form-custom'><input autocomplete='off' id='actualResult_" + modalId + "' type='text'  maxlength='50' class='form-control form-control-custom form-control-width' placeholder='Enter Actual Result for Fail Status'></div></div")
             
         }
         else{
@@ -3587,11 +3586,11 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                    
                     openModalFormDialog('Add Test Step Details','');
                      $(".stepDetailsContainer").empty()
-                     $(".stepDetailsContainer").append("<div class='formGroup form-inline form-custom'><input autocomplete='off' id='testDetails_"+modalId+"' maxlength='50' type='text' class='form-control form-control-custom form-control-width' placeholder='Enter Test Description'></div><div id='pass_"+modalId+"' class='passFormFields'><div class='formGroup form-inline form-custom'><input autocomplete='off' id='expectedResult_"+modalId+"'  maxlength='50' type='text' class='form-control form-control-custom form-control-width' placeholder='Enter Expected Result for Pass Status'></div><div class='formGroup form-inline form-custom'><input autocomplete='off' id='actualResult_"+modalId+"' type='text'  maxlength='50' class='form-control form-control-custom form-control-width' placeholder='Enter Actual Result for Pass Status'></div></div><div id ='fail_"+modalId+"' class='failFormFields'><div class='formGroup form-inline form-custom'><input autocomplete='off' id='expectedResult_"+modalId+"'  maxlength='50' type='text' class='form-control form-control-custom form-control-width' placeholder='Enter Expected Result for Fail Status'></div><div class='formGroup form-inline form-custom'><input autocomplete='off' id='actualResult_"+modalId+"' type='text'  maxlength='50' class='form-control form-control-custom form-control-width' placeholder='Enter Actual Result for Fail Status'></div></div")
+                     $(".stepDetailsContainer").append("<div class='formGroup form-inline form-custom'><input autocomplete='off' id='testDetails_" + modalId + "' maxlength='50' type='text' class='form-control form-control-custom form-control-width' placeholder='Enter Expected Result'></div><div id='pass_" + modalId + "' class='passFormFields'><div class='formGroup form-inline form-custom'><input autocomplete='off' id='actualResult_" + modalId + "' type='text'  maxlength='50' class='form-control form-control-custom form-control-width' placeholder='Enter Actual Result for Pass Status'></div></div><div id ='fail_" + modalId + "' class='failFormFields'><div class='formGroup form-inline form-custom'><input autocomplete='off' id='actualResult_" + modalId + "' type='text'  maxlength='50' class='form-control form-control-custom form-control-width' placeholder='Enter Actual Result for Fail Status'></div></div");
                      $("#testDetails_"+modalId+"").val(details.testcaseDetails);
-                     $("#pass_"+modalId+"").find("#expectedResult_"+modalId+"").val(details.expectedResult_pass);
+                     //$("#pass_"+modalId+"").find("#expectedResult_"+modalId+"").val(details.expectedResult_pass);
                      $("#pass_"+modalId+"").find("#actualResult_"+modalId+"").val(details.actualResult_pass);
-                     $("#fail_"+modalId+"").find("#expectedResult_"+modalId+"").val(details.expectedResult_fail);
+                    // $("#fail_"+modalId+"").find("#expectedResult_"+modalId+"").val(details.expectedResult_fail);
                      $("#fail_"+modalId+"").find("#actualResult_"+modalId+"").val(details.actualResult_fail);
                 },
                 function(error) {});
@@ -4021,35 +4020,36 @@ function contentTable(newTestScriptDataLS) {
             getTestStepDetailsRowData = $grid.jqGrid ('getRowData', modalId);
             getTestStepDetailsRowData.addTestCaseDetailsInfo = {};
             var testDetails = $.trim($('#testDetails_'+modalId+'').val());
-            var expectedResult_pass = $.trim($('#pass_'+modalId+'').find('#expectedResult_'+modalId+'').val());
+          //  var expectedResult_pass = $.trim($('#pass_'+modalId+'').find('#expectedResult_'+modalId+'').val());
             var actualResult_pass =  $.trim($('#pass_'+modalId+'').find('#actualResult_'+modalId+'').val());
-            var expectedResult_fail = $.trim($('#fail_'+modalId+'').find('#expectedResult_'+modalId+'').val());
+          //  var expectedResult_fail = $.trim($('#fail_'+modalId+'').find('#expectedResult_'+modalId+'').val());
             var actualResult_fail =  $.trim($('#fail_'+modalId+'').find('#actualResult_'+modalId+'').val());
     
-           if(testDetails == '' && expectedResult_pass == '' && actualResult_pass == ''  && expectedResult_fail == '' && actualResult_fail == '')
+           if(testDetails == '' && actualResult_pass == '' && actualResult_fail == '')
            {
                 $('#globalModalForm').modal('hide');
                 openDialog('Add Test Step Details','Please enter atleast one field to save test step details');
            }
            else{
 
-            if(testDetails == '' && expectedResult_pass == '' && actualResult_pass == ''  && expectedResult_fail == '' && actualResult_fail == '')
+            if(testDetails == ''  && actualResult_pass == ''  && actualResult_fail == '')
             {
-                getTestStepDetailsRowData.addTestCaseDetailsInfo ={};
                 getTestStepDetailsRowData.addTestCaseDetails ='';
+                getTestStepDetailsRowData.addTestCaseDetailsInfo = {
+                    "testcaseDetails": "",
+                    "actualResult_pass": "",
+                    "actualResult_fail": "",
+                };
             }
-
+          
                  getTestStepDetailsRowData.addTestCaseDetailsInfo = {
                     "testcaseDetails": testDetails,
-                    "expectedResult_pass": expectedResult_pass,
                     "actualResult_pass": actualResult_pass,
-                    "expectedResult_fail": expectedResult_fail,
                     "actualResult_fail": actualResult_fail,
                 };
               
                 $grid.jqGrid('setCell', modalId, 'addTestCaseDetailsInfo',JSON.stringify(getTestStepDetailsRowData.addTestCaseDetailsInfo));
                 var gridData =  $grid.jqGrid('getGridParam','data');
-                console.log("sdsd", gridData);
                 for(let i=0;i<gridData.length;i++)
                 {
                     if(gridData[i].stepNo === getTestStepDetailsRowData.stepNo)
@@ -5201,7 +5201,6 @@ function addTestScriptRow() {
                     }
                 }
                 var allRowsInGrid = $('#jqGrid').jqGrid('getGridParam','data');
-                console.log("dd",allRowsInGrid);
             } else {
                 gridArrayData.splice(arrayLength, 0, emptyRowData);
                 gridArrayData[arrayLength].stepNo = parseInt(gridArrayData[arrayLength - 1].stepNo) + 1;
