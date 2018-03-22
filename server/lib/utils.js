@@ -1,3 +1,4 @@
+var logger = require('../../logger');
 var myserver = require('../../server');
 var redisServer = require('../lib/redisSocketHandler');
 
