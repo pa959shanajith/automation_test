@@ -291,8 +291,7 @@ mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
 .run(function($rootScope, $location, headerServices){
 	$rootScope.redirectPage = function(){
 		unblockUI();
-		var UserName = JSON.parse(window.localStorage['_UI']).username;
-		headerServices.logoutUser_Nineteen68(UserName)
+		headerServices.logoutUser_Nineteen68()
 		.then(function(data){
 			if(data == "Session Expired"){
 				window.localStorage.clear();

@@ -30,8 +30,6 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 			$(this).parent().hide();
 		}
 	});
-	/*window.localStorage["_VP"] = false;
-	window.localStorage["_VM"] = false;*/
 	//$("#plugin-container").addClass("inactiveLink");
 	if(window.localStorage['_UI'])
 	{
@@ -159,13 +157,11 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 			$(this).text(counter) 
 			counter++;
 		});
-	} 
+	}
 
 	//Plugin click event 
 	$scope.pluginFunction = function(name){
-		window.localStorage["_VP"] = true;
 		if(name == "p_Mindmap"){
-			//window.localStorage["_VM"] = true;
 			name = 'mindmap'
 		}
 		else if(name == "p_NeuronGraphs") name = 'neuronGraphs';

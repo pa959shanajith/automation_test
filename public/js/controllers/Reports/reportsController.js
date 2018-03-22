@@ -14,11 +14,6 @@ mySPA.controller('reportsController', ['$scope','$rootScope', '$http', '$locatio
 		/*document.getElementById("currentYear").innerHTML = new Date().getFullYear()*/
 		angular.element(document.getElementById("reportSection")).scope().getReports_ICE();
 	}, 100)
-	/*var taskAuth;
-	if(window.localStorage["_VP"] == "false")
-	{
-		taskAuth = false;
-	}*/
 	if(window.localStorage['navigateScreen'] != "p_Reports"){
 		$rootScope.redirectPage();
 	}
