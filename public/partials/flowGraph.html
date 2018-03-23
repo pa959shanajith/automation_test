@@ -8,11 +8,15 @@
 	<!--Left Panel-->
 	<div id="left-nav-section">
 		<div class="scrollbar-macosx">
-			<div id="left-top-section" class="left-top-section-utility">
+			<!-- Apptype Desktop -->
+			<div id="left-top-section" ng-if="ComplexityScreenView == true" class="ComplexityScreenView">
 				<ul>
-					
+					<li><span><a class='openFileintxt'>Open File</a></span></li>
+					<li><a href='#'  title="Notepad++"  data-toggle="modal" ng-click="openFileInEditor($event,'notepad++'); $event.preventDefault(); $event.stopPropagation();"><span><img src='imgs/ic-desktop.png' alt='Notepad++' /></span>Notepad++</a></li>
+					<!-- <li class="last"  title="Append Objects"><span style="margin-bottom:-5px"><input ng-model="enbledChecked" id="enableAppend" type='checkbox' value=""></span><label for="enableAppend">Append</label></li> -->
 				</ul>
 			</div>
+			<!-- Apptype Desktop -->
 		</div>
 	</div> 
 	<!--Left Panel-->

@@ -12,6 +12,32 @@ mySPA.factory('flowGraphServices', ['$http','$q', function ($http, $q)   {
 			}, function(err){
 				console.log(err);
 			});
+		},
+		APG_OpenFileInEditor : function(editorName, filePath, lineNumber){
+			return $http({
+				url: '/APG_OpenFileInEditor',
+				method: "POST",
+				data: {"editorName": editorName, "filePath" : filePath, "lineNumber": lineNumber},
+				headers : {'Content-Type' : 'application/json'} 
+			}).then(function(response){
+				return response.data
+			}, function(err){
+				console.log(err);
+			});
+
+		},
+		APG_createAPGProject : function(data){
+			console.log(data);
+			return $http({
+				url: '/APG_createAPGProject',
+				method: 'POST',
+				data: {"data": data},
+				headers: {'Content-Type': 'application/json'}
+			}).then(function(response){
+				return response.data
+			}, function(err){
+				console.log(err);
+			});
 		}
 	}
 }]);

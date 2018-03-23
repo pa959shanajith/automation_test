@@ -5467,3 +5467,10 @@ border-radius: 6px;
   stroke: #333;
   stroke-width: 1.5px;
 }
+
+.openFileintxt{
+    font-family: 'LatoWebMedium' !important;
+    font-size: 18px !important;
+    color: #eee9ff;
+    cursor: text !important;
+}

@@ -446,8 +446,9 @@ try {
     app.post('/loadDashboard_2', dashboard.loadDashboard_2);
     //app.post('/manualTestcaseDetails_ICE', qc.manualTestcaseDetails_ICE);
 	// Automated Path Generator Routes
-	app.post('/flowGraphResults', flowGraph.flowGraphResults);
-
+    app.post('/flowGraphResults', flowGraph.flowGraphResults);
+    app.post('/APG_OpenFileInEditor', flowGraph.APG_OpenFileInEditor);
+    app.post('/APG_createAPGProject',flowGraph.APG_createAPGProject);
     //-------------SERVER START------------//
     var hostFamilyType = '0.0.0.0';
     var portNumber = process.env.serverPort;

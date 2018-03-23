@@ -280,7 +280,14 @@ sub1.on("message", function (channel, message) {
 			pub2.publish('ICE2_' + data.username, dataToNode);
 		});
 		break;
-		
+	case 'apgOpenFileInEditor':
+		mySocket.emit("apgOpenFileInEditor", data.editorName, data.filePath, data.lineNumber);
+
+		mySocket.on('open_file_in_editor_result', function (value) {
+			dataToNode = JSON.stringify({"type" : "res","username" : data.username,"onAction" : "open_file_in_editor_result","value":JSON.parse(value)});
+			pub2.publish('ICE2_' + data.username, dataToNode);
+		});
+		break;
 	default:
 		dataToNode = JSON.stringify({"username": data.username, "onAction": "fail", "value": "fail"});
 		pub2.publish('ICE2_' + data.username, dataToNode);

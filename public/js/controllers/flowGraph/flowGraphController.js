@@ -1,4 +1,4 @@
-mySPA.controller('flowGraphController', ['$scope', '$http', '$location', '$timeout', 'flowGraphServices','cfpLoadingBar','$window', 'socket', function($scope,$http,$location,$timeout,flowGraphServices,cfpLoadingBar,$window,socket) {
+mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$location', '$timeout', 'flowGraphServices','cfpLoadingBar','$window', 'socket', function($scope,$rootScope,$http,$location,$timeout,flowGraphServices,cfpLoadingBar,$window,socket) {
 	 //Task Listing
 	 $timeout(function() {
 		$('.scrollbar-inner').scrollbar();
@@ -12,24 +12,55 @@ mySPA.controller('flowGraphController', ['$scope', '$http', '$location', '$timeo
 	 loadUserTasks(); 
 
 	 $scope.enableGenerate = false;
-	 $scope.showFlowGraphHome = function(){
-		$('#complexity-canvas').hide();
-		if (!$scope.enableGenerate)
-		return;
-		var myNode = document.getElementById("apg-cd-canvas");
-		while (myNode.firstChild) {
-			myNode.removeChild(myNode.firstChild);
-		}
-		$('#middle-content-section').removeAttr('class');
+	 $scope.ComplexityScreenView = false;
+	//  $scope.showFlowGraphHome = function(){
+	// 	$('#complexity-canvas').hide();
+	// 	if (!$scope.enableGenerate)
+	// 	return;
+	// 	var myNode = document.getElementById("apg-cd-canvas");
+	// 	while (myNode.firstChild) {
+	// 		myNode.removeChild(myNode.firstChild);
+	// 	}
+	// 	$('#middle-content-section').removeAttr('class');
 	
-		$("#apg-cd-canvas").hide();
-		$("#apg-dfd-canvas").hide();
-		document.getElementById('path').value = '';
-		$scope.showInfo = false;
-		$scope.obj = {};
-		$scope.hideBaseContent = { message: 'false' };		  
-	  }
-	  
+	// 	$("#apg-cd-canvas").hide();
+	// 	$("#apg-dfd-canvas").hide();
+	// 	document.getElementById('path').value = '';
+	// 	$scope.showInfo = false;
+	// 	$scope.obj = {};
+	// 	$scope.hideBaseContent = { message: 'false' };	
+	// 	$scope.ComplexityScreenView = false;	  
+	//   }
+	$scope.showFlowGraphHome = function(){
+		if (!$scope.enableGenerate)
+						return;
+		
+		if($("#complexity-canvas").is(':visible')){
+						$('#complexity-canvas').hide();
+						$("#apg-cd-canvas").show();
+		}else if($("#apg-cd-canvas").is(':visible')){
+						$("#apg-cd-canvas").hide();
+						var myNode = document.getElementById("apg-cd-canvas");
+						while (myNode.firstChild) {
+										myNode.removeChild(myNode.firstChild);
+						}
+						$('#middle-content-section').removeAttr('class');
+		
+						//$("#apg-cd-canvas").hide();
+						//$("#apg-dfd-canvas").hide();
+						document.getElementById('path').value = '';
+						$scope.showInfo = false;
+						$scope.obj = {};
+						$scope.hideBaseContent = { message: 'false' };
+		}else if($("#apg-dfd-canvas").is(':visible')){
+						$("#apg-dfd-canvas").hide();
+						$("#apg-cd-canvas").show();
+		}
+		$scope.ComplexityScreenView = false;
+		
+										  
+}
+
 	  socket.on('ICEnotAvailable', function () {
 		var slider = document.getElementById("slider-container");
 		slider.remove();
@@ -88,6 +119,7 @@ mySPA.controller('flowGraphController', ['$scope', '$http', '$location', '$timeo
 				});
 				$scope.generateClassDiagram(obj);
 				$scope.enableGenerate = true;
+				$scope.createAPGProject(obj);
 				//$scope.generateDataFlowDiagram(obj);
 			}else if(obj.result == "fail"){
 				$('#progress-canvas').fadeOut(800, function(){
@@ -575,6 +607,8 @@ mySPA.controller('flowGraphController', ['$scope', '$http', '$location', '$timeo
 					$('#complexity-canvas').show();
 					$scope.ccname=d.name;
 					$scope.cc =d.complexity.class;
+					$scope.ComplexityScreenView = true;
+					$scope.filePath = d.file;
 					var methods_data=d.complexity.methods;
 					var method_names=Object.keys(methods_data);
 					$scope.cmethod=method_names.length;
@@ -1024,5 +1058,55 @@ mySPA.controller('flowGraphController', ['$scope', '$http', '$location', '$timeo
 		nodeDrag.call(svg.selectAll("g.node"));
 		edgeDrag.call(svg.selectAll("g.edgePath"));
 	}
-	
+
+	$scope.openFileInEditor = function(e,editorName){
+		//logic to open file in the editor
+		console.log('inside scope.openFileInEditor')
+		//filePath = "D:\\Nineteen68_1.0\\V1.0\\DesktopCore\\CobraWinLDTP\\ldtp\\Java\\src\\com\\cobra\\ldtp\\Callback.java";
+		
+		lineNumber = 24;
+		flowGraphServices.APG_OpenFileInEditor(editorName,$scope.filePath,lineNumber) .then(function(data) {
+			if (data == "unavailableLocalServer") {
+				$scope.hideBaseContent = { message: 'false' };
+				$('#progress-canvas').hide();
+				document.getElementById('path').value = '';
+				openDialog("Flowgraph Generator", "ICE Engine is not available. Please run the batch file and connect to the Server.");
+				return false;
+			}else if(data == "Invalid Session"){
+				document.getElementById('path').value = '';
+				$rootScope.redirectPage();
+			}
+			else if(data.status == "fail"){
+				openDialog("Open File", data.message);
+				return false;
+			}
+		}, function(err){
+			console.log("Error :", err);
+		});
+	}
+	$scope.createAPGProject = function(obj){
+		var data = {};
+		var preparedJSON = $scope.prepareJSON(obj);
+		data.nodes = JSON.stringify(preparedJSON.nodes);
+		data.edges = JSON.stringify(preparedJSON.links);
+		data.dataflow = JSON.stringify(obj.data_flow);
+		data.starttime = obj.starttime;
+		data.endtime =  obj.endtime;
+		data.projectname = "sampleAPGProject1";
+
+		flowGraphServices.APG_createAPGProject(data).then(function(data) {
+			if (data == "unavailableLocalServer") {
+				$scope.hideBaseContent = { message: 'false' };
+				$('#progress-canvas').hide();
+				document.getElementById('path').value = '';
+				openDialog("APG", "ICE Engine is not available. Please run the batch file and connect to the Server.");
+				return false;
+			}else if(data == "Invalid Session"){
+				document.getElementById('path').value = '';
+				$rootScope.redirectPage();
+			}
+		}, function(err){
+			console.log("Error :", err);
+		});
+	}
 }]);
