@@ -5474,3 +5474,23 @@ border-radius: 6px;
     color: #eee9ff;
     cursor: text !important;
 }
+
+#data-flow-window{
+	width: 700px;
+	height: 700px;
+    /* min-height: auto;
+    /*max-height: calc(100% - 212px); */
+    position: fixed;
+    top: 120px;
+}
+
+#data-flow-window .popupContent{
+	padding:1%;
+	padding-bottom: 0;
+}
+
+#method-flow svg{
+	width: 650px;
+	height: 650px;
+	
+}

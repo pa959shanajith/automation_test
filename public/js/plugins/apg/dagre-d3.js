@@ -900,7 +900,7 @@ function addTextLabel(root, node) {
     domNode
       .append("tspan")
         .attr("xml:space", "preserve")
-        .attr("dy", "1em")
+        .attr("dy", "11")
         .attr("x", "1")
 		.attr("font-family", "LatoWeb")
         .text(lines[i]);

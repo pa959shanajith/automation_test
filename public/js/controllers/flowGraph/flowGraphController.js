@@ -13,52 +13,34 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 
 	 $scope.enableGenerate = false;
 	 $scope.ComplexityScreenView = false;
-	//  $scope.showFlowGraphHome = function(){
-	// 	$('#complexity-canvas').hide();
-	// 	if (!$scope.enableGenerate)
-	// 	return;
-	// 	var myNode = document.getElementById("apg-cd-canvas");
-	// 	while (myNode.firstChild) {
-	// 		myNode.removeChild(myNode.firstChild);
-	// 	}
-	// 	$('#middle-content-section').removeAttr('class');
-	
-	// 	$("#apg-cd-canvas").hide();
-	// 	$("#apg-dfd-canvas").hide();
-	// 	document.getElementById('path').value = '';
-	// 	$scope.showInfo = false;
-	// 	$scope.obj = {};
-	// 	$scope.hideBaseContent = { message: 'false' };	
-	// 	$scope.ComplexityScreenView = false;	  
-	//   }
 	$scope.showFlowGraphHome = function(){
+		$scope.enableDataflow = false;
 		if (!$scope.enableGenerate)
-						return;
-		
+			return;
 		if($("#complexity-canvas").is(':visible')){
-						$('#complexity-canvas').hide();
-						$("#apg-cd-canvas").show();
+			$('#complexity-canvas').hide();
+			$scope.enableFilter = true;
+			$("#apg-cd-canvas").show();
 		}else if($("#apg-cd-canvas").is(':visible')){
-						$("#apg-cd-canvas").hide();
-						var myNode = document.getElementById("apg-cd-canvas");
-						while (myNode.firstChild) {
-										myNode.removeChild(myNode.firstChild);
-						}
-						$('#middle-content-section').removeAttr('class');
-		
-						//$("#apg-cd-canvas").hide();
-						//$("#apg-dfd-canvas").hide();
-						document.getElementById('path').value = '';
-						$scope.showInfo = false;
-						$scope.obj = {};
-						$scope.hideBaseContent = { message: 'false' };
+			$scope.enableFilter = false;
+			$("#apg-cd-canvas").hide();
+			var myNode = document.getElementById("apg-cd-canvas");
+			while (myNode.firstChild) {
+				myNode.removeChild(myNode.firstChild);
+			}
+			$('#middle-content-section').removeAttr('class');
+			//$("#apg-cd-canvas").hide();
+			//$("#apg-dfd-canvas").hide();
+			document.getElementById('path').value = '';
+			$scope.showInfo = false;
+			$scope.obj = {};
+			$scope.hideBaseContent = { message: 'false' };
 		}else if($("#apg-dfd-canvas").is(':visible')){
-						$("#apg-dfd-canvas").hide();
-						$("#apg-cd-canvas").show();
+			$scope.enableFilter = true;
+			$("#apg-dfd-canvas").hide();
+			$("#apg-cd-canvas").show();
 		}
-		$scope.ComplexityScreenView = false;
-		
-										  
+		$scope.ComplexityScreenView = false;									  
 }
 
 	  socket.on('ICEnotAvailable', function () {
@@ -71,6 +53,27 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 		document.getElementById('path').value = '';
 		openDialog("APG", "ICE Engine is not available. Please run the batch file and connect to the Server.");
 	});
+	  
+	$scope.disableButton = function($event){
+		if($event.originalEvent.srcElement.alt == 'Data-flow'){
+			if(!$scope.enableDataflow ){
+				$event.preventDefault();
+				$event.stopPropagation();
+				//$(".popupWrap").animate({ opacity: 0, right: "70px" }, 100).css({'z-index':'0','pointer-events':'none'})
+				//$(".thumb-ic").removeClass("thumb-ic-highlight");
+				/*if($("#data-flow-window").is(':visible')){
+					console.log('here');
+					S("#data-flow-window").hide();
+				}*/
+			}
+		}
+		else if($event.originalEvent.srcElement.alt == 'Filter Objects'){
+			if(!$scope.enableFilter){
+				$event.preventDefault();
+				$event.stopPropagation();
+			}
+		}
+	}
 	  
 	$scope.executeGenerate = function(){
 		$scope.obj = {};
@@ -120,7 +123,6 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 				$scope.generateClassDiagram(obj);
 				$scope.enableGenerate = true;
 				$scope.createAPGProject(obj);
-				//$scope.generateDataFlowDiagram(obj);
 			}else if(obj.result == "fail"){
 				$('#progress-canvas').fadeOut(800, function(){
 					$scope.hideBaseContent = { message: 'false' };
@@ -365,7 +367,8 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 	}
 	
 	$scope.generateClassDiagram = function(obj){
-		
+		$scope.enableFilter = true;
+		$scope.$apply();
 		$("#apg-cd-canvas").show();
 		let width = $("#middle-content-section").width();
 		let height = $("#middle-content-section").height();
@@ -479,7 +482,7 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 				p.y = p.y + dy;
 			});
 		}
-		//taken from dagre-d3 source code (not the exact same)
+		
 		function calcPoints(e) {
 			var edge = g.edge(e.v, e.w),
 				tail = g.node(e.v),
@@ -499,7 +502,6 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 			(points);
 		}
 
-		//taken from dagre-d3 source code (not the exact same)
 		function intersectRect(node, point) {
 			var x = node.x;
 			var y = node.y;
@@ -598,6 +600,8 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 			.attr('style', 'transform: translateX(-21px)')
 			.attr('class', 'apg-info-icon')
 			.on('click', function(d){
+				$scope.enableFilter = false;
+				$scope.$apply();
 				d = $scope.obj.classes[d];
 				if(d== undefined || d.complexity== "Undefined"){
 					openDialog('APG', "Complexity can't determine.");
@@ -614,12 +618,17 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 					$scope.cmethod=method_names.length;
 					$("#tblMethodLevel tbody").empty();
 					for(var i=0;i<method_names.length;i++){
-						$("#tblMethodLevel tbody").append("<tr class='highlightRow'><td><div>"+method_names[i]+"</div></td><td><div>"+methods_data[method_names[i]]['complexity']+"</div></td><td><div></div></td></tr>");
+						var line = methods_data[method_names[i]]['line_no'];
+						$("#tblMethodLevel tbody").append("<tr class='highlightRow' name='"+method_names[i]+'_'+line+"'><td><div>"+method_names[i]+"</div></td><td><div>"+methods_data[method_names[i]]['complexity']+"</div></td><td><div></div></td></tr>");
 					}
 					$scope.$apply();
 					$("tr:visible").on('click',function() {
+						$scope.enableDataflow = true;
+						$scope.$apply();
 						$("tr.hightlight_Complexity_row").removeClass("hightlight_Complexity_row");
 						$(this).addClass('hightlight_Complexity_row');
+						var e = $("tr.hightlight_Complexity_row")[0]
+						showMethodFlow($scope.obj.data_flow, (e.getAttribute('name')).split('_')[0], d.name);
 					});
 				}
 			})
@@ -650,7 +659,7 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 			edge.customId = e.v + "-" + e.w
 		});
 		
-		//zoom.translate([(svg.attr('width') - g.graph().width * initialScale) / 2, 10]).scale(1).event(svg);
+		zoom.translate([(svg.attr('width') - g.graph().width * initialScale) / 2, 10]).scale(1).event(svg);
 		var coord= $('.nodes').children()[0].getAttribute("transform").split("(")[1].split(")")[0].split(",");
 		zoom.translate([ Number(-coord[0]+width/2),  Number(-coord[1]+height/2)]).scale(1).event(svg);
 		
@@ -658,13 +667,10 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 		edgeDrag.call(svg.selectAll("g.edgePath"));
 		
 		function nodeOver(d){
-			//d3.event.sourceEvent.stopPropagation();
-			//$(".apg-info-icon").removeClass("apg-active");
 			this.lastChild.classList.add("apg-active");
 			this.lastChild.previousSibling.classList.add("apg-active");
 		}
 		function nodeOut(d){
-			//d3.event.sourceEvent.stopPropagation();
 			$(".apg-info-icon").removeClass("apg-active");
 		}
 
@@ -682,7 +688,10 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 	
 
 	$scope.generateDataFlowDiagram = function(i){
-		console.log(i);
+		$scope.enableDataflow = false;
+		$scope.enableFilter = false;
+		$scope.$apply();
+		$('#apg-dfd-canvas svg').remove();
 		var obj = $scope.obj;
 		var links = obj.links;
 		var nodes = [];
@@ -691,29 +700,26 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 		
 		var data_flow_classes = new Set([]);
 		data_flow_classes.add(selected_class);
-		for (var i=0; i < links.length; i++){
-			if(links[i].source == selected_class){
-				selected_class = links[i].target;
-				data_flow_classes.add(links[i].target);
-				i = -1;
+		for (var j=0; j < links.length; j++){
+			if(links[j].source == selected_class){
+				selected_class = links[j].target;
+				data_flow_classes.add(links[j].target);
+				j = -1;
 			}
 		}
 		console.log(data_flow_classes);
-		for (var i=0; i<obj.data_flow.length; i++){
-			if(data_flow_classes.has((obj.data_flow[i].class).split('(')[0])){
-				if((obj.data_flow[i].text).startsWith("Class:")){
-					obj.data_flow[i].parent = null;
+		for (var k=0; k<obj.data_flow.length; k++){
+			if(data_flow_classes.has((obj.data_flow[k].class).split('(')[0])){
+				if(obj.data_flow[k].text == 'Start' || obj.data_flow[k].text == 'End'){
+					obj.data_flow[k].shape = "ellipse";
 				}
-				if(obj.data_flow[i].text == 'Start' || obj.data_flow[i].text == 'End'){
-					obj.data_flow[i].shape = "ellipse";
-				}
-				else if (obj.data_flow[i].shape == 'Diamond' || obj.data_flow[i].shape == 'SwitchDiamond'){
-					obj.data_flow[i].shape = "diamond";
+				else if (obj.data_flow[k].shape == 'Diamond' || obj.data_flow[k].shape == 'SwitchDiamond'){
+					obj.data_flow[k].shape = "diamond";
 				}
 				else{
-					obj.data_flow[i].shape = "rect";
+					obj.data_flow[k].shape = "rect";
 				}
-				nodes.push(obj.data_flow[i]);
+				nodes.push(obj.data_flow[k]);
 			}
 		}
 		console.log(nodes);
@@ -750,18 +756,20 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 		var g = new dagreD3.graphlib.Graph().setGraph({});
 		
 		nodes.forEach(function (node) {
-		  g.setNode(node.modified_id, {
-			label: node.text,
-			shape: node.shape
+			g.setNode(node.id, {
+				label: node.text,
+				shape: node.shape
 		  });
 		});
 		console.log(g.nodes());
 		for (var i=0; i<nodes.length; i++){
 			if(nodes[i].child != null){
 				for (var j=0; j<nodes[i].child.length; j++){
-					if(data_flow_classes.has((obj.data_flow[nodes[i].child[j]].class).split('(')[0])){
-						g.setEdge(nodes[i].modified_id, nodes[i].child[j], {
-						});
+					for (var k=0; k<obj.data_flow.length; k++){
+						if(obj.data_flow[k].id == nodes[i].child[j] && data_flow_classes.has((obj.data_flow[k].class).split('(')[0])){
+							g.setEdge(nodes[i].id, nodes[i].child[j], {});
+							break;
+						}
 					}
 				}
 			}
@@ -819,7 +827,6 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 				p.y = p.y + dy;
 			});
 		}
-		//taken from dagre-d3 source code (not the exact same)
 		function calcPoints(e) {
 			var edge = g.edge(e.v, e.w),
 				tail = g.node(e.v),
@@ -838,8 +845,7 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 				.interpolate("basis")
 			(points);
 		}
-
-		//taken from dagre-d3 source code (not the exact same)
+		
 		function intersectRect(node, point) {
 			var x = node.x;
 			var y = node.y;
@@ -905,8 +911,6 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 					}
 				  }
 				  function intersectLine(p1, p2, q1, q2) {
-					  // Algorithm from J. Avro, (ed.) Graphics Gems, No 2, Morgan Kaufmann, 1994,
-					  // p7 and p473.
 
 					  var a1, a2, b1, b2, c1, c2;
 					  var r1, r2 , r3, r4;
@@ -1017,12 +1021,9 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 				y: parseFloat(y) + parseFloat(sy)
 			};
 		}
+
 		var render = new dagreD3.render();
 		render(inner, g);
-		var initialScale = 0.75;
-		var _height = svg.attr('height') - g.graph().height;
-		var _width = svg.attr('width') - g.graph().width;
-		//console.log(height / _height);
 		svg.selectAll("g.node rect")
 			.attr("id", function (d) {
 			return "node" + d;
@@ -1061,28 +1062,32 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 
 	$scope.openFileInEditor = function(e,editorName){
 		//logic to open file in the editor
-		console.log('inside scope.openFileInEditor')
-		//filePath = "D:\\Nineteen68_1.0\\V1.0\\DesktopCore\\CobraWinLDTP\\ldtp\\Java\\src\\com\\cobra\\ldtp\\Callback.java";
-		
-		lineNumber = 24;
-		flowGraphServices.APG_OpenFileInEditor(editorName,$scope.filePath,lineNumber) .then(function(data) {
-			if (data == "unavailableLocalServer") {
-				$scope.hideBaseContent = { message: 'false' };
-				$('#progress-canvas').hide();
-				document.getElementById('path').value = '';
-				openDialog("Flowgraph Generator", "ICE Engine is not available. Please run the batch file and connect to the Server.");
-				return false;
-			}else if(data == "Invalid Session"){
-				document.getElementById('path').value = '';
-				$rootScope.redirectPage();
-			}
-			else if(data.status == "fail"){
-				openDialog("Open File", data.message);
-				return false;
-			}
-		}, function(err){
-			console.log("Error :", err);
-		});
+		var e = $("tr.hightlight_Complexity_row")[0]
+		if(e != undefined){
+			lineNumber = (e.getAttribute('name')).split('_')[1];
+			flowGraphServices.APG_OpenFileInEditor(editorName,$scope.filePath,lineNumber) .then(function(data) {
+				if (data == "unavailableLocalServer") {
+					$scope.hideBaseContent = { message: 'false' };
+					$('#progress-canvas').hide();
+					document.getElementById('path').value = '';
+					openDialog("Flowgraph Generator", "ICE Engine is not available. Please run the batch file and connect to the Server.");
+					return false;
+				}else if(data == "Invalid Session"){
+					document.getElementById('path').value = '';
+					$rootScope.redirectPage();
+				}
+				else if(data.status == "fail"){
+					openDialog("Open File", data.message);
+					return false;
+				}
+			}, function(err){
+				console.log("Error :", err);
+			});
+		}
+		else{
+			openDialog("Open File", "Please select one of the methods.");
+			return false;
+		}
 	}
 	$scope.createAPGProject = function(obj){
 		var data = {};
@@ -1109,4 +1114,108 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 			console.log("Error :", err);
 		});
 	}
+	
+	$(document).on("click", ".filterObjects", function() {
+        cfpLoadingBar.start();
+        blockUI('Filtering in progress. Please wait...');
+        $(".checkStylebox").prop("checked", false);
+        $("html").css({
+            'cursor': 'wait'
+        });
+		console.log($(this).data("tag"));
+        $timeout(function() {
+			filter();	
+			unblockUI();
+        }, 500);
+    });
+	
+	function filter() {
+        
+        $("html").css({
+            'cursor': 'auto'
+        });
+        cfpLoadingBar.complete();
+    }
+	
+	function showMethodFlow(data_flow, method_name, class_name) {
+		$('#method-flow svg').remove();
+		let width =700;
+		let height = 650 ;
+        var svg = d3.select('#method-flow').append('svg')
+				.attr("width", width)
+				.attr("height", height);
+		var inner = svg.append('g').attr("id", "data-flow-method");	
+
+		var zoom = d3.behavior.zoom()
+				.translate([0, 0])
+				.scale(1)
+				.size([900, 800])
+				.scaleExtent([0.2, 8])
+				.on('zoom', zoomed);
+
+		svg.call(zoom) 
+			.call(zoom.event);
+			
+		function zoomed() {
+			inner.attr('transform', 'translate(' + zoom.translate() + ')scale(' + zoom.scale() + ')');
+		}
+		var g = new dagreD3.graphlib.Graph().setGraph({});
+		var nodes = [];
+		var node_ids = new Set([]);
+		for (var i=0; i<data_flow.length; i++){
+			if(data_flow[i].method == method_name && data_flow[i].class.split('(')[0] == class_name){
+				if(data_flow[i].text == 'Start' || data_flow[i].text == 'End'){
+					data_flow[i].shape = "ellipse";
+				}
+				else if (data_flow[i].shape == 'Diamond' || data_flow[i].shape == 'SwitchDiamond'){
+					data_flow[i].shape = "diamond";
+				}
+				else{
+					data_flow[i].shape = "rect";
+				}
+				g.setNode(data_flow[i].id, {
+					label: data_flow[i].text,
+					shape: data_flow[i].shape
+				});
+				nodes.push(data_flow[i]);
+				node_ids.add(data_flow[i].id);
+			}
+		}
+		console.log(nodes);
+		for (var j=0; j<nodes.length; j++){
+			if(nodes[j].child != null){
+				for (var k=0; k<nodes[j].child.length; k++){
+					if(!node_ids.has(nodes[j].child[k])){
+						nodes.push({"parent":[nodes[j].id],"text":"Another method call","class":nodes[j].class,"shape":"Circle","child":null,"id":nodes[j].child[k],"method":nodes[j].method});
+						g.setNode(nodes[j].child[k], {
+							label: "Another method call",
+							shape: "ellipse"
+						});
+					}
+				}
+			}
+		}
+		for (var i=0; i<nodes.length; i++){
+			if(nodes[i].child != null){
+				for (var j=0; j<nodes[i].child.length; j++){
+					g.setEdge(nodes[i].id, nodes[i].child[j], {style: "stroke: #fff; fill: none; stroke-width: 1", arrowheadStyle:"fill: #fff"});
+				}
+			}
+		}
+		console.log(g.edges());
+		g.nodes().forEach(function (v) {
+			var node = g.node(v);
+			node.rx = node.ry = 5;
+		});
+		g.edges().forEach(function (e) {
+			var edge = g.edge(e.v, e.w);
+			edge.lineInterpolate = 'basis';
+		});
+		
+		var render = new dagreD3.render();
+		render(inner, g);
+		var coord= $('#data-flow-method .nodes').children()[0].getAttribute("transform").split("(")[1].split(")")[0].split(",");
+		zoom.translate([ Number(-coord[0]+width/2 ),  Number(-coord[1]+height/2)]).scale(1).event(svg);
+    }
+	
 }]);

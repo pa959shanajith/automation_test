@@ -102,7 +102,25 @@
 
 	<!--Right Panel-->
 	<div id="right-dependencies-section">
-
+		<div ng-class="enableDataflow ? 'enableActions' : 'disableActions'" class="thumbnail thumbnail-custom" id="screenshot_div">
+        	<a class="slidePopup"  title="Screenshot" ng-click="disableButton($event) ">
+          		<img class="thumb-ic" src="imgs/ic-screenshot.png" alt="Data-flow" id="screenshot_img">
+          		<div class="caption">
+            		<p>Data-flow</p>
+          		</div>
+        	</a>
+			<!--Popupdata-flow-popup-->
+			<div tabindex="0" id="data-flow-window" class="popupWrap" style="opacity: 0; right: 70px; z-index: 0; pointer-events: none; display: block;">
+				<h4 class="h4-custom closePopup">Data-flow <img class="closePopup pull-right" src="imgs/ic-arrow.png" /></h4>
+				<div class="scrollbar-screenshot popupContent-screenshot" >
+					<div class="popupContent" id="method-flow">
+						
+					</div>
+				</div>
+			</div>
+			<!--Popup-->
+      	</div>
+		
 		<!--Images Blocks-->
 		<div class="thumbnail thumbnail-custom">
         	<a class="slidePopup"  title="Tasks">
@@ -146,6 +164,27 @@
 			<!--Popup-->
       	</div>
 		<!--Images Blocks-->
+		
+		<div ng-class="enableFilter ? 'enableActions' : 'disableActions'" class="thumbnail thumbnail-custom" ng-click="disableButton($event)">
+        	<a class="slidePopup"  title="Filter">
+          		<img class="thumb-ic" src="imgs/ic-filter.png" alt="Filter Objects">
+          		<div class="caption">
+            		<p>Filter</p>
+          		</div>
+        	</a>
+			<!--Popup-->
+			<div tabindex="0" id="window-filter" class="popupWrap popupWrap-filter">
+				<h4 class="h4-custom closePopup">Filters <img class="closePopup pull-right" src="imgs/ic-arrow.png" /></h4>
+				<div class="popupContent popupContent-filter">
+				<div id ='selectAllFilters'><label><input title="Select all" type="checkbox" class="checkStyleboxFilter"><span class='selectAllTxt'>Select all</span></label></div>
+					<div><span class='popupContent-default filterObjects' data-tag="association">Association</span></div>
+					<div><span class='popupContent-default filterObjects' data-tag="extends">Generalization</span></div>
+					<div><span class='popupContent-default filterObjects' data-tag="implements">Realization</span></div>
+					<!--<div><span class='popupContent-default filterObjects' data-tag="img">Aggregation</span></div>-->
+				</div>
+			</div>
+			<!--Popup-->
+      	</div>
 
 		<!--Images Blocks-->
 		<div class="thumbnail thumbnail-custom thumbnail-custom-wiki">
