@@ -89,7 +89,6 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 			$scope.$apply();
 		}
 		unreadNotifications();
-
 		}
 	});
 
