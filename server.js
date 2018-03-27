@@ -77,7 +77,7 @@ try {
         honorCipherOrder: true
     };
     var httpsServer = require('https').createServer(credentials, app);
-    process.env.serverPort = 8443;
+    if (!process.env.serverPort) process.env.serverPort = 8443;
     module.exports = app;
     module.exports.redisSessionStore = redisSessionStore;
     module.exports.httpsServer = httpsServer;
