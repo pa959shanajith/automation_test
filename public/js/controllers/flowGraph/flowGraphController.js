@@ -603,7 +603,7 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 				$scope.enableFilter = false;
 				$scope.$apply();
 				d = $scope.obj.classes[d];
-				if(d== undefined || d.complexity== "Undefined"){
+				if(d == undefined || d.complexity== "Undefined"){
 					openDialog('APG', "Complexity can't determine.");
 				}
 				else{
@@ -614,12 +614,14 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 					$scope.ComplexityScreenView = true;
 					$scope.filePath = d.file;
 					var methods_data=d.complexity.methods;
-					var method_names=Object.keys(methods_data);
-					$scope.cmethod=method_names.length;
+					$scope.cmethod=methods_data.length;
 					$("#tblMethodLevel tbody").empty();
-					for(var i=0;i<method_names.length;i++){
-						var line = methods_data[method_names[i]]['line_no'];
-						$("#tblMethodLevel tbody").append("<tr class='highlightRow' name='"+method_names[i]+'_'+line+"'><td><div>"+method_names[i]+"</div></td><td><div>"+methods_data[method_names[i]]['complexity']+"</div></td><td><div></div></td></tr>");
+					var decisionPoint=undefined;
+					for(var i=0;i<methods_data.length;i++){
+						decisionPoint=parseInt(methods_data[i].complexity)-1;
+						decisionPoint = decisionPoint <= 0 ? "1":String(decisionPoint);
+						$("#tblMethodLevel tbody").append("<tr class='highlightRow' name='"+methods_data[i].methodname+'_'+methods_data[i].line_no+"'><td><div>"+methods_data[i].methodname+"</div></td><td><div>"+methods_data[i].complexity+"</div></td><td><div>"+decisionPoint+"</div></td><td><div></div></td>"
+						+"<td><div></div></td></td><td><div></div></td></tr>");
 					}
 					$scope.$apply();
 					$("tr:visible").on('click',function() {
