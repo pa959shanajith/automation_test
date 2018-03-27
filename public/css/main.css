@@ -2330,7 +2330,7 @@ input[disabled]{
 
 .executionDataTable thead, .scheduleDataHeader, .designDataTable thead {
     position: fixed;
-     width: calc(100% - 308px);
+    width: calc(100% - 308px);
     margin: -0.1em;
     z-index: 1;
     /*background: #5e636b;*/
@@ -4574,7 +4574,7 @@ select:-webkit-autofill:focus {
 }
 
 /**********Search field style**********/
-.searchIcon{
+.searchIcon,.filterIcon{
 	cursor: pointer;
 	background: white;
     padding: 4px;
@@ -5261,4 +5261,10 @@ Webocular report css
     width: 18px;
     height: 16px;
     float: left;
+}
+label.checkbox{
+    display:block !important;
+}
+option:disabled {
+    background: #ccc!important;
 }
