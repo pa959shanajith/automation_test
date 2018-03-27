@@ -97,7 +97,7 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 		if(window.localStorage.notification){
 			var notifications = JSON.parse(window.localStorage.notification);
 			var unreadNotifications = notifications.filter(function(a){
-				a.isRead == false;
+				return a.isRead == false;
 			});
 			var notificationCount = unreadNotifications.length;
 			if (notificationCount < 1 || notificationCount == '' || notificationCount == undefined) {

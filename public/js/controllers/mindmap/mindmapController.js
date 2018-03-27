@@ -993,7 +993,20 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         }
         if (errorRelCyc) {
             openDialogMindmap("Task Assignment Error", "Please select Release/Cycle")
-        }   
+        }
+        for (var i = 0; i < taskidArr.length; i++) {
+			if (taskidArr[i].id == dNodes[pi].task.id) {
+				if (dNodes[pi].task.task == "Execute" || dNodes[pi].task.task == "Execute Batch") {
+					assignedObj[dNodes[pi].task.task] = $("#ct-assignedTo option:selected").text();
+				} else if (dNodes[pi].task.task == "Execute Scenario") {
+					assignedObj[dNodes[pi].task.task] = $("#ct-assignedTo option:selected").text();
+				} else if (dNodes[pi].task.task == "Scrape" || dNodes[pi].task.task == "Append" || dNodes[pi].task.task == "Compare" || dNodes[pi].task.task == "Add" || dNodes[pi].task.task == "Map") {
+					assignedObj[dNodes[pi].task.task] = $("#ct-assignedTo option:selected").text();
+				} else if (dNodes[pi].task.task == "Design" || dNodes[pi].task.task == "Update") {
+					assignedObj[dNodes[pi].task.task] = $("#ct-assignedTo option:selected").text();
+				}
+			}
+		}
     };
 
     function nodeClick(e) {                
