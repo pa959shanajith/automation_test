@@ -4743,7 +4743,7 @@ function getSelectionStart(o) {
             
             
         for (i = 0; i < elems.length; i++) {
-            if (elems[i].textContent.toUpperCase().indexOf(filter_elem) > -1) {
+            if ($(elems[i]).attr('title').toUpperCase().indexOf(filter_elem) > -1) {
                 elems[i].style.display = "";
             } else {
                 elems[i].style.display = "none";
