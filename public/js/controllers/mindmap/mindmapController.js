@@ -4,8 +4,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     //Createmap//
     var activeNode, childNode, uNix, uLix, node, link, dNodes, dLinks, dNodes_c, dLinks_c, allMMaps, temp, rootIndex, faRef, nCount, scrList, tcList, mapSaved, zoom, cSpan, cScale, taskAssign, releaseResult, selectedProject;
     //unassignTask is an array to store whose task to be deleted
-    var deletednode = [],
-        unassignTask = [],
+    var deletednode = [], unassignTask = [],
         deletednode_info = [];
     var versioning_enabled = 0;
     // node_names_tc keep track of testcase names to decide reusability of testcases
@@ -553,6 +552,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     }
 
     function getReuseDetails(){
+        // reuse details within the same module
         var dictTmp = {};
         dNodes.forEach(function(e,i){
             dictTmp[i] = [];
@@ -1898,7 +1898,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 d3.select('#ct-node-' + d.id).remove();
                 deletednode_info.push(d);
                 if (d.oid != undefined) {
-                    deletednode.push(d.oid);
+                    deletednode.push(d.oid);            
                 }
                 var temp=dLinks;
                 for (j = temp.length - 1; j >= 0; j--) {
@@ -1911,6 +1911,49 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             });
             dNodes[pi].children=[];
         }
+        if(reuseDict[pi].length>0){
+            reuseDict[pi].forEach(function(idx,i){
+                var dn = dNodes[idx];
+                if(dn.children){
+                    dn.children.forEach(function(d,i){
+                        d.parent = null;
+                        d.children = null;
+                        d.task = null;
+                        d3.select('#ct-node-' + d.id).remove();
+                        deletednode_info.push(d);
+                        if (d.oid != undefined) {
+                            deletednode.push(d.oid);            
+                        }
+                        var temp=dLinks;
+                        for (j = temp.length - 1; j >= 0; j--) {
+                            if (temp[j].target.id == d.id) {
+                                d3.select('#ct-link-' + temp[j].id).remove();
+                                temp[j].deleted = !0;
+                            }
+                        }  
+                        //dNodes.splice(i, 1);                   
+                    });
+                    dNodes[idx].children=[];
+                }
+            });
+        }
+
+        var dataReuse = {
+            'screen': [{'screenname': dNodes[pi].original_name}],
+            'testcase': [],
+            'projectid': $('.project-list').val(),
+            'modules':'',
+            'gettestcases': true  // if true will fetch all the testcase ids under given screen including reused ones         
+            };
+        blockUI("Deleting testcase! Please wait..");    
+        mindmapServices.checkReuse(dataReuse).then(function(result) {
+            result = result.toString().split(',');
+            deletednode.push.apply(deletednode,result);
+            unblockUI();
+        }, function(error) {
+            unblockUI();
+            console.log("Error: checkReuse service 1");
+        });                    
         if (!dNodes[pi].children || dNodes[pi].children.length == 0) d3.select('#ct-node-' + pi).select('.ct-cRight').remove();
     }
 
@@ -3860,7 +3903,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         var from_v = to_v = '';
         
 
-        mindmapServices.saveEndtoEndData(username, flag, window.localStorage['_SR'], from_v, to_v, 'endToend', mapData, deletednode_W, unassignTask, selectedProject, $('#ct-assignRel').val(), $('#ct-assignCyc').val()).then(function(result) {
+        mindmapServices.saveEndtoEndData(username, flag, window.localStorage['_SR'], from_v, to_v, 'endToend', mapData, deletednode, unassignTask, selectedProject, $('#ct-assignRel').val(), $('#ct-assignCyc').val()).then(function(result) {
             unblockUI();
             var res = result;
             if (flag == 10) {

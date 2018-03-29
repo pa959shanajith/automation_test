@@ -205,35 +205,43 @@ exports.checkReuse=function(req,res){
 					res.status(500).send('Fail');			
 				}
 				else{
-					var i = 0;
-					while(i<qData['screen'].length){
-						if(result[i].data[0].row[0]>1)
-							qData['screen'][i].reuse = true;
-						else
-							qData['screen'][i].reuse = false;						
-						qData['screen'][i].count = result[i].data[0].row[0];
-						i = i+1;
+
+					if(qData.gettestcases){
+						res.status(200).send(result[0].data[0].row[0]);
 					}
-					var j = 0;
-					while(j<qData['testcase'].length){
-						if(result[i+j].data[0].row[0]>1)
-							qData['testcase'][j].reuse = true;
-						else
-							qData['testcase'][j].reuse = false;						
-						j = j+1;
-					}
-					var k = 0;
-					if(qData['scenarios']){
-						while(k<qData['scenarios'].length){
-							if(result[k].data.length>0 && (result[k].data[0].row[0]>1 || (result[k].data[0].row[0]==1 && qData['modules']!=result[k].data[0].row[1])))
-								qData['scenarios'][k].reuse = true;
+					else{
+						var i = 0;
+						while(i<qData['screen'].length){
+							if(result[i].data[0].row[0]>1)
+								qData['screen'][i].reuse = true;
 							else
-								qData['scenarios'][k].reuse = false;						
-							k = k+1;
+								qData['screen'][i].reuse = false;						
+							qData['screen'][i].count = result[i].data[0].row[0];
+							i = i+1;
 						}
+						var j = 0;
+						while(j<qData['testcase'].length){
+							if(result[i+j].data[0].row[0].length>1){
+								qData['testcase'][j].reuse = true;
+								qData['testcase'][j].oidlist = result[i+j].data[0].row[0];
+							}
+							else
+								qData['testcase'][j].reuse = false;						
+							j = j+1;
+						}
+						var k = 0;
+						if(qData['scenarios']){
+							while(k<qData['scenarios'].length){
+								if(result[k].data.length>0 && (result[k].data[0].row[0]>1 || (result[k].data[0].row[0]==1 && qData['modules']!=result[k].data[0].row[1])))
+									qData['scenarios'][k].reuse = true;
+								else
+									qData['scenarios'][k].reuse = false;						
+								k = k+1;
+							}
+						}
+						
+						res.status(status).send(qData);	
 					}
-					
-					res.status(status).send(qData);
 				} 
 			});
 	}
@@ -540,6 +548,8 @@ exports.saveData=function(req,res){
 					qList.push({"statement":"MATCH (N) WHERE ID(N)="+t+" MATCH (N)-[r:FNTT]->(b) with b as b MATCH(b)<-[s:FNTT]-(M) WITH count(M) as rel_cnt,b as b  WHERE rel_cnt=1 DETACH DELETE b"});
 					// Else delete just connection					
 					qList.push({"statement":"MATCH (N) WHERE ID(N)="+t+" MATCH (N)-[r:FNTT]-(b) DELETE r"});
+					// delete nodes in case renamed a reused node
+					qList.push({"statement":"MATCH (N) WHERE ID(N)="+t+" DETACH DELETE N"});
 				});
 				//TO support task deletion
 				removeTask.forEach(function(t,i){
@@ -776,7 +786,7 @@ exports.saveData=function(req,res){
 
 						var new_res=jsonData[jsonData.length-1].data;
 						if(new_res.length==0){
-							new_res=jsonData[jsonData.length-2].data
+							new_res=jsonData[jsonData.length-2].data;
 						}
 						new_res.forEach(function(row){
 							row.graph.nodes.forEach(function(n){
@@ -1085,37 +1095,43 @@ exports.saveEndtoEndData=function(req,res){
 
 function getQueries(qdata){
 	var qList_reuse= [];
-	if(qdata.versionNumber!=undefined){
-		//Reuse in case of versioning
-		if (qdata.scenarios!=undefined){
-			qdata['scenarios'].forEach(function(e,i){
-				qList_reuse.push({'statement':'Match (n:TESTSCENARIOS{testScenarioName : "'+e.scenarioname+'",projectID :"'+qdata['projectid']+'"})<-[s:FMTTS]-(m:MODULES)<-[t:FVTM]-(v:VERSION{versionNumber:'+qdata['versionNumber']+'}) return count(n),m.moduleName'});
-			})
-		}else{
-			qdata['screen'].forEach(function(e,i){
-				qList_reuse.push({'statement':'Match (n:SCREENS{screenName : "'+e.screenname+'",projectID :"'+qdata['projectid']+'"})<-[r:FTSTS]-(ts:TESTSCENARIOS)<-[s:FMTTS]-(m:MODULES)<-[t:FVTM]-(v:VERSION{versionNumber:'+qdata['versionNumber']+'}) return count(n)'});
-			})
-			qdata['testcase'].forEach(function(e,i){
-				qList_reuse.push({'statement':'Match (n:TESTCASES{testCaseName : "'+e.testcasename+'",projectID :"'+qdata['projectid']+'"})<-[a:FSTTS]-(scr:SCREENS{screenName:"'+e.screenname+'"})<-[r:FTSTS]-(ts:TESTSCENARIOS)<-[s:FMTTS]-(m:MODULES)<-[t:FVTM]-(v:VERSION{versionNumber:'+qdata['versionNumber']+'}) return count(n)'});
-			})
-		}
-				
+	if(qdata.gettestcases){	//for a reused screen fetches all the testcases
+		qList_reuse.push({'statement':'Match (n:SCREENS{screenName :"'+qdata.screen[0].screenname+'",projectID :"'+qdata['projectid']+'"})-[r]-(m:TESTCASES) return distinct collect(ID(m))'});
 	}
 	else{
-		if (qdata.scenarios!=undefined){
-			qdata['scenarios'].forEach(function(e,i){
-				qList_reuse.push({'statement':'Match (n:TESTSCENARIOS{testScenarioName : "'+e.scenarioname+'",projectID :"'+qdata['projectid']+'"})<-[s:FMTTS]-(m:MODULES) return count(n),m.moduleName'});
-			})
-		}else{
-			qdata['screen'].forEach(function(e,i){
-				qList_reuse.push({'statement':'Match (n:SCREENS{screenName : "'+e.screenname+'",projectID :"'+qdata['projectid']+'"}) return count(n)'});
-			})
-			qdata['testcase'].forEach(function(e,i){
-				qList_reuse.push({'statement':'Match (n:TESTCASES{testCaseName : "'+e.testcasename+'",projectID :"'+qdata['projectid']+'"})<-[a:FSTTS]-(scr:SCREENS{screenName:"'+e.screenname+'"}) return count(n)'});
-			})
+		if(qdata.versionNumber!=undefined){
+			//Reuse in case of versioning
+			if (qdata.scenarios!=undefined){
+				qdata['scenarios'].forEach(function(e,i){
+					qList_reuse.push({'statement':'Match (n:TESTSCENARIOS{testScenarioName : "'+e.scenarioname+'",projectID :"'+qdata['projectid']+'"})<-[s:FMTTS]-(m:MODULES)<-[t:FVTM]-(v:VERSION{versionNumber:'+qdata['versionNumber']+'}) return count(n),m.moduleName'});
+				})
+			}else{
+				qdata['screen'].forEach(function(e,i){
+					qList_reuse.push({'statement':'Match (n:SCREENS{screenName : "'+e.screenname+'",projectID :"'+qdata['projectid']+'"})<-[r:FTSTS]-(ts:TESTSCENARIOS)<-[s:FMTTS]-(m:MODULES)<-[t:FVTM]-(v:VERSION{versionNumber:'+qdata['versionNumber']+'}) return count(n)'});
+				})
+				qdata['testcase'].forEach(function(e,i){
+					qList_reuse.push({'statement':'Match (n:TESTCASES{testCaseName : "'+e.testcasename+'",projectID :"'+qdata['projectid']+'"})<-[a:FSTTS]-(scr:SCREENS{screenName:"'+e.screenname+'"})<-[r:FTSTS]-(ts:TESTSCENARIOS)<-[s:FMTTS]-(m:MODULES)<-[t:FVTM]-(v:VERSION{versionNumber:'+qdata['versionNumber']+'}) return collect(ID(n))'});
+				})
+			}
+					
 		}
-		
+		else{
+			if (qdata.scenarios!=undefined){
+				qdata['scenarios'].forEach(function(e,i){
+					qList_reuse.push({'statement':'Match (n:TESTSCENARIOS{testScenarioName : "'+e.scenarioname+'",projectID :"'+qdata['projectid']+'"})<-[s:FMTTS]-(m:MODULES) return count(n),m.moduleName'});
+				})
+			}else{
+				qdata['screen'].forEach(function(e,i){
+					qList_reuse.push({'statement':'Match (n:SCREENS{screenName : "'+e.screenname+'",projectID :"'+qdata['projectid']+'"}) return count(n)'});
+				})
+				qdata['testcase'].forEach(function(e,i){
+					qList_reuse.push({'statement':'Match (n:TESTCASES{testCaseName : "'+e.testcasename+'",projectID :"'+qdata['projectid']+'"})<-[a:FSTTS]-(scr:SCREENS{screenName:"'+e.screenname+'"}) return collect(ID(n))'});
+				})
+			}
+			
+		}
 	}
+
 	return qList_reuse;
 }
 
