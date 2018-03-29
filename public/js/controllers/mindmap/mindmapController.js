@@ -362,27 +362,15 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             d3.event.preventDefault();
         });
 
-        var svgTileG = d3.select('.ct-tile').append('svg').attr('class', 'ct-svgTile').attr('height', '150px').attr('width', '150px').append('g');
-        var svgTileLen = $(".ct-svgTile").length;
-        if (svgTileLen == 0) {
-            $('#ct-mapSvg, #ct-canvas').empty();
-            $('#ct-canvas').append(`<div id="minimap-wrapper" style="display: none;"><div id="minimap-header"><img class="move-ic-img" src="imgs/move_img.svg" alt="move" style="height: 15px;"></div><div id="minimap"></div></div>
-                                <div class="ct-tileBox">
-                                    <div class="ct-tile" title="Create Mindmap">
-                                        <svg class="ct-svgTile" height="150px" width="150px">
-                                            <g>
-                                                <circle cx="75" cy="75" r="30"></circle>
-                                                <path d="M75,55L75,95"></path>
-                                                <path d="M55,75L95,75"></path>
-                                            </g>
-                                        </svg>
+        $('#ct-mapSvg, #ct-canvas').empty();
+        $('#ct-canvas').append(`<div id="minimap-wrapper" style="display: none;">
+                                    <div id="minimap-header">
+                                        <img class="move-ic-img" src="imgs/move_img.svg" alt="move" style="height: 15px;">
                                     </div>
-                                <span class="ct-text">Create Mindmap</span>
-                                </div>`);
-            $(".ct-tile").click(function() {
-                createNewMap();
-            });
-        }
+                                    <div id="minimap">
+                                    </div>
+                                </div>
+                            `);
         d3.select('#ct-assignBox').classed('no-disp', !0);
         var version_num = '';
 
@@ -432,7 +420,6 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     function initiate() {
         var t, u;
         var selectedTab = window.localStorage['tabMindMap'];
-        d3.select('.ct-tileBox').remove();
         if (d3.select('#ct-mindMap')[0][0] != null) return;
         if (selectedTab == "tabAssign") var canvas = d3.select('#ct-canvasforAssign');
         else var canvas = d3.select('#ct-canvas');
@@ -2609,7 +2596,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
     //FUnction is tagged to every click on 'cnavas' element to validate the names of nodes when created
     function callme() {
-        if ($('.ct-tileBox').length > 0) return;
+        if ($('#ct-mindMap').length > 0) return;
         if (childNode != null && (childNode.text() == 'Module_0' || childNode.text() == 'Screen_0' || childNode.text() == 'Scenario_0' || childNode.text() == 'Testcase_0')) {
             d3.select('#ct-inpBox').classed('no-disp', !1);
         }
@@ -3118,8 +3105,6 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         d3.select('#ct-main').on('contextmenu', function(e) {
             d3.event.preventDefault();
         });
-        var svgTileG = d3.select('.ct-tile_W').append('svg').attr('class', 'ct-svgTile').attr('height', '150px').attr('width', '150px').append('g');
-        var svgTileLen = $(".ct-svgTile").length;
 
         d3.select('#ct-assignBox').classed('no-disp', !0);
         mindmapServices.getModules(versioning_enabled,'endToend', $("#selectProjectEtem").val(),$('.release-list').val(),$('.cycle-list').val()).then(function(result) {
@@ -3157,7 +3142,6 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     function initiate_W() {
         var t, u;
         var selectedTab = window.localStorage['tabMindMap'];
-        d3.select('.ct-tileBox').remove();
         if (d3.select('#ct-mindMap')[0][0] != null) return;
         if (selectedTab == "tabAssign") var canvas = d3.select('#ct-canvasforAssign');
         else var canvas = d3.select('#ct-canvas');
@@ -4305,13 +4289,6 @@ function loadModules() {
   var active_version = $('.version-list').val();
   $('.version-list').attr({title:active_version});
   blockUI('Loading...');
-  var svgTileG = d3.select('.ct-tile').append('svg').attr('class', 'ct-svgTile').attr('height', '150px').attr('width', '150px').append('g');
-  var svgTileLen = $(".ct-svgTile").length;
-  if (svgTileLen == 0) {
-    $('#ct-mapSvg, #ct-canvas').empty();
-    $('#ct-canvas').append('<div class="ct-tileBox"><div class="ct-tile" title="Create Mindmap"><svg class="ct-svgTile" height="150px" width="150px"><g><circle cx="75" cy="75" r="30"></circle><path d="M75,55L75,95"></path><path d="M55,75L95,75"></path></g></svg></div><span class="ct-text">Create Mindmap</span></div>');
-
-  }
   mindmapServices.getModules(versioning_enabled,window.localStorage['tabMindMap'],$(".project-list").val(),parseFloat(active_version),$('.release-list').val(),$('.cycle-list').val()).then(
       function(res){
             var nodeBox = d3.select('.ct-nodeBox');
@@ -4552,9 +4529,6 @@ function getSelectionStart(o) {
 
     function adjustMidPanel() {
         if ($('.leftBarOpen.rightBarOpen').length > 0) {
-            $(".ct-tileBox").css({
-                'left': '50%'
-            })
             //endtoend
             $(".endtoend-modulesContainer").prop("style", "width:calc(100% - 256px) !important; left:166px !important;");
             $(".searchModuleimg").prop("style", "right:86px !important;");
@@ -4562,9 +4536,6 @@ function getSelectionStart(o) {
             $(".eteLabel").prop("style", "left:366px !important; width:140px !important; bottom:23px !important;");
         } else if ($('.leftBarOpen').length > 0) {
             // $("#ct-moduleBox,.tabAssign").css({'left':'147px !important','width':'100%'})
-            $(".ct-tileBox").css({
-                'left': '52% !important'
-            });
             //endtoend
             $(".endtoend-modulesContainer").prop("style", "width:calc(100% - 172px) !important; left:166px !important;");
             $(".searchModuleimg").prop("style", "right:91px !important;");
