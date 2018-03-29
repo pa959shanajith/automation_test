@@ -131,7 +131,9 @@ function next_function(resultobj, cb, data) {
 				'expectedEndDate': '',
 				'batchTaskIDs':[],
 				'status': 'assigned',
-				'reuse':'False'
+				'reuse':'False',
+				'releaseid': '',
+				'cycleid':''
 			};
 			var testSuiteDetails_obj = {
 				"releaseid": "",
@@ -169,6 +171,8 @@ function next_function(resultobj, cb, data) {
 			taskDetails.reviewer = t.reviewer;
 			taskDetails.subTaskId = t.taskID;
 			taskDetails.taskDescription = t.details;
+			taskDetails.releaseid = t.release;
+			taskDetails.cycleid = t.cycle;
 			if (t.status != undefined) {
 				taskDetails.status = t.status;
 			}

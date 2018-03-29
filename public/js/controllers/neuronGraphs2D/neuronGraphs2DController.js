@@ -1057,13 +1057,13 @@ mySPA.controller('neuronGraphs2DController', ['$scope', '$http', '$location', '$
         // 	'imgs/assets/cubemap/"'+$scope.nodes[i].type+'"back.png'
         // ];		
         var url = [
-            'imgs/cubemap/Releaseright.png',
-            'imgs/cubemap/Releaseleft.png',
-            'imgs/cubemap/Releasetop.png',
-            'imgs/cubemap/Releasebottom.png',
-            'imgs/cubemap/Releasefront.png',
-            'imgs/cubemap/Releaseback.png'
-        ];
+                   'imgs/cubemap/Releasefront.png',
+                   'imgs/cubemap/Releasefront.png',
+                   'imgs/cubemap/Releasefront.png',
+                   'imgs/cubemap/Releasefront.png',
+                   'imgs/cubemap/Releasefront.png',
+                   'imgs/cubemap/Releaseback.png'
+               ];
 
         var sphereList = ['TestCase', 'Screen', 'TestSuite', 'TestScenario', 'Cycle'];
         var cubeMaterial = new THREE.MeshLambertMaterial();

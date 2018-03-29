@@ -2340,7 +2340,7 @@ input[disabled]{
 
 .executionDataTable thead, .scheduleDataHeader, .designDataTable thead {
     position: fixed;
-     width: calc(100% - 308px);
+    width: calc(100% - 308px);
     margin: -0.1em;
     z-index: 1;
     /*background: #5e636b;*/
@@ -4584,18 +4584,20 @@ select:-webkit-autofill:focus {
 }
 
 /**********Search field style**********/
-.searchIcon{
+.filterIcon{
 	cursor: pointer;
 	background: white;
     padding: 4px;
     border-radius: 7px 7px 7px 7px;
     position: relative;
     left: 61px;
+    margin: 3px;
 }
 .searchInput{
 	  border-radius: 7px 0px 0px 7px;
     border: none;
-    position: relative;
+    position: absolute;
+    margin-left: 79px;
     left: 60px;
     height: 28px;
     outline: none;
@@ -5271,4 +5273,10 @@ Webocular report css
     width: 18px;
     height: 16px;
     float: left;
+}
+label.checkbox{
+    display:block !important;
+}
+option:disabled {
+    background: #ccc!important;
 }
