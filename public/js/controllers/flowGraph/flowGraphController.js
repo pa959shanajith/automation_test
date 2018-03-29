@@ -620,11 +620,11 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 					for(var i=0;i<methods_data.length;i++){
 						decisionPoint=parseInt(methods_data[i].complexity)-1;
 						decisionPoint = decisionPoint <= 0 ? "1":String(decisionPoint);
-						$("#tblMethodLevel tbody").append("<tr class='highlightRow' name='"+methods_data[i].methodname+'_'+methods_data[i].line_no+"'><td><div>"+methods_data[i].methodname+"</div></td><td><div>"+methods_data[i].complexity+"</div></td><td><div>"+decisionPoint+"</div></td><td><div></div></td>"
-						+"<td><div></div></td></td><td><div></div></td></tr>");
+						$("#tblMethodLevel tbody").append("<tr class='highlightRow' name='"+methods_data[i].methodname+'_'+methods_data[i].line_no+"'><td><div>"+methods_data[i].methodname+"</div></td><td><div>"+methods_data[i].complexity+"</div></td><td><div>"+decisionPoint+"</div></td><td><div>"+methods_data[i].complexity
+						+"</div></td><td><div></div></td></tr>");
 					}
 					$scope.$apply();
-					$("tr:visible").on('click',function() {
+					$("tbody tr:visible").on('click',function() {
 						$scope.enableDataflow = true;
 						$scope.$apply();
 						$("tr.hightlight_Complexity_row").removeClass("hightlight_Complexity_row");
