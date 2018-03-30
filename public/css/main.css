@@ -636,6 +636,16 @@ body {
     font-size: 15px;
 }
 
+.tasks-l-l{
+    left : -13 px;
+}
+.tasks-l-m{
+    left : -5px;
+}
+.tasks-l-s{
+    left : 0px;
+}
+
 .assignedTask {
 	cursor: pointer;
     font-size: 17px;

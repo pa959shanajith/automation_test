@@ -4,7 +4,7 @@ var logger = require('../../logger');
 var client = new Client();
 var neoURL = "http://" + config.host + "/db/data/transaction/commit";
 var requestHeaders = {
-	'Authorization': 'Basic ' + new Buffer(config.username + ':' + config.password).toString('base64'),
+	'Authorization': 'Basic ' + Buffer.from(config.username + ':' + config.password).toString('base64'),
 	'Accept': 'application/json,text/plain',
 	'Content-Type': 'application/json',
 };
