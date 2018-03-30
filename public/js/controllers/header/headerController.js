@@ -263,6 +263,7 @@ mySPA.controller('headerController', function($scope, $rootScope, $timeout, $htt
 	}
 
 	$scope.logout = function(){
+		window.sessionStorage.clear();
 		$rootScope.redirectPage();
 	};
 });
