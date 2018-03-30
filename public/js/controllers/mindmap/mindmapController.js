@@ -933,6 +933,10 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                         dNodes[pi].task['updatedParent'] = validate[1];
                     }                    
                 }
+                if(!origTask){
+                    dNodes[pi].task.cx = undefined;
+                    dNodes[pi].task.details = '';
+                }
 
                 dNodes[pi].task.tstatus = taskStatus;
 
@@ -1066,9 +1070,11 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         $("#ct-assignTask option[value='" + tObj.t + "']").attr('selected', 'selected');
 
         if(tObj.det===null || tObj.det.trim() == ""){
-            tObj.det=tObj.t+" "+dNodes[pi].type+" "+dNodes[pi].name
+            d3.select('#ct-assignDetails').property('value', tObj.t+" "+dNodes[pi].type+" "+dNodes[pi].name);
         }
-        d3.select('#ct-assignDetails').property('value', tObj.det);
+        else{
+            d3.select('#ct-assignDetails').property('value', tObj.det);            
+        }        
 
         $("#ct-assignTask").change(function() {
             if ($("#ct-assignTask").val() == 'Execute Batch') {
@@ -1199,6 +1205,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     if(!(clist=="undefined"||clist==undefined)){
                         $('#ct-cxval').text(getComplexityLevel(t,parseInt(clist[0])));
                         $('#complexity-val').text('Complexity: '+getComplexityLevel(t,parseInt(clist[0])));
+                    }
+                    else{
+                        $('#complexity-val').text('Complexity: Unassigned');
                     }
                     
                 }
