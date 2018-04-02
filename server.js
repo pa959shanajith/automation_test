@@ -1,11 +1,22 @@
 //load environment variables
 var env = require('node-env-file');
-if (!process.env.ENV)
-    env(__dirname + '/.env');
+var fs = require('fs');
 
+var envFilePath = __dirname + '/.env';  
+try{   
+    if (fs.existsSync(envFilePath)) {
+        env(envFilePath);
+    }
+    else{
+        console.error("Error occurred in loading ENVIRONMENT VARIABLES, .env file is missing! ")
+    }
+} catch(ex){
+    console.error("Error occurred in loading ENVIRONMENT VARIABLES")
+    console.error(ex);
+}
 // Module Dependencies
 var cluster = require('cluster');
-var fs = require('fs');
+
 var expressWinston = require('express-winston');
 var winston = require('winston');
 var epurl = "http://"+process.env.NDAC_IP+":"+process.env.NDAC_PORT+"/";

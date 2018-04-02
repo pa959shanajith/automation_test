@@ -27,8 +27,8 @@ else if(process.env.ENV == 'PROD'){
   LOG_LEVEL_FILE = 'info';
 }
 else{
-  console.warn("ENV variable is not set in .env file, starting with default TEST environment");
-  //process.env.ENV = 'TEST'
+  console.warn("ENV variable is not set in .env file, attempting to start with default PROD environment");
+  //process.env.ENV = 'PROD'
 }
 const logger = new (winston.Logger)({
   rewriters: [
