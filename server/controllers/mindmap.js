@@ -205,35 +205,43 @@ exports.checkReuse=function(req,res){
 					res.status(500).send('Fail');			
 				}
 				else{
-					var i = 0;
-					while(i<qData['screen'].length){
-						if(result[i].data[0].row[0]>1)
-							qData['screen'][i].reuse = true;
-						else
-							qData['screen'][i].reuse = false;						
-						qData['screen'][i].count = result[i].data[0].row[0];
-						i = i+1;
+
+					if(qData.gettestcases){
+						res.status(200).send(result[0].data[0].row[0]);
 					}
-					var j = 0;
-					while(j<qData['testcase'].length){
-						if(result[i+j].data[0].row[0]>1)
-							qData['testcase'][j].reuse = true;
-						else
-							qData['testcase'][j].reuse = false;						
-						j = j+1;
-					}
-					var k = 0;
-					if(qData['scenarios']){
-						while(k<qData['scenarios'].length){
-							if(result[k].data.length>0 && (result[k].data[0].row[0]>1 || (result[k].data[0].row[0]==1 && qData['modules']!=result[k].data[0].row[1])))
-								qData['scenarios'][k].reuse = true;
+					else{
+						var i = 0;
+						while(i<qData['screen'].length){
+							if(result[i].data[0].row[0]>1)
+								qData['screen'][i].reuse = true;
 							else
-								qData['scenarios'][k].reuse = false;						
-							k = k+1;
+								qData['screen'][i].reuse = false;						
+							qData['screen'][i].count = result[i].data[0].row[0];
+							i = i+1;
 						}
+						var j = 0;
+						while(j<qData['testcase'].length){
+							if(result[i+j].data[0].row[0].length>1){
+								qData['testcase'][j].reuse = true;
+								qData['testcase'][j].oidlist = result[i+j].data[0].row[0];
+							}
+							else
+								qData['testcase'][j].reuse = false;						
+							j = j+1;
+						}
+						var k = 0;
+						if(qData['scenarios']){
+							while(k<qData['scenarios'].length){
+								if(result[k].data.length>0 && (result[k].data[0].row[0]>1 || (result[k].data[0].row[0]==1 && qData['modules']!=result[k].data[0].row[1])))
+									qData['scenarios'][k].reuse = true;
+								else
+									qData['scenarios'][k].reuse = false;						
+								k = k+1;
+							}
+						}
+						
+						res.status(status).send(qData);	
 					}
-					
-					res.status(status).send(qData);
 				} 
 			});
 	}
@@ -540,6 +548,8 @@ exports.saveData=function(req,res){
 					qList.push({"statement":"MATCH (N) WHERE ID(N)="+t+" MATCH (N)-[r:FNTT]->(b) with b as b MATCH(b)<-[s:FNTT]-(M) WITH count(M) as rel_cnt,b as b  WHERE rel_cnt=1 DETACH DELETE b"});
 					// Else delete just connection					
 					qList.push({"statement":"MATCH (N) WHERE ID(N)="+t+" MATCH (N)-[r:FNTT]-(b) DELETE r"});
+					// delete nodes in case renamed a reused node
+					qList.push({"statement":"MATCH (N) WHERE ID(N)="+t+" DETACH DELETE N"});
 				});
 				//TO support task deletion
 				removeTask.forEach(function(t,i){
@@ -771,12 +781,12 @@ exports.saveData=function(req,res){
 						var k=0,rIndex,lbl,neoIdDict={};
 						idDict={};
 
-						var attrDict={"modules_endtoend":{"childIndex":"childIndex","projectID":"pid_n","moduleName":"name","moduleID":"id_n","moduleID_c":"id_c"},"modules":{"childIndex":"childIndex","projectID":"pid_n","moduleName":"name","moduleID":"id_n","moduleID_c":"id_c"},"scenarios":{"childIndex":"childIndex","moduleID":"pid_n","testScenarioName":"name","testScenarioID":"id_n","testScenarioID_c":"id_c"},"screens":{"childIndex":"childIndex","testScenarioID":"pid_n","screenName":"name","screenID":"id_n","screenID_c":"id_c"},"testcases":{"childIndex":"childIndex","screenID":"pid_n","testCaseName":"name","testCaseID":"id_n","testCaseID_c":"id_c"},"tasks":{"taskID":"id_n","task":"t","batchName":"bn","assignedTo":"at","reviewer":"rw","startDate":"sd","endDate":"ed","re_estimation":"re_estimation","release":"re","cycle":"cy","details":"det","nodeID":"pid","parent":"anc","cx":"cx"}};
+						var attrDict={"modules_endtoend":{"childIndex":"childIndex","projectID":"projectID","moduleName":"name","moduleID":"id_n","moduleID_c":"id_c"},"modules":{"childIndex":"childIndex","projectID":"projectID","moduleName":"name","moduleID":"id_n","moduleID_c":"id_c"},"scenarios":{"projectID":"projectID","childIndex":"childIndex","moduleID":"pid_n","testScenarioName":"name","testScenarioID":"id_n","testScenarioID_c":"id_c"},"screens":{"projectID":"projectID","childIndex":"childIndex","testScenarioID":"pid_n","screenName":"name","screenID":"id_n","screenID_c":"id_c","taskexists":"taskexists"},"testcases":{"projectID":"projectID","childIndex":"childIndex","screenID":"pid_n","testCaseName":"name","testCaseID":"id_n","testCaseID_c":"id_c","taskexists":"taskexists"},"tasks":{"taskID":"id_n","task":"t","batchName":"bn","assignedTo":"at","reviewer":"rw","startDate":"sd","endDate":"ed","re_estimation":"re_estimation","release":"re","cycle":"cy","details":"det","nodeID":"pid","parent":"anc","cx":"cx"}};
 						var jsonData=result;
 
 						var new_res=jsonData[jsonData.length-1].data;
 						if(new_res.length==0){
-							new_res=jsonData[jsonData.length-2].data
+							new_res=jsonData[jsonData.length-2].data;
 						}
 						new_res.forEach(function(row){
 							row.graph.nodes.forEach(function(n){
@@ -790,7 +800,7 @@ exports.saveData=function(req,res){
 									if(lbl=="tasks") nData.push({id:n.id_n,oid:n.id,task:n.t,batchName:n.bn,assignedTo:n.at,reviewer:n.rw,startDate:n.sd,endDate:n.ed,re_estimation:n.re_estimation,release:n.re,cycle:n.cy,details:n.det,nodeID:n.pid,parent:n.anc.slice(1,-1).split(','),cx:n.cx});
 									else{
 										if(lbl=="modules" || lbl=="modules_endtoend") n.childIndex=0;
-										nData.push({childIndex:n.childIndex,id:n.id,"type":lbl,name:n.name,id_n:n.id_n,pid_n:n.pid_n,id_c:n.id_c,children:[],task:null});
+										nData.push({projectID:n.projectID,childIndex:n.childIndex,id:n.id,"type":lbl,name:n.name,id_n:n.id_n,pid_n:n.pid_n,id_c:n.id_c,children:[],task:null});
 									}
 									if(lbl=="modules" || lbl=="modules_endtoend") rIndex=k;
 									idDict[n.id]=k;neoIdDict[n.id_n]=k;
@@ -981,7 +991,7 @@ exports.saveEndtoEndData=function(req,res){
 						res.setHeader('Content-Type', 'application/json');
 						var k=0,rIndex,lbl,neoIdDict={};
 						idDict={};
-						var attrDict={"modules_endtoend":{"childIndex":"childIndex","projectID":"projectID","moduleName":"name","moduleID":"id_n","moduleID_c":"id_c"},"modules":{"childIndex":"childIndex","projectID":"pid_n","moduleName":"name","moduleID":"id_n","moduleID_c":"id_c"},"scenarios":{"projectID":"projectID","childIndex":"childIndex","moduleID":"pid_n","testScenarioName":"name","testScenarioID":"id_n","testScenarioID_c":"id_c"},"screens":{"childIndex":"childIndex","testScenarioID":"pid_n","screenName":"name","screenID":"id_n","screenID_c":"id_c"},"testcases":{"childIndex":"childIndex","screenID":"pid_n","testCaseName":"name","testCaseID":"id_n","testCaseID_c":"id_c"},"tasks":{"taskID":"id_n","task":"t","assignedTo":"at","reviewer":"rw","startDate":"sd","endDate":"ed","re_estimation":"re_estimation","release":"re","cycle":"cy","details":"det","nodeID":"pid","parent":"anc"}};
+						var attrDict={"modules_endtoend":{"childIndex":"childIndex","projectID":"projectID","moduleName":"name","moduleID":"id_n","moduleID_c":"id_c"},"modules":{"childIndex":"childIndex","projectID":"projectID","moduleName":"name","moduleID":"id_n","moduleID_c":"id_c"},"scenarios":{"projectID":"projectID","childIndex":"childIndex","moduleID":"pid_n","testScenarioName":"name","testScenarioID":"id_n","testScenarioID_c":"id_c"},"screens":{"projectID":"projectID","childIndex":"childIndex","testScenarioID":"pid_n","screenName":"name","screenID":"id_n","screenID_c":"id_c","taskexists":"taskexists"},"testcases":{"projectID":"projectID","childIndex":"childIndex","screenID":"pid_n","testCaseName":"name","testCaseID":"id_n","testCaseID_c":"id_c","taskexists":"taskexists"},"tasks":{"taskID":"id_n","task":"t","batchName":"bn","assignedTo":"at","reviewer":"rw","startDate":"sd","endDate":"ed","re_estimation":"re_estimation","release":"re","cycle":"cy","details":"det","nodeID":"pid","parent":"anc","cx":"cx"}};
 						var jsonData=result;
 
 						var new_res=jsonData[jsonData.length-1].data;
@@ -1085,37 +1095,43 @@ exports.saveEndtoEndData=function(req,res){
 
 function getQueries(qdata){
 	var qList_reuse= [];
-	if(qdata.versionNumber!=undefined){
-		//Reuse in case of versioning
-		if (qdata.scenarios!=undefined){
-			qdata['scenarios'].forEach(function(e,i){
-				qList_reuse.push({'statement':'Match (n:TESTSCENARIOS{testScenarioName : "'+e.scenarioname+'",projectID :"'+qdata['projectid']+'"})<-[s:FMTTS]-(m:MODULES)<-[t:FVTM]-(v:VERSION{versionNumber:'+qdata['versionNumber']+'}) return count(n),m.moduleName'});
-			})
-		}else{
-			qdata['screen'].forEach(function(e,i){
-				qList_reuse.push({'statement':'Match (n:SCREENS{screenName : "'+e.screenname+'",projectID :"'+qdata['projectid']+'"})<-[r:FTSTS]-(ts:TESTSCENARIOS)<-[s:FMTTS]-(m:MODULES)<-[t:FVTM]-(v:VERSION{versionNumber:'+qdata['versionNumber']+'}) return count(n)'});
-			})
-			qdata['testcase'].forEach(function(e,i){
-				qList_reuse.push({'statement':'Match (n:TESTCASES{testCaseName : "'+e.testcasename+'",projectID :"'+qdata['projectid']+'"})<-[a:FSTTS]-(scr:SCREENS{screenName:"'+e.screenname+'"})<-[r:FTSTS]-(ts:TESTSCENARIOS)<-[s:FMTTS]-(m:MODULES)<-[t:FVTM]-(v:VERSION{versionNumber:'+qdata['versionNumber']+'}) return count(n)'});
-			})
-		}
-				
+	if(qdata.gettestcases){	//for a reused screen fetches all the testcases
+		qList_reuse.push({'statement':'Match (n:SCREENS{screenName :"'+qdata.screen[0].screenname+'",projectID :"'+qdata['projectid']+'"})-[r]-(m:TESTCASES) return distinct collect(ID(m))'});
 	}
 	else{
-		if (qdata.scenarios!=undefined){
-			qdata['scenarios'].forEach(function(e,i){
-				qList_reuse.push({'statement':'Match (n:TESTSCENARIOS{testScenarioName : "'+e.scenarioname+'",projectID :"'+qdata['projectid']+'"})<-[s:FMTTS]-(m:MODULES) return count(n),m.moduleName'});
-			})
-		}else{
-			qdata['screen'].forEach(function(e,i){
-				qList_reuse.push({'statement':'Match (n:SCREENS{screenName : "'+e.screenname+'",projectID :"'+qdata['projectid']+'"}) return count(n)'});
-			})
-			qdata['testcase'].forEach(function(e,i){
-				qList_reuse.push({'statement':'Match (n:TESTCASES{testCaseName : "'+e.testcasename+'",projectID :"'+qdata['projectid']+'"})<-[a:FSTTS]-(scr:SCREENS{screenName:"'+e.screenname+'"}) return count(n)'});
-			})
+		if(qdata.versionNumber!=undefined){
+			//Reuse in case of versioning
+			if (qdata.scenarios!=undefined){
+				qdata['scenarios'].forEach(function(e,i){
+					qList_reuse.push({'statement':'Match (n:TESTSCENARIOS{testScenarioName : "'+e.scenarioname+'",projectID :"'+qdata['projectid']+'"})<-[s:FMTTS]-(m:MODULES)<-[t:FVTM]-(v:VERSION{versionNumber:'+qdata['versionNumber']+'}) return count(n),m.moduleName'});
+				})
+			}else{
+				qdata['screen'].forEach(function(e,i){
+					qList_reuse.push({'statement':'Match (n:SCREENS{screenName : "'+e.screenname+'",projectID :"'+qdata['projectid']+'"})<-[r:FTSTS]-(ts:TESTSCENARIOS)<-[s:FMTTS]-(m:MODULES)<-[t:FVTM]-(v:VERSION{versionNumber:'+qdata['versionNumber']+'}) return count(n)'});
+				})
+				qdata['testcase'].forEach(function(e,i){
+					qList_reuse.push({'statement':'Match (n:TESTCASES{testCaseName : "'+e.testcasename+'",projectID :"'+qdata['projectid']+'"})<-[a:FSTTS]-(scr:SCREENS{screenName:"'+e.screenname+'"})<-[r:FTSTS]-(ts:TESTSCENARIOS)<-[s:FMTTS]-(m:MODULES)<-[t:FVTM]-(v:VERSION{versionNumber:'+qdata['versionNumber']+'}) return collect(ID(n))'});
+				})
+			}
+					
 		}
-		
+		else{
+			if (qdata.scenarios!=undefined){
+				qdata['scenarios'].forEach(function(e,i){
+					qList_reuse.push({'statement':'Match (n:TESTSCENARIOS{testScenarioName : "'+e.scenarioname+'",projectID :"'+qdata['projectid']+'"})<-[s:FMTTS]-(m:MODULES) return count(n),m.moduleName'});
+				})
+			}else{
+				qdata['screen'].forEach(function(e,i){
+					qList_reuse.push({'statement':'Match (n:SCREENS{screenName : "'+e.screenname+'",projectID :"'+qdata['projectid']+'"}) return count(n)'});
+				})
+				qdata['testcase'].forEach(function(e,i){
+					qList_reuse.push({'statement':'Match (n:TESTCASES{testCaseName : "'+e.testcasename+'",projectID :"'+qdata['projectid']+'"})<-[a:FSTTS]-(scr:SCREENS{screenName:"'+e.screenname+'"}) return collect(ID(n))'});
+				})
+			}
+			
+		}
 	}
+
 	return qList_reuse;
 }
 

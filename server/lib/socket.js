@@ -9,9 +9,9 @@ var socketMapNotify = {};
 var myserver = require('./../../server');
 var httpsServer = myserver.httpsServer;
 // var io = require('socket.io')(httpsServer);
-var io = require('socket.io').listen(httpsServer,{ cookie: false });
+var io = require('socket.io').listen(httpsServer, { cookie: false });
 var notificationMsg = require('./../notifications/notifyMessages');
-var epurl = "http://"+process.env.NDAC_IP+":"+process.env.NDAC_PORT+"/";
+var epurl = "http://" + process.env.NDAC_IP + ":" + process.env.NDAC_PORT + "/";
 var Client = require("node-rest-client").Client;
 var apiclient = new Client();
 
@@ -28,12 +28,14 @@ io.on('connection', function (socket) {
 		socketMapUI[address] = socket;
 		socket.emit("connectionAck", "Success");
 	} else if (socket.request._query.check == "notify") {
-		 //address = Base64.decode(socket.request._query.username);
-		 //socketMapNotify[address] = socket;
-		socket.on('key',function(data) {
-			address = Base64.decode(data);
-			socketMapNotify[address] = socket;
-		  });
+		//address = Buffer.from(socket.request._query.username, "base64").toString();
+		//socketMapNotify[address] = socket;
+		socket.on('key', function (data) {
+			if (typeof(data) == "string") {
+				address = Buffer.from(data, "base64").toString();
+				socketMapNotify[address] = socket;
+			}
+		});
 		//Broadcast Message
 		var broadcastTo = ['/admin', '/plugin', '/design', '/designTestCase', '/execute', '/scheduling', '/specificreports', '/mindmap', '/p_Utility', '/p_Reports', 'p_Weboccular', '/neuronGraphs2D', '/p_ALM'];
 		notificationMsg.to = broadcastTo;
@@ -55,8 +57,8 @@ io.on('connection', function (socket) {
 			}
 		};
 		logger.info("Calling NDAC Service: updateActiveIceSessions");
-		apiclient.post(epurl+"server/updateActiveIceSessions", args,
-		function (result, response) {
+		apiclient.post(epurl + "server/updateActiveIceSessions", args,
+			function (result, response) {
 			if (response.statusCode != 200) {
 				logger.error("Error occurred in updateActiveIceSessions Error Code: ERRNDAC");
 			} else {
@@ -97,8 +99,8 @@ io.on('connection', function (socket) {
 			logger.info("Disconnecting from UI socket: %s", address);
 		} else if (socket.request._query.check == "notify") {
 			// address = socket.handshake.query.username;
-			address = Base64.decode(socket.request._query.username);
-			logger.info("Disconnecting from Notification socket: %s", address);
+			// logger.info("Disconnecting from Notification socket: %s", address);
+			// address = Buffer.from(socket.request._query.username, "base64").toString();
 		} else {
 			var connect_flag = false;
 			logger.info("Inside ICE Socket disconnection");
@@ -132,7 +134,7 @@ io.on('connection', function (socket) {
 					}
 				};
 				logger.info("Calling NDAC Service: updateActiveIceSessions");
-				apiclient.post(epurl+"server/updateActiveIceSessions", args,
+				apiclient.post(epurl + "server/updateActiveIceSessions", args,
 					function (result, response) {
 					if (response.statusCode != 200 || result.rows == "fail") {
 						logger.error("Error occurred in updateActiveIceSessions Error Code: ERRNDAC");
@@ -181,59 +183,5 @@ io.on('connection', function (socket) {
 	});
 });
 //SOCKET CONNECTION USING SOCKET.IO
-
-var Base64 = {
-	_keyStr: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",
-	decode: function (input) {
-		if(input != undefined) {
-			var output = "";
-			var chr1,chr2,chr3;
-			var enc1,enc2,enc3,enc4;
-			var i = 0;
-			input = input.replace(/[^A-Za-z0-9\+\/\=]/g, "");
-			while (i < input.length) {
-				enc1 = this._keyStr.indexOf(input.charAt(i++));
-				enc2 = this._keyStr.indexOf(input.charAt(i++));
-				enc3 = this._keyStr.indexOf(input.charAt(i++));
-				enc4 = this._keyStr.indexOf(input.charAt(i++));
-				chr1 = (enc1 << 2) | (enc2 >> 4);
-				chr2 = ((enc2 & 15) << 4) | (enc3 >> 2);
-				chr3 = ((enc3 & 3) << 6) | enc4;
-				output = output + String.fromCharCode(chr1);
-				if (enc3 != 64) {
-					output = output + String.fromCharCode(chr2);
-				}
-				if (enc4 != 64) {
-					output = output + String.fromCharCode(chr3);
-				}
-			}
-			output = Base64._utf8_decode(output);
-			return output;
-		}
-	},
-
-	_utf8_decode: function (utftext) {
-		var string = "";
-		var i = 0;
-		var c, c2, c3;
-		while (i < utftext.length) {
-			c = utftext.charCodeAt(i);
-			if (c < 128) {
-				string += String.fromCharCode(c);
-				i++;
-			} else if ((c > 191) && (c < 224)) {
-				c2 = utftext.charCodeAt(i + 1);
-				string += String.fromCharCode(((c & 31) << 6) | (c2 & 63));
-				i += 2;
-			} else {
-				c2 = utftext.charCodeAt(i + 1);
-				c3 = utftext.charCodeAt(i + 2);
-				string += String.fromCharCode(((c & 15) << 12) | ((c2 & 63) << 6) | (c3 & 63));
-				i += 3;
-			}
-		}
-		return string;
-	}
-};
 
 module.exports = io;

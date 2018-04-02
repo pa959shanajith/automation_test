@@ -7,8 +7,8 @@
     "ldap_port":"389",
     "ldap_domain":"psys.com",
     "host": "localhost:7474",
-    "username": "neo4j",
-    "password": "local7474",
+    "username": "bmVvNGo=",
+    "password": "bG9jYWw3NDc0",
     "screenShotPath": {
     	"default": "",
     	"mac": ""

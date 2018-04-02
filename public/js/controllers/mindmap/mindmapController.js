@@ -4,8 +4,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     //Createmap//
     var activeNode, childNode, uNix, uLix, node, link, dNodes, dLinks, dNodes_c, dLinks_c, allMMaps, temp, rootIndex, faRef, nCount, scrList, tcList, mapSaved, zoom, cSpan, cScale, taskAssign, releaseResult, selectedProject;
     //unassignTask is an array to store whose task to be deleted
-    var deletednode = [],
-        unassignTask = [],
+    var deletednode = [], unassignTask = [],
         deletednode_info = [];
     var versioning_enabled = 0;
     // node_names_tc keep track of testcase names to decide reusability of testcases
@@ -362,27 +361,15 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             d3.event.preventDefault();
         });
 
-        var svgTileG = d3.select('.ct-tile').append('svg').attr('class', 'ct-svgTile').attr('height', '150px').attr('width', '150px').append('g');
-        var svgTileLen = $(".ct-svgTile").length;
-        if (svgTileLen == 0) {
-            $('#ct-mapSvg, #ct-canvas').empty();
-            $('#ct-canvas').append(`<div id="minimap-wrapper" style="display: none;"><div id="minimap-header"><img class="move-ic-img" src="imgs/move_img.svg" alt="move" style="height: 15px;"></div><div id="minimap"></div></div>
-                                <div class="ct-tileBox">
-                                    <div class="ct-tile" title="Create Mindmap">
-                                        <svg class="ct-svgTile" height="150px" width="150px">
-                                            <g>
-                                                <circle cx="75" cy="75" r="30"></circle>
-                                                <path d="M75,55L75,95"></path>
-                                                <path d="M55,75L95,75"></path>
-                                            </g>
-                                        </svg>
+        $('#ct-mapSvg, #ct-canvas').empty();
+        $('#ct-canvas').append(`<div id="minimap-wrapper" style="display: none;">
+                                    <div id="minimap-header">
+                                        <img class="move-ic-img" src="imgs/move_img.svg" alt="move" style="height: 15px;">
                                     </div>
-                                <span class="ct-text">Create Mindmap</span>
-                                </div>`);
-            $(".ct-tile").click(function() {
-                createNewMap();
-            });
-        }
+                                    <div id="minimap">
+                                    </div>
+                                </div>
+                            `);
         d3.select('#ct-assignBox').classed('no-disp', !0);
         var version_num = '';
 
@@ -432,7 +419,6 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     function initiate() {
         var t, u;
         var selectedTab = window.localStorage['tabMindMap'];
-        d3.select('.ct-tileBox').remove();
         if (d3.select('#ct-mindMap')[0][0] != null) return;
         if (selectedTab == "tabAssign") var canvas = d3.select('#ct-canvasforAssign');
         else var canvas = d3.select('#ct-canvas');
@@ -566,6 +552,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     }
 
     function getReuseDetails(){
+        // reuse details within the same module
         var dictTmp = {};
         dNodes.forEach(function(e,i){
             dictTmp[i] = [];
@@ -946,6 +933,10 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                         dNodes[pi].task['updatedParent'] = validate[1];
                     }                    
                 }
+                if(!origTask){
+                    dNodes[pi].task.cx = undefined;
+                    dNodes[pi].task.details = '';
+                }
 
                 dNodes[pi].task.tstatus = taskStatus;
 
@@ -993,7 +984,20 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         }
         if (errorRelCyc) {
             openDialogMindmap("Task Assignment Error", "Please select Release/Cycle")
-        }   
+        }
+        for (var i = 0; i < taskidArr.length; i++) {
+			if (taskidArr[i].id == dNodes[pi].task.id) {
+				if (dNodes[pi].task.task == "Execute" || dNodes[pi].task.task == "Execute Batch") {
+					assignedObj[dNodes[pi].task.task] = $("#ct-assignedTo option:selected").text();
+				} else if (dNodes[pi].task.task == "Execute Scenario") {
+					assignedObj[dNodes[pi].task.task] = $("#ct-assignedTo option:selected").text();
+				} else if (dNodes[pi].task.task == "Scrape" || dNodes[pi].task.task == "Append" || dNodes[pi].task.task == "Compare" || dNodes[pi].task.task == "Add" || dNodes[pi].task.task == "Map") {
+					assignedObj[dNodes[pi].task.task] = $("#ct-assignedTo option:selected").text();
+				} else if (dNodes[pi].task.task == "Design" || dNodes[pi].task.task == "Update") {
+					assignedObj[dNodes[pi].task.task] = $("#ct-assignedTo option:selected").text();
+				}
+			}
+		}
     };
 
     function nodeClick(e) {                
@@ -1066,9 +1070,11 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         $("#ct-assignTask option[value='" + tObj.t + "']").attr('selected', 'selected');
 
         if(tObj.det===null || tObj.det.trim() == ""){
-            tObj.det=tObj.t+" "+dNodes[pi].type+" "+dNodes[pi].name
+            d3.select('#ct-assignDetails').property('value', tObj.t+" "+dNodes[pi].type+" "+dNodes[pi].name);
         }
-        d3.select('#ct-assignDetails').property('value', tObj.det);
+        else{
+            d3.select('#ct-assignDetails').property('value', tObj.det);            
+        }        
 
         $("#ct-assignTask").change(function() {
             if ($("#ct-assignTask").val() == 'Execute Batch') {
@@ -1199,6 +1205,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     if(!(clist=="undefined"||clist==undefined)){
                         $('#ct-cxval').text(getComplexityLevel(t,parseInt(clist[0])));
                         $('#complexity-val').text('Complexity: '+getComplexityLevel(t,parseInt(clist[0])));
+                    }
+                    else{
+                        $('#complexity-val').text('Complexity: Unassigned');
                     }
                     
                 }
@@ -1898,7 +1907,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 d3.select('#ct-node-' + d.id).remove();
                 deletednode_info.push(d);
                 if (d.oid != undefined) {
-                    deletednode.push(d.oid);
+                    deletednode.push(d.oid);            
                 }
                 var temp=dLinks;
                 for (j = temp.length - 1; j >= 0; j--) {
@@ -1911,6 +1920,49 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             });
             dNodes[pi].children=[];
         }
+        if(reuseDict[pi].length>0){
+            reuseDict[pi].forEach(function(idx,i){
+                var dn = dNodes[idx];
+                if(dn.children){
+                    dn.children.forEach(function(d,i){
+                        d.parent = null;
+                        d.children = null;
+                        d.task = null;
+                        d3.select('#ct-node-' + d.id).remove();
+                        deletednode_info.push(d);
+                        if (d.oid != undefined) {
+                            deletednode.push(d.oid);            
+                        }
+                        var temp=dLinks;
+                        for (j = temp.length - 1; j >= 0; j--) {
+                            if (temp[j].target.id == d.id) {
+                                d3.select('#ct-link-' + temp[j].id).remove();
+                                temp[j].deleted = !0;
+                            }
+                        }  
+                        //dNodes.splice(i, 1);                   
+                    });
+                    dNodes[idx].children=[];
+                }
+            });
+        }
+
+        var dataReuse = {
+            'screen': [{'screenname': dNodes[pi].original_name}],
+            'testcase': [],
+            'projectid': $('.project-list').val(),
+            'modules':'',
+            'gettestcases': true  // if true will fetch all the testcase ids under given screen including reused ones         
+            };
+        blockUI("Deleting testcase! Please wait..");    
+        mindmapServices.checkReuse(dataReuse).then(function(result) {
+            result = result.toString().split(',');
+            deletednode.push.apply(deletednode,result);
+            unblockUI();
+        }, function(error) {
+            unblockUI();
+            console.log("Error: checkReuse service 1");
+        });                    
         if (!dNodes[pi].children || dNodes[pi].children.length == 0) d3.select('#ct-node-' + pi).select('.ct-cRight').remove();
     }
 
@@ -2596,7 +2648,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
     //FUnction is tagged to every click on 'cnavas' element to validate the names of nodes when created
     function callme() {
-        if ($('.ct-tileBox').length > 0) return;
+        if ($('#ct-mindMap').length > 0) return;
         if (childNode != null && (childNode.text() == 'Module_0' || childNode.text() == 'Screen_0' || childNode.text() == 'Scenario_0' || childNode.text() == 'Testcase_0')) {
             d3.select('#ct-inpBox').classed('no-disp', !1);
         }
@@ -3105,8 +3157,6 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         d3.select('#ct-main').on('contextmenu', function(e) {
             d3.event.preventDefault();
         });
-        var svgTileG = d3.select('.ct-tile_W').append('svg').attr('class', 'ct-svgTile').attr('height', '150px').attr('width', '150px').append('g');
-        var svgTileLen = $(".ct-svgTile").length;
 
         d3.select('#ct-assignBox').classed('no-disp', !0);
         mindmapServices.getModules(versioning_enabled,'endToend', $("#selectProjectEtem").val(),$('.release-list').val(),$('.cycle-list').val()).then(function(result) {
@@ -3144,7 +3194,6 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     function initiate_W() {
         var t, u;
         var selectedTab = window.localStorage['tabMindMap'];
-        d3.select('.ct-tileBox').remove();
         if (d3.select('#ct-mindMap')[0][0] != null) return;
         if (selectedTab == "tabAssign") var canvas = d3.select('#ct-canvasforAssign');
         else var canvas = d3.select('#ct-canvas');
@@ -3863,7 +3912,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         var from_v = to_v = '';
         
 
-        mindmapServices.saveEndtoEndData(username, flag, window.localStorage['_SR'], from_v, to_v, 'endToend', mapData, deletednode_W, unassignTask, selectedProject, $('#ct-assignRel').val(), $('#ct-assignCyc').val()).then(function(result) {
+        mindmapServices.saveEndtoEndData(username, flag, window.localStorage['_SR'], from_v, to_v, 'endToend', mapData, deletednode, unassignTask, selectedProject, $('#ct-assignRel').val(), $('#ct-assignCyc').val()).then(function(result) {
             unblockUI();
             var res = result;
             if (flag == 10) {
@@ -4292,13 +4341,6 @@ function loadModules() {
   var active_version = $('.version-list').val();
   $('.version-list').attr({title:active_version});
   blockUI('Loading...');
-  var svgTileG = d3.select('.ct-tile').append('svg').attr('class', 'ct-svgTile').attr('height', '150px').attr('width', '150px').append('g');
-  var svgTileLen = $(".ct-svgTile").length;
-  if (svgTileLen == 0) {
-    $('#ct-mapSvg, #ct-canvas').empty();
-    $('#ct-canvas').append('<div class="ct-tileBox"><div class="ct-tile" title="Create Mindmap"><svg class="ct-svgTile" height="150px" width="150px"><g><circle cx="75" cy="75" r="30"></circle><path d="M75,55L75,95"></path><path d="M55,75L95,75"></path></g></svg></div><span class="ct-text">Create Mindmap</span></div>');
-
-  }
   mindmapServices.getModules(versioning_enabled,window.localStorage['tabMindMap'],$(".project-list").val(),parseFloat(active_version),$('.release-list').val(),$('.cycle-list').val()).then(
       function(res){
             var nodeBox = d3.select('.ct-nodeBox');
@@ -4539,9 +4581,6 @@ function getSelectionStart(o) {
 
     function adjustMidPanel() {
         if ($('.leftBarOpen.rightBarOpen').length > 0) {
-            $(".ct-tileBox").css({
-                'left': '50%'
-            })
             //endtoend
             $(".endtoend-modulesContainer").prop("style", "width:calc(100% - 256px) !important; left:166px !important;");
             $(".searchModuleimg").prop("style", "right:86px !important;");
@@ -4549,9 +4588,6 @@ function getSelectionStart(o) {
             $(".eteLabel").prop("style", "left:366px !important; width:140px !important; bottom:23px !important;");
         } else if ($('.leftBarOpen').length > 0) {
             // $("#ct-moduleBox,.tabAssign").css({'left':'147px !important','width':'100%'})
-            $(".ct-tileBox").css({
-                'left': '52% !important'
-            });
             //endtoend
             $(".endtoend-modulesContainer").prop("style", "width:calc(100% - 172px) !important; left:166px !important;");
             $(".searchModuleimg").prop("style", "right:91px !important;");
@@ -4716,7 +4752,7 @@ function getSelectionStart(o) {
             
             
         for (i = 0; i < elems.length; i++) {
-            if (elems[i].textContent.toUpperCase().indexOf(filter_elem) > -1) {
+            if ($(elems[i]).attr('title').toUpperCase().indexOf(filter_elem) > -1) {
                 elems[i].style.display = "";
             } else {
                 elems[i].style.display = "none";

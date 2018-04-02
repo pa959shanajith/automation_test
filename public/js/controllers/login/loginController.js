@@ -4,7 +4,13 @@ mySPA.controller('loginController', function ($scope, $rootScope, $timeout, $htt
 	window.localStorage.clear();
 	window.localStorage['LoginSuccess'] = "False";
 	document.getElementById("currentYear").innerHTML = new Date().getFullYear();
-
+	
+	///if checkLoggedIn was true, means, user was logged in but now the session is expired 
+	if(window.sessionStorage.getItem('checkLoggedIn') == "true"){
+		$scope.loginValidation = "Your session has expired, Please login again";
+		window.sessionStorage['checkLoggedIn'] = "false";
+	}
+	
 	$scope.check_credentials = function (path) {
 		cfpLoadingBar.start();
 		$scope.loginValidation = "";
@@ -52,6 +58,7 @@ mySPA.controller('loginController', function ($scope, $rootScope, $timeout, $htt
 								window.localStorage['LoginSuccess'] = "True";
 								window.localStorage['_SR'] = data.rolename;
 								window.localStorage['_UI'] = JSON.stringify(data);
+								window.sessionStorage["checkLoggedIn"]= "true";
 								if(data.rolename == "Admin"){
 									window.localStorage['navigateScreen'] = "admin";
 									$location.path( "/admin");
