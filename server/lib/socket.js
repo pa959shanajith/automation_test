@@ -31,8 +31,10 @@ io.on('connection', function (socket) {
 		//address = Buffer.from(socket.request._query.username, "base64").toString();
 		//socketMapNotify[address] = socket;
 		socket.on('key', function (data) {
-			address = Buffer.from(data, "base64").toString();
-			socketMapNotify[address] = socket;
+			if (typeof(data) == "string") {
+				address = Buffer.from(data, "base64").toString();
+				socketMapNotify[address] = socket;
+			}
 		});
 		//Broadcast Message
 		var broadcastTo = ['/admin', '/plugin', '/design', '/designTestCase', '/execute', '/scheduling', '/specificreports', '/mindmap', '/p_Utility', '/p_Reports', 'p_Weboccular', '/neuronGraphs2D', '/p_ALM'];
@@ -97,8 +99,8 @@ io.on('connection', function (socket) {
 			logger.info("Disconnecting from UI socket: %s", address);
 		} else if (socket.request._query.check == "notify") {
 			// address = socket.handshake.query.username;
-			address = Buffer.from(socket.request._query.username, "base64").toString();
-			logger.info("Disconnecting from Notification socket: %s", address);
+			// logger.info("Disconnecting from Notification socket: %s", address);
+			// address = Buffer.from(socket.request._query.username, "base64").toString();
 		} else {
 			var connect_flag = false;
 			logger.info("Inside ICE Socket disconnection");

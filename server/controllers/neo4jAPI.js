@@ -1,4 +1,4 @@
-var config = require('../../server/config/config');
+var config = require('../config/options').storageConfig;
 var Client = require("node-rest-client").Client;
 var logger = require('../../logger');
 var client = new Client();
