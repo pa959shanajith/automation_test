@@ -1774,6 +1774,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     });
 
     $scope.createNodes = function(){
+        blockUI('Validating names..');
         var nodeNames = [];
         $('.errBorder').removeClass('errBorder');
         $('input.form-control-custom').each(function() {
@@ -1788,7 +1789,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 createNode({name:node});
             });
             $("#dialog-addObject").modal("hide");
+            openDialogMindmap("Success","Nodes created successfully!");
         }
+        unblockUI();
     }
 
     //------End of Create Multiple Child Node-------//
