@@ -3,30 +3,30 @@
 <!--Header-->
 
 <!--Content Area-->
-<section class="container-fluid container-fluid-inner">
+<section class="container-fluid container-fluid-inner" id="main-content-section">
 
 	<!--Left Panel-->
-	<div id="left-nav-section">
+
+	<div class="ct-side fl-left" id="ct-lSide">
+	<div id="left-nav-section" style='z-index:999;' class='left-sec-mindmap lsSlide'>
 		<div class="scrollbar-macosx">
-			<!-- Apptype Desktop -->
 			<div id="left-top-section" ng-if="ComplexityScreenView == true" class="ComplexityScreenView">
 				<ul>
 					<li><span><a class='openFileintxt'>Open File</a></span></li>
 					<li><a href='#'  title="Notepad++"  data-toggle="modal" ng-click="openFileInEditor($event,'notepad++'); $event.preventDefault(); $event.stopPropagation();"><span><img src='imgs/ic-desktop.png' alt='Notepad++' /></span>Notepad++</a></li>
-					<!-- <li class="last"  title="Append Objects"><span style="margin-bottom:-5px"><input ng-model="enbledChecked" id="enableAppend" type='checkbox' value=""></span><label for="enableAppend">Append</label></li> -->
 				</ul>
 			</div>
-			<!-- Apptype Desktop -->
 		</div>
-	</div> 
+     </div>
+     <div  ng-show="enableToggleSidebars"  id='ct-expand-left-apg' class="ct-expand ct-rev" ng-click="toggleLeftSidebar()"></div>
+   </div>
 	<!--Left Panel-->
 
 	<!--Middle Panel-->
 	<div id="middle-content-section">
 		<!--Task Name-->
 			<div id="page-taskName">
-				<!--<span style="cursor:pointer" ng-click="showWeboccularHome()">Flowgraph</Flowgraph></span>-->
-				<span style="cursor:pointer" ng-click="showFlowGraphHome()">Automated Path Generator</Flowgraph></span>
+				<span style="cursor:pointer; position : relative" ng-click="showFlowGraphHome()">Automated Path Generator</Flowgraph></span>
 			</div>
 			<!--Task Name-->
 			<!-- Generate DIV -->
@@ -52,15 +52,6 @@
 				<button ng-if="flowgraph_form.pathInput.$valid" class="btn btn-md pull-right pairwise-GenBtn" ng-click="executeGenerate()">Generate</button>
 			</form>
 			</div>
-
-			<!-- <div class="url-div">
-				<form name="flowgraph_form">
-					<span><b>Path:</b></span>
-					<input name="pathInput" type="text" ng-model="text" class="pathInput" id="path" placeholder="Enter Path of Folder/Zip/File" required> 
-					<button ng-if="flowgraph_form.pathInput.$invalid" disabled class="btn btn-md pull-right pairwise-GenBtn" ng-click="executeGenerate()">Generate</button>
-					<button ng-if="flowgraph_form.pathInput.$valid" class="btn btn-md pull-right pairwise-GenBtn" ng-click="executeGenerate()">Generate</button>
-				</form>
-			</div> -->
 			
 			<div class="crawl-result" >
 				<br>
@@ -98,13 +89,13 @@
 				</table>
 			</div>
 		</div>
-		<div id="report-canvas"></div>
 	</div>
 	<!--Middle Panel-->
-
-	<!--Right Panel-->
-	<div id="right-dependencies-section">
-		<div ng-class="enableDataflow ? 'enableActions' : 'disableActions'" class="thumbnail thumbnail-custom" id="screenshot_div">
+	
+	<!-- Right Section --> 
+   <div class="ct-side fl-right" id="ct-rSide"> 
+   <div id="right-dependencies-section" class="rsSlide" style='z-index:999'>
+          <div ng-class="enableDataflow ? 'enableActions' : 'disableActions'" class="thumbnail thumbnail-custom" id="screenshot_div">
         	<a class="slidePopup"  title="Screenshot" ng-click="disableButton($event) ">
           		<img class="thumb-ic" src="imgs/ic-screenshot.png" alt="Data-flow" id="screenshot_img">
           		<div class="caption">
@@ -122,7 +113,16 @@
 			</div>
 			<!--Popup-->
       	</div>
-		
+		  <div ng-if="enableToggleSidebars" class="thumbnail thumbnail-custom">
+      <!--<div class="thumbnail thumbnail-custom">-->
+         <a class="slidePopup" ng-click ="fullScreen()" id="fullscr" title="full screen">
+            <img class="thumb-ic" src="imgs/fscr.png" alt="full screen" style="height: 55px;">
+            <div class="caption">
+               <p>Full Screen</p>
+            </div>
+         </a>
+      </div>
+
 		<!--Images Blocks-->
 		<div class="thumbnail thumbnail-custom">
         	<a class="slidePopup"  title="Tasks">
@@ -187,53 +187,14 @@
 			</div>
 			<!--Popup-->
       	</div>
-
-		<!--Images Blocks-->
-		<div class="thumbnail thumbnail-custom thumbnail-custom-wiki">
-        	<a class="slide_popup slide_assist" href="#"  title="Assist">
-          		<img class="thumb-ic" src="imgs/ic-assist.png" alt="Assist">
-          		<div class="caption">
-            		<p>Assist</p>
-          		</div>
-        	</a>
-        	<!--Popup-->
-			<div id="assistWindow" class="assistWrap">
-				<h4 class="h4-custom h4-custom-assist">
-					<span class="assist-left pull-left"> <img
-						src="imgs/ic-message.png" />Assist
-					</span> <span class="assist-right pull-right"> <img
-						src="imgs/ic-up.png" class="animateAssistUp" style="margin-right: 10px" /> <img
-						src="imgs/ic-close.png" class="animateAssistClose" />
-					</span>
-				</h4>
-				<div class="assistContent">
-					<!-- Chat Container -->
-					<div class="chatContainer scrollbar-inner scrollbar-chatArea chatArea">
-						<ul class="chatList">
-							<li>Choose from the available browser icons from the action bar</li>
-							<li>Enter the URL of the AUT (Application under test)</li>
-							<li>Click on one of the options available in the Scrape Options
-								window</li>
-							<li>Identify the required objects</li>
-							<li>Rename the objects as per the naming convention</li>
-							<li>Click on the save button in the work area</li>
-							<li>Click on submit to complete task.</li>
-						</ul>
-					</div>
-
-					<div class="chatContainer">
-						<textarea rows="3" cols="" class="chatTextArea form-control"
-							placeholder="Ask Prof.J"></textarea>
-						<button class="btn btn-md pull-right">Send</button>
-					</div>
-					<!-- Chat Container -->
-				</div>
-			</div>
-			<!--Popup-->
-      	</div>
-		<!--Images Blocks-->
-	</div>
-	<!--Right Panel-->
+      <!--Images Blocks-->
+      <chatbot chatbot></chatbot>
+      <!--Images Blocks-->
+   </div>
+   
+      <div  ng-show="enableToggleSidebars" id='ct-expand-right-apg' class="ct-expand ct-rev" ng-click="toggleRightSidebar()"></div>
+   </div>
+	
 </section>
 <!--Content Area-->
 
@@ -241,7 +202,7 @@
 <footer footer id="footer" class="footer-global"></footer>
 <!--Footer-->
 	<!-- Global Modal  -->
-       <div class="modal fade" id="globalModal" role="dialog" data-keyboard="false" data-backdrop="static">
+       <div class="modal fade" id="globalModal" style="z-index: 10000" role="dialog" data-keyboard="false" data-backdrop="static">
          <div class="modal-dialog modal-sm">
            <div class="modal-content">
              <div class="modal-header">

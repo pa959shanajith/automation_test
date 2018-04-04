@@ -1,48 +1,107 @@
 mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$location', '$timeout', 'flowGraphServices','cfpLoadingBar','$window', 'socket', function($scope,$rootScope,$http,$location,$timeout,flowGraphServices,cfpLoadingBar,$window,socket) {
-	 //Task Listing
 	 $timeout(function() {
 		$('.scrollbar-inner').scrollbar();
 		$('.scrollbar-macosx').scrollbar();
 		document.getElementById("currentYear").innerHTML = new Date().getFullYear()
-		cfpLoadingBar.complete()
-		$("#utilityEncrytpion").trigger("click");
-	
+		cfpLoadingBar.complete();
 	  }, 500);
 	  
 	 loadUserTasks(); 
-
+	
 	 $scope.enableGenerate = false;
 	 $scope.ComplexityScreenView = false;
+	 $scope.expandSidebars = function(){
+		$("#middle-content-section").css({
+			left: '173px',
+			width: 'calc(100% - 270px)'
+		});
+		$("#page-taskName span").css({
+			left: '0px'
+		});	
+		
+		$("#ct-lSide").animate({left: '0px'}, 300, function(){
+			$("#ct-expand-left-apg").addClass('ct-rev');
+		});
+		$("#ct-rSide").animate({right: '0px'}, 300, function(){
+			$("#ct-expand-right-apg").addClass('ct-rev');
+		}); 
+	 }
+	 $scope.collapseSidebars = function(){
+		$("#ct-lSide").animate({left: '-160px'}, 300, function(){
+			$("#ct-expand-left-apg").removeClass('ct-rev');
+		});
+		$("#ct-rSide").animate({right: '-85px'}, 300, function(){
+			$("#ct-expand-right-apg").removeClass('ct-rev');
+		});
+		$("#middle-content-section").animate({
+			left: '0px',
+			width: '100%'
+		});
+	}
 	$scope.showFlowGraphHome = function(){
 		$scope.enableDataflow = false;
 		if (!$scope.enableGenerate)
 			return;
 		if($("#complexity-canvas").is(':visible')){
+			$scope.enableToggleSidebars = true;
 			$('#complexity-canvas').hide();
 			$scope.enableFilter = true;
 			$("#apg-cd-canvas").show();
+			$scope.collapseSidebars();
 		}else if($("#apg-cd-canvas").is(':visible')){
 			$scope.enableFilter = false;
+			$scope.enableToggleSidebars = false;
 			$("#apg-cd-canvas").hide();
 			var myNode = document.getElementById("apg-cd-canvas");
+			$scope.expandSidebars();
+
 			while (myNode.firstChild) {
 				myNode.removeChild(myNode.firstChild);
 			}
 			$('#middle-content-section').removeAttr('class');
-			//$("#apg-cd-canvas").hide();
-			//$("#apg-dfd-canvas").hide();
 			document.getElementById('path').value = '';
-			$scope.showInfo = false;
 			$scope.obj = {};
 			$scope.hideBaseContent = { message: 'false' };
 		}else if($("#apg-dfd-canvas").is(':visible')){
+			$scope.enableToggleSidebars = true;
 			$scope.enableFilter = true;
 			$("#apg-dfd-canvas").hide();
 			$("#apg-cd-canvas").show();
+			$scope.collapseSidebars();
+			$('#page-taskName span').animate({
+				left : '0px'
+			})
 		}
 		$scope.ComplexityScreenView = false;									  
 }
-
+	$scope.toggleLeftSidebar = function(){
+		if($("#ct-expand-left-apg").hasClass('ct-rev')){
+			$("#ct-lSide").animate({left: '-160px'}, 300, function(){
+				$("#ct-expand-left-apg").removeClass('ct-rev');
+			});
+			$("#page-taskName span").animate({
+				left: '0px'
+			});
+		}else{	
+			$("#ct-lSide").animate({left: '0px'}, 300, function(){
+				$("#ct-expand-left-apg").addClass('ct-rev');
+			});
+			$("#page-taskName span").animate({
+				left: '173px'
+			});		
+		}
+	}
+	$scope.toggleRightSidebar = function(){
+		if(!$("#ct-expand-right-apg").hasClass('ct-rev')){
+			$("#ct-rSide").animate({right: '0px'}, 300, function(){
+				$("#ct-expand-right-apg").addClass('ct-rev');
+			});
+		}else{
+			$("#ct-rSide").animate({right: '-85px'}, 300, function(){
+				$("#ct-expand-right-apg").removeClass('ct-rev');
+			});
+		}
+	}
 	  socket.on('ICEnotAvailable', function () {
 		var slider = document.getElementById("slider-container");
 		slider.remove();
@@ -79,6 +138,7 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 		$scope.obj = {};
 		$scope.enableGenerate = false;
 		currentDot = 0;
+		classes = [];
 		for( var k = 1 ; k <  $('#progress-canvas').children().length; ){
 			var child = document.getElementById('progress-canvas').children[k];
 			child.parentNode.removeChild(child);
@@ -112,6 +172,7 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 		socket.on('newdata', function(obj){
 			$scope.addClass(obj);
 			$scope.$apply();
+			classes.push(obj);
 		});
 		
 		socket.on('endData', function(obj){
@@ -120,6 +181,9 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 					$scope.hideBaseContent = { message: 'true' };
 					$scope.$apply();
 				});
+				
+				$scope.collapseSidebars();
+				console.log("Generating class diagram");
 				$scope.generateClassDiagram(obj);
 				$scope.enableGenerate = true;
 				$scope.createAPGProject(obj);
@@ -131,7 +195,94 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 				document.getElementById('path').value = '';
 				openDialog("APG", "Failed to generate graph.");
 			}
-			
+		});
+		
+		var canv =   d3.select("#progress-canvas").append('svg').attr('id','legend-box');
+		var u = canv.append('g').attr("transform", "translate(10,10)");	
+		var legends=[{text:'Public'},{text:'Private'},{text:'Protected'},{text:'Default'}];
+		legends.forEach(function(e,i) {
+			t=u.append('g');
+			if(e.text == "Public"){
+				var offset = i*90+10;
+				t.append("rect")
+				.style('fill', '#18b6df')
+				.attr('x',offset)
+				.attr('y', -6)
+				.attr('width', '15px')
+				.attr('height', '15px')
+				.attr('rx',3)
+				.attr('ry', 3)
+				t.append('text')
+				 .attr('x',offset+3)
+				 .attr('y',4.5)
+				 .attr('fill','#ffffff')
+				 .text('+')
+				t.append('text')
+				.attr('class','classLabel')
+				.attr('x',offset+25)
+				.attr('y',3)
+				.text(e.text);
+			}else if(e.text == "Private"){
+				var offset = i*90+50;
+				t.append("rect")
+				.style('fill', '#18b6df')
+				.attr('x',offset)
+				.attr('y', -6)
+				.attr('width', '15px')
+				.attr('height', '15px')
+				.attr('rx',3)
+				.attr('ry', 3)
+				t.append('text')
+				 .attr('x',offset+4)
+				 .attr('y',5)
+				 .attr('fill','#ffffff')
+				 .text('-')
+				t.append('text')
+				.attr('class','classLabel')
+				.attr('x',offset+25)
+				.attr('y',3)
+				.text(e.text);
+			}else if(e.text == "Protected"){
+				var offset = i*90+90;
+				t.append("rect")
+				.style('fill', '#18b6df')
+				.attr('x',offset)
+				.attr('y', -6)
+				.attr('width', '15px')
+				.attr('height', '15px')
+				.attr('rx',3)
+				.attr('ry', 3)
+				t.append('text')
+				 .attr('x',offset+3)
+				 .attr('y',4.5)
+				 .attr('fill','#ffffff')
+				 .text('#')
+				t.append('text')
+				.attr('class','classLabel')
+				.attr('x',offset+25)
+				.attr('y',3)
+				.text(e.text);
+			}else if(e.text == "Default"){
+				var offset = i*90+130;
+				t.append("rect")
+				.style('fill', '#18b6df')
+				.attr('x',offset)
+				.attr('y', -6)
+				.attr('width', '15px')
+				.attr('height', '15px')
+				.attr('rx',3)
+				.attr('ry', 3)
+				t.append('text')
+				 .attr('x',offset+3)
+				 .attr('y',4.5)
+				 .attr('fill','#ffffff')
+				 .text('~')
+				t.append('text')
+				.attr('class','classLabel')
+				.attr('x',offset+25)
+				.attr('y',3)
+				.text(e.text);
+			}
 		});
 	}
 	
@@ -239,7 +390,7 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 
 	$scope.prepareJSON = function(obj) {
 		links = obj.links;
-		obj = obj.classes;
+		obj = classes;
 		var class_map = {};
 		var size = -1;
 		var graph_json = {
@@ -368,17 +519,18 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 	
 	$scope.generateClassDiagram = function(obj){
 		$scope.enableFilter = true;
+		$scope.enableToggleSidebars = true;
 		$scope.$apply();
 		$("#apg-cd-canvas").show();
-		let width = $("#middle-content-section").width();
-		let height = $("#middle-content-section").height();
+		let width = $("#main-content-section").width();
+		let height = $("#main-content-section").height();
 		let center = [width / 2, height / 2];
 
 		var svg = d3.select('#apg-cd-canvas').append('svg')
 				.attr("width", width)
 				.attr("height", height);
 
-		var inner = svg.append('g').attr("id", "data-flow-g");	
+		var inner = svg.append('g');	
 
 		var zoom = d3.behavior.zoom()
 				.translate([0, 0])
@@ -583,9 +735,6 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 		})
 		// Center the graph
 		var initialScale = 0.75;
-		var _height = svg.attr('height') - g.graph().height;
-		var _width = svg.attr('width') - g.graph().width;
-		//console.log(height / _height);
 		svg.selectAll("g.node rect")
 			.attr("id", function (d) {
 			return "node" + d;
@@ -601,12 +750,13 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 			.attr('class', 'apg-info-icon')
 			.on('click', function(d){
 				$scope.enableFilter = false;
+				$scope.enableToggleSidebars = false;
 				$scope.$apply();
-				d = $scope.obj.classes[d];
+				d = classes[d];
+				$scope.expandSidebars();
 				if(d == undefined || d.complexity== "Undefined"){
-					openDialog('APG', "Complexity can't determine.");
-				}
-				else{
+					openDialog('APG', "Complexity can't be determined.");
+				}else{
 					$('#apg-cd-canvas').hide();
 					$('#complexity-canvas').show();
 					$scope.ccname=d.name;
@@ -667,7 +817,6 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 		
 		nodeDrag.call(svg.selectAll("g.node"));
 		edgeDrag.call(svg.selectAll("g.edgePath"));
-		
 		function nodeOver(d){
 			this.lastChild.classList.add("apg-active");
 			this.lastChild.previousSibling.classList.add("apg-active");
@@ -692,13 +841,18 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 	$scope.generateDataFlowDiagram = function(i){
 		$scope.enableDataflow = false;
 		$scope.enableFilter = false;
+		$scope.enableToggleSidebars = true;
 		$scope.$apply();
+		$scope.collapseSidebars();
+		$('#page-taskName span').animate({
+			left : '0px'
+		})
 		$('#apg-dfd-canvas svg').remove();
 		var obj = $scope.obj;
 		var links = obj.links;
 		var nodes = [];
 		var edges = [];
-		var selected_class = obj.classes[i].name;
+		var selected_class = classes[i].name;
 		
 		var data_flow_classes = new Set([]);
 		data_flow_classes.add(selected_class);
@@ -725,8 +879,8 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 			}
 		}
 		console.log(nodes);
-		var width = $("#middle-content-section").width();
-		var height = $("#middle-content-section").height();
+		var width = $("#main-content-section").width();
+		var height = $("#main-content-section").height();
 		$("#apg-cd-canvas").hide();
 		$("#apg-dfd-canvas").show();
 		
@@ -769,8 +923,17 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 				for (var j=0; j<nodes[i].child.length; j++){
 					for (var k=0; k<obj.data_flow.length; k++){
 						if(obj.data_flow[k].id == nodes[i].child[j] && data_flow_classes.has((obj.data_flow[k].class).split('(')[0])){
-							g.setEdge(nodes[i].id, nodes[i].child[j], {});
-							break;
+							if(nodes[i].shape == 'diamond' && nodes[i].child.length == 2){
+								if(nodes[i].child.indexOf(nodes[i].child[j]) == 0)
+									g.setEdge(nodes[i].id, nodes[i].child[j], {label: "True"});
+								else
+									g.setEdge(nodes[i].id, nodes[i].child[j], {label: "False"});
+								break;
+							}
+							else{
+								g.setEdge(nodes[i].id, nodes[i].child[j], {});
+								break;
+							}
 						}
 					}
 				}
@@ -1055,7 +1218,7 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 			var edge = g.edge(e.v, e.w);
 			edge.customId = e.v + "-" + e.w
 		});
-		var coord= $('.nodes').children()[0].getAttribute("transform").split("(")[1].split(")")[0].split(",");
+		var coord= $('#data-flow-g .nodes').children()[0].getAttribute("transform").split("(")[1].split(")")[0].split(",");
 		zoom.translate([ Number(-coord[0]+width/2),  Number(-coord[1]+height/2)]).scale(1).event(svg);
 		
 		nodeDrag.call(svg.selectAll("g.node"));
@@ -1091,6 +1254,49 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 			return false;
 		}
 	}
+	
+	 $scope.fullScreen = function() {
+		// remove highlight from fullscreen icon
+		$timeout(function(){$('#fullscr img').removeClass('thumb-ic-highlight')},500);
+		// for two canvas - pass the id of the canvas to be full-screened
+		var elemId = $("#apg-cd-canvas").is(':visible') ? "#apg-cd-canvas" : "#apg-dfd-canvas";
+        var elt = document.querySelector(elemId);
+		$(elemId).css({
+			width : '100%',
+			height: '100%'
+		});
+		setTimeout(function(){
+			$(elemId+" svg").attr({
+				height : $(elemId).innerHeight()
+			});
+		},200);
+		
+        if ((window.fullScreen) || (window.innerWidth == screen.width && (screen.height - window.innerHeight) <= 1)) {
+            if (document.cancelFullScreen) {
+                document.cancelFullScreen();
+            } else if (document.mozCancelFullScreen) {
+                document.mozCancelFullScreen();
+            } else if (document.webkitCancelFullScreen) {
+                document.webkitCancelFullScreen();
+            }
+            $timeout(function() {
+                $('.thumb-ic-highlight').removeClass('thumb-ic-highlight');
+            }, 100);
+        } else {
+            if (elt.requestFullscreen) {
+                elt.requestFullscreen();
+            } else if (elt.msRequestFullscreen) {
+                elt.msRequestFullscreen();
+            } else if (elt.mozRequestFullScreen) {
+                elt.mozRequestFullScreen();
+            } else if (elt.webkitRequestFullscreen) {
+                elt.webkitRequestFullscreen();
+            } else {
+                console.log("Fullscreen not available");
+            }
+        }
+    }
+
 	$scope.createAPGProject = function(obj){
 		var data = {};
 		var preparedJSON = $scope.prepareJSON(obj);
@@ -1143,6 +1349,7 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 		$('#method-flow svg').remove();
 		let width =700;
 		let height = 650 ;
+		var flag = false;
         var svg = d3.select('#method-flow').append('svg')
 				.attr("width", width)
 				.attr("height", height);
@@ -1162,9 +1369,17 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 			inner.attr('transform', 'translate(' + zoom.translate() + ')scale(' + zoom.scale() + ')');
 		}
 		var g = new dagreD3.graphlib.Graph().setGraph({});
-		var nodes = [];
+		var method_nodes = [];
 		var node_ids = new Set([]);
+		var index = 0;
 		for (var i=0; i<data_flow.length; i++){
+			if(data_flow[i].method == method_name && data_flow[i].class.split('(')[0] == class_name && (data_flow[i].text).startsWith('Method Name:')){
+				index = i;
+				break;
+			}
+		}
+		console.log(data_flow);
+		for (var i=index; i<data_flow.length; i++){
 			if(data_flow[i].method == method_name && data_flow[i].class.split('(')[0] == class_name){
 				if(data_flow[i].text == 'Start' || data_flow[i].text == 'End'){
 					data_flow[i].shape = "ellipse";
@@ -1175,32 +1390,39 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 				else{
 					data_flow[i].shape = "rect";
 				}
-				g.setNode(data_flow[i].id, {
-					label: data_flow[i].text,
-					shape: data_flow[i].shape
-				});
-				nodes.push(data_flow[i]);
+				if(data_flow[i].hasOwnProperty('within') || data_flow[i].hasOwnProperty('outside')){
+					g.setNode(data_flow[i].id, {
+						label: data_flow[i].text,
+						shape: data_flow[i].shape,
+						style: "fill: #afa"
+					});
+					flag = true;
+				}
+				else{
+					g.setNode(data_flow[i].id, {
+						label: data_flow[i].text,
+						shape: data_flow[i].shape
+					});
+				}
+				method_nodes.push(data_flow[i]);
 				node_ids.add(data_flow[i].id);
 			}
 		}
-		console.log(nodes);
-		for (var j=0; j<nodes.length; j++){
-			if(nodes[j].child != null){
-				for (var k=0; k<nodes[j].child.length; k++){
-					if(!node_ids.has(nodes[j].child[k])){
-						nodes.push({"parent":[nodes[j].id],"text":"Another method call","class":nodes[j].class,"shape":"Circle","child":null,"id":nodes[j].child[k],"method":nodes[j].method});
-						g.setNode(nodes[j].child[k], {
-							label: "Another method call",
-							shape: "ellipse"
-						});
+		console.log(method_nodes);
+		for (var j=0; j<method_nodes.length; j++){
+			if(method_nodes[j].child != null){
+				for (var k=0; k<method_nodes[j].child.length; k++){
+					if(node_ids.has(method_nodes[j].child[k])){
+						if(method_nodes[j].shape == 'diamond' && method_nodes[j].child.length == 2){
+							if(method_nodes[j].child.indexOf(method_nodes[j].child[k]) == 0)
+								g.setEdge(method_nodes[j].id, method_nodes[j].child[k], {style: "stroke: #fff; fill: none; stroke-width: 1", arrowheadStyle:"fill: #fff", label: "True", labelStyle: "font-family: 'LatoWeb'; stroke: #fff; stroke-width: 0.1"});
+							else
+								g.setEdge(method_nodes[j].id, method_nodes[j].child[k], {style: "stroke: #fff; fill: none; stroke-width: 1", arrowheadStyle:"fill: #fff", label: "False", labelStyle: "font-family: 'LatoWeb'; stroke: #fff; stroke-width: 0.1"});
+						}
+						else{
+							g.setEdge(method_nodes[j].id, method_nodes[j].child[k], {style: "stroke: #fff; fill: none; stroke-width: 1", arrowheadStyle:"fill: #fff"});
+						}
 					}
-				}
-			}
-		}
-		for (var i=0; i<nodes.length; i++){
-			if(nodes[i].child != null){
-				for (var j=0; j<nodes[i].child.length; j++){
-					g.setEdge(nodes[i].id, nodes[i].child[j], {style: "stroke: #fff; fill: none; stroke-width: 1", arrowheadStyle:"fill: #fff"});
 				}
 			}
 		}
@@ -1218,6 +1440,26 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 		render(inner, g);
 		var coord= $('#data-flow-method .nodes').children()[0].getAttribute("transform").split("(")[1].split(")")[0].split(",");
 		zoom.translate([ Number(-coord[0]+width/2 ),  Number(-coord[1]+height/2)]).scale(1).event(svg);
+		
+		if (flag){
+			var canv = d3.select("#method-flow").append('svg').attr('id','legend-box-data-flow');
+			var u = canv.append('g').attr("transform", "translate(10,10)");	
+			t=u.append('g');
+			var offset = 10;
+			t.append("rect")
+			.style('fill', '#afa')
+			.attr('x',offset)
+			.attr('y', -6)
+			.attr('width', '15px')
+			.attr('height', '15px')
+			.attr('rx',3)
+			.attr('ry', 3)
+			t.append('text')
+			.attr('x',offset+25)
+			.attr('y',3)
+			.text("Outside Method call")
+			.attr('style','stroke:#fff; stroke-width:0.5');
+		}
     }
 	
 }]);

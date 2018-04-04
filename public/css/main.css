@@ -797,6 +797,7 @@ body {
     min-height: 60%;
     float: left;
     width: 100%;
+	border-bottom: 2px solid #461F6E;							 
 }
 .left-top-section-utility{
 	border-bottom: none !important;
@@ -5464,6 +5465,7 @@ border-radius: 6px;
 .edgePath path {
   stroke: #333;
   stroke-width: 1.5px;
+  fill: none;
 }
 
 .openFileintxt{
@@ -5492,3 +5494,94 @@ border-radius: 6px;
 	height: 650px;
 	
 }
+
+#legend-box {
+    position: absolute;
+    z-index: 10;
+    height: 20px;
+    width: 551px;
+    top: calc(100% - 2px);
+    left: 200px;
+}
+
+#legend-box-data-flow {
+    position: absolute;
+    z-index: 10;
+    height: 20px;
+    width: 551px;
+    top: calc(100% - 42px);
+    left: -10px;
+}
+
+/*For Side bars*/
+ .ct-side{
+    height:100%;
+    width:6px;
+    color:#fff;
+    background-color:#633690
+}
+ .ct-side .ct-expand{
+    top:50%;
+    width:6px;
+    height:25px
+}
+ .ct-expand{
+    position:absolute;
+    cursor:pointer;
+    overflow:hidden;
+    background-color:rgba(255,255,255,.7);
+    z-index:9999;
+}
+
+#ct-expand-left-apg {
+    left: 160px;
+}
+#ct-expand-right-apg {
+    right: 84px;
+}
+ .ct-expand::after{
+    position:absolute;
+    content:'';
+    top:7.5px;
+    border:5px solid transparent
+}
+ #ct-lSide{
+    left:0;
+    position: relative
+}
+#ct-expand-left-apg::after{
+    left:1px;
+    border-left-color:#333;
+    border-right-color:transparent
+}
+ #ct-expand-left-apg.ct-rev{
+    position:relative;
+    left:160px;
+    z-index:9999
+}
+ #ct-expand-left-apg.ct-rev::after{
+    left:-5px;
+    border-left-color:transparent;
+    border-right-color:#333
+}
+ #ct-rSide{
+    right: 0;
+    position: absolute;
+    top: 0;
+}
+ #ct-expand-right-apg.ct-rev{
+    position:relative;
+    right:84px;
+    z-index:9999
+}
+ #ct-expand-right-apg.ct-expand::after{
+    left:-5px;
+    border-left-color:transparent;
+    border-right-color:#333
+}
+ #ct-expand-right-apg.ct-expand.ct-rev::after{
+    left:1px;
+    border-left-color:#333;
+    border-right-color:transparent
+}
+/*For Side bars*/
