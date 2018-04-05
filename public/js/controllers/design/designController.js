@@ -3828,7 +3828,8 @@ function contentTable(newTestScriptDataLS) {
                 for (i = 0; i < gridArrayData.length; i++) {
                     if (gridArrayData[i].outputVal.indexOf('##') !== -1 || gridArrayData[i].outputVal.indexOf(';##') !== -1) {
                         $(this).find('tr.jqgrow')[i].style.borderLeft = "5px solid red";
-                        $(this).find('tr.jqgrow')[i].childNodes[0].style.marginLeft = "-4px"
+                        $(this).find('tr.jqgrow')[i].childNodes[0].style.paddingRight = "7px"
+                        $(this).find('tr.jqgrow')[i].childNodes[1].childNodes[0].style.marginLeft = "-4px";
                         $(this).find('tr.jqgrow')[i].childNodes[7].style.color = "red";
                     } else {
                         //$(this).find('tr.jqgrow')[i].style.borderLeft = "5px solid transparent";
