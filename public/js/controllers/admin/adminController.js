@@ -2430,7 +2430,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 		setTimeout(function () {
 			var userEnteredText = $(element).val();
 			//userEnteredText = userEnteredText.replace(/\s/g,"");
-			userEnteredText = userEnteredText.replace(/[\\[\]\~`!@#$%^&*()+={}|;:"',<>?/\s] / g, "");
+			userEnteredText = userEnteredText.replace(/[\\[\]\~`!@#$%^&*()+={}|;:"',<>?/\s]/g, "");
 			$(element).val(userEnteredText);
 		}, 5);
 	});
@@ -2441,9 +2441,9 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 		setTimeout(function () {
 			var userEnteredText = $(element).val();
 			if (e.target.id == 'projectName' || e.target.id == 'releaseTxt' || e.target.id == 'cycleTxt' || e.target.id == 'releaseName' || e.target.id == 'cycleName') {
-				userEnteredText = userEnteredText.replace(/[-\\[\]\~`!@#$%^&*()+={}|;:"',.<>?/\s] / g, "");
+				userEnteredText = userEnteredText.replace(/[-\\[\]\~`!@#$%^&*()+={}|;:"',.<>?/\s]/g, "");
 			} else {
-				userEnteredText = userEnteredText.replace(/[-\\0-9[\]\~`!@#$%^&*()-+={}|;:"',.<>?/\s_] / g, "");
+				userEnteredText = userEnteredText.replace(/[-\\0-9[\]\~`!@#$%^&*()-+={}|;:"',.<>?/\s_]/g, "");
 			}
 			//userEnteredText = userEnteredText.replace (/[[\]\~`!@#$%^&*()-_+={}|;:"',.<>?/\s]_/g ,"");
 			$(element).val(userEnteredText);
@@ -2514,9 +2514,20 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 	}
 
 	// Session Management Tab Click
-	$("#sessionTab").on("click", function (e) {
-		e.preventDefault();
+	$scope.sessionTabClick = function () {
 		$("img.selectedIcon").removeClass("selectedIcon");
 		$(this).children().find('img').addClass('selectedIcon');
-	});
+		blockUI("Retrieving session data...");
+		adminServices.getSessionData()
+		.then(function (res) {
+			if (res == "Invalid Session") {
+				$rootScope.redirectPage();
+			} else {
+				console.log(res);
+			}
+			unblockUI();
+		}, function (error) {
+			console.error("Fail to load session data", error)
+		});
+	};
 }]);

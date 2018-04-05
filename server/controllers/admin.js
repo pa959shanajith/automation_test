@@ -2070,3 +2070,17 @@ exports.generateCItoken = function (req, res) {
 		res.send("fail");
 	}
 };
+
+exports.getSessionData = function (req, res) {
+	logger.info("Inside UI service: getSessionData");
+	try {
+		if (utils.isSessionActive(req.session)) {
+			res.send("Success!!");
+		} else {
+			res.send("Invalid Session");
+		}
+	} catch (exception) {
+		logger.error("Error occurred in admin/getSessionData:",exception);
+		res.status(500).send("fail");
+	}
+};

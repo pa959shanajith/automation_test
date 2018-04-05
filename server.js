@@ -397,6 +397,8 @@ try {
     app.post('/assignProjects_ICE', admin.assignProjects_ICE);
     app.post('/getAssignedProjects_ICE', admin.getAssignedProjects_ICE);
     app.post('/getAvailablePlugins', admin.getAvailablePlugins);
+    app.post('/getSessionData', admin.getSessionData);
+    app.post('/generateCItoken', admin.generateCItoken);
     //Design Screen Routes
     app.post('/initScraping_ICE', design.initScraping_ICE);
     app.post('/highlightScrapElement_ICE', design.highlightScrapElement_ICE);
@@ -408,7 +410,6 @@ try {
     app.post('/debugTestCase_ICE', design.debugTestCase_ICE);
     app.post('/getKeywordDetails_ICE', design.getKeywordDetails_ICE);
     app.post('/getTestcasesByScenarioId_ICE', design.getTestcasesByScenarioId_ICE);
-    app.post('/generateCItoken', admin.generateCItoken);
     //Execute Screen Routes
     app.post('/readTestSuite_ICE', suite.readTestSuite_ICE);
     app.post('/updateTestSuite_ICE', suite.updateTestSuite_ICE);
