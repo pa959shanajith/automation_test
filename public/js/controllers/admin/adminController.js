@@ -359,7 +359,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 		// }
 	};
 
-	$("#projectTab").on('click',function() {
+	$(document).on('click','#projectTab', function() {
 		resetForm();
 		projectDetails = [];
 		updateProjectDetails = [];
@@ -371,39 +371,42 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 			for(var i = 0; i < plugins_list.length; i++){
 				plugins[i] = plugins_list[i]
 			}
+			$("img.selectedIcon").removeClass("selectedIcon");
+			$(this).children().find('img').addClass('selectedIcon');
+			$timeout(function(){
+				$('.scrollbar-inner').scrollbar();
+				$('.scrollbar-macosx').scrollbar();
+				toggleCycleClick();
+			}, 10)
+			adminServices.getDomains_ICE()
+			.then(function (data) {
+			
+				if(data == "Invalid Session"){
+					$rootScope.redirectPage();
+				}else {
+					$("#selDomain").val(data[0].domainName);
+					domainId = data[0].domainId;
+					var details = {
+						"web":{"data":"Web","title":"Web","img":"web"},
+						"webservice":{"data":"Webservice","title":"Web Service","img":"webservice"},
+						"mainframe":{"data":"Mainframe","title":"Mainframe","img":"mainframe"},
+						"desktop":{"data":"Desktop","title":"Desktop Apps","img":"desktop"},
+						"oebs":{"data":"DesktopJava","title":"Oracle Apps","img":"oracleApps"},
+						"mobileapp":{"data":"MobileApp","title":"Mobile Apps","img":"mobileApps"},
+						"mobileweb":{"data":"MobileWeb","title":"Mobile Web","img":"mobileWeb"},
+						"sap":{"data":"SAP","title":"SAP Apps","img":"sapApps"}
+					};
+					$("div.appTypesContainer").empty();
+					for(var i = 0; i < plugins.length; i++){
+						html = '<div class="projectTypes_create" data-app="'+details[plugins[i]]['data']+'" title="'+details[plugins[i]]['title']+'"><img src="imgs/'+details[plugins[i]]['img']+'.png" alt="'+details[plugins[i]]['title']+'" /><label>'+details[plugins[i]]['title']+'</label></div>';
+						$(".appTypesContainer").append(html);
+					}
+				
+				}
+			}, function (error) { console.log("Error:::::::::::::", error) })
 		}, function (error) { console.log("Error:::::::::::::", error) });
 
-		$("img.selectedIcon").removeClass("selectedIcon");
-		$(this).children().find('img').addClass('selectedIcon');
-		$timeout(function(){
-			$('.scrollbar-inner').scrollbar();
-			$('.scrollbar-macosx').scrollbar();
-			toggleCycleClick();
-		}, 10)
-		adminServices.getDomains_ICE()
-		.then(function (data) {
-			if(data == "Invalid Session"){
-				$rootScope.redirectPage();
-			}else {
-				$("#selDomain").val(data[0].domainName);
-				domainId = data[0].domainId;
-				var details = {
-					"web":{"data":"Web","title":"Web","img":"web"},
-					"webservice":{"data":"Webservice","title":"Web Service","img":"webservice"},
-					"mainframe":{"data":"Mainframe","title":"Mainframe","img":"mainframe"},
-					"desktop":{"data":"Desktop","title":"Desktop Apps","img":"desktop"},
-					"oebs":{"data":"DesktopJava","title":"Oracle Apps","img":"oracleApps"},
-					"mobileapp":{"data":"MobileApp","title":"Mobile Apps","img":"mobileApps"},
-					"mobileweb":{"data":"MobileWeb","title":"Mobile Web","img":"mobileWeb"},
-					"sap":{"data":"SAP","title":"SAP Apps","img":"sapApps"}
-				};
-				$(".appTypesContainer").empty();
-				for(var i = 0; i < plugins.length; i++){
-					html = '<div class="projectTypes_create" data-app="'+details[plugins[i]]['data']+'" title="'+details[plugins[i]]['title']+'"><img src="imgs/'+details[plugins[i]]['img']+'.png" alt="'+details[plugins[i]]['title']+'" /><label>'+details[plugins[i]]['title']+'</label></div>';
-					$(".appTypesContainer").append(html);
-				}
-			}
-		}, function (error) { console.log("Error:::::::::::::", error) })
+		
 	});
 
 	function toggleCycleClick()
