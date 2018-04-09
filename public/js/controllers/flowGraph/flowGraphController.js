@@ -42,6 +42,7 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 	 
 	$scope.showFlowGraphHome = function(){
 		$scope.enableDataflow = false;
+		$(".projectInfoWrap").empty();
 		if (!$scope.enableGenerate)
 			return;
 		if($("#complexity-canvas").is(':visible')){
@@ -183,7 +184,6 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 					$scope.hideBaseContent = { message: 'true' };
 					$scope.$apply();
 				});
-				
 				$scope.collapseSidebars();
 				console.log("Generating class diagram");
 				$scope.generateClassDiagram(obj);
@@ -335,7 +335,7 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 		if(currentDot >= 40){
 		  currentDot = 0;
 		}
-		categoriesDict = {"public" : "+", "private" : "-", "default" : "~", "protected" : "#"};
+		var categoriesDict = {"public" : "+", "private" : "-", "default" : "~", "protected" : "#"};
 		var x = dotsPosition[currentDot].x;
 		var y = dotsPosition[currentDot].y;
 		currentDot++;
@@ -522,6 +522,7 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 	$scope.generateClassDiagram = function(obj){
 		$scope.enableFilter = true;
 		$scope.enableToggleSidebars = true;
+		$(".projectInfoWrap").empty();
 		$scope.$apply();
 		$("#apg-cd-canvas").show();
 		let width = $("#main-content-section").width();
@@ -727,8 +728,6 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 			.style("stroke", "none");
 			dagreD3.util.applyStyle(path, edge[type + "Style"]);
 		};
-		
-		
 
 		// Run the renderer. This is what draws the final graph.
 		render(inner, g);
@@ -753,11 +752,12 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 			.on('click', function(d){
 				$scope.enableFilter = false;
 				$scope.enableToggleSidebars = false;
+				$(".projectInfoWrap").empty();
 				$scope.$apply();
 				d = classes[d];
 				$scope.expandSidebars();
 				if(d == undefined || d.complexity== "Undefined"){
-					openDialog('APG', "Complexity can't be determined.");
+					openDialog('APG', "Complexity can't be determined for this class.");
 				}else{
 					$('#apg-cd-canvas').hide();
 					$('#complexity-canvas').show();
@@ -768,7 +768,7 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 					var methods_data=d.complexity.methods;
 					$scope.cmethod=methods_data.length;
 					$("#tblMethodLevel tbody").empty();
-					var decisionPoint=undefined;
+					var decisionPoint;
 					for(var i=0;i<methods_data.length;i++){
 						decisionPoint=parseInt(methods_data[i].complexity)-1;
 						decisionPoint = decisionPoint <= 0 ? "0":String(decisionPoint);
@@ -782,8 +782,17 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 						$scope.$apply();
 						$("tr.hightlight_Complexity_row").removeClass("hightlight_Complexity_row");
 						$(this).addClass('hightlight_Complexity_row');
-						var e = $("tr.hightlight_Complexity_row")[0]
-						showMethodFlow($scope.obj.data_flow, (e.getAttribute('name')).split('_')[0], d.name);
+						var e = $("tr.hightlight_Complexity_row")[0];
+						var method_name = (e.getAttribute('name')).split('_')[0];
+						if(($scope.obj.method_calls_count).hasOwnProperty(method_name)){
+							$(".projectInfoWrap").empty();
+							$(".projectInfoWrap").append('<p><span>Method Calls Within Class :</span><span>' + $scope.obj.method_calls_count[method_name]['within'] + '</span></p><p><span>Method Calls Outside Class :</span><span>' + $scope.obj.method_calls_count[method_name]['outside'] + '</span></p>');
+						}
+						else{
+							$(".projectInfoWrap").empty();
+							$(".projectInfoWrap").append('<p><span>Method Calls Within Class : 0</span><span></span></p><p><span>Method Calls Outside Class : 0</span><span></span></p>');
+						}
+						showMethodFlow($scope.obj.data_flow, method_name, d.name);
 					});
 
 					$("[id^=editWeightage_]").on('click',function(e) {
@@ -825,7 +834,7 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 			.attr('width', '20px')
 			.attr('style', 'transform: translateX(-41px)')
 			.attr('class', 'apg-info-icon')
-			.on('click', $scope.generateDataFlowDiagram)
+			.on('click', $scope.generateDataFlowDiagram);
 			
 		svg.selectAll("g.edgePath path")
 			.attr("id", function (e) {
@@ -876,6 +885,7 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 		$scope.enableDataflow = false;
 		$scope.enableFilter = false;
 		$scope.enableToggleSidebars = true;
+		$(".projectInfoWrap").empty();
 		$scope.$apply();
 		$scope.collapseSidebars();
 		$('#page-taskName span').animate({
@@ -886,377 +896,381 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 		var links = obj.links;
 		var nodes = [];
 		var edges = [];
-		var selected_class = classes[i].name;
-		
-		var data_flow_classes = new Set([]);
-		data_flow_classes.add(selected_class);
-		for (var j=0; j < links.length; j++){
-			if(links[j].source == selected_class){
-				selected_class = links[j].target;
-				data_flow_classes.add(links[j].target);
-				j = -1;
+		if(classes[i] == undefined){
+			openDialog('APG', "Data flow can't be generated for this class.");
+		}
+		else{
+			var selected_class = classes[i].name;
+			var data_flow_classes = new Set([]);
+			data_flow_classes.add(selected_class);
+			for (var j=0; j < links.length; j++){
+				if(links[j].source == selected_class){
+					selected_class = links[j].target;
+					data_flow_classes.add(links[j].target);
+					j = -1;
+				}
 			}
-		}
-		console.log(data_flow_classes);
-		for (var k=0; k<obj.data_flow.length; k++){
-			if(data_flow_classes.has((obj.data_flow[k].class).split('(')[0])){
-				if(obj.data_flow[k].text == 'Start' || obj.data_flow[k].text == 'End'){
-					obj.data_flow[k].shape = "ellipse";
-				}
-				else if (obj.data_flow[k].shape == 'Diamond' || obj.data_flow[k].shape == 'SwitchDiamond'){
-					obj.data_flow[k].shape = "diamond";
-				}
-				else{
-					obj.data_flow[k].shape = "rect";
-				}
-				nodes.push(obj.data_flow[k]);
-			}
-		}
-		console.log(nodes);
-		var width = $("#main-content-section").width();
-		var height = $("#main-content-section").height();
-		$("#apg-cd-canvas").hide();
-		$("#apg-dfd-canvas").show();
-		
-		var svg = d3.select('#apg-dfd-canvas').append('svg')
-					.attr("width", width)
-					.attr("height", height);
-		inner = svg.append('g').attr("id", "data-flow-g");	
-		var zoom = d3.behavior.zoom()
-			  .translate([0, 0])
-			  .scale(1)
-			  .size([900, 800])
-			  .scaleExtent([0.2, 8])
-			  .on('zoom', zoomed);
-		svg.call(zoom) 
-		  .call(zoom.event);
-		function zoomed() {
-		  inner.attr('transform', 'translate(' + zoom.translate() + ')scale(' + zoom.scale() + ')');
-		}
-		var nodeDrag = d3.behavior.drag()
-						.on("dragstart", dragstart)
-						.on("drag", dragmove);
-
-		var edgeDrag = d3.behavior.drag()
-			.on("dragstart", dragstart)
-			.on('drag', function (d) {
-			translateEdge(g.edge(d.v, d.w), d3.event.dx, d3.event.dy);
-			$('#' + g.edge(d.v, d.w).customId).attr('d', calcPoints(d));
-		});
-		var g = new dagreD3.graphlib.Graph().setGraph({});
-		
-		nodes.forEach(function (node) {
-			g.setNode(node.id, {
-				label: node.text,
-				shape: node.shape
-		  });
-		});
-		console.log(g.nodes());
-		for (var i=0; i<nodes.length; i++){
-			if(nodes[i].child != null){
-				for (var j=0; j<nodes[i].child.length; j++){
-					for (var k=0; k<obj.data_flow.length; k++){
-						if(obj.data_flow[k].id == nodes[i].child[j] && data_flow_classes.has((obj.data_flow[k].class).split('(')[0])){
-							if(nodes[i].shape == 'diamond' && nodes[i].child.length == 2){
-								if(nodes[i].child.indexOf(nodes[i].child[j]) == 0)
-									g.setEdge(nodes[i].id, nodes[i].child[j], {label: "True"});
-								else
-									g.setEdge(nodes[i].id, nodes[i].child[j], {label: "False"});
-								break;
-							}
-							else{
-								g.setEdge(nodes[i].id, nodes[i].child[j], {});
-								break;
-							}
-						}
+			console.log(data_flow_classes);
+			for (var k=0; k<obj.data_flow.length; k++){
+				if(data_flow_classes.has((obj.data_flow[k].class).split('(')[0])){
+					if(obj.data_flow[k].text == 'Start' || obj.data_flow[k].text == 'End'){
+						obj.data_flow[k].shape = "ellipse";
 					}
+					else if (obj.data_flow[k].shape == 'Diamond' || obj.data_flow[k].shape == 'SwitchDiamond'){
+						obj.data_flow[k].shape = "diamond";
+					}
+					else{
+						obj.data_flow[k].shape = "rect";
+					}
+					nodes.push(obj.data_flow[k]);
 				}
 			}
-		}
-		console.log(g.edges());
-		g.nodes().forEach(function (v) {
-			var node = g.node(v);
-			node.rx = node.ry = 5;
-		});
-		g.edges().forEach(function (e) {
-			var edge = g.edge(e.v, e.w);
-			edge.lineInterpolate = 'basis';
-		});
+			console.log(nodes);
+			var width = $("#main-content-section").width();
+			var height = $("#main-content-section").height();
+			$("#apg-cd-canvas").hide();
+			$("#apg-dfd-canvas").show();
+			
+			var svg = d3.select('#apg-dfd-canvas').append('svg')
+						.attr("width", width)
+						.attr("height", height);
+			inner = svg.append('g').attr("id", "data-flow-g");	
+			var zoom = d3.behavior.zoom()
+				  .translate([0, 0])
+				  .scale(1)
+				  .size([900, 800])
+				  .scaleExtent([0.2, 8])
+				  .on('zoom', zoomed);
+			svg.call(zoom) 
+			  .call(zoom.event);
+			function zoomed() {
+			  inner.attr('transform', 'translate(' + zoom.translate() + ')scale(' + zoom.scale() + ')');
+			}
+			var nodeDrag = d3.behavior.drag()
+							.on("dragstart", dragstart)
+							.on("drag", dragmove);
 
-		function dragstart(d) {
-			d3.event.sourceEvent.stopPropagation();
-		}
-
-		
-		function dragmove(d) {
-			var node = d3.select(this),
-				selectedNode = g.node(d);
-			var prevX = selectedNode.x,
-				prevY = selectedNode.y;
-
-			selectedNode.x += d3.event.dx;
-			selectedNode.y += d3.event.dy;
-			node.attr('transform', 'translate(' + selectedNode.x + ',' + selectedNode.y + ')');
-
-			var dx = selectedNode.x - prevX,
-				dy = selectedNode.y - prevY;
-
-			g.edges().forEach(function (e) {
-				if (e.v == d || e.w == d) {
-					edge = g.edge(e.v, e.w);
-					translateEdge(g.edge(e.v, e.w), dx, dy);
-					$('#' + edge.customId).attr('d', calcPoints(e));
-					label = $('#label_' + edge.customId);
-					var xforms = label.attr('transform');
-					if (xforms != "") {
-						var parts  = /translate\(\s*([^\s,)]+)[ ,]?([^\s,)]+)?/.exec(xforms);
-						var X = parseInt(parts[1])+dx, Y = parseInt(parts[2])+dy;
-						if (isNaN(Y)) {
-							Y = dy;
-						}
-						label.attr('transform','translate('+X+','+Y+')');
-					}            
-				}
-			})
-		}
-
-		function translateEdge(e, dx, dy) {
-			e.points.forEach(function (p) {
-				p.x = p.x + dx;
-				p.y = p.y + dy;
+			var edgeDrag = d3.behavior.drag()
+				.on("dragstart", dragstart)
+				.on('drag', function (d) {
+				translateEdge(g.edge(d.v, d.w), d3.event.dx, d3.event.dy);
+				$('#' + g.edge(d.v, d.w).customId).attr('d', calcPoints(d));
 			});
-		}
-		function calcPoints(e) {
-			var edge = g.edge(e.v, e.w),
-				tail = g.node(e.v),
-				head = g.node(e.w);
-			var points = edge.points.slice(1, edge.points.length - 1);
-			var afterslice = edge.points.slice(1, edge.points.length - 1)
-			points.unshift(intersectRect(tail, points[0]));
-			points.push(intersectRect(head, points[points.length - 1]));
-			return d3.svg.line()
-				.x(function (d) {
-				return d.x;
-			})
-				.y(function (d) {
-				return d.y;
-			})
-				.interpolate("basis")
-			(points);
-		}
-		
-		function intersectRect(node, point) {
-			var x = node.x;
-			var y = node.y;
-			var dx = point.x - x;
-			var dy = point.y - y;
-			var w, h;
-			if(node.shape == "ellipse"){
-				var rx = $("#" + node.customId).attr('rx');
-				var ry = $("#" + node.customId).attr('ry');
-				  var cx = node.x;
-				  var cy = node.y;
-
-				  var px = cx - point.x;
-				  var py = cy - point.y;
-
-				  var det = Math.sqrt(rx * rx * py * py + ry * ry * px * px);
-
-				  var dx = Math.abs(rx * ry * px / det);
-				  if (point.x < cx) {
-					dx = -dx;
-				  }
-				  var dy = Math.abs(rx * ry * py / det);
-				  if (point.y < cy) {
-					dy = -dy;
-				  }
-
-				  return {x: cx + dx, y: cy + dy};
+			var g = new dagreD3.graphlib.Graph().setGraph({});
+			
+			nodes.forEach(function (node) {
+				g.setNode(node.id, {
+					label: node.text,
+					shape: node.shape
+			  });
+			});
+			console.log(g.nodes());
+			for (var i=0; i<nodes.length; i++){
+				if(nodes[i].child != null){
+					for (var j=0; j<nodes[i].child.length; j++){
+						for (var k=0; k<obj.data_flow.length; k++){
+							if(obj.data_flow[k].id == nodes[i].child[j] && data_flow_classes.has((obj.data_flow[k].class).split('(')[0])){
+								if(nodes[i].shape == 'diamond' && nodes[i].child.length == 2){
+									if(nodes[i].child.indexOf(nodes[i].child[j]) == 0)
+										g.setEdge(nodes[i].id, nodes[i].child[j], {label: "True"});
+									else
+										g.setEdge(nodes[i].id, nodes[i].child[j], {label: "False"});
+									break;
+								}
+								else{
+									g.setEdge(nodes[i].id, nodes[i].child[j], {});
+									break;
+								}
+							}
+						}
+					}
+				}
 			}
-			else if(node.shape == "diamond"){
-				  var x1 = node.x;
-				  var y1 = node.y;
-		
-				  var intersections = [];
-					var coords = $("#" + node.customId).attr('points').split(" ");
-				w = Math.abs(coords[1].split(",")[0] - coords[3].split(",")[0])/2;
-				h = Math.abs(coords[0].split(",")[1] - coords[2].split(",")[1])/2;
-					polyPoints = [
-						{ x:  0, y: -h  },
-						{ x: -w, y:  0 },
-						{ x:  0, y:  h },
-						{ x:  w, y:  0 }
-					  ]
-					  
-					  
-				  var minX = Number.POSITIVE_INFINITY,
-					  minY = Number.POSITIVE_INFINITY;
-				  polyPoints.forEach(function(entry) {
-					minX = Math.min(minX, entry.x);
-					minY = Math.min(minY, entry.y);
-				  });
-	
-				  
-				  var left = x1 - w  - minX;
-				  var top =  y1 - h  - minY;
+			console.log(g.edges());
+			g.nodes().forEach(function (v) {
+				var node = g.node(v);
+				node.rx = node.ry = 5;
+			});
+			g.edges().forEach(function (e) {
+				var edge = g.edge(e.v, e.w);
+				edge.lineInterpolate = 'basis';
+			});
 
-				  for (var i = 0; i < polyPoints.length; i++) {
-					var p1 = polyPoints[i];
-					var p2 = polyPoints[i < polyPoints.length - 1 ? i + 1 : 0];
-					var intersect = intersectLine(node, point,
-					  {x: left + p1.x, y: top + p1.y}, {x: left + p2.x, y: top + p2.y});
-					if (intersect) {
-					  intersections.push(intersect);
-					}
-				  }
-				  function intersectLine(p1, p2, q1, q2) {
-
-					  var a1, a2, b1, b2, c1, c2;
-					  var r1, r2 , r3, r4;
-					  var denom, offset, num;
-					  var x, y;
-
-					  // Compute a1, b1, c1, where line joining points 1 and 2 is F(x,y) = a1 x +
-					  // b1 y + c1 = 0.
-					  a1 = p2.y - p1.y;
-					  b1 = p1.x - p2.x;
-					  c1 = (p2.x * p1.y) - (p1.x * p2.y);
-
-					  // Compute r3 and r4.
-					  r3 = ((a1 * q1.x) + (b1 * q1.y) + c1);
-					  r4 = ((a1 * q2.x) + (b1 * q2.y) + c1);
-
-					  // Check signs of r3 and r4. If both point 3 and point 4 lie on
-					  // same side of line 1, the line segments do not intersect.
-					  if ((r3 !== 0) && (r4 !== 0) && sameSign(r3, r4)) {
-						return /*DONT_INTERSECT*/;
-					  }
-
-					  // Compute a2, b2, c2 where line joining points 3 and 4 is G(x,y) = a2 x + b2 y + c2 = 0
-					  a2 = q2.y - q1.y;
-					  b2 = q1.x - q2.x;
-					  c2 = (q2.x * q1.y) - (q1.x * q2.y);
-
-					  // Compute r1 and r2
-					  r1 = (a2 * p1.x) + (b2 * p1.y) + c2;
-					  r2 = (a2 * p2.x) + (b2 * p2.y) + c2;
-
-					  // Check signs of r1 and r2. If both point 1 and point 2 lie
-					  // on same side of second line segment, the line segments do
-					  // not intersect.
-					  if ((r1 !== 0) && (r2 !== 0) && (sameSign(r1, r2))) {
-						return /*DONT_INTERSECT*/;
-					  }
-
-					  // Line segments intersect: compute intersection point.
-					  denom = (a1 * b2) - (a2 * b1);
-					  if (denom === 0) {
-						return /*COLLINEAR*/;
-					  }
-
-					  offset = Math.abs(denom / 2);
-
-					  // The denom/2 is to get rounding instead of truncating. It
-					  // is added or subtracted to the numerator, depending upon the
-					  // sign of the numerator.
-					  num = (b1 * c2) - (b2 * c1);
-					  x = (num < 0) ? ((num - offset) / denom) : ((num + offset) / denom);
-
-					  num = (a2 * c1) - (a1 * c2);
-					  y = (num < 0) ? ((num - offset) / denom) : ((num + offset) / denom);
-
-					  return { x: x, y: y };
-					}
-
-					function sameSign(r1, r2) {
-					  return r1 * r2 > 0;
-					}
-
-				  if (!intersections.length) {
-					console.log("NO INTERSECTION FOUND, RETURN NODE CENTER", node);
-					return node;
-				  }
-
-				  if (intersections.length > 1) {
-					// More intersections, find the one nearest to edge end point
-					intersections.sort(function(p, q) {
-					  var pdx = p.x - point.x,
-						  pdy = p.y - point.y,
-						  distp = Math.sqrt(pdx * pdx + pdy * pdy),
-
-						  qdx = q.x - point.x,
-						  qdy = q.y - point.y,
-						  distq = Math.sqrt(qdx * qdx + qdy * qdy);
-
-					  return (distp < distq) ? -1 : (distp === distq ? 0 : 1);
-					});
-				  }
-				  return intersections[0];
+			function dragstart(d) {
+				d3.event.sourceEvent.stopPropagation();
 			}
-			else{
-				w = $("#" + node.customId).attr('width') / 2;
-				h = $("#" + node.customId).attr('height') / 2;
+
+			
+			function dragmove(d) {
+				var node = d3.select(this),
+					selectedNode = g.node(d);
+				var prevX = selectedNode.x,
+					prevY = selectedNode.y;
+
+				selectedNode.x += d3.event.dx;
+				selectedNode.y += d3.event.dy;
+				node.attr('transform', 'translate(' + selectedNode.x + ',' + selectedNode.y + ')');
+
+				var dx = selectedNode.x - prevX,
+					dy = selectedNode.y - prevY;
+
+				g.edges().forEach(function (e) {
+					if (e.v == d || e.w == d) {
+						edge = g.edge(e.v, e.w);
+						translateEdge(g.edge(e.v, e.w), dx, dy);
+						$('#' + edge.customId).attr('d', calcPoints(e));
+						label = $('#label_' + edge.customId);
+						var xforms = label.attr('transform');
+						if (xforms != "") {
+							var parts  = /translate\(\s*([^\s,)]+)[ ,]?([^\s,)]+)?/.exec(xforms);
+							var X = parseInt(parts[1])+dx, Y = parseInt(parts[2])+dy;
+							if (isNaN(Y)) {
+								Y = dy;
+							}
+							label.attr('transform','translate('+X+','+Y+')');
+						}            
+					}
+				})
+			}
+
+			function translateEdge(e, dx, dy) {
+				e.points.forEach(function (p) {
+					p.x = p.x + dx;
+					p.y = p.y + dy;
+				});
+			}
+			function calcPoints(e) {
+				var edge = g.edge(e.v, e.w),
+					tail = g.node(e.v),
+					head = g.node(e.w);
+				var points = edge.points.slice(1, edge.points.length - 1);
+				var afterslice = edge.points.slice(1, edge.points.length - 1)
+				points.unshift(intersectRect(tail, points[0]));
+				points.push(intersectRect(head, points[points.length - 1]));
+				return d3.svg.line()
+					.x(function (d) {
+					return d.x;
+				})
+					.y(function (d) {
+					return d.y;
+				})
+					.interpolate("basis")
+				(points);
 			}
 			
-			var sx = 0,
-				sy = 0;
-			if (Math.abs(dy) * w > Math.abs(dx) * h) {
-				// Intersection is top or bottom of rect.
-				if (dy < 0) {
-					h = -h;
-				}
-				sx = dy === 0 ? 0 : h * dx / dy;
-				sy = h;
-			} else {
-				// Intersection is left or right of rect.
-				if (dx < 0) {
-					w = -w;
-				}
-				sx = w;
-				sy = dx === 0 ? 0 : w * dy / dx;
-			}
-			return {
-				x: parseFloat(x) + parseFloat(sx),
-				y: parseFloat(y) + parseFloat(sy)
-			};
-		}
+			function intersectRect(node, point) {
+				var x = node.x;
+				var y = node.y;
+				var dx = point.x - x;
+				var dy = point.y - y;
+				var w, h;
+				if(node.shape == "ellipse"){
+					var rx = $("#" + node.customId).attr('rx');
+					var ry = $("#" + node.customId).attr('ry');
+					  var cx = node.x;
+					  var cy = node.y;
 
-		var render = new dagreD3.render();
-		render(inner, g);
-		svg.selectAll("g.node rect")
-			.attr("id", function (d) {
-			return "node" + d;
-		});
-		svg.selectAll("g.node ellipse")
-			.attr("id", function (d) {
-			return "node" + d;
-		});
-		svg.selectAll("g.node polygon")
-			.attr("id", function (d) {
-			return "node" + d;
-		});
-		svg.selectAll("g.edgePath path")
-			.attr("id", function (e) {
-			return e.v + "-" + e.w;
-		});
-		svg.selectAll("g.edgeLabel g")
-			.attr("id", function (e) {
-			return 'label_'+e.v + "-" + e.w;
-		});
+					  var px = cx - point.x;
+					  var py = cy - point.y;
 
-		g.nodes().forEach(function (v) {
-			var node = g.node(v);
-			node.customId = "node" + v;
-		})
-		g.edges().forEach(function (e) {
-			var edge = g.edge(e.v, e.w);
-			edge.customId = e.v + "-" + e.w
-		});
-		var coord= $('#data-flow-g .nodes').children()[0].getAttribute("transform").split("(")[1].split(")")[0].split(",");
-		zoom.translate([ Number(-coord[0]+width/2),  Number(-coord[1]+height/2)]).scale(1).event(svg);
+					  var det = Math.sqrt(rx * rx * py * py + ry * ry * px * px);
+
+					  var dx = Math.abs(rx * ry * px / det);
+					  if (point.x < cx) {
+						dx = -dx;
+					  }
+					  var dy = Math.abs(rx * ry * py / det);
+					  if (point.y < cy) {
+						dy = -dy;
+					  }
+
+					  return {x: cx + dx, y: cy + dy};
+				}
+				else if(node.shape == "diamond"){
+					  var x1 = node.x;
+					  var y1 = node.y;
+			
+					  var intersections = [];
+						var coords = $("#" + node.customId).attr('points').split(" ");
+					w = Math.abs(coords[1].split(",")[0] - coords[3].split(",")[0])/2;
+					h = Math.abs(coords[0].split(",")[1] - coords[2].split(",")[1])/2;
+						polyPoints = [
+							{ x:  0, y: -h  },
+							{ x: -w, y:  0 },
+							{ x:  0, y:  h },
+							{ x:  w, y:  0 }
+						  ]
+						  
+						  
+					  var minX = Number.POSITIVE_INFINITY,
+						  minY = Number.POSITIVE_INFINITY;
+					  polyPoints.forEach(function(entry) {
+						minX = Math.min(minX, entry.x);
+						minY = Math.min(minY, entry.y);
+					  });
 		
-		nodeDrag.call(svg.selectAll("g.node"));
-		edgeDrag.call(svg.selectAll("g.edgePath"));
+					  
+					  var left = x1 - w  - minX;
+					  var top =  y1 - h  - minY;
+
+					  for (var i = 0; i < polyPoints.length; i++) {
+						var p1 = polyPoints[i];
+						var p2 = polyPoints[i < polyPoints.length - 1 ? i + 1 : 0];
+						var intersect = intersectLine(node, point,
+						  {x: left + p1.x, y: top + p1.y}, {x: left + p2.x, y: top + p2.y});
+						if (intersect) {
+						  intersections.push(intersect);
+						}
+					  }
+					  function intersectLine(p1, p2, q1, q2) {
+
+						  var a1, a2, b1, b2, c1, c2;
+						  var r1, r2 , r3, r4;
+						  var denom, offset, num;
+						  var x, y;
+
+						  // Compute a1, b1, c1, where line joining points 1 and 2 is F(x,y) = a1 x +
+						  // b1 y + c1 = 0.
+						  a1 = p2.y - p1.y;
+						  b1 = p1.x - p2.x;
+						  c1 = (p2.x * p1.y) - (p1.x * p2.y);
+
+						  // Compute r3 and r4.
+						  r3 = ((a1 * q1.x) + (b1 * q1.y) + c1);
+						  r4 = ((a1 * q2.x) + (b1 * q2.y) + c1);
+
+						  // Check signs of r3 and r4. If both point 3 and point 4 lie on
+						  // same side of line 1, the line segments do not intersect.
+						  if ((r3 !== 0) && (r4 !== 0) && sameSign(r3, r4)) {
+							return /*DONT_INTERSECT*/;
+						  }
+
+						  // Compute a2, b2, c2 where line joining points 3 and 4 is G(x,y) = a2 x + b2 y + c2 = 0
+						  a2 = q2.y - q1.y;
+						  b2 = q1.x - q2.x;
+						  c2 = (q2.x * q1.y) - (q1.x * q2.y);
+
+						  // Compute r1 and r2
+						  r1 = (a2 * p1.x) + (b2 * p1.y) + c2;
+						  r2 = (a2 * p2.x) + (b2 * p2.y) + c2;
+
+						  // Check signs of r1 and r2. If both point 1 and point 2 lie
+						  // on same side of second line segment, the line segments do
+						  // not intersect.
+						  if ((r1 !== 0) && (r2 !== 0) && (sameSign(r1, r2))) {
+							return /*DONT_INTERSECT*/;
+						  }
+
+						  // Line segments intersect: compute intersection point.
+						  denom = (a1 * b2) - (a2 * b1);
+						  if (denom === 0) {
+							return /*COLLINEAR*/;
+						  }
+
+						  offset = Math.abs(denom / 2);
+
+						  // The denom/2 is to get rounding instead of truncating. It
+						  // is added or subtracted to the numerator, depending upon the
+						  // sign of the numerator.
+						  num = (b1 * c2) - (b2 * c1);
+						  x = (num < 0) ? ((num - offset) / denom) : ((num + offset) / denom);
+
+						  num = (a2 * c1) - (a1 * c2);
+						  y = (num < 0) ? ((num - offset) / denom) : ((num + offset) / denom);
+
+						  return { x: x, y: y };
+						}
+
+						function sameSign(r1, r2) {
+						  return r1 * r2 > 0;
+						}
+
+					  if (!intersections.length) {
+						console.log("NO INTERSECTION FOUND, RETURN NODE CENTER", node);
+						return node;
+					  }
+
+					  if (intersections.length > 1) {
+						// More intersections, find the one nearest to edge end point
+						intersections.sort(function(p, q) {
+						  var pdx = p.x - point.x,
+							  pdy = p.y - point.y,
+							  distp = Math.sqrt(pdx * pdx + pdy * pdy),
+
+							  qdx = q.x - point.x,
+							  qdy = q.y - point.y,
+							  distq = Math.sqrt(qdx * qdx + qdy * qdy);
+
+						  return (distp < distq) ? -1 : (distp === distq ? 0 : 1);
+						});
+					  }
+					  return intersections[0];
+				}
+				else{
+					w = $("#" + node.customId).attr('width') / 2;
+					h = $("#" + node.customId).attr('height') / 2;
+				}
+				
+				var sx = 0,
+					sy = 0;
+				if (Math.abs(dy) * w > Math.abs(dx) * h) {
+					// Intersection is top or bottom of rect.
+					if (dy < 0) {
+						h = -h;
+					}
+					sx = dy === 0 ? 0 : h * dx / dy;
+					sy = h;
+				} else {
+					// Intersection is left or right of rect.
+					if (dx < 0) {
+						w = -w;
+					}
+					sx = w;
+					sy = dx === 0 ? 0 : w * dy / dx;
+				}
+				return {
+					x: parseFloat(x) + parseFloat(sx),
+					y: parseFloat(y) + parseFloat(sy)
+				};
+			}
+
+			var render = new dagreD3.render();
+			render(inner, g);
+			svg.selectAll("g.node rect")
+				.attr("id", function (d) {
+				return "node" + d;
+			});
+			svg.selectAll("g.node ellipse")
+				.attr("id", function (d) {
+				return "node" + d;
+			});
+			svg.selectAll("g.node polygon")
+				.attr("id", function (d) {
+				return "node" + d;
+			});
+			svg.selectAll("g.edgePath path")
+				.attr("id", function (e) {
+				return e.v + "-" + e.w;
+			});
+			svg.selectAll("g.edgeLabel g")
+				.attr("id", function (e) {
+				return 'label_'+e.v + "-" + e.w;
+			});
+
+			g.nodes().forEach(function (v) {
+				var node = g.node(v);
+				node.customId = "node" + v;
+			})
+			g.edges().forEach(function (e) {
+				var edge = g.edge(e.v, e.w);
+				edge.customId = e.v + "-" + e.w
+			});
+			var coord= $('#data-flow-g .nodes').children()[0].getAttribute("transform").split("(")[1].split(")")[0].split(",");
+			zoom.translate([ Number(-coord[0]+width/2),  Number(-coord[1]+height/2)]).scale(1).event(svg);
+			
+			nodeDrag.call(svg.selectAll("g.node"));
+			edgeDrag.call(svg.selectAll("g.edgePath"));
+		}
 	}
 
 	$scope.openFileInEditor = function(e,editorName){
