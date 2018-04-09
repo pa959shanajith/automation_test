@@ -137,7 +137,7 @@ exports.readTestSuite_ICE = function (req, res) {
 												responsedata[eachSuite.testsuiteid] = respeachscenario;
 												if (testsuitesindex == requiredreadTestSuite.length) {
 													if (fromFlg == "scheduling") {
-														utils.scheduleSocketList(function(connectusers){
+														utils.getSocketList("schedule", function(connectusers){
 															logger.debug("IP\'s connected : %s", connectusers.join());
 															var schedulingDetails = {
 																"connectedUsers": connectusers,
@@ -293,7 +293,7 @@ function readTestSuite_ICE_SVN(req,callback) {
 													responsedata[eachSuite.testsuitename] = respeachscenario;
 													if (testsuitesindex == requiredreadTestSuite.length) {
 														if (fromFlg == "scheduling") {
-															utils.scheduleSocketList(function(connectusers){
+															utils.getSocketList("schedule", function(connectusers){
 																logger.debug("IP\'s connected : %s", connectusers.join());
 																var schedulingDetails = {
 																	"connectedUsers": connectusers,
@@ -867,7 +867,7 @@ exports.getListofScheduledSocketMap = function (req, res) {
 			}
 			if(validUser){
 				logger.info("Inside UI service: getListofScheduledSocketMap authentication pass");
-				utils.scheduleSocketList(function(connectusers){
+				utils.getSocketList("schedule", function(connectusers){
 					res.send({ "status": "success", "username": connectusers,"tokenValidation": "Passed"});
 				});
 			}else{
