@@ -10,19 +10,16 @@
 			<div id="left-top-section" style='border-bottom: 0px !important'>
 				<ul>
 					<li><span><a class='scrapeOnTxt'>Create</a></span></li>
-					<li><a id='userTab' ng-click="tab = 'tabUser'" title="Create/Update User"
-						class="selectBrowser" data-name="3"><span><img
-								class='selectedIcon' src='imgs/user.png' alt='User' /></span>User</a></li>
-					<li><a id='projectTab' ng-click="tab = 'tabProject'" title="Create/Update Project"
-						class="selectBrowser" data-name="1"><span><img
-								src='imgs/project.png' alt='Project' /></span>Project</a></li>
-					<li><a id='assignProjectTab' ng-click="tab = 'tabAssignProject'" title="Assign Project"
-					class="selectBrowser" data-name="1"><span><img
-							src='imgs/project.png' alt='Project' /></span>Assign Projects</a></li>
-					<li style="margin-bottom: 30px"><a id='preferencesTab' title="Preferences"
-						ng-click="tab = 'tabPreferences'" class="selectBrowser"
-						data-name="2"><span><img src='imgs/preferences.png'
-								alt='Preferences' /></span>Preferences</a></li>
+					<li><a id='userTab' ng-click="tab = 'tabUser'" title="Create/Update User" class="selectBrowser" data-name="3">
+						<span><img class='selectedIcon' src='imgs/user.png' alt='User' /></span>User</a></li>
+					<li><a id='projectTab' ng-click="tab = 'tabProject'" title="Create/Update Project" class="selectBrowser" data-name="1">
+						<span><img src='imgs/project.png' alt='Project' /></span>Project</a></li>
+					<li><a id='assignProjectTab' ng-click="tab = 'tabAssignProject'" title="Assign Project" class="selectBrowser" data-name="1">
+						<span><img src='imgs/assign.png' alt='Project' /></span>Assign Projects</a></li>
+					<li ng-if="tab=='sessionTab'"><a id='sessionTab' title="Session Management" ng-click="tab = 'tabSession';sessionTabClick()" class="selectBrowser" data-name="4">
+						<span><img src='imgs/session.png' alt='Session' /></span>Session Management</a></li>
+					<li style="margin-bottom: 30px"><a id='preferencesTab' title="Preferences" ng-click="tab = 'tabPreferences'" class="selectBrowser" data-name="2">
+						<span><img src='imgs/preferences.png' alt='Preferences' /></span>Preferences</a></li>
 				</ul>
 			</div>
 			<div class='clear-both'></div>
@@ -430,10 +427,82 @@
 		</div>
 		<!-- Update Project -->
 
+		<!-- Session Management -->
+		<div class="containerWrap" ng-if="tab == 'tabSession'">
+			<!--Task Name-->
+			<div id="page-taskName">
+				<span>Session Management</span>
+			</div>
+			<!--Task Name-->
+			<!-- Button -->
+			<div class="adminActionBtn">
+				<button class="btn btn-md pull-right adminBtn createProjectBtn" ng-click="update_project()">Update</button>
+			</div>
+			<!-- Button -->
+			<div class="col-xs-9 form-group" style="width: 83%" id='updateProjectForm'>
+				<div class='userForm projectForm' >
+					<!--<div class='domainTxt'>Domain</div>
+					<select class="adminSelect form-control" style="width: 91%" id="selDomainEdit">
+						<option value="" disabled selected>Please Select Your Domain</option>
+					</select> -->
+					<label class='domainTxt' style="margin-left: -1px;">Domain  </label>
+					<input type="text" id="selDomainEdit" name="projectName"
+						readonly="readonly"
+						placeholder="Domain Name">
+					<span ng-show="domainNameRequired" class="error-msg ng-cloak errorlbl">{{domainNameRequired}}</span>
+				</div>
+				<div class='userForm adminControl'>
+					<div class='domainTxt'>Project</div>
+					<select class="adminSelect form-control" style="width: 91.5%" id="selProject">
+						<option value="" disabled selected>Please Select Your Project</option>
+					</select>
+					<span ng-show="projectNameRequired" class="error-msg ng-cloak errorlbl">{{projectNameRequired}}</span>
+				</div>
+
+				<div class='domainTxt appTypeTxt'>Application Type</div>
+
+				<div class="appTypesContainer"></div>
+			</div>
+
+			<!-- Relase Cycle -->
+			<div id='updateReleaseCycle' class="containerWrap relCycContainer">
+				 <!-- Release Container -->
+				 <div class="containerWrap releaseContainer rcContainer">
+				 	<!-- Add Release -->
+				 	<div class="addContainer"><span id="addRelease" title="Add Release"><img src="imgs/ic-add-sm.png" />Add Release</span></div>
+				 	<!-- Add Release -->
+
+				 	<!-- Releases List -->
+				 	<ul id="releaseList" class="containerWrap scrollbar-inner relCycScroll">
+				 	</ul>
+				 	<!-- Releases List -->
+				 </div>
+				 <!-- Release Container -->
+
+				  <!-- Cycle Container -->
+				 <div class="containerWrap cycleContainer rcContainer">
+				 	<!-- Add Release -->
+				 	<div class="addContainer"><span id="addCycle" title="Add Cycle" class="disableAddCycle"><img src="imgs/ic-add-sm.png" />Add Cycle</span></div>
+				 	<!-- Add Release -->
+
+				 	<!-- Cycle List -->
+				 	<ul id="cycleList" class="containerWrap scrollbar-inner relCycScroll">
+				 	</ul>
+				 	<!-- Cycle List -->
+				 </div>
+				 <!-- Cycle Container -->
+			</div>
+			<!-- Relase Cycle -->
+		</div>
+		<!-- Session Management -->
+
+		<!-- Preferences -->
 		<div ng-if="tab == 'tabPreferences'">
+			<!--Task Name-->
 			<div id="page-taskName">
 				<span>Preferences</span>
 			</div>
+			<!--Task Name-->
 			<div class="container preferencesTbl">
 				<table id="preferencesTable" class=" customtblWidth table">
 					<thead>
@@ -478,6 +547,7 @@
 				</table>
 				</div>
 		</div>
+		<!-- Preferences -->
 	</div>
 	<!--Middle Panel-->
 

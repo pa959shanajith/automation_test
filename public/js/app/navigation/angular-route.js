@@ -59,7 +59,7 @@ mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
 		})
 		.state('admin', {
             url: '/admin',
-            templateUrl: 'partials/adminMain.html',
+            templateUrl: 'partials/admin.html',
             controller: 'adminController',
             resolve: {
                 deps: ['$ocLazyLoad', function ($ocLazyLoad) {

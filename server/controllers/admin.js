@@ -2070,3 +2070,31 @@ exports.generateCItoken = function (req, res) {
 		res.send("fail");
 	}
 };
+
+exports.getSessionData = function (req, res) {
+	logger.info("Inside UI service: getSessionData");
+	try {
+		if (utils.isSessionActive(req.session)) {
+			utils.allSess(function(err, sessions){
+				if (err) {
+					logger.error("Error occurred in admin/getSessionData");
+					logger.debug(err);
+					return res.status(500).send("fail");
+				}
+				var sessionData = {};
+				sessions.forEach(function(e){
+					sessionData[e.username]={
+						id: Buffer.from(e.uniqueId).toString("base64"),
+						role: e.defaultRole
+					};
+				});
+				res.send(sessionData);
+			});
+		} else {
+			res.send("Invalid Session");
+		}
+	} catch (exception) {
+		logger.error("Error occurred in admin/getSessionData:",exception);
+		res.status(500).send("fail");
+	}
+};
