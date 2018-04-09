@@ -415,17 +415,18 @@
             }
             .reportsDetails{border: 1px solid #cfcfcf; background: linear-gradient(to bottom, #FFFFFF 0%, #E6E6E6 100%); font-size: 15px;}
             .reportsDetails tr{height: 32px;}
-            .reportsDetails th:nth-child(1){width: 4%;} .rDid{width: 4.3% !important; word-break: break-word; text-align: center !important;}
-            .reportsDetails th:nth-child(2){width: 8%;} .rDstep{width: 8.1% !important; word-break: break-word;text-align: center !important;}
-            .reportsDetails th:nth-child(3){width: 27%;} .rDstepDes{width: 26.5% !important; text-align: left; word-break: break-word;text-align: center  !important;}
-            .reportsDetails th:nth-child(4){width: 10%;} .rDstatus{width: 10.1% !important; word-break: break-word;text-align: center  !important;}
-            .reportsDetails th:nth-child(5){width: 10%;} .rDellaps{width: 10.1% !important; word-break: break-word;text-align: center  !important;}
-            .reportsDetails th:nth-child(6), .rDcomments{width: 15%; word-break: break-word;text-align: center  !important;}
-            .reportsDetails th:nth-child(7), .rDremarks{width: 15%; word-break: break-word;text-align: center  !important;}
-            .reportsDetails th:nth-child(8), .rjira{width: 8%; word-break: break-word;text-align: center  !important;}
+            .reportsDetails th:nth-child(1){width: 4%;} .rDid{width: 4.3% !important; word-break: break-word; }
+            .reportsDetails th:nth-child(2){width: 8%;} .rDstep{width: 8.1% !important; word-break: break-word;}
+            .reportsDetails th:nth-child(3){width: 27%;} .rDstepDes{width: 26.5% !important;  word-break: break-word;}
+            .reportsDetails th:nth-child(4){width: 10%;} .rDstatus{width: 10.1% !important; word-break: break-word;}
+            .reportsDetails th:nth-child(5){width: 10%;} .rDellaps{width: 10.1% !important; word-break: break-word;}
+            .reportsDetails th:nth-child(6), .rDcomments{width: 15%; word-break: break-word;}
+            .reportsDetails th:nth-child(7), .rDremarks{width: 15%; word-break: break-word;}
+            .reportsDetails th:nth-child(8), .rjira{width: 8%; word-break: break-word;}
+           
             .maintabCont{float: left; width: 100%; border: 1px solid #dcdcdc; height: 50%;}
             .tabCont{display: table-cell; border-bottom: 1px solid #ececec; border-right: 1px solid #ececec;word-wrap:break-word}
-            .reportsDetail{line-height: 2; text-align: center; height: calc(100% - 35px); overflow: auto;font-size: 14px;}
+            .reportsDetail{line-height: 2;  height: calc(100% - 35px); overflow: auto;font-size: 14px;}
             .openscreenshot{cursor: pointer;}
             .openscreenshot:hover{text-decoration: underline;}
             .progress {
@@ -731,7 +732,11 @@
             color:#461F6E;
             font-family: LatoWebBold;
         }
-
+        .reportsDetails th,.reportdetailsrow div
+            {
+                text-align: left !important;
+                padding: 2px;
+            }
         </style>
     </head>
     <body>

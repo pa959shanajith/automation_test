@@ -3,7 +3,7 @@ mySPA.controller('reportsController', ['$scope','$rootScope', '$http', '$locatio
 	$("head").append('<link id="mindmapCSS2" rel="stylesheet" type="text/css" href="fonts/font-awesome_mindmap/css/font-awesome.min.css" />')
 	var getUserInfo = JSON.parse(window.localStorage['_UI']);
 	var userID = getUserInfo.user_id;
-	var open = 0;	var openWindow = 0;
+	var openArrow = 0;	var openWindow = 0;
 	var executionId, testsuiteId;
 	$("#page-taskName").empty().append('<span>Reports</span>')
 
@@ -52,7 +52,9 @@ mySPA.controller('reportsController', ['$scope','$rootScope', '$http', '$locatio
 			if($(".dynamicTestsuiteContainer").is(":Visible")){
 				$('.iconSpace-reports').trigger('click');
 			}
+			// openArrow = 0;
 			getProjectsAndSuites(projectId, "reports");
+			
 		}
 	})
 	
@@ -154,7 +156,12 @@ mySPA.controller('reportsController', ['$scope','$rootScope', '$http', '$locatio
 	});
 
 	//Service call to get start and end details of suites
-	$(document).on('click', '.suiteContainer', function(){
+	$(document).off('click.suiteContainerClick', '.suiteContainer');	
+	$(document).on({
+		'click.suiteContainerClick': suiteContainerClick         
+	}, '.suiteContainer')
+	
+	function suiteContainerClick(e){
 		$('.formatpdfbrwsrexport').remove();
 		$(this).find('.reportbox').parent().addClass('reportboxselected');
 		if($(this).parent().hasClass('staticTestsuiteContainer')){
@@ -218,7 +225,8 @@ mySPA.controller('reportsController', ['$scope','$rootScope', '$http', '$locatio
 		if($('.dynamicTestsuiteContainer').is(':Visible')){
 			$('.iconSpace-reports').trigger('click');
 		}
-	})
+		e.stopImmediatePropagation();
+	}
 
 	//Date sorting
 	$(document).on('click', '#dateDESC', function(){
@@ -405,9 +413,10 @@ mySPA.controller('reportsController', ['$scope','$rootScope', '$http', '$locatio
 		$('.formatpdfbrwsrexport').remove();
 	})
 
-	function onIconSpaceClick(){
+	function onIconSpaceClick(e){
+		e.preventDefault()
 		$elem = $(this);
-		if(open == 0){
+		if(openArrow == 0){
 			//getting the next element
 			$content = $elem.parent().parent().next();
 			//open up the content needed - toggle the slide- if visible, slide up, if not slidedown.
@@ -423,15 +432,16 @@ mySPA.controller('reportsController', ['$scope','$rootScope', '$http', '$locatio
 				$('.scrollbar-macosx').scrollbar();
 			});
 			$('.searchScrapEle').css('display', '');
-			open = 1;
+			openArrow = 1;
+			e.stopImmediatePropagation();
 		}
 		else {
 			$content = $elem.parent().parent();
 			$content.slideUp(200, function () {
 				//execute this after slideToggle is done
 				//change text of header based on visibility of content div
-				if($(".scroll-content").parent(".upper-collapsible-section").find($elem.parent()).length > 0){
-					$(".scroll-content").parent(".upper-collapsible-section").find($elem.parent()).remove();
+				if($(".scroll-content").parent(".upper-collapsible-section").find(".suitedropdownicon").length > 0){
+					$(".scroll-content").parent(".upper-collapsible-section").find(".suitedropdownicon").remove();
 				}
 				$(".upper-section-testsuites").append($elem.parent());
 				$(".suitedropdownicon").children(".iconSpace-reports").attr("src","imgs/ic-collapse.png")
@@ -440,7 +450,8 @@ mySPA.controller('reportsController', ['$scope','$rootScope', '$http', '$locatio
 			$('.searchScrapEle').css('display', 'none');
 			$(".searchScrapInput").hide();
 			showSearchBox = true;
-			open = 0;
+			openArrow = 0;
+			e.stopImmediatePropagation();
 		}
 	}
 
