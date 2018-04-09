@@ -10,6 +10,7 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 	
 	 $scope.enableGenerate = false;
 	 $scope.ComplexityScreenView = false;
+	 $scope.wmcList=[];
 	 $scope.expandSidebars = function(){
 		$("#middle-content-section").css({
 			left: '173px',
@@ -38,6 +39,7 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 			width: '100%'
 		});
 	}
+	 
 	$scope.showFlowGraphHome = function(){
 		$scope.enableDataflow = false;
 		if (!$scope.enableGenerate)
@@ -769,12 +771,13 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 					var decisionPoint=undefined;
 					for(var i=0;i<methods_data.length;i++){
 						decisionPoint=parseInt(methods_data[i].complexity)-1;
-						decisionPoint = decisionPoint <= 0 ? "1":String(decisionPoint);
-						$("#tblMethodLevel tbody").append("<tr class='highlightRow' name='"+methods_data[i].methodname+'_'+methods_data[i].line_no+"'><td><div>"+methods_data[i].methodname+"</div></td><td><div>"+methods_data[i].complexity+"</div></td><td><div>"+decisionPoint+"</div></td><td><div>"+methods_data[i].complexity
-						+"</div></td><td><div></div></td></tr>");
+						decisionPoint = decisionPoint <= 0 ? "0":String(decisionPoint);
+						$("#tblMethodLevel tbody").append("<tr class='highlightRow' name='"+methods_data[i].methodname+'_'+methods_data[i].line_no+"'><td><div>"+methods_data[i].methodname+"</div></td><td><div class='ccvalue'>"+methods_data[i].complexity+"</div></td><td><div>"+decisionPoint+"</div></td><td><div>"+methods_data[i].complexity
+						+"</div></td><td><div id='weight_"+i+"'><span id='weightage_"+i+"'></span><span id='editWeightage_"+i+"' class='glyphicon glyphicon-pencil editWeightage'></span></div></td></tr>");
 					}
 					$scope.$apply();
-					$("tbody tr:visible").on('click',function() {
+				
+					$("tbody tr:visible").on('click',function(e) {
 						$scope.enableDataflow = true;
 						$scope.$apply();
 						$("tr.hightlight_Complexity_row").removeClass("hightlight_Complexity_row");
@@ -782,9 +785,40 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 						var e = $("tr.hightlight_Complexity_row")[0]
 						showMethodFlow($scope.obj.data_flow, (e.getAttribute('name')).split('_')[0], d.name);
 					});
+
+					$("[id^=editWeightage_]").on('click',function(e) {
+						e.preventDefault();
+						var id = e.target.id.split("_")[1];
+						var previousValue=$('#weightage_'+id).text();
+						$('#weightage_'+id).text('');
+						$("#"+e.target.id).parent().append("<input id='txtWeightage_"+id+"' type='text' name='' value="+previousValue+">")
+						$(this).hide();
+						$("[id^=txtWeightage_]").on('keydown',function(event) {
+							//event.preventDefault();
+							if(event.keyCode == "13")
+							{
+								var id = event.target.id.split("_")[1];
+								var updatedCValue = $(this).val();
+								$(this).remove();
+								$('#weightage_'+id).text(updatedCValue);
+								$("#editWeightage_"+id).show();
+							}
+						});
+					});	
 				}
-			})
+			});
 		
+		$scope.wmcCalculate =function(e){
+			var listWeight=$("[id^=weightage_]");
+			var ccData = $(".ccvalue");
+			var weightedSum = 0; 
+			for(var i=0;i<listWeight.length;i++){
+				$scope.wmcList[i] = parseInt(listWeight[i].innerText);
+				weightedSum+=(parseInt(ccData[i].innerText)*($scope.wmcList[i]*0.01));
+			}
+			$scope.wmcc = Math.ceil(weightedSum); 
+			$scope.apply();
+		}	
 
 		nodeGroup.append('image')
 			.attr('href', 'imgs/apg-check-icon.png')

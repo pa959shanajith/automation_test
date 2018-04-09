@@ -71,8 +71,13 @@
 			<h4 class="heading-bold">Class Level Complexity Info: </h4>
 			<p>Class Name: {{ccname}} </p> 
 			<p>Class Complexity : {{cc}}</p>
-			<p>No. of Method :{{cmethod}}</p> 
-			<h4 class="heading-bold">Method Level Complexity Info: </h4>
+			<p>No. of Method : {{cmethod}}</p> 
+			<p> Weighted Method Class Complexity : {{wmcc}} </p>
+			<h4 class="heading-bold">Method Level Complexity Info:  
+			</h4>
+			<div >
+				Weighted Method Class Complexity : <button type="button" class="btn btn-primary btn-md" id="wmcCalculate" ng-click="wmcCalculate()">Calculate!</button>
+			</div>
 			<div class='divMethodContainer'>
 				<table id='tblMethodLevel'>
 					<thead>
