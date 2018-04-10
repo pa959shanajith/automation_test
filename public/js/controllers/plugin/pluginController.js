@@ -347,6 +347,33 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 				counter++;
 			}
 		}
+
+		if($scope.filterData['relval']=='Select Release' && $scope.filterData['cycval']=='Select Cycle' && !(Object.values($scope.filterData['tasktype']).includes(true) || Object.values($scope.filterData['apptype']).includes(true))){
+			$scope.filterEnable = false;
+			$('.filterIcon').css('background','white');
+		}
+		else{
+			$scope.filterEnable = true;
+			$('.filterIcon').css('background','#b875da');
+		}
+		
+	}
+
+	$scope.clearFilter = function(){
+		$scope.filterData['relval']='Select Release';
+		$scope.filterData['cycval']='Select Cycle'; 
+		
+		Object.keys($scope.filterData.tasktype).forEach(function(key) {
+			$scope.filterData.tasktype[key] = false;
+		});
+		Object.keys($scope.filterData.apptype).forEach(function(key) {
+			$scope.filterData.apptype[key] = false;
+		});
+	}
+	function validID(id){
+		// Checks if neo4j id for relase and cycle in task is valid
+		if(id == 'null' || id == 'undefined' || id == null || id == undefined || id == 'Select Release' || id == 'Select Cycle') return false;
+		return true;
 	}
 
 	function fillFilterValues(obj,tidx){
@@ -354,6 +381,9 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 		* Another dict for releaseid and cyclelist out of task json
 		* List of apptype and tasktype
 		*/
+		if(!validID(obj.taskDetails[tidx].releaseid)) return;
+		if(!validID(obj.taskDetails[tidx].cycleid)) return;
+
 		if($scope.filterDat.releaseids.indexOf(obj.taskDetails[tidx].releaseid) == -1){
 			$scope.filterDat.releaseids.push(obj.taskDetails[tidx].releaseid);
 			$scope.filterDat.relcycmap[obj.taskDetails[tidx].releaseid] = [obj.taskDetails[tidx].cycleid];
