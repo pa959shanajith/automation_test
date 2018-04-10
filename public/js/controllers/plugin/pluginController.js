@@ -20,8 +20,6 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 			var pluginTxt = availablePlugins[i].pluginName.replace(/\s/g,''); 
 			var dataName = Encrypt.encode("p_"+pluginTxt);
 			$rootScope.plugins.push("p_"+pluginName);
-
-
 			$("#plugin-container").append('<div class="col-md-4 plugin-block"><span class="toggleClick pluginBox" data-name="p_'+availablePlugins[i].pluginName.replace(/\s/g,'')+'" id="'+availablePlugins[i].pluginName+'" title="'+availablePlugins[i].pluginName+'">'+pluginName+'</span><input class="plugins" type="hidden" id="'+availablePlugins[i].pluginName+"_"+dataName+'"  title="'+pluginTxt+"_"+dataName+'"></div>').fadeIn();
 		}
 	}
@@ -33,8 +31,6 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 			$(this).parent().hide();
 		}
 	});
-
-	
 	//$("#plugin-container").addClass("inactiveLink");
 	if(window.localStorage['_UI'])
 	{
@@ -95,15 +91,8 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 						for(i=0; i<tasksJson.length; i++){
 							var classIndex = i<100 ? "tasks-l-s": i<1000? "tasks-l-m" : "tasks-l-l";
 							for(j=0; j<tasksJson[i].taskDetails.length; j++){
-																																				  
-																																	  
-																																		  
 								var taskTypeIcon = "imgs/ic-taskType-yellow-plus.png";
-																																								  
-		 
-																																								
 								var testSuiteDetails = JSON.stringify(tasksJson[i].testSuiteDetails);
-																																									  
 								if(tasksJson[i].taskDetails[j].taskType == "Execution"){
 									taskTypeIcon = "imgs/ic-taskType-blue-plus.png";
 								}
@@ -111,9 +100,9 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 								
 								counter++;
 								fillFilterValues(tasksJson[i],j);
-		
+							}
 
-	   
+						}
 						  	//prevent mouseclick before loading tasks
 						  	$("span.toggleClick").removeClass('toggleClick');
 						}
@@ -153,8 +142,6 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 				}, function (error) { 
 					console.log("Error:::::::::::::", error);
 				})
-
-				
 			}	
 			else{
 				$rootScope.redirectPage();
@@ -209,9 +196,7 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 
 	//Plugin click event 
 	$scope.pluginFunction = function(name){
-
 		if(name == "p_Mindmap"){
-
 			name = 'mindmap'
 		}
 		else if(name == "p_NeuronGraphs") name = 'neuronGraphs';
@@ -362,33 +347,6 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 				counter++;
 			}
 		}
-
-		if($scope.filterData['relval']=='Select Release' && $scope.filterData['cycval']=='Select Cycle' && !(Object.values($scope.filterData['tasktype']).includes(true) || Object.values($scope.filterData['apptype']).includes(true))){
-			$scope.filterEnable = false;
-			$('.filterIcon').css('background','white');
-		}
-		else{
-			$scope.filterEnable = true;
-			$('.filterIcon').css('background','#b875da');
-		}
-		
-	}
-
-	$scope.clearFilter = function(){
-		$scope.filterData['relval']='Select Release';
-		$scope.filterData['cycval']='Select Cycle'; 
-		
-		Object.keys($scope.filterData.tasktype).forEach(function(key) {
-			$scope.filterData.tasktype[key] = false;
-		});
-		Object.keys($scope.filterData.apptype).forEach(function(key) {
-			$scope.filterData.apptype[key] = false;
-		});
-	}
-	function validID(id){
-		// Checks if neo4j id for relase and cycle in task is valid
-		if(id == 'null' || id == 'undefined' || id == null || id == undefined || id == 'Select Release' || id == 'Select Cycle') return false;
-		return true;
 	}
 
 	function fillFilterValues(obj,tidx){
@@ -396,9 +354,6 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 		* Another dict for releaseid and cyclelist out of task json
 		* List of apptype and tasktype
 		*/
-		if(!validID(obj.taskDetails[tidx].releaseid)) return;
-		if(!validID(obj.taskDetails[tidx].cycleid)) return;
-
 		if($scope.filterDat.releaseids.indexOf(obj.taskDetails[tidx].releaseid) == -1){
 			$scope.filterDat.releaseids.push(obj.taskDetails[tidx].releaseid);
 			$scope.filterDat.relcycmap[obj.taskDetails[tidx].releaseid] = [obj.taskDetails[tidx].cycleid];
@@ -449,8 +404,6 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 
 // function p_event(name){ 	
 // }
-
-
 
 function taskRedirection(testsuitedetails,scenarioflag,assignedtestscenarioids,subtask,subtaskid,screenid,screenname,projectid,taskname,testcaseid,testcasename,apptype,scenarioid,versionnumber,status,batchTaskIDs,releaseid,cycleid,reuse){
 	angular.element(document.getElementsByClassName("assignedTask")).scope().taskRedirection(testsuitedetails,scenarioflag,assignedtestscenarioids,subtask,subtaskid,screenid,screenname,projectid,taskname,testcaseid,testcasename,apptype,scenarioid,versionnumber,status,batchTaskIDs,releaseid,cycleid,reuse)
