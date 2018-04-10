@@ -156,6 +156,10 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                                 loadMindmapData1(param);
                             });
                             $('.release-list').change(function() {
+                                if ($("#ct-AssignBox").hasClass("ct-open") == true){
+                                    $('.iconSpaceArrow').trigger('click');
+                                }
+                                $('#ctExpandAssign').unbind('click');
                                 unloadMindmapData();
                                 mindmapServices.populateCycles($('.release-list').val()).then(function(result_cycles) {
                                     if (result_cycles == "Invalid Session") {
@@ -244,6 +248,10 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                         selectedProject = $(".project-list").val();
 
                     if($scope.tab=='tabAssign'){
+                        if ($("#ct-AssignBox").hasClass("ct-open") == true){
+                            $('.iconSpaceArrow').trigger('click');
+                        }
+                        $('#ctExpandAssign').unbind('click');
                         unloadMindmapData();
                         mindmapServices.populateReleases(selectedProject).then(function(result) {
                             if (result == "Invalid Session") {
@@ -261,6 +269,10 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                             }
                             default_releaseid = $('.release-list').val();
                             $('.release-list').change(function() {
+                                if ($("#ct-AssignBox").hasClass("ct-open") == true){
+                                    $('.iconSpaceArrow').trigger('click');
+                                }
+                                $('#ctExpandAssign').unbind('click');                                
                                 unloadMindmapData();
                                 mindmapServices.populateCycles($('.release-list').val()).then(function(result_cycles) {
                                     if (result_cycles == "Invalid Session") {
