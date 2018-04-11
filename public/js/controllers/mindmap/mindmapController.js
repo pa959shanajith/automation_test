@@ -145,17 +145,20 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                             
                             $('.release-list').empty();
                             $('.release-list').append("<option data-id='Select' value='Select' disabled selected>Select</option>");
+                            $('.release-list').addClass('errorClass');
                             $('.cycle-list').empty();
                             $('.cycle-list').append("<option data-id='Select' value='Select' disabled selected>Select</option>");
-
+                            $('.cycle-list').addClass('errorClass');
                             for (i = 0; i < result.r_ids.length && result.rel.length; i++) {
                                 $('.release-list').append("<option data-id='" + result.rel[i] + "' value='" + result.r_ids[i] + "'>" + result.rel[i] + "</option>");
                             }
                             default_releaseid = $('.release-list').val();
                             $('.cycle-list').change(function() {
+                                $('.cycle-list').removeClass('errorClass');
                                 loadMindmapData1(param);
                             });
                             $('.release-list').change(function() {
+                                $('.release-list').removeClass('errorClass');
                                 if ($("#ct-AssignBox").hasClass("ct-open") == true){
                                     $('.iconSpaceArrow').trigger('click');
                                 }
@@ -168,6 +171,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                                     var result2 = result_cycles;
                                     $('.cycle-list').empty();
                                     $('.cycle-list').append("<option data-id='Select' value='Select' disabled selected>Select</option>");
+                                    $('.cycle-list').addClass('errorClass');
                                     for (i = 0; i < result2.c_ids.length && result2.cyc.length; i++) {
                                         $('.cycle-list').append("<option data-id='" + result2.cyc[i] + "' value='" + result2.c_ids[i] + "'>" + result2.cyc[i] + "</option>");
                                     }
@@ -261,14 +265,17 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                             default_releaseid = '';
                             $('.release-list').empty();
                             $('.release-list').append("<option data-id='Select' value='Select' disabled selected>Select</option>");
+                            $('.release-list').addClass('errorClass');
                             $('.cycle-list').empty();
                             $('.cycle-list').append("<option data-id='Select' value='Select' disabled selected>Select</option>");
-
+                            $('.cycle-list').addClass('errorClass');
                             for (i = 0; i < result.r_ids.length && result.rel.length; i++) {
                                 $('.release-list').append("<option data-id='" + result.rel[i] + "' value='" + result.r_ids[i] + "'>" + result.rel[i] + "</option>");
                             }
                             default_releaseid = $('.release-list').val();
                             $('.release-list').change(function() {
+                                $('.release-list').removeClass('errorClass');
+                                $('.cycle-list').addClass('errorClass');
                                 if ($("#ct-AssignBox").hasClass("ct-open") == true){
                                     $('.iconSpaceArrow').trigger('click');
                                 }
