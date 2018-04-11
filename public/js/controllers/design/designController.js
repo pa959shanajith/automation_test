@@ -4251,7 +4251,27 @@ function contentTable(newTestScriptDataLS) {
                 $grid.jqGrid('setCell', rowId, 'url', url);
                 $grid.jqGrid('setCell', rowId, 'objectName', objName);
             }
-        } else if (selectedText == "@Browser") {
+        }
+        else if(selectedText=="@System"){
+            var sc = Object.keys(keywordArrayList.system);
+            selectedKeywordList = "getOsInfo";
+            objName = " ";
+            url=" ";
+            for (var i = 0; i < sc.length; i++) {
+                if (selectedKeyword == sc[i]) {
+                    res += '<option role="option" value="' + sc[i] + '" selected>' + sc[i] + '</option>';
+                } else
+                    res += '<option role="option" value="' + sc[i] + '">' + sc[i] + '</option>';
+            }
+            var row = $(e.target).closest('tr.jqgrow');
+            var rowId = row.attr('id');
+            $("select#" + rowId + "_keywordVal", row[0]).html(res);
+            selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
+            $grid.jqGrid('setCell', rowId, 'appType', "Generic");
+            $grid.jqGrid('setCell', rowId, 'url', url);
+            $grid.jqGrid('setCell', rowId, 'objectName', objName);
+        }
+        else if (selectedText == "@Browser") {
             objName = " ";
             url = " ";
             var sc = Object.keys(keywordArrayList.browser);
@@ -4563,6 +4583,7 @@ function contentTable(newTestScriptDataLS) {
             selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
             $grid.jqGrid('setCell', rowId, 'appType', 'Generic');
         } else {
+
             selectedText = replaceHtmlEntites(selectedText.trim());
             for (var i = 0; i < scrappedData.length; i++) {
                 var ob = scrappedData[i];
@@ -5824,7 +5845,7 @@ function getTags(data) {
     var obnames = [];
     var appTypeLocal = JSON.parse(window.localStorage['_CT']).appType;
     if (appTypeLocal == "Web") {
-        obnames = ["@Generic","@Excel","@Custom","@Browser","@BrowserPopUp"];
+        obnames = ["@Generic","@Excel","@Custom","@Browser","@BrowserPopUp","@System"];
     } else if (appTypeLocal == "Webservice") {
         obnames = ["@Generic","@Excel","WebService List"];
     } else if (appTypeLocal == "Mainframe") {
