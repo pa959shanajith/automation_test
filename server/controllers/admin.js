@@ -1911,7 +1911,7 @@ exports.assignProjects_ICE = function (req, res) {
 					} else {
                         inputs.projectids1 = "'"+inputs.projectids.join('\',\'')+"'";
                         //Execute neo4j query!!
-                        //var qList=[];
+                        var qList=[];
                         qList.push({"statement":"MERGE (n:ICEPERMISSIONS_NG {userid:'"+inputs.userid+
                                     "',domainid:'"+inputs.domainid+"'}) set n.projectids=["+inputs.projectids1+"] return n"});
                         //Relationships
@@ -1919,7 +1919,16 @@ exports.assignProjects_ICE = function (req, res) {
                                     "',domainid:'"+inputs.domainid+"'}),(b:DOMAINS_NG {domainid:'"+
                                     inputs.domainid+"'}) MERGE(a)-[r:FICETDOM_NG{id:'"+inputs.domainid+"'}]->(b) return a,r,b"});
 
-                        // MATCH p = (a:DOMAINS_NG{userid:'bced8722-1ce1-41e0-b7d3-d9a9c0bcd800'})-[r1]->(d:DOMAINS_NG) return p
+						// MATCH p = (a:DOMAINS_NG{userid:'bced8722-1ce1-41e0-b7d3-d9a9c0bcd800'})-[r1]->(d:DOMAINS_NG) return p
+						
+						// if length of unassigned projects > 0 then delete tasks of that project
+						if(assignProjectsDetails.deletetasksofprojects.length > 0){
+							assignProjectsDetails.deletetasksofprojects.forEach(function(e,i){
+								qList.push({"statement":"match p = (m{projectID:'"+e.projectid+"'})-[FNTT]-(t:TASKS{assignedTo:'"+assignProjectsDetails.userId+"'}) where t.status = 'assigned' or t.status = 'inprogress' or t.status = 'reassign' detach delete t;"});
+								qList.push({"statement":"match p = (m{projectID:'"+e.projectid+"'})-[FNTT]-(t:TASKS{reviewer:'"+assignProjectsDetails.userId+"'}) where t.status = 'review' detach delete t;"});
+							})
+						}
+
 						logger.info("Calling neo4jAPI execute queries for assignProjects_ICE");
                         neo4jAPI.executeQueries(qList,function(status,result){
                             if(status!=200){

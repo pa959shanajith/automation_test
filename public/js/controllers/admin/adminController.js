@@ -33,6 +33,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 	});
 
 	$(document).on('change', '#selAssignUser', function (e) {
+		$scope.assignedProjectInitial = [];
 		$scope.allProjectAP = [];
 		$scope.assignedProjectAP = [];
 		$(".load").show();
@@ -79,6 +80,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 						for (var i = 0; i < data1.length; i++) {
 							$scope.assignedProjectAP.push({'projectid':data1[i].projectId,'projectname':data1[i].projectName});
 						}
+						$scope.assignedProjectInitial = $scope.assignedProjectAP;
 						for (var j = 0; j < projectData.length; j++) {
 							assignedProjectsArr.push(projectData[j].projectId);
 							assignedProjectNames.push(projectData[j].projectName)
@@ -236,6 +238,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 				for (var i = 0; i < data.length; i++) {
 					$scope.assignedProjectAP.push({'projectname':data[i].projectName,'projectid':data[i].projectId});
 				}
+				$scope.assignedProjectInitial = $scope.assignedProjectAP;
 				for (var j = 0; j < projectData.length; j++) {
 					assignedProjectsArr.push(projectData[j].projectId);
 					assignedProjectNames.push(projectData[j].projectName)
@@ -336,9 +339,33 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 		assignProjectsObj.domainId = domainId;
 		assignProjectsObj.userInfo = userDetails;
 		assignProjectsObj.userId = userId;
-		//			assignProjectsObj.unAssignedProjects = unAssignedProjects;
-		assignProjectsObj.assignedProjects = assignedProjects; ;
+		//assignProjectsObj.unAssignedProjects = unAssignedProjects;
+		assignProjectsObj.assignedProjects = assignedProjects;
 		assignProjectsObj.getAssignedProjectsLen = getAssignedProjectsLen;
+
+
+		// function sortObject(unordered){
+		// 	Object.keys(unordered).sort().forEach(function(key) {
+		// 		var value = unordered[key];
+		// 		delete unordered[key];
+		// 		unordered[key] = value;
+		// 	});		
+		// 	return unordered;	
+		// }
+		/* Logic to get unassigned project list */
+		$scope.diffprj = [];
+		function getDifferentProjects(){
+			$scope.diffprj = $scope.assignedProjectInitial;
+			for (i = 0; i < assignedProjects.length; i++) { 
+				$scope.diffprj = $.grep($scope.diffprj, function(e){ 
+					return e.projectid != assignedProjects[i].projectId ; 
+			   });
+			}
+		}
+		getDifferentProjects();
+		console.log($scope.diffprj);
+		/*End of logic to get unassigned project list */
+		assignProjectsObj.deletetasksofprojects = $scope.diffprj;
 		//console.log(assignProjectsObj);
 		adminServices.assignProjects_ICE(assignProjectsObj)
 		.then(function (data) {
