@@ -31,6 +31,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     //node_names_tc keep track of testcase names to decide reusability of testcases
     var saveFlag_W = false;
     var collapseEteflag = true;
+    var reldata = {};
+    var cycdata = {};
     //Workflow//
 
 // Complexity
@@ -149,8 +151,10 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                             $('.cycle-list').empty();
                             $('.cycle-list').append("<option data-id='Select' value='Select' disabled selected>Select</option>");
                             $('.cycle-list').addClass('errorClass');
+                            reldata = {};
                             for (i = 0; i < result.r_ids.length && result.rel.length; i++) {
                                 $('.release-list').append("<option data-id='" + result.rel[i] + "' value='" + result.r_ids[i] + "'>" + result.rel[i] + "</option>");
+                                reldata[result.r_ids[i]] = result.rel[i]
                             }
                             default_releaseid = $('.release-list').val();
                             $('.cycle-list').change(function() {
@@ -172,8 +176,10 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                                     $('.cycle-list').empty();
                                     $('.cycle-list').append("<option data-id='Select' value='Select' disabled selected>Select</option>");
                                     $('.cycle-list').addClass('errorClass');
+                                    cycdata = {};
                                     for (i = 0; i < result2.c_ids.length && result2.cyc.length; i++) {
                                         $('.cycle-list').append("<option data-id='" + result2.cyc[i] + "' value='" + result2.c_ids[i] + "'>" + result2.cyc[i] + "</option>");
+                                        cycdata[result2.c_ids[i]] = result2.cyc[i];
                                     }
                                     //loadMindmapData1(param);
                                 }, function(error) {
@@ -269,9 +275,11 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                             $('.cycle-list').empty();
                             $('.cycle-list').append("<option data-id='Select' value='Select' disabled selected>Select</option>");
                             $('.cycle-list').addClass('errorClass');
+                            reldata = {};
                             for (i = 0; i < result.r_ids.length && result.rel.length; i++) {
                                 $('.release-list').append("<option data-id='" + result.rel[i] + "' value='" + result.r_ids[i] + "'>" + result.rel[i] + "</option>");
-                            }
+                                reldata[result.r_ids[i]] = result.rel[i]
+                            }                            
                             default_releaseid = $('.release-list').val();
                             $('.release-list').change(function() {
                                 $('.release-list').removeClass('errorClass');
@@ -288,8 +296,10 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                                     var result2 = result_cycles;
                                     $('.cycle-list').empty();
                                     $('.cycle-list').append("<option data-id='Select' value='Select' disabled selected>Select</option>");
+                                    cycdata = {};
                                     for (i = 0; i < result2.c_ids.length && result2.cyc.length; i++) {
                                         $('.cycle-list').append("<option data-id='" + result2.cyc[i] + "' value='" + result2.c_ids[i] + "'>" + result2.cyc[i] + "</option>");
+                                        cycdata[result2.c_ids[i]] = result2.cyc[i];
                                     }
                                     //loadMindmapData1(param);
                                 }, function(error) {
@@ -1040,7 +1050,17 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 		}
     };
 
-    function nodeClick(e) {                
+    function addInfo(d) {
+        attrArr = "<strong>Node Type:</strong> " + d.type;
+        for (var key in d.attributes) {
+            if(d.attributes[key])
+                attrArr += "<br><strong>" + key + ":</strong> " + d.attributes[key];
+        }
+        d3.select('#window-pi p.proj-info-wrap').html(attrArr);
+    };
+
+    function nodeClick(e) {
+        d3.select('#window-pi p.proj-info-wrap').empty();
         if (IncompleteFlowFlag) {
             openDialogMindmap('Error', 'Incomplete Flow!');
             return;
@@ -1057,6 +1077,16 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         var u, v, w, f, c = d3.select('#ct-assignBox');
         var p = d3.select(activeNode);
         var pi = parseInt(p.attr('id').split('-')[2]);
+
+        if((dNodes[pi].type == 'screens' || dNodes[pi].type == 'testcases') && dNodes[pi].taskexists){
+            addInfo({type:dNodes[pi].type,attributes:{'task':dNodes[pi].taskexists.task,'release':reldata[dNodes[pi].taskexists.release],'cycle':cycdata[dNodes[pi].taskexists.cycle]}});
+            if(!$("#right-dependencies-section").is(":visible")){
+                $("#ct-expand-right").trigger('click');
+            }
+            $('[title="Info"]').trigger('click');
+            return;
+        }
+
         var t = p.attr('data-nodetype');
         var flag = true;
         var apptype=$('.project-list option:selected').attr('app-type')
@@ -1459,8 +1489,10 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 $rootScope.redirectPage();
             }                 
             var result2 = result_cycles;
+            cycdata = {};
             for (i = 0; i < result2.c_ids.length && result2.cyc.length; i++) {
                 $('#ct-assignCyc').append("<option data-id='" + result2.cyc[i] + "' value='" + result2.c_ids[i] + "'>" + result2.cyc[i] + "</option>");
+                cycdata[result2.c_ids[i]] = result2.cyc[i];
             }
             $("#ct-assignCyc option[value='" + result2.cyc[0] + "']").attr('selected', 'selected');
         }, function(error) {
