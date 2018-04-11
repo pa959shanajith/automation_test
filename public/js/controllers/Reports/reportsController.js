@@ -41,23 +41,27 @@ mySPA.controller('reportsController', ['$scope','$rootScope', '$http', '$locatio
 		});
 	}
 
+
 	//service call to get projects and testsuites
-	$(document).on('change', ".rpProjects", function(){
+	$(document).on('change', ".rpProjects", function(e){
 		var projectId = $(this).children("option:selected").val();
 		if(projectId){
 			$('.suiteContainer, .scenariostatusreport').remove();
 			$('.scenarioReportstbody tr').remove();
 			$('.progress-bar-success, .progress-bar-danger, .progress-bar-warning, .progress-bar-norun').css('width','0%');
 			$('.passPercent, .failPercent, .terminatePercent, .incompletePercent').text('');
+			
 			if($(".dynamicTestsuiteContainer").is(":Visible")){
 				$('.iconSpace-reports').trigger('click');
 			}
+			$('#searchModule').val('');
 			// openArrow = 0;
-			getProjectsAndSuites(projectId, "reports");
 			
+			getProjectsAndSuites(projectId, "reports");
+			e.stopImmediatePropagation();
 		}
 	})
-	
+
 	//getAllSuites_ICE function call
 	function getProjectsAndSuites(ID, type){
 		reportService.getAllSuites_ICE(ID, type)
@@ -134,9 +138,11 @@ mySPA.controller('reportsController', ['$scope','$rootScope', '$http', '$locatio
 	$(document).on("click", ".searchScrapEle", function(){
 		if(showSearchBox){
 			$(".searchScrapInput").show();
+			$(".searchScrapEle").addClass('positionInputSerachBox');
 			showSearchBox=false;
 			$(".searchScrapInput").focus();
 		}	else{
+			$(".searchScrapEle").removeClass('positionInputSerachBox');
 			$(".searchScrapInput").hide();
 			showSearchBox=true;
 		}
@@ -453,6 +459,7 @@ mySPA.controller('reportsController', ['$scope','$rootScope', '$http', '$locatio
 			openArrow = 0;
 			e.stopImmediatePropagation();
 		}
+		e.stopImmediatePropagation();
 	}
 
 	$(document).off('click.as', '.iconSpace-reports');
