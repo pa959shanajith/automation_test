@@ -315,7 +315,9 @@
 						<!--Labels-->
 						<div class="seprator" style="margin-bottom:0px;">
 							<!-- <select multiple id="allProjectEU" ng-model="allProjectNameEU" size="13" ng-options="p as p.ProjectName for p in projBox1 track by p.ProjectId"></select> -->
-							<select multiple="" id="allProjectAP" ng-model="allProjectNameAP" size="" ng-options="p as p.ProjectName for p in projBox1 track by p.ProjectId" class="ng-pristine ng-untouched ng-valid"></select>
+							<select multiple="" id="allProjectAP" ng-model="allProjectNameAP" size="" class="ng-pristine ng-untouched ng-valid">
+								<option ng-repeat="prj in allProjectAP" value="{{prj.projectid}}">{{prj.projectname}}</option>
+							</select>
 							<span ng-show="projectNameRequired" class="error-msg ng-binding ng-hide"></span>
 						</div>
 					</div>
@@ -347,7 +349,9 @@
 
 						<div class="seprator" style="margin-bottom:0px;">
 							<!-- <select size="13" multiple ng-model="assignedProjectNameEU" id="assignedProject" ng-options="p as p.ProjectName for p in projBox2 track by p.ProjectId"></select> -->
-							<select size="" multiple="" ng-model="assignedProjectNameAP" id="assignedProjectAP" ng-options="p as p.ProjectName for p in projBox2 track by p.ProjectId" class="ng-pristine ng-untouched ng-valid"></select>
+							<select multiple="" id="assignedProjectAP" ng-model="assignedProjectNameAP" size="" class="ng-pristine ng-untouched ng-valid">
+								<option ng-repeat="prj in assignedProjectAP" value="{{prj.projectid}}">{{prj.projectname}}</option>
+							</select>
 							<span ng-show="selectProjects" class="error-msg ng-binding ng-hide"></span>
 						</div>
 					</div>
