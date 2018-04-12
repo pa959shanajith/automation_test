@@ -1007,7 +1007,6 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 }
 
                 replicateTask(pi);
-                if(!origTask) dNodes[pi].task.cx = undefined;
             }
         }
 
@@ -1271,9 +1270,10 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     $("#ct-compbox").append(`<i class="fa fa-list" aria-hidden="true"></i>`);   
                     $("#ct-compbox").css('color','#643693').css('margin-left','30px'); 
                     var HTMLcontent = getHTMLdropdown(t);
+                    $('#addObjContainer111').empty().append(HTMLcontent);
                     clist = tObj.cx;
                     if(!(clist=="undefined"||clist==undefined)) clist = clist.split(",");
-                    $('#addObjContainer111').empty().append(HTMLcontent);
+                    else cscore = 0;                    
                     populateComplexityValues(pi);
                     $('#ct-compbox').click(function(){
                         showComplexityBox(t);
@@ -1340,21 +1340,17 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
     function showComplexityBox(nType){
         //Calculate complexity and then show
-        $.each($(".addObj-row"), function(e) {
-            console.log($(this).find('.form-group-1').text());
-            console.log($(this).find("select option:selected").val());
-        });
         $('#dialog-compBox').modal("show");
+        cscore_tmp = cscore;
         $('.form-control.form-control-custom').change(function(){
-            cscore=0;
+            cscore_tmp=0;
             $.each($(".addObj-row"), function(e){
                 var cs=0,cw=0;
                 cw = cx_weightage[$(this).find('.form-group-1').text().trim()]!=undefined?cx_weightage[$(this).find('.form-group-1').text().trim()]:0;
                 cs = cx_scale[$(this).find("select option:selected").val().trim()]!=undefined?cx_scale[$(this).find("select option:selected").val().trim()]:0;
-                cscore = cscore+(cs*cw);
+                cscore_tmp = cscore_tmp+(cs*cw);
             });
-            console.log("score:",cscore);
-            $('#complexity-val').text('Complexity: '+getComplexityLevel(nType,cscore));
+            $('#complexity-val').text('Complexity: '+getComplexityLevel(nType,cscore_tmp));
         });
         //$('.modal-backdrop.in').remove();
     }
@@ -1362,7 +1358,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     $scope.submitComplexity = function(){
         var pi = $('#ct-cxval').attr('idx');
         var err = false;
-        if(cscore!=0) clist = [cscore];
+        clist_tmp = [cscore_tmp];
         $(".addObj-row").find("select").removeClass('selectErrorBorder');
 
         $.each($(".addObj-row"), function() {
@@ -1371,10 +1367,12 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 err = "true";
             } 
             else{
-                clist.push($(this).find("select option:selected").val().trim());
+                clist_tmp.push($(this).find("select option:selected").val().trim());
             }
         })
         if(!err){
+            cscore = cscore_tmp;
+            clist = clist_tmp;
             $('#dialog-compBox').modal("hide");
             $('#ct-cxval').text(getComplexityLevel($('#ct-cxval').attr('nType'),cscore));
         }
