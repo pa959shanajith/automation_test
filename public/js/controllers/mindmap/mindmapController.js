@@ -1266,7 +1266,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             else if(tk == "cx"){
                 if(dNodes[pi].parent){
                     v.append('span').attr('class', 'ct-assignItem fl-left').html('Complexity');
-                    v.append('span').attr('id', 'ct-cxval').attr('nType',t).attr('idx',pi).text('Unassigned');
+                    v.append('span').attr('id', 'ct-cxval').attr('nType',t).attr('idx',pi).text('Not Set');
                     v.append('span').attr('id','ct-compbox');
                     $("#ct-compbox").append(`<i class="fa fa-list" aria-hidden="true"></i>`);   
                     $("#ct-compbox").css('color','#643693').css('margin-left','30px'); 
@@ -1283,7 +1283,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                         $('#complexity-val').text('Complexity: '+getComplexityLevel(t,parseInt(clist[0])));
                     }
                     else{
-                        $('#complexity-val').text('Complexity: Unassigned');
+                        $('#complexity-val').text('Complexity: Not Set');
                     }
                     
                 }
