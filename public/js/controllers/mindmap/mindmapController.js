@@ -31,6 +31,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     //node_names_tc keep track of testcase names to decide reusability of testcases
     var saveFlag_W = false;
     var collapseEteflag = true;
+    var reldata = {};
+    var cycdata = {};
     //Workflow//
 
 // Complexity
@@ -138,28 +140,46 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                         selectedProject = res.projectId[0];  
                     if($scope.tab=='tabAssign'){
                         mindmapServices.populateReleases(selectedProject).then(function(result) {
+                            if (result == "Invalid Session") {
+                                $rootScope.redirectPage();
+                            }                            
                             //releaseResult = result;
                             
                             $('.release-list').empty();
                             $('.release-list').append("<option data-id='Select' value='Select' disabled selected>Select</option>");
+                            $('.release-list').addClass('errorClass');
                             $('.cycle-list').empty();
                             $('.cycle-list').append("<option data-id='Select' value='Select' disabled selected>Select</option>");
-
+                            $('.cycle-list').addClass('errorClass');
+                            reldata = {};
                             for (i = 0; i < result.r_ids.length && result.rel.length; i++) {
                                 $('.release-list').append("<option data-id='" + result.rel[i] + "' value='" + result.r_ids[i] + "'>" + result.rel[i] + "</option>");
+                                reldata[result.r_ids[i]] = result.rel[i]
                             }
                             default_releaseid = $('.release-list').val();
                             $('.cycle-list').change(function() {
+                                $('.cycle-list').removeClass('errorClass');
                                 loadMindmapData1(param);
                             });
                             $('.release-list').change(function() {
+                                $('.release-list').removeClass('errorClass');
+                                if ($("#ct-AssignBox").hasClass("ct-open") == true){
+                                    $('.iconSpaceArrow').trigger('click');
+                                }
+                                $('#ctExpandAssign').unbind('click');
                                 unloadMindmapData();
                                 mindmapServices.populateCycles($('.release-list').val()).then(function(result_cycles) {
+                                    if (result_cycles == "Invalid Session") {
+                                        $rootScope.redirectPage();
+                                    }                                    
                                     var result2 = result_cycles;
                                     $('.cycle-list').empty();
                                     $('.cycle-list').append("<option data-id='Select' value='Select' disabled selected>Select</option>");
+                                    $('.cycle-list').addClass('errorClass');
+                                    cycdata = {};
                                     for (i = 0; i < result2.c_ids.length && result2.cyc.length; i++) {
                                         $('.cycle-list').append("<option data-id='" + result2.cyc[i] + "' value='" + result2.c_ids[i] + "'>" + result2.cyc[i] + "</option>");
+                                        cycdata[result2.c_ids[i]] = result2.cyc[i];
                                     }
                                     //loadMindmapData1(param);
                                 }, function(error) {
@@ -195,6 +215,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                         versioning_enabled = 1;
                         mindmapServices.getVersions($(".project-list").val()).then(
                             function(res){
+                                if (res == "Invalid Session") {
+                                    $rootScope.redirectPage();
+                                }                                       
                                 addVersioning(res);
                             },function(err){
                                  console.log(err);
@@ -235,27 +258,48 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                         selectedProject = $(".project-list").val();
 
                     if($scope.tab=='tabAssign'){
+                        if ($("#ct-AssignBox").hasClass("ct-open") == true){
+                            $('.iconSpaceArrow').trigger('click');
+                        }
+                        $('#ctExpandAssign').unbind('click');
                         unloadMindmapData();
                         mindmapServices.populateReleases(selectedProject).then(function(result) {
+                            if (result == "Invalid Session") {
+                                $rootScope.redirectPage();
+                            }                                   
                             //releaseResult = result;
                             default_releaseid = '';
                             $('.release-list').empty();
                             $('.release-list').append("<option data-id='Select' value='Select' disabled selected>Select</option>");
+                            $('.release-list').addClass('errorClass');
                             $('.cycle-list').empty();
                             $('.cycle-list').append("<option data-id='Select' value='Select' disabled selected>Select</option>");
-
+                            $('.cycle-list').addClass('errorClass');
+                            reldata = {};
                             for (i = 0; i < result.r_ids.length && result.rel.length; i++) {
                                 $('.release-list').append("<option data-id='" + result.rel[i] + "' value='" + result.r_ids[i] + "'>" + result.rel[i] + "</option>");
-                            }
+                                reldata[result.r_ids[i]] = result.rel[i]
+                            }                            
                             default_releaseid = $('.release-list').val();
                             $('.release-list').change(function() {
+                                $('.release-list').removeClass('errorClass');
+                                $('.cycle-list').addClass('errorClass');
+                                if ($("#ct-AssignBox").hasClass("ct-open") == true){
+                                    $('.iconSpaceArrow').trigger('click');
+                                }
+                                $('#ctExpandAssign').unbind('click');                                
                                 unloadMindmapData();
                                 mindmapServices.populateCycles($('.release-list').val()).then(function(result_cycles) {
+                                    if (result_cycles == "Invalid Session") {
+                                        $rootScope.redirectPage();
+                                    }                                         
                                     var result2 = result_cycles;
                                     $('.cycle-list').empty();
                                     $('.cycle-list').append("<option data-id='Select' value='Select' disabled selected>Select</option>");
+                                    cycdata = {};
                                     for (i = 0; i < result2.c_ids.length && result2.cyc.length; i++) {
                                         $('.cycle-list').append("<option data-id='" + result2.cyc[i] + "' value='" + result2.c_ids[i] + "'>" + result2.cyc[i] + "</option>");
+                                        cycdata[result2.c_ids[i]] = result2.cyc[i];
                                     }
                                     //loadMindmapData1(param);
                                 }, function(error) {
@@ -292,6 +336,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                         if (param == 1) {
                             mindmapServices.getVersions($(".project-list").val()).then(
                             function(res){
+                                if (res == "Invalid Session") {
+                                    $rootScope.redirectPage();
+                                }                                     
                                 addVersioning(res);
                             },function(err){
                                  console.log(err);
@@ -378,6 +425,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         }
         mindmapServices.getModules(versioning_enabled,window.localStorage['tabMindMap'], $(".project-list").val(),  parseFloat(version_num),$('.release-list').val(),$('.cycle-list').val())
             .then(function(res) {
+                if (res == "Invalid Session") {
+                    $rootScope.redirectPage();
+                }                     
                 var nodeBox = d3.select('.ct-nodeBox');
                 $(nodeBox[0]).empty();
                 //allMMaps = JSON.parse(result);
@@ -957,7 +1007,6 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 }
 
                 replicateTask(pi);
-                if(!origTask) dNodes[pi].task.cx = undefined;
             }
         }
 
@@ -1000,7 +1049,17 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 		}
     };
 
-    function nodeClick(e) {                
+    function addInfo(d) {
+        attrArr = "<strong>Node Type:</strong> " + d.type;
+        for (var key in d.attributes) {
+            if(d.attributes[key])
+                attrArr += "<br><strong>" + key + ":</strong> " + d.attributes[key];
+        }
+        d3.select('#window-pi p.proj-info-wrap').html(attrArr);
+    };
+
+    function nodeClick(e) {
+        d3.select('#window-pi p.proj-info-wrap').empty();
         if (IncompleteFlowFlag) {
             openDialogMindmap('Error', 'Incomplete Flow!');
             return;
@@ -1017,6 +1076,16 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         var u, v, w, f, c = d3.select('#ct-assignBox');
         var p = d3.select(activeNode);
         var pi = parseInt(p.attr('id').split('-')[2]);
+
+        if((dNodes[pi].type == 'screens' || dNodes[pi].type == 'testcases') && dNodes[pi].taskexists){
+            addInfo({type:dNodes[pi].type,attributes:{'task':dNodes[pi].taskexists.task,'release':reldata[dNodes[pi].taskexists.release],'cycle':cycdata[dNodes[pi].taskexists.cycle]}});
+            if(!$("#right-dependencies-section").is(":visible")){
+                $("#ct-expand-right").trigger('click');
+            }
+            $('[title="Info"]').trigger('click');
+            return;
+        }
+
         var t = p.attr('data-nodetype');
         var flag = true;
         var apptype=$('.project-list option:selected').attr('app-type')
@@ -1108,6 +1177,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 //PAssing selected projectid to the service
                 mindmapServices.populateUsers($(".project-list").val())
                     .then(function(res) {
+                        if (res == "Invalid Session") {
+                            $rootScope.redirectPage();
+                        }                             
                         for (i = 0; i < res.userRoles.length && res.r_ids.length; i++) {
                             $('#ct-assignedTo').append("<option data-id='" + res.userRoles[i] + "' value='" + res.r_ids[i] + "'>" + res.userRoles[i] + "</option>");
                         }
@@ -1124,6 +1196,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 $('#ct-assignRevw').append("<option value='select reviewer' select=selected>" + "Select Reviewer" + "</option>");
                 mindmapServices.populateUsers($(".project-list").val())
                     .then(function(res) {
+                        if (res == "Invalid Session") {
+                            $rootScope.redirectPage();
+                        }                             
                         for (i = 0; i < res.userRoles.length && res.r_ids.length; i++) {
                             $('#ct-assignRevw').append("<option data-id='" + res.userRoles[i] + "' value='" + res.r_ids[i] + "'>" + res.userRoles[i] + "</option>");
                         }
@@ -1190,14 +1265,15 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             else if(tk == "cx"){
                 if(dNodes[pi].parent){
                     v.append('span').attr('class', 'ct-assignItem fl-left').html('Complexity');
-                    v.append('span').attr('id', 'ct-cxval').attr('nType',t).attr('idx',pi).text('Unassigned');
+                    v.append('span').attr('id', 'ct-cxval').attr('nType',t).attr('idx',pi).text('Not Set');
                     v.append('span').attr('id','ct-compbox');
                     $("#ct-compbox").append(`<i class="fa fa-list" aria-hidden="true"></i>`);   
                     $("#ct-compbox").css('color','#643693').css('margin-left','30px'); 
                     var HTMLcontent = getHTMLdropdown(t);
+                    $('#addObjContainer111').empty().append(HTMLcontent);
                     clist = tObj.cx;
                     if(!(clist=="undefined"||clist==undefined)) clist = clist.split(",");
-                    $('#addObjContainer111').empty().append(HTMLcontent);
+                    else cscore = 0;                    
                     populateComplexityValues(pi);
                     $('#ct-compbox').click(function(){
                         showComplexityBox(t);
@@ -1207,7 +1283,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                         $('#complexity-val').text('Complexity: '+getComplexityLevel(t,parseInt(clist[0])));
                     }
                     else{
-                        $('#complexity-val').text('Complexity: Unassigned');
+                        $('#complexity-val').text('Complexity: Not Set');
                     }
                     
                 }
@@ -1264,21 +1340,17 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
     function showComplexityBox(nType){
         //Calculate complexity and then show
-        $.each($(".addObj-row"), function(e) {
-            console.log($(this).find('.form-group-1').text());
-            console.log($(this).find("select option:selected").val());
-        });
         $('#dialog-compBox').modal("show");
+        cscore_tmp = cscore;
         $('.form-control.form-control-custom').change(function(){
-            cscore=0;
+            cscore_tmp=0;
             $.each($(".addObj-row"), function(e){
                 var cs=0,cw=0;
                 cw = cx_weightage[$(this).find('.form-group-1').text().trim()]!=undefined?cx_weightage[$(this).find('.form-group-1').text().trim()]:0;
                 cs = cx_scale[$(this).find("select option:selected").val().trim()]!=undefined?cx_scale[$(this).find("select option:selected").val().trim()]:0;
-                cscore = cscore+(cs*cw);
+                cscore_tmp = cscore_tmp+(cs*cw);
             });
-            console.log("score:",cscore);
-            $('#complexity-val').text('Complexity: '+getComplexityLevel(nType,cscore));
+            $('#complexity-val').text('Complexity: '+getComplexityLevel(nType,cscore_tmp));
         });
         //$('.modal-backdrop.in').remove();
     }
@@ -1286,7 +1358,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     $scope.submitComplexity = function(){
         var pi = $('#ct-cxval').attr('idx');
         var err = false;
-        if(cscore!=0) clist = [cscore];
+        clist_tmp = [cscore_tmp];
         $(".addObj-row").find("select").removeClass('selectErrorBorder');
 
         $.each($(".addObj-row"), function() {
@@ -1295,10 +1367,12 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 err = "true";
             } 
             else{
-                clist.push($(this).find("select option:selected").val().trim());
+                clist_tmp.push($(this).find("select option:selected").val().trim());
             }
         })
         if(!err){
+            cscore = cscore_tmp;
+            clist = clist_tmp;
             $('#dialog-compBox').modal("hide");
             $('#ct-cxval').text(getComplexityLevel($('#ct-cxval').attr('nType'),cscore));
         }
@@ -1409,9 +1483,14 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         $('#ct-assignCyc').append("<option value='select cycle' select=selected>" + "Select cycle" + "</option>");
         //'46974ffa-d02a-49d8-978d-7da3b2304255'
         mindmapServices.populateCycles($("#ct-assignRel").val()).then(function(result_cycles) {
+            if (result_cycles == "Invalid Session") {
+                $rootScope.redirectPage();
+            }                 
             var result2 = result_cycles;
+            cycdata = {};
             for (i = 0; i < result2.c_ids.length && result2.cyc.length; i++) {
                 $('#ct-assignCyc').append("<option data-id='" + result2.cyc[i] + "' value='" + result2.c_ids[i] + "'>" + result2.cyc[i] + "</option>");
+                cycdata[result2.c_ids[i]] = result2.cyc[i];
             }
             $("#ct-assignCyc option[value='" + result2.cyc[0] + "']").attr('selected', 'selected');
         }, function(error) {
@@ -1774,6 +1853,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     });
 
     $scope.createNodes = function(){
+        blockUI('Validating names..');
         var nodeNames = [];
         $('.errBorder').removeClass('errBorder');
         $('input.form-control-custom').each(function() {
@@ -1788,7 +1868,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 createNode({name:node});
             });
             $("#dialog-addObject").modal("hide");
+            openDialogMindmap("Success","Nodes created successfully!");
         }
+        unblockUI();
     }
 
     //------End of Create Multiple Child Node-------//
@@ -1813,7 +1895,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         if (isIE) split_char = ' ';
         var l = p.attr('transform').slice(10, -1).split(split_char);
         d3.select('#ct-ctrlBox').classed('no-disp', !0);
-        if (node==0 && dNodes[activeNode.id.split('-')[2]].task) {
+        if (activeNode && dNodes[activeNode.id.split('-')[2]].task) {
             var msg = 'Unassign the task to rename';
             if (t == 'screens') {
                 msg = 'Unassign the task to rename. And unassign the corresponding testcases tasks';
@@ -1956,6 +2038,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             };
         blockUI("Deleting testcase! Please wait..");    
         mindmapServices.checkReuse(dataReuse).then(function(result) {
+            if (result == "Invalid Session") {
+                $rootScope.redirectPage();
+            }                 
             result = result.toString().split(',');
             deletednode.push.apply(deletednode,result);
             unblockUI();
@@ -2174,6 +2259,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             };
             $('#renamingConfirmationPopup').attr('node',pi);  
             mindmapServices.checkReuse(dataReuse).then(function(result) {
+                if (result == "Invalid Session") {
+                    $rootScope.redirectPage();
+                }                     
                 result['screen'].forEach(function(e, i) { 
                     if(e.count>0){
                         $('#renamingConfirmationPopup').modal("show");
@@ -2346,6 +2434,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         }
        
         mindmapServices.checkReuse(restrict_scenario_reuse).then(function(result_reuse) {
+            if (result_reuse == "Invalid Session") {
+                $rootScope.redirectPage();
+            }                 
             var reuse=[];
              if (selectedTab!='tabAssign'){
                  result_reuse['scenarios'].forEach(function(e, i) {
@@ -2408,6 +2499,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
             mindmapServices.saveData(versioning_enabled,assignedTo, flag, window.localStorage['_SR'], from_v, to_v, cur_module, mapData, deletednode, unassignTask,
                 $('.project-list').val(), $('.release-list').val(), $('.cycle-list').val(),selectedTab).then(function(result) {
+                if (result == "Invalid Session") {
+                    $rootScope.redirectPage();
+                }                         
                 unblockUI();
                 if (flag == 10) {
                     var res = result;
@@ -2444,6 +2538,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     if ($('.version-list').length != 0)
                         from_v = to_v = $('.version-list').val()
                     mindmapServices.getModules(versioning_enabled,window.localStorage['tabMindMap'], $(".project-list").val(), parseFloat(from_v),$('.release-list').val(),$('.cycle-list').val()).then(function(result) {
+                        if (result == "Invalid Session") {
+                            $rootScope.redirectPage();
+                        }                             
                         var nodeBox = d3.select('.ct-nodeBox');
                         $(nodeBox[0]).empty();
                         allMMaps = result;
@@ -2779,6 +2876,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         var user_id = userInfo.user_id;
 
         mindmapServices.checkReuse(reusedata).then(function(result) {
+            if (result == "Invalid Session") {
+                $rootScope.redirectPage();
+            }                 
             result['screen'].forEach(function(e, i) {
                 dNodes[e.idx].reuse = e.reuse;
             })
@@ -2918,6 +3018,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         var user_id = userInfo.user_id;
         mindmapServices.getModules(versioning_enabled,window.localStorage['tabMindMap'], $(".project-list").val(),parseFloat(version_num),$('.release-list').val(),$('.cycle-list').val()).then(
             function(result){
+                if (result == "Invalid Session") {
+                    $rootScope.redirectPage();
+                }                     
                 result_details = result;
                 flag = 0;
                 for (var i = 0; i < result_details.length; i++) {
@@ -2957,9 +3060,15 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 if (flag) {
                     mindmapServices.getProjectTypeMM_Nineteen68($(".project-list").val()).then(
                         function(project_type){
+                            if (project_type == "Invalid Session") {
+                                $rootScope.redirectPage();
+                            }                                 
                              parsed_project_data = project_type;
                              mindmapServices.getCRId($(".project-list").val()).then(
                                  function(rel_cycle_data){
+                                    if (rel_cycle_data == "Invalid Session") {
+                                        $rootScope.redirectPage();
+                                    }                                          
                                        ci_parsed_details =rel_cycle_data;
                                     for (var i = 0; i < data.moduleInfo.length; i++) {
                                         data.moduleInfo[i].cycleId = ci_parsed_details.row.cycleid;
@@ -3160,6 +3269,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
         d3.select('#ct-assignBox').classed('no-disp', !0);
         mindmapServices.getModules(versioning_enabled,'endToend', $("#selectProjectEtem").val(),$('.release-list').val(),$('.cycle-list').val()).then(function(result) {
+            if (result == "Invalid Session") {
+                $rootScope.redirectPage();
+            }                 
             var nodeBox = d3.select('#etemModuleContainer');
             $(nodeBox[0]).empty();
             allMMaps_W = allMaps_info = result;
@@ -3341,6 +3453,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             return;
         }
         mindmapServices.populateScenarios(moduleid).then(function(result) {
+            if (result == "Invalid Session") {
+                $rootScope.redirectPage();
+            }                 
             container.empty();
             result.forEach(function(row) {
                 container.append("<span class='eteScenrios' data-scenarioId='" + row.testScenarioID_c + "' title='" + row.testScenarioName + "'>" + row.testScenarioName + "</span>")
@@ -3913,6 +4028,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         
 
         mindmapServices.saveEndtoEndData(username, flag, window.localStorage['_SR'], from_v, to_v, 'endToend', mapData, deletednode, unassignTask, selectedProject, $('#ct-assignRel').val(), $('#ct-assignCyc').val()).then(function(result) {
+            if (result == "Invalid Session") {
+                $rootScope.redirectPage();
+            }     
             unblockUI();
             var res = result;
             if (flag == 10) {
@@ -3947,6 +4065,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 //alert(window.localStorage['tabMindMap']);
                 mindmapServices.getModules(versioning_enabled,'endToend', $("#selectProjectEtem").val(),'',$('.release-list').val(),$('.cycle-list').val())
                     .then(function(result) {
+                        if (result == "Invalid Session") {
+                            $rootScope.redirectPage();
+                        }     
                         var nodeBox = d3.select('#etemModuleContainer');
                         $(nodeBox[0]).empty();
                         allMMaps_W = allMaps_info = result;
@@ -4161,8 +4282,14 @@ function replicationHandler() {
   var user_id = userInfo.user_id;
   blockUI('Loading....')
   mindmapServices.populateProjects().then(function(result) {
+      if (result == "Invalid Session") {
+          $rootScope.redirectPage();
+      }           
       var project_type=$('.project-list').find(':selected').attr('app-type')
       mindmapServices.getProjectsNeo().then(function(res){
+        if (res == "Invalid Session") {
+            $rootScope.redirectPage();
+        }               
           var parse_data = res;
           var flag=0;
           $('.versioningOption').remove()
@@ -4238,6 +4365,9 @@ function replicate_project(from_v, to_v, pid) {
   blockUI('Loading....')
     mindmapServices.createVersion('project_replicate',window.localStorage['_SR'], $(".project-list").val(),pid, from_v,  to_v,10 ).then(
       function(res){
+        if (res == "Invalid Session") {
+            $rootScope.redirectPage();
+        }               
         //$('.version-list').val(to_v);
        unblockUI();
        openDialogMindmap('Mindmap', "Project Replicated Successfully.")
@@ -4343,6 +4473,9 @@ function loadModules() {
   blockUI('Loading...');
   mindmapServices.getModules(versioning_enabled,window.localStorage['tabMindMap'],$(".project-list").val(),parseFloat(active_version),$('.release-list').val(),$('.cycle-list').val()).then(
       function(res){
+            if (res == "Invalid Session") {
+                $rootScope.redirectPage();
+            }               
             var nodeBox = d3.select('.ct-nodeBox');
             $(nodeBox[0]).empty();
             allMMaps = res;
@@ -4384,6 +4517,9 @@ function createNewTab(from_v, to_v) {
   blockUI('Loading...');
   mindmapServices.createVersion('',window.localStorage['_SR'],  $(".project-list").val(),'', from_v, to_v, 10 ).then(
       function(res){
+        if (res == "Invalid Session") {
+            $rootScope.redirectPage();
+        }               
         $('.version-list').val(to_v);
        unblockUI();
        loadModules();
@@ -4436,6 +4572,9 @@ $('#createNewVersionButton').click(function(e){
 function versionInputDialogShow() {
   mindmapServices.getVersions($(".project-list").val()).then(
     function(res){
+      if (res == "Invalid Session") {
+          $rootScope.redirectPage();
+      }             
       maxVersionNumber=res[res.length-1];
 	  $('#versionNumInputPopUp').modal("show");
         $('#versionNumberInput').val((parseFloat(maxVersionNumber) + 0.1).toFixed(1));
@@ -4460,6 +4599,9 @@ function createNewVersion(from_v) {
   inputVersion = parseFloat($('#versionNumberInput').val());
   mindmapServices.getVersions($(".project-list").val()).then(
     function(result){
+        if (result == "Invalid Session") {
+            $rootScope.redirectPage();
+        }             
         maxVersionNumber=result[result.length-1];
         if(inputVersion>parseFloat(maxVersionNumber)){
             createNewTab(from_v, inputVersion);
@@ -4612,6 +4754,9 @@ function getSelectionStart(o) {
     // Changes made for End to end module implementation
     $scope.createMapsCall = function(e) {
         mindmapServices.getProjectsNeo().then(function(res){
+            if (res == "Invalid Session") {
+                $rootScope.redirectPage();
+            }                 
             versioningEnabled = true;
             load_tab();
 
@@ -5207,6 +5352,9 @@ function getSelectionStart(o) {
         var validate = true;
         $scope.content = $fileContent;
         mindmapServices.excelToMindmap($scope.content).then(function(result) {
+            if (result == "Invalid Session") {
+                $rootScope.redirectPage();
+            }                 
             $scope.dataJSON = result;
             $scope.dataJSON.forEach(function(e,i){
                 if(!validNodeDetails(e.name)) validate = false;
