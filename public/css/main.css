@@ -1469,7 +1469,7 @@ input[disabled]{
     border: 1px solid #656565 !important;
 }
 
-.>li>input {
+.dropdown-menu-multiselect>li>input {
     display: block;
     padding: 3px 20px;
     clear: both;
