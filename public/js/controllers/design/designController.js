@@ -1888,12 +1888,14 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
             {
                 $("#deleteObjects,#saveObjects").prop("disabled", false);
                 $(".checkStylebox").prop("checked", false);
+                return;
             }
             else{
                 $("#deleteObjects,.checkStylebox").prop("disabled", true);
                 $(".checkStylebox").prop("checked", false);
                 $(".popupContent-filter-active").trigger('click');
-                $("#saveObjects").prop("disabled", false);
+                $("#saveObjects").prop("disabled", true);
+                return;
             }
       }
       else{
