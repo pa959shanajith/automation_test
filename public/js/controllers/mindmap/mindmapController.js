@@ -7,6 +7,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     var deletednode = [], unassignTask = [],
         deletednode_info = [];
     var versioning_enabled = 0;
+    var idxSearch = 0;
     // node_names_tc keep track of testcase names to decide reusability of testcases
     var node_names_tc = [];
     var sections = {
@@ -35,6 +36,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     var cycdata = {};
     //Workflow//
 
+    var dragsearch = false;
 // Complexity
         var cx_weightage = {   //scale , weightage
             'Application Type':3,
@@ -359,6 +361,69 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             })
     }
 
+    function addSearchNodeListeners(){
+        var reg=/[^a-zA-Z0-9\_]+/;
+        $('.searchimg-canvas').click(function(e){
+            if(!dragsearch){
+                if($('.search-canvas').hasClass('search-visible')){
+                    $('.search-canvas').removeClass('search-visible');
+                    $('.search-canvas').val('');
+                    $('.searched-node').removeClass('searched-node');
+                }
+                else{
+                    $('.search-canvas').addClass('search-visible');
+                }    
+            }
+            else dragsearch = false;
+        });
+        $('#search-canvas-icon').draggable({ containment: "#ct-mapSvg",    
+                                            start: function(e, ui){dragsearch = true}
+        });         
+        $('.search-canvas').keyup(function(e){
+            if(reg.test($('.search-canvas').val())){
+                $('.search-canvas').addClass('inputErrorBorderFull');
+                $('.searched-node').removeClass('searched-node');
+            }
+            else{
+                $('.searched-node').removeClass('searched-node');
+                if($('#ct-mindMap').length>0){
+                    $('.search-canvas').removeClass('inputErrorBorderFull');
+                    var mptf = $('#ct-mindMap').attr('transform');
+                    var elem = $('text[title*="'+$('.search-canvas').val()+'" i]');
+                    if(elem.length == 0){
+                        if(!$('.search-canvas').val() == '')
+                            $('.search-canvas').addClass('inputErrorBorderFull');
+                        return;
+                    }
+                    if(e.keyCode == 13){
+                        idxSearch = (idxSearch + 1) % elem.length;
+                    }
+                    else{
+                        idxSearch = 0;
+                    }
+                    var nodetf = $(elem.parent()[idxSearch]).attr('transform');
+                    var x_mptf = parseInt(mptf.split(/[()]/)[1].split(',')[0]);
+                    var y_mptf = parseInt(mptf.split(/[()]/)[1].split(',')[1]);
+                    var scale_mptf = parseInt(mptf.split(/[()]/)[3]);
+                    var x_nodetf = parseInt(nodetf.split(/[()]/)[1].split(',')[0]);
+                    var y_nodetf = parseInt(nodetf.split(/[()]/)[1].split(',')[1]);
+                    //Approx cordinates of node: mindmap translate + nodetf/mpscale
+                    var ccord = [x_mptf+(x_nodetf/scale_mptf),y_mptf+(y_nodetf/scale_mptf)];
+                    if ($scope.tab == 'mindmapEndtoEndModules') zoom = zoom_W;
+                    zoom.translate([x_mptf-ccord[0]+400,y_mptf-ccord[1]+300]);
+                    zoom.scale(scale_mptf);
+                    zoom.event(d3.select('#ct-mindMap'));
+                    $(elem.parent()[idxSearch]).addClass('searched-node');                 
+                }
+                else{
+                    return;
+                }
+                return;                
+            }
+
+        });        
+    }
+
     function loadMindmapData1(param) {
         blockUI("Loading...");
         var selectedTab = window.localStorage['tabMindMap'];
@@ -417,6 +482,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                                     </div>
                                 </div>
                             `);
+        
+
         d3.select('#ct-assignBox').classed('no-disp', !0);
         var version_num = '';
 
@@ -470,8 +537,15 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         var t, u;
         var selectedTab = window.localStorage['tabMindMap'];
         if (d3.select('#ct-mindMap')[0][0] != null) return;
-        if (selectedTab == "tabAssign") var canvas = d3.select('#ct-canvasforAssign');
-        else var canvas = d3.select('#ct-canvas');
+        if (selectedTab == "tabAssign"){
+            var canvas = d3.select('#ct-canvasforAssign');
+            $('#ct-canvasforAssign').append('<div id = "search-canvas-icon"><img alt="Search Icon" class="searchimg-canvas" src="imgs/ic-search-icon.png"><input type="text" class="search-canvas" placeholder="Search Node.."></div>');
+        }
+        else{
+            var canvas = d3.select('#ct-canvas');
+            $('#ct-canvas').append('<div id = "search-canvas-icon"><img alt="Search Icon" class="searchimg-canvas" src="imgs/ic-search-icon.png"><input type="text" class="search-canvas" placeholder="Search Node.."></div>');
+        } 
+        addSearchNodeListeners();
         canvas.empty();
         u = canvas.append('div').attr('id', 'ct-inpBox').classed('no-disp', !0);
         u.append('input').attr('id', 'ct-inpPredict').attr('class', 'ct-inp');
@@ -3307,8 +3381,17 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         var t, u;
         var selectedTab = window.localStorage['tabMindMap'];
         if (d3.select('#ct-mindMap')[0][0] != null) return;
-        if (selectedTab == "tabAssign") var canvas = d3.select('#ct-canvasforAssign');
-        else var canvas = d3.select('#ct-canvas');
+
+        if (selectedTab == "tabAssign"){
+            var canvas = d3.select('#ct-canvasforAssign');
+            $('#ct-canvasforAssign').append('<div id = "search-canvas-icon"><img alt="Search Icon" class="searchimg-canvas" src="imgs/ic-search-icon.png"><input type="text" class="search-canvas" placeholder="Search Node.."></div>');
+        }
+        else{
+            var canvas = d3.select('#ct-canvas');
+            $('#ct-canvas').append('<div id = "search-canvas-icon"><img alt="Search Icon" class="searchimg-canvas" src="imgs/ic-search-icon.png"><input type="text" class="search-canvas" placeholder="Search Node.."></div>');
+        } 
+        addSearchNodeListeners();
+
         u = canvas.append('div').attr('id', 'ct-inpBox').classed('no-disp', !0);
         u.append('input').attr('id', 'ct-inpPredict').attr('class', 'ct-inp');
         u.append('input').attr('id', 'ct-inpAct').attr('maxlength', '255').attr('class', 'ct-inp').on('change', inpChange_W).on('keyup', inpKeyUp_W);
@@ -3349,7 +3432,6 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             t.append('text').attr('x', 114).attr('y', 18).text('Create');
 
         }
-
 
     };
 
@@ -4185,6 +4267,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         d3.select('#ct-ctrlBox').classed('no-disp', !0);
         d3.select('#ct-assignBox').classed('no-disp', !0);
         d3.select('#ct-mapSvg').append('g').attr('id', 'ct-mindMap');
+
         uNix_W = 0;
         uLix_W = 0;
         dNodes_W = [];
@@ -5242,7 +5325,11 @@ function getSelectionStart(o) {
                 //console.log("current transform: ",d3.select("#ct-mindMap").attr("transform"));
                 x_l = -xmin_v*scale-l*$('#ct-mindMap').width()/$('#minimap').width();
                 y_l = -ymin_v*scale-t*$('#ct-mindMap').height()/$('#minimap').height();
-                d3.select('#ct-mindMap').attr('transform','translate('+x_l+','+y_l+')scale('+scale+')');
+                //d3.select('#ct-mindMap').attr('transform','translate('+x_l+','+y_l+')scale('+scale+')');
+                
+                zoom.translate([x_l,y_l]);
+                zoom.scale(scale);
+                zoom.event(d3.select('#ct-mindMap'));                
                 //console.log("updated transform: ",d3.select("#ct-mindMap").attr("transform"));
 
             }

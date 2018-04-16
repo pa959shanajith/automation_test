@@ -329,6 +329,7 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 		var counter = 1;
 		var taskTypeIcon = "";
 		for(i=0; i<tasksJson.length; i++){
+			var classIndex = i<100 ? "tasks-l-s": i<1000? "tasks-l-m" : "tasks-l-l";
 			//console.log("taskJson", tasksJson[i]);
 			for(j=0; j<tasksJson[i].taskDetails.length; j++){
 				//console.log("TASKJSONDETAILS",tasksJson[i].taskDetails);
