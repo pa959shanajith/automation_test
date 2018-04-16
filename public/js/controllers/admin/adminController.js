@@ -2112,35 +2112,35 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 				switch (selProjectRes.appType) {
 				case "Web":
 					$("div.projectTypeSelected").removeClass("projectTypeSelected");
-					$(".projectTypes[data-app='Web']").addClass("projectTypeSelected");
+					$(".projectTypes[data-app='Web'],.projectTypes_create[data-app='Web']").addClass("projectTypeSelected");
 					break;
 				case "Webservice":
 					$("div.projectTypeSelected").removeClass("projectTypeSelected");
-					$(".projectTypes[data-app='Webservice']").addClass("projectTypeSelected");
+					$(".projectTypes[data-app='Webservice'],.projectTypes_create[data-app='Webservice']").addClass("projectTypeSelected");
 					break;
 				case "Mainframe":
 					$("div.projectTypeSelected").removeClass("projectTypeSelected");
-					$(".projectTypes[data-app='Mainframe']").addClass("projectTypeSelected");
+					$(".projectTypes[data-app='Mainframe'],.projectTypes_create[data-app='Mainframe']").addClass("projectTypeSelected");
 					break;
 				case "Desktop":
 					$("div.projectTypeSelected").removeClass("projectTypeSelected");
-					$(".projectTypes[data-app='Desktop']").addClass("projectTypeSelected");
+					$(".projectTypes[data-app='Desktop'],.projectTypes_create[data-app='Desktop']").addClass("projectTypeSelected");
 					break;
 				case "DesktopJava":
 					$("div.projectTypeSelected").removeClass("projectTypeSelected");
-					$(".projectTypes[data-app='DesktopJava']").addClass("projectTypeSelected");
+					$(".projectTypes[data-app='DesktopJava'],.projectTypes_create[data-app='DesktopJava']").addClass("projectTypeSelected");
 					break;
 				case "MobileApp":
 					$("div.projectTypeSelected").removeClass("projectTypeSelected");
-					$(".projectTypes[data-app='MobileApp']").addClass("projectTypeSelected");
+					$(".projectTypes[data-app='MobileApp'],.projectTypes_create[data-app='MobileApp']").addClass("projectTypeSelected");
 					break;
 				case "MobileWeb":
 					$("div.projectTypeSelected").removeClass("projectTypeSelected");
-					$(".projectTypes[data-app='MobileWeb']").addClass("projectTypeSelected");
+					$(".projectTypes[data-app='MobileWeb'],.projectTypes_create[data-app='MobileWeb']").addClass("projectTypeSelected");
 					break;
 				case "SAP":
 					$("div.projectTypeSelected").removeClass("projectTypeSelected");
-					$(".projectTypes[data-app='SAP']").addClass("projectTypeSelected");
+					$(".projectTypes[data-app='SAP'],.projectTypes_create[data-app='SAP']").addClass("projectTypeSelected");
 					break;
 				default:
 				}
