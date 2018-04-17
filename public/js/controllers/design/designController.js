@@ -4267,7 +4267,7 @@ function contentTable(newTestScriptDataLS) {
             var rowId = row.attr('id');
             $("select#" + rowId + "_keywordVal", row[0]).html(res);
             selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
-            $grid.jqGrid('setCell', rowId, 'appType', "Generic");
+            $grid.jqGrid('setCell', rowId, 'appType', "System");
             $grid.jqGrid('setCell', rowId, 'url', url);
             $grid.jqGrid('setCell', rowId, 'objectName', objName);
         }
@@ -5845,7 +5845,7 @@ function getTags(data) {
     var obnames = [];
     var appTypeLocal = JSON.parse(window.localStorage['_CT']).appType;
     if (appTypeLocal == "Web") {
-        obnames = ["@Generic","@Excel","@Custom","@Browser","@BrowserPopUp","@System"];
+        obnames = ["@Generic","@Excel","@Custom","@Browser","@BrowserPopUp"];
     } else if (appTypeLocal == "Webservice") {
         obnames = ["@Generic","@Excel","WebService List"];
     } else if (appTypeLocal == "Mainframe") {
@@ -5862,6 +5862,9 @@ function getTags(data) {
         obnames = ["@Generic", "@MobileiOS"]
     } else if (appTypeLocal == "SAP") {
         obnames = ["@Generic", "@Sap", "@Custom"]
+    }
+    else if(appTypeLocal="System"){
+        obnames=["@Generic","@System"];
     }
     for (var i = 0; i < data.length; i++) {
         obnames.push(data[i].custname);

@@ -84,7 +84,8 @@ var projectTypes = {
 	'b2a208a5-8c9d-4a7f-b522-0df14993dbd2': 'MobileWeb',
 	'07181740-f420-4ea1-bf2b-5219d6535fb5': 'Generic',
 	'258afbfd-088c-445f-b270-5014e61ba4e2': 'Mainframe',
-	'1fd77879-4dbb-416a-a46d-126d27fee2c7': 'SAP'
+	'1fd77879-4dbb-416a-a46d-126d27fee2c7': 'SAP',
+	'7a6820f1-2817-4d57-adaf-53734dd2354b':'System'
 };
 
 var screen_tasks=['scrape','append','compare','add','map'];

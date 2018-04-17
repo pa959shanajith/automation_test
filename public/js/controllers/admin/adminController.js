@@ -395,7 +395,8 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 					"oebs":{"data":"DesktopJava","title":"Oracle Apps","img":"oracleApps"},
 					"mobileapp":{"data":"MobileApp","title":"Mobile Apps","img":"mobileApps"},
 					"mobileweb":{"data":"MobileWeb","title":"Mobile Web","img":"mobileWeb"},
-					"sap":{"data":"SAP","title":"SAP Apps","img":"sapApps"}
+					"sap":{"data":"SAP","title":"SAP Apps","img":"sapApps"},
+					"system":{"data":"System","title":"System Apps","img":"desktop"}
 				};
 				$(".appTypesContainer").empty();
 				for(var i = 0; i < plugins.length; i++){
@@ -1970,7 +1971,8 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 					"oebs":{"data":"DesktopJava","title":"Oracle Apps","img":"oracleApps"},
 					"mobileapp":{"data":"MobileApp","title":"Mobile Apps","img":"mobileApps"},
 					"mobileweb":{"data":"MobileWeb","title":"Mobile Web","img":"mobileWeb"},
-					"sap":{"data":"SAP","title":"SAP Apps","img":"sapApps"}
+					"sap":{"data":"SAP","title":"SAP Apps","img":"sapApps"},
+					"system":{"data":"System","title":"System Apps","img":"desktop"}
 				};
 				$(".appTypesContainer").empty();
 				for(var i = 0; i < plugins.length; i++){
