@@ -1926,9 +1926,8 @@ exports.assignProjects_ICE = function (req, res) {
 							assignProjectsDetails.deletetasksofprojects.forEach(function(e,i){
 								qList.push({"statement":"match p = (m{projectID:'"+e.projectid+"'})-[FNTT]-(t:TASKS{assignedTo:'"+assignProjectsDetails.userId+"'}) where t.status = 'assigned' or t.status = 'inprogress' or t.status = 'reassign' detach delete t;"});
 								qList.push({"statement":"match p = (m{projectID:'"+e.projectid+"'})-[FNTT]-(t:TASKS{reviewer:'"+assignProjectsDetails.userId+"'}) where t.status = 'review' detach delete t;"});
-								qList.push({"statement":"match p = (m{projectID:'"+e.projectid+"'})-[FNTT]-(t:TASKS{assignedTo:'"+assignProjectsDetails.userId+"'}) set n.assignedTo = '' "});
-								qList.push({"statement":"match p = (m{projectID:'"+e.projectid+"'})-[FNTT]-(t:TASKS{reviewer:'"+assignProjectsDetails.userId+"'}) set n.reviewer = '' "});
-
+								qList.push({"statement":"match p = (m{projectID:'"+e.projectid+"'})-[FNTT]-(t:TASKS{assignedTo:'"+assignProjectsDetails.userId+"'}) set m.assignedTo = '' "});
+								qList.push({"statement":"match p = (m{projectID:'"+e.projectid+"'})-[FNTT]-(t:TASKS{reviewer:'"+assignProjectsDetails.userId+"'}) set m.reviewer = '' "});
 							})
 						}
 
