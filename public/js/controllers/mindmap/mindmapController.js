@@ -636,6 +636,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         //To fix issue 710-Create a module and see that module name does not display in edit mode
         v = addNode(dNodes[uNix - 1], !1, null);
         childNode = v;
+        activeNode = undefined;
         if(!moduleName) editNode(node);
     };
 
