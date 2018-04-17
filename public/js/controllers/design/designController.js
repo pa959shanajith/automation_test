@@ -2106,7 +2106,6 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
         if($(".ellipsis").length == 0)
         {
            $(".checkStylebox").prop('disabled', true);
-           $("#saveObjects").prop("disabled", true);
         }
     }
 
