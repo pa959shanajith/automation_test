@@ -1153,7 +1153,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         var pi = parseInt(p.attr('id').split('-')[2]);
 
         if((dNodes[pi].type == 'screens' || dNodes[pi].type == 'testcases') && dNodes[pi].taskexists){
-            addInfo({type:dNodes[pi].type,attributes:{'task':dNodes[pi].taskexists.task,'release':reldata[dNodes[pi].taskexists.release],'cycle':cycdata[dNodes[pi].taskexists.cycle]}});
+            addInfo({type:dNodes[pi].type,attributes:{'Task':dNodes[pi].taskexists.task,'Release':reldata[dNodes[pi].taskexists.release],'Cycle':cycdata[dNodes[pi].taskexists.cycle]}});
             if(!$("#right-dependencies-section").is(":visible")){
                 $("#ct-expand-right").trigger('click');
             }
