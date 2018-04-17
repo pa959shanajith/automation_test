@@ -379,6 +379,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         $('#search-canvas-icon').draggable({ containment: "#ct-mapSvg",    
                                             start: function(e, ui){dragsearch = true}
         });         
+        $( ".search-canvas" ).off( "keyup");
         $('.search-canvas').keyup(function(e){
             if(reg.test($('.search-canvas').val())){
                 $('.search-canvas').addClass('inputErrorBorderFull');
@@ -671,7 +672,6 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             IncompleteFlowFlag = true;
         }
         $("#minimap").minimap( $('#ct-mapSvg') );
-        reuseDict = getReuseDetails();
         //console.log('Reusedict:', reuseDict);        
     }
 
@@ -2906,7 +2906,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             return dataReuse;
         }
     
-    function treeBuilder(tree) {
+    function treeBuilder(tree) {        // Async
         node_names_tc = [];
         var pidx = 0,
             levelCount = [1],
@@ -2933,12 +2933,11 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         var d3Tree = d3.layout.tree().size([newHeight * 1.5, cSize[0]]);
         // if(tree.oid===undefined) d3Tree.sort(function(a,b){return a.childIndex-b.childIndex;});
         // else d3Tree.sort(function(a,b){return a.childIndex-b.childIndex;});
-        if (tree.childIndex === undefined) d3Tree.sort(function(a, b) {
+        
+        d3Tree.sort(function(a, b) {
             return a.childIndex - b.childIndex;
         });
-        else d3Tree.sort(function(a, b) {
-            return a.childIndex - b.childIndex;
-        });
+
         dNodes = d3Tree.nodes(tree);
         //dLinks=d3Tree.links(dNodes);
 
@@ -2996,6 +2995,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             //zoom.translate([(cSize[0]/2),(cSize[1]/2)]);
             zoom.event(d3.select('#ct-mapSvg'));
             progressFlag = false;
+
+            reuseDict = getReuseDetails();
+
         }, function(error) {
             progressFlag = false;
             console.log("Error: checkReuse service")
@@ -4319,6 +4321,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         else d3Tree.sort(function(a, b) {
             return a.childIndex - b.childIndex;
         });
+        // dNodes.sort(function(a, b) {
+        //     return a.childIndex - b.childIndex;
+        // });        
         dNodes_W = d3Tree.nodes(tree);
         //dLinks_W=d3Tree.links(dNodes_W);
         dNodes_W.forEach(function(d) {
