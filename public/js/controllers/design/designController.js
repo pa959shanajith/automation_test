@@ -1888,12 +1888,14 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
             {
                 $("#deleteObjects,#saveObjects").prop("disabled", false);
                 $(".checkStylebox").prop("checked", false);
+                return;
             }
             else{
                 $("#deleteObjects,.checkStylebox").prop("disabled", true);
                 $(".checkStylebox").prop("checked", false);
                 $(".popupContent-filter-active").trigger('click');
-                $("#saveObjects").prop("disabled", false);
+                $("#saveObjects").prop("disabled", true);
+                return;
             }
       }
       else{
@@ -3828,7 +3830,8 @@ function contentTable(newTestScriptDataLS) {
                 for (i = 0; i < gridArrayData.length; i++) {
                     if (gridArrayData[i].outputVal.indexOf('##') !== -1 || gridArrayData[i].outputVal.indexOf(';##') !== -1) {
                         $(this).find('tr.jqgrow')[i].style.borderLeft = "5px solid red";
-                        $(this).find('tr.jqgrow')[i].childNodes[0].style.marginLeft = "-4px"
+                        $(this).find('tr.jqgrow')[i].childNodes[0].style.paddingRight = "7px"
+                        $(this).find('tr.jqgrow')[i].childNodes[1].childNodes[0].style.marginLeft = "-4px";
                         $(this).find('tr.jqgrow')[i].childNodes[7].style.color = "red";
                     } else {
                         //$(this).find('tr.jqgrow')[i].style.borderLeft = "5px solid transparent";

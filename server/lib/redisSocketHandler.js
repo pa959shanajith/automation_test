@@ -1,12 +1,12 @@
 var redis = require("redis");
 var logger = require("../../logger");
 var redisConfig = {"host": process.env.REDIS_IP, "port": parseInt(process.env.REDIS_PORT),"password" : process.env.REDIS_AUTH};
-var ice_sub = redis.createClient(redisConfig);
-var ice_pub = redis.createClient(redisConfig);
+var default_sub = redis.createClient(redisConfig);
+var default_pub = redis.createClient(redisConfig);
 var server_sub = redis.createClient(redisConfig);
 var server_pub = redis.createClient(redisConfig);
 
-ice_sub.on("message", function (channel, message) {
+default_sub.on("message", function (channel, message) {
 	logger.debug("In redisSocketHandler: Channel is %s", channel);
 	var data = JSON.parse(message);
 	var socketchannel = channel.split('_')[1];
@@ -88,13 +88,13 @@ function redisErrorHandler(err) {
 	/* Error Handler function */
 }
 
-ice_sub.on("error",redisErrorHandler);
-ice_pub.on("error",redisErrorHandler);
+default_sub.on("error",redisErrorHandler);
+default_pub.on("error",redisErrorHandler);
 server_sub.on("error",redisErrorHandler);
 server_pub.on("error",redisErrorHandler);
 
-module.exports.redisSubICE = ice_sub;
-module.exports.redisPubICE = ice_pub;
+module.exports.redisSubClient = default_sub;
+module.exports.redisPubICE = default_pub;
 module.exports.redisSubServer = server_sub;
 module.exports.redisPubServer = server_pub;
 
