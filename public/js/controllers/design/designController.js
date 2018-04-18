@@ -1888,14 +1888,12 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
             {
                 $("#deleteObjects,#saveObjects").prop("disabled", false);
                 $(".checkStylebox").prop("checked", false);
-                return;
             }
             else{
                 $("#deleteObjects,.checkStylebox").prop("disabled", true);
                 $(".checkStylebox").prop("checked", false);
                 $(".popupContent-filter-active").trigger('click');
-                $("#saveObjects").prop("disabled", true);
-                return;
+                $("#saveObjects").prop("disabled", false);
             }
       }
       else{
@@ -4254,7 +4252,27 @@ function contentTable(newTestScriptDataLS) {
                 $grid.jqGrid('setCell', rowId, 'url', url);
                 $grid.jqGrid('setCell', rowId, 'objectName', objName);
             }
-        } else if (selectedText == "@Browser") {
+        }
+        else if(selectedText=="@System"){
+            var sc = Object.keys(keywordArrayList.system);
+            selectedKeywordList = "getOsInfo";
+            objName = " ";
+            url=" ";
+            for (var i = 0; i < sc.length; i++) {
+                if (selectedKeyword == sc[i]) {
+                    res += '<option role="option" value="' + sc[i] + '" selected>' + sc[i] + '</option>';
+                } else
+                    res += '<option role="option" value="' + sc[i] + '">' + sc[i] + '</option>';
+            }
+            var row = $(e.target).closest('tr.jqgrow');
+            var rowId = row.attr('id');
+            $("select#" + rowId + "_keywordVal", row[0]).html(res);
+            selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
+            $grid.jqGrid('setCell', rowId, 'appType', "System");
+            $grid.jqGrid('setCell', rowId, 'url', url);
+            $grid.jqGrid('setCell', rowId, 'objectName', objName);
+        }
+        else if (selectedText == "@Browser") {
             objName = " ";
             url = " ";
             var sc = Object.keys(keywordArrayList.browser);
@@ -4566,6 +4584,7 @@ function contentTable(newTestScriptDataLS) {
             selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
             $grid.jqGrid('setCell', rowId, 'appType', 'Generic');
         } else {
+
             selectedText = replaceHtmlEntites(selectedText.trim());
             for (var i = 0; i < scrappedData.length; i++) {
                 var ob = scrappedData[i];
@@ -5844,6 +5863,9 @@ function getTags(data) {
         obnames = ["@Generic", "@MobileiOS"]
     } else if (appTypeLocal == "SAP") {
         obnames = ["@Generic", "@Sap", "@Custom"]
+    }
+    else if(appTypeLocal="System"){
+        obnames=["@Generic","@System"];
     }
     for (var i = 0; i < data.length; i++) {
         obnames.push(data[i].custname);

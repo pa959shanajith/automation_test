@@ -379,6 +379,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         $('#search-canvas-icon').draggable({ containment: "#ct-mapSvg",    
                                             start: function(e, ui){dragsearch = true}
         });         
+        $( ".search-canvas" ).off( "keyup");
         $('.search-canvas').keyup(function(e){
             if(reg.test($('.search-canvas').val())){
                 $('.search-canvas').addClass('inputErrorBorderFull');
@@ -635,6 +636,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         //To fix issue 710-Create a module and see that module name does not display in edit mode
         v = addNode(dNodes[uNix - 1], !1, null);
         childNode = v;
+        activeNode = undefined;
         if(!moduleName) editNode(node);
     };
 
@@ -671,7 +673,6 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             IncompleteFlowFlag = true;
         }
         $("#minimap").minimap( $('#ct-mapSvg') );
-        reuseDict = getReuseDetails();
         //console.log('Reusedict:', reuseDict);        
     }
 
@@ -973,7 +974,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     addTask_11(tSc.id,tObj,1);
                     if (tSc.children != undefined ) {
                         tSc.children.forEach(function(scr) {
-                            if(apptype!="258afbfd-088c-445f-b270-5014e61ba4e2") addTask_11(scr.id,tObj,2);
+                            if(apptype!="258afbfd-088c-445f-b270-5014e61ba4e2" && apptype!="7a6820f1-2817-4d57-adaf-53734dd2354b") addTask_11(scr.id,tObj,2);
                             scr.children.forEach(function(tCa) {
                                 addTask_11(tCa.id,tObj,3);
                             });
@@ -989,7 +990,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 if (tscid != 'null') {
                     addTask_11(dNodes[pi].id,tObj,4);
                     if (dNodes[pi].children && $('.pg-checkbox')[0].checked) dNodes[pi].children.forEach(function(scr) {
-                        if(apptype!="258afbfd-088c-445f-b270-5014e61ba4e2") addTask_11(scr.id,tObj,5);
+                        if(apptype!="258afbfd-088c-445f-b270-5014e61ba4e2" && apptype!="7a6820f1-2817-4d57-adaf-53734dd2354b") addTask_11(scr.id,tObj,5);
                         scr.children.forEach(function(tCa) {
                             addTask_11(tCa.id,tObj,6);
                         });
@@ -1152,7 +1153,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         var pi = parseInt(p.attr('id').split('-')[2]);
 
         if((dNodes[pi].type == 'screens' || dNodes[pi].type == 'testcases') && dNodes[pi].taskexists){
-            addInfo({type:dNodes[pi].type,attributes:{'task':dNodes[pi].taskexists.task,'release':reldata[dNodes[pi].taskexists.release],'cycle':cycdata[dNodes[pi].taskexists.cycle]}});
+            addInfo({type:dNodes[pi].type,attributes:{'Task':dNodes[pi].taskexists.task,'Release':reldata[dNodes[pi].taskexists.release],'Cycle':cycdata[dNodes[pi].taskexists.cycle]}});
             if(!$("#right-dependencies-section").is(":visible")){
                 $("#ct-expand-right").trigger('click');
             }
@@ -1165,8 +1166,11 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         var apptype=$('.project-list option:selected').attr('app-type')
         if (t == 'scenarios' && dNodes[pi].parent.type == 'modules_endtoend') {
             flag = false;
-        }else if(t == 'screens' && apptype=="258afbfd-088c-445f-b270-5014e61ba4e2"){
-            openDialogMindmap('Error', 'Task disabled for Mainframe screen');
+        }else if(t == 'screens' && (apptype=="258afbfd-088c-445f-b270-5014e61ba4e2" || apptype=="7a6820f1-2817-4d57-adaf-53734dd2354b")){
+            if(apptype == "7a6820f1-2817-4d57-adaf-53734dd2354b") 
+                openDialogMindmap('Error', 'Task disabled for System screen');
+            else
+                openDialogMindmap('Error', 'Task disabled for Mainframe screen');
             return;
         }
         if (flag) {
@@ -2906,7 +2910,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             return dataReuse;
         }
     
-    function treeBuilder(tree) {
+    function treeBuilder(tree) {        // Async
         node_names_tc = [];
         var pidx = 0,
             levelCount = [1],
@@ -2933,12 +2937,11 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         var d3Tree = d3.layout.tree().size([newHeight * 1.5, cSize[0]]);
         // if(tree.oid===undefined) d3Tree.sort(function(a,b){return a.childIndex-b.childIndex;});
         // else d3Tree.sort(function(a,b){return a.childIndex-b.childIndex;});
-        if (tree.childIndex === undefined) d3Tree.sort(function(a, b) {
+        
+        d3Tree.sort(function(a, b) {
             return a.childIndex - b.childIndex;
         });
-        else d3Tree.sort(function(a, b) {
-            return a.childIndex - b.childIndex;
-        });
+
         dNodes = d3Tree.nodes(tree);
         //dLinks=d3Tree.links(dNodes);
 
@@ -2996,6 +2999,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             //zoom.translate([(cSize[0]/2),(cSize[1]/2)]);
             zoom.event(d3.select('#ct-mapSvg'));
             progressFlag = false;
+
+            reuseDict = getReuseDetails();
+
         }, function(error) {
             progressFlag = false;
             console.log("Error: checkReuse service")
@@ -4319,6 +4325,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         else d3Tree.sort(function(a, b) {
             return a.childIndex - b.childIndex;
         });
+        // dNodes.sort(function(a, b) {
+        //     return a.childIndex - b.childIndex;
+        // });        
         dNodes_W = d3Tree.nodes(tree);
         //dLinks_W=d3Tree.links(dNodes_W);
         dNodes_W.forEach(function(d) {

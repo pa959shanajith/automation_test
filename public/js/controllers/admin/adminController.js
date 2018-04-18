@@ -425,7 +425,8 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 						"oebs":{"data":"DesktopJava","title":"Oracle Apps","img":"oracleApps"},
 						"mobileapp":{"data":"MobileApp","title":"Mobile Apps","img":"mobileApps"},
 						"mobileweb":{"data":"MobileWeb","title":"Mobile Web","img":"mobileWeb"},
-						"sap":{"data":"SAP","title":"SAP Apps","img":"sapApps"}
+						"sap":{"data":"SAP","title":"SAP Apps","img":"sapApps"},
+						"system":{"data":"System","title":"System Apps","img":"desktop"}
 					};
 					$("div.appTypesContainer").empty();
 					for (var i = 0; i < plugins.length; i++) {
@@ -1884,46 +1885,15 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 				//var requestedids = domains.push(domainId);
 				var idtype = ["domaindetails"];
 				var details = {
-					"web": {
-						"data": "Web",
-						"title": "Web",
-						"img": "web"
-					},
-					"webservice": {
-						"data": "Webservice",
-						"title": "Web Service",
-						"img": "webservice"
-					},
-					"mainframe": {
-						"data": "Mainframe",
-						"title": "Mainframe",
-						"img": "mainframe"
-					},
-					"desktop": {
-						"data": "Desktop",
-						"title": "Desktop Apps",
-						"img": "desktop"
-					},
-					"oebs": {
-						"data": "DesktopJava",
-						"title": "Oracle Apps",
-						"img": "oracleApps"
-					},
-					"mobileapp": {
-						"data": "MobileApp",
-						"title": "Mobile Apps",
-						"img": "mobileApps"
-					},
-					"mobileweb": {
-						"data": "MobileWeb",
-						"title": "Mobile Web",
-						"img": "mobileWeb"
-					},
-					"sap": {
-						"data": "SAP",
-						"title": "SAP Apps",
-						"img": "sapApps"
-					}
+					"web":{"data":"Web","title":"Web","img":"web"},
+					"webservice":{"data":"Webservice","title":"Web Service","img":"webservice"},
+					"mainframe":{"data":"Mainframe","title":"Mainframe","img":"mainframe"},
+					"desktop":{"data":"Desktop","title":"Desktop Apps","img":"desktop"},
+					"oebs":{"data":"DesktopJava","title":"Oracle Apps","img":"oracleApps"},
+					"mobileapp":{"data":"MobileApp","title":"Mobile Apps","img":"mobileApps"},
+					"mobileweb":{"data":"MobileWeb","title":"Mobile Web","img":"mobileWeb"},
+					"sap":{"data":"SAP","title":"SAP Apps","img":"sapApps"},
+					"system":{"data":"System","title":"System Apps","img":"desktop"}
 				};
 				$(".appTypesContainer").empty();
 				for (var i = 0; i < plugins.length; i++) {
