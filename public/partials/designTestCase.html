@@ -39,6 +39,15 @@
 				</ul>
 			</div>
 			<!-- Desktop -->
+
+			<!-- System -->
+			<div id="left-top-section" ng-if="getScreenView == 'System'" class="ApptypeScreenView">
+				<ul>
+					<li><span><a class='scrapeOnTxt'>Debug On</a></span></li>
+					<li><a href='#' ng-click="debugTestCase_ICE('1');" title="System Apps"><span><img src='imgs/ic-desktop.png' alt='System Apps' /></span>System Apps</a></li>
+				</ul>
+			</div>
+			<!-- System -->
 			
 			<!-- SAP -->
 			<div id="left-top-section" ng-if="getScreenView == 'SAP'" class="ApptypeScreenView">
@@ -333,7 +342,7 @@
 							</div>
 							<div class="form-group" style="width: 100% !important;">
 								<label id="labelContent" style="margin-bottom: 0px; color: black;">Add Remarks</label>
-								<textarea class="form-control" id="getremarksData"></textarea>
+								<textarea maxlength="50" class="form-control" id="getremarksData"></textarea>
 							</div>
 						</div>
 						<!--Inputs Seprators-->
@@ -436,3 +445,24 @@
 	  </div>
 	</div>
 	<!-- reused Modal -->
+
+ <!-- Modal Form  -->
+	<div class="modal fade" id="globalModalForm" tabindex="-1" role="dialog" aria-labelledby="globalModalLabel" aria-hidden="true">
+		<div class="modal-dialog" role="document">
+		  <div class="modal-content">
+			<div class="modal-header">
+			  <h5 class="modal-title" id="globalModalLabel">New message</h5>
+			  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+				<span aria-hidden="true">&times;</span>
+			  </button>
+			</div>
+			<div class="modal-body">
+			  <form class='stepDetailsContainer'></form>
+			</div>
+			<div class="modal-footer">
+			  <button id='resetTestStepDetails' type="button" class="btn btn-secondary">Reset</button>
+			  <button id='saveTestStepDetails' type="button" class="btn btn-primary">Save</button>
+			</div>
+		  </div>
+		</div>
+	  </div>

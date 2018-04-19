@@ -130,6 +130,8 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 
     $timeout(function() {
         projectDetails = angular.element(document.getElementById("left-nav-section")).scope().projectDetails;
+        releaseName = angular.element(document.getElementById("left-nav-section")).scope().releaseDetails;
+        cycleName = angular.element(document.getElementById("left-nav-section")).scope().cycleDetails;
         var getTaskName = JSON.parse(window.localStorage['_CT']).taskName;
         appType = JSON.parse(window.localStorage['_CT']).appType;
         screenName = angular.element(document.getElementById("left-nav-section")).scope().screenName;
@@ -137,80 +139,80 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
         subTaskType = JSON.parse(window.localStorage['_CT']).subTaskType;
         subTask = JSON.parse(window.localStorage['_CT']).subTask;
         if (subTaskType == "Scrape" || subTask == "Scrape") {
-            $(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">Project :</span><span class="content">' + projectDetails.respnames[0] + '</span></p><p class="proj-info-wrap"><span class="content-label">Screen :</span><span class="content">' + screenName + '</span></p>')
+            $(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">Project :</span><span class="content">' + projectDetails.respnames[0] + '</span></p><p class="proj-info-wrap"><span class="content-label">Screen :</span><span class="content">' + screenName + '</span></p><p class="proj-info-wrap"><span class="content-label">Release :</span><span class="content">' + releaseName + '</span></p><p class="proj-info-wrap"><span class="content-label">Cycle :</span><span class="content">' + cycleName + '</span></p>')
         } else {
-            $(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">Project: </span><span class="content">' + projectDetails.respnames[0] + '</span></p><p class="proj-info-wrap"><span class="content-label">Screen: </span><span class="content">' + screenName + '</span></p><p class="proj-info-wrap"><span class="content-label">TestCase: </span><span class="content">' + testCaseName + '</span></p>')
+            $(".projectInfoWrap").append('<p class="proj-info-wrap"><span class="content-label">Project: </span><span class="content">' + projectDetails.respnames[0] + '</span></p><p class="proj-info-wrap"><span class="content-label">Screen: </span><span class="content">' + screenName + '</span></p><p class="proj-info-wrap"><span class="content-label">TestCase: </span><span class="content">' + testCaseName + '</span></p><p class="proj-info-wrap"><span class="content-label">Release :</span><span class="content">' + releaseName + '</span></p><p class="proj-info-wrap"><span class="content-label">Cycle :</span><span class="content">' + cycleName + '</span></p>')
         }
 
     }, 3000)
 
 //console.log("screenName:", screenName);
-    if (window.localStorage['_TJ']) {
-        allTasks = JSON.parse(window.localStorage['_TJ']);
-        if(allTasks.length > 0)
-        {
-                allTasks =  allTasks.filter(function(n){
-                    return n.appType === appType
-                });
-        }
+    // if (window.localStorage['_TJ']) {
+    //     allTasks = JSON.parse(window.localStorage['_TJ']);
+    //     if(allTasks.length > 0)
+    //     {
+    //             allTasks =  allTasks.filter(function(n){
+    //                 return n.appType === appType
+    //             });
+    //     }
 
-        for (var i = 0; i < allTasks.length; i++) {
-            //Screen with no testcases
-            if (allTasks[i].screenName != "" && allTasks[i].testCaseId == "") {
-                allScreenNames.push(allTasks[i].screenName);
-            }
-            //screen with testcases
-            if (allTasks[i].screenName != "" && allTasks[i].testCaseId != "") {
-                allScreenTestcaseNames.push(allTasks[i].screenName);
-            }
-            //testcases
-            if (allTasks[i].testCaseName != "" && allTasks[i].testCaseId != "") {
-                allTestcases.push(allTasks[i].testCaseName);
-            }
-        }
-        var sorted_screens = allScreenNames.slice().sort();
-        for (var i = 0; i < allScreenNames.length - 1; i++) {
-            if (sorted_screens[i + 1] == sorted_screens[i]) {
-                reusedScreens.push(sorted_screens[i]);
-            }
-        }
-        var sorted_screensTestcase = allScreenTestcaseNames.slice().sort();
-        for (var i = 0; i < allScreenTestcaseNames.length - 1; i++) {
-            if (sorted_screensTestcase[i + 1] == sorted_screensTestcase[i]) {
-                reusedScreensTestcase.push(sorted_screensTestcase[i]);
-            }
-        }
-        var sorted_testcases = allTestcases.slice().sort();
-        for (var i = 0; i < allTestcases.length - 1; i++) {
-            if (sorted_testcases[i + 1] == sorted_testcases[i]) {
-                reusedTestcases.push(sorted_testcases[i]);
-            }
-        }
-        //console.log("reusedScreens",reusedScreens);
-        //console.log("reusedScreensTestcase",reusedScreensTestcase);
-        //console.log("reusedTestcases", reusedTestcases);
-        if (reusedScreens.length > 0) {
-            for (var j = 0; j < reusedScreens.length; j++) {
-                if ($.trim(reusedScreens[j]) == $.trim(screenName)) {
-                    reusedScreenNames = true;
-                }
-            }
-        }
-        if (reusedScreens.length > 0) {
-            for (var j = 0; j < reusedScreensTestcase.length; j++) {
-                if ($.trim(reusedScreensTestcase[j]) == $.trim(screenName)) {
-                    reusedScreenTestcaseNames = true;
-                }
-            }
-        }
-        if (reusedTestcases.length > 0) {
-            for (var j = 0; j < reusedTestcases.length; j++) {
-                if ($.trim(reusedTestcases[j]) == $.trim(testCaseName)) {
-                    reusedTestcaseNames = true;
-                }
-            }
-        }
-    }
+    //     for (var i = 0; i < allTasks.length; i++) {
+    //         //Screen with no testcases
+    //         if (allTasks[i].screenName != "" && allTasks[i].testCaseId == "") {
+    //             allScreenNames.push(allTasks[i].screenName);
+    //         }
+    //         //screen with testcases
+    //         if (allTasks[i].screenName != "" && allTasks[i].testCaseId != "") {
+    //             allScreenTestcaseNames.push(allTasks[i].screenName);
+    //         }
+    //         //testcases
+    //         if (allTasks[i].testCaseName != "" && allTasks[i].testCaseId != "") {
+    //             allTestcases.push(allTasks[i].testCaseName);
+    //         }
+    //     }
+    //     var sorted_screens = allScreenNames.slice().sort();
+    //     for (var i = 0; i < allScreenNames.length - 1; i++) {
+    //         if (sorted_screens[i + 1] == sorted_screens[i]) {
+    //             reusedScreens.push(sorted_screens[i]);
+    //         }
+    //     }
+    //     var sorted_screensTestcase = allScreenTestcaseNames.slice().sort();
+    //     for (var i = 0; i < allScreenTestcaseNames.length - 1; i++) {
+    //         if (sorted_screensTestcase[i + 1] == sorted_screensTestcase[i]) {
+    //             reusedScreensTestcase.push(sorted_screensTestcase[i]);
+    //         }
+    //     }
+    //     var sorted_testcases = allTestcases.slice().sort();
+    //     for (var i = 0; i < allTestcases.length - 1; i++) {
+    //         if (sorted_testcases[i + 1] == sorted_testcases[i]) {
+    //             reusedTestcases.push(sorted_testcases[i]);
+    //         }
+    //     }
+    //     //console.log("reusedScreens",reusedScreens);
+    //     //console.log("reusedScreensTestcase",reusedScreensTestcase);
+    //     //console.log("reusedTestcases", reusedTestcases);
+    //     if (reusedScreens.length > 0) {
+    //         for (var j = 0; j < reusedScreens.length; j++) {
+    //             if ($.trim(reusedScreens[j]) == $.trim(screenName)) {
+    //                 reusedScreenNames = true;
+    //             }
+    //         }
+    //     }
+    //     if (reusedScreens.length > 0) {
+    //         for (var j = 0; j < reusedScreensTestcase.length; j++) {
+    //             if ($.trim(reusedScreensTestcase[j]) == $.trim(screenName)) {
+    //                 reusedScreenTestcaseNames = true;
+    //             }
+    //         }
+    //     }
+    //     if (reusedTestcases.length > 0) {
+    //         for (var j = 0; j < reusedTestcases.length; j++) {
+    //             if ($.trim(reusedTestcases[j]) == $.trim(testCaseName)) {
+    //                 reusedTestcaseNames = true;
+    //             }
+    //         }
+    //     }
+    // }
 
     var custnameArr = [];
     var keywordValArr = [];
@@ -302,7 +304,10 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                                 $scope.newTestScriptDataLS = data2.view;
                                 getScrapeDataforCustomObj = data2.view;
                                 $("#window-scrape-screenshotTs .popupContent").empty()
-                                $("#window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrapeTS"><img id="screenshotTS" src="data:image/PNG;base64,' + data2.mirror + '" /></div>')
+                                if (data2.mirror == undefined)
+                                    $("#window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrapeTS">No Screenshot Available</div>')
+                                else
+                                    $("#window-scrape-screenshotTs .popupContent").html('<div id="screenShotScrapeTS"><img id="screenshotTS" src="data:image/PNG;base64,' + data2.mirror + '" /></div>')
 
                                 // service call # 3 -objectType service call
                                 DesignServices.getKeywordDetails_ICE(appType)
@@ -327,7 +332,9 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                                                     "_id_": "",
                                                     "appType": appTypeLocal1,
                                                     "remarksStatus": "",
-                                                    "remarks": ""
+                                                    "remarks": "",
+                                                    "addTestCaseDetails":"",
+                                                    "addTestCaseDetailsInfo":""
                                                 }];
                                                 readTestCaseData = JSON.stringify(datalist);
                                                 $("#jqGrid").jqGrid('GridUnload');
@@ -386,76 +393,47 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
     $scope.debugTestCase_ICE = function(selectedBrowserType) {
         var taskInfo = JSON.parse(window.localStorage['_CT']);
         var testcaseID = [];
-        testcaseID.push(taskInfo.testCaseId);
         var browserType = [];
         browserType.push(selectedBrowserType)
         if (appType == "MobileWeb" || appType == "Mainframe") browserType = [];
         globalSelectedBrowserType = selectedBrowserType;
-        var blockMsg = 'Debug in Progress. Please Wait...';
+        
         if (dependentTestCaseFlag == true) {
-            blockUI(blockMsg);
-            DesignServices.debugTestCase_ICE(browserType, checkedTestcases, appType)
-                .then(function(data) {
-                        if (data == "Invalid Session") {
-                            $rootScope.redirectPage();
-                        }
-                        //console.log("debug-----", data);
-                        if (data == "unavailableLocalServer") {
-                            unblockUI();
-                            openDialog("Debug Testcase", "ICE Engine is not available. Please run the batch file and connect to the Server.")
-                        } else if (data == "success") {
-                            unblockUI();
-                            openDialog("Debug Testcase", "Debug completed successfully.")
-                        } else if (data == "fail") {
-                            unblockUI();
-                            openDialog("Debug Testcase", "Failed to debug.")
-                        } else if (data == "Terminate") {
-                            unblockUI();
-                            openDialog("Debug Testcase", "Debug Terminated")
-                        } else if (data == "browserUnavailable") {
-                            unblockUI();
-                            openDialog("Debug Testcase", "Browser is not available")
-                        } else if (data == "scheduleModeOn") {
-                            unblockUI();
-                            openDialog("Debug Testcase", "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.")
-                        }
-
-                    },
-                    function(error) {
-                        console.log("Error while traversing while executing debugTestcase method!! \r\n " + (error.data));
-                    });
+            testcaseID = checkedTestcases;
         } else {
-            blockUI(blockMsg);
-            DesignServices.debugTestCase_ICE(browserType, testcaseID, appType)
-                .then(function(data) {
-                        if (data == "Invalid Session") {
-                            $rootScope.redirectPage();
-                        }
-                        //console.log("debug-----", data);
-                        if (data == "unavailableLocalServer") {
-                            unblockUI();
-                            openDialog("Debug Testcase", "ICE Engine is not available. Please run the batch file and connect to the Server.")
-                        } else if (data == "success") {
-                            unblockUI();
-                            openDialog("Debug Testcase", "Debug completed successfully.")
-                        } else if (data == "fail") {
-                            unblockUI();
-                            openDialog("Debug Testcase", "Failed to debug.")
-                        } else if (data == "Terminate") {
-                            unblockUI();
-                            openDialog("Debug Testcase", "Debug Terminated")
-                        } else if (data == "browserUnavailable") {
-                            unblockUI();
-                            openDialog("Debug Testcase", "Browser is not available")
-                        } else if (data == "scheduleModeOn") {
-                            unblockUI();
-                            openDialog("Debug Testcase", "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.")
-                        }
-                    },
-                    function(error) {
-                        console.log("Error while traversing while executing debugTestcase method!! \r\n " + (error.data));
-                    });
+            testcaseID.push(taskInfo.testCaseId);
         }
+
+        var blockMsg = 'Debug in Progress. Please Wait...';
+        blockUI(blockMsg);
+        DesignServices.debugTestCase_ICE(browserType, testcaseID, appType)
+        .then(function(data) {
+            if (data == "Invalid Session") {
+                $rootScope.redirectPage();
+            }
+            if (data == "unavailableLocalServer") {
+                unblockUI();
+                openDialog("Debug Testcase", "ICE Engine is not available. Please run the batch file and connect to the Server.")
+            } else if (data == "success") {
+                unblockUI();
+                openDialog("Debug Testcase", "Debug completed successfully.")
+            } else if (data == "fail") {
+                unblockUI();
+                openDialog("Debug Testcase", "Failed to debug.")
+            } else if (data == "Terminate") {
+                unblockUI();
+                openDialog("Debug Testcase", "Debug Terminated")
+            } else if (data == "browserUnavailable") {
+                unblockUI();
+                openDialog("Debug Testcase", "Browser is not available")
+            } else if (data == "scheduleModeOn") {
+                unblockUI();
+                openDialog("Debug Testcase", "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.")
+            }
+
+        },function(error) {
+            console.log("Error while traversing while executing debugTestcase method!! \r\n " + (error.data));
+        });
     }; // browser invocation ends
 
     //Import Test case
@@ -1155,7 +1133,9 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                         "outputVal": "",
                         "url": "",
                         "custname": "",
-                        "remarks": [""]
+                        "remarks": [""],
+                        "addTestCaseDetails":"",
+                        "addTestCaseDetailsInfo":""
                     })
                 }
             }
@@ -1168,7 +1148,9 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                 "outputVal": "",
                 "url": "",
                 "custname": "",
-                "remarks": [""]
+                "remarks": [""],
+                "addTestCaseDetails":"",
+                "addTestCaseDetailsInfo":""
             })
             initWSJson.testcasename = "",
             initWSJson.apptype = "Webservice",
@@ -1472,7 +1454,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                 } else {
                     $(document).find("#mobilityWebSerialNo, #mobilityAndroidVersion").removeClass("inputErrorBorder")
                     screenViewObject.appType = $scope.getScreenView,
-                        screenViewObject.mobileSerial = $(document).find("#mobilityWebSerialNo").val();
+                    screenViewObject.mobileSerial = $(document).find("#mobilityWebSerialNo").val();
                     screenViewObject.androidVersion = $(document).find("#mobilityAndroidVersion").val();
                     $("#launchMobilityWeb").modal("hide");
                     // blockUI(blockMsg);
@@ -1874,9 +1856,11 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
         //$("#viewScrapedObjects").show();
     });
     $(document).on('shown.bs.modal', '#deleteObjectsModal', function() {
-        if (reusedScreenNames == true || reusedScreenTestcaseNames == true) {
+        var task=JSON.parse(window.localStorage['_CT'])
+       if (task.reuse == 'True') {
             $("#deleteObjectsModal").find('.modal-body p').text("Screen is been reused. Are you sure you want to delete objects?").css('color', 'black');
-        } else {
+        } else 
+        {
             $("#deleteObjectsModal").find('.modal-body p').text("Are you sure you want to delete objects?").css('color', 'black');
         }
     });
@@ -2942,7 +2926,8 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
     $(document).on('click', "#saveObjects", function(e) {
         //console.log("reused", reusedScreenNames);
         //console.log("reusedT", reusedScreenTestcaseNames);
-        if (reusedScreenNames == true || reusedScreenTestcaseNames == true) {
+        var task=JSON.parse(window.localStorage['_CT'])
+        if (task.reuse == 'True') {
             $("#reUsedObjectsModal").find('.modal-title').text("Save Scraped data");
             $("#reUsedObjectsModal").find('.modal-body p').text("Screen is been reused. Are you sure you want to save objects?").css('color', 'black');
             $("#reUsedObjectsModal").modal("show");
@@ -3199,7 +3184,8 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 
     //save button clicked - save the testcase steps
     $scope.updateTestCase_ICE = function() {
-        if (reusedTestcaseNames == true) {
+        var task=JSON.parse(window.localStorage['_CT'])
+       if (task.reuse == 'True') {
             //$("#reUsedTestcaseModal").find('.modal-title').text("");
             $("#reUsedTestcaseModal").find('.modal-body p').text("Testcase is been reused. Are you sure you want to save ?").css('color', 'black');
             $("#reUsedTestcaseModal").modal("show");
@@ -3565,6 +3551,54 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
         }
     });
 
+    
+
+    $(document).on('click', '.detailsIcon', function(e) {
+        modalId = '';
+        modalId = e.target.id;
+        modalId = parseInt(modalId.split("_")[1]);
+        if(e.target.className.includes('inActiveDetails')){
+            openModalFormDialog('Add Test Step Details','');
+            $(".stepDetailsContainer").empty()
+            $(".stepDetailsContainer").append("<div class='formGroup form-inline form-custom'><input autocomplete='off' id='testDetails_" + modalId + "' maxlength='50' type='text' class='form-control form-control-custom form-control-width' placeholder='Enter Expected Result'></div><div id='pass_" + modalId + "' class='passFormFields'><div class='formGroup form-inline form-custom'><input autocomplete='off' id='actualResult_" + modalId + "' type='text'  maxlength='50' class='form-control form-control-custom form-control-width' placeholder='Enter Actual Result for Pass Status'></div></div><div id ='fail_" + modalId + "' class='failFormFields'><div class='formGroup form-inline form-custom'><input autocomplete='off' id='actualResult_" + modalId + "' type='text'  maxlength='50' class='form-control form-control-custom form-control-width' placeholder='Enter Actual Result for Fail Status'></div></div")
+            
+        }
+        else{
+            var taskInfo = JSON.parse(window.localStorage['_CT']);
+            var screenId = taskInfo.screenId;
+            var testCaseId = taskInfo.testCaseId;
+            var testCaseName = taskInfo.testCaseName;
+            var versionnumber = taskInfo.versionnumber;
+            DesignServices.readTestCase_ICE(screenId, testCaseId, testCaseName, versionnumber)
+            .then(function(response) {
+                    if (response == "Invalid Session") {
+                        $rootScope.redirectPage();
+                    }
+                   console.log("Responseeee",response);
+                    var testcaseSteps  = JSON.parse(response.testcase);
+                    if(typeof(testcaseSteps[modalId -1].addTestCaseDetailsInfo) == "object")
+                    {
+                        var details = testcaseSteps[modalId -1].addTestCaseDetailsInfo;
+                    }
+                    else{
+                        var details = JSON.parse(testcaseSteps[modalId -1].addTestCaseDetailsInfo);
+                    }
+                   
+                    openModalFormDialog('Add Test Step Details','');
+                     $(".stepDetailsContainer").empty()
+                     $(".stepDetailsContainer").append("<div class='formGroup form-inline form-custom'><input autocomplete='off' id='testDetails_" + modalId + "' maxlength='50' type='text' class='form-control form-control-custom form-control-width' placeholder='Enter Expected Result'></div><div id='pass_" + modalId + "' class='passFormFields'><div class='formGroup form-inline form-custom'><input autocomplete='off' id='actualResult_" + modalId + "' type='text'  maxlength='50' class='form-control form-control-custom form-control-width' placeholder='Enter Actual Result for Pass Status'></div></div><div id ='fail_" + modalId + "' class='failFormFields'><div class='formGroup form-inline form-custom'><input autocomplete='off' id='actualResult_" + modalId + "' type='text'  maxlength='50' class='form-control form-control-custom form-control-width' placeholder='Enter Actual Result for Fail Status'></div></div");
+                     $("#testDetails_"+modalId+"").val(details.testcaseDetails);
+                     //$("#pass_"+modalId+"").find("#expectedResult_"+modalId+"").val(details.expectedResult_pass);
+                     $("#pass_"+modalId+"").find("#actualResult_"+modalId+"").val(details.actualResult_pass);
+                    // $("#fail_"+modalId+"").find("#expectedResult_"+modalId+"").val(details.expectedResult_fail);
+                     $("#fail_"+modalId+"").find("#actualResult_"+modalId+"").val(details.actualResult_fail);
+                },
+                function(error) {});
+        }
+      
+        e.stopImmediatePropagation();
+    });
+
 
       $scope.submit_task=function(action) {
         var taskinfo = JSON.parse(window.localStorage['_CT']);
@@ -3647,7 +3681,9 @@ function contentTable(newTestScriptDataLS) {
                 {label: 'Remarks', name: 'remarksStatus', editable: false, resizable: false, sortable: false},
                 {label: 'Remarks', name: 'remarks', editable: false, resizable: false, sortable: false, hidden: true},
                 {label: 'URL', name: 'url', editable: false, resizable: false, hidden: true},
-                {label: 'appType', name: 'appType', editable: false, resizable: false, hidden: true}
+                {label: 'appType', name: 'appType', editable: false, resizable: false, hidden: true},
+                {label: 'Details', name: 'addTestCaseDetails', editable: false, resizable: false, sortable: false},
+                {label: 'Details', name: 'addTestCaseDetailsInfo', editable: false, resizable: false, sortable: false,hidden: true}
             ],
             loadonce: false,
             viewrecords: false,
@@ -3671,9 +3707,13 @@ function contentTable(newTestScriptDataLS) {
             toppager: true,
             autoencode: true,
             scrollrows: true,
-            loadComplete: function() {
+            loadComplete: function(data) {
+                loadedGridData = JSON.parse(JSON.stringify(data));
                 $("#jqGrid tr[id^='jqg']").remove();
-                $("#jqGrid tr").each(function() {
+                var v=1;
+
+                $("#jqGrid tr:visible").each(function() {
+
                     if ($(this).find("td:nth-child(10)").text().trim().length <= 0) {
                         $(this).find("td:nth-child(9)").text('');
                         $(this).find("td:nth-child(9)").append('<img src="imgs/ic-remarks-inactive.png" class="remarksIcon"/>');
@@ -3681,6 +3721,86 @@ function contentTable(newTestScriptDataLS) {
                         $(this).find("td:nth-child(9)").text('');
                         $(this).find("td:nth-child(9)").append('<img src="imgs/ic-remarks-active.png" class="remarksIcon"/>');
                     }
+                   
+                    var rowId = parseInt($(this).children("td[aria-describedby='jqGrid_stepNo']").text());
+                    if('rows' in data)
+                    {
+                        if(typeof (data.rows[rowId -1].addTestCaseDetailsInfo) == 'object')
+                        {
+                            $('#jqGrid').jqGrid('setCell', rowId, 'addTestCaseDetailsInfo', angular.toJson(data.rows[rowId -1].addTestCaseDetailsInfo));
+                            $('#jqGrid').jqGrid('setCell', rowId, 'addTestCaseDetails', angular.toJson(data.rows[rowId -1].addTestCaseDetails));
+                        }
+                        else{
+                            $('#jqGrid').jqGrid('setCell', rowId, 'addTestCaseDetailsInfo', data.rows[rowId -1].addTestCaseDetailsInfo);
+                            $('#jqGrid').jqGrid('setCell', rowId, 'addTestCaseDetails', data.rows[rowId -1].addTestCaseDetails);
+                        }
+                        var str = typeof(data.rows[rowId -1].addTestCaseDetailsInfo);
+                        
+                    }
+                    else{
+                        
+                        if(typeof (data[rowId -1].addTestCaseDetailsInfo) == 'object')
+                        {
+                            $('#jqGrid').jqGrid('setCell', rowId, 'addTestCaseDetailsInfo', angular.toJson(data[rowId -1].addTestCaseDetailsInfo));
+                            $('#jqGrid').jqGrid('setCell', rowId, 'addTestCaseDetails', angular.toJson(data[rowId -1].addTestCaseDetails));
+                        }
+                        else{
+                            $('#jqGrid').jqGrid('setCell', rowId, 'addTestCaseDetailsInfo', data[rowId -1].addTestCaseDetailsInfo);
+                            $('#jqGrid').jqGrid('setCell', rowId, 'addTestCaseDetails', data[rowId -1].addTestCaseDetails);
+                        }
+                        var str = typeof(data[rowId -1].addTestCaseDetailsInfo);
+                    }
+
+                    
+               
+                    var getRowData = $('#jqGrid').jqGrid ('getRowData', rowId);
+                    
+                    if(str == "string" && 'rows' in data)
+                    {
+                        if(data.rows[rowId -1].addTestCaseDetailsInfo.length > 0)
+                        {
+                            $(this).find("td:nth-child(13)").text('');
+                            $(this).find("td:nth-child(13)").append('<img alt="activeDetails" title="" id="details_'+v+'" src="imgs/ic-details-active.png" class="detailsIcon activeDetails"/>');
+                        }
+                        else if(data.rows[rowId -1].addTestCaseDetails.length == 0){
+                            $(this).find("td:nth-child(13)").text('');
+                            $(this).find("td:nth-child(13)").append('<img alt="inActiveDetails"  title="" id="details_'+v+'" src="imgs/ic-details-inactive.png" class="detailsIcon inActiveDetails"/>');
+                        }
+                        else{
+                            $(this).find("td:nth-child(13)").text('');
+                            $(this).find("td:nth-child(13)").append('<img  alt="inActiveDetails" title="" id="details_'+v+'" src="imgs/ic-details-inactive.png" class="detailsIcon inActiveDetails"/>');
+                        }
+                    }
+                    else if(str == "string")
+                    {
+                        if(data[rowId -1].addTestCaseDetailsInfo.length > 0)
+                        {
+                            $(this).find("td:nth-child(13)").text('');
+                            $(this).find("td:nth-child(13)").append('<img  alt="activeDetails"  title="" id="details_'+v+'" src="imgs/ic-details-active.png" class="detailsIcon activeDetails"/>');
+                        }
+                        else if(data[rowId -1].addTestCaseDetails.length == 0){
+                            $(this).find("td:nth-child(13)").text('');
+                            $(this).find("td:nth-child(13)").append('<img alt="inActiveDetails" title="" id="details_'+v+'" src="imgs/ic-details-inactive.png" class="detailsIcon inActiveDetails"/>');
+                        }
+                        else{
+                            $(this).find("td:nth-child(13)").text('');
+                            $(this).find("td:nth-child(13)").append('<img alt="inActiveDetails"  title="" id="details_'+v+'" src="imgs/ic-details-inactive.png" class="detailsIcon inActiveDetails"/>');
+                        }
+                    }
+
+                    if(str != "string")
+                    {
+                        if( str != "" && str != "undefined" && str !=undefined )
+                        {
+                            $(this).find("td:nth-child(13)").text('');
+                            $(this).find("td:nth-child(13)").append('<img  alt="activeDetails" title="" id="details_'+v+'" src="imgs/ic-details-active.png" class="detailsIcon activeDetails"/>');
+                        }
+                        else{
+                            $(this).find("td:nth-child(13)").text('');
+                            $(this).find("td:nth-child(13)").append('<img  alt="inActiveDetails" title="" id="details_'+v+'" src="imgs/ic-details-inactive.png" class="detailsIcon inActiveDetails"/>');
+                        }
+                    }
+                    v++;
                 })
                 //$("#cb_jqGrid").on('click', function() {
                 /*var cboxParent =  $(this).is(":checked");
@@ -3708,7 +3828,8 @@ function contentTable(newTestScriptDataLS) {
                 for (i = 0; i < gridArrayData.length; i++) {
                     if (gridArrayData[i].outputVal.indexOf('##') !== -1 || gridArrayData[i].outputVal.indexOf(';##') !== -1) {
                         $(this).find('tr.jqgrow')[i].style.borderLeft = "5px solid red";
-                        $(this).find('tr.jqgrow')[i].childNodes[0].style.marginLeft = "-4px"
+                        $(this).find('tr.jqgrow')[i].childNodes[0].style.paddingRight = "7px"
+                        $(this).find('tr.jqgrow')[i].childNodes[1].childNodes[0].style.marginLeft = "-4px";
                         $(this).find('tr.jqgrow')[i].childNodes[7].style.color = "red";
                     } else {
                         //$(this).find('tr.jqgrow')[i].style.borderLeft = "5px solid transparent";
@@ -3838,6 +3959,12 @@ function contentTable(newTestScriptDataLS) {
     $("#jqGrid").jqGrid("setColProp", "appType", {
         editable: false
     });
+    $("#jqGrid").jqGrid("setColProp", "addTestCaseDetails", {
+        editable: false
+    });
+    $("#jqGrid").jqGrid("setColProp", "addTestCaseDetailsInfo", {
+        editable: false
+    });
     $("#jqGrid").resetSelection();
 
     $(document).on('click', '.remarksIcon', function() {
@@ -3887,6 +4014,75 @@ function contentTable(newTestScriptDataLS) {
             }
         }
     })
+
+        //Save teststep details
+        $(document).on('click', '#saveTestStepDetails', function(e) {
+            var $grid =  $('#jqGrid');
+            getTestStepDetailsRowData = $grid.jqGrid ('getRowData', modalId);
+            getTestStepDetailsRowData.addTestCaseDetailsInfo = {};
+            var testDetails = $.trim($('#testDetails_'+modalId+'').val());
+          //  var expectedResult_pass = $.trim($('#pass_'+modalId+'').find('#expectedResult_'+modalId+'').val());
+            var actualResult_pass =  $.trim($('#pass_'+modalId+'').find('#actualResult_'+modalId+'').val());
+          //  var expectedResult_fail = $.trim($('#fail_'+modalId+'').find('#expectedResult_'+modalId+'').val());
+            var actualResult_fail =  $.trim($('#fail_'+modalId+'').find('#actualResult_'+modalId+'').val());
+    
+           if(testDetails == '' && actualResult_pass == '' && actualResult_fail == '')
+           {
+                $('#globalModalForm').modal('hide');
+                openDialog('Add Test Step Details','Please enter atleast one field to save test step details');
+           }
+           else{
+
+            if(testDetails == ''  && actualResult_pass == ''  && actualResult_fail == '')
+            {
+                getTestStepDetailsRowData.addTestCaseDetails ='';
+                getTestStepDetailsRowData.addTestCaseDetailsInfo = {
+                    "testcaseDetails": "",
+                    "actualResult_pass": "",
+                    "actualResult_fail": "",
+                };
+            }
+          
+                 getTestStepDetailsRowData.addTestCaseDetailsInfo = {
+                    "testcaseDetails": testDetails,
+                    "actualResult_pass": actualResult_pass,
+                    "actualResult_fail": actualResult_fail,
+                };
+              
+                $grid.jqGrid('setCell', modalId, 'addTestCaseDetailsInfo',JSON.stringify(getTestStepDetailsRowData.addTestCaseDetailsInfo));
+                var gridData =  $grid.jqGrid('getGridParam','data');
+                for(let i=0;i<gridData.length;i++)
+                {
+                    if(gridData[i].stepNo === getTestStepDetailsRowData.stepNo)
+                    {
+                        gridData[i] = getTestStepDetailsRowData;
+                    }
+                    // if('addTestCaseDetailsInfo' in  gridData[i])
+                    // {
+                    //     if(gridData[i].addTestCaseDetailsInfo != "undefined")
+                    //     {
+                    //         $("tr#"+modalId).find("td:nth-child(13)").text('');
+                    //         $("tr#"+modalId).find("td:nth-child(13)").append('<img id="details_'+modalId+'" src="imgs/ic-details-active.png" class="detailsIcon activeDetails"/>');
+                    //     }
+                    //     else{
+                    //         $("tr#"+modalId).find("td:nth-child(13)").text('');
+                    //         $("tr#"+modalId).find("td:nth-child(13)").append('<img id="details_'+modalId+'" src="imgs/ic-details-inactive.png" class="detailsIcon inActiveDetails"/>');
+                    //     }
+                    // }
+                    // else{
+                    //     $("tr#"+modalId).find("td:nth-child(13)").text('');
+                    //     $("tr#"+modalId).find("td:nth-child(13)").append('<img id="details_'+modalId+'" src="imgs/ic-details-inactive.png" class="detailsIcon inActiveDetails"/>');
+                    // }
+                }
+             
+                $(".close:visible").trigger('click'); 
+           }  
+        });
+
+    //Reset test step details
+    $(document).on('click', '#resetTestStepDetails', function(e) {
+        $('input:visible').val('');
+    });
 
     function hideOtherFuncOnEdit() {
         $("#jqGrid").each(function() {
@@ -4056,7 +4252,27 @@ function contentTable(newTestScriptDataLS) {
                 $grid.jqGrid('setCell', rowId, 'url', url);
                 $grid.jqGrid('setCell', rowId, 'objectName', objName);
             }
-        } else if (selectedText == "@Browser") {
+        }
+        else if(selectedText=="@System"){
+            var sc = Object.keys(keywordArrayList.system);
+            selectedKeywordList = "getOsInfo";
+            objName = " ";
+            url=" ";
+            for (var i = 0; i < sc.length; i++) {
+                if (selectedKeyword == sc[i]) {
+                    res += '<option role="option" value="' + sc[i] + '" selected>' + sc[i] + '</option>';
+                } else
+                    res += '<option role="option" value="' + sc[i] + '">' + sc[i] + '</option>';
+            }
+            var row = $(e.target).closest('tr.jqgrow');
+            var rowId = row.attr('id');
+            $("select#" + rowId + "_keywordVal", row[0]).html(res);
+            selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
+            $grid.jqGrid('setCell', rowId, 'appType', "System");
+            $grid.jqGrid('setCell', rowId, 'url', url);
+            $grid.jqGrid('setCell', rowId, 'objectName', objName);
+        }
+        else if (selectedText == "@Browser") {
             objName = " ";
             url = " ";
             var sc = Object.keys(keywordArrayList.browser);
@@ -4128,6 +4344,48 @@ function contentTable(newTestScriptDataLS) {
             } else {
                 sc = Object.keys(keywordArrayList.custom);
                 selectedKeywordList = "custom";
+            }
+            for (var i = 0; i < sc.length; i++) {
+                if (selectedKeyword == sc[i]) {
+                    res += '<option role="option" value="' + sc[i] + '" selected>' + sc[i] + '</option>';
+                } else
+                    res += '<option role="option" value="' + sc[i] + '">' + sc[i] + '</option>';
+            }
+            var row = $(e.target).closest('tr.jqgrow');
+            var rowId = row.attr('id');
+            $("select#" + rowId + "_keywordVal", row[0]).html(res);
+            selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
+            $grid.jqGrid('setCell', rowId, 'objectName', objName);
+            $grid.jqGrid('setCell', rowId, 'url', url);
+            $grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
+        }
+        //ends here
+		//Object
+		else if (selectedText == "@Object") {
+            objName = "@Object";
+            url = "";
+            var sc;
+            var res = '';
+            if (appTypeLocal == 'Web') {
+                sc = Object.keys(keywordArrayList.object);
+                selectedKeywordList = "object";
+                var newTSDataLS = angular.element(document.getElementById('jqGrid')).scope().newTestScriptDataLS;
+                if (newTSDataLS) {
+                    if (newTSDataLS != "undefined") {
+                        //var testScriptTableData = JSON.parse(newTSDataLS);
+                        for (j = 0; j < newTSDataLS.length; j++) {
+                            if (newTSDataLS[j].custname != '@Browser' && newTSDataLS[j].custname != '@Oebs' && newTSDataLS[j].custname != '@Window' && newTSDataLS[j].custname != '@Generic' && newTSDataLS[j].custname != '@Custom') {
+                                if (newTSDataLS[j].url != "") {
+                                    url = newTSDataLS[j].url;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            } else {
+                sc = Object.keys(keywordArrayList.object);
+                selectedKeywordList = "object";
             }
             for (var i = 0; i < sc.length; i++) {
                 if (selectedKeyword == sc[i]) {
@@ -4326,6 +4584,7 @@ function contentTable(newTestScriptDataLS) {
             selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
             $grid.jqGrid('setCell', rowId, 'appType', 'Generic');
         } else {
+
             selectedText = replaceHtmlEntites(selectedText.trim());
             for (var i = 0; i < scrappedData.length; i++) {
                 var ob = scrappedData[i];
@@ -4869,9 +5128,11 @@ function deleteTestScriptRow(e) {
     } else {
         if ($(document).find("#cb_jqGrid:checked").length > 0 || $("#jqGrid").find(".cbox:checked").length > 0) {
             $("#globalModalYesNo").find('.modal-title').text("Delete Test Step");
-            if (reusedTestcaseNames == true) {
+            var task=JSON.parse(window.localStorage['_CT'])
+            if (task.reuse == 'True') {
                 $("#globalModalYesNo").find('.modal-body p').text("Testcase is been reused. Are you sure, you want to delete?").css('color', 'black');
-            } else {
+            } else 
+            {
                 $("#globalModalYesNo").find('.modal-body p').text("Are you sure, you want to delete?").css('color', 'black');
             }
             $("#globalModalYesNo").find('.modal-footer button:nth-child(1)').attr("id", "btnDeleteStepYes")
@@ -4931,7 +5192,9 @@ function addTestScriptRow() {
             "appType": "Generic",
             "remarksStatus": "",
             "remarks": "",
-            "_id_": ""
+            "_id_": "",
+            "addTestCaseDetails": "",
+            "addTestCaseDetailsInfo": ""
         };
 
         $("#jqGrid tr").each(function() {
@@ -4959,6 +5222,7 @@ function addTestScriptRow() {
                         gridArrayData[i].stepNo = i + 1;
                     }
                 }
+                var allRowsInGrid = $('#jqGrid').jqGrid('getGridParam','data');
             } else {
                 gridArrayData.splice(arrayLength, 0, emptyRowData);
                 gridArrayData[arrayLength].stepNo = parseInt(gridArrayData[arrayLength - 1].stepNo) + 1;
@@ -5020,6 +5284,12 @@ function rearrangeTestScriptRow() {
     $("#jqGrid").jqGrid("setColProp", "remarksIcon", {
         editable: false
     });
+    $("#jqGrid").jqGrid("setColProp", "addTestCaseDetails", {
+        editable: false
+    });
+    $("#jqGrid").jqGrid("setColProp", "addTestCaseDetailsInfo", {
+        editable: false
+    });
     $("#jqGrid").resetSelection();
     $("#jqGrid").find(">tbody").sortable("enable");
     enabledEdit = "false";
@@ -5064,6 +5334,12 @@ function editTestCaseRow() {
         });
         $("#jqGrid").jqGrid("setColProp", "appType", {
             editable: true
+        });
+        $("#jqGrid").jqGrid("setColProp", "addTestCaseDetails", {
+            editable: false
+        });
+        $("#jqGrid").jqGrid("setColProp", "addTestCaseDetailsInfo", {
+            editable: false
         });
         $("#jqGrid").resetSelection();
         $("#jqGrid").trigger("reloadGrid");
@@ -5118,6 +5394,8 @@ function copyTestStep() {
                 getRowJsonCopy = [];
                 return false
             } else {
+                var rowId =  parseInt($(this).children("td:nth-child(1)").text());
+                var getRowData = $('#jqGrid').jqGrid ('getRowData', rowId);
                 getRowJsonCopy.push({
                     "objectName": $(this).children("td:nth-child(4)").text().trim(),
                     "custname": $(this).children("td:nth-child(5)").text(),
@@ -5128,7 +5406,9 @@ function copyTestStep() {
                     "remarksIcon": $(this).children("td:nth-child(9)").text(),
                     "remarks": $(this).children("td:nth-child(10)").text(),
                     "url": $(this).children("td:nth-child(11)").text().trim(),
-                    "appType": $(this).children("td:nth-child(12)").text()
+                    "appType": $(this).children("td:nth-child(12)").text(),
+                    "addTestCaseDetails": $(this).children("td:nth-child(13)").children('img')[0].outerHTML,
+                    "addTestCaseDetailsInfo": getRowData.addTestCaseDetailsInfo
                 });
             }
         });
@@ -5163,6 +5443,12 @@ function copyTestStep() {
             editable: false
         });
         $("#jqGrid").jqGrid("setColProp", "remarksIcon", {
+            editable: false
+        });
+        $("#jqGrid").jqGrid("setColProp", "addTestCaseDetails", {
+            editable: false
+        });
+        $("#jqGrid").jqGrid("setColProp", "addTestCaseDetailsInfo", {
             editable: false
         });
         $("#jqGrid").resetSelection();
@@ -5560,46 +5846,26 @@ function getTags(data) {
     var obnames = [];
     var appTypeLocal = JSON.parse(window.localStorage['_CT']).appType;
     if (appTypeLocal == "Web") {
-        obnames.push("@Generic");
-        obnames.push("@Excel");
-        obnames.push("@Custom");
-        obnames.push("@Browser");
-        obnames.push("@BrowserPopUp");
+        obnames = ["@Generic","@Excel","@Custom","@Browser","@BrowserPopUp"];
     } else if (appTypeLocal == "Webservice") {
-        obnames.push("@Generic");
-        obnames.push("@Excel");
-        obnames.push("WebService List");
+        obnames = ["@Generic","@Excel","WebService List"];
     } else if (appTypeLocal == "Mainframe") {
-        obnames.push("@Generic");
-        obnames.push("@Excel");
-        obnames.push("Mainframe List");
+        obnames = ["@Generic","@Excel","Mainframe List"];
     } else if (appTypeLocal == "Desktop") {
-        obnames.push("@Generic");
-        obnames.push("@Excel");
-        obnames.push("@Window");
-        obnames.push("@Custom");
-        obnames.push("@Email");
+        obnames = ["@Generic","@Excel","@Window","@Custom","@Email"];
     } else if (appTypeLocal == "DesktopJava") {
-        obnames.push("@Generic");
-        obnames.push("@Excel");
-        obnames.push("@Oebs");
-        obnames.push("@Custom");
+        obnames = ["@Generic","@Excel","@Oebs","@Custom"];
     } else if (appTypeLocal == "MobileApp") {
-        obnames.push("@Generic");
-        obnames.push("@Mobile");
-        obnames.push("@Action");
+        obnames = ["@Generic","@Mobile","@Action"];
     } else if (appTypeLocal == "MobileWeb") {
-        obnames.push("@Generic");
-        obnames.push("@Browser");
-        obnames.push("@BrowserPopUp");
-        obnames.push("@Action");
+        obnames = ["@Generic","@Browser","@BrowserPopUp","@Action"];
     } else if (appTypeLocal == "MobileApp") {
-        obnames.push("@Generic");
-        obnames.push("@MobileiOS");
+        obnames = ["@Generic", "@MobileiOS"]
     } else if (appTypeLocal == "SAP") {
-        obnames.push("@Generic");
-        obnames.push("@Sap");
-        obnames.push("@Custom");
+        obnames = ["@Generic", "@Sap", "@Custom"]
+    }
+    else if(appTypeLocal="System"){
+        obnames=["@Generic","@System"];
     }
     for (var i = 0; i < data.length; i++) {
         obnames.push(data[i].custname);
@@ -5708,5 +5974,16 @@ function openDialog(title, body,submitflag) {
             $("#globalTaskSubmit").modal("show");
     }
    
+}
+
+function openModalFormDialog(title, body)
+{
+            $("#globalModalForm").find('.modal-title').text(title);
+            $("#globalModalForm").next('.modal-sm').removeClass('modal-');
+            $("#globalModalForm").find('.modal-body p').text(body).css('color', 'black');
+            $("#globalModalForm").modal("show");
+            setTimeout(function() {
+                $("#globalModalForm").find('.btn-default').focus();
+            }, 300);
 }
 

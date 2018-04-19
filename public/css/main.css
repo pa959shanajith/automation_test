@@ -636,6 +636,16 @@ body {
     font-size: 15px;
 }
 
+.tasks-l-l{
+    left : -13 px;
+}
+.tasks-l-m{
+    left : -5px;
+}
+.tasks-l-s{
+    left : 0px;
+}
+
 .assignedTask {
 	cursor: pointer;
     font-size: 17px;
@@ -1454,8 +1464,6 @@ input[disabled]{
     border-radius: 4px;
     height: 25px;
     width: 60%;
-    margin-left: 34%;
-    margin-top: -10%;
     line-height: 1.7;
     border: 1px solid #656565 !important;
 }
@@ -1477,7 +1485,6 @@ input[disabled]{
 }
 
 .dropdown-menu-multiselect{
-    margin-left: 15px;
     margin-top: -5px;
     z-index: 1000;
     display: none;
@@ -2321,6 +2328,12 @@ input[disabled]{
 	width:100%;
 	position: relative;
 }
+
+/* .designDataTable tbody
+{
+    display:none;
+} */
+
 .executionDataTable thead, .scheduleDataHeader, .designDataTable thead {
     position: fixed;
     width: calc(100% - 308px);
@@ -2687,12 +2700,14 @@ input[disabled]{
 .designDataTable thead tr th:nth-child(1), .designDataTable tbody tr td:nth-child(1){width: 5% !important;}
 .designDataTable thead tr th:nth-child(2), .designDataTable tbody tr td:nth-child(2){width: 3% !important;}
 .designDataTable tbody tr td:nth-child(3),.designDataTable tbody tr td:nth-child(4), .designDataTable thead tr th:nth-child(3), .designDataTable thead tr th:nth-child(4){width: 0;}
-.designDataTable thead tr th:nth-child(5), .designDataTable tbody tr td:nth-child(5){width: 22% !important; text-align: left;}
-.designDataTable thead tr th:nth-child(6), .designDataTable tbody tr td:nth-child(6){width: 20% !important;}
+.designDataTable thead tr th:nth-child(5), .designDataTable tbody tr td:nth-child(5){width: 18% !important; text-align: left;}
+.designDataTable thead tr th:nth-child(6), .designDataTable tbody tr td:nth-child(6){width: 18% !important;}
 .designDataTable thead tr th:nth-child(7), .designDataTable tbody tr td:nth-child(7){width: 20% !important;}
 .designDataTable thead tr th:nth-child(8), .designDataTable tbody tr td:nth-child(8){width: 20% !important;}
-.designDataTable thead tr th:nth-child(9), .designDataTable tbody tr td:nth-child(9){width: 10% !important;}
-.designDataTable thead tr th:nth-child(5), .designDataTable thead tr th:nth-child(6), .designDataTable thead tr th:nth-child(7), .designDataTable thead tr th:nth-child(8){border-right: 1px solid #fff;}
+.designDataTable thead tr th:nth-child(9), .designDataTable tbody tr td:nth-child(9){width: 8% !important;}
+.designDataTable thead tr th:nth-child(13), .designDataTable tbody tr td:nth-child(13){width: 8% !important;}
+
+.designDataTable thead tr th:nth-child(5), .designDataTable thead tr th:nth-child(6), .designDataTable thead tr th:nth-child(7), .designDataTable thead tr th:nth-child(8),.designDataTable thead tr th:nth-child(9){border-right: 1px solid #fff;}
 .designDataTable tbody tr td:nth-child(1),.designDataTable tbody tr td:nth-child(2),.designDataTable tbody tr td:nth-child(5),.designDataTable tbody tr td:nth-child(6),.designDataTable tbody tr td:nth-child(7),.designDataTable tbody tr td:nth-child(8){text-align: left;}
 .designDataTable tbody tr td:nth-child(6),.designDataTable tbody tr td:nth-child(7),.designDataTable tbody tr td:nth-child(8){padding-left: 3px; padding-right: 5px; word-break: break-all;}
 .designDataTable tbody tr td:nth-child(5){padding-right: 5px; padding-left: 5px; word-wrap: break-word; word-break: break-all;}
@@ -3269,7 +3284,7 @@ li.select_all .addCustObj{
 
 .projectTypes,.projectTypes_create {
 	float: left;
-	width: 12.5%;
+	width: 10.5%;
 	padding: 7px;
 	text-align: center;
 	cursor: pointer
@@ -3499,7 +3514,6 @@ li.select_all .addCustObj{
 
 #additionalRoles{
 	position: relative;
-    left: 95px;
     top: -1px;
 }
 /*****************ADMIN CSS NEW ************************/
@@ -3608,7 +3622,7 @@ li.select_all .addCustObj{
 
 .projectTypes,.projectTypes_create {
 	float: left;
-	width: 12.5%;
+	width: 10.5%;
 	padding: 7px;
 	text-align: center;
 	cursor: pointer
@@ -4241,7 +4255,7 @@ select:-webkit-autofill:focus {
 .reportsDetails th:nth-child(5), .rDellaps{width: 12%;}
 .reportsDetails th:nth-child(6), .rDcomments{width: 13%;}
 .maintabCont{float: left; width: 100%; border: 1px solid #dcdcdc;}
-.tabCont{display: table-cell; border-bottom: 1px solid #ececec;}
+.tabCont{display: table-cell; border-bottom: 1px solid #ececec;word-wrap:break-word}
 .reportsDetail{line-height: 2; text-align: center; height:425px; overflow: auto;}
 .rDstepDes{text-align: left;}
 .openreportstatuss{text-decoration: none; cursor: text;}
@@ -4565,18 +4579,20 @@ select:-webkit-autofill:focus {
 }
 
 /**********Search field style**********/
-.searchIcon{
+.filterIcon{
 	cursor: pointer;
 	background: white;
     padding: 4px;
     border-radius: 7px 7px 7px 7px;
     position: relative;
     left: 61px;
+    margin: 3px;
 }
 .searchInput{
 	  border-radius: 7px 0px 0px 7px;
     border: none;
-    position: relative;
+    position: absolute;
+    margin-left: 79px;
     left: 60px;
     height: 28px;
     outline: none;
@@ -5585,3 +5601,59 @@ border-radius: 6px;
     border-right-color:transparent
 }
 /*For Side bars*/
+.form-control-width
+{
+    width: 90% !important;
+}
+.form-custom
+{
+    margin-bottom: 5%;
+}
+.checkContainerBox
+{
+    float: left;
+    width: 100%;
+    padding-bottom: 3%;
+}
+
+.checkContainerBox .checkbox-inline input[type='checkbox']{
+    width: 18px;
+    height: 16px;
+    float: left;
+}
+label.checkbox{
+    display:block !important;
+}
+option:disabled {
+    background: #ccc!important;
+}
+#preferencesTable thead th
+{
+    background: #5e626b;
+    color: #fff;
+    border-right: 1px solid #fff;
+    border-radius: 4px;
+    padding: 0.5%;
+}
+#preferencesTable tbody td
+{
+    padding: 1% !important;
+}
+.module_admin
+{
+    width: 14px;
+    height: 14px;
+}
+#preferencesTable tr:nth-child(odd)
+{
+    background: rgb(232, 230, 254);
+}
+.positionInputSerachBox
+{
+    top:0px;
+    left: 3px;
+}
+#additionalRoleTxt
+{
+    width: 33% !important;
+}

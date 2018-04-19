@@ -3,9 +3,14 @@ mySPA.controller('loginController', function ($scope, $rootScope, $timeout, $htt
 	$scope.loginValidation = "";
 	window.localStorage.clear();
 	window.localStorage['LoginSuccess'] = "False";
-	document.getElementById("currentYear").innerHTML = new Date().getFullYear()
-
-
+	document.getElementById("currentYear").innerHTML = new Date().getFullYear();
+	
+	///if checkLoggedIn was true, means, user was logged in but now the session is expired 
+	if(window.sessionStorage.getItem('checkLoggedIn') == "true"){
+		$scope.loginValidation = "Your session has expired, Please login again";
+		window.sessionStorage['checkLoggedIn'] = "false";
+	}
+	
 	$scope.check_credentials = function (path) {
 		cfpLoadingBar.start();
 		$scope.loginValidation = "";
@@ -38,84 +43,56 @@ mySPA.controller('loginController', function ($scope, $rootScope, $timeout, $htt
 						$(".ic-password").parent().addClass("input-border-error")
 						$scope.loginValidation = "The username or password you entered isn't correct. Please try again.";
 						cfpLoadingBar.complete();
-					}
-                    // else if(data == "userLogged"){
-                    //     $scope.loginValidation = "User is already logged in!";
-					// 	cfpLoadingBar.complete();
-				    // }
-					else {
-						if (data == 'validCredential') {
-							cfpLoadingBar.complete();
-							$(".ic-username").children().attr("src", "imgs/ic-username.png");
-							$(".ic-password").children().attr("src", "imgs/ic-password.png");
-							$(".ic-username, .ic-password").parent().removeClass("input-border-error")
-							var username = $scope.userName.toLowerCase();
-							var password = $scope.password;
-							$scope.loginButtonValidation = '';
-							var selRole;
-
-							LoginService.loadUserInfo_Nineteen68(username,selRole,false)
-							.then(function (data) {
-								if(data != "fail"){
-									//To be removed - Has to come from database
-									var availablePlugins = [];
-									var key = ["ALM", "APG", "Dashboard", "Dead Code Identifier", "Mindmap", "Neuron Graphs", "Neuron Graphs 3D", "Oxbow Code Identifier", "Reports", "Utility", "Webocular"];
-									for(i=0; i<data.plugindetails.length; i++){
-										availablePlugins.push({
-											"pluginName" : key[i],
-											"pluginValue" : data.plugindetails[i].keyValue
-										})
-									}
-									data.pluginsInfo = availablePlugins;
-									window.localStorage['LoginSuccess'] = "True";
-									window.localStorage['_UI'] = JSON.stringify(data);
-									var roleasarray=[];
-									roleasarray.push(data.role);
-									LoginService.getRoleNameByRoleId_Nineteen68(roleasarray)
-									.then(function (data) {
-										if(data != "fail"){
-											window.localStorage['_SR'] = data;
-											window.localStorage['_pR'] = data+";"+roleasarray;
-
-											if(data == "Admin"){
-												window.localStorage['navigateScreen'] = "admin";
-												$location.path( "/admin");
-											}
-											else{
-												window.localStorage['navigateScreen'] = "plugin";
-												$location.path( "/plugin");
-											}
-										}
-										else	console.log("Fail to get role name by role Id.");
-									}, function (error) { console.log("Fail to Load UserInfo") });
-								}
-								else	console.log("Failed to Load UserInfo.");
-							}, function (error) { console.log("Fail to Load UserInfo") });
-						}
-						else if(data == "userLogged"){
-							 $scope.loginValidation = "User is already logged in! Please logout from the previous session.";
-						     cfpLoadingBar.complete();
-				         }
-					}
-				}
-
-				else if(data == 'noProjectsAssigned')
-				{
-						$scope.loginValidation = "To Login, user must be allocated to a Domain and Project. Please contact Admin.";
+					} else if(data == "userLogged"){
+						$scope.loginValidation = "User is already logged in! Please logout from the previous session.";
 						cfpLoadingBar.complete();
-				}
-				else if(data == 'invalid_username_password')
-				{
+					} else if (data == 'validCredential') {
+						cfpLoadingBar.complete();
+						$(".ic-username").children().attr("src", "imgs/ic-username.png");
+						$(".ic-password").children().attr("src", "imgs/ic-password.png");
+						$(".ic-username, .ic-password").parent().removeClass("input-border-error");
+						$scope.loginButtonValidation = "";
+						LoginService.loadUserInfo_Nineteen68()
+						.then(function (data) {
+							if(data != "fail"){
+								window.localStorage['LoginSuccess'] = "True";
+								window.localStorage['_SR'] = data.rolename;
+								window.localStorage['_UI'] = JSON.stringify(data);
+								window.sessionStorage["checkLoggedIn"]= "true";
+								if(data.rolename == "Admin"){
+									window.localStorage['navigateScreen'] = "admin";
+									$location.path( "/admin");
+								}
+								else{
+									window.localStorage['navigateScreen'] = "plugin";
+									$location.path( "/plugin");
+								}
+							} else {
+								$scope.loginValidation = "Failed to Login.";
+								console.log("Failed to Load UserInfo.");
+							}
+						}, function (error) {
+							$scope.loginValidation = "Failed to Login.";
+							console.log("Fail to Load UserInfo")
+						});
+					}
+				} else if(data == 'noProjectsAssigned') {
+					$scope.loginValidation = "To Login, user must be allocated to a Domain and Project. Please contact Admin.";
+					cfpLoadingBar.complete();
+				} else if(data == 'invalid_username_password') {
 					$scope.loginValidation = "The username or password you entered isn't correct. Please try again.";
 					console.log("Invalid username or password");
 					cfpLoadingBar.complete();
-				}
-				else{
+				} else {
 					$scope.loginValidation = "Failed to Login.";
 					console.log("Fail to Login.")
 					cfpLoadingBar.complete();
 				}
-			}, function (error) { console.log("Failed to Authenticate User") });
+			}, function (error) {
+				console.log("Failed to Authenticate User.")
+				$scope.loginValidation = "Failed to Authenticate User.";
+				cfpLoadingBar.complete();
+			});
 		}
 	}
 });

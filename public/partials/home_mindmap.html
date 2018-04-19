@@ -8,7 +8,7 @@
                <div class="clear-both"></div>
                <div id="left-top-section" class="mindmap-left-section" style="top: 150px !important;">
                   <ul>
-                     <li><a id='reqImg1' ng-click="tab = 'tabRequirement'; createMapsCall()" href="#" title="Requirement"><span><img id='reqImg' class="highlightImg selectedIcon" src="images_mindmap/requirement.png" alt="Requirement"></span>Requirement</a></li>
+                     <li><a id='reqImg1' ng-click="tab = 'tabRequirement'; createMapsCall()" class = 'no-disp' href="#" title="Requirement"><span><img id='reqImg' class="highlightImg selectedIcon" src="images_mindmap/requirement.png" alt="Requirement"></span>Requirement</a></li>
                      <li>
                         <a id='createImg1' ng-click="tab = 'mindmapCreateOption'; createMapsCall()" href="#" title="Create"><span ><img id='createImg' class="highlightImg highlightImg1" src="images_mindmap/create.png" alt="Create"></span>Create</a>
                         <!--<span  class="ct-expand ct-show-left">
@@ -42,7 +42,13 @@
    		<div class="createOptionContainer">
    			<div ng-click="createMap('tabCreate'); tab = 'tabCreate'; createMapsCall()" title="Create New"><img alt="Create New" class="" src="images_mindmap/ic-create-newMindmap.png"><label>Create New</label></div>
    			<div ng-click="createMap('mindmapEndtoEndModules'); tab = 'mindmapEndtoEndModules'; createMapsCall()" title="End to End flow"><img alt="End to End flow" class="" src="images_mindmap/ic-endtoendFlow.png"><label>End to End Flow</label></div>
-   			<div title="Import from Excel"><img alt="Import from Excel" class="" src="images_mindmap/ic-importfromexcel-mindmap.png"><label>Import from Excel</label></div>
+   			<div title="Import from Excel">
+                <label for="file-input">
+                    <img alt="Import from Excel" class="" src="images_mindmap/ic-importfromexcel-mindmap.png">
+                </label>
+                <label>Import from Excel</label>
+                <input id="file-input" on-read-file="showContent($fileContent)" type="file" name="xlsfile" accept=".xls,.xlsx" required="" autofocus="" style="display:none"/>
+            </div>
    		</div>
    </div>   
    <div id="ct-main-e2e" class="fl-left" ng-if="tab == 'mindmapEndtoEndModules'">
@@ -55,7 +61,7 @@
                             <option value="project2">Project2</option>
                         </select>
                         <input type="text" class="makeElementFloatleft" id="eteSearchModules"  ng-keyup = "searchModule('eteSearchModules')" placeholder="Search modules" /><img alt="Search Icon" class="searchModuleimg" src="imgs/ic-search-icon.png" >
-                        <span class="eteLabel makeElementFloatleft">End to End Modules</span>
+                        <span class="eteLabel makeElementFloatleft no-disp">End to End Modules</span>
                     </div>
                     <div class="scrollbar-inner endtoend-modules-left-lower makeElementFloatleft" style="overflow-y:hidden !important" id="etemModuleContainer"></div>
                 </div>
@@ -81,7 +87,7 @@
       <div id="ct-projectList">
          <div class="ct-project"></div>
       </div>
-      <div ng-if="tab == 'tabRequirement'" id="page-taskName" class="showContainer" style="width:0px !important"><span class="taskname">Requirement</span></div>
+      <!--<div ng-if="tab == 'tabRequirement'" id="page-taskName" class="showContainer" style="width:0px !important"><span class="taskname">Requirement</span></div>-->
       <div ng-if="tab == 'tabRequirement'" class='clear-both'></div>
       <div ng-if="tab == 'tabRequirement'" class="content-div"></div>
       <div ng-if="tab == 'tabRequirement'" class="content-div"></div>
@@ -92,7 +98,7 @@
       <div ng-if="tab == 'tabCreate'" id="ct-moduleBox" class="ct-moduleBoxOptional tabCreate">      
 
 		<div class="ct-project-tab">
-            <button ng-if="tab=='tabCreate'" style="position: absolute;padding: 0px 13px;top: 1px;right: 209px;" class="btn btn-md pull-right pairwise-GenBtn" ng-click="createNewMap()" title="Create New Mindmap">Create New</button>
+            <button ng-if="tab=='tabCreate'" style="position: absolute;padding: 0px 13px;top: 1px;right: 209px;" class="btn btn-md pull-right pairwise-GenBtn" ng-click="createNewMapModal()" title="Create New Mindmap">Create New</button>
                 <span ng-if="tab == 'tabCreate'" id='SearchCreate-ete'>
                     <span class="search-create"><img alt="Search Icon" class="searchModuleimg-create" src="imgs/ic-search-icon.png"></span>
                     <input type="text" id="searchModule-create" class="searchbox-create" placeholder="Search Modules" ng-keyup = "searchModule('searchModule-create')">
@@ -238,8 +244,8 @@
       <!--Images Blocks-->
       <div ng-if="tab == 'tabCreate' || tab == 'tabAssign' || tab=='mindmapEndtoEndModules'" class="thumbnail thumbnail-custom">
       <!--<div class="thumbnail thumbnail-custom">-->
-         <a class="slidePopup" ng-click ="toggleview()" id="switch-layout" class="vertical-layout" title="SwitchLayout">
-            <img class="thumb-ic" src="imgs/ic-preferences.png" alt="SwitchLayout">
+         <a class="slidePopup" ng-click ="toggleview()" id="switch-layout" class="vertical-layout" title="SwitchLayout" >
+            <img class="thumb-ic" src="imgs/switch.png" alt="SwitchLayout" style="height: 55px;">
             <div class="caption">
                <p>Switch Layout</p>
             </div>
@@ -249,13 +255,23 @@
       <div ng-if="tab == 'tabCreate' || tab == 'tabAssign' || tab=='mindmapEndtoEndModules'" class="thumbnail thumbnail-custom">
       <!--<div class="thumbnail thumbnail-custom">-->
          <a class="slidePopup" ng-click ="fullScreen()" id="fullscr" title="full screen">
-            <img class="thumb-ic" src="imgs/ic-preferences.png" alt="full screen">
+            <img class="thumb-ic" src="imgs/fscr.png" alt="full screen" style="height: 55px;">
             <div class="caption">
                <p>Full Screen</p>
             </div>
          </a>
       </div>
-      
+
+      <div ng-if="tab == 'tabCreate'" class="thumbnail thumbnail-custom">
+      <!--<div class="thumbnail thumbnail-custom">-->
+         <a class="slidePopup" ng-click ="toggleMinimap()" id="togglemini" title="toggle minimap">
+            <img class="thumb-ic" src="imgs/ic-webservice.png" alt="full screen" style="height: 55px;">
+            <div class="caption">
+               <p>Toggle Minimap View</p>
+            </div>
+         </a>
+      </div>
+
       <!--Images Blocks-->  		
       <div class="thumbnail thumbnail-custom">
          <a class="slidePopup" title="Info">
@@ -357,7 +373,7 @@
             <!--Modal Content-->
         </div>
         <div class="modal-footer">
-            <div id="complexity-val" class="" style="display: inline-block;float: left;">Complexity: Unset</div>
+            <div id="complexity-val" class="" style="display: inline-block;float: left;">Complexity: Not Set</div>
             <button ng-click="submitComplexity()" type="button" id="submitComplexity" class="btn btn-default">Ok</button>
         </div>
         </div>
@@ -410,6 +426,67 @@
 			</div>
 		</div>
 	</div>
-<!--Footer-->
+<!-- MIndmaps renaming confirmation dialog-->
+<div class="modal fade" id="renamingConfirmationPopup" role="dialog" data-keyboard="false" data-backdrop="static">
+	<div class="modal-dialog modal-sm">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">&times;</button>
+				<h4 class="modal-title">Confirmation</h4>
+			</div>
+			<div class="modal-body">
+				<p>This screenname is already reused, It will delete all the testcases associated. Do you wish to continue?</p>
+                
+			</div>
+			<div class="modal-footer">
+                <button type="button" class="btn btn-default" id="deleteTestcase" data-dismiss="modal">Yes</button>
+				<button type="button" class="btn btn-default" id="undoChanges" data-dismiss="modal">No</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- MIndmaps createnewmap confirmation dialog-->
+<div class="modal fade" id="createNewConfirmationPopup" role="dialog" data-keyboard="false" data-backdrop="static">
+	<div class="modal-dialog modal-sm">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">&times;</button>
+				<h4 class="modal-title">Confirmation</h4>
+			</div>
+			<div class="modal-body">
+				<p>Unsaved work will be lost if you continue. Do you want to continue?</p>
+                
+			</div>
+			<div class="modal-footer">
+                <button type="button" class="btn btn-default" ng-click="callFunction()" data-dismiss="modal">Yes</button>
+				<button type="button" class="btn btn-default" id="undoChanges" data-dismiss="modal">No</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- MIndmaps createnewmap confirmation dialog-->
+<div class="modal fade" id="ProjectInput" role="dialog" data-keyboard="false" data-backdrop="static">
+	<div class="modal-dialog modal-sm">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">&times;</button>
+				<h4 class="modal-title">Select a Project</h4>
+			</div>
+			<div class="modal-body">
+                    <select class="project-list project-list-popup">
+                        <option value="" disabled selected>Please Select Project</option>
+                        <option value="project1">Project1</option>
+                        <option value="project2">Project2</option>
+                    </select>
+			</div>
+			<div class="modal-footer">
+                <button type="button" class="btn btn-default" ng-click="createFromJson()" data-dismiss="modal">Create Flow</button>
+			</div>
+		</div>
+	</div>
+</div>
+
 <footer footer id="footer" class="footer-global"></footer>
 <!--Footer-->

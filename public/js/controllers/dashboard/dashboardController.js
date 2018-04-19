@@ -58,7 +58,7 @@ mySPA.controller('dashboardController', ['$scope', '$rootScope', '$http', '$time
     };
     $scope.taskStatus= {};
     $scope.taskTypesCount = {};
-    $scope.tData.forEach((d)=>{
+    $scope.tData.forEach(function(d){
       $scope.totalReestimationCount += $scope.sumRestimationCount(d.data);
       $scope.getTaskDetails(d.data);
     });
@@ -118,7 +118,7 @@ mySPA.controller('dashboardController', ['$scope', '$rootScope', '$http', '$time
 
   $scope.sumRestimationCount = function(data){
     var total = 0;
-    data.forEach((d)=>{
+    data.forEach(function(d){
       if ($scope.selectedProject.id == null) {
         total += Number(d.row[0].re_estimation);
       }else{
@@ -135,7 +135,7 @@ mySPA.controller('dashboardController', ['$scope', '$rootScope', '$http', '$time
   $scope.getTaskDetails= function(data){
     var adherenceFlag = true;
     $scope.scheduledAdherence  = "emerald";
-    data.forEach((d)=>{
+    data.forEach(function(d){
       var taskStatus = d.row[0].status;
         if ($scope.selectedProject.id == null || d.row[0].parent.includes($scope.selectedProject.id)) {
           var date = d.row[0].endDate.split("/");
@@ -291,7 +291,7 @@ mySPA.controller('dashboardController', ['$scope', '$rootScope', '$http', '$time
   var userid = userInfo.user_id;
 
   dashboardService.loadDashboardData(userid)
-  .then((data)=>{
+  .then(function(data){
     //console.log(data);
     $scope.eData = data.eData;
     $scope.tData = data.tData;
@@ -338,7 +338,7 @@ mySPA.controller('dashboardController', ['$scope', '$rootScope', '$http', '$time
       "Execute Batch":0
     }
 
-    $scope.tData.forEach((d)=>{
+    $scope.tData.forEach(function(d){
       $scope.totalReestimationCount += $scope.sumRestimationCount(d.data);
       $scope.getTaskDetails(d.data);
     });
@@ -352,7 +352,7 @@ mySPA.controller('dashboardController', ['$scope', '$rootScope', '$http', '$time
     progressAnimate();
     console.log($scope.taskStatus);
     console.log($scope.totalReestimationCount);
-  }, (err)=>{
+  }, function(err){
     console.log(err);
   });
 }]);

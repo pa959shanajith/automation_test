@@ -83,7 +83,7 @@ mySPA.factory('mindmapServices', ['$http','$q', function ($http,$q)   {
     		.then(function (response) { return response.data; },
     				function (response) { return $q.reject(response.data); });
     	},
-		saveData: function (versioning_enabled,assignedTo,writeFlag,userRole,from_v,to_v,cur_module,mapData,deletednode,unassignTask,prjId,relId,cycId){
+		saveData: function (versioning_enabled,assignedTo,writeFlag,userRole,from_v,to_v,cur_module,mapData,deletednode,unassignTask,prjId,relId,cycId,selectedTab){
 			var param = "/saveData";
 			if (versioning_enabled==1){
 				param = "/saveDataVersioning";
@@ -101,7 +101,8 @@ mySPA.factory('mindmapServices', ['$http','$q', function ($http,$q)   {
 					unassignTask: unassignTask,
 					prjId: prjId,
 					relId: relId,
-					cycId: cycId
+					cycId: cycId,
+					selectedTab:selectedTab
 			})
 			.then(function (response) { return response.data; },
 					function (response) { return $q.reject(response.data); });
@@ -182,6 +183,12 @@ mySPA.factory('mindmapServices', ['$http','$q', function ($http,$q)   {
     		.then(function (response) { return response.data; },
     				function (response) { return $q.reject(response.data); });
     	},
-
+		excelToMindmap: function(data){
+    		return $http.post('/excelToMindmap', {
+    			data: data
+    		})
+    		.then(function (response) { return response.data; },
+    				function (response) { return $q.reject(response.data); });
+		},
 	}
 }]);

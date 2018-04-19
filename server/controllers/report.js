@@ -57,17 +57,17 @@ exports.openScreenShot = function (req, res) {
 		var name = req.session.username;
 		logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
 		logger.debug("ICE Socket requesting Address: %s" , name);
-		redisServer.redisSub2.subscribe('ICE2_' + name);
-		redisServer.redisPub1.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
+		redisServer.redisSubServer.subscribe('ICE2_' + name);
+		redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
 			if (redisres[1]>0) {
 				logger.info("Sending socket request for render_screenshot to redis");
 				dataToIce = {"emitAction" : "render_screenshot","username" : name, "path":path};
-				redisServer.redisPub1.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
+				redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
 				var updateSessionExpiry = utils.resetSession(req.session);
 				function render_screenshot_listener(channel,message) {
 					data = JSON.parse(message);
 					if(name == data.username){
-						redisServer.redisSub2.removeListener('message',render_screenshot_listener);
+						redisServer.redisSubServer.removeListener('message',render_screenshot_listener);
 						if (data.onAction == "unavailableLocalServer") {
 							logger.error("Error occured in openScreenShot: Socket Disconnected");
 							if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
@@ -87,7 +87,7 @@ exports.openScreenShot = function (req, res) {
 						}
 					}
 				}
-				redisServer.redisSub2.on("message",render_screenshot_listener);
+				redisServer.redisSubServer.on("message",render_screenshot_listener);
 			} else {
 				utils.getChannelNum('ICE1_scheduling_' + name, function(found){
 					var flag="";
@@ -998,7 +998,7 @@ exports.connectJira_ICE = function (req, res) {
 	try{
 		if (utils.isSessionActive(req.session)) {
 			var name = req.session.username;
-			redisServer.redisSub2.subscribe('ICE2_' + name);
+			redisServer.redisSubServer.subscribe('ICE2_' + name);
 			if(req.body.action == 'loginToJira'){ //Login to Jira for creating issues
 				var jiraurl = req.body.url;
 				var jirausername = req.body.username;
@@ -1013,17 +1013,17 @@ exports.connectJira_ICE = function (req, res) {
 					try {
 						logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
 						logger.debug("ICE Socket requesting Address: %s" , name);
-						redisServer.redisPub1.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
+						redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
 							if (redisres[1]>0) {
 								logger.info("Sending socket request for jira_login to redis");
 								dataToIce = {"emitAction": "jiralogin", "username": name, "action": req.body.action, "inputs": inputs};
-								redisServer.redisPub1.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
+								redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
 								var updateSessionExpiry = utils.resetSession(req.session);
 								var count = 0;
 								function jira_login_1_listener(channel,message) {
 									data = JSON.parse(message);
 									if(name == data.username){
-										redisServer.redisSub2.removeListener("message",jira_login_1_listener);
+										redisServer.redisSubServer.removeListener("message",jira_login_1_listener);
 										if (data.onAction == "unavailableLocalServer") {
 											logger.error("Error occured in connectJira_ICE - loginToJira: Socket Disconnected");
 											if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
@@ -1049,7 +1049,7 @@ exports.connectJira_ICE = function (req, res) {
 										}
 									}
 								}
-								redisServer.redisSub2.on("message",jira_login_1_listener);
+								redisServer.redisSubServer.on("message",jira_login_1_listener);
 							} else {
 								utils.getChannelNum('ICE1_scheduling_' + name, function(found){
 									var flag="";
@@ -1077,17 +1077,17 @@ exports.connectJira_ICE = function (req, res) {
 					try {
 						logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
 						logger.debug("ICE Socket requesting Address: %s" , name);
-						redisServer.redisPub1.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
+						redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
 							if (redisres[1]>0) {
 								logger.info("Sending socket request for jira_login to redis");
 								dataToIce = {"emitAction": "jiralogin", "username": name, "action": req.body.action, "inputs": createObj};
-								redisServer.redisPub1.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
+								redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
 								var updateSessionExpiry = utils.resetSession(req.session);
 								var count = 0;
 								function jira_login_2_listener(channel,message) {
 									data = JSON.parse(message);
 									if(name == data.username){
-										redisServer.redisSub2.removeListener("message",jira_login_2_listener);
+										redisServer.redisSubServer.removeListener("message",jira_login_2_listener);
 										if (data.onAction == "unavailableLocalServer") {
 											logger.error("Error occured in connectJira_ICE - createIssueInJira: Socket Disconnected");
 											if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
@@ -1113,7 +1113,7 @@ exports.connectJira_ICE = function (req, res) {
 										}
 									}
 								}
-								redisServer.redisSub2.on("message",jira_login_2_listener);
+								redisServer.redisSubServer.on("message",jira_login_2_listener);
 							} else {
 								utils.getChannelNum('ICE1_scheduling_' + name, function(found){
 									var flag="";

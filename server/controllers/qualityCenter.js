@@ -18,7 +18,7 @@ exports.loginQCServer_ICE = function (req, res) {
 		logger.info("Inside UI service: loginQCServer_ICE");
 		if (utils.isSessionActive(req.session)) {
 			name = req.session.username;
-			redisServer.redisSub2.subscribe('ICE2_' + name);
+			redisServer.redisSubServer.subscribe('ICE2_' + name);
 			var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
 			logger.debug("ICE Socket connecting IP: %s" , ip);
 			logger.debug("ICE Socket requesting Address: %s" , name);
@@ -35,7 +35,7 @@ exports.loginQCServer_ICE = function (req, res) {
                  validate_qcPassword = true;
             }
 			if(validate_qcUrl == true && validate_qcUsername == true &&  validate_qcPassword == true) {
-				redisServer.redisPub1.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
+				redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
 					if (redisres[1]>0) {
 						var username = req.body.qcUsername;
 						var password = req.body.qcPassword;
@@ -49,13 +49,13 @@ exports.loginQCServer_ICE = function (req, res) {
 						};
 						logger.info("Sending socket request for qclogin to redis");
 						dataToIce = {"emitAction" : "qclogin","username" : name, "responsedata":qcDetails};
-						redisServer.redisPub1.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
+						redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
 						var updateSessionExpiry = utils.resetSession(req.session);
 						function qclogin_listener(channel,message) {
 							data = JSON.parse(message);
 							if(name == data.username){
 								clearInterval(updateSessionExpiry);
-								redisServer.redisSub2.removeListener('message',qclogin_listener);
+								redisServer.redisSubServer.removeListener('message',qclogin_listener);
 								if (data.onAction == "unavailableLocalServer") {
 									logger.error("Error occured in loginQCServer_ICE: Socket Disconnected");
 									if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
@@ -68,7 +68,7 @@ exports.loginQCServer_ICE = function (req, res) {
 								}
 							}
 						}
-						redisServer.redisSub2.on("message",qclogin_listener);
+						redisServer.redisSubServer.on("message",qclogin_listener);
 					} else {
 						utils.getChannelNum('ICE1_scheduling_' + name, function(found){
 							var flag="";
@@ -114,10 +114,10 @@ exports.qcProjectDetails_ICE = function (req, res) {
 	try {
 		if (utils.isSessionActive(req.session)) {
 			name = req.session.username;
-			redisServer.redisSub2.subscribe('ICE2_' + name);
+			redisServer.redisSubServer.subscribe('ICE2_' + name);
 			logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
 			logger.debug("ICE Socket requesting Address: %s" , name);
-			redisServer.redisPub1.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
+			redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
 				if (redisres[1]>0) {
 					var userid = req.body.user_id;
 					var qcDetails = {
@@ -128,13 +128,13 @@ exports.qcProjectDetails_ICE = function (req, res) {
 						// var qcDetails = {"qcUsername":username,"qcPassword":password,"qcURL":url};
 						logger.info("Sending socket request for qclogin to redis");
 						dataToIce = {"emitAction" : "qclogin","username" : name, "responsedata":qcDetails};
-						redisServer.redisPub1.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
+						redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
 						var updateSessionExpiry = utils.resetSession(req.session);
 						function qclogin_listener(channel,message) {
 							data = JSON.parse(message);
 							if(name == data.username){
 								clearInterval(updateSessionExpiry);
-								redisServer.redisSub2.removeListener('message',qclogin_listener);
+								redisServer.redisSubServer.removeListener('message',qclogin_listener);
 								if (data.onAction == "unavailableLocalServer") {
 									logger.error("Error occured in qcProjectDetails_ICE: Socket Disconnected");
 									if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
@@ -158,7 +158,7 @@ exports.qcProjectDetails_ICE = function (req, res) {
 								}
 							}
 						}
-						redisServer.redisSub2.on("message",qclogin_listener);
+						redisServer.redisSubServer.on("message",qclogin_listener);
 					});
 				} else {
 					utils.getChannelNum('ICE1_scheduling_' + name, function(found){
@@ -315,20 +315,20 @@ exports.qcFolderDetails_ICE = function (req, res) {
 		if (utils.isSessionActive(req.session)) {
 			var qcDetails = req.body;
 			name = req.session.username;
-			redisServer.redisSub2.subscribe('ICE2_' + name);
+			redisServer.redisSubServer.subscribe('ICE2_' + name);
 			logger.debug("IP\'s connected : %s", Object.keys(myserver.allSocketsMap).join());
 			logger.debug("ICE Socket requesting Address: %s" , name);
-			redisServer.redisPub1.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
+			redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
 				if (redisres[1]>0) {
 					logger.info("Sending socket request for qclogin to redis");
 					dataToIce = {"emitAction" : "qclogin","username" : name, "responsedata":qcDetails};
-					redisServer.redisPub1.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
+					redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
 					var updateSessionExpiry = utils.resetSession(req.session);
 					function qclogin_listener(channel,message) {
 						data = JSON.parse(message);
 						if(name == data.username){
 							clearInterval(updateSessionExpiry);
-							redisServer.redisSub2.removeListener('message',qclogin_listener);
+							redisServer.redisSubServer.removeListener('message',qclogin_listener);
 							if (data.onAction == "unavailableLocalServer") {
 								logger.error("Error occured in qcFolderDetails_ICE: Socket Disconnected");
 								if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
@@ -341,7 +341,7 @@ exports.qcFolderDetails_ICE = function (req, res) {
 							}
 						}
 					}
-					redisServer.redisSub2.on("message",qclogin_listener);
+					redisServer.redisSubServer.on("message",qclogin_listener);
 				} else {
 					try {
 						utils.getChannelNum('ICE1_scheduling_' + name, function(found){

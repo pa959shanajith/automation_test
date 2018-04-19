@@ -24,22 +24,17 @@ mySPA.factory('PluginService', ['$http','$q', function ($http,$q) {
 			})
 			.then (function(response)	{return response.data;	},
 			function(response){	return $q.reject(response.data);});	
-		}
+		},
+		getNames_ICE: function (requestedids,idtype) {
+            var param = "getNames_ICE";
+            return $http.post('/getNames_ICE', {
+                action: param,
+				requestedids:requestedids,
+				idtype: idtype
+            })
+            .then(function (response) { return response.data; },
+            function (response) { return $q.reject(response.data); });
+        }
+
 	}
 }]);
-mySPA.factory('socket', ['$rootScope', function($rootScope) {
-	//	var socket = io.connect();
-	if(window.localStorage['_UI'])
-	var userName= Encrypt.encode(JSON.parse(window.localStorage['_UI']).username);
-	var param={check:'notify'};
-	$rootScope.socket = io('', { forceNew: true, reconnect: true, query: param});
-	$rootScope.socket.emit("key",userName);
-	return {
-		on: function(eventName, callback){
-			$rootScope.socket.on(eventName, callback);
-		},
-		emit: function(eventName, data) {
-			$rootScope.socket.emit(eventName, data);
-		}
-	};
-}])

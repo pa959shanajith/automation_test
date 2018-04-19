@@ -1,9 +1,8 @@
 <!DOCTYPE html>
 <!-- Angular App Initialization -->
 <html lang="en" ng-app="singlePageApp">
-
 <head>
-	<!--<base href="/TestAutoWebSPANode/">-->
+	<base href="/">
 	<title>SLK Nineteen68</title>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -12,18 +11,13 @@
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
     <meta name="description" content="">
     <meta name="author" content="">
-    <link rel="icon" href=""> <!-- Favicon -->
+    <link rel="icon" href="imgs/favicon.ico"><!-- Favicon -->
 	<!--Font-->
 	<link rel="stylesheet" type="text/css" href="fonts/latofonts.css" />
 	<link rel="stylesheet" type="text/css" href="css/bootstrap/bootstrap.min.css" />
-	<link rel="stylesheet" type="text/css" href="css/bootstrap/bootstrap-datepicker.min.css" />
-	<link rel="stylesheet" type="text/css" href="css/bootstrap/bootstrap-timepicker.min.css" />
-	<link rel="stylesheet" type="text/css" href="css/bootstrap/bootstrap-slider.css" />
 	<link rel="stylesheet" type="text/css" href="css/bootstrap/bootstrap-notify.min.css" />
 	<link rel="stylesheet" type="text/css" href="css/notify.css" />
 	<!--<link rel="stylesheet" type="text/css" href="css/bootstrap/bootstrap-datetimepicker.css" />-->
-
-
 	<!--Main-->
 	<link rel="stylesheet" type="text/css" href="css/main.css" />
 	<link rel="stylesheet" type="text/css" href="css/scroll.css" />
@@ -38,106 +32,63 @@
 
 	<!--Loading Bar-->
 	<link rel="stylesheet" type="text/css" href="css/loading-bar.css" />
-
-	<!--QC-->
-	<link rel="stylesheet" type="text/css" href="css/css_QC/qcStyle.css" />
 </head>
-
-<body onload="loadBody()">
+<body >
 	<div class="overlayPage"></div>
-	<!-- Content goes in ng-view -->
+	<!-- Content goes in ui-view -->
 	<div id="viewArea" class="viewAreaStyle">
-		<div ng-view class="ngViewCustom"></div>
+		<div ui-view class="ngViewCustom"></div>
 	</div>
-	<!-- Content goes in ng-view -->
+	<!-- Content goes in ui-view -->
+
 	<!-- Angular JS Scripts-->
 	<script type="text/javascript" src="js/plugins/jquery.min.js"></script>
 	<script type="text/javascript" src="js/plugins/jquery.mask.js"></script>
-	<script type="text/javascript" src="js/plugins/angular/angular.min.js"></script>
-	<script type="text/javascript" src="js/plugins/angular/angular-route.min.js"></script>
+
+	<!-- Angular JS Scripts-->
+	<script type="text/javascript" src="js/plugins/angular/angular.min.js"></script>	
+	<script src="js/plugins/angular/angular-ui-router.min.js"></script>
+	<script src="js/plugins/ocLazyLoad.min.js"></script>
 
 	<!-- Angular JS Initialization & Routes-->
 	<script type="text/javascript" src="js/app/initializer/app.js"></script>
 	<script type="text/javascript" src="js/app/navigation/angular-route.js"></script>
-
-	<!-- AngularJS Directives for Transclusion -->
-	<script type="text/javascript" src="js/directives/headerDirective.js"></script>
-	<script type="text/javascript" src="js/directives/footerDirective.js"></script>
-
-	<!--JqGrid-->
-	<script type="text/javascript" src="js/plugins/jquery.jqGrid.min.js"></script>
-	<script type="text/ecmascript" src="js/i18n/grid.locale-en.js"></script>
 	<script type="text/javascript" src="js/plugins/jquery-ui.min.js"></script>
-
-
-
-	<!--AngularJS Controllers-->
-	<script type="text/javascript" src="js/controllers/admin/adminController.js"></script>
-	<script type="text/javascript" src="js/controllers/admin/adminServices.js"></script>
-	<script type="text/javascript" src="js/controllers/header/headerController.js"></script>
-	<script type="text/javascript" src="js/controllers/header/headerServices.js"></script>
-	<script type="text/javascript" src="js/controllers/login/loginController.js"></script>
-	<script type="text/javascript" src="js/controllers/login/loginService.js"></script>
-	<script type="text/javascript" src="js/controllers/plugin/pluginController.js"></script>
-	<script type="text/javascript" src="js/controllers/plugin/pluginService.js"></script>
-	<script type="text/javascript" src="js/controllers/design/designController.js"></script>
-	<script type="text/javascript" src="js/controllers/design/designService.js"></script>
-	<script type="text/javascript" src="js/controllers/execution/executionController.js"></script>
-	<script type="text/javascript" src="js/controllers/execution/executionService.js"></script>
-	<script type="text/javascript" src="js/controllers/scheduling/scheduleController.js"></script>
-	<script type="text/javascript" src="js/controllers/scheduling/scheduleService.js"></script>
-	<script type="text/javascript" src="js/controllers/Reports/reportsController.js"></script>
-	<script type="text/javascript" src="js/controllers/Reports/reportService.js"></script>
-	<script type="text/javascript" src="js/controllers/mindmap/mindmapController.js"></script>
-	<script type="text/javascript" src="js/controllers/mindmap/mindmapService.js"></script>
-	<script type="text/javascript" src="js/controllers/utility/utilityController.js"></script>
-	<script type="text/javascript" src="js/controllers/utility/utilityServices.js"></script>
-	<script type="text/javascript" src="js/controllers/qualityCenter/qcController.js"></script>
-	<script type="text/javascript" src="js/controllers/qualityCenter/qcServices.js"></script>
-	<script type="text/javascript" src="js/controllers/webocular/webocularController.js"></script>
-	<script type="text/javascript" src="js/controllers/webocular/webocularService.js"></script>
-	<script type="text/javascript" src="js/controllers/chatbot/chatbotController.js"></script>
-	<script type="text/javascript" src="js/controllers/chatbot/chatbotService.js"></script>
-	<script type="text/javascript" src="js/controllers/neuronGraphs2D/neuronGraphs2DController.js"></script>
-	<script type="text/javascript" src="js/controllers/neuronGraphs2D/neuronGraphs2DService.js"></script>
-	<script type="text/javascript" src="js/controllers/dashboard/dashboardController.js"></script>
-	<script type="text/javascript" src="js/controllers/dashboard/dashboardService.js"></script>
-	<script type="text/javascript" src="js/controllers/flowGraph/flowGraphController.js"></script>
-	<script type="text/javascript" src="js/controllers/flowGraph/flowGraphService.js"></script>
 	<!--Bootstrap-->
 	<script type="text/javascript" src="js/plugins/bootstrap/bootstrap.min.js"></script>
-	<script type="text/javascript" src="js/plugins/bootstrap/bootstrap-datepicker.min.js"></script>
-	<script type="text/javascript" src="js/plugins/bootstrap/bootstrap-timepicker.min.js"></script>
-	<script type="text/javascript" src="js/plugins/bootstrap/bootstrap-slider.js"></script>
 	<script type="text/javascript" src="js/plugins/bootstrap/bootstrap-notify.min.js"></script>
 	<script type="text/javascript" src="js/plugins/bootstrap/moment-with-locales.js"></script>
 
 	<!-- Socket io -->
-	<script type="text/javascript" src="/socket.io/socket.io.js"></script>
+	
+		<script type="text/javascript" src="js/plugins/three.min.js"></script>
+		<script type="text/javascript" src='js/plugins/libs_ng/OrbitControls.js'></script>
+		<!--<script type="text/javascript" src='js/controllers/neuronGraphs2D/neuronGraphs2DController.js'></script>-->
+		<!--<script type="text/javascript" src='js/controllers/neuronGraphs2D/neuronGraphs2DService.js'></script>-->
 
+
+
+	<script type="text/javascript" src="/socket.io/socket.io.js"></script>
 	<!-- Custom Scroll -->
 	<script type="text/javascript" src="js/plugins/scroll.js"></script>
 
 	<!--Common-->
 	<script type="text/javascript" src="js/plugins/custom.js"></script>
-	<script type="text/javascript" src="js/plugins/dtree.m.scrapper.js"></script>
-	<script type="text/javascript" src="js/plugins/jquery.tablednd.js"></script>
-	<script type="text/javascript" src="js/plugins/d3.v3.min.js"></script>
-	<script type="text/javascript" src="js/plugins/three.min.js"></script>
-	<script type="text/javascript" src="js/plugins/Tween.js"></script>
-	<script type="text/javascript" src="js/plugins/trackballcontrols.min.js"></script>
-	<!--<script type="text/javascript" src="js/plugins/css3drenderer.min.js"></script>-->
-	<script type="text/javascript" src="js/plugins/Chart.min.js"></script>
+	
 	<!--Loading Bar on HTTP Request-->
 	<script type="text/javascript" src="js/plugins/loading-bar.js"></script>
-    <script type="text/javascript" src="js/js_mindmap/createMap.js"></script>
-    <script type="text/javascript" src="js/js_mindmap/WorkFlow.js"></script>
-	<script type="text/javascript" src="js/js_mindmap/versioning.js"></script>
+	
+	<!-- AngularJS Directives for Transclusion -->
+	<script type="text/javascript" src="js/directives/headerDirective.js"></script>
+	<script type="text/javascript" src="js/directives/footerDirective.js"></script>
+	<script type="text/javascript" src="js/directives/chatbotDirective.js"></script>	
+	<script type="text/javascript" src="js/controllers/header/headerService.js"></script>
+
 
     <!--NeuronGraphs-->
 	<!--<script type="text/javascript" src="js/plugins/libs_ng/TrackballControls.js"></script>	-->
     <!--<script type="text/javascript" src="js/plugins/libs_ng/three.js"></script>-->
-	<script type="text/javascript" src="js/plugins/libs_ng/OrbitControls.js"></script>
+	<!-- <script type="text/javascript" src="js/plugins/libs_ng/OrbitControls.js"></script> -->
 	
 	<!--APG-->
 	<script type="text/javascript" src="js/plugins/apg/class-diagram.js"></script>

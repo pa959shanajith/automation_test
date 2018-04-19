@@ -30,9 +30,10 @@ exports.getTaskJson_mindmaps = function (req, res) {
 	logger.info("Inside UI service: getTaskJson_mindmaps");
 	if (utils.isSessionActive(req.session)) {
 		try {
+			//MATCH (b{assignedTo:'60f6ad0b-ce14-4cad-8345-b09c0739f3e2'})<-[r:FNTT]-(a) with b,collect (a) as set return set,b
 			var userid = req.session.userid;
 			var prjId=req.body.obj;
-			var qlist_query = [{'statement': "MATCH (b{assignedTo:'" + userid + "'})<-[r:FNTT]-(a) with a as a,b as b, b.taskID as id,  collect(b) as nodes where size(nodes)=1 return a,b"}];
+			var qlist_query = [{'statement': "MATCH (b{assignedTo:'" + userid + "'})<-[r:FNTT]-(a) with b,collect (a) as set return set,b"}];
 			neo4jAPI.executeQueries(qlist_query,function(status,result){
 				if(status!=200) {
 					logger.info(result);
@@ -83,7 +84,8 @@ var projectTypes = {
 	'b2a208a5-8c9d-4a7f-b522-0df14993dbd2': 'MobileWeb',
 	'07181740-f420-4ea1-bf2b-5219d6535fb5': 'Generic',
 	'258afbfd-088c-445f-b270-5014e61ba4e2': 'Mainframe',
-	'1fd77879-4dbb-416a-a46d-126d27fee2c7': 'SAP'
+	'1fd77879-4dbb-416a-a46d-126d27fee2c7': 'SAP',
+	'7a6820f1-2817-4d57-adaf-53734dd2354b':'System'
 };
 
 var screen_tasks=['scrape','append','compare','add','map'];
@@ -113,7 +115,10 @@ function next_function(resultobj, cb, data) {
 				'assignedTestScenarioIds': [],
 				'taskDetails': [],
 				'testSuiteDetails': [],
-				'scenarioFlag': 'False'
+				'scenarioFlag': 'False',
+				'releaseid':'',
+				'cycleid':''
+
 			};
 			taskDetails = {
 				'taskName': '',
@@ -126,7 +131,10 @@ function next_function(resultobj, cb, data) {
 				'startDate': '',
 				'expectedEndDate': '',
 				'batchTaskIDs':[],
-				'status': 'assigned'
+				'status': 'assigned',
+				'reuse':'False',
+				'releaseid': '',
+				'cycleid':''
 			};
 			var testSuiteDetails_obj = {
 				"releaseid": "",
@@ -139,13 +147,18 @@ function next_function(resultobj, cb, data) {
 			};
 			/*t refers to task node, and m refers to its respective node */
 			var t = a.row[1];
-			var m = a.row[0];
+			var reuseflag='False';
+			var m = a.row[0][0];
+			if(a.row[0].length>1) reuseflag='True';
 			var abc = tasktypes[t.task];
 			var batch_flag = false;
 			//To support the task assignmnet in scenario
 			if (t.task == 'Execute' || t.task == 'Execute Scenario' || t.task == 'Execute Batch') {
 				testSuiteDetails_obj.releaseid = t.release;
 				testSuiteDetails_obj.cycleid = t.cycle;
+			}else{
+				task_json.releaseid=t.release;
+				task_json.cycleid=t.cycle;
 			}
 			if (t.taskvn !== undefined) {
 				task_json.versionnumber = t.taskvn;
@@ -159,6 +172,8 @@ function next_function(resultobj, cb, data) {
 			taskDetails.reviewer = t.reviewer;
 			taskDetails.subTaskId = t.taskID;
 			taskDetails.taskDescription = t.details;
+			taskDetails.releaseid = t.release;
+			taskDetails.cycleid = t.cycle;
 			if (t.status != undefined) {
 				taskDetails.status = t.status;
 			}
@@ -207,6 +222,7 @@ function next_function(resultobj, cb, data) {
 
 						if (t.task == 'Design' || t.task == 'Update') {
 							taskDetails.taskName = t.task + versioningCheck() + m.testCaseName;
+							taskDetails.reuse=reuseflag;
 							task_json.testCaseName = m.testCaseName;
 						} else if (t.task == 'Execute') {
 							taskDetails.taskName = t.task + versioningCheck()  + m.moduleName;
@@ -234,6 +250,7 @@ function next_function(resultobj, cb, data) {
 						} else {
 							taskDetails.taskName = t.task + versioningCheck() + m.screenName;
 							task_json.screenName = m.screenName;
+							taskDetails.reuse=reuseflag;
 						}
 						//task_json.assignedTestScenarioIds=data.assignedTestScenarioIds;
 						if (!batch_flag) {

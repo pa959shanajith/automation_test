@@ -1,26 +1,30 @@
+var logger = require('../../logger');
 var myserver = require('../../server');
 var redisServer = require('../lib/redisSocketHandler');
 
+module.exports.allSess = function (cb){
+	myserver.redisSessionStore.all(cb);
+};
+
+module.exports.delSession = function (sessid, cb){
+	myserver.redisSessionStore.destroy(sessid, cb);
+};
+
 module.exports.getChannelNum = function(channel,cb) {
-	redisServer.redisPub1.pubsub('numsub', channel,function(err,redisres){
+	redisServer.redisPubICE.pubsub('numsub', channel,function(err,redisres){
 		if (redisres[1]>0) cb(true);
 		else cb(false);
 	});
 };
 
-module.exports.socketList = function(cb) {
-	var connectusers=[];
-	redisServer.redisPub1.pubsub('channels','ICE1_normal_*',function(err,redisres){
-		redisres.forEach(function(e){
-			connectusers.push(e.split('_')[2]);
-		});
-		cb(connectusers);
-	});
-};
-
-module.exports.scheduleSocketList = function(cb) {
-	var connectusers=[];
-	redisServer.redisPub1.pubsub('channels','ICE1_scheduling_*',function(err,redisres){
+module.exports.getSocketList = function(toFetch, cb) {
+	var fetchQuery;
+	if (toFetch == "ICE") fetchQuery = "ICE1_*";
+	else if (toFetch == "default") fetchQuery = "ICE1_normal_*";
+	else if (toFetch == "schedule") fetchQuery = "ICE1_scheduling_*";
+	else if (toFetch == "notify") fetchQuery = "notify_*";
+	var connectusers = [];
+	redisServer.redisPubICE.pubsub('channels', fetchQuery, function(err,redisres){
 		redisres.forEach(function(e){
 			connectusers.push(e.split('_')[2]);
 		});
@@ -30,9 +34,13 @@ module.exports.scheduleSocketList = function(cb) {
 
 module.exports.resetSession = function(session) {
 	var intr = parseInt(process.env.SESSION_INTERVAL);
+	var sessAge = parseInt(process.env.SESSION_AGE);
+	session.cookie.maxAge = sessAge;
+	myserver.redisSessionStore.touch(session.uniqueId,session);
 	var updateSessionExpiry = setInterval(function () {
-			myserver.redisSessionStore.touch(session.id, session);
-		}, intr);
+		session.cookie.maxAge = sessAge;
+		myserver.redisSessionStore.touch(session.uniqueId,session);
+	}, intr);
 	return updateSessionExpiry;
 };
 

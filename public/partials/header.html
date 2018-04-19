@@ -4,21 +4,18 @@
         <img width="160" src="imgs/logo.png" style="cursor: pointer;" id='naviPg' ng-click="naviPg()" />
     </div>
     <!--left Logo-->
-<!-- Notify Div -->
-      <div class='notifications top-left'></div>
-    <!--Right Navigation-->
+    <!-- Notify Div -->
+    <div class='notifications top-left'></div>
+    <!-- Notify Div -->
 
+    <!--Right Navigation-->
     <div class="dropdown dropdown-userPart">
-			 
-        <div class="col-md-6" id='sRole' ng-click="Switch_Role()">
+        <div class="col-md-6" id='sRole' ng-click="switchRole()">
             <button class="btn dropdown-toggle dropdown-userrole" type="button" data-toggle="dropdown">
                 <span><img class="header-ic" src="imgs/ic-switch-user.png" /></span>
                 <span class='userInfo'>Switch Role</span>
             </button>
-            <ul class="dropdown-menu" id="switchRoles">
-                <!--<li class="switchRole_confirm" ng-click="switchedRoleConfirm()"><a href="#" data-toggle="modal" data-target="#switchRoleModal">Test Engineer</a></li>-->
-                <!--<li><a href="#" data-toggle="modal" data-target="#switchRoleModal">Test Lead</a></li>-->
-            </ul>
+            <ul class="dropdown-menu" id="switchRoles"></ul>
         </div>
 
         <div class="col-md-6">
@@ -31,99 +28,78 @@
                 <li><a href="#" ng-click ="$event.preventDefault(); logout();">Logout</a></li>
             </ul>
         </div>
-				<!--<div class="col-sm-2 bell-icon-div"  ng-click="showNotifications()">
-					<span class="count animated ng-binding" id="notifications-count">1</span>
-					<span class='glyphicon glyphicon-bell bell-icon'></span>
-				</div>-->
+        <!--<div class="col-sm-2 bell-icon-div" ng-click="showNotifications()">
+            <span class="count animated ng-binding" id="notifications-count">1</span>
+            <span class='glyphicon glyphicon-bell bell-icon'></span>
+        </div>-->
 
-				<div class="dropdown col-sm-2 bell-icon-div">
-						<button class="btn btn-secondary dropdown-toggle notify-btn" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" ng-click="dropdownMenuButton()" aria-expanded="false" >
-								<span class="count animated ng-binding" id="notifications-count" ng-bind=""></span>
-								<span class='glyphicon glyphicon-bell bell-icon'></span>
-						</button>
-						
-						<div id='notifyBox' class="dropdown-menu  dropdown-menu-right notify-div" aria-labelledby="dropdownMenuButton">
-							<div ng-repeat ="item in notifications| orderBy:-'$index':true "  class='dropdown-item notifyMsgDiv'> 
-								<div class='messageNotify'>
-									 <span class='txtNotify'>Recieved on: {{item.dateTime}}</span><br /><span class='txtNotify'>{{item.notifyMsg}}</span> 
-									 <span style='display:none' class='indexCount'>{{$index}}</span>
-        				</div>
-								 <div class="divider"></div>
-							</div>
-						</div>
-</div>
+        <div class="dropdown col-sm-2 bell-icon-div">
+            <button class="btn btn-secondary dropdown-toggle notify-btn" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" ng-click="dropdownMenuButton()" aria-expanded="false" >
+                <span class="count animated ng-binding" id="notifications-count" ng-bind=""></span>
+                <span class='glyphicon glyphicon-bell bell-icon'></span>
+            </button>
+
+            <div id='notifyBox' class="dropdown-menu dropdown-menu-right notify-div" aria-labelledby="dropdownMenuButton">
+                <div ng-repeat ="item in notifications| orderBy:-'$index':true " class='dropdown-item notifyMsgDiv'> 
+                    <div class='messageNotify'>
+                        <span class='txtNotify'>Recieved on: {{item.dateTime}}</span><br /><span class='txtNotify'>{{item.notifyMsg}}</span> 
+                        <span style='display:none' class='indexCount'>{{$index}}</span>
+                    </div>
+                    <div class="divider"></div>
+                </div>
+            </div>
+        </div>
     </div>
     <!--Right Navigation-->
-    
-    <!-- SwitchRole Modal  -->
-	<div class="modal fade" id="switchRoleModal" role="dialog" data-keyboard="false" data-backdrop="static">
-	  <div class="modal-dialog modal-sm">
-	    <div class="modal-content">
-	      <div class="modal-header">
-	        <button type="button" class="close" data-dismiss="modal">&times;</button>
-	        <h4 class="modal-title">Switch Role</h4>
-	      </div>
-	      <div class="modal-body">
-	        <p></p>
-	      </div>
-	      <div class="modal-footer">
-	        <button type="button" class="btn btn-default" ng-click="switchedRole()">Yes</button>
-	        <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
-	      </div>
-	    </div>
-	  </div>
-	</div>
-	<!-- SwitchRole Modal  -->
 
-	<!---- Notification HTML ---->
-	<!--<div class="" id="notification-dropdown" style="display: none;">
-		          <div class="dropdown-body">
-		                <ul class="notification-menu">
-											<li><span class="highlight ng-binding">Notification 1</span></li>
-											<li class="divider"></li>
-											<li><span class="highlight ng-binding">Notification 1</span></li>
-									</ul>
-							</div>
-	</div>-->
-	<!---- Notification HTML ---->
-	
-	<!-- Popup for Role change -->
-	<div class="modal fade" id="switchedRoleModal" role="dialog" data-keyboard="false" data-backdrop="static">
-	  <div class="modal-dialog modal-sm">
-	    <div class="modal-content">
-	      <div class="modal-header">
-	        <button type="button" class="close" ng-click="switchRole_Yes()">&times;</button>
-	        <h4 class="modal-title">Switch Role</h4>
-	      </div>
-	      <div class="modal-body" id="changedRole">
-	        <!--<p></p>-->
-	      </div>
-	      <div class="modal-footer">
-	        <button type="button" class="btn btn-default" ng-click="switchRole_Yes()">OK</button>
-	        <!--<button type="button" class="btn btn-default" data-dismiss="modal">No</button>-->
-	      </div>
-	    </div>
-	  </div>
-	</div>
-	<!-- Popup for Role change -->
+    <!-- SwitchRole Modal -->
+    <div class="modal fade" id="switchRoleModal" role="dialog" data-keyboard="false" data-backdrop="static">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Switch Role</h4>
+                </div>
+                <div class="modal-body">
+                    <p></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" ng-click="switchedRole()">Yes</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- SwitchRole Modal -->
 
-		<!-- Popup for NO Role change -->
-	<div class="modal fade" id="noRoles" role="dialog" data-keyboard="false" data-backdrop="static">
-	  <div class="modal-dialog modal-sm">
-	    <div class="modal-content">
-	      <div class="modal-header">
-	        <button type="button" class="close" data-dismiss="modal">&times;</button>
-	        <h4 class="modal-title">Switch Role</h4>
-	      </div>
-	      <div class="modal-body" id="changedRole">
-	        <p>There are no roles to switch</p>
-	      </div>
-	      <div class="modal-footer">
-	        <button type="button" class="btn btn-default" data-dismiss="modal">OK</button>
-	      </div>
-	    </div>
-	  </div>
-	</div>
-	<!-- Popup for NO Role change -->
+    <!---- Notification HTML ---->
+    <!--<div class="" id="notification-dropdown" style="display: none;">
+        <div class="dropdown-body">
+            <ul class="notification-menu">
+                <li><span class="highlight ng-binding">Notification 1</span></li>
+                <li class="divider"></li>
+                <li><span class="highlight ng-binding">Notification 1</span></li>
+            </ul>
+        </div>
+    </div>-->
+    <!---- Notification HTML ---->
 
+    <!-- Popup for Role change -->
+    <div class="modal fade" id="switchRoleStatus" role="dialog" data-keyboard="false" data-backdrop="static">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Switch Role</h4>
+                </div>
+                <div class="modal-body">
+                    <p>There are no roles to switch</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Popup for Role change -->
 </div>

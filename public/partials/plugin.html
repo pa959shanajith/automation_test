@@ -32,7 +32,8 @@
 					<ul class="list-inline list-inline-right">
 						<li class="list-inline-item" style="margin-right:15px"><span class="color-block color-block-blue"></span> Daily</li>
 						<li class="list-inline-item" style="margin-right:-56px"><span class="color-block color-block-yellow"></span> Weekly</li>
-						<li class=""><input type="text" style="display: none;" class="searchInput"/><span class="searchIcon"><img src="imgs/ic-search-icon.png" style="margin-top: -1px; margin-left: 1px;"></img></span></li>
+						<li class=""><input type="text" style="display: none;" class="searchInput"/><span class="searchIcon"><img src="imgs/ic-search-icon.png" style="margin-top: -1px; margin-left: 1px;"></img></span><span class="filterIcon" ng-click="showTaskFilterPopup()" ><img src="imgs/ic-filter-task.png" style="margin-top: -1px;margin-left: 1px; height:20px"></span></li>
+						<!--<li class=""><span class="filterIcon"><img src="imgs/ic-search-icon.png" style="margin-top: -1px; margin-left: 1px;"></img></span></li>						-->
 					</ul>
  				</div>
 				<!--Task Heading Part-->
@@ -49,6 +50,7 @@
 		</div>
 	</div>
 	<!--Content Area-->
+	
 </section>
 
 <!--Footer-->
@@ -60,3 +62,59 @@
 	</p>
 </footer>
 <!--Footer-->
+
+<!-- Task filter block -->
+<div id="dialog-taskFilter" class="modal fade" role="dialog" data-keyboard="false" data-backdrop="static">
+	<div class="modal-dialog" style="width: 60%">
+		<!-- Modal content-->
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">&times;</button>
+				<h4 class="modal-title">Filter Tasks</h4>
+			</div>
+			<div class="modal-body modal-body-tf" style="height:200px;overflow:scroll;">
+				<form class="form-inline" id="filtrOptionsContainer">
+					<div class="row row-modal addObj-row">
+						<div class="form-group form-group-1">Select Release </div>
+						<div class="form-group form-group-2">
+							<select class="form-control form-control-custom" style="padding: 6px 19px 3px 10px !important;" id="release-filter-list" ng-model="filterData['relval']">
+								<option selected="" disabled="">Select Release</option>
+								<option ng-repeat="(id, name) in filterDat.idnamemaprel" value="{{id}}" ng-model="filterData[id]" >{{name}}</option>
+							</select>
+						</div>
+					</div>
+					<div class="row row-modal addObj-row">
+						<div class="form-group form-group-1">Select Cycle </div>
+						<div class="form-group form-group-2">
+							<select class="form-control form-control-custom" style="padding: 6px 19px 3px 10px !important;" id="cycle-filter-list" ng-model="filterData['cycval']">
+									<option selected="" disabled="">Select Cycle</option>
+									<option ng-repeat="(id, name) in filterDat.idnamemapcyc" value="{{id}}" ng-model="filterData[id]" >{{name}}</option>
+							</select>
+						</div>
+					</div>
+					<div class="row row-modal addObj-row">
+						<div><span class="form-group form-group-1">Task Type:</span>
+							<span class="form-group form-group-2">
+						<label class="checkbox" ng-repeat="ttype in filterDat.tasktypes"><input type="checkbox" value="" ng-model="filterData.tasktype[ttype]">{{ttype}}</label>	
+						</span>
+						</div>
+					</div>
+					<div class="row row-modal addObj-row">
+						<div><span class="form-group form-group-1">AppType:</span>
+							<span class="form-group form-group-2">
+						<label class="checkbox" ng-repeat="apptype in filterDat.apptypes"><input type="checkbox" value="" ng-model="filterData.apptype[apptype]">{{apptype}}</label>
+						</span>
+						</div>
+					</div>
+				</form>
+				<!--Modal Content-->
+			</div>
+			<div class="modal-footer">
+				<button type="button" ng-click="clearFilter()" id="clearFilter" class="btn btn-default">Reset</button>
+				<button type="button" ng-click="filterTasks()" id="filterTask" class="btn btn-default" data-dismiss="modal">Filter</button>
+			</div>
+		</div>
+	</div>
+</div>
+		
+<!-- Task filter block -->
