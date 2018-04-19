@@ -57,6 +57,27 @@ mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
                 }]
             }
 		})
+		.state('apg', {
+            url: '/p_APG',
+            templateUrl: 'partials/flowGraph.html',
+            controller: 'flowGraphController',
+            resolve: {
+                deps: ['$ocLazyLoad', function ($ocLazyLoad) {
+                    return $ocLazyLoad.load([
+						'js/factories/socketFactory.js',
+						'js/plugins/apg/class-diagram.js',
+						'js/plugins/apg/multiline-text.js',
+						'js/plugins/apg/dagre-d3.js',
+						'js/controllers/chatbot/chatbotController.js',
+						'js/controllers/chatbot/chatbotService.js',
+						'js/controllers/login/loginService.js',												
+						'js/controllers/header/headerController.js',
+						'js/controllers/flowGraph/flowGraphController.js',
+						'js/controllers/flowGraph/flowGraphService.js'
+                    ]);
+                }]
+            }
+		})
 		.state('admin', {
             url: '/admin',
             templateUrl: 'partials/admin.html',
@@ -283,18 +304,6 @@ mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
 						'js/controllers/Reports/reportService.js',
 						'js/controllers/neuronGraphs2D/neuronGraphs2DController.js',
 						'js/controllers/neuronGraphs2D/neuronGraphs2DService.js'
-                    ]);
-                }]
-            }
-		})
-		.state('apg', {
-            url: '/p_APG',
-            templateUrl: 'partials/flowGraph.html',
-            controller: 'flowGraphController',
-            resolve: {
-                deps: ['$ocLazyLoad', function ($ocLazyLoad) {
-                    return $ocLazyLoad.load([
-						
                     ]);
                 }]
             }

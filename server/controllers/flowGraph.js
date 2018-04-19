@@ -29,18 +29,18 @@ exports.flowGraphResults = function(req, res){
 					valid = false; 
 				}
 			}*/
-			redisServer.redisSub2.subscribe('ICE2_' + name ,1);
-			redisServer.redisPub1.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
+			redisServer.redisSubServer.subscribe('ICE2_' + name ,1);
+			redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
 				if (redisres[1]>0) {
 					logger.info("Sending socket request for generateFlowGraph to redis");
 					dataToIce = {"emitAction" : "generateFlowGraph","username" : name, "version":version, "path" : path};
-					redisServer.redisPub1.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
+					redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
 					function generateFlowGraph_listener(channel,message) {
 						data = JSON.parse(message);
 						if(name == data.username){
 							var value = data.value;
 							if (data.onAction == "unavailableLocalServer") {
-								redisServer.redisSub2.removeListener('message',generateFlowGraph_listener);	
+								redisServer.redisSubServer.removeListener('message',generateFlowGraph_listener);	
 								logger.error("Error occured in flowGraphResults: Socket Disconnected");
 								if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
 									var soc = myserver.socketMapNotify[name];
@@ -54,7 +54,7 @@ exports.flowGraphResults = function(req, res){
 									logger.error(exception.message);
 								}
 							} else if (data.onAction == "result_flow_graph_finished") {
-								redisServer.redisSub2.removeListener('message',generateFlowGraph_listener);	
+								redisServer.redisSubServer.removeListener('message',generateFlowGraph_listener);	
 								try {
 									var mySocketUI = myserver.allSocketsMapUI[name];
 									mySocketUI.emit("endData", value);
@@ -66,7 +66,7 @@ exports.flowGraphResults = function(req, res){
 							}
 						}
 					};
-					redisServer.redisSub2.on("message",generateFlowGraph_listener);
+					redisServer.redisSubServer.on("message",generateFlowGraph_listener);
 				} else {
 					logger.info("ICE socket not available for Address : %s", name);
 					res.send("unavailableLocalServer");
@@ -91,8 +91,8 @@ exports.APG_OpenFileInEditor = function (req, res) {
 		logger.info("Inside UI service: APG_OpenFileInEditor");
 		if (isSessionActive(req)) {
 			var name = req.session.username;
-			redisServer.redisSub2.subscribe('ICE2_' + name);
-			redisServer.redisPub1.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
+			redisServer.redisSubServer.subscribe('ICE2_' + name);
+			redisServer.redisPubICE.pubsub('numsub','ICE1_normal_' + name,function(err,redisres){
 				if (redisres[1]>0) {
 					var editorName = req.body.editorName;
 					var filePath = req.body.filePath;
@@ -102,13 +102,13 @@ exports.APG_OpenFileInEditor = function (req, res) {
 					logger.info("Sending socket request for apgOpenFileInEditor to redis");
 					dataToIce = {"emitAction" : "apgOpenFileInEditor","username" : name,
 								"editorName":editorName,"filePath":filePath,"lineNumber":lineNumber};
-					redisServer.redisPub1.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
+					redisServer.redisPubICE.publish('ICE1_normal_' + name,JSON.stringify(dataToIce));
 					function apgOpenFileInEditor_listener(channel,message) {
 						data = JSON.parse(message);
 						if(name == data.username){
 							var value = data.value;
 							if (data.onAction == "unavailableLocalServer") {
-								redisServer.redisSub2.removeListener('message',apgOpenFileInEditor_listener);	
+								redisServer.redisSubServer.removeListener('message',apgOpenFileInEditor_listener);	
 								logger.error("Error occured in APG_OpenFileInEditor: Socket Disconnected");
 								if('socketMapNotify' in myserver &&  name in myserver.socketMapNotify){
 									var soc = myserver.socketMapNotify[name];
@@ -116,7 +116,7 @@ exports.APG_OpenFileInEditor = function (req, res) {
 								}
 
 							}  else if (data.onAction == "open_file_in_editor_result") {
-								redisServer.redisSub2.removeListener('message',apgOpenFileInEditor_listener);	
+								redisServer.redisSubServer.removeListener('message',apgOpenFileInEditor_listener);	
 								try {
 									res.send(data.value);
 								} catch (exception) {
@@ -126,7 +126,7 @@ exports.APG_OpenFileInEditor = function (req, res) {
 							}
 						}
 					};
-					redisServer.redisSub2.on("message",apgOpenFileInEditor_listener);
+					redisServer.redisSubServer.on("message",apgOpenFileInEditor_listener);
 				} else {
 					logger.info("ICE socket not available for Address : %s", name);
 					res.send("unavailableLocalServer");
