@@ -5515,9 +5515,9 @@ border-radius: 6px;
     position: absolute;
     z-index: 10;
     height: 20px;
-    width: 551px;
+    width: 700px;
     top: calc(100% - 2px);
-    left: 200px;
+    left: 120px;
 }
 
 #legend-box-data-flow {
@@ -5600,6 +5600,15 @@ border-radius: 6px;
     border-left-color:#333;
     border-right-color:transparent
 }
+.editWeightage
+{
+    color: #311d4e;
+    float: right;
+}
+#wmcCalculate{
+    margin-bottom: 1%;
+}
+
 /*For Side bars*/
 .form-control-width
 {
@@ -5657,3 +5666,5 @@ option:disabled {
 {
     width: 33% !important;
 }
+
+

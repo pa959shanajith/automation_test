@@ -9,8 +9,8 @@ mySPA.factory('flowGraphServices', ['$http','$q', function ($http, $q)   {
 				headers: {'Content-Type': 'application/json'}
 			}).then(function(response){
 				return response.data;
-			}, function(err){
-				console.log(err);
+			}, function(response){
+				return $q.reject(response.data)
 			});
 		},
 		APG_OpenFileInEditor : function(editorName, filePath, lineNumber){
@@ -21,13 +21,12 @@ mySPA.factory('flowGraphServices', ['$http','$q', function ($http, $q)   {
 				headers : {'Content-Type' : 'application/json'} 
 			}).then(function(response){
 				return response.data
-			}, function(err){
-				console.log(err);
+			}, function(response){
+				return $q.reject(response.data)
 			});
 
 		},
 		APG_createAPGProject : function(data){
-			console.log(data);
 			return $http({
 				url: '/APG_createAPGProject',
 				method: 'POST',
@@ -35,8 +34,8 @@ mySPA.factory('flowGraphServices', ['$http','$q', function ($http, $q)   {
 				headers: {'Content-Type': 'application/json'}
 			}).then(function(response){
 				return response.data
-			}, function(err){
-				console.log(err);
+			},function(response){
+				return $q.reject(response.data)
 			});
 		}
 	}

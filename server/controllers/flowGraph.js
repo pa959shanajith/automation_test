@@ -153,7 +153,6 @@ exports.APG_createAPGProject = function(req,res){
 				var inputs = req.body.data;
 				inputs.createdby = name;
 				inputs.modifiedby = name;
-				logger.debug(inputs);
 				var args = {
 					data: inputs,
 					headers: {

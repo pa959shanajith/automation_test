@@ -48,11 +48,11 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 		if($("#complexity-canvas").is(':visible')){
 			$scope.enableToggleSidebars = true;
 			$('#complexity-canvas').hide();
-			$scope.enableFilter = true;
+			//$scope.enableFilter = true;
 			$("#apg-cd-canvas").show();
 			$scope.collapseSidebars();
 		}else if($("#apg-cd-canvas").is(':visible')){
-			$scope.enableFilter = false;
+			//$scope.enableFilter = false;
 			$scope.enableToggleSidebars = false;
 			$("#apg-cd-canvas").hide();
 			var myNode = document.getElementById("apg-cd-canvas");
@@ -67,7 +67,7 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 			$scope.hideBaseContent = { message: 'false' };
 		}else if($("#apg-dfd-canvas").is(':visible')){
 			$scope.enableToggleSidebars = true;
-			$scope.enableFilter = true;
+			//$scope.enableFilter = true;
 			$("#apg-dfd-canvas").hide();
 			$("#apg-cd-canvas").show();
 			$scope.collapseSidebars();
@@ -123,18 +123,17 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 				$event.stopPropagation();
 				//$(".popupWrap").animate({ opacity: 0, right: "70px" }, 100).css({'z-index':'0','pointer-events':'none'})
 				//$(".thumb-ic").removeClass("thumb-ic-highlight");
-				/*if($("#data-flow-window").is(':visible')){
-					console.log('here');
+				/*if($("#data-flow-window").is(':visible')){\
 					S("#data-flow-window").hide();
 				}*/
 			}
 		}
-		else if($event.originalEvent.srcElement.alt == 'Filter Objects'){
+		/*else if($event.originalEvent.srcElement.alt == 'Filter Objects'){
 			if(!$scope.enableFilter){
 				$event.preventDefault();
 				$event.stopPropagation();
 			}
-		}
+		}*/
 	}
 	  
 	$scope.executeGenerate = function(){
@@ -185,10 +184,9 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 					$scope.$apply();
 				});
 				$scope.collapseSidebars();
-				console.log("Generating class diagram");
 				$scope.generateClassDiagram(obj);
 				$scope.enableGenerate = true;
-				$scope.createAPGProject(obj);
+				//$scope.createAPGProject(obj);
 			}else if(obj.result == "fail"){
 				$('#progress-canvas').fadeOut(800, function(){
 					$scope.hideBaseContent = { message: 'false' };
@@ -201,7 +199,7 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 		
 		var canv =   d3.select("#progress-canvas").append('svg').attr('id','legend-box');
 		var u = canv.append('g').attr("transform", "translate(10,10)");	
-		var legends=[{text:'Public'},{text:'Private'},{text:'Protected'},{text:'Default'}];
+		var legends=[{text:'Public'},{text:'Private'},{text:'Protected'},{text:'Default'},{text:'Abstract'}];
 		legends.forEach(function(e,i) {
 			t=u.append('g');
 			if(e.text == "Public"){
@@ -279,6 +277,28 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 				 .attr('y',4.5)
 				 .attr('fill','#ffffff')
 				 .text('~')
+				t.append('text')
+				.attr('class','classLabel')
+				.attr('x',offset+25)
+				.attr('y',3)
+				.text(e.text);
+			}else if(e.text == "Abstract"){
+				var offset = i*90+170;
+				t.append("rect")
+				.style('fill', '#18b6df')
+				.style('stroke', '#591e1ea8')
+				.style('stroke-width',2)
+				.attr('x',offset)
+				.attr('y', -6)
+				.attr('width', '15px')
+				.attr('height', '15px')
+				.attr('rx',3)
+				.attr('ry', 3)
+				t.append('text')
+				 .attr('x',offset+4)
+				 .attr('y',8.5)
+				 .attr('fill','#ffffff')
+				 .text('*')
 				t.append('text')
 				.attr('class','classLabel')
 				.attr('x',offset+25)
@@ -515,12 +535,11 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 				graph_json["links"].push(link);
 			}
 		}
-		console.log(graph_json);
 		return graph_json;
 	}
 	
 	$scope.generateClassDiagram = function(obj){
-		$scope.enableFilter = true;
+		//$scope.enableFilter = true;
 		$scope.enableToggleSidebars = true;
 		$(".projectInfoWrap").empty();
 		$scope.$apply();
@@ -586,8 +605,6 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 				g.setEdge(link.source, link.target, {arrowhead: "simpleArrow" });
 		});
 		
-		console.log(g.edges());
-		console.log(g.nodes());
 		//makes the lines smooth
 		g.edges().forEach(function (e) {
 			var edge = g.edge(e.v, e.w);
@@ -750,7 +767,7 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 			.attr('style', 'transform: translateX(-21px)')
 			.attr('class', 'apg-info-icon')
 			.on('click', function(d){
-				$scope.enableFilter = false;
+				//$scope.enableFilter = false;
 				$scope.enableToggleSidebars = false;
 				$(".projectInfoWrap").empty();
 				$scope.$apply();
@@ -815,7 +832,7 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 						});
 					});	
 				}
-			});
+			}).append('title').text('Complexity');
 		
 		$scope.wmcCalculate =function(e){
 			var listWeight=$("[id^=weightage_]");
@@ -834,7 +851,7 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 			.attr('width', '20px')
 			.attr('style', 'transform: translateX(-41px)')
 			.attr('class', 'apg-info-icon')
-			.on('click', $scope.generateDataFlowDiagram);
+			.on('click', $scope.generateDataFlowDiagram).append('title').text('Data-flow');
 			
 		svg.selectAll("g.edgePath path")
 			.attr("id", function (e) {
@@ -883,7 +900,7 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 
 	$scope.generateDataFlowDiagram = function(i){
 		$scope.enableDataflow = false;
-		$scope.enableFilter = false;
+		//$scope.enableFilter = false;
 		$scope.enableToggleSidebars = true;
 		$(".projectInfoWrap").empty();
 		$scope.$apply();
@@ -910,7 +927,6 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 					j = -1;
 				}
 			}
-			console.log(data_flow_classes);
 			for (var k=0; k<obj.data_flow.length; k++){
 				if(data_flow_classes.has((obj.data_flow[k].class).split('(')[0])){
 					if(obj.data_flow[k].text == 'Start' || obj.data_flow[k].text == 'End'){
@@ -925,7 +941,6 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 					nodes.push(obj.data_flow[k]);
 				}
 			}
-			console.log(nodes);
 			var width = $("#main-content-section").width();
 			var height = $("#main-content-section").height();
 			$("#apg-cd-canvas").hide();
@@ -964,7 +979,6 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 					shape: node.shape
 			  });
 			});
-			console.log(g.nodes());
 			for (var i=0; i<nodes.length; i++){
 				if(nodes[i].child != null){
 					for (var j=0; j<nodes[i].child.length; j++){
@@ -986,7 +1000,6 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 					}
 				}
 			}
-			console.log(g.edges());
 			g.nodes().forEach(function (v) {
 				var node = g.node(v);
 				node.rx = node.ry = 5;
@@ -1378,7 +1391,6 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
         $("html").css({
             'cursor': 'wait'
         });
-		console.log($(this).data("tag"));
         $timeout(function() {
 			filter();	
 			unblockUI();
@@ -1426,7 +1438,6 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 				break;
 			}
 		}
-		console.log(data_flow);
 		for (var i=index; i<data_flow.length; i++){
 			if(data_flow[i].method == method_name && data_flow[i].class.split('(')[0] == class_name){
 				if(data_flow[i].text == 'Start' || data_flow[i].text == 'End'){
@@ -1456,7 +1467,6 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 				node_ids.add(data_flow[i].id);
 			}
 		}
-		console.log(method_nodes);
 		for (var j=0; j<method_nodes.length; j++){
 			if(method_nodes[j].child != null){
 				for (var k=0; k<method_nodes[j].child.length; k++){
@@ -1474,7 +1484,6 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 				}
 			}
 		}
-		console.log(g.edges());
 		g.nodes().forEach(function (v) {
 			var node = g.node(v);
 			node.rx = node.ry = 5;
