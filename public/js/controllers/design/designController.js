@@ -3620,6 +3620,10 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                 } else {
                     openDialog("Task Submission Success", "Task Submitted scucessfully!",true)
                 }
+                $timeout(function() {
+                    $(".close:visible").addClass('globalSubmit');
+                },200)
+              
         },function(error){
             console.log(error);
         })
