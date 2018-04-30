@@ -675,7 +675,7 @@ exports.loadUserInfo_Nineteen68 = function (req, res) {
 									} else {
 										var pluginsArr = [];
 										//"alm,apg,dashboard,deadcode,mindmap,neurongraphs,oxbowcode,reports,weboccular,utility"
-										var key = ["ALM", "Auto Gen Path", "Dashboard", "Dead Code Identifier", "Mindmap", "Neuron Graphs", "Oxbow Code Identifier", "Reports", "Utility", "Webocular"];
+										var key = ["ALM", "APG", "Dashboard", "Dead Code Identifier", "Mindmap", "Neuron Graphs", "Oxbow Code Identifier", "Reports", "Utility", "Webocular"];
 										var vals = Object.values(pluginResult.rows[0]);
 										for(i=0; i < key.length; i++){
 											pluginsArr.push({

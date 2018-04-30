@@ -833,8 +833,11 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                         if (appType == 'Web') {
                             if ($(".ellipsis").length > 0) {
                                 $("li.compareObjects").removeClass('disableActions compareObjectDisable').addClass('enableActions');
+                                $("li.generateObj").removeClass('disableActions addObjectDisable').addClass('enableActions');
+                                
                             } else {
                                 $("li.compareObjects").removeClass('enableActions').addClass('disableActions compareObjectDisable');
+                                $("li.generateObj").removeClass('enableActions').addClass('disableActions addObjectDisable');                                
                             }
                         } else {
                             $("li.compareObjects").hide();
@@ -1926,6 +1929,8 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
             var currentElements = $(".ellipsis:visible").length;
             $("a.disableActions").removeClass("disableActions");
             $("li.compareObjects").removeClass('enableActions').addClass('disableActions compareObjectDisable');
+            $("li.generateObj").removeClass('enableActions').addClass('disableActions addObjectDisable');
+            
             getIndexOfDeletedObjects = []
             viewString = {};
             if(newScrapedList != undefined){
@@ -2739,34 +2744,38 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
         $(".submitObjectWarning, .objectExistMap, .noObjectToMap").hide();
         $("#dialog-mapObject").modal("show");
         $('#scrapedObjforMap, #customObjforMap').empty();
-        for (i = 0; i < viewString.view.length; i++) {
-            var path = viewString.view[i].xpath;
-            var ob = viewString.view[i];
-            ob.tempId = i;
-            var custN = ob.custname.replace(/[<>]/g, '').trim();
-            var tag = ob.tag;
-            if (tag == "dropdown") {
-                imgTag = "select"
-            } else if (tag == "textbox/textarea") {
-                imgTag = "input"
-            } else imgTag = tag;
-            var tag1 = tag.replace(/ /g, "_");
-            var tag2;
-            if (path != "") {
-                var innerUL = $('#scrapedObjforMap');
-                var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + " draggable='true' ondragstart='drag(event)'> <span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' data-xpath='" + ob.xpath + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></li>";
-                angular.element(innerUL).append(li);
-            } else {
-                var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-tag='" + tag + "' class='item select_all " + tag + "x' dropzone='move s:text/plain' ondrop='drop(event)' ondragover='allowDrop(event)'><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></li>";
-                $('#customObjforMap').append('<div class="accd-Obj"><div class="accd-Obj-head">' + tag + '</div><div class="accd-Obj-body">' + li + '</div></div>')
 
-                /****Filtering same object type in one container****/
-                $(".accd-Obj .accd-Obj-head").each(function() {
-                    if ($(this).text() == $(li).data("tag") && $(this).siblings().text() != $(li).children("span").text()) {
-                        $(this).parent().children(".accd-Obj-body").append(li);
-                    }
-                })
-                /****Filtering same object type in one container****/
+        // if viewstring.view has scraped objects, then populate these in map object popup 
+        if(viewString.view){
+            for (i = 0; i < viewString.view.length; i++) {
+                var path = viewString.view[i].xpath;
+                var ob = viewString.view[i];
+                ob.tempId = i;
+                var custN = ob.custname.replace(/[<>]/g, '').trim();
+                var tag = ob.tag;
+                if (tag == "dropdown") {
+                    imgTag = "select"
+                } else if (tag == "textbox/textarea") {
+                    imgTag = "input"
+                } else imgTag = tag;
+                var tag1 = tag.replace(/ /g, "_");
+                var tag2;
+                if (path != "") {
+                    var innerUL = $('#scrapedObjforMap');
+                    var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + " draggable='true' ondragstart='drag(event)'> <span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' data-xpath='" + ob.xpath + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></li>";
+                    angular.element(innerUL).append(li);
+                } else {
+                    var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-tag='" + tag + "' class='item select_all " + tag + "x' dropzone='move s:text/plain' ondrop='drop(event)' ondragover='allowDrop(event)'><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></li>";
+                    $('#customObjforMap').append('<div class="accd-Obj"><div class="accd-Obj-head">' + tag + '</div><div class="accd-Obj-body">' + li + '</div></div>')
+
+                    /****Filtering same object type in one container****/
+                    $(".accd-Obj .accd-Obj-head").each(function() {
+                        if ($(this).text() == $(li).data("tag") && $(this).siblings().text() != $(li).children("span").text()) {
+                            $(this).parent().children(".accd-Obj-body").append(li);
+                        }
+                    })
+                    /****Filtering same object type in one container****/
+                }
             }
         }
 
@@ -3724,6 +3733,10 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                 } else {
                     openDialog("Task Submission Success", "Task Submitted scucessfully!",true)
                 }
+                $timeout(function() {
+                    $(".close:visible").addClass('globalSubmit');
+                },200)
+              
         },function(error){
             console.log(error);
         })
@@ -4356,7 +4369,27 @@ function contentTable(newTestScriptDataLS) {
                 $grid.jqGrid('setCell', rowId, 'url', url);
                 $grid.jqGrid('setCell', rowId, 'objectName', objName);
             }
-        } else if (selectedText == "@Browser") {
+        }
+        else if(selectedText=="@System"){
+            var sc = Object.keys(keywordArrayList.system);
+            selectedKeywordList = "getOsInfo";
+            objName = " ";
+            url=" ";
+            for (var i = 0; i < sc.length; i++) {
+                if (selectedKeyword == sc[i]) {
+                    res += '<option role="option" value="' + sc[i] + '" selected>' + sc[i] + '</option>';
+                } else
+                    res += '<option role="option" value="' + sc[i] + '">' + sc[i] + '</option>';
+            }
+            var row = $(e.target).closest('tr.jqgrow');
+            var rowId = row.attr('id');
+            $("select#" + rowId + "_keywordVal", row[0]).html(res);
+            selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
+            $grid.jqGrid('setCell', rowId, 'appType', "System");
+            $grid.jqGrid('setCell', rowId, 'url', url);
+            $grid.jqGrid('setCell', rowId, 'objectName', objName);
+        }
+        else if (selectedText == "@Browser") {
             objName = " ";
             url = " ";
             var sc = Object.keys(keywordArrayList.browser);
@@ -4668,6 +4701,7 @@ function contentTable(newTestScriptDataLS) {
             selectedKey = $grid.find("tr.jqgrow:visible").find("td[aria-describedby^=jqGrid_keywordVal]:visible").children('select').find('option:selected').text();
             $grid.jqGrid('setCell', rowId, 'appType', 'Generic');
         } else {
+
             selectedText = replaceHtmlEntites(selectedText.trim());
             for (var i = 0; i < scrappedData.length; i++) {
                 var ob = scrappedData[i];
@@ -5946,6 +5980,9 @@ function getTags(data) {
         obnames = ["@Generic", "@MobileiOS"]
     } else if (appTypeLocal == "SAP") {
         obnames = ["@Generic", "@Sap", "@Custom"]
+    }
+    else if(appTypeLocal="System"){
+        obnames=["@Generic","@System"];
     }
     for (var i = 0; i < data.length; i++) {
         obnames.push(data[i].custname);

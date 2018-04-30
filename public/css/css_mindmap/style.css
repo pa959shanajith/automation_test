@@ -1390,8 +1390,8 @@
     width: 225px;
     height: 245px;
     position: fixed;
-    top: 196px;
-    left: calc(100% - 250px);
+    top: 385px;
+    left: calc(100% - 341px);
 }
 #minimap-header{
     margin-left: 196px;
@@ -1446,4 +1446,34 @@
     /* top: 10px; */
     position: absolute;
     cursor: nw-resize;
+}
+.search-canvas{
+    border: 1px solid #633690;
+    border-radius: 3px;
+    transition: width 0.4s ease-in-out;
+    width: 0px;
+    opacity: 0;
+}
+
+.search-visible {
+    width: 150px;
+    opacity: 1;
+    transition: width 0.4s ease-in-out;
+}
+
+.searched-node{
+    outline: 2px solid green;
+}
+.searchimg-canvas{
+    border: 1px solid #633690;
+    border-radius: 3px;
+    padding: 2px;    
+}
+#search-canvas-icon{
+    width: 27px;
+    height: 25px;
+    left: 3px;
+    top: 9px;
+    position: absolute;
+    display: flex;
 }

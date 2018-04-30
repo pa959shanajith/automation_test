@@ -39,6 +39,15 @@
 				</ul>
 			</div>
 			<!-- Desktop -->
+
+			<!-- System -->
+			<div id="left-top-section" ng-if="getScreenView == 'System'" class="ApptypeScreenView">
+				<ul>
+					<li><span><a class='scrapeOnTxt'>Debug On</a></span></li>
+					<li><a href='#' ng-click="debugTestCase_ICE('1');" title="System Apps"><span><img src='imgs/ic-desktop.png' alt='System Apps' /></span>System Apps</a></li>
+				</ul>
+			</div>
+			<!-- System -->
 			
 			<!-- SAP -->
 			<div id="left-top-section" ng-if="getScreenView == 'SAP'" class="ApptypeScreenView">

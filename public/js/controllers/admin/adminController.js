@@ -33,7 +33,9 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 	});
 
 	$(document).on('change', '#selAssignUser', function (e) {
-		$('#allProjectAP, #assignedProjectAP').empty();
+		$scope.assignedProjectInitial = [];
+		$scope.allProjectAP = [];
+		$scope.assignedProjectAP = [];
 		$(".load").show();
 		$("#selAssignUser, #rightall, #rightgo, #leftgo, #leftall, .adminBtn").prop("disabled", true);
 		$("#overlayContainer").prop("style", "opacity: 1;")
@@ -44,7 +46,8 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 			} else {
 				domainId = data[0].domainId;
 				$("#selAssignProject").val(data[0].domainName);
-				$('#allProjectAP, #assignedProjectAP').empty();
+				$scope.allProjectAP = [];
+				$scope.assignedProjectAP = [];
 				//var domainId = data[0].domainId;
 				//var requestedids = domainId;
 				//var domains = [];
@@ -70,13 +73,14 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 					if (data1 == "Invalid Session") {
 						$rootScope.redirectPage();
 					}
-					$('#assignedProjectAP').empty();
+					$scope.assignedProjectAP = [];
 					projectData = [];
 					projectData = data1;
 					if (data1.length > 0) {
 						for (var i = 0; i < data1.length; i++) {
-							$('#assignedProjectAP').append($("<option value=" + data1[i].projectId + "></option>").text(data1[i].projectName));
+							$scope.assignedProjectAP.push({'projectid':data1[i].projectId,'projectname':data1[i].projectName});
 						}
+						$scope.assignedProjectInitial = $scope.assignedProjectAP;
 						for (var j = 0; j < projectData.length; j++) {
 							assignedProjectsArr.push(projectData[j].projectId);
 							assignedProjectNames.push(projectData[j].projectName)
@@ -87,7 +91,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 							if (detResponse == "Invalid Session") {
 								$rootScope.redirectPage();
 							}
-							$('#allProjectAP').empty();
+							$scope.allProjectAP = [];
 							if (detResponse.projectIds.length > 0) {
 								for (var k = 0; k < detResponse.projectIds.length; k++) {
 									if (!eleContainsInArray(assignedProjectsArr, detResponse.projectIds[k])) {
@@ -113,10 +117,11 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 								unAssignedProjects.projectIds = unassignedProjectIds;
 								unAssignedProjects.projectNames = unassignedProjectNames;
 								for (var m = 0; m < unAssignedProjects.projectIds.length; m++) {
-									$('#allProjectAP').append($("<option value=" + unAssignedProjects.projectIds[m] + "></option>").text(unAssignedProjects.projectNames[m]));
+									$scope.allProjectAP.push({'projectname':unAssignedProjects.projectNames[m],'projectid':unAssignedProjects.projectIds[m]});
 								}
 								if ($("#selAssignUser").find("option:selected").text() == 'Select User') {
-									$("#assignedProjectAP,#allProjectAP").empty();
+									$scope.allProjectAP = [];
+									$scope.assignedProjectAP = [];
 								}
 								$(".load").hide();
 								$("#selAssignUser, #rightall, #rightgo, #leftgo, #leftall, .adminBtn").prop("disabled", false);
@@ -131,9 +136,10 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 								$rootScope.redirectPage();
 							}
 							if (res.projectIds.length > 0) {
-								$("#assignedProjectAP,#allProjectAP").empty();
+								$scope.allProjectAP = [];
+								$scope.assignedProjectAP = [];
 								for (var n = 0; n < res.projectIds.length; n++) {
-									$('#allProjectAP').append($("<option value=" + res.projectIds[n] + "></option>").text(res.projectNames[n]));
+									$scope.allProjectAP.push({'projectname':res.projectNames[n],'projectid':res.projectIds[n]});
 								}
 							}
 							$(".load").hide();
@@ -188,7 +194,9 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 				$("#selAssignUser").append(selectOptions[i])
 			}
 			$("#selAssignUser").prop('selectedIndex', 0);
-			$("#allProjectAP,#assignedProjectAP,#selAssignProject").empty();
+			$scope.allProjectAP = [];
+			$scope.assignedProjectAP = [];
+			$("#selAssignProject").empty();
 		},
 			function (error) {
 			console.log("Error:::::::::::::", error)
@@ -197,7 +205,8 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 	});
 
 	$(document).on('change', '#selAssignProject', function () {
-		$('#allProjectAP, #assignedProjectAP').empty();
+		$scope.allProjectAP = [];
+		$scope.assignedProjectAP = [];
 		var domainId = $("#selAssignProject option:selected").val();
 		var requestedids = [domainId];
 		var domains = [];
@@ -222,13 +231,14 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 			if (data == "Invalid Session") {
 				$rootScope.redirectPage();
 			}
-			$('#assignedProjectAP').empty();
+			$scope.assignedProjectAP = [];
 			projectData = [];
 			projectData = data;
 			if (data.length > 0) {
 				for (var i = 0; i < data.length; i++) {
-					$('#assignedProjectAP').append($("<option value=" + data[i].projectId + "></option>").text(data[i].projectName));
+					$scope.assignedProjectAP.push({'projectname':data[i].projectName,'projectid':data[i].projectId});
 				}
+				$scope.assignedProjectInitial = $scope.assignedProjectAP;
 				for (var j = 0; j < projectData.length; j++) {
 					assignedProjectsArr.push(projectData[j].projectId);
 					assignedProjectNames.push(projectData[j].projectName)
@@ -239,7 +249,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 					if (response == "Invalid Session") {
 						$rootScope.redirectPage();
 					}
-					$('#allProjectAP').empty();
+					$scope.allProjectAP = [];
 					if (response.projectIds.length > 0) {
 						for (var k = 0; k < response.projectIds.length; k++) {
 							if (!eleContainsInArray(assignedProjectsArr, response.projectIds[k])) {
@@ -265,7 +275,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 						unAssignedProjects.projectIds = unassignedProjectIds;
 						unAssignedProjects.projectNames = unassignedProjectNames;
 						for (var m = 0; m < unAssignedProjects.projectIds.length; m++) {
-							$('#allProjectAP').append($("<option value=" + unAssignedProjects.projectIds[m] + "></option>").text(unAssignedProjects.projectNames[m]));
+							$scope.allProjectAP.push({'projectname':unAssignedProjects.projectNames[m],'projectid':unAssignedProjects.projectIds[m]});
 						}
 					}
 				}, function (error) {
@@ -278,10 +288,11 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 						$rootScope.redirectPage();
 					}
 					if (resDetails.projectIds.length > 0) {
-						$("#assignedProjectAP,#allProjectAP").empty();
+						$scope.allProjectAP = [];
+						$scope.assignedProjectAP = [];
 
 						for (var n = 0; n < resDetails.projectIds.length; n++) {
-							$('#allProjectAP').append($("<option value=" + resDetails.projectIds[n] + "></option>").text(resDetails.projectNames[n]));
+							$scope.allProjectAP.push({'projectname':resDetails.projectNames[n],'projectid':resDetails.projectIds[n]});
 						}
 					}
 				}, function (error) {
@@ -328,9 +339,33 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 		assignProjectsObj.domainId = domainId;
 		assignProjectsObj.userInfo = userDetails;
 		assignProjectsObj.userId = userId;
-		//			assignProjectsObj.unAssignedProjects = unAssignedProjects;
-		assignProjectsObj.assignedProjects = assignedProjects; ;
+		//assignProjectsObj.unAssignedProjects = unAssignedProjects;
+		assignProjectsObj.assignedProjects = assignedProjects;
 		assignProjectsObj.getAssignedProjectsLen = getAssignedProjectsLen;
+
+
+		// function sortObject(unordered){
+		// 	Object.keys(unordered).sort().forEach(function(key) {
+		// 		var value = unordered[key];
+		// 		delete unordered[key];
+		// 		unordered[key] = value;
+		// 	});		
+		// 	return unordered;	
+		// }
+		/* Logic to get unassigned project list */
+		$scope.diffprj = [];
+		function getDifferentProjects(){
+			$scope.diffprj = $scope.assignedProjectInitial;
+			for (i = 0; i < assignedProjects.length; i++) { 
+				$scope.diffprj = $.grep($scope.diffprj, function(e){ 
+					return e.projectid != assignedProjects[i].projectId ; 
+			   });
+			}
+		}
+		getDifferentProjects();
+		console.log($scope.diffprj);
+		/*End of logic to get unassigned project list */
+		assignProjectsObj.deletetasksofprojects = $scope.diffprj;
 		//console.log(assignProjectsObj);
 		adminServices.assignProjects_ICE(assignProjectsObj)
 		.then(function (data) {
@@ -390,7 +425,8 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 						"oebs":{"data":"DesktopJava","title":"Oracle Apps","img":"oracleApps"},
 						"mobileapp":{"data":"MobileApp","title":"Mobile Apps","img":"mobileApps"},
 						"mobileweb":{"data":"MobileWeb","title":"Mobile Web","img":"mobileWeb"},
-						"sap":{"data":"SAP","title":"SAP Apps","img":"sapApps"}
+						"sap":{"data":"SAP","title":"SAP Apps","img":"sapApps"},
+						"system":{"data":"System","title":"System Apps","img":"desktop"}
 					};
 					$("div.appTypesContainer").empty();
 					for (var i = 0; i < plugins.length; i++) {
@@ -920,7 +956,9 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 	}
 	function resetAssignProjectForm() {
 		$("#selAssignUser, #selAssignProject").prop('selectedIndex', 0);
-		$("#allProjectAP,#assignedProjectAP,#selAssignProject").empty();
+		$scope.allProjectAP = [];
+		$scope.assignedProjectAP = [];        
+		$("#selAssignProject").empty();
 		$("#selAssignProject").append('<option data-id="" value disabled selected>Please Select your domain</option>')
 	}
 
@@ -1847,46 +1885,15 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 				//var requestedids = domains.push(domainId);
 				var idtype = ["domaindetails"];
 				var details = {
-					"web": {
-						"data": "Web",
-						"title": "Web",
-						"img": "web"
-					},
-					"webservice": {
-						"data": "Webservice",
-						"title": "Web Service",
-						"img": "webservice"
-					},
-					"mainframe": {
-						"data": "Mainframe",
-						"title": "Mainframe",
-						"img": "mainframe"
-					},
-					"desktop": {
-						"data": "Desktop",
-						"title": "Desktop Apps",
-						"img": "desktop"
-					},
-					"oebs": {
-						"data": "DesktopJava",
-						"title": "Oracle Apps",
-						"img": "oracleApps"
-					},
-					"mobileapp": {
-						"data": "MobileApp",
-						"title": "Mobile Apps",
-						"img": "mobileApps"
-					},
-					"mobileweb": {
-						"data": "MobileWeb",
-						"title": "Mobile Web",
-						"img": "mobileWeb"
-					},
-					"sap": {
-						"data": "SAP",
-						"title": "SAP Apps",
-						"img": "sapApps"
-					}
+					"web":{"data":"Web","title":"Web","img":"web"},
+					"webservice":{"data":"Webservice","title":"Web Service","img":"webservice"},
+					"mainframe":{"data":"Mainframe","title":"Mainframe","img":"mainframe"},
+					"desktop":{"data":"Desktop","title":"Desktop Apps","img":"desktop"},
+					"oebs":{"data":"DesktopJava","title":"Oracle Apps","img":"oracleApps"},
+					"mobileapp":{"data":"MobileApp","title":"Mobile Apps","img":"mobileApps"},
+					"mobileweb":{"data":"MobileWeb","title":"Mobile Web","img":"mobileWeb"},
+					"sap":{"data":"SAP","title":"SAP Apps","img":"sapApps"},
+					"system":{"data":"System","title":"System Apps","img":"desktop"}
 				};
 				$(".appTypesContainer").empty();
 				for (var i = 0; i < plugins.length; i++) {
@@ -2075,35 +2082,35 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 				switch (selProjectRes.appType) {
 				case "Web":
 					$("div.projectTypeSelected").removeClass("projectTypeSelected");
-					$(".projectTypes[data-app='Web']").addClass("projectTypeSelected");
+					$(".projectTypes[data-app='Web'],.projectTypes_create[data-app='Web']").addClass("projectTypeSelected");
 					break;
 				case "Webservice":
 					$("div.projectTypeSelected").removeClass("projectTypeSelected");
-					$(".projectTypes[data-app='Webservice']").addClass("projectTypeSelected");
+					$(".projectTypes[data-app='Webservice'],.projectTypes_create[data-app='Webservice']").addClass("projectTypeSelected");
 					break;
 				case "Mainframe":
 					$("div.projectTypeSelected").removeClass("projectTypeSelected");
-					$(".projectTypes[data-app='Mainframe']").addClass("projectTypeSelected");
+					$(".projectTypes[data-app='Mainframe'],.projectTypes_create[data-app='Mainframe']").addClass("projectTypeSelected");
 					break;
 				case "Desktop":
 					$("div.projectTypeSelected").removeClass("projectTypeSelected");
-					$(".projectTypes[data-app='Desktop']").addClass("projectTypeSelected");
+					$(".projectTypes[data-app='Desktop'],.projectTypes_create[data-app='Desktop']").addClass("projectTypeSelected");
 					break;
 				case "DesktopJava":
 					$("div.projectTypeSelected").removeClass("projectTypeSelected");
-					$(".projectTypes[data-app='DesktopJava']").addClass("projectTypeSelected");
+					$(".projectTypes[data-app='DesktopJava'],.projectTypes_create[data-app='DesktopJava']").addClass("projectTypeSelected");
 					break;
 				case "MobileApp":
 					$("div.projectTypeSelected").removeClass("projectTypeSelected");
-					$(".projectTypes[data-app='MobileApp']").addClass("projectTypeSelected");
+					$(".projectTypes[data-app='MobileApp'],.projectTypes_create[data-app='MobileApp']").addClass("projectTypeSelected");
 					break;
 				case "MobileWeb":
 					$("div.projectTypeSelected").removeClass("projectTypeSelected");
-					$(".projectTypes[data-app='MobileWeb']").addClass("projectTypeSelected");
+					$(".projectTypes[data-app='MobileWeb'],.projectTypes_create[data-app='MobileWeb']").addClass("projectTypeSelected");
 					break;
 				case "SAP":
 					$("div.projectTypeSelected").removeClass("projectTypeSelected");
-					$(".projectTypes[data-app='SAP']").addClass("projectTypeSelected");
+					$(".projectTypes[data-app='SAP'],.projectTypes_create[data-app='SAP']").addClass("projectTypeSelected");
 					break;
 				default:
 				}
