@@ -1549,8 +1549,7 @@ input[disabled]{
     white-space: nowrap !important;
     text-overflow: ellipsis;
     float: left;
-    max-width: 20%;
-
+    max-width: 80%;
 }
 
 .wsdlRqstRspns{
