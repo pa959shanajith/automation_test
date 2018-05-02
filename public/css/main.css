@@ -5748,3 +5748,6 @@ ul.browserInlineIcons
     text-overflow: ellipsis;
 }
 
+#enableAppend:disabled {
+    opacity: 0.7;
+}
