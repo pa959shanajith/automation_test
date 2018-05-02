@@ -1094,6 +1094,8 @@ input[disabled]{
     float: left;
     width: 85%;
     margin-top: 2%;
+    /* overflow: auto;
+    max-height: calc(100% - 131px); */
 }
 .customTxtName,.customTxtName:hover
 {
@@ -1428,9 +1430,8 @@ input[disabled]{
 {
     float: right;
     width: auto;
-    /* margin-right: 31%; */
     position: relative;
-    left: -32%;
+    left: -5%;
 }
 .saveComapredObj
 {
@@ -3134,6 +3135,11 @@ li.select_all .addCustObj{
     top: 5px;
     right: 300px;
     color: red;
+}
+
+.addObjectDisable
+{
+    pointer-events: none;
 }
 /******Map Object CSS******/
 
@@ -5635,6 +5641,53 @@ label.checkbox{
 }
 option:disabled {
     background: #ccc!important;
+}
+.browserInlineIcons li{
+    width: 20%;
+    float: left;
+    margin-top: 1%;
+    position: relative;
+    left: 13%;
+}
+ul.browserInlineIcons
+{
+    float: left;
+    width: 100%;
+    margin-bottom: 2%;
+}
+.inline-ie-img
+{
+    width: 27px;
+    height: 27px;
+}
+.inline-chrome-img
+{
+    width: 27px;
+    height: 27px;
+}
+.inline-firefox-img
+{
+    width: 27px;
+    height: 28px;
+}
+
+.inline-safari-img
+{
+    width: 27px;
+    height: 28px;
+}
+.checkStyleComparebox
+{
+    position: relative;
+    left: -3px;
+    top: 2px;
+    outline: none;
+    width: 15px;
+    height: 15px;
+}
+.disableClick
+{
+    pointer-events: none;
 }
 #preferencesTable thead th
 {
