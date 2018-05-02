@@ -171,12 +171,12 @@ var listId;
                                                     //         $('#hiddenTagBox').modal('show');
                                                     //         return false;
                                                     //     }  
-                                                    if ($.inArray(modVal, viewStringCustnames)!='-1') {
-                                                        $("#hiddenTagBox").find('.modal-title').text("Edit Objects");
-                                                        $("#hiddenTagBox").find('.modal-body p').text("Object characterstics are same for '"+modVal+"' ").css('color', 'black');
-                                                        $('#hiddenTagBox').modal('show');
-                                                        return false;
-                                                    }                   
+                                                    // if ($.inArray(modVal, viewStringCustnames)!='-1') {
+                                                    //     $("#hiddenTagBox").find('.modal-title').text("Edit Objects");
+                                                    //     $("#hiddenTagBox").find('.modal-body p').text("Object characterstics are same for '"+modVal+"' ").css('color', 'black');
+                                                    //     $('#hiddenTagBox').modal('show');
+                                                    //     return false;
+                                                    // }                   
                                                     var flagEdit = true;
                                                     window.localStorage['checkEditWorking'] = "true";
                                                     if(window.localStorage['_modified']){                                                        
