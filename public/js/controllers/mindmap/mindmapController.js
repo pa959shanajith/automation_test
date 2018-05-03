@@ -405,7 +405,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     var nodetf = $(elem.parent()[idxSearch]).attr('transform');
                     var x_mptf = parseInt(mptf.split(/[()]/)[1].split(',')[0]);
                     var y_mptf = parseInt(mptf.split(/[()]/)[1].split(',')[1]);
-                    var scale_mptf = parseInt(mptf.split(/[()]/)[3]);
+                    var scale_mptf = 1; //parseFloat(mptf.split(/[()]/)[3]);
                     var x_nodetf = parseInt(nodetf.split(/[()]/)[1].split(',')[0]);
                     var y_nodetf = parseInt(nodetf.split(/[()]/)[1].split(',')[1]);
                     //Approx cordinates of node: mindmap translate + nodetf/mpscale
@@ -1556,27 +1556,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         return tableHTML;
     }
     
-    function loadCycles() {
-        $('#ct-assignCyc').empty();
-        $('#ct-assignCyc').append("<option value='select cycle' select=selected>" + "Select cycle" + "</option>");
-        //'46974ffa-d02a-49d8-978d-7da3b2304255'
-        mindmapServices.populateCycles($("#ct-assignRel").val()).then(function(result_cycles) {
-            if (result_cycles == "Invalid Session") {
-                $rootScope.redirectPage();
-            }                 
-            var result2 = result_cycles;
-            cycdata = {};
-            for (i = 0; i < result2.c_ids.length && result2.cyc.length; i++) {
-                $('#ct-assignCyc').append("<option data-id='" + result2.cyc[i] + "' value='" + result2.c_ids[i] + "'>" + result2.cyc[i] + "</option>");
-                cycdata[result2.c_ids[i]] = result2.cyc[i];
-            }
-            $("#ct-assignCyc option[value='" + result2.cyc[0] + "']").attr('selected', 'selected');
-        }, function(error) {
-            console.log("Error in populating Cycles");
-            //callback(null, err);
-        })
 
-    }
 
     function nodeCtrlClick(e) {
         d3.select('#ct-inpBox').classed('no-disp', !0);
@@ -1966,7 +1946,10 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         if (node == 0 || node == undefined) {
             childNode = null;
             var p = d3.select(activeNode);
-        } else var p = childNode;
+        } else{
+            var p = childNode;
+            activeNode = childNode[0][0];
+        } 
         var pi = p.attr('id').split('-')[2];
         var t = p.attr('data-nodetype');
         var split_char = ',';
