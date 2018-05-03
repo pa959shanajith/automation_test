@@ -79,6 +79,10 @@ var listId;
                                     $('.focus-highlight').removeAttr('src').attr('src', 'imgs/ic-highlight-element-inactive.png').removeClass('focus-highlight');
                                     $(this).addClass('focus-highlight');
                                     $(this).attr('src', 'imgs/ic-highlight-element-active.png');
+                                    if(xpath == undefined){
+                                        xpath = $(this).parent().parent().text();
+                                        url = "irisurl"
+                                    } 
                                     angular.element(document.getElementById("finalScrap")).scope().highlightScrapElement(xpath, url);
 
                                 }
