@@ -185,7 +185,7 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 					else{
 						row.append($('<td style="width:18%" class="tabeleCellPadding exe-conditionCheck"><select class="conditionCheck form-control alertGreen"><option value="'+getEachScenario[i].condition+'" selected>True</option><option value="0">False</option></select> </td>'));
 					}
-					row.append($("<td title="+getEachScenario[i].projectnames+" style='width:23%; word-break: break-all; padding-left: 1% !important; padding-right: 1% !important' class='tabeleCellPadding'>" + getEachScenario[i].projectnames + "</td>"));
+					row.append($("<td class='projectName' title="+getEachScenario[i].projectnames+" style='width:23%; word-break: break-all; padding-left: 1% !important; padding-right: 1% !important' class='tabeleCellPadding'>" + getEachScenario[i].projectnames + "</td>"));
 					//row.append($("<td style='width:8%' class='tabeleCellPadding'><img src='../imgs/ic-alm.png' id='syncScenario' title='Sync Test Scenario' style='cursor: pointer;'/></td>"));
 					count++;
 				    }
@@ -353,8 +353,9 @@ mySPA.controller('executionController',['$scope', '$rootScope', '$http','$timeou
 			var scenarioNames = e.target.parentElement.nextSibling.getElementsByClassName("testScenarioScroll")[0].children;
 			$("#suiteDetailsContent").empty();
 			$("#modalSuiteDetails").find(".modal-title").text(e.target.textContent);
+			var projectName = $(".projectName").text();
 			for(var i=0; i<scenarioNames.length;i++){
-				$("#suiteDetailsContent").append('<div class="sDInnerContentsWrap"><div class="sDInnerContents" style="width: 50%;">'+scenarioNames[i].getElementsByClassName("exe-scenarioIds")[0].textContent+'</div><div class="sDInnerContents" style="width: 50%;">'+scenarioNames[i].getElementsByClassName("exe-scenarioIds")[0].textContent+'</div></div>');
+				$("#suiteDetailsContent").append('<div class="sDInnerContentsWrap"><div class="sDInnerContents" style="width: 50%;">'+scenarioNames[i].getElementsByClassName("exe-scenarioIds")[0].textContent+'</div><div class="sDInnerContents" style="width: 50%;">'+projectName+'</div></div>');
 			}
 			$("#modalSuiteDetails").modal("show");
 			$('#modalSuiteDetails').find('.btn-default').focus();
