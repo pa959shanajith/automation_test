@@ -367,8 +367,10 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 		/*End of logic to get unassigned project list */
 		assignProjectsObj.deletetasksofprojects = $scope.diffprj;
 		//console.log(assignProjectsObj);
+		blockUI('Saving in Progress. Please Wait...')
 		adminServices.assignProjects_ICE(assignProjectsObj)
 		.then(function (data) {
+			unblockUI();
 			if (data == "Invalid Session") {
 				$rootScope.redirectPage();
 			}

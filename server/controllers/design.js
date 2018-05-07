@@ -185,10 +185,12 @@ exports.initScraping_ICE = function (req, res) {
 						}
 						redisServer.redisSubServer.on("message",LAUNCH_MOBILE_WEB_listener);
 					} else {
+						//Web Scrape
 						var data = {};
 						var browserType = req.body.screenViewObject.browserType;
 						if (req.body.screenViewObject.action == 'compare') {
 							data.viewString = req.body.screenViewObject.viewString.view;
+							data.scrapedurl = req.body.screenViewObject.viewString.scrapedurl;
 							data.action = req.body.screenViewObject.action;
 							if (browserType == "chrome") {
 								data.task = "OPEN BROWSER CH";
@@ -996,31 +998,48 @@ exports.updateScreen_ICE = function (req, res) {
 													scrapedobjects.mirror = '';
 													scrapedobjects.scrapedin = '';
 													scrapedobjects.scrapetype = '';
+													scrapedobjects.scrapedurl='';
 												}
+												//updatedViewString: New Data posted from UI
+												//viewString: Data from Database
 												var updatedViewString = updateData.updatedViewString.view[0].changedobject;
-												for (var i = 0; i < updatedViewString.length; i++) {
-													for (var j = 0; j < viewString.length; j++) {
-														var updatedXpath = updatedViewString[i].xpath.replace(/\s/g, ' ').replace('&nbsp;', ' ');
-														updatedXpath = updatedViewString[i].xpath.split(";");
-														updatedXpath = updatedXpath[1];
-														var fetchedXpath = viewString[j].xpath.replace(/\s/g, ' ').replace('&nbsp;', ' ');
-														fetchedXpath = viewString[j].xpath.split(";");
-														fetchedXpath = fetchedXpath[1];
-														if (updatedXpath == fetchedXpath) {
-															updatedIndex.push(j);
-															viewString[j] = updatedViewString[i];
-															elementschanged = elementschanged + 1;
-														}
-													}
+												// for (var i = 0; i < updatedViewString.length; i++) {
+												// 	for (var j = 0; j < viewString.length; j++) {
+												// 		var updatedXpath = updatedViewString[i].xpath.replace(/\s/g, ' ').replace('&nbsp;', ' ');
+												// 		updatedXpath = updatedViewString[i].xpath.split(";");
+												// 		updatedXpath = updatedXpath[1];
+												// 		var fetchedXpath = viewString[j].xpath.replace(/\s/g, ' ').replace('&nbsp;', ' ');
+												// 		fetchedXpath = viewString[j].xpath.split(";");
+												// 		fetchedXpath = fetchedXpath[1];
+												// 		// fetchedXpath = viewString[j].xpath
+												// 		// updatedXpath = updatedViewString[i].xpath
+												// 		if (updatedXpath == fetchedXpath) {
+												// 			updatedIndex.push(j);
+												// 			viewString[j] = updatedViewString[i];
+												// 			elementschanged = elementschanged + 1;
+												// 		}
+												// 	}
+												// }
+												
+												//Update all the changed objects in the viewString
+												for(var i=0; i< updateData.updatedViewString.changedobjectskeys.length; i++){
+													indexToUpdate = updateData.updatedViewString.changedobjectskeys[i];
+													viewString[indexToUpdate] = updateData.updatedViewString.view[0].changedobject[i];
 												}
-												updatedIndex = updatedIndex.sort(sortNumber);
+												//Delete all the not found objects from the viewString
+												for(var i=0; i< updateData.updatedViewString.notfoundobjectskeys.length; i++){
+													indexToDelete = updateData.updatedViewString.notfoundobjectskeys[i];
+													delete viewString[indexToDelete];
+												}
+												//updatedIndex = updatedIndex.sort(sortNumber);
 												viewString = viewString.filter(function (n) {
 														return n != null;
 													});
 												scrapedObjects.view = viewString;
 												scrapedObjects.mirror = updateData.updatedViewString.mirror;
-												scrapedObjects.scrapedin = scrapedobjects.scrapedin;
-												scrapedObjects.scrapetype = scrapedobjects.scrapetype;
+												scrapedObjects.scrapedin = updateData.updatedViewString.scrapedin;
+												scrapedObjects.scrapetype = updateData.updatedViewString.scrapetype;
+												scrapedObjects.scrapedurl = updateData.updatedViewString.scrapedurl;
 												if ('view' in scrapedObjects) {
 													scrapedObjects = JSON.stringify(scrapedObjects);
 													scrapedObjects = scrapedObjects.replace(/'+/g, "''");

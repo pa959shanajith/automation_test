@@ -405,7 +405,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     var nodetf = $(elem.parent()[idxSearch]).attr('transform');
                     var x_mptf = parseInt(mptf.split(/[()]/)[1].split(',')[0]);
                     var y_mptf = parseInt(mptf.split(/[()]/)[1].split(',')[1]);
-                    var scale_mptf = parseInt(mptf.split(/[()]/)[3]);
+                    var scale_mptf = 1; //parseFloat(mptf.split(/[()]/)[3]);
                     var x_nodetf = parseInt(nodetf.split(/[()]/)[1].split(',')[0]);
                     var y_nodetf = parseInt(nodetf.split(/[()]/)[1].split(',')[1]);
                     //Approx cordinates of node: mindmap translate + nodetf/mpscale
@@ -1966,7 +1966,10 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         if (node == 0 || node == undefined) {
             childNode = null;
             var p = d3.select(activeNode);
-        } else var p = childNode;
+        } else{
+            var p = childNode;
+            activeNode = childNode[0][0];
+        } 
         var pi = p.attr('id').split('-')[2];
         var t = p.attr('data-nodetype');
         var split_char = ',';

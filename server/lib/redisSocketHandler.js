@@ -76,6 +76,14 @@ default_sub.on("message", function (channel, message) {
 	case "qclogin":
 		mySocket.emit("qclogin", data.responsedata);
 		break;
+	
+	case "apgOpenFileInEditor":
+	mySocket.emit("apgOpenFileInEditor", data.editorName, data.filePath, data.lineNumber);
+	break;
+		 
+	case "generateFlowGraph":
+		mySocket.emit("generateFlowGraph", data.version, data.path);
+		break;
 
 	default:
 		var dataToNode = JSON.stringify({"username": data.username, "onAction": "fail", "value": "fail"});
@@ -170,6 +178,21 @@ module.exports.initListeners = function(mySocket){
 	mySocket.on("qcresponse", function (value) {
 		var dataToNode = JSON.stringify({"username": username, "onAction": "qcresponse", "value": value});
 		server_pub.publish("ICE2_" + username, dataToNode);
+	});
+
+	mySocket.on('open_file_in_editor_result', function (value) {
+		var dataToNode = JSON.stringify({"type" : "res","username" : username,"onAction" : "open_file_in_editor_result","value":JSON.parse(value)});
+		server_pub.publish('ICE2_' + username, dataToNode);
+	});
+	
+	mySocket.on('flowgraph_result', function (value) {
+		var dataToNode = JSON.stringify({"username" : username,"onAction" : "flowgraph_result","value":JSON.parse(value)});
+		server_pub.publish('ICE2_' + username, dataToNode);
+	});
+
+	mySocket.on('result_flow_graph_finished', function (value) {
+		var dataToNode = JSON.stringify({"type" : "res","username" : username,"onAction" : "result_flow_graph_finished","value":JSON.parse(value)});
+		server_pub.publish('ICE2_' + username, dataToNode);
 	});
 
 };
