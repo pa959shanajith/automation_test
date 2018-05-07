@@ -280,7 +280,10 @@ mySPA.controller('qcController',['$scope', '$rootScope', '$window','$http','$loc
 								if(getObject.hasClass("Tsetnode")){
 									if("testcase" in data[a] && data[a].testcase.length > 0){
 										for(var k=0; k<data[a].testcase.length; k++){
-											getObject.next("ul").append("<li class='testSet testcaselink'><label title='"+data[a].testcase[k]+"'>"+data[a].testcase[k]+"</label><img class='qcUndoSyncronise' title='Undo' src='imgs/ic-qcUndoSyncronise.png'><img class='qcSyncronise' title='Syncronise' src='imgs/ic-qcSyncronise.png'></li>");
+											var complete_testcase_name = data[a].testcase[k];
+											var testcase_name = complete_testcase_name.substring(0,complete_testcase_name.lastIndexOf('/'));
+											var testcase_id = complete_testcase_name.substring(complete_testcase_name.lastIndexOf('/')+1);
+											getObject.next("ul").append("<li class='testSet testcaselink'><label title='"+complete_testcase_name+"'> <span class='qcTestcaseId'>"+testcase_id+"</span><span class='qcTestcaseName'>"+testcase_name+"</span></label><img class='qcUndoSyncronise' title='Undo' src='imgs/ic-qcUndoSyncronise.png'><img class='qcSyncronise' title='Syncronise' src='imgs/ic-qcSyncronise.png'></li>");
 										}
 									}
 								}
