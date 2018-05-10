@@ -94,6 +94,14 @@ try {
     module.exports.httpsServer = httpsServer;
     var io = require('./server/lib/socket');
 
+    //serve all asset files from necessary directories
+    app.use('/partials',express.static(__dirname + "/public/partials"));
+    app.use("/js", express.static(__dirname + "/public/js"));
+    app.use("/imgs", express.static(__dirname + "/public/imgs"));
+    app.use("/images_mindmap", express.static(__dirname + "/public/images_mindmap"));
+    app.use("/css", express.static(__dirname + "/public/css"));
+    app.use("/fonts", express.static(__dirname + "/public/fonts"));
+
     app.use(bodyParser.json({
         limit: '50mb'
     }));
@@ -207,14 +215,6 @@ try {
             frameSrc: ["data:"]
         }
     }));
-
-    //serve all asset files from necessary directories
-    app.use('/partials',express.static(__dirname + "/public/partials"));
-    app.use("/js", express.static(__dirname + "/public/js"));
-    app.use("/imgs", express.static(__dirname + "/public/imgs"));
-    app.use("/images_mindmap", express.static(__dirname + "/public/images_mindmap"));
-    app.use("/css", express.static(__dirname + "/public/css"));
-    app.use("/fonts", express.static(__dirname + "/public/fonts"));
 
     app.get('/',  function (req,  res)  {
         res.clearCookie('connect.sid');
