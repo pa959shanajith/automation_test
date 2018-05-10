@@ -1556,27 +1556,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         return tableHTML;
     }
     
-    function loadCycles() {
-        $('#ct-assignCyc').empty();
-        $('#ct-assignCyc').append("<option value='select cycle' select=selected>" + "Select cycle" + "</option>");
-        //'46974ffa-d02a-49d8-978d-7da3b2304255'
-        mindmapServices.populateCycles($("#ct-assignRel").val()).then(function(result_cycles) {
-            if (result_cycles == "Invalid Session") {
-                $rootScope.redirectPage();
-            }                 
-            var result2 = result_cycles;
-            cycdata = {};
-            for (i = 0; i < result2.c_ids.length && result2.cyc.length; i++) {
-                $('#ct-assignCyc').append("<option data-id='" + result2.cyc[i] + "' value='" + result2.c_ids[i] + "'>" + result2.cyc[i] + "</option>");
-                cycdata[result2.c_ids[i]] = result2.cyc[i];
-            }
-            $("#ct-assignCyc option[value='" + result2.cyc[0] + "']").attr('selected', 'selected');
-        }, function(error) {
-            console.log("Error in populating Cycles");
-            //callback(null, err);
-        })
 
-    }
 
     function nodeCtrlClick(e) {
         d3.select('#ct-inpBox').classed('no-disp', !0);
@@ -2361,8 +2341,27 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     $('#undoChanges').click(function(){
         pi=$('#renamingConfirmationPopup').attr('node');
         dNodes[pi].name = dNodes[pi].original_name;
-        $('#ct-node-'+pi+' > text').text(dNodes[pi].original_name);        
+        $('#ct-node-'+pi+' > text').text(dNodes[pi].original_name);   
+        if(reuseDict && reuseDict[pi].length>0){
+            reuseDict[pi].forEach(function(e,i){
+                dNodes[e].name = dNodes[e].original_name;
+                $('#ct-node-'+e+' > text').text(dNodes[e].original_name);
+            });
+        }          
     });
+
+    $('#undoChanges2').click(function(){
+        pi=$('#renamingConfirmationPopup').attr('node');
+        dNodes[pi].name = dNodes[pi].original_name;
+        $('#ct-node-'+pi+' > text').text(dNodes[pi].original_name);   
+        if(reuseDict && reuseDict[pi].length>0){
+            reuseDict[pi].forEach(function(e,i){
+                dNodes[e].name = dNodes[e].original_name;
+                $('#ct-node-'+e+' > text').text(dNodes[e].original_name);
+            });
+        }          
+    });    
+    
     function inpKeyUp(e) {
         e = e || window.event;
         temp = [];
