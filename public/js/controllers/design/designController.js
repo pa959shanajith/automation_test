@@ -861,7 +861,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
         if (viewString == "") {
             $(this).children("img").addClass("thumb-ic-disabled").removeClass("thumb-ic");
             $(this).parent().css("cursor", "no-drop");
-        } else if (viewString.view.length == 0) {
+        } else if (Object.keys(viewString).length == 0) {
             $(this).children("img").addClass("thumb-ic-disabled").removeClass("thumb-ic");
             $(this).parent().css("cursor", "no-drop");
         } else {
@@ -1937,18 +1937,18 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                 newScrapedList.view = [];
                 newScrapedList.mirror = "";
             }
-            if(currentElements > 0)
-            {
-                $("#deleteObjects,#saveObjects").prop("disabled", false);
-                $(".checkStylebox").prop("checked", false);
+                if(currentElements > 0)
+                {
+                    $("#deleteObjects,#saveObjects").prop("disabled", false);
+                    $(".checkStylebox").prop("checked", false);
+                }
+                else{
+                    $("#deleteObjects,.checkStylebox").prop("disabled", true);
+                    $(".checkStylebox").prop("checked", false);
+                    $(".popupContent-filter-active").trigger('click');
+                    $("#saveObjects").prop("disabled", false);
+                }
             }
-            else{
-                $("#deleteObjects,.checkStylebox").prop("disabled", true);
-                $(".checkStylebox").prop("checked", false);
-                $(".popupContent-filter-active").trigger('click');
-                $("#saveObjects").prop("disabled", false);
-            }
-      }
       else{
             //Delete Selected Elements
           $.each($("input[type=checkbox].checkall:checked"), function() {
@@ -2053,7 +2053,6 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                 }
             }
               //Delete all objects ------------------------------------------
-              
               deleteScrapedObjects();
               $("#saveObjects").trigger('click');
         } else {
@@ -2123,31 +2122,50 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                 openDialog("Delete Scrape data", "Please select objects to delete.")
             } else {
                 if (eaCheckbox){
-                    var dontChkViewString = 0;
-                    $.each($("input[type=checkbox].checkall:checked"), function() {  
-                        for (var i = 0; i < newScrapedList.view.length; i++) {
-                            if ($(this).parents("li").data("xpath") == newScrapedList.view[i].xpath && ($(this).parent('.objectNames').siblings(".ellipsis").text().trim().replace('/\s/g', ' ')).replace('\n', ' ') == newScrapedList.view[i].custname.trim()) {
-                                if(!(isInArray(newScrapedList.view.indexOf(newScrapedList.view[i]), getIndexOfDeletedObjects))){
-                                    getIndexOfDeletedObjects.push(newScrapedList.view.indexOf(newScrapedList.view[i]))
-                                    $(this).parents("li.select_all").remove();
-                                    dontChkViewString++;
-                                    break;
-                                }
-                            }
+                    var totalElements = $(".ellipsis").length;
+                    var selectedElements = $("input[type=checkbox].checkall:checked:visible").length;
+                    if(totalElements == selectedElements)
+                    {
+                        $("#scraplist").empty();
+                        var currentElements = $(".ellipsis:visible").length;
+                        $("a.disableActions").removeClass("disableActions");
+                        $("li.compareObjects").removeClass('enableActions').addClass('disableActions compareObjectDisable');
+                        $("li.generateObj").removeClass('enableActions').addClass('disableActions addObjectDisable');
+                        
+                        getIndexOfDeletedObjects = []
+                        viewString = {};
+                        if(newScrapedList != undefined){
+                            newScrapedList.view = [];
+                            newScrapedList.mirror = "";
                         }
-                    })
-                    if($("input[type=checkbox].checkall:checked").length != dontChkViewString){ 
-                        $.each($("input[type=checkbox].checkall:checked"), function() {
-                            for (var i = 0; i < viewString.view.length; i++) {
-                                if ($(this).parents("li").data("xpath") == viewString.view[i].xpath && ($(this).parent('.objectNames').siblings(".ellipsis").text().trim().replace('/\s/g', ' ')).replace('\n', ' ') == viewString.view[i].custname.trim()) {
-                                    if(!(isInArray(viewString.view.indexOf(viewString.view[i]), getIndexOfDeletedObjects))){
-                                        getIndexOfDeletedObjects.push(viewString.view.indexOf(viewString.view[i]))
+                    }
+                    else{
+                        var dontChkViewString = 0;
+                        $.each($("input[type=checkbox].checkall:checked"), function() {  
+                            for (var i = 0; i < newScrapedList.view.length; i++) {
+                                if ($(this).parents("li").data("xpath") == newScrapedList.view[i].xpath && ($(this).parent('.objectNames').siblings(".ellipsis").text().trim().replace('/\s/g', ' ')).replace('\n', ' ') == newScrapedList.view[i].custname.trim()) {
+                                    if(!(isInArray(newScrapedList.view.indexOf(newScrapedList.view[i]), getIndexOfDeletedObjects))){
+                                        getIndexOfDeletedObjects.push(newScrapedList.view.indexOf(newScrapedList.view[i]))
                                         $(this).parents("li.select_all").remove();
+                                        dontChkViewString++;
                                         break;
                                     }
                                 }
                             }
                         })
+                        if($("input[type=checkbox].checkall:checked").length != dontChkViewString){ 
+                            $.each($("input[type=checkbox].checkall:checked"), function() {
+                                for (var i = 0; i < viewString.view.length; i++) {
+                                    if ($(this).parents("li").data("xpath") == viewString.view[i].xpath && ($(this).parent('.objectNames').siblings(".ellipsis").text().trim().replace('/\s/g', ' ')).replace('\n', ' ') == viewString.view[i].custname.trim()) {
+                                        if(!(isInArray(viewString.view.indexOf(viewString.view[i]), getIndexOfDeletedObjects))){
+                                            getIndexOfDeletedObjects.push(viewString.view.indexOf(viewString.view[i]))
+                                            $(this).parents("li.select_all").remove();
+                                            break;
+                                        }
+                                    }
+                                }
+                            })
+                        }
                     }
                 }
                 else{
@@ -2159,6 +2177,11 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
         if($(".ellipsis").length == 0)
         {
            $(".checkStylebox").prop('disabled', true);
+           if(saveScrapeDataFlag == false)
+           {
+             $("#saveObjects").prop("disabled", true);
+           }
+          
         }
     }
 
@@ -3516,13 +3539,21 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
             else{
                 $(".checkStylebox").attr("disabled",false);
             }
+            // var currentElements = $("span.ellipsis:visible").length;
+            // if(currentElements == 0)
+            // {
+            //     $("#saveObjects").prop('disabled',true);
+            // }
+            // else{
+            //     $("#saveObjects").prop('disabled',false);
+            // }
             unblockUI();
         }, 500);
     })
 
     function filter() { 
         if (gsElement.length > 0) {
-            for (i = 0; i < gsElement.length; i++) {
+            for (var i = 0; i < gsElement.length; i++) {
                 if (gsElement[i] == "others") {
                     $.each($("#scraplist li"), function() {
                         if ($(this).data("tag") != "button" &&
@@ -3552,7 +3583,98 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                             $(this).data("tag").toLowerCase().indexOf("radio button") == -1) {
                             $(this).show();
                         }
-                    })
+                    });
+                }
+                /*** Filtering Duplicate Objects ***/
+                else if  (gsElement[i] == "duplicateCustnames") {
+                    var allCustnames = [];
+                    var duplicateCustnames = [];
+                        if(window.localStorage['_modified']){
+                            modifiednames = JSON.parse(window.localStorage['_modified']);
+                        }                 
+                        //if object names are modified
+                        if(modifiednames.length > 0){
+                            var mdName;
+                            for(var j=0; j<modifiednames.length; j++){
+                                mdName = modifiednames[j].split("^^");
+                                if (eaCheckbox){
+                                    if(mdName[1]){
+                                        if(newScrapedList.view[mdName[1]])
+                                            newScrapedList.view[mdName[1]].custname = mdName[0];
+                                    }
+                                }
+                                else{
+                                    if(mdName[1]){
+                                        if(viewString.view[mdName[1]])
+                                            viewString.view[mdName[1]].custname = mdName[0];
+                                    }
+                                }
+                            }
+                        }
+                        //If Enable Append checkbox is true
+                        if (eaCheckbox){
+                            //If Enable Append checkbox is true and object names are modified
+                            if(modifiednames.length > 0){
+                                var mdName;
+                                for(var k=0; k<modifiednames.length; k++){
+                                    mdName = modifiednames[k].split("^^");
+                                    if (eaCheckbox){
+                                        if(mdName[1]){
+                                            if(newScrapedList.view[mdName[1]])
+                                                newScrapedList.view[mdName[1]].custname = mdName[0];
+                                        }
+                                    }
+                                    else{
+                                        if(mdName[1]){
+                                            if(viewString.view[mdName[1]])
+                                                viewString.view[mdName[1]].custname = mdName[0];
+                                        }
+                                    }
+                                }
+                            }
+                            if('view' in newScrapedList)
+                            {
+                                for(var l=0;l<newScrapedList.view.length;l++)
+                                {
+                                    allCustnames.push(newScrapedList.view[l].custname);       //get all custnames
+                                }
+                            }
+                            if('view' in viewString)
+                            {
+                                for(var m=0;m<viewString.view.length;m++)
+                                {
+                                    allCustnames.push(viewString.view[m].custname);           //get all custnames
+                                }
+                            }
+                           
+                        }
+                        //If Enable Append checkbox is false
+                        else{
+                            if('view' in viewString)
+                            {
+                                for(var n=0;n<viewString.view.length;n++)
+                                {
+                                    allCustnames.push(viewString.view[n].custname);           //get all custnames
+                                }
+                            }
+                        }
+                    
+                        var sorted_custnames = allCustnames.slice().sort();
+                        for (var p = 0; p < allCustnames.length - 1; p++) {
+                            if (sorted_custnames[p + 1] == sorted_custnames[p]) {
+                                duplicateCustnames.push(sorted_custnames[p]);               //get duplicate custnames
+                            }
+                        }
+                        //console.log("Duplicate Custnames", duplicateCustnames);
+                        $.each($("#scraplist li"), function() {
+                                for(var q=0;q<duplicateCustnames.length;q++)
+                                {
+                                    if($.trim($(this)[0].childNodes[0].childNodes[2].innerHTML) == $.trim(duplicateCustnames[q]))
+                                    {
+                                        $(this).show();                                         //Display duplicate custnames only
+                                    }
+                                }
+                            });
                 }
                 else{
                     $.each($("#scraplist li"), function() {
@@ -3579,9 +3701,10 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                         ) {
                             $(this).show();
                         }
-                    })
+                    });
                 }
             }
+
         } else {
             $("#scraplist li").show()
         }
@@ -3589,6 +3712,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
             'cursor': 'auto'
         });
         cfpLoadingBar.complete()
+      
     }
 
     //Click on add dependent testcase
