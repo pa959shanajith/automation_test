@@ -116,7 +116,6 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 								response.respnames.forEach(function(name,i){
 									$scope.filterDat.idnamemaprel[response.requestedids[i]] = name;
 								});
-								console.log(response);
 								PluginService.getNames_ICE($scope.filterDat.cycleids,Array($scope.filterDat.cycleids.length).fill('cycles'))
 								.then(function (response) {
 									if(response == "Invalid Session"){

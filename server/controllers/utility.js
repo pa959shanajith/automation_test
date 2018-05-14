@@ -131,31 +131,30 @@ exports.Encrypt_ICE = function getDomains_ICE(req, res) {
 	}
 };
 
-// exports.pairwise_ICE = function(req, res) {
-//  	if (utils.isSessionActive(req.session)) {
-// 			var abc = {}
-// 			abc.key = req.body.dataObj;
-// 			var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-// 			console.log("IP:",ip);
-// 			var name = req.session.username;
-// 			console.log(Object.keys(myserver.allSocketsMap),"<<all people, asking person:",name);
-// 			if('allSocketsMap' in myserver && name in myserver.allSocketsMap){
-// 				var mySocket = myserver.allSocketsMap[name];
-// 				mySocket._events.pairwise = [];
-// 			//mySocket.send(dataObj);
-// 				mySocket.emit("pairwise", abc );//Sending
-// 				var updateSessionExpiry =utils.resetSession(req.session);
-// 				//Receiving
-// 				mySocket.on('result_pairs', function (data) {
-// 					//req.session.cookie.expires = sessionExtend;
-// 					clearInterval(updateSessionExpiry);
-// 					res.send(data);
-// 				});
-// 			}else{
-// 				console.log("Socket not Available");
-// 				res.send("unavailableLocalServer");
-// 			}
+/*exports.pairwise_ICE = function (req, res) {
+	if (utils.isSessionActive(req.session)) {
+		var abc = {}
+		abc.key = req.body.dataObj;
+		var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+		console.log("IP:", ip);
+		var name = req.session.username;
+		console.log(Object.keys(myserver.allSocketsMap), "<<all people, asking person:", name);
+		if ('allSocketsMap' in myserver && name in myserver.allSocketsMap) {
+			var mySocket = myserver.allSocketsMap[name];
+			mySocket._events.pairwise = [];
+			//mySocket.send(dataObj);
+			mySocket.emit("pairwise", abc); //Sending
+			var updateSessionExpiry = utils.resetSession(req.session);
+			//Receiving
+			mySocket.on('result_pairs', function (data) {
+				//req.session.cookie.expires = sessionExtend;
+				clearInterval(updateSessionExpiry);
+				res.send(data);
+			});
+		} else {
+			console.log("Socket not Available");
+			res.send("unavailableLocalServer");
+		}
+	}
+}*/
 
-// 		}
-
-// 	}

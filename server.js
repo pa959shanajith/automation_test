@@ -152,6 +152,64 @@ try {
     }));
     app.use(helmet.noCache());
 
+	app.post('/restartService',function(req, res){
+		logger.info("Inside UI Service: restartService");
+		var childProcess = require("child_process");
+		var serverList = ["License Server", "NDAC Server", "Web Server"];
+		var svcNA = "service does not exist";
+		var svcRun = "RUNNING";
+		var svcRunPending = "START_PENDING";
+		var svcStop = "STOPPED";
+		var svcStopPending = "STOP_PENDING";
+		var svc = req.body.id;
+		var batFile = require.resolve("./assets/svc.bat");
+		try {
+			if (svc == "query") {
+				var svcStatus = [];
+				var execCmd = batFile + " ";
+				childProcess.exec(execCmd + "0 QUERY", function(error, stdout, stderr) {
+					if (stdout && stdout.indexOf(svcNA) == -1) svcStatus.push(true);
+					else svcStatus.push(false);
+					childProcess.exec(execCmd + "1 QUERY", function(error, stdout, stderr) {
+						if (stdout && stdout.indexOf(svcNA) == -1) svcStatus.push(true);
+						else svcStatus.push(false);
+						childProcess.exec(execCmd + "2 QUERY", function(error, stdout, stderr) {
+							if (stdout && stdout.indexOf(svcNA) == -1) svcStatus.push(true);
+							else svcStatus.push(false);
+							return res.send(svcStatus);
+						});
+					});
+				});
+			} else {
+				var execCmd = batFile + " " + svc.toString() + " ";
+				childProcess.exec(execCmd + "QUERY", function(error, stdout, stderr) {
+					if (stdout) {
+						if (stdout.indexOf(svcNA) > 0) {
+							logger.error("Error occured in restartService:",serverList[svc],"Service is not installed");
+							return res.send("na");
+						} else {
+							if (stdout.indexOf(svcRun) > 0 || stdout.indexOf(svcRunPending) > 0) execCmd += "RESTART";
+							else execCmd += "START";
+							logger.error(serverList[svc],"Service restarted successfully");
+							res.send("success");
+							childProcess.exec("START " + execCmd, function(error, stdout, stderr) {
+								//console.log("error: ", error);
+								//console.log("stdout: ", stdout);
+							});
+							return true;
+						}
+					} else {
+						logger.error("Error occured in restartService: Fail to restart",serverList[svc],"Service");
+						return res.status(500).send("fail");
+					}
+				});
+			}
+		} catch (exception) {
+			logger.error(exception.message);
+			return res.status(500).send("fail");
+		}
+	});
+
     //Role Based User Access to services
     app.post('*', function (req, res, next) {
         var roleId = req.session.activeRole;
@@ -359,6 +417,7 @@ try {
         app.post('/createVersion', version.createVersion);
         app.post('/getProjectsNeo', version.getProjectsNeo);
     } catch (Ex) {
+        process.env.projectVersioning = "disabled";
         logger.warn('Versioning is disabled');
     }
 

@@ -208,15 +208,10 @@ function next_function(resultobj, cb, data) {
 						task_json.scenarioName = 'scenarioname';
 						task_json.testCaseName = 'testcasename';
 						//Check if versioning exists
-						function versioningCheck()
-						{
-							try {
-								var versioning = require('../controllers/project_versioning.js');
-								versioningEnabled = ' version_'+ task_json.versionnumber+ ' : ';
-							}
-							catch(err) {
-								versioningEnabled = ' ';
-							}
+						function versioningCheck() {
+							versioningEnabled = ' ';
+							if (process.env.projectVersioning != "disabled")
+								versioningEnabled += 'version_'+ task_json.versionnumber+ ' : ';
 							return versioningEnabled;
 						}
 

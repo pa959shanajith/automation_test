@@ -6100,13 +6100,10 @@ function getTags(data) {
         obnames = ["@Generic","@Mobile","@Action"];
     } else if (appTypeLocal == "MobileWeb") {
         obnames = ["@Generic","@Browser","@BrowserPopUp","@Action"];
-    } else if (appTypeLocal == "MobileApp") {
-        obnames = ["@Generic", "@MobileiOS"]
     } else if (appTypeLocal == "SAP") {
         obnames = ["@Generic", "@Sap", "@Custom"]
-    }
-    else if(appTypeLocal="System"){
-        obnames=["@Generic","@System"];
+    } else if(appTypeLocal="System"){
+        obnames=["@Generic","@Excel","@System"];
     }
     for (var i = 0; i < data.length; i++) {
         obnames.push(data[i].custname);
