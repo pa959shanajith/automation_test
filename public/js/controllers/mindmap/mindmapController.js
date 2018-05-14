@@ -522,7 +522,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     }
 
     function unloadMindmapData(){
-        $('#ct-mindMap').hide();
+        //$('#ct-mindMap').hide();
+        $('#ct-mindMap').empty();
         $('#ct-actionBox').remove();
         var nodeBox = d3.select('.ct-nodeBox');
         $(nodeBox[0]).empty();
@@ -740,9 +741,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         n.display_name = n.name;
         var ch = 15;
         //Issue 697
-        if (n.type == 'testcases') ch = 9;
-        if ((n.name.length > 15) || (n.name.length > 9 && n.type == 'testcases')) {
-
+        //if (n.type == 'testcases') ch = 9;
+        //if ((n.name.length > 15) || (n.name.length > 9 && n.type == 'testcases')) {
+        if (n.name.length > 15) {
             n.display_name = n.display_name.slice(0, ch) + '...';
         }
         v.append('text').attr('class', 'ct-nodeLabel').text(n.display_name).attr('text-anchor', 'middle').attr('x', 20).attr('title', n.name).attr('y', 50);
@@ -3583,7 +3584,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         v.append('image').attr('height', '40px').attr('width', '40px').attr('class', 'ct-nodeIcon').attr('xlink:href', img_src).on('click', nodeCtrlClick_W).attr('style','opacity:'+nodeOpacity+';');
         var ch = 15;
         if (n.name.length > 15 && n.type != 'modules_endtoend') {
-            if (n.type == 'testcases') ch = 9;
+            //if (n.type == 'testcases') ch = 9;
             n.display_name = n.display_name.slice(0, ch) + '...';
         }
         v.append('text').attr('class', 'ct-nodeLabel').text(n.display_name).attr('text-anchor', 'middle').attr('x', 20).attr('title', n.name).attr('y', 50);
@@ -5013,7 +5014,7 @@ function getSelectionStart(o) {
         else
             var temp = dNodes.length;
 
-        if (temp == 0) {
+        if ($('#ct-mindMap').length == 0 ||$('#ct-mindMap').is(':empty')) {
             openDialogMindmap('Error', "Please select a module first");
         } else if ((selectedTab == 'mindmapEndtoEndModules' || selectedTab == 'tabCreate') && !$('#ct-inpBox').hasClass('no-disp')) {
             openDialogMindmap('Error', "Please complete editing first");
