@@ -4730,6 +4730,9 @@ function contentTable(newTestScriptDataLS) {
                         } else if(obType =='treeview'|| obType=='TreeView' || obType=='tree'){
                             sc = Object.keys(keywordArrayList.tree);
                             selectedKeywordList = "tree";
+                        } else if(obType =='iris'){
+                            sc = Object.keys(keywordArrayList.iris);
+                            selectedKeywordList = "iris";
                         } else {
                             sc = Object.keys(keywordArrayList.element);
                             selectedKeywordList = "element";
@@ -4747,6 +4750,8 @@ function contentTable(newTestScriptDataLS) {
                         $grid.jqGrid('setCell', rowId, 'url', url);
                         $grid.jqGrid('setCell', rowId, 'objectName', objName);
                         $grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
+                        if(obType == 'iris')
+                            $grid.jqGrid('setCell', rowId, 'cord',cord);
                         break;
                     } else if (appTypeLocal == 'Desktop' && (!(obType == 'push_button' || obType == 'text' || obType == 'combo_box' || obType == 'list_item' || obType == 'hyperlink' || obType == 'lbl' || obType =='treeview'|| obType=='TreeView' || obType=='tree' ||
                             obType == 'list' || obType == 'edit' || obType == null || obType == 'Static' || obType == 'check_box' || obType == 'radio_button' || obType == 'tab' || obType == 'datepicker'))) {
