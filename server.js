@@ -386,7 +386,7 @@ try {
         logger.warn('Versioning is disabled');
     }
 
-    //app.post('/home', mindmap.mindmapService);
+	// Route Mapping
     app.post('/populateProjects', mindmap.populateProjects);
     app.post('/populateUsers', mindmap.populateUsers);
     app.post('/checkReuse', mindmap.checkReuse);

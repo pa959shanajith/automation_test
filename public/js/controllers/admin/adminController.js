@@ -1,4 +1,4 @@
-var domainId, DOMAINID, releaseName, cycleName, count=0,delCount=0,editReleaseId='',editCycleId='',deleteReleaseId='',deleteRelid,deleteCycleId='',deleteCycId,taskName;releaseNamesArr =[];
+var domainId, DOMAINID, releaseName, cycleName, count=0,delCount=0,editReleaseId='',editCycleId='',deleteReleaseId='',deleteRelid,deleteCycleId='',deleteCycId,taskName;var releaseNamesArr =[];
 var createprojectObj = {}; var projectDetails = [];var flag;var projectExists;var updateProjectDetails = [];
 var editedProjectDetails = [];
 var deletedProjectDetails = [];
@@ -25,7 +25,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 
 	$timeout(function(){
 		angular.element('#userTab').triggerHandler('click');
-		cfpLoadingBar.complete()
+		cfpLoadingBar.complete();
 	}, 500);
 
 	$(document).on('change', '#selAssignUser', function (e) {
@@ -34,7 +34,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 		$scope.assignedProjectAP = [];
 		$(".load").show();
 		$("#selAssignUser, #rightall, #rightgo, #leftgo, #leftall, .adminBtn").prop("disabled", true);
-		$("#overlayContainer").prop("style", "opacity: 1;")
+		$("#overlayContainer").prop("style", "opacity: 1;");
 		adminServices.getDomains_ICE()
 		.then(function (data) {
 			if (data == "Invalid Session") {
@@ -79,7 +79,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 						$scope.assignedProjectInitial = $scope.assignedProjectAP;
 						for (var j = 0; j < projectData.length; j++) {
 							assignedProjectsArr.push(projectData[j].projectId);
-							assignedProjectNames.push(projectData[j].projectName)
+							assignedProjectNames.push(projectData[j].projectName);
 						}
 
 						adminServices.getDetails_ICE(idtype, requestedids)
@@ -123,8 +123,8 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 								$("#selAssignUser, #rightall, #rightgo, #leftgo, #leftall, .adminBtn").prop("disabled", false);
 							}
 						}, function (error) {
-							console.log("Error:::::::::::::", error)
-						})
+							console.log("Error:::::::::::::", error);
+						});
 					} else {
 						adminServices.getDetails_ICE(idtype, requestedids)
 						.then(function (res) {
@@ -141,12 +141,12 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 							$(".load").hide();
 							$("#selAssignUser, #rightall, #rightgo, #leftgo, #leftall, .adminBtn").prop("disabled", false);
 						}, function (error) {
-							console.log("Error:::::::::::::", error)
-						})
+							console.log("Error:::::::::::::", error);
+						});
 					}
 				}, function (error) {
-					console.log("Error:::::::::::::", error)
-				})
+					console.log("Error:::::::::::::", error);
+				});
 			}
 		});
 
@@ -166,13 +166,13 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 			} else if(data == "empty") {
 				openModalPopup("Assign Project", "There are no users present.");
 			} else {
-				data.sort(function(a,b){ return a[0] > b[0] });
+				data.sort(function(a,b){ return a[0] > b[0]; });
 				var selectBox = $("#selAssignUser");
 				selectBox.empty();
-				selectBox.append('<option data-id="" value disabled selected>Select User</option>')
+				selectBox.append('<option data-id="" value disabled selected>Select User</option>');
 				for(i=0; i<data.length; i++){
 					if(data[i][2] != "b5e9cb4a-5299-4806-b7d7-544c30593a6e"){
-						selectBox.append('<option data-id="'+data[i][1]+'" value="'+data[i][0]+'">'+data[i][0]+'</option>')
+						selectBox.append('<option data-id="'+data[i][1]+'" value="'+data[i][0]+'">'+data[i][0]+'</option>');
 					}
 				}
 				selectBox.prop('selectedIndex', 0);
@@ -181,7 +181,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 		}, function (error) {
 			console.log("Error:::::::::::::", error);
 		});
-	});
+	};
 
 	$(document).on('change', '#selAssignProject', function () {
 		$scope.allProjectAP = [];
@@ -220,7 +220,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 				$scope.assignedProjectInitial = $scope.assignedProjectAP;
 				for (var j = 0; j < projectData.length; j++) {
 					assignedProjectsArr.push(projectData[j].projectId);
-					assignedProjectNames.push(projectData[j].projectName)
+					assignedProjectNames.push(projectData[j].projectName);
 				}
 
 				adminServices.getDetails_ICE(idtype, requestedids)
@@ -258,8 +258,8 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 						}
 					}
 				}, function (error) {
-					console.log("Error:::::::::::::", error)
-				})
+					console.log("Error:::::::::::::", error);
+				});
 			} else {
 				adminServices.getDetails_ICE(idtype, requestedids)
 				.then(function (resDetails) {
@@ -275,12 +275,12 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 						}
 					}
 				}, function (error) {
-					console.log("Error:::::::::::::", error)
-				})
+					console.log("Error:::::::::::::", error);
+				});
 			}
 		}, function (error) {
-			console.log("Error:::::::::::::", error)
-		})
+			console.log("Error:::::::::::::", error);
+		});
 	});
 
 	//	Assign Projects Button Click
@@ -335,7 +335,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 		/*End of logic to get unassigned project list */
 		assignProjectsObj.deletetasksofprojects = $scope.diffprj;
 		//console.log(assignProjectsObj);
-		blockUI('Saving in Progress. Please Wait...')
+		blockUI('Saving in Progress. Please Wait...');
 		adminServices.assignProjects_ICE(assignProjectsObj)
 		.then(function (data) {
 			unblockUI();
@@ -352,8 +352,8 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 				openModalPopup("Assign Projects", "Failed to assign projects to user");
 			}
 		}, function (error) {
-			console.log("Error:::::::::::::", error)
-		})
+			console.log("Error:::::::::::::", error);
+		});
 	};
 
 	$(document).on('click', '#projectTab', function () {
@@ -366,13 +366,13 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 		adminServices.getAvailablePlugins()
 		.then(function (plugins_list) {
 			for (var i = 0; i < plugins_list.length; i++) {
-				plugins[i] = plugins_list[i]
+				plugins[i] = plugins_list[i];
 			}
 			$timeout(function () {
 				$('.scrollbar-inner').scrollbar();
 				$('.scrollbar-macosx').scrollbar();
 				toggleCycleClick();
-			}, 10)
+			}, 10);
 			adminServices.getDomains_ICE()
 			.then(function (data) {
 				if (data == "Invalid Session") {
@@ -399,10 +399,10 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 
 				}
 			}, function (error) {
-				console.log("Error:::::::::::::", error)
-			})
+				console.log("Error:::::::::::::", error);
+			});
 		}, function (error) {
-			console.log("Error:::::::::::::", error)
+			console.log("Error:::::::::::::", error);
 		});
 	});
 
@@ -427,7 +427,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 				$(this).attr("disabled", "disabled");
 			});
 		}, 50);
-	});
+	};
 
 	// Create Project Action
 	$scope.create_project = function () {
@@ -515,12 +515,12 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 									}
 									unblockUI();
 								}, function (error) {
-									console.log("Error:::::::::::::", error)
-								})
+									console.log("Error:::::::::::::", error);
+								});
 							}
 						}, function (error) {
-							console.log("Error:::::::::::::", error)
-						})
+							console.log("Error:::::::::::::", error);
+						});
 					}
 				}
 			} else {
@@ -657,8 +657,8 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 					}
 					unblockUI();
 				}, function (error) {
-					console.log("Error:::::::::::::", error)
-				})
+					console.log("Error:::::::::::::", error);
+				});
 			}
 		}
 	};
@@ -676,14 +676,14 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 		$scope.allProjectAP = [];
 		$scope.assignedProjectAP = [];        
 		$("#selAssignProject").empty();
-		$("#selAssignProject").append('<option data-id="" value disabled selected>Please Select your domain</option>')
+		$("#selAssignProject").append('<option data-id="" value disabled selected>Please Select your domain</option>');
 	}
 
 	//Add Release Name Functionality
 	$(document).on("click", "#addRelease", function () {
 		flag = false;
 		//$("#addReleaseNameModal").modal("show");
-		openEditGlobalModal("Add Release", "releaseTxt", "Add Release Name", "addReleaseName")
+		openEditGlobalModal("Add Release", "releaseTxt", "Add Release Name", "addReleaseName");
 		$("#releaseTxt").removeClass("inputErrorBorder");
 		$("#releaseTxt").addClass("validationKeydown");
 		//$("#releaseTxt").focus();
@@ -691,7 +691,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 		$('#releaseTxt').focus();
 		});*/
 		$("#releaseTxt").val('');
-		var reg = /^[a-zA-Z0-9\s\.\-\_]+$/
+		var reg = /^[a-zA-Z0-9\s\.\-\_]+$/;
 			$(document).on('click', "#addReleaseName", function (e) {
 				e.preventDefault();
 				if ($("#releaseTxt").val() == "") {
@@ -735,7 +735,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 							"releaseName": "",
 							"newStatus": true,
 							"cycleDetails": []
-						}
+						};
 						count = $("#releaseList li").length;
 						$("#releaseList").append("<li class='createRelease' id='releaseList_" + count + "'><img src='imgs/ic-release.png' /><span title=" + releaseName + " class='releaseName'>" + releaseName + "</span><span class='actionOnHover'><img id=editReleaseName_" + count + " title='Edit Release Name' src='imgs/ic-edit-sm.png' class='editReleaseName'><img id=deleteReleaseName_" + count + " title='Delete Release' src='imgs/ic-delete-sm.png' class='deleteRelease'></span></li>");
 						// releCycObj = {};
@@ -754,7 +754,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 						$('.scrollbar-inner').scrollbar();
 					e.stopImmediatePropagation();
 				}
-			})
+			});
 	});
 
 	$(document).on('click', "#releaseList li", function () {
@@ -772,7 +772,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 		e.preventDefault();
 		flag = false;
 		//$("#addCycleNameModal").modal("show");
-		openEditGlobalModal("Add Cycle", "cycleTxt", "Add Cycle Name", "addCycleName")
+		openEditGlobalModal("Add Cycle", "cycleTxt", "Add Cycle Name", "addCycleName");
 		$("#cycleTxt").removeClass('inputErrorBorder');
 		$("#cycleTxt").addClass("validationKeydown");
 		/*$('#addCycleNameModal').on('shown.bs.modal', function () {
@@ -781,7 +781,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 		$("#cycleTxt").val('');
 		$(document).on('click', "#addCycleName", function (e) {
 			var reg = /^[a-zA-Z0-9\s\.\-\_]+$/
-				var relName = $("#releaseList li.active .releaseName").text();
+			var relName = $("#releaseList li.active .releaseName").text();
 			e.preventDefault();
 			$("#cycleTxt").removeClass("inputErrorBorder");
 			if ($("#cycleTxt").val() == "") {
@@ -844,11 +844,11 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 						"releaseId": "",
 						"newStatus": false,
 						"cycleDetails": []
-					}
+					};
 					var createCyc = {
 						"cycleName": "",
 						"newStatus": true
-					}
+					};
 					delCount = (delCount + 1) * 3;
 					$("#cycleList").append("<li class='cycleList createCycle'><img src='imgs/ic-cycle.png' /><span title=" + cycleName + " class='cycleName'>" + cycleName + "</span><span class='actionOnHover'><img id=editCycleName_" + delCount + " title='Edit Cycle Name' src='imgs/ic-edit-sm.png' class='editCycleName'><img id=deleteCycleName_" + delCount + " title='Delete Cycle' src='imgs/ic-delete-sm.png' class='deleteCycle'></span></li>");
 					/*for (var i = 0; i < updateProjectDetails.length; i++) {
@@ -870,7 +870,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 						createNewRelCyc.releaseName = relName;
 						createNewRelCyc.releaseId = RelID;
 						createCyc.cycleName = cycleName;
-						createNewRelCyc.cycleDetails.push(createCyc)
+						createNewRelCyc.cycleDetails.push(createCyc);
 						newProjectDetails.push(createNewRelCyc);
 					} else {
 						var chk = true;
@@ -886,7 +886,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 							createNewRelCyc.releaseName = relName;
 							createNewRelCyc.releaseId = RelID;
 							createCyc.cycleName = cycleName;
-							createNewRelCyc.cycleDetails.push(createCyc)
+							createNewRelCyc.cycleDetails.push(createCyc);
 							newProjectDetails.push(createNewRelCyc);
 						}
 					}
@@ -898,7 +898,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 					$('.scrollbar-inner').scrollbar();
 				e.stopImmediatePropagation();
 			}
-		})
+		});
 	});
 
 	$(document).on('click', '[id^=releaseList]', function (e) {
@@ -982,11 +982,11 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 			$('#editReleaseNameModal').on('shown.bs.modal', function () {
 				$('#releaseName').focus();
 			});
-			var existingReleaseName = $(this).parents("li").children(".releaseName").text()
+			var existingReleaseName = $(this).parents("li").children(".releaseName").text();
 				releaseName = $("#releaseName").val(existingReleaseName);
 			//Save edited release name
 			$(document).on('click', '#updateReleaseName', function (event) {
-				var reg = /^[a-zA-Z0-9\s\.\-\_]+$/
+				var reg = /^[a-zA-Z0-9\s\.\-\_]+$/;
 					if ($("#releaseName").val() == "") {
 						$("#releaseName").addClass('inputErrorBorder');
 						return false;
@@ -1055,7 +1055,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 										"oldreleaseName": "",
 										"cycleDetails": [],
 										"editStatus": false
-									}
+									};
 									updateProjectDetails[i].releaseName = $("#releaseName").val();
 									//For update project json
 									if (editedProjectDetails.length <= 0) {
@@ -1063,7 +1063,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 										editRelCyc.releaseName = $("#releaseName").val(); //updateProjectDetails[i].releaseName;
 										editRelCyc.oldreleaseName = oldRelText;
 										editRelCyc.editStatus = true;
-										editedProjectDetails.push(editRelCyc)
+										editedProjectDetails.push(editRelCyc);
 									} else {
 										var chkPresent = true;
 										for (m = 0; m < editedProjectDetails.length; m++) {
@@ -1080,7 +1080,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 											editRelCyc.releaseName = $("#releaseName").val(); //updateProjectDetails[i].releaseName;
 											editRelCyc.oldreleaseName = oldRelText;
 											editRelCyc.editStatus = true;
-											editedProjectDetails.push(editRelCyc)
+											editedProjectDetails.push(editRelCyc);
 										}
 									}
 									//For update project json
@@ -1091,7 +1091,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 						//$("#"+editReleaseId).siblings(".deleteRelease").addClass("editedRelease");
 						event.stopImmediatePropagation();
 					}
-			})
+			});
 			e.stopImmediatePropagation();
 		}
 	});
@@ -1117,7 +1117,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 						delete projectDetails[i];
 						goahead = true;
 						projectDetails = projectDetails.filter(function (n) {
-								return n != undefined
+								return n != undefined;
 							});
 					}
 				}
@@ -1133,7 +1133,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 							"releaseId": "",
 							"cycleDetails": [],
 							"deleteStatus": false
-						}
+						};
 						//For update project json
 						if (deletedProjectDetails.length <= 0) {
 							deleteRelCyc.releaseName = $("#" + deleteReleaseId).parent().prev('span.releaseName').text(); //updateProjectDetails[i].releaseName;
@@ -1161,7 +1161,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 						delete updateProjectDetails[i];
 						$("#cycleList li").remove();
 						updateProjectDetails = updateProjectDetails.filter(function (n) {
-								return n != undefined
+								return n != undefined;
 							});
 					}
 				}
@@ -1169,7 +1169,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 					if (newProjectDetails[j].releaseName == $("#" + deleteReleaseId).parent().prev('span.releaseName').text()) {
 						delete newProjectDetails[j];
 						newProjectDetails = newProjectDetails.filter(function (n) {
-								return n != undefined
+								return n != undefined;
 							});
 					}
 				}
@@ -1189,24 +1189,24 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 	//Edit Cycle Name Functionality
 	$(document).on("click", "[id^=editCycleName_]", function (e) {
 		//$("#editCycleNameModal").modal("show");
-		openEditGlobalModal("Edit Cycle Name", "cycleName", "Enter New Cycle Name", "updateCycleName")
+		openEditGlobalModal("Edit Cycle Name", "cycleName", "Enter New Cycle Name", "updateCycleName");
 		$("#cycleName").addClass("validationKeydown");
-		var existingCycleName = $(this).parents("li").children(".cycleName").text()
-			$("#cycleName").val(existingCycleName)
-			editCycleId = e.target.id;
+		var existingCycleName = $(this).parents("li").children(".cycleName").text();
+		$("#cycleName").val(existingCycleName);
+		editCycleId = e.target.id;
 		editCycId = e.target.parentElement.previousSibling.dataset.cycleid;
 		if (e.target.id != "cycleName") {
 			$("#cycleName").removeClass("inputErrorBorder");
 			/*$('#editCycleNameModal').on('shown.bs.modal', function () {
 			$('#cycleName').focus();
 			});*/
-			var existingCycleName = $(this).parents("li").children(".cycleName").text()
+			var existingCycleName = $(this).parents("li").children(".cycleName").text();
 				cycleName = $("#cycleName").val(existingCycleName);
 			$('#cycleName').focus();
 			//Edit cycle name save button
 			$(document).on('click', '#updateCycleName', function (event) {
 				flag = false;
-				var reg = /^[a-zA-Z0-9\s\.\-\_]+$/
+				var reg = /^[a-zA-Z0-9\s\.\-\_]+$/;
 					$("#cycleList li:visible").each(function () {
 						if ($(this).children('span.cycleName').text().trim() == $("#cycleName").val().trim()) {
 							$(".close:visible").trigger('click');
@@ -1274,13 +1274,13 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 											"oldreleaseName": "",
 											"cycleDetails": [],
 											"editStatus": false
-										}
+										};
 										var editCycle = {
 											"oldCycleName": "",
 											"cycleName": "",
 											"cycleId": "",
 											"editStatus": false
-										}
+										};
 										//console.log("objectType", typeof(updateProjectDetails[i].cycleDetails[j]))
 										updateProjectDetails[i].cycleDetails[j].cycleName = $("#cycleName").val();
 
@@ -1294,9 +1294,9 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 											editCycle.cycleName = $("#cycleName").val(); //updateProjectDetails[i].cycleDetails[j].cycleName;
 											editCycle.cycleId = editCycId; //updateProjectDetails[i].cycleDetails[j].cycleId;
 											editCycle.editStatus = true;
-											editRelCyc.cycleDetails.push(editCycle)
+											editRelCyc.cycleDetails.push(editCycle);
 											//pushing all data to an array
-											editedProjectDetails.push(editRelCyc)
+											editedProjectDetails.push(editRelCyc);
 										} else {
 											var chkRelPresent = true;
 											for (m = 0; m < editedProjectDetails.length; m++) {
@@ -1332,9 +1332,9 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 												editCycle.cycleName = $("#cycleName").val(); //updateProjectDetails[i].cycleDetails[j].cycleName;
 												editCycle.cycleId = editCycId; //updateProjectDetails[i].cycleDetails[j].cycleId;
 												editCycle.editStatus = true;
-												editRelCyc.cycleDetails.push(editCycle)
+												editRelCyc.cycleDetails.push(editCycle);
 												//pushing all data to an array
-												editedProjectDetails.push(editRelCyc)
+												editedProjectDetails.push(editRelCyc);
 											}
 										}
 										break;
@@ -1377,7 +1377,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 					if ((projectDetails[i].cycleNames[j] == $("#" + deleteCycleId).parent().prev('span.cycleName').text()) && (projectDetails[i].releaseName == $("li.active").children('span.releaseName').text())) {
 						delete projectDetails[i].cycleNames[j];
 						projectDetails[i].cycleNames = projectDetails[i].cycleNames.filter(function (n) {
-								return n != null
+								return n != null;
 							});
 						goahead = true;
 					}
@@ -1402,12 +1402,12 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 							if (newProjectDetails[i].cycleDetails[j].cycleName == $("#" + deleteCycleId).parent().prev('span.cycleName').text()) {
 								delete newProjectDetails[i].cycleDetails[j];
 								newProjectDetails[i].cycleDetails = newProjectDetails[i].cycleDetails.filter(function (n) {
-										return n != null
+										return n != null;
 									});
 								if (newProjectDetails[i].cycleDetails.length <= 0) {
 									delete newProjectDetails[i];
 									newProjectDetails = newProjectDetails.filter(function (n) {
-											return n != null
+											return n != null;
 										});
 									break;
 								}
@@ -1428,12 +1428,12 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 											"releaseId": "",
 											"cycleDetails": [],
 											"deleteStatus": false
-										}
+										};
 										var deleteCycle = {
 											"cycleName": "",
 											"cycleId": "",
 											"deleteStatus": false
-										}
+										};
 										//For update project json
 										if (deletedProjectDetails.length <= 0) {
 											//adding release object
@@ -1464,7 +1464,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 														deleteCycle.cycleName = $("#" + deleteCycleId).parent().prev('span.cycleName').text(); //updateProjectDetails[i].cycleDetails[j].cycleName;
 														deleteCycle.cycleId = deleteCycId; //updateProjectDetails[i].cycleDetails[j].cycleId;
 														deleteCycle.deleteStatus = true;
-														deletedProjectDetails[k].cycleDetails.push(deleteCycle)
+														deletedProjectDetails[k].cycleDetails.push(deleteCycle);
 													}
 													chk = false;
 												}
@@ -1486,14 +1486,14 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 										//For update project json
 										delete updateProjectDetails[i].cycleDetails[j];
 										updateProjectDetails[i].cycleDetails = updateProjectDetails[i].cycleDetails.filter(function (n) {
-												return n != null
+												return n != null;
 											});
 									}
 								} else if (objectType == 'string') {
 									if (updateProjectDetails[i].cycleDetails[j] == $("#" + deleteCycleId).parent().prev('span.cycleName').text()) {
 										delete updateProjectDetails[i].cycleDetails[j];
 										updateProjectDetails[i].cycleDetails = updateProjectDetails[i].cycleDetails.filter(function (n) {
-												return n != null
+												return n != null;
 											});
 									}
 								}
@@ -1523,7 +1523,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 		adminServices.getAvailablePlugins()
 		.then(function (plugins_list) {
 			for (var i = 0; i < plugins_list.length; i++) {
-				plugins[i] = plugins_list[i]
+				plugins[i] = plugins_list[i];
 			}
 			//$(document).on('change','#selDomainEdit', function() {
 			//	var domainId = $("#selDomainEdit option:selected").val();
@@ -1573,23 +1573,23 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 								return -1;
 							else
 								return 0;
-						})
-						$("#selProject").empty()
+						});
+						$("#selProject").empty();
 						$("#selProject").append('<option data-id="" value disabled selected>Please Select Your Project</option>');
 						for (i = 0; i < selectOptions.length; i++) {
-							$("#selProject").append(selectOptions[i])
+							$("#selProject").append(selectOptions[i]);
 						}
 						$("#selProject").prop('selectedIndex', 0);
 					}, function (error) {
-						console.log("Error:::::::::::::", error)
-					})
+						console.log("Error:::::::::::::", error);
+					});
 					clearUpdateProjectObjects();
 				}
 			}, function (error) {
-				console.log("Error:::::::::::::", error)
-			})
+				console.log("Error:::::::::::::", error);
+			});
 		}, function (error) {
-			console.log("Error:", error)
+			console.log("Error:", error);
 		});
 
 
@@ -1648,19 +1648,19 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 						$(this).addClass("projectTypesremovefunc");
 						$(this).find("label").css("cursor", "default");
 					}
-				})
+				});
 
 				updateProjectDetails = [];
 				updateProjectDetails = selProjectRes.projectDetails;
-				$("#releaseList li,#cycleList li").remove()
+				$("#releaseList li,#cycleList li").remove();
 				for (var i = 0; i < updateProjectDetails.length; i++) {
 					$("#releaseList:not(.createRelBox)").append("<li class='updateRelease' id='releaseList_" + i + "'><img src='imgs/ic-release.png' /><span title=" + updateProjectDetails[i].releaseName + " data-releaseid=" + updateProjectDetails[i].releaseId + " class='releaseName'>" + updateProjectDetails[i].releaseName + "</span><span class='actionOnHover'><img id=editReleaseName_" + i + " title='Edit Release Name' src='imgs/ic-edit-sm.png' class='editReleaseName'><img id=deleteReleaseName_" + i + " title='Delete Release' src='imgs/ic-delete-sm.png' class='deleteRelease'></span></li>");
 					$("#releaseList:not(.createRelBox) li:first").trigger('click');
 				}
 				showHideEditDeleteIcons();
 			}, function (error) {
-				console.log("Error:::::::::::::", error)
-			})
+				console.log("Error:::::::::::::", error);
+			});
 			clearUpdateProjectObjects();
 		});
 	};
@@ -1681,7 +1681,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 		var taskName = $("#page-taskName").children("span").text();
 		if (taskName == "Create Project") {
 			$(this).toggleClass("projectTypeSelected");
-			$(this).siblings().removeClass("projectTypeSelected")
+			$(this).siblings().removeClass("projectTypeSelected");
 		} else
 			return false;
 		event.stopImmediatePropagation();
@@ -1722,7 +1722,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 					$rootScope.redirectPage();
 				} else {
 					rolesRes.sort(function(a,b){ return a[0] >  b[0]; });
-					$scope.userConf.allRoles = rolesRes
+					$scope.userConf.allRoles = rolesRes;
 					$scope.userConf.allAddRoles = rolesRes.slice(0);
 					rolesRes.some(function(e,i) {
 						if (e[0].toLowerCase()=="admin") {
@@ -1831,7 +1831,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 		if (!userConf.validate(action)) return;
 		var bAction = action.charAt(0).toUpperCase() + action.substr(1);
 		var addRole = [];
-		for (role in userConf.addRole) {
+		for (var role in userConf.addRole) {
 			if (userConf.addRole[role]) addRole.push(role);
 		}
 		var userObj = {
@@ -1857,14 +1857,14 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 				$rootScope.redirectPage();
 			} else if(data == "success") {
 				if (action == "create") $scope.userConf.click();
-				else $scope.userConf.edit()
+				else $scope.userConf.edit();
 				openModalPopup(bAction+" User", "User "+action+"d successfully!");
 			} else if(data == "exists") {
 				$("#userName").addClass("inputErrorBorder");
 				openModalPopup(bAction+" User", "User already Exists!");
 			} else if(data == "fail") {
 				if (action == "create") $scope.userConf.click();
-				else $scope.userConf.edit()
+				else $scope.userConf.edit();
 				openModalPopup(bAction+" User", "Failed to "+action+" user.");
 			} else if(/^2[0-4]{10}$/.test(data)) {
 				if (parseInt(data[1])) {
@@ -1891,8 +1891,10 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 
 	//LDAP Functionality for User
 	$scope.userConf.activateLDAP = function(cb) {
-		if (!cb) cb = function(){};
-		this.ldap = {server: '', fetch: "map", user: ''};
+		if (!cb) cb = function() {};
+		var currentServer = this.ldap.server;
+		if (currentServer) this.ldap = {server: currentServer, fetch: "map", user: ''};
+		else this.ldap = {server: '', fetch: "map", user: ''};
 		setTimeout(function(){
 			var target = $("button.ldapBtn");
 			if ($scope.userConf.ldapActive) target.addClass("userTypeBtnActive");
@@ -2012,6 +2014,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 				userConf.firstName = data.firstname;
 				userConf.lastName = data.lastname;
 				userConf.email = data.email;
+				userConf.ldap.user = data.ldapname;
 			}
 		}, function (error) {
 			unblockUI();
@@ -2045,7 +2048,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 			target.removeClass("userTypeBtnActive");
 			$scope.userConf.click();
 		}
-	}
+	};
 
 	//Load Users for Edit
 	$scope.userConf.edit = function() {
@@ -2064,7 +2067,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 			} else if(data == "empty") {
 				openModalPopup("Edit User", "There are no users created yet.");
 			} else {
-				data.sort(function(a,b){ return a[0] > b[0] });
+				data.sort(function(a,b){ return a[0] > b[0]; });
 				$scope.userConf.allUsersList = data;
 			}
 		}, function (error) {
@@ -2097,7 +2100,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 				userConf.lastName = data.lastname;
 				userConf.email = data.email;
 				userConf.role = data.role;
-				userConf.addRole = {}
+				userConf.addRole = {};
 				data.addrole.forEach(function(e){
 					userConf.addRole[e] = true;
 				});
@@ -2198,13 +2201,13 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 			var userEnteredText = element.val();
 			var regex;
 			if (e.target.id == 'userName')
-				regex = /[\\[\]\~`!@#$%^&*()+={}|;:"',<>?/\s] / g;
+				regex = /[\\[\]\~`!@#$%^&*()+={}|;:"',<>?/\s]/g;
 			if (e.target.id == 'ldapServerURL')
 				regex = /[\\[\]\~`!@#$%^&*()+={}|;"',<>?\s]/g;
 			else if (e.target.id == 'projectName' || e.target.id == 'releaseTxt' || e.target.id == 'cycleTxt')
-				regex = /[-\\[\]\~`!@#$%^&*()+={}|;:"',.<>?/\s] / g;
+				regex = /[-\\[\]\~`!@#$%^&*()+={}|;:"',.<>?/\s]/g;
 			else
-				regex = /[-\\0-9[\]\~`!@#$%^&*()-+={}|;:"',.<>?/\s_] / g;
+				regex = /[-\\0-9[\]\~`!@#$%^&*()-+={}|;:"',.<>?/\s_]/g;
 			userEnteredText = userEnteredText.replace(regex, "");
 			element.val(userEnteredText);
 		}, 5);
@@ -2285,19 +2288,19 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 
 	$scope.moveItems.leftgo = function (to,from) {
 		moveItems(to,from);
-	}
+	};
 
 	$scope.moveItems.rightgo = function (from,to) {
 		moveItems(from,to);
-	}
+	};
 
 	$scope.moveItems.leftall = function (to,from) {
 		moveAllItems(to,from);
-	}
+	};
 
 	$scope.moveItems.rightall = function (from,to) {
 		moveAllItems(from,to);
-	}
+	};
 
 	$scope.ldapConf.click = function (action) {
 		$(".selectedIcon").removeClass("selectedIcon");
@@ -2385,14 +2388,14 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 				$rootScope.redirectPage();
 			} else if(data == "success") {
 				if (action == "create") $scope.ldapConf.click();
-				else $scope.ldapConf.edit()
+				else $scope.ldapConf.edit();
 				openModalPopup(bAction+" Configuration", "Configuration '"+confObj.name+"' "+action+"d successfully!");
 			} else if(data == "exists") {
 				$("#ldapServerName").addClass("inputErrorBorder");
 				openModalPopup(bAction+" Configuration", "Configuration '"+confObj.name+"' already Exists!");
 			} else if(data == "fail") {
 				if (action == "create") $scope.ldapConf.click();
-				else $scope.ldapConf.edit()
+				else $scope.ldapConf.edit();
 				openModalPopup(bAction+" Configuration", "Failed to "+action+" '"+confObj.name+"' configuration.");
 			} else if(/^1[0-4]{8}$/.test(data)) {
 				if (parseInt(data[1])) {
@@ -2436,7 +2439,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 				selBox.append("<option value='' disabled selected>Select Server</option>");
 				selBox.prop("selectedIndex", 0);
 			} else {
-				data.sort(function(a,b){ return a > b });
+				data.sort(function(a,b){ return a > b; });
 				var selBox = $("#ldapServerName");
 				selBox.empty();
 				selBox.append("<option value='' disabled selected>Select Server</option>");
@@ -2529,8 +2532,8 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 
 	$scope.ldapConf.switchAuthType = function(){
 		if($scope.ldapConf.authType == "anonymous"){
-			$("#bindDN").val('')
-			$("#bindCredentials").val('')
+			$("#bindDN").val('');
+			$("#bindCredentials").val('');
 		}
 	};
 
@@ -2548,7 +2551,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 			}
 			unblockUI();
 		}, function (error) {
-			console.error("Fail to load session data", error)
+			console.error("Fail to load session data", error);
 		});
 	};
 }]);
