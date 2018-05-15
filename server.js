@@ -319,9 +319,10 @@ try {
             }
         });
 
-        if (req.session.switchedRole !== true) {
+        if (req.session.activeRole == req.session.defaultRoleId) {
             if (!req.session.defaultRole || roles.indexOf(req.session.defaultRole) >= 0) {
-                req.session.destroy();  res.status(401).redirect('/');
+                req.session.destroy();
+                res.status(401).redirect('/');
             } else {
                 if (req.session.uniqueId != undefined) {
                     res.sendFile("index.html", { root: __dirname + "/public/" });
