@@ -5454,19 +5454,29 @@ function getSelectionStart(o) {
             if (result == "Invalid Session") {
                 $rootScope.redirectPage();
             }                 
-            $scope.dataJSON = result;
-            $scope.dataJSON.forEach(function(e,i){
-                if(!validNodeDetails(e.name)) validate = false;
-            });
-            if(!validate){
-                openDialogMindmap('Error','Validation of excel failed');
-                return;
+            else if(result == 'fail'){
+                openDialogMindmap('Error','Some column names are invalid');
             }
-            // Create Mindmap Flow
-            $scope.createMap('tabCreate'); 
-            $scope.tab = 'tabCreate'; 
-            $scope.createMapsCall();
-            $('#ProjectInput').modal('show');
+            else{
+                $scope.dataJSON = result;
+                $scope.dataJSON.forEach(function(e,i){
+                    if(!validNodeDetails(e.name)) validate = false;
+                });
+                if(!validate){
+                    openDialogMindmap('Error','Some node names are invalid');
+                }
+                else if($.grep($scope.dataJSON, function(v) {return v.type === 0 ;}).length>1){ //mode than one module
+                    openDialogMindmap('Error','More than one module name in Excel. ( Only one module is supported at a time )');
+                }
+                else{
+                    // Create Mindmap Flow
+                    $scope.createMap('tabCreate'); 
+                    $scope.tab = 'tabCreate'; 
+                    $scope.createMapsCall();
+                    $('#ProjectInput').modal('show');
+                }
+    
+            }
         }, function(error) {
             console.log(error);
         })        
@@ -5485,13 +5495,13 @@ mySPA.directive('onReadFile', function ($parse) {
 				var reader = new FileReader();
                 
 				reader.onload = function(onLoadEvent) {
-                    console.log(onLoadEvent.target.result);
 					scope.$apply(function() {
 						fn(scope, {$fileContent:onLoadEvent.target.result});
 					});
 				};
 
-				reader.readAsBinaryString((onChangeEvent.srcElement || onChangeEvent.target).files[0]);
+                reader.readAsBinaryString((onChangeEvent.srcElement || onChangeEvent.target).files[0]);
+                this.value = null;
 			});
 		}
 	};
