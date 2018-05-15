@@ -4,12 +4,10 @@
 var bcrypt = require('bcrypt');
 var uuid = require('uuid-random');
 var async = require('async');
+var activeDirectory = require('activedirectory');
 var Client = require("node-rest-client").Client;
 var client = new Client();
 var epurl = "http://"+process.env.NDAC_IP+":"+process.env.NDAC_PORT+"/";
-var roles = [];
-var r_ids = [];
-var userRoles = {};
 var validator =  require('validator');
 var qList = [];
 var neo4jAPI = require('../controllers/neo4jAPI');
@@ -26,30 +24,199 @@ exports.getUserRoles_Nineteen68 = function (req, res) {
 				function (result, response) {
 				if (response.statusCode != 200 || result.rows == "fail") {
 					logger.error("Error occured in getUserRoles_Nineteen68 Error Code : ERRNDAC");
-					res.send("fail");
+					res.status(500).send("fail");
 				} else {
-					try {
-						for (var i = 0; i < result.rows.length; i++) {
-							roles[i] = result.rows[i].rolename;
-							r_ids[i] = result.rows[i].roleid;
-						}
-						userRoles.userRoles = roles;
-						userRoles.r_ids = r_ids;
-						logger.info("User Roles fetched successfully");
-						res.send(userRoles);
-					} catch (exception) {
-						logger.error(exception.message);
-						res.send("fail");
+					var rolesList = [];
+					var result = result.rows;
+					for (var i = 0; i < result.length; i++) {
+						rolesList.push([result[i].rolename, result[i].roleid]);
 					}
+					res.send(rolesList);
 				}
 			});
 		} else {
-			logger.info("Invalid Session");
+			logger.error("Error occured in getUserRoles_Nineteen68: Invalid Session");
 			res.send("Invalid Session");
 		}
 	} catch (exception) {
 		logger.error(exception.message);
-		res.send("fail");
+		res.status(500).send("fail");
+	}
+};
+
+// Create/Edit/Delete Users
+exports.manageUserDetails = function(req, res){
+	logger.info("Inside UI Service: manageUserDetails");
+	try{
+		if (utils.isSessionActive(req.session)) {
+			var flag = ['2','0','0','0','0','0','0','0','0','0','0'];
+			var salt = bcrypt.genSaltSync(10);
+			var reqData = req.body.user;
+			var action = req.body.action;
+			var inputs = {};
+			inputs.action = action;
+			inputs.createdby = req.session.username;
+			inputs.createdbyrole = req.session.defaultRole;
+			inputs.username = (reqData.username || "").trim();
+			inputs.ciuser = reqData.ciUser || false;
+			inputs.ldapuser = reqData.ldapUser;
+			inputs.password = (reqData.password || "").trim();
+
+			if (validator.isEmpty(action) || ["create","update","delete"].indexOf(action) == -1) {
+				logger.error("Error occured in admin/manageUserDetails: Invalid action.");
+				flag[1]='1';
+			}
+			if (!validator.isLength(inputs.username,1,100)) {
+				logger.error("Error occured in admin/manageUserDetails: Invalid User name.");
+				flag[2]='1';
+			}
+			if (action != "create") {
+				inputs.userid = (reqData.userid || "").trim();
+				if (!validator.isUUID(inputs.userid)) {
+					logger.error("Error occured in admin/manageUserDetails: Invalid User ID.");
+					flag[2]='1';
+				}
+			}
+			if (!inputs.ldapuser && action == "create") {
+				if (validator.isEmpty(inputs.password) && !(inputs.ciuser || validator.isLength(inputs.password,1,12))) {
+					logger.error("Error occured in admin/manageUserDetails: Invalid Password.");
+					flag[5]='1';
+				}
+			}
+			if (inputs.password == '') delete inputs.password;
+			else inputs.password = bcrypt.hashSync(inputs.password, salt);
+			if (!inputs.ciuser && action != "delete") {
+				inputs.firstname = (reqData.firstname || "").trim();
+				inputs.lastname = (reqData.lastname || "").trim();
+				inputs.emailid = (reqData.email || "").trim();
+				inputs.defaultrole = (reqData.role || "").trim();
+
+				if (!validator.isLength(inputs.firstname,1,100)) {
+					logger.error("Error occured in admin/manageUserDetails: Invalid First name.");
+					flag[3]='1';
+				}
+				if (!validator.isLength(inputs.lastname,1,100)) {
+					logger.error("Error occured in admin/manageUserDetails: Invalid Last name.");
+					flag[4]='1';
+				}
+				if (!validator.isLength(inputs.emailid,1,100)) {
+					logger.error("Error occured in admin/manageUserDetails: Email cannot be empty.");
+					flag[6]='1';
+				}
+				if (!validator.isUUID(inputs.defaultrole)) {
+					logger.error("Error occured in admin/manageUserDetails: Invalid Primary Role.");
+					flag[7]='1';
+				}
+				if (action == "update") {
+					inputs.additionalroles = reqData.addRole || [];
+					inputs.additionalroles.every(function(e) {
+						if (!validator.isUUID(e)) {
+							logger.error("Error occured in admin/manageUserDetails: Invalid Additional Role.");
+							flag[8]='1';
+							return false;
+						}
+					});
+				}
+				if (inputs.ldapuser) {
+					inputs.ldapuser = reqData.ldap || {};
+					if (!inputs.ldapuser.server || validator.isEmpty(inputs.ldapuser.server)) {
+						logger.error("Error occured in admin/manageUserDetails: Invalid LDAP Server.");
+						flag[9]='1';
+					}
+					if (validator.isEmpty(inputs.ldapuser.user)) {
+						logger.error("Error occured in admin/manageUserDetails: Invalid User Domain Name.");
+						flag[10]='1';
+					}
+					inputs.ldapuser = JSON.stringify({server:inputs.ldapuser.server,user:inputs.ldapuser.user});
+				}
+			}
+			flag = flag.join('');
+			if (flag != "20000000000") {
+				return res.send(flag);
+			}
+			logger.info("Calling NDAC Service: manageUserDetails");
+			var args = {
+				data: inputs,
+				headers: {
+					"Content-Type": "application/json"
+				}
+			};
+			client.post(epurl + "admin/manageUserDetails", args,
+				function (result, response) {
+				if (response.statusCode != 200 || result.rows == "fail") {
+					logger.error("Error occured in admin/manageUserDetails Error Code : ERRNDAC");
+					res.status(500).send("fail");
+				} else {
+					return res.send(result.rows);
+				}
+			});
+		} else {
+			res.send("Invalid Session");
+		}
+	} catch (exception){
+		logger.error("Error occured in admin/manageUserDetails", exception);
+		res.status(500).send("fail");
+	}
+};
+
+// Fetch Users or a specific user details
+exports.getUserDetails = function (req, res) {
+	logger.info("Inside UI Service: getUserDetails");
+	try{
+		if (utils.isSessionActive(req.session)) {
+			var action = req.body.action;
+			var userid = req.body.args;
+			logger.info("Calling NDAC Service: getUserDetails");
+			var inputs = {};
+			if (action != "user") inputs.userid = userid;
+			var args = {
+				data: inputs,
+				headers: {
+					"Content-Type": "application/json"
+				}
+			};
+			client.post(epurl + "admin/getUserDetails", args,
+				function (result, response) {
+				if (response.statusCode != 200 || result.rows == "fail") {
+					logger.error("Error occured in admin/getUserDetails Error Code : ERRNDAC");
+					res.status(500).send("fail");
+				} else if (result.rows.length == 0) {
+					res.send("empty");
+				} else {
+					var data;
+					if (action != "user") {
+						result = result.rows;
+						//var password = result.password;
+						data = {
+							userid: userid,
+							username: result.username,
+							password: '',
+							firstname: result.firstname,
+							lastname: result.lastname,
+							email: result.emailid,
+							role: result.defaultrole,
+							addrole: result.additionalroles,
+							ldapuser: JSON.parse(result.ldapuser),
+						};
+						if (!data.ldapuser.server) data.ldapuser = false;
+						return res.send(data);
+					}
+					else {
+						data = [];
+						var result = result.rows;
+						for(var i = 0; i < result.length; i++) {
+							data.push([result[i].username,result[i].userid,result[i].defaultrole]);
+						}
+						return res.send(data);
+					}
+				}
+			});
+		} else {
+			res.send("Invalid Session");
+		}
+	} catch (exception){
+		logger.error("Error occured in admin/getUserDetails", exception);
+		res.status(500).send("fail");
 	}
 };
 
@@ -66,7 +233,7 @@ exports.getUsers_Nineteen68 = function (req, res) {
 	client.post(epurl + "admin/getUserRoles_Nineteen68", args,
 		function (userrolesresult, userrolesresponse) {
 		if (userrolesresponse.statusCode != 200 || userrolesresult.rows == "fail") {
-			logger.error("Error occured in getUsers_Nineteen68 Error Code : ERRNDAC");
+			logger.error("Error occured in getRoleNameByRoleId_Nineteen68 Error Code : ERRNDAC");
 			res(null, "fail");
 		} else {
 			var inputs = {
@@ -94,445 +261,9 @@ exports.getUsers_Nineteen68 = function (req, res) {
 	});
 };
 
-//Get All Users
-exports.getAllUsers_Nineteen68 = function (req, res) {
-	try {
-		logger.info("Inside UI service: getAllUsers_Nineteen68");
-		var checkAction = validator.isEmpty(req.body.action);
-		if(checkAction == false) {
-			if (utils.isSessionActive(req.session)) {
-				var user_names = [];
-				var userIds = [];
-				var d_role = [];
-				var userDetails = {
-					user_names: [],
-					userIds: [],
-					d_roles: []
-				};
-				var args = {
-					headers: {
-						"Content-Type": "application/json"
-					}
-				};
-				logger.info("Calling NDAC Service: getAllUsers_Nineteen68");
-				client.post(epurl + "admin/getAllUsers_Nineteen68", args,
-					function (allusersresult, allusersresponse) {
-					if (allusersresponse.statusCode != 200 || allusersresult.rows == "fail") {
-					logger.error("Error occured in getAllUsers_Nineteen68 Error Code : ERRNDAC");
-						res(null, "fail");
-					} else {
-						for (var i = 0; i < allusersresult.rows.length; i++) {
-							user_names[i] = allusersresult.rows[i].username.toLowerCase();
-							userIds[i] = allusersresult.rows[i].userid;
-							d_role[i] = allusersresult.rows[i].defaultrole;
-						}
-						userDetails.userIds = userIds;
-						userDetails.user_names = user_names;
-						userDetails.d_roles = d_role;
-						logger.info("Users fetched successfully");
-						res.send(userDetails);
-					}
-				});
-			} else {
-				logger.info("Invalid Session");
-				res.send("Invalid Session");
-			}
-		} else{
-				res.send("fail");
-		}
-	} catch (exception) {
-		logger.error(exception.message);
-		res.send("fail");
-	}
-};
-
-//Get Users for Edit
-exports.getEditUsersInfo_Nineteen68 = function (req, res) {
-	try {
-		logger.info("Inside UI service: getEditUsersInfo_Nineteen68");
-		if (utils.isSessionActive(req.session)) {
-			var requestedUserId = req.body.userId;
-			var userDetails = {};
-			var inputs = {
-				"userid": requestedUserId
-			};
-			var args = {
-				data: inputs,
-				headers: {
-					"Content-Type": "application/json"
-				}
-			};
-			logger.info("Calling NDAC Service: getUserData_Nineteen68");
-			client.post(epurl + "admin/getUserData_Nineteen68", args,
-				function (result, response) {
-				try {
-					if (response.statusCode != 200 || result.rows == "fail") {
-						res.send("fail");
-					} else {
-						result.rows.forEach(function (iterator) {
-							userDetails.userName = iterator.username.toLowerCase();
-							userDetails.roleId = iterator.defaultrole;
-							userDetails.additionalroles = iterator.additionalroles;
-							userDetails.emailId = iterator.emailid;
-							userDetails.firstName = iterator.firstname;
-							userDetails.lastName = iterator.lastname;
-							userDetails.ldapuser = iterator.ldapuser;
-						});
-						logger.info("User Details fetched successfully");
-						res.send(userDetails);
-					}
-				} catch (exception) {
-					logger.error(exception.message);
-					res.send("fail");
-				}
-			});
-		} else {
-			logger.info("Invalid Session");
-			res.send("Invalid Session");
-		}
-	} catch (exception) {
-		logger.error(exception.message);
-	}
-};
-
-//CreateUser
-exports.createUser_Nineteen68 = function (req, res) {
-	try {
-		logger.info("Inside UI service: createUser_Nineteen68");
-		if (utils.isSessionActive(req.session)) {
-			var flag = "fail";
-			var status = false;
-			var req_username = req.body.createUser.username.toLowerCase();
-			var req_password = req.body.createUser.password;
-			var req_firstname = req.body.createUser.firstName;
-			var req_ciuser = req.body.createUser.ciuser;
-			var req_lastname = req.body.createUser.lastName;
-			var req_ldapuser = req.body.createUser.ldapUser;
-			var req_defaultRole = req.body.createUser.role;
-			var req_email_id = req.body.createUser.email;
-			var req_token = req.body.createUser.ci_token;
-			var salt = bcrypt.genSaltSync(10);
-			var req_hashedPassword = bcrypt.hashSync(req_password, salt);
-			var req_hashedtoken = bcrypt.hashSync(req_token, salt);
-			var ci_user=true;
-			if (!req_ciuser){
-				ci_user=false;
-				validateCreateUser();
-			}
-			var valid_username, valid_password, valid_firstname, valid_lastname, valid_ldapuser, valid_defaultRole, valid_email_id, valid_hashedPassword;
-			function validateCreateUser() {
-				logger.info("Inside validateCreateUser function");
-				var check_username = validator.isEmpty(req_username);
-				var check_usernameLen = validator.isLength(req_username, 1, 50);
-				if (check_username == false && check_usernameLen == true) {
-					valid_username = true;
-				}
-				var check_password = validator.isEmpty(req_password);
-				var check_passwordLen = validator.isLength(req_password, 1, 12);
-				if ((check_password == false && check_passwordLen == true) || req_ldapuser == true) {
-					valid_password = true;
-				}
-				var check_firstname = validator.isEmpty(req_firstname);
-				var check_firstnameLen = validator.isLength(req_firstname, 1, 12);
-				var check_firstnamePattern = validator.isAlpha(req_firstname);
-				if (check_firstname == false && check_firstnameLen == true && check_firstnamePattern == true) {
-					valid_firstname = true;
-				}
-				var check_lastname = validator.isEmpty(req_lastname);
-				var check_lastnameLen = validator.isLength(req_lastname, 1, 12);
-				var check_lastnamePattern = validator.isAlpha(req_lastname);
-				if (check_lastname == false && check_lastnameLen == true && check_lastnamePattern == true) {
-					valid_lastname = true;
-				}
-				var check_ldapuser = validator.isEmpty(req_ldapuser.toString());
-				if (check_ldapuser == false) {
-					valid_ldapuser = true;
-				}
-				var check_defaultRole = validator.isUUID(req_defaultRole);
-				if (check_defaultRole == true) {
-					valid_defaultRole = true;
-				}
-				var check_email_id = validator.isEmail(req_email_id);
-				var check_emailLen = validator.isLength(req_email_id, 1, 50);
-				if (check_email_id == true && check_emailLen == true) {
-					valid_email_id = true;
-				}
-				var salt = bcrypt.genSaltSync(10);
-				var check_hashedPassword = validator.isEmpty(bcrypt.hashSync(req_password, salt));
-				if (check_hashedPassword == false) {
-					valid_hashedPassword = true;
-				}
-			}
-
-			var inputs = {
-				"query": "allusernames"
-			};
-			var args = {
-				data: inputs,
-				headers: {
-					"Content-Type": "application/json"
-				}
-			};
-			if (ci_user== true ||(valid_username == true && valid_password == true && valid_firstname == true && valid_lastname == true && valid_ldapuser == true && valid_defaultRole == true && valid_email_id == true && valid_hashedPassword == true)) {
-				logger.info("Calling NDAC Service: createUser_Nineteen68");
-				client.post(epurl + "admin/createUser_Nineteen68", args,
-					function (userNameresult, response) {
-					if (response.statusCode != 200 || userNameresult.rows == "fail") {
-						logger.error("Error occured in createUser_Nineteen68 Error Code : ERRNDAC");
-						res.send("fail");
-					} else {
-						try {
-							if(!ci_user){
-								for (var i = 0; i < userNameresult.rows.length; i++) {
-									var dbResult = userNameresult.rows[i];
-									if (req_username.toLowerCase() === dbResult.username.toLowerCase()) {
-										status = true;
-										break;
-									}
-								}
-							}
-							if (req_ldapuser) {
-								req_hashedPassword = "not required";
-							}
-							if (status === false) {
-								if(!ci_user){
-									inputs = {
-										"query": "createuser",
-										"createdby": req_username,
-										"defaultrole": req_defaultRole,
-										"emailid": req_email_id,
-										"firstname": req_firstname,
-										"lastname": req_lastname,
-										"ldapuser": req_ldapuser,
-										"password": req_hashedPassword,
-										"username": req_username,
-										"ciuser":false
-									};
-								}
-								else{
-									inputs = {
-									"query": "createciuser",
-									"createdby": req_username,
-									"password": req_hashedtoken,
-									"username": req_username,
-									"ciuser":true
-									};
-								}
-								var args = {
-									data: inputs,
-									headers: {
-										"Content-Type": "application/json"
-									}
-								};
-								logger.info("Calling NDAC Service: createUser_Nineteen68");
-								client.post(epurl + "admin/createUser_Nineteen68", args,
-									function (result, response) {
-									try {
-										if(result.rows != "fail") flag = "Success";
-										else flag = "fail";
-										logger.info("User created successfully");
-										res.send(flag);
-									} catch (exception) {
-										logger.error(exception.message);
-										res.send(flag);
-									}
-								});
-							} else {
-								flag = "User Exists";
-								logger.info("User already exists");
-								res.send(flag);
-							}
-						} catch (exception) {
-							logger.error(exception.message);
-							res.send(flag);
-						}
-					}
-				});
-			} else {
-				res.send("fail");
-			}
-		} else {
-			logger.info("Invalid Session");
-			res.send("Invalid Session");
-		}
-	} catch (exception) {
-		logger.error(exception.message);
-		res.send("fail");
-	}
-};
-
-//Edit User
-exports.updateUser_nineteen68 = function updateUser_nineteen68(req, res) {
-	try {
-		logger.info("Inside UI service: updateUser_nineteen68");
-		if (utils.isSessionActive(req.session)) {
-			var flag = "fail";
-			var userdetails = req.body.userinfo;
-			var userObj = req.body.updateUserObj;
-			var local_username = userObj.userName.toLowerCase();
-			//needs to be sent from front end further on
-			var local_additionalroles = userObj.additionalRole;
-			var local_password = userObj.passWord;
-			var local_firstname = userObj.firstName;
-			var local_lastname = userObj.lastName;
-			var local_role;
-			//var local_role = userObj.role;
-			var local_email_id = userObj.email;
-			var local_user_Id = userObj.userId;
-			var db_password = '';
-			validateUpdateUser();
-			var valid_username, valid_password, valid_firstname, valid_lastname, valid_email_id;
-			function validateUpdateUser() {
-				logger.info("Inside validateUpdateUser function");
-				var check_username = validator.isEmpty(local_username);
-				var check_usernameLen = validator.isLength(local_username, 1, 50);
-				if (check_username == false && check_usernameLen == true) {
-					valid_username = true;
-				}
-				if (local_password != "") {
-					var check_password = validator.isEmpty(local_password);
-					var check_passwordLen = validator.isLength(local_password, 1, 12);
-					if (check_password == false && check_passwordLen == true) {
-						valid_password = true;
-					} else {
-						valid_password = false;
-					}
-				} else if (local_password == "") {
-					valid_password = true;
-				}
-				var check_firstname = validator.isEmpty(local_firstname);
-				var check_firstnameLen = validator.isLength(local_firstname, 1, 12);
-				var check_firstnamePattern = validator.isAlpha(local_firstname);
-				if (check_firstname == false && check_firstnameLen == true && check_firstnamePattern == true) {
-					valid_firstname = true;
-				}
-				var check_lastname = validator.isEmpty(local_lastname);
-				var check_lastnameLen = validator.isLength(local_lastname, 1, 12);
-				var check_lastnamePattern = validator.isAlpha(local_lastname);
-				if (check_lastname == false && check_lastnameLen == true && check_lastnamePattern == true);{
-					valid_lastname = true;
-				}
-				var check_email_id = validator.isEmail(local_email_id);
-				var check_emailLen = validator.isLength(local_email_id, 1, 50);
-				if (check_email_id == true && check_emailLen == true) {
-					valid_email_id = true;
-				}
-
-			}
-			var inputs = {
-				"userid": local_user_Id
-			};
-			var args = {
-				data: inputs,
-				headers: {
-					"Content-Type": "application/json"
-				}
-			};
-			if (valid_username == true && valid_password == true && valid_firstname == true && valid_lastname == true && valid_email_id == true) {
-				logger.info("Calling NDAC Service: getUserData_Nineteen68");
-				client.post(epurl + "admin/getUserData_Nineteen68", args,
-					function (result, response) {
-					try {
-						var flag = "fail";
-						if (response.statusCode != 200 || result.rows == "fail") {
-							logger.error("Error occured in getUserData_Nineteen68 Error Code : ERRNDAC");
-							res.send(flag);
-						} else {
-							var req_hashedPassword;
-							var service = result.rows[0];
-							if (local_username == undefined || local_username == 'undefined' || local_username == '') {
-								local_username = service.username.toLowerCase();
-							}
-							if (local_password.trim().length == 0) {
-								db_password = "existing";
-							} else {
-								var salt = bcrypt.genSaltSync(10);
-								req_hashedPassword = bcrypt.hashSync(local_password, salt);
-							}
-							if (local_firstname == undefined || local_firstname == 'undefined' || local_firstname == '') {
-								local_firstname = service.firstname;
-							}
-							if (local_lastname == undefined || local_lastname == 'undefined' || local_lastname == '') {
-								local_lastname = service.lastname;
-							}
-
-							if (local_role == undefined || local_role == 'undefined' || local_role == '') {
-								local_role = service.role;
-							}
-							// if(local_additionalroles == undefined || local_additionalroles == 'undefined' || local_additionalroles == ''){
-							//     local_additionalroles = service.additionalroles;
-							// }
-							if (local_email_id == undefined || local_email_id == 'undefined' || local_email_id == '') {
-								local_email_id = service.emailid;
-							}
-							if (result.rows[0].ldapuser != null || result.rows[0].ldapuser != undefined) {
-								if (result.rows[0].ldapuser) {
-									db_password = null;
-									req_hashedPassword = "not required";
-								}
-							}
-							var inputs = {
-								"userid": local_user_Id,
-								"additionalroles": local_additionalroles,
-								"deactivated": false,
-								"emailid": local_email_id,
-								"firstname": local_firstname,
-								"lastname": local_lastname,
-								"ldapuser": result.rows[0].ldapuser,
-								"modifiedby": userdetails.username.toLowerCase(),
-								"modifiedbyrole": userdetails.role,
-								"password": req_hashedPassword,
-								"username": local_username
-							};
-							if (db_password != "" && db_password != undefined) {
-								inputs.password = db_password;
-							}
-							var args = {
-								data: inputs,
-								headers: {
-									"Content-Type": "application/json"
-								}
-							};
-							logger.info("Calling NDAC Service: updateUser_Nineteen68");
-							client.post(epurl + "admin/updateUser_Nineteen68", args,
-								function (result, response) {
-								try {
-									if (response.statusCode != 200 || result.rows == "fail") {
-										flag = "fail";
-										res.send(flag);
-									} else {
-										flag = "success";
-										logger.info("User updated successfully");
-										res.send(flag);
-									}
-								} catch (exception) {
-									logger.error(exception.message);
-									res.send(flag);
-								}
-							});
-						}
-					} catch (exception) {
-						logger.error(exception.message);
-						res.send(flag);
-					}
-				});
-			} else {
-				res.send("fail");
-			}
-		} else {
-			logger.info("Invalid Session");
-			res.send("Invalid Session");
-		}
-	} catch (exception) {
-		logger.error(exception.message);
-		res.send("fail");
-	}
-};
-
 //Get Domains
 exports.getDomains_ICE = function getDomains_ICE(req, res) {
 	logger.info("Inside UI service: getDomains_ICE");
-	var checkAction = validator.isEmpty(req.body.action);
 	try {
 		if (utils.isSessionActive(req.session)) {
 			var responsedata = [];
@@ -541,37 +272,33 @@ exports.getDomains_ICE = function getDomains_ICE(req, res) {
 					"Content-Type": "application/json"
 				}
 			};
-			if (checkAction == false) {
-					logger.info("Calling NDAC Service: getDomains_ICE");
-				client.post(epurl + "admin/getDomains_ICE", args,
-					function (result, response) {
-					try {
-						if (response.statusCode != 200 || result.rows == "fail") {
-							logger.error("Error occured in getDomains_ICE Error Code : ERRNDAC");
-							res.send("fail");
-						} else {
-							async.forEachSeries(result.rows, function (eachdomain, domainscallback) {
-								try {
-									var reponseobj = {
-										domainId: "",
-										domainName: ""
-									};
-									reponseobj.domainId = eachdomain.domainid;
-									reponseobj.domainName = eachdomain.domainname;
-									responsedata.push(reponseobj);
-									domainscallback();
-								} catch (exception) {
-									logger.error(exception.message);
-								}
-							}, finalresult);
-						}
-					} catch (exception) {
-					logger.error(exception.message);
+			logger.info("Calling NDAC Service: getDomains_ICE");
+			client.post(epurl + "admin/getDomains_ICE", args,
+				function (result, response) {
+				try {
+					if (response.statusCode != 200 || result.rows == "fail") {
+						logger.error("Error occured in getDomains_ICE Error Code : ERRNDAC");
+						res.send("fail");
+					} else {
+						async.forEachSeries(result.rows, function (eachdomain, domainscallback) {
+							try {
+								var reponseobj = {
+									domainId: "",
+									domainName: ""
+								};
+								reponseobj.domainId = eachdomain.domainid;
+								reponseobj.domainName = eachdomain.domainname;
+								responsedata.push(reponseobj);
+								domainscallback();
+							} catch (exception) {
+								logger.error(exception.message);
+							}
+						}, finalresult);
 					}
-				});
-			} else {
-				res.send("fail");
-			}
+				} catch (exception) {
+				logger.error(exception.message);
+				}
+			});
 			function finalresult() {
 				logger.info("Domains fetched successfully");
 				res.send(responsedata);
@@ -1928,7 +1655,7 @@ exports.assignProjects_ICE = function (req, res) {
 								qList.push({"statement":"match p = (m{projectID:'"+e.projectid+"'})-[FNTT]-(t:TASKS{reviewer:'"+assignProjectsDetails.userId+"'}) where t.status = 'review' detach delete t;"});
 								qList.push({"statement":"match p = (m{projectID:'"+e.projectid+"'})-[FNTT]-(t:TASKS{assignedTo:'"+assignProjectsDetails.userId+"'}) set m.assignedTo = '' "});
 								qList.push({"statement":"match p = (m{projectID:'"+e.projectid+"'})-[FNTT]-(t:TASKS{reviewer:'"+assignProjectsDetails.userId+"'}) set m.reviewer = '' "});
-							})
+							});
 						}
 
 						logger.info("Calling neo4jAPI execute queries for assignProjects_ICE");
@@ -2048,6 +1775,7 @@ exports.getAssignedProjects_ICE = function (req, res) {
 };
 
 exports.getAvailablePlugins = function (req, res) {
+	logger.info("Inside UI service: getAvailablePlugins");
 	try {
 		if (utils.isSessionActive(req.session)) {
 			client.post(epurl + "admin/getAvailablePlugins",
@@ -2062,7 +1790,7 @@ exports.getAvailablePlugins = function (req, res) {
 			res.send("Invalid Session");
 		}
 	} catch (exception) {
-		logger.error(exception);
+		logger.error("Error occurred in admin/getAvailablePlugins:", exception);
 		res.send("fail");
 	}
 };
@@ -2071,14 +1799,303 @@ exports.generateCItoken = function (req, res) {
 	logger.info("Inside UI service: generateCItoken");
 	try {
 		if (utils.isSessionActive(req.session)) {
-			var user_info={user_name:'ci_user',token:uuid()};
+			var user_info = {
+				user_name: "ci_user",
+				token: uuid()
+			};
 			res.send(user_info);
 		} else {
 			res.send("Invalid Session");
 		}
 	} catch (exception) {
-		logger.error("Error occurred in admin/generateCItoken:",exception);
-		res.send("fail");
+		logger.error("Error occurred in admin/generateCItoken:", exception);
+		res.status(500).send("fail");
+	}
+};
+
+exports.testLDAPConnection = function(req, res){
+	logger.info("Inside UI Service: testLDAPConnection");
+	try{
+		if (utils.isSessionActive(req.session)) {
+			var reqData = req.body;
+			var ldapURL = (reqData.ldapURL || "").trim();
+			if (ldapURL.slice(0,8) == "ldaps://") {
+				logger.error("Error occured in admin/testLDAPConnection: 'ldaps' protocol is not supported.");
+				res.send("invalid_url_protocol");
+			} else if (ldapURL.slice(0,7) != "ldap://") {
+				logger.error("Error occured in admin/testLDAPConnection: Invalid URL provided for connection test.");
+				res.send("invalid_url");
+			}
+			var baseDN = (reqData.baseDN || "").trim();
+			var authUser = (reqData.username || "").trim();
+			var authKey = (reqData.password || "").trim();
+			var authType = reqData.authType;
+			var adConfig = {
+				url: ldapURL,
+				baseDN: baseDN
+			};
+			if (authType == "simple") {
+				adConfig.bindDN = authUser;
+				adConfig.bindCredentials = authKey;
+			}
+			var ad = new activeDirectory(adConfig);
+			var resSent = false;
+			ad.find("cn=*", function (err, result) {
+				if (resSent) return;
+				resSent = !resSent;
+				var flag = "success";
+				if (err) {
+					if (err.errno == "EADDRNOTAVAIL" || err.errno == "ECONNREFUSED" || err.errno == "ETIMEDOUT") flag = "invalid_addr";
+					else if (err.errno == "INSUFFICIENT_ACCESS_RIGHTS") {
+						if (authType == "simple") flag = "insufficient_access";
+						else flag = "success";
+					} else if (err.lde_message.indexOf("DSID-0C0906E8") > -1) {
+						if (authType == "simple") flag = "insufficient_access";
+						else flag = "invalid_auth";
+					} else if (err.lde_message.indexOf("DSID-031522C9") > -1) {
+						flag = "insufficient_access";
+						logger.error("User Does not have sufficient Access!");
+					} else if (err.lde_message.indexOf("DSID-0C0903A9") > -1 && authType == "simple") flag = "invalid_credentials";
+					else if (err.lde_message.indexOf("DSID-031007DB") > -1) flag = "invalid_basedn";
+					else flag = "fail";
+				}
+				if (flag == "success") {
+					logger.info('LDAP Connection test passed!');
+				} else {
+					logger.error('LDAP Connection test failed!');
+				}
+				return res.send(flag);
+			});
+		} else {
+			res.send("Invalid Session");
+		}
+	} catch (exception){
+		if (exception.name == "InvalidDistinguishedNameError") {
+			res.send("invalid_basedn");
+			logger.error('LDAP Connection test failed!');
+		} else {
+			logger.error("Error occured in admin/testLDAPConnection", exception);
+			res.status(500).send("fail");
+		}
+	}
+};
+
+exports.manageLDAPConfig = function(req, res){
+	logger.info("Inside UI Service: manageLDAPConfig");
+	try{
+		if (utils.isSessionActive(req.session)) {
+			var flag = ['1','0','0','0','0','0','0','0','0'];
+			var reqData = req.body.conf;
+			var action = req.body.action;
+			var inputs = {};
+			inputs.action = action;
+			inputs.name = (reqData.name || "").trim();
+			if (validator.isEmpty(action) || ["create","update","delete"].indexOf(action) == -1) {
+				logger.error("Error occured in admin/manageLDAPConfig: Invalid action.");
+				flag[1] = '1';
+			}
+			if (validator.isEmpty(inputs.name)) {
+				logger.error("Error occured in admin/manageLDAPConfig: LDAP Server Name cannot be empty.");
+				flag[2] = '1';
+			}
+			if  (action != "delete") {
+				inputs.ldapURL = (reqData.ldapURL || "").trim();
+				inputs.baseDN = (reqData.baseDN || "").trim();
+				inputs.authType = reqData.authType;
+				inputs.fieldMap = reqData.fieldMap || {};
+				if (validator.isEmpty(inputs.ldapURL)) {
+					logger.error("Error occured in admin/manageLDAPConfig: LDAP Server URL cannot be empty.");
+					flag[3] = '1';
+				} else if (inputs.ldapURL.slice(0,8) == "ldaps://") {
+					logger.error("Error occured in admin/manageLDAPConfig: 'ldaps' protocol is not supported.");
+					flag[3] = '2';
+				} else if (inputs.ldapURL.slice(0,7) != "ldap://") {
+					logger.error("Error occured in admin/manageLDAPConfig: Invalid URL provided for connection test.");
+					flag[3] = '3';
+				}
+				if (validator.isEmpty(inputs.baseDN)) {
+					logger.error("Error occured in admin/manageLDAPConfig: Invalid Base Domain Name.");
+					flag[4] = '1';
+				}
+				if (validator.isEmpty(inputs.authType)) {
+					logger.error("Error occured in admin/manageLDAPConfig: Invalid Authentication Protocol.");
+					flag[5] = '1';
+				}
+				if (inputs.authType == "simple") {
+					inputs.authUser = (reqData.authUser || "").trim();
+					inputs.authKey = (reqData.authKey || "").trim();
+					if (validator.isEmpty(inputs.authUser)) {
+						logger.error("Error occured in admin/manageLDAPConfig: Invalid Bind Domain Name.");
+						flag[6] = '1';
+					}
+					if (validator.isEmpty(inputs.authKey)) {
+						if (action == "create") {
+							logger.error("Error occured in admin/manageLDAPConfig: Invalid Bind Credentials.");
+							flag[7] = '1';
+						} else {
+							delete inputs.authKey;
+						}
+					}
+				}
+				if (!inputs.fieldMap.uName || !inputs.fieldMap.fName || !inputs.fieldMap.lName || !inputs.fieldMap.email) {
+					logger.error("Error occured in admin/manageLDAPConfig: Invalid Field Map.");
+					flag[8] = '1';
+				} else inputs.fieldMap = JSON.stringify(inputs.fieldMap);
+			}
+			flag = flag.join('');
+			if (flag != "100000000") {
+				return res.send(flag);
+			}
+			logger.info("Calling NDAC Service: manageLDAPConfig");
+			var args = {
+				data: inputs,
+				headers: {
+					"Content-Type": "application/json"
+				}
+			};
+			client.post(epurl + "admin/manageLDAPConfig", args,
+				function (result, response) {
+				if (response.statusCode != 200 || result.rows == "fail") {
+					logger.error("Error occured in admin/manageLDAPConfig Error Code : ERRNDAC");
+					res.status(500).send("fail");
+				} else {
+					return res.send(result.rows);
+				}
+			});
+		} else {
+			res.send("Invalid Session");
+		}
+	} catch (exception){
+		logger.error("Error occured in admin/manageLDAPConfig", exception);
+		res.status(500).send("fail");
+	}
+};
+
+exports.getLDAPConfig = function(req, res){
+	logger.info("Inside UI Service: getLDAPConfig");
+	try{
+		if (utils.isSessionActive(req.session)) {
+			var action = req.body.action;
+			var name = req.body.args;
+			var opts = (req.body.opts || "").trim();
+			logger.info("Calling NDAC Service: getLDAPConfig");
+			var inputs = {};
+			if (action != "server") inputs.name = name;
+			var args = {
+				data: inputs,
+				headers: {
+					"Content-Type": "application/json"
+				}
+			};
+			client.post(epurl + "admin/getLDAPConfig", args,
+				function (result, response) {
+				if (response.statusCode != 200 || result.rows == "fail") {
+					logger.error("Error occured in admin/getLDAPConfig Error Code : ERRNDAC");
+					res.status(500).send("fail");
+				} else if (result.rows.length == 0) {
+					res.send("empty");
+				} else {
+					var data;
+					if (action != "server") {
+						result = result.rows[0];
+						var bindCredentials = result.bind_credentials;
+						data = {
+							url: result.url,
+							baseDN: result.base_dn,
+							authType: result.authtype,
+							bindDN: result.bind_dn,
+							bindCredentials: '',
+							fieldMap: JSON.parse(result.fieldmap)
+						};
+						if (action == "config") return res.send(data);
+						if (action == "user") {
+							var adConfig = {
+								url: data.url,
+								baseDN: data.baseDN
+							};
+							if (data.authType == "simple") {
+								adConfig.bindDN = data.bindDN;
+								adConfig.bindCredentials = bindCredentials;
+							}
+							var dataMaps = data.fieldMap;
+							var filter = dataMaps.uName;
+							var ad = new activeDirectory(adConfig);
+							if (opts.length > 0) {
+								ad.findUser(opts, function (err, result) {
+									if (err) {
+										if (err.lde_message.indexOf("DSID-031522C9") > -1) {
+											logger.error("Error occured in admin/getLDAPConfig: Fetch User Details: Insufficient Access");
+											data = "insufficient_access";
+										} else {
+											logger.error("Error occured in admin/getLDAPConfig: Fetch User Details:", err.lde_message);
+											logger.debug("ERROR: " + JSON.stringify(err));
+											data = "server_error";
+										}
+									}
+									if (result) {
+										var uName = result.dn.split(',')[0].split('=')[1];
+										data = {
+											username: uName,
+											firstname: result[dataMaps.fName],
+											lastname: result[dataMaps.lName],
+											email: result[dataMaps.email]
+										};
+									} else {
+										logger.error("Error occured in admin/getLDAPConfig: Fetch User Details: User not Found");
+										data = "empty";
+									}
+									return res.send(data);
+								});
+							} else {
+								ad.find(filter+"=*", function (err, result) {
+									if (err) {
+										if (err.lde_message.indexOf("DSID-031522C9") > -1) {
+											logger.error("Error occured in admin/getLDAPConfig: Fetch Users: Insufficient Access");
+											data = "insufficient_access";
+										} else {
+											logger.error("Error occured in admin/getLDAPConfig: Fetch Users:", err.lde_message);
+											logger.debug("ERROR: " + JSON.stringify(err));
+											data = "server_error";
+										}
+									}
+									if (result) {
+										var groups = result.groups;
+										var others = result.other;
+										groups.forEach(function(e) {
+											logger.info("Group '%s' found in base domain '%s'", e.dn, adConfig.baseDN);
+										});
+										others.forEach(function(e) {
+											logger.info("Unknown entry '%s' found in base domain '%s'", e.dn, adConfig.baseDN);
+										});
+										var users = result.users;
+										data = [];
+										for (var i = 0; i < users.length; i++) {
+											data.push([users[i].cn, users[i].dn]);
+										}
+									} else {
+										logger.error("Error occured in admin/getLDAPConfig: Fetch Users: No users Found");
+										data = "empty";
+									}
+									return res.send(data);
+								});
+							}
+						}
+					}
+					else {
+						data = [];
+						for(var i = 0; i < result.rows.length; i++) {
+							data.push(result.rows[i].servername);
+						}
+						return res.send(data);
+					}
+				}
+			});
+		} else {
+			res.send("Invalid Session");
+		}
+	} catch (exception){
+		logger.error("Error occured in admin/getLDAPConfig", exception);
+		res.status(500).send("fail");
 	}
 };
 
