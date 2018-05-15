@@ -109,6 +109,7 @@ mySPA.controller('reportsController', ['$scope','$rootScope', '$http', '$locatio
 				$('.scrollbar-inner').scrollbar();
 				$('.scrollbar-macosx').scrollbar();
 				var container = $('.staticTestsuiteContainer');
+				$('.suiteContainer').remove();
 				if(Object.prototype.toString.call( data ) === '[object Object]'){
 					if(data.suiteids.length > 0){
 						for(i=0; i<data.suiteids.length; i++){

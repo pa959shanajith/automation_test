@@ -1,6 +1,3 @@
-/**
- * Dependencies.
- */
 var async = require('async');
 var bcrypt = require('bcrypt');
 var validator = require('validator');
@@ -10,7 +7,6 @@ var Client = require("node-rest-client").Client;
 var client = new Client();
 var logger = require('../../logger');
 var notificationMsg = require("../notifications/notifyMessages");
-var config = require('../../server/config/config');
 var utils = require('../lib/utils');
 
 //Authenticate User - Nineteen68
@@ -21,25 +17,17 @@ exports.authenticateUser_Nineteen68 = function (req, res) {
 		var password = req.body.password;
 		var sessId = req.session.id;
 
+		// Credentials for service user that can restart services
 		if (username == "restartservice" && password == "r3Start@3") return res.send("restart");
-		var valid_username, valid_password;
-		validateLogin();
-		function validateLogin() {
-			var check_username = validator.isEmpty(username);
-			var check_usernameLen = validator.isLength(username, 1, 50);
-			if (check_username == false && check_usernameLen == true) {
-				valid_username = true;
-			}
-			var check_password = validator.isEmpty(password);
-			var check_passwordLen = validator.isLength(password, 1, 12);
-			if (check_password == false && check_passwordLen == true) {
-				valid_password = true;
-			}
-		}
+
+		var valid_username = validator.isLength(username, 1, 100);
+		var valid_password = validator.isLength(password, 1, 100);
 		if (valid_username == true && valid_password == true) {
 			var flag = 'inValidCredential';
 			var assignedProjects = false;
 			var userLogged = false;
+			var validUser = false;
+			var userid = '';
 			var inputs = {
 				"username": username
 			};
@@ -50,26 +38,29 @@ exports.authenticateUser_Nineteen68 = function (req, res) {
 				}
 			};
 
-			function checkldapuser_callback(err, data) {
+			function checkldapuser_callback(data) {
 				logger.info("Inside call function of checkldapuser");
 				if (data) {
-					ldapCheck(username, password, function (err, ldapdata) {
-						logger.info("Inside call function of ldapCheck");
-						logger.info("LDAP User");
-						if (ldapdata == 'pass') {
+					userid = data.userid;
+					data.password = password;
+					ldapCheck(data, function (ldapdata) {
+						logger.info("Inside call function of ldapCheck: LDAP User");
+						if (ldapdata == "empty") {
+							flag = "inValidLDAPServer";
+							logger.info("User Authentication failed");
+							res.send(flag);
+						}
+						if (ldapdata == "pass") {
 							if (userLogged == true) {
 								flag = "userLogged";
 								logger.info("User already logged in");
 								req.session.destroy();
+								return res.send(flag);
 							} else {
-								flag = 'validCredential';
-								addUsernameAndIdInLogs(username,flag,data);
-								req.session.username = username;
-								req.session.uniqueId = sessId;
-								req.session.userid = data;
-								logger.info("User Authenticated successfully");
+								validUser = true;
+								//Check whether projects are assigned for a user
+								checkAssignedProjects(username, checkAssignedProjects_callback);
 							}
-							return res.send(flag);
 						} else {
 							logger.info("User Authentication failed");
 							res.send(flag);
@@ -88,8 +79,8 @@ exports.authenticateUser_Nineteen68 = function (req, res) {
 									res.send(flag);
 								} else {
 									var dbHashedPassword = result.rows[0].password;
-									var userid = result.rows[0].userid;
-									var validUser = bcrypt.compareSync(password, dbHashedPassword); // true
+									userid = result.rows[0].userid;
+									validUser = bcrypt.compareSync(password, dbHashedPassword); // true
 
 									if (validUser == true && userLogged == true) {
 										flag = "userLogged";
@@ -98,52 +89,7 @@ exports.authenticateUser_Nineteen68 = function (req, res) {
 										res.send(flag);
 									} else {
 										//Check whether projects are assigned for a user
-										checkAssignedProjects(username,
-											function checkAssignedProjects_callback(err, assignedProjectsData, role) {
-											if(err == 'fail') {
-												logger.error("Error occured in authenticateUser_Nineteen68 Error Code : ERRNDAC");
-												res.send('fail');
-											} else {
-												logger.info("Inside function call of checkAssignedProjects");
-												if (role != "Admin" && role != "Business Analyst" && role != "Tech Lead") {
-													if (assignedProjectsData > 0) {
-														assignedProjects = true;
-													}
-													if (validUser == true && assignedProjects == true) {
-														flag = 'validCredential';
-														addUsernameAndIdInLogs(username,flag,userid);
-														req.session.username = username;
-														req.session.uniqueId = sessId;
-														req.session.userid = userid;
-														logger.info("User Authenticated successfully");
-														res.send(flag);
-													} else if (validUser == true && assignedProjects == false) {
-														flag = 'noProjectsAssigned';
-														logger.info("User has not been assigned any projects");
-														req.session.destroy();
-														res.send(flag);
-													} else {
-														logger.info("User Authentication failed");
-														req.session.destroy();
-														res.send(flag);
-													}
-												} else {
-													if (validUser == true) {
-														flag = 'validCredential';
-														addUsernameAndIdInLogs(username,flag,userid);
-														req.session.username = username;
-														req.session.uniqueId = sessId;
-														req.session.userid = userid;
-														logger.info("User Authenticated successfully");
-														res.send(flag);
-													} else {
-														logger.info("User Authentication failed");
-														req.session.destroy();
-														res.send(flag);
-													}
-												}
-											}
-										});
+										checkAssignedProjects(username, checkAssignedProjects_callback);
 									}
 								}
 							} catch (exception) {
@@ -152,6 +98,52 @@ exports.authenticateUser_Nineteen68 = function (req, res) {
 							}
 						}
 					});
+				}
+			}
+
+			function checkAssignedProjects_callback(err, assignedProjectsData, role) {
+				if(err == 'fail') {
+					logger.error("Error occured in authenticateUser_Nineteen68 Error Code : ERRNDAC");
+					res.send('fail');
+				} else {
+					logger.info("Inside function call of checkAssignedProjects");
+					if (role != "Admin" && role != "Business Analyst" && role != "Tech Lead") {
+						if (assignedProjectsData > 0) {
+							assignedProjects = true;
+						}
+						if (validUser == true && assignedProjects == true) {
+							flag = 'validCredential';
+							addUsernameAndIdInLogs(username,flag,userid);
+							req.session.username = username;
+							req.session.uniqueId = sessId;
+							req.session.userid = userid;
+							logger.info("User Authenticated successfully");
+							res.send(flag);
+						} else if (validUser == true && assignedProjects == false) {
+							flag = 'noProjectsAssigned';
+							logger.info("User has not been assigned any projects");
+							req.session.destroy();
+							res.send(flag);
+						} else {
+							logger.info("User Authentication failed");
+							req.session.destroy();
+							res.send(flag);
+						}
+					} else {
+						if (validUser == true) {
+							flag = 'validCredential';
+							addUsernameAndIdInLogs(username,flag,userid);
+							req.session.username = username;
+							req.session.uniqueId = sessId;
+							req.session.userid = userid;
+							logger.info("User Authenticated successfully");
+							res.send(flag);
+						} else {
+							logger.info("User Authentication failed");
+							req.session.destroy();
+							res.send(flag);
+						}
+					}
 				}
 			}
 
@@ -167,7 +159,7 @@ exports.authenticateUser_Nineteen68 = function (req, res) {
 							break;
 						}
 					}
-					checkldapuser(req, username, checkldapuser_callback);
+					checkldapuser(username, checkldapuser_callback);
 				}
 			});
 		} else {
@@ -191,184 +183,10 @@ function addUsernameAndIdInLogs(username,flag,userid){
 }
 
 /**
- * @see : function to authenticate users from jenkins
- * @author : vinay
- */
-exports.authenticateUser_Nineteen68_CI = function (req, res) {
-	try {
-		logger.info("Inside UI service: authenticateUser_Nineteen68_CI");
-		var username = req.body.username.toLowerCase();
-		var password = req.body.password;
-		var sessId = req.session.id;
-		var flag = 'inValidCredential';
-		var inputs = {
-			"username": username
-		};
-		var args = {
-			data: inputs,
-			headers: {
-				"Content-Type": "application/json"
-			}
-		};
-		var userid, assignedProjects, valid_username, valid_password;
-		validateLogin();
-		function validateLogin() {
-			var check_username = validator.isEmpty(username);
-			var check_usernameLen = validator.isLength(username, 1, 50);
-			if (check_username == false && check_usernameLen == true) {
-				valid_username = true;
-			}
-			var check_password = validator.isEmpty(password);
-			var check_passwordLen = validator.isLength(password, 1, 12);
-			if (check_password == false && check_passwordLen == true) {
-				valid_password = true;
-			}
-		}
-		if (valid_username == true && valid_password == true) {
-			checkldapuser(req, username, function (err, data) {
-					logger.info("Inside call function of checkldapuser");
-				if (data) {
-					ldapCheck(username, password, function (err, ldapdata) {
-						logger.info("Inside call function of ldapCheck");
-						if (ldapdata == 'pass') {
-							flag = 'validCredential';
-							req.session.username = username;
-							req.session.uniqueId = sessId;
-							req.session.userid = userid;
-							res.setHeader('set-cookie', sessId);
-							res.writeHead(200, {
-								'Content-Type': 'text/plain'
-							});
-							res.write("status : " + flag + " , session_id : " + sessId);
-							logger.info("User Authenticated successfully");
-							res.end();
-						} else {
-							res.setHeader('set-cookie', sessId);
-							res.writeHead(401, {
-								'Content-Type': 'text/plain'
-							});
-							res.write("status : " + flag + " , session_id : " + "");
-							logger.info("User Authentication failed");
-							res.end();
-						}
-					});
-				} else {
-					logger.info("Calling NDAC Service: authenticateUser_Nineteen68_CI");
-					client.post(epurl + "login/authenticateUser_Nineteen68", args,
-						function (result, response) {
-						if (response.statusCode != 200 || result.rows == "fail") {
-							logger.error("Error occured in authenticateUser_Nineteen68_CI Error Code : ERRNDAC");
-							res.setHeader('set-cookie', sessId);
-							res.writeHead(500, {
-								'Content-Type': 'text/plain'
-							});
-							res.write("status : fail , session_id : ");
-							res.end();
-						} else {
-							try {
-								if (result.rows.length == 0) {
-									res.setHeader('set-cookie', sessId);
-									res.writeHead(401, {
-										'Content-Type': 'text/plain'
-									});
-									res.write("status : " + flag + " , session_id : " + "");
-									res.end();
-								} else {
-									var dbHashedPassword = result.rows[0].password;
-									var userid = result.rows[0].userid;
-									var validUser = bcrypt.compareSync(password, dbHashedPassword); // true
-									checkAssignedProjects(username, function (err, assignedProjectsData, role) {
-										logger.info("Inside function call of checkAssignedProjects");
-										if (role != "Admin" && role != "Business Analyst" && role != "Tech Lead") {
-											if (assignedProjectsData > 0) {
-												assignedProjects = true;
-											}
-											if (validUser == true && assignedProjects == true) {
-												flag = 'validCredential';
-												req.session.username = username;
-												req.session.uniqueId = sessId;
-												req.session.userid = userid;
-												res.setHeader('set-cookie', sessId);
-												res.writeHead(200, {
-													'Content-Type': 'text/plain'
-												});
-												res.write("status : " + flag + " , session_id : " + sessId);
-												logger.info("User Authenticated successfully");
-												res.end();
-											} else if (validUser == true && assignedProjects == false) {
-												flag = 'noProjectsAssigned';
-												res.writeHead(401, {
-													'Content-Type': 'text/plain'
-												});
-												res.write("status : " + flag + " , session_id : " + "");
-												logger.info("User has not been assigned any projects");
-												res.end();
-											} else {
-												logger.info("User Authentication failed");
-												res.setHeader('set-cookie', sessId);
-												res.writeHead(401, {
-													'Content-Type': 'text/plain'
-												});
-												res.write("status : " + flag + " , session_id : " + "");
-												res.end();
-											}
-										} else {
-											if (validUser == true) {
-												flag = 'validCredential';
-												req.session.username = username;
-												req.session.uniqueId = sessId;
-												req.session.userid = userid;
-												res.setHeader('set-cookie', sessId);
-												res.writeHead(200, {
-													'Content-Type': 'text/plain'
-												});
-												res.write("status : " + flag + " , session_id : " + sessId);
-												logger.info("User Authenticated successfully");
-												res.end();
-											} else {
-												logger.info("User Authentication failed");
-												res.setHeader('set-cookie', sessId);
-												res.writeHead(401, {
-													'Content-Type': 'text/plain'
-												});
-												res.write("status : " + flag + " , session_id : " + "");
-												res.end();
-											}
-										}
-									});
-								}
-							} catch (exception) {
-								logger.error(exception.message);
-								res.setHeader('set-cookie', sessId);
-								res.writeHead(500, {
-									'Content-Type': 'text/plain'
-								});
-								res.write("status : fail , session_id : ");
-								res.end();
-							}
-						}
-					});
-				}
-			});
-		} else {
-			res.send('fail');
-		}
-	} catch (exception) {
-		logger.error(exception.message);
-		res.setHeader('set-cookie', sessId);
-		res.writeHead(500, {
-			'Content-Type': 'text/plain'
-		});
-		res.write("status : fail , session_id : ");
-		res.end();
-	}
-};
-
-/**
  * @see : function to check whether projects are assigned for user
  * @author : vinay
  */
-function checkAssignedProjects(username, callback, data) {
+function checkAssignedProjects(username, callback) {
 	logger.info("Inside checkAssignedProjects function");
 	var userid = '';
 	var roleid = '';
@@ -393,7 +211,6 @@ function checkAssignedProjects(username, callback, data) {
 				if (response.statusCode != 200 || result.rows == "fail") {
 					logger.error("Error occured in authenticateUser_Nineteen68/projassigned Error Code : ERRNDAC");
 					callback(flag);
-					//res.send("fail");
 				} else {
 					userid = result.rows[0].userid;
 					roleid = result.rows[0].defaultrole;
@@ -481,7 +298,7 @@ function checkAssignedProjects(username, callback, data) {
  * @see : function to check whether existing user is ldap user or not
  * @author : shree.p
  */
-function checkldapuser(req, username, callback, data) {
+function checkldapuser(username, callback) {
 	logger.info("Inside function checkldapuser");
 	var flag = false;
 	var inputs = {
@@ -493,66 +310,65 @@ function checkldapuser(req, username, callback, data) {
 			"Content-Type": "application/json"
 		}
 	};
-		logger.info("Calling NDAC Service : authenticateUser_Nineteen68/ldap");
+	logger.info("Calling NDAC Service : authenticateUser_Nineteen68/ldap");
 	client.post(epurl + "login/authenticateUser_Nineteen68/ldap", args,
 		function (result, response) {
 		if (response.statusCode != 200 || result.rows == "fail") {
 			logger.error("Error occured in authenticateUser_Nineteen68_ldap Error Code : ERRNDAC");
-			callback(null, flag);
+			callback(flag);
+		} else if (result.rows.length == 0) {
+			callback(flag);
 		} else {
-			try {
-				if (result.rows.length == 0) {
-					callback(null, flag);
-				} else {
-					if (result.rows[0].ldapuser == true) {
-						flag = result.rows[0].userid;
-					}
-					callback(null, flag);
-				}
-			} catch (exception) {
-				logger.error(exception.message);
-				callback(null, flag);
+			if (result.rows[0].ldapuser != '{}') {
+				flag = JSON.parse(result.rows[0].ldapuser);
+				flag.userid = result.rows[0].userid;
 			}
+			callback(flag);
 		}
 	});
 }
 
-function ldapCheck(username, password, cb) {
+function ldapCheck(ldapdata, cb) {
 	logger.info("Inside ldapCheck function");
-	var ldap_ip = '',
-	ldap_port = '',
-	ldap_domain = '';
-	ldap_ip = config.ldap_ip;
-	ldap_port = config.ldap_port;
-	ldap_domain = config.ldap_domain;
-	var dcarray = [];
-	var dcstringarr = [];
-	try {
-		if (ldap_domain.indexOf(".") !== -1) {
-			dcarray = ldap_domain.split(".");
-		}
-		for (var i = 0; i < dcarray.length; i++) {
-			dcstringarr.push("dc=" + dcarray[i]);
-		}
-	} catch (ex) {
-		logger.error(ex);
+	var username = ldapdata.user;
+	var password = ldapdata.password;
+	var inputs = {
+		name: ldapdata.server
 	}
-	var ad = new activeDirectory({
-			url: 'ldap://' + ldap_ip + ':' + ldap_port,
-			baseDN: dcstringarr.toString()
-		});
-	ad.authenticate(username, password, function (err, auth) {
-		if (err) {
-			logger.error('Error occurred in ldap authentication : ' + JSON.stringify(err));
-			//console.log('Authentication failed!');
-			//cb(null,'fail');
+	var args = {
+		data: inputs,
+		headers: {
+			"Content-Type": "application/json"
 		}
-		if (auth) {
-			logger.info("LDAP user");
-			cb(null, 'pass');
+	};
+	client.post(epurl + "admin/getLDAPConfig", args,
+		function (result, response) {
+		if (response.statusCode != 200 || result.rows == "fail") {
+			logger.error("Error occured in admin/getLDAPConfig Error Code : ERRNDAC");
+			cb("fail");
+		} else if (result.rows.length == 0) {
+			cb("empty");
 		} else {
-			logger.info('Authentication failed!');
-			cb(null, 'fail');
+			result = result.rows[0];
+			var ad_config = {
+				url: result.url,
+				baseDN: result.base_dn,
+			};
+			if (result.authtype == "simple") {
+				ad_config.bindDN = result.bind_dn;
+				ad_config.bindCredentials = result.bind_credentials;
+			}
+			var ad = new activeDirectory(ad_config);
+			ad.authenticate(username, password, function (err, auth) {
+				if (err) {
+					logger.error("Error occurred in ldap authentication");
+					logger.debug("Error occurred in ldap authentication : " + JSON.stringify(err));
+					cb("fail");
+				} else {
+					if (auth) cb("pass");
+					else cb("pass");
+				}
+			});
 		}
 	});
 }
@@ -586,25 +402,20 @@ exports.loadUserInfo_Nineteen68 = function (req, res) {
 								logger.error("Error occurred in loadUserInfo_Nineteen68 Error Code : ERRNDAC");
 								res.send(flag);
 							} else {
-								try {
-									if (userResult.rows.length > 0) {
-										var service = userResult.rows[0];
-										jsonService.user_id = service.userid;
-										jsonService.email_id = service.emailid;
-										jsonService.additionalrole = service.additionalroles;
-										jsonService.firstname = service.firstname;
-										jsonService.lastname = service.lastname;
-										jsonService.role = service.defaultrole;
-										jsonService.username = service.username.toLowerCase();
-										selectedRole = selectedRole||jsonService.role;
-										req.session.defaultRoleId = jsonService.role;
-										req.session.activeRole = selectedRole;
-									} else {
-										logger.info("User info not found");
-										res.send("fail");
-									}
-								} catch (exception) {
-									logger.error(exception.message);
+								if (userResult.rows.length > 0) {
+									var service = userResult.rows[0];
+									jsonService.user_id = service.userid;
+									jsonService.email_id = service.emailid;
+									jsonService.additionalrole = service.additionalroles;
+									jsonService.firstname = service.firstname;
+									jsonService.lastname = service.lastname;
+									jsonService.role = service.defaultrole;
+									jsonService.username = service.username.toLowerCase();
+									selectedRole = selectedRole||jsonService.role;
+									req.session.defaultRoleId = jsonService.role;
+									req.session.activeRole = selectedRole;
+								} else {
+									logger.info("User info not found");
 									res.send("fail");
 								}
 							}
@@ -675,7 +486,6 @@ exports.loadUserInfo_Nineteen68 = function (req, res) {
 										res.send("fail");
 									} else {
 										var pluginsArr = [];
-										//"alm,apg,dashboard,deadcode,mindmap,neurongraphs,oxbowcode,reports,weboccular,utility"
 										var key = ["ALM", "APG", "Dashboard", "Dead Code Identifier", "Mindmap", "Neuron Graphs", "Oxbow Code Identifier", "Reports", "Utility", "Webocular"];
 										var vals = Object.values(pluginResult.rows[0]);
 										for(i=0; i < key.length; i++){
@@ -748,25 +558,6 @@ exports.getRoleNameByRoleId_Nineteen68 = function (req, res) {
 	} catch (exception) {
 		logger.error(exception.message);
 		res.send("fail");
-	}
-};
-
-/**
- * @author shree.p
- * @see function to logout in Nineteen68 from jenkins
- */
-exports.logoutUser_Nineteen68_CI = function (req, res) {
-	logger.info("Inside UI Service: logoutUser_Nineteen68_CI");
-	if (req.sessionStore.sessions != undefined) {
-		var session_list = req.sessionStore.sessions;
-		if (Object.keys(session_list).length != 0) {
-			logger.info("user logged out successfully");
-			req.sessionStore.clear();
-			res.send('Logout successful');
-		} else {
-			logger.info("Session Expired");
-			res.send('Session Expired');
-		}
 	}
 };
 

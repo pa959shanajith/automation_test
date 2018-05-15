@@ -317,10 +317,12 @@ mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
 		.then(function(data){
 			if(data == "Session Expired"){
 				window.localStorage.clear();
-				$location.path('/login');
+				//$location.path('/login');
+				window.location='/';
 			}
 		}, function(error) {
 			console.log("Failed to Logout");
+			//window.location='/';
 		});
 	}
 });

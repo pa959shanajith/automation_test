@@ -38,68 +38,65 @@ mySPA.controller('loginController', function ($scope, $rootScope, $timeout, $htt
 			LoginService.authenticateUser_Nineteen68(username, password)
 			.then(function (data) {
 				cfpLoadingBar.complete();
-				if (data != "fail" && data != "noProjectsAssigned" && data != "invalid_username_password") {
-					if (data == "restart") {
-						$scope.restartForm = true;
-						blockUI("Fetching active services...");
-						adminServices.restartService("query")
-						.then(function (data) {
-							if (data == "fail") {
-								$scope.loginValidation = "Failed to fetch services.";
-							} else {
-								data.forEach(function(e, i){
-									$scope.serverList[i].active = e;
-								});
-								//$scope.serverList[0].active = false;
-							}
-							unblockUI();
-						}, function (error) {
-							unblockUI();
+				if (data == "restart") {
+					blockUI("Fetching active services...");
+					adminServices.restartService("query")
+					.then(function (data) {
+						if (data == "fail") {
 							$scope.loginValidation = "Failed to fetch services.";
-						});
-					} else if (data == 'inValidCredential') {
-						$(".ic-username").children().attr("src", "imgs/ic-username-error.png");
-						$(".ic-password").children().attr("src", "imgs/ic-password-error.png");
-						$(".ic-password").parent().addClass("input-border-error")
-						$scope.loginValidation = "The username or password you entered isn't correct. Please try again.";
-					} else if (data == "userLogged") {
-						$scope.loginValidation = "User is already logged in! Please logout from the previous session.";
-					} else if (data == 'validCredential') {
-						$(".ic-username").children().attr("src", "imgs/ic-username.png");
-						$(".ic-password").children().attr("src", "imgs/ic-password.png");
-						$(".ic-username, .ic-password").parent().removeClass("input-border-error");
-						$scope.loginButtonValidation = "";
-						LoginService.loadUserInfo_Nineteen68()
-						.then(function (data) {
-							if (data != "fail") {
-								window.localStorage['LoginSuccess'] = "True";
-								window.localStorage['_SR'] = data.rolename;
-								window.localStorage['_UI'] = JSON.stringify(data);
-								window.sessionStorage["checkLoggedIn"] = "true";
-								if (data.rolename == "Admin") {
-									window.localStorage['navigateScreen'] = "admin";
-									$location.path("/admin");
-								} else {
-									window.localStorage['navigateScreen'] = "plugin";
-									$location.path("/plugin");
-								}
+						} else {
+							$scope.restartForm = true;
+							data.forEach(function(e, i){
+								$scope.serverList[i].active = e;
+							});
+						}
+						unblockUI();
+					}, function (error) {
+						unblockUI();
+						$scope.loginValidation = "Failed to fetch services.";
+					});
+				} else if (data == 'validCredential') {
+					$(".ic-username").children().attr("src", "imgs/ic-username.png");
+					$(".ic-password").children().attr("src", "imgs/ic-password.png");
+					$(".ic-username, .ic-password").parent().removeClass("input-border-error");
+					$scope.loginButtonValidation = "";
+					LoginService.loadUserInfo_Nineteen68()
+					.then(function (data) {
+						if (data != "fail") {
+							window.localStorage['LoginSuccess'] = "True";
+							window.localStorage['_SR'] = data.rolename;
+							window.localStorage['_UI'] = JSON.stringify(data);
+							window.sessionStorage["checkLoggedIn"] = "true";
+							if (data.rolename == "Admin") {
+								window.localStorage['navigateScreen'] = "admin";
+								$location.path("/admin");
 							} else {
-								$scope.loginValidation = "Failed to Login.";
-								console.log("Failed to Load UserInfo.");
+								window.localStorage['navigateScreen'] = "plugin";
+								$location.path("/plugin");
 							}
-						}, function (error) {
+						} else {
 							$scope.loginValidation = "Failed to Login.";
-							console.log("Fail to Load UserInfo")
-						});
-					}
+							console.log("Failed to Load UserInfo.");
+						}
+					}, function (error) {
+						$scope.loginValidation = "Failed to Login.";
+						console.log("Fail to Load UserInfo")
+					});
+				} else if (data == 'inValidCredential') {
+					$(".ic-username").children().attr("src", "imgs/ic-username-error.png");
+					$(".ic-password").children().attr("src", "imgs/ic-password-error.png");
+					$(".ic-password").parent().addClass("input-border-error")
+					$scope.loginValidation = "The username or password you entered isn't correct. Please try again.";
+				} else if (data == "userLogged") {
+					$scope.loginValidation = "User is already logged in! Please logout from the previous session.";
+				} else if (data == "inValidLDAPServer") {
+					$scope.loginValidation = "LDAP Server Configuration is invalid!";
 				} else if (data == 'noProjectsAssigned') {
 					$scope.loginValidation = "To Login, user must be allocated to a Domain and Project. Please contact Admin.";
 				} else if (data == 'invalid_username_password') {
 					$scope.loginValidation = "The username or password you entered isn't correct. Please try again.";
-					console.log("Invalid username or password");
 				} else {
 					$scope.loginValidation = "Failed to Login.";
-					console.log("Fail to Login.")
 				}
 			}, function (error) {
 				console.log("Failed to Authenticate User.")
@@ -118,7 +115,7 @@ mySPA.controller('loginController', function ($scope, $rootScope, $timeout, $htt
 				setTimeout(function(){
 					unblockUI();
 					openModalPopup("Restart Service", serverName+" service is restarted successfully!!");
-				},120*1000);
+				}, 120 * 1000);
 			} else {
 				unblockUI();
 				if (data == "na") errmsg = "Service is not found. Ensure "+serverName+" is running as a service.";
