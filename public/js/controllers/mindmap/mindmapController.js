@@ -405,7 +405,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     var nodetf = $(elem.parent()[idxSearch]).attr('transform');
                     var x_mptf = parseInt(mptf.split(/[()]/)[1].split(',')[0]);
                     var y_mptf = parseInt(mptf.split(/[()]/)[1].split(',')[1]);
-                    var scale_mptf = parseInt(mptf.split(/[()]/)[3]);
+                    var scale_mptf = 1; //parseFloat(mptf.split(/[()]/)[3]);
                     var x_nodetf = parseInt(nodetf.split(/[()]/)[1].split(',')[0]);
                     var y_nodetf = parseInt(nodetf.split(/[()]/)[1].split(',')[1]);
                     //Approx cordinates of node: mindmap translate + nodetf/mpscale
@@ -522,7 +522,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     }
 
     function unloadMindmapData(){
-        $('#ct-mindMap').hide();
+        //$('#ct-mindMap').hide();
+        $('#ct-mindMap').empty();
         $('#ct-actionBox').remove();
         var nodeBox = d3.select('.ct-nodeBox');
         $(nodeBox[0]).empty();
@@ -740,9 +741,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         n.display_name = n.name;
         var ch = 15;
         //Issue 697
-        if (n.type == 'testcases') ch = 9;
-        if ((n.name.length > 15) || (n.name.length > 9 && n.type == 'testcases')) {
-
+        //if (n.type == 'testcases') ch = 9;
+        //if ((n.name.length > 15) || (n.name.length > 9 && n.type == 'testcases')) {
+        if (n.name.length > 15) {
             n.display_name = n.display_name.slice(0, ch) + '...';
         }
         v.append('text').attr('class', 'ct-nodeLabel').text(n.display_name).attr('text-anchor', 'middle').attr('x', 20).attr('title', n.name).attr('y', 50);
@@ -1556,27 +1557,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         return tableHTML;
     }
     
-    function loadCycles() {
-        $('#ct-assignCyc').empty();
-        $('#ct-assignCyc').append("<option value='select cycle' select=selected>" + "Select cycle" + "</option>");
-        //'46974ffa-d02a-49d8-978d-7da3b2304255'
-        mindmapServices.populateCycles($("#ct-assignRel").val()).then(function(result_cycles) {
-            if (result_cycles == "Invalid Session") {
-                $rootScope.redirectPage();
-            }                 
-            var result2 = result_cycles;
-            cycdata = {};
-            for (i = 0; i < result2.c_ids.length && result2.cyc.length; i++) {
-                $('#ct-assignCyc').append("<option data-id='" + result2.cyc[i] + "' value='" + result2.c_ids[i] + "'>" + result2.cyc[i] + "</option>");
-                cycdata[result2.c_ids[i]] = result2.cyc[i];
-            }
-            $("#ct-assignCyc option[value='" + result2.cyc[0] + "']").attr('selected', 'selected');
-        }, function(error) {
-            console.log("Error in populating Cycles");
-            //callback(null, err);
-        })
 
-    }
 
     function nodeCtrlClick(e) {
         d3.select('#ct-inpBox').classed('no-disp', !0);
@@ -1966,7 +1947,10 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         if (node == 0 || node == undefined) {
             childNode = null;
             var p = d3.select(activeNode);
-        } else var p = childNode;
+        } else{
+            var p = childNode;
+            activeNode = childNode[0][0];
+        } 
         var pi = p.attr('id').split('-')[2];
         var t = p.attr('data-nodetype');
         var split_char = ',';
@@ -2358,8 +2342,27 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     $('#undoChanges').click(function(){
         pi=$('#renamingConfirmationPopup').attr('node');
         dNodes[pi].name = dNodes[pi].original_name;
-        $('#ct-node-'+pi+' > text').text(dNodes[pi].original_name);        
+        $('#ct-node-'+pi+' > text').text(dNodes[pi].original_name);   
+        if(reuseDict && reuseDict[pi].length>0){
+            reuseDict[pi].forEach(function(e,i){
+                dNodes[e].name = dNodes[e].original_name;
+                $('#ct-node-'+e+' > text').text(dNodes[e].original_name);
+            });
+        }          
     });
+
+    $('#undoChanges2').click(function(){
+        pi=$('#renamingConfirmationPopup').attr('node');
+        dNodes[pi].name = dNodes[pi].original_name;
+        $('#ct-node-'+pi+' > text').text(dNodes[pi].original_name);   
+        if(reuseDict && reuseDict[pi].length>0){
+            reuseDict[pi].forEach(function(e,i){
+                dNodes[e].name = dNodes[e].original_name;
+                $('#ct-node-'+e+' > text').text(dNodes[e].original_name);
+            });
+        }          
+    });    
+    
     function inpKeyUp(e) {
         e = e || window.event;
         temp = [];
@@ -2399,7 +2402,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 if (d.name.length > 23) s = d.name.slice(0, 23) + "...";
                 else s = d.name;
                 iul.append('li').attr('class', 'divider');
-                iul.append('li').append('a').attr('data-nodeid', i).attr('data-nodename', d.name).html(s).on('click', function() {
+                iul.append('li').append('a').attr('data-nodeid', i).attr('data-nodename', d.name).attr('title', d.name).html(s).on('click', function() {
                     var k = d3.select(this);
                     d3.select('#ct-inpSugg').classed('no-disp', !0);
                     d3.select('#ct-inpPredict').property('value', '');
@@ -3581,7 +3584,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         v.append('image').attr('height', '40px').attr('width', '40px').attr('class', 'ct-nodeIcon').attr('xlink:href', img_src).on('click', nodeCtrlClick_W).attr('style','opacity:'+nodeOpacity+';');
         var ch = 15;
         if (n.name.length > 15 && n.type != 'modules_endtoend') {
-            if (n.type == 'testcases') ch = 9;
+            //if (n.type == 'testcases') ch = 9;
             n.display_name = n.display_name.slice(0, ch) + '...';
         }
         v.append('text').attr('class', 'ct-nodeLabel').text(n.display_name).attr('text-anchor', 'middle').attr('x', 20).attr('title', n.name).attr('y', 50);
@@ -5011,7 +5014,7 @@ function getSelectionStart(o) {
         else
             var temp = dNodes.length;
 
-        if (temp == 0) {
+        if ($('#ct-mindMap').length == 0 ||$('#ct-mindMap').is(':empty')) {
             openDialogMindmap('Error', "Please select a module first");
         } else if ((selectedTab == 'mindmapEndtoEndModules' || selectedTab == 'tabCreate') && !$('#ct-inpBox').hasClass('no-disp')) {
             openDialogMindmap('Error', "Please complete editing first");

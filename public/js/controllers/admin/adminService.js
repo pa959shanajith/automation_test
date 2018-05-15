@@ -223,6 +223,13 @@ mySPA.factory('adminServices', ['$http', '$q', function ($http, $q) {
 				function (response) {
 				return $q.reject(response.data);
 			});
+		},
+		restartService : function(i){
+			return $http.post('/restartService',{
+				id : i
+			})
+			.then(function(response) { return response.data},
+			function(response) { return $q.reject(response.data)})
 		}
 	};
 }]);

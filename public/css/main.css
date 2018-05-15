@@ -1545,6 +1545,11 @@ input[disabled]{
 }
 .taskname{
     cursor: pointer;
+    overflow: hidden;
+    white-space: nowrap !important;
+    text-overflow: ellipsis;
+    float: left;
+    max-width: 80%;
 }
 
 .wsdlRqstRspns{
@@ -2481,7 +2486,11 @@ input[disabled]{
 .scenarioHeaders tr td{
 	padding: 0 5px 0 5px;
 	border-right: 1px solid #fff;
-	text-align: center;
+    text-align: center;
+    /* float: left;
+    overflow: hidden;
+    white-space: nowrap !important;
+    text-overflow: ellipsis; */
 }
 .scenarioHeaders tr td:first-child{text-align: left; padding-left: 8px; padding-top: 2px; width: 7%;}
 .scenarioHeaders tr td:nth-child(2){width: 30%;}
@@ -2523,7 +2532,10 @@ input[disabled]{
 	box-shadow:none;
 }
 .tabeleCellPadding{
-	padding: 5px 0px !important;
+    padding: 5px 0px !important;
+    overflow: hidden;
+    white-space:nowrap !important; 
+    text-overflow: ellipsis;
 }
 .alertGreen{
 	background: #fff url("../imgs/ic-true.png") 90% center no-repeat !important
@@ -2611,6 +2623,10 @@ input[disabled]{
     margin-top: 7px;
     width: 327px;
     padding: 0 10px 0 2px;
+    overflow:hidden;
+    white-space: nowrap !important;
+    text-overflow: ellipsis;
+    max-width: 350px;
 }
 .cancelJob{
     cursor: pointer;
@@ -2678,6 +2694,9 @@ input[disabled]{
     word-break: break-all;
     word-wrap: break-word;
     padding: 0px 10px;
+    overflow: hidden;
+    white-space: nowrap !important;
+    text-overflow: ellipsis;
 }
 /******Scenario Details Modal******/
 
@@ -2814,6 +2833,9 @@ input[disabled]{
     text-align: center;
     word-break: break-all;
     font-size: 17px;
+    overflow: hidden;
+    white-space: nowrap !important;
+    text-overflow: ellipsis;
 }
 
 .modal-header .close {
@@ -4455,7 +4477,7 @@ select:-webkit-autofill:focus {
 	.plugin-block span{
 		-webkit-transform: translateX(-103%) translateY(-50%);
 	}
-	.tabeleCellPadding{width: 4%;}
+	.tabeleCellPadding{width: 4%;overflow: hidden;white-space:nowrap !important; text-overflow: ellipsis;}
 	.suitestartend thead{width: calc(100% - 1004px);}
 	.formatpdfbrwsrexport{left: 75px;}
 }
@@ -5719,5 +5741,26 @@ ul.browserInlineIcons
 {
     width: 33% !important;
 }
+.ellipsisCls
+{
+    overflow:hidden;
+    white-space: nowrap !important;
+    text-overflow: ellipsis;
+}
 
+#enableAppend:disabled {
+    opacity: 0.7;
+}
+.qcTestcaseName{
+    padding-left:4px;
 
+}
+.qcTestcaseId{
+    background: #331d4c;
+    color: #fff;
+    border-radius: 3px;
+    /* height: 14px; */
+    /* width: 14px; */
+    display: inline;
+    padding: 2px;
+}

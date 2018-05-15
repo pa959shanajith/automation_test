@@ -13,7 +13,8 @@ mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
                 deps: ['$ocLazyLoad', function ($ocLazyLoad) {
                     return $ocLazyLoad.load([
 						'js/controllers/login/loginController.js',
-						'js/controllers/login/loginService.js'
+						'js/controllers/login/loginService.js',
+						'js/controllers/admin/adminService.js'
                     ]);
                 }]
             }
