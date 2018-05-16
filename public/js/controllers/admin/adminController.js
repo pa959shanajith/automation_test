@@ -1520,6 +1520,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 		updateProjectDetails = [];
 		$scope.tab = "editProject";
 		var plugins = [];
+		$("#middle-content-section").addClass('removeScroll');
 		adminServices.getAvailablePlugins()
 		.then(function (plugins_list) {
 			for (var i = 0; i < plugins_list.length; i++) {
