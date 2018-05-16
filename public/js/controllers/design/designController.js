@@ -3725,7 +3725,7 @@ function contentTable(newTestScriptDataLS) {
                 {label: 'URL', name: 'url', editable: false, resizable: false, hidden: true},
                 {label: 'appType', name: 'appType', editable: false, resizable: false, hidden: true},
                 {label: 'Details', name: 'addTestCaseDetails', editable: false, resizable: false, sortable: false},
-                {label: 'Details', name: 'addTestCaseDetailsInfo', editable: false, resizable: false, sortable: false,hidden: true}
+                {label: 'Details', name: 'addTestCaseDetailsInfo', editable: false, resizable: false, sortable: false,hidden: true},
                 {label: 'cord', name: 'cord', editable: false, resizable: false, hidden: true}
             ],
             loadonce: false,
