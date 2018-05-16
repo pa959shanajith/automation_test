@@ -287,7 +287,7 @@
 						<div class="seprator" style="margin-bottom:0px;">
 							<!-- <select multiple id="allProjectEU" ng-model="allProjectNameEU" size="13" ng-options="p as p.ProjectName for p in projBox1 track by p.ProjectId"></select> -->
 							<select multiple="" id="allProjectAP" ng-model="allProjectNameAP" size="" class="ng-pristine ng-untouched ng-valid">
-								<option ng-repeat="prj in allProjectAP" value="{{prj.projectid}}">{{prj.projectname}}</option>
+								<option ng-repeat="prj in assignProj.allProjectAP" value="{{prj.projectid}}">{{prj.projectname}}</option>
 							</select>
 							<span ng-show="projectNameRequired" class="error-msg ng-binding ng-hide"></span>
 						</div>
@@ -309,14 +309,10 @@
 						<label class="labelStyle1">Assigned Projects</label><img class="load" style="position: relative; left: 10px; bottom: 4px; display: none;" src="imgs/loader.gif" alt="Loading...">
 						<!--Labels-->
 
-						<!--Print Selected Domain-->
-						<!--<div class="sltd-domain-print">Please Assign Projects</strong></div>-->
-						<!--Print Selected Domain-->
-
 						<div class="seprator" style="margin-bottom:0px;">
 							<!-- <select size="13" multiple ng-model="assignedProjectNameEU" id="assignedProject" ng-options="p as p.ProjectName for p in projBox2 track by p.ProjectId"></select> -->
 							<select multiple="" id="assignedProjectAP" ng-model="assignedProjectNameAP" size="" class="ng-pristine ng-untouched ng-valid">
-								<option ng-repeat="prj in assignedProjectAP" value="{{prj.projectid}}">{{prj.projectname}}</option>
+								<option ng-repeat="prj in assignProj.assignedProjectAP" value="{{prj.projectid}}">{{prj.projectname}}</option>
 							</select>
 							<span ng-show="selectProjects" class="error-msg ng-binding ng-hide"></span>
 						</div>

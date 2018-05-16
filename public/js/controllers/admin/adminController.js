@@ -30,8 +30,8 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 
 	$(document).on('change', '#selAssignUser', function (e) {
 		$scope.assignedProjectInitial = [];
-		$scope.allProjectAP = [];
-		$scope.assignedProjectAP = [];
+		$scope.assignProj.allProjectAP = [];
+		$scope.assignProj.assignedProjectAP = [];
 		$(".load").show();
 		$("#selAssignUser, #rightall, #rightgo, #leftgo, #leftall, .adminBtn").prop("disabled", true);
 		$("#overlayContainer").prop("style", "opacity: 1;");
@@ -42,8 +42,8 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 			} else {
 				domainId = data[0].domainId;
 				$("#selAssignProject").val(data[0].domainName);
-				$scope.allProjectAP = [];
-				$scope.assignedProjectAP = [];
+				$scope.assignProj.allProjectAP = [];
+				$scope.assignProj.assignedProjectAP = [];
 				//var domainId = data[0].domainId;
 				//var requestedids = domainId;
 				//var domains = [];
@@ -69,14 +69,14 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 					if (data1 == "Invalid Session") {
 						$rootScope.redirectPage();
 					}
-					$scope.assignedProjectAP = [];
+					$scope.assignProj.assignedProjectAP = [];
 					projectData = [];
 					projectData = data1;
 					if (data1.length > 0) {
 						for (var i = 0; i < data1.length; i++) {
-							$scope.assignedProjectAP.push({'projectid':data1[i].projectId,'projectname':data1[i].projectName});
+							$scope.assignProj.assignedProjectAP.push({'projectid':data1[i].projectId,'projectname':data1[i].projectName});
 						}
-						$scope.assignedProjectInitial = $scope.assignedProjectAP;
+						$scope.assignedProjectInitial = $scope.assignProj.assignedProjectAP;
 						for (var j = 0; j < projectData.length; j++) {
 							assignedProjectsArr.push(projectData[j].projectId);
 							assignedProjectNames.push(projectData[j].projectName);
@@ -87,7 +87,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 							if (detResponse == "Invalid Session") {
 								$rootScope.redirectPage();
 							}
-							$scope.allProjectAP = [];
+							$scope.assignProj.allProjectAP = [];
 							if (detResponse.projectIds.length > 0) {
 								for (var k = 0; k < detResponse.projectIds.length; k++) {
 									if (!eleContainsInArray(assignedProjectsArr, detResponse.projectIds[k])) {
@@ -113,11 +113,11 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 								unAssignedProjects.projectIds = unassignedProjectIds;
 								unAssignedProjects.projectNames = unassignedProjectNames;
 								for (var m = 0; m < unAssignedProjects.projectIds.length; m++) {
-									$scope.allProjectAP.push({'projectname':unAssignedProjects.projectNames[m],'projectid':unAssignedProjects.projectIds[m]});
+									$scope.assignProj.allProjectAP.push({'projectname':unAssignedProjects.projectNames[m],'projectid':unAssignedProjects.projectIds[m]});
 								}
 								if ($("#selAssignUser").find("option:selected").text() == 'Select User') {
-									$scope.allProjectAP = [];
-									$scope.assignedProjectAP = [];
+									$scope.assignProj.allProjectAP = [];
+									$scope.assignProj.assignedProjectAP = [];
 								}
 								$(".load").hide();
 								$("#selAssignUser, #rightall, #rightgo, #leftgo, #leftall, .adminBtn").prop("disabled", false);
@@ -132,10 +132,10 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 								$rootScope.redirectPage();
 							}
 							if (res.projectIds.length > 0) {
-								$scope.allProjectAP = [];
-								$scope.assignedProjectAP = [];
+								$scope.assignProj.allProjectAP = [];
+								$scope.assignProj.assignedProjectAP = [];
 								for (var n = 0; n < res.projectIds.length; n++) {
-									$scope.allProjectAP.push({'projectname':res.projectNames[n],'projectid':res.projectIds[n]});
+									$scope.assignProj.allProjectAP.push({'projectname':res.projectNames[n],'projectid':res.projectIds[n]});
 								}
 							}
 							$(".load").hide();
@@ -176,112 +176,11 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 					}
 				}
 				selectBox.prop('selectedIndex', 0);
-				$("#allProjectAP,#assignedProjectAP,#selAssignProject").empty();
 			}
 		}, function (error) {
 			console.log("Error:::::::::::::", error);
 		});
 	};
-
-	$(document).on('change', '#selAssignProject', function () {
-		$scope.allProjectAP = [];
-		$scope.assignedProjectAP = [];
-		var domainId = $("#selAssignProject option:selected").val();
-		var requestedids = [domainId];
-		var domains = [];
-		domains.push(domainId);
-		//console.log("Domain", domains);
-		//var requestedids = domains.push(domainId);
-		var idtype = ["domaindetails"];
-		var userId = $("#selAssignUser option:selected").attr("data-id");
-		var getAssignProj = {};
-		getAssignProj.domainId = domainId;
-		getAssignProj.userId = userId;
-		var assignedProjectsArr = [];
-		var assignedProjectNames = [];
-		var unassignedProjectIds = [];
-		var unassignedProjectNames = [];
-		var unAssignedProjects = {};
-		//	getAssignedProjectsLen = 0;
-
-		adminServices.getAssignedProjects_ICE(getAssignProj)
-		.then(function (data) {
-			getAssignedProjectsLen = data.length;
-			if (data == "Invalid Session") {
-				$rootScope.redirectPage();
-			}
-			$scope.assignedProjectAP = [];
-			projectData = [];
-			projectData = data;
-			if (data.length > 0) {
-				for (var i = 0; i < data.length; i++) {
-					$scope.assignedProjectAP.push({'projectname':data[i].projectName,'projectid':data[i].projectId});
-				}
-				$scope.assignedProjectInitial = $scope.assignedProjectAP;
-				for (var j = 0; j < projectData.length; j++) {
-					assignedProjectsArr.push(projectData[j].projectId);
-					assignedProjectNames.push(projectData[j].projectName);
-				}
-
-				adminServices.getDetails_ICE(idtype, requestedids)
-				.then(function (response) {
-					if (response == "Invalid Session") {
-						$rootScope.redirectPage();
-					}
-					$scope.allProjectAP = [];
-					if (response.projectIds.length > 0) {
-						for (var k = 0; k < response.projectIds.length; k++) {
-							if (!eleContainsInArray(assignedProjectsArr, response.projectIds[k])) {
-								unassignedProjectIds.push(response.projectIds[k]);
-							}
-						}
-
-						for (var l = 0; l < response.projectNames.length; l++) {
-							if (!eleContainsInArray(assignedProjectNames, response.projectNames[l])) {
-								unassignedProjectNames.push(response.projectNames[l]);
-							}
-						}
-
-						function eleContainsInArray(arr, element) {
-							if (arr != null && arr.length > 0) {
-								for (var s = 0; s < arr.length; s++) {
-									if (arr[s] == element)
-										return true;
-								}
-							}
-							return false;
-						}
-						unAssignedProjects.projectIds = unassignedProjectIds;
-						unAssignedProjects.projectNames = unassignedProjectNames;
-						for (var m = 0; m < unAssignedProjects.projectIds.length; m++) {
-							$scope.allProjectAP.push({'projectname':unAssignedProjects.projectNames[m],'projectid':unAssignedProjects.projectIds[m]});
-						}
-					}
-				}, function (error) {
-					console.log("Error:::::::::::::", error);
-				});
-			} else {
-				adminServices.getDetails_ICE(idtype, requestedids)
-				.then(function (resDetails) {
-					if (resDetails == "Invalid Session") {
-						$rootScope.redirectPage();
-					}
-					if (resDetails.projectIds.length > 0) {
-						$scope.allProjectAP = [];
-						$scope.assignedProjectAP = [];
-
-						for (var n = 0; n < resDetails.projectIds.length; n++) {
-							$scope.allProjectAP.push({'projectname':resDetails.projectNames[n],'projectid':resDetails.projectIds[n]});
-						}
-					}
-				}, function (error) {
-					console.log("Error:::::::::::::", error);
-				});
-			}
-		}, function (error) {
-			console.log("Error:::::::::::::", error);
-		});
-	});
 
 	//	Assign Projects Button Click
 	$scope.assignProjects = function () {
@@ -673,8 +572,8 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 
 	function resetAssignProjectForm() {
 		$("#selAssignUser, #selAssignProject").prop('selectedIndex', 0);
-		$scope.allProjectAP = [];
-		$scope.assignedProjectAP = [];        
+		$scope.assignProj.allProjectAP = [];
+		$scope.assignProj.assignedProjectAP = [];        
 		$("#selAssignProject").empty();
 		$("#selAssignProject").append('<option data-id="" value disabled selected>Please Select your domain</option>');
 	}
