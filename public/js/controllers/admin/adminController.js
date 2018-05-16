@@ -1589,7 +1589,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 
 	$scope.userConf.click = function() {
 		$(".selectedIcon").removeClass("selectedIcon");
-		$("button.userTypeBtnActive").removeClass('userTypeBtnActive')
+		$("button.userTypeBtnActive").removeClass('userTypeBtnActive');
 		$("#userTab").find("img").addClass("selectedIcon");
 		this.userId = '';
 		this.userName = '';
