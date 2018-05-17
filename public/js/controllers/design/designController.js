@@ -811,18 +811,13 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                                     //     var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' /><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis " + addcusOb + "'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
                                     // } 
                                     // else {
-                                    if(ob.cord && ob.cord != ''){
-										addcusOb = ""
-                                        custN = custN,
-                                        ob.height = 53,
-                                        ob.hiddentag = "No",
-                                        ob.left = 198,
-                                        tag = "iris",
-                                        ob.top = 163,
-                                        ob.url = "",
-                                        ob.width = 91,
-                                        ob.xpath = ""                                        
-                                    }                                        
+                                        if(ob.cord && ob.cord != ''){  //in case of iris object
+                                            addcusOb = ""
+                                            ob.hiddentag = "No",
+                                            tag = "iris",
+                                            ob.url = "",
+                                            ob.xpath = ""                                        
+                                        }                                  
                                     var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' /><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis " + addcusOb + "'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
                                     // }                                       
                                 // }        
@@ -1726,17 +1721,13 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                                         imgTag = "input"
                                     } else imgTag = tag;
 
-                                    if(ob.cord && ob.cord != ''){
-                                        custN = custN,
-                                        ob.height = 53,
+                                    if(ob.cord && ob.cord != ''){  //in case of iris object
+										addcusOb = ""
                                         ob.hiddentag = "No",
-                                        ob.left = 198,
                                         tag = "iris",
-                                        ob.top = 163,
                                         ob.url = "",
-                                        ob.width = 91,
                                         ob.xpath = ""                                        
-                                    }           
+                                    }        
 
                                     // if (tag == "a" || tag == "input" || tag == "table" || tag == "list" || tag == "select" || tag == "img" || tag == "button" || tag == "radiobutton" || tag == "checkbox" || tag == "tablecell") {
                                     //     var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
@@ -1773,17 +1764,13 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                                         // if (tag == "a" || tag == "input" || tag == "table" || tag == "list" || tag == "select" || tag == "img" || tag == "button" || tag == "radiobutton" || tag == "checkbox" || tag == "tablecell") {
                                         //     var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
                                         // } else {
-                                            if(ob.cord && ob.cord != ''){
-                                                custN = custN,
-                                                ob.height = 53,
+                                            if(ob.cord && ob.cord != ''){  //in case of iris object
+                                                addcusOb = ""
                                                 ob.hiddentag = "No",
-                                                ob.left = 198,
                                                 tag = "iris",
-                                                ob.top = 163,
                                                 ob.url = "",
-                                                ob.width = 91,
                                                 ob.xpath = ""                                        
-                                            }      
+                                            }   
                                             var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
                                         // }    
                                   
@@ -1822,17 +1809,13 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                                     // if (tag == "a" || tag == "input" || tag == "table" || tag == "list" || tag == "select" || tag == "img" || tag == "button" || tag == "radiobutton" || tag == "checkbox" || tag == "tablecell") {
                                     //     var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
                                     // } else {
-                                    if(ob.cord && ob.cord != ''){
-                                        custN = custN,
-                                        ob.height = 53,
-                                        ob.hiddentag = "No",
-                                        ob.left = 198,
-                                        tag = "iris",
-                                        ob.top = 163,
-                                        ob.url = "",
-                                        ob.width = 91,
-                                        ob.xpath = ""                                        
-                                    }                                        
+                                        if(ob.cord && ob.cord != ''){  //in case of iris object
+                                            addcusOb = ""
+                                            ob.hiddentag = "No",
+                                            tag = "iris",
+                                            ob.url = "",
+                                            ob.xpath = ""                                        
+                                        }                                      
                                     var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
                                     // }
                                 // }
@@ -2282,20 +2265,20 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                 }
 
         }
-        else if(url == 'irisurl'){
-            var cordlist = xpath.split("_");
-            var xt,yt,wt,ht;
-            xt = Math.min(cordlist[2] , cordlist[3]);
-            yt = Math.min(cordlist[4] , cordlist[5]);
-            wt = Math.abs(cordlist[2] - cordlist[3]);
-            ht = Math.abs(cordlist[4] - cordlist[5]);
-            rect = {
-                x: xt,
-                y: yt,
-                w: wt,
-                h: ht
-            }
-        }
+        // else if(url == 'irisurl'){
+        //     var cordlist = xpath.split("_");
+        //     var xt,yt,wt,ht;
+        //     xt = Math.min(cordlist[2] , cordlist[3]);
+        //     yt = Math.min(cordlist[4] , cordlist[5]);
+        //     wt = Math.abs(cordlist[2] - cordlist[3]);
+        //     ht = Math.abs(cordlist[4] - cordlist[5]);
+        //     rect = {
+        //         x: xt,
+        //         y: yt,
+        //         w: wt,
+        //         h: ht
+        //     }
+        // }
         else{
              rect = {
                         x: data.rslt.obj.data("left"),
@@ -4874,6 +4857,9 @@ function contentTable(newTestScriptDataLS) {
                         } else if (obType == 'hyperlink' || obType == 'a') {
                             sc = Object.keys(keywordArrayList.link);
                             selectedKeywordList = "link";
+                        } else if(obType =='iris'){
+                            sc = Object.keys(keywordArrayList.iris);
+                            selectedKeywordList = "iris";
                         } else {
                             sc = Object.keys(keywordArrayList.element);
                             selectedKeywordList = "element";
@@ -4891,6 +4877,8 @@ function contentTable(newTestScriptDataLS) {
                         $grid.jqGrid('setCell', rowId, 'url', url);
                         $grid.jqGrid('setCell', rowId, 'objectName', objName);
                         $grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
+						if(obType == 'iris')
+                            $grid.jqGrid('setCell', rowId, 'cord',cord);
                         break;
                     } else if (appTypeLocal == 'MobileApp' &&
                         (obType.indexOf("RadioButton") >= 0 || obType.indexOf("ImageButton") >= 0 || obType.indexOf("Button") >= 0 || obType.indexOf("EditText") >= 0 ||
