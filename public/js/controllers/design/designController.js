@@ -789,12 +789,11 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                         var innerUL = $("#finalScrap").children('#scrapTree').children('ul').children().children('#scraplist');
 
                         if (viewString.view != undefined) {
-
                             for (var i = 0; i < viewString.view.length; i++) {
-                                // if(viewString.scrapetype == 'caa'){
-                                    // var li = "<li  class='item select_all'><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='"+viewString.view[i].custname+"' class='ellipsis'>"+viewString.view[i].custname+"</span></a></li>";
-                                // }
-                                // else{
+                                if(viewString.scrapetype == 'caa'){
+                                    var li = "<li  class='item select_all'><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='"+viewString.view[i].custname+"' class='ellipsis'>"+viewString.view[i].custname+"</span></a></li>";
+                                }
+                                else{
                                     var path = viewString.view[i].xpath;
                                     var ob = viewString.view[i];
                                     addcusOb = '';
@@ -807,25 +806,13 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                                         imgTag = "input"
                                     } else imgTag = tag;
                                     if (path == "") addcusOb = 'addCustObj';
-                                    // if (tag == "a" || tag == "input" || tag == "table" || tag == "list" || tag == "select" || tag == "img" || tag == "button" || tag == "radiobutton" || tag == "checkbox" || tag == "tablecell") {
-                                    //     var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' /><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis " + addcusOb + "'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
-                                    // } 
-                                    // else {
-                                    if(ob.cord && ob.cord != ''){
-										addcusOb = ""
-                                        custN = custN,
-                                        ob.height = 53,
-                                        ob.hiddentag = "No",
-                                        ob.left = 198,
-                                        tag = "iris",
-                                        ob.top = 163,
-                                        ob.url = "",
-                                        ob.width = 91,
-                                        ob.xpath = ""                                        
-                                    }                                        
-                                    var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' /><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis " + addcusOb + "'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
-                                    // }                                       
-                                // }        
+                                    if (tag == "a" || tag == "input" || tag == "table" || tag == "list" || tag == "select" || tag == "img" || tag == "button" || tag == "radiobutton" || tag == "checkbox" || tag == "tablecell") {
+                                        var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' /><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis " + addcusOb + "'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
+                                    } 
+                                    else {
+                                        var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' /><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis " + addcusOb + "'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
+                                    }                                       
+                                }        
                                 angular.element(innerUL).append(li);                        
                             }
                             $(".checkStylebox, .checkall").prop("disabled", false);
@@ -1711,10 +1698,10 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                         if (eaCheckbox) {
                             //Getting the Existing Scrape Data
                             for (var i = 0; i < newScrapedList.view.length; i++) {
-                                // if(newScrapedList.scrapetype == 'caa'){
-                                //     var li = "<li  class='item select_all'><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='"+newScrapedList.view[i].custname+"'>"+newScrapedList.view[i].custname+"</span></a></li>";
-                                // }
-                                // else{
+                                if(newScrapedList.scrapetype == 'caa'){
+                                    var li = "<li  class='item select_all'><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='"+newScrapedList.view[i].custname+"'>"+newScrapedList.view[i].custname+"</span></a></li>";
+                                }
+                                else{
                                     var path = newScrapedList.view[i].xpath;
                                     var ob = newScrapedList.view[i];
                                     ob.tempId = i;
@@ -1725,25 +1712,12 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                                     } else if (tag == "textbox/textarea") {
                                         imgTag = "input"
                                     } else imgTag = tag;
-
-                                    if(ob.cord && ob.cord != ''){
-                                        custN = custN,
-                                        ob.height = 53,
-                                        ob.hiddentag = "No",
-                                        ob.left = 198,
-                                        tag = "iris",
-                                        ob.top = 163,
-                                        ob.url = "",
-                                        ob.width = 91,
-                                        ob.xpath = ""                                        
-                                    }           
-
-                                    // if (tag == "a" || tag == "input" || tag == "table" || tag == "list" || tag == "select" || tag == "img" || tag == "button" || tag == "radiobutton" || tag == "checkbox" || tag == "tablecell") {
-                                    //     var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
-                                    // } else {
-                                    var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
-                                    // }
-                                // }                                
+                                    if (tag == "a" || tag == "input" || tag == "table" || tag == "list" || tag == "select" || tag == "img" || tag == "button" || tag == "radiobutton" || tag == "checkbox" || tag == "tablecell") {
+                                        var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
+                                    } else {
+                                        var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
+                                    }
+                                }                                
 
                                 angular.element(innerUL).append(li);
                             }
@@ -1755,10 +1729,10 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                             function generateScrape() {
                                 var tempId = newScrapedList.view.length - 1;
                                 for (var i = 0; i < viewString.view.length; i++) {
-                                    // if(viewString.scrapetype == 'caa'){
-                                    //     var li = "<li  class='item select_all'><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='"+viewString.view[i].custname+"'>"+viewString.view[i].custname+"</span></a></li>";
-                                    // }
-                                    // else{
+                                    if(viewString.scrapetype == 'caa'){
+                                        var li = "<li  class='item select_all'><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='"+viewString.view[i].custname+"'>"+viewString.view[i].custname+"</span></a></li>";
+                                    }
+                                    else{
                                         tempId++
                                         var path = viewString.view[i].xpath;
                                         var ob = viewString.view[i];
@@ -1769,25 +1743,15 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                                         } else if (tag == "textbox/textarea") {
                                             imgTag = "input"
                                         } else imgTag = tag;
+                                        var tag1 = tag.replace(/ /g, "_");
+                                        var tag2;
     
-                                        // if (tag == "a" || tag == "input" || tag == "table" || tag == "list" || tag == "select" || tag == "img" || tag == "button" || tag == "radiobutton" || tag == "checkbox" || tag == "tablecell") {
-                                        //     var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
-                                        // } else {
-                                            if(ob.cord && ob.cord != ''){
-                                                custN = custN,
-                                                ob.height = 53,
-                                                ob.hiddentag = "No",
-                                                ob.left = 198,
-                                                tag = "iris",
-                                                ob.top = 163,
-                                                ob.url = "",
-                                                ob.width = 91,
-                                                ob.xpath = ""                                        
-                                            }      
+                                        if (tag == "a" || tag == "input" || tag == "table" || tag == "list" || tag == "select" || tag == "img" || tag == "button" || tag == "radiobutton" || tag == "checkbox" || tag == "tablecell") {
                                             var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
-                                        // }    
-                                  
-                                    // }                                    
+                                        } else {
+                                            var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
+                                        }    
+                                    }                                    
                                     angular.element(innerUL).append(li)
                                     //newScrapedList.view.push(viewString.view[i]);
                                 }
@@ -1805,10 +1769,10 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                             for (var i = 0; i < viewString.view.length; i++) {
                                 var innerUL = $("#finalScrap").children('#scrapTree').children('ul').children().children('#scraplist');
 
-                                // if(viewString.scrapetype == 'caa'){
-                                //     var li = "<li  class='item select_all'><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='"+viewString.view[i].custname+"'>"+viewString.view[i].custname+"</span></a></li>";
-                                // }
-                                // else{
+                                if(viewString.scrapetype == 'caa'){
+                                    var li = "<li  class='item select_all'><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='"+viewString.view[i].custname+"'>"+viewString.view[i].custname+"</span></a></li>";
+                                }
+                                else{
                                     var path = viewString.view[i].xpath;
                                     var ob = viewString.view[i];
                                     ob.tempId = i;
@@ -1819,23 +1783,14 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                                     } else if (tag == "textbox/textarea") {
                                         imgTag = "input"
                                     } else imgTag = tag;
-                                    // if (tag == "a" || tag == "input" || tag == "table" || tag == "list" || tag == "select" || tag == "img" || tag == "button" || tag == "radiobutton" || tag == "checkbox" || tag == "tablecell") {
-                                    //     var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
-                                    // } else {
-                                    if(ob.cord && ob.cord != ''){
-                                        custN = custN,
-                                        ob.height = 53,
-                                        ob.hiddentag = "No",
-                                        ob.left = 198,
-                                        tag = "iris",
-                                        ob.top = 163,
-                                        ob.url = "",
-                                        ob.width = 91,
-                                        ob.xpath = ""                                        
-                                    }                                        
-                                    var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
-                                    // }
-                                // }
+                                    var tag1 = tag.replace(/ /g, "_");
+                                    var tag2;
+                                    if (tag == "a" || tag == "input" || tag == "table" || tag == "list" || tag == "select" || tag == "img" || tag == "button" || tag == "radiobutton" || tag == "checkbox" || tag == "tablecell") {
+                                        var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
+                                    } else {
+                                        var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
+                                    }
+                                }
                                 angular.element(innerUL).append(li);
 
 
@@ -1843,7 +1798,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                             //Before Saving the Scrape JSON to the Database
                         }
 						$("li.item:visible").each(function() {
-                            if ($(this).attr('data-xpath') == "" && $(this).attr('data-tag') != "iris") {
+                            if ($(this).attr('data-xpath') == "") {
                                 $(this).children().find('span.ellipsis').addClass('customObject');
                             }
                         });
@@ -3929,7 +3884,7 @@ function contentTable(newTestScriptDataLS) {
                 $("#jqGrid").parent('div').css('height', 'auto');
                 if (getScrapeDataforCustomObj != "" && getScrapeDataforCustomObj != undefined) {
                     for (i = 0; i < getScrapeDataforCustomObj.length; i++) {
-                        if (getScrapeDataforCustomObj[i].xpath == "" && !getScrapeDataforCustomObj[i].cord) {
+                        if (getScrapeDataforCustomObj[i].xpath == "") {
                             var testGridData = $("#jqGrid tbody tr:not(.jqgfirstrow)");
                             $.each(testGridData, function() {
                                 debugger;
@@ -4874,6 +4829,9 @@ function contentTable(newTestScriptDataLS) {
                         } else if (obType == 'hyperlink' || obType == 'a') {
                             sc = Object.keys(keywordArrayList.link);
                             selectedKeywordList = "link";
+                        } else if(obType =='iris'){
+                            sc = Object.keys(keywordArrayList.iris);
+                            selectedKeywordList = "iris";
                         } else {
                             sc = Object.keys(keywordArrayList.element);
                             selectedKeywordList = "element";
@@ -4891,6 +4849,8 @@ function contentTable(newTestScriptDataLS) {
                         $grid.jqGrid('setCell', rowId, 'url', url);
                         $grid.jqGrid('setCell', rowId, 'objectName', objName);
                         $grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
+						if(obType == 'iris')
+                            $grid.jqGrid('setCell', rowId, 'cord',cord);
                         break;
                     } else if (appTypeLocal == 'MobileApp' &&
                         (obType.indexOf("RadioButton") >= 0 || obType.indexOf("ImageButton") >= 0 || obType.indexOf("Button") >= 0 || obType.indexOf("EditText") >= 0 ||
