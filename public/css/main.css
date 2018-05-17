@@ -3427,7 +3427,8 @@ li.select_all .addCustObj{
 }
 
 #updateReleaseCycle{
-  height: calc(100% - 255px);
+  /* height: calc(100% - 255px); */
+  height: calc(100% - 300px);
 }
 
 .addContainer{
@@ -5523,4 +5524,8 @@ ul.browserInlineIcons
     /* width: 14px; */
     display: inline;
     padding: 2px;
+}
+.removeScroll
+{
+    overflow: hidden !important;
 }
