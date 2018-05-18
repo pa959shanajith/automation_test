@@ -3026,7 +3026,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                         if (!duplicateXpathElements.hasOwnProperty(xpath)) {
                             duplicateXpathElements[xpath] = $(this).text();
                         } else {
-                            $(this).css('color', 'red').addClass('duplicateCustnames');
+                            $(this).css('color', 'red');
                             duplicateCustnames.push($(this).text());
                             isDuplicateXpath = true;
                             count = 1;
@@ -3037,7 +3037,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                             if (count == 0)
                                 duplicateCustnames.push($(this).text());
                             isDuplicateCustNames = true;
-                            $(this).css('color', 'red').addClass('duplicateCustnames');
+                            $(this).css('color', 'red');
                         }
                     } else {
                         xpath = "";
@@ -3046,7 +3046,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                         } else {
                             duplicateCustnames.push($(this).text());
                             isDuplicateCustNames = true;
-                            $(this).css('color', 'red').addClass('duplicateCustnames');
+                            $(this).css('color', 'red');
                         }
                     }
 
@@ -3607,7 +3607,6 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                     }
                     
                     
-                   
                     //console.log("CN",custnameIndices);
                     var custnameIndices = Object.values(custnameIndices);
                     for(var q=0;q<custnameIndices.length;q++)
@@ -3619,53 +3618,11 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                                 //console.log(custnameIndices[q][r]);
                                 var elements = document.getElementsByClassName("item");
                                 //console.log(elements[custnameIndices[q][r]]);
-                                $(elements[custnameIndices[q][r]]).show();
+                                $(elements[custnameIndices[q][r]]).show();             //Display Duplicate Custnames
                             }
                         }
                         
                     }
-                    // var processedArr = [];
-                    // $.each($("#scraplist li"), function() {
-                    //   var keyElement =   $.trim($(this)[0].childNodes[0].childNodes[2].innerHTML);
-                    //   if(custnameIndices.hasOwnProperty(keyElement) && processedArr.indexOf(keyElement) == -1)
-                    //   {
-                    //     processedArr.push(keyElement);
-                    //     for(var q=0;q<custnameIndices[keyElement].length - 1;q++)
-                    //     {
-                    //         console.log("Key",custnameIndices[keyElement]);
-                    //         console.log("q",custnameIndices[keyElement][q]);
-                    //         if($(this).val() == custnameIndices[keyElement][q])
-                    //         {
-                    //             $(this).show(); //Display duplicate custnames only
-                    //         }
-                    //     }
-                    //   }
-                      
-                    // });
-
-
-                   // console.log("pA",processedArr);
-                    
-
-                    //console.log("CUS",custnameCount);
-                    // for(var q=0;q<Object.keys(custnameCount).length;q++)
-                    // {
-                    //     if()
-                    // }
-                    // var sorted_custnames = allCustnames.slice().sort();
-                    // for (var p = 0; p < allCustnames.length - 1; p++) {
-                    //     if (sorted_custnames[p + 1] == sorted_custnames[p]) {
-                    //         duplicateCustnames.push(sorted_custnames[p]); //get duplicate custnames
-                    //     }
-                    // }
-                    // console.log("Duplicate Custnames", duplicateCustnames);
-                    // $.each($("#scraplist li"), function() {
-                    //     for (var q = 0; q < duplicateCustnames.length; q++) {
-                    //         if ($.trim($(this)[0].childNodes[0].childNodes[2].innerHTML) == $.trim(duplicateCustnames[q])) {
-                    //             $(this).show(); //Display duplicate custnames only
-                    //         }
-                    //     }
-                    // });
                 } else {
                     $.each($("#scraplist li"), function() {
                         if (gsElement[i] == $(this).data("tag") || ($(this).data("tag").toLowerCase().indexOf(gsElement[i].toLowerCase()) >= 0 && gsElement[i] != "a" && $(this).data("tag").toLowerCase() != "radio button" && $(this).data("tag").toLowerCase() != "radiobutton" && $(this).data("tag").toLowerCase().indexOf("listview") < 0 && $(this).data("tag").toLowerCase().indexOf("tablecell") < 0) ||
