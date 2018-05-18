@@ -17,7 +17,7 @@ var gsElement = [];
 window.localStorage['selectRowStepNo'] = '';
 window.localStorage['_modified'] = "";
 var getWSTemplateData = {} //Contains Webservice saved data
-var appType, projectId, projectDetails, screenName, testCaseName, subTaskType,subTask,draggedEle,getDraggedEle,allTasks;
+var appType, projectId, projectDetails, screenName, testCaseName, subTaskType, subTask, draggedEle, getDraggedEle, allTasks;
 var updatedViewString = {};
 var allScreenNames = [];
 var reusedScreens = [];
@@ -36,9 +36,9 @@ var copiedViewstring = false;
 var getIndexOfDeletedObjects = [];
 var newScrapedData;
 var saveScrapeDataFlag = false;
+var savedScrapeObjects = false;
 window.localStorage['disableEditing'] = "false";
-mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$location', '$timeout', 'DesignServices', 'mindmapServices','cfpLoadingBar', '$window', 'socket', function($scope, $rootScope, $http, $location, $timeout, DesignServices, mindmapServices,cfpLoadingBar, $window, socket) 
-{
+mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$location', '$timeout', 'DesignServices', 'mindmapServices', 'cfpLoadingBar', '$window', 'socket', function($scope, $rootScope, $http, $location, $timeout, DesignServices, mindmapServices, cfpLoadingBar, $window, socket) {
     $rootScope.compareFlag = false;
     $("body").css("background", "#eee");
     $("#tableActionButtons, .designTableDnd").delay(500).animate({
@@ -85,11 +85,11 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
         $scope.errorMessage = "";
     }
     //Default Function to reset all input, select
-    socket.on('ICEnotAvailable', function () {
+    socket.on('ICEnotAvailable', function() {
         unblockUI();
-		openDialog("Debug Testcase", "ICE Engine is not available. Please run the batch file and connect to the Server.");
-	});
-    var current_task=JSON.parse(window.localStorage['_CT']);
+        openDialog("Debug Testcase", "ICE Engine is not available. Please run the batch file and connect to the Server.");
+    });
+    var current_task = JSON.parse(window.localStorage['_CT']);
     var getTaskName = current_task.taskName;
     appType = current_task.appType;
     screenName = current_task.screenName;
@@ -97,10 +97,10 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
     subTaskType = current_task.subTaskType;
     subTask = current_task.subtask;
     status = current_task.status;
-	if(status=='review'){
-				$('.submitTaskBtn').text('Approve');
-				$('.reassignTaskBtn').show();
-	}
+    if (status == 'review') {
+        $('.submitTaskBtn').text('Approve');
+        $('.reassignTaskBtn').show();
+    }
 
     $("#page-taskName").empty().append('<span class="taskname">' + getTaskName + '</span>');
     $(".projectInfoWrap").empty()
@@ -148,7 +148,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 
     }, 3000)
 
-//console.log("screenName:", screenName);
+    //console.log("screenName:", screenName);
     // if (window.localStorage['_TJ']) {
     //     allTasks = JSON.parse(window.localStorage['_TJ']);
     //     if(allTasks.length > 0)
@@ -220,17 +220,16 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
     var keywordValArr = [];
     var proceed = false;
 
-//Submit Task Screen
-	$scope.submitTasksScreen = function(action){
-		$("#submitTasksScreen").modal("show")
-		if(action=='reassign'){
+    //Submit Task Screen
+    $scope.submitTasksScreen = function(action) {
+        $("#submitTasksScreen").modal("show")
+        if (action == 'reassign') {
             $scope.stask = 'reassign';
             $("#submitTasksScreen").find('.modal-title').text('Reassign Task');
-			$("#submitTasksScreen").find('.modal-body p').text('Are you sure you want to reassign the task ?')
-			//$("#submitTasksScreen").find('.modal-footer button')[0].setAttribute('ng-click',"submit_task('reassign')")
+            $("#submitTasksScreen").find('.modal-body p').text('Are you sure you want to reassign the task ?')
+            //$("#submitTasksScreen").find('.modal-footer button')[0].setAttribute('ng-click',"submit_task('reassign')")
         }
-        if(action == 'submit'  &&  $(".submitTaskBtn:visible").text() == 'Approve' )
-        {
+        if (action == 'submit' && $(".submitTaskBtn:visible").text() == 'Approve') {
             $scope.stask = 'approve';
             $("#submitTasksScreen").find('.modal-title').text('Approve Task');
             $("#submitTasksScreen").find('.modal-body p').text('Are you sure you want to approve the task ?')
@@ -239,21 +238,21 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
         //     $("#submitTasksScreen").find('.modal-footer button')[0].setAttribute('onclick',"submit_task('"+action+"')")
         // }
 
-	}
-	//Submit Task Screen
+    }
+    //Submit Task Screen
 
-	//Submit Tast Test Case
-	$scope.submitTasksTestCase = function(action){
-		
-		$("#submitTasksTestCase").modal("show")
-		if(action=='reassign'){
-            $scope.stask='reassign';
+    //Submit Tast Test Case
+    $scope.submitTasksTestCase = function(action) {
+
+        $("#submitTasksTestCase").modal("show")
+        if (action == 'reassign') {
+            $scope.stask = 'reassign';
             $("#submitTasksTestCase").find('.modal-title').text('Reassign Task');
-			$("#submitTasksTestCase").find('.modal-body p').text('Are you sure you want to reassign the task ?')
-			//$("#submitTasksTestCase").find('.modal-footer button')[0].setAttribute('ng-click',"submit_task('reassign')")
+            $("#submitTasksTestCase").find('.modal-body p').text('Are you sure you want to reassign the task ?')
+            //$("#submitTasksTestCase").find('.modal-footer button')[0].setAttribute('ng-click',"submit_task('reassign')")
         }
-        if(action == 'submit' &&  $(".submitTaskBtn:visible").text() == 'Approve')
-        {   $scope.stask='approve';
+        if (action == 'submit' && $(".submitTaskBtn:visible").text() == 'Approve') {
+            $scope.stask = 'approve';
             $("#submitTasksTestCase").find('.modal-title').text('Approve Task');
             $("#submitTasksTestCase").find('.modal-body p').text('Are you sure you want to approve the task ?')
         }
@@ -261,15 +260,15 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
         //     $("#submitTasksTestCase").find('.modal-footer button')[0].setAttribute('onclick',"submit_task('"+action+"')")
         // }
 
-	}
-	//Submit task Test Case
+    }
+    //Submit task Test Case
 
     $scope.readTestCase_ICE = function() {
         var taskInfo = JSON.parse(window.localStorage['_CT']);
         var screenId = taskInfo.screenId;
         var testCaseId = taskInfo.testCaseId;
         var testCaseName = taskInfo.testCaseName;
-		var versionnumber = taskInfo.versionnumber;
+        var versionnumber = taskInfo.versionnumber;
         appType = taskInfo.appType;
         enabledEdit = "false";
         blockUI("Loading...");
@@ -335,8 +334,8 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                                                     "appType": appTypeLocal1,
                                                     "remarksStatus": "",
                                                     "remarks": "",
-                                                    "addTestCaseDetails":"",
-                                                    "addTestCaseDetailsInfo":""
+                                                    "addTestCaseDetails": "",
+                                                    "addTestCaseDetailsInfo": ""
                                                 }];
                                                 readTestCaseData = JSON.stringify(datalist);
                                                 $("#jqGrid").jqGrid('GridUnload');
@@ -364,7 +363,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                                                         testcaseArray.push(testcase[i]);
                                                     }
                                                 }
-                                              //  console.log("readTestCase:::", testcaseArray)
+                                                //  console.log("readTestCase:::", testcaseArray)
 
                                                 readTestCaseData = JSON.stringify(testcaseArray)
                                                 $("#jqGrid_addNewTestScript").jqGrid('clearGridData');
@@ -399,7 +398,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
         browserType.push(selectedBrowserType)
         if (appType == "MobileWeb" || appType == "Mainframe") browserType = [];
         globalSelectedBrowserType = selectedBrowserType;
-        
+
         if (dependentTestCaseFlag == true) {
             testcaseID = checkedTestcases;
         } else {
@@ -409,33 +408,33 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
         var blockMsg = 'Debug in Progress. Please Wait...';
         blockUI(blockMsg);
         DesignServices.debugTestCase_ICE(browserType, testcaseID, appType)
-        .then(function(data) {
-            if (data == "Invalid Session") {
-                $rootScope.redirectPage();
-            }
-            if (data == "unavailableLocalServer") {
-                unblockUI();
-                openDialog("Debug Testcase", "ICE Engine is not available. Please run the batch file and connect to the Server.")
-            } else if (data == "success") {
-                unblockUI();
-                openDialog("Debug Testcase", "Debug completed successfully.")
-            } else if (data == "fail") {
-                unblockUI();
-                openDialog("Debug Testcase", "Failed to debug.")
-            } else if (data == "Terminate") {
-                unblockUI();
-                openDialog("Debug Testcase", "Debug Terminated")
-            } else if (data == "browserUnavailable") {
-                unblockUI();
-                openDialog("Debug Testcase", "Browser is not available")
-            } else if (data == "scheduleModeOn") {
-                unblockUI();
-                openDialog("Debug Testcase", "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.")
-            }
+            .then(function(data) {
+                if (data == "Invalid Session") {
+                    $rootScope.redirectPage();
+                }
+                if (data == "unavailableLocalServer") {
+                    unblockUI();
+                    openDialog("Debug Testcase", "ICE Engine is not available. Please run the batch file and connect to the Server.")
+                } else if (data == "success") {
+                    unblockUI();
+                    openDialog("Debug Testcase", "Debug completed successfully.")
+                } else if (data == "fail") {
+                    unblockUI();
+                    openDialog("Debug Testcase", "Failed to debug.")
+                } else if (data == "Terminate") {
+                    unblockUI();
+                    openDialog("Debug Testcase", "Debug Terminated")
+                } else if (data == "browserUnavailable") {
+                    unblockUI();
+                    openDialog("Debug Testcase", "Browser is not available")
+                } else if (data == "scheduleModeOn") {
+                    unblockUI();
+                    openDialog("Debug Testcase", "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.")
+                }
 
-        },function(error) {
-            console.log("Error while traversing while executing debugTestcase method!! \r\n " + (error.data));
-        });
+            }, function(error) {
+                console.log("Error while traversing while executing debugTestcase method!! \r\n " + (error.data));
+            });
     }; // browser invocation ends
 
     //Import Test case
@@ -445,7 +444,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
         var taskInfo = JSON.parse(window.localStorage['_CT']);
         var screenId = taskInfo.screenId;
         var testCaseId = taskInfo.testCaseId;
-		var versionnumber = taskInfo.versionnumber;
+        var versionnumber = taskInfo.versionnumber;
         var testCaseName = taskInfo.testCaseName;
         var appType = taskInfo.appType;
         var flag = false;
@@ -515,7 +514,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
         var screenId = taskInfo.screenId;
         var testCaseId = taskInfo.testCaseId;
         var testCaseName = taskInfo.testCaseName;
-		var versionnumber = taskInfo.versionnumber;
+        var versionnumber = taskInfo.versionnumber;
         var appType = taskInfo.appType;
         var flag = false;
         $("#overWriteJson").trigger("click");
@@ -525,7 +524,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                 var file = overWriteJson.files[0];
                 var textType = /json.*/;
                 var reader = new FileReader();
-                reader.onload = function(e) {                    
+                reader.onload = function(e) {
                     if ((file.name.split('.')[file.name.split('.').length - 1]).toLowerCase() == "json") {
                         var resultString = JSON.parse(reader.result);
                         for (i = 0; i < resultString.length; i++) {
@@ -542,7 +541,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                         } else {
                             DesignServices.updateTestCase_ICE(screenId, testCaseId, testCaseName, resultString, userInfo, versionnumber)
                                 .then(function(data) {
-                                   // console.log("hello");
+                                    // console.log("hello");
                                     if (data == "Invalid Session") {
                                         $rootScope.redirectPage();
                                     }
@@ -577,7 +576,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
         var screenId = taskInfo.screenId;
         var testCaseId = taskInfo.testCaseId;
         var testCaseName = taskInfo.testCaseName;
-		var versionnumber = taskInfo.versionnumber;
+        var versionnumber = taskInfo.versionnumber;
         var appType = taskInfo.appType;
         var flag = false;
         overWriteJson.addEventListener('change', function(e) {
@@ -728,13 +727,13 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
         }
     })
     //Enable Append Checkbox (if after checking the, browser doesn't enables)
-   
+
     //Populating Saved Scrape Data
     $scope.getScrapeData = function() {
         blockUI("Loading...");
         $('.scrollbar-compare').hide();
-		//window.localStorage['_modified'] = "";
-		modifiednames = [];
+        //window.localStorage['_modified'] = "";
+        modifiednames = [];
         $("#enableAppend").prop("checked", false)
         window.localStorage['checkEditWorking'] = "false";
         if ($("#finalScrap").find("#scrapTree").length == 0) {
@@ -745,8 +744,9 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
             $("#enableAppend").prop("disabled", false).css('cursor', 'pointer')
         }
         //enableScreenShotHighlight = true;
+
         DesignServices.getScrapeDataScreenLevel_ICE()
-            .then(function(data) {   
+            .then(function(data) {
                     if (data == "Invalid Session") {
                         $rootScope.redirectPage();
                     }
@@ -760,9 +760,9 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                     });
                     $(".filterObjects").removeClass("popupContent-filter-active").addClass("popupContent-default");
                     $(".thumb-ic").removeClass("thumb-ic-highlight");
-                
+                    $(".duplicateCustnames").removeClass("duplicateCustnames");
                     if (data != null && data != "getScrapeData Fail." && data != "" && data != " ") {
-                        
+
                         viewString = data;
 
                         newScrapedList = viewString
@@ -771,6 +771,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                         $("#finalScrap").empty()
                         if (jQuery.isEmptyObject(viewString)) {
                             console.log("Data is Empty");
+                            savedScrapeObjects = false;
                             $(".disableActions").addClass("enableActions").removeClass("disableActions");
                             $("#enableAppend").prop("disabled", true).css('cursor', 'no-drop');
                             $("#screenShotScrape").text("No Screenshot Available");
@@ -778,8 +779,9 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 
                             //return;
                         } else {
-
+                       
                             console.log("Data There");
+                            savedScrapeObjects = true;
                             $(".enableActions").addClass("disableActions").removeClass("enableActions");
                             $("#enableAppend").prop("disabled", false).css('cursor', 'pointer')
                         }
@@ -807,8 +809,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                                 if (path == "") addcusOb = 'addCustObj';
                                 if (tag == "a" || tag == "input" || tag == "table" || tag == "list" || tag == "select" || tag == "img" || tag == "button" || tag == "radiobutton" || tag == "checkbox" || tag == "tablecell") {
                                     var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' /><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis " + addcusOb + "'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
-                                } 
-								else {
+                                } else {
                                     var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' /><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis " + addcusOb + "'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
                                 }
                                 angular.element(innerUL).append(li);
@@ -834,18 +835,17 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                             if ($(".ellipsis").length > 0) {
                                 $("li.compareObjects").removeClass('disableActions compareObjectDisable').addClass('enableActions');
                                 $("li.generateObj").removeClass('disableActions addObjectDisable').addClass('enableActions');
-                                
+
                             } else {
                                 $("li.compareObjects").removeClass('enableActions').addClass('disableActions compareObjectDisable');
-                                $("li.generateObj").removeClass('enableActions').addClass('disableActions addObjectDisable');                                
+                                $("li.generateObj").removeClass('enableActions').addClass('disableActions addObjectDisable');
                             }
                         } else {
                             $("li.compareObjects").hide();
                         }
                     }
-                    if($(".ellipsis:visible").length == 0)
-                    {
-                       $(".checkStylebox").prop("disabled",true);
+                    if ($(".ellipsis:visible").length == 0) {
+                        $(".checkStylebox").prop("disabled", true);
                     }
                     unblockUI();
                 },
@@ -857,7 +857,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 
     //Disabling Filter
     $("a[title='Filter']").mouseover(function() {
-      
+
         if (viewString == "") {
             $(this).children("img").addClass("thumb-ic-disabled").removeClass("thumb-ic");
             $(this).parent().css("cursor", "no-drop");
@@ -868,8 +868,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
             $(this).children("img").addClass("thumb-ic").removeClass("thumb-ic-disabled");
             $(this).parent().css("cursor", "pointer");
         }
-        if($("#viewscrapedObjects").is(":visible") == true)
-        {
+        if ($("#viewscrapedObjects").is(":visible") == true) {
             $(this).parent().addClass('disableFilter');
         }
     })
@@ -1050,7 +1049,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
             scrapeObject.screenId = screenId;
             scrapeObject.screenName = screenName;
             scrapeObject.userinfo = userinfo;
-			scrapeObject.versionnumber = tasks.versionnumber;
+            scrapeObject.versionnumber = tasks.versionnumber;
             DesignServices.updateScreen_ICE(scrapeObject)
                 .then(function(data) {
                     if (data == "Invalid Session") {
@@ -1140,8 +1139,8 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                         "url": "",
                         "custname": "",
                         "remarks": [""],
-                        "addTestCaseDetails":"",
-                        "addTestCaseDetailsInfo":""
+                        "addTestCaseDetails": "",
+                        "addTestCaseDetailsInfo": ""
                     })
                 }
             }
@@ -1155,12 +1154,12 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                 "url": "",
                 "custname": "",
                 "remarks": [""],
-                "addTestCaseDetails":"",
-                "addTestCaseDetailsInfo":""
+                "addTestCaseDetails": "",
+                "addTestCaseDetailsInfo": ""
             })
             initWSJson.testcasename = "",
-            initWSJson.apptype = "Webservice",
-            initWSJson.testcase = testCaseWS
+                initWSJson.apptype = "Webservice",
+                initWSJson.testcase = testCaseWS
             DesignServices.initScrapeWS_ICE(initWSJson)
                 .then(function(data) {
                     if (data == "Invalid Session") {
@@ -1231,7 +1230,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                             openDialog("WSDL-Scrape Screen", "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.")
                             return false
                         }
-                      //  console.log(data)
+                        //  console.log(data)
                         $("#wsldSelect").empty().append('<option value selected disabled>Select Operation</option>')
                         for (i = 0; i < data.listofoperations.length; i++) {
                             $("#wsldSelect").append('<option value="' + data.listofoperations[i] + '">' + data.listofoperations[i] + '</option>')
@@ -1353,11 +1352,10 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                     screenViewObject.appType = $scope.getScreenView,
                         screenViewObject.applicationPath = $(document).find("#desktopPath").val();
                     $("#launchDesktopApps").modal("hide");
-                    if( $rootScope.compareFlag == true){
+                    if ($rootScope.compareFlag == true) {
                         blockUI(blockMsg2);
                         e.stopImmediatePropagation();
-                    }
-                    else{
+                    } else {
                         blockUI(blockMsg);
                         e.stopImmediatePropagation();
                     }
@@ -1375,11 +1373,10 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                         screenViewObject.applicationPath = $(document).find("#SAPPath").val();
                     $("#launchSAPApps").modal("hide");
                     //blockUI(blockMsg);
-                    if( $rootScope.compareFlag == true){
+                    if ($rootScope.compareFlag == true) {
                         blockUI(blockMsg2);
                         e.stopImmediatePropagation();
-                    }
-                    else{
+                    } else {
                         blockUI(blockMsg);
                         e.stopImmediatePropagation();
                     }
@@ -1405,14 +1402,13 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                         screenViewObject.mobileSerial = $(document).find("#mobilitySerialPath").val();
                         $("#launchMobilityApps").modal("hide");
                         // blockUI(blockMsg);
-                        if( $rootScope.compareFlag == true){
-                        blockUI(blockMsg2);
-                        e.stopImmediatePropagation();
-                    }
-                    else{
-                        blockUI(blockMsg);
-                        e.stopImmediatePropagation();
-                    }
+                        if ($rootScope.compareFlag == true) {
+                            blockUI(blockMsg2);
+                            e.stopImmediatePropagation();
+                        } else {
+                            blockUI(blockMsg);
+                            e.stopImmediatePropagation();
+                        }
                     }
                 } else if ($("#mobilityAPKPath").val().toLowerCase().indexOf(".ipa") >= 0 || $("#mobilityAPKPath").val().toLowerCase().indexOf(".app") >= 0) {
                     if ($(document).find("#mobilityAPKPath").val() == "") {
@@ -1436,11 +1432,10 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                         screenViewObject.mobileUDID = $(document).find("#mobilityUDID").val();
                         $("#launchMobilityApps").modal("hide");
                         // blockUI(blockMsg);
-                        if( $rootScope.compareFlag == true){
-                        blockUI(blockMsg2);
-                        e.stopImmediatePropagation();
-                        }
-                        else{
+                        if ($rootScope.compareFlag == true) {
+                            blockUI(blockMsg2);
+                            e.stopImmediatePropagation();
+                        } else {
                             blockUI(blockMsg);
                             e.stopImmediatePropagation();
                         }
@@ -1460,15 +1455,14 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                 } else {
                     $(document).find("#mobilityWebSerialNo, #mobilityAndroidVersion").removeClass("inputErrorBorder")
                     screenViewObject.appType = $scope.getScreenView,
-                    screenViewObject.mobileSerial = $(document).find("#mobilityWebSerialNo").val();
+                        screenViewObject.mobileSerial = $(document).find("#mobilityWebSerialNo").val();
                     screenViewObject.androidVersion = $(document).find("#mobilityAndroidVersion").val();
                     $("#launchMobilityWeb").modal("hide");
                     // blockUI(blockMsg);
-                    if( $rootScope.compareFlag == true){
+                    if ($rootScope.compareFlag == true) {
                         blockUI(blockMsg2);
                         e.stopImmediatePropagation();
-                    }
-                    else{
+                    } else {
                         blockUI(blockMsg);
                         e.stopImmediatePropagation();
                     }
@@ -1487,11 +1481,10 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                         screenViewObject.applicationPath = $(document).find("#OEBSPath").val();
                     $("#launchOEBSApps").modal("hide");
                     // blockUI(blockMsg);
-                    if( $rootScope.compareFlag == true){
+                    if ($rootScope.compareFlag == true) {
                         blockUI(blockMsg2);
                         e.stopImmediatePropagation();
-                    }
-                    else{
+                    } else {
                         blockUI(blockMsg);
                         e.stopImmediatePropagation();
                     }
@@ -1501,26 +1494,25 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 
             //For Web
             else {
-                if ( $rootScope.compareFlag == true) {
+                if ($rootScope.compareFlag == true) {
                     screenViewObject.viewString = viewString;
                     screenViewObject.action = "compare";
                 }
                 screenViewObject.browserType = browserType
                 // blockUI(blockMsg);
-                if( $rootScope.compareFlag == true){
-                        blockUI(blockMsg2);
-                        e.stopImmediatePropagation();
-                    }
-                    else{
-                        blockUI(blockMsg);
-                        e.stopImmediatePropagation();
-                    }
+                if ($rootScope.compareFlag == true) {
+                    blockUI(blockMsg2);
+                    e.stopImmediatePropagation();
+                } else {
+                    blockUI(blockMsg);
+                    e.stopImmediatePropagation();
+                }
             }
             //For Web
             DesignServices.initScraping_ICE(screenViewObject)
                 .then(function(data) {
                     //console.log("UI", data);
-                    
+                    savedScrapeObjects = false;
                     unblockUI();
                     //window.localStorage['disableEditing'] = "true";
                     if (data == "Invalid Session") {
@@ -1528,35 +1520,35 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                     } else if (data == "Response Body exceeds max. Limit.") {
                         openDialog("Scrape Screen", "Scraped data exceeds max. Limit.");
                         return false
-                    } else if(data == 'scheduleModeOn') {
+                    } else if (data == 'scheduleModeOn') {
                         eaCheckbox = false;
                         var scrapedObjectsLen = $("span.ellipsis").length;
-                        if(scrapedObjectsLen > 0) {
-                           $(".enableActions").removeClass("enableActions").addClass("disableActions");
+                        if (scrapedObjectsLen > 0) {
+                            $(".enableActions").removeClass("enableActions").addClass("disableActions");
                         } else {
-                           $(".disableActions").removeClass("disableActions").addClass("enableActions");
+                            $(".disableActions").removeClass("disableActions").addClass("enableActions");
                         }
-                        $("#enableAppend").prop('checked',false);
+                        $("#enableAppend").prop('checked', false);
                         openDialog("Scrape Screen", "Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.");
                         return false
                     } else if (data == "unavailableLocalServer") {
                         eaCheckbox = false;
                         var scrapedObjectsLen = $("span.ellipsis").length;
-                        if(scrapedObjectsLen > 0) {
-							$(".enableActions").removeClass("enableActions").addClass("disableActions");
+                        if (scrapedObjectsLen > 0) {
+                            $(".enableActions").removeClass("enableActions").addClass("disableActions");
                         } else {
                             $(".disableActions").removeClass("disableActions").addClass("enableActions");
                         }
-                        $("#enableAppend").prop('checked',false);
+                        $("#enableAppend").prop('checked', false);
                         openDialog("Scrape Screen", "ICE Engine is not available. Please run the batch file and connect to the Server.");
                         return false
                     } else if (data == "fail") {
                         openDialog("Scrape", "Failed to scrape.")
                         //$("#scrapeFailModal").modal("show");
                         return false
-					} else if (data == "Terminate") {
-						unblockUI();
-						openDialog("Scrape Screen", "Scrape Terminated")
+                    } else if (data == "Terminate") {
+                        unblockUI();
+                        openDialog("Scrape Screen", "Scrape Terminated")
                         return false
                     } else if (data == "wrongWindowName") {
                         openDialog("Scrape", "Wrong window name.")
@@ -1564,12 +1556,11 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                     //COMPARE & UPDATE SCRAPE OPERATION
                     if (data.action == "compare") {
                         unblockUI();
-                        if(data.status == 'SUCCESS')
-                        {
+                        if (data.status == 'SUCCESS') {
                             $('.scrollbar-compare, .saveCompareDiv').show();
                             updatedViewString = data;
                             $("#changedOrdList li,#compareUnchangedObjectsBox li ,#compareNotFoundObjectsBox li").empty();
-                           $("#viewscrapedObjects").show();
+                            $("#viewscrapedObjects").show();
                             //Hide Scrape Objects
                             $("#scrapTree,.fsScroll").hide();
                             if (data.view[0].changedobject.length > 0) {
@@ -1609,7 +1600,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                             }
                             if (data.view[1].notchangedobject.length > 0) {
                                 $("#compareUnchangedObjectsBox").show();
-    
+
                                 //unchanged objects list
                                 for (var j = 0; j < data.view[1].notchangedobject.length; j++) {
                                     var innerUL = $('.unchangedObjOrdList');
@@ -1634,7 +1625,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                                 }
                                 $(document).find('#unchangedOrdList').scrapTree({
                                     multipleSelection: {
-                                       // checkbox : checked,
+                                        // checkbox : checked,
                                         classes: ['.item .treeUnChangedObjects']
                                     },
                                     editable: false,
@@ -1643,7 +1634,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                             } else {
                                 $("#compareUnchangedObjectsBox").hide();
                             }
-                           // console.log("nf", data.view[2].notfoundobject);
+                            // console.log("nf", data.view[2].notfoundobject);
                             if (data.view[2].notfoundobject.length > 0) {
                                 $("#compareNotFoundObjectsBox, #saveComparedObjects").show();
                                 // //Objects not found
@@ -1679,23 +1670,23 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                             } else {
                                 $("#compareNotFoundObjectsBox").hide();
                             }
-                        }
-                        else{
-                            openDialog("Compare Objects","Failed to compare objects");
+                        } else {
+                            openDialog("Compare Objects", "Failed to compare objects");
                             $rootScope.compareFlag = false;
                             setTimeout(() => {
                                 $(".close:visible, .btn-default:visible").addClass('navigateToDesign');
-                                $(document).on('click','.navigateToDesign',function() {
+                                $(document).on('click', '.navigateToDesign', function() {
                                     $(".scrollbar-compare,.saveCompareDiv").hide(); //Hide Compare Div
                                     angular.element(document.getElementById("left-nav-section")).scope().getScrapeData();
                                     $("#scrapTree,.fsScroll").show(); //Show Scraped Objects
                                 });
                             }, 200);
-                            
+
                         }
-                       
+
                     } else {
                         saveScrapeDataFlag = false;
+
                         $('.scrollbar-compare').hide();
                         if (data.view.length > 0) {
                             $("#finalScrap").show();
@@ -1713,7 +1704,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                         $("#finalScrap").append("<div id='scrapTree' class='scrapTree'><ul><li><span class='parentObjContainer'><input title='Select all' type='checkbox' class='checkStylebox'/><span class='parentObject'><a id='aScrapper'>Select all </a><button id='saveObjects' class='btn btn-xs btn-xs-custom objBtn' style='margin-left: 10px'>Save</button><button data-toggle='modal' id='deleteObjects' data-target='#deleteObjectsModal' class='btn btn-xs btn-xs-custom objBtn' style='margin-right: 0' disabled>Delete</button></span><span class='searchScrapEle'><img src='imgs/ic-search-icon.png'></input></span><span><input type='text' class='searchScrapInput'></span></span><ul id='scraplist' class='scraplistStyle'></ul></li></ul></div>");
                         var innerUL = $("#finalScrap").children('#scrapTree').children('ul').children().children('#scraplist');
 
-                       // console.log("data", viewString);
+                        // console.log("data", viewString);
                         //If enable append is active
                         if (eaCheckbox) {
                             //Getting the Existing Scrape Data
@@ -1798,7 +1789,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                             }
                             //Before Saving the Scrape JSON to the Database
                         }
-						$("li.item:visible").each(function() {
+                        $("li.item:visible").each(function() {
                             if ($(this).attr('data-xpath') == "") {
                                 $(this).children().find('span.ellipsis').addClass('customObject');
                             }
@@ -1822,25 +1813,21 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                         } else $("#saveObjects").addClass('hide');
                     }
 
-                    if($("#compareChangedObjectsBox").is(":visible") == true || $("#compareNotFoundObjectsBox").is(":visible") == true)
-                    {
+                    if ($("#compareChangedObjectsBox").is(":visible") == true || $("#compareNotFoundObjectsBox").is(":visible") == true) {
                         $("#saveComparedObjects").show();
-                    }
-                    else{
+                    } else {
                         $("#saveComparedObjects").hide();
                     }
 
-                    if($("#compareChangedObjectsBox").is(":visible") == true || $("#compareNotFoundObjectsBox").is(":visible") == true || $("#compareUnchangedObjectsBox").is(":visible") == true)
-                    {
+                    if ($("#compareChangedObjectsBox").is(":visible") == true || $("#compareNotFoundObjectsBox").is(":visible") == true || $("#compareUnchangedObjectsBox").is(":visible") == true) {
                         $("#viewscrapedObjects").show();
                         $("#left-top-section,#left-bottom-section").addClass('disableClick');
-                      //  $("a[title='Filter']").parent().removeAttr( 'style' ).css("cursor", "no-drop");
-                    }
-                    else{
+                        //  $("a[title='Filter']").parent().removeAttr( 'style' ).css("cursor", "no-drop");
+                    } else {
                         $("#viewscrapedObjects").hide();
                     }
 
-                    $(document).on('click','#viewscrapedObjects',function() {
+                    $(document).on('click', '#viewscrapedObjects', function() {
                         $(".scrollbar-compare,.saveCompareDiv").hide(); //Hide Compare Div
                         angular.element(document.getElementById("left-nav-section")).scope().getScrapeData();
                         $("#scrapTree,.fsScroll").show(); //Show Scraped Objects
@@ -1859,9 +1846,9 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
         var scrapeObject = {};
         var updatedSelection = [];
         scrapeObject.param = 'updateComparedObjects';
-        $("#changedOrdList").find("input[type='checkbox'].checkCompareAll:checked").each(function () {
-          var id= parseInt($(this).parent().attr('id').split('_')[1]);
-          updatedSelection.push( updatedViewString.view[0].changedobject[id]);
+        $("#changedOrdList").find("input[type='checkbox'].checkCompareAll:checked").each(function() {
+            var id = parseInt($(this).parent().attr('id').split('_')[1]);
+            updatedSelection.push(updatedViewString.view[0].changedobject[id]);
         });
         updatedViewString.view[0].changedobject = updatedSelection;
         scrapeObject.updatedViewString = updatedViewString;
@@ -1870,7 +1857,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
         scrapeObject.screenName = tasks.screenName;
         scrapeObject.projectId = tasks.projectId;
         scrapeObject.appType = tasks.app
-		scrapeObject.versionnumber = tasks.versionnumber;
+        scrapeObject.versionnumber = tasks.versionnumber;
         DesignServices.updateScreen_ICE(scrapeObject)
             .then(function(data) {
                 //console.log("out", data);
@@ -1882,13 +1869,13 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                     $("#compareBox").modal("show");
                     $("#compareBox .modal-body p").text("Scraped data updated successfully.");
                     $(document).on('click', '#btnNavDesign', function() {
-                          $(".scrollbar-compare,.saveCompareDiv").hide(); //Hide Compare Div
-                          angular.element(document.getElementById("left-nav-section")).scope().getScrapeData();
-                          $("#scrapTree,.fsScroll").show(); //Show Scraped Objects
-                          $rootScope.compareFlag = false;
-                          $("#left-top-section,#left-bottom-section").removeClass('disableClick');
-                          $("#changedOrdList li,#compareUnchangedObjectsBox li ,#compareNotFoundObjectsBox li").empty();
-                       //window.location.href = "/design";
+                        $(".scrollbar-compare,.saveCompareDiv").hide(); //Hide Compare Div
+                        angular.element(document.getElementById("left-nav-section")).scope().getScrapeData();
+                        $("#scrapTree,.fsScroll").show(); //Show Scraped Objects
+                        $rootScope.compareFlag = false;
+                        $("#left-top-section,#left-bottom-section").removeClass('disableClick');
+                        $("#changedOrdList li,#compareUnchangedObjectsBox li ,#compareNotFoundObjectsBox li").empty();
+                        //window.location.href = "/design";
                     });
                 } else {
                     openDialog("Compared Objects", "Failed to update objects");
@@ -1906,88 +1893,79 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
         //$("#viewScrapedObjects").show();
     });
     $(document).on('shown.bs.modal', '#deleteObjectsModal', function() {
-        var task=JSON.parse(window.localStorage['_CT'])
-       if (task.reuse == 'True') {
+        var task = JSON.parse(window.localStorage['_CT'])
+        if (task.reuse == 'True') {
             $("#deleteObjectsModal").find('.modal-body p').text("Screen is been reused. Are you sure you want to delete objects?").css('color', 'black');
-        } else 
-        {
+        } else {
             $("#deleteObjectsModal").find('.modal-body p').text("Are you sure you want to delete objects?").css('color', 'black');
         }
     });
 
     //Delete Scraped Objects
-    function deleteScrapedObjects()
-    {
+    function deleteScrapedObjects() {
         var totalElements = $(".ellipsis").length;
         var selectedElements = $("input[type=checkbox].checkall:checked:visible").length;
-       // var currentElements = $(".ellipsis:visible").length
+        // var currentElements = $(".ellipsis:visible").length
         var filterActiveLen = $(".popupContent-filter-active").length;
         //Delete All Elements
-        if(totalElements == selectedElements)
-        {
+        if (totalElements == selectedElements) {
             $("#scraplist").empty();
             var currentElements = $(".ellipsis:visible").length;
             $("a.disableActions").removeClass("disableActions");
             $("li.compareObjects").removeClass('enableActions').addClass('disableActions compareObjectDisable');
             $("li.generateObj").removeClass('enableActions').addClass('disableActions addObjectDisable');
-            
+
             getIndexOfDeletedObjects = []
             viewString = {};
-            if(newScrapedList != undefined){
+            if (newScrapedList != undefined) {
                 newScrapedList.view = [];
                 newScrapedList.mirror = "";
             }
-                if(currentElements > 0)
-                {
-                    $("#deleteObjects,#saveObjects").prop("disabled", false);
-                    $(".checkStylebox").prop("checked", false);
-                }
-                else{
-                    $("#deleteObjects,.checkStylebox").prop("disabled", true);
-                    $(".checkStylebox").prop("checked", false);
-                    $(".popupContent-filter-active").trigger('click');
-                    $("#saveObjects").prop("disabled", false);
-                }
+            if (currentElements > 0) {
+                $("#deleteObjects,#saveObjects").prop("disabled", false);
+                $(".checkStylebox").prop("checked", false);
+            } else {
+                $("#deleteObjects,.checkStylebox").prop("disabled", true);
+                $(".checkStylebox").prop("checked", false);
+                $(".popupContent-filter-active").trigger('click');
+                $("#saveObjects").prop("disabled", false);
             }
-      else{
+        } else {
             //Delete Selected Elements
-          $.each($("input[type=checkbox].checkall:checked"), function() {
-             $(this).parents("li.select_all").remove();
-             var json ={
-                "xpath": $(this).closest("li").attr('data-xpath'),
-                "url": $(this).closest("li").attr('data-xpath'),
-                "top":  $(this).closest("li").attr('data-top'),
-                "hiddentag":  $(this).closest("li").attr('data-hiddentag'),
-                "height":  $(this).closest("li").attr('data-height'),
-                "custname":  $(this).parent().next("span.ellipsis").text(),
-                "width":  $(this).closest("li").attr('data-width'),
-                "tag":  $(this).closest("li").attr('data-tag'),
-                "left":  $(this).closest("li").attr('data-left'),
-                "tempId":  parseInt($(this).closest("li").attr('val'))
-            };
-            getIndexOfDeletedObjects.push(json);
-          })
-           var currentElements = $(".ellipsis:visible").length;
-          if(currentElements > 0)
-          {
-              $("#saveObjects").prop("disabled", false);
-              $(".checkStylebox").prop("checked", false);
-              $("#deleteObjects").prop("disabled", true);
-          }
-          else{
-              $("#deleteObjects,.checkStylebox").prop("disabled", true);
-              $(".checkStylebox").prop("checked", false);
-              $(".popupContent-filter-active").trigger('click');
-              $("#saveObjects").prop("disabled", false);
-          }
-      }
-     
+            $.each($("input[type=checkbox].checkall:checked"), function() {
+                $(this).parents("li.select_all").remove();
+                var json = {
+                    "xpath": $(this).closest("li").attr('data-xpath'),
+                    "url": $(this).closest("li").attr('data-xpath'),
+                    "top": $(this).closest("li").attr('data-top'),
+                    "hiddentag": $(this).closest("li").attr('data-hiddentag'),
+                    "height": $(this).closest("li").attr('data-height'),
+                    "custname": $(this).parent().next("span.ellipsis").text(),
+                    "width": $(this).closest("li").attr('data-width'),
+                    "tag": $(this).closest("li").attr('data-tag'),
+                    "left": $(this).closest("li").attr('data-left'),
+                    "tempId": parseInt($(this).closest("li").attr('val'))
+                };
+                getIndexOfDeletedObjects.push(json);
+            })
+            var currentElements = $(".ellipsis:visible").length;
+            if (currentElements > 0) {
+                $("#saveObjects").prop("disabled", false);
+                $(".checkStylebox").prop("checked", false);
+                $("#deleteObjects").prop("disabled", true);
+            } else {
+                $("#deleteObjects,.checkStylebox").prop("disabled", true);
+                $(".checkStylebox").prop("checked", false);
+                $(".popupContent-filter-active").trigger('click');
+                $("#saveObjects").prop("disabled", false);
+            }
+        }
+
     }
 
     //To delete Scrape Objects
     $scope.del_Objects = function() {
         $("#deleteObjectsModal").modal("hide");
-       
         if (deleteScrapeDataservice) {
             var userinfo = JSON.parse(window.localStorage['_UI']);
             //var tasks = JSON.parse(window.localStorage['_TJ']);
@@ -2016,34 +1994,33 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 
             //updating renamed objects
             var tempModifiednames;
-            if(window.localStorage['_modified']){
+            if (window.localStorage['_modified']) {
                 modifiednames = JSON.parse(window.localStorage['_modified']);
                 tempModifiednames = JSON.parse(window.localStorage['_modified']);
             }
             if (eaCheckbox) {
-                if(copiedViewstring != true){
+                if (copiedViewstring != true) {
                     for (var j = 0; j < viewString.view.length; j++) {
                         newScrapedList.view.push(viewString.view[j]);
                     }
                     copiedViewstring = true;
                 }
             }
-            if(modifiednames.length > 0){
+            if (modifiednames.length > 0) {
                 var mdName;
-                for(var i=0; i<modifiednames.length; i++){
+                for (var i = 0; i < modifiednames.length; i++) {
                     mdName = modifiednames[i].split("^^");
-                    if (eaCheckbox){
-                        if(mdName[1] != undefined){
-                            if(newScrapedList.view[mdName[1]])
+                    if (eaCheckbox) {
+                        if (mdName[1] != undefined) {
+                            if (newScrapedList.view[mdName[1]])
                                 newScrapedList.view[mdName[1]].custname = mdName[0];
                             tempModifiednames[i] = mdName[0];
                             //tempModifiednames = tempModifiednames.filter(function(n) {return n != null});
                             window.localStorage['_modified'] = JSON.stringify(tempModifiednames)
                         }
-                    }
-                    else{
-                        if(mdName[1] != undefined){
-                            if(viewString.view[mdName[1]])                         
+                    } else {
+                        if (mdName[1] != undefined) {
+                            if (viewString.view[mdName[1]])
                                 viewString.view[mdName[1]].custname = mdName[0];
                             tempModifiednames[i] = mdName[0];
                             //tempModifiednames = tempModifiednames.filter(function(n) {return n != null});
@@ -2052,38 +2029,37 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                     }
                 }
             }
-              //Delete all objects ------------------------------------------
-              deleteScrapedObjects();
-              $("#saveObjects").trigger('click');
+            //Delete all objects ------------------------------------------
+            deleteScrapedObjects();
+            $("#saveObjects").trigger('click');
         } else {
             var tempModifiednames;
-            if(window.localStorage['_modified']){
+            if (window.localStorage['_modified']) {
                 modifiednames = JSON.parse(window.localStorage['_modified']);
                 tempModifiednames = JSON.parse(window.localStorage['_modified']);
             }
             if (eaCheckbox) {
-                if(copiedViewstring != true){
+                if (copiedViewstring != true) {
                     for (var j = 0; j < viewString.view.length; j++) {
                         newScrapedList.view.push(viewString.view[j]);
                     }
                     copiedViewstring = true;
                 }
-            }            
-            if(modifiednames.length > 0){
+            }
+            if (modifiednames.length > 0) {
                 var mdName;
-                for(var i=0; i<modifiednames.length; i++){
+                for (var i = 0; i < modifiednames.length; i++) {
                     mdName = modifiednames[i].split("^^");
-                    if (eaCheckbox){
-                        if(mdName[1] != undefined){
-                            if(newScrapedList.view[mdName[1]])
+                    if (eaCheckbox) {
+                        if (mdName[1] != undefined) {
+                            if (newScrapedList.view[mdName[1]])
                                 newScrapedList.view[mdName[1]].custname = mdName[0];
                             tempModifiednames[i] = mdName[0];
                             window.localStorage['_modified'] = JSON.stringify(tempModifiednames)
                         }
-                    }
-                    else{
-                        if(mdName[1] != undefined){
-                            if(viewString.view[mdName[1]])                           
+                    } else {
+                        if (mdName[1] != undefined) {
+                            if (viewString.view[mdName[1]])
                                 viewString.view[mdName[1]].custname = mdName[0];
                             tempModifiednames[i] = mdName[0];
                             window.localStorage['_modified'] = JSON.stringify(tempModifiednames)
@@ -2094,94 +2070,77 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
             if ($(".parentObjContainer").find(".checkStylebox").is(":checked") && saveScrapeDataFlag == true) {
                 viewString.view = [];
                 viewString.mirror = "";
-                if(newScrapedList != undefined){
+                if (newScrapedList != undefined) {
                     newScrapedList.view = [];
                     newScrapedList.mirror = "";
                 }
                 var totalElements = $(".ellipsis").length;
                 var selectedElements = $(".ellipsis:visible").length;
-                if(totalElements == selectedElements)
-                {
+                if (totalElements == selectedElements) {
                     $("#scraplist").empty();
-                }
-                else{
+                } else {
                     $("#scraplist").children("li:visible").empty();
                 }
                 var currentElements = $(".ellipsis:visible").length;
-                if(currentElements > 0)
-                {
+                if (currentElements > 0) {
                     $("#deleteObjects,#saveObjects").prop("disabled", false);
                     $(".checkStylebox").prop("checked", false);
-                }
-                else{
+                } else {
                     $("#deleteObjects,.checkStylebox").prop("disabled", true);
                     $(".checkStylebox").prop("checked", false);
-                  
+
                 }
             } else if (!$("input[type=checkbox].checkall").is(":checked")) {
                 openDialog("Delete Scrape data", "Please select objects to delete.")
             } else {
-                if (eaCheckbox){
-                    var totalElements = $(".ellipsis").length;
-                    var selectedElements = $("input[type=checkbox].checkall:checked:visible").length;
-                    if(totalElements == selectedElements)
-                    {
-                        $("#scraplist").empty();
-                        var currentElements = $(".ellipsis:visible").length;
-                        $("a.disableActions").removeClass("disableActions");
-                        $("li.compareObjects").removeClass('enableActions').addClass('disableActions compareObjectDisable');
-                        $("li.generateObj").removeClass('enableActions').addClass('disableActions addObjectDisable');
-                        
-                        getIndexOfDeletedObjects = []
-                        viewString = {};
-                        if(newScrapedList != undefined){
-                            newScrapedList.view = [];
-                            newScrapedList.mirror = "";
+                if (eaCheckbox) {
+                    var dontChkViewString = 0;
+                    $.each($("input[type=checkbox].checkall:checked"), function() {
+                        for (var i = 0; i < newScrapedList.view.length; i++) {
+                            if ($(this).parents("li").data("xpath") == newScrapedList.view[i].xpath && ($(this).parent('.objectNames').siblings(".ellipsis").text().trim().replace('/\s/g', ' ')).replace('\n', ' ') == newScrapedList.view[i].custname.trim()) {
+                                if (!(isInArray(newScrapedList.view.indexOf(newScrapedList.view[i]), getIndexOfDeletedObjects))) {
+                                    getIndexOfDeletedObjects.push(newScrapedList.view.indexOf(newScrapedList.view[i]))
+                                    $(this).parents("li.select_all").remove();
+                                    dontChkViewString++;
+                                    break;
+                                }
+                            }
                         }
-                    }
-                    else{
-                        var dontChkViewString = 0;
-                        $.each($("input[type=checkbox].checkall:checked"), function() {  
-                            for (var i = 0; i < newScrapedList.view.length; i++) {
-                                if ($(this).parents("li").data("xpath") == newScrapedList.view[i].xpath && ($(this).parent('.objectNames').siblings(".ellipsis").text().trim().replace('/\s/g', ' ')).replace('\n', ' ') == newScrapedList.view[i].custname.trim()) {
-                                    if(!(isInArray(newScrapedList.view.indexOf(newScrapedList.view[i]), getIndexOfDeletedObjects))){
-                                        getIndexOfDeletedObjects.push(newScrapedList.view.indexOf(newScrapedList.view[i]))
+                    })
+                    if ($("input[type=checkbox].checkall:checked").length != dontChkViewString) {
+                        $.each($("input[type=checkbox].checkall:checked"), function() {
+                            for (var i = 0; i < viewString.view.length; i++) {
+                                if ($(this).parents("li").data("xpath") == viewString.view[i].xpath && ($(this).parent('.objectNames').siblings(".ellipsis").text().trim().replace('/\s/g', ' ')).replace('\n', ' ') == viewString.view[i].custname.trim()) {
+                                    if (!(isInArray(viewString.view.indexOf(viewString.view[i]), getIndexOfDeletedObjects))) {
+                                        getIndexOfDeletedObjects.push(viewString.view.indexOf(viewString.view[i]))
                                         $(this).parents("li.select_all").remove();
-                                        dontChkViewString++;
                                         break;
                                     }
                                 }
                             }
                         })
-                        if($("input[type=checkbox].checkall:checked").length != dontChkViewString){ 
-                            $.each($("input[type=checkbox].checkall:checked"), function() {
-                                for (var i = 0; i < viewString.view.length; i++) {
-                                    if ($(this).parents("li").data("xpath") == viewString.view[i].xpath && ($(this).parent('.objectNames').siblings(".ellipsis").text().trim().replace('/\s/g', ' ')).replace('\n', ' ') == viewString.view[i].custname.trim()) {
-                                        if(!(isInArray(viewString.view.indexOf(viewString.view[i]), getIndexOfDeletedObjects))){
-                                            getIndexOfDeletedObjects.push(viewString.view.indexOf(viewString.view[i]))
-                                            $(this).parents("li.select_all").remove();
-                                            break;
-                                        }
-                                    }
-                                }
-                            })
+                    }
+                    // }
+                    if (savedScrapeObjects == false) {
+                        var currentElements = $("span.ellipsis:visible").length;
+                        if (currentElements == 0) {
+                            $("#saveObjects").prop('disabled', true);
+                            $(".checkStylebox").prop('checked', false);
+                        } else {
+                            $("#saveObjects").prop('disabled', false);
                         }
                     }
-                }
-                else{
-                        deleteScrapedObjects();  
+                } else {
+                    deleteScrapedObjects();
                 }
                 $("#deleteObjects").prop("disabled", true);
             }
         }
-        if($(".ellipsis").length == 0)
-        {
-           $(".checkStylebox").prop('disabled', true);
-           if(saveScrapeDataFlag == false)
-           {
-             $("#saveObjects").prop("disabled", true);
-           }
-          
+        if ($(".ellipsis").length == 0) {
+            $(".checkStylebox").prop('disabled', true);
+            if (saveScrapeDataFlag == false) {
+                $("#saveObjects").prop("disabled", true);
+            }
         }
     }
 
@@ -2207,7 +2166,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
         var count = 0;
         var numberOfElems = 0;
         var value = $(this).val();
-        
+
         $(".select_all").each(function() {
             if ($(this).find("span.ellipsis").text().toLowerCase().indexOf(value.toLowerCase()) > -1) {
                 numberOfElems++;
@@ -2223,28 +2182,24 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 
         if (numberOfElems == 0) {
             $("#deleteObjects,.checkStylebox").prop("disabled", true);
-         } 
-        else {
+        } else {
             $("#deleteObjects,.checkStylebox").prop("disabled", false);
         }
-      //  var checkedLen = $(".ellipsis:checked").length;
+        //  var checkedLen = $(".ellipsis:checked").length;
         var checkedLen = $("#scraplist li").children('a').find('input[type=checkbox].checkall:checked:visible').length;
-        if(checkedLen == 0)
-        {
+        if (checkedLen == 0) {
             $("#deleteObjects").prop("disabled", true);
         }
         if (numberOfElems == 0 && count == 0) {
             $('.checkStylebox').prop("checked", false);
         }
         if (numberOfElems != 0 && count == 0) {
-            if($("#scraplist li").children('a').find('input[type=checkbox].checkall:checked:visible').length > 0)
-            {
+            if ($("#scraplist li").children('a').find('input[type=checkbox].checkall:checked:visible').length > 0) {
                 $('.checkStylebox').prop("checked", true);
-            }
-            else{
+            } else {
                 $('.checkStylebox').prop("checked", false);
             }
-           
+
         } else {
             $('.checkStylebox').prop("checked", false);
         }
@@ -2264,40 +2219,37 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
         }
         //console.log(data)
         var rect, type, ref, name, id, value, label, visible, l10n, source;
-        if (appType == "MobileWeb" ) {
-            if(parseInt(viewString.mirrorwidth) > 500)
-            {
-                x = (parseInt(data.rslt.obj.data("left") * 490)/ parseInt(viewString.mirrorwidth))
-                y = (parseInt(data.rslt.obj.data("top") * 761)/ parseInt(viewString.mirrorheight))
-                w = (parseInt(data.rslt.obj.data("width") * 490)/ parseInt(viewString.mirrorwidth))
-                h = (parseInt(data.rslt.obj.data("height") * 761)/ parseInt(viewString.mirrorheight))
-                  rect = {
-                            x: x.toString(),
-                            y: y.toString(),
-                            w: w.toString(),
-                            h: h.toString()
-                        }
-
-            }
-             else{
-             rect = {
-                        x: data.rslt.obj.data("left"),
-                        y: data.rslt.obj.data("top"),
-                        w: data.rslt.obj.data("width"),
-                        h: data.rslt.obj.data("height")
-                    }
+        if (appType == "MobileWeb") {
+            if (parseInt(viewString.mirrorwidth) > 500) {
+                x = (parseInt(data.rslt.obj.data("left") * 490) / parseInt(viewString.mirrorwidth))
+                y = (parseInt(data.rslt.obj.data("top") * 761) / parseInt(viewString.mirrorheight))
+                w = (parseInt(data.rslt.obj.data("width") * 490) / parseInt(viewString.mirrorwidth))
+                h = (parseInt(data.rslt.obj.data("height") * 761) / parseInt(viewString.mirrorheight))
+                rect = {
+                    x: x.toString(),
+                    y: y.toString(),
+                    w: w.toString(),
+                    h: h.toString()
                 }
 
+            } else {
+                rect = {
+                    x: data.rslt.obj.data("left"),
+                    y: data.rslt.obj.data("top"),
+                    w: data.rslt.obj.data("width"),
+                    h: data.rslt.obj.data("height")
+                }
+            }
+
+        } else {
+            rect = {
+                x: data.rslt.obj.data("left"),
+                y: data.rslt.obj.data("top"),
+                w: data.rslt.obj.data("width"),
+                h: data.rslt.obj.data("height")
+            }
         }
-        else{
-             rect = {
-                        x: data.rslt.obj.data("left"),
-                        y: data.rslt.obj.data("top"),
-                        w: data.rslt.obj.data("width"),
-                        h: data.rslt.obj.data("height")
-                    }
-        }
-       
+
 
         type = data.rslt.obj.data("tag");
         ref = data.rslt.obj.data("reference");
@@ -2336,7 +2288,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                     d.css('width', (rect.w / 3) + 'px');
                 } else if (navigator.appVersion.indexOf("Mac") != -1) {
                     d.css('left', rect.x + 'px');
-                    if(rect.y > 450) d.css('top', (rect.y - 12) + 'px');
+                    if (rect.y > 450) d.css('top', (rect.y - 12) + 'px');
                     else d.css('top', rect.y + 'px');
                     d.css('height', rect.h + 'px');
                     d.css('width', rect.w + 'px');
@@ -2348,20 +2300,18 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                     d.css('height', rect.h + 'px');
                     d.css('width', rect.w + 'px');
                 } else {
-                     if(parseInt(viewString.mirrorwidth) > 500)
-                     {
-                            d.css('left', (rect.x) + 'px');
-                            d.css('top', (rect.y) + 'px');
-                            d.css('height', rect.h + 'px');
-                            d.css('width', rect.w + 'px');
-                     }
-                     else{
-                            d.css('left', (rect.x - 2) + 'px');
-                            d.css('top', (rect.y - 6) + 'px');
-                            d.css('height', rect.h + 'px');
-                            d.css('width', rect.w + 'px');
-                     }
-                   
+                    if (parseInt(viewString.mirrorwidth) > 500) {
+                        d.css('left', (rect.x) + 'px');
+                        d.css('top', (rect.y) + 'px');
+                        d.css('height', rect.h + 'px');
+                        d.css('width', rect.w + 'px');
+                    } else {
+                        d.css('left', (rect.x - 2) + 'px');
+                        d.css('top', (rect.y - 6) + 'px');
+                        d.css('height', rect.h + 'px');
+                        d.css('width', rect.w + 'px');
+                    }
+
                 }
             } else if (appType == "SAP") {
                 d.css('left', (Math.round(rect.x) * scale_highlight) + 3 + 'px');
@@ -2379,12 +2329,18 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
             d.css('z-index', '3');
             d.css('opacity', '0.7');
             getTopValue = Math.round(rect.y) * scale_highlight + 'px';
-            getTopValueios = Math.round(rect.y) * scale_highlight +100+ 'px'
+            getTopValueios = Math.round(rect.y) * scale_highlight + 100 + 'px'
             if (appType == "MobileApp")
-                if(navigator.appVersion.indexOf("Mac") != -1) $(".scroll-wrapper > .scrollbar-screenshot").animate({scrollTop: parseInt(getTopValueios)}, 500);
-                else $(".scroll-wrapper > .scrollbar-screenshot").animate({scrollTop: parseInt(Math.round(rect.y) - 600) + 'px'}, 500);
+                if (navigator.appVersion.indexOf("Mac") != -1) $(".scroll-wrapper > .scrollbar-screenshot").animate({
+                    scrollTop: parseInt(getTopValueios)
+                }, 500);
+                else $(".scroll-wrapper > .scrollbar-screenshot").animate({
+                    scrollTop: parseInt(Math.round(rect.y) - 600) + 'px'
+                }, 500);
             else
-                $(".scroll-wrapper > .scrollbar-screenshot").animate({scrollTop: parseInt(getTopValue)}, 500);
+                $(".scroll-wrapper > .scrollbar-screenshot").animate({
+                    scrollTop: parseInt(getTopValue)
+                }, 500);
             //$('.scroll-wrapper > .scrollbar-screenshot').scrollTo(d.offset().top);
             var color;
             if (translationFound) {
@@ -2426,7 +2382,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                 obj: $("#" + uid).find(".focus-highlight").closest("li")
             }
         }
-       // console.log(data)
+        // console.log(data)
         var rect, type, ref, name, id, value, label, visible, l10n, source;
         rect = {
             x: data.rslt.obj.data("left"),
@@ -2500,15 +2456,15 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
             $(".hightlight").remove();
         }
         DesignServices.highlightScrapElement_ICE(xpath, url, appType)
-        .then(function(data) {
-            if (data == "Invalid Session") {
-                $rootScope.redirectPage();
-            }
-            if (data == "fail") {
-                openDialog("Fail", "Failed to highlight")
-            }
-            console.log("success!::::" + data);
-        }, function(error) {});
+            .then(function(data) {
+                if (data == "Invalid Session") {
+                    $rootScope.redirectPage();
+                }
+                if (data == "fail") {
+                    openDialog("Fail", "Failed to highlight")
+                }
+                console.log("success!::::" + data);
+            }, function(error) {});
         //}
     };
     //Highlight compared and updated objects
@@ -2525,8 +2481,8 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
         $("#addObjContainer").empty()
         if ($(".addObj-row").length > 1) $(".addObj-row").remove()
         $("#addObjContainer").append('<div class="row row-modal addObj-row"><div class="form-group"><input type="text" class="form-control form-control-custom" placeholder="Enter object name"></div><div class="form-group form-group-2"><select class="form-control form-control-custom"><option selected disabled>Select Object Type</option><option value="a">Link</option><option value="input">Textbox/Textarea</option><option value="table">Table</option><option value="list">List</option><option value="select">Dropdown</option><option value="img">Image</option><option value="button">Button</option><option value="radiobutton">Radiobutton</option><option value="checkbox">Checkbox</option><option value="Element">Element</option></select></div><img class="deleteAddObjRow" src="imgs/ic-delete.png" /></div>')
-        
-        $scope.removeAddObjectSelection = function(){
+
+        $scope.removeAddObjectSelection = function() {
             $("img.left-bottom-selection").removeClass('left-bottom-selection');
         };
     };
@@ -2560,7 +2516,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
         var custObjNames = [];
         var dupCustObjNames = [];
         $('input.form-control-custom').each(function() {
-            custObjNames.push( $.trim($(this).val()));
+            custObjNames.push($.trim($(this).val()));
         });
         var sorted_custObjNames = custObjNames.slice().sort();
         for (var i = 0; i < custObjNames.length - 1; i++) {
@@ -2568,18 +2524,15 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                 dupCustObjNames.push(sorted_custObjNames[i]);
             }
         }
-        if(dupCustObjNames.length > 0)
-        {
+        if (dupCustObjNames.length > 0) {
             openDialog("Add Object", "Duplicate custom names");
             $('input.form-control-custom').each(function() {
-                for(var j=0;j<dupCustObjNames.length;j++)
-                {
-                    if ($.trim($(this).val()) == $.trim(dupCustObjNames[j]))
-                    {
+                for (var j = 0; j < dupCustObjNames.length; j++) {
+                    if ($.trim($(this).val()) == $.trim(dupCustObjNames[j])) {
                         $(this).addClass('inputErrorBorderBottom');
-                    } 
+                    }
                 }
-                    
+
             });
             return false;
         }
@@ -2597,17 +2550,17 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                 flag = "false";
                 return false
             } else {
-				// if(window.localStorage['_modified']){
-				// 	modifiednames = JSON.parse(window.localStorage['_modified']);
-				// }
-				// if(modifiednames.length > 0){
-				// 	var mdName;
-				// 	for(var i=0; i<modifiednames.length; i++){
-				// 		mdName = modifiednames[i].split("^^");
-				// 		if (eaCheckbox)	newScrapedList.view[mdName[1]].custname = mdName[0];
-				// 		else viewString.view[mdName[1]].custname = mdName[0];
-				// 	}
-				// }
+                // if(window.localStorage['_modified']){
+                // 	modifiednames = JSON.parse(window.localStorage['_modified']);
+                // }
+                // if(modifiednames.length > 0){
+                // 	var mdName;
+                // 	for(var i=0; i<modifiednames.length; i++){
+                // 		mdName = modifiednames[i].split("^^");
+                // 		if (eaCheckbox)	newScrapedList.view[mdName[1]].custname = mdName[0];
+                // 		else viewString.view[mdName[1]].custname = mdName[0];
+                // 	}
+                // }
                 // if (Object.keys(viewString.view).length > 0) {
                 //     for (var i = 0; i < viewString.view.length; i++) {
                 //         if ($(this).find("input").val() == viewString.view[i].custname) {
@@ -2617,25 +2570,21 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                 //         }
                 //     }
                 // }find("span.ellipsis").text()
-                if(viewString.view != undefined && viewString.view.length !=undefined)
-                {
-                      for (var i = 0; i < viewString.view.length; i++) {
-                         
-						if ( $.trim($(this).find("input").val()) == $.trim(viewString.view[i].custname) || $.trim($(this).find("input").val()) == $.trim(viewString.view[i].custname).split("_")[0]) {
-							//$("#dialog-addObject").modal("hide");
+                if (viewString.view != undefined && viewString.view.length != undefined) {
+                    for (var i = 0; i < viewString.view.length; i++) {
+
+                        if ($.trim($(this).find("input").val()) == $.trim(viewString.view[i].custname) || $.trim($(this).find("input").val()) == $.trim(viewString.view[i].custname).split("_")[0]) {
+                            //$("#dialog-addObject").modal("hide");
                             openDialog("Add Object", "Object characterstics are same for " + $(this).find("input").val() + "");
                             $(this).find("input").addClass('inputErrorBorderBottom');
                             err = "true";
-						}
+                        }
                     }
                 }
-                if(err == "true")
-                {
+                if (err == "true") {
                     flag = "false";
                     return false;
-                }
-                else
-                {
+                } else {
                     //If no field is empty, proceed to service call
                     flag = "true";
                     $scope.errorMessage = "";
@@ -2651,7 +2600,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
             $.each($(".addObj-row"), function() {
                 var typeOfElement;
                 var eleType = $(this).find("select option:selected").val();
-                switch(eleType){
+                switch (eleType) {
                     case "button":
                         typeOfElement = "btn";
                         break;
@@ -2686,7 +2635,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                         break;
                 }
                 customObj.push({
-                    custname: $(this).find("input").val()+"_"+typeOfElement,
+                    custname: $(this).find("input").val() + "_" + typeOfElement,
                     tag: eleType,
 
                     xpath: ''
@@ -2728,7 +2677,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                 }
                 angular.element(innerUL).append(li);
             }
-			$("li.item:visible").each(function() {
+            $("li.item:visible").each(function() {
                 if ($(this).attr('data-xpath') == "") {
                     $(this).children().find('span.ellipsis').addClass('customObject');
                 }
@@ -2769,7 +2718,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
         $('#scrapedObjforMap, #customObjforMap').empty();
 
         // if viewstring.view has scraped objects, then populate these in map object popup 
-        if(viewString.view){
+        if (viewString.view) {
             for (i = 0; i < viewString.view.length; i++) {
                 var path = viewString.view[i].xpath;
                 var ob = viewString.view[i];
@@ -2828,8 +2777,8 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
             }
         });
 
-        $scope.removeMapObjectSelection = function()
-        {   $('#scrapedObjforMap, #customObjforMap').empty();
+        $scope.removeMapObjectSelection = function() {
+            $('#scrapedObjforMap, #customObjforMap').empty();
             $("img.left-bottom-selection").removeClass('left-bottom-selection');
         };
     }
@@ -2843,16 +2792,15 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 
         //openDialog("Compare Object", "");
         $rootScope.compareFlag = true;
-        if ( $rootScope.compareFlag == true) {      
-           $("#compareObjectModal").modal("show");    
-           $timeout(function() {
-            if (navigator.appVersion.indexOf("Mac") != -1) {
-                $(".safariBrowser").show();
-            }
-        }, 300)         
+        if ($rootScope.compareFlag == true) {
+            $("#compareObjectModal").modal("show");
+            $timeout(function() {
+                if (navigator.appVersion.indexOf("Mac") != -1) {
+                    $(".safariBrowser").show();
+                }
+            }, 300)
         }
-        $scope.removeCompareSelection = function()
-        {
+        $scope.removeCompareSelection = function() {
             $rootScope.compareFlag = false;
             $("img.left-bottom-selection").removeClass('left-bottom-selection');
         };
@@ -3031,7 +2979,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
     $(document).on('click', "#saveObjects", function(e) {
         //console.log("reused", reusedScreenNames);
         //console.log("reusedT", reusedScreenTestcaseNames);
-        var task=JSON.parse(window.localStorage['_CT'])
+        var task = JSON.parse(window.localStorage['_CT'])
         if (task.reuse == 'True') {
             $("#reUsedObjectsModal").find('.modal-title').text("Save Scraped data");
             $("#reUsedObjectsModal").find('.modal-body p').text("Screen is been reused. Are you sure you want to save objects?").css('color', 'black');
@@ -3053,7 +3001,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
         return false;
     };
 
-  
+
     function saveScrapedObjects() {
         if (noSave = "false") {
             var xpath;
@@ -3068,29 +3016,28 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                     var count = 0;
                     if ($(this).parent().parent().attr("data-xpath") != "" && $(this).parent().parent().attr("data-xpath") != undefined) {
                         xpath = $(this).parent().parent().attr("data-xpath");
-						if(appType == 'Web'){
-							xpath = xpath.split(";")[1];
-						}else if(appType == 'MobileWeb'){
-							xpath = xpath.split(";")[2];
-						}
-						else{
-							xpath = xpath;
-						}
+                        if (appType == 'Web') {
+                            xpath = xpath.split(";")[1];
+                        } else if (appType == 'MobileWeb') {
+                            xpath = xpath.split(";")[2];
+                        } else {
+                            xpath = xpath;
+                        }
                         if (!duplicateXpathElements.hasOwnProperty(xpath)) {
                             duplicateXpathElements[xpath] = $(this).text();
                         } else {
-                            $(this).css('color','red');
+                            $(this).css('color', 'red');
                             duplicateCustnames.push($(this).text());
-                            isDuplicateXpath = true;    
+                            isDuplicateXpath = true;
                             count = 1;
                         }
                         if (count == 0 && !duplicateCustnamesElements.hasOwnProperty($(this).text())) {
                             duplicateCustnamesElements[$(this).text()] = xpath;
-                        } else if ( duplicateCustnamesElements.hasOwnProperty($(this).text())) {
-                            if(count == 0)
+                        } else if (duplicateCustnamesElements.hasOwnProperty($(this).text())) {
+                            if (count == 0)
                                 duplicateCustnames.push($(this).text());
                             isDuplicateCustNames = true;
-                            $(this).css('color','red');
+                            $(this).css('color', 'red');
                         }
                     } else {
                         xpath = "";
@@ -3098,20 +3045,20 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                             duplicateCustnamesElements[$(this).text()] = xpath;
                         } else {
                             duplicateCustnames.push($(this).text());
-                            isDuplicateCustNames= true;
-                            $(this).css('color','red');
+                            isDuplicateCustNames = true;
+                            $(this).css('color', 'red');
                         }
                     }
 
                 });
-                 if(isDuplicateCustNames) {
+                if (isDuplicateCustNames) {
                     openDialog("Save Scrape data", "");
                     $("#globalModal").find('.modal-body p').html("<span><strong>Please rename/delete duplicate scraped objects</strong></span><br /><br /><strong>Object characterstics are same for:</strong>").css("color", "#000").append("<ul class='custList'></ul>");
                     for (var j = 0; j < duplicateCustnames.length; j++) {
                         $("#globalModal").find('.modal-body p ul').append("<li>" + duplicateCustnames[j] + "</li>");
                     }
                     return false;
-                }else if(isDuplicateXpath){
+                } else if (isDuplicateXpath) {
                     $("#saveConfirmObjects").modal('show');
                     $("#saveConfirmObjects").find('.modal-body p').html("<strong>Are you sure you want to save objects ?  <br /><br/ >Object characterstics are still same for:").css("color", "#000").append("<ul class='custList'></ul>");
                     for (var j = 0; j < duplicateCustnames.length; j++) {
@@ -3125,7 +3072,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
         }
     }
 
-	$(document).on('click', '#saveElements', function(e) {
+    $(document).on('click', '#saveElements', function(e) {
         $("#saveConfirmObjects").modal('hide');
         renameScrapedObjects();
     });
@@ -3134,7 +3081,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
         return false;
     });
 
-	function renameScrapedObjects() {
+    function renameScrapedObjects() {
         var custnames = [];
         var viewStringXpath = [];
         var modifiedCustXpath = [];
@@ -3143,62 +3090,63 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
         var modifiedCustObj = [];
         var modifiedCustObjName = '';
         var tempId = '';
-		if(window.localStorage['_modified']){
-			modifiednames = JSON.parse(window.localStorage['_modified']);
-		}
-		if (eaCheckbox) {
-            if(!copiedViewstring){
+        if (window.localStorage['_modified']) {
+            modifiednames = JSON.parse(window.localStorage['_modified']);
+        }
+        if (eaCheckbox) {
+            if (!copiedViewstring) {
                 for (var j = 0; j < viewString.view.length; j++) {
                     newScrapedList.view.push(viewString.view[j]);
                 }
             }
             newScrapedList.mirror = viewString.mirror;
-            if(appType == "MobileApp" || appType == "MobileWeb"){
+            if (appType == "MobileApp" || appType == "MobileWeb") {
                 newScrapedList.mirrorheight = viewString.mirrorheight;
                 newScrapedList.mirrorwidth = viewString.mirrorwidth;
             }
-		}
-		
-		if(modifiednames.length > 0){
-			var mdName;
-			for(var i=0; i<modifiednames.length; i++){
-				mdName = modifiednames[i].split("^^");
-				if (eaCheckbox){
-                    if(mdName[1]){
-                        if(newScrapedList.view[mdName[1]])
+        }
+
+        if (modifiednames.length > 0) {
+            var mdName;
+            for (var i = 0; i < modifiednames.length; i++) {
+                mdName = modifiednames[i].split("^^");
+                if (eaCheckbox) {
+                    if (mdName[1]) {
+                        if (newScrapedList.view[mdName[1]])
                             newScrapedList.view[mdName[1]].custname = mdName[0];
                     }
-                }
-				else{
-                    if(mdName[1]){
-                        if(viewString.view[mdName[1]])
+                } else {
+                    if (mdName[1]) {
+                        if (viewString.view[mdName[1]])
                             viewString.view[mdName[1]].custname = mdName[0];
                     }
                 }
-			}
-		}
+            }
+        }
         //End of Filter Duplicate Values in ViewString based on custname
         window.localStorage['disableEditing'] = "false";
         //var tasks = JSON.parse(window.localStorage['_TJ']);
         var tasks = JSON.parse(window.localStorage['_CT']);
         var getScrapeData;
-        if (eaCheckbox){
-            for(var i=0; i<getIndexOfDeletedObjects.length;i++){
+        if (eaCheckbox) {
+            for (var i = 0; i < getIndexOfDeletedObjects.length; i++) {
                 delete newScrapedList.view[getIndexOfDeletedObjects[i]];
                 //newScrapedList.view.splice(getIndexOfDeletedObjects[i], 1);
             }
-            newScrapedList.view =  newScrapedList.view.filter(function(n){ return n != null });
+            newScrapedList.view = newScrapedList.view.filter(function(n) {
+                return n != null
+            });
             getScrapeData = JSON.stringify(newScrapedList);
             //console.log(newScrapedList.view)
-        }
-        else{
-            if(getIndexOfDeletedObjects.length > 0)
-            {
-                for(var i=0; i<getIndexOfDeletedObjects.length;i++){
+        } else {
+            if (getIndexOfDeletedObjects.length > 0) {
+                for (var i = 0; i < getIndexOfDeletedObjects.length; i++) {
                     delete viewString.view[getIndexOfDeletedObjects[i].tempId];
                     //viewString.view.splice(getIndexOfDeletedObjects[i], 1);
                 }
-                viewString.view =  viewString.view.filter(function(n){ return n != null });
+                viewString.view = viewString.view.filter(function(n) {
+                    return n != null
+                });
             }
             getScrapeData = JSON.stringify(viewString);
             //console.log(viewString.view)
@@ -3215,7 +3163,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
         scrapeObject.userinfo = userinfo;
         scrapeObject.param = "updateScrapeData_ICE";
         scrapeObject.appType = tasks.appType;
-		scrapeObject.versionnumber = tasks.versionnumber;
+        scrapeObject.versionnumber = tasks.versionnumber;
         //Update Service to Save Scrape Objects
         DesignServices.updateScreen_ICE(scrapeObject)
             .then(function(data) {
@@ -3223,9 +3171,9 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                     $rootScope.redirectPage();
                 }
                 if (data == "success") {
-					eaCheckbox = false;
+                    eaCheckbox = false;
                     //window.localStorage['_modified'] = "";
-					modifiednames = [];
+                    modifiednames = [];
                     getIndexOfDeletedObjects = [];
                     copiedViewstring = false;
                     //enableScreenShotHighlight = true;
@@ -3287,8 +3235,8 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
     });
 
 
-      //To Select and unSelect all objects in compare and update screen
-      $(document).on("click", ".checkStyleComparebox", function() {
+    //To Select and unSelect all objects in compare and update screen
+    $(document).on("click", ".checkStyleComparebox", function() {
         if ($(this).is(":checked")) {
             $("#changedOrdList li").find('input[name="selectAllChangedItems"]').prop("checked", true).addClass('checked');
         } else {
@@ -3315,8 +3263,8 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 
     //save button clicked - save the testcase steps
     $scope.updateTestCase_ICE = function() {
-        var task=JSON.parse(window.localStorage['_CT'])
-       if (task.reuse == 'True') {
+        var task = JSON.parse(window.localStorage['_CT'])
+        if (task.reuse == 'True') {
             //$("#reUsedTestcaseModal").find('.modal-title').text("");
             $("#reUsedTestcaseModal").find('.modal-body p').text("Testcase is been reused. Are you sure you want to save ?").css('color', 'black');
             $("#reUsedTestcaseModal").modal("show");
@@ -3336,11 +3284,10 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
         noSaveTestcase = "true";
         return false;
     };
-    if($rootScope.compareFlag == true)
-    {
+    if ($rootScope.compareFlag == true) {
         $('.submitTaskBtn').hide();
     }
-    
+
 
     function updateTestCase() {
         if (noSaveTestcase == "false") {
@@ -3364,61 +3311,61 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                     var mydata = $("#jqGrid").jqGrid('getGridParam', 'data');
                     var getTR = $("#jqGrid tbody tr:visible td:nth-child(10)");
                     for (var i = 0; i < mydata.length; i++) {
-//                        if (mydata[i].hasOwnProperty("_id_")) {
-//                            if (mydata[i]._id_.indexOf('jpg') !== -1 || mydata[i]._id_.indexOf('jqg') !== -1) {
-//                                var index = mydata.indexOf(mydata[i]);
-//                                mydata.splice(index, 1);
-//                            } else {
-                                mydata[i].stepNo = i + 1;
-                                if (mydata[i].custname == undefined || mydata[i].custname == "") {
-                                    var stepNoPos = parseInt(mydata[i].stepNo);
-                                    openDialog("Save Testcase", "Please select Object Name at Step No. " + stepNoPos)
-                                    serviceCallFlag = true;
-                                    break;
-                                } else {
-                                    //check - keyword column should be mandatorily populated by User
-                                    mydata[i].custname = mydata[i].custname.trim();
-                                    if (mydata[i].keywordVal == undefined || mydata[i].keywordVal == "") {
-                                        var stepNoPos = parseInt(mydata[i].stepNo);
-                                        openDialog("Save Testcase", "Please select keyword at Step No. " + stepNoPos)
-                                        serviceCallFlag = true;
-                                        break;
-                                    } else if (mydata[i].keywordVal == 'SwitchToFrame') {
-                                        if ($scope.newTestScriptDataLS != "undefined" || $scope.newTestScriptDataLS != undefined) {
-                                            var testScriptTableData = $scope.newTestScriptDataLS;
-                                            for (j = 0; j < testScriptTableData.length; j++) {
-                                                if (testScriptTableData[j].custname != '@Browser' && testScriptTableData[j].custname != '@Oebs' && testScriptTableData[j].custname != '@Window' && testScriptTableData[j].custname != '@Generic' && testScriptTableData[j].custname != '@Custom') {
-                                                    if (testScriptTableData[j].url != "") {
-                                                        mydata[i].url = testScriptTableData[j].url;
-                                                        break;
-                                                    }
-                                                }
+                        //                        if (mydata[i].hasOwnProperty("_id_")) {
+                        //                            if (mydata[i]._id_.indexOf('jpg') !== -1 || mydata[i]._id_.indexOf('jqg') !== -1) {
+                        //                                var index = mydata.indexOf(mydata[i]);
+                        //                                mydata.splice(index, 1);
+                        //                            } else {
+                        mydata[i].stepNo = i + 1;
+                        if (mydata[i].custname == undefined || mydata[i].custname == "") {
+                            var stepNoPos = parseInt(mydata[i].stepNo);
+                            openDialog("Save Testcase", "Please select Object Name at Step No. " + stepNoPos)
+                            serviceCallFlag = true;
+                            break;
+                        } else {
+                            //check - keyword column should be mandatorily populated by User
+                            mydata[i].custname = mydata[i].custname.trim();
+                            if (mydata[i].keywordVal == undefined || mydata[i].keywordVal == "") {
+                                var stepNoPos = parseInt(mydata[i].stepNo);
+                                openDialog("Save Testcase", "Please select keyword at Step No. " + stepNoPos)
+                                serviceCallFlag = true;
+                                break;
+                            } else if (mydata[i].keywordVal == 'SwitchToFrame') {
+                                if ($scope.newTestScriptDataLS != "undefined" || $scope.newTestScriptDataLS != undefined) {
+                                    var testScriptTableData = $scope.newTestScriptDataLS;
+                                    for (j = 0; j < testScriptTableData.length; j++) {
+                                        if (testScriptTableData[j].custname != '@Browser' && testScriptTableData[j].custname != '@Oebs' && testScriptTableData[j].custname != '@Window' && testScriptTableData[j].custname != '@Generic' && testScriptTableData[j].custname != '@Custom') {
+                                            if (testScriptTableData[j].url != "") {
+                                                mydata[i].url = testScriptTableData[j].url;
+                                                break;
                                             }
                                         }
                                     }
-                                    if (mydata[i].keywordVal == "setHeader" || mydata[i].keywordVal == "setHeaderTemplate") {
-                                        if (typeof(mydata[i].inputVal) === "string") {
-                                            mydata[i].inputVal = mydata[i].inputVal.replace(/[\n\r]/g, '##');
-                                        } else mydata[i].inputVal[0] = mydata[i].inputVal[0].replace(/[\n\r]/g, '##');
-                                    }
-                                    //console.log("updateTestCase:::", mydata)
                                 }
-                                if (mydata[i].url == undefined) {
-                                    mydata[i].url = "";
-                                }
-                                if (mydata[i].remarks != undefined) {
-                                    if (mydata[i].remarks != getTR[i].textContent && getTR[i].textContent.trim().length > 0) {
-                                        if (mydata[i].remarks.length > 0) {
-                                            mydata[i].remarks = mydata[i].remarks.concat(" ; " + getTR[i].textContent);
-                                        } else {
-                                            mydata[i].remarks = getTR[i].textContent;
-                                        }
-                                    }
+                            }
+                            if (mydata[i].keywordVal == "setHeader" || mydata[i].keywordVal == "setHeaderTemplate") {
+                                if (typeof(mydata[i].inputVal) === "string") {
+                                    mydata[i].inputVal = mydata[i].inputVal.replace(/[\n\r]/g, '##');
+                                } else mydata[i].inputVal[0] = mydata[i].inputVal[0].replace(/[\n\r]/g, '##');
+                            }
+                            //console.log("updateTestCase:::", mydata)
+                        }
+                        if (mydata[i].url == undefined) {
+                            mydata[i].url = "";
+                        }
+                        if (mydata[i].remarks != undefined) {
+                            if (mydata[i].remarks != getTR[i].textContent && getTR[i].textContent.trim().length > 0) {
+                                if (mydata[i].remarks.length > 0) {
+                                    mydata[i].remarks = mydata[i].remarks.concat(" ; " + getTR[i].textContent);
                                 } else {
                                     mydata[i].remarks = getTR[i].textContent;
                                 }
-//                            }
-//                        }
+                            }
+                        } else {
+                            mydata[i].remarks = getTR[i].textContent;
+                        }
+                        //                            }
+                        //                        }
                         /*else{
                         	if(mydata[i].remarks != undefined){
                         		if(mydata[i].remarks != getTR[i].textContent  && getTR[i].textContent.trim().length > 0 )	{
@@ -3528,30 +3475,27 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                 $(".checkStylebox").prop("checked", true);
             } else $(".checkStylebox").prop("checked", false);
             $(".checkStylebox,.checkall").prop("checked", false);
-            if($("#scraplist li").children('a').find('input[type=checkbox].checkall:checked:visible').length == 0)
-            {
-              $(".checkStylebox").prop("checked", false);
+            if ($("#scraplist li").children('a').find('input[type=checkbox].checkall:checked:visible').length == 0) {
+                $(".checkStylebox").prop("checked", false);
             }
-            if($("#scraplist li").children('a').find('input[type=checkbox]:visible').length == 0)
-            {
-                $(".checkStylebox").attr("disabled",true);
+            if ($("#scraplist li").children('a').find('input[type=checkbox]:visible').length == 0) {
+                $(".checkStylebox").attr("disabled", true);
+            } else {
+                $(".checkStylebox").attr("disabled", false);
             }
-            else{
-                $(".checkStylebox").attr("disabled",false);
+            if (savedScrapeObjects == false) {
+                var currentElements = $("span.ellipsis:visible").length;
+                if (currentElements == 0) {
+                    $("#saveObjects").prop('disabled', true);
+                } else {
+                    $("#saveObjects").prop('disabled', false);
+                }
             }
-            // var currentElements = $("span.ellipsis:visible").length;
-            // if(currentElements == 0)
-            // {
-            //     $("#saveObjects").prop('disabled',true);
-            // }
-            // else{
-            //     $("#saveObjects").prop('disabled',false);
-            // }
             unblockUI();
         }, 500);
     })
 
-    function filter() { 
+    function filter() {
         if (gsElement.length > 0) {
             for (var i = 0; i < gsElement.length; i++) {
                 if (gsElement[i] == "others") {
@@ -3586,97 +3530,100 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                     });
                 }
                 /*** Filtering Duplicate Objects ***/
-                else if  (gsElement[i] == "duplicateCustnames") {
+                else if (gsElement[i] == "duplicateCustnames") {
                     var allCustnames = [];
                     var duplicateCustnames = [];
-                        if(window.localStorage['_modified']){
-                            modifiednames = JSON.parse(window.localStorage['_modified']);
-                        }                 
-                        //if object names are modified
-                        if(modifiednames.length > 0){
+                    if (window.localStorage['_modified']) {
+                        modifiednames = JSON.parse(window.localStorage['_modified']);
+                    }
+                    //if object names are modified
+                    if (modifiednames.length > 0) {
+                        var mdName;
+                        for (var j = 0; j < modifiednames.length; j++) {
+                            mdName = modifiednames[j].split("^^");
+                            if (eaCheckbox) {
+                                if (mdName[1]) {
+                                    if (newScrapedList.view[mdName[1]])
+                                        newScrapedList.view[mdName[1]].custname = mdName[0];
+                                }
+                            } else {
+                                if (mdName[1]) {
+                                    if (viewString.view[mdName[1]])
+                                        viewString.view[mdName[1]].custname = mdName[0];
+                                }
+                            }
+                        }
+                    }
+                    //If Enable Append checkbox is true
+                    if (eaCheckbox) {
+                        //If Enable Append checkbox is true and object names are modified
+                        if (modifiednames.length > 0) {
                             var mdName;
-                            for(var j=0; j<modifiednames.length; j++){
-                                mdName = modifiednames[j].split("^^");
-                                if (eaCheckbox){
-                                    if(mdName[1]){
-                                        if(newScrapedList.view[mdName[1]])
+                            for (var k = 0; k < modifiednames.length; k++) {
+                                mdName = modifiednames[k].split("^^");
+                                if (eaCheckbox) {
+                                    if (mdName[1]) {
+                                        if (newScrapedList.view[mdName[1]])
                                             newScrapedList.view[mdName[1]].custname = mdName[0];
                                     }
-                                }
-                                else{
-                                    if(mdName[1]){
-                                        if(viewString.view[mdName[1]])
+                                } else {
+                                    if (mdName[1]) {
+                                        if (viewString.view[mdName[1]])
                                             viewString.view[mdName[1]].custname = mdName[0];
                                     }
                                 }
                             }
                         }
-                        //If Enable Append checkbox is true
-                        if (eaCheckbox){
-                            //If Enable Append checkbox is true and object names are modified
-                            if(modifiednames.length > 0){
-                                var mdName;
-                                for(var k=0; k<modifiednames.length; k++){
-                                    mdName = modifiednames[k].split("^^");
-                                    if (eaCheckbox){
-                                        if(mdName[1]){
-                                            if(newScrapedList.view[mdName[1]])
-                                                newScrapedList.view[mdName[1]].custname = mdName[0];
-                                        }
-                                    }
-                                    else{
-                                        if(mdName[1]){
-                                            if(viewString.view[mdName[1]])
-                                                viewString.view[mdName[1]].custname = mdName[0];
-                                        }
-                                    }
-                                }
-                            }
-                            if('view' in newScrapedList)
-                            {
-                                for(var l=0;l<newScrapedList.view.length;l++)
-                                {
-                                    allCustnames.push(newScrapedList.view[l].custname);       //get all custnames
-                                }
-                            }
-                            if('view' in viewString)
-                            {
-                                for(var m=0;m<viewString.view.length;m++)
-                                {
-                                    allCustnames.push(viewString.view[m].custname);           //get all custnames
-                                }
-                            }
-                           
-                        }
-                        //If Enable Append checkbox is false
-                        else{
-                            if('view' in viewString)
-                            {
-                                for(var n=0;n<viewString.view.length;n++)
-                                {
-                                    allCustnames.push(viewString.view[n].custname);           //get all custnames
-                                }
+                        if ('view' in newScrapedList) {
+                            for (var l = 0; l < newScrapedList.view.length; l++) {
+                                allCustnames.push(newScrapedList.view[l].custname); //get all custnames
                             }
                         }
+                        if ('view' in viewString) {
+                            for (var m = 0; m < viewString.view.length; m++) {
+                                allCustnames.push(viewString.view[m].custname); //get all custnames
+                            }
+                        }
+
+                    }
+                    //If Enable Append checkbox is false
+                    else {
+                        if ('view' in viewString) {
+                            for (var n = 0; n < viewString.view.length; n++) {
+                                allCustnames.push(viewString.view[n].custname); //get all custnames
+                            }
+                        }
+                    }
+
+                    var custnameIndices = {};
+                    for(var p=0;p<allCustnames.length;p++)
+                    {
+                        if(!custnameIndices.hasOwnProperty(allCustnames[p]))
+                        {
+                            //custnameIndices[allCustnames[p]] = custnameIndices[allCustnames[p]] + 1;
+                            custnameIndices[allCustnames[p]] = [];
+                        }
+                            custnameIndices[allCustnames[p]].push(p);
+                    }
                     
-                        var sorted_custnames = allCustnames.slice().sort();
-                        for (var p = 0; p < allCustnames.length - 1; p++) {
-                            if (sorted_custnames[p + 1] == sorted_custnames[p]) {
-                                duplicateCustnames.push(sorted_custnames[p]);               //get duplicate custnames
+                    
+                    //console.log("CN",custnameIndices);
+                    var custnameIndices = Object.values(custnameIndices);
+                    for(var q=0;q<custnameIndices.length;q++)
+                    {
+                        if(custnameIndices[q].length > 1)
+                        {
+                            for(var r=0;r<custnameIndices[q].length - 1;r++)
+                            {
+                                //console.log(custnameIndices[q][r]);
+                                var elements = document.getElementsByClassName("item");
+                                //console.log(elements[custnameIndices[q][r]]);
+                                $(elements[custnameIndices[q][r]]).show();             //Display Duplicate Custnames
                             }
                         }
-                        //console.log("Duplicate Custnames", duplicateCustnames);
-                        $.each($("#scraplist li"), function() {
-                                for(var q=0;q<duplicateCustnames.length;q++)
-                                {
-                                    if($.trim($(this)[0].childNodes[0].childNodes[2].innerHTML) == $.trim(duplicateCustnames[q]))
-                                    {
-                                        $(this).show();                                         //Display duplicate custnames only
-                                    }
-                                }
-                            });
-                }
-                else{
+                        
+                    }
+                } else {
                     $.each($("#scraplist li"), function() {
                         if (gsElement[i] == $(this).data("tag") || ($(this).data("tag").toLowerCase().indexOf(gsElement[i].toLowerCase()) >= 0 && gsElement[i] != "a" && $(this).data("tag").toLowerCase() != "radio button" && $(this).data("tag").toLowerCase() != "radiobutton" && $(this).data("tag").toLowerCase().indexOf("listview") < 0 && $(this).data("tag").toLowerCase().indexOf("tablecell") < 0) ||
                             (gsElement[i] == "input" && ($(this).data("tag").indexOf("edit") >= 0 || $(this).data("tag").indexOf("Edit Box") >= 0 || $(this).data("tag").indexOf("text") >= 0 || $(this).data("tag").indexOf("EditText") >= 0 || $(this).data("tag").indexOf("TextField") >= 0)) ||
@@ -3711,8 +3658,16 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
         $("html").css({
             'cursor': 'auto'
         });
+        if (savedScrapeObjects == false) {
+            var currentElements = $("span.ellipsis:visible").length;
+            if (currentElements == 0) {
+                $("#saveObjects").prop('disabled', true);
+            } else {
+                $("#saveObjects").prop('disabled', false);
+            }
+        }
         cfpLoadingBar.complete()
-      
+
     }
 
     //Click on add dependent testcase
@@ -3788,80 +3743,77 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
         }
     });
 
-    
+
 
     $(document).on('click', '.detailsIcon', function(e) {
         modalId = '';
         modalId = e.target.id;
         modalId = parseInt(modalId.split("_")[1]);
-        if(e.target.className.includes('inActiveDetails')){
-            openModalFormDialog('Add Test Step Details','');
+        if (e.target.className.includes('inActiveDetails')) {
+            openModalFormDialog('Add Test Step Details', '');
             $(".stepDetailsContainer").empty()
             $(".stepDetailsContainer").append("<div class='formGroup form-inline form-custom'><input autocomplete='off' id='testDetails_" + modalId + "' maxlength='50' type='text' class='form-control form-control-custom form-control-width' placeholder='Enter Expected Result'></div><div id='pass_" + modalId + "' class='passFormFields'><div class='formGroup form-inline form-custom'><input autocomplete='off' id='actualResult_" + modalId + "' type='text'  maxlength='50' class='form-control form-control-custom form-control-width' placeholder='Enter Actual Result for Pass Status'></div></div><div id ='fail_" + modalId + "' class='failFormFields'><div class='formGroup form-inline form-custom'><input autocomplete='off' id='actualResult_" + modalId + "' type='text'  maxlength='50' class='form-control form-control-custom form-control-width' placeholder='Enter Actual Result for Fail Status'></div></div")
-            
-        }
-        else{
+
+        } else {
             var taskInfo = JSON.parse(window.localStorage['_CT']);
             var screenId = taskInfo.screenId;
             var testCaseId = taskInfo.testCaseId;
             var testCaseName = taskInfo.testCaseName;
             var versionnumber = taskInfo.versionnumber;
             DesignServices.readTestCase_ICE(screenId, testCaseId, testCaseName, versionnumber)
-            .then(function(response) {
-                    if (response == "Invalid Session") {
-                        $rootScope.redirectPage();
-                    }
-                   console.log("Responseeee",response);
-                    var testcaseSteps  = JSON.parse(response.testcase);
-                    if(typeof(testcaseSteps[modalId -1].addTestCaseDetailsInfo) == "object")
-                    {
-                        var details = testcaseSteps[modalId -1].addTestCaseDetailsInfo;
-                    }
-                    else{
-                        var details = JSON.parse(testcaseSteps[modalId -1].addTestCaseDetailsInfo);
-                    }
-                   
-                    openModalFormDialog('Add Test Step Details','');
-                     $(".stepDetailsContainer").empty()
-                     $(".stepDetailsContainer").append("<div class='formGroup form-inline form-custom'><input autocomplete='off' id='testDetails_" + modalId + "' maxlength='50' type='text' class='form-control form-control-custom form-control-width' placeholder='Enter Expected Result'></div><div id='pass_" + modalId + "' class='passFormFields'><div class='formGroup form-inline form-custom'><input autocomplete='off' id='actualResult_" + modalId + "' type='text'  maxlength='50' class='form-control form-control-custom form-control-width' placeholder='Enter Actual Result for Pass Status'></div></div><div id ='fail_" + modalId + "' class='failFormFields'><div class='formGroup form-inline form-custom'><input autocomplete='off' id='actualResult_" + modalId + "' type='text'  maxlength='50' class='form-control form-control-custom form-control-width' placeholder='Enter Actual Result for Fail Status'></div></div");
-                     $("#testDetails_"+modalId+"").val(details.testcaseDetails);
-                     //$("#pass_"+modalId+"").find("#expectedResult_"+modalId+"").val(details.expectedResult_pass);
-                     $("#pass_"+modalId+"").find("#actualResult_"+modalId+"").val(details.actualResult_pass);
-                    // $("#fail_"+modalId+"").find("#expectedResult_"+modalId+"").val(details.expectedResult_fail);
-                     $("#fail_"+modalId+"").find("#actualResult_"+modalId+"").val(details.actualResult_fail);
-                },
-                function(error) {});
+                .then(function(response) {
+                        if (response == "Invalid Session") {
+                            $rootScope.redirectPage();
+                        }
+                        console.log("Responseeee", response);
+                        var testcaseSteps = JSON.parse(response.testcase);
+                        if (typeof(testcaseSteps[modalId - 1].addTestCaseDetailsInfo) == "object") {
+                            var details = testcaseSteps[modalId - 1].addTestCaseDetailsInfo;
+                        } else {
+                            var details = JSON.parse(testcaseSteps[modalId - 1].addTestCaseDetailsInfo);
+                        }
+
+                        openModalFormDialog('Add Test Step Details', '');
+                        $(".stepDetailsContainer").empty()
+                        $(".stepDetailsContainer").append("<div class='formGroup form-inline form-custom'><input autocomplete='off' id='testDetails_" + modalId + "' maxlength='50' type='text' class='form-control form-control-custom form-control-width' placeholder='Enter Expected Result'></div><div id='pass_" + modalId + "' class='passFormFields'><div class='formGroup form-inline form-custom'><input autocomplete='off' id='actualResult_" + modalId + "' type='text'  maxlength='50' class='form-control form-control-custom form-control-width' placeholder='Enter Actual Result for Pass Status'></div></div><div id ='fail_" + modalId + "' class='failFormFields'><div class='formGroup form-inline form-custom'><input autocomplete='off' id='actualResult_" + modalId + "' type='text'  maxlength='50' class='form-control form-control-custom form-control-width' placeholder='Enter Actual Result for Fail Status'></div></div");
+                        $("#testDetails_" + modalId + "").val(details.testcaseDetails);
+                        //$("#pass_"+modalId+"").find("#expectedResult_"+modalId+"").val(details.expectedResult_pass);
+                        $("#pass_" + modalId + "").find("#actualResult_" + modalId + "").val(details.actualResult_pass);
+                        // $("#fail_"+modalId+"").find("#expectedResult_"+modalId+"").val(details.expectedResult_fail);
+                        $("#fail_" + modalId + "").find("#actualResult_" + modalId + "").val(details.actualResult_fail);
+                    },
+                    function(error) {});
         }
-      
+
         e.stopImmediatePropagation();
     });
 
 
-      $scope.submit_task=function(action) {
+    $scope.submit_task = function(action) {
         var taskinfo = JSON.parse(window.localStorage['_CT']);
         var taskid = taskinfo.subTaskId;
         var taskstatus = taskinfo.status;
         var version = taskinfo.versionnumber;
         var batchTaskIDs = taskinfo.batchTaskIDs;
-        var projectId=taskinfo.projectId;
+        var projectId = taskinfo.projectId;
         if (action != undefined && action == 'reassign') {
             taskstatus = action;
         }
-        mindmapServices.reviewTask(projectId,taskid,taskstatus,version,batchTaskIDs).then(function(result){
-        if (result == 'fail') {
-                    openDialog("Task Submission Error", "Reviewer is not assigned !",true)
-                } else if (taskstatus == 'reassign') {
-                    openDialog("Task Reassignment Success", "Task Reassigned scucessfully!",true)
-                } else if (taskstatus == 'review') {
-                    openDialog("Task Completion Success", "Task Approved scucessfully!",true)
-                } else {
-                    openDialog("Task Submission Success", "Task Submitted scucessfully!",true)
-                }
-                $timeout(function() {
-                    $(".close:visible").addClass('globalSubmit');
-                },200)
-              
-        },function(error){
+        mindmapServices.reviewTask(projectId, taskid, taskstatus, version, batchTaskIDs).then(function(result) {
+            if (result == 'fail') {
+                openDialog("Task Submission Error", "Reviewer is not assigned !", true)
+            } else if (taskstatus == 'reassign') {
+                openDialog("Task Reassignment Success", "Task Reassigned scucessfully!", true)
+            } else if (taskstatus == 'review') {
+                openDialog("Task Completion Success", "Task Approved scucessfully!", true)
+            } else {
+                openDialog("Task Submission Success", "Task Submitted scucessfully!", true)
+            }
+            $timeout(function() {
+                $(".close:visible").addClass('globalSubmit');
+            }, 200)
+
+        }, function(error) {
             console.log(error);
         })
     }
@@ -3894,10 +3846,28 @@ function contentTable(newTestScriptDataLS) {
             editUrl: 'obj',
             page: 1,
             scroll: 1,
-            colModel: [
-				{label: 'Step No', name: 'stepNo', key: true, editable: false, sortable: false, resizable: false, hidden: true},
-                {name: 'objectName', editable: false, sortable: false, resizable: false, hidden: true},
-                {label: 'Object Name', name: 'custname', editable: true, resizable: false, sortable: false,
+            colModel: [{
+                    label: 'Step No',
+                    name: 'stepNo',
+                    key: true,
+                    editable: false,
+                    sortable: false,
+                    resizable: false,
+                    hidden: true
+                },
+                {
+                    name: 'objectName',
+                    editable: false,
+                    sortable: false,
+                    resizable: false,
+                    hidden: true
+                },
+                {
+                    label: 'Object Name',
+                    name: 'custname',
+                    editable: true,
+                    resizable: false,
+                    sortable: false,
                     edittype: 'select',
                     editoptions: {
                         value: getTags(scrappedData),
@@ -3907,7 +3877,12 @@ function contentTable(newTestScriptDataLS) {
                         }]
                     }
                 },
-                {label: 'Keyword', name: 'keywordVal', editable: true, resizable: false, sortable: false,
+                {
+                    label: 'Keyword',
+                    name: 'keywordVal',
+                    editable: true,
+                    resizable: false,
+                    sortable: false,
                     edittype: 'select',
                     editoptions: {
                         value: getKeywordList(keywordArrayList),
@@ -3917,14 +3892,64 @@ function contentTable(newTestScriptDataLS) {
                         }]
                     }
                 },
-                {label: 'Input', name: 'inputVal', editable: true, resizable: false, sortable: false},
-                {label: 'Output', name: 'outputVal', editable: true, resizable: false, sortable: false},
-                {label: 'Remarks', name: 'remarksStatus', editable: false, resizable: false, sortable: false},
-                {label: 'Remarks', name: 'remarks', editable: false, resizable: false, sortable: false, hidden: true},
-                {label: 'URL', name: 'url', editable: false, resizable: false, hidden: true},
-                {label: 'appType', name: 'appType', editable: false, resizable: false, hidden: true},
-                {label: 'Details', name: 'addTestCaseDetails', editable: false, resizable: false, sortable: false},
-                {label: 'Details', name: 'addTestCaseDetailsInfo', editable: false, resizable: false, sortable: false,hidden: true}
+                {
+                    label: 'Input',
+                    name: 'inputVal',
+                    editable: true,
+                    resizable: false,
+                    sortable: false
+                },
+                {
+                    label: 'Output',
+                    name: 'outputVal',
+                    editable: true,
+                    resizable: false,
+                    sortable: false
+                },
+                {
+                    label: 'Remarks',
+                    name: 'remarksStatus',
+                    editable: false,
+                    resizable: false,
+                    sortable: false
+                },
+                {
+                    label: 'Remarks',
+                    name: 'remarks',
+                    editable: false,
+                    resizable: false,
+                    sortable: false,
+                    hidden: true
+                },
+                {
+                    label: 'URL',
+                    name: 'url',
+                    editable: false,
+                    resizable: false,
+                    hidden: true
+                },
+                {
+                    label: 'appType',
+                    name: 'appType',
+                    editable: false,
+                    resizable: false,
+                    hidden: true
+                },
+                {
+                    label: 'Details',
+                    name: 'addTestCaseDetails',
+                    editable: false,
+                    resizable: false,
+                    sortable: false
+                },
+                {
+                    label: 'Details',
+                    name: 'addTestCaseDetailsInfo',
+                    editable: false,
+                    resizable: false,
+                    sortable: false,
+                    hidden: true
+                }
             ],
             loadonce: false,
             viewrecords: false,
@@ -3951,7 +3976,7 @@ function contentTable(newTestScriptDataLS) {
             loadComplete: function(data) {
                 loadedGridData = JSON.parse(JSON.stringify(data));
                 $("#jqGrid tr[id^='jqg']").remove();
-                var v=1;
+                var v = 1;
 
                 $("#jqGrid tr:visible").each(function() {
 
@@ -3962,83 +3987,65 @@ function contentTable(newTestScriptDataLS) {
                         $(this).find("td:nth-child(9)").text('');
                         $(this).find("td:nth-child(9)").append('<img src="imgs/ic-remarks-active.png" class="remarksIcon"/>');
                     }
-                   
+
                     var rowId = parseInt($(this).children("td[aria-describedby='jqGrid_stepNo']").text());
-                    if('rows' in data)
-                    {
-                        if(typeof (data.rows[rowId -1].addTestCaseDetailsInfo) == 'object')
-                        {
-                            $('#jqGrid').jqGrid('setCell', rowId, 'addTestCaseDetailsInfo', angular.toJson(data.rows[rowId -1].addTestCaseDetailsInfo));
-                            $('#jqGrid').jqGrid('setCell', rowId, 'addTestCaseDetails', angular.toJson(data.rows[rowId -1].addTestCaseDetails));
+                    if ('rows' in data) {
+                        if (typeof(data.rows[rowId - 1].addTestCaseDetailsInfo) == 'object') {
+                            $('#jqGrid').jqGrid('setCell', rowId, 'addTestCaseDetailsInfo', angular.toJson(data.rows[rowId - 1].addTestCaseDetailsInfo));
+                            $('#jqGrid').jqGrid('setCell', rowId, 'addTestCaseDetails', angular.toJson(data.rows[rowId - 1].addTestCaseDetails));
+                        } else {
+                            $('#jqGrid').jqGrid('setCell', rowId, 'addTestCaseDetailsInfo', data.rows[rowId - 1].addTestCaseDetailsInfo);
+                            $('#jqGrid').jqGrid('setCell', rowId, 'addTestCaseDetails', data.rows[rowId - 1].addTestCaseDetails);
                         }
-                        else{
-                            $('#jqGrid').jqGrid('setCell', rowId, 'addTestCaseDetailsInfo', data.rows[rowId -1].addTestCaseDetailsInfo);
-                            $('#jqGrid').jqGrid('setCell', rowId, 'addTestCaseDetails', data.rows[rowId -1].addTestCaseDetails);
+                        var str = typeof(data.rows[rowId - 1].addTestCaseDetailsInfo);
+
+                    } else {
+
+                        if (typeof(data[rowId - 1].addTestCaseDetailsInfo) == 'object') {
+                            $('#jqGrid').jqGrid('setCell', rowId, 'addTestCaseDetailsInfo', angular.toJson(data[rowId - 1].addTestCaseDetailsInfo));
+                            $('#jqGrid').jqGrid('setCell', rowId, 'addTestCaseDetails', angular.toJson(data[rowId - 1].addTestCaseDetails));
+                        } else {
+                            $('#jqGrid').jqGrid('setCell', rowId, 'addTestCaseDetailsInfo', data[rowId - 1].addTestCaseDetailsInfo);
+                            $('#jqGrid').jqGrid('setCell', rowId, 'addTestCaseDetails', data[rowId - 1].addTestCaseDetails);
                         }
-                        var str = typeof(data.rows[rowId -1].addTestCaseDetailsInfo);
-                        
-                    }
-                    else{
-                        
-                        if(typeof (data[rowId -1].addTestCaseDetailsInfo) == 'object')
-                        {
-                            $('#jqGrid').jqGrid('setCell', rowId, 'addTestCaseDetailsInfo', angular.toJson(data[rowId -1].addTestCaseDetailsInfo));
-                            $('#jqGrid').jqGrid('setCell', rowId, 'addTestCaseDetails', angular.toJson(data[rowId -1].addTestCaseDetails));
-                        }
-                        else{
-                            $('#jqGrid').jqGrid('setCell', rowId, 'addTestCaseDetailsInfo', data[rowId -1].addTestCaseDetailsInfo);
-                            $('#jqGrid').jqGrid('setCell', rowId, 'addTestCaseDetails', data[rowId -1].addTestCaseDetails);
-                        }
-                        var str = typeof(data[rowId -1].addTestCaseDetailsInfo);
+                        var str = typeof(data[rowId - 1].addTestCaseDetailsInfo);
                     }
 
-                    
-               
-                    var getRowData = $('#jqGrid').jqGrid ('getRowData', rowId);
-                    
-                    if(str == "string" && 'rows' in data)
-                    {
-                        if(data.rows[rowId -1].addTestCaseDetailsInfo.length > 0)
-                        {
+
+
+                    var getRowData = $('#jqGrid').jqGrid('getRowData', rowId);
+
+                    if (str == "string" && 'rows' in data) {
+                        if (data.rows[rowId - 1].addTestCaseDetailsInfo.length > 0) {
                             $(this).find("td:nth-child(13)").text('');
-                            $(this).find("td:nth-child(13)").append('<img alt="activeDetails" title="" id="details_'+v+'" src="imgs/ic-details-active.png" class="detailsIcon activeDetails"/>');
+                            $(this).find("td:nth-child(13)").append('<img alt="activeDetails" title="" id="details_' + v + '" src="imgs/ic-details-active.png" class="detailsIcon activeDetails"/>');
+                        } else if (data.rows[rowId - 1].addTestCaseDetails.length == 0) {
+                            $(this).find("td:nth-child(13)").text('');
+                            $(this).find("td:nth-child(13)").append('<img alt="inActiveDetails"  title="" id="details_' + v + '" src="imgs/ic-details-inactive.png" class="detailsIcon inActiveDetails"/>');
+                        } else {
+                            $(this).find("td:nth-child(13)").text('');
+                            $(this).find("td:nth-child(13)").append('<img  alt="inActiveDetails" title="" id="details_' + v + '" src="imgs/ic-details-inactive.png" class="detailsIcon inActiveDetails"/>');
                         }
-                        else if(data.rows[rowId -1].addTestCaseDetails.length == 0){
+                    } else if (str == "string") {
+                        if (data[rowId - 1].addTestCaseDetailsInfo.length > 0) {
                             $(this).find("td:nth-child(13)").text('');
-                            $(this).find("td:nth-child(13)").append('<img alt="inActiveDetails"  title="" id="details_'+v+'" src="imgs/ic-details-inactive.png" class="detailsIcon inActiveDetails"/>');
-                        }
-                        else{
+                            $(this).find("td:nth-child(13)").append('<img  alt="activeDetails"  title="" id="details_' + v + '" src="imgs/ic-details-active.png" class="detailsIcon activeDetails"/>');
+                        } else if (data[rowId - 1].addTestCaseDetails.length == 0) {
                             $(this).find("td:nth-child(13)").text('');
-                            $(this).find("td:nth-child(13)").append('<img  alt="inActiveDetails" title="" id="details_'+v+'" src="imgs/ic-details-inactive.png" class="detailsIcon inActiveDetails"/>');
-                        }
-                    }
-                    else if(str == "string")
-                    {
-                        if(data[rowId -1].addTestCaseDetailsInfo.length > 0)
-                        {
+                            $(this).find("td:nth-child(13)").append('<img alt="inActiveDetails" title="" id="details_' + v + '" src="imgs/ic-details-inactive.png" class="detailsIcon inActiveDetails"/>');
+                        } else {
                             $(this).find("td:nth-child(13)").text('');
-                            $(this).find("td:nth-child(13)").append('<img  alt="activeDetails"  title="" id="details_'+v+'" src="imgs/ic-details-active.png" class="detailsIcon activeDetails"/>');
-                        }
-                        else if(data[rowId -1].addTestCaseDetails.length == 0){
-                            $(this).find("td:nth-child(13)").text('');
-                            $(this).find("td:nth-child(13)").append('<img alt="inActiveDetails" title="" id="details_'+v+'" src="imgs/ic-details-inactive.png" class="detailsIcon inActiveDetails"/>');
-                        }
-                        else{
-                            $(this).find("td:nth-child(13)").text('');
-                            $(this).find("td:nth-child(13)").append('<img alt="inActiveDetails"  title="" id="details_'+v+'" src="imgs/ic-details-inactive.png" class="detailsIcon inActiveDetails"/>');
+                            $(this).find("td:nth-child(13)").append('<img alt="inActiveDetails"  title="" id="details_' + v + '" src="imgs/ic-details-inactive.png" class="detailsIcon inActiveDetails"/>');
                         }
                     }
 
-                    if(str != "string")
-                    {
-                        if( str != "" && str != "undefined" && str !=undefined )
-                        {
+                    if (str != "string") {
+                        if (str != "" && str != "undefined" && str != undefined) {
                             $(this).find("td:nth-child(13)").text('');
-                            $(this).find("td:nth-child(13)").append('<img  alt="activeDetails" title="" id="details_'+v+'" src="imgs/ic-details-active.png" class="detailsIcon activeDetails"/>');
-                        }
-                        else{
+                            $(this).find("td:nth-child(13)").append('<img  alt="activeDetails" title="" id="details_' + v + '" src="imgs/ic-details-active.png" class="detailsIcon activeDetails"/>');
+                        } else {
                             $(this).find("td:nth-child(13)").text('');
-                            $(this).find("td:nth-child(13)").append('<img  alt="inActiveDetails" title="" id="details_'+v+'" src="imgs/ic-details-inactive.png" class="detailsIcon inActiveDetails"/>');
+                            $(this).find("td:nth-child(13)").append('<img  alt="inActiveDetails" title="" id="details_' + v + '" src="imgs/ic-details-inactive.png" class="detailsIcon inActiveDetails"/>');
                         }
                     }
                     v++;
@@ -4256,69 +4263,64 @@ function contentTable(newTestScriptDataLS) {
         }
     })
 
-        //Save teststep details
-        $(document).on('click', '#saveTestStepDetails', function(e) {
-            var $grid =  $('#jqGrid');
-            getTestStepDetailsRowData = $grid.jqGrid ('getRowData', modalId);
-            getTestStepDetailsRowData.addTestCaseDetailsInfo = {};
-            var testDetails = $.trim($('#testDetails_'+modalId+'').val());
-          //  var expectedResult_pass = $.trim($('#pass_'+modalId+'').find('#expectedResult_'+modalId+'').val());
-            var actualResult_pass =  $.trim($('#pass_'+modalId+'').find('#actualResult_'+modalId+'').val());
-          //  var expectedResult_fail = $.trim($('#fail_'+modalId+'').find('#expectedResult_'+modalId+'').val());
-            var actualResult_fail =  $.trim($('#fail_'+modalId+'').find('#actualResult_'+modalId+'').val());
-    
-           if(testDetails == '' && actualResult_pass == '' && actualResult_fail == '')
-           {
-                $('#globalModalForm').modal('hide');
-                openDialog('Add Test Step Details','Please enter atleast one field to save test step details');
-           }
-           else{
+    //Save teststep details
+    $(document).on('click', '#saveTestStepDetails', function(e) {
+        var $grid = $('#jqGrid');
+        getTestStepDetailsRowData = $grid.jqGrid('getRowData', modalId);
+        getTestStepDetailsRowData.addTestCaseDetailsInfo = {};
+        var testDetails = $.trim($('#testDetails_' + modalId + '').val());
+        //  var expectedResult_pass = $.trim($('#pass_'+modalId+'').find('#expectedResult_'+modalId+'').val());
+        var actualResult_pass = $.trim($('#pass_' + modalId + '').find('#actualResult_' + modalId + '').val());
+        //  var expectedResult_fail = $.trim($('#fail_'+modalId+'').find('#expectedResult_'+modalId+'').val());
+        var actualResult_fail = $.trim($('#fail_' + modalId + '').find('#actualResult_' + modalId + '').val());
 
-            if(testDetails == ''  && actualResult_pass == ''  && actualResult_fail == '')
-            {
-                getTestStepDetailsRowData.addTestCaseDetails ='';
+        if (testDetails == '' && actualResult_pass == '' && actualResult_fail == '') {
+            $('#globalModalForm').modal('hide');
+            openDialog('Add Test Step Details', 'Please enter atleast one field to save test step details');
+        } else {
+
+            if (testDetails == '' && actualResult_pass == '' && actualResult_fail == '') {
+                getTestStepDetailsRowData.addTestCaseDetails = '';
                 getTestStepDetailsRowData.addTestCaseDetailsInfo = {
                     "testcaseDetails": "",
                     "actualResult_pass": "",
                     "actualResult_fail": "",
                 };
             }
-          
-                 getTestStepDetailsRowData.addTestCaseDetailsInfo = {
-                    "testcaseDetails": testDetails,
-                    "actualResult_pass": actualResult_pass,
-                    "actualResult_fail": actualResult_fail,
-                };
-              
-                $grid.jqGrid('setCell', modalId, 'addTestCaseDetailsInfo',JSON.stringify(getTestStepDetailsRowData.addTestCaseDetailsInfo));
-                var gridData =  $grid.jqGrid('getGridParam','data');
-                for(let i=0;i<gridData.length;i++)
-                {
-                    if(gridData[i].stepNo === getTestStepDetailsRowData.stepNo)
-                    {
-                        gridData[i] = getTestStepDetailsRowData;
-                    }
-                    // if('addTestCaseDetailsInfo' in  gridData[i])
-                    // {
-                    //     if(gridData[i].addTestCaseDetailsInfo != "undefined")
-                    //     {
-                    //         $("tr#"+modalId).find("td:nth-child(13)").text('');
-                    //         $("tr#"+modalId).find("td:nth-child(13)").append('<img id="details_'+modalId+'" src="imgs/ic-details-active.png" class="detailsIcon activeDetails"/>');
-                    //     }
-                    //     else{
-                    //         $("tr#"+modalId).find("td:nth-child(13)").text('');
-                    //         $("tr#"+modalId).find("td:nth-child(13)").append('<img id="details_'+modalId+'" src="imgs/ic-details-inactive.png" class="detailsIcon inActiveDetails"/>');
-                    //     }
-                    // }
-                    // else{
-                    //     $("tr#"+modalId).find("td:nth-child(13)").text('');
-                    //     $("tr#"+modalId).find("td:nth-child(13)").append('<img id="details_'+modalId+'" src="imgs/ic-details-inactive.png" class="detailsIcon inActiveDetails"/>');
-                    // }
+
+            getTestStepDetailsRowData.addTestCaseDetailsInfo = {
+                "testcaseDetails": testDetails,
+                "actualResult_pass": actualResult_pass,
+                "actualResult_fail": actualResult_fail,
+            };
+
+            $grid.jqGrid('setCell', modalId, 'addTestCaseDetailsInfo', JSON.stringify(getTestStepDetailsRowData.addTestCaseDetailsInfo));
+            var gridData = $grid.jqGrid('getGridParam', 'data');
+            for (let i = 0; i < gridData.length; i++) {
+                if (gridData[i].stepNo === getTestStepDetailsRowData.stepNo) {
+                    gridData[i] = getTestStepDetailsRowData;
                 }
-             
-                $(".close:visible").trigger('click'); 
-           }  
-        });
+                // if('addTestCaseDetailsInfo' in  gridData[i])
+                // {
+                //     if(gridData[i].addTestCaseDetailsInfo != "undefined")
+                //     {
+                //         $("tr#"+modalId).find("td:nth-child(13)").text('');
+                //         $("tr#"+modalId).find("td:nth-child(13)").append('<img id="details_'+modalId+'" src="imgs/ic-details-active.png" class="detailsIcon activeDetails"/>');
+                //     }
+                //     else{
+                //         $("tr#"+modalId).find("td:nth-child(13)").text('');
+                //         $("tr#"+modalId).find("td:nth-child(13)").append('<img id="details_'+modalId+'" src="imgs/ic-details-inactive.png" class="detailsIcon inActiveDetails"/>');
+                //     }
+                // }
+                // else{
+                //     $("tr#"+modalId).find("td:nth-child(13)").text('');
+                //     $("tr#"+modalId).find("td:nth-child(13)").append('<img id="details_'+modalId+'" src="imgs/ic-details-inactive.png" class="detailsIcon inActiveDetails"/>');
+                // }
+            }
+
+            $(".close:visible").trigger('click');
+        }
+    });
 
     //Reset test step details
     $(document).on('click', '#resetTestStepDetails', function(e) {
@@ -4425,12 +4427,10 @@ function contentTable(newTestScriptDataLS) {
             if (selectedKeywordList == keywordArrayKey) {
                 $.each(keywordArrayValue, function(k, v) {
                     if (selectedKeyword == k) {
-                        if(v != "")
-                        {
+                        if (v != "") {
                             inputSyntax = JSON.parse(v).inputVal;
                             outputSyntax = JSON.parse(v).outputVal;
-                        }
-                        else{
+                        } else {
                             inputSyntax = v;
                             outputSyntax = v;
                         }
@@ -4493,12 +4493,11 @@ function contentTable(newTestScriptDataLS) {
                 $grid.jqGrid('setCell', rowId, 'url', url);
                 $grid.jqGrid('setCell', rowId, 'objectName', objName);
             }
-        }
-        else if(selectedText=="@System"){
+        } else if (selectedText == "@System") {
             var sc = Object.keys(keywordArrayList.system);
             selectedKeywordList = "getOsInfo";
             objName = " ";
-            url=" ";
+            url = " ";
             for (var i = 0; i < sc.length; i++) {
                 if (selectedKeyword == sc[i]) {
                     res += '<option role="option" value="' + sc[i] + '" selected>' + sc[i] + '</option>';
@@ -4512,8 +4511,7 @@ function contentTable(newTestScriptDataLS) {
             $grid.jqGrid('setCell', rowId, 'appType', "System");
             $grid.jqGrid('setCell', rowId, 'url', url);
             $grid.jqGrid('setCell', rowId, 'objectName', objName);
-        }
-        else if (selectedText == "@Browser") {
+        } else if (selectedText == "@Browser") {
             objName = " ";
             url = " ";
             var sc = Object.keys(keywordArrayList.browser);
@@ -4601,8 +4599,8 @@ function contentTable(newTestScriptDataLS) {
             $grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
         }
         //ends here
-		//Object
-		else if (selectedText == "@Object") {
+        //Object
+        else if (selectedText == "@Object") {
             objName = "@Object";
             url = "";
             var sc;
@@ -4876,7 +4874,7 @@ function contentTable(newTestScriptDataLS) {
                         $grid.jqGrid('setCell', rowId, 'objectName', objName);
                         $grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
                         break;
-                    } else if (appTypeLocal == 'Desktop' && (obType == 'button' || obType == 'input' || obType == 'select' || obType == 'list_item' || obType == 'hyperlink' || obType == 'lbl' || obType =='treeview'|| obType=='TreeView' || obType=='tree' ||
+                    } else if (appTypeLocal == 'Desktop' && (obType == 'button' || obType == 'input' || obType == 'select' || obType == 'list_item' || obType == 'hyperlink' || obType == 'lbl' || obType == 'treeview' || obType == 'TreeView' || obType == 'tree' ||
                             obType == 'list' || obType == 'edit' || obType == null || obType == 'checkbox' || obType == 'radiobutton' || obType == 'tab' || obType == 'datepicker' || obType != undefined)) {
                         var res = '';
                         var sc;
@@ -4916,7 +4914,7 @@ function contentTable(newTestScriptDataLS) {
                         } else if (obType == 'hyperlink' || obType == 'lbl') {
                             sc = Object.keys(keywordArrayList.link);
                             selectedKeywordList = "link";
-                        } else if(obType =='treeview'|| obType=='TreeView' || obType=='tree'){
+                        } else if (obType == 'treeview' || obType == 'TreeView' || obType == 'tree') {
                             sc = Object.keys(keywordArrayList.tree);
                             selectedKeywordList = "tree";
                         } else {
@@ -4937,7 +4935,7 @@ function contentTable(newTestScriptDataLS) {
                         $grid.jqGrid('setCell', rowId, 'objectName', objName);
                         $grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
                         break;
-                    } else if (appTypeLocal == 'Desktop' && (!(obType == 'push_button' || obType == 'text' || obType == 'combo_box' || obType == 'list_item' || obType == 'hyperlink' || obType == 'lbl' || obType =='treeview'|| obType=='TreeView' || obType=='tree' ||
+                    } else if (appTypeLocal == 'Desktop' && (!(obType == 'push_button' || obType == 'text' || obType == 'combo_box' || obType == 'list_item' || obType == 'hyperlink' || obType == 'lbl' || obType == 'treeview' || obType == 'TreeView' || obType == 'tree' ||
                             obType == 'list' || obType == 'edit' || obType == null || obType == 'Static' || obType == 'check_box' || obType == 'radio_button' || obType == 'tab' || obType == 'datepicker'))) {
                         var res = '';
                         var sc = Object.keys(keywordArrayList.element);
@@ -5369,11 +5367,10 @@ function deleteTestScriptRow(e) {
     } else {
         if ($(document).find("#cb_jqGrid:checked").length > 0 || $("#jqGrid").find(".cbox:checked").length > 0) {
             $("#globalModalYesNo").find('.modal-title').text("Delete Test Step");
-            var task=JSON.parse(window.localStorage['_CT'])
+            var task = JSON.parse(window.localStorage['_CT'])
             if (task.reuse == 'True') {
                 $("#globalModalYesNo").find('.modal-body p').text("Testcase is been reused. Are you sure, you want to delete?").css('color', 'black');
-            } else 
-            {
+            } else {
                 $("#globalModalYesNo").find('.modal-body p').text("Are you sure, you want to delete?").css('color', 'black');
             }
             $("#globalModalYesNo").find('.modal-footer button:nth-child(1)').attr("id", "btnDeleteStepYes")
@@ -5391,7 +5388,7 @@ $(document).on('click', '#btnDeleteStepYes', function() {
         selectedRowIds.push($(this).attr("id"));
     })
     var gridArrayData = $("#jqGrid").jqGrid('getRowData');
-   // console.log("array data test ***** " + JSON.stringify(gridArrayData));
+    // console.log("array data test ***** " + JSON.stringify(gridArrayData));
     for (var i = 0; i < selectedRowIds.length; i++) {
         $("#jqGrid").delRowData(selectedRowIds[i]);
     }
@@ -5463,7 +5460,7 @@ function addTestScriptRow() {
                         gridArrayData[i].stepNo = i + 1;
                     }
                 }
-                var allRowsInGrid = $('#jqGrid').jqGrid('getGridParam','data');
+                var allRowsInGrid = $('#jqGrid').jqGrid('getGridParam', 'data');
             } else {
                 gridArrayData.splice(arrayLength, 0, emptyRowData);
                 gridArrayData[arrayLength].stepNo = parseInt(gridArrayData[arrayLength - 1].stepNo) + 1;
@@ -5635,8 +5632,8 @@ function copyTestStep() {
                 getRowJsonCopy = [];
                 return false
             } else {
-                var rowId =  parseInt($(this).children("td:nth-child(1)").text());
-                var getRowData = $('#jqGrid').jqGrid ('getRowData', rowId);
+                var rowId = parseInt($(this).children("td:nth-child(1)").text());
+                var getRowData = $('#jqGrid').jqGrid('getRowData', rowId);
                 getRowJsonCopy.push({
                     "objectName": $(this).children("td:nth-child(4)").text().trim(),
                     "custname": $(this).children("td:nth-child(5)").text(),
@@ -6087,23 +6084,25 @@ function getTags(data) {
     var obnames = [];
     var appTypeLocal = JSON.parse(window.localStorage['_CT']).appType;
     if (appTypeLocal == "Web") {
-        obnames = ["@Generic","@Excel","@Custom","@Browser","@BrowserPopUp"];
+        obnames = ["@Generic", "@Excel", "@Custom", "@Browser", "@BrowserPopUp"];
     } else if (appTypeLocal == "Webservice") {
-        obnames = ["@Generic","@Excel","WebService List"];
+        obnames = ["@Generic", "@Excel", "WebService List"];
     } else if (appTypeLocal == "Mainframe") {
-        obnames = ["@Generic","@Excel","Mainframe List"];
+        obnames = ["@Generic", "@Excel", "Mainframe List"];
     } else if (appTypeLocal == "Desktop") {
-        obnames = ["@Generic","@Excel","@Window","@Custom","@Email"];
+        obnames = ["@Generic", "@Excel", "@Window", "@Custom", "@Email"];
     } else if (appTypeLocal == "DesktopJava") {
-        obnames = ["@Generic","@Excel","@Oebs","@Custom"];
+        obnames = ["@Generic", "@Excel", "@Oebs", "@Custom"];
     } else if (appTypeLocal == "MobileApp") {
-        obnames = ["@Generic","@Mobile","@Action"];
+        obnames = ["@Generic", "@Mobile", "@Action"];
     } else if (appTypeLocal == "MobileWeb") {
-        obnames = ["@Generic","@Browser","@BrowserPopUp","@Action"];
+        obnames = ["@Generic", "@Browser", "@BrowserPopUp", "@Action"];
+    } else if (appTypeLocal == "MobileApp") {
+        obnames = ["@Generic", "@MobileiOS"]
     } else if (appTypeLocal == "SAP") {
         obnames = ["@Generic", "@Sap", "@Custom"]
-    } else if(appTypeLocal="System"){
-        obnames=["@Generic","@Excel","@System"];
+    } else if (appTypeLocal = "System") {
+        obnames = ["@Generic","@Excel", "@System"];
     }
     for (var i = 0; i < data.length; i++) {
         obnames.push(data[i].custname);
@@ -6158,13 +6157,13 @@ function drop(ev) {
         $(ev.target).parent("li").append(getDraggedEle);
     }
     ev.preventDefault();
-    if($(ev.target).parent("li").find(".ellipsis").hide().hasClass("toMergeObj") == true){
-    //Enable-Disable dragged element based on drop event
-    draggedEle.setAttribute("draggable", false)
-    draggedEle.childNodes[1].style.background = "#e0e0e0";
-    draggedEle.childNodes[1].style.cursor = "no-drop";
-    $(".modal-body:visible").trigger('click');
-    //Enable-Disable dragged element based on drop event
+    if ($(ev.target).parent("li").find(".ellipsis").hide().hasClass("toMergeObj") == true) {
+        //Enable-Disable dragged element based on drop event
+        draggedEle.setAttribute("draggable", false)
+        draggedEle.childNodes[1].style.background = "#e0e0e0";
+        draggedEle.childNodes[1].style.cursor = "no-drop";
+        $(".modal-body:visible").trigger('click');
+        //Enable-Disable dragged element based on drop event
     }
 }
 //Map Object Drag nad Drop Functionality
@@ -6198,29 +6197,28 @@ function formatXml(xml) {
     return formatted;
 }
 
-function openDialog(title, body,submitflag) {
-    if(submitflag==undefined){
-         $("#globalModal").find('.modal-title').text(title);
+function openDialog(title, body, submitflag) {
+    if (submitflag == undefined) {
+        $("#globalModal").find('.modal-title').text(title);
         $("#globalModal").find('.modal-body p').text(body).css('color', 'black');
         $("#globalModal").modal("show");
         setTimeout(function() {
             $("#globalModal").find('.btn-default').focus();
         }, 300);
-    }else{
+    } else {
         $("#globalTaskSubmit").find('.modal-title').text(title);
-            $("#globalTaskSubmit").find('.modal-body p').text(body);
-            $("#globalTaskSubmit").modal("show");
+        $("#globalTaskSubmit").find('.modal-body p').text(body);
+        $("#globalTaskSubmit").modal("show");
     }
-   
+
 }
 
-function openModalFormDialog(title, body)
-{
-            $("#globalModalForm").find('.modal-title').text(title);
-            $("#globalModalForm").next('.modal-sm').removeClass('modal-');
-            $("#globalModalForm").find('.modal-body p').text(body).css('color', 'black');
-            $("#globalModalForm").modal("show");
-            setTimeout(function() {
-                $("#globalModalForm").find('.btn-default').focus();
-            }, 300);
+function openModalFormDialog(title, body) {
+    $("#globalModalForm").find('.modal-title').text(title);
+    $("#globalModalForm").next('.modal-sm').removeClass('modal-');
+    $("#globalModalForm").find('.modal-body p').text(body).css('color', 'black');
+    $("#globalModalForm").modal("show");
+    setTimeout(function() {
+        $("#globalModalForm").find('.btn-default').focus();
+    }, 300);
 }
