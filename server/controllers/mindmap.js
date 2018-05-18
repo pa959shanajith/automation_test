@@ -1237,7 +1237,7 @@ exports.excelToMindmap = function(req,res){
 			if(/script/i.test(e))sctIdx=i;
 		});
 		if(modIdx==-1||scoIdx==-1||scrIdx==-1||sctIdx==-1||cSheetRow.length<2){
-			err='FATAL Error!! Import a non empty excel file with Module, Scenario, Screen, Script columns.';
+			err=true;
 			break;
 		}
 		var e,lastSco=-1,lastScr=-1,nodeDict={},scrDict={};
@@ -1276,7 +1276,11 @@ exports.excelToMindmap = function(req,res){
 		}
 	}
 	var tSt,qList=[];
-	res.status(200).send(qObj);
+	if(err){
+		res.status(200).send('fail');
+	}
+	else
+		res.status(200).send(qObj);
 }
 
 //MATCH (n)-[r:FMTTS{id:'bad100b6-c223-4888-a8e9-ad26a2de4a61'}]->(o:TESTSCENARIOS) DETACH DELETE r,o

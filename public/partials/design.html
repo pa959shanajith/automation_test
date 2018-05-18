@@ -85,7 +85,7 @@
 			<div ng-class="getScreenView == 'Webservice' ? 'hideContainer' : 'showContainer'" id="left-bottom-section">
 				<ul>
 					<li><a ng-click="addObj()" href='#'  title="Add Objects" class="addObject"><span><img src='imgs/ic-addobject.png' alt='Add Object' /></span>Add Object</a></li>
-					<li><a ng-click="generateMapObj()" href='#'  title="Map Objects" class="generateObj"><span><img src='imgs/ic-mapobject.png' alt='Map Object' /></span>Map Object</a></li>
+					<li class='generateObj'><a ng-click="generateMapObj()" href='#'  title="Map Objects" class="generateObj"><span><img src='imgs/ic-mapobject.png' alt='Map Object' /></span>Map Object</a></li>
 					<li class='compareObjects'><a ng-click="compareObj()" href='#'  title="Compare Objects" class="compareObject"><span><img src='imgs/ic-compareobject.png' alt='Compare Object' /></span>Compare Object</a></li>
 				</ul>
 			</div>
@@ -98,12 +98,14 @@
 		<!--Task Name-->
 		<div id="page-taskName"></div>
 		<!--Task Name-->
-			<div class='saveCompareDiv'><button style='display:none;' id='saveComparedObjects' title="Save Scraped Objects" class="btn btn-md saveComapredObj" ng-click="updateComparedObjects()">Update</button><button id='viewscrapedObjects' title="View Scraped Objects" class="btn btn-md" ng-click="">Cancel</button></div>
+			<div class='saveCompareDiv'><button style='display:none;' id='saveComparedObjects' title="Update and Save Objects" class="btn btn-md saveComapredObj" ng-click="updateComparedObjects()">Update</button><button style='display:none;' id='viewscrapedObjects' title="Cancel Update" class="btn btn-md" ng-click="">Cancel</button></div>
+
+	<div class='scrollbar-inner scrollbar-compare' ng-show="compareFlag">
 		<div class='parentCompareObj'>
 		<!---- Compare Object Div ------>
 		<div class="panel panel-default compareObj" id='compareChangedObjectsBox' style='display:none;'>
 				<div class="panel-heading compareObjHeading">
-					<h3 class="panel-title">Changed Objects</h3>
+					<h3 class="panel-title"><input title='selectAll' class='checkStyleComparebox'  type='checkbox' name='selectAllChanged' />Changed Objects</h3>
 				</div>
 				<div class="panel-body compareObjPanelBody">
 					<ul id='changedOrdList' class='changedObjOrdList'></ul>
@@ -126,6 +128,7 @@
 				</div>
 		</div>
 	</div>
+	</div>
 		<!---- Compare Object Div ------>
 		<!-- Specificly Webservice Screen -->
 		<div ng-class="getScreenView == 'Webservice' ? 'showContainer' : 'hideContainer'" class="WebServcieScreen">
@@ -146,8 +149,8 @@
 				</div>
 
 				<!-- Submit Task Button-->
-				<button class="btn btn-md pull-right reassignTaskBtn " style="margin-top: 2px;display:None" ng-click="submitTasksScreen('reassign')"  title="Reassign Task">Reassign</button>
-				<button class="btn btn-md pull-right submitTaskBtn submitTaskBtn-abs" ng-click="submitTasksScreen('submit')"  title="Submit">Submit</button>
+				<button class="btn btn-md pull-right reassignTaskBtn " style="margin-top: 2px;display:none" ng-click="submitTasksScreen('reassign')"  title="Reassign Task">Reassign</button>
+				<button  class="btn btn-md pull-right submitTaskBtn submitTaskBtn-abs" ng-click="submitTasksScreen('submit')"  title="Submit">Submit</button>
 				<!-- Submit Task Button-->
 			</div>
 			<!-- Top -->
@@ -194,8 +197,8 @@
 		<!-- Specificly Webservice Screen -->
 
 		<!-- Submit Task Button-->
-		<button class="btn btn-md pull-right reassignTaskBtn " style="float: left !important; margin-left: -46px; display:None" ng-click="submitTasksScreen('reassign')"  title="Reassign Task">Reassign</button>
-		<button ng-class="getScreenView == 'Webservice' ? 'hideContainer' : 'showContainer'" class="btn btn-md pull-right submitTaskBtn" ng-click="submitTasksScreen('submit')"  title="Submit Task">Submit</button>
+		<button class="btn btn-md pull-right reassignTaskBtn " style="float: right !important;display:none" ng-click="submitTasksScreen('reassign')"  title="Reassign Task">Reassign</button>
+		<button ng-class="getScreenView == 'Webservice' ? 'hideContainer' : 'showContainer'" style="position: relative !important; left:-5px" class="btn btn-md pull-right submitTaskBtn" ng-click="submitTasksScreen('submit')"  title="Submit Task">Submit</button>
 		<!--<button ng-class="getScreenView == 'Webservice' ? 'hideContainer' : 'showContainer'" class="btn btn-md pull-right submitTaskBtn" ng-click="submitTasksScreen()"  title="Submit Task">Submit</button>-->
 		<!-- Submit Task Button-->
 
@@ -252,6 +255,7 @@
 					<div><span class='popupContent-default filterObjects' data-tag="list">List Box</span></div>
 					<div><span class='popupContent-default filterObjects' data-tag="table">Table</span></div>
 					<div><span class='popupContent-default filterObjects' data-tag="others">Others</span></div>
+					<div style='width:auto;'><span class='popupContent-default filterObjects' data-tag="duplicateCustnames">Duplicate Custnames</span></div>
 					<!-- <div><span class='popupContent-default filterObjects' data-tag="internalframe">Internal frame</span></div>
 					<div><span class='popupContent-default filterObjects' data-tag="tab">Tab</span></div>
 					<div><span class='popupContent-default filterObjects' data-tag="datepicker">Date Picker</span></div> -->
@@ -324,7 +328,7 @@
 			<!-- Modal content-->
 			<div class="modal-content">
 			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal">&times;</button>
+				<button type="button" class="close" ng-click="removeAddObjectSelection()" data-dismiss="modal">&times;</button>
 				<h4 class="modal-title">Add Object</h4>
 			</div>
 			<div class="modal-body modal-body-add_obj">
@@ -354,7 +358,7 @@
 			<!-- Modal content-->
 			<div class="modal-content">
 				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal">&times;</button>
+					<button type="button" ng-click = "removeMapObjectSelection()" class="close" data-dismiss="modal">&times;</button>
 					<h4 class="modal-title">Map Object</h4>
 				</div>
 				<div class="modal-body">
@@ -651,4 +655,32 @@
 	  </div>
 	</div>
 	<!-- DeleteObjects Modal  -->
+
+	<!-- Compare Object Modal  -->
+	<div class="modal fade" id="compareObjectModal" role="dialog" data-keyboard="false" data-backdrop="static">
+		<div class="modal-dialog modal-sm" style='width:auto;'>
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" ng-click="removeCompareSelection()" data-dismiss="modal">&times;</button>
+					<h4 class="modal-title">Compare Objects</h4>
+				</div>
+				<div class="modal-body" style='height:90px;'>
+					<p>
+						<span>Select one of the browsers below to compare objects</span>
+						<ul class="browserInlineIcons"> 
+							<li><a href="#" title="Launch Internet Explorer" ng-click="initScraping($event, 'ie'); $event.preventDefault(); $event.stopPropagation();" class=""><span><img class="inline-ie-img" src="imgs/ic-reports-ie.png" alt="Internet Explorer"></span></a></li>
+							<li><a href="#" title="Launch Google Chrome" ng-click="initScraping($event, 'chrome'); $event.preventDefault(); $event.stopPropagation();" class=""><span><img  class="inline-chrome-img" src="imgs/ic-reports-chrome.png" alt="Google Chrome"></span></a></li>
+							<li class="safariBrowser" style="display: none;"><a href="#" title="Launch Safari" ng-click="initScraping($event, 'safari'); $event.preventDefault(); $event.stopPropagation();" ><span><img class="inline-safari-img" src="imgs/ic-reports-safari.png" alt="Safari"></span></a></li>
+							<li><a href="#" title="Launch Mozilla Firefox" ng-click="initScraping($event, 'mozilla'); $event.preventDefault(); $event.stopPropagation();" class=""><span><img  class="inline-firefox-img" src="imgs/ic-reports-firefox.png" alt="Mozilla Firefox"></span></a></li>
+						</ul>
+					</p>
+				</div>
+				<div class="modal-footer">
+					<button type="button" ng-click="removeCompareSelection()" class="btn btn-default" data-dismiss="modal">Cancel</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- Compare Object Modal  -->
+
 <!--Bootstrap Popup-->

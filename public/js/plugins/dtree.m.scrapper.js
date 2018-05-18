@@ -36,7 +36,7 @@ var listId;
             radio: false
         };
         var settings = $.extend({}, defaults, options); //.css({"color":"red","border":"2px solid red"});
-        console.log("settings: ", settings);
+        //console.log("settings: ", settings);
 
         if (settings.editable == true && settings.radio == true) {
             var id = $("#scrapTree");
@@ -55,6 +55,7 @@ var listId;
                     //var radioStr = '<span><input type="radio"  name="radio"></input></span>';
                     var radioStr = '<img class="focus-icon" src="imgs/ic-highlight-element-inactive.png"/>';
                     var ri = 0;
+                     //Building ScrapeTree for Scraped Objects
                     if (settings.radio) {
                         $('li.item').each(function(i, v) {
                             if ($(this).parent().parent().parent().parent().attr('id') == "scrapTree") {
@@ -165,7 +166,7 @@ var listId;
                                                     if(window.localStorage['_modified'])
                                                     {
                                                         modifiednames = JSON.parse(window.localStorage['_modified']);
-                                                        console.log(modifiednames);
+                                                        //console.log(modifiednames);
                                                     }
                                                   
                                                     // if ($.inArray(modVal, viewStringCustnames)!='-1' || ($.inArray(modVal, modStringCustnames)!='-1')) {
@@ -174,12 +175,12 @@ var listId;
                                                     //         $('#hiddenTagBox').modal('show');
                                                     //         return false;
                                                     //     }  
-                                                    if ($.inArray(modVal, viewStringCustnames)!='-1') {
-                                                        $("#hiddenTagBox").find('.modal-title').text("Edit Objects");
-                                                        $("#hiddenTagBox").find('.modal-body p').text("Object characterstics are same for '"+modVal+"' ").css('color', 'black');
-                                                        $('#hiddenTagBox').modal('show');
-                                                        return false;
-                                                    }                   
+                                                    // if ($.inArray(modVal, viewStringCustnames)!='-1') {
+                                                    //     $("#hiddenTagBox").find('.modal-title').text("Edit Objects");
+                                                    //     $("#hiddenTagBox").find('.modal-body p').text("Object characterstics are same for '"+modVal+"' ").css('color', 'black');
+                                                    //     $('#hiddenTagBox').modal('show');
+                                                    //     return false;
+                                                    // }                   
                                                     var flagEdit = true;
                                                     window.localStorage['checkEditWorking'] = "true";
                                                     if(window.localStorage['_modified']){                                                        
@@ -342,7 +343,9 @@ var listId;
                     $(this).parent().children('ul:first').toggle(150);
                 });
             });
-        } else if (settings.editable == false && settings.radio == false) {
+        } 
+        //Building ScrapeTree for Compare & update 
+        else if (settings.editable == false && settings.radio == true) {
             if (settings.multipleSelection.classes[0] == ".item .treeChangedObjects") {
                 var id = $('#changedOrdList');
                 listId = id;
@@ -366,9 +369,9 @@ var listId;
                     //var radioStr = '<span><input type="radio"  name="radio"></input></span>';
                     var radioStr = '<img class="focus-icon" style="margin-top:2px;" src="imgs/ic-highlight-element-inactive.png"/>';
                     var ri = 0;
-                    if (settings.radio == false) {
+                    //if (settings.radio == true) {
                         $('li.item').each(function(i, v) {
-                            console.log("ul", listId);
+                            //console.log("ul", listId);
                             if ($(this).parent().attr('id') == listId[0].id) {
                                 //$(this).append(radioStr);
                                 //  $(this).children("a").append(radioStr);
@@ -398,7 +401,17 @@ var listId;
 
                             });
                         });
-                    }
+
+                        $(sel).each(function(i, v) {
+                            var id_compare = "compare_" + index;
+                            //var id_editable = "editable_" + index; //to make editable scraped objects
+                            index++;
+                            var spanHtml = "<span class='compared_objectNames' id='" + id_compare + "'/>";
+                            //wrap anchor text in a span to hide/show 
+                            $(v).contents().eq(1).wrap(function() {
+                                return spanHtml;
+                            });
+                        });
                 }
                 //multiple selection
                 if (settings.multipleSelection.checkbox) {

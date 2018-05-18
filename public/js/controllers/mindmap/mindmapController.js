@@ -522,7 +522,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     }
 
     function unloadMindmapData(){
-        $('#ct-mindMap').hide();
+        //$('#ct-mindMap').hide();
+        $('#ct-mindMap').empty();
         $('#ct-actionBox').remove();
         var nodeBox = d3.select('.ct-nodeBox');
         $(nodeBox[0]).empty();
@@ -740,9 +741,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         n.display_name = n.name;
         var ch = 15;
         //Issue 697
-        if (n.type == 'testcases') ch = 9;
-        if ((n.name.length > 15) || (n.name.length > 9 && n.type == 'testcases')) {
-
+        //if (n.type == 'testcases') ch = 9;
+        //if ((n.name.length > 15) || (n.name.length > 9 && n.type == 'testcases')) {
+        if (n.name.length > 15) {
             n.display_name = n.display_name.slice(0, ch) + '...';
         }
         v.append('text').attr('class', 'ct-nodeLabel').text(n.display_name).attr('text-anchor', 'middle').attr('x', 20).attr('title', n.name).attr('y', 50);
@@ -2341,8 +2342,27 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     $('#undoChanges').click(function(){
         pi=$('#renamingConfirmationPopup').attr('node');
         dNodes[pi].name = dNodes[pi].original_name;
-        $('#ct-node-'+pi+' > text').text(dNodes[pi].original_name);        
+        $('#ct-node-'+pi+' > text').text(dNodes[pi].original_name);   
+        if(reuseDict && reuseDict[pi].length>0){
+            reuseDict[pi].forEach(function(e,i){
+                dNodes[e].name = dNodes[e].original_name;
+                $('#ct-node-'+e+' > text').text(dNodes[e].original_name);
+            });
+        }          
     });
+
+    $('#undoChanges2').click(function(){
+        pi=$('#renamingConfirmationPopup').attr('node');
+        dNodes[pi].name = dNodes[pi].original_name;
+        $('#ct-node-'+pi+' > text').text(dNodes[pi].original_name);   
+        if(reuseDict && reuseDict[pi].length>0){
+            reuseDict[pi].forEach(function(e,i){
+                dNodes[e].name = dNodes[e].original_name;
+                $('#ct-node-'+e+' > text').text(dNodes[e].original_name);
+            });
+        }          
+    });    
+    
     function inpKeyUp(e) {
         e = e || window.event;
         temp = [];
@@ -2382,7 +2402,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 if (d.name.length > 23) s = d.name.slice(0, 23) + "...";
                 else s = d.name;
                 iul.append('li').attr('class', 'divider');
-                iul.append('li').append('a').attr('data-nodeid', i).attr('data-nodename', d.name).html(s).on('click', function() {
+                iul.append('li').append('a').attr('data-nodeid', i).attr('data-nodename', d.name).attr('title', d.name).html(s).on('click', function() {
                     var k = d3.select(this);
                     d3.select('#ct-inpSugg').classed('no-disp', !0);
                     d3.select('#ct-inpPredict').property('value', '');
@@ -3564,7 +3584,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         v.append('image').attr('height', '40px').attr('width', '40px').attr('class', 'ct-nodeIcon').attr('xlink:href', img_src).on('click', nodeCtrlClick_W).attr('style','opacity:'+nodeOpacity+';');
         var ch = 15;
         if (n.name.length > 15 && n.type != 'modules_endtoend') {
-            if (n.type == 'testcases') ch = 9;
+            //if (n.type == 'testcases') ch = 9;
             n.display_name = n.display_name.slice(0, ch) + '...';
         }
         v.append('text').attr('class', 'ct-nodeLabel').text(n.display_name).attr('text-anchor', 'middle').attr('x', 20).attr('title', n.name).attr('y', 50);
@@ -4994,7 +5014,7 @@ function getSelectionStart(o) {
         else
             var temp = dNodes.length;
 
-        if (temp == 0) {
+        if ($('#ct-mindMap').length == 0 ||$('#ct-mindMap').is(':empty')) {
             openDialogMindmap('Error', "Please select a module first");
         } else if ((selectedTab == 'mindmapEndtoEndModules' || selectedTab == 'tabCreate') && !$('#ct-inpBox').hasClass('no-disp')) {
             openDialogMindmap('Error', "Please complete editing first");
@@ -5434,19 +5454,29 @@ function getSelectionStart(o) {
             if (result == "Invalid Session") {
                 $rootScope.redirectPage();
             }                 
-            $scope.dataJSON = result;
-            $scope.dataJSON.forEach(function(e,i){
-                if(!validNodeDetails(e.name)) validate = false;
-            });
-            if(!validate){
-                openDialogMindmap('Error','Validation of excel failed');
-                return;
+            else if(result == 'fail'){
+                openDialogMindmap('Error','Some column names are invalid');
             }
-            // Create Mindmap Flow
-            $scope.createMap('tabCreate'); 
-            $scope.tab = 'tabCreate'; 
-            $scope.createMapsCall();
-            $('#ProjectInput').modal('show');
+            else{
+                $scope.dataJSON = result;
+                $scope.dataJSON.forEach(function(e,i){
+                    if(!validNodeDetails(e.name)) validate = false;
+                });
+                if(!validate){
+                    openDialogMindmap('Error','Some node names are invalid');
+                }
+                else if($.grep($scope.dataJSON, function(v) {return v.type === 0 ;}).length>1){ //mode than one module
+                    openDialogMindmap('Error','More than one module name in Excel. ( Only one module is supported at a time )');
+                }
+                else{
+                    // Create Mindmap Flow
+                    $scope.createMap('tabCreate'); 
+                    $scope.tab = 'tabCreate'; 
+                    $scope.createMapsCall();
+                    $('#ProjectInput').modal('show');
+                }
+    
+            }
         }, function(error) {
             console.log(error);
         })        
@@ -5465,13 +5495,13 @@ mySPA.directive('onReadFile', function ($parse) {
 				var reader = new FileReader();
                 
 				reader.onload = function(onLoadEvent) {
-                    console.log(onLoadEvent.target.result);
 					scope.$apply(function() {
 						fn(scope, {$fileContent:onLoadEvent.target.result});
 					});
 				};
 
-				reader.readAsBinaryString((onChangeEvent.srcElement || onChangeEvent.target).files[0]);
+                reader.readAsBinaryString((onChangeEvent.srcElement || onChangeEvent.target).files[0]);
+                this.value = null;
 			});
 		}
 	};

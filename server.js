@@ -1,22 +1,20 @@
 //load environment variables
 var env = require('node-env-file');
 var fs = require('fs');
-
 var envFilePath = __dirname + '/.env';  
-try{   
+try {
     if (fs.existsSync(envFilePath)) {
         env(envFilePath);
-    }
-    else{
+    } else {
         console.error("Error occurred in loading ENVIRONMENT VARIABLES, .env file is missing! ")
     }
-} catch(ex){
+} catch (ex) {
     console.error("Error occurred in loading ENVIRONMENT VARIABLES")
     console.error(ex);
 }
+
 // Module Dependencies
 var cluster = require('cluster');
-
 var expressWinston = require('express-winston');
 var winston = require('winston');
 var epurl = "http://"+process.env.NDAC_IP+":"+process.env.NDAC_PORT+"/";
@@ -67,24 +65,7 @@ try {
         // secureOptions: consts.SSL_OP_NO_SSLv2 | consts.SSL_OP_NO_SSLv3 | consts.SSL_OP_NO_TLSv1 | consts.SSL_OP_NO_TLSv1_1,
         secureOptions: consts.SSL_OP_NO_SSLv2 | consts.SSL_OP_NO_SSLv3,
         secureProtocol: 'SSLv23_method',
-        ciphers: [
-            "ECDHE-RSA-AES256-SHA384",
-            "DHE-RSA-AES256-SHA384",
-            "ECDHE-RSA-AES256-SHA256",
-            "DHE-RSA-AES256-SHA256",
-            "ECDHE-RSA-AES128-SHA256",
-            "DHE-RSA-AES128-SHA256",
-            "HIGH",
-            "!aNULL",
-            "!eNULL",
-            "!EXPORT",
-            "!DES",
-            "!RC4",
-            "!MD5",
-            "!PSK",
-            "!SRP",
-            "!CAMELLIA"
-        ].join(':'),
+        ciphers: ["ECDHE-RSA-AES256-SHA384", "DHE-RSA-AES256-SHA384", "ECDHE-RSA-AES256-SHA256", "DHE-RSA-AES256-SHA256", "ECDHE-RSA-AES128-SHA256", "DHE-RSA-AES128-SHA256", "HIGH", "!aNULL", "!eNULL", "!EXPORT", "!DES", "!RC4", "!MD5", "!PSK", "!SRP", "!CAMELLIA"].join(':'), 
         honorCipherOrder: true
     };
     var httpsServer = require('https').createServer(credentials, app);
@@ -94,6 +75,14 @@ try {
     module.exports.httpsServer = httpsServer;
     var io = require('./server/lib/socket');
 
+    //serve all asset files from necessary directories
+    app.use('/partials',express.static(__dirname + "/public/partials"));
+    app.use("/js", express.static(__dirname + "/public/js"));
+    app.use("/imgs", express.static(__dirname + "/public/imgs"));
+    app.use("/images_mindmap", express.static(__dirname + "/public/images_mindmap"));
+    app.use("/css", express.static(__dirname + "/public/css"));
+    app.use("/fonts", express.static(__dirname + "/public/fonts"));
+
     app.use(bodyParser.json({
         limit: '50mb'
     }));
@@ -102,16 +91,19 @@ try {
         limit: '50mb',
         extended: true
     }));
-    if(process.env.EXPRESSLOGS == 'ON')
-    app.use(expressWinston.logger({
-        winstonInstance: logger,
-        requestWhitelist: ['url'],
-        colorize: true
-    }));
-    else logger.info("Express logs are disabled");
+
+    if(process.env.EXPRESSLOGS.toLowerCase() != 'on') logger.info("Express logs are disabled");
+    else {
+        app.use(expressWinston.logger({
+            winstonInstance: logger,
+            requestWhitelist: ['url'],
+            colorize: true
+        }));
+    }
 
     process.env.SESSION_AGE = 30 * 60 * 1000;
     process.env.SESSION_INTERVAL = 20 * 60 * 1000;
+
     app.use(sessions({
         cookie: {
             path: '/',
@@ -128,10 +120,9 @@ try {
 
     app.use('*',function(req,res,next){
         if (req.session === undefined) {
-            res.status(500).send("<html><body><p>[ECODE 600] Internal Server Error Occured!</p></body></html>");
-        } else {
-            return next();
+            return res.status(500).send("<html><body><p>[ECODE 600] Internal Server Error Occured!</p></body></html>");
         }
+		return next();
     });
 
     app.use(helmet());
@@ -143,6 +134,61 @@ try {
         sha256s: ['AbCdEf123=', 'ZyXwVu456=']
     }));
     app.use(helmet.noCache());
+
+    app.post('/restartService',function(req, res){
+        logger.info("Inside UI Service: restartService");
+        var childProcess = require("child_process");
+        var serverList = ["License Server", "NDAC Server", "Web Server"];
+        var svcNA = "service does not exist";
+        var svcRun = "RUNNING";
+        var svcRunPending = "START_PENDING";
+        var svcStop = "STOPPED";
+        var svcStopPending = "STOP_PENDING";
+        var svc = req.body.id;
+        var batFile = require.resolve("./assets/svc.bat");
+        try {
+            if (svc == "query") {
+                var svcStatus = [];
+                var execCmd = batFile + " ";
+                childProcess.exec(execCmd + "0 QUERY", function(error, stdout, stderr) {
+                    if (stdout && stdout.indexOf(svcNA) == -1) svcStatus.push(true);
+                    else svcStatus.push(false);
+                    childProcess.exec(execCmd + "1 QUERY", function(error, stdout, stderr) {
+                        if (stdout && stdout.indexOf(svcNA) == -1) svcStatus.push(true);
+                        else svcStatus.push(false);
+                        childProcess.exec(execCmd + "2 QUERY", function(error, stdout, stderr) {
+                            if (stdout && stdout.indexOf(svcNA) == -1) svcStatus.push(true);
+                            else svcStatus.push(false);
+                            return res.send(svcStatus);
+                        });
+                    });
+                });
+            } else {
+                var execCmd = batFile + " " + svc.toString() + " ";
+                childProcess.exec(execCmd + "QUERY", function(error, stdout, stderr) {
+                    if (stdout) {
+                        if (stdout.indexOf(svcNA) > 0) {
+                            logger.error("Error occured in restartService:",serverList[svc],"Service is not installed");
+                            return res.send("na");
+                        } else {
+                            if (stdout.indexOf(svcRun) > 0 || stdout.indexOf(svcRunPending) > 0) execCmd += "RESTART";
+                            else execCmd += "START";
+                            logger.error(serverList[svc],"Service restarted successfully");
+                            res.send("success");
+                            childProcess.exec("START " + execCmd, function(error, stdout, stderr) { return; });
+                            return true;
+                        }
+                    } else {
+                        logger.error("Error occured in restartService: Fail to restart",serverList[svc],"Service");
+                        return res.status(500).send("fail");
+                    }
+                });
+            }
+        } catch (exception) {
+            logger.error(exception.message);
+            return res.status(500).send("fail");
+        }
+    });
 
     //Role Based User Access to services
     app.post('*', function (req, res, next) {
@@ -207,14 +253,6 @@ try {
             frameSrc: ["data:"]
         }
     }));
-
-    //serve all asset files from necessary directories
-    app.use('/partials',express.static(__dirname + "/public/partials"));
-    app.use("/js", express.static(__dirname + "/public/js"));
-    app.use("/imgs", express.static(__dirname + "/public/imgs"));
-    app.use("/images_mindmap", express.static(__dirname + "/public/images_mindmap"));
-    app.use("/css", express.static(__dirname + "/public/css"));
-    app.use("/fonts", express.static(__dirname + "/public/fonts"));
 
     app.get('/',  function (req,  res)  {
         res.clearCookie('connect.sid');
@@ -281,9 +319,10 @@ try {
             }
         });
 
-        if (req.session.switchedRole !== true) {
+        if (req.session.activeRole == req.session.defaultRoleId) {
             if (!req.session.defaultRole || roles.indexOf(req.session.defaultRole) >= 0) {
-                req.session.destroy();  res.status(401).redirect('/');
+                req.session.destroy();
+                res.status(401).redirect('/');
             } else {
                 if (req.session.uniqueId != undefined) {
                     res.sendFile("index.html", { root: __dirname + "/public/" });
@@ -317,21 +356,6 @@ try {
         });
     });
 
-    // express-winston errorLogger makes sense AFTER the router.
-    // app.use(expressWinston.errorLogger({
-    //   transports: [
-    //     new winston.transports.Console({
-    //       json: true,
-    //       colorize: true
-    //     })
-    //   ]
-    // }));
-    //  // Optionally you can include your custom error handler after the logging.
-    // app.use(express.errorLogger({
-    //   dumpExceptions: true,
-    //   showStack: true
-    // }));
-
     //Route Directories
     var mindmap = require('./server/controllers/mindmap');
     var login = require('./server/controllers/login');
@@ -347,11 +371,11 @@ try {
     var neuronGraphs2D = require('./server/controllers/neuronGraphs2D');
     var dashboard = require('./server/controllers/dashboard');
     var taskbuilder = require('./server/controllers/taskJson');
-	var flowGraph = require('./server/controllers/flowGraph');
+    var flowGraph = require('./server/controllers/flowGraph');
 
     // Mindmap Routes
     try {
-    	throw "Disable Versioning";
+        throw "Disable Versioning";
         var version = require('./server/controllers/project_versioning');
         app.post('/getVersions', version.getVersions);
         app.post('/getModulesVersioning', version.getModulesVersioning);
@@ -359,10 +383,11 @@ try {
         app.post('/createVersion', version.createVersion);
         app.post('/getProjectsNeo', version.getProjectsNeo);
     } catch (Ex) {
+        process.env.projectVersioning = "disabled";
         logger.warn('Versioning is disabled');
     }
 
-    //app.post('/home', mindmap.mindmapService);
+	// Route Mapping
     app.post('/populateProjects', mindmap.populateProjects);
     app.post('/populateUsers', mindmap.populateUsers);
     app.post('/checkReuse', mindmap.checkReuse);
@@ -379,17 +404,11 @@ try {
 
     //Login Routes
     app.post('/authenticateUser_Nineteen68', login.authenticateUser_Nineteen68);
-    app.post('/authenticateUser_Nineteen68_CI', login.authenticateUser_Nineteen68_CI);
     app.post('/loadUserInfo_Nineteen68', login.loadUserInfo_Nineteen68);
     app.post('/getRoleNameByRoleId_Nineteen68', login.getRoleNameByRoleId_Nineteen68);
     app.post('/logoutUser_Nineteen68', login.logoutUser_Nineteen68);
-    app.post('/logoutUser_Nineteen68_CI', login.logoutUser_Nineteen68_CI);
     //Admin Routes
     app.post('/getUserRoles_Nineteen68', admin.getUserRoles_Nineteen68);
-    app.post('/createUser_Nineteen68', admin.createUser_Nineteen68);
-    app.post('/updateUser_nineteen68', admin.updateUser_nineteen68);
-    app.post('/getAllUsers_Nineteen68', admin.getAllUsers_Nineteen68);
-    app.post('/getEditUsersInfo_Nineteen68', admin.getEditUsersInfo_Nineteen68);
     app.post('/getDomains_ICE', admin.getDomains_ICE);
     app.post('/createProject_ICE', admin.createProject_ICE);
     app.post('/updateProject_ICE', admin.updateProject_ICE);
@@ -399,7 +418,13 @@ try {
     app.post('/getAssignedProjects_ICE', admin.getAssignedProjects_ICE);
     app.post('/getAvailablePlugins', admin.getAvailablePlugins);
     app.post('/getSessionData', admin.getSessionData);
+    app.post('/manageUserDetails', admin.manageUserDetails);
+    app.post('/getUserDetails', admin.getUserDetails);
+    app.post('/testLDAPConnection', admin.testLDAPConnection);
+    app.post('/getLDAPConfig', admin.getLDAPConfig);
+    app.post('/manageLDAPConfig', admin.manageLDAPConfig);
     app.post('/generateCItoken', admin.generateCItoken);
+
     //Design Screen Routes
     app.post('/initScraping_ICE', design.initScraping_ICE);
     app.post('/highlightScrapElement_ICE', design.highlightScrapElement_ICE);
@@ -462,7 +487,7 @@ try {
     app.post('/loadDashboardData', dashboard.loadDashboardData);
     app.post('/loadDashboard_2', dashboard.loadDashboard_2);
     //app.post('/manualTestcaseDetails_ICE', qc.manualTestcaseDetails_ICE);
-	// Automated Path Generator Routes
+    // Automated Path Generator Routes
     app.post('/flowGraphResults', flowGraph.flowGraphResults);
     app.post('/APG_OpenFileInEditor', flowGraph.APG_OpenFileInEditor);
     app.post('/APG_createAPGProject',flowGraph.APG_createAPGProject);

@@ -1094,6 +1094,8 @@ input[disabled]{
     float: left;
     width: 85%;
     margin-top: 2%;
+    /* overflow: auto;
+    max-height: calc(100% - 131px); */
 }
 .customTxtName,.customTxtName:hover
 {
@@ -1428,9 +1430,8 @@ input[disabled]{
 {
     float: right;
     width: auto;
-    /* margin-right: 31%; */
     position: relative;
-    left: -32%;
+    left: -5%;
 }
 .saveComapredObj
 {
@@ -1487,7 +1488,6 @@ input[disabled]{
 .dropdown-menu-multiselect{
     margin-top: -5px;
     z-index: 1000;
-    display: none;
     float: left;
     min-width: 187px;
     padding: 5px 0;
@@ -1544,6 +1544,11 @@ input[disabled]{
 }
 .taskname{
     cursor: pointer;
+    overflow: hidden;
+    white-space: nowrap !important;
+    text-overflow: ellipsis;
+    float: left;
+    max-width: 80%;
 }
 
 .wsdlRqstRspns{
@@ -2480,7 +2485,11 @@ input[disabled]{
 .scenarioHeaders tr td{
 	padding: 0 5px 0 5px;
 	border-right: 1px solid #fff;
-	text-align: center;
+    text-align: center;
+    /* float: left;
+    overflow: hidden;
+    white-space: nowrap !important;
+    text-overflow: ellipsis; */
 }
 .scenarioHeaders tr td:first-child{text-align: left; padding-left: 8px; padding-top: 2px; width: 7%;}
 .scenarioHeaders tr td:nth-child(2){width: 30%;}
@@ -2522,7 +2531,10 @@ input[disabled]{
 	box-shadow:none;
 }
 .tabeleCellPadding{
-	padding: 5px 0px !important;
+    padding: 5px 0px !important;
+    overflow: hidden;
+    white-space:nowrap !important; 
+    text-overflow: ellipsis;
 }
 .alertGreen{
 	background: #fff url("../imgs/ic-true.png") 90% center no-repeat !important
@@ -2610,6 +2622,10 @@ input[disabled]{
     margin-top: 7px;
     width: 327px;
     padding: 0 10px 0 2px;
+    overflow:hidden;
+    white-space: nowrap !important;
+    text-overflow: ellipsis;
+    max-width: 350px;
 }
 .cancelJob{
     cursor: pointer;
@@ -2677,6 +2693,9 @@ input[disabled]{
     word-break: break-all;
     word-wrap: break-word;
     padding: 0px 10px;
+    overflow: hidden;
+    white-space: nowrap !important;
+    text-overflow: ellipsis;
 }
 /******Scenario Details Modal******/
 
@@ -2813,6 +2832,9 @@ input[disabled]{
     text-align: center;
     word-break: break-all;
     font-size: 17px;
+    overflow: hidden;
+    white-space: nowrap !important;
+    text-overflow: ellipsis;
 }
 
 .modal-header .close {
@@ -3135,6 +3157,11 @@ li.select_all .addCustObj{
     right: 300px;
     color: red;
 }
+
+.addObjectDisable
+{
+    pointer-events: none;
+}
 /******Map Object CSS******/
 
 
@@ -3195,6 +3222,17 @@ li.select_all .addCustObj{
     position: relative;
     float: left;
     width: 100%;
+}
+
+.adminControl div span{
+    display: inline-block;
+    width: 75px;
+	font-weight: 700;
+}
+
+.adminControl div input{
+    display: inline;
+	width: calc(100% - 75px);
 }
 
 .adminSelect:focus {
@@ -3264,7 +3302,7 @@ li.select_all .addCustObj{
     padding: 10px;
 }
 .domainTxt {
-    font-weight: normal;
+    /*font-weight: normal;*/
 	float: left;
 }
 
@@ -3334,8 +3372,8 @@ li.select_all .addCustObj{
 }
 
 #selDomain, #selDomainEdit, #selAssignDomain, #selAssignUser {
-	    position: relative;
-        left: 10px
+    position: relative;
+    left: 10px
 }
 #selDomain, #selDomainEdit, #selAssignProject{
     margin-left: 10px;
@@ -3355,13 +3393,15 @@ li.select_all .addCustObj{
     font-size: 14px;
     line-height: 1.42857143;
 }
-#selAssignUser
-{
+#selDomain {
+	margin-left: 0;
+}
+
+#selAssignUser{
     margin-left: 6.5%;
 }
 
-#selAssignProject
-{
+#selAssignProject{
     margin-left: 2%;
     width: 90%;
 }
@@ -3379,16 +3419,16 @@ li.select_all .addCustObj{
     -webkit-border-radius: 5px;
     -o-border-radius: 5px;
     -ms-border-radius: 5px;
-    height: calc(100% - 285px);
+    height: calc(100% - 325px);
     padding: 8px;
     clear: both;
     position: relative;
     top: 5px;
 }
 
-#updateReleaseCycle
-{
-  height: calc(100% - 255px);
+#updateReleaseCycle{
+  /* height: calc(100% - 255px); */
+  height: calc(100% - 300px);
 }
 
 .addContainer{
@@ -3425,7 +3465,7 @@ li.select_all .addCustObj{
 #cycleList li{
 	float: left;
     width: 100%;
-    padding: 8px 25px 8px 30px;
+    padding: 8px 25px 8px 24px;
     font-size: 15px;
     position: relative;
     cursor: pointer;
@@ -3441,6 +3481,7 @@ li.select_all .addCustObj{
     position: absolute;
     right: 45px;
     top: 5px;
+    visibility: hidden;
 }
 
 .actionOnHover img{
@@ -3450,35 +3491,34 @@ li.select_all .addCustObj{
 .actionOnHover img:first-child{
 	margin-right: 10px !important;
 }
-.citokenBtn{
+
+.userTypeBtn.focus,
+.userTypeBtn,
+.userTypeBtn:active:focus,
+.userTypeBtn:focus,
+.userTypeBtn:hover{
+	margin: 6px 0;
 	position: absolute;
+	width: 80px;
     z-index: 1;
-    right: 82px;
-    background: #5e636b !important;
+    background: #5e636b;
+	padding: 0px 20px !important;
 }
-.citokenBtnActive{
+
+.userTypeBtnActive{
     background: #643693 !important;
 }
-.ldapBtn {
-	position: absolute;
-    z-index: 1;
+
+.citokenBtn{
+    right: 88px;
+}
+
+.ldapBtn{
     right: 0;
-    margin: 0;
-    padding: 0px 20px;
-    background: #5e636b !important;
 }
 
-.ldapBtnActive{
-	background: #643693 !important;
-}
-
-.ldapBtn.focus,
-.ldapBtn,
-.ldapBtn:active:focus,
-.ldapBtn:focus,
-.ldapBtn:hover{
-	padding: 0px 20px !important;
-	margin-right: 0;
+.userLDAPFetch label{
+	margin: 0 50px 10px 50px;
 }
 
 .selectlg{
@@ -3516,187 +3556,10 @@ li.select_all .addCustObj{
 	position: relative;
     top: -1px;
 }
-/*****************ADMIN CSS NEW ************************/
-.containerWrap {
-	float: left;
-	width: 100%;
-	height: 100%
-}
 
-.adminActionBtn {
-	float: right;
-	width: auto;
-}
-
-.adminBtn {
-	padding: 2px 25px !important;
-}
-
-.adminForm {
-	padding-top: 5%;
-}
-
-.adminSmBox {
-	padding-top: 5%;
-	padding-left: 0px;
-}
-
-.adminControl {
-	margin-bottom: 3%;
-    padding: 0px 0px;
-    position: relative;
-    float: left;
-    width: 100%;
-}
-
-.adminSelect:focus {
-	box-shadow: none !important;
-}
-
-.leftControl {
-	float: left;
-	width: 47%;
-}
-
-.rightControl {
-	float: right;
-	width: 50%;
-}
-
-.primaryRole {
-	width: auto;
-	vertical-align: middle;
-	font-weight: normal;
-	line-height: 2;
-}
-
-.selectControl {
-	position: relative;
-	left: -90px;
-}
-
-.errorlbl {
-	margin: -2.5em 0 2em;
-	line-height: 17px;
-	position: relative;
-	left: 12px;
-}
-
-.userForm {
-	float: left;
-	width: 100%;
-}
-
-.adminSelect {
-	padding: 0px;
-	height: 25px;
-	margin-bottom: 0;
-	width: 60%;
-	margin-left: 4%;
-	margin-top: 0%;
-	line-height: 2;
-	border: 1px solid #656565 !important;
-}
-
-.selectRole {
-	margin-top: 2%;
-	float: left;
-}
-.domainTxt {
-	float: left;
-}
-
-.projectForm:first-child {
-	margin-top: 5%;
-}
-
-.projectForm {
-	margin-bottom: 3%;
-	padding: 0 0px;
-}
-
-.appTypeTxt {
-	position: relative;
-	top: 20px;
-}
-
-.projectTypes,.projectTypes_create {
-	float: left;
-	width: 10.5%;
-	padding: 7px;
-	text-align: center;
-	cursor: pointer
-}
-
-.projectTypes label,.projectTypes_create label {
-	float: left;
-	width: 100%;
-	font-size: 11px;
-	font-weight: 500;
-	margin-top: 8px;
-	color: #311d4e;
-	margin-bottom: 0;
-	cursor: pointer
-}
-
-.projectTypes:nth-child(3) label,.projectTypes_create:nth-child(3) label,
-.projectTypes:nth-child(4) label,.projectTypes_create:nth-child(4) label,
-.projectTypes:nth-child(6) label,.projectTypes_create:nth-child(6) label,
-.projectTypes:nth-child(7) label,.projectTypes_create:nth-child(7) label{
-	margin-top: 9px;
-}
-
-.projectTypes:nth-child(5) label,.projectTypes_create:nth-child(5) label{
-	margin-top: 14px;
-}
-
-.projectTypes:nth-child(8) label,.projectTypes:nth-child(8) label{
-	margin-top: 19px;
-}
-
-.projectTypes:hover,.projectTypes_create:hover{
-	background: #e4e4e4;
-    border-radius: 6px;
-    transition: 0.3s ease-in-out;
-    -moz-transition: 0.3s ease-in-out;
-    -webkit-transition: 0.3s ease-in-out;
-}
 .projectTypesremovefunc:hover,.projectTypesremovefunc_create:hover{
 	background:none !important;
 	cursor:default !important;
-}
-
-.projectTypeSelected{
-	background: #e4e4e4;
-    border-radius: 6px;
-    -moz-border-radius: 6px;
-    -webkit-border-radius: 6px;
-    -o-border-radius: 6px;
-    -ms-border-radius: 6px;
-}
-
-#selDomain {
-	margin-left: 0;
-}
-
-.appTypesContainer {
-	float: right;
-    width: 86%;
-    margin-left: 5px;
-}
-
-.relCycContainer{
-	background: #e6e7e9;
-    border-radius: 5px;
-    -moz-border-radius: 5px;
-    -webkit-border-radius: 5px;
-    -o-border-radius: 5px;
-    -ms-border-radius: 5px;
-    height: calc(100% - 290px);
-    padding: 8px;
-    clear: both;
-    position: relative;
-    top: 5px;
 }
 
 .releaseContainer, .cycleContainer{
@@ -3704,87 +3567,14 @@ li.select_all .addCustObj{
 }
 .releaseContainer{padding-right: 3px;}
 .cycleContainer{padding-left: 3px;}
-.addContainer{
-	float: left;
-    width: 100%;
-    padding: 10px 25px;
-    font-size: 15px;
-    margin-bottom: 10px
-}
 
-.addContainer span{
-	cursor: pointer;
-	display: inline-block;
-}
-
-.addContainer img{
-	margin-right: 10px;
-    vertical-align: bottom;
-}
-
-#releaseList, #cycleList{
-	padding: 0;
-    float: left;
-    width: 100%;
-}
-
-#releaseList li img,
-#cycleList li img{
-	vertical-align: bottom;
-    margin-right: 15px;
-}
-
-#releaseList li,
-#cycleList li{
-	float: left;
-    width: 100%;
-    padding: 8px 25px 8px 24px;
-    font-size: 15px;
-    position: relative;
-    cursor: pointer;
-}
-
-#releaseList li:hover,
-#cycleList li:hover{
-	background: #f1f1f1;
-}
-
-.actionOnHover{
-	display: inline-block;
-    position: absolute;
-    right: 45px;
-    top: 5px;
-    visibility: hidden;
-}
-
-.actionOnHover img{
-	margin: 0 !important;
-}
-
-.actionOnHover img:first-child{
-	margin-right: 10px !important;
-}
 .editReleaseName, .editCycleName{visibility: visible;}
-.ldapBtn.focus,
-.ldapBtn,
-.ldapBtn:active:focus,
-.ldapBtn:focus,
-.ldapBtn:hover{
-	padding: 0px 20px !important;
-	margin-right: 0;
-}
 
-.selectlg{
-	margin-left: 0;
-    width: 100%;
-}
-.pointerEventsDisabled
-{
+.pointerEventsDisabled {
     pointer-events: none;
 }
 /* Ellipsis for Release and Cycle Name */
-.releaseName,.cycleName
-{
+.releaseName,.cycleName{
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
@@ -3792,8 +3582,7 @@ li.select_all .addCustObj{
     vertical-align: middle;
     display: inline-block;
 }
-.cycleName
-{
+.cycleName{
     margin-top:-10px !important;
 }
 
@@ -4449,7 +4238,7 @@ select:-webkit-autofill:focus {
 	.plugin-block span{
 		-webkit-transform: translateX(-103%) translateY(-50%);
 	}
-	.tabeleCellPadding{width: 4%;}
+	.tabeleCellPadding{width: 4%;overflow: hidden;white-space:nowrap !important; text-overflow: ellipsis;}
 	.suitestartend thead{width: calc(100% - 1004px);}
 	.formatpdfbrwsrexport{left: 75px;}
 }
@@ -5636,6 +5425,53 @@ label.checkbox{
 option:disabled {
     background: #ccc!important;
 }
+.browserInlineIcons li{
+    width: 20%;
+    float: left;
+    margin-top: 1%;
+    position: relative;
+    left: 13%;
+}
+ul.browserInlineIcons
+{
+    float: left;
+    width: 100%;
+    margin-bottom: 2%;
+}
+.inline-ie-img
+{
+    width: 27px;
+    height: 27px;
+}
+.inline-chrome-img
+{
+    width: 27px;
+    height: 27px;
+}
+.inline-firefox-img
+{
+    width: 27px;
+    height: 28px;
+}
+
+.inline-safari-img
+{
+    width: 27px;
+    height: 28px;
+}
+.checkStyleComparebox
+{
+    position: relative;
+    left: -3px;
+    top: 2px;
+    outline: none;
+    width: 15px;
+    height: 15px;
+}
+.disableClick
+{
+    pointer-events: none;
+}
 #preferencesTable thead th
 {
     background: #5e626b;
@@ -5666,5 +5502,30 @@ option:disabled {
 {
     width: 33% !important;
 }
+.ellipsisCls
+{
+    overflow:hidden;
+    white-space: nowrap !important;
+    text-overflow: ellipsis;
+}
 
+#enableAppend:disabled {
+    opacity: 0.7;
+}
+.qcTestcaseName{
+    padding-left:4px;
 
+}
+.qcTestcaseId{
+    background: #331d4c;
+    color: #fff;
+    border-radius: 3px;
+    /* height: 14px; */
+    /* width: 14px; */
+    display: inline;
+    padding: 2px;
+}
+.removeScroll
+{
+    overflow: hidden !important;
+}

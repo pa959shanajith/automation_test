@@ -263,6 +263,28 @@
 }
 
 
+.scroll-wrapper > .scrollbar-compare{
+	padding: 0px;
+	height: auto !important;
+	min-height: auto !important;
+	max-height: 650px !important;
+	width:100% !important;
+}
+.scroll-wrapper.scrollbar-compare {
+   /*  height: calc(100% - 350px); */
+    margin-bottom: 1%;
+}
+.scrollbar-compare > .scroll-element.scroll-y .scroll-bar{
+	background: #321e4f
+}
+.scrollbar-compare > .scroll-element .scroll-element_track{
+	background: rgb(211, 211, 211)
+}
+
+.scrollbar-compare > .scroll-element.scroll-y{
+    height: 90% !important;
+}
+
 .scroll-wrapper > .scrollbar-screenshotTs{
        padding: 0px;
        /* height: auto !important; */

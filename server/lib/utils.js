@@ -35,11 +35,8 @@ module.exports.getSocketList = function(toFetch, cb) {
 module.exports.resetSession = function(session) {
 	var intr = parseInt(process.env.SESSION_INTERVAL);
 	var sessAge = parseInt(process.env.SESSION_AGE);
-	session.cookie.maxAge = sessAge;
-	myserver.redisSessionStore.touch(session.uniqueId,session);
 	var updateSessionExpiry = setInterval(function () {
-		session.cookie.maxAge = sessAge;
-		myserver.redisSessionStore.touch(session.uniqueId,session);
+		session.maxAge = sessAge;
 	}, intr);
 	return updateSessionExpiry;
 };

@@ -23,19 +23,22 @@
 				<!--Logo-->
 
 				<!--Login Form-->
-				<div class="wrap login-wrap">
+				<div class="wrap login-wrap" ng-if="restartForm!=true">
 					<form>
 						<div class="input-group">
 							<span class="input-group-addon ic-username"><img src="imgs/ic-username.png" /></span>
-							<input ng-model="userName" type="text" class="form-control" name="username" placeholder="Username">
+							<input ng-model="ud.userName" type="text" class="form-control" name="username" placeholder="Username">
 						</div>
 						<div class="input-group">
 							<span class="input-group-addon ic-password"><img src="imgs/ic-password.png" /></span>
-							<input ng-model="password" type="password" class="form-control" name="password" placeholder="Password" autocomplete="off">
+							<input ng-model="ud.password" type="password" class="form-control" name="password" placeholder="Password" autocomplete="off">
 						</div>
 						<span ng-show="loginValidation" class="absoluteError errorMessages">{{loginValidation}}</span>
 						<button ng-click="check_credentials('/plugin')" type="submit" class="btn btn-block">Login</button>
 					</form>
+				</div>
+				<div class="wrap login-wrap" ng-if="restartForm==true">
+					<button ng-repeat="server in serverList" ng-click="restartServer($index, server.name)" ng-disabled="!server.active" style="font-size:25px;margin-bottom:35px" type="submit" class="btn btn-block">Restart {{server.name}}</button>
 				</div>
 				<!--Login Form-->
 			</div>
@@ -54,3 +57,22 @@
 	</p>
 </footer>
 <!--Footer-->
+
+<!--Modal Box-->
+<div class="modal fade" id="popupModal" role="dialog" data-keyboard="false" data-backdrop="static">
+	<div class="modal-dialog modal-sm">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">&times;</button>
+				<h4 class="modal-title"></h4>
+			</div>
+			<div class="modal-body">
+				<p></p>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Ok</button>
+			</div>
+		</div>
+	</div>
+</div>
+<!--Modal Box-->

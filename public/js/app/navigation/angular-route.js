@@ -13,7 +13,8 @@ mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
                 deps: ['$ocLazyLoad', function ($ocLazyLoad) {
                     return $ocLazyLoad.load([
 						'js/controllers/login/loginController.js',
-						'js/controllers/login/loginService.js'
+						'js/controllers/login/loginService.js',
+						'js/controllers/admin/adminService.js'
                     ]);
                 }]
             }
@@ -316,10 +317,12 @@ mySPA.config(['$stateProvider', '$urlRouterProvider', function ($stateProvider, 
 		.then(function(data){
 			if(data == "Session Expired"){
 				window.localStorage.clear();
-				$location.path('/login');
+				//$location.path('/login');
+				window.location='/';
 			}
 		}, function(error) {
 			console.log("Failed to Logout");
+			//window.location='/';
 		});
 	}
 });

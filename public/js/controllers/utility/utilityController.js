@@ -73,10 +73,10 @@ mySPA.controller('utilityController', ['$scope','$rootScope',  '$http', '$locati
                                 }
                             }
                             $("#dialog-addObject").modal("show");
-                        } else console.log("Something wrong with your code")
+                        } else console.log("Something went wrong")
                     },
                     function(error) {
-                        console.log("Error while traversing DesignController.js file addUITestscripts method!! \r\n " + (error.TableData));
+                        console.log("Something went wrong");
                     });
         };
         //$(TableData).appendTo("#modal-body-pairwise tbody");		
