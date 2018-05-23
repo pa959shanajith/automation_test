@@ -793,25 +793,37 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
 
                         if (viewString.view != undefined) {
                             for (var i = 0; i < viewString.view.length; i++) {
-                                var path = viewString.view[i].xpath;
-                                var ob = viewString.view[i];
-                                addcusOb = '';
-                                ob.tempId = i;
-                                custN = ob.custname;
-                                var tag = ob.tag;
-                                if (tag == "dropdown") {
-                                    imgTag = "select"
-                                } else if (tag == "textbox/textarea") {
-                                    imgTag = "input"
-                                } else imgTag = tag;
-                                if (path == "") addcusOb = 'addCustObj';
-                                if (tag == "a" || tag == "input" || tag == "table" || tag == "list" || tag == "select" || tag == "img" || tag == "button" || tag == "radiobutton" || tag == "checkbox" || tag == "tablecell") {
+                                // if(viewString.scrapetype == 'caa'){
+                                    // var li = "<li  class='item select_all'><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='"+viewString.view[i].custname+"' class='ellipsis'>"+viewString.view[i].custname+"</span></a></li>";
+                                // }
+                                // else{
+                                    var path = viewString.view[i].xpath;
+                                    var ob = viewString.view[i];
+                                    addcusOb = '';
+                                    ob.tempId = i;
+                                    custN = ob.custname;
+                                    var tag = ob.tag;
+                                    if (tag == "dropdown") {
+                                        imgTag = "select"
+                                    } else if (tag == "textbox/textarea") {
+                                        imgTag = "input"
+                                    } else imgTag = tag;
+                                    if (path == "") addcusOb = 'addCustObj';
+                                    // if (tag == "a" || tag == "input" || tag == "table" || tag == "list" || tag == "select" || tag == "img" || tag == "button" || tag == "radiobutton" || tag == "checkbox" || tag == "tablecell") {
+                                    //     var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' /><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis " + addcusOb + "'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
+                                    // } 
+                                    // else {
+                                        if(ob.cord && ob.cord != ''){  //in case of iris object
+                                            addcusOb = ""
+                                            ob.hiddentag = "No",
+                                            tag = "iris",
+                                            ob.url = "",
+                                            ob.xpath = ""                                        
+                                        }                                  
                                     var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' /><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis " + addcusOb + "'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
-                                } 
-								else {
-                                    var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' /><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis " + addcusOb + "'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
-                                }
-                                angular.element(innerUL).append(li);
+                                    // }                                       
+                                // }        
+                                angular.element(innerUL).append(li);                        
                             }
                             $(".checkStylebox, .checkall").prop("disabled", false);
                             if (viewString.view.length == 0) {
@@ -1718,22 +1730,37 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                         if (eaCheckbox) {
                             //Getting the Existing Scrape Data
                             for (var i = 0; i < newScrapedList.view.length; i++) {
-                                var path = newScrapedList.view[i].xpath;
-                                var ob = newScrapedList.view[i];
-                                ob.tempId = i;
-                                custN = ob.custname;
-                                var tag = ob.tag;
-                                if (tag == "dropdown") {
-                                    imgTag = "select"
-                                } else if (tag == "textbox/textarea") {
-                                    imgTag = "input"
-                                } else imgTag = tag;
-                                if (tag == "a" || tag == "input" || tag == "table" || tag == "list" || tag == "select" || tag == "img" || tag == "button" || tag == "radiobutton" || tag == "checkbox" || tag == "tablecell") {
+                                // if(newScrapedList.scrapetype == 'caa'){
+                                //     var li = "<li  class='item select_all'><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='"+newScrapedList.view[i].custname+"'>"+newScrapedList.view[i].custname+"</span></a></li>";
+                                // }
+                                // else{
+                                    var path = newScrapedList.view[i].xpath;
+                                    var ob = newScrapedList.view[i];
+                                    ob.tempId = i;
+                                    custN = ob.custname;
+                                    var tag = ob.tag;
+                                    if (tag == "dropdown") {
+                                        imgTag = "select"
+                                    } else if (tag == "textbox/textarea") {
+                                        imgTag = "input"
+                                    } else imgTag = tag;
+
+                                    if(ob.cord && ob.cord != ''){  //in case of iris object
+										addcusOb = ""
+                                        ob.hiddentag = "No",
+                                        tag = "iris",
+                                        ob.url = "",
+                                        ob.xpath = ""                                        
+                                    }        
+
+                                    // if (tag == "a" || tag == "input" || tag == "table" || tag == "list" || tag == "select" || tag == "img" || tag == "button" || tag == "radiobutton" || tag == "checkbox" || tag == "tablecell") {
+                                    //     var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
+                                    // } else {
                                     var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
-                                } else {
-                                    var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
-                                }
-                                angular.element(innerUL).append(li)
+                                    // }
+                                // }                                
+
+                                angular.element(innerUL).append(li);
                             }
                             //Getting the Existing Scrape Data
 
@@ -1743,24 +1770,35 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                             function generateScrape() {
                                 var tempId = newScrapedList.view.length - 1;
                                 for (var i = 0; i < viewString.view.length; i++) {
-                                    tempId++
-                                    var path = viewString.view[i].xpath;
-                                    var ob = viewString.view[i];
-                                    var custN = ob.custname.replace(/[<>]/g, '').trim();
-                                    var tag = ob.tag;
-                                    if (tag == "dropdown") {
-                                        imgTag = "select"
-                                    } else if (tag == "textbox/textarea") {
-                                        imgTag = "input"
-                                    } else imgTag = tag;
-                                    var tag1 = tag.replace(/ /g, "_");
-                                    var tag2;
-
-                                    if (tag == "a" || tag == "input" || tag == "table" || tag == "list" || tag == "select" || tag == "img" || tag == "button" || tag == "radiobutton" || tag == "checkbox" || tag == "tablecell") {
-                                        var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
-                                    } else {
-                                        var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
-                                    }
+                                    // if(viewString.scrapetype == 'caa'){
+                                    //     var li = "<li  class='item select_all'><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='"+viewString.view[i].custname+"'>"+viewString.view[i].custname+"</span></a></li>";
+                                    // }
+                                    // else{
+                                        tempId++
+                                        var path = viewString.view[i].xpath;
+                                        var ob = viewString.view[i];
+                                        var custN = ob.custname.replace(/[<>]/g, '').trim();
+                                        var tag = ob.tag;
+                                        if (tag == "dropdown") {
+                                            imgTag = "select"
+                                        } else if (tag == "textbox/textarea") {
+                                            imgTag = "input"
+                                        } else imgTag = tag;
+    
+                                        // if (tag == "a" || tag == "input" || tag == "table" || tag == "list" || tag == "select" || tag == "img" || tag == "button" || tag == "radiobutton" || tag == "checkbox" || tag == "tablecell") {
+                                        //     var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
+                                        // } else {
+                                            if(ob.cord && ob.cord != ''){  //in case of iris object
+                                                addcusOb = ""
+                                                ob.hiddentag = "No",
+                                                tag = "iris",
+                                                ob.url = "",
+                                                ob.xpath = ""                                        
+                                            }   
+                                            var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
+                                        // }    
+                                  
+                                    // }                                    
                                     angular.element(innerUL).append(li)
                                     //newScrapedList.view.push(viewString.view[i]);
                                 }
@@ -1777,29 +1815,42 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                             //Before Saving the Scrape JSON to the Database
                             for (var i = 0; i < viewString.view.length; i++) {
                                 var innerUL = $("#finalScrap").children('#scrapTree').children('ul').children().children('#scraplist');
-                                var path = viewString.view[i].xpath;
-                                var ob = viewString.view[i];
-                                ob.tempId = i;
-                                var custN = ob.custname.replace(/[<>]/g, '').trim();
-                                var tag = ob.tag;
-                                if (tag == "dropdown") {
-                                    imgTag = "select"
-                                } else if (tag == "textbox/textarea") {
-                                    imgTag = "input"
-                                } else imgTag = tag;
-                                var tag1 = tag.replace(/ /g, "_");
-                                var tag2;
-                                if (tag == "a" || tag == "input" || tag == "table" || tag == "list" || tag == "select" || tag == "img" || tag == "button" || tag == "radiobutton" || tag == "checkbox" || tag == "tablecell") {
+
+                                // if(viewString.scrapetype == 'caa'){
+                                //     var li = "<li  class='item select_all'><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='"+viewString.view[i].custname+"'>"+viewString.view[i].custname+"</span></a></li>";
+                                // }
+                                // else{
+                                    var path = viewString.view[i].xpath;
+                                    var ob = viewString.view[i];
+                                    ob.tempId = i;
+                                    var custN = ob.custname.replace(/[<>]/g, '').trim();
+                                    var tag = ob.tag;
+                                    if (tag == "dropdown") {
+                                        imgTag = "select"
+                                    } else if (tag == "textbox/textarea") {
+                                        imgTag = "input"
+                                    } else imgTag = tag;
+                                    // if (tag == "a" || tag == "input" || tag == "table" || tag == "list" || tag == "select" || tag == "img" || tag == "button" || tag == "radiobutton" || tag == "checkbox" || tag == "tablecell") {
+                                    //     var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
+                                    // } else {
+                                        if(ob.cord && ob.cord != ''){  //in case of iris object
+                                            addcusOb = ""
+                                            ob.hiddentag = "No",
+                                            tag = "iris",
+                                            ob.url = "",
+                                            ob.xpath = ""                                        
+                                        }                                      
                                     var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
-                                } else {
-                                    var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems'/><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
-                                }
+                                    // }
+                                // }
                                 angular.element(innerUL).append(li);
+
+
                             }
                             //Before Saving the Scrape JSON to the Database
                         }
 						$("li.item:visible").each(function() {
-                            if ($(this).attr('data-xpath') == "") {
+                            if ($(this).attr('data-xpath') == "" && $(this).attr('data-tag') != "iris") {
                                 $(this).children().find('span.ellipsis').addClass('customObject');
                             }
                         });
@@ -3924,7 +3975,8 @@ function contentTable(newTestScriptDataLS) {
                 {label: 'URL', name: 'url', editable: false, resizable: false, hidden: true},
                 {label: 'appType', name: 'appType', editable: false, resizable: false, hidden: true},
                 {label: 'Details', name: 'addTestCaseDetails', editable: false, resizable: false, sortable: false},
-                {label: 'Details', name: 'addTestCaseDetailsInfo', editable: false, resizable: false, sortable: false,hidden: true}
+                {label: 'Details', name: 'addTestCaseDetailsInfo', editable: false, resizable: false, sortable: false,hidden: true},
+                {label: 'cord', name: 'cord', editable: false, resizable: false, hidden: true}
             ],
             loadonce: false,
             viewrecords: false,
@@ -4082,7 +4134,7 @@ function contentTable(newTestScriptDataLS) {
                 $("#jqGrid").parent('div').css('height', 'auto');
                 if (getScrapeDataforCustomObj != "" && getScrapeDataforCustomObj != undefined) {
                     for (i = 0; i < getScrapeDataforCustomObj.length; i++) {
-                        if (getScrapeDataforCustomObj[i].xpath == "") {
+                        if (getScrapeDataforCustomObj[i].xpath == "" && !getScrapeDataforCustomObj[i].cord) {
                             var testGridData = $("#jqGrid tbody tr:not(.jqgfirstrow)");
                             $.each(testGridData, function() {
                                 debugger;
@@ -4829,18 +4881,27 @@ function contentTable(newTestScriptDataLS) {
             selectedText = replaceHtmlEntites(selectedText.trim());
             for (var i = 0; i < scrappedData.length; i++) {
                 var ob = scrappedData[i];
-                var custname1;
+                var custname1,cord;
                 var custval = ob.custname;
                 custname1 = $('<input>').html(custval).text().trim();
-                if (custname1.replace(/\s/g, ' ') == (selectedText.replace('/\s/g', ' ')).replace('\n', ' ')) {
-                    objName = ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ');
-                    url = ob.url;
-                    var obType = ob.tag;
-                    var listType = ob.canselectmultiple;
+                if ((custname1.replace(/\s/g, ' ') == (selectedText.replace('/\s/g', ' ')).replace('\n', ' ')) ) {
+                    if(ob.xpath){
+                        objName = ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ');
+                        url = ob.url;
+                        var obType = ob.tag;
+                        var listType = ob.canselectmultiple;
+                    }
+                    else if (ob.cord){
+                        selectedKeywordList = 'iris';
+                        objName = custname1;
+                        cord = ob.cord
+                        obType = "iris";
+                        url = "";
+                    }
 
                     //changes from wasim
                     if (obType != 'a' && obType != 'select' && obType != 'radiobutton' && obType != 'checkbox' && obType != 'input' && obType != 'list' &&
-                        obType != 'tablecell' && obType != 'table' && obType != 'img' && obType != 'button' && (appTypeLocal == 'Web' || appTypeLocal == 'MobileWeb')) {
+                        obType != 'tablecell' && obType != 'table' && obType != 'img' && obType != 'button' && obType != 'iris' && (appTypeLocal == 'Web' || appTypeLocal == 'MobileWeb')) {
                         var sc = Object.keys(keywordArrayList.element);
                         selectedKeywordList = "element";
                         var res = '';
@@ -4919,6 +4980,9 @@ function contentTable(newTestScriptDataLS) {
                         } else if(obType =='treeview'|| obType=='TreeView' || obType=='tree'){
                             sc = Object.keys(keywordArrayList.tree);
                             selectedKeywordList = "tree";
+                        } else if(obType =='iris'){
+                            sc = Object.keys(keywordArrayList.iris);
+                            selectedKeywordList = "iris";
                         } else {
                             sc = Object.keys(keywordArrayList.element);
                             selectedKeywordList = "element";
@@ -4936,6 +5000,8 @@ function contentTable(newTestScriptDataLS) {
                         $grid.jqGrid('setCell', rowId, 'url', url);
                         $grid.jqGrid('setCell', rowId, 'objectName', objName);
                         $grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
+                        if(obType == 'iris')
+                            $grid.jqGrid('setCell', rowId, 'cord',cord);
                         break;
                     } else if (appTypeLocal == 'Desktop' && (!(obType == 'push_button' || obType == 'text' || obType == 'combo_box' || obType == 'list_item' || obType == 'hyperlink' || obType == 'lbl' || obType =='treeview'|| obType=='TreeView' || obType=='tree' ||
                             obType == 'list' || obType == 'edit' || obType == null || obType == 'Static' || obType == 'check_box' || obType == 'radio_button' || obType == 'tab' || obType == 'datepicker'))) {
@@ -5013,6 +5079,9 @@ function contentTable(newTestScriptDataLS) {
                         } else if (obType == 'hyperlink' || obType == 'a') {
                             sc = Object.keys(keywordArrayList.link);
                             selectedKeywordList = "link";
+                        } else if(obType =='iris'){
+                            sc = Object.keys(keywordArrayList.iris);
+                            selectedKeywordList = "iris";
                         } else {
                             sc = Object.keys(keywordArrayList.element);
                             selectedKeywordList = "element";
@@ -5030,6 +5099,8 @@ function contentTable(newTestScriptDataLS) {
                         $grid.jqGrid('setCell', rowId, 'url', url);
                         $grid.jqGrid('setCell', rowId, 'objectName', objName);
                         $grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
+						if(obType == 'iris')
+                            $grid.jqGrid('setCell', rowId, 'cord',cord);
                         break;
                     } else if (appTypeLocal == 'MobileApp' &&
                         (obType.indexOf("RadioButton") >= 0 || obType.indexOf("ImageButton") >= 0 || obType.indexOf("Button") >= 0 || obType.indexOf("EditText") >= 0 ||
@@ -5255,6 +5326,8 @@ function contentTable(newTestScriptDataLS) {
                         $grid.jqGrid('setCell', rowId, 'url', url);
                         $grid.jqGrid('setCell', rowId, 'objectName', objName);
                         $grid.jqGrid('setCell', rowId, 'appType', appTypeLocal);
+                        if(obType == 'iris')
+                            $grid.jqGrid('setCell', rowId, 'cord',cord);
                         break;
                     }
                 }
