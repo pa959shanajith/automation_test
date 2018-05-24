@@ -4612,13 +4612,13 @@ function contentTable(newTestScriptDataLS) {
         //ends here
 		//Object
 		else if (selectedText == "@Object") {
+			var sc = Object.keys(keywordArrayList.object);
+            selectedKeywordList = "object";
             objName = "@Object";
             url = "";
             var sc;
             var res = '';
             if (appTypeLocal == 'Web') {
-                sc = Object.keys(keywordArrayList.object);
-                selectedKeywordList = "object";
                 var newTSDataLS = angular.element(document.getElementById('jqGrid')).scope().newTestScriptDataLS;
                 if (newTSDataLS) {
                     if (newTSDataLS != "undefined") {
@@ -6096,7 +6096,7 @@ function getTags(data) {
     var obnames = [];
     var appTypeLocal = JSON.parse(window.localStorage['_CT']).appType;
     if (appTypeLocal == "Web") {
-        obnames = ["@Generic","@Excel","@Custom","@Browser","@BrowserPopUp"];
+        obnames = ["@Generic","@Excel","@Custom","@Browser","@BrowserPopUp","@Object"];
     } else if (appTypeLocal == "Webservice") {
         obnames = ["@Generic","@Excel","WebService List"];
     } else if (appTypeLocal == "Mainframe") {
