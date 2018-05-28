@@ -35,7 +35,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     var reldata = {};
     var cycdata = {};
     //Workflow//
-
+    var currMap = {};
     var dragsearch = false;
 // Complexity
         var cx_weightage = {   //scale , weightage
@@ -643,7 +643,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
     function loadMap(e) {
         $scope.functionTBE = 'loadMapPopupConfirmed';
-        $('#createNewConfirmationPopup').attr('mapid',d3.select(this).attr('data-mapid'));
+        $('#createNewConfirmationPopup').attr('mapid',d3.select(this).attr('title'));
         if ($('#ct-mindMap').length != 0){
             $('#createNewConfirmationPopup').modal('show');
         }
@@ -657,24 +657,34 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         $('.fa.fa-pencil-square-o.fa-lg.plus-icon.active-map').trigger('click') //Remove copy rectangle
         $('.fa.fa-clipboard.fa-lg.plus-icon.active-map').trigger('click') //Disable paste
         saveFlag = false;
-        //$('#ct-createAction').addClass('disableButton');
         SaveCreateED('#ct-createAction',1,0);
         $("div.nodeBoxSelected").removeClass("nodeBoxSelected");
-        $('[data-mapid='+$('#createNewConfirmationPopup').attr('mapid')+']').addClass("nodeBoxSelected");
+        $('[title='+$('#createNewConfirmationPopup').attr('mapid')+']').addClass("nodeBoxSelected");
         d3.select('#ct-inpBox').classed('no-disp', true);
         initiate();
-        clearSvg();
-        var reqMap = $('#createNewConfirmationPopup').attr('mapid');
-        treeBuilder(allMMaps[reqMap]);
-        IncompleteFlowFlag = false;
-        var errTemp = false;
-        if (dNodes[0].type != 'modules_endtoend')
-            errTemp = treeIterator(undefined, dNodes[0], false);
-        if (errTemp) {
-            IncompleteFlowFlag = true;
-        }
-        $("#minimap").minimap( $('#ct-mapSvg') );
-        //console.log('Reusedict:', reuseDict);        
+        clearSvg();        
+        var modName = $('#createNewConfirmationPopup').attr('mapid');
+        mindmapServices.getModules(versioning_enabled,window.localStorage['tabMindMap'], $(".project-list").val(), 0,$('.release-list').val(),$('.cycle-list').val(),modName).then(function(result) {
+            if (result == "Invalid Session") {
+                $rootScope.redirectPage();
+            }                             
+            currMap = result[0];
+            $('div[title='+modName+']').addClass('nodeBoxSelected');
+            if ($scope.tab == 'tabCreate')
+                populateDynamicInputList();
+            setModuleBoxHeight();
+            treeBuilder(currMap);
+            IncompleteFlowFlag = false;
+            var errTemp = false;
+            if (dNodes[0].type != 'modules_endtoend')
+                errTemp = treeIterator(undefined, dNodes[0], false);
+            if (errTemp) {
+                IncompleteFlowFlag = true;
+            }
+            $("#minimap").minimap( $('#ct-mapSvg') );
+        }, function(error) {
+            console.log(error);
+        })      
     }
 
     function getReuseDetails(){
@@ -2588,7 +2598,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     var res = result;
                     mapSaved = !0;
                     var mid, sts = allMMaps.some(function(m, i) {
-                        if (m.id_n == res.id_n) {
+                        if (m.name == res.name) {
                             mid = i;
                             allMMaps[i] = res;
                             return !0;
@@ -2606,7 +2616,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     if (selectedTab == 'tabCreate') populateDynamicInputList();
 
                     clearSvg();
-                    treeBuilder(allMMaps[mid]);
+                    treeBuilder(res);
                     unassignTask = [];
 
                     if (selectedTab == 'tabAssign') {
@@ -2658,8 +2668,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     });
                     //263-'Mindmap- Module: Currently allowing to create 2 modules with same name- Error msg is given on click of Create button
                     if (allMMaps[mid] != undefined) {
-                        allMMaps[mid].id_c = res[resMap[0]];
-                        allMMaps[mid].children.forEach(function(tsc) {
+                        currMap.id_c = res[resMap[0]];
+                        currMap.children.forEach(function(tsc) {
                             tsc.id_c = res[tsc.id_n];
                             tsc.children.forEach(function(scr) {
                                 scr.id_c = res[scr.id_n];
@@ -3491,7 +3501,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
     function loadScenarios(e) {
         $scope.functionTBE = 'loadScenariosPopupConfirmed';
-        $('#createNewConfirmationPopup').attr('mapid',d3.select(this).attr('data-mapid'));
+        $('#createNewConfirmationPopup').attr('mapid',d3.select(this).attr('title'));
         if ($('#ct-mindMap').length != 0){
             $('#createNewConfirmationPopup').modal('show');
         }
@@ -3510,8 +3520,18 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         initiate_W();
         d3.select('#ct-inpBox').classed('no-disp', !0);
         clearSvg_W();
-        var reqMap = $('#createNewConfirmationPopup').attr('mapid');
-        treeBuilder_W(allMaps_info[reqMap]);        
+        var modName = $('#createNewConfirmationPopup').attr('mapid');
+        mindmapServices.getModules(versioning_enabled,'endToend', $("#selectProjectEtem").val(),'',$('.release-list').val(),$('.cycle-list').val(),modName)
+        .then(function(result) {
+            if (result == "Invalid Session") {
+                $rootScope.redirectPage();
+            }     
+            currMap = result[0];
+            treeBuilder_W(currMap);    
+        }, function(error) {
+            console.log(error);
+        })        
+    
     }
 
     function displayScenarios(e) {
@@ -4144,7 +4164,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 }
                 setModuleBoxHeight_W();
                 clearSvg_W();
-                treeBuilder_W(allMaps_info[mid]);
+                treeBuilder_W(currMap);
                 unassignTask = [];
                 //var selectedTab = window.localStorage['tabMindMap']
                 unblockUI();
@@ -4198,11 +4218,10 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     return !1;
                 });
                 //263-'Mindmap- Module: Currently allowing to create 2 modules with same name- Error msg is given on click of Create button
-                console.log(allMMaps_W);
-                console.log(mid);
-                if (allMMaps_W[mid] != undefined) {
-                    allMMaps_W[mid].id_c = res[resMap[0]];
-                    allMMaps_W[mid].children.forEach(function(tsc) {
+
+                if (currMap != undefined) {
+                    currMap.id_c = res[resMap[0]];
+                    currMap.children.forEach(function(tsc) {
                         tsc.id_c = res[tsc.id_n];
                         //Himanshu please check the cause for scenario children is undefined here
                         tsc.children.forEach(function(scr) {

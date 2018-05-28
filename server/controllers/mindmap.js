@@ -259,15 +259,19 @@ exports.getModules=function(req,res){
 		var d=req.body;
 		var tab=d.tab;
 		var prjId=d.prjId;
+		var modName = d.modName;
 		var relId=d.relId;
 		var cycId=d.cycId;
+		var qmod = ''
+		if(modName){
+			qmod = ',moduleName:"'+modName+'"';
 			if(d.tab=='tabAssign' || d.tab=='endToend'){
-				qList.push({"statement":"MATCH path=(n:MODULES_ENDTOEND{projectID:'"+prjId+"'})-[r*1..]->(t) RETURN path","resultDataContents":["graph"]});
-				qList.push({"statement":"MATCH path=(n:MODULES_ENDTOEND{projectID:'"+prjId+"'}) WHERE NOT (n)-[:FMTTS]->() RETURN n","resultDataContents":["graph"]});
+				qList.push({"statement":"MATCH path=(n:MODULES_ENDTOEND{projectID:'"+prjId+"' "+qmod+"})-[r*1..]->(t) RETURN path","resultDataContents":["graph"]});
+				qList.push({"statement":"MATCH path=(n:MODULES_ENDTOEND{projectID:'"+prjId+"' "+qmod+"}) WHERE NOT (n)-[:FMTTS]->() RETURN n","resultDataContents":["graph"]});
 
 			}
-			qList.push({"statement":" MATCH path=(n:MODULES{projectID:'"+prjId+"'})-[r*1..]->(t) RETURN path","resultDataContents":["graph"]});
-			qList.push({"statement":"MATCH path=(n:MODULES{projectID:'"+prjId+"'}) WHERE NOT (n)-[:FMTTS]->() RETURN n","resultDataContents":["graph"]});
+			qList.push({"statement":" MATCH path=(n:MODULES{projectID:'"+prjId+"' "+qmod+"})-[r*1..]->(t) RETURN path","resultDataContents":["graph"]});
+			qList.push({"statement":"MATCH path=(n:MODULES{projectID:'"+prjId+"' "+qmod+"}) WHERE NOT (n)-[:FMTTS]->() RETURN n","resultDataContents":["graph"]});
 			//MATCH (a:MODULES) WHERE NOT (a)-[:FMTTS]->() return a
 
 			neo4jAPI.executeQueries(qList,function(status,result){
@@ -349,6 +353,33 @@ exports.getModules=function(req,res){
 					res.status(status).send(maps);
 				}
 			});
+		}
+		else{
+			qList.push({"statement":" MATCH (n:MODULES{projectID:'"+prjId+"'}) RETURN n.moduleName,n.moduleID","resultDataContents":["row"]});
+			if(d.tab=='tabAssign' || d.tab=='endToend'){
+				qList.push({"statement":"MATCH (n:MODULES_ENDTOEND{projectID:'"+prjId+"'}) RETURN n.moduleName,n.moduleID","resultDataContents":["row"]});
+			}
+
+			neo4jAPI.executeQueries(qList,function(status,result){
+				var modulenames = [];
+				res.setHeader('Content-Type', 'application/json');
+				if(status!=200) res.status(status).send(result);
+				else{
+					
+					result[0].data.forEach(function(e,i){
+						modulenames.push({name:e.row[0],type:'modules',id_n:e.row[1]});
+					});
+					if(result[1]){
+						result[1].data.forEach(function(e,i){
+							modulenames.push({name:e.row[0],type:'modules_endtoend',id_n:e.row[1]});
+						});	
+					}
+
+					res.status(status).send(modulenames);
+
+				}
+			});			
+		}
 	}
 	else{
 		logger.error("Invalid Session");
@@ -1237,7 +1268,7 @@ exports.excelToMindmap = function(req,res){
 			if(/script/i.test(e))sctIdx=i;
 		});
 		if(modIdx==-1||scoIdx==-1||scrIdx==-1||sctIdx==-1||cSheetRow.length<2){
-			err=true;
+			err='FATAL Error!! Import a non empty excel file with Module, Scenario, Screen, Script columns.';
 			break;
 		}
 		var e,lastSco=-1,lastScr=-1,nodeDict={},scrDict={};
@@ -1276,11 +1307,7 @@ exports.excelToMindmap = function(req,res){
 		}
 	}
 	var tSt,qList=[];
-	if(err){
-		res.status(200).send('fail');
-	}
-	else
-		res.status(200).send(qObj);
+	res.status(200).send(qObj);
 }
 
 //MATCH (n)-[r:FMTTS{id:'bad100b6-c223-4888-a8e9-ad26a2de4a61'}]->(o:TESTSCENARIOS) DETACH DELETE r,o
