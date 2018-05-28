@@ -3515,7 +3515,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         //$('#ct-createAction_W').addClass('disableButton');
         SaveCreateED('#ct-createAction_W',1,0);
         $("span.nodeBoxSelected").removeClass("nodeBoxSelected");
-        $('[data-mapid='+$('#createNewConfirmationPopup').attr('mapid')+']').addClass("nodeBoxSelected");
+        $('[title='+$('#createNewConfirmationPopup').attr('mapid')+']').addClass("nodeBoxSelected");
         cur_module = $('[data-mapid='+$('#createNewConfirmationPopup').attr('mapid')+']');
         initiate_W();
         d3.select('#ct-inpBox').classed('no-disp', !0);
