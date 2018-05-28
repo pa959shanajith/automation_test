@@ -2598,7 +2598,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     var res = result;
                     mapSaved = !0;
                     var mid, sts = allMMaps.some(function(m, i) {
-                        if (m.name == res.name) {
+                        if (m.id_n == res.id_n) {
                             mid = i;
                             allMMaps[i] = res;
                             return !0;
