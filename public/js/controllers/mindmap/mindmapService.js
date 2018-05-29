@@ -191,5 +191,15 @@ mySPA.factory('mindmapServices', ['$http','$q', function ($http,$q)   {
     		.then(function (response) { return response.data; },
     				function (response) { return $q.reject(response.data); });
 		},
+		getScreens: function (projectId) {
+    		var param = "getScreens";
+    		return $http.post('/getScreens', {
+    			action: param,
+				projectId:projectId
+
+    		})
+    		.then(function (response) { return response.data; },
+    				function (response) { return $q.reject(response.data); });
+    	},
 	}
 }]);

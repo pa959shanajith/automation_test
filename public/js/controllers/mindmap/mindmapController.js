@@ -2770,51 +2770,57 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     };
 
     function populateDynamicInputList() {
-        scrList = [];
-        tcList = [];
-        scenarioList = [];
-        var scrDict = {},
-            tcDict = {},
-            scenarioDict = {};
-        allMMaps.forEach(function(m) {
-            if (m.children != undefined) {
-                m.children.forEach(function(ts) {
-                    // if(scenarioDict[ts.id_n]===undefined){
-                    // 		scenarioList.push({id:ts.id,name:ts.name,id_n:ts.id_n,id_c:ts.id_c});
-                    // 		scenarioDict[ts.id_n]=!0;
-                    // }
-                    if (ts.children != undefined) {
-                        ts.children.forEach(function(s) {
-                            if (scrDict[s.name] === undefined) {
-                                scrList.push({
-                                    id: s.id,
-                                    name: s.name,
-                                    id_n: s.id_n,
-                                    id_c: s.id_c
-                                });
-                                scrDict[s.name] = !0;
-                            }
-                            if (s.children != undefined) {
-                                s.children.forEach(function(tc) {
-                                    if (tcDict[tc.name] === undefined) {
-                                        tcList.push({
-                                            id: tc.id,
-                                            name: tc.name,
-                                            id_n: tc.id_n,
-                                            id_c: tc.id_c
-                                        });
-                                        tcDict[tc.name] = !0;
-                                    }
-                                });
-                            }
+        mindmapServices.getScreens($('.project-list').val()).then(function(result) {
+                                if (result == "Invalid Session") {
+                                    $rootScope.redirectPage();
+                                } 
+                            })
+							
+        // scrList = [];
+        // tcList = [];
+        // scenarioList = [];
+        // var scrDict = {},
+        //     tcDict = {},
+        //     scenarioDict = {};
+        // allMMaps.forEach(function(m) {
+        //     if (m.children != undefined) {
+        //         m.children.forEach(function(ts) {
+        //             // if(scenarioDict[ts.id_n]===undefined){
+        //             // 		scenarioList.push({id:ts.id,name:ts.name,id_n:ts.id_n,id_c:ts.id_c});
+        //             // 		scenarioDict[ts.id_n]=!0;
+        //             // }
+        //             if (ts.children != undefined) {
+        //                 ts.children.forEach(function(s) {
+        //                     if (scrDict[s.name] === undefined) {
+        //                         scrList.push({
+        //                             id: s.id,
+        //                             name: s.name,
+        //                             id_n: s.id_n,
+        //                             id_c: s.id_c
+        //                         });
+        //                         scrDict[s.name] = !0;
+        //                     }
+        //                     if (s.children != undefined) {
+        //                         s.children.forEach(function(tc) {
+        //                             if (tcDict[tc.name] === undefined) {
+        //                                 tcList.push({
+        //                                     id: tc.id,
+        //                                     name: tc.name,
+        //                                     id_n: tc.id_n,
+        //                                     id_c: tc.id_c
+        //                                 });
+        //                                 tcDict[tc.name] = !0;
+        //                             }
+        //                         });
+        //                     }
 
-                        });
-                    }
+        //                 });
+        //             }
 
-                });
-            }
+        //         });
+        //     }
 
-        });
+        // });
     };
 
     function clearSvg() {

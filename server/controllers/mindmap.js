@@ -1315,4 +1315,45 @@ exports.excelToMindmap = function(req,res){
 	
 }
 
+exports.getScreens=function(req,res){
+	logger.info("Inside UI service: populateScenarios");
+	if (utils.isSessionActive(req.session)) {
+		var d=req.body;
+		var prjId=d.projectId;
+		var screenList = [];
+		var testCasesList = [];
+		var qList = [];
+		qList.push({'statement':"MATCH (n:SCREENS{projectID:'"+prjId+"'}) RETURN n.screenID_c,n.screenID,n.screenName"});
+		qList.push({'statement':"MATCH (n:TESTCASES{projectID:'"+prjId+"'}) RETURN n.testCaseID_c,n.testCaseID,n.testCaseName"});
+		
+		var scenarioList=[];
+		neo4jAPI.executeQueries(qList,function(status,result){
+			res.setHeader('Content-Type', 'application/json');
+			if(status!=200) res.status(status).send(result);
+				try{
+					result[0].data.forEach(function(e,i){
+						screenList.push({'screenName':e.row[2],'id_c':e.row[0],'id_n':e.row[1]})
+					})
+					result[1].data.forEach(function(e,i){
+						testCasesList.push({'testCaseName':e.row[2],'id_c':e.row[0],'id_n':e.row[1]})
+					})
+					// res_data=result;
+					// res_data[0].data.forEach(function(row){
+					// 	scenarioList.push(row.row[0])
+					// });
+					 res.status(200).send({'screenList':screenList,'testCaseList':testCasesList});
+					}catch(ex){
+						logger.error("exception in mindmapService: ",ex);
+						res.status(200).send('fail');
+					}
+
+			});
+	}
+	else{
+		logger.error("Invalid Session");
+		res.send("Invalid Session");
+	}
+
+}
+
 //MATCH (n)-[r:FMTTS{id:'bad100b6-c223-4888-a8e9-ad26a2de4a61'}]->(o:TESTSCENARIOS) DETACH DELETE r,o
