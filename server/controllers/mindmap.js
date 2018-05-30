@@ -1323,8 +1323,8 @@ exports.getScreens=function(req,res){
 		var screenList = [];
 		var testCasesList = [];
 		var qList = [];
-		qList.push({'statement':"MATCH (n:SCREENS{projectID:'"+prjId+"'}) RETURN n.screenID_c,n.screenID,n.screenName"});
-		qList.push({'statement':"MATCH (n:TESTCASES{projectID:'"+prjId+"'}) RETURN n.testCaseID_c,n.testCaseID,n.testCaseName"});
+		qList.push({'statement':"MATCH (n:SCREENS{projectID:'"+prjId+"'}) RETURN n.screenID_c,n.screenID,n.screenName,ID(n)"});
+		qList.push({'statement':"MATCH (n:TESTCASES{projectID:'"+prjId+"'}) RETURN n.testCaseID_c,n.testCaseID,n.testCaseName,ID(n)"});
 		
 		var scenarioList=[];
 		neo4jAPI.executeQueries(qList,function(status,result){
@@ -1332,10 +1332,10 @@ exports.getScreens=function(req,res){
 			if(status!=200) res.status(status).send(result);
 				try{
 					result[0].data.forEach(function(e,i){
-						screenList.push({'screenName':e.row[2],'id_c':e.row[0],'id_n':e.row[1]})
+						screenList.push({'screenName':e.row[2],'id_c':e.row[0],'id_n':e.row[1],'id':e.row[3]})
 					})
 					result[1].data.forEach(function(e,i){
-						testCasesList.push({'testCaseName':e.row[2],'id_c':e.row[0],'id_n':e.row[1]})
+						testCasesList.push({'testCaseName':e.row[2],'id_c':e.row[0],'id_n':e.row[1],'id':e.row[3]})
 					})
 					// res_data=result;
 					// res_data[0].data.forEach(function(row){

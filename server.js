@@ -20,7 +20,7 @@ var winston = require('winston');
 var epurl = "http://" + process.env.NDAC_IP + ":" + process.env.NDAC_PORT + "/";
 var logger = require('./logger');
 
-if (cluster.isMaster) {
+/*if (cluster.isMaster) {
     cluster.fork();
     cluster.on('disconnect', function(worker) {
         logger.error('Nineteen68 server has encountered some problems, Disconnecting!');
@@ -31,7 +31,7 @@ if (cluster.isMaster) {
             cluster.fork();
         }
     });
-} else {
+} else */{
     try {
         var express = require('express');
         var app = express();
@@ -453,6 +453,7 @@ if (cluster.isMaster) {
         app.post('/saveData', mindmap.saveData);
         app.post('/saveEndtoEndData', mindmap.saveEndtoEndData);
         app.post('/excelToMindmap', mindmap.excelToMindmap);
+        app.post('/getScreens', mindmap.getScreens);
 
         //Login Routes
         app.post('/authenticateUser_Nineteen68', login.authenticateUser_Nineteen68);
