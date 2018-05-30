@@ -209,7 +209,7 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 		window.localStorage['navigateScreen'] = name;
 		$timeout(function () {
 			$location.path('/'+ name);
-			//Transaction Activity for Login Button Action
+			//Transaction Activity for Plugin Navigation
 			var labelArr = [];
 			var infoArr = [];
 			labelArr.push({ label: event.target.outerText });
@@ -254,11 +254,6 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
     }*/
 
 	$scope.taskRedirection = function(testsuitedetails,scenarioflag,assignedtestscenarioids,subtask,subtaskid,screenid,screenname,projectid,taskname,testcaseid,testcasename,apptype,scenarioid,versionnumber,status,batchTaskIDs,releaseid,cycleid,reuse,event){
-		//Transaction Activity for Login Button Action
-		var labelArr = [];
-		var infoArr = [];
-		labelArr.push({ label: event.target.outerText });
-		txnHistory.log(event.type,labelArr,infoArr,$location.$$path); 
 		
 		var taskObj = {};
 		if(status=='assigned'){
@@ -317,6 +312,11 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 			window.localStorage['navigateScreen'] = "scheduling";
 			$window.location.assign("/scheduling")
 		}
+		//Transaction Activity for Plugin Task Click
+		var labelArr = [];
+		var infoArr = [];
+		labelArr.push({ label: event.target.outerText });
+		txnHistory.log(event.type,labelArr,infoArr,$location.$$path); 
 	}
 
 	$scope.showTaskFilterPopup = function(){
