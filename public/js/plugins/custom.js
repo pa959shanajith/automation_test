@@ -474,3 +474,77 @@ function getCookie(cname) {
     }
     return "";
 }
+
+var txnHistory = {
+    log: function(data) {
+        var idbSupported = false;
+        var db;
+
+        //Check Indexed DB Support
+        if ("indexedDB" in window) {
+            idbSupported = true;
+        }
+
+        //IF Indexed DB is supported
+        if (idbSupported) {
+            var openRequest = indexedDB.open("indexedDBOpen", 1);       //Indexed DB instantiated
+            //Indexed DB on Upgrade
+            openRequest.onupgradeneeded = function(e) {
+                console.log("Upgrading...");
+                db = e.target.result;
+                if (!db.objectStoreNames.contains("transactionHistory")) {
+                    db.createObjectStore("transactionHistory", {
+                        keyPath: "transactionId",
+                        autoIncrement: true
+                    });
+                }
+            }
+            //Indexed DB on Success DB connection
+            openRequest.onsuccess = function(e) {
+                console.log("Success!");
+                db = e.target.result;
+                var transaction = db.transaction(["transactionHistory"]);          //Create Transaction
+                var objectStore = transaction.objectStore("transactionHistory");   //Get ObjectStore
+                var request = objectStore.getAll();								   
+                request.onerror = function(event) {								  // Handle errors!
+                    console.log("Error");
+                };
+                request.onsuccess = function(event) {
+                    ///console.log(request.result);
+                };
+				saveTransactionHistory(); 										// Save Transaction History function being called
+            }
+            //Indexed DB on Error DB connection
+            openRequest.onerror = function(e) {
+                console.log("Error");
+                console.dir(e);
+            }
+        }
+		// Save Transaction History
+        function saveTransactionHistory() {
+            var transaction = db.transaction(["transactionHistory"], "readwrite");
+            var objectStore = transaction.objectStore("transactionHistory");
+            var request = objectStore.put(data); //Saves transaction History
+            request.onsuccess = function(event) {
+                ///console.log("Indexed",data);
+            };
+        }
+
+		//Read Transaction History
+        // function read() {
+        // 	var transaction = db.transaction(["transactionHistory"], "readonly");
+        // 	var objectStore = transaction.objectStore("transactionHistory");
+        // 	/* 
+        // 	//x is some value
+        // 	var ob = objectStore.get(2);
+
+        // 	ob.onsuccess = function(e) {
+        // 		console.log(e.target.result);
+        // 	}*/
+        // 	objectStore.openCursor(null, "prev").onsuccess = function(event) {
+        // 		var cursor = event.target.result;
+        // 		console.log("theme id is: " + cursor.value.theme);
+        // 	}
+        // }
+    }
+}
