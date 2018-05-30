@@ -476,18 +476,38 @@ function getCookie(cname) {
 }
 
 var txnHistory = {
-    log: function(data) {
+	/*
+	Params: 
+	1. action: the action related to the transaction
+	2. labelArr: an array of label codes for the action
+	3. infoArr:  an array of info related to the action
+	4. url: the current url when action was performed
+	*/
+
+    log: function(action,labelArr,infoArr,url) {
+
+		var data = {};
+		var timeStampInMs = window.performance && window.performance.now && window.performance.timing && window.performance.timing.navigationStart ? window.performance.now() + window.performance.timing.navigationStart : Date.now();
+		        data.username = JSON.parse(window.localStorage['_UI']).username;
+				data.timestamp = timeStampInMs
+		        data.action = action;
+				data.labels = labelArr;
+				data.category = "UI";
+				data.infoArr  = infoArr;
+				data.elapsedTime = '';
+				data.url = url;
+				data.role = window.localStorage['_SR'];
         var idbSupported = false;
         var db;
 
         //Check Indexed DB Support
-        if ("indexedDB" in window) {
+        if (window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB || window.shimIndexedDB) {
             idbSupported = true;
         }
 
         //IF Indexed DB is supported
         if (idbSupported) {
-            var openRequest = indexedDB.open("indexedDBOpen", 1);       //Indexed DB instantiated
+            var openRequest = indexedDB.open("transactionHistorydb", 1);       //Indexed DB instantiated
             //Indexed DB on Upgrade
             openRequest.onupgradeneeded = function(e) {
                 console.log("Upgrading...");
@@ -501,17 +521,19 @@ var txnHistory = {
             }
             //Indexed DB on Success DB connection
             openRequest.onsuccess = function(e) {
-                console.log("Success!");
+                //console.log("Success!");
                 db = e.target.result;
-                var transaction = db.transaction(["transactionHistory"]);          //Create Transaction
-                var objectStore = transaction.objectStore("transactionHistory");   //Get ObjectStore
-                var request = objectStore.getAll();								   
-                request.onerror = function(event) {								  // Handle errors!
-                    console.log("Error");
-                };
-                request.onsuccess = function(event) {
+                // var transaction = db.transaction(["transactionHistory"]);          //Create Transaction
+                // var objectStore = transaction.objectStore("transactionHistory");   //Get ObjectStore
+				
+				//To get all objects from the db
+				//var request = objectStore.getAll();								   
+                //request.onerror = function(event) {								  // Handle errors!
+                    //console.log("Error");
+               // };
+                //request.onsuccess = function(event) {
                     ///console.log(request.result);
-                };
+               // };
 				saveTransactionHistory(); 										// Save Transaction History function being called
             }
             //Indexed DB on Error DB connection
@@ -527,24 +549,12 @@ var txnHistory = {
             var request = objectStore.put(data); //Saves transaction History
             request.onsuccess = function(event) {
                 ///console.log("Indexed",data);
+			};
+			
+			request.onerror = function(e) {
+				console.log("Error");
+                console.dir(e);
             };
         }
-
-		//Read Transaction History
-        // function read() {
-        // 	var transaction = db.transaction(["transactionHistory"], "readonly");
-        // 	var objectStore = transaction.objectStore("transactionHistory");
-        // 	/* 
-        // 	//x is some value
-        // 	var ob = objectStore.get(2);
-
-        // 	ob.onsuccess = function(e) {
-        // 		console.log(e.target.result);
-        // 	}*/
-        // 	objectStore.openCursor(null, "prev").onsuccess = function(event) {
-        // 		var cursor = event.target.result;
-        // 		console.log("theme id is: " + cursor.value.theme);
-        // 	}
-        // }
     }
 }
