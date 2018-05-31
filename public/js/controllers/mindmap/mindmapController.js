@@ -133,9 +133,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     $rootScope.redirectPage();
                 }
                 if (res.projectId.length > 0) {
-                    $(".project-list").empty();
+                    $scope.projectList = [];
                     for (i = 0; i < (res.projectId.length && res.projectName.length); i++) {
-                        $('.project-list').append("<option app-type='" + res.appType[i] + "' data-id='" + res.projectName[i] + "' value='" + res.projectId[i] + "'>" + res.projectName[i] + "</option>");
+                        $scope.projectList.push({'apptype':res.appType[i],'name':res.projectName[i],'id':res.projectId[i]});
                     }
                     var default_releaseid = '';
                     if (!selectedProject)
@@ -474,15 +474,15 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             d3.event.preventDefault();
         });
 
-        $('#ct-mapSvg, #ct-canvas').empty();
-        $('#ct-canvas').append(`<div id="minimap-wrapper" style="display: none;">
-                                    <div id="minimap-header">
-                                        <img class="move-ic-img" src="imgs/move_img.svg" alt="move" style="height: 15px;">
-                                    </div>
-                                    <div id="minimap">
-                                    </div>
-                                </div>
-                            `);
+        $('#ct-mapSvg').empty();
+        // $('#ct-canvas').append(`<div id="minimap-wrapper" style="display: none;">
+        //                             <div id="minimap-header">
+        //                                 <img class="move-ic-img" src="imgs/move_img.svg" alt="move" style="height: 15px;">
+        //                             </div>
+        //                             <div id="minimap">
+        //                             </div>
+        //                         </div>
+        //                     `);
         
 
         d3.select('#ct-assignBox').classed('no-disp', !0);
@@ -491,7 +491,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         if (param == 1) {
             version_num = $('.version-list').val();
         }
-        mindmapServices.getModules(versioning_enabled,window.localStorage['tabMindMap'], $(".project-list").val(),  parseFloat(version_num),$('.release-list').val(),$('.cycle-list').val())
+        mindmapServices.getModules(versioning_enabled,window.localStorage['tabMindMap'], $(".project-list").val() || $scope.projectList[0].id,  parseFloat(version_num),$('.release-list').val(),$('.cycle-list').val())
             .then(function(res) {
                 if (res == "Invalid Session") {
                     $rootScope.redirectPage();
@@ -545,26 +545,26 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         }
         else{
             var canvas = d3.select('#ct-canvas');
-            $('#ct-canvas').append('<div id = "search-canvas-icon"><img alt="Search Icon" class="searchimg-canvas" src="imgs/ic-search-icon.png"><input type="text" class="search-canvas" placeholder="Search Node.."></div>');
+            //$('#ct-canvas').append('<div id = "search-canvas-icon"><img alt="Search Icon" class="searchimg-canvas" src="imgs/ic-search-icon.png"><input type="text" class="search-canvas" placeholder="Search Node.."></div>');
         } 
         addSearchNodeListeners();
-        canvas.empty();
-        u = canvas.append('div').attr('id', 'ct-inpBox').classed('no-disp', !0);
-        u.append('input').attr('id', 'ct-inpPredict').attr('class', 'ct-inp');
-        u.append('input').attr('id', 'ct-inpAct').attr('maxlength', '255').attr('class', 'ct-inp').on('change', inpChange).on('keyup', inpKeyUp);
-        u.append('ul').attr('id', 'ct-inpSugg').classed('no-disp', !0);
-        u = canvas.append('div').attr('id', 'ct-ctrlBox').classed('no-disp', !0);
-        u.append('p').attr('class', 'ct-ctrl fa ' + faRef.plus).on('click', createNode).append('span').attr('class', 'ct-tooltiptext').html('');
-        u.append('p').attr('class', 'ct-ctrl fa ' + faRef.plus1).on('click', createMultipleNode).append('span').attr('class', 'ct-tooltiptext').html('');
-        u.append('p').attr('class', 'ct-ctrl fa ' + faRef.edit).on('click', editNode).append('span').attr('class', 'ct-tooltiptext').html('');
-        u.append('p').attr('class', 'ct-ctrl fa ' + faRef.delete).on('click', deleteNode).append('span').attr('class', 'ct-tooltiptext').html('');
-        u = canvas.append('div').attr('id', 'ct-assignBox').classed('no-disp', !0);
-        u.append('div').attr('id', 'ct-assignTable');
-        u.append('div').attr('class', 'ct-assignDetailsBox').append('textarea').attr('id', 'ct-assignDetails').attr('placeholder', 'Enter Details');
-        u.append('div').attr('id', 'ct-assignButton').append('a').html('OK').on('click', addTask);
-        u.append('div').attr('id', 'ct-unassignButton').append('a').html('Unassign').on('click', removeTask);
-        // var mapSvgDiv = canvas.append('div').attr("class","ct-mapSvgContainer");
-        // var mapSvg=mapSvgDiv.append('svg').attr('id','ct-mapSvg').call(zoom).on('click.hideElements',clickHideElements);
+        // canvas.empty();
+        // u = canvas.append('div').attr('id', 'ct-inpBox').classed('no-disp', !0);
+        // u.append('input').attr('id', 'ct-inpPredict').attr('class', 'ct-inp');
+        // u.append('input').attr('id', 'ct-inpAct').attr('maxlength', '255').attr('class', 'ct-inp').on('change', inpChange).on('keyup', inpKeyUp);
+        // u.append('ul').attr('id', 'ct-inpSugg').classed('no-disp', !0);
+        // u = canvas.append('div').attr('id', 'ct-ctrlBox').classed('no-disp', !0);
+        // u.append('p').attr('class', 'ct-ctrl fa ' + faRef.plus).on('click', createNode).append('span').attr('class', 'ct-tooltiptext').html('');
+        // u.append('p').attr('class', 'ct-ctrl fa ' + faRef.plus1).on('click', createMultipleNode).append('span').attr('class', 'ct-tooltiptext').html('');
+        // u.append('p').attr('class', 'ct-ctrl fa ' + faRef.edit).on('click', editNode).append('span').attr('class', 'ct-tooltiptext').html('');
+        // u.append('p').attr('class', 'ct-ctrl fa ' + faRef.delete).on('click', deleteNode).append('span').attr('class', 'ct-tooltiptext').html('');
+        // u = canvas.append('div').attr('id', 'ct-assignBox').classed('no-disp', !0);
+        // u.append('div').attr('id', 'ct-assignTable');
+        // u.append('div').attr('class', 'ct-assignDetailsBox').append('textarea').attr('id', 'ct-assignDetails').attr('placeholder', 'Enter Details');
+        // u.append('div').attr('id', 'ct-assignButton').append('a').html('OK').on('click', addTask);
+        // u.append('div').attr('id', 'ct-unassignButton').append('a').html('Unassign').on('click', removeTask);
+        // // var mapSvgDiv = canvas.append('div').attr("class","ct-mapSvgContainer");
+        // // var mapSvg=mapSvgDiv.append('svg').attr('id','ct-mapSvg').call(zoom).on('click.hideElements',clickHideElements);
         var mapSvg = canvas.append('svg').attr('id', 'ct-mapSvg').call(zoom).on('click.hideElements', clickHideElements);
         var dataAdder = [{
             c: '#5c5ce5',
@@ -2775,52 +2775,52 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                                     $rootScope.redirectPage();
                                 } 
                             })
-							
-        // scrList = [];
-        // tcList = [];
-        // scenarioList = [];
-        // var scrDict = {},
-        //     tcDict = {},
-        //     scenarioDict = {};
-        // allMMaps.forEach(function(m) {
-        //     if (m.children != undefined) {
-        //         m.children.forEach(function(ts) {
-        //             // if(scenarioDict[ts.id_n]===undefined){
-        //             // 		scenarioList.push({id:ts.id,name:ts.name,id_n:ts.id_n,id_c:ts.id_c});
-        //             // 		scenarioDict[ts.id_n]=!0;
-        //             // }
-        //             if (ts.children != undefined) {
-        //                 ts.children.forEach(function(s) {
-        //                     if (scrDict[s.name] === undefined) {
-        //                         scrList.push({
-        //                             id: s.id,
-        //                             name: s.name,
-        //                             id_n: s.id_n,
-        //                             id_c: s.id_c
-        //                         });
-        //                         scrDict[s.name] = !0;
-        //                     }
-        //                     if (s.children != undefined) {
-        //                         s.children.forEach(function(tc) {
-        //                             if (tcDict[tc.name] === undefined) {
-        //                                 tcList.push({
-        //                                     id: tc.id,
-        //                                     name: tc.name,
-        //                                     id_n: tc.id_n,
-        //                                     id_c: tc.id_c
-        //                                 });
-        //                                 tcDict[tc.name] = !0;
-        //                             }
-        //                         });
-        //                     }
+	   
+        scrList = [];
+        tcList = [];
+        scenarioList = [];
+        var scrDict = {},
+            tcDict = {},
+            scenarioDict = {};
+        allMMaps.forEach(function(m) {
+            if (m.children != undefined) {
+                m.children.forEach(function(ts) {
+                    // if(scenarioDict[ts.id_n]===undefined){
+                    // 		scenarioList.push({id:ts.id,name:ts.name,id_n:ts.id_n,id_c:ts.id_c});
+                    // 		scenarioDict[ts.id_n]=!0;
+                    // }
+                    if (ts.children != undefined) {
+                        ts.children.forEach(function(s) {
+                            if (scrDict[s.name] === undefined) {
+                                scrList.push({
+                                    id: s.id,
+                                    name: s.name,
+                                    id_n: s.id_n,
+                                    id_c: s.id_c
+                                });
+                                scrDict[s.name] = !0;
+                            }
+                            if (s.children != undefined) {
+                                s.children.forEach(function(tc) {
+                                    if (tcDict[tc.name] === undefined) {
+                                        tcList.push({
+                                            id: tc.id,
+                                            name: tc.name,
+                                            id_n: tc.id_n,
+                                            id_c: tc.id_c
+                                        });
+                                        tcDict[tc.name] = !0;
+                                    }
+                                });
+                            }
 
-        //                 });
-        //             }
+                        });
+                    }
 
-        //         });
-        //     }
+                });
+            }
 
-        // });
+        });
     };
 
     function clearSvg() {
