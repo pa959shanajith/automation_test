@@ -136,7 +136,14 @@ mySPA.controller('flowGraphController', ['$scope','$rootScope', '$http', '$locat
 		}*/
 	}
 	  
-	$scope.executeGenerate = function(){
+	$scope.executeGenerate = function($event){
+		
+		//Transaction Activity for APG Generate Button Action
+		var labelArr = [];
+		var infoArr = [];
+		labelArr.push($event.target.outerText,"APG");
+		txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
+
 		$scope.obj = {};
 		$scope.enableGenerate = false;
 		currentDot = 0;

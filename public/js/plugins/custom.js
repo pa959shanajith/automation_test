@@ -556,5 +556,21 @@ var txnHistory = {
                 console.dir(e);
             };
         }
-    }
+	},
+
+	codesDict : {
+		"Login" : "100",
+		"Nineteen68Logo" : "101",
+		"BellIcon" : "102",
+		"SwitchRole" : "103",
+		"Logout" : "104",		
+		"PluginNavigation" : "201",
+		"FilterTaskBySearch" : "202",
+		"FilterTaskByParams" : "203",
+		"TaskNavigation" : "204",
+		"CancelALMLogin" : "301",
+		"SubmitALMLogin" : "302",
+		
+
+	}
 }

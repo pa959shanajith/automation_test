@@ -190,7 +190,7 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 		//Transaction Activity for Task Search 
 		var labelArr = [];
 		var infoArr = [];
-		labelArr.push({ label: event.target.value });
+		labelArr.push(txnHistory.codesDict['FilterTaskBySearch']);		
 		txnHistory.log(event.type,labelArr,infoArr,$location.$$path); 
 		var counter=1;
 		$(".panel-default h4:visible").each(function () {
@@ -209,10 +209,11 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 		window.localStorage['navigateScreen'] = name;
 		$timeout(function () {
 			$location.path('/'+ name);
-			//Transaction Activity for Login Button Action
+			//Transaction Activity for Plugin Navigation
 			var labelArr = [];
 			var infoArr = [];
-			labelArr.push({ label: event.target.outerText });
+			infoArr.push({pluginName : name });
+			labelArr.push(txnHistory.codesDict['PluginNavigation']);
 			txnHistory.log(event.type,labelArr,infoArr,$location.$$path); 
 	   	}, 100);
 	}
@@ -254,10 +255,11 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
     }*/
 
 	$scope.taskRedirection = function(testsuitedetails,scenarioflag,assignedtestscenarioids,subtask,subtaskid,screenid,screenname,projectid,taskname,testcaseid,testcasename,apptype,scenarioid,versionnumber,status,batchTaskIDs,releaseid,cycleid,reuse,event){
-		//Transaction Activity for Login Button Action
+		//Transaction Activity for Task Navigation
 		var labelArr = [];
 		var infoArr = [];
-		labelArr.push({ label: event.target.outerText });
+		infoArr.push({taskName : event.target.outerText });
+		labelArr.push(txnHistory.codesDict['TaskNavigation']);
 		txnHistory.log(event.type,labelArr,infoArr,$location.$$path); 
 		
 		var taskObj = {};
@@ -378,6 +380,12 @@ mySPA.controller('pluginController',['$scope', '$rootScope', '$window','$http','
 			$scope.filterEnable = true;
 			$('.filterIcon').css('background','#b875da');
 		}
+
+		//Transaction Activity for Filter Button Action
+		var labelArr = [];
+		var infoArr = [];
+		labelArr.push(txnHistory.codesDict['FilterTaskByParams']);
+		txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
 		
 	}
 

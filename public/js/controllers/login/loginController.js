@@ -77,7 +77,7 @@ mySPA.controller('loginController', function ($scope, $rootScope, $timeout, $htt
 							//Transaction Activity for Login Button Action
 							var labelArr = [];
 							var infoArr = [];
-							labelArr.push({ label: $event.target.outerText });
+							labelArr.push(txnHistory.codesDict['Login']);
 							txnHistory.log($event.type,labelArr,infoArr,$location.$$path); 
 						} else {
 							$scope.loginValidation = "Failed to Login.";

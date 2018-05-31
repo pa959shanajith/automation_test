@@ -48,8 +48,8 @@
 				<br>
 				<span><b>Path:</b></span>
 				<input name="pathInput" type="text" ng-model="text" class="pathInput" id="path" placeholder="Enter Path of Folder/Zip/File" required> 
-				<button ng-if="flowgraph_form.pathInput.$invalid" disabled class="btn btn-md pull-right pairwise-GenBtn" ng-click="executeGenerate()">Generate</button>
-				<button ng-if="flowgraph_form.pathInput.$valid" class="btn btn-md pull-right pairwise-GenBtn" ng-click="executeGenerate()">Generate</button>
+				<button ng-if="flowgraph_form.pathInput.$invalid" disabled class="btn btn-md pull-right pairwise-GenBtn" ng-click="executeGenerate($event)">Generate</button>
+				<button ng-if="flowgraph_form.pathInput.$valid" class="btn btn-md pull-right pairwise-GenBtn" ng-click="executeGenerate($event)">Generate</button>
 			</form>
 			</div>
 			
