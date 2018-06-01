@@ -25,7 +25,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     //Createmap//
 
     //Workflow//
-    var uNix_W, uLix_W, dNodes_W, dLinks_W, allMMaps_W, temp_W, zoom_W, cSpan_W, cScale_W;
+    var uNix_W, uLix_W, dNodes_W, dLinks_W, temp_W, zoom_W, cSpan_W, cScale_W;
     var cur_module, allMaps_info, activeNode_W, childNode_W;
     //unassignTask is an array to store whose task to be deleted
     var deletednode_W = [];
@@ -37,6 +37,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     //Workflow//
     var currMap = {};
     var dragsearch = false;
+    $scope.allMMaps = [];
 // Complexity
         var cx_weightage = {   //scale , weightage
             'Application Type':3,
@@ -155,6 +156,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                             $('.cycle-list').addClass('errorClass');
                             reldata = {};
                             for (i = 0; i < result.r_ids.length && result.rel.length; i++) {
+                                
                                 $('.release-list').append("<option data-id='" + result.rel[i] + "' value='" + result.r_ids[i] + "'>" + result.rel[i] + "</option>");
                                 reldata[result.r_ids[i]] = result.rel[i]
                             }
@@ -188,22 +190,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                                     console.log("Error in populating Cycles");
                                 })                                
                             });
-                            // mindmapServices.populateCycles(default_releaseid).then(function(result_cycles) {
-                            //     var result2 = result_cycles;
-                            //     $('.cycle-list').empty();
-                            //     for (i = 0; i < result2.c_ids.length && result2.cyc.length; i++) {
-                            //         $('.cycle-list').append("<option data-id='" + result2.cyc[i] + "' value='" + result2.c_ids[i] + "'>" + result2.cyc[i] + "</option>");
-                            //     }
-                            //     loadMindmapData1(param);
-                            //     //var selectedCyc=result2.c_ids[0];
-                            //     var selectedCyc = 'select cycle';
-                            //     // if (tObj.cy != "") {
-                            //     //     selectedCyc = tObj.cy;
-                            //     // }
 
-                            // }, function(error) {
-                            //     console.log("Error in populating Cycles");
-                            // })
                             //display assign box after populating data
                         }, function(error) {
                             console.log("Error in populating Releases");
@@ -213,21 +200,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     $(".project-list").val(selectedProject);
                     selectedProject = undefined;
 
-                    if (param == 1) {
-                        versioning_enabled = 1;
-                        mindmapServices.getVersions($(".project-list").val()).then(
-                            function(res){
-                                if (res == "Invalid Session") {
-                                    $rootScope.redirectPage();
-                                }                                       
-                                addVersioning(res);
-                            },function(err){
-                                 console.log(err);
-                                openDialogMindmap('Error', 'Error loading Versions')
-                            })
-                       
-                    } 
-                    else if(param == 0 && $scope.tab=='tabCreate') {
+                    if(param == 0 && $scope.tab=='tabCreate') {
                         loadMindmapData1(param);
                     }
                     else if(param == 2){
@@ -497,19 +470,19 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     $rootScope.redirectPage();
                 }                     
                 var nodeBox = d3.select('.ct-nodeBox');
-                $(nodeBox[0]).empty();
+                //$(nodeBox[0]).empty();
                 //allMMaps = JSON.parse(result);
-                allMMaps = res;
-                allMMaps.forEach(function(e, i) {
-                    //var t=e.name.replace(/_/g,' ');
-                    var t = $.trim(e.name);
-                    var img_src = 'images_mindmap/node-modules-no.png';
-                    if (e.type == 'modules_endtoend') img_src = 'images_mindmap/MM5.png';
-                    var node = nodeBox.append('div').attr('class', 'ct-node fl-left').attr('data-mapid', i).attr('title', t).on('click', loadMap);
-                    node.append('img').attr('class', 'ct-nodeIcon').attr('src', img_src).attr('alt', 'Module').attr('aria-hidden', true);
-                    if(t.length>20) t = t.substring(0, 20)+'...';
-                    node.append('span').attr('class', 'ct-nodeLabel').html(t);
-                });
+                $scope.allMMaps = res;
+                // $scope.allMMaps.forEach(function(e, i) {
+                //     //var t=e.name.replace(/_/g,' ');
+                //     var t = $.trim(e.name);
+                //     var img_src = 'images_mindmap/node-modules-no.png';
+                //     if (e.type == 'modules_endtoend') img_src = 'images_mindmap/MM5.png';
+                //     var node = nodeBox.append('div').attr('class', 'ct-node fl-left').attr('data-mapid', i).attr('title', t).on('click', loadMap);
+                //     node.append('img').attr('class', 'ct-nodeIcon').attr('src', img_src).attr('alt', 'Module').attr('aria-hidden', true);
+                //     if(t.length>20) t = t.substring(0, 20)+'...';
+                //     node.append('span').attr('class', 'ct-nodeLabel').html(t);
+                // });
                 if (selectedTab == 'tabCreate')
                     populateDynamicInputList();
                 setModuleBoxHeight();
@@ -526,7 +499,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         $('#ct-mindMap').empty();
         $('#ct-actionBox').remove();
         var nodeBox = d3.select('.ct-nodeBox');
-        $(nodeBox[0]).empty();
+        // $(nodeBox[0]).empty();
     }
 
     window.onresize = function() {
@@ -541,7 +514,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         if (d3.select('#ct-mindMap')[0][0] != null) return;
         if (selectedTab == "tabAssign"){
             var canvas = d3.select('#ct-canvasforAssign');
-            $('#ct-canvasforAssign').append('<div id = "search-canvas-icon"><img alt="Search Icon" class="searchimg-canvas" src="imgs/ic-search-icon.png"><input type="text" class="search-canvas" placeholder="Search Node.."></div>');
+            //$('#ct-canvasforAssign').append('<div id = "search-canvas-icon"><img alt="Search Icon" class="searchimg-canvas" src="imgs/ic-search-icon.png"><input type="text" class="search-canvas" placeholder="Search Node.."></div>');
         }
         else{
             var canvas = d3.select('#ct-canvas');
@@ -641,9 +614,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         if(!moduleName) editNode(node);
     };
 
-    function loadMap(e) {
+    $scope.loadMap = function(idx) {
         $scope.functionTBE = 'loadMapPopupConfirmed';
-        $('#createNewConfirmationPopup').attr('mapid',d3.select(this).attr('title'));
+        $('#createNewConfirmationPopup').attr('mapid',$scope.allMMaps[idx].name);
         if ($('#ct-mindMap').length != 0){
             $('#createNewConfirmationPopup').modal('show');
         }
@@ -2597,20 +2570,20 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 if (flag == 10) {
                     var res = result;
                     mapSaved = !0;
-                    var mid, sts = allMMaps.some(function(m, i) {
+                    var mid, sts = $scope.allMMaps.some(function(m, i) {
                         if (m.id_n == res.id_n) {
                             mid = i;
-                            allMMaps[i] = res;
+                            $scope.allMMaps[i] = res;
                             return !0;
                         }
                         return !1;
                     });
                     if (!sts) {
-                        mid = allMMaps.length;
-                        allMMaps.push(res);
-                        var node = d3.select('.ct-nodeBox').append('div').attr('class', 'ct-node fl-left').attr('data-mapid', mid).attr('title', res.name).on('click', loadMap);
-                        node.append('img').attr('class', 'ct-nodeIcon').attr('src', 'images_mindmap/node-modules-no.png').attr('alt', 'Module').attr('aria-hidden', true);
-                        node.append('span').attr('class', 'ct-nodeLabel').html(res.name.replace(/_/g, ' '));
+                        mid = $scope.allMMaps.length;
+                        $scope.allMMaps.push(res);
+                        // var node = d3.select('.ct-nodeBox').append('div').attr('class', 'ct-node fl-left').attr('data-mapid', mid).attr('title', res.name).on('click', loadMap);
+                        // node.append('img').attr('class', 'ct-nodeIcon').attr('src', 'images_mindmap/node-modules-no.png').attr('alt', 'Module').attr('aria-hidden', true);
+                        // node.append('span').attr('class', 'ct-nodeLabel').html(res.name.replace(/_/g, ' '));
                     }
                     setModuleBoxHeight();
                     if (selectedTab == 'tabCreate') populateDynamicInputList();
@@ -2634,17 +2607,17 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                         }                             
                         var nodeBox = d3.select('.ct-nodeBox');
                         $(nodeBox[0]).empty();
-                        allMMaps = result;
-                        allMMaps.forEach(function(e, i) {
-                            //var t=e.name.replace(/_/g,' ');
-                            var img_src = 'images_mindmap/node-modules-no.png';
-                            if (e.type == 'modules_endtoend') img_src = 'images_mindmap/MM5.png';
-                            var t = $.trim(e.name);
-                            var node = nodeBox.append('div').attr('class', 'ct-node fl-left').attr('data-mapid', i).attr('title', t).on('click', loadMap);
-                            node.append('img').attr('class', 'ct-nodeIcon').attr('src', img_src).attr('alt', 'Module').attr('aria-hidden', true);
-                            if(t.length>20) t = t.substring(0, 20)+'...';
-                            node.append('span').attr('class', 'ct-nodeLabel').html(t);
-                        });
+                        $scope.allMMaps = result;
+                        // $scope.allMMaps.forEach(function(e, i) {
+                        //     //var t=e.name.replace(/_/g,' ');
+                        //     var img_src = 'images_mindmap/node-modules-no.png';
+                        //     if (e.type == 'modules_endtoend') img_src = 'images_mindmap/MM5.png';
+                        //     var t = $.trim(e.name);
+                        //     var node = nodeBox.append('div').attr('class', 'ct-node fl-left').attr('data-mapid', i).attr('title', t).on('click', loadMap);
+                        //     node.append('img').attr('class', 'ct-nodeIcon').attr('src', img_src).attr('alt', 'Module').attr('aria-hidden', true);
+                        //     if(t.length>20) t = t.substring(0, 20)+'...';
+                        //     node.append('span').attr('class', 'ct-nodeLabel').html(t);
+                        // });
                         $('div[title='+selectedNodeTitle+']').addClass('nodeBoxSelected');
                         if (selectedTab == 'tabCreate')
                             populateDynamicInputList();
@@ -2659,7 +2632,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     var res = result[0];
                     //res = res[0];
                     var mid, resMap = Object.keys(res);
-                    allMMaps.some(function(m, i) {
+                    $scope.allMMaps.some(function(m, i) {
                         if (m.id_n == resMap[0]) {
                             mid = i;
                             return !0;
@@ -2667,7 +2640,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                         //return !1;
                     });
                     //263-'Mindmap- Module: Currently allowing to create 2 modules with same name- Error msg is given on click of Create button
-                    if (allMMaps[mid] != undefined) {
+                    if ($scope.allMMaps[mid] != undefined) {
                         currMap.id_c = res[resMap[0]];
                         currMap.children.forEach(function(tsc) {
                             tsc.id_c = res[tsc.id_n];
@@ -2782,7 +2755,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         var scrDict = {},
             tcDict = {},
             scenarioDict = {};
-        allMMaps.forEach(function(m) {
+        $scope.allMMaps.forEach(function(m) {
             if (m.children != undefined) {
                 m.children.forEach(function(ts) {
                     // if(scenarioDict[ts.id_n]===undefined){
@@ -3373,9 +3346,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             }                 
             var nodeBox = d3.select('#etemModuleContainer');
             $(nodeBox[0]).empty();
-            allMMaps_W = allMaps_info = result;
+            $scope.allMMaps = allMaps_info = result;
 
-            allMMaps_W.forEach(function(e, i) {
+            $scope.allMMaps.forEach(function(e, i) {
                 //var t=e.name.replace(/_/g,' ');
                 var src_image = 'imgs/ic-reportbox.png'
                 var class_name = 'eteMbox';
@@ -3409,22 +3382,22 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
         if (selectedTab == "tabAssign"){
             var canvas = d3.select('#ct-canvasforAssign');
-            $('#ct-canvasforAssign').append('<div id = "search-canvas-icon"><img alt="Search Icon" class="searchimg-canvas" src="imgs/ic-search-icon.png"><input type="text" class="search-canvas" placeholder="Search Node.."></div>');
+            // $('#ct-canvasforAssign').append('<div id = "search-canvas-icon"><img alt="Search Icon" class="searchimg-canvas" src="imgs/ic-search-icon.png"><input type="text" class="search-canvas" placeholder="Search Node.."></div>');
         }
         else{
             var canvas = d3.select('#ct-canvas');
-            $('#ct-canvas').append('<div id = "search-canvas-icon"><img alt="Search Icon" class="searchimg-canvas" src="imgs/ic-search-icon.png"><input type="text" class="search-canvas" placeholder="Search Node.."></div>');
+            // $('#ct-canvas').append('<div id = "search-canvas-icon"><img alt="Search Icon" class="searchimg-canvas" src="imgs/ic-search-icon.png"><input type="text" class="search-canvas" placeholder="Search Node.."></div>');
         } 
         addSearchNodeListeners();
 
-        u = canvas.append('div').attr('id', 'ct-inpBox').classed('no-disp', !0);
-        u.append('input').attr('id', 'ct-inpPredict').attr('class', 'ct-inp');
-        u.append('input').attr('id', 'ct-inpAct').attr('maxlength', '255').attr('class', 'ct-inp').on('change', inpChange_W).on('keyup', inpKeyUp_W);
-        u.append('ul').attr('id', 'ct-inpSugg').classed('no-disp', !0);
-        u = canvas.append('div').attr('id', 'ct-ctrlBox').classed('no-disp', !0);
-        u.append('p').attr('class', 'ct-ctrl fa ' + faRef.plus).on('click', '').append('span').attr('class', 'ct-tooltiptext').html('');
-        u.append('p').attr('class', 'ct-ctrl fa ' + faRef.edit).on('click', editNode_W).append('span').attr('class', 'ct-tooltiptext').html('');
-        u.append('p').attr('class', 'ct-ctrl fa ' + faRef.delete).on('click', deleteNode_W).append('span').attr('class', 'ct-tooltiptext').html('');
+        // u = canvas.append('div').attr('id', 'ct-inpBox').classed('no-disp', !0);
+        // u.append('input').attr('id', 'ct-inpPredict').attr('class', 'ct-inp');
+        // u.append('input').attr('id', 'ct-inpAct').attr('maxlength', '255').attr('class', 'ct-inp').on('change', inpChange_W).on('keyup', inpKeyUp_W);
+        // u.append('ul').attr('id', 'ct-inpSugg').classed('no-disp', !0);
+        // u = canvas.append('div').attr('id', 'ct-ctrlBox').classed('no-disp', !0);
+        // u.append('p').attr('class', 'ct-ctrl fa ' + faRef.plus).on('click', '').append('span').attr('class', 'ct-tooltiptext').html('');
+        // u.append('p').attr('class', 'ct-ctrl fa ' + faRef.edit).on('click', editNode_W).append('span').attr('class', 'ct-tooltiptext').html('');
+        // u.append('p').attr('class', 'ct-ctrl fa ' + faRef.delete).on('click', deleteNode_W).append('span').attr('class', 'ct-tooltiptext').html('');
 
         var mapSvg = canvas.append('svg').attr('id', 'ct-mapSvg').call(zoom_W).on('click.hideElements', clickHideElements);
         var dataAdder = [{
@@ -4187,9 +4160,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                         }     
                         var nodeBox = d3.select('#etemModuleContainer');
                         $(nodeBox[0]).empty();
-                        allMMaps_W = allMaps_info = result;
+                        $scope.allMMaps = allMaps_info = result;
                         //<span class='moduleContainer' data-moduleId=''><img alt='Module icon' class='eteMbox' src='imgs/ic-reportbox.png' title=''><br/><span class='modulename' title=''>Module"+(i+1)+"</span></span>
-                        allMMaps_W.forEach(function(e, i) {
+                        $scope.allMMaps.forEach(function(e, i) {
                             //var t=e.name.replace(/_/g,' ');
                             var src_image = 'imgs/ic-reportbox.png'
                             var class_name = 'eteMbox';
@@ -4216,7 +4189,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 if (!saveFlag_W) return;
                 var res = result[0];
                 var mid, resMap = Object.keys(res);
-                allMMaps_W.some(function(m, i) {
+                $scope.allMMaps.some(function(m, i) {
                     if (m.id_n == resMap[0]) {
                         mid = i;
                         return !0;
@@ -4597,17 +4570,17 @@ function loadModules() {
                 $rootScope.redirectPage();
             }               
             var nodeBox = d3.select('.ct-nodeBox');
-            $(nodeBox[0]).empty();
-            allMMaps = res;
-            allMMaps.forEach(function (e, i) {
-                var t = $.trim(e.name);
-                var img_src = 'images_mindmap/node-modules-no.png';
-                if (e.type == 'modules_endtoend') img_src = 'images_mindmap/MM5.png';
-                var node = nodeBox.append('div').attr('class', 'ct-node fl-left').attr('data-mapid', i).attr('title', t).on('click', loadMap);
-                node.append('img').attr('class', 'ct-nodeIcon').attr('src', img_src).attr('alt', 'Module').attr('aria-hidden', true);
-                if(t.length>20) t = t.substring(0, 20)+'...';
-                node.append('span').attr('class', 'ct-nodeLabel').html(t);
-            });
+            // $(nodeBox[0]).empty();
+            $scope.allMMaps = res;
+            // $scope.allMMaps.forEach(function (e, i) {
+            //     var t = $.trim(e.name);
+            //     var img_src = 'images_mindmap/node-modules-no.png';
+            //     if (e.type == 'modules_endtoend') img_src = 'images_mindmap/MM5.png';
+            //     var node = nodeBox.append('div').attr('class', 'ct-node fl-left').attr('data-mapid', i).attr('title', t).on('click', loadMap);
+            //     node.append('img').attr('class', 'ct-nodeIcon').attr('src', img_src).attr('alt', 'Module').attr('aria-hidden', true);
+            //     if(t.length>20) t = t.substring(0, 20)+'...';
+            //     node.append('span').attr('class', 'ct-nodeLabel').html(t);
+            // });
             populateDynamicInputList();
             setModuleBoxHeight();
             unblockUI();
