@@ -577,5 +577,10 @@ var txnHistory = {
 		"PDFReportClick": "1005",
 		"HTMLReportClick": "1006",
 		"ExportToJSONClick": "1007",
+		"JiraLoginConnection": "1008",
+		"SelectEncryptionMethod": "1201",
+		"Encryption": "1202",
+		"ResetEncryptionData": "1203"
+
 	}
 }

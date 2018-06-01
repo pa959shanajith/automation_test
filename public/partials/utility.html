@@ -60,9 +60,9 @@
 				
 				<div id="encryption_btns" style="display:none;">
 				<button id="reset_btn" style="padding: 2px 25px;" class="btn btn-md pull-right"
-					ng-click="resetEncrypt()" title="Reset">Reset</button>
+					ng-click="resetEncrypt($event)" title="Reset">Reset</button>
 				<button id="encrypt_btn" style="padding: 2px 25px; margin-right: 10px;" class="btn btn-md pull-right"
-					ng-click="EncryptData()" title="Encrypt">Encrypt</button>
+					ng-click="EncryptData($event)" title="Encrypt">Encrypt</button>
 				</div>
 				
 				<textarea id="encryptedData"
