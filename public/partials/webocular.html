@@ -37,16 +37,16 @@
 					<!--<span>Screen Capture</span>
 					<button  class="btn btn-sm btn-crawl theme" title=" Run for all">All</button>
 					<button  class="btn btn-sm btn-crawl " title="Run only for failed">Only Failed</button>-->
-				<button ng-if="enableGenerate" style="padding: 2px 25px" class="btn btn-md pull-right pairwise-GenBtn" ng-click="generateGraph()" title="Generate">Generate</button>
+				<button ng-if="enableGenerate" style="padding: 2px 25px" class="btn btn-md pull-right pairwise-GenBtn" ng-click="generateGraph($event)" title="Generate">Generate</button>
 			</form>
 			</div>
 
 			<div>
 				<span><b>Levels</b></span>
 				<input  id="level-slider" ng-model="level" data-slider-id='ex1Slider' type="text" data-slider-min="0" data-slider-max="20" data-slider-step="1" data-slider-value="4"/>
-				<button ng-if="!webocular_form.urlInput.$valid" disabled class="btn btn-sm btn-crawl theme" ng-click="executeGo()">Go</button>
-				<button ng-if="webocular_form.urlInput.$valid" class="btn btn-sm btn-crawl theme" ng-click="executeGo()">Go</button>
-				<button ng-if="enableGenerate"  class="btn btn-md pull-right pairwise-GenBtn" ng-click="showReport()" title="Show Report">View Report</button>
+				<button ng-if="!webocular_form.urlInput.$valid" disabled class="btn btn-sm btn-crawl theme" ng-click="executeGo($event)">Go</button>
+				<button ng-if="webocular_form.urlInput.$valid" class="btn btn-sm btn-crawl theme" ng-click="executeGo($event)">Go</button>
+				<button ng-if="enableGenerate"  class="btn btn-md pull-right pairwise-GenBtn" ng-click="showReport($event)" title="Show Report">View Report</button>
 
 			</div>
 

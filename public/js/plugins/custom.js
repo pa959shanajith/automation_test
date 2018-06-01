@@ -578,9 +578,12 @@ var txnHistory = {
 		"HTMLReportClick": "1006",
 		"ExportToJSONClick": "1007",
 		"JiraLoginConnection": "1008",
+		"WebocularGoClick": "1101",
+		"generateGraphClick": "1102",
+		"showReportClick": "1103",
 		"SelectEncryptionMethod": "1201",
 		"Encryption": "1202",
-		"ResetEncryptionData": "1203"
+		"ResetEncryptionData": "1203",
 
 	}
 }
