@@ -570,7 +570,12 @@ var txnHistory = {
 		"TaskNavigation" : "204",
 		"CancelALMLogin" : "301",
 		"SubmitALMLogin" : "302",
-		
-
+		"FilterProjectsForReports" : "1001",
+		"SuiteNodeClick" : "1002",
+		"SuiteDrillDownClick": "1003",
+		"selectReportFormatClick": "1004",
+		"PDFReportClick": "1005",
+		"HTMLReportClick": "1006",
+		"ExportToJSONClick": "1007",
 	}
 }
