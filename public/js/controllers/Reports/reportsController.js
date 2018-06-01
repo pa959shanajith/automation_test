@@ -56,7 +56,11 @@ mySPA.controller('reportsController', ['$scope','$rootScope', '$http', '$locatio
 			}
 			$('#searchModule').val('');
 			// openArrow = 0;
-			
+			//Transaction Activity for FilterProjectsForReports
+			var labelArr = [];
+			var infoArr = [];
+			labelArr.push(txnHistory.codesDict['FilterProjectsForReports']);
+			txnHistory.log(e.type,labelArr,infoArr,window.location.pathname); 
 			getProjectsAndSuites(projectId, "reports");
 			e.stopImmediatePropagation();
 		}
@@ -232,6 +236,11 @@ mySPA.controller('reportsController', ['$scope','$rootScope', '$http', '$locatio
 		if($('.dynamicTestsuiteContainer').is(':Visible')){
 			$('.iconSpace-reports').trigger('click');
 		}
+		//Transaction Activity for SuiteNodeClick
+		var labelArr = [];
+		var infoArr = [];
+		labelArr.push(txnHistory.codesDict['SuiteNodeClick']);
+		txnHistory.log(e.type,labelArr,infoArr,window.location.pathname); 
 		e.stopImmediatePropagation();
 	}
 
@@ -333,7 +342,7 @@ mySPA.controller('reportsController', ['$scope','$rootScope', '$http', '$locatio
 	}
 	//Date sorting
 	//Service call to get scenario status
-	$(document).on('click', '.scenariostatusreport', function(){
+	$(document).on('click', '.scenariostatusreport', function(e){
 		$(this).addClass('scenariostatusreportselect');
 		$(this).siblings().removeClass('scenariostatusreportselect');
 		executionId = $(this).attr('data-executionid');
@@ -407,14 +416,24 @@ mySPA.controller('reportsController', ['$scope','$rootScope', '$http', '$locatio
 		function(error) {
 			console.log("Error-------"+error);
 		})
-	})
+		//Transaction Activity for SuiteDrillDownClick
+			var labelArr = [];
+			var infoArr = [];
+			labelArr.push(txnHistory.codesDict['SuiteDrillDownClick']);
+			txnHistory.log(event.type,labelArr,infoArr,window.location.pathname); 
+			});
 
-	$(document).on('click', '.selectFormat', function(){
+	$(document).on('click', '.selectFormat', function(e){
 		$('.formatpdfbrwsrexport').remove();
 		var repID = $(this).parent().attr("data-reportid");
 		$(this).parent().append("<span class='formatpdfbrwsrexport'><img alt='Pdf Icon' class='getSpecificReportBrowser openreportstatus' data-getrep='wkhtmltopdf' data-reportid='"+repID+"' style='cursor: pointer; margin-right: 10px;' src='imgs/ic-pdf.png' title='PDF Report'><img alt='-' class='getSpecificReportBrowser openreportstatus' data-getrep='html' data-reportid='"+repID+"' style='cursor: pointer; margin-right: 10px; width: 23px;' src='imgs/ic-web.png' title='Browser Report'><img alt='Export JSON' class='exportToJSON' data-reportid='"+repID+"' style='cursor: pointer;' src='imgs/ic-export-to-json.png' title='Export to Json'></span>")
 		$('.formatpdfbrwsrexport').focus();
-	})
+		//Transaction Activity for selectReportFormatClick
+		var labelArr = [];
+		var infoArr = [];
+		labelArr.push(txnHistory.codesDict['selectReportFormatClick']);
+		txnHistory.log(e.type,labelArr,infoArr,window.location.pathname); 
+	});
 
 	$('span.formatpdfbrwsrexport').focusout(function(){
 		$('.formatpdfbrwsrexport').remove();
@@ -611,6 +630,11 @@ mySPA.controller('reportsController', ['$scope','$rootScope', '$http', '$locatio
 					function(error) {
 						console.log("Error-------"+error);
 					});
+					//Transaction Activity for HTMLReportClick
+					var labelArr = [];
+					var infoArr = [];
+					labelArr.push(txnHistory.codesDict['HTMLReportClick']);
+					txnHistory.log(e.type,labelArr,infoArr,window.location.pathname); 
 				}
 				else{
 					//Service call to get screenshots for Pdf reports
@@ -639,6 +663,11 @@ mySPA.controller('reportsController', ['$scope','$rootScope', '$http', '$locatio
 									URL.revokeObjectURL(fileURL);
 								}
 								openWindow++;
+								//Transaction Activity for PDFReportClick
+								var labelArr = [];
+								var infoArr = [];
+								labelArr.push(txnHistory.codesDict['PDFReportClick']);
+								txnHistory.log(e.type,labelArr,infoArr,window.location.pathname); 
 								e.stopImmediatePropagation();
 							}
 						},
@@ -657,7 +686,6 @@ mySPA.controller('reportsController', ['$scope','$rootScope', '$http', '$locatio
 		function(error) {
 			console.log("Error-------"+error);
 		});
-		e.stopImmediatePropagation();
 	});
 
 
@@ -744,6 +772,11 @@ mySPA.controller('reportsController', ['$scope','$rootScope', '$http', '$locatio
 				}
 			}
 			else	console.log("Error while exporting JSON.\n");
+			//Transaction Activity for ExportToJSONClick
+			var labelArr = [];
+			var infoArr = [];
+			labelArr.push(txnHistory.codesDict['ExportToJSONClick']);
+			txnHistory.log(e.type,labelArr,infoArr,window.location.pathname); 
 		},
 		function(error) {
 			console.log("Error while exportsing JSON.\n "+(error.data));

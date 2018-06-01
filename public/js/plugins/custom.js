@@ -576,16 +576,25 @@ var txnHistory = {
 		"OpenFileInEditor" : "404",
 		"WMCCalculate" : "405",
 		"ShowFlowGraphHome" : "406",
+		"FilterProjectsForReports" : "1001",
+		"SuiteNodeClick" : "1002",
+		"SuiteDrillDownClick": "1003",
+		"selectReportFormatClick": "1004",
+		"PDFReportClick": "1005",
+		"HTMLReportClick": "1006",
+		"ExportToJSONClick": "1007",
+		"JiraLoginConnection": "1008",
+		"WebocularGoClick": "1101",
+		"generateGraphClick": "1102",
+		"showReportClick": "1103",
+		"SelectEncryptionMethod": "1201",
+		"Encryption": "1202",
+		"ResetEncryptionData": "1203",
 		"UserConfmanage" : "1301",
 		"CreateProject" : "1302",
 		"UpdateProject" : "1303",
 		"AssignProjects" : "1304",
 		"LdapConftest" : "1305",
 		"LdapConfmanage" : "1306",
-
-
-
-
-
 	}
 }
