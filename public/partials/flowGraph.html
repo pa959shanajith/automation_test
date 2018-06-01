@@ -26,7 +26,7 @@
 	<div id="middle-content-section">
 		<!--Task Name-->
 			<div id="page-taskName">
-				<span style="cursor:pointer; position : relative" ng-click="showFlowGraphHome()">Automated Path Generator</Flowgraph></span>
+				<span style="cursor:pointer; position : relative" ng-click="showFlowGraphHome($event)">Automated Path Generator</Flowgraph></span>
 			</div>
 			<!--Task Name-->
 			<!-- Generate DIV -->
@@ -76,7 +76,7 @@
 			<h4 class="heading-bold">Method Level Complexity Info:  
 			</h4>
 			<div >
-				Weighted Method Class Complexity : <button type="button" class="btn btn-primary btn-md" id="wmcCalculate" ng-click="wmcCalculate()">Calculate!</button>
+				Weighted Method Class Complexity : <button type="button" class="btn btn-primary btn-md" id="wmcCalculate" ng-click="wmcCalculate($event)">Calculate!</button>
 			</div>
 			<div class='divMethodContainer'>
 				<table id='tblMethodLevel'>

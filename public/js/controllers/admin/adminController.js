@@ -4,7 +4,7 @@ var editedProjectDetails = [];
 var deletedProjectDetails = [];
 var newProjectDetails = [];
 var unAssignedProjects = []; var assignedProjects = [];var projectData =[];var valid = "";var getAssignedProjectsLen=0;
-mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServices','$timeout','cfpLoadingBar', function ($scope, $rootScope, $http, adminServices, $timeout, cfpLoadingBar) {
+mySPA.controller('adminController', ['$scope', '$rootScope', '$http', '$location', 'adminServices','$timeout','cfpLoadingBar', function ($scope, $rootScope, $http, $location, adminServices, $timeout, cfpLoadingBar) {
 	$("body").css("background","#eee");
 
 	localStorage.setItem("navigateEnable", false);
@@ -183,7 +183,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 	};
 
 	//	Assign Projects Button Click
-	$scope.assignProjects = function () {
+	$scope.assignProjects = function ($event) {
 		unAssignedProjects = [];
 		assignedProjects = [];
 		$("#selAssignUser,#selAssignProject").removeClass("selectErrorBorder").css('border', '1px solid #909090 !important');
@@ -234,6 +234,13 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 		/*End of logic to get unassigned project list */
 		assignProjectsObj.deletetasksofprojects = $scope.diffprj;
 		//console.log(assignProjectsObj);
+
+		//Transaction Activity for Assign Project Button Action
+		var labelArr = [];
+		var infoArr = [];
+		labelArr.push(txnHistory.codesDict['AssignProjects']);
+		txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
+
 		blockUI('Saving in Progress. Please Wait...');
 		adminServices.assignProjects_ICE(assignProjectsObj)
 		.then(function (data) {
@@ -329,7 +336,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 	};
 
 	// Create Project Action
-	$scope.create_project = function () {
+	$scope.create_project = function ($event) {
 		$("#selDomain").removeClass("inputErrorBorder");
 		$("#projectName").removeClass("inputErrorBorder");
 
@@ -366,6 +373,12 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 				if (valid == "false") {
 					return false;
 				} else {
+
+					//Transaction Activity for Create Project Button Action
+					var labelArr = [];
+					var infoArr = [];
+					labelArr.push(txnHistory.codesDict['CreateProject']);
+					txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
 					if ($('#selDomain').val() != "") {
 						requestedids.push(domainId);
 						idtype.push('domainsall');
@@ -444,7 +457,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 	}
 
 	//Update Project Action
-	$scope.update_project = function () {
+	$scope.update_project = function ($event) {
 		$("#selDomainEdit,#selProject").removeClass("selectErrorBorder");
 		if ($('#selDomainEdit option:selected').val() == "") {
 			$("#selDomainEdit").addClass("selectErrorBorder");
@@ -528,6 +541,13 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 				return false;
 			}
 			if (proceedFlag == true) {
+
+				//Transaction Activity for Update Project Button Action
+				var labelArr = [];
+				var infoArr = [];
+				labelArr.push(txnHistory.codesDict['UpdateProject']);
+				txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
+
 				if (updateProjectObj.newProjectDetails.length <= 0)
 					updateProjectObj.newProjectDetails = newProjectDetails;
 				else
@@ -1727,7 +1747,15 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 	};
 
 	//Create / Update / Delete User
-	$scope.userConf.manage = function(action) {
+	$scope.userConf.manage = function(action,$event) {
+		
+		//Transaction Activity for Create/ Update/ Delete User button Action
+		var labelArr = [];
+		var infoArr = [];
+		labelArr.push(txnHistory.codesDict['UserConfmanage']);
+		infoArr.push(action);
+		txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
+		
 		var userConf = $scope.userConf;
 		if (!userConf.validate(action)) return;
 		var bAction = action.charAt(0).toUpperCase() + action.substr(1);
@@ -2038,7 +2066,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 	//Delete User Data
 	$(document).on('click','#delUserConf', function(e) {
 		hideDeleteGlobalModal();
-		$scope.userConf.manage("delete");
+		$scope.userConf.manage("delete",e);
 	});
 
 	//Populating secondary role drop down
@@ -2268,7 +2296,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 		return flag;
 	};
 
-	$scope.ldapConf.manage = function (action) {
+	$scope.ldapConf.manage = function (action,$event) {
 		var ldapConf = $scope.ldapConf;
 		if (!ldapConf.validate(action)) return;
 		var bAction = action.charAt(0).toUpperCase() + action.substr(1);
@@ -2282,6 +2310,12 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 			fieldMap: ldapConf.fieldMap
 		};
 		blockUI(bAction.slice(0,-1)+"ing configuration...");
+		//Transaction Activity for Create/ Update/ Delete LDAP conf button Action
+		var labelArr = [];
+		var infoArr = [];
+		labelArr.push(txnHistory.codesDict['LdapConfmanage']);
+		infoArr.push(action);
+		txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
 		adminServices.manageLDAPConfig(action, confObj)
 		.then(function(data){
 			unblockUI();
@@ -2361,7 +2395,7 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 	
 	$(document).on('click','#delLdapConf', function(e) {
 		hideDeleteGlobalModal();
-		$scope.ldapConf.manage("delete");
+		$scope.ldapConf.manage("delete",e);
 	});
 
 	$scope.ldapConf.getServerData = function () {
@@ -2390,8 +2424,13 @@ mySPA.controller('adminController', ['$scope', '$rootScope', '$http', 'adminServ
 		});
 	};
 
-	$scope.ldapConf.test = function(){
+	$scope.ldapConf.test = function($event){
 		if (!this.validate("test")) return;
+		//Transaction Activity for LDAP conf Test Button Action
+		var labelArr = [];
+		var infoArr = [];
+		labelArr.push(txnHistory.codesDict['LdapConftest']);
+		txnHistory.log($event.type,labelArr,infoArr,$location.$$path);
 		var url = this.url;
 		var base_dn = this.baseDN;
 		var bind_dn = this.bindDN;

@@ -570,7 +570,22 @@ var txnHistory = {
 		"TaskNavigation" : "204",
 		"CancelALMLogin" : "301",
 		"SubmitALMLogin" : "302",
-		
+		"Generate" : "401",
+		"ViewComplexity" : "402",
+		"GenerateDataFlowDiagram" : "403",
+		"OpenFileInEditor" : "404",
+		"WMCCalculate" : "405",
+		"ShowFlowGraphHome" : "406",
+		"UserConfmanage" : "1301",
+		"CreateProject" : "1302",
+		"UpdateProject" : "1303",
+		"AssignProjects" : "1304",
+		"LdapConftest" : "1305",
+		"LdapConfmanage" : "1306",
+
+
+
+
 
 	}
 }

@@ -41,7 +41,7 @@
 			<!-- Button -->
 			<div class="adminActionBtn">
 				<button class="btn btn-md pull-right adminBtn" ng-click="userConf.edit()" title="Edit User">Edit</button>
-				<button class="btn btn-md pull-right adminBtn" ng-click="userConf.manage('create')" ng-disabled="userConf.nocreate" style="margin-right:10px" title="Create User">Create</button>
+				<button class="btn btn-md pull-right adminBtn" ng-click="userConf.manage('create',$event)" ng-disabled="userConf.nocreate" style="margin-right:10px" title="Create User">Create</button>
 			</div>
 			<!-- Button -->
 			<!-- Action area -->
@@ -115,7 +115,7 @@
 			<!--Task Name-->
 			<!-- Button -->
 			<div class="adminActionBtn">
-				<button class="btn btn-md pull-right adminBtn" ng-click="userConf.manage('update')" ng-disabled="userConf.userIdName==''" title="Update User">Update</button>
+				<button class="btn btn-md pull-right adminBtn" ng-click="userConf.manage('update',$event)" ng-disabled="userConf.userIdName==''" title="Update User">Update</button>
 				<button class="btn btn-md pull-right adminBtn" ng-click="userConf.delete()" ng-disabled="userConf.userIdName==''" style="margin-right:10px" title="Delete Configuration">Delete</button>
 			</div>
 			<!-- Button -->
@@ -191,8 +191,8 @@
 			<!--Task Name-->
 			<!-- Button -->
 			<div class="adminActionBtn">
-				<button class="btn btn-md pull-right adminBtn" ng-click="editProjectTab()" title="Edit Project">Edit</button>
-				<button class="btn btn-md pull-right adminBtn createProjectBtn" ng-click="create_project()" title="Create Project">Create</button>
+				<button class="btn btn-md pull-right adminBtn" ng-click="editProjectTab($event)" title="Edit Project">Edit</button>
+				<button class="btn btn-md pull-right adminBtn createProjectBtn" ng-click="create_project($event)" title="Create Project">Create</button>
 			</div>
 			<!-- Button -->
 			<div class="col-xs-9 form-group" style="width: 83%">
@@ -255,7 +255,7 @@
 			</div>
 			<!--Task Name-->
 			<div class="adminActionBtn">
-				<button title="Save" class="btn btn-md pull-right adminBtn" ng-click="assignProjects()" style="margin-right:10px">Save</button>
+				<button title="Save" class="btn btn-md pull-right adminBtn" ng-click="assignProjects($event)" style="margin-right:10px">Save</button>
 			</div>
 			<div class="col-xs-9 form-group" style="width: 83%">
 				<div class='userForm projectForm'>
@@ -333,7 +333,7 @@
 			<!--Task Name-->
 			<!-- Button -->
 			<div class="adminActionBtn">
-				<button class="btn btn-md pull-right adminBtn createProjectBtn" ng-click="update_project()">Update</button>
+				<button class="btn btn-md pull-right adminBtn createProjectBtn" ng-click="update_project($event)">Update</button>
 			</div>
 			<!-- Button -->
 			<div class="col-xs-9 form-group" style="width: 83%" id='updateProjectForm'>
@@ -401,8 +401,8 @@
 			<!-- Button -->
 			<div class="adminActionBtn">
 				<button class="btn btn-md pull-right adminBtn" ng-click="ldapConf.edit()" title="Edit Configuration">Edit</button>
-				<button class="btn btn-md pull-right adminBtn" ng-click="ldapConf.manage('create')" ng-disabled="ldapConf.testStatus != 'success'" style="margin-right:10px" title="Create Configuration">Create</button>
-				<button class="btn btn-md pull-right adminBtn" ng-click="ldapConf.test()" style="margin-right:10px" title="Test Configuration">Test</button>
+				<button class="btn btn-md pull-right adminBtn" ng-click="ldapConf.manage('create',$event)" ng-disabled="ldapConf.testStatus != 'success'" style="margin-right:10px" title="Create Configuration">Create</button>
+				<button class="btn btn-md pull-right adminBtn" ng-click="ldapConf.test($event)" style="margin-right:10px" title="Test Configuration">Test</button>
 			</div>
 			<!-- Button -->
 			<!-- Create Configuration Form -->
@@ -458,7 +458,7 @@
 			<!--Task Name-->
 			<!-- Button -->
 			<div class="adminActionBtn">
-				<button class="btn btn-md pull-right adminBtn" ng-click="ldapConf.manage('update')" ng-disabled="ldapConf.serverName == ''" title="Update Configuration">Update</button>
+				<button class="btn btn-md pull-right adminBtn" ng-click="ldapConf.manage('update',$event)" ng-disabled="ldapConf.serverName == ''" title="Update Configuration">Update</button>
 				<button class="btn btn-md pull-right adminBtn" ng-click="ldapConf.delete()" ng-disabled="ldapConf.serverName == ''" style="margin-right:10px" title="Delete Configuration">Delete</button>
 				<button class="btn btn-md pull-right adminBtn" ng-click="ldapConf.test()" ng-disabled="ldapConf.serverName == ''" style="margin-right:10px" title="Test Configuration">Test</button>
 			</div>
