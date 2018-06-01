@@ -56,7 +56,6 @@ mySPA.controller('reportsController', ['$scope','$rootScope', '$http', '$locatio
 			}
 			$('#searchModule').val('');
 			// openArrow = 0;
-			debugger;
 			//Transaction Activity for FilterProjectsForReports
 			var labelArr = [];
 			var infoArr = [];
