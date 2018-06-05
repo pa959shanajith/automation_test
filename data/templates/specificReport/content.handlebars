@@ -1,722 +1,1103 @@
 <html style="height: 100%;">
-    <head>
-        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
-        <title>SLK Nineteen68</title>
-        <link rel="stylesheet" type="text/css" href="{#asset latofonts.css @encoding=link}"/>
-        <link rel="stylesheet" type="text/css" href="{#asset font-awesome.min.css @encoding=link}"/>
-        <script type="text/javascript" src="{#asset jquery.min.js @encoding=link}"></script>
-        <script>
-            var url,userName,pwd;
-            function blockUI(content){
-                    $("body").append("<div id='overlayContainer'><div class='contentOverlay'>"+content+"</div></div>");
-                    $("#overlayContainer").fadeIn(300);
+
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+    <title>SLK Nineteen68</title>
+    <link rel="stylesheet" type="text/css" href="{#asset latofonts.css @encoding=link}" />
+    <link rel="stylesheet" type="text/css" href="{#asset font-awesome.min.css @encoding=link}" />
+    <script type="text/javascript" src="{#asset jquery.min.js @encoding=link}"></script>
+    <script>
+        var url, userName, pwd;
+
+        function blockUI(content) {
+            $("body").append("<div id='overlayContainer'><div class='contentOverlay'>" + content + "</div></div>");
+            $("#overlayContainer").fadeIn(300);
+        }
+
+        function unblockUI() {
+            $("#overlayContainer").fadeOut(300).remove()
+        }
+        setTimeout(function() {
+            /*if($('.reportsDetail .reportdetailsrow').length < 12){
+            	$('.rDstep').css('width','10.1%');
+            	$('.rDstepDes').css('width','49.6%');
+            	$('.rDstatus').css('width','10%');
+            }*/
+            var getRows = $('.reportdetailsrow');
+            for (i = 0; i < getRows.length; i++) {
+                var getRowId = parseInt(getRows[i].getAttribute('data-id'));
+                var name = getRows[i].children[2].innerHTML;
+                var rowCount = 0;
+                var getParentId;
+                if (getRows[i].children[3].getAttribute("data-screenshot").length <= 0 || getRows[i].children[3].getAttribute("data-screenshot").toLowerCase().indexOf(".png") == -1) {
+                    getRows[i].children[3].classList.remove("openscreenshot");
                 }
-            function unblockUI(){
-                $("#overlayContainer").fadeOut(300).remove()
+                if (name.indexOf("Testscriptname") >= 0 || name.indexOf("TestCase Name") >= 0) {
+                    getRows[i].children[7].children[0].remove();
+                }
+                for (j = i; j < getRows.length; j++) {
+                    if (parseInt(getRows[j].getAttribute('data-parentid')).length == NaN) getParentId = parseInt(getRows[j].getAttribute('data-parentid').split(",")[1]);
+                    else getParentId = parseInt(getRows[j].getAttribute('data-parentid'));
+                    if (getParentId == getRowId && name.indexOf('TestCase Name') === -1) rowCount++;
+                }
+                if (rowCount > 0) {
+                    if (getRows[i].children[1].innerText.indexOf("Step") >= 0) {
+                        getRows[i].children[1].innerHTML += '<i class="fa fa-caret-down unexpand" aria-hidden="true" style="position: relative; left: -58px;"></i>';
+                    } else if (getRows[i].children[1].innerText.trim() == "") {
+                        //#499 //getRows[i].children[1].innerHTML += '<i class="fa fa-caret-down unexpand" aria-hidden="true" style="position: relative; left: -54px;"></i>';
+                    } else {
+                        getRows[i].children[1].innerHTML += '<i class="fa fa-caret-down unexpand" aria-hidden="true" style="position: relative; left: -97px;"></i>';
+                    }
+                    rowCount = 0;
+                }
             }
-			setTimeout(function(){
-				if($('.reportsDetail .reportdetailsrow').length < 12){
-					$('.rDstep').css('width','10.1%');
-					$('.rDstepDes').css('width','49.6%');
-					$('.rDstatus').css('width','10%');
-				}
-				var getRows = $('.reportdetailsrow');
-                for(i=0; i<getRows.length; i++){
-                    var getRowId = parseInt(getRows[i].getAttribute('data-id'));
-                    var name = getRows[i].children[2].innerHTML;
-                    var rowCount = 0;
-                    var getParentId;
-                    if(getRows[i].children[3].getAttribute("data-screenshot").length <= 0 || getRows[i].children[3].getAttribute("data-screenshot").toLowerCase().indexOf(".png") == -1){
-                    	getRows[i].children[3].classList.remove("openscreenshot");
-                    }
-                    if(name.indexOf("Testscriptname") >= 0 || name.indexOf("TestCase Name") >= 0){
-                        getRows[i].children[7].children[0].remove();
-                    }
-                    for(j=i; j<getRows.length; j++){
-                        if(parseInt(getRows[j].getAttribute('data-parentid')).length == NaN)    getParentId = parseInt(getRows[j].getAttribute('data-parentid').split(",")[1]);
-                        else    getParentId = parseInt(getRows[j].getAttribute('data-parentid'));
-                        if(getParentId == getRowId && name.indexOf('TestCase Name') === -1) rowCount++;
-                    }
-                    if (rowCount > 0) {
-                        if (getRows[i].children[1].innerText.indexOf("Step") >= 0) {
-                            getRows[i].children[1].innerHTML += '<i class="fa fa-caret-down unexpand" aria-hidden="true" style="position: relative; left: -58px;"></i>';
-                        } 
-                        else if (getRows[i].children[1].innerText.trim() == "") {
-                            //#499 //getRows[i].children[1].innerHTML += '<i class="fa fa-caret-down unexpand" aria-hidden="true" style="position: relative; left: -54px;"></i>';
-                        }
-                        else {
-                            getRows[i].children[1].innerHTML += '<i class="fa fa-caret-down unexpand" aria-hidden="true" style="position: relative; left: -97px;"></i>';
-                        }
-                        rowCount = 0;
-                    }
-                }
 
-                window.stop();
+            window.stop();
 
-                $(document).on('click', '.unexpand', function(){
-                    var getID = $(this).parents('.reportdetailsrow').attr('data-id');
-                    $(this).removeClass('unexpand').addClass('expand');
-                    $(this).removeClass('fa-caret-down').addClass('fa-caret-right');
-                    $.each(getRows, function(){
-                        if($(this).attr('data-parentid') == getID){
-                            $(this).hide();
-                        }
-                    })
+            $(document).on('click', '.unexpand', function() {
+                var getID = $(this).parents('.reportdetailsrow').attr('data-id');
+                $(this).removeClass('unexpand').addClass('expand');
+                $(this).removeClass('fa-caret-down').addClass('fa-caret-right');
+                $.each(getRows, function() {
+                    if ($(this).attr('data-parentid') == getID) {
+                        $(this).hide();
+                    }
                 })
+            })
 
-                $(".rDstatus").each(function() {
-                    if($.trim($(this).text()) == "")
-                    {
-                        $(this).css("pointer-events","none");
+            $(".rDstatus").each(function() {
+                if ($.trim($(this).text()) == "") {
+                    $(this).css("pointer-events", "none");
+                }
+            });
+
+            $(document).on('click', '.openscreenshot', function() {
+                var path = $(this).attr("data-screenshot");
+                var hostName = window.location.host;
+                console.log(path + "-----" + hostName);
+                if ($.trim(path) != "") {
+                    $.ajax({
+                        type: 'POST',
+                        url: 'https://' + hostName + '/openScreenShot',
+                        responseType: 'arraybuffer',
+                        data: {
+                            "absPath": [path]
+                        },
+                        success: function(data) {
+                            if (data == "unavailableLocalServer") {
+                                alert("ICE Engine is not available. Please run the batch file and connect to the Server.");
+                            } else if (data == 'scheduleModeOn') {
+                                alert("Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.");
+                            } else if (data == "fail") {
+                                alert("Failed to open image");
+                            } else {
+                                data = data[0]
+                                var b64Response = window.btoa(unescape(encodeURIComponent(data)));
+                                var imageUrl = 'data:image/PNG;base64,' + data;
+                                var WindowObject = window.open();
+                                var strHtml = "<html>\n<head>\n</head>\n<body style='margin: 2px' >\n<img style='border: 1px solid #ccc' src='" + imageUrl + "'/>\n</body>\n</html>";
+                                WindowObject.document.writeln(strHtml);
+                            }
+                        }
+                    });
+                }
+            })
+
+            $(document).on('click', '.expand', function() {
+                var getID = $(this).parents('.reportdetailsrow').attr('data-id');
+                $(this).removeClass('expand').addClass('unexpand');
+                $(this).removeClass('fa-caret-right').addClass('fa-caret-down');
+                $.each(getRows, function() {
+                    if ($(this).attr('data-parentid') == getID) {
+                        $(this).show();
                     }
-                });
+                })
+            })
 
-				$(document).on('click', '.openscreenshot', function(){
-					var path = $(this).attr("data-screenshot");
+            $(document).on('click', '.logintojira', function() {
+                $(".jiraWindow").show();
+                clearData();
+                $('#overlay').css('display', 'block');
+            })
+
+            /*$(document).on('click', '.disconnectJira', function(){
+                $(".logintojira").show();
+                $(".disconnectJira, .Llogdefect, #inputSlno, .go_defectlog").hide();
+            })*/
+
+            //Login to Jira
+            $(document).on('click', '.resetJiraCredentials', function() {
+                $("#jiraURL").val('');
+                $("#jiraUserName").val('');
+                $("#jiraPassword").val('');
+            });
+            $(document).on('click', '.loginJiraCredentials', function(e) {
+                $("#jiraURL, #jiraUserName, #jiraPassword").css('border-color', '#bbb');
+                url = $("#jiraURL").val().trim();
+                userName = $("#jiraUserName").val();
+                pwd = $("#jiraPassword").val();
+                var urlPattern = new RegExp("(http|ftp|https)://[\w-]+(\.[\w-]+)+([\w.,@?^=%&amp;:/~+#-]*[\w@?^=%&amp;/~+#-])?")
+                if (!url && urlPattern.test(url)) $("#jiraURL").css('border-color', 'red');
+                else if (!userName) $("#jiraUserName").css('border-color', 'red');
+                else if (!pwd) $("#jiraPassword").css('border-color', 'red');
+                else {
                     var hostName = window.location.host;
-                    console.log(path+"-----"+hostName);
-                    if($.trim(path) != ""){
-                        $.ajax({
-                            type: 'POST',
-                            url: 'https://'+hostName+'/openScreenShot',
-                            responseType: 'arraybuffer',
-                            data: {
-                                "absPath" : [path]
-                            },
-                            success: function(data){
-                                if(data == "unavailableLocalServer"){
-                                    alert("ICE Engine is not available. Please run the batch file and connect to the Server.");
-                                }
-                                else if(data == 'scheduleModeOn')
-                                {
-                                     alert("Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.");
-                                }
-                                else if(data == "fail"){
-                                    alert("Failed to open image");
-                                }
-                                else{
-                                    data=data[0]
-                                    var b64Response = window.btoa(unescape(encodeURIComponent(data)));
-                                    var imageUrl = 'data:image/PNG;base64,'+ data;
-                                    var WindowObject = window.open();
-                                    var strHtml = "<html>\n<head>\n</head>\n<body style='margin: 2px' >\n<img style='border: 1px solid #ccc' src='" + imageUrl + "'/>\n</body>\n</html>";
-                                    WindowObject.document.writeln(strHtml);
-                                }
+                    var posturl = 'https://' + hostName + '/connectJira_ICE';
+                    console.log("---" + posturl);
+                    blockUI('Loading....');
+                    $.ajax({
+                        type: 'POST',
+                        url: posturl,
+                        responseType: 'arraybuffer',
+                        data: {
+                            "url": url,
+                            "username": userName,
+                            "password": pwd,
+                            "action": "loginToJira"
+                        },
+                        success: function(data) {
+                            if (data == "Fail") {
+                                $(".error-msg").text("Failed to login");
+                            } else if (data == 'Invalid Url') {
+                                $(".error-msg").text("Invalid Url");
+                            } else if (data == "Invalid Credentials") {
+                                $(".error-msg").text("Invalid Credentials");
+                            } else if (data == "unavailableLocalServer") {
+                                $(".error-msg").text("ICE Engine is not available. Please run the batch file and connect to the Server.");
+                            } else if (data == "Invalid Session") {
+                                $(".error-msg").text("Invalid Session. Login again");
+                            } else if (data == 'scheduleModeOn') {
+                                $(".error-msg").text("Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.");
+                            } else {
+                                //if(data === [object Object])
+                                localStorage.setItem("jiraLoginDetails", JSON.stringify(data));
+                                clearData();
+                                $(".error-msg").text('');
+                                $(".jiraWindow, .logintojira").hide();
+                                $('#overlay').css('display', 'none');
+                                $(".Llogdefect, #inputSlno, .go_defectlog").show();
+                                //Transaction Activity for JiraLoginConnection
+                                var labelArr = [];
+                                var infoArr = [];
+                                labelArr.push(txnHistory.codesDict['JiraLoginConnection']);
+                                txnHistory.log(e.type, labelArr, infoArr, window.location.pathname);
                             }
-                        });
-                    }
-                })
-
-                $(document).on('click', '.expand', function(){
-                    var getID = $(this).parents('.reportdetailsrow').attr('data-id');
-                    $(this).removeClass('expand').addClass('unexpand');
-                    $(this).removeClass('fa-caret-right').addClass('fa-caret-down');
-                    $.each(getRows, function(){
-                        if($(this).attr('data-parentid') == getID){
-                            $(this).show();
+                            unblockUI();
                         }
-                    })
-                })
-
-                $(document).on('click', '.logintojira', function(){
-                    $(".jiraWindow").show();
-                    clearData();
-                    $('#overlay').css('display', 'block');
-                })
-
-                /*$(document).on('click', '.disconnectJira', function(){
-                    $(".logintojira").show();
-                    $(".disconnectJira, .Llogdefect, #inputSlno, .go_defectlog").hide();
-                })*/                
-                
-                //Login to Jira
-                $(document).on('click','.resetJiraCredentials',function(){
-                    $("#jiraURL").val('');
-                    $("#jiraUserName").val('');
-                    $("#jiraPassword").val('');
-                });
-                $(document).on('click', '.loginJiraCredentials', function(){
-                    $("#jiraURL, #jiraUserName, #jiraPassword").css('border-color','#bbb');
-                    url = $("#jiraURL").val().trim();
-                    userName = $("#jiraUserName").val();
-                    pwd = $("#jiraPassword").val();
-                    var urlPattern = new RegExp("(http|ftp|https)://[\w-]+(\.[\w-]+)+([\w.,@?^=%&amp;:/~+#-]*[\w@?^=%&amp;/~+#-])?")
-                    if(!url && urlPattern.test(url)) $("#jiraURL").css('border-color','red');
-                    else if(!userName) $("#jiraUserName").css('border-color','red');
-                    else if(!pwd) $("#jiraPassword").css('border-color','red');
-                    else{
-                        var hostName = window.location.host;
-                        var posturl = 'https://'+hostName+'/connectJira_ICE';
-                        console.log("---"+posturl);
-                        blockUI('Loading....');
-                        $.ajax({
-                            type: 'POST',
-                            url: posturl,
-                            responseType: 'arraybuffer',
-                            data: {
-                                "url" : url,
-                                "username": userName,
-                                "password": pwd,
-                                "action": "loginToJira"
-                            },
-                            success: function(data){
-                                console.log(data);
-                                if(data == "Fail"){
-                                    $(".error-msg").text("Failed to login");
-                                }
-                                else if(data == 'Invalid Url'){
-                                    $(".error-msg").text("Invalid Url");
-                                }
-                                else if(data == "Invalid Credentials"){
-                                     $(".error-msg").text("Invalid Credentials");
-                                }
-                                else if(data == "unavailableLocalServer"){
-                                    $(".error-msg").text("ICE Engine is not available. Please run the batch file and connect to the Server.");
-                                }
-                                else if(data == "Invalid Session"){
-                                    $(".error-msg").text("Invalid Session. Login again");
-                                }
-                                  else if(data == 'scheduleModeOn')
-                                {
-                                     $(".error-msg").text("Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.");
-                                }
-                                else {
-                                   //if(data === [object Object])
-                                    localStorage.setItem("jiraLoginDetails", JSON.stringify(data));
-                                    clearData();
-                                    $(".error-msg").text('');
-                                    $(".jiraWindow, .logintojira").hide();
-                                    $('#overlay').css('display', 'none');
-                                    $(".Llogdefect, #inputSlno, .go_defectlog").show();
-                                }
-                                unblockUI();
-                            }
-                        });
-                    }
-                })
-                //Login to Jira
-                $("#jIssuetype").change(function() {
-                    var on_change_data=$('option:selected', this).text();
-                    if(on_change_data=='Sub-task'){
-                        $('.createIssueWindow p:nth-child(11)').height(68+"px");
-                        $('#parentIssue').show();
-                    }
-                    else{
-                        $('.createIssueWindow p:nth-child(11)').height(117+"px");
-                         $('#parentIssue').hide();
-                    }
-                });
-                //Open create issue popup and get details of mentioned row
-                $(document).on('click', '.opendescpopup', function(){
-                    var slno = parseInt($("#inputSlno").val())
+                    });
+                }
+            })
+            //Login to Jira
+            $("#jIssuetype").change(function() {
+                var on_change_data = $('option:selected', this).text();
+                if (on_change_data == 'Sub-task') {
+                    $('.createIssueWindow p:nth-child(11)').height(68 + "px");
+                    $('#parentIssue').show();
+                } else {
+                    $('.createIssueWindow p:nth-child(11)').height(117 + "px");
                     $('#parentIssue').hide();
-                    if(slno > getRows.length){
-                        $('#overlay').css('display', 'block');
-                        $(".statusWindow").show();
-                        $(".statusWindow .popupheader label").text("Invalid Input")
-                        $("#showStatus").text("SL No: "+slno+" does not exist.");
-                    }
-                    else{
-                        $('#overlay').css('display', 'block');
-                        $(".createIssueWindow").hide();
-                        $("#jSummary, #jDescription, #jLabel").val('');
-                        $("#jProjects, #jIssuetype, #jPriority").prop('selectedIndex', 0);
-                        $(".createIssueWindow").show();
-                        var jsonData = localStorage.getItem("jiraLoginDetails");
-                        console.log(jsonData);
-                        jsonData = JSON.parse(jsonData);
-                        console.log(jsonData.projects);
-                        fillSelector(jsonData.projects, "jProjects");
-                        fillSelector(jsonData.issuetype, "jIssuetype");
-                        fillSelector(jsonData.priority, "jPriority");
-                        var desc, path, currentDataid;
-                        var description = "";
-                        for(var i=0; i<getRows.length; i++){
-                            if(parseInt(getRows[i].children[0].textContent) == slno){
-                                desc = getRows[i].children[2].innerText;
-                                path = getRows[i].children[3].dataset.screenshot;
-                                currentDataid = parseInt(getRows[i].dataset.id);
-                                for(var j=0; j<currentDataid; j++){
-                                    if(getRows[j].children[2].textContent.indexOf("Testscriptname") >= 0 || getRows[j].children[2].textContent.indexOf("TestCase Name") >= 0){}
-                                    else description = description + getRows[j].children[1].textContent +": "+ getRows[j].children[2].textContent.trim() +"\n\n";
-                                }
-                                break;
-                            }
-                        }
-                        if(desc.length >= 255)   $("#jSummary").val(desc.substring(0, 252)+"...");
-                        else $("#jSummary").val(desc);
-                        $("#jDescription").val(description);
-                        $("#scrnShotPath").val(path);
-                    }
-                })
-
-                function fillSelector(dataArray, selector){
-                    $("#"+selector).find("option").not(":first").remove();
-                    for(var i=0; i<dataArray.length;i++){
-                        if(dataArray[i].name!='Epic')
-                        $("#"+selector).append("<option value="+dataArray[i].id+">"+dataArray[i].name+"</option>");
-                    }
                 }
-                /*
-                function ele(id){return document.getElementById(id);}
-                ele("jAttachment").addEventListener("change", updateFilePath, false);
-                function updateFilePath(){
-                    console.log("jAttachment----"+$("#jAttachment").val());
-                    console.log("scrnShotPath----"+$("#scrnShotPath").val());
-                    $("#scrnShotPath").val($("#jAttachment").val());
-                    console.log("jAttachment----"+$("#jAttachment").val());
-                    console.log("scrnShotPath----"+$("#scrnShotPath").val());
-                }*/
-                //function to close popup window
-                $(document).on('click', '.closeWindow', function(){
-                     $(".jiraWindow, .createIssueWindow, .statusWindow").hide();
-                     $('#overlay').css('display', 'none');
-                     $(".error-msg").text('');
-                })
-
-                $(document).on('click', '.cancelIssues', function(){
-                     $(".createIssueWindow").hide();
-                     $('#overlay').css('display', 'none');
-                })
-                //function to close popup window
-
-                //Create Issues in Jira
-                $(document).on('click', '.createIssues', function(){
-                    $("#jProjects, #jIssuetype, #jSummary, #jPriority").css('border-color','#bbb');
-                    var issue_dict = {};
-                    var projectid = $("#jProjects option:selected").val();
-                    var issuetype = $("#jIssuetype option:selected").text();
-                    var summary = $("#jSummary").val();
-                    var description = $("#jDescription").val();
-                    var priority = $("#jPriority option:selected").text();
-                    var label = $("#jLabel").val().split(" ");
-                    var attachment = $("#scrnShotPath").val();
-                    var pissue=$("#jpIssueid").val();
-                    if(!projectid) $("#jProjects").css('border-color','red');
-                    else if(!issuetype || issuetype == "Select Issue") $("#jIssuetype").css('border-color','red');
-                    else if(!summary) $("#jSummary").css('border-color','red');
-                    //else if(!description) $("#jDescription").css('border-color','red');
-                    else if(!priority || priority == "Select Priority") $("#jPriority").css('border-color','red');
-                    //else if(!label) $("#jLabel").css('border-color','red');
-                    //else if(!attachment) $("#jAttachment").css('border-color','red');
-                    else{
-                        if(!attachment) attachment = $("#scrnShotPath").val();
-                        issue_dict = {
-                            "issue_dict": {
-                                'project': projectid,
-                                'issuetype': issuetype,
-                                'summary': summary,
-                                'description': description,
-                                'priority': priority,
-                                'label': label,
-                                'attachment': attachment,
-                                'url': url,
-                                'username': userName,
-                                'password': pwd,
-                                'parentissue':''
-                            },
-                            "action": "createIssueInJira"
-                        }
-                        if(issuetype=='Sub-task'){
-                            issue_dict.issue_dict.parentissue=pissue;
-                        }
-                        var hostName = window.location.host;
-                        var posturl = 'https://'+hostName+'/connectJira_ICE';
-                        blockUI('Loading....');
-                        $.ajax({
-                            type: 'POST',
-                            url: posturl,
-                            responseType: 'arraybuffer',
-                            data: issue_dict,
-                            success: function(data){
-                                if(data == "Fail"){
-                                    $(".createIssueWindow").hide();
-                                    $(".statusWindow").show();
-                                    $("#showStatus").text("Failed to create issue.");
-                                }
-                                else if(data == "unavailableLocalServer"){
-                                    $(".createIssueWindow").hide();
-                                    $(".statusWindow").show();
-                                    $("#showStatus").text("ICE Engine is not available. Please run the batch file and connect to the Server.");
-                                }
-                                else if(data == 'scheduleModeOn')
-                                {
-                                    $(".createIssueWindow").hide();
-                                    $(".statusWindow").show();
-                                    $("#showStatus").text("Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.");
-                                }
-                                else if(data == "Invalid Session"){
-                                    $(".createIssueWindow").hide();
-                                    $(".statusWindow").show();
-                                    $("#showStatus").text("Invalid Session. Login again");
-                                }
-                                else{
-                                    getRows[parseInt($("#inputSlno").val())-1].children[7].innerText = data;
-                                    $(".createIssueWindow").hide();
-                                    $(".statusWindow").show();
-                                    $("#showStatus").text("Issue bearing ID " + data + " created successfully.");
-                                }
-                                $('#inputSlno').val('');
-                                $("#jpIssueid").val('');
-                                unblockUI();
+            });
+            //Open create issue popup and get details of mentioned row
+            $(document).on('click', '.opendescpopup', function() {
+                var slno = parseInt($("#inputSlno").val())
+                $('#parentIssue').hide();
+                if (slno > getRows.length) {
+                    $('#overlay').css('display', 'block');
+                    $(".statusWindow").show();
+                    $(".statusWindow .popupheader label").text("Invalid Input")
+                    $("#showStatus").text("SL No: " + slno + " does not exist.");
+                } else {
+                    $('#overlay').css('display', 'block');
+                    $(".createIssueWindow").hide();
+                    $("#jSummary, #jDescription, #jLabel").val('');
+                    $("#jProjects, #jIssuetype, #jPriority").prop('selectedIndex', 0);
+                    $(".createIssueWindow").show();
+                    var jsonData = localStorage.getItem("jiraLoginDetails");
+                    console.log(jsonData);
+                    jsonData = JSON.parse(jsonData);
+                    console.log(jsonData.projects);
+                    fillSelector(jsonData.projects, "jProjects");
+                    fillSelector(jsonData.issuetype, "jIssuetype");
+                    fillSelector(jsonData.priority, "jPriority");
+                    var desc, path, currentDataid;
+                    var description = "";
+                    for (var i = 0; i < getRows.length; i++) {
+                        if (parseInt(getRows[i].children[0].textContent) == slno) {
+                            desc = getRows[i].children[2].innerText;
+                            path = getRows[i].children[3].dataset.screenshot;
+                            currentDataid = parseInt(getRows[i].dataset.id);
+                            for (var j = 0; j < currentDataid; j++) {
+                                if (getRows[j].children[2].textContent.indexOf("Testscriptname") >= 0 || getRows[j].children[2].textContent.indexOf("TestCase Name") >= 0) {} else description = description + getRows[j].children[1].textContent + ": " + getRows[j].children[2].textContent.trim() + "\n\n";
                             }
-                        });
+                            break;
+                        }
                     }
-                })
-                //Create Issues in Jira
-
-                function clearData(){
-                    $("#jiraURL, #jiraUserName, #jiraPassword").val("");
+                    if (desc.length >= 255) $("#jSummary").val(desc.substring(0, 252) + "...");
+                    else $("#jSummary").val(desc);
+                    $("#jDescription").val(description);
+                    $("#scrnShotPath").val(path);
                 }
-			}, 400);
-		</script>
-        <style>
-            body{font-family: LatoWeb; height: 98%; overflow: hidden;}
-            .mainContainer{ border: 1px solid #B5AAAA; margin: 4px; float: left; padding: 14px; width: 97%; height: calc(100% - 50px);}
-            .hearderCon{position: relative; width: 100%; float: left; border: 1px solid #cfcfcf; background: linear-gradient(to bottom, #FFFFFF 0%, #E6E6E6 100%); height: 50px; margin-bottom: 10px;border-radius: 5px; font-size: 16px; padding-top: 7px;}
-            .headerRepDetails{ width: 50%; padding: 3px 40px;}
-            .headerRepDetails label{ text-align: right; width: 29%; font-size: 13px;}
-            .headerRepDetails span{ width: 64%; padding-bottom: 5px; font-weight: bold; font-size: 13px;}
-            .h2Header{ position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);}
-            .leftSummary{width: 50%; float: left; padding: 25px 0; font-size: 14px;}
-            .leftSummary label{
-                text-align: right;
-                float: left;
-                width: 29%;
-                padding-right: 5px;
-                padding-bottom: 5px;
+            })
+
+            function fillSelector(dataArray, selector) {
+                $("#" + selector).find("option").not(":first").remove();
+                for (var i = 0; i < dataArray.length; i++) {
+                    if (dataArray[i].name != 'Epic')
+                        $("#" + selector).append("<option value=" + dataArray[i].id + ">" + dataArray[i].name + "</option>");
+                }
             }
-            .leftSummary span{
-                float: left;
-                width: 64%;
-                padding-bottom: 5px;
-                font-weight: bold;
+            /*
+            function ele(id){return document.getElementById(id);}
+            ele("jAttachment").addEventListener("change", updateFilePath, false);
+            function updateFilePath(){
+                console.log("jAttachment----"+$("#jAttachment").val());
+                console.log("scrnShotPath----"+$("#scrnShotPath").val());
+                $("#scrnShotPath").val($("#jAttachment").val());
+                console.log("jAttachment----"+$("#jAttachment").val());
+                console.log("scrnShotPath----"+$("#scrnShotPath").val());
+            }*/
+            //function to close popup window
+            $(document).on('click', '.closeWindow', function() {
+                $(".jiraWindow, .createIssueWindow, .statusWindow").hide();
+                $('#overlay').css('display', 'none');
+                $(".error-msg").text('');
+            })
+
+            $(document).on('click', '.cancelIssues', function() {
+                $(".createIssueWindow").hide();
+                $('#overlay').css('display', 'none');
+            })
+            //function to close popup window
+
+            //Create Issues in Jira
+            $(document).on('click', '.createIssues', function() {
+                $("#jProjects, #jIssuetype, #jSummary, #jPriority").css('border-color', '#bbb');
+                var issue_dict = {};
+                var projectid = $("#jProjects option:selected").val();
+                var issuetype = $("#jIssuetype option:selected").text();
+                var summary = $("#jSummary").val();
+                var description = $("#jDescription").val();
+                var priority = $("#jPriority option:selected").text();
+                var label = $("#jLabel").val().split(" ");
+                var attachment = $("#scrnShotPath").val();
+                var pissue = $("#jpIssueid").val();
+                if (!projectid) $("#jProjects").css('border-color', 'red');
+                else if (!issuetype || issuetype == "Select Issue") $("#jIssuetype").css('border-color', 'red');
+                else if (!summary) $("#jSummary").css('border-color', 'red');
+                //else if(!description) $("#jDescription").css('border-color','red');
+                else if (!priority || priority == "Select Priority") $("#jPriority").css('border-color', 'red');
+                //else if(!label) $("#jLabel").css('border-color','red');
+                //else if(!attachment) $("#jAttachment").css('border-color','red');
+                else {
+                    if (!attachment) attachment = $("#scrnShotPath").val();
+                    issue_dict = {
+                        "issue_dict": {
+                            'project': projectid,
+                            'issuetype': issuetype,
+                            'summary': summary,
+                            'description': description,
+                            'priority': priority,
+                            'label': label,
+                            'attachment': attachment,
+                            'url': url,
+                            'username': userName,
+                            'password': pwd,
+                            'parentissue': ''
+                        },
+                        "action": "createIssueInJira"
+                    }
+                    if (issuetype == 'Sub-task') {
+                        issue_dict.issue_dict.parentissue = pissue;
+                    }
+                    var hostName = window.location.host;
+                    var posturl = 'https://' + hostName + '/connectJira_ICE';
+                    blockUI('Loading....');
+                    $.ajax({
+                        type: 'POST',
+                        url: posturl,
+                        responseType: 'arraybuffer',
+                        data: issue_dict,
+                        success: function(data) {
+                            if (data == "Fail") {
+                                $(".createIssueWindow").hide();
+                                $(".statusWindow").show();
+                                $("#showStatus").text("Failed to create issue.");
+                            } else if (data == "unavailableLocalServer") {
+                                $(".createIssueWindow").hide();
+                                $(".statusWindow").show();
+                                $("#showStatus").text("ICE Engine is not available. Please run the batch file and connect to the Server.");
+                            } else if (data == 'scheduleModeOn') {
+                                $(".createIssueWindow").hide();
+                                $(".statusWindow").show();
+                                $("#showStatus").text("Schedule mode is Enabled, Please uncheck 'Schedule' option in ICE Engine to proceed.");
+                            } else if (data == "Invalid Session") {
+                                $(".createIssueWindow").hide();
+                                $(".statusWindow").show();
+                                $("#showStatus").text("Invalid Session. Login again");
+                            } else {
+                                getRows[parseInt($("#inputSlno").val()) - 1].children[7].innerText = data;
+                                $(".createIssueWindow").hide();
+                                $(".statusWindow").show();
+                                $("#showStatus").text("Issue bearing ID " + data + " created successfully.");
+                            }
+                            $('#inputSlno').val('');
+                            $("#jpIssueid").val('');
+                            unblockUI();
+                        }
+                    });
+                }
+            })
+            //Create Issues in Jira
+
+            function clearData() {
+                $("#jiraURL, #jiraUserName, #jiraPassword").val("");
             }
-            .summaryCon{position: relative; float: left; width: 100%; border: 1px solid #cfcfcf; background: linear-gradient(to bottom, #FFFFFF 0%, #E6E6E6 100%); height: 38px; border-radius: 5px;}
-            .summaryCon span{position: absolute; top: 10px; left: 40px;}
-            .midSection{float: left; width: 100%;}
-            .midContainer{
-                border-collapse: collapse;
-                border: 1px solid #cfcfcf;
-                width: 100%;
-                font: 14px cabin_Regular;
-                float: left;
-                margin: 0 0 1% 0;
-                font-family: LatoWeb;
-    			font-size: 14px;
+        }, 400);
+    </script>
+    <style>
+        body {
+            font-family: LatoWeb;
+            height: 98%;
+            overflow: hidden;
+        }
+
+        .mainContainer {
+            border: 1px solid #B5AAAA;
+            margin: 4px;
+            float: left;
+            padding: 14px;
+            width: 97%;
+            height: calc(100% - 50px);
+        }
+
+        .hearderCon {
+            position: relative;
+            width: 100%;
+            float: left;
+            border: 1px solid #cfcfcf;
+            background: linear-gradient(to bottom, #FFFFFF 0%, #E6E6E6 100%);
+            height: 50px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            font-size: 16px;
+            padding-top: 7px;
+        }
+
+        .headerRepDetails {
+            width: 50%;
+            padding: 3px 40px;
+        }
+
+        .headerRepDetails label {
+            text-align: right;
+            width: 29%;
+            font-size: 13px;
+        }
+
+        .headerRepDetails span {
+            width: 64%;
+            padding-bottom: 5px;
+            font-weight: bold;
+            font-size: 13px;
+        }
+
+        .h2Header {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .leftSummary {
+            width: 50%;
+            float: left;
+            padding: 25px 0;
+            font-size: 14px;
+        }
+
+        .leftSummary label {
+            text-align: right;
+            float: left;
+            width: 29%;
+            padding-right: 5px;
+            padding-bottom: 5px;
+        }
+
+        .leftSummary span {
+            float: left;
+            width: 64%;
+            padding-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .summaryCon {
+            position: relative;
+            float: left;
+            width: 100%;
+            border: 1px solid #cfcfcf;
+            background: linear-gradient(to bottom, #FFFFFF 0%, #E6E6E6 100%);
+            height: 38px;
+            border-radius: 5px;
+        }
+
+        .summaryCon span {
+            position: absolute;
+            top: 10px;
+            left: 40px;
+        }
+
+        .midSection {
+            float: left;
+            width: 100%;
+        }
+
+        .midContainer {
+            border-collapse: collapse;
+            border: 1px solid #cfcfcf;
+            width: 100%;
+            font: 14px cabin_Regular;
+            float: left;
+            margin: 0 0 1% 0;
+            font-family: LatoWeb;
+            font-size: 14px;
+        }
+
+        .midContainer td {
+            padding-top: 5px;
+            border: 1px solid #cfcfcf;
+        }
+
+        .midContainer td label {
+            text-align: right;
+            float: left;
+            width: 29%;
+            padding-right: 5px;
+            padding-bottom: 5px;
+        }
+
+        .reportsDetails {
+            border: 1px solid #cfcfcf;
+            background: linear-gradient(to bottom, #FFFFFF 0%, #E6E6E6 100%);
+            font-size: 15px;
+        }
+
+        .reportsDetails tr {
+            height: 32px;
+        }
+
+        .reportsDetails th:nth-child(1) {
+            width: 4%;
+        }
+
+        .rDid {
+            width: 4.3% !important;
+            word-break: break-word;
+        }
+
+        .reportsDetails th:nth-child(2) {
+            width: 6%;
+        }
+
+        .rDstep {
+            width: 6.1% !important;
+            word-break: break-word;
+        }
+
+        .reportsDetails th:nth-child(3) {
+            width: 15%;
+        }
+
+        .rDstepDes {
+            width: 15.5% !important;
+            word-break: break-word;
+        }
+
+        .reportsDetails th:nth-child(4) {
+            width: 6%;
+        }
+
+        .rDstatus {
+            width: 6.1% !important;
+            word-break: break-word;
+        }
+
+        .reportsDetails th:nth-child(5) {
+            width: 8%;
+        }
+
+        .rDellaps {
+            width: 8.5% !important;
+            word-break: break-word;
+        }
+
+        .reportsDetails th:nth-child(6),
+        .rDcomments {
+            width: 13%;
+            word-break: break-word;
+        }
+
+        .reportsDetails th:nth-child(7),
+        .rDremarks {
+            width: 15%;
+            word-break: break-word;
+        }
+
+        .reportsDetails th:nth-child(8),
+        .rjira {
+            width: 7%;
+            word-break: break-word;
+        }
+
+        .reportsDetails th:nth-child(9),
+        .rDExpectedRes {
+            width: 12%;
+            word-break: break-word;
+        }
+
+        .reportsDetails th:nth-child(10),
+        .rDActualRes {
+            width: 12%;
+            word-break: break-word;
+        }
+
+        .maintabCont {
+            float: left;
+            width: 100%;
+            border: 1px solid #dcdcdc;
+            height: 50%;
+        }
+
+        .tabCont {
+            display: table-cell;
+            border-bottom: 1px solid #ececec;
+            border-right: 1px solid #ececec;
+            word-wrap: break-word
+        }
+
+        .reportsDetail {
+            line-height: 2;
+            height: calc(100% - 35px);
+            overflow: auto;
+            font-size: 14px;
+        }
+
+        .openscreenshot {
+            cursor: pointer;
+        }
+
+        .openscreenshot:hover {
+            text-decoration: underline;
+        }
+
+        .progress {
+            margin-bottom: 20px;
+            overflow: hidden;
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, .1);
+        }
+
+        .progress-bar {
+            float: left;
+            height: 100%;
+            font-size: 12px;
+            line-height: 20px;
+            color: #fff;
+            text-align: center;
+            box-shadow: inset 0 -1px 0 rgba(0, 0, 0, .15);
+            transition: width .6s ease;
+        }
+
+        .reportStatusBlk {
+            float: left;
+            width: 100%;
+        }
+
+        .progresslabel {
+            float: left;
+            display: inline-block;
+            width: 15%;
+            padding-left: 14px;
+        }
+
+        .customprogress {
+            float: left;
+            width: 45% !important;
+            height: 12px;
+            border-radius: 8px;
+            margin-top: 3px;
+            background-color: #e0e0e0;
+        }
+
+        .customprogress .progress-bar {
+            border-radius: 20px;
+        }
+
+        .progress-bar-success {
+            background: linear-gradient(to right, #39b54a, #009444) !important;
+        }
+
+        .progress-bar-danger {
+            background: linear-gradient(to right, #d41e2d, #b31f2d) !important;
+        }
+
+        .progresspercentage {
+            margin-left: 20px;
+        }
+
+        .rightSummaryFunc {
+            width: 50%;
+            float: left;
+            margin-top: 80px;
+            font-size: 14px;
+        }
+
+        .progress-bar-warning {
+            background: linear-gradient(to right, #f7b91e, #faa536) !important;
+        }
+
+        .reportsDetail div.reportdetailsrow:nth-child(even) {
+            background: #f9f9f9;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            border-radius: 10px;
+            -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.5);
+        }
+
+        .logintojira,
+        .disconnectJira {
+            cursor: pointer;
+            float: left;
+            position: relative;
+            left: 134px;
+            border-radius: 3px;
+        }
+
+        .logintojira {
+            left: 34px;
+        }
+
+        .disconnectJira {
+            display: none;
+        }
+
+        .jiraWindow,
+        .createIssueWindow,
+        .statusWindow {
+            position: absolute;
+            width: 300px;
+            height: 200px;
+            display: inline-block;
+            top: 40%;
+            left: 38%;
+            border: 1px solid black;
+            background-color: white;
+            text-align: center;
+            z-index: 1001;
+            border-radius: 6px;
+        }
+
+        .jiraWindow {
+            width: 497px;
+            height: 240px;
+            left: 31%;
+        }
+
+        .jiraWindow .popupheader label {
+            position: relative;
+            top: 7px;
+            left: 10px;
+        }
+
+        .loginJiraCredentials,
+        .resetJiraCredentials {
+            width: 85px;
+            float: right;
+            margin-right: 28px;
+        }
+
+        .jiraWindow .error-msg {
+            float: left;
+            margin-left: 28px;
+            font-size: 14px;
+            color: red;
+        }
+
+        .statusWindow {
+            height: 130px;
+        }
+
+        .createIssueWindow {
+            width: 700px;
+            height: 630px;
+            top: 15%;
+            left: 22%;
+        }
+
+        .createIssueWindow p {
+            width: calc(100% - 43px);
+            float: left;
+            padding: 0 0 0 42px;
+            margin-top: 6px;
+            margin-bottom: 6px;
+        }
+
+        .createIssueWindow p:nth-child(2) {
+            margin-top: 12px;
+        }
+
+        .createIssueWindow p:nth-child(3) {
+            margin-bottom: 0;
+            padding-bottom: 6px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .createIssueWindow p:nth-child(4) {
+            margin-top: 6px;
+        }
+
+        .createIssueWindow p:nth-child(11) {
+            background: linear-gradient(to bottom, #FFFFFF 0%, #E6E6E6 50%);
+            border-radius: 5px;
+            border-top: 1px solid #ccc;
+            height: 117px;
+            margin-bottom: 0;
+            position: relative;
+            bottom: calc(100% - 620px);
+        }
+
+        .createIssueWindow p label {
+            width: 112px;
+            text-align: right;
+            font-size: 15px;
+            position: relative;
+            right: 24px;
+        }
+
+        .createIssueWindow p label,
+        .createIssueWindow p select,
+        .createIssueWindow p textarea,
+        .createIssueWindow p input {
+            float: left;
+        }
+
+        .jirapopupinput {
+            width: 250px;
+            height: 28px;
+            border-radius: 4px;
+            border-style: groove;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .jiraWindow .jirapopupinput {
+            width: calc(100% - 55px);
+            height: 28px;
+            border-radius: 4px;
+            border-style: groove;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .popupheader {
+            width: 100%;
+            height: 30px;
+            background: linear-gradient(to bottom, #FFFFFF 0%, #E6E6E6 60%);
+            ;
+            margin-bottom: 14px;
+            border-radius: 5px;
+        }
+
+        .createIssueWindow .popupheader {
+            height: 42px;
+            border-bottom: 1px solid #ccc;
+            margin-bottom: 12px;
+            background: linear-gradient(to bottom, #FFFFFF 0%, #E6E6E6 100%);
+            border-radius: 5px;
+        }
+
+        .createIssueWindow .popupheader label {
+            float: left;
+            margin: 13px 0 0 18px;
+        }
+
+        .createIssueWindow .popupheader .closeWindow {
+            margin-top: 13px;
+            margin-right: 15px;
+        }
+
+        .closeWindow {
+            cursor: pointer;
+        }
+
+        .popupheader span {
+            float: right;
+            margin-top: 6px;
+            margin-right: 12px;
+        }
+
+        .statusWindow .popupheader label {
+            float: left;
+            margin: 6px 0 0 20px;
+        }
+
+        #jSummary,
+        #jDescription,
+        #jlabel {
+            width: 500px;
+            text-align: left;
+        }
+
+        /*#jAttachment{width: 95px;}*/
+
+        .createIssueWindow #scrnShotPath {
+            width: 406px;
+        }
+
+        #jDescription {
+            height: 130px;
+        }
+
+        #jDeadline {
+            text-align: left;
+        }
+
+        .createIssues,
+        .cancelIssues {
+            float: right;
+            margin-right: 45px;
+            width: 88px;
+            height: 26px;
+            margin-top: 14px;
+            border-radius: 5px;
+        }
+
+        .createIssues:hover,
+        .cancelIssues:hover {
+            color: white;
+            background-color: #3b73af;
+            border-style: none;
+        }
+
+        #overlay {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1000;
+            background-color: #333;
+            opacity: .80;
+        }
+
+        .mandatory {
+            color: red;
+            font-size: 17px;
+        }
+
+        .Llogdefect {
+            position: relative;
+            top: 5px;
+            left: 70px;
+            display: none;
+            z-index: -1;
+        }
+
+        #inputSlno {
+            border-radius: 3px;
+            border-style: groove;
+            width: 100px;
+            position: relative;
+            left: 72px;
+            display: none;
+        }
+
+        .go_defectlog {
+            position: relative;
+            left: 82px;
+            border-radius: 3px;
+            cursor: pointer;
+            bottom: 1px;
+            display: none;
+        }
+
+        @media screen and (max-height: 680px) {
+            .reportsDetail {
+                height: 174px;
             }
-            .midContainer td{padding-top: 5px; border: 1px solid #cfcfcf;}
-            .midContainer td label{
-                text-align: right;
-                float: left;
-                width: 29%;
-                padding-right: 5px;
-                padding-bottom: 5px;
+            .hearderCon {
+                height: 40px;
             }
-            .reportsDetails{border: 1px solid #cfcfcf; background: linear-gradient(to bottom, #FFFFFF 0%, #E6E6E6 100%); font-size: 15px;}
-            .reportsDetails tr{height: 32px;}
-            .reportsDetails th:nth-child(1){width: 4%;} .rDid{width: 4.3% !important; word-break: break-word; }
-            .reportsDetails th:nth-child(2){width: 8%;} .rDstep{width: 8.1% !important; word-break: break-word;}
-            .reportsDetails th:nth-child(3){width: 27%;} .rDstepDes{width: 26.5% !important;  word-break: break-word;}
-            .reportsDetails th:nth-child(4){width: 10%;} .rDstatus{width: 10.1% !important; word-break: break-word;}
-            .reportsDetails th:nth-child(5){width: 10%;} .rDellaps{width: 10.1% !important; word-break: break-word;}
-            .reportsDetails th:nth-child(6), .rDcomments{width: 15%; word-break: break-word;}
-            .reportsDetails th:nth-child(7), .rDremarks{width: 15%; word-break: break-word;}
-            .reportsDetails th:nth-child(8), .rjira{width: 8%; word-break: break-word;}
-           
-            .maintabCont{float: left; width: 100%; border: 1px solid #dcdcdc; height: 50%;}
-            .tabCont{display: table-cell; border-bottom: 1px solid #ececec; border-right: 1px solid #ececec;word-wrap:break-word}
-            .reportsDetail{line-height: 2;  height: calc(100% - 35px); overflow: auto;font-size: 14px;}
-            .openscreenshot{cursor: pointer;}
-            .openscreenshot:hover{text-decoration: underline;}
-            .progress {
-                margin-bottom: 20px;
-                overflow: hidden;
-                box-shadow: inset 0 1px 2px rgba(0,0,0,.1);
+            .headerRepDetails {
+                padding: 1px 40px;
             }
-            .progress-bar {
-                float: left;
-                height: 100%;
-                font-size: 12px;
-                line-height: 20px;
-                color: #fff;
-                text-align: center;
-                box-shadow: inset 0 -1px 0 rgba(0,0,0,.15);
-                transition: width .6s ease;
-            }
-            .reportStatusBlk {
-                float: left;
-                width: 100%;
-            }
-            .progresslabel {
-                float: left;
-                display: inline-block;
-                width: 15%;
-                padding-left: 14px;
-            }
-            .customprogress{
-                float: left;
-                width: 45% !important;
-                height: 12px;
-                border-radius: 8px;
-                margin-top: 3px;
-                background-color: #e0e0e0;
-            }
-            .customprogress .progress-bar {
-                border-radius: 20px;
-            }
-            .progress-bar-success {
-                background: linear-gradient(to right, #39b54a, #009444) !important;
-            }
-            .progress-bar-danger {
-                background: linear-gradient(to right, #d41e2d, #b31f2d) !important;
-            }
-            .progresspercentage{margin-left: 20px;}
-            .rightSummaryFunc{
-                    width: 50%;
-                    float: left;
-                    margin-top: 80px;
-                    font-size: 14px;
-            }
-            .progress-bar-warning {
-                background: linear-gradient(to right, #f7b91e, #faa536) !important;
-            }
-            .reportsDetail div.reportdetailsrow:nth-child(even){background: #f9f9f9;}
-			::-webkit-scrollbar{
-			    width: 8px;
-			}
-			::-webkit-scrollbar-track{
-			    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
-			    border-radius: 4px;
-			}
-			::-webkit-scrollbar-thumb{
-			    border-radius: 10px;
-			    -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.5);
-			}
-            .logintojira, .disconnectJira{cursor: pointer;float: left; position: relative; left: 134px; border-radius: 3px;}
-            .logintojira{left: 34px;}
-            .disconnectJira{display: none;}
-            .jiraWindow, .createIssueWindow, .statusWindow{
-                position: absolute;
-                width: 300px;
-                height: 200px;
-                display: inline-block;
-                top: 40%; 
-                left: 38%;
-                border: 1px solid black;
-                background-color: white;
-                text-align: center;
-                z-index: 1001;
-                border-radius: 6px;
-            }
-            .jiraWindow{
-                width: 497px;
-                height: 240px;
-                left: 31%;
-            }            
-            .jiraWindow .popupheader label{position: relative; top: 7px; left: 10px;}
-            .loginJiraCredentials, .resetJiraCredentials{
-                width: 85px;
-                float: right;
-                margin-right: 28px;
-            }
-            .jiraWindow .error-msg{
-                float: left;
-                margin-left: 28px;
-                font-size: 14px;
-                color: red;
-            }
-            .statusWindow{height: 130px;}
-            .createIssueWindow{
-                width: 700px;
-                height: 630px;
-                top: 15%;
-                left: 22%;
-            }
-            .createIssueWindow p{
-                width: calc(100% - 43px);
-                float: left;
-                padding: 0 0 0 42px;
-                margin-top: 6px;
-                margin-bottom: 6px;
-            }
-            .createIssueWindow p:nth-child(2){margin-top: 12px;}
-            .createIssueWindow p:nth-child(3){
-                margin-bottom: 0;
-                padding-bottom: 6px;
-                border-bottom: 1px solid #ddd;
-            }
-            .createIssueWindow p:nth-child(4){margin-top: 6px;}
-            .createIssueWindow p:nth-child(11){
-                background: linear-gradient(to bottom, #FFFFFF 0%, #E6E6E6 50%);
-                border-radius: 5px;
-                border-top: 1px solid #ccc;
-                height: 117px;
-                margin-bottom: 0;
-                position: relative;
-                bottom: calc(100% - 620px);
-            }
-            .createIssueWindow p label{
-                width: 112px;
-                text-align: right;
-                font-size: 15px;
-                position: relative;
-                right: 24px;
-            }
-            .createIssueWindow p label, .createIssueWindow p select, .createIssueWindow p textarea, .createIssueWindow p input{
-                float: left;
-            }
-            .jirapopupinput{
-                width: 250px;
-                height: 28px;
-                border-radius: 4px;
-                border-style: groove;
-                text-align: center;
-                margin-bottom: 10px;
-            }
-            .jiraWindow .jirapopupinput{
-                width: calc(100% - 55px);
-                height: 28px;
-                border-radius: 4px;
-                border-style: groove;
-                text-align: center;
-                margin-bottom: 15px;
-            }
-            .popupheader{
-                width: 100%;
+            .summaryCon {
                 height: 30px;
-                background: linear-gradient(to bottom, #FFFFFF 0%, #E6E6E6 60%);;
-                margin-bottom: 14px;
-                border-radius: 5px;
             }
-            .createIssueWindow .popupheader{
-                height: 42px;
-                border-bottom: 1px solid #ccc;
-                margin-bottom: 12px;
-                background: linear-gradient(to bottom, #FFFFFF 0%, #E6E6E6 100%);
-                border-radius: 5px;
+            .summaryCon span {
+                top: 6px;
             }
-            .createIssueWindow .popupheader label{float: left; margin: 13px 0 0 18px;}
-            .createIssueWindow .popupheader .closeWindow{margin-top: 13px; margin-right: 15px;}
-            .closeWindow{cursor: pointer;}
-            .popupheader span{
-                float: right;     
-                margin-top: 6px;     
-                margin-right: 12px;
+            .leftSummary {
+                padding: 15px 0 6px 0;
             }
-            .statusWindow .popupheader label{float: left; margin: 6px 0 0 20px;}
-            #jSummary, #jDescription, #jlabel{
-                width: 500px;
-                text-align: left;
+            .rightSummaryFunc {
+                margin-top: 74px;
             }
-            /*#jAttachment{width: 95px;}*/
-            .createIssueWindow #scrnShotPath{
-                width: 406px;
+            .maintabCont {
+                height: 33%;
             }
-            #jDescription{
-                height: 130px;
+            .reportsDetail {
+                height: 148px;
             }
-            #jDeadline{text-align: left;}
-            .createIssues, .cancelIssues{
-                float: right;
-                margin-right: 45px;
-                width: 88px;
-                height: 26px;
-                margin-top: 14px;
-                border-radius: 5px;
-            }
-            .createIssues:hover, .cancelIssues:hover{
-                color: white;
-                background-color: #3b73af;
-                border-style: none;
-            }
-            #overlay{
-                display:none;
-                position:absolute;
-                top:0;
-                left:0;
-                width:100%;
-                height:100%;
-                z-index:1000;
-                background-color:#333;
-                opacity:.80;
-            }
-            .mandatory{color: red; font-size: 17px;}
-            .Llogdefect{position: relative; top: 5px; left: 70px; display: none; z-index: -1;}
-            #inputSlno{border-radius: 3px; border-style: groove; width: 100px; position: relative; left: 72px; display: none;}
-            .go_defectlog{position: relative; left: 82px; border-radius: 3px; cursor: pointer; bottom: 1px; display: none;}
-			@media screen and (max-height: 680px) {
-				.reportsDetail{
-					height: 174px;
-				}
-				.hearderCon{height: 40px;}
-				.headerRepDetails{padding: 1px 40px;}
-				.summaryCon{height: 30px;}
-				.summaryCon span{top: 6px;}
-				.leftSummary{padding: 15px 0 6px 0;}
-				.rightSummaryFunc{margin-top: 74px;}
-				.maintabCont{height: 33%;}
-				.reportsDetail{height: 148px;}
-			}
-			@media screen and (min-device-width: 1440px) and (max-device-height: 900px){
-				.hearderCon{height: 38px;}
-				.summaryCon{height: 30px;}
-				.leftSummary{padding: 15px 0;}
-				.rightSummaryFunc{margin-top: 72px;}
-				.maintabCont{height: 325px;}
-				.headerRepDetails{padding: 1px 40px;}
-				.summaryCon span{top: 6px;}
-			}
-			@media screen and (min-height: 1000px){
-				.hearderCon{height: 35px !important;}
-				.headerRepDetails{padding: 0px 40px;}
-				.summaryCon{height: 28px;}
-				.summaryCon span{top: 5px;}
-				.leftSummary{padding: 18px 0;}
-				.rightSummaryFunc{margin-top: 76px;}
-				.mainContainer > div:nth-child(4){margin-top: 258px !important;}
-				.midContainer{margin: -10px 0 6px 0;}
-				.midContainer td{padding-top: 3px; padding-bottom: 0px;}
-				.maintabCont{height: 207px;}
-				.reportsDetail{height: 172px;}
-			}
-			@media only screen and (height:768px){
-				.hearderCon{height: 40px !important;}
-				.headerRepDetails{padding: 1px 40px;}
-				.summaryCon{height: 28px;}
-				.summaryCon span{top: 5px;}
-				.leftSummary{padding: 18px 0;}
-				.rightSummaryFunc{margin-top: 76px;}
-				.midContainer{margin: -10px 0 6px 0;}
-				.midContainer td{padding-top: 3px; padding-bottom: 0px;}
-				.maintabCont{height: 353px;}
-				.reportsDetail{height: 317px;}
-			}
-            @media only screen and (height:790px){
-                .reportStatus{margin-top: 52px;}
-                .hearderCon{height: 35px;}
-                .headerRepDetails{padding: 0px 40px;}
-                .summaryCon{height: 28px !important;}
-                .summaryCon span{top: 5px !important;}
-                .leftSummary{padding: 12px 0 !important;}
-                .rightSummaryFunc{margin-top: 20px !important;}
-                .midContainer{margin: 0 0 7px 0 !important;}            
-            }
-            #overlayContainer{
-                    position: fixed;
-                    background-color: rgba(0, 0, 0, 0.85);
-                    -moz-background-color: rgba(0, 0, 0, 0.85);
-                    -webkit-background-color: rgba(0, 0, 0, 0.85);
-                    width: 100%;
-                    height: 100%;
-                    top: 0;
-                    left: 0;
-                    cursor: wait;
-                    z-index: 10001;
-                    display: none
-                }
+        }
 
-        .contentOverlay{
+        @media screen and (min-device-width: 1440px) and (max-device-height: 900px) {
+            .hearderCon {
+                height: 38px;
+            }
+            .summaryCon {
+                height: 30px;
+            }
+            .leftSummary {
+                padding: 15px 0;
+            }
+            .rightSummaryFunc {
+                margin-top: 72px;
+            }
+            .maintabCont {
+                height: 325px;
+            }
+            .headerRepDetails {
+                padding: 1px 40px;
+            }
+            .summaryCon span {
+                top: 6px;
+            }
+        }
+
+        @media screen and (min-height: 1000px) {
+            .hearderCon {
+                height: 35px !important;
+            }
+            .headerRepDetails {
+                padding: 0px 40px;
+            }
+            .summaryCon {
+                height: 28px;
+            }
+            .summaryCon span {
+                top: 5px;
+            }
+            .leftSummary {
+                padding: 18px 0;
+            }
+            .rightSummaryFunc {
+                margin-top: 76px;
+            }
+            .mainContainer>div:nth-child(4) {
+                margin-top: 258px !important;
+            }
+            .midContainer {
+                margin: -10px 0 6px 0;
+            }
+            .midContainer td {
+                padding-top: 3px;
+                padding-bottom: 0px;
+            }
+            .maintabCont {
+                height: 207px;
+            }
+            .reportsDetail {
+                height: 172px;
+            }
+        }
+
+        @media only screen and (height:768px) {
+            .hearderCon {
+                height: 40px !important;
+            }
+            .headerRepDetails {
+                padding: 1px 40px;
+            }
+            .summaryCon {
+                height: 28px;
+            }
+            .summaryCon span {
+                top: 5px;
+            }
+            .leftSummary {
+                padding: 18px 0;
+            }
+            .rightSummaryFunc {
+                margin-top: 76px;
+            }
+            .midContainer {
+                margin: -10px 0 6px 0;
+            }
+            .midContainer td {
+                padding-top: 3px;
+                padding-bottom: 0px;
+            }
+            .maintabCont {
+                height: 353px;
+            }
+            .reportsDetail {
+                height: 317px;
+            }
+        }
+
+        @media only screen and (height:790px) {
+            .reportStatus {
+                margin-top: 52px;
+            }
+            .hearderCon {
+                height: 35px;
+            }
+            .headerRepDetails {
+                padding: 0px 40px;
+            }
+            .summaryCon {
+                height: 28px !important;
+            }
+            .summaryCon span {
+                top: 5px !important;
+            }
+            .leftSummary {
+                padding: 12px 0 !important;
+            }
+            .rightSummaryFunc {
+                margin-top: 20px !important;
+            }
+            .midContainer {
+                margin: 0 0 7px 0 !important;
+            }
+        }
+
+        #overlayContainer {
+            position: fixed;
+            background-color: rgba(0, 0, 0, 0.85);
+            -moz-background-color: rgba(0, 0, 0, 0.85);
+            -webkit-background-color: rgba(0, 0, 0, 0.85);
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            cursor: wait;
+            z-index: 10001;
+            display: none
+        }
+
+        .contentOverlay {
             position: absolute;
             left: 50%;
             top: 50%;
@@ -729,168 +1110,194 @@
             -moz-border-radius: 5px;
             -webkit-border-radius: 5px;
             cursor: auto;
-            color:#461F6E;
+            color: #461F6E;
             font-family: LatoWebBold;
         }
-        .reportsDetails th,.reportdetailsrow div
-            {
-                text-align: left !important;
-                padding: 2px;
-            }
-        </style>
-    </head>
-    <body>
-        <div class="mainContainer">
-            {{#each overallstatus}}
-            <div class="hearderCon" >
-                <div class="headerRepDetails">
-                    <label>Report Generated Date : </label><span>{{date}}</span>
-                </div>
-                <div class="headerRepDetails">
-                    <label>Report Generated Time : </label><span>{{time}}</span>
-                </div>
-                <div class="h2Header">
-                    <h4>SLK Nineteen68 Execution Report</h4>
+
+        .reportsDetails th,
+        .reportdetailsrow div {
+            text-align: left !important;
+            padding: 2px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="mainContainer">
+        {{#each overallstatus}}
+        <div class="hearderCon">
+            <div class="headerRepDetails">
+                <label>Report Generated Date : </label><span>{{date}}</span>
+            </div>
+            <div class="headerRepDetails">
+                <label>Report Generated Time : </label><span>{{time}}</span>
+            </div>
+            <div class="h2Header">
+                <h4>SLK Nineteen68 Execution Report</h4>
+            </div>
+        </div>
+        <div class="summaryCon">
+            <span>Result Summary</span>
+        </div>
+        <div style="width: 100%;">
+            <div class="leftSummary">
+                <label>Scenario :</label><span>{{scenarioName}}</span>
+                <label>Cycle :</label><span>{{cycleName}}</span>
+                <label>Release :</label><span>{{releaseName}}</span>
+                <label>Project :</label><span>{{projectName}}</span>
+                <label>Domain :</label><span>{{domainName}}</span>
+                <label>Browser Type :</label><span>{{browserType}}</span>
+                <label>Browser Version :</label><span>{{browserVersion}}</span>
+            </div>
+            <div id="rightSummaryFunc" class="rightSummaryFunc">
+                <div class="reportStatus">
+                    <div class="reportStatusBlk">
+                        <span class="progresslabel">Pass</span>
+                        <div class="progress customprogress">
+                            <span class="progress-bar progress-bar-success" style="width: {{pass}}%" role="progressbar"></span>
+                        </div>
+                        <span class="progresspercentage">{{pass}} %</span>
+                    </div>
+                    <div class="reportStatusBlk">
+                        <span class="progresslabel">Fail</span>
+                        <div class="progress customprogress">
+                            <span class="progress-bar progress-bar-danger" style="width: {{fail}}%" role="progressbar"></span>
+                        </div>
+                        <span class="progresspercentage">{{fail}} %</span>
+                    </div>
+                    <div class="reportStatusBlk">
+                        <span class="progresslabel">Terminated</span>
+                        <div class="progress customprogress">
+                            <span class="progress-bar progress-bar-warning" style="width: {{terminate}}%" role="progressbar"></span>
+                        </div>
+                        <span class="progresspercentage">{{terminate}} %</span>
+                    </div>
                 </div>
             </div>
-            <div class="summaryCon">
-                <span>Result Summary</span>
-            </div>
-            <div style="width: 100%;">
-                <div class="leftSummary">
-                    <label>Scenario :</label><span>{{scenarioName}}</span>
-                    <label>Cycle :</label><span>{{cycleName}}</span>
-                    <label>Release :</label><span>{{releaseName}}</span>
-                    <label>Project :</label><span>{{projectName}}</span>
-                    <label>Domain :</label><span>{{domainName}}</span>
-                    <label>Browser Type :</label><span>{{browserType}}</span>
-                    <label>Browser Version :</label><span>{{browserVersion}}</span>
-                </div>
-                <div id="rightSummaryFunc" class="rightSummaryFunc">
-                    <div class="reportStatus">
-            			<div class="reportStatusBlk">
-            				<span class="progresslabel">Pass</span>
-            				<div class="progress customprogress">
-            					<span class="progress-bar progress-bar-success" style="width: {{pass}}%" role="progressbar"></span>
-            				</div>
-            				<span class="progresspercentage">{{pass}} %</span>
-            			</div>
-            			<div class="reportStatusBlk">
-            				<span class="progresslabel">Fail</span>
-            				<div class="progress customprogress">
-            					<span class="progress-bar progress-bar-danger" style="width: {{fail}}%" role="progressbar"></span>
-            				</div>
-            				<span class="progresspercentage">{{fail}} %</span>
-            			</div>
-            			<div class="reportStatusBlk">
-            				<span class="progresslabel">Terminated</span>
-            				<div class="progress customprogress">
-            					<span class="progress-bar progress-bar-warning" style="width: {{terminate}}%" role="progressbar"></span>
-            			    </div>
-            			    <span class="progresspercentage">{{terminate}} %</span>
-            			</div>
-            		</div>
-                </div>
-            </div>
-            <div class="midSection">
-                <table cellpadding="3" cellspacing="0" class="midContainer" id="staustable">
-                    <tbody>
-                        <tr>
-                            <td>
-                                <label>Start Date and Time :</label><span id="startTime"><b>{{StartTime}}</b></span>
-                            </td>
-                            <td rowspan="2">
-                                <label>Status :</label><span id="overAllStat" style="color:{{getColor overAllStatus}}"><span></span><b>{{overAllStatus}}</b></span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <label>End Date and Time :</label><span id="endTime"><b>{{EndTime}}</b></span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <label>Elapsed Time :</label><span id="elapsedTime"><b>{{EllapsedTime}}</b></span>
-                            </td>
-                            <td>
-                                <button class="logintojira" title="Login to Jira">Jira Login</button><button class="disconnectJira" title="Disconnect from Jira">Disconnect</button><label class="Llogdefect">Log Defect</label><input type="text" id="inputSlno" placeholder="Enter SL No." maxlength="5"/><button class="go_defectlog opendescpopup">Go</button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            {{/each}}
-            <div class="maintabCont">
-                <table style="width: 100%;">
-                    <thead class="reportsDetails">
-                        <th>Sl No.</th>
-                        <th>Test Step No.</th>
-                        <th>Test Step Description</th>
-                        <th>Status</th>
-                        <th>Elapsed Time</th>
-                        <th>Comments</th>
-                        <th>Remarks</th>
-                        <th>Defect ID</th>
-                        {{!-- <th>Expected Result</th> --}}
-                    </thead>
-                </table>
+        </div>
+        <div class="midSection">
+            <table cellpadding="3" cellspacing="0" class="midContainer" id="staustable">
+                <tbody>
+                    <tr>
+                        <td>
+                            <label>Start Date and Time :</label><span id="startTime"><b>{{StartTime}}</b></span>
+                        </td>
+                        <td rowspan="2">
+                            <label>Status :</label><span id="overAllStat" style="color:{{getColor overAllStatus}}"><span></span><b>{{overAllStatus}}</b></span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <label>End Date and Time :</label><span id="endTime"><b>{{EndTime}}</b></span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <label>Elapsed Time :</label><span id="elapsedTime"><b>{{EllapsedTime}}</b></span>
+                        </td>
+                        <td>
+                            <button class="logintojira" title="Login to Jira">Jira Login</button><button class="disconnectJira" title="Disconnect from Jira">Disconnect</button><label class="Llogdefect">Log Defect</label><input type="text" id="inputSlno" placeholder="Enter SL No." maxlength="5" /><button class="go_defectlog opendescpopup">Go</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        {{/each}}
+        <div class="maintabCont">
+            <table style="width: 100%;table-layout: fixed">
+                <thead class="reportsDetails">
+                    <th>Sl No.</th>
+                    <th>Test Step No.</th>
+                    <th>Test Step Description</th>
+                    <th>Status</th>
+                    <th>Elapsed Time</th>
+                    <th>Comments</th>
+                    <th>Remarks</th>
+                    <th>Defect ID</th>
+                    <th>Expected Result</th>
+                    <th>Actual Result</th>
+                    {{!--
+                    <th>Expected Result</th> --}}
+                </thead>
+            </table>
+            <table style='table-layout: fixed;width:100%'>
                 <div class="reportsDetail">
                     {{#each rows}}
                     <div style="width: 100%; display: table;" class="reportdetailsrow" data-id={{id}} data-parentid={{parentId}}>
                         <div class="rDid tabCont">{{slno}}</div>
                         <div class="rDstep tabCont">{{Step}}</div>
                         <div class="rDstepDes tabCont" style="padding-left: 10px; font-weight:{{getStyle StepDescription}}">{{StepDescription}}</div>
-                        <div class="rDstatus tabCont openscreenshot"  style="color:{{getColor status}}" data-screenshot="{{screenshot_path}}">{{status}}</div>
+                        <div class="rDstatus tabCont openscreenshot" style="color:{{getColor status}}" data-screenshot="{{screenshot_path}}">{{status}}</div>
                         <div class="rDellaps tabCont">{{EllapsedTime}}</div>
                         <div class="rDcomments tabCont" style="padding-left: 10px;">{{Comments}}</div>
                         <div class="rDremarks tabCont" style="padding-left: 10px;">{{Remark}}</div>
                         <div class="rjira tabCont"><span class="opendescpopup" title="Create Issue"></span></div>
-                        {{!-- <div class="rDcomments tabCont">{{testcase_details.expectedResult}}</div> --}}
+                        {{#ifEquals testcase_details.testcaseDetails undefined}}
+                        <div class="rDExpectedRes tabCont"></div>
+                        {{/ifEquals}} {{#ifEquals testcase_details.testcaseDetails ""}}
+                        <div class="rDExpectedRes tabCont" style="padding-left: 10px;">{{StepDescription}}</div>
+                        {{/ifEquals}} {{#ifnotEquals testcase_details.testcaseDetails ""}} {{#ifnotEquals testcase_details undefined}}
+                        <div class="rDExpectedRes tabCont" style="padding-left: 10px;">{{testcase_details.testcaseDetails}}</div>
+                        {{/ifnotEquals}} {{/ifnotEquals}} {{#ifEquals status undefined}}
+                        <div class="rDActualRes tabCont"></div>
+                        {{/ifEquals}} {{#ifEquals status ""}}
+                        <div class="rDActualRes tabCont"></div>
+                        {{/ifEquals}} {{#ifEquals status "Pass"}} {{#ifEquals testcase_details.actualResult_pass ""}}
+                        <div class="rDActualRes tabCont" style="padding-left: 10px;">{{status}}</div>
+                        {{/ifEquals}} {{#ifnotEquals testcase_details.actualResult_pass ""}}
+                        <div class="rDActualRes tabCont" style="padding-left: 10px;">{{testcase_details.actualResult_pass}}</div>
+                        {{/ifnotEquals}} {{/ifEquals}} {{#ifEquals status "Fail"}} {{#ifEquals testcase_details.actualResult_fail ""}}
+                        <div class="rDActualRes tabCont" style="padding-left: 10px;">{{status}}</div>
+                        {{/ifEquals}} {{#ifnotEquals testcase_details.actualResult_fail ""}}
+                        <div class="rDActualRes tabCont" style="padding-left: 10px;">{{testcase_details.actualResult_fail}}</div>
+                        {{/ifnotEquals}} {{/ifEquals}}
                     </div>
                     {{/each}}
                 </div>
-                <div id="overlay"></div>
-                <!-- Jira login window popup-->
-                <div class="jiraWindow" style="display: none;">
-                    <div class="popupheader">
-                        <label>Login to Jira</label>
-                        <span class="closeWindow">X</span>
-                    </div>
-                    <input type="text" class="jirapopupinput" placeholder="Enter Url" id="jiraURL" />
-                    <input type="text" class="jirapopupinput" placeholder="Enter User Name" id="jiraUserName"/>
-                    <input type="password" class="jirapopupinput" placeholder="Enter Password" id="jiraPassword" />
-                    <button type="button" class="resetJiraCredentials">Reset</button>
-                    <button type="button" class="loginJiraCredentials">Connect</button>
-                    <span class="error-msg"></span>
+            </table>
+            <div id="overlay"></div>
+            <!-- Jira login window popup-->
+            <div class="jiraWindow" style="display: none;">
+                <div class="popupheader">
+                    <label>Login to Jira</label>
+                    <span class="closeWindow">X</span>
                 </div>
+                <input type="text" class="jirapopupinput" placeholder="Enter Url" id="jiraURL" />
+                <input type="text" class="jirapopupinput" placeholder="Enter User Name" id="jiraUserName" />
+                <input type="password" class="jirapopupinput" placeholder="Enter Password" id="jiraPassword" />
+                <button type="button" class="resetJiraCredentials">Reset</button>
+                <button type="button" class="loginJiraCredentials">Connect</button>
+                <span class="error-msg"></span>
+            </div>
 
-                <!-- Jira description window popup-->
-                <div class="createIssueWindow" style="display: none;">
-                    <div class="popupheader">
-                        <label>Create Issue</label>
-                        <span class="closeWindow">X</span>
-                    </div>
-                    <p><label>Projects<span class="mandatory">*</span></label><select class="jirapopupinput" id="jProjects"><option value="" selected disabled>Select Projects</option></select></p>
-                    <p><label>Issue Type<span class="mandatory">*</span></label><select class="jirapopupinput" id="jIssuetype"><option value="" selected disabled>Select Issue</option></select></p>
-                    <p id='parentIssue'><label>Parent Issue Id<span class="mandatory">*</span></label><input type="text" class="jirapopupinput" id="jpIssueid" /></p>
-                    <p><label>Summary<span class="mandatory">*</span></label><input type="text" class="jirapopupinput" id="jSummary" maxlength="255" title="Maximum 255 characters accepted."/></p>
-                    <p><label>Description</label><textarea class="jirapopupinput" id="jDescription"></textarea></p>
-                    <p><label>Priority<span class="mandatory">*</span></label><select class="jirapopupinput" id="jPriority"><option value="" selected disabled>Select Priority</option></select></p>
-                    <p><label>Label</label><textarea class="jirapopupinput" id="jLabel"></textarea></p>
-                    <p><label>Attachment Path</label><input type="text" id="scrnShotPath" class="jirapopupinput"/></p>
-                    <p><span class="error-msg"></span><button type="button" class="cancelIssues">Cancel</button><button type="button" class="createIssues">Create</button></p>
+            <!-- Jira description window popup-->
+            <div class="createIssueWindow" style="display: none;">
+                <div class="popupheader">
+                    <label>Create Issue</label>
+                    <span class="closeWindow">X</span>
                 </div>
+                <p><label>Projects<span class="mandatory">*</span></label><select class="jirapopupinput" id="jProjects"><option value="" selected disabled>Select Projects</option></select></p>
+                <p><label>Issue Type<span class="mandatory">*</span></label><select class="jirapopupinput" id="jIssuetype"><option value="" selected disabled>Select Issue</option></select></p>
+                <p id='parentIssue'><label>Parent Issue Id<span class="mandatory">*</span></label><input type="text" class="jirapopupinput" id="jpIssueid" /></p>
+                <p><label>Summary<span class="mandatory">*</span></label><input type="text" class="jirapopupinput" id="jSummary" maxlength="255" title="Maximum 255 characters accepted." /></p>
+                <p><label>Description</label><textarea class="jirapopupinput" id="jDescription"></textarea></p>
+                <p><label>Priority<span class="mandatory">*</span></label><select class="jirapopupinput" id="jPriority"><option value="" selected disabled>Select Priority</option></select></p>
+                <p><label>Label</label><textarea class="jirapopupinput" id="jLabel"></textarea></p>
+                <p><label>Attachment Path</label><input type="text" id="scrnShotPath" class="jirapopupinput" /></p>
+                <p><span class="error-msg"></span><button type="button" class="cancelIssues">Cancel</button><button type="button" class="createIssues">Create</button></p>
+            </div>
 
-                <!-- Ststus popup window -->
-                <div class="statusWindow" style="display: none;">
-                    <div class="popupheader">
-                        <label>Create Issue</label>
-                        <span class="closeWindow">X</span>
-                    </div>
-                    <p><label id="showStatus"></label></p>
-                    <p><button type="button" class="closeWindow">Ok</button></p>
+            <!-- Ststus popup window -->
+            <div class="statusWindow" style="display: none;">
+                <div class="popupheader">
+                    <label>Create Issue</label>
+                    <span class="closeWindow">X</span>
                 </div>
+                <p><label id="showStatus"></label></p>
+                <p><button type="button" class="closeWindow">Ok</button></p>
             </div>
         </div>
-    </body>
+    </div>
+</body>
+
 </html>
