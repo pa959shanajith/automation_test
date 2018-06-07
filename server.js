@@ -31,7 +31,8 @@ if (cluster.isMaster) {
             cluster.fork();
         }
     });
-} else{
+} else
+{
     try {
         var express = require('express');
         var app = express();
@@ -453,6 +454,7 @@ if (cluster.isMaster) {
         app.post('/saveData', mindmap.saveData);
         app.post('/saveEndtoEndData', mindmap.saveEndtoEndData);
         app.post('/excelToMindmap', mindmap.excelToMindmap);
+		app.post('/getScreens',mindmap.getScreens);
 
         //Login Routes
         app.post('/authenticateUser_Nineteen68', login.authenticateUser_Nineteen68);

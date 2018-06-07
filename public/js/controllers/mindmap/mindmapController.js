@@ -4,13 +4,11 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     //Createmap//
     var activeNode, childNode, uNix, uLix, node, link, dNodes, dLinks, dNodes_c, dLinks_c, allMMaps, temp, rootIndex, faRef, nCount, scrList, tcList, mapSaved, zoom, cSpan, cScale, taskAssign, releaseResult, selectedProject;
     //unassignTask is an array to store whose task to be deleted
-    var deletednode = [],
-        unassignTask = [],
-        deletednode_info = [];
+    var deletednode = [],unassignTask = [],deletednode_info = [];
     var versioning_enabled = 0;
     var idxSearch = 0;
-    // node_names_tc keep track of testcase names to decide reusability of testcases
-    var node_names_tc = [];
+    $scope.verticalLayout = false;   
+    $scope.moving = false;
     var sections = {
         'modules': 112,
         'scenarios': 237,
@@ -29,11 +27,10 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     //Createmap//
 
     //Workflow//
-    var uNix_W, uLix_W, dNodes_W, dLinks_W, temp_W, zoom_W, cSpan_W, cScale_W;
-    var cur_module, allMaps_info, activeNode_W, childNode_W;
+    var uNix, uLix, dNodes, dLinks, temp_W, zoom, cSpan, cScale;
+    var cur_module, allMaps_info, activeNode, childNode_W;
     //unassignTask is an array to store whose task to be deleted
     var deletednode_W = [];
-    //node_names_tc keep track of testcase names to decide reusability of testcases
     var saveFlag_W = false;
     var collapseEteflag = true;
     var reldata = {};
@@ -61,7 +58,6 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         'Re-usability/Re-#': 2,
         'Database Check points': 1
     }
-
     var cx_scale = {
         //apptype
         'DW ETL (H)': 5,
@@ -116,21 +112,17 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     };
     var cscore = 0;
     var clist;
-
-
-
+    $scope.nodeDisplay = {};
+    $scope.linkDisplay = {};
     //-------------------End of Global Variables-----------------------//
-
     var faRef = {
         "plus": "fa-plus",
         "plus1": "fa-hand-peace-o",
         "edit": "fa-pencil-square-o",
         "delete": "fa-trash-o"
     };
-
     //------------------Createmap.js---------------------//
-
-    function loadMindmapData(param) {
+    function loadMindmapData() {
         //param 0: normal , 1: normal with versioning, 2: end to end
         blockUI("Loading...");
         mindmapServices.populateProjects().then(function(res) {
@@ -155,7 +147,6 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                             $rootScope.redirectPage();
                         }
                         //releaseResult = result;
-
                         $('.release-list').empty();
                         $('.release-list').append("<option data-id='Select' value='Select' disabled selected>Select</option>");
                         $('.release-list').addClass('errorClass');
@@ -171,7 +162,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                         default_releaseid = $('.release-list').val();
                         $('.cycle-list').change(function() {
                             $('.cycle-list').removeClass('errorClass');
-                            loadMindmapData1(param);
+                            loadMindmapData1();
                         });
                         $('.release-list').change(function() {
                             $('.release-list').removeClass('errorClass');
@@ -205,133 +196,19 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     })
                 }
 
-                $(".project-list").val(selectedProject);
+                // $(".project-list").val(selectedProject);
+                $scope.projectName = selectedProject;
                 selectedProject = undefined;
 
-                if (param == 0 && $scope.tab == 'tabCreate') {
-                    loadMindmapData1(param);
-                } else if (param == 2) {
+                if ($scope.param == 0 && $scope.tab == 'tabCreate') {
+                    loadMindmapData1();
+                } else if ($scope.param == 2) {
                     $('#eteSearchModules').val('');
                     if ($("img.iconSpaceArrow").hasClass("iconSpaceArrowTop")) {
                         $("img.iconSpaceArrow").removeClass("iconSpaceArrowTop");
                     }
                     loadMindmapData1_W();
                 }
-
-                $(".project-list").change(function() {
-                    if (param == 2) {
-                        selectedProject = $("#selectProjectEtem").val();
-                        //alert($(".project-list").val());
-                        $('#eteSearchModules').val('');
-                        if ($("img.iconSpaceArrow").hasClass("iconSpaceArrowTop")) {
-                            $("img.iconSpaceArrow").removeClass("iconSpaceArrowTop");
-                        }
-                        loadMindmapData1_W();
-                        return;
-                    }
-                    //Mindmap clear search box on selecting different project
-                    dNodes_c = [] //Copied data should be cleared
-                    dLinks_c = [] // on change of projet list
-                    $('.fa.fa-pencil-square-o.fa-lg.plus-icon').removeClass('active-map');
-                    $('#rect-copy').remove();
-                    $('.fa.fa-clipboard.fa-lg.plus-icon').removeClass('active-map');
-                    $('#searchModule-create').val('');
-                    $('#searchModule-assign').val('');
-                    selectedProject = $(".project-list").val();
-
-                    if ($scope.tab == 'tabAssign') {
-                        if ($("#ct-AssignBox").hasClass("ct-open") == true) {
-                            $('.iconSpaceArrow').trigger('click');
-                        }
-                        $('#ctExpandAssign').unbind('click');
-                        unloadMindmapData();
-                        mindmapServices.populateReleases(selectedProject).then(function(result) {
-                            if (result == "Invalid Session") {
-                                $rootScope.redirectPage();
-                            }
-                            //releaseResult = result;
-                            default_releaseid = '';
-                            $('.release-list').empty();
-                            $('.release-list').append("<option data-id='Select' value='Select' disabled selected>Select</option>");
-                            $('.release-list').addClass('errorClass');
-                            $('.cycle-list').empty();
-                            $('.cycle-list').append("<option data-id='Select' value='Select' disabled selected>Select</option>");
-                            $('.cycle-list').addClass('errorClass');
-                            reldata = {};
-                            for (i = 0; i < result.r_ids.length && result.rel.length; i++) {
-                                $('.release-list').append("<option data-id='" + result.rel[i] + "' value='" + result.r_ids[i] + "'>" + result.rel[i] + "</option>");
-                                reldata[result.r_ids[i]] = result.rel[i]
-                            }
-                            default_releaseid = $('.release-list').val();
-                            $('.release-list').change(function() {
-                                $('.release-list').removeClass('errorClass');
-                                $('.cycle-list').addClass('errorClass');
-                                if ($("#ct-AssignBox").hasClass("ct-open") == true) {
-                                    $('.iconSpaceArrow').trigger('click');
-                                }
-                                $('#ctExpandAssign').unbind('click');
-                                unloadMindmapData();
-                                mindmapServices.populateCycles($('.release-list').val()).then(function(result_cycles) {
-                                    if (result_cycles == "Invalid Session") {
-                                        $rootScope.redirectPage();
-                                    }
-                                    var result2 = result_cycles;
-                                    $('.cycle-list').empty();
-                                    $('.cycle-list').append("<option data-id='Select' value='Select' disabled selected>Select</option>");
-                                    cycdata = {};
-                                    for (i = 0; i < result2.c_ids.length && result2.cyc.length; i++) {
-                                        $('.cycle-list').append("<option data-id='" + result2.cyc[i] + "' value='" + result2.c_ids[i] + "'>" + result2.cyc[i] + "</option>");
-                                        cycdata[result2.c_ids[i]] = result2.cyc[i];
-                                    }
-                                    //loadMindmapData1(param);
-                                }, function(error) {
-                                    console.log("Error in populating Cycles");
-                                })
-                            });
-                            // mindmapServices.populateCycles(default_releaseid).then(function(result_cycles) {
-                            //     var result2 = result_cycles;
-                            //     $('.cycle-list').empty();
-                            //     for (i = 0; i < result2.c_ids.length && result2.cyc.length; i++) {
-                            //         $('.cycle-list').append("<option data-id='" + result2.cyc[i] + "' value='" + result2.c_ids[i] + "'>" + result2.cyc[i] + "</option>");
-                            //     }
-                            //     loadMindmapData1(param);
-
-                            //     //var selectedCyc=result2.c_ids[0];
-                            //     //var selectedCyc = 'select cycle';
-                            //     // if (tObj.cy != "") {
-                            //     //     selectedCyc = tObj.cy;
-                            //     // }
-                            // }, function(error) {
-                            //     console.log("Error in populating Cycles");
-                            // })
-                            //display assign box after populating data
-                        }, function(error) {
-                            console.log("Error in populating Releases");
-                        })
-                    }
-                    //////////////////////////////////////////////////////
-
-
-                    if ($("img.iconSpaceArrow").hasClass("iconSpaceArrowTop")) {
-                        $("img.iconSpaceArrow").removeClass("iconSpaceArrowTop");
-                    }
-                    if (param == 1) {
-                        mindmapServices.getVersions($(".project-list").val()).then(
-                            function(res) {
-                                if (res == "Invalid Session") {
-                                    $rootScope.redirectPage();
-                                }
-                                addVersioning(res);
-                            },
-                            function(err) {
-                                console.log(err);
-                                openDialogMindmap('Error', 'Error loading Versions')
-                            })
-
-                    } else if ($scope.tab == 'tabCreate') {
-                        loadMindmapData1(param);
-                    }
-                });
                 //Calling the function to restrict the user to give default node names
                 $("#ct-canvas").click(callme);
                 unblockUI();
@@ -341,6 +218,121 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             unblockUI();
         })
     }
+
+    $scope.projectListChange = function() {
+        if ($scope.tab == 'mindmapEndtoEndModules') { 
+            selectedProject = $("#selectProjectEtem").val();
+            //alert($scope.projectName);
+            $('#eteSearchModules').val('');
+            if ($("img.iconSpaceArrow").hasClass("iconSpaceArrowTop")) {
+                $("img.iconSpaceArrow").removeClass("iconSpaceArrowTop");
+            }
+            loadMindmapData1_W();
+            return;
+        }
+        //Mindmap clear search box on selecting different project
+        dNodes_c = [] //Copied data should be cleared
+        dLinks_c = [] // on change of projet list
+        $('.fa.fa-pencil-square-o.fa-lg.plus-icon').removeClass('active-map');
+        $('#rect-copy').remove();
+        $('.fa.fa-clipboard.fa-lg.plus-icon').removeClass('active-map');
+        $('#searchModule-create').val('');
+        $('#searchModule-assign').val('');
+        selectedProject = $scope.projectName;
+
+        if ($scope.tab == 'tabAssign') {
+            if ($("#ct-AssignBox").hasClass("ct-open") == true) {
+                $('.iconSpaceArrow').trigger('click');
+            }
+            $('#ctExpandAssign').unbind('click');
+            unloadMindmapData();
+            mindmapServices.populateReleases(selectedProject).then(function(result) {
+                if (result == "Invalid Session") {
+                    $rootScope.redirectPage();
+                }
+                //releaseResult = result;
+                default_releaseid = '';
+                $('.release-list').empty();
+                $('.release-list').append("<option data-id='Select' value='Select' disabled selected>Select</option>");
+                $('.release-list').addClass('errorClass');
+                $('.cycle-list').empty();
+                $('.cycle-list').append("<option data-id='Select' value='Select' disabled selected>Select</option>");
+                $('.cycle-list').addClass('errorClass');
+                reldata = {};
+                for (i = 0; i < result.r_ids.length && result.rel.length; i++) {
+                    $('.release-list').append("<option data-id='" + result.rel[i] + "' value='" + result.r_ids[i] + "'>" + result.rel[i] + "</option>");
+                    reldata[result.r_ids[i]] = result.rel[i]
+                }
+                default_releaseid = $('.release-list').val();
+                $('.release-list').change(function() {
+                    $('.release-list').removeClass('errorClass');
+                    $('.cycle-list').addClass('errorClass');
+                    if ($("#ct-AssignBox").hasClass("ct-open") == true) {
+                        $('.iconSpaceArrow').trigger('click');
+                    }
+                    $('#ctExpandAssign').unbind('click');
+                    unloadMindmapData();
+                    mindmapServices.populateCycles($('.release-list').val()).then(function(result_cycles) {
+                        if (result_cycles == "Invalid Session") {
+                            $rootScope.redirectPage();
+                        }
+                        var result2 = result_cycles;
+                        $('.cycle-list').empty();
+                        $('.cycle-list').append("<option data-id='Select' value='Select' disabled selected>Select</option>");
+                        cycdata = {};
+                        for (i = 0; i < result2.c_ids.length && result2.cyc.length; i++) {
+                            $('.cycle-list').append("<option data-id='" + result2.cyc[i] + "' value='" + result2.c_ids[i] + "'>" + result2.cyc[i] + "</option>");
+                            cycdata[result2.c_ids[i]] = result2.cyc[i];
+                        }
+                        //loadMindmapData1($scope.param);
+                    }, function(error) {
+                        console.log("Error in populating Cycles");
+                    })
+                });
+                // mindmapServices.populateCycles(default_releaseid).then(function(result_cycles) {
+                //     var result2 = result_cycles;
+                //     $('.cycle-list').empty();
+                //     for (i = 0; i < result2.c_ids.length && result2.cyc.length; i++) {
+                //         $('.cycle-list').append("<option data-id='" + result2.cyc[i] + "' value='" + result2.c_ids[i] + "'>" + result2.cyc[i] + "</option>");
+                //     }
+                //     loadMindmapData1($scope.param);
+
+                //     //var selectedCyc=result2.c_ids[0];
+                //     //var selectedCyc = 'select cycle';
+                //     // if (tObj.cy != "") {
+                //     //     selectedCyc = tObj.cy;
+                //     // }
+                // }, function(error) {
+                //     console.log("Error in populating Cycles");
+                // })
+                //display assign box after populating data
+            }, function(error) {
+                console.log("Error in populating Releases");
+            })
+        }
+        //////////////////////////////////////////////////////
+
+
+        if ($("img.iconSpaceArrow").hasClass("iconSpaceArrowTop")) {
+            $("img.iconSpaceArrow").removeClass("iconSpaceArrowTop");
+        }
+        if ($scope.param == 1) {
+            mindmapServices.getVersions($scope.projectName).then(
+                function(res) {
+                    if (res == "Invalid Session") {
+                        $rootScope.redirectPage();
+                    }
+                    addVersioning(res);
+                },
+                function(err) {
+                    console.log(err);
+                    openDialogMindmap('Error', 'Error loading Versions')
+                })
+
+        } else if ($scope.tab == 'tabCreate') {
+            loadMindmapData1();
+        }
+    };
 
     function addSearchNodeListeners() {
         var reg = /[^a-zA-Z0-9\_]+/;
@@ -390,7 +382,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     var y_nodetf = parseInt(nodetf.split(/[()]/)[1].split(',')[1]);
                     //Approx cordinates of node: mindmap translate + nodetf/mpscale
                     var ccord = [x_mptf + (x_nodetf / scale_mptf), y_mptf + (y_nodetf / scale_mptf)];
-                    if ($scope.tab == 'mindmapEndtoEndModules') zoom = zoom_W;
+                    if ($scope.tab == 'mindmapEndtoEndModules') zoom = zoom;
                     zoom.translate([x_mptf - ccord[0] + 400, y_mptf - ccord[1] + 300]);
                     zoom.scale(scale_mptf);
                     zoom.event(d3.select('#ct-mindMap'));
@@ -404,7 +396,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         });
     }
 
-    function loadMindmapData1(param) {
+    function loadMindmapData1() {
         blockUI("Loading...");
         var selectedTab = window.localStorage['tabMindMap'];
         uNix = 0;
@@ -453,42 +445,21 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             d3.event.preventDefault();
         });
 
-        $('#ct-mapSvg').empty();
-        // $('#ct-canvas').append(`<div id="minimap-wrapper" style="display: none;">
-        //                             <div id="minimap-header">
-        //                                 <img class="move-ic-img" src="imgs/move_img.svg" alt="move" style="height: 15px;">
-        //                             </div>
-        //                             <div id="minimap">
-        //                             </div>
-        //                         </div>
-        //                     `);
-
-
+        $scope.nodeDisplay = {};
+        $scope.linkDisplay = {};
         d3.select('#ct-assignBox').classed('no-disp', !0);
         var version_num = '';
 
-        if (param == 1) {
+        if ($scope.param == 1) {
             version_num = $('.version-list').val();
         }
-        mindmapServices.getModules(versioning_enabled, window.localStorage['tabMindMap'], $(".project-list").val() || $scope.projectList[0].id, parseFloat(version_num), $('.release-list').val(), $('.cycle-list').val())
+        mindmapServices.getModules(versioning_enabled, window.localStorage['tabMindMap'], $scope.projectName || $scope.projectList[0].id, parseFloat(version_num), $('.release-list').val(), $('.cycle-list').val())
             .then(function(res) {
                 if (res == "Invalid Session") {
                     $rootScope.redirectPage();
                 }
                 var nodeBox = d3.select('.ct-nodeBox');
-                //$(nodeBox[0]).empty();
-                //allMMaps = JSON.parse(result);
                 $scope.allMMaps = res;
-                // $scope.allMMaps.forEach(function(e, i) {
-                //     //var t=e.name.replace(/_/g,' ');
-                //     var t = $.trim(e.name);
-                //     var img_src = 'images_mindmap/node-modules-no.png';
-                //     if (e.type == 'modules_endtoend') img_src = 'images_mindmap/MM5.png';
-                //     var node = nodeBox.append('div').attr('class', 'ct-node fl-left').attr('data-mapid', i).attr('title', t).on('click', loadMap);
-                //     node.append('img').attr('class', 'ct-nodeIcon').attr('src', img_src).attr('alt', 'Module').attr('aria-hidden', true);
-                //     if(t.length>20) t = t.substring(0, 20)+'...';
-                //     node.append('span').attr('class', 'ct-nodeLabel').html(t);
-                // });
                 if (selectedTab == 'tabCreate')
                     populateDynamicInputList();
                 setModuleBoxHeight();
@@ -502,10 +473,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
     function unloadMindmapData() {
         //$('#ct-mindMap').hide();
-        $('#ct-mindMap').empty();
-        $('#ct-actionBox').remove();
-        var nodeBox = d3.select('.ct-nodeBox');
-        // $(nodeBox[0]).empty();
+        $scope.nodeDisplay = {};
+        $scope.linkDisplay = {};
     }
 
     window.onresize = function() {
@@ -517,68 +486,20 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     function initiate() {
         var t, u;
         var selectedTab = window.localStorage['tabMindMap'];
-        if (d3.select('#ct-mindMap')[0][0] != null) return;
-        if (selectedTab == "tabAssign") {
-            var canvas = d3.select('#ct-canvasforAssign');
-            //$('#ct-canvasforAssign').append('<div id = "search-canvas-icon"><img alt="Search Icon" class="searchimg-canvas" src="imgs/ic-search-icon.png"><input type="text" class="search-canvas" placeholder="Search Node.."></div>');
-        } else {
-            var canvas = d3.select('#ct-canvas');
-            //$('#ct-canvas').append('<div id = "search-canvas-icon"><img alt="Search Icon" class="searchimg-canvas" src="imgs/ic-search-icon.png"><input type="text" class="search-canvas" placeholder="Search Node.."></div>');
-        }
+        // if (d3.select('#ct-mindMap')[0][0] != null) return;
         addSearchNodeListeners();
-        // canvas.empty();
-        // u = canvas.append('div').attr('id', 'ct-inpBox').classed('no-disp', !0);
-        // u.append('input').attr('id', 'ct-inpPredict').attr('class', 'ct-inp');
-        // u.append('input').attr('id', 'ct-inpAct').attr('maxlength', '255').attr('class', 'ct-inp').on('change', inpChange).on('keyup', inpKeyUp);
-        // u.append('ul').attr('id', 'ct-inpSugg').classed('no-disp', !0);
-        // u = canvas.append('div').attr('id', 'ct-ctrlBox').classed('no-disp', !0);
-        // u.append('p').attr('class', 'ct-ctrl fa ' + faRef.plus).on('click', createNode).append('span').attr('class', 'ct-tooltiptext').html('');
-        // u.append('p').attr('class', 'ct-ctrl fa ' + faRef.plus1).on('click', createMultipleNode).append('span').attr('class', 'ct-tooltiptext').html('');
-        // u.append('p').attr('class', 'ct-ctrl fa ' + faRef.edit).on('click', editNode).append('span').attr('class', 'ct-tooltiptext').html('');
-        // u.append('p').attr('class', 'ct-ctrl fa ' + faRef.delete).on('click', deleteNode).append('span').attr('class', 'ct-tooltiptext').html('');
-        // u = canvas.append('div').attr('id', 'ct-assignBox').classed('no-disp', !0);
-        // u.append('div').attr('id', 'ct-assignTable');
-        // u.append('div').attr('class', 'ct-assignDetailsBox').append('textarea').attr('id', 'ct-assignDetails').attr('placeholder', 'Enter Details');
-        // u.append('div').attr('id', 'ct-assignButton').append('a').html('OK').on('click', addTask);
-        // u.append('div').attr('id', 'ct-unassignButton').append('a').html('Unassign').on('click', removeTask);
-        // // var mapSvgDiv = canvas.append('div').attr("class","ct-mapSvgContainer");
-        // // var mapSvg=mapSvgDiv.append('svg').attr('id','ct-mapSvg').call(zoom).on('click.hideElements',clickHideElements);
-        var mapSvg = canvas.append('svg').attr('id', 'ct-mapSvg').call(zoom).on('click.hideElements', clickHideElements);
-        var dataAdder = [{
-            c: '#5c5ce5',
-            t: 'Modules'
-        }, {
-            c: '#4299e2',
-            t: 'Scenarios'
-        }, {
-            c: '#19baae',
-            t: 'Screens'
-        }, {
-            c: '#efa022',
-            t: 'Test Cases'
-        }];
-        u = canvas.append('svg').attr('id', 'ct-legendBox').append('g').attr('transform', 'translate(10,10)');
-        dataAdder.forEach(function(e, i) {
-            t = u.append('g');
-            t.append('circle').attr('class', 'ct-' + (e.t.toLowerCase().replace(/ /g, ''))).attr('cx', i * 90).attr('cy', 0).attr('r', 10);
-            t.append('text').attr('class', 'ct-nodeLabel').attr('x', i * 90 + 15).attr('y', 3).text(e.t);
-        });
-        u = canvas.append('svg').attr('id', 'ct-actionBox').append('g');
-        t = u.append('g').attr('id', 'ct-saveAction').attr('class', 'ct-actionButton').on('click', actionEvent);
-        t.append('rect').attr('x', 0).attr('y', 0).attr('rx', 12).attr('ry', 12).attr("width", "80px").attr("height", "50px");
-        t.append('text').attr('x', 23).attr('y', 18).text('Save');
-        if (selectedTab == "tabCreate") {
-            t = u.append('g').attr('id', 'ct-createAction').attr('class', 'ct-actionButton disableButton').on('click', actionEvent);
-            t.append('rect').attr('x', 100).attr('y', 0).attr('rx', 12).attr('ry', 12).attr("width", "80px").attr("height", "50px");
-            t.append('text').attr('x', 114).attr('y', 18).text('Create');
-        }
+        d3.select('#ct-mapSvg').call(zoom).on('click.hideElements', clickHideElements);
     };
 
-    function zoomed() {
-        cSpan = d3.event.translate;
-        cScale = d3.event.scale;
-        //Logic to change the layout
-        d3.select("#ct-mindMap").attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+
+    function zoomed(e) {     
+        if(!$scope.moving) {
+            cSpan = d3.event.translate;
+            cScale = d3.event.scale;
+            //Logic to change the layout               
+            d3.select("#ct-mindMap").attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+
+        }
     };
 
     function getElementDimm(s) {
@@ -604,19 +525,26 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         };
         if (moduleName) node.name = moduleName;
 
-        if ($('#switch-layout').hasClass('vertical-layout')) {
+        if ($scope.verticalLayout) {
             node.y = s[0] * 0.1 * (0.9);
             node.x = s[1] * 0.4;
         };
 
         dNodes.push(node);
+        $scope.nodeDisplay[node.id] = {
+            'type':node.type,
+            'transform':"translate(" + (node.x).toString() + "," + (node.y).toString() + ")",
+            'opacity':!(node.id_c == "null" || node.id_c == null || node.id_c == undefined) ? 1 : 0.5,
+            'title':node.name,
+            'name':node.display_name || node.name
+           };            
         nCount[0]++;
         uNix++;
         //To fix issue 710-Create a module and see that module name does not display in edit mode
         v = addNode(dNodes[uNix - 1], !1, null);
         childNode = v;
         activeNode = undefined;
-        if (!moduleName) editNode(node);
+        if (!moduleName) $scope.createNode(node);
     };
 
     $scope.loadMap = function(idx) {
@@ -629,6 +557,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     };
 
     function loadMapPopupConfirmed() {
+        $scope.nodeDisplay = {};
+        $scope.linkDisplay = {};
         if (progressFlag) return;
         progressFlag = true;
         $('.fa.fa-pencil-square-o.fa-lg.plus-icon.active-map').trigger('click') //Remove copy rectangle
@@ -641,7 +571,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         initiate();
         clearSvg();
         var modName = $('#createNewConfirmationPopup').attr('mapid');
-        mindmapServices.getModules(versioning_enabled, window.localStorage['tabMindMap'], $(".project-list").val(), 0, $('.release-list').val(), $('.cycle-list').val(), modName).then(function(result) {
+        mindmapServices.getModules(versioning_enabled, window.localStorage['tabMindMap'], $scope.projectName, 0, $('.release-list').val(), $('.cycle-list').val(), modName).then(function(result) {
             if (result == "Invalid Session") {
                 $rootScope.redirectPage();
             }
@@ -685,9 +615,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     function loadMap2() {
         var selectedTab = window.localStorage['tabMindMap'];
         if (selectedTab == 'mindmapEndtoEndModules') {
-            var tbd = dNodes_W[0];
-            initiate_W();
-            clearSvg_W();
+            var tbd = dNodes[0];
+            initiate();
+            clearSvg();
             treeBuilder_W(tbd);
         } else {
             var tbd = dNodes[0];
@@ -701,71 +631,29 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         return ('M' + s[0] + ',' + s[1] + 'C' + (s[0] + t[0]) / 2 + ',' + s[1] + ' ' + (s[0] + t[0]) / 2 + ',' + t[1] + ' ' + t[0] + ',' + t[1]);
     };
 
-    var node_names_tc = [];
 
     function addNode(n, m, pi) {
+        // n:node m : flag , pi: parentnode
         var selectedTab = window.localStorage['tabMindMap'];
-        if (n.type == 'testcases') {
-            node_names_tc.push(n.name);
-        }
-
-        var v = d3.select('#ct-mindMap').append('g').attr('id', 'ct-node-' + n.id).attr('class', 'ct-node').attr('data-nodetype', n.type).attr('transform', "translate(" + (n.x).toString() + "," + (n.y).toString() + ")");
-        // To fix rendering issue in FF issue #415
-
-        var img_src = 'images_mindmap/node-' + n.type + '.png';
-        if (n.reuse && (n.type == 'testcases' || n.type == 'screens')) img_src = 'images_mindmap/' + n.type + '-reuse.png';
-        if (n.type == 'modules_endtoend') img_src = 'images_mindmap/MM5.png';
-
-        var nodeOpacity = !(n.id_c == "null" || n.id_c == null || n.id_c == undefined) ? 1 : 0.5;
-        if ($("#ct-canvas").attr('class') == 'tabCreate ng-scope') {
-            var v_c = v.append('image').attr('height', '40px').attr('width', '40px').attr('class', 'ct-nodeIcon').attr('xlink:href', img_src).attr('style', 'opacity:' + nodeOpacity + ';');
-            $(v_c.node()).on('click', nodeCtrlClick);
-        } else {
-            v.append('image').attr('height', '40px').attr('width', '40px').attr('class', 'ct-nodeIcon').attr('xlink:href', img_src).attr('style', 'opacity:' + nodeOpacity + ';');
-            $(v.node()).on('click', nodeClick);
-        }
-
         n.display_name = n.name;
         var ch = 15;
-        //Issue 697
-        //if (n.type == 'testcases') ch = 9;
-        //if ((n.name.length > 15) || (n.name.length > 9 && n.type == 'testcases')) {
         if (n.name.length > 15) {
             n.display_name = n.display_name.slice(0, ch) + '...';
         }
-        v.append('text').attr('class', 'ct-nodeLabel').text(n.display_name).attr('text-anchor', 'middle').attr('x', 20).attr('title', n.name).attr('y', 50);
-        v.append('title').text(n.name);
+        var img_src = 'images_mindmap/node-' + n.type + '.png';
+        if (n.reuse && (n.type == 'testcases' || n.type == 'screens')) img_src = 'images_mindmap/' + n.type + '-reuse.png';
 
-        if (m && pi) {
-            var p = d3.select('#ct-node-' + pi.id);
-            //modified params for layout change
-            // switch-layout feature
-            if ($('#switch-layout').hasClass('vertical-layout')) {
-                if (!p.select('circle.ct-cRight')[0][0]) {
-                    p.append('circle').attr('class', 'ct-' + pi.type + ' ct-cRight ct-nodeBubble').attr('cx', 20).attr('cy', 55).attr('r', 4).on('click', toggleNode);
-                }
-                v.append('circle').attr('class', 'ct-' + n.type + ' ct-cLeft ct-nodeBubble').attr('cx', 20).attr('cy', -3).attr('r', 4); //.on('mousedown',moveNodeBegin).on('mouseup',moveNodeEnd);
-                if (selectedTab == 'tabAssign')
-                    v.append('circle').attr('class', 'ct-' + n.type + ' ct-cLeft ct-nodeBubble').attr('cx', -3).attr('cy', 20).attr('r', 4);
-                else {
-                    v.append('circle').attr('class', 'ct-' + n.type + ' ct-cLeft ct-nodeBubble').attr('cx', -3).attr('cy', 20).attr('r', 4);
-                    $(".ct-cLeft.ct-nodeBubble").off();
-                    $(".ct-cLeft.ct-nodeBubble").on('mousedown', moveNodeBegin).on('mouseup', moveNodeEnd);
-                }
+        $scope.nodeDisplay[n.id] = {
+                                 'type':n.type,
+                                 'transform':"translate(" + (n.x).toString() + "," + (n.y).toString() + ")",
+                                 'opacity':!(n.id_c == "null" || n.id_c == null || n.id_c == undefined) ? 1 : 0.5,
+                                 'title':n.name,
+                                 'name':n.display_name
+                                };
 
-            } else {
-                if (!p.select('circle.ct-cRight')[0][0]) {
-                    p.append('circle').attr('class', 'ct-' + pi.type + ' ct-cRight ct-nodeBubble').attr('cx', 43).attr('cy', 20).attr('r', 4).on('click', toggleNode);
-                }
-                if (selectedTab == 'tabAssign')
-                    v.append('circle').attr('class', 'ct-' + n.type + ' ct-cLeft ct-nodeBubble').attr('cx', -3).attr('cy', 20).attr('r', 4);
-                else {
-                    v.append('circle').attr('class', 'ct-' + n.type + ' ct-cLeft ct-nodeBubble').attr('cx', -3).attr('cy', 20).attr('r', 4);
-                    $(".ct-cLeft.ct-nodeBubble").off();
-                    $(".ct-cLeft.ct-nodeBubble").on('mousedown', moveNodeBegin).on('mouseup', moveNodeEnd);
-                }
-            }
-        }
+        var v = '#ct-node-'+n.id;
+
+        // // To fix rendering issue in FF issue #415
         return v;
     };
 
@@ -774,7 +662,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         //Modified parameters for layout change
 
         // switch-layout feature
-        if ($('#switch-layout').hasClass('vertical-layout')) {
+        if ($scope.verticalLayout) {
             var s = [p.x + 20, p.y + 55];
             var t = [c.x + 20, c.y - 3];
         } else {
@@ -782,10 +670,12 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             var t = [c.x - 3, c.y + 20];
         }
         var d = genPathData(s, t);
-        var l = d3.select('#ct-mindMap').insert('path', 'g').attr('id', 'ct-link-' + r).attr('class', 'ct-link').attr('d', d);
+        var lid = 'link-'+p.id+'-'+c.id
+        $scope.linkDisplay[lid] = ({'d':d});
+        //var l = d3.select('#ct-mindMap').insert('path', 'g').attr('id', 'ct-link-' + r).attr('class', 'ct-link').attr('d', d);
     };
     //To Unassign the task of a particular node
-    function removeTask(e, tidx) {
+    $scope.removeTask = function(e, tidx) {
         if (tidx == 0 || tidx == undefined) {
             if ($("#ct-unassignButton a").attr('class') == 'disableButton') return;
             var p = d3.select(activeNode);
@@ -803,7 +693,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             dNodes[pi].children.forEach(function(e, i) {
                 var p = d3.select('#ct-node-' + e.id);
                 p.select('.ct-nodeTask').classed('no-disp', !0);
-                removeTask('something', e.id);
+                $scope.removeTask('something', e.id);
             });
         }
     }
@@ -923,7 +813,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         return t;
     }
 
-    function addTask(e) {
+   $scope.addTask = function(e) {
         var validateStatus = assignBoxValidator();
         if (validateStatus === false) return false;
         d3.select('#ct-assignBox').classed('no-disp', !0);
@@ -1140,21 +1030,156 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         d3.select('#window-pi p.proj-info-wrap').html(attrArr);
     };
 
+
+    function nodeCtrlClick(e) {
+        d3.select('#ct-inpBox').classed('no-disp', !0);
+        //In case of paste
+        var activeNode_temp;
+        if ($('#pasteImg1').hasClass('active-map')) {
+            activeNode_temp = activeNode;
+            if (d3.select(activeNode).attr('data-nodetype') == $($('.node-selected')[0]).attr('data-nodetype')) {
+                if ($($('.node-selected')[0]).attr('data-nodetype') == 'scenarios') {
+                    //paste to scenarios
+                    //call $scope.createnode for each node
+                    dNodes_c.forEach(function(e, i) {
+                        activeNode = activeNode_temp;
+                        if (e.type == 'screens') {
+                            $scope.createNode({
+                                name: e.name
+                            });
+                            activeNode = childNode;
+                            dLinks_c.forEach(function(f, j) {
+                                if (f.source.id == e.id) {
+                                    $scope.createNode({
+                                        name: f.target.name
+                                    });
+                                }
+                            })
+                        }
+
+                    });
+                } else if ($($('.node-selected')[0]).attr('data-nodetype') == 'modules') {
+                    var activenode_scr;
+                    //paste to module
+                    //call $scope.createNode for each node
+                    dNodes_c.forEach(function(e, i) {
+                        if (e.type == 'scenarios') {
+                            activeNode = '#ct-node-0';
+                            $scope.createNode({
+                                name: e.name
+                            });
+                            activeNode = childNode;
+                            activenode_scr = activeNode;
+                            dLinks_c.forEach(function(f, j) {
+                                if (f.source.id == e.id && f.target.type == 'screens') {
+                                    activeNode = activenode_scr;
+                                    $scope.createNode({
+                                        name: f.target.name
+                                    });
+                                    activeNode = childNode;
+                                    dLinks_c.forEach(function(g, k) {
+                                        if (g.source.id == f.target.id && g.source.type == 'screens') {
+                                            $scope.createNode({
+                                                name: g.target.name
+                                            });
+                                        }
+                                    });
+                                }
+                            })
+                        }
+
+                    });
+                }
+                openDialogMindmap('Success', 'Pasted successfully');
+            } else {
+                openDialogMindmap('Error', 'Please select a Scenario to paste to..');
+            }
+            return;
+        }
+        var p = d3.select(activeNode);
+        var t = p.attr('data-nodetype');
+        var split_char = ',';
+        if (isIE) split_char = ' ';
+        var l = p.attr('transform').slice(10, -1).split(split_char);
+        l = [(parseFloat(l[0]) + 40) * cScale + cSpan[0], (parseFloat(l[1]) + 40) * cScale + cSpan[1]];
+        var c = d3.select('#ct-ctrlBox').style('top', l[1] + 'px').style('left', l[0] + 'px').classed('no-disp', !1);
+        c.select('p.' + faRef.plus).classed('ct-ctrl-inactive', !1);
+        c.select('p.' + faRef.delete).classed('ct-ctrl-inactive', !1);
+        c.select('p.' + faRef.plus1).classed('ct-ctrl-inactive', !1);
+        c.select('p.' + faRef.edit).classed('ct-ctrl-inactive', !1);
+        if($scope.tab == 'mindmapEndtoEndModules'){
+            if (t == 'modules_endtoend') {
+                c.select('p.' + faRef.plus).classed('ct-ctrl-inactive', !0);
+                c.select('p.' + faRef.edit + ' .ct-tooltiptext').html('Edit Module');
+                //513-'Mindmap: When we delete an existing Module and create another module in the same work space  then a new Module instance is being appended .
+                c.select('p.' + faRef.delete).classed('ct-ctrl-inactive', !0);
+                //c.select('p.'+faRef.delete+' .ct-tooltiptext').html('Delete Module');
+            } else if (t == 'scenarios') {
+                c.select('p.' + faRef.plus).classed('ct-ctrl-inactive', !0);
+                c.select('p.' + faRef.edit).classed('ct-ctrl-inactive', !0);
+                c.select('p.' + faRef.delete + ' .ct-tooltiptext').html('Delete Scenario');
+            }    
+        }
+        else{
+            if (t == 'modules') {
+                c.select('p.' + faRef.plus + ' .ct-tooltiptext').html('Create Scenarios');
+                c.select('p.' + faRef.plus1 + ' .ct-tooltiptext').html('Create Multiple Scenarios');
+                c.select('p.' + faRef.edit + ' .ct-tooltiptext').html('Edit Module');
+                //513-'Mindmap: When we delete an existing Module and create another module in the same work space  then a new Module instance is being appended .
+                c.select('p.' + faRef.delete).classed('ct-ctrl-inactive', !0);
+                //c.select('p.'+faRef.delete+' .ct-tooltiptext').html('Delete Module');
+            } else if (t == 'scenarios') {
+                c.select('p.' + faRef.plus + ' .ct-tooltiptext').html('Create Screens');
+                c.select('p.' + faRef.plus1 + ' .ct-tooltiptext').html('Create Multiple Screens');
+                c.select('p.' + faRef.edit + ' .ct-tooltiptext').html('Edit Scenario');
+                c.select('p.' + faRef.delete + ' .ct-tooltiptext').html('Delete Scenario');
+            } else if (t == 'screens') {
+                c.select('p.' + faRef.plus + ' .ct-tooltiptext').html('Create Testcases');
+                c.select('p.' + faRef.plus1 + ' .ct-tooltiptext').html('Create Multiple Testcases');
+                c.select('p.' + faRef.edit + ' .ct-tooltiptext').html('Edit Screen');
+                c.select('p.' + faRef.delete + ' .ct-tooltiptext').html('Delete Screen');
+            } else if (t == 'testcases') {
+                c.select('p.' + faRef.plus).classed('ct-ctrl-inactive', !0);
+                c.select('p.' + faRef.plus1).classed('ct-ctrl-inactive', !0);
+                c.select('p.' + faRef.edit + ' .ct-tooltiptext').html('Edit Testcase');
+                c.select('p.' + faRef.delete + ' .ct-tooltiptext').html('Delete Testcase');
+            }
+        }
+
+    };
+
+    // function nodeCtrlClick_W(e) {
+    //     activeNode = '#ct-node-'+e
+    //     var p = d3.select(activeNode);
+    //     var t = p.attr('data-nodetype');
+    //     var split_char = ',';
+    //     if (isIE) split_char = ' ';
+    //     var l = p.attr('transform').slice(10, -1).split(split_char);
+    //     l = [(parseFloat(l[0]) + 40) * cScale + cSpan[0], (parseFloat(l[1]) + 40) * cScale + cSpan[1]];
+    //     var c = d3.select('#ct-ctrlBox').style('top', l[1] + 'px').style('left', l[0] + 'px').classed('no-disp', !1);
+    //     c.select('p.' + faRef.plus).classed('ct-ctrl-inactive', !1);
+    //     c.select('p.' + faRef.edit).classed('ct-ctrl-inactive', !1);
+    //     c.select('p.' + faRef.delete).classed('ct-ctrl-inactive', !1);
+    //     if (t == 'modules_endtoend') {
+    //         c.select('p.' + faRef.plus).classed('ct-ctrl-inactive', !0);
+    //         c.select('p.' + faRef.edit + ' .ct-tooltiptext').html('Edit Module');
+    //         //513-'Mindmap: When we delete an existing Module and create another module in the same work space  then a new Module instance is being appended .
+    //         c.select('p.' + faRef.delete).classed('ct-ctrl-inactive', !0);
+    //         //c.select('p.'+faRef.delete+' .ct-tooltiptext').html('Delete Module');
+    //     } else if (t == 'scenarios') {
+    //         c.select('p.' + faRef.plus).classed('ct-ctrl-inactive', !0);
+    //         c.select('p.' + faRef.edit).classed('ct-ctrl-inactive', !0);
+    //         c.select('p.' + faRef.delete + ' .ct-tooltiptext').html('Delete Scenario');
+    //     }
+
+    // };
+
     function nodeClick(e) {
         d3.select('#window-pi p.proj-info-wrap').empty();
         if (IncompleteFlowFlag) {
             openDialogMindmap('Error', 'Incomplete Flow!');
             return;
         }
-
-        e = e || window.event;
-        if (e) {
-            e.cancelbubble = !0;
-            if (e.stopPropagation) e.stopPropagation();
-        }
-        if (isIE) activeNode = this.parentNode;
-        //   else activeNode = this.parentElement;
-        else activeNode = this;
         var u, v, w, f, c = d3.select('#ct-assignBox');
         var p = d3.select(activeNode);
         var pi = parseInt(p.attr('id').split('-')[2]);
@@ -1266,7 +1291,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
                 $('#ct-assignedTo').append("<option value='select user' >Select User</option>");
                 //PAssing selected projectid to the service
-                mindmapServices.populateUsers($(".project-list").val())
+                mindmapServices.populateUsers($scope.projectName)
                     .then(function(res) {
                         if (res == "Invalid Session") {
                             $rootScope.redirectPage();
@@ -1285,7 +1310,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 v.append('span').attr('class', 'ct-assignItem fl-left').html('Reviewer');
                 var d = v.append('select').attr('id', 'ct-assignRevw'); //.attr('class','reviwedBy');
                 $('#ct-assignRevw').append("<option value='select reviewer' select=selected>" + "Select Reviewer" + "</option>");
-                mindmapServices.populateUsers($(".project-list").val())
+                mindmapServices.populateUsers($scope.projectName)
                     .then(function(res) {
                         if (res == "Invalid Session") {
                             $rootScope.redirectPage();
@@ -1424,6 +1449,13 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         }
     };
 
+    $scope.nodeUniversalClick = function(idx){
+        activeNode = "#ct-node-"+idx;
+        if($scope.tab == 'tabCreate') nodeCtrlClick();
+        else if($scope.tab == 'mindmapEndtoEndModules') nodeCtrlClick();
+        else if($scope.tab == 'tabAssign') nodeClick();
+    }
+
     function showComplexityBox(nType) {
         //Calculate complexity and then show
         $('#dialog-compBox').modal("show");
@@ -1557,121 +1589,14 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
 
 
-    function nodeCtrlClick(e) {
-        d3.select('#ct-inpBox').classed('no-disp', !0);
-        e = e || window.event;
-        if (e) {
-            e.cancelbubble = !0;
-            if (e.stopPropagation) e.stopPropagation();
-        }
-        if (isIE) activeNode = this.parentNode;
-        else activeNode = this.parentElement;
-        //In case of paste
-        var activeNode_temp;
-        if ($('#pasteImg1').hasClass('active-map')) {
-            activeNode_temp = activeNode;
-            if (d3.select(activeNode).attr('data-nodetype') == $($('.node-selected')[0]).attr('data-nodetype')) {
-                if ($($('.node-selected')[0]).attr('data-nodetype') == 'scenarios') {
-                    //paste to scenarios
-                    //call createnode for each node
-                    dNodes_c.forEach(function(e, i) {
-                        activeNode = activeNode_temp;
-                        if (e.type == 'screens') {
-                            createNode({
-                                name: e.name
-                            });
-                            activeNode = childNode[0][0];
-                            dLinks_c.forEach(function(f, j) {
-                                if (f.source.id == e.id) {
-                                    createNode({
-                                        name: f.target.name
-                                    });
-                                }
-                            })
-                        }
 
-                    });
-                } else if ($($('.node-selected')[0]).attr('data-nodetype') == 'modules') {
-                    var activenode_scr;
-                    //paste to module
-                    //call createnode for each node
-                    dNodes_c.forEach(function(e, i) {
-                        if (e.type == 'scenarios') {
-                            activeNode = '#ct-node-0';
-                            createNode({
-                                name: e.name
-                            });
-                            activeNode = childNode[0][0];
-                            activenode_scr = activeNode;
-                            dLinks_c.forEach(function(f, j) {
-                                if (f.source.id == e.id && f.target.type == 'screens') {
-                                    activeNode = activenode_scr;
-                                    createNode({
-                                        name: f.target.name
-                                    });
-                                    activeNode = childNode[0][0];
-                                    dLinks_c.forEach(function(g, k) {
-                                        if (g.source.id == f.target.id && g.source.type == 'screens') {
-                                            createNode({
-                                                name: g.target.name
-                                            });
-                                        }
-                                    });
-                                }
-                            })
-                        }
-
-                    });
-                }
-                openDialogMindmap('Success', 'Pasted successfully');
-            } else {
-                openDialogMindmap('Error', 'Please select a Scenario to paste to..');
-            }
-            return;
-        }
-
-
-        var p = d3.select(activeNode);
-        var t = p.attr('data-nodetype');
-        var split_char = ',';
-        if (isIE) split_char = ' ';
-        var l = p.attr('transform').slice(10, -1).split(split_char);
-        l = [(parseFloat(l[0]) + 40) * cScale + cSpan[0], (parseFloat(l[1]) + 40) * cScale + cSpan[1]];
-        var c = d3.select('#ct-ctrlBox').style('top', l[1] + 'px').style('left', l[0] + 'px').classed('no-disp', !1);
-        c.select('p.' + faRef.plus).classed('ct-ctrl-inactive', !1);
-        c.select('p.' + faRef.delete).classed('ct-ctrl-inactive', !1);
-        c.select('p.' + faRef.plus1).classed('ct-ctrl-inactive', !1);
-        if (t == 'modules') {
-            c.select('p.' + faRef.plus + ' .ct-tooltiptext').html('Create Scenarios');
-            c.select('p.' + faRef.plus1 + ' .ct-tooltiptext').html('Create Multiple Scenarios');
-            c.select('p.' + faRef.edit + ' .ct-tooltiptext').html('Edit Module');
-            //513-'Mindmap: When we delete an existing Module and create another module in the same work space  then a new Module instance is being appended .
-            c.select('p.' + faRef.delete).classed('ct-ctrl-inactive', !0);
-            //c.select('p.'+faRef.delete+' .ct-tooltiptext').html('Delete Module');
-        } else if (t == 'scenarios') {
-            c.select('p.' + faRef.plus + ' .ct-tooltiptext').html('Create Screens');
-            c.select('p.' + faRef.plus1 + ' .ct-tooltiptext').html('Create Multiple Screens');
-            c.select('p.' + faRef.edit + ' .ct-tooltiptext').html('Edit Scenario');
-            c.select('p.' + faRef.delete + ' .ct-tooltiptext').html('Delete Scenario');
-        } else if (t == 'screens') {
-            c.select('p.' + faRef.plus + ' .ct-tooltiptext').html('Create Testcases');
-            c.select('p.' + faRef.plus1 + ' .ct-tooltiptext').html('Create Multiple Testcases');
-            c.select('p.' + faRef.edit + ' .ct-tooltiptext').html('Edit Screen');
-            c.select('p.' + faRef.delete + ' .ct-tooltiptext').html('Delete Screen');
-        } else if (t == 'testcases') {
-            c.select('p.' + faRef.plus).classed('ct-ctrl-inactive', !0);
-            c.select('p.' + faRef.plus1).classed('ct-ctrl-inactive', !0);
-            c.select('p.' + faRef.edit + ' .ct-tooltiptext').html('Edit Testcase');
-            c.select('p.' + faRef.delete + ' .ct-tooltiptext').html('Delete Testcase');
-        }
-    };
 
     function getNewPosition(node, pi, arr_co) {
         // Switch_layout functionality
         // **NOTE**
         //dNodes[pi].children are arranged in increasing
         // order of x/y disance depending on layout
-        var layout_vertical = $('#switch-layout').hasClass('vertical-layout');
+        var layout_vertical = $scope.verticalLayout;
         if (dNodes[pi].children.length > 0) { // new node has siblings
             index = dNodes[pi].children.length - 1;
             if (layout_vertical)
@@ -1722,7 +1647,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     }
 
     function getNonOverlappingPosition(node, arr_co, new_one) {
-        var layout_vertical = $('#switch-layout').hasClass('vertical-layout');
+        var layout_vertical = $scope.verticalLayout;
         var dist = 0;
         dist = closestCord(arr_co, new_one);
         while (dist < 60) {
@@ -1750,16 +1675,14 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         return dmin;
     }
 
-    function createNode(e) {
-
+    $scope.createNode = function(obj) {
         //If module is in edit mode, then return do not add any node
         if (d3.select('#ct-inpBox').attr('class') == "") return;
         d3.select('#ct-inpBox').classed('no-disp', !0);
         d3.select('#ct-ctrlBox').classed('no-disp', !0);
-        var p = d3.select(activeNode);
-        var pt = p.attr('data-nodetype');
-        if (pt == 'testcases') return;
-        var pi = p.attr('id').split('-')[2];
+        var pi = activeNode.split('-')[2];
+        var pt = $scope.nodeDisplay[pi].type;              
+        if (pt == 'testcases') return;   
         SaveCreateED('#ct-createAction', 1, 0);
         if (dNodes[pi]._children == null) {
             if (dNodes[pi].children == undefined) dNodes[pi]['children'] = [];
@@ -1782,40 +1705,32 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
             });
             // switch-layout feature
-            if (e) {
-                var tempName = e.name;
+            if (obj) {
+                var tempName = obj.name;
             } else {
                 var tempName = nNext[pt][0] + '_' + nCount[nNext[pt][1]];
             }
-            if ($('#switch-layout').hasClass('vertical-layout')) {
-                node = {
-                    id: uNix,
-                    childIndex: '',
-                    path: '',
-                    name: tempName,
-                    type: (nNext[pt][0]).toLowerCase() + 's',
-                    y: h * (0.15 * (1.34 + nNext[pt][1]) + Math.random() * 0.1),
-                    x: 90 + 30 * Math.floor(Math.random() * (Math.floor((w - 150) / 80))),
-                    children: [],
-                    parent: dNodes[pi]
-                };
-            } else {
-                node = {
-                    id: uNix,
-                    childIndex: '',
-                    path: '',
-                    name: tempName,
-                    type: (nNext[pt][0]).toLowerCase() + 's',
-                    y: h * (0.15 * (1.34 + nNext[pt][1]) + Math.random() * 0.1),
-                    x: 90 + 30 * Math.floor(Math.random() * (Math.floor((w - 150) / 80))),
-                    children: [],
-                    parent: dNodes[pi]
-                };
-            }
-
+            node = {
+                id: uNix,
+                childIndex: '',
+                path: '',
+                name: tempName,
+                type: (nNext[pt][0]).toLowerCase() + 's',
+                y: h * (0.15 * (1.34 + nNext[pt][1]) + Math.random() * 0.1),
+                x: 90 + 30 * Math.floor(Math.random() * (Math.floor((w - 150) / 80))),
+                children: [],
+                parent: dNodes[pi]
+            };
             node = getNewPosition(node, pi, arr_co); //pi: active node ID
             var curNode = node;
             dNodes.push(node);
+            $scope.nodeDisplay[node.id] = {
+                'type':node.type,
+                'transform':"translate(" + (node.x).toString() + "," + (node.y).toString() + ")",
+                'opacity':!(node.id_c == "null" || node.id_c == null || node.id_c == undefined) ? 1 : 0.5,
+                'title':node.name,
+                'name':node.display_name || node.name
+               };                
             nCount[nNext[pt][1]]++;
             dNodes[pi].children.push(dNodes[uNix]);
             dNodes[uNix].childIndex = dNodes[pi].children.length;
@@ -1836,9 +1751,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
                 //By default when a node is created it's name should be in ediatable mode
                 CreateEditFlag = true;
-                if (e);
+                if (obj);
                 else
-                    editNode(currentNode);
+                    $scope.editNode(currentNode);
             }
 
         } else {
@@ -1848,7 +1763,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     };
 
     //------Create Multiple Child Node-------//
-    function createMultipleNode() {
+    $scope.createMultipleNode = function() {
         switch (d3.select(activeNode).attr('data-nodetype')) {
             case 'modules_endtoend':
                 $scope.addedntype = 'Scenario_';
@@ -1873,7 +1788,6 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         $timeout(function() {
             $('.modal-backdrop.in').remove();
         }, 1000);
-
     }
 
     $scope.addMoreNode = function() {
@@ -1923,7 +1837,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         if ($('.errBorder').length == 0) {
             console.log("NodeNames:", nodeNames);
             nodeNames.forEach(function(node, i) {
-                createNode({
+                $scope.createNode({
                     name: node
                 });
             });
@@ -1935,22 +1849,15 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
     //------End of Create Multiple Child Node-------//
 
-    function editNode(node) {
-
+    $scope.editNode = function(node) {
         $('#ct-inpAct').removeClass('errorClass');
         d3.select('#ct-inpAct').classed('no-disp', !1);
-        // e = e || window.event;
-        // if (e) {
-        //     e.cancelbubble = !0;
-        //     if (e.stopPropagation) e.stopPropagation();
-        // }
-        //logic to create the node in editable mode
         if (node == 0 || node == undefined) {
             childNode = null;
             var p = d3.select(activeNode);
         } else {
             var p = childNode;
-            activeNode = childNode[0][0];
+            activeNode = childNode;
         }
         var pi = p.attr('id').split('-')[2];
         var t = p.attr('data-nodetype');
@@ -1958,7 +1865,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         if (isIE) split_char = ' ';
         var l = p.attr('transform').slice(10, -1).split(split_char);
         d3.select('#ct-ctrlBox').classed('no-disp', !0);
-        if (activeNode && dNodes[activeNode.id.split('-')[2]].task) {
+        if (p && dNodes[p.attr('id').split('-')[2]].task) {
             var msg = 'Unassign the task to rename';
             if (t == 'screens') {
                 msg = 'Unassign the task to rename. And unassign the corresponding testcases tasks';
@@ -1966,8 +1873,6 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             openDialogMindmap('Rename Error', msg);
             return;
         }
-
-        d3.select('#ct-ctrlBox').classed('no-disp', !0);
         var name = '';
         //By default when a node is created it's name should be in ediatable mode
 
@@ -2006,14 +1911,13 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             }
         }
 
-
         d3.select('#ct-inpBox').style('top', l[1] + 'px').style('left', l[0] + 'px').classed('no-disp', !1);
         d3.select('#ct-inpPredict').property('value', '');
         d3.select('#ct-inpAct').attr('data-nodeid', null).property('value', name).node().focus();
         d3.select('#ct-inpSugg').classed('no-disp', !0);
     };
 
-    function deleteNode(e) {
+    $scope.deleteNode = function() {
         //If module is in edit mode, then return do not add any node
         if (d3.select('#ct-inpBox').attr('class') == "") return;
         d3.select('#ct-ctrlBox').classed('no-disp', !0);
@@ -2130,7 +2034,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         }
         var temp = dLinks;
         if (tab == 'mindmapEndtoEndModules') {
-            temp = dLinks_W;
+            temp = dLinks;
         }
         for (j = temp.length - 1; j >= 0; j--) {
             if (temp[j].source.id == d.id) {
@@ -2142,52 +2046,44 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     };
 
     function moveNode(e) {
-        e = e || window.event;
         //#886 Unable to rearrange nodes in e2e
-        d3.select('.ct-movable').attr('transform', "translate(" + parseFloat((e.pageX - $('#ct-mapSvg').offset().left - cSpan[0]) / cScale + 2) + "," + parseFloat((e.pageY - $('#ct-mapSvg').offset().top - cSpan[1]) / cScale - 20) + ")");
+        d3.select('.ct-movable').attr('transform', "translate(" + parseFloat((e.pageX - $('#ct-mapSvg').offset().left - cSpan[0]) / cScale + 2)+ "," + parseFloat((e.pageY - $('#ct-mapSvg').offset().top - cSpan[1]) / cScale - 20) + ")");
     };
 
-    function moveNodeBegin(e) {
-        e = e || window.event;
-        e.cancelbubble = !0;
+    $scope.moveNodeBegin = function(idx) {
+        $scope.moving = true;
         //Issue #763 is fixed,Mindmap - If node is moved in edit mode ,then Textbox is not been moved with the Node.
         d3.select('#ct-inpAct').classed('no-disp', !0);
-        if (e.stopPropagation) e.stopPropagation();
         //To check whether browser Is IE or not issue #415
-        var isIE = /*@cc_on!@*/ false || !!document.documentMode;
-        var p = d3.select(this.parentElement);
-        if (isIE) {
-            var p = d3.select(this.parentNode);
-        }
-        var pi = p.attr('id').split('-')[2];
         temp = {
             s: [],
             t: ""
         };
         dLinks.forEach(function(d, i) {
-            if (d.source.id == pi) {
-                temp.s.push(d.id);
-                d3.select('#ct-link-' + d.id).remove();
-            } else if (d.target.id == pi) {
+            if (d.source.id == idx) {
+                temp.s.push(d.id); 
+                delete $scope.linkDisplay['link-'+d.source.id+'-'+d.target.id];
+            } else if (d.target.id == idx) {
                 temp.t = d.id;
-                d3.select('#ct-link-' + d.id).remove();
+                delete $scope.linkDisplay['link-'+d.source.id+'-'+d.target.id];
             }
         });
-        p.classed('ct-movable', !0);
+        d3.select('#ct-node-'+idx).classed('ct-movable', !0);
         $(d3.select('#ct-mapSvg').node()).on('mousemove.nodemove', moveNode);
+
     };
 
-    function moveNodeEnd(e) {
+    $scope.moveNodeEnd = function(idx) {
+        $scope.moving = false;
         d3.select('#ct-mapSvg').on('mousemove.nodemove', null);
         var isIE = /*@cc_on!@*/ false || !!document.documentMode;
-        var p = d3.select(this.parentElement);
+        var p = d3.select("#ct-node-"+idx);
         var split_char = ',';
         if (isIE) {
-            var p = d3.select(this.parentNode);
             split_char = ' ';
         }
 
-        var pi = p.attr('id').split('-')[2];
+        var pi = idx;
         var l = p.attr('transform').slice(10, -1).split(split_char);
         dNodes[pi].x = parseFloat(l[0]);
         dNodes[pi].y = parseFloat(l[1]);
@@ -2205,13 +2101,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         p.classed('ct-movable', !1);
     };
 
-    function toggleNode(e) {
-        var isIE = /*@cc_on!@*/ false || !!document.documentMode;
-        var p = d3.select(this.parentElement);
-        if (isIE) {
-            var p = d3.select(this.parentNode);
-        }
-        var pi = p.attr('id').split('-')[2];
+    $scope.toggleNode = function (id) {
+        var p = d3.select('#ct-node-'+id);
+        var pi = id;
         if (dNodes[pi].children) {
             p.select('.ct-cRight').classed('ct-nodeBubble', !1);
             dNodes[pi]._children = dNodes[pi].children;
@@ -2231,7 +2123,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             d3.select('#ct-node-' + e.id).classed('no-disp', v);
             for (j = dLinks.length - 1; j >= 0; j--) {
                 if (dLinks[j].source.id == d.id) {
-                    d3.select('#ct-link-' + dLinks[j].id).classed('no-disp', v);
+                    d3.select('#link-'+dLinks[j].source.id+'-'+dLinks[j].target.id).classed('no-disp', v);
                 }
             }
         });
@@ -2240,13 +2132,13 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             d3.select('#ct-node-' + e.id).classed('no-disp', !0);
             for (j = dLinks.length - 1; j >= 0; j--) {
                 if (dLinks[j].source.id == d.id) {
-                    d3.select('#ct-link-' + dLinks[j].id).classed('no-disp', !0);
+                    d3.select('#link-'+dLinks[j].source.id+'-'+dLinks[j].target.id).classed('no-disp', !0);
                 }
             }
         });
     };
 
-    function validNodeDetails(value, p) {
+    function validNodeDetails(value) {
         var nName, flag = !0;
         nName = value;
         var regex = /^[a-zA-Z0-9_]*$/;;
@@ -2257,17 +2149,15 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         return flag;
     };
 
-
-    function inpChange(e) {
+    $scope.txtBoxChange = function() {
         reuseDict = getReuseDetails();
-        console.log('inpchange executed');
         var inp = d3.select('#ct-inpAct');
         var val = inp.property('value');
         if (val == 'Screen_0' || val == 'Scenario_0' || val == 'Testcase_0') {
             $('#ct-inpAct').addClass('errorClass');
             return;
         }
-        if (!validNodeDetails(val, this)) return;
+        if (!validNodeDetails(val)) return;
         //if(!validNodeDetails(this)) return;
         if (childNode != null) {
             var p = childNode;
@@ -2370,30 +2260,22 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         }
     });
 
-    function inpKeyUp(e) {
-        e = e || window.event;
+    $scope.txtBoxKeyup = function(keyCode) {
         temp = [];
         var t, list;
+        $scope.inpText = angular.element("#ct-inpBox").scope().inpText;
         //To fix issue with suggestions
-        if (childNode != null) {
-            var p = childNode;
-        } else {
-            var p = d3.select(activeNode);
-        }
+        var p = d3.select(activeNode);
         //var p=d3.select(activeNode);
-        var val = d3.select(this).property('value');
         var iul = d3.select('#ct-inpSugg');
-        if (e.keyCode == 13) {
-            inpChange();
+        if (keyCode == 13) {
+            $scope.txtBoxChange();
             return;
         }
-        if (val.indexOf('_') == -1) {
+        if ($scope.inpText.indexOf('_') == -1) {
             iul.classed('no-disp', !0);
             var isIE = /*@cc_on!@*/ false || !!document.documentMode;
-            if (isIE) {
-                d3.select(this.parentNode).select('#ct-inpPredict').property('value', '');
-            } else d3.select(this.parentElement).select('#ct-inpPredict').property('value', '');
-
+            d3.select('#ct-inpPredict').property('value', '');
             return;
         }
         t = p.attr('data-nodetype');
@@ -2404,36 +2286,34 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         iul.selectAll('li').remove();
         list.forEach(function(d, i) {
             var s = d.name.toLowerCase();
-            if (s.lastIndexOf(val.toLowerCase(), 0) === 0) {
+            if (s.lastIndexOf($scope.inpText.toLowerCase(), 0) === 0) {
                 temp.push(i);
                 if (d.name.length > 23) s = d.name.slice(0, 23) + "...";
                 else s = d.name;
                 iul.append('li').attr('class', 'divider');
                 iul.append('li').append('a').attr('data-nodeid', i).attr('data-nodename', d.name).attr('title', d.name).html(s).on('click', function() {
-                    var k = d3.select(this);
+                    var k = d3.select('#ct-inpAct');
                     d3.select('#ct-inpSugg').classed('no-disp', !0);
                     d3.select('#ct-inpPredict').property('value', '');
                     d3.select('#ct-inpAct').attr('data-nodeid', k.attr('data-nodeid')).property('value', k.attr('data-nodename')).node().focus();
                 });
             }
         });
-        if (temp.length > 0 && val != list[temp[0]].name) {
-            if (e.keyCode == 39) {
+        if (temp.length > 0 && $scope.inpText != list[temp[0]].name) {
+            if (keyCode == 39) {
                 iul.classed('no-disp', !0);
                 d3.select('#ct-inpPredict').property('value', '');
-                d3.select(this).attr('data-nodeid', temp[0]).property('value', list[temp[0]].name);
+                d3.select('#ct-inpAct').attr('data-nodeid', temp[0]).property('value', list[temp[0]].name);
             } else {
                 iul.select('li.divider').remove();
                 iul.classed('no-disp', !1);
-                d3.select(this).attr('data-nodeid', null);
-                if (isIE) d3.select(this.parentNode).select('#ct-inpPredict').property('value', list[temp[0]].name);
-                else d3.select(this.parentElement).select('#ct-inpPredict').property('value', list[temp[0]].name);
+                d3.select('#ct-inpAct').attr('data-nodeid', null);
+                d3.select('#ct-inpPredict').property('value', list[temp[0]].name);
             }
         } else {
             iul.classed('no-disp', !0);
-            d3.select(this).attr('data-nodeid', null);
-            if (isIE) d3.select(this.parentNode).select('#ct-inpPredict').property('value', '');
-            else d3.select(this.parentElement).select('#ct-inpPredict').property('value', '');
+            d3.select('#ct-inpAct').attr('data-nodeid', null);
+            d3.select('#ct-inpPredict').property('value', '');
         }
     };
 
@@ -2467,13 +2347,37 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         return e;
     };
 
+    function treeIterator_W(c, d, e) {
+        c.push({
+            projectID: d.projectID,
+            id: d.id,
+            childIndex: d.childIndex,
+            id_c: (d.id_c) ? d.id_c : null,
+            id_n: (d.id_n) ? d.id_n : null,
+            oid: (d.oid) ? d.oid : null,
+            name: d.name,
+            type: d.type,
+            pid: (d.parent) ? d.parent.id : null,
+            pid_c: (d.parent) ? d.parent.id_c : null,
+            task: (d.task) ? d.task : null,
+            renamed: (d.rnm) ? d.rnm : !1,
+            orig_name: (d.original_name) ? d.original_name : null
+        });
+        if (d.children && d.children.length > 0) d.children.forEach(function(t) {
+            e = treeIterator_W(c, t, e);
+        });
+        else if (d._children && d._children.length > 0) d._children.forEach(function(t) {
+            e = treeIterator(c, t, e);
+        });
+        //else if(d.type!='testcases') return !0;
+        return e;
+    };
 
-
-    function actionEvent(e) {
+    $scope.actionEvent = function(e) {
         var selectedNodeTitle = $('.nodeBoxSelected').attr('title');
-        if ($(this).hasClass('disableButton') || $(this).hasClass('no-access')) return;
+        if ($(e.target.parentElement).hasClass('disableButton') || $(e.target.parentElement).hasClass('no-access')) return;
         var selectedTab = window.localStorage['tabMindMap'];
-        var s = d3.select(this);
+        var s = d3.select(e.target.parentElement);
         var cur_module = null;
         var error = !1,
             mapData = [],
@@ -2490,7 +2394,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             };
         });
 
-        var layout_vertical = $('#switch-layout').hasClass('vertical-layout');
+        var layout_vertical = $scope.verticalLayout;
         if (layout_vertical) {
 
             temp_data.sort(function(a, b) {
@@ -2625,7 +2529,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     var vn = '';
                     if ($('.version-list').length != 0)
                         from_v = to_v = $('.version-list').val()
-                    mindmapServices.getModules(versioning_enabled, window.localStorage['tabMindMap'], $(".project-list").val(), parseFloat(from_v), $('.release-list').val(), $('.cycle-list').val()).then(function(result) {
+                    mindmapServices.getModules(versioning_enabled, window.localStorage['tabMindMap'], $scope.projectName, parseFloat(from_v), $('.release-list').val(), $('.cycle-list').val()).then(function(result) {
                         if (result == "Invalid Session") {
                             $rootScope.redirectPage();
                         }
@@ -2725,10 +2629,6 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         e.stopImmediatePropagation();
         if ($("#ct-" + tab + "Box").hasClass("ct-open") == true) {
             $("#ct-canvas").css("top", "5px");
-            // if($("#left-nav-section").is(":visible") == true && $("#right-dependencies-section").is(":visible") == true)
-            // 	{
-            // 	$("#ct-AssignBox").css({"position":"relative","top":"25px"});
-            // 	}
             $(".ct-nodeBox .ct-node").css("width", "139px");
             $(".ct-nodeBox").css({
                 "overflow": "auto",
@@ -2751,9 +2651,10 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     };
 
     function clickHideElements(e) {
+        if( event.target !== this ) {return;}
         d3.select('#ct-inpBox').classed('no-disp', !0);
         d3.select('#ct-ctrlBox').classed('no-disp', !0);
-        d3.select('#ct-assignBox').classed('no-disp', !0);
+        d3.select('#ct-assignBox').classed('no-disp', !0);    
     };
 
     function setModuleBoxHeight() {
@@ -2771,70 +2672,11 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             if (result == "Invalid Session") {
                 $rootScope.redirectPage();
             }
-        })
-
-        scrList = [];
-        tcList = [];
-        scenarioList = [];
-        var scrDict = {},
-            tcDict = {},
-            scenarioDict = {};
-        $scope.allMMaps.forEach(function(m) {
-            if (m.children != undefined) {
-                m.children.forEach(function(ts) {
-                    // if(scenarioDict[ts.id_n]===undefined){
-                    // 		scenarioList.push({id:ts.id,name:ts.name,id_n:ts.id_n,id_c:ts.id_c});
-                    // 		scenarioDict[ts.id_n]=!0;
-                    // }
-                    if (ts.children != undefined) {
-                        ts.children.forEach(function(s) {
-                            if (scrDict[s.name] === undefined) {
-                                scrList.push({
-                                    id: s.id,
-                                    name: s.name,
-                                    id_n: s.id_n,
-                                    id_c: s.id_c
-                                });
-                                scrDict[s.name] = !0;
-                            }
-                            if (s.children != undefined) {
-                                s.children.forEach(function(tc) {
-                                    if (tcDict[tc.name] === undefined) {
-                                        tcList.push({
-                                            id: tc.id,
-                                            name: tc.name,
-                                            id_n: tc.id_n,
-                                            id_c: tc.id_c
-                                        });
-                                        tcDict[tc.name] = !0;
-                                    }
-                                });
-                            }
-
-                        });
-                    }
-
-                });
+            else{
+                scrList = result.screenList;
+                tcList = result.testCaseList;
             }
-
-        });
-    };
-
-    function clearSvg() {
-        d3.select('#ct-mindMap').remove();
-        d3.select('#ct-ctrlBox').classed('no-disp', !0);
-        d3.select('#ct-assignBox').classed('no-disp', !0);
-        d3.select('#ct-mapSvg').append('g').attr('id', 'ct-mindMap');
-        uNix = 0;
-        uLix = 0;
-        dNodes = [];
-        dLinks = [];
-        nCount = [0, 0, 0, 0];
-        cSpan = [0, 0];
-        cScale = 1;
-        mapSaved = !1;
-        zoom.scale(cScale).translate(cSpan);
-        zoom.event(d3.select('#ct-mapSvg'));
+        })
     };
 
     //FUnction is tagged to every click on 'cnavas' element to validate the names of nodes when created
@@ -2844,7 +2686,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             d3.select('#ct-inpBox').classed('no-disp', !1);
         }
         if (!$('#ct-inpBox').hasClass('no-disp')) {
-            inpChange();
+            $scope.txtBoxChange();
         }
     }
 
@@ -2918,7 +2760,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             }
 
         })
-        dataReuse['projectid'] = $(".project-list").val();
+        dataReuse['projectid'] = $scope.projectName;
         if (versioningEnabled) {
             // Add version number
             dataReuse['versionNumber'] = $('.version-list').val();
@@ -2927,7 +2769,6 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     }
 
     function treeBuilder(tree) { // Async
-        node_names_tc = [];
         var pidx = 0,
             levelCount = [1],
             cSize = getElementDimm(d3.select("#ct-mapSvg"));
@@ -2980,7 +2821,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             })
             dNodes.forEach(function(d) {
                 // switch-layout feature
-                if ($('#switch-layout').hasClass('vertical-layout')) {
+                if ($scope.verticalLayout) {
                     d.y = cSize[0] * 0.1 * (0.9 + typeNum[d.type]);
                     sections[d.type] = d.y;
                 } else {
@@ -2992,14 +2833,19 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 if (d.oid === undefined) d.oid = d.id;
                 d.id = uNix++;
                 addNode(d, !0, d.parent);
+                $scope.nodeDisplay[d.id].task = false;
                 if (d.task != null && $scope.tab != 'tabCreate') {
                     if (d.task.release == $('.release-list').val() && d.task.cycle == $('.cycle-list').val()) {
-                        d3.select('#ct-node-' + d.id).append('image').attr('class', 'ct-nodeTask').attr('width', '21px').attr('height', '21px').attr('xlink:href', 'images_mindmap/node-task-assigned.png').attr('x', 29).attr('y', -10);
+                        //d3.select('#ct-node-' + d.id).append('image').attr('class', 'ct-nodeTask').attr('width', '21px').attr('height', '21px').attr('xlink:href', 'images_mindmap/node-task-assigned.png').attr('x', 29).attr('y', -10);
+                        $scope.nodeDisplay[d.id].task = true;
+                        $scope.nodeDisplay[d.id].taskOpacity = 1;
                     }
                 }
                 //Enhancement : Part of Issue 1685 showing the task assigned icon little transperent to indicate that task originally do not belongs to this release and cycle but task exists in some other release and cycle
                 else if (d.taskexists && $scope.tab != 'tabCreate') {
-                    d3.select('#ct-node-' + d.id).append('image').attr('class', 'ct-nodeTask').attr('width', '21px').attr('height', '21px').attr('xlink:href', 'images_mindmap/node-task-assigned.png').attr('style', 'opacity:0.6').attr('x', 29).attr('y', -10);
+                    //d3.select('#ct-node-' + d.id).append('image').attr('class', 'ct-nodeTask').attr('width', '21px').attr('height', '21px').attr('xlink:href', 'images_mindmap/node-task-assigned.png').attr('style', 'opacity:0.6').attr('x', 29).attr('y', -10);
+                    $scope.nodeDisplay[d.id].task = true;
+                    $scope.nodeDisplay[d.id].taskOpacity = 0.6;
                 }
             });
             dLinks = d3Tree.links(dNodes);
@@ -3008,7 +2854,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 addLink(d.id, d.source, d.target);
             });
             // switch-layout feature
-            if ($('#switch-layout').hasClass('vertical-layout'))
+            if ($scope.verticalLayout)
                 zoom.translate([(cSize[0] / 2) - dNodes[0].x, (cSize[1] / 5) - dNodes[0].y]);
             else
                 zoom.translate([(cSize[0] / 3) - dNodes[0].x, (cSize[1] / 2) - dNodes[0].y]);
@@ -3041,39 +2887,13 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
     }
 
-    /* function to set a Browser cookie */
-    function setCookie(cname, cvalue, exdays) {
-        var d = new Date();
-        d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
-        var expires = "expires=" + d.toUTCString();
-        document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
-    }
-
-    /* function to get a Browser cookie */
-    function getCookie(cname) {
-        var name = cname + "=";
-        var ca = document.cookie.split(';');
-        for (var i = 0; i < ca.length; i++) {
-            var c = ca[i];
-            while (c.charAt(0) == ' ') {
-                c = c.substring(1);
-            }
-            if (c.indexOf(name) == 0) {
-                return c.substring(name.length, c.length);
-            }
-        }
-        return "";
-    }
-
-
-
     /*
     function : exportData()
     Purpose : Exporting data in json file
     param :
     */
 
-    function exportData(versioning_status) {
+    $scope.exportData = function(versioning_status) {
         var data_not_exported = [];
         var vs_n = 0;
         var version_num = "0.0";
@@ -3112,7 +2932,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         blockUI('Loading UI');
         var userInfo = JSON.parse(window.localStorage['_UI']);
         var user_id = userInfo.user_id;
-        mindmapServices.getModules(versioning_enabled, window.localStorage['tabMindMap'], $(".project-list").val(), parseFloat(version_num), $('.release-list').val(), $('.cycle-list').val()).then(
+        mindmapServices.getModules(versioning_enabled, window.localStorage['tabMindMap'], $scope.projectName, parseFloat(version_num), $('.release-list').val(), $('.cycle-list').val(),"fetch all").then(
             function(result) {
                 if (result == "Invalid Session") {
                     $rootScope.redirectPage();
@@ -3122,7 +2942,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 for (var i = 0; i < result_details.length; i++) {
                     var module_info = {
                         "appType": "",
-                        "projectId": $(".project-list").val(),
+                        "projectId": $scope.projectName,
                         "cycleId": "",
                         "moduleId": "",
                         "moduleName": "",
@@ -3154,13 +2974,13 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     }
                 }
                 if (flag) {
-                    mindmapServices.getProjectTypeMM_Nineteen68($(".project-list").val()).then(
+                    mindmapServices.getProjectTypeMM_Nineteen68($scope.projectName).then(
                         function(project_type) {
                             if (project_type == "Invalid Session") {
                                 $rootScope.redirectPage();
                             }
                             parsed_project_data = project_type;
-                            mindmapServices.getCRId($(".project-list").val()).then(
+                            mindmapServices.getCRId($scope.projectName).then(
                                 function(rel_cycle_data) {
                                     if (rel_cycle_data == "Invalid Session") {
                                         $rootScope.redirectPage();
@@ -3212,14 +3032,14 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     }
 
 
-    function addExport(versioning_status) {
-        $('.selectProject').append($('<i>').attr({
-            class: 'glyphicon glyphicon-export export-icon',
-            title: "Export Version"
-        }).click(function(e) {
-            exportData(versioning_status);
-        }));
-    }
+    // function addExport(versioning_status) {
+    //     $('.selectProject').append($('<i>').attr({
+    //         class: 'glyphicon glyphicon-export export-icon',
+    //         title: "Export Version"
+    //     }).click(function(e) {
+    //         exportData(versioning_status);
+    //     }));
+    // }
 
     /*
     function : jsonDownload()
@@ -3334,7 +3154,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         d3.select('.addScenarios-ete').classed('disableButton', !0);
         //$('#ct-saveAction_W').removeClass('no-access');
         SaveCreateED('#ct-saveAction_W', 0, 0);
-        //uNix=0;uLix=0;dNodes=[];dLinks=[];nCount=[0,0,0,0];scrList=[];tcList=[];cSpan_W=[0,0];cScale_W=1;mapSaved=!1;
+        //uNix=0;uLix=0;dNodes=[];dLinks=[];nCount=[0,0,0,0];scrList=[];tcList=[];cSpan=[0,0];cScale=1;mapSaved=!1;
         taskAssign = {
             "modules_endtoend": {
                 "task": ["Execute"],
@@ -3353,7 +3173,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 "attributes": ["at", "rw", "sd", "ed", "cx"]
             }
         };
-        zoom_W = d3.behavior.zoom().scaleExtent([0.1, 3]).on("zoom", zoomed);
+        zoom = d3.behavior.zoom().scaleExtent([0.1, 3]).on("zoom", zoomed);
         $("#ctExpandCreate").click(function(e) {
             if ($(".ct-node:visible").length > 6) {
                 toggleExpand(e, 'module');
@@ -3381,7 +3201,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 //var t=e.name.replace(/_/g,' ');
                 var src_image = 'imgs/ic-reportbox.png'
                 var class_name = 'eteMbox';
-                var onclick_func = displayScenarios;
+                var onclick_func = loadEndtoEndModule;
                 if (e.type == 'modules_endtoend') {
                     class_name = 'eteMboxETE';
                     onclick_func = loadScenarios;
@@ -3404,77 +3224,22 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
     }
 
-    function initiate_W() {
-        var t, u;
-        var selectedTab = window.localStorage['tabMindMap'];
-        if (d3.select('#ct-mindMap')[0][0] != null) return;
 
-        if (selectedTab == "tabAssign") {
-            var canvas = d3.select('#ct-canvasforAssign');
-            // $('#ct-canvasforAssign').append('<div id = "search-canvas-icon"><img alt="Search Icon" class="searchimg-canvas" src="imgs/ic-search-icon.png"><input type="text" class="search-canvas" placeholder="Search Node.."></div>');
-        } else {
-            var canvas = d3.select('#ct-canvas');
-            // $('#ct-canvas').append('<div id = "search-canvas-icon"><img alt="Search Icon" class="searchimg-canvas" src="imgs/ic-search-icon.png"><input type="text" class="search-canvas" placeholder="Search Node.."></div>');
-        }
-        addSearchNodeListeners();
-
-        // u = canvas.append('div').attr('id', 'ct-inpBox').classed('no-disp', !0);
-        // u.append('input').attr('id', 'ct-inpPredict').attr('class', 'ct-inp');
-        // u.append('input').attr('id', 'ct-inpAct').attr('maxlength', '255').attr('class', 'ct-inp').on('change', inpChange_W).on('keyup', inpKeyUp_W);
-        // u.append('ul').attr('id', 'ct-inpSugg').classed('no-disp', !0);
-        // u = canvas.append('div').attr('id', 'ct-ctrlBox').classed('no-disp', !0);
-        // u.append('p').attr('class', 'ct-ctrl fa ' + faRef.plus).on('click', '').append('span').attr('class', 'ct-tooltiptext').html('');
-        // u.append('p').attr('class', 'ct-ctrl fa ' + faRef.edit).on('click', editNode_W).append('span').attr('class', 'ct-tooltiptext').html('');
-        // u.append('p').attr('class', 'ct-ctrl fa ' + faRef.delete).on('click', deleteNode_W).append('span').attr('class', 'ct-tooltiptext').html('');
-
-        var mapSvg = canvas.append('svg').attr('id', 'ct-mapSvg').call(zoom_W).on('click.hideElements', clickHideElements);
-        var dataAdder = [{
-            c: '#5c5ce5',
-            t: 'Modules'
-        }, {
-            c: '#4299e2',
-            t: 'Scenarios'
-        }, {
-            c: '#19baae',
-            t: 'Screens'
-        }, {
-            c: '#efa022',
-            t: 'Test Cases'
-        }];
-        u = canvas.append('svg').attr('id', 'ct-legendBox').append('g').attr('transform', 'translate(10,10)');
-        dataAdder.forEach(function(e, i) {
-            t = u.append('g');
-            t.append('circle').attr('class', 'ct-' + (e.t.toLowerCase().replace(/ /g, ''))).attr('cx', i * 90).attr('cy', 0).attr('r', 10);
-            t.append('text').attr('class', 'ct-nodeLabel').attr('x', i * 90 + 15).attr('y', 3).text(e.t);
-        });
-        u = canvas.append('svg').attr('id', 'ct-actionBox_W').append('g');
-        t = u.append('g').attr('id', 'ct-saveAction_W').attr('class', 'ct-actionButton_W').on('click', actionEvent_W);
-        // 886: Unable to rearrange nodes in e2e
-        t.append('rect').attr('x', 0).attr('y', 0).attr('rx', 12).attr('ry', 12).attr("width", "80px").attr("height", "50px");
-        t.append('text').attr('x', 23).attr('y', 18).text('Save');
-        if (selectedTab == "tabCreate" || 'mindmapEndtoEndModules') {
-            t = u.append('g').attr('id', 'ct-createAction_W').attr('class', 'ct-actionButton_W disableButton').on('click', actionEvent_W);
-            t.append('rect').attr('x', 100).attr('y', 0).attr('rx', 12).attr('ry', 12).attr("width", "80px").attr("height", "50px");;
-            t.append('text').attr('x', 114).attr('y', 18).text('Create');
-
-        }
-
-    };
 
     function getElementDimm(s) {
         return [parseFloat(s.style("width")), parseFloat(s.style("height"))];
     };
 
     function createNewMap_W(e) {
-        initiate_W();
-        clearSvg_W();
+        initiate();
+        clearSvg();
         var s = getElementDimm(d3.select("#ct-mapSvg"));
         //X and y changed to implement layout change
         // switch-layout feature
-        if ($('#switch-layout').hasClass('vertical-layout')) {
+        if ($scope.verticalLayout) {
             node = {
                 projectID: $('#selectProjectEtem').val(),
-                id: uNix_W,
+                id: uNix,
                 childIndex: 0,
                 name: 'Module_0',
                 type: 'modules_endtoend',
@@ -3486,7 +3251,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         } else {
             node = {
                 projectID: $('#selectProjectEtem').val(),
-                id: uNix_W,
+                id: uNix,
                 childIndex: 0,
                 name: 'Module_0',
                 type: 'modules_endtoend',
@@ -3497,11 +3262,18 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             };
         }
 
-        dNodes_W.push(node);
+        dNodes.push(node);
+        $scope.nodeDisplay[node.id] = {
+            'type':node.type,
+            'transform':"translate(" + (node.x).toString() + "," + (node.y).toString() + ")",
+            'opacity':!(node.id_c == "null" || node.id_c == null || node.id_c == undefined) ? 1 : 0.5,
+            'title':node.name,
+            'name':node.display_name || node.name
+           };            
         nCount[0]++;
-        uNix_W++;
+        uNix++;
         //To fix issue 710-Create a module and see that module name does not display in edit mode
-        v = addNode_W(dNodes_W[uNix_W - 1], !1, null);
+        v = addNode_W(dNodes[uNix - 1], !1, null);
         childNode_W = v;
         editNode_W(e);
     };
@@ -3523,9 +3295,9 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         $("span.nodeBoxSelected").removeClass("nodeBoxSelected");
         $('[title=' + $('#createNewConfirmationPopup').attr('mapid') + ']').addClass("nodeBoxSelected");
         cur_module = $('[data-mapid=' + $('#createNewConfirmationPopup').attr('mapid') + ']');
-        initiate_W();
+        initiate();
         d3.select('#ct-inpBox').classed('no-disp', !0);
-        clearSvg_W();
+        clearSvg();
         var modName = $('#createNewConfirmationPopup').attr('mapid');
         mindmapServices.getModules(versioning_enabled, 'endToend', $("#selectProjectEtem").val(), '', $('.release-list').val(), $('.cycle-list').val(), modName)
             .then(function(result) {
@@ -3540,7 +3312,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
     }
 
-    function displayScenarios(e) {
+    function loadEndtoEndModule(e) {
         if ($('#ct-mindMap').length == 0) { // if no map is loaded 
             openDialogMindmap('Error', 'First, Please select an end to end module or create a new one!');
             return;
@@ -3596,53 +3368,39 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     }
 
     function addNode_W(n, m, pi) {
-
-        if (n.type == 'testcases') {
-            node_names_tc.push(n.name);
-        }
-
-        var v = d3.select('#ct-mindMap').append('g').attr('id', 'ct-node-' + n.id).attr('class', 'ct-node').attr('data-nodetype', n.type).attr('transform', "translate(" + (n.x).toString() + "," + (n.y).toString() + ")");
-
+        var v = d3.select('#ct-node-' + n.id);
         n.display_name = n.name;
-        var img_src = 'images_mindmap/node-scenarios.png';
-        if (n.type == 'modules_endtoend') img_src = 'images_mindmap/MM5.png';
         var nodeOpacity = !(n.id_c == "null" || n.id_c == null || n.id_c == undefined) ? 1 : 0.5;
-        v.append('image').attr('height', '40px').attr('width', '40px').attr('class', 'ct-nodeIcon').attr('xlink:href', img_src).on('click', nodeCtrlClick_W).attr('style', 'opacity:' + nodeOpacity + ';');
         var ch = 15;
-        if (n.name.length > 15 && n.type != 'modules_endtoend') {
-            //if (n.type == 'testcases') ch = 9;
+        if (n.name.length > ch) {
             n.display_name = n.display_name.slice(0, ch) + '...';
         }
-        v.append('text').attr('class', 'ct-nodeLabel').text(n.display_name).attr('text-anchor', 'middle').attr('x', 20).attr('title', n.name).attr('y', 50);
-        v.append('title').text(n.name);
         //Condition to add the properties of reuse to the node (Currently only for testcases)
-        if (node_names_tc.length > 0 && node_names_tc.indexOf(n.name) > -1) {
-            if (node_names_tc.indexOf(n.name) == node_names_tc.lastIndexOf(n.name)) {
-                n.reuse = 'reuse';
-            } else {
-                n.reuse = 'parent';
-            }
-
-
-        }
-        if (m && pi) {
-            var p = d3.select('#ct-node-' + pi.id);
-            // switch-layout feature
-            if ($('#switch-layout').hasClass('vertical-layout')) {
-                if (!p.select('circle.ct-cRight')[0][0]) p.append('circle').attr('class', 'ct-' + pi.type + ' ct-cRight ct-nodeBubble').attr('cx', 20).attr('cy', 55).attr('r', 4).on('click', toggleNode_W);
-                v.append('circle').attr('class', 'ct-' + n.type + ' ct-cLeft ct-nodeBubble').attr('cx', 20).attr('cy', -3).attr('r', 4); //.on('mousedown',moveNodeBegin).on('mouseup',moveNodeEnd);
-                v.append('circle').attr('class', 'ct-' + n.type + ' ct-cLeft ct-nodeBubble').attr('cx', -3).attr('cy', 20).attr('r', 4);
-                $(".ct-cLeft.ct-nodeBubble").off();
-                $(".ct-cLeft.ct-nodeBubble").on('mousedown', moveNodeBegin_W).on('mouseup', moveNodeEnd_W)
-            } else {
-                if (!p.select('circle.ct-cRight')[0][0]) p.append('circle').attr('class', 'ct-' + pi.type + ' ct-cRight ct-nodeBubble').attr('cx', 43).attr('cy', 20).attr('r', 4).on('click', toggleNode_W);
-                //Logic to change the layout
-                //v.append('circle').attr('class','ct-'+n.type+' ct-cLeft ct-nodeBubble').attr('cx',20).attr('cy',-3).attr('r',4);//.on('mousedown',moveNodeBegin).on('mouseup',moveNodeEnd);
-                v.append('circle').attr('class', 'ct-' + n.type + ' ct-cLeft ct-nodeBubble').attr('cx', -3).attr('cy', 20).attr('r', 4);
-                $(".ct-cLeft.ct-nodeBubble").off();
-                $(".ct-cLeft.ct-nodeBubble").on('mousedown', moveNodeBegin_W).on('mouseup', moveNodeEnd_W)
-            }
-        }
+        $scope.nodeDisplay[n.id] = {
+                                 'type':n.type,
+                                 'transform':"translate(" + (n.x).toString() + "," + (n.y).toString() + ")",
+                                 'opacity':!(n.id_c == "null" || n.id_c == null || n.id_c == undefined) ? 1 : 0.5,
+                                 'title':n.name,
+                                 'name':n.display_name
+                                }; 
+        // if (m && pi) {
+        //     var p = d3.select('#ct-node-' + pi.id);
+        //     // switch-layout feature
+        //     if ($scope.verticalLayout) {
+        //         if (!p.select('circle.ct-cRight')[0][0]) p.append('circle').attr('class', 'ct-' + pi.type + ' ct-cRight ct-nodeBubble').attr('cx', 20).attr('cy', 55).attr('r', 4).on('click', toggleNode_W);
+        //         v.append('circle').attr('class', 'ct-' + n.type + ' ct-cLeft ct-nodeBubble').attr('cx', 20).attr('cy', -3).attr('r', 4); //.on('mousedown',moveNodeBegin).on('mouseup',moveNodeEnd);
+        //         v.append('circle').attr('class', 'ct-' + n.type + ' ct-cLeft ct-nodeBubble').attr('cx', -3).attr('cy', 20).attr('r', 4);
+        //         $(".ct-cLeft.ct-nodeBubble").off();
+        //         $(".ct-cLeft.ct-nodeBubble").on('mousedown', moveNodeBegin_W).on('mouseup', moveNodeEnd_W)
+        //     } else {
+        //         if (!p.select('circle.ct-cRight')[0][0]) p.append('circle').attr('class', 'ct-' + pi.type + ' ct-cRight ct-nodeBubble').attr('cx', 43).attr('cy', 20).attr('r', 4).on('click', toggleNode_W);
+        //         //Logic to change the layout
+        //         //v.append('circle').attr('class','ct-'+n.type+' ct-cLeft ct-nodeBubble').attr('cx',20).attr('cy',-3).attr('r',4);//.on('mousedown',moveNodeBegin).on('mouseup',moveNodeEnd);
+        //         v.append('circle').attr('class', 'ct-' + n.type + ' ct-cLeft ct-nodeBubble').attr('cx', -3).attr('cy', 20).attr('r', 4);
+        //         $(".ct-cLeft.ct-nodeBubble").off();
+        //         $(".ct-cLeft.ct-nodeBubble").on('mousedown', moveNodeBegin_W).on('mouseup', moveNodeEnd_W)
+        //     }
+        // }
         return v;
 
     };
@@ -3658,8 +3416,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         d3.select('#ct-inpBox').classed('no-disp', !0);
         d3.select('#ct-ctrlBox').classed('no-disp', !0);
         var pi = 0;
-        if (dNodes_W[pi]._children == null) {
-            if (dNodes_W[pi].children == undefined) dNodes_W[pi]['children'] = [];
+        if (dNodes[pi]._children == null) {
+            if (dNodes[pi].children == undefined) dNodes[pi]['children'] = [];
             //var nNext={'modules_endtoend':['Scenario',1],'scenarios':['Screen',2],'screens':['Testcase',3]};
             var mapSvg = d3.select('#ct-mapSvg');
             var w = parseFloat(mapSvg.style('width'));
@@ -3668,7 +3426,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
 
             node = {
                 projectID: scenario_prjId,
-                id: uNix_W,
+                id: uNix,
                 childIndex: '',
                 path: '',
                 name: text,
@@ -3676,14 +3434,14 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 y: h * (0.15 * (1.34 + 1) + Math.random() * 0.1),
                 x: 90 + 30 * Math.floor(Math.random() * (Math.floor((w - 150) / 80))),
                 children: [],
-                parent: dNodes_W[pi]
+                parent: dNodes[pi]
             };
             //TO fix issue with random positions of newly created nodes
-            if (dNodes_W[pi].children.length > 0) {
-                arr = dNodes_W[pi].children;
-                index = dNodes_W[pi].children.length - 1;
+            if (dNodes[pi].children.length > 0) {
+                arr = dNodes[pi].children;
+                index = dNodes[pi].children.length - 1;
                 // switch-layout feature
-                if ($('#switch-layout').hasClass('vertical-layout')) {
+                if ($scope.verticalLayout) {
                     node.x = arr[index].x + 80;
                     node.y = arr[index].y;
                 } else {
@@ -3695,66 +3453,43 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             } else {
                 //Modified parameters to change the layout
                 // switch-layout feature
-                if ($('#switch-layout').hasClass('vertical-layout')) {
-                    node.x = dNodes_W[pi].x;
-                    node.y = dNodes_W[pi].y + 125;
+                if ($scope.verticalLayout) {
+                    node.x = dNodes[pi].x;
+                    node.y = dNodes[pi].y + 125;
                 } else {
-                    node.y = dNodes_W[pi].y;
-                    node.x = dNodes_W[pi].x + 125;
+                    node.y = dNodes[pi].y;
+                    node.x = dNodes[pi].x + 125;
                 }
             }
 
-            dNodes_W.push(node);
-            dNodes_W[pi].children.push(dNodes_W[uNix_W]);
-            dNodes_W[uNix_W].childIndex = dNodes_W[pi].children.length
-            var currentNode = addNode_W(dNodes_W[uNix_W], !0, dNodes_W[pi]);
+            dNodes.push(node);
+            $scope.nodeDisplay[node.id] = {
+                'type':node.type,
+                'transform':"translate(" + (node.x).toString() + "," + (node.y).toString() + ")",
+                'opacity':!(node.id_c == "null" || node.id_c == null || node.id_c == undefined) ? 1 : 0.5,
+                'title':node.name,
+                'name':node.display_name || node.name
+               };            
+            dNodes[pi].children.push(dNodes[uNix]);
+            dNodes[uNix].childIndex = dNodes[pi].children.length
+            var currentNode = addNode_W(dNodes[uNix], !0, dNodes[pi]);
             if (currentNode != null) {
                 childNode_W = currentNode;
                 //console.log(currentNode);
                 link = {
-                    id: uLix_W,
-                    source: dNodes_W[pi],
-                    target: dNodes_W[uNix_W]
+                    id: uLix,
+                    source: dNodes[pi],
+                    target: dNodes[uNix]
                 };
-                dLinks_W.push(link);
-                addLink(uLix_W, dNodes_W[pi], dNodes_W[uNix_W]);
-                uNix_W++;
-                uLix_W++;
+                dLinks.push(link);
+                addLink(uLix, dNodes[pi], dNodes[uNix]);
+                uNix++;
+                uLix++;
 
             }
 
         } else {
             openDialogMindmap('Error', 'Expand the node');
-        }
-
-    };
-
-    function nodeCtrlClick_W(e) {
-        e = e || window.event;
-        e.cancelbubble = !0;
-        if (e.stopPropagation) e.stopPropagation();
-        if (isIE) activeNode_W = this.parentNode;
-        else activeNode_W = this.parentElement;
-        var p = d3.select(activeNode_W);
-        var t = p.attr('data-nodetype');
-        var split_char = ',';
-        if (isIE) split_char = ' ';
-        var l = p.attr('transform').slice(10, -1).split(split_char);
-        l = [(parseFloat(l[0]) + 40) * cScale + cSpan[0], (parseFloat(l[1]) + 40) * cScale + cSpan[1]];
-        var c = d3.select('#ct-ctrlBox').style('top', l[1] + 'px').style('left', l[0] + 'px').classed('no-disp', !1);
-        c.select('p.' + faRef.plus).classed('ct-ctrl-inactive', !1);
-        c.select('p.' + faRef.edit).classed('ct-ctrl-inactive', !1);
-        c.select('p.' + faRef.delete).classed('ct-ctrl-inactive', !1);
-        if (t == 'modules_endtoend') {
-            c.select('p.' + faRef.plus).classed('ct-ctrl-inactive', !0);
-            c.select('p.' + faRef.edit + ' .ct-tooltiptext').html('Edit Module');
-            //513-'Mindmap: When we delete an existing Module and create another module in the same work space  then a new Module instance is being appended .
-            c.select('p.' + faRef.delete).classed('ct-ctrl-inactive', !0);
-            //c.select('p.'+faRef.delete+' .ct-tooltiptext').html('Delete Module');
-        } else if (t == 'scenarios') {
-            c.select('p.' + faRef.plus).classed('ct-ctrl-inactive', !0);
-            c.select('p.' + faRef.edit).classed('ct-ctrl-inactive', !0);
-            c.select('p.' + faRef.delete + ' .ct-tooltiptext').html('Delete Scenario');
         }
 
     };
@@ -3768,7 +3503,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         //logic to create the node in editable mode
         if (node == 0) {
             childNode_W = null;
-            var p = d3.select(activeNode_W);
+            var p = d3.select(activeNode);
         } else var p = childNode_W;
         var pi = p.attr('id').split('-')[2];
         var t = p.attr('data-nodetype');
@@ -3790,7 +3525,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         var name = '';
         //By default when a node is created it's name should be in ediatable mode
 
-        name = dNodes_W[pi].name;
+        name = dNodes[pi].name;
         //name=p.text();
         l = [(parseFloat(l[0]) - 20) * cScale + cSpan[0], (parseFloat(l[1]) + 42) * cScale + cSpan[1]];
         d3.select('#ct-inpBox').style('top', l[1] + 'px').style('left', l[0] + 'px').classed('no-disp', !1);
@@ -3803,23 +3538,23 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         //If module is in edit mode, then return do not add any node
         if (d3.select('#ct-inpBox').attr('class') == "") return;
         d3.select('#ct-ctrlBox').classed('no-disp', !0);
-        var s = d3.select(activeNode_W);
+        var s = d3.select(activeNode);
         //513-'Mindmap: When we delete an existing Module and create another module in the same work space  then a new Module instance is being appended .
         var t = s.attr('data-nodetype');
         if (t == 'modules_endtoend') return;
         var sid = s.attr('id').split('-')[2];
-        var p = dNodes_W[sid].parent;
-        recurseDelChild(dNodes_W[sid], $scope.tab);
-        for (j = dLinks_W.length - 1; j >= 0; j--) {
-            if (dLinks_W[j].target.id == sid) {
-                d3.select('#ct-link-' + dLinks_W[j].id).remove();
-                dLinks_W[j].deleted = !0;
+        var p = dNodes[sid].parent;
+        recurseDelChild(dNodes[sid], $scope.tab);
+        for (j = dLinks.length - 1; j >= 0; j--) {
+            if (dLinks[j].target.id == sid) {
+                d3.select('#ct-link-' + dLinks[j].id).remove();
+                dLinks[j].deleted = !0;
                 break;
             }
         }
         p.children.some(function(d, i) {
             if (d.id == sid) {
-                //var nodeDel=dNodes_W.pop(sid);
+                //var nodeDel=dNodes.pop(sid);
                 p.children.splice(i, 1);
                 return !0;
             }
@@ -3849,7 +3584,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             s: [],
             t: ""
         };
-        dLinks_W.forEach(function(d, i) {
+        dLinks.forEach(function(d, i) {
             if (d.source.id == pi) {
                 temp_W.s.push(d.id);
                 d3.select('#ct-link-' + d.id).remove();
@@ -3875,14 +3610,14 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         var pi = p.attr('id').split('-')[2];
         var l = p.attr('transform').slice(10, -1).split(split_char);
         //Logic to implement rearranging of nodes
-        var curNode = dNodes_W[pi];
+        var curNode = dNodes[pi];
 
-        dNodes_W[pi].x = parseFloat(l[0]);
-        dNodes_W[pi].y = parseFloat(l[1]);
-        addLink(temp_W.t, dLinks_W[temp_W.t].source, dLinks_W[temp_W.t].target);
-        var v = (dNodes_W[pi].children) ? !1 : !0;
+        dNodes[pi].x = parseFloat(l[0]);
+        dNodes[pi].y = parseFloat(l[1]);
+        addLink(temp_W.t, dLinks[temp_W.t].source, dLinks[temp_W.t].target);
+        var v = (dNodes[pi].children) ? !1 : !0;
         temp_W.s.forEach(function(d) {
-            addLink(d, dLinks_W[d].source, dLinks_W[d].target);
+            addLink(d, dLinks[d].source, dLinks[d].target);
             d3.select('#ct-link-' + d).classed('no-disp', v);
         });
         p.classed('ct-movable', !1);
@@ -3895,16 +3630,16 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             var p = d3.select(this.parentNode);
         }
         var pi = p.attr('id').split('-')[2];
-        if (dNodes_W[pi].children) {
+        if (dNodes[pi].children) {
             p.select('.ct-cRight').classed('ct-nodeBubble', !1);
-            dNodes_W[pi]._children = dNodes_W[pi].children;
-            dNodes_W[pi].children = null;
-            recurseTogChild_W(dNodes_W[pi], !0);
-        } else if (dNodes_W[pi]._children) {
+            dNodes[pi]._children = dNodes[pi].children;
+            dNodes[pi].children = null;
+            recurseTogChild_W(dNodes[pi], !0);
+        } else if (dNodes[pi]._children) {
             p.select('.ct-cRight').classed('ct-nodeBubble', !0);
-            dNodes_W[pi].children = dNodes_W[pi]._children;
-            dNodes_W[pi]._children = null;
-            recurseTogChild_W(dNodes_W[pi], !1);
+            dNodes[pi].children = dNodes[pi]._children;
+            dNodes[pi]._children = null;
+            recurseTogChild_W(dNodes[pi], !1);
         }
     };
 
@@ -3912,143 +3647,21 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         if (d.children) d.children.forEach(function(e) {
             recurseTogChild_W(e, v);
             d3.select('#ct-node-' + e.id).classed('no-disp', v);
-            for (j = dLinks_W.length - 1; j >= 0; j--) {
-                if (dLinks_W[j].source.id == d.id) {
-                    d3.select('#ct-link-' + dLinks_W[j].id).classed('no-disp', v);
+            for (j = dLinks.length - 1; j >= 0; j--) {
+                if (dLinks[j].source.id == d.id) {
+                    d3.select('#ct-link-' + dLinks[j].id).classed('no-disp', v);
                 }
             }
         });
         else if (d._children) d._children.forEach(function(e) {
             recurseTogChild_W(e, !0);
             d3.select('#ct-node-' + e.id).classed('no-disp', !0);
-            for (j = dLinks_W.length - 1; j >= 0; j--) {
-                if (dLinks_W[j].source.id == d.id) {
-                    d3.select('#ct-link-' + dLinks_W[j].id).classed('no-disp', !0);
+            for (j = dLinks.length - 1; j >= 0; j--) {
+                if (dLinks[j].source.id == d.id) {
+                    d3.select('#ct-link-' + dLinks[j].id).classed('no-disp', !0);
                 }
             }
         });
-    };
-
-    function inpChange_W(e) {
-        var inp = d3.select('#ct-inpAct');
-        var val = inp.property('value');
-        if (val == 'Screen_0' || val == 'Scenario_0' || val == 'Testcase_0') {
-            $('#ct-inpAct').addClass('errorClass');
-            return;
-        }
-        if (!validNodeDetails(val, this)) return;
-        //if(!validNodeDetails(this)) return;
-        if (childNode_W != null) {
-            var p = childNode_W;
-        } else {
-            var p = d3.select(activeNode_W);
-        }
-        var pi = p.attr('id').split('-')[2];
-        var pt = p.select('.ct-nodeLabel');
-        var t = p.attr('data-nodetype');
-        if (!d3.select('#ct-inpSugg').classed('no-disp') && temp_W && temp_W.length > 0) return;
-        if (dNodes_W[pi].id_n) {
-            dNodes_W[pi].original_name = p.text();
-            dNodes_W[pi].rnm = !0;
-        }
-        //To fix issue 378: In Mindmap, in End to end flow screen , for scenarios, tootlip is not present.
-        dNodes_W[pi].name = val;
-        pt.text(dNodes_W[pi].name);
-        d3.select('#ct-inpBox').classed('no-disp', !0);
-
-
-    };
-    var inpKeyUp_W = function(e) {
-        e = e || window.event;
-        temp_W = [];
-        var t, list;
-        //To fix issue with suggestions
-        if (childNode_W != null) {
-            var p = childNode_W;
-        } else {
-            var p = d3.select(activeNode_W);
-        }
-        //var p=d3.select(activeNode_W);
-        var val = d3.select(this).property('value');
-        var iul = d3.select('#ct-inpSugg');
-        if (e.keyCode == 13) {
-            inpChange_W();
-            return;
-        }
-        if (val.indexOf('_') == -1) {
-            iul.classed('no-disp', !0);
-            var isIE = /*@cc_on!@*/ false || !!document.documentMode;
-            if (isIE) {
-                d3.select(this.parentNode).select('#ct-inpPredict').property('value', '');
-            } else d3.select(this.parentElement).select('#ct-inpPredict').property('value', '');
-
-            return;
-        }
-        t = p.attr('data-nodetype');
-        //if(t == 'scenarios') list = scenarioList;
-        if (t == 'screens') list = scrList;
-        else if (t == 'testcases') list = tcList;
-        else return;
-        iul.selectAll('li').remove();
-        list.forEach(function(d, i) {
-            var s = d.name.toLowerCase();
-            if (s.lastIndexOf(val.toLowerCase(), 0) === 0) {
-                temp_W.push(i);
-                if (d.name.length > 23) s = d.name.slice(0, 23) + "...";
-                else s = d.name;
-                iul.append('li').attr('class', 'divider');
-                iul.append('li').append('a').attr('data-nodeid', i).attr('data-nodename', d.name).html(s).on('click', function() {
-                    var k = d3.select(this);
-                    d3.select('#ct-inpSugg').classed('no-disp', !0);
-                    d3.select('#ct-inpPredict').property('value', '');
-                    d3.select('#ct-inpAct').attr('data-nodeid', k.attr('data-nodeid')).property('value', k.attr('data-nodename')).node().focus();
-                });
-            }
-        });
-        if (temp_W.length > 0 && val != list[temp_W[0]].name) {
-            if (e.keyCode == 39) {
-                iul.classed('no-disp', !0);
-                d3.select('#ct-inpPredict').property('value', '');
-                d3.select(this).attr('data-nodeid', temp_W[0]).property('value', list[temp_W[0]].name);
-            } else {
-                iul.select('li.divider').remove();
-                iul.classed('no-disp', !1);
-                d3.select(this).attr('data-nodeid', null);
-                if (isIE) d3.select(this.parentNode).select('#ct-inpPredict').property('value', list[temp_W[0]].name);
-                else d3.select(this.parentElement).select('#ct-inpPredict').property('value', list[temp_W[0]].name);
-            }
-        } else {
-            iul.classed('no-disp', !0);
-            d3.select(this).attr('data-nodeid', null);
-            if (isIE) d3.select(this.parentNode).select('#ct-inpPredict').property('value', '');
-            else d3.select(this.parentElement).select('#ct-inpPredict').property('value', '');
-        }
-    };
-
-    function treeIterator_W(c, d, e) {
-        c.push({
-            projectID: d.projectID,
-            id: d.id,
-            childIndex: d.childIndex,
-            id_c: (d.id_c) ? d.id_c : null,
-            id_n: (d.id_n) ? d.id_n : null,
-            oid: (d.oid) ? d.oid : null,
-            name: d.name,
-            type: d.type,
-            pid: (d.parent) ? d.parent.id : null,
-            pid_c: (d.parent) ? d.parent.id_c : null,
-            task: (d.task) ? d.task : null,
-            renamed: (d.rnm) ? d.rnm : !1,
-            orig_name: (d.original_name) ? d.original_name : null
-        });
-        if (d.children && d.children.length > 0) d.children.forEach(function(t) {
-            e = treeIterator_W(c, t, e);
-        });
-        else if (d._children && d._children.length > 0) d._children.forEach(function(t) {
-            e = treeIterator(c, t, e);
-        });
-        //else if(d.type!='testcases') return !0;
-        return e;
     };
 
     function actionEvent_W(e) {
@@ -4060,7 +3673,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             flag = 0,
             alertMsg;
         var temp_data = [];
-        dNodes_W.forEach(function(e, i) {
+        dNodes.forEach(function(e, i) {
             if (i == 0) return;
             temp_data[i] = {
                 idx: i,
@@ -4070,7 +3683,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             };
         });
 
-        var layout_vertical = $('#switch-layout').hasClass('vertical-layout');
+        var layout_vertical = $scope.verticalLayout;
         if (layout_vertical) {
 
             temp_data.sort(function(a, b) {
@@ -4088,10 +3701,10 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
             'scenarios': 1
         };
         temp_data.forEach(function(e, i) {
-            dNodes_W[e.idx].childIndex = counter[e.type];
+            dNodes[e.idx].childIndex = counter[e.type];
             counter[e.type] = counter[e.type] + 1;
         })
-        error = treeIterator_W(mapData, dNodes_W[0], error);
+        error = treeIterator_W(mapData, dNodes[0], error);
 
         if (s.attr('id') == 'ct-saveAction_W') {
             blockUI('Saving flow! Please wait...');
@@ -4169,7 +3782,7 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                     node.append('span').attr('class', 'ct-nodeLabel modulename').html(res.name.replace(/_/g, ' '));
                 }
                 setModuleBoxHeight_W();
-                clearSvg_W();
+                clearSvg();
                 treeBuilder_W(currMap);
                 unassignTask = [];
                 //var selectedTab = window.localStorage['tabMindMap']
@@ -4239,8 +3852,8 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                             });
                         });
                     });
-                    //To update cassandra_ids (id_c) of nodes in dNodes_W variable
-                    dNodes_W.forEach(function(d) {
+                    //To update cassandra_ids (id_c) of nodes in dNodes variable
+                    dNodes.forEach(function(d) {
                         if (d.type == 'modules') d.id_c = res[resMap[0]];
                         else d.id_c = res[d.id_n];
                         if (!(d.id_c == null || d.id_c == 'null' || d.id_c == undefined)) {
@@ -4296,22 +3909,25 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         else lm.select('.ct-expand').classed('no-disp', !1);
     };
 
-    function clearSvg_W() {
-        d3.select('#ct-mindMap').remove();
+    function clearSvg() {
+        $scope.nodeDisplay = {};
+        $scope.linkDisplay = {};
         d3.select('#ct-ctrlBox').classed('no-disp', !0);
         d3.select('#ct-assignBox').classed('no-disp', !0);
-        d3.select('#ct-mapSvg').append('g').attr('id', 'ct-mindMap');
+        //d3.select('#ct-mapSvg').append('g').attr('id', 'ct-mindMap');
 
-        uNix_W = 0;
-        uLix_W = 0;
-        dNodes_W = [];
-        dLinks_W = [];
+        uNix = 0;
+        uLix = 0;
+        dNodes = [];
+        dLinks = [];
+        dNodes = [];
+        dLinks = [];        
         nCount = [0, 0, 0, 0];
-        cSpan_W = [0, 0];
-        cScale_W = 1;
+        cSpan = [0, 0];
+        cScale = 1;
         mapSaved = !1;
-        zoom_W.scale(cScale_W).translate(cSpan_W);
-        zoom_W.event(d3.select('#ct-mapSvg'));
+        zoom.scale(cScale).translate(cSpan);
+        zoom.event(d3.select('#ct-mapSvg'));   
     };
 
     //FUnction is tagged to every click on 'cnavas' element to validate the names of nodes when created
@@ -4323,7 +3939,6 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
     }
 
     function treeBuilder_W(tree) {
-        node_names_tc = [];
         var pidx = 0,
             levelCount = [1],
             cSize = getElementDimm(d3.select("#ct-mapSvg"));
@@ -4356,12 +3971,12 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
         // dNodes.sort(function(a, b) {
         //     return a.childIndex - b.childIndex;
         // });        
-        dNodes_W = d3Tree.nodes(tree);
-        //dLinks_W=d3Tree.links(dNodes_W);
-        dNodes_W.forEach(function(d) {
+        dNodes = d3Tree.nodes(tree);
+        //dLinks=d3Tree.links(dNodes);
+        dNodes.forEach(function(d) {
 
             // switch-layout feature
-            if ($('#switch-layout').hasClass('vertical-layout')) {
+            if ($scope.verticalLayout) {
                 d.y = cSize[0] * 0.1 * (0.9 + typeNum[d.type]);
             } else {
                 d.y = d.x;
@@ -4369,25 +3984,25 @@ mySPA.controller('mindmapController', ['$scope', '$rootScope', '$http', '$locati
                 d.x = cSize[0] * 0.1 * (0.9 + typeNum[d.type]);
             }
             if (d.oid === undefined) d.oid = d.id;
-            d.id = uNix_W++;
+            d.id = uNix++;
             addNode_W(d, !0, d.parent);
             if ($scope.tab != 'mindmapEndtoEndModules') {
                 if (d.task != null) d3.select('#ct-node-' + d.id).append('image').attr('class', 'ct-nodeTask').attr('xlink:href', 'images_mindmap/node-task-assigned.png').attr('x', 29).attr('y', -10);
             }
         });
-        dLinks_W = d3Tree.links(dNodes_W);
-        dLinks_W.forEach(function(d) {
-            d.id = uLix_W++;
+        dLinks = d3Tree.links(dNodes);
+        dLinks.forEach(function(d) {
+            d.id = uLix++;
             addLink(d.id, d.source, d.target);
         });
-        //zoom.translate([0,(cSize[1]/2)-dNodes_W[0].y]);
+        //zoom.translate([0,(cSize[1]/2)-dNodes[0].y]);
         // switch-layout feature
-        if ($('#switch-layout').hasClass('vertical-layout')) {
-            zoom_W.translate([(cSize[0] / 2) - dNodes_W[0].x, (cSize[1] / 5) - dNodes_W[0].y]);
+        if ($scope.verticalLayout) {
+            zoom.translate([(cSize[0] / 2) - dNodes[0].x, (cSize[1] / 5) - dNodes[0].y]);
         } else {
-            zoom_W.translate([(cSize[0] / 3) - dNodes_W[0].x, (cSize[1] / 2) - dNodes_W[0].y]);
+            zoom.translate([(cSize[0] / 3) - dNodes[0].x, (cSize[1] / 2) - dNodes[0].y]);
         }
-        zoom_W.event(d3.select('#ct-mapSvg'));
+        zoom.event(d3.select('#ct-mapSvg'));
     };
     //-------------------End of workflow.js---------------------------//
     //-------------------Start of Versioning.js-----------------------//
@@ -4484,7 +4099,7 @@ Purpose : displaying pop up for replication of project
         var user_id = userInfo.user_id;
         console.log("inside replicate project");
         blockUI('Loading....')
-        mindmapServices.createVersion('project_replicate', window.localStorage['_SR'], $(".project-list").val(), pid, from_v, to_v, 10).then(
+        mindmapServices.createVersion('project_replicate', window.localStorage['_SR'], $scope.projectName, pid, from_v, to_v, 10).then(
             function(res) {
                 if (res == "Invalid Session") {
                     $rootScope.redirectPage();
@@ -4510,7 +4125,8 @@ Purpose : displaying pop up for replication of project
     */
 
     function loadMindmapData_V() {
-        loadMindmapData(1);
+        $scope.param = 1;
+        loadMindmapData();
     }
 
     /*
@@ -4595,7 +4211,7 @@ Purpose : displaying pop up for replication of project
             title: active_version
         });
         blockUI('Loading...');
-        mindmapServices.getModules(versioning_enabled, window.localStorage['tabMindMap'], $(".project-list").val(), parseFloat(active_version), $('.release-list').val(), $('.cycle-list').val()).then(
+        mindmapServices.getModules(versioning_enabled, window.localStorage['tabMindMap'], $scope.projectName, parseFloat(active_version), $('.release-list').val(), $('.cycle-list').val()).then(
             function(res) {
                 if (res == "Invalid Session") {
                     $rootScope.redirectPage();
@@ -4640,7 +4256,7 @@ Purpose : displaying pop up for replication of project
             return;
         }
         blockUI('Loading...');
-        mindmapServices.createVersion('', window.localStorage['_SR'], $(".project-list").val(), '', from_v, to_v, 10).then(
+        mindmapServices.createVersion('', window.localStorage['_SR'], $scope.projectName, '', from_v, to_v, 10).then(
             function(res) {
                 if (res == "Invalid Session") {
                     $rootScope.redirectPage();
@@ -4696,7 +4312,7 @@ Purpose : displaying pop up for replication of project
       param: e : event to get the source version number tab
     */
     function versionInputDialogShow() {
-        mindmapServices.getVersions($(".project-list").val()).then(
+        mindmapServices.getVersions($scope.projectName).then(
             function(res) {
                 if (res == "Invalid Session") {
                     $rootScope.redirectPage();
@@ -4724,7 +4340,7 @@ Purpose : displaying pop up for replication of project
     function createNewVersion(from_v) {
         console.log(from_v);
         inputVersion = parseFloat($('#versionNumberInput').val());
-        mindmapServices.getVersions($(".project-list").val()).then(
+        mindmapServices.getVersions($scope.projectName).then(
             function(result) {
                 if (result == "Invalid Session") {
                     $rootScope.redirectPage();
@@ -4917,7 +4533,8 @@ Purpose : displaying pop up for replication of project
                 selectOpt('createImg');
                 collapseSidebars();
                 //loadMindmapData_W();
-                loadMindmapData(2);
+                $scope.param = 2;
+                loadMindmapData();
 
             } else {
                 if ($scope.tab == 'tabCreate') {
@@ -4926,9 +4543,9 @@ Purpose : displaying pop up for replication of project
                     if (!versioningEnabled)
                         $('.selectProject').addClass('selectProjectPosition');
                     $("#ct-main").show();
-                    if (!versioningEnabled) {
-                        addExport(versioningEnabled);
-                    }
+                    // if (!versioningEnabled) {
+                    //     addExport(versioningEnabled);
+                    // }
                 } else if ($scope.tab == 'tabAssign') {
                     $('.selectProject').show();
                     selectOpt('assignImg');
@@ -4942,7 +4559,8 @@ Purpose : displaying pop up for replication of project
                 if (versioningEnabled) {
                     loadMindmapData_V();
                 } else {
-                    loadMindmapData(0);
+                    $scope.param = 0;
+                    loadMindmapData();
                 }
 
                 $timeout(function() {
@@ -4958,8 +4576,9 @@ Purpose : displaying pop up for replication of project
 
     $scope.createMap = function(option) {
         $scope.tab = option;
+        $scope.nodeDisplay = {};
+        $scope.linkDisplay = {};
     }
-
 
     $scope.collapseETE = function() {
         if (collapseEteflag) {
@@ -5043,7 +4662,7 @@ Purpose : displaying pop up for replication of project
     $scope.toggleview = function() {
         var selectedTab = window.localStorage['tabMindMap'];
         if (selectedTab == 'mindmapEndtoEndModules')
-            var temp = dNodes_W.length;
+            var temp = dNodes.length;
         else
             var temp = dNodes.length;
 
@@ -5055,7 +4674,7 @@ Purpose : displaying pop up for replication of project
         } else if (selectedTab == 'tabAssign' && !$('#ct-assignBox').hasClass('no-disp')) {
             openDialogMindmap('Error', 'Please complete assign step first');
         } else {
-            $('#switch-layout').toggleClass('vertical-layout');
+            $scope.verticalLayout = ! $scope.verticalLayout;
             loadMap2();
         }
     };
@@ -5201,7 +4820,7 @@ Purpose : displaying pop up for replication of project
                         activeNode = '#ct-node-' + dNodes[dNodes.length - 1].parent.parent.parent.id;
                     }
                 }
-                createNode({
+                $scope.createNode({
                     name: $scope.dataJSON[i].name
                 });
                 typeo = typen;

@@ -12,7 +12,7 @@
                         <a id='createImg1' ng-click="tab = 'mindmapCreateOption'; createMapsCall()" href="#" title="Create"><span ><img id='createImg' class="highlightImg highlightImg1" src="images_mindmap/create.png" alt="Create"></span>Create</a>
                      </li>
                      <li>
-                        <a id='assignImg1' ng-click="tab = 'tabAssign'; createMapsCall()" href="#" title="Assign"><span><img id='assignImg' class="highlightImg highlightImg1" src="images_mindmap/assign.png" alt="Assign"></span>Assign</a>
+                        <a id='assignImg1' ng-click="tab = 'tabAssign'; createMapsCall();createMap('tabAssign');" href="#" title="Assign"><span><img id='assignImg' class="highlightImg highlightImg1" src="images_mindmap/assign.png" alt="Assign"></span>Assign</a>
                      </li>
                   </ul>
                </div>
@@ -37,7 +37,7 @@
    </div>
    <!-- Left Section -->
    <!-- Mid Section -->
-   <div class="createFirstContainer" ng-if="tab == 'mindmapCreateOption'">
+   <div class="createFirstContainer" ng-show="tab == 'mindmapCreateOption'">
       <div class="createOptionContainer">
          <div ng-click="createMap('tabCreate'); tab = 'tabCreate'; createMapsCall()" title="Create New">
             <img alt="Create New" class="" src="images_mindmap/ic-create-newMindmap.png">
@@ -57,11 +57,11 @@
       </div>
    </div>
    <div id="ct-main-e2e" class="fl-left" ng-if="tab == 'mindmapEndtoEndModules'">
-      <div class="endtoend-modulesContainer" ng-if="tab == 'mindmapEndtoEndModules'">
+      <div class="endtoend-modulesContainer">
          <div class="endtoend-modules-left endtoend-module-upperSection">
             <div class="endtoend-modules-left-upper">
-               <select class="makeElementFloatleft project-list" id="selectProjectEtem" >
-                  <option ng-repeat="project in projectList" app-type='{{project.apptype}}' data-id='{{project.name}}' value='{{project.id}}'>{{project.name}}</option>
+               <select class="makeElementFloatleft project-list" id="selectProjectEtem" ng-change="projectListChange()" ng-model="projectName">
+                  <option ng-repeat="project in projectList" ng-selected="projectName == project.id" app-type='{{project.apptype}}' data-id='{{project.name}}' value='{{project.id}}'>{{project.name}}</option>
                </select>
                <input type="text" class="makeElementFloatleft" id="eteSearchModules"  ng-keyup = "searchModule('eteSearchModules')" placeholder="Search modules" /><img alt="Search Icon" class="searchModuleimg" src="imgs/ic-search-icon.png" >
                <span class="eteLabel makeElementFloatleft no-disp">End to End Modules</span>
@@ -91,21 +91,34 @@
          </div>
          <div id="search-canvas-icon" class="ui-draggable ui-draggable-handle"><img alt="Search Icon" class="searchimg-canvas" src="imgs/ic-search-icon.png"><input type="text" class="search-canvas" placeholder="Search Node.."></div>
          <div id="ct-inpBox" class="no-disp">
-            <input id="ct-inpPredict" class="ct-inp"><input id="ct-inpAct" maxlength="255" class="ct-inp">
+            <input id="ct-inpPredict" class="ct-inp"><input id="ct-inpAct" maxlength="255" class="ct-inp" ng-model="inpText" ng-keyup="txtBoxKeyup($event.keyCode)">
             <ul id="ct-inpSugg" class="no-disp"></ul>
          </div>
          <div id="ct-ctrlBox" class="no-disp" style="top: 413px; left: 457.333px;">
-            <p class="ct-ctrl fa fa-plus"><span class="ct-tooltiptext">Create Scenarios</span></p>
-            <p class="ct-ctrl fa fa-hand-peace-o"><span class="ct-tooltiptext">Create Multiple Scenarios</span></p>
-            <p class="ct-ctrl fa fa-pencil-square-o"><span class="ct-tooltiptext">Edit Module</span></p>
-            <p class="ct-ctrl fa fa-trash-o ct-ctrl-inactive"><span class="ct-tooltiptext"></span></p>
+            <p class="ct-ctrl fa fa-plus" ng-click="createNode()"><span class="ct-tooltiptext">Create Scenarios</span></p>
+            <!-- <p class="ct-ctrl fa fa-hand-peace-o" ng-click="createMultipleNode()"><span class="ct-tooltiptext">Create Multiple Scenarios</span></p> -->
+            <p class="ct-ctrl fa fa-pencil-square-o" ng-click="editNode()"><span class="ct-tooltiptext">Edit Module</span></p>
+            <p class="ct-ctrl fa fa-trash-o ct-ctrl-inactive" ng-click="deleteNode()"><span class="ct-tooltiptext"></span></p>
          </div>
          <div id="ct-assignBox" class="no-disp">
             <div id="ct-assignTable"></div>
             <div class="ct-assignDetailsBox"><textarea id="ct-assignDetails" placeholder="Enter Details"></textarea></div>
-            <div id="ct-assignButton"><a>OK</a></div>
-            <div id="ct-unassignButton"><a>Unassign</a></div>
-         </div>
+            <div id="ct-assignButton" ng-click="addTask()"><a>OK</a></div>
+            <div id="ct-unassignButton" ng-click="removeTask()"><a>Unassign</a></div>
+         </div>         
+         <svg id="ct-mapSvg" style="width: 100%; height: 100%;">
+            <g id="ct-mindMap">
+                <path ng-repeat="(id,link) in linkDisplay" ng-model="link" id="{{id}}" class="ct-link" d="{{link.d}}"></path>           
+                <g ng-repeat="(id, node) in nodeDisplay" ng-model="dispnode" id="ct-node-{{id}}" class="ct-node" data-nodetype="{{node.type}}" transform="{{node.transform}}">
+                    <image height="40px" width="40px" class="ct-nodeIcon" xlink:href={{"images_mindmap/node-"+node.type+".png"}} style="opacity:1;" ng-click="nodeUniversalClick($index)" ></image>
+                    <text class="ct-nodeLabel" text-anchor="middle" x="20" title="{{node.title}}" y="50">{{node.name}}</text>
+                    <title>{{node.title}}</title>
+                    <circle ng-if="node.type=='modules'|| node.type=='modules_endtoend'" class="ct-{{node.type}} ct-cRight ct-nodeBubble" cx="{{verticalLayout ? 20 : 44}}" cy="{{verticalLayout ? 55 : 20}}" r="4" ng-click = "toggleNode(id)"></circle>
+                    <circle ng-if="node.type=='scenarios'" class="ct-{{node.type}} ct-cRight ct-nodeBubble" cx="-3" cy="20" r="4"  ng-mousedown="moveNodeBegin(id)" ng-mouseup="moveNodeEnd(id)"></circle>    
+                </g>         
+            </g>
+         </svg>
+
          <svg id="ct-legendBox">
             <g transform="translate(10,10)">
                <g>
@@ -128,62 +141,83 @@
          </svg>
          <svg id="ct-actionBox">
             <g>
-               <g id="ct-saveAction" class="ct-actionButton" onclick='actionEvent()'>
+               <g id="ct-saveAction" class="ct-actionButton" ng-click = "actionEvent($event)">
                   <rect x="0" y="0" rx="12" ry="12" width="80px" height="50px"></rect>
                   <text x="23" y="18">Save</text>
                </g>
-               <g id="ct-createAction" class="ct-actionButton disableButton" onclick='actionEvent()'>
+               <g id="ct-createAction" class="ct-actionButton disableButton" ng-click = "actionEvent($event)">
                   <rect x="100" y="0" rx="12" ry="12" width="80px" height="50px"></rect>
                   <text x="114" y="18">Create</text>
                </g>
             </g>
          </svg>
+         <svg id="ct-legendBox">
+            <g transform="translate(10,10)">
+               <g>
+                  <circle class="ct-modules" cx="0" cy="0" r="10"></circle>
+                  <text class="ct-nodeLabel" x="15" y="3">Modules</text>
+               </g>
+               <g>
+                  <circle class="ct-scenarios" cx="90" cy="0" r="10"></circle>
+                  <text class="ct-nodeLabel" x="105" y="3">Scenarios</text>
+               </g>
+               <g>
+                  <circle class="ct-screens" cx="180" cy="0" r="10"></circle>
+                  <text class="ct-nodeLabel" x="195" y="3">Screens</text>
+               </g>
+               <g>
+                  <circle class="ct-testcases" cx="270" cy="0" r="10"></circle>
+                  <text class="ct-nodeLabel" x="285" y="3">Test Cases</text>
+               </g>
+            </g>
+         </svg>         
       </div>
    </div>
    <div id="ct-main" class="fl-left">
       <div id="ct-projectList">
          <div class="ct-project"></div>
       </div>
-      <!--<div ng-if="tab == 'tabRequirement'" id="page-taskName" class="showContainer" style="width:0px !important"><span class="taskname">Requirement</span></div>-->
-      <div ng-if="tab == 'tabCreate'" id="ct-moduleBox" class="ct-moduleBoxOptional tabCreate">
+      <!--<div ng-show="tab == 'tabRequirement'" id="page-taskName" class="showContainer" style="width:0px !important"><span class="taskname">Requirement</span></div>-->
+      <div ng-show="tab == 'tabCreate'" id="ct-moduleBox" class="ct-moduleBoxOptional tabCreate">
          <div class="ct-project-tab">
-            <button ng-if="tab=='tabCreate'" style="position: absolute;padding: 0px 13px;top: 1px;right: 209px;" class="btn btn-md pull-right pairwise-GenBtn" ng-click="createNewMapModal()" title="Create New Mindmap">Create New</button>
-            <span ng-if="tab == 'tabCreate'" id='SearchCreate-ete'>
+            <button ng-show="tab=='tabCreate'" style="position: absolute;padding: 0px 13px;top: 1px;right: 209px;" class="btn btn-md pull-right pairwise-GenBtn" ng-click="createNewMapModal()" title="Create New Mindmap">Create New</button>
+            <span ng-show="tab == 'tabCreate'" id='SearchCreate-ete'>
             <span class="search-create"><img alt="Search Icon" class="searchModuleimg-create" src="imgs/ic-search-icon.png"></span>
             <input type="text" id="searchModule-create" class="searchbox-create" placeholder="Search Modules" ng-keyup = "searchModule('searchModule-create')">
             </span>
             <span class="selectProject">
                <label class="selectProjectLabel">Project:</label>
-               <select class="project-list">
-                  <option ng-repeat="project in projectList" app-type='{{project.apptype}}' data-id='{{project.name}}' value='{{project.id}}'>{{project.name}}</option>
+               <select class="project-list" ng-change="projectListChange()" ng-model="projectName">
+                    <option ng-repeat="project in projectList" ng-selected="projectName == project.id" app-type='{{project.apptype}}' data-id='{{project.name}}' value='{{project.id}}'>{{project.name}}</option>
                </select>
                <span id="copy-paste">
                <i class="fa fa-crop fa-lg plus-icon" id="copyImg1" title="add a rectangle" ng-click="startCopy()"></i>
                <i class="fa fa-files-o fa-lg plus-icon" title="copy selected map" ng-click="copyMindMap()"></i>
                <i class="fa fa-clipboard fa-lg plus-icon" id="pasteImg1" title="Paste map" ng-click="pasteMap()"></i>
+               <i class="glyphicon glyphicon-export export-icon" ng-click="exportData(0)" title="Export Version"></i>
                </span>
             </span>
          </div>
          <!-- versioning -->
          <div class="ct-nodeBox">
             <div ng-repeat="map in allMMaps" ng-click="loadMap($index)" class="ct-node fl-left" data-mapid="{{$index}}" title="{{map.name}}" style="width: 139px;">
-               <img class="ct-nodeIcon" src="images_mindmap/node-modules-no.png" alt="Module" aria-hidden="true">
+               <img class="ct-nodeIcon" src="images_mindmap/node-modules.png" alt="Module" aria-hidden="true">
                <span class="ct-nodeLabel">{{map.name}}</span>
             </div>
          </div>
          <span id='ctExpandCreate' class=''><img alt="Collapse Icon" class="iconSpaceArrow" src="imgs/ic-collapse.png"></span>
          <!--<div id="ctExpandCreate" class="ct-expand"></div>-->
       </div>
-      <div ng-if="tab == 'tabAssign'" id="ct-AssignBox" class="ct-moduleBoxOptional tabAssign">
+      <div ng-show="tab == 'tabAssign'" id="ct-AssignBox" class="ct-moduleBoxOptional tabAssign">
          <div class='ct-project-tab'>
-            <span ng-if="tab == 'tabAssign'" id='SearchAssign-ete'>
+            <span ng-show="tab == 'tabAssign'" id='SearchAssign-ete'>
             <span class="search-assign"><img alt="Search Icon" class="searchModuleimg-assign" src="imgs/ic-search-icon.png"></span>
             <input type="text" id="searchModule-assign" class="searchbox-assign" placeholder="Search Modules"  ng-keyup = "searchModule('searchModule-assign')">
             </span>
             <span class="selectProject">
                <label class="selectProjectLabel">Project:</label>
-               <select class="project-list">
-                  <option ng-repeat="project in projectList" app-type='{{project.apptype}}' data-id='{{project.name}}' value='{{project.id}}'>{{project.name}}</option>
+               <select class="project-list" ng-change="projectListChange()" ng-model="projectName">
+                    <option ng-repeat="project in projectList" ng-selected="projectName == project.id" app-type='{{project.apptype}}' data-id='{{project.name}}' value='{{project.id}}'>{{project.name}}</option>
                </select>
             </span>
             <span class="selectRelease selectProjectPosition"> 
@@ -197,7 +231,7 @@
          </div>
          <div class="ct-nodeBox">
             <div ng-repeat="map in allMMaps" ng-click="loadMap($index)" class="ct-node fl-left" data-mapid="{{$index}}" title="{{map.name}}" style="width: 139px;">
-               <img class="ct-nodeIcon" src="images_mindmap/{{map.type}}.png" alt="Module" aria-hidden="true">
+               <img class="ct-nodeIcon" src="images_mindmap/node-{{map.type}}.png" alt="Module" aria-hidden="true">
                <span class="ct-nodeLabel">{{map.name}}</span>
             </div>
          </div>
@@ -214,21 +248,29 @@
          </div>
          <div id="search-canvas-icon" class="ui-draggable ui-draggable-handle"><img alt="Search Icon" class="searchimg-canvas" src="imgs/ic-search-icon.png"><input type="text" class="search-canvas" placeholder="Search Node.."></div>
          <div id="ct-inpBox" class="no-disp">
-            <input id="ct-inpPredict" class="ct-inp"><input id="ct-inpAct" maxlength="255" class="ct-inp">
-            <ul id="ct-inpSugg" class="no-disp"></ul>
-         </div>
-         <div id="ct-ctrlBox" class="no-disp" style="top: 413px; left: 457.333px;">
-            <p class="ct-ctrl fa fa-plus"><span class="ct-tooltiptext">Create Scenarios</span></p>
-            <p class="ct-ctrl fa fa-hand-peace-o"><span class="ct-tooltiptext">Create Multiple Scenarios</span></p>
-            <p class="ct-ctrl fa fa-pencil-square-o"><span class="ct-tooltiptext">Edit Module</span></p>
-            <p class="ct-ctrl fa fa-trash-o ct-ctrl-inactive"><span class="ct-tooltiptext"></span></p>
-         </div>
-         <div id="ct-assignBox" class="no-disp">
+                <input id="ct-inpPredict" class="ct-inp"><input id="ct-inpAct" maxlength="255" class="ct-inp" ng-model="inpText" ng-keyup="txtBoxKeyup($event.keyCode)">
+                <ul id="ct-inpSugg" class="no-disp"></ul>
+        </div>
+        <div id="ct-assignBox" class="no-disp">
             <div id="ct-assignTable"></div>
             <div class="ct-assignDetailsBox"><textarea id="ct-assignDetails" placeholder="Enter Details"></textarea></div>
-            <div id="ct-assignButton"><a>OK</a></div>
-            <div id="ct-unassignButton"><a>Unassign</a></div>
-         </div>
+            <div id="ct-assignButton" ng-click="addTask()"><a>OK</a></div>
+            <div id="ct-unassignButton" ng-click="removeTask()"><a>Unassign</a></div>
+        </div>
+         <svg id="ct-mapSvg" style="width: 100%; height: 100%;">
+            <g id="ct-mindMap">
+                <path ng-repeat="(id,link) in linkDisplay" ng-model="link" id="{{id}}" class="ct-link" d="{{link.d}}"></path>           
+                <g ng-repeat="(id, node) in nodeDisplay" ng-model="dispnode" id="ct-node-{{id}}" class="ct-node" data-nodetype="{{node.type}}" transform="{{node.transform}}">
+                    <image height="40px" width="40px" class="ct-nodeIcon" xlink:href={{"images_mindmap/node-"+node.type+".png"}} style="opacity:1;" ng-click="nodeUniversalClick($index)"></image>
+                    <image ng-if="node.task == true" class="ct-nodeTask" width="21px" height="21px" xlink:href="images_mindmap/node-task-assigned.png" style="opacity:{{node.taskOpacity}}" x="29" y="-10"></image>                    
+                    <text class="ct-nodeLabel" text-anchor="middle" x="20" title="{{node.title}}" y="50">{{node.name}}</text>
+                    <title>{{node.title}}</title>
+                    <circle ng-if="node.type=='scenarios' || node.type=='screens' || node.type=='modules' || node.type=='modules_endtoend'" class="ct-{{node.type}} ct-cRight ct-nodeBubble" cx="{{verticalLayout ? 20 : 44}}" cy="{{verticalLayout ? 55 : 20}}" r="4" ng-click="toggleNode(id)"></circle>
+                    <circle ng-if="node.type=='scenarios' || node.type=='screens' || node.type=='testcases'" class="ct-{{node.type}} ct-cRight ct-nodeBubble" cx="-3" cy="20" r="4" ></circle>    
+                </g>         
+            </g>
+         </svg>
+
          <svg id="ct-legendBox">
             <g transform="translate(10,10)">
                <g>
@@ -251,16 +293,36 @@
          </svg>
          <svg id="ct-actionBox">
             <g>
-               <g id="ct-saveAction" class="ct-actionButton" onclick='actionEvent()'>
+               <g id="ct-saveAction" class="ct-actionButton" ng-click = "actionEvent($event)">
                   <rect x="0" y="0" rx="12" ry="12" width="80px" height="50px"></rect>
                   <text x="23" y="18">Save</text>
                </g>
-               <g id="ct-createAction" class="ct-actionButton disableButton" onclick='actionEvent()'>
+               <g id="ct-createAction" class="ct-actionButton disableButton" ng-click = "actionEvent($event)">
                   <rect x="100" y="0" rx="12" ry="12" width="80px" height="50px"></rect>
                   <text x="114" y="18">Create</text>
                </g>
             </g>
          </svg>
+         <svg id="ct-legendBox">
+            <g transform="translate(10,10)">
+               <g>
+                  <circle class="ct-modules" cx="0" cy="0" r="10"></circle>
+                  <text class="ct-nodeLabel" x="15" y="3">Modules</text>
+               </g>
+               <g>
+                  <circle class="ct-scenarios" cx="90" cy="0" r="10"></circle>
+                  <text class="ct-nodeLabel" x="105" y="3">Scenarios</text>
+               </g>
+               <g>
+                  <circle class="ct-screens" cx="180" cy="0" r="10"></circle>
+                  <text class="ct-nodeLabel" x="195" y="3">Screens</text>
+               </g>
+               <g>
+                  <circle class="ct-testcases" cx="270" cy="0" r="10"></circle>
+                  <text class="ct-nodeLabel" x="285" y="3">Test Cases</text>
+               </g>
+            </g>
+         </svg>         
       </div>
       <div ng-if="tab == 'tabCreate'" id="ct-canvas" class="tabCreate">
          <div id="minimap-wrapper" style="display: none;">
@@ -272,21 +334,33 @@
          </div>
          <div id="search-canvas-icon" class="ui-draggable ui-draggable-handle"><img alt="Search Icon" class="searchimg-canvas" src="imgs/ic-search-icon.png"><input type="text" class="search-canvas" placeholder="Search Node.."></div>
          <div id="ct-inpBox" class="no-disp">
-            <input id="ct-inpPredict" class="ct-inp"><input id="ct-inpAct" maxlength="255" class="ct-inp">
+            <input id="ct-inpPredict" class="ct-inp"><input id="ct-inpAct" maxlength="255" class="ct-inp" ng-model="inpText" ng-keyup="txtBoxKeyup($event.keyCode)">
             <ul id="ct-inpSugg" class="no-disp"></ul>
          </div>
          <div id="ct-ctrlBox" class="no-disp" style="top: 413px; left: 457.333px;">
-            <p class="ct-ctrl fa fa-plus"><span class="ct-tooltiptext">Create Scenarios</span></p>
-            <p class="ct-ctrl fa fa-hand-peace-o"><span class="ct-tooltiptext">Create Multiple Scenarios</span></p>
-            <p class="ct-ctrl fa fa-pencil-square-o"><span class="ct-tooltiptext">Edit Module</span></p>
-            <p class="ct-ctrl fa fa-trash-o"><span class="ct-tooltiptext">Delete</span></p>
+            <p class="ct-ctrl fa fa-plus" ng-click="createNode()"><span class="ct-tooltiptext">Create Scenarios</span></p>
+            <p class="ct-ctrl fa fa-hand-peace-o" ng-click="createMultipleNode()"><span class="ct-tooltiptext">Create Multiple Scenarios</span></p>
+            <p class="ct-ctrl fa fa-pencil-square-o" ng-click="editNode()"><span class="ct-tooltiptext">Edit Module</span></p>
+            <p class="ct-ctrl fa fa-trash-o ct-ctrl-inactive" ng-click="deleteNode()"><span class="ct-tooltiptext"></span></p>
          </div>
          <div id="ct-assignBox" class="no-disp">
             <div id="ct-assignTable"></div>
             <div class="ct-assignDetailsBox"><textarea id="ct-assignDetails" placeholder="Enter Details"></textarea></div>
-            <div id="ct-assignButton"><a>OK</a></div>
-            <div id="ct-unassignButton"><a>Unassign</a></div>
+            <div id="ct-assignButton" ng-click="addTask()"><a>OK</a></div>
+            <div id="ct-unassignButton" ng-click="removeTask()"><a>Unassign</a></div>
          </div>
+         <svg id="ct-mapSvg" style="width: 100%; height: 100%;">
+            <g id="ct-mindMap">
+                <path ng-repeat="(id,link) in linkDisplay" ng-model="link" id="{{id}}" class="ct-link" d="{{link.d}}"></path>           
+                <g ng-repeat="(id, node) in nodeDisplay" ng-model="dispnode" id="ct-node-{{id}}" class="ct-node" data-nodetype="{{node.type}}" transform="{{node.transform}}">
+                    <image height="40px" width="40px" class="ct-nodeIcon" xlink:href={{"images_mindmap/node-"+node.type+".png"}} style="opacity:1;" ng-click="nodeUniversalClick($index)"></image>
+                    <text class="ct-nodeLabel" text-anchor="middle" x="20" title="{{node.title}}" y="50">{{node.name}}</text>
+                    <title>{{node.title}}</title>
+                    <circle ng-if="node.type=='scenarios' || node.type=='screens' || node.type=='modules'" class="ct-{{node.type}} ct-cRight ct-nodeBubble" cx="{{verticalLayout ? 20 : 44}}" cy="{{verticalLayout ? 55 : 20}}" r="4"  ng-click = "toggleNode(id)"></circle>
+                    <circle ng-if="node.type=='scenarios' || node.type=='screens' || node.type=='testcases'" class="ct-{{node.type}} ct-cRight ct-nodeBubble" cx="-3" cy="20" r="4" ng-mousedown="moveNodeBegin(id)" ng-mouseup="moveNodeEnd(id)"></circle> 
+                </g>         
+            </g>
+        </svg>
          <svg id="ct-legendBox">
             <g transform="translate(10,10)">
                <g>
@@ -309,11 +383,11 @@
          </svg>
          <svg id="ct-actionBox">
             <g>
-               <g id="ct-saveAction" class="ct-actionButton" onclick='actionEvent()'>
+               <g id="ct-saveAction" class="ct-actionButton" ng-click = "actionEvent($event)">
                   <rect x="0" y="0" rx="12" ry="12" width="80px" height="50px"></rect>
                   <text x="23" y="18">Save</text>
                </g>
-               <g id="ct-createAction" class="ct-actionButton disableButton" onclick='actionEvent()'>
+               <g id="ct-createAction" class="ct-actionButton disableButton" ng-click = "actionEvent($event)">
                   <rect x="100" y="0" rx="12" ry="12" width="80px" height="50px"></rect>
                   <text x="114" y="18">Create</text>
                </g>
@@ -380,7 +454,7 @@
             <!--Popup-->
          </div>
          <!--Images Blocks-->
-         <div ng-if="tab == 'tabCreate' || tab == 'tabAssign' || tab=='mindmapEndtoEndModules'" class="thumbnail thumbnail-custom">
+         <div ng-show="tab == 'tabCreate' || tab == 'tabAssign' || tab=='mindmapEndtoEndModules'" class="thumbnail thumbnail-custom">
             <!--<div class="thumbnail thumbnail-custom">-->
             <a class="slidePopup" ng-click ="toggleview()" id="switch-layout" class="vertical-layout" title="SwitchLayout" >
                <img class="thumb-ic" src="imgs/switch.png" alt="SwitchLayout" style="height: 55px;">
@@ -389,7 +463,7 @@
                </div>
             </a>
          </div>
-         <div ng-if="tab == 'tabCreate' || tab == 'tabAssign' || tab=='mindmapEndtoEndModules'" class="thumbnail thumbnail-custom">
+         <div ng-show="tab == 'tabCreate' || tab == 'tabAssign' || tab=='mindmapEndtoEndModules'" class="thumbnail thumbnail-custom">
             <!--<div class="thumbnail thumbnail-custom">-->
             <a class="slidePopup" ng-click ="fullScreen()" id="fullscr" title="full screen">
                <img class="thumb-ic" src="imgs/fscr.png" alt="full screen" style="height: 55px;">
@@ -398,7 +472,7 @@
                </div>
             </a>
          </div>
-         <div ng-if="tab == 'tabCreate'" class="thumbnail thumbnail-custom">
+         <div ng-show="tab == 'tabCreate'" class="thumbnail thumbnail-custom">
             <!--<div class="thumbnail thumbnail-custom">-->
             <a class="slidePopup" ng-click ="toggleMinimap()" id="togglemini" title="toggle minimap">
                <img class="thumb-ic" src="imgs/ic-webservice.png" alt="full screen" style="height: 55px;">
@@ -597,7 +671,7 @@
             <h4 class="modal-title">Select a Project</h4>
          </div>
          <div class="modal-body">
-            <select class="project-list project-list-popup">
+            <select class="project-list project-list-popup" ng-change="projectListChange()" ng-model="projectName">
                <option value="" disabled selected>Please Select Project</option>
                <option value="project1">Project1</option>
                <option value="project2">Project2</option>
