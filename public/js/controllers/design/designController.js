@@ -822,7 +822,7 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                                         }                                  
                                     var li = "<li data-xpath='" + ob.xpath.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "' data-left='" + ob.left + "' data-top='" + ob.top + "' data-width='" + ob.width + "' data-height='" + ob.height + "' data-tag='" + tag + "' data-url='" + ob.url + "' data-hiddentag='" + ob.hiddentag + "' class='item select_all " + tag + "x' val=" + ob.tempId + "><a><span class='highlight'></span><input type='checkbox' class='checkall' name='selectAllListItems' /><span title='" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ').replace(/["]/g, '&quot;').replace(/[']/g, '&#39;') + "' class='ellipsis " + addcusOb + "'>" + custN.replace(/\r?\n|\r/g, " ").replace(/\s+/g, ' ') + "</span></a></li>";
                                     // }                                       
-                                // }        
+                                // }
                                 angular.element(innerUL).append(li);                        
                             }
                             $(".checkStylebox, .checkall").prop("disabled", false);
@@ -3709,23 +3709,32 @@ mySPA.controller('designController', ['$scope', '$rootScope', '$http', '$locatio
                                 }
                             }
                         }
-                    
-                        var sorted_custnames = allCustnames.slice().sort();
-                        for (var p = 0; p < allCustnames.length - 1; p++) {
-                            if (sorted_custnames[p + 1] == sorted_custnames[p]) {
-                                duplicateCustnames.push(sorted_custnames[p]);               //get duplicate custnames
+                        var custnameIndices = {};
+                        for(var p=0;p<allCustnames.length;p++)
+                        {
+                            if(!custnameIndices.hasOwnProperty(allCustnames[p]))
+                            {
+                                //custnameIndices[allCustnames[p]] = custnameIndices[allCustnames[p]] + 1;
+                                custnameIndices[allCustnames[p]] = [];
+                            }
+                                custnameIndices[allCustnames[p]].push(p);
+                        }
+                        var custnameIndices = Object.values(custnameIndices);
+                        for(var q=0;q<custnameIndices.length;q++)
+                        {
+                            if(custnameIndices[q].length > 1)
+                            {
+                                $.each($("#scraplist li"), function() {
+                                    for(var r=0;r<custnameIndices[q].length -1;r++)
+                                    {
+                                        if(parseInt($(this)[0].getAttribute("val")) == parseInt(custnameIndices[q][r]))                                   // if($.trim($(this)[0].childNodes[0].childNodes[2].innerHTML) == $.trim(duplicateCustnamesLen[q]))
+                                        {
+                                            $(this)[0].style.display = 'block';               //Display duplicate custnames only
+                                        }
+                                    }
+                                });
                             }
                         }
-                        //console.log("Duplicate Custnames", duplicateCustnames);
-                        $.each($("#scraplist li"), function() {
-                                for(var q=0;q<duplicateCustnames.length;q++)
-                                {
-                                    if($.trim($(this)[0].childNodes[0].childNodes[2].innerHTML) == $.trim(duplicateCustnames[q]))
-                                    {
-                                        $(this).show();                                         //Display duplicate custnames only
-                                    }
-                                }
-                            });
                 }
                 else{
                     $.each($("#scraplist li"), function() {
@@ -4655,13 +4664,13 @@ function contentTable(newTestScriptDataLS) {
         //ends here
 		//Object
 		else if (selectedText == "@Object") {
+            var sc = Object.keys(keywordArrayList.object);
+            selectedKeywordList = "object";
             objName = "@Object";
             url = "";
             var sc;
             var res = '';
             if (appTypeLocal == 'Web') {
-                sc = Object.keys(keywordArrayList.object);
-                selectedKeywordList = "object";
                 var newTSDataLS = angular.element(document.getElementById('jqGrid')).scope().newTestScriptDataLS;
                 if (newTSDataLS) {
                     if (newTSDataLS != "undefined") {
@@ -6160,7 +6169,7 @@ function getTags(data) {
     var obnames = [];
     var appTypeLocal = JSON.parse(window.localStorage['_CT']).appType;
     if (appTypeLocal == "Web") {
-        obnames = ["@Generic","@Excel","@Custom","@Browser","@BrowserPopUp"];
+        obnames = ["@Generic","@Excel","@Custom","@Browser","@BrowserPopUp","@Object"];
     } else if (appTypeLocal == "Webservice") {
         obnames = ["@Generic","@Excel","WebService List"];
     } else if (appTypeLocal == "Mainframe") {

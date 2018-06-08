@@ -1,5 +1,5 @@
 <style>
-    body{font-family: LatoWeb; height: 98%; margin: 0;}
+    body{font-family: 'LatoWeb', sans-serif; height: 98%; margin: 0;}
     .mainContainer{
         float: left;
         padding: 5px;
@@ -92,17 +92,16 @@
         border-collapse: collapse;
         border: 1px solid #cfcfcf;
         width: 100%;
-        font: 14px cabin_Regular;
         float: left;
         margin: 1% 0;
-        font-family: LatoWeb;
         font-size: 14px;
     }
-    .midContainer td{padding-top: 5px; border: 1px solid #cfcfcf;}
+    .midContainer td{padding-top: 5px; border: 1px solid #cfcfcf;float: left;}
     .midContainer td label{
         text-align: right;
         float: left;
-        width: 29%;
+        width: 35%;
+        font-family: 'LatoWeb',sans-serif;
         padding-right: 5px;
         padding-bottom: 5px;
     }
@@ -149,6 +148,9 @@
         width: 100%;
         table-layout: table;
     }
+    .latobold{
+        font-weight: bold;
+    }
 </style>
 
 
@@ -156,9 +158,9 @@
     {{#each overallstatus}}
     <div class="h2Header" >
       <div class="headerRepDetails" >
-          <label>Report Generated Date : </label><span>{{date}}</span>
+          <label>Report Generated Date : </label><span class='latobold'>{{date}}</span>
           <br>
-          <label>Report Generated Time : </label><span>{{time}}</span>
+          <label>Report Generated Time : </label><span class='latobold'>{{time}}</span>
       </div>
       <h3>SLK Nineteen68 Execution Report</h3>
     </div>
